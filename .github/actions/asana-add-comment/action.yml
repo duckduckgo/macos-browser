@@ -28,10 +28,8 @@ runs:
   steps:
     - id: extract-task-id
       if: ${{ inputs.task-url }}
-      uses: ./.github/actions/asana-extract-task-id
-      with:
-        task-url: ${{ inputs.task-url }}
-        access-token: ${{ inputs.access-token }}
+      shell: bash
+      run: bundle exec fastlane run asana_extract_task_id task_url:"${{ inputs.task-url }}"
 
     - id: process-template-payload
       if: ${{ inputs.template-name }}

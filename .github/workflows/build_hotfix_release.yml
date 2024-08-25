@@ -86,11 +86,12 @@ jobs:
           ref: ${{ github.ref_name }}
           submodules: recursive
 
+      - name: Set up fastlane
+        run: bundle install
+
       - name: Extract Asana Task ID
         id: task-id
-        uses: ./.github/actions/asana-extract-task-id
-        with:
-          task-url: ${{ github.event.inputs.asana-task-url }}
+        run: bundle exec fastlane run asana_extract_task_id task_url:"${{ github.event.inputs.asana-task-url }}"
 
       - name: Update Asana tasks for the release
         env:

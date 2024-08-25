@@ -20,10 +20,8 @@ runs:
   using: "composite"
   steps:
     - id: extract-task-id
-      uses: ./.github/actions/asana-extract-task-id
-      with:
-        task-url: ${{ inputs.task-url }}
-        access-token: ${{ inputs.access-token }}
+      shell: bash
+      run: bundle exec fastlane run asana_extract_task_id task_url:"${{ inputs.task-url }}"
 
     - id: extract-assignee-id
       uses: ./.github/actions/asana-extract-task-assignee

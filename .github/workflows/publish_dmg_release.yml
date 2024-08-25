@@ -129,14 +129,15 @@ jobs:
             echo "::notice::Branch ${branch} doesn't exist on the remote repository, staying on main."
           fi
 
+      - name: Set up fastlane
+        run: bundle install
+
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
       - name: Extract Asana Task ID
         id: task-id
-        uses: ./.github/actions/asana-extract-task-id
-        with:
-          task-url: ${{ env.asana-task-url }}
+        run: bundle exec fastlane run asana_extract_task_id task_url:"${{ env.asana-task-url }}"
 
       - name: Fetch and validate release notes
         env:
