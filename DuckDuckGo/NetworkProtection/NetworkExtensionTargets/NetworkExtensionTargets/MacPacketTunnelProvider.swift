@@ -24,6 +24,7 @@ import NetworkExtension
 import Networking
 import PixelKit
 import Subscription
+import WireGuard
 
 final class MacPacketTunnelProvider: PacketTunnelProvider {
 
@@ -461,6 +462,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                    tunnelHealthStore: tunnelHealthStore,
                    controllerErrorStore: controllerErrorStore,
                    snoozeTimingStore: NetworkProtectionSnoozeTimingStore(userDefaults: .netP),
+                   wireGuardInterface: DefaultWireGuardInterface(),
                    keychainType: Bundle.keychainType,
                    tokenStore: tokenStore,
                    debugEvents: debugEvents,
@@ -625,4 +627,34 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         }
     }
 
+}
+
+final class DefaultWireGuardInterface: WireGuardInterface {
+    func turnOn(settings: UnsafePointer<CChar>, handle: Int32) -> Int32 {
+        wgTurnOn(settings, handle)
+    }
+
+    func turnOff(handle: Int32) {
+        wgTurnOff(handle)
+    }
+
+    func getConfig(handle: Int32) -> UnsafeMutablePointer<CChar>? {
+        return wgGetConfig(handle)
+    }
+
+    func setConfig(handle: Int32, config: String) -> Int64 {
+        return wgSetConfig(handle, config)
+    }
+
+    func bumpSockets(handle: Int32) {
+        wgBumpSockets(handle)
+    }
+
+    func disableSomeRoamingForBrokenMobileSemantics(handle: Int32) {
+        wgDisableSomeRoamingForBrokenMobileSemantics(handle)
+    }
+
+    func setLogger(context: UnsafeMutableRawPointer?, logFunction: (@convention(c) (UnsafeMutableRawPointer?, Int32, UnsafePointer<CChar>?) -> Void)?) {
+        wgSetLogger(context, logFunction)
+    }
 }

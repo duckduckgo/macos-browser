@@ -1214,6 +1214,8 @@
 		4B4D60E22A0C883A00BCD287 /* AppMain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60E12A0C883A00BCD287 /* AppMain.swift */; };
 		4B4D60E32A0C883A00BCD287 /* AppMain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60E12A0C883A00BCD287 /* AppMain.swift */; };
 		4B4F72EC266B2ED300814C60 /* CollectionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4F72EB266B2ED300814C60 /* CollectionExtension.swift */; };
+		4B5235452C7BB14D00AFAF64 /* WireGuard in Frameworks */ = {isa = PBXBuildFile; productRef = 4B5235442C7BB14D00AFAF64 /* WireGuard */; };
+		4B5235472C7BB15700AFAF64 /* WireGuard in Frameworks */ = {isa = PBXBuildFile; productRef = 4B5235462C7BB15700AFAF64 /* WireGuard */; };
 		4B59023E26B35F3600489384 /* ChromiumLoginReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59023926B35F3600489384 /* ChromiumLoginReader.swift */; };
 		4B59024026B35F3600489384 /* ChromiumDataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59023B26B35F3600489384 /* ChromiumDataImporter.swift */; };
 		4B59024826B3673600489384 /* ThirdPartyBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59024726B3673600489384 /* ThirdPartyBrowser.swift */; };
@@ -4417,6 +4419,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4B5235452C7BB14D00AFAF64 /* WireGuard in Frameworks */,
 				37269F012B332FC8005E8E46 /* Common in Frameworks */,
 				9D9DE57B2C63AA1F00D20B15 /* AppKitExtensions in Frameworks */,
 				EE7295E92A545BC4008C0991 /* NetworkProtection in Frameworks */,
@@ -4481,6 +4484,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F1DF95E52BD1807C0045E591 /* Subscription in Frameworks */,
+				4B5235472C7BB15700AFAF64 /* WireGuard in Frameworks */,
 				37269EFF2B332FBB005E8E46 /* Common in Frameworks */,
 				EE7295E72A545BBB008C0991 /* NetworkProtection in Frameworks */,
 				F198C7162BD18A44000BF24D /* PixelKit in Frameworks */,
@@ -8809,6 +8813,7 @@
 				7B37C7A42BAA32A50062546A /* Subscription */,
 				F198C7172BD18A4C000BF24D /* PixelKit */,
 				9D9DE57A2C63AA1F00D20B15 /* AppKitExtensions */,
+				4B5235442C7BB14D00AFAF64 /* WireGuard */,
 			);
 			productName = NetworkProtectionSystemExtension;
 			productReference = 4B25375A2A11BE7300610219 /* com.duckduckgo.macos.vpn.network-extension.debug.systemextension */;
@@ -8930,6 +8935,7 @@
 				F198C7152BD18A44000BF24D /* PixelKit */,
 				7B2366872C09FADA002D393F /* VPNAppLauncher */,
 				9D9DE5762C63AA1600D20B15 /* AppKitExtensions */,
+				4B5235462C7BB15700AFAF64 /* WireGuard */,
 			);
 			productName = NetworkProtectionAppExtension;
 			productReference = 4B4D603D2A0B290200BCD287 /* NetworkProtectionAppExtension.appex */;
@@ -9273,6 +9279,7 @@
 				B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */,
 				F1D43AF12B98E47800BAB743 /* XCRemoteSwiftPackageReference "BareBonesBrowser" */,
 				9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */,
+				4B5235432C7BB14D00AFAF64 /* XCRemoteSwiftPackageReference "wireguard-apple" */,
 			);
 			productRefGroup = AA585D7F248FD31100E9A3E2 /* Products */;
 			projectDirPath = "";
@@ -13468,12 +13475,20 @@
 				revision = c06709ba8a586f6a40190bacaaaaa96b2d55e540;
 			};
 		};
+		4B5235432C7BB14D00AFAF64 /* XCRemoteSwiftPackageReference "wireguard-apple" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/duckduckgo/wireguard-apple";
+			requirement = {
+				kind = exactVersion;
+				version = 1.1.3;
+			};
+		};
 		9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 185.0.1;
+				branch = "sam/remove-wireguard-dependency";
+				kind = branch;
 			};
 		};
 		9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
@@ -13749,6 +13764,16 @@
 		4B4D60B02A0C83B900BCD287 /* NetworkProtectionUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = NetworkProtectionUI;
+		};
+		4B5235442C7BB14D00AFAF64 /* WireGuard */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4B5235432C7BB14D00AFAF64 /* XCRemoteSwiftPackageReference "wireguard-apple" */;
+			productName = WireGuard;
+		};
+		4B5235462C7BB15700AFAF64 /* WireGuard */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4B5235432C7BB14D00AFAF64 /* XCRemoteSwiftPackageReference "wireguard-apple" */;
+			productName = WireGuard;
 		};
 		4B5F14FB2A15291D0060320F /* InputFilesChecker */ = {
 			isa = XCSwiftPackageProductDependency;
