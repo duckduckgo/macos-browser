@@ -141,7 +141,7 @@ jobs:
 
       - name: Fetch and validate release notes
         env:
-          TASK_ID: ${{ steps.task-id.outputs.task-id }}
+          TASK_ID: ${{ steps.task-id.outputs.asana_task_id }}
           ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
         run: |
           curl -fLSs "https://app.asana.com/api/1.0/tasks/${TASK_ID}?opt_fields=notes" \
@@ -257,7 +257,7 @@ jobs:
         run: |
           version="$(cut -d '/' -f 2 <<< "$BRANCH")"
           ./scripts/update_asana_for_release.sh public \
-            ${{ steps.task-id.outputs.task-id }} \
+            ${{ steps.task-id.outputs.asana_task_id }} \
             ${{ vars.MACOS_APP_BOARD_DONE_SECTION_ID }} \
             "${version}" \
             announcement-task-contents.txt
@@ -282,7 +282,7 @@ jobs:
           echo "DMG_URL=${{ vars.DMG_URL_ROOT }}${DMG_NAME}" >> $GITHUB_ENV
           echo "RELEASE_BUCKET_NAME=${{ vars.RELEASE_BUCKET_NAME }}" >> $GITHUB_ENV
           echo "RELEASE_BUCKET_PREFIX=${{ vars.RELEASE_BUCKET_PREFIX }}" >> $GITHUB_ENV
-          echo "RELEASE_TASK_ID=${{ steps.task-id.outputs.task-id }}" >> $GITHUB_ENV
+          echo "RELEASE_TASK_ID=${{ steps.task-id.outputs.asana_task_id }}" >> $GITHUB_ENV
           echo "TASKS_SINCE_LAST_INTERNAL_RELEASE=${{ steps.get-tasks-since-last-internal-release.outputs.tasks }}" >> $GITHUB_ENV
           echo "VERSION=${{ steps.verify-tag.outputs.release-version }}" >> $GITHUB_ENV
           echo "WORKFLOW_URL=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_ENV

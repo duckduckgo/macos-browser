@@ -225,11 +225,6 @@ jobs:
         name: DuckDuckGo-${{ env.release-type }}-dSYM-${{ env.app-version }}
         path: ${{ github.workspace }}/release/${{ steps.set-outputs.outputs.dsym-name }}
 
-    - name: Extract Asana Task ID
-      id: task-id
-      if: ${{ env.upload-to == 'asana' }}
-      run: bundle exec fastlane run asana_extract_task_id task_url:"${{ env.asana-task-url }}"
-
     - name: Upload dSYMs to S3
       id: upload-dsyms-to-s3
       if: ${{ env.upload-to == 's3' }}
@@ -361,7 +356,7 @@ jobs:
       with:
         access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
         file-name: ${{ github.workspace }}/duckduckgo-${{ env.app-version }}.dmg
-        task-id: ${{ steps.task-id.outputs.task-id }}
+        task-id: ${{ steps.task-id.outputs.asana_task_id }}
 
   mattermost:
 

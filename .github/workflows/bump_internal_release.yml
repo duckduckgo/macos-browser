@@ -99,7 +99,7 @@ jobs:
         env:
           ASANA_TASK_URL: ${{ steps.find-asana-task.outputs.task-url || github.event.inputs.asana-task-url }}
           RELEASE_BRANCH: ${{ steps.find-asana-task.outputs.release-branch || github.ref_name }}
-          TASK_ID: ${{ steps.find-asana-task.outputs.task-id || steps.task-id.outputs.task-id }}
+          TASK_ID: ${{ steps.find-asana-task.outputs.task-id || steps.task-id.outputs.asana_task_id }}
           SKIP_APPSTORE: ${{ github.event.inputs.skip-appstore || false }} # make sure this is set to false on scheduled runs
         run: |
           if [[ "${RELEASE_BRANCH}" == "main" ]]; then
@@ -212,7 +212,7 @@ jobs:
           BRANCH: ${{ needs.validate_input_conditions.outputs.release-branch }}
         run: |
           version="$(cut -d '/' -f 2 <<< "$BRANCH")"
-          ./scripts/update_asana_for_release.sh internal ${{ steps.task-id.outputs.task-id }} ${{ vars.MACOS_APP_BOARD_VALIDATION_SECTION_ID }} "${version}"
+          ./scripts/update_asana_for_release.sh internal ${{ steps.task-id.outputs.asana_task_id }} ${{ vars.MACOS_APP_BOARD_VALIDATION_SECTION_ID }} "${version}"
 
   prepare_release:
     name: Prepare Release

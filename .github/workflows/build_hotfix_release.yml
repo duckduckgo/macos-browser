@@ -102,7 +102,7 @@ jobs:
           version="$(cut -d '/' -f 2 <<< "$BRANCH")"
           # 'internal', because we start with making a build that still needs to be tested before being published
           # and we want Asana tasks to be moved to "Validation" and not already to "Done"
-          ./scripts/update_asana_for_release.sh internal ${{ steps.task-id.outputs.task-id }} ${{ vars.MACOS_APP_BOARD_VALIDATION_SECTION_ID }} "${version}"
+          ./scripts/update_asana_for_release.sh internal ${{ steps.task-id.outputs.asana_task_id }} ${{ vars.MACOS_APP_BOARD_VALIDATION_SECTION_ID }} "${version}"
 
   prepare_release:
     name: Prepare Release
