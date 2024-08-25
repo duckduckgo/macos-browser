@@ -22,6 +22,9 @@ import BrowserServicesKit
 import PixelKit
 
 protocol DataBrokerProtectionStatsPixelsRepository {
+
+    var customStatsPixelsLastSentTimestamp: Date? { get set }
+
     func markStatsWeeklyPixelDate()
     func markStatsMonthlyPixelDate()
 
@@ -34,9 +37,19 @@ final class DataBrokerProtectionStatsPixelsUserDefaults: DataBrokerProtectionSta
     enum Consts {
         static let weeklyPixelKey = "macos.browser.data-broker-protection.statsWeeklyPixelKey"
         static let monthlyPixelKey = "macos.browser.data-broker-protection.statsMonthlyPixelKey"
+        static let customStatsPixelKey = "macos.browser.data-broker-protection.customStatsPixelKey"
     }
 
     private let userDefaults: UserDefaults
+
+    var customStatsPixelsLastSentTimestamp: Date? {
+        get {
+            userDefaults.object(forKey: Consts.customStatsPixelKey) as? Date
+        }
+        set {
+            userDefaults.set(newValue, forKey: Consts.customStatsPixelKey)
+        }
+    }
 
     init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
@@ -125,18 +138,61 @@ extension Array where Element == StatsByBroker {
     }
 }
 
-final class DataBrokerProtectionStatsPixels {
+protocol StatsPixels {
+    /// Calculates and fires custom stats pixels if needed
+    func fireCustomStatsPixelsIfNeeded()
+}
+
+/// Conforming types provide a method to check if we should fire custom stats based on an input date
+protocol CustomStatsPixelsTrigger {
+
+    /// This method determines whether custom stats pixels should be fired based on the time interval since the provided fromDate.
+    /// - Parameter fromDate: An optional date parameter representing the start date. If nil, the method will return true.
+    /// - Returns: Returns true if more than 24 hours have passed since the fromDate. If fromDate is nil, it also returns true. Otherwise, it returns false.
+    func shouldFireCustomStatsPixels(fromDate: Date?) -> Bool
+}
+
+struct DefaultCustomStatsPixelsTrigger: CustomStatsPixelsTrigger {
+
+    func shouldFireCustomStatsPixels(fromDate: Date?) -> Bool {
+        guard let fromDate = fromDate else { return true }
+
+        let interval = Date().timeIntervalSince(fromDate)
+        let secondsIn24Hours: TimeInterval = 24 * 60 * 60
+        return abs(interval) > secondsIn24Hours
+    }
+}
+
+extension Date {
+
+    /// Returns the current date minus the specified number of hours
+    /// If the date calculate fails, returns the current date
+    /// - Parameter hours: Hours expressed as an integer
+    /// - Returns: The current time minus the specified number of hours
+    static func nowMinus(hours: Int) -> Date {
+        Calendar.current.date(byAdding: .hour, value: -hours, to: Date()) ?? Date()
+    }
+}
+
+final class DataBrokerProtectionStatsPixels: StatsPixels {
+
     private let database: DataBrokerProtectionRepository
     private let handler: EventMapping<DataBrokerProtectionPixels>
-    private let repository: DataBrokerProtectionStatsPixelsRepository
+    private var repository: DataBrokerProtectionStatsPixelsRepository
+    private let customStatsPixelsTrigger: CustomStatsPixelsTrigger
+    private let customOptOutStatsProvider: DataBrokerProtectionCustomOptOutStatsProvider
     private let calendar = Calendar.current
 
     init(database: DataBrokerProtectionRepository,
          handler: EventMapping<DataBrokerProtectionPixels>,
-         repository: DataBrokerProtectionStatsPixelsRepository = DataBrokerProtectionStatsPixelsUserDefaults()) {
+         repository: DataBrokerProtectionStatsPixelsRepository = DataBrokerProtectionStatsPixelsUserDefaults(),
+         customStatsPixelsTrigger: CustomStatsPixelsTrigger = DefaultCustomStatsPixelsTrigger(),
+         customOptOutStatsProvider: DataBrokerProtectionCustomOptOutStatsProvider = DefaultDataBrokerProtectionCustomOptOutStatsProvider()) {
         self.database = database
         self.handler = handler
         self.repository = repository
+        self.customStatsPixelsTrigger = customStatsPixelsTrigger
+        self.customOptOutStatsProvider = customOptOutStatsProvider
     }
 
     func tryToFireStatsPixels() {
@@ -159,77 +215,26 @@ final class DataBrokerProtectionStatsPixels {
                        dateSinceLastSubmission: repository.getLatestStatsMonthlyPixelDate())
             repository.markStatsMonthlyPixelDate()
         }
+
+        fireRegularIntervalConfirmationPixelsForSubmittedOptOuts(for: brokerProfileQueryData)
     }
 
-    private func shouldFireWeeklyStats(dateOfFirstScan: Date?) -> Bool {
-        // If no initial scan was done yet, we do not want to fire the pixel.
-        guard let dateOfFirstScan = dateOfFirstScan else {
-            return false
-        }
+    func fireCustomStatsPixelsIfNeeded() {
+        let startDate = repository.customStatsPixelsLastSentTimestamp
 
-        if let lastWeeklyUpdateDate = repository.getLatestStatsWeeklyPixelDate() {
-            // If the last weekly was set we need to compare the date with it.
-            return DataBrokerProtectionPixelsUtilities.shouldWeFirePixel(startDate: lastWeeklyUpdateDate, endDate: Date(), daysDifference: .weekly)
-        } else {
-            // If the weekly update date was never set we need to check the first scan date.
-            return DataBrokerProtectionPixelsUtilities.shouldWeFirePixel(startDate: dateOfFirstScan, endDate: Date(), daysDifference: .weekly)
-        }
-    }
+        guard customStatsPixelsTrigger.shouldFireCustomStatsPixels(fromDate: startDate),
+        let queryData = try? database.fetchAllBrokerProfileQueryData() else { return }
 
-    private func shouldFireMonthlyStats(dateOfFirstScan: Date?) -> Bool {
-        // If no initial scan was done yet, we do not want to fire the pixel.
-        guard let dateOfFirstScan = dateOfFirstScan else {
-            return false
-        }
+        let endDate = Date.nowMinus(hours: 24)
 
-        if let lastMonthlyUpdateDate = repository.getLatestStatsMonthlyPixelDate() {
-            // If the last monthly was set we need to compare the date with it.
-            return DataBrokerProtectionPixelsUtilities.shouldWeFirePixel(startDate: lastMonthlyUpdateDate, endDate: Date(), daysDifference: .monthly)
-        } else {
-            // If the monthly update date was never set we need to check the first scan date.
-            return DataBrokerProtectionPixelsUtilities.shouldWeFirePixel(startDate: dateOfFirstScan, endDate: Date(), daysDifference: .monthly)
-        }
-    }
+        let customOptOutStats = customOptOutStatsProvider.customOptOutStats(startDate: startDate,
+                                                                            endDate: endDate,
+                                                                            andQueryData: queryData)
 
-    private func firePixels(for brokerProfileQueryData: [BrokerProfileQueryData], frequency: Frequency, dateSinceLastSubmission: Date? = nil) {
-        let statsByBroker = calculateStatsByBroker(brokerProfileQueryData, dateSinceLastSubmission: dateSinceLastSubmission)
+        fireCustomDataBrokerStatsPixels(customOptOutStats: customOptOutStats)
+        fireCustomGlobalStatsPixel(customOptOutStats: customOptOutStats)
 
-        fireGlobalStats(statsByBroker, brokerProfileQueryData: brokerProfileQueryData, frequency: frequency)
-        fireStatsByBroker(statsByBroker, frequency: frequency)
-    }
-
-    private func calculateStatsByBroker(_ brokerProfileQueryData: [BrokerProfileQueryData], dateSinceLastSubmission: Date? = nil) -> [StatsByBroker] {
-        let profileQueriesGroupedByBroker = Dictionary(grouping: brokerProfileQueryData, by: { $0.dataBroker })
-        let statsByBroker = profileQueriesGroupedByBroker.map { (key: DataBroker, value: [BrokerProfileQueryData]) in
-            calculateByBroker(key, data: value, dateSinceLastSubmission: dateSinceLastSubmission)
-        }
-
-        return statsByBroker
-    }
-
-    private func fireGlobalStats(_ stats: [StatsByBroker], brokerProfileQueryData: [BrokerProfileQueryData], frequency: Frequency) {
-        // The duration for the global stats is calculated not taking into the account the broker. That's why we do not use one from the stats.
-        let durationOfFirstOptOut = calculateDurationOfFirstOptOut(brokerProfileQueryData)
-
-        switch frequency {
-        case .weekly:
-            handler.fire(stats.toWeeklyPixel(durationOfFirstOptOut: durationOfFirstOptOut))
-        case .monthly:
-            handler.fire(stats.toMonthlyPixel(durationOfFirstOptOut: durationOfFirstOptOut))
-        default: ()
-        }
-    }
-
-    private func fireStatsByBroker(_ stats: [StatsByBroker], frequency: Frequency) {
-        for stat in stats {
-            switch frequency {
-            case .weekly:
-                handler.fire(stat.toWeeklyPixel)
-            case .monthly:
-                handler.fire(stat.toMonthlyPixel)
-            default: ()
-            }
-        }
+        repository.customStatsPixelsLastSentTimestamp = Date.nowMinus(hours: 24)
     }
 
     /// internal for testing purposes
@@ -263,7 +268,7 @@ final class DataBrokerProtectionStatsPixels {
                 }
             }
 
-            numberOfReAppearences += calculateNumberOfReAppereances(query.scanJobData) + mirrorSitesSize
+            numberOfReAppearences += calculateNumberOfProfileReAppereances(query.scanJobData) + mirrorSitesSize
         }
 
         let numberOfFailureOptOuts = numberOfProfilesFound - numberOfOptOutsInProgress - numberOfSuccessfulOptOuts
@@ -313,10 +318,6 @@ final class DataBrokerProtectionStatsPixels {
         return numberOfNewMatches
     }
 
-    private func calculateNumberOfReAppereances(_ scan: ScanJobData) -> Int {
-        return scan.historyEvents.filter { $0.type == .reAppearence }.count
-    }
-
     /// Calculate the difference in days since the first scan and the first submitted opt-out for the list of brokerProfileQueryData.
     /// The scan and the opt-out do not need to be for the same record.
     /// If an opt-out wasn't submitted yet, we return 0.
@@ -343,9 +344,19 @@ final class DataBrokerProtectionStatsPixels {
 
         return differenceInDays
     }
+}
+
+private extension DataBrokerProtectionStatsPixels {
+
+    /// Calculates the number of profile reappearances
+    /// - Parameter scan: Scan Job Data
+    /// - Returns: Count of reappearances
+    func calculateNumberOfProfileReAppereances(_ scan: ScanJobData) -> Int {
+        return scan.historyEvents.filter { $0.type == .reAppearence }.count
+    }
 
     /// Returns the date of the first scan since the beginning if not from Date is provided
-    private func dateOfFirstScan(_ brokerProfileQueryData: [BrokerProfileQueryData], from: Date? = nil) -> Date? {
+    func dateOfFirstScan(_ brokerProfileQueryData: [BrokerProfileQueryData], from: Date? = nil) -> Date? {
         let allScanOperations = brokerProfileQueryData.map { $0.scanJobData }
         let allScanHistoryEvents = allScanOperations.flatMap { $0.historyEvents }
         let scanStartedEventsSortedByDate = allScanHistoryEvents
@@ -360,7 +371,7 @@ final class DataBrokerProtectionStatsPixels {
     }
 
     /// Returns the date of the first sumbitted opt-out. If no from date is provided, we return it from the beginning.
-    private func dateOfFirstSubmittedOptOut(_ brokerProfileQueryData: [BrokerProfileQueryData], from: Date? = nil) -> Date? {
+    func dateOfFirstSubmittedOptOut(_ brokerProfileQueryData: [BrokerProfileQueryData], from: Date? = nil) -> Date? {
         let firstOptOutSubmittedEvent = brokerProfileQueryData
             .flatMap { $0.optOutJobData }
             .flatMap { $0.historyEvents }
@@ -372,5 +383,209 @@ final class DataBrokerProtectionStatsPixels {
         } else {
             return firstOptOutSubmittedEvent.first?.date
         }
+    }
+
+    func shouldFireWeeklyStats(dateOfFirstScan: Date?) -> Bool {
+        // If no initial scan was done yet, we do not want to fire the pixel.
+        guard let dateOfFirstScan = dateOfFirstScan else {
+            return false
+        }
+
+        if let lastWeeklyUpdateDate = repository.getLatestStatsWeeklyPixelDate() {
+            // If the last weekly was set we need to compare the date with it.
+            return DataBrokerProtectionPixelsUtilities.shouldWeFirePixel(startDate: lastWeeklyUpdateDate, endDate: Date(), daysDifference: .weekly)
+        } else {
+            // If the weekly update date was never set we need to check the first scan date.
+            return DataBrokerProtectionPixelsUtilities.shouldWeFirePixel(startDate: dateOfFirstScan, endDate: Date(), daysDifference: .weekly)
+        }
+    }
+
+    func shouldFireMonthlyStats(dateOfFirstScan: Date?) -> Bool {
+        // If no initial scan was done yet, we do not want to fire the pixel.
+        guard let dateOfFirstScan = dateOfFirstScan else {
+            return false
+        }
+
+        if let lastMonthlyUpdateDate = repository.getLatestStatsMonthlyPixelDate() {
+            // If the last monthly was set we need to compare the date with it.
+            return DataBrokerProtectionPixelsUtilities.shouldWeFirePixel(startDate: lastMonthlyUpdateDate, endDate: Date(), daysDifference: .monthly)
+        } else {
+            // If the monthly update date was never set we need to check the first scan date.
+            return DataBrokerProtectionPixelsUtilities.shouldWeFirePixel(startDate: dateOfFirstScan, endDate: Date(), daysDifference: .monthly)
+        }
+    }
+
+    func firePixels(for brokerProfileQueryData: [BrokerProfileQueryData], frequency: Frequency, dateSinceLastSubmission: Date? = nil) {
+        let statsByBroker = calculateStatsByBroker(brokerProfileQueryData, dateSinceLastSubmission: dateSinceLastSubmission)
+
+        fireGlobalStats(statsByBroker, brokerProfileQueryData: brokerProfileQueryData, frequency: frequency)
+        fireStatsByBroker(statsByBroker, frequency: frequency)
+    }
+
+    func calculateStatsByBroker(_ brokerProfileQueryData: [BrokerProfileQueryData], dateSinceLastSubmission: Date? = nil) -> [StatsByBroker] {
+        let profileQueriesGroupedByBroker = Dictionary(grouping: brokerProfileQueryData, by: { $0.dataBroker })
+        let statsByBroker = profileQueriesGroupedByBroker.map { (key: DataBroker, value: [BrokerProfileQueryData]) in
+            calculateByBroker(key, data: value, dateSinceLastSubmission: dateSinceLastSubmission)
+        }
+
+        return statsByBroker
+    }
+
+    func fireGlobalStats(_ stats: [StatsByBroker], brokerProfileQueryData: [BrokerProfileQueryData], frequency: Frequency) {
+        // The duration for the global stats is calculated not taking into the account the broker. That's why we do not use one from the stats.
+        let durationOfFirstOptOut = calculateDurationOfFirstOptOut(brokerProfileQueryData)
+
+        switch frequency {
+        case .weekly:
+            handler.fire(stats.toWeeklyPixel(durationOfFirstOptOut: durationOfFirstOptOut))
+        case .monthly:
+            handler.fire(stats.toMonthlyPixel(durationOfFirstOptOut: durationOfFirstOptOut))
+        default: ()
+        }
+    }
+
+    func fireStatsByBroker(_ stats: [StatsByBroker], frequency: Frequency) {
+        for stat in stats {
+            switch frequency {
+            case .weekly:
+                handler.fire(stat.toWeeklyPixel)
+            case .monthly:
+                handler.fire(stat.toMonthlyPixel)
+            default: ()
+            }
+        }
+    }
+
+    func fireCustomDataBrokerStatsPixels(customOptOutStats: CustomOptOutStats) {
+        Task {
+            for stat in customOptOutStats.customIndividualDataBrokerStat {
+                handler.fire(pixel(for: stat))
+                // Introduce a delay to prevent all databroker pixels from firing at (nearly) the same time
+                try? await Task.sleep(nanoseconds: 100_000_000)
+            }
+        }
+    }
+
+    func pixel(for dataBrokerStat: CustomIndividualDataBrokerStat) -> DataBrokerProtectionPixels {
+        .customDataBrokerStatsOptoutSubmit(dataBrokerName: dataBrokerStat.dataBrokerName,
+                                           optOutSubmitSuccessRate: dataBrokerStat.optoutSubmitSuccessRate)
+    }
+
+    func fireCustomGlobalStatsPixel(customOptOutStats: CustomOptOutStats) {
+        handler.fire(pixel(for: customOptOutStats.customAggregateBrokersStat))
+    }
+
+    func pixel(for aggregateStat: CustomAggregateBrokersStat) -> DataBrokerProtectionPixels {
+        .customGlobalStatsOptoutSubmit(optOutSubmitSuccessRate: aggregateStat.optoutSubmitSuccessRate)
+    }
+}
+
+// MARK: - Opt out confirmation pixels
+
+extension DataBrokerProtectionStatsPixels {
+    // swiftlint:disable:next cyclomatic_complexity
+    func fireRegularIntervalConfirmationPixelsForSubmittedOptOuts(for brokerProfileQueryData: [BrokerProfileQueryData]) {
+        /*
+         This fires pixels to indicate if any submitted opt outs have been confirmed or unconfirmed
+         at fixed intervals after the submission (7, 14, and 21 days)
+         Goal: Be able to calculate what % of removals occur within x weeks of successful opt-out submission.
+
+         - We get all opt out jobs with status showing they were submitted successfully
+         - Compare the date they were submitted successfully with the current date
+         - Bucket into >=7, >=14, and >=21 days groups (with overlap between the groups, e.g. it's possible it's been 15 days but neither the 7 day or the 14 day pixel has been fired)
+         - Filter those groups based on if the pixel for that time interval has been fired yet
+         - Fire the appropriate confirmed/unconfirmed pixels for each job
+         - Update the DB to indicate which pixels have been newly fired
+
+         Because submittedSuccessfullyDate will be nil for data that existed before the migration
+         the pixels won't fire for old data, which is the behaviour we want.
+         */
+
+        let allOptOuts = brokerProfileQueryData.flatMap { $0.optOutJobData }
+        let successfullySubmittedOptOuts = allOptOuts.filter { $0.submittedSuccessfullyDate != nil }
+
+        let sevenDayOldPlusOptOutsThatHaveNotFiredPixel = successfullySubmittedOptOuts.filter { optOutJob in
+            guard let submittedSuccessfullyDate = optOutJob.submittedSuccessfullyDate else { return false }
+            let hasEnoughTimePassedToFirePixel = submittedSuccessfullyDate.hasBeenExceededByNumberOfDays(7)
+            return hasEnoughTimePassedToFirePixel && !optOutJob.sevenDaysConfirmationPixelFired
+        }
+
+        let fourteenDayOldPlusOptOutsThatHaveNotFiredPixel = successfullySubmittedOptOuts.filter { optOutJob in
+            guard let submittedSuccessfullyDate = optOutJob.submittedSuccessfullyDate else { return false }
+            let hasEnoughTimePassedToFirePixel = submittedSuccessfullyDate.hasBeenExceededByNumberOfDays(14)
+            return hasEnoughTimePassedToFirePixel && !optOutJob.fourteenDaysConfirmationPixelFired
+        }
+
+        let twentyOneDayOldPlusOptOutsThatHaveNotFiredPixel = successfullySubmittedOptOuts.filter { optOutJob in
+            guard let submittedSuccessfullyDate = optOutJob.submittedSuccessfullyDate else { return false }
+            let hasEnoughTimePassedToFirePixel = submittedSuccessfullyDate.hasBeenExceededByNumberOfDays(21)
+            return hasEnoughTimePassedToFirePixel && !optOutJob.twentyOneDaysConfirmationPixelFired
+        }
+
+        let brokerIDsToNames = brokerProfileQueryData.reduce(into: [Int64: String]()) {
+            // Really the ID should never be zero
+            $0[$1.dataBroker.id ?? -1] = $1.dataBroker.name
+        }
+
+        // Now fire the pixels and update the DB
+        for optOutJob in sevenDayOldPlusOptOutsThatHaveNotFiredPixel {
+            let brokerName = brokerIDsToNames[optOutJob.brokerId] ?? ""
+            let isOptOutConfirmed = optOutJob.extractedProfile.removedDate != nil
+
+            if isOptOutConfirmed {
+                handler.fire(.optOutJobAt7DaysConfirmed(dataBroker: brokerName))
+            } else {
+                handler.fire(.optOutJobAt7DaysUnconfirmed(dataBroker: brokerName))
+            }
+
+            guard let extractedProfileID = optOutJob.extractedProfile.id else { continue }
+            try? database.updateSevenDaysConfirmationPixelFired(true,
+                                                                forBrokerId: optOutJob.brokerId,
+                                                                profileQueryId: optOutJob.profileQueryId,
+                                                                extractedProfileId: extractedProfileID)
+        }
+
+        for optOutJob in fourteenDayOldPlusOptOutsThatHaveNotFiredPixel {
+            let brokerName = brokerIDsToNames[optOutJob.brokerId] ?? ""
+            let isOptOutConfirmed = optOutJob.extractedProfile.removedDate != nil
+
+            if isOptOutConfirmed {
+                handler.fire(.optOutJobAt14DaysConfirmed(dataBroker: brokerName))
+            } else {
+                handler.fire(.optOutJobAt14DaysUnconfirmed(dataBroker: brokerName))
+            }
+
+            guard let extractedProfileID = optOutJob.extractedProfile.id else { continue }
+            try? database.updateFourteenDaysConfirmationPixelFired(true,
+                                                                   forBrokerId: optOutJob.brokerId,
+                                                                   profileQueryId: optOutJob.profileQueryId,
+                                                                   extractedProfileId: extractedProfileID)
+        }
+
+        for optOutJob in twentyOneDayOldPlusOptOutsThatHaveNotFiredPixel {
+            let brokerName = brokerIDsToNames[optOutJob.brokerId] ?? ""
+            let isOptOutConfirmed = optOutJob.extractedProfile.removedDate != nil
+
+            if isOptOutConfirmed {
+                handler.fire(.optOutJobAt21DaysConfirmed(dataBroker: brokerName))
+            } else {
+                handler.fire(.optOutJobAt21DaysUnconfirmed(dataBroker: brokerName))
+            }
+
+            guard let extractedProfileID = optOutJob.extractedProfile.id else { continue }
+            try? database.updateTwentyOneDaysConfirmationPixelFired(true,
+                                                                    forBrokerId: optOutJob.brokerId,
+                                                                    profileQueryId: optOutJob.profileQueryId,
+                                                                    extractedProfileId: extractedProfileID)
+        }
+    }
+}
+
+private extension Date {
+    func hasBeenExceededByNumberOfDays(_ days: Int) -> Bool {
+        guard let submittedDatePlusTimeInterval = Calendar.current.date(byAdding: .day, value: days, to: self) else {
+            return false
+        }
+        return submittedDatePlusTimeInterval <= Date()
     }
 }
