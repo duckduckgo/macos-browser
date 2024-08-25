@@ -321,8 +321,8 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     private func populateNetworkProtectionEnvironmentListMenuItems() {
         environmentMenu.items = [
-            NSMenuItem(title: "⚠️ A staging subscription can only be used for the staging VPN environment", action: nil, target: nil),
-            NSMenuItem(title: "⚠️ A production subscription can be used for both VPN environments", action: nil, target: nil),
+            NSMenuItem(title: "⚠️ A staging subscription can be used for the staging VPN environment, a production subscription can be used for both", action: nil, target: nil),
+            NSMenuItem(title: "⚠️ Please restart the browser after changing environment", action: nil, target: nil),
             NSMenuItem.separator(),
             NSMenuItem(title: "Production", action: #selector(setSelectedEnvironment(_:)), target: self, keyEquivalent: ""),
             NSMenuItem(title: "Staging", action: #selector(setSelectedEnvironment(_:)), target: self, keyEquivalent: ""),
