@@ -17,9 +17,10 @@
 //
 
 import Combine
+@testable import DuckDuckGo_Privacy_Browser
 import Foundation
 import PixelKit
-@testable import DuckDuckGo_Privacy_Browser
+import SwiftUI
 import XCTest
 
 private typealias SettingsModel = HomePage.Models.SettingsModel
@@ -42,6 +43,7 @@ final class SettingsModelTests: XCTestCase {
     var sendPixelEvents: [PixelKitEvent] = []
     var openFilePanel: () -> URL? = { return "file:///sample.jpg".url! }
     var openFilePanelCallCount = 0
+    var showImageFailedAlertCallCount = 0
     var imageURL: URL?
 
     override func setUp() async throws {
@@ -59,6 +61,7 @@ final class SettingsModelTests: XCTestCase {
                 self?.openFilePanelCallCount += 1
                 return self?.openFilePanel()
             },
+            showAddImageFailedAlert: { [weak self] in self?.showImageFailedAlertCallCount += 1 },
             openSettings: { [weak self] in self?.openSettingsCallCount += 1 }
         )
     }
@@ -166,6 +169,43 @@ final class SettingsModelTests: XCTestCase {
 
         XCTAssertEqual(userBackgroundImagesManager.updateSelectedTimestampForUserBackgroundImageCallCount, 1)
         XCTAssertEqual(updateSelectedTimestampForUserBackgroundImageArguments, [userImage])
+    }
+
+    func testAddImageWhenImageIsNotSelectedThenReturnsEarly() async {
+        openFilePanel = { nil }
+        await model.addNewImage()
+        XCTAssertEqual(userBackgroundImagesManager.addImageWithURLCallCount, 0)
+        XCTAssertTrue(sendPixelEvents.isEmpty)
+        XCTAssertEqual(showImageFailedAlertCallCount, 0)
+    }
+
+    func testAddImageWhenImageIsAddedThenCustomBackgroundIsUpdated() async {
+        openFilePanel = { "file:///sample.jpg".url! }
+        await model.addNewImage()
+        XCTAssertEqual(userBackgroundImagesManager.addImageWithURLCallCount, 1)
+        XCTAssertEqual(model.customBackground, .customImage(.init(fileName: "sample.jpg", colorScheme: .light)))
+        XCTAssertEqual(sendPixelEvents.map(\.name), [
+            NewTabPagePixel.newTabBackgroundSelectedUserImage.name
+        ])
+        XCTAssertEqual(showImageFailedAlertCallCount, 0)
+    }
+
+    func testAddImageWhenImageAddingFailsThenAlertIsShown() async {
+        struct TestError: Error {}
+        openFilePanel = { "file:///sample.jpg".url! }
+        userBackgroundImagesManager.addImageWithURL = { _ in
+            throw TestError()
+        }
+
+        let originalCustomBackground = model.customBackground
+        await model.addNewImage()
+
+        XCTAssertEqual(userBackgroundImagesManager.addImageWithURLCallCount, 1)
+        XCTAssertEqual(model.customBackground, originalCustomBackground)
+        XCTAssertEqual(sendPixelEvents.map(\.name), [
+            NewTabPagePixel.newTabBackgroundAddImageError.name
+        ])
+        XCTAssertEqual(showImageFailedAlertCallCount, 1)
     }
 
     override func tearDown() async throws {

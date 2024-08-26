@@ -37,7 +37,9 @@ final class CapturingUserBackgroundImagesManager: UserBackgroundImagesManaging {
     var thumbnailImageForUserBackgroundImage: (UserBackgroundImage) -> NSImage? = { _ in return nil }
 
     var addImageWithURLCallCount = 0
-    var addImageWithURL: (URL) async throws -> UserBackgroundImage = { _ in return .init(fileName: "abc", colorScheme: .light) }
+    var addImageWithURL: (URL) async throws -> UserBackgroundImage = { url in
+        return .init(fileName: url.lastPathComponent, colorScheme: .light)
+    }
 
     var deleteImageCallCount = 0
     var deleteImageImpl: (UserBackgroundImage) -> Void = { _ in }

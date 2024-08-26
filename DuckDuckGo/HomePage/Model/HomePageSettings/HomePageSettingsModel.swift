@@ -67,33 +67,52 @@ extension HomePage.Models {
         let customImagesManager: UserBackgroundImagesManaging
         let sendPixel: (PixelKitEvent) -> Void
         let openFilePanel: () -> URL?
+        let showAddImageFailedAlert: () -> Void
         let openSettings: () -> Void
 
         @Published private(set) var availableUserBackgroundImages: [UserBackgroundImage] = []
 
         private var availableCustomImagesCancellable: AnyCancellable?
 
+        convenience init(openSettings: @escaping () -> Void) {
+            self.init(
+                appearancePreferences: .shared,
+                userBackgroundImagesManager: UserBackgroundImagesManager(
+                    maximumNumberOfImages: Const.maximumNumberOfUserImages,
+                    applicationSupportDirectory: URL.sandboxApplicationSupportURL
+                ),
+                sendPixel: { pixelEvent in
+                    PixelKit.fire(pixelEvent)
+                },
+                openFilePanel: {
+                    let panel = NSOpenPanel(allowedFileTypes: [.image])
+                    guard case .OK = panel.runModal(), let url = panel.url else {
+                        return nil
+                    }
+                    return url
+                },
+                showAddImageFailedAlert: {
+                    let alert = NSAlert.cannotReadImageAlert()
+                    alert.runModal()
+                },
+                openSettings: openSettings
+            )
+        }
+
         init(
-            appearancePreferences: AppearancePreferences = .shared,
-            userBackgroundImagesManager: UserBackgroundImagesManaging = UserBackgroundImagesManager(
-                maximumNumberOfImages: Const.maximumNumberOfUserImages,
-                applicationSupportDirectory: URL.sandboxApplicationSupportURL
-            ),
-            sendPixel: ((PixelKitEvent) -> Void)? = nil,
-            openFilePanel: (() -> URL?)? = nil,
+            appearancePreferences: AppearancePreferences,
+            userBackgroundImagesManager: UserBackgroundImagesManaging,
+            sendPixel: @escaping (PixelKitEvent) -> Void,
+            openFilePanel: @escaping () -> URL?,
+            showAddImageFailedAlert: @escaping () -> Void,
             openSettings: @escaping () -> Void
         ) {
             self.appearancePreferences = appearancePreferences
             self.customImagesManager = userBackgroundImagesManager
             customBackground = appearancePreferences.homePageCustomBackground
-            self.sendPixel = sendPixel ?? { PixelKit.fire($0) }
-            self.openFilePanel = openFilePanel ?? {
-                let panel = NSOpenPanel(allowedFileTypes: [.image])
-                guard case .OK = panel.runModal(), let url = panel.url else {
-                    return nil
-                }
-                return url
-            }
+            self.sendPixel = sendPixel
+            self.openFilePanel = openFilePanel
+            self.showAddImageFailedAlert = showAddImageFailedAlert
             self.openSettings = openSettings
 
             availableCustomImagesCancellable = customImagesManager.availableImagesPublisher
@@ -176,14 +195,8 @@ extension HomePage.Models {
                 customBackground = .customImage(image)
             } catch {
                 sendPixel(DebugEvent(NewTabPagePixel.newTabBackgroundAddImageError, error: error))
-                await showAddImageFailedAlert()
+                showAddImageFailedAlert()
             }
-        }
-
-        @MainActor
-        private func showAddImageFailedAlert() async {
-            let alert = NSAlert.cannotReadImageAlert()
-            await alert.runModal()
         }
 
         func customBackgroundModeModel(for contentType: ContentType) -> CustomBackgroundModeModel {
