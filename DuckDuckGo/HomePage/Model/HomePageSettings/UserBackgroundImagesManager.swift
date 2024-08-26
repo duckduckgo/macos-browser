@@ -187,7 +187,7 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
 
         deleteImagesOverLimit()
 
-        sendPixel(NonStandardEvent(NewTabPagePixel.newTabBackgroundAddedUserImage))
+        sendPixel(NewTabPagePixel.newTabBackgroundAddedUserImage)
 
         let userBackgroundImage = UserBackgroundImage(fileName: fileName, colorScheme: colorScheme)
         imagesMetadata = [userBackgroundImage.description] + imagesMetadata.prefix(maximumNumberOfImages - 1)
@@ -201,7 +201,7 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
         imagesMetadata.remove(at: index)
         deleteImageFiles(for: userBackgroundImage)
 
-        sendPixel(NonStandardEvent(NewTabPagePixel.newTabBackgroundDeletedUserImage))
+        sendPixel(NewTabPagePixel.newTabBackgroundDeletedUserImage)
     }
 
     func updateSelectedTimestamp(for userBackgroundImage: UserBackgroundImage) {

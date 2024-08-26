@@ -154,15 +154,15 @@ extension HomePage.Models {
                 }
                 switch customBackground {
                 case .gradient:
-                    sendPixel(NonStandardEvent(NewTabPagePixel.newTabBackgroundSelectedGradient))
+                    sendPixel(NewTabPagePixel.newTabBackgroundSelectedGradient)
                 case .solidColor:
-                    sendPixel(NonStandardEvent(NewTabPagePixel.newTabBackgroundSelectedSolidColor))
+                    sendPixel(NewTabPagePixel.newTabBackgroundSelectedSolidColor)
                 case .illustration:
-                    sendPixel(NonStandardEvent(NewTabPagePixel.newTabBackgroundSelectedIllustration))
+                    sendPixel(NewTabPagePixel.newTabBackgroundSelectedIllustration)
                 case .customImage:
-                    sendPixel(NonStandardEvent(NewTabPagePixel.newTabBackgroundSelectedUserImage))
+                    sendPixel(NewTabPagePixel.newTabBackgroundSelectedUserImage)
                 case .none:
-                    sendPixel(NonStandardEvent(NewTabPagePixel.newTabBackgroundReset))
+                    sendPixel(NewTabPagePixel.newTabBackgroundReset)
                 }
             }
         }

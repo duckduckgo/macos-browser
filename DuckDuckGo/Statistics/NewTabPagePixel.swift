@@ -39,19 +39,19 @@ enum NewTabPagePixel: PixelKitEventV2 {
     var name: String {
         switch self {
         case .newTabBackgroundSelectedGradient:
-            return "newtab_mac_background_selected-gradient"
+            return "m_mac_newtab_background_selected-gradient"
         case .newTabBackgroundSelectedSolidColor:
-            return "newtab_mac_background_selected-solid-color"
+            return "m_mac_newtab_background_selected-solid-color"
         case .newTabBackgroundSelectedIllustration:
-            return "newtab_mac_background_selected-illustration"
+            return "m_mac_newtab_background_selected-illustration"
         case .newTabBackgroundSelectedUserImage:
-            return "newtab_mac_background_selected-user-image"
+            return "m_mac_newtab_background_selected-user-image"
         case .newTabBackgroundAddedUserImage:
-            return "newtab_mac_background_added-user-image"
+            return "m_mac_newtab_background_added-user-image"
         case .newTabBackgroundDeletedUserImage:
-            return "newtab_mac_background_deleted-user-image"
+            return "m_mac_newtab_background_deleted-user-image"
         case .newTabBackgroundReset:
-            return "newtab_mac_background_reset"
+            return "m_mac_newtab_background_reset"
 
         case .newTabBackgroundInitializeStorageError: return "newtab_background_initialize-storage-error"
         case .newTabBackgroundAddImageError: return "newtab_background_add-image-error"
