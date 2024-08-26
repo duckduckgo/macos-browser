@@ -39,7 +39,7 @@ protocol UpdateControllerProtocol: AnyObject {
     var lastUpdateCheckDate: Date? { get }
 
     func checkForUpdate()
-    func checkForUpdateInBackground()
+    func checkForUpdateInBackground(userInitiated: Bool)
 
     func runUpdate()
 
@@ -67,6 +67,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         let isInstalled: Bool
     }
     private var updateCheckResult: UpdateCheckResult?
+    private var currentUpdateCheck: SPUUpdateCheck?
 
     @Published private(set) var latestUpdate: Update? {
         didSet {
@@ -153,12 +154,14 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     func checkForUpdate() {
         os_log("Checking for updates", log: .updates)
 
+        currentUpdateCheck = .updates
         updater.updater.checkForUpdates()
     }
 
-    func checkForUpdateInBackground() {
+    func checkForUpdateInBackground(userInitiated: Bool) {
         os_log("Checking for updates in background", log: .updates)
 
+        currentUpdateCheck = userInitiated ? .updates : .updatesInBackground
         updater.updater.checkForUpdatesInBackground()
     }
 
@@ -185,11 +188,11 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
             updater.updater.automaticallyDownloadsUpdates = automaticUpdateFlow
         }
 
-#if DEBUG
-        updater.updater.automaticallyChecksForUpdates = false
-        updater.updater.automaticallyDownloadsUpdates = false
-        updater.updater.updateCheckInterval = 0
-#endif
+//#if DEBUG
+//        updater.updater.automaticallyChecksForUpdates = false
+//        updater.updater.automaticallyDownloadsUpdates = false
+//        updater.updater.updateCheckInterval = 0
+//#endif
     }
 
     @objc private func openUpdatesPage() {
@@ -214,6 +217,32 @@ extension UpdateController: SPUUpdaterDelegate {
         os_log("Updater started performing the update check. (isInternalUser: \(internalUserDecider.isInternalUser)", log: .updates)
 
         onUpdateCheckStart()
+    }
+
+    func bestValidUpdate(in appcast: SUAppcast, for updater: SPUUpdater) -> SUAppcastItem? {
+        guard case .updates = currentUpdateCheck, let currentVersion = Int(AppVersion.shared.buildNumber) else {
+            return nil
+        }
+        let allowedChannels = allowedChannels(for: updater)
+        let bestItem = appcast.items.filter { item in
+            if let channel = item.channel {
+                guard allowedChannels.contains(channel) else {
+                    return false
+                }
+            }
+            return true
+        }
+        .max { lhs, rhs in
+            guard let lhsVersion = Int(lhs.versionString), let rhsVersion = Int(rhs.versionString) else {
+                return false
+            }
+            return lhsVersion > rhsVersion
+        }
+
+        guard let bestItem, let bestItemVersion = Int(bestItem.versionString), bestItemVersion > currentVersion else {
+            return nil
+        }
+        return bestItem
     }
 
     private func onUpdateCheckStart() {
@@ -313,6 +342,7 @@ extension UpdateController: SPUUpdaterDelegate {
         // Clear cache
         isUpdateBeingLoaded = false
         updateCheckResult = nil
+        currentUpdateCheck = nil
     }
 
 }
