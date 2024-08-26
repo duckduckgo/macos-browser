@@ -13390,6 +13390,261 @@
         }
       }
     },
+    "contextual.onboarding.browsing.multiple.trackers" : {
+      "comment" : "First parameter is a count of additional trackers, second and third are names of the tracker networks (strings)"
+    },
+    "contextual.onboarding.browsing.one.tracker" : {
+      "comment" : "Parameter is domain name (string)",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "*%1$@* was trying to track you here. I blocked them!\n\n☝️ Tap the shield for more info."
+          }
+        }
+      }
+    },
+    "contextual.onboarding.final-screen.button" : {
+      "comment" : "Button on the last screen of the onboarding, it will dismiss the onboarding screen.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "High five!"
+          }
+        }
+      }
+    },
+    "contextual.onboarding.final-screen.message" : {
+      "comment" : "Message of the last screen of the onboarding to the browser app.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Remember: every time you browse with me a creepy ad loses its wings. 👌"
+          }
+        }
+      }
+    },
+    "contextual.onboarding.final-screen.title" : {
+      "comment" : "Title of the last screen of the onboarding to the browser app",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You’ve got this!"
+          }
+        }
+      }
+    },
+    "contextual.onboarding.first-search-done.message" : {
+      "comment" : "After the user performs their first search using the browser, this dialog explains the advantages of using DuckDuckGo",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Private. Fast. Fewer ads."
+          }
+        }
+      }
+    },
+    "contextual.onboarding.first-search-done.title" : {
+      "comment" : "After the user performs their first search using the browser, this dialog explains the advantages of using DuckDuckGo",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "That’s DuckDuckGo Search!"
+          }
+        }
+      }
+    },
+    "contextual.onboarding.got-it.button" : {
+      "comment" : "During onboarding steps this button is shown and takes either to the next steps or closes the onboarding.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Got it"
+          }
+        }
+      }
+    },
+    "contextual.onboarding.ntp.try-a-site.title" : {
+      "comment" : "Title of a popover on the new tab page browser that invites the user to try a visiting a website",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Try visiting a site!"
+          }
+        }
+      }
+    },
+    "contextual.onboarding.try-a-search.message" : {
+      "comment" : "Message of a popover on the browser that invites the user to try a search explaining that their searches are anonymous",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your DuckDuckGo searches are always anonymous."
+          }
+        }
+      }
+    },
+    "contextual.onboarding.try-a-search.title" : {
+      "comment" : "Title of a popover on the browser that invites the user to try a search",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Try a search!"
+          }
+        }
+      }
+    },
+    "contextual.onboarding.try-a-site.message" : {
+      "comment" : "Message of a popover on the browser that invites the user to try visiting a website to explain that we block trackers",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "I’ll block trackers so they can’t spy on you."
+          }
+        }
+      }
+    },
+    "contextual.onboarding.try-a-site.title" : {
+      "comment" : "Title of a popover on the browser that invites the user to try a visiting a website",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Next, try visiting a site!"
+          }
+        }
+      }
+    },
+    "contextual.onboarding.try-fire-button.message" : {
+      "comment" : "Message of a popover on the browser that invites the user to try visiting the browser Fire Button. Please leave the line break",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Instantly clear your browsing activity with the Fire Button.\n\nGive it a try! 🔥"
+          }
+        }
+      }
+    },
+    "contextual.onboarding.try-search.option1-English" : {
+      "comment" : "Browser Search query for how to say duck in english",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "how to say “duck” in spanish"
+          }
+        }
+      }
+    },
+    "contextual.onboarding.try-search.option1international" : {
+      "comment" : "Browser Search query for how to say duck in english",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "how to say “duck” in english"
+          }
+        }
+      }
+    },
+    "contextual.onboarding.try-search.option2-english" : {
+      "comment" : "Search query for the cast of Mighty Ducks",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "mighty ducks cast"
+          }
+        }
+      }
+    },
+    "contextual.onboarding.try-search.option2-international" : {
+      "comment" : "Search query for the cast of Avatar",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "cast of avatar"
+          }
+        }
+      }
+    },
+    "contextual.onboarding.try-search.option3" : {
+      "comment" : "Browser Search query for local weather",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "local weather"
+          }
+        }
+      }
+    },
+    "contextual.onboarding.try-search.surprise-me-english" : {
+      "comment" : "Browser Search query for chocolate chip cookie recipes",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "chocolate chip cookie recipes"
+          }
+        }
+      }
+    },
+    "contextual.onboarding.try-search.surprise-me-international" : {
+      "comment" : "Browser Search query for dinner recipes",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "dinner recipes"
+          }
+        }
+      }
+    },
+    "contextual.onboarding.try-search.surprise-me-title" : {
+      "comment" : "Title for a button that triggers an unknown search query for the user.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Surprise me!"
+          }
+        }
+      }
+    },
     "copy" : {
       "comment" : "Copy button",
       "extractionState" : "extracted_with_value",
