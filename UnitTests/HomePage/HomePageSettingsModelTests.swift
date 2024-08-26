@@ -1,5 +1,5 @@
 //
-//  SettingsModelTests.swift
+//  HomePageSettingsModelTests.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -33,7 +33,7 @@ fileprivate extension SettingsModel.CustomBackgroundModeModel {
     static let customImagePicker: Self = .init(contentType: .customImagePicker, title: "", customBackgroundPreview: nil)
 }
 
-final class SettingsModelTests: XCTestCase {
+final class HomePageSettingsModelTests: XCTestCase {
 
     fileprivate var model: SettingsModel!
     var storageLocation: URL!
