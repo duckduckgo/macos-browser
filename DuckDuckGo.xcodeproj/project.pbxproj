@@ -242,6 +242,8 @@
 		31C01F972C7CC4250066AAE1 /* TabModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C01F952C7CC4250066AAE1 /* TabModal.swift */; };
 		31C01F9A2C7CC4C50066AAE1 /* TabModalManageable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C01F992C7CC4C50066AAE1 /* TabModalManageable.swift */; };
 		31C01F9B2C7CC4C50066AAE1 /* TabModalManageable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C01F992C7CC4C50066AAE1 /* TabModalManageable.swift */; };
+		31C01FA02C7CED620066AAE1 /* DefaultDuckPlayerOnboardingDeciderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C01F9F2C7CED620066AAE1 /* DefaultDuckPlayerOnboardingDeciderTests.swift */; };
+		31C01FA12C7CEF980066AAE1 /* DefaultDuckPlayerOnboardingDeciderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C01F9F2C7CED620066AAE1 /* DefaultDuckPlayerOnboardingDeciderTests.swift */; };
 		31C3CE0228EDC1E70002C24A /* CustomRoundedCornersShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C3CE0128EDC1E70002C24A /* CustomRoundedCornersShape.swift */; };
 		31C9ADE52AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C9ADE42AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift */; };
 		31C9ADE62AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C9ADE42AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift */; };
@@ -3105,7 +3107,7 @@
 		31B4AF522901A4F20013585E /* NSEventExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSEventExtension.swift; sourceTree = "<group>"; };
 		31C01F952C7CC4250066AAE1 /* TabModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabModal.swift; sourceTree = "<group>"; };
 		31C01F992C7CC4C50066AAE1 /* TabModalManageable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabModalManageable.swift; sourceTree = "<group>"; };
-		31C01F9C2C7CDE1B0066AAE1 /* DuckPlayerOnboardingDeciderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckPlayerOnboardingDeciderTests.swift; sourceTree = "<group>"; };
+		31C01F9F2C7CED620066AAE1 /* DefaultDuckPlayerOnboardingDeciderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultDuckPlayerOnboardingDeciderTests.swift; sourceTree = "<group>"; };
 		31C3CE0128EDC1E70002C24A /* CustomRoundedCornersShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomRoundedCornersShape.swift; sourceTree = "<group>"; };
 		31C5FFB82AF64D120008A79F /* DataBrokerProtectionFeatureGatekeeper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionFeatureGatekeeper.swift; sourceTree = "<group>"; };
 		31C9ADE42AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaitlistFeatureSetupHandler.swift; sourceTree = "<group>"; };
@@ -5018,7 +5020,7 @@
 			children = (
 				3714B1E828EDBAAB0056C57A /* DuckPlayerTests.swift */,
 				567DA94429E95C3F008AC5EE /* YoutubeOverlayUserScriptTests.swift */,
-				31C01F9C2C7CDE1B0066AAE1 /* DuckPlayerOnboardingDeciderTests.swift */,
+				31C01F9F2C7CED620066AAE1 /* DefaultDuckPlayerOnboardingDeciderTests.swift */,
 			);
 			path = YoutubePlayer;
 			sourceTree = "<group>";
@@ -10788,6 +10790,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				31C01FA12C7CEF980066AAE1 /* DefaultDuckPlayerOnboardingDeciderTests.swift in Sources */,
 				9F0FFFB92BCCAE9C007C87DD /* AddEditBookmarkDialogViewModelMock.swift in Sources */,
 				3706FDDA293F661700E42796 /* EmbeddedTrackerDataTests.swift in Sources */,
 				3706FDDB293F661700E42796 /* AutofillPreferencesTests.swift in Sources */,
@@ -12454,6 +12457,7 @@
 				561D29C62BDA74ED007B91D0 /* MockDDGSyncing.swift in Sources */,
 				B60C6F8429B1BAD3007BFAA8 /* FileManagerTempDirReplacement.swift in Sources */,
 				BDA7648D2BC4E4EF00D0400C /* DefaultVPNLocationFormatterTests.swift in Sources */,
+				31C01FA02C7CED620066AAE1 /* DefaultDuckPlayerOnboardingDeciderTests.swift in Sources */,
 				85F487B5276A8F2E003CE668 /* OnboardingTests.swift in Sources */,
 				B626A7642992506A00053070 /* SerpHeadersNavigationResponderTests.swift in Sources */,
 				C1D8BE452C1739E70057E426 /* DataBrokerProtectionMocks.swift in Sources */,

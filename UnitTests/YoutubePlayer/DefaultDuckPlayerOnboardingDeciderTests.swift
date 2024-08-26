@@ -1,5 +1,5 @@
 //
-//  DuckPlayerOnboardingDeciderTests.swift
+//  DefaultDuckPlayerOnboardingDeciderTests.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -16,7 +16,6 @@
 //  limitations under the License.
 //
 
-import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
@@ -57,23 +56,16 @@ final class DefaultDuckPlayerOnboardingDeciderTests: XCTestCase {
 
     func testShouldOpenFirstVideoOnDuckPlayer_ReturnsFalseAfterSettingFirstVideoAsDone() {
         decider.setOpenFirstVideoOnDuckPlayer()
+        XCTAssertTrue(decider.shouldOpenFirstVideoOnDuckPlayer)
+
         decider.setFirstVideoInDuckPlayerAsDone()
         XCTAssertFalse(decider.shouldOpenFirstVideoOnDuckPlayer)
     }
 
-    func testSetOnboardingAsDone_SetsOnboardingWasDisplayedToTrue() {
+    func testSetOnboardingAsDone_canDisplayOnboardingReturnsFalse() {
+        XCTAssertTrue(decider.canDisplayOnboarding)
         decider.setOnboardingAsDone()
-        XCTAssertTrue(defaults.onboardingWasDisplayed)
-    }
-
-    func testSetOpenFirstVideoOnDuckPlayer_SetsShouldOpenFirstVideoInDuckPlayerToTrue() {
-        decider.setOpenFirstVideoOnDuckPlayer()
-        XCTAssertTrue(defaults.shouldOpenFirstVideoInDuckPlayer)
-    }
-
-    func testSetFirstVideoInDuckPlayerAsDone_SetsFirstVideoWasOpenedInDuckPlayerToTrue() {
-        decider.setFirstVideoInDuckPlayerAsDone()
-        XCTAssertTrue(defaults.firstVideoWasOpenedInDuckPlayer)
+        XCTAssertFalse(decider.canDisplayOnboarding)
     }
 
     func testReset_ResetsAllFlagsToFalse() {
@@ -81,8 +73,8 @@ final class DefaultDuckPlayerOnboardingDeciderTests: XCTestCase {
         decider.setOpenFirstVideoOnDuckPlayer()
         decider.setFirstVideoInDuckPlayerAsDone()
         decider.reset()
-        XCTAssertFalse(defaults.onboardingWasDisplayed)
-        XCTAssertFalse(defaults.shouldOpenFirstVideoInDuckPlayer)
-        XCTAssertFalse(defaults.firstVideoWasOpenedInDuckPlayer)
+
+        XCTAssertTrue(decider.canDisplayOnboarding)
+        XCTAssertFalse(decider.shouldOpenFirstVideoOnDuckPlayer)
     }
 }
