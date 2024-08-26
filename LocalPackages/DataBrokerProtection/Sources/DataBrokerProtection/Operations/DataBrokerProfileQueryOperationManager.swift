@@ -100,7 +100,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         }
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
+    // swiftlint:disable cyclomatic_complexity
     internal func runScanOperation(on runner: WebJobRunner,
                                    brokerProfileQueryData: BrokerProfileQueryData,
                                    database: DataBrokerProtectionRepository,
@@ -171,10 +171,15 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                         // we insert the opt-out operation, we do not want to do things separately in case creating an opt-out fails
                         // causing the extracted profile to be orphan.
                         let optOutJobData = OptOutJobData(brokerId: brokerId,
-                                                                      profileQueryId: profileQueryId,
-                                                                      preferredRunDate: preferredRunOperation,
-                                                                      historyEvents: [HistoryEvent](),
-                                                                      extractedProfile: extractedProfile)
+                                                          profileQueryId: profileQueryId,
+                                                          createdDate: Date(),
+                                                          preferredRunDate: preferredRunOperation,
+                                                          historyEvents: [HistoryEvent](),
+                                                          submittedSuccessfullyDate: nil,
+                                                          extractedProfile: extractedProfile,
+                                                          sevenDaysConfirmationPixelFired: false,
+                                                          fourteenDaysConfirmationPixelFired: false,
+                                                          twentyOneDaysConfirmationPixelFired: false)
 
                         try database.saveOptOutJob(optOut: optOutJobData, extractedProfile: extractedProfile)
 
@@ -249,6 +254,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             throw error
         }
     }
+    // swiftlint:enable cyclomatic_complexity
 
     private func sendProfileRemovedNotificationIfNecessary(userNotificationService: DataBrokerProtectionUserNotificationService, database: DataBrokerProtectionRepository) {
 

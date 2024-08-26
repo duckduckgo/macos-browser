@@ -78,6 +78,7 @@ public enum DataBrokerProtectionPixels {
         static let durationOfFirstOptOut = "duration_firstoptout"
         static let numberOfNewRecordsFound = "num_new_found"
         static let numberOfReappereances = "num_reappeared"
+        static let optOutSubmitSuccessRate = "optout_submit_success_rate"
     }
 
     case error(error: DataBrokerProtectionError, dataBroker: String)
@@ -152,6 +153,14 @@ public enum DataBrokerProtectionPixels {
     case scanningEventNewMatch
     case scanningEventReAppearance
 
+    // Additional opt out metrics
+    case optOutJobAt7DaysConfirmed(dataBroker: String)
+    case optOutJobAt7DaysUnconfirmed(dataBroker: String)
+    case optOutJobAt14DaysConfirmed(dataBroker: String)
+    case optOutJobAt14DaysUnconfirmed(dataBroker: String)
+    case optOutJobAt21DaysConfirmed(dataBroker: String)
+    case optOutJobAt21DaysUnconfirmed(dataBroker: String)
+
     // Web UI - loading errors
     case webUILoadingStarted(environment: String)
     case webUILoadingFailed(errorCategory: String)
@@ -190,6 +199,10 @@ public enum DataBrokerProtectionPixels {
     // Feature Gatekeeper
     case gatekeeperNotAuthenticated
     case gatekeeperEntitlementsInvalid
+
+    // Custom stats
+    case customDataBrokerStatsOptoutSubmit(dataBrokerName: String, optOutSubmitSuccessRate: Double)
+    case customGlobalStatsOptoutSubmit(optOutSubmitSuccessRate: Double)
 }
 
 extension DataBrokerProtectionPixels: PixelKitEvent {
@@ -279,6 +292,14 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .webUILoadingSuccess: return "m_mac_dbp_web_ui_loading_success"
         case .webUILoadingFailed: return "m_mac_dbp_web_ui_loading_failed"
 
+            // Additional opt out metrics
+        case .optOutJobAt7DaysConfirmed: return "m_mac_dbp_optoutjob_at-7-days_confirmed"
+        case .optOutJobAt7DaysUnconfirmed: return "m_mac_dbp_optoutjob_at-7-days_unconfirmed"
+        case .optOutJobAt14DaysConfirmed: return "m_mac_dbp_optoutjob_at-14-days_confirmed"
+        case .optOutJobAt14DaysUnconfirmed: return "m_mac_dbp_optoutjob_at-14-days_unconfirmed"
+        case .optOutJobAt21DaysConfirmed: return "m_mac_dbp_optoutjob_at-21-days_confirmed"
+        case .optOutJobAt21DaysUnconfirmed: return "m_mac_dbp_optoutjob_at-21-days_unconfirmed"
+
             // Backend service errors
         case .generateEmailHTTPErrorDaily: return "m_mac_dbp_service_email-generate-http-error"
         case .emptyAccessTokenDaily: return "m_mac_dbp_service_empty-auth-token"
@@ -309,6 +330,9 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             // Feature Gatekeeper
         case .gatekeeperNotAuthenticated: return "m_mac_dbp_gatekeeper_not_authenticated"
         case .gatekeeperEntitlementsInvalid: return "m_mac_dbp_gatekeeper_entitlements_invalid"
+
+        case .customDataBrokerStatsOptoutSubmit: return "m_mac_dbp_databroker_custom_stats_optoutsubmit"
+        case .customGlobalStatsOptoutSubmit: return "m_mac_dbp_custom_stats_optoutsubmit"
         }
     }
 
@@ -376,6 +400,13 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             return [Consts.hadNewMatch: hadNewMatch ? "1" : "0", Consts.hadReAppereance: hadReAppereance ? "1" : "0", Consts.scanCoverage: scanCoverage.description]
         case .weeklyReportRemovals(let removals):
             return [Consts.removals: String(removals)]
+        case .optOutJobAt7DaysConfirmed(let dataBroker),
+                .optOutJobAt7DaysUnconfirmed(let dataBroker),
+                .optOutJobAt14DaysConfirmed(let dataBroker),
+                .optOutJobAt14DaysUnconfirmed(let dataBroker),
+                .optOutJobAt21DaysConfirmed(let dataBroker),
+                .optOutJobAt21DaysUnconfirmed(let dataBroker):
+            return [Consts.dataBrokerParamKey: dataBroker]
         case .webUILoadingStarted(let environment):
             return [Consts.environmentKey: environment]
         case .webUILoadingSuccess(let environment):
@@ -467,6 +498,11 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                            Consts.durationOfFirstOptOut: String(durationOfFirstOptOut),
                            Consts.numberOfNewRecordsFound: String(numberOfNewRecordsFound),
                            Consts.numberOfReappereances: String(numberOfReappereances)]
+        case .customDataBrokerStatsOptoutSubmit(let dataBrokerName, let optOutSubmitSuccessRate):
+            return [Consts.dataBrokerParamKey: dataBrokerName,
+                    Consts.optOutSubmitSuccessRate: String(optOutSubmitSuccessRate)]
+        case .customGlobalStatsOptoutSubmit(let optOutSubmitSuccessRate):
+            return [Consts.optOutSubmitSuccessRate: String(optOutSubmitSuccessRate)]
         }
     }
 }
@@ -537,6 +573,12 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .monthlyActiveUser,
                     .weeklyReportScanning,
                     .weeklyReportRemovals,
+                    .optOutJobAt7DaysConfirmed,
+                    .optOutJobAt7DaysUnconfirmed,
+                    .optOutJobAt14DaysConfirmed,
+                    .optOutJobAt14DaysUnconfirmed,
+                    .optOutJobAt21DaysConfirmed,
+                    .optOutJobAt21DaysUnconfirmed,
                     .scanningEventNewMatch,
                     .scanningEventReAppearance,
                     .webUILoadingFailed,
@@ -551,7 +593,9 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .dataBrokerMetricsWeeklyStats,
                     .dataBrokerMetricsMonthlyStats,
                     .gatekeeperNotAuthenticated,
-                    .gatekeeperEntitlementsInvalid:
+                    .gatekeeperEntitlementsInvalid,
+                    .customDataBrokerStatsOptoutSubmit,
+                    .customGlobalStatsOptoutSubmit:
 
                 PixelKit.fire(event)
 
