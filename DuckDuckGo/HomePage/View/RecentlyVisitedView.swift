@@ -33,7 +33,7 @@ struct RecentlyVisited: View {
             if settingsModel.customBackground != nil {
                 RoundedRectangle(cornerRadius: 12)
                     .stroke(Color.homeFavoritesGhost, style: StrokeStyle(lineWidth: 1.0))
-                    .vibrancyEffect(material: settingsModel.vibrancyMaterial, alpha: settingsModel.vibrancyAlpha, color: settingsModel.backgroundColor)
+                    .vibrancyEffect()
                     .cornerRadius(12)
             } else {
                 RoundedRectangle(cornerRadius: 12)

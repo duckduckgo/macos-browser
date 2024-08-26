@@ -54,10 +54,9 @@ public extension View {
     func vibrancyEffect(
         material: NSVisualEffectView.Material = .fullScreenUI,
         blendingMode: NSVisualEffectView.BlendingMode = .withinWindow,
-        alpha: CGFloat = 1.0,
-        color: NSColor = .clear
+        alpha: CGFloat = 1.0
     ) -> some View {
-        modifier(VibrancyModifier(material: material, blendingMode: blendingMode, alpha: alpha, color: color))
+        modifier(VibrancyModifier(material: material, blendingMode: blendingMode, alpha: alpha))
     }
 }
 
@@ -66,17 +65,11 @@ private struct VibrancyModifier: ViewModifier {
     let material: NSVisualEffectView.Material
     let blendingMode: NSVisualEffectView.BlendingMode
     let alpha: CGFloat
-    let color: NSColor
 
     @ViewBuilder
     func body(content: Content) -> some View {
         content.background(
-            ZStack {
-                if #available(macOS 12.0, *) {
-                    Color(nsColor: color)
-                }
-                VisualEffectBlur(material: material, blendingMode: blendingMode, alpha: alpha)
-            }
+            VisualEffectBlur(material: material, blendingMode: blendingMode, alpha: alpha)
         )
     }
 }

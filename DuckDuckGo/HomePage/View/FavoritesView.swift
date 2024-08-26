@@ -284,7 +284,7 @@ struct FavoriteTemplate: View {
 
                     if settingsModel.customBackground != nil {
                         RoundedRectangle(cornerRadius: 12)
-                            .vibrancyEffect(material: settingsModel.vibrancyMaterial, alpha: settingsModel.vibrancyAlpha, color: settingsModel.backgroundColor)
+                            .vibrancyEffect()
                             .cornerRadius(12)
                             .blendMode(.destinationOut)
                     } else {
@@ -299,7 +299,7 @@ struct FavoriteTemplate: View {
                 if settingsModel.customBackground != nil {
                     RoundedRectangle(cornerRadius: 12)
                         .fill(isHovering ? .buttonMouseOver : .clear)
-                        .vibrancyEffect(material: settingsModel.vibrancyMaterial, alpha: settingsModel.vibrancyAlpha, color: settingsModel.backgroundColor)
+                        .vibrancyEffect()
                         .cornerRadius(12)
                 } else {
                     RoundedRectangle(cornerRadius: 12)
@@ -323,7 +323,7 @@ struct FavoriteTemplate: View {
                 .padding(.horizontal, 3)
                 .if(settingsModel.customBackground != nil) { view in
                     view
-                        .vibrancyEffect(material: settingsModel.vibrancyMaterial, alpha: settingsModel.vibrancyAlpha, color: settingsModel.backgroundColor)
+                        .vibrancyEffect()
                         .cornerRadius(3)
                 }
 
