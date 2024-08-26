@@ -180,7 +180,6 @@ final class SettingsModelTests: XCTestCase {
     }
 
     func testAddImageWhenImageIsAddedThenCustomBackgroundIsUpdated() async {
-        openFilePanel = { "file:///sample.jpg".url! }
         await model.addNewImage()
         XCTAssertEqual(userBackgroundImagesManager.addImageWithURLCallCount, 1)
         XCTAssertEqual(model.customBackground, .customImage(.init(fileName: "sample.jpg", colorScheme: .light)))
@@ -192,7 +191,6 @@ final class SettingsModelTests: XCTestCase {
 
     func testAddImageWhenImageAddingFailsThenAlertIsShown() async {
         struct TestError: Error {}
-        openFilePanel = { "file:///sample.jpg".url! }
         userBackgroundImagesManager.addImageWithURL = { _ in
             throw TestError()
         }
@@ -206,6 +204,63 @@ final class SettingsModelTests: XCTestCase {
             NewTabPagePixel.newTabBackgroundAddImageError.name
         ])
         XCTAssertEqual(showImageFailedAlertCallCount, 1)
+    }
+
+    func testThatCustomBackgroundModeModelShowsPreviewOfCurrentlySelectedBackground() {
+        model.customBackground = nil
+        XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundPreview), [
+            .gradient(SettingsModel.CustomBackground.placeholderGradient),
+            .solidColor(SettingsModel.CustomBackground.placeholderColor),
+            .illustration(SettingsModel.CustomBackground.placeholderIllustration),
+            nil
+        ])
+
+        model.customBackground = .gradient(.gradient04)
+        XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundPreview), [
+            .gradient(.gradient04),
+            .solidColor(SettingsModel.CustomBackground.placeholderColor),
+            .illustration(SettingsModel.CustomBackground.placeholderIllustration),
+            nil
+        ])
+
+        model.customBackground = .solidColor(.darkPink)
+        XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundPreview), [
+            .gradient(SettingsModel.CustomBackground.placeholderGradient),
+            .solidColor(.darkPink),
+            .illustration(SettingsModel.CustomBackground.placeholderIllustration),
+            nil
+        ])
+
+        model.customBackground = .illustration(.illustration02)
+        XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundPreview), [
+            .gradient(SettingsModel.CustomBackground.placeholderGradient),
+            .solidColor(SettingsModel.CustomBackground.placeholderColor),
+            .illustration(.illustration02),
+            nil
+        ])
+    }
+
+    func testThatCustomBackgroundModeModelShowsPreviewOfLastSelectedUserImageIfUserImagesArePresent() {
+        let image1 = UserBackgroundImage(fileName: "abc1", colorScheme: .light)
+        let image2 = UserBackgroundImage(fileName: "abc2", colorScheme: .light)
+        let image3 = UserBackgroundImage(fileName: "abc3", colorScheme: .light)
+
+        userBackgroundImagesManager.availableImages = [image1, image2, image3]
+        model.customBackground = nil
+        XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundPreview), [
+            .gradient(SettingsModel.CustomBackground.placeholderGradient),
+            .solidColor(SettingsModel.CustomBackground.placeholderColor),
+            .illustration(SettingsModel.CustomBackground.placeholderIllustration),
+            .customImage(image1)
+        ])
+
+        userBackgroundImagesManager.availableImages = [image2, image1, image3]
+        XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundPreview), [
+            .gradient(SettingsModel.CustomBackground.placeholderGradient),
+            .solidColor(SettingsModel.CustomBackground.placeholderColor),
+            .illustration(SettingsModel.CustomBackground.placeholderIllustration),
+            .customImage(image2)
+        ])
     }
 
     override func tearDown() async throws {
