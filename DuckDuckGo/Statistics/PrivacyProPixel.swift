@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import Subscription
 import PixelKit
 
 // swiftlint:disable private_over_fileprivate
@@ -118,4 +119,30 @@ enum PrivacyProPixel: PixelKitEventV2 {
     var parameters: [String: String]? {
         return nil
     }
+}
+
+enum PrivacyProErrorPixel: PixelKitEventV2 {
+
+    case privacyProKeychainAccessError(accessType: AccountKeychainAccessType, accessError: AccountKeychainAccessError)
+
+    var name: String {
+        switch self {
+        case .privacyProKeychainAccessError: return "m_mac_\(appDistribution)_privacy-pro_keychain_access_error"
+        }
+    }
+
+    var parameters: [String: String]? {
+        switch self {
+        case .privacyProKeychainAccessError(let accessType, let accessError):
+            return [
+                "type": accessType.rawValue,
+                "error": accessError.errorDescription
+            ]
+        }
+    }
+
+    var error: (any Error)? {
+        return nil
+    }
+
 }
