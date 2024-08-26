@@ -40,6 +40,7 @@ final class SettingsModelTests: XCTestCase {
     var userBackgroundImagesManager: CapturingUserBackgroundImagesManager!
     var openSettingsCallCount = 0
     var sendPixelEvents: [PixelKitEvent] = []
+    var openFilePanel: () -> URL? = { return "file:///sample.jpg".url! }
     var openFilePanelCallCount = 0
     var imageURL: URL?
 
@@ -56,7 +57,7 @@ final class SettingsModelTests: XCTestCase {
             sendPixel: { [weak self] in self?.sendPixelEvents.append($0) },
             openFilePanel: { [weak self] in
                 self?.openFilePanelCallCount += 1
-                return self?.imageURL
+                return self?.openFilePanel()
             },
             openSettings: { [weak self] in self?.openSettingsCallCount += 1 }
         )
@@ -98,9 +99,14 @@ final class SettingsModelTests: XCTestCase {
     }
 
     func testWhenThereAreNoUserImagesThenHandleRootGridSelectionOpensFilePicker() {
+        let openFilePanelExpectation = expectation(description: "openFilePanel")
+        openFilePanel = {
+            openFilePanelExpectation.fulfill()
+            return "file:///sample.jpg".url!
+        }
         model.handleRootGridSelection(.customImagePicker)
         XCTAssertEqual(model.contentType, .root)
-        XCTAssertEqual(openFilePanelCallCount, 1)
+        waitForExpectations(timeout: 0.1)
     }
 
     func testWhenThereAreUserImagesThenHandleRootGridSelectionOpensUserImages() {

@@ -151,7 +151,9 @@ extension HomePage.Views {
         @ViewBuilder
         var addBackgroundButton: some View {
             let button = Button {
-                model.addNewImage()
+                Task {
+                    await model.addNewImage()
+                }
             } label: {
                 Text("Add Background")
                     .frame(maxWidth: .infinity)

@@ -1114,6 +1114,8 @@
 		37CEFCAA2A6737A2001EF741 /* CredentialsCleanupErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CEFCA82A6737A2001EF741 /* CredentialsCleanupErrorHandling.swift */; };
 		37D046992C7D037500AEAA50 /* CapturingUserBackgroundImagesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D046982C7D037500AEAA50 /* CapturingUserBackgroundImagesManager.swift */; };
 		37D0469A2C7D037500AEAA50 /* CapturingUserBackgroundImagesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D046982C7D037500AEAA50 /* CapturingUserBackgroundImagesManager.swift */; };
+		37D0469E2C7D0EDD00AEAA50 /* CustomBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D0469B2C7D0EC100AEAA50 /* CustomBackground.swift */; };
+		37D0469F2C7D0EDD00AEAA50 /* CustomBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D0469B2C7D0EC100AEAA50 /* CustomBackground.swift */; };
 		37D2377A287EB8CA00BCE03B /* TabIndex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D23779287EB8CA00BCE03B /* TabIndex.swift */; };
 		37D2377C287EBDA300BCE03B /* TabIndexTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D2377B287EBDA300BCE03B /* TabIndexTests.swift */; };
 		37D23780287EFEE200BCE03B /* PinnedTabsManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D2377F287EFEE200BCE03B /* PinnedTabsManagerTests.swift */; };
@@ -3273,6 +3275,7 @@
 		37CD54C827F2FDD100F1F7B9 /* DefaultBrowserPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefaultBrowserPreferences.swift; sourceTree = "<group>"; };
 		37CEFCA82A6737A2001EF741 /* CredentialsCleanupErrorHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialsCleanupErrorHandling.swift; sourceTree = "<group>"; };
 		37D046982C7D037500AEAA50 /* CapturingUserBackgroundImagesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturingUserBackgroundImagesManager.swift; sourceTree = "<group>"; };
+		37D0469B2C7D0EC100AEAA50 /* CustomBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomBackground.swift; sourceTree = "<group>"; };
 		37D23779287EB8CA00BCE03B /* TabIndex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabIndex.swift; sourceTree = "<group>"; };
 		37D2377B287EBDA300BCE03B /* TabIndexTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabIndexTests.swift; sourceTree = "<group>"; };
 		37D2377F287EFEE200BCE03B /* PinnedTabsManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedTabsManagerTests.swift; sourceTree = "<group>"; };
@@ -5024,6 +5027,7 @@
 				3797C7A22C62C38800DA77FB /* HomePageSettingsModel.swift */,
 				379026D02C650CCD00A089E8 /* UserBackgroundImagesManager.swift */,
 				370C23102C7747E200A80A3E /* ImageProcessor.swift */,
+				37D0469B2C7D0EC100AEAA50 /* CustomBackground.swift */,
 			);
 			path = HomePageSettings;
 			sourceTree = "<group>";
@@ -10560,6 +10564,7 @@
 				BDA7647D2BC497BE00D0400C /* DefaultVPNLocationFormatter.swift in Sources */,
 				3706FBCC293F65D500E42796 /* CustomRoundedCornersShape.swift in Sources */,
 				3706FBCD293F65D500E42796 /* LocaleExtension.swift in Sources */,
+				37D0469E2C7D0EDD00AEAA50 /* CustomBackground.swift in Sources */,
 				3706FBCE293F65D500E42796 /* SavePaymentMethodViewController.swift in Sources */,
 				9FA5A0A62BC8F34900153786 /* UserDefaultsBookmarkFoldersStore.swift in Sources */,
 				1DDC85002B835BC000670238 /* SearchPreferences.swift in Sources */,
@@ -11731,6 +11736,7 @@
 				B68C92C1274E3EF4002AC6B0 /* PopUpWindow.swift in Sources */,
 				AA5FA6A0275F948900DCE9C9 /* Favicons.xcdatamodeld in Sources */,
 				9F6434612BEC82B700D2D8A0 /* AttributionPixelHandler.swift in Sources */,
+				37D0469F2C7D0EDD00AEAA50 /* CustomBackground.swift in Sources */,
 				B684592225C93BE000DC17B6 /* Publisher.asVoid.swift in Sources */,
 				4B9DB01D2A983B24000927DB /* Waitlist.swift in Sources */,
 				AAA0CC33252F181A0079BC96 /* NavigationButtonMenuDelegate.swift in Sources */,
