@@ -19,7 +19,7 @@
 import SwiftUI
 import AppKit
 
-final class DuckPlayerOnboardingViewController: NSViewController, TabModalViewControllerDelegate {
+final class DuckPlayerOnboardingViewController: NSViewController {
     var didFinish: () -> Void
 
     internal init(didFinish: @escaping () -> Void) {

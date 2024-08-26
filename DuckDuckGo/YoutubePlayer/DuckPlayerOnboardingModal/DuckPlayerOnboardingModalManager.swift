@@ -18,59 +18,12 @@
 
 import Foundation
 
-protocol ModalPresentable: AnyObject {
-    func close(animated: Bool, completion: (() -> Void)?)
-    func show(on currentTabView: NSView, animated: Bool)
-}
-
-protocol TabModalViewControllerDelegate: AnyObject {
-    var didFinish: () -> Void { get set }
-}
-
-protocol TabModalPresentable: AnyObject {
-    associatedtype ModalType: TabModal
-
-    var modal: ModalType? { get set }
-
-    func show(on view: NSView, animated: Bool)
-    func close(animated: Bool)
-    func createModal() -> ModalType
-}
-
-extension TabModalPresentable {
-    func show(on view: NSView, animated: Bool) {
-        prepareModal()
-        modal?.show(on: view, animated: animated)
-    }
-
-    func close(animated: Bool) {
-        modal?.close(animated: animated) { [weak self] in
-            self?.cleanUp()
-        }
-    }
-
-    func cleanUp() {
-        modal = nil
-    }
-
-    func prepareModal() {
-        if modal == nil {
-            modal = createModal()
-        }
-    }
-}
-
-final class DuckPlayerOnboardingModalManager: TabModalPresentable {
-    typealias ModalType = TabModal
-
+final class DuckPlayerOnboardingModalManager: TabModalManageable {
     var modal: TabModal?
 
-    func createModal() -> TabModal {
-        let viewController = DuckPlayerOnboardingViewController { [weak self] in
-            self?.close(animated: true)
+    var viewController: NSViewController {
+        DuckPlayerOnboardingViewController { [weak self] in
+            self?.close(animated: true, completion: nil)
         }
-
-        let modal = TabModal(modalViewController: viewController)
-        return modal
     }
 }

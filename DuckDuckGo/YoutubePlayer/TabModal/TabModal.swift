@@ -1,5 +1,5 @@
 //
-//  DuckPlayerOnboardingModal.swift
+//  TabModal.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -78,9 +78,8 @@ public final class TabModal {
     }
 }
 
-extension TabModal: ModalPresentable {
-    
-    // MARK: - Public methods
+// MARK: - Public methods
+extension TabModal: TabModalPresentable {
     public func close(animated: Bool, completion: (() -> Void)? = nil) {
         guard let overlayWindow = windowController.window else {
             return

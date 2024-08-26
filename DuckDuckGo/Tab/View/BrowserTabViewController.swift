@@ -54,7 +54,10 @@ final class BrowserTabViewController: NSViewController {
     private var hoverLabelWorkItem: DispatchWorkItem?
 
     private(set) var transientTabContentViewController: NSViewController?
-    private var duckPlayerOnboardingModalManager = DuckPlayerOnboardingModalManager()
+    private lazy var duckPlayerOnboardingModalManager: DuckPlayerOnboardingModalManager = {
+        let modal = DuckPlayerOnboardingModalManager()
+        return modal
+    }()
 
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
@@ -436,7 +439,7 @@ final class BrowserTabViewController: NSViewController {
         tabViewModel?.tab.duckPlayerOnboardingPublisher.sink { [weak self, weak tab = tabViewModel?.tab] onboardingState in
 
             guard let self, let tab, let onboardingState = onboardingState, onboardingState.onboardingDecider.canDisplayOnboarding else  {
-                self?.duckPlayerOnboardingModalManager.close(animated: false)
+                self?.duckPlayerOnboardingModalManager.close(animated: false, completion: nil)
                 return
             }
 

@@ -186,8 +186,6 @@
 		1ED910D52B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ED910D42B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift */; };
 		1ED910D62B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ED910D42B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift */; };
 		310E79BF294A19A8007C49E8 /* FireproofingReferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 310E79BE294A19A8007C49E8 /* FireproofingReferenceTests.swift */; };
-		31119B3C2C74AB8B00884471 /* DuckPlayerOnboardingModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31119B362C74AB8B00884471 /* DuckPlayerOnboardingModal.swift */; };
-		31119B3D2C74AB8B00884471 /* DuckPlayerOnboardingModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31119B362C74AB8B00884471 /* DuckPlayerOnboardingModal.swift */; };
 		31119B402C74AB8B00884471 /* DuckPlayerOnboardingModalManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31119B382C74AB8B00884471 /* DuckPlayerOnboardingModalManager.swift */; };
 		31119B412C74AB8B00884471 /* DuckPlayerOnboardingModalManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31119B382C74AB8B00884471 /* DuckPlayerOnboardingModalManager.swift */; };
 		31119B422C74AB8B00884471 /* DuckPlayerOnboardingModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31119B392C74AB8B00884471 /* DuckPlayerOnboardingModalView.swift */; };
@@ -240,6 +238,10 @@
 		31B108DE2C762D820066AA9E /* DuckPlayerOnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B108DD2C762D820066AA9E /* DuckPlayerOnboardingViewModel.swift */; };
 		31B108DF2C762D820066AA9E /* DuckPlayerOnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B108DD2C762D820066AA9E /* DuckPlayerOnboardingViewModel.swift */; };
 		31B4AF532901A4F20013585E /* NSEventExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B4AF522901A4F20013585E /* NSEventExtension.swift */; };
+		31C01F962C7CC4250066AAE1 /* TabModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C01F952C7CC4250066AAE1 /* TabModal.swift */; };
+		31C01F972C7CC4250066AAE1 /* TabModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C01F952C7CC4250066AAE1 /* TabModal.swift */; };
+		31C01F9A2C7CC4C50066AAE1 /* TabModalManageable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C01F992C7CC4C50066AAE1 /* TabModalManageable.swift */; };
+		31C01F9B2C7CC4C50066AAE1 /* TabModalManageable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C01F992C7CC4C50066AAE1 /* TabModalManageable.swift */; };
 		31C3CE0228EDC1E70002C24A /* CustomRoundedCornersShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C3CE0128EDC1E70002C24A /* CustomRoundedCornersShape.swift */; };
 		31C9ADE52AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C9ADE42AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift */; };
 		31C9ADE62AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C9ADE42AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift */; };
@@ -3072,7 +3074,6 @@
 		1E862A882A9FC01200F84D4B /* SubscriptionUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = SubscriptionUI; sourceTree = "<group>"; };
 		1ED910D42B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityTheftRestorationPagesUserScript.swift; sourceTree = "<group>"; };
 		310E79BE294A19A8007C49E8 /* FireproofingReferenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireproofingReferenceTests.swift; sourceTree = "<group>"; };
-		31119B362C74AB8B00884471 /* DuckPlayerOnboardingModal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DuckPlayerOnboardingModal.swift; sourceTree = "<group>"; };
 		31119B382C74AB8B00884471 /* DuckPlayerOnboardingModalManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DuckPlayerOnboardingModalManager.swift; sourceTree = "<group>"; };
 		31119B392C74AB8B00884471 /* DuckPlayerOnboardingModalView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DuckPlayerOnboardingModalView.swift; sourceTree = "<group>"; };
 		31119B3A2C74AB8B00884471 /* DuckPlayerOnboardingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DuckPlayerOnboardingViewController.swift; sourceTree = "<group>"; };
@@ -3102,6 +3103,8 @@
 		31AA6B962B960B870025014E /* DataBrokerProtectionLoginItemPixels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionLoginItemPixels.swift; sourceTree = "<group>"; };
 		31B108DD2C762D820066AA9E /* DuckPlayerOnboardingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckPlayerOnboardingViewModel.swift; sourceTree = "<group>"; };
 		31B4AF522901A4F20013585E /* NSEventExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSEventExtension.swift; sourceTree = "<group>"; };
+		31C01F952C7CC4250066AAE1 /* TabModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabModal.swift; sourceTree = "<group>"; };
+		31C01F992C7CC4C50066AAE1 /* TabModalManageable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabModalManageable.swift; sourceTree = "<group>"; };
 		31C3CE0128EDC1E70002C24A /* CustomRoundedCornersShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomRoundedCornersShape.swift; sourceTree = "<group>"; };
 		31C5FFB82AF64D120008A79F /* DataBrokerProtectionFeatureGatekeeper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionFeatureGatekeeper.swift; sourceTree = "<group>"; };
 		31C9ADE42AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaitlistFeatureSetupHandler.swift; sourceTree = "<group>"; };
@@ -4847,7 +4850,6 @@
 		31119B3B2C74AB8B00884471 /* DuckPlayerOnboardingModal */ = {
 			isa = PBXGroup;
 			children = (
-				31119B362C74AB8B00884471 /* DuckPlayerOnboardingModal.swift */,
 				31119B382C74AB8B00884471 /* DuckPlayerOnboardingModalManager.swift */,
 				31119B392C74AB8B00884471 /* DuckPlayerOnboardingModalView.swift */,
 				31119B3A2C74AB8B00884471 /* DuckPlayerOnboardingViewController.swift */,
@@ -4913,6 +4915,15 @@
 			path = DBP;
 			sourceTree = "<group>";
 		};
+		31C01F942C7CC40A0066AAE1 /* TabModal */ = {
+			isa = PBXGroup;
+			children = (
+				31C01F952C7CC4250066AAE1 /* TabModal.swift */,
+				31C01F992C7CC4C50066AAE1 /* TabModalManageable.swift */,
+			);
+			path = TabModal;
+			sourceTree = "<group>";
+		};
 		31E163BB293A577200963C10 /* PrivacyReferenceTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -4935,6 +4946,7 @@
 		31F28C4B28C8EE9000119F70 /* YoutubePlayer */ = {
 			isa = PBXGroup;
 			children = (
+				31C01F942C7CC40A0066AAE1 /* TabModal */,
 				31119B3B2C74AB8B00884471 /* DuckPlayerOnboardingModal */,
 				37F19A6928E2F2D000740DC6 /* DuckPlayer.swift */,
 				31F28C5228C8EECA00119F70 /* DuckURLSchemeHandler.swift */,
@@ -10311,6 +10323,7 @@
 				B6E1491029A5C30500AAFBE8 /* ContentBlockingTabExtension.swift in Sources */,
 				3706FB82293F65D500E42796 /* PasswordManagementNoteItemView.swift in Sources */,
 				4BF97AD82B43C5B300EB4240 /* NetworkProtectionAppEvents.swift in Sources */,
+				31C01F972C7CC4250066AAE1 /* TabModal.swift in Sources */,
 				3706FEC5293F6F0600E42796 /* BWInstallationService.swift in Sources */,
 				3775912E29AAC72700E26367 /* SyncPreferences.swift in Sources */,
 				3706FB83293F65D500E42796 /* NSApplicationExtension.swift in Sources */,
@@ -10703,13 +10716,13 @@
 				3706FC7B293F65D500E42796 /* PasswordManagementViewController.swift in Sources */,
 				3706FC7C293F65D500E42796 /* ImportedBookmarks.swift in Sources */,
 				3706FC7D293F65D500E42796 /* NSMenuExtension.swift in Sources */,
+				31C01F9B2C7CC4C50066AAE1 /* TabModalManageable.swift in Sources */,
 				3701C9CF29BD040C00305B15 /* FirefoxBerkeleyDatabaseReader.swift in Sources */,
 				B65E5DB02B74E6A900480415 /* TrackerNetwork.swift in Sources */,
 				3706FC7E293F65D500E42796 /* MainWindowController.swift in Sources */,
 				3706FC7F293F65D500E42796 /* Tab.swift in Sources */,
 				3706FC81293F65D500E42796 /* DispatchQueueExtensions.swift in Sources */,
 				C13909F02B85FD4E001626ED /* AutofillActionExecutor.swift in Sources */,
-				31119B3D2C74AB8B00884471 /* DuckPlayerOnboardingModal.swift in Sources */,
 				F1FD5B682C2B0AAA0040FA0D /* SubscriptionPagesUseSubscriptionFeature.swift in Sources */,
 				3706FC82293F65D500E42796 /* PermissionAuthorizationPopover.swift in Sources */,
 				4BCBE4552BA7E16600FC75A1 /* NetworkProtectionSubscriptionEventHandler.swift in Sources */,
@@ -11494,6 +11507,7 @@
 				B6D574B429472253008ED1B6 /* FBProtectionTabExtension.swift in Sources */,
 				AAC30A28268E045400D2D9CD /* CrashReportReader.swift in Sources */,
 				85AC3B3525DA82A600C7D2AA /* DataTaskProviding.swift in Sources */,
+				31C01F962C7CC4250066AAE1 /* TabModal.swift in Sources */,
 				EECE10E529DD77E60044D027 /* FeatureFlag.swift in Sources */,
 				56406D4B2C636A8900BF8FA2 /* SpecialPagesUserScriptExtension.swift in Sources */,
 				AA3D531727A1EEED00074EC1 /* FeedbackViewController.swift in Sources */,
@@ -11786,6 +11800,7 @@
 				3171D6BA288984D00068632A /* BadgeAnimationView.swift in Sources */,
 				1DB67F292B6FE4A6003DF243 /* WebViewSnapshotRenderer.swift in Sources */,
 				4B9292CE2667123700AD2C21 /* BrowserTabSelectionDelegate.swift in Sources */,
+				31C01F9A2C7CC4C50066AAE1 /* TabModalManageable.swift in Sources */,
 				9FEE986D2B85BA17002E44E8 /* AddEditBookmarkDialogCoordinatorViewModel.swift in Sources */,
 				B6BCC53B2AFD15DF002C5499 /* DataImportProfilePicker.swift in Sources */,
 				3158B1562B0BF75D00AF130C /* DataBrokerProtectionFeatureGatekeeper.swift in Sources */,
@@ -12076,7 +12091,6 @@
 				4B9292D12667123700AD2C21 /* BookmarkTableRowView.swift in Sources */,
 				85589E9427BFE1E70038AD11 /* FavoritesView.swift in Sources */,
 				85AC7ADB27BD628400FFB69B /* HomePage.swift in Sources */,
-				31119B3C2C74AB8B00884471 /* DuckPlayerOnboardingModal.swift in Sources */,
 				376705AF27EB488600DD8D76 /* RoundedSelectionRowView.swift in Sources */,
 				B69B503F2726A12500758A2B /* LocalStatisticsStore.swift in Sources */,
 				B689ECD526C247DB006FB0C5 /* BackForwardListItem.swift in Sources */,
