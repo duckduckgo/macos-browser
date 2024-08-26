@@ -1,5 +1,5 @@
 //
-//  UnifiedFeedbackFormViewModelTests.swift
+//  VPNFeedbackFormViewModelTests.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -19,36 +19,38 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-final class UnifiedFeedbackFormViewModelTests: XCTestCase {
+final class VPNFeedbackFormViewModelTests: XCTestCase {
 
     func testWhenCreatingViewModel_ThenInitialStateIsFeedbackPending() throws {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
-        let viewModel = UnifiedFeedbackFormViewModel(vpnMetadataCollector: collector, feedbackSender: sender)
+        let viewModel = VPNFeedbackFormViewModel(metadataCollector: collector, feedbackSender: sender)
 
         XCTAssertEqual(viewModel.viewState, .feedbackPending)
+        XCTAssertEqual(viewModel.selectedFeedbackCategory, .landingPage)
     }
 
     func testWhenSendingFeedbackSucceeds_ThenFeedbackIsSent() async throws {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
-        let viewModel = UnifiedFeedbackFormViewModel(vpnMetadataCollector: collector, feedbackSender: sender)
-        viewModel.selectedReportType = UnifiedFeedbackReportType.reportIssue.rawValue
+        let viewModel = VPNFeedbackFormViewModel(metadataCollector: collector, feedbackSender: sender)
         let text = "Some feedback report text"
+        viewModel.selectedFeedbackCategory = .unableToInstall
         viewModel.feedbackFormText = text
 
         XCTAssertFalse(sender.sentMetadata)
         await viewModel.process(action: .submit)
         XCTAssertTrue(sender.sentMetadata)
-        XCTAssertEqual(sender.receivedData!.4, text)
+        XCTAssertEqual(sender.receivedData!.1, .unableToInstall)
+        XCTAssertEqual(sender.receivedData!.2, text)
     }
 
     func testWhenSendingFeedbackFails_ThenFeedbackIsNotSent() async throws {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
-        let viewModel = UnifiedFeedbackFormViewModel(vpnMetadataCollector: collector, feedbackSender: sender)
-        viewModel.selectedReportType = UnifiedFeedbackReportType.reportIssue.rawValue
+        let viewModel = VPNFeedbackFormViewModel(metadataCollector: collector, feedbackSender: sender)
         let text = "Some feedback report text"
+        viewModel.selectedFeedbackCategory = .unableToInstall
         viewModel.feedbackFormText = text
         sender.throwErrorWhenSending = true
 
@@ -62,21 +64,23 @@ final class UnifiedFeedbackFormViewModelTests: XCTestCase {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
         let delegate = MockVPNFeedbackFormViewModelDelegate()
-        let viewModel = UnifiedFeedbackFormViewModel(vpnMetadataCollector: collector, feedbackSender: sender)
+        let viewModel = VPNFeedbackFormViewModel(metadataCollector: collector, feedbackSender: sender)
         viewModel.delegate = delegate
 
         XCTAssertFalse(delegate.receivedDismissedViewCallback)
         await viewModel.process(action: .cancel)
         XCTAssertTrue(delegate.receivedDismissedViewCallback)
     }
+
 }
 
 // MARK: - Mocks
 
-private class MockVPNMetadataCollector: UnifiedMetadataCollector {
-    var collectedMetadata = false
+private class MockVPNMetadataCollector: VPNMetadataCollector {
 
-    func collectMetadata() async -> VPNMetadata {
+    var collectedMetadata: Bool = false
+
+    func collectVPNMetadata() async -> VPNMetadata {
         self.collectedMetadata = true
 
         let appInfo = VPNMetadata.AppInfo(
@@ -143,52 +147,33 @@ private class MockVPNMetadataCollector: UnifiedMetadataCollector {
 
 }
 
-private class MockVPNFeedbackSender: UnifiedFeedbackSender {
+private class MockVPNFeedbackSender: VPNFeedbackSender {
+
     var throwErrorWhenSending: Bool = false
     var sentMetadata: Bool = false
 
-    var receivedData: (VPNMetadata?, UnifiedFeedbackSource, String?, String?, String?)?
+    var receivedData: (VPNMetadata, VPNFeedbackCategory, String)?
 
     enum SomeError: Error {
         case error
     }
 
-    func sendFeatureRequestPixel(description: String, source: UnifiedFeedbackSource) async throws {
+    func send(metadata: VPNMetadata, category: VPNFeedbackCategory, userText: String) async throws {
         if throwErrorWhenSending {
             throw SomeError.error
         }
 
         self.sentMetadata = true
-        self.receivedData = (nil, source, nil, nil, description)
+        self.receivedData = (metadata, category, userText)
     }
 
-    func sendGeneralFeedbackPixel(description: String, source: UnifiedFeedbackSource) async throws {
-        if throwErrorWhenSending {
-            throw SomeError.error
-        }
-
-        self.sentMetadata = true
-        self.receivedData = (nil, source, nil, nil, description)
-    }
-
-    func sendReportIssuePixel<T: UnifiedFeedbackMetadata>(source: UnifiedFeedbackSource, category: String, subcategory: String, description: String, metadata: T?) async throws {
-        if throwErrorWhenSending {
-            throw SomeError.error
-        }
-
-        self.sentMetadata = true
-        self.receivedData = (metadata as? VPNMetadata, source, category, subcategory, description)
-    }
-
-    func sendFormShowPixel() {}
-    func sendSubmitScreenShowPixel(source: UnifiedFeedbackSource, reportType: String, category: String, subcategory: String) {}
-    func sendSubmitScreenFAQClickPixel(source: UnifiedFeedbackSource, reportType: String, category: String, subcategory: String) {}
 }
 
-private class MockVPNFeedbackFormViewModelDelegate: UnifiedFeedbackFormViewModelDelegate {
+private class MockVPNFeedbackFormViewModelDelegate: VPNFeedbackFormViewModelDelegate {
+
     var receivedDismissedViewCallback: Bool = false
 
-    func feedbackViewModelDismissedView(_ viewModel: UnifiedFeedbackFormViewModel) {
+    func vpnFeedbackViewModelDismissedView(_ viewModel: VPNFeedbackFormViewModel) {
         receivedDismissedViewCallback = true
     }
 
