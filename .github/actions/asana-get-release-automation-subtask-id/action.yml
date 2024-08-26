@@ -20,20 +20,18 @@ runs:
   using: "composite"
   steps:
     - id: extract-task-id
-      uses: ./.github/actions/asana-extract-task-id
-      with:
-        task-url: ${{ inputs.task-url }}
-        access-token: ${{ inputs.access-token }}
+      shell: bash
+      run: bundle exec fastlane run asana_extract_task_id task_url:"${{ inputs.task-url }}"
 
     - id: extract-assignee-id
       uses: ./.github/actions/asana-extract-task-assignee
       with:
-        task-id: ${{ steps.extract-task-id.outputs.task-id }}
+        task-id: ${{ steps.extract-task-id.outputs.asana_task_id }}
         access-token: ${{ inputs.access-token }}
 
     - id: extract-automation-task-id
       run: |
-        task_id="${{ steps.extract-task-id.outputs.task-id }}"
+        task_id="${{ steps.extract-task-id.outputs.asana_task_id }}"
         automation_task_id=$(curl -fLSs "https://app.asana.com/api/1.0/tasks/${task_id}/subtasks?opt_fields=name" \
           -H "Authorization: Bearer ${{ inputs.access-token }}" \
           | jq -r '.data[] | select(.name=="Automation").gid')
