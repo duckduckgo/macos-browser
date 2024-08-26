@@ -21,7 +21,7 @@ import Foundation
 protocol UnifiedMetadataCollector {
     associatedtype Metadata: UnifiedFeedbackMetadata
 
-    func collectMetadata() async -> Metadata?
+    func collectMetadata() async -> Metadata
 }
 
 protocol UnifiedFeedbackMetadata: Encodable {

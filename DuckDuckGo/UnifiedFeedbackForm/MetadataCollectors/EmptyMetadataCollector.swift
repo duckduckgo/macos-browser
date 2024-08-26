@@ -22,8 +22,11 @@ struct EmptyFeedbackMetadata: UnifiedFeedbackMetadata {
 
 }
 
+/// Default implementation for Privacy Pro metadata collector
+/// Intentionally left blank as we currently don't collect any metadata for PIR and ITR
+/// See `DefaultVPNMetadataCollector` for a reference implementation
 final class EmptyMetadataCollector: UnifiedMetadataCollector {
-    func collectMetadata() async -> EmptyFeedbackMetadata? {
-        nil
+    func collectMetadata() async -> EmptyFeedbackMetadata {
+        EmptyFeedbackMetadata()
     }
 }

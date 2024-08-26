@@ -335,7 +335,7 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
 extension VPNMetadata: UnifiedFeedbackMetadata {}
 
 extension DefaultVPNMetadataCollector: UnifiedMetadataCollector {
-    func collectMetadata() async -> VPNMetadata? {
+    func collectMetadata() async -> VPNMetadata {
         await collectVPNMetadata()
     }
 }

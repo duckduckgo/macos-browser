@@ -40564,9 +40564,6 @@
         }
       }
     },
-    "Please give us your feedback:" : {
-
-    },
     "Please submit a report to help us fix the issue." : {
       "comment" : "Data import failure Report dialog title.",
       "localizations" : {
