@@ -83,6 +83,9 @@ jobs:
         submodules: recursive
         ref: ${{ env.BRANCH }}
 
+    - name: Set up fastlane
+      run: bundle install
+
     - name: Create Tag and GitHub Release
       id: create-tag
       uses: ./.github/actions/create-tag-and-github-release
