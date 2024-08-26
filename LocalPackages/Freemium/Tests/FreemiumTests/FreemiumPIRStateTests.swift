@@ -59,7 +59,7 @@ final class FreemiumPIRStateTests: XCTestCase {
     }
 
     func testIsCurrentFreemiumPIRUser_WhenDidOnboardIsTrueAndUserIsNotAuthenticated_ShouldReturnTrue() {
-        //Given
+        // Given
         let sut = DefaultFreemiumPIRState(userDefaults: testUserDefaults, accountManager: mockAccountManager)
         XCTAssertFalse(sut.didOnboard)
         testUserDefaults.setValue(true, forKey: pir)
@@ -74,7 +74,7 @@ final class FreemiumPIRStateTests: XCTestCase {
     }
 
     func testIsCurrentFreemiumPIRUser_WhenDidOnboardIsTrueAndUserIsAuthenticated_ShouldReturnFalse() {
-        //Given
+        // Given
         let sut = DefaultFreemiumPIRState(userDefaults: testUserDefaults, accountManager: mockAccountManager)
         XCTAssertFalse(sut.didOnboard)
         testUserDefaults.setValue(true, forKey: pir)
@@ -89,7 +89,7 @@ final class FreemiumPIRStateTests: XCTestCase {
     }
 
     func testIsCurrentFreemiumPIRUser_WhenDidOnboardIsFalse_ShouldReturnFalse() {
-        //Given
+        // Given
         let sut = DefaultFreemiumPIRState(userDefaults: testUserDefaults, accountManager: mockAccountManager)
         XCTAssertFalse(sut.didOnboard)
         testUserDefaults.setValue(false, forKey: pir)

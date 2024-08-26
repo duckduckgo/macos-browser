@@ -75,4 +75,3 @@ final class MockAccountManager: AccountManager {
         true
     }
 }
-
