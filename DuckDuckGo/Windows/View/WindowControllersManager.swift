@@ -232,7 +232,7 @@ extension WindowControllersManager {
         windowController.mainViewController.navigationBarViewController.showNetworkProtectionStatus()
     }
 
-    func showShareFeedbackModal(source: UnifiedFeedbackFormViewModel.Source = .unknown) {
+    func showShareFeedbackModal(source: UnifiedFeedbackSource = .default) {
         let feedbackFormViewController: NSViewController = {
             if subscriptionFeatureAvailability.usesUnifiedFeedbackForm {
                 return UnifiedFeedbackFormViewController(source: source)

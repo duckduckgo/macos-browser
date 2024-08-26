@@ -26,15 +26,6 @@ protocol UnifiedFeedbackFormViewModelDelegate: AnyObject {
 }
 
 final class UnifiedFeedbackFormViewModel: ObservableObject {
-    enum Source: String {
-        case settings
-        case ppro
-        case vpn
-        case pir
-        case itr
-        case unknown
-    }
-
     enum ViewState {
         case feedbackPending
         case feedbackSending
@@ -76,7 +67,7 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
     @Published var selectedReportType: String = UnifiedFeedbackReportType.prompt.rawValue {
         didSet {
             let defaultCategory: UnifiedFeedbackCategory
-            switch Source(rawValue: source) {
+            switch source {
             case .ppro: defaultCategory = .subscription
             case .vpn: defaultCategory = .vpn
             case .pir: defaultCategory = .pir
@@ -126,18 +117,18 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
     private let defaultMetadataCollector: any UnifiedMetadataCollector
     private let feedbackSender: any UnifiedFeedbackSender
 
-    let source: String
+    let source: UnifiedFeedbackSource
 
     init(vpnMetadataCollector: any UnifiedMetadataCollector,
          defaultMetadataCollector: any UnifiedMetadataCollector = EmptyMetadataCollector(),
          feedbackSender: any UnifiedFeedbackSender = DefaultFeedbackSender(),
-         source: Source = .unknown) {
+         source: UnifiedFeedbackSource = .default) {
         self.viewState = .feedbackPending
 
         self.vpnMetadataCollector = vpnMetadataCollector
         self.defaultMetadataCollector = defaultMetadataCollector
         self.feedbackSender = feedbackSender
-        self.source = source.rawValue
+        self.source = source
     }
 
     @MainActor

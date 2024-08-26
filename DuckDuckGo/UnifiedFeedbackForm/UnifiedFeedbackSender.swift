@@ -19,14 +19,19 @@
 import Foundation
 import PixelKit
 
+enum UnifiedFeedbackSource: String, StringRepresentable {
+    case settings, ppro, vpn, pir, itr, unknown
+    static var `default` = UnifiedFeedbackSource.unknown
+}
+
 protocol UnifiedFeedbackSender {
-    func sendFeatureRequestPixel(description: String, source: String) async throws
-    func sendGeneralFeedbackPixel(description: String, source: String) async throws
-    func sendReportIssuePixel<T: UnifiedFeedbackMetadata>(source: String, category: String, subcategory: String, description: String, metadata: T?) async throws
+    func sendFeatureRequestPixel(description: String, source: UnifiedFeedbackSource) async throws
+    func sendGeneralFeedbackPixel(description: String, source: UnifiedFeedbackSource) async throws
+    func sendReportIssuePixel<T: UnifiedFeedbackMetadata>(source: UnifiedFeedbackSource, category: String, subcategory: String, description: String, metadata: T?) async throws
 
     func sendFormShowPixel()
-    func sendSubmitScreenShowPixel(source: String, reportType: String, category: String, subcategory: String)
-    func sendSubmitScreenFAQClickPixel(source: String, reportType: String, category: String, subcategory: String)
+    func sendSubmitScreenShowPixel(source: UnifiedFeedbackSource, reportType: String, category: String, subcategory: String)
+    func sendSubmitScreenFAQClickPixel(source: UnifiedFeedbackSource, reportType: String, category: String, subcategory: String)
 }
 
 extension UnifiedFeedbackSender {
@@ -54,11 +59,6 @@ extension StringRepresentable where RawValue == String {
 }
 
 struct DefaultFeedbackSender: UnifiedFeedbackSender {
-    enum Source: String, StringRepresentable {
-        case settings, ppro, vpn, pir, itr, unknown
-        static var `default` = Source.unknown
-    }
-
     enum ReportType: String, StringRepresentable {
         case general, reportIssue, requestFeature
         static var `default` = ReportType.general
@@ -78,18 +78,18 @@ struct DefaultFeedbackSender: UnifiedFeedbackSender {
         static var `default` = Subcategory.somethingElse
     }
 
-    func sendFeatureRequestPixel(description: String, source: String) async throws {
+    func sendFeatureRequestPixel(description: String, source: UnifiedFeedbackSource) async throws {
         try await sendStandardPixel(GeneralPixel.pproFeedbackFeatureRequest(description: description,
-                                                                            source: Source.from(source)))
+                                                                            source: source.rawValue))
     }
 
-    func sendGeneralFeedbackPixel(description: String, source: String) async throws {
+    func sendGeneralFeedbackPixel(description: String, source: UnifiedFeedbackSource) async throws {
         try await sendStandardPixel(GeneralPixel.pproFeedbackGeneralFeedback(description: description,
-                                                                             source: Source.from(source)))
+                                                                             source: source.rawValue))
     }
 
-    func sendReportIssuePixel<T: UnifiedFeedbackMetadata>(source: String, category: String, subcategory: String, description: String, metadata: T?) async throws {
-        try await sendStandardPixel(GeneralPixel.pproFeedbackReportIssue(source: Source.from(source),
+    func sendReportIssuePixel<T: UnifiedFeedbackMetadata>(source: UnifiedFeedbackSource, category: String, subcategory: String, description: String, metadata: T?) async throws {
+        try await sendStandardPixel(GeneralPixel.pproFeedbackReportIssue(source: source.rawValue,
                                                                          category: Category.from(category),
                                                                          subcategory: Subcategory.from(subcategory),
                                                                          description: description,
@@ -100,16 +100,16 @@ struct DefaultFeedbackSender: UnifiedFeedbackSender {
         PixelKit.fire(GeneralPixel.pproFeedbackFormShow, frequency: .dailyAndCount)
     }
 
-    func sendSubmitScreenShowPixel(source: String, reportType: String, category: String, subcategory: String) {
-        PixelKit.fire(GeneralPixel.pproFeedbackSubmitScreenShow(source: source,
+    func sendSubmitScreenShowPixel(source: UnifiedFeedbackSource, reportType: String, category: String, subcategory: String) {
+        PixelKit.fire(GeneralPixel.pproFeedbackSubmitScreenShow(source: source.rawValue,
                                                                 reportType: ReportType.from(reportType),
                                                                 category: Category.from(category),
                                                                 subcategory: Subcategory.from(subcategory)),
                       frequency: .dailyAndCount)
     }
 
-    func sendSubmitScreenFAQClickPixel(source: String, reportType: String, category: String, subcategory: String) {
-        PixelKit.fire(GeneralPixel.pproFeedbackSubmitScreenFAQClick(source: source,
+    func sendSubmitScreenFAQClickPixel(source: UnifiedFeedbackSource, reportType: String, category: String, subcategory: String) {
+        PixelKit.fire(GeneralPixel.pproFeedbackSubmitScreenFAQClick(source: source.rawValue,
                                                                     reportType: ReportType.from(reportType),
                                                                     category: Category.from(category),
                                                                     subcategory: Subcategory.from(subcategory)),
