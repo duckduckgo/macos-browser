@@ -17,16 +17,19 @@
 //
 
 import Foundation
+import Subscription
 
 /// `FreemiumPIRState` types provide access to Freemium PIR-related state
 protocol FreemiumPIRState {
     var didOnboard: Bool { get set }
+    var isCurrentFreemiumPIRUser: Bool { get }
 }
 
 /// Default implementation of `FreemiumPIRState`. `UserDefaults` is used as underlying storage.
 public final class DefaultFreemiumPIRState: FreemiumPIRState {
 
     private let userDefaults: UserDefaults
+    private let accountManager: AccountManager
     private let key = "macos.browser.freemium.pir"
 
     public var didOnboard: Bool {
@@ -37,7 +40,13 @@ public final class DefaultFreemiumPIRState: FreemiumPIRState {
         }
     }
 
-    public init(userDefaults: UserDefaults) {
+    public var isCurrentFreemiumPIRUser: Bool {
+        didOnboard && !accountManager.isUserAuthenticated
+    }
+
+    public init(userDefaults: UserDefaults,
+                accountManager: AccountManager) {
         self.userDefaults = userDefaults
+        self.accountManager = accountManager
     }
 }
