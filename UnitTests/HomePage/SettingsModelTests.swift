@@ -34,6 +34,24 @@ final class MockUserBackgroundImagesManager: UserBackgroundImagesManaging {
     let storageLocation: URL
     let maximumNumberOfImages: Int
 
+    var imageForUserBackgroundImageCallCount = 0
+    var imageForUserBackgroundImage: (UserBackgroundImage) -> NSImage? = { _ in return nil }
+
+    var thumbnailImageForUserBackgroundImageCallCount = 0
+    var thumbnailImageForUserBackgroundImage: (UserBackgroundImage) -> NSImage? = { _ in return nil }
+
+    var addImageWithURLCallCount = 0
+    var addImageWithURL: (URL) async throws -> UserBackgroundImage = { _ in return .init(fileName: "abc", colorScheme: .light) }
+
+    var deleteImageCallCount = 0
+    var deleteImageImpl: (UserBackgroundImage) -> Void = { _ in }
+
+    var updateSelectedTimestampForUserBackgroundImageCallCount = 0
+    var updateSelectedTimestampForUserBackgroundImage: (UserBackgroundImage) -> Void = { _ in }
+
+    var sortImagesByLastUsedCallCount = 0
+    var sortImagesByLastUsedImpl: () -> Void = {}
+
     @Published var availableImages: [UserBackgroundImage] = []
 
     var availableImagesPublisher: AnyPublisher<[UserBackgroundImage], Never> {
@@ -41,24 +59,33 @@ final class MockUserBackgroundImagesManager: UserBackgroundImagesManaging {
     }
 
     func image(for userBackgroundImage: UserBackgroundImage) -> NSImage? {
-        nil
+        imageForUserBackgroundImageCallCount += 1
+        return imageForUserBackgroundImage(userBackgroundImage)
     }
 
     func thumbnailImage(for userBackgroundImage: UserBackgroundImage) -> NSImage? {
-        nil
+        thumbnailImageForUserBackgroundImageCallCount += 1
+        return thumbnailImageForUserBackgroundImage(userBackgroundImage)
     }
 
     func addImage(with url: URL) async throws -> UserBackgroundImage {
-        .init(fileName: "abc", colorScheme: .light)
+        addImageWithURLCallCount += 1
+        return try await addImageWithURL(url)
     }
 
     func deleteImage(_ userBackgroundImage: UserBackgroundImage) {
+        deleteImageCallCount += 1
+        deleteImageImpl(userBackgroundImage)
     }
 
     func updateSelectedTimestamp(for userBackgroundImage: UserBackgroundImage) {
+        updateSelectedTimestampForUserBackgroundImageCallCount += 1
+        updateSelectedTimestampForUserBackgroundImage(userBackgroundImage)
     }
 
     func sortImagesByLastUsed() {
+        sortImagesByLastUsedCallCount += 1
+        sortImagesByLastUsedImpl()
     }
 }
 
