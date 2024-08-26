@@ -24,71 +24,6 @@ import XCTest
 
 private typealias SettingsModel = HomePage.Models.SettingsModel
 
-final class MockUserBackgroundImagesManager: UserBackgroundImagesManaging {
-
-    init(storageLocation: URL, maximumNumberOfImages: Int = HomePage.Models.SettingsModel.Const.maximumNumberOfUserImages) {
-        self.storageLocation = storageLocation
-        self.maximumNumberOfImages = maximumNumberOfImages
-    }
-
-    let storageLocation: URL
-    let maximumNumberOfImages: Int
-
-    var imageForUserBackgroundImageCallCount = 0
-    var imageForUserBackgroundImage: (UserBackgroundImage) -> NSImage? = { _ in return nil }
-
-    var thumbnailImageForUserBackgroundImageCallCount = 0
-    var thumbnailImageForUserBackgroundImage: (UserBackgroundImage) -> NSImage? = { _ in return nil }
-
-    var addImageWithURLCallCount = 0
-    var addImageWithURL: (URL) async throws -> UserBackgroundImage = { _ in return .init(fileName: "abc", colorScheme: .light) }
-
-    var deleteImageCallCount = 0
-    var deleteImageImpl: (UserBackgroundImage) -> Void = { _ in }
-
-    var updateSelectedTimestampForUserBackgroundImageCallCount = 0
-    var updateSelectedTimestampForUserBackgroundImage: (UserBackgroundImage) -> Void = { _ in }
-
-    var sortImagesByLastUsedCallCount = 0
-    var sortImagesByLastUsedImpl: () -> Void = {}
-
-    @Published var availableImages: [UserBackgroundImage] = []
-
-    var availableImagesPublisher: AnyPublisher<[UserBackgroundImage], Never> {
-        $availableImages.removeDuplicates().eraseToAnyPublisher()
-    }
-
-    func image(for userBackgroundImage: UserBackgroundImage) -> NSImage? {
-        imageForUserBackgroundImageCallCount += 1
-        return imageForUserBackgroundImage(userBackgroundImage)
-    }
-
-    func thumbnailImage(for userBackgroundImage: UserBackgroundImage) -> NSImage? {
-        thumbnailImageForUserBackgroundImageCallCount += 1
-        return thumbnailImageForUserBackgroundImage(userBackgroundImage)
-    }
-
-    func addImage(with url: URL) async throws -> UserBackgroundImage {
-        addImageWithURLCallCount += 1
-        return try await addImageWithURL(url)
-    }
-
-    func deleteImage(_ userBackgroundImage: UserBackgroundImage) {
-        deleteImageCallCount += 1
-        deleteImageImpl(userBackgroundImage)
-    }
-
-    func updateSelectedTimestamp(for userBackgroundImage: UserBackgroundImage) {
-        updateSelectedTimestampForUserBackgroundImageCallCount += 1
-        updateSelectedTimestampForUserBackgroundImage(userBackgroundImage)
-    }
-
-    func sortImagesByLastUsed() {
-        sortImagesByLastUsedCallCount += 1
-        sortImagesByLastUsedImpl()
-    }
-}
-
 fileprivate extension SettingsModel.CustomBackgroundModeModel {
     static let root: Self = .init(contentType: .root, title: "", customBackgroundPreview: nil)
     static let gradientPicker: Self = .init(contentType: .gradientPicker, title: "", customBackgroundPreview: nil)
@@ -101,24 +36,24 @@ final class SettingsModelTests: XCTestCase {
 
     fileprivate var model: SettingsModel!
     var storageLocation: URL!
-    var appearancePreferencesPersistor: AppearancePreferencesPersistorMock!
-    var userBackgroundImagesManager: MockUserBackgroundImagesManager!
+    var appearancePreferences: AppearancePreferences!
+    var userBackgroundImagesManager: CapturingUserBackgroundImagesManager!
     var openSettingsCallCount = 0
-    var sendPixelCalls: [PixelKitEvent] = []
+    var sendPixelEvents: [PixelKitEvent] = []
     var openFilePanelCallCount = 0
     var imageURL: URL?
 
     override func setUp() async throws {
         openSettingsCallCount = 0
-        sendPixelCalls = []
+        sendPixelEvents = []
 
         storageLocation = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
-        appearancePreferencesPersistor = AppearancePreferencesPersistorMock()
-        userBackgroundImagesManager = MockUserBackgroundImagesManager(storageLocation: storageLocation, maximumNumberOfImages: 4)
+        appearancePreferences = .init(persistor: AppearancePreferencesPersistorMock())
+        userBackgroundImagesManager = CapturingUserBackgroundImagesManager(storageLocation: storageLocation, maximumNumberOfImages: 4)
         model = SettingsModel(
-            appearancePreferences: .init(persistor: appearancePreferencesPersistor),
+            appearancePreferences: appearancePreferences,
             userBackgroundImagesManager: userBackgroundImagesManager,
-            sendPixel: { [weak self] in self?.sendPixelCalls.append($0) },
+            sendPixel: { [weak self] in self?.sendPixelEvents.append($0) },
             openFilePanel: { [weak self] in
                 self?.openFilePanelCallCount += 1
                 return self?.imageURL
@@ -173,6 +108,58 @@ final class SettingsModelTests: XCTestCase {
         model.handleRootGridSelection(.customImagePicker)
         XCTAssertEqual(model.contentType, .customImagePicker)
         XCTAssertEqual(openFilePanelCallCount, 0)
+    }
+
+    func testWhenNavigatingFromUserImagePickerToRootThenUserImagesAreSorted() {
+        userBackgroundImagesManager.availableImages = [.init(fileName: "abc", colorScheme: .light)]
+        model.handleRootGridSelection(.customImagePicker)
+        XCTAssertEqual(userBackgroundImagesManager.sortImagesByLastUsedCallCount, 0)
+
+        model.popToRootView()
+        XCTAssertEqual(userBackgroundImagesManager.sortImagesByLastUsedCallCount, 1)
+    }
+
+    func testWhenCustomBackgroundIsUpdatedThenPixelIsSent() {
+        model.customBackground = .solidColor(.black)
+        model.customBackground = .gradient(.gradient01)
+        model.customBackground = .illustration(.illustration01)
+        model.customBackground = .customImage(.init(fileName: "abc", colorScheme: .light))
+        model.customBackground = nil
+
+        XCTAssertEqual(sendPixelEvents.map(\.name), [
+            NewTabPagePixel.newTabBackgroundSelectedSolidColor.name,
+            NewTabPagePixel.newTabBackgroundSelectedGradient.name,
+            NewTabPagePixel.newTabBackgroundSelectedIllustration.name,
+            NewTabPagePixel.newTabBackgroundSelectedUserImage.name,
+            NewTabPagePixel.newTabBackgroundReset.name
+        ])
+    }
+
+    func testThatCustomBackgroundIsPersistedToAppearancePreferences() {
+        model.customBackground = .solidColor(.black)
+        XCTAssertEqual(appearancePreferences.homePageCustomBackground, SettingsModel.CustomBackground.solidColor(.black))
+        model.customBackground = .gradient(.gradient01)
+        XCTAssertEqual(appearancePreferences.homePageCustomBackground, SettingsModel.CustomBackground.gradient(.gradient01))
+        model.customBackground = .illustration(.illustration01)
+        XCTAssertEqual(appearancePreferences.homePageCustomBackground, SettingsModel.CustomBackground.illustration(.illustration01))
+        let userImage = UserBackgroundImage(fileName: "abc", colorScheme: .light)
+        model.customBackground = .customImage(userImage)
+        XCTAssertEqual(appearancePreferences.homePageCustomBackground, SettingsModel.CustomBackground.customImage(userImage))
+        model.customBackground = nil
+        XCTAssertNil(appearancePreferences.homePageCustomBackground)
+    }
+
+    func testWhenUserImageIsSelectedThenItsTimestampIsUpdated() {
+        let userImage = UserBackgroundImage(fileName: "abc", colorScheme: .light)
+        var updateSelectedTimestampForUserBackgroundImageArguments: [UserBackgroundImage] = []
+
+        userBackgroundImagesManager.updateSelectedTimestampForUserBackgroundImage = { image in
+            updateSelectedTimestampForUserBackgroundImageArguments.append(image)
+        }
+        model.customBackground = .customImage(userImage)
+
+        XCTAssertEqual(userBackgroundImagesManager.updateSelectedTimestampForUserBackgroundImageCallCount, 1)
+        XCTAssertEqual(updateSelectedTimestampForUserBackgroundImageArguments, [userImage])
     }
 
     override func tearDown() async throws {
