@@ -32,7 +32,7 @@ let package = Package(
         .library(name: "VPNAppLauncher", targets: ["VPNAppLauncher"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", revision: "0e9f45c1612c27aba128ba2142caf984362c95db"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", revision: "6a9024d4d9ae7376738ca471d69a9398c8445b69"),
         .package(url: "https://github.com/airbnb/lottie-spm", exact: "4.4.3"),
         .package(path: "../AppLauncher"),
         .package(path: "../UDSHelper"),
