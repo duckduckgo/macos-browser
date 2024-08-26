@@ -67,7 +67,7 @@ final class FreemiumPIRStateTests: XCTestCase {
         XCTAssertTrue(testUserDefaults.bool(forKey: pir))
 
         // When
-        let result = sut.isCurrentFreemiumPIRUser
+        let result = sut.isCurrentUser
 
         // Then
         XCTAssertTrue(result)
@@ -82,7 +82,7 @@ final class FreemiumPIRStateTests: XCTestCase {
         XCTAssertTrue(testUserDefaults.bool(forKey: pir))
 
         // When
-        let result = sut.isCurrentFreemiumPIRUser
+        let result = sut.isCurrentUser
 
         // Then
         XCTAssertFalse(result)
@@ -97,7 +97,7 @@ final class FreemiumPIRStateTests: XCTestCase {
         XCTAssertFalse(testUserDefaults.bool(forKey: pir))
 
         // When
-        let result = sut.isCurrentFreemiumPIRUser
+        let result = sut.isCurrentUser
 
         // Then
         XCTAssertFalse(result)

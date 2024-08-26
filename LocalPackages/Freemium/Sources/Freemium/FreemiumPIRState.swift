@@ -20,9 +20,9 @@ import Foundation
 import Subscription
 
 /// `FreemiumPIRState` types provide access to Freemium PIR-related state
-protocol FreemiumPIRState {
+public protocol FreemiumPIRState {
     var didOnboard: Bool { get set }
-    var isCurrentFreemiumPIRUser: Bool { get }
+    var isCurrentUser: Bool { get }
 }
 
 /// Default implementation of `FreemiumPIRState`. `UserDefaults` is used as underlying storage.
@@ -39,11 +39,19 @@ public final class DefaultFreemiumPIRState: FreemiumPIRState {
             userDefaults.set(newValue, forKey: key)
         }
     }
-
-    public var isCurrentFreemiumPIRUser: Bool {
+    
+    /// Logic is based on `didOnboard` && `accountManager.isUserAuthenticated`
+    /// A user can only be a current freemium user is they onboarded and DON'T have a subscription
+    public var isCurrentUser: Bool {
         didOnboard && !accountManager.isUserAuthenticated
     }
-
+    
+    /// Initializes a `DefaultFreemiumPIRState` instance
+    /// Note: The `UserDefaults` parameter will be used to get and set state values. If creating and accessing this type from
+    /// multiple places, you must ensure you always pass the same `UserDefaults` instance to get consistent results.
+    /// - Parameters:
+    ///   - userDefaults: The `UserDefaults` parameter will be used to get and set state values.
+    ///   - accountManager: the `AccountManager` parameter is used to check if a user has a privacy pro subscription
     public init(userDefaults: UserDefaults,
                 accountManager: AccountManager) {
         self.userDefaults = userDefaults
