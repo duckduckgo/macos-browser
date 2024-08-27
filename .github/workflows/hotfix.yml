@@ -31,7 +31,7 @@ jobs:
           submodules: recursive
           fetch-depth: 0 # Fetch all history and tags in order to extract Asana task URLs from git log
 
-      - name: Prepare fastlane
+      - name: Set up fastlane
         run: bundle install
 
       - name: Make release branch

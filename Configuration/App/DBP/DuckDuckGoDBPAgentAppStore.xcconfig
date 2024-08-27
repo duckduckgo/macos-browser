@@ -31,14 +31,11 @@ INFOPLIST_KEY_NSPrincipalClass = Application
 //CODE_SIGN_STYLE[config=Debug][sdk=*] = Manual
 //CODE_SIGN_STYLE[config=Release][sdk=*] = Manual
 
-CODE_SIGN_ENTITLEMENTS[config=Review][sdk=macosx*] = DuckDuckGoDBPBackgroundAgent/DuckDuckGoDBPBackgroundAgentAppStore.entitlements
-CODE_SIGN_ENTITLEMENTS[config=CI][sdk=macosx*] = DuckDuckGoDBPBackgroundAgent/DuckDuckGoDBPBackgroundAgentAppStore.entitlements
-CODE_SIGN_ENTITLEMENTS[config=Debug][sdk=macosx*] = DuckDuckGoDBPBackgroundAgent/DuckDuckGoDBPBackgroundAgentAppStore.entitlements
-CODE_SIGN_ENTITLEMENTS[config=Release][sdk=macosx*] = DuckDuckGoDBPBackgroundAgent/DuckDuckGoDBPBackgroundAgentAppStore.entitlements
+CODE_SIGN_ENTITLEMENTS[sdk=macosx*] = DuckDuckGoDBPBackgroundAgent/DuckDuckGoDBPBackgroundAgentAppStore.entitlements
 
 CODE_SIGN_IDENTITY[sdk=macosx*] = 3rd Party Mac Developer Application
 CODE_SIGN_IDENTITY[config=Debug][sdk=macosx*] = Apple Development
-CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
+CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] = Developer ID Application
 
 PRODUCT_NAME_PREFIX = $(DBP_BACKGROUND_AGENT_PRODUCT_NAME)
 PRODUCT_NAME = $(DBP_BACKGROUND_AGENT_PRODUCT_NAME)
@@ -46,6 +43,7 @@ PRODUCT_NAME[config=Review][arch=*][sdk=*] = $(DBP_BACKGROUND_AGENT_PRODUCT_NAME
 PRODUCT_NAME[config=Release][arch=*][sdk=*] = $(DBP_BACKGROUND_AGENT_RELEASE_PRODUCT_NAME)
 
 PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*] =
+PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] = macOS DBP Agent App Store - CI
 PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = match AppStore com.duckduckgo.mobile.ios.DBP.backgroundAgent.review macos
 PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = match AppStore com.duckduckgo.mobile.ios.DBP.backgroundAgent macos
 

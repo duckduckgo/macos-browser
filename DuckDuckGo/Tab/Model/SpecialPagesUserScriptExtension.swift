@@ -42,21 +42,11 @@ extension SpecialPagesUserScript {
         self.registerSubfeature(delegate: sslErrorPageUserScript)
     }
 
-#if SPARKLE
-    func withReleaseNotes() {
-        let releaseNotesUserScript = ReleaseNotesUserScript()
-        self.registerSubfeature(delegate: releaseNotesUserScript)
-    }
-#endif
-
     @MainActor
     func withAllSubfeatures() {
         withOnboarding()
         withErrorPages()
         withDuckPlayerIfAvailable()
-#if SPARKLE
-        withReleaseNotes()
-#endif
     }
 
     @MainActor

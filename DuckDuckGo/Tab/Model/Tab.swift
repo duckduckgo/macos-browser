@@ -26,6 +26,7 @@ import WebKit
 import History
 import PixelKit
 import PhishingDetection
+import os.log
 
 protocol TabDelegate: ContentOverlayUserScriptDelegate {
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool)
@@ -1021,7 +1022,7 @@ extension Tab: UserContentControllerDelegate {
 
     @MainActor
     func userContentController(_ userContentController: UserContentController, didInstallContentRuleLists contentRuleLists: [String: WKContentRuleList], userScripts: UserScriptsProvider, updateEvent: ContentBlockerRulesManager.UpdateEvent) {
-        os_log("didInstallContentRuleLists", log: .contentBlocking, type: .info)
+        Logger.contentBlocking.info("didInstallContentRuleLists")
         guard let userScripts = userScripts as? UserScripts else { fatalError("Unexpected UserScripts") }
 
         userScripts.debugScript.instrumentation = instrumentation

@@ -28,10 +28,8 @@ runs:
   steps:
     - id: extract-task-id
       if: ${{ inputs.task-url }}
-      uses: ./.github/actions/asana-extract-task-id
-      with:
-        task-url: ${{ inputs.task-url }}
-        access-token: ${{ inputs.access-token }}
+      shell: bash
+      run: bundle exec fastlane run asana_extract_task_id task_url:"${{ inputs.task-url }}"
 
     - id: process-template-payload
       if: ${{ inputs.template-name }}
@@ -62,7 +60,7 @@ runs:
       shell: bash
       env:
         ASANA_ACCESS_TOKEN: ${{ inputs.access-token }}
-        TASK_ID: ${{ inputs.task-id || steps.extract-task-id.outputs.task-id }}
+        TASK_ID: ${{ inputs.task-id || steps.extract-task-id.outputs.asana_task_id }}
         PAYLOAD_BASE64: ${{ steps.process-template-payload.outputs.payload-base64 || steps.process-comment-payload.outputs.payload-base64 }}
       run: |
         return_code=$(curl -fLSs "https://app.asana.com/api/1.0/tasks/${TASK_ID}/stories" \
