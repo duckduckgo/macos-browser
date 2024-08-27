@@ -53,8 +53,6 @@ final class DefaultFreemiumPIRFeature: FreemiumPIRFeature {
         self.featureFlagger = featureFlagger
         self.subscriptionManager = subscriptionManager
         self.accountManager = accountManager
-
-//        let freemiumState = DefaultFreemiumPIRState(userDefaults: .dbp, subscriptionStatusProvider: subscriptionManager.accountManager)
     }
 }
 
