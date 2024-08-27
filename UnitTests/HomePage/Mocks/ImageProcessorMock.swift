@@ -1,5 +1,5 @@
 //
-//  CapturingImageProcessor.swift
+//  ImageProcessorMock.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -20,7 +20,7 @@
 import Foundation
 import SwiftUI
 
-final class CapturingImageProcessor: ImageProcessing {
+final class ImageProcessorMock: ImageProcessing {
 
     var convertImageToJPEG: (URL) throws -> Data = { _ in Data() }
     var resizeImage: (Data, CGSize) throws -> Data = { data, _ in data }

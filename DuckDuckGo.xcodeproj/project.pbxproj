@@ -1120,8 +1120,8 @@
 		37D0469F2C7D0EDD00AEAA50 /* CustomBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D0469B2C7D0EC100AEAA50 /* CustomBackground.swift */; };
 		37D046A12C7DA9A200AEAA50 /* UserBackgroundImagesManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D046A02C7DA9A200AEAA50 /* UserBackgroundImagesManagerTests.swift */; };
 		37D046A22C7DA9A200AEAA50 /* UserBackgroundImagesManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D046A02C7DA9A200AEAA50 /* UserBackgroundImagesManagerTests.swift */; };
-		37D046A42C7DAA8900AEAA50 /* CapturingImageProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D046A32C7DAA8900AEAA50 /* CapturingImageProcessor.swift */; };
-		37D046A52C7DAA8900AEAA50 /* CapturingImageProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D046A32C7DAA8900AEAA50 /* CapturingImageProcessor.swift */; };
+		37D046A42C7DAA8900AEAA50 /* ImageProcessorMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D046A32C7DAA8900AEAA50 /* ImageProcessorMock.swift */; };
+		37D046A52C7DAA8900AEAA50 /* ImageProcessorMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D046A32C7DAA8900AEAA50 /* ImageProcessorMock.swift */; };
 		37D2377A287EB8CA00BCE03B /* TabIndex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D23779287EB8CA00BCE03B /* TabIndex.swift */; };
 		37D2377C287EBDA300BCE03B /* TabIndexTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D2377B287EBDA300BCE03B /* TabIndexTests.swift */; };
 		37D23780287EFEE200BCE03B /* PinnedTabsManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D2377F287EFEE200BCE03B /* PinnedTabsManagerTests.swift */; };
@@ -3284,7 +3284,7 @@
 		37D046982C7D037500AEAA50 /* CapturingUserBackgroundImagesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturingUserBackgroundImagesManager.swift; sourceTree = "<group>"; };
 		37D0469B2C7D0EC100AEAA50 /* CustomBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomBackground.swift; sourceTree = "<group>"; };
 		37D046A02C7DA9A200AEAA50 /* UserBackgroundImagesManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserBackgroundImagesManagerTests.swift; sourceTree = "<group>"; };
-		37D046A32C7DAA8900AEAA50 /* CapturingImageProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturingImageProcessor.swift; sourceTree = "<group>"; };
+		37D046A32C7DAA8900AEAA50 /* ImageProcessorMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageProcessorMock.swift; sourceTree = "<group>"; };
 		37D23779287EB8CA00BCE03B /* TabIndex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabIndex.swift; sourceTree = "<group>"; };
 		37D2377B287EBDA300BCE03B /* TabIndexTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabIndexTests.swift; sourceTree = "<group>"; };
 		37D2377F287EFEE200BCE03B /* PinnedTabsManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedTabsManagerTests.swift; sourceTree = "<group>"; };
@@ -6212,7 +6212,7 @@
 				56D145F029E6F06D00E3488A /* MockBookmarkManager.swift */,
 				567DA93E29E8045D008AC5EE /* MockEmailStorage.swift */,
 				37D046982C7D037500AEAA50 /* CapturingUserBackgroundImagesManager.swift */,
-				37D046A32C7DAA8900AEAA50 /* CapturingImageProcessor.swift */,
+				37D046A32C7DAA8900AEAA50 /* ImageProcessorMock.swift */,
 			);
 			path = Mocks;
 			sourceTree = "<group>";
@@ -11032,7 +11032,7 @@
 				4B9DB0552A983B55000927DB /* MockWaitlistStorage.swift in Sources */,
 				1D9FDEC72B9B64DB0040B78C /* PrivacyProtectionStatusTests.swift in Sources */,
 				C13909F52B85FD79001626ED /* AutofillDeleteAllPasswordsExecutorTests.swift in Sources */,
-				37D046A52C7DAA8900AEAA50 /* CapturingImageProcessor.swift in Sources */,
+				37D046A52C7DAA8900AEAA50 /* ImageProcessorMock.swift in Sources */,
 				857E44642A9F70F200ED77A7 /* CampaignVariantTests.swift in Sources */,
 				561D29C72BDA74F4007B91D0 /* MockDDGSyncing.swift in Sources */,
 				3706FE1E293F661700E42796 /* GeolocationProviderTests.swift in Sources */,
@@ -12639,7 +12639,7 @@
 				F1AFDBD22C231B7A00710F2C /* SubscriptionAppStoreRestorerTests.swift in Sources */,
 				B610F2E427A8F37A00FCEBE9 /* CBRCompileTimeReporterTests.swift in Sources */,
 				AABAF59C260A7D130085060C /* FaviconManagerMock.swift in Sources */,
-				37D046A42C7DAA8900AEAA50 /* CapturingImageProcessor.swift in Sources */,
+				37D046A42C7DAA8900AEAA50 /* ImageProcessorMock.swift in Sources */,
 				1DFAB5222A8983DE00A0F7F6 /* SetExtensionTests.swift in Sources */,
 				4BF6962028BEEE8B00D402D4 /* LocalPinningManagerTests.swift in Sources */,
 				9F0FFFB82BCCAE9C007C87DD /* AddEditBookmarkDialogViewModelMock.swift in Sources */,

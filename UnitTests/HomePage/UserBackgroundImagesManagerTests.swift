@@ -25,12 +25,12 @@ final class UserBackgroundImagesManagerTests: XCTestCase {
 
     var manager: UserBackgroundImagesManager!
     var storageLocation: URL!
-    var imageProcessor: CapturingImageProcessor!
+    var imageProcessor: ImageProcessorMock!
     var sendPixelEvents: [PixelKitEvent] = []
 
     override func setUp() async throws {
         storageLocation = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
-        imageProcessor = CapturingImageProcessor()
+        imageProcessor = ImageProcessorMock()
 
         manager = UserBackgroundImagesManager(
             maximumNumberOfImages: 4,
@@ -202,6 +202,66 @@ final class UserBackgroundImagesManagerTests: XCTestCase {
 
         XCTAssertEqual(sendPixelEvents.map(\.name), Array(repeating: NewTabPagePixel.newTabBackgroundAddedUserImage.name, count: 5))
         XCTAssertEqual(manager.availableImages, Array(userBackgroundImages[1...4].reversed()))
+    }
+
+    func testAddImageWhenCopyingImageFailsThenNewImageIsNotAdded() async throws {
+        struct CopyImageError: Error {}
+
+        let image = NSImage.sampleImage(with: .black)
+        let imageURL = storageLocation.appending("abc.jpg")
+        try image.save(to: imageURL)
+
+        imageProcessor.convertImageToJPEG = { _ in throw CopyImageError() }
+
+        do {
+            let userBackgroundImage = try await manager.addImage(with: imageURL)
+            XCTFail("Expected to throw an error")
+        } catch {
+            XCTAssertTrue(manager.availableImages.isEmpty)
+        }
+    }
+
+    func testAddImageWhenThumbnailCreationFailsThenPixelIsSentAndNewImageIsStillAdded() async throws {
+        struct ThumbnailGenerationError: Error {}
+
+        let image = NSImage.sampleImage(with: .black)
+        let imageURL = storageLocation.appending("abc.jpg")
+        try image.save(to: imageURL)
+
+        let defaultImageProcessor = ImageProcessor()
+
+        imageProcessor.convertImageToJPEG = { try defaultImageProcessor.convertImageToJPEG(at: $0) }
+        imageProcessor.resizeImage = { data, size in
+            if size == UserBackgroundImagesManager.Const.thumbnailSize {
+                throw ThumbnailGenerationError()
+            }
+            return try defaultImageProcessor.resizeImage(with: data, to: size)
+        }
+
+        let userBackgroundImage = try await manager.addImage(with: imageURL)
+        XCTAssertEqual(sendPixelEvents.map(\.name), [
+            NewTabPagePixel.newTabBackgroundThumbnailGenerationError.name,
+            NewTabPagePixel.newTabBackgroundAddedUserImage.name
+        ])
+
+        XCTAssertEqual(manager.availableImages, [userBackgroundImage])
+
+        XCTAssertNotNil(manager.image(for: userBackgroundImage))
+
+        // verify that when thumbnail is requested then the original image is returned
+        XCTAssertEqual(
+            manager.thumbnailImage(for: userBackgroundImage)?.tiffRepresentation,
+            manager.image(for: userBackgroundImage)?.tiffRepresentation
+        )
+    }
+
+    func testDeleteImage() {
+    }
+
+    func testUpdateSelectedTimestamp() {
+    }
+
+    func testSortImagesByLastUsed() {
     }
 }
 
