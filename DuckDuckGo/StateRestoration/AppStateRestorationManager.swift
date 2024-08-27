@@ -67,7 +67,8 @@ final class AppStateRestorationManager: NSObject {
             try service.restoreState(using: { coder in
                 state = try WindowsManager.restoreState(from: coder, includePinnedTabs: isCalledAtStartup)
             })
-            clearLastSessionState()
+            // rename loaded app state file
+            service.didLoadState()
         } catch CocoaError.fileReadNoSuchFile {
             // ignore
         } catch {
@@ -80,7 +81,7 @@ final class AppStateRestorationManager: NSObject {
     }
 
     func clearLastSessionState() {
-        service.removeLastSessionState()
+        service.clearState(sync: true)
     }
 
     // Cleans all stored snapshots except snapshots listed in the state
@@ -94,8 +95,10 @@ final class AppStateRestorationManager: NSObject {
     }
 
     func applicationDidFinishLaunching() {
-        let isRelaunchingAutomatically = appIsRelaunchingAutomatically
-        appIsRelaunchingAutomatically = false
+        let isRelaunchingAutomatically = self.appIsRelaunchingAutomatically
+        self.appIsRelaunchingAutomatically = false
+        // don‘t automatically restore windows if relaunched 2nd time with no recently updated app session state
+        let shouldRestorePreviousSession = self.shouldRestorePreviousSession && !service.isAppStateFileStale
         readLastSessionState(restoreWindows: shouldRestorePreviousSession || isRelaunchingAutomatically)
 
         stateChangedCancellable = WindowControllersManager.shared.stateChanged

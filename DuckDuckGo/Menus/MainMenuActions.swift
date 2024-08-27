@@ -190,6 +190,11 @@ extension AppDelegate {
         }
     }
 
+    @MainActor
+    @objc func openPProFeedback(_ sender: Any?) {
+        WindowControllersManager.shared.showShareFeedbackModal(source: .settings)
+    }
+
     #endif
 
     @objc func navigateToBookmark(_ sender: Any?) {

@@ -1,5 +1,5 @@
 //
-//  SubscriptionFeatureAvailabilityMock.swift
+//  UnifiedMetadataCollector.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -17,17 +17,26 @@
 //
 
 import Foundation
-import Subscription
-import BrowserServicesKit
 
-public struct SubscriptionFeatureAvailabilityMock: SubscriptionFeatureAvailability {
-    public var isFeatureAvailable: Bool
-    public var isSubscriptionPurchaseAllowed: Bool
-    public var usesUnifiedFeedbackForm: Bool
+protocol UnifiedMetadataCollector {
+    associatedtype Metadata: UnifiedFeedbackMetadata
 
-    public init(isFeatureAvailable: Bool, isSubscriptionPurchaseAllowed: Bool, usesUnifiedFeedbackForm: Bool) {
-        self.isFeatureAvailable = isFeatureAvailable
-        self.isSubscriptionPurchaseAllowed = isSubscriptionPurchaseAllowed
-        self.usesUnifiedFeedbackForm = usesUnifiedFeedbackForm
+    func collectMetadata() async -> Metadata
+}
+
+protocol UnifiedFeedbackMetadata: Encodable {
+    func toBase64() -> String
+}
+
+extension UnifiedFeedbackMetadata {
+    func toBase64() -> String {
+        let encoder = JSONEncoder()
+
+        do {
+            let encodedMetadata = try encoder.encode(self)
+            return encodedMetadata.base64EncodedString()
+        } catch {
+            return "Failed to encode metadata to JSON, error message: \(error.localizedDescription)"
+        }
     }
 }
