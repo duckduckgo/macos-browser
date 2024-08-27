@@ -1,5 +1,5 @@
 //
-//  VPNFeedbackFormViewController.swift
+//  UnifiedFeedbackFormViewController.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -20,27 +20,36 @@ import Foundation
 import AppKit
 import SwiftUI
 import Combine
+import PixelKit
 
-final class VPNFeedbackFormViewController: NSViewController {
-
+final class UnifiedFeedbackFormViewController: NSViewController {
     // Using a dynamic height in the form was causing layout problems and couldn't be completed in time for the release that needed this form.
     // As a temporary measure, the heights of each form state are hardcoded.
     // This should be cleaned up later, and eventually use the `sizingOptions` property of NSHostingController.
     enum Constants {
         static let landingPageHeight = 260.0
-        static let feedbackFormHeight = 535.0
+        static let feedbackFormCompactHeight = 430.0
+        static let feedbackFormHeight = 650.0
         static let feedbackSentHeight = 350.0
         static let feedbackErrorHeight = 560.0
     }
 
     private let defaultSize = CGSize(width: 480, height: Constants.landingPageHeight)
-    private let viewModel: VPNFeedbackFormViewModel
+
+    private let feedbackSender: UnifiedFeedbackSender
+    private let viewModel: UnifiedFeedbackFormViewModel
 
     private var heightConstraint: NSLayoutConstraint?
     private var cancellables = Set<AnyCancellable>()
 
-    init() {
-        self.viewModel = VPNFeedbackFormViewModel(metadataCollector: DefaultVPNMetadataCollector(accountManager: Application.appDelegate.subscriptionManager.accountManager))
+    init(feedbackSender: UnifiedFeedbackSender = DefaultFeedbackSender(),
+         source: UnifiedFeedbackSource = .default) {
+        self.feedbackSender = feedbackSender
+        self.viewModel = UnifiedFeedbackFormViewModel(
+            vpnMetadataCollector: DefaultVPNMetadataCollector(accountManager: Application.appDelegate.subscriptionManager.accountManager),
+            feedbackSender: feedbackSender,
+            source: source
+        )
         super.init(nibName: nil, bundle: nil)
         self.viewModel.delegate = self
     }
@@ -56,7 +65,7 @@ final class VPNFeedbackFormViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let feedbackFormView = VPNFeedbackFormView()
+        let feedbackFormView = UnifiedFeedbackFormView()
         let hostingView = NSHostingView(rootView: feedbackFormView.environmentObject(self.viewModel))
         hostingView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(hostingView)
@@ -81,27 +90,27 @@ final class VPNFeedbackFormViewController: NSViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.updateViewHeight()
-            }
-            .store(in: &cancellables)
+        }
+        .store(in: &cancellables)
 
-        viewModel.$selectedFeedbackCategory
+        viewModel.$selectedReportType
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.updateViewHeight()
-            }
-            .store(in: &cancellables)
+        }
+        .store(in: &cancellables)
     }
 
     private func updateViewHeight() {
         switch viewModel.viewState {
         case .feedbackPending:
-            if viewModel.selectedFeedbackCategory == .landingPage {
+            if UnifiedFeedbackReportType(rawValue: viewModel.selectedReportType) == .prompt {
                 heightConstraint?.constant = Constants.landingPageHeight
             } else {
-                heightConstraint?.constant = Constants.feedbackFormHeight
+                heightConstraint?.constant = viewModel.usesCompactForm ? Constants.feedbackFormCompactHeight : Constants.feedbackFormHeight
             }
         case .feedbackSending:
-            heightConstraint?.constant = Constants.feedbackFormHeight
+            heightConstraint?.constant = viewModel.usesCompactForm ? Constants.feedbackFormCompactHeight : Constants.feedbackFormHeight
         case .feedbackSent:
             heightConstraint?.constant = Constants.feedbackSentHeight
         case .feedbackSendingFailed:
@@ -111,9 +120,9 @@ final class VPNFeedbackFormViewController: NSViewController {
 
 }
 
-extension VPNFeedbackFormViewController: VPNFeedbackFormViewModelDelegate {
+extension UnifiedFeedbackFormViewController: UnifiedFeedbackFormViewModelDelegate {
 
-    func vpnFeedbackViewModelDismissedView(_ viewModel: VPNFeedbackFormViewModel) {
+    func feedbackViewModelDismissedView(_ viewModel: UnifiedFeedbackFormViewModel) {
         dismiss()
     }
 

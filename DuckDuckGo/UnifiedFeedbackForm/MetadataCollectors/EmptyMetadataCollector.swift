@@ -1,7 +1,7 @@
 //
-//  UserText.swift
+//  EmptyMetadataCollector.swift
 //
-//  Copyright © 2023 DuckDuckGo. All rights reserved.
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -18,9 +18,15 @@
 
 import Foundation
 
-final class UserText {
-    // MARK: - Status Menu
+struct EmptyFeedbackMetadata: UnifiedFeedbackMetadata {
 
-    static let networkProtectionStatusMenuSendFeedback = NSLocalizedString("network.protection.status.menu.send.feedback", value: "Send Feedback…", comment: "The status menu 'Send Feedback' menu item")
-    static let networkProtectionStatusMenuOpenDuckDuckGo = NSLocalizedString("network.protection.status.menu.open.duckduckgo", value: "Open DuckDuckGo…", comment: "The status menu 'Open DuckDuckGo' menu item")
+}
+
+/// Default implementation for Privacy Pro metadata collector
+/// Intentionally left blank as we currently don't collect any metadata for PIR and ITR
+/// See `DefaultVPNMetadataCollector` for a reference implementation
+final class EmptyMetadataCollector: UnifiedMetadataCollector {
+    func collectMetadata() async -> EmptyFeedbackMetadata {
+        EmptyFeedbackMetadata()
+    }
 }
