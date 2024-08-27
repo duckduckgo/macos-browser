@@ -22,6 +22,7 @@ import ContentBlocking
 import Foundation
 import PrivacyDashboard
 import History
+import PhishingDetection
 
 /**
  Tab Extensions should conform to TabExtension protocol
@@ -72,6 +73,8 @@ protocol TabExtensionDependencies {
     var duckPlayer: DuckPlayer { get }
     var certificateTrustEvaluator: CertificateTrustEvaluating { get }
     var tunnelController: NetworkProtectionIPCTunnelController? { get }
+    var phishingDetector: PhishingSiteDetecting { get }
+    var phishingStateManager: PhishingTabStateManager { get }
 }
 
 // swiftlint:disable:next large_tuple
@@ -127,7 +130,8 @@ extension TabExtensionsBuilder {
                                          autoconsentUserScriptPublisher: userScripts.map(\.?.autoconsentUserScript),
                                          didUpgradeToHttpsPublisher: httpsUpgrade.didUpgradeToHttpsPublisher,
                                          trackersPublisher: contentBlocking.trackersPublisher,
-                                         webViewPublisher: args.webViewFuture)
+                                         webViewPublisher: args.webViewFuture,
+                                         phishingStateManager: dependencies.phishingStateManager)
         }
 
         add {
@@ -179,7 +183,8 @@ extension TabExtensionsBuilder {
                                 historyCoordinating: dependencies.historyCoordinating,
                                 trackersPublisher: contentBlocking.trackersPublisher,
                                 urlPublisher: args.contentPublisher.map { content in content.isUrl ? content.urlForWebView : nil },
-                                titlePublisher: args.titlePublisher)
+                                titlePublisher: args.titlePublisher,
+                                phishingStateManager: dependencies.phishingStateManager)
         }
         add {
             ExternalAppSchemeHandler(workspace: dependencies.workspace, permissionModel: args.permissionModel, contentPublisher: args.contentPublisher)
@@ -196,8 +201,10 @@ extension TabExtensionsBuilder {
         }
 
         add {
-            SSLErrorPageTabExtension(webViewPublisher: args.webViewFuture,
-                                  scriptsPublisher: userScripts.compactMap { $0 })
+            SpecialErrorPageTabExtension(webViewPublisher: args.webViewFuture,
+                                  scriptsPublisher: userScripts.compactMap { $0 },
+                                  phishingDetector: dependencies.phishingDetector,
+                                  phishingStateManager: dependencies.phishingStateManager)
         }
 #if SPARKLE
         add {
