@@ -631,7 +631,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 extension MacPacketTunnelProvider: AccountManagerKeychainAccessDelegate {
 
     public func accountManagerKeychainAccessFailed(accessType: AccountKeychainAccessType, error: AccountKeychainAccessError) {
-        PixelKit.fire(PrivacyProErrorPixel.privacyProVPNKeychainAccessError(accessType: accessType, accessError: error),
+        PixelKit.fire(PrivacyProErrorPixel.privacyProKeychainAccessError(accessType: accessType, accessError: error),
                       frequency: .dailyAndCount)
     }
 }
