@@ -21,6 +21,7 @@ import Cocoa
 import Combine
 import Common
 import WebKit
+import PrivacyDashboard
 
 final class TabViewModel {
 
@@ -281,9 +282,32 @@ final class TabViewModel {
     }
 
     private func subscribeToWebViewDidFinishNavigation() {
-        tab.webViewDidFinishNavigationPublisher.sink { [weak self] in
+        // When a web page finishes loading, wait when the `ContentBlockerRulesUserScript` detects trackers
+        // and adds them to `PrivacyDashboardTabExtension.$privacyInfo.$trackerInfo`.
+        // Map the `$trackerInfo` into a debounced Publisher and play trackers animations
+        // if there were any trackers detected.
+        tab.webViewDidFinishNavigationPublisher.map { [weak tab] in
+            guard let tab else { return Empty<TrackerInfo?, Never>().eraseToAnyPublisher() }
+
+            // `Tab(PrivacyDashboardTabExtension).$privacyInfo` is reset on new navigation start.
+            return tab.privacyInfoPublisher.map {
+                guard let trackerInfoPublisher = $0?.$trackerInfo else {
+                    // no TrackerInfo added yet
+                    return Just(TrackerInfo?.none).eraseToAnyPublisher()
+                }
+                // map the TrackerInfo Publisher and `switchToLatest` to use its Output.
+                return trackerInfoPublisher.map { TrackerInfo?.some($0) }.eraseToAnyPublisher()
+            }
+            .switchToLatest()
+            // prepend existing TrackerInfo if set before the navigation finishes.
+            .prepend(tab.privacyInfo?.trackerInfo)
+            .debounce(for: 0.2, scheduler: RunLoop.main)
+            .eraseToAnyPublisher()
+        }
+        .switchToLatest()
+        .sink { [weak self] trackerInfo in
             guard let self = self else { return }
-            self.sendAnimationTrigger()
+            self.sendAnimationTrigger(trackerInfo: trackerInfo)
         }.store(in: &cancellables)
     }
 
@@ -448,9 +472,9 @@ final class TabViewModel {
 
     private var trackerAnimationTimer: Timer?
 
-    private func sendAnimationTrigger() {
+    private func sendAnimationTrigger(trackerInfo: TrackerInfo?) {
         privacyEntryPointIconUpdateTrigger.send()
-        if self.tab.privacyInfo?.trackerInfo.trackersBlocked.count ?? 0 > 0 {
+        if let trackerInfo, !trackerInfo.trackersBlocked.isEmpty {
             self.trackersAnimationTriggerPublisher.send()
         }
     }
