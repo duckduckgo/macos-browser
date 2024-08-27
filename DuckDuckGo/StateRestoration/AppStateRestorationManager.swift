@@ -142,7 +142,7 @@ final class AppStateRestorationManager: NSObject {
         } catch CocoaError.fileReadNoSuchFile {
             // ignore
         } catch {
-            os_log("Pinned tabs state could not be decoded: %s", "\(error)")
+            Logger.general.error("Pinned tabs state could not be decoded: \(error)")
             PixelKit.fire(DebugEvent(GeneralPixel.appStateRestorationFailed, error: error))
         }
     }

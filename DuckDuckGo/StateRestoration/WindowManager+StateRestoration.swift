@@ -159,7 +159,7 @@ final class WindowRestorationItem: NSObject, NSSecureCoding {
 
     required init?(coder: NSCoder) {
         guard let model = coder.decodeObject(of: TabCollectionViewModel.self, forKey: NSSecureCodingKeys.model) else {
-            os_log("WindowRestoration:initWithCoder: could not decode model object: %s", type: .error, String(describing: coder.error))
+            Logger.general.error("WindowRestoration:initWithCoder: could not decode model object: \(String(describing: coder.error))")
             return nil
         }
         self.model = model

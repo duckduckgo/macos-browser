@@ -65,14 +65,14 @@ final class URLEventHandler {
 
     @objc func handleUrlEvent(event: NSAppleEventDescriptor, reply: NSAppleEventDescriptor) {
         guard let stringValue = event.paramDescriptor(forKeyword: keyDirectObject)?.stringValue else {
-            os_log("UrlEventListener: unable to determine path", type: .error)
+            Logger.general.error("UrlEventListener: unable to determine path")
             let error = NSError(domain: "CouldNotGetPath", code: -1, userInfo: nil)
             PixelKit.fire(DebugEvent(GeneralPixel.appOpenURLFailed, error: error))
             return
         }
 
         guard let url = URL.makeURL(from: stringValue) else {
-            os_log("UrlEventListener: failed to construct URL from path %s", type: .error, stringValue)
+            Logger.general.debug("UrlEventListener: failed to construct URL from path \(stringValue)")
             let error = NSError(domain: "CouldNotConstructURL", code: -1, userInfo: nil)
             PixelKit.fire(DebugEvent(GeneralPixel.appOpenURLFailed, error: error))
             return

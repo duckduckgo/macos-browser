@@ -212,7 +212,7 @@ final class NavigationBarViewController: NSViewController {
 
     @IBAction func goBackAction(_ sender: NSButton) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", type: .error, className)
+            Logger.navigation.error("Selected tab view model is nil")
             return
         }
 
@@ -228,7 +228,7 @@ final class NavigationBarViewController: NSViewController {
 
     @IBAction func goForwardAction(_ sender: NSButton) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", type: .error, className)
+            Logger.navigation.error("Selected tab view model is nil")
             return
         }
 
@@ -249,7 +249,7 @@ final class NavigationBarViewController: NSViewController {
 
     @IBAction func refreshOrStopAction(_ sender: NSButton) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", type: .error, className)
+            Logger.navigation.error("Selected tab view model is nil")
             return
         }
 
@@ -262,7 +262,7 @@ final class NavigationBarViewController: NSViewController {
 
     @IBAction func homeButtonAction(_ sender: NSButton) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", type: .error, className)
+            Logger.navigation.error("%s: Selected tab view model is nil")
             return
         }
         selectedTabViewModel.tab.openHomePage()

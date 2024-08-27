@@ -165,7 +165,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             let encryptionKey = NSApplication.runType.requiresEnvironment ? try keyStore.readKey() : nil
             fileStore = EncryptedFileStore(encryptionKey: encryptionKey)
         } catch {
-            os_log("App Encryption Key could not be read: %s", "\(error)")
+            Logger.general.error("App Encryption Key could not be read: \(error.localizedDescription)")
             fileStore = EncryptedFileStore()
         }
 

@@ -237,7 +237,7 @@ struct TabExtensions {
 #if DEBUG
         assert(!NSApp.runType.requiresEnvironment || tabExtension != nil)
 #else
-        os_log("%s Tab Extension not initialised for Unit Tests, activate it in TabExtensions.swift", log: .autoconsent, type: .debug, "\(T.self)")
+        Logger.autoconsent.debug("Tab Extension not initialised for Unit Tests, activate it in TabExtensions.swift")
 #endif
         return tabExtension
     }

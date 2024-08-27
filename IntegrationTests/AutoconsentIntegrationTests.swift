@@ -151,11 +151,11 @@ class AutoconsentIntegrationTests: XCTestCase {
             .first()
             .promise()
 
-        os_log("starting navigation to http://privacy-test-pages.site/features/autoconsent/banner.html")
+        Logger.general.debug("starting navigation to http://privacy-test-pages.site/features/autoconsent/banner.html")
         let navigation = tab.setUrl(url, source: .link)
 
         navigation?.appendResponder(navigationResponse: { response in
-            os_log("navigationResponse: %s", "\(String(describing: response))")
+            Logger.general.debug("navigationResponse: \(String(describing: response))")
 
             // cause UserScripts reload (ContentBlockingUpdating)
             WebTrackingProtectionPreferences.shared.isGPCEnabled = true
@@ -165,7 +165,7 @@ class AutoconsentIntegrationTests: XCTestCase {
         })
         _=await navigation?.result
 
-        os_log("navigation done")
+        Logger.general.debug("navigation done")
         let cookieConsentManaged = try await cookieConsentManagedPromise.value
         XCTAssertTrue(cookieConsentManaged == true)
 

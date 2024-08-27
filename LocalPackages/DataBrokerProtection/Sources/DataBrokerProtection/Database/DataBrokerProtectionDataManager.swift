@@ -66,7 +66,7 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
 
     public func fetchProfile() throws -> DataBrokerProtectionProfile? {
         if cache.profile != nil {
-            os_log("Returning cached profile")
+            Logger.dataBrokerProtection.debug("Returning cached profile")
             return cache.profile
         }
 
