@@ -182,7 +182,7 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
         shouldBypassSSLError = false
         return .credential(credential)
     }
-    
+
     @MainActor
     func generateErrorPageURL(_ url: URL) -> URL? {
         guard let urlString = url.absoluteString.data(using: .utf8) else {
