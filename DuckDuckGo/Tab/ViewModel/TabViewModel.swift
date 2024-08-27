@@ -287,21 +287,26 @@ final class TabViewModel {
         // Map the `$trackerInfo` into a debounced Publisher and play trackers animations
         // if there were any trackers detected.
         tab.webViewDidFinishNavigationPublisher.map { [weak tab] in
-            guard let tab else { return Empty<TrackerInfo?, Never>().eraseToAnyPublisher() }
+            guard let tab,
+                  tab.privacyInfo?.trackerInfo.trackersBlocked.isEmpty ?? true else {
+                // the blocked trackers are already present when the navigation is finished, just return them
+                return Just(tab?.privacyInfo?.trackerInfo).eraseToAnyPublisher()
+            }
 
             // `Tab(PrivacyDashboardTabExtension).$privacyInfo` is reset on new navigation start.
             return tab.privacyInfoPublisher.map {
                 guard let trackerInfoPublisher = $0?.$trackerInfo else {
-                    // no TrackerInfo added yet
-                    return Just(TrackerInfo?.none).eraseToAnyPublisher()
+                    // no TrackerInfo added yet, don‘t publish
+                    return Empty<TrackerInfo?, Never>().eraseToAnyPublisher()
                 }
                 // map the TrackerInfo Publisher and `switchToLatest` to use its Output.
                 return trackerInfoPublisher.map { TrackerInfo?.some($0) }.eraseToAnyPublisher()
             }
             .switchToLatest()
-            // prepend existing TrackerInfo if set before the navigation finishes.
-            .prepend(tab.privacyInfo?.trackerInfo)
+            // debounce detected trackers (if any)
             .debounce(for: 0.2, scheduler: RunLoop.main)
+            // prepend with existing (empty) TrackerInfo that won‘t trigger the animation but will update the privacy icon
+            .prepend(tab.privacyInfo?.trackerInfo)
             .eraseToAnyPublisher()
         }
         .switchToLatest()
