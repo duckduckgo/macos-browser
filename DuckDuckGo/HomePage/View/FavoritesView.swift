@@ -319,15 +319,9 @@ struct FavoriteTemplate: View {
             Text(title)
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
-                .font(.system(size: 10))
-                .padding(.horizontal, 3)
-                .if(settingsModel.customBackground != nil) { view in
-                    view
-                        .vibrancyEffect()
-                        .cornerRadius(3)
-                }
+                .font(.system(size: 11))
+                .frame(height: 32, alignment: .top)
 
-            Spacer()
         }
         .frame(width: FavoritesGrid.GridDimensions.itemWidth)
         .frame(maxWidth: FavoritesGrid.GridDimensions.itemWidth)
