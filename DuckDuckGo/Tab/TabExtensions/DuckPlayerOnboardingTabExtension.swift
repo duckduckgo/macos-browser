@@ -35,46 +35,14 @@ extension DuckPlayerOnboardingTabExtension: NavigationResponder {
 
     func navigationDidFinish(_ navigation: Navigation) {
         guard onboardingDecider.canDisplayOnboarding else { return }
-        
+
         let locationValidator = DuckPlayerOnboardingLocationValidator()
 
         Task { @MainActor in
-            if await locationValidator.isValidLocation(navigation) {
+            if let webView = navigation.navigationAction.targetFrame?.webView,
+                await locationValidator.isValidLocation(webView) {
                 onboardingState = .init(onboardingDecider: onboardingDecider)
             }
-        }
-    }
-}
-
-struct DuckPlayerOnboardingLocationValidator {
-    private static let youtubeChannelCheckScript = """
-        (function() {
-            var canonicalLink = document.querySelector('link[rel="canonical"]');
-            return canonicalLink && canonicalLink.href.includes('channel');
-        })();
-    """
-
-    func isValidLocation(_ navigation: Navigation) async -> Bool {
-        guard let webView = await navigation.navigationAction.targetFrame?.webView,
-              let url = await webView.url else { return false }
-
-        let isRootURL = isYoutubeRootURL(url)
-        let isInChannel = await isCurrentWebViewInAYoutubeChannel(webView)
-        return isRootURL || isInChannel
-    }
-
-    private func isYoutubeRootURL(_ url: URL) -> Bool {
-        guard let urlComponents = URLComponents(string: url.absoluteString) else { return false }
-        return urlComponents.scheme == "https" &&
-               urlComponents.host == "www.youtube.com" &&
-               urlComponents.path == "/"
-    }
-
-    private func isCurrentWebViewInAYoutubeChannel(_ webView: WKWebView) async -> Bool {
-        do {
-            return try await webView.evaluateJavaScript(DuckPlayerOnboardingLocationValidator.youtubeChannelCheckScript) as Bool? ?? false
-        } catch {
-            return false
         }
     }
 }

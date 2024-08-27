@@ -197,6 +197,10 @@
 		31267C6A2B640C4B00FEF811 /* DataBrokerProtectionFeatureDisabler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3199C6F82AF94F5B002A7BA1 /* DataBrokerProtectionFeatureDisabler.swift */; };
 		31267C6B2B640C5200FEF811 /* DataBrokerProtectionAppEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3199C6FC2AF97367002A7BA1 /* DataBrokerProtectionAppEvents.swift */; };
 		3129788A2B64131200B67619 /* DataBrokerProtection in Frameworks */ = {isa = PBXBuildFile; productRef = 312978892B64131200B67619 /* DataBrokerProtection */; };
+		313168362C7E33EA00C7D874 /* DuckPlayerOnboardingLocationValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 313168352C7E33EA00C7D874 /* DuckPlayerOnboardingLocationValidator.swift */; };
+		313168372C7E33EA00C7D874 /* DuckPlayerOnboardingLocationValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 313168352C7E33EA00C7D874 /* DuckPlayerOnboardingLocationValidator.swift */; };
+		313168392C7E343700C7D874 /* DuckPlayerOnboardingLocationValidatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 313168382C7E343700C7D874 /* DuckPlayerOnboardingLocationValidatorTests.swift */; };
+		3131683A2C7E343700C7D874 /* DuckPlayerOnboardingLocationValidatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 313168382C7E343700C7D874 /* DuckPlayerOnboardingLocationValidatorTests.swift */; };
 		3154FD1428E6011A00909769 /* TabShadowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3154FD1328E6011A00909769 /* TabShadowView.swift */; };
 		3158B1492B0BF73000AF130C /* DBPHomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3192EC872A4DCF21001E97A5 /* DBPHomeViewController.swift */; };
 		3158B14A2B0BF74300AF130C /* DataBrokerProtectionDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316850712AF3AD58009A2828 /* DataBrokerProtectionDebugMenu.swift */; };
@@ -3096,6 +3100,8 @@
 		31119B392C74AB8B00884471 /* DuckPlayerOnboardingModalView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DuckPlayerOnboardingModalView.swift; sourceTree = "<group>"; };
 		31119B3A2C74AB8B00884471 /* DuckPlayerOnboardingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DuckPlayerOnboardingViewController.swift; sourceTree = "<group>"; };
 		311B262628E73E0A00FD181A /* TabShadowConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabShadowConfig.swift; sourceTree = "<group>"; };
+		313168352C7E33EA00C7D874 /* DuckPlayerOnboardingLocationValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckPlayerOnboardingLocationValidator.swift; sourceTree = "<group>"; };
+		313168382C7E343700C7D874 /* DuckPlayerOnboardingLocationValidatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckPlayerOnboardingLocationValidatorTests.swift; sourceTree = "<group>"; };
 		3139A1512AA4B3C000969C7D /* DataBrokerProtectionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionManager.swift; sourceTree = "<group>"; };
 		3154FD1328E6011A00909769 /* TabShadowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabShadowView.swift; sourceTree = "<group>"; };
 		315AA06F28CA5CC800200030 /* YoutubePlayerNavigationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YoutubePlayerNavigationHandler.swift; sourceTree = "<group>"; };
@@ -4886,6 +4892,15 @@
 			path = DuckPlayerOnboardingModal;
 			sourceTree = "<group>";
 		};
+		313168342C7E33D000C7D874 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				31119B3B2C74AB8B00884471 /* DuckPlayerOnboardingModal */,
+				313168352C7E33EA00C7D874 /* DuckPlayerOnboardingLocationValidator.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
 		3169132B2BD2C7960051B46D /* ErrorView */ = {
 			isa = PBXGroup;
 			children = (
@@ -4973,8 +4988,8 @@
 		31F28C4B28C8EE9000119F70 /* YoutubePlayer */ = {
 			isa = PBXGroup;
 			children = (
+				313168342C7E33D000C7D874 /* Onboarding */,
 				31C01F942C7CC40A0066AAE1 /* TabModal */,
-				31119B3B2C74AB8B00884471 /* DuckPlayerOnboardingModal */,
 				37F19A6928E2F2D000740DC6 /* DuckPlayer.swift */,
 				31F28C5228C8EECA00119F70 /* DuckURLSchemeHandler.swift */,
 				315AA06F28CA5CC800200030 /* YoutubePlayerNavigationHandler.swift */,
@@ -5045,6 +5060,7 @@
 				3714B1E828EDBAAB0056C57A /* DuckPlayerTests.swift */,
 				567DA94429E95C3F008AC5EE /* YoutubeOverlayUserScriptTests.swift */,
 				31C01F9F2C7CED620066AAE1 /* DefaultDuckPlayerOnboardingDeciderTests.swift */,
+				313168382C7E343700C7D874 /* DuckPlayerOnboardingLocationValidatorTests.swift */,
 			);
 			path = YoutubePlayer;
 			sourceTree = "<group>";
@@ -10038,6 +10054,7 @@
 				3706FA97293F65D500E42796 /* WindowDraggingView.swift in Sources */,
 				BB7B5F992C4ED73800BA4AF8 /* BookmarksSearchAndSortMetrics.swift in Sources */,
 				B60D644A2AAF1B7C00B26F50 /* AddressBarTextSelectionNavigation.swift in Sources */,
+				313168372C7E33EA00C7D874 /* DuckPlayerOnboardingLocationValidator.swift in Sources */,
 				1D01A3D52B88CF7700FE8150 /* AccessibilityPreferences.swift in Sources */,
 				3706FA98293F65D500E42796 /* SecureVaultSorting.swift in Sources */,
 				1DEDB3652C19934C006B6D1B /* MoreOptionsMenuButton.swift in Sources */,
@@ -11041,6 +11058,7 @@
 				1DE03425298BC7F000CAB3D7 /* InternalUserDeciderStoreMock.swift in Sources */,
 				3706FE4A293F661700E42796 /* BookmarkManagedObjectTests.swift in Sources */,
 				BBFF355E2C4AF26200DA3289 /* BookmarksSortModeTests.swift in Sources */,
+				3131683A2C7E343700C7D874 /* DuckPlayerOnboardingLocationValidatorTests.swift in Sources */,
 				EEC8EB402982CD550065AA39 /* JSAlertViewModelTests.swift in Sources */,
 				BDA764922BC4E57200D0400C /* MockVPNLocationFormatter.swift in Sources */,
 				3706FE4B293F661700E42796 /* BookmarksHTMLImporterTests.swift in Sources */,
@@ -11982,6 +12000,7 @@
 				B68458C525C7EA0C00DC17B6 /* TabCollection+NSSecureCoding.swift in Sources */,
 				C13909EF2B85FD4E001626ED /* AutofillActionExecutor.swift in Sources */,
 				4BB88B5B25B7BA50006F6B06 /* Instruments.swift in Sources */,
+				313168362C7E33EA00C7D874 /* DuckPlayerOnboardingLocationValidator.swift in Sources */,
 				3768D8442C2CC884004120AE /* RemoteMessagingConfigMatcherProvider.swift in Sources */,
 				9812D895276CEDA5004B6181 /* ContentBlockerRulesLists.swift in Sources */,
 				4B0511E2262CAA8600F6079C /* NSViewControllerExtension.swift in Sources */,
@@ -12370,6 +12389,7 @@
 				84DC715B2C1C1E9000033B8C /* UserDefaultsWrapperTests.swift in Sources */,
 				561D29CA2BDA752F007B91D0 /* MockAppearancePreferencesPersistor.swift in Sources */,
 				56A0540D2C1C375D007D8FAB /* MockWindow.swift in Sources */,
+				313168392C7E343700C7D874 /* DuckPlayerOnboardingLocationValidatorTests.swift in Sources */,
 				567DA93F29E8045D008AC5EE /* MockEmailStorage.swift in Sources */,
 				37CD54B727F1B28A00F1F7B9 /* DefaultBrowserPreferencesTests.swift in Sources */,
 				9F3344622BBFBDA40040CBEB /* BookmarksBarVisibilityManagerTests.swift in Sources */,
