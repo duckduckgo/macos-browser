@@ -20,6 +20,7 @@ import Foundation
 import os.log
 import Combine
 import BrowserServicesKit
+import Persistence
 import Configuration
 import Common
 import Networking
@@ -27,11 +28,23 @@ import PixelKit
 
 final class ConfigurationManager: DefaultConfigurationManager {
 
+    private enum Constants {
+        static let lastConfigurationInstallDateKey = "config.last.installed"
+    }
+
     static let shared = ConfigurationManager(fetcher: ConfigurationFetcher(store: ConfigurationStore.shared,
                                                                            eventMapping: configurationDebugEvents))
 
-    @UserDefaultsWrapper(key: .configLastInstalled, defaultValue: nil)
-    private(set) var lastConfigurationInstallDate: Date?
+    private var defaults: KeyValueStoring
+
+    private(set) var lastConfigurationInstallDate: Date? {
+        get {
+            defaults.object(forKey: Constants.lastConfigurationInstallDateKey) as? Date
+        }
+        set {
+            defaults.set(newValue, forKey: Constants.lastConfigurationInstallDateKey)
+        }
+    }
 
     static let configurationDebugEvents = EventMapping<ConfigurationDebugEvents> { event, error, _, _ in
         let domainEvent: GeneralPixel
@@ -43,29 +56,9 @@ final class ConfigurationManager: DefaultConfigurationManager {
         PixelKit.fire(DebugEvent(domainEvent, error: error))
     }
 
-    private var fileDispatchSource: DispatchSourceFileSystemObject?
-
-    override init(fetcher: ConfigurationFetcher, defaults: UserDefaults = UserDefaults.appConfiguration) {
+    override init(fetcher: ConfigurationFetcher, defaults: any KeyValueStoring = UserDefaults.appConfiguration) {
+        self.defaults = defaults
         super.init(fetcher: fetcher, defaults: defaults)
-
-        do {
-            let fileHandle = try FileHandle(forReadingFrom: ConfigurationStore.shared.fileUrl(for: .privacyConfiguration))
-            fileDispatchSource = DispatchSource.makeFileSystemObjectSource(
-                fileDescriptor: fileHandle.fileDescriptor,
-                eventMask: .write,
-                queue: ConfigurationManager.queue
-            )
-            fileDispatchSource?.setEventHandler { [weak self] in
-                self?.updateTrackerBlockingDependencies()
-            }
-            fileDispatchSource?.resume()
-        } catch {
-            Logger.config.error("unable to set up configuration dispatch source: \(error.localizedDescription, privacy: .public)")
-        }
-    }
-
-    deinit {
-        fileDispatchSource?.cancel()
     }
 
     func log() {
@@ -188,4 +181,14 @@ final class ConfigurationManager: DefaultConfigurationManager {
         }.value
     }
 
+}
+
+extension ConfigurationManager {
+    override var presentedItemURL: URL? {
+        ConfigurationStore.shared.fileUrl(for: .privacyConfiguration)
+    }
+
+    override func presentedItemDidChange() {
+        updateTrackerBlockingDependencies()
+    }
 }

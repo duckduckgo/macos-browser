@@ -19,6 +19,7 @@
 import Foundation
 import os.log
 import BrowserServicesKit
+import Persistence
 import Common
 import Configuration
 import PixelKit
@@ -45,31 +46,47 @@ final class ConfigurationStore: ConfigurationStoring {
     }
 
     static let shared = ConfigurationStore()
-    let defaults = UserDefaults.appConfiguration
+    let defaults: KeyValueStoring
 
     var privacyConfigurationEtag: String? {
         get {
-            defaults.string(forKey: privacyConfigurationEtagKey)
+            defaults.object(forKey: privacyConfigurationEtagKey) as? String
         }
         set {
-            defaults.setValue(newValue, forKey: privacyConfigurationEtagKey)
+            defaults.set(newValue, forKey: privacyConfigurationEtagKey)
         }
+    }
+
+    init(defaults: KeyValueStoring = UserDefaults.appConfiguration) {
+        self.defaults = defaults
     }
 
     func log() {
         Logger.config.log("privacyConfigurationEtag \(self.privacyConfigurationEtag ?? "", privacy: .public)")
     }
 
-    func loadData(for configuration: Configuration) -> Data? {
-        guard configuration == .privacyConfiguration else { return nil }
+    func loadData(for config: Configuration) -> Data? {
+        let file = fileUrl(for: config)
+        var data: Data?
+        var coordinatorError: NSError?
 
-        let file = fileUrl(for: configuration)
-        do {
-            return try Data(contentsOf: file)
-        } catch {
-            PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionConfigurationErrorLoadingCachedConfig(error))
-            return nil
+        NSFileCoordinator().coordinate(readingItemAt: file, error: &coordinatorError) { fileUrl in
+            do {
+                data = try Data(contentsOf: fileUrl)
+            } catch {
+                let nserror = error as NSError
+
+                if nserror.domain != NSCocoaErrorDomain || nserror.code != NSFileReadNoSuchFileError {
+                    PixelKit.fire(DebugEvent(NetworkProtectionPixelEvent.networkProtectionConfigurationErrorLoadingCachedConfig(error)))
+                }
+            }
         }
+
+        if let coordinatorError {
+            Logger.config.error("Unable to read \(config.rawValue, privacy: .public): \(coordinatorError.localizedDescription, privacy: .public)")
+        }
+
+        return data
     }
 
     func loadEtag(for configuration: Configuration) -> String? {
@@ -85,9 +102,20 @@ final class ConfigurationStore: ConfigurationStoring {
 
     func saveData(_ data: Data, for configuration: Configuration) throws {
         guard configuration == .privacyConfiguration else { throw Error.unsupportedConfig }
-
         let file = fileUrl(for: configuration)
-        try data.write(to: file, options: .atomic)
+        var coordinatorError: NSError?
+
+        NSFileCoordinator().coordinate(writingItemAt: file, options: .forReplacing, error: &coordinatorError) { fileUrl in
+            do {
+                try data.write(to: fileUrl, options: .atomic)
+            } catch {
+                Logger.config.error("Unable to write \(configuration.rawValue, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            }
+        }
+
+        if let coordinatorError {
+            Logger.config.error("Unable to write \(configuration.rawValue, privacy: .public): \(coordinatorError.localizedDescription, privacy: .public)")
+        }
     }
 
     func saveEtag(_ etag: String, for configuration: Configuration) throws {

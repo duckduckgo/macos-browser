@@ -43,31 +43,6 @@ final class ConfigurationManager: DefaultConfigurationManager {
         PixelKit.fire(DebugEvent(domainEvent, error: error))
     }
 
-    private var fileDispatchSource: DispatchSourceFileSystemObject?
-
-    override init(fetcher: ConfigurationFetcher, defaults: UserDefaults = UserDefaults.config) {
-        super.init(fetcher: fetcher, defaults: defaults)
-
-        do {
-            let fileHandle = try FileHandle(forReadingFrom: ConfigurationStore.shared.fileUrl(for: .privacyConfiguration))
-            fileDispatchSource = DispatchSource.makeFileSystemObjectSource(
-                fileDescriptor: fileHandle.fileDescriptor,
-                eventMask: .write,
-                queue: ConfigurationManager.queue
-            )
-            fileDispatchSource?.setEventHandler { [weak self] in
-                self?.updateConfigDependencies()
-            }
-            fileDispatchSource?.resume()
-        } catch {
-            Logger.config.error("unable to set up configuration dispatch source: \(error.localizedDescription, privacy: .public)")
-        }
-    }
-
-    deinit {
-        fileDispatchSource?.cancel()
-    }
-
     func log() {
         Logger.config.log("last update \(String(describing: self.lastUpdateTime), privacy: .public)")
         Logger.config.log("last refresh check \(String(describing: self.lastRefreshCheckTime), privacy: .public)")
@@ -107,5 +82,15 @@ final class ConfigurationManager: DefaultConfigurationManager {
             etag: ConfigurationStore.shared.loadEtag(for: .privacyConfiguration),
             data: ConfigurationStore.shared.loadData(for: .privacyConfiguration)
         )
+    }
+}
+
+extension ConfigurationManager {
+    override var presentedItemURL: URL? {
+        ConfigurationStore.shared.fileUrl(for: .privacyConfiguration)
+    }
+
+    override func presentedItemDidChange() {
+        updateConfigDependencies()
     }
 }
