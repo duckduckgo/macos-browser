@@ -62,6 +62,7 @@ extension DefaultSubscriptionManager {
 extension DefaultSubscriptionManager: AccountManagerKeychainAccessDelegate {
 
     public func accountManagerKeychainAccessFailed(accessType: AccountKeychainAccessType, error: AccountKeychainAccessError) {
-        PixelKit.fire(PrivacyProErrorPixel.privacyProKeychainAccessError(accessType: accessType, accessError: error), frequency: .dailyAndCount)
+        PixelKit.fire(PrivacyProErrorPixel.privacyProKeychainAccessError(accessType: accessType, accessError: error), 
+                      frequency: .dailyAndCount)
     }
 }
