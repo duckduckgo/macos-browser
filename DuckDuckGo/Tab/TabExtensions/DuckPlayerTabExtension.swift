@@ -360,9 +360,6 @@ extension DuckPlayerTabExtension: NavigationResponder {
             let newTabSettings = preferences.duckPlayerOpenInNewTab ? "true" : "false"
             let autoplay = preferences.duckPlayerAutoplay ? "true" : "false"
 
-            // WIP
-            onboardingDecider.setFirstVideoInDuckPlayerAsDone()
-
             PixelKit.fire(GeneralPixel.duckPlayerDailyUniqueView,
                           frequency: .legacyDaily,
                           withAdditionalParameters: ["setting": setting,

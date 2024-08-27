@@ -57,6 +57,7 @@ struct InitialPlayerSettings: Codable {
     struct PlayerSettings: Codable {
         let pip: PIP
         let autoplay: Autoplay
+        let focusMode: FocusMode
     }
 
     struct PIP: Codable {
@@ -72,6 +73,17 @@ struct InitialPlayerSettings: Codable {
     }
 
     struct Autoplay: Codable {
+        let state: State
+    }
+
+    /// Represents the current focus mode of the player.
+    ///
+    /// Focus mode determines whether the bottom toolbar should be visible or hidden.
+    /// When focus mode is enabled, the toolbar will auto-hide after a few seconds.
+    /// When focus mode is disabled, the toolbar will always be visible and the background wallpaper will be slightly brighter.
+    ///
+    /// Default should be enabled.
+    struct FocusMode: Codable {
         let state: State
     }
 
@@ -145,12 +157,14 @@ final class DuckPlayer {
 
     init(
         preferences: DuckPlayerPreferences = .shared,
-        privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager
+        privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
+        onboardingDecider: DuckPlayerOnboardingDecider = DefaultDuckPlayerOnboardingDecider()
     ) {
         self.preferences = preferences
         isFeatureEnabled = privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .duckPlayer)
         isPiPFeatureEnabled = privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DuckPlayerSubfeature.pip)
         isAutoplayFeatureEnabled = privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DuckPlayerSubfeature.autoplay)
+        self.onboardingDecider = onboardingDecider
 
         mode = preferences.duckPlayerMode
         bindDuckPlayerModeIfNeeded()
@@ -265,8 +279,12 @@ final class DuckPlayer {
         let platform = InitialPlayerSettings.Platform(name: "macos")
         let environment = InitialPlayerSettings.Environment.development
         let locale = InitialPlayerSettings.Locale.en
-        let playerSettings = InitialPlayerSettings.PlayerSettings(pip: pip, autoplay: autoplay)
+        let focusMode = InitialPlayerSettings.FocusMode(state: onboardingDecider.shouldOpenFirstVideoOnDuckPlayer ? .disabled : .enabled)
+        let playerSettings = InitialPlayerSettings.PlayerSettings(pip: pip, autoplay: autoplay, focusMode: focusMode)
         let userValues = encodeUserValues()
+
+        /// Since the FE is requesting player-encoded values, we can assume that the first player video setup is complete from the onboarding point of view.
+        onboardingDecider.setFirstVideoInDuckPlayerAsDone()
 
         return InitialPlayerSettings(userValues: userValues,
                                      settings: playerSettings,
@@ -296,6 +314,7 @@ final class DuckPlayer {
     private var isFeatureEnabledCancellable: AnyCancellable?
     private var isPiPFeatureEnabled: Bool
     private var isAutoplayFeatureEnabled: Bool
+    private let onboardingDecider: DuckPlayerOnboardingDecider
 
     private func bindDuckPlayerModeIfNeeded() {
         if isFeatureEnabled {
