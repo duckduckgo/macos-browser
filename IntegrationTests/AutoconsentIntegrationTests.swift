@@ -20,6 +20,7 @@ import Combine
 import Common
 import PrivacyDashboard
 import XCTest
+import os.log
 
 @testable import DuckDuckGo_Privacy_Browser
 

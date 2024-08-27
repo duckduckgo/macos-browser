@@ -248,13 +248,7 @@ extension UpdateController: SPUUpdaterDelegate {
     }
 
     func updater(_ updater: SPUUpdater, didFindValidUpdate item: SUAppcastItem) {
-<<<<<<< HEAD
         Logger.updates.debug("Updater did find valid update: \(item.displayVersionString)(\(item.versionString))")
-=======
-        os_log("Updater did find valid update: %{public}@",
-               log: .updates,
-               "\(item.displayVersionString)(\(item.versionString))")
->>>>>>> main
 
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidFindUpdate))
 
@@ -267,31 +261,17 @@ extension UpdateController: SPUUpdaterDelegate {
 
     func updaterDidNotFindUpdate(_ updater: SPUUpdater, error: any Error) {
         let item = (error as NSError).userInfo["SULatestAppcastItemFound"] as? SUAppcastItem
-<<<<<<< HEAD
         Logger.updates.debug("Updater did not find update: \(String(describing: item?.displayVersionString))(\(String(describing: item?.versionString)))")
-
-        onUpdateCheckEnd(item: item, isInstalled: true)
-=======
-        os_log("Updater did not find update: %{public}@",
-               log: .updates,
-               "\(item?.displayVersionString ?? "")(\(item?.versionString ?? ""))")
         if let item {
             // User is running the latest version
             updateCheckResult = UpdateCheckResult(item: item, isInstalled: true)
         }
->>>>>>> main
 
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidNotFindUpdate, error: error))
     }
 
     func updater(_ updater: SPUUpdater, didDownloadUpdate item: SUAppcastItem) {
-<<<<<<< HEAD
         Logger.updates.debug("Updater did download update: \(item.displayVersionString)(\(item.versionString))")
-=======
-        os_log("Updater did download update: %{public}@",
-               log: .updates,
-               "\(item.displayVersionString)(\(item.versionString))")
->>>>>>> main
 
         if automaticUpdateFlow {
             // For automatic updates, the available item has to be downloaded
@@ -303,7 +283,7 @@ extension UpdateController: SPUUpdaterDelegate {
     }
 
     func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {
-        os_log("Updater did finish update cycle", log: .updates)
+        Logger.updates.debug("Updater did finish update cycle")
 
         onUpdateCheckEnd()
     }
@@ -313,7 +293,7 @@ extension UpdateController: SPUUpdaterDelegate {
             // The update check end is already handled
             return
         }
-
+        
         // If the update is available, present it
         if let updateCheckResult = updateCheckResult {
             latestUpdate = Update(appcastItem: updateCheckResult.item,
@@ -321,15 +301,10 @@ extension UpdateController: SPUUpdaterDelegate {
         } else {
             latestUpdate = nil
         }
-
-<<<<<<< HEAD
-    func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {
-        Logger.updates.debug("Updater did finish update cycle")
-=======
+        
         // Clear cache
         isUpdateBeingLoaded = false
         updateCheckResult = nil
->>>>>>> main
     }
 
 }
