@@ -104,8 +104,7 @@ final class RemoteMessagingClientTests: XCTestCase {
                 pinnedTabsManager: PinnedTabsManager(),
                 internalUserDecider: InternalUserDeciderMock(),
                 statisticsStore: MockStatisticsStore(),
-                variantManager: MockVariantManager(),
-                freemiumPIRState: MockFreemiumPIRState()
+                variantManager: MockVariantManager()
             ),
             configurationStore: MockConfigurationStore(),
             remoteMessagingAvailabilityProvider: availabilityProvider
