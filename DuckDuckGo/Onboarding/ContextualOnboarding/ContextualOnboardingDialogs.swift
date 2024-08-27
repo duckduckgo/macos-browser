@@ -21,9 +21,9 @@ import Onboarding
 import SwiftUIExtensions
 
 struct OnboardingDialogsContants {
-    static let titleFont = Font.system(size: 16, weight: .bold, design: .default)
-    static let messageFont = Font.system(size: Self.messageFontSize, weight: .regular, design: .default)
-    static let messageFontSize = 14.0
+    static let titleFont = Font.system(size: 20, weight: .bold, design: .rounded)
+    static let messageFont = Font.system(size: Self.messageFontSize, weight: .regular, design: .rounded)
+    static let messageFontSize = 16.0
 }
 
 struct OnboardingTrySearchDialog: View {
@@ -215,7 +215,7 @@ struct OnboardingPrimaryCTAButton: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .padding(.vertical, 2)
+                .padding(.vertical, 3)
                 .padding(.horizontal, 24)
         }
         .buttonStyle(DefaultActionButtonStyle(enabled: true))
@@ -234,7 +234,7 @@ struct OnboardingSecondaryCTAButton: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-            .padding(.vertical, 2)
+            .padding(.vertical, 3)
             .padding(.horizontal, 26)
         }
         .buttonStyle(DismissActionButtonStyle())
