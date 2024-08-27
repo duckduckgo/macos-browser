@@ -42,7 +42,7 @@ final class DefaultFreemiumPIRFeature: FreemiumPIRFeature {
          */
         featureFlagger.isFeatureOn(.freemiumPIR) // #1
         && subscriptionManager.isPrivacyProPurchaseAvailable // #2
-        && !accountManager.hasSubscription // #3
+        && !accountManager.isUserAuthenticated // #3
         // TODO: - Also check experiment cohort here
     }
 
@@ -66,12 +66,5 @@ private extension SubscriptionManager {
         case .stripe:
             return true
         }
-    }
-}
-
-private extension AccountManager {
-
-    var hasSubscription: Bool {
-        isUserAuthenticated
     }
 }
