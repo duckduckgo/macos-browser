@@ -22,14 +22,14 @@ extension HomePage.Views {
 
     struct BackgroundThumbnailView<Content>: View where Content: View {
         let showCheckmarkIfSelected: Bool
-        let customBackground: HomePage.Models.SettingsModel.CustomBackground?
+        let customBackground: CustomBackground?
         @ViewBuilder let content: () -> Content
 
         @EnvironmentObject var model: HomePage.Models.SettingsModel
 
         init(
             showCheckmarkIfSelected: Bool = false,
-            customBackground: HomePage.Models.SettingsModel.CustomBackground,
+            customBackground: CustomBackground,
             @ViewBuilder content: @escaping () -> Content = { EmptyView() }
         ) {
             self.showCheckmarkIfSelected = showCheckmarkIfSelected
@@ -68,14 +68,14 @@ extension HomePage.Views {
                 illustration.image.resizable().scaledToFill()
             case .customImage(let userBackgroundImage):
                 Group {
-                    if let image = model.customImagesManager.thumbnailImage(for: userBackgroundImage) {
+                    if let image = model.customImagesManager?.thumbnailImage(for: userBackgroundImage) {
                         Image(nsImage: image).resizable().scaledToFill()
                     } else {
                         EmptyView()
                     }
                 }
                 .contextMenu {
-                    Button("Delete Background", action: { model.customImagesManager.deleteImage(userBackgroundImage) })
+                    Button("Delete Background", action: { model.customImagesManager?.deleteImage(userBackgroundImage) })
                 }
             case .none:
                 content()

@@ -223,7 +223,7 @@ final class AppearancePreferences: ObservableObject {
         }
     }
 
-    @Published var homePageCustomBackground: HomePage.Models.SettingsModel.CustomBackground? {
+    @Published var homePageCustomBackground: CustomBackground? {
         didSet {
             persistor.homePageCustomBackground = homePageCustomBackground?.description
         }
@@ -251,7 +251,7 @@ final class AppearancePreferences: ObservableObject {
         showBookmarksBar = persistor.showBookmarksBar
         bookmarksBarAppearance = persistor.bookmarksBarAppearance
         homeButtonPosition = persistor.homeButtonPosition
-        homePageCustomBackground = persistor.homePageCustomBackground.flatMap(HomePage.Models.SettingsModel.CustomBackground.init)
+        homePageCustomBackground = persistor.homePageCustomBackground.flatMap(CustomBackground.init)
     }
 
     private var persistor: AppearancePreferencesPersistor

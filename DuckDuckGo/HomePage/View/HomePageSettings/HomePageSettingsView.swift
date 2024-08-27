@@ -42,13 +42,13 @@ extension HomePage.Views {
                             rootView
                                 .transition(.move(edge: .leading).combined(with: .opacity))
                         case .colorPicker:
-                            BackgroundPickerView(title: "Solid Colors", items: HomePage.Models.SettingsModel.SolidColor.allCases)
+                            BackgroundPickerView(title: "Solid Colors", items: SolidColor.allCases)
                                 .transition(.move(edge: .trailing).combined(with: .opacity))
                         case .gradientPicker:
-                            BackgroundPickerView(title: "Gradients", items: HomePage.Models.SettingsModel.Gradient.allCases)
+                            BackgroundPickerView(title: "Gradients", items: Gradient.allCases)
                                 .transition(.move(edge: .trailing).combined(with: .opacity))
                         case .illustrationPicker:
-                            BackgroundPickerView(title: "Illustrations", items: HomePage.Models.SettingsModel.Illustration.allCases)
+                            BackgroundPickerView(title: "Illustrations", items: Illustration.allCases)
                                 .transition(.move(edge: .trailing).combined(with: .opacity))
                         case .customImagePicker:
                             BackgroundPickerView(title: "My Backgrounds", items: model.availableUserBackgroundImages) {

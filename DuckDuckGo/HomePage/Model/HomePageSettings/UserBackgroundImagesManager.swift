@@ -21,37 +21,6 @@ import Foundation
 import PixelKit
 import SwiftUI
 
-struct UserBackgroundImage: Hashable, Equatable, Identifiable, LosslessStringConvertible, ColorSchemeProviding, CustomBackgroundConvertible {
-    let fileName: String
-    let colorScheme: ColorScheme
-
-    var id: String {
-        fileName
-    }
-
-    var customBackground: HomePage.Models.SettingsModel.CustomBackground {
-        .customImage(self)
-    }
-
-    var description: String {
-        "\(fileName)|\(colorScheme.description)"
-    }
-
-    init(fileName: String, colorScheme: ColorScheme) {
-        self.fileName = fileName
-        self.colorScheme = colorScheme
-    }
-
-    init?(_ description: String) {
-        let components = description.split(separator: "|")
-        guard components.count == 2, let colorScheme = ColorScheme(String(components[1])) else {
-            return nil
-        }
-        self.fileName = String(components[0])
-        self.colorScheme = colorScheme
-    }
-}
-
 protocol UserBackgroundImagesManaging {
     var storageLocation: URL { get }
     var maximumNumberOfImages: Int { get }
@@ -87,19 +56,19 @@ extension ColorScheme: LosslessStringConvertible {
 
 final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
 
-    let storageLocation: URL
-    let sendPixel: (PixelKitEvent) -> Void
-    private let imageProcessor: ImageProcessing
-    private let thumbnailsStorageLocation: URL
-
-    let maximumNumberOfImages: Int
-
     enum Const {
         static let storageDirectoryName = "UserBackgroundImages"
         static let thumbnailsDirectoryName = "thumbnails"
         static let thumbnailSize = CGSize(width: 192, height: 128)
         static let jpegExtension = "jpg"
     }
+
+    let maximumNumberOfImages: Int
+    let storageLocation: URL
+    let sendPixel: (PixelKitEvent) -> Void
+    private let imageProcessor: ImageProcessing
+    private let thumbnailsStorageLocation: URL
+    private var availableImagesSortedByAccessTime: [UserBackgroundImage] = []
 
     var availableImagesPublisher: AnyPublisher<[UserBackgroundImage], Never> {
         $availableImages.removeDuplicates().eraseToAnyPublisher()
@@ -113,8 +82,6 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
         }
     }
 
-    private var availableImagesSortedByAccessTime: [UserBackgroundImage] = []
-
     @UserDefaultsWrapper(key: .homePageUserBackgroundImages, defaultValue: [])
     private var imagesMetadata: [String] {
         didSet {
@@ -122,7 +89,7 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
         }
     }
 
-    init(
+    init?(
         maximumNumberOfImages: Int,
         applicationSupportDirectory: URL,
         imageProcessor: ImageProcessing = ImageProcessor(),
@@ -139,12 +106,13 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
         do {
             try setUpStorageDirectory(at: storageLocation.path)
             try setUpStorageDirectory(at: thumbnailsStorageLocation.path)
+
+            availableImages = imagesMetadata.compactMap(UserBackgroundImage.init)
+            validateAvailableImages()
         } catch {
             sendPixel(DebugEvent(NewTabPagePixel.newTabBackgroundInitializeStorageError, error: error))
+            return nil
         }
-
-        availableImages = imagesMetadata.compactMap(UserBackgroundImage.init)
-        validateAvailableImages()
     }
 
     func image(for userBackgroundImage: UserBackgroundImage) -> NSImage? {
@@ -165,7 +133,8 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
         // first copy the image, converting it to JPEG
         try copyImage(at: url, toJPEGAt: destinationURL)
 
-        // then generate thumbnail...
+        // then spawn 2 concurrent tasks:
+        // thumbnail generation
         async let thumbnailTask: Void = {
             do {
                 let imageData = try Data(contentsOf: destinationURL)
@@ -176,12 +145,11 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
             }
         }()
 
-        // ...and calculate color scheme...
+        // and color scheme calculation
         async let colorSchemeTask = {
             imageProcessor.calculatePreferredColorScheme(forImageAt: destinationURL)
         }()
 
-        // ...concurrently
         await thumbnailTask
         let colorScheme = await colorSchemeTask
 
@@ -237,7 +205,7 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
     }
 
     private func setUpStorageDirectory(at path: String) throws {
-        var isDirectory: ObjCBool = .init(booleanLiteral: false)
+        var isDirectory: ObjCBool = false
         let fileExists = FileManager.default.fileExists(atPath: path, isDirectory: &isDirectory)
 
         switch (fileExists, isDirectory.boolValue) {

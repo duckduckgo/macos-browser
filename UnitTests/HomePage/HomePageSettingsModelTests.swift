@@ -66,6 +66,10 @@ final class HomePageSettingsModelTests: XCTestCase {
         )
     }
 
+    override func tearDown() async throws {
+        try? FileManager.default.removeItem(at: storageLocation)
+    }
+
     func testThatContentTypeIsRootByDefault() {
         XCTAssertEqual(model.contentType, .root)
     }
@@ -146,14 +150,14 @@ final class HomePageSettingsModelTests: XCTestCase {
 
     func testThatCustomBackgroundIsPersistedToAppearancePreferences() {
         model.customBackground = .solidColor(.black)
-        XCTAssertEqual(appearancePreferences.homePageCustomBackground, SettingsModel.CustomBackground.solidColor(.black))
+        XCTAssertEqual(appearancePreferences.homePageCustomBackground, CustomBackground.solidColor(.black))
         model.customBackground = .gradient(.gradient01)
-        XCTAssertEqual(appearancePreferences.homePageCustomBackground, SettingsModel.CustomBackground.gradient(.gradient01))
+        XCTAssertEqual(appearancePreferences.homePageCustomBackground, CustomBackground.gradient(.gradient01))
         model.customBackground = .illustration(.illustration01)
-        XCTAssertEqual(appearancePreferences.homePageCustomBackground, SettingsModel.CustomBackground.illustration(.illustration01))
+        XCTAssertEqual(appearancePreferences.homePageCustomBackground, CustomBackground.illustration(.illustration01))
         let userImage = UserBackgroundImage(fileName: "abc", colorScheme: .light)
         model.customBackground = .customImage(userImage)
-        XCTAssertEqual(appearancePreferences.homePageCustomBackground, SettingsModel.CustomBackground.customImage(userImage))
+        XCTAssertEqual(appearancePreferences.homePageCustomBackground, CustomBackground.customImage(userImage))
         model.customBackground = nil
         XCTAssertNil(appearancePreferences.homePageCustomBackground)
     }
@@ -209,32 +213,32 @@ final class HomePageSettingsModelTests: XCTestCase {
     func testThatCustomBackgroundModeModelShowsPreviewOfCurrentlySelectedBackground() {
         model.customBackground = nil
         XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundPreview), [
-            .gradient(SettingsModel.CustomBackground.placeholderGradient),
-            .solidColor(SettingsModel.CustomBackground.placeholderColor),
-            .illustration(SettingsModel.CustomBackground.placeholderIllustration),
+            .gradient(CustomBackground.placeholderGradient),
+            .solidColor(CustomBackground.placeholderColor),
+            .illustration(CustomBackground.placeholderIllustration),
             nil
         ])
 
         model.customBackground = .gradient(.gradient04)
         XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundPreview), [
             .gradient(.gradient04),
-            .solidColor(SettingsModel.CustomBackground.placeholderColor),
-            .illustration(SettingsModel.CustomBackground.placeholderIllustration),
+            .solidColor(CustomBackground.placeholderColor),
+            .illustration(CustomBackground.placeholderIllustration),
             nil
         ])
 
         model.customBackground = .solidColor(.darkPink)
         XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundPreview), [
-            .gradient(SettingsModel.CustomBackground.placeholderGradient),
+            .gradient(CustomBackground.placeholderGradient),
             .solidColor(.darkPink),
-            .illustration(SettingsModel.CustomBackground.placeholderIllustration),
+            .illustration(CustomBackground.placeholderIllustration),
             nil
         ])
 
         model.customBackground = .illustration(.illustration02)
         XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundPreview), [
-            .gradient(SettingsModel.CustomBackground.placeholderGradient),
-            .solidColor(SettingsModel.CustomBackground.placeholderColor),
+            .gradient(CustomBackground.placeholderGradient),
+            .solidColor(CustomBackground.placeholderColor),
             .illustration(.illustration02),
             nil
         ])
@@ -248,22 +252,18 @@ final class HomePageSettingsModelTests: XCTestCase {
         userBackgroundImagesManager.availableImages = [image1, image2, image3]
         model.customBackground = nil
         XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundPreview), [
-            .gradient(SettingsModel.CustomBackground.placeholderGradient),
-            .solidColor(SettingsModel.CustomBackground.placeholderColor),
-            .illustration(SettingsModel.CustomBackground.placeholderIllustration),
+            .gradient(CustomBackground.placeholderGradient),
+            .solidColor(CustomBackground.placeholderColor),
+            .illustration(CustomBackground.placeholderIllustration),
             .customImage(image1)
         ])
 
         userBackgroundImagesManager.availableImages = [image2, image1, image3]
         XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundPreview), [
-            .gradient(SettingsModel.CustomBackground.placeholderGradient),
-            .solidColor(SettingsModel.CustomBackground.placeholderColor),
-            .illustration(SettingsModel.CustomBackground.placeholderIllustration),
+            .gradient(CustomBackground.placeholderGradient),
+            .solidColor(CustomBackground.placeholderColor),
+            .illustration(CustomBackground.placeholderIllustration),
             .customImage(image2)
         ])
-    }
-
-    override func tearDown() async throws {
-        try? FileManager.default.removeItem(at: storageLocation)
     }
 }
