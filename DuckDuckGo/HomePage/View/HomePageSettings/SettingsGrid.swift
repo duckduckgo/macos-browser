@@ -50,4 +50,72 @@ extension HomePage.Views {
             }
         }
     }
+
+    struct SettingsGridWithPlaceholders<Item, ItemView>: View where Item: Identifiable & Hashable, ItemView: View {
+
+        enum ItemOrPlaceholder<I>: Identifiable & Hashable where I: Identifiable & Hashable {
+            case item(I)
+            case placeholder(Int)
+
+            var id: Int {
+                switch self {
+                case .item(let item):
+                    return item.id.hashValue
+                case .placeholder(let index):
+                    return index.hashValue
+                }
+            }
+        }
+
+        let items: [ItemOrPlaceholder<Item>]
+        let maxNumberOfItems: Int
+        @ViewBuilder let itemView: (Item?) -> ItemView
+
+        init(items: [Item], maxNumberOfItems: Int, @ViewBuilder itemView: @escaping (Item?) -> ItemView) {
+            var allItems = items.map(ItemOrPlaceholder.item)
+            if maxNumberOfItems > allItems.count {
+                for index in allItems.count..<maxNumberOfItems {
+                    allItems.append(.placeholder(index))
+                }
+            }
+            self.items = allItems
+            self.maxNumberOfItems = maxNumberOfItems
+            self.itemView = itemView
+        }
+
+        var body: some View {
+            if #available(macOS 12.0, *), items.count > 1 {
+                LazyVGrid(
+                    columns: Array(repeating: GridItem(.flexible(minimum: 0, maximum: .infinity), spacing: 12), count: 2),
+                    spacing: 12
+                ) {
+                    ForEach(items, content: { item in
+                        if case .item(let item) = item {
+                            itemView(item)
+                        } else {
+                            itemView(nil)
+                        }
+                    })
+                }
+            } else {
+                let rows = items.chunked(into: 2)
+                VStack(alignment: .leading, spacing: 12) {
+                    ForEach(rows, id: \.self) { row in
+                        HStack(spacing: 12) {
+                            ForEach(row) { row in
+                                if case .item(let item) = row {
+                                    itemView(item).frame(width: 96)
+                                } else {
+                                    itemView(nil).frame(width: 96)
+                                }
+                            }
+                            if row.count == 1 {
+                                Spacer()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

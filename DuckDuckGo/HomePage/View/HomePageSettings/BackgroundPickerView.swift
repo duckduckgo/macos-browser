@@ -24,11 +24,13 @@ extension HomePage.Views {
 
         let title: String
         let items: [Item]
+        let maxItemsCount: Int
         @ViewBuilder let footer: () -> ContentView
 
-        init(title: String, items: [Item], @ViewBuilder footer: @escaping () -> ContentView = { EmptyView() }) {
+        init(title: String, items: [Item], maxItemsCount: Int = 0, @ViewBuilder footer: @escaping () -> ContentView = { EmptyView() }) {
             self.title = title
             self.items = items
+            self.maxItemsCount = maxItemsCount
             self.footer = footer
         }
 
@@ -37,20 +39,43 @@ extension HomePage.Views {
         var body: some View {
             VStack(spacing: 16) {
                 backButton
-                SettingsGrid(items: items) { item in
-                    Button {
-                        withAnimation {
-                            if model.customBackground != item.customBackground {
-                                model.customBackground = item.customBackground
+                if items.count < maxItemsCount {
+                    SettingsGridWithPlaceholders(items: items, maxNumberOfItems: maxItemsCount) { item in
+                        if let item {
+                            itemView(for: item)
+                        } else {
+                            Button {
+                                Task {
+                                    await model.addNewImage()
+                                }
+                            } label: {
+                                RoundedRectangle(cornerRadius: 4)
+                                    .stroke(Color(.homeFavoritesGhost), style: StrokeStyle(lineWidth: 1.5, dash: [4.0, 2.0]))
+                                    .frame(height: 64)
+                                    .contentShape(Rectangle())
                             }
+                            .buttonStyle(.plain)
                         }
-                    } label: {
-                        BackgroundThumbnailView(customBackground: item.customBackground)
                     }
-                    .buttonStyle(.plain)
+                } else {
+                    SettingsGrid(items: items, itemView: itemView(for:))
                 }
                 footer()
             }
+        }
+
+        @ViewBuilder
+        func itemView(for item: Item) -> some View {
+            Button {
+                withAnimation {
+                    if model.customBackground != item.customBackground {
+                        model.customBackground = item.customBackground
+                    }
+                }
+            } label: {
+                BackgroundThumbnailView(customBackground: item.customBackground)
+            }
+            .buttonStyle(.plain)
         }
 
         @ViewBuilder

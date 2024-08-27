@@ -51,7 +51,11 @@ extension HomePage.Views {
                             BackgroundPickerView(title: "Illustrations", items: Illustration.allCases)
                                 .transition(.move(edge: .trailing).combined(with: .opacity))
                         case .customImagePicker:
-                            BackgroundPickerView(title: "My Backgrounds", items: model.availableUserBackgroundImages) {
+                            BackgroundPickerView(
+                                title: "My Backgrounds",
+                                items: model.availableUserBackgroundImages,
+                                maxItemsCount: HomePage.Models.SettingsModel.Const.maximumNumberOfUserImages
+                            ) {
                                 addBackgroundButton
                                 Text("Images are stored on your device so DuckDuckGo can't see or access them.")
                                     .foregroundColor(.blackWhite60)
