@@ -73,7 +73,6 @@ public final class UDSServer {
 
     private let fileManager: FileManager
     private let socketFileURL: URL
-    private let log: OSLog
 
     /// Default initializer
     ///
@@ -82,12 +81,10 @@ public final class UDSServer {
     ///         to share this socket with other apps in the same app group, this path should be in an app group
     ///         that both apps have access to.
     ///     - socketFileName: the name of the socket file
-    ///     - log: the log to use
     ///
-    public init(socketFileURL: URL, fileManager: FileManager = .default, log: OSLog) {
+    public init(socketFileURL: URL, fileManager: FileManager = .default) {
         self.fileManager = fileManager
         self.socketFileURL = socketFileURL
-        self.log = log
         self.receiver = UDSReceiver()
 
         do {
@@ -261,7 +258,7 @@ public final class UDSServer {
                     return
                 }
 
-                os_log("UDSServer - Send Success", log: self.log)
+                Logger.udsHelper.info("UDSServer - Send Success")
                 continuation.resume()
             })
         }

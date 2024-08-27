@@ -22,6 +22,7 @@ import Foundation
 import NetworkProtection
 import NetworkProtectionProxy
 import SwiftUI
+import os.log
 
 /// Controller for the VPN debug menu.
 ///
@@ -176,7 +177,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
             do {
                 try await debugUtilities.resetAllState(keepAuthToken: false)
             } catch {
-                os_log("Error in resetAllState: \(, privacy: .public)", log: .networkProtection, error.localizedDescription)
+                Logger.networkProtection.error("Error in resetAllState: \(error.localizedDescription, privacy: .public)")
             }
         }
     }
@@ -189,7 +190,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
             do {
                 try await debugUtilities.resetAllState(keepAuthToken: true)
             } catch {
-                os_log("Error in resetAllState: \(, privacy: .public)", log: .networkProtection, error.localizedDescription)
+                Logger.networkProtection.error("Error in resetAllState: \(error.localizedDescription, privacy: .public)")
             }
         }
     }

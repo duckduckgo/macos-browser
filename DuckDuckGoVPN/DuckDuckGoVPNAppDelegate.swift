@@ -30,6 +30,7 @@ import ServiceManagement
 import PixelKit
 import Subscription
 import VPNAppLauncher
+import os.log
 
 @objc(Application)
 final class DuckDuckGoVPNApplication: NSApplication {
@@ -38,16 +39,11 @@ final class DuckDuckGoVPNApplication: NSApplication {
     private let _delegate: DuckDuckGoVPNAppDelegate
 
     override init() {
-        os_log(.default,
-               log: .networkProtection,
-               "🟢 Status Bar Agent starting\nPath: (\(, privacy: .public))\nVersion: \(, privacy: .public)\nPID: \(, privacy: .public)",
-               Bundle.main.bundlePath,
-               "\(Bundle.main.versionNumber!).\(Bundle.main.buildNumber)",
-               NSRunningApplication.current.processIdentifier)
+        Logger.networkProtection.debug("🟢 Status Bar Agent starting\nPath: (\(Bundle.main.bundlePath, privacy: .public))\nVersion: \("\(Bundle.main.versionNumber!).\(Bundle.main.buildNumber)", privacy: .public)\nPID: \(NSRunningApplication.current.processIdentifier, privacy: .public)")
 
         // prevent agent from running twice
         if let anotherInstance = NSRunningApplication.runningApplications(withBundleIdentifier: Bundle.main.bundleIdentifier!).first(where: { $0 != .current }) {
-            Logger..error(log: .networkProtection, "🔴 Stopping: another instance is running: \(, privacy: .public).", anotherInstance.processIdentifier)
+            Logger.networkProtection.error("Stopping: another instance is running: \(anotherInstance.processIdentifier, privacy: .public).")
             exit(0)
         }
 
@@ -76,9 +72,9 @@ final class DuckDuckGoVPNApplication: NSApplication {
 
 #if DEBUG
         if accountManager.accessToken != nil {
-            Logger..error(log: .networkProtection, "🟢 VPN Agent found token")
+            Logger.networkProtection.debug("🟢 VPN Agent found token")
         } else {
-            Logger..error(log: .networkProtection, "🔴 VPN Agent found no token")
+            Logger.networkProtection.error("VPN Agent found no token")
         }
 #endif
     }
@@ -361,7 +357,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ aNotification: Notification) {
 
         APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
-        os_log("DuckDuckGoVPN started", log: .networkProtectionLoginItemLog)
+        Logger.networkProtection.info("DuckDuckGoVPN started")
 
         setupMenuVisibility()
 

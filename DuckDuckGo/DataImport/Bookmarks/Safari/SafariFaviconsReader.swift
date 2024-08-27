@@ -21,6 +21,7 @@ import Foundation
 import Common
 import CryptoKit
 import GRDB
+import os.log
 
 final class SafariFaviconsReader {
 
@@ -119,7 +120,7 @@ final class SafariFaviconsReader {
             do {
                 imageData = try readImageData(with: record.host)
             } catch {
-                Logger..error(log: .dataImportExport, "could not read image data for \(record.host)")
+                Logger.dataImportExport.error("could not read image data for \(record.host): \(error.localizedDescription)")
                 return nil
             }
             guard let formattedHost = record.formattedHost else { return nil }

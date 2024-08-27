@@ -34,7 +34,7 @@ final class DuckDuckGoNotificationsApplication: NSApplication {
 
         // prevent agent from running twice
         if let anotherInstance = NSRunningApplication.runningApplications(withBundleIdentifier: Bundle.main.bundleIdentifier!).first(where: { $0 != .current }) {
-            Logger.networkProtection.error("🔴 Stopping: another instance is running: \(anotherInstance.processIdentifier, privacy: .public).")
+            Logger.networkProtection.error("Stopping: another instance is running: \(anotherInstance.processIdentifier, privacy: .public).")
             exit(EXIT_SUCCESS)
         }
 

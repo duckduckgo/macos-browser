@@ -20,12 +20,13 @@ import Common
 import Foundation
 import LoginItems
 import PixelKit
+import os.log
 
 protocol LoginItemsManaging {
-    func enableLoginItems(_ items: Set<LoginItem>, log: OSLog)
-    func throwingEnableLoginItems(_ items: Set<LoginItem>, log: OSLog) throws
+    func enableLoginItems(_ items: Set<LoginItem>)
+    func throwingEnableLoginItems(_ items: Set<LoginItem>) throws
     func disableLoginItems(_ items: Set<LoginItem>)
-    func restartLoginItems(_ items: Set<LoginItem>, log: OSLog)
+    func restartLoginItems(_ items: Set<LoginItem>)
 
     func isAnyEnabled(_ items: Set<LoginItem>) -> Bool
 }
@@ -41,11 +42,11 @@ final class LoginItemsManager: LoginItemsManaging {
 
     // MARK: - Main Interactions
 
-    func enableLoginItems(_ items: Set<LoginItem>, log: OSLog) {
+    func enableLoginItems(_ items: Set<LoginItem>) {
         for item in items {
             do {
                 try item.enable()
-                os_log("🟢 Enabled successfully \(, privacy: .public)", log: log, String(describing: item))
+                Logger.networkProtection.debug("🟢 Enabled successfully \(String(describing: item), privacy: .public)")
             } catch let error as NSError {
                 handleError(for: item, action: .enable, error: error)
             }
@@ -54,11 +55,11 @@ final class LoginItemsManager: LoginItemsManaging {
 
     /// Throwing version of enableLoginItems
     ///
-    func throwingEnableLoginItems(_ items: Set<LoginItem>, log: OSLog) throws {
+    func throwingEnableLoginItems(_ items: Set<LoginItem>) throws {
         for item in items {
             do {
                 try item.enable()
-                os_log("🟢 Enabled successfully \(, privacy: .public)", log: log, String(describing: item))
+                Logger.networkProtection.debug("🟢 Enabled successfully \(String(describing: item), privacy: .public)")
             } catch let error as NSError {
                 handleError(for: item, action: .enable, error: error)
                 throw error
@@ -66,11 +67,11 @@ final class LoginItemsManager: LoginItemsManaging {
         }
     }
 
-    func restartLoginItems(_ items: Set<LoginItem>, log: OSLog) {
+    func restartLoginItems(_ items: Set<LoginItem>) {
         for item in items {
             do {
                 try item.restart()
-                os_log("🟢 Restarted successfully \(, privacy: .public)", log: log, String(describing: item))
+                Logger.networkProtection.debug("🟢 Restarted successfully \(String(describing: item), privacy: .public)")
             } catch let error as NSError {
                 handleError(for: item, action: .restart, error: error)
             }
@@ -95,7 +96,7 @@ final class LoginItemsManager: LoginItemsManaging {
                                                       buildType: AppVersion.shared.buildType,
                                                       osVersion: AppVersion.shared.osVersion)
         PixelKit.fire(DebugEvent(event, error: error), frequency: .dailyAndCount)
-        os_log("🔴 Could not enable \(, privacy: .public): \(, privacy: .public)", item.debugDescription, error.debugDescription)
+        Logger.networkProtection.error("Could not enable \(item.debugDescription, privacy: .public): \(error.debugDescription, privacy: .public)")
     }
 
     // MARK: - Debug Interactions

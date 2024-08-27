@@ -25,6 +25,7 @@ import BrowserServicesKit
 import PixelKit
 import Networking
 import Subscription
+import os.log
 
 @objc(Application)
 final class DuckDuckGoDBPBackgroundAgentApplication: NSApplication {
@@ -32,7 +33,7 @@ final class DuckDuckGoDBPBackgroundAgentApplication: NSApplication {
     private let subscriptionManager: SubscriptionManager
 
     override init() {
-        Logger..error(log: .dbpBackgroundAgent, "🟢 DBP background Agent starting: \(, privacy: .public)", NSRunningApplication.current.processIdentifier)
+        Logger.dbpBackgroundAgent.info("🟢 Starting: \(NSRunningApplication.current.processIdentifier, privacy: .public)")
 
         let dryRun: Bool
 #if DEBUG
@@ -62,7 +63,7 @@ final class DuckDuckGoDBPBackgroundAgentApplication: NSApplication {
 
         // prevent agent from running twice
         if let anotherInstance = NSRunningApplication.runningApplications(withBundleIdentifier: Bundle.main.bundleIdentifier!).first(where: { $0 != .current }) {
-            Logger..error(log: .dbpBackgroundAgent, "🔴 Stopping: another instance is running: \(, privacy: .public).", anotherInstance.processIdentifier)
+            Logger.dbpBackgroundAgent.error("Stopping: another instance is running: \(anotherInstance.processIdentifier, privacy: .public).")
             pixelHandler.fire(.backgroundAgentStartedStoppingDueToAnotherInstanceRunning)
             exit(0)
         }
@@ -96,7 +97,7 @@ final class DuckDuckGoDBPBackgroundAgentAppDelegate: NSObject, NSApplicationDele
 
     @MainActor
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        os_log("DuckDuckGoAgent started", log: .dbpBackgroundAgent, type: .info)
+        Logger.dbpBackgroundAgent.info("DuckDuckGoAgent started")
 
         let redeemUseCase = RedeemUseCase(authenticationService: AuthenticationService(),
                                           authenticationRepository: KeychainAuthenticationData())

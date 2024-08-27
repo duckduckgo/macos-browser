@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import os.log
 
 struct BWRequest: Codable {
 
@@ -109,23 +110,25 @@ struct BWRequest: Codable {
             do {
                 jsonData = try JSONEncoder().encode(self)
             } catch {
-                logOrAssertionFailure("BWRequest: Can't encode the message")
+                Logger.general.fault("BWRequest: Can't encode the message")
+                assertionFailure("BWRequest: Can't encode the message")
                 return nil
             }
             return jsonData
         }
-
+        
     }
-
+    
     var data: Data? {
         let jsonData: Data
         do {
             jsonData = try JSONEncoder().encode(self)
         } catch {
-            logOrAssertionFailure("BWRequest: Can't encode the message")
+            Logger.general.fault("BWRequest: Can't encode the message")
+            assertionFailure("BWRequest: Can't encode the message")
             return nil
         }
         return jsonData
     }
-
+    
 }

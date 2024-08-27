@@ -18,6 +18,7 @@
 
 import Cocoa
 import Common
+import os.log
 
 extension WindowsManager {
 
@@ -90,8 +91,7 @@ final class WindowManagerStateRestoration: NSObject, NSSecureCoding {
     init?(coder: NSCoder) {
         guard let restorationArray = coder.decodeObject(of: [NSArray.self, WindowRestorationItem.self],
                                              forKey: NSSecureCodingKeys.controllers) as? [WindowRestorationItem] else {
-            os_log("WindowsManager:initWithCoder: could not decode Restoration Array: %s", type: .error,
-                   String(describing: coder.error))
+            Logger.general.error("WindowsManager:initWithCoder: could not decode Restoration Array: \(String(describing: coder.error), privacy: .public)")
             return nil
         }
         self.windows = restorationArray

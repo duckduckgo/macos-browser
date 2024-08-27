@@ -26,6 +26,7 @@ import SwiftUI
 import PDFKit
 import Navigation
 import PixelKit
+import os.log
 
 extension SyncDevice {
     init(_ account: SyncAccount) {
@@ -371,7 +372,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
     func refreshDevices() {
         guard !isScreenLocked else {
-            os_log(.debug, log: .sync, "Screen is locked, skipping devices refresh")
+            Logger.sync.debug("Screen is locked, skipping devices refresh")
             return
         }
         guard syncService.account != nil else {
@@ -383,7 +384,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
                 let registeredDevices = try await syncService.fetchDevices()
                 mapDevices(registeredDevices)
             } catch {
-                Logger..error(log: .sync, "Failed to refresh devices: \(error)")
+                Logger.sync.debug("Failed to refresh devices: \(error)")
             }
         }
     }

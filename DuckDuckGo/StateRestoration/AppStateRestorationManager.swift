@@ -20,6 +20,7 @@ import Foundation
 import Combine
 import Common
 import PixelKit
+import os.log
 
 @MainActor
 final class AppStateRestorationManager: NSObject {
@@ -71,7 +72,7 @@ final class AppStateRestorationManager: NSObject {
         } catch CocoaError.fileReadNoSuchFile {
             // ignore
         } catch {
-            os_log("App state could not be decoded: %s", "\(error)")
+            Logger.general.error("App state could not be decoded: \(error.localizedDescription, privacy: .public)")
             PixelKit.fire(DebugEvent(GeneralPixel.appStateRestorationFailed, error: error),
                           withAdditionalParameters: ["interactive": String(interactive)])
         }

@@ -20,6 +20,7 @@ import Cocoa
 import Combine
 import Common
 import History
+import os.log
 
 protocol FirePopoverViewControllerDelegate: AnyObject {
 

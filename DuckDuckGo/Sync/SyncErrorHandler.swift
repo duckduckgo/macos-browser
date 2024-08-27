@@ -23,6 +23,7 @@ import PixelKit
 import Persistence
 import Combine
 import SyncDataProviders
+import os.log
 
 /// The SyncErrorHandling protocol defines methods for handling sync errors related to specific data types such as bookmarks and credentials.
 protocol SyncErrorHandling {
@@ -252,7 +253,7 @@ extension SyncErrorHandler: SyncErrorHandling {
                 PixelKit.fire(DebugEvent(modelType.syncFailedPixel, error: error), withAdditionalParameters: params)
             }
             let modelTypeString = modelType.rawValue.capitalized
-            Logger..error(log: OSLog.sync, "\(, privacy: .public) Sync error: \(, privacy: .public)", modelTypeString, String(reflecting: error))
+            Logger.sync.error("\(modelTypeString, privacy: .public) Sync error: \(String(reflecting: error), privacy: .public)")
         }
     }
 

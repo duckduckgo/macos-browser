@@ -22,6 +22,12 @@ import os.log
 extension Logger {
     static var dataImportExport = { Logger(subsystem: "Data Import/Export", category: "") }()
     static var config = { Logger(subsystem: "Configuration Downloading", category: "") }()
+    static var autoLock = { Logger(subsystem: "Auto-Lock", category: "") }()
+    static var httpsUpgrade = { Logger(subsystem: "HTTPS Upgrade", category: "") }()
+    static var atb = { Logger(subsystem: "ATB", category: "") }()
+    static var tabSnapshots = { Logger(subsystem: "Tab Snapshots", category: "") }()
+    static var tabLazyLoading = { Logger(subsystem: "Lazy Loading", category: "") }()
+    static var updates = { Logger(subsystem: "Updates", category: "") }()
 }
 
 //extension OSLog {

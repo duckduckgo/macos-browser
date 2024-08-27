@@ -19,7 +19,7 @@
 import Foundation
 import os.log
 
-extension Logger {
+public extension Logger {
     fileprivate static let subsystem = "com.duckduckgo.macos.browser.databroker-protection"
 
     static var dataBrokerProtection = { Logger(subsystem: subsystem, category: "") }()

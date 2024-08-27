@@ -1,7 +1,7 @@
 //
-//  QuartzIdleStateProvider.swift
+//  Logger+DBPBackgroundAgent.swift
 //
-//  Copyright © 2022 DuckDuckGo. All rights reserved.
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -17,19 +17,8 @@
 //
 
 import Foundation
-import Common
-import CoreGraphics
 import os.log
 
-final class QuartzIdleStateProvider: DeviceIdleStateProvider {
-
-    func secondsSinceLastEvent() -> TimeInterval {
-        let anyInputEventType = CGEventType(rawValue: ~0)!
-        let seconds = CGEventSource.secondsSinceLastEventType(.hidSystemState, eventType: anyInputEventType)
-
-        Logger.autoLock.debug("Idle duration since last user input event: \(seconds)")
-
-        return seconds
-    }
-
+extension Logger {
+    static var dbpBackgroundAgent = { Logger(subsystem: "DBP Background Agent", category: "") }()
 }

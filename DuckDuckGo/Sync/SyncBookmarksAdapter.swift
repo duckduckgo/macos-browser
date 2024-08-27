@@ -23,6 +23,7 @@ import DDGSync
 import Persistence
 import SyncDataProviders
 import PixelKit
+import os.log
 
 public class BookmarksFaviconsFetcherErrorHandler: EventMapping<BookmarksFaviconsFetcherError> {
 
@@ -74,8 +75,7 @@ final class SyncBookmarksAdapter {
         self.syncErrorHandler = syncErrorHandler
         databaseCleaner = BookmarkDatabaseCleaner(
             bookmarkDatabase: database,
-            errorEvents: BookmarksCleanupErrorHandling(),
-            log: .bookmarks
+            errorEvents: BookmarksCleanupErrorHandling()
         )
     }
 
@@ -106,7 +106,6 @@ final class SyncBookmarksAdapter {
             database: database,
             metadataStore: metadataStore,
             metricsEvents: metricsEventsHandler,
-            log: OSLog.sync,
             syncDidUpdateData: { [weak self] in
                 self?.syncErrorHandler.syncBookmarksSucceded()
                 guard let manager = self?.bookmarkManager as? LocalBookmarkManager else { return }
@@ -142,7 +141,7 @@ final class SyncBookmarksAdapter {
             stateStore = try BookmarksFaviconsFetcherStateStore(applicationSupportURL: URL.sandboxApplicationSupportURL)
         } catch {
             PixelKit.fire(DebugEvent(GeneralPixel.bookmarksFaviconsFetcherStateStoreInitializationFailed, error: error))
-            Logger..error(log: OSLog.sync, "Failed to initialize BookmarksFaviconsFetcherStateStore: \(, privacy: .public)", String(reflecting: error))
+            Logger.sync.error("Failed to initialize BookmarksFaviconsFetcherStateStore: \(String(reflecting: error), privacy: .public)")
             return nil
         }
 
@@ -151,8 +150,7 @@ final class SyncBookmarksAdapter {
             stateStore: stateStore,
             fetcher: FaviconFetcher(),
             faviconStore: FaviconManager.shared,
-            errorEvents: BookmarksFaviconsFetcherErrorHandler(),
-            log: .sync
+            errorEvents: BookmarksFaviconsFetcherErrorHandler()
         )
     }
 

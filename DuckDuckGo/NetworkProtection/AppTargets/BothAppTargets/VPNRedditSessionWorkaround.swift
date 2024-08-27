@@ -22,6 +22,7 @@ import NetworkProtectionIPC
 import Subscription
 import WebKit
 import Common
+import os.log
 
 final class VPNRedditSessionWorkaround {
 
@@ -70,9 +71,9 @@ final class VPNRedditSessionWorkaround {
         }
 
         if requiresRedditSessionCookie {
-            Logger..error(log: .networkProtection, "Installing VPN cookie workaround...")
+            Logger.networkProtection.error("Installing VPN cookie workaround...")
             await cookieStore.setCookie(redditSessionCookie)
-            Logger..error(log: .networkProtection, "Installed VPN cookie workaround")
+            Logger.networkProtection.error("Installed VPN cookie workaround")
         }
     }
 
@@ -85,9 +86,9 @@ final class VPNRedditSessionWorkaround {
         for cookie in cookies {
             if cookie.domain == redditSessionCookie.domain, cookie.name == redditSessionCookie.name {
                 if cookie.value == redditSessionCookie.value {
-                    Logger..error(log: .networkProtection, "Removing VPN cookie workaround")
+                    Logger.networkProtection.error("Removing VPN cookie workaround")
                     await cookieStore.deleteCookie(cookie)
-                    Logger..error(log: .networkProtection, "Removed VPN cookie workaround")
+                    Logger.networkProtection.error("Removed VPN cookie workaround")
                 }
 
                 break

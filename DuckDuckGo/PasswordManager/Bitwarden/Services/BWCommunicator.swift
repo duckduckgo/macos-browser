@@ -18,6 +18,7 @@
 
 import Common
 import Foundation
+import os.log
 
 protocol BWCommunicatorDelegate: AnyObject {
 
@@ -74,7 +75,7 @@ final class BWCommunicator: BWCommunication {
         process.terminationHandler = processDidTerminate(_:)
 
         try process.run()
-        os_log("BWCommunicator: Proxy process running", log: .bitwarden, type: .default)
+        Logger.bitWarden.debug("BWCommunicator: Proxy process running")
 
         self.process = BitwardenProcess(process: process, readingHandle: outHandle, writingHandle: inputHandle)
     }
@@ -85,7 +86,7 @@ final class BWCommunicator: BWCommunication {
     }
 
     private func processDidTerminate(_ process: Process) {
-        os_log("BWCommunicator: Proxy process terminated", log: .bitwarden, type: .default)
+        Logger.bitWarden.debug("BWCommunicator: Proxy process terminated")
 
         if let runningProcess = self.process?.process {
             if process != runningProcess {

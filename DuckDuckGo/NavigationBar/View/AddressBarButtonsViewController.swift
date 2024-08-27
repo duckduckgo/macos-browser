@@ -22,6 +22,7 @@ import Cocoa
 import Combine
 import Common
 import Lottie
+import os.log
 
 protocol AddressBarButtonsViewControllerDelegate: AnyObject {
 
@@ -400,7 +401,7 @@ final class AddressBarButtonsViewController: NSViewController {
         guard let tabViewModel,
               let state = tabViewModel.usedPermissions.microphone
         else {
-            os_log("%s: Selected tab view model is nil or no microphone state", type: .error, className)
+            Logger.general.error("Selected tab view model is nil or no microphone state")
             return
         }
         if case .requested(let query) = state {
@@ -419,7 +420,7 @@ final class AddressBarButtonsViewController: NSViewController {
         guard let tabViewModel,
               let state = tabViewModel.usedPermissions.geolocation
         else {
-            os_log("%s: Selected tab view model is nil or no geolocation state", type: .error, className)
+            Logger.general.debug("Selected tab view model is nil or no geolocation state")
             return
         }
         if case .requested(let query) = state {
@@ -438,7 +439,7 @@ final class AddressBarButtonsViewController: NSViewController {
         guard let tabViewModel,
               let state = tabViewModel.usedPermissions.popups
         else {
-            os_log("%s: Selected tab view model is nil or no popups state", type: .error, className)
+            Logger.general.error("Selected tab view model is nil or no popups state")
             return
         }
 
@@ -463,7 +464,7 @@ final class AddressBarButtonsViewController: NSViewController {
         guard let tabViewModel,
               let (permissionType, state) = tabViewModel.usedPermissions.first(where: { $0.key.isExternalScheme })
         else {
-            os_log("%s: Selected tab view model is nil or no externalScheme state", type: .error, className)
+            Logger.general.error("Selected tab view model is nil or no externalScheme state")
             return
         }
 

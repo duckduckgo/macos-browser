@@ -19,6 +19,7 @@
 import Common
 import Foundation
 import CoreData
+import os.log
 
 internal class FireproofDomains {
 

@@ -21,6 +21,7 @@ import BrowserServicesKit
 import Combine
 import Common
 import PixelKit
+import os.log
 
 protocol SaveIdentityDelegate: AnyObject {
 

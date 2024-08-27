@@ -39,6 +39,7 @@ import Subscription
 import NetworkProtectionIPC
 import DataBrokerProtection
 import RemoteMessaging
+import os.log
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
 
@@ -619,10 +620,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     return
                 }
                 if isLocked {
-                    os_log(.debug, log: .sync, "Screen is locked")
+                    Logger.sync.debug("Screen is locked")
                     syncService.scheduler.cancelSyncAndSuspendSyncQueue()
                 } else {
-                    os_log(.debug, log: .sync, "Screen is unlocked")
+                    Logger.sync.debug("Screen is unlocked")
                     syncService.scheduler.resumeSyncQueue()
                 }
             }

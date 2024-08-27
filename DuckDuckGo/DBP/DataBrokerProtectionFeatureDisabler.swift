@@ -19,6 +19,7 @@
 import Foundation
 import DataBrokerProtection
 import Common
+import os.log
 
 public extension Notification.Name {
     static let dbpWasDisabled = Notification.Name("com.duckduckgo.DBP.DBPWasDisabled")
@@ -43,7 +44,7 @@ struct DataBrokerProtectionFeatureDisabler: DataBrokerProtectionFeatureDisabling
             try dataManager.removeAllData()
             // the dataManagers delegate handles login item disabling
         } catch {
-            os_log("DataBrokerProtectionFeatureDisabler error: disableAndDelete, error: \(, privacy: .public)", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("DataBrokerProtectionFeatureDisabler error: disableAndDelete, error: \(error.localizedDescription, privacy: .public)")
         }
 
         DataBrokerProtectionLoginItemPixels.fire(pixel: GeneralPixel.dataBrokerDisableAndDeleteDaily, frequency: .daily)

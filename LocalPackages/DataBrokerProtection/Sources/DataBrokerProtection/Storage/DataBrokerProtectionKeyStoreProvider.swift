@@ -58,17 +58,11 @@ final class DataBrokerProtectionKeyStoreProvider: SecureStorageKeyStoreProvider 
 
     let keychainService: KeychainService
     private let groupNameProvider: GroupNameProviding
-    private let getLog: () -> OSLog
-    private var log: OSLog {
-        getLog()
-    }
 
     init(keychainService: KeychainService = DefaultKeychainService(),
-         groupNameProvider: GroupNameProviding = Bundle.main,
-         log: @escaping @autoclosure () -> OSLog = .disabled) {
+         groupNameProvider: GroupNameProviding = Bundle.main) {
         self.keychainService = keychainService
         self.groupNameProvider = groupNameProvider
-        self.getLog = log
     }
 
     func readData(named: String, serviceName: String) throws -> Data? {

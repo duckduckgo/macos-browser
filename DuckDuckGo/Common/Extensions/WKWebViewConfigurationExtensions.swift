@@ -21,6 +21,7 @@ import Combine
 import Common
 import WebKit
 import UserScript
+import os.log
 
 extension WKWebViewConfiguration {
 
@@ -120,7 +121,7 @@ extension NSPopover {
                 observer?.cancel()
             }
 
-            Logger..error("trying to present \(self) from \(positioningView) not in view hierarchy")
+            Logger.general.error("trying to present \(self) from \(positioningView) not in view hierarchy")
             return
         }
         self.swizzled_show(relativeTo: positioningRect, of: positioningView, preferredEdge: preferredEdge)

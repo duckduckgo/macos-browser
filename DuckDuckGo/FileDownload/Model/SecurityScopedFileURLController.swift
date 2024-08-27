@@ -18,6 +18,7 @@
 
 import Foundation
 import Common
+import os.log
 
 /// Manages security-scoped resource access to a file URL.
 ///
@@ -29,9 +30,6 @@ import Common
 ///         `stopAccessingSecurityScopedResource` methods to accurately reflect the current number of start and stop calls.
 ///         The number is reflected in the associated `URL.sandboxExtensionRetainCount` value.
 final class SecurityScopedFileURLController {
-
-    fileprivate let logger: any FilePresenterLogger
-
     private(set) var url: URL
     let isManagingSecurityScope: Bool
 
@@ -42,7 +40,7 @@ final class SecurityScopedFileURLController {
     ///   - manageSecurityScope: A Boolean value indicating whether the controller should manage the URL security scope access (i.e. call stop and end accessing resource methods).
     ///   - logger: An optional logger instance for logging file operations. Defaults to disabled.
     /// - Note: when `manageSecurityScope` is `true` access to the represented URL will be stopped for the whole app on the controller deallocation.
-    init(url: URL, manageSecurityScope: Bool = true, logger: any FilePresenterLogger = OSLog.disabled) {
+    init(url: URL, manageSecurityScope: Bool = true) {
         assert(url.isFileURL)
 #if APPSTORE
         let didStartAccess = manageSecurityScope && url.startAccessingSecurityScopedResource()
@@ -51,8 +49,7 @@ final class SecurityScopedFileURLController {
 #endif
         self.url = url
         self.isManagingSecurityScope = didStartAccess
-        self.logger = logger
-        logger.log("\(didStartAccess ? "🧪 " : "")SecurityScopedFileURLController.init: \(url.sandboxExtensionRetainCount) – \"\(url.path)\"")
+        Logger.fileDownload.debug("\(didStartAccess ? "🧪 " : "")SecurityScopedFileURLController.init: \(url.sandboxExtensionRetainCount) – \"\(url.path)\"")
     }
 
     func updateUrlKeepingSandboxExtensionRetainCount(_ newURL: URL) {
@@ -67,7 +64,7 @@ final class SecurityScopedFileURLController {
     deinit {
         if isManagingSecurityScope {
             let url = url
-            logger.log("\(isManagingSecurityScope ? "🪓 " : "")SecurityScopedFileURLController.deinit: \(url.sandboxExtensionRetainCount) – \"\(url.path)\"")
+            Logger.fileDownload.debug("\(self.isManagingSecurityScope ? "🪓 " : "")SecurityScopedFileURLController.deinit: \(url.sandboxExtensionRetainCount) – \"\(url.path)\"")
             for _ in 0..<(url as NSURL).sandboxExtensionRetainCount {
                 url.stopAccessingSecurityScopedResource()
             }

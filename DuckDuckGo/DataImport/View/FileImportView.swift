@@ -19,6 +19,7 @@
 import Common
 import SwiftUI
 import UniformTypeIdentifiers
+import os.log
 
 @InstructionsView.InstructionsBuilder
 func fileImportInstructionsBuilder(source: DataImport.Source, dataType: DataImport.DataType, button: @escaping (String) -> AnyView) -> [InstructionsView.InstructionsItem] {
@@ -532,13 +533,13 @@ struct FileImportView: View {
               let provider = providers.first(where: {
                   $0.hasItemConformingToTypeIdentifier(typeIdentifier)
               }) else {
-            Logger..error(log: .dataImportExport, "invalid type identifiers: \(allowedTypeIdentifiers)")
+            Logger.dataImportExport.error("invalid type identifiers: \(allowedTypeIdentifiers)")
             return false
         }
 
         provider.loadItem(forTypeIdentifier: typeIdentifier) { data, error in
             guard let data else {
-                Logger..error(log: .dataImportExport, "error loading \(typeIdentifier): \(error?.localizedDescription ?? "?")")
+                Logger.dataImportExport.error("error loading \(typeIdentifier): \(error?.localizedDescription ?? "?")")
                 return
             }
             let url: URL
@@ -547,12 +548,12 @@ struct FileImportView: View {
                 url = value
             case let data as Data:
                 guard let value = URL(dataRepresentation: data, relativeTo: nil) else {
-                    Logger..error(log: .dataImportExport, "could not decode data: \(data.debugDescription)")
+                    Logger.dataImportExport.error("could not decode data: \(data.debugDescription)")
                     return
                 }
                 url = value
             default:
-                Logger..error(log: .dataImportExport, "unsupported data: \(data)")
+                Logger.dataImportExport.error("unsupported data: \(String(describing: data))")
                 return
             }
 
