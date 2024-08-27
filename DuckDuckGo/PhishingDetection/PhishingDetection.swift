@@ -20,6 +20,8 @@ import Foundation
 import PhishingDetection
 import Combine
 import BrowserServicesKit
+import PixelKit
+import Common
 
 /// PhishingDetection is implemented using two datasets that are embedded into the client as a Bundle in `DataProvider`,
 /// and kept up to date by `DataActivities` and `UpdateManager`. If the feature is disabled in `Preferences`,
@@ -73,7 +75,19 @@ public class PhishingDetection: PhishingSiteDetecting {
             hashPrefixDataSHA: hashPrefixDataSHA
         )
         self.dataStore = dataStore ?? PhishingDetectionDataStore(dataProvider: resolvedDataProvider)
-        self.detector = detector ?? PhishingDetector(apiClient: detectionClient, dataProvider: resolvedDataProvider, dataStore: self.dataStore as! PhishingDetectionDataSets)
+        self.detector = detector ?? PhishingDetector(apiClient: detectionClient, dataStore: self.dataStore, eventMapping:
+                                                        EventMapping<PhishingDetectionEvents> {event, _, params, _ in
+            switch event {
+            case .errorPageShown(clientSideHit: let clientSideHit):
+                PixelKit.fire(PhishingDetectionEvents.errorPageShown(clientSideHit: clientSideHit))
+            case .iframeLoaded:
+                PixelKit.fire(PhishingDetectionEvents.iframeLoaded)
+            case .visitSite:
+                PixelKit.fire(PhishingDetectionEvents.visitSite)
+            case .updateTaskFailed48h(error: let error):
+                PixelKit.fire(PhishingDetectionEvents.updateTaskFailed48h(error: error))
+            }
+        })
         self.updateManager = updateManager ?? PhishingDetectionUpdateManager(client: detectionClient, dataStore: self.dataStore)
         self.dataActivities = dataActivities ?? PhishingDetectionDataActivities(phishingDetectionDataProvider: resolvedDataProvider, updateManager: self.updateManager)
         self.detectionPreferences = detectionPreferences

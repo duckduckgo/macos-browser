@@ -38,7 +38,7 @@ extension SpecialPagesUserScript {
     }
 
     func withErrorPages() {
-        let sslErrorPageUserScript = SSLErrorPageUserScript()
+        let sslErrorPageUserScript = SpecialErrorPageUserScript()
         self.registerSubfeature(delegate: sslErrorPageUserScript)
     }
 
