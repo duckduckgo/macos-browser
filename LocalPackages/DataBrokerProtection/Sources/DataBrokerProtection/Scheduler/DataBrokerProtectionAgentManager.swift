@@ -173,6 +173,8 @@ extension DataBrokerProtectionAgentManager {
         eventPixels.tryToFireWeeklyPixels()
         // This will try to fire the stats pixels
         statsPixels.tryToFireStatsPixels()
+        // Fire custom stats pixels if needed
+        statsPixels.fireCustomStatsPixelsIfNeeded()
     }
 }
 
