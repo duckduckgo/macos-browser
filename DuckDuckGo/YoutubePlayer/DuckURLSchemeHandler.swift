@@ -18,6 +18,7 @@
 
 import Foundation
 import WebKit
+import PhishingDetection
 import ContentScopeScripts
 
 final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
@@ -28,11 +29,22 @@ final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
             return
         }
 
+        // Handle error page resources, requestURL will be the failingURL
+        // so we need to look at the target URL
+        if let targetUrlType = urlSchemeTask.request.url?.type {
+            if targetUrlType == .errorPageResource {
+                handleSpecialPages(urlSchemeTask: urlSchemeTask)
+                return
+            }
+        }
+
         switch requestURL.type {
         case .onboarding, .releaseNotes:
             handleSpecialPages(urlSchemeTask: urlSchemeTask)
         case .duckPlayer:
             handleDuckPlayer(requestURL: requestURL, urlSchemeTask: urlSchemeTask, webView: webView)
+        case .phishingErrorPage:
+            handleErrorPage(urlSchemeTask: urlSchemeTask)
         default:
             handleNativeUIPages(requestURL: requestURL, urlSchemeTask: urlSchemeTask)
         }
@@ -125,6 +137,8 @@ private extension DuckURLSchemeHandler {
             directoryURL = URL(fileURLWithPath: "/pages/onboarding")
         } else if url.isReleaseNotesScheme {
             directoryURL = URL(fileURLWithPath: "/pages/release-notes")
+        } else if url.isErrorPageResource {
+            directoryURL = URL(fileURLWithPath: "/pages/special-error")
         } else {
             assertionFailure("Unknown scheme")
             return nil
@@ -167,10 +181,46 @@ private extension DuckURLSchemeHandler {
 
 }
 
+// MARK: Error Page
+private extension DuckURLSchemeHandler {
+    func handleErrorPage(urlSchemeTask: WKURLSchemeTask) {
+        guard let requestURL = urlSchemeTask.request.url else {
+            assertionFailure("No URL for error page scheme handler")
+            return
+        }
+
+        guard requestURL.isPhishingErrorPage,
+              let urlString = requestURL.getParameter(named: "url"),
+              let decodedData = URLTokenValidator.base64URLDecode(base64URLString: urlString),
+              let decodedString = String(data: decodedData, encoding: .utf8),
+              let url = URL(string: decodedString),
+              let token = requestURL.getParameter(named: "token"),
+              URLTokenValidator.shared.validateToken(token, for: url) else {
+            let error = WKError.unknown
+            let nsError = NSError(domain: "Unexpected Error", code: error.rawValue, userInfo: [
+                NSURLErrorFailingURLErrorKey: "about:blank",
+                NSLocalizedDescriptionKey: "Unexpected Error"
+            ])
+            urlSchemeTask.didFailWithError(nsError)
+            return
+        }
+
+        let error = PhishingDetectionError.detected
+        let nsError = NSError(domain: PhishingDetectionError.errorDomain, code: error.errorCode, userInfo: [
+            NSURLErrorFailingURLErrorKey: url,
+            NSLocalizedDescriptionKey: error.errorUserInfo[NSLocalizedDescriptionKey] ?? "Phishing detected"
+        ])
+        urlSchemeTask.didFailWithError(nsError)
+        return
+    }
+}
+
 extension URL {
     enum URLType {
         case onboarding
         case duckPlayer
+        case errorPageResource
+        case phishingErrorPage
         case releaseNotes
     }
 
@@ -179,6 +229,10 @@ extension URL {
             return .duckPlayer
         } else if self.isOnboarding {
             return .onboarding
+        } else if self.isErrorPageResource {
+            return .errorPageResource
+        } else if self.isPhishingErrorPage {
+            return .phishingErrorPage
         } else if self.isReleaseNotesScheme {
             return .releaseNotes
         } else {
@@ -194,6 +248,17 @@ extension URL {
         navigationalScheme == .duck
     }
 
+    var isErrorPage: Bool {
+        isDuckURLScheme && self.host == "error"
+    }
+
+    var isErrorPageResource: Bool {
+        return isErrorPage && pathComponents.contains("js")
+    }
+
+    var isPhishingErrorPage: Bool {
+        isErrorPage && self.getParameter(named: "reason") == "phishing" && self.getParameter(named: "url") != nil
+    }
     var isReleaseNotesScheme: Bool {
         return isDuckURLScheme && host == "release-notes"
     }
