@@ -293,7 +293,7 @@ extension UpdateController: SPUUpdaterDelegate {
             // The update check end is already handled
             return
         }
-        
+
         // If the update is available, present it
         if let updateCheckResult = updateCheckResult {
             latestUpdate = Update(appcastItem: updateCheckResult.item,
@@ -301,7 +301,7 @@ extension UpdateController: SPUUpdaterDelegate {
         } else {
             latestUpdate = nil
         }
-        
+
         // Clear cache
         isUpdateBeingLoaded = false
         updateCheckResult = nil

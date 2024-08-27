@@ -22,7 +22,7 @@ import NetworkProtection
 import os.log
 
 extension LoginItem {
-    static let vpnMenu = LoginItem(bundleId: Bundle.main.vpnMenuAgentBundleId, 
+    static let vpnMenu = LoginItem(bundleId: Bundle.main.vpnMenuAgentBundleId,
                                    defaults: .netP,
                                    logger: Logger.networkProtection)
 #if NETP_SYSTEM_EXTENSION

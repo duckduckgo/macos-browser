@@ -116,9 +116,9 @@ struct BWRequest: Codable {
             }
             return jsonData
         }
-        
+
     }
-    
+
     var data: Data? {
         let jsonData: Data
         do {
@@ -130,5 +130,5 @@ struct BWRequest: Codable {
         }
         return jsonData
     }
-    
+
 }
