@@ -23,7 +23,7 @@ import Subscription
 final class FreemiumPIRStateTests: XCTestCase {
 
     private static let testSuiteName = "test.defaults.freemium.state.tests"
-    private let pir = "macos.browser.freemium.pir"
+    private let pir = "macos.browser.freemium.pir.did.onboard"
     private let testUserDefaults = UserDefaults(suiteName: FreemiumPIRStateTests.testSuiteName)!
     private var mockAccountManager: MockAccountManager!
 

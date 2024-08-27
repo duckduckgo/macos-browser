@@ -41,7 +41,7 @@ final class DefaultFreemiumPIRFeature: FreemiumPIRFeature {
             4. (Temp) In experiment cohort
          */
         featureFlagger.isFeatureOn(.freemiumPIR) // #1
-        && subscriptionManager.isPrivacyProAvailable // #2
+        && subscriptionManager.isPrivacyProPurchaseAvailable // #2
         && !accountManager.hasSubscription // #3
         // TODO: - Also check experiment cohort here
     }
@@ -58,7 +58,7 @@ final class DefaultFreemiumPIRFeature: FreemiumPIRFeature {
 
 private extension SubscriptionManager {
 
-    var isPrivacyProAvailable: Bool {
+    var isPrivacyProPurchaseAvailable: Bool {
         let platform = currentEnvironment.purchasePlatform
         switch platform {
         case .appStore:

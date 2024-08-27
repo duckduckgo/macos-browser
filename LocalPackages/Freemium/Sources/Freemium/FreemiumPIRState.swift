@@ -30,7 +30,7 @@ public final class DefaultFreemiumPIRState: FreemiumPIRState {
 
     private let userDefaults: UserDefaults
     private let accountManager: AccountManager
-    private let key = "macos.browser.freemium.pir"
+    private let key = "macos.browser.freemium.pir.did.onboard"
 
     public var didOnboard: Bool {
         get {
@@ -39,13 +39,13 @@ public final class DefaultFreemiumPIRState: FreemiumPIRState {
             userDefaults.set(newValue, forKey: key)
         }
     }
-    
+
     /// Logic is based on `didOnboard` && `accountManager.isUserAuthenticated`
     /// A user can only be a current freemium user is they onboarded and DON'T have a subscription
     public var isCurrentUser: Bool {
         didOnboard && !accountManager.isUserAuthenticated
     }
-    
+
     /// Initializes a `DefaultFreemiumPIRState` instance
     /// Note: The `UserDefaults` parameter will be used to get and set state values. If creating and accessing this type from
     /// multiple places, you must ensure you always pass the same `UserDefaults` instance to get consistent results.
