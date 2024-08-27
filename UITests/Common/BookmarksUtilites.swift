@@ -18,6 +18,12 @@
 
 import XCTest
 
+// Enum to represent bookmark modes
+enum BookmarkMode {
+    case panel
+    case manager
+}
+
 class BookmarkUtilities {
 
     /// Reset the bookmarks so we can rely on a single bookmark's existence
@@ -28,15 +34,6 @@ class BookmarkUtilities {
             "Reset bookmarks menu item didn't become available in a reasonable timeframe."
         )
         resetMenuItem.click()
-    }
-
-    /// Opens the bookmarks manager via the menu
-    static func openBookmarksManager(app: XCUIApplication, manageBookmarksMenuItem: XCUIElement) {
-        XCTAssertTrue(
-            manageBookmarksMenuItem.waitForExistence(timeout: UITests.Timeouts.elementExistence),
-            "Manage bookmarks menu item didn't become available in a reasonable timeframe."
-        )
-        manageBookmarksMenuItem.click()
     }
 
     /// Open the initial site to be bookmarked, bookmarking it and/or escaping out of the dialog only if needed
@@ -85,12 +82,16 @@ class BookmarkUtilities {
         button.tap()
     }
 
-    /// Shows the bookmarks panel shortcut and taps it. If the bookmarks shortcut is visible, it only taps it.
-    static func showAndTapBookmarksPanelShortcut(app: XCUIApplication, bookmarksPanelShortcutButton: XCUIElement) {
-        if !bookmarksPanelShortcutButton.exists {
-            app.typeKey("K", modifierFlags: [.command, .shift])
-        }
+    static func verifyBookmarkOrder(app: XCUIApplication, expectedOrder: [String], mode: BookmarkMode) {
+        let rowCount = (mode == .panel ? app.popovers.firstMatch.outlines.firstMatch : app.tables.firstMatch).cells.count
+        XCTAssertEqual(rowCount, expectedOrder.count, "Row count does not match expected count.")
 
-        bookmarksPanelShortcutButton.tap()
+        for index in 0..<rowCount {
+            let cell = (mode == .panel ? app.popovers.firstMatch.outlines.firstMatch : app.tables.firstMatch).cells.element(boundBy: index)
+            XCTAssertTrue(cell.exists, "Cell at index \(index) does not exist.")
+
+            let cellLabel = cell.staticTexts[expectedOrder[index]]
+            XCTAssertTrue(cellLabel.exists, "Cell at index \(index) has unexpected label.")
+        }
     }
 }

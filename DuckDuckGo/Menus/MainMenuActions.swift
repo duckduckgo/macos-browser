@@ -799,6 +799,7 @@ extension MainViewController {
         UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageContinueSetUpImport.rawValue)
         UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.bookmarksBarPromptShown.rawValue)
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.onboardingFinished.rawValue)
+        LocalBookmarkManager.shared.sortMode = .manual
     }
 
     @objc func resetPinnedTabs(_ sender: Any?) {
