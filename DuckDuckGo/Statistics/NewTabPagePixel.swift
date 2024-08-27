@@ -34,7 +34,9 @@ enum NewTabPagePixel: PixelKitEventV2 {
 
     case newTabBackgroundInitializeStorageError
     case newTabBackgroundAddImageError
-    case newTabBackgroundThumbnailError
+    case newTabBackgroundThumbnailGenerationError
+    case newTabBackgroundImageNotFound
+    case newTabBackgroundThumbnailNotFound
 
     var name: String {
         switch self {
@@ -55,7 +57,9 @@ enum NewTabPagePixel: PixelKitEventV2 {
 
         case .newTabBackgroundInitializeStorageError: return "newtab_background_initialize-storage-error"
         case .newTabBackgroundAddImageError: return "newtab_background_add-image-error"
-        case .newTabBackgroundThumbnailError: return "newtab_background_thumbnail-error"
+        case .newTabBackgroundThumbnailGenerationError: return "newtab_background_thumbnail-generation-error"
+        case .newTabBackgroundImageNotFound: return "newtab_background_image-not-found"
+        case .newTabBackgroundThumbnailNotFound: return "newtab_background_thumbnail-not-found"
         }
     }
 

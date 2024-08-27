@@ -29,7 +29,6 @@ final class UserBackgroundImagesManagerTests: XCTestCase {
     var sendPixelEvents: [PixelKitEvent] = []
 
     override func setUp() async throws {
-        sendPixelEvents = []
         storageLocation = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         imageProcessor = CapturingImageProcessor()
 
@@ -39,6 +38,8 @@ final class UserBackgroundImagesManagerTests: XCTestCase {
             imageProcessor: imageProcessor,
             sendPixel: { [weak self] in self?.sendPixelEvents.append($0) }
         )
+
+        sendPixelEvents = []
     }
 
     override func tearDown() async throws {
@@ -46,6 +47,101 @@ final class UserBackgroundImagesManagerTests: XCTestCase {
     }
 
     func testWhenManagerIsInitializedSucessfullyThenPixelIsNotSent() {
-        
+        manager = UserBackgroundImagesManager(
+            maximumNumberOfImages: 4,
+            applicationSupportDirectory: storageLocation,
+            imageProcessor: imageProcessor,
+            sendPixel: { [weak self] in self?.sendPixelEvents.append($0) }
+        )
+        XCTAssertTrue(sendPixelEvents.isEmpty)
+    }
+
+    func testWhenManagerFailsToInitializeStorageThenPixelIsSent() {
+        manager = UserBackgroundImagesManager(
+            maximumNumberOfImages: 4,
+            applicationSupportDirectory: URL(fileURLWithPath: "/dev/null"),
+            imageProcessor: imageProcessor,
+            sendPixel: { [weak self] in self?.sendPixelEvents.append($0) }
+        )
+        XCTAssertNil(manager)
+        XCTAssertEqual(sendPixelEvents.map(\.name), [NewTabPagePixel.newTabBackgroundInitializeStorageError.name])
+    }
+
+    func testImageWhenUserImageFileExistsThenNSImageIsReturned() throws {
+        let image = NSImage.sampleImage(with: .black)
+        try image.save(to: manager.storageLocation.appending("abc.jpg"))
+        let userBackgroundImage = UserBackgroundImage(fileName: "abc.jpg", colorScheme: .light)
+
+        XCTAssertNotNil(manager.image(for: userBackgroundImage))
+        XCTAssertTrue(sendPixelEvents.isEmpty)
+    }
+
+    func testImageWhenUserImageFileDoesNotExistThenNilIsReturned() throws {
+        let userBackgroundImage = UserBackgroundImage(fileName: "abc.jpg", colorScheme: .light)
+
+        XCTAssertNil(manager.image(for: userBackgroundImage))
+        XCTAssertEqual(sendPixelEvents.map(\.name), [NewTabPagePixel.newTabBackgroundImageNotFound.name])
+    }
+
+    func testThumbnailImageWhenThumbnailFileExistsThenNSImageIsReturned() throws {
+        let image = NSImage.sampleImage(with: .black)
+        try image.save(to: manager.thumbnailsStorageLocation.appending("abc.jpg"))
+        let userBackgroundImage = UserBackgroundImage(fileName: "abc.jpg", colorScheme: .light)
+
+        XCTAssertNotNil(manager.thumbnailImage(for: userBackgroundImage))
+        XCTAssertTrue(sendPixelEvents.isEmpty)
+    }
+
+    func testThumbnailImageWhenThumbnailFileDoesNotExistThenImageIsReturned() throws {
+        let image = NSImage.sampleImage(with: .black)
+        try image.save(to: manager.storageLocation.appending("abc.jpg"))
+        let userBackgroundImage = UserBackgroundImage(fileName: "abc.jpg", colorScheme: .light)
+
+        XCTAssertNotNil(manager.thumbnailImage(for: userBackgroundImage))
+        XCTAssertEqual(sendPixelEvents.map(\.name), [NewTabPagePixel.newTabBackgroundThumbnailNotFound.name])
+    }
+}
+
+fileprivate extension NSImage {
+
+    func save(to fileURL: URL, as fileType: NSBitmapImageRep.FileType = .jpeg) throws {
+        let tiffData = tiffRepresentation!
+        let bitmapImageRep = NSBitmapImageRep(data: tiffData)!
+        let imageData = bitmapImageRep.representation(using: fileType, properties: [:])!
+
+        try imageData.write(to: fileURL)
+    }
+
+    static func sampleImage(with color: NSColor) -> NSImage {
+        // Create a 1x1 pixel bitmap image representation
+        let bitmapRep = NSBitmapImageRep(
+            bitmapDataPlanes: nil,
+            pixelsWide: 1,
+            pixelsHigh: 1,
+            bitsPerSample: 8,
+            samplesPerPixel: 4,
+            hasAlpha: true,
+            isPlanar: false,
+            colorSpaceName: .deviceRGB,
+            bytesPerRow: 0,
+            bitsPerPixel: 0
+        )!
+
+        // Lock focus on the bitmap representation to draw into it
+        NSGraphicsContext.saveGraphicsState()
+        NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: bitmapRep)
+
+        // Set the color of the single pixel
+        color.setFill()
+        NSRect(x: 0, y: 0, width: 1, height: 1).fill()
+
+        // Unlock focus
+        NSGraphicsContext.restoreGraphicsState()
+
+        // Create an NSImage and add the bitmap representation to it
+        let image = NSImage(size: NSSize(width: 1, height: 1))
+        image.addRepresentation(bitmapRep)
+
+        return image
     }
 }

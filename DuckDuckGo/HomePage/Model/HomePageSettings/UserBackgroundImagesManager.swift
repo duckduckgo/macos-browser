@@ -65,10 +65,20 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
 
     let maximumNumberOfImages: Int
     let storageLocation: URL
-    let sendPixel: (PixelKitEvent) -> Void
+    let thumbnailsStorageLocation: URL
+    private let sendPixel: (PixelKitEvent) -> Void
     private let imageProcessor: ImageProcessing
-    private let thumbnailsStorageLocation: URL
     private var availableImagesSortedByAccessTime: [UserBackgroundImage] = []
+
+    /**
+     * This set contains names of files for which `NSImage` couldn't be fetched.
+     *
+     * Whenever `image(for:)` or `thumbnailImage(for:)` failes to return an `NSImage`
+     * a pixel is sent. To avoid sending multiple pixels per single image, this set keeps
+     * track of image file names in order to ensure the pixels are sent only once per image
+     * per app session.
+     */
+    private var pathsForNotFoundImages: Set<String> = []
 
     var availableImagesPublisher: AnyPublisher<[UserBackgroundImage], Never> {
         $availableImages.removeDuplicates().eraseToAnyPublisher()
@@ -116,11 +126,24 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
     }
 
     func image(for userBackgroundImage: UserBackgroundImage) -> NSImage? {
-        NSImage(contentsOf: storageLocation.appendingPathComponent(userBackgroundImage.fileName))
+        let imagePath = storageLocation.appendingPathComponent(userBackgroundImage.fileName).path
+        guard let image = NSImage(contentsOfFile: imagePath) else {
+            if !pathsForNotFoundImages.contains(imagePath) {
+                pathsForNotFoundImages.insert(imagePath)
+                sendPixel(DebugEvent(NewTabPagePixel.newTabBackgroundImageNotFound))
+            }
+            return nil
+        }
+        return image
     }
 
     func thumbnailImage(for userBackgroundImage: UserBackgroundImage) -> NSImage? {
-        guard let thumbnail = NSImage(contentsOf: thumbnailsStorageLocation.appendingPathComponent(userBackgroundImage.fileName)) else {
+        let thumbnailPath = thumbnailsStorageLocation.appendingPathComponent(userBackgroundImage.fileName).path
+        guard let thumbnail = NSImage(contentsOfFile: thumbnailPath) else {
+            if !pathsForNotFoundImages.contains(thumbnailPath) {
+                pathsForNotFoundImages.insert(thumbnailPath)
+                sendPixel(DebugEvent(NewTabPagePixel.newTabBackgroundThumbnailNotFound))
+            }
             return image(for: userBackgroundImage)
         }
         return thumbnail
@@ -141,7 +164,7 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
                 let resizedImageData = try imageProcessor.resizeImage(with: imageData, to: Const.thumbnailSize)
                 try resizedImageData.write(to: thumbnailsStorageLocation.appendingPathComponent(fileName))
             } catch {
-                sendPixel(DebugEvent(NewTabPagePixel.newTabBackgroundThumbnailError, error: error))
+                sendPixel(DebugEvent(NewTabPagePixel.newTabBackgroundThumbnailGenerationError, error: error))
             }
         }()
 
@@ -212,7 +235,9 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
         case (true, true):
             return
         case (true, false):
-            assertionFailure("File at \(path) is not a directory")
+            // File found where directory was expected
+            // Because we're inside the application data directory, we claim ownership
+            // over files inside it and proceed with deleting the file.
             try FileManager.default.removeItem(atPath: path)
             fallthrough
         case (false, _):
