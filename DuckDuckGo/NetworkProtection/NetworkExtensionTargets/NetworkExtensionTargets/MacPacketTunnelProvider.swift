@@ -446,9 +446,9 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         let subscriptionEndpointService = DefaultSubscriptionEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
         let authEndpointService = DefaultAuthEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
         let accountManager = DefaultAccountManager(accessTokenStorage: tokenStore,
-                                            entitlementsCache: entitlementsCache,
-                                            subscriptionEndpointService: subscriptionEndpointService,
-                                            authEndpointService: authEndpointService)
+                                                   entitlementsCache: entitlementsCache,
+                                                   subscriptionEndpointService: subscriptionEndpointService,
+                                                   authEndpointService: authEndpointService)
 
         let entitlementsCheck = {
             await accountManager.hasEntitlement(forProductName: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
@@ -471,6 +471,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                    entitlementCheck: entitlementsCheck)
 
         setupPixels()
+        accountManager.delegate = self
         observeServerChanges()
         observeStatusUpdateRequests()
     }
@@ -625,4 +626,12 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         }
     }
 
+}
+
+extension MacPacketTunnelProvider: AccountManagerKeychainAccessDelegate {
+
+    public func accountManagerKeychainAccessFailed(accessType: AccountKeychainAccessType, error: AccountKeychainAccessError) {
+        PixelKit.fire(PrivacyProErrorPixel.privacyProVPNKeychainAccessError(accessType: accessType, accessError: error),
+                      frequency: .dailyAndCount)
+    }
 }

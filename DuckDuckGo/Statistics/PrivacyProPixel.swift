@@ -124,16 +124,19 @@ enum PrivacyProPixel: PixelKitEventV2 {
 enum PrivacyProErrorPixel: PixelKitEventV2 {
 
     case privacyProKeychainAccessError(accessType: AccountKeychainAccessType, accessError: AccountKeychainAccessError)
+    case privacyProVPNKeychainAccessError(accessType: AccountKeychainAccessType, accessError: AccountKeychainAccessError)
 
     var name: String {
         switch self {
         case .privacyProKeychainAccessError: return "m_mac_\(appDistribution)_privacy-pro_keychain_access_error"
+        case .privacyProVPNKeychainAccessError: return "m_mac_\(appDistribution)_privacy-pro_vpn_keychain_access_error"
         }
     }
 
     var parameters: [String: String]? {
         switch self {
-        case .privacyProKeychainAccessError(let accessType, let accessError):
+        case .privacyProKeychainAccessError(let accessType, let accessError),
+             .privacyProVPNKeychainAccessError(let accessType, let accessError):
             return [
                 "type": accessType.rawValue,
                 "error": accessError.errorDescription

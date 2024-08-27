@@ -34,7 +34,7 @@ import VPNAppLauncher
 @objc(Application)
 final class DuckDuckGoVPNApplication: NSApplication {
 
-    public let accountManager: AccountManager
+    public var accountManager: AccountManager
     private let _delegate: DuckDuckGoVPNAppDelegate
 
     override init() {
@@ -62,9 +62,9 @@ final class DuckDuckGoVPNApplication: NSApplication {
                                                                  settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(20)))
         let accessTokenStorage = SubscriptionTokenKeychainStorage(keychainType: .dataProtection(.named(subscriptionAppGroup)))
         accountManager = DefaultAccountManager(accessTokenStorage: accessTokenStorage,
-                                        entitlementsCache: entitlementsCache,
-                                        subscriptionEndpointService: subscriptionEndpointService,
-                                        authEndpointService: authEndpointService)
+                                               entitlementsCache: entitlementsCache,
+                                               subscriptionEndpointService: subscriptionEndpointService,
+                                               authEndpointService: authEndpointService)
 
         _delegate = DuckDuckGoVPNAppDelegate(accountManager: accountManager,
                                              accessTokenStorage: accessTokenStorage,
@@ -73,6 +73,7 @@ final class DuckDuckGoVPNApplication: NSApplication {
 
         setupPixelKit()
         self.delegate = _delegate
+        accountManager.delegate = _delegate
 
 #if DEBUG
         if accountManager.accessToken != nil {
@@ -438,5 +439,13 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
                 }
             }
         }
+    }
+}
+
+extension DuckDuckGoVPNAppDelegate: AccountManagerKeychainAccessDelegate {
+
+    public func accountManagerKeychainAccessFailed(accessType: AccountKeychainAccessType, error: AccountKeychainAccessError) {
+        PixelKit.fire(PrivacyProErrorPixel.privacyProVPNKeychainAccessError(accessType: accessType, accessError: error),
+                      frequency: .dailyAndCount)
     }
 }
