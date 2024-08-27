@@ -44,7 +44,7 @@ final class UserScripts: UserScriptsProvider {
     let autoconsentUserScript: UserScriptWithAutoconsent
     let youtubeOverlayScript: YoutubeOverlayUserScript?
     let youtubePlayerUserScript: YoutubePlayerUserScript?
-    let sslErrorPageUserScript: SSLErrorPageUserScript?
+    let specialErrorPageUserScript: SpecialErrorPageUserScript?
     let onboardingUserScript: OnboardingUserScript?
 #if SPARKLE
     let releaseNotesUserScript: ReleaseNotesUserScript?
@@ -68,7 +68,7 @@ final class UserScripts: UserScriptsProvider {
 
         autoconsentUserScript = AutoconsentUserScript(scriptSource: sourceProvider, config: sourceProvider.privacyConfigurationManager.privacyConfig)
 
-        sslErrorPageUserScript = SSLErrorPageUserScript()
+        specialErrorPageUserScript = SpecialErrorPageUserScript()
 
         onboardingUserScript = OnboardingUserScript(onboardingActionsManager: sourceProvider.onboardingActionsManager!)
 
@@ -95,9 +95,10 @@ final class UserScripts: UserScriptsProvider {
         }
 
         if let specialPages = specialPages {
-            if let sslErrorPageUserScript {
-                specialPages.registerSubfeature(delegate: sslErrorPageUserScript)
+            if let specialErrorPageUserScript {
+                specialPages.registerSubfeature(delegate: specialErrorPageUserScript)
             }
+
             if let youtubePlayerUserScript {
                 specialPages.registerSubfeature(delegate: youtubePlayerUserScript)
             }
