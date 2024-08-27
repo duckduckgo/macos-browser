@@ -87,8 +87,8 @@ extension Tab: NavigationResponder {
             // Tab Snapshots
             .weak(nullable: self.tabSnapshots),
 
-            // Error Page
-            .weak(nullable: self.errorPage),
+            // Special Error Page
+            .weak(nullable: self.specialErrorPage),
 
             // Release Notes
             .weak(nullable: self.releaseNotes),
