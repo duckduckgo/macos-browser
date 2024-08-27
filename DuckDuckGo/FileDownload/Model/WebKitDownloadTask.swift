@@ -24,6 +24,7 @@ import UniformTypeIdentifiers
 import WebKit
 import PixelKit
 import os.log
+import BrowserServicesKit
 
 protocol WebKitDownloadTaskDelegate: AnyObject {
     func fileDownloadTaskNeedsDestinationURL(_ task: WebKitDownloadTask, suggestedFilename: String, suggestedFileType: UTType?) async -> (URL?, UTType?)
