@@ -149,10 +149,10 @@ extension HomePage.Views {
 
             var body: some View {
                 ZStack(alignment: .center) {
-                    if settingsModel.customBackground != nil {
+                    if let customBackground = settingsModel.customBackground {
                         RoundedRectangle(cornerRadius: 12)
                             .stroke(Color.homeFavoritesGhost, style: StrokeStyle(lineWidth: 1.0))
-                            .vibrancyEffect()
+                            .homePageViewBackground(customBackground)
                             .cornerRadius(12)
                     } else {
                         RoundedRectangle(cornerRadius: 12)

@@ -1032,6 +1032,8 @@
 		37534CA8281198CD002621E7 /* AdjacentItemEnumerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37534CA62811988E002621E7 /* AdjacentItemEnumerator.swift */; };
 		376113CC2B29CD5B00E794BB /* CriticalPathsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565E46DF2B2725DD0013AC2A /* CriticalPathsTests.swift */; };
 		376705AF27EB488600DD8D76 /* RoundedSelectionRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511B3262CAA5A00F6079C /* RoundedSelectionRowView.swift */; };
+		376731822C7E226A00EB097B /* HomePageViewBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376731812C7E226A00EB097B /* HomePageViewBackground.swift */; };
+		376731832C7E226A00EB097B /* HomePageViewBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376731812C7E226A00EB097B /* HomePageViewBackground.swift */; };
 		3768D8382C24BFF5004120AE /* RemoteMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3768D8372C24BFF5004120AE /* RemoteMessageView.swift */; };
 		3768D8392C24BFF5004120AE /* RemoteMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3768D8372C24BFF5004120AE /* RemoteMessageView.swift */; };
 		3768D83B2C24C0A8004120AE /* RemoteMessageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3768D83A2C24C0A8004120AE /* RemoteMessageViewModel.swift */; };
@@ -3209,6 +3211,7 @@
 		376113C52B29BCD600E794BB /* SyncE2EUITests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = SyncE2EUITests.xcconfig; sourceTree = "<group>"; };
 		376113D42B29CD5B00E794BB /* SyncE2EUITests App Store.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "SyncE2EUITests App Store.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		376113D72B29D0F800E794BB /* SyncE2EUITestsAppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = SyncE2EUITestsAppStore.xcconfig; sourceTree = "<group>"; };
+		376731812C7E226A00EB097B /* HomePageViewBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePageViewBackground.swift; sourceTree = "<group>"; };
 		3768D8372C24BFF5004120AE /* RemoteMessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMessageView.swift; sourceTree = "<group>"; };
 		3768D83A2C24C0A8004120AE /* RemoteMessageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMessageViewModel.swift; sourceTree = "<group>"; };
 		3768D83F2C29C1F1004120AE /* ActiveRemoteMessageModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveRemoteMessageModel.swift; sourceTree = "<group>"; };
@@ -5023,6 +5026,7 @@
 				370C23062C76A36500A80A3E /* BackgroundPickerView.swift */,
 				370C23082C76A39900A80A3E /* BackgroundCategoryView.swift */,
 				370C230A2C76A3BC00A80A3E /* BackgroundThumbnailView.swift */,
+				376731812C7E226A00EB097B /* HomePageViewBackground.swift */,
 			);
 			path = HomePageSettings;
 			sourceTree = "<group>";
@@ -10209,6 +10213,7 @@
 				3706FAE2293F65D500E42796 /* SequenceExtensions.swift in Sources */,
 				3706FAE3293F65D500E42796 /* ChromiumDataImporter.swift in Sources */,
 				3706FAE5293F65D500E42796 /* BackForwardListItemViewModel.swift in Sources */,
+				376731832C7E226A00EB097B /* HomePageViewBackground.swift in Sources */,
 				3706FAE6293F65D500E42796 /* BWNotRespondingAlert.swift in Sources */,
 				3706FAE7293F65D500E42796 /* DebugUserScript.swift in Sources */,
 				B6CC26692BAD959500F53F8D /* DownloadProgress.swift in Sources */,
@@ -11618,6 +11623,7 @@
 				B6619EFB2B111CC500CD9186 /* InstructionsFormatParser.swift in Sources */,
 				9FBD84522BB3AACB00220859 /* AttributionOriginFileProvider.swift in Sources */,
 				1DC669702B6CF0D700AA0645 /* TabSnapshotStore.swift in Sources */,
+				376731822C7E226A00EB097B /* HomePageViewBackground.swift in Sources */,
 				379026D12C650CCD00A089E8 /* UserBackgroundImagesManager.swift in Sources */,
 				AAC30A26268DFEE200D2D9CD /* CrashReporter.swift in Sources */,
 				B60D64492AAF1B7C00B26F50 /* AddressBarTextSelectionNavigation.swift in Sources */,
