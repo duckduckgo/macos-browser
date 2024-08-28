@@ -88,7 +88,6 @@ private extension RecentlyClosedWindow {
 }
 
 private final class WindowControllersManagerMock: WindowControllersManagerProtocol {
-
     var pinnedTabsManager = PinnedTabsManager(tabCollection: .init())
 
     var didRegisterWindowController = PassthroughSubject<(MainWindowController), Never>()
@@ -96,4 +95,6 @@ private final class WindowControllersManagerMock: WindowControllersManagerProtoc
 
     func register(_ windowController: MainWindowController) {}
     func unregister(_ windowController: MainWindowController) {}
+
+    func showTab(with content: DuckDuckGo_Privacy_Browser.Tab.TabContent) { }
 }

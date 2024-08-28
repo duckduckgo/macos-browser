@@ -31,6 +31,7 @@ protocol WindowControllersManagerProtocol {
     func register(_ windowController: MainWindowController)
     func unregister(_ windowController: MainWindowController)
 
+    func showTab(with content: Tab.TabContent)
 }
 
 @MainActor

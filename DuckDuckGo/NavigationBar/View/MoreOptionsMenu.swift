@@ -23,6 +23,7 @@ import BrowserServicesKit
 import PixelKit
 import NetworkProtection
 import Subscription
+import Freemium
 
 protocol OptionsButtonMenuDelegate: AnyObject {
 
@@ -58,6 +59,9 @@ final class MoreOptionsMenu: NSMenu {
     private lazy var sharingMenu: NSMenu = SharingMenu(title: UserText.shareMenuItem)
     private var accountManager: AccountManager { subscriptionManager.accountManager }
     private let subscriptionManager: SubscriptionManager
+    private let freemiumPIRUserState: FreemiumPIRUserState
+    private let freemiumPIRFeature: FreemiumPIRFeature
+    private let freemiumPIRPresenter: FreemiumPIRPresenter
 
     private let vpnFeatureGatekeeper: VPNFeatureGatekeeper
     private let subscriptionFeatureAvailability: SubscriptionFeatureAvailability
@@ -73,7 +77,10 @@ final class MoreOptionsMenu: NSMenu {
          subscriptionFeatureAvailability: SubscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability(),
          sharingMenu: NSMenu? = nil,
          internalUserDecider: InternalUserDecider,
-         subscriptionManager: SubscriptionManager) {
+         subscriptionManager: SubscriptionManager,
+         freemiumPIRUserState: FreemiumPIRUserState,
+         freemiumPIRFeature: FreemiumPIRFeature,
+         freemiumPIRPresenter: FreemiumPIRPresenter = DefaultFreemiumPIRPresenter()) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.emailManager = emailManager
@@ -82,6 +89,9 @@ final class MoreOptionsMenu: NSMenu {
         self.subscriptionFeatureAvailability = subscriptionFeatureAvailability
         self.internalUserDecider = internalUserDecider
         self.subscriptionManager = subscriptionManager
+        self.freemiumPIRUserState = freemiumPIRUserState
+        self.freemiumPIRFeature = freemiumPIRFeature
+        self.freemiumPIRPresenter = freemiumPIRPresenter
 
         super.init(title: "")
 
@@ -130,7 +140,7 @@ final class MoreOptionsMenu: NSMenu {
 
         addItem(NSMenuItem.separator())
 
-        addSubscriptionItems()
+        addSubscriptionAndFreemiumPIRItems()
 
         addPageItems()
 
@@ -245,6 +255,10 @@ final class MoreOptionsMenu: NSMenu {
         actionDelegate?.optionsButtonMenuRequestedIdentityTheftRestoration(self)
     }
 
+    @objc func openFreemiumPIR(_ sender: NSMenuItem) {
+        freemiumPIRPresenter.showFreemiumPIR(didOnboard: freemiumPIRUserState.didOnboard, windowControllerManager: WindowControllersManager.shared)
+    }
+
     @objc func findInPage(_ sender: NSMenuItem) {
         tabCollectionViewModel.selectedTabViewModel?.showFindInPage()
     }
@@ -313,6 +327,13 @@ final class MoreOptionsMenu: NSMenu {
         addItem(NSMenuItem.separator())
     }
 
+    private func addSubscriptionAndFreemiumPIRItems() {
+        addSubscriptionItems()
+        addFreemiumPIRItem()
+
+        addItem(NSMenuItem.separator())
+    }
+
     private func addSubscriptionItems() {
         guard subscriptionFeatureAvailability.isFeatureAvailable else { return }
 
@@ -330,15 +351,24 @@ final class MoreOptionsMenu: NSMenu {
             // Do not add for App Store when purchase not available in the region
             if !shouldHideDueToNoProduct() {
                 addItem(privacyProItem)
-                addItem(NSMenuItem.separator())
             }
         } else {
             privacyProItem.submenu = SubscriptionSubMenu(targeting: self,
                                                          subscriptionFeatureAvailability: DefaultSubscriptionFeatureAvailability(),
                                                          accountManager: accountManager)
             addItem(privacyProItem)
-            addItem(NSMenuItem.separator())
         }
+    }
+
+    private func addFreemiumPIRItem() {
+        guard freemiumPIRFeature.isAvailable else { return }
+
+        let freemiumPIRItem = NSMenuItem(title: UserText.freemiumPIROptionsMenuItem).withImage(.dbpIcon)
+
+        freemiumPIRItem.target = self
+        freemiumPIRItem.action = #selector(openFreemiumPIR(_:))
+
+        addItem(freemiumPIRItem)
     }
 
     private func addPageItems() {

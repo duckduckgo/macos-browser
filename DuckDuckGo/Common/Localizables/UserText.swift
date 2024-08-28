@@ -1272,4 +1272,7 @@ struct UserText {
     // Comment: "Progress view title when completing the purchase"
     static let completingPurchaseTitle = "Completing purchase..."
 
+    // Key: "freemium.pir.menu.item"
+    // Comment: "Title for Freemium Personal Information Removal (Scan-Only) item in the options menu"
+    static let freemiumPIROptionsMenuItem = "Personal Information Scan"
 }
