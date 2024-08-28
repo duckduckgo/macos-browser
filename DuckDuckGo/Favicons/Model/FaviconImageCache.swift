@@ -20,6 +20,7 @@ import Foundation
 import Combine
 import Common
 import BrowserServicesKit
+import os.log
 
 @MainActor
 final class FaviconImageCache {
@@ -49,9 +50,9 @@ final class FaviconImageCache {
         let favicons: [Favicon]
         do {
             favicons = try await storing.loadFavicons()
-            os_log("Favicons loaded successfully", log: .favicons)
+            Logger.favicons.debug("Favicons loaded successfully")
         } catch {
-            os_log("Loading of favicons failed: %s", log: .favicons, type: .error, error.localizedDescription)
+            Logger.favicons.error("Loading of favicons failed: \(error.localizedDescription)")
             throw error
         }
 
@@ -76,12 +77,12 @@ final class FaviconImageCache {
             do {
                 await removeFaviconsFromStore(oldFavicons)
                 try await storing.save(favicons)
-                os_log("Favicon saved successfully. URL: %s", log: .favicons, favicons.map(\.url.absoluteString).description)
+                Logger.favicons.debug("Favicon saved successfully. URL: \(favicons.map(\.url.absoluteString).description)")
                 await MainActor.run {
                     NotificationCenter.default.post(name: .faviconCacheUpdated, object: nil)
                 }
             } catch {
-                os_log("Saving of favicon failed: %s", log: .favicons, type: .error, error.localizedDescription)
+                Logger.favicons.error("Saving of favicon failed: \(error.localizedDescription)")
             }
         }
     }
@@ -171,9 +172,9 @@ final class FaviconImageCache {
 
         do {
             try await storing.removeFavicons(favicons)
-            os_log("Favicons removed successfully.", log: .favicons)
+            Logger.favicons.debug("Favicons removed successfully.")
         } catch {
-            os_log("Removing of favicons failed: %s", log: .favicons, type: .error, error.localizedDescription)
+            Logger.favicons.error("Removing of favicons failed: \(error.localizedDescription)")
         }
     }
 

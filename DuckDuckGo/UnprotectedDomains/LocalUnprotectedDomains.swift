@@ -19,6 +19,7 @@ import Common
 import Foundation
 import CoreData
 import BrowserServicesKit
+import os.log
 
 typealias UnprotectedDomainsStore = CoreDataStore<UnprotectedDomainManagedObject>
 final class LocalUnprotectedDomains: DomainsProtectionStore {
@@ -74,7 +75,7 @@ final class LocalUnprotectedDomains: DomainsProtectionStore {
 
             return try store.load(into: [:]) { $0[$1.value] = $1.id }
         } catch {
-            os_log("UnprotectedDomainStore: Failed to load Unprotected Domains", type: .error)
+            Logger.general.error("UnprotectedDomainStore: Failed to load Unprotected Domains")
             return [:]
         }
     }

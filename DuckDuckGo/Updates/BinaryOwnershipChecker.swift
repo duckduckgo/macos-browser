@@ -18,6 +18,7 @@
 
 import Foundation
 import Common
+import os.log
 
 protocol BinaryOwnershipChecking {
     func isCurrentUserOwner() -> Bool
@@ -43,7 +44,7 @@ final class BinaryOwnershipChecker: BinaryOwnershipChecking {
         }
 
         guard let binaryPath = Bundle.main.executablePath else {
-            os_log("Failed to get the binary path", log: .updates)
+            Logger.updates.debug("Failed to get the binary path")
             ownershipCache = false
             return false
         }
@@ -56,9 +57,7 @@ final class BinaryOwnershipChecker: BinaryOwnershipChecking {
                 return isOwner
             }
         } catch {
-            os_log("Failed to get binary file attributes: %{public}@",
-                   log: .updates,
-                   error.localizedDescription)
+            Logger.updates.error("Failed to get binary file attributes: \(error.localizedDescription, privacy: .public)")
         }
 
         ownershipCache = false

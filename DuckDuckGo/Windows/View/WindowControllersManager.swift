@@ -19,6 +19,7 @@
 import Cocoa
 import Combine
 import Common
+import os.log
 import BrowserServicesKit
 
 @MainActor
@@ -95,7 +96,7 @@ final class WindowControllersManager: WindowControllersManagerProtocol {
 
     func unregister(_ windowController: MainWindowController) {
         guard let idx = mainWindowControllers.firstIndex(of: windowController) else {
-            os_log("WindowControllersManager: Window Controller not registered", type: .error)
+            Logger.general.error("WindowControllersManager: Window Controller not registered")
             return
         }
         mainWindowControllers.remove(at: idx)

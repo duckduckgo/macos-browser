@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import os.log
 
 typealias Base64EncodedString = String
 typealias MessageId = String
@@ -94,7 +95,8 @@ struct BWResponse: Codable {
         do {
             self = try JSONDecoder().decode(BWResponse.self, from: messageData)
         } catch {
-            logOrAssertionFailure("Decoding the message failed")
+            Logger.general.fault("Decoding the message failed")
+            assertionFailure("Decoding the message failed")
             return nil
         }
     }

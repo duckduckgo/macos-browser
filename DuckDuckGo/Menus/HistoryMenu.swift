@@ -20,6 +20,7 @@ import Cocoa
 import Combine
 import Common
 import History
+import os.log
 
 @MainActor
 final class HistoryMenu: NSMenu {
@@ -334,7 +335,7 @@ private extension HistoryCoordinating {
 
     func getSortedArrayOfVisits() -> [Visit] {
         guard let history = history else {
-            os_log("HistoryCoordinator: No history available", type: .error)
+            Logger.general.error("HistoryCoordinator: No history available")
             return []
         }
 
