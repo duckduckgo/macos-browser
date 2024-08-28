@@ -136,7 +136,7 @@ final class HomePageSettingsModelTests: XCTestCase {
         model.customBackground = .solidColor(.black)
         model.customBackground = .gradient(.gradient01)
         model.customBackground = .illustration(.illustration01)
-        model.customBackground = .customImage(.init(fileName: "abc", colorScheme: .light))
+        model.customBackground = .userImage(.init(fileName: "abc", colorScheme: .light))
         model.customBackground = nil
 
         XCTAssertEqual(sendPixelEvents.map(\.name), [
@@ -156,8 +156,8 @@ final class HomePageSettingsModelTests: XCTestCase {
         model.customBackground = .illustration(.illustration01)
         XCTAssertEqual(appearancePreferences.homePageCustomBackground, CustomBackground.illustration(.illustration01))
         let userImage = UserBackgroundImage(fileName: "abc", colorScheme: .light)
-        model.customBackground = .customImage(userImage)
-        XCTAssertEqual(appearancePreferences.homePageCustomBackground, CustomBackground.customImage(userImage))
+        model.customBackground = .userImage(userImage)
+        XCTAssertEqual(appearancePreferences.homePageCustomBackground, CustomBackground.userImage(userImage))
         model.customBackground = nil
         XCTAssertNil(appearancePreferences.homePageCustomBackground)
     }
@@ -169,7 +169,7 @@ final class HomePageSettingsModelTests: XCTestCase {
         userBackgroundImagesManager.updateSelectedTimestampForUserBackgroundImage = { image in
             updateSelectedTimestampForUserBackgroundImageArguments.append(image)
         }
-        model.customBackground = .customImage(userImage)
+        model.customBackground = .userImage(userImage)
 
         XCTAssertEqual(userBackgroundImagesManager.updateSelectedTimestampForUserBackgroundImageCallCount, 1)
         XCTAssertEqual(updateSelectedTimestampForUserBackgroundImageArguments, [userImage])
@@ -186,7 +186,7 @@ final class HomePageSettingsModelTests: XCTestCase {
     func testAddImageWhenImageIsAddedThenCustomBackgroundIsUpdated() async {
         await model.addNewImage()
         XCTAssertEqual(userBackgroundImagesManager.addImageWithURLCallCount, 1)
-        XCTAssertEqual(model.customBackground, .customImage(.init(fileName: "sample.jpg", colorScheme: .light)))
+        XCTAssertEqual(model.customBackground, .userImage(.init(fileName: "sample.jpg", colorScheme: .light)))
         XCTAssertEqual(sendPixelEvents.map(\.name), [
             NewTabPagePixel.newTabBackgroundSelectedUserImage.name
         ])
@@ -255,7 +255,7 @@ final class HomePageSettingsModelTests: XCTestCase {
             .gradient(CustomBackground.placeholderGradient),
             .solidColor(CustomBackground.placeholderColor),
             .illustration(CustomBackground.placeholderIllustration),
-            .customImage(image1)
+            .userImage(image1)
         ])
 
         userBackgroundImagesManager.availableImages = [image2, image1, image3]
@@ -263,7 +263,7 @@ final class HomePageSettingsModelTests: XCTestCase {
             .gradient(CustomBackground.placeholderGradient),
             .solidColor(CustomBackground.placeholderColor),
             .illustration(CustomBackground.placeholderIllustration),
-            .customImage(image2)
+            .userImage(image2)
         ])
     }
 }

@@ -66,7 +66,7 @@ extension HomePage.Views {
                 solidColor.color.scaledToFill()
             case .illustration(let illustration):
                 illustration.image.resizable().scaledToFill()
-            case .customImage(let userBackgroundImage):
+            case .userImage(let userBackgroundImage):
                 Group {
                     if let image = model.customImagesManager?.thumbnailImage(for: userBackgroundImage) {
                         Image(nsImage: image).resizable().scaledToFill()

@@ -37,7 +37,7 @@ enum CustomBackground: Equatable, Hashable, ColorSchemeProviding, LosslessString
     case gradient(Gradient)
     case solidColor(SolidColor)
     case illustration(Illustration)
-    case customImage(UserBackgroundImage)
+    case userImage(UserBackgroundImage)
 
     var gradient: Gradient? {
         guard case let .gradient(gradient) = self else {
@@ -61,7 +61,7 @@ enum CustomBackground: Equatable, Hashable, ColorSchemeProviding, LosslessString
     }
 
     var userBackgroundImage: UserBackgroundImage? {
-        guard case let .customImage(image) = self else {
+        guard case let .userImage(image) = self else {
             return nil
         }
         return image
@@ -75,7 +75,7 @@ enum CustomBackground: Equatable, Hashable, ColorSchemeProviding, LosslessString
             illustration.colorScheme
         case .solidColor(let solidColor):
             solidColor.colorScheme
-        case .customImage(let image):
+        case .userImage(let image):
             image.colorScheme
         }
     }
@@ -103,11 +103,11 @@ enum CustomBackground: Equatable, Hashable, ColorSchemeProviding, LosslessString
                 return nil
             }
             self = .illustration(illustration)
-        case "customImage":
+        case "userImage":
             guard let userBackgroundImage = UserBackgroundImage(String(components[1])) else {
                 return nil
             }
-            self = .customImage(userBackgroundImage)
+            self = .userImage(userBackgroundImage)
         default:
             return nil
         }
@@ -121,8 +121,8 @@ enum CustomBackground: Equatable, Hashable, ColorSchemeProviding, LosslessString
             "solidColor|\(solidColor.rawValue)"
         case let .illustration(illustration):
             "illustration|\(illustration.rawValue)"
-        case let .customImage(userBackgroundImage):
-            "customImage|\(userBackgroundImage.description)"
+        case let .userImage(userBackgroundImage):
+            "userImage|\(userBackgroundImage.description)"
         }
     }
 }

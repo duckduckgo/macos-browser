@@ -28,7 +28,7 @@ struct UserBackgroundImage: Hashable, Equatable, Identifiable, LosslessStringCon
     }
 
     var customBackground: CustomBackground {
-        .customImage(self)
+        .userImage(self)
     }
 
     init(fileName: String, colorScheme: ColorScheme) {

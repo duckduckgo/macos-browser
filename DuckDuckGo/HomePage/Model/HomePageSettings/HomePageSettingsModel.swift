@@ -95,7 +95,7 @@ extension HomePage.Models {
             self.appearancePreferences = appearancePreferences
             self.customImagesManager = userBackgroundImagesManager
 
-            if case .customImage = appearancePreferences.homePageCustomBackground, userBackgroundImagesManager == nil {
+            if case .userImage = appearancePreferences.homePageCustomBackground, userBackgroundImagesManager == nil {
                 customBackground = nil
             } else {
                 customBackground = appearancePreferences.homePageCustomBackground
@@ -109,11 +109,11 @@ extension HomePage.Models {
             availableCustomImagesCancellable = customImagesManager?.availableImagesPublisher
                 .receive(on: DispatchQueue.main)
                 .handleEvents(receiveOutput: { [weak self] images in
-                    guard case .customImage(let userBackgroundImage) = self?.customBackground, !images.contains(userBackgroundImage) else {
+                    guard case .userImage(let userBackgroundImage) = self?.customBackground, !images.contains(userBackgroundImage) else {
                         return
                     }
                     if let firstImage = images.first {
-                        self?.customBackground = .customImage(firstImage)
+                        self?.customBackground = .userImage(firstImage)
                     } else {
                         self?.customBackground = nil
                         withAnimation {
@@ -160,7 +160,7 @@ extension HomePage.Models {
         @Published var customBackground: CustomBackground? {
             didSet {
                 appearancePreferences.homePageCustomBackground = customBackground
-                if case .customImage(let userBackgroundImage) = customBackground {
+                if case .userImage(let userBackgroundImage) = customBackground {
                     customImagesManager?.updateSelectedTimestamp(for: userBackgroundImage)
                 }
                 switch customBackground {
@@ -170,7 +170,7 @@ extension HomePage.Models {
                     sendPixel(NewTabPagePixel.newTabBackgroundSelectedSolidColor)
                 case .illustration:
                     sendPixel(NewTabPagePixel.newTabBackgroundSelectedIllustration)
-                case .customImage:
+                case .userImage:
                     sendPixel(NewTabPagePixel.newTabBackgroundSelectedUserImage)
                 case .none:
                     sendPixel(NewTabPagePixel.newTabBackgroundReset)
@@ -186,7 +186,7 @@ extension HomePage.Models {
 
             do {
                 let image = try await customImagesManager.addImage(with: url)
-                customBackground = .customImage(image)
+                customBackground = .userImage(image)
             } catch {
                 sendPixel(DebugEvent(NewTabPagePixel.newTabBackgroundAddImageError, error: error))
                 showAddImageFailedAlert()
@@ -238,7 +238,7 @@ extension HomePage.Models {
                     guard let lastUsedUserBackgroundImage = customImagesManager.availableImages.first else {
                         return nil
                     }
-                    return .customImage(lastUsedUserBackgroundImage)
+                    return .userImage(lastUsedUserBackgroundImage)
                 }()
                 return CustomBackgroundModeModel(contentType: .customImagePicker, title: title, customBackgroundPreview: preview)
             }

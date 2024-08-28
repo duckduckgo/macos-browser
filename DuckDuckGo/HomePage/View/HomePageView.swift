@@ -177,7 +177,7 @@ extension HomePage.Views {
             case .solidColor(let solidColor):
                 solidColor.color
                     .animation(.none, value: settingsModel.contentType)
-            case .customImage(let userBackgroundImage):
+            case .userImage(let userBackgroundImage):
                 if let nsImage = settingsModel.customImagesManager?.image(for: userBackgroundImage) {
                     Image(nsImage: nsImage).resizable().aspectRatio(contentMode: .fill)
                         .animation(.none, value: settingsModel.contentType)

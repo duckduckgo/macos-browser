@@ -38,7 +38,7 @@ private struct HomePageElementBackgroundModifier: ViewModifier {
     @ViewBuilder
     func body(content: Content) -> some View {
         switch customBackground {
-        case .illustration, .customImage:
+        case .illustration, .userImage:
             content.vibrancyEffect()
         case .gradient(let gradient):
             content.background(Color.newTabPageElementsBackground.colorScheme(gradient.colorScheme))
