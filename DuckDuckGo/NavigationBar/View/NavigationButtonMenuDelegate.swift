@@ -20,6 +20,7 @@ import Cocoa
 import Common
 import WebKit
 import History
+import os.log
 
 @MainActor
 final class NavigationButtonMenuDelegate: NSObject {
@@ -52,7 +53,7 @@ extension NavigationButtonMenuDelegate: NSMenuDelegate {
 
     func menu(_ menu: NSMenu, update item: NSMenuItem, at index: Int, shouldCancel: Bool) -> Bool {
         guard let listItem = listItems[safe: index] else {
-            os_log("%s: Index out of bounds", type: .error, className)
+            Logger.general.error("Index out of bounds")
             return true
         }
 
@@ -75,7 +76,7 @@ extension NavigationButtonMenuDelegate: NSMenuDelegate {
     @objc func menuItemAction(_ sender: NSMenuItem) {
         let index = sender.tag
         guard let listItem = listItems[safe: index] else {
-            os_log("%s: Index out of bounds", type: .error, className)
+            Logger.general.error("Index out of bounds")
             return
         }
         tabCollectionViewModel.selectedTabViewModel?.tab.go(to: listItem)

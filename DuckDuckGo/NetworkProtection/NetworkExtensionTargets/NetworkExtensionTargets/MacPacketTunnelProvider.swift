@@ -24,6 +24,8 @@ import NetworkExtension
 import Networking
 import PixelKit
 import Subscription
+import os.log
+import WireGuard
 
 final class MacPacketTunnelProvider: PacketTunnelProvider {
 
@@ -461,6 +463,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                    tunnelHealthStore: tunnelHealthStore,
                    controllerErrorStore: controllerErrorStore,
                    snoozeTimingStore: NetworkProtectionSnoozeTimingStore(userDefaults: .netP),
+                   wireGuardInterface: DefaultWireGuardInterface(),
                    keychainType: Bundle.keychainType,
                    tokenStore: tokenStore,
                    debugEvents: debugEvents,
@@ -566,7 +569,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         try super.loadVendorOptions(from: provider)
 
         guard let vendorOptions = provider?.providerConfiguration else {
-            os_log("🔵 Provider is nil, or providerConfiguration is not set", log: .networkProtection)
+            Logger.networkProtection.debug("🔵 Provider is nil, or providerConfiguration is not set")
             throw ConfigurationError.missingProviderConfiguration
         }
 
@@ -575,7 +578,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     private func loadDefaultPixelHeaders(from options: [String: Any]) throws {
         guard let defaultPixelHeaders = options[NetworkProtectionOptionKey.defaultPixelHeaders] as? [String: String] else {
-            os_log("🔵 Pixel options are not set", log: .networkProtection)
+            Logger.networkProtection.debug("🔵 Pixel options are not set")
             throw ConfigurationError.missingPixelHeaders
         }
 
@@ -628,6 +631,37 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
 }
 
+final class DefaultWireGuardInterface: WireGuardInterface {
+    func turnOn(settings: UnsafePointer<CChar>, handle: Int32) -> Int32 {
+        wgTurnOn(settings, handle)
+    }
+
+    func turnOff(handle: Int32) {
+        wgTurnOff(handle)
+    }
+
+    func getConfig(handle: Int32) -> UnsafeMutablePointer<CChar>? {
+        return wgGetConfig(handle)
+    }
+
+    func setConfig(handle: Int32, config: String) -> Int64 {
+        return wgSetConfig(handle, config)
+    }
+
+    func bumpSockets(handle: Int32) {
+        wgBumpSockets(handle)
+    }
+
+    func disableSomeRoamingForBrokenMobileSemantics(handle: Int32) {
+        wgDisableSomeRoamingForBrokenMobileSemantics(handle)
+    }
+
+    func setLogger(context: UnsafeMutableRawPointer?, logFunction: (@convention(c) (UnsafeMutableRawPointer?, Int32, UnsafePointer<CChar>?) -> Void)?) {
+        wgSetLogger(context, logFunction)
+    }
+}
+
+
 extension MacPacketTunnelProvider: AccountManagerKeychainAccessDelegate {
 
     public func accountManagerKeychainAccessFailed(accessType: AccountKeychainAccessType, error: AccountKeychainAccessError) {
@@ -635,3 +669,4 @@ extension MacPacketTunnelProvider: AccountManagerKeychainAccessDelegate {
                       frequency: .dailyAndCount)
     }
 }
+

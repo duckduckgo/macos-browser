@@ -18,6 +18,7 @@
 
 import Cocoa
 import Common
+import os.log
 
 final class TabPreviewWindowController: NSWindowController {
 
@@ -82,7 +83,7 @@ final class TabPreviewWindowController: NSWindowController {
 
         guard let childWindows = parentWindow.childWindows,
               let tabPreviewWindow = self.window else {
-            os_log("TabPreviewWindowController: Showing tab preview window failed", type: .error)
+            Logger.general.error("TabPreviewWindowController: Showing tab preview window failed")
             return
         }
 

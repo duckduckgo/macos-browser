@@ -19,6 +19,7 @@ let package = Package(
         .target(
             name: "SubscriptionUI",
             dependencies: [
+                .product(name: "BrowserServicesKit", package: "BrowserServicesKit"),
                 .product(name: "Subscription", package: "BrowserServicesKit"),
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions"),
                 .product(name: "PreferencesViews", package: "SwiftUIExtensions"),

@@ -19,6 +19,7 @@
 import Foundation
 import Common
 import WebKit
+import os.log
 
 protocol ViewSnapshotRendering {
 
@@ -40,11 +41,11 @@ final class ViewSnapshotRenderer: ViewSnapshotRendering {
     func renderSnapshot(view: NSView, completion: @escaping (NSImage?) -> Void) {
         let originalBounds = view.bounds
 
-        os_log("Native snapshot rendering started", log: .tabSnapshots)
+        Logger.tabSnapshots.debug("Native snapshot rendering started")
         DispatchQueue.global(qos: .userInitiated).async {
             guard let resizedImage = self.createResizedImage(from: view, with: originalBounds) else {
                 DispatchQueue.main.async {
-                    os_log("Native snapshot rendering failed", log: .tabSnapshots, type: .error)
+                    Logger.tabSnapshots.error("Native snapshot rendering failed")
                     completion(nil)
                 }
                 return
@@ -53,7 +54,7 @@ final class ViewSnapshotRenderer: ViewSnapshotRendering {
             DispatchQueue.main.async {
                 completion(resizedImage)
 
-                os_log("Snapshot of native page rendered", log: .tabSnapshots)
+                Logger.tabSnapshots.debug("Snapshot of native page rendered")
             }
         }
     }

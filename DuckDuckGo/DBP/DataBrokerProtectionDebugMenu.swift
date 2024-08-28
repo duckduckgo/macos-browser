@@ -22,6 +22,7 @@ import AppKit
 import Common
 import LoginItems
 import NetworkProtectionProxy
+import os.log
 
 @MainActor
 final class DataBrokerProtectionDebugMenu: NSMenu {
@@ -175,28 +176,28 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     }
 
     @objc private func startScheduledOperations(_ sender: NSMenuItem) {
-        os_log("Running queued operations...", log: .dataBrokerProtection)
+        Logger.dataBrokerProtection.debug("Running queued operations...")
         let showWebView = sender.representedObject as? Bool ?? false
 
         DataBrokerProtectionManager.shared.loginItemInterface.startScheduledOperations(showWebView: showWebView)
     }
 
     @objc private func runScanOperations(_ sender: NSMenuItem) {
-        os_log("Running scan operations...", log: .dataBrokerProtection)
+        Logger.dataBrokerProtection.debug("Running scan operations...")
         let showWebView = sender.representedObject as? Bool ?? false
 
         DataBrokerProtectionManager.shared.loginItemInterface.startImmediateOperations(showWebView: showWebView)
     }
 
     @objc private func runOptoutOperations(_ sender: NSMenuItem) {
-        os_log("Running Optout operations...", log: .dataBrokerProtection)
+        Logger.dataBrokerProtection.debug("Running Optout operations...")
         let showWebView = sender.representedObject as? Bool ?? false
 
         DataBrokerProtectionManager.shared.loginItemInterface.runAllOptOuts(showWebView: showWebView)
     }
 
     @objc private func backgroundAgentRestart() {
-        LoginItemsManager().restartLoginItems([LoginItem.dbpBackgroundAgent], log: .dbp)
+        LoginItemsManager().restartLoginItems([LoginItem.dbpBackgroundAgent])
     }
 
     @objc private func backgroundAgentDisable() {
@@ -204,7 +205,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     }
 
     @objc private func backgroundAgentEnable() {
-        LoginItemsManager().enableLoginItems([LoginItem.dbpBackgroundAgent], log: .dbp)
+        LoginItemsManager().enableLoginItems([LoginItem.dbpBackgroundAgent])
     }
 
     @objc private func deleteAllDataAndStopAgent() {
