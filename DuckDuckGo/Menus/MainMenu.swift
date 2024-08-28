@@ -601,6 +601,7 @@ final class MainMenu: NSMenu {
                 NSMenuItem(title: "Show Save Credentials Popover", action: #selector(MainViewController.showSaveCredentialsPopover))
                 NSMenuItem(title: "Show Credentials Saved Popover", action: #selector(MainViewController.showCredentialsSavedPopover))
                 NSMenuItem(title: "Show Pop Up Window", action: #selector(MainViewController.showPopUpWindow))
+                NSMenuItem(title: "Reset Home View Promotion State", action: #selector(MainViewController.showHomePromotionView))
             }
             NSMenuItem(title: "Remote Configuration") {
                 customConfigurationUrlMenuItem
