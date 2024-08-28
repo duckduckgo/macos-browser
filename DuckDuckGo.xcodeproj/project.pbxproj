@@ -185,6 +185,8 @@
 		1EA7B8D52B7E078C000330A4 /* Subscription in Frameworks */ = {isa = PBXBuildFile; productRef = 1EA7B8D42B7E078C000330A4 /* Subscription */; };
 		1ED910D52B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ED910D42B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift */; };
 		1ED910D62B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ED910D42B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift */; };
+		1EFA1A072C7C7F0E0099F508 /* PrivacyProPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F188267F2BBEB58100D9AC4F /* PrivacyProPixel.swift */; };
+		1EFA1A082C7C7F0F0099F508 /* PrivacyProPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F188267F2BBEB58100D9AC4F /* PrivacyProPixel.swift */; };
 		310E79BF294A19A8007C49E8 /* FireproofingReferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 310E79BE294A19A8007C49E8 /* FireproofingReferenceTests.swift */; };
 		311B262728E73E0A00FD181A /* TabShadowConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311B262628E73E0A00FD181A /* TabShadowConfig.swift */; };
 		31267C692B640C4200FEF811 /* DataBrokerProtectionFeatureGatekeeper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C5FFB82AF64D120008A79F /* DataBrokerProtectionFeatureGatekeeper.swift */; };
@@ -11414,6 +11416,7 @@
 				31A83FB72BE28D8A00F74E67 /* UserText+DBP.swift in Sources */,
 				F1D042942BFBA12300A31506 /* DataBrokerProtectionSettings+Environment.swift in Sources */,
 				F1C70D822BFF510000599292 /* SubscriptionEnvironment+Default.swift in Sources */,
+				1EFA1A072C7C7F0E0099F508 /* PrivacyProPixel.swift in Sources */,
 				9D9AE91D2AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppDelegate.swift in Sources */,
 				9D9AE9212AAA3B450026E7DC /* UserText.swift in Sources */,
 				31ECDA132BED339600AE679F /* DataBrokerAuthenticationManagerBuilder.swift in Sources */,
@@ -11430,6 +11433,7 @@
 				31A83FB82BE28D8A00F74E67 /* UserText+DBP.swift in Sources */,
 				F1D042952BFBA12300A31506 /* DataBrokerProtectionSettings+Environment.swift in Sources */,
 				F1C70D832BFF510000599292 /* SubscriptionEnvironment+Default.swift in Sources */,
+				1EFA1A082C7C7F0F0099F508 /* PrivacyProPixel.swift in Sources */,
 				9D9AE91E2AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppDelegate.swift in Sources */,
 				9D9AE9222AAA3B450026E7DC /* UserText.swift in Sources */,
 				31ECDA142BED339600AE679F /* DataBrokerAuthenticationManagerBuilder.swift in Sources */,
@@ -13594,7 +13598,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = exactVersion;
-				version = 188.0.0;
+				version = 188.1.0;
 			};
 		};
 		9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
