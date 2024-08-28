@@ -6211,6 +6211,7 @@
 				02FDA6582C764B970024CD8B /* ConfigurationManager.swift */,
 				02FDA65A2C764C200024CD8B /* ConfigurationStore.swift */,
 				02FDA65E2C764E220024CD8B /* VPNPrivacyConfigurationManager.swift */,
+				02FDA6612C765D0F0024CD8B /* VPNAgentConfigurationURLProvider.swift */,
 				7B60AFF92C511B65008E32A3 /* VPNUIActionHandler.swift */,
 				7BA7CC0E2AD11DC80042E5CE /* DuckDuckGoVPNAppDelegate.swift */,
 				7BD1688D2AD4A4C400D24876 /* NetworkExtensionController.swift */,
@@ -6226,7 +6227,6 @@
 				7BA7CC142AD11DC80042E5CE /* DuckDuckGoVPNAppStore.entitlements */,
 				7BA7CC1A2AD11DC80042E5CE /* Info.plist */,
 				7BA7CC102AD11DC80042E5CE /* Info-AppStore.plist */,
-				02FDA6612C765D0F0024CD8B /* VPNAgentConfigurationURLProvider.swift */,
 			);
 			path = DuckDuckGoVPN;
 			sourceTree = "<group>";

@@ -180,6 +180,7 @@ final class ConfigurationStore: ConfigurationStoring {
         }
 
         if let coordinatorError {
+            // TODO: Fire pixel
             Logger.config.error("Unable to read \(config.rawValue, privacy: .public): \(coordinatorError.localizedDescription, privacy: .public)")
         }
 
