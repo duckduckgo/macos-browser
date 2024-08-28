@@ -73,7 +73,7 @@ final class SecurityScopedFileURLController {
 #if DEBUG && APPSTORE
             url.ensureUrlIsNotWritable {
             #if SANDBOX_TEST_TOOL
-                Logger().log("❗️ url \(url.path) is still writable after stopping access to it")
+                Logger.fileDownload.log("❗️ url \(url.path) is still writable after stopping access to it")
                 fatalError("❗️ url \(url.path) is still writable after stopping access to it")
             #else
                 breakByRaisingSigInt("❗️ url \(url.path) is still writable after stopping access to it")
