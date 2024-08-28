@@ -70,7 +70,7 @@ struct OnboardingTryVisitingSiteDialogContent: View {
             orientation: .horizontalStack(alignment: .top),
             title: viewModel.title,
             titleFont: OnboardingDialogsContants.titleFont,
-            message: message, 
+            message: message,
             messageFont: OnboardingDialogsContants.messageFont,
             list: viewModel.itemsList,
             listAction: viewModel.listItemPressed)
@@ -138,7 +138,7 @@ struct OnboardingFireButtonDialogContent: View {
     var body: some View {
         ContextualDaxDialogContent(
             orientation: .horizontalStack(alignment: .center),
-            message: attributedMessage, 
+            message: attributedMessage,
             messageFont: OnboardingDialogsContants.messageFont,
             customActionView: AnyView(actionView))
     }
@@ -226,7 +226,6 @@ struct OnboardingSecondaryCTAButton: View {
     let title: String
     let action: () -> Void
     
-
     var body: some View {
         Button(action: action) {
             Text(title)
