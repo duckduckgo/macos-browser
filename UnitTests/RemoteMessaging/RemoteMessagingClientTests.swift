@@ -30,9 +30,9 @@ struct MockRemoteMessagingStoreProvider: RemoteMessagingStoreProviding {
     }
 }
 
-struct MockFreemiumPIRState: FreemiumPIRState {
+struct MockFreemiumPIRUserState: FreemiumPIRUserState {
     var didOnboard = false
-    var isCurrentUser = false
+    var isActiveUser = false
 }
 
 final class RemoteMessagingClientTests: XCTestCase {

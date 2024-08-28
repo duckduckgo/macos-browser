@@ -21,16 +21,16 @@ import XCTest
 import Subscription
 import SubscriptionTestingUtilities
 
-final class FreemiumPIRStateTests: XCTestCase {
+final class FreemiumPIRUserStateTests: XCTestCase {
 
-    private static let testSuiteName = "test.defaults.freemium.state.tests"
+    private static let testSuiteName = "test.defaults.freemium.user.state.tests"
     private let pir = "macos.browser.freemium.pir.did.onboard"
-    private let testUserDefaults = UserDefaults(suiteName: FreemiumPIRStateTests.testSuiteName)!
+    private let testUserDefaults = UserDefaults(suiteName: FreemiumPIRUserStateTests.testSuiteName)!
     private var mockAccountManager: AccountManagerMock!
 
     override func setUpWithError() throws {
         mockAccountManager = AccountManagerMock()
-        testUserDefaults.removePersistentDomain(forName: FreemiumPIRStateTests.testSuiteName)
+        testUserDefaults.removePersistentDomain(forName: FreemiumPIRUserStateTests.testSuiteName)
     }
 
     func testSetsHasFreemiumPIR() throws {
