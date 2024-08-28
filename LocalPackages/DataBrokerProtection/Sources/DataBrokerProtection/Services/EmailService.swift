@@ -18,6 +18,7 @@
 
 import Foundation
 import Common
+import os.log
 
 public enum EmailError: Error, Equatable, Codable {
     case cantGenerateURL
@@ -125,17 +126,17 @@ struct EmailService: EmailServiceProtocol {
         switch emailResult.status {
         case .ready:
             if let link = emailResult.link, let url = URL(string: link) {
-                os_log("Email received", log: .service)
+                Logger.service.debug("Email received")
                 return url
             } else {
-                os_log("Invalid email link", log: .service)
+                Logger.service.debug("Invalid email link")
                 throw EmailError.invalidEmailLink
             }
         case .pending:
             if numberOfRetries == 0 {
                 throw EmailError.linkExtractionTimedOut
             }
-            os_log("No email yet. Waiting for a new request ...", log: .service)
+            Logger.service.debug("No email yet. Waiting for a new request ...")
             try await Task.sleep(nanoseconds: pollingTimeInNanoSecondsSeconds)
             return try await getConfirmationLink(from: email,
                                                  numberOfRetries: numberOfRetries - 1,

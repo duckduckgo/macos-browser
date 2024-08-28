@@ -23,6 +23,7 @@ import BrowserServicesKit
 import PixelKit
 import NetworkProtection
 import Subscription
+import os.log
 
 protocol OptionsButtonMenuDelegate: AnyObject {
 
@@ -108,7 +109,10 @@ final class MoreOptionsMenu: NSMenu {
         let feedbackMenuItem = NSMenuItem(title: feedbackString, action: nil, keyEquivalent: "")
             .withImage(.sendFeedback)
 
-        feedbackMenuItem.submenu = FeedbackSubMenu(targetting: self, tabCollectionViewModel: tabCollectionViewModel)
+        feedbackMenuItem.submenu = FeedbackSubMenu(targetting: self,
+                                                   tabCollectionViewModel: tabCollectionViewModel,
+                                                   subscriptionFeatureAvailability: subscriptionFeatureAvailability,
+                                                   accountManager: accountManager)
         addItem(feedbackMenuItem)
 
         addItem(NSMenuItem.separator())
@@ -166,7 +170,7 @@ final class MoreOptionsMenu: NSMenu {
 
     @objc func toggleFireproofing(_ sender: NSMenuItem) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("MainViewController: No tab view model selected", type: .error)
+            Logger.general.error("MainViewController: No tab view model selected")
             return
         }
 
@@ -488,8 +492,15 @@ final class EmailOptionsButtonSubMenu: NSMenu {
 
 @MainActor
 final class FeedbackSubMenu: NSMenu {
+    private let subscriptionFeatureAvailability: SubscriptionFeatureAvailability
+    private let accountManager: AccountManager
 
-    init(targetting target: AnyObject, tabCollectionViewModel: TabCollectionViewModel) {
+    init(targetting target: AnyObject,
+         tabCollectionViewModel: TabCollectionViewModel,
+         subscriptionFeatureAvailability: SubscriptionFeatureAvailability,
+         accountManager: AccountManager) {
+        self.subscriptionFeatureAvailability = subscriptionFeatureAvailability
+        self.accountManager = accountManager
         super.init(title: UserText.sendFeedback)
         updateMenuItems(with: tabCollectionViewModel, targetting: target)
     }
@@ -512,6 +523,16 @@ final class FeedbackSubMenu: NSMenu {
                                               keyEquivalent: "")
             .withImage(.siteBreakage)
         addItem(reportBrokenSiteItem)
+
+        if subscriptionFeatureAvailability.usesUnifiedFeedbackForm, accountManager.isUserAuthenticated {
+            addItem(.separator())
+
+            let sendPProFeedbackItem = NSMenuItem(title: UserText.sendPProFeedback,
+                                                  action: #selector(AppDelegate.openPProFeedback(_:)),
+                                                  keyEquivalent: "")
+                .withImage(.pProFeedback)
+            addItem(sendPProFeedbackItem)
+        }
     }
 }
 

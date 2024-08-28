@@ -20,6 +20,7 @@ import Foundation
 import Combine
 import Common
 import BrowserServicesKit
+import os.log
 
 final class SuggestionContainerViewModel {
 
@@ -110,7 +111,7 @@ final class SuggestionContainerViewModel {
         let items = suggestionContainer.result?.all ?? []
 
         guard index < items.count else {
-            os_log("SuggestionContainerViewModel: Absolute index is out of bounds", type: .error)
+            Logger.general.error("SuggestionContainerViewModel: Absolute index is out of bounds")
             return nil
         }
 
@@ -119,7 +120,7 @@ final class SuggestionContainerViewModel {
 
     func select(at index: Int) {
         guard index >= 0, index < numberOfSuggestions else {
-            os_log("SuggestionContainerViewModel: Index out of bounds", type: .error)
+            Logger.general.error("SuggestionContainerViewModel: Index out of bounds")
             selectionIndex = nil
             return
         }

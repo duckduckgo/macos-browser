@@ -116,7 +116,7 @@ final class DownloadsPreferences: ObservableObject {
                 if isStale {
                     setSelectedDownloadLocation(url) // update bookmark data and selectedDownloadLocationController
                 } else {
-                    selectedDownloadLocationController = SecurityScopedFileURLController(url: url, logger: OSLog.downloads)
+                    selectedDownloadLocationController = SecurityScopedFileURLController(url: url)
                 }
                 return url
             }
@@ -135,7 +135,7 @@ final class DownloadsPreferences: ObservableObject {
     }
 
     private func setSelectedDownloadLocation(_ url: URL?) {
-        selectedDownloadLocationController = url.map { SecurityScopedFileURLController(url: $0, logger: OSLog.downloads) }
+        selectedDownloadLocationController = url.map { SecurityScopedFileURLController(url: $0) }
         let locationString: String?
 #if APPSTORE
         locationString = (try? url?.bookmarkData(options: .withSecurityScope).base64EncodedString()) ?? url?.absoluteString

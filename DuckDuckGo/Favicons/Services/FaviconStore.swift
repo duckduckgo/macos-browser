@@ -21,6 +21,7 @@ import CoreData
 import Combine
 import Common
 import PixelKit
+import os.log
 
 protocol FaviconStoring {
 
@@ -61,7 +62,7 @@ final class FaviconStore: FaviconStoring {
                 fetchRequest.returnsObjectsAsFaults = false
                 do {
                     let faviconMOs = try context.fetch(fetchRequest)
-                    os_log("%d favicons loaded ", log: .favicons, faviconMOs.count)
+                    Logger.favicons.debug("\(faviconMOs.count) favicons loaded")
                     let favicons = faviconMOs.compactMap { Favicon(faviconMO: $0) }
 
                     continuation.resume(returning: favicons)
@@ -112,7 +113,7 @@ final class FaviconStore: FaviconStoring {
                 let faviconHostReferences: [FaviconHostReference]
                 do {
                     let faviconHostReferenceMOs = try context.fetch(hostFetchRequest)
-                    os_log("%d favicon host references loaded ", log: .favicons, faviconHostReferenceMOs.count)
+                    Logger.favicons.debug("\(faviconHostReferenceMOs.count) favicon host references loaded")
                     faviconHostReferences = faviconHostReferenceMOs.compactMap { FaviconHostReference(faviconHostReferenceMO: $0) }
                 } catch {
                     continuation.resume(throwing: error)
@@ -124,7 +125,7 @@ final class FaviconStore: FaviconStoring {
                 urlFetchRequest.returnsObjectsAsFaults = false
                 do {
                     let faviconUrlReferenceMOs = try context.fetch(urlFetchRequest)
-                    os_log("%d favicon url references loaded ", log: .favicons, faviconUrlReferenceMOs.count)
+                    Logger.favicons.debug("\(faviconUrlReferenceMOs.count) favicon url references loaded")
                     let faviconUrlReferences = faviconUrlReferenceMOs.compactMap { FaviconUrlReference(faviconUrlReferenceMO: $0) }
                     continuation.resume(returning: (faviconHostReferences, faviconUrlReferences))
                 } catch {
@@ -207,7 +208,7 @@ final class FaviconStore: FaviconStoring {
                     let deletedObjects = result?.result as? [NSManagedObjectID] ?? []
                     let changes: [AnyHashable: Any] = [NSDeletedObjectsKey: deletedObjects]
                     NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [context])
-                    os_log("%d entries of %s removed", log: .favicons, deletedObjects.count, entityName)
+                    Logger.favicons.debug("\(deletedObjects.count) entries of \(entityName) removed")
 
                     continuation.resume(returning: ())
                 } catch {
