@@ -53160,6 +53160,18 @@
         }
       }
     },
+    "send.ppro.feedback" : {
+      "comment" : "Menu with feedback commands",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Send Privacy Pro Feedback"
+          }
+        }
+      }
+    },
     "settings" : {
       "comment" : "Menu item for opening settings",
       "extractionState" : "extracted_with_value",
