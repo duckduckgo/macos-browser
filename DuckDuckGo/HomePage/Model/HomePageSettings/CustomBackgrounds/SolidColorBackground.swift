@@ -74,9 +74,9 @@ enum SolidColorBackground: String, Equatable, Identifiable, CaseIterable, ColorS
 
     var colorScheme: ColorScheme {
         switch self {
-        case .gray, .lightPink, .lightOrange, .lightYellow, .lightGreen, .lightBlue, .lightPurple:
+        case .gray, .lightPink, .lightOrange, .lightYellow, .darkYellow, .lightGreen, .lightBlue, .lightPurple:
                 .light
-        case .black, .darkPink, .darkOrange, .darkYellow, .darkGreen, .darkBlue, .darkPurple:
+        case .black, .darkPink, .darkOrange, .darkGreen, .darkBlue, .darkPurple:
                 .dark
         }
     }
