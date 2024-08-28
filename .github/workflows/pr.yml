@@ -135,6 +135,7 @@ jobs:
       with:
         check_name: "Test Report: Shell Scripts"
         report_paths: 'bats-tests.xml'
+        check_retries: true
 
   tests:
     name: Test
