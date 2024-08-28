@@ -167,6 +167,44 @@ final class UserBackgroundImagesManagerTests: XCTestCase {
         ])
     }
 
+    func testThatAvailableImagesAreSortedByLastAdded() async throws {
+        let image = NSImage.sampleImage(with: .black)
+        let imageURL = storageLocation.appending("abc.jpg")
+        try image.save(to: imageURL)
+
+        let image1 = try await manager.addImage(with: imageURL)
+        let image2 = try await manager.addImage(with: imageURL)
+        let image3 = try await manager.addImage(with: imageURL)
+
+        XCTAssertEqual(manager.availableImages, [image3, image2, image1])
+    }
+
+    func testThatUpdateSelectedTimestampMovesImageToTheFrontOfAvailableImages() async throws {
+        let image = NSImage.sampleImage(with: .black)
+        let imageURL = storageLocation.appending("abc.jpg")
+        try image.save(to: imageURL)
+
+        let image1 = try await manager.addImage(with: imageURL)
+        let image2 = try await manager.addImage(with: imageURL)
+        let image3 = try await manager.addImage(with: imageURL)
+
+        manager.updateSelectedTimestamp(for: image1)
+        manager.sortImagesByLastUsed()
+        XCTAssertEqual(manager.availableImages, [image1, image3, image2])
+
+        manager.updateSelectedTimestamp(for: image2)
+        manager.sortImagesByLastUsed()
+        XCTAssertEqual(manager.availableImages, [image2, image1, image3])
+
+        manager.updateSelectedTimestamp(for: image1)
+        manager.sortImagesByLastUsed()
+        XCTAssertEqual(manager.availableImages, [image1, image2, image3])
+
+        manager.updateSelectedTimestamp(for: image3)
+        manager.sortImagesByLastUsed()
+        XCTAssertEqual(manager.availableImages, [image3, image1, image2])
+    }
+
     func testWhenAddImageCompletesSuccessfullyThenNewImageIsAdded() async throws {
         let image = NSImage.sampleImage(with: .black)
         let imageURL = storageLocation.appending("abc.jpg")
@@ -214,7 +252,7 @@ final class UserBackgroundImagesManagerTests: XCTestCase {
         imageProcessor.convertImageToJPEG = { _ in throw CopyImageError() }
 
         do {
-            let userBackgroundImage = try await manager.addImage(with: imageURL)
+            _ = try await manager.addImage(with: imageURL)
             XCTFail("Expected to throw an error")
         } catch {
             XCTAssertTrue(manager.availableImages.isEmpty)
@@ -255,13 +293,58 @@ final class UserBackgroundImagesManagerTests: XCTestCase {
         )
     }
 
-    func testDeleteImage() {
+    func testWhenDeleteImageIsPassedExistingImageThenImageIsRemovedAndFilesAreDeleted() async throws {
+        let image = NSImage.sampleImage(with: .black)
+        let imageURL = storageLocation.appending("abc.jpg")
+        try image.save(to: imageURL)
+
+        // Don't mock image processor in order to enable actual processing
+        manager = UserBackgroundImagesManager(
+            maximumNumberOfImages: 4,
+            applicationSupportDirectory: storageLocation,
+            sendPixel: { [weak self] in self?.sendPixelEvents.append($0) }
+        )
+
+        let userBackgroundImage1 = try await manager.addImage(with: imageURL)
+        let userBackgroundImage2 = try await manager.addImage(with: imageURL)
+        sendPixelEvents.removeAll()
+
+        // WHEN
+        manager.deleteImage(userBackgroundImage2)
+
+        // THEN
+        XCTAssertEqual(sendPixelEvents.map(\.name), [NewTabPagePixel.newTabBackgroundDeletedUserImage.name])
+
+        XCTAssertEqual(manager.availableImages, [userBackgroundImage1])
+        XCTAssertNil(manager.image(for: userBackgroundImage2))
+        XCTAssertNil(manager.thumbnailImage(for: userBackgroundImage2))
     }
 
-    func testUpdateSelectedTimestamp() {
-    }
+    func testWhenDeleteImageIsPassedUnknownImageThenItPerformsNoAction() async throws {
+        let image = NSImage.sampleImage(with: .black)
+        let imageURL = storageLocation.appending("abc.jpg")
+        try image.save(to: imageURL)
 
-    func testSortImagesByLastUsed() {
+        // Don't mock image processor in order to enable actual processing
+        manager = UserBackgroundImagesManager(
+            maximumNumberOfImages: 4,
+            applicationSupportDirectory: storageLocation,
+            sendPixel: { [weak self] in self?.sendPixelEvents.append($0) }
+        )
+
+        let userBackgroundImage1 = try await manager.addImage(with: imageURL)
+        let userBackgroundImage2 = UserBackgroundImage(fileName: UUID().uuidString, colorScheme: .dark)
+        sendPixelEvents.removeAll()
+
+        // WHEN
+        manager.deleteImage(userBackgroundImage2)
+
+        // THEN
+        XCTAssertTrue(sendPixelEvents.isEmpty)
+
+        XCTAssertEqual(manager.availableImages, [userBackgroundImage1])
+        XCTAssertNil(manager.image(for: userBackgroundImage2))
+        XCTAssertNil(manager.thumbnailImage(for: userBackgroundImage2))
     }
 }
 
