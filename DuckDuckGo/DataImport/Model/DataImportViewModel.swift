@@ -403,7 +403,7 @@ private func dataImporter(for source: DataImport.Source, fileDataType: DataImpor
 
     case .onePassword8, .onePassword7, .bitwarden, .lastPass, .csv,
          /* any */_ where fileDataType == .passwords:
-        CSVImporter(fileURL: url, loginImporter: SecureVaultLoginImporter(), defaultColumnPositions: .init(source: source))
+        CSVImporter(fileURL: url, loginImporter: SecureVaultLoginImporter(userDefaults: .standard), defaultColumnPositions: .init(source: source))
 
     case .brave, .chrome, .chromium, .coccoc, .edge, .opera, .operaGX, .vivaldi:
         ChromiumDataImporter(profile: profile,
