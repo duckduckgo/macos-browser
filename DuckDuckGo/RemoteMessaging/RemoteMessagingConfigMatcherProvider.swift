@@ -23,6 +23,7 @@ import Bookmarks
 import RemoteMessaging
 import NetworkProtection
 import Subscription
+import Freemium
 
 extension DefaultWaitlistActivationDateStore: VPNActivationDateProviding {}
 
@@ -136,6 +137,8 @@ final class RemoteMessagingConfigMatcherProvider: RemoteMessagingConfigMatcherPr
 
         let deprecatedRemoteMessageStorage = DefaultSurveyRemoteMessagingStorage.surveys()
 
+        let freemiumPIRUserState = DefaultFreemiumPIRUserState(userDefaults: .dbp, accountManager: subscriptionManager.accountManager)
+
         return RemoteMessagingConfigMatcher(
             appAttributeMatcher: AppAttributeMatcher(statisticsStore: statisticsStore,
                                                      variantManager: variantManager,
@@ -161,7 +164,7 @@ final class RemoteMessagingConfigMatcherProvider: RemoteMessagingConfigMatcherPr
                                                        hasCustomHomePage: startupPreferencesPersistor().launchToCustomHomePage,
                                                        isDuckPlayerOnboarded: duckPlayerPreferencesPersistor.youtubeOverlayAnyButtonPressed,
                                                        isDuckPlayerEnabled: duckPlayerPreferencesPersistor.duckPlayerModeBool != false,
-                                                       isCurrentFreemiumPIRUser: false,
+                                                       isCurrentFreemiumPIRUser: freemiumPIRUserState.isActiveUser,
                                                        dismissedDeprecatedMacRemoteMessageIds: deprecatedRemoteMessageStorage.dismissedMessageIDs()
                                                       ),
             percentileStore: RemoteMessagingPercentileUserDefaultsStore(keyValueStore: UserDefaults.standard),
