@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "michal/subs-keychain-errors",
-        "revision" : "37f1c9c257d2192830d5a003836164d1685ea84b"
+        "revision" : "ce1b7228a38d2b18525590256051a012109cfee6",
+        "version" : "188.1.0"
       }
     },
     {
@@ -75,7 +75,7 @@
     {
       "identity" : "lottie-spm",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/airbnb/lottie-spm",
+      "location" : "https://github.com/airbnb/lottie-spm.git",
       "state" : {
         "revision" : "1d29eccc24cc8b75bff9f6804155112c0ffc9605",
         "version" : "4.4.3"
@@ -104,8 +104,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/privacy-dashboard",
       "state" : {
-        "revision" : "36dc07cba4bc1e7e0c1d1fb679c3cd077694a072",
-        "version" : "5.0.0"
+        "revision" : "665b23dc656c9f787494620494f8e56098a900b2",
+        "version" : "5.1.1"
       }
     },
     {
@@ -178,15 +178,6 @@
       "state" : {
         "revision" : "1403e17eeeb8493b92fb9d11eb8c846bb9776581",
         "version" : "2.1.2"
-      }
-    },
-    {
-      "identity" : "wireguard-apple",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/wireguard-apple",
-      "state" : {
-        "revision" : "13fd026384b1af11048451061cc1b21434990668",
-        "version" : "1.1.3"
       }
     }
   ],
