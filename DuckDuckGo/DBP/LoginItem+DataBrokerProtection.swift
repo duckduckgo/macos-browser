@@ -19,11 +19,11 @@
 import Foundation
 import LoginItems
 import DataBrokerProtection
+import os.log
 
 extension LoginItem {
 
-    static let dbpBackgroundAgent = LoginItem(bundleId: Bundle.main.dbpBackgroundAgentBundleId, defaults: .dbp, log: .dbp)
-
+    static let dbpBackgroundAgent = LoginItem(bundleId: Bundle.main.dbpBackgroundAgentBundleId, defaults: .dbp, logger: Logger.dataBrokerProtection)
 }
 
 extension LoginItem: DBPLoginItemStatusChecker {

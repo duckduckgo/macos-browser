@@ -19,6 +19,7 @@
 import Foundation
 import Common
 import SecureStorage
+import os.log
 
 protocol DataBrokerProtectionRepository {
     func save(_ profile: DataBrokerProtectionProfile) async throws
@@ -93,7 +94,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
                 try await saveNewProfile(profile, vault: vault)
             }
         } catch {
-            os_log("Database error: save profile, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("Database error: save profile, error: \(error.localizedDescription, privacy: .public)")
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.save profile"))
             throw error
         }
@@ -104,7 +105,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
             let vault = try DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
             return try vault.fetchProfile(with: Self.profileId)
         } catch {
-            os_log("Database error: fetchProfile, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("Database error: fetchProfile, error: \(error.localizedDescription, privacy: .public)")
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.fetchProfile"))
             throw error
         }
@@ -115,7 +116,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
             let vault = try DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
             try vault.deleteProfileData()
         } catch {
-            os_log("Database error: deleteProfileData, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("Database error: deleteProfileData, error: \(error.localizedDescription, privacy: .public)")
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.deleteProfileData"))
             throw error
         }
@@ -126,7 +127,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
             let vault = try DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
             return try vault.fetchChildBrokers(for: parentBroker)
         } catch {
-            os_log("Database error: fetchChildBrokers, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("Database error: fetchChildBrokers, error: \(error.localizedDescription, privacy: .public)")
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.fetchChildBrokers for parentBroker"))
             throw error
         }
@@ -138,7 +139,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
 
             return try vault.save(extractedProfile: extractedProfile, brokerId: brokerId, profileQueryId: profileQueryId)
         } catch {
-            os_log("Database error: extractedProfile, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("Database error: extractedProfile, error: \(error.localizedDescription, privacy: .public)")
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.save extractedProfile brokerId profileQueryId"))
             throw error
         }
@@ -151,7 +152,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
                   let profileQuery = try vault.fetchProfileQuery(with: profileQueryId),
                   let scanJob = try vault.fetchScan(brokerId: brokerId, profileQueryId: profileQueryId) else {
                 let error = DataBrokerProtectionError.dataNotInDatabase
-                os_log("Database error: brokerProfileQueryData, error: %{public}@", log: .error, error.localizedDescription)
+                Logger.dataBrokerProtection.error("Database error: brokerProfileQueryData, error: \(error.localizedDescription, privacy: .public)")
                 pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.brokerProfileQueryData for brokerId and profileQueryId"))
                 throw error
             }
@@ -165,7 +166,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
                 optOutJobData: optOutJobs
             )
         } catch {
-            os_log("Database error: brokerProfileQueryData, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("Database error: brokerProfileQueryData, error: \(error.localizedDescription, privacy: .public)")
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.brokerProfileQueryData for brokerId and profileQueryId"))
             throw error
         }
@@ -176,7 +177,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
             let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
             return try vault.fetchExtractedProfiles(for: brokerId)
         } catch {
-            os_log("Database error: fetchExtractedProfiles, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("Database error: fetchExtractedProfiles, error: \(error.localizedDescription, privacy: .public)")
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.fetchExtractedProfiles for brokerId"))
             throw error
         }
@@ -187,7 +188,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
             let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
             try vault.updatePreferredRunDate(date, brokerId: brokerId, profileQueryId: profileQueryId)
         } catch {
-            os_log("Database error: updatePreferredRunDate without extractedProfileID, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("Database error: updatePreferredRunDate without extractedProfileID, error: \(error.localizedDescription, privacy: .public)")
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.updatePreferredRunDate date brokerID profileQueryId"))
             throw error
         }
@@ -203,7 +204,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
                 profileQueryId: profileQueryId,
                 extractedProfileId: extractedProfileId)
         } catch {
-            os_log("Database error: updatePreferredRunDate with extractedProfileID, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("Database error: updatePreferredRunDate with extractedProfileID, error: \(error.localizedDescription, privacy: .public)")
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.updatePreferredRunDate date brokerID profileQueryId extractedProfileID"))
             throw error
         }
@@ -214,7 +215,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
             let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
             try vault.updateLastRunDate(date, brokerId: brokerId, profileQueryId: profileQueryId)
         } catch {
-            os_log("Database error: updateLastRunDate without extractedProfileID, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("Database error: updateLastRunDate without extractedProfileID, error: \(error.localizedDescription, privacy: .public)")
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.updateLastRunDate date brokerID profileQueryId"))
             throw error
         }
@@ -231,7 +232,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
                 extractedProfileId: extractedProfileId
             )
         } catch {
-            os_log("Database error: updateLastRunDate with extractedProfileID, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("Database error: updateLastRunDate with extractedProfileID, error: \(error.localizedDescription, privacy: .public)")
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.updateLastRunDate date brokerId profileQueryId extractedProfileId"))
             throw error
         }
@@ -251,7 +252,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
                 extractedProfileId: extractedProfileId
             )
         } catch {
-            os_log("Database error: updateSubmittedSuccessfullyDate, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("Database error: updateSubmittedSuccessfullyDate, error: \(error.localizedDescription, privacy: .public)")
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.updateSubmittedSuccessfullyDate date forBrokerId profileQueryId extractedProfileId"))
             throw error
         }
@@ -271,7 +272,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
                 extractedProfileId: extractedProfileId
             )
         } catch {
-            os_log("Database error: updateSevenDaysConfirmationPixelFired, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("Database error: updateSevenDaysConfirmationPixelFired, error: \(error.localizedDescription, privacy: .public)")
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.updateSevenDaysConfirmationPixelFired pixelFired forBrokerId profileQueryId extractedProfileId"))
             throw error
         }
@@ -291,7 +292,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
                 extractedProfileId: extractedProfileId
             )
         } catch {
-            os_log("Database error: updateFourteenDaysConfirmationPixelFired, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("Database error: updateFourteenDaysConfirmationPixelFired, error: \(error.localizedDescription, privacy: .public)")
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.updateFourteenDaysConfirmationPixelFired pixelFired forBrokerId profileQueryId extractedProfileId"))
             throw error
         }
@@ -311,7 +312,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
                 extractedProfileId: extractedProfileId
             )
         } catch {
-            os_log("Database error: updateTwentyOneDaysConfirmationPixelFired, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("Database error: updateTwentyOneDaysConfirmationPixelFired, error: \(error.localizedDescription, privacy: .public)")
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.updateTwentyOneDaysConfirmationPixelFired pixelFired forBrokerId profileQueryId extractedProfileId"))
             throw error
         }
@@ -322,7 +323,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
             let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
             try vault.updateRemovedDate(for: extractedProfileId, with: date)
         } catch {
-            os_log("Database error: updateRemovedDate, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("Database error: updateRemovedDate, error: \(error.localizedDescription, privacy: .public)")
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.updateRemovedDate date on extractedProfileId"))
             throw error
         }
@@ -338,7 +339,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
                 try vault.save(historyEvent: historyEvent, brokerId: historyEvent.brokerId, profileQueryId: historyEvent.profileQueryId)
             }
         } catch {
-            os_log("Database error: add historyEvent, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("Database error: add historyEvent, error: \(error.localizedDescription, privacy: .public)")
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.add historyEvent"))
             throw error
         }
@@ -371,7 +372,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
 
             return brokerProfileQueryDataList
         } catch {
-            os_log("Database error: fetchAllBrokerProfileQueryData, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("Database error: fetchAllBrokerProfileQueryData, error: \(error.localizedDescription, privacy: .public)")
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.fetchAllBrokerProfileQueryData"))
             throw error
         }
@@ -392,7 +393,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
                            fourteenDaysConfirmationPixelFired: optOut.fourteenDaysConfirmationPixelFired,
                            twentyOneDaysConfirmationPixelFired: optOut.twentyOneDaysConfirmationPixelFired)
         } catch {
-            os_log("Database error: saveOptOutOperation, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("Database error: saveOptOutOperation, error: \(error.localizedDescription, privacy: .public)")
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.saveOptOutOperation optOut extractedProfile"))
             throw error
         }
@@ -405,7 +406,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
 
             return events.max(by: { $0.date < $1.date })
         } catch {
-            os_log("Database error: fetchLastEvent, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("Database error: fetchLastEvent, error: \(error.localizedDescription, privacy: .public)")
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "fetchLastEvent brokerId profileQueryId"))
             throw error
         }
@@ -416,7 +417,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
             let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
             return try vault.hasMatches()
         } catch {
-            os_log("Database error: hasMatches, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("Database error: hasMatches, error: \(error.localizedDescription, privacy: .public)")
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.hasMatches"))
             throw error
         }
@@ -431,7 +432,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
 
             return scan.historyEvents
         } catch {
-            os_log("Database error: fetchHistoryEvents, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("Database error: fetchHistoryEvents, error: \(error.localizedDescription, privacy: .public)")
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "fetchScanHistoryEvents brokerId profileQueryId"))
             throw error
         }
@@ -446,7 +447,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
 
             return optOut.historyEvents
         } catch {
-            os_log("Database error: fetchHistoryEvents, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("Database error: fetchHistoryEvents, error: \(error.localizedDescription, privacy: .public)")
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.fetchOptOutHistoryEvents brokerId profileQueryId extractedProfileId"))
             throw error
         }
@@ -457,7 +458,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
             let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
             return try vault.fetchAttemptInformation(for: extractedProfileId)
         } catch {
-            os_log("Database error: fetchAttemptInformation, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("Database error: fetchAttemptInformation, error: \(error.localizedDescription, privacy: .public)")
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.fetchAttemptInformation for extractedProfileId"))
             throw error
         }
@@ -472,7 +473,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
                            lastStageDate: lastStageDate,
                            startTime: startTime)
         } catch {
-            os_log("Database error: addAttempt, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("Database error: addAttempt, error: \(error.localizedDescription, privacy: .public)")
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.addAttempt extractedProfileId attemptUUID dataBroker lastStageDate startTime"))
             throw error
         }

@@ -24,6 +24,7 @@ import NetworkExtension
 import Networking
 import PixelKit
 import Subscription
+import os.log
 import WireGuard
 
 final class MacPacketTunnelProvider: PacketTunnelProvider {
@@ -567,7 +568,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         try super.loadVendorOptions(from: provider)
 
         guard let vendorOptions = provider?.providerConfiguration else {
-            os_log("🔵 Provider is nil, or providerConfiguration is not set", log: .networkProtection)
+            Logger.networkProtection.debug("🔵 Provider is nil, or providerConfiguration is not set")
             throw ConfigurationError.missingProviderConfiguration
         }
 
@@ -576,7 +577,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     private func loadDefaultPixelHeaders(from options: [String: Any]) throws {
         guard let defaultPixelHeaders = options[NetworkProtectionOptionKey.defaultPixelHeaders] as? [String: String] else {
-            os_log("🔵 Pixel options are not set", log: .networkProtection)
+            Logger.networkProtection.debug("🔵 Pixel options are not set")
             throw ConfigurationError.missingPixelHeaders
         }
 
