@@ -541,7 +541,7 @@ final class BWManager: BWManagement, ObservableObject {
 
     @Published private(set) var status: BWStatus = .disabled {
         didSet {
-            Logger.bitWarden.debug("Status changed: \(String(describing: self.status))")
+            Logger.bitWarden.log("Status changed: \(String(describing: self.status))")
 
             // If vault is locked, keep refreshing the latest status
             if case .connected(vault: let vault) = status,
@@ -631,7 +631,7 @@ extension BWManager: BWCommunicatorDelegate {
         }
 
         guard let messageId = response.messageId, messageIdGenerator.verify(messageId: messageId) else {
-            Logger.bitWarden.debug("BWManager: Unknown message id. Ignoring the message")
+            Logger.bitWarden.log("BWManager: Unknown message id. Ignoring the message")
             return
         }
 

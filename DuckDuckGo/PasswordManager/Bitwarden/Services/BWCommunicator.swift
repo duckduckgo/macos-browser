@@ -75,7 +75,7 @@ final class BWCommunicator: BWCommunication {
         process.terminationHandler = processDidTerminate(_:)
 
         try process.run()
-        Logger.bitWarden.debug("BWCommunicator: Proxy process running")
+        Logger.bitWarden.log("BWCommunicator: Proxy process running")
 
         self.process = BitwardenProcess(process: process, readingHandle: outHandle, writingHandle: inputHandle)
     }
@@ -86,7 +86,7 @@ final class BWCommunicator: BWCommunication {
     }
 
     private func processDidTerminate(_ process: Process) {
-        Logger.bitWarden.debug("BWCommunicator: Proxy process terminated")
+        Logger.bitWarden.log("BWCommunicator: Proxy process terminated")
 
         if let runningProcess = self.process?.process {
             if process != runningProcess {

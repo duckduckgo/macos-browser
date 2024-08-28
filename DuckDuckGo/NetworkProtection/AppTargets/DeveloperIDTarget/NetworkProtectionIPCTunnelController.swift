@@ -161,7 +161,7 @@ extension NetworkProtectionIPCTunnelController: TunnelController {
     private func log(_ error: Error) {
         switch error {
         case RequestError.notAuthorizedToEnableLoginItem:
-            Logger.networkProtection.debug("IPC Controller not authorized to enable the login item")
+            Logger.networkProtection.error("IPC Controller not authorized to enable the login item: \(error.localizedDescription)")
         case RequestError.internalLoginItemError(let error):
             Logger.networkProtection.error("IPC Controller found an error while enabling the login item: \(error.localizedDescription)")
         default:

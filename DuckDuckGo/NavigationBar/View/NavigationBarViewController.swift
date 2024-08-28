@@ -264,7 +264,7 @@ final class NavigationBarViewController: NSViewController {
 
     @IBAction func homeButtonAction(_ sender: NSButton) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            Logger.navigation.error("%s: Selected tab view model is nil")
+            Logger.navigation.error("Selected tab view model is nil")
             return
         }
         selectedTabViewModel.tab.openHomePage()

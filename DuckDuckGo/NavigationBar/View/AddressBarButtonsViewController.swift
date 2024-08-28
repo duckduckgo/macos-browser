@@ -420,7 +420,7 @@ final class AddressBarButtonsViewController: NSViewController {
         guard let tabViewModel,
               let state = tabViewModel.usedPermissions.geolocation
         else {
-            Logger.general.debug("Selected tab view model is nil or no geolocation state")
+            Logger.general.error("Selected tab view model is nil or no geolocation state")
             return
         }
         if case .requested(let query) = state {
