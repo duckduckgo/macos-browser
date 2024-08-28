@@ -19,6 +19,7 @@
 import Foundation
 import Common
 import os.log
+import BrowserServicesKit
 
 /// Manages security-scoped resource access to a file URL.
 ///
