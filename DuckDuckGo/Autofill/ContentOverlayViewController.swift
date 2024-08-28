@@ -129,7 +129,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
 
     private func initWebView() {
         let scriptSourceProvider = buildAutofillSource()
-        self.topAutofillUserScript = OverlayAutofillUserScript(scriptSourceProvider: scriptSourceProvider, overlay: self)
+        self.topAutofillUserScript = OverlayAutofillUserScript(scriptSourceProvider: scriptSourceProvider, overlay: self, loginImportStateProvider: UserDefaults.standard)
         guard let topAutofillUserScript = topAutofillUserScript else { return }
         let configuration = WKWebViewConfiguration()
 
