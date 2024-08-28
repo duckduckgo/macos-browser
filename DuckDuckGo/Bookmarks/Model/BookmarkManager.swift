@@ -20,6 +20,7 @@ import Bookmarks
 import Cocoa
 import Combine
 import Common
+import os.log
 
 protocol BookmarkManager: AnyObject {
 
@@ -61,12 +62,14 @@ protocol BookmarkManager: AnyObject {
     var listPublisher: Published<BookmarkList?>.Publisher { get }
     var list: BookmarkList? { get }
 
+    var sortModePublisher: Published<BookmarksSortMode>.Publisher { get }
+    var sortMode: BookmarksSortMode { get set }
+
     func requestSync()
 
 }
 
 final class LocalBookmarkManager: BookmarkManager {
-
     static let shared = LocalBookmarkManager()
 
     init(bookmarkStore: BookmarkStore? = nil, faviconManagement: FaviconManagement? = nil) {
@@ -76,7 +79,9 @@ final class LocalBookmarkManager: BookmarkManager {
         if let faviconManagement {
             self.faviconManagement = faviconManagement
         }
+
         self.subscribeToFavoritesDisplayMode()
+        self.sortMode = sortRepository.storedSortMode
     }
 
     private func subscribeToFavoritesDisplayMode() {
@@ -93,8 +98,16 @@ final class LocalBookmarkManager: BookmarkManager {
     @Published private(set) var list: BookmarkList?
     var listPublisher: Published<BookmarkList?>.Publisher { $list }
 
+    @Published var sortMode: BookmarksSortMode = .manual {
+        didSet {
+            sortRepository.storedSortMode = sortMode
+        }
+    }
+    var sortModePublisher: Published<BookmarksSortMode>.Publisher { $sortMode }
+
     private lazy var bookmarkStore: BookmarkStore = LocalBookmarkStore(bookmarkDatabase: BookmarkDatabase.shared)
     private lazy var faviconManagement: FaviconManagement = FaviconManager.shared
+    private lazy var sortRepository: SortBookmarksRepository = SortBookmarksUserDefaults()
 
     private var favoritesDisplayMode: FavoritesDisplayMode = .displayNative(.desktop)
     private var favoritesDisplayModeCancellable: AnyCancellable?
@@ -104,19 +117,19 @@ final class LocalBookmarkManager: BookmarkManager {
     func loadBookmarks() {
         bookmarkStore.loadAll(type: .topLevelEntities) { [weak self] (topLevelEntities, error) in
             guard error == nil, let topLevelEntities = topLevelEntities else {
-                os_log("LocalBookmarkManager: Failed to fetch entities.", type: .error)
+                Logger.bookmarks.error("LocalBookmarkManager: Failed to fetch entities.")
                 return
             }
 
             self?.bookmarkStore.loadAll(type: .bookmarks) { [weak self] (bookmarks, error) in
                 guard error == nil, let bookmarks = bookmarks else {
-                    os_log("LocalBookmarkManager: Failed to fetch bookmarks.", type: .error)
+                    Logger.bookmarks.error("LocalBookmarkManager: Failed to fetch bookmarks.")
                     return
                 }
 
                 self?.bookmarkStore.loadAll(type: .favorites) { [weak self] (favorites, error) in
                     guard error == nil, let favorites = favorites else {
-                        os_log("LocalBookmarkManager: Failed to fetch favorites.", type: .error)
+                        Logger.bookmarks.error("LocalBookmarkManager: Failed to fetch favorites.")
                         return
                     }
 
@@ -158,7 +171,7 @@ final class LocalBookmarkManager: BookmarkManager {
         guard list != nil else { return nil }
 
         guard !isUrlBookmarked(url: url) else {
-            os_log("LocalBookmarkManager: Url is already bookmarked", type: .error)
+            Logger.bookmarks.error("LocalBookmarkManager: Url is already bookmarked")
             return nil
         }
 
@@ -188,7 +201,7 @@ final class LocalBookmarkManager: BookmarkManager {
     func remove(bookmark: Bookmark) {
         guard list != nil else { return }
         guard let latestBookmark = getBookmark(forUrl: bookmark.url) else {
-            os_log("LocalBookmarkManager: Attempt to remove already removed bookmark", type: .error)
+            Logger.bookmarks.error("LocalBookmarkManager: Attempt to remove already removed bookmark")
             return
         }
 
@@ -220,7 +233,7 @@ final class LocalBookmarkManager: BookmarkManager {
     func update(bookmark: Bookmark) {
         guard list != nil else { return }
         guard getBookmark(forUrl: bookmark.url) != nil else {
-            os_log("LocalBookmarkManager: Failed to update bookmark - not in the list.", type: .error)
+            Logger.bookmarks.error("LocalBookmarkManager: Failed to update bookmark - not in the list.")
             return
         }
 
@@ -234,12 +247,12 @@ final class LocalBookmarkManager: BookmarkManager {
     func update(bookmark: Bookmark, withURL url: URL, title: String, isFavorite: Bool) {
         guard list != nil else { return }
         guard getBookmark(forUrl: bookmark.url) != nil else {
-            os_log("LocalBookmarkManager: Failed to update bookmark url - not in the list.", type: .error)
+            Logger.bookmarks.error("LocalBookmarkManager: Failed to update bookmark url - not in the list.")
             return
         }
 
         guard let newBookmark = list?.update(bookmark: bookmark, newURL: url.absoluteString, newTitle: title, newIsFavorite: isFavorite) else {
-            os_log("LocalBookmarkManager: Failed to update URL of bookmark.", type: .error)
+            Logger.bookmarks.error("LocalBookmarkManager: Failed to update URL of bookmark.")
             return
         }
 
@@ -263,12 +276,12 @@ final class LocalBookmarkManager: BookmarkManager {
     func updateUrl(of bookmark: Bookmark, to newUrl: URL) -> Bookmark? {
         guard list != nil else { return nil }
         guard getBookmark(forUrl: bookmark.url) != nil else {
-            os_log("LocalBookmarkManager: Failed to update bookmark url - not in the list.", type: .error)
+            Logger.bookmarks.error("LocalBookmarkManager: Failed to update bookmark url - not in the list.")
             return nil
         }
 
         guard let newBookmark = list?.updateUrl(of: bookmark, to: newUrl.absoluteString) else {
-            os_log("LocalBookmarkManager: Failed to update URL of bookmark.", type: .error)
+            Logger.bookmarks.error("LocalBookmarkManager: Failed to update URL of bookmark.")
             return nil
         }
 
@@ -377,7 +390,7 @@ final class LocalBookmarkManager: BookmarkManager {
             guard let syncService = NSApp.delegateTyped.syncService else {
                 return
             }
-            os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
+            Logger.bookmarks.debug("Requesting sync if enabled")
             syncService.scheduler.notifyDataChanged()
         }
     }

@@ -22,15 +22,11 @@ import WebKit
 import Combine
 import ContentScopeScripts
 import BrowserServicesKit
+import SpecialErrorPages
+import Common
 
 protocol SpecialErrorPageScriptProvider {
     var specialErrorPageUserScript: SpecialErrorPageUserScript? { get }
-}
-
-struct SpecialErrorData: Encodable, Equatable {
-    var kind: String
-    var errorType: String?
-    var domain: String?
 }
 
 public enum SSLErrorType: String {
@@ -61,6 +57,8 @@ final class SpecialErrorPageTabExtension {
     private var shouldBypassSSLError = false
     private var urlCredentialCreator: URLCredentialCreating
     private var featureFlagger: FeatureFlagger
+    private var failingURL: URL?
+    private let tld = TLD()
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -111,9 +109,9 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
             if featureFlagger.isFeatureOn(.sslCertificatesBypass),
                error.errorCode == NSURLErrorServerCertificateUntrusted,
                let errorCode = error.userInfo["_kCFStreamErrorCodeKey"] as? Int {
-                specialErrorPageUserScript?.failingURL = url
+                failingURL = url
                 let domain: String = url.host ?? url.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true)
-                errorData = SpecialErrorData(kind: "ssl", errorType: SSLErrorType.forErrorCode(errorCode).rawValue, domain: domain)
+                errorData = SpecialErrorData(kind: .ssl, errorType: SSLErrorType.forErrorCode(errorCode).rawValue, domain: domain, eTldPlus1: tld.eTLDplus1(failingURL?.host))
                 loadSSLErrorHTML(url: url, alternate: shouldPerformAlternateNavigation)
             }
         }
@@ -121,7 +119,7 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
 
     @MainActor
     func navigationDidFinish(_ navigation: Navigation) {
-        specialErrorPageUserScript?.isEnabled = navigation.url == specialErrorPageUserScript?.failingURL
+        specialErrorPageUserScript?.isEnabled = navigation.url == failingURL
     }
 
     @MainActor
@@ -137,6 +135,7 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
 }
 
 extension SpecialErrorPageTabExtension: SpecialErrorPageUserScriptDelegate {
+    
     func leaveSite() {
         guard webView?.canGoBack == true else {
             webView?.close()
@@ -148,6 +147,10 @@ extension SpecialErrorPageTabExtension: SpecialErrorPageUserScriptDelegate {
     func visitSite() {
         shouldBypassSSLError = true
         _ = webView?.reloadPage()
+    }
+
+    func advancedInfoPresented() {
+        // Not sure what we need to do here
     }
 }
 

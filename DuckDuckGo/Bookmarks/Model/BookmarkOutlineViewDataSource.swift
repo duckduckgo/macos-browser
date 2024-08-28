@@ -19,6 +19,7 @@
 import AppKit
 import Common
 import Foundation
+import os.log
 
 final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NSOutlineViewDelegate {
 
@@ -209,8 +210,8 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
             return .none
         }
 
-        let bookmarks = PasteboardBookmark.pasteboardBookmarks(with: info.draggingPasteboard)
-        let folders = PasteboardFolder.pasteboardFolders(with: info.draggingPasteboard)
+        let bookmarks = PasteboardBookmark.pasteboardBookmarks(with: info.draggingPasteboard.pasteboardItems)
+        let folders = PasteboardFolder.pasteboardFolders(with: info.draggingPasteboard.pasteboardItems)
 
         if let bookmarks = bookmarks, let folders = folders {
             let canMoveBookmarks = validateDrop(for: bookmarks, destination: destinationNode) == .move
@@ -305,13 +306,13 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
                     bookmark?.isFavorite = true
                 }, completion: { error in
                     if let error = error {
-                        os_log("Failed to update entities during drop via outline view: %s", error.localizedDescription)
+                        Logger.bookmarks.error("Failed to update entities during drop via outline view: \(error.localizedDescription, privacy: .public)")
                     }
                 })
             } else if pseudoFolder == .bookmarks {
                 bookmarkManager.add(objectsWithUUIDs: draggedObjectIdentifiers, to: nil) { error in
                     if let error = error {
-                        os_log("Failed to accept nil parent drop via outline view: %s", error.localizedDescription)
+                        Logger.bookmarks.error("Failed to accept nil parent drop via outline view: \(error.localizedDescription, privacy: .public)")
                     }
                 }
             }
@@ -340,7 +341,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         let parent: ParentFolderType = (representedObject as? BookmarkFolder).map { .parent(uuid: $0.id) } ?? .root
         bookmarkManager.move(objectUUIDs: draggedObjectIdentifiers, toIndex: index, withinParentFolder: parent) { error in
             if let error = error {
-                os_log("Failed to accept existing parent drop via outline view: %s", error.localizedDescription)
+                Logger.bookmarks.error("Failed to accept existing parent drop via outline view: \(error.localizedDescription, privacy: .public)")
             }
         }
 

@@ -1,5 +1,5 @@
 //
-//  UserDefaults+vpnLegacyUser.swift
+//  Logger+Fire.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -17,24 +17,8 @@
 //
 
 import Foundation
+import os.log
 
-extension UserDefaults {
-    static var vpnLegacyUserAccessDisabledOnceKey: String {
-        "vpnLegacyUserAccessDisabledOnce"
-    }
-
-    @objc
-    dynamic var vpnLegacyUserAccessDisabledOnce: Bool {
-        get {
-            bool(forKey: Self.vpnLegacyUserAccessDisabledOnceKey)
-        }
-
-        set {
-            set(newValue, forKey: Self.vpnLegacyUserAccessDisabledOnceKey)
-        }
-    }
-
-    func resetVPNLegacyUserAccessDisabledOnce() {
-        removeObject(forKey: Self.vpnLegacyUserAccessDisabledOnceKey)
-    }
+public extension Logger {
+    static var fire = { Logger(subsystem: "Fire", category: "") }()
 }

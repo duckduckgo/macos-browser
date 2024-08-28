@@ -18,12 +18,14 @@
 
 import AppKit
 import Foundation
+import AppKitExtensions
 
 extension UserDefaults {
     /// The app group's shared UserDefaults
     static let netP = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .netP))!
     static let dbp = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .dbp))!
     static let subs = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .subs))!
+    static let appConfiguration = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .appConfiguration))!
 }
 
 public struct UserDefaultsWrapperKey: RawRepresentable {
@@ -73,6 +75,7 @@ public struct UserDefaultsWrapper<T> {
         case alwaysRequestDownloadLocationKey = "preferences.download-location.always-request"
         case openDownloadsPopupOnCompletionKey = "preferences.downloads.open.on.completion"
         case autoconsentEnabled = "preferences.autoconsent-enabled"
+        case autoconsentFilterlistExperimentCohort = "preferences.autoconsent.filterListExperimentCohort"
         case duckPlayerMode = "preferences.duck-player"
         case youtubeOverlayInteracted = "preferences.youtube-overlay-interacted"
         case youtubeOverlayButtonsUsed = "preferences.youtube-overlay-user-used-buttons"
@@ -173,8 +176,6 @@ public struct UserDefaultsWrapper<T> {
         // VPN
 
         case networkProtectionExcludedRoutes = "netp.excluded-routes"
-        case networkProtectionTermsAndConditionsAccepted = "network-protection.waitlist-terms-and-conditions.accepted"
-        case networkProtectionWaitlistSignUpPromptDismissed = "network-protection.waitlist.sign-up-prompt-dismissed"
 
         // VPN: Shared Defaults
         // ---
@@ -182,8 +183,6 @@ public struct UserDefaultsWrapper<T> {
         // or else KVO will just not work as of 2023-08-07
 
         case networkProtectionOnboardingStatusRawValue = "networkProtectionOnboardingStatusRawValue"
-        case networkProtectionWaitlistActiveOverrideRawValue = "networkProtectionWaitlistActiveOverrideRawValue"
-        case networkProtectionWaitlistEnabledOverrideRawValue = "networkProtectionWaitlistEnabledOverrideRawValue"
 
         // Updates
         case automaticUpdates = "updates.automatic"

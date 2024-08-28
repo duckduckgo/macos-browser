@@ -20,6 +20,7 @@ import Foundation
 import Subscription
 import NetworkProtection
 import Common
+import os.log
 
 extension NetworkProtectionKeychainTokenStore: SubscriptionTokenStoring {
 
@@ -32,7 +33,7 @@ extension NetworkProtectionKeychainTokenStore: SubscriptionTokenStoring {
         if token.hasPrefix("ddg:") {
             token = token.replacingOccurrences(of: "ddg:", with: "")
         }
-        os_log("🟢 Wrapper successfully fetched token %{token}@", log: .networkProtection, token)
+        Logger.networkProtection.debug("🟢 Wrapper successfully fetched token \(token)")
         return token
     }
 

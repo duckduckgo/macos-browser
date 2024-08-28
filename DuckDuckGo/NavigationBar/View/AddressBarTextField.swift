@@ -24,6 +24,7 @@ import Common
 import PixelKit
 import Suggestions
 import Subscription
+import os.log
 
 final class AddressBarTextField: NSTextField {
 
@@ -348,7 +349,7 @@ final class AddressBarTextField: NSTextField {
 
     private func updateTabUrlWithUrl(_ providedUrl: URL, userEnteredValue: String, downloadRequested: Bool, suggestion: Suggestion?) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("AddressBarTextField: Selected tab view model is nil", type: .error)
+            Logger.general.error("AddressBarTextField: Selected tab view model is nil")
             return
         }
 
@@ -410,7 +411,7 @@ final class AddressBarTextField: NSTextField {
         makeUrl(suggestion: suggestion,
                 stringValueWithoutSuffix: stringValueWithoutSuffix) { [weak self] url, userEnteredValue, isUpgraded in
             guard let self, let url else {
-                os_log("AddressBarTextField: Making url from address bar string failed", type: .error)
+                Logger.general.error("AddressBarTextField: Making url from address bar string failed")
                 return
             }
             let tab = Tab(content: .url(url, source: .userEntered(userEnteredValue)),
@@ -500,7 +501,7 @@ final class AddressBarTextField: NSTextField {
 
     private func displaySelectedSuggestionViewModel() {
         guard let suggestionWindow = suggestionWindowController?.window else {
-            os_log("AddressBarTextField: Window not available", type: .error)
+            Logger.general.error("AddressBarTextField: Window not available")
             return
         }
         guard suggestionWindow.isVisible else { return }
@@ -575,7 +576,7 @@ final class AddressBarTextField: NSTextField {
 
     private func showSuggestionWindow() {
         guard let window = window, let suggestionWindow = suggestionWindowController?.window else {
-            os_log("AddressBarTextField: Window not available", type: .error)
+            Logger.general.error("AddressBarTextField: Window not available")
             return
         }
 
@@ -607,7 +608,7 @@ final class AddressBarTextField: NSTextField {
             return
         }
         guard let superview = superview else {
-            os_log("AddressBarTextField: Superview not available", type: .error)
+            Logger.general.error("AddressBarTextField: Superview not available")
             return
         }
 

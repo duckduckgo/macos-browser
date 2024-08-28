@@ -21,7 +21,7 @@ import Combine
 import Common
 import BrowserServicesKit
 import PixelKit
-
+import os.log
 import NetworkProtection
 import NetworkProtectionIPC
 import NetworkProtectionUI
@@ -95,6 +95,7 @@ final class NavigationBarViewController: NSViewController {
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var credentialsToSaveCancellable: AnyCancellable?
     private var vpnToggleCancellable: AnyCancellable?
+    private var feedbackFormCancellable: AnyCancellable?
     private var passwordManagerNotificationCancellable: AnyCancellable?
     private var pinnedViewsNotificationCancellable: AnyCancellable?
     private var navigationButtonsCancellables = Set<AnyCancellable>()
@@ -151,6 +152,7 @@ final class NavigationBarViewController: NSViewController {
         listenToPasswordManagerNotifications()
         listenToPinningManagerNotifications()
         listenToMessageNotifications()
+        listenToFeedbackFormNotifications()
         subscribeToDownloads()
         addContextMenu()
 
@@ -212,7 +214,7 @@ final class NavigationBarViewController: NSViewController {
 
     @IBAction func goBackAction(_ sender: NSButton) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", type: .error, className)
+            Logger.navigation.error("Selected tab view model is nil")
             return
         }
 
@@ -228,7 +230,7 @@ final class NavigationBarViewController: NSViewController {
 
     @IBAction func goForwardAction(_ sender: NSButton) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", type: .error, className)
+            Logger.navigation.error("Selected tab view model is nil")
             return
         }
 
@@ -249,7 +251,7 @@ final class NavigationBarViewController: NSViewController {
 
     @IBAction func refreshOrStopAction(_ sender: NSButton) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", type: .error, className)
+            Logger.navigation.error("Selected tab view model is nil")
             return
         }
 
@@ -262,7 +264,7 @@ final class NavigationBarViewController: NSViewController {
 
     @IBAction func homeButtonAction(_ sender: NSButton) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", type: .error, className)
+            Logger.navigation.error("Selected tab view model is nil")
             return
         }
         selectedTabViewModel.tab.openHomePage()
@@ -402,6 +404,12 @@ final class NavigationBarViewController: NSViewController {
                 }
             }
             .store(in: &cancellables)
+    }
+
+    func listenToFeedbackFormNotifications() {
+        feedbackFormCancellable = NotificationCenter.default.publisher(for: .OpenUnifiedFeedbackForm).receive(on: DispatchQueue.main).sink { _ in
+            WindowControllersManager.shared.showShareFeedbackModal(source: .ppro)
+        }
     }
 
     @objc private func showVPNUninstalledFeedback() {
@@ -866,23 +874,23 @@ final class NavigationBarViewController: NSViewController {
         let autofillPreferences = AutofillPreferences()
 
         if autofillPreferences.askToSaveUsernamesAndPasswords, let credentials = data.credentials {
-            os_log("Presenting Save Credentials popover", log: .passwordManager)
+            Logger.passwordManager.debug("Presenting Save Credentials popover")
             popovers.displaySaveCredentials(credentials,
                                             automaticallySaved: data.automaticallySavedCredentials,
                                             usingView: passwordManagementButton,
                                             withDelegate: self)
         } else if autofillPreferences.askToSavePaymentMethods, let card = data.creditCard {
-            os_log("Presenting Save Payment Method popover", log: .passwordManager)
+            Logger.passwordManager.debug("Presenting Save Payment Method popover")
             popovers.displaySavePaymentMethod(card,
                                               usingView: passwordManagementButton,
                                               withDelegate: self)
         } else if autofillPreferences.askToSaveAddresses, let identity = data.identity {
-            os_log("Presenting Save Identity popover", log: .passwordManager)
+            Logger.passwordManager.debug("Presenting Save Identity popover")
             popovers.displaySaveIdentity(identity,
                                          usingView: passwordManagementButton,
                                          withDelegate: self)
         } else {
-            os_log("Received save autofill data call, but there was no data to present", log: .passwordManager)
+            Logger.passwordManager.error("Received save autofill data call, but there was no data to present")
         }
     }
 
@@ -1169,4 +1177,5 @@ extension NavigationBarViewController {
 
 extension Notification.Name {
     static let ToggleNetworkProtectionInMainWindow = Notification.Name("com.duckduckgo.vpn.toggle-popover-in-main-window")
+    static let OpenUnifiedFeedbackForm = Notification.Name("com.duckduckgo.subscription.open-unified-feedback-form")
 }

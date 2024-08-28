@@ -81,7 +81,8 @@ final class MoreOptionsMenuTests: XCTestCase {
                                           passwordManagerCoordinator: passwordManagerCoordinator,
                                           vpnFeatureGatekeeper: networkProtectionVisibilityMock,
                                           subscriptionFeatureAvailability: SubscriptionFeatureAvailabilityMock(isFeatureAvailable: true,
-                                                                                                               isSubscriptionPurchaseAllowed: true),
+                                                                                                               isSubscriptionPurchaseAllowed: true,
+                                                                                                               usesUnifiedFeedbackForm: false),
                                           sharingMenu: NSMenu(),
                                           internalUserDecider: internalUserDecider,
                                           subscriptionManager: subscriptionManager)
@@ -269,10 +270,6 @@ final class NetworkProtectionVisibilityMock: VPNFeatureGatekeeper {
 
     func disableForAllUsers() async {
         // intentional no-op
-    }
-
-    var isEligibleForThankYouMessage: Bool {
-        false
     }
 
     func disableIfUserHasNoAccess() async {

@@ -19,11 +19,19 @@
 import Foundation
 import GRDB
 import Common
+import os.log
+
+enum DataBrokerProtectionDatabaseMigrationErrors: Error {
+    case deleteOrphanedRecordFailed
+    case recreateTablesFailed
+    case foreignKeyViolation
+}
 
 /// Conforming types provide migrations for the PIR database. Mostly utilized for testing.
 protocol DataBrokerProtectionDatabaseMigrationsProvider {
     static var v2Migrations: (inout DatabaseMigrator) throws -> Void { get }
     static var v3Migrations: (inout DatabaseMigrator) throws -> Void { get }
+    static var v4Migrations: (inout DatabaseMigrator) throws -> Void { get }
 }
 
 final class DefaultDataBrokerProtectionDatabaseMigrationsProvider: DataBrokerProtectionDatabaseMigrationsProvider {
@@ -37,6 +45,13 @@ final class DefaultDataBrokerProtectionDatabaseMigrationsProvider: DataBrokerPro
         migrator.registerMigration("v1", migrate: migrateV1(database:))
         migrator.registerMigration("v2", migrate: migrateV2(database:))
         migrator.registerMigration("v3", migrate: migrateV3(database:))
+    }
+
+    static var v4Migrations: (inout DatabaseMigrator) throws -> Void = { migrator in
+        migrator.registerMigration("v1", migrate: migrateV1(database:))
+        migrator.registerMigration("v2", migrate: migrateV2(database:))
+        migrator.registerMigration("v3", migrate: migrateV3(database:))
+        migrator.registerMigration("v4", migrate: migrateV4(database:))
     }
 
     static func migrateV1(database: Database) throws {
@@ -238,7 +253,21 @@ final class DefaultDataBrokerProtectionDatabaseMigrationsProvider: DataBrokerPro
             // Throws an error if a foreign key violation exists in the database.
             try database.checkForeignKeys()
         } catch {
-            throw DataBrokerProtectionDatabaseErrors.migrationFailureIntegrityCheck
+            throw DataBrokerProtectionDatabaseMigrationErrors.foreignKeyViolation
+        }
+    }
+
+    static func migrateV4(database: Database) throws {
+        try database.alter(table: OptOutDB.databaseTableName) {
+            // We default `createdDate` values to unix epoch to avoid any existing data being treated as new data
+            $0.add(column: OptOutDB.Columns.createdDate.name, .datetime).notNull().defaults(to: Date(timeIntervalSince1970: 0))
+
+            // For existing data this will be nil even for opt outs that have been submitted
+            $0.add(column: OptOutDB.Columns.submittedSuccessfullyDate.name, .datetime)
+
+            $0.add(column: OptOutDB.Columns.sevenDaysConfirmationPixelFired.name, .boolean).notNull().defaults(to: false)
+            $0.add(column: OptOutDB.Columns.fourteenDaysConfirmationPixelFired.name, .boolean).notNull().defaults(to: false)
+            $0.add(column: OptOutDB.Columns.twentyOneDaysConfirmationPixelFired.name, .boolean).notNull().defaults(to: false)
         }
     }
 
@@ -279,8 +308,12 @@ final class DefaultDataBrokerProtectionDatabaseMigrationsProvider: DataBrokerPro
         deleteStatements.append(sqlOrphanedCleanupFromProfile(of: AddressDB.databaseTableName))
         deleteStatements.append(sqlOrphanedCleanupFromProfile(of: PhoneDB.databaseTableName))
 
-        for sql in deleteStatements {
-            try database.execute(sql: sql)
+        do {
+            for sql in deleteStatements {
+                try database.execute(sql: sql)
+            }
+        } catch {
+            throw DataBrokerProtectionDatabaseMigrationErrors.deleteOrphanedRecordFailed
         }
 
         // As a precaution, explicitly check for any foreign key violations which were missed
@@ -292,7 +325,7 @@ final class DefaultDataBrokerProtectionDatabaseMigrationsProvider: DataBrokerPro
                 try database.execute(sql: sql, arguments: [violation.originRowID])
             }
         } catch {
-            os_log("Database error: error cleaning up foreign key violations, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("Database error: error cleaning up foreign key violations, error: \(error.localizedDescription, privacy: .public)")
         }
     }
 
@@ -356,16 +389,20 @@ final class DefaultDataBrokerProtectionDatabaseMigrationsProvider: DataBrokerPro
     }
 
     private static func recreateTablesV3(database: Database) throws {
-        try recreateNameTable(database: database)
-        try recreateAddressTable(database: database)
-        try recreatePhoneTable(database: database)
-        try recreateProfileQueryTable(database: database)
-        try recreateScanTable(database: database)
-        try recreateScanHistoryTable(database: database)
-        try recreateExtractedProfileTable(database: database)
-        try recreateOptOutTable(database: database)
-        try recreateOptOutHistoryTable(database: database)
-        try recreateOptOutAttemptTable(database: database)
+        do {
+            try recreateNameTable(database: database)
+            try recreateAddressTable(database: database)
+            try recreatePhoneTable(database: database)
+            try recreateProfileQueryTable(database: database)
+            try recreateScanTable(database: database)
+            try recreateScanHistoryTable(database: database)
+            try recreateExtractedProfileTable(database: database)
+            try recreateOptOutTable(database: database)
+            try recreateOptOutHistoryTable(database: database)
+            try recreateOptOutAttemptTable(database: database)
+        } catch {
+            throw DataBrokerProtectionDatabaseMigrationErrors.recreateTablesFailed
+        }
     }
 
     private static func recreateNameTable(database: Database) throws {

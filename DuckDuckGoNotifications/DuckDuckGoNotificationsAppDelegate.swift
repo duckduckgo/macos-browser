@@ -23,17 +23,18 @@ import Common
 import NetworkExtension
 import NetworkProtection
 import VPNAppLauncher
+import os.log
 
 @objc(Application)
 final class DuckDuckGoNotificationsApplication: NSApplication {
     private let _delegate = DuckDuckGoNotificationsAppDelegate()
 
     override init() {
-        os_log(.error, log: .networkProtection, "🟢 Notifications Agent starting: %{public}d", ProcessInfo.processInfo.processIdentifier)
+        Logger.networkProtection.error("🟢 Notifications Agent starting: \(ProcessInfo.processInfo.processIdentifier, privacy: .public)")
 
         // prevent agent from running twice
         if let anotherInstance = NSRunningApplication.runningApplications(withBundleIdentifier: Bundle.main.bundleIdentifier!).first(where: { $0 != .current }) {
-            os_log(.error, log: .networkProtection, "🔴 Stopping: another instance is running: %{public}d.", anotherInstance.processIdentifier)
+            Logger.networkProtection.error("Stopping: another instance is running: \(anotherInstance.processIdentifier, privacy: .public).")
             exit(EXIT_SUCCESS)
         }
 
@@ -69,14 +70,14 @@ final class DuckDuckGoNotificationsAppDelegate: NSObject, NSApplicationDelegate 
     private var cancellables = Set<AnyCancellable>()
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        os_log("Login item finished launching", log: .networkProtectionLoginItemLog, type: .info)
+        Logger.networkProtection.info("Login item finished launching")
 
         startObservingVPNStatusChanges()
-        os_log("Login item listening")
+        Logger.networkProtection.info("Login item listening")
     }
 
     private func startObservingVPNStatusChanges() {
-        os_log("Register with sysex")
+        Logger.networkProtection.info("Register with sysex")
 
         distributedNotificationCenter.publisher(for: .showIssuesStartedNotification)
             .receive(on: DispatchQueue.main)
@@ -110,7 +111,7 @@ final class DuckDuckGoNotificationsAppDelegate: NSObject, NSApplicationDelegate 
             }.store(in: &cancellables)
 
         distributedNotificationCenter.publisher(for: .serverSelected).sink { [weak self] _ in
-            os_log("Got notification: listener started")
+            Logger.networkProtection.info("Got notification: listener started")
             self?.notificationsPresenter.requestAuthorization()
         }.store(in: &cancellables)
 
@@ -128,33 +129,33 @@ final class DuckDuckGoNotificationsAppDelegate: NSObject, NSApplicationDelegate 
     // MARK: - Showing Notifications
 
     func showConnectedNotification(serverLocation: String?) {
-        os_log("Presenting reconnected notification", log: .networkProtection, type: .info)
-        notificationsPresenter.showConnectedNotification(serverLocation: serverLocation)
+        Logger.networkProtection.info("Presenting reconnected notification")
+        notificationsPresenter.showConnectedNotification(serverLocation: serverLocation, snoozeEnded: false)
     }
 
     func showReconnectingNotification() {
-        os_log("Presenting reconnecting notification", log: .networkProtection, type: .info)
+        Logger.networkProtection.info("Presenting reconnecting notification")
         notificationsPresenter.showReconnectingNotification()
     }
 
     func showConnectionFailureNotification() {
-        os_log("Presenting failure notification", log: .networkProtection, type: .info)
+        Logger.networkProtection.info("Presenting failure notification")
         notificationsPresenter.showConnectionFailureNotification()
     }
 
     func showSupersededNotification() {
-        os_log("Presenting Superseded notification", log: .networkProtection, type: .info)
+        Logger.networkProtection.info("Presenting Superseded notification")
         notificationsPresenter.showSupersededNotification()
     }
 
     func showEntitlementNotification() {
-        os_log("Presenting Entitlements notification", log: .networkProtection, type: .info)
+        Logger.networkProtection.info("Presenting Entitlements notification")
 
         notificationsPresenter.showEntitlementNotification()
     }
 
     func showTestNotification() {
-        os_log("Presenting test notification", log: .networkProtection, type: .info)
+        Logger.networkProtection.info("Presenting test notification")
         notificationsPresenter.showTestNotification()
     }
 

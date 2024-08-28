@@ -18,6 +18,7 @@
 
 import Foundation
 import BrowserServicesKit
+import SpecialErrorPages
 
 extension SpecialPagesUserScript {
     @MainActor
@@ -38,25 +39,16 @@ extension SpecialPagesUserScript {
     }
 
     func withErrorPages() {
-        let specialErrorPageUserScript = SpecialErrorPageUserScript()
+        let specialErrorPageUserScript = SpecialErrorPageUserScript(localeStrings: SpecialErrorPageUserScript.localeStrings,
+                                                                    languageCode: Locale.current.languageCode ?? "en")
         self.registerSubfeature(delegate: specialErrorPageUserScript)
     }
-
-#if SPARKLE
-    func withReleaseNotes() {
-        let releaseNotesUserScript = ReleaseNotesUserScript()
-        self.registerSubfeature(delegate: releaseNotesUserScript)
-    }
-#endif
 
     @MainActor
     func withAllSubfeatures() {
         withOnboarding()
         withErrorPages()
         withDuckPlayerIfAvailable()
-#if SPARKLE
-        withReleaseNotes()
-#endif
     }
 
     @MainActor

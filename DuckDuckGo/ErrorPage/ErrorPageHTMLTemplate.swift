@@ -44,18 +44,3 @@ struct ErrorPageHTMLTemplate {
     }
 
 }
-
-struct SpecialErrorPageHTMLTemplate {
-
-    static var htmlFromTemplate: String {
-        guard let file = ContentScopeScripts.Bundle.path(forResource: "index", ofType: "html", inDirectory: "pages/special-error") else {
-            assertionFailure("HTML template not found")
-            return ""
-        }
-        guard let html = try? String(contentsOfFile: file) else {
-            assertionFailure("Should be able to load template")
-            return ""
-        }
-        return html
-    }
-}

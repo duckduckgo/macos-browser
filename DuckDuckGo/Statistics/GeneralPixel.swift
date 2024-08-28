@@ -130,6 +130,8 @@ enum GeneralPixel: PixelKitEventV2 {
     case duckPlayerAutoplaySettingsOff
     case duckPlayerNewTabSettingsOn
     case duckPlayerNewTabSettingsOff
+    case duckPlayerContingencySettingsDisplayed
+    case duckPlayerContingencyLearnMoreClicked
 
     // Dashboard
     case dashboardProtectionAllowlistAdd(triggerOrigin: String?)
@@ -137,6 +139,15 @@ enum GeneralPixel: PixelKitEventV2 {
 
     // VPN
     case vpnBreakageReport(category: String, description: String, metadata: String)
+
+    // Unified Feedback
+    case pproFeedbackFeatureRequest(description: String, source: String)
+    case pproFeedbackGeneralFeedback(description: String, source: String)
+    case pproFeedbackReportIssue(source: String, category: String, subcategory: String, description: String, metadata: String)
+
+    case pproFeedbackFormShow
+    case pproFeedbackSubmitScreenShow(source: String, reportType: String, category: String, subcategory: String)
+    case pproFeedbackSubmitScreenFAQClick(source: String, reportType: String, category: String, subcategory: String)
 
     case networkProtectionEnabledOnSearch
     case networkProtectionGeoswitchingOpened
@@ -604,6 +615,10 @@ enum GeneralPixel: PixelKitEventV2 {
             return "duckplayer_mac_newtab_setting-on"
         case .duckPlayerNewTabSettingsOff:
             return "duckplayer_mac_newtab_setting-off"
+        case .duckPlayerContingencySettingsDisplayed:
+            return "duckplayer_mac_contingency_settings-displayed"
+        case .duckPlayerContingencyLearnMoreClicked:
+            return "duckplayer_mac_contingency_learn-more-clicked"
         case .dashboardProtectionAllowlistAdd:
             return "m_mac_mp_wla"
         case .dashboardProtectionAllowlistRemove:
@@ -618,6 +633,19 @@ enum GeneralPixel: PixelKitEventV2 {
 
         case .vpnBreakageReport:
             return "m_mac_vpn_breakage_report"
+
+        case .pproFeedbackFeatureRequest:
+            return "m_mac_ppro_feedback_feature-request"
+        case .pproFeedbackGeneralFeedback:
+            return "m_mac_ppro_feedback_general-feedback"
+        case .pproFeedbackReportIssue:
+            return "m_mac_ppro_feedback_report-issue"
+        case .pproFeedbackFormShow:
+            return "m_mac_ppro_feedback_general-screen_show"
+        case .pproFeedbackSubmitScreenShow:
+            return "m_mac_ppro_feedback_submit-screen_show"
+        case .pproFeedbackSubmitScreenFAQClick:
+            return "m_mac_ppro_feedback_submit-screen-faq_click"
 
         case .networkProtectionEnabledOnSearch:
             return "m_mac_netp_ev_enabled_on_search"
@@ -1070,6 +1098,39 @@ enum GeneralPixel: PixelKitEventV2 {
                 PixelKit.Parameters.vpnBreakageCategory: category,
                 PixelKit.Parameters.vpnBreakageDescription: description,
                 PixelKit.Parameters.vpnBreakageMetadata: metadata
+            ]
+
+        case .pproFeedbackFeatureRequest(let description, let source):
+            return [
+                PixelKit.Parameters.pproIssueDescription: description,
+                PixelKit.Parameters.pproIssueSource: source,
+            ]
+        case .pproFeedbackGeneralFeedback(let description, let source):
+            return [
+                PixelKit.Parameters.pproIssueDescription: description,
+                PixelKit.Parameters.pproIssueSource: source,
+            ]
+        case .pproFeedbackReportIssue(let source, let category, let subcategory, let description, let metadata):
+            return [
+                PixelKit.Parameters.pproIssueSource: source,
+                PixelKit.Parameters.pproIssueCategory: category,
+                PixelKit.Parameters.pproIssueSubcategory: subcategory,
+                PixelKit.Parameters.pproIssueDescription: description,
+                PixelKit.Parameters.pproIssueMetadata: metadata,
+            ]
+        case .pproFeedbackSubmitScreenShow(let source, let reportType, let category, let subcategory):
+            return [
+                PixelKit.Parameters.pproIssueSource: source,
+                PixelKit.Parameters.pproIssueReportType: reportType,
+                PixelKit.Parameters.pproIssueCategory: category,
+                PixelKit.Parameters.pproIssueSubcategory: subcategory,
+            ]
+        case .pproFeedbackSubmitScreenFAQClick(let source, let reportType, let category, let subcategory):
+            return [
+                PixelKit.Parameters.pproIssueSource: source,
+                PixelKit.Parameters.pproIssueReportType: reportType,
+                PixelKit.Parameters.pproIssueCategory: category,
+                PixelKit.Parameters.pproIssueSubcategory: subcategory,
             ]
 
         case .onboardingCohortAssigned(let cohort):

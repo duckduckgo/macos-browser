@@ -21,6 +21,7 @@ import BrowserServicesKit
 import UserScript
 import WebKit
 import Subscription
+import SpecialErrorPages
 
 @MainActor
 final class UserScripts: UserScriptsProvider {
@@ -68,7 +69,8 @@ final class UserScripts: UserScriptsProvider {
 
         autoconsentUserScript = AutoconsentUserScript(scriptSource: sourceProvider, config: sourceProvider.privacyConfigurationManager.privacyConfig)
 
-        specialErrorPageUserScript = SpecialErrorPageUserScript()
+        specialErrorPageUserScript = SpecialErrorPageUserScript(localeStrings: SpecialErrorPageUserScript.localeStrings,
+                                                                languageCode: Locale.current.languageCode ?? "en")
 
         onboardingUserScript = OnboardingUserScript(onboardingActionsManager: sourceProvider.onboardingActionsManager!)
 
