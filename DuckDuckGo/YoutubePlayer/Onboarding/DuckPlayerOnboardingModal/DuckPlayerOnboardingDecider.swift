@@ -74,7 +74,11 @@ struct DefaultDuckPlayerOnboardingDecider: DuckPlayerOnboardingDecider {
     var canDisplayOnboarding: Bool {
         // returning false until we turn on the experiment
         return false
-        // return !defaults.onboardingWasDisplayed && preferences.duckPlayerMode == .alwaysAsk && !preferences.youtubeOverlayAnyButtonPressed
+        // return !defaults.onboardingWasDisplayed && preferences.duckPlayerMode == .alwaysAsk && isUserInExperiment
+    }
+
+    private var isUserInExperiment: Bool {
+        DefaultVariantManager().isSupported(feature: .duckPlayerOnboarding)
     }
 
     var shouldOpenFirstVideoOnDuckPlayer: Bool {
