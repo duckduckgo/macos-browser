@@ -42,17 +42,6 @@ extension HomePage.Views {
                 BurnerHomePageView()
             } else {
                 regularHomePageView(includingContinueSetUpCards: model.isContinueSetUpAvailable)
-                    .contextMenu(ContextMenu(menuItems: {
-                        if model.isContinueSetUpAvailable {
-                            Toggle(UserText.newTabMenuItemShowContinuteSetUp, isOn: $model.isContinueSetUpVisible)
-                                .toggleStyle(.checkbox)
-                                .visibility(continueSetUpModel.hasContent ? .visible : .gone)
-                        }
-                        Toggle(UserText.newTabMenuItemShowFavorite, isOn: $model.isFavoriteVisible)
-                            .toggleStyle(.checkbox)
-                        Toggle(UserText.newTabMenuItemShowRecentActivity, isOn: $model.isRecentActivityVisible)
-                            .toggleStyle(.checkbox)
-                    }))
             }
         }
 
@@ -76,6 +65,17 @@ extension HomePage.Views {
                             }
                         }
                         .frame(width: isSettingsVisible ? geometry.size.width - settingsPanelWidth : geometry.size.width)
+                        .contextMenu(ContextMenu {
+                            if model.isContinueSetUpAvailable {
+                                Toggle(UserText.newTabMenuItemShowContinuteSetUp, isOn: $model.isContinueSetUpVisible)
+                                    .toggleStyle(.checkbox)
+                                    .visibility(continueSetUpModel.hasContent ? .visible : .gone)
+                            }
+                            Toggle(UserText.newTabMenuItemShowFavorite, isOn: $model.isFavoriteVisible)
+                                .toggleStyle(.checkbox)
+                            Toggle(UserText.newTabMenuItemShowRecentActivity, isOn: $model.isRecentActivityVisible)
+                                .toggleStyle(.checkbox)
+                        })
 
                         if isSettingsVisible {
                             SettingsView(includingContinueSetUpCards: includingContinueSetUpCards, isSettingsVisible: $isSettingsVisible)
