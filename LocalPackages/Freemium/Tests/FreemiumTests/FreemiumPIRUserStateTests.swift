@@ -1,5 +1,5 @@
 //
-//  FreemiumPIRStateTests.swift
+//  FreemiumPIRUserStateTests.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -19,22 +19,23 @@
 import XCTest
 @testable import Freemium
 import Subscription
+import SubscriptionTestingUtilities
 
 final class FreemiumPIRStateTests: XCTestCase {
 
     private static let testSuiteName = "test.defaults.freemium.state.tests"
     private let pir = "macos.browser.freemium.pir.did.onboard"
     private let testUserDefaults = UserDefaults(suiteName: FreemiumPIRStateTests.testSuiteName)!
-    private var mockAccountManager: MockAccountManager!
+    private var mockAccountManager: AccountManagerMock!
 
     override func setUpWithError() throws {
-        mockAccountManager = MockAccountManager()
+        mockAccountManager = AccountManagerMock()
         testUserDefaults.removePersistentDomain(forName: FreemiumPIRStateTests.testSuiteName)
     }
 
     func testSetsHasFreemiumPIR() throws {
         // Given
-        let sut = DefaultFreemiumPIRState(userDefaults: testUserDefaults, accountManager: mockAccountManager)
+        let sut = DefaultFreemiumPIRUserState(userDefaults: testUserDefaults, accountManager: mockAccountManager)
         XCTAssertFalse(testUserDefaults.bool(forKey: pir))
 
         // When
@@ -46,7 +47,7 @@ final class FreemiumPIRStateTests: XCTestCase {
 
     func testGetsHasFreemiumPIR() throws {
         // Given
-        let sut = DefaultFreemiumPIRState(userDefaults: testUserDefaults, accountManager: mockAccountManager)
+        let sut = DefaultFreemiumPIRUserState(userDefaults: testUserDefaults, accountManager: mockAccountManager)
         XCTAssertFalse(sut.didOnboard)
         testUserDefaults.setValue(true, forKey: pir)
         XCTAssertTrue(testUserDefaults.bool(forKey: pir))
@@ -60,14 +61,14 @@ final class FreemiumPIRStateTests: XCTestCase {
 
     func testIsCurrentFreemiumPIRUser_WhenDidOnboardIsTrueAndUserIsNotAuthenticated_ShouldReturnTrue() {
         // Given
-        let sut = DefaultFreemiumPIRState(userDefaults: testUserDefaults, accountManager: mockAccountManager)
+        let sut = DefaultFreemiumPIRUserState(userDefaults: testUserDefaults, accountManager: mockAccountManager)
         XCTAssertFalse(sut.didOnboard)
         testUserDefaults.setValue(true, forKey: pir)
         mockAccountManager.accessToken = nil
         XCTAssertTrue(testUserDefaults.bool(forKey: pir))
 
         // When
-        let result = sut.isCurrentUser
+        let result = sut.isActiveUser
 
         // Then
         XCTAssertTrue(result)
@@ -75,14 +76,14 @@ final class FreemiumPIRStateTests: XCTestCase {
 
     func testIsCurrentFreemiumPIRUser_WhenDidOnboardIsTrueAndUserIsAuthenticated_ShouldReturnFalse() {
         // Given
-        let sut = DefaultFreemiumPIRState(userDefaults: testUserDefaults, accountManager: mockAccountManager)
+        let sut = DefaultFreemiumPIRUserState(userDefaults: testUserDefaults, accountManager: mockAccountManager)
         XCTAssertFalse(sut.didOnboard)
         testUserDefaults.setValue(true, forKey: pir)
         mockAccountManager.accessToken = "some_token"
         XCTAssertTrue(testUserDefaults.bool(forKey: pir))
 
         // When
-        let result = sut.isCurrentUser
+        let result = sut.isActiveUser
 
         // Then
         XCTAssertFalse(result)
@@ -90,14 +91,14 @@ final class FreemiumPIRStateTests: XCTestCase {
 
     func testIsCurrentFreemiumPIRUser_WhenDidOnboardIsFalse_ShouldReturnFalse() {
         // Given
-        let sut = DefaultFreemiumPIRState(userDefaults: testUserDefaults, accountManager: mockAccountManager)
+        let sut = DefaultFreemiumPIRUserState(userDefaults: testUserDefaults, accountManager: mockAccountManager)
         XCTAssertFalse(sut.didOnboard)
         testUserDefaults.setValue(false, forKey: pir)
         mockAccountManager.accessToken = "some_token"
         XCTAssertFalse(testUserDefaults.bool(forKey: pir))
 
         // When
-        let result = sut.isCurrentUser
+        let result = sut.isActiveUser
 
         // Then
         XCTAssertFalse(result)

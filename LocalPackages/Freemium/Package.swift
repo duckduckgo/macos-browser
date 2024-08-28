@@ -36,11 +36,11 @@ let package = Package(
             name: "Freemium",
             dependencies: [
                 .product(name: "Subscription", package: "BrowserServicesKit"),
+                .product(name: "SubscriptionTestingUtilities", package: "BrowserServicesKit"),
             ]
         ),
         .testTarget(
             name: "FreemiumTests",
-            dependencies: ["Freemium"],
-            sources: ["Mocks", "."]),
+            dependencies: ["Freemium"]),
     ]
 )
