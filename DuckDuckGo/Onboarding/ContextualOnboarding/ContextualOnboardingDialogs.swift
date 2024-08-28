@@ -52,12 +52,11 @@ struct OnboardingTryVisitingSiteDialog: View {
     let viewModel: OnboardingSiteSuggestionsViewModel
 
     var body: some View {
-        ScrollView(.vertical) {
-            DaxDialogView(logoPosition: .left) {
-                OnboardingTryVisitingSiteDialogContent(viewModel: viewModel)
-            }
-            .padding()
+        DaxDialogView(logoPosition: .left) {
+            OnboardingTryVisitingSiteDialogContent(viewModel: viewModel)
         }
+        .padding()
+
     }
 }
 
@@ -90,34 +89,33 @@ struct OnboardingFirstSearchDoneDialog: View {
     let gotItAction: () -> Void
 
     var body: some View {
-        ScrollView(.vertical, showsIndicators: false) {
-            DaxDialogView(logoPosition: .left) {
-                VStack {
-                    if showNextScreen {
-                        OnboardingTryVisitingSiteDialogContent(viewModel: viewModel)
-                    } else {
-                        ContextualDaxDialogContent(
-                            orientation: .horizontalStack(alignment: .center),
-                            title: title,
-                            titleFont: OnboardingDialogsContants.titleFont,
-                            message: message, 
-                            messageFont: OnboardingDialogsContants.messageFont,
-                            customActionView: AnyView(
-                                OnboardingPrimaryCTAButton(title: cta) {
-                                    gotItAction()
-                                    withAnimation {
-                                        if shouldFollowUp {
-                                            showNextScreen = true
-                                        }
+        DaxDialogView(logoPosition: .left) {
+            VStack {
+                if showNextScreen {
+                    OnboardingTryVisitingSiteDialogContent(viewModel: viewModel)
+                } else {
+                    ContextualDaxDialogContent(
+                        orientation: .horizontalStack(alignment: .center),
+                        title: title,
+                        titleFont: OnboardingDialogsContants.titleFont,
+                        message: message,
+                        messageFont: OnboardingDialogsContants.messageFont,
+                        customActionView: AnyView(
+                            OnboardingPrimaryCTAButton(title: cta) {
+                                gotItAction()
+                                withAnimation {
+                                    if shouldFollowUp {
+                                        showNextScreen = true
                                     }
                                 }
-                            )
+                            }
                         )
-                    }
+                    )
                 }
             }
-            .padding()
         }
+        .padding()
+
     }
 }
 
@@ -158,14 +156,13 @@ struct OnboardingFireButtonDialogContent: View {
 struct OnboardingFireDialog: View {
 
     var body: some View {
-        ScrollView(.vertical, showsIndicators: false) {
-            DaxDialogView(logoPosition: .left) {
-                VStack {
-                    OnboardingFireButtonDialogContent()
-                }
+        DaxDialogView(logoPosition: .left) {
+            VStack {
+                OnboardingFireButtonDialogContent()
             }
-            .padding()
         }
+        .padding()
+
     }
 }
 
@@ -179,32 +176,31 @@ struct OnboardingTrackersDoneDialog: View {
     let blockedTrackersCTAAction: () -> Void
 
     var body: some View {
-        ScrollView(.vertical, showsIndicators: false) {
-            DaxDialogView(logoPosition: .left) {
-                VStack {
-                    if showNextScreen {
-                        OnboardingFireButtonDialogContent()
-                    } else {
-                        ContextualDaxDialogContent(
-                            orientation: .horizontalStack(alignment: .center),
-                            message: message, 
-                            messageFont: OnboardingDialogsContants.messageFont,
-                            customActionView: AnyView(
-                                OnboardingPrimaryCTAButton(title: cta) {
-                                    blockedTrackersCTAAction()
-                                    if shouldFollowUp {
-                                        withAnimation {
-                                            showNextScreen = true
-                                        }
+        DaxDialogView(logoPosition: .left) {
+            VStack {
+                if showNextScreen {
+                    OnboardingFireButtonDialogContent()
+                } else {
+                    ContextualDaxDialogContent(
+                        orientation: .horizontalStack(alignment: .center),
+                        message: message,
+                        messageFont: OnboardingDialogsContants.messageFont,
+                        customActionView: AnyView(
+                            OnboardingPrimaryCTAButton(title: cta) {
+                                blockedTrackersCTAAction()
+                                if shouldFollowUp {
+                                    withAnimation {
+                                        showNextScreen = true
                                     }
                                 }
-                            )
+                            }
                         )
-                    }
+                    )
                 }
             }
-            .padding()
         }
+        .padding()
+
     }
 }
 
