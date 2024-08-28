@@ -29,31 +29,31 @@ protocol CustomBackgroundConvertible {
 
 enum CustomBackground: Equatable, Hashable, ColorSchemeProviding, LosslessStringConvertible {
 
-    static let placeholderGradient: Gradient = .gradient03
-    static let placeholderColor: SolidColor = .lightPurple
-    static let placeholderIllustration: Illustration = .illustration01
-    static let placeholderCustomImage: SolidColor = .gray
+    static let placeholderGradient: GradientBackground = .gradient03
+    static let placeholderColor: SolidColorBackground = .lightPurple
+    static let placeholderIllustration: IllustrationBackground = .illustration01
+    static let placeholderCustomImage: SolidColorBackground = .gray
 
-    case gradient(Gradient)
-    case solidColor(SolidColor)
-    case illustration(Illustration)
+    case gradient(GradientBackground)
+    case solidColor(SolidColorBackground)
+    case illustration(IllustrationBackground)
     case userImage(UserBackgroundImage)
 
-    var gradient: Gradient? {
+    var gradient: GradientBackground? {
         guard case let .gradient(gradient) = self else {
             return nil
         }
         return gradient
     }
 
-    var solidColor: SolidColor? {
+    var solidColor: SolidColorBackground? {
         guard case let .solidColor(solidColor) = self else {
             return nil
         }
         return solidColor
     }
 
-    var illustration: Illustration? {
+    var illustration: IllustrationBackground? {
         guard case let .illustration(illustration) = self else {
             return nil
         }
@@ -89,17 +89,17 @@ enum CustomBackground: Equatable, Hashable, ColorSchemeProviding, LosslessString
         }
         switch components[0] {
         case "gradient":
-            guard let gradient = Gradient(rawValue: String(components[1])) else {
+            guard let gradient = GradientBackground(rawValue: String(components[1])) else {
                 return nil
             }
             self = .gradient(gradient)
         case "solidColor":
-            guard let solidColor = SolidColor(rawValue: String(components[1])) else {
+            guard let solidColor = SolidColorBackground(rawValue: String(components[1])) else {
                 return nil
             }
             self = .solidColor(solidColor)
         case "illustration":
-            guard let illustration = Illustration(rawValue: String(components[1])) else {
+            guard let illustration = IllustrationBackground(rawValue: String(components[1])) else {
                 return nil
             }
             self = .illustration(illustration)

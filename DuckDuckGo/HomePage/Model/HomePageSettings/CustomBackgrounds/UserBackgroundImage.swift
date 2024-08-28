@@ -39,11 +39,17 @@ struct UserBackgroundImage: Hashable, Equatable, Identifiable, LosslessStringCon
     // MARK: - LosslessStringConvertible
 
     init?(_ description: String) {
-        let components = description.split(separator: "|", maxSplits: 1)
-        guard components.count == 2, let colorScheme = ColorScheme(String(components[1])) else {
+        guard let index = description.lastIndex(of: "|") else {
             return nil
         }
-        self.fileName = String(components[0])
+        let fileName = String(description.prefix(upTo: index))
+        let colorSchemeDescription = String(description.suffix(from: description.index(after: index)))
+
+        guard !fileName.isEmpty, let colorScheme = ColorScheme(colorSchemeDescription) else {
+            return nil
+        }
+
+        self.fileName = fileName
         self.colorScheme = colorScheme
     }
 

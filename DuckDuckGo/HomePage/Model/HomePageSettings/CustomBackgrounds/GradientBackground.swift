@@ -1,5 +1,5 @@
 //
-//  Gradient.swift
+//  GradientBackground.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -19,7 +19,7 @@
 import AppKit
 import SwiftUI
 
-enum Gradient: String, Equatable, Identifiable, CaseIterable, ColorSchemeProviding, CustomBackgroundConvertible {
+enum GradientBackground: String, Equatable, Identifiable, CaseIterable, ColorSchemeProviding, CustomBackgroundConvertible {
     var id: Self {
         self
     }

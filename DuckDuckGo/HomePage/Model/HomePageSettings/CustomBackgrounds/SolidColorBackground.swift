@@ -1,5 +1,5 @@
 //
-//  SolidColor.swift
+//  SolidColorBackground.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -19,7 +19,7 @@
 import AppKit
 import SwiftUI
 
-enum SolidColor: String, Equatable, Identifiable, CaseIterable, ColorSchemeProviding, CustomBackgroundConvertible {
+enum SolidColorBackground: String, Equatable, Identifiable, CaseIterable, ColorSchemeProviding, CustomBackgroundConvertible {
     var id: Self {
         self
     }

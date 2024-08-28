@@ -1,5 +1,5 @@
 //
-//  Illustration.swift
+//  IllustrationBackground.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -19,7 +19,7 @@
 import AppKit
 import SwiftUI
 
-enum Illustration: String, Equatable, Identifiable, CaseIterable, ColorSchemeProviding, CustomBackgroundConvertible {
+enum IllustrationBackground: String, Equatable, Identifiable, CaseIterable, ColorSchemeProviding, CustomBackgroundConvertible {
     var id: Self {
         self
     }
