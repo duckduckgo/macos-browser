@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "jacek/ssl-errors",
-        "revision" : "58f00f3b0f36545cf6b25a926f30051db58a3b41"
+        "revision" : "faf25f57d1d61ff855216178c454616031585c07",
+        "version" : "188.0.0"
       }
     },
     {
@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "branch" : "pr-releases/pr-1009",
-        "revision" : "b7f1c1ee8a37e1a10cf71a6f73d23f6a8e79e77c"
+        "revision" : "f97053d24c21ea301d4067adbbe0899ff940526a",
+        "version" : "6.7.0"
       }
     },
     {
