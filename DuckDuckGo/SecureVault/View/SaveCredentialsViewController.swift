@@ -235,7 +235,7 @@ final class SaveCredentialsViewController: NSViewController {
 
                 passwordManagerCoordinator.storeWebsiteCredentials(credentials) { error in
                     if let error = error {
-                        Logger.sync.error("Failed to store credentials: \(error.localizedDescription, privacy: .public)")
+                        Logger.sync.error("Failed to store credentials: \(error.localizedDescription)")
                     }
                 }
             } else {
@@ -249,7 +249,7 @@ final class SaveCredentialsViewController: NSViewController {
                 }
             }
         } catch {
-            Logger.sync.error("failed to store credentials \(error.localizedDescription, privacy: .public)")
+            Logger.sync.error("failed to store credentials \(error.localizedDescription)")
             PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
         }
 
@@ -344,7 +344,7 @@ final class SaveCredentialsViewController: NSViewController {
         do {
             _ = try AutofillNeverPromptWebsitesManager.shared.saveNeverPromptWebsite(domainLabel.stringValue)
         } catch {
-            Logger.sync.error("failed to save never prompt for website \(error.localizedDescription, privacy: .public)")
+            Logger.sync.error("failed to save never prompt for website \(error.localizedDescription)")
         }
         PixelKit.fire(GeneralPixel.autofillLoginsSaveLoginModalExcludeSiteConfirmed)
 

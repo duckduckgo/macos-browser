@@ -73,7 +73,7 @@ final class AppStateRestorationManager: NSObject {
         } catch CocoaError.fileReadNoSuchFile {
             // ignore
         } catch {
-            Logger.general.error("App state could not be decoded: \(error.localizedDescription, privacy: .public)")
+            Logger.general.error("App state could not be decoded: \(error.localizedDescription)")
             PixelKit.fire(DebugEvent(GeneralPixel.appStateRestorationFailed, error: error),
                           withAdditionalParameters: ["interactive": String(interactive)])
         }

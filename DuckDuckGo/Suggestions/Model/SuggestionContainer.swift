@@ -71,7 +71,7 @@ final class SuggestionContainer {
 
             if let error = error {
                 // Fetching remote suggestions failed but local can be presented
-                Logger.general.error("Suggestions: Error when getting suggestions - \(String(describing: error), privacy: .public)")
+                Logger.general.error("Suggestions: Error when getting suggestions - \(error.localizedDescription)")
             }
 
             self?.result = result

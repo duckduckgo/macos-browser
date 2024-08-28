@@ -75,7 +75,7 @@ internal class WebCacheManager {
         do {
             try fm.createDirectory(at: tmpDir, withIntermediateDirectories: false, attributes: nil)
         } catch {
-            Logger.general.error("Could not create temporary directory: \(error.localizedDescription, privacy: .public)")
+            Logger.general.error("Could not create temporary directory: \(error.localizedDescription)")
             return
         }
 
@@ -105,7 +105,7 @@ internal class WebCacheManager {
         do {
             try fm.createDirectory(at: tmpDir, withIntermediateDirectories: false, attributes: nil)
         } catch {
-            Logger.general.error("Could not create temporary directory: \(error.localizedDescription, privacy: .public)")
+            Logger.general.error("Could not create temporary directory: \(error.localizedDescription)")
             return
         }
 
@@ -209,7 +209,7 @@ internal class WebCacheManager {
                 }
             }
         } catch {
-            Logger.fire.error("Failed to clear observations database: \(error.localizedDescription, privacy: .public)")
+            Logger.fire.error("Failed to clear observations database: \(error.localizedDescription)")
         }
     }
 
