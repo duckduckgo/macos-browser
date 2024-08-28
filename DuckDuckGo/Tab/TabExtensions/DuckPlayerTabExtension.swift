@@ -41,7 +41,7 @@ final class DuckPlayerTabExtension {
         preferences.duckPlayerMode != .disabled
     }
     private var shouldOpenDuckPlayerDirectly: Bool {
-        preferences.duckPlayerMode == .enabled || onboardingDecider.shouldOpenFirstVideoOnDuckPlayer
+        preferences.duckPlayerMode == .enabled
     }
     private let preferences: DuckPlayerPreferences
 
@@ -61,7 +61,7 @@ final class DuckPlayerTabExtension {
          scriptsPublisher: some Publisher<some YoutubeScriptsProvider, Never>,
          webViewPublisher: some Publisher<WKWebView, Never>,
          preferences: DuckPlayerPreferences = .shared,
-         onboardingDecider: DuckPlayerOnboardingDecider = DefaultDuckPlayerOnboardingDecider()) {
+         onboardingDecider: DuckPlayerOnboardingDecider) {
         self.duckPlayer = duckPlayer
         self.isBurner = isBurner
         self.preferences = preferences

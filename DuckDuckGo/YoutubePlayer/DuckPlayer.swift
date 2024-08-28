@@ -102,10 +102,12 @@ struct InitialPlayerSettings: Codable {
     let platform: Platform
     let environment: Environment
     let locale: Locale
+
 }
 
 struct InitialOverlaySettings: Codable {
     let userValues: UserValues
+    let ui: UIUserValues
 }
 
 // Values that the YouTube Overlays can use to determine the current state
@@ -121,6 +123,15 @@ public struct UserValues: Codable {
     }
     let duckPlayerMode: DuckPlayerMode
     let overlayInteracted: Bool
+}
+
+public struct UIUserValues: Codable {
+    /// If this value is true, we force the FE layer to play in duck player even if the settings is off
+    let playInDuckPlayer: Bool
+
+    init(onboardingDecider: DuckPlayerOnboardingDecider) {
+        self.playInDuckPlayer = onboardingDecider.shouldOpenFirstVideoOnDuckPlayer
+    }
 }
 
 final class DuckPlayer {
@@ -297,7 +308,7 @@ final class DuckPlayer {
     private func encodedOverlaySettings(with webView: WKWebView?) async -> InitialOverlaySettings {
         let userValues = encodeUserValues()
 
-        return InitialOverlaySettings(userValues: userValues)
+        return InitialOverlaySettings(userValues: userValues, ui: UIUserValues(onboardingDecider: onboardingDecider))
     }
 
     // MARK: - Private

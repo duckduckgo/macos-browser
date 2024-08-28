@@ -26,7 +26,7 @@ final class DuckPlayerOnboardingTabExtension: TabExtension {
     @Published private(set) var onboardingState: OnboardingState?
     private let onboardingDecider: DuckPlayerOnboardingDecider
 
-    init(onboardingDecider: DuckPlayerOnboardingDecider = DefaultDuckPlayerOnboardingDecider()) {
+    init(onboardingDecider: DuckPlayerOnboardingDecider) {
         self.onboardingDecider = onboardingDecider
     }
 }
