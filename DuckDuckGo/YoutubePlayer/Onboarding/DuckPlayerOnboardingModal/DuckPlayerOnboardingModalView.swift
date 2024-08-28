@@ -79,11 +79,11 @@ private struct DuckPlayerOnboardingChoiceView: View {
         VStack(spacing: 20) {
             DaxSpeechBubble {
                 VStack (alignment: .leading, spacing: 8) {
-                    Text("Drowning in ads on YouTube?")
+                    Text(UserText.duckPlayerOnboardingChoiceModalTitle)
                         .font(.title)
                         .padding(.horizontal)
 
-                    Text("Duck Player lets you watch without targeted ads and comes free to use in DuckDuckGo.")
+                    Text(UserText.duckPlayerOnboardingChoiceModalMessage)
                         .font(.body)
                         .multilineText()
                         .padding(.horizontal)
@@ -102,7 +102,7 @@ private struct DuckPlayerOnboardingChoiceView: View {
                 Button {
                     notNowPressed()
                 } label: {
-                    Text("Not Now")
+                    Text(UserText.duckPlayerOnboardingChoiceModalCTADeny)
                 }
                 .buttonStyle(SecondaryCTAStyle())
 
@@ -110,7 +110,7 @@ private struct DuckPlayerOnboardingChoiceView: View {
                 Button {
                     turnOnButtonPressed()
                 } label: {
-                    Text("Turn on Duck Player")
+                    Text(UserText.duckPlayerOnboardingChoiceModalCTAConfirm)
                 }
                 .buttonStyle(PrimaryCTAStyle())
             }
@@ -124,11 +124,11 @@ private struct DuckPlayerOnboardingConfirmationView: View {
         VStack(spacing: 20) {
             DaxSpeechBubble {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("All set!")
+                    Text(UserText.duckPlayerOnboardingConfirmationModalTitle)
                         .font(.title)
                         .padding(.horizontal)
 
-                    Text("Pick a video to see Duck Player work its magic.")
+                    Text(UserText.duckPlayerOnboardingConfirmationModalMessage)
                         .font(.body)
                         .padding(.horizontal)
                 }
@@ -140,7 +140,7 @@ private struct DuckPlayerOnboardingConfirmationView: View {
             Button {
                 voidButtonPressed()
             } label: {
-                Text("Got it")
+                Text(UserText.duckPlayerOnboardingConfirmationModalCTAConfirm)
             }
             .buttonStyle(PrimaryCTAStyle())
         }
