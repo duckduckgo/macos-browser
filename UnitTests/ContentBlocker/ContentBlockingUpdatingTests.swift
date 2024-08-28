@@ -29,6 +29,7 @@ final class ContentBlockingUpdatingTests: XCTestCase {
     let rulesManager = ContentBlockerRulesManagerMock()
     var updating: UserContentUpdating!
 
+    @MainActor
     override func setUp() {
         updating = UserContentUpdating(contentBlockerRulesManager: rulesManager,
                                        privacyConfigurationManager: MockPrivacyConfigurationManager(),
