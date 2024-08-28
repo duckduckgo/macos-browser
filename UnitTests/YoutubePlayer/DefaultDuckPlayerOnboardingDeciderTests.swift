@@ -68,6 +68,73 @@ final class DefaultDuckPlayerOnboardingDeciderTests: XCTestCase {
         XCTAssertFalse(decider.canDisplayOnboarding)
     }
 
+    func testCanDisplayOnboarding_WhenAlwaysAskAndNotInteracted() {
+        let preferences = DuckPlayerPreferences(
+            persistor: DuckPlayerPreferencesPersistorMock(
+                duckPlayerMode: .alwaysAsk,
+                youtubeOverlayInteracted: false,
+                youtubeOverlayAnyButtonPressed: false
+            )
+        )
+
+
+        let onboardingDecider = DefaultDuckPlayerOnboardingDecider(defaults: defaults, preferences: preferences)
+        XCTAssertTrue(onboardingDecider.canDisplayOnboarding)
+    }
+
+    func testCanDisplayOnboarding_WhenAlwaysAskAndInteracted() {
+        let preferences = DuckPlayerPreferences(
+            persistor: DuckPlayerPreferencesPersistorMock(
+                duckPlayerMode: .alwaysAsk,
+                youtubeOverlayInteracted: false,
+                youtubeOverlayAnyButtonPressed: true
+            )
+        )
+
+        let onboardingDecider = DefaultDuckPlayerOnboardingDecider(defaults: defaults, preferences: preferences)
+        XCTAssertFalse(onboardingDecider.canDisplayOnboarding)
+    }
+
+    func testCanDisplayOnboarding_WhenEnabled() {
+        let preferences = DuckPlayerPreferences(
+            persistor: DuckPlayerPreferencesPersistorMock(
+                duckPlayerMode: .enabled,
+                youtubeOverlayInteracted: false,
+                youtubeOverlayAnyButtonPressed: false
+            )
+        )
+
+        let onboardingDecider = DefaultDuckPlayerOnboardingDecider(defaults: defaults, preferences: preferences)
+        XCTAssertFalse(onboardingDecider.canDisplayOnboarding)
+    }
+
+    func testCanDisplayOnboarding_WhenDisabled() {
+        let preferences = DuckPlayerPreferences(
+            persistor: DuckPlayerPreferencesPersistorMock(
+                duckPlayerMode: .disabled,
+                youtubeOverlayInteracted: false,
+                youtubeOverlayAnyButtonPressed: false
+            )
+        )
+
+        let onboardingDecider = DefaultDuckPlayerOnboardingDecider(defaults: defaults, preferences: preferences)
+        XCTAssertFalse(onboardingDecider.canDisplayOnboarding)
+    }
+
+    func testCanDisplayOnboarding_WhenOnboardingWasDisplayed() {
+        let preferences = DuckPlayerPreferences(
+            persistor: DuckPlayerPreferencesPersistorMock(
+                duckPlayerMode: .alwaysAsk,
+                youtubeOverlayInteracted: false,
+                youtubeOverlayAnyButtonPressed: false
+            )
+        )
+
+        let onboardingDecider = DefaultDuckPlayerOnboardingDecider(defaults: defaults, preferences: preferences)
+        onboardingDecider.setOnboardingAsDone()
+        XCTAssertFalse(onboardingDecider.canDisplayOnboarding)
+    }
+
     func testReset_ResetsAllFlagsToFalse() {
         decider.setOnboardingAsDone()
         decider.setOpenFirstVideoOnDuckPlayer()

@@ -117,6 +117,14 @@ final class DuckPlayerPreferences: ObservableObject {
         duckPlayerContingencyHandler.shouldDisplayContingencyMessage
     }
 
+    func reset() {
+        youtubeOverlayAnyButtonPressed = false
+        youtubeOverlayInteracted = false
+        duckPlayerMode = .alwaysAsk
+        duckPlayerOpenInNewTab = true
+        duckPlayerAutoplay = true
+    }
+
     @MainActor
     func openLearnMoreContingencyURL() {
         guard let url = duckPlayerContingencyHandler.learnMoreURL else { return }

@@ -89,6 +89,12 @@ final class DuckPlayerTabExtension {
         youtubePlayerCancellables.removeAll()
         guard duckPlayer.isAvailable else { return }
 
+        onboardingDecider.valueChangedPublisher.sink {[weak self] _ in
+            guard let self = self else { return }
+
+            self.youtubeOverlayScript?.userUISettingsUpdated(uiValues: UIUserValues(onboardingDecider: self.onboardingDecider))
+        }.store(in: &youtubePlayerCancellables)
+
         if let hostname = url?.host, let script = youtubeOverlayScript {
             if script.messageOriginPolicy.isAllowed(hostname) {
                 duckPlayer.$mode

@@ -41,22 +41,38 @@ protocol DuckPlayerOnboardingDecider {
     /// This method should be called when the first video has been opened in the Duck Player.
     func setFirstVideoInDuckPlayerAsDone()
 
+    /// A publisher that emits a notification whenever any onboarding or video flags change.
+    ///
+    /// Subscribe to receive updates when `canDisplayOnboarding`, `shouldOpenFirstVideoOnDuckPlayer`, or related values change.
+    ///
+    /// Note that this publisher will emit a notification whenever any of the underlying values change, even if the change is made on a different instance of `DefaultDuckPlayerOnboardingDecider`.
+    var valueChangedPublisher: PassthroughSubject<Void, Never> { get set }
+
     /// Resets the onboarding and video flags to their initial state.
     ///
     /// This method should be called when the onboarding and video flags need to be reset.
     func reset()
 }
 
+import Combine
 
 struct DefaultDuckPlayerOnboardingDecider: DuckPlayerOnboardingDecider {
     private let defaults: UserDefaults
+    private var observer: NSObjectProtocol?
+    private let preferences: DuckPlayerPreferences
+    var valueChangedPublisher: PassthroughSubject<Void, Never> = .init()
 
-    init(defaults: UserDefaults = .standard) {
+    init(defaults: UserDefaults = .standard, preferences: DuckPlayerPreferences = .shared) {
         self.defaults = defaults
+        self.preferences = preferences
+        observer = NotificationCenter.default.addObserver(forName: .valuesDidChange, object: nil, queue: nil) { [valuesDidChange] _ in
+            valuesDidChange()
+        }
     }
 
+    /// We only want to display the onboarding if it was never displayed, the settings is set to alwaysAsk and haven't interacted with the overlay.
     var canDisplayOnboarding: Bool {
-        return !defaults.onboardingWasDisplayed
+        return !defaults.onboardingWasDisplayed && preferences.duckPlayerMode == .alwaysAsk && !preferences.youtubeOverlayAnyButtonPressed
     }
 
     var shouldOpenFirstVideoOnDuckPlayer: Bool {
@@ -64,21 +80,28 @@ struct DefaultDuckPlayerOnboardingDecider: DuckPlayerOnboardingDecider {
     }
 
     func setOnboardingAsDone() {
+        NotificationCenter.default.post(name: .valuesDidChange, object: nil)
         defaults.onboardingWasDisplayed = true
     }
 
     func setOpenFirstVideoOnDuckPlayer() {
         defaults.shouldOpenFirstVideoInDuckPlayer = true
+        NotificationCenter.default.post(name: .valuesDidChange, object: nil)
     }
 
     func setFirstVideoInDuckPlayerAsDone() {
         defaults.firstVideoWasOpenedInDuckPlayer = true
+        NotificationCenter.default.post(name: .valuesDidChange, object: nil)
     }
 
     func reset() {
         defaults.onboardingWasDisplayed = false
         defaults.shouldOpenFirstVideoInDuckPlayer = false
         defaults.firstVideoWasOpenedInDuckPlayer = false
+    }
+
+    private func valuesDidChange() {
+        valueChangedPublisher.send()
     }
 }
 
@@ -103,4 +126,8 @@ private extension UserDefaults {
         get { return bool(forKey: Keys.shouldOpenFirstVideoInDuckPlayer) }
         set { set(newValue, forKey: Keys.shouldOpenFirstVideoInDuckPlayer) }
     }
+}
+
+private extension Notification.Name {
+    static let valuesDidChange = Notification.Name("duckplayer.onboarding.should-open-first-video")
 }

@@ -597,6 +597,8 @@ final class MainMenu: NSMenu {
                 NSMenuItem(title: "Reset Remote Messages", action: #selector(AppDelegate.resetRemoteMessages))
                 NSMenuItem(title: "Reset CPM Experiment Cohort (needs restart)", action: #selector(AppDelegate.resetCpmCohort))
                 NSMenuItem(title: "Reset Duck Player Onboarding", action: #selector(MainViewController.resetDuckPlayerOnboarding))
+                NSMenuItem(title: "Reset Duck Player Preferences", action: #selector(MainViewController.resetDuckPlayerPreferences))
+
 
             }.withAccessibilityIdentifier("MainMenu.resetData")
             NSMenuItem(title: "UI Triggers") {
