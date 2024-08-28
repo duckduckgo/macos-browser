@@ -116,7 +116,7 @@ final class DownloadsPreferences: ObservableObject {
                 if isStale {
                     setSelectedDownloadLocation(url) // update bookmark data and selectedDownloadLocationController
                 } else {
-                    selectedDownloadLocationController = SecurityScopedFileURLController(url: url, logger: OSLog.downloads)
+                    selectedDownloadLocationController = SecurityScopedFileURLController(url: url)
                 }
                 return url
             }

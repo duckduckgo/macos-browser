@@ -16,15 +16,15 @@
 //  limitations under the License.
 //
 
-import Combine
-import Common
 import Foundation
+import Combine
+import BrowserServicesKit
+import Common
 import Navigation
 import UniformTypeIdentifiers
 import WebKit
 import PixelKit
 import os.log
-import BrowserServicesKit
 
 protocol WebKitDownloadTaskDelegate: AnyObject {
     func fileDownloadTaskNeedsDestinationURL(_ task: WebKitDownloadTask, suggestedFilename: String, suggestedFileType: UTType?) async -> (URL?, UTType?)
