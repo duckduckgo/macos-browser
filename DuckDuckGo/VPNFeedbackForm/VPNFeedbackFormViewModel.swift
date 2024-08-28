@@ -85,7 +85,7 @@ final class VPNFeedbackFormViewModel: ObservableObject {
             self.viewState = .feedbackSending
 
             do {
-                let metadata = await self.metadataCollector.collectMetadata()
+                let metadata = await self.metadataCollector.collectVPNMetadata()
                 try await self.feedbackSender.send(metadata: metadata, category: selectedFeedbackCategory, userText: feedbackFormText)
                 self.viewState = .feedbackSent
             } catch {

@@ -19,6 +19,7 @@
 import Cocoa
 import Combine
 import Common
+import BrowserServicesKit
 
 @MainActor
 protocol WindowControllersManagerProtocol {
@@ -61,14 +62,18 @@ extension WindowControllersManagerProtocol {
 @MainActor
 final class WindowControllersManager: WindowControllersManagerProtocol {
 
-    static let shared = WindowControllersManager(pinnedTabsManager: Application.appDelegate.pinnedTabsManager)
+    static let shared = WindowControllersManager(pinnedTabsManager: Application.appDelegate.pinnedTabsManager,
+                                                 subscriptionFeatureAvailability: DefaultSubscriptionFeatureAvailability()
+    )
 
     var activeViewController: MainViewController? {
         lastKeyMainWindowController?.mainViewController
     }
 
-    init(pinnedTabsManager: PinnedTabsManager) {
+    init(pinnedTabsManager: PinnedTabsManager,
+         subscriptionFeatureAvailability: SubscriptionFeatureAvailability) {
         self.pinnedTabsManager = pinnedTabsManager
+        self.subscriptionFeatureAvailability = subscriptionFeatureAvailability
     }
 
     /**
@@ -77,6 +82,7 @@ final class WindowControllersManager: WindowControllersManagerProtocol {
     @Published private(set) var isInInitialState: Bool = true
     @Published private(set) var mainWindowControllers = [MainWindowController]()
     private(set) var pinnedTabsManager: PinnedTabsManager
+    private let subscriptionFeatureAvailability: SubscriptionFeatureAvailability
 
     weak var lastKeyMainWindowController: MainWindowController? {
         didSet {
@@ -251,8 +257,14 @@ extension WindowControllersManager {
         windowController.mainViewController.navigationBarViewController.showNetworkProtectionStatus()
     }
 
-    func showShareFeedbackModal() {
-        let feedbackFormViewController = VPNFeedbackFormViewController()
+    func showShareFeedbackModal(source: UnifiedFeedbackSource = .default) {
+        let feedbackFormViewController: NSViewController = {
+            if subscriptionFeatureAvailability.usesUnifiedFeedbackForm {
+                return UnifiedFeedbackFormViewController(source: source)
+            } else {
+                return VPNFeedbackFormViewController()
+            }
+        }()
         let feedbackFormWindowController = feedbackFormViewController.wrappedInWindowController()
 
         guard let feedbackFormWindow = feedbackFormWindowController.window else {
