@@ -599,6 +599,10 @@ final class BookmarksSubMenu: NSMenu {
 
         BookmarksBarMenuFactory.addToMenu(self)
 
+        addItem(withTitle: UserText.bookmarksManageBookmarks, action: #selector(MoreOptionsMenu.openBookmarksManagementInterface), keyEquivalent: "b")
+            .withModifierMask([.command, .option])
+            .targetting(target)
+
         addItem(NSMenuItem.separator())
 
         if let favorites = LocalBookmarkManager.shared.list?.favoriteBookmarks {
