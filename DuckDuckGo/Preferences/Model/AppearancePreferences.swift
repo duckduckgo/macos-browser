@@ -29,6 +29,7 @@ protocol AppearancePreferencesPersistor {
     var isFavoriteVisible: Bool { get set }
     var isContinueSetUpVisible: Bool { get set }
     var isRecentActivityVisible: Bool { get set }
+    var isHomePagePromotionVisible: Bool { get set }
     var showBookmarksBar: Bool { get set }
     var bookmarksBarAppearance: BookmarksBarAppearance { get set }
     var homeButtonPosition: HomeButtonPosition { get set }
@@ -52,6 +53,9 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
 
     @UserDefaultsWrapper(key: .homePageIsRecentActivityVisible, defaultValue: true)
     var isRecentActivityVisible: Bool
+
+    @UserDefaultsWrapper(key: .homePagePromotionVisible, defaultValue: true)
+    var isHomePagePromotionVisible: Bool
 
     @UserDefaultsWrapper(key: .showBookmarksBar, defaultValue: false)
     var showBookmarksBar: Bool
@@ -225,6 +229,12 @@ final class AppearancePreferences: ObservableObject {
         return privacyConfig.isEnabled(featureKey: .newTabContinueSetUp) && osVersion.majorVersion >= 12
     }
 
+    @Published var isHomePagePromotionVisible: Bool {
+        didSet {
+            persistor.isHomePagePromotionVisible = isHomePagePromotionVisible
+        }
+    }
+
     func updateUserInterfaceStyle() {
         NSApp.appearance = currentThemeName.appearance
     }
@@ -240,6 +250,7 @@ final class AppearancePreferences: ObservableObject {
         showBookmarksBar = persistor.showBookmarksBar
         bookmarksBarAppearance = persistor.bookmarksBarAppearance
         homeButtonPosition = persistor.homeButtonPosition
+        isHomePagePromotionVisible = persistor.isHomePagePromotionVisible
     }
 
     private var persistor: AppearancePreferencesPersistor

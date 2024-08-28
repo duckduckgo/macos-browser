@@ -22,6 +22,7 @@ import SwiftUI
 import History
 import PixelKit
 import RemoteMessaging
+import Freemium
 
 @MainActor
 final class HomePageViewController: NSViewController {
@@ -31,6 +32,8 @@ final class HomePageViewController: NSViewController {
     private let historyCoordinating: HistoryCoordinating
     private let fireViewModel: FireViewModel
     private let onboardingViewModel: OnboardingViewModel
+    private var freemiumPIRUserState: FreemiumPIRUserState
+    private let freemiumPIRPresenter: FreemiumPIRPresenter
 
     private(set) lazy var faviconsFetcherOnboarding: FaviconsFetcherOnboarding? = {
         guard let syncService = NSApp.delegateTyped.syncService, let syncBookmarksAdapter = NSApp.delegateTyped.syncDataProviders?.bookmarksAdapter else {
@@ -44,6 +47,7 @@ final class HomePageViewController: NSViewController {
     var defaultBrowserModel: HomePage.Models.DefaultBrowserModel!
     var recentlyVisitedModel: HomePage.Models.RecentlyVisitedModel!
     var featuresModel: HomePage.Models.ContinueSetUpModel!
+    var promotionModel: PromotionViewModel!
     let accessibilityPreferences: AccessibilityPreferences
     let appearancePreferences: AppearancePreferences
     let defaultBrowserPreferences: DefaultBrowserPreferences
@@ -63,7 +67,9 @@ final class HomePageViewController: NSViewController {
          onboardingViewModel: OnboardingViewModel = OnboardingViewModel(),
          accessibilityPreferences: AccessibilityPreferences = AccessibilityPreferences.shared,
          appearancePreferences: AppearancePreferences = AppearancePreferences.shared,
-         defaultBrowserPreferences: DefaultBrowserPreferences = DefaultBrowserPreferences.shared) {
+         defaultBrowserPreferences: DefaultBrowserPreferences = DefaultBrowserPreferences.shared,
+         freemiumPIRUserState: FreemiumPIRUserState,
+         freemiumPIRPresenter: FreemiumPIRPresenter = DefaultFreemiumPIRPresenter()) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.bookmarkManager = bookmarkManager
@@ -73,6 +79,8 @@ final class HomePageViewController: NSViewController {
         self.accessibilityPreferences = accessibilityPreferences
         self.appearancePreferences = appearancePreferences
         self.defaultBrowserPreferences = defaultBrowserPreferences
+        self.freemiumPIRUserState = freemiumPIRUserState
+        self.freemiumPIRPresenter = freemiumPIRPresenter
 
         super.init(nibName: nil, bundle: nil)
     }
@@ -82,6 +90,7 @@ final class HomePageViewController: NSViewController {
         defaultBrowserModel = createDefaultBrowserModel()
         recentlyVisitedModel = createRecentlyVisitedModel()
         featuresModel = createFeatureModel()
+        promotionModel = createPromotionModel()
 
         refreshModels()
 
@@ -93,6 +102,7 @@ final class HomePageViewController: NSViewController {
             .environmentObject(accessibilityPreferences)
             .environmentObject(appearancePreferences)
             .environmentObject(Application.appDelegate.activeRemoteMessageModel)
+            .environmentObject(promotionModel)
             .onTapGesture { [weak self] in
                 // Remove focus from the address bar if interacting with this view.
                 self?.view.makeMeFirstResponder()
@@ -194,6 +204,19 @@ final class HomePageViewController: NSViewController {
         }, onFaviconMissing: { [weak self] in
             self?.faviconsFetcherOnboarding?.presentOnboardingIfNeeded()
         })
+    }
+
+    func createPromotionModel() -> PromotionViewModel {
+        return PromotionViewModel.freemiumPIRPromotion { [weak self] in
+            // TODO: Remove this
+            self?.freemiumPIRUserState.didOnboard = true
+            // ------
+            self?.freemiumPIRPresenter.showFreemiumPIR(didOnboard: self?.freemiumPIRUserState.didOnboard ?? false,
+                                                       windowControllerManager: WindowControllersManager.shared)
+            self?.appearancePreferences.isHomePagePromotionVisible = false
+        } closeAction: { [weak self] in
+            self?.appearancePreferences.isHomePagePromotionVisible = false
+        }
     }
 
     func refreshFavoritesModel() {

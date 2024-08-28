@@ -65,6 +65,10 @@ extension HomePage.Views {
                         Group {
                             remoteMessage()
 
+                            PromotionView()
+                                .padding(.bottom, 16)
+                                .visibility(model.isHomePagePromotionVisible ? .visible : .gone)
+
                             if includingContinueSetUpCards {
                                 ContinueSetUpView()
                                     .visibility(model.isContinueSetUpVisible ? .visible : .gone)

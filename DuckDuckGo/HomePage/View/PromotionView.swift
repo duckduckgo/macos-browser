@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import SwiftUIExtensions
 
 typealias PromotionViewModel = HomePage.Models.PromotionViewModel
 
@@ -34,21 +35,15 @@ extension HomePage.Views {
 
                 imageView
 
-                Spacer(minLength: 4)
-
                 descriptionView
 
-                Spacer(minLength: 4)
-
                 proceedButtonView
-
-                Spacer(minLength: 4)
 
                 closeButton
 
             }
-            .padding([.horizontal], 16)
-            .padding([.vertical], 16)
+            .padding([.horizontal], 24)
+            .padding([.vertical], 14)
             .background(Color.blackWhite3)
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .onHover { isHovering in
@@ -72,8 +67,12 @@ extension HomePage.Views {
                 Text(viewModel.proceedButtonText)
                     .padding([.horizontal], 16)
                     .padding([.vertical], 5)
+                    .font(.system(size: 13).bold())
+
             }
-                .controlSize(.large)
+                .buttonStyle(DefaultActionButtonStyle(enabled: true))
+                .cornerRadius(8)
+                .padding(.horizontal, 8)
         }
 
         private var closeButton: some View {
@@ -81,7 +80,7 @@ extension HomePage.Views {
                 viewModel.closeAction()
             }
             .visibility(isHovering ? .visible : .invisible)
-            .padding(6)
+            .padding(.trailing, 8)
         }
     }
 }

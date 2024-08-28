@@ -59,9 +59,10 @@ final class MoreOptionsMenu: NSMenu {
     private lazy var sharingMenu: NSMenu = SharingMenu(title: UserText.shareMenuItem)
     private var accountManager: AccountManager { subscriptionManager.accountManager }
     private let subscriptionManager: SubscriptionManager
-    private let freemiumPIRUserState: FreemiumPIRUserState
+    private var freemiumPIRUserState: FreemiumPIRUserState
     private let freemiumPIRFeature: FreemiumPIRFeature
     private let freemiumPIRPresenter: FreemiumPIRPresenter
+    private let appearancePreferences: AppearancePreferences
 
     private let vpnFeatureGatekeeper: VPNFeatureGatekeeper
     private let subscriptionFeatureAvailability: SubscriptionFeatureAvailability
@@ -80,7 +81,8 @@ final class MoreOptionsMenu: NSMenu {
          subscriptionManager: SubscriptionManager,
          freemiumPIRUserState: FreemiumPIRUserState,
          freemiumPIRFeature: FreemiumPIRFeature,
-         freemiumPIRPresenter: FreemiumPIRPresenter = DefaultFreemiumPIRPresenter()) {
+         freemiumPIRPresenter: FreemiumPIRPresenter = DefaultFreemiumPIRPresenter(),
+         appearancePreferences: AppearancePreferences = .shared) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.emailManager = emailManager
@@ -92,6 +94,7 @@ final class MoreOptionsMenu: NSMenu {
         self.freemiumPIRUserState = freemiumPIRUserState
         self.freemiumPIRFeature = freemiumPIRFeature
         self.freemiumPIRPresenter = freemiumPIRPresenter
+        self.appearancePreferences = appearancePreferences
 
         super.init(title: "")
 
@@ -256,7 +259,12 @@ final class MoreOptionsMenu: NSMenu {
     }
 
     @objc func openFreemiumPIR(_ sender: NSMenuItem) {
+
+        // TODO: Remove this
+        freemiumPIRUserState.didOnboard = true
+        // ------
         freemiumPIRPresenter.showFreemiumPIR(didOnboard: freemiumPIRUserState.didOnboard, windowControllerManager: WindowControllersManager.shared)
+        appearancePreferences.isHomePagePromotionVisible = false
     }
 
     @objc func findInPage(_ sender: NSMenuItem) {

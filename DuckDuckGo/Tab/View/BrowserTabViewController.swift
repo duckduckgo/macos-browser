@@ -24,6 +24,7 @@ import SwiftUI
 import WebKit
 import Subscription
 import PixelKit
+import Freemium
 
 final class BrowserTabViewController: NSViewController {
 
@@ -673,7 +674,9 @@ final class BrowserTabViewController: NSViewController {
     var homePageViewController: HomePageViewController?
     private func homePageViewControllerCreatingIfNeeded() -> HomePageViewController {
         return homePageViewController ?? {
-            let homePageViewController = HomePageViewController(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager)
+            let subscriptionManager = Application.appDelegate.subscriptionManager
+            let freemiumPIRUserState = DefaultFreemiumPIRUserState(userDefaults: .dbp, accountManager: subscriptionManager.accountManager)
+            let homePageViewController = HomePageViewController(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager, freemiumPIRUserState: freemiumPIRUserState)
             self.homePageViewController = homePageViewController
             return homePageViewController
         }()

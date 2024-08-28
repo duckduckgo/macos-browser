@@ -43,4 +43,5 @@ class MockAppearancePreferencesPersistor: AppearancePreferencesPersistor {
 
     var bookmarksBarAppearance: BookmarksBarAppearance = .alwaysOn
 
+    var isHomePagePromotionVisible = true
 }
