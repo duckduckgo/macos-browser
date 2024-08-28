@@ -107,7 +107,9 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .gatekeeperNotAuthenticated,
                     .gatekeeperEntitlementsInvalid,
                     .invalidPayload,
-                    .pixelTest:
+                    .pixelTest,
+                    .customDataBrokerStatsOptoutSubmit,
+                    .customGlobalStatsOptoutSubmit:
 
                 PixelKit.fire(event)
 

@@ -25,6 +25,7 @@ import Configuration
 import Common
 import Networking
 import PixelKit
+import os.log
 
 final class ConfigurationManager: DefaultConfigurationManager {
 
@@ -100,7 +101,9 @@ final class ConfigurationManager: DefaultConfigurationManager {
         await updateBloomFilterExclusionsTask.value
 
         ConfigurationStore.shared.log()
-        log()
+
+        Logger.config.info("last update \(String(describing: self.lastUpdateTime), privacy: .public)")
+        Logger.config.info("last refresh check \(String(describing: self.lastRefreshCheckTime), privacy: .public)")
     }
 
     private func fetchTrackerBlockingDependencies(isDebug: Bool) async -> Bool {

@@ -22,6 +22,7 @@ import Foundation
 import Configuration
 import Persistence
 import PixelKit
+import os.log
 
 final class ConfigurationStore: ConfigurationStoring {
 
@@ -205,14 +206,14 @@ final class ConfigurationStore: ConfigurationStoring {
     }
 
     func log() {
-        Logger.config.log("bloomFilterBinaryEtag \(self.bloomFilterBinaryEtag ?? "", privacy: .public)")
-        Logger.config.log("bloomFilterSpecEtag \(self.bloomFilterSpecEtag ?? "", privacy: .public)")
-        Logger.config.log("bloomFilterExcludedDomainsEtag \(self.bloomFilterExcludedDomainsEtag ?? "", privacy: .public)")
-        Logger.config.log("surrogatesEtag \(self.surrogatesEtag ?? "", privacy: .public)")
-        Logger.config.log("trackerRadarEtag \(self.trackerRadarEtag ?? "", privacy: .public)")
-        Logger.config.log("privacyConfigurationEtag \(self.privacyConfigurationEtag ?? "", privacy: .public)")
-        Logger.config.log("FBConfigEtag \(self.FBConfigEtag ?? "", privacy: .public)")
-        Logger.config.log("remoteMessagingConfig \(self.remoteMessagingConfigEtag ?? "", privacy: .public)")
+        Logger.config.info("bloomFilterBinaryEtag \(self.bloomFilterBinaryEtag ?? "", privacy: .public)")
+        Logger.config.info("bloomFilterSpecEtag \(self.bloomFilterSpecEtag ?? "", privacy: .public)")
+        Logger.config.info("bloomFilterExcludedDomainsEtag \(self.self.bloomFilterExcludedDomainsEtag ?? "", privacy: .public)")
+        Logger.config.info("surrogatesEtag \(self.surrogatesEtag ?? "", privacy: .public)")
+        Logger.config.info("trackerRadarEtag \(self.trackerRadarEtag ?? "", privacy: .public)")
+        Logger.config.info("privacyConfigurationEtag \(self.privacyConfigurationEtag ?? "", privacy: .public)")
+        Logger.config.info("FBConfigEtag \(self.FBConfigEtag ?? "", privacy: .public)")
+        Logger.config.info("remoteMessagingConfig \(self.remoteMessagingConfigEtag ?? "", privacy: .public)")
     }
 
     func fileUrl(for config: Configuration) -> URL {

@@ -715,8 +715,7 @@ final class MainMenu: NSMenu {
             let logStore = try OSLogStore(scope: .currentProcessIdentifier)
             try logStore.getEntries()
                 .compactMap {
-                    guard let entry = $0 as? OSLogEntryLog,
-                          entry.subsystem == OSLog.subsystem else { return nil }
+                    guard let entry = $0 as? OSLogEntryLog else { return nil }
                     return "\(formatter.string(from: entry.date)) [\(entry.category)] \(entry.composedMessage)"
                 }
                 .joined(separator: "\n")

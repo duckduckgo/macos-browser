@@ -21,6 +21,7 @@ import Combine
 import WebKit
 import BrowserServicesKit
 import Common
+import os.log
 
 protocol DBPUIScanOps: AnyObject {
     func updateCacheWithCurrentScans() async
@@ -81,7 +82,7 @@ extension DBPUIViewModel: DBPUIScanOps {
         do {
             try dataManager.prepareBrokerProfileQueryDataCache()
         } catch {
-            os_log("DBPUIViewModel error: updateCacheWithCurrentScans, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("DBPUIViewModel error: updateCacheWithCurrentScans, error: \(error.localizedDescription, privacy: .public)")
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DBPUIViewModel.updateCacheWithCurrentScans"))
         }
     }

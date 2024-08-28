@@ -19,6 +19,7 @@
 import Foundation
 import Common
 import NetworkProtection
+import os.log
 
 final class VPNAppEventsHandler {
 
@@ -36,7 +37,7 @@ final class VPNAppEventsHandler {
         }
 
         let restartTunnel = {
-            os_log(.info, log: .networkProtection, "App updated from %{public}s to %{public}s: updating login items", versionStore.lastAgentVersionRun ?? "null", currentVersion)
+            Logger.networking.info("App updated from \(versionStore.lastAgentVersionRun ?? "null", privacy: .public) to \(currentVersion, privacy: .public): updating login items")
             self.restartTunnel()
         }
 

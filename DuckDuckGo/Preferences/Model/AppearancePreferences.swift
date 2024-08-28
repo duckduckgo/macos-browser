@@ -21,6 +21,7 @@ import AppKit
 import Bookmarks
 import Common
 import PixelKit
+import os.log
 
 protocol AppearancePreferencesPersistor {
     var showFullURL: Bool { get set }
@@ -249,7 +250,7 @@ final class AppearancePreferences: ObservableObject {
             guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService else {
                 return
             }
-            os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
+            Logger.sync.debug("Requesting sync if enabled")
             syncService.scheduler.notifyDataChanged()
         }
     }
