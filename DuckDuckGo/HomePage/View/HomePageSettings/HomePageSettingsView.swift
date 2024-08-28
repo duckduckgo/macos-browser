@@ -42,22 +42,22 @@ extension HomePage.Views {
                             rootView
                                 .transition(.move(edge: .leading).combined(with: .opacity))
                         case .colorPicker:
-                            BackgroundPickerView(title: "Solid Colors", items: SolidColorBackground.allCases)
+                            BackgroundPickerView(title: UserText.solidColors, items: SolidColorBackground.allCases)
                                 .transition(.move(edge: .trailing).combined(with: .opacity))
                         case .gradientPicker:
-                            BackgroundPickerView(title: "Gradients", items: GradientBackground.allCases)
+                            BackgroundPickerView(title: UserText.gradients, items: GradientBackground.allCases)
                                 .transition(.move(edge: .trailing).combined(with: .opacity))
                         case .illustrationPicker:
-                            BackgroundPickerView(title: "Illustrations", items: IllustrationBackground.allCases)
+                            BackgroundPickerView(title: UserText.illustrations, items: IllustrationBackground.allCases)
                                 .transition(.move(edge: .trailing).combined(with: .opacity))
                         case .customImagePicker:
                             BackgroundPickerView(
-                                title: "My Backgrounds",
+                                title: UserText.myBackgrounds,
                                 items: model.availableUserBackgroundImages,
                                 maxItemsCount: HomePage.Models.SettingsModel.Const.maximumNumberOfUserImages
                             ) {
                                 addBackgroundButton
-                                Text("Images are stored on your device so DuckDuckGo can't see or access them.")
+                                Text(UserText.myBackgroundsDisclaimer)
                                     .foregroundColor(.blackWhite60)
                                     .multilineTextAlignment(.leading)
                             }
@@ -85,7 +85,7 @@ extension HomePage.Views {
 
         var header: some View {
             HStack(spacing: 0) {
-                Text("Customize")
+                Text(UserText.homePageSettingsTitle)
                     .font(.system(size: 17).bold())
                 Spacer()
                 CloseButton(icon: .closeLarge, size: 28) {
@@ -103,7 +103,7 @@ extension HomePage.Views {
                     model.openSettings()
                 } label: {
                     HStack {
-                        Text("All Settings")
+                        Text(UserText.allSettings)
                         Spacer()
                         Image(.externalAppScheme)
                     }
@@ -130,23 +130,23 @@ extension HomePage.Views {
 
         @ViewBuilder
         var rootView: some View {
-            SettingsSection(title: "Background") {
+            SettingsSection(title: UserText.background) {
                 SettingsGrid(items: model.customBackgroundModes) { mode in
                     BackgroundCategoryView(modeModel: mode) {
                         model.handleRootGridSelection(mode)
                     }
                 }
-                TextButton("Reset Background") {
+                TextButton(UserText.resetBackground) {
                     withAnimation {
                         model.customBackground = nil
                     }
                 }
             }
             .animation(.none, value: model.customBackground)
-            SettingsSection(title: "Browser Theme") {
+            SettingsSection(title: UserText.browserTheme) {
                 ThemePicker()
             }
-            SettingsSection(title: "Sections") {
+            SettingsSection(title: UserText.homePageSections) {
                 HomeContentSectionsView(includeContinueSetUpCards: includingContinueSetUpCards)
             }
             footer
@@ -159,7 +159,7 @@ extension HomePage.Views {
                     await model.addNewImage()
                 }
             } label: {
-                Text("Add Background")
+                Text(UserText.addBackground)
                     .frame(maxWidth: .infinity)
             }
                 .controlSize(.large)

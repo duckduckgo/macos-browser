@@ -75,7 +75,7 @@ extension HomePage.Views {
                     }
                 }
                 .contextMenu {
-                    Button("Delete Background", action: { model.customImagesManager?.deleteImage(userBackgroundImage) })
+                    Button(UserText.deleteBackground, action: { model.customImagesManager?.deleteImage(userBackgroundImage) })
                 }
             case .none:
                 content()

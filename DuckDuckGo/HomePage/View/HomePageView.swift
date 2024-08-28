@@ -238,7 +238,7 @@ extension HomePage.Views {
                                         .frame(width: iconSize, height: iconSize)
                                         .scaledToFit()
                                     if !isCompact(with: geometry) {
-                                        Text("Customize")
+                                        Text(UserText.homePageSettingsTitle)
                                             .font(.system(size: 13))
                                             .background(WidthGetter())
                                     }

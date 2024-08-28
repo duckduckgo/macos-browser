@@ -25197,6 +25197,162 @@
         }
       }
     },
+    "home.page.settings.add.background" : {
+      "comment" : "Button caption for adding user-provided Home Page background image",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add Background"
+          }
+        }
+      }
+    },
+    "home.page.settings.all.settings" : {
+      "comment" : "Button caption",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "All Settings"
+          }
+        }
+      }
+    },
+    "home.page.settings.background" : {
+      "comment" : "Section title in Home Page Settings to customization Home Page background",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Background"
+          }
+        }
+      }
+    },
+    "home.page.settings.browser.theme" : {
+      "comment" : "Section title in Home Page Settings to adjust browser theme",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Browser Theme"
+          }
+        }
+      }
+    },
+    "home.page.settings.delete.background" : {
+      "comment" : "Context menu option to delete custom home page background image",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Delete Background"
+          }
+        }
+      }
+    },
+    "home.page.settings.gradients" : {
+      "comment" : "Button caption for presenting available Home Page background gradients",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Gradients"
+          }
+        }
+      }
+    },
+    "home.page.settings.header" : {
+      "comment" : "Home Page Settings title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Customize"
+          }
+        }
+      }
+    },
+    "home.page.settings.illustrations" : {
+      "comment" : "Button caption for presenting available Home Page background illustrations",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Illustrations"
+          }
+        }
+      }
+    },
+    "home.page.settings.my.backgrounds" : {
+      "comment" : "Button caption for presenting available user-provided Home Page background images",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "My Backgrounds"
+          }
+        }
+      }
+    },
+    "home.page.settings.my.backgrounds.disclaimer" : {
+      "comment" : "Disclaimer explaining privacy of user-provided custom Home Page background images",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Images are stored on your device so DuckDuckGo can't see or access them."
+          }
+        }
+      }
+    },
+    "home.page.settings.reset.background" : {
+      "comment" : "Button caption to reset custom home page background",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Reset Background"
+          }
+        }
+      }
+    },
+    "home.page.settings.sections" : {
+      "comment" : "Section title in Home Page Settings to adjust Home Page sections visibility",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sections"
+          }
+        }
+      }
+    },
+    "home.page.settings.solid.colors" : {
+      "comment" : "Button caption for presenting available solid-color Home Page backgrounds",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Solid Colors"
+          }
+        }
+      }
+    },
     "If your computer prompts you to enter a password prior to import, DuckDuckGo will not see that password.\n\nImported passwords are stored securely using encryption." : {
       "comment" : "Warning that Chromium data import would require entering system passwords.",
       "extractionState" : "stale",

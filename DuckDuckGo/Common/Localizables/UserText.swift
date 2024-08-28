@@ -1161,7 +1161,20 @@ struct UserText {
     static let bookmarksBarPromptDismiss = NSLocalizedString("bookmarks.bar.prompt.dismiss", value: "Hide", comment: "Dismiss button label on bookmarks bar prompt")
     static let bookmarksBarPromptAccept = NSLocalizedString("bookmarks.bar.prompt.accept", value: "Show", comment: "Accept button label on bookmarks bar prompt")
 
-    // Background
+    // MARK: Home Page Settings
+    static let homePageSettingsTitle = NSLocalizedString("home.page.settings.header", value: "Customize", comment: "Home Page Settings title")
+    static let allSettings = NSLocalizedString("home.page.settings.all.settings", value: "All Settings", comment: "Button caption")
+    static let background = NSLocalizedString("home.page.settings.background", value: "Background", comment: "Section title in Home Page Settings to customization Home Page background")
+    static let solidColors = NSLocalizedString("home.page.settings.solid.colors", value: "Solid Colors", comment: "Button caption for presenting available solid-color Home Page backgrounds")
+    static let gradients = NSLocalizedString("home.page.settings.gradients", value: "Gradients", comment: "Button caption for presenting available Home Page background gradients")
+    static let illustrations = NSLocalizedString("home.page.settings.illustrations", value: "Illustrations", comment: "Button caption for presenting available Home Page background illustrations")
+    static let myBackgrounds = NSLocalizedString("home.page.settings.my.backgrounds", value: "My Backgrounds", comment: "Button caption for presenting available user-provided Home Page background images")
+    static let myBackgroundsDisclaimer = NSLocalizedString("home.page.settings.my.backgrounds.disclaimer", value: "Images are stored on your device so DuckDuckGo can't see or access them.", comment: "Disclaimer explaining privacy of user-provided custom Home Page background images")
+    static let addBackground = NSLocalizedString("home.page.settings.add.background", value: "Add Background", comment: "Button caption for adding user-provided Home Page background image")
+    static let resetBackground = NSLocalizedString("home.page.settings.reset.background", value: "Reset Background", comment: "Button caption to reset custom home page background")
+    static let browserTheme = NSLocalizedString("home.page.settings.browser.theme", value: "Browser Theme", comment: "Section title in Home Page Settings to adjust browser theme")
+    static let homePageSections = NSLocalizedString("home.page.settings.sections", value: "Sections", comment: "Section title in Home Page Settings to adjust Home Page sections visibility")
+    static let deleteBackground = NSLocalizedString("home.page.settings.delete.background", value: "Delete Background", comment: "Context menu option to delete custom home page background image")
     static let cannotReadImageAlertHeader = NSLocalizedString("cannot.read.image.alert.header", value: "Processing Image Failed", comment: "Header of the alert dialog informing user that the app failed to load the provided custom background image")
     static let cannotReadImageAlertInformative = NSLocalizedString("cannot.read.image.informative", value: "The image file may be corrupted. Please try again with a different file.", comment: "Informative of the alert dialog informing user it is not possible to open the file")
 
