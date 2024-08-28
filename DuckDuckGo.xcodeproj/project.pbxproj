@@ -1455,8 +1455,6 @@
 		566B736A2BECC02D00FF1959 /* SyncAlertsPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566B73682BECBF8400FF1959 /* SyncAlertsPresenter.swift */; };
 		566B736C2BECC3C600FF1959 /* SyncPausedStateManaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566B736B2BECC3C600FF1959 /* SyncPausedStateManaging.swift */; };
 		566B736D2BECC3C600FF1959 /* SyncPausedStateManaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566B736B2BECC3C600FF1959 /* SyncPausedStateManaging.swift */; };
-		567A23BA2C7F533C0010F66C /* SpecialErrorPages in Frameworks */ = {isa = PBXBuildFile; productRef = 567A23B92C7F533C0010F66C /* SpecialErrorPages */; };
-		567A23BC2C7F53470010F66C /* SpecialErrorPages in Frameworks */ = {isa = PBXBuildFile; productRef = 567A23BB2C7F53470010F66C /* SpecialErrorPages */; };
 		567A23BE2C7F539C0010F66C /* SpecialErrorPageUserScriptExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567A23BD2C7F539C0010F66C /* SpecialErrorPageUserScriptExtension.swift */; };
 		567A23BF2C7F539C0010F66C /* SpecialErrorPageUserScriptExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567A23BD2C7F539C0010F66C /* SpecialErrorPageUserScriptExtension.swift */; };
 		567DA93F29E8045D008AC5EE /* MockEmailStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567DA93E29E8045D008AC5EE /* MockEmailStorage.swift */; };
@@ -1515,8 +1513,6 @@
 		56BA1E762BAAF70F001CF69F /* SpecialErrorPageTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BA1E742BAAF70F001CF69F /* SpecialErrorPageTabExtension.swift */; };
 		56BA1E7F2BAB2D29001CF69F /* ErrorPageTabExtensionTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BA1E7C2BAB290E001CF69F /* ErrorPageTabExtensionTest.swift */; };
 		56BA1E802BAB2E43001CF69F /* ErrorPageTabExtensionTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BA1E7C2BAB290E001CF69F /* ErrorPageTabExtensionTest.swift */; };
-		56BA1E872BAC8239001CF69F /* SSLErrorPageUserScriptTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BA1E862BAC8239001CF69F /* SSLErrorPageUserScriptTests.swift */; };
-		56BA1E882BAC8239001CF69F /* SSLErrorPageUserScriptTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BA1E862BAC8239001CF69F /* SSLErrorPageUserScriptTests.swift */; };
 		56BA1E8A2BB1CB5B001CF69F /* CertificateTrustEvaluator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BA1E892BB1CB5B001CF69F /* CertificateTrustEvaluator.swift */; };
 		56BA1E8B2BB1CB5B001CF69F /* CertificateTrustEvaluator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BA1E892BB1CB5B001CF69F /* CertificateTrustEvaluator.swift */; };
 		56CEE90E2B7A725B00CF10AA /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 56CEE90D2B7A6DE100CF10AA /* InfoPlist.xcstrings */; };
@@ -3508,7 +3504,6 @@
 		566B196029CDB7C9007E38F4 /* CapturingOptionsButtonMenuDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturingOptionsButtonMenuDelegate.swift; sourceTree = "<group>"; };
 		566B73682BECBF8400FF1959 /* SyncAlertsPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncAlertsPresenter.swift; sourceTree = "<group>"; };
 		566B736B2BECC3C600FF1959 /* SyncPausedStateManaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncPausedStateManaging.swift; sourceTree = "<group>"; };
-		567A23B82C7F52370010F66C /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../../BrowserServicesKit; sourceTree = "<group>"; };
 		567A23BD2C7F539C0010F66C /* SpecialErrorPageUserScriptExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpecialErrorPageUserScriptExtension.swift; sourceTree = "<group>"; };
 		567DA93E29E8045D008AC5EE /* MockEmailStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockEmailStorage.swift; sourceTree = "<group>"; };
 		567DA94429E95C3F008AC5EE /* YoutubeOverlayUserScriptTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YoutubeOverlayUserScriptTests.swift; sourceTree = "<group>"; };
@@ -3538,7 +3533,6 @@
 		56B234BE2A84EFD200F2A1CC /* NavigationBarUrlExtensionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarUrlExtensionsTests.swift; sourceTree = "<group>"; };
 		56BA1E742BAAF70F001CF69F /* SpecialErrorPageTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpecialErrorPageTabExtension.swift; sourceTree = "<group>"; };
 		56BA1E7C2BAB290E001CF69F /* ErrorPageTabExtensionTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorPageTabExtensionTest.swift; sourceTree = "<group>"; };
-		56BA1E862BAC8239001CF69F /* SSLErrorPageUserScriptTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSLErrorPageUserScriptTests.swift; sourceTree = "<group>"; };
 		56BA1E892BB1CB5B001CF69F /* CertificateTrustEvaluator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CertificateTrustEvaluator.swift; sourceTree = "<group>"; };
 		56CEE9092B7A66C500CF10AA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		56CEE90D2B7A6DE100CF10AA /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
@@ -4399,7 +4393,6 @@
 				371209252C232E6C003ADF3D /* RemoteMessaging in Frameworks */,
 				4BCBE45A2BA7E17800FC75A1 /* Subscription in Frameworks */,
 				B6EC37FF29B8D915001ACE79 /* Configuration in Frameworks */,
-				567A23BC2C7F53470010F66C /* SpecialErrorPages in Frameworks */,
 				372217822B33380700B8E9C2 /* TestUtils in Frameworks */,
 				3706FCAA293F65D500E42796 /* UserScript in Frameworks */,
 				85E2BBD02B8F534A00DBEC7A /* History in Frameworks */,
@@ -4592,7 +4585,6 @@
 				F1DF95E32BD1807C0045E591 /* Crashes in Frameworks */,
 				85E2BBCE2B8F534000DBEC7A /* History in Frameworks */,
 				1EA7B8D32B7E078C000330A4 /* SubscriptionUI in Frameworks */,
-				567A23BA2C7F533C0010F66C /* SpecialErrorPages in Frameworks */,
 				B6F7128129F681EB00594A45 /* QuickLookUI.framework in Frameworks */,
 				EE7295E32A545B9A008C0991 /* NetworkProtection in Frameworks */,
 				9807F645278CA16F00E1547B /* BrowserServicesKit in Frameworks */,
@@ -5113,7 +5105,6 @@
 		378E279C2970217400FCADA2 /* LocalPackages */ = {
 			isa = PBXGroup;
 			children = (
-				567A23B82C7F52370010F66C /* BrowserServicesKit */,
 				9D9DE5712C63A96400D20B15 /* AppKitExtensions */,
 				7B9167A82C09E88800322310 /* AppLauncher */,
 				378E279D2970217400FCADA2 /* BuildToolPlugins */,
@@ -6166,7 +6157,6 @@
 		56BA1E852BAC820D001CF69F /* UserScripts */ = {
 			isa = PBXGroup;
 			children = (
-				56BA1E862BAC8239001CF69F /* SSLErrorPageUserScriptTests.swift */,
 			);
 			path = UserScripts;
 			sourceTree = "<group>";
@@ -8752,7 +8742,6 @@
 				D6BC8AC72C5A95B10025375B /* DuckPlayer */,
 				9D9DE5742C63AA0C00D20B15 /* AppKitExtensions */,
 				C18BF9CD2C73678C00ED6B8A /* Freemium */,
-				567A23BB2C7F53470010F66C /* SpecialErrorPages */,
 			);
 			productName = DuckDuckGo;
 			productReference = 3706FD05293F65D500E42796 /* DuckDuckGo App Store.app */;
@@ -9170,7 +9159,6 @@
 				D6BC8AC52C5A95AA0025375B /* DuckPlayer */,
 				9D9DE5722C63AA0700D20B15 /* AppKitExtensions */,
 				C18BF9CB2C73678500ED6B8A /* Freemium */,
-				567A23B92C7F533C0010F66C /* SpecialErrorPages */,
 			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo.app */;
@@ -11085,7 +11073,6 @@
 				3706FE79293F661700E42796 /* AppearancePreferencesTests.swift in Sources */,
 				3706FE7A293F661700E42796 /* FirePopoverViewModelTests.swift in Sources */,
 				7B09CBAA2BA4BE8200CF245B /* NetworkProtectionPixelEventTests.swift in Sources */,
-				56BA1E882BAC8239001CF69F /* SSLErrorPageUserScriptTests.swift in Sources */,
 				3706FE7B293F661700E42796 /* HistoryStoringMock.swift in Sources */,
 				562984702AC4610100AC20EB /* SyncPreferencesTests.swift in Sources */,
 				3706FE7C293F661700E42796 /* LocalBookmarkStoreTests.swift in Sources */,
@@ -12271,7 +12258,6 @@
 				B67C6C472654C643006C872E /* FileManagerExtensionTests.swift in Sources */,
 				B69B50482726C5C200758A2B /* StatisticsLoaderTests.swift in Sources */,
 				9F6434702BECBA2800D2D8A0 /* SubscriptionRedirectManagerTests.swift in Sources */,
-				56BA1E872BAC8239001CF69F /* SSLErrorPageUserScriptTests.swift in Sources */,
 				142879DA24CE1179005419BB /* SuggestionViewModelTests.swift in Sources */,
 				4B9292BC2667103100AD2C21 /* BookmarkSidebarTreeControllerTests.swift in Sources */,
 				4B9DB05A2A983B55000927DB /* MockWaitlistRequest.swift in Sources */,
@@ -13569,7 +13555,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = "sabrina/refactor-ssl-page";
+				branch = "jacek/ssl-errors";
 				kind = branch;
 			};
 		};
@@ -13900,14 +13886,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 4311906792B7676CE9535D76 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = Crashes;
-		};
-		567A23B92C7F533C0010F66C /* SpecialErrorPages */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = SpecialErrorPages;
-		};
-		567A23BB2C7F53470010F66C /* SpecialErrorPages */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = SpecialErrorPages;
 		};
 		7B00997C2B6508B700FE7C31 /* NetworkProtectionProxy */ = {
 			isa = XCSwiftPackageProductDependency;

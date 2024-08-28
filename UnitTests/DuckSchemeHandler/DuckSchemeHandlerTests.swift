@@ -62,25 +62,6 @@ final class DuckSchemeHandlerTests: XCTestCase {
         XCTAssertNil(schemeTask.error)
     }
 
-    func testWebViewFromSpecialErrorHandlerReturnsResponseAndData() throws {
-        // Given
-        let releaseNotesURL = URL(string: "duck://special-error")!
-        let handler = DuckURLSchemeHandler()
-        let webView = WKWebView()
-        let schemeTask = MockSchemeTask(request: URLRequest(url: releaseNotesURL))
-
-        // When
-        handler.webView(webView, start: schemeTask)
-
-        // Then
-        XCTAssertEqual(schemeTask.response?.url, releaseNotesURL)
-        XCTAssertEqual(schemeTask.response?.mimeType, "text/html")
-        XCTAssertNotNil(schemeTask.data)
-        XCTAssertTrue(schemeTask.data?.utf8String()?.contains("<title>SSL Error Page</title>") ?? false)
-        XCTAssertTrue(schemeTask.didFinishCalled)
-        XCTAssertNil(schemeTask.error)
-    }
-
     @MainActor
     func testWebViewFromDuckPlayerHandlerReturnsResponseAndData() throws {
         // Given
