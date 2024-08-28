@@ -1,0 +1,32 @@
+name: Migration Test - Asana Extract Task Assignee
+
+on: 
+  push:
+    branches: [ "dominik/fastlane-plugin-asana-extract-assignee" ]
+  workflow_dispatch:
+
+jobs:
+  test:
+
+    name: Test
+
+    runs-on: macos-14
+
+    steps:
+ 
+    - name: Check out the code
+      uses: actions/checkout@v4
+
+    - name: Set up fastlane
+      run: bundle install
+
+    - name: Test
+      id: get-automation-subtask
+      uses: ./.github/actions/asana-get-release-automation-subtask-id
+      with:
+        access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        task-url: "https://app.asana.com/0/1199230911884351/1208154191967682/f"
+
+    - name: Output assignee ID
+      run: |
+        echo "Assignee ID: ${{ steps.get-automation-subtask.outputs.assignee-id }}"
