@@ -57,12 +57,12 @@ final class SpecialErrorPageTabExtension {
     private var shouldBypassSSLError = false
     private var urlCredentialCreator: URLCredentialCreating
     private var featureFlagger: FeatureFlagger
-    private var failingURL: URL?
     private let tld = TLD()
 
     private var cancellables = Set<AnyCancellable>()
 
     var errorData: SpecialErrorData?
+    var failingURL: URL?
 
     init(
         webViewPublisher: some Publisher<WKWebView, Never>,
@@ -135,7 +135,7 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
 }
 
 extension SpecialErrorPageTabExtension: SpecialErrorPageUserScriptDelegate {
-    
+
     func leaveSite() {
         guard webView?.canGoBack == true else {
             webView?.close()
@@ -149,9 +149,7 @@ extension SpecialErrorPageTabExtension: SpecialErrorPageUserScriptDelegate {
         _ = webView?.reloadPage()
     }
 
-    func advancedInfoPresented() {
-        // Not sure what we need to do here
-    }
+    func advancedInfoPresented() {}
 }
 
 protocol ErrorPageTabExtensionProtocol: AnyObject, NavigationResponder {}
