@@ -661,7 +661,6 @@ final class DefaultWireGuardInterface: WireGuardInterface {
     }
 }
 
-
 extension MacPacketTunnelProvider: AccountManagerKeychainAccessDelegate {
 
     public func accountManagerKeychainAccessFailed(accessType: AccountKeychainAccessType, error: AccountKeychainAccessError) {
@@ -669,4 +668,3 @@ extension MacPacketTunnelProvider: AccountManagerKeychainAccessDelegate {
                       frequency: .dailyAndCount)
     }
 }
-
