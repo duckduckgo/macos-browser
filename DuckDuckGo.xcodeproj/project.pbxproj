@@ -1034,6 +1034,8 @@
 		376705AF27EB488600DD8D76 /* RoundedSelectionRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511B3262CAA5A00F6079C /* RoundedSelectionRowView.swift */; };
 		376731822C7E226A00EB097B /* HomePageViewBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376731812C7E226A00EB097B /* HomePageViewBackground.swift */; };
 		376731832C7E226A00EB097B /* HomePageViewBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376731812C7E226A00EB097B /* HomePageViewBackground.swift */; };
+		376731872C7EF9C200EB097B /* ColorSchemeLosslessStringConvertibleExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376731842C7EF97400EB097B /* ColorSchemeLosslessStringConvertibleExtensionTests.swift */; };
+		376731882C7EF9C300EB097B /* ColorSchemeLosslessStringConvertibleExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376731842C7EF97400EB097B /* ColorSchemeLosslessStringConvertibleExtensionTests.swift */; };
 		3768D8382C24BFF5004120AE /* RemoteMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3768D8372C24BFF5004120AE /* RemoteMessageView.swift */; };
 		3768D8392C24BFF5004120AE /* RemoteMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3768D8372C24BFF5004120AE /* RemoteMessageView.swift */; };
 		3768D83B2C24C0A8004120AE /* RemoteMessageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3768D83A2C24C0A8004120AE /* RemoteMessageViewModel.swift */; };
@@ -3212,6 +3214,7 @@
 		376113D42B29CD5B00E794BB /* SyncE2EUITests App Store.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "SyncE2EUITests App Store.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		376113D72B29D0F800E794BB /* SyncE2EUITestsAppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = SyncE2EUITestsAppStore.xcconfig; sourceTree = "<group>"; };
 		376731812C7E226A00EB097B /* HomePageViewBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePageViewBackground.swift; sourceTree = "<group>"; };
+		376731842C7EF97400EB097B /* ColorSchemeLosslessStringConvertibleExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorSchemeLosslessStringConvertibleExtensionTests.swift; sourceTree = "<group>"; };
 		3768D8372C24BFF5004120AE /* RemoteMessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMessageView.swift; sourceTree = "<group>"; };
 		3768D83A2C24C0A8004120AE /* RemoteMessageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMessageViewModel.swift; sourceTree = "<group>"; };
 		3768D83F2C29C1F1004120AE /* ActiveRemoteMessageModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveRemoteMessageModel.swift; sourceTree = "<group>"; };
@@ -6142,6 +6145,7 @@
 				560C3FFB2BC9911000F589CE /* PermanentSurveyManagerTests.swift */,
 				370270BF2C78EB13002E44E4 /* HomePageSettingsModelTests.swift */,
 				37D046A02C7DA9A200AEAA50 /* UserBackgroundImagesManagerTests.swift */,
+				376731842C7EF97400EB097B /* ColorSchemeLosslessStringConvertibleExtensionTests.swift */,
 			);
 			path = HomePage;
 			sourceTree = "<group>";
@@ -11164,6 +11168,7 @@
 				3706FE5D293F661700E42796 /* FileSystemDSL.swift in Sources */,
 				3706FE5E293F661700E42796 /* DataImportMocks.swift in Sources */,
 				3706FE5F293F661700E42796 /* CrashReportTests.swift in Sources */,
+				376731882C7EF9C300EB097B /* ColorSchemeLosslessStringConvertibleExtensionTests.swift in Sources */,
 				84DC715A2C1C1E9000033B8C /* UserDefaultsWrapperTests.swift in Sources */,
 				B60C6F7F29B1B41D007BFAA8 /* TestRunHelperInitializer.m in Sources */,
 				9F0FFFBF2BCCAF1F007C87DD /* BookmarkAllTabsDialogViewModelMock.swift in Sources */,
@@ -12494,6 +12499,7 @@
 				566B196529CDB828007E38F4 /* CapturingOptionsButtonMenuDelegate.swift in Sources */,
 				1D7693FF2BE3A1AA0016A22B /* DockCustomizerMock.swift in Sources */,
 				4B8AD0B127A86D9200AE44D6 /* WKWebsiteDataStoreExtensionTests.swift in Sources */,
+				376731872C7EF9C200EB097B /* ColorSchemeLosslessStringConvertibleExtensionTests.swift in Sources */,
 				9FA5A0B02BC9039200153786 /* BookmarkFolderStoreMock.swift in Sources */,
 				F1F861152C1B25D4005DB446 /* SubscriptionUIHandlerMock.swift in Sources */,
 				B69B50472726C5C200758A2B /* VariantManagerTests.swift in Sources */,
