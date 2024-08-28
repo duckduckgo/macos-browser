@@ -42,7 +42,7 @@ extension HomePage.Models {
         struct CustomBackgroundModeModel: Identifiable, Hashable {
             let contentType: ContentType
             let title: String
-            let customBackgroundPreview: CustomBackground?
+            let customBackgroundThumbnail: CustomBackground?
 
             var id: String {
                 title
@@ -215,31 +215,31 @@ extension HomePage.Models {
             switch contentType {
             case .root:
                 assertionFailure("\(#function) must not be called for ContentType.root")
-                return CustomBackgroundModeModel(contentType: .root, title: "", customBackgroundPreview: nil)
+                return CustomBackgroundModeModel(contentType: .root, title: "", customBackgroundThumbnail: nil)
             case .gradientPicker:
                 return CustomBackgroundModeModel(
                     contentType: .gradientPicker,
-                    title: "Gradients",
-                    customBackgroundPreview: .gradient(customBackground?.gradient ?? CustomBackground.placeholderGradient)
+                    title: UserText.gradients,
+                    customBackgroundThumbnail: .gradient(customBackground?.gradient ?? CustomBackground.placeholderGradient)
                 )
             case .colorPicker:
                 return CustomBackgroundModeModel(
                     contentType: .colorPicker,
-                    title: "Solid Colors",
-                    customBackgroundPreview: .solidColor(customBackground?.solidColor ?? CustomBackground.placeholderColor)
+                    title: UserText.solidColors,
+                    customBackgroundThumbnail: .solidColor(customBackground?.solidColor ?? CustomBackground.placeholderColor)
                 )
             case .illustrationPicker:
                 return CustomBackgroundModeModel(
                     contentType: .illustrationPicker,
-                    title: "Illustrations",
-                    customBackgroundPreview: .illustration(customBackground?.illustration ?? CustomBackground.placeholderIllustration)
+                    title: UserText.illustrations,
+                    customBackgroundThumbnail: .illustration(customBackground?.illustration ?? CustomBackground.placeholderIllustration)
                 )
             case .customImagePicker:
                 guard let customImagesManager else {
                     return nil
                 }
-                let title = customImagesManager.availableImages.isEmpty ? "Add Background" : "My Backgrounds"
-                let preview: CustomBackground? = {
+                let title = customImagesManager.availableImages.isEmpty ? UserText.addBackground : UserText.myBackgrounds
+                let thumbnail: CustomBackground? = {
                     guard customBackground?.userBackgroundImage == nil else {
                         return customBackground
                     }
@@ -248,7 +248,7 @@ extension HomePage.Models {
                     }
                     return .userImage(lastUsedUserBackgroundImage)
                 }()
-                return CustomBackgroundModeModel(contentType: .customImagePicker, title: title, customBackgroundPreview: preview)
+                return CustomBackgroundModeModel(contentType: .customImagePicker, title: title, customBackgroundThumbnail: thumbnail)
             }
         }
     }

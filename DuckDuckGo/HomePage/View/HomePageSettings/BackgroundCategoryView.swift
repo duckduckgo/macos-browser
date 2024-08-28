@@ -47,7 +47,7 @@ extension HomePage.Views {
                         } else {
                             BackgroundThumbnailView(
                                 showCheckmarkIfSelected: true,
-                                customBackground: modeModel.customBackgroundPreview ?? .solidColor(.gray)
+                                customBackground: modeModel.customBackgroundThumbnail ?? .solidColor(.gray)
                             )
                         }
                     }

@@ -26,11 +26,11 @@ import XCTest
 private typealias SettingsModel = HomePage.Models.SettingsModel
 
 fileprivate extension SettingsModel.CustomBackgroundModeModel {
-    static let root: Self = .init(contentType: .root, title: "", customBackgroundPreview: nil)
-    static let gradientPicker: Self = .init(contentType: .gradientPicker, title: "", customBackgroundPreview: nil)
-    static let colorPicker: Self = .init(contentType: .colorPicker, title: "", customBackgroundPreview: nil)
-    static let illustrationPicker: Self = .init(contentType: .illustrationPicker, title: "", customBackgroundPreview: nil)
-    static let customImagePicker: Self = .init(contentType: .customImagePicker, title: "", customBackgroundPreview: nil)
+    static let root: Self = .init(contentType: .root, title: "", customBackgroundThumbnail: nil)
+    static let gradientPicker: Self = .init(contentType: .gradientPicker, title: "", customBackgroundThumbnail: nil)
+    static let colorPicker: Self = .init(contentType: .colorPicker, title: "", customBackgroundThumbnail: nil)
+    static let illustrationPicker: Self = .init(contentType: .illustrationPicker, title: "", customBackgroundThumbnail: nil)
+    static let customImagePicker: Self = .init(contentType: .customImagePicker, title: "", customBackgroundThumbnail: nil)
 }
 
 final class HomePageSettingsModelTests: XCTestCase {
@@ -212,7 +212,7 @@ final class HomePageSettingsModelTests: XCTestCase {
 
     func testThatCustomBackgroundModeModelShowsPreviewOfCurrentlySelectedBackground() {
         model.customBackground = nil
-        XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundPreview), [
+        XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundThumbnail), [
             .gradient(CustomBackground.placeholderGradient),
             .solidColor(CustomBackground.placeholderColor),
             .illustration(CustomBackground.placeholderIllustration),
@@ -220,7 +220,7 @@ final class HomePageSettingsModelTests: XCTestCase {
         ])
 
         model.customBackground = .gradient(.gradient04)
-        XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundPreview), [
+        XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundThumbnail), [
             .gradient(.gradient04),
             .solidColor(CustomBackground.placeholderColor),
             .illustration(CustomBackground.placeholderIllustration),
@@ -228,7 +228,7 @@ final class HomePageSettingsModelTests: XCTestCase {
         ])
 
         model.customBackground = .solidColor(.darkPink)
-        XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundPreview), [
+        XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundThumbnail), [
             .gradient(CustomBackground.placeholderGradient),
             .solidColor(.darkPink),
             .illustration(CustomBackground.placeholderIllustration),
@@ -236,7 +236,7 @@ final class HomePageSettingsModelTests: XCTestCase {
         ])
 
         model.customBackground = .illustration(.illustration02)
-        XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundPreview), [
+        XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundThumbnail), [
             .gradient(CustomBackground.placeholderGradient),
             .solidColor(CustomBackground.placeholderColor),
             .illustration(.illustration02),
@@ -251,7 +251,7 @@ final class HomePageSettingsModelTests: XCTestCase {
 
         userBackgroundImagesManager.availableImages = [image1, image2, image3]
         model.customBackground = nil
-        XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundPreview), [
+        XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundThumbnail), [
             .gradient(CustomBackground.placeholderGradient),
             .solidColor(CustomBackground.placeholderColor),
             .illustration(CustomBackground.placeholderIllustration),
@@ -259,7 +259,7 @@ final class HomePageSettingsModelTests: XCTestCase {
         ])
 
         userBackgroundImagesManager.availableImages = [image2, image1, image3]
-        XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundPreview), [
+        XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundThumbnail), [
             .gradient(CustomBackground.placeholderGradient),
             .solidColor(CustomBackground.placeholderColor),
             .illustration(CustomBackground.placeholderIllustration),
