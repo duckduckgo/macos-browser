@@ -20,6 +20,7 @@ import Bookmarks
 import Foundation
 import Persistence
 import RemoteMessaging
+import Freemium
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
@@ -27,6 +28,11 @@ struct MockRemoteMessagingStoreProvider: RemoteMessagingStoreProviding {
     func makeRemoteMessagingStore(database: CoreDataDatabase, availabilityProvider: RemoteMessagingAvailabilityProviding) -> RemoteMessagingStoring {
         RemoteMessagingStore(database: database, errorEvents: nil, remoteMessagingAvailabilityProvider: availabilityProvider)
     }
+}
+
+struct MockFreemiumPIRUserState: FreemiumPIRUserState {
+    var didOnboard = false
+    var isActiveUser = false
 }
 
 final class RemoteMessagingClientTests: XCTestCase {
