@@ -28,7 +28,6 @@ import NetworkProtection
 import Subscription
 import SubscriptionUI
 
-@MainActor
 final class MainMenu: NSMenu {
 
     enum Constants {
@@ -48,6 +47,7 @@ final class MainMenu: NSMenu {
     let closeTabMenuItem = NSMenuItem(title: UserText.closeTab, action: #selector(MainViewController.closeTab), keyEquivalent: "w")
     let importBrowserDataMenuItem = NSMenuItem(title: UserText.mainMenuFileImportBookmarksandPasswords, action: #selector(AppDelegate.openImportBrowserDataWindow))
 
+    @MainActor
     let sharingMenu = SharingMenu(title: UserText.shareMenuItem)
 
     // MARK: View
@@ -60,9 +60,12 @@ final class MainMenu: NSMenu {
     let zoomOutMenuItem = NSMenuItem(title: UserText.mainMenuViewZoomOut, action: #selector(MainViewController.zoomOut), keyEquivalent: "-")
 
     // MARK: History
+    @MainActor
     let historyMenu = HistoryMenu()
 
+    @MainActor
     var backMenuItem: NSMenuItem { historyMenu.backMenuItem }
+    @MainActor
     var forwardMenuItem: NSMenuItem { historyMenu.forwardMenuItem }
 
     // MARK: Bookmarks
@@ -101,6 +104,7 @@ final class MainMenu: NSMenu {
 
     // MARK: - Initialization
 
+    @MainActor
     init(featureFlagger: FeatureFlagger, bookmarkManager: BookmarkManager, faviconManager: FaviconManagement, copyHandler: CopyHandler) {
 
         super.init(title: UserText.duckDuckGo)
@@ -358,6 +362,7 @@ final class MainMenu: NSMenu {
             })
     }
 
+    @MainActor
     func buildDebugMenu(featureFlagger: FeatureFlagger) -> NSMenuItem? {
 #if DEBUG || REVIEW
         NSMenuItem(title: "Debug")
@@ -416,6 +421,7 @@ final class MainMenu: NSMenu {
     // MARK: - Bookmarks
 
     var faviconsCancellable: AnyCancellable?
+    @MainActor
     private func subscribeToFavicons(faviconManager: FaviconManagement) {
         faviconsCancellable = faviconManager.faviconsLoadedPublisher
             .receive(on: DispatchQueue.main)
@@ -563,6 +569,7 @@ final class MainMenu: NSMenu {
 
     let internalUserItem = NSMenuItem(title: "Set Internal User State", action: #selector(MainViewController.internalUserState))
 
+    @MainActor
     private func setupDebugMenu() -> NSMenu {
         let debugMenu = NSMenu(title: "Debug") {
             NSMenuItem(title: "Open Vanilla Browser", action: #selector(MainViewController.openVanillaBrowser)).withAccessibilityIdentifier("MainMenu.openVanillaBrowser")

@@ -82,7 +82,7 @@ protocol NewWindowPolicyDecisionMaker {
 
     @MainActor
     convenience init(content: TabContent,
-                     faviconManagement: FaviconManagement = FaviconManager.shared,
+                     faviconManagement: FaviconManagement? = nil,
                      webCacheManager: WebCacheManager = WebCacheManager.shared,
                      webViewConfiguration: WKWebViewConfiguration? = nil,
                      historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
@@ -124,7 +124,7 @@ protocol NewWindowPolicyDecisionMaker {
         }
 
         self.init(content: content,
-                  faviconManagement: faviconManager,
+                  faviconManagement: faviconManager ?? FaviconManager.shared,
                   webCacheManager: webCacheManager,
                   webViewConfiguration: webViewConfiguration,
                   historyCoordinating: historyCoordinating,

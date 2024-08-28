@@ -21,7 +21,6 @@ import Combine
 import Common
 import History
 
-@MainActor
 final class HistoryMenu: NSMenu {
 
     let backMenuItem = NSMenuItem(title: UserText.navigateBack, action: #selector(MainViewController.back), keyEquivalent: "[")
@@ -38,8 +37,10 @@ final class HistoryMenu: NSMenu {
     private let clearAllHistorySeparator = NSMenuItem.separator()
 
     private let historyCoordinator: HistoryCoordinating
+    @MainActor
     private let reopenMenuItemKeyEquivalentManager = ReopenMenuItemKeyEquivalentManager()
 
+    @MainActor
     init(historyCoordinator: HistoryCoordinating = HistoryCoordinator.shared) {
         self.historyCoordinator = historyCoordinator
 
@@ -67,6 +68,7 @@ final class HistoryMenu: NSMenu {
         fatalError("init(coder:) has not been implemented")
     }
 
+    @MainActor
     override func update() {
         super.update()
 
@@ -89,6 +91,7 @@ final class HistoryMenu: NSMenu {
 
     // MARK: - Last Closed & Recently Closed
 
+    @MainActor
     private func updateReopenLastClosedMenuItem() {
         switch RecentlyClosedCoordinator.shared.cache.last {
         case is RecentlyClosedWindow:
@@ -101,6 +104,7 @@ final class HistoryMenu: NSMenu {
 
     }
 
+    @MainActor
     private func updateRecentlyClosedMenu() {
         let recentlyClosedMenu = RecentlyClosedMenu(recentlyClosedCoordinator: RecentlyClosedCoordinator.shared)
         recentlyClosedMenuItem.submenu = recentlyClosedMenu

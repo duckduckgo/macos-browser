@@ -91,11 +91,11 @@ final class Fire {
          permissionManager: PermissionManagerProtocol = PermissionManager.shared,
          savedZoomLevelsCoordinating: SavedZoomLevelsCoordinating = AccessibilityPreferences.shared,
          downloadListCoordinator: DownloadListCoordinator = DownloadListCoordinator.shared,
-         windowControllerManager: WindowControllersManager = WindowControllersManager.shared,
+         windowControllerManager: WindowControllersManager? = nil,
          faviconManagement: FaviconManagement = FaviconManager.shared,
          autoconsentManagement: AutoconsentManagement? = nil,
          stateRestorationManager: AppStateRestorationManager? = nil,
-         recentlyClosedCoordinator: RecentlyClosedCoordinating? = RecentlyClosedCoordinator.shared,
+         recentlyClosedCoordinator: RecentlyClosedCoordinating? = nil,
          pinnedTabsManager: PinnedTabsManager? = nil,
          tld: TLD,
          bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
@@ -108,9 +108,9 @@ final class Fire {
         self.permissionManager = permissionManager
         self.savedZoomLevelsCoordinating = savedZoomLevelsCoordinating
         self.downloadListCoordinator = downloadListCoordinator
-        self.windowControllerManager = windowControllerManager
+        self.windowControllerManager = windowControllerManager ?? WindowControllersManager.shared
         self.faviconManagement = faviconManagement
-        self.recentlyClosedCoordinator = recentlyClosedCoordinator
+        self.recentlyClosedCoordinator = recentlyClosedCoordinator ?? RecentlyClosedCoordinator.shared
         self.pinnedTabsManager = pinnedTabsManager ?? WindowControllersManager.shared.pinnedTabsManager
         self.bookmarkManager = bookmarkManager
         self.syncService = syncService ?? NSApp.delegateTyped.syncService

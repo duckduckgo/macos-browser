@@ -23,7 +23,6 @@ import Common
 import LoginItems
 import NetworkProtectionProxy
 
-@MainActor
 final class DataBrokerProtectionDebugMenu: NSMenu {
 
     enum EnvironmentTitle: String {

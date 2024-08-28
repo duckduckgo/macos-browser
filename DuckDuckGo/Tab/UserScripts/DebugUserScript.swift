@@ -38,6 +38,7 @@ final class DebugUserScript: NSObject, StaticUserScript {
     static var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
     static var forMainFrameOnly: Bool { false }
     var messageNames: [String] { MessageNames.allCases.map(\.rawValue) }
+    @MainActor
     static let source: String = {
         #if DEBUG
             return DebugUserScript.debugMessagingEnabledSource
