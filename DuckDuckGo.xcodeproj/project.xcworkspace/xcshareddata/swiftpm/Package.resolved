@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "fcappelli/os_log_to_logger_2",
-        "revision" : "16c1f4b0d500d1cea36f95f6c5f31a62136e43a5"
+        "revision" : "faf25f57d1d61ff855216178c454616031585c07",
+        "version" : "188.0.0"
       }
     },
     {
