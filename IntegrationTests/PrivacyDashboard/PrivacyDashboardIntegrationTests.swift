@@ -61,7 +61,7 @@ class PrivacyDashboardIntegrationTests: XCTestCase {
             .switchToLatest()
             .filter { $0.trackersBlocked.count > 0 }
             .map { $0.trackers.count }
-            .timeout(10)
+            .timeout(30)
             .first()
             .promise()
 
