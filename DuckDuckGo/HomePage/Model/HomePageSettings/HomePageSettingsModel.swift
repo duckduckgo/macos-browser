@@ -18,6 +18,7 @@
 
 import Combine
 import Foundation
+import os.log
 import PixelKit
 import SwiftUI
 import SwiftUIExtensions
@@ -163,6 +164,11 @@ extension HomePage.Models {
                 if case .userImage(let userBackgroundImage) = customBackground {
                     customImagesManager?.updateSelectedTimestamp(for: userBackgroundImage)
                 }
+                if let customBackground {
+                    Logger.homePageSettings.debug("Home page background updated: \(customBackground), color scheme: \(customBackground.colorScheme)")
+                } else {
+                    Logger.homePageSettings.debug("Home page background reset")
+                }
                 switch customBackground {
                 case .gradient:
                     sendPixel(NewTabPagePixel.newTabBackgroundSelectedGradient)
@@ -187,9 +193,11 @@ extension HomePage.Models {
             do {
                 let image = try await customImagesManager.addImage(with: url)
                 customBackground = .userImage(image)
+                Logger.homePageSettings.debug("New user image added")
             } catch {
                 sendPixel(DebugEvent(NewTabPagePixel.newTabBackgroundAddImageError, error: error))
                 showAddImageFailedAlert()
+                Logger.homePageSettings.error("Failed to add user image: \(error)")
             }
         }
 

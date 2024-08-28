@@ -19,6 +19,23 @@
 import AppKit
 import SwiftUI
 
+extension ColorScheme: LosslessStringConvertible {
+    public init?(_ description: String) {
+        switch description {
+        case "light":
+            self = .light
+        case "dark":
+            self = .dark
+        default:
+            return nil
+        }
+    }
+
+    public var description: String {
+        self == .light ? "light" : "dark"
+    }
+}
+
 struct UserBackgroundImage: Hashable, Equatable, Identifiable, LosslessStringConvertible, ColorSchemeProviding, CustomBackgroundConvertible {
     let fileName: String
     let colorScheme: ColorScheme

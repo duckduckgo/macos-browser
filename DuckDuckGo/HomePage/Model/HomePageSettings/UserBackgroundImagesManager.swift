@@ -18,6 +18,7 @@
 
 import Combine
 import Foundation
+import os.log
 import PixelKit
 import SwiftUI
 
@@ -35,23 +36,6 @@ protocol UserBackgroundImagesManaging {
 
     func updateSelectedTimestamp(for userBackgroundImage: UserBackgroundImage)
     func sortImagesByLastUsed()
-}
-
-extension ColorScheme: LosslessStringConvertible {
-    public init?(_ description: String) {
-        switch description {
-        case "light":
-            self = .light
-        case "dark":
-            self = .dark
-        default:
-            return nil
-        }
-    }
-
-    public var description: String {
-        self == .light ? "light" : "dark"
-    }
 }
 
 final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
@@ -120,6 +104,7 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
             availableImages = imagesMetadata.compactMap(UserBackgroundImage.init)
             validateAvailableImages()
         } catch {
+            Logger.homePageSettings.error("Failed to initialize user background images storage: \(error)")
             sendPixel(DebugEvent(NewTabPagePixel.newTabBackgroundInitializeStorageError, error: error))
             return nil
         }
@@ -132,6 +117,7 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
                 pathsForNotFoundImages.insert(imagePath)
                 sendPixel(DebugEvent(NewTabPagePixel.newTabBackgroundImageNotFound))
             }
+            Logger.homePageSettings.error("Image for \(userBackgroundImage.fileName) not found")
             return nil
         }
         return image
@@ -144,6 +130,7 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
                 pathsForNotFoundImages.insert(thumbnailPath)
                 sendPixel(DebugEvent(NewTabPagePixel.newTabBackgroundThumbnailNotFound))
             }
+            Logger.homePageSettings.error("Thumbnail for \(userBackgroundImage.fileName) not found, using full-size image as thumbnail")
             return image(for: userBackgroundImage)
         }
         return thumbnail
@@ -152,6 +139,7 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
     func addImage(with url: URL) async throws -> UserBackgroundImage {
         let fileName = [UUID().uuidString, Const.jpegExtension].joined(separator: ".")
         let destinationURL = storageLocation.appendingPathComponent(fileName)
+        Logger.homePageSettings.debug("Processing user image at \(url.path) -> \(fileName) ...")
 
         // first copy the image, converting it to JPEG
         try copyImage(at: url, toJPEGAt: destinationURL)
@@ -162,15 +150,21 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
             do {
                 let imageData = try Data(contentsOf: destinationURL)
                 let resizedImageData = try imageProcessor.resizeImage(with: imageData, to: Const.thumbnailSize)
+                Logger.homePageSettings.debug("Thumbnail for \(destinationURL.lastPathComponent) generated")
+
                 try resizedImageData.write(to: thumbnailsStorageLocation.appendingPathComponent(fileName))
+                Logger.homePageSettings.debug("Thumbnail for \(destinationURL.lastPathComponent) saved in application data directory")
             } catch {
+                Logger.homePageSettings.error("Failed to generate thumbnail for \(destinationURL.lastPathComponent): \(error)")
                 sendPixel(DebugEvent(NewTabPagePixel.newTabBackgroundThumbnailGenerationError, error: error))
             }
         }()
 
         // and color scheme calculation
         async let colorSchemeTask = {
-            imageProcessor.calculatePreferredColorScheme(forImageAt: destinationURL)
+            let colorScheme = imageProcessor.calculatePreferredColorScheme(forImageAt: destinationURL)
+            Logger.homePageSettings.debug("Preferred color scheme for \(destinationURL.lastPathComponent) is \(colorScheme)")
+            return colorScheme
         }()
 
         await thumbnailTask
@@ -211,13 +205,16 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
 
     private func copyImage(at sourceURL: URL, toJPEGAt destinationURL: URL) throws {
         let data = try imageProcessor.convertImageToJPEG(at: sourceURL)
+        Logger.homePageSettings.debug("Image \(destinationURL.lastPathComponent) processed")
         try data.write(to: destinationURL)
+        Logger.homePageSettings.debug("Image \(destinationURL.lastPathComponent) saved in application data directory")
     }
 
     private func deleteImagesOverLimit() {
         guard imagesMetadata.count >= maximumNumberOfImages else {
             return
         }
+        Logger.homePageSettings.debug("User images are over limit, deleting oldest image(s) ...")
         let imagesToDelete = imagesMetadata.suffix(from: maximumNumberOfImages - 1).compactMap(UserBackgroundImage.init)
         imagesToDelete.forEach { deleteImageFiles(for: $0) }
     }
@@ -225,6 +222,7 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
     private func deleteImageFiles(for userBackgroundImage: UserBackgroundImage) {
         FileManager.default.remove(fileAtURL: storageLocation.appendingPathComponent(userBackgroundImage.fileName))
         FileManager.default.remove(fileAtURL: thumbnailsStorageLocation.appendingPathComponent(userBackgroundImage.fileName))
+        Logger.homePageSettings.debug("Deleted user background image files for \(userBackgroundImage.fileName)")
     }
 
     private func setUpStorageDirectory(at path: String) throws {
@@ -233,22 +231,29 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
 
         switch (fileExists, isDirectory.boolValue) {
         case (true, true):
+            Logger.homePageSettings.info("User background images storage directory is ready for use at \(path)")
             return
         case (true, false):
             // File found where directory was expected
             // Because we're inside the application data directory, we claim ownership
             // over files inside it and proceed with deleting the file.
+            Logger.homePageSettings.info("Deleting file at \(path) in order to prepare user background images storage")
             try FileManager.default.removeItem(atPath: path)
             fallthrough
         case (false, _):
             try FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: true)
+            Logger.homePageSettings.info("User background images storage directory created \(path)")
         }
     }
 
     private func validateAvailableImages() {
         availableImages = availableImages.filter { image in
             let imagePath = storageLocation.appendingPathComponent(image.fileName).path
-            return FileManager.default.fileExists(atPath: imagePath)
+            if FileManager.default.fileExists(atPath: imagePath) {
+                return true
+            }
+            Logger.homePageSettings.debug("User background image \(image.fileName) not found in storage, removing from the list of available images")
+            return false
         }
     }
 }
