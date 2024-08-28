@@ -36,21 +36,6 @@ extension HomePage.Models {
             case colorPicker
             case illustrationPicker
             case customImagePicker
-
-            var customBackgroundType: CustomBackgroundType? {
-                switch self {
-                case .gradientPicker:
-                        .gradient
-                case .colorPicker:
-                        .solidColor
-                case .illustrationPicker:
-                        .illustration
-                case .customImagePicker:
-                        .customImage
-                case .root:
-                    nil
-                }
-            }
         }
 
         struct CustomBackgroundModeModel: Identifiable, Hashable {

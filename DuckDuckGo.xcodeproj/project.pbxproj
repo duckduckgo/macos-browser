@@ -1036,6 +1036,14 @@
 		376731832C7E226A00EB097B /* HomePageViewBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376731812C7E226A00EB097B /* HomePageViewBackground.swift */; };
 		376731872C7EF9C200EB097B /* ColorSchemeLosslessStringConvertibleExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376731842C7EF97400EB097B /* ColorSchemeLosslessStringConvertibleExtensionTests.swift */; };
 		376731882C7EF9C300EB097B /* ColorSchemeLosslessStringConvertibleExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376731842C7EF97400EB097B /* ColorSchemeLosslessStringConvertibleExtensionTests.swift */; };
+		3767318B2C7F32C500EB097B /* Gradient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3767318A2C7F32C500EB097B /* Gradient.swift */; };
+		3767318C2C7F32C500EB097B /* Gradient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3767318A2C7F32C500EB097B /* Gradient.swift */; };
+		3767318E2C7F32E900EB097B /* SolidColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3767318D2C7F32E900EB097B /* SolidColor.swift */; };
+		3767318F2C7F32E900EB097B /* SolidColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3767318D2C7F32E900EB097B /* SolidColor.swift */; };
+		376731912C7F330400EB097B /* Illustration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376731902C7F330400EB097B /* Illustration.swift */; };
+		376731922C7F330400EB097B /* Illustration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376731902C7F330400EB097B /* Illustration.swift */; };
+		376731942C7F332300EB097B /* UserBackgroundImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376731932C7F332300EB097B /* UserBackgroundImage.swift */; };
+		376731952C7F332300EB097B /* UserBackgroundImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376731932C7F332300EB097B /* UserBackgroundImage.swift */; };
 		3768D8382C24BFF5004120AE /* RemoteMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3768D8372C24BFF5004120AE /* RemoteMessageView.swift */; };
 		3768D8392C24BFF5004120AE /* RemoteMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3768D8372C24BFF5004120AE /* RemoteMessageView.swift */; };
 		3768D83B2C24C0A8004120AE /* RemoteMessageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3768D83A2C24C0A8004120AE /* RemoteMessageViewModel.swift */; };
@@ -3215,6 +3223,10 @@
 		376113D72B29D0F800E794BB /* SyncE2EUITestsAppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = SyncE2EUITestsAppStore.xcconfig; sourceTree = "<group>"; };
 		376731812C7E226A00EB097B /* HomePageViewBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePageViewBackground.swift; sourceTree = "<group>"; };
 		376731842C7EF97400EB097B /* ColorSchemeLosslessStringConvertibleExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorSchemeLosslessStringConvertibleExtensionTests.swift; sourceTree = "<group>"; };
+		3767318A2C7F32C500EB097B /* Gradient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gradient.swift; sourceTree = "<group>"; };
+		3767318D2C7F32E900EB097B /* SolidColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolidColor.swift; sourceTree = "<group>"; };
+		376731902C7F330400EB097B /* Illustration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Illustration.swift; sourceTree = "<group>"; };
+		376731932C7F332300EB097B /* UserBackgroundImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserBackgroundImage.swift; sourceTree = "<group>"; };
 		3768D8372C24BFF5004120AE /* RemoteMessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMessageView.swift; sourceTree = "<group>"; };
 		3768D83A2C24C0A8004120AE /* RemoteMessageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMessageViewModel.swift; sourceTree = "<group>"; };
 		3768D83F2C29C1F1004120AE /* ActiveRemoteMessageModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveRemoteMessageModel.swift; sourceTree = "<group>"; };
@@ -5037,10 +5049,10 @@
 		370C23172C77C47700A80A3E /* HomePageSettings */ = {
 			isa = PBXGroup;
 			children = (
+				376731892C7F32B700EB097B /* CustomBackgrounds */,
 				3797C7A22C62C38800DA77FB /* HomePageSettingsModel.swift */,
 				379026D02C650CCD00A089E8 /* UserBackgroundImagesManager.swift */,
 				370C23102C7747E200A80A3E /* ImageProcessor.swift */,
-				37D0469B2C7D0EC100AEAA50 /* CustomBackground.swift */,
 			);
 			path = HomePageSettings;
 			sourceTree = "<group>";
@@ -5096,6 +5108,18 @@
 				567DA94429E95C3F008AC5EE /* YoutubeOverlayUserScriptTests.swift */,
 			);
 			path = YoutubePlayer;
+			sourceTree = "<group>";
+		};
+		376731892C7F32B700EB097B /* CustomBackgrounds */ = {
+			isa = PBXGroup;
+			children = (
+				37D0469B2C7D0EC100AEAA50 /* CustomBackground.swift */,
+				3767318A2C7F32C500EB097B /* Gradient.swift */,
+				3767318D2C7F32E900EB097B /* SolidColor.swift */,
+				376731902C7F330400EB097B /* Illustration.swift */,
+				376731932C7F332300EB097B /* UserBackgroundImage.swift */,
+			);
+			path = CustomBackgrounds;
 			sourceTree = "<group>";
 		};
 		3775913429AB99DA00E26367 /* Sync */ = {
@@ -10117,6 +10141,7 @@
 				1D01A3D52B88CF7700FE8150 /* AccessibilityPreferences.swift in Sources */,
 				3706FA98293F65D500E42796 /* SecureVaultSorting.swift in Sources */,
 				1DEDB3652C19934C006B6D1B /* MoreOptionsMenuButton.swift in Sources */,
+				3767318C2C7F32C500EB097B /* Gradient.swift in Sources */,
 				3706FA99293F65D500E42796 /* PreferencesSidebarModel.swift in Sources */,
 				3706FA9D293F65D500E42796 /* PermissionState.swift in Sources */,
 				3707C724294B5D2900682A9F /* StringExtension.swift in Sources */,
@@ -10126,6 +10151,7 @@
 				37197EA22942441900394917 /* Tab+Dialogs.swift in Sources */,
 				3706FAA0293F65D500E42796 /* UserAgent.swift in Sources */,
 				3706FAA1293F65D500E42796 /* NSAlert+DataImport.swift in Sources */,
+				376731922C7F330400EB097B /* Illustration.swift in Sources */,
 				3706FAA2293F65D500E42796 /* MainWindow.swift in Sources */,
 				3707C727294B5D2900682A9F /* WKWebView+SessionState.swift in Sources */,
 				4B44FEF42B1FEF5A000619D8 /* FocusableTextEditor.swift in Sources */,
@@ -10599,6 +10625,7 @@
 				B6ABD0CF2BC042CE0000EB69 /* NSURL+sandboxExtensionRetainCount.m in Sources */,
 				B62B483F2ADE48DE000DECE5 /* ArrayBuilder.swift in Sources */,
 				569277C229DDCBB500B633EF /* HomePageContinueSetUpModel.swift in Sources */,
+				3767318F2C7F32E900EB097B /* SolidColor.swift in Sources */,
 				3706FBD7293F65D500E42796 /* ContentBlockerRulesLists.swift in Sources */,
 				3706FBD8293F65D500E42796 /* NSViewControllerExtension.swift in Sources */,
 				3706FBD9293F65D500E42796 /* NSAppearanceExtension.swift in Sources */,
@@ -10838,6 +10865,7 @@
 				9F872DA42B90920F00138637 /* BookmarkFolderInfo.swift in Sources */,
 				7B60AFFE2C514269008E32A3 /* VPNURLEventHandler.swift in Sources */,
 				B677FC502B06376B0099EB04 /* ReportFeedbackView.swift in Sources */,
+				376731952C7F332300EB097B /* UserBackgroundImage.swift in Sources */,
 				3706FC68293F65D500E42796 /* ToggleableScrollView.swift in Sources */,
 				3706FC69293F65D500E42796 /* UserScripts.swift in Sources */,
 				3706FC6A293F65D500E42796 /* NSWorkspaceExtension.swift in Sources */,
@@ -11566,6 +11594,7 @@
 				4B9DB03E2A983B24000927DB /* JoinWaitlistView.swift in Sources */,
 				1ED910D52B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift in Sources */,
 				3768D8402C29C1F1004120AE /* ActiveRemoteMessageModel.swift in Sources */,
+				376731942C7F332300EB097B /* UserBackgroundImage.swift in Sources */,
 				37534CA028113101002621E7 /* LazyLoadable.swift in Sources */,
 				0230C0A3272080090018F728 /* KeyedCodingExtension.swift in Sources */,
 				31AA6B972B960B870025014E /* DataBrokerProtectionLoginItemPixels.swift in Sources */,
@@ -12352,9 +12381,11 @@
 				850E8DFB2A6FEC5E00691187 /* BookmarksBarAppearance.swift in Sources */,
 				B64C84EB2692DD650048FEBE /* PermissionAuthorizationPopover.swift in Sources */,
 				85378D9E274E664C007C5CBF /* PopoverMessageViewController.swift in Sources */,
+				3767318E2C7F32E900EB097B /* SolidColor.swift in Sources */,
 				AA6FFB4624DC3B5A0028F4D0 /* WebView.swift in Sources */,
 				1DDD3EC02B84F5D5004CBF2B /* PreferencesCookiePopupProtectionView.swift in Sources */,
 				B693955026F04BEB0015B914 /* ShadowView.swift in Sources */,
+				376731912C7F330400EB097B /* Illustration.swift in Sources */,
 				AA3D531D27A2F58F00074EC1 /* FeedbackSender.swift in Sources */,
 				B6E3E5502BBFCDEE00A41922 /* OpenDownloadsCellView.swift in Sources */,
 				B6BDDA012942389000F68088 /* TabExtensions.swift in Sources */,
@@ -12369,6 +12400,7 @@
 				37AFCE8B27DB69BC00471A10 /* PreferencesGeneralView.swift in Sources */,
 				37BF3F22286F0A7A00BD9014 /* PinnedTabsView.swift in Sources */,
 				37FD78112A29EBD100B36DB1 /* SyncErrorHandler.swift in Sources */,
+				3767318B2C7F32C500EB097B /* Gradient.swift in Sources */,
 				AA8EDF2424923E980071C2E8 /* URLExtension.swift in Sources */,
 				B634DBDF293C8F7F00C3C99E /* Tab+UIDelegate.swift in Sources */,
 				B6F1B02E2BCE6B47005E863C /* TunnelControllerProvider.swift in Sources */,
