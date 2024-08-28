@@ -1175,8 +1175,8 @@ struct UserText {
     static let browserTheme = NSLocalizedString("home.page.settings.browser.theme", value: "Browser Theme", comment: "Section title in Home Page Settings to adjust browser theme")
     static let homePageSections = NSLocalizedString("home.page.settings.sections", value: "Sections", comment: "Section title in Home Page Settings to adjust Home Page sections visibility")
     static let deleteBackground = NSLocalizedString("home.page.settings.delete.background", value: "Delete Background", comment: "Context menu option to delete custom home page background image")
-    static let cannotReadImageAlertHeader = NSLocalizedString("cannot.read.image.alert.header", value: "Processing Image Failed", comment: "Header of the alert dialog informing user that the app failed to load the provided custom background image")
-    static let cannotReadImageAlertInformative = NSLocalizedString("cannot.read.image.informative", value: "The image file may be corrupted. Please try again with a different file.", comment: "Informative of the alert dialog informing user it is not possible to open the file")
+    static let cannotReadImageAlertHeader = NSLocalizedString("cannot.read.image.alert.header", value: "There was an issue adding your background", comment: "Header of the alert dialog informing user that the app failed to load the provided custom background image")
+    static let cannotReadImageAlertInformative = NSLocalizedString("cannot.read.image.informative", value: "Please try again with a different image file.", comment: "Informative of the alert dialog informing user it is not possible to open the file")
 
     // MARK: Fireproof
     static let fireproofRemoveAllButton = NSLocalizedString("fireproof.domains.remove.all", value: "Remove All", comment: "Label of a button that allows the user to remove all the websites from the fireproofed list")

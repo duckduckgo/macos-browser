@@ -12290,7 +12290,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Processing Image Failed"
+            "value" : "There was an issue adding your background"
           }
         }
       }
@@ -12302,7 +12302,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "The image file may be corrupted. Please try again with a different file."
+            "value" : "Please try again with a different image file."
           }
         }
       }
