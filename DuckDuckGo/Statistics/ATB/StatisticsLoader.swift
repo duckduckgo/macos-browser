@@ -95,7 +95,7 @@ final class StatisticsLoader {
         request.fetch { response, error in
             self.isAppRetentionRequestInProgress = false
             if let error = error {
-                Logger.atb.error("Initial atb request failed with error \(error.localizedDescription, privacy: .public)")
+                Logger.atb.error("Initial atb request failed with error \(error.localizedDescription)")
                 completion()
                 return
             }
@@ -126,7 +126,7 @@ final class StatisticsLoader {
         request.fetch { _, error in
             self.isAppRetentionRequestInProgress = false
             if let error = error {
-                Logger.atb.error("Extit request failed with error \(error.localizedDescription, privacy: .public)")
+                Logger.atb.error("Extit request failed with error \(error.localizedDescription)")
                 completion()
                 return
             }
@@ -159,7 +159,7 @@ final class StatisticsLoader {
         let request = APIRequest(configuration: configuration, urlSession: URLSession.session(useMainThreadCallbackQueue: true))
         request.fetch { (response, error) in
             if let error = error {
-                Logger.atb.error("Search atb request failed with error \(error.localizedDescription, privacy: .public)")
+                Logger.atb.error("Search atb request failed with error \(error.localizedDescription)")
                 completion()
                 return
             }
@@ -198,7 +198,7 @@ final class StatisticsLoader {
             self.isAppRetentionRequestInProgress = false
 
             if let error = error {
-                Logger.atb.error("App atb request failed with error \(error.localizedDescription, privacy: .public)")
+                Logger.atb.error("App atb request failed with error \(error.localizedDescription)")
                 completion()
                 return
             }

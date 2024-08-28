@@ -930,7 +930,7 @@ extension MainViewController {
         if let configurationUrl {
             Logger.general.debug("New configuration URL set to \(configurationUrl.absoluteString)")
         } else {
-            Logger.general.debug("New configuration URL reset to default")
+            Logger.general.log("New configuration URL reset to default")
         }
     }
 

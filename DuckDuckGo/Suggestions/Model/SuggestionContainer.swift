@@ -64,7 +64,7 @@ final class SuggestionContainer {
             guard self?.latestQuery == query else { return }
             guard let result = result else {
                 self?.result = nil
-                Logger.general.error("Suggestions: Failed to get suggestions - \(String(describing: error), privacy: .public)")
+                Logger.general.error("Suggestions: Failed to get suggestions - \(String(describing: error))")
                 PixelKit.fire(DebugEvent(GeneralPixel.suggestionsFetchFailed, error: error))
                 return
             }
