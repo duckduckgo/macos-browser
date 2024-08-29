@@ -184,6 +184,7 @@ final class TabViewModel {
             }
             .store(in: &cancellables)
 
+        // The tab content is updated for every same document navigation as well while we want to update zoom and can be bookmarked only for full navifation. Using it allows for the zoom to be applied immediately and not only when the navigation is ended avoiding a visible change in size
         tab.$hasCommittedContent
             .sink { [weak self] _ in
                 guard let self else { return }
