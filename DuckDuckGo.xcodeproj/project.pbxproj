@@ -222,8 +222,6 @@
 		3184AC6F288F2A1100C35E4B /* CookieNotificationAnimationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3184AC6E288F2A1100C35E4B /* CookieNotificationAnimationModel.swift */; };
 		3199AF6F2C80734A003AEBDC /* DuckPlayerOnboardingDecider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3199AF632C80734A003AEBDC /* DuckPlayerOnboardingDecider.swift */; };
 		3199AF702C80734A003AEBDC /* DuckPlayerOnboardingDecider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3199AF632C80734A003AEBDC /* DuckPlayerOnboardingDecider.swift */; };
-		3199AF712C80734A003AEBDC /* DuckPlayerOnboardingExperiment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3199AF642C80734A003AEBDC /* DuckPlayerOnboardingExperiment.swift */; };
-		3199AF722C80734A003AEBDC /* DuckPlayerOnboardingExperiment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3199AF642C80734A003AEBDC /* DuckPlayerOnboardingExperiment.swift */; };
 		3199AF732C80734A003AEBDC /* DuckPlayerOnboardingModalManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3199AF652C80734A003AEBDC /* DuckPlayerOnboardingModalManager.swift */; };
 		3199AF742C80734A003AEBDC /* DuckPlayerOnboardingModalManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3199AF652C80734A003AEBDC /* DuckPlayerOnboardingModalManager.swift */; };
 		3199AF752C80734A003AEBDC /* DuckPlayerOnboardingModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3199AF662C80734A003AEBDC /* DuckPlayerOnboardingModalView.swift */; };
@@ -3135,7 +3133,6 @@
 		3192A2702A4C4E330084EA89 /* DataBrokerProtection */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = DataBrokerProtection; sourceTree = "<group>"; };
 		3192EC872A4DCF21001E97A5 /* DBPHomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DBPHomeViewController.swift; sourceTree = "<group>"; };
 		3199AF632C80734A003AEBDC /* DuckPlayerOnboardingDecider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DuckPlayerOnboardingDecider.swift; sourceTree = "<group>"; };
-		3199AF642C80734A003AEBDC /* DuckPlayerOnboardingExperiment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DuckPlayerOnboardingExperiment.swift; sourceTree = "<group>"; };
 		3199AF652C80734A003AEBDC /* DuckPlayerOnboardingModalManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DuckPlayerOnboardingModalManager.swift; sourceTree = "<group>"; };
 		3199AF662C80734A003AEBDC /* DuckPlayerOnboardingModalView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DuckPlayerOnboardingModalView.swift; sourceTree = "<group>"; };
 		3199AF672C80734A003AEBDC /* DuckPlayerOnboardingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DuckPlayerOnboardingViewController.swift; sourceTree = "<group>"; };
@@ -4954,7 +4951,6 @@
 			isa = PBXGroup;
 			children = (
 				3199AF632C80734A003AEBDC /* DuckPlayerOnboardingDecider.swift */,
-				3199AF642C80734A003AEBDC /* DuckPlayerOnboardingExperiment.swift */,
 				3199AF652C80734A003AEBDC /* DuckPlayerOnboardingModalManager.swift */,
 				3199AF662C80734A003AEBDC /* DuckPlayerOnboardingModalView.swift */,
 				3199AF672C80734A003AEBDC /* DuckPlayerOnboardingViewController.swift */,
@@ -10468,7 +10464,6 @@
 				1D26EBB12B74DB600002A93F /* TabSnapshotCleanupService.swift in Sources */,
 				4B4032852AAAC24400CCA602 /* WaitlistActivationDateStore.swift in Sources */,
 				3706FB93293F65D500E42796 /* PasteboardFolder.swift in Sources */,
-				3199AF722C80734A003AEBDC /* DuckPlayerOnboardingExperiment.swift in Sources */,
 				3706FB94293F65D500E42796 /* CookieManagedNotificationView.swift in Sources */,
 				EEC4A65F2B277EE100F7C0AA /* VPNLocationViewModel.swift in Sources */,
 				7B60B0032C5145ED008E32A3 /* VPNUIActionHandler.swift in Sources */,
@@ -11991,7 +11986,6 @@
 				AA6EF9B525081B4C004754E6 /* MainMenuActions.swift in Sources */,
 				56A0541F2C1CA1F5007D8FAB /* OnboardingTabExtension.swift in Sources */,
 				B63D466925BEB6C200874977 /* WKWebView+SessionState.swift in Sources */,
-				3199AF712C80734A003AEBDC /* DuckPlayerOnboardingExperiment.swift in Sources */,
 				B6F1B0222BCE5658005E863C /* BrokenSiteInfoTabExtension.swift in Sources */,
 				3199AF7F2C80734A003AEBDC /* TabModalManageable.swift in Sources */,
 				4B4D60C02A0C848D00BCD287 /* NetworkProtectionControllerErrorStore.swift in Sources */,
