@@ -1,5 +1,5 @@
 //
-//  VPNSettings+Environment.swift
+//  VPNPixel.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -17,20 +17,28 @@
 //
 
 import Foundation
-import NetworkProtection
-import Subscription
+import PixelKit
 
-public extension VPNSettings {
+/// The prefix that should be used for all pixels in this module
+///
+let vpnPixelModulePrefix = "vpn"
 
-    /// Align VPN environment to the Subscription environment
-    func alignTo(subscriptionEnvironment: SubscriptionEnvironment) {
-        switch subscriptionEnvironment.serviceEnvironment {
-        case .production:
-            // Do nothing for a production subscription, as it can be used for both VPN environments.
-            break
-        case .staging:
-            // If using a staging subscription, force the staging VPN environment as it is not compatible with anything else.
-            self.selectedEnvironment = .staging
-        }
+public protocol VPNPixel: PixelKitEventV2 {
+
+    /// The name of the pixel without the module prefix.
+    ///
+    var unscopedPixelName: String { get }
+}
+
+extension VPNPixel {
+
+    /// Convenience method to provide the scoped pixel name.
+    ///
+    public var name: String {
+        scopedPixelName(forUnscopedPixelName: unscopedPixelName)
+    }
+
+    func scopedPixelName(forUnscopedPixelName unscopedName: String) -> String {
+        "\(vpnPixelModulePrefix)_\(unscopedName)"
     }
 }
