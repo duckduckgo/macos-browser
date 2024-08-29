@@ -21,6 +21,7 @@ import BrowserServicesKit
 import Common
 import ContentScopeScripts
 import Combine
+import os.log
 
 struct ExtractedAddress: Codable {
     let state: String
@@ -335,10 +336,10 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
                 let fileURL = URL(fileURLWithPath: "\(path)/\(fileName)")
                 try csv.write(to: fileURL, atomically: true, encoding: .utf8)
             } else {
-                os_log("Error getting path")
+                Logger.dataBrokerProtection.debug("Error getting path")
             }
         } catch {
-            os_log("Error writing to file: \(error)")
+            Logger.dataBrokerProtection.error("Error writing to file: \(error)")
         }
     }
 

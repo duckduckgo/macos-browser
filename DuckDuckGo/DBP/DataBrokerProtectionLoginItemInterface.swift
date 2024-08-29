@@ -51,7 +51,7 @@ extension DefaultDataBrokerProtectionLoginItemInterface: DataBrokerProtectionLog
 
     private func enableLoginItem() {
         DataBrokerProtectionLoginItemPixels.fire(pixel: GeneralPixel.dataBrokerEnableLoginItemDaily, frequency: .daily)
-        loginItemsManager.enableLoginItems([.dbpBackgroundAgent], log: .dbp)
+        loginItemsManager.enableLoginItems([.dbpBackgroundAgent])
     }
 
     // MARK: - DataBrokerProtectionLoginItemInterface

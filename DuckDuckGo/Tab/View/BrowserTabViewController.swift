@@ -24,6 +24,7 @@ import SwiftUI
 import WebKit
 import Subscription
 import PixelKit
+import os.log
 
 final class BrowserTabViewController: NSViewController {
 
@@ -521,7 +522,7 @@ final class BrowserTabViewController: NSViewController {
               let contentView = viewToMakeFirstResponderAfterAdding?() else { return }
 
         guard contentView.window === window else {
-            os_log("BrowserTabViewController: Content view window is \(contentView.window?.description ?? "<nil>") but expected: \(window)", type: .error)
+            Logger.general.error("BrowserTabViewController: Content view window is \(contentView.window?.description ?? "<nil>") but expected: \(window)")
             return
         }
         viewToMakeFirstResponderAfterAdding = nil
@@ -1219,7 +1220,7 @@ extension BrowserTabViewController {
         dispatchPrecondition(condition: .onQueue(.main))
 
         guard let webView = webView else {
-            os_log("BrowserTabViewController: failed to create a snapshot of webView", type: .error)
+            Logger.general.error("BrowserTabViewController: failed to create a snapshot of webView")
             return
         }
 
@@ -1228,7 +1229,7 @@ extension BrowserTabViewController {
 
         webView.takeSnapshot(with: config) { [weak self] image, _ in
             guard let image = image else {
-                os_log("BrowserTabViewController: failed to create a snapshot of webView", type: .error)
+                Logger.general.error("BrowserTabViewController: failed to create a snapshot of webView")
                 return
             }
             self?.showWebViewSnapshot(with: image)

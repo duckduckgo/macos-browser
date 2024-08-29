@@ -20,6 +20,7 @@ import Cocoa
 import Combine
 import Common
 import History
+import os.log
 
 protocol FirePopoverViewControllerDelegate: AnyObject {
 
@@ -328,7 +329,7 @@ final class FirePopoverViewController: NSViewController {
 
     private func setupOptionsButton() {
         guard let menu = optionsButton.menu, let font = optionsButton.font else {
-            os_log("FirePopoverViewController: Menu and/or font not present for optionsMenu", type: .error)
+            Logger.fire.error("FirePopoverViewController: Menu and/or font not present for optionsMenu")
             return
         }
         menu.removeAllItems()

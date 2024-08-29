@@ -30,24 +30,20 @@ import ServiceManagement
 import PixelKit
 import Subscription
 import VPNAppLauncher
+import os.log
 
 @objc(Application)
 final class DuckDuckGoVPNApplication: NSApplication {
 
-    public let accountManager: AccountManager
+    public var accountManager: AccountManager
     private let _delegate: DuckDuckGoVPNAppDelegate
 
     override init() {
-        os_log(.default,
-               log: .networkProtection,
-               "🟢 Status Bar Agent starting\nPath: (%{public}@)\nVersion: %{public}@\nPID: %{public}d",
-               Bundle.main.bundlePath,
-               "\(Bundle.main.versionNumber!).\(Bundle.main.buildNumber)",
-               NSRunningApplication.current.processIdentifier)
+        Logger.networkProtection.debug("🟢 Status Bar Agent starting\nPath: (\(Bundle.main.bundlePath, privacy: .public))\nVersion: \("\(Bundle.main.versionNumber!).\(Bundle.main.buildNumber)", privacy: .public)\nPID: \(NSRunningApplication.current.processIdentifier, privacy: .public)")
 
         // prevent agent from running twice
         if let anotherInstance = NSRunningApplication.runningApplications(withBundleIdentifier: Bundle.main.bundleIdentifier!).first(where: { $0 != .current }) {
-            os_log(.error, log: .networkProtection, "🔴 Stopping: another instance is running: %{public}d.", anotherInstance.processIdentifier)
+            Logger.networkProtection.error("Stopping: another instance is running: \(anotherInstance.processIdentifier, privacy: .public).")
             exit(0)
         }
 
@@ -62,9 +58,9 @@ final class DuckDuckGoVPNApplication: NSApplication {
                                                                  settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(20)))
         let accessTokenStorage = SubscriptionTokenKeychainStorage(keychainType: .dataProtection(.named(subscriptionAppGroup)))
         accountManager = DefaultAccountManager(accessTokenStorage: accessTokenStorage,
-                                        entitlementsCache: entitlementsCache,
-                                        subscriptionEndpointService: subscriptionEndpointService,
-                                        authEndpointService: authEndpointService)
+                                               entitlementsCache: entitlementsCache,
+                                               subscriptionEndpointService: subscriptionEndpointService,
+                                               authEndpointService: authEndpointService)
 
         _delegate = DuckDuckGoVPNAppDelegate(accountManager: accountManager,
                                              accessTokenStorage: accessTokenStorage,
@@ -73,12 +69,13 @@ final class DuckDuckGoVPNApplication: NSApplication {
 
         setupPixelKit()
         self.delegate = _delegate
+        accountManager.delegate = _delegate
 
 #if DEBUG
         if accountManager.accessToken != nil {
-            os_log(.error, log: .networkProtection, "🟢 VPN Agent found token")
+            Logger.networkProtection.debug("🟢 VPN Agent found token")
         } else {
-            os_log(.error, log: .networkProtection, "🔴 VPN Agent found no token")
+            Logger.networkProtection.error("VPN Agent found no token")
         }
 #endif
     }
@@ -361,7 +358,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ aNotification: Notification) {
 
         APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
-        os_log("DuckDuckGoVPN started", log: .networkProtectionLoginItemLog)
+        Logger.networkProtection.info("DuckDuckGoVPN started")
 
         setupMenuVisibility()
 
@@ -438,5 +435,13 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
                 }
             }
         }
+    }
+}
+
+extension DuckDuckGoVPNAppDelegate: AccountManagerKeychainAccessDelegate {
+
+    public func accountManagerKeychainAccessFailed(accessType: AccountKeychainAccessType, error: AccountKeychainAccessError) {
+        PixelKit.fire(PrivacyProErrorPixel.privacyProKeychainAccessError(accessType: accessType, accessError: error),
+                      frequency: .dailyAndCount)
     }
 }

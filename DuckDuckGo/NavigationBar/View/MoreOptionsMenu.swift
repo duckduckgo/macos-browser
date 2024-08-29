@@ -23,6 +23,7 @@ import BrowserServicesKit
 import PixelKit
 import NetworkProtection
 import Subscription
+import os.log
 
 protocol OptionsButtonMenuDelegate: AnyObject {
 
@@ -169,7 +170,7 @@ final class MoreOptionsMenu: NSMenu {
 
     @objc func toggleFireproofing(_ sender: NSMenuItem) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("MainViewController: No tab view model selected", type: .error)
+            Logger.general.error("MainViewController: No tab view model selected")
             return
         }
 

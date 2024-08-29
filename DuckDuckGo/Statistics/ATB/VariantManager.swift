@@ -19,6 +19,7 @@
 import BrowserServicesKit
 import Common
 import Foundation
+import os.log
 
 struct Variant: BrowserServicesKit.Variant {
 
@@ -80,17 +81,17 @@ final class DefaultVariantManager: VariantManager {
 
     func assignVariantIfNeeded(_ newInstallCompletion: (VariantManager) -> Void) {
         guard !storage.hasInstallStatistics else {
-            os_log("ATB: No new variant needed for existing user", type: .debug)
+            Logger.atb.debug("ATB: No new variant needed for existing user")
             return
         }
 
         if let variant = currentVariant {
-            os_log("ATB: Already assigned variant: %s", type: .debug, String(describing: variant))
+            Logger.atb.debug("ATB: Already assigned variant: \(String(describing: variant))")
             return
         }
 
         guard let variant = selectVariant() else {
-            os_log("ATB: Failed to assign variant", type: .debug)
+            Logger.atb.debug("ATB: Failed to assign variant")
 
             // it's possible this failed because there are none to assign, we should still let new install logic execute
             _ = newInstallCompletion(self)

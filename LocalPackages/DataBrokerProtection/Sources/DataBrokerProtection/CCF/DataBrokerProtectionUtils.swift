@@ -19,7 +19,7 @@ import Foundation
 import WebKit
 import BrowserServicesKit
 import UserScript
-import Common
+import os.log
 import Combine
 
 final class DataBrokerUserContentController: WKUserContentController {
@@ -51,7 +51,7 @@ final class DataBrokerUserContentController: WKUserContentController {
 
     @MainActor
     public func cleanUpBeforeClosing() {
-        os_log("Cleaning up DBP user scripts", log: .dataBrokerProtection)
+        Logger.dataBrokerProtection.debug("Cleaning up DBP user scripts")
 
         self.removeAllUserScripts()
         self.removeAllScriptMessageHandlers()
@@ -61,7 +61,7 @@ final class DataBrokerUserContentController: WKUserContentController {
     }
 
     deinit {
-        os_log("DataBrokerUserContentController Deinit", log: .dataBrokerProtection)
+        Logger.dataBrokerProtection.debug("DataBrokerUserContentController Deinit")
     }
 }
 
