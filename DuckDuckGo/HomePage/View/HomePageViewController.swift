@@ -90,6 +90,7 @@ final class HomePageViewController: NSViewController {
             .environmentObject(defaultBrowserModel)
             .environmentObject(recentlyVisitedModel)
             .environmentObject(featuresModel)
+            .environmentObject(Application.appDelegate.homePageSettingsModel)
             .environmentObject(accessibilityPreferences)
             .environmentObject(appearancePreferences)
             .environmentObject(Application.appDelegate.activeRemoteMessageModel)

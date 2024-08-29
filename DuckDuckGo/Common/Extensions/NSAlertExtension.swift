@@ -246,6 +246,15 @@ extension NSAlert {
         return alert
     }
 
+    static func cannotReadImageAlert() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = UserText.cannotReadImageAlertHeader
+        alert.informativeText = UserText.cannotReadImageAlertInformative
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: UserText.ok)
+        return alert
+    }
+
     @discardableResult
     func runModal() async -> NSApplication.ModalResponse {
         await withCheckedContinuation { continuation in
