@@ -486,9 +486,6 @@
         }
       }
     },
-    "0" : {
-
-    },
     "0.0.0.0" : {
       "localizations" : {
         "de" : {
@@ -540,9 +537,6 @@
           }
         }
       }
-    },
-    "1" : {
-
     },
     "1." : {
       "localizations" : {
@@ -881,9 +875,6 @@
           }
         }
       }
-    },
-    "Add Background" : {
-
     },
     "add.bookmark.name" : {
       "comment" : "New bookmark folder dialog folder name field heading",
@@ -2430,9 +2421,6 @@
           }
         }
       }
-    },
-    "All Settings" : {
-
     },
     "allow.integration" : {
       "comment" : "Setup of the integration with Bitwarden app",
@@ -15279,9 +15267,6 @@
         }
       }
     },
-    "Customize" : {
-
-    },
     "dashboard.permission.allow" : {
       "comment" : "Privacy Dashboard: Website can always access input media device",
       "extractionState" : "extracted_with_value",
@@ -15874,9 +15859,6 @@
           }
         }
       }
-    },
-    "Delete Background" : {
-
     },
     "delete-bookmark" : {
       "comment" : "Delete Bookmark button",
@@ -25406,9 +25388,6 @@
           }
         }
       }
-    },
-    "Images are stored on your device so DuckDuckGo can't see or access them." : {
-
     },
     "Import" : {
       "comment" : "Menu item",
