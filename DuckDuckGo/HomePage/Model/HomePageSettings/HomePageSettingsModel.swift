@@ -171,15 +171,15 @@ extension HomePage.Models {
                 }
                 switch customBackground {
                 case .gradient:
-                    sendPixel(NewTabPagePixel.newTabBackgroundSelectedGradient)
+                    sendPixel(NewTabBackgroundPixel.newTabBackgroundSelectedGradient)
                 case .solidColor:
-                    sendPixel(NewTabPagePixel.newTabBackgroundSelectedSolidColor)
+                    sendPixel(NewTabBackgroundPixel.newTabBackgroundSelectedSolidColor)
                 case .illustration:
-                    sendPixel(NewTabPagePixel.newTabBackgroundSelectedIllustration)
+                    sendPixel(NewTabBackgroundPixel.newTabBackgroundSelectedIllustration)
                 case .userImage:
-                    sendPixel(NewTabPagePixel.newTabBackgroundSelectedUserImage)
+                    sendPixel(NewTabBackgroundPixel.newTabBackgroundSelectedUserImage)
                 case .none:
-                    sendPixel(NewTabPagePixel.newTabBackgroundReset)
+                    sendPixel(NewTabBackgroundPixel.newTabBackgroundReset)
                 }
             }
         }
@@ -195,7 +195,7 @@ extension HomePage.Models {
                 customBackground = .userImage(image)
                 Logger.homePageSettings.debug("New user image added")
             } catch {
-                sendPixel(DebugEvent(NewTabPagePixel.newTabBackgroundAddImageError, error: error))
+                sendPixel(DebugEvent(NewTabBackgroundPixel.newTabBackgroundAddImageError, error: error))
                 showAddImageFailedAlert()
                 Logger.homePageSettings.error("Failed to add user image: \(error)")
             }

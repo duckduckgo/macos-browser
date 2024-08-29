@@ -65,7 +65,7 @@ final class UserBackgroundImagesManagerTests: XCTestCase {
             sendPixel: { [weak self] in self?.sendPixelEvents.append($0) }
         )
         XCTAssertNil(manager)
-        XCTAssertEqual(sendPixelEvents.map(\.name), [NewTabPagePixel.newTabBackgroundInitializeStorageError.name])
+        XCTAssertEqual(sendPixelEvents.map(\.name), [NewTabBackgroundPixel.newTabBackgroundInitializeStorageError.name])
     }
 
     func testImageWhenUserImageFileExistsThenNSImageIsReturned() throws {
@@ -81,7 +81,7 @@ final class UserBackgroundImagesManagerTests: XCTestCase {
         let userBackgroundImage = UserBackgroundImage(fileName: "abc.jpg", colorScheme: .light)
 
         XCTAssertNil(manager.image(for: userBackgroundImage))
-        XCTAssertEqual(sendPixelEvents.map(\.name), [NewTabPagePixel.newTabBackgroundImageNotFound.name])
+        XCTAssertEqual(sendPixelEvents.map(\.name), [NewTabBackgroundPixel.newTabBackgroundImageNotFound.name])
     }
 
     func testImageWhenCalledMultipleTimesAndUserImageFileDoesNotExistThenOnlyOnePixelIsSent() throws {
@@ -93,24 +93,24 @@ final class UserBackgroundImagesManagerTests: XCTestCase {
         XCTAssertNil(manager.image(for: userBackgroundImage1))
         XCTAssertNil(manager.image(for: userBackgroundImage1))
         XCTAssertEqual(sendPixelEvents.map(\.name), [
-            NewTabPagePixel.newTabBackgroundImageNotFound.name
+            NewTabBackgroundPixel.newTabBackgroundImageNotFound.name
         ])
 
         XCTAssertNil(manager.image(for: userBackgroundImage2))
         XCTAssertNil(manager.image(for: userBackgroundImage2))
         XCTAssertNil(manager.image(for: userBackgroundImage2))
         XCTAssertEqual(sendPixelEvents.map(\.name), [
-            NewTabPagePixel.newTabBackgroundImageNotFound.name,
-            NewTabPagePixel.newTabBackgroundImageNotFound.name
+            NewTabBackgroundPixel.newTabBackgroundImageNotFound.name,
+            NewTabBackgroundPixel.newTabBackgroundImageNotFound.name
         ])
 
         XCTAssertNil(manager.image(for: userBackgroundImage3))
         XCTAssertNil(manager.image(for: userBackgroundImage3))
         XCTAssertNil(manager.image(for: userBackgroundImage3))
         XCTAssertEqual(sendPixelEvents.map(\.name), [
-            NewTabPagePixel.newTabBackgroundImageNotFound.name,
-            NewTabPagePixel.newTabBackgroundImageNotFound.name,
-            NewTabPagePixel.newTabBackgroundImageNotFound.name
+            NewTabBackgroundPixel.newTabBackgroundImageNotFound.name,
+            NewTabBackgroundPixel.newTabBackgroundImageNotFound.name,
+            NewTabBackgroundPixel.newTabBackgroundImageNotFound.name
         ])
     }
 
@@ -129,7 +129,7 @@ final class UserBackgroundImagesManagerTests: XCTestCase {
         let userBackgroundImage = UserBackgroundImage(fileName: "abc.jpg", colorScheme: .light)
 
         XCTAssertNotNil(manager.thumbnailImage(for: userBackgroundImage))
-        XCTAssertEqual(sendPixelEvents.map(\.name), [NewTabPagePixel.newTabBackgroundThumbnailNotFound.name])
+        XCTAssertEqual(sendPixelEvents.map(\.name), [NewTabBackgroundPixel.newTabBackgroundThumbnailNotFound.name])
     }
 
     func testThumbnailImageWhenCalledMultipleTimesAndThumbnailFileDoesNotExistThenOnlyOnePixelIsSent() throws {
@@ -146,24 +146,24 @@ final class UserBackgroundImagesManagerTests: XCTestCase {
         XCTAssertNotNil(manager.thumbnailImage(for: userBackgroundImage1))
         XCTAssertNotNil(manager.thumbnailImage(for: userBackgroundImage1))
         XCTAssertEqual(sendPixelEvents.map(\.name), [
-            NewTabPagePixel.newTabBackgroundThumbnailNotFound.name
+            NewTabBackgroundPixel.newTabBackgroundThumbnailNotFound.name
         ])
 
         XCTAssertNotNil(manager.thumbnailImage(for: userBackgroundImage2))
         XCTAssertNotNil(manager.thumbnailImage(for: userBackgroundImage2))
         XCTAssertNotNil(manager.thumbnailImage(for: userBackgroundImage2))
         XCTAssertEqual(sendPixelEvents.map(\.name), [
-            NewTabPagePixel.newTabBackgroundThumbnailNotFound.name,
-            NewTabPagePixel.newTabBackgroundThumbnailNotFound.name
+            NewTabBackgroundPixel.newTabBackgroundThumbnailNotFound.name,
+            NewTabBackgroundPixel.newTabBackgroundThumbnailNotFound.name
         ])
 
         XCTAssertNotNil(manager.thumbnailImage(for: userBackgroundImage3))
         XCTAssertNotNil(manager.thumbnailImage(for: userBackgroundImage3))
         XCTAssertNotNil(manager.thumbnailImage(for: userBackgroundImage3))
         XCTAssertEqual(sendPixelEvents.map(\.name), [
-            NewTabPagePixel.newTabBackgroundThumbnailNotFound.name,
-            NewTabPagePixel.newTabBackgroundThumbnailNotFound.name,
-            NewTabPagePixel.newTabBackgroundThumbnailNotFound.name
+            NewTabBackgroundPixel.newTabBackgroundThumbnailNotFound.name,
+            NewTabBackgroundPixel.newTabBackgroundThumbnailNotFound.name,
+            NewTabBackgroundPixel.newTabBackgroundThumbnailNotFound.name
         ])
     }
 
@@ -218,7 +218,7 @@ final class UserBackgroundImagesManagerTests: XCTestCase {
         )
 
         let userBackgroundImage = try await manager.addImage(with: imageURL)
-        XCTAssertEqual(sendPixelEvents.map(\.name), [NewTabPagePixel.newTabBackgroundAddedUserImage.name])
+        XCTAssertEqual(sendPixelEvents.map(\.name), [NewTabBackgroundPixel.newTabBackgroundAddedUserImage.name])
 
         XCTAssertEqual(manager.availableImages, [userBackgroundImage])
 
@@ -238,7 +238,7 @@ final class UserBackgroundImagesManagerTests: XCTestCase {
         userBackgroundImages.append(try await manager.addImage(with: imageURL))
         userBackgroundImages.append(try await manager.addImage(with: imageURL))
 
-        XCTAssertEqual(sendPixelEvents.map(\.name), Array(repeating: NewTabPagePixel.newTabBackgroundAddedUserImage.name, count: 5))
+        XCTAssertEqual(sendPixelEvents.map(\.name), Array(repeating: NewTabBackgroundPixel.newTabBackgroundAddedUserImage.name, count: 5))
         XCTAssertEqual(manager.availableImages, Array(userBackgroundImages[1...4].reversed()))
     }
 
@@ -278,8 +278,8 @@ final class UserBackgroundImagesManagerTests: XCTestCase {
 
         let userBackgroundImage = try await manager.addImage(with: imageURL)
         XCTAssertEqual(sendPixelEvents.map(\.name), [
-            NewTabPagePixel.newTabBackgroundThumbnailGenerationError.name,
-            NewTabPagePixel.newTabBackgroundAddedUserImage.name
+            NewTabBackgroundPixel.newTabBackgroundThumbnailGenerationError.name,
+            NewTabBackgroundPixel.newTabBackgroundAddedUserImage.name
         ])
 
         XCTAssertEqual(manager.availableImages, [userBackgroundImage])
@@ -313,7 +313,7 @@ final class UserBackgroundImagesManagerTests: XCTestCase {
         manager.deleteImage(userBackgroundImage2)
 
         // THEN
-        XCTAssertEqual(sendPixelEvents.map(\.name), [NewTabPagePixel.newTabBackgroundDeletedUserImage.name])
+        XCTAssertEqual(sendPixelEvents.map(\.name), [NewTabBackgroundPixel.newTabBackgroundDeletedUserImage.name])
 
         XCTAssertEqual(manager.availableImages, [userBackgroundImage1])
         XCTAssertNil(manager.image(for: userBackgroundImage2))

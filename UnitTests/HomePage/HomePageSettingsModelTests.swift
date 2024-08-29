@@ -140,11 +140,11 @@ final class HomePageSettingsModelTests: XCTestCase {
         model.customBackground = nil
 
         XCTAssertEqual(sendPixelEvents.map(\.name), [
-            NewTabPagePixel.newTabBackgroundSelectedSolidColor.name,
-            NewTabPagePixel.newTabBackgroundSelectedGradient.name,
-            NewTabPagePixel.newTabBackgroundSelectedIllustration.name,
-            NewTabPagePixel.newTabBackgroundSelectedUserImage.name,
-            NewTabPagePixel.newTabBackgroundReset.name
+            NewTabBackgroundPixel.newTabBackgroundSelectedSolidColor.name,
+            NewTabBackgroundPixel.newTabBackgroundSelectedGradient.name,
+            NewTabBackgroundPixel.newTabBackgroundSelectedIllustration.name,
+            NewTabBackgroundPixel.newTabBackgroundSelectedUserImage.name,
+            NewTabBackgroundPixel.newTabBackgroundReset.name
         ])
     }
 
@@ -188,7 +188,7 @@ final class HomePageSettingsModelTests: XCTestCase {
         XCTAssertEqual(userBackgroundImagesManager.addImageWithURLCallCount, 1)
         XCTAssertEqual(model.customBackground, .userImage(.init(fileName: "sample.jpg", colorScheme: .light)))
         XCTAssertEqual(sendPixelEvents.map(\.name), [
-            NewTabPagePixel.newTabBackgroundSelectedUserImage.name
+            NewTabBackgroundPixel.newTabBackgroundSelectedUserImage.name
         ])
         XCTAssertEqual(showImageFailedAlertCallCount, 0)
     }
@@ -205,7 +205,7 @@ final class HomePageSettingsModelTests: XCTestCase {
         XCTAssertEqual(userBackgroundImagesManager.addImageWithURLCallCount, 1)
         XCTAssertEqual(model.customBackground, originalCustomBackground)
         XCTAssertEqual(sendPixelEvents.map(\.name), [
-            NewTabPagePixel.newTabBackgroundAddImageError.name
+            NewTabBackgroundPixel.newTabBackgroundAddImageError.name
         ])
         XCTAssertEqual(showImageFailedAlertCallCount, 1)
     }

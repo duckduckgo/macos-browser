@@ -105,7 +105,7 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
             validateAvailableImages()
         } catch {
             Logger.homePageSettings.error("Failed to initialize user background images storage: \(error)")
-            sendPixel(DebugEvent(NewTabPagePixel.newTabBackgroundInitializeStorageError, error: error))
+            sendPixel(DebugEvent(NewTabBackgroundPixel.newTabBackgroundInitializeStorageError, error: error))
             return nil
         }
     }
@@ -115,7 +115,7 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
         guard let image = NSImage(contentsOfFile: imagePath) else {
             if !pathsForNotFoundImages.contains(imagePath) {
                 pathsForNotFoundImages.insert(imagePath)
-                sendPixel(DebugEvent(NewTabPagePixel.newTabBackgroundImageNotFound))
+                sendPixel(DebugEvent(NewTabBackgroundPixel.newTabBackgroundImageNotFound))
             }
             Logger.homePageSettings.error("Image for \(userBackgroundImage.fileName) not found")
             return nil
@@ -128,7 +128,7 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
         guard let thumbnail = NSImage(contentsOfFile: thumbnailPath) else {
             if !pathsForNotFoundImages.contains(thumbnailPath) {
                 pathsForNotFoundImages.insert(thumbnailPath)
-                sendPixel(DebugEvent(NewTabPagePixel.newTabBackgroundThumbnailNotFound))
+                sendPixel(DebugEvent(NewTabBackgroundPixel.newTabBackgroundThumbnailNotFound))
             }
             Logger.homePageSettings.error("Thumbnail for \(userBackgroundImage.fileName) not found, using full-size image as thumbnail")
             return image(for: userBackgroundImage)
@@ -156,7 +156,7 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
                 Logger.homePageSettings.debug("Thumbnail for \(destinationURL.lastPathComponent) saved in application data directory")
             } catch {
                 Logger.homePageSettings.error("Failed to generate thumbnail for \(destinationURL.lastPathComponent): \(error)")
-                sendPixel(DebugEvent(NewTabPagePixel.newTabBackgroundThumbnailGenerationError, error: error))
+                sendPixel(DebugEvent(NewTabBackgroundPixel.newTabBackgroundThumbnailGenerationError, error: error))
             }
         }()
 
@@ -172,7 +172,7 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
 
         deleteImagesOverLimit()
 
-        sendPixel(NewTabPagePixel.newTabBackgroundAddedUserImage)
+        sendPixel(NewTabBackgroundPixel.newTabBackgroundAddedUserImage)
 
         let userBackgroundImage = UserBackgroundImage(fileName: fileName, colorScheme: colorScheme)
         imagesMetadata = [userBackgroundImage.description] + imagesMetadata.prefix(maximumNumberOfImages - 1)
@@ -186,7 +186,7 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
         imagesMetadata.remove(at: index)
         deleteImageFiles(for: userBackgroundImage)
 
-        sendPixel(NewTabPagePixel.newTabBackgroundDeletedUserImage)
+        sendPixel(NewTabBackgroundPixel.newTabBackgroundDeletedUserImage)
     }
 
     func updateSelectedTimestamp(for userBackgroundImage: UserBackgroundImage) {
