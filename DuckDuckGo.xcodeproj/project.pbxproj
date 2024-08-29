@@ -13597,8 +13597,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 188.1.0;
+				kind = revision;
+				revision = 7ad2a2a3fbe0ac8aa4239bc9e56867553a29e44d;
 			};
 		};
 		9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
