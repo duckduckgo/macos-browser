@@ -70,7 +70,7 @@ extension TabExtensions {
 }
 
 extension Tab {
-    var duckPlayerOnboardingPublisher:DuckPlayerOnboardingPublisher {
+    var duckPlayerOnboardingPublisher: DuckPlayerOnboardingPublisher {
         self.duckPlayerOnboarding?.duckPlayerOnboardingPublisher ?? Just(nil).eraseToAnyPublisher()
     }
 }
