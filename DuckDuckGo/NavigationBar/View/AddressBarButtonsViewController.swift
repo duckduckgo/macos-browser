@@ -495,11 +495,8 @@ final class AddressBarButtonsViewController: NSViewController {
             bookmarkButton.position = .right
             privacyEntryPointButton.position = .left
         }
-        let isFlaggedPhishing = tabViewModel?.tab.phishingState.didBypassError ?? false
-        privacyEntryPointButton.isAnimationEnabled = !isFlaggedPhishing
-        privacyEntryPointButton.normalTintColor = isFlaggedPhishing ? .fireButtonRedPressed : .privacyEnabled
-        privacyEntryPointButton.mouseOverTintColor = isFlaggedPhishing ? .alertRedHover : privacyEntryPointButton.mouseOverTintColor
-        privacyEntryPointButton.mouseDownTintColor = isFlaggedPhishing ? .alertRedPressed : privacyEntryPointButton.mouseDownTintColor
+
+        privacyEntryPointButton.contentTintColor = .privacyEnabled
         privacyEntryPointButton.sendAction(on: .leftMouseUp)
 
         imageButton.applyFaviconStyle()
@@ -757,27 +754,19 @@ final class AddressBarButtonsViewController: NSViewController {
 
             let isNotSecure = url.scheme == URL.NavigationalScheme.http.rawValue
             let isCertificateValid = tabViewModel.tab.isCertificateValid ?? true
-            let isFlaggedPhishing = tabViewModel.tab.phishingState.didBypassError
-            let isUnprotected = ContentBlocking.shared.privacyConfigurationManager.privacyConfig.isUserUnprotected(domain: host)
+
+            let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
+            let isUnprotected = configuration.isUserUnprotected(domain: host)
 
             let isShieldDotVisible = isNotSecure || isUnprotected || !isCertificateValid
 
-            if isFlaggedPhishing {
-                privacyEntryPointButton.isAnimationEnabled = false
-                privacyEntryPointButton.image = .exclamationFilled
-                privacyEntryPointButton.normalTintColor = .alertRed
-                privacyEntryPointButton.mouseOverTintColor = .alertRedHover
-                privacyEntryPointButton.mouseDownTintColor = .alertRedPressed
-            } else {
-                privacyEntryPointButton.image = isShieldDotVisible ? .shieldDot : .shield
-                privacyEntryPointButton.isAnimationEnabled = true
+            privacyEntryPointButton.image = isShieldDotVisible ? .shieldDot : .shield
 
-                let animationNames = MouseOverAnimationButton.AnimationNames(
-                    aqua: isShieldDotVisible ? "shield-dot-mouse-over" : "shield-mouse-over",
-                    dark: isShieldDotVisible ? "dark-shield-dot-mouse-over" : "dark-shield-mouse-over"
-                )
-                privacyEntryPointButton.animationNames = animationNames
-            }
+            let shieldDotMouseOverAnimationNames = MouseOverAnimationButton.AnimationNames(aqua: "shield-dot-mouse-over",
+                                                                                           dark: "dark-shield-dot-mouse-over")
+            let shieldMouseOverAnimationNames = MouseOverAnimationButton.AnimationNames(aqua: "shield-mouse-over",
+                                                                                        dark: "dark-shield-mouse-over")
+            privacyEntryPointButton.animationNames = isShieldDotVisible ? shieldDotMouseOverAnimationNames: shieldMouseOverAnimationNames
         default:
             break
         }
