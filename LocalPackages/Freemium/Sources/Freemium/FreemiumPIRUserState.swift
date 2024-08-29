@@ -28,15 +28,19 @@ public protocol FreemiumPIRUserState {
 /// Default implementation of `FreemiumPIRUserState`. `UserDefaults` is used as underlying storage.
 public final class DefaultFreemiumPIRUserState: FreemiumPIRUserState {
 
+    private enum Keys {
+        static let didOnboard = "macos.browser.freemium.pir.did.onboard"
+    }
+
     private let userDefaults: UserDefaults
     private let accountManager: AccountManager
     private let key = "macos.browser.freemium.pir.did.onboard"
 
     public var didOnboard: Bool {
         get {
-            userDefaults.bool(forKey: key)
+            userDefaults.bool(forKey: Keys.didOnboard)
         } set {
-            userDefaults.set(newValue, forKey: key)
+            userDefaults.set(newValue, forKey: Keys.didOnboard)
         }
     }
 

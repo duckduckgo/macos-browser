@@ -21,6 +21,7 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
+
     var isFavoriteVisible: Bool
     var isContinueSetUpVisible: Bool
     var isRecentActivityVisible: Bool
@@ -31,6 +32,7 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
     var bookmarksBarAppearance: BookmarksBarAppearance
     var homeButtonPosition: HomeButtonPosition
     var homePageCustomBackground: String?
+    var didDismissHomePagePromotion: Bool
 
     init(
         showFullURL: Bool = false,
@@ -42,7 +44,8 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
         showBookmarksBar: Bool = true,
         bookmarksBarAppearance: BookmarksBarAppearance = .alwaysOn,
         homeButtonPosition: HomeButtonPosition = .right,
-        homePageCustomBackground: String? = nil
+        homePageCustomBackground: String? = nil,
+        didDismissHomePagePromotion: Bool = true
     ) {
         self.showFullURL = showFullURL
         self.currentThemeName = currentThemeName
@@ -54,6 +57,7 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
         self.bookmarksBarAppearance = bookmarksBarAppearance
         self.homeButtonPosition = homeButtonPosition
         self.homePageCustomBackground = homePageCustomBackground
+        self.didDismissHomePagePromotion = didDismissHomePagePromotion
     }
 }
 
