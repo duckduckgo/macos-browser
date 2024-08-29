@@ -29,26 +29,6 @@ protocol SpecialErrorPageScriptProvider {
     var specialErrorPageUserScript: SpecialErrorPageUserScript? { get }
 }
 
-public enum SSLErrorType: String {
-    case expired
-    case wrongHost
-    case selfSigned
-    case invalid
-
-    static func forErrorCode(_ errorCode: Int) -> Self {
-        switch Int32(errorCode) {
-        case errSSLCertExpired:
-            return .expired
-        case errSSLHostNameMismatch:
-            return .wrongHost
-        case errSSLXCertChainInvalid:
-            return .selfSigned
-        default:
-            return .invalid
-        }
-    }
-}
-
 extension UserScripts: SpecialErrorPageScriptProvider {}
 
 final class SpecialErrorPageTabExtension {
