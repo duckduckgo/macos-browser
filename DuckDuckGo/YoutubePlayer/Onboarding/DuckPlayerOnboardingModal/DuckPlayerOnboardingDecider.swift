@@ -78,7 +78,7 @@ struct DefaultDuckPlayerOnboardingDecider: DuckPlayerOnboardingDecider {
     }
 
     private var isUserInExperiment: Bool {
-        DefaultVariantManager().isSupported(feature: .duckPlayerOnboarding)
+        return false
     }
 
     var shouldOpenFirstVideoOnDuckPlayer: Bool {
