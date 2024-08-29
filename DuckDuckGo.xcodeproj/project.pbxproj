@@ -248,6 +248,8 @@
 		31C01F9B2C7CC4C50066AAE1 /* TabModalManageable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C01F992C7CC4C50066AAE1 /* TabModalManageable.swift */; };
 		31C01FA02C7CED620066AAE1 /* DefaultDuckPlayerOnboardingDeciderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C01F9F2C7CED620066AAE1 /* DefaultDuckPlayerOnboardingDeciderTests.swift */; };
 		31C01FA12C7CEF980066AAE1 /* DefaultDuckPlayerOnboardingDeciderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C01F9F2C7CED620066AAE1 /* DefaultDuckPlayerOnboardingDeciderTests.swift */; };
+		31C1FEFB2C7F95BC0022D8A4 /* DuckPlayerOnboardingExperiment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C1FEFA2C7F95BC0022D8A4 /* DuckPlayerOnboardingExperiment.swift */; };
+		31C1FEFC2C7F95BC0022D8A4 /* DuckPlayerOnboardingExperiment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C1FEFA2C7F95BC0022D8A4 /* DuckPlayerOnboardingExperiment.swift */; };
 		31C3CE0228EDC1E70002C24A /* CustomRoundedCornersShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C3CE0128EDC1E70002C24A /* CustomRoundedCornersShape.swift */; };
 		31C9ADE52AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C9ADE42AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift */; };
 		31C9ADE62AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C9ADE42AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift */; };
@@ -3130,6 +3132,7 @@
 		31C01F952C7CC4250066AAE1 /* TabModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabModal.swift; sourceTree = "<group>"; };
 		31C01F992C7CC4C50066AAE1 /* TabModalManageable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabModalManageable.swift; sourceTree = "<group>"; };
 		31C01F9F2C7CED620066AAE1 /* DefaultDuckPlayerOnboardingDeciderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultDuckPlayerOnboardingDeciderTests.swift; sourceTree = "<group>"; };
+		31C1FEFA2C7F95BC0022D8A4 /* DuckPlayerOnboardingExperiment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckPlayerOnboardingExperiment.swift; sourceTree = "<group>"; };
 		31C3CE0128EDC1E70002C24A /* CustomRoundedCornersShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomRoundedCornersShape.swift; sourceTree = "<group>"; };
 		31C5FFB82AF64D120008A79F /* DataBrokerProtectionFeatureGatekeeper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionFeatureGatekeeper.swift; sourceTree = "<group>"; };
 		31C9ADE42AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaitlistFeatureSetupHandler.swift; sourceTree = "<group>"; };
@@ -4888,6 +4891,7 @@
 				31119B3A2C74AB8B00884471 /* DuckPlayerOnboardingViewController.swift */,
 				31B108DD2C762D820066AA9E /* DuckPlayerOnboardingViewModel.swift */,
 				3183EB7A2C7679130086C6D7 /* DuckPlayerOnboardingDecider.swift */,
+				31C1FEFA2C7F95BC0022D8A4 /* DuckPlayerOnboardingExperiment.swift */,
 			);
 			path = DuckPlayerOnboardingModal;
 			sourceTree = "<group>";
@@ -10251,6 +10255,7 @@
 				3706FB1F293F65D500E42796 /* DataClearingPreferences.swift in Sources */,
 				1D01A3D12B88CEC600FE8150 /* PreferencesAccessibilityView.swift in Sources */,
 				3706FB20293F65D500E42796 /* LocalUnprotectedDomains.swift in Sources */,
+				31C1FEFC2C7F95BC0022D8A4 /* DuckPlayerOnboardingExperiment.swift in Sources */,
 				3707C719294B5D0F00682A9F /* HoveredLinkTabExtension.swift in Sources */,
 				3706FB21293F65D500E42796 /* NavigationBarBadgeAnimator.swift in Sources */,
 				3706FB22293F65D500E42796 /* NSTextViewExtension.swift in Sources */,
@@ -12007,6 +12012,7 @@
 				C16127EE2BDFB46400966BB9 /* DataImportShortcutsView.swift in Sources */,
 				9FA173DF2B7A0EFE00EE4E6E /* BookmarkDialogButtonsView.swift in Sources */,
 				F44C130225C2DA0400426E3E /* NSAppearanceExtension.swift in Sources */,
+				31C1FEFB2C7F95BC0022D8A4 /* DuckPlayerOnboardingExperiment.swift in Sources */,
 				4B3B8490297A0E1000A384BD /* EmailManagerExtension.swift in Sources */,
 				B64C84F1269310120048FEBE /* PermissionManager.swift in Sources */,
 				37CD54D027F2FDD100F1F7B9 /* DefaultBrowserPreferences.swift in Sources */,
