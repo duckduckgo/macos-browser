@@ -30,17 +30,10 @@ struct RecentlyVisited: View {
 
         ZStack {
 
-            if let customBackground = settingsModel.customBackground {
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.homeFavoritesGhost, style: StrokeStyle(lineWidth: 1.0))
-                    .homePageViewBackground(customBackground)
-                    .cornerRadius(12)
-            } else {
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.homeFavoritesGhost, style: StrokeStyle(lineWidth: 1.0))
-                    .background(Color.homeFavoritesBackground)
-                    .cornerRadius(12)
-            }
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.homeFavoritesGhost, style: StrokeStyle(lineWidth: 1.0))
+                .homePageViewBackground(settingsModel.customBackground)
+                .cornerRadius(12)
 
             VStack(spacing: 18) {
                 RecentlyVisitedTitle(isExpanded: $model.showRecentlyVisited)

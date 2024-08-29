@@ -22,6 +22,16 @@ extension HomePage.Views {
 
     struct SettingsView: View {
 
+        enum Const {
+            static let gridItemWidth = 96.0
+            static let gridItemHeight = 64.0
+            static let gridItemSpacing = 12.0
+            static let viewWidth = 204.0
+            static let viewPadding = 16.0
+            static let headerSpacing = 24.0
+            static let sectionSpacing = 36.0
+        }
+
         let includingContinueSetUpCards: Bool
         @EnvironmentObject var model: HomePage.Models.SettingsModel
         @EnvironmentObject var appearancePreferences: AppearancePreferences
@@ -32,11 +42,11 @@ extension HomePage.Views {
 
         var body: some View {
             ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
+                VStack(alignment: .leading, spacing: Const.headerSpacing) {
 
                     header
 
-                    VStack(alignment: .leading, spacing: 36) {
+                    VStack(alignment: .leading, spacing: Const.sectionSpacing) {
                         switch model.contentType {
                         case .root:
                             rootView
@@ -68,8 +78,8 @@ extension HomePage.Views {
 
                     Spacer()
                 }
-                .frame(width: 204)
-                .padding(16)
+                .frame(width: Const.viewWidth)
+                .padding(Const.viewPadding)
                 .frame(maxHeight: .infinity)
             }
             .background(

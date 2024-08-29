@@ -21,6 +21,11 @@ import SwiftUIExtensions
 extension HomePage.Views {
 
     struct BackgroundCategoryView: View {
+
+        enum Const {
+            static let titleSpacing = 6.0
+        }
+
         let modeModel: HomePage.Models.SettingsModel.CustomBackgroundModeModel
         let showTitle: Bool
         let action: () -> Void
@@ -35,7 +40,7 @@ extension HomePage.Views {
 
         var body: some View {
             Button(action: action) {
-                VStack(alignment: .leading, spacing: 6) {
+                VStack(alignment: .leading, spacing: Const.titleSpacing) {
                     ZStack {
                         if modeModel.contentType == .customImagePicker && !model.hasUserImages {
                             BackgroundThumbnailView(showCheckmarkIfSelected: true) {

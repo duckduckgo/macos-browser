@@ -217,17 +217,11 @@ extension HomePage.Views {
                         HStack {
                             Spacer(minLength: 0)
                             ZStack(alignment: .bottomTrailing) {
-                                if let customBackground = settingsModel.customBackground {
-                                    RoundedRectangle(cornerRadius: 6)
-                                        .stroke(Color.homeFavoritesGhost, style: StrokeStyle(lineWidth: 1.0))
-                                        .homePageViewBackground(customBackground)
-                                        .cornerRadius(6)
-                                } else {
-                                    RoundedRectangle(cornerRadius: 6)
-                                        .stroke(Color.homeFavoritesGhost, style: StrokeStyle(lineWidth: 1.0))
-                                        .background(Color.homeFavoritesBackground)
-                                        .cornerRadius(6)
-                                }
+
+                                RoundedRectangle(cornerRadius: 6)
+                                    .stroke(Color.homeFavoritesGhost, style: StrokeStyle(lineWidth: 1.0))
+                                    .homePageViewBackground(settingsModel.customBackground)
+                                    .cornerRadius(6)
 
                                 RoundedRectangle(cornerRadius: 6)
                                     .fill(buttonBackgroundColor)

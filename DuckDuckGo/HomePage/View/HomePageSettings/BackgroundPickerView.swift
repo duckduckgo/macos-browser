@@ -51,7 +51,7 @@ extension HomePage.Views {
                             } label: {
                                 RoundedRectangle(cornerRadius: 4)
                                     .stroke(Color(.homeFavoritesGhost), style: StrokeStyle(lineWidth: 1.5, dash: [4.0, 2.0]))
-                                    .frame(height: 64)
+                                    .frame(height: SettingsView.Const.gridItemHeight)
                                     .contentShape(Rectangle())
                             }
                             .buttonStyle(.plain)

@@ -51,7 +51,7 @@ extension HomePage.Views {
                     .cornerRadius(4)
                 RoundedRectangle(cornerRadius: 4)
                     .stroke(Color.homeSettingsBackgroundPreviewStroke)
-                    .frame(height: 64)
+                    .frame(height: SettingsView.Const.gridItemHeight)
                     .background(selectionBackground)
             }
             .contentShape(Rectangle())

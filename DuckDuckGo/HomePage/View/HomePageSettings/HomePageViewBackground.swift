@@ -26,14 +26,14 @@ extension View {
      * Some custom backgrounds use vibrancy effect, and some others use background color.
      * This function applies correct background based on the provided `customBackground` argument.
      */
-    func homePageViewBackground(_ customBackground: CustomBackground) -> some View {
+    func homePageViewBackground(_ customBackground: CustomBackground?) -> some View {
         modifier(HomePageElementBackgroundModifier(customBackground: customBackground))
     }
 }
 
 private struct HomePageElementBackgroundModifier: ViewModifier {
 
-    let customBackground: CustomBackground
+    let customBackground: CustomBackground?
 
     @ViewBuilder
     func body(content: Content) -> some View {
@@ -44,6 +44,8 @@ private struct HomePageElementBackgroundModifier: ViewModifier {
             content.background(Color.newTabPageElementsBackground.colorScheme(gradient.colorScheme))
         case .solidColor(let solidColor):
             content.background(Color.newTabPageElementsBackground.colorScheme(solidColor.colorScheme))
+        case .none:
+            content.background(Color.homeFavoritesBackground)
         }
     }
 }

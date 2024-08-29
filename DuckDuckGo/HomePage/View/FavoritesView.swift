@@ -282,31 +282,17 @@ struct FavoriteTemplate: View {
                         .shadow(color: isHovering ? .clear : .black.opacity(0.16), radius: 1.5, x: 0, y: 0)
                         .shadow(color: isHovering ? .clear : .black.opacity(0.12), radius: 2, x: 0, y: 2)
 
-                    if let customBackground = settingsModel.customBackground {
-                        RoundedRectangle(cornerRadius: 12)
-                            .homePageViewBackground(customBackground)
-                            .cornerRadius(12)
-                            .blendMode(.destinationOut)
-                    } else {
-                        RoundedRectangle(cornerRadius: 12)
-                            .background(Color.homeFavoritesBackground)
-                            .cornerRadius(12)
-                            .blendMode(.destinationOut)
-                    }
+                    RoundedRectangle(cornerRadius: 12)
+                        .homePageViewBackground(settingsModel.customBackground)
+                        .cornerRadius(12)
+                        .blendMode(.destinationOut)
                 }
                 .compositingGroup()
 
-                if let customBackground = settingsModel.customBackground {
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(isHovering ? .buttonMouseOver : .clear)
-                        .homePageViewBackground(customBackground)
-                        .cornerRadius(12)
-                } else {
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(isHovering ? .buttonMouseOver : .clear)
-                        .background(Color.homeFavoritesBackground)
-                        .cornerRadius(12)
-                }
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(isHovering ? .buttonMouseOver : .clear)
+                    .homePageViewBackground(settingsModel.customBackground)
+                    .cornerRadius(12)
 
                 if let url = url {
                     FaviconView(url: url, onFaviconMissing: onFaviconMissing)
