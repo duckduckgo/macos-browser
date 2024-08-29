@@ -31,7 +31,7 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
     var showBookmarksBar: Bool
     var bookmarksBarAppearance: BookmarksBarAppearance
     var homeButtonPosition: HomeButtonPosition
-    var isHomePagePromotionVisible: Bool
+    var didDismissHomePagePromotion: Bool
 
     init(
         showFullURL: Bool = false,
@@ -43,7 +43,7 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
         showBookmarksBar: Bool = true,
         bookmarksBarAppearance: BookmarksBarAppearance = .alwaysOn,
         homeButtonPosition: HomeButtonPosition = .right,
-        isHomePagePromotionVisible: Bool = true
+        didDismissHomePagePromotion: Bool = true
     ) {
         self.showFullURL = showFullURL
         self.currentThemeName = currentThemeName
@@ -54,7 +54,7 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
         self.showBookmarksBar = showBookmarksBar
         self.bookmarksBarAppearance = bookmarksBarAppearance
         self.homeButtonPosition = homeButtonPosition
-        self.isHomePagePromotionVisible = isHomePagePromotionVisible
+        self.didDismissHomePagePromotion = didDismissHomePagePromotion
     }
 }
 

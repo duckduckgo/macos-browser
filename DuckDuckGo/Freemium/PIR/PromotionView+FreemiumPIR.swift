@@ -21,8 +21,8 @@ import Foundation
 extension PromotionViewModel {
     static func freemiumPIRPromotion(proceedAction: @escaping () -> Void, closeAction: @escaping () -> Void) -> PromotionViewModel {
 
-        let description = UserText.homePagPromotionFreemiumPIRDescription
-        let actionButtonText = UserText.homePagPromotionFreemiumPIRButtonTitle
+        let description = UserText.homePagePromotionFreemiumPIRDescription
+        let actionButtonText = UserText.homePagePromotionFreemiumPIRButtonTitle
 
         return PromotionViewModel(image: .gift96,
                                   description: description,

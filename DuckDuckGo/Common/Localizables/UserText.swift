@@ -1278,9 +1278,9 @@ struct UserText {
 
     // Key: "home.page.promotion.freemium.pir.description"
     // Comment: "Description for the Freemium PIR Home Page Promotion"
-    static let homePagPromotionFreemiumPIRDescription = "Find your personal information from sites that store and sell it."
+    static let homePagePromotionFreemiumPIRDescription = "Find your personal information from sites that store and sell it."
 
     // Key: "home.page.promotion.freemium.pir.button.title"
     // Comment: "Title for the Freemium PIR Home Page Promotion Button"
-    static let homePagPromotionFreemiumPIRButtonTitle = "Scan"
+    static let homePagePromotionFreemiumPIRButtonTitle = "Scan"
 }
