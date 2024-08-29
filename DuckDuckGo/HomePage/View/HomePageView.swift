@@ -26,7 +26,8 @@ extension HomePage.Views {
     struct RootView: View {
 
         static let targetWidth: CGFloat = 508
-        let settingsPanelWidth: CGFloat = 236
+        static let minWindowWidth: CGFloat = 600
+        static let settingsPanelWidth: CGFloat = 236
         let isBurner: Bool
 
         @EnvironmentObject var model: AppearancePreferences
@@ -45,10 +46,6 @@ extension HomePage.Views {
             }
         }
 
-        func innerViewOffset(with geometry: GeometryProxy) -> CGFloat {
-            max(0, ((settingsPanelWidth + 600) - geometry.size.width) / 2)
-        }
-
         func regularHomePageView(includingContinueSetUpCards: Bool) -> some View {
             GeometryReader { geometry in
                 ZStack(alignment: .top) {
@@ -57,14 +54,12 @@ extension HomePage.Views {
                         ZStack(alignment: .leading) {
                             ScrollView {
                                 innerView(includingContinueSetUpCards: includingContinueSetUpCards)
-                                    .frame(width: geometry.size.width - (isSettingsVisible ? settingsPanelWidth : 0))
+                                    .frame(width: geometry.size.width - (isSettingsVisible ? Self.settingsPanelWidth : 0))
                                     .offset(x: isSettingsVisible ? innerViewOffset(with: geometry) : 0)
-                                    .ifLet(settingsModel.customBackground?.colorScheme) { view, colorScheme in
-                                        view.colorScheme(colorScheme)
-                                    }
+                                    .fixedColorScheme(for: settingsModel.customBackground)
                             }
                         }
-                        .frame(width: isSettingsVisible ? geometry.size.width - settingsPanelWidth : geometry.size.width)
+                        .frame(width: isSettingsVisible ? geometry.size.width - Self.settingsPanelWidth : geometry.size.width)
                         .contextMenu(ContextMenu {
                             if model.isContinueSetUpAvailable {
                                 Toggle(UserText.newTabMenuItemShowContinuteSetUp, isOn: $model.isContinueSetUpVisible)
@@ -79,7 +74,7 @@ extension HomePage.Views {
 
                         if isSettingsVisible {
                             SettingsView(includingContinueSetUpCards: includingContinueSetUpCards, isSettingsVisible: $isSettingsVisible)
-                                .frame(width: settingsPanelWidth)
+                                .frame(width: Self.settingsPanelWidth)
                                 .transition(.move(edge: .trailing))
                                 .layoutPriority(1)
                                 .environmentObject(settingsModel)
@@ -93,14 +88,11 @@ extension HomePage.Views {
                             HStack {
                                 Spacer(minLength: Self.targetWidth + (geometry.size.width - Self.targetWidth)/2)
                                 SettingsButtonView(isSettingsVisible: $isSettingsVisible)
-                                    .padding(.bottom, 14)
-                                    .padding(.trailing, 14)
+                                    .padding([.bottom, .trailing], 14)
                             }
                         }
                         .frame(width: geometry.size.width, height: geometry.size.height)
-                        .ifLet(settingsModel.customBackground?.colorScheme) { view, colorScheme in
-                            view.colorScheme(colorScheme)
-                        }
+                        .fixedColorScheme(for: settingsModel.customBackground)
                     }
                 }
                 .frame(maxWidth: .infinity)
@@ -114,6 +106,10 @@ extension HomePage.Views {
                     LocalBookmarkManager.shared.requestSync()
                 }
             }
+        }
+
+        private func innerViewOffset(with geometry: GeometryProxy) -> CGFloat {
+            max(0, ((Self.settingsPanelWidth + Self.minWindowWidth) - geometry.size.width) / 2)
         }
 
         func innerView(includingContinueSetUpCards: Bool) -> some View {

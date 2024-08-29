@@ -29,6 +29,16 @@ extension View {
     func homePageViewBackground(_ customBackground: CustomBackground?) -> some View {
         modifier(HomePageElementBackgroundModifier(customBackground: customBackground))
     }
+
+    /**
+     * This view modifier applies fixed color scheme based on the `customBackground`.
+     *
+     * If the passed `customBackground` is not nil, this modifier takes background's associated
+     * `colorScheme` and applies it to the view. Otherwise it returns an unmodified view.
+     */
+    func fixedColorScheme(for customBackground: CustomBackground?) -> some View {
+        modifier(CustomBackgroundFixedColorScheme(customBackground: customBackground))
+    }
 }
 
 private struct HomePageElementBackgroundModifier: ViewModifier {
@@ -46,6 +56,20 @@ private struct HomePageElementBackgroundModifier: ViewModifier {
             content.background(Color.newTabPageElementsBackground.colorScheme(solidColor.colorScheme))
         case .none:
             content.background(Color.homeFavoritesBackground)
+        }
+    }
+}
+
+private struct CustomBackgroundFixedColorScheme: ViewModifier {
+
+    let customBackground: CustomBackground?
+
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        if let colorScheme = customBackground?.colorScheme {
+            content.colorScheme(colorScheme)
+        } else {
+            content
         }
     }
 }
