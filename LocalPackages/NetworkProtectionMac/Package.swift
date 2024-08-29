@@ -84,11 +84,24 @@ let package = Package(
             ]
         ),
 
+        // MARK: - VPNPixels
+
+        .target(
+            name: "VPNPixels",
+            dependencies: [
+                .product(name: "PixelKit", package: "BrowserServicesKit"),
+            ],
+            swiftSettings: [
+                .define("DEBUG", .when(configuration: .debug))
+            ]
+        ),
+
         // MARK: - NetworkProtectionUI
 
         .target(
             name: "NetworkProtectionUI",
             dependencies: [
+                "VPNPixels",
                 .product(name: "NetworkProtection", package: "BrowserServicesKit"),
                 .product(name: "PixelKit", package: "BrowserServicesKit"),
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions"),
