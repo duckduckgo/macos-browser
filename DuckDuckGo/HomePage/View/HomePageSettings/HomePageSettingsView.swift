@@ -186,11 +186,18 @@ extension HomePage.Views {
     }
 }
 
+// The extensions below are required for the preview to work
+
 extension HomePage.Views.SettingsView {
-    fileprivate typealias CloseButton = HomePage.Views.CloseButton
-    fileprivate typealias SettingsSection = HomePage.Views.SettingsSection
-    fileprivate typealias BackgroundThumbnailView = HomePage.Views.BackgroundThumbnailView
     fileprivate typealias BackgroundCategoryView = HomePage.Views.BackgroundCategoryView
+    fileprivate typealias BackgroundPickerView = HomePage.Views.BackgroundPickerView
+    fileprivate typealias BackgroundThumbnailView = HomePage.Views.BackgroundThumbnailView
+    fileprivate typealias CloseButton = HomePage.Views.CloseButton
+    fileprivate typealias HomeContentSectionsView = HomePage.Views.HomeContentSectionsView
+    fileprivate typealias SettingsGrid = HomePage.Views.SettingsGrid
+    fileprivate typealias SettingsGridWithPlaceholders = HomePage.Views.SettingsGridWithPlaceholders
+    fileprivate typealias SettingsSection = HomePage.Views.SettingsSection
+    fileprivate typealias ThemePicker = HomePage.Views.ThemePicker
 }
 
 extension HomePage.Views.BackgroundCategoryView {
@@ -204,6 +211,23 @@ extension HomePage.Views.BackgroundCategoryView {
     model.customBackground = .solidColor(.lightPink)
 
     return HomePage.Views.SettingsView(includingContinueSetUpCards: true, isSettingsVisible: $isSettingsVisible)
-        .frame(width: 236)
+        .frame(width: 236, height: 600)
         .environmentObject(model)
+        .environmentObject(AppearancePreferences.shared)
+        .environmentObject(HomePage.Models.ContinueSetUpModel(
+            defaultBrowserProvider: SystemDefaultBrowserProvider(),
+            dockCustomizer: DockCustomizer(),
+            dataImportProvider: BookmarksAndPasswordsImportStatusProvider(),
+            tabCollectionViewModel: TabCollectionViewModel(),
+            duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor()
+        ))
+        .environmentObject(HomePage.Models.FavoritesModel(
+            open: { _, _ in },
+            removeFavorite: { _ in },
+            deleteBookmark: { _ in },
+            add: {},
+            edit: { _ in },
+            moveFavorite: { _, _ in },
+            onFaviconMissing: {}
+        ))
 }
