@@ -72,9 +72,13 @@ struct DefaultDuckPlayerOnboardingDecider: DuckPlayerOnboardingDecider {
 
     /// We only want to display the onboarding if it was never displayed, the settings is set to alwaysAsk and haven't interacted with the overlay.
     var canDisplayOnboarding: Bool {
+#if DEBUG
+        return !defaults.onboardingWasDisplayed && preferences.duckPlayerMode == .alwaysAsk
+#else
         // returning false until we turn on the experiment
         return false
-        // return !defaults.onboardingWasDisplayed && preferences.duckPlayerMode == .alwaysAsk && isUserInExperiment
+#endif
+
     }
 
     private var isUserInExperiment: Bool {

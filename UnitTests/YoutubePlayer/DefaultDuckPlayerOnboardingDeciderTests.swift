@@ -91,7 +91,7 @@ final class DefaultDuckPlayerOnboardingDeciderTests: XCTestCase {
         )
 
         let onboardingDecider = DefaultDuckPlayerOnboardingDecider(defaults: defaults, preferences: preferences)
-        XCTAssertFalse(onboardingDecider.canDisplayOnboarding)
+        XCTAssertTrue(onboardingDecider.canDisplayOnboarding)
     }
 
     func testCanDisplayOnboarding_WhenEnabled() {
