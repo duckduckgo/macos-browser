@@ -262,21 +262,6 @@ struct UserText {
         return String(format: localized, domain)
     }
 
-    // MARK: Phishing Error Page
-    static let phishingErrorPageHeader = NSLocalizedString("phishing.error.page.header", value: "Warning: This site puts your personal information at risk", comment: "Title shown in an error page that warn users of security risks on a website due to Phishing issues")
-    static let phishingErrorPageTabTitle = NSLocalizedString("phishing.error.page.tab.title", value: "Warning: Deceptive Site Ahead", comment: "Title shown in an error page tab that warn users of security risks on a website due to Phishing issues")
-    static let phishingErrorPageBody =  NSLocalizedString("phishing.error.page.body",
-                                          value: "This website may be impersonating a legitimate site in order to trick you into providing personal information, such as passwords or credit card numbers. <a href=\"https://duckduckgo.com/duckduckgo-help-pages/privacy/phishing-and-malware-protection/\" target=\"_blank\">Learn more</a>",
-                                          comment: "Error description shown in an error page that warns users of security risks on a website due to Phishing issues.")
-    static let phishingErrorPageAdvancedButton = NSLocalizedString("phishing.error.page.advanced.button", value: "Advanced…", comment: "Button shown in an error page that warns users of security risks on a website due to Phishing issues. The buttons allows the user to see advanced options on click.")
-    static let phishingErrorPageLeaveSiteButton = NSLocalizedString("phishing.error.page.leave.site.button", value: "Leave This Site", comment: "Button shown in an error page that warns users of security risks on a website due to Phishing issues. The buttons allows the user to leave the website and navigate to previous page.")
-    static let phishingErrorPageVisitSiteButton = NSLocalizedString("phishing.error.page.visit.site.button", value: "Accept Risk and Visit Site", comment: "Button shown in an error page that warns users of security risks on a website due to Phishing issues. The buttons allows the user to visit the website anyway despite the risks.")
-    static let phishingErrorAdvancedInfoTitle = NSLocalizedString("phishing.error.page.advanced.info.title", value: "DuckDuckGo warns you when a website has been flagged as malicious.", comment: "Title of the Advanced info section shown in an error page that warns users of security risks on a website due to Phishing issues.")
-    static let phishingErrorAdvancedInfoBodyPhishing = NSLocalizedString("phishing.error.page.advanced.info.body.credential.phishing", value: "Warnings are shown for websites that have been reported to be deceptive. Deceptive websites try to trick you into believing they are legitimate websites you trust. If you understand the risks involved, you can continue anyway.", comment: "Body of the text of the Advanced info shown in an error page that warns users of security risks on a website due to Phishing issues.")
-    static let phishingErrorPageReadMore = NSLocalizedString("phishing.error.page.read.more", value: "See our <a href=\"https://duckduckgo.com/duckduckgo-help-pages/privacy/phishing-and-malware-protection/\" target=\"_blank\">Phishing and Malware Protection help page</a> for more information.", comment: "A call-to-action to read more on our help pages for phishing and malware protection.")
-
-
-
     static let openSystemPreferences = NSLocalizedString("open.preferences", value: "Open System Preferences", comment: "Open System Preferences (to re-enable permission for the App) (up to and including macOS 12")
     static let openSystemSettings = NSLocalizedString("open.settings", value: "Open System Settings…", comment: "This string represents a prompt or button label prompting the user to open system settings")
     static let checkForUpdate = NSLocalizedString("check.for.update", value: "Check for Update", comment: "Button users can use to check for a new update")
