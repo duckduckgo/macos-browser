@@ -107,7 +107,7 @@ final class ErrorPageTabExtensionTest: XCTestCase {
 
     @MainActor func test_WhenUserScriptsPublisherPublishSSLErrorPageScript_ThenErrorPageExtensionIsSetAsUserScriptDelegate() {
         // GIVEN
-        let userScript = SpecialErrorPageUserScript(localeStrings: SpecialErrorPageUserScript.localeStrings,
+        let userScript = SpecialErrorPageUserScript(localeStrings: SpecialErrorPageUserScript.localeStrings(),
                                                     languageCode: Locale.current.languageCode ?? "en")
         let mockScriptProvider = MockSpecialErrorPageScriptProvider(script: userScript)
 
@@ -120,7 +120,7 @@ final class ErrorPageTabExtensionTest: XCTestCase {
 
     @MainActor func testWhenNavigationEnded_IfNoFailure_SSLUserScriptIsNotEnabled() {
         // GIVEN
-        let userScript = SpecialErrorPageUserScript(localeStrings: SpecialErrorPageUserScript.localeStrings,
+        let userScript = SpecialErrorPageUserScript(localeStrings: SpecialErrorPageUserScript.localeStrings(),
                                                     languageCode: Locale.current.languageCode ?? "en")
         let mockScriptProvider = MockSpecialErrorPageScriptProvider(script: userScript)
         let mockWebView = MockWKWebView(url: URL(string: errorURLString)!)
@@ -139,7 +139,7 @@ final class ErrorPageTabExtensionTest: XCTestCase {
 
     @MainActor func testWhenNavigationEnded_IfNonSSLFailure_SSLUserScriptIsNotEnabled() {
         // GIVEN
-        let userScript = SpecialErrorPageUserScript(localeStrings: SpecialErrorPageUserScript.localeStrings,
+        let userScript = SpecialErrorPageUserScript(localeStrings: SpecialErrorPageUserScript.localeStrings(),
                                                     languageCode: Locale.current.languageCode ?? "en")
         let mockScriptProvider = MockSpecialErrorPageScriptProvider(script: userScript)
         let mockWebView = MockWKWebView(url: URL(string: errorURLString)!)
@@ -161,7 +161,7 @@ final class ErrorPageTabExtensionTest: XCTestCase {
 
     @MainActor func testWhenNavigationEnded_IfSSLFailure_AndErrorURLIsDifferentFromNavigationURL_SSLUserScriptIsNotEnabled() {
         // GIVEN
-        let userScript = SpecialErrorPageUserScript(localeStrings: SpecialErrorPageUserScript.localeStrings,
+        let userScript = SpecialErrorPageUserScript(localeStrings: SpecialErrorPageUserScript.localeStrings(),
                                                     languageCode: Locale.current.languageCode ?? "en")
         let mockScriptProvider = MockSpecialErrorPageScriptProvider(script: userScript)
         let mockWebView = MockWKWebView(url: URL(string: errorURLString)!)
@@ -182,7 +182,7 @@ final class ErrorPageTabExtensionTest: XCTestCase {
 
     @MainActor func testWhenNavigationEnded_IfSSLFailure_AndErrorURLIsTheSameAsNavigationURL_SSLUserScriptIsEnabled() {
         // GIVEN
-        let userScript = SpecialErrorPageUserScript(localeStrings: SpecialErrorPageUserScript.localeStrings,
+        let userScript = SpecialErrorPageUserScript(localeStrings: SpecialErrorPageUserScript.localeStrings(),
                                                     languageCode: Locale.current.languageCode ?? "en")
         let mockScriptProvider = MockSpecialErrorPageScriptProvider(script: userScript)
         let mockWebView = MockWKWebView(url: URL(string: errorURLString)!)

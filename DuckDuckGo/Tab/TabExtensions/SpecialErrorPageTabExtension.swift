@@ -62,7 +62,6 @@ final class SpecialErrorPageTabExtension {
 
     @MainActor private func loadSSLErrorHTML(url: URL, alternate: Bool) {
         let html = SpecialErrorPageHTMLTemplate.htmlFromTemplate
-        webView?.loadAlternateHTML(html, baseURL: .error, forUnreachableURL: url)
         loadHTML(html: html, url: url, alternate: alternate)
     }
 

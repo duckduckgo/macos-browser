@@ -39,8 +39,9 @@ extension SpecialPagesUserScript {
     }
 
     func withErrorPages() {
-        let specialErrorPageUserScript = SpecialErrorPageUserScript(localeStrings: SpecialErrorPageUserScript.localeStrings,
-                                                                    languageCode: Locale.current.languageCode ?? "en")
+        let lenguageCode = Locale.current.languageCode ?? "en"
+        let specialErrorPageUserScript = SpecialErrorPageUserScript(localeStrings: SpecialErrorPageUserScript.localeStrings(for: lenguageCode),
+                                                                    languageCode: lenguageCode)
         self.registerSubfeature(delegate: specialErrorPageUserScript)
     }
 

@@ -69,8 +69,9 @@ final class UserScripts: UserScriptsProvider {
 
         autoconsentUserScript = AutoconsentUserScript(scriptSource: sourceProvider, config: sourceProvider.privacyConfigurationManager.privacyConfig)
 
-        specialErrorPageUserScript = SpecialErrorPageUserScript(localeStrings: SpecialErrorPageUserScript.localeStrings,
-                                                                languageCode: Locale.current.languageCode ?? "en")
+        let lenguageCode = Locale.current.languageCode ?? "en"
+        specialErrorPageUserScript = SpecialErrorPageUserScript(localeStrings: SpecialErrorPageUserScript.localeStrings(for: lenguageCode),
+                                                                    languageCode: lenguageCode)
 
         onboardingUserScript = OnboardingUserScript(onboardingActionsManager: sourceProvider.onboardingActionsManager!)
 
