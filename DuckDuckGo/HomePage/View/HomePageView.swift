@@ -191,6 +191,7 @@ extension HomePage.Views {
             let onSelectedColor: Color = .buttonMouseDown
             let iconSize = 16.02
             let targetSize = 28.0
+            let buttonWidthWithoutTitle = 52.0
 
             @State var isHovering: Bool = false
             @Binding var isSettingsVisible: Bool
@@ -203,7 +204,7 @@ extension HomePage.Views {
             }
 
             private func isCompact(with geometry: GeometryProxy) -> Bool {
-                geometry.size.width < textWidth + 52
+                geometry.size.width < textWidth + buttonWidthWithoutTitle
             }
 
             var body: some View {
@@ -255,6 +256,13 @@ extension HomePage.Views {
             }
         }
 
+        /**
+         * This view updates a custom preference key with its width.
+         *
+         * The view is used as the background for the button's title, so that it can report the text width.
+         * The button view listens to changes of the preference key and updates its state variable accordingly
+         * to decide on the mode (compact or full-size) of the button.
+         */
         struct WidthGetter: View {
             var body: some View {
                 GeometryReader { geometry in
