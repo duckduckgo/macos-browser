@@ -21,7 +21,7 @@ import SpecialErrorPages
 import ContentScopeScripts
 
 extension SpecialErrorPageUserScript {
-    
+
     static func localeStrings(for languageCode: String = Locale.current.languageCode ?? "en") -> String? {
         if let localizedFile = ContentScopeScripts.Bundle.path(forResource: "special-error",
                                                                ofType: "json",
@@ -30,5 +30,5 @@ extension SpecialErrorPageUserScript {
         }
         return nil
     }
-    
+
 }
