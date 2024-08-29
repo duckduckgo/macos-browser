@@ -294,7 +294,7 @@ final class MoreOptionsMenuTests: XCTestCase {
 
         // Then
         XCTAssertTrue(mockFreemiumPIRPresenter.didCallShowFreemium)
-        XCTAssertFalse(mockFreemiumPIRPresenter.didOnboardState)
+        XCTAssertTrue(mockFreemiumPIRPresenter.didOnboardState)
     }
 
     @MainActor

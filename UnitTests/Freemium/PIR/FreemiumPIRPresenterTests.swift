@@ -42,7 +42,7 @@ final class FreemiumPIRPresenterTests: XCTestCase {
         // When
         sut.showFreemiumPIR(didOnboard: false, windowControllerManager: mockWindowControllerManager)
         // Then
-        XCTAssertEqual(mockWindowControllerManager.showTabContent, Tab.Content.dataBrokerProtection)
+        XCTAssertEqual(mockWindowControllerManager.showTabContent, Tab.Content.none)
     }
 }
 

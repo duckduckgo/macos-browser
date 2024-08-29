@@ -21,8 +21,8 @@ import Foundation
 extension PromotionViewModel {
     static func freemiumPIRPromotion(proceedAction: @escaping () -> Void, closeAction: @escaping () -> Void) -> PromotionViewModel {
 
-        let description = "Find your personal information from sites that store and sell it."
-        let actionButtonText = "Scan"
+        let description = UserText.homePagPromotionFreemiumPIRDescription
+        let actionButtonText = UserText.homePagPromotionFreemiumPIRButtonTitle
 
         return PromotionViewModel(image: .gift96,
                                   description: description,

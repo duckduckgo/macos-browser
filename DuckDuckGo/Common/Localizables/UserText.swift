@@ -1275,4 +1275,12 @@ struct UserText {
     // Key: "freemium.pir.menu.item"
     // Comment: "Title for Freemium Personal Information Removal (Scan-Only) item in the options menu"
     static let freemiumPIROptionsMenuItem = "Personal Information Scan"
+
+    // Key: "home.page.promotion.freemium.pir.description"
+    // Comment: "Description for the Freemium PIR Home Page Promotion"
+    static let homePagPromotionFreemiumPIRDescription = "Find your personal information from sites that store and sell it."
+
+    // Key: "home.page.promotion.freemium.pir.button.title"
+    // Comment: "Title for the Freemium PIR Home Page Promotion Button"
+    static let homePagPromotionFreemiumPIRButtonTitle = "Scan"
 }
