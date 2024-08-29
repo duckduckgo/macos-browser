@@ -40,7 +40,7 @@ extension HomePage.Views {
             VStack(spacing: 16) {
                 backButton
                 if items.count < maxItemsCount {
-                    SettingsGridWithPlaceholders(items: items, maxNumberOfItems: maxItemsCount) { item in
+                    SettingsGridWithPlaceholders(items: items, expectedMaxNumberOfItems: maxItemsCount) { item in
                         if let item {
                             itemView(for: item)
                         } else {

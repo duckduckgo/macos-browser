@@ -20,6 +20,14 @@ import SwiftUIExtensions
 
 extension HomePage.Views {
 
+    private enum Const {
+        static let gridItemWidth = 96.0
+        static let gridItemSpacing = 12.0
+    }
+
+    /**
+     * This view displays array of items in a grid with 2 columns.
+     */
     struct SettingsGrid<Item, ItemView>: View where Item: Identifiable & Hashable, ItemView: View {
 
         let items: [Item]
@@ -28,18 +36,18 @@ extension HomePage.Views {
         var body: some View {
             if #available(macOS 12.0, *), items.count > 1 {
                 LazyVGrid(
-                    columns: Array(repeating: GridItem(.flexible(minimum: 0, maximum: .infinity), spacing: 12), count: 2),
-                    spacing: 12
+                    columns: Array(repeating: GridItem(.flexible(minimum: 0, maximum: .infinity), spacing: Const.gridItemSpacing), count: 2),
+                    spacing: Const.gridItemSpacing
                 ) {
                     ForEach(items, content: itemView)
                 }
             } else {
                 let rows = items.chunked(into: 2)
-                VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: Const.gridItemSpacing) {
                     ForEach(rows, id: \.self) { row in
-                        HStack(spacing: 12) {
+                        HStack(spacing: Const.gridItemSpacing) {
                             ForEach(row) { row in
-                                itemView(row).frame(width: 96)
+                                itemView(row).frame(width: Const.gridItemWidth)
                             }
                             if row.count == 1 {
                                 Spacer()
@@ -51,6 +59,9 @@ extension HomePage.Views {
         }
     }
 
+    /**
+     * This view displays array of items in a grid with 2 columns, and optionally displays customizable placeholder items.
+     */
     struct SettingsGridWithPlaceholders<Item, ItemView>: View where Item: Identifiable & Hashable, ItemView: View {
 
         enum ItemOrPlaceholder<I>: Identifiable & Hashable where I: Identifiable & Hashable {
@@ -68,26 +79,35 @@ extension HomePage.Views {
         }
 
         let items: [ItemOrPlaceholder<Item>]
-        let maxNumberOfItems: Int
+
+        /**
+         * This closure provides a view for a given item.
+         *
+         * If `item` parameter is `nil`, the closure should build a placeholder view.
+         */
         @ViewBuilder let itemView: (Item?) -> ItemView
 
-        init(items: [Item], maxNumberOfItems: Int, @ViewBuilder itemView: @escaping (Item?) -> ItemView) {
+        /**
+         * If `items` has fewer elements than `expectedMaxNumberOfItems`, it's padded with placeholder items
+         * up to `expectedMaxNumberOfItems` items. If `items` has as many elements as the value of
+         * `expectedMaxNumberOfItems` or more, no placeholders are displayed.
+         */
+        init(items: [Item], expectedMaxNumberOfItems: Int, @ViewBuilder itemView: @escaping (Item?) -> ItemView) {
             var allItems = items.map(ItemOrPlaceholder.item)
-            if maxNumberOfItems > allItems.count {
-                for index in allItems.count..<maxNumberOfItems {
+            if expectedMaxNumberOfItems > allItems.count {
+                for index in allItems.count..<expectedMaxNumberOfItems {
                     allItems.append(.placeholder(index))
                 }
             }
             self.items = allItems
-            self.maxNumberOfItems = maxNumberOfItems
             self.itemView = itemView
         }
 
         var body: some View {
             if #available(macOS 12.0, *), items.count > 1 {
                 LazyVGrid(
-                    columns: Array(repeating: GridItem(.flexible(minimum: 0, maximum: .infinity), spacing: 12), count: 2),
-                    spacing: 12
+                    columns: Array(repeating: GridItem(.flexible(minimum: 0, maximum: .infinity), spacing: Const.gridItemSpacing), count: 2),
+                    spacing: Const.gridItemSpacing
                 ) {
                     ForEach(items, content: { item in
                         if case .item(let item) = item {
@@ -99,14 +119,14 @@ extension HomePage.Views {
                 }
             } else {
                 let rows = items.chunked(into: 2)
-                VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: Const.gridItemSpacing) {
                     ForEach(rows, id: \.self) { row in
-                        HStack(spacing: 12) {
+                        HStack(spacing: Const.gridItemSpacing) {
                             ForEach(row) { row in
                                 if case .item(let item) = row {
-                                    itemView(item).frame(width: 96)
+                                    itemView(item).frame(width: Const.gridItemWidth)
                                 } else {
-                                    itemView(nil).frame(width: 96)
+                                    itemView(nil).frame(width: Const.gridItemWidth)
                                 }
                             }
                             if row.count == 1 {
