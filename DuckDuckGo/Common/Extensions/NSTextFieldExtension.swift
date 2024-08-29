@@ -18,6 +18,7 @@
 
 import Cocoa
 import Common
+import os.log
 
 extension NSTextField {
 
@@ -54,7 +55,7 @@ extension NSTextField {
 
     func gradient(width: CGFloat, trailingPadding: CGFloat) {
         guard let layer = layer else {
-            os_log("NSTextField: Making of gradient failed - Text field has no layer.", type: .error)
+            Logger.general.error("NSTextField: Making of gradient failed - Text field has no layer.")
             return
         }
 
@@ -65,7 +66,7 @@ extension NSTextField {
         }
 
         guard let mask = layer.mask as? CAGradientLayer else {
-            os_log("NSTextField: Making of gradient failed - Mask has no gradient layer.", type: .error)
+            Logger.general.error("NSTextField: Making of gradient failed - Mask has no gradient layer.")
             return
         }
 

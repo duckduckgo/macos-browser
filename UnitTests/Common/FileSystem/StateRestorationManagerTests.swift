@@ -104,15 +104,49 @@ final class StateRestorationManagerTests: XCTestCase {
     }
 
     @MainActor
-    func testWhenLastSessionStateIsRemovedManuallyThenLastSessionCannotBeRestored() {
+    func testWhenLastSessionStateIsClearedThenLastSessionCannotBeRestored() {
         changeState("val1", 1, sync: true)
 
         srm = StatePersistenceService(fileStore: fileStore, fileName: testFileName)
         srm.loadLastSessionState()
         XCTAssertTrue(srm.canRestoreLastSessionState)
 
-        srm.removeLastSessionState()
+        srm.clearState(sync: true)
         XCTAssertFalse(srm.canRestoreLastSessionState)
+    }
+
+    @MainActor
+    func testWhenSessionStateIsRestoredItCanBeRestoredAgain() {
+        changeState("val1", 1, sync: true)
+
+        srm = StatePersistenceService(fileStore: fileStore, fileName: testFileName)
+        srm.loadLastSessionState()
+        srm.didLoadState()
+        XCTAssertTrue(srm.canRestoreLastSessionState)
+
+        srm = StatePersistenceService(fileStore: fileStore, fileName: testFileName)
+        srm.loadLastSessionState()
+        srm.didLoadState()
+        XCTAssertTrue(srm.canRestoreLastSessionState)
+    }
+
+    @MainActor
+    func testWhenSameSessionStateIsRestoredTwiceItBecomesStale() {
+        changeState("val1", 1, sync: true)
+
+        srm = StatePersistenceService(fileStore: fileStore, fileName: testFileName)
+        XCTAssertFalse(srm.isAppStateFileStale)
+        srm.loadLastSessionState()
+        srm.didLoadState()
+
+        srm = StatePersistenceService(fileStore: fileStore, fileName: testFileName)
+        XCTAssertFalse(srm.isAppStateFileStale)
+        srm.loadLastSessionState()
+        srm.didLoadState()
+        XCTAssertTrue(srm.isAppStateFileStale)
+
+        srm = StatePersistenceService(fileStore: fileStore, fileName: testFileName)
+        XCTAssertTrue(srm.isAppStateFileStale)
     }
 
     @MainActor
@@ -151,9 +185,13 @@ final class StateRestorationManagerTests: XCTestCase {
     func testStatePersistenceThrottlesWrites() {
         fileStore.delay = 0.1 // write operations will sleep for 100ms
         var counter = 0
-        let observer = fileStore.publisher(for: \.storage).dropFirst().sink { _ in
-            counter += 1
-        }
+
+        let observer = fileStore.publisher(for: \.storage)
+            .dropFirst()
+            .removeDuplicates()
+            .sink { _ in
+                counter += 1
+            }
 
         changeState("val1", 1)
         changeState("val2", 2)
@@ -172,9 +210,12 @@ final class StateRestorationManagerTests: XCTestCase {
         fileStore.delay = 0.01 // write operations will sleep for 100ms
 
         var counter = 0
-        let observer = fileStore.publisher(for: \.storage).dropFirst().sink { _ in
-            counter += 1
-        }
+        let observer = fileStore.publisher(for: \.storage)
+            .dropFirst()
+            .removeDuplicates()
+            .sink { _ in
+                counter += 1
+            }
 
         changeState("val1", 1, sync: true)
         changeState("val2", 2, sync: true)

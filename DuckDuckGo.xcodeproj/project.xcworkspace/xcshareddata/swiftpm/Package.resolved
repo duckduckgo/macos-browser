@@ -33,7 +33,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "anh/netp/geolocation-issues",
-        "revision" : "cb3efb0ac6e1f7621e8e811032b0d59e24e9427f"
+        "revision" : "dd663b3f3716c0dc43e19f5043742ac122772f7b"
       }
     },
     {
@@ -104,8 +104,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/privacy-dashboard",
       "state" : {
-        "revision" : "36dc07cba4bc1e7e0c1d1fb679c3cd077694a072",
-        "version" : "5.0.0"
+        "revision" : "665b23dc656c9f787494620494f8e56098a900b2",
+        "version" : "5.1.1"
       }
     },
     {
