@@ -82,7 +82,7 @@ class BookmarkSearchTests: XCTestCase {
         testShowInFolderFunctionality(in: .panel)
     }
 
-    func testShoInFolderFunctionalityOnBookmarksManager() {
+    func testShowInFolderFunctionalityOnBookmarksManager() {
         testShowInFolderFunctionality(in: .manager)
     }
 
