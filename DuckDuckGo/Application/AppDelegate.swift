@@ -97,6 +97,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     public let vpnSettings = VPNSettings(defaults: .netP)
 
+    var configurationManager = ConfigurationManager()
+
     // MARK: - VPN
 
     private var networkProtectionSubscriptionEventHandler: NetworkProtectionSubscriptionEventHandler?
@@ -308,7 +310,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if case .normal = NSApp.runType {
             FaviconManager.shared.loadFavicons()
         }
-        ConfigurationManager.shared.start()
+        configurationManager.start()
         _ = DownloadListCoordinator.shared
         _ = RecentlyClosedCoordinator.shared
 

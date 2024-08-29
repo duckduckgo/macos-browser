@@ -682,7 +682,7 @@ final class MainMenu: NSMenu {
 
     private func updateRemoteConfigurationInfo() {
         var dateString: String
-        if let date = ConfigurationManager.shared.lastConfigurationInstallDate {
+        if let date = Application.appDelegate.configurationManager.lastConfigurationInstallDate {
             dateString = DateFormatter.localizedString(from: date, dateStyle: .short, timeStyle: .medium)
             configurationDateAndTimeMenuItem.title = "Last Update Time: \(dateString)"
         } else {

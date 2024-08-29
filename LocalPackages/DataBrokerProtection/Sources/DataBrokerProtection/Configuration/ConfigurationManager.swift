@@ -19,6 +19,7 @@
 import Foundation
 import os.log
 import BrowserServicesKit
+import Persistence
 import Configuration
 import Common
 import Networking
@@ -30,8 +31,11 @@ public extension Logger {
 
 final class ConfigurationManager: DefaultConfigurationManager {
 
-    static let shared = ConfigurationManager(fetcher: ConfigurationFetcher(store: ConfigurationStore.shared,
-                                                                           eventMapping: configurationDebugEvents))
+    override init(fetcher: ConfigurationFetching = ConfigurationFetcher(store: ConfigurationStore(), eventMapping: configurationDebugEvents),
+                  store: ConfigurationStoring = ConfigurationStore(),
+                  defaults: KeyValueStoring = UserDefaults.config) {
+        super.init(fetcher: fetcher, store: store, defaults: defaults)
+    }
 
     static let configurationDebugEvents = EventMapping<ConfigurationDebugEvents> { event, error, _, _ in
         let domainEvent: DataBrokerProtectionPixels
@@ -59,7 +63,7 @@ final class ConfigurationManager: DefaultConfigurationManager {
 
         await updateConfigDependenciesTask.value
 
-        ConfigurationStore.shared.log()
+        (store as? ConfigurationStore)?.log()
         log()
     }
 
@@ -79,15 +83,15 @@ final class ConfigurationManager: DefaultConfigurationManager {
 
     func updateConfigDependencies() {
         DBPPrivacyConfigurationManager.shared.reload(
-            etag: ConfigurationStore.shared.loadEtag(for: .privacyConfiguration),
-            data: ConfigurationStore.shared.loadData(for: .privacyConfiguration)
+            etag: store.loadEtag(for: .privacyConfiguration),
+            data: store.loadData(for: .privacyConfiguration)
         )
     }
 }
 
 extension ConfigurationManager {
     override var presentedItemURL: URL? {
-        ConfigurationStore.shared.fileUrl(for: .privacyConfiguration)
+        store.fileUrl(for: .privacyConfiguration)
     }
 
     override func presentedItemDidChange() {

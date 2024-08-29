@@ -130,6 +130,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private let appLauncher = AppLauncher()
     private let accountManager: AccountManager
     private let accessTokenStorage: SubscriptionTokenKeychainStorage
+    private let configurattionManager = ConfigurationManager()
 
     public init(accountManager: AccountManager,
                 accessTokenStorage: SubscriptionTokenKeychainStorage,
@@ -364,10 +365,10 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
         // Setup Remote Configuration
         Configuration.setURLProvider(VPNAgentConfigurationURLProvider())
-        ConfigurationManager.shared.start()
+        configurattionManager.start()
         let privacyConfigurationManager = VPNPrivacyConfigurationManager.shared
         // Load cached config (if any)
-        let configStore = ConfigurationStore.shared
+        let configStore = ConfigurationStore()
         privacyConfigurationManager.reload(etag: configStore.loadEtag(for: .privacyConfiguration), data: configStore.loadData(for: .privacyConfiguration))
 
         setupMenuVisibility()

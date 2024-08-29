@@ -170,6 +170,15 @@
         "revision" : "1403e17eeeb8493b92fb9d11eb8c846bb9776581",
         "version" : "2.1.2"
       }
+    },
+    {
+      "identity" : "wireguard-apple",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/duckduckgo/wireguard-apple",
+      "state" : {
+        "revision" : "13fd026384b1af11048451061cc1b21434990668",
+        "version" : "1.1.3"
+      }
     }
   ],
   "version" : 2

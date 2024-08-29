@@ -45,7 +45,6 @@ final class ConfigurationStore: ConfigurationStoring {
         return "configurationPrivacyConfigurationEtag"
     }
 
-    static let shared = ConfigurationStore()
     let defaults: KeyValueStoring
 
     var privacyConfigurationEtag: String? {

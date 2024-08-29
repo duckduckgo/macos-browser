@@ -25,16 +25,12 @@ import Configuration
 import Common
 import Networking
 import PixelKit
-import os.log
 
 final class ConfigurationManager: DefaultConfigurationManager {
 
     private enum Constants {
         static let lastConfigurationInstallDateKey = "config.last.installed"
     }
-
-    static let shared = ConfigurationManager(fetcher: ConfigurationFetcher(store: ConfigurationStore.shared,
-                                                                           eventMapping: configurationDebugEvents))
 
     private var defaults: KeyValueStoring
 
@@ -57,9 +53,11 @@ final class ConfigurationManager: DefaultConfigurationManager {
         PixelKit.fire(DebugEvent(domainEvent, error: error))
     }
 
-    override init(fetcher: ConfigurationFetcher, defaults: any KeyValueStoring = UserDefaults.appConfiguration) {
+    override init(fetcher: ConfigurationFetching = ConfigurationFetcher(store: ConfigurationStore(), eventMapping: configurationDebugEvents),
+                  store: ConfigurationStoring = ConfigurationStore(),
+                  defaults: KeyValueStoring = UserDefaults.appConfiguration) {
         self.defaults = defaults
-        super.init(fetcher: fetcher, defaults: defaults)
+        super.init(fetcher: fetcher, store: store, defaults: defaults)
     }
 
     func log() {
@@ -88,7 +86,7 @@ final class ConfigurationManager: DefaultConfigurationManager {
 
         let updateBloomFilterExclusionsTask = Task {
             do {
-                try await fetcher.fetch(.bloomFilterExcludedDomains)
+                try await fetcher.fetch(.bloomFilterExcludedDomains, isDebug: isDebug)
                 try await updateBloomFilterExclusions()
                 tryAgainLater()
             } catch {
@@ -110,8 +108,8 @@ final class ConfigurationManager: DefaultConfigurationManager {
         var didFetchAnyTrackerBlockingDependencies = false
 
         var tasks = [Configuration: Task<(), Swift.Error>]()
-        tasks[.trackerDataSet] = Task { try await fetcher.fetch(.trackerDataSet) }
-        tasks[.surrogates] = Task { try await fetcher.fetch(.surrogates) }
+        tasks[.trackerDataSet] = Task { try await fetcher.fetch(.trackerDataSet, isDebug: isDebug) }
+        tasks[.surrogates] = Task { try await fetcher.fetch(.surrogates, isDebug: isDebug) }
         tasks[.privacyConfiguration] = Task { try await fetcher.fetch(.privacyConfiguration, isDebug: isDebug) }
 
         for (configuration, task) in tasks {
@@ -192,6 +190,10 @@ extension ConfigurationManager {
     }
 
     override func presentedItemDidChange() {
+        // Check for significant time since last install to prevent double config install in short time
+        if let lastConfigurationInstallDate, lastUpdateTime.timeIntervalSince(lastConfigurationInstallDate) < 1 {
+            return
+        }
         updateTrackerBlockingDependencies()
     }
 }

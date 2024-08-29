@@ -917,7 +917,7 @@ extension MainViewController {
     }
 
     @objc func reloadConfigurationNow(_ sender: Any?) {
-        ConfigurationManager.shared.forceRefresh(isDebug: true)
+        Application.appDelegate.configurationManager.forceRefresh(isDebug: true)
     }
 
     private func setConfigurationUrl(_ configurationUrl: URL?) {
@@ -926,11 +926,11 @@ extension MainViewController {
             configurationProvider.resetToDefaultConfigurationUrl()
         }
         Configuration.setURLProvider(configurationProvider)
-        ConfigurationManager.shared.forceRefresh(isDebug: true)
+        Application.appDelegate.configurationManager.forceRefresh(isDebug: true)
         if let configurationUrl {
-            Logger.general.debug("New configuration URL set to \(configurationUrl.absoluteString)")
+            Logger.config.debug("New configuration URL set to \(configurationUrl.absoluteString)")
         } else {
-            Logger.general.log("New configuration URL reset to default")
+            Logger.config.log("New configuration URL reset to default")
         }
     }
 
@@ -940,7 +940,7 @@ extension MainViewController {
         if alert.runModal() != .cancel {
             guard let textField = alert.accessoryView as? NSTextField,
                   let newConfigurationUrl = URL(string: textField.stringValue) else {
-                Logger.general.error("Failed to set custom configuration URL")
+                Logger.config.error("Failed to set custom configuration URL")
                 return
             }
 

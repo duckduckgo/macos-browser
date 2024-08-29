@@ -34,10 +34,11 @@ public class DataBrokerProtectionAgentManagerProvider {
 
         let notificationService = DefaultDataBrokerProtectionUserNotificationService(pixelHandler: pixelHandler)
         Configuration.setURLProvider(DBPAgentConfigurationURLProvider())
-        ConfigurationManager.shared.start()
+        let configurationManager = ConfigurationManager()
+        configurationManager.start()
         let privacyConfigurationManager = DBPPrivacyConfigurationManager.shared
         // Load cached config (if any)
-        let configStore = ConfigurationStore.shared
+        let configStore = ConfigurationStore()
         privacyConfigurationManager.reload(etag: configStore.loadEtag(for: .privacyConfiguration), data: configStore.loadData(for: .privacyConfiguration))
         let ipcServer = DefaultDataBrokerProtectionIPCServer(machServiceName: Bundle.main.bundleIdentifier!)
 
@@ -100,7 +101,8 @@ public class DataBrokerProtectionAgentManagerProvider {
             dataManager: dataManager,
             operationDependencies: operationDependencies,
             pixelHandler: pixelHandler,
-            agentStopper: agentstopper)
+            agentStopper: agentstopper,
+            configurationManager: configurationManager)
     }
 }
 
@@ -114,6 +116,7 @@ public final class DataBrokerProtectionAgentManager {
     private let operationDependencies: DataBrokerOperationDependencies
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let agentStopper: DataBrokerProtectionAgentStopper
+    private let configurationManger: ConfigurationManager
 
     // Used for debug functions only, so not injected
     private lazy var browserWindowManager = BrowserWindowManager()
@@ -127,7 +130,8 @@ public final class DataBrokerProtectionAgentManager {
          dataManager: DataBrokerProtectionDataManaging,
          operationDependencies: DataBrokerOperationDependencies,
          pixelHandler: EventMapping<DataBrokerProtectionPixels>,
-         agentStopper: DataBrokerProtectionAgentStopper
+         agentStopper: DataBrokerProtectionAgentStopper,
+         configurationManager: ConfigurationManager
     ) {
         self.userNotificationService = userNotificationService
         self.activityScheduler = activityScheduler
@@ -137,6 +141,7 @@ public final class DataBrokerProtectionAgentManager {
         self.operationDependencies = operationDependencies
         self.pixelHandler = pixelHandler
         self.agentStopper = agentStopper
+        self.configurationManger = configurationManager
 
         self.activityScheduler.delegate = self
         self.ipcServer.serverDelegate = self
