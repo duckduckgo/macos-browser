@@ -60,6 +60,18 @@ extension HomePage.Views {
                         case .illustrationPicker:
                             BackgroundPickerView(title: UserText.illustrations, items: IllustrationBackground.allCases)
                                 .transition(.move(edge: .trailing).combined(with: .opacity))
+                        case .customImagePicker:
+                            BackgroundPickerView(
+                                title: UserText.myBackgrounds,
+                                items: model.availableUserBackgroundImages,
+                                maxItemsCount: HomePage.Models.SettingsModel.Const.maximumNumberOfUserImages
+                            ) {
+                                addBackgroundButton
+                                Text(UserText.myBackgroundsDisclaimer)
+                                    .foregroundColor(.blackWhite60)
+                                    .multilineTextAlignment(.leading)
+                            }
+                            .transition(.move(edge: .trailing).combined(with: .opacity))
                         }
                     }
                     .animation(.none, value: model.customBackground)
@@ -148,6 +160,25 @@ extension HomePage.Views {
                 HomeContentSectionsView(includeContinueSetUpCards: includingContinueSetUpCards)
             }
             footer
+        }
+
+        @ViewBuilder
+        var addBackgroundButton: some View {
+            let button = Button {
+                Task {
+                    await model.addNewImage()
+                }
+            } label: {
+                Text(UserText.addBackground)
+                    .frame(maxWidth: .infinity)
+            }
+                .controlSize(.large)
+
+            if #available(macOS 12.0, *) {
+                button.buttonStyle(.borderedProminent)
+            } else {
+                button.buttonStyle(DefaultActionButtonStyle(enabled: true))
+            }
         }
     }
 

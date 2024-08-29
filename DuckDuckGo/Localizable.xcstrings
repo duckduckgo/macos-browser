@@ -12151,6 +12151,18 @@
         }
       }
     },
+    "cannot.read.image.alert.message" : {
+      "comment" : "Header of the alert dialog informing user that the app failed to load the provided custom background image",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "There was an issue uploading this file"
+          }
+        }
+      }
+    },
     "Capitalize" : {
       "comment" : "Main Menu Edit-Transformations item",
       "localizations" : {
@@ -12493,6 +12505,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Очистить и выйти"
+          }
+        }
+      }
+    },
+    "close" : {
+      "comment" : "Close button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Close"
           }
         }
       }
@@ -25341,6 +25365,18 @@
         }
       }
     },
+    "home.page.settings.add.background" : {
+      "comment" : "Button caption for adding user-provided Home Page background image",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add Background"
+          }
+        }
+      }
+    },
     "home.page.settings.all.settings" : {
       "comment" : "Button caption",
       "extractionState" : "extracted_with_value",
@@ -25377,6 +25413,18 @@
         }
       }
     },
+    "home.page.settings.delete.background" : {
+      "comment" : "Context menu option to delete custom home page background image",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Delete Background"
+          }
+        }
+      }
+    },
     "home.page.settings.gradients" : {
       "comment" : "Button caption for presenting available Home Page background gradients",
       "extractionState" : "extracted_with_value",
@@ -25409,6 +25457,30 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Illustrations"
+          }
+        }
+      }
+    },
+    "home.page.settings.my.backgrounds" : {
+      "comment" : "Button caption for presenting available user-provided Home Page background images",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "My Backgrounds"
+          }
+        }
+      }
+    },
+    "home.page.settings.my.backgrounds.disclaimer" : {
+      "comment" : "Disclaimer explaining privacy of user-provided custom Home Page background images",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Images are stored on your device so DuckDuckGo can't see or access them."
           }
         }
       }

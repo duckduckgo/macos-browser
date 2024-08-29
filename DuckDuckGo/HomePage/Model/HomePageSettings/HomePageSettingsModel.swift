@@ -27,11 +27,16 @@ extension HomePage.Models {
 
     final class SettingsModel: ObservableObject {
 
+        enum Const {
+            static let maximumNumberOfUserImages = 4
+        }
+
         enum ContentType: Equatable {
             case root
             case gradientPicker
             case colorPicker
             case illustrationPicker
+            case customImagePicker
         }
 
         struct CustomBackgroundModeModel: Identifiable, Hashable {
@@ -45,14 +50,36 @@ extension HomePage.Models {
         }
 
         let appearancePreferences: AppearancePreferences
+        let customImagesManager: UserBackgroundImagesManaging?
         let sendPixel: (PixelKitEvent) -> Void
+        let openFilePanel: () -> URL?
+        let showAddImageFailedAlert: () -> Void
         let openSettings: () -> Void
+
+        @Published private(set) var availableUserBackgroundImages: [UserBackgroundImage] = []
+
+        private var availableCustomImagesCancellable: AnyCancellable?
 
         convenience init(openSettings: @escaping () -> Void) {
             self.init(
                 appearancePreferences: .shared,
+                userBackgroundImagesManager: UserBackgroundImagesManager(
+                    maximumNumberOfImages: Const.maximumNumberOfUserImages,
+                    applicationSupportDirectory: URL.sandboxApplicationSupportURL
+                ),
                 sendPixel: { pixelEvent in
                     PixelKit.fire(pixelEvent)
+                },
+                openFilePanel: {
+                    let panel = NSOpenPanel(allowedFileTypes: [.image])
+                    guard case .OK = panel.runModal(), let url = panel.url else {
+                        return nil
+                    }
+                    return url
+                },
+                showAddImageFailedAlert: {
+                    let alert = NSAlert.cannotReadImageAlert()
+                    alert.runModal()
                 },
                 openSettings: openSettings
             )
@@ -60,15 +87,49 @@ extension HomePage.Models {
 
         init(
             appearancePreferences: AppearancePreferences,
+            userBackgroundImagesManager: UserBackgroundImagesManaging?,
             sendPixel: @escaping (PixelKitEvent) -> Void,
+            openFilePanel: @escaping () -> URL?,
+            showAddImageFailedAlert: @escaping () -> Void,
             openSettings: @escaping () -> Void
         ) {
             self.appearancePreferences = appearancePreferences
+            self.customImagesManager = userBackgroundImagesManager
 
-            customBackground = appearancePreferences.homePageCustomBackground
+            if case .userImage = appearancePreferences.homePageCustomBackground, userBackgroundImagesManager == nil {
+                customBackground = nil
+            } else {
+                customBackground = appearancePreferences.homePageCustomBackground
+            }
 
             self.sendPixel = sendPixel
+            self.openFilePanel = openFilePanel
+            self.showAddImageFailedAlert = showAddImageFailedAlert
             self.openSettings = openSettings
+
+            availableCustomImagesCancellable = customImagesManager?.availableImagesPublisher
+                .receive(on: DispatchQueue.main)
+                .handleEvents(receiveOutput: { [weak self] images in
+                    guard case .userImage(let userBackgroundImage) = self?.customBackground, !images.contains(userBackgroundImage) else {
+                        return
+                    }
+                    if let firstImage = images.first {
+                        self?.customBackground = .userImage(firstImage)
+                    } else {
+                        self?.customBackground = nil
+                        withAnimation {
+                            self?.contentType = .root
+                        }
+                    }
+                })
+                .assign(to: \.availableUserBackgroundImages, onWeaklyHeld: self)
+        }
+
+        var hasUserImages: Bool {
+            guard let customImagesManager else {
+                return false
+            }
+            return !customImagesManager.availableImages.isEmpty
         }
 
         func popToRootView() {
@@ -78,16 +139,31 @@ extension HomePage.Models {
         }
 
         func handleRootGridSelection(_ modeModel: CustomBackgroundModeModel) {
-            withAnimation {
-                contentType = modeModel.contentType
+            if modeModel.contentType == .customImagePicker && !hasUserImages {
+                Task {
+                    await addNewImage()
+                }
+            } else {
+                withAnimation {
+                    contentType = modeModel.contentType
+                }
             }
         }
 
-        @Published private(set) var contentType: ContentType = .root
+        @Published private(set) var contentType: ContentType = .root {
+            didSet {
+                if contentType == .root, oldValue == .customImagePicker {
+                    customImagesManager?.sortImagesByLastUsed()
+                }
+            }
+        }
 
         @Published var customBackground: CustomBackground? {
             didSet {
                 appearancePreferences.homePageCustomBackground = customBackground
+                if case .userImage(let userBackgroundImage) = customBackground {
+                    customImagesManager?.updateSelectedTimestamp(for: userBackgroundImage)
+                }
                 if let customBackground {
                     Logger.homePageSettings.debug("Home page background updated: \(customBackground), color scheme: \(customBackground.colorScheme)")
                 } else {
@@ -100,9 +176,28 @@ extension HomePage.Models {
                     sendPixel(NewTabBackgroundPixel.newTabBackgroundSelectedSolidColor)
                 case .illustration:
                     sendPixel(NewTabBackgroundPixel.newTabBackgroundSelectedIllustration)
+                case .userImage:
+                    sendPixel(NewTabBackgroundPixel.newTabBackgroundSelectedUserImage)
                 case .none:
                     sendPixel(NewTabBackgroundPixel.newTabBackgroundReset)
                 }
+            }
+        }
+
+        @MainActor
+        func addNewImage() async {
+            guard let customImagesManager, let url = openFilePanel() else {
+                return
+            }
+
+            do {
+                let image = try await customImagesManager.addImage(with: url)
+                customBackground = .userImage(image)
+                Logger.homePageSettings.debug("New user image added")
+            } catch {
+                sendPixel(DebugEvent(NewTabBackgroundPixel.newTabBackgroundAddImageError, error: error))
+                showAddImageFailedAlert()
+                Logger.homePageSettings.error("Failed to add user image: \(error)")
             }
         }
 
@@ -110,11 +205,13 @@ extension HomePage.Models {
             [
                 customBackgroundModeModel(for: .gradientPicker),
                 customBackgroundModeModel(for: .colorPicker),
-                customBackgroundModeModel(for: .illustrationPicker)
+                customBackgroundModeModel(for: .illustrationPicker),
+                customBackgroundModeModel(for: .customImagePicker)
             ]
+                .compactMap { $0 }
         }
 
-        private func customBackgroundModeModel(for contentType: ContentType) -> CustomBackgroundModeModel {
+        private func customBackgroundModeModel(for contentType: ContentType) -> CustomBackgroundModeModel? {
             switch contentType {
             case .root:
                 assertionFailure("\(#function) must not be called for ContentType.root")
@@ -137,6 +234,21 @@ extension HomePage.Models {
                     title: UserText.illustrations,
                     customBackgroundThumbnail: .illustration(customBackground?.illustration ?? CustomBackground.placeholderIllustration)
                 )
+            case .customImagePicker:
+                guard let customImagesManager else {
+                    return nil
+                }
+                let title = customImagesManager.availableImages.isEmpty ? UserText.addBackground : UserText.myBackgrounds
+                let thumbnail: CustomBackground? = {
+                    guard customBackground?.userBackgroundImage == nil else {
+                        return customBackground
+                    }
+                    guard let lastUsedUserBackgroundImage = customImagesManager.availableImages.first else {
+                        return nil
+                    }
+                    return .userImage(lastUsedUserBackgroundImage)
+                }()
+                return CustomBackgroundModeModel(contentType: .customImagePicker, title: title, customBackgroundThumbnail: thumbnail)
             }
         }
     }
