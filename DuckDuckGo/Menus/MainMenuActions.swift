@@ -973,6 +973,11 @@ extension MainViewController {
     @objc func showPageResources(_ sender: Any?) {
         getActiveTabAndIndex()?.tab.webView.showPageSource()
     }
+
+    // MARK: - Debug Menu
+    @objc func showHomePromotionView(_ sender: Any?) {
+        AppearancePreferences.shared.isHomePagePromotionVisible = true
+    }
 }
 
 extension MainViewController: NSMenuItemValidation {

@@ -27,6 +27,7 @@ import NetworkProtectionIPC
 import NetworkProtectionUI
 import Subscription
 import SubscriptionUI
+import Freemium
 
 final class NavigationBarViewController: NSViewController {
 
@@ -271,11 +272,16 @@ final class NavigationBarViewController: NSViewController {
 
     @IBAction func optionsButtonAction(_ sender: NSButton) {
         let internalUserDecider = NSApp.delegateTyped.internalUserDecider
+        let freemiumPIRUserState = DefaultFreemiumPIRUserState(userDefaults: .dbp, accountManager: subscriptionManager.accountManager)
+        let freemiumPIRFeature = DefaultFreemiumPIRFeature(subscriptionManager: subscriptionManager, accountManager: subscriptionManager.accountManager)
         let menu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                    passwordManagerCoordinator: PasswordManagerCoordinator.shared,
                                    vpnFeatureGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: subscriptionManager),
                                    internalUserDecider: internalUserDecider,
-                                   subscriptionManager: subscriptionManager)
+                                   subscriptionManager: subscriptionManager,
+                                   freemiumPIRUserState: freemiumPIRUserState,
+                                   freemiumPIRFeature: freemiumPIRFeature)
+
         menu.actionDelegate = self
         let location = NSPoint(x: -menu.size.width + sender.bounds.width, y: sender.bounds.height + 4)
         menu.popUp(positioning: nil, at: location, in: sender)

@@ -38,6 +38,11 @@ final class MoreOptionsMenuTests: XCTestCase {
 
     var subscriptionManager: SubscriptionManagerMock!
 
+    private var mockFreemiumPIRFeatureFlagger = MockFreemiumPIRFeatureFlagger()
+    private var mockFreemiumPIRPresenter = MockFreemiumPIRPresenter()
+    private var freemiumPIRFeature: DefaultFreemiumPIRFeature!
+    private var mockFreemiumPIRUserState = MockFreemiumPIRUserState()
+
     var moreOptionsMenu: MoreOptionsMenu!
 
     @MainActor
@@ -63,6 +68,8 @@ final class MoreOptionsMenuTests: XCTestCase {
                                                                                                   purchasePlatform: .appStore),
                                                       canPurchase: false)
 
+        freemiumPIRFeature = DefaultFreemiumPIRFeature(featureFlagger: mockFreemiumPIRFeatureFlagger, subscriptionManager: subscriptionManager, accountManager: subscriptionManager.accountManager)
+
     }
 
     @MainActor
@@ -84,10 +91,15 @@ final class MoreOptionsMenuTests: XCTestCase {
                                                                                                                isSubscriptionPurchaseAllowed: true),
                                           sharingMenu: NSMenu(),
                                           internalUserDecider: internalUserDecider,
-                                          subscriptionManager: subscriptionManager)
+                                          subscriptionManager: subscriptionManager,
+                                          freemiumPIRUserState: mockFreemiumPIRUserState,
+                                          freemiumPIRFeature: freemiumPIRFeature,
+                                          freemiumPIRPresenter: mockFreemiumPIRPresenter)
 
         moreOptionsMenu.actionDelegate = capturingActionDelegate
     }
+
+    // MARK: - Subscription & Freemium
 
     private func mockAuthentication() {
         subscriptionManager.accountManager.storeAuthToken(token: "")
@@ -128,9 +140,10 @@ final class MoreOptionsMenuTests: XCTestCase {
     }
 
     @MainActor
-    func testThatMoreOptionMenuHasTheExpectedItemsWhenUnauthenticatedAndCanPurchaseSubscription() {
+    func testThatMoreOptionMenuHasTheExpectedItemsWhenUnauthenticatedAndCanPurchaseSubscriptionAndFreemiumPIRFeatureFlagDisabled() {
         subscriptionManager.canPurchase = true
         subscriptionManager.currentEnvironment = SubscriptionEnvironment(serviceEnvironment: .production, purchasePlatform: .stripe)
+        mockFreemiumPIRFeatureFlagger.isEnabled = false
 
         setupMoreOptionsMenu()
 
@@ -159,8 +172,42 @@ final class MoreOptionsMenuTests: XCTestCase {
     }
 
     @MainActor
-    func testThatMoreOptionMenuHasTheExpectedItemsWhenSubscriptionIsActive() {
+    func testThatMoreOptionMenuHasTheExpectedItemsWhenUnauthenticatedAndFreemiumPIRFeatureFlagEnabled() {
+        subscriptionManager.canPurchase = true
+        subscriptionManager.currentEnvironment = SubscriptionEnvironment(serviceEnvironment: .production, purchasePlatform: .stripe)
+        mockFreemiumPIRFeatureFlagger.isEnabled = true
+
+        setupMoreOptionsMenu()
+
+        XCTAssertFalse(subscriptionManager.accountManager.isUserAuthenticated)
+        XCTAssertTrue(subscriptionManager.canPurchase)
+
+        XCTAssertEqual(moreOptionsMenu.items[0].title, UserText.sendFeedback)
+        XCTAssertTrue(moreOptionsMenu.items[1].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[2].title, UserText.plusButtonNewTabMenuItem)
+        XCTAssertEqual(moreOptionsMenu.items[3].title, UserText.newWindowMenuItem)
+        XCTAssertEqual(moreOptionsMenu.items[4].title, UserText.newBurnerWindowMenuItem)
+        XCTAssertTrue(moreOptionsMenu.items[5].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[6].title, UserText.zoom)
+        XCTAssertTrue(moreOptionsMenu.items[7].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[8].title, UserText.bookmarks)
+        XCTAssertEqual(moreOptionsMenu.items[9].title, UserText.downloads)
+        XCTAssertEqual(moreOptionsMenu.items[10].title, UserText.passwordManagementTitle)
+        XCTAssertTrue(moreOptionsMenu.items[11].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[12].title, UserText.emailOptionsMenuItem)
+        XCTAssertTrue(moreOptionsMenu.items[13].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[14].title, UserText.subscriptionOptionsMenuItem)
+        XCTAssertFalse(moreOptionsMenu.items[14].hasSubmenu)
+        XCTAssertEqual(moreOptionsMenu.items[15].title, UserText.freemiumPIROptionsMenuItem)
+        XCTAssertTrue(moreOptionsMenu.items[16].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[17].title, UserText.mainMenuHelp)
+        XCTAssertEqual(moreOptionsMenu.items[18].title, UserText.settings)
+    }
+
+    @MainActor
+    func testThatMoreOptionMenuHasTheExpectedItemsWhenSubscriptionIsActiveAndFreemiumPIRFeatureFlagDisabled() {
         mockAuthentication()
+        mockFreemiumPIRFeatureFlagger.isEnabled = false
 
         setupMoreOptionsMenu()
 
@@ -192,6 +239,81 @@ final class MoreOptionsMenuTests: XCTestCase {
         XCTAssertTrue(moreOptionsMenu.items[15].isSeparatorItem)
         XCTAssertEqual(moreOptionsMenu.items[16].title, UserText.mainMenuHelp)
         XCTAssertEqual(moreOptionsMenu.items[17].title, UserText.settings)
+    }
+
+    @MainActor
+    func testThatMoreOptionMenuHasTheExpectedItemsWhenSubscriptionIsActiveAndFreemiumPIRFeatureFlagEnabled() {
+        mockAuthentication()
+        mockFreemiumPIRFeatureFlagger.isEnabled = true
+
+        setupMoreOptionsMenu()
+
+        XCTAssertTrue(subscriptionManager.accountManager.isUserAuthenticated)
+
+        XCTAssertEqual(moreOptionsMenu.items[0].title, UserText.sendFeedback)
+        XCTAssertTrue(moreOptionsMenu.items[1].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[2].title, UserText.plusButtonNewTabMenuItem)
+        XCTAssertEqual(moreOptionsMenu.items[3].title, UserText.newWindowMenuItem)
+        XCTAssertEqual(moreOptionsMenu.items[4].title, UserText.newBurnerWindowMenuItem)
+        XCTAssertTrue(moreOptionsMenu.items[5].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[6].title, UserText.zoom)
+        XCTAssertTrue(moreOptionsMenu.items[7].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[8].title, UserText.bookmarks)
+        XCTAssertEqual(moreOptionsMenu.items[9].title, UserText.downloads)
+        XCTAssertEqual(moreOptionsMenu.items[10].title, UserText.passwordManagementTitle)
+        XCTAssertTrue(moreOptionsMenu.items[11].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[12].title, UserText.emailOptionsMenuItem)
+        XCTAssertTrue(moreOptionsMenu.items[13].isSeparatorItem)
+
+        XCTAssertEqual(moreOptionsMenu.items[14].title, UserText.subscriptionOptionsMenuItem)
+        XCTAssertTrue(moreOptionsMenu.items[14].hasSubmenu)
+        XCTAssertEqual(moreOptionsMenu.items[14].submenu?.items[0].title, UserText.networkProtection)
+        XCTAssertEqual(moreOptionsMenu.items[14].submenu?.items[1].title, UserText.dataBrokerProtectionOptionsMenuItem)
+        XCTAssertEqual(moreOptionsMenu.items[14].submenu?.items[2].title, UserText.identityTheftRestorationOptionsMenuItem)
+        XCTAssertTrue(moreOptionsMenu.items[14].submenu!.items[3].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[14].submenu?.items[4].title, UserText.subscriptionSettingsOptionsMenuItem)
+
+        XCTAssertTrue(moreOptionsMenu.items[15].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[16].title, UserText.mainMenuHelp)
+        XCTAssertEqual(moreOptionsMenu.items[17].title, UserText.settings)
+    }
+
+    @MainActor
+    func testWhenClickingFreemiumPIROptionAndDidNotOnboardThenFreemiumPresenterIsCalledWithDidNotOnboardState() throws {
+        // Given
+        subscriptionManager.canPurchase = true
+        subscriptionManager.currentEnvironment = SubscriptionEnvironment(serviceEnvironment: .production, purchasePlatform: .stripe)
+        mockFreemiumPIRFeatureFlagger.isEnabled = true
+        mockFreemiumPIRUserState.didOnboard = false
+        setupMoreOptionsMenu()
+
+        let freemiumItemIndex = try XCTUnwrap(moreOptionsMenu.indexOfItem(withTitle: UserText.freemiumPIROptionsMenuItem))
+
+        // When
+        moreOptionsMenu.performActionForItem(at: freemiumItemIndex)
+
+        // Then
+        XCTAssertTrue(mockFreemiumPIRPresenter.didCallShowFreemium)
+        XCTAssertTrue(mockFreemiumPIRPresenter.didOnboardState)
+    }
+
+    @MainActor
+    func testWhenClickingFreemiumPIROptionAndDidOnboardThenFreemiumPresenterIsCalledWithDidOnboardState() throws {
+        // Given
+        subscriptionManager.canPurchase = true
+        subscriptionManager.currentEnvironment = SubscriptionEnvironment(serviceEnvironment: .production, purchasePlatform: .stripe)
+        mockFreemiumPIRFeatureFlagger.isEnabled = true
+        mockFreemiumPIRUserState.didOnboard = true
+        setupMoreOptionsMenu()
+
+        let freemiumItemIndex = try XCTUnwrap(moreOptionsMenu.indexOfItem(withTitle: UserText.freemiumPIROptionsMenuItem))
+
+        // When
+        moreOptionsMenu.performActionForItem(at: freemiumItemIndex)
+
+        // Then
+        XCTAssertTrue(mockFreemiumPIRPresenter.didCallShowFreemium)
+        XCTAssertTrue(mockFreemiumPIRPresenter.didOnboardState)
     }
 
     // MARK: Zoom
@@ -273,5 +395,23 @@ final class NetworkProtectionVisibilityMock: VPNFeatureGatekeeper {
 
     func disableIfUserHasNoAccess() async {
         // Intentional no-op
+    }
+}
+
+private final class MockFreemiumPIRFeature: FreemiumPIRFeature {
+    var featureAvailable = false
+
+    var isAvailable: Bool {
+        featureAvailable
+    }
+}
+
+private final class MockFreemiumPIRPresenter: FreemiumPIRPresenter {
+    var didCallShowFreemium = false
+    var didOnboardState = false
+
+    func showFreemiumPIR(didOnboard: Bool, windowControllerManager: WindowControllersManagerProtocol? = nil) {
+        didCallShowFreemium = true
+        didOnboardState = didOnboard
     }
 }

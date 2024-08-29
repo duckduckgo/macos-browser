@@ -24,6 +24,7 @@ import SwiftUI
 import WebKit
 import Subscription
 import PixelKit
+import Freemium
 
 final class BrowserTabViewController: NSViewController {
 
@@ -673,7 +674,12 @@ final class BrowserTabViewController: NSViewController {
     var homePageViewController: HomePageViewController?
     private func homePageViewControllerCreatingIfNeeded() -> HomePageViewController {
         return homePageViewController ?? {
-            let homePageViewController = HomePageViewController(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager)
+            let subscriptionManager = Application.appDelegate.subscriptionManager
+            let freemiumPIRFeature = DefaultFreemiumPIRFeature(subscriptionManager: subscriptionManager, accountManager: subscriptionManager.accountManager)
+            let freemiumPIRUserState = DefaultFreemiumPIRUserState(userDefaults: .dbp, accountManager: subscriptionManager.accountManager)
+            let homePageViewController = HomePageViewController(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager,
+                                                                freemiumPIRFeature: freemiumPIRFeature,
+                                                                freemiumPIRUserState: freemiumPIRUserState)
             self.homePageViewController = homePageViewController
             return homePageViewController
         }()
@@ -684,7 +690,9 @@ final class BrowserTabViewController: NSViewController {
     var dataBrokerProtectionHomeViewController: DBPHomeViewController?
     private func dataBrokerProtectionHomeViewControllerCreatingIfNeeded() -> DBPHomeViewController {
         return dataBrokerProtectionHomeViewController ?? {
-            let dataBrokerProtectionHomeViewController = DBPHomeViewController(dataBrokerProtectionManager: DataBrokerProtectionManager.shared)
+            let subscriptionManager = Application.appDelegate.subscriptionManager
+            let freemiumPIRFeature = DefaultFreemiumPIRFeature(subscriptionManager: subscriptionManager, accountManager: subscriptionManager.accountManager)
+            let dataBrokerProtectionHomeViewController = DBPHomeViewController(dataBrokerProtectionManager: DataBrokerProtectionManager.shared, freemiumPIRFeature: freemiumPIRFeature)
             self.dataBrokerProtectionHomeViewController = dataBrokerProtectionHomeViewController
             return dataBrokerProtectionHomeViewController
         }()
