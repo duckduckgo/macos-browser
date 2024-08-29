@@ -114,7 +114,7 @@ extension PrivacyDashboardTabExtension {
     private func makePrivacyInfo(url: URL) -> PrivacyInfo? {
         guard let host = url.host else { return nil }
 
-        let entity = contentBlocking.trackerDataManager.trackerData.findEntity(forHost: host)
+        let entity = contentBlocking.trackerDataManager.trackerData.findParentEntityOrFallback(forHost: host)
 
         privacyInfo = PrivacyInfo(url: url,
                                   parentEntity: entity,
