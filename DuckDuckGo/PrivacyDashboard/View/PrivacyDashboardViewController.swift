@@ -23,6 +23,7 @@ import BrowserServicesKit
 import PrivacyDashboard
 import Common
 import PixelKit
+import os.log
 
 protocol PrivacyDashboardViewControllerSizeDelegate: AnyObject {
 
@@ -45,8 +46,14 @@ final class PrivacyDashboardViewController: NSViewController {
 
     private let brokenSiteReporter: BrokenSiteReporter = {
         BrokenSiteReporter(pixelHandler: { parameters in
+            let privacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager
+            var updatedParameters = parameters
+            // do not enroll users who have CPM disabled
+            if CookiePopupProtectionPreferences.shared.isAutoconsentEnabled && privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(AutoconsentSubfeature.filterlistExperiment) {
+                updatedParameters["cpmExperiment"] = AutoconsentFilterlistExperiment.cohort == AutoconsentFilterlistExperiment.test ? "1" : "0"
+            }
             PixelKit.fire(NonStandardEvent(NonStandardPixel.brokenSiteReport),
-                          withAdditionalParameters: parameters,
+                          withAdditionalParameters: updatedParameters,
                           allowedQueryReservedCharacters: BrokenSiteReport.allowedQueryReservedCharacters)
         }, keyValueStoring: UserDefaults.standard)
     }()
@@ -259,7 +266,7 @@ extension PrivacyDashboardViewController: PrivacyDashboardControllerDelegate {
                 let report = try await makeBrokenSiteReport(category: category, description: description, source: privacyDashboardController.source)
                 try brokenSiteReporter.report(report, reportMode: .regular)
             } catch {
-                os_log("Failed to generate or send the broken site report: \(error.localizedDescription)", type: .error)
+                Logger.general.error("Failed to generate or send the broken site report: \(error.localizedDescription)")
             }
         }
     }
@@ -277,7 +284,7 @@ extension PrivacyDashboardViewController: PrivacyDashboardControllerDelegate {
                 let report = try await makeBrokenSiteReport(source: source)
                 try toggleProtectionsOffReporter.report(report, reportMode: .toggle)
             } catch {
-                os_log("Failed to generate or send the broken site report: %@", type: .error, error.localizedDescription)
+                Logger.general.error("Failed to generate or send the broken site report: \(error.localizedDescription)")
             }
         }
     }

@@ -26,6 +26,7 @@ import SecureStorage
 @testable import DataBrokerProtection
 
 extension BrokerProfileQueryData {
+
     static func mock(with steps: [Step] = [Step](),
                      dataBrokerName: String = "test",
                      url: String = "test.com",
@@ -34,7 +35,8 @@ extension BrokerProfileQueryData {
                      extractedProfile: ExtractedProfile? = nil,
                      scanHistoryEvents: [HistoryEvent] = [HistoryEvent](),
                      mirrorSites: [MirrorSite] = [MirrorSite](),
-                     deprecated: Bool = false) -> BrokerProfileQueryData {
+                     deprecated: Bool = false,
+                     optOutJobData: [OptOutJobData]? = nil) -> BrokerProfileQueryData {
         BrokerProfileQueryData(
             dataBroker: DataBroker(
                 name: dataBrokerName,
@@ -46,12 +48,95 @@ extension BrokerProfileQueryData {
             ),
             profileQuery: ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", birthYear: 50, deprecated: deprecated),
             scanJobData: ScanJobData(brokerId: 1,
-                                                 profileQueryId: 1,
-                                                 preferredRunDate: preferredRunDate,
-                                                 historyEvents: scanHistoryEvents,
-                                                 lastRunDate: lastRunDate),
+                                     profileQueryId: 1,
+                                     preferredRunDate: preferredRunDate,
+                                     historyEvents: scanHistoryEvents,
+                                     lastRunDate: lastRunDate),
             optOutJobData: extractedProfile != nil ? [.mock(with: extractedProfile!)] : [OptOutJobData]()
         )
+    }
+
+    static var queryDataWithMultipleSuccessfulOptOutRequestsIn24Hours: [BrokerProfileQueryData] {
+        let optOutJobDataParams: [(Int64, Int64, Int, Int, Int)] = [
+            (1, 1, 24, 23, 25)
+        ]
+        return [createQueryData(brokerId: 1, optOutJobDataParams: optOutJobDataParams)]
+    }
+
+    static var queryDataTwoBrokers50PercentSuccessEach: [BrokerProfileQueryData] {
+        let broker1OptOutJobDataParams: [(Int64, Int64, Int, Int, Int)] = [
+            (1, 1, 24, 23, 25),
+            (2, 2, 24, 0, 25)
+        ]
+
+        let broker2OptOutJobDataParams: [(Int64, Int64, Int, Int, Int)] = [
+            (3, 3, 24, 23, 25),
+            (4, 4, 24, 0, 25)
+        ]
+
+        let broker1Data = createQueryData(brokerId: 1, optOutJobDataParams: broker1OptOutJobDataParams)
+        let broker2Data = createQueryData(brokerId: 2, optOutJobDataParams: broker2OptOutJobDataParams)
+
+        return [broker1Data, broker2Data]
+    }
+
+    static var queryDataWithNoOptOutsInDateRange: [BrokerProfileQueryData] {
+        let optOutJobDataParams: [(Int64, Int64, Int, Int, Int)] = [
+            (1, 1, 48, 47, 49)
+        ]
+        return [createQueryData(brokerId: 1, optOutJobDataParams: optOutJobDataParams)]
+    }
+
+    static var queryDataMultipleBrokersVaryingSuccessRates: [BrokerProfileQueryData] {
+        let broker1OptOutJobDataParams: [(Int64, Int64, Int, Int, Int)] = [
+            (1, 1, 24, 23, 25),
+            (2, 2, 24, 23, 25),
+            (3, 3, 24, 23, 25),
+            (4, 4, 24, 0, 25)
+        ]
+
+        let broker2OptOutJobDataParams: [(Int64, Int64, Int, Int, Int)] = [
+            (5, 5, 24, 23, 25),
+            (6, 6, 24, 0, 25)
+        ]
+
+        let broker3OptOutJobDataParams: [(Int64, Int64, Int, Int, Int)] = [
+            (7, 7, 24, 23, 25)
+        ]
+
+        let broker1Data = createQueryData(brokerId: 1, optOutJobDataParams: broker1OptOutJobDataParams)
+        let broker2Data = createQueryData(brokerId: 2, optOutJobDataParams: broker2OptOutJobDataParams)
+        let broker3Data = createQueryData(brokerId: 3, optOutJobDataParams: broker3OptOutJobDataParams)
+
+        return [broker1Data, broker2Data, broker3Data]
+    }
+
+    static func createOptOutJobData(extractedProfileId: Int64, brokerId: Int64, profileQueryId: Int64, startEventHoursAgo: Int, requestEventHoursAgo: Int, jobCreatedHoursAgo: Int) -> OptOutJobData {
+
+        let extractedProfile = ExtractedProfile(id: extractedProfileId)
+
+        let startedEvent = optOutEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutStarted, date: .nowMinus(hours: startEventHoursAgo))
+
+        if requestEventHoursAgo != 0 {
+            let requestedEvent = optOutEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested, date: .nowMinus(hours: requestEventHoursAgo))
+
+            return OptOutJobData(brokerId: brokerId, profileQueryId: profileQueryId, createdDate: .nowMinus(hours: jobCreatedHoursAgo), historyEvents: [startedEvent, requestedEvent], extractedProfile: extractedProfile)
+        } else {
+            return OptOutJobData(brokerId: brokerId, profileQueryId: profileQueryId, createdDate: .nowMinus(hours: jobCreatedHoursAgo), historyEvents: [startedEvent], extractedProfile: extractedProfile)
+        }
+    }
+
+    static func createQueryData(brokerId: Int64, optOutJobDataParams: [(extractedProfileId: Int64, profileQueryId: Int64, startEventHoursAgo: Int, requestEventHoursAgo: Int, jobCreatedHoursAgo: Int)]) -> BrokerProfileQueryData {
+
+        let optOutJobDataList = optOutJobDataParams.map { params in
+            createOptOutJobData(extractedProfileId: params.extractedProfileId, brokerId: brokerId, profileQueryId: params.profileQueryId, startEventHoursAgo: params.startEventHoursAgo, requestEventHoursAgo: params.requestEventHoursAgo, jobCreatedHoursAgo: params.jobCreatedHoursAgo)
+        }
+
+        return BrokerProfileQueryData(dataBroker: .mock(withId: brokerId), profileQuery: .mock, scanJobData: .mock(withBrokerId: brokerId), optOutJobData: optOutJobDataList)
+    }
+
+    static func optOutEvent(extractedProfileId: Int64, brokerId: Int64, profileQueryId: Int64, type: HistoryEvent.EventType, date: Date) -> HistoryEvent {
+        HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: type, date: date)
     }
 }
 
@@ -567,6 +652,19 @@ final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64) throws {
     }
 
+    func updateSubmittedSuccessfullyDate(_ date: Date?, forBrokerId brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+    }
+
+    func updateSevenDaysConfirmationPixelFired(_ pixelFired: Bool, forBrokerId brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+    }
+
+    func updateFourteenDaysConfirmationPixelFired(_ pixelFired: Bool, forBrokerId brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+    }
+
+    func updateTwentyOneDaysConfirmationPixelFired(_ pixelFired: Bool, forBrokerId brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+
+    }
+
     func fetchScan(brokerId: Int64, profileQueryId: Int64) throws -> ScanJobData? {
         scanJobData.first
     }
@@ -575,10 +673,14 @@ final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault
         return scanJobData
     }
 
-    func save(brokerId: Int64, profileQueryId: Int64, extractedProfile: ExtractedProfile, lastRunDate: Date?, preferredRunDate: Date?) throws {
-    }
-
-    func save(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64, lastRunDate: Date?, preferredRunDate: Date?) throws {
+    func save(brokerId: Int64, profileQueryId: Int64,
+              extractedProfile: DataBrokerProtection.ExtractedProfile,
+              createdDate: Date, lastRunDate: Date?,
+              preferredRunDate: Date?,
+              submittedSuccessfullyDate: Date?,
+              sevenDaysConfirmationPixelFired: Bool,
+              fourteenDaysConfirmationPixelFired: Bool,
+              twentyOneDaysConfirmationPixelFired: Bool) throws {
     }
 
     func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
@@ -687,6 +789,10 @@ final class MockDatabase: DataBrokerProtectionRepository {
     var wasUpdatedPreferredRunDateForOptOutCalled = false
     var wasUpdateLastRunDateForScanCalled = false
     var wasUpdateLastRunDateForOptOutCalled = false
+    var wasUpdateSubmittedSuccessfullyDateForOptOutCalled = false
+    var wasUpdateSevenDaysConfirmationPixelFired = false
+    var wasUpdateFourteenDaysConfirmationPixelFired = false
+    var wasUpdateTwentyOneDaysConfirmationPixelFired = false
     var wasUpdateRemoveDateCalled = false
     var wasAddHistoryEventCalled = false
     var wasFetchLastHistoryEventCalled = false
@@ -695,6 +801,7 @@ final class MockDatabase: DataBrokerProtectionRepository {
     var lastHistoryEventToReturn: HistoryEvent?
     var lastPreferredRunDateOnScan: Date?
     var lastPreferredRunDateOnOptOut: Date?
+    var submittedSuccessfullyDate: Date?
     var extractedProfileRemovedDate: Date?
     var extractedProfilesFromBroker = [ExtractedProfile]()
     var childBrokers = [DataBroker]()
@@ -714,6 +821,10 @@ final class MockDatabase: DataBrokerProtectionRepository {
         wasFetchAllBrokerProfileQueryDataCalled,
         wasUpdatedPreferredRunDateForScanCalled,
         wasUpdatedPreferredRunDateForOptOutCalled,
+        wasUpdateSubmittedSuccessfullyDateForOptOutCalled,
+        wasUpdateSevenDaysConfirmationPixelFired,
+        wasUpdateFourteenDaysConfirmationPixelFired,
+        wasUpdateTwentyOneDaysConfirmationPixelFired,
         wasUpdateLastRunDateForScanCalled,
         wasUpdateLastRunDateForOptOutCalled,
         wasUpdateRemoveDateCalled,
@@ -775,6 +886,23 @@ final class MockDatabase: DataBrokerProtectionRepository {
     func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) {
         lastPreferredRunDateOnOptOut = date
         wasUpdatedPreferredRunDateForOptOutCalled = true
+    }
+
+    func updateSubmittedSuccessfullyDate(_ date: Date?, forBrokerId brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+        submittedSuccessfullyDate = date
+        wasUpdateSubmittedSuccessfullyDateForOptOutCalled = true
+    }
+
+    func updateSevenDaysConfirmationPixelFired(_ pixelFired: Bool, forBrokerId brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+        wasUpdateSevenDaysConfirmationPixelFired = true
+    }
+
+    func updateFourteenDaysConfirmationPixelFired(_ pixelFired: Bool, forBrokerId brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+        wasUpdateFourteenDaysConfirmationPixelFired = true
+    }
+
+    func updateTwentyOneDaysConfirmationPixelFired(_ pixelFired: Bool, forBrokerId brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+        wasUpdateTwentyOneDaysConfirmationPixelFired = true
     }
 
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64) {
@@ -1013,7 +1141,30 @@ extension ScanJobData {
 extension OptOutJobData {
     static func mock(with extractedProfile: ExtractedProfile,
                      historyEvents: [HistoryEvent] = [HistoryEvent]()) -> OptOutJobData {
-        .init(brokerId: 1, profileQueryId: 1, historyEvents: historyEvents, extractedProfile: extractedProfile)
+        .init(brokerId: 1, profileQueryId: 1, createdDate: Date(), historyEvents: historyEvents, extractedProfile: extractedProfile)
+    }
+
+    static func mock(with type: HistoryEvent.EventType,
+                     submittedDate: Date?,
+                     sevenDaysConfirmationPixelFired: Bool,
+                     fourteenDaysConfirmationPixelFired: Bool,
+                     twentyOneDaysConfirmationPixelFired: Bool) -> OptOutJobData {
+        let extractedProfileId: Int64 = 1
+        let brokerId: Int64 = 1
+        let profileQueryId: Int64 = 11
+
+        let historyEvent = HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested, date: submittedDate ?? Date())
+
+        let extractedProfile = type == .optOutConfirmed ? ExtractedProfile.mockWithRemovedDate : ExtractedProfile.mockWithoutRemovedDate
+        return OptOutJobData(brokerId: brokerId,
+                             profileQueryId: profileQueryId,
+                             createdDate: submittedDate ?? Date(),
+                             historyEvents: [historyEvent],
+                             submittedSuccessfullyDate: submittedDate,
+                             extractedProfile: extractedProfile,
+                             sevenDaysConfirmationPixelFired: sevenDaysConfirmationPixelFired,
+                             fourteenDaysConfirmationPixelFired: fourteenDaysConfirmationPixelFired,
+                             twentyOneDaysConfirmationPixelFired: twentyOneDaysConfirmationPixelFired)
     }
 }
 
@@ -1560,10 +1711,24 @@ extension SecureStorageError: Equatable {
 }
 
 final class MockDataBrokerProtectionStatsPixelsRepository: DataBrokerProtectionStatsPixelsRepository {
+
     var wasMarkStatsWeeklyPixelDateCalled: Bool = false
     var wasMarkStatsMonthlyPixelDateCalled: Bool = false
     var latestStatsWeeklyPixelDate: Date?
     var latestStatsMonthlyPixelDate: Date?
+    var didSetCustomStatsPixelsLastSentTimestamp = false
+    var didGetCustomStatsPixelsLastSentTimestamp = false
+    var _customStatsPixelsLastSentTimestamp: Date?
+
+    var customStatsPixelsLastSentTimestamp: Date? {
+        get {
+            defer { didGetCustomStatsPixelsLastSentTimestamp = true }
+            return _customStatsPixelsLastSentTimestamp
+        } set {
+            didSetCustomStatsPixelsLastSentTimestamp = true
+            _customStatsPixelsLastSentTimestamp = newValue
+        }
+    }
 
     func markStatsWeeklyPixelDate() {
         wasMarkStatsWeeklyPixelDateCalled = true
@@ -1586,6 +1751,20 @@ final class MockDataBrokerProtectionStatsPixelsRepository: DataBrokerProtectionS
         wasMarkStatsMonthlyPixelDateCalled = false
         latestStatsWeeklyPixelDate = nil
         latestStatsMonthlyPixelDate = nil
+        didSetCustomStatsPixelsLastSentTimestamp = false
+        customStatsPixelsLastSentTimestamp = nil
+
+    }
+}
+
+final class MockDataBrokerProtectionCustomOptOutStatsProvider: DataBrokerProtectionCustomOptOutStatsProvider {
+
+    var customStatsWasCalled = false
+    var customStatsToReturn = CustomOptOutStats(customIndividualDataBrokerStat: [], customAggregateBrokersStat: CustomAggregateBrokersStat(optoutSubmitSuccessRate: 0))
+
+    func customOptOutStats(startDate: Date?, endDate: Date, andQueryData queryData: [BrokerProfileQueryData]) -> CustomOptOutStats {
+        customStatsWasCalled = true
+        return customStatsToReturn
     }
 }
 
@@ -1733,6 +1912,7 @@ extension ExtractedProfileDB {
 struct MockMigrationsProvider: DataBrokerProtectionDatabaseMigrationsProvider {
     static var didCallV2Migrations = false
     static var didCallV3Migrations = false
+    static var didCallV4Migrations = false
 
     static var v2Migrations: (inout GRDB.DatabaseMigrator) throws -> Void {
         didCallV2Migrations = true
@@ -1743,12 +1923,9 @@ struct MockMigrationsProvider: DataBrokerProtectionDatabaseMigrationsProvider {
         didCallV3Migrations = true
         return { _ in }
     }
-}
 
-struct MockFeatureFlagger: DataBrokerProtectionMigrationsFeatureFlagger {
-    var isUserIn = false
-
-    func isUserIn(percent: Int) -> Bool {
-        isUserIn
+    static var v4Migrations: (inout GRDB.DatabaseMigrator) throws -> Void {
+        didCallV4Migrations = true
+        return { _ in }
     }
 }

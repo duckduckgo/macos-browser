@@ -18,6 +18,7 @@
 
 import Common
 import Foundation
+import os.log
 
 extension FileManager {
 
@@ -89,7 +90,7 @@ extension FileManager {
             index += 1
         } while index <= limit
         // If it gets beyond the limit then chances are something else is wrong
-        os_log("Failed to move file to %s, attempt: %d", type: .error, desiredURL.deletingLastPathComponent().path, index)
+        Logger.general.error("Failed to move file to \(desiredURL.deletingLastPathComponent().path), attempt: \(index)")
         throw CocoaError(.fileWriteFileExists)
     }
 

@@ -18,7 +18,7 @@
 
 import Foundation
 import NetworkExtension
-import OSLog // swiftlint:disable:this enforce_os_log_wrapper
+import os.log
 
 /// A private global actor to handle UDP flows management
 ///
@@ -82,12 +82,12 @@ final class TCPFlowManager {
         do {
             try await startDataCopyLoop(for: remoteConnection)
 
-            logger.log("🔴 Stopping proxy connection to \(remoteEndpoint, privacy: .public)")
+            logger.log("Stopping proxy connection to \(remoteEndpoint, privacy: .public)")
             remoteConnection.cancel()
             flow.closeReadWithError(nil)
             flow.closeWriteWithError(nil)
         } catch {
-            logger.log("🔴 Stopping proxy connection to \(remoteEndpoint, privacy: .public) with error \(String(reflecting: error), privacy: .public)")
+            logger.log("Stopping proxy connection to \(remoteEndpoint, privacy: .public) with error \(String(reflecting: error), privacy: .public)")
 
             remoteConnection.cancel()
             flow.closeReadWithError(error)

@@ -22,6 +22,7 @@ import Common
 import Foundation
 import PixelKit
 import RemoteMessaging
+import os.log
 
 /**
  * This is used to feed a remote message to the home page view.
@@ -137,12 +138,12 @@ final class ActiveRemoteMessageModel: ObservableObject {
         guard let remoteMessage, let store = store() else {
             return
         }
-        os_log("Remote message shown: %s", log: .remoteMessaging, type: .info, remoteMessage.id)
+        Logger.remoteMessaging.info("Remote message shown: \(remoteMessage.id, privacy: .public)")
         if remoteMessage.isMetricsEnabled {
             PixelKit.fire(GeneralPixel.remoteMessageShown, withAdditionalParameters: ["message": remoteMessage.id])
         }
         if !store.hasShownRemoteMessage(withID: remoteMessage.id) {
-            os_log("Remote message shown for first time: %s", log: .remoteMessaging, type: .info, remoteMessage.id)
+            Logger.remoteMessaging.info("Remote message shown for first time: \(remoteMessage.id, privacy: .public)")
             if remoteMessage.isMetricsEnabled {
                 PixelKit.fire(GeneralPixel.remoteMessageShownUnique, withAdditionalParameters: ["message": remoteMessage.id])
             }

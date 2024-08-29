@@ -20,7 +20,7 @@ import Foundation
 import WebKit
 import BrowserServicesKit
 import UserScript
-import Common
+import os.log
 
 protocol CCFCommunicationDelegate: AnyObject {
     func loadURL(url: URL) async
@@ -60,20 +60,20 @@ struct DataBrokerProtectionFeature: Subfeature {
             case .actionError: return onActionError
             }
         } else {
-            os_log("Cant parse method: %{public}@", log: .action, methodName)
+            Logger.action.debug("Cant parse method: \(methodName, privacy: .public)")
             return nil
         }
     }
 
     func onActionCompleted(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        os_log("Action completed", log: .action)
+        Logger.action.debug("Action completed")
 
         await parseActionCompleted(params: params)
         return nil
     }
 
     func parseActionCompleted(params: Any) async {
-        os_log("Parse action completed", log: .action)
+        Logger.action.debug("Parse action completed")
 
         guard let data = try? JSONSerialization.data(withJSONObject: params),
                 let result = try? JSONDecoder().decode(CCFResult.self, from: data) else {
@@ -91,7 +91,7 @@ struct DataBrokerProtectionFeature: Subfeature {
     }
 
     func parseSuccess(success: CCFSuccessResponse) async {
-        os_log("Parse success: %{public}@", log: .action, String(describing: success.actionType.rawValue))
+        Logger.action.debug("Parse success: \(String(describing: success.actionType.rawValue), privacy: .public)")
 
         switch success.response {
         case .navigate(let navigate):
@@ -114,7 +114,7 @@ struct DataBrokerProtectionFeature: Subfeature {
 
     func onActionError(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         let error = DataBrokerProtectionError.parse(params: params)
-        os_log("Action Error: %{public}@", log: .action, String(describing: error.localizedDescription))
+        Logger.action.debug("Action Error: \(String(describing: error.localizedDescription), privacy: .public)")
 
         await delegate?.onError(error: error)
         return nil
@@ -129,7 +129,7 @@ struct DataBrokerProtectionFeature: Subfeature {
             assertionFailure("Cannot continue without broker instance")
             return
         }
-        os_log("Pushing into WebView: %@ params %@", log: .action, method.rawValue, String(describing: params))
+        Logger.action.debug("Pushing into WebView: \(method.rawValue) params \(String(describing: params))")
 
         broker.push(method: method.rawValue, params: params, for: self, into: webView)
     }

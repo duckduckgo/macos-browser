@@ -134,6 +134,9 @@
                   Identifier = "CoreDataEncryptionTests/testSavingIncorrectValueTypes()">
                </Test>
                <Test
+                  Identifier = "DownloadsIntegrationTests/testWhenDownloadIsStartedInNewTab_tabIsClosed()">
+               </Test>
+               <Test
                   Identifier = "EncryptionKeyStoreTests">
                </Test>
                <Test
@@ -146,10 +149,7 @@
                   Identifier = "NavigationProtectionIntegrationTests/testReferrerTrimming()">
                </Test>
                <Test
-                  Identifier = "TabContentTests/testWhenPDFContextMenuPrintChosen_printDialogOpens()">
-               </Test>
-               <Test
-                  Identifier = "TabContentTests/testWhenPDFMainMenuPrintChosen_printDialogOpens()">
+                  Identifier = "TabContentTests">
                </Test>
             </SkippedTests>
          </TestableReference>

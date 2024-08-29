@@ -21,6 +21,7 @@ import Foundation
 import SwiftUI
 import OpenSSL
 import PixelKit
+import os.log
 
 final class BWManager: BWManagement, ObservableObject {
 
@@ -125,7 +126,7 @@ final class BWManager: BWManagement, ObservableObject {
         do {
             try communicator.runProxyProcess()
         } catch {
-            os_log("BWManagement: Running of proxy process failed", type: .error)
+            Logger.bitWarden.error("BWManagement: Running of proxy process failed")
             PixelKit.fire(DebugEvent(GeneralPixel.bitwardenNotResponding))
             status = .error(error: .runningOfProxyProcessFailed)
             scheduleConnectionAttempt()
@@ -215,7 +216,8 @@ final class BWManager: BWManagement, ObservableObject {
                 status = .notRunning
             }
         default:
-            logOrAssertionFailure("BWManager: Wrong handler")
+            Logger.bitWarden.fault("BWManager: Wrong handler")
+            assertionFailure("BWManager: Wrong handler")
         }
     }
 
@@ -236,7 +238,8 @@ final class BWManager: BWManagement, ObservableObject {
     private func handleError(_ error: String) {
         switch error {
         case "cannot-decrypt":
-            logOrAssertionFailure("BWManagement: Bitwarden error - cannot decrypt")
+            Logger.bitWarden.fault("BWManagement: Bitwarden error - cannot decrypt")
+            assertionFailure("BWManagement: Bitwarden error - cannot decrypt")
             PixelKit.fire(DebugEvent(GeneralPixel.bitwardenRespondedCannotDecrypt), frequency: .daily)
         case "locked":
             if case let .connected(vault) = status {
@@ -245,7 +248,9 @@ final class BWManager: BWManagement, ObservableObject {
                 sendStatus()
             }
             return
-        default: logOrAssertionFailure("BWManager: Unhandled error")
+        default:
+            Logger.bitWarden.fault("BWManager: Unhandled error")
+            assertionFailure("BWManager: Unhandled error")
             PixelKit.fire(DebugEvent(GeneralPixel.bitwardenRespondedWithError))
         }
     }
@@ -293,7 +298,8 @@ final class BWManager: BWManagement, ObservableObject {
         let ourHmac = encryption.computeHmac(data, iv: ivData)
         guard ourHmac == hmac else {
             PixelKit.fire(DebugEvent(GeneralPixel.bitwardenHmacComparisonFailed))
-            logOrAssertionFailure("BWManager: HMAC comparison failed")
+            Logger.bitWarden.fault("BWManager: HMAC comparison failed")
+            assertionFailure("BWManager: HMAC comparison failed")
             return
         }
 
@@ -335,7 +341,8 @@ final class BWManager: BWManagement, ObservableObject {
         default: break
         }
 
-        logOrAssertionFailure("BWManager: Unhandled response")
+        Logger.bitWarden.fault("BWManager: Unhandled response")
+        assertionFailure("BWManager: Unhandled response")
     }
 
     private func handleStatusResponse(payloadItemArray: [BWResponse.PayloadItem]) {
@@ -351,7 +358,8 @@ final class BWManager: BWManagement, ObservableObject {
 
     private func handleCredentialRetrievalResponse(messageId: MessageId, payload: BWResponse.Payload) {
         guard let (domain, completion) = retrieveCredentialsCompletionCache[messageId] else {
-            logOrAssertionFailure("BWManager: Missing or already removed completion block")
+            Logger.bitWarden.fault("BWManager: Missing or already removed completion block")
+            assertionFailure("BWManager: Missing or already removed completion block")
             return
         }
 
@@ -362,7 +370,8 @@ final class BWManager: BWManagement, ObservableObject {
             completion(credentials, nil)
         case .item(let payloadItem):
             guard let error = payloadItem.error else {
-                logOrAssertionFailure("BWManager: Unexpected response in credential retrieval")
+                Logger.bitWarden.fault("BWManager: Unexpected response in credential retrieval")
+                assertionFailure("BWManager: Unexpected response in credential retrieval")
                 return
             }
 
@@ -375,7 +384,8 @@ final class BWManager: BWManagement, ObservableObject {
     private func handleCredentialCreationResponse(messageId: MessageId, payloadItem: BWResponse.PayloadItem) {
 
         guard let completion = createCredentialCompletionCache[messageId] else {
-            logOrAssertionFailure("BWManager: Missing completion block")
+            Logger.bitWarden.fault("BWManager: Missing completion block")
+            assertionFailure("BWManager: Missing completion block")
             return
         }
         createCredentialCompletionCache[messageId] = nil
@@ -391,7 +401,8 @@ final class BWManager: BWManagement, ObservableObject {
     private func handleCredentialUpdateResponse(messageId: MessageId, payloadItem: BWResponse.PayloadItem) {
 
         guard let completion = updateCredentialCompletionCache[messageId] else {
-            logOrAssertionFailure("BWManager: Missing completion block")
+            Logger.bitWarden.fault("BWManager: Missing completion block")
+            assertionFailure("BWManager: Missing completion block")
             return
         }
         updateCredentialCompletionCache[messageId] = nil
@@ -410,13 +421,15 @@ final class BWManager: BWManagement, ObservableObject {
 
     func sendHandshake() {
         guard let publicKey = generateKeyPair() else {
-            logOrAssertionFailure("BWManager: Public key is missing")
+            Logger.bitWarden.fault("BWManager: Public key is missing")
+            assertionFailure("BWManager: Public key is missing")
             return
         }
 
         guard let messageData = BWRequest.makeHandshakeRequest(with: publicKey,
-                                                                      messageId: messageIdGenerator.generateMessageId()).data else {
-            logOrAssertionFailure("BWManager: Making the handshake message failed")
+                                                               messageId: messageIdGenerator.generateMessageId()).data else {
+            Logger.bitWarden.fault("BWManager: Making the handshake message failed")
+            assertionFailure("BWManager: Making the handshake message failed")
             return
         }
 
@@ -428,7 +441,8 @@ final class BWManager: BWManagement, ObservableObject {
               let encryptedCommand = encryptCommandData(commandData),
               let messageData = BWRequest.makeEncryptedCommandRequest(encryptedCommand: encryptedCommand,
                                                                       messageId: messageIdGenerator.generateMessageId()).data else {
-            logOrAssertionFailure("BWManager: Making the status message failed")
+            Logger.bitWarden.fault("BWManager: Making the status message failed")
+            assertionFailure("BWManager: Making the status message failed")
             PixelKit.fire(DebugEvent(GeneralPixel.bitwardenSendingOfMessageFailed))
             status = .error(error: .sendingOfMessageFailed)
             return
@@ -440,11 +454,12 @@ final class BWManager: BWManagement, ObservableObject {
     private func sendCredentialRetrieval(url: URL, messageId: MessageId) {
         let payload = BWRequest.EncryptedCommand.Payload(uri: url.absoluteString)
         guard let commandData = BWRequest.EncryptedCommand(command: .credentialRetrieval,
-                                                                  payload: payload).data,
+                                                           payload: payload).data,
               let encryptedCommand = encryptCommandData(commandData),
               let messageData = BWRequest.makeEncryptedCommandRequest(encryptedCommand: encryptedCommand,
                                                                       messageId: messageId).data else {
-            logOrAssertionFailure("BWManager: Making the credential retrieval message failed")
+            Logger.bitWarden.fault("BWManager: Making the credential retrieval message failed")
+            assertionFailure("BWManager: Making the credential retrieval message failed")
             PixelKit.fire(DebugEvent(GeneralPixel.bitwardenSendingOfMessageFailed))
             status = .error(error: .sendingOfMessageFailed)
             return
@@ -455,16 +470,17 @@ final class BWManager: BWManagement, ObservableObject {
 
     private func sendCredentialCreation(_ credential: BWCredential, messageId: MessageId) {
         let payload = BWRequest.EncryptedCommand.Payload(uri: credential.url,
-                                                                userId: credential.userId,
-                                                                userName: credential.username,
-                                                                password: credential.password,
-                                                                name: credential.credentialName)
+                                                         userId: credential.userId,
+                                                         userName: credential.username,
+                                                         password: credential.password,
+                                                         name: credential.credentialName)
         guard let commandData = BWRequest.EncryptedCommand(command: .credentialCreate,
-                                                                  payload: payload).data,
+                                                           payload: payload).data,
               let encryptedCommand = encryptCommandData(commandData),
               let messageData = BWRequest.makeEncryptedCommandRequest(encryptedCommand: encryptedCommand,
                                                                       messageId: messageId).data else {
-            logOrAssertionFailure("BWManager: Making the credential creation message failed")
+            Logger.bitWarden.fault("BWManager: Making the credential creation message failed")
+            assertionFailure("BWManager: Making the credential creation message failed")
             PixelKit.fire(DebugEvent(GeneralPixel.bitwardenSendingOfMessageFailed))
             status = .error(error: .sendingOfMessageFailed)
             return
@@ -475,17 +491,18 @@ final class BWManager: BWManagement, ObservableObject {
 
     private func sendCredentialUpdate(_ credential: BWCredential, messageId: MessageId) {
         let payload = BWRequest.EncryptedCommand.Payload(uri: credential.url,
-                                                                userId: credential.userId,
-                                                                userName: credential.username,
-                                                                password: credential.password,
-                                                                name: credential.credentialName,
-                                                                credentialId: credential.credentialId)
+                                                         userId: credential.userId,
+                                                         userName: credential.username,
+                                                         password: credential.password,
+                                                         name: credential.credentialName,
+                                                         credentialId: credential.credentialId)
         guard let commandData = BWRequest.EncryptedCommand(command: .credentialUpdate,
-                                                                  payload: payload).data,
+                                                           payload: payload).data,
               let encryptedCommand = encryptCommandData(commandData),
               let messageData = BWRequest.makeEncryptedCommandRequest(encryptedCommand: encryptedCommand,
                                                                       messageId: messageId).data else {
-            logOrAssertionFailure("BWManager: Making the credential update message failed")
+            Logger.bitWarden.fault("BWManager: Making the credential update message failed")
+            assertionFailure("BWManager: Making the credential update message failed")
             PixelKit.fire(DebugEvent(GeneralPixel.bitwardenSendingOfMessageFailed))
             status = .error(error: .sendingOfMessageFailed)
             return
@@ -524,7 +541,7 @@ final class BWManager: BWManagement, ObservableObject {
 
     @Published private(set) var status: BWStatus = .disabled {
         didSet {
-            os_log("Status changed: %s", log: .bitwarden, type: .default, String(describing: status))
+            Logger.bitWarden.log("Status changed: \(String(describing: self.status))")
 
             // If vault is locked, keep refreshing the latest status
             if case .connected(vault: let vault) = status,
@@ -603,7 +620,8 @@ extension BWManager: BWCommunicatorDelegate {
 
     func bitwardenCommunicator(_ bitwardenCommunicator: BWCommunication, didReceiveMessageData messageData: Data) {
         guard let response = BWResponse(from: messageData) else {
-            logOrAssertionFailure("BWManager: Can't decode the message")
+            Logger.bitWarden.fault("BWManager: Can't decode the message")
+            assertionFailure("BWManager: Can't decode the message")
             return
         }
 
@@ -613,7 +631,7 @@ extension BWManager: BWCommunicatorDelegate {
         }
 
         guard let messageId = response.messageId, messageIdGenerator.verify(messageId: messageId) else {
-            os_log("BWManager: Unkown message id. Ignoring the message", log: .bitwarden, type: .default)
+            Logger.bitWarden.log("BWManager: Unknown message id. Ignoring the message")
             return
         }
 
@@ -635,6 +653,7 @@ extension BWManager: BWCommunicatorDelegate {
             return
         }
 
-        logOrAssertionFailure("BWManager: Unhandled message from Bitwarden")
+        Logger.bitWarden.fault("BWManager: Unhandled message from Bitwarden")
+        assertionFailure("BWManager: Unhandled message from Bitwarden")
     }
 }

@@ -38,8 +38,7 @@ final class SyncCredentialsAdapter {
         databaseCleaner = CredentialsDatabaseCleaner(
             secureVaultFactory: secureVaultFactory,
             secureVaultErrorReporter: SecureVaultReporter.shared,
-            errorEvents: CredentialsCleanupErrorHandling(),
-            log: .passwordManager
+            errorEvents: CredentialsCleanupErrorHandling()
         )
     }
 
@@ -67,7 +66,6 @@ final class SyncCredentialsAdapter {
                 secureVaultErrorReporter: SecureVaultReporter.shared,
                 metadataStore: metadataStore,
                 metricsEvents: metricsEventsHandler,
-                log: OSLog.sync,
                 syncDidUpdateData: { [weak self] in
                     self?.syncDidCompleteSubject.send()
                     self?.syncErrorHandler.syncCredentialsSucceded()
