@@ -51,6 +51,18 @@ protocol ImageProcessing {
     func calculatePreferredColorScheme(forImageAt url: URL) -> ColorScheme
 }
 
+/**
+ * This class is responsible by processing user-provided New Tab Page background images.
+ *
+ * It has the following responsibilities:
+ * * converting input files to JPEG – if they already are JPEG, then they're still
+ *   processed by correcting orientation in case it's not `.up`,
+ * * creating thumbnails (by resizing images),
+ * * calculating preferred color scheme by analyzing image brightness.
+ *
+ * > Related links:
+ * [Tech Design](https://app.asana.com/0/481882893211075/1208090992610433/f)
+ */
 final class ImageProcessor: ImageProcessing {
 
     func calculatePreferredColorScheme(forImageAt url: URL) -> ColorScheme {

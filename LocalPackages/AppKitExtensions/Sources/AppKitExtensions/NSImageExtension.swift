@@ -24,7 +24,9 @@ extension NSImage {
      * This function calculates image brightness using relative luminance formula.
      *
      * The image is downsammpled to 1x1 pixel, and that pixel's luminance is computed.
-     * Tech Design: https://app.asana.com/0/0/1208090992610433/f
+
+     * > Related links:
+     * [Tech Design](https://app.asana.com/0/481882893211075/1208090992610433/f)
      */
     public func averageBrightness() -> CGFloat? {
         guard let tiffData = downsampledTo1x1Pixel()?.tiffRepresentation,

@@ -19,14 +19,36 @@
 import Foundation
 import SwiftUI
 
+/**
+ * This protocol describes types that determine color scheme to be used in the UI.
+ *
+ * It's implemented by various custom backgrounds, allowing them to fix color scheme
+ * of the New Tab Page to either light or dark, regardless of the system theme
+ * or browser appearance settings.
+ */
 protocol ColorSchemeProviding {
     var colorScheme: ColorScheme { get }
 }
 
+/**
+ * This protocol describes types that can be converted to `CustomBackground`.
+ *
+ * These are essentially all available custom background types. The `customBackground`
+ * property returns the given custom background type wrapped in a `CustomBackground` enum case.
+ */
 protocol CustomBackgroundConvertible {
     var customBackground: CustomBackground { get }
 }
 
+/**
+ * This enum represents custom New Tab Page background.
+ *
+ * 4 types of backgrounds are available at the moment:
+ * - gradient – uses predefined gradient images
+ * - solid color – uses predefined colors
+ * - illustration – uses predefined illustrations
+ * - user image – uses images uploaded by the user.
+ */
 enum CustomBackground: Equatable, Hashable, ColorSchemeProviding, LosslessStringConvertible {
 
     static let placeholderGradient: GradientBackground = .gradient03
