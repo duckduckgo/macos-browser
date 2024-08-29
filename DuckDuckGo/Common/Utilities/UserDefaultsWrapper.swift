@@ -146,6 +146,7 @@ public struct UserDefaultsWrapper<T> {
         case homePageIsRecentActivityVisible = "home.page.is.recent.activity.visible"
         case homePageIsFirstSession = "home.page.is.first.session"
         case homePagePromotionVisible = "home.page.promotion.visible"
+        case homePagePromotionDidDismiss = "home.page.promotion.did.dismiss"
 
         case appIsRelaunchingAutomatically = "app-relaunching-automatically"
 

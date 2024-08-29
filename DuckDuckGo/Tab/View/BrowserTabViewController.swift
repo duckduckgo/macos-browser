@@ -675,8 +675,11 @@ final class BrowserTabViewController: NSViewController {
     private func homePageViewControllerCreatingIfNeeded() -> HomePageViewController {
         return homePageViewController ?? {
             let subscriptionManager = Application.appDelegate.subscriptionManager
+            let freemiumPIRFeature = DefaultFreemiumPIRFeature(subscriptionManager: subscriptionManager, accountManager: subscriptionManager.accountManager)
             let freemiumPIRUserState = DefaultFreemiumPIRUserState(userDefaults: .dbp, accountManager: subscriptionManager.accountManager)
-            let homePageViewController = HomePageViewController(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager, freemiumPIRUserState: freemiumPIRUserState)
+            let homePageViewController = HomePageViewController(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager,
+                                                                freemiumPIRFeature: freemiumPIRFeature,
+                                                                freemiumPIRUserState: freemiumPIRUserState)
             self.homePageViewController = homePageViewController
             return homePageViewController
         }()

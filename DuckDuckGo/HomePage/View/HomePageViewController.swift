@@ -32,6 +32,7 @@ final class HomePageViewController: NSViewController {
     private let historyCoordinating: HistoryCoordinating
     private let fireViewModel: FireViewModel
     private let onboardingViewModel: OnboardingViewModel
+    private let freemiumPIRFeature: FreemiumPIRFeature
     private var freemiumPIRUserState: FreemiumPIRUserState
     private let freemiumPIRPresenter: FreemiumPIRPresenter
 
@@ -68,6 +69,7 @@ final class HomePageViewController: NSViewController {
          accessibilityPreferences: AccessibilityPreferences = AccessibilityPreferences.shared,
          appearancePreferences: AppearancePreferences = AppearancePreferences.shared,
          defaultBrowserPreferences: DefaultBrowserPreferences = DefaultBrowserPreferences.shared,
+         freemiumPIRFeature: FreemiumPIRFeature,
          freemiumPIRUserState: FreemiumPIRUserState,
          freemiumPIRPresenter: FreemiumPIRPresenter = DefaultFreemiumPIRPresenter()) {
 
@@ -79,6 +81,7 @@ final class HomePageViewController: NSViewController {
         self.accessibilityPreferences = accessibilityPreferences
         self.appearancePreferences = appearancePreferences
         self.defaultBrowserPreferences = defaultBrowserPreferences
+        self.freemiumPIRFeature = freemiumPIRFeature
         self.freemiumPIRUserState = freemiumPIRUserState
         self.freemiumPIRPresenter = freemiumPIRPresenter
 
@@ -123,6 +126,8 @@ final class HomePageViewController: NSViewController {
             PixelKit.fire(GeneralPixel.newTabInitial, frequency: .legacyInitial)
         }
         subscribeToHistory()
+
+        setPromotionViewVisibilityState()
     }
 
     override func viewDidAppear() {
@@ -206,16 +211,20 @@ final class HomePageViewController: NSViewController {
         })
     }
 
-    func createPromotionModel() -> PromotionViewModel {
+    private func setPromotionViewVisibilityState() {
+        appearancePreferences.isHomePagePromotionVisible = (!appearancePreferences.didDismissHomePagePromotion && freemiumPIRFeature.isAvailable)
+    }
+
+    private func createPromotionModel() -> PromotionViewModel {
         return PromotionViewModel.freemiumPIRPromotion { [weak self] in
             // TODO: Remove this
             self?.freemiumPIRUserState.didOnboard = true
             // ------
             self?.freemiumPIRPresenter.showFreemiumPIR(didOnboard: self?.freemiumPIRUserState.didOnboard ?? false,
                                                        windowControllerManager: WindowControllersManager.shared)
-            self?.appearancePreferences.isHomePagePromotionVisible = false
+            self?.appearancePreferences.didDismissHomePagePromotion = true
         } closeAction: { [weak self] in
-            self?.appearancePreferences.isHomePagePromotionVisible = false
+            self?.appearancePreferences.didDismissHomePagePromotion = true
         }
     }
 

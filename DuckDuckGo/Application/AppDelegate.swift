@@ -284,8 +284,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler(subscriptionManager: subscriptionManager,
                                                                                               tunnelController: tunnelController,
                                                                                               vpnUninstaller: vpnUninstaller)
-        // Freemium PIR Setup Home View State
-        setupFreemiumPIRHomeViewState()
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -721,14 +719,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                                                    queue: nil) { [weak self] _ in
             self?.autofillPixelReporter?.updateAutofillEnabledStatus(AutofillPreferences().askToSaveUsernamesAndPasswords)
         }
-    }
-
-    /// Decides if we should show the Freemium PIR home view promotion based on:
-    /// 1. It's current state (it's true by default, but set to false if dismissed)
-    /// 2. The Freemium PIR feature state (i.e enabled/disabled)
-    private func setupFreemiumPIRHomeViewState() {
-        let freemiumPIRFeature = DefaultFreemiumPIRFeature(subscriptionManager: subscriptionManager, accountManager: subscriptionManager.accountManager)
-        AppearancePreferences.shared.isHomePagePromotionVisible = (AppearancePreferences.shared.isHomePagePromotionVisible && freemiumPIRFeature.isAvailable)
     }
 }
 
