@@ -26,7 +26,7 @@ final class DuckSchemeHandlerTests: XCTestCase {
 
     func testWebViewFromOnboardingHandlerReturnsResponseAndData() throws {
         // Given
-        let onboardingURL = URL(string: "duck://onboarding?platform=integration")!
+        let onboardingURL = URL(string: "duck://onboarding")!
         let handler = DuckURLSchemeHandler()
         let webView = WKWebView()
         let schemeTask = MockSchemeTask(request: URLRequest(url: onboardingURL))
@@ -39,6 +39,25 @@ final class DuckSchemeHandlerTests: XCTestCase {
         XCTAssertEqual(schemeTask.response?.mimeType, "text/html")
         XCTAssertNotNil(schemeTask.data)
         XCTAssertTrue(schemeTask.data?.utf8String()?.contains("<title>Welcome</title>") ?? false)
+        XCTAssertTrue(schemeTask.didFinishCalled)
+        XCTAssertNil(schemeTask.error)
+    }
+
+    func testWebViewFromReleaseNoteHandlerReturnsResponseAndData() throws {
+        // Given
+        let releaseNotesURL = URL(string: "duck://release-notes")!
+        let handler = DuckURLSchemeHandler()
+        let webView = WKWebView()
+        let schemeTask = MockSchemeTask(request: URLRequest(url: releaseNotesURL))
+
+        // When
+        handler.webView(webView, start: schemeTask)
+
+        // Then
+        XCTAssertEqual(schemeTask.response?.url, releaseNotesURL)
+        XCTAssertEqual(schemeTask.response?.mimeType, "text/html")
+        XCTAssertNotNil(schemeTask.data)
+        XCTAssertTrue(schemeTask.data?.utf8String()?.contains("<title>Browser Release Notes</title>") ?? false)
         XCTAssertTrue(schemeTask.didFinishCalled)
         XCTAssertNil(schemeTask.error)
     }

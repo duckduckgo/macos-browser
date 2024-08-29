@@ -67,7 +67,6 @@ extension DuckURLSchemeHandler {
     private func handleNativeUIPages(requestURL: URL, urlSchemeTask: WKURLSchemeTask) {
         // return empty page for native UI pages navigations (like the Home page or Settings) if the request is not for the Duck Player
         let data = Self.emptyHtml.utf8data
-
         let response = URLResponse(url: requestURL,
                                    mimeType: "text/html",
                                    expectedContentLength: data.count,
@@ -108,7 +107,7 @@ private extension DuckURLSchemeHandler {
 private extension DuckURLSchemeHandler {
     func handleSpecialPages(urlSchemeTask: WKURLSchemeTask) {
         guard let requestURL = urlSchemeTask.request.url else {
-            assertionFailure("No URL for Onboarding scheme handler")
+            assertionFailure("No URL for Special Pages scheme handler")
             return
         }
         guard let (response, data) = response(for: requestURL) else { return }
