@@ -142,9 +142,11 @@ extension BookmarksContextMenu {
     }
 
     static func menuItems(for folder: BookmarkFolder, target: AnyObject?, forSearch: Bool, includeManageBookmarksItem: Bool) -> [NSMenuItem] {
+        // disable "Open All" if no Bookmarks in folder
+        var hasBookmarks = folder.children.contains(where: { $0 is Bookmark })
         var items = [
-            openInNewTabsMenuItem(folder: folder, target: target),
-            openAllInNewWindowMenuItem(folder: folder, target: target),
+            openInNewTabsMenuItem(folder: folder, target: target, enabled: hasBookmarks),
+            openAllInNewWindowMenuItem(folder: folder, target: target, enabled: hasBookmarks),
             NSMenuItem.separator(),
             editFolderMenuItem(folder: folder, target: target),
             deleteFolderMenuItem(folder: folder, target: target),
@@ -215,12 +217,16 @@ extension BookmarksContextMenu {
 
     // MARK: - Bookmark Folder Menu Items
 
-    static func openInNewTabsMenuItem(folder: BookmarkFolder?, target: AnyObject?) -> NSMenuItem {
-        NSMenuItem(title: UserText.openAllInNewTabs, action: #selector(FolderMenuItemSelectors.openInNewTabs(_:)), target: target, representedObject: folder)
+    static func openInNewTabsMenuItem(folder: BookmarkFolder?, target: AnyObject?, enabled: Bool) -> NSMenuItem {
+        let item = NSMenuItem(title: UserText.openAllInNewTabs, action: #selector(FolderMenuItemSelectors.openInNewTabs(_:)), target: target, representedObject: folder)
+        item.isEnabled = enabled
+        return item
     }
 
-    static func openAllInNewWindowMenuItem(folder: BookmarkFolder?, target: AnyObject?) -> NSMenuItem {
-        NSMenuItem(title: UserText.openAllTabsInNewWindow, action: #selector(FolderMenuItemSelectors.openAllInNewWindow(_:)), target: target, representedObject: folder)
+    static func openAllInNewWindowMenuItem(folder: BookmarkFolder?, target: AnyObject?, enabled: Bool) -> NSMenuItem {
+        let item = NSMenuItem(title: UserText.openAllTabsInNewWindow, action: #selector(FolderMenuItemSelectors.openAllInNewWindow(_:)), target: target, representedObject: folder)
+        item.isEnabled = enabled
+        return item
     }
 
     static func addNewFolderMenuItem(entity: BaseBookmarkEntity?, target: AnyObject?) -> NSMenuItem {
