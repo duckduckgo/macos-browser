@@ -34,4 +34,4 @@ jobs:
       with:
         access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
         comment: "This is a sample comment"
-        task-url: "https://app.asana.com/0/1199230911884351/1208154191967682/f"
+        task-url: "https://app.asana.com/0/1201621708115095/1208137627434473/f"
