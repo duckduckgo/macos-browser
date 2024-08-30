@@ -47,6 +47,7 @@ final class BookmarksContextMenu: NSMenu {
         self.windowControllersManager = windowControllersManager ?? WindowControllersManager.shared
         super.init(title: "")
         self.delegate = delegate
+        self.autoenablesItems = false
     }
 
     required init(coder: NSCoder) {
@@ -67,29 +68,33 @@ extension BookmarksContextMenu {
     /// Creates menu items for the specified Objects and target.
     /// - Parameters:
     ///   - objects: The objects to create the menu for.
-    ///   - target: The target to associate to the `NSMenuItem`
     ///   - forSearch: Boolean that indicates if a bookmark search is currently happening.
     /// - Returns: An instance of NSMenu or nil if `objects` is not a `Bookmark` or a `Folder`.
     static func menuItems(for objects: [Any]?, target: AnyObject?, forSearch: Bool, includeManageBookmarksItem: Bool) -> [NSMenuItem] {
         guard let objects, !objects.isEmpty else {
-            return [addFolderMenuItem(folder: nil, target: target)]
+            return [addNewFolderMenuItem(entity: nil, target: target)]
         }
 
         if objects.count > 1, let entities = objects as? [BaseBookmarkEntity] {
             return menuItems(for: entities, target: target)
         }
 
-        let node = objects.first as? BookmarkNode
-        let object = node?.representedObject as? BaseBookmarkEntity ?? objects.first as? BaseBookmarkEntity
-        let parentFolder = node?.parent?.representedObject as? BookmarkFolder
-
-        guard let object else { return [] }
-
-        let menuItems = menuItems(for: object, parentFolder: parentFolder, forSearch: forSearch, includeManageBookmarksItem: includeManageBookmarksItem)
-
-        for item in menuItems {
-            item.target = target
+        let object: BaseBookmarkEntity
+        switch objects.first {
+        case let node as BookmarkNode:
+            guard let entity = node.representedObject as? BaseBookmarkEntity else {
+                assertionFailure("Unexpected represented object \(node.representedObject)")
+                return []
+            }
+            object = entity
+        case let entity as BaseBookmarkEntity:
+            object = entity
+        default:
+            assertionFailure("Unexpected object \(objects.first!)")
+            return []
         }
+
+        let menuItems = menuItems(for: object, target: target, forSearch: forSearch, includeManageBookmarksItem: includeManageBookmarksItem)
 
         return menuItems
     }
@@ -98,67 +103,64 @@ extension BookmarksContextMenu {
     ///
     /// - Parameters:
     ///   - entity: The bookmark entity to create the menu for.
-    ///   - parentFolder: An optional `BookmarkFolder`.
+    ///   - target: The target to associate to the `NSMenuItem`
     ///   - forSearch: Boolean that indicates if a bookmark search is currently happening.
     /// - Returns: An instance of NSMenu or nil if `entity` is not a `Bookmark` or a `Folder`.
-    static func menuItems(for entity: BaseBookmarkEntity, parentFolder: BookmarkFolder?, forSearch: Bool, includeManageBookmarksItem: Bool) -> [NSMenuItem] {
-        if let bookmark = entity as? Bookmark {
-            return menuItems(for: bookmark, parent: parentFolder, isFavorite: bookmark.isFavorite, forSearch: forSearch, includeManageBookmarksItem: includeManageBookmarksItem)
-        } else if let folder = entity as? BookmarkFolder {
-            // When the user edits a folder we need to show the parent in the folder picker. Folders directly child of PseudoFolder `Bookmarks` have nil parent because their parent is not an instance of `BookmarkFolder`
-            return menuItems(for: folder, parent: parentFolder, forSearch: forSearch, includeManageBookmarksItem: includeManageBookmarksItem)
+    static func menuItems(for entity: BaseBookmarkEntity, target: AnyObject?, forSearch: Bool, includeManageBookmarksItem: Bool) -> [NSMenuItem] {
+        switch entity {
+        case let bookmark as Bookmark:
+            return menuItems(for: bookmark, target: target, isFavorite: bookmark.isFavorite, forSearch: forSearch, includeManageBookmarksItem: includeManageBookmarksItem)
+        case let folder as BookmarkFolder:
+            return menuItems(for: folder, target: target, forSearch: forSearch, includeManageBookmarksItem: includeManageBookmarksItem)
+        default:
+            assertionFailure("Unexpected entity \(entity)")
+            return []
         }
-
-        return []
     }
 
-}
-
-private extension BookmarksContextMenu {
-
-    static func menuItems(for bookmark: Bookmark?, parent: BookmarkFolder?, isFavorite: Bool, forSearch: Bool = false, includeManageBookmarksItem: Bool) -> [NSMenuItem] {
+    static func menuItems(for bookmark: Bookmark, target: AnyObject?, isFavorite: Bool, forSearch: Bool, includeManageBookmarksItem: Bool) -> [NSMenuItem] {
         var items = [
-            openBookmarkInNewTabMenuItem(bookmark: bookmark),
-            openBookmarkInNewWindowMenuItem(bookmark: bookmark),
+            openBookmarkInNewTabMenuItem(bookmark: bookmark, target: target),
+            openBookmarkInNewWindowMenuItem(bookmark: bookmark, target: target),
             NSMenuItem.separator(),
-            addBookmarkToFavoritesMenuItem(isFavorite: isFavorite, bookmark: bookmark),
+            addBookmarkToFavoritesMenuItem(isFavorite: isFavorite, bookmark: bookmark, target: target),
             NSMenuItem.separator(),
-            editBookmarkMenuItem(bookmark: bookmark),
-            copyBookmarkMenuItem(bookmark: bookmark),
-            deleteBookmarkMenuItem(bookmark: bookmark),
-            moveToEndMenuItem(entity: bookmark, parent: parent),
+            editBookmarkMenuItem(bookmark: bookmark, target: target),
+            copyBookmarkMenuItem(bookmark: bookmark, target: target),
+            deleteBookmarkMenuItem(bookmark: bookmark, target: target),
+            moveToEndMenuItem(entity: bookmark, target: target),
             NSMenuItem.separator(),
-            addFolderMenuItem(folder: parent, target: self),
+            addNewFolderMenuItem(entity: bookmark, target: target),
         ]
 
         if includeManageBookmarksItem {
-            items.append(manageBookmarksMenuItem())
+            items.append(manageBookmarksMenuItem(target: target))
         }
         if forSearch {
-            let showInFolderItem = showInFolderMenuItem(bookmark: bookmark, parent: parent)
+            let showInFolderItem = showInFolderMenuItem(bookmark: bookmark, target: target)
             items.insert(showInFolderItem, at: 5)
         }
 
         return items
     }
 
-    static func menuItems(for folder: BookmarkFolder?, parent: BookmarkFolder?, forSearch: Bool = false, includeManageBookmarksItem: Bool) -> [NSMenuItem] {
+    static func menuItems(for folder: BookmarkFolder, target: AnyObject?, forSearch: Bool, includeManageBookmarksItem: Bool) -> [NSMenuItem] {
         var items = [
-            openInNewTabsMenuItem(folder: folder),
-            openAllInNewWindowMenuItem(folder: folder),
+            openInNewTabsMenuItem(folder: folder, target: target),
+            openAllInNewWindowMenuItem(folder: folder, target: target),
             NSMenuItem.separator(),
-            editFolderMenuItem(folder: folder, parent: parent),
-            deleteFolderMenuItem(folder: folder),
-            moveToEndMenuItem(entity: folder, parent: parent),
+            editFolderMenuItem(folder: folder, target: target),
+            deleteFolderMenuItem(folder: folder, target: target),
+            moveToEndMenuItem(entity: folder, target: target),
             NSMenuItem.separator(),
-            addFolderMenuItem(folder: folder, target: self),
+            addNewFolderMenuItem(entity: folder, target: target),
         ]
 
         if includeManageBookmarksItem {
-            items.append(manageBookmarksMenuItem())
+            items.append(manageBookmarksMenuItem(target: target))
         }
         if forSearch {
-            let showInFolderItem = showInFolderMenuItem(folder: folder, parent: parent)
+            let showInFolderItem = showInFolderMenuItem(folder: folder, target: target)
             items.insert(showInFolderItem, at: 3)
         }
 
@@ -167,85 +169,83 @@ private extension BookmarksContextMenu {
 
     // MARK: - Single Bookmark Menu Items
 
-    static func openBookmarkInNewTabMenuItem(bookmark: Bookmark?) -> NSMenuItem {
-        NSMenuItem(title: UserText.openInNewTab, action: #selector(BookmarkMenuItemSelectors.openBookmarkInNewTab(_:)), representedObject: bookmark)
+    static func openBookmarkInNewTabMenuItem(bookmark: Bookmark?, target: AnyObject?) -> NSMenuItem {
+        NSMenuItem(title: UserText.openInNewTab, action: #selector(BookmarkMenuItemSelectors.openBookmarkInNewTab(_:)), target: target, representedObject: bookmark)
     }
 
-    static func openBookmarkInNewWindowMenuItem(bookmark: Bookmark?) -> NSMenuItem {
-        NSMenuItem(title: UserText.openInNewWindow, action: #selector(BookmarkMenuItemSelectors.openBookmarkInNewWindow(_:)), representedObject: bookmark)
+    static func openBookmarkInNewWindowMenuItem(bookmark: Bookmark?, target: AnyObject?) -> NSMenuItem {
+        NSMenuItem(title: UserText.openInNewWindow, action: #selector(BookmarkMenuItemSelectors.openBookmarkInNewWindow(_:)), target: target, representedObject: bookmark)
     }
 
-    static func manageBookmarksMenuItem() -> NSMenuItem {
-        NSMenuItem(title: UserText.bookmarksManageBookmarks, action: #selector(BookmarkMenuItemSelectors.manageBookmarks(_:)))
+    static func manageBookmarksMenuItem(target: AnyObject?) -> NSMenuItem {
+        NSMenuItem(title: UserText.bookmarksManageBookmarks, action: #selector(BookmarkMenuItemSelectors.manageBookmarks(_:)), target: target)
     }
 
-    static func addBookmarkToFavoritesMenuItem(isFavorite: Bool, bookmark: Bookmark?) -> NSMenuItem {
+    static func addBookmarkToFavoritesMenuItem(isFavorite: Bool, bookmark: Bookmark?, target: AnyObject?) -> NSMenuItem {
         let title = isFavorite ? UserText.removeFromFavorites : UserText.addToFavorites
-        return NSMenuItem(title: title, action: #selector(BookmarkMenuItemSelectors.toggleBookmarkAsFavorite(_:)), representedObject: bookmark)
+        return NSMenuItem(title: title, action: #selector(BookmarkMenuItemSelectors.toggleBookmarkAsFavorite(_:)), target: target, representedObject: bookmark)
             .withAccessibilityIdentifier(isFavorite == false ? "ContextualMenu.addBookmarkToFavoritesMenuItem" :
                 "ContextualMenu.removeBookmarkFromFavoritesMenuItem")
     }
 
-    static func addBookmarksToFavoritesMenuItem(bookmarks: [Bookmark], allFavorites: Bool) -> NSMenuItem {
+    static func addBookmarksToFavoritesMenuItem(bookmarks: [Bookmark], allFavorites: Bool, target: AnyObject?) -> NSMenuItem {
         let title = allFavorites ? UserText.removeFromFavorites : UserText.addToFavorites
         let accessibilityValue = allFavorites ? "Favorited" : "Unfavorited"
-        return NSMenuItem(title: title, action: #selector(BookmarkMenuItemSelectors.toggleBookmarkAsFavorite(_:)), representedObject: bookmarks)
+        return NSMenuItem(title: title, action: #selector(BookmarkMenuItemSelectors.toggleBookmarkAsFavorite(_:)), target: target, representedObject: bookmarks)
             .withAccessibilityIdentifier("ContextualMenu.addBookmarksToFavoritesMenuItem").withAccessibilityValue(accessibilityValue)
     }
 
-    static func editBookmarkMenuItem(bookmark: Bookmark?) -> NSMenuItem {
-        NSMenuItem(title: UserText.editBookmark, action: #selector(BookmarkMenuItemSelectors.editBookmark(_:)), representedObject: bookmark)
+    static func editBookmarkMenuItem(bookmark: Bookmark?, target: AnyObject?) -> NSMenuItem {
+        NSMenuItem(title: UserText.editBookmark, action: #selector(BookmarkMenuItemSelectors.editBookmark(_:)), target: target, representedObject: bookmark)
     }
 
-    static func copyBookmarkMenuItem(bookmark: Bookmark?) -> NSMenuItem {
-        NSMenuItem(title: UserText.copy, action: #selector(BookmarkMenuItemSelectors.copyBookmark(_:)), representedObject: bookmark)
+    static func copyBookmarkMenuItem(bookmark: Bookmark?, target: AnyObject?) -> NSMenuItem {
+        NSMenuItem(title: UserText.copy, action: #selector(BookmarkMenuItemSelectors.copyBookmark(_:)), target: target, representedObject: bookmark)
     }
 
-    static func deleteBookmarkMenuItem(bookmark: Bookmark?) -> NSMenuItem {
-        NSMenuItem(title: UserText.bookmarksBarContextMenuDelete, action: #selector(BookmarkMenuItemSelectors.deleteBookmark(_:)), representedObject: bookmark)
+    static func deleteBookmarkMenuItem(bookmark: Bookmark?, target: AnyObject?) -> NSMenuItem {
+        NSMenuItem(title: UserText.bookmarksBarContextMenuDelete, action: #selector(BookmarkMenuItemSelectors.deleteBookmark(_:)), target: target, representedObject: bookmark)
             .withAccessibilityIdentifier("ContextualMenu.deleteBookmark")
     }
 
-    static func moveToEndMenuItem(entity: BaseBookmarkEntity?, parent: BookmarkFolder?) -> NSMenuItem {
-        let bookmarkEntityInfo = entity.flatMap { BookmarkEntityInfo(entity: $0, parent: parent) }
-        return NSMenuItem(title: UserText.bookmarksBarContextMenuMoveToEnd, action: #selector(BookmarkMenuItemSelectors.moveToEnd(_:)), representedObject: bookmarkEntityInfo)
+    static func moveToEndMenuItem(entity: BaseBookmarkEntity?, target: AnyObject?) -> NSMenuItem {
+        NSMenuItem(title: UserText.bookmarksBarContextMenuMoveToEnd, action: #selector(BookmarkMenuItemSelectors.moveToEnd(_:)), target: target, representedObject: entity)
     }
 
-    static func showInFolderMenuItem(bookmark: Bookmark?, parent: BookmarkFolder?) -> NSMenuItem {
-        NSMenuItem(title: UserText.showInFolder, action: #selector(BookmarkSearchMenuItemSelectors.showInFolder(_:)), representedObject: bookmark)
+    static func showInFolderMenuItem(bookmark: Bookmark?, target: AnyObject?) -> NSMenuItem {
+        NSMenuItem(title: UserText.showInFolder, action: #selector(BookmarkSearchMenuItemSelectors.showInFolder(_:)), target: target, representedObject: bookmark)
     }
 
     // MARK: - Bookmark Folder Menu Items
 
-    static func openInNewTabsMenuItem(folder: BookmarkFolder?) -> NSMenuItem {
-        NSMenuItem(title: UserText.openAllInNewTabs, action: #selector(FolderMenuItemSelectors.openInNewTabs(_:)), representedObject: folder)
+    static func openInNewTabsMenuItem(folder: BookmarkFolder?, target: AnyObject?) -> NSMenuItem {
+        NSMenuItem(title: UserText.openAllInNewTabs, action: #selector(FolderMenuItemSelectors.openInNewTabs(_:)), target: target, representedObject: folder)
     }
 
-    static func openAllInNewWindowMenuItem(folder: BookmarkFolder?) -> NSMenuItem {
-        NSMenuItem(title: UserText.openAllTabsInNewWindow, action: #selector(FolderMenuItemSelectors.openAllInNewWindow(_:)), representedObject: folder)
+    static func openAllInNewWindowMenuItem(folder: BookmarkFolder?, target: AnyObject?) -> NSMenuItem {
+        NSMenuItem(title: UserText.openAllTabsInNewWindow, action: #selector(FolderMenuItemSelectors.openAllInNewWindow(_:)), target: target, representedObject: folder)
     }
 
-    static func addFolderMenuItem(folder: BookmarkFolder?, target: AnyObject?) -> NSMenuItem {
-        NSMenuItem(title: UserText.addFolder, action: #selector(FolderMenuItemSelectors.newFolder(_:)), target: target, representedObject: folder)
+    static func addNewFolderMenuItem(entity: BaseBookmarkEntity?, target: AnyObject?) -> NSMenuItem {
+        NSMenuItem(title: UserText.addFolder, action: #selector(FolderMenuItemSelectors.newFolder(_:)), target: target, representedObject: entity)
     }
 
-    static func showInFolderMenuItem(folder: BookmarkFolder?, parent: BookmarkFolder?) -> NSMenuItem {
-        NSMenuItem(title: UserText.showInFolder, action: #selector(BookmarkSearchMenuItemSelectors.showInFolder(_:)), representedObject: folder)
+    static func showInFolderMenuItem(folder: BookmarkFolder?, target: AnyObject?) -> NSMenuItem {
+        NSMenuItem(title: UserText.showInFolder, action: #selector(BookmarkSearchMenuItemSelectors.showInFolder(_:)), target: target, representedObject: folder)
     }
 
-    static func editFolderMenuItem(folder: BookmarkFolder?, parent: BookmarkFolder?) -> NSMenuItem {
-        let folderEntityInfo = folder.flatMap { BookmarkEntityInfo(entity: $0, parent: parent) }
-        return NSMenuItem(title: UserText.editBookmark, action: #selector(FolderMenuItemSelectors.editFolder(_:)), representedObject: folderEntityInfo)
+    static func editFolderMenuItem(folder: BookmarkFolder?, target: AnyObject?) -> NSMenuItem {
+        return NSMenuItem(title: UserText.editBookmark, action: #selector(FolderMenuItemSelectors.editFolder(_:)), target: target, representedObject: folder)
     }
 
-    static func deleteFolderMenuItem(folder: BookmarkFolder?) -> NSMenuItem {
-        NSMenuItem(title: UserText.bookmarksBarContextMenuDelete, action: #selector(FolderMenuItemSelectors.deleteFolder(_:)), representedObject: folder)
+    static func deleteFolderMenuItem(folder: BookmarkFolder?, target: AnyObject?) -> NSMenuItem {
+        NSMenuItem(title: UserText.bookmarksBarContextMenuDelete, action: #selector(FolderMenuItemSelectors.deleteFolder(_:)), target: target, representedObject: folder)
     }
 
     // MARK: - Multi-Item Menu Creation
 
-    static func openBookmarksInNewTabsMenuItem(bookmarks: [Bookmark]) -> NSMenuItem {
-        NSMenuItem(title: UserText.bookmarksOpenInNewTabs, action: #selector(FolderMenuItemSelectors.openInNewTabs(_:)), representedObject: bookmarks)
+    static func openBookmarksInNewTabsMenuItem(bookmarks: [Bookmark], target: AnyObject?) -> NSMenuItem {
+        NSMenuItem(title: UserText.bookmarksOpenInNewTabs, action: #selector(FolderMenuItemSelectors.openInNewTabs(_:)), target: target, representedObject: bookmarks)
     }
 
     static func menuItems(for entities: [BaseBookmarkEntity], target: AnyObject?) -> [NSMenuItem] {
@@ -254,27 +254,23 @@ private extension BookmarksContextMenu {
         let bookmarks = entities.compactMap({ $0 as? Bookmark })
 
         if !bookmarks.isEmpty {
-            menuItems.append(openBookmarksInNewTabsMenuItem(bookmarks: bookmarks))
+            menuItems.append(openBookmarksInNewTabsMenuItem(bookmarks: bookmarks, target: target))
 
             // If all selected items are bookmarks and they all have the same favourite status, show a menu item to add/remove them all as favourites.
             if bookmarks.count == entities.count {
                 if bookmarks.allSatisfy({ $0.isFavorite }) {
-                    menuItems.append(addBookmarksToFavoritesMenuItem(bookmarks: bookmarks, allFavorites: true))
+                    menuItems.append(addBookmarksToFavoritesMenuItem(bookmarks: bookmarks, allFavorites: true, target: target))
                 } else if bookmarks.allSatisfy({ !$0.isFavorite }) {
-                    menuItems.append(addBookmarksToFavoritesMenuItem(bookmarks: bookmarks, allFavorites: false))
+                    menuItems.append(addBookmarksToFavoritesMenuItem(bookmarks: bookmarks, allFavorites: false, target: target))
                 }
             }
 
             menuItems.append(NSMenuItem.separator())
         }
 
-        let deleteItem = NSMenuItem(title: UserText.bookmarksBarContextMenuDelete, action: #selector(BookmarkMenuItemSelectors.deleteEntities(_:)), keyEquivalent: "")
+        let deleteItem = NSMenuItem(title: UserText.bookmarksBarContextMenuDelete, action: #selector(BookmarkMenuItemSelectors.deleteEntities(_:)), target: target, keyEquivalent: "")
         deleteItem.representedObject = entities
         menuItems.append(deleteItem)
-
-        for menuItem in menuItems {
-            menuItem.target = target
-        }
 
         return menuItems
     }
@@ -362,13 +358,13 @@ extension BookmarksContextMenu: BookmarkMenuItemSelectors {
     }
 
     @objc func moveToEnd(_ sender: NSMenuItem) {
-        guard let bookmarkEntity = sender.representedObject as? BookmarksEntityIdentifiable else {
-            assertionFailure("Failed to cast menu item's represented object to BookmarkEntity")
+        guard let entity = sender.representedObject as? BaseBookmarkEntity else {
+            assertionFailure("Failed to cast menu item's represented object to BaseBookmarkEntity")
             return
         }
 
-        let parentFolderType: ParentFolderType = bookmarkEntity.parentId.flatMap { .parent(uuid: $0) } ?? .root
-        bookmarkManager.move(objectUUIDs: [bookmarkEntity.entityId], toIndex: nil, withinParentFolder: parentFolderType) { _ in }
+        let parentFolderType: ParentFolderType = entity.parentFolderUUID.flatMap { .parent(uuid: $0) } ?? .root
+        bookmarkManager.move(objectUUIDs: [entity.id], toIndex: nil, withinParentFolder: parentFolderType) { _ in }
     }
 
 }
@@ -377,21 +373,39 @@ extension BookmarksContextMenu: FolderMenuItemSelectors {
 
     @MainActor
     @objc func newFolder(_ sender: Any?) {
-        let parentFolder = (sender as? NSMenuItem)?.representedObject as? BookmarkFolder
+        var representedObject: Any?
+        switch sender {
+        case let menuItem as NSMenuItem:
+            representedObject = menuItem.representedObject
+        case let button as NSControl:
+            representedObject = button.cell?.representedObject
+        default:
+            assertionFailure("Unexpected sender \(String(describing: sender))")
+        }
+        var parentFolder: BookmarkFolder?
+        switch representedObject {
+        case let folder as BookmarkFolder:
+            parentFolder = folder
+        case let bookmark as Bookmark:
+            parentFolder = bookmark.parentFolderUUID.flatMap(bookmarkManager.getBookmarkFolder(withId:))
+        case .none:
+            parentFolder = bookmarksContextMenuDelegate?.parentFolder
+        case .some(let object):
+            assertionFailure("Unexpected representedObject: \(object)")
+        }
+
         let view = BookmarksDialogViewFactory.makeAddBookmarkFolderView(parentFolder: parentFolder, bookmarkManager: bookmarkManager)
         bookmarksContextMenuDelegate?.showDialog(view)
     }
 
     @MainActor
     @objc func editFolder(_ sender: NSMenuItem) {
-        guard let bookmarkEntityInfo = sender.representedObject as? BookmarkEntityInfo,
-              let folder = bookmarkEntityInfo.entity as? BookmarkFolder
-        else {
+        guard let folder = sender.representedObject as? BookmarkFolder else {
             assertionFailure("Failed to retrieve Bookmark from Edit Folder context menu item")
             return
         }
-
-        let view = BookmarksDialogViewFactory.makeEditBookmarkFolderView(folder: folder, parentFolder: bookmarkEntityInfo.parent, bookmarkManager: bookmarkManager)
+        let parent = folder.parentFolderUUID.flatMap(bookmarkManager.getBookmarkFolder(withId:))
+        let view = BookmarksDialogViewFactory.makeEditBookmarkFolderView(folder: folder, parentFolder: parent, bookmarkManager: bookmarkManager)
         bookmarksContextMenuDelegate?.showDialog(view)
     }
 

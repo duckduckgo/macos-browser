@@ -1874,8 +1874,6 @@
 		9F872D9E2B9058D000138637 /* Bookmarks+TabTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F872D9C2B9058D000138637 /* Bookmarks+TabTests.swift */; };
 		9F872DA02B90644800138637 /* ContextualMenuTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F872D9F2B90644800138637 /* ContextualMenuTests.swift */; };
 		9F872DA12B90644800138637 /* ContextualMenuTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F872D9F2B90644800138637 /* ContextualMenuTests.swift */; };
-		9F872DA32B90920F00138637 /* BookmarkFolderInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F872DA22B90920F00138637 /* BookmarkFolderInfo.swift */; };
-		9F872DA42B90920F00138637 /* BookmarkFolderInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F872DA22B90920F00138637 /* BookmarkFolderInfo.swift */; };
 		9F8D57322BCCCB9A00AEA660 /* UserDefaultsBookmarkFoldersStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F8D57312BCCCB9A00AEA660 /* UserDefaultsBookmarkFoldersStoreTests.swift */; };
 		9F8D57332BCCCB9A00AEA660 /* UserDefaultsBookmarkFoldersStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F8D57312BCCCB9A00AEA660 /* UserDefaultsBookmarkFoldersStoreTests.swift */; };
 		9F982F0D2B8224BF00231028 /* AddEditBookmarkFolderDialogViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F982F0C2B8224BE00231028 /* AddEditBookmarkFolderDialogViewModel.swift */; };
@@ -3796,7 +3794,6 @@
 		9F872D972B8DA9F800138637 /* Bookmarks+Tab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bookmarks+Tab.swift"; sourceTree = "<group>"; };
 		9F872D9C2B9058D000138637 /* Bookmarks+TabTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bookmarks+TabTests.swift"; sourceTree = "<group>"; };
 		9F872D9F2B90644800138637 /* ContextualMenuTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextualMenuTests.swift; sourceTree = "<group>"; };
-		9F872DA22B90920F00138637 /* BookmarkFolderInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkFolderInfo.swift; sourceTree = "<group>"; };
 		9F8D57312BCCCB9A00AEA660 /* UserDefaultsBookmarkFoldersStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsBookmarkFoldersStoreTests.swift; sourceTree = "<group>"; };
 		9F982F0C2B8224BE00231028 /* AddEditBookmarkFolderDialogViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditBookmarkFolderDialogViewModel.swift; sourceTree = "<group>"; };
 		9F982F112B82268F00231028 /* AddEditBookmarkFolderDialogViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditBookmarkFolderDialogViewModelTests.swift; sourceTree = "<group>"; };
@@ -7715,7 +7712,6 @@
 			children = (
 				AAC5E4CD25D6A709007F5990 /* Bookmark.swift */,
 				841BE93D2C6F235F00E9C2B5 /* BookmarkDragDropManager.swift */,
-				9F872DA22B90920F00138637 /* BookmarkFolderInfo.swift */,
 				AAC5E4CF25D6A709007F5990 /* BookmarkList.swift */,
 				4B9292D82667124B00AD2C21 /* BookmarkListTreeControllerDataSource.swift */,
 				BBB881872C4029BA001247C6 /* BookmarkListTreeControllerSearchDataSource.swift */,
@@ -10778,7 +10774,6 @@
 				3706FC67293F65D500E42796 /* OperatingSystemVersionExtension.swift in Sources */,
 				7B6545EE2C0779D500115BEA /* VPNControllerUDSClient+ConvenienceInitializers.swift in Sources */,
 				B6F9BDE52B45CD1900677B33 /* ModalView.swift in Sources */,
-				9F872DA42B90920F00138637 /* BookmarkFolderInfo.swift in Sources */,
 				7B60AFFE2C514269008E32A3 /* VPNURLEventHandler.swift in Sources */,
 				B677FC502B06376B0099EB04 /* ReportFeedbackView.swift in Sources */,
 				3706FC68293F65D500E42796 /* ToggleableScrollView.swift in Sources */,
@@ -11686,7 +11681,6 @@
 				AAAB9114288EB1D600A057A9 /* CleanThisHistoryMenuItem.swift in Sources */,
 				1D0DE9412C3BB9CC0037ABC2 /* ReleaseNotesParser.swift in Sources */,
 				B6C0B23626E732000031CB7F /* DownloadListItem.swift in Sources */,
-				9F872DA32B90920F00138637 /* BookmarkFolderInfo.swift in Sources */,
 				4B9DB0232A983B24000927DB /* WaitlistRequest.swift in Sources */,
 				4BE3A6C12C16BEB1003FC378 /* VPNRedditSessionWorkaround.swift in Sources */,
 				B6B1E87E26D5DA0E0062C350 /* DownloadsPopover.swift in Sources */,

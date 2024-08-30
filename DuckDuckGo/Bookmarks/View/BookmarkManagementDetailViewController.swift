@@ -37,7 +37,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     private let toolbarButtonsStackView = NSStackView()
     private lazy var newBookmarkButton = MouseOverButton(title: "  " + UserText.newBookmark, target: self, action: #selector(presentAddBookmarkModal))
         .withAccessibilityIdentifier("BookmarkManagementDetailViewController.newBookmarkButton")
-    private lazy var newFolderButton = MouseOverButton(title: "  " + UserText.newFolder, target: self, action: #selector(FolderMenuItemSelectors.newFolder))
+    private lazy var newFolderButton = MouseOverButton(title: "  " + UserText.newFolder, target: tableView.menu, action: #selector(FolderMenuItemSelectors.newFolder))
         .withAccessibilityIdentifier("BookmarkManagementDetailViewController.newFolderButton")
     private lazy var deleteItemsButton = MouseOverButton(title: "  " + UserText.bookmarksBarContextMenuDelete, target: self, action: #selector(delete))
         .withAccessibilityIdentifier("BookmarkManagementDetailViewController.deleteItemsButton")
@@ -100,6 +100,9 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         view = ColorView(frame: .zero, backgroundColor: .bookmarkPageBackground)
         view.translatesAutoresizingMaskIntoConstraints = false
 
+        // set menu before `newFolderButton` initialization as it uses the menu as its target
+        tableView.menu = BookmarksContextMenu(bookmarkManager: bookmarkManager, delegate: self)
+
         view.addSubview(separator)
         view.addSubview(scrollView)
         view.addSubview(emptyState)
@@ -159,7 +162,6 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         scrollView.usesPredominantAxisScrolling = false
         scrollView.automaticallyAdjustsContentInsets = false
         scrollView.contentInsets = NSEdgeInsets(top: 22, left: 0, bottom: 22, right: 0)
-        scrollView.menu = BookmarksContextMenu(bookmarkManager: bookmarkManager, delegate: self)
 
         let clipView = NSClipView()
         clipView.documentView = tableView
@@ -170,7 +172,6 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         clipView.frame = CGRect(x: 0, y: 0, width: 640, height: 601)
 
         tableView.addTableColumn(NSTableColumn())
-
         tableView.headerView = nil
         tableView.backgroundColor = .clear
         tableView.setContentHuggingPriority(.defaultHigh, for: .vertical)
@@ -520,6 +521,8 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
     }
 
     private func updateToolbarButtons() {
+        newFolderButton.cell?.representedObject = selectionState.folder
+
         let shouldShowDeleteButton = tableView.selectedRowIndexes.count > 1
         NSAnimationContext.runAnimationGroup { context in
             context.duration = 0.25
@@ -584,6 +587,7 @@ private extension BookmarkManagementDetailViewController {
 extension BookmarkManagementDetailViewController: BookmarkTableCellViewDelegate {
 
     func bookmarkTableCellViewRequestedMenu(_ sender: NSButton, cell: BookmarkTableCellView) {
+        // will update the menu using `BookmarksContextMenuDelegate.selectedItems`
         tableView.menu?.popUpAtMouseLocation(in: cell)
     }
 
@@ -602,7 +606,9 @@ extension BookmarkManagementDetailViewController: BookmarksContextMenuDelegate {
     var shouldIncludeManageBookmarksItem: Bool { false }
 
     func selectedItems() -> [Any] {
-        guard let row = tableView.clickedRowIfValid else { return [] }
+        guard let row = tableView.clickedRowIfValid ?? tableView.withMouseLocationInViewCoordinates(convert: { point in
+            tableView.row(at: point)
+        }), row != -1 else { return [] }
 
         // If only one item is selected try to get the item and its parent folder otherwise show the menu for multiple items.
         if tableView.selectedRowIndexes.contains(row), tableView.selectedRowIndexes.count > 1 {
