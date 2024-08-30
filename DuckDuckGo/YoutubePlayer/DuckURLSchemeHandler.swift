@@ -19,6 +19,7 @@
 import Foundation
 import WebKit
 import ContentScopeScripts
+import PhishingDetection
 
 final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
 
@@ -33,6 +34,8 @@ final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
             handleSpecialPages(urlSchemeTask: urlSchemeTask)
         case .duckPlayer:
             handleDuckPlayer(requestURL: requestURL, urlSchemeTask: urlSchemeTask, webView: webView)
+        case .phishingErrorPage:
+            handleErrorPage(urlSchemeTask: urlSchemeTask)
         default:
             handleNativeUIPages(requestURL: requestURL, urlSchemeTask: urlSchemeTask)
         }
@@ -166,11 +169,46 @@ private extension DuckURLSchemeHandler {
 
 }
 
+// MARK: Error Page
+private extension DuckURLSchemeHandler {
+    func handleErrorPage(urlSchemeTask: WKURLSchemeTask) {
+        guard let requestURL = urlSchemeTask.request.url else {
+            assertionFailure("No URL for error page scheme handler")
+            return
+        }
+
+        guard requestURL.isPhishingErrorPage,
+              let urlString = requestURL.getParameter(named: "url"),
+              let decodedData = URLTokenValidator.base64URLDecode(base64URLString: urlString),
+              let decodedString = String(data: decodedData, encoding: .utf8),
+              let url = URL(string: decodedString),
+              let token = requestURL.getParameter(named: "token"),
+              URLTokenValidator.shared.validateToken(token, for: url) else {
+            let error = WKError.unknown
+            let nsError = NSError(domain: "Unexpected Error", code: error.rawValue, userInfo: [
+                NSURLErrorFailingURLErrorKey: "about:blank",
+                NSLocalizedDescriptionKey: "Unexpected Error"
+            ])
+            urlSchemeTask.didFailWithError(nsError)
+            return
+        }
+
+        let error = PhishingDetectionError.detected
+        let nsError = NSError(domain: PhishingDetectionError.errorDomain, code: error.errorCode, userInfo: [
+            NSURLErrorFailingURLErrorKey: url,
+            NSLocalizedDescriptionKey: error.errorUserInfo[NSLocalizedDescriptionKey] ?? "Phishing detected"
+        ])
+        urlSchemeTask.didFailWithError(nsError)
+        return
+    }
+}
+
 extension URL {
     enum URLType {
         case onboarding
         case duckPlayer
         case releaseNotes
+        case phishingErrorPage
     }
 
     var type: URLType? {
@@ -178,6 +216,8 @@ extension URL {
             return .duckPlayer
         } else if self.isOnboarding {
             return .onboarding
+        } else if self.isPhishingErrorPage {
+            return .phishingErrorPage
         } else if self.isReleaseNotesScheme {
             return .releaseNotes
         } else {
@@ -195,6 +235,14 @@ extension URL {
 
     var isReleaseNotesScheme: Bool {
         return isDuckURLScheme && host == "release-notes"
+    }
+    
+    var isErrorPage: Bool {
+        isDuckURLScheme && self.host == "error"
+    }
+
+    var isPhishingErrorPage: Bool {
+        isErrorPage && self.getParameter(named: "reason") == "phishing" && self.getParameter(named: "url") != nil
     }
 
 }
