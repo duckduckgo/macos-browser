@@ -26,6 +26,7 @@ import WebKit
 import History
 import PixelKit
 import PhishingDetection
+import SpecialErrorPages
 import os.log
 
 protocol TabDelegate: ContentOverlayUserScriptDelegate {
@@ -1226,12 +1227,17 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
     @MainActor
     private func loadErrorHTML(_ error: WKError, header: String, forUnreachableURL url: URL, alternate: Bool) {
-        let html = ErrorPageHTMLTemplate(error: error, header: header).makeHTMLFromTemplate()
-        if alternate {
+        if error.localizedDescription == PhishingDetectionError.detected.localizedDescription {
+            let html = SpecialErrorPageHTMLTemplate.htmlFromTemplate
             webView.loadAlternateHTML(html, baseURL: .error, forUnreachableURL: url)
         } else {
-            // this should be updated using an error page update script call when (if) we have a dynamic error page content implemented
-            webView.setDocumentHtml(html)
+            let html = ErrorPageHTMLTemplate(error: error, header: header).makeHTMLFromTemplate()
+            if alternate {
+                webView.loadAlternateHTML(html, baseURL: .error, forUnreachableURL: url)
+            } else {
+                // this should be updated using an error page update script call when (if) we have a dynamic error page content implemented
+                webView.setDocumentHtml(html)
+            }
         }
     }
 
