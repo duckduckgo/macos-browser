@@ -53,6 +53,57 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
                                                                   userNotificationService: mockUserNotification)
     }
 
+    func testWhenStartImmediateScanOperations_thenCreatorIsCalledWithManualScanOperationType() async throws {
+        // Given
+        sut = DefaultDataBrokerProtectionQueueManager(operationQueue: mockQueue,
+                                                      operationsCreator: mockOperationsCreator,
+                                                      mismatchCalculator: mockMismatchCalculator,
+                                                      brokerUpdater: mockUpdater,
+                                                      pixelHandler: mockPixelHandler)
+
+        // When
+        sut.startImmediateScanOperationsIfPermitted(showWebView: false,
+                                                operationDependencies: mockDependencies,
+                                                   completion: nil)
+
+        // Then
+        XCTAssertEqual(mockOperationsCreator.createdType, .manualScan)
+    }
+
+    func testWhenStartScheduledAllOperations_thenCreatorIsCalledWithAllOperationType() async throws {
+        // Given
+        sut = DefaultDataBrokerProtectionQueueManager(operationQueue: mockQueue,
+                                                      operationsCreator: mockOperationsCreator,
+                                                      mismatchCalculator: mockMismatchCalculator,
+                                                      brokerUpdater: mockUpdater,
+                                                      pixelHandler: mockPixelHandler)
+
+        // When
+        sut.startScheduledAllOperationsIfPermitted(showWebView: false,
+                                                operationDependencies: mockDependencies,
+                                                   completion: nil)
+
+        // Then
+        XCTAssertEqual(mockOperationsCreator.createdType, .all)
+    }
+
+    func testWhenStartScheduledScanOperations_thenCreatorIsCalledWithScheduledScanOperationType() async throws {
+        // Given
+        sut = DefaultDataBrokerProtectionQueueManager(operationQueue: mockQueue,
+                                                      operationsCreator: mockOperationsCreator,
+                                                      mismatchCalculator: mockMismatchCalculator,
+                                                      brokerUpdater: mockUpdater,
+                                                      pixelHandler: mockPixelHandler)
+
+        // When
+        sut.startScheduledScanOperationsIfPermitted(showWebView: false,
+                                                operationDependencies: mockDependencies,
+                                                   completion: nil)
+
+        // Then
+        XCTAssertEqual(mockOperationsCreator.createdType, .scheduledScan)
+    }
+
     func testWhenStartImmediateScan_andScanCompletesWithErrors_thenCompletionIsCalledWithErrors() async throws {
         // Given
         sut = DefaultDataBrokerProtectionQueueManager(operationQueue: mockQueue,
@@ -90,8 +141,8 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
                                                       mismatchCalculator: mockMismatchCalculator,
                                                       brokerUpdater: mockUpdater,
                                                       pixelHandler: mockPixelHandler)
-        let mockOperation = MockDataBrokerOperation(id: 1, operationType: .manualScan, errorDelegate: sut)
-        let mockOperationWithError = MockDataBrokerOperation(id: 2, operationType: .manualScan, errorDelegate: sut, shouldError: true)
+        let mockOperation = MockDataBrokerOperation(id: 1, operationType: .all, errorDelegate: sut)
+        let mockOperationWithError = MockDataBrokerOperation(id: 2, operationType: .all, errorDelegate: sut, shouldError: true)
         mockOperationsCreator.operationCollections = [mockOperation, mockOperationWithError]
         let expectation = expectation(description: "Expected errors to be returned in completion")
         var errorCollection: DataBrokerProtectionAgentErrorCollection!
@@ -120,8 +171,8 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
                                                       mismatchCalculator: mockMismatchCalculator,
                                                       brokerUpdater: mockUpdater,
                                                       pixelHandler: mockPixelHandler)
-        let mockOperation = MockDataBrokerOperation(id: 1, operationType: .manualScan, errorDelegate: sut)
-        let mockOperationWithError = MockDataBrokerOperation(id: 2, operationType: .manualScan, errorDelegate: sut, shouldError: true)
+        let mockOperation = MockDataBrokerOperation(id: 1, operationType: .scheduledScan, errorDelegate: sut)
+        let mockOperationWithError = MockDataBrokerOperation(id: 2, operationType: .scheduledScan, errorDelegate: sut, shouldError: true)
         mockOperationsCreator.operationCollections = [mockOperation, mockOperationWithError]
         let expectation = expectation(description: "Expected errors to be returned in completion")
         var errorCollection: DataBrokerProtectionAgentErrorCollection!
