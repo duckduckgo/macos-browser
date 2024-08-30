@@ -25,6 +25,7 @@ extension HomePage.Views {
         let customBackground: CustomBackground?
         @ViewBuilder let content: () -> Content
 
+        @State var isHovering = false
         @EnvironmentObject var model: HomePage.Models.SettingsModel
 
         init(
@@ -53,8 +54,25 @@ extension HomePage.Views {
                     .stroke(Color.homeSettingsBackgroundPreviewStroke)
                     .frame(height: SettingsView.Const.gridItemHeight)
                     .background(selectionBackground)
+                if case .userImage(let image) = customBackground {
+                    HStack {
+                        Spacer()
+                        VStack {
+                            CloseButton(icon: .close, size: 16) {
+                                model.customImagesManager?.deleteImage(image)
+                            }
+                            .colorScheme(image.colorScheme)
+                            .visibility(isHovering ? .visible : .gone)
+                            Spacer()
+                        }
+                    }
+                    .padding([.top, .trailing], 4)
+                }
             }
             .contentShape(Rectangle())
+            .onHover { isHovering in
+                self.isHovering = isHovering
+            }
         }
 
         @ViewBuilder
