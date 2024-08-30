@@ -248,6 +248,7 @@ extension AppDelegate {
 
         DeviceAuthenticator.shared.authenticateUser(reason: .exportLogins) { authenticationResult in
             guard authenticationResult.authenticated else {
+
                 return
             }
 
@@ -792,6 +793,7 @@ extension MainViewController {
                                                           eventMapping: EventMapping<AutofillPixelEvent> { _, _, _, _ in },
                                                           installDate: nil)
         autofillPixelReporter.resetStoreDefaults()
+        UserDefaults.standard.hasImportedLogins = false
     }
 
     @objc func resetBookmarks(_ sender: Any?) {
