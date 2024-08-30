@@ -23,11 +23,13 @@ import Common
 @testable import DataBrokerProtection
 
 final class DataBrokerProtectionAgentStopperTests: XCTestCase {
-   private var mockPixelHandler: EventMapping<DataBrokerProtectionPixels>!
-   private var mockAuthenticationManager: MockAuthenticationManager!
-   private var mockEntitlementMonitor: DataBrokerProtectionEntitlementMonitor!
-   private var mockDataManager: MockDataBrokerProtectionDataManager!
-   private var mockStopAction: MockDataProtectionStopAction!
+
+    private var mockPixelHandler: EventMapping<DataBrokerProtectionPixels>!
+    private var mockAuthenticationManager: MockAuthenticationManager!
+    private var mockEntitlementMonitor: DataBrokerProtectionEntitlementMonitor!
+    private var mockDataManager: MockDataBrokerProtectionDataManager!
+    private var mockStopAction: MockDataProtectionStopAction!
+    private var mockFreemiumPIRUserState: MockFreemiumPIRUserState!
 
     private var fakeProfile: DataBrokerProtectionProfile {
         let name = DataBrokerProtectionProfile.Name(firstName: "John", lastName: "Doe")
@@ -44,6 +46,8 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
         mockDataManager = MockDataBrokerProtectionDataManager(pixelHandler: mockPixelHandler,
                                                               fakeBrokerFlag: DataBrokerDebugFlagFakeBroker())
         mockStopAction = MockDataProtectionStopAction()
+        mockFreemiumPIRUserState = MockFreemiumPIRUserState()
+        mockFreemiumPIRUserState.isActiveUser = false
     }
 
     override func tearDown() {
@@ -64,7 +68,8 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               entitlementMonitor: mockEntitlementMonitor,
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
-                                                              stopAction: mockStopAction)
+                                                              stopAction: mockStopAction,
+                                                              freemiumPIRUserState: mockFreemiumPIRUserState)
         await stopper.validateRunPrerequisitesAndStopAgentIfNecessary()
 
         XCTAssertTrue(mockStopAction.wasStopCalled)
@@ -79,7 +84,8 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               entitlementMonitor: mockEntitlementMonitor,
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
-                                                              stopAction: mockStopAction)
+                                                              stopAction: mockStopAction,
+                                                              freemiumPIRUserState: mockFreemiumPIRUserState)
         await stopper.validateRunPrerequisitesAndStopAgentIfNecessary()
 
         XCTAssertTrue(mockStopAction.wasStopCalled)
@@ -94,7 +100,8 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               entitlementMonitor: mockEntitlementMonitor,
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
-                                                              stopAction: mockStopAction)
+                                                              stopAction: mockStopAction,
+                                                              freemiumPIRUserState: mockFreemiumPIRUserState)
         await stopper.validateRunPrerequisitesAndStopAgentIfNecessary()
 
         XCTAssertTrue(mockStopAction.wasStopCalled)
@@ -109,7 +116,8 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               entitlementMonitor: mockEntitlementMonitor,
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
-                                                              stopAction: mockStopAction)
+                                                              stopAction: mockStopAction,
+                                                              freemiumPIRUserState: mockFreemiumPIRUserState)
         await stopper.validateRunPrerequisitesAndStopAgentIfNecessary()
 
         XCTAssertFalse(mockStopAction.wasStopCalled)
@@ -124,7 +132,8 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               entitlementMonitor: mockEntitlementMonitor,
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
-                                                              stopAction: mockStopAction)
+                                                              stopAction: mockStopAction,
+                                                              freemiumPIRUserState: mockFreemiumPIRUserState)
         await stopper.validateRunPrerequisitesAndStopAgentIfNecessary()
 
         XCTAssertFalse(mockStopAction.wasStopCalled)
@@ -139,7 +148,8 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               entitlementMonitor: mockEntitlementMonitor,
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
-                                                              stopAction: mockStopAction)
+                                                              stopAction: mockStopAction,
+                                                              freemiumPIRUserState: mockFreemiumPIRUserState)
 
         let expectation = XCTestExpectation(description: "Wait for monitor")
         stopper.monitorEntitlementAndStopAgentIfEntitlementIsInvalid(interval: 0.1)
@@ -161,7 +171,8 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               entitlementMonitor: mockEntitlementMonitor,
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
-                                                              stopAction: mockStopAction)
+                                                              stopAction: mockStopAction,
+                                                              freemiumPIRUserState: mockFreemiumPIRUserState)
 
         let expectation = XCTestExpectation(description: "Wait for monitor")
         stopper.monitorEntitlementAndStopAgentIfEntitlementIsInvalid(interval: 0.1)
@@ -183,7 +194,8 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               entitlementMonitor: mockEntitlementMonitor,
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
-                                                              stopAction: mockStopAction)
+                                                              stopAction: mockStopAction,
+                                                              freemiumPIRUserState: mockFreemiumPIRUserState)
 
         let expectation = XCTestExpectation(description: "Wait for monitor")
         stopper.monitorEntitlementAndStopAgentIfEntitlementIsInvalid(interval: 0.1)
