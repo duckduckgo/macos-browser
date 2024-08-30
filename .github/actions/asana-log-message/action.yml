@@ -27,7 +27,7 @@ runs:
       shell: bash
       env:
         ASANA_ACCESS_TOKEN: ${{ inputs.access-token }}
-      run: bundle exec fastlane run asana_get_release_automation_subtask_id task_url:"${{ inputs.release-task-url }}"
+      run: bundle exec fastlane run asana_get_release_automation_subtask_id task_url:"${{ inputs.task-url }}"
 
     - id: get-asana-user-id
       if: github.event_name != 'schedule'
