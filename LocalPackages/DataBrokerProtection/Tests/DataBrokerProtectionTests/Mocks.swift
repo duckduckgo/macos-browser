@@ -22,6 +22,7 @@ import Common
 import Foundation
 import GRDB
 import SecureStorage
+import Freemium
 
 @testable import DataBrokerProtection
 
@@ -1928,4 +1929,9 @@ struct MockMigrationsProvider: DataBrokerProtectionDatabaseMigrationsProvider {
         didCallV4Migrations = true
         return { _ in }
     }
+}
+
+struct MockFreemiumPIRUserState: FreemiumPIRUserState {
+    var didOnboard = false
+    var isActiveUser = false
 }

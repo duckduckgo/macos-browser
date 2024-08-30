@@ -20,11 +20,14 @@ import Foundation
 import Common
 import BrowserServicesKit
 import PixelKit
+import Freemium
+import Subscription
 
 // This is to avoid exposing all the dependancies outside of the DBP package
 public class DataBrokerProtectionAgentManagerProvider {
 
-    public static func agentManager(authenticationManager: DataBrokerProtectionAuthenticationManaging) -> DataBrokerProtectionAgentManager {
+    public static func agentManager(authenticationManager: DataBrokerProtectionAuthenticationManaging, 
+                                    accountManager: AccountManager) -> DataBrokerProtectionAgentManager {
         let pixelHandler = DataBrokerProtectionPixelsHandler()
 
         let executionConfig = DataBrokerExecutionConfig()
@@ -72,10 +75,13 @@ public class DataBrokerProtectionAgentManagerProvider {
                                                          emailService: emailService,
                                                          captchaService: captchaService)
 
+        let freemiumPIRUserState = DefaultFreemiumPIRUserState(userDefaults: .dbp, accountManager: accountManager)
+
         let agentstopper = DefaultDataBrokerProtectionAgentStopper(dataManager: dataManager,
                                                                    entitlementMonitor: DataBrokerProtectionEntitlementMonitor(),
                                                                    authenticationManager: authenticationManager,
-                                                                   pixelHandler: pixelHandler)
+                                                                   pixelHandler: pixelHandler,
+                                                                   freemiumPIRUserState: freemiumPIRUserState)
 
         let operationDependencies = DefaultDataBrokerOperationDependencies(
             database: dataManager.database,

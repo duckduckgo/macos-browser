@@ -112,7 +112,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
                                                                    entitlementMonitor: DataBrokerProtectionEntitlementMonitor(),
                                                                    authenticationManager: MockAuthenticationManager(),
                                                                    pixelHandler: mockPixelHandler,
-                                                                   stopAction: mockStopAction)
+                                                                   stopAction: mockStopAction, freemiumPIRUserState: MockFreemiumPIRUserState())
         sut = DataBrokerProtectionAgentManager(
             userNotificationService: mockNotificationService,
             activityScheduler: mockActivityScheduler,
