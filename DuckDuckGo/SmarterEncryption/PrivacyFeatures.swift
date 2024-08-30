@@ -47,6 +47,14 @@ final class AppPrivacyFeatures: PrivacyFeaturesProtocol {
         let domainEvent: GeneralPixel
         let dailyAndCount: Bool
 
+        var parameters = parameters ?? [:]
+
+        if let error = error as? NSError {
+            let processedErrors = CoreDataErrorsParser.parse(error: error)
+            let additionalCoreDataParameters = processedErrors.errorPixelParameters
+            parameters.merge(additionalCoreDataParameters) { (current, _) in current }
+        }
+
         switch event {
         case .dbSaveBloomFilterError:
             domainEvent = GeneralPixel.dbSaveBloomFilterError(error: error)
@@ -59,14 +67,14 @@ final class AppPrivacyFeatures: PrivacyFeaturesProtocol {
         if dailyAndCount {
             PixelKit.fire(DebugEvent(domainEvent, error: error),
                           frequency: .dailyAndCount,
-                          withAdditionalParameters: parameters ?? [:],
+                          withAdditionalParameters: parameters,
                           includeAppVersionParameter: true) { _, error in
                 onComplete(error)
             }
         } else {
             PixelKit.fire(DebugEvent(domainEvent, error: error),
                           frequency: .dailyAndCount,
-                          withAdditionalParameters: parameters ?? [:]) { _, error in
+                          withAdditionalParameters: parameters) { _, error in
                 onComplete(error)
             }
         }
