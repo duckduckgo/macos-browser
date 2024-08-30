@@ -1341,12 +1341,8 @@ final class MockIPCServer: DataBrokerProtectionIPCServer {
         serverDelegate?.startImmediateOperations(showWebView: showWebView)
     }
 
-    func startScheduledAllOperations(showWebView: Bool) {
-        serverDelegate?.startScheduledAllOperations(showWebView: showWebView)
-    }
-
-    func startScheduledScanOperations(showWebView: Bool) {
-        serverDelegate?.startScheduledScanOperations(showWebView: showWebView)
+    func startScheduledOperations(showWebView: Bool) {
+        serverDelegate?.startScheduledOperations(showWebView: showWebView)
     }
 
     func runAllOptOuts(showWebView: Bool) {
