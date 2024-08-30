@@ -30,10 +30,18 @@ final class BookmarkOutlineCellView: NSTableCellView {
         NSUserInterfaceItemIdentifier("\(mode)_\(self.className())")
     }
 
-    static let sizingCell = BookmarkOutlineCellView(identifier: BookmarkOutlineCellView.sizingCellIdentifier)
+    static let sizingCell: BookmarkOutlineCellView = {
+        let cell = BookmarkOutlineCellView(identifier: BookmarkOutlineCellView.sizingCellIdentifier)
+        cell.highlight = true // include menu button width
+        return cell
+    }()
 
     static let rowHeight: CGFloat = 28
-    private static let minUrlLabelWidth: CGFloat = 42
+    private enum Constants {
+        static let minUrlLabelWidth: CGFloat = 42
+        static let minWidth: CGFloat = 75
+        static let extraWidth: CGFloat = 6
+    }
 
     private lazy var faviconImageView = NSImageView()
     private lazy var titleLabel = NSTextField(string: "Bookmark/Folder")
@@ -252,7 +260,7 @@ final class BookmarkOutlineCellView: NSTableCellView {
         super.layout()
 
         // hide URL label if it can‘t fit meaningful text length
-        if urlLabel.isShown, urlLabel.frame.width < Self.minUrlLabelWidth {
+        if urlLabel.isShown, urlLabel.frame.width < Constants.minUrlLabelWidth {
             urlLabel.stringValue = ""
             urlLabel.isHidden = true
         }
@@ -265,15 +273,24 @@ final class BookmarkOutlineCellView: NSTableCellView {
     // MARK: - Public
 
     static func preferredContentWidth(for object: Any?) -> CGFloat {
-        guard let representedObject = (object as? BookmarkNode)?.representedObject ?? object,
-              representedObject is Bookmark || representedObject is BookmarkFolder
-                || representedObject is PseudoFolder || representedObject is MenuItemNode else { return 0 }
-
+        guard let representedObject = (object as? BookmarkNode)?.representedObject ?? object else { return 0 }
+        let extraWidth: CGFloat
+        let minWidth: CGFloat
+        switch representedObject {
+        case is Bookmark, is BookmarkFolder, is PseudoFolder:
+            minWidth = Constants.minWidth
+            extraWidth = Constants.extraWidth
+        case is MenuItemNode:
+            minWidth = 0
+            extraWidth = 0
+        default:
+            return 0
+        }
         sizingCell.frame = .zero
         sizingCell.update(from: representedObject)
         sizingCell.layoutSubtreeIfNeeded()
 
-        return sizingCell.frame.width + 6
+        return max(minWidth, sizingCell.frame.width + extraWidth)
     }
 
     func update(from object: Any, isSearch: Bool = false) {
