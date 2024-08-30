@@ -101,8 +101,12 @@ extension DefaultDataBrokerProtectionLoginItemInterface: DataBrokerProtectionLog
         ipcClient.startImmediateOperations(showWebView: showWebView)
     }
 
-    func startScheduledOperations(showWebView: Bool) {
-        ipcClient.startScheduledOperations(showWebView: showWebView)
+    func startScheduledAllOperations(showWebView: Bool) {
+        ipcClient.startScheduledAllOperations(showWebView: showWebView)
+    }
+
+    func startScheduledScanOperations(showWebView: Bool) {
+        ipcClient.startScheduledAllOperations(showWebView: showWebView)
     }
 
     func runAllOptOuts(showWebView: Bool) {

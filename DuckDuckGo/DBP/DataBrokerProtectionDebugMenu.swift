@@ -75,8 +75,12 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
 
             NSMenuItem(title: "Operations") {
                 NSMenuItem(title: "Hidden WebView") {
-                    menuItem(withTitle: "Run queued operations",
-                             action: #selector(DataBrokerProtectionDebugMenu.startScheduledOperations(_:)),
+                    menuItem(withTitle: "Run queued all operations",
+                             action: #selector(DataBrokerProtectionDebugMenu.startScheduledAllOperations(_:)),
+                             representedObject: false)
+
+                    menuItem(withTitle: "Run queued scan operations",
+                             action: #selector(DataBrokerProtectionDebugMenu.startScheduledScanOperations(_:)),
                              representedObject: false)
 
                     menuItem(withTitle: "Run scan operations",
@@ -90,7 +94,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
 
                 NSMenuItem(title: "Visible WebView") {
                     menuItem(withTitle: "Run queued operations",
-                             action: #selector(DataBrokerProtectionDebugMenu.startScheduledOperations(_:)),
+                             action: #selector(DataBrokerProtectionDebugMenu.startScheduledAllOperations(_:)),
                              representedObject: true)
 
                     menuItem(withTitle: "Run scan operations",
@@ -174,11 +178,18 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         }
     }
 
-    @objc private func startScheduledOperations(_ sender: NSMenuItem) {
-        os_log("Running queued operations...", log: .dataBrokerProtection)
+    @objc private func startScheduledAllOperations(_ sender: NSMenuItem) {
+        os_log("Running queued all operations...", log: .dataBrokerProtection)
         let showWebView = sender.representedObject as? Bool ?? false
 
-        DataBrokerProtectionManager.shared.loginItemInterface.startScheduledOperations(showWebView: showWebView)
+        DataBrokerProtectionManager.shared.loginItemInterface.startScheduledAllOperations(showWebView: showWebView)
+    }
+
+    @objc private func startScheduledScanOperations(_ sender: NSMenuItem) {
+        os_log("Running queued scan operations...", log: .dataBrokerProtection)
+        let showWebView = sender.representedObject as? Bool ?? false
+
+        DataBrokerProtectionManager.shared.loginItemInterface.startScheduledScanOperations(showWebView: showWebView)
     }
 
     @objc private func runScanOperations(_ sender: NSMenuItem) {
