@@ -82,10 +82,7 @@ extension BookmarksContextMenu {
         let object: BaseBookmarkEntity
         switch objects.first {
         case let node as BookmarkNode:
-            guard let entity = node.representedObject as? BaseBookmarkEntity else {
-                assertionFailure("Unexpected represented object \(node.representedObject)")
-                return []
-            }
+            guard let entity = node.representedObject as? BaseBookmarkEntity else { return [] }
             object = entity
         case let entity as BaseBookmarkEntity:
             object = entity
