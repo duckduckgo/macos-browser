@@ -18,7 +18,6 @@
 
 import Cocoa
 
-@MainActor
 final class SharingMenu: NSMenu {
 
     override init(title: String) {
@@ -45,6 +44,7 @@ final class SharingMenu: NSMenu {
     }
 
     typealias SharingData = (title: String?, items: [Any])
+    @MainActor
     private func sharingData() -> SharingData? {
         guard let tabViewModel = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel.selectedTabViewModel,
               tabViewModel.canReload,
@@ -80,6 +80,7 @@ final class SharingMenu: NSMenu {
                                                launchIdentifiers: nil)
     }
 
+    @MainActor
     @objc func sharingItemSelected(_ sender: NSMenuItem) {
         guard let service = sender.representedObject as? NSSharingService else {
             assertionFailure("representedObject is not NSSharingService")
