@@ -130,7 +130,8 @@ extension TabExtensionsBuilder {
                                          autoconsentUserScriptPublisher: userScripts.map(\.?.autoconsentUserScript),
                                          didUpgradeToHttpsPublisher: httpsUpgrade.didUpgradeToHttpsPublisher,
                                          trackersPublisher: contentBlocking.trackersPublisher,
-                                         webViewPublisher: args.webViewFuture)
+                                         webViewPublisher: args.webViewFuture,
+                                         phishingStateManager: dependencies.phishingStateManager)
         }
 
         add {
@@ -182,7 +183,8 @@ extension TabExtensionsBuilder {
                                 historyCoordinating: dependencies.historyCoordinating,
                                 trackersPublisher: contentBlocking.trackersPublisher,
                                 urlPublisher: args.contentPublisher.map { content in content.isUrl ? content.urlForWebView : nil },
-                                titlePublisher: args.titlePublisher)
+                                titlePublisher: args.titlePublisher,
+                                phishingStateManager: dependencies.phishingStateManager)
         }
         add {
             ExternalAppSchemeHandler(workspace: dependencies.workspace, permissionModel: args.permissionModel, contentPublisher: args.contentPublisher)
