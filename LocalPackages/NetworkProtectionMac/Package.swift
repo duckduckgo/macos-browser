@@ -32,7 +32,7 @@ let package = Package(
         .library(name: "VPNAppLauncher", targets: ["VPNAppLauncher"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "186.0.0"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "190.0.0"),
         .package(url: "https://github.com/airbnb/lottie-spm", exact: "4.4.3"),
         .package(path: "../AppLauncher"),
         .package(path: "../UDSHelper"),
@@ -84,11 +84,24 @@ let package = Package(
             ]
         ),
 
+        // MARK: - VPNPixels
+
+        .target(
+            name: "VPNPixels",
+            dependencies: [
+                .product(name: "PixelKit", package: "BrowserServicesKit"),
+            ],
+            swiftSettings: [
+                .define("DEBUG", .when(configuration: .debug))
+            ]
+        ),
+
         // MARK: - NetworkProtectionUI
 
         .target(
             name: "NetworkProtectionUI",
             dependencies: [
+                "VPNPixels",
                 .product(name: "NetworkProtection", package: "BrowserServicesKit"),
                 .product(name: "PixelKit", package: "BrowserServicesKit"),
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions"),

@@ -115,7 +115,7 @@ struct VPNMetadata: Encodable {
 }
 
 protocol VPNMetadataCollector {
-    func collectMetadata() async -> VPNMetadata
+    func collectVPNMetadata() async -> VPNMetadata
 }
 
 final class DefaultVPNMetadataCollector: VPNMetadataCollector {
@@ -162,7 +162,7 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
     }
 
     @MainActor
-    func collectMetadata() async -> VPNMetadata {
+    func collectVPNMetadata() async -> VPNMetadata {
         let appInfoMetadata = collectAppInfoMetadata()
         let deviceInfoMetadata = collectDeviceInfoMetadata()
         let networkInfoMetadata = await collectNetworkInformation()
@@ -216,17 +216,17 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
     }
 
     private func getMachineArchitecture() -> String {
-        #if arch(arm)
-            return "arm"
-        #elseif arch(arm64)
-            return "arm64"
-        #elseif arch(i386)
-            return "i386"
-        #elseif arch(x86_64)
-            return "x86_64"
-        #else
-            return "unknown"
-        #endif
+#if arch(arm)
+        return "arm"
+#elseif arch(arm64)
+        return "arm64"
+#elseif arch(i386)
+        return "i386"
+#elseif arch(x86_64)
+        return "x86_64"
+#else
+        return "unknown"
+#endif
     }
 
     func collectNetworkInformation() async -> VPNMetadata.NetworkInfo {
@@ -328,4 +328,14 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
         )
     }
 
+}
+
+// MARK: - Unified feedback form support
+
+extension VPNMetadata: UnifiedFeedbackMetadata {}
+
+extension DefaultVPNMetadataCollector: UnifiedMetadataCollector {
+    func collectMetadata() async -> VPNMetadata {
+        await collectVPNMetadata()
+    }
 }

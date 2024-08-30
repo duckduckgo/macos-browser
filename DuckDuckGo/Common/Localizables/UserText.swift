@@ -229,40 +229,7 @@ struct UserText {
     static let errorPageHeader = NSLocalizedString("page.error.header", value: "DuckDuckGo can’t load this page.", comment: "Error page heading text")
     static let webProcessCrashPageHeader = NSLocalizedString("page.crash.header", value: "This webpage has crashed.", comment: "Error page heading text shown when a Web Page process had crashed")
     static let webProcessCrashPageMessage = NSLocalizedString("page.crash.message", value: "Try reloading the page or come back later.", comment: "Error page message text shown when a Web Page process had crashed")
-    static let sslErrorPageHeader = NSLocalizedString("ssl.error.page.header", value: "Warning: This site may be insecure", comment: "Title shown in an error page that warn users of security risks on a website due to SSL issues")
     static let sslErrorPageTabTitle = NSLocalizedString("ssl.error.page.tab.title", value: "Warning: Site May Be Insecure", comment: "Title shown in an error page tab that warn users of security risks on a website due to SSL issues")
-    static func sslErrorPageBody(_ domain: String) -> String {
-        let localized = NSLocalizedString("ssl.error.page.body",
-                                          value: "The certificate for this site is invalid. You might be connecting to a server that is pretending to be %1$@ which could put your confidential information at risk.",
-                                          comment: "Error description shown in an error page that warns users of security risks on a website due to SSL issues. %1$@ represent the site domain.")
-        return String(format: localized, domain)
-    }
-    static let sslErrorPageAdvancedButton = NSLocalizedString("ssl.error.page.advanced.button", value: "Advanced…", comment: "Button shown in an error page that warns users of security risks on a website due to SSL issues. The buttons allows the user to see advanced options on click.")
-    static let sslErrorPageLeaveSiteButton = NSLocalizedString("ssl.error.page.leave.site.button", value: "Leave This Site", comment: "Button shown in an error page that warns users of security risks on a website due to SSL issues. The buttons allows the user to leave the website and navigate to previous page.")
-    static let sslErrorPageVisitSiteButton = NSLocalizedString("ssl.error.page.visit.site.button", value: "Accept Risk and Visit Site", comment: "Button shown in an error page that warns users of security risks on a website due to SSL issues. The buttons allows the user to visit the website anyway despite the risks.")
-    static let sslErrorAdvancedInfoTitle = NSLocalizedString("ssl.error.page.advanced.info.title", value: "DuckDuckGo warns you when a website has an invalid certificate.", comment: "Title of the Advanced info section shown in an error page that warns users of security risks on a website due to SSL issues.")
-    static let sslErrorAdvancedInfoBodyWrongHost = NSLocalizedString("ssl.error.page.advanced.info.body.wrong.host", value: "It’s possible that the website is misconfigured or that an attacker has compromised your connection.", comment: "Body of the text of the Advanced info shown in an error page that warns users of security risks on a website due to SSL issues.")
-    static let sslErrorAdvancedInfoBodyExpired = NSLocalizedString("ssl.error.page.advanced.info.body.expired", value: "It’s possible that the website is misconfigured, that an attacker has compromised your connection, or that your system clock is incorrect.", comment: "Body of the text of the Advanced info shown in an error page that warns users of security risks on a website due to SSL issues.")
-    static func sslErrorCertificateExpiredMessage(_ domain: String) -> String {
-        let localized = NSLocalizedString("ssl.error.certificate.expired.message",
-                                          value: "The security certificate for %1$@ is expired.",
-                                          comment: "Describes an SSL error where a website's security certificate is expired. '%1$@' is a placeholder for the website's domain.")
-        return String(format: localized, domain)
-    }
-    static func sslErrorCertificateWrongHostMessage(_ domain: String, eTldPlus1: String) -> String {
-        let localized = NSLocalizedString("ssl.error.wrong.host.message",
-                                          value: "The security certificate for %1$@ does not match *.%2$@.",
-                                          comment: "Explains an SSL error when a site's certificate doesn't match its domain. '%1$@' is the site's domain.")
-        return String(format: localized, domain, eTldPlus1)
-    }
-    static func sslErrorCertificateSelfSignedMessage(_ domain: String) -> String {
-        let localized = NSLocalizedString("ssl.error.self.signed.message",
-                                          value: "The security certificate for %1$@ is not trusted by your device's operating system.",
-                                          comment: "Warns the user that the site's security certificate is self-signed and not trusted. '%1$@' is the site's domain.")
-        return String(format: localized, domain)
-    }
-
-
 
     static let openSystemPreferences = NSLocalizedString("open.preferences", value: "Open System Preferences", comment: "Open System Preferences (to re-enable permission for the App) (up to and including macOS 12")
     static let openSystemSettings = NSLocalizedString("open.settings", value: "Open System Settings…", comment: "This string represents a prompt or button label prompting the user to open system settings")
@@ -492,6 +459,7 @@ struct UserText {
     static let bookmarkImportedFromFolder = NSLocalizedString("bookmarks.imported.from.folder", value: "Imported from", comment: "Name of the folder the imported bookmarks are saved into")
 
     // MARK: Feedback
+    static let sendPProFeedback = NSLocalizedString("send.ppro.feedback", value: "Send Privacy Pro Feedback", comment: "Menu with feedback commands")
     static let reportBrokenSite = NSLocalizedString("report.broken.site", value: "Report Broken Site", comment: "Menu with feedback commands")
     static let browserFeedback = NSLocalizedString("send.browser.feedback", value: "Send Browser Feedback", comment: "Menu with feedback commands")
     static let browserFeedbackTitle = NSLocalizedString("send.browser.feedback.title", value: "Help Improve the DuckDuckGo Browser", comment: "Title of the interface to send feedback on the browser")
@@ -1244,6 +1212,30 @@ struct UserText {
                 static let addAllBookmarks = NSLocalizedString("bookmarks.dialog.action.addAllBookmarks", value: "Save Bookmarks", comment: "CTA title for saving multiple Bookmarks at once")
             }
         }
+    }
+    
+    // MARK: - Onboarding
+    enum ContextualOnboarding {
+        static let onboardingTryASearchTitle = NSLocalizedString("contextual.onboarding.try-a-search.title", value: "Try a search!", comment: "Title of a popover on the browser that invites the user to try a search")
+        static let onboardingTryASearchMessage = NSLocalizedString("contextual.onboarding.try-a-search.message", value: "Your DuckDuckGo searches are always anonymous.", comment: "Message of a popover on the browser that invites the user to try a search explaining that their searches are anonymous")
+        static let onboardingTryASiteTitle = NSLocalizedString("contextual.onboarding.try-a-site.title", value: "Next, try visiting a site!", comment: "Title of a popover on the browser that invites the user to try a visiting a website")
+        static let onboardingTryASiteNTPTitle = NSLocalizedString("contextual.onboarding.ntp.try-a-site.title", value: "Try visiting a site!", comment: "Title of a popover on the new tab page browser that invites the user to try a visiting a website")
+        static let onboardingTryASiteMessage = NSLocalizedString("contextual.onboarding.try-a-site.message", value: "I’ll block trackers so they can’t spy on you.", comment: "Message of a popover on the browser that invites the user to try visiting a website to explain that we block trackers")
+        static let onboardingTryFireButtonMessage = NSLocalizedString("contextual.onboarding.try-fire-button.message", value: "Instantly clear your browsing activity with the Fire Button.\n\nGive it a try! 🔥", comment: "Message of a popover on the browser that invites the user to try visiting the browser Fire Button. Please leave the line break")
+        static let onboardingGotItButton = NSLocalizedString("contextual.onboarding.got-it.button", value: "Got it", comment: "During onboarding steps this button is shown and takes either to the next steps or closes the onboarding.")
+        static let onboardingFirstSearchDoneTitle = NSLocalizedString("contextual.onboarding.first-search-done.title", value: "That’s DuckDuckGo Search.", comment: "After the user performs their first search using the browser, this dialog explains the advantages of using DuckDuckGo")
+        static let onboardingFirstSearchDoneMessage = NSLocalizedString("contextual.onboarding.first-search-done.message", value: "Private. Fast. Fewer ads.", comment: "After the user performs their first search using the browser, this dialog explains the advantages of using DuckDuckGo")
+        static let onboardingFinalScreenTitle = NSLocalizedString("contextual.onboarding.final-screen.title", value: "You’ve got this!", comment: "Title of the last screen of the onboarding to the browser app")
+        static let onboardingFinalScreenMessage = NSLocalizedString("contextual.onboarding.final-screen.message", value: "Remember: every time you browse with me a creepy ad loses its wings. 👌", comment: "Message of the last screen of the onboarding to the browser app.")
+        static let onboardingFinalScreenButton = NSLocalizedString("contextual.onboarding.final-screen.button", value: "High five!", comment: "Button on the last screen of the onboarding, it will dismiss the onboarding screen.")
+        static let tryASearchOption1English = NSLocalizedString("contextual.onboarding.try-search.option1-English", value: "how to say “duck” in spanish", comment: "Browser Search query for how to say duck in english")
+        static let tryASearchOption1International = NSLocalizedString("contextual.onboarding.try-search.option1international", value: "how to say “duck” in english", comment: "Browser Search query for how to say duck in english")
+        static let tryASearchOption2English = NSLocalizedString("contextual.onboarding.try-search.option2-english", value: "mighty ducks cast", comment: "Search query for the cast of Mighty Ducks")
+        static let tryASearchOption2International = NSLocalizedString("contextual.onboarding.try-search.option2-international", value: "cast of avatar", comment: "Search query for the cast of Avatar")
+        static let tryASearchOption3 = NSLocalizedString("contextual.onboarding.try-search.option3", value: "local weather", comment: "Browser Search query for local weather")
+        static let tryASearchOptionSurpriseMeTitle = NSLocalizedString("contextual.onboarding.try-search.surprise-me-title", value: "Surprise me!", comment: "Title for a button that triggers an unknown search query for the user.")
+        static let tryASearchOptionSurpriseMeEnglish = NSLocalizedString("contextual.onboarding.try-search.surprise-me-english", value: "chocolate chip cookie recipes", comment: "Browser Search query for chocolate chip cookie recipes")
+        static let tryASearchOptionSurpriseMeInternational = NSLocalizedString("contextual.onboarding.try-search.surprise-me-international", value: "dinner recipes", comment: "Browser Search query for dinner recipes")
     }
 
     // Key: "subscription.menu.item"

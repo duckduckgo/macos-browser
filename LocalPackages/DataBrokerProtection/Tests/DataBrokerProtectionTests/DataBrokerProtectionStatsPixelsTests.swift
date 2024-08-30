@@ -19,7 +19,6 @@
 import XCTest
 import Foundation
 @testable import DataBrokerProtection
-import PixelKitTestingUtilities
 @testable import PixelKit
 
 final class DataBrokerProtectionStatsPixelsTests: XCTestCase {

@@ -24,6 +24,7 @@ import PrivacyDashboard
 import WebKit
 import SecureStorage
 import History
+import os.log
 
 final class Fire {
 
@@ -129,7 +130,7 @@ final class Fire {
     func burnEntity(entity: BurningEntity,
                     includingHistory: Bool = true,
                     completion: (() -> Void)? = nil) {
-        os_log("Fire started", log: .fire)
+        Logger.fire.debug("Fire started")
 
         let group = DispatchGroup()
         dispatchGroup = group
@@ -180,14 +181,14 @@ final class Fire {
 
                 completion?()
 
-                os_log("Fire finished", log: .fire)
+                Logger.fire.debug("Fire finished")
             }
         }
     }
 
     @MainActor
     func burnAll(completion: (() -> Void)? = nil) {
-        os_log("Fire started", log: .fire)
+        Logger.fire.debug("Fire started")
 
         let group = DispatchGroup()
         dispatchGroup = group
@@ -231,7 +232,7 @@ final class Fire {
                 self.burningData = nil
                 completion?()
 
-                os_log("Fire finished", log: .fire)
+                Logger.fire.debug("Fire finished")
             }
         }
     }
@@ -331,15 +332,15 @@ final class Fire {
     // MARK: - Web cache
 
     private func burnWebCache() async {
-        os_log("WebsiteDataStore began cookie deletion", log: .fire)
+        Logger.fire.debug("WebsiteDataStore began cookie deletion")
         await webCacheManager.clear()
-        os_log("WebsiteDataStore completed cookie deletion", log: .fire)
+        Logger.fire.debug("WebsiteDataStore completed cookie deletion")
     }
 
     private func burnWebCache(baseDomains: Set<String>? = nil) async {
-        os_log("WebsiteDataStore began cookie deletion", log: .fire)
+        Logger.fire.debug("WebsiteDataStore began cookie deletion")
         await webCacheManager.clear(baseDomains: baseDomains)
-        os_log("WebsiteDataStore completed cookie deletion", log: .fire)
+        Logger.fire.debug("WebsiteDataStore completed cookie deletion")
     }
 
     // MARK: - History
