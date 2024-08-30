@@ -28,6 +28,6 @@ extension VPNControllerUDSClient {
 
 extension UDSClient {
     static let sharedVPNUDSClient: UDSClient = {
-        return UDSClient(socketFileURL: VPNIPCResources.socketFileURL, log: .networkProtectionIPCLog)
+        return UDSClient(socketFileURL: VPNIPCResources.socketFileURL)
     }()
 }

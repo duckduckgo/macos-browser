@@ -21,6 +21,7 @@ import Suggestions
 import Common
 import History
 import PixelKit
+import os.log
 
 final class SuggestionContainer {
 
@@ -63,18 +64,14 @@ final class SuggestionContainer {
             guard self?.latestQuery == query else { return }
             guard let result = result else {
                 self?.result = nil
-                os_log("Suggestions: Failed to get suggestions - %s",
-                       type: .error,
-                       "\(String(describing: error))")
+                Logger.general.error("Suggestions: Failed to get suggestions - \(String(describing: error))")
                 PixelKit.fire(DebugEvent(GeneralPixel.suggestionsFetchFailed, error: error))
                 return
             }
 
             if let error = error {
                 // Fetching remote suggestions failed but local can be presented
-                os_log("Suggestions: Error when getting suggestions - %s",
-                       type: .error,
-                       "\(String(describing: error))")
+                Logger.general.error("Suggestions: Error when getting suggestions - \(error.localizedDescription)")
             }
 
             self?.result = result

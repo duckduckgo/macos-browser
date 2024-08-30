@@ -20,6 +20,7 @@ import AppKit
 import Combine
 import Common
 import Foundation
+import os.log
 
 final class BookmarksBarViewController: NSViewController {
 
@@ -218,7 +219,7 @@ final class BookmarksBarViewController: NSViewController {
             self.bookmarksBarCollectionView.indexPathForItem(at: point)
         }),
               let item = bookmarksBarCollectionView.item(at: indexPath.item) as? BookmarksBarCollectionViewItem else {
-            os_log("Item at mouseUp point not found.", type: .error)
+            Logger.bookmarks.error("Item at mouseUp point not found.")
             return
         }
 

@@ -196,7 +196,7 @@ extension TabExtensionsBuilder {
         }
 
         add {
-            SSLErrorPageTabExtension(webViewPublisher: args.webViewFuture,
+            SpecialErrorPageTabExtension(webViewPublisher: args.webViewFuture,
                                   scriptsPublisher: userScripts.compactMap { $0 })
         }
 #if SPARKLE
