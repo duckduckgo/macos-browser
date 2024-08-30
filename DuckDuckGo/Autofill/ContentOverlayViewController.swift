@@ -148,6 +148,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         topAutofillUserScript.contentOverlay = self
         topAutofillUserScript.emailDelegate = emailManager
         topAutofillUserScript.vaultDelegate = vaultManager
+        topAutofillUserScript.passwordImportDelegate = self
     }
 
     // EmailManagerRequestDelegate
@@ -365,5 +366,11 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
             .buildRuntimeConfigResponse()
 
         completionHandler(runtimeConfiguration)
+    }
+}
+
+extension ContentOverlayViewController: AutofillPasswordImportDelegate {
+    public func autofillUserScriptDidRequestPasswordImportFlow(_ completion: @escaping () -> Void) {
+        DataImportView().show(completion: completion)
     }
 }
