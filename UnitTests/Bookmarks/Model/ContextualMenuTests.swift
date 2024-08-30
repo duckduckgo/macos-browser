@@ -102,13 +102,33 @@ final class ContextualMenuTests: XCTestCase {
     @MainActor
     func testWhenAskingFolderItemThenItShouldReturnTheItemsInTheCorrectOrders() {
         // WHEN
-        let folder = BookmarkFolder(id: "1", title: "DuckDuckGo", children: [])
+        let bookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: "DDG", isFavorite: false)
+        let folder = BookmarkFolder(id: "1", title: "DuckDuckGo", children: [bookmark])
         let items = BookmarksContextMenu.folderMenuItems(with: folder)
 
         // THEN
         XCTAssertEqual(items.count, 9)
         assertMenuItem(items[0], withTitle: UserText.openAllInNewTabs, selector: #selector(FolderMenuItemSelectors.openInNewTabs(_:)), representedObject: folder)
         assertMenuItem(items[1], withTitle: UserText.openAllTabsInNewWindow, selector: #selector(FolderMenuItemSelectors.openAllInNewWindow(_:)), representedObject: folder)
+        XCTAssertTrue(items[2].isSeparatorItem) // Separator
+        assertMenuItem(items[3], withTitle: UserText.editBookmark, selector: #selector(FolderMenuItemSelectors.editFolder(_:)), representedObject: folder)
+        assertMenuItem(items[4], withTitle: UserText.bookmarksBarContextMenuDelete, selector: #selector(FolderMenuItemSelectors.deleteFolder(_:)), representedObject: folder)
+        assertMenuItem(items[5], withTitle: UserText.bookmarksBarContextMenuMoveToEnd, selector: #selector(FolderMenuItemSelectors.moveToEnd(_:)), representedObject: folder)
+        XCTAssertTrue(items[6].isSeparatorItem) // Separator
+        assertMenuItem(items[7], withTitle: UserText.addFolder, selector: #selector(FolderMenuItemSelectors.newFolder(_:)), representedObject: folder)
+        assertMenuItem(items[8], withTitle: UserText.bookmarksManageBookmarks, selector: #selector(FolderMenuItemSelectors.manageBookmarks(_:)))
+    }
+
+    @MainActor
+    func testWhenAskingEmptyFolderItem_OpenAllItemsShouldBeDisabled() {
+        // WHEN
+        let folder = BookmarkFolder(id: "1", title: "DuckDuckGo", children: [])
+        let items = BookmarksContextMenu.folderMenuItems(with: folder)
+
+        // THEN
+        XCTAssertEqual(items.count, 9)
+        assertMenuItem(items[0], withTitle: UserText.openAllInNewTabs, selector: #selector(FolderMenuItemSelectors.openInNewTabs(_:)), representedObject: folder, disabled: true)
+        assertMenuItem(items[1], withTitle: UserText.openAllTabsInNewWindow, selector: #selector(FolderMenuItemSelectors.openAllInNewWindow(_:)), representedObject: folder, disabled: true)
         XCTAssertTrue(items[2].isSeparatorItem) // Separator
         assertMenuItem(items[3], withTitle: UserText.editBookmark, selector: #selector(FolderMenuItemSelectors.editFolder(_:)), representedObject: folder)
         assertMenuItem(items[4], withTitle: UserText.bookmarksBarContextMenuDelete, selector: #selector(FolderMenuItemSelectors.deleteFolder(_:)), representedObject: folder)
@@ -185,7 +205,8 @@ final class ContextualMenuTests: XCTestCase {
     @MainActor
     func testWhenCreateMenuForFolderNodeThenReturnsAMenuWithTheFolderMenuItems() throws {
         // GIVEN
-        let folder = BookmarkFolder(id: "1", title: "Child")
+        let bookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: "DDG", isFavorite: false)
+        let folder = BookmarkFolder(id: "1", title: "Child", children: [bookmark])
         let parent = BookmarkFolder(id: "1", title: "Parent", children: [folder])
         let parentNode = BookmarkNode(representedObject: parent, parent: nil)
         let node = BookmarkNode(representedObject: folder, parent: parentNode)
