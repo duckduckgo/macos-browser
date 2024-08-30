@@ -21,12 +21,12 @@ import Common
 import Freemium
 
 protocol DataBrokerProtectionAgentStopper {
-    /// Validates if the user has profile data, is authenticated, and has valid entitlement. If any of these conditions are not met, the agent will be stopped.
+    /// Validates if the user has is an active freemium user, OR if they have profile data, is authenticated, and has valid entitlement. If any of these conditions are not met, the agent will be stopped.
     func validateRunPrerequisitesAndStopAgentIfNecessary() async
 
-    /// Monitors the entitlement package. If the entitlement check returns false, the agent will be stopped.
+    /// Monitors the entitlement package. If the entitlement check returns false, and the user is NOT an active freemium user, the agent will be stopped.
     /// This function ensures that the agent is stopped if the user's subscription has expired, even if the browser is not active. Regularly checking for entitlement is required since notifications are not posted to agents.
-    func monitorEntitlementAndStopAgentIfEntitlementIsInvalid(interval: TimeInterval)
+    func monitorEntitlementAndStopAgentIfEntitlementIsInvalidAndUserIsNotFreemium(interval: TimeInterval)
 }
 
 struct DefaultDataBrokerProtectionAgentStopper: DataBrokerProtectionAgentStopper {
@@ -58,10 +58,10 @@ struct DefaultDataBrokerProtectionAgentStopper: DataBrokerProtectionAgentStopper
     /// 2. The user has a subscription with valid entitlements
     public func validateRunPrerequisitesAndStopAgentIfNecessary() async {
 
-        if freemiumPIRUserState.isActiveUser { return }
+        let isFreemiumUser = freemiumPIRUserState.isActiveUser
 
         do {
-            guard try dataManager.fetchProfile() != nil,
+            guard try dataManager.fetchProfile() != nil, isFreemiumUser ||
                   authenticationManager.isUserAuthenticated else {
                 os_log("Prerequisites are invalid", log: .dataBrokerProtection)
                 stopAgent()
@@ -81,9 +81,10 @@ struct DefaultDataBrokerProtectionAgentStopper: DataBrokerProtectionAgentStopper
         }
     }
 
-    public func monitorEntitlementAndStopAgentIfEntitlementIsInvalid(interval: TimeInterval) {
+    public func monitorEntitlementAndStopAgentIfEntitlementIsInvalidAndUserIsNotFreemium(interval: TimeInterval) {
         entitlementMonitor.start(checkEntitlementFunction: authenticationManager.hasValidEntitlement,
                                  interval: interval) { result in
+            guard !self.freemiumPIRUserState.isActiveUser else { return }
             stopAgentBasedOnEntitlementCheckResult(result)
         }
     }
