@@ -25,6 +25,7 @@ import ContentScopeScripts
 import BrowserServicesKit
 import PhishingDetection
 import PixelKit
+import SpecialErrorPages
 
 protocol SpecialErrorPageScriptProvider {
     var specialErrorPageUserScript: SpecialErrorPageUserScript? { get }
@@ -58,6 +59,11 @@ final class SpecialErrorPageTabExtension {
 
     private var cancellables = Set<AnyCancellable>()
 
+    private let tld = TLD()
+
+    var errorData: SpecialErrorData?
+    var failingURL: URL?
+
     init(
         webViewPublisher: some Publisher<WKWebView, Never>,
         scriptsPublisher: some Publisher<some SpecialErrorPageScriptProvider, Never>,
@@ -78,17 +84,8 @@ final class SpecialErrorPageTabExtension {
             }.store(in: &cancellables)
         }
 
-    @MainActor
-    private func loadSSLErrorHTML(url: URL, alternate: Bool, errorCode: Int) {
-        let domain: String = url.host ?? url.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true)
-        let html = SSLErrorPageHTMLTemplate(domain: domain, errorCode: errorCode).makeHTMLFromTemplate()
-        webView?.loadAlternateHTML(html, baseURL: .error, forUnreachableURL: url)
-        loadHTML(html: html, url: url, alternate: alternate)
-    }
-
-    @MainActor
-    private func loadErrorHTML(_ error: WKError, header: String, forUnreachableURL url: URL, alternate: Bool) {
-        let html = ErrorPageHTMLTemplate(error: error, header: header).makeHTMLFromTemplate()
+    @MainActor private func loadSSLErrorHTML(url: URL, alternate: Bool) {
+        let html = SpecialErrorPageHTMLTemplate.htmlFromTemplate
         loadHTML(html: html, url: url, alternate: alternate)
     }
 
@@ -100,7 +97,6 @@ final class SpecialErrorPageTabExtension {
             webView?.setDocumentHtml(html)
         }
     }
-
 }
 
 extension SpecialErrorPageTabExtension: NavigationResponder {
@@ -126,11 +122,11 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
             self.specialErrorPageUserScript?.errorData.kind = "phishing"
             if let mainFrameTarget = navigationAction.mainFrameTarget {
                 specialErrorPageUserScript?.failingURL = navigationAction.url
-                return .redirect(mainFrameTarget) { navigator in
-                    if let errorURL = self.generateErrorPageURL(url) {
-                        navigator.load(URLRequest(url: errorURL))
-                    }
+                if let errorURL = self.generateErrorPageURL(navigationAction.url) {
+                    _ = webView?.load(URLRequest(url: errorURL))
+                    return .cancel
                 }
+                return .next
             } else {
                 // Malicious iFrame Detected
                 PixelKit.fire(PhishingDetectionPixels.iframeLoaded)
@@ -154,28 +150,29 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
         guard error.errorCode != NSURLErrorCannotFindHost else { return }
 
         if !error.isFrameLoadInterrupted, !error.isNavigationCancelled {
-            // when already displaying the error page and reload navigation fails again: don‘t navigate, just update page HTML
             guard let webView else { return }
             let shouldPerformAlternateNavigation = navigation.url != webView.url || navigation.navigationAction.targetFrame?.url != .error
             if featureFlagger.isFeatureOn(.sslCertificatesBypass),
                error.errorCode == NSURLErrorServerCertificateUntrusted,
                let errorCode = error.userInfo["_kCFStreamErrorCodeKey"] as? Int {
                 errorPageType = .ssl
-                specialErrorPageUserScript?.failingURL = url
-                loadSSLErrorHTML(url: url, alternate: shouldPerformAlternateNavigation, errorCode: errorCode)
+                failingURL = url
+                let domain: String = url.host ?? url.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true)
+                errorData = SpecialErrorData(kind: .ssl, errorType: SSLErrorType.forErrorCode(errorCode).rawValue, domain: domain, eTldPlus1: tld.eTLDplus1(failingURL?.host))
+                loadSSLErrorHTML(url: url, alternate: shouldPerformAlternateNavigation)
             }
         }
     }
 
     @MainActor
     func navigationDidFinish(_ navigation: Navigation) {
-        specialErrorPageUserScript?.isEnabled = navigation.url == specialErrorPageUserScript?.failingURL
+        specialErrorPageUserScript?.isEnabled = navigation.url == failingURL
     }
 
     @MainActor
     func didReceive(_ challenge: URLAuthenticationChallenge, for navigation: Navigation?) async -> AuthChallengeDisposition? {
         guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust else { return nil }
-        guard shouldBypassSSLError else { return nil }
+        guard shouldBypassSSLError else { return nil}
         guard navigation?.url == webView?.url else { return nil }
         guard let credential = urlCredentialCreator.urlCredentialFrom(trust: challenge.protectionSpace.serverTrust) else { return nil }
 
@@ -228,7 +225,7 @@ extension SpecialErrorPageTabExtension: TabExtension, SpecialErrorPageTabExtensi
 }
 
 extension TabExtensions {
-    var specialErrorPage: SpecialErrorPageTabExtensionProtocol? {
+    var errorPage: ErrorPageTabExtensionProtocol? {
         resolve(SpecialErrorPageTabExtension.self)
     }
 }

@@ -21,6 +21,7 @@ import BrowserServicesKit
 import Combine
 import Common
 import PixelKit
+import os.log
 
 protocol SavePaymentMethodDelegate: AnyObject {
 
@@ -94,7 +95,7 @@ final class SavePaymentMethodViewController: NSViewController {
         do {
             try AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared).storeCreditCard(paymentMethod)
         } catch {
-            os_log("%s:%s: failed to store payment method %s", type: .error, className, #function, error.localizedDescription)
+            Logger.secureVault.error("Failed to store payment method \(error.localizedDescription)")
             PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
         }
     }

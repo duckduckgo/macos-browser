@@ -345,7 +345,7 @@ extension NetworkProtectionStatusView {
         var warningViewModel: WarningView.Model? {
             if let warningMessage = warningMessage(for: knownFailure) {
                 return WarningView.Model(message: warningMessage,
-                                         actionTitle: UserText.vpnShareFeedback,
+                                         actionTitle: UserText.vpnSendFeedback,
                                          action: openFeedbackForm)
             }
 

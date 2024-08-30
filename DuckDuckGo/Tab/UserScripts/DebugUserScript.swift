@@ -18,6 +18,7 @@
 
 import WebKit
 import UserScript
+import os.log
 
 protocol TabInstrumentationProtocol: AnyObject {
     func request(url: String, allowedIn timeInMs: Double)
@@ -66,7 +67,7 @@ final class DebugUserScript: NSObject, StaticUserScript {
 
     private func handleLog(message: WKScriptMessage) {
         // Used to log JS debug events. This is noisy every time a new tab is opened, so it's commented out unless needed.
-        // os_log("%s", type: .debug, String(describing: message.body))
+//        Logger.general.debug("Handle log \(String(describing: message.body))")
     }
 
     private func handleSignpost(message: WKScriptMessage) {

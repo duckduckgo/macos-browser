@@ -20,6 +20,7 @@ import AppKit
 import Combine
 import Common
 import Foundation
+import os.log
 
 @main
 struct SandboxTestTool {
@@ -46,60 +47,9 @@ final class SandboxTestToolApp: NSApplication {
 
 }
 
-extension FileLogger: FilePresenterLogger {
-    func log(_ message: @autoclosure () -> String) {
-        log(message(), includeTimestamp: true)
-    }
-}
-
-final class FileLogger {
-    static let shared = FileLogger()
-
-    private init() {
-        if !FileManager.default.fileExists(atPath: fileURL.path) {
-            FileManager.default.createFile(atPath: fileURL.path, contents: nil)
-        }
-    }
-
-    private let pid = ProcessInfo().processIdentifier
-
-    private let fileURL: URL = {
-        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        return documentsURL.appendingPathComponent("logfile.txt")
-    }()
-
-    private let dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm:ss.SSS"
-        return formatter
-    }()
-
-    private let queue = DispatchQueue(label: "log queue")
-    private lazy var fileHandle: FileHandle = {
-        let fileHandle = (try? FileHandle(forWritingTo: fileURL))!
-        fileHandle.seekToEndOfFile()
-        return fileHandle
-    }()
-
-    func log(_ message: String, includeTimestamp: Bool) {
-        os_log("%{public}s", message)
-        queue.sync {
-            let logMessage = includeTimestamp ? "[\(pid)] \(dateFormatter.string(from: Date())): \(message)\n" : (message + "\n")
-
-            fileHandle.write(logMessage.data(using: .utf8)!)
-        }
-    }
-
-}
-
 final class SandboxTestToolAppDelegate: NSObject, NSApplicationDelegate {
 
-    // uncomment these for logging
-// #if CI
-    let logger = OSLog.disabled
-// #else
-//    let logger = FileLogger.shared
-// #endif
+    let logger = Logger(subsystem: "SandboxTestTool", category: "")
 
     override init() {
         logger.log("\n\n\n🚦 starting…\n")
@@ -180,7 +130,7 @@ final class SandboxTestToolAppDelegate: NSObject, NSApplicationDelegate {
             return
         }
         do {
-            let filePresenter = try BookmarkFilePresenter(fileBookmarkData: bookmark, logger: logger)
+            let filePresenter = try BookmarkFilePresenter(fileBookmarkData: bookmark)
             guard let url = filePresenter.url else { throw NSError(domain: "SandboxTestTool", code: -1, userInfo: [NSLocalizedDescriptionKey: "FilePresenter URL is nil"]) }
 
             filePresenter.urlPublisher.dropFirst().sink { [unowned self] url in
