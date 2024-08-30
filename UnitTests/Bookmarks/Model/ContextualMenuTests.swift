@@ -48,7 +48,7 @@ final class ContextualMenuTests: XCTestCase {
         assertMenuItem(items[7], withTitle: UserText.bookmarksBarContextMenuDelete, selector: #selector(BookmarkMenuItemSelectors.deleteBookmark(_:)), representedObject: bookmark)
         assertMenuItem(items[8], withTitle: UserText.bookmarksBarContextMenuMoveToEnd, selector: #selector(BookmarkMenuItemSelectors.moveToEnd(_:)), representedObject: bookmark)
         XCTAssertTrue(items[9].isSeparatorItem) // Separator
-        assertMenuItem(items[10], withTitle: UserText.addFolder, selector: #selector(BookmarkMenuItemSelectors.newFolder(_:)))
+        assertMenuItem(items[10], withTitle: UserText.addFolder, selector: #selector(BookmarkMenuItemSelectors.newFolder(_:)), representedObject: bookmark)
         assertMenuItem(items[11], withTitle: UserText.bookmarksManageBookmarks, selector: #selector(BookmarkMenuItemSelectors.manageBookmarks(_:)))
     }
 
@@ -72,7 +72,7 @@ final class ContextualMenuTests: XCTestCase {
         assertMenuItem(items[7], withTitle: UserText.bookmarksBarContextMenuDelete, selector: #selector(BookmarkMenuItemSelectors.deleteBookmark(_:)), representedObject: bookmark)
         assertMenuItem(items[8], withTitle: UserText.bookmarksBarContextMenuMoveToEnd, selector: #selector(BookmarkMenuItemSelectors.moveToEnd(_:)), representedObject: bookmark)
         XCTAssertTrue(items[9].isSeparatorItem) // Separator
-        assertMenuItem(items[10], withTitle: UserText.addFolder, selector: #selector(BookmarkMenuItemSelectors.newFolder(_:)))
+        assertMenuItem(items[10], withTitle: UserText.addFolder, selector: #selector(BookmarkMenuItemSelectors.newFolder(_:)), representedObject: bookmark)
         assertMenuItem(items[11], withTitle: UserText.bookmarksManageBookmarks, selector: #selector(BookmarkMenuItemSelectors.manageBookmarks(_:)))
     }
 
@@ -96,7 +96,7 @@ final class ContextualMenuTests: XCTestCase {
         assertMenuItem(items[7], withTitle: UserText.bookmarksBarContextMenuDelete, selector: #selector(BookmarkMenuItemSelectors.deleteBookmark(_:)), representedObject: bookmark)
         assertMenuItem(items[8], withTitle: UserText.bookmarksBarContextMenuMoveToEnd, selector: #selector(BookmarkMenuItemSelectors.moveToEnd(_:)), representedObject: bookmark)
         XCTAssertTrue(items[9].isSeparatorItem) // Separator
-        assertMenuItem(items[10], withTitle: UserText.addFolder, selector: #selector(BookmarkMenuItemSelectors.newFolder(_:)))
+        assertMenuItem(items[10], withTitle: UserText.addFolder, selector: #selector(BookmarkMenuItemSelectors.newFolder(_:)), representedObject: bookmark)
     }
 
     @MainActor
@@ -150,7 +150,7 @@ final class ContextualMenuTests: XCTestCase {
         assertMenuItem(items[7], withTitle: UserText.bookmarksBarContextMenuDelete, selector: #selector(BookmarkMenuItemSelectors.deleteBookmark(_:)), representedObject: bookmark)
         assertMenuItem(items[8], withTitle: UserText.bookmarksBarContextMenuMoveToEnd, selector: #selector(BookmarkMenuItemSelectors.moveToEnd(_:)), representedObject: bookmark)
         XCTAssertTrue(items[9].isSeparatorItem) // Separator
-        assertMenuItem(items[10], withTitle: UserText.addFolder, selector: #selector(BookmarkMenuItemSelectors.newFolder(_:)))
+        assertMenuItem(items[10], withTitle: UserText.addFolder, selector: #selector(BookmarkMenuItemSelectors.newFolder(_:)), representedObject: bookmark)
         assertMenuItem(items[11], withTitle: UserText.bookmarksManageBookmarks, selector: #selector(BookmarkMenuItemSelectors.manageBookmarks(_:)))
     }
 
@@ -178,7 +178,7 @@ final class ContextualMenuTests: XCTestCase {
         assertMenuItem(items[7], withTitle: UserText.bookmarksBarContextMenuDelete, selector: #selector(BookmarkMenuItemSelectors.deleteBookmark(_:)), representedObject: bookmark)
         assertMenuItem(items[8], withTitle: UserText.bookmarksBarContextMenuMoveToEnd, selector: #selector(BookmarkMenuItemSelectors.moveToEnd(_:)), representedObject: bookmark)
         XCTAssertTrue(items[9].isSeparatorItem) // Separator
-        assertMenuItem(items[10], withTitle: UserText.addFolder, selector: #selector(BookmarkMenuItemSelectors.newFolder(_:)), representedObject: parent)
+        assertMenuItem(items[10], withTitle: UserText.addFolder, selector: #selector(BookmarkMenuItemSelectors.newFolder(_:)), representedObject: bookmark)
         assertMenuItem(items[11], withTitle: UserText.bookmarksManageBookmarks, selector: #selector(BookmarkMenuItemSelectors.manageBookmarks(_:)))
     }
 
@@ -461,6 +461,23 @@ final class ContextualMenuTests: XCTestCase {
     }
 
     @MainActor
+    func testWhenItemInRootFiresMoveToEndAction_moveObjectsCalled() {
+        // GIVEN
+        let bookmark = Bookmark(id: "n", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: true, parentFolderUUID: nil)
+        let menu = BookmarksContextMenu.bookmarkMenu(with: bookmark)
+        guard let menuItem = menu.items.first(where: { $0.title == UserText.bookmarksBarContextMenuMoveToEnd }) else {
+            XCTFail("No item")
+            return
+        }
+
+        // WHEN
+        _=menuItem.target!.perform(menuItem.action!, with: menuItem)
+
+        // THEN
+        XCTAssertEqual((menu.bookmarkManager as! MockBookmarkManager).moveObjectsCalled, .init(objectUUIDs: ["n"], toIndex: nil, withinParentFolder: .root))
+    }
+
+    @MainActor
     func testWhenItemFiresMoveToEndAction_moveObjectsCalled() {
         // GIVEN
         let bookmark = Bookmark(id: "n", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: true, parentFolderUUID: "1")
@@ -474,7 +491,7 @@ final class ContextualMenuTests: XCTestCase {
         _=menuItem.target!.perform(menuItem.action!, with: menuItem)
 
         // THEN
-        XCTAssertEqual((menu.bookmarkManager as! MockBookmarkManager).moveObjectsCalled, .init(objectUUIDs: ["n"], toIndex: nil, withinParentFolder: .root))
+        XCTAssertEqual((menu.bookmarkManager as! MockBookmarkManager).moveObjectsCalled, .init(objectUUIDs: ["n"], toIndex: nil, withinParentFolder: .parent(uuid: "1")))
     }
 
     @MainActor
