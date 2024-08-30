@@ -1,5 +1,5 @@
 //
-//  BookmarkFolderInfo.swift
+//  Logger+Fire.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -17,16 +17,8 @@
 //
 
 import Foundation
+import os.log
 
-protocol BookmarksEntityIdentifiable {
-    var entityId: String { get }
-    var parentId: String? { get }
-}
-
-struct BookmarkEntityInfo: Equatable, BookmarksEntityIdentifiable {
-    let entity: BaseBookmarkEntity
-    let parent: BookmarkFolder?
-
-    var entityId: String { entity.id }
-    var parentId: String? { parent?.id }
+public extension Logger {
+    static var fire = { Logger(subsystem: "Fire", category: "") }()
 }

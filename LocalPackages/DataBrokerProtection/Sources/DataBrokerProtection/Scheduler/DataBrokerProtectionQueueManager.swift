@@ -18,6 +18,7 @@
 
 import Common
 import Foundation
+import os.log
 
 protocol DataBrokerProtectionOperationQueue {
     var maxConcurrentOperationCount: Int { get set }
@@ -226,7 +227,7 @@ private extension DefaultDataBrokerProtectionQueueManager {
                 operationQueue.addOperation(collection)
             }
         } catch {
-            os_log("DataBrokerProtectionProcessor error: addOperations, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("DataBrokerProtectionProcessor error: addOperations, error: \(error.localizedDescription, privacy: .public)")
             completion?(DataBrokerProtectionAgentErrorCollection(oneTimeError: error))
             return
         }

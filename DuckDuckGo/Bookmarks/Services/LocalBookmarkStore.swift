@@ -25,6 +25,17 @@ import Bookmarks
 import Cocoa
 import Persistence
 import PixelKit
+import os.log
+
+protocol BookmarkEntityProtocol {
+    var uuid: String? { get }
+    var bookmarkEntityParent: BookmarkEntityProtocol? { get }
+}
+extension BookmarkEntity: BookmarkEntityProtocol {
+    var bookmarkEntityParent: (any BookmarkEntityProtocol)? {
+        parent
+    }
+}
 
 final class LocalBookmarkStore: BookmarkStore {
 
@@ -430,9 +441,9 @@ final class LocalBookmarkStore: BookmarkStore {
                 bookmarkFolderToReturn = bookmarkFolder
 
             } catch BookmarkStoreError.badModelMapping {
-                os_log("Failed to map BookmarkEntity to BookmarkFolder, with error: %s", log: .bookmarks, type: .error)
+                Logger.bookmarks.error("Failed to map BookmarkEntity to BookmarkFolder, with error: BookmarkStoreError.badModelMapping")
             } catch {
-                os_log("Failed to fetch last saved folder for bookmarks all tabs, with error: %s", log: .bookmarks, type: .error, error.localizedDescription)
+                Logger.bookmarks.error("Failed to fetch last saved folder for bookmarks all tabs, with error: \(error.localizedDescription, privacy: .public)")
             }
         }
 
@@ -597,24 +608,28 @@ final class LocalBookmarkStore: BookmarkStore {
             guard let folderToMove = folderToMoveFetchRequestResults?.first,
                   let parentFolder = parentFolderFetchRequestResults?.first,
                   folderToMove.isFolder,
-                  parentFolder.isFolder else {
-                return
-            }
+                  parentFolder.isFolder,
+                  let uuid = folderToMove.uuid else { return }
 
-            var currentParentFolder = parentFolder.parent
-
-            // Check each parent and verify that the folder being moved isn't being given itself as an ancestor
-            while let currentParent = currentParentFolder {
-                if currentParent.uuid == uuid {
-                    canMoveObject = false
-                    return
-                }
-
-                currentParentFolder = currentParent.parent
-            }
+            canMoveObject = Self.validateObjectMove(withUUID: uuid, to: parentFolder)
         }
 
         return canMoveObject
+    }
+
+    static func validateObjectMove(withUUID uuid: String, to parent: BookmarkEntityProtocol) -> Bool {
+        guard uuid != parent.uuid else { return false }
+        var currentParentFolder = parent.bookmarkEntityParent
+
+        // Check each parent and verify that the folder being moved isn't being given itself as an ancestor
+        while let currentParent = currentParentFolder {
+            if currentParent.uuid == uuid {
+                return false
+            }
+
+            currentParentFolder = currentParent.bookmarkEntityParent
+        }
+        return true
     }
 
     func move(objectUUIDs: [String], toIndex index: Int?, withinParentFolder type: ParentFolderType, completion: @escaping (Error?) -> Void) {
@@ -796,7 +811,7 @@ final class LocalBookmarkStore: BookmarkStore {
             }
 
         } catch {
-            os_log("Failed to import bookmarks, with error: %s", log: .dataImportExport, type: .error, error.localizedDescription)
+            Logger.dataImportExport.error("Failed to import bookmarks, with error: \(error.localizedDescription, privacy: .public)")
 
             let error = error as NSError
             let processedErrors = CoreDataErrorsParser.parse(error: error)
@@ -943,7 +958,7 @@ final class LocalBookmarkStore: BookmarkStore {
         } onError: { [weak self] error in
             self?.commonOnSaveErrorHandler(error)
 
-            os_log("Failed to remove invalid bookmark entities", type: .error)
+            Logger.bookmarks.error("Failed to remove invalid bookmark entities")
         } onDidSave: {}
 
     }

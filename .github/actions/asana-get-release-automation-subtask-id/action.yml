@@ -15,7 +15,7 @@ outputs:
     value: ${{ steps.extract-automation-task-id.outputs.automation-task-id }}
   assignee-id:
     description: "Release task assignee ID"
-    value: ${{ steps.extract-assignee-id.outputs.assignee-id }}
+    value: ${{ steps.extract-assignee-id.outputs.asana_assignee_id }}
 runs:
   using: "composite"
   steps:
@@ -24,10 +24,10 @@ runs:
       run: bundle exec fastlane run asana_extract_task_id task_url:"${{ inputs.task-url }}"
 
     - id: extract-assignee-id
-      uses: ./.github/actions/asana-extract-task-assignee
-      with:
-        task-id: ${{ steps.extract-task-id.outputs.asana_task_id }}
-        access-token: ${{ inputs.access-token }}
+      shell: bash
+      env:
+        ASANA_ACCESS_TOKEN: ${{ inputs.access-token }}
+      run: bundle exec fastlane run asana_extract_task_assignee task_id:"${{ steps.extract-task-id.outputs.asana_task_id }}"
 
     - id: extract-automation-task-id
       run: |

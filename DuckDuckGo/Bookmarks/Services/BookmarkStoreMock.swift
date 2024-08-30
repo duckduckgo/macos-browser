@@ -106,11 +106,11 @@ public final class BookmarkStoreMock: BookmarkStore {
 
     var bookmarkFolderWithIdCalled = false
     var capturedFolderId: String?
-    var bookmarkFolder: BookmarkFolder?
+    var bookmarkFolderWithId: ((String) -> BookmarkFolder?)?
     func bookmarkFolder(withId id: String) -> BookmarkFolder? {
         bookmarkFolderWithIdCalled = true
         capturedFolderId = id
-        return bookmarkFolder
+        return bookmarkFolderWithId?(id)
     }
 
     var updateFolderCalled = false
@@ -155,7 +155,15 @@ public final class BookmarkStoreMock: BookmarkStore {
     var canMoveObjectWithUUIDCalled = false
     func canMoveObjectWithUUID(objectUUID uuid: String, to parent: BookmarkFolder) -> Bool {
         canMoveObjectWithUUIDCalled = true
-        return true
+        return LocalBookmarkStore.validateObjectMove(withUUID: uuid, to: mockBookmarkEntity(from: parent))
+    }
+
+    private func mockBookmarkEntity(from folder: BookmarkFolder) -> MockBookmarkEntity {
+        MockBookmarkEntity(uuid: folder.id, parent: {
+            guard let parentUUID = folder.parentFolderUUID,
+                  let folder = self.bookmarkFolderWithId!(parentUUID) else { return nil }
+            return self.mockBookmarkEntity(from: folder)
+        })
     }
 
     var moveObjectUUIDCalled = false
@@ -173,17 +181,12 @@ public final class BookmarkStoreMock: BookmarkStore {
 
     func applyFavoritesDisplayMode(_ configuration: FavoritesDisplayMode) {}
     func handleFavoritesAfterDisablingSync() {}
-}
 
-extension ParentFolderType: Equatable {
-    public static func == (lhs: Self, rhs: Self) -> Bool {
-        switch (lhs, rhs) {
-        case (.root, .root):
-            return true
-        case (.parent(let lhsValue), .parent(let rhsValue)):
-            return lhsValue == rhsValue
-        default:
-            return false
+    struct MockBookmarkEntity: BookmarkEntityProtocol {
+        var uuid: String?
+        var parent: () -> BookmarkEntityProtocol?
+        var bookmarkEntityParent: (any BookmarkEntityProtocol)? {
+            parent()
         }
     }
 }

@@ -24,6 +24,7 @@ import PrivacyDashboard
 import WebKit
 import SecureStorage
 import History
+import os.log
 
 final class Fire {
 
@@ -91,11 +92,11 @@ final class Fire {
          permissionManager: PermissionManagerProtocol = PermissionManager.shared,
          savedZoomLevelsCoordinating: SavedZoomLevelsCoordinating = AccessibilityPreferences.shared,
          downloadListCoordinator: DownloadListCoordinator = DownloadListCoordinator.shared,
-         windowControllerManager: WindowControllersManager = WindowControllersManager.shared,
+         windowControllerManager: WindowControllersManager? = nil,
          faviconManagement: FaviconManagement = FaviconManager.shared,
          autoconsentManagement: AutoconsentManagement? = nil,
          stateRestorationManager: AppStateRestorationManager? = nil,
-         recentlyClosedCoordinator: RecentlyClosedCoordinating? = RecentlyClosedCoordinator.shared,
+         recentlyClosedCoordinator: RecentlyClosedCoordinating? = nil,
          pinnedTabsManager: PinnedTabsManager? = nil,
          tld: TLD,
          bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
@@ -108,9 +109,9 @@ final class Fire {
         self.permissionManager = permissionManager
         self.savedZoomLevelsCoordinating = savedZoomLevelsCoordinating
         self.downloadListCoordinator = downloadListCoordinator
-        self.windowControllerManager = windowControllerManager
+        self.windowControllerManager = windowControllerManager ?? WindowControllersManager.shared
         self.faviconManagement = faviconManagement
-        self.recentlyClosedCoordinator = recentlyClosedCoordinator
+        self.recentlyClosedCoordinator = recentlyClosedCoordinator ?? RecentlyClosedCoordinator.shared
         self.pinnedTabsManager = pinnedTabsManager ?? WindowControllersManager.shared.pinnedTabsManager
         self.bookmarkManager = bookmarkManager
         self.syncService = syncService ?? NSApp.delegateTyped.syncService
@@ -129,7 +130,7 @@ final class Fire {
     func burnEntity(entity: BurningEntity,
                     includingHistory: Bool = true,
                     completion: (() -> Void)? = nil) {
-        os_log("Fire started", log: .fire)
+        Logger.fire.debug("Fire started")
 
         let group = DispatchGroup()
         dispatchGroup = group
@@ -180,14 +181,14 @@ final class Fire {
 
                 completion?()
 
-                os_log("Fire finished", log: .fire)
+                Logger.fire.debug("Fire finished")
             }
         }
     }
 
     @MainActor
     func burnAll(completion: (() -> Void)? = nil) {
-        os_log("Fire started", log: .fire)
+        Logger.fire.debug("Fire started")
 
         let group = DispatchGroup()
         dispatchGroup = group
@@ -231,7 +232,7 @@ final class Fire {
                 self.burningData = nil
                 completion?()
 
-                os_log("Fire finished", log: .fire)
+                Logger.fire.debug("Fire finished")
             }
         }
     }
@@ -331,15 +332,15 @@ final class Fire {
     // MARK: - Web cache
 
     private func burnWebCache() async {
-        os_log("WebsiteDataStore began cookie deletion", log: .fire)
+        Logger.fire.debug("WebsiteDataStore began cookie deletion")
         await webCacheManager.clear()
-        os_log("WebsiteDataStore completed cookie deletion", log: .fire)
+        Logger.fire.debug("WebsiteDataStore completed cookie deletion")
     }
 
     private func burnWebCache(baseDomains: Set<String>? = nil) async {
-        os_log("WebsiteDataStore began cookie deletion", log: .fire)
+        Logger.fire.debug("WebsiteDataStore began cookie deletion")
         await webCacheManager.clear(baseDomains: baseDomains)
-        os_log("WebsiteDataStore completed cookie deletion", log: .fire)
+        Logger.fire.debug("WebsiteDataStore completed cookie deletion")
     }
 
     // MARK: - History

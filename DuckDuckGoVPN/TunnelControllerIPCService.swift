@@ -89,7 +89,7 @@ final class TunnelControllerIPCService {
         self.defaults = defaults
         self.pixelKit = pixelKit
 
-        udsServer = UDSServer(socketFileURL: VPNIPCResources.socketFileURL, log: .networkProtectionIPCLog)
+        udsServer = UDSServer(socketFileURL: VPNIPCResources.socketFileURL)
 
         subscribeToErrorChanges()
         subscribeToStatusUpdates()

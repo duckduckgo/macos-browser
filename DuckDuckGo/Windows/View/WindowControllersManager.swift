@@ -19,10 +19,13 @@
 import Cocoa
 import Combine
 import Common
+import os.log
+import BrowserServicesKit
 
 @MainActor
 protocol WindowControllersManagerProtocol {
 
+    var lastKeyMainWindowController: MainWindowController? { get }
     var pinnedTabsManager: PinnedTabsManager { get }
 
     var didRegisterWindowController: PassthroughSubject<(MainWindowController), Never> { get }
@@ -31,19 +34,47 @@ protocol WindowControllersManagerProtocol {
     func register(_ windowController: MainWindowController)
     func unregister(_ windowController: MainWindowController)
 
+    func show(url: URL?, source: Tab.TabContent.URLSource, newTab: Bool)
+    func showBookmarksTab()
+
+    @discardableResult
+    func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel?,
+                       burnerMode: BurnerMode,
+                       droppingPoint: NSPoint?,
+                       contentSize: NSSize?,
+                       showWindow: Bool,
+                       popUp: Bool,
+                       lazyLoadTabs: Bool,
+                       isMiniaturized: Bool) -> MainWindow?
+}
+extension WindowControllersManagerProtocol {
+    @discardableResult
+    func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel? = nil,
+                       burnerMode: BurnerMode = .regular,
+                       droppingPoint: NSPoint? = nil,
+                       contentSize: NSSize? = nil,
+                       showWindow: Bool = true,
+                       popUp: Bool = false,
+                       lazyLoadTabs: Bool = false) -> MainWindow? {
+        openNewWindow(with: tabCollectionViewModel, burnerMode: burnerMode, droppingPoint: droppingPoint, contentSize: contentSize, showWindow: showWindow, popUp: popUp, lazyLoadTabs: lazyLoadTabs, isMiniaturized: false)
+    }
 }
 
 @MainActor
 final class WindowControllersManager: WindowControllersManagerProtocol {
 
-    static let shared = WindowControllersManager(pinnedTabsManager: Application.appDelegate.pinnedTabsManager)
+    static let shared = WindowControllersManager(pinnedTabsManager: Application.appDelegate.pinnedTabsManager,
+                                                 subscriptionFeatureAvailability: DefaultSubscriptionFeatureAvailability()
+    )
 
     var activeViewController: MainViewController? {
         lastKeyMainWindowController?.mainViewController
     }
 
-    init(pinnedTabsManager: PinnedTabsManager) {
+    init(pinnedTabsManager: PinnedTabsManager,
+         subscriptionFeatureAvailability: SubscriptionFeatureAvailability) {
         self.pinnedTabsManager = pinnedTabsManager
+        self.subscriptionFeatureAvailability = subscriptionFeatureAvailability
     }
 
     /**
@@ -52,6 +83,7 @@ final class WindowControllersManager: WindowControllersManagerProtocol {
     @Published private(set) var isInInitialState: Bool = true
     @Published private(set) var mainWindowControllers = [MainWindowController]()
     private(set) var pinnedTabsManager: PinnedTabsManager
+    private let subscriptionFeatureAvailability: SubscriptionFeatureAvailability
 
     weak var lastKeyMainWindowController: MainWindowController? {
         didSet {
@@ -89,7 +121,7 @@ final class WindowControllersManager: WindowControllersManagerProtocol {
 
     func unregister(_ windowController: MainWindowController) {
         guard let idx = mainWindowControllers.firstIndex(of: windowController) else {
-            os_log("WindowControllersManager: Window Controller not registered", type: .error)
+            Logger.general.error("WindowControllersManager: Window Controller not registered")
             return
         }
         mainWindowControllers.remove(at: idx)
@@ -226,8 +258,14 @@ extension WindowControllersManager {
         windowController.mainViewController.navigationBarViewController.showNetworkProtectionStatus()
     }
 
-    func showShareFeedbackModal() {
-        let feedbackFormViewController = VPNFeedbackFormViewController()
+    func showShareFeedbackModal(source: UnifiedFeedbackSource = .default) {
+        let feedbackFormViewController: NSViewController = {
+            if subscriptionFeatureAvailability.usesUnifiedFeedbackForm {
+                return UnifiedFeedbackFormViewController(source: source)
+            } else {
+                return VPNFeedbackFormViewController()
+            }
+        }()
         let feedbackFormWindowController = feedbackFormViewController.wrappedInWindowController()
 
         guard let feedbackFormWindow = feedbackFormWindowController.window else {
@@ -263,6 +301,18 @@ extension WindowControllersManager {
         }
 
         parentWindowController.window?.beginSheet(locationsFormWindow)
+    }
+
+    @discardableResult
+    func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel? = nil,
+                       burnerMode: BurnerMode = .regular,
+                       droppingPoint: NSPoint? = nil,
+                       contentSize: NSSize? = nil,
+                       showWindow: Bool = true,
+                       popUp: Bool = false,
+                       lazyLoadTabs: Bool = false,
+                       isMiniaturized: Bool = false) -> MainWindow? {
+        WindowsManager.openNewWindow(with: tabCollectionViewModel, burnerMode: burnerMode, droppingPoint: droppingPoint, contentSize: contentSize, showWindow: showWindow, popUp: popUp, lazyLoadTabs: lazyLoadTabs, isMiniaturized: isMiniaturized)
     }
 
 }

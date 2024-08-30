@@ -128,7 +128,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
                                 try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showFAQ)
                             }),
                         NetworkProtectionStatusView.Model.MenuItem(
-                            name: UserText.networkProtectionNavBarStatusViewShareFeedback,
+                            name: UserText.networkProtectionNavBarStatusViewSendFeedback,
                             action: {
                                 try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.shareFeedback)
                             })
@@ -140,7 +140,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
                                 try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showFAQ)
                             }),
                         NetworkProtectionStatusView.Model.MenuItem(
-                            name: UserText.networkProtectionNavBarStatusViewShareFeedback,
+                            name: UserText.networkProtectionNavBarStatusViewSendFeedback,
                             action: {
                                 try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.shareFeedback)
                             })

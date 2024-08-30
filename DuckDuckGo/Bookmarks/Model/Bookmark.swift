@@ -55,14 +55,13 @@ internal class BaseBookmarkEntity: Identifiable, Equatable, Hashable {
     let id: String
     var title: String
     let isFolder: Bool
+    let parentFolderUUID: String?
 
-    fileprivate init(id: String,
-                     title: String,
-                     isFolder: Bool) {
-
+    fileprivate init(id: String, title: String, isFolder: Bool, parentFolderUUID: String?) {
         self.id = id
         self.title = title
         self.isFolder = isFolder
+        self.parentFolderUUID = parentFolderUUID
     }
 
     static func from(
@@ -129,7 +128,6 @@ final class BookmarkFolder: BaseBookmarkEntity {
         return request
     }
 
-    let parentFolderUUID: String?
     let children: [BaseBookmarkEntity]
     let totalChildBookmarks: Int
 
@@ -141,11 +139,7 @@ final class BookmarkFolder: BaseBookmarkEntity {
         return children.compactMap { $0 as? BookmarkFolder }
     }
 
-    init(id: String,
-         title: String,
-         parentFolderUUID: String? = nil,
-         children: [BaseBookmarkEntity] = []) {
-        self.parentFolderUUID = parentFolderUUID
+    init(id: String, title: String, parentFolderUUID: String? = nil, children: [BaseBookmarkEntity] = []) {
         self.children = children
 
         let childFolders = children.compactMap({ $0 as? BookmarkFolder })
@@ -154,7 +148,7 @@ final class BookmarkFolder: BaseBookmarkEntity {
 
         self.totalChildBookmarks = childBookmarks.count + subfolderBookmarksCount
 
-        super.init(id: id, title: title, isFolder: true)
+        super.init(id: id, title: title, isFolder: true, parentFolderUUID: parentFolderUUID)
     }
 
     override func isEqual(to instance: BaseBookmarkEntity) -> Bool {
@@ -203,7 +197,6 @@ final class Bookmark: BaseBookmarkEntity {
 
     let url: String
     var isFavorite: Bool
-    private(set) var parentFolderUUID: String?
 
     public var urlObject: URL? {
         return url.isBookmarklet() ? url.toEncodedBookmarklet() : URL(string: url)
@@ -223,18 +216,12 @@ final class Bookmark: BaseBookmarkEntity {
         }
     }
 
-    init(id: String,
-         url: String,
-         title: String,
-         isFavorite: Bool,
-         parentFolderUUID: String? = nil,
-         faviconManagement: FaviconManagement = FaviconManager.shared) {
+    init(id: String, url: String, title: String, isFavorite: Bool, parentFolderUUID: String? = nil, faviconManagement: FaviconManagement = FaviconManager.shared) {
         self.url = url
         self.isFavorite = isFavorite
-        self.parentFolderUUID = parentFolderUUID
         self.faviconManagement = faviconManagement
 
-        super.init(id: id, title: title, isFolder: false)
+        super.init(id: id, title: title, isFolder: false, parentFolderUUID: parentFolderUUID)
     }
 
     convenience init(from bookmark: Bookmark, with newUrl: String) {

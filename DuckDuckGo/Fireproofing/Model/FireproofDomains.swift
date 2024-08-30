@@ -19,6 +19,7 @@
 import Common
 import Foundation
 import CoreData
+import os.log
 
 internal class FireproofDomains {
 
@@ -78,7 +79,7 @@ internal class FireproofDomains {
 
             return try store.load()
         } catch {
-            os_log("FireproofDomainsStore: Failed to load Fireproof Domains", type: .error)
+            Logger.fire.error("FireproofDomainsStore: Failed to load Fireproof Domains")
             return FireproofDomainsContainer()
         }
     }

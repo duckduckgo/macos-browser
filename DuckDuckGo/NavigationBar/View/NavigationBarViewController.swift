@@ -33,6 +33,8 @@ final class NavigationBarViewController: NSViewController {
     enum Constants {
         static let downloadsButtonAutoHidingInterval: TimeInterval = 5 * 60
         static let homeButtonSeparatorSpacing: CGFloat = 12
+        static let maxDragDistanceToExpandHoveredFolder: CGFloat = 4
+        static let dragOverFolderExpandDelay: TimeInterval = 0.3
     }
 
     @IBOutlet weak var goBackButton: NSButton!
@@ -70,6 +72,8 @@ final class NavigationBarViewController: NSViewController {
         return progressView
     }()
 
+    private let dragDropManager: BookmarkDragDropManager
+
     private var subscriptionManager: SubscriptionManager {
         Application.appDelegate.subscriptionManager
     }
@@ -86,6 +90,9 @@ final class NavigationBarViewController: NSViewController {
 
     private var popovers: NavigationBarPopovers
 
+    // used to show Bookmarks when dragging over the Bookmarks button
+    private var dragDestination: (mouseLocation: NSPoint, hoverStarted: Date)?
+
     var isDownloadsPopoverShown: Bool {
         popovers.isDownloadsPopoverShown
     }
@@ -95,6 +102,7 @@ final class NavigationBarViewController: NSViewController {
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var credentialsToSaveCancellable: AnyCancellable?
     private var vpnToggleCancellable: AnyCancellable?
+    private var feedbackFormCancellable: AnyCancellable?
     private var passwordManagerNotificationCancellable: AnyCancellable?
     private var pinnedViewsNotificationCancellable: AnyCancellable?
     private var navigationButtonsCancellables = Set<AnyCancellable>()
@@ -112,15 +120,16 @@ final class NavigationBarViewController: NSViewController {
     static func create(tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool,
                        networkProtectionFeatureActivation: NetworkProtectionFeatureActivation = NetworkProtectionKeychainTokenStore(),
                        downloadListCoordinator: DownloadListCoordinator = .shared,
+                       dragDropManager: BookmarkDragDropManager = .shared,
                        networkProtectionPopoverManager: NetPPopoverManager,
                        networkProtectionStatusReporter: NetworkProtectionStatusReporter,
                        autofillPopoverPresenter: AutofillPopoverPresenter) -> NavigationBarViewController {
         NSStoryboard(name: "NavigationBar", bundle: nil).instantiateInitialController { coder in
-            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner, networkProtectionFeatureActivation: networkProtectionFeatureActivation, downloadListCoordinator: downloadListCoordinator, networkProtectionPopoverManager: networkProtectionPopoverManager, networkProtectionStatusReporter: networkProtectionStatusReporter, autofillPopoverPresenter: autofillPopoverPresenter)
+            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner, networkProtectionFeatureActivation: networkProtectionFeatureActivation, downloadListCoordinator: downloadListCoordinator, dragDropManager: dragDropManager, networkProtectionPopoverManager: networkProtectionPopoverManager, networkProtectionStatusReporter: networkProtectionStatusReporter, autofillPopoverPresenter: autofillPopoverPresenter)
         }!
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, networkProtectionFeatureActivation: NetworkProtectionFeatureActivation, downloadListCoordinator: DownloadListCoordinator, networkProtectionPopoverManager: NetPPopoverManager, networkProtectionStatusReporter: NetworkProtectionStatusReporter, autofillPopoverPresenter: AutofillPopoverPresenter) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, networkProtectionFeatureActivation: NetworkProtectionFeatureActivation, downloadListCoordinator: DownloadListCoordinator, dragDropManager: BookmarkDragDropManager, networkProtectionPopoverManager: NetPPopoverManager, networkProtectionStatusReporter: NetworkProtectionStatusReporter, autofillPopoverPresenter: AutofillPopoverPresenter) {
 
         self.popovers = NavigationBarPopovers(networkProtectionPopoverManager: networkProtectionPopoverManager, autofillPopoverPresenter: autofillPopoverPresenter)
         self.tabCollectionViewModel = tabCollectionViewModel
@@ -128,6 +137,7 @@ final class NavigationBarViewController: NSViewController {
         self.isBurner = isBurner
         self.networkProtectionFeatureActivation = networkProtectionFeatureActivation
         self.downloadListCoordinator = downloadListCoordinator
+        self.dragDropManager = dragDropManager
         goBackButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .back, tabCollectionViewModel: tabCollectionViewModel)
         goForwardButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .forward, tabCollectionViewModel: tabCollectionViewModel)
         super.init(coder: coder)
@@ -151,12 +161,17 @@ final class NavigationBarViewController: NSViewController {
         listenToPasswordManagerNotifications()
         listenToPinningManagerNotifications()
         listenToMessageNotifications()
+        listenToFeedbackFormNotifications()
         subscribeToDownloads()
         addContextMenu()
 
         optionsButton.sendAction(on: .leftMouseDown)
+
         bookmarkListButton.sendAction(on: .leftMouseDown)
+        bookmarkListButton.registerForDraggedTypes(BookmarkDragDropManager.draggedTypes)
+        bookmarkListButton.delegate = self
         bookmarkListButton.setAccessibilityIdentifier("NavigationBarViewController.bookmarkListButton")
+
         downloadsButton.sendAction(on: .leftMouseDown)
         networkProtectionButton.sendAction(on: .leftMouseDown)
         passwordManagementButton.sendAction(on: .leftMouseDown)
@@ -213,7 +228,7 @@ final class NavigationBarViewController: NSViewController {
 
     @IBAction func goBackAction(_ sender: NSButton) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", type: .error, className)
+            Logger.navigation.error("Selected tab view model is nil")
             return
         }
 
@@ -229,7 +244,7 @@ final class NavigationBarViewController: NSViewController {
 
     @IBAction func goForwardAction(_ sender: NSButton) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", type: .error, className)
+            Logger.navigation.error("Selected tab view model is nil")
             return
         }
 
@@ -250,7 +265,7 @@ final class NavigationBarViewController: NSViewController {
 
     @IBAction func refreshOrStopAction(_ sender: NSButton) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", type: .error, className)
+            Logger.navigation.error("Selected tab view model is nil")
             return
         }
 
@@ -263,7 +278,7 @@ final class NavigationBarViewController: NSViewController {
 
     @IBAction func homeButtonAction(_ sender: NSButton) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", type: .error, className)
+            Logger.navigation.error("Selected tab view model is nil")
             return
         }
         selectedTabViewModel.tab.openHomePage()
@@ -403,6 +418,12 @@ final class NavigationBarViewController: NSViewController {
                 }
             }
             .store(in: &cancellables)
+    }
+
+    func listenToFeedbackFormNotifications() {
+        feedbackFormCancellable = NotificationCenter.default.publisher(for: .OpenUnifiedFeedbackForm).receive(on: DispatchQueue.main).sink { _ in
+            WindowControllersManager.shared.showShareFeedbackModal(source: .ppro)
+        }
     }
 
     @objc private func showVPNUninstalledFeedback() {
@@ -1127,6 +1148,42 @@ extension NavigationBarViewController: DownloadsViewControllerDelegate {
 
 }
 
+extension NavigationBarViewController: MouseOverButtonDelegate {
+
+    func mouseOverButton(_ sender: MouseOverButton, draggingEntered info: any NSDraggingInfo, isMouseOver: UnsafeMutablePointer<Bool>) -> NSDragOperation {
+        guard sender === bookmarkListButton else { return .none }
+        let operation = dragDropManager.validateDrop(info, to: PseudoFolder.bookmarks)
+        isMouseOver.pointee = (operation != .none)
+        return operation
+    }
+
+    func mouseOverButton(_ sender: MouseOverButton, draggingUpdatedWith info: any NSDraggingInfo, isMouseOver: UnsafeMutablePointer<Bool>) -> NSDragOperation {
+        guard sender === bookmarkListButton else { return .none }
+        cursorDraggedOverBookmarkListButton(with: info)
+
+        let operation = dragDropManager.validateDrop(info, to: PseudoFolder.bookmarks)
+        isMouseOver.pointee = (operation != .none)
+        return operation
+    }
+
+    private func cursorDraggedOverBookmarkListButton(with info: any NSDraggingInfo) {
+        guard !popovers.bookmarkListPopoverShown else { return }
+        let cursorPosition = info.draggingLocation
+
+        // show folder bookmarks menu after 0.3
+        if let dragDestination,
+           dragDestination.mouseLocation.distance(to: cursorPosition) < Constants.maxDragDistanceToExpandHoveredFolder {
+
+            if Date().timeIntervalSince(dragDestination.hoverStarted) >= Constants.dragOverFolderExpandDelay {
+                popovers.showBookmarkListPopover(from: bookmarkListButton, withDelegate: self, forTab: tabCollectionViewModel.selectedTabViewModel?.tab)
+            }
+        } else {
+            self.dragDestination = (mouseLocation: cursorPosition, hoverStarted: Date())
+        }
+    }
+
+}
+
 #if DEBUG || REVIEW
 extension NavigationBarViewController {
 
@@ -1170,4 +1227,5 @@ extension NavigationBarViewController {
 
 extension Notification.Name {
     static let ToggleNetworkProtectionInMainWindow = Notification.Name("com.duckduckgo.vpn.toggle-popover-in-main-window")
+    static let OpenUnifiedFeedbackForm = Notification.Name("com.duckduckgo.subscription.open-unified-feedback-form")
 }
