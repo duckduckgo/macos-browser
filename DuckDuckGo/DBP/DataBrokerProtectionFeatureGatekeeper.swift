@@ -76,7 +76,7 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
 
         os_log("Disabling and removing DBP for all users", log: .dataBrokerProtection)
     }
-    
+
     /// Checks PIR prerequisites
     ///
     /// Prerequisites are satisified if either:

@@ -125,19 +125,9 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
         })
     }
 
-    public func startScheduledAllOperations(showWebView: Bool) {
+    public func startScheduledOperations(showWebView: Bool) {
         xpc.execute(call: { server in
-            server.startScheduledAllOperations(showWebView: showWebView)
-        }, xpcReplyErrorHandler: { error in
-            os_log("Error \(error.localizedDescription)")
-            // Intentional no-op as there's no completion block
-            // If you add a completion block, please remember to call it here too!
-        })
-    }
-
-    public func startScheduledScanOperations(showWebView: Bool) {
-        xpc.execute(call: { server in
-            server.startScheduledScanOperations(showWebView: showWebView)
+            server.startScheduledOperations(showWebView: showWebView)
         }, xpcReplyErrorHandler: { error in
             os_log("Error \(error.localizedDescription)")
             // Intentional no-op as there's no completion block

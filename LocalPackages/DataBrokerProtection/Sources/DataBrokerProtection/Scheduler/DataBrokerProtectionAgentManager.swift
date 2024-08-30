@@ -26,7 +26,7 @@ import Subscription
 // This is to avoid exposing all the dependancies outside of the DBP package
 public class DataBrokerProtectionAgentManagerProvider {
 
-    public static func agentManager(authenticationManager: DataBrokerProtectionAuthenticationManaging, 
+    public static func agentManager(authenticationManager: DataBrokerProtectionAuthenticationManaging,
                                     accountManager: AccountManager) -> DataBrokerProtectionAgentManager {
         let pixelHandler = DataBrokerProtectionPixelsHandler()
 
@@ -314,14 +314,8 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentDebugComman
                                                          completion: nil)
     }
 
-    public func startScheduledAllOperations(showWebView: Bool) {
-        queueManager.startScheduledAllOperationsIfPermitted(showWebView: showWebView,
-                                                         operationDependencies: operationDependencies,
-                                                         completion: nil)
-    }
-
-    public func startScheduledScanOperations(showWebView: Bool) {
-        queueManager.startScheduledScanOperationsIfPermitted(showWebView: showWebView,
+    public func startScheduledOperations(showWebView: Bool) {
+        startFreemiumOrSubscriptionScheduledOperations(showWebView: showWebView,
                                                          operationDependencies: operationDependencies,
                                                          completion: nil)
     }

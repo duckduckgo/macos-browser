@@ -74,14 +74,14 @@ protocol DataBrokerProtectionQueueManager {
          pixelHandler: EventMapping<DataBrokerProtectionPixels>)
 
     func startImmediateScanOperationsIfPermitted(showWebView: Bool,
-                                             operationDependencies: DataBrokerOperationDependencies,
-                                             completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?)
+                                                 operationDependencies: DataBrokerOperationDependencies,
+                                                 completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?)
     func startScheduledAllOperationsIfPermitted(showWebView: Bool,
-                                             operationDependencies: DataBrokerOperationDependencies,
-                                             completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?)
+                                                operationDependencies: DataBrokerOperationDependencies,
+                                                completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?)
     func startScheduledScanOperationsIfPermitted(showWebView: Bool,
-                                             operationDependencies: DataBrokerOperationDependencies,
-                                             completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?)
+                                                 operationDependencies: DataBrokerOperationDependencies,
+                                                 completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?)
 
     func execute(_ command: DataBrokerProtectionQueueManagerDebugCommand)
     var debugRunningStatusString: String { get }
@@ -122,8 +122,8 @@ final class DefaultDataBrokerProtectionQueueManager: DataBrokerProtectionQueueMa
     }
 
     func startImmediateScanOperationsIfPermitted(showWebView: Bool,
-                                             operationDependencies: DataBrokerOperationDependencies,
-                                             completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
+                                                 operationDependencies: DataBrokerOperationDependencies,
+                                                 completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
 
         let newMode = DataBrokerProtectionQueueMode.immediate(completion: completion)
         startOperationsIfPermitted(forNewMode: newMode,
@@ -136,8 +136,8 @@ final class DefaultDataBrokerProtectionQueueManager: DataBrokerProtectionQueueMa
     }
 
     func startScheduledAllOperationsIfPermitted(showWebView: Bool,
-                                             operationDependencies: DataBrokerOperationDependencies,
-                                             completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
+                                                operationDependencies: DataBrokerOperationDependencies,
+                                                completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
         startScheduleOperationsIfPermitted(withOperationType: .all,
                                            showWebView: showWebView,
                                            operationDependencies: operationDependencies,
@@ -145,8 +145,8 @@ final class DefaultDataBrokerProtectionQueueManager: DataBrokerProtectionQueueMa
     }
 
     func startScheduledScanOperationsIfPermitted(showWebView: Bool,
-                                             operationDependencies: DataBrokerOperationDependencies,
-                                             completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
+                                                 operationDependencies: DataBrokerOperationDependencies,
+                                                 completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
         startScheduleOperationsIfPermitted(withOperationType: .scheduledScan,
                                            showWebView: showWebView,
                                            operationDependencies: operationDependencies,
