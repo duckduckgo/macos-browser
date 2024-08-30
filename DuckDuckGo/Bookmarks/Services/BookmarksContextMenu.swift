@@ -354,7 +354,7 @@ extension BookmarksContextMenu: BookmarkMenuItemSelectors {
     }
 
     @MainActor
-    @objc func manageBookmarks(_ sender: Any?) {
+    @objc func manageBookmarks(_ sender: NSMenuItem) {
         windowControllersManager.showBookmarksTab()
         bookmarksContextMenuDelegate?.closePopoverIfNeeded()
     }

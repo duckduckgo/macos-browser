@@ -96,59 +96,6 @@ final class BookmarkManagementDetailViewModel {
         return bookmarkManager.getBookmarkFolder(withId: parentID)
     }
 
-    // MARK: - Drag and drop
-
-    func validateDrop(pasteboardItems: [NSPasteboardItem]?,
-                      proposedRow row: Int,
-                      proposedDropOperation dropOperation: NSTableView.DropOperation) -> NSDragOperation {
-        if let proposedDestination = fetchEntity(at: row), proposedDestination.isFolder {
-            if let bookmarks = PasteboardBookmark.pasteboardBookmarks(with: pasteboardItems) {
-                return validateDrop(for: bookmarks, destination: proposedDestination)
-            }
-
-            if let folders = PasteboardFolder.pasteboardFolders(with: pasteboardItems) {
-                return validateDrop(for: folders, destination: proposedDestination)
-            }
-
-            return .none
-        } else {
-            // We only want to allow dropping in the same level when not searching
-            if dropOperation == .above && searchQuery.isBlank {
-                return .move
-            } else {
-                return .none
-            }
-        }
-    }
-
-    private func validateDrop(for draggedBookmarks: Set<PasteboardBookmark>, destination: BaseBookmarkEntity) -> NSDragOperation {
-        guard destination is BookmarkFolder else {
-            return .none
-        }
-
-        return .move
-    }
-
-    private func validateDrop(for draggedFolders: Set<PasteboardFolder>, destination: BaseBookmarkEntity) -> NSDragOperation {
-        guard let destinationFolder = destination as? BookmarkFolder else {
-            return .none
-        }
-
-        for folderID in draggedFolders.map(\.id) where !bookmarkManager.canMoveObjectWithUUID(objectUUID: folderID, to: destinationFolder) {
-            return .none
-        }
-
-        let tryingToDragOntoSameFolder = draggedFolders.contains { folder in
-            return folder.id == destination.id
-        }
-
-        if tryingToDragOntoSameFolder {
-            return .none
-        }
-
-        return .move
-    }
-
     // MARK: - Metrics
 
     func onSortButtonTapped() {

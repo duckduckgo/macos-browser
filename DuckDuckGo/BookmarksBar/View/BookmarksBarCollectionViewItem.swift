@@ -21,6 +21,7 @@ import Cocoa
 protocol BookmarksBarCollectionViewItemDelegate: AnyObject {
 
     @MainActor func bookmarksBarCollectionViewItemClicked(_ item: BookmarksBarCollectionViewItem)
+    @MainActor func bookmarksBarCollectionViewItem(_ item: BookmarksBarCollectionViewItem, isMouseOver: Bool)
 
     func showDialog(_ dialog: any ModalView)
 
@@ -55,6 +56,32 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
     weak var delegate: BookmarksBarCollectionViewItemDelegate?
     private var entityType: EntityType?
 
+    var isDisplayingMouseDownState: Bool {
+        get {
+            mouseOverView.backgroundColor == .buttonMouseDown
+        }
+        set {
+            mouseOverView.backgroundColor = newValue ? .buttonMouseDown : .clear
+            mouseOverView.mouseOverColor = newValue ? .buttonMouseDown : .buttonMouseOver
+        }
+    }
+
+    override var highlightState: NSCollectionViewItem.HighlightState {
+        get { super.highlightState }
+        set {
+            switch newValue {
+            case .asDropTarget:
+                mouseOverView.isMouseOver = true
+            case .forSelection, .forDeselection, .none:
+                if highlightState == .asDropTarget {
+                    mouseOverView.isMouseOver = false
+                }
+            @unknown default: break
+            }
+            super.highlightState = newValue
+        }
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -65,6 +92,7 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
     }
 
     func updateItem(from entity: BaseBookmarkEntity, isInteractionPrevented: Bool) {
+        self.representedObject = entity
         self.title = entity.title
         self.representedObject = entity
 
@@ -78,6 +106,7 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
                                         isFavorite: bookmark.isFavorite)
         } else if let folder = entity as? BookmarkFolder {
             self.entityType = .folder(title: folder.title)
+
         } else {
             fatalError("Could not cast bookmark subclass from entity")
         }
@@ -122,6 +151,14 @@ extension BookmarksBarCollectionViewItem: BookmarksContextMenuDelegate {
     func closePopoverIfNeeded() {}
     func showInFolder(_ sender: NSMenuItem) {
         assertionFailure("BookmarksBarCollectionViewItem does not support search")
+    }
+
+}
+// MARK: - MouseOverViewDelegate
+extension BookmarksBarCollectionViewItem: MouseOverViewDelegate {
+
+    func mouseOverView(_ mouseOverView: MouseOverView, isMouseOver: Bool) {
+        delegate?.bookmarksBarCollectionViewItem(self, isMouseOver: isMouseOver)
     }
 
 }

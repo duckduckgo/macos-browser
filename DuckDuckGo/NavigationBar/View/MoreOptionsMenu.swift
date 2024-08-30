@@ -47,7 +47,6 @@ protocol OptionsButtonMenuDelegate: AnyObject {
     func optionsButtonMenuRequestedIdentityTheftRestoration(_ menu: NSMenu)
 }
 
-@MainActor
 final class MoreOptionsMenu: NSMenu {
 
     weak var actionDelegate: OptionsButtonMenuDelegate?
@@ -56,6 +55,7 @@ final class MoreOptionsMenu: NSMenu {
     private let emailManager: EmailManager
     private let passwordManagerCoordinator: PasswordManagerCoordinating
     private let internalUserDecider: InternalUserDecider
+    @MainActor
     private lazy var sharingMenu: NSMenu = SharingMenu(title: UserText.shareMenuItem)
     private var accountManager: AccountManager { subscriptionManager.accountManager }
     private let subscriptionManager: SubscriptionManager
@@ -67,6 +67,7 @@ final class MoreOptionsMenu: NSMenu {
         fatalError("MoreOptionsMenu: Bad initializer")
     }
 
+    @MainActor
     init(tabCollectionViewModel: TabCollectionViewModel,
          emailManager: EmailManager = EmailManager(),
          passwordManagerCoordinator: PasswordManagerCoordinator,
@@ -96,6 +97,7 @@ final class MoreOptionsMenu: NSMenu {
 
     let zoomMenuItem = NSMenuItem(title: UserText.zoom, action: nil, keyEquivalent: "").withImage(.optionsButtonMenuZoom)
 
+    @MainActor
     private func setupMenuItems() {
         addUpdateItem()
 
@@ -156,18 +158,22 @@ final class MoreOptionsMenu: NSMenu {
         actionDelegate?.optionsButtonMenuRequestedNetworkProtectionPopover(self)
     }
 
+    @MainActor
     @objc func newTab(_ sender: NSMenuItem) {
         tabCollectionViewModel.appendNewTab()
     }
 
+    @MainActor
     @objc func newWindow(_ sender: NSMenuItem) {
         WindowsManager.openNewWindow()
     }
 
+    @MainActor
     @objc func newBurnerWindow(_ sender: NSMenuItem) {
         WindowsManager.openNewWindow(burnerMode: BurnerMode(isBurner: true))
     }
 
+    @MainActor
     @objc func toggleFireproofing(_ sender: NSMenuItem) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             Logger.general.error("MainViewController: No tab view model selected")
@@ -249,6 +255,7 @@ final class MoreOptionsMenu: NSMenu {
         actionDelegate?.optionsButtonMenuRequestedIdentityTheftRestoration(self)
     }
 
+    @MainActor
     @objc func findInPage(_ sender: NSMenuItem) {
         tabCollectionViewModel.selectedTabViewModel?.showFindInPage()
     }
@@ -293,6 +300,7 @@ final class MoreOptionsMenu: NSMenu {
         addItem(NSMenuItem.separator())
     }
 
+    @MainActor
     private func addUtilityItems() {
         let bookmarksSubMenu = BookmarksSubMenu(targetting: self, tabCollectionViewModel: tabCollectionViewModel)
 
@@ -317,6 +325,7 @@ final class MoreOptionsMenu: NSMenu {
         addItem(NSMenuItem.separator())
     }
 
+    @MainActor
     private func addSubscriptionItems() {
         guard subscriptionFeatureAvailability.isFeatureAvailable else { return }
 
@@ -345,6 +354,7 @@ final class MoreOptionsMenu: NSMenu {
         }
     }
 
+    @MainActor
     private func addPageItems() {
         guard let tabViewModel = tabCollectionViewModel.selectedTabViewModel,
               let url = tabViewModel.tab.content.userEditableUrl else { return }
@@ -397,7 +407,6 @@ final class MoreOptionsMenu: NSMenu {
 
 }
 
-@MainActor
 final class EmailOptionsButtonSubMenu: NSMenu {
 
     private let tabCollectionViewModel: TabCollectionViewModel
@@ -451,6 +460,7 @@ final class EmailOptionsButtonSubMenu: NSMenu {
         }
     }
 
+    @MainActor
     @objc func manageAccountAction(_ sender: NSMenuItem) {
         let tab = Tab(content: .url(EmailUrls().emailProtectionAccountLink, source: .ui), shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
         tabCollectionViewModel.append(tab: tab)
@@ -484,13 +494,13 @@ final class EmailOptionsButtonSubMenu: NSMenu {
         }
     }
 
+    @MainActor
     @objc func turnOnEmailAction(_ sender: NSMenuItem) {
         let tab = Tab(content: .url(EmailUrls().emailProtectionLink, source: .ui), shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
         tabCollectionViewModel.append(tab: tab)
     }
 }
 
-@MainActor
 final class FeedbackSubMenu: NSMenu {
     private let subscriptionFeatureAvailability: SubscriptionFeatureAvailability
     private let accountManager: AccountManager
@@ -536,9 +546,9 @@ final class FeedbackSubMenu: NSMenu {
     }
 }
 
-@MainActor
 final class ZoomSubMenu: NSMenu {
 
+    @MainActor
     init(targetting target: AnyObject, tabCollectionViewModel: TabCollectionViewModel) {
         super.init(title: UserText.zoom)
 
@@ -549,6 +559,7 @@ final class ZoomSubMenu: NSMenu {
         fatalError("init(coder:) has not been implemented")
     }
 
+    @MainActor
     private func updateMenuItems(with tabCollectionViewModel: TabCollectionViewModel, targetting target: AnyObject) {
         removeAllItems()
 
@@ -574,9 +585,9 @@ final class ZoomSubMenu: NSMenu {
     }
 }
 
-@MainActor
 final class BookmarksSubMenu: NSMenu {
 
+    @MainActor
     init(targetting target: AnyObject, tabCollectionViewModel: TabCollectionViewModel) {
         super.init(title: UserText.passwordManagementTitle)
         self.autoenablesItems = false
@@ -587,6 +598,7 @@ final class BookmarksSubMenu: NSMenu {
         fatalError("init(coder:) has not been implemented")
     }
 
+    @MainActor
     private func addMenuItems(with tabCollectionViewModel: TabCollectionViewModel, target: AnyObject) {
         let bookmarkPageItem = addItem(withTitle: UserText.bookmarkThisPage, action: #selector(MoreOptionsMenu.bookmarkPage(_:)), keyEquivalent: "d")
             .withModifierMask([.command])
@@ -607,6 +619,10 @@ final class BookmarksSubMenu: NSMenu {
             .targetting(target)
 
         BookmarksBarMenuFactory.addToMenu(self)
+
+        addItem(withTitle: UserText.bookmarksManageBookmarks, action: #selector(MoreOptionsMenu.openBookmarksManagementInterface), keyEquivalent: "b")
+            .withModifierMask([.command, .option])
+            .targetting(target)
 
         addItem(NSMenuItem.separator())
 
@@ -723,9 +739,9 @@ final class LoginsSubMenu: NSMenu {
 
 }
 
-@MainActor
 final class HelpSubMenu: NSMenu {
 
+    @MainActor
     init(targetting target: AnyObject) {
         super.init(title: UserText.mainMenuHelp)
 
@@ -736,6 +752,7 @@ final class HelpSubMenu: NSMenu {
         fatalError("init(coder:) has not been implemented")
     }
 
+    @MainActor
     private func updateMenuItems(targetting target: AnyObject) {
         removeAllItems()
 
@@ -756,7 +773,6 @@ final class HelpSubMenu: NSMenu {
     }
 }
 
-@MainActor
 final class SubscriptionSubMenu: NSMenu, NSMenuDelegate {
 
     var subscriptionFeatureAvailability: SubscriptionFeatureAvailability
