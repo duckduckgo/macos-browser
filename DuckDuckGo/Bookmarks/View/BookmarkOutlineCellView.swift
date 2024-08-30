@@ -26,6 +26,10 @@ protocol BookmarkOutlineCellViewDelegate: AnyObject {
 final class BookmarkOutlineCellView: NSTableCellView {
 
     private static let sizingCellIdentifier = NSUserInterfaceItemIdentifier("sizing")
+    static func identifier(for mode: BookmarkOutlineViewDataSource.ContentMode) -> NSUserInterfaceItemIdentifier {
+        NSUserInterfaceItemIdentifier("\(mode)_\(self.className())")
+    }
+
     static let sizingCell = BookmarkOutlineCellView(identifier: BookmarkOutlineCellView.sizingCellIdentifier)
 
     static let rowHeight: CGFloat = 28
@@ -51,7 +55,18 @@ final class BookmarkOutlineCellView: NSTableCellView {
         }
     }
 
-    var shouldShowMenuButton = false
+    var contentMode: BookmarkOutlineViewDataSource.ContentMode? {
+        BookmarkOutlineViewDataSource.ContentMode.allCases.first { mode in
+            Self.identifier(for: mode) == self.identifier
+        }
+    }
+
+    var shouldShowMenuButton: Bool {
+        contentMode != .foldersOnly
+    }
+    var shouldShowChevron: Bool {
+        contentMode == .bookmarksMenu
+    }
 
     weak var delegate: BookmarkOutlineCellViewDelegate?
 
@@ -222,7 +237,9 @@ final class BookmarkOutlineCellView: NSTableCellView {
         }
         if !titleLabel.isEnabled {
             titleLabel.textColor = .disabledControlTextColor
-        } else if highlight && isInKeyWindow {
+        } else if highlight,
+                  isInKeyWindow,
+                  contentMode != .foldersOnly {
             titleLabel.textColor = .selectedMenuItemTextColor
             urlLabel.textColor = .selectedMenuItemTextColor
         } else {
@@ -253,19 +270,19 @@ final class BookmarkOutlineCellView: NSTableCellView {
                 || representedObject is PseudoFolder || representedObject is MenuItemNode else { return 0 }
 
         sizingCell.frame = .zero
-        sizingCell.update(from: representedObject, isMenuPopover: true)
+        sizingCell.update(from: representedObject)
         sizingCell.layoutSubtreeIfNeeded()
 
         return sizingCell.frame.width + 6
     }
 
-    func update(from object: Any, isSearch: Bool = false, isMenuPopover: Bool) {
+    func update(from object: Any, isSearch: Bool = false) {
         let representedObject = (object as? BookmarkNode)?.representedObject ?? object
         switch representedObject {
         case let bookmark as Bookmark:
             update(from: bookmark, isSearch: isSearch, showURL: identifier != Self.sizingCellIdentifier)
         case let folder as BookmarkFolder:
-            update(from: folder, isSearch: isSearch, showChevron: isMenuPopover)
+            update(from: folder, isSearch: isSearch)
         case let folder as PseudoFolder:
             update(from: folder)
         case let menuItem as MenuItemNode:
@@ -298,18 +315,18 @@ final class BookmarkOutlineCellView: NSTableCellView {
         updateConstraints(isSearch: isSearch)
     }
 
-    func update(from folder: BookmarkFolder, isSearch: Bool = false, showChevron: Bool) {
+    func update(from folder: BookmarkFolder, isSearch: Bool = false) {
         faviconImageView.image = .folder
         faviconImageView.isHidden = false
         titleLabel.stringValue = folder.title
         titleLabel.isEnabled = true
-        favoriteImageView.image = showChevron ? .chevronMediumRight16 : nil
+        favoriteImageView.image = shouldShowChevron ? .chevronMediumRight16 : nil
         favoriteImageView.isHidden = favoriteImageView.image == nil
         urlLabel.stringValue = ""
         self.toolTip = nil
 
         let totalChildBookmarks = folder.totalChildBookmarks
-        if totalChildBookmarks > 0 && !showChevron {
+        if totalChildBookmarks > 0 && !shouldShowChevron {
             countLabel.stringValue = String(totalChildBookmarks)
             countLabel.isHidden = false
         } else {
@@ -373,12 +390,12 @@ extension BookmarkOutlineCellView {
                 BookmarkOutlineCellView(identifier: .init("")),
                 BookmarkOutlineCellView(identifier: .init("")),
                 BookmarkOutlineCellView(identifier: .init("")),
+                BookmarkOutlineCellView(identifier: BookmarkOutlineCellView.identifier(for: .bookmarksMenu)),
                 BookmarkOutlineCellView(identifier: .init("")),
                 BookmarkOutlineCellView(identifier: .init("")),
                 BookmarkOutlineCellView(identifier: .init("")),
-                BookmarkOutlineCellView(identifier: .init("")),
-                BookmarkOutlineCellView(identifier: .init("")),
-                BookmarkOutlineCellView(identifier: .init("")),
+                BookmarkOutlineCellView(identifier: BookmarkOutlineCellView.identifier(for: .bookmarksMenu)),
+                BookmarkOutlineCellView(identifier: BookmarkOutlineCellView.identifier(for: .bookmarksMenu)),
                 BookmarkOutlineCellView(identifier: .init("")),
                 BookmarkOutlineCellView(identifier: .init("")),
             ]
@@ -397,22 +414,22 @@ extension BookmarkOutlineCellView {
             let bkm2 = Bookmark(id: "3", url: "http://a.b", title: "Bookmark with longer title to test width", isFavorite: false)
             cells[2].update(from: bkm2, showURL: false)
 
-            cells[3].update(from: BookmarkFolder(id: "4", title: "Bookmark Folder with a reasonably long name"), showChevron: true)
-            cells[4].update(from: BookmarkFolder(id: "5", title: "Bookmark Folder with 42 bookmark children", children: Array(repeating: Bookmark(id: "2", url: "http://a.b", title: "DuckDuckGo", isFavorite: true), count: 42)), showChevron: false)
+            cells[3].update(from: BookmarkFolder(id: "4", title: "Bookmark Folder with a reasonably long name"))
+            cells[4].update(from: BookmarkFolder(id: "5", title: "Bookmark Folder with 42 bookmark children", children: Array(repeating: Bookmark(id: "2", url: "http://a.b", title: "DuckDuckGo", isFavorite: true), count: 42)))
             PseudoFolder.favorites.count = 64
             cells[5].update(from: PseudoFolder.favorites)
             PseudoFolder.bookmarks.count = 256
             cells[6].update(from: PseudoFolder.bookmarks)
 
             let node = BookmarkNode(representedObject: MenuItemNode(identifier: "", title: UserText.bookmarksOpenInNewTabs, isEnabled: true), parent: BookmarkNode.genericRootNode())
-            cells[7].update(from: node, isMenuPopover: true)
+            cells[7].update(from: node)
 
             let emptyNode = BookmarkNode(representedObject: MenuItemNode(identifier: "", title: UserText.bookmarksBarFolderEmpty, isEnabled: false), parent: BookmarkNode.genericRootNode())
-            cells[8].update(from: emptyNode, isMenuPopover: true)
+            cells[8].update(from: emptyNode)
 
             let sbkm = Bookmark(id: "3", url: "http://a.b", title: "Bookmark in Search mode", isFavorite: false)
             cells[9].update(from: sbkm, isSearch: true, showURL: false)
-            cells[10].update(from: BookmarkFolder(id: "5", title: "Folder in Search mode", children: Array(repeating: Bookmark(id: "2", url: "http://a.b", title: "DuckDuckGo", isFavorite: true), count: 42)), isSearch: true, showChevron: false)
+            cells[10].update(from: BookmarkFolder(id: "5", title: "Folder in Search mode", children: Array(repeating: Bookmark(id: "2", url: "http://a.b", title: "DuckDuckGo", isFavorite: true), count: 42)), isSearch: true)
 
             widthAnchor.constraint(equalToConstant: 258).isActive = true
             heightAnchor.constraint(equalToConstant: CGFloat((28 + 1) * cells.count)).isActive = true

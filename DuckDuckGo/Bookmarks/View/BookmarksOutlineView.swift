@@ -83,6 +83,9 @@ final class BookmarksOutlineView: NSOutlineView {
         return nil
     }
 
+    private var isInPopover: Bool {
+        popover != nil
+    }
     private var isInKeyPopover: Bool {
         guard highlightedRow != nil else { return false }
         // is there a child menu popover window owned by our window?
@@ -103,6 +106,11 @@ final class BookmarksOutlineView: NSOutlineView {
 
     // mark highlight with inactive color for non-key popover menu and with active color for key popover menu
     private func updateIsInKeyPopoverState() {
+        guard isInPopover else {
+            highlightedRowView?.isInKeyWindow = false
+            highlightedCellView?.isInKeyWindow = false
+            return
+        }
         // when no highlighted row - our parent is the key popover
         guard highlightedRow != nil else {
             parentMenuOutlineView?.updateIsInKeyPopoverState()
@@ -366,7 +374,7 @@ final class BookmarksOutlineView: NSOutlineView {
         }
         if highlightedRow != row {
             highlightedRow = row
-        } else {
+        } else if isInPopover {
             highlightedRowView?.isInKeyWindow = true
             highlightedCellView?.isInKeyWindow = true
         }

@@ -23,12 +23,19 @@ import os.log
 
 final class BookmarkOutlineViewDataSource: NSObject, BookmarksOutlineViewDataSource, NSOutlineViewDelegate {
 
-    enum ContentMode {
+    enum ContentMode: CaseIterable {
         case bookmarksAndFolders
         case foldersOnly
         case bookmarksMenu
 
         var isSeparatorVisible: Bool {
+            switch self {
+            case .bookmarksAndFolders, .bookmarksMenu: true
+            case .foldersOnly: false
+            }
+        }
+
+        var showMenuButtonOnHover: Bool {
             switch self {
             case .bookmarksAndFolders, .bookmarksMenu: true
             case .foldersOnly: false
@@ -73,7 +80,6 @@ final class BookmarkOutlineViewDataSource: NSObject, BookmarksOutlineViewDataSou
     private let treeController: BookmarkTreeController
     private let bookmarkManager: BookmarkManager
     private let dragDropManager: BookmarkDragDropManager
-    private let showMenuButtonOnHover: Bool
     private let presentFaviconsFetcherOnboarding: (() -> Void)?
 
     init(
@@ -82,14 +88,12 @@ final class BookmarkOutlineViewDataSource: NSObject, BookmarksOutlineViewDataSou
         treeController: BookmarkTreeController,
         dragDropManager: BookmarkDragDropManager = .shared,
         sortMode: BookmarksSortMode,
-        showMenuButtonOnHover: Bool = true,
         presentFaviconsFetcherOnboarding: (() -> Void)? = nil
     ) {
         self.contentMode = contentMode
         self.bookmarkManager = bookmarkManager
         self.dragDropManager = dragDropManager
         self.treeController = treeController
-        self.showMenuButtonOnHover = showMenuButtonOnHover
         self.presentFaviconsFetcherOnboarding = presentFaviconsFetcherOnboarding
 
         super.init()
@@ -206,11 +210,10 @@ final class BookmarkOutlineViewDataSource: NSObject, BookmarksOutlineViewDataSou
                 ?? OutlineSeparatorViewCell(isSeparatorVisible: contentMode.isSeparatorVisible)
         }
 
-        let cell = outlineView.makeView(withIdentifier: .init(BookmarkOutlineCellView.className()), owner: self) as? BookmarkOutlineCellView
-            ?? BookmarkOutlineCellView(identifier: .init(BookmarkOutlineCellView.className()))
-        cell.shouldShowMenuButton = showMenuButtonOnHover
+        let cell = outlineView.makeView(withIdentifier: BookmarkOutlineCellView.identifier(for: contentMode), owner: self) as? BookmarkOutlineCellView
+            ?? BookmarkOutlineCellView(identifier: BookmarkOutlineCellView.identifier(for: contentMode))
         cell.delegate = self
-        cell.update(from: node, isSearch: isSearching, isMenuPopover: contentMode == .bookmarksMenu)
+        cell.update(from: node, isSearch: isSearching)
 
         if let bookmark = node.representedObject as? Bookmark, bookmark.favicon(.small) == nil {
             presentFaviconsFetcherOnboarding?()
