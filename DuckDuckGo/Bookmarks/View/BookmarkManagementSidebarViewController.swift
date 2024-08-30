@@ -56,8 +56,7 @@ final class BookmarkManagementSidebarViewController: NSViewController {
                                                                 bookmarkManager: bookmarkManager,
                                                                 treeController: treeController,
                                                                 dragDropManager: dragDropManager,
-                                                                sortMode: selectedSortMode,
-                                                                showMenuButtonOnHover: false)
+                                                                sortMode: selectedSortMode)
 
     private var cancellables = Set<AnyCancellable>()
     private var selectedSortMode: BookmarksSortMode

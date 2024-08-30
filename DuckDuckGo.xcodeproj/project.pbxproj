@@ -6056,6 +6056,8 @@
 				4BE5336A286912D40019DBFD /* BookmarksBarCollectionViewItem.swift */,
 				4BE53369286912D40019DBFD /* BookmarksBarCollectionViewItem.xib */,
 				85774AFE2A713D3B00DE0561 /* BookmarksBarMenuFactory.swift */,
+				84F1C8CE2C7705B500716446 /* BookmarksBarMenuPopover.swift */,
+				848648A02C76F4B20082282D /* BookmarksBarMenuViewController.swift */,
 				4BD18EFF283F0BC500058124 /* BookmarksBarViewController.swift */,
 				4BE41A5D28446EAD00760399 /* BookmarksBarViewModel.swift */,
 				4BE5336D286915A10019DBFD /* HorizontallyCenteredLayout.swift */,
@@ -6482,8 +6484,8 @@
 		859F30622A72A7A900C20372 /* Prompt */ = {
 			isa = PBXGroup;
 			children = (
-				859F30632A72A7BB00C20372 /* BookmarksBarPromptPopover.swift */,
 				859F30662A72B38500C20372 /* BookmarksBarPromptAssets.xcassets */,
+				859F30632A72A7BB00C20372 /* BookmarksBarPromptPopover.swift */,
 			);
 			path = Prompt;
 			sourceTree = "<group>";
@@ -7673,8 +7675,6 @@
 				4B9292C72667123700AD2C21 /* BookmarkManagementSidebarViewController.swift */,
 				4B9292C82667123700AD2C21 /* BookmarkManagementSplitViewController.swift */,
 				4B92928726670D1600AD2C21 /* BookmarkOutlineCellView.swift */,
-				84F1C8CE2C7705B500716446 /* BookmarksBarMenuPopover.swift */,
-				848648A02C76F4B20082282D /* BookmarksBarMenuViewController.swift */,
 				4B92928526670D1600AD2C21 /* BookmarksOutlineView.swift */,
 				4B92928926670D1700AD2C21 /* BookmarkTableCellView.swift */,
 				4B9292C92667123700AD2C21 /* BookmarkTableRowView.swift */,
