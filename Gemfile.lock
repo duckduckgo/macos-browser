@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/duckduckgo/fastlane-plugin-ddg_apple_automation
-  revision: 5d267b66e9c63f879eecbb4ae1f40cb42547026e
-  tag: 0.2.0
+  revision: fcbc84820345dea381e53ba9bd036c4baae531a6
+  branch: jacek/asana-upload
   specs:
     fastlane-plugin-ddg_apple_automation (0.2.0)
 
@@ -231,4 +231,4 @@ DEPENDENCIES
   httparty
 
 BUNDLED WITH
-   2.4.19
+   2.4.4

@@ -345,29 +345,26 @@ jobs:
       - name: Upload patch to the Asana task
         id: upload-patch
         if: success()
-        uses: ./.github/actions/asana-upload
-        with:
-          access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          file-name: ${{ env.SPARKLE_DIR }}/${{ steps.appcast.outputs.appcast-patch-name }}
-          task-id: ${{ steps.create-task.outputs.new-task-id }}
+        run: |
+          bundle exec fastlane run asana_upload \
+            file_name:"${{ env.SPARKLE_DIR }}/${{ steps.appcast.outputs.appcast-patch-name }}" \
+            task_id:"${{ steps.create-task.outputs.new-task-id }}" 
 
       - name: Upload old appcast file to the Asana task
         id: upload-old-appcast
         if: success()
-        uses: ./.github/actions/asana-upload
-        with:
-          access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          file-name: ${{ env.OLD_APPCAST_NAME }}
-          task-id: ${{ steps.create-task.outputs.new-task-id }}
+        run: |
+          bundle exec fastlane run asana_upload \
+            file_name:"${{ env.OLD_APPCAST_NAME }}" \
+            task_id:"${{ steps.create-task.outputs.new-task-id }}" 
   
       - name: Upload release notes to the Asana task
         id: upload-release-notes
         if: success()
-        uses: ./.github/actions/asana-upload
-        with:
-          access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          file-name: ${{ env.RELEASE_NOTES_FILE }}
-          task-id: ${{ steps.create-task.outputs.new-task-id }}
+        run: |
+          bundle exec fastlane run asana_upload \
+            file_name:"${{ env.RELEASE_NOTES_FILE }}" \
+            task_id:"${{ steps.create-task.outputs.new-task-id }}" 
         
       - name: Report status
         if: always()
