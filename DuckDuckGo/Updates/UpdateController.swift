@@ -24,6 +24,7 @@ import BrowserServicesKit
 import SwiftUIExtensions
 import PixelKit
 import SwiftUI
+import os.log
 
 protocol UpdateControllerProtocol: AnyObject {
 
@@ -98,7 +99,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     @UserDefaultsWrapper(key: .automaticUpdates, defaultValue: true)
     var areAutomaticUpdatesEnabled: Bool {
         didSet {
-            os_log("areAutomaticUpdatesEnabled: \(areAutomaticUpdatesEnabled)", log: .updates)
+            Logger.updates.debug("areAutomaticUpdatesEnabled: \(self.areAutomaticUpdatesEnabled)")
             if updater.updater.automaticallyDownloadsUpdates != areAutomaticUpdatesEnabled {
                 updater.updater.automaticallyDownloadsUpdates = areAutomaticUpdatesEnabled
 
@@ -151,13 +152,13 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     }
 
     func checkForUpdate() {
-        os_log("Checking for updates", log: .updates)
+        Logger.updates.debug("Checking for updates")
 
         updater.updater.checkForUpdates()
     }
 
     func checkForUpdateInBackground() {
-        os_log("Checking for updates in background", log: .updates)
+        Logger.updates.debug("Checking for updates in background")
 
         updater.updater.checkForUpdatesInBackground()
     }
@@ -211,7 +212,7 @@ extension UpdateController: SPUStandardUserDriverDelegate {
 extension UpdateController: SPUUpdaterDelegate {
 
     func updater(_ updater: SPUUpdater, mayPerform updateCheck: SPUUpdateCheck) throws {
-        os_log("Updater started performing the update check. (isInternalUser: \(internalUserDecider.isInternalUser)", log: .updates)
+        Logger.updates.debug("Updater started performing the update check. (isInternalUser: \(self.internalUserDecider.isInternalUser)")
 
         onUpdateCheckStart()
     }
@@ -234,10 +235,7 @@ extension UpdateController: SPUUpdaterDelegate {
     }
 
     func updater(_ updater: SPUUpdater, didAbortWithError error: Error) {
-        os_log("Updater did abort with error: %{public}@",
-               log: .updates,
-               error.localizedDescription)
-
+        Logger.updates.error("Updater did abort with error: \(error.localizedDescription)")
         let errorCode = (error as NSError).code
         guard ![Int(Sparkle.SUError.noUpdateError.rawValue),
                 Int(Sparkle.SUError.installationCanceledError.rawValue),
@@ -250,9 +248,7 @@ extension UpdateController: SPUUpdaterDelegate {
     }
 
     func updater(_ updater: SPUUpdater, didFindValidUpdate item: SUAppcastItem) {
-        os_log("Updater did find valid update: %{public}@",
-               log: .updates,
-               "\(item.displayVersionString)(\(item.versionString))")
+        Logger.updates.debug("Updater did find valid update: \(item.displayVersionString)(\(item.versionString))")
 
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidFindUpdate))
 
@@ -265,9 +261,7 @@ extension UpdateController: SPUUpdaterDelegate {
 
     func updaterDidNotFindUpdate(_ updater: SPUUpdater, error: any Error) {
         let item = (error as NSError).userInfo["SULatestAppcastItemFound"] as? SUAppcastItem
-        os_log("Updater did not find update: %{public}@",
-               log: .updates,
-               "\(item?.displayVersionString ?? "")(\(item?.versionString ?? ""))")
+        Logger.updates.debug("Updater did not find update: \(String(describing: item?.displayVersionString))(\(String(describing: item?.versionString)))")
         if let item {
             // User is running the latest version
             updateCheckResult = UpdateCheckResult(item: item, isInstalled: true)
@@ -277,9 +271,7 @@ extension UpdateController: SPUUpdaterDelegate {
     }
 
     func updater(_ updater: SPUUpdater, didDownloadUpdate item: SUAppcastItem) {
-        os_log("Updater did download update: %{public}@",
-               log: .updates,
-               "\(item.displayVersionString)(\(item.versionString))")
+        Logger.updates.debug("Updater did download update: \(item.displayVersionString)(\(item.versionString))")
 
         if automaticUpdateFlow {
             // For automatic updates, the available item has to be downloaded
@@ -291,7 +283,7 @@ extension UpdateController: SPUUpdaterDelegate {
     }
 
     func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {
-        os_log("Updater did finish update cycle", log: .updates)
+        Logger.updates.debug("Updater did finish update cycle")
 
         onUpdateCheckEnd()
     }

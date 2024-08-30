@@ -17,9 +17,10 @@
 //
 
 import Foundation
-import Common
+import os.log
 import BrowserServicesKit
 import PixelKit
+import Common
 
 protocol DataBrokerProtectionEngagementPixelsRepository {
     func markDailyPixelSent()
@@ -106,7 +107,7 @@ final class DataBrokerProtectionEngagementPixels {
 
     func fireEngagementPixel(currentDate: Date = Date()) {
         guard (try? database.fetchProfile()) != nil else {
-            os_log("No profile. We do not fire any pixel because we do not consider it an engaged user.", log: .dataBrokerProtection)
+            Logger.dataBrokerProtection.debug("No profile. We do not fire any pixel because we do not consider it an engaged user.")
             return
         }
 

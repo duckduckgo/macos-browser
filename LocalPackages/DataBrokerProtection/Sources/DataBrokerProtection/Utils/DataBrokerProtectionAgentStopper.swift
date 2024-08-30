@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import os.log
 import Common
 
 protocol DataBrokerProtectionAgentStopper {
@@ -51,13 +52,13 @@ struct DefaultDataBrokerProtectionAgentStopper: DataBrokerProtectionAgentStopper
         do {
             guard try dataManager.fetchProfile() != nil,
                   authenticationManager.isUserAuthenticated else {
-                os_log("Prerequisites are invalid", log: .dataBrokerProtection)
+                Logger.dataBrokerProtection.debug("Prerequisites are invalid")
                 stopAgent()
                 return
             }
-            os_log("Prerequisites are valid", log: .dataBrokerProtection)
+            Logger.dataBrokerProtection.debug("Prerequisites are valid")
         } catch {
-            os_log("Error validating prerequisites, error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
+            Logger.dataBrokerProtection.error("Error validating prerequisites, error: \(error.localizedDescription, privacy: .public)")
             stopAgent()
         }
 
@@ -83,14 +84,14 @@ struct DefaultDataBrokerProtectionAgentStopper: DataBrokerProtectionAgentStopper
     private func stopAgentBasedOnEntitlementCheckResult(_ result: DataBrokerProtectionEntitlementMonitorResult) {
         switch result {
         case .enabled:
-            os_log("Valid entitlement", log: .dataBrokerProtection)
+            Logger.dataBrokerProtection.debug("Valid entitlement")
             pixelHandler.fire(.entitlementCheckValid)
         case .disabled:
-            os_log("Invalid entitlement", log: .dataBrokerProtection)
+            Logger.dataBrokerProtection.debug("Invalid entitlement")
             pixelHandler.fire(.entitlementCheckInvalid)
             stopAgent()
         case .error:
-            os_log("Error when checking entitlement", log: .dataBrokerProtection)
+            Logger.dataBrokerProtection.debug("Error when checking entitlement")
             /// We don't want to disable the agent in case of an error while checking for entitlements.
             /// Since this is a destructive action, the only situation that should cause the data to be deleted and the agent to be removed is .success(false)
             pixelHandler.fire(.entitlementCheckError)
@@ -104,7 +105,7 @@ protocol DataProtectionStopAction {
 
 struct DefaultDataProtectionStopAction: DataProtectionStopAction {
     func stopAgent() {
-        os_log("Stopping DataBrokerProtection Agent", log: .dataBrokerProtection)
+        Logger.dataBrokerProtection.debug("Stopping DataBrokerProtection Agent")
         exit(EXIT_SUCCESS)
     }
 }

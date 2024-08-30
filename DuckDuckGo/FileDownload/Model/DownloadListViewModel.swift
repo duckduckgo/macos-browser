@@ -19,6 +19,7 @@
 import Combine
 import Common
 import Foundation
+import os.log
 
 @MainActor
 final class DownloadListViewModel {
@@ -41,7 +42,7 @@ final class DownloadListViewModel {
     }
 
     private func handleDownloadsUpdate(of kind: DownloadListCoordinator.UpdateKind, item: DownloadListItem) {
-        os_log(.debug, log: .downloads, "DownloadListViewModel: .\(kind) \(item.identifier)")
+        Logger.fileDownload.debug("DownloadListViewModel: .\(String(describing: kind)) \(item.identifier)")
 
         dispatchPrecondition(condition: .onQueue(.main))
         switch kind {

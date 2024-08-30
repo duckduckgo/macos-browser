@@ -95,6 +95,7 @@ final class NavigationBarViewController: NSViewController {
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var credentialsToSaveCancellable: AnyCancellable?
     private var vpnToggleCancellable: AnyCancellable?
+    private var feedbackFormCancellable: AnyCancellable?
     private var passwordManagerNotificationCancellable: AnyCancellable?
     private var pinnedViewsNotificationCancellable: AnyCancellable?
     private var navigationButtonsCancellables = Set<AnyCancellable>()
@@ -151,6 +152,7 @@ final class NavigationBarViewController: NSViewController {
         listenToPasswordManagerNotifications()
         listenToPinningManagerNotifications()
         listenToMessageNotifications()
+        listenToFeedbackFormNotifications()
         subscribeToDownloads()
         addContextMenu()
 
@@ -212,7 +214,7 @@ final class NavigationBarViewController: NSViewController {
 
     @IBAction func goBackAction(_ sender: NSButton) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", type: .error, className)
+            Logger.navigation.error("Selected tab view model is nil")
             return
         }
 
@@ -228,7 +230,7 @@ final class NavigationBarViewController: NSViewController {
 
     @IBAction func goForwardAction(_ sender: NSButton) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", type: .error, className)
+            Logger.navigation.error("Selected tab view model is nil")
             return
         }
 
@@ -249,7 +251,7 @@ final class NavigationBarViewController: NSViewController {
 
     @IBAction func refreshOrStopAction(_ sender: NSButton) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", type: .error, className)
+            Logger.navigation.error("Selected tab view model is nil")
             return
         }
 
@@ -262,7 +264,7 @@ final class NavigationBarViewController: NSViewController {
 
     @IBAction func homeButtonAction(_ sender: NSButton) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", type: .error, className)
+            Logger.navigation.error("Selected tab view model is nil")
             return
         }
         selectedTabViewModel.tab.openHomePage()
@@ -402,6 +404,12 @@ final class NavigationBarViewController: NSViewController {
                 }
             }
             .store(in: &cancellables)
+    }
+
+    func listenToFeedbackFormNotifications() {
+        feedbackFormCancellable = NotificationCenter.default.publisher(for: .OpenUnifiedFeedbackForm).receive(on: DispatchQueue.main).sink { _ in
+            WindowControllersManager.shared.showShareFeedbackModal(source: .ppro)
+        }
     }
 
     @objc private func showVPNUninstalledFeedback() {
@@ -1169,4 +1177,5 @@ extension NavigationBarViewController {
 
 extension Notification.Name {
     static let ToggleNetworkProtectionInMainWindow = Notification.Name("com.duckduckgo.vpn.toggle-popover-in-main-window")
+    static let OpenUnifiedFeedbackForm = Notification.Name("com.duckduckgo.subscription.open-unified-feedback-form")
 }

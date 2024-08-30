@@ -92,8 +92,7 @@ final class AppContentBlocking {
                                                                           compiledRulesSource: contentBlockingManager,
                                                                           exceptionsSource: exceptionsSource,
                                                                           errorReporting: attributionDebugEvents,
-                                                                          compilationErrorReporting: Self.debugEvents,
-                                                                          log: .attribution)
+                                                                          compilationErrorReporting: Self.debugEvents)
     }
 
     private static let debugEvents = EventMapping<ContentBlockerDebugEvents> { event, error, parameters, onComplete in
