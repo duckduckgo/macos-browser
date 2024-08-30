@@ -103,7 +103,7 @@ extension BookmarksContextMenu {
     /// - Returns: An instance of NSMenu or nil if `entity` is not a `Bookmark` or a `Folder`.
     static func menuItems(for entity: BaseBookmarkEntity, parentFolder: BookmarkFolder?, forSearch: Bool, includeManageBookmarksItem: Bool) -> [NSMenuItem] {
         if let bookmark = entity as? Bookmark {
-            return menuItems(for: bookmark, parent: parentFolder, isFavorite: bookmark.isFavorite, forSearch: forSearch)
+            return menuItems(for: bookmark, parent: parentFolder, isFavorite: bookmark.isFavorite, forSearch: forSearch, includeManageBookmarksItem: includeManageBookmarksItem)
         } else if let folder = entity as? BookmarkFolder {
             // When the user edits a folder we need to show the parent in the folder picker. Folders directly child of PseudoFolder `Bookmarks` have nil parent because their parent is not an instance of `BookmarkFolder`
             return menuItems(for: folder, parent: parentFolder, forSearch: forSearch, includeManageBookmarksItem: includeManageBookmarksItem)
@@ -116,7 +116,7 @@ extension BookmarksContextMenu {
 
 private extension BookmarksContextMenu {
 
-    static func menuItems(for bookmark: Bookmark?, parent: BookmarkFolder?, isFavorite: Bool, forSearch: Bool = false) -> [NSMenuItem] {
+    static func menuItems(for bookmark: Bookmark?, parent: BookmarkFolder?, isFavorite: Bool, forSearch: Bool = false, includeManageBookmarksItem: Bool) -> [NSMenuItem] {
         var items = [
             openBookmarkInNewTabMenuItem(bookmark: bookmark),
             openBookmarkInNewWindowMenuItem(bookmark: bookmark),
@@ -129,9 +129,11 @@ private extension BookmarksContextMenu {
             moveToEndMenuItem(entity: bookmark, parent: parent),
             NSMenuItem.separator(),
             addFolderMenuItem(folder: parent, target: self),
-            manageBookmarksMenuItem(),
         ]
 
+        if includeManageBookmarksItem {
+            items.append(manageBookmarksMenuItem())
+        }
         if forSearch {
             let showInFolderItem = showInFolderMenuItem(bookmark: bookmark, parent: parent)
             items.insert(showInFolderItem, at: 5)
