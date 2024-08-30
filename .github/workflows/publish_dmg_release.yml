@@ -345,6 +345,8 @@ jobs:
       - name: Upload patch to the Asana task
         id: upload-patch
         if: success()
+        env:
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
         run: |
           bundle exec fastlane run asana_upload \
             file_name:"${{ env.SPARKLE_DIR }}/${{ steps.appcast.outputs.appcast-patch-name }}" \
@@ -353,6 +355,8 @@ jobs:
       - name: Upload old appcast file to the Asana task
         id: upload-old-appcast
         if: success()
+        env:
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
         run: |
           bundle exec fastlane run asana_upload \
             file_name:"${{ env.OLD_APPCAST_NAME }}" \
@@ -361,6 +365,8 @@ jobs:
       - name: Upload release notes to the Asana task
         id: upload-release-notes
         if: success()
+        env:
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
         run: |
           bundle exec fastlane run asana_upload \
             file_name:"${{ env.RELEASE_NOTES_FILE }}" \

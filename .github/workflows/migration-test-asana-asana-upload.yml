@@ -20,6 +20,8 @@ jobs:
       run: bundle install
 
     - name: Test asana_upload
+      env:
+        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
       run: |
         bundle exec fastlane run asana_upload \
           file_name:"Gemfile" \
