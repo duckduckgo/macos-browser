@@ -29,8 +29,27 @@ fileprivate extension SettingsModel.CustomBackgroundModeModel {
     static let root: Self = .init(contentType: .root, title: "", customBackgroundThumbnail: nil)
     static let gradientPicker: Self = .init(contentType: .gradientPicker, title: "", customBackgroundThumbnail: nil)
     static let colorPicker: Self = .init(contentType: .colorPicker, title: "", customBackgroundThumbnail: nil)
-    static let illustrationPicker: Self = .init(contentType: .illustrationPicker, title: "", customBackgroundThumbnail: nil)
     static let customImagePicker: Self = .init(contentType: .customImagePicker, title: "", customBackgroundThumbnail: nil)
+}
+
+final class MockUserColorProvider: UserColorProviding {
+    var colorPublisher: AnyPublisher<NSColor, Never> {
+        colorSubject.eraseToAnyPublisher()
+    }
+
+    func showColorPanel(with color: NSColor?) {
+        showColorPanelCallCount += 1
+        showColorPanel(color)
+    }
+
+    func closeColorPanel() {
+        closeColorPanelCallCount += 1
+    }
+
+    var colorSubject = PassthroughSubject<NSColor, Never>()
+    var showColorPanelCallCount = 0
+    var showColorPanel: (NSColor?) -> Void = { _ in }
+    var closeColorPanelCallCount = 0
 }
 
 final class HomePageSettingsModelTests: XCTestCase {
@@ -45,6 +64,7 @@ final class HomePageSettingsModelTests: XCTestCase {
     var openFilePanelCallCount = 0
     var showImageFailedAlertCallCount = 0
     var imageURL: URL?
+    var userColorProvider: MockUserColorProvider!
 
     override func setUp() async throws {
         openSettingsCallCount = 0
@@ -53,6 +73,10 @@ final class HomePageSettingsModelTests: XCTestCase {
         storageLocation = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         appearancePreferences = .init(persistor: AppearancePreferencesPersistorMock())
         userBackgroundImagesManager = CapturingUserBackgroundImagesManager(storageLocation: storageLocation, maximumNumberOfImages: 4)
+        userColorProvider = MockUserColorProvider()
+
+        UserDefaultsWrapper<Any>.sharedDefaults.removeObject(forKey: UserDefaultsWrapper<Any>.Key.homePageLastPickedCustomColor.rawValue)
+
         model = SettingsModel(
             appearancePreferences: appearancePreferences,
             userBackgroundImagesManager: userBackgroundImagesManager,
@@ -61,6 +85,7 @@ final class HomePageSettingsModelTests: XCTestCase {
                 self?.openFilePanelCallCount += 1
                 return self?.openFilePanel()
             },
+            userColorProvider: self.userColorProvider,
             showAddImageFailedAlert: { [weak self] in self?.showImageFailedAlertCallCount += 1 },
             openSettings: { [weak self] in self?.openSettingsCallCount += 1 }
         )
@@ -100,9 +125,6 @@ final class HomePageSettingsModelTests: XCTestCase {
 
         model.handleRootGridSelection(.gradientPicker)
         XCTAssertEqual(model.contentType, .gradientPicker)
-
-        model.handleRootGridSelection(.illustrationPicker)
-        XCTAssertEqual(model.contentType, .illustrationPicker)
     }
 
     func testWhenThereAreNoUserImagesThenHandleRootGridSelectionOpensFilePicker() {
@@ -133,28 +155,24 @@ final class HomePageSettingsModelTests: XCTestCase {
     }
 
     func testWhenCustomBackgroundIsUpdatedThenPixelIsSent() {
-        model.customBackground = .solidColor(.black)
+        model.customBackground = .solidColor(.color01)
         model.customBackground = .gradient(.gradient01)
-        model.customBackground = .illustration(.illustration01)
         model.customBackground = .userImage(.init(fileName: "abc", colorScheme: .light))
         model.customBackground = nil
 
         XCTAssertEqual(sendPixelEvents.map(\.name), [
             NewTabBackgroundPixel.newTabBackgroundSelectedSolidColor.name,
             NewTabBackgroundPixel.newTabBackgroundSelectedGradient.name,
-            NewTabBackgroundPixel.newTabBackgroundSelectedIllustration.name,
             NewTabBackgroundPixel.newTabBackgroundSelectedUserImage.name,
             NewTabBackgroundPixel.newTabBackgroundReset.name
         ])
     }
 
     func testThatCustomBackgroundIsPersistedToAppearancePreferences() {
-        model.customBackground = .solidColor(.black)
-        XCTAssertEqual(appearancePreferences.homePageCustomBackground, CustomBackground.solidColor(.black))
+        model.customBackground = .solidColor(.color01)
+        XCTAssertEqual(appearancePreferences.homePageCustomBackground, CustomBackground.solidColor(.color01))
         model.customBackground = .gradient(.gradient01)
         XCTAssertEqual(appearancePreferences.homePageCustomBackground, CustomBackground.gradient(.gradient01))
-        model.customBackground = .illustration(.illustration01)
-        XCTAssertEqual(appearancePreferences.homePageCustomBackground, CustomBackground.illustration(.illustration01))
         let userImage = UserBackgroundImage(fileName: "abc", colorScheme: .light)
         model.customBackground = .userImage(userImage)
         XCTAssertEqual(appearancePreferences.homePageCustomBackground, CustomBackground.userImage(userImage))
@@ -215,7 +233,6 @@ final class HomePageSettingsModelTests: XCTestCase {
         XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundThumbnail), [
             .gradient(CustomBackground.placeholderGradient),
             .solidColor(CustomBackground.placeholderColor),
-            .illustration(CustomBackground.placeholderIllustration),
             nil
         ])
 
@@ -223,23 +240,13 @@ final class HomePageSettingsModelTests: XCTestCase {
         XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundThumbnail), [
             .gradient(.gradient04),
             .solidColor(CustomBackground.placeholderColor),
-            .illustration(CustomBackground.placeholderIllustration),
             nil
         ])
 
-        model.customBackground = .solidColor(.darkPink)
+        model.customBackground = .solidColor(.color17)
         XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundThumbnail), [
             .gradient(CustomBackground.placeholderGradient),
-            .solidColor(.darkPink),
-            .illustration(CustomBackground.placeholderIllustration),
-            nil
-        ])
-
-        model.customBackground = .illustration(.illustration02)
-        XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundThumbnail), [
-            .gradient(CustomBackground.placeholderGradient),
-            .solidColor(CustomBackground.placeholderColor),
-            .illustration(.illustration02),
+            .solidColor(.color17),
             nil
         ])
     }
@@ -254,7 +261,6 @@ final class HomePageSettingsModelTests: XCTestCase {
         XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundThumbnail), [
             .gradient(CustomBackground.placeholderGradient),
             .solidColor(CustomBackground.placeholderColor),
-            .illustration(CustomBackground.placeholderIllustration),
             .userImage(image1)
         ])
 
@@ -262,8 +268,70 @@ final class HomePageSettingsModelTests: XCTestCase {
         XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundThumbnail), [
             .gradient(CustomBackground.placeholderGradient),
             .solidColor(CustomBackground.placeholderColor),
-            .illustration(CustomBackground.placeholderIllustration),
             .userImage(image2)
         ])
+    }
+
+    func testThatColorPickerIsPresentedWithLastPickedColor() {
+        var colors = [NSColor?]()
+        userColorProvider.showColorPanel = { color in
+            colors.append(color)
+        }
+
+        let color = NSColor.green
+        UserDefaultsWrapper<Any>.sharedDefaults.set(color.hex(), forKey: UserDefaultsWrapper<Any>.Key.homePageLastPickedCustomColor.rawValue)
+
+        model.openColorPanel()
+        XCTAssertEqual(userColorProvider.showColorPanelCallCount, 1)
+        XCTAssertEqual(colors, [color])
+    }
+
+    func testWhenColorsArePickedThenLastPickedCustomColorIsUpdated() {
+        model.openColorPanel()
+
+        userColorProvider.colorSubject.send(.green)
+        XCTAssertEqual(model.lastPickedCustomColor, .green)
+        userColorProvider.colorSubject.send(.blue)
+        XCTAssertEqual(model.lastPickedCustomColor, .blue)
+        userColorProvider.colorSubject.send(.yellow)
+        XCTAssertEqual(model.lastPickedCustomColor, .yellow)
+        userColorProvider.colorSubject.send(.white)
+        XCTAssertEqual(model.lastPickedCustomColor, .white)
+        userColorProvider.colorSubject.send(.red)
+        XCTAssertEqual(model.lastPickedCustomColor, .red)
+    }
+
+    func testWhenColorPanelIsDismissedThenLastPickedCustomColorIsNotUpdated() {
+        model.openColorPanel()
+
+        userColorProvider.colorSubject.send(.green)
+        XCTAssertEqual(model.lastPickedCustomColor, .green)
+        model.onColorPickerDisappear()
+        userColorProvider.colorSubject.send(.blue)
+        XCTAssertEqual(model.lastPickedCustomColor, .green)
+        userColorProvider.colorSubject.send(.yellow)
+        XCTAssertEqual(model.lastPickedCustomColor, .green)
+        userColorProvider.colorSubject.send(.white)
+        XCTAssertEqual(model.lastPickedCustomColor, .green)
+        userColorProvider.colorSubject.send(.red)
+        XCTAssertEqual(model.lastPickedCustomColor, .green)
+    }
+
+    func testThatSolidColorPickerFirstItemRepresentsLastPickedCustomColor() {
+        model.openColorPanel()
+
+        userColorProvider.colorSubject.send(.green)
+        XCTAssertEqual(model.lastPickedCustomColor, .green)
+        XCTAssertEqual(model.solidColorPickerItems.first, .picker(.init(color: .green)))
+
+        userColorProvider.colorSubject.send(.orange)
+        XCTAssertEqual(model.lastPickedCustomColor, .orange)
+        XCTAssertEqual(model.solidColorPickerItems.first, .picker(.init(color: .orange)))
+    }
+
+    func testThatColorPanelIsClosedOnDisappear() {
+        XCTAssertEqual(userColorProvider.closeColorPanelCallCount, 0)
+        model.onColorPickerDisappear()
+        XCTAssertEqual(userColorProvider.closeColorPanelCallCount, 1)
     }
 }

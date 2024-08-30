@@ -165,13 +165,10 @@ extension HomePage.Views {
         var backgroundView: some View {
             switch settingsModel.customBackground {
             case .gradient(let gradient):
-                gradient.image.resizable().aspectRatio(contentMode: .fill)
-                    .animation(.none, value: settingsModel.contentType)
-            case .illustration(let illustration):
-                illustration.image.resizable().aspectRatio(contentMode: .fill)
+                gradient.view
                     .animation(.none, value: settingsModel.contentType)
             case .solidColor(let solidColor):
-                solidColor.color
+                Color(hex: solidColor.color.hex())
                     .animation(.none, value: settingsModel.contentType)
             case .userImage(let userBackgroundImage):
                 if let nsImage = settingsModel.customImagesManager?.image(for: userBackgroundImage) {

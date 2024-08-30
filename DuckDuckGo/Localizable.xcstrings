@@ -25449,18 +25449,6 @@
         }
       }
     },
-    "home.page.settings.illustrations" : {
-      "comment" : "Button caption for presenting available Home Page background illustrations",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Illustrations"
-          }
-        }
-      }
-    },
     "home.page.settings.my.backgrounds" : {
       "comment" : "Button caption for presenting available user-provided Home Page background images",
       "extractionState" : "extracted_with_value",

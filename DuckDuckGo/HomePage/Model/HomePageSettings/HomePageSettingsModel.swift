@@ -23,6 +23,42 @@ import PixelKit
 import SwiftUI
 import SwiftUIExtensions
 
+protocol UserColorProviding {
+    var colorPublisher: AnyPublisher<NSColor, Never> { get }
+
+    func showColorPanel(with color: NSColor?)
+    func closeColorPanel()
+}
+
+extension NSColorPanel: UserColorProviding {
+    var colorPublisher: AnyPublisher<NSColor, Never> {
+        publisher(for: \.color).removeDuplicates().eraseToAnyPublisher()
+    }
+
+    func showColorPanel(with color: NSColor?) {
+        if let color {
+            self.color = color
+        }
+
+        if !isVisible {
+            var frame = self.frame
+            frame.origin = NSEvent.mouseLocation
+            if let keyWindow = NSApp.keyWindow {
+                frame.origin.x = keyWindow.frame.maxX - frame.size.width
+            }
+            frame.origin.y -= frame.size.height + 40
+            setFrame(frame, display: true)
+        }
+
+        showsAlpha = false
+        orderFront(nil)
+    }
+
+    func closeColorPanel() {
+        close()
+    }
+}
+
 extension HomePage.Models {
 
     final class SettingsModel: ObservableObject {
@@ -35,7 +71,6 @@ extension HomePage.Models {
             case root
             case gradientPicker
             case colorPicker
-            case illustrationPicker
             case customImagePicker
         }
 
@@ -53,12 +88,15 @@ extension HomePage.Models {
         let customImagesManager: UserBackgroundImagesManaging?
         let sendPixel: (PixelKitEvent) -> Void
         let openFilePanel: () -> URL?
+        let userColorProvider: () -> UserColorProviding
         let showAddImageFailedAlert: () -> Void
         let openSettings: () -> Void
 
         @Published private(set) var availableUserBackgroundImages: [UserBackgroundImage] = []
 
         private var availableCustomImagesCancellable: AnyCancellable?
+        private var userColorCancellable: AnyCancellable?
+        private var customBackgroundPixelCancellable: AnyCancellable?
 
         convenience init(openSettings: @escaping () -> Void) {
             self.init(
@@ -77,6 +115,7 @@ extension HomePage.Models {
                     }
                     return url
                 },
+                userColorProvider: NSColorPanel.shared,
                 showAddImageFailedAlert: {
                     let alert = NSAlert.cannotReadImageAlert()
                     alert.runModal()
@@ -90,6 +129,7 @@ extension HomePage.Models {
             userBackgroundImagesManager: UserBackgroundImagesManaging?,
             sendPixel: @escaping (PixelKitEvent) -> Void,
             openFilePanel: @escaping () -> URL?,
+            userColorProvider: @autoclosure @escaping () -> UserColorProviding,
             showAddImageFailedAlert: @escaping () -> Void,
             openSettings: @escaping () -> Void
         ) {
@@ -104,6 +144,7 @@ extension HomePage.Models {
 
             self.sendPixel = sendPixel
             self.openFilePanel = openFilePanel
+            self.userColorProvider = userColorProvider
             self.showAddImageFailedAlert = showAddImageFailedAlert
             self.openSettings = openSettings
 
@@ -123,6 +164,33 @@ extension HomePage.Models {
                     }
                 })
                 .assign(to: \.availableUserBackgroundImages, onWeaklyHeld: self)
+
+            let customBackgroundPublisher: AnyPublisher<CustomBackground?, Never> = {
+                if NSApp.runType == .unitTests {
+                    return $customBackground.dropFirst().eraseToAnyPublisher()
+                }
+                return $customBackground.dropFirst()
+                    .throttle(for: .seconds(1), scheduler: DispatchQueue.main, latest: true)
+                    .eraseToAnyPublisher()
+            }()
+
+            customBackgroundPixelCancellable = customBackgroundPublisher
+                .sink { customBackground in
+                    switch customBackground {
+                    case .gradient:
+                        sendPixel(NewTabBackgroundPixel.newTabBackgroundSelectedGradient)
+                    case .solidColor:
+                        sendPixel(NewTabBackgroundPixel.newTabBackgroundSelectedSolidColor)
+                    case .userImage:
+                        sendPixel(NewTabBackgroundPixel.newTabBackgroundSelectedUserImage)
+                    case .none:
+                        sendPixel(NewTabBackgroundPixel.newTabBackgroundReset)
+                    }
+                }
+
+            if let customColor = NSColor(hex: lastPickedCustomColorHexValue) {
+                lastPickedCustomColor = customColor
+            }
         }
 
         var hasUserImages: Bool {
@@ -169,20 +237,10 @@ extension HomePage.Models {
                 } else {
                     Logger.homePageSettings.debug("Home page background reset")
                 }
-                switch customBackground {
-                case .gradient:
-                    sendPixel(NewTabBackgroundPixel.newTabBackgroundSelectedGradient)
-                case .solidColor:
-                    sendPixel(NewTabBackgroundPixel.newTabBackgroundSelectedSolidColor)
-                case .illustration:
-                    sendPixel(NewTabBackgroundPixel.newTabBackgroundSelectedIllustration)
-                case .userImage:
-                    sendPixel(NewTabBackgroundPixel.newTabBackgroundSelectedUserImage)
-                case .none:
-                    sendPixel(NewTabBackgroundPixel.newTabBackgroundReset)
-                }
             }
         }
+
+        private(set) var solidColorPickerItems: [SolidColorBackgroundPickerItem] = []
 
         @MainActor
         func addNewImage() async {
@@ -201,11 +259,38 @@ extension HomePage.Models {
             }
         }
 
+        @Published private(set) var lastPickedCustomColor: NSColor = .white {
+            didSet {
+                lastPickedCustomColorHexValue = lastPickedCustomColor.hex()
+                let predefinedColorBackgrounds = SolidColorBackground.predefinedColors.map(SolidColorBackgroundPickerItem.background)
+                solidColorPickerItems = [.picker(.init(color: lastPickedCustomColor))] + predefinedColorBackgrounds
+            }
+        }
+
+        @UserDefaultsWrapper(key: .homePageLastPickedCustomColor, defaultValue: "#FFFFFF")
+        private var lastPickedCustomColorHexValue: String
+
+        func openColorPanel() {
+            let provider = userColorProvider()
+            provider.showColorPanel(with: NSColor(hex: lastPickedCustomColorHexValue))
+
+            userColorCancellable = provider.colorPublisher
+                .handleEvents(receiveOutput: { [weak self] color in
+                    self?.lastPickedCustomColor = color
+                })
+                .map { CustomBackground.solidColor(.init(color: $0)) }
+                .assign(to: \.customBackground, onWeaklyHeld: self)
+        }
+
+        func onColorPickerDisappear() {
+            userColorCancellable?.cancel()
+            userColorProvider().closeColorPanel()
+        }
+
         var customBackgroundModes: [CustomBackgroundModeModel] {
             [
                 customBackgroundModeModel(for: .gradientPicker),
                 customBackgroundModeModel(for: .colorPicker),
-                customBackgroundModeModel(for: .illustrationPicker),
                 customBackgroundModeModel(for: .customImagePicker)
             ]
                 .compactMap { $0 }
@@ -227,12 +312,6 @@ extension HomePage.Models {
                     contentType: .colorPicker,
                     title: UserText.solidColors,
                     customBackgroundThumbnail: .solidColor(customBackground?.solidColor ?? CustomBackground.placeholderColor)
-                )
-            case .illustrationPicker:
-                return CustomBackgroundModeModel(
-                    contentType: .illustrationPicker,
-                    title: UserText.illustrations,
-                    customBackgroundThumbnail: .illustration(customBackground?.illustration ?? CustomBackground.placeholderIllustration)
                 )
             case .customImagePicker:
                 guard let customImagesManager else {

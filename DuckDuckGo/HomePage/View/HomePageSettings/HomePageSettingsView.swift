@@ -18,6 +18,56 @@
 
 import SwiftUIExtensions
 
+struct CustomColorPicker: NSViewRepresentable {
+    @Binding var selectedColor: Color
+    var label: String
+    var previewSize: NSSize
+
+    func makeNSView(context: Context) -> CustomNSColorWell {
+        let colorWell = CustomNSColorWell(frame: .zero)
+        colorWell.color = NSColor(selectedColor)
+        colorWell.customPreviewSize = previewSize
+        colorWell.target = context.coordinator
+        colorWell.action = #selector(Coordinator.colorChanged(_:))
+        return colorWell
+    }
+
+    func updateNSView(_ nsView: CustomNSColorWell, context: Context) {
+        nsView.color = NSColor(selectedColor)
+        nsView.customPreviewSize = previewSize
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+
+    final class Coordinator: NSObject {
+        var parent: CustomColorPicker
+
+        init(_ parent: CustomColorPicker) {
+            self.parent = parent
+        }
+
+        @objc func colorChanged(_ sender: NSColorWell) {
+            parent.selectedColor = Color(sender.color)
+        }
+    }
+}
+
+final class CustomNSColorWell: NSColorWell {
+    var customPreviewSize: NSSize = NSSize(width: 44, height: 44)
+
+    override func draw(_ dirtyRect: NSRect) {
+        super.draw(dirtyRect)
+        color.setFill()
+        dirtyRect.fill()
+    }
+
+    override var intrinsicContentSize: NSSize {
+        return customPreviewSize
+    }
+}
+
 extension HomePage.Views {
 
     struct SettingsView: View {
@@ -52,25 +102,48 @@ extension HomePage.Views {
                             rootView
                                 .transition(.move(edge: .leading).combined(with: .opacity))
                         case .colorPicker:
-                            BackgroundPickerView(title: UserText.solidColors, items: SolidColorBackground.allCases)
-                                .transition(.move(edge: .trailing).combined(with: .opacity))
+                            BackgroundPickerView(title: UserText.solidColors, items: model.solidColorPickerItems, itemView: { item in
+                                switch item {
+                                case .background:
+                                    defaultItemView(for: item)
+                                case .picker:
+                                    Button {
+                                        withAnimation {
+                                            if model.customBackground != item.customBackground {
+                                                model.customBackground = item.customBackground
+                                            }
+                                        }
+                                        model.openColorPanel()
+                                    } label: {
+                                        ZStack {
+                                            BackgroundThumbnailView(displayMode: .pickerView, customBackground: item.customBackground)
+                                            Image(.colorPicker)
+                                                .opacity(0.8)
+                                                .colorScheme(item.customBackground.colorScheme)
+                                        }
+                                    }
+                                    .buttonStyle(.plain)
+                                }
+                            })
+                            .transition(.move(edge: .trailing).combined(with: .opacity))
+                            .onDisappear {
+                                model.onColorPickerDisappear()
+                            }
                         case .gradientPicker:
-                            BackgroundPickerView(title: UserText.gradients, items: GradientBackground.allCases)
-                                .transition(.move(edge: .trailing).combined(with: .opacity))
-                        case .illustrationPicker:
-                            BackgroundPickerView(title: UserText.illustrations, items: IllustrationBackground.allCases)
+                            BackgroundPickerView(title: UserText.gradients, items: GradientBackground.allCases, itemView: defaultItemView(for:))
                                 .transition(.move(edge: .trailing).combined(with: .opacity))
                         case .customImagePicker:
                             BackgroundPickerView(
                                 title: UserText.myBackgrounds,
                                 items: model.availableUserBackgroundImages,
-                                maxItemsCount: HomePage.Models.SettingsModel.Const.maximumNumberOfUserImages
-                            ) {
-                                addBackgroundButton
-                                Text(UserText.myBackgroundsDisclaimer)
-                                    .foregroundColor(.blackWhite60)
-                                    .multilineTextAlignment(.leading)
-                            }
+                                maxItemsCount: HomePage.Models.SettingsModel.Const.maximumNumberOfUserImages,
+                                itemView: defaultItemView(for:),
+                                footer: {
+                                    addBackgroundButton
+                                    Text(UserText.myBackgroundsDisclaimer)
+                                        .foregroundColor(.blackWhite60)
+                                        .multilineTextAlignment(.leading)
+                                })
                             .transition(.move(edge: .trailing).combined(with: .opacity))
                         }
                     }
@@ -105,25 +178,6 @@ extension HomePage.Views {
             }
         }
 
-        var footer: some View {
-            VStack(spacing: 18) {
-                Divider()
-
-                Button {
-                    model.openSettings()
-                } label: {
-                    HStack {
-                        Text(UserText.allSettings)
-                        Spacer()
-                        Image(.externalAppScheme)
-                    }
-                    .foregroundColor(Color.linkBlue)
-                    .cursor(.pointingHand)
-                }
-                .buttonStyle(.plain)
-            }
-        }
-
         func backButton(title: String) -> some View {
             Button {
                 model.popToRootView()
@@ -134,6 +188,20 @@ extension HomePage.Views {
                     Spacer()
                 }
                 .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+        }
+
+        @ViewBuilder
+        func defaultItemView(for item: any Identifiable & Hashable & CustomBackgroundConvertible) -> some View {
+            Button {
+                withAnimation {
+                    if model.customBackground != item.customBackground {
+                        model.customBackground = item.customBackground
+                    }
+                }
+            } label: {
+                BackgroundThumbnailView(displayMode: .pickerView, customBackground: item.customBackground)
             }
             .buttonStyle(.plain)
         }
@@ -159,7 +227,26 @@ extension HomePage.Views {
             SettingsSection(title: UserText.homePageSections) {
                 HomeContentSectionsView(includeContinueSetUpCards: includingContinueSetUpCards)
             }
-            footer
+            rootViewFooter
+        }
+
+        var rootViewFooter: some View {
+            VStack(spacing: 18) {
+                Divider()
+
+                Button {
+                    model.openSettings()
+                } label: {
+                    HStack {
+                        Text(UserText.allSettings)
+                        Spacer()
+                        Image(.externalAppScheme)
+                    }
+                    .foregroundColor(Color.linkBlue)
+                    .cursor(.pointingHand)
+                }
+                .buttonStyle(.plain)
+            }
         }
 
         @ViewBuilder
@@ -218,7 +305,7 @@ extension HomePage.Views.BackgroundCategoryView {
     @State var isSettingsVisible: Bool = true
 
     let model = HomePage.Models.SettingsModel(openSettings: {})
-    model.customBackground = .solidColor(.lightPink)
+    model.customBackground = .solidColor(.color10)
 
     return HomePage.Views.SettingsView(includingContinueSetUpCards: true, isSettingsVisible: $isSettingsVisible)
         .frame(width: 236, height: 600)
