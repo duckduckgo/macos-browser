@@ -25,4 +25,4 @@ jobs:
       run: |
         bundle exec fastlane run asana_upload \
           file_name:"Gemfile" \
-          task_id:"${{ 1208189657535242 }}" 
+          task_id:"1208189657535242" 
