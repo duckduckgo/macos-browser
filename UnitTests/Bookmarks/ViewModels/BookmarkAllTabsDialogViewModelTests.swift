@@ -217,13 +217,11 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
     @MainActor
     func testWhenFoldersStoreLastUsedFolderIsNotNilAndBookmarkStoreDoesNotContainFolderThenSelectedFolderIsNil() throws {
         // GIVEN
-        let folder = BookmarkFolder(id: "1", title: #function)
         foldersStoreMock.lastBookmarkAllTabsFolderIdUsed = "1"
         bookmarkStoreMock.bookmarkFolderWithId = {
-            XCTAssertNotEqual($0, folder.id)
+            XCTAssertEqual($0, "1")
             return nil
         }
-        bookmarkStoreMock.bookmarks = [folder]
         bookmarkManager.loadBookmarks()
         let websitesInfo = WebsiteInfo.makeWebsitesInfo(url: .duckDuckGo)
         let sut = BookmarkAllTabsDialogViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
