@@ -20,6 +20,16 @@ import AppKit
 
 final class OutlineSeparatorViewCell: NSTableCellView {
 
+    static let separatorIdentifier = NSUserInterfaceItemIdentifier(className() + "_separator")
+    static let blankIdentifier = NSUserInterfaceItemIdentifier(className())
+
+    static func rowHeight(for mode: BookmarkOutlineViewDataSource.ContentMode) -> CGFloat {
+        switch mode {
+        case .bookmarksMenu: 11
+        case .bookmarksAndFolders, .foldersOnly: 28
+        }
+    }
+
     private lazy var separatorView: NSBox = {
         let box = NSBox()
         box.translatesAutoresizingMaskIntoConstraints = false
@@ -28,13 +38,15 @@ final class OutlineSeparatorViewCell: NSTableCellView {
         return box
     }()
 
-    init(separatorVisible: Bool = false) {
+    init(identifier: NSUserInterfaceItemIdentifier) {
         super.init(frame: .zero)
+        self.identifier = identifier
+    }
 
-        // Previous value of 20 was being ignored anyway and causes lots of console logging
-        self.heightAnchor.constraint(equalToConstant: 28).isActive = true
+    convenience init(isSeparatorVisible: Bool = false) {
+        self.init(identifier: isSeparatorVisible ? Self.separatorIdentifier : Self.blankIdentifier)
 
-        if separatorVisible {
+        if isSeparatorVisible {
             addSubview(separatorView)
 
             separatorView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 5).isActive = true

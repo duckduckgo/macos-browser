@@ -238,13 +238,13 @@ final class DownloadsCellView: NSTableCellView {
     }
 
     private func subscribeToMouseOverEvents() {
-        cancelButton.$isMouseOver.sink { [weak self] isMouseOver in
+        cancelButton.publisher(for: \.isMouseOver).sink { [weak self] isMouseOver in
             self?.onButtonMouseOverChange?(isMouseOver)
         }.store(in: &buttonOverCancellables)
-        revealButton.$isMouseOver.sink { [weak self] isMouseOver in
+        revealButton.publisher(for: \.isMouseOver).sink { [weak self] isMouseOver in
             self?.onButtonMouseOverChange?(isMouseOver)
         }.store(in: &buttonOverCancellables)
-        restartButton.$isMouseOver.sink { [weak self] isMouseOver in
+        restartButton.publisher(for: \.isMouseOver).sink { [weak self] isMouseOver in
             self?.onButtonMouseOverChange?(isMouseOver)
         }.store(in: &buttonOverCancellables)
     }

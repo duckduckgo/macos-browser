@@ -38,6 +38,12 @@ extension NSOutlineView {
         selectedNodes.compactMap { $0.representedObject as? PseudoFolder }
     }
 
+    func rowIfValid(forItem item: Any?) -> Int? {
+        let row = row(forItem: item)
+        guard row >= 0, row != NSNotFound else { return nil }
+        return row
+    }
+
     func revealAndSelect(nodePath: BookmarkNode.Path) {
         let totalNodePathComponents = nodePath.components.count
         if totalNodePathComponents < 2 {
