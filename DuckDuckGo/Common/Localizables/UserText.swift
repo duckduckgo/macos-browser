@@ -229,40 +229,7 @@ struct UserText {
     static let errorPageHeader = NSLocalizedString("page.error.header", value: "DuckDuckGo can’t load this page.", comment: "Error page heading text")
     static let webProcessCrashPageHeader = NSLocalizedString("page.crash.header", value: "This webpage has crashed.", comment: "Error page heading text shown when a Web Page process had crashed")
     static let webProcessCrashPageMessage = NSLocalizedString("page.crash.message", value: "Try reloading the page or come back later.", comment: "Error page message text shown when a Web Page process had crashed")
-    static let sslErrorPageHeader = NSLocalizedString("ssl.error.page.header", value: "Warning: This site may be insecure", comment: "Title shown in an error page that warn users of security risks on a website due to SSL issues")
     static let sslErrorPageTabTitle = NSLocalizedString("ssl.error.page.tab.title", value: "Warning: Site May Be Insecure", comment: "Title shown in an error page tab that warn users of security risks on a website due to SSL issues")
-    static func sslErrorPageBody(_ domain: String) -> String {
-        let localized = NSLocalizedString("ssl.error.page.body",
-                                          value: "The certificate for this site is invalid. You might be connecting to a server that is pretending to be %1$@ which could put your confidential information at risk.",
-                                          comment: "Error description shown in an error page that warns users of security risks on a website due to SSL issues. %1$@ represent the site domain.")
-        return String(format: localized, domain)
-    }
-    static let sslErrorPageAdvancedButton = NSLocalizedString("ssl.error.page.advanced.button", value: "Advanced…", comment: "Button shown in an error page that warns users of security risks on a website due to SSL issues. The buttons allows the user to see advanced options on click.")
-    static let sslErrorPageLeaveSiteButton = NSLocalizedString("ssl.error.page.leave.site.button", value: "Leave This Site", comment: "Button shown in an error page that warns users of security risks on a website due to SSL issues. The buttons allows the user to leave the website and navigate to previous page.")
-    static let sslErrorPageVisitSiteButton = NSLocalizedString("ssl.error.page.visit.site.button", value: "Accept Risk and Visit Site", comment: "Button shown in an error page that warns users of security risks on a website due to SSL issues. The buttons allows the user to visit the website anyway despite the risks.")
-    static let sslErrorAdvancedInfoTitle = NSLocalizedString("ssl.error.page.advanced.info.title", value: "DuckDuckGo warns you when a website has an invalid certificate.", comment: "Title of the Advanced info section shown in an error page that warns users of security risks on a website due to SSL issues.")
-    static let sslErrorAdvancedInfoBodyWrongHost = NSLocalizedString("ssl.error.page.advanced.info.body.wrong.host", value: "It’s possible that the website is misconfigured or that an attacker has compromised your connection.", comment: "Body of the text of the Advanced info shown in an error page that warns users of security risks on a website due to SSL issues.")
-    static let sslErrorAdvancedInfoBodyExpired = NSLocalizedString("ssl.error.page.advanced.info.body.expired", value: "It’s possible that the website is misconfigured, that an attacker has compromised your connection, or that your system clock is incorrect.", comment: "Body of the text of the Advanced info shown in an error page that warns users of security risks on a website due to SSL issues.")
-    static func sslErrorCertificateExpiredMessage(_ domain: String) -> String {
-        let localized = NSLocalizedString("ssl.error.certificate.expired.message",
-                                          value: "The security certificate for %1$@ is expired.",
-                                          comment: "Describes an SSL error where a website's security certificate is expired. '%1$@' is a placeholder for the website's domain.")
-        return String(format: localized, domain)
-    }
-    static func sslErrorCertificateWrongHostMessage(_ domain: String, eTldPlus1: String) -> String {
-        let localized = NSLocalizedString("ssl.error.wrong.host.message",
-                                          value: "The security certificate for %1$@ does not match *.%2$@.",
-                                          comment: "Explains an SSL error when a site's certificate doesn't match its domain. '%1$@' is the site's domain.")
-        return String(format: localized, domain, eTldPlus1)
-    }
-    static func sslErrorCertificateSelfSignedMessage(_ domain: String) -> String {
-        let localized = NSLocalizedString("ssl.error.self.signed.message",
-                                          value: "The security certificate for %1$@ is not trusted by your device's operating system.",
-                                          comment: "Warns the user that the site's security certificate is self-signed and not trusted. '%1$@' is the site's domain.")
-        return String(format: localized, domain)
-    }
-
-
 
     static let openSystemPreferences = NSLocalizedString("open.preferences", value: "Open System Preferences", comment: "Open System Preferences (to re-enable permission for the App) (up to and including macOS 12")
     static let openSystemSettings = NSLocalizedString("open.settings", value: "Open System Settings…", comment: "This string represents a prompt or button label prompting the user to open system settings")

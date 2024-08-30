@@ -25,7 +25,7 @@ enum BookmarkStoreFetchPredicateType {
     case favorites
 }
 
-enum ParentFolderType {
+enum ParentFolderType: Equatable {
     case root
     case parent(uuid: String)
 }
