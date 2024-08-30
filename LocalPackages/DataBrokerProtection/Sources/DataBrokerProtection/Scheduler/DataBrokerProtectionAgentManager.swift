@@ -116,7 +116,7 @@ public final class DataBrokerProtectionAgentManager {
     private let operationDependencies: DataBrokerOperationDependencies
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let agentStopper: DataBrokerProtectionAgentStopper
-    private let configurationManger: ConfigurationManager
+    private let configurationManger: DefaultConfigurationManager
 
     // Used for debug functions only, so not injected
     private lazy var browserWindowManager = BrowserWindowManager()
@@ -131,7 +131,7 @@ public final class DataBrokerProtectionAgentManager {
          operationDependencies: DataBrokerOperationDependencies,
          pixelHandler: EventMapping<DataBrokerProtectionPixels>,
          agentStopper: DataBrokerProtectionAgentStopper,
-         configurationManager: ConfigurationManager
+         configurationManager: DefaultConfigurationManager
     ) {
         self.userNotificationService = userNotificationService
         self.activityScheduler = activityScheduler

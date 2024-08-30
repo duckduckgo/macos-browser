@@ -19,6 +19,7 @@
 import BrowserServicesKit
 import Combine
 import Common
+import Configuration
 import Foundation
 import GRDB
 import SecureStorage
@@ -1929,3 +1930,17 @@ struct MockMigrationsProvider: DataBrokerProtectionDatabaseMigrationsProvider {
         return { _ in }
     }
 }
+
+//struct MockConfigurationFetcher: ConfigurationFetching {
+//    func fetch(_ configuration: Configuration, isDebug: Bool) async throws {
+//        return
+//    }
+//    
+//    func fetch(all configurations: [Configuration]) async throws {
+//        return
+//    }
+//}
+//
+//final class MockConfigurationManager: DefaultConfigurationManager {
+//
+//}

@@ -60,4 +60,8 @@ final class MockConfigurationStore: ConfigurationStoring {
 
     func log() { }
 
+    func fileUrl(for configuration: Configuration) -> URL {
+        return URL(string: "file///\(configuration.rawValue)")!
+    }
+
 }

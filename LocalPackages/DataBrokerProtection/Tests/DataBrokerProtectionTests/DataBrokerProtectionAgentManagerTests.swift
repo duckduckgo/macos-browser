@@ -17,6 +17,8 @@
 //
 
 import XCTest
+import Configuration
+import Persistence
 @testable import DataBrokerProtection
 
 final class DataBrokerProtectionAgentManagerTests: XCTestCase {
@@ -32,6 +34,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
     private var mockDependencies: DefaultDataBrokerOperationDependencies!
     private var mockProfile: DataBrokerProtectionProfile!
     private var mockAgentStopper: MockAgentStopper!
+    private var mockConfigurationManager: MockConfigurationManager!
 
     override func setUpWithError() throws {
 
@@ -39,6 +42,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
         mockActivityScheduler = MockDataBrokerProtectionBackgroundActivityScheduler()
         mockNotificationService = MockUserNotificationService()
         mockAgentStopper = MockAgentStopper()
+        mockConfigurationManager = MockConfigurationManager()
 
         let mockDatabase = MockDatabase()
         let mockMismatchCalculator = MockMismatchCalculator(database: mockDatabase, pixelHandler: mockPixelHandler)
@@ -78,7 +82,8 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             dataManager: mockDataManager,
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
-            agentStopper: mockAgentStopper)
+            agentStopper: mockAgentStopper,
+            configurationManager: mockConfigurationManager)
 
         mockDataManager.profileToReturn = mockProfile
 
@@ -121,7 +126,8 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             dataManager: mockDataManager,
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
-            agentStopper: agentStopper)
+            agentStopper: agentStopper,
+            configurationManager: mockConfigurationManager)
 
         mockDataManager.profileToReturn = nil
 
@@ -153,7 +159,8 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             dataManager: mockDataManager,
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
-            agentStopper: mockAgentStopper)
+            agentStopper: mockAgentStopper,
+            configurationManager: mockConfigurationManager)
 
         mockDataManager.profileToReturn = nil
 
@@ -190,7 +197,8 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             dataManager: mockDataManager,
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
-            agentStopper: mockAgentStopper)
+            agentStopper: mockAgentStopper,
+            configurationManager: mockConfigurationManager)
 
         mockDataManager.profileToReturn = mockProfile
 
@@ -216,7 +224,8 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             dataManager: mockDataManager,
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
-            agentStopper: mockAgentStopper)
+            agentStopper: mockAgentStopper,
+            configurationManager: mockConfigurationManager)
 
         mockDataManager.profileToReturn = mockProfile
 
@@ -242,7 +251,8 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             dataManager: mockDataManager,
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
-            agentStopper: mockAgentStopper)
+            agentStopper: mockAgentStopper,
+            configurationManager: mockConfigurationManager)
 
         mockNotificationService.reset()
 
@@ -263,7 +273,8 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             dataManager: mockDataManager,
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
-            agentStopper: mockAgentStopper)
+            agentStopper: mockAgentStopper,
+            configurationManager: mockConfigurationManager)
 
         mockNotificationService.reset()
 
@@ -284,7 +295,8 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             dataManager: mockDataManager,
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
-            agentStopper: mockAgentStopper)
+            agentStopper: mockAgentStopper,
+            configurationManager: mockConfigurationManager)
 
         mockNotificationService.reset()
         mockQueueManager.startImmediateOperationsIfPermittedCompletionError = DataBrokerProtectionAgentErrorCollection(oneTimeError: NSError(domain: "test", code: 10))
@@ -306,7 +318,8 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             dataManager: mockDataManager,
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
-            agentStopper: mockAgentStopper)
+            agentStopper: mockAgentStopper,
+            configurationManager: mockConfigurationManager)
 
         mockNotificationService.reset()
         mockDataManager.shouldReturnHasMatches = true
@@ -328,7 +341,8 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             dataManager: mockDataManager,
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
-            agentStopper: mockAgentStopper)
+            agentStopper: mockAgentStopper,
+            configurationManager: mockConfigurationManager)
 
         mockNotificationService.reset()
         mockDataManager.shouldReturnHasMatches = false
@@ -350,7 +364,8 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             dataManager: mockDataManager,
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
-            agentStopper: mockAgentStopper)
+            agentStopper: mockAgentStopper,
+            configurationManager: mockConfigurationManager)
 
         var startScheduledScansCalled = false
         mockQueueManager.startScheduledOperationsIfPermittedCalledCompletion = { _ in
@@ -362,5 +377,50 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
 
         // Then
         XCTAssertTrue(startScheduledScansCalled)
+    }
+}
+
+struct MockConfigurationFetcher: ConfigurationFetching {
+    func fetch(_ configuration: Configuration, isDebug: Bool) async throws {
+        return
+    }
+
+    func fetch(all configurations: [Configuration]) async throws {
+        return
+    }
+}
+
+struct MockConfigurationStore: ConfigurationStoring {
+    func loadData(for configuration: Configuration) -> Data? {
+        return nil
+    }
+
+    func loadEtag(for configuration: Configuration) -> String? {
+        return nil
+    }
+
+    func loadEmbeddedEtag(for configuration: Configuration) -> String? {
+        return nil
+    }
+
+    mutating func saveData(_ data: Data, for configuration: Configuration) throws {
+        return
+    }
+
+    mutating func saveEtag(_ etag: String, for configuration: Configuration) throws {
+        return
+    }
+
+    func fileUrl(for configuration: Configuration) -> URL {
+        return URL(string: "file:///\(configuration.rawValue)")!
+    }
+
+}
+
+final class MockConfigurationManager: DefaultConfigurationManager {
+    override init(fetcher: ConfigurationFetching = MockConfigurationFetcher(),
+                  store: ConfigurationStoring = MockConfigurationStore(),
+                  defaults: KeyValueStoring = UserDefaults()) {
+        super.init(fetcher: fetcher, store: store)
     }
 }

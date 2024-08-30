@@ -41,6 +41,8 @@ let package = Package(
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions"),
                 .byName(name: "XPCHelper"),
                 .product(name: "PixelKit", package: "BrowserServicesKit"),
+                .product(name: "Configuration", package: "BrowserServicesKit"),
+                .product(name: "Persistence", package: "BrowserServicesKit")
             ],
             resources: [.process("Resources")],
             swiftSettings: [
