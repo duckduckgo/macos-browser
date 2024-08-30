@@ -26,6 +26,7 @@ import BrowserServicesKit
 import PhishingDetection
 import PixelKit
 import SpecialErrorPages
+import os
 
 protocol SpecialErrorPageScriptProvider {
     var specialErrorPageUserScript: SpecialErrorPageUserScript? { get }
@@ -119,9 +120,10 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
         self.phishingStateManager.isShowingPhishingError = isMalicious
         if isMalicious {
             errorPageType = .phishing
-            self.specialErrorPageUserScript?.errorData.kind = "phishing"
             if let mainFrameTarget = navigationAction.mainFrameTarget {
-                specialErrorPageUserScript?.failingURL = navigationAction.url
+                failingURL = url
+                let domain: String = url.host ?? url.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true)
+                errorData = SpecialErrorData(kind: .phishing, errorType: PhishingDetectionError.detected.localizedDescription, domain: domain, eTldPlus1: tld.eTLDplus1(failingURL?.host))
                 if let errorURL = self.generateErrorPageURL(navigationAction.url) {
                     _ = webView?.load(URLRequest(url: errorURL))
                     return .cancel
@@ -129,9 +131,11 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
                 return .next
             } else {
                 // Malicious iFrame Detected
-                PixelKit.fire(PhishingDetectionPixels.iframeLoaded)
+                // PixelKit.fire(PhishingDetectionPixels.iframeLoaded) // to be tested later
                 let iframeTopUrl = navigationAction.sourceFrame.url
-                specialErrorPageUserScript?.failingURL = iframeTopUrl
+                failingURL = iframeTopUrl
+                let domain: String = iframeTopUrl.host ?? url.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true)
+                errorData = SpecialErrorData(kind: .phishing, errorType: PhishingDetectionError.detected.localizedDescription, domain: domain, eTldPlus1: tld.eTLDplus1(failingURL?.host))
                 if let errorURL = self.generateErrorPageURL(iframeTopUrl) {
                     _ = webView?.load(URLRequest(url: errorURL))
                     return .cancel
@@ -183,7 +187,7 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
     @MainActor
     func generateErrorPageURL(_ url: URL) -> URL? {
         guard let urlString = url.absoluteString.data(using: .utf8) else {
-            os_log(.debug, log: .phishingDetection, "Failed to convert URL string to data.")
+            Logger.phishingDetection.error("Failed to convert URL string to data: \(url)")
             return nil
         }
         let encodedURL = URLTokenValidator.base64URLEncode(data: urlString)
@@ -205,7 +209,7 @@ extension SpecialErrorPageTabExtension: SpecialErrorPageUserScriptDelegate {
     func visitSite() {
         if errorPageType == .phishing {
             if let url = webView?.url {
-                PixelKit.fire(PhishingDetectionPixels.visitSite)
+                // PixelKit.fire(PhishingDetectionEvents.visitSite) // to test later
                 phishingURLExemptions.insert(url)
                 self.phishingStateManager.didBypassError = true
                 self.phishingStateManager.isShowingPhishingError = false
@@ -215,6 +219,8 @@ extension SpecialErrorPageTabExtension: SpecialErrorPageUserScriptDelegate {
         }
         _ = webView?.reloadPage()
     }
+    
+    func advancedInfoPresented() {}
 }
 
 protocol SpecialErrorPageTabExtensionProtocol: AnyObject, NavigationResponder {}
@@ -225,7 +231,7 @@ extension SpecialErrorPageTabExtension: TabExtension, SpecialErrorPageTabExtensi
 }
 
 extension TabExtensions {
-    var errorPage: ErrorPageTabExtensionProtocol? {
+    var errorPage: SpecialErrorPageTabExtensionProtocol? {
         resolve(SpecialErrorPageTabExtension.self)
     }
 }
