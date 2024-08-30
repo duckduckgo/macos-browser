@@ -25,6 +25,7 @@ import UserScript
 import WebKit
 import History
 import PixelKit
+import PhishingDetection
 import os.log
 
 protocol TabDelegate: ContentOverlayUserScriptDelegate {
@@ -51,6 +52,8 @@ protocol NewWindowPolicyDecisionMaker {
         var downloadManager: FileDownloadManagerProtocol
         var certificateTrustEvaluator: CertificateTrustEvaluating
         var tunnelController: NetworkProtectionIPCTunnelController?
+        var phishingDetector: PhishingSiteDetecting
+        var phishingStateManager: PhishingTabStateManager
     }
 
     fileprivate weak var delegate: TabDelegate?
@@ -68,6 +71,7 @@ protocol NewWindowPolicyDecisionMaker {
 
     let startupPreferences: StartupPreferences
     let tabsPreferences: TabsPreferences
+    let phishingState: PhishingTabStateManager = PhishingTabStateManager()
     let navigationDidEndPublisher = PassthroughSubject<Tab, Never>()
 
     private var extensions: TabExtensions
@@ -109,6 +113,7 @@ protocol NewWindowPolicyDecisionMaker {
                      startupPreferences: StartupPreferences = StartupPreferences.shared,
                      certificateTrustEvaluator: CertificateTrustEvaluating = CertificateTrustEvaluator(),
                      tunnelController: NetworkProtectionIPCTunnelController? = TunnelControllerProvider.shared.tunnelController,
+                     phishingDetector: PhishingSiteDetecting = PhishingDetection.shared,
                      tabsPreferences: TabsPreferences = TabsPreferences.shared
     ) {
 
@@ -152,6 +157,7 @@ protocol NewWindowPolicyDecisionMaker {
                   startupPreferences: startupPreferences,
                   certificateTrustEvaluator: certificateTrustEvaluator,
                   tunnelController: tunnelController,
+                  phishingDetector: phishingDetector,
                   tabsPreferences: tabsPreferences)
     }
 
@@ -185,6 +191,7 @@ protocol NewWindowPolicyDecisionMaker {
          startupPreferences: StartupPreferences,
          certificateTrustEvaluator: CertificateTrustEvaluating,
          tunnelController: NetworkProtectionIPCTunnelController?,
+         phishingDetector: PhishingSiteDetecting,
          tabsPreferences: TabsPreferences
     ) {
 
@@ -251,7 +258,9 @@ protocol NewWindowPolicyDecisionMaker {
                                                        duckPlayer: duckPlayer,
                                                        downloadManager: downloadManager,
                                                        certificateTrustEvaluator: certificateTrustEvaluator,
-                                                       tunnelController: tunnelController))
+                                                       tunnelController: tunnelController,
+                                                       phishingDetector: phishingDetector,
+                                                       phishingStateManager: phishingState))
 
         super.init()
         tabGetter = { [weak self] in self }
@@ -1183,14 +1192,13 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     func navigation(_ navigation: Navigation, didFailWith error: WKError) {
         let url = error.failingUrl ?? navigation.url
         guard navigation.isCurrent else { return }
-
         invalidateInteractionStateData()
 
         if !error.isFrameLoadInterrupted, !error.isNavigationCancelled,
                    // don‘t show an error page if the error was already handled
                    // (by SearchNonexistentDomainNavigationResponder) or another navigation was triggered by `setContent`
-            self.content.urlForWebView == url || self.content == .none /* when navigation fails instantly we may have no content set yet */ {
-
+            self.content.urlForWebView == url || self.content == .none /* when navigation fails instantly we may have no content set yet */
+            || error.errorCode == PhishingDetectionError.detected.errorCode {
             self.error = error
             // when already displaying the error page and reload navigation fails again: don‘t navigate, just update page HTML
             if error.errorCode != NSURLErrorServerCertificateUntrusted {

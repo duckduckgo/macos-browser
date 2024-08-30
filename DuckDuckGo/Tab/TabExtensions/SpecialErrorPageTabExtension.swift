@@ -24,6 +24,7 @@ import ContentScopeScripts
 import BrowserServicesKit
 import SpecialErrorPages
 import Common
+import PhishingDetection
 
 protocol SpecialErrorPageScriptProvider {
     var specialErrorPageUserScript: SpecialErrorPageUserScript? { get }
@@ -48,7 +49,9 @@ final class SpecialErrorPageTabExtension {
         webViewPublisher: some Publisher<WKWebView, Never>,
         scriptsPublisher: some Publisher<some SpecialErrorPageScriptProvider, Never>,
         urlCredentialCreator: URLCredentialCreating = URLCredentialCreator(),
-        featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger) {
+        featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger,
+        phishingDetector: some PhishingSiteDetecting,
+        phishingStateManager: PhishingTabStateManager) {
             self.featureFlagger = featureFlagger
             self.urlCredentialCreator = urlCredentialCreator
             webViewPublisher.sink { [weak self] webView in
