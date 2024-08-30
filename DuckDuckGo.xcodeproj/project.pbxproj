@@ -2652,6 +2652,18 @@
 		CBC83E3629B63D380008E19C /* Configuration in Frameworks */ = {isa = PBXBuildFile; productRef = CBC83E3529B63D380008E19C /* Configuration */; };
 		CBDD5DE329A67F2700832877 /* MockConfigurationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBDD5DE229A67F2700832877 /* MockConfigurationStore.swift */; };
 		CBDD5DE429A6800300832877 /* MockConfigurationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBDD5DE229A67F2700832877 /* MockConfigurationStore.swift */; };
+		CD2AB5BE2C82218D0019EB49 /* PhishingDetection in Frameworks */ = {isa = PBXBuildFile; productRef = CD2AB5BD2C82218D0019EB49 /* PhishingDetection */; };
+		CD2AB5BF2C8222F20019EB49 /* PhishingDetection.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE248A42C821FFE00F9399D /* PhishingDetection.swift */; };
+		CD2AB5C02C8222F20019EB49 /* PhishingDetection.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE248A42C821FFE00F9399D /* PhishingDetection.swift */; };
+		CD2AB5C12C8222F40019EB49 /* PhishingDetectionPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE248A52C821FFE00F9399D /* PhishingDetectionPreferences.swift */; };
+		CD2AB5C22C8222F50019EB49 /* PhishingDetectionPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE248A52C821FFE00F9399D /* PhishingDetectionPreferences.swift */; };
+		CD2AB5C32C8222F70019EB49 /* PhishingDetectionStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE248A72C821FFE00F9399D /* PhishingDetectionStateManager.swift */; };
+		CD2AB5C42C8222F70019EB49 /* PhishingDetectionStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE248A72C821FFE00F9399D /* PhishingDetectionStateManager.swift */; };
+		CD2AB5C52C8222FE0019EB49 /* filterSet.json in Resources */ = {isa = PBXBuildFile; fileRef = CDE248A62C821FFE00F9399D /* filterSet.json */; };
+		CD2AB5C62C8222FE0019EB49 /* filterSet.json in Resources */ = {isa = PBXBuildFile; fileRef = CDE248A62C821FFE00F9399D /* filterSet.json */; };
+		CD2AB5C72C8223030019EB49 /* hashPrefixes.json in Resources */ = {isa = PBXBuildFile; fileRef = CDE248A32C821FFE00F9399D /* hashPrefixes.json */; };
+		CD2AB5C82C8223040019EB49 /* hashPrefixes.json in Resources */ = {isa = PBXBuildFile; fileRef = CDE248A32C821FFE00F9399D /* hashPrefixes.json */; };
+		CDE248A02C821DF400F9399D /* PhishingDetection in Frameworks */ = {isa = PBXBuildFile; productRef = CDE2489F2C821DF400F9399D /* PhishingDetection */; };
 		D64A5FF82AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D64A5FF72AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift */; };
 		D64A5FF92AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D64A5FF72AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift */; };
 		D6BC8AC62C5A95AA0025375B /* DuckPlayer in Frameworks */ = {isa = PBXBuildFile; productRef = D6BC8AC52C5A95AA0025375B /* DuckPlayer */; };
@@ -4336,6 +4348,12 @@
 		CB24F70B29A3D9CB006DCC58 /* AppConfigurationURLProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfigurationURLProvider.swift; sourceTree = "<group>"; };
 		CB6BCDF827C6BEFF00CC76DC /* PrivacyFeatures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyFeatures.swift; sourceTree = "<group>"; };
 		CBDD5DE229A67F2700832877 /* MockConfigurationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockConfigurationStore.swift; sourceTree = "<group>"; };
+		CDE2489E2C821DE800F9399D /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../../BrowserServicesKit; sourceTree = "<group>"; };
+		CDE248A32C821FFE00F9399D /* hashPrefixes.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = hashPrefixes.json; sourceTree = "<group>"; };
+		CDE248A42C821FFE00F9399D /* PhishingDetection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhishingDetection.swift; sourceTree = "<group>"; };
+		CDE248A52C821FFE00F9399D /* PhishingDetectionPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhishingDetectionPreferences.swift; sourceTree = "<group>"; };
+		CDE248A62C821FFE00F9399D /* filterSet.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = filterSet.json; sourceTree = "<group>"; };
+		CDE248A72C821FFE00F9399D /* PhishingDetectionStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhishingDetectionStateManager.swift; sourceTree = "<group>"; };
 		D64A5FF72AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeButtonMenuFactory.swift; sourceTree = "<group>"; };
 		EA0BA3A8272217E6002A0B6C /* ClickToLoadUserScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClickToLoadUserScript.swift; sourceTree = "<group>"; };
 		EA18D1C9272F0DC8006DC101 /* social_images */ = {isa = PBXFileReference; lastKnownFileType = folder; path = social_images; sourceTree = "<group>"; };
@@ -4450,6 +4468,7 @@
 				9D9DE5752C63AA0C00D20B15 /* AppKitExtensions in Frameworks */,
 				37BA812F29B3CD6E0053F1A3 /* SyncUI in Frameworks */,
 				3706FCAF293F65D500E42796 /* PrivacyDashboard in Frameworks */,
+				CD2AB5BE2C82218D0019EB49 /* PhishingDetection in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4638,6 +4657,7 @@
 				EE7295E32A545B9A008C0991 /* NetworkProtection in Frameworks */,
 				9807F645278CA16F00E1547B /* BrowserServicesKit in Frameworks */,
 				D6BC8AC62C5A95AA0025375B /* DuckPlayer in Frameworks */,
+				CDE248A02C821DF400F9399D /* PhishingDetection in Frameworks */,
 				987799ED299998B1005D8EB6 /* Bookmarks in Frameworks */,
 				1E950E3F2912A10D0051A99B /* ContentBlocking in Frameworks */,
 				31A3A4E32B0C115F0021063C /* DataBrokerProtection in Frameworks */,
@@ -5155,6 +5175,7 @@
 			isa = PBXGroup;
 			children = (
 				9D9DE5712C63A96400D20B15 /* AppKitExtensions */,
+				CDE2489E2C821DE800F9399D /* BrowserServicesKit */,
 				7B9167A82C09E88800322310 /* AppLauncher */,
 				378E279D2970217400FCADA2 /* BuildToolPlugins */,
 				3192A2702A4C4E330084EA89 /* DataBrokerProtection */,
@@ -7024,6 +7045,7 @@
 				85B7184727677A7D00B4277F /* Onboarding */,
 				1D074B252909A371006E4AC3 /* PasswordManager */,
 				B64C84DB2692D6E80048FEBE /* Permissions */,
+				CDE248A22C821FD500F9399D /* PhishingDetection */,
 				37BF3F12286D8A4B00BD9014 /* PinnedTabs */,
 				4B0511A2262CAA5A00F6079C /* Preferences */,
 				B6FA893A269C414900588ECD /* PrivacyDashboard */,
@@ -8637,6 +8659,18 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		CDE248A22C821FD500F9399D /* PhishingDetection */ = {
+			isa = PBXGroup;
+			children = (
+				CDE248A62C821FFE00F9399D /* filterSet.json */,
+				CDE248A32C821FFE00F9399D /* hashPrefixes.json */,
+				CDE248A42C821FFE00F9399D /* PhishingDetection.swift */,
+				CDE248A52C821FFE00F9399D /* PhishingDetectionPreferences.swift */,
+				CDE248A72C821FFE00F9399D /* PhishingDetectionStateManager.swift */,
+			);
+			path = PhishingDetection;
+			sourceTree = "<group>";
+		};
 		EEA3EEAF2B24EB5100E8333A /* VPNLocation */ = {
 			isa = PBXGroup;
 			children = (
@@ -8806,6 +8840,7 @@
 				560EB9362C78974C0080DBC8 /* Onboarding */,
 				C18BF9CD2C73678C00ED6B8A /* Freemium */,
 				567A23C42C7F75BB0010F66C /* SpecialErrorPages */,
+				CD2AB5BD2C82218D0019EB49 /* PhishingDetection */,
 			);
 			productName = DuckDuckGo;
 			productReference = 3706FD05293F65D500E42796 /* DuckDuckGo App Store.app */;
@@ -9225,6 +9260,7 @@
 				560EB9342C7897370080DBC8 /* Onboarding */,
 				C18BF9CB2C73678500ED6B8A /* Freemium */,
 				567A23C02C7F71570010F66C /* SpecialErrorPages */,
+				CDE2489F2C821DF400F9399D /* PhishingDetection */,
 			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo.app */;
@@ -9428,6 +9464,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				561D66672B95C45A008ACC5C /* Suggestion.storyboard in Resources */,
+				CD2AB5C82C8223040019EB49 /* hashPrefixes.json in Resources */,
 				3706FCB4293F65D500E42796 /* CrashReports.storyboard in Resources */,
 				3706FCB5293F65D500E42796 /* trackerData.json in Resources */,
 				3706FCB6293F65D500E42796 /* dark-shield-dot-mouse-over.json in Resources */,
@@ -9464,6 +9501,7 @@
 				3706FCE2293F65D500E42796 /* dark-trackers-3.json in Resources */,
 				3706FCE3293F65D500E42796 /* dark-trackers-2.json in Resources */,
 				3706FCE4293F65D500E42796 /* Fire.storyboard in Resources */,
+				CD2AB5C62C8222FE0019EB49 /* filterSet.json in Resources */,
 				3706FCE6293F65D500E42796 /* social_images in Resources */,
 				3706FCE7293F65D500E42796 /* shield-dot-mouse-over.json in Resources */,
 				BD384ACB2BBC821B00EF3735 /* vpn-dark-mode.json in Resources */,
@@ -9621,6 +9659,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				561D66662B95C45A008ACC5C /* Suggestion.storyboard in Resources */,
+				CD2AB5C72C8223030019EB49 /* hashPrefixes.json in Resources */,
 				AA693E5E2696E5B90007BB78 /* CrashReports.storyboard in Resources */,
 				9833913127AAA4B500DAF119 /* trackerData.json in Resources */,
 				AA7EB6ED27E880B600036718 /* dark-shield-dot-mouse-over.json in Resources */,
@@ -9657,6 +9696,7 @@
 				AA34397D2754D55100B241FA /* dark-trackers-3.json in Resources */,
 				AA3439782754D55100B241FA /* dark-trackers-2.json in Resources */,
 				AAB7320726DD0C37002FACF9 /* Fire.storyboard in Resources */,
+				CD2AB5C52C8222FE0019EB49 /* filterSet.json in Resources */,
 				EA18D1CA272F0DC8006DC101 /* social_images in Resources */,
 				AA7EB6E927E880A600036718 /* shield-dot-mouse-over.json in Resources */,
 				BD384AC92BBC821A00EF3735 /* vpn-dark-mode.json in Resources */,
@@ -10067,6 +10107,7 @@
 				3706FA9D293F65D500E42796 /* PermissionState.swift in Sources */,
 				3707C724294B5D2900682A9F /* StringExtension.swift in Sources */,
 				3706FA9F293F65D500E42796 /* FeedbackPresenter.swift in Sources */,
+				CD2AB5C42C8222F70019EB49 /* PhishingDetectionStateManager.swift in Sources */,
 				37A6A8F22AFCC988008580A3 /* FaviconsFetcherOnboarding.swift in Sources */,
 				859F30652A72A9FA00C20372 /* BookmarksBarPromptPopover.swift in Sources */,
 				37197EA22942441900394917 /* Tab+Dialogs.swift in Sources */,
@@ -10655,6 +10696,7 @@
 				3706FC1F293F65D500E42796 /* BookmarksBarViewController.swift in Sources */,
 				1DDC85042B83903E00670238 /* PreferencesWebTrackingProtectionView.swift in Sources */,
 				3706FC20293F65D500E42796 /* PreferencesAutofillView.swift in Sources */,
+				CD2AB5C22C8222F50019EB49 /* PhishingDetectionPreferences.swift in Sources */,
 				3706FC21293F65D500E42796 /* UserText+PasswordManager.swift in Sources */,
 				F118EA7E2BEA2B8700F77634 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift in Sources */,
 				3706FC22293F65D500E42796 /* LoadingProgressView.swift in Sources */,
@@ -10799,6 +10841,7 @@
 				3706FC79293F65D500E42796 /* NSImageExtensions.swift in Sources */,
 				3706FEBD293F6EFF00E42796 /* BWCommand.swift in Sources */,
 				3706FC7B293F65D500E42796 /* PasswordManagementViewController.swift in Sources */,
+				CD2AB5C02C8222F20019EB49 /* PhishingDetection.swift in Sources */,
 				3706FC7C293F65D500E42796 /* ImportedBookmarks.swift in Sources */,
 				3706FC7D293F65D500E42796 /* NSMenuExtension.swift in Sources */,
 				3701C9CF29BD040C00305B15 /* FirefoxBerkeleyDatabaseReader.swift in Sources */,
@@ -11888,6 +11931,7 @@
 				3768D83B2C24C0A8004120AE /* RemoteMessageViewModel.swift in Sources */,
 				B68C2FB227706E6A00BF2C7D /* ProcessExtension.swift in Sources */,
 				B6106BA726A7BECC0013B453 /* PermissionAuthorizationQuery.swift in Sources */,
+				CD2AB5C32C8222F70019EB49 /* PhishingDetectionStateManager.swift in Sources */,
 				3171D6BA288984D00068632A /* BadgeAnimationView.swift in Sources */,
 				1DB67F292B6FE4A6003DF243 /* WebViewSnapshotRenderer.swift in Sources */,
 				4B9292CE2667123700AD2C21 /* BrowserTabSelectionDelegate.swift in Sources */,
@@ -11994,6 +12038,7 @@
 				AAE7527C263B056C00B973F8 /* EncryptedHistoryStore.swift in Sources */,
 				AAE246F32709EF3B00BEEAEE /* FirePopoverCollectionViewItem.swift in Sources */,
 				4B41EDA32B1543B9001EEDF4 /* VPNPreferencesModel.swift in Sources */,
+				CD2AB5BF2C8222F20019EB49 /* PhishingDetection.swift in Sources */,
 				AA61C0D22727F59B00E6B681 /* ArrayExtension.swift in Sources */,
 				373A1AB02842C4EA00586521 /* BookmarkHTMLImporter.swift in Sources */,
 				B6B5F57F2B024105008DB58A /* DataImportSummaryView.swift in Sources */,
@@ -12216,6 +12261,7 @@
 				1D4071AE2BD64267002D4537 /* DockCustomizer.swift in Sources */,
 				AA585D82248FD31100E9A3E2 /* AppDelegate.swift in Sources */,
 				7B1E81A027C8874900FF0E60 /* ContentOverlayViewController.swift in Sources */,
+				CD2AB5C12C8222F40019EB49 /* PhishingDetectionPreferences.swift in Sources */,
 				C1DAF3B52B9A44860059244F /* AutofillPopoverPresenter.swift in Sources */,
 				B687B7CA2947A029001DEA6F /* ContentBlockingTabExtension.swift in Sources */,
 				85B7184C27677C6500B4277F /* OnboardingViewController.swift in Sources */,
@@ -14313,6 +14359,14 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = Configuration;
+		};
+		CD2AB5BD2C82218D0019EB49 /* PhishingDetection */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PhishingDetection;
+		};
+		CDE2489F2C821DF400F9399D /* PhishingDetection */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PhishingDetection;
 		};
 		D6BC8AC52C5A95AA0025375B /* DuckPlayer */ = {
 			isa = XCSwiftPackageProductDependency;
