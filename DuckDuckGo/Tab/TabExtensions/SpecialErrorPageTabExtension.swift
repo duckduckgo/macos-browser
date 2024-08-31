@@ -120,11 +120,10 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
         let errorType = PhishingDetectionError.detected.localizedDescription
         if isMalicious {
             errorPageType = .phishing
-            //self.specialErrorPageUserScript?.errorData.kind = "phishing"
             if let mainFrameTarget = navigationAction.mainFrameTarget {
                 failingURL = url
                 let domain: String = url.host ?? url.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true)
-                errorData = SpecialErrorData(kind: .ssl, errorType: errorType, domain: domain, eTldPlus1: tld.eTLDplus1(failingURL?.host))
+                errorData = SpecialErrorData(kind: .phishing, errorType: errorType, domain: domain, eTldPlus1: tld.eTLDplus1(failingURL?.host))
                 if let errorURL = self.generateErrorPageURL(url) {
                     _ = webView?.load(URLRequest(url: errorURL))
                     return .cancel
