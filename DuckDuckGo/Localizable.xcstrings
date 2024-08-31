@@ -40762,6 +40762,18 @@
         }
       }
     },
+    "phishing.error.page.tab.title" : {
+      "comment" : "Title shown in an error page tab that warn users of security risks on a website that has been flagged as malicious.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Warning: Site May Be Deceptive"
+          }
+        }
+      }
+    },
     "pin.tab" : {
       "comment" : "Menu item. Pin as a verb",
       "extractionState" : "extracted_with_value",
