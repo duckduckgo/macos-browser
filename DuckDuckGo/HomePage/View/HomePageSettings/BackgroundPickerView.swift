@@ -20,17 +20,26 @@ import SwiftUIExtensions
 
 extension HomePage.Views {
 
-    struct BackgroundPickerView<Item, ContentView>: View where Item: Identifiable & Hashable & CustomBackgroundConvertible, ContentView: View {
+    struct BackgroundPickerView<Item, HeaderView, FooterView>: View where Item: Identifiable & Hashable & CustomBackgroundConvertible,
+                                                                          HeaderView: View,
+                                                                          FooterView: View {
 
         let title: String
         let items: [Item]
         let maxItemsCount: Int
-        @ViewBuilder let footer: () -> ContentView
+        @ViewBuilder let header: () -> HeaderView
+        @ViewBuilder let footer: () -> FooterView
 
-        init(title: String, items: [Item], maxItemsCount: Int = 0, @ViewBuilder footer: @escaping () -> ContentView = { EmptyView() }) {
+        init(
+            title: String,
+            items: [Item],
+            maxItemsCount: Int = 0,
+            @ViewBuilder header: @escaping () -> HeaderView = { EmptyView() },
+            @ViewBuilder footer: @escaping () -> FooterView = { EmptyView() }) {
             self.title = title
             self.items = items
             self.maxItemsCount = maxItemsCount
+            self.header = header
             self.footer = footer
         }
 
@@ -39,6 +48,7 @@ extension HomePage.Views {
         var body: some View {
             VStack(spacing: 16) {
                 backButton
+                header()
                 if items.count < maxItemsCount {
                     SettingsGridWithPlaceholders(items: items, expectedMaxNumberOfItems: maxItemsCount) { item in
                         if let item {

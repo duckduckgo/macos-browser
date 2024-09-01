@@ -23,6 +23,23 @@ import PixelKit
 import SwiftUI
 import SwiftUIExtensions
 
+protocol UserColorProviding {
+    var colorPublisher: AnyPublisher<NSColor, Never> { get }
+
+    func showColorPanel()
+}
+
+extension NSColorPanel: UserColorProviding {
+    var colorPublisher: AnyPublisher<NSColor, Never> {
+        publisher(for: \.color).eraseToAnyPublisher()
+    }
+
+    func showColorPanel() {
+        showsAlpha = false
+        orderFront(nil)
+    }
+}
+
 extension HomePage.Models {
 
     final class SettingsModel: ObservableObject {
@@ -53,12 +70,14 @@ extension HomePage.Models {
         let customImagesManager: UserBackgroundImagesManaging?
         let sendPixel: (PixelKitEvent) -> Void
         let openFilePanel: () -> URL?
+        let userColorProvider: () -> UserColorProviding
         let showAddImageFailedAlert: () -> Void
         let openSettings: () -> Void
 
         @Published private(set) var availableUserBackgroundImages: [UserBackgroundImage] = []
 
         private var availableCustomImagesCancellable: AnyCancellable?
+        private var userColorCancellable: AnyCancellable?
 
         convenience init(openSettings: @escaping () -> Void) {
             self.init(
@@ -77,6 +96,7 @@ extension HomePage.Models {
                     }
                     return url
                 },
+                userColorProvider: NSColorPanel.shared,
                 showAddImageFailedAlert: {
                     let alert = NSAlert.cannotReadImageAlert()
                     alert.runModal()
@@ -90,6 +110,7 @@ extension HomePage.Models {
             userBackgroundImagesManager: UserBackgroundImagesManaging?,
             sendPixel: @escaping (PixelKitEvent) -> Void,
             openFilePanel: @escaping () -> URL?,
+            userColorProvider: @autoclosure @escaping () -> UserColorProviding,
             showAddImageFailedAlert: @escaping () -> Void,
             openSettings: @escaping () -> Void
         ) {
@@ -104,6 +125,7 @@ extension HomePage.Models {
 
             self.sendPixel = sendPixel
             self.openFilePanel = openFilePanel
+            self.userColorProvider = userColorProvider
             self.showAddImageFailedAlert = showAddImageFailedAlert
             self.openSettings = openSettings
 
@@ -199,6 +221,27 @@ extension HomePage.Models {
                 showAddImageFailedAlert()
                 Logger.homePageSettings.error("Failed to add user image: \(error)")
             }
+        }
+
+        @Published var customColor: Color = .white
+
+        func openColorPanel() {
+            let provider = userColorProvider()
+            userColorCancellable = provider.colorPublisher
+                .map { color -> Color in
+                    if #available(macOS 12.0, *) {
+                        return Color(nsColor: color)
+                    } else {
+                        return Color(hue: color.hueComponent, saturation: color.saturationComponent, brightness: color.brightnessComponent)
+                    }
+                }
+                .assign(to: \.customColor, onWeaklyHeld: self)
+
+            provider.showColorPanel()
+        }
+
+        func onDisappear() {
+            userColorCancellable?.cancel()
         }
 
         var customBackgroundModes: [CustomBackgroundModeModel] {

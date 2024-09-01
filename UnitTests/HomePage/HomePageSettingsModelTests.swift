@@ -33,6 +33,14 @@ fileprivate extension SettingsModel.CustomBackgroundModeModel {
     static let customImagePicker: Self = .init(contentType: .customImagePicker, title: "", customBackgroundThumbnail: nil)
 }
 
+final class MockUserColorProvider: UserColorProviding {
+    var colorPublisher: AnyPublisher<NSColor, Never> {
+        Empty<NSColor, Never>().eraseToAnyPublisher()
+    }
+
+    func showColorPanel() {}
+}
+
 final class HomePageSettingsModelTests: XCTestCase {
 
     fileprivate var model: SettingsModel!
@@ -61,6 +69,7 @@ final class HomePageSettingsModelTests: XCTestCase {
                 self?.openFilePanelCallCount += 1
                 return self?.openFilePanel()
             },
+            userColorProvider: MockUserColorProvider(),
             showAddImageFailedAlert: { [weak self] in self?.showImageFailedAlertCallCount += 1 },
             openSettings: { [weak self] in self?.openSettingsCallCount += 1 }
         )

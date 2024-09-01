@@ -18,6 +18,56 @@
 
 import SwiftUIExtensions
 
+struct CustomColorPicker: NSViewRepresentable {
+    @Binding var selectedColor: Color
+    var label: String
+    var previewSize: NSSize
+
+    func makeNSView(context: Context) -> CustomNSColorWell {
+        let colorWell = CustomNSColorWell(frame: .zero)
+        colorWell.color = NSColor(selectedColor)
+        colorWell.customPreviewSize = previewSize
+        colorWell.target = context.coordinator
+        colorWell.action = #selector(Coordinator.colorChanged(_:))
+        return colorWell
+    }
+
+    func updateNSView(_ nsView: CustomNSColorWell, context: Context) {
+        nsView.color = NSColor(selectedColor)
+        nsView.customPreviewSize = previewSize
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+
+    final class Coordinator: NSObject {
+        var parent: CustomColorPicker
+
+        init(_ parent: CustomColorPicker) {
+            self.parent = parent
+        }
+
+        @objc func colorChanged(_ sender: NSColorWell) {
+            parent.selectedColor = Color(sender.color)
+        }
+    }
+}
+
+final class CustomNSColorWell: NSColorWell {
+    var customPreviewSize: NSSize = NSSize(width: 44, height: 44)
+
+    override func draw(_ dirtyRect: NSRect) {
+        super.draw(dirtyRect)
+        color.setFill()
+        dirtyRect.fill()
+    }
+
+    override var intrinsicContentSize: NSSize {
+        return customPreviewSize
+    }
+}
+
 extension HomePage.Views {
 
     struct SettingsView: View {
@@ -52,7 +102,24 @@ extension HomePage.Views {
                             rootView
                                 .transition(.move(edge: .leading).combined(with: .opacity))
                         case .colorPicker:
-                            BackgroundPickerView(title: UserText.solidColors, items: SolidColorBackground.allCases)
+                            BackgroundPickerView(title: UserText.solidColors, items: SolidColorBackground.allCases, header: {
+                                HStack {
+                                    Text("Pick a color:")
+                                    Spacer()
+                                    Button {
+                                        model.openColorPanel()
+                                    } label: {
+                                        BackgroundThumbnailView {
+                                            model.customColor.scaledToFill()
+                                        }
+                                    }
+                                    .frame(width: 96, height: 64)
+                                }
+                                .buttonStyle(.plain)
+                                .onDisappear {
+                                    model.onDisappear()
+                                }
+                            })
                                 .transition(.move(edge: .trailing).combined(with: .opacity))
                         case .gradientPicker:
                             BackgroundPickerView(title: UserText.gradients, items: GradientBackground.allCases)
@@ -64,13 +131,13 @@ extension HomePage.Views {
                             BackgroundPickerView(
                                 title: UserText.myBackgrounds,
                                 items: model.availableUserBackgroundImages,
-                                maxItemsCount: HomePage.Models.SettingsModel.Const.maximumNumberOfUserImages
-                            ) {
-                                addBackgroundButton
-                                Text(UserText.myBackgroundsDisclaimer)
-                                    .foregroundColor(.blackWhite60)
-                                    .multilineTextAlignment(.leading)
-                            }
+                                maxItemsCount: HomePage.Models.SettingsModel.Const.maximumNumberOfUserImages,
+                                footer: {
+                                    addBackgroundButton
+                                    Text(UserText.myBackgroundsDisclaimer)
+                                        .foregroundColor(.blackWhite60)
+                                        .multilineTextAlignment(.leading)
+                                })
                             .transition(.move(edge: .trailing).combined(with: .opacity))
                         }
                     }
