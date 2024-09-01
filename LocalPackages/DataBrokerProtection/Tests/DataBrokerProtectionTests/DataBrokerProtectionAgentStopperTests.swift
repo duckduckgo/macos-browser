@@ -59,7 +59,41 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
         mockStopAction = nil
     }
 
-    func testNoProfile_andUserIsNotFreemium_thenStopAgentIsCalled() async {
+    func testNoProfile_andUserIsNotAuthenticated_andUserIsNotFreemium_thenStopAgentIsCalled() async {
+        mockAuthenticationManager.isUserAuthenticatedValue = false
+        mockAuthenticationManager.hasValidEntitlementValue = true
+        mockDataManager.profileToReturn = nil
+        mockFreemiumPIRUserState.isActiveUser = false
+
+        let stopper = DefaultDataBrokerProtectionAgentStopper(dataManager: mockDataManager,
+                                                              entitlementMonitor: mockEntitlementMonitor,
+                                                              authenticationManager: mockAuthenticationManager,
+                                                              pixelHandler: mockPixelHandler,
+                                                              stopAction: mockStopAction,
+                                                              freemiumPIRUserState: mockFreemiumPIRUserState)
+        await stopper.validateRunPrerequisitesAndStopAgentIfNecessary()
+
+        XCTAssertTrue(mockStopAction.wasStopCalled)
+    }
+
+    func testNoProfile_andUserIsNotAuthenticated_andUserIsFreemium_thenStopAgentIsCalled() async {
+        mockAuthenticationManager.isUserAuthenticatedValue = false
+        mockAuthenticationManager.hasValidEntitlementValue = true
+        mockDataManager.profileToReturn = nil
+        mockFreemiumPIRUserState.isActiveUser = true
+
+        let stopper = DefaultDataBrokerProtectionAgentStopper(dataManager: mockDataManager,
+                                                              entitlementMonitor: mockEntitlementMonitor,
+                                                              authenticationManager: mockAuthenticationManager,
+                                                              pixelHandler: mockPixelHandler,
+                                                              stopAction: mockStopAction,
+                                                              freemiumPIRUserState: mockFreemiumPIRUserState)
+        await stopper.validateRunPrerequisitesAndStopAgentIfNecessary()
+
+        XCTAssertTrue(mockStopAction.wasStopCalled)
+    }
+
+    func testNoProfile_andUserIsAuthenticated_andUserIsNotFreemium_thenStopAgentIsCalled() async {
         mockAuthenticationManager.isUserAuthenticatedValue = true
         mockAuthenticationManager.hasValidEntitlementValue = true
         mockDataManager.profileToReturn = nil
@@ -76,7 +110,7 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
         XCTAssertTrue(mockStopAction.wasStopCalled)
     }
 
-    func testNoProfile_andUserIsFreemium_thenStopAgentIsCalled() async {
+    func testNoProfile_andUserIsAuthenticated_andUserIsFreemium_thenStopAgentIsCalled() async {
         mockAuthenticationManager.isUserAuthenticatedValue = true
         mockAuthenticationManager.hasValidEntitlementValue = true
         mockDataManager.profileToReturn = nil
@@ -93,7 +127,41 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
         XCTAssertTrue(mockStopAction.wasStopCalled)
     }
 
-    func testInvalidEntitlement_andUserIsNotFreemium_thenStopAgentIsCalled() async {
+    func testInvalidEntitlement_andUserIsNotAuthenticated_andUserIsNotFreemium_thenStopAgentIsCalled() async {
+        mockAuthenticationManager.isUserAuthenticatedValue = false
+        mockAuthenticationManager.hasValidEntitlementValue = false
+        mockDataManager.profileToReturn = fakeProfile
+        mockFreemiumPIRUserState.isActiveUser = false
+
+        let stopper = DefaultDataBrokerProtectionAgentStopper(dataManager: mockDataManager,
+                                                              entitlementMonitor: mockEntitlementMonitor,
+                                                              authenticationManager: mockAuthenticationManager,
+                                                              pixelHandler: mockPixelHandler,
+                                                              stopAction: mockStopAction,
+                                                              freemiumPIRUserState: mockFreemiumPIRUserState)
+        await stopper.validateRunPrerequisitesAndStopAgentIfNecessary()
+
+        XCTAssertTrue(mockStopAction.wasStopCalled)
+    }
+
+    func testInvalidEntitlement_andUserIsNotAuthenticated_andUserIsFreemium_thenStopAgentIsNotCalled() async {
+        mockAuthenticationManager.isUserAuthenticatedValue = false
+        mockAuthenticationManager.hasValidEntitlementValue = false
+        mockDataManager.profileToReturn = fakeProfile
+        mockFreemiumPIRUserState.isActiveUser = true
+
+        let stopper = DefaultDataBrokerProtectionAgentStopper(dataManager: mockDataManager,
+                                                              entitlementMonitor: mockEntitlementMonitor,
+                                                              authenticationManager: mockAuthenticationManager,
+                                                              pixelHandler: mockPixelHandler,
+                                                              stopAction: mockStopAction,
+                                                              freemiumPIRUserState: mockFreemiumPIRUserState)
+        await stopper.validateRunPrerequisitesAndStopAgentIfNecessary()
+
+        XCTAssertFalse(mockStopAction.wasStopCalled)
+    }
+
+    func testInvalidEntitlement_andUserIsAuthenticated_andUserIsNotFreemium_thenStopAgentIsCalled() async {
         mockAuthenticationManager.isUserAuthenticatedValue = true
         mockAuthenticationManager.hasValidEntitlementValue = false
         mockDataManager.profileToReturn = fakeProfile
@@ -110,7 +178,7 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
         XCTAssertTrue(mockStopAction.wasStopCalled)
     }
 
-    func testInvalidEntitlement_andUserIsFreemium_thenStopAgentIsCalled() async {
+    func testInvalidEntitlement_andUserIsAuthenticated_andUserIsFreemium_thenStopAgentIsCalled() async {
         mockAuthenticationManager.isUserAuthenticatedValue = true
         mockAuthenticationManager.hasValidEntitlementValue = false
         mockDataManager.profileToReturn = fakeProfile

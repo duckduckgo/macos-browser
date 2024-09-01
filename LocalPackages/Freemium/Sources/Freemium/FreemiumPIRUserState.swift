@@ -22,6 +22,8 @@ import Subscription
 /// `FreemiumPIRUserState` types provide access to Freemium PIR-related state
 public protocol FreemiumPIRUserState {
     var didOnboard: Bool { get set }
+
+    /// `isActiveUser` implementations`should only return `true` if the current user DOES NOT have a subscription
     var isActiveUser: Bool { get }
 }
 

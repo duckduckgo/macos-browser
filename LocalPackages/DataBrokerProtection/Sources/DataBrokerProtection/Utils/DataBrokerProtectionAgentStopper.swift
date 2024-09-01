@@ -58,25 +58,27 @@ struct DefaultDataBrokerProtectionAgentStopper: DataBrokerProtectionAgentStopper
     /// 2. The user has a subscription with valid entitlements
     public func validateRunPrerequisitesAndStopAgentIfNecessary() async {
 
-        let isFreemiumUser = freemiumPIRUserState.isActiveUser
-
         do {
-            guard try dataManager.fetchProfile() != nil, isFreemiumUser ||
-                  authenticationManager.isUserAuthenticated else {
+            let hasProfile = try dataManager.fetchProfile() != nil
+            let isAuthenticated = authenticationManager.isUserAuthenticated
+            let isFreemium = freemiumPIRUserState.isActiveUser
+
+            if !hasProfile || (!isAuthenticated && !isFreemium) {
                 os_log("Prerequisites are invalid", log: .dataBrokerProtection)
                 stopAgent()
                 return
             }
-            os_log("Prerequisites are valid", log: .dataBrokerProtection)
-        } catch {
-            os_log("Error validating prerequisites, error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
-            stopAgent()
-        }
 
-        do {
-            let result = try await authenticationManager.hasValidEntitlement()
-            stopAgentBasedOnEntitlementCheckResult(result ? .enabled : .disabled)
+            if !isAuthenticated && isFreemium {
+                os_log("User is Freemium", log: .dataBrokerProtection)
+                return
+            }
+
+            let hasValidEntitlement = try await authenticationManager.hasValidEntitlement()
+            stopAgentBasedOnEntitlementCheckResult(hasValidEntitlement ? .enabled : .disabled)
+
         } catch {
+            os_log("Error validating prerequisites or checking entitlement, error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
             stopAgentBasedOnEntitlementCheckResult(.error)
         }
     }
