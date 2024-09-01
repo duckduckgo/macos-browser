@@ -129,6 +129,7 @@ final class BookmarkTableCellView: NSTableCellView {
         menuButton.translatesAutoresizingMaskIntoConstraints = false
         menuButton.isBordered = false
         menuButton.isHidden = true
+        menuButton.sendAction(on: .leftMouseDown)
         menuButton.setAccessibilityIdentifier("BookmarkTableCellView.menuButton")
     }
 

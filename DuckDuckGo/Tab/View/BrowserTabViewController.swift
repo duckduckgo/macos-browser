@@ -24,6 +24,7 @@ import SwiftUI
 import WebKit
 import Subscription
 import PixelKit
+import os.log
 
 final class BrowserTabViewController: NSViewController {
 
@@ -43,6 +44,7 @@ final class BrowserTabViewController: NSViewController {
 
     private var tabViewModelCancellables = Set<AnyCancellable>()
     private var activeUserDialogCancellable: Cancellable?
+    private var duckPlayerConsentCancellable: AnyCancellable?
     private var pinnedTabsDelegatesCancellable: AnyCancellable?
     private var keyWindowSelectedTabCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
@@ -53,6 +55,10 @@ final class BrowserTabViewController: NSViewController {
     private var hoverLabelWorkItem: DispatchWorkItem?
 
     private(set) var transientTabContentViewController: NSViewController?
+    private lazy var duckPlayerOnboardingModalManager: DuckPlayerOnboardingModalManager = {
+        let modal = DuckPlayerOnboardingModalManager()
+        return modal
+    }()
 
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
@@ -254,6 +260,7 @@ final class BrowserTabViewController: NSViewController {
                 self.subscribeToTabContent(of: selectedTabViewModel)
                 self.subscribeToHoveredLink(of: selectedTabViewModel)
                 self.subscribeToUserDialogs(of: selectedTabViewModel)
+                self.subscribeToDuckPlayerOnboardingPrompt(of: selectedTabViewModel)
 
                 self.adjustFirstResponder(force: true)
             }
@@ -429,6 +436,18 @@ final class BrowserTabViewController: NSViewController {
 #endif
     }
 
+    private func subscribeToDuckPlayerOnboardingPrompt(of tabViewModel: TabViewModel?) {
+        tabViewModel?.tab.duckPlayerOnboardingPublisher.sink { [weak self, weak tab = tabViewModel?.tab] onboardingState in
+
+            guard let self, let tab, let onboardingState = onboardingState, onboardingState.onboardingDecider.canDisplayOnboarding else  {
+                self?.duckPlayerOnboardingModalManager.close(animated: false, completion: nil)
+                return
+            }
+
+            self.duckPlayerOnboardingModalManager.show(on: self.view, animated: true)
+        }.store(in: &tabViewModelCancellables)
+    }
+
     private func shouldMakeContentViewFirstResponder(for tabContent: Tab.TabContent) -> Bool {
         // always steal focus when first responder is not a text field
         guard view.window?.firstResponder is NSText else {
@@ -503,7 +522,7 @@ final class BrowserTabViewController: NSViewController {
               let contentView = viewToMakeFirstResponderAfterAdding?() else { return }
 
         guard contentView.window === window else {
-            os_log("BrowserTabViewController: Content view window is \(contentView.window?.description ?? "<nil>") but expected: \(window)", type: .error)
+            Logger.general.error("BrowserTabViewController: Content view window is \(contentView.window?.description ?? "<nil>") but expected: \(window)")
             return
         }
         viewToMakeFirstResponderAfterAdding = nil
@@ -1201,7 +1220,7 @@ extension BrowserTabViewController {
         dispatchPrecondition(condition: .onQueue(.main))
 
         guard let webView = webView else {
-            os_log("BrowserTabViewController: failed to create a snapshot of webView", type: .error)
+            Logger.general.error("BrowserTabViewController: failed to create a snapshot of webView")
             return
         }
 
@@ -1210,7 +1229,7 @@ extension BrowserTabViewController {
 
         webView.takeSnapshot(with: config) { [weak self] image, _ in
             guard let image = image else {
-                os_log("BrowserTabViewController: failed to create a snapshot of webView", type: .error)
+                Logger.general.error("BrowserTabViewController: failed to create a snapshot of webView")
                 return
             }
             self?.showWebViewSnapshot(with: image)

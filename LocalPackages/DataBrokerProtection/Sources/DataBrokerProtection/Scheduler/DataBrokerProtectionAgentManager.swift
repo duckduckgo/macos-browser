@@ -20,6 +20,7 @@ import Foundation
 import Common
 import BrowserServicesKit
 import PixelKit
+import os.log
 
 // This is to avoid exposing all the dependancies outside of the DBP package
 public class DataBrokerProtectionAgentManagerProvider {
@@ -172,6 +173,8 @@ extension DataBrokerProtectionAgentManager {
         eventPixels.tryToFireWeeklyPixels()
         // This will try to fire the stats pixels
         statsPixels.tryToFireStatsPixels()
+        // Fire custom stats pixels if needed
+        statsPixels.fireCustomStatsPixelsIfNeeded()
     }
 }
 
@@ -200,15 +203,15 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentAppEvents {
                     switch oneTimeError {
                     case DataBrokerProtectionQueueError.interrupted:
                         self.pixelHandler.fire(.ipcServerImmediateScansInterrupted)
-                        os_log("Interrupted during DataBrokerProtectionAgentManager.profileSaved in queueManager.startImmediateOperationsIfPermitted(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
+                        Logger.dataBrokerProtection.debug("Interrupted during DataBrokerProtectionAgentManager.profileSaved in queueManager.startImmediateOperationsIfPermitted(), error: \(oneTimeError.localizedDescription, privacy: .public)")
                     default:
                         self.pixelHandler.fire(.ipcServerImmediateScansFinishedWithError(error: oneTimeError))
-                        os_log("Error during DataBrokerProtectionAgentManager.profileSaved in queueManager.startImmediateOperationsIfPermitted, error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
+                        Logger.dataBrokerProtection.debug("Error during DataBrokerProtectionAgentManager.profileSaved in queueManager.startImmediateOperationsIfPermitted, error: \(oneTimeError.localizedDescription, privacy: .public)")
                     }
                 }
                 if let operationErrors = errors.operationErrors,
                           operationErrors.count != 0 {
-                    os_log("Operation error(s) during DataBrokerProtectionAgentManager.profileSaved in queueManager.startImmediateOperationsIfPermitted, count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
+                    Logger.dataBrokerProtection.debug("Operation error(s) during DataBrokerProtectionAgentManager.profileSaved in queueManager.startImmediateOperationsIfPermitted, count: \(operationErrors.count, privacy: .public)")
                 }
             }
 
@@ -238,18 +241,18 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentAppEvents {
                     switch oneTimeError {
                     case DataBrokerProtectionQueueError.interrupted:
                         self.pixelHandler.fire(.ipcServerAppLaunchedScheduledScansInterrupted)
-                        os_log("Interrupted during DataBrokerProtectionAgentManager.appLaunched in queueManager.startScheduledOperationsIfPermitted(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
+                        Logger.dataBrokerProtection.debug("Interrupted during DataBrokerProtectionAgentManager.appLaunched in queueManager.startScheduledOperationsIfPermitted(), error: \(oneTimeError.localizedDescription, privacy: .public)")
                     case DataBrokerProtectionQueueError.cannotInterrupt:
                         self.pixelHandler.fire(.ipcServerAppLaunchedScheduledScansBlocked)
-                        os_log("Cannot interrupt during DataBrokerProtectionAgentManager.appLaunched in queueManager.startScheduledOperationsIfPermitted()")
+                        Logger.dataBrokerProtection.debug("Cannot interrupt during DataBrokerProtectionAgentManager.appLaunched in queueManager.startScheduledOperationsIfPermitted()")
                     default:
                         self.pixelHandler.fire(.ipcServerAppLaunchedScheduledScansFinishedWithError(error: oneTimeError))
-                        os_log("Error during DataBrokerProtectionAgentManager.appLaunched in queueManager.startScheduledOperationsIfPermitted, error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
+                        Logger.dataBrokerProtection.debug("Error during DataBrokerProtectionAgentManager.appLaunched in queueManager.startScheduledOperationsIfPermitted, error: \(oneTimeError.localizedDescription, privacy: .public)")
                     }
                 }
                 if let operationErrors = errors.operationErrors,
                           operationErrors.count != 0 {
-                    os_log("Operation error(s) during DataBrokerProtectionAgentManager.profileSaved in queueManager.startImmediateOperationsIfPermitted, count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
+                    Logger.dataBrokerProtection.debug("Operation error(s) during DataBrokerProtectionAgentManager.profileSaved in queueManager.startImmediateOperationsIfPermitted, count: \(operationErrors.count, privacy: .public)")
                 }
             }
 
@@ -266,7 +269,7 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentAppEvents {
             self.pixelHandler.fire(.initialScanTotalDuration(duration: durationSinceStart.rounded(.towardZero),
                                                              profileQueries: profileQueries))
         } catch {
-            os_log("Initial Scans Error when trying to fetch the profile to get the profile queries", log: .dataBrokerProtection)
+            Logger.dataBrokerProtection.debug("Initial Scans Error when trying to fetch the profile to get the profile queries")
         }
     }
 }

@@ -55,12 +55,14 @@ protocol FaviconManagement: AnyObject {
 @MainActor
 final class FaviconManager: FaviconManagement {
 
-    static let shared: FaviconManager = {
+    nonisolated static let shared: FaviconManager = {
+        MainActor.assumeIsolated {
 #if DEBUG
-        return FaviconManager(cacheType: NSApp.runType == .normal ? .standard : .inMemory)
+            return FaviconManager(cacheType: NSApp.runType == .normal ? .standard : .inMemory)
 #else
-        return FaviconManager(cacheType: .standard)
+            return FaviconManager(cacheType: .standard)
 #endif
+        }
     }()
 
     enum CacheType {

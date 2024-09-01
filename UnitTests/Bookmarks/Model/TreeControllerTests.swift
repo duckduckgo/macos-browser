@@ -29,7 +29,7 @@ private class MockTreeControllerDataSource: BookmarkTreeControllerDataSource {
 private final class MockTreeControllerSearchDataSource: BookmarkTreeControllerSearchDataSource {
     var returnNodes: [BookmarkNode] = []
 
-    func nodes(for searchQuery: String, sortMode: BookmarksSortMode) -> [BookmarkNode] {
+    func nodes(forSearchQuery searchQuery: String, sortMode: BookmarksSortMode) -> [BookmarkNode] {
         return returnNodes
     }
 }
@@ -114,7 +114,7 @@ class TreeControllerTests: XCTestCase {
         searchDataSource.returnNodes = [firstNode, secondNode, thirdNode]
         let sut = BookmarkTreeController(dataSource: dataSource, sortMode: .manual, searchDataSource: searchDataSource)
 
-        sut.rebuild(for: "some search query", sortMode: .manual)
+        sut.rebuild(forSearchQuery: "some search query", sortMode: .manual)
 
         XCTAssertEqual(sut.rootNode.childNodes.count, 3)
     }

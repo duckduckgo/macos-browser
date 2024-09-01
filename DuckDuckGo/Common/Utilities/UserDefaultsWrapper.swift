@@ -25,6 +25,7 @@ extension UserDefaults {
     static let netP = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .netP))!
     static let dbp = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .dbp))!
     static let subs = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .subs))!
+    static let appConfiguration = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .appConfiguration))!
 }
 
 public struct UserDefaultsWrapperKey: RawRepresentable {
@@ -50,7 +51,6 @@ public struct UserDefaultsWrapper<T> {
         case configStorageBloomFilterExclusionsEtag = "config.storage.bloomfilter.exclusions.etag"
         case configStorageSurrogatesEtag = "config.storage.surrogates.etag"
         case configStoragePrivacyConfigurationEtag = "config.storage.privacyconfiguration.etag"
-        case configFBConfigEtag = "config.storage.fbconfig.etag"
         case configStorageRemoteMessagingConfigEtag = "config.storage.remotemessagingconfig.etag"
 
         case configLastInstalled = "config.last.installed"

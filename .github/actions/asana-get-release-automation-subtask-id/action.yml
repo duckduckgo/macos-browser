@@ -15,25 +15,23 @@ outputs:
     value: ${{ steps.extract-automation-task-id.outputs.automation-task-id }}
   assignee-id:
     description: "Release task assignee ID"
-    value: ${{ steps.extract-assignee-id.outputs.assignee-id }}
+    value: ${{ steps.extract-assignee-id.outputs.asana_assignee_id }}
 runs:
   using: "composite"
   steps:
     - id: extract-task-id
-      uses: ./.github/actions/asana-extract-task-id
-      with:
-        task-url: ${{ inputs.task-url }}
-        access-token: ${{ inputs.access-token }}
+      shell: bash
+      run: bundle exec fastlane run asana_extract_task_id task_url:"${{ inputs.task-url }}"
 
     - id: extract-assignee-id
-      uses: ./.github/actions/asana-extract-task-assignee
-      with:
-        task-id: ${{ steps.extract-task-id.outputs.task-id }}
-        access-token: ${{ inputs.access-token }}
+      shell: bash
+      env:
+        ASANA_ACCESS_TOKEN: ${{ inputs.access-token }}
+      run: bundle exec fastlane run asana_extract_task_assignee task_id:"${{ steps.extract-task-id.outputs.asana_task_id }}"
 
     - id: extract-automation-task-id
       run: |
-        task_id="${{ steps.extract-task-id.outputs.task-id }}"
+        task_id="${{ steps.extract-task-id.outputs.asana_task_id }}"
         automation_task_id=$(curl -fLSs "https://app.asana.com/api/1.0/tasks/${task_id}/subtasks?opt_fields=name" \
           -H "Authorization: Bearer ${{ inputs.access-token }}" \
           | jq -r '.data[] | select(.name=="Automation").gid')

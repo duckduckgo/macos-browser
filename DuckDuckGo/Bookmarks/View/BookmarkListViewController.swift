@@ -17,17 +17,21 @@
 //
 
 import AppKit
+import Carbon
 import Combine
 
 protocol BookmarkListViewControllerDelegate: AnyObject {
 
-    func popoverShouldClose(_ bookmarkListViewController: BookmarkListViewController)
+    func closeBookmarksPopover(_ sender: BookmarkListViewController)
     func popover(shouldPreventClosure: Bool)
 
 }
 
 final class BookmarkListViewController: NSViewController {
-    static let preferredContentSize = CGSize(width: 420, height: 500)
+
+    fileprivate enum Constants {
+        static let preferredContentSize = CGSize(width: 420, height: 500)
+    }
 
     weak var delegate: BookmarkListViewControllerDelegate?
     var currentTabWebsite: WebsiteInfo?
@@ -36,10 +40,9 @@ final class BookmarkListViewController: NSViewController {
 
     private lazy var stackView = NSStackView()
     private lazy var newBookmarkButton = MouseOverButton(image: .addBookmark, target: self, action: #selector(newBookmarkButtonClicked))
-    private lazy var newFolderButton = MouseOverButton(image: .addFolder, target: self, action: #selector(newFolderButtonClicked))
+    private lazy var newFolderButton = MouseOverButton(image: .addFolder, target: outlineView.menu, action: #selector(FolderMenuItemSelectors.newFolder))
     private lazy var searchBookmarksButton = MouseOverButton(image: .searchBookmarks, target: self, action: #selector(searchBookmarkButtonClicked))
     private lazy var sortBookmarksButton = MouseOverButton(image: .bookmarkSortAsc, target: self, action: #selector(sortBookmarksButtonClicked))
-    private var isSearchVisible = false
 
     private lazy var buttonsDivider = NSBox()
     private lazy var manageBookmarksButton = MouseOverButton(title: UserText.bookmarksManage, target: self, action: #selector(openManagementInterface))
@@ -56,26 +59,37 @@ final class BookmarkListViewController: NSViewController {
     private lazy var searchBar = NSSearchField()
     private var boxDividerTopConstraint = NSLayoutConstraint()
 
-    private var cancellables = Set<AnyCancellable>()
     private let bookmarkManager: BookmarkManager
+    private let dragDropManager: BookmarkDragDropManager
     private let treeControllerDataSource: BookmarkListTreeControllerDataSource
     private let treeControllerSearchDataSource: BookmarkListTreeControllerSearchDataSource
     private let sortBookmarksViewModel: SortBookmarksViewModel
     private let bookmarkMetrics: BookmarksSearchAndSortMetrics
 
-    private lazy var treeController = BookmarkTreeController(dataSource: treeControllerDataSource,
-                                                             sortMode: sortBookmarksViewModel.selectedSortMode,
-                                                             searchDataSource: treeControllerSearchDataSource)
+    private let treeController: BookmarkTreeController
+
+    private var isSearchVisible = false {
+        didSet {
+            switch (oldValue, isSearchVisible) {
+            case (false, true):
+                showSearchBar()
+            case (true, false):
+                hideSearchBar()
+                showTreeView()
+            default: break
+            }
+        }
+    }
+
+    private var cancellables = Set<AnyCancellable>()
 
     private lazy var dataSource: BookmarkOutlineViewDataSource = {
         BookmarkOutlineViewDataSource(
             contentMode: .bookmarksAndFolders,
             bookmarkManager: bookmarkManager,
             treeController: treeController,
+            dragDropManager: dragDropManager,
             sortMode: sortBookmarksViewModel.selectedSortMode,
-            onMenuRequestedAction: { [weak self] cell in
-                self?.showContextMenu(for: cell)
-            },
             presentFaviconsFetcherOnboarding: { [weak self] in
                 guard let self, let window = self.view.window else {
                     return
@@ -101,18 +115,26 @@ final class BookmarkListViewController: NSViewController {
     }()
 
     init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
+         dragDropManager: BookmarkDragDropManager = BookmarkDragDropManager.shared,
          metrics: BookmarksSearchAndSortMetrics = BookmarksSearchAndSortMetrics()) {
         self.bookmarkManager = bookmarkManager
+        self.dragDropManager = dragDropManager
         self.treeControllerDataSource = BookmarkListTreeControllerDataSource(bookmarkManager: bookmarkManager)
         self.treeControllerSearchDataSource = BookmarkListTreeControllerSearchDataSource(bookmarkManager: bookmarkManager)
         self.bookmarkMetrics = metrics
         self.sortBookmarksViewModel = SortBookmarksViewModel(manager: bookmarkManager, metrics: metrics, origin: .panel)
+        self.treeController = BookmarkTreeController(dataSource: treeControllerDataSource,
+                                                     sortMode: sortBookmarksViewModel.selectedSortMode,
+                                                     searchDataSource: treeControllerSearchDataSource,
+                                                     isBookmarksBarMenu: false)
         super.init(nibName: nil, bundle: nil)
     }
 
     required init?(coder: NSCoder) {
         fatalError("\(type(of: self)): Bad initializer")
     }
+
+    // MARK: View Lifecycle
 
     override func loadView() {
         view = ColorView(frame: .zero, backgroundColor: .popoverBackground)
@@ -147,6 +169,9 @@ final class BookmarkListViewController: NSViewController {
         stackView.addArrangedSubview(searchBookmarksButton)
         stackView.addArrangedSubview(buttonsDivider)
         stackView.addArrangedSubview(manageBookmarksButton)
+
+        // keep OutlineView menu declaration before the buttons as it‘s their target
+        outlineView.menu = BookmarksContextMenu(bookmarkManager: bookmarkManager, delegate: self)
 
         newBookmarkButton.bezelStyle = .shadowlessSquare
         newBookmarkButton.cornerRadius = 4
@@ -229,8 +254,7 @@ final class BookmarkListViewController: NSViewController {
         outlineView.usesAutomaticRowHeights = true
         outlineView.target = self
         outlineView.action = #selector(handleClick)
-        outlineView.menu = NSMenu()
-        outlineView.menu!.delegate = self
+        outlineView.menu = BookmarksContextMenu(bookmarkManager: bookmarkManager, delegate: self)
         outlineView.dataSource = dataSource
         outlineView.delegate = dataSource
 
@@ -241,6 +265,7 @@ final class BookmarkListViewController: NSViewController {
         clipView.drawsBackground = false
         scrollView.contentView = clipView
 
+        emptyStateImageView.translatesAutoresizingMaskIntoConstraints = false
         emptyState.addSubview(emptyStateImageView)
         emptyState.addSubview(emptyStateTitle)
         emptyState.addSubview(emptyStateMessage)
@@ -280,137 +305,116 @@ final class BookmarkListViewController: NSViewController {
     private func setupLayout() {
         titleTextField.setContentHuggingPriority(.defaultHigh, for: .vertical)
         titleTextField.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
-        titleTextField.topAnchor.constraint(equalTo: view.topAnchor, constant: 12).isActive = true
-        titleTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
 
-        newBookmarkButton.heightAnchor.constraint(equalToConstant: 28).isActive = true
-        newBookmarkButton.widthAnchor.constraint(equalToConstant: 28).isActive = true
-
-        newFolderButton.heightAnchor.constraint(equalToConstant: 28).isActive = true
-        newFolderButton.widthAnchor.constraint(equalToConstant: 28).isActive = true
-
-        searchBookmarksButton.heightAnchor.constraint(equalToConstant: 28).isActive = true
-        searchBookmarksButton.widthAnchor.constraint(equalToConstant: 28).isActive = true
-
-        sortBookmarksButton.heightAnchor.constraint(equalToConstant: 28).isActive = true
-        sortBookmarksButton.widthAnchor.constraint(equalToConstant: 28).isActive = true
-
-        buttonsDivider.widthAnchor.constraint(equalToConstant: 13).isActive = true
-        buttonsDivider.heightAnchor.constraint(equalToConstant: 18).isActive = true
-
-        manageBookmarksButton.heightAnchor.constraint(equalToConstant: 28).isActive = true
-        let titleWidth = (manageBookmarksButton.title as NSString)
-            .size(withAttributes: [.font: manageBookmarksButton.font as Any]).width
-        let buttonWidth = manageBookmarksButton.image!.size.height + titleWidth + 18
-        manageBookmarksButton.widthAnchor.constraint(equalToConstant: buttonWidth).isActive = true
-
-        stackView.centerYAnchor.constraint(equalTo: titleTextField.centerYAnchor).isActive = true
-        view.trailingAnchor.constraint(equalTo: stackView.trailingAnchor, constant: 20).isActive = true
-
-        boxDividerTopConstraint = boxDivider.topAnchor.constraint(equalTo: titleTextField.bottomAnchor, constant: 12)
-        boxDividerTopConstraint.isActive = true
-        boxDivider.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        view.trailingAnchor.constraint(equalTo: boxDivider.trailingAnchor).isActive = true
-
-        scrollView.topAnchor.constraint(equalTo: boxDivider.bottomAnchor).isActive = true
-        scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-        scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-
-        emptyState.topAnchor.constraint(equalTo: boxDivider.bottomAnchor).isActive = true
-        emptyState.centerXAnchor.constraint(equalTo: boxDivider.centerXAnchor).isActive = true
-        emptyState.widthAnchor.constraint(equalToConstant: 342).isActive = true
-        emptyState.heightAnchor.constraint(equalToConstant: 383).isActive = true
-
-        emptyStateImageView.translatesAutoresizingMaskIntoConstraints = false
         emptyStateImageView.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
         emptyStateImageView.setContentHuggingPriority(.init(rawValue: 251), for: .vertical)
-        emptyStateImageView.topAnchor.constraint(equalTo: emptyState.topAnchor, constant: 94.5).isActive = true
-        emptyStateImageView.widthAnchor.constraint(equalToConstant: 128).isActive = true
-        emptyStateImageView.heightAnchor.constraint(equalToConstant: 96).isActive = true
-        emptyStateImageView.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor).isActive = true
 
         emptyStateTitle.setContentHuggingPriority(.defaultHigh, for: .vertical)
         emptyStateTitle.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
-        emptyStateTitle.topAnchor.constraint(equalTo: emptyStateImageView.bottomAnchor, constant: 8).isActive = true
-        emptyStateTitle.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor).isActive = true
-        emptyStateTitle.widthAnchor.constraint(equalToConstant: 192).isActive = true
 
         emptyStateMessage.setContentHuggingPriority(.defaultHigh, for: .vertical)
         emptyStateMessage.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
-        emptyStateMessage.topAnchor.constraint(equalTo: emptyStateTitle.bottomAnchor, constant: 8).isActive = true
-        emptyStateMessage.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor).isActive = true
 
-        emptyStateMessage.widthAnchor.constraint(equalToConstant: 192).isActive = true
+        NSLayoutConstraint.activate([
+            titleTextField.topAnchor.constraint(equalTo: view.topAnchor, constant: 12),
+            titleTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
 
-        importButton.topAnchor.constraint(equalTo: emptyStateMessage.bottomAnchor, constant: 8).isActive = true
-        importButton.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor).isActive = true
+            newBookmarkButton.heightAnchor.constraint(equalToConstant: 28),
+            newBookmarkButton.widthAnchor.constraint(equalToConstant: 28),
+
+            newFolderButton.heightAnchor.constraint(equalToConstant: 28),
+            newFolderButton.widthAnchor.constraint(equalToConstant: 28),
+
+            searchBookmarksButton.heightAnchor.constraint(equalToConstant: 28),
+            searchBookmarksButton.widthAnchor.constraint(equalToConstant: 28),
+
+            sortBookmarksButton.heightAnchor.constraint(equalToConstant: 28),
+            sortBookmarksButton.widthAnchor.constraint(equalToConstant: 28),
+
+            buttonsDivider.widthAnchor.constraint(equalToConstant: 13),
+            buttonsDivider.heightAnchor.constraint(equalToConstant: 18),
+
+            manageBookmarksButton.heightAnchor.constraint(equalToConstant: 28),
+            manageBookmarksButton.widthAnchor.constraint(equalToConstant: {
+                let titleWidth = (manageBookmarksButton.title as NSString)
+                    .size(withAttributes: [.font: manageBookmarksButton.font as Any]).width
+                let buttonWidth = manageBookmarksButton.image!.size.height + titleWidth + 18
+                return buttonWidth
+            }()),
+
+            stackView.centerYAnchor.constraint(equalTo: titleTextField.centerYAnchor),
+            view.trailingAnchor.constraint(equalTo: stackView.trailingAnchor, constant: 20),
+
+            {
+                boxDividerTopConstraint = boxDivider.topAnchor.constraint(equalTo: titleTextField.bottomAnchor, constant: 12)
+                return boxDividerTopConstraint
+            }(),
+            boxDivider.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            view.trailingAnchor.constraint(equalTo: boxDivider.trailingAnchor),
+
+            scrollView.topAnchor.constraint(equalTo: boxDivider.bottomAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+
+            emptyState.topAnchor.constraint(equalTo: boxDivider.bottomAnchor),
+            emptyState.centerXAnchor.constraint(equalTo: boxDivider.centerXAnchor),
+            emptyState.widthAnchor.constraint(equalToConstant: 342),
+            emptyState.heightAnchor.constraint(equalToConstant: 383),
+
+            emptyStateImageView.topAnchor.constraint(equalTo: emptyState.topAnchor, constant: 94.5),
+            emptyStateImageView.widthAnchor.constraint(equalToConstant: 128),
+            emptyStateImageView.heightAnchor.constraint(equalToConstant: 96),
+            emptyStateImageView.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor),
+
+            emptyStateTitle.topAnchor.constraint(equalTo: emptyStateImageView.bottomAnchor, constant: 8),
+            emptyStateTitle.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor),
+            emptyStateTitle.widthAnchor.constraint(equalToConstant: 192),
+
+            emptyStateMessage.topAnchor.constraint(equalTo: emptyStateTitle.bottomAnchor, constant: 8),
+            emptyStateMessage.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor),
+
+            emptyStateMessage.widthAnchor.constraint(equalToConstant: 192),
+
+            importButton.topAnchor.constraint(equalTo: emptyStateMessage.bottomAnchor, constant: 8),
+            importButton.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor),
+        ])
     }
 
     override func viewDidLoad() {
-        super.viewDidLoad()
-
-        preferredContentSize = Self.preferredContentSize
+        preferredContentSize = Constants.preferredContentSize
 
         outlineView.setDraggingSourceOperationMask([.move], forLocal: true)
-        outlineView.registerForDraggedTypes([BookmarkPasteboardWriter.bookmarkUTIInternalType,
-                                             FolderPasteboardWriter.folderUTIInternalType])
-
-        bookmarkManager.listPublisher.receive(on: DispatchQueue.main).sink { [weak self] list in
-            guard let self else { return }
-
-            self.reloadData()
-            let isEmpty = list?.topLevelEntities.isEmpty ?? true
-
-            if isEmpty {
-                self.searchBookmarksButton.isHidden = true
-                self.showEmptyStateView(for: .noBookmarks)
-            } else {
-                self.searchBookmarksButton.isHidden = false
-                self.outlineView.isHidden = false
-            }
-        }.store(in: &cancellables)
-
-        sortBookmarksViewModel.$selectedSortMode.sink { [weak self] newSortMode in
-            guard let self else { return }
-
-            switch newSortMode {
-            case .nameDescending:
-                self.sortBookmarksButton.image = .bookmarkSortDesc
-            default:
-                self.sortBookmarksButton.image = .bookmarkSortAsc
-            }
-
-            self.setupSort(mode: newSortMode)
-        }.store(in: &cancellables)
+        outlineView.registerForDraggedTypes(BookmarkDragDropManager.draggedTypes)
     }
 
     override func viewWillAppear() {
-        super.viewWillAppear()
-
+        subscribeToModelEvents()
         reloadData()
     }
 
-    override func keyDown(with event: NSEvent) {
-        let commandKeyDown = event.modifierFlags.contains(.command)
-        if commandKeyDown && event.keyCode == 3 { // CMD + F
-            if isSearchVisible {
-                searchBar.makeMeFirstResponder()
-            } else {
-                showSearchBar()
-            }
-        } else {
-            super.keyDown(with: event)
-        }
+    override func viewWillDisappear() {
+        cancellables = []
+    }
+
+    private func subscribeToModelEvents() {
+        bookmarkManager.listPublisher.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.reloadData()
+        }.store(in: &cancellables)
+
+        sortBookmarksViewModel.$selectedSortMode.sink { [weak self] newSortMode in
+            self?.setupSort(mode: newSortMode)
+        }.store(in: &cancellables)
     }
 
     private func reloadData() {
         if dataSource.isSearching {
-            if let destinationFolder = dataSource.dragDestinationFolderInSearchMode {
+            if let destinationFolder = dataSource.dragDestinationFolder {
                 hideSearchBar()
                 updateSearchAndExpand(destinationFolder)
             } else {
-                dataSource.reloadData(for: searchBar.stringValue, and: sortBookmarksViewModel.selectedSortMode)
+                dataSource.reloadData(forSearchQuery: searchBar.stringValue,
+                                      sortMode: sortBookmarksViewModel.selectedSortMode)
                 outlineView.reloadData()
             }
         } else {
@@ -421,139 +425,64 @@ final class BookmarkListViewController: NSViewController {
 
             expandAndRestore(selectedNodes: selectedNodes)
         }
-    }
 
-    private func updateSearchAndExpand(_ folder: BookmarkFolder) {
-        showTreeView()
-        expandFoldersAndScrollUntil(folder)
-        outlineView.scrollToAdjustedPositionInOutlineView(folder)
+        let isEmpty = (outlineView.numberOfRows == 0)
+        self.emptyState.isHidden = !isEmpty
+        self.searchBookmarksButton.isHidden = isEmpty
+        self.outlineView.isHidden = isEmpty
 
-        guard let node = dataSource.treeController.node(representing: folder) else {
-            return
+        if isEmpty {
+            self.showEmptyStateView(for: .noBookmarks)
         }
-
-        outlineView.highlight(node)
-    }
-
-    @objc func newBookmarkButtonClicked(_ sender: AnyObject) {
-        let view = BookmarksDialogViewFactory.makeAddBookmarkView(currentTab: currentTabWebsite)
-        showDialog(view: view)
-    }
-
-    @objc func newFolderButtonClicked(_ sender: AnyObject) {
-        let parentFolder = sender.representedObject as? BookmarkFolder
-        let view = BookmarksDialogViewFactory.makeAddBookmarkFolderView(parentFolder: parentFolder)
-        showDialog(view: view)
-    }
-
-    @objc func searchBookmarkButtonClicked(_ sender: NSButton) {
-        isSearchVisible.toggle()
-
-        if isSearchVisible {
-            showSearchBar()
-        } else {
-            hideSearchBar()
-            showTreeView()
-        }
-    }
-
-    @objc func sortBookmarksButtonClicked(_ sender: NSButton) {
-        let menu = sortBookmarksViewModel.menu
-        bookmarkMetrics.fireSortButtonClicked(origin: .panel)
-        menu.popUpAtMouseLocation(in: sortBookmarksButton)
-    }
-
-    private func showSearchBar() {
-        view.addSubview(searchBar)
-
-        boxDividerTopConstraint.isActive = false
-        searchBar.topAnchor.constraint(equalTo: titleTextField.bottomAnchor, constant: 8).isActive = true
-        searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
-        view.trailingAnchor.constraint(equalTo: searchBar.trailingAnchor, constant: 16).isActive = true
-        boxDivider.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 10).isActive = true
-        searchBar.makeMeFirstResponder()
-        searchBookmarksButton.backgroundColor = .buttonMouseDown
-        searchBookmarksButton.mouseOverColor = .buttonMouseDown
-    }
-
-    private func hideSearchBar() {
-        searchBar.stringValue = ""
-        searchBar.removeFromSuperview()
-        boxDividerTopConstraint.isActive = true
-        isSearchVisible = false
-        searchBookmarksButton.backgroundColor = .clear
-        searchBookmarksButton.mouseOverColor = .buttonMouseOver
     }
 
     private func setupSort(mode: BookmarksSortMode) {
         hideSearchBar()
         dataSource.reloadData(with: mode)
         outlineView.reloadData()
+        sortBookmarksButton.image = (mode == .nameDescending) ? .bookmarkSortDesc : .bookmarkSortAsc
         sortBookmarksButton.backgroundColor = mode.shouldHighlightButton ? .buttonMouseDown : .clear
         sortBookmarksButton.mouseOverColor = mode.shouldHighlightButton ? .buttonMouseDown : .buttonMouseOver
     }
 
-    @objc func openManagementInterface(_ sender: NSButton) {
-        showManageBookmarks()
+    // MARK: Layout
+
+    private func updateSearchAndExpand(_ folder: BookmarkFolder) {
+        showTreeView()
+        expandFoldersAndScrollUntil(folder)
+        outlineView.scrollToAdjustedPositionInOutlineView(folder)
+
+        guard let node = treeController.node(representing: folder) else { return }
+
+        outlineView.highlight(node)
     }
 
-    @objc func handleClick(_ sender: NSOutlineView) {
-        guard sender.clickedRow != -1 else { return }
+    private func showSearchBar() {
+        isSearchVisible = true
+        view.addSubview(searchBar)
+        outlineView.highlightedRow = nil
 
-        let item = sender.item(atRow: sender.clickedRow)
-        if let node = item as? BookmarkNode,
-           let bookmark = node.representedObject as? Bookmark {
-            onBookmarkClick(bookmark)
-        } else if let node = item as? BookmarkNode, let folder = node.representedObject as? BookmarkFolder, dataSource.isSearching {
-            bookmarkMetrics.fireSearchResultClicked(origin: .panel)
-            hideSearchBar()
-            updateSearchAndExpand(folder)
-        } else {
-            handleItemClickWhenNotInSearchMode(item: item)
-        }
+        boxDividerTopConstraint.isActive = false
+        NSLayoutConstraint.activate([
+            searchBar.topAnchor.constraint(equalTo: titleTextField.bottomAnchor, constant: 8),
+            searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            view.trailingAnchor.constraint(equalTo: searchBar.trailingAnchor, constant: 16),
+            boxDivider.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 10),
+        ])
+        searchBar.makeMeFirstResponder()
+        searchBookmarksButton.backgroundColor = .buttonMouseDown
+        searchBookmarksButton.mouseOverColor = .buttonMouseDown
     }
 
-    private func onBookmarkClick(_ bookmark: Bookmark) {
-        if dataSource.isSearching {
-            bookmarkMetrics.fireSearchResultClicked(origin: .panel)
-        }
-
-        WindowControllersManager.shared.open(bookmark: bookmark)
-        delegate?.popoverShouldClose(self)
-    }
-
-    private func handleItemClickWhenNotInSearchMode(item: Any?) {
-        if outlineView.isItemExpanded(item) {
-            outlineView.animator().collapseItem(item)
-        } else {
-            outlineView.animator().expandItem(item)
-        }
-    }
-
-    private func expandFoldersAndScrollUntil(_ folder: BookmarkFolder) {
-        guard let folderNode = treeController.findNodeWithId(representing: folder) else {
-            return
-        }
-
-        expandFoldersUntil(node: folderNode)
-        outlineView.scrollToAdjustedPositionInOutlineView(folderNode)
-    }
-
-    private func expandFoldersUntil(node: BookmarkNode?) {
-        var nodes: [BookmarkNode?] = []
-        var parent = node?.parent
-        nodes.append(node)
-
-        while parent != nil {
-            nodes.append(parent)
-            parent = parent?.parent
-        }
-
-        while !nodes.isEmpty {
-            if let current = nodes.removeLast() {
-                outlineView.animator().expandItem(current)
-            }
-        }
+    private func hideSearchBar() {
+        isSearchVisible = false
+        outlineView.highlightedRow = nil
+        outlineView.makeMeFirstResponder()
+        searchBar.stringValue = ""
+        searchBar.removeFromSuperview()
+        boxDividerTopConstraint.isActive = true
+        searchBookmarksButton.backgroundColor = .clear
+        searchBookmarksButton.mouseOverColor = .buttonMouseOver
     }
 
     private func showTreeView() {
@@ -561,6 +490,23 @@ final class BookmarkListViewController: NSViewController {
         outlineView.isHidden = false
         dataSource.reloadData(with: sortBookmarksViewModel.selectedSortMode)
         outlineView.reloadData()
+        if !isSearchVisible {
+            outlineView.makeMeFirstResponder()
+        }
+    }
+
+    private func expandFoldersAndScrollUntil(_ folder: BookmarkFolder) {
+        guard let folderNode = treeController.findNodeWithId(representing: folder) else { return }
+
+        expandFoldersUntil(node: folderNode)
+        outlineView.scrollToAdjustedPositionInOutlineView(folderNode)
+    }
+
+    private func expandFoldersUntil(node: BookmarkNode?) {
+        guard let folderParent = node?.parent else { return }
+        for parent in sequence(first: folderParent, next: \.parent).reversed() {
+            outlineView.animator().expandItem(parent)
+        }
     }
 
     private func showEmptyStateView(for mode: BookmarksEmptyStateContent) {
@@ -572,8 +518,107 @@ final class BookmarkListViewController: NSViewController {
         importButton.isHidden = mode.shouldHideImportButton
     }
 
+    // MARK: Actions
+
+    override func keyDown(with event: NSEvent) {
+        switch Int(event.keyCode) {
+        case kVK_ANSI_F where event.deviceIndependentFlags == .command:
+            if isSearchVisible {
+                searchBar.makeMeFirstResponder()
+            } else {
+                showSearchBar()
+            }
+
+        case kVK_Return, kVK_ANSI_KeypadEnter, kVK_Space:
+            if outlineView.highlightedRow != nil {
+                // submit action when there‘s a highlighted row
+                handleClick(outlineView)
+
+            } else if outlineView.numberOfRows > 0 {
+                // when in child menu popover without selection: highlight first row
+                outlineView.highlightedRow = 0
+            }
+
+        case kVK_Escape:
+            delegate?.closeBookmarksPopover(self)
+
+        default:
+            // start search when letters are typed
+            if let characters = event.characters,
+               !characters.isEmpty {
+
+                showSearchBar()
+                searchBar.currentEditor()?.keyDown(with: event)
+                return
+            }
+
+            super.keyDown(with: event)
+        }
+    }
+
+    @objc func newBookmarkButtonClicked(_ sender: AnyObject) {
+        let view = BookmarksDialogViewFactory.makeAddBookmarkView(currentTab: currentTabWebsite)
+        showDialog(view)
+    }
+
+    @objc func searchBookmarkButtonClicked(_ sender: NSButton) {
+        isSearchVisible.toggle()
+    }
+
+    @objc func sortBookmarksButtonClicked(_ sender: NSButton) {
+        let menu = sortBookmarksViewModel.menu
+        bookmarkMetrics.fireSortButtonClicked(origin: .panel)
+        menu.popUpAtMouseLocation(in: sender)
+    }
+
+    @objc func openManagementInterface(_ sender: NSButton) {
+        showManageBookmarks()
+    }
+
+    @objc func handleClick(_ sender: NSOutlineView) {
+        let row = NSApp.currentEvent?.type == .keyDown ? outlineView.highlightedRow : sender.clickedRow
+        guard let row, row != -1 else { return }
+        let item = sender.item(atRow: row)
+        guard let node = item as? BookmarkNode else { return }
+
+        switch node.representedObject {
+        case let bookmark as Bookmark:
+            onBookmarkClick(bookmark)
+
+        case let folder as BookmarkFolder where dataSource.isSearching:
+            bookmarkMetrics.fireSearchResultClicked(origin: .panel)
+            hideSearchBar()
+            updateSearchAndExpand(folder)
+
+        default:
+            handleItemClickWhenNotInSearchMode(item: item)
+        }
+    }
+
+    private func onBookmarkClick(_ bookmark: Bookmark) {
+        if dataSource.isSearching {
+            bookmarkMetrics.fireSearchResultClicked(origin: .panel)
+        }
+
+        WindowControllersManager.shared.open(bookmark: bookmark)
+        delegate?.closeBookmarksPopover(self)
+    }
+
+    private func handleItemClickWhenNotInSearchMode(item: Any?) {
+        if outlineView.isItemExpanded(item) {
+            outlineView.animator().collapseItem(item)
+        } else {
+            outlineView.animator().expandItem(item)
+        }
+    }
+
     @objc func onImportClicked(_ sender: NSButton) {
         DataImportView().show()
+    }
+
+    private func showManageBookmarks() {
+        WindowControllersManager.shared.showBookmarksTab()
+        delegate?.closeBookmarksPopover(self)
     }
 
     // MARK: NSOutlineView Configuration
@@ -627,214 +672,37 @@ final class BookmarkListViewController: NSViewController {
         outlineView.selectRowIndexes(indexes, byExtendingSelection: false)
     }
 
-    private func showContextMenu(for cell: BookmarkOutlineCellView) {
-        let row = outlineView.row(for: cell)
-        guard
-            let item = outlineView.item(atRow: row),
-            let contextMenu = ContextualMenu.menu(for: [item], target: self, forSearch: dataSource.isSearching)
-        else {
-            return
+}
+// MARK: - BookmarksContextMenuDelegate
+extension BookmarkListViewController: BookmarksContextMenuDelegate {
+
+    var isSearching: Bool { dataSource.isSearching }
+    var parentFolder: BookmarkFolder? { nil }
+    var shouldIncludeManageBookmarksItem: Bool { true }
+
+    func selectedItems() -> [Any] {
+        guard let row = outlineView.clickedRowIfValid else { return [] }
+
+        if outlineView.selectedRowIndexes.contains(row) {
+            return outlineView.selectedItems
         }
 
-        contextMenu.popUpAtMouseLocation(in: view)
+        return outlineView.item(atRow: row).map { [$0] } ?? []
     }
 
-}
-
-private extension BookmarkListViewController {
-
-    func showDialog(view: any ModalView) {
+    func showDialog(_ dialog: any ModalView) {
         delegate?.popover(shouldPreventClosure: true)
-
-        view.show(in: parent?.view.window) { [weak delegate] in
+        dialog.show(in: parent?.view.window) { [weak delegate] in
             delegate?.popover(shouldPreventClosure: false)
         }
     }
 
-    func showManageBookmarks() {
-        WindowControllersManager.shared.showBookmarksTab()
-        delegate?.popoverShouldClose(self)
+    func closePopoverIfNeeded() {
+        delegate?.closeBookmarksPopover(self)
     }
 
 }
-
-// MARK: - Menu Item Selectors
-
-extension BookmarkListViewController: NSMenuDelegate {
-
-    func contextualMenuForClickedRows() -> NSMenu? {
-        let row = outlineView.clickedRow
-
-        guard row != -1 else {
-            return ContextualMenu.menu(for: nil)
-        }
-
-        if outlineView.selectedRowIndexes.contains(row) {
-            return ContextualMenu.menu(for: outlineView.selectedItems)
-        }
-
-        if let item = outlineView.item(atRow: row) {
-            return ContextualMenu.menu(for: [item], forSearch: dataSource.isSearching)
-        } else {
-            return nil
-        }
-    }
-
-    public func menuNeedsUpdate(_ menu: NSMenu) {
-        menu.removeAllItems()
-
-        guard let contextualMenu = contextualMenuForClickedRows() else {
-            return
-        }
-
-        let items = contextualMenu.items
-        contextualMenu.removeAllItems()
-        for menuItem in items {
-            menu.addItem(menuItem)
-        }
-    }
-
-}
-
-extension BookmarkListViewController: BookmarkMenuItemSelectors {
-
-    func openBookmarkInNewTab(_ sender: NSMenuItem) {
-        guard let bookmark = sender.representedObject as? Bookmark else {
-            assertionFailure("Failed to cast menu represented object to Bookmark")
-            return
-        }
-
-        WindowControllersManager.shared.show(url: bookmark.urlObject, source: .bookmark, newTab: true)
-    }
-
-    func openBookmarkInNewWindow(_ sender: NSMenuItem) {
-        guard let bookmark = sender.representedObject as? Bookmark else {
-            assertionFailure("Failed to cast menu represented object to Bookmark")
-            return
-        }
-        guard let urlObject = bookmark.urlObject else {
-            return
-        }
-        WindowsManager.openNewWindow(with: urlObject, source: .bookmark, isBurner: false)
-    }
-
-    func toggleBookmarkAsFavorite(_ sender: NSMenuItem) {
-        guard let bookmark = sender.representedObject as? Bookmark else {
-            assertionFailure("Failed to cast menu represented object to Bookmark")
-            return
-        }
-
-        bookmark.isFavorite.toggle()
-        bookmarkManager.update(bookmark: bookmark)
-    }
-
-    func editBookmark(_ sender: NSMenuItem) {
-        guard let bookmark = sender.representedObject as? Bookmark else {
-            assertionFailure("Failed to retrieve Bookmark from Edit Bookmark context menu item")
-            return
-        }
-
-        let view = BookmarksDialogViewFactory.makeEditBookmarkView(bookmark: bookmark)
-        showDialog(view: view)
-    }
-
-    func copyBookmark(_ sender: NSMenuItem) {
-        guard let bookmark = sender.representedObject as? Bookmark else {
-            assertionFailure("Failed to cast menu represented object to Bookmark")
-            return
-        }
-        bookmark.copyUrlToPasteboard()
-    }
-
-    func deleteBookmark(_ sender: NSMenuItem) {
-        guard let bookmark = sender.representedObject as? Bookmark else {
-            assertionFailure("Failed to cast menu represented object to Bookmark")
-            return
-        }
-
-        bookmarkManager.remove(bookmark: bookmark)
-    }
-
-    func deleteEntities(_ sender: NSMenuItem) {
-        guard let uuids = sender.representedObject as? [String] else {
-            assertionFailure("Failed to cast menu item's represented object to UUID array")
-            return
-        }
-
-        bookmarkManager.remove(objectsWithUUIDs: uuids)
-    }
-
-    func manageBookmarks(_ sender: NSMenuItem) {
-        showManageBookmarks()
-    }
-
-    func moveToEnd(_ sender: NSMenuItem) {
-        guard let bookmarkEntity = sender.representedObject as? BookmarksEntityIdentifiable else {
-            assertionFailure("Failed to cast menu item's represented object to BookmarkEntity")
-            return
-        }
-
-        let parentFolderType: ParentFolderType = bookmarkEntity.parentId.flatMap { .parent(uuid: $0) } ?? .root
-        bookmarkManager.move(objectUUIDs: [bookmarkEntity.entityId], toIndex: nil, withinParentFolder: parentFolderType) { _ in }
-    }
-
-}
-
-extension BookmarkListViewController: FolderMenuItemSelectors {
-
-    func newFolder(_ sender: NSMenuItem) {
-        newFolderButtonClicked(sender)
-    }
-
-    func editFolder(_ sender: NSMenuItem) {
-        guard let bookmarkEntityInfo = sender.representedObject as? BookmarkEntityInfo,
-              let folder = bookmarkEntityInfo.entity as? BookmarkFolder
-        else {
-            assertionFailure("Failed to retrieve Bookmark from Edit Folder context menu item")
-            return
-        }
-
-        let view = BookmarksDialogViewFactory.makeEditBookmarkFolderView(folder: folder, parentFolder: bookmarkEntityInfo.parent)
-        showDialog(view: view)
-    }
-
-    func deleteFolder(_ sender: NSMenuItem) {
-        guard let folder = sender.representedObject as? BookmarkFolder else {
-            assertionFailure("Failed to retrieve Bookmark from Delete Folder context menu item")
-            return
-        }
-
-        bookmarkManager.remove(folder: folder)
-    }
-
-    func openInNewTabs(_ sender: NSMenuItem) {
-        guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel,
-              let folder = sender.representedObject as? BookmarkFolder
-        else {
-            assertionFailure("Cannot open all in new tabs")
-            return
-        }
-
-        let tabs = Tab.withContentOfBookmark(folder: folder, burnerMode: tabCollection.burnerMode)
-        tabCollection.append(tabs: tabs)
-        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
-    }
-
-    func openAllInNewWindow(_ sender: NSMenuItem) {
-        guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel,
-              let folder = sender.representedObject as? BookmarkFolder
-        else {
-            assertionFailure("Cannot open all in new window")
-            return
-        }
-
-        let newTabCollection = TabCollection.withContentOfBookmark(folder: folder, burnerMode: tabCollection.burnerMode)
-        WindowsManager.openNewWindow(with: newTabCollection, isBurner: tabCollection.isBurner)
-        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
-    }
-
-}
-
+// MARK: - BookmarkSearchMenuItemSelectors
 extension BookmarkListViewController: BookmarkSearchMenuItemSelectors {
     func showInFolder(_ sender: NSMenuItem) {
         guard let baseBookmark = sender.representedObject as? BaseBookmarkEntity else {
@@ -845,18 +713,14 @@ extension BookmarkListViewController: BookmarkSearchMenuItemSelectors {
         hideSearchBar()
         showTreeView()
 
-        guard let node = dataSource.treeController.node(representing: baseBookmark) else {
-            return
-        }
+        guard let node = treeController.node(representing: baseBookmark) else { return }
 
         expandFoldersUntil(node: node)
         outlineView.scrollToAdjustedPositionInOutlineView(node)
         outlineView.highlight(node)
     }
 }
-
 // MARK: - Search field delegate
-
 extension BookmarkListViewController: NSSearchFieldDelegate {
 
     func controlTextDidChange(_ obj: Notification) {
@@ -866,90 +730,90 @@ extension BookmarkListViewController: NSSearchFieldDelegate {
             if searchQuery.isBlank {
                 showTreeView()
             } else {
-                showSearch(for: searchQuery)
+                showSearch(forSearchQuery: searchQuery)
             }
 
             bookmarkMetrics.fireSearchExecuted(origin: .panel)
         }
     }
 
-    private func showSearch(for searchQuery: String) {
-        dataSource.reloadData(for: searchQuery, and: sortBookmarksViewModel.selectedSortMode)
+    private func showSearch(forSearchQuery searchQuery: String) {
+        outlineView.highlightedRow = nil
+        dataSource.reloadData(forSearchQuery: searchQuery, sortMode: sortBookmarksViewModel.selectedSortMode)
 
-        if dataSource.treeController.rootNode.childNodes.isEmpty {
+        if treeController.rootNode.childNodes.isEmpty {
             showEmptyStateView(for: .noSearchResults)
         } else {
             emptyState.isHidden = true
             outlineView.isHidden = false
             outlineView.reloadData()
 
-            if let firstNode = dataSource.treeController.rootNode.childNodes.first {
+            if let firstNode = treeController.rootNode.childNodes.first {
                 outlineView.scrollTo(firstNode)
             }
         }
     }
-}
 
-// MARK: - BookmarkListPopover
+    func control(_ control: NSControl, textView: NSTextView, doCommandBy selector: Selector) -> Bool {
+        guard control === searchBar else {
+            assertionFailure("Unexpected delegating control")
+            return false
+        }
+        switch selector {
+        case #selector(cancelOperation):
+            // handle Esc key press while in search mode
+            isSearchVisible = false
 
-final class BookmarkListPopover: NSPopover {
+        case #selector(moveUp):
+            // handle Up Arrow in search mode
+            if !outlineView.highlightPreviousItem() {
+                // unhighlight for the first row
+                outlineView.highlightedRow = nil
+            }
+        case #selector(moveDown):
+            // handle Down Arrow in search mode
+            outlineView.highlightNextItem()
 
-    override init() {
-        super.init()
+        case #selector(insertNewline) where outlineView.highlightedRow != nil:
+            // handle Enter key in search mode when there‘s a highlighted row
+            handleClick(outlineView)
 
-        self.animates = false
-        self.behavior = .transient
-
-        setupContentController()
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("BookmarkListPopover: Bad initializer")
-    }
-
-    // swiftlint:disable:next force_cast
-    var viewController: BookmarkListViewController { contentViewController as! BookmarkListViewController }
-
-    private func setupContentController() {
-        let controller = BookmarkListViewController()
-        controller.delegate = self
-        contentViewController = controller
-    }
-
-}
-
-extension BookmarkListPopover: BookmarkListViewControllerDelegate {
-
-    func popoverShouldClose(_ bookmarkListViewController: BookmarkListViewController) {
-        close()
-    }
-
-    func popover(shouldPreventClosure: Bool) {
-        behavior = shouldPreventClosure ? .applicationDefined : .transient
+        default:
+            return false
+        }
+        return true
     }
 
 }
 
+// MARK: - Preview
 #if DEBUG
 // swiftlint:disable:next identifier_name
 func _mockPreviewBookmarkManager(previewEmptyState: Bool) -> BookmarkManager {
-    let bkman = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: previewEmptyState ? [] : [
-        BookmarkFolder(id: "1", title: "Folder 1", children: [
-            BookmarkFolder(id: "2", title: "Nested Folder", children: [
-                Bookmark(id: "b1", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: false, parentFolderUUID: "2")
-            ])
-        ]),
-        BookmarkFolder(id: "3", title: "Another Folder", children: [
-            BookmarkFolder(id: "4", title: "Nested Folder", children: [
-                BookmarkFolder(id: "5", title: "Another Nested Folder", children: [
-                    Bookmark(id: "b2", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: false, parentFolderUUID: "5")
+    let bookmarks: [BaseBookmarkEntity]
+    if previewEmptyState {
+        bookmarks = []
+    } else {
+        bookmarks = (1..<100).map { _ in [
+            BookmarkFolder(id: "1", title: "Folder 1", children: [
+                BookmarkFolder(id: "2", title: "Nested Folder", children: [
+                    Bookmark(id: "b1", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: false, parentFolderUUID: "2")
                 ])
-            ])
-        ]),
-        Bookmark(id: "b3", url: URL.duckDuckGo.absoluteString, title: "Bookmark 1", isFavorite: false, parentFolderUUID: ""),
-        Bookmark(id: "b4", url: URL.duckDuckGo.absoluteString, title: "Bookmark 2", isFavorite: false, parentFolderUUID: ""),
-        Bookmark(id: "b5", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: false, parentFolderUUID: "")
-    ]))
+            ]),
+            BookmarkFolder(id: "3", title: "Another Folder", children: [
+                BookmarkFolder(id: "4", title: "Nested Folder", children: [
+                    BookmarkFolder(id: "5", title: "Another Nested Folder", children: [
+                        Bookmark(id: "b2", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: false, parentFolderUUID: "5")
+                    ])
+                ])
+            ]),
+            Bookmark(id: "b3", url: URL.duckDuckGo.absoluteString, title: "Bookmark 1", isFavorite: false, parentFolderUUID: ""),
+            Bookmark(id: "b4", url: URL.duckDuckGo.absoluteString, title: "Bookmark 2", isFavorite: false, parentFolderUUID: ""),
+            Bookmark(id: "b5", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: false, parentFolderUUID: "")
+        ] }.flatMap { $0 }
+    }
+    let bkman = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: bookmarks))
+
     bkman.loadBookmarks()
     customAssertionFailure = { _, _, _ in }
 
@@ -958,13 +822,13 @@ func _mockPreviewBookmarkManager(previewEmptyState: Bool) -> BookmarkManager {
 
 @available(macOS 14.0, *)
 #Preview("Test Bookmark data",
-         traits: BookmarkListViewController.preferredContentSize.fixedLayout) {
+         traits: BookmarkListViewController.Constants.preferredContentSize.fixedLayout) {
     BookmarkListViewController(bookmarkManager: _mockPreviewBookmarkManager(previewEmptyState: false))
         ._preview_hidingWindowControlsOnAppear()
 }
 
 @available(macOS 14.0, *)
-#Preview("Empty Scope", traits: BookmarkListViewController.preferredContentSize.fixedLayout) {
+#Preview("Empty Scope", traits: BookmarkListViewController.Constants.preferredContentSize.fixedLayout) {
     BookmarkListViewController(bookmarkManager: _mockPreviewBookmarkManager(previewEmptyState: true))
         ._preview_hidingWindowControlsOnAppear()
 }

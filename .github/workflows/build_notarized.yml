@@ -63,9 +63,9 @@ on:
         required: true
       INTEGRATION_TESTS_CI_PROVISION_PROFILE_BASE64:
         required: true
-      NETP_AGENT_RELEASE_PROVISION_PROFILE_BASE64_V2:
+      NETP_AGENT_RELEASE_PROVISION_PROFILE_BASE64:
         required: true
-      NETP_AGENT_REVIEW_PROVISION_PROFILE_BASE64_V2:
+      NETP_AGENT_REVIEW_PROVISION_PROFILE_BASE64:
         required: true
       NETP_NOTIFICATIONS_CI_PROVISION_PROFILE_BASE64:
         required: true
@@ -73,9 +73,9 @@ on:
         required: true
       NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64:
         required: true
-      NETP_SYSEX_RELEASE_PROVISION_PROFILE_BASE64_V2:
+      NETP_SYSEX_RELEASE_PROVISION_PROFILE_BASE64:
         required: true
-      NETP_SYSEX_REVIEW_PROVISION_PROFILE_BASE64_V2:
+      NETP_SYSEX_REVIEW_PROVISION_PROFILE_BASE64:
         required: true
       RELEASE_PROVISION_PROFILE_BASE64:
         required: true
@@ -139,6 +139,9 @@ jobs:
         submodules: recursive
         ref: ${{ env.branch }}
 
+    - name: Set up fastlane
+      run: bundle install
+
     - name: Check if this is an official release build
       id: is-official-release
       env:
@@ -166,13 +169,13 @@ jobs:
         DBP_AGENT_REVIEW_PROVISION_PROFILE_BASE64: ${{ secrets.DBP_AGENT_REVIEW_PROVISION_PROFILE_BASE64 }}
         INTEGRATION_TESTS_APPSTORE_CI_PROVISION_PROFILE_BASE64: ${{ secrets.INTEGRATION_TESTS_APPSTORE_CI_PROVISION_PROFILE_BASE64 }}
         INTEGRATION_TESTS_CI_PROVISION_PROFILE_BASE64: ${{ secrets.INTEGRATION_TESTS_CI_PROVISION_PROFILE_BASE64 }}
-        NETP_AGENT_RELEASE_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_AGENT_RELEASE_PROVISION_PROFILE_BASE64_V2 }}
-        NETP_AGENT_REVIEW_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_AGENT_REVIEW_PROVISION_PROFILE_BASE64_V2 }}
+        NETP_AGENT_RELEASE_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_AGENT_RELEASE_PROVISION_PROFILE_BASE64 }}
+        NETP_AGENT_REVIEW_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_AGENT_REVIEW_PROVISION_PROFILE_BASE64 }}
         NETP_NOTIFICATIONS_CI_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_NOTIFICATIONS_CI_PROVISION_PROFILE_BASE64 }}
         NETP_NOTIFICATIONS_RELEASE_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_NOTIFICATIONS_RELEASE_PROVISION_PROFILE_BASE64 }}
         NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64 }}
-        NETP_SYSEX_RELEASE_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_SYSEX_RELEASE_PROVISION_PROFILE_BASE64_V2 }}
-        NETP_SYSEX_REVIEW_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_SYSEX_REVIEW_PROVISION_PROFILE_BASE64_V2 }}
+        NETP_SYSEX_RELEASE_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_SYSEX_RELEASE_PROVISION_PROFILE_BASE64 }}
+        NETP_SYSEX_REVIEW_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_SYSEX_REVIEW_PROVISION_PROFILE_BASE64 }}
         RELEASE_PROVISION_PROFILE_BASE64: ${{ secrets.RELEASE_PROVISION_PROFILE_BASE64 }}
         REVIEW_PROVISION_PROFILE_BASE64: ${{ secrets.REVIEW_PROVISION_PROFILE_BASE64 }}
         UNIT_TESTS_APPSTORE_CI_PROVISION_PROFILE_BASE64: ${{ secrets.UNIT_TESTS_APPSTORE_CI_PROVISION_PROFILE_BASE64 }}
@@ -222,13 +225,6 @@ jobs:
         name: DuckDuckGo-${{ env.release-type }}-dSYM-${{ env.app-version }}
         path: ${{ github.workspace }}/release/${{ steps.set-outputs.outputs.dsym-name }}
 
-    - name: Extract Asana Task ID
-      id: task-id
-      if: ${{ env.upload-to == 'asana' }}
-      uses: ./.github/actions/asana-extract-task-id
-      with:
-        task-url: ${{ env.asana-task-url }}
-
     - name: Upload dSYMs to S3
       id: upload-dsyms-to-s3
       if: ${{ env.upload-to == 's3' }}
@@ -276,7 +272,14 @@ jobs:
       with:
         submodules: recursive
         ref: ${{ inputs.branch || github.ref_name }}
-        sparse-checkout: .github
+        sparse-checkout: |
+          .github
+          Gemfile
+          Gemfile.lock
+          fastlane
+
+    - name: Set up fastlane
+      run: bundle install
 
     - name: Fetch app bundle
       uses: actions/download-artifact@v4
@@ -345,9 +348,7 @@ jobs:
     - name: Extract Asana Task ID
       id: task-id
       if: ${{ env.upload-to == 'asana' }}
-      uses: ./.github/actions/asana-extract-task-id
-      with:
-        task-url: ${{ env.asana-task-url }}
+      run: bundle exec fastlane run asana_extract_task_id task_url:"${{ env.asana-task-url }}"
 
     - name: Upload DMG to Asana
       if: ${{ env.upload-to == 'asana' }}
@@ -355,7 +356,7 @@ jobs:
       with:
         access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
         file-name: ${{ github.workspace }}/duckduckgo-${{ env.app-version }}.dmg
-        task-id: ${{ steps.task-id.outputs.task-id }}
+        task-id: ${{ steps.task-id.outputs.asana_task_id }}
 
   mattermost:
 

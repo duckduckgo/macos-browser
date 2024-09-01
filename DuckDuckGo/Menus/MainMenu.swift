@@ -28,7 +28,6 @@ import NetworkProtection
 import Subscription
 import SubscriptionUI
 
-@MainActor
 final class MainMenu: NSMenu {
 
     enum Constants {
@@ -48,6 +47,7 @@ final class MainMenu: NSMenu {
     let closeTabMenuItem = NSMenuItem(title: UserText.closeTab, action: #selector(MainViewController.closeTab), keyEquivalent: "w")
     let importBrowserDataMenuItem = NSMenuItem(title: UserText.mainMenuFileImportBookmarksandPasswords, action: #selector(AppDelegate.openImportBrowserDataWindow))
 
+    @MainActor
     let sharingMenu = SharingMenu(title: UserText.shareMenuItem)
 
     // MARK: View
@@ -60,13 +60,17 @@ final class MainMenu: NSMenu {
     let zoomOutMenuItem = NSMenuItem(title: UserText.mainMenuViewZoomOut, action: #selector(MainViewController.zoomOut), keyEquivalent: "-")
 
     // MARK: History
+    @MainActor
     let historyMenu = HistoryMenu()
 
+    @MainActor
     var backMenuItem: NSMenuItem { historyMenu.backMenuItem }
+    @MainActor
     var forwardMenuItem: NSMenuItem { historyMenu.forwardMenuItem }
 
     // MARK: Bookmarks
-    let manageBookmarksMenuItem = NSMenuItem(title: UserText.mainMenuHistoryManageBookmarks, action: #selector(MainViewController.showManageBookmarks)).withAccessibilityIdentifier("MainMenu.manageBookmarksMenuItem")
+    let manageBookmarksMenuItem = NSMenuItem(title: UserText.mainMenuHistoryManageBookmarks, action: #selector(MainViewController.showManageBookmarks), keyEquivalent: [.command, .option, "b"])
+        .withAccessibilityIdentifier("MainMenu.manageBookmarksMenuItem")
     var bookmarksMenuToggleBookmarksBarMenuItem = NSMenuItem(title: "BookmarksBarMenuPlaceholder", action: #selector(MainViewController.toggleBookmarksBarFromMenu), keyEquivalent: "B")
     let importBookmarksMenuItem = NSMenuItem(title: UserText.importBookmarks, action: #selector(AppDelegate.openImportBrowserDataWindow))
     let bookmarksMenu = NSMenu(title: UserText.bookmarks)
@@ -101,6 +105,7 @@ final class MainMenu: NSMenu {
 
     // MARK: - Initialization
 
+    @MainActor
     init(featureFlagger: FeatureFlagger, bookmarkManager: BookmarkManager, faviconManager: FaviconManagement, copyHandler: CopyHandler) {
 
         super.init(title: UserText.duckDuckGo)
@@ -358,6 +363,7 @@ final class MainMenu: NSMenu {
             })
     }
 
+    @MainActor
     func buildDebugMenu(featureFlagger: FeatureFlagger) -> NSMenuItem? {
 #if DEBUG || REVIEW
         NSMenuItem(title: "Debug")
@@ -416,6 +422,7 @@ final class MainMenu: NSMenu {
     // MARK: - Bookmarks
 
     var faviconsCancellable: AnyCancellable?
+    @MainActor
     private func subscribeToFavicons(faviconManager: FaviconManagement) {
         faviconsCancellable = faviconManager.faviconsLoadedPublisher
             .receive(on: DispatchQueue.main)
@@ -563,6 +570,7 @@ final class MainMenu: NSMenu {
 
     let internalUserItem = NSMenuItem(title: "Set Internal User State", action: #selector(MainViewController.internalUserState))
 
+    @MainActor
     private func setupDebugMenu() -> NSMenu {
         let debugMenu = NSMenu(title: "Debug") {
             NSMenuItem(title: "Open Vanilla Browser", action: #selector(MainViewController.openVanillaBrowser)).withAccessibilityIdentifier("MainMenu.openVanillaBrowser")
@@ -596,6 +604,9 @@ final class MainMenu: NSMenu {
                 NSMenuItem(title: "Reset Pixels Storage", action: #selector(MainViewController.resetDailyPixels))
                 NSMenuItem(title: "Reset Remote Messages", action: #selector(AppDelegate.resetRemoteMessages))
                 NSMenuItem(title: "Reset CPM Experiment Cohort (needs restart)", action: #selector(AppDelegate.resetCpmCohort))
+                NSMenuItem(title: "Reset Duck Player Onboarding", action: #selector(MainViewController.resetDuckPlayerOnboarding))
+                NSMenuItem(title: "Reset Duck Player Preferences", action: #selector(MainViewController.resetDuckPlayerPreferences))
+
             }.withAccessibilityIdentifier("MainMenu.resetData")
             NSMenuItem(title: "UI Triggers") {
                 NSMenuItem(title: "Show Save Credentials Popover", action: #selector(MainViewController.showSaveCredentialsPopover))
@@ -715,8 +726,7 @@ final class MainMenu: NSMenu {
             let logStore = try OSLogStore(scope: .currentProcessIdentifier)
             try logStore.getEntries()
                 .compactMap {
-                    guard let entry = $0 as? OSLogEntryLog,
-                          entry.subsystem == OSLog.subsystem else { return nil }
+                    guard let entry = $0 as? OSLogEntryLog else { return nil }
                     return "\(formatter.string(from: entry.date)) [\(entry.category)] \(entry.composedMessage)"
                 }
                 .joined(separator: "\n")

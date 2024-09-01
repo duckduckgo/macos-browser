@@ -57,6 +57,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         case openVPN,
              openDB,
              openITR,
+             openFeedback,
              iHaveASubscriptionClick,
              activateAddEmailClick,
              postSubscriptionAddEmailClick,
@@ -280,6 +281,11 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     @MainActor
     func openFAQ() {
         openURLHandler(subscriptionManager.url(for: .faq))
+    }
+
+    @MainActor
+    func openUnifiedFeedbackForm() {
+        userEventHandler(.openFeedback)
     }
 
     @MainActor

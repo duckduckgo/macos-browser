@@ -20,6 +20,7 @@ import Foundation
 import Combine
 import Common
 import BrowserServicesKit
+import os.log
 
 @MainActor
 final class FaviconReferenceCache {
@@ -62,12 +63,12 @@ final class FaviconReferenceCache {
                 }
                 loaded = true
 
-                os_log("References loaded successfully", log: .favicons)
+                Logger.favicons.debug("References loaded successfully")
 
                 NotificationCenter.default.post(name: .faviconCacheUpdated, object: nil)
             }.value
         } catch {
-            os_log("Loading of references failed: %s", log: .favicons, type: .error, error.localizedDescription)
+            Logger.favicons.error("Loading of references failed: \(error.localizedDescription)")
             throw error
         }
     }
@@ -268,9 +269,9 @@ final class FaviconReferenceCache {
         Task {
             do {
                 try await self.storing.save(hostReference: hostReference)
-                os_log("Host reference saved successfully. host: %s", log: .favicons, hostReference.host)
+                Logger.favicons.debug("Host reference saved successfully. host: \(hostReference.host)")
             } catch {
-                os_log("Saving of host reference failed: %s", log: .favicons, type: .error, error.localizedDescription)
+                Logger.favicons.error("Saving of host reference failed: \(error.localizedDescription)")
             }
         }
     }
@@ -295,9 +296,9 @@ final class FaviconReferenceCache {
         Task.detached {
             do {
                 try await self.storing.save(urlReference: urlReference)
-                os_log("URL reference saved successfully. document URL: %s", log: .favicons, urlReference.documentUrl.absoluteString)
+                Logger.favicons.debug("URL reference saved successfully. document URL: \(urlReference.documentUrl.absoluteString)")
             } catch {
-                os_log("Saving of URL reference failed: %s", log: .favicons, type: .error, error.localizedDescription)
+                Logger.favicons.error("Saving of URL reference failed: \(error.localizedDescription)")
             }
         }
     }
@@ -322,9 +323,9 @@ final class FaviconReferenceCache {
 
         do {
             try await storing.remove(hostReferences: hostReferences)
-            os_log("Host references removed successfully.", log: .favicons)
+            Logger.favicons.debug("Host references removed successfully.")
         } catch {
-            os_log("Removing of host references failed: %s", log: .favicons, type: .error, error.localizedDescription)
+            Logger.favicons.error("Removing of host references failed: \(error.localizedDescription)")
         }
     }
 
@@ -342,9 +343,9 @@ final class FaviconReferenceCache {
 
         do {
             try await storing.remove(urlReferences: urlReferences)
-            os_log("URL references removed successfully.", log: .favicons)
+            Logger.favicons.debug("URL references removed successfully.")
         } catch {
-            os_log("Removing of URL references failed: %s", log: .favicons, type: .error, error.localizedDescription)
+            Logger.favicons.error("Removing of URL references failed: \(error.localizedDescription)")
         }
     }
 

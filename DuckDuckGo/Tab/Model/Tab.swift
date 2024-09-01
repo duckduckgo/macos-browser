@@ -56,7 +56,7 @@ protocol NewWindowPolicyDecisionMaker {
     fileprivate weak var delegate: TabDelegate?
     func setDelegate(_ delegate: TabDelegate) { self.delegate = delegate }
 
-    private let navigationDelegate = DistributedNavigationDelegate(log: .navigation)
+    private let navigationDelegate = DistributedNavigationDelegate()
     private var newWindowPolicyDecisionMakers: [NewWindowPolicyDecisionMaker]?
     private var onNewWindow: ((WKNavigationAction?) -> NavigationDecision)?
 
@@ -82,7 +82,7 @@ protocol NewWindowPolicyDecisionMaker {
 
     @MainActor
     convenience init(content: TabContent,
-                     faviconManagement: FaviconManagement = FaviconManager.shared,
+                     faviconManagement: FaviconManagement? = nil,
                      webCacheManager: WebCacheManager = WebCacheManager.shared,
                      webViewConfiguration: WKWebViewConfiguration? = nil,
                      historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
@@ -124,7 +124,7 @@ protocol NewWindowPolicyDecisionMaker {
         }
 
         self.init(content: content,
-                  faviconManagement: faviconManager,
+                  faviconManagement: faviconManager ?? FaviconManager.shared,
                   webCacheManager: webCacheManager,
                   webViewConfiguration: webViewConfiguration,
                   historyCoordinating: historyCoordinating,
@@ -697,7 +697,7 @@ protocol NewWindowPolicyDecisionMaker {
         }
 
         guard let backForwardNavigation else {
-            os_log(.error, "item `\(item.title ?? "") – \(item.url?.absoluteString ?? "")` is not in the backForwardList")
+            Logger.navigation.error("item `\(item.title ?? "") – \(item.url?.absoluteString ?? "")` is not in the backForwardList")
             return nil
         }
 

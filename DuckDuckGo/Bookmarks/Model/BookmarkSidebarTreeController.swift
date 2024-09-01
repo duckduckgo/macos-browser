@@ -34,6 +34,7 @@ final class BookmarkSidebarTreeController: BookmarkTreeControllerDataSource {
 
     private func childNodesForRootNode(_ node: BookmarkNode) -> [BookmarkNode] {
         let bookmarks = PseudoFolder.bookmarks
+        bookmarks.count = bookmarkManager.list?.totalBookmarks ?? 0
         let bookmarksNode = BookmarkNode(representedObject: bookmarks, parent: node)
         bookmarksNode.canHaveChildNodes = true
 

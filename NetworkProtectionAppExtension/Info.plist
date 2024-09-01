@@ -15,5 +15,7 @@
 	</dict>
 	<key>SUBSCRIPTION_APP_GROUP</key>
 	<string>$(SUBSCRIPTION_APP_GROUP)</string>
+	<key>APP_CONFIGURATION_APP_GROUP</key>
+	<string>$(APP_CONFIGURATION_APP_GROUP)</string>
 </dict>
 </plist>

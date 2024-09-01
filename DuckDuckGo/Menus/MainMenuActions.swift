@@ -25,6 +25,7 @@ import History
 import PixelKit
 import Subscription
 import WebKit
+import os.log
 
 // Actions are sent to objects of responder chain
 
@@ -190,11 +191,16 @@ extension AppDelegate {
         }
     }
 
+    @MainActor
+    @objc func openPProFeedback(_ sender: Any?) {
+        WindowControllersManager.shared.showShareFeedbackModal(source: .settings)
+    }
+
     #endif
 
     @objc func navigateToBookmark(_ sender: Any?) {
         guard let menuItem = sender as? NSMenuItem else {
-            os_log("AppDelegate: Casting to menu item failed", type: .error)
+            Logger.general.error("AppDelegate: Casting to menu item failed")
             return
         }
 
@@ -380,7 +386,7 @@ extension MainViewController {
     @objc func openLocation(_ sender: Any?) {
         makeKeyIfNeeded()
         guard let addressBarTextField = navigationBarViewController.addressBarViewController?.addressBarTextField else {
-            os_log("MainViewController: Cannot reference address bar text field", type: .error)
+            Logger.general.error("MainViewController: Cannot reference address bar text field")
             return
         }
 
@@ -595,7 +601,7 @@ extension MainViewController {
 
     @objc func openBookmark(_ sender: Any?) {
         guard let menuItem = sender as? NSMenuItem else {
-            os_log("MainViewController: Casting to menu item failed", type: .error)
+            Logger.general.error("MainViewController: Casting to menu item failed")
             return
         }
 
@@ -607,7 +613,7 @@ extension MainViewController {
 
     @objc func openAllInTabs(_ sender: Any?) {
         guard let menuItem = sender as? NSMenuItem else {
-            os_log("MainViewController: Casting to menu item failed", type: .error)
+            Logger.general.error("MainViewController: Casting to menu item failed")
             return
         }
 
@@ -653,11 +659,11 @@ extension MainViewController {
     @objc func showTab(_ sender: Any?) {
         makeKeyIfNeeded()
         guard let sender = sender as? NSMenuItem else {
-            os_log("MainViewController: Casting to NSMenuItem failed", type: .error)
+            Logger.general.error("MainViewController: Casting to NSMenuItem failed")
             return
         }
         guard let keyEquivalent = Int(sender.keyEquivalent), keyEquivalent >= 0 && keyEquivalent <= 9 else {
-            os_log("MainViewController: Key equivalent is not correct for tab selection", type: .error)
+            Logger.general.error("MainViewController: Key equivalent is not correct for tab selection")
             return
         }
         let index = keyEquivalent - 1
@@ -820,6 +826,14 @@ extension MainViewController {
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowPermanentSurvey.rawValue)
     }
 
+    @objc func resetDuckPlayerOnboarding(_ sender: Any?) {
+        DefaultDuckPlayerOnboardingDecider().reset()
+    }
+
+    @objc func resetDuckPlayerPreferences(_ sender: Any?) {
+        DuckPlayerPreferences.shared.reset()
+    }
+
     @objc func internalUserState(_ sender: Any?) {
         guard let internalUserDecider = NSApp.delegateTyped.internalUserDecider as? DefaultInternalUserDecider else { return }
         let state = internalUserDecider.isInternalUser
@@ -907,18 +921,14 @@ extension MainViewController {
     @objc func removeUserScripts(_ sender: Any?) {
         tabCollectionViewModel.selectedTab?.userContentController?.cleanUpBeforeClosing()
         tabCollectionViewModel.selectedTab?.reload()
-        os_log("User scripts removed from the current tab", type: .info)
+        Logger.general.info("User scripts removed from the current tab")
     }
 
     @objc func reloadConfigurationNow(_ sender: Any?) {
-        OSLog.loggingCategories.insert(OSLog.AppCategories.config.rawValue)
-
         ConfigurationManager.shared.forceRefresh(isDebug: true)
     }
 
     private func setConfigurationUrl(_ configurationUrl: URL?) {
-        OSLog.loggingCategories.insert(OSLog.AppCategories.config.rawValue)
-
         var configurationProvider = AppConfigurationURLProvider(customPrivacyConfiguration: configurationUrl)
         if configurationUrl == nil {
             configurationProvider.resetToDefaultConfigurationUrl()
@@ -926,9 +936,9 @@ extension MainViewController {
         Configuration.setURLProvider(configurationProvider)
         ConfigurationManager.shared.forceRefresh(isDebug: true)
         if let configurationUrl {
-            os_log("New configuration URL set to \(configurationUrl.absoluteString)", type: .info)
+            Logger.general.debug("New configuration URL set to \(configurationUrl.absoluteString)")
         } else {
-            os_log("New configuration URL reset to default", type: .info)
+            Logger.general.log("New configuration URL reset to default")
         }
     }
 
@@ -938,7 +948,7 @@ extension MainViewController {
         if alert.runModal() != .cancel {
             guard let textField = alert.accessoryView as? NSTextField,
                   let newConfigurationUrl = URL(string: textField.stringValue) else {
-                os_log("Failed to set custom configuration URL", type: .error)
+                Logger.general.error("Failed to set custom configuration URL")
                 return
             }
 

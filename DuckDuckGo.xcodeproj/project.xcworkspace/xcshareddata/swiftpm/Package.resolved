@@ -40,8 +40,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "f97053d24c21ea301d4067adbbe0899ff940526a",
-        "version" : "6.7.0"
+        "revision" : "5876a5d2e2e7f5a2e11f6419c6c3fafb7cafdfca",
+        "version" : "6.12.0"
       }
     },
     {
@@ -74,7 +74,7 @@
     {
       "identity" : "lottie-spm",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/airbnb/lottie-spm.git",
+      "location" : "https://github.com/airbnb/lottie-spm",
       "state" : {
         "revision" : "1d29eccc24cc8b75bff9f6804155112c0ffc9605",
         "version" : "4.4.3"
@@ -103,8 +103,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/privacy-dashboard",
       "state" : {
-        "revision" : "36dc07cba4bc1e7e0c1d1fb679c3cd077694a072",
-        "version" : "5.0.0"
+        "revision" : "665b23dc656c9f787494620494f8e56098a900b2",
+        "version" : "5.1.1"
       }
     },
     {
