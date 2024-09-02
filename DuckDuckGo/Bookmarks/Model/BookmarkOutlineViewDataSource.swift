@@ -264,6 +264,13 @@ final class BookmarkOutlineViewDataSource: NSObject, BookmarksOutlineViewDataSou
         }
 
         let destination = destinationNode.isRoot ? PseudoFolder.bookmarks : destinationNode.representedObject
+
+        if isSearching {
+            let result = dragDropManager.validateDropWhileInSearchMode(info, to: destination)
+            self.dragDestinationFolder = result.destinationFolder
+            return result.operation
+        }
+
         let operation = dragDropManager.validateDrop(info, to: destination)
         self.dragDestinationFolder = (operation == .none || item == nil) ? nil : destinationNode.representedObject as? BookmarkFolder
 
