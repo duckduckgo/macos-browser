@@ -91,7 +91,7 @@ extension HomePage.Views {
         private var previewContent: some View {
             switch customBackground {
             case .gradient(let gradient):
-                gradient.image.resizable().scaledToFill()
+                gradient.view
             case .solidColor(let solidColor):
                 if #available(macOS 12.0, *) {
                     Color(nsColor: solidColor.color)

@@ -32,6 +32,53 @@ enum GradientBackground: String, Equatable, Identifiable, CaseIterable, ColorSch
     case gradient06
     case gradient07
 
+    struct Constants {
+        static let ColorSystemPurple100: Color = Color(.sRGB, red: 0.03, green: 0, blue: 0.1)
+    }
+
+    @ViewBuilder
+    var view: some View {
+        switch self {
+        case .gradient07:
+            if #available(macOS 12.0, *) {
+                ZStack {
+                    // background: radial-gradient(92.44% 78.41% at 96.76% 110.91%, rgba(44, 20, 102, 0.80) 0%, rgba(44, 20, 111, 0.00) 100%);
+                    EllipticalGradient(
+                        colors: [Color(red: 44/255.0, green: 20/255.0, blue: 102/255.0).opacity(0.8), .clear],
+                        center: UnitPoint(x: 0.9676, y: 1.1091),
+                        endRadiusFraction: 1
+                    )
+
+                    // background: radial-gradient(128.38% 142.82% at 4.57% 123.78%, rgba(62, 34, 140, 0.70) 0%, rgba(44, 20, 111, 0.00) 100%);
+                    EllipticalGradient(
+                        colors: [Color(red: 0.24, green: 0.13, blue: 0.55).opacity(0.7), .clear],
+                        center: UnitPoint(x: 0.05, y: 1.24),
+                        endRadiusFraction: 1
+                    )
+
+                    // background: radial-gradient(136.09% 142.11% at 94.26% -10.49%, rgba(135, 110, 203, 0.80) 0%, rgba(44, 20, 111, 0.00) 100%);
+                    EllipticalGradient(
+                        colors: [Color(red: 0.53, green: 0.43, blue: 0.8).opacity(0.8), .clear],
+                        center: UnitPoint(x: 0.94, y: -0.1),
+                        endRadiusFraction: 1
+                    )
+
+                    // background: radial-gradient(117.73% 115.54% at 100% -8.25%, rgba(222, 88, 51, 0.80) 0%, rgba(44, 20, 111, 0.00) 100%);
+                    EllipticalGradient(
+                        colors: [Color(red: 0.87, green: 0.35, blue: 0.2).opacity(0.8), .clear],
+                        center: UnitPoint(x: 1, y: -0.08),
+                        endRadiusFraction: 1
+                    )
+                }
+                .background(Constants.ColorSystemPurple100)
+            } else {
+                image.resizable().scaledToFill()
+            }
+        default:
+            image.resizable().scaledToFill()
+        }
+    }
+
     var image: Image {
         switch self {
         case .gradient01:
@@ -63,4 +110,9 @@ enum GradientBackground: String, Equatable, Identifiable, CaseIterable, ColorSch
     var customBackground: CustomBackground {
         .gradient(self)
     }
+}
+
+#Preview {
+    GradientBackground.gradient07.view
+        .frame(width: 640, height: 400)
 }

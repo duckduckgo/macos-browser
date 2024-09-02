@@ -165,7 +165,7 @@ extension HomePage.Views {
         var backgroundView: some View {
             switch settingsModel.customBackground {
             case .gradient(let gradient):
-                gradient.image.resizable().aspectRatio(contentMode: .fill)
+                gradient.view
                     .animation(.none, value: settingsModel.contentType)
             case .illustration(let illustration):
                 illustration.image.resizable().aspectRatio(contentMode: .fill)
