@@ -139,6 +139,11 @@ final class BrowserTabViewController: NSViewController {
                                                object: nil)
 
         NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onCloseInlinePasswordImportFlow),
+                                               name: .passwordImportDidCloseImportDialog,
+                                               object: nil)
+
+        NotificationCenter.default.addObserver(self,
                                                selector: #selector(onDBPFeatureDisabled),
                                                name: .dbpWasDisabled,
                                                object: nil)
@@ -185,6 +190,16 @@ final class BrowserTabViewController: NSViewController {
 
         tabCollectionViewModel.select(tab: previouslySelectedTab)
         previouslySelectedTab.webView.evaluateJavaScript("window.openAutofillAfterClosingEmailProtectionTab()", in: nil, in: WKContentWorld.defaultClient)
+        self.previouslySelectedTab = nil
+    }
+
+    @objc
+    private func onCloseInlinePasswordImportFlow(_ notification: Notification) {
+        guard WindowControllersManager.shared.lastKeyMainWindowController === self.view.window?.windowController,
+              let previouslySelectedTab else { return }
+
+        tabCollectionViewModel.select(tab: previouslySelectedTab)
+        previouslySelectedTab.webView.evaluateJavaScript("window.credentialsImportFinished()", in: nil, in: WKContentWorld.defaultClient)
         self.previouslySelectedTab = nil
     }
 
