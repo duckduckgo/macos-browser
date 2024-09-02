@@ -64,7 +64,9 @@ struct DuckPlayerOnboardingModalView: View {
 
         case .onboardingOptions:
             DuckPlayerOnboardingChoiceView(turnOnButtonPressed: {
-                viewModel.currentView = .confirmation
+                withAnimation {
+                    viewModel.currentView = .confirmation
+                }
                 viewModel.handleTurnOnCTA()
             }, notNowPressed: viewModel.handleNotNowCTA)
         }
@@ -153,7 +155,6 @@ private struct DuckPlayerOnboardingConfirmationView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal)
-
             }
 
             Button {

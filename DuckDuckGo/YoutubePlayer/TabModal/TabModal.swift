@@ -36,6 +36,10 @@ public final class TabModal {
             window.isOpaque = false
             window.hasShadow = true
             window.level = .floating
+
+            window.contentView?.wantsLayer = true
+            window.contentView?.layer?.cornerRadius = 12
+            window.contentView?.layer?.masksToBounds = true
         }
         modalViewController.view.wantsLayer = true
         return windowController
@@ -123,7 +127,7 @@ extension TabModal: TabModalPresentable {
 
         if animated {
             overlayWindow.setFrameOrigin(NSPoint(x: xPosition, y: yPosition))
-            overlayWindow.alphaValue = 0
+            overlayWindow.alphaValue = 1
 
             NSAnimationContext.runAnimationGroup { context in
                 context.duration = AnimationConsts.duration
