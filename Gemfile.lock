@@ -1,9 +1,9 @@
 GIT
   remote: https://github.com/duckduckgo/fastlane-plugin-ddg_apple_automation
-  revision: fcbc84820345dea381e53ba9bd036c4baae531a6
-  branch: jacek/asana-upload
+  revision: a207fdee88bd26b877c973dfbf45038eff19ec17
+  tag: 0.4.0
   specs:
-    fastlane-plugin-ddg_apple_automation (0.2.0)
+    fastlane-plugin-ddg_apple_automation (0.4.0)
 
 GEM
   remote: https://rubygems.org/

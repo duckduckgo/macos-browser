@@ -17,9 +17,13 @@
 //
 import AppKit
 
+extension NSCollectionView {
+    static let interItemGapIndicatorIdentifier = "NSCollectionElementKindInterItemGapIndicator"
+}
+
 extension NSCollectionLayoutGroup {
 
-    static func horizontallyCentered(cellSizes: [CGSize], interItemSpacing: CGFloat = 6, centered: Bool = true) -> NSCollectionLayoutGroup {
+    static func horizontallyCentered(cellSizes: [CGSize], interItemSpacing: CGFloat, centered: Bool = true) -> NSCollectionLayoutGroup {
         let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(28))
 
         return custom(layoutSize: groupSize) { environment in
@@ -41,7 +45,7 @@ extension NSCollectionLayoutGroup {
             // Calculate frames for layout group items:
 
             let rowItems: [NSCollectionLayoutGroupCustomItem] = cellSizes.map { size in
-                let origin = CGPoint(x: horizontalPosition, y: verticalPosition + (maxItemHeight - size.height) / 2)
+                let origin = CGPoint(x: ceil(horizontalPosition), y: verticalPosition + (maxItemHeight - size.height) / 2)
                 let itemFrame = CGRect(origin: origin, size: size)
                 horizontalPosition += (size.width + interItemSpacing)
 
@@ -53,4 +57,37 @@ extension NSCollectionLayoutGroup {
             return items
         }
     }
+}
+
+final class BookmarksBarCenteredLayout: NSCollectionViewCompositionalLayout {
+
+    private static let interItemGapWidth: CGFloat = 16
+
+    private var lastKnownInterItemGapIndicatorLayoutAttributes: NSCollectionViewLayoutAttributes?
+
+    override func layoutAttributesForInterItemGap(before indexPath: IndexPath) -> NSCollectionViewLayoutAttributes? {
+        let result = super.layoutAttributesForInterItemGap(before: indexPath)
+        if let result, result.frame.width < Self.interItemGapWidth {
+            result.frame.origin.x -= (Self.interItemGapWidth - result.frame.width) * 0.5
+            result.frame.size.width = Self.interItemGapWidth
+        }
+        return result
+    }
+
+    override func layoutAttributesForDropTarget(at pointInCollectionView: NSPoint) -> NSCollectionViewLayoutAttributes? {
+        var result = super.layoutAttributesForDropTarget(at: pointInCollectionView)
+        if result == nil, let gapAttributes = lastKnownInterItemGapIndicatorLayoutAttributes,
+           gapAttributes.frame.contains(pointInCollectionView) {
+            result = gapAttributes
+        }
+        if let result, result.representedElementKind == NSCollectionView.interItemGapIndicatorIdentifier {
+            if result.frame.width < Self.interItemGapWidth {
+                result.frame.origin.x -= (Self.interItemGapWidth - result.frame.width) * 0.5
+                result.frame.size.width = Self.interItemGapWidth
+            }
+            lastKnownInterItemGapIndicatorLayoutAttributes = result
+        }
+        return result
+    }
+
 }

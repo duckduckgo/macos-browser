@@ -25,7 +25,7 @@ final class BookmarkListTreeControllerSearchDataSource: BookmarkTreeControllerSe
         self.bookmarkManager = bookmarkManager
     }
 
-    func nodes(for searchQuery: String, sortMode: BookmarksSortMode) -> [BookmarkNode] {
+    func nodes(forSearchQuery searchQuery: String, sortMode: BookmarksSortMode) -> [BookmarkNode] {
         let searchResults = bookmarkManager.search(by: searchQuery)
 
         return rebuildChildNodes(for: searchResults.sorted(by: sortMode))
