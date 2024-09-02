@@ -362,7 +362,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
             return
         }
         if navigation.url.isDuckPlayer {
-            var setting = preferences.duckPlayerMode == .enabled ? "always" : "default"
+            let setting = preferences.duckPlayerMode == .enabled ? "always" : "default"
             let newTabSettings = preferences.duckPlayerOpenInNewTab ? "true" : "false"
             let autoplay = preferences.duckPlayerAutoplay ? "true" : "false"
 

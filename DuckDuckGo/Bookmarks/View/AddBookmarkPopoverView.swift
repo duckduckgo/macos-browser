@@ -51,6 +51,7 @@ struct AddBookmarkPopoverView: View {
             otherActionTitle: UserText.delete,
             isOtherActionDisabled: false,
             otherAction: model.removeButtonAction,
+            isOtherActionTriggeredByEscKey: false,
             defaultActionTitle: UserText.done,
             isDefaultActionDisabled: model.isDefaultActionButtonDisabled,
             defaultAction: model.doneButtonAction

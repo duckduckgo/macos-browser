@@ -158,6 +158,9 @@ final class BookmarkListViewController: NSViewController {
         boxDivider.setContentHuggingPriority(.defaultHigh, for: .vertical)
         boxDivider.translatesAutoresizingMaskIntoConstraints = false
 
+        // keep OutlineView menu declaration before buttons as it‘s used as target
+        outlineView.menu = BookmarksContextMenu(bookmarkManager: bookmarkManager, delegate: self)
+
         stackView.orientation = .horizontal
         stackView.spacing = 4
         stackView.setHuggingPriority(.defaultHigh, for: .horizontal)
@@ -169,9 +172,6 @@ final class BookmarkListViewController: NSViewController {
         stackView.addArrangedSubview(searchBookmarksButton)
         stackView.addArrangedSubview(buttonsDivider)
         stackView.addArrangedSubview(manageBookmarksButton)
-
-        // keep OutlineView menu declaration before the buttons as it‘s their target
-        outlineView.menu = BookmarksContextMenu(bookmarkManager: bookmarkManager, delegate: self)
 
         newBookmarkButton.bezelStyle = .shadowlessSquare
         newBookmarkButton.cornerRadius = 4
@@ -254,7 +254,6 @@ final class BookmarkListViewController: NSViewController {
         outlineView.usesAutomaticRowHeights = true
         outlineView.target = self
         outlineView.action = #selector(handleClick)
-        outlineView.menu = BookmarksContextMenu(bookmarkManager: bookmarkManager, delegate: self)
         outlineView.dataSource = dataSource
         outlineView.delegate = dataSource
 
