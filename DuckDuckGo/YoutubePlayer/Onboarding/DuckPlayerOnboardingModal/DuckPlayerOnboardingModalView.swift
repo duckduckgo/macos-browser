@@ -22,7 +22,7 @@ struct DuckPlayerOnboardingModalView: View {
     private enum Constants {
         static let outerContainerWidth: CGFloat = 504
         static let smallContainerHeight: CGFloat = 182
-        static let bigContainerHeight: CGFloat = 326
+        static let bigContainerHeight: CGFloat = 366
         static let containerCornerRadius: CGFloat = 12
         static let darkModeBorderColor: Color = .white.opacity(0.2)
         static let whiteModeBorderColor: Color = .black.opacity(0.1)
@@ -78,7 +78,7 @@ private struct DuckPlayerOnboardingChoiceView: View {
     var body: some View {
         VStack(spacing: 20) {
             DaxSpeechBubble {
-                VStack (alignment: .leading, spacing: 8) {
+                VStack (alignment: .leading, spacing: 16) {
                     VStack (alignment: .leading, spacing: 0) {
                         Text(UserText.duckPlayerOnboardingChoiceModalTitleTop)
                         Text(UserText.duckPlayerOnboardingChoiceModalTitleBottom)
@@ -87,8 +87,10 @@ private struct DuckPlayerOnboardingChoiceView: View {
                     .padding(.horizontal)
 
                     Text(UserText.duckPlayerOnboardingChoiceModalMessage)
-                        .font(.body)
+                        .font(.title3)
+                        .fontWeight(.light)
                         .multilineText()
+                        .lineSpacing(4)
                         .padding(.horizontal)
 
                     HStack {
@@ -116,6 +118,7 @@ private struct DuckPlayerOnboardingChoiceView: View {
                     Text(UserText.duckPlayerOnboardingChoiceModalCTAConfirm)
                 }
                 .buttonStyle(PrimaryCTAStyle())
+
             }
         }
     }
@@ -126,13 +129,16 @@ private struct DuckPlayerOnboardingConfirmationView: View {
     var body: some View {
         VStack(spacing: 20) {
             DaxSpeechBubble {
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 16) {
                     Text(UserText.duckPlayerOnboardingConfirmationModalTitle)
+                        .foregroundColor(.systemGray90)
                         .font(.title)
                         .padding(.horizontal)
 
                     Text(UserText.duckPlayerOnboardingConfirmationModalMessage)
-                        .font(.body)
+                        .foregroundColor(.systemGray90)
+                        .font(.title3)
+                        .fontWeight(.light)
                         .padding(.horizontal)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
