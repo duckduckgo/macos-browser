@@ -71,24 +71,35 @@ struct DuckPlayerOnboardingModalView: View {
     }
 }
 
+private enum Constants {
+    enum FontSize {
+        static let title: CGFloat = 17
+        static let body: CGFloat = 13
+    }
+
+    enum Layout {
+        static let modalOuterVerticalSpacing: CGFloat = 20
+        static let modalInnerVerticalSpacing: CGFloat = 16
+    }
+}
+
 private struct DuckPlayerOnboardingChoiceView: View {
     let turnOnButtonPressed: () -> Void
     let notNowPressed: () -> Void
 
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: Constants.Layout.modalOuterVerticalSpacing) {
             DaxSpeechBubble {
-                VStack (alignment: .leading, spacing: 16) {
+                VStack (alignment: .leading, spacing: Constants.Layout.modalInnerVerticalSpacing) {
                     VStack (alignment: .leading, spacing: 0) {
                         Text(UserText.duckPlayerOnboardingChoiceModalTitleTop)
                         Text(UserText.duckPlayerOnboardingChoiceModalTitleBottom)
                     }
-                    .font(.title)
+                    .font(.system(size: Constants.FontSize.title).weight(.bold))
                     .padding(.horizontal)
 
                     Text(UserText.duckPlayerOnboardingChoiceModalMessage)
-                        .font(.title3)
-                        .fontWeight(.light)
+                        .font(.system(size: Constants.FontSize.body))
                         .multilineText()
                         .lineSpacing(4)
                         .padding(.horizontal)
@@ -127,18 +138,17 @@ private struct DuckPlayerOnboardingChoiceView: View {
 private struct DuckPlayerOnboardingConfirmationView: View {
     let voidButtonPressed: () -> Void
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: Constants.Layout.modalOuterVerticalSpacing) {
             DaxSpeechBubble {
-                VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: Constants.Layout.modalInnerVerticalSpacing) {
                     Text(UserText.duckPlayerOnboardingConfirmationModalTitle)
                         .foregroundColor(.systemGray90)
-                        .font(.title)
+                        .font(.system(size: Constants.FontSize.title).weight(.bold))
                         .padding(.horizontal)
 
                     Text(UserText.duckPlayerOnboardingConfirmationModalMessage)
                         .foregroundColor(.systemGray90)
-                        .font(.title3)
-                        .fontWeight(.light)
+                        .font(.system(size: Constants.FontSize.body))
                         .padding(.horizontal)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
