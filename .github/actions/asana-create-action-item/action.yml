@@ -51,7 +51,7 @@ runs:
     - id: set-assignee-id
       shell: bash
       env:
-        USER_ID: ${{ steps.get-asana-user-id.outputs.user-id || steps.get-automation-subtask.outputs.asana_assignee_id }}
+        USER_ID: ${{ steps.get-asana-user-id.outputs.asana_user_id || steps.get-automation-subtask.outputs.asana_assignee_id }}
       run: |
         echo "assignee-id=${USER_ID}" >> $GITHUB_OUTPUT
 
