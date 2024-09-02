@@ -30,6 +30,7 @@ runs:
       run: bundle exec fastlane run asana_get_release_automation_subtask_id task_url:"${{ inputs.task-url }}"
 
     - id: get-asana-user-id
+      shell: bash
       if: github.event_name != 'schedule'
       run: bundle exec fastlane run asana_get_user_id_for_github_handle github_handle:"${{ github.actor }}"
 

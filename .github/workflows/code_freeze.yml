@@ -47,6 +47,7 @@ jobs:
 
       - name: Get Asana user ID
         id: get-asana-user-id
+        shell: bash
         run: bundle exec fastlane run asana_get_user_id_for_github_handle github_handle:"${{ github.actor }}"
 
       - name: Create release task
