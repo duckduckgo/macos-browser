@@ -113,12 +113,12 @@ final class BookmarksBarMenuPopover: NSPopover {
         return frame
     }
 
-    /// close other BookmarkListPopover-s shown from the main window when opening a new one
+    /// close other `BookmarksBarMenuPopover`-s and `BookmarkListPopover`-s shown from the main window when opening a new one
     static func closeBookmarkListPopovers(shownIn window: NSWindow?, except popoverToKeep: BookmarksBarMenuPopover? = nil) {
         guard let window,
               // ignore when opening a submenu from another BookmarkListPopover
               !(window.contentViewController?.nextResponder is Self) else { return }
-        for case let .some(popover as Self) in (window.childWindows ?? []).map(\.contentViewController?.nextResponder) where popover !== popoverToKeep && popover.isShown {
+        for case let .some(popover as NSPopover) in (window.childWindows ?? []).map(\.contentViewController?.nextResponder) where popover !== popoverToKeep && popover.isShown {
             popover.close()
         }
     }
