@@ -2,4 +2,4 @@
 #
 # Ensure this file is checked in to source control!
 
-gem 'fastlane-plugin-ddg_apple_automation', git: 'https://github.com/duckduckgo/fastlane-plugin-ddg_apple_automation', branch: 'jacek/asana-get-user-id-for-github-handle'
+gem 'fastlane-plugin-ddg_apple_automation', git: 'https://github.com/duckduckgo/fastlane-plugin-ddg_apple_automation', tag: '0.5.0'
