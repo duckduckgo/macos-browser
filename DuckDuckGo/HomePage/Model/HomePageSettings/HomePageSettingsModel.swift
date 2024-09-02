@@ -55,7 +55,6 @@ extension HomePage.Models {
             case root
             case gradientPicker
             case colorPicker
-            case illustrationPicker
             case customImagePicker
         }
 
@@ -263,7 +262,6 @@ extension HomePage.Models {
             [
                 customBackgroundModeModel(for: .gradientPicker),
                 customBackgroundModeModel(for: .colorPicker),
-                customBackgroundModeModel(for: .illustrationPicker),
                 customBackgroundModeModel(for: .customImagePicker)
             ]
                 .compactMap { $0 }
@@ -285,12 +283,6 @@ extension HomePage.Models {
                     contentType: .colorPicker,
                     title: UserText.solidColors,
                     customBackgroundThumbnail: .solidColor(customBackground?.solidColor ?? CustomBackground.placeholderColor)
-                )
-            case .illustrationPicker:
-                return CustomBackgroundModeModel(
-                    contentType: .illustrationPicker,
-                    title: UserText.illustrations,
-                    customBackgroundThumbnail: .illustration(customBackground?.illustration ?? CustomBackground.placeholderIllustration)
                 )
             case .customImagePicker:
                 guard let customImagesManager else {

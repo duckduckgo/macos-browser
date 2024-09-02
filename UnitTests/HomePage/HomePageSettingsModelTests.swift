@@ -29,7 +29,6 @@ fileprivate extension SettingsModel.CustomBackgroundModeModel {
     static let root: Self = .init(contentType: .root, title: "", customBackgroundThumbnail: nil)
     static let gradientPicker: Self = .init(contentType: .gradientPicker, title: "", customBackgroundThumbnail: nil)
     static let colorPicker: Self = .init(contentType: .colorPicker, title: "", customBackgroundThumbnail: nil)
-    static let illustrationPicker: Self = .init(contentType: .illustrationPicker, title: "", customBackgroundThumbnail: nil)
     static let customImagePicker: Self = .init(contentType: .customImagePicker, title: "", customBackgroundThumbnail: nil)
 }
 
@@ -109,9 +108,6 @@ final class HomePageSettingsModelTests: XCTestCase {
 
         model.handleRootGridSelection(.gradientPicker)
         XCTAssertEqual(model.contentType, .gradientPicker)
-
-        model.handleRootGridSelection(.illustrationPicker)
-        XCTAssertEqual(model.contentType, .illustrationPicker)
     }
 
     func testWhenThereAreNoUserImagesThenHandleRootGridSelectionOpensFilePicker() {
@@ -144,14 +140,12 @@ final class HomePageSettingsModelTests: XCTestCase {
     func testWhenCustomBackgroundIsUpdatedThenPixelIsSent() {
         model.customBackground = .solidColor(.black)
         model.customBackground = .gradient(.gradient01)
-        model.customBackground = .illustration(.illustration01)
         model.customBackground = .userImage(.init(fileName: "abc", colorScheme: .light))
         model.customBackground = nil
 
         XCTAssertEqual(sendPixelEvents.map(\.name), [
             NewTabBackgroundPixel.newTabBackgroundSelectedSolidColor.name,
             NewTabBackgroundPixel.newTabBackgroundSelectedGradient.name,
-            NewTabBackgroundPixel.newTabBackgroundSelectedIllustration.name,
             NewTabBackgroundPixel.newTabBackgroundSelectedUserImage.name,
             NewTabBackgroundPixel.newTabBackgroundReset.name
         ])
@@ -162,8 +156,6 @@ final class HomePageSettingsModelTests: XCTestCase {
         XCTAssertEqual(appearancePreferences.homePageCustomBackground, CustomBackground.solidColor(.black))
         model.customBackground = .gradient(.gradient01)
         XCTAssertEqual(appearancePreferences.homePageCustomBackground, CustomBackground.gradient(.gradient01))
-        model.customBackground = .illustration(.illustration01)
-        XCTAssertEqual(appearancePreferences.homePageCustomBackground, CustomBackground.illustration(.illustration01))
         let userImage = UserBackgroundImage(fileName: "abc", colorScheme: .light)
         model.customBackground = .userImage(userImage)
         XCTAssertEqual(appearancePreferences.homePageCustomBackground, CustomBackground.userImage(userImage))
@@ -224,7 +216,6 @@ final class HomePageSettingsModelTests: XCTestCase {
         XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundThumbnail), [
             .gradient(CustomBackground.placeholderGradient),
             .solidColor(CustomBackground.placeholderColor),
-            .illustration(CustomBackground.placeholderIllustration),
             nil
         ])
 
@@ -232,7 +223,6 @@ final class HomePageSettingsModelTests: XCTestCase {
         XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundThumbnail), [
             .gradient(.gradient04),
             .solidColor(CustomBackground.placeholderColor),
-            .illustration(CustomBackground.placeholderIllustration),
             nil
         ])
 
@@ -240,15 +230,6 @@ final class HomePageSettingsModelTests: XCTestCase {
         XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundThumbnail), [
             .gradient(CustomBackground.placeholderGradient),
             .solidColor(.darkPink),
-            .illustration(CustomBackground.placeholderIllustration),
-            nil
-        ])
-
-        model.customBackground = .illustration(.illustration02)
-        XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundThumbnail), [
-            .gradient(CustomBackground.placeholderGradient),
-            .solidColor(CustomBackground.placeholderColor),
-            .illustration(.illustration02),
             nil
         ])
     }
@@ -263,7 +244,6 @@ final class HomePageSettingsModelTests: XCTestCase {
         XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundThumbnail), [
             .gradient(CustomBackground.placeholderGradient),
             .solidColor(CustomBackground.placeholderColor),
-            .illustration(CustomBackground.placeholderIllustration),
             .userImage(image1)
         ])
 
@@ -271,7 +251,6 @@ final class HomePageSettingsModelTests: XCTestCase {
         XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundThumbnail), [
             .gradient(CustomBackground.placeholderGradient),
             .solidColor(CustomBackground.placeholderColor),
-            .illustration(CustomBackground.placeholderIllustration),
             .userImage(image2)
         ])
     }

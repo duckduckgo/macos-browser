@@ -167,9 +167,6 @@ extension HomePage.Views {
             case .gradient(let gradient):
                 gradient.view
                     .animation(.none, value: settingsModel.contentType)
-            case .illustration(let illustration):
-                illustration.image.resizable().aspectRatio(contentMode: .fill)
-                    .animation(.none, value: settingsModel.contentType)
             case .solidColor(let solidColor):
                 Color(hex: solidColor.color.hex())
                     .animation(.none, value: settingsModel.contentType)

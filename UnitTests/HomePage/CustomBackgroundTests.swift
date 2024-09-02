@@ -26,7 +26,6 @@ final class CustomBackgroundTests: XCTestCase {
         XCTAssertEqual(CustomBackground.gradient(.gradient01).gradient, .gradient01)
         XCTAssertEqual(CustomBackground.gradient(.gradient05).gradient, .gradient05)
         XCTAssertNil(CustomBackground.solidColor(.black).gradient)
-        XCTAssertNil(CustomBackground.illustration(.illustration03).gradient)
         XCTAssertNil(CustomBackground.userImage(.init(fileName: "abc.jpg", colorScheme: .light)).gradient)
     }
 
@@ -34,16 +33,7 @@ final class CustomBackgroundTests: XCTestCase {
         XCTAssertEqual(CustomBackground.solidColor(.black).solidColor, .black)
         XCTAssertEqual(CustomBackground.solidColor(.darkPink).solidColor, .darkPink)
         XCTAssertNil(CustomBackground.gradient(.gradient03).solidColor)
-        XCTAssertNil(CustomBackground.illustration(.illustration03).solidColor)
         XCTAssertNil(CustomBackground.userImage(.init(fileName: "abc.jpg", colorScheme: .light)).solidColor)
-    }
-
-    func testIllustration() {
-        XCTAssertEqual(CustomBackground.illustration(.illustration01).illustration, .illustration01)
-        XCTAssertEqual(CustomBackground.illustration(.illustration03).illustration, .illustration03)
-        XCTAssertNil(CustomBackground.gradient(.gradient03).illustration)
-        XCTAssertNil(CustomBackground.solidColor(.lightBlue).illustration)
-        XCTAssertNil(CustomBackground.userImage(.init(fileName: "abc.jpg", colorScheme: .light)).illustration)
     }
 
     func testUserBackgroundImage() {
@@ -53,20 +43,17 @@ final class CustomBackgroundTests: XCTestCase {
         XCTAssertEqual(CustomBackground.userImage(userImage2).userBackgroundImage, userImage2)
         XCTAssertNil(CustomBackground.gradient(.gradient03).userBackgroundImage)
         XCTAssertNil(CustomBackground.solidColor(.lightBlue).userBackgroundImage)
-        XCTAssertNil(CustomBackground.illustration(.illustration04).userBackgroundImage)
     }
 
     func testColorScheme() {
         XCTAssertEqual(CustomBackground.gradient(.gradient03).colorScheme, GradientBackground.gradient03.colorScheme)
         XCTAssertEqual(CustomBackground.solidColor(.darkBlue).colorScheme, SolidColorBackground.darkBlue.colorScheme)
-        XCTAssertEqual(CustomBackground.illustration(.illustration01).colorScheme, IllustrationBackground.illustration01.colorScheme)
         XCTAssertEqual(CustomBackground.userImage(.init(fileName: "abc.jpg", colorScheme: .dark)).colorScheme, .dark)
     }
 
     func testDescription() {
         XCTAssertEqual(CustomBackground.gradient(.gradient01).description, "gradient|gradient01")
         XCTAssertEqual(CustomBackground.solidColor(.darkPurple).description, "solidColor|darkPurple")
-        XCTAssertEqual(CustomBackground.illustration(.illustration06).description, "illustration|illustration06")
 
         let image = UserBackgroundImage(fileName: "abc.jpg", colorScheme: .dark)
         XCTAssertEqual(CustomBackground.userImage(image).description, "userImage|\(image.description)")
@@ -75,7 +62,6 @@ final class CustomBackgroundTests: XCTestCase {
     func testDescriptionInitializer() {
         XCTAssertEqual(CustomBackground("gradient|gradient03"), .gradient(.gradient03))
         XCTAssertEqual(CustomBackground("solidColor|lightOrange"), .solidColor(.lightOrange))
-        XCTAssertEqual(CustomBackground("illustration|illustration04"), .illustration(.illustration04))
 
         XCTAssertEqual(CustomBackground("userImage|abc.jpg|dark"), .userImage(.init(fileName: "abc.jpg", colorScheme: .dark)))
         XCTAssertEqual(CustomBackground("userImage|abc|def.jpg|light"), .userImage(.init(fileName: "abc|def.jpg", colorScheme: .light)))
@@ -90,11 +76,6 @@ final class CustomBackgroundTests: XCTestCase {
         XCTAssertNil(CustomBackground("solidColor|lightBlack"))
         XCTAssertNil(CustomBackground("solidColor|illustration01"))
         XCTAssertNil(CustomBackground("darkBlue"))
-
-        XCTAssertNil(CustomBackground("illustration|illustration98"))
-        XCTAssertNil(CustomBackground("illustration"))
-        XCTAssertNil(CustomBackground("illustration|gradient02"))
-        XCTAssertNil(CustomBackground("illustration04"))
 
         XCTAssertNil(CustomBackground("userImage"))
         XCTAssertNil(CustomBackground("userImage|"))

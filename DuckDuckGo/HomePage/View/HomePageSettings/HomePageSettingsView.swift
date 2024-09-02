@@ -128,9 +128,6 @@ extension HomePage.Views {
                         case .gradientPicker:
                             BackgroundPickerView(title: UserText.gradients, items: GradientBackground.allCases)
                                 .transition(.move(edge: .trailing).combined(with: .opacity))
-                        case .illustrationPicker:
-                            BackgroundPickerView(title: UserText.illustrations, items: IllustrationBackground.allCases)
-                                .transition(.move(edge: .trailing).combined(with: .opacity))
                         case .customImagePicker:
                             BackgroundPickerView(
                                 title: UserText.myBackgrounds,

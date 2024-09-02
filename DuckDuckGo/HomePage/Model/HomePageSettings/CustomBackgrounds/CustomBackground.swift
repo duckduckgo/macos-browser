@@ -46,19 +46,16 @@ protocol CustomBackgroundConvertible {
  * 4 types of backgrounds are available at the moment:
  * - gradient – uses predefined gradient images
  * - solid color – uses predefined colors
- * - illustration – uses predefined illustrations
  * - user image – uses images uploaded by the user.
  */
 enum CustomBackground: Equatable, Hashable, ColorSchemeProviding, LosslessStringConvertible {
 
     static let placeholderGradient: GradientBackground = .gradient03
     static let placeholderColor: SolidColorBackground = .lightPurple
-    static let placeholderIllustration: IllustrationBackground = .illustration01
     static let placeholderCustomImage: SolidColorBackground = .gray
 
     case gradient(GradientBackground)
     case solidColor(SolidColorBackground)
-    case illustration(IllustrationBackground)
     case userImage(UserBackgroundImage)
 
     var gradient: GradientBackground? {
@@ -75,13 +72,6 @@ enum CustomBackground: Equatable, Hashable, ColorSchemeProviding, LosslessString
         return solidColor
     }
 
-    var illustration: IllustrationBackground? {
-        guard case let .illustration(illustration) = self else {
-            return nil
-        }
-        return illustration
-    }
-
     var userBackgroundImage: UserBackgroundImage? {
         guard case let .userImage(image) = self else {
             return nil
@@ -93,8 +83,6 @@ enum CustomBackground: Equatable, Hashable, ColorSchemeProviding, LosslessString
         switch self {
         case .gradient(let gradient):
             gradient.colorScheme
-        case .illustration(let illustration):
-            illustration.colorScheme
         case .solidColor(let solidColor):
             solidColor.colorScheme
         case .userImage(let image):
@@ -120,11 +108,6 @@ enum CustomBackground: Equatable, Hashable, ColorSchemeProviding, LosslessString
                 return nil
             }
             self = .solidColor(solidColor)
-        case "illustration":
-            guard let illustration = IllustrationBackground(rawValue: String(components[1])) else {
-                return nil
-            }
-            self = .illustration(illustration)
         case "userImage":
             guard let userBackgroundImage = UserBackgroundImage(String(components[1])) else {
                 return nil
@@ -141,8 +124,6 @@ enum CustomBackground: Equatable, Hashable, ColorSchemeProviding, LosslessString
             "gradient|\(gradient.rawValue)"
         case let .solidColor(solidColor):
             "solidColor|\(solidColor.description)"
-        case let .illustration(illustration):
-            "illustration|\(illustration.rawValue)"
         case let .userImage(userBackgroundImage):
             "userImage|\(userBackgroundImage.description)"
         }

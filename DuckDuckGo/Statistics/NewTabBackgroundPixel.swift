@@ -47,15 +47,6 @@ enum NewTabBackgroundPixel: PixelKitEventV2 {
     case newTabBackgroundSelectedSolidColor
 
     /**
-     * Event Trigger: User selects illustration as custom NTP background.
-     *
-     * Anomaly Investigation:
-     * - `customBackground` is updated with this value from `HomePage.Models.SettingsModel` and `HomePage.Views.BackgroundPickerView`.
-     * - Check the above places in code and make sure nothing got broken to cause the update to be fired repeatedly.
-     */
-    case newTabBackgroundSelectedIllustration
-
-    /**
      * Event Trigger: User selects a user-uploaded image as custom NTP background.
      *
      * Anomaly Investigation:
@@ -154,8 +145,6 @@ enum NewTabBackgroundPixel: PixelKitEventV2 {
             return "m_mac_newtab_background_selected-gradient"
         case .newTabBackgroundSelectedSolidColor:
             return "m_mac_newtab_background_selected-solid-color"
-        case .newTabBackgroundSelectedIllustration:
-            return "m_mac_newtab_background_selected-illustration"
         case .newTabBackgroundSelectedUserImage:
             return "m_mac_newtab_background_selected-user-image"
         case .newTabBackgroundAddedUserImage:

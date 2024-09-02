@@ -98,8 +98,6 @@ extension HomePage.Views {
                 } else {
                     Color(hex: solidColor.color.hex())
                 }
-            case .illustration(let illustration):
-                illustration.image.resizable().scaledToFill()
             case .userImage(let userBackgroundImage):
                 Group {
                     if let image = model.customImagesManager?.thumbnailImage(for: userBackgroundImage) {

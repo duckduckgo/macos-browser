@@ -1067,8 +1067,6 @@
 		3767318C2C7F32C500EB097B /* GradientBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3767318A2C7F32C500EB097B /* GradientBackground.swift */; };
 		3767318E2C7F32E900EB097B /* SolidColorBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3767318D2C7F32E900EB097B /* SolidColorBackground.swift */; };
 		3767318F2C7F32E900EB097B /* SolidColorBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3767318D2C7F32E900EB097B /* SolidColorBackground.swift */; };
-		376731912C7F330400EB097B /* IllustrationBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376731902C7F330400EB097B /* IllustrationBackground.swift */; };
-		376731922C7F330400EB097B /* IllustrationBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376731902C7F330400EB097B /* IllustrationBackground.swift */; };
 		376731942C7F332300EB097B /* UserBackgroundImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376731932C7F332300EB097B /* UserBackgroundImage.swift */; };
 		376731952C7F332300EB097B /* UserBackgroundImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376731932C7F332300EB097B /* UserBackgroundImage.swift */; };
 		376731992C7F36B200EB097B /* UserBackgroundImageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376731962C7F36AA00EB097B /* UserBackgroundImageTests.swift */; };
@@ -3294,7 +3292,6 @@
 		376731842C7EF97400EB097B /* ColorSchemeLosslessStringConvertibleExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorSchemeLosslessStringConvertibleExtensionTests.swift; sourceTree = "<group>"; };
 		3767318A2C7F32C500EB097B /* GradientBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientBackground.swift; sourceTree = "<group>"; };
 		3767318D2C7F32E900EB097B /* SolidColorBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolidColorBackground.swift; sourceTree = "<group>"; };
-		376731902C7F330400EB097B /* IllustrationBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IllustrationBackground.swift; sourceTree = "<group>"; };
 		376731932C7F332300EB097B /* UserBackgroundImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserBackgroundImage.swift; sourceTree = "<group>"; };
 		376731962C7F36AA00EB097B /* UserBackgroundImageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserBackgroundImageTests.swift; sourceTree = "<group>"; };
 		3767319B2C7F415200EB097B /* CustomBackgroundTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomBackgroundTests.swift; sourceTree = "<group>"; };
@@ -5247,7 +5244,6 @@
 				37D0469B2C7D0EC100AEAA50 /* CustomBackground.swift */,
 				3767318A2C7F32C500EB097B /* GradientBackground.swift */,
 				3767318D2C7F32E900EB097B /* SolidColorBackground.swift */,
-				376731902C7F330400EB097B /* IllustrationBackground.swift */,
 				376731932C7F332300EB097B /* UserBackgroundImage.swift */,
 			);
 			path = CustomBackgrounds;
@@ -10293,7 +10289,6 @@
 				31C3F9372C8636C2005556D1 /* DuckPlayerOnboardingExperimentPixel.swift in Sources */,
 				3706FAA0293F65D500E42796 /* UserAgent.swift in Sources */,
 				3706FAA1293F65D500E42796 /* NSAlert+DataImport.swift in Sources */,
-				376731922C7F330400EB097B /* IllustrationBackground.swift in Sources */,
 				3706FAA2293F65D500E42796 /* MainWindow.swift in Sources */,
 				3707C727294B5D2900682A9F /* WKWebView+SessionState.swift in Sources */,
 				4B44FEF42B1FEF5A000619D8 /* FocusableTextEditor.swift in Sources */,
@@ -12571,7 +12566,6 @@
 				AA6FFB4624DC3B5A0028F4D0 /* WebView.swift in Sources */,
 				1DDD3EC02B84F5D5004CBF2B /* PreferencesCookiePopupProtectionView.swift in Sources */,
 				B693955026F04BEB0015B914 /* ShadowView.swift in Sources */,
-				376731912C7F330400EB097B /* IllustrationBackground.swift in Sources */,
 				AA3D531D27A2F58F00074EC1 /* FeedbackSender.swift in Sources */,
 				B6E3E5502BBFCDEE00A41922 /* OpenDownloadsCellView.swift in Sources */,
 				B6BDDA012942389000F68088 /* TabExtensions.swift in Sources */,
