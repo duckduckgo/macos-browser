@@ -439,7 +439,7 @@ final class BrowserTabViewController: NSViewController {
     private func subscribeToDuckPlayerOnboardingPrompt(of tabViewModel: TabViewModel?) {
         tabViewModel?.tab.duckPlayerOnboardingPublisher.sink { [weak self, weak tab = tabViewModel?.tab] onboardingState in
 
-            guard let self, let tab, let onboardingState = onboardingState, onboardingState.onboardingDecider.canDisplayOnboarding else  {
+            guard let self, tab != nil, let onboardingState = onboardingState, onboardingState.onboardingDecider.canDisplayOnboarding else  {
                 self?.duckPlayerOnboardingModalManager.close(animated: false, completion: nil)
                 return
             }
