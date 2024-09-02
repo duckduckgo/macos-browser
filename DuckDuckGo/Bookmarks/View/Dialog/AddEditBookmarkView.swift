@@ -36,6 +36,7 @@ struct AddEditBookmarkView: View {
     let otherActionTitle: String
     let isOtherActionDisabled: Bool
     let otherAction: @MainActor (_ dismiss: () -> Void) -> Void
+    let isOtherActionTriggeredByEscKey: Bool
 
     let defaultActionTitle: String
     let isDefaultActionDisabled: Bool
@@ -78,6 +79,7 @@ struct AddEditBookmarkView: View {
                     viewState: .init(buttonsState),
                     otherButtonAction: .init(
                         title: otherActionTitle,
+                        keyboardShortCut: isOtherActionTriggeredByEscKey ? .cancelAction : nil,
                         isDisabled: isOtherActionDisabled,
                         action: otherAction
                     ),

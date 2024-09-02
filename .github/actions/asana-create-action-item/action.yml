@@ -38,22 +38,20 @@ runs:
   using: "composite"
   steps:
     - id: get-automation-subtask
-      uses: ./.github/actions/asana-get-release-automation-subtask-id
-      with:
-        access-token: ${{ inputs.access-token }}
-        task-url: ${{ inputs.release-task-url }}
+      shell: bash
+      env:
+        ASANA_ACCESS_TOKEN: ${{ inputs.access-token }}
+      run: bundle exec fastlane run asana_get_release_automation_subtask_id task_url:"${{ inputs.release-task-url }}"
 
     - id: get-asana-user-id
+      shell: bash
       if: github.event_name != 'schedule'
-      uses: duckduckgo/apple-toolbox/actions/asana-get-user-id-for-github-handle@main
-      with:
-        access-token: ${{ inputs.access-token }}
-        github-handle: ${{ github.actor }}
+      run: bundle exec fastlane run asana_get_user_id_for_github_handle github_handle:"${{ github.actor }}"
 
     - id: set-assignee-id
       shell: bash
       env:
-        USER_ID: ${{ steps.get-asana-user-id.outputs.user-id || steps.get-automation-subtask.outputs.assignee-id }}
+        USER_ID: ${{ steps.get-asana-user-id.outputs.asana_user_id || steps.get-automation-subtask.outputs.asana_assignee_id }}
       run: |
         echo "assignee-id=${USER_ID}" >> $GITHUB_OUTPUT
 
@@ -62,7 +60,7 @@ runs:
       shell: bash
       env:
         ASSIGNEE_ID: ${{ steps.set-assignee-id.outputs.assignee-id }}
-        AUTOMATION_TASK_ID: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
+        AUTOMATION_TASK_ID: ${{ steps.get-automation-subtask.outputs.asana_automation_task_id }}
         TEMPLATE_PATH: ${{ github.action_path }}/templates/${{ inputs.template-name }}.yml
         WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
       run: |
@@ -80,7 +78,7 @@ runs:
       shell: bash
       env:
         ASSIGNEE_ID: ${{ steps.set-assignee-id.outputs.assignee-id }}
-        AUTOMATION_TASK_ID: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
+        AUTOMATION_TASK_ID: ${{ steps.get-automation-subtask.outputs.asana_automation_task_id }}
         NOTES: ${{ inputs.notes }}
         TASK_NAME: ${{ inputs.task-name }}
         WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
@@ -93,7 +91,7 @@ runs:
       shell: bash
       env:
         ASSIGNEE_ID: ${{ steps.set-assignee-id.outputs.assignee-id }}
-        AUTOMATION_TASK_ID: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
+        AUTOMATION_TASK_ID: ${{ steps.get-automation-subtask.outputs.asana_automation_task_id }}
         HTML_NOTES: ${{ inputs.html-notes }}
         TASK_NAME: ${{ inputs.task-name }}
         WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
@@ -106,7 +104,7 @@ runs:
       env:
         ASANA_ACCESS_TOKEN: ${{ inputs.access-token }}
         ASSIGNEE_ID: ${{ steps.set-assignee-id.outputs.assignee-id }}
-        TASK_ID: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
+        TASK_ID: ${{ steps.get-automation-subtask.outputs.asana_automation_task_id }}
         PAYLOAD_BASE64: ${{ steps.process-template-payload.outputs.payload-base64 || steps.process-notes-payload.outputs.payload-base64 || steps.process-html-notes-payload.outputs.payload-base64 }}
       run: |
         # Create a subtask and retrieve its ID from the response (.data.gid) to return as an output

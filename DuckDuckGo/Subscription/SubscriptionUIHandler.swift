@@ -32,7 +32,7 @@ final class SubscriptionUIHandler: SubscriptionUIHandling {
     fileprivate nonisolated let windowControllersManagerProvider: WindowControllersManagerProvider
     fileprivate var progressViewController: ProgressViewController?
 
-    nonisolated init(windowControllersManagerProvider: @escaping WindowControllersManagerProvider) {
+    @MainActor init(windowControllersManagerProvider: @escaping WindowControllersManagerProvider) {
         self.windowControllersManagerProvider = windowControllersManagerProvider
     }
 
