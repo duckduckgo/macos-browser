@@ -96,8 +96,7 @@ class BookmarksAndFavoritesTests: XCTestCase {
 
         app.launch()
         resetBookmarks()
-        app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Let's enforce a single window
-        app.typeKey("n", modifierFlags: .command)
+        app.enforceSingleWindow()
     }
 
     func test_bookmarks_canBeAddedTo_withContextClickBookmarkThisPage() {

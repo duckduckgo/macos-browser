@@ -92,4 +92,26 @@ extension XCUIElement {
         )
         self.hover()
     }
+
+    var normalizedCoordinate: XCUICoordinate {
+        coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+    }
+
+    func clickAtCoordinate() {
+        normalizedCoordinate.click()
+    }
+
+    func press(forDuration duration: TimeInterval, thenDragTo endCoordinate: XCUICoordinate? = nil, withVelocity velocity: XCUIGestureVelocity? = nil, thenHoldForDuration holdDuration: TimeInterval? = nil) {
+        switch (endCoordinate, velocity, holdDuration) {
+        case let (.some(endCoordinate), .some(velocity), .some(holdDuration)):
+            normalizedCoordinate.press(forDuration: duration, thenDragTo: endCoordinate, withVelocity: velocity, thenHoldForDuration: holdDuration)
+        case let (.some(endCoordinate), .none, .none):
+            normalizedCoordinate.press(forDuration: duration, thenDragTo: endCoordinate)
+        case (.none, .none, .none):
+            normalizedCoordinate.press(forDuration: duration)
+        default:
+            assertionFailure("Wrong arguments set")
+        }
+    }
+
 }

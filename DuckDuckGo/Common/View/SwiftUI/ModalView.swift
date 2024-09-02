@@ -25,7 +25,7 @@ extension ModalView {
     @MainActor
     func show(in window: NSWindow? = nil, completion: (() -> Void)? = nil) {
 
-        guard let window = window ?? WindowControllersManager.shared.lastKeyMainWindowController?.window else {
+        guard let window = window ?? WindowControllersManager.shared.lastKeyMainWindowController?.window ?? WindowsManager.openNewWindow() else {
             assertionFailure("No parent window to display in. Displaying app-wide modal windows not implemented")
             completion?()
             return

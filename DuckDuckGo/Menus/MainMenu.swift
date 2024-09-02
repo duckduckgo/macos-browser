@@ -73,6 +73,7 @@ final class MainMenu: NSMenu {
         .withAccessibilityIdentifier("MainMenu.manageBookmarksMenuItem")
     var bookmarksMenuToggleBookmarksBarMenuItem = NSMenuItem(title: "BookmarksBarMenuPlaceholder", action: #selector(MainViewController.toggleBookmarksBarFromMenu), keyEquivalent: "B")
     let importBookmarksMenuItem = NSMenuItem(title: UserText.importBookmarks, action: #selector(AppDelegate.openImportBrowserDataWindow))
+        .withAccessibilityIdentifier("MainMenu.importBookmarks")
     let bookmarksMenu = NSMenu(title: UserText.bookmarks)
     let favoritesMenu = NSMenu(title: UserText.favorites)
 
@@ -588,8 +589,10 @@ final class MainMenu: NSMenu {
             NSMenuItem(title: "Reset Data") {
                 NSMenuItem(title: "Reset Default Browser Prompt", action: #selector(MainViewController.resetDefaultBrowserPrompt))
                 NSMenuItem(title: "Reset Default Grammar Checks", action: #selector(MainViewController.resetDefaultGrammarChecks))
-                NSMenuItem(title: "Reset Autofill Data", action: #selector(MainViewController.resetSecureVaultData)).withAccessibilityIdentifier("MainMenu.resetSecureVaultData")
-                NSMenuItem(title: "Reset Bookmarks", action: #selector(MainViewController.resetBookmarks)).withAccessibilityIdentifier("MainMenu.resetBookmarks")
+                NSMenuItem(title: "Reset Autofill Data", action: #selector(MainViewController.resetSecureVaultData))
+                    .withAccessibilityIdentifier("MainMenu.resetSecureVaultData")
+                NSMenuItem(title: "Reset Bookmarks", action: #selector(MainViewController.resetBookmarks))
+                    .withAccessibilityIdentifier("MainMenu.resetBookmarks")
                 NSMenuItem(title: "Reset Pinned Tabs", action: #selector(MainViewController.resetPinnedTabs))
                 NSMenuItem(title: "Reset YouTube Overlay Interactions", action: #selector(MainViewController.resetDuckPlayerOverlayInteractions))
                 NSMenuItem(title: "Reset MakeDuckDuckYours user settings", action: #selector(MainViewController.resetMakeDuckDuckGoYoursUserSettings))
