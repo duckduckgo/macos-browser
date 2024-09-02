@@ -28,12 +28,9 @@ protocol OnboardingExperimentManager {
 // https://app.asana.com/0/72649045549333/1208088257884523/f
 struct DuckPlayerOnboardingExperiment: OnboardingExperimentManager {
     private let userDefaults: UserDefaults
-    private let preferences: DuckPlayerPreferences
 
-    init(userDefault: UserDefaults = .standard,
-         preferences: DuckPlayerPreferences = .shared) {
+    init(userDefault: UserDefaults = .standard) {
         self.userDefaults = userDefault
-        self.preferences = preferences
     }
 
     enum Cohort: String {
@@ -45,7 +42,11 @@ struct DuckPlayerOnboardingExperiment: OnboardingExperimentManager {
         static let name = "priming-modal"
     }
 
-    private var enrollmentDate: Date?
+    private enum ExperimentPixelKeys {
+        static let variant = "variant"
+        static let enrollment = "enrollment"
+        static let experimentName = "expname"
+    }
 
     func assignUserToCohort() {
         guard !userDefaults.didRunEnrollment else {
@@ -65,38 +66,36 @@ struct DuckPlayerOnboardingExperiment: OnboardingExperimentManager {
     func sendWeeklyUniqueView() {
         // m_mac_duck-player_weekly-unique-view
     }
-    /*
-     Duck Player DAUs
-     YouTube overlay CTR
-     SERP overlay CTR
-     Users changing settings to Never
-     Users changing settings to Always
-     */
+
     func getPixelParameters(cohort: Bool = true,
                             date: Bool = true,
                             experimentName: Bool = true) -> [String: String]? {
         var parameters: [String: String] = [:]
 
         if let experimentCohort = experimentCohort, cohort {
-            parameters["variant"] = experimentCohort.rawValue
+            parameters[ExperimentPixelKeys.variant] = experimentCohort.rawValue
         }
 
         if let enrollmentDate = enrollmentDate, date {
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "yyyyMMdd"
             let enrollmentDateString = dateFormatter.string(from: enrollmentDate)
-            parameters["enrollment"] = enrollmentDateString
+            parameters[ExperimentPixelKeys.enrollment] = enrollmentDateString
         }
 
         if experimentName {
-            parameters["expname"] = ExperimentPixelValues.name
+            parameters[ExperimentPixelKeys.experimentName] = ExperimentPixelValues.name
         }
 
         return parameters.isEmpty ? nil : parameters
     }
 
+    private var enrollmentDate: Date? {
+        return userDefaults.enrollmentDate
+    }
+
     private var isUserInExperiment: Bool {
-        return enrollmentDate != nil
+        return userDefaults.enrollmentDate != nil
     }
 
     private var experimentCohort: Cohort? {

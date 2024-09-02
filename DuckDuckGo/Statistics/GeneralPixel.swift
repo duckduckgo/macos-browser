@@ -1162,6 +1162,31 @@ enum GeneralPixel: PixelKitEventV2 {
         case .onboardingDuckplayerUsed5to7(let cohort):
             return [PixelKit.Parameters.experimentCohort: cohort]
 
+        case .duckPlayerDailyUniqueView,
+                .duckPlayerViewFromYoutubeViaMainOverlay,
+                .duckPlayerViewFromYoutubeViaHoverButton,
+                .duckPlayerViewFromYoutubeAutomatic,
+                .duckPlayerViewFromSERP,
+                .duckPlayerViewFromOther,
+                .duckPlayerOverlayYoutubeImpressions,
+                .duckPlayerOverlayYoutubeWatchHere,
+                .duckPlayerSettingAlwaysDuckPlayer,
+                .duckPlayerSettingAlwaysOverlaySERP,
+                .duckPlayerSettingAlwaysOverlayYoutube,
+                .duckPlayerSettingAlwaysSettings,
+                .duckPlayerSettingNeverOverlaySERP,
+                .duckPlayerSettingNeverOverlayYoutube,
+                .duckPlayerSettingNeverSettings,
+                .duckPlayerSettingBackToDefault,
+                .duckPlayerWatchOnYoutube,
+                .duckPlayerAutoplaySettingsOn,
+                .duckPlayerAutoplaySettingsOff,
+                .duckPlayerNewTabSettingsOn,
+                .duckPlayerNewTabSettingsOff,
+                .duckPlayerContingencySettingsDisplayed,
+                .duckPlayerContingencyLearnMoreClicked:
+            return DuckPlayerOnboardingExperiment().getPixelParameters()
+
         case .bookmarksSortButtonClicked(let origin),
                 .bookmarksSortButtonDismissed(let origin),
                 .bookmarksSortByName(let origin),
