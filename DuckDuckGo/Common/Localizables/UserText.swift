@@ -362,8 +362,10 @@ struct UserText {
     static let duckPlayerContingencyMessageBody = NSLocalizedString("duck-player.video-contingency-message", value: "Duck Player's functionality has been affected by recent changes to YouTube. We’re working to fix these issues and appreciate your understanding.", comment: "Message explaining to the user that Duck Player is not available")
     static let duckPlayerContingencyMessageCTA = NSLocalizedString("duck-player.video-contingency-cta", value: "Learn More", comment: "Button for the message explaining to the user that Duck Player is not available so the user can learn more")
 
-    static let duckPlayerOnboardingChoiceModalTitle = NSLocalizedString("duck-player.onboarding-choice-modal-title", value: "Drowning in ads on YouTube?", comment: "Title for a Duck Player onboarding modal screen")
-    static let duckPlayerOnboardingChoiceModalMessage = NSLocalizedString("duck-player.onboarding-choice-modal-message", value: "Duck Player lets you watch without targeted ads and comes free to use in DuckDuckGo.", comment: "Message for a Duck Player onboarding modal screen")
+    static let duckPlayerOnboardingChoiceModalTitleTop = NSLocalizedString("duck-player.onboarding-choice-modal-title-top", value: "Drowning in ads on YouTube?", comment: "Top title for a Duck Player onboarding modal screen")
+    static let duckPlayerOnboardingChoiceModalTitleBottom = NSLocalizedString("duck-player.onboarding-choice-modal-title-bottom", value: "Try Duck Player!", comment: "Bottom title for a Duck Player onboarding modal screen")
+
+    static let duckPlayerOnboardingChoiceModalMessage = NSLocalizedString("duck-player.onboarding-choice-modal-message-body", value: "Duck Player lets you watch YouTube without targeted ads in DuckDuckGo and what you watch won't influence your recommendations.", comment: "Message for a Duck Player onboarding modal screen")
     static let duckPlayerOnboardingChoiceModalCTAConfirm = NSLocalizedString("duck-player.onboarding-choice-modal-CTA-confirm", value: "Turn on Duck Player", comment: "Confirm Button to enable Duck Player. -Duck Player- should not be translated")
     static let duckPlayerOnboardingChoiceModalCTADeny = NSLocalizedString("duck-player.onboarding-choice-modal-CTA-deny", value: "Not Now", comment: "Deny Button to enable Duck Player")
 

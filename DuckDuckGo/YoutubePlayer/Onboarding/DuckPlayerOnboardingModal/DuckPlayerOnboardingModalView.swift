@@ -22,7 +22,7 @@ struct DuckPlayerOnboardingModalView: View {
     private enum Constants {
         static let outerContainerWidth: CGFloat = 504
         static let smallContainerHeight: CGFloat = 182
-        static let bigContainerHeight: CGFloat = 286
+        static let bigContainerHeight: CGFloat = 326
         static let containerCornerRadius: CGFloat = 12
         static let darkModeBorderColor: Color = .white.opacity(0.2)
         static let whiteModeBorderColor: Color = .black.opacity(0.1)
@@ -79,9 +79,12 @@ private struct DuckPlayerOnboardingChoiceView: View {
         VStack(spacing: 20) {
             DaxSpeechBubble {
                 VStack (alignment: .leading, spacing: 8) {
-                    Text(UserText.duckPlayerOnboardingChoiceModalTitle)
-                        .font(.title)
-                        .padding(.horizontal)
+                    VStack (alignment: .leading, spacing: 0) {
+                        Text(UserText.duckPlayerOnboardingChoiceModalTitleTop)
+                        Text(UserText.duckPlayerOnboardingChoiceModalTitleBottom)
+                    }
+                    .font(.title)
+                    .padding(.horizontal)
 
                     Text(UserText.duckPlayerOnboardingChoiceModalMessage)
                         .font(.body)
@@ -279,7 +282,7 @@ private struct SecondaryCTAStyle: ButtonStyle {
         }, notNowPressed: {
 
         })
-        .frame(width: 504, height: 286)
+        .frame(width: 504, height: 326)
 
         Divider()
             .padding()
