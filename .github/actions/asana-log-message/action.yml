@@ -31,10 +31,7 @@ runs:
 
     - id: get-asana-user-id
       if: github.event_name != 'schedule'
-      uses: duckduckgo/apple-toolbox/actions/asana-get-user-id-for-github-handle@main
-      with:
-        access-token: ${{ inputs.access-token }}
-        github-handle: ${{ github.actor }}
+      run: bundle exec fastlane run asana_get_user_id_for_github_handle github_handle:"${{ github.actor }}"
 
     - id: add-colaborator
       shell: bash
