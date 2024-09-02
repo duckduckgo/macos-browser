@@ -143,7 +143,7 @@ extension BookmarksContextMenu {
 
     static func menuItems(for folder: BookmarkFolder, target: AnyObject?, forSearch: Bool, includeManageBookmarksItem: Bool) -> [NSMenuItem] {
         // disable "Open All" if no Bookmarks in folder
-        var hasBookmarks = folder.children.contains(where: { $0 is Bookmark })
+        let hasBookmarks = folder.children.contains(where: { $0 is Bookmark })
         var items = [
             openInNewTabsMenuItem(folder: folder, target: target, enabled: hasBookmarks),
             openAllInNewWindowMenuItem(folder: folder, target: target, enabled: hasBookmarks),
