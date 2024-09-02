@@ -352,11 +352,12 @@ jobs:
 
     - name: Upload DMG to Asana
       if: ${{ env.upload-to == 'asana' }}
-      uses: ./.github/actions/asana-upload
-      with:
-        access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-        file-name: ${{ github.workspace }}/duckduckgo-${{ env.app-version }}.dmg
-        task-id: ${{ steps.task-id.outputs.asana_task_id }}
+      env:
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+      run: |
+        bundle exec fastlane run asana_upload \
+          file_name:"${{ github.workspace }}/duckduckgo-${{ env.app-version }}.dmg" \
+          task_id:"${{ steps.task-id.outputs.asana_task_id }}" 
 
   mattermost:
 
