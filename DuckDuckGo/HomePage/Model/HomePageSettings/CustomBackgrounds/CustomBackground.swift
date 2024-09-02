@@ -116,7 +116,7 @@ enum CustomBackground: Equatable, Hashable, ColorSchemeProviding, LosslessString
             }
             self = .gradient(gradient)
         case "solidColor":
-            guard let solidColor = SolidColorBackground(rawValue: String(components[1])) else {
+            guard let solidColor = SolidColorBackground(String(components[1])) else {
                 return nil
             }
             self = .solidColor(solidColor)
@@ -140,7 +140,7 @@ enum CustomBackground: Equatable, Hashable, ColorSchemeProviding, LosslessString
         case let .gradient(gradient):
             "gradient|\(gradient.rawValue)"
         case let .solidColor(solidColor):
-            "solidColor|\(solidColor.rawValue)"
+            "solidColor|\(solidColor.description)"
         case let .illustration(illustration):
             "illustration|\(illustration.rawValue)"
         case let .userImage(userBackgroundImage):

@@ -43,7 +43,7 @@ extension HomePage.Views {
                 VStack(alignment: .leading, spacing: Const.titleSpacing) {
                     ZStack {
                         if modeModel.contentType == .customImagePicker && !model.hasUserImages {
-                            BackgroundThumbnailView(showCheckmarkIfSelected: true) {
+                            BackgroundThumbnailView(displayMode: .categoryView) {
                                 ZStack {
                                     Color.blackWhite5
                                     Image(.share)
@@ -51,7 +51,7 @@ extension HomePage.Views {
                             }
                         } else {
                             BackgroundThumbnailView(
-                                showCheckmarkIfSelected: true,
+                                displayMode: .categoryView,
                                 customBackground: modeModel.customBackgroundThumbnail ?? .solidColor(.gray)
                             )
                         }

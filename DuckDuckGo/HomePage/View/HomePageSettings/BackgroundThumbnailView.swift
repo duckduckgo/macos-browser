@@ -21,7 +21,19 @@ import SwiftUIExtensions
 extension HomePage.Views {
 
     struct BackgroundThumbnailView<Content>: View where Content: View {
-        let showCheckmarkIfSelected: Bool
+        enum DisplayMode: Equatable {
+            case categoryView, pickerView
+
+            var showsCheckmarkIfSelected: Bool {
+                self == .categoryView
+            }
+
+            var allowsDeletingCustomBackgrounds: Bool {
+                self == .pickerView
+            }
+        }
+ 
+        let displayMode: DisplayMode
         let customBackground: CustomBackground?
         @ViewBuilder let content: () -> Content
 
@@ -29,18 +41,18 @@ extension HomePage.Views {
         @EnvironmentObject var model: HomePage.Models.SettingsModel
 
         init(
-            showCheckmarkIfSelected: Bool = false,
+            displayMode: DisplayMode,
             customBackground: CustomBackground,
             @ViewBuilder content: @escaping () -> Content = { EmptyView() }
         ) {
-            self.showCheckmarkIfSelected = showCheckmarkIfSelected
+            self.displayMode = displayMode
             self.customBackground = customBackground
             self.content = content
         }
 
-        init(showCheckmarkIfSelected: Bool = false, @ViewBuilder content: @escaping () -> Content) {
+        init(displayMode: DisplayMode, @ViewBuilder content: @escaping () -> Content) {
             customBackground = nil
-            self.showCheckmarkIfSelected = showCheckmarkIfSelected
+            self.displayMode = displayMode
             self.content = content
         }
 
@@ -54,7 +66,7 @@ extension HomePage.Views {
                     .stroke(Color.homeSettingsBackgroundPreviewStroke)
                     .frame(height: SettingsView.Const.gridItemHeight)
                     .background(selectionBackground)
-                if case .userImage(let image) = customBackground {
+                if displayMode.allowsDeletingCustomBackgrounds, case .userImage(let image) = customBackground {
                     HStack {
                         Spacer()
                         VStack {
@@ -81,7 +93,11 @@ extension HomePage.Views {
             case .gradient(let gradient):
                 gradient.image.resizable().scaledToFill()
             case .solidColor(let solidColor):
-                solidColor.color.scaledToFill()
+                if #available(macOS 12.0, *) {
+                    Color(nsColor: solidColor.color)
+                } else {
+                    Color(hex: solidColor.color.hex())
+                }
             case .illustration(let illustration):
                 illustration.image.resizable().scaledToFill()
             case .userImage(let userBackgroundImage):
@@ -92,8 +108,10 @@ extension HomePage.Views {
                         EmptyView()
                     }
                 }
-                .contextMenu {
-                    Button(UserText.deleteBackground, action: { model.customImagesManager?.deleteImage(userBackgroundImage) })
+                .if(displayMode.allowsDeletingCustomBackgrounds) { view in
+                    view.contextMenu {
+                        Button(UserText.deleteBackground, action: { model.customImagesManager?.deleteImage(userBackgroundImage) })
+                    }
                 }
             case .none:
                 content()
@@ -106,7 +124,7 @@ extension HomePage.Views {
                 ZStack {
                     RoundedRectangle(cornerRadius: 6)
                         .stroke(Color(.updateIndicator), lineWidth: 2)
-                    if showCheckmarkIfSelected {
+                    if displayMode.showsCheckmarkIfSelected {
                         Image(.solidCheckmark)
                             .opacity(0.8)
                             .colorScheme(customBackground.colorScheme)

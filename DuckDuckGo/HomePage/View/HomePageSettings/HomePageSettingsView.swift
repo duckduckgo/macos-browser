@@ -102,15 +102,19 @@ extension HomePage.Views {
                             rootView
                                 .transition(.move(edge: .leading).combined(with: .opacity))
                         case .colorPicker:
-                            BackgroundPickerView(title: UserText.solidColors, items: SolidColorBackground.allCases, header: {
+                            BackgroundPickerView(title: UserText.solidColors, items: SolidColorBackground.predefinedColors, header: {
                                 HStack {
                                     Text("Pick a color:")
                                     Spacer()
                                     Button {
                                         model.openColorPanel()
                                     } label: {
-                                        BackgroundThumbnailView {
-                                            model.customColor.scaledToFill()
+                                        BackgroundThumbnailView(displayMode: .pickerView) {
+                                            if case .solidColor(let solidColor) = model.customBackground, !SolidColorBackground.predefinedColors.contains(solidColor) {
+                                                Color(hex: solidColor.color.hex()).scaledToFill()
+                                            } else {
+                                                Color(hex: model.lastPickedCustomColor.hex()).scaledToFill()
+                                            }
                                         }
                                     }
                                     .frame(width: 96, height: 64)

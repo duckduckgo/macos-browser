@@ -83,7 +83,7 @@ extension HomePage.Views {
                     }
                 }
             } label: {
-                BackgroundThumbnailView(customBackground: item.customBackground)
+                BackgroundThumbnailView(displayMode: .pickerView, customBackground: item.customBackground)
             }
             .buttonStyle(.plain)
         }

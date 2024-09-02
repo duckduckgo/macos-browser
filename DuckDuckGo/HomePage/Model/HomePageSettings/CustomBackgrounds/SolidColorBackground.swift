@@ -16,72 +16,66 @@
 //  limitations under the License.
 //
 
-import AppKit
+import AppKitExtensions
 import SwiftUI
 
-enum SolidColorBackground: String, Equatable, Identifiable, CaseIterable, ColorSchemeProviding, CustomBackgroundConvertible {
-    var id: Self {
-        self
+struct SolidColorBackground: Hashable, Equatable, Identifiable, LosslessStringConvertible, ColorSchemeProviding, CustomBackgroundConvertible {
+    var id: Int {
+        color.hashValue
     }
 
-    case lightPink
-    case darkPink
-    case lightOrange
-    case darkOrange
-    case lightYellow
-    case darkYellow
-    case lightGreen
-    case darkGreen
-    case lightBlue
-    case darkBlue
-    case lightPurple
-    case darkPurple
-    case gray
-    case black
+    init(color: NSColor, colorScheme: ColorScheme? = nil) {
+        self.color = color
+        self.colorScheme = colorScheme ?? (color.brightness > 0.5 ? .light : .dark)
+    }
 
-    var color: Color {
-        switch self {
-        case .gray:
-                .homePageBackgroundGray
-        case .black:
-                .homePageBackgroundBlack
-        case .lightPink:
-                .homePageBackgroundLightPink
-        case .lightOrange:
-                .homePageBackgroundLightOrange
-        case .lightYellow:
-                .homePageBackgroundLightYellow
-        case .lightGreen:
-                .homePageBackgroundLightGreen
-        case .lightBlue:
-                .homePageBackgroundLightBlue
-        case .lightPurple:
-                .homePageBackgroundLightPurple
-        case .darkPink:
-                .homePageBackgroundDarkPink
-        case .darkOrange:
-                .homePageBackgroundDarkOrange
-        case .darkYellow:
-                .homePageBackgroundDarkYellow
-        case .darkGreen:
-                .homePageBackgroundDarkGreen
-        case .darkBlue:
-                .homePageBackgroundDarkBlue
-        case .darkPurple:
-                .homePageBackgroundDarkPurple
+    init?(_ description: String) {
+        guard let color = NSColor(hex: description) else {
+            return nil
         }
+        self.init(color: color)
     }
 
-    var colorScheme: ColorScheme {
-        switch self {
-        case .gray, .lightPink, .lightOrange, .lightYellow, .darkYellow, .lightGreen, .lightBlue, .lightPurple:
-                .light
-        case .black, .darkPink, .darkOrange, .darkGreen, .darkBlue, .darkPurple:
-                .dark
-        }
+    var description: String {
+        color.hex(includeAlpha: false)
     }
+
+    let color: NSColor
+    let colorScheme: ColorScheme
 
     var customBackground: CustomBackground {
         .solidColor(self)
     }
+
+    static let predefinedColors: [SolidColorBackground] = [
+        .lightPink,
+        .darkPink,
+        .lightOrange,
+        .darkOrange,
+        .lightYellow,
+        .darkYellow,
+        .lightGreen,
+        .darkGreen,
+        .lightBlue,
+        .darkBlue,
+        .lightPurple,
+        .darkPurple,
+        .gray,
+        .black
+    ]
+
+    static let lightPink = SolidColorBackground(color: .homePageBackgroundLightPink, colorScheme: .light)
+    static let darkPink = SolidColorBackground(color: .homePageBackgroundDarkPink, colorScheme: .dark)
+    static let lightOrange = SolidColorBackground(color: .homePageBackgroundLightOrange, colorScheme: .light)
+    static let darkOrange = SolidColorBackground(color: .homePageBackgroundDarkOrange, colorScheme: .dark)
+    static let lightYellow = SolidColorBackground(color: .homePageBackgroundLightYellow, colorScheme: .light)
+    static let darkYellow = SolidColorBackground(color: .homePageBackgroundDarkYellow, colorScheme: .light)
+    static let lightGreen = SolidColorBackground(color: .homePageBackgroundLightGreen, colorScheme: .light)
+    static let darkGreen = SolidColorBackground(color: .homePageBackgroundDarkGreen, colorScheme: .dark)
+    static let lightBlue = SolidColorBackground(color: .homePageBackgroundLightBlue, colorScheme: .light)
+    static let darkBlue = SolidColorBackground(color: .homePageBackgroundDarkBlue, colorScheme: .dark)
+    static let lightPurple = SolidColorBackground(color: .homePageBackgroundLightPurple, colorScheme: .light)
+    static let darkPurple = SolidColorBackground(color: .homePageBackgroundDarkPurple, colorScheme: .dark)
+    static let gray = SolidColorBackground(color: .homePageBackgroundGray, colorScheme: .dark)
+    static let black = SolidColorBackground(color: .homePageBackgroundBlack, colorScheme: .dark)
 }

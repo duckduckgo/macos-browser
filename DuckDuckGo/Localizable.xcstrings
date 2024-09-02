@@ -41422,6 +41422,9 @@
         }
       }
     },
+    "Pick a color:" : {
+
+    },
     "pin.tab" : {
       "comment" : "Menu item. Pin as a verb",
       "extractionState" : "extracted_with_value",

@@ -26,15 +26,18 @@ import SwiftUIExtensions
 protocol UserColorProviding {
     var colorPublisher: AnyPublisher<NSColor, Never> { get }
 
-    func showColorPanel()
+    func showColorPanel(with color: NSColor?)
 }
 
 extension NSColorPanel: UserColorProviding {
     var colorPublisher: AnyPublisher<NSColor, Never> {
-        publisher(for: \.color).eraseToAnyPublisher()
+        publisher(for: \.color).removeDuplicates().eraseToAnyPublisher()
     }
 
-    func showColorPanel() {
+    func showColorPanel(with color: NSColor?) {
+        if let color {
+            self.color = color
+        }
         showsAlpha = false
         orderFront(nil)
     }
@@ -78,6 +81,7 @@ extension HomePage.Models {
 
         private var availableCustomImagesCancellable: AnyCancellable?
         private var userColorCancellable: AnyCancellable?
+        private var customBackgroundPixelCancellable: AnyCancellable?
 
         convenience init(openSettings: @escaping () -> Void) {
             self.init(
@@ -145,6 +149,25 @@ extension HomePage.Models {
                     }
                 })
                 .assign(to: \.availableUserBackgroundImages, onWeaklyHeld: self)
+
+            customBackgroundPixelCancellable = $customBackground
+                .throttle(for: .seconds(1), scheduler: DispatchQueue.main, latest: true)
+                .sink { customBackground in
+                    switch customBackground {
+                    case .gradient:
+                        sendPixel(NewTabBackgroundPixel.newTabBackgroundSelectedGradient)
+                    case .solidColor:
+                        sendPixel(NewTabBackgroundPixel.newTabBackgroundSelectedSolidColor)
+                    case .userImage:
+                        sendPixel(NewTabBackgroundPixel.newTabBackgroundSelectedUserImage)
+                    case .none:
+                        sendPixel(NewTabBackgroundPixel.newTabBackgroundReset)
+                    }
+                }
+
+            if let customColor = NSColor(hex: lastPickedCustomColorHexValue) {
+                lastPickedCustomColor = customColor
+            }
         }
 
         var hasUserImages: Bool {
@@ -191,18 +214,6 @@ extension HomePage.Models {
                 } else {
                     Logger.homePageSettings.debug("Home page background reset")
                 }
-                switch customBackground {
-                case .gradient:
-                    sendPixel(NewTabBackgroundPixel.newTabBackgroundSelectedGradient)
-                case .solidColor:
-                    sendPixel(NewTabBackgroundPixel.newTabBackgroundSelectedSolidColor)
-                case .illustration:
-                    sendPixel(NewTabBackgroundPixel.newTabBackgroundSelectedIllustration)
-                case .userImage:
-                    sendPixel(NewTabBackgroundPixel.newTabBackgroundSelectedUserImage)
-                case .none:
-                    sendPixel(NewTabBackgroundPixel.newTabBackgroundReset)
-                }
             }
         }
 
@@ -223,21 +234,25 @@ extension HomePage.Models {
             }
         }
 
-        @Published var customColor: Color = .white
+        var lastPickedCustomColor: NSColor = .white {
+            didSet {
+                lastPickedCustomColorHexValue = lastPickedCustomColor.hex()
+            }
+        }
+
+        @UserDefaultsWrapper(key: .homePageLastPickedCustomColor, defaultValue: "#FFFFFF")
+        private var lastPickedCustomColorHexValue: String
 
         func openColorPanel() {
             let provider = userColorProvider()
-            userColorCancellable = provider.colorPublisher
-                .map { color -> Color in
-                    if #available(macOS 12.0, *) {
-                        return Color(nsColor: color)
-                    } else {
-                        return Color(hue: color.hueComponent, saturation: color.saturationComponent, brightness: color.brightnessComponent)
-                    }
-                }
-                .assign(to: \.customColor, onWeaklyHeld: self)
+            provider.showColorPanel(with: NSColor(hex: lastPickedCustomColorHexValue))
 
-            provider.showColorPanel()
+            userColorCancellable = provider.colorPublisher.dropFirst()
+                .handleEvents(receiveOutput: { [weak self] color in
+                    self?.lastPickedCustomColor = color
+                })
+                .map { CustomBackground.solidColor(.init(color: $0)) }
+                .assign(to: \.customBackground, onWeaklyHeld: self)
         }
 
         func onDisappear() {
