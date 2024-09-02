@@ -20,6 +20,50 @@ import Foundation
 import Common
 import SecureStorage
 
+public protocol PIRScanResults {
+    func matchesFoundCount() -> Int
+}
+
+public final class DefaultPIRScanResults: PIRScanResults {
+
+    public init() {}
+
+    public func matchesFoundCount() -> Int {
+
+        let database = DataBrokerProtectionDatabase(pixelHandler: DataBrokerProtectionPixelsHandler())
+
+        do  {
+            let queryData = try database.fetchAllBrokerProfileQueryData()
+            return matchesCount(forQueryData: queryData)
+        } catch {
+            return 0
+        }
+    }
+}
+
+private extension DefaultPIRScanResults {
+
+    func matchesCount(forQueryData queryData: [BrokerProfileQueryData]) -> Int {
+
+        return queryData.reduce(0) { count, data in
+            var profileCount = count
+
+            for _ in data.extractedProfiles where !data.profileQuery.deprecated {
+                profileCount += 1
+
+                if !data.dataBroker.mirrorSites.isEmpty {
+                    let mirrorSitesCount = data.dataBroker.mirrorSites.reduce(0) { mirrorCount, mirrorSite in
+                        return mirrorCount + (mirrorSite.shouldWeIncludeMirrorSite() ? 1 : 0)
+                    }
+                    profileCount += mirrorSitesCount
+                }
+            }
+
+            return profileCount
+        }
+    }
+}
+
 protocol DataBrokerProtectionRepository {
     func save(_ profile: DataBrokerProtectionProfile) async throws
     func fetchProfile() throws -> DataBrokerProtectionProfile?

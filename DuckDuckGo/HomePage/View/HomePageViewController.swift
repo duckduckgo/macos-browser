@@ -35,6 +35,7 @@ final class HomePageViewController: NSViewController {
     private let freemiumPIRFeature: FreemiumPIRFeature
     private var freemiumPIRUserState: FreemiumPIRUserState
     private let freemiumPIRPresenter: FreemiumPIRPresenter
+    private var freemiumPIRScanResultPolling: DefaultFreemiumPIRScanResultPolling
 
     private(set) lazy var faviconsFetcherOnboarding: FaviconsFetcherOnboarding? = {
         guard let syncService = NSApp.delegateTyped.syncService, let syncBookmarksAdapter = NSApp.delegateTyped.syncDataProviders?.bookmarksAdapter else {
@@ -84,6 +85,15 @@ final class HomePageViewController: NSViewController {
         self.freemiumPIRFeature = freemiumPIRFeature
         self.freemiumPIRUserState = freemiumPIRUserState
         self.freemiumPIRPresenter = freemiumPIRPresenter
+        self.freemiumPIRScanResultPolling = DefaultFreemiumPIRScanResultPolling {
+            let alert = NSAlert()
+            alert.messageText = "Alert Title"
+            alert.informativeText = "This is a simple alert message."
+            alert.alertStyle = .warning // You can also use .informational, .critical
+            alert.addButton(withTitle: "OK")
+
+            alert.runModal()
+        }
 
         super.init(nibName: nil, bundle: nil)
     }

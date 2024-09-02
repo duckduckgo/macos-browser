@@ -19,6 +19,10 @@
 import Foundation
 import Common
 
+public extension Notification.Name {
+    static let pirFirstProfileSaved = Notification.Name("pirFirstProfileSaved")
+}
+
 public protocol DataBrokerProtectionDataManaging {
     var cache: InMemoryDataCache { get }
     var delegate: DataBrokerProtectionDataManagerDelegate? { get set }
@@ -52,6 +56,9 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
     }
 
     public func saveProfile(_ profile: DataBrokerProtectionProfile) async throws {
+
+        NotificationCenter.default.post(name: .pirFirstProfileSaved, object: nil)
+
         do {
             try await database.save(profile)
         } catch {

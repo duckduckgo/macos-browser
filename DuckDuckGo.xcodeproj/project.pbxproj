@@ -2605,6 +2605,8 @@
 		C18BF9D22C736C9700ED6B8A /* Freemium in Frameworks */ = {isa = PBXBuildFile; productRef = C18BF9D12C736C9700ED6B8A /* Freemium */; };
 		C1B1CBE12BE1915100B6049C /* DataImportShortcutsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B1CBE02BE1915100B6049C /* DataImportShortcutsViewModel.swift */; };
 		C1B1CBE22BE1915100B6049C /* DataImportShortcutsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B1CBE02BE1915100B6049C /* DataImportShortcutsViewModel.swift */; };
+		C1B567242C85927A00EF050A /* FreemiumPIRScanResultPolling.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B567232C85927A00EF050A /* FreemiumPIRScanResultPolling.swift */; };
+		C1B567252C85927A00EF050A /* FreemiumPIRScanResultPolling.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B567232C85927A00EF050A /* FreemiumPIRScanResultPolling.swift */; };
 		C1C405872C7F80E50089DE8A /* PromotionView+FreemiumPIR.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1C405862C7F80E50089DE8A /* PromotionView+FreemiumPIR.swift */; };
 		C1C405882C7F80E50089DE8A /* PromotionView+FreemiumPIR.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1C405862C7F80E50089DE8A /* PromotionView+FreemiumPIR.swift */; };
 		C1D8BE452C1739E70057E426 /* DataBrokerProtectionMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1D8BE442C1739E70057E426 /* DataBrokerProtectionMocks.swift */; };
@@ -4276,6 +4278,7 @@
 		C18194662C7F60E500381092 /* FreemiumPIRPresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreemiumPIRPresenterTests.swift; sourceTree = "<group>"; };
 		C1858CD12C7C971D00C9BEAB /* FreemiumPIRFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreemiumPIRFeature.swift; sourceTree = "<group>"; };
 		C1B1CBE02BE1915100B6049C /* DataImportShortcutsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportShortcutsViewModel.swift; sourceTree = "<group>"; };
+		C1B567232C85927A00EF050A /* FreemiumPIRScanResultPolling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreemiumPIRScanResultPolling.swift; sourceTree = "<group>"; };
 		C1C405862C7F80E50089DE8A /* PromotionView+FreemiumPIR.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PromotionView+FreemiumPIR.swift"; sourceTree = "<group>"; };
 		C1D8BE442C1739E70057E426 /* DataBrokerProtectionMocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionMocks.swift; sourceTree = "<group>"; };
 		C1DAF3B42B9A44860059244F /* AutofillPopoverPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillPopoverPresenter.swift; sourceTree = "<group>"; };
@@ -8543,6 +8546,7 @@
 				C1858CD12C7C971D00C9BEAB /* FreemiumPIRFeature.swift */,
 				C18194632C7DF7D600381092 /* FreemiumPIRPresenter.swift */,
 				C1C405862C7F80E50089DE8A /* PromotionView+FreemiumPIR.swift */,
+				C1B567232C85927A00EF050A /* FreemiumPIRScanResultPolling.swift */,
 			);
 			path = PIR;
 			sourceTree = "<group>";
@@ -10543,6 +10547,7 @@
 				3706FC07293F65D500E42796 /* ScriptSourceProviding.swift in Sources */,
 				31EF1E832B63FFCA00E6DB17 /* LoginItem+DataBrokerProtection.swift in Sources */,
 				021EA0812BD2A9D500772C9A /* TabsPreferences.swift in Sources */,
+				C1B567252C85927A00EF050A /* FreemiumPIRScanResultPolling.swift in Sources */,
 				B6619EFC2B111CC600CD9186 /* InstructionsFormatParser.swift in Sources */,
 				3706FC08293F65D500E42796 /* CoreDataBookmarkImporter.swift in Sources */,
 				3706FC09293F65D500E42796 /* SuggestionViewModel.swift in Sources */,
@@ -12130,6 +12135,7 @@
 				B687B7CA2947A029001DEA6F /* ContentBlockingTabExtension.swift in Sources */,
 				85B7184C27677C6500B4277F /* OnboardingViewController.swift in Sources */,
 				4B379C1E27BDB7FF008A968E /* DeviceAuthenticator.swift in Sources */,
+				C1B567242C85927A00EF050A /* FreemiumPIRScanResultPolling.swift in Sources */,
 				1456D6E124EFCBC300775049 /* TabBarCollectionView.swift in Sources */,
 				C181945F2C7CDD0E00381092 /* PromotionViewModel.swift in Sources */,
 				4B4D60BF2A0C848A00BCD287 /* NetworkProtection+ConvenienceInitializers.swift in Sources */,
