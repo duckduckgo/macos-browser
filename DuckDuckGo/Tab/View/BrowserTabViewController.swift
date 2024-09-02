@@ -195,12 +195,14 @@ final class BrowserTabViewController: NSViewController {
 
     @objc
     private func onCloseInlinePasswordImportFlow(_ notification: Notification) {
-        guard WindowControllersManager.shared.lastKeyMainWindowController === self.view.window?.windowController,
-              let previouslySelectedTab else { return }
-
-        tabCollectionViewModel.select(tab: previouslySelectedTab)
-        previouslySelectedTab.webView.evaluateJavaScript("window.credentialsImportFinished()", in: nil, in: WKContentWorld.defaultClient)
-        self.previouslySelectedTab = nil
+        guard WindowControllersManager.shared.lastKeyMainWindowController === self.view.window?.windowController else { return }
+        if let previouslySelectedTab {
+            tabCollectionViewModel.select(tab: previouslySelectedTab)
+            previouslySelectedTab.webView.evaluateJavaScript("window.credentialsImportFinished()", in: nil, in: WKContentWorld.defaultClient)
+            self.previouslySelectedTab = nil
+        } else {
+            webView?.evaluateJavaScript("window.credentialsImportFinished()", in: nil, in: WKContentWorld.defaultClient)
+        }
     }
 
     @objc
