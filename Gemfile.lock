@@ -1,9 +1,9 @@
 GIT
   remote: https://github.com/duckduckgo/fastlane-plugin-ddg_apple_automation
-  revision: a207fdee88bd26b877c973dfbf45038eff19ec17
-  tag: 0.4.0
+  revision: 857c55c75a1153746a2db89710b6d69c241d534f
+  tag: 0.5.0
   specs:
-    fastlane-plugin-ddg_apple_automation (0.4.0)
+    fastlane-plugin-ddg_apple_automation (0.5.0)
 
 GEM
   remote: https://rubygems.org/
@@ -17,8 +17,8 @@ GEM
     artifactory (3.0.17)
     atomos (0.1.3)
     aws-eventstream (1.3.0)
-    aws-partitions (1.968.0)
-    aws-sdk-core (3.201.5)
+    aws-partitions (1.970.0)
+    aws-sdk-core (3.202.2)
       aws-eventstream (~> 1, >= 1.3.0)
       aws-partitions (~> 1, >= 1.651.0)
       aws-sigv4 (~> 1.9)
