@@ -50,7 +50,7 @@ final class DataBrokerProtectionFeatureGatekeeperTests: XCTestCase {
                                                            userDefaults: userDefaults(),
                                                            subscriptionAvailability: mockFeatureAvailability,
                                                            accountManager: mockAccountManager,
-                                                           freemiumPIRUserState: mockFreemiumPIRUserState)
+                                                           freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         // When
         let result = await sut.arePrerequisitesSatisfied()
@@ -68,7 +68,7 @@ final class DataBrokerProtectionFeatureGatekeeperTests: XCTestCase {
                                                            userDefaults: userDefaults(),
                                                            subscriptionAvailability: mockFeatureAvailability,
                                                            accountManager: mockAccountManager,
-                                                           freemiumPIRUserState: mockFreemiumPIRUserState)
+                                                           freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         // When
         let result = await sut.arePrerequisitesSatisfied()
@@ -86,7 +86,7 @@ final class DataBrokerProtectionFeatureGatekeeperTests: XCTestCase {
                                                            userDefaults: userDefaults(),
                                                            subscriptionAvailability: mockFeatureAvailability,
                                                            accountManager: mockAccountManager,
-                                                           freemiumPIRUserState: mockFreemiumPIRUserState)
+                                                           freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         // When
         let result = await sut.arePrerequisitesSatisfied()
@@ -104,7 +104,7 @@ final class DataBrokerProtectionFeatureGatekeeperTests: XCTestCase {
                                                            userDefaults: userDefaults(),
                                                            subscriptionAvailability: mockFeatureAvailability,
                                                            accountManager: mockAccountManager,
-                                                           freemiumPIRUserState: mockFreemiumPIRUserState)
+                                                           freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         // When
         let result = await sut.arePrerequisitesSatisfied()
@@ -122,7 +122,7 @@ final class DataBrokerProtectionFeatureGatekeeperTests: XCTestCase {
                                                            userDefaults: userDefaults(),
                                                            subscriptionAvailability: mockFeatureAvailability,
                                                            accountManager: mockAccountManager,
-                                                           freemiumPIRUserState: mockFreemiumPIRUserState)
+                                                           freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         // When
         let result = await sut.arePrerequisitesSatisfied()
@@ -140,7 +140,7 @@ final class DataBrokerProtectionFeatureGatekeeperTests: XCTestCase {
                                                            userDefaults: userDefaults(),
                                                            subscriptionAvailability: mockFeatureAvailability,
                                                            accountManager: mockAccountManager,
-                                                           freemiumPIRUserState: mockFreemiumPIRUserState)
+                                                           freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         // When
         let result = await sut.arePrerequisitesSatisfied()

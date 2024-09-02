@@ -59,7 +59,7 @@ final class MoreOptionsMenu: NSMenu {
     private lazy var sharingMenu: NSMenu = SharingMenu(title: UserText.shareMenuItem)
     private var accountManager: AccountManager { subscriptionManager.accountManager }
     private let subscriptionManager: SubscriptionManager
-    private var freemiumPIRUserState: FreemiumPIRUserState
+    private var freemiumPIRUserStateManager: FreemiumPIRUserStateManager
     private let freemiumPIRFeature: FreemiumPIRFeature
     private let freemiumPIRPresenter: FreemiumPIRPresenter
     private let appearancePreferences: AppearancePreferences
@@ -79,7 +79,7 @@ final class MoreOptionsMenu: NSMenu {
          sharingMenu: NSMenu? = nil,
          internalUserDecider: InternalUserDecider,
          subscriptionManager: SubscriptionManager,
-         freemiumPIRUserState: FreemiumPIRUserState,
+         freemiumPIRUserStateManager: FreemiumPIRUserStateManager,
          freemiumPIRFeature: FreemiumPIRFeature,
          freemiumPIRPresenter: FreemiumPIRPresenter = DefaultFreemiumPIRPresenter(),
          appearancePreferences: AppearancePreferences = .shared) {
@@ -91,7 +91,7 @@ final class MoreOptionsMenu: NSMenu {
         self.subscriptionFeatureAvailability = subscriptionFeatureAvailability
         self.internalUserDecider = internalUserDecider
         self.subscriptionManager = subscriptionManager
-        self.freemiumPIRUserState = freemiumPIRUserState
+        self.freemiumPIRUserStateManager = freemiumPIRUserStateManager
         self.freemiumPIRFeature = freemiumPIRFeature
         self.freemiumPIRPresenter = freemiumPIRPresenter
         self.appearancePreferences = appearancePreferences
@@ -261,9 +261,9 @@ final class MoreOptionsMenu: NSMenu {
     @objc func openFreemiumPIR(_ sender: NSMenuItem) {
 
         // TODO: Remove this
-        freemiumPIRUserState.didOnboard = true
+        freemiumPIRUserStateManager.didOnboard = true
         // ------
-        freemiumPIRPresenter.showFreemiumPIR(didOnboard: freemiumPIRUserState.didOnboard, windowControllerManager: WindowControllersManager.shared)
+        freemiumPIRPresenter.showFreemiumPIR(didOnboard: freemiumPIRUserStateManager.didOnboard, windowControllerManager: WindowControllersManager.shared)
         appearancePreferences.isHomePagePromotionVisible = false
     }
 

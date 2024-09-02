@@ -1938,7 +1938,7 @@ struct MockMigrationsProvider: DataBrokerProtectionDatabaseMigrationsProvider {
     }
 }
 
-final class MockFreemiumPIRUserState: FreemiumPIRUserState {
+final class MockFreemiumPIRUserState: FreemiumPIRUserStateManager {
     var didOnboard = false
     var isActiveUser = false
 }

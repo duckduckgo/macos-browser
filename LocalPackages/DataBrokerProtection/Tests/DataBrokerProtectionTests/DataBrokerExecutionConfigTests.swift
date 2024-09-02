@@ -30,7 +30,7 @@ final class DataBrokerExecutionConfigTests: XCTestCase {
         XCTAssertEqual(value, expectedValue)
     }
 
-    func testWhenOperationIsScheduledScans_thenConcurrentOperationsBetweenBrokersIsSix() {
+    func testWhenOperationIsScheduledScans_thenConcurrentOperationsBetweenBrokersIsTwo() {
         let value = sut.concurrentOperationsFor(.scheduledScan)
         let expectedValue = 2
         XCTAssertEqual(value, expectedValue)

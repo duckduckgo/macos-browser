@@ -676,10 +676,10 @@ final class BrowserTabViewController: NSViewController {
         return homePageViewController ?? {
             let subscriptionManager = Application.appDelegate.subscriptionManager
             let freemiumPIRFeature = DefaultFreemiumPIRFeature(subscriptionManager: subscriptionManager, accountManager: subscriptionManager.accountManager)
-            let freemiumPIRUserState = DefaultFreemiumPIRUserState(userDefaults: .dbp, accountManager: subscriptionManager.accountManager)
+            let freemiumPIRUserStateManager = DefaultFreemiumPIRUserStateManager(userDefaults: .dbp, accountManager: subscriptionManager.accountManager)
             let homePageViewController = HomePageViewController(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager,
                                                                 freemiumPIRFeature: freemiumPIRFeature,
-                                                                freemiumPIRUserState: freemiumPIRUserState)
+                                                                freemiumPIRUserStateManager: freemiumPIRUserStateManager)
             self.homePageViewController = homePageViewController
             return homePageViewController
         }()

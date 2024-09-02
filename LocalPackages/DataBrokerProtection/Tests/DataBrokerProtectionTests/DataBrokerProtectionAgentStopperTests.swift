@@ -70,7 +70,7 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
                                                               stopAction: mockStopAction,
-                                                              freemiumPIRUserState: mockFreemiumPIRUserState)
+                                                              freemiumPIRUserStateManager: mockFreemiumPIRUserState)
         await stopper.validateRunPrerequisitesAndStopAgentIfNecessary()
 
         XCTAssertTrue(mockStopAction.wasStopCalled)
@@ -87,7 +87,7 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
                                                               stopAction: mockStopAction,
-                                                              freemiumPIRUserState: mockFreemiumPIRUserState)
+                                                              freemiumPIRUserStateManager: mockFreemiumPIRUserState)
         await stopper.validateRunPrerequisitesAndStopAgentIfNecessary()
 
         XCTAssertTrue(mockStopAction.wasStopCalled)
@@ -104,7 +104,7 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
                                                               stopAction: mockStopAction,
-                                                              freemiumPIRUserState: mockFreemiumPIRUserState)
+                                                              freemiumPIRUserStateManager: mockFreemiumPIRUserState)
         await stopper.validateRunPrerequisitesAndStopAgentIfNecessary()
 
         XCTAssertTrue(mockStopAction.wasStopCalled)
@@ -121,7 +121,7 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
                                                               stopAction: mockStopAction,
-                                                              freemiumPIRUserState: mockFreemiumPIRUserState)
+                                                              freemiumPIRUserStateManager: mockFreemiumPIRUserState)
         await stopper.validateRunPrerequisitesAndStopAgentIfNecessary()
 
         XCTAssertTrue(mockStopAction.wasStopCalled)
@@ -138,7 +138,7 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
                                                               stopAction: mockStopAction,
-                                                              freemiumPIRUserState: mockFreemiumPIRUserState)
+                                                              freemiumPIRUserStateManager: mockFreemiumPIRUserState)
         await stopper.validateRunPrerequisitesAndStopAgentIfNecessary()
 
         XCTAssertTrue(mockStopAction.wasStopCalled)
@@ -155,7 +155,7 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
                                                               stopAction: mockStopAction,
-                                                              freemiumPIRUserState: mockFreemiumPIRUserState)
+                                                              freemiumPIRUserStateManager: mockFreemiumPIRUserState)
         await stopper.validateRunPrerequisitesAndStopAgentIfNecessary()
 
         XCTAssertFalse(mockStopAction.wasStopCalled)
@@ -172,7 +172,7 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
                                                               stopAction: mockStopAction,
-                                                              freemiumPIRUserState: mockFreemiumPIRUserState)
+                                                              freemiumPIRUserStateManager: mockFreemiumPIRUserState)
         await stopper.validateRunPrerequisitesAndStopAgentIfNecessary()
 
         XCTAssertTrue(mockStopAction.wasStopCalled)
@@ -189,7 +189,7 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
                                                               stopAction: mockStopAction,
-                                                              freemiumPIRUserState: mockFreemiumPIRUserState)
+                                                              freemiumPIRUserStateManager: mockFreemiumPIRUserState)
         await stopper.validateRunPrerequisitesAndStopAgentIfNecessary()
 
         XCTAssertTrue(mockStopAction.wasStopCalled)
@@ -206,7 +206,7 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
                                                               stopAction: mockStopAction,
-                                                              freemiumPIRUserState: mockFreemiumPIRUserState)
+                                                              freemiumPIRUserStateManager: mockFreemiumPIRUserState)
         await stopper.validateRunPrerequisitesAndStopAgentIfNecessary()
 
         XCTAssertTrue(mockStopAction.wasStopCalled)
@@ -223,7 +223,7 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
                                                               stopAction: mockStopAction,
-                                                              freemiumPIRUserState: mockFreemiumPIRUserState)
+                                                              freemiumPIRUserStateManager: mockFreemiumPIRUserState)
         await stopper.validateRunPrerequisitesAndStopAgentIfNecessary()
 
         XCTAssertFalse(mockStopAction.wasStopCalled)
@@ -239,7 +239,7 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
                                                               stopAction: mockStopAction,
-                                                              freemiumPIRUserState: mockFreemiumPIRUserState)
+                                                              freemiumPIRUserStateManager: mockFreemiumPIRUserState)
         await stopper.validateRunPrerequisitesAndStopAgentIfNecessary()
 
         XCTAssertFalse(mockStopAction.wasStopCalled)
@@ -256,7 +256,7 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
                                                               stopAction: mockStopAction,
-                                                              freemiumPIRUserState: mockFreemiumPIRUserState)
+                                                              freemiumPIRUserStateManager: mockFreemiumPIRUserState)
         await stopper.validateRunPrerequisitesAndStopAgentIfNecessary()
 
         XCTAssertFalse(mockStopAction.wasStopCalled)
@@ -273,7 +273,7 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
                                                               stopAction: mockStopAction,
-                                                              freemiumPIRUserState: mockFreemiumPIRUserState)
+                                                              freemiumPIRUserStateManager: mockFreemiumPIRUserState)
         await stopper.validateRunPrerequisitesAndStopAgentIfNecessary()
 
         XCTAssertFalse(mockStopAction.wasStopCalled)
@@ -290,7 +290,7 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
                                                               stopAction: mockStopAction,
-                                                              freemiumPIRUserState: mockFreemiumPIRUserState)
+                                                              freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         let expectation = XCTestExpectation(description: "Wait for monitor")
         stopper.monitorEntitlementAndStopAgentIfEntitlementIsInvalidAndUserIsNotFreemium(interval: 0.1)
@@ -314,7 +314,7 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
                                                               stopAction: mockStopAction,
-                                                              freemiumPIRUserState: mockFreemiumPIRUserState)
+                                                              freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         let expectation = XCTestExpectation(description: "Wait for monitor")
         stopper.monitorEntitlementAndStopAgentIfEntitlementIsInvalidAndUserIsNotFreemium(interval: 0.1)
@@ -338,7 +338,7 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
                                                               stopAction: mockStopAction,
-                                                              freemiumPIRUserState: mockFreemiumPIRUserState)
+                                                              freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         let expectation = XCTestExpectation(description: "Wait for monitor")
         stopper.monitorEntitlementAndStopAgentIfEntitlementIsInvalidAndUserIsNotFreemium(interval: 0.1)
@@ -362,7 +362,7 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
                                                               stopAction: mockStopAction,
-                                                              freemiumPIRUserState: mockFreemiumPIRUserState)
+                                                              freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         let expectation = XCTestExpectation(description: "Wait for monitor")
         stopper.monitorEntitlementAndStopAgentIfEntitlementIsInvalidAndUserIsNotFreemium(interval: 0.1)
@@ -385,7 +385,7 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
                                                               stopAction: mockStopAction,
-                                                              freemiumPIRUserState: mockFreemiumPIRUserState)
+                                                              freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         let expectation = XCTestExpectation(description: "Wait for monitor")
         stopper.monitorEntitlementAndStopAgentIfEntitlementIsInvalidAndUserIsNotFreemium(interval: 0.1)

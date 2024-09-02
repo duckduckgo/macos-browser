@@ -35,7 +35,7 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
     private let userDefaults: UserDefaults
     private let subscriptionAvailability: SubscriptionFeatureAvailability
     private let accountManager: AccountManager
-    private let freemiumPIRUserState: FreemiumPIRUserState
+    private let freemiumPIRUserStateManager: FreemiumPIRUserStateManager
 
     init(privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
          featureDisabler: DataBrokerProtectionFeatureDisabling = DataBrokerProtectionFeatureDisabler(),
@@ -43,14 +43,14 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
          userDefaults: UserDefaults = .standard,
          subscriptionAvailability: SubscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability(),
          accountManager: AccountManager,
-         freemiumPIRUserState: FreemiumPIRUserState) {
+         freemiumPIRUserStateManager: FreemiumPIRUserStateManager) {
         self.privacyConfigurationManager = privacyConfigurationManager
         self.featureDisabler = featureDisabler
         self.pixelHandler = pixelHandler
         self.userDefaults = userDefaults
         self.subscriptionAvailability = subscriptionAvailability
         self.accountManager = accountManager
-        self.freemiumPIRUserState = freemiumPIRUserState
+        self.freemiumPIRUserStateManager = freemiumPIRUserStateManager
     }
 
     var isUserLocaleAllowed: Bool {
@@ -86,7 +86,7 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
     /// - Returns: Bool indicating prerequisites are satisfied
     func arePrerequisitesSatisfied() async -> Bool {
 
-        if freemiumPIRUserState.isActiveUser { return true }
+        if freemiumPIRUserStateManager.isActiveUser { return true }
 
         let entitlements = await accountManager.hasEntitlement(forProductName: .dataBrokerProtection,
                                                                cachePolicy: .reloadIgnoringLocalCacheData)

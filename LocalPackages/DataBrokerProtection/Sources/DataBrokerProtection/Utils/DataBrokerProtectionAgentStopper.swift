@@ -21,7 +21,7 @@ import Common
 import Freemium
 
 protocol DataBrokerProtectionAgentStopper {
-    /// Validates if the user has is an active freemium user, OR if they have profile data, is authenticated, and has valid entitlement. If any of these conditions are not met, the agent will be stopped.
+    /// Validates if the user is an active freemium user, OR if they have profile data, is authenticated, and has valid entitlement. If any of these conditions are not met, the agent will be stopped.
     func validateRunPrerequisitesAndStopAgentIfNecessary() async
 
     /// Monitors the entitlement package. If the entitlement check returns false, and the user is NOT an active freemium user, the agent will be stopped.
@@ -35,20 +35,20 @@ struct DefaultDataBrokerProtectionAgentStopper: DataBrokerProtectionAgentStopper
     private let authenticationManager: DataBrokerProtectionAuthenticationManaging
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let stopAction: DataProtectionStopAction
-    private let freemiumPIRUserState: FreemiumPIRUserState
+    private let freemiumPIRUserStateManager: FreemiumPIRUserStateManager
 
     init(dataManager: DataBrokerProtectionDataManaging,
          entitlementMonitor: DataBrokerProtectionEntitlementMonitoring,
          authenticationManager: DataBrokerProtectionAuthenticationManaging,
          pixelHandler: EventMapping<DataBrokerProtectionPixels>,
          stopAction: DataProtectionStopAction = DefaultDataProtectionStopAction(),
-         freemiumPIRUserState: FreemiumPIRUserState) {
+         freemiumPIRUserStateManager: FreemiumPIRUserStateManager) {
         self.dataManager = dataManager
         self.entitlementMonitor = entitlementMonitor
         self.authenticationManager = authenticationManager
         self.pixelHandler = pixelHandler
         self.stopAction = stopAction
-        self.freemiumPIRUserState = freemiumPIRUserState
+        self.freemiumPIRUserStateManager = freemiumPIRUserStateManager
     }
 
     /// Checks PIR prerequisites and stops the agent if necessary
@@ -61,7 +61,7 @@ struct DefaultDataBrokerProtectionAgentStopper: DataBrokerProtectionAgentStopper
         do {
             let hasProfile = try dataManager.fetchProfile() != nil
             let isAuthenticated = authenticationManager.isUserAuthenticated
-            let isFreemium = freemiumPIRUserState.isActiveUser
+            let isFreemium = freemiumPIRUserStateManager.isActiveUser
 
             if !hasProfile || (!isAuthenticated && !isFreemium) {
                 os_log("Prerequisites are invalid", log: .dataBrokerProtection)
@@ -86,7 +86,7 @@ struct DefaultDataBrokerProtectionAgentStopper: DataBrokerProtectionAgentStopper
     public func monitorEntitlementAndStopAgentIfEntitlementIsInvalidAndUserIsNotFreemium(interval: TimeInterval) {
         entitlementMonitor.start(checkEntitlementFunction: authenticationManager.hasValidEntitlement,
                                  interval: interval) { result in
-            guard !self.freemiumPIRUserState.isActiveUser else { return }
+            guard !self.freemiumPIRUserStateManager.isActiveUser else { return }
             stopAgentBasedOnEntitlementCheckResult(result)
         }
     }

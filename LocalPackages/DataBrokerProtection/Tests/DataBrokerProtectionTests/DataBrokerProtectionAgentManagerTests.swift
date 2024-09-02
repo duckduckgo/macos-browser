@@ -82,7 +82,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
             agentStopper: mockAgentStopper,
-            freemiumPIRUserState: mockFreemiumPIRUserState)
+            freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         mockDataManager.profileToReturn = mockProfile
         mockFreemiumPIRUserState.isActiveUser = false
@@ -121,7 +121,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
             agentStopper: mockAgentStopper,
-            freemiumPIRUserState: mockFreemiumPIRUserState)
+            freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         mockDataManager.profileToReturn = mockProfile
         mockFreemiumPIRUserState.isActiveUser = true
@@ -156,7 +156,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
                                                                    entitlementMonitor: DataBrokerProtectionEntitlementMonitor(),
                                                                    authenticationManager: MockAuthenticationManager(),
                                                                    pixelHandler: mockPixelHandler,
-                                                                   stopAction: mockStopAction, freemiumPIRUserState: MockFreemiumPIRUserState())
+                                                                   stopAction: mockStopAction, freemiumPIRUserStateManager: MockFreemiumPIRUserState())
         sut = DataBrokerProtectionAgentManager(
             userNotificationService: mockNotificationService,
             activityScheduler: mockActivityScheduler,
@@ -166,7 +166,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
             agentStopper: agentStopper,
-            freemiumPIRUserState: mockFreemiumPIRUserState)
+            freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         mockDataManager.profileToReturn = nil
         mockFreemiumPIRUserState.isActiveUser = true
@@ -200,7 +200,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
             agentStopper: mockAgentStopper,
-            freemiumPIRUserState: mockFreemiumPIRUserState)
+            freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         mockDataManager.profileToReturn = nil
 
@@ -238,7 +238,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
             agentStopper: mockAgentStopper,
-            freemiumPIRUserState: mockFreemiumPIRUserState)
+            freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         mockDataManager.profileToReturn = mockProfile
         mockFreemiumPIRUserState.isActiveUser = false
@@ -266,7 +266,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
             agentStopper: mockAgentStopper,
-            freemiumPIRUserState: mockFreemiumPIRUserState)
+            freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         mockDataManager.profileToReturn = mockProfile
         mockFreemiumPIRUserState.isActiveUser = true
@@ -294,7 +294,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
             agentStopper: mockAgentStopper,
-            freemiumPIRUserState: mockFreemiumPIRUserState)
+            freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         mockDataManager.profileToReturn = mockProfile
         mockFreemiumPIRUserState.isActiveUser = false
@@ -322,7 +322,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
             agentStopper: mockAgentStopper,
-            freemiumPIRUserState: mockFreemiumPIRUserState)
+            freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         mockDataManager.profileToReturn = mockProfile
         mockFreemiumPIRUserState.isActiveUser = true
@@ -350,7 +350,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
             agentStopper: mockAgentStopper,
-            freemiumPIRUserState: mockFreemiumPIRUserState)
+            freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         mockNotificationService.reset()
 
@@ -372,7 +372,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
             agentStopper: mockAgentStopper,
-            freemiumPIRUserState: mockFreemiumPIRUserState)
+            freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         mockNotificationService.reset()
 
@@ -394,7 +394,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
             agentStopper: mockAgentStopper,
-            freemiumPIRUserState: mockFreemiumPIRUserState)
+            freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         mockNotificationService.reset()
         mockQueueManager.startImmediateScanOperationsIfPermittedCompletionError = DataBrokerProtectionAgentErrorCollection(oneTimeError: NSError(domain: "test", code: 10))
@@ -417,7 +417,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
             agentStopper: mockAgentStopper,
-            freemiumPIRUserState: mockFreemiumPIRUserState)
+            freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         mockNotificationService.reset()
         mockDataManager.shouldReturnHasMatches = true
@@ -440,7 +440,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
             agentStopper: mockAgentStopper,
-            freemiumPIRUserState: mockFreemiumPIRUserState)
+            freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         mockNotificationService.reset()
         mockDataManager.shouldReturnHasMatches = false
@@ -463,7 +463,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
             agentStopper: mockAgentStopper,
-            freemiumPIRUserState: mockFreemiumPIRUserState)
+            freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         mockFreemiumPIRUserState.isActiveUser = false
 
@@ -490,7 +490,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
             agentStopper: mockAgentStopper,
-            freemiumPIRUserState: mockFreemiumPIRUserState)
+            freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         mockFreemiumPIRUserState.isActiveUser = true
 

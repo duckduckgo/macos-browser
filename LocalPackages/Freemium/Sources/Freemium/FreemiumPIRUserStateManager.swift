@@ -1,5 +1,5 @@
 //
-//  FreemiumPIRUserState.swift
+//  FreemiumPIRUserStateManager.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -19,16 +19,16 @@
 import Foundation
 import Subscription
 
-/// `FreemiumPIRUserState` types provide access to Freemium PIR-related state
-public protocol FreemiumPIRUserState {
+/// `FreemiumPIRUserStateManager` types provide access to Freemium PIR-related state
+public protocol FreemiumPIRUserStateManager {
     var didOnboard: Bool { get set }
 
     /// `isActiveUser` implementations`should only return `true` if the current user DOES NOT have a subscription
     var isActiveUser: Bool { get }
 }
 
-/// Default implementation of `FreemiumPIRUserState`. `UserDefaults` is used as underlying storage.
-public final class DefaultFreemiumPIRUserState: FreemiumPIRUserState {
+/// Default implementation of `FreemiumPIRUserStateManager`. `UserDefaults` is used as underlying storage.
+public final class DefaultFreemiumPIRUserStateManager: FreemiumPIRUserStateManager {
 
     private enum Keys {
         static let didOnboard = "macos.browser.freemium.pir.did.onboard"

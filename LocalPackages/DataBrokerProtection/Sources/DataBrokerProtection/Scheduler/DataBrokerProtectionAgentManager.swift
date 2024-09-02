@@ -75,13 +75,13 @@ public class DataBrokerProtectionAgentManagerProvider {
                                                          emailService: emailService,
                                                          captchaService: captchaService)
 
-        let freemiumPIRUserState = DefaultFreemiumPIRUserState(userDefaults: .dbp, accountManager: accountManager)
+        let freemiumPIRUserStateManager = DefaultFreemiumPIRUserStateManager(userDefaults: .dbp, accountManager: accountManager)
 
         let agentstopper = DefaultDataBrokerProtectionAgentStopper(dataManager: dataManager,
                                                                    entitlementMonitor: DataBrokerProtectionEntitlementMonitor(),
                                                                    authenticationManager: authenticationManager,
                                                                    pixelHandler: pixelHandler,
-                                                                   freemiumPIRUserState: freemiumPIRUserState)
+                                                                   freemiumPIRUserStateManager: freemiumPIRUserStateManager)
 
         let operationDependencies = DefaultDataBrokerOperationDependencies(
             database: dataManager.database,
@@ -100,7 +100,7 @@ public class DataBrokerProtectionAgentManagerProvider {
             operationDependencies: operationDependencies,
             pixelHandler: pixelHandler,
             agentStopper: agentstopper,
-            freemiumPIRUserState: freemiumPIRUserState)
+            freemiumPIRUserStateManager: freemiumPIRUserStateManager)
     }
 }
 
@@ -114,7 +114,7 @@ public final class DataBrokerProtectionAgentManager {
     private let operationDependencies: DataBrokerOperationDependencies
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let agentStopper: DataBrokerProtectionAgentStopper
-    private let freemiumPIRUserState: FreemiumPIRUserState
+    private let freemiumPIRUserStateManager: FreemiumPIRUserStateManager
 
     // Used for debug functions only, so not injected
     private lazy var browserWindowManager = BrowserWindowManager()
@@ -129,7 +129,7 @@ public final class DataBrokerProtectionAgentManager {
          operationDependencies: DataBrokerOperationDependencies,
          pixelHandler: EventMapping<DataBrokerProtectionPixels>,
          agentStopper: DataBrokerProtectionAgentStopper,
-         freemiumPIRUserState: FreemiumPIRUserState
+         freemiumPIRUserStateManager: FreemiumPIRUserStateManager
     ) {
         self.userNotificationService = userNotificationService
         self.activityScheduler = activityScheduler
@@ -139,7 +139,7 @@ public final class DataBrokerProtectionAgentManager {
         self.operationDependencies = operationDependencies
         self.pixelHandler = pixelHandler
         self.agentStopper = agentStopper
-        self.freemiumPIRUserState = freemiumPIRUserState
+        self.freemiumPIRUserStateManager = freemiumPIRUserStateManager
 
         self.activityScheduler.delegate = self
         self.ipcServer.serverDelegate = self
@@ -197,7 +197,7 @@ private extension DataBrokerProtectionAgentManager {
     func startFreemiumOrSubscriptionScheduledOperations(showWebView: Bool,
                                                         operationDependencies: DataBrokerOperationDependencies,
                                                         completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
-        if freemiumPIRUserState.isActiveUser {
+        if freemiumPIRUserStateManager.isActiveUser {
             queueManager.startScheduledScanOperationsIfPermitted(showWebView: showWebView, operationDependencies: operationDependencies, completion: completion)
         } else {
             queueManager.startScheduledAllOperationsIfPermitted(showWebView: showWebView, operationDependencies: operationDependencies, completion: completion)
