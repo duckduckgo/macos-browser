@@ -17,17 +17,24 @@
 //
 
 import Foundation
+import PixelKit
+import os.log
 
 protocol OnboardingExperimentManager {
     func assignUserToCohort()
-    func sendEnrollmentPixel()
-    func getPixelParameters() -> [String: String]?
+    func getPixelParameters(cohort: Bool, date: Bool, experimentName: Bool) -> [String: String]?
 }
 
 // https://app.asana.com/0/72649045549333/1208088257884523/f
 struct DuckPlayerOnboardingExperiment: OnboardingExperimentManager {
     private let userDefaults: UserDefaults
     private let preferences: DuckPlayerPreferences
+
+    init(userDefault: UserDefaults = .standard,
+         preferences: DuckPlayerPreferences = .shared) {
+        self.userDefaults = userDefault
+        self.preferences = preferences
+    }
 
     enum Cohort: String {
         case control
@@ -41,34 +48,51 @@ struct DuckPlayerOnboardingExperiment: OnboardingExperimentManager {
     private var enrollmentDate: Date?
 
     func assignUserToCohort() {
+        guard !userDefaults.didRunEnrollment else {
+            Logger.duckPlayerOnboardingExperiment.debug("Cohort already assigned, skipping...")
+            return
+        }
+
         let cohort: Cohort = Bool.random() ? .experiment : .control
         userDefaults.experimentCohort = cohort
         userDefaults.enrollmentDate = Date()
+        userDefaults.didRunEnrollment = true
+
+        PixelKit.fire(NonStandardEvent(DuckPlayerOnboardingExperimentPixel.enrollmentPixel))
+        Logger.duckPlayerOnboardingExperiment.debug("User assigned to cohort \(cohort.rawValue)")
     }
 
-    func sendEnrollmentPixel() {
-        // to do
-        // duckplayer_experiment_cohort_assign
-        /*
-         Sent when a user enrolls in the experiment
-         variant (Variant) = control | experiment
-         expname (experimnet name) = priming-modal
-         */
+    func sendWeeklyUniqueView() {
+        // m_mac_duck-player_weekly-unique-view
     }
+    /*
+     Duck Player DAUs
+     YouTube overlay CTR
+     SERP overlay CTR
+     Users changing settings to Never
+     Users changing settings to Always
+     */
+    func getPixelParameters(cohort: Bool = true,
+                            date: Bool = true,
+                            experimentName: Bool = true) -> [String: String]? {
+        var parameters: [String: String] = [:]
 
-    func getPixelParameters() -> [String: String]? {
-        guard isUserInExperiment,
-              let experimentCohort = experimentCohort,
-              let enrollmentDate = enrollmentDate else { return nil }
+        if let experimentCohort = experimentCohort, cohort {
+            parameters["variant"] = experimentCohort.rawValue
+        }
 
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyyMMdd"
-        let enrollmentDateString = dateFormatter.string(from: enrollmentDate)
+        if let enrollmentDate = enrollmentDate, date {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyyMMdd"
+            let enrollmentDateString = dateFormatter.string(from: enrollmentDate)
+            parameters["enrollment"] = enrollmentDateString
+        }
 
-        return [
-            "enrollment": enrollmentDateString,
-            "variant": experimentCohort.rawValue
-        ]
+        if experimentName {
+            parameters["expname"] = ExperimentPixelValues.name
+        }
+
+        return parameters.isEmpty ? nil : parameters
     }
 
     private var isUserInExperiment: Bool {
@@ -78,12 +102,21 @@ struct DuckPlayerOnboardingExperiment: OnboardingExperimentManager {
     private var experimentCohort: Cohort? {
         return userDefaults.experimentCohort
     }
+
+    func reset() {
+        userDefaults.enrollmentDate = nil
+        userDefaults.experimentCohort = nil
+        userDefaults.didRunEnrollment = false
+
+    }
 }
 
 private extension UserDefaults {
     enum Keys {
-        static let enrollmentDate = "onboarding.experiment-enrollment-date"
-        static let experimentCohort = "onboarding.experiment-cohort"
+        static let enrollmentDate = "duckplayer.onboarding.experiment-enrollment-date"
+        static let experimentCohort = "duckplayer.onboarding.experiment-cohort"
+        static let didRunEnrollment = "duckplayer.onboarding.experiment-did-run-enrollment"
+
     }
 
     var enrollmentDate: Date? {
@@ -94,5 +127,10 @@ private extension UserDefaults {
     var experimentCohort: DuckPlayerOnboardingExperiment.Cohort? {
         get { return DuckPlayerOnboardingExperiment.Cohort(rawValue: string(forKey: Keys.experimentCohort) ?? "") }
         set { set(newValue?.rawValue, forKey: Keys.experimentCohort) }
+    }
+
+    var didRunEnrollment: Bool {
+        get { return bool(forKey: Keys.didRunEnrollment) }
+        set { set(newValue, forKey: Keys.didRunEnrollment) }
     }
 }

@@ -253,6 +253,10 @@
 		31AA6B982B960BA50025014E /* DataBrokerProtectionLoginItemPixels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31AA6B962B960B870025014E /* DataBrokerProtectionLoginItemPixels.swift */; };
 		31B4AF532901A4F20013585E /* NSEventExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B4AF522901A4F20013585E /* NSEventExtension.swift */; };
 		31C3CE0228EDC1E70002C24A /* CustomRoundedCornersShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C3CE0128EDC1E70002C24A /* CustomRoundedCornersShape.swift */; };
+		31C3F9362C8636C2005556D1 /* DuckPlayerOnboardingExperimentPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C3F9352C8636C2005556D1 /* DuckPlayerOnboardingExperimentPixel.swift */; };
+		31C3F9372C8636C2005556D1 /* DuckPlayerOnboardingExperimentPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C3F9352C8636C2005556D1 /* DuckPlayerOnboardingExperimentPixel.swift */; };
+		31C3F9392C864087005556D1 /* DuckPlayerOnboardingExperiment+Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C3F9382C864087005556D1 /* DuckPlayerOnboardingExperiment+Logger.swift */; };
+		31C3F93A2C864087005556D1 /* DuckPlayerOnboardingExperiment+Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C3F9382C864087005556D1 /* DuckPlayerOnboardingExperiment+Logger.swift */; };
 		31C9ADE52AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C9ADE42AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift */; };
 		31C9ADE62AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C9ADE42AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift */; };
 		31CF3432288B0B1B0087244B /* NavigationBarBadgeAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CF3431288B0B1B0087244B /* NavigationBarBadgeAnimator.swift */; };
@@ -3172,6 +3176,8 @@
 		31AA6B962B960B870025014E /* DataBrokerProtectionLoginItemPixels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionLoginItemPixels.swift; sourceTree = "<group>"; };
 		31B4AF522901A4F20013585E /* NSEventExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSEventExtension.swift; sourceTree = "<group>"; };
 		31C3CE0128EDC1E70002C24A /* CustomRoundedCornersShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomRoundedCornersShape.swift; sourceTree = "<group>"; };
+		31C3F9352C8636C2005556D1 /* DuckPlayerOnboardingExperimentPixel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckPlayerOnboardingExperimentPixel.swift; sourceTree = "<group>"; };
+		31C3F9382C864087005556D1 /* DuckPlayerOnboardingExperiment+Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DuckPlayerOnboardingExperiment+Logger.swift"; sourceTree = "<group>"; };
 		31C5FFB82AF64D120008A79F /* DataBrokerProtectionFeatureGatekeeper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionFeatureGatekeeper.swift; sourceTree = "<group>"; };
 		31C9ADE42AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaitlistFeatureSetupHandler.swift; sourceTree = "<group>"; };
 		31CF3431288B0B1B0087244B /* NavigationBarBadgeAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarBadgeAnimator.swift; sourceTree = "<group>"; };
@@ -5043,6 +5049,8 @@
 			isa = PBXGroup;
 			children = (
 				31EEBADE2C85F74A001BF112 /* DuckPlayerOnboardingExperiment.swift */,
+				31C3F9352C8636C2005556D1 /* DuckPlayerOnboardingExperimentPixel.swift */,
+				31C3F9382C864087005556D1 /* DuckPlayerOnboardingExperiment+Logger.swift */,
 			);
 			path = Experiment;
 			sourceTree = "<group>";
@@ -10151,6 +10159,7 @@
 				37A6A8F22AFCC988008580A3 /* FaviconsFetcherOnboarding.swift in Sources */,
 				859F30652A72A9FA00C20372 /* BookmarksBarPromptPopover.swift in Sources */,
 				37197EA22942441900394917 /* Tab+Dialogs.swift in Sources */,
+				31C3F9372C8636C2005556D1 /* DuckPlayerOnboardingExperimentPixel.swift in Sources */,
 				3706FAA0293F65D500E42796 /* UserAgent.swift in Sources */,
 				3706FAA1293F65D500E42796 /* NSAlert+DataImport.swift in Sources */,
 				3706FAA2293F65D500E42796 /* MainWindow.swift in Sources */,
@@ -10765,6 +10774,7 @@
 				F1C70D7D2BFF510000599292 /* SubscriptionEnvironment+Default.swift in Sources */,
 				3706FC2C293F65D500E42796 /* BookmarkHTMLReader.swift in Sources */,
 				3706FC2D293F65D500E42796 /* Tab+NSSecureCoding.swift in Sources */,
+				31C3F93A2C864087005556D1 /* DuckPlayerOnboardingExperiment+Logger.swift in Sources */,
 				3706FC2E293F65D500E42796 /* NSNotificationName+EmailManager.swift in Sources */,
 				37445F9D2A1569F00029F789 /* SyncBookmarksAdapter.swift in Sources */,
 				B6685E4029A606190043D2EE /* WorkspaceProtocol.swift in Sources */,
@@ -11708,6 +11718,7 @@
 				8589063C267BCDC000D23B0D /* SaveCredentialsViewController.swift in Sources */,
 				4BBE0AA727B9B027003B37A8 /* PopUpButton.swift in Sources */,
 				AABEE6A524AA0A7F0043105B /* SuggestionViewController.swift in Sources */,
+				31C3F9392C864087005556D1 /* DuckPlayerOnboardingExperiment+Logger.swift in Sources */,
 				1D6216B229069BBF00386B2C /* BWKeyStorage.swift in Sources */,
 				AA7E919F287872EA00AB6B62 /* VisitViewModel.swift in Sources */,
 				7BD7B0012C19D3830039D20A /* VPNIPCResources.swift in Sources */,
@@ -11896,6 +11907,7 @@
 				B63ED0E526BB8FB900A9DAD1 /* SharingMenu.swift in Sources */,
 				AA4FF40C2624751A004E2377 /* GrammarFeaturesManager.swift in Sources */,
 				4B9DB0442A983B24000927DB /* WaitlistModalViewController.swift in Sources */,
+				31C3F9362C8636C2005556D1 /* DuckPlayerOnboardingExperimentPixel.swift in Sources */,
 				B6DA06E8291401D700225DE2 /* WKMenuItemIdentifier.swift in Sources */,
 				4B0AACAE28BC6FD0001038AC /* SafariFaviconsReader.swift in Sources */,
 				B60293E62BA19ECD0033186B /* NetPPopoverManagerMock.swift in Sources */,
