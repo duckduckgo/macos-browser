@@ -1,5 +1,5 @@
 //
-//  BookmarksUtilites.swift
+//  XCUIApplicationExtension.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -18,11 +18,29 @@
 
 import XCTest
 
-class BookmarkUtilities {
+extension XCUIApplication {
+
+    private enum AccessibilityIdentifiers {
+        static let addressBarTextField = "AddressBarViewController.addressBarTextField"
+        static let bookmarksPanelShortcutButton = "NavigationBarViewController.bookmarkListButton"
+        static let manageBookmarksMenuItem = "MainMenu.manageBookmarksMenuItem"
+        static let resetBookmarksMenuItem = "MainMenu.resetBookmarks"
+    }
+
+    /// Dismiss popover with the passed button identifier
+    /// - Parameter buttonIdentifier: The button identifier we want to tap from the popover
+    func dismissPopover(buttonIdentifier: String) {
+        let popover = popovers.firstMatch
+        let button = popover.buttons[buttonIdentifier]
+        button.tap()
+    }
+
+    // MARK: - Bookmarks
 
     /// Reset the bookmarks so we can rely on a single bookmark's existence
-    static func resetBookmarks(app: XCUIApplication, resetMenuItem: XCUIElement) {
-        app.typeKey("n", modifierFlags: [.command]) // Can't use debug menu without a window
+    func resetBookmarks() {
+        let resetMenuItem = menuItems[AccessibilityIdentifiers.resetBookmarksMenuItem]
+        typeKey("n", modifierFlags: [.command]) // Can't use debug menu without a window
         XCTAssertTrue(
             resetMenuItem.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Reset bookmarks menu item didn't become available in a reasonable timeframe."
@@ -31,7 +49,8 @@ class BookmarkUtilities {
     }
 
     /// Opens the bookmarks manager via the menu
-    static func openBookmarksManager(app: XCUIApplication, manageBookmarksMenuItem: XCUIElement) {
+    func openBookmarksManager() {
+        let manageBookmarksMenuItem = menuItems[AccessibilityIdentifiers.manageBookmarksMenuItem]
         XCTAssertTrue(
             manageBookmarksMenuItem.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Manage bookmarks menu item didn't become available in a reasonable timeframe."
@@ -45,13 +64,13 @@ class BookmarkUtilities {
     /// - Parameter bookmarkingViaDialog: open bookmark dialog, adding bookmark
     /// - Parameter escapingDialog: `esc` key to leave dialog
     /// - Parameter folderName: The name of the folder where you want to save the bookmark. If the folder does not exist, it fails.
-    static func openSiteToBookmark(app: XCUIApplication,
-                                   url: URL,
-                                   pageTitle: String,
-                                   bookmarkingViaDialog: Bool,
-                                   escapingDialog: Bool,
-                                   addressBarTextField: XCUIElement,
-                                   folderName: String? = nil) {
+    func openSiteToBookmark(app: XCUIApplication,
+                            url: URL,
+                            pageTitle: String,
+                            bookmarkingViaDialog: Bool,
+                            escapingDialog: Bool,
+                            folderName: String? = nil) {
+        let addressBarTextField = windows.textFields[AccessibilityIdentifiers.addressBarTextField]
         XCTAssertTrue(
             addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The address bar text field didn't become available in a reasonable timeframe."
@@ -77,18 +96,11 @@ class BookmarkUtilities {
         }
     }
 
-    /// Dismiss popover with the passed button identifier
-    /// - Parameter buttonIdentifier: The button identifier we want to tap from the popover
-    static func dismissPopover(app: XCUIApplication, buttonIdentifier: String) {
-        let popover = app.popovers.firstMatch
-        let button = popover.buttons[buttonIdentifier]
-        button.tap()
-    }
-
     /// Shows the bookmarks panel shortcut and taps it. If the bookmarks shortcut is visible, it only taps it.
-    static func showAndTapBookmarksPanelShortcut(app: XCUIApplication, bookmarksPanelShortcutButton: XCUIElement) {
+    func showAndTapBookmarksPanelShortcut() {
+        let bookmarksPanelShortcutButton = buttons[AccessibilityIdentifiers.bookmarksPanelShortcutButton]
         if !bookmarksPanelShortcutButton.exists {
-            app.typeKey("K", modifierFlags: [.command, .shift])
+            typeKey("K", modifierFlags: [.command, .shift])
         }
 
         bookmarksPanelShortcutButton.tap()

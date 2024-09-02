@@ -47,7 +47,7 @@ class BookmarkSearchTests: XCTestCase {
         app = XCUIApplication()
         app.launchEnvironment["UITEST_MODE"] = "1"
         app.launch()
-        BookmarkUtilities.resetBookmarks(app: app, resetMenuItem: app.menuItems[AccessibilityIdentifiers.resetBookmarksMenuItem])
+        app.resetBookmarks()
         enforceSingleWindow()
     }
 
@@ -127,13 +127,12 @@ class BookmarkSearchTests: XCTestCase {
 
     private func addBookmark(pageTitle: String, in folder: String? = nil) {
         let urlForBookmarksBar = UITests.simpleServedPage(titled: pageTitle)
-        BookmarkUtilities.openSiteToBookmark(app: app,
-                                             url: urlForBookmarksBar,
-                                             pageTitle: pageTitle,
-                                             bookmarkingViaDialog: true,
-                                             escapingDialog: true,
-                                             addressBarTextField: app.windows.textFields[AccessibilityIdentifiers.addressBarTextField],
-                                             folderName: folder)
+        app.openSiteToBookmark(app: app,
+                               url: urlForBookmarksBar,
+                               pageTitle: pageTitle,
+                               bookmarkingViaDialog: true,
+                               escapingDialog: true,
+                               folderName: folder)
     }
 
     private func searchInBookmarksPanel(for title: String) {
@@ -183,11 +182,11 @@ class BookmarkSearchTests: XCTestCase {
     }
 
     private func openBookmarksPanel() {
-        BookmarkUtilities.showAndTapBookmarksPanelShortcut(app: app, bookmarksPanelShortcutButton: app.buttons[AccessibilityIdentifiers.bookmarksPanelShortcutButton])
+        app.showAndTapBookmarksPanelShortcut()
     }
 
     private func openBookmarksManager() {
-        BookmarkUtilities.openBookmarksManager(app: app, manageBookmarksMenuItem: app.menuItems[AccessibilityIdentifiers.manageBookmarksMenuItem])
+        app.openBookmarksManager()
     }
 
     private func openNewTab() {
@@ -324,7 +323,7 @@ class BookmarkSearchTests: XCTestCase {
     }
 
     private func closeShowBookmarksBarAlert() {
-        BookmarkUtilities.dismissPopover(app: app, buttonIdentifier: "Hide")
+        app.dismissPopover(buttonIdentifier: "Hide")
     }
 }
 
