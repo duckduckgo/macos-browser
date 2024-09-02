@@ -25,23 +25,29 @@ typealias DuckPlayerOnboardingPublisher = AnyPublisher<OnboardingState?, Never>
 final class DuckPlayerOnboardingTabExtension: TabExtension {
     @Published private(set) var onboardingState: OnboardingState?
     private let onboardingDecider: DuckPlayerOnboardingDecider
+    private let experimentManager: OnboardingExperimentManager
 
-    init(onboardingDecider: DuckPlayerOnboardingDecider) {
+    init(onboardingDecider: DuckPlayerOnboardingDecider,
+         experimentManager: OnboardingExperimentManager = DuckPlayerOnboardingExperiment()) {
         self.onboardingDecider = onboardingDecider
+        self.experimentManager = experimentManager
     }
 }
 
 extension DuckPlayerOnboardingTabExtension: NavigationResponder {
 
     func navigationDidFinish(_ navigation: Navigation) {
-        guard onboardingDecider.canDisplayOnboarding else { return }
-
         let locationValidator = DuckPlayerOnboardingLocationValidator()
 
         Task { @MainActor in
             if let webView = navigation.navigationAction.targetFrame?.webView,
                 await locationValidator.isValidLocation(webView) {
-                onboardingState = .init(onboardingDecider: onboardingDecider)
+
+                self.experimentManager.assignUserToCohort()
+
+                if onboardingDecider.canDisplayOnboarding {
+                    onboardingState = .init(onboardingDecider: onboardingDecider)
+                }
             }
         }
     }

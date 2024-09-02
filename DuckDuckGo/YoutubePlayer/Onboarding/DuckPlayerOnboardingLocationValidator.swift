@@ -28,7 +28,8 @@ struct DuckPlayerOnboardingLocationValidator {
     """
 
     func isValidLocation(_ webView: WKWebView) async -> Bool {
-        guard let url = await webView.url else { return false }
+        guard let url = await webView.url,
+              isYoutubeHost(url) else { return false }
 
         let isRootURL = isYoutubeRootURL(url)
         let isInChannel = await isCurrentWebViewInAYoutubeChannel(webView)
@@ -38,8 +39,13 @@ struct DuckPlayerOnboardingLocationValidator {
     private func isYoutubeRootURL(_ url: URL) -> Bool {
         guard let urlComponents = URLComponents(string: url.absoluteString) else { return false }
         return urlComponents.scheme == "https" &&
-               urlComponents.host == "www.youtube.com" &&
+               isYoutubeHost(url) &&
                urlComponents.path == "/"
+    }
+
+    private func isYoutubeHost(_ url: URL) -> Bool {
+        guard let urlComponents = URLComponents(string: url.absoluteString) else { return false }
+        return urlComponents.host == "www.youtube.com"
     }
 
     private func isCurrentWebViewInAYoutubeChannel(_ webView: WKWebView) async -> Bool {

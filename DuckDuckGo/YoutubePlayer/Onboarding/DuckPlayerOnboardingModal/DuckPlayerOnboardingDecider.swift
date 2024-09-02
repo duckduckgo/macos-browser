@@ -60,11 +60,15 @@ struct DefaultDuckPlayerOnboardingDecider: DuckPlayerOnboardingDecider {
     private let defaults: UserDefaults
     private var observer: NSObjectProtocol?
     private let preferences: DuckPlayerPreferences
+    private let onboardingExperiment: OnboardingExperimentManager
+
     var valueChangedPublisher: PassthroughSubject<Void, Never> = .init()
 
-    init(defaults: UserDefaults = .standard, preferences: DuckPlayerPreferences = .shared) {
+    init(defaults: UserDefaults = .standard, preferences: DuckPlayerPreferences = .shared,
+         onboardingExperiment: OnboardingExperimentManager = DuckPlayerOnboardingExperiment()) {
         self.defaults = defaults
         self.preferences = preferences
+        self.onboardingExperiment = onboardingExperiment
         observer = NotificationCenter.default.addObserver(forName: .valuesDidChange, object: nil, queue: nil) { [valuesDidChange] _ in
             valuesDidChange()
         }
@@ -73,7 +77,7 @@ struct DefaultDuckPlayerOnboardingDecider: DuckPlayerOnboardingDecider {
     /// We only want to display the onboarding if it was never displayed, the settings is set to alwaysAsk and haven't interacted with the overlay.
     var canDisplayOnboarding: Bool {
 #if DEBUG
-        return !defaults.onboardingWasDisplayed && preferences.duckPlayerMode == .alwaysAsk
+        return onboardingExperiment.isUserAssignedToExperimentCohort && !defaults.onboardingWasDisplayed && preferences.duckPlayerMode == .alwaysAsk
 #else
         // returning false until we turn on the experiment
         return false

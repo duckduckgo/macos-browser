@@ -23,6 +23,7 @@ import os.log
 protocol OnboardingExperimentManager {
     func assignUserToCohort()
     func getPixelParameters(cohort: Bool, date: Bool, experimentName: Bool) -> [String: String]?
+    var isUserAssignedToExperimentCohort: Bool { get }
 }
 
 // https://app.asana.com/0/72649045549333/1208088257884523/f
@@ -46,6 +47,11 @@ struct DuckPlayerOnboardingExperiment: OnboardingExperimentManager {
         static let variant = "variant"
         static let enrollment = "enrollment"
         static let experimentName = "expname"
+    }
+
+    var isUserAssignedToExperimentCohort: Bool {
+        guard enrollmentDate != nil else { return false }
+        return experimentCohort == .experiment
     }
 
     func assignUserToCohort() {
