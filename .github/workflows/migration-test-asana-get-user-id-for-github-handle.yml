@@ -1,0 +1,37 @@
+name: Migration Test - Asana get user ID for Github handle
+
+on: 
+  push:
+  workflow_dispatch:
+
+jobs:
+  test:
+
+    name: Test
+
+    runs-on: macos-14
+
+    steps:
+ 
+    - name: Check out the code
+      uses: actions/checkout@v4
+
+    - name: Set up fastlane
+      run: bundle install
+
+    - name: Test asana-create-action-item
+      id: create-action-item
+      uses: ./.github/actions/asana-create-action-item
+      with:
+        access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        notes: "This is a content of a sample action item"
+        release-task-url: "https://app.asana.com/0/1201621708115095/1208203993436408/f"
+        task-name: "This is a sample action item"
+
+    - name: Test asana-log-message
+      id: log-message
+      uses: ./.github/actions/asana-log-message
+      with:
+        access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        comment: "This is a sample comment"
+        task-url: "https://app.asana.com/0/1201621708115095/1208203993436408/f"
