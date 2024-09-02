@@ -93,6 +93,7 @@ final class BookmarksBarViewController: NSViewController {
         clippedItemsIndicator.registerForDraggedTypes(BookmarkDragDropManager.draggedTypes)
         clippedItemsIndicator.delegate = self
         clippedItemsIndicator.sendAction(on: .leftMouseDown)
+        clippedItemsIndicator.setAccessibilityIdentifier("BookmarksBarViewController.clippedItemsIndicator")
 
         importBookmarksLabel.stringValue = UserText.importBookmarks
 

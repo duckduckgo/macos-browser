@@ -166,9 +166,12 @@ final class NavigationBarViewController: NSViewController {
         addContextMenu()
 
         optionsButton.sendAction(on: .leftMouseDown)
+
         bookmarkListButton.sendAction(on: .leftMouseDown)
         bookmarkListButton.registerForDraggedTypes(BookmarkDragDropManager.draggedTypes)
         bookmarkListButton.delegate = self
+        bookmarkListButton.setAccessibilityIdentifier("NavigationBarViewController.bookmarkListButton")
+
         downloadsButton.sendAction(on: .leftMouseDown)
         networkProtectionButton.sendAction(on: .leftMouseDown)
         passwordManagementButton.sendAction(on: .leftMouseDown)

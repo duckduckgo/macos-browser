@@ -20,6 +20,18 @@ enum BookmarksEmptyStateContent {
     case noBookmarks
     case noSearchResults
 
+    static var titleAccessibilityIdentifier: String {
+        "BookmarksEmptyStateContent.emptyStateTitle"
+    }
+
+    static var descriptionAccessibilityIdentifier: String {
+        "BookmarksEmptyStateContent.emptyStateMessage"
+    }
+
+    static var imageAccessibilityIdentifier: String {
+        "BookmarksEmptyStateContent.emptyStateImageView"
+    }
+
     var title: String {
         switch self {
         case .noBookmarks: return UserText.bookmarksEmptyStateTitle
