@@ -21,8 +21,8 @@ import SwiftUI
 struct DuckPlayerOnboardingModalView: View {
     private enum Constants {
         static let outerContainerWidth: CGFloat = 504
-        static let smallContainerHeight: CGFloat = 182
-        static let bigContainerHeight: CGFloat = 366
+        static let smallContainerHeight: CGFloat = 166
+        static let bigContainerHeight: CGFloat = 350
         static let containerCornerRadius: CGFloat = 12
         static let darkModeBorderColor: Color = .white.opacity(0.2)
         static let whiteModeBorderColor: Color = .black.opacity(0.1)
@@ -79,7 +79,7 @@ private enum Constants {
 
     enum Layout {
         static let modalOuterVerticalSpacing: CGFloat = 20
-        static let modalInnerVerticalSpacing: CGFloat = 16
+        static let modalInnerVerticalSpacing: CGFloat = 8
     }
 }
 
@@ -298,7 +298,6 @@ private struct SecondaryCTAStyle: ButtonStyle {
         }, notNowPressed: {
 
         })
-        .frame(width: 504, height: 326)
 
         Divider()
             .padding()
@@ -306,7 +305,8 @@ private struct SecondaryCTAStyle: ButtonStyle {
         DuckPlayerOnboardingConfirmationView(voidButtonPressed: {
 
         })
-        .frame(width: 504, height: 152)
     }
+    .frame(width: 504)
+    .fixedSize()
     .padding()
 }
