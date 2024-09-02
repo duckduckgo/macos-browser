@@ -59,12 +59,11 @@ struct DuckPlayerOnboardingExperiment: OnboardingExperimentManager {
     func getPixelParameters() -> [String: String]? {
         guard isUserInExperiment,
               let experimentCohort = experimentCohort,
-              let enrollmentDate = enrollmentDate,
-              let enrollmentDateComponents = Calendar.current.dateComponents([.month, .day], from: enrollmentDate),
-              let month = enrollmentDateComponents.month,
-              let day = enrollmentDateComponents.day else { return nil }
+              let enrollmentDate = enrollmentDate else { return nil }
 
-        let enrollmentDateString = String(format: "%02d%02d", month, day)
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyyMMdd"
+        let enrollmentDateString = dateFormatter.string(from: enrollmentDate)
 
         return [
             "enrollment": enrollmentDateString,
