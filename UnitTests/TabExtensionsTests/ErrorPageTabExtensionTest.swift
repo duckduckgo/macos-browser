@@ -39,7 +39,8 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         scriptPublisher = PassthroughSubject<MockSpecialErrorPageScriptProvider, Never>()
         credentialCreator = MockCredentialCreator()
         let featureFlagger = MockFeatureFlagger()
-        errorPageExtention = SpecialErrorPageTabExtension(webViewPublisher: mockWebViewPublisher, scriptsPublisher: scriptPublisher, urlCredentialCreator: credentialCreator, featureFlagger: featureFlagger)
+        let phishingSiteDetector = MockPhishingSiteDetector(isMalicious: true)
+        errorPageExtention = SpecialErrorPageTabExtension(webViewPublisher: mockWebViewPublisher, scriptsPublisher: scriptPublisher, urlCredentialCreator: credentialCreator, featureFlagger: featureFlagger, phishingDetector: phishingSiteDetector, phishingStateManager: PhishingTabStateManager())
     }
 
     override func tearDownWithError() throws {
@@ -324,6 +325,7 @@ class MockWKWebView: NSObject, ErrorPageTabExtensionNavigationDelegate {
     var capturedHTML: String = ""
     var goBackCalled = false
     var reloadCalled = false
+    var loadCalled = false
     var closedCalled = false
 
     init(url: URL) {
@@ -350,6 +352,12 @@ class MockWKWebView: NSObject, ErrorPageTabExtensionNavigationDelegate {
 
     func close() {
         closedCalled = true
+    }
+
+    func load(_ request: URLRequest) -> WKNavigation? {
+        loadCalled = true
+        url = request.url
+        return .none
     }
 }
 

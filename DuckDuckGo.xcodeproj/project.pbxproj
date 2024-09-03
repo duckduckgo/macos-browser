@@ -2665,6 +2665,12 @@
 		CD2AB5C82C8223040019EB49 /* hashPrefixes.json in Resources */ = {isa = PBXBuildFile; fileRef = CDE248A32C821FFE00F9399D /* hashPrefixes.json */; };
 		CD2AB5CA2C8225E70019EB49 /* URLTokenValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2AB5C92C8225E70019EB49 /* URLTokenValidator.swift */; };
 		CD2AB5CB2C8225E70019EB49 /* URLTokenValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2AB5C92C8225E70019EB49 /* URLTokenValidator.swift */; };
+		CD2AB5D02C874BD40019EB49 /* PhishingDetectionMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2AB5CC2C874BD30019EB49 /* PhishingDetectionMocks.swift */; };
+		CD2AB5D12C874BD40019EB49 /* PhishingDetectionMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2AB5CC2C874BD30019EB49 /* PhishingDetectionMocks.swift */; };
+		CD2AB5D22C874BD40019EB49 /* PhishingDetectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2AB5CE2C874BD30019EB49 /* PhishingDetectionTests.swift */; };
+		CD2AB5D32C874BD40019EB49 /* PhishingDetectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2AB5CE2C874BD30019EB49 /* PhishingDetectionTests.swift */; };
+		CD2AB5D62C874BF30019EB49 /* PhishingDetectionIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2AB5D42C874BF30019EB49 /* PhishingDetectionIntegrationTests.swift */; };
+		CD2AB5D72C874BF30019EB49 /* PhishingDetectionIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2AB5D42C874BF30019EB49 /* PhishingDetectionIntegrationTests.swift */; };
 		CDE248A02C821DF400F9399D /* PhishingDetection in Frameworks */ = {isa = PBXBuildFile; productRef = CDE2489F2C821DF400F9399D /* PhishingDetection */; };
 		D64A5FF82AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D64A5FF72AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift */; };
 		D64A5FF92AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D64A5FF72AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift */; };
@@ -4351,6 +4357,9 @@
 		CB6BCDF827C6BEFF00CC76DC /* PrivacyFeatures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyFeatures.swift; sourceTree = "<group>"; };
 		CBDD5DE229A67F2700832877 /* MockConfigurationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockConfigurationStore.swift; sourceTree = "<group>"; };
 		CD2AB5C92C8225E70019EB49 /* URLTokenValidator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLTokenValidator.swift; sourceTree = "<group>"; };
+		CD2AB5CC2C874BD30019EB49 /* PhishingDetectionMocks.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhishingDetectionMocks.swift; sourceTree = "<group>"; };
+		CD2AB5CE2C874BD30019EB49 /* PhishingDetectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhishingDetectionTests.swift; sourceTree = "<group>"; };
+		CD2AB5D42C874BF30019EB49 /* PhishingDetectionIntegrationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhishingDetectionIntegrationTests.swift; sourceTree = "<group>"; };
 		CDE2489E2C821DE800F9399D /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../../BrowserServicesKit; sourceTree = "<group>"; };
 		CDE248A32C821FFE00F9399D /* hashPrefixes.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = hashPrefixes.json; sourceTree = "<group>"; };
 		CDE248A42C821FFE00F9399D /* PhishingDetection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhishingDetection.swift; sourceTree = "<group>"; };
@@ -5383,6 +5392,7 @@
 				B62A233E29C41D2D00D22475 /* History */,
 				B603973229BEF84900902A34 /* HTTPSUpgrade */,
 				B62A233A29C322A000D22475 /* NavigationProtection */,
+				CD2AB5D52C874BF30019EB49 /* PhishingDetection */,
 				B603973629BF0E9400902A34 /* PrivacyDashboard */,
 				B644B43C29D56811003FA9AB /* Tab */,
 				4B1AD91625FC46FB00261379 /* CoreDataEncryptionTests.swift */,
@@ -7113,6 +7123,7 @@
 				85F487B3276A8F1B003CE668 /* Onboarding */,
 				1D3B1AB7293405F5006F4388 /* PasswordManagers */,
 				B6106BA126A7BE430013B453 /* Permissions */,
+				CD2AB5CF2C874BD30019EB49 /* PhishingDetection */,
 				37D2377E287EFECD00BCE03B /* PinnedTabs */,
 				4B0511EE262CAEB300F6079C /* Preferences */,
 				31E163BB293A577200963C10 /* PrivacyReferenceTests */,
@@ -8661,6 +8672,31 @@
 				4B67742A255DBEB800025BD8 /* httpsMobileV2FalsePositives.json */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		CD2AB5CD2C874BD30019EB49 /* Mocks */ = {
+			isa = PBXGroup;
+			children = (
+				CD2AB5CC2C874BD30019EB49 /* PhishingDetectionMocks.swift */,
+			);
+			path = Mocks;
+			sourceTree = "<group>";
+		};
+		CD2AB5CF2C874BD30019EB49 /* PhishingDetection */ = {
+			isa = PBXGroup;
+			children = (
+				CD2AB5CD2C874BD30019EB49 /* Mocks */,
+				CD2AB5CE2C874BD30019EB49 /* PhishingDetectionTests.swift */,
+			);
+			path = PhishingDetection;
+			sourceTree = "<group>";
+		};
+		CD2AB5D52C874BF30019EB49 /* PhishingDetection */ = {
+			isa = PBXGroup;
+			children = (
+				CD2AB5D42C874BF30019EB49 /* PhishingDetectionIntegrationTests.swift */,
+			);
+			path = PhishingDetection;
 			sourceTree = "<group>";
 		};
 		CDE248A22C821FD500F9399D /* PhishingDetection */ = {
@@ -11094,6 +11130,7 @@
 				3706FE3D293F661700E42796 /* DataEncryptionTests.swift in Sources */,
 				C17CA7B32B9B5317008EC3C1 /* MockAutofillPopoverPresenter.swift in Sources */,
 				3706FE3F293F661700E42796 /* FileStoreMock.swift in Sources */,
+				CD2AB5D12C874BD40019EB49 /* PhishingDetectionMocks.swift in Sources */,
 				B6619F042B17123200CD9186 /* DataImportViewModelTests.swift in Sources */,
 				1D8C2FE62B70F4C4005E4BBD /* TabSnapshotExtensionTests.swift in Sources */,
 				3706FE40293F661700E42796 /* BWResponseTests.swift in Sources */,
@@ -11106,6 +11143,7 @@
 				1DA6D1032A1FFA3B00540406 /* HTTPCookieTests.swift in Sources */,
 				3706FE45293F661700E42796 /* ProgressEstimationTests.swift in Sources */,
 				31A2FD182BAB43BA00D0E741 /* DataBrokerProtectionFeatureGatekeeperTests.swift in Sources */,
+				CD2AB5D32C874BD40019EB49 /* PhishingDetectionTests.swift in Sources */,
 				B6619F072B17138D00CD9186 /* DataImportSourceViewModelTests.swift in Sources */,
 				3706FE46293F661700E42796 /* EncryptedValueTransformerTests.swift in Sources */,
 				9F3910632B68C35600CB5112 /* DownloadsTabExtensionTests.swift in Sources */,
@@ -11257,6 +11295,7 @@
 				3706FEA5293F662100E42796 /* CoreDataEncryptionTesting.xcdatamodeld in Sources */,
 				B603973D29BF1D7D00902A34 /* AutoconsentIntegrationTests.swift in Sources */,
 				B60C6F8729B1CAB2007BFAA8 /* TestRunHelper.swift in Sources */,
+				CD2AB5D72C874BF30019EB49 /* PhishingDetectionIntegrationTests.swift in Sources */,
 				B64CE01F2B8622D700126CA5 /* AddressBarTests.swift in Sources */,
 				B603972D29BEDF2100902A34 /* ExpectedNavigationExtension.swift in Sources */,
 				3706FEA6293F662100E42796 /* EncryptionKeyStoreTests.swift in Sources */,
@@ -11301,6 +11340,7 @@
 				B644B43D29D56829003FA9AB /* SearchNonexistentDomainTests.swift in Sources */,
 				B603973C29BF1D7D00902A34 /* AutoconsentIntegrationTests.swift in Sources */,
 				B60C6F8629B1CAB0007BFAA8 /* TestRunHelper.swift in Sources */,
+				CD2AB5D62C874BF30019EB49 /* PhishingDetectionIntegrationTests.swift in Sources */,
 				B64CE01E2B8622D700126CA5 /* AddressBarTests.swift in Sources */,
 				B603972C29BEDF2100902A34 /* ExpectedNavigationExtension.swift in Sources */,
 				4B1AD8D525FC38DD00261379 /* EncryptionKeyStoreTests.swift in Sources */,
@@ -12487,6 +12527,7 @@
 				9F26060B2B85C20A00819292 /* AddEditBookmarkDialogViewModelTests.swift in Sources */,
 				B63ED0DE26AFD9A300A9DAD1 /* AVCaptureDeviceMock.swift in Sources */,
 				98A95D88299A2DF900B9B81A /* BookmarkMigrationTests.swift in Sources */,
+				CD2AB5D02C874BD40019EB49 /* PhishingDetectionMocks.swift in Sources */,
 				B63ED0E026AFE32F00A9DAD1 /* GeolocationProviderMock.swift in Sources */,
 				378205FB283C277800D1D4AA /* MainMenuTests.swift in Sources */,
 				4B43469528655D1400177407 /* FirefoxDataImporterTests.swift in Sources */,
@@ -12510,6 +12551,7 @@
 				37DB56EF2C3B31CD0093D4DC /* MockRemoteMessagingAvailabilityProvider.swift in Sources */,
 				B6106BA026A7BE0B0013B453 /* PermissionManagerTests.swift in Sources */,
 				4B59CC8C290083240058F2F6 /* ConnectBitwardenViewModelTests.swift in Sources */,
+				CD2AB5D22C874BD40019EB49 /* PhishingDetectionTests.swift in Sources */,
 				37DB56F52C3B3C420093D4DC /* MockRemoteMessagingStore.swift in Sources */,
 				B68412202B6A30680092F66A /* StringExtensionTests.swift in Sources */,
 				B6106BB526A809E60013B453 /* GeolocationProviderTests.swift in Sources */,
