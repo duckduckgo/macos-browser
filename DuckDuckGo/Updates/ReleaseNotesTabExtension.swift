@@ -84,7 +84,7 @@ final class ReleaseNotesTabExtension: NavigationResponder {
             return
         }
         let updateController = Application.appDelegate.updateController!
-        Publishers.CombineLatest(updateController.isUpdateBeingLoadedPublisher, updateController.latestUpdatePublisher)
+        Publishers.CombineLatest(updateController.updateProgressPublisher, updateController.latestUpdatePublisher)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 guard let self else { return }
@@ -125,7 +125,7 @@ extension ReleaseNotesValues {
         let status: String
         let latestVersion: String
 
-        guard let updateController, !updateController.isUpdateBeingLoaded else {
+        guard let updateController, !updateController.updateProgress.isIdle else {
             self.init(status: "loading",
                       currentVersion: currentVersion,
                       lastUpdate: lastUpdate)
