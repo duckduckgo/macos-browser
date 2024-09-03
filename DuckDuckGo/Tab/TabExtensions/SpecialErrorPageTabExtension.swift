@@ -111,6 +111,7 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
         self.phishingStateManager.didBypassError = phishingURLExemptions.contains(url)
 
         if self.phishingStateManager.didBypassError || url.isDuckDuckGo || url.isDuckURLScheme {
+            self.phishingStateManager.isShowingPhishingError = false
             return .next
         }
 
