@@ -24,6 +24,8 @@ enum DuckPlayerOnboardingExperimentPixel: PixelKitEventV2 {
 
     case enrollmentPixel
     case weeklyUniqueView
+    case modalAccept
+    case modalReject
 
     var name: String {
         switch self {
@@ -31,6 +33,10 @@ enum DuckPlayerOnboardingExperimentPixel: PixelKitEventV2 {
             "duckplayer_experiment_cohort_assign"
         case .weeklyUniqueView:
             "duckplayer_weekly-unique-view"
+        case .modalAccept:
+            "duckplayer_experiment_modal-accept"
+        case .modalReject:
+            "duckplayer_experiment_modal-reject"
         }
     }
 
@@ -38,7 +44,9 @@ enum DuckPlayerOnboardingExperimentPixel: PixelKitEventV2 {
         switch self {
         case .enrollmentPixel:
             return DuckPlayerOnboardingExperiment().getPixelParameters(date: false)
-        case .weeklyUniqueView:
+        case .weeklyUniqueView,
+                .modalAccept,
+                .modalReject:
             return DuckPlayerOnboardingExperiment().getPixelParameters()
         }
     }
