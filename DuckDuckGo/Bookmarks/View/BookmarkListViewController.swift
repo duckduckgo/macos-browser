@@ -451,7 +451,7 @@ final class BookmarkListViewController: NSViewController {
         expandFoldersAndScrollUntil(folder)
         outlineView.scrollToAdjustedPositionInOutlineView(folder)
 
-        guard let node = treeController.node(representing: folder) else { return }
+        guard let node = treeController.findNodeWithId(representing: folder) else { return }
 
         outlineView.highlight(node)
     }
