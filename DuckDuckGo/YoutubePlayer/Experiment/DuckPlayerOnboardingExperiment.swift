@@ -21,10 +21,23 @@ import PixelKit
 import os.log
 
 protocol OnboardingExperimentManager {
+    /// Assigns the user to a cohort for the onboarding experiment.
     func assignUserToCohort()
+
+    /// Retrieves pixel parameters for tracking the experiment.
+    /// - Parameters:
+    ///   - cohort: A Boolean indicating whether to include the cohort information.
+    ///   - date: A Boolean indicating whether to include the enrollment date.
+    ///   - experimentName: A Boolean indicating whether to include the experiment name.
+    /// - Returns: A dictionary containing pixel parameters, or nil if no parameters are available.
     func getPixelParameters(cohort: Bool, date: Bool, experimentName: Bool) -> [String: String]?
-    var isUserAssignedToExperimentCohort: Bool { get }
+
+    /// Fires a pixel for tracking unique views on a weekly basis.
+    /// - Parameter extraParams: Additional parameters to include with the pixel event.
     func fireWeeklyUniqueViewPixel(extraParams: [String: String]?)
+
+    /// A Boolean value indicating whether the user is assigned to the experiment cohort.
+    var isUserAssignedToExperimentCohort: Bool { get }
 }
 
 // https://app.asana.com/0/72649045549333/1208088257884523/f

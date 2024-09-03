@@ -24,20 +24,30 @@ final class DefaultDuckPlayerOnboardingDeciderTests: XCTestCase {
     var decider: DefaultDuckPlayerOnboardingDecider!
     var defaults: UserDefaults!
     static let defaultsName = "TestDefaults"
+    var experiment: MockOnboardingExperimentManager!
+
 
     override func setUp() {
         super.setUp()
         defaults = UserDefaults(suiteName: DefaultDuckPlayerOnboardingDeciderTests.defaultsName)!
-        decider = DefaultDuckPlayerOnboardingDecider(defaults: defaults)
+        experiment = MockOnboardingExperimentManager()
+        experiment.cohortUser = true
+        decider = DefaultDuckPlayerOnboardingDecider(defaults: defaults, onboardingExperiment: experiment)
     }
 
     override func tearDown() {
         super.tearDown()
         defaults.removePersistentDomain(forName: DefaultDuckPlayerOnboardingDeciderTests.defaultsName)
+        experiment.reset()
     }
 
     func testCanDisplayOnboarding_InitiallyReturnsTrue() {
         XCTAssertTrue(decider.canDisplayOnboarding)
+    }
+
+    func testCanDisplayOnboardingNotOnCohort_InitiallyReturnsTrue() {
+        experiment.cohortUser = false
+        XCTAssertFalse(decider.canDisplayOnboarding)
     }
 
     func testCanDisplayOnboarding_ReturnsFalseAfterSettingOnboardingAsDone() {
@@ -77,7 +87,9 @@ final class DefaultDuckPlayerOnboardingDeciderTests: XCTestCase {
             )
         )
 
-        let onboardingDecider = DefaultDuckPlayerOnboardingDecider(defaults: defaults, preferences: preferences)
+        let onboardingDecider = DefaultDuckPlayerOnboardingDecider(defaults: defaults,
+                                                                   preferences: preferences,
+                                                                   onboardingExperiment: experiment)
         XCTAssertTrue(onboardingDecider.canDisplayOnboarding)
     }
 
@@ -90,7 +102,9 @@ final class DefaultDuckPlayerOnboardingDeciderTests: XCTestCase {
             )
         )
 
-        let onboardingDecider = DefaultDuckPlayerOnboardingDecider(defaults: defaults, preferences: preferences)
+        let onboardingDecider = DefaultDuckPlayerOnboardingDecider(defaults: defaults, 
+                                                                   preferences: preferences,
+                                                                   onboardingExperiment: experiment)
         XCTAssertTrue(onboardingDecider.canDisplayOnboarding)
     }
 
@@ -142,5 +156,23 @@ final class DefaultDuckPlayerOnboardingDeciderTests: XCTestCase {
 
         XCTAssertTrue(decider.canDisplayOnboarding)
         XCTAssertFalse(decider.shouldOpenFirstVideoOnDuckPlayer)
+    }
+}
+
+final class MockOnboardingExperimentManager: OnboardingExperimentManager {
+    var cohortUser: Bool = true
+
+    func assignUserToCohort() { }
+    func getPixelParameters(cohort: Bool, date: Bool, experimentName: Bool) -> [String: String]? { 
+        return nil
+    }
+    func fireWeeklyUniqueViewPixel(extraParams: [String: String]?) { }
+    
+    var isUserAssignedToExperimentCohort: Bool {
+        cohortUser
+    }
+
+    func reset() {
+        cohortUser = true
     }
 }
