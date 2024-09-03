@@ -23,6 +23,7 @@ import Configuration
 import Foundation
 import GRDB
 import SecureStorage
+import Freemium
 
 @testable import DataBrokerProtection
 
@@ -1192,24 +1193,31 @@ extension DataBroker {
 final class MockDataBrokerProtectionOperationQueueManager: DataBrokerProtectionQueueManager {
     var debugRunningStatusString: String { return "" }
 
-    var startImmediateOperationsIfPermittedCompletionError: DataBrokerProtectionAgentErrorCollection?
-    var startScheduledOperationsIfPermittedCompletionError: DataBrokerProtectionAgentErrorCollection?
+    var startImmediateScanOperationsIfPermittedCompletionError: DataBrokerProtectionAgentErrorCollection?
+    var startScheduledAllOperationsIfPermittedCompletionError: DataBrokerProtectionAgentErrorCollection?
+    var startScheduledScanOperationsIfPermittedCompletionError: DataBrokerProtectionAgentErrorCollection?
 
-    var startImmediateOperationsIfPermittedCalledCompletion: ((DataBrokerProtection.DataBrokerProtectionAgentErrorCollection?) -> Void)?
-    var startScheduledOperationsIfPermittedCalledCompletion: ((DataBrokerProtection.DataBrokerProtectionAgentErrorCollection?) -> Void)?
+    var startImmediateScanOperationsIfPermittedCalledCompletion: ((DataBrokerProtection.DataBrokerProtectionAgentErrorCollection?) -> Void)?
+    var startScheduledAllOperationsIfPermittedCalledCompletion: ((DataBrokerProtection.DataBrokerProtectionAgentErrorCollection?) -> Void)?
+    var startScheduledScanOperationsIfPermittedCalledCompletion: ((DataBrokerProtection.DataBrokerProtectionAgentErrorCollection?) -> Void)?
 
     init(operationQueue: DataBrokerProtection.DataBrokerProtectionOperationQueue, operationsCreator: DataBrokerProtection.DataBrokerOperationsCreator, mismatchCalculator: DataBrokerProtection.MismatchCalculator, brokerUpdater: DataBrokerProtection.DataBrokerProtectionBrokerUpdater?, pixelHandler: Common.EventMapping<DataBrokerProtection.DataBrokerProtectionPixels>) {
 
     }
 
-    func startImmediateOperationsIfPermitted(showWebView: Bool, operationDependencies: DataBrokerProtection.DataBrokerOperationDependencies, completion: ((DataBrokerProtection.DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
-        completion?(startImmediateOperationsIfPermittedCompletionError)
-        startImmediateOperationsIfPermittedCalledCompletion?(startImmediateOperationsIfPermittedCompletionError)
+    func startImmediateScanOperationsIfPermitted(showWebView: Bool, operationDependencies: DataBrokerProtection.DataBrokerOperationDependencies, completion: ((DataBrokerProtection.DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
+        completion?(startImmediateScanOperationsIfPermittedCompletionError)
+        startImmediateScanOperationsIfPermittedCalledCompletion?(startImmediateScanOperationsIfPermittedCompletionError)
     }
 
-    func startScheduledOperationsIfPermitted(showWebView: Bool, operationDependencies: DataBrokerProtection.DataBrokerOperationDependencies, completion: ((DataBrokerProtection.DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
-        completion?(startScheduledOperationsIfPermittedCompletionError)
-        startScheduledOperationsIfPermittedCalledCompletion?(startScheduledOperationsIfPermittedCompletionError)
+    func startScheduledAllOperationsIfPermitted(showWebView: Bool, operationDependencies: DataBrokerProtection.DataBrokerOperationDependencies, completion: ((DataBrokerProtection.DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
+        completion?(startScheduledAllOperationsIfPermittedCompletionError)
+        startScheduledAllOperationsIfPermittedCalledCompletion?(startScheduledAllOperationsIfPermittedCompletionError)
+    }
+
+    func startScheduledScanOperationsIfPermitted(showWebView: Bool, operationDependencies: DataBrokerProtection.DataBrokerOperationDependencies, completion: ((DataBrokerProtection.DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
+        completion?(startScheduledScanOperationsIfPermittedCompletionError)
+        startScheduledScanOperationsIfPermittedCalledCompletion?(startScheduledScanOperationsIfPermittedCompletionError)
     }
 
     func execute(_ command: DataBrokerProtection.DataBrokerProtectionQueueManagerDebugCommand) {
@@ -1484,7 +1492,7 @@ final class MockDataBrokerOperationsCreator: DataBrokerOperationsCreator {
     var operationCollections: [DataBrokerOperation] = []
     var shouldError = false
     var priorityDate: Date?
-    var createdType: OperationType = .scan
+    var createdType: OperationType = .manualScan
 
     init(operationCollections: [DataBrokerOperation] = []) {
         self.operationCollections = operationCollections
@@ -1578,7 +1586,7 @@ final class MockAgentStopper: DataBrokerProtectionAgentStopper {
         validateRunPrerequisitesCompletion?()
     }
 
-    func monitorEntitlementAndStopAgentIfEntitlementIsInvalid(interval: TimeInterval) {
+    func monitorEntitlementAndStopAgentIfEntitlementIsInvalidAndUserIsNotFreemium(interval: TimeInterval) {
         monitorEntitlementCompletion?()
     }
 }
@@ -1931,4 +1939,9 @@ struct MockMigrationsProvider: DataBrokerProtectionDatabaseMigrationsProvider {
         didCallV4Migrations = true
         return { _ in }
     }
+}
+
+final class MockFreemiumPIRUserState: FreemiumPIRUserStateManager {
+    var didOnboard = false
+    var isActiveUser = false
 }
