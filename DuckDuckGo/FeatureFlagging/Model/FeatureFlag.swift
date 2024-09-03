@@ -22,7 +22,8 @@ import BrowserServicesKit
 public enum FeatureFlag: String {
     case debugMenu
     case sslCertificatesBypass
-    case phishingDetection
+    case phishingDetectionErrorPage
+    case phishingDetectionPreferences
 
     /// Add experimental atb parameter to SERP queries for internal users to display Privacy Reminder
     /// https://app.asana.com/0/1199230911884351/1205979030848528/f
@@ -48,8 +49,10 @@ extension FeatureFlag: FeatureFlagSourceProviding {
             return .remoteReleasable(.subfeature(AutofillSubfeature.deduplicateLoginsOnImport))
         case .freemiumPIR:
             return .remoteDevelopment(.subfeature(DBPSubfeature.freemium))
-        case .phishingDetection:
+        case .phishingDetectionErrorPage:
             return .remoteReleasable(.subfeature(PhishingDetectionSubfeature.allowErrorPage))
+        case .phishingDetectionPreferences:
+            return .remoteReleasable(.subfeature(PhishingDetectionSubfeature.allowPreferencesToggle))
         }
     }
 }
