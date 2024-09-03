@@ -362,7 +362,7 @@ struct RecentlyVisitedTitle: View {
 
 struct SiteIconAndConnector: View {
 
-    let backgroundColor = Color.homeFavoritesBackground
+    let backgroundColor = Color.homeFeedIconBackground
     let mouseOverColor = Color.homeFavoritesHover
 
     @EnvironmentObject var model: HomePage.Models.RecentlyVisitedModel
