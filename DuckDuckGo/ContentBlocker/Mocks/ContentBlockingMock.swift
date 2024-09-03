@@ -30,8 +30,8 @@ final class ContentBlockingMock: NSObject, ContentBlockingProtocol, AdClickAttri
         var embeddedDataEtag: String = ""
         var embeddedData: Data = .init()
     }
-    var trackerDataManager = TrackerDataManager(etag: ConfigurationStore.shared.loadEtag(for: .trackerDataSet),
-                                                data: ConfigurationStore.shared.loadData(for: .trackerDataSet),
+    var trackerDataManager = TrackerDataManager(etag: ConfigurationStore().loadEtag(for: .trackerDataSet),
+                                                data: ConfigurationStore().loadData(for: .trackerDataSet),
                                                 embeddedDataProvider: AppTrackerDataSetProvider(),
                                                 errorReporting: nil)
 

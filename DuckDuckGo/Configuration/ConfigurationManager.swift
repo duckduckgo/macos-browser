@@ -98,7 +98,7 @@ final class ConfigurationManager: DefaultConfigurationManager {
         await updateBloomFilterTask.value
         await updateBloomFilterExclusionsTask.value
 
-        ConfigurationStore.shared.log()
+        (store as? ConfigurationStore)?.log()
 
         Logger.config.info("last update \(String(describing: self.lastUpdateTime), privacy: .public)")
         Logger.config.info("last refresh check \(String(describing: self.lastRefreshCheckTime), privacy: .public)")
@@ -141,18 +141,18 @@ final class ConfigurationManager: DefaultConfigurationManager {
 
     private func updateTrackerBlockingDependencies() {
         lastConfigurationInstallDate = Date()
-        ContentBlocking.shared.trackerDataManager.reload(etag: ConfigurationStore.shared.loadEtag(for: .trackerDataSet),
-                                                         data: ConfigurationStore.shared.loadData(for: .trackerDataSet))
-        ContentBlocking.shared.privacyConfigurationManager.reload(etag: ConfigurationStore.shared.loadEtag(for: .privacyConfiguration),
-                                                                  data: ConfigurationStore.shared.loadData(for: .privacyConfiguration))
+        ContentBlocking.shared.trackerDataManager.reload(etag: store.loadEtag(for: .trackerDataSet),
+                                                         data: store.loadData(for: .trackerDataSet))
+        ContentBlocking.shared.privacyConfigurationManager.reload(etag: store.loadEtag(for: .privacyConfiguration),
+                                                                  data: store.loadData(for: .privacyConfiguration))
         ContentBlocking.shared.contentBlockingManager.scheduleCompilation()
     }
 
     private func updateBloomFilter() async throws {
-        guard let specData = ConfigurationStore.shared.loadData(for: .bloomFilterSpec) else {
+        guard let specData = store.loadData(for: .bloomFilterSpec) else {
             throw Error.bloomFilterSpecNotFound
         }
-        guard let bloomFilterData = ConfigurationStore.shared.loadData(for: .bloomFilterBinary) else {
+        guard let bloomFilterData = store.loadData(for: .bloomFilterBinary) else {
             throw Error.bloomFilterBinaryNotFound
         }
         try await Task.detached {
@@ -168,7 +168,7 @@ final class ConfigurationManager: DefaultConfigurationManager {
     }
 
     private func updateBloomFilterExclusions() async throws {
-        guard let bloomFilterExclusions = ConfigurationStore.shared.loadData(for: .bloomFilterExcludedDomains) else {
+        guard let bloomFilterExclusions = store.loadData(for: .bloomFilterExcludedDomains) else {
             throw Error.bloomFilterExclusionsNotFound
         }
         try await Task.detached {
@@ -186,7 +186,7 @@ final class ConfigurationManager: DefaultConfigurationManager {
 
 extension ConfigurationManager {
     override var presentedItemURL: URL? {
-        ConfigurationStore.shared.fileUrl(for: .privacyConfiguration)
+        store.fileUrl(for: .privacyConfiguration)
     }
 
     override func presentedItemDidChange() {

@@ -60,7 +60,7 @@ final class AppContentBlocking {
     // keeping whole ContentBlocking state initialization in one place to avoid races between updates publishing and rules storing
     @MainActor
     init(internalUserDecider: InternalUserDecider) {
-        let configStorage = ConfigurationStore.shared
+        let configStorage = ConfigurationStore()
         privacyConfigurationManager = PrivacyConfigurationManager(fetchedETag: configStorage.loadEtag(for: .privacyConfiguration),
                                                                   fetchedData: configStorage.loadData(for: .privacyConfiguration),
                                                                   embeddedDataProvider: AppPrivacyConfigurationDataProvider(),
@@ -68,8 +68,8 @@ final class AppContentBlocking {
                                                                   errorReporting: Self.debugEvents,
                                                                   internalUserDecider: internalUserDecider)
 
-        trackerDataManager = TrackerDataManager(etag: ConfigurationStore.shared.loadEtag(for: .trackerDataSet),
-                                                data: ConfigurationStore.shared.loadData(for: .trackerDataSet),
+        trackerDataManager = TrackerDataManager(etag: configStorage.loadEtag(for: .trackerDataSet),
+                                                data: configStorage.loadData(for: .trackerDataSet),
                                                 embeddedDataProvider: AppTrackerDataSetProvider(),
                                                 errorReporting: Self.debugEvents)
 

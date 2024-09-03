@@ -48,7 +48,6 @@ final class ConfigurationStore: ConfigurationStoring {
         static let configStorageRemoteMessagingConfigEtag = "config.storage.remotemessagingconfig.etag"
     }
 
-    static let shared = ConfigurationStore()
     private let defaults: KeyValueStoring
 
     private var trackerRadarEtag: String? {

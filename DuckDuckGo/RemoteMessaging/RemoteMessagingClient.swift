@@ -99,7 +99,7 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
                 urlSession: .session(),
                 eventMapping: ConfigurationManager.configurationDebugEvents
             ),
-            configurationStore: ConfigurationStore.shared
+            configurationStore: ConfigurationStore()
         )
         self.configMatcherProvider = configMatcherProvider
         self.remoteMessagingAvailabilityProvider = remoteMessagingAvailabilityProvider

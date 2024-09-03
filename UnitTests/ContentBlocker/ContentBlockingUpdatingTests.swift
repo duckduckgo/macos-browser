@@ -31,12 +31,13 @@ final class ContentBlockingUpdatingTests: XCTestCase {
 
     @MainActor
     override func setUp() {
+        let configStore = ConfigurationStore()
         updating = UserContentUpdating(contentBlockerRulesManager: rulesManager,
                                        privacyConfigurationManager: MockPrivacyConfigurationManager(),
-                                       trackerDataManager: TrackerDataManager(etag: ConfigurationStore.shared.loadEtag(for: .trackerDataSet),
-                                                                                                                                              data: ConfigurationStore.shared.loadData(for: .trackerDataSet),
-                                                                                                                                              embeddedDataProvider: AppTrackerDataSetProvider(),
-                                                                                                                                              errorReporting: nil),
+                                       trackerDataManager: TrackerDataManager(etag: configStore.loadEtag(for: .trackerDataSet),
+                                                                              data: configStore.loadData(for: .trackerDataSet),
+                                                                              embeddedDataProvider: AppTrackerDataSetProvider(),
+                                                                              errorReporting: nil),
                                        configStorage: MockConfigurationStore(),
                                        webTrackingProtectionPreferences: preferences,
                                        tld: TLD())

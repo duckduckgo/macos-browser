@@ -234,7 +234,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 appearancePreferences: .shared,
                 pinnedTabsManager: pinnedTabsManager,
                 internalUserDecider: internalUserDecider,
-                configurationStore: ConfigurationStore.shared,
+                configurationStore: ConfigurationStore(),
                 remoteMessagingAvailabilityProvider: PrivacyConfigurationRemoteMessagingAvailabilityProvider(
                     privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager
                 )
