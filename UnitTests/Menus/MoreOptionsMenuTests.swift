@@ -93,7 +93,7 @@ final class MoreOptionsMenuTests: XCTestCase {
                                           sharingMenu: NSMenu(),
                                           internalUserDecider: internalUserDecider,
                                           subscriptionManager: subscriptionManager,
-                                          freemiumPIRUserState: mockFreemiumPIRUserState,
+                                          freemiumPIRUserStateManager: mockFreemiumPIRUserState,
                                           freemiumPIRFeature: freemiumPIRFeature,
                                           freemiumPIRPresenter: mockFreemiumPIRPresenter)
 
