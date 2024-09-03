@@ -25,20 +25,23 @@ import os.log
 #if SPARKLE
 
 protocol UpdateUserDriverDelegate: AnyObject {
-    func userDriverUpdateCheckStart(_ userDriver: UpdateUserDriver)
     func userDriverUpdateCheckEnd(_ userDriver: UpdateUserDriver, item: SUAppcastItem?, isInstalled: Bool)
+    func userDriverUpdateCheckProgress(_ userDriver: UpdateUserDriver, progress: UpdateControllerProgress)
 }
 
 final class UpdateUserDriver: NSObject, SPUUserDriver {
     private var internalUserDecider: InternalUserDecider
-    private var automaticUpdateFlow: Bool
+    private var deferInstallation: Bool
     private weak var delegate: UpdateUserDriverDelegate?
 
+    private var bytesToDownload: UInt64 = 0
+    private var bytesDownloaded: UInt64 = 0
+
     init(internalUserDecider: InternalUserDecider,
-         automaticUpdateFlow: Bool,
-         delegate: UpdateUserDriverDelegate? = nil) {
+         deferInstallation: Bool,
+         delegate: UpdateUserDriverDelegate?) {
         self.internalUserDecider = internalUserDecider
-        self.automaticUpdateFlow = automaticUpdateFlow
+        self.deferInstallation = deferInstallation
         self.delegate = delegate
     }
 
@@ -52,79 +55,80 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
 
     func showUserInitiatedUpdateCheck(cancellation: @escaping () -> Void) {
         Logger.updates.debug("Updater started performing the update check. (isInternalUser: \(self.internalUserDecider.isInternalUser)")
-        delegate?.userDriverUpdateCheckStart(self)
+        delegate?.userDriverUpdateCheckProgress(self, progress: .checkDidStart)
     }
 
     func showUpdateFound(with appcastItem: SUAppcastItem, state: SPUUserUpdateState) async -> SPUUserUpdateChoice {
-        guard !appcastItem.isInformationOnlyUpdate else {
-            return .dismiss
-        }
-
         Logger.updates.debug("Updater did find valid update: \(appcastItem.displayVersionString)(\(appcastItem.versionString))")
-
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidFindUpdate))
 
-        if !automaticUpdateFlow {
-            delegate?.userDriverUpdateCheckEnd(self, item: appcastItem, isInstalled: false)
+        delegate?.userDriverUpdateCheckEnd(self, item: appcastItem, isInstalled: false)
 
-            return .dismiss
-        }
-
-        return .install
+        return deferInstallation ? .install : .dismiss
     }
 
     func showUpdateReleaseNotes(with downloadData: SPUDownloadData) {
+        // no-op
     }
 
     func showUpdateReleaseNotesFailedToDownloadWithError(_ error: any Error) {
+        // no-op
     }
 
     func showUpdateNotFoundWithError(_ error: any Error, acknowledgement: @escaping () -> Void) {
-        let item = (error as NSError).userInfo["SULatestAppcastItemFound"] as? SUAppcastItem
-        Logger.updates.debug("Updater did not find update: \(String(describing: item?.displayVersionString))(\(String(describing: item?.versionString)))")
-        if let item {
-            // User is running the latest version
-            delegate?.userDriverUpdateCheckEnd(self, item: item, isInstalled: true)
+        guard let item = (error as NSError).userInfo["SULatestAppcastItemFound"] as? SUAppcastItem else {
+            acknowledgement()
+            return
         }
 
+        Logger.updates.debug("Updater did not find update: \(String(describing: item.displayVersionString))(\(String(describing: item.versionString)))")
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidNotFindUpdate, error: error))
+
+        // User is running the latest version
+        delegate?.userDriverUpdateCheckEnd(self, item: item, isInstalled: true)
 
         acknowledgement()
     }
 
     func showUpdaterError(_ error: any Error, acknowledgement: @escaping () -> Void) {
+        // no-op
     }
 
     func showDownloadInitiated(cancellation: @escaping () -> Void) {
+        delegate?.userDriverUpdateCheckProgress(self, progress: .downloadDidStart)
     }
 
     func showDownloadDidReceiveExpectedContentLength(_ expectedContentLength: UInt64) {
-        let megabytes = Double(expectedContentLength) / 1024
-        print("[Update] Expected content length: \(String(format: "%.2f", megabytes)) MB")
+        bytesDownloaded = 0
+        bytesToDownload = expectedContentLength
     }
 
     func showDownloadDidReceiveData(ofLength length: UInt64) {
-        let megabytes = Double(length) / 1024
-        print("[Update] Did receive: \(String(format: "%.2f", megabytes)) MB")
+        bytesDownloaded += length
+        if bytesDownloaded > bytesToDownload {
+            bytesToDownload = bytesDownloaded
+        }
+        delegate?.userDriverUpdateCheckProgress(self, progress: .downloading(bytesDownloaded, bytesToDownload))
     }
 
     func showDownloadDidStartExtractingUpdate() {
-        print("[Update] Start extracting update")
+        delegate?.userDriverUpdateCheckProgress(self, progress: .extractionDidStart)
     }
 
     func showExtractionReceivedProgress(_ progress: Double) {
-        print("[Update] Extraction: \(String(format: "%.2f", progress / 100.0))%")
+        delegate?.userDriverUpdateCheckProgress(self, progress: .extracting(progress))
     }
 
     func showReadyToInstallAndRelaunch() async -> SPUUserUpdateChoice {
-        .install
+        deferInstallation ? .dismiss : .install
     }
 
     func showInstallingUpdate(withApplicationTerminated applicationTerminated: Bool, retryTerminatingApplication: @escaping () -> Void) {
-        retryTerminatingApplication()
+        delegate?.userDriverUpdateCheckProgress(self, progress: .installationDidStart)
     }
 
     func showUpdateInstalledAndRelaunched(_ relaunched: Bool, acknowledgement: @escaping () -> Void) {
+        delegate?.userDriverUpdateCheckProgress(self, progress: .installing)
         acknowledgement()
     }
 
@@ -132,6 +136,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     }
 
     func dismissUpdateInstallation() {
+        delegate?.userDriverUpdateCheckProgress(self, progress: .done)
     }
 }
 
