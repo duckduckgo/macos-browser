@@ -33,7 +33,7 @@ final class HomePageViewController: NSViewController {
     private let fireViewModel: FireViewModel
     private let onboardingViewModel: OnboardingViewModel
     private let freemiumPIRFeature: FreemiumPIRFeature
-    private var freemiumPIRUserState: FreemiumPIRUserState
+    private var freemiumPIRUserStateManager: FreemiumPIRUserStateManager
     private let freemiumPIRPresenter: FreemiumPIRPresenter
 
     private(set) lazy var faviconsFetcherOnboarding: FaviconsFetcherOnboarding? = {
@@ -70,7 +70,7 @@ final class HomePageViewController: NSViewController {
          appearancePreferences: AppearancePreferences = AppearancePreferences.shared,
          defaultBrowserPreferences: DefaultBrowserPreferences = DefaultBrowserPreferences.shared,
          freemiumPIRFeature: FreemiumPIRFeature,
-         freemiumPIRUserState: FreemiumPIRUserState,
+         freemiumPIRUserStateManager: FreemiumPIRUserStateManager,
          freemiumPIRPresenter: FreemiumPIRPresenter = DefaultFreemiumPIRPresenter()) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
@@ -82,7 +82,7 @@ final class HomePageViewController: NSViewController {
         self.appearancePreferences = appearancePreferences
         self.defaultBrowserPreferences = defaultBrowserPreferences
         self.freemiumPIRFeature = freemiumPIRFeature
-        self.freemiumPIRUserState = freemiumPIRUserState
+        self.freemiumPIRUserStateManager = freemiumPIRUserStateManager
         self.freemiumPIRPresenter = freemiumPIRPresenter
 
         super.init(nibName: nil, bundle: nil)
@@ -218,9 +218,9 @@ final class HomePageViewController: NSViewController {
     private func createPromotionModel() -> PromotionViewModel {
         return PromotionViewModel.freemiumPIRPromotion { [weak self] in
             // TODO: Remove this
-            self?.freemiumPIRUserState.didOnboard = true
+            self?.freemiumPIRUserStateManager.didOnboard = true
             // ------
-            self?.freemiumPIRPresenter.showFreemiumPIR(didOnboard: self?.freemiumPIRUserState.didOnboard ?? false,
+            self?.freemiumPIRPresenter.showFreemiumPIR(didOnboard: self?.freemiumPIRUserStateManager.didOnboard ?? false,
                                                        windowControllerManager: WindowControllersManager.shared)
             self?.appearancePreferences.didDismissHomePagePromotion = true
         } closeAction: { [weak self] in

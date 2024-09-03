@@ -102,7 +102,8 @@ final class DuckDuckGoDBPBackgroundAgentAppDelegate: NSObject, NSApplicationDele
                                           authenticationRepository: KeychainAuthenticationData())
         let authenticationManager = DataBrokerAuthenticationManagerBuilder.buildAuthenticationManager(redeemUseCase: redeemUseCase,
                                                                                                       subscriptionManager: subscriptionManager)
-        manager = DataBrokerProtectionAgentManagerProvider.agentManager(authenticationManager: authenticationManager)
+        manager = DataBrokerProtectionAgentManagerProvider.agentManager(authenticationManager: authenticationManager,
+                                                                        accountManager: subscriptionManager.accountManager)
         manager?.agentFinishedLaunching()
 
         setupStatusBarMenu()

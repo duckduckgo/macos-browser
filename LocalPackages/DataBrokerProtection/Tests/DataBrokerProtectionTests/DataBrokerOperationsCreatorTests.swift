@@ -70,7 +70,7 @@ final class DataBrokerOperationsCreatorTests: XCTestCase {
         mockDatabase.brokerProfileQueryDataToReturn = dataBrokerProfileQueries
 
         // When
-        let result = try! sut.operations(forOperationType: .scan,
+        let result = try! sut.operations(forOperationType: .manualScan,
                                          withPriorityDate: Date(),
                                          showWebView: false,
                                          errorDelegate: MockDataBrokerOperationErrorDelegate(),

@@ -39,6 +39,7 @@ import Subscription
 import NetworkProtectionIPC
 import DataBrokerProtection
 import RemoteMessaging
+import Freemium
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
 
@@ -375,7 +376,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         UNUserNotificationCenter.current().delegate = self
 
         dataBrokerProtectionSubscriptionEventHandler.registerForSubscriptionAccountManagerEvents()
-        DataBrokerProtectionAppEvents(featureGatekeeper: DefaultDataBrokerProtectionFeatureGatekeeper(accountManager: subscriptionManager.accountManager)).applicationDidFinishLaunching()
+
+        let freemiumPIRUserStateManager = DefaultFreemiumPIRUserStateManager(userDefaults: .dbp, accountManager: subscriptionManager.accountManager)
+        let pirGatekeeper = DefaultDataBrokerProtectionFeatureGatekeeper(accountManager:
+                                                                            subscriptionManager.accountManager,
+                                                                         freemiumPIRUserStateManager: freemiumPIRUserStateManager)
+
+        DataBrokerProtectionAppEvents(featureGatekeeper: pirGatekeeper).applicationDidFinishLaunching()
 
         setUpAutoClearHandler()
 
@@ -422,9 +429,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         NetworkProtectionAppEvents(featureGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: subscriptionManager)).applicationDidBecomeActive()
 
-        DataBrokerProtectionAppEvents(featureGatekeeper:
-                                        DefaultDataBrokerProtectionFeatureGatekeeper(accountManager:
-                                                                                        subscriptionManager.accountManager)).applicationDidBecomeActive()
+        let freemiumPIRUserStateManager = DefaultFreemiumPIRUserStateManager(userDefaults: .dbp, accountManager: subscriptionManager.accountManager)
+        let pirGatekeeper = DefaultDataBrokerProtectionFeatureGatekeeper(accountManager:
+                                                                            subscriptionManager.accountManager,
+                                                                         freemiumPIRUserStateManager: freemiumPIRUserStateManager)
+
+        DataBrokerProtectionAppEvents(featureGatekeeper: pirGatekeeper).applicationDidBecomeActive()
 
         subscriptionManager.refreshCachedSubscriptionAndEntitlements { isSubscriptionActive in
             if isSubscriptionActive {
