@@ -177,6 +177,7 @@ private struct DaxSpeechBubble<Content: View>: View {
             HStack(alignment: .top, spacing: 12) {
                 Image("DuckPlayerOnboardingModalDax")
                     .padding(.leading, -10)
+                    .padding(.top, 8)
 
                 ZStack {
                     SpeechBubble()
