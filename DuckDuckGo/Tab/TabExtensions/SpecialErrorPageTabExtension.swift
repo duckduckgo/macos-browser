@@ -120,7 +120,7 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
         let errorType = PhishingDetectionError.detected.localizedDescription
         if isMalicious {
             errorPageType = .phishing
-            //self.specialErrorPageUserScript?.errorData.kind = "phishing"
+            // self.specialErrorPageUserScript?.errorData.kind = "phishing"
             if let mainFrameTarget = navigationAction.mainFrameTarget {
                 failingURL = url
                 let domain: String = url.host ?? url.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true)
@@ -183,7 +183,7 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
         shouldBypassSSLError = false
         return .credential(credential)
     }
-    
+
     @MainActor
     func generateErrorPageURL(_ url: URL) -> URL? {
         guard let urlString = url.absoluteString.data(using: .utf8) else {
@@ -209,7 +209,7 @@ extension SpecialErrorPageTabExtension: SpecialErrorPageUserScriptDelegate {
     func visitSite() {
         if errorPageType == .phishing {
             if let url = webView?.url {
-                //PixelKit.fire(PhishingDetectionPixels.visitSite)
+                // PixelKit.fire(PhishingDetectionPixels.visitSite)
                 phishingURLExemptions.insert(url)
                 self.phishingStateManager.didBypassError = true
                 self.phishingStateManager.isShowingPhishingError = false
