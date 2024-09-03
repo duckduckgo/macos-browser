@@ -18,7 +18,6 @@
 
 import Foundation
 
-
 /**
  `URLTokenValidator` is responsible for generating and validating URL signatures to securely pass URLs around in Special Pages.
 
@@ -144,13 +143,13 @@ public class URLTokenValidator {
         var base64String = base64URLString
             .replacingOccurrences(of: "-", with: "+")
             .replacingOccurrences(of: "_", with: "/")
-        
+
         // Add padding if necessary
         let paddingLength = 4 - (base64String.count % 4)
         if paddingLength < 4 {
             base64String.append(contentsOf: repeatElement("=", count: paddingLength))
         }
-        
+
         // Decode the Base64 string to data
         return Data(base64Encoded: base64String)
     }
