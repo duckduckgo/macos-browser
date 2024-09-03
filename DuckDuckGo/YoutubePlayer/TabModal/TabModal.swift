@@ -127,7 +127,13 @@ extension TabModal: TabModalPresentable {
 
         if animated {
             overlayWindow.setFrameOrigin(NSPoint(x: xPosition, y: yPosition))
-            overlayWindow.alphaValue = 1
+            overlayWindow.alphaValue = 0
+
+            /// There's a bug in macOS 14.x where, if a window's alpha value is animated from X to Y, the final value will always be X.
+            /// This is a workaround to prevent that.
+            if #unavailable(macOS 15) {
+                overlayWindow.styleMask.insert(.titled)
+            }
 
             NSAnimationContext.runAnimationGroup { context in
                 context.duration = AnimationConsts.duration
@@ -135,7 +141,11 @@ extension TabModal: TabModalPresentable {
                 let size = overlayWindow.frame.size
                 overlayWindow.animator().alphaValue = 1
                 overlayWindow.animator().setFrame(NSRect(origin: newOrigin, size: size), display: true)
+            }
 
+            /// Second part of the workaround mentioned above
+            if #unavailable(macOS 15) {
+                overlayWindow.styleMask.remove(.titled)
             }
         } else {
             overlayWindow.setFrameOrigin(NSPoint(x: xPosition, y: yPosition - AnimationConsts.yAnimationOffset))
