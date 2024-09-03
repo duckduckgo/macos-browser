@@ -150,35 +150,68 @@ extension Preferences {
                     }))
 #if SPARKLE
                 switch model.updateState {
-                case .loading:
-                    Text(" — " + UserText.checkingForUpdate)
                 case .upToDate:
                     Text(" — " + UserText.upToDate)
-                case .newVersionAvailable:
-                    Text(" — " + UserText.newerVersionAvailable)
+                case .newVersionAvailable(let progress):
+                    if progress.isIdle {
+                        Text(" — " + UserText.newerVersionAvailable)
+                    } else {
+                        text(for: progress)
+                    }
                 }
 #endif
             }
         }
 
 #if SPARKLE
+        private var formatter: ByteCountFormatter {
+            let formatter = ByteCountFormatter()
+            formatter.allowsNonnumericFormatting = false
+            formatter.allowedUnits = [.useKB, .useMB, .useGB]
+            return formatter
+        }
+
+        @ViewBuilder
+        private func text(for progress: UpdateControllerProgress) -> some View {
+            switch progress {
+            case .checkDidStart:
+                Text("- Checking for update")
+            case .downloadDidStart:
+                Text("- Downloading update")
+            case .downloading(let bytesDownloaded, let bytesToDownload):
+                Text("- Downloading \(formatter.string(fromByteCount: Int64(bytesDownloaded))) / \(formatter.string(fromByteCount: Int64(bytesToDownload)))")
+            case .extractionDidStart:
+                Text("- Extracting update")
+            case .extracting(let percentage):
+                Text("- Extracting update (\(percentage * 100)%)")
+            case .readyToInstallAndRelaunch:
+                Text("- Ready to install")
+            case .installationDidStart, .installing:
+                Text("- Installing")
+            case .idle, .done:
+                Text("")
+            }
+        }
+
         @ViewBuilder
         private var statusIcon: some View {
             switch model.updateState {
-            case .loading:
-                ProgressView()
-                    .scaleEffect(0.6)
             case .upToDate:
                 Image(systemName: "checkmark.circle.fill")
                     .foregroundColor(.green)
-            case .newVersionAvailable:
-                Image(systemName: "exclamationmark.circle.fill")
-                    .foregroundColor(.red)
+            case .newVersionAvailable(let progress):
+                if progress.isIdle {
+                    Image(systemName: "exclamationmark.circle.fill")
+                        .foregroundColor(.red)
+                } else {
+                    ProgressView()
+                        .scaleEffect(0.6)
+                }
             }
         }
 
         private var lastCheckedText: some View {
-            let lastChecked = model.updateState != .loading ? "\(lastCheckedFormattedDate(model.lastUpdateCheckDate))" : "-"
+            let lastChecked = !model.updateState.isLoading ? "\(lastCheckedFormattedDate(model.lastUpdateCheckDate))" : "-"
             return Text("\(UserText.lastChecked): \(lastChecked)")
                 .foregroundColor(.secondary)
         }
@@ -200,22 +233,24 @@ extension Preferences {
         @ViewBuilder
         private var updateButton: some View {
             switch model.updateState {
-            case .loading:
-                Button(UserText.checkForUpdate) {
-                    model.checkForUpdate()
-                }
-                .buttonStyle(UpdateButtonStyle(enabled: false))
-                .disabled(true)
             case .upToDate:
                 Button(UserText.checkForUpdate) {
                     model.checkForUpdate()
                 }
                 .buttonStyle(UpdateButtonStyle(enabled: true))
-            case .newVersionAvailable:
-                Button(UserText.restartToUpdate) {
-                    model.restartToUpdate()
+            case .newVersionAvailable(let progress):
+                if progress.isIdle {
+                    Button(UserText.restartToUpdate) {
+                        model.restartToUpdate()
+                    }
+                    .buttonStyle(UpdateButtonStyle(enabled: true))
+                } else {
+                    Button(UserText.checkForUpdate) {
+                        model.checkForUpdate()
+                    }
+                    .buttonStyle(UpdateButtonStyle(enabled: false))
+                    .disabled(true)
                 }
-                .buttonStyle(UpdateButtonStyle(enabled: true))
             }
         }
 #endif

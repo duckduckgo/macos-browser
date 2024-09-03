@@ -12384,6 +12384,9 @@
         }
       }
     },
+    "Checking for update" : {
+
+    },
     "clear" : {
       "comment" : "Clear button",
       "extractionState" : "extracted_with_value",
@@ -16780,6 +16783,19 @@
           }
         }
       }
+    },
+    "Downloading %@ / %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Downloading %1$@ / %2$@"
+          }
+        }
+      }
+    },
+    "Downloading update" : {
+
     },
     "downloads.active.alert.message.and.others" : {
       "comment" : "Alert text format element for “, and other files”",
@@ -21235,6 +21251,12 @@
           }
         }
       }
+    },
+    "Extracting update" : {
+
+    },
+    "Extracting update (%lf%%)" : {
+
     },
     "Favorite This Page…" : {
       "comment" : "Main Menu History item",
@@ -30119,6 +30141,9 @@
           }
         }
       }
+    },
+    "Installing" : {
+
     },
     "invite.dialog.get.started.button" : {
       "comment" : "Get Started button on an invite dialog",
@@ -52877,6 +52902,9 @@
           }
         }
       }
+    },
+    "Ready to install" : {
+
     },
     "Recently Closed" : {
       "comment" : "Main Menu History item",
