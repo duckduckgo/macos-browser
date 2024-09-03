@@ -1227,7 +1227,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
     @MainActor
     private func loadErrorHTML(_ error: WKError, header: String, forUnreachableURL url: URL, alternate: Bool) {
-        if error.localizedDescription == PhishingDetectionError.detected.localizedDescription {
+        if error.errorCode == PhishingDetectionError.detected.errorCode {
             let html = SpecialErrorPageHTMLTemplate.htmlFromTemplate
             webView.loadAlternateHTML(html, baseURL: .error, forUnreachableURL: url)
         } else {
