@@ -26,7 +26,6 @@ final class DefaultDuckPlayerOnboardingDeciderTests: XCTestCase {
     static let defaultsName = "TestDefaults"
     var experiment: MockOnboardingExperimentManager!
 
-
     override func setUp() {
         super.setUp()
         defaults = UserDefaults(suiteName: DefaultDuckPlayerOnboardingDeciderTests.defaultsName)!
@@ -102,7 +101,7 @@ final class DefaultDuckPlayerOnboardingDeciderTests: XCTestCase {
             )
         )
 
-        let onboardingDecider = DefaultDuckPlayerOnboardingDecider(defaults: defaults, 
+        let onboardingDecider = DefaultDuckPlayerOnboardingDecider(defaults: defaults,
                                                                    preferences: preferences,
                                                                    onboardingExperiment: experiment)
         XCTAssertTrue(onboardingDecider.canDisplayOnboarding)
@@ -163,11 +162,11 @@ final class MockOnboardingExperimentManager: OnboardingExperimentManager {
     var cohortUser: Bool = true
 
     func assignUserToCohort() { }
-    func getPixelParameters(cohort: Bool, date: Bool, experimentName: Bool) -> [String: String]? { 
+    func getPixelParameters(cohort: Bool, date: Bool, experimentName: Bool) -> [String: String]? {
         return nil
     }
     func fireWeeklyUniqueViewPixel(extraParams: [String: String]?) { }
-    
+
     var isUserAssignedToExperimentCohort: Bool {
         cohortUser
     }
