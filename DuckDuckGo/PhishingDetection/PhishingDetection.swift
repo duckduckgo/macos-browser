@@ -95,7 +95,7 @@ public class PhishingDetection: PhishingSiteDetecting {
         self.featureFlagger = NSApp.delegateTyped.featureFlagger
         self.config = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig
         if let featureFlagger = featureFlagger,
-           featureFlagger.isFeatureOn(.phishingDetection),
+           featureFlagger.isFeatureOn(.phishingDetectionErrorPage),
            self.detectionPreferences.isEnabled {
             startUpdateTasks()
         }
