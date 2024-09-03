@@ -473,6 +473,9 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
                    proposedRow row: Int,
                    proposedDropOperation dropOperation: NSTableView.DropOperation) -> NSDragOperation {
         let destination = destination(for: dropOperation, at: row)
+
+        guard !isSearching || destination is BookmarkFolder else { return .none }
+
         return dragDropManager.validateDrop(info, to: destination)
     }
 
