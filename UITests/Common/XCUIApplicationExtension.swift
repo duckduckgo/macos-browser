@@ -18,6 +18,12 @@
 
 import XCTest
 
+// Enum to represent bookmark modes
+enum BookmarkMode {
+    case panel
+    case manager
+}
+
 extension XCUIApplication {
 
     private enum AccessibilityIdentifiers {
@@ -34,6 +40,19 @@ extension XCUIApplication {
         let button = popover.buttons[buttonIdentifier]
         button.tap()
     }
+
+    /// Enforces single a single window by:
+    ///  1. First, closing all windows
+    ///  2. Opening a new window
+    func enforceSingleWindow() {
+        typeKey("w", modifierFlags: [.command, .option, .shift])
+        typeKey("n", modifierFlags: .command)
+    }
+
+    /// Opens a new tab via keyboard shortcut
+    func openNewTab() {
+         typeKey("t", modifierFlags: .command)
+     }
 
     // MARK: - Bookmarks
 
@@ -64,8 +83,7 @@ extension XCUIApplication {
     /// - Parameter bookmarkingViaDialog: open bookmark dialog, adding bookmark
     /// - Parameter escapingDialog: `esc` key to leave dialog
     /// - Parameter folderName: The name of the folder where you want to save the bookmark. If the folder does not exist, it fails.
-    func openSiteToBookmark(app: XCUIApplication,
-                            url: URL,
+    func openSiteToBookmark(url: URL,
                             pageTitle: String,
                             bookmarkingViaDialog: Bool,
                             escapingDialog: Bool,
@@ -77,32 +95,45 @@ extension XCUIApplication {
         )
         addressBarTextField.typeURL(url)
         XCTAssertTrue(
-            app.windows.webViews[pageTitle].waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            windows.webViews[pageTitle].waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Visited site didn't load with the expected title in a reasonable timeframe."
         )
         if bookmarkingViaDialog {
-            app.typeKey("d", modifierFlags: [.command]) // Add bookmark
+            typeKey("d", modifierFlags: [.command]) // Add bookmark
 
             if let folderName = folderName {
-                let folderLocationButton = app.popUpButtons["bookmark.add.folder.dropdown"]
+                let folderLocationButton = popUpButtons["bookmark.add.folder.dropdown"]
                 folderLocationButton.tap()
                 let folderOneLocation = folderLocationButton.menuItems[folderName]
                 folderOneLocation.tap()
             }
 
             if escapingDialog {
-                app.typeKey(.escape, modifierFlags: []) // Exit dialog
+                typeKey(.escape, modifierFlags: []) // Exit dialog
             }
         }
     }
 
     /// Shows the bookmarks panel shortcut and taps it. If the bookmarks shortcut is visible, it only taps it.
-    func showAndTapBookmarksPanelShortcut() {
+    func openBookmarksPanel() {
         let bookmarksPanelShortcutButton = buttons[AccessibilityIdentifiers.bookmarksPanelShortcutButton]
         if !bookmarksPanelShortcutButton.exists {
             typeKey("K", modifierFlags: [.command, .shift])
         }
 
         bookmarksPanelShortcutButton.tap()
+    }
+
+    func verifyBookmarkOrder(expectedOrder: [String], mode: BookmarkMode) {
+        let rowCount = (mode == .panel ? popovers.firstMatch.outlines.firstMatch : tables.firstMatch).cells.count
+        XCTAssertEqual(rowCount, expectedOrder.count, "Row count does not match expected count.")
+
+        for index in 0..<rowCount {
+            let cell = (mode == .panel ? popovers.firstMatch.outlines.firstMatch : tables.firstMatch).cells.element(boundBy: index)
+            XCTAssertTrue(cell.exists, "Cell at index \(index) does not exist.")
+
+            let cellLabel = cell.staticTexts[expectedOrder[index]]
+            XCTAssertTrue(cellLabel.exists, "Cell at index \(index) has unexpected label.")
+        }
     }
 }
