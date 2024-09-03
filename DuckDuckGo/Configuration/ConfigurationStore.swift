@@ -33,7 +33,6 @@ final class ConfigurationStore: ConfigurationStoring {
         .surrogates: "surrogates.txt",
         .privacyConfiguration: "macos-config.json",
         .trackerDataSet: "tracker-radar.json",
-        .FBConfig: "social_ctp_configuration.json",
         .remoteMessagingConfig: "remote-messaging-config.json"
     ]
 
@@ -134,7 +133,6 @@ final class ConfigurationStore: ConfigurationStoring {
         case .surrogates: return surrogatesEtag
         case .trackerDataSet: return trackerRadarEtag
         case .privacyConfiguration: return privacyConfigurationEtag
-        case .FBConfig: return FBConfigEtag
         case .remoteMessagingConfig: return remoteMessagingConfigEtag
         }
     }
@@ -155,7 +153,6 @@ final class ConfigurationStore: ConfigurationStoring {
         case .surrogates: surrogatesEtag = etag
         case .trackerDataSet: trackerRadarEtag = etag
         case .privacyConfiguration: privacyConfigurationEtag = etag
-        case .FBConfig: FBConfigEtag = etag
         case .remoteMessagingConfig: remoteMessagingConfigEtag = etag
         }
     }
@@ -211,7 +208,6 @@ final class ConfigurationStore: ConfigurationStoring {
         Logger.config.info("surrogatesEtag \(self.surrogatesEtag ?? "", privacy: .public)")
         Logger.config.info("trackerRadarEtag \(self.trackerRadarEtag ?? "", privacy: .public)")
         Logger.config.info("privacyConfigurationEtag \(self.privacyConfigurationEtag ?? "", privacy: .public)")
-        Logger.config.info("FBConfigEtag \(self.FBConfigEtag ?? "", privacy: .public)")
         Logger.config.info("remoteMessagingConfig \(self.remoteMessagingConfigEtag ?? "", privacy: .public)")
     }
 

@@ -188,11 +188,17 @@ extension TabExtensionsBuilder {
             NavigationHotkeyHandler(isTabPinned: args.isTabPinned, isBurner: args.isTabBurner)
         }
 
+        let duckPlayerOnboardingDecider = DefaultDuckPlayerOnboardingDecider()
         add {
             DuckPlayerTabExtension(duckPlayer: dependencies.duckPlayer,
                                    isBurner: args.isTabBurner,
                                    scriptsPublisher: userScripts.compactMap { $0 },
-                                   webViewPublisher: args.webViewFuture)
+                                   webViewPublisher: args.webViewFuture,
+                                   onboardingDecider: duckPlayerOnboardingDecider)
+        }
+
+        add {
+            DuckPlayerOnboardingTabExtension(onboardingDecider: duckPlayerOnboardingDecider)
         }
 
         add {

@@ -253,7 +253,8 @@ extension ContentScopeFeatureToggles {
             credentialsSaving: false,
             passwordGeneration: false,
             inlineIconCredentials: false,
-            thirdPartyCredentialsProvider: false
+            thirdPartyCredentialsProvider: false,
+            unknownUsernameCategorization: false
         )
     }
 }

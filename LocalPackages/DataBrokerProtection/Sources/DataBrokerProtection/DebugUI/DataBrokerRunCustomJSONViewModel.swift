@@ -164,7 +164,8 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
                                                   credentialsSaving: false,
                                                   passwordGeneration: false,
                                                   inlineIconCredentials: false,
-                                                  thirdPartyCredentialsProvider: false)
+                                                  thirdPartyCredentialsProvider: false,
+                                                  unknownUsernameCategorization: false)
 
         let sessionKey = UUID().uuidString
         self.authenticationManager = authenticationManager
