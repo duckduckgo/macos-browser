@@ -26,6 +26,28 @@ import PixelKit
 import SwiftUI
 import os.log
 
+enum UpdateControllerProgress {
+    case idle
+    case checkDidStart
+    case downloadDidStart
+    case downloading(UInt64, UInt64)
+    case extractionDidStart
+    case extracting(Double)
+    case readyToInstallAndRelaunch
+    case installationDidStart
+    case installing
+    case done
+
+    static var `default` = UpdateControllerProgress.idle
+
+    var isIdle: Bool {
+        switch self {
+        case .idle, .done: return true
+        default: return false
+        }
+    }
+}
+
 protocol UpdateControllerProtocol: AnyObject {
 
     var latestUpdate: Update? { get }
@@ -34,8 +56,8 @@ protocol UpdateControllerProtocol: AnyObject {
     var isUpdateAvailableToInstall: Bool { get }
     var isUpdateAvailableToInstallPublisher: Published<Bool>.Publisher { get }
 
-    var isUpdateBeingLoaded: Bool { get }
-    var isUpdateBeingLoadedPublisher: Published<Bool>.Publisher { get }
+    var updateProgress: UpdateControllerProgress { get }
+    var updateProgressPublisher: Published<UpdateControllerProgress>.Publisher { get }
 
     var lastUpdateCheckDate: Date? { get }
 
@@ -69,8 +91,8 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         configureUpdater()
     }
 
-    @Published private(set) var isUpdateBeingLoaded = false
-    var isUpdateBeingLoadedPublisher: Published<Bool>.Publisher { $isUpdateBeingLoaded }
+    @Published private(set) var updateProgress = UpdateControllerProgress.default
+    var updateProgressPublisher: Published<UpdateControllerProgress>.Publisher { $updateProgress }
 
     @Published private(set) var latestUpdate: Update? {
         didSet {
@@ -151,7 +173,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     private func configureUpdater() {
         // The default configuration of Sparkle updates is in Info.plist
         userDriver = UpdateUserDriver(internalUserDecider: internalUserDecider,
-                                      automaticUpdateFlow: areAutomaticUpdatesEnabled,
+                                      deferInstallation: areAutomaticUpdatesEnabled,
                                       delegate: self)
         updater = SPUUpdater(hostBundle: Bundle.main, applicationBundle: Bundle.main, userDriver: userDriver, delegate: self)
         try? updater.start()
@@ -167,7 +189,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         updater.updateCheckInterval = 0
 #endif
 
-        checkForUpdateInBackground()
+//        checkForUpdateInBackground()
     }
 
     @objc func openUpdatesPage() {
@@ -199,20 +221,16 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
 //}
 
 extension UpdateController: UpdateUserDriverDelegate {
-    func userDriverUpdateCheckStart(_ userDriver: UpdateUserDriver) {
-        onUpdateCheckStart()
-    }
-
     func userDriverUpdateCheckEnd(_ userDriver: UpdateUserDriver, item: SUAppcastItem?, isInstalled: Bool) {
         onUpdateCheckEnd(item: item, isInstalled: isInstalled)
+    }
+
+    func userDriverUpdateCheckProgress(_ userDriver: UpdateUserDriver, progress: UpdateControllerProgress) {
+        updateProgress = progress
     }
 }
 
 extension UpdateController: SPUUpdaterDelegate {
-
-    private func onUpdateCheckStart() {
-        isUpdateBeingLoaded = true
-    }
 
     func allowedChannels(for updater: SPUUpdater) -> Set<String> {
         if internalUserDecider.isInternalUser {
@@ -258,11 +276,11 @@ extension UpdateController: SPUUpdaterDelegate {
         } else {
             latestUpdate = nil
         }
-        isUpdateBeingLoaded = false
     }
 
     func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {
         Logger.updates.debug("Updater did finish update cycle")
+        updateProgress = .done
     }
 
 }
