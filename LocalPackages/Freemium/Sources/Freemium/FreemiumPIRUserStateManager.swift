@@ -17,14 +17,11 @@
 //
 
 import Foundation
-import Subscription
 
 /// `FreemiumPIRUserStateManager` types provide access to Freemium PIR-related state
 public protocol FreemiumPIRUserStateManager {
     var didOnboard: Bool { get set }
 
-    /// `isActiveUser` implementations`should only return `true` if the current user DOES NOT have a subscription
-    var isActiveUser: Bool { get }
 }
 
 /// Default implementation of `FreemiumPIRUserStateManager`. `UserDefaults` is used as underlying storage.
@@ -35,7 +32,6 @@ public final class DefaultFreemiumPIRUserStateManager: FreemiumPIRUserStateManag
     }
 
     private let userDefaults: UserDefaults
-    private let accountManager: AccountManager
     private let key = "macos.browser.freemium.pir.did.onboard"
 
     public var didOnboard: Bool {
@@ -46,21 +42,14 @@ public final class DefaultFreemiumPIRUserStateManager: FreemiumPIRUserStateManag
         }
     }
 
-    /// Logic is based on `didOnboard` && `accountManager.isUserAuthenticated`
-    /// A user can only be a current freemium user is they onboarded and DON'T have a subscription
-    public var isActiveUser: Bool {
-        didOnboard && !accountManager.isUserAuthenticated
-    }
-
     /// Initializes a `DefaultFreemiumPIRState` instance
-    /// Note: The `UserDefaults` parameter will be used to get and set state values. If creating and accessing this type from
+    ///
+    /// Note 1: The `UserDefaults` parameter will be used to get and set state values. If creating and accessing this type from
     /// multiple places, you must ensure you always pass the same `UserDefaults` instance to get consistent results.
+    /// .
     /// - Parameters:
     ///   - userDefaults: The `UserDefaults` parameter will be used to get and set state values.
-    ///   - accountManager: the `AccountManager` parameter is used to check if a user has a privacy pro subscription
-    public init(userDefaults: UserDefaults,
-                accountManager: AccountManager) {
+    public init(userDefaults: UserDefaults) {
         self.userDefaults = userDefaults
-        self.accountManager = accountManager
     }
 }

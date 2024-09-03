@@ -377,7 +377,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         dataBrokerProtectionSubscriptionEventHandler.registerForSubscriptionAccountManagerEvents()
 
-        let freemiumPIRUserStateManager = DefaultFreemiumPIRUserStateManager(userDefaults: .dbp, accountManager: subscriptionManager.accountManager)
+        let freemiumPIRUserStateManager = DefaultFreemiumPIRUserStateManager(userDefaults: .dbp)
         let pirGatekeeper = DefaultDataBrokerProtectionFeatureGatekeeper(accountManager:
                                                                             subscriptionManager.accountManager,
                                                                          freemiumPIRUserStateManager: freemiumPIRUserStateManager)
@@ -429,7 +429,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         NetworkProtectionAppEvents(featureGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: subscriptionManager)).applicationDidBecomeActive()
 
-        let freemiumPIRUserStateManager = DefaultFreemiumPIRUserStateManager(userDefaults: .dbp, accountManager: subscriptionManager.accountManager)
+        let freemiumPIRUserStateManager = DefaultFreemiumPIRUserStateManager(userDefaults: .dbp)
         let pirGatekeeper = DefaultDataBrokerProtectionFeatureGatekeeper(accountManager:
                                                                             subscriptionManager.accountManager,
                                                                          freemiumPIRUserStateManager: freemiumPIRUserStateManager)

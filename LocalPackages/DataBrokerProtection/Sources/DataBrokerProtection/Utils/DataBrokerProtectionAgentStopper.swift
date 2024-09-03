@@ -61,15 +61,15 @@ struct DefaultDataBrokerProtectionAgentStopper: DataBrokerProtectionAgentStopper
         do {
             let hasProfile = try dataManager.fetchProfile() != nil
             let isAuthenticated = authenticationManager.isUserAuthenticated
-            let isFreemium = freemiumPIRUserStateManager.isActiveUser
+            let didOnboardToFreemium = freemiumPIRUserStateManager.didOnboard
 
-            if !hasProfile || (!isAuthenticated && !isFreemium) {
+            if !hasProfile || (!isAuthenticated && !didOnboardToFreemium) {
                 os_log("Prerequisites are invalid", log: .dataBrokerProtection)
                 stopAgent()
                 return
             }
 
-            if !isAuthenticated && isFreemium {
+            if satisfiesFreemiumPrerequisites() {
                 os_log("User is Freemium", log: .dataBrokerProtection)
                 return
             }
@@ -86,9 +86,16 @@ struct DefaultDataBrokerProtectionAgentStopper: DataBrokerProtectionAgentStopper
     public func monitorEntitlementAndStopAgentIfEntitlementIsInvalidAndUserIsNotFreemium(interval: TimeInterval) {
         entitlementMonitor.start(checkEntitlementFunction: authenticationManager.hasValidEntitlement,
                                  interval: interval) { result in
-            guard !self.freemiumPIRUserStateManager.isActiveUser else { return }
+
+            if satisfiesFreemiumPrerequisites() { return }
             stopAgentBasedOnEntitlementCheckResult(result)
         }
+    }
+
+    private func satisfiesFreemiumPrerequisites() -> Bool {
+        let isAuthenticated = authenticationManager.isUserAuthenticated
+        let didOnboardToFreemium = freemiumPIRUserStateManager.didOnboard
+        return !isAuthenticated && didOnboardToFreemium
     }
 
     private func stopAgent() {

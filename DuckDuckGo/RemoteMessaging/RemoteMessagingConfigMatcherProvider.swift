@@ -137,7 +137,8 @@ final class RemoteMessagingConfigMatcherProvider: RemoteMessagingConfigMatcherPr
 
         let deprecatedRemoteMessageStorage = DefaultSurveyRemoteMessagingStorage.surveys()
 
-        let freemiumPIRUserStateManager = DefaultFreemiumPIRUserStateManager(userDefaults: .dbp, accountManager: subscriptionManager.accountManager)
+        let freemiumPIRUserStateManager = DefaultFreemiumPIRUserStateManager(userDefaults: .dbp)
+        let isCurrentFreemiumPIRUser = !subscriptionManager.accountManager.isUserAuthenticated && freemiumPIRUserStateManager.didOnboard
 
         return RemoteMessagingConfigMatcher(
             appAttributeMatcher: AppAttributeMatcher(statisticsStore: statisticsStore,
@@ -164,7 +165,7 @@ final class RemoteMessagingConfigMatcherProvider: RemoteMessagingConfigMatcherPr
                                                        hasCustomHomePage: startupPreferencesPersistor().launchToCustomHomePage,
                                                        isDuckPlayerOnboarded: duckPlayerPreferencesPersistor.youtubeOverlayAnyButtonPressed,
                                                        isDuckPlayerEnabled: duckPlayerPreferencesPersistor.duckPlayerModeBool != false,
-                                                       isCurrentFreemiumPIRUser: freemiumPIRUserStateManager.isActiveUser,
+                                                       isCurrentFreemiumPIRUser: isCurrentFreemiumPIRUser,
                                                        dismissedDeprecatedMacRemoteMessageIds: deprecatedRemoteMessageStorage.dismissedMessageIDs()
                                                       ),
             percentileStore: RemoteMessagingPercentileUserDefaultsStore(keyValueStore: UserDefaults.standard),
