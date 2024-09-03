@@ -54,14 +54,6 @@ final class BookmarkDragDropManager {
         }
     }
 
-    func validateDropWhileInSearchMode(_ info: NSDraggingInfo, to destination: Any) -> (destinationFolder: BookmarkFolder?, operation: NSDragOperation) {
-        if let destinationFolder = destination as? BookmarkFolder {
-            return (destinationFolder, .move)
-        }
-
-        return (nil, .none)
-    }
-
     private func validateMove(for draggedBookmarks: Set<PasteboardBookmark>, destination: Any) -> Bool? {
         guard !draggedBookmarks.isEmpty else { return nil }
         guard destination is BookmarkFolder || destination is PseudoFolder else { return false }
