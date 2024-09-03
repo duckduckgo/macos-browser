@@ -30,7 +30,7 @@ struct MockRemoteMessagingStoreProvider: RemoteMessagingStoreProviding {
     }
 }
 
-struct MockFreemiumPIRUserState: FreemiumPIRUserState {
+struct MockFreemiumPIRUserState: FreemiumPIRUserStateManager {
     var didOnboard = false
     var isActiveUser = false
 }
