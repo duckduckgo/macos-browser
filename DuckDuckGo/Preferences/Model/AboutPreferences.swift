@@ -27,19 +27,21 @@ final class AboutPreferences: ObservableObject, PreferencesTabOpening {
 #if SPARKLE
     enum UpdateState {
 
-        case loading
         case upToDate
-        case newVersionAvailable
+        case newVersionAvailable(UpdateControllerProgress)
 
-        init(from update: Update?, isLoading: Bool) {
-            if isLoading {
-                self = .loading
+        var isLoading: Bool {
+            switch self {
+            case .upToDate: return false
+            case .newVersionAvailable(let progress): return !progress.isIdle
+            }
+        }
+
+        init(from update: Update?, progress: UpdateControllerProgress) {
+            if let update, !update.isInstalled {
+                self = .newVersionAvailable(progress)
             } else {
-                if let update, !update.isInstalled {
-                    self = .newVersionAvailable
-                } else {
-                    self = .upToDate
-                }
+                self = .upToDate
             }
         }
     }
@@ -101,7 +103,7 @@ final class AboutPreferences: ObservableObject, PreferencesTabOpening {
         guard let updateController, !subscribed else { return }
 
         cancellable = updateController.latestUpdatePublisher
-            .combineLatest(updateController.isUpdateBeingLoadedPublisher)
+            .combineLatest(updateController.updateProgressPublisher)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.refreshUpdateState()
@@ -114,7 +116,7 @@ final class AboutPreferences: ObservableObject, PreferencesTabOpening {
 
     private func refreshUpdateState() {
         guard let updateController else { return }
-        updateState = UpdateState(from: updateController.latestUpdate, isLoading: updateController.isUpdateBeingLoaded)
+        updateState = UpdateState(from: updateController.latestUpdate, progress: updateController.updateProgress)
     }
 #endif
 
