@@ -1,15 +1,12 @@
 {
   "images" : [
     {
-      "filename" : "GradientTone06.svg",
+      "filename" : "grain.png",
       "idiom" : "universal"
     }
   ],
   "info" : {
     "author" : "xcode",
     "version" : 1
-  },
-  "properties" : {
-    "preserves-vector-representation" : true
   }
 }
