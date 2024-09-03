@@ -38,6 +38,15 @@ extension NSColorPanel: UserColorProviding {
         if let color {
             self.color = color
         }
+
+        var frame = self.frame
+        frame.origin = NSEvent.mouseLocation
+        if let keyWindow = NSApp.keyWindow {
+            frame.origin.x = keyWindow.frame.maxX - frame.size.width
+        }
+        frame.origin.y -= frame.size.height + 40
+        setFrame(frame, display: true)
+
         showsAlpha = false
         orderFront(nil)
     }

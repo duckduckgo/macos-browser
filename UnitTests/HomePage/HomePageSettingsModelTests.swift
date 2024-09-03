@@ -37,7 +37,7 @@ final class MockUserColorProvider: UserColorProviding {
         Empty<NSColor, Never>().eraseToAnyPublisher()
     }
 
-    func showColorPanel() {}
+    func showColorPanel(with color: NSColor?) {}
 }
 
 final class HomePageSettingsModelTests: XCTestCase {

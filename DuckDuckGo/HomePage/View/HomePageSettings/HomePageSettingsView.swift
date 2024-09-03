@@ -124,7 +124,7 @@ extension HomePage.Views {
                                     model.onDisappear()
                                 }
                             })
-                                .transition(.move(edge: .trailing).combined(with: .opacity))
+                            .transition(.move(edge: .trailing).combined(with: .opacity))
                         case .gradientPicker:
                             BackgroundPickerView(title: UserText.gradients, items: GradientBackground.allCases)
                                 .transition(.move(edge: .trailing).combined(with: .opacity))
