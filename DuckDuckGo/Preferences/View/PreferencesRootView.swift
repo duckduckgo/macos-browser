@@ -94,7 +94,7 @@ enum Preferences {
                                 searchModel: SearchPreferences.shared,
                                 tabsModel: TabsPreferences.shared,
                                 dataClearingModel: DataClearingPreferences.shared,
-                                dockCustomizer: DockCustomizer())
+                                phishingDetectionModel: PhishingDetectionPreferences.shared, dockCustomizer: DockCustomizer())
                 case .sync:
                     SyncView()
                 case .appearance:
