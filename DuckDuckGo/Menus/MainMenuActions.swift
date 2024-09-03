@@ -803,6 +803,7 @@ extension MainViewController {
     @objc func resetBookmarks(_ sender: Any?) {
         LocalBookmarkManager.shared.resetBookmarks()
         UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageContinueSetUpImport.rawValue)
+        UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.bookmarksBarPromptShown.rawValue)
     }
 
     @objc func resetPinnedTabs(_ sender: Any?) {
