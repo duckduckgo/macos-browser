@@ -236,7 +236,7 @@ extension URL {
     var isReleaseNotesScheme: Bool {
         return isDuckURLScheme && host == "release-notes"
     }
-    
+
     var isErrorPage: Bool {
         isDuckURLScheme && self.host == "error"
     }
