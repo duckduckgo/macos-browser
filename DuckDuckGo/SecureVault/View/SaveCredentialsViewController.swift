@@ -63,6 +63,7 @@ final class SaveCredentialsViewController: NSViewController {
     @IBOutlet weak var passwordManagerNotNowButton: NSButton!
     @IBOutlet var fireproofCheck: NSButton!
     @IBOutlet weak var fireproofCheckDescription: NSTextFieldCell!
+    @IBOutlet weak var securityButton: NSButton!
 
     private enum Action {
         case displayed
@@ -83,6 +84,8 @@ final class SaveCredentialsViewController: NSViewController {
     private var saveButtonAction: (() -> Void)?
 
     private var shouldFirePinPromptNotification = false
+
+    private var infoViewController: PopoverInfoViewController?
 
     var passwordData: Data {
         let string = hiddenPasswordField.isHidden ? visiblePasswordField.stringValue : hiddenPasswordField.stringValue
@@ -364,6 +367,16 @@ final class SaveCredentialsViewController: NSViewController {
 
     @IBAction func onTogglePasswordVisibility(sender: Any?) {
         updatePasswordFieldVisibility(visible: !hiddenPasswordField.isHidden)
+    }
+
+    @IBAction func onSecurityClicked(sender: NSButton?) {
+        infoViewController?.dismiss()
+        infoViewController = PopoverInfoViewController(message: UserText.pmSaveCredentialsSecurityInfo) { [weak self] in
+            self?.infoViewController?.removeCompletely()
+            self?.infoViewController = nil
+        }
+        let relativeView = sender ?? self.view
+        infoViewController?.show(onParent: self, relativeTo: relativeView)
     }
 
     func loadFaviconForDomain(_ domain: String?) {

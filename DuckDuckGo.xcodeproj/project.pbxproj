@@ -2658,6 +2658,8 @@
 		EEC8EB402982CD550065AA39 /* JSAlertViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF53E172950CED5002D78F4 /* JSAlertViewModelTests.swift */; };
 		EECE10E529DD77E60044D027 /* FeatureFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = EECE10E429DD77E60044D027 /* FeatureFlag.swift */; };
 		EECE10E629DD77E60044D027 /* FeatureFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = EECE10E429DD77E60044D027 /* FeatureFlag.swift */; };
+		EED4D3D82C874AE200C79EEA /* PopoverInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EED4D3D72C874AE200C79EEA /* PopoverInfoViewController.swift */; };
+		EED4D3D92C874AE200C79EEA /* PopoverInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EED4D3D72C874AE200C79EEA /* PopoverInfoViewController.swift */; };
 		EED735362BB46B6000F173D6 /* AutocompleteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EED735352BB46B6000F173D6 /* AutocompleteTests.swift */; };
 		EED9A6752C37FE6900E0FAB9 /* login_deduplication_test_data.csv in Resources */ = {isa = PBXBuildFile; fileRef = EED9A6732C37FE6800E0FAB9 /* login_deduplication_test_data.csv */; };
 		EED9A6762C37FE6900E0FAB9 /* login_deduplication_test_data.csv in Resources */ = {isa = PBXBuildFile; fileRef = EED9A6732C37FE6800E0FAB9 /* login_deduplication_test_data.csv */; };
@@ -4281,6 +4283,7 @@
 		EEC4A6702B2C90AB00F7C0AA /* VPNLocationPreferenceItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNLocationPreferenceItem.swift; sourceTree = "<group>"; };
 		EEC7BE2D2BC6C09400F86835 /* AddressBarKeyboardShortcutsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressBarKeyboardShortcutsTests.swift; sourceTree = "<group>"; };
 		EECE10E429DD77E60044D027 /* FeatureFlag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureFlag.swift; sourceTree = "<group>"; };
+		EED4D3D72C874AE200C79EEA /* PopoverInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverInfoViewController.swift; sourceTree = "<group>"; };
 		EED735352BB46B6000F173D6 /* AutocompleteTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutocompleteTests.swift; sourceTree = "<group>"; };
 		EED9A6732C37FE6800E0FAB9 /* login_deduplication_test_data.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = login_deduplication_test_data.csv; sourceTree = "<group>"; };
 		EED9A6742C37FE6900E0FAB9 /* login_deduplication_starting_data.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = login_deduplication_starting_data.csv; sourceTree = "<group>"; };
@@ -6909,6 +6912,7 @@
 				B65536902684409300085A79 /* Geolocation */,
 				AAE75275263B036300B973F8 /* History */,
 				AAE71DB225F66A0900D74437 /* HomePage */,
+				EED4D3D62C87480B00C79EEA /* InfoViews */,
 				56CEE9092B7A66C500CF10AA /* Info.plist */,
 				56CEE90D2B7A6DE100CF10AA /* InfoPlist.xcstrings */,
 				EEAEA3F4294D05CF00D04DF3 /* JSAlert */,
@@ -8557,6 +8561,14 @@
 			path = AppAndExtensionAndAgentTargets;
 			sourceTree = "<group>";
 		};
+		EED4D3D62C87480B00C79EEA /* InfoViews */ = {
+			isa = PBXGroup;
+			children = (
+				EED4D3D72C874AE200C79EEA /* PopoverInfoViewController.swift */,
+			);
+			path = InfoViews;
+			sourceTree = "<group>";
+		};
 		EEE0E1CB2C32F53C0058E148 /* DataImport */ = {
 			isa = PBXGroup;
 			children = (
@@ -9999,6 +10011,7 @@
 				3706FAD6293F65D500E42796 /* ConfigurationStore.swift in Sources */,
 				3706FAD7293F65D500E42796 /* Feedback.swift in Sources */,
 				1D0DE9422C3BB9CC0037ABC2 /* ReleaseNotesParser.swift in Sources */,
+				EED4D3D92C874AE200C79EEA /* PopoverInfoViewController.swift in Sources */,
 				3707C722294B5D2900682A9F /* WKWebViewExtension.swift in Sources */,
 				3706FAD9293F65D500E42796 /* FirefoxFaviconsReader.swift in Sources */,
 				3706FADA293F65D500E42796 /* CopyHandler.swift in Sources */,
@@ -11770,6 +11783,7 @@
 				856CADF0271710F400E79BB0 /* HoverUserScript.swift in Sources */,
 				B6DE57F62B05EA9000CD54B9 /* SheetHostingWindow.swift in Sources */,
 				AA6EF9B525081B4C004754E6 /* MainMenuActions.swift in Sources */,
+				EED4D3D82C874AE200C79EEA /* PopoverInfoViewController.swift in Sources */,
 				56A0541F2C1CA1F5007D8FAB /* OnboardingTabExtension.swift in Sources */,
 				B63D466925BEB6C200874977 /* WKWebView+SessionState.swift in Sources */,
 				B6F1B0222BCE5658005E863C /* BrokenSiteInfoTabExtension.swift in Sources */,

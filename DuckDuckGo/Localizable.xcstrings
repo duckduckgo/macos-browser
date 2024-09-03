@@ -45036,6 +45036,18 @@
         }
       }
     },
+    "pm.save-credentials.security.info" : {
+      "comment" : "Info message for the save credentials dialog",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Passwords are encrypted and nobody but you can see them, not even us. [Learn More](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        }
+      }
+    },
     "pm.signin.to.manage" : {
       "comment" : "Message displayed to the user when they are logged out of Email protection.",
       "extractionState" : "extracted_with_value",

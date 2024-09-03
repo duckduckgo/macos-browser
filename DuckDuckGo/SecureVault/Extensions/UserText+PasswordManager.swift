@@ -22,6 +22,7 @@ extension UserText {
 
     static let pmSaveCredentialsEditableTitle = NSLocalizedString("pm.save-credentials.editable.title", value: "Save password in DuckDuckGo?", comment: "Title for the editable Save Credentials popover")
     static let pmSaveCredentialsNonEditableTitle = NSLocalizedString("pm.save-credentials.non-editable.title", value: "New password saved", comment: "Title for the non-editable Save Credentials popover")
+    static let pmSaveCredentialsSecurityInfo = NSLocalizedString("pm.save-credentials.security.info", value: "Passwords are encrypted and nobody but you can see them, not even us. [Learn More](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)", comment: "Info message for the save credentials dialog")
     static let pmUpdateCredentialsTitle = NSLocalizedString("pm.update-credentials.title", value: "Update password?", comment: "Title for the Update Credentials popover")
 
     static let pmEmptyStateDefaultTitle = NSLocalizedString("pm.empty.default.title", value: "No passwords or credit cards saved yet", comment: "Label for default empty state title")
