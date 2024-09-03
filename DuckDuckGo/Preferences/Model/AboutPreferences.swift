@@ -90,7 +90,7 @@ final class AboutPreferences: ObservableObject, PreferencesTabOpening {
 
 #if SPARKLE
     func checkForUpdate() {
-        updateController?.checkForUpdateInBackground()
+        updateController?.checkForUpdate()
     }
 
     func restartToUpdate() {
