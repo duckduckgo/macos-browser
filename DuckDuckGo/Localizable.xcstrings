@@ -18701,6 +18701,90 @@
         }
       }
     },
+    "duck-player.onboarding-choice-modal-CTA-confirm" : {
+      "comment" : "Confirm Button to enable Duck Player. -Duck Player- should not be translated",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Turn on Duck Player"
+          }
+        }
+      }
+    },
+    "duck-player.onboarding-choice-modal-CTA-deny" : {
+      "comment" : "Deny Button to enable Duck Player",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Not Now"
+          }
+        }
+      }
+    },
+    "duck-player.onboarding-choice-modal-message" : {
+      "comment" : "Message for a Duck Player onboarding modal screen",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Duck Player lets you watch without targeted ads and comes free to use in DuckDuckGo."
+          }
+        }
+      }
+    },
+    "duck-player.onboarding-choice-modal-title" : {
+      "comment" : "Title for a Duck Player onboarding modal screen",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Drowning in ads on YouTube?"
+          }
+        }
+      }
+    },
+    "duck-player.onboarding-confirmation-modal-CTA-confirm" : {
+      "comment" : "Button to confirm on Duck Player onboarding modal confirmation screen",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Got it"
+          }
+        }
+      }
+    },
+    "duck-player.onboarding-confirmation-modal-message" : {
+      "comment" : "Message for a Duck Player onboarding modal confirmation screen",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Pick a video to see Duck Player work its magic."
+          }
+        }
+      }
+    },
+    "duck-player.onboarding-confirmation-modal-title" : {
+      "comment" : "Title for a Duck Player onboarding modal confirmation screen",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "All set!"
+          }
+        }
+      }
+    },
     "duck-player.show-buttons" : {
       "comment" : "Private YouTube Player option",
       "extractionState" : "extracted_with_value",

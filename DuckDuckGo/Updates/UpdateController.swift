@@ -94,15 +94,15 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     var isUpdateAvailableToInstallPublisher: Published<Bool>.Publisher { $isUpdateAvailableToInstall }
 
     var lastUpdateCheckDate: Date? {
-        updater.updater.lastUpdateCheckDate
+        updater.lastUpdateCheckDate
     }
 
     @UserDefaultsWrapper(key: .automaticUpdates, defaultValue: true)
     var areAutomaticUpdatesEnabled: Bool {
         didSet {
             Logger.updates.debug("areAutomaticUpdatesEnabled: \(self.areAutomaticUpdatesEnabled)")
-            if updater.updater.automaticallyDownloadsUpdates != areAutomaticUpdatesEnabled {
-                updater.updater.automaticallyDownloadsUpdates = areAutomaticUpdatesEnabled
+            if updater.automaticallyDownloadsUpdates != areAutomaticUpdatesEnabled {
+                updater.automaticallyDownloadsUpdates = areAutomaticUpdatesEnabled
 
                 // Reinitialize in order to reset the current loaded state
                 if !areAutomaticUpdatesEnabled {
@@ -115,7 +115,8 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
 
     var shouldShowManualUpdateDialog = false
 
-    private(set) var updater: SPUStandardUpdaterController!
+    private(set) var updater: SPUUpdater!
+    private(set) var userDriver: UpdateUserDriver!
     private var appRestarter: AppRestarting
     private let willRelaunchAppSubject = PassthroughSubject<Void, Never>()
     private var internalUserDecider: InternalUserDecider
@@ -136,30 +137,34 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     func checkForUpdate() {
         Logger.updates.debug("Checking for updates")
 
-        updater.updater.checkForUpdates()
+        updater.checkForUpdates()
     }
 
     func checkForUpdateInBackground() {
         Logger.updates.debug("Checking for updates in background")
 
-        updater.updater.checkForUpdatesInBackground()
+        updater.checkForUpdatesInBackground()
     }
 
     // MARK: - Private
 
     private func configureUpdater() {
         // The default configuration of Sparkle updates is in Info.plist
-        updater = SPUStandardUpdaterController(updaterDelegate: self, userDriverDelegate: self)
+        userDriver = UpdateUserDriver(internalUserDecider: internalUserDecider,
+                                      automaticUpdateFlow: areAutomaticUpdatesEnabled,
+                                      delegate: self)
+        updater = SPUUpdater(hostBundle: Bundle.main, applicationBundle: Bundle.main, userDriver: userDriver, delegate: self)
+        try? updater.start()
         shouldShowManualUpdateDialog = false
 
-        if updater.updater.automaticallyDownloadsUpdates != areAutomaticUpdatesEnabled {
-            updater.updater.automaticallyDownloadsUpdates = areAutomaticUpdatesEnabled
+        if updater.automaticallyDownloadsUpdates != areAutomaticUpdatesEnabled {
+            updater.automaticallyDownloadsUpdates = areAutomaticUpdatesEnabled
         }
 
 #if DEBUG
-        updater.updater.automaticallyChecksForUpdates = false
-        updater.updater.automaticallyDownloadsUpdates = false
-        updater.updater.updateCheckInterval = 0
+//        updater.automaticallyChecksForUpdates = false
+//        updater.automaticallyDownloadsUpdates = false
+//        updater.updateCheckInterval = 0
 #endif
 
         checkForUpdateInBackground()
@@ -175,7 +180,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         if areAutomaticUpdatesEnabled {
             appRestarter.restart()
         } else {
-            updater.userDriver.activeUpdateAlert?.hideUnnecessaryUpdateButtons()
+//            updater.userDriver.activeUpdateAlert?.hideUnnecessaryUpdateButtons()
             shouldShowManualUpdateDialog = true
             checkForUpdate()
         }
@@ -183,23 +188,27 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
 
 }
 
-extension UpdateController: SPUStandardUserDriverDelegate {
+//extension UpdateController: SPUStandardUserDriverDelegate {
+//
+//    func standardUserDriverShouldHandleShowingScheduledUpdate(_ update: SUAppcastItem, andInImmediateFocus immediateFocus: Bool) -> Bool {
+//        return shouldShowManualUpdateDialog
+//    }
+//
+//    func standardUserDriverWillHandleShowingUpdate(_ handleShowingUpdate: Bool, forUpdate update: SUAppcastItem, state: SPUUserUpdateState) {}
+//
+//}
 
-    func standardUserDriverShouldHandleShowingScheduledUpdate(_ update: SUAppcastItem, andInImmediateFocus immediateFocus: Bool) -> Bool {
-        return shouldShowManualUpdateDialog
+extension UpdateController: UpdateUserDriverDelegate {
+    func userDriverUpdateCheckStart(_ userDriver: UpdateUserDriver) {
+        onUpdateCheckStart()
     }
 
-    func standardUserDriverWillHandleShowingUpdate(_ handleShowingUpdate: Bool, forUpdate update: SUAppcastItem, state: SPUUserUpdateState) {}
-
+    func userDriverUpdateCheckEnd(_ userDriver: UpdateUserDriver, item: SUAppcastItem?, isInstalled: Bool) {
+        onUpdateCheckEnd(item: item, isInstalled: isInstalled)
+    }
 }
 
 extension UpdateController: SPUUpdaterDelegate {
-
-    func updater(_ updater: SPUUpdater, mayPerform updateCheck: SPUUpdateCheck) throws {
-        Logger.updates.debug("Updater started performing the update check. (isInternalUser: \(self.internalUserDecider.isInternalUser)")
-
-        onUpdateCheckStart()
-    }
 
     private func onUpdateCheckStart() {
         isUpdateBeingLoaded = true
@@ -228,28 +237,6 @@ extension UpdateController: SPUUpdaterDelegate {
         }
 
         PixelKit.fire(DebugEvent(GeneralPixel.updaterAborted, error: error))
-    }
-
-    func updater(_ updater: SPUUpdater, didFindValidUpdate item: SUAppcastItem) {
-        Logger.updates.debug("Updater did find valid update: \(item.displayVersionString)(\(item.versionString))")
-
-        PixelKit.fire(DebugEvent(GeneralPixel.updaterDidFindUpdate))
-
-        guard !areAutomaticUpdatesEnabled else {
-            // If automatic updates are enabled, we are waiting until the update is downloaded
-            return
-        }
-        // For manual updates, show the available update without downloading
-        onUpdateCheckEnd(item: item, isInstalled: false)
-    }
-
-    func updaterDidNotFindUpdate(_ updater: SPUUpdater, error: any Error) {
-        let item = (error as NSError).userInfo["SULatestAppcastItemFound"] as? SUAppcastItem
-        Logger.updates.debug("Updater did not find update: \(String(describing: item?.displayVersionString))(\(String(describing: item?.versionString)))")
-
-        onUpdateCheckEnd(item: item, isInstalled: true)
-
-        PixelKit.fire(DebugEvent(GeneralPixel.updaterDidNotFindUpdate, error: error))
     }
 
     func updater(_ updater: SPUUpdater, didDownloadUpdate item: SUAppcastItem) {
