@@ -42192,14 +42192,14 @@
         }
       }
     },
-    "pm.empty.default.description.extended" : {
+    "pm.empty.default.description.extended.v2" : {
       "comment" : "Label for default empty state description",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "You can import saved passwords from another browser into DuckDuckGo. Passwords are encrypted and nobody but you can see them, not even us."
+            "value" : "Passwords are encrypted. Nobody but you can see them, not even us."
           }
         }
       }

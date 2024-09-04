@@ -76,7 +76,6 @@ final class PasswordManagementViewController: NSViewController {
         }
     }
 
-    @IBOutlet var learnMoreButton: NSButton!
     @IBOutlet var lockScreenDurationLabel: NSTextField!
     @IBOutlet var lockScreenOpenInPreferencesTextView: NSTextView! {
         didSet {
@@ -108,7 +107,6 @@ final class PasswordManagementViewController: NSViewController {
             lockScreenOpenInPreferencesTextView.textStorage?.setAttributedString(string)
         }
     }
-    @IBOutlet weak var stackView: NSStackView!
 
     var emptyStateCancellable: AnyCancellable?
     var editingCancellable: AnyCancellable?
@@ -172,10 +170,13 @@ final class PasswordManagementViewController: NSViewController {
         reloadDataAfterSyncCancellable = bindSyncDidFinish()
 
         emptyStateTitle.attributedStringValue = NSAttributedString.make(emptyStateTitle.stringValue, lineHeight: 1.14, kern: -0.23)
-        emptyStateMessage.attributedStringValue = NSAttributedString.make(emptyStateMessage.stringValue, lineHeight: 1.05, kern: -0.08)
+
+        emptyStateMessage.allowsEditingTextAttributes = true
+        emptyStateMessage.isSelectable = true
         emptyStateMessage.lineBreakMode = .byWordWrapping
         emptyStateMessage.maximumNumberOfLines = 0
-        stackView.setCustomSpacing(0, after: emptyStateMessage)
+        emptyStateMessage.delegate = self
+        setUpEmptyStateMessageAttributedText()
 
         addVaultItemButton.toolTip = UserText.addItemTooltip
         moreButton.toolTip = UserText.moreOptionsTooltip
@@ -199,9 +200,31 @@ final class PasswordManagementViewController: NSViewController {
                 self?.refreshData()
             }
             .store(in: &cancellables)
+    }
 
-        learnMoreButton.isBordered = false
-        learnMoreButton.contentTintColor = .globalAccent
+    private func setUpEmptyStateMessageAttributedText() {
+        let attributedString = NSMutableAttributedString(string: UserText.pmEmptyStateDefaultDescription)
+        let learnMoreString = NSAttributedString(string: UserText.learnMore)
+        attributedString.append(.init(string: " "))
+        attributedString.append(learnMoreString)
+        let range = (attributedString.string as NSString).range(of: learnMoreString.string)
+        let wholeRange = NSRange(location: 0, length: attributedString.length)
+
+        let font = emptyStateMessage.font ?? .systemFont(ofSize: 13)
+        let paragraph = NSMutableParagraphStyle()
+        paragraph.alignment = .center
+        attributedString.setAttributes([
+            .font: font,
+            .paragraphStyle: paragraph,
+            .cursor: NSCursor.arrow
+        ], range: wholeRange)
+        attributedString.setAttributes([
+            .link: URL.passwordManagerLearnMore,
+            .font: font,
+            .foregroundColor: NSColor.linkBlue,
+            .cursor: NSCursor.pointingHand
+        ], range: range)
+        emptyStateMessage.attributedStringValue = attributedString
     }
 
     private func setupStrings() {
@@ -212,7 +235,7 @@ final class PasswordManagementViewController: NSViewController {
         unlockYourAutofillLabel.title = UserText.passwordManagerUnlockAutofill
         autofillTitleLabel.stringValue = UserText.passwordManagementTitle
         emptyStateTitle.stringValue = UserText.pmEmptyStateDefaultTitle
-        emptyStateMessage.stringValue = UserText.pmEmptyStateDefaultDescription
+        setUpEmptyStateMessageAttributedText()
         emptyStateButton.title = UserText.pmEmptyStateDefaultButtonTitle
     }
 
@@ -314,10 +337,6 @@ final class PasswordManagementViewController: NSViewController {
     @IBAction func openExportLogins(_ sender: Any) {
         self.dismiss()
         NSApp.sendAction(#selector(AppDelegate.openExportLogins(_:)), to: nil, from: sender)
-    }
-
-    @IBAction func onLearnMoreClicked(_ sender: NSButton) {
-        URL.gpcLearnMore
     }
 
     @IBAction func onImportClicked(_ sender: NSButton) {
@@ -998,7 +1017,7 @@ final class PasswordManagementViewController: NSViewController {
 
     private func showEmptyState(category: SecureVaultSorting.Category) {
         switch category {
-        case .allItems: showEmptyState(image: .passwordsAdd128, title: UserText.pmEmptyStateDefaultTitle, message: UserText.pmEmptyStateDefaultDescription, hideMessage: false, hideButton: false)
+        case .allItems: showEmptyState(image: .passwordsAdd128, title: UserText.pmEmptyStateDefaultTitle, hideMessage: false, hideButton: false)
         case .logins: showEmptyState(image: .passwordsAdd128, title: UserText.pmEmptyStateLoginsTitle, hideMessage: false, hideButton: false)
         case .identities: showEmptyState(image: .identityAdd128, title: UserText.pmEmptyStateIdentitiesTitle)
         case .cards: showEmptyState(image: .creditCardsAdd128, title: UserText.pmEmptyStateCardsTitle)
@@ -1009,12 +1028,12 @@ final class PasswordManagementViewController: NSViewController {
         emptyState.isHidden = true
     }
 
-    private func showEmptyState(image: NSImage, title: String, message: String? = nil, hideMessage: Bool = true, hideButton: Bool = true) {
+    private func showEmptyState(image: NSImage, title: String, hideMessage: Bool = true, hideButton: Bool = true) {
         emptyState.isHidden = false
         emptyStateImageView.image = image
         emptyStateTitle.attributedStringValue = NSAttributedString.make(title, lineHeight: 1.14, kern: -0.23)
-        if let message {
-            emptyStateMessage.attributedStringValue = NSAttributedString.make(message, lineHeight: 1.05, kern: -0.08)
+        if !hideMessage {
+            setUpEmptyStateMessageAttributedText()
         }
         emptyStateMessage.isHidden = hideMessage
         emptyStateButton.isHidden = hideButton
@@ -1051,7 +1070,6 @@ extension PasswordManagementViewController: NSTextFieldDelegate {
     func controlTextDidChange(_ obj: Notification) {
         updateFilter()
     }
-
 }
 
 extension PasswordManagementViewController: NSTextViewDelegate {
