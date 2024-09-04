@@ -152,10 +152,12 @@ extension Preferences {
                 switch model.updateState {
                 case .upToDate:
                     Text(" — " + UserText.upToDate)
-                case .readyToInstallAndRelaunch:
-                    Text(" — " + UserText.newerVersionAvailable)
-                case .newVersionAvailable(let progress):
-                    text(for: progress)
+                case .updateCycle(let progress):
+                    if progress.isDone {
+                        Text(" — " + UserText.newerVersionAvailable)
+                    } else {
+                        text(for: progress)
+                    }
                 }
 #endif
             }
@@ -170,7 +172,7 @@ extension Preferences {
         }
 
         @ViewBuilder
-        private func text(for progress: UpdateControllerProgress) -> some View {
+        private func text(for progress: UpdateCycleProgress) -> some View {
             switch progress {
             case .updateCycleDidStart:
                 Text("- Checking for update")
@@ -186,8 +188,8 @@ extension Preferences {
                 Text("- Ready to install")
             case .installationDidStart, .installing:
                 Text("- Installing")
-            case .updateCycleNotStarted, .updateCycleDone:
-                fatalError()
+            case .updateCycleNotStarted, .updateCycleDone, .updateFound, .updateNotFound:
+                EmptyView()
             }
         }
 
@@ -197,12 +199,14 @@ extension Preferences {
             case .upToDate:
                 Image(systemName: "checkmark.circle.fill")
                     .foregroundColor(.green)
-            case .readyToInstallAndRelaunch:
-                Image(systemName: "exclamationmark.circle.fill")
-                    .foregroundColor(.red)
-            case .newVersionAvailable:
-                ProgressView()
-                    .scaleEffect(0.6)
+            case .updateCycle(let progress):
+                if progress.isDone {
+                    Image(systemName: "exclamationmark.circle.fill")
+                        .foregroundColor(.red)
+                } else {
+                    ProgressView()
+                        .scaleEffect(0.6)
+                }
             }
         }
 
@@ -234,17 +238,19 @@ extension Preferences {
                     model.checkForUpdate()
                 }
                 .buttonStyle(UpdateButtonStyle(enabled: true))
-            case .readyToInstallAndRelaunch:
-                Button(UserText.restartToUpdate) {
-                    model.restartToUpdate()
+            case .updateCycle(let progress):
+                if progress.isDone {
+                    Button(UserText.restartToUpdate) {
+                        model.restartToUpdate()
+                    }
+                    .buttonStyle(UpdateButtonStyle(enabled: true))
+                } else {
+                    Button(UserText.checkForUpdate) {
+                        model.checkForUpdate()
+                    }
+                    .buttonStyle(UpdateButtonStyle(enabled: false))
+                    .disabled(true)
                 }
-                .buttonStyle(UpdateButtonStyle(enabled: true))
-            case .newVersionAvailable:
-                Button(UserText.checkForUpdate) {
-                    model.checkForUpdate()
-                }
-                .buttonStyle(UpdateButtonStyle(enabled: false))
-                .disabled(true)
             }
         }
 #endif
