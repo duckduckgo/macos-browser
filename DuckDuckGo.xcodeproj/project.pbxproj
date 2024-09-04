@@ -15,6 +15,8 @@
 		0230C0A3272080090018F728 /* KeyedCodingExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0230C0A2272080090018F728 /* KeyedCodingExtension.swift */; };
 		02589D9D2C88E8210093940D /* Configuration in Frameworks */ = {isa = PBXBuildFile; productRef = 02589D9C2C88E8210093940D /* Configuration */; };
 		02589D9F2C88E8270093940D /* Persistence in Frameworks */ = {isa = PBXBuildFile; productRef = 02589D9E2C88E8270093940D /* Persistence */; };
+		02589DA12C88EB570093940D /* Configuration in Frameworks */ = {isa = PBXBuildFile; productRef = 02589DA02C88EB570093940D /* Configuration */; };
+		02589DA32C88EB5D0093940D /* Persistence in Frameworks */ = {isa = PBXBuildFile; productRef = 02589DA22C88EB5D0093940D /* Persistence */; };
 		026ADE1426C3010C002518EE /* macos-config.json in Resources */ = {isa = PBXBuildFile; fileRef = 026ADE1326C3010C002518EE /* macos-config.json */; };
 		028904202A7B25380028369C /* AppConfigurationURLProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0289041E2A7B23CE0028369C /* AppConfigurationURLProviderTests.swift */; };
 		028904212A7B25770028369C /* AppConfigurationURLProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0289041E2A7B23CE0028369C /* AppConfigurationURLProviderTests.swift */; };
@@ -4560,10 +4562,12 @@
 				9D9DE57B2C63AA1F00D20B15 /* AppKitExtensions in Frameworks */,
 				EE7295E92A545BC4008C0991 /* NetworkProtection in Frameworks */,
 				7B37C7A52BAA32A50062546A /* Subscription in Frameworks */,
+				02589DA12C88EB570093940D /* Configuration in Frameworks */,
 				F198C7182BD18A4C000BF24D /* PixelKit in Frameworks */,
 				7BBE2B7B2B61663C00697445 /* NetworkProtectionProxy in Frameworks */,
 				4B2D062C2A11C0E100DE1F49 /* Networking in Frameworks */,
 				4B25375B2A11BE7300610219 /* NetworkExtension.framework in Frameworks */,
+				02589DA32C88EB5D0093940D /* Persistence in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9036,6 +9040,8 @@
 				F198C7172BD18A4C000BF24D /* PixelKit */,
 				9D9DE57A2C63AA1F00D20B15 /* AppKitExtensions */,
 				4B5235442C7BB14D00AFAF64 /* WireGuard */,
+				02589DA02C88EB570093940D /* Configuration */,
+				02589DA22C88EB5D0093940D /* Persistence */,
 			);
 			productName = NetworkProtectionSystemExtension;
 			productReference = 4B25375A2A11BE7300610219 /* com.duckduckgo.macos.vpn.network-extension.debug.systemextension */;
@@ -13883,6 +13889,16 @@
 			productName = Configuration;
 		};
 		02589D9E2C88E8270093940D /* Persistence */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Persistence;
+		};
+		02589DA02C88EB570093940D /* Configuration */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Configuration;
+		};
+		02589DA22C88EB5D0093940D /* Persistence */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = Persistence;
