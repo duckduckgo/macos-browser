@@ -1282,7 +1282,7 @@ final class MockDataBrokerProtectionDataManager: DataBrokerProtectionDataManagin
     var cache: DataBrokerProtection.InMemoryDataCache
     var delegate: DataBrokerProtection.DataBrokerProtectionDataManagerDelegate?
 
-    init(pixelHandler: Common.EventMapping<DataBrokerProtection.DataBrokerProtectionPixels>, fakeBrokerFlag: DataBrokerProtection.DataBrokerDebugFlag) {
+    init(database: DataBrokerProtectionRepository? = nil, pixelHandler: Common.EventMapping<DataBrokerProtection.DataBrokerProtectionPixels>, fakeBrokerFlag: DataBrokerProtection.DataBrokerDebugFlag) {
         cache = InMemoryDataCache()
     }
 
@@ -1305,6 +1305,10 @@ final class MockDataBrokerProtectionDataManager: DataBrokerProtectionDataManagin
 
     func hasMatches() throws -> Bool {
         return shouldReturnHasMatches
+    }
+
+    func matchesFoundCount() throws -> Int {
+        0
     }
 
     func profileQueriesCount() throws -> Int {
@@ -1940,4 +1944,5 @@ struct MockMigrationsProvider: DataBrokerProtectionDatabaseMigrationsProvider {
 
 final class MockFreemiumPIRUserStateManager: FreemiumPIRUserStateManager {
     var didOnboard = false
+    var profileSavedTimestamp: String?
 }

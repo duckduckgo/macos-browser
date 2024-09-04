@@ -84,6 +84,14 @@ extension MirrorSite {
     func scannedBroker(withStatus status: ScannedBroker.Status) -> ScannedBroker {
         ScannedBroker(name: name, url: url, status: status)
     }
+    
+    func shouldWeIncludeMirrorSite(for date: Date = Date()) -> Bool {
+        if let removedAt = self.removedAt {
+            return self.addedAt < date && date < removedAt
+        } else {
+            return self.addedAt < date
+        }
+    }
 }
 
 public enum DataBrokerHierarchy: Int {

@@ -23,13 +23,16 @@ public protocol DataBrokerProtectionDataManaging {
     var cache: InMemoryDataCache { get }
     var delegate: DataBrokerProtectionDataManagerDelegate? { get set }
 
-    init(pixelHandler: EventMapping<DataBrokerProtectionPixels>, fakeBrokerFlag: DataBrokerDebugFlag)
+    init(database: DataBrokerProtectionRepository?,
+         pixelHandler: EventMapping<DataBrokerProtectionPixels>,
+         fakeBrokerFlag: DataBrokerDebugFlag)
     func saveProfile(_ profile: DataBrokerProtectionProfile) async throws
     func fetchProfile() throws -> DataBrokerProtectionProfile?
     func prepareProfileCache() throws
     func fetchBrokerProfileQueryData(ignoresCache: Bool) throws -> [BrokerProfileQueryData]
     func prepareBrokerProfileQueryDataCache() throws
     func hasMatches() throws -> Bool
+    func matchesFoundCount() throws -> Int
     func profileQueriesCount() throws -> Int
 }
 
@@ -45,8 +48,10 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
 
     internal let database: DataBrokerProtectionRepository
 
-    required public init(pixelHandler: EventMapping<DataBrokerProtectionPixels>, fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker()) {
-        self.database = DataBrokerProtectionDatabase(fakeBrokerFlag: fakeBrokerFlag, pixelHandler: pixelHandler)
+    required public init(database: DataBrokerProtectionRepository? = nil,
+                         pixelHandler: EventMapping<DataBrokerProtectionPixels>,
+                         fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker()) {
+        self.database = database ?? DataBrokerProtectionDatabase(fakeBrokerFlag: fakeBrokerFlag, pixelHandler: pixelHandler)
 
         cache.delegate = self
     }
@@ -115,6 +120,43 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
 
     public func hasMatches() throws -> Bool {
         return try database.hasMatches()
+    }
+
+    /// Fetches all broker profile query data from the database and calculates the total number of matches found.
+    ///
+    /// A match is defined as either:
+    /// 1. An extracted profile associated with the broker profile query data.
+    /// 2. A mirror site that should be included in the count (determined by the `shouldWeIncludeMirrorSite()` logic).
+    ///
+    /// - Returns: The total number of matches found (extracted profiles + valid mirror sites).
+    /// - Throws: An error if fetching broker profile query data from the database fails.
+    public func matchesFoundCount() throws -> Int {
+        let queryData = try database.fetchAllBrokerProfileQueryData()
+        return matchesCount(forQueryData: queryData)
+    }
+}
+
+private extension DataBrokerProtectionDataManager {
+
+    /// Calculates the total number of matches from an array of `BrokerProfileQueryData`.
+    ///
+    /// For each `BrokerProfileQueryData`:
+    /// - Skips if the associated `profileQuery` is deprecated.
+    /// - Counts the number of extracted profiles associated with the data.
+    /// - Counts the number of mirror sites that should be included (as determined by `shouldWeIncludeMirrorSite()`).
+    ///
+    /// - Parameter queryData: An array of `BrokerProfileQueryData` representing broker data.
+    /// - Returns: The total number of matches (extracted profiles and valid mirror sites).
+    func matchesCount(forQueryData queryData: [BrokerProfileQueryData]) -> Int {
+        return queryData.reduce(0) { count, data in
+            guard !data.profileQuery.deprecated else { return count }
+
+            let extractedProfileCount = data.extractedProfiles.count
+
+            let mirrorSitesCount = data.dataBroker.mirrorSites.filter { $0.shouldWeIncludeMirrorSite() }.count
+
+            return count + extractedProfileCount + mirrorSitesCount
+        }
     }
 }
 
