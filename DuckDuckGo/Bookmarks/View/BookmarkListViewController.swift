@@ -45,6 +45,7 @@ final class BookmarkListViewController: NSViewController {
     private lazy var searchBookmarksButton = MouseOverButton(image: .searchBookmarks, target: self, action: #selector(searchBookmarkButtonClicked))
         .withAccessibilityIdentifier("BookmarkListViewController.searchBookmarksButton")
     private lazy var sortBookmarksButton = MouseOverButton(image: .bookmarkSortAsc, target: self, action: #selector(sortBookmarksButtonClicked))
+        .withAccessibilityIdentifier("BookmarkListViewController.sortBookmarksButton")
 
     private lazy var buttonsDivider = NSBox()
     private lazy var manageBookmarksButton = MouseOverButton(title: UserText.bookmarksManage, target: self, action: #selector(openManagementInterface))

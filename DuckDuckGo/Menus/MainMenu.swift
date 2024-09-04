@@ -106,14 +106,14 @@ final class MainMenu: NSMenu {
     // MARK: - Initialization
 
     @MainActor
-    init(featureFlagger: FeatureFlagger, bookmarkManager: BookmarkManager, faviconManager: FaviconManagement, copyHandler: CopyHandler) {
+    init(featureFlagger: FeatureFlagger, bookmarkManager: BookmarkManager, faviconManager: FaviconManagement) {
 
         super.init(title: UserText.duckDuckGo)
 
         buildItems {
             buildDuckDuckGoMenu()
             buildFileMenu()
-            buildEditMenu(copyHandler: copyHandler)
+            buildEditMenu()
             buildViewMenu()
             buildHistoryMenu()
             buildBookmarksMenu()
@@ -182,14 +182,14 @@ final class MainMenu: NSMenu {
         }
     }
 
-    func buildEditMenu(copyHandler: CopyHandler) -> NSMenuItem {
+    func buildEditMenu() -> NSMenuItem {
         NSMenuItem(title: UserText.mainMenuEdit) {
             NSMenuItem(title: UserText.mainMenuEditUndo, action: Selector(("undo:")), keyEquivalent: "z")
             NSMenuItem(title: UserText.mainMenuEditRedo, action: Selector(("redo:")), keyEquivalent: "Z")
             NSMenuItem.separator()
 
-            NSMenuItem(title: UserText.mainMenuEditCut, action: #selector(NSText.cut), keyEquivalent: "x")
-            NSMenuItem(title: UserText.mainMenuEditCopy, action: #selector(CopyHandler.copy(_:)), target: copyHandler, keyEquivalent: "c")
+            NSMenuItem(title: UserText.mainMenuEditCut, action: #selector(NSText.cut(_:)), keyEquivalent: "x")
+            NSMenuItem(title: UserText.mainMenuEditCopy, action: #selector(NSText.copy(_:)), keyEquivalent: "c")
             NSMenuItem(title: UserText.mainMenuEditPaste, action: #selector(NSText.paste), keyEquivalent: "v")
             NSMenuItem(title: UserText.mainMenuEditPasteAndMatchStyle, action: #selector(NSTextView.pasteAsPlainText), keyEquivalent: [.option, .command, .shift, "v"])
             NSMenuItem(title: UserText.mainMenuEditPasteAndMatchStyle, action: #selector(NSTextView.pasteAsPlainText), keyEquivalent: [.command, .shift, "v"])

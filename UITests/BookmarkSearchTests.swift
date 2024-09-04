@@ -66,7 +66,7 @@ class BookmarkSearchTests: XCTestCase {
     func testFilteredResultsInPanel() {
         addThreeBookmarks()
         closeShowBookmarksBarAlert()
-        openBookmarksPanel()
+        app.openBookmarksPanel()
         searchInBookmarksPanel(for: "Bookmark #2")
         assertOnlyBookmarkExists(on: app.outlines.firstMatch, bookmarkTitle: "Bookmark #2")
     }
@@ -95,7 +95,7 @@ class BookmarkSearchTests: XCTestCase {
     }
 
     func testSearchActionIsHiddenOnBookmarksPanelWhenUserHasNoBookmarks() {
-        openBookmarksPanel()
+        app.openBookmarksPanel()
         let bookmarksPanelPopover = app.popovers.firstMatch
         XCTAssertFalse(bookmarksPanelPopover.buttons[AccessibilityIdentifiers.searchBookmarksButton].exists)
     }
@@ -110,7 +110,7 @@ class BookmarkSearchTests: XCTestCase {
     private func addBookmarkAndOpenBookmarksPanel(bookmarkPageTitle: String, in folder: String? = nil) {
         addBookmark(pageTitle: bookmarkPageTitle, in: folder)
         closeShowBookmarksBarAlert()
-        openBookmarksPanel()
+        app.openBookmarksPanel()
     }
 
     private func addBookmarkAndOpenBookmarksManager(bookmarkPageTitle: String, in folder: String? = nil) {
@@ -127,8 +127,7 @@ class BookmarkSearchTests: XCTestCase {
 
     private func addBookmark(pageTitle: String, in folder: String? = nil) {
         let urlForBookmarksBar = UITests.simpleServedPage(titled: pageTitle)
-        app.openSiteToBookmark(app: app,
-                               url: urlForBookmarksBar,
+        app.openSiteToBookmark(url: urlForBookmarksBar,
                                pageTitle: pageTitle,
                                bookmarkingViaDialog: true,
                                escapingDialog: true,
@@ -181,10 +180,6 @@ class BookmarkSearchTests: XCTestCase {
         popover.buttons[AccessibilityIdentifiers.searchBookmarksButton].tap()
     }
 
-    private func openBookmarksPanel() {
-        app.showAndTapBookmarksPanelShortcut()
-    }
-
     private func openBookmarksManager() {
         app.openBookmarksManager()
     }
@@ -200,7 +195,7 @@ class BookmarkSearchTests: XCTestCase {
         closeShowBookmarksBarAlert()
 
         if mode == .panel {
-            openBookmarksPanel()
+            app.openBookmarksPanel()
             searchInBookmarksPanel(for: "Bookmark #1")
         } else {
             openBookmarksManager()
@@ -244,7 +239,7 @@ class BookmarkSearchTests: XCTestCase {
         addThreeBookmarks()
         if mode == .panel {
             closeShowBookmarksBarAlert()
-            openBookmarksPanel()
+            app.openBookmarksPanel()
         } else {
             openBookmarksManager()
         }
@@ -306,7 +301,7 @@ class BookmarkSearchTests: XCTestCase {
     }
 
     private func createFolderWithSubFolder() {
-        openBookmarksPanel()
+        app.openBookmarksPanel()
         let bookmarksPanel = app.popovers.firstMatch
         bookmarksPanel.buttons[AccessibilityIdentifiers.newFolderButton].tap()
 
@@ -325,10 +320,4 @@ class BookmarkSearchTests: XCTestCase {
     private func closeShowBookmarksBarAlert() {
         app.dismissPopover(buttonIdentifier: "Hide")
     }
-}
-
-// Enum to represent bookmark modes
-private enum BookmarkMode {
-    case panel
-    case manager
 }

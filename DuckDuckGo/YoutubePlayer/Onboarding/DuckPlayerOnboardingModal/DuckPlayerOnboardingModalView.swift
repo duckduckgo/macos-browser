@@ -21,8 +21,8 @@ import SwiftUI
 struct DuckPlayerOnboardingModalView: View {
     private enum Constants {
         static let outerContainerWidth: CGFloat = 504
-        static let smallContainerHeight: CGFloat = 182
-        static let bigContainerHeight: CGFloat = 286
+        static let smallContainerHeight: CGFloat = 166
+        static let bigContainerHeight: CGFloat = 350
         static let containerCornerRadius: CGFloat = 12
         static let darkModeBorderColor: Color = .white.opacity(0.2)
         static let whiteModeBorderColor: Color = .black.opacity(0.1)
@@ -64,10 +64,24 @@ struct DuckPlayerOnboardingModalView: View {
 
         case .onboardingOptions:
             DuckPlayerOnboardingChoiceView(turnOnButtonPressed: {
-                viewModel.currentView = .confirmation
+                withAnimation {
+                    viewModel.currentView = .confirmation
+                }
                 viewModel.handleTurnOnCTA()
             }, notNowPressed: viewModel.handleNotNowCTA)
         }
+    }
+}
+
+private enum Constants {
+    enum FontSize {
+        static let title: CGFloat = 17
+        static let body: CGFloat = 13
+    }
+
+    enum Layout {
+        static let modalOuterVerticalSpacing: CGFloat = 20
+        static let modalInnerVerticalSpacing: CGFloat = 8
     }
 }
 
@@ -76,16 +90,20 @@ private struct DuckPlayerOnboardingChoiceView: View {
     let notNowPressed: () -> Void
 
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: Constants.Layout.modalOuterVerticalSpacing) {
             DaxSpeechBubble {
-                VStack (alignment: .leading, spacing: 8) {
-                    Text(UserText.duckPlayerOnboardingChoiceModalTitle)
-                        .font(.title)
-                        .padding(.horizontal)
+                VStack (alignment: .leading, spacing: Constants.Layout.modalInnerVerticalSpacing) {
+                    VStack (alignment: .leading, spacing: 0) {
+                        Text(UserText.duckPlayerOnboardingChoiceModalTitleTop)
+                        Text(UserText.duckPlayerOnboardingChoiceModalTitleBottom)
+                    }
+                    .font(.system(size: Constants.FontSize.title).weight(.bold))
+                    .padding(.horizontal)
 
                     Text(UserText.duckPlayerOnboardingChoiceModalMessage)
-                        .font(.body)
+                        .font(.system(size: Constants.FontSize.body))
                         .multilineText()
+                        .lineSpacing(4)
                         .padding(.horizontal)
 
                     HStack {
@@ -113,6 +131,7 @@ private struct DuckPlayerOnboardingChoiceView: View {
                     Text(UserText.duckPlayerOnboardingChoiceModalCTAConfirm)
                 }
                 .buttonStyle(PrimaryCTAStyle())
+
             }
         }
     }
@@ -121,20 +140,21 @@ private struct DuckPlayerOnboardingChoiceView: View {
 private struct DuckPlayerOnboardingConfirmationView: View {
     let voidButtonPressed: () -> Void
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: Constants.Layout.modalOuterVerticalSpacing) {
             DaxSpeechBubble {
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: Constants.Layout.modalInnerVerticalSpacing) {
                     Text(UserText.duckPlayerOnboardingConfirmationModalTitle)
-                        .font(.title)
+                        .foregroundColor(.systemGray90)
+                        .font(.system(size: Constants.FontSize.title).weight(.bold))
                         .padding(.horizontal)
 
                     Text(UserText.duckPlayerOnboardingConfirmationModalMessage)
-                        .font(.body)
+                        .foregroundColor(.systemGray90)
+                        .font(.system(size: Constants.FontSize.body))
                         .padding(.horizontal)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal)
-
             }
 
             Button {
@@ -279,7 +299,6 @@ private struct SecondaryCTAStyle: ButtonStyle {
         }, notNowPressed: {
 
         })
-        .frame(width: 504, height: 286)
 
         Divider()
             .padding()
@@ -287,7 +306,8 @@ private struct SecondaryCTAStyle: ButtonStyle {
         DuckPlayerOnboardingConfirmationView(voidButtonPressed: {
 
         })
-        .frame(width: 504, height: 152)
     }
+    .frame(width: 504)
+    .fixedSize()
     .padding()
 }

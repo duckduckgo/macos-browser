@@ -19,7 +19,7 @@
 import Cocoa
 import Combine
 private enum AnimationConsts {
-    static let yAnimationOffset: CGFloat = 65
+    static let yAnimationOffset: CGFloat = 70
     static let duration: CGFloat = 0.6
 }
 
@@ -36,6 +36,10 @@ public final class TabModal {
             window.isOpaque = false
             window.hasShadow = true
             window.level = .floating
+
+            window.contentView?.wantsLayer = true
+            window.contentView?.layer?.cornerRadius = 12
+            window.contentView?.layer?.masksToBounds = true
         }
         modalViewController.view.wantsLayer = true
         return windowController
@@ -125,13 +129,25 @@ extension TabModal: TabModalPresentable {
             overlayWindow.setFrameOrigin(NSPoint(x: xPosition, y: yPosition))
             overlayWindow.alphaValue = 0
 
+            /// There's a bug in macOS 14.x where, if a window's alpha value is animated from X to Y, the final value will always be X.
+            /// This is a workaround to prevent that.
+            var titleWindowOffset: CGFloat = 0
+            if #unavailable(macOS 15) {
+                overlayWindow.styleMask.insert(.titled)
+                titleWindowOffset = 28
+            }
+
             NSAnimationContext.runAnimationGroup { context in
                 context.duration = AnimationConsts.duration
-                let newOrigin = NSPoint(x: xPosition, y: yPosition - AnimationConsts.yAnimationOffset)
+                let newOrigin = NSPoint(x: xPosition, y: yPosition - AnimationConsts.yAnimationOffset - titleWindowOffset)
                 let size = overlayWindow.frame.size
                 overlayWindow.animator().alphaValue = 1
                 overlayWindow.animator().setFrame(NSRect(origin: newOrigin, size: size), display: true)
+            }
 
+            /// Second part of the workaround mentioned above
+            if #unavailable(macOS 15) {
+                overlayWindow.styleMask.remove(.titled)
             }
         } else {
             overlayWindow.setFrameOrigin(NSPoint(x: xPosition, y: yPosition - AnimationConsts.yAnimationOffset))
