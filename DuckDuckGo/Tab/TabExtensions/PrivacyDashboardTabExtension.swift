@@ -23,11 +23,13 @@ import ContentBlocking
 import Foundation
 import Navigation
 import PrivacyDashboard
+import PhishingDetection
 
 final class PrivacyDashboardTabExtension {
 
     private let contentBlocking: any ContentBlockingProtocol
     private let certificateTrustEvaluator: CertificateTrustEvaluating
+    private var phishingStateManager: PhishingTabStateManaging
 
     @Published private(set) var privacyInfo: PrivacyInfo?
 
@@ -42,10 +44,12 @@ final class PrivacyDashboardTabExtension {
          autoconsentUserScriptPublisher: some Publisher<UserScriptWithAutoconsent?, Never>,
          didUpgradeToHttpsPublisher: some Publisher<URL, Never>,
          trackersPublisher: some Publisher<DetectedTracker, Never>,
-         webViewPublisher: some Publisher<WKWebView, Never>) {
+         webViewPublisher: some Publisher<WKWebView, Never>,
+         phishingStateManager: PhishingTabStateManaging) {
 
         self.contentBlocking = contentBlocking
         self.certificateTrustEvaluator = certificateTrustEvaluator
+        self.phishingStateManager = phishingStateManager
 
         autoconsentUserScriptPublisher.sink { [weak self] autoconsentUserScript in
             autoconsentUserScript?.delegate = self
@@ -94,6 +98,16 @@ final class PrivacyDashboardTabExtension {
         }
     }
 
+    private func updatePrivacyInfo(with url: URL?) async {
+        guard let url = url else { return }
+        guard url.isValid else { return }
+        guard !(url.isDuckURLScheme || url.isDuckDuckGo) else { return }
+        let malicious = phishingStateManager.didBypassError
+        await MainActor.run {
+            self.privacyInfo?.isPhishing = malicious
+        }
+    }
+
 }
 
 extension PrivacyDashboardTabExtension {
@@ -119,7 +133,7 @@ extension PrivacyDashboardTabExtension {
         privacyInfo = PrivacyInfo(url: url,
                                   parentEntity: entity,
                                   protectionStatus: makeProtectionStatus(for: host),
-                                  isPhishing: false)
+                                  isPhishing: self.phishingStateManager.didBypassError)
 
         previousPrivacyInfosByURL[url.absoluteString] = privacyInfo
 
@@ -163,7 +177,8 @@ extension PrivacyDashboardTabExtension: NavigationResponder {
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         resetConnectionUpgradedTo(navigationAction: navigationAction)
-
+        let url = navigationAction.url
+        await updatePrivacyInfo(with: url)
         return .next
     }
 
