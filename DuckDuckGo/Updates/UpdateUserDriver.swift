@@ -24,9 +24,32 @@ import os.log
 
 #if SPARKLE
 
+enum UpdateCycleProgress {
+    case updateCycleNotStarted
+    case updateCycleDidStart
+    case updateFound(SUAppcastItem)
+    case updateNotFound(SUAppcastItem, NSError)
+    case downloadDidStart
+    case downloading(UInt64, UInt64)
+    case extractionDidStart
+    case extracting(Double)
+    case readyToInstallAndRelaunch
+    case installationDidStart
+    case installing
+    case updateCycleDone
+
+    static var `default` = UpdateCycleProgress.updateCycleNotStarted
+
+    var isDone: Bool {
+        switch self {
+        case .updateCycleDone: return true
+        default: return false
+        }
+    }
+}
+
 protocol UpdateUserDriverDelegate: AnyObject {
-    func userDriverUpdateCycleEnd(_ userDriver: UpdateUserDriver, item: SUAppcastItem?, isInstalled: Bool)
-    func userDriverUpdateCycleProgress(_ userDriver: UpdateUserDriver, progress: UpdateControllerProgress)
+    func userDriverUpdateCycleProgress(_ userDriver: UpdateUserDriver, progress: UpdateCycleProgress)
 }
 
 final class UpdateUserDriver: NSObject, SPUUserDriver {
@@ -68,7 +91,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         Logger.updates.debug("Updater did find valid update: \(appcastItem.displayVersionString)(\(appcastItem.versionString))")
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidFindUpdate))
 
-        delegate?.userDriverUpdateCycleEnd(self, item: appcastItem, isInstalled: false)
+        delegate?.userDriverUpdateCycleProgress(self, progress: .updateFound(appcastItem))
 
         return appcastItem.isInformationOnlyUpdate ? .dismiss : .install
     }
@@ -82,7 +105,8 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     }
 
     func showUpdateNotFoundWithError(_ error: any Error, acknowledgement: @escaping () -> Void) {
-        guard let item = (error as NSError).userInfo["SULatestAppcastItemFound"] as? SUAppcastItem else {
+        let nsError = error as NSError
+        guard let item = nsError.userInfo["SULatestAppcastItemFound"] as? SUAppcastItem else {
             acknowledgement()
             return
         }
@@ -90,8 +114,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         Logger.updates.debug("Updater did not find update: \(String(describing: item.displayVersionString))(\(String(describing: item.versionString)))")
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidNotFindUpdate, error: error))
 
-        // User is running the latest version
-        delegate?.userDriverUpdateCycleEnd(self, item: item, isInstalled: true)
+        delegate?.userDriverUpdateCycleProgress(self, progress: .updateNotFound(item, nsError))
 
         acknowledgement()
     }
