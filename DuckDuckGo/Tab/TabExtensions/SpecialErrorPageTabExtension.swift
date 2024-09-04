@@ -51,7 +51,7 @@ final class SpecialErrorPageTabExtension {
         urlCredentialCreator: URLCredentialCreating = URLCredentialCreator(),
         featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger,
         phishingDetector: some PhishingSiteDetecting,
-        phishingStateManager: PhishingTabStateManager) {
+        phishingStateManager: PhishingTabStateManaging) {
             self.featureFlagger = featureFlagger
             self.urlCredentialCreator = urlCredentialCreator
             webViewPublisher.sink { [weak self] webView in

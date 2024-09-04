@@ -46,5 +46,4 @@ final class PhishingDetectionPreferences: ObservableObject {
     }
 
     private var persistor: PhishingDetectionPreferencesPersistor
-    private var cancellables: Set<AnyCancellable> = []
 }

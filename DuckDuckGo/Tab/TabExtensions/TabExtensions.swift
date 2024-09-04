@@ -74,7 +74,7 @@ protocol TabExtensionDependencies {
     var certificateTrustEvaluator: CertificateTrustEvaluating { get }
     var tunnelController: NetworkProtectionIPCTunnelController? { get }
     var phishingDetector: PhishingSiteDetecting { get }
-    var phishingStateManager: PhishingTabStateManager { get }
+    var phishingStateManager: PhishingTabStateManaging { get }
 }
 
 // swiftlint:disable:next large_tuple
