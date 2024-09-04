@@ -64,7 +64,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         self.internalUserDecider = internalUserDecider
         super.init()
 
-        configureUpdater()
+        try? configureUpdater()
     }
 
     @Published private(set) var updateProgress = UpdateCycleProgress.default
@@ -85,15 +85,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     var areAutomaticUpdatesEnabled: Bool {
         didSet {
             Logger.updates.debug("areAutomaticUpdatesEnabled: \(self.areAutomaticUpdatesEnabled)")
-            if updater.automaticallyDownloadsUpdates != areAutomaticUpdatesEnabled {
-                updater.automaticallyDownloadsUpdates = areAutomaticUpdatesEnabled
-
-                // Reinitialize in order to reset the current loaded state
-                if !areAutomaticUpdatesEnabled {
-                    configureUpdater()
-                    latestUpdate = nil
-                }
-            }
+            try? configureUpdater()
         }
     }
 
@@ -130,12 +122,11 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
 
     // MARK: - Private
 
-    private func configureUpdater() {
+    private func configureUpdater() throws {
         // The default configuration of Sparkle updates is in Info.plist
         userDriver = UpdateUserDriver(internalUserDecider: internalUserDecider,
                                       deferInstallation: !areAutomaticUpdatesEnabled)
         updater = SPUUpdater(hostBundle: Bundle.main, applicationBundle: Bundle.main, userDriver: userDriver, delegate: self)
-        try? updater.start()
 
         if updater.automaticallyDownloadsUpdates != areAutomaticUpdatesEnabled {
             updater.automaticallyDownloadsUpdates = areAutomaticUpdatesEnabled
@@ -154,6 +145,8 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
                 self?.updateProgress = progress
                 self?.showUpdateNotificationIfNeeded()
             }
+
+        try updater.start()
 
 #if DEBUG
         updater.automaticallyChecksForUpdates = false
