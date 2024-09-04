@@ -22,7 +22,6 @@ import Foundation
 import Configuration
 import Persistence
 import PixelKit
-import os.log
 
 final class ConfigurationStore: ConfigurationStoring {
 

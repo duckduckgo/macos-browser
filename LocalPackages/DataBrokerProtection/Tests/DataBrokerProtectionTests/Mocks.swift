@@ -1931,17 +1931,3 @@ struct MockMigrationsProvider: DataBrokerProtectionDatabaseMigrationsProvider {
         return { _ in }
     }
 }
-
-//struct MockConfigurationFetcher: ConfigurationFetching {
-//    func fetch(_ configuration: Configuration, isDebug: Bool) async throws {
-//        return
-//    }
-//    
-//    func fetch(all configurations: [Configuration]) async throws {
-//        return
-//    }
-//}
-//
-//final class MockConfigurationManager: DefaultConfigurationManager {
-//
-//}
