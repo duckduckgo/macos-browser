@@ -115,6 +115,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidNotFindUpdate, error: error))
 
         delegate?.userDriverUpdateCycleProgress(self, progress: .updateNotFound(item, nsError))
+        delegate?.userDriverUpdateCycleProgress(self, progress: .updateCycleDone)
 
         acknowledgement()
     }
@@ -151,10 +152,11 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     func showReady(toInstallAndRelaunch reply: @escaping (SPUUserUpdateChoice) -> Void) {
         if deferInstallation {
             onManualInstall = { reply(.install) }
-            delegate?.userDriverUpdateCycleProgress(self, progress: .updateCycleDone)
         } else {
             reply(.install)
         }
+
+        delegate?.userDriverUpdateCycleProgress(self, progress: .updateCycleDone)
     }
 
     func showInstallingUpdate(withApplicationTerminated applicationTerminated: Bool, retryTerminatingApplication: @escaping () -> Void) {
