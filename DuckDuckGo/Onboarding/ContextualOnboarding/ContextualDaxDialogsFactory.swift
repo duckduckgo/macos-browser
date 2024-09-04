@@ -24,7 +24,7 @@ protocol ContextualDaxDialogsFactory {
     func makeView(for type: ContextualDialogType, delegate: OnboardingNavigationDelegate, onDismiss: @escaping () -> Void) -> AnyView
 }
 
-struct DefaultContextualDialogViewFactory: ContextualDaxDialogsFactory {
+struct DefaultContextualDaxDialogViewFactory: ContextualDaxDialogsFactory {
     func makeView(for type: ContextualDialogType, delegate: any OnboardingNavigationDelegate, onDismiss: @escaping () -> Void) -> AnyView {
         let dialogView: AnyView
         switch type {

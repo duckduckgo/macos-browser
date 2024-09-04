@@ -67,7 +67,7 @@ final class BrowserTabViewController: NSViewController {
     init(tabCollectionViewModel: TabCollectionViewModel,
          bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
          onboardingDialogTypeProvider: ContextualOnboardingDialogTypeProviding = ContextualOnboardingDialogTypeProvider(),
-         onboardingDialogFactory: ContextualDaxDialogsFactory = DefaultContextualDialogViewFactory(),
+         onboardingDialogFactory: ContextualDaxDialogsFactory = DefaultContextualDaxDialogViewFactory(),
          featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger) {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.bookmarkManager = bookmarkManager
