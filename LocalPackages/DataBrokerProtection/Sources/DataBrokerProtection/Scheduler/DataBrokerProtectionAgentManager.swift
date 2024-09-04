@@ -85,7 +85,7 @@ public class DataBrokerProtectionAgentManagerProvider {
                                                          emailService: emailService,
                                                          captchaService: captchaService)
 
-        let freemiumPIRUserStateManager = DefaultFreemiumPIRUserStateManager(userDefaults: .dbp, accountManager: accountManager)
+        let freemiumPIRUserStateManager = DefaultFreemiumPIRUserStateManager(userDefaults: .dbp)
 
         let agentstopper = DefaultDataBrokerProtectionAgentStopper(dataManager: dataManager,
                                                                    entitlementMonitor: DataBrokerProtectionEntitlementMonitor(),
@@ -111,7 +111,8 @@ public class DataBrokerProtectionAgentManagerProvider {
             pixelHandler: pixelHandler,
             agentStopper: agentstopper,
             configurationManager: configurationManager,
-            privacyConfigurationManager: privacyConfigurationManager),
+            privacyConfigurationManager: privacyConfigurationManager,
+            authenticationManager: authenticationManager,
             freemiumPIRUserStateManager: freemiumPIRUserStateManager)
     }
 }
@@ -128,6 +129,7 @@ public final class DataBrokerProtectionAgentManager {
     private let agentStopper: DataBrokerProtectionAgentStopper
     private let configurationManger: DefaultConfigurationManager
     private let privacyConfigurationManager: DBPPrivacyConfigurationManager
+    private let authenticationManager: DataBrokerProtectionAuthenticationManaging
     private let freemiumPIRUserStateManager: FreemiumPIRUserStateManager
 
     // Used for debug functions only, so not injected
@@ -147,6 +149,7 @@ public final class DataBrokerProtectionAgentManager {
          agentStopper: DataBrokerProtectionAgentStopper,
          configurationManager: DefaultConfigurationManager,
          privacyConfigurationManager: DBPPrivacyConfigurationManager,
+         authenticationManager: DataBrokerProtectionAuthenticationManaging,
          freemiumPIRUserStateManager: FreemiumPIRUserStateManager
     ) {
         self.userNotificationService = userNotificationService
@@ -159,6 +162,7 @@ public final class DataBrokerProtectionAgentManager {
         self.agentStopper = agentStopper
         self.configurationManger = configurationManager
         self.privacyConfigurationManager = privacyConfigurationManager
+        self.authenticationManager = authenticationManager
         self.freemiumPIRUserStateManager = freemiumPIRUserStateManager
 
         self.activityScheduler.delegate = self
@@ -216,7 +220,7 @@ extension DataBrokerProtectionAgentManager {
 
 private extension DataBrokerProtectionAgentManager {
 
-    /// Starts either Freemium (scan-only) or Subscription (scan and opt-out) scheduled operations
+    /// Starts either Subscription (scan and opt-out) or Freemium (scan-only) scheduled operations
     /// - Parameters:
     ///   - showWebView: Whether to show the web view or not
     ///   - operationDependencies: Operation dependencies
@@ -224,10 +228,10 @@ private extension DataBrokerProtectionAgentManager {
     func startFreemiumOrSubscriptionScheduledOperations(showWebView: Bool,
                                                         operationDependencies: DataBrokerOperationDependencies,
                                                         completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
-        if freemiumPIRUserStateManager.isActiveUser {
-            queueManager.startScheduledScanOperationsIfPermitted(showWebView: showWebView, operationDependencies: operationDependencies, completion: completion)
-        } else {
+        if authenticationManager.isUserAuthenticated {
             queueManager.startScheduledAllOperationsIfPermitted(showWebView: showWebView, operationDependencies: operationDependencies, completion: completion)
+        } else {
+            queueManager.startScheduledScanOperationsIfPermitted(showWebView: showWebView, operationDependencies: operationDependencies, completion: completion)
         }
     }
 }
