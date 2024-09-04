@@ -26,7 +26,6 @@ public enum VPNAppLaunchCommand: Codable, AppLaunchCommand {
     case showStatus
     case showSettings
     case showVPNLocations
-    case manageExclusions
     case moveAppToApplications
     case showPrivacyPro
 
@@ -44,8 +43,6 @@ public enum VPNAppLaunchCommand: Codable, AppLaunchCommand {
             return "networkprotection://show-settings"
         case .showVPNLocations:
             return "networkprotection://show-settings/locations"
-        case .manageExclusions:
-            return "networkprotection://manage-exclusions"
         case .moveAppToApplications:
             return "networkprotection://move-app-to-applications"
         case .showPrivacyPro:

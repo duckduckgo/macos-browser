@@ -85,12 +85,6 @@ extension SiteTroubleshootingView {
                 .store(in: &cancellables)
         }
 
-        func manageExclusions() {
-            Task { @MainActor in
-                await uiActionHandler.manageExclusions()
-            }
-        }
-
         func setExclusion(_ exclude: Bool, forDomain domain: String) {
             Task { @MainActor in
                 guard let siteInfo,

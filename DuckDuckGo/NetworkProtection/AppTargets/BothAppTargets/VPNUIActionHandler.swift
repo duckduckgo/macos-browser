@@ -40,10 +40,6 @@ final class VPNUIActionHandler: VPNUIActionHandling {
         self.proxySettings = proxySettings
     }
 
-    public func manageExclusions() async {
-        await vpnURLEventHandler.manageExclusions()
-    }
-
     public func moveAppToApplications() async {
 #if !APPSTORE && !DEBUG
         await vpnURLEventHandler.moveAppToApplicationsFolder()
@@ -53,7 +49,10 @@ final class VPNUIActionHandler: VPNUIActionHandling {
     func setExclusion(_ exclude: Bool, forDomain domain: String) async {
         proxySettings.setExclusion(exclude, forDomain: domain)
         try? await vpnIPCClient.command(.restartAdapter)
-        await vpnURLEventHandler.reloadTab(showingDomain: domain)
+
+        Task {
+            await vpnURLEventHandler.reloadTab(showingDomain: domain)
+        }
     }
 
     public func shareFeedback() async {

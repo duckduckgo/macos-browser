@@ -54,10 +54,6 @@ final class VPNURLEventHandler {
         }
     }
 
-    func manageExclusions() async {
-        windowControllerManager.showPreferencesTab(withSelectedPane: .vpn)
-    }
-
     func reloadTab(showingDomain domain: String) {
         windowControllerManager.selectedTab?.reload()
     }

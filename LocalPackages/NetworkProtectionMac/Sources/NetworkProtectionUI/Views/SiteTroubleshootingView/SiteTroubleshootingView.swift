@@ -95,18 +95,4 @@ public struct SiteTroubleshootingView: View {
                 .foregroundColor(isHovered ? .white : Color(.defaultText))
         }
     }
-
-    /// Creates a menu button for the site troubleshooting view.
-    ///
-    @ViewBuilder
-    private func manageExclusionsMenuButton(title: String, selected: Bool, action: @escaping () -> Void) -> MenuItemCustomButton<some View> {
-
-        MenuItemCustomButton {
-            action()
-        } label: { isHovered in
-            Text(title)
-                .font(.system(size: 12))
-                .foregroundColor(isHovered ? .white : Color(.defaultText))
-        }
-    }
 }
