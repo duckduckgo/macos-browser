@@ -32,6 +32,8 @@ final class DefaultFreemiumPIRFeature: FreemiumPIRFeature {
     private let featureFlagger: FeatureFlagger
     private let subscriptionManager: SubscriptionManager
     private let accountManager: AccountManager
+    private var freemiumPIRUserStateManager: FreemiumPIRUserStateManager
+    private let featureDisabler: DataBrokerProtectionFeatureDisabling
 
     var isAvailable: Bool {
         /* Freemium PIR availability criteria:
@@ -41,18 +43,59 @@ final class DefaultFreemiumPIRFeature: FreemiumPIRFeature {
             4. (Temp) In experiment cohort
          */
         featureFlagger.isFeatureOn(.freemiumPIR) // #1
-        && subscriptionManager.isPrivacyProPurchaseAvailable // #2
-        && !accountManager.isUserAuthenticated // #3
+        && isPotentialPrivacyProSubscriber // #2 & #3
         // TODO: - Also check experiment cohort here
     }
 
     init(featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger,
          subscriptionManager: SubscriptionManager,
-         accountManager: AccountManager) {
+         accountManager: AccountManager,
+         freemiumPIRUserStateManager: FreemiumPIRUserStateManager,
+         featureDisabler: DataBrokerProtectionFeatureDisabling = DataBrokerProtectionFeatureDisabler()) {
 
         self.featureFlagger = featureFlagger
         self.subscriptionManager = subscriptionManager
         self.accountManager = accountManager
+        self.freemiumPIRUserStateManager = freemiumPIRUserStateManager
+        self.featureDisabler = featureDisabler
+
+        offBoardIfNecessary()
+    }
+}
+
+private extension DefaultFreemiumPIRFeature {
+
+    /// Returns true if a user is a "potential" Privacy Pro subscriber. This means:
+    ///
+    /// 1. Is eligible to purchase
+    /// 2. Is not a current subscriber
+    var isPotentialPrivacyProSubscriber: Bool {
+        subscriptionManager.isPrivacyProPurchaseAvailable
+        && !accountManager.isUserAuthenticated
+    }
+    
+    /// Returns true IFF:
+    ///
+    /// 1. The user did onboard to Freemium PIR
+    /// 2. The feature flag is disabled
+    /// 3. The user `isPotentialPrivacyProSubscriber` (see definition)
+    var shouldDisableAndDelete: Bool {
+        guard freemiumPIRUserStateManager.didOnboard else { return false }
+
+        return !featureFlagger.isFeatureOn(.freemiumPIR)
+        && isPotentialPrivacyProSubscriber
+    }
+
+    /// This method offboards a Freemium user if the feature flag was disabled
+    ///
+    /// Offboarding involves:
+    /// - Resettting `FreemiumPIRUserStateManager`state
+    /// - Disabling and deleting PIR data
+    func offBoardIfNecessary() {
+        if shouldDisableAndDelete {
+            freemiumPIRUserStateManager.didOnboard = false
+            featureDisabler.disableAndDelete()
+        }
     }
 }
 
