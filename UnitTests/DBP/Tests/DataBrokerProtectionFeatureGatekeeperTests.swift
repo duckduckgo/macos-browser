@@ -92,7 +92,7 @@ final class DataBrokerProtectionFeatureGatekeeperTests: XCTestCase {
         let result = await sut.arePrerequisitesSatisfied()
 
         // Then
-        XCTAssertTrue(result)
+        XCTAssertFalse(result)
     }
 
     func testWhenAccessTokenAndEntitlementAreNotFound_andIsNotActiveFreemiumUser_thenFeatureIsDisabled() async {
