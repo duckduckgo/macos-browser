@@ -214,11 +214,11 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
 //}
 
 extension UpdateController: UpdateUserDriverDelegate {
-    func userDriverUpdateCheckEnd(_ userDriver: UpdateUserDriver, item: SUAppcastItem?, isInstalled: Bool) {
+    func userDriverUpdateCycleEnd(_ userDriver: UpdateUserDriver, item: SUAppcastItem?, isInstalled: Bool) {
         onUpdateCheckEnd(item: item, isInstalled: isInstalled)
     }
 
-    func userDriverUpdateCheckProgress(_ userDriver: UpdateUserDriver, progress: UpdateControllerProgress) {
+    func userDriverUpdateCycleProgress(_ userDriver: UpdateUserDriver, progress: UpdateControllerProgress) {
         updateProgress = progress
     }
 }
