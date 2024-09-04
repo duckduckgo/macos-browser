@@ -34,11 +34,6 @@ protocol SpecialErrorPageScriptProvider {
 
 extension UserScripts: SpecialErrorPageScriptProvider {}
 
-enum ErrorType {
-    case phishing
-    case ssl
-}
-
 final class SpecialErrorPageTabExtension {
     weak var webView: ErrorPageTabExtensionNavigationDelegate?
     private weak var specialErrorPageUserScript: SpecialErrorPageUserScript?
@@ -47,7 +42,7 @@ final class SpecialErrorPageTabExtension {
     private var featureFlagger: FeatureFlagger
     private var phishingDetector: PhishingSiteDetecting
     private var phishingStateManager: PhishingTabStateManaging
-    private var errorPageType: ErrorType?
+    private var errorPageType: SpecialErrorKind?
     private var phishingURLExemptions: Set<URL> = []
     private let tld = TLD()
 
