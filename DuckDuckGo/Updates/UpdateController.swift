@@ -26,28 +26,6 @@ import PixelKit
 import SwiftUI
 import os.log
 
-enum UpdateControllerProgress {
-    case updateCycleNotStarted
-    case updateCycleDidStart
-    case downloadDidStart
-    case downloading(UInt64, UInt64)
-    case extractionDidStart
-    case extracting(Double)
-    case readyToInstallAndRelaunch
-    case installationDidStart
-    case installing
-    case updateCycleDone
-
-    static var `default` = UpdateControllerProgress.updateCycleNotStarted
-
-    var isDone: Bool {
-        switch self {
-        case .updateCycleDone, .readyToInstallAndRelaunch: return true
-        default: return false
-        }
-    }
-}
-
 protocol UpdateControllerProtocol: AnyObject {
 
     var latestUpdate: Update? { get }
@@ -56,8 +34,8 @@ protocol UpdateControllerProtocol: AnyObject {
     var isUpdateAvailableToInstall: Bool { get }
     var isUpdateAvailableToInstallPublisher: Published<Bool>.Publisher { get }
 
-    var updateProgress: UpdateControllerProgress { get }
-    var updateProgressPublisher: Published<UpdateControllerProgress>.Publisher { get }
+    var updateProgress: UpdateCycleProgress { get }
+    var updateProgressPublisher: Published<UpdateCycleProgress>.Publisher { get }
 
     var lastUpdateCheckDate: Date? { get }
 
@@ -89,8 +67,8 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         configureUpdater()
     }
 
-    @Published private(set) var updateProgress = UpdateControllerProgress.default
-    var updateProgressPublisher: Published<UpdateControllerProgress>.Publisher { $updateProgress }
+    @Published private(set) var updateProgress = UpdateCycleProgress.default
+    var updateProgressPublisher: Published<UpdateCycleProgress>.Publisher { $updateProgress }
 
     @Published private(set) var latestUpdate: Update? {
         didSet {
@@ -198,11 +176,15 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
 }
 
 extension UpdateController: UpdateUserDriverDelegate {
-    func userDriverUpdateCycleEnd(_ userDriver: UpdateUserDriver, item: SUAppcastItem?, isInstalled: Bool) {
-        onUpdateCheckEnd(item: item, isInstalled: isInstalled)
-    }
-
-    func userDriverUpdateCycleProgress(_ userDriver: UpdateUserDriver, progress: UpdateControllerProgress) {
+    func userDriverUpdateCycleProgress(_ userDriver: UpdateUserDriver, progress: UpdateCycleProgress) {
+        switch progress {
+        case .updateFound(let item):
+            latestUpdate = Update(appcastItem: item, isInstalled: false)
+        case .updateNotFound(let item, _):
+            latestUpdate = Update(appcastItem: item, isInstalled: true)
+        default:
+            break
+        }
         updateProgress = progress
     }
 }
@@ -242,17 +224,9 @@ extension UpdateController: SPUUpdaterDelegate {
             return
         }
         // Automatic updates present the available update after it's downloaded
-        onUpdateCheckEnd(item: item, isInstalled: false)
+        updateProgress = .updateFound(item)
 
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidDownloadUpdate))
-    }
-
-    private func onUpdateCheckEnd(item: SUAppcastItem?, isInstalled: Bool) {
-        if let item {
-            latestUpdate = Update(appcastItem: item, isInstalled: isInstalled)
-        } else {
-            latestUpdate = nil
-        }
     }
 
     func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {
