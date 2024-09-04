@@ -42,11 +42,11 @@ final class FreemiumDebugMenu: NSMenuItem {
 
     @objc
     func setFreemiumPIROnboardStateEnabled() {
-        DefaultFreemiumPIRUserStateManager(userDefaults: .dbp, accountManager: Application.appDelegate.subscriptionManager.accountManager).didOnboard = true
+        DefaultFreemiumPIRUserStateManager(userDefaults: .dbp).didOnboard = true
     }
 
     @objc
     func setFreemiumPIROnboardStateDisabled() {
-        DefaultFreemiumPIRUserStateManager(userDefaults: .dbp, accountManager: Application.appDelegate.subscriptionManager.accountManager).didOnboard = false
+        DefaultFreemiumPIRUserStateManager(userDefaults: .dbp).didOnboard = false
     }
 }

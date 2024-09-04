@@ -28,22 +28,11 @@ let package = Package(
             name: "Freemium",
             targets: ["Freemium"]),
     ],
-    dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "186.0.0"),
-    ],
     targets: [
         .target(
-            name: "Freemium",
-            dependencies: [
-                .product(name: "Subscription", package: "BrowserServicesKit"),
-            ]
-        ),
+            name: "Freemium"),
         .testTarget(
             name: "FreemiumTests",
-            dependencies: [
-                "Freemium",
-                .product(name: "SubscriptionTestingUtilities", package: "BrowserServicesKit")
-            ]
-        ),
+            dependencies: ["Freemium"]),
     ]
 )

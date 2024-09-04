@@ -81,13 +81,14 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
     /// Checks PIR prerequisites
     ///
     /// Prerequisites are satisified if either:
-    /// 1. The user is an active freemium user
+    /// 1. The user is an active freemium user (e.g has onboarded to freemium and is not authenticated)
     /// 2. The user has a subscription with valid entitlements
     ///
     /// - Returns: Bool indicating prerequisites are satisfied
     func arePrerequisitesSatisfied() async -> Bool {
 
-        if freemiumPIRUserStateManager.isActiveUser { return true }
+        let isAuthenticated = accountManager.isUserAuthenticated
+        if !isAuthenticated && freemiumPIRUserStateManager.didOnboard { return true }
 
         let entitlements = await accountManager.hasEntitlement(forProductName: .dataBrokerProtection,
                                                                cachePolicy: .reloadIgnoringLocalCacheData)
@@ -98,8 +99,6 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
         case .failure:
             hasEntitlements = false
         }
-
-        let isAuthenticated = accountManager.accessToken != nil
 
         firePrerequisitePixelsAndLogIfNecessary(hasEntitlements: hasEntitlements, isAuthenticatedResult: isAuthenticated)
 
