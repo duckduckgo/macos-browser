@@ -64,7 +64,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
 
         delegate?.userDriverUpdateCheckEnd(self, item: appcastItem, isInstalled: false)
 
-        return deferInstallation ? .install : .dismiss
+        return deferInstallation ? .dismiss : .install
     }
 
     func showUpdateReleaseNotes(with downloadData: SPUDownloadData) {
