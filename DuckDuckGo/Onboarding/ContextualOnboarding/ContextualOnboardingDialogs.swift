@@ -133,7 +133,7 @@ struct OnboardingFirstSearchDoneDialog: View {
 struct OnboardingFireButtonDialogContent: View {
     private let attributedMessage: NSAttributedString = {
         let firstString = UserText.ContextualOnboarding.onboardingTryFireButtonMessage
-        let boldString = "Fire Button."
+        let boldString = "Fire Button"
         let attributedString = NSMutableAttributedString(string: firstString)
         let boldFontAttribute: [NSAttributedString.Key: Any] = [
             .font: NSFont.systemFont(ofSize: OnboardingDialogsContants.messageFontSize, weight: .bold)
@@ -146,6 +146,8 @@ struct OnboardingFireButtonDialogContent: View {
         return attributedString
     }()
 
+    let viewModel: OnboardingFireButtonDialogViewModel
+
     var body: some View {
         ContextualDaxDialogContent(
             orientation: .horizontalStack(alignment: .center),
@@ -157,18 +159,19 @@ struct OnboardingFireButtonDialogContent: View {
     @ViewBuilder
     private var actionView: some View {
         VStack {
-            OnboardingPrimaryCTAButton(title: "Try it", action: {})
-            OnboardingSecondaryCTAButton(title: "Skip", action: {})
+            OnboardingPrimaryCTAButton(title: "Try it", action: viewModel.tryFireButton)
+            OnboardingSecondaryCTAButton(title: UserText.skip, action: viewModel.skip)
         }
     }
 
 }
 
 struct OnboardingFireDialog: View {
+    let viewModel: OnboardingFireButtonDialogViewModel
 
     var body: some View {
         DaxDialogView(logoPosition: .left) {
-            OnboardingFireButtonDialogContent()
+            OnboardingFireButtonDialogContent(viewModel: viewModel)
         }
         .padding()
 
@@ -184,11 +187,13 @@ struct OnboardingTrackersDoneDialog: View {
     let message: NSAttributedString
     let blockedTrackersCTAAction: () -> Void
 
+    let viewModel: OnboardingFireButtonDialogViewModel
+
     var body: some View {
         DaxDialogView(logoPosition: .left) {
             VStack {
                 if showNextScreen {
-                    OnboardingFireButtonDialogContent()
+                    OnboardingFireButtonDialogContent(viewModel: viewModel)
                 } else {
                     ContextualDaxDialogContent(
                         orientation: .horizontalStack(alignment: .center),
@@ -291,7 +296,7 @@ final class OnboardingPixelReporter: OnboardingSearchSuggestionsPixelReporting, 
 
 #Preview("Try Fire Button") {
     DaxDialogView(logoPosition: .left) {
-        OnboardingFireButtonDialogContent()
+        OnboardingFireButtonDialogContent(viewModel: OnboardingFireButtonDialogViewModel(onDismiss: {}))
     }
     .padding()
 }
@@ -301,6 +306,6 @@ final class OnboardingPixelReporter: OnboardingSearchSuggestionsPixelReporting, 
         let firstString = UserText.ContextualOnboarding.onboardingTryFireButtonMessage
         return NSMutableAttributedString(string: firstString)
     }()
-    return OnboardingTrackersDoneDialog(shouldFollowUp: true, message: message, blockedTrackersCTAAction: {})
+    return OnboardingTrackersDoneDialog(shouldFollowUp: true, message: message, blockedTrackersCTAAction: {}, viewModel:  OnboardingFireButtonDialogViewModel(onDismiss: {}))
         .padding()
 }

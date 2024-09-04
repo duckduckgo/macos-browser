@@ -32,6 +32,8 @@ public enum FeatureFlag: String {
 
     // https://app.asana.com/0/1206488453854252/1207136666798700/f
     case freemiumPIR
+
+    case highlightsOnboarding
 }
 
 extension FeatureFlag: FeatureFlagSourceProviding {
@@ -47,6 +49,8 @@ extension FeatureFlag: FeatureFlagSourceProviding {
             return .remoteReleasable(.subfeature(AutofillSubfeature.deduplicateLoginsOnImport))
         case .freemiumPIR:
             return .remoteDevelopment(.subfeature(DBPSubfeature.freemium))
+        case .highlightsOnboarding:
+            return .internalOnly
         }
     }
 }

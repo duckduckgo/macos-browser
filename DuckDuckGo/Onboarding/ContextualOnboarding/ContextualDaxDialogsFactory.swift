@@ -37,7 +37,7 @@ struct DefaultContextualDialogViewFactory: ContextualDaxDialogsFactory {
         case .trackers(message: let message, shouldFollowUp: let shouldFollowUp):
             dialogView = AnyView(trackersDialog(message: message, shouldFollowUp: shouldFollowUp, onDismiss: onDismiss))
         case .tryFireButton:
-            dialogView = AnyView(tryFireButtonDialog())
+            dialogView = AnyView(tryFireButtonDialog(onDismiss: onDismiss))
         case .highFive:
             dialogView = AnyView(highFiveDialog(onDismiss: onDismiss))
         }
@@ -79,11 +79,13 @@ struct DefaultContextualDialogViewFactory: ContextualDaxDialogsFactory {
 
     private func trackersDialog(message: NSAttributedString, shouldFollowUp: Bool, onDismiss: @escaping () -> Void) -> some View {
         let gotIt = shouldFollowUp ? {} : onDismiss
-        return OnboardingTrackersDoneDialog(shouldFollowUp: true, message: message, blockedTrackersCTAAction: gotIt)
+        let viewModel = OnboardingFireButtonDialogViewModel(onDismiss: onDismiss)
+        return OnboardingTrackersDoneDialog(shouldFollowUp: true, message: message, blockedTrackersCTAAction: gotIt, viewModel: viewModel)
     }
 
-    private func tryFireButtonDialog() -> some View {
-        return OnboardingFireDialog()
+    private func tryFireButtonDialog(onDismiss: @escaping () -> Void) -> some View {
+        let viewModel = OnboardingFireButtonDialogViewModel(onDismiss: onDismiss)
+        return OnboardingFireDialog(viewModel: viewModel)
     }
 
     private func highFiveDialog(onDismiss: @escaping () -> Void) -> some View {

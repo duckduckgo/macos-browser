@@ -45,6 +45,7 @@ final class BrowserTabViewController: NSViewController {
     private let dockCustomizer = DockCustomizer()
     private let onboardingDialogTypeProvider: ContextualOnboardingDialogTypeProviding
     private let onboardingDialogFactory: ContextualDaxDialogsFactory
+    private let featureFlagger: FeatureFlagger
 
     private var tabViewModelCancellables = Set<AnyCancellable>()
     private var activeUserDialogCancellable: Cancellable?
@@ -66,11 +67,13 @@ final class BrowserTabViewController: NSViewController {
     init(tabCollectionViewModel: TabCollectionViewModel,
          bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
          onboardingDialogTypeProvider: ContextualOnboardingDialogTypeProviding = ContextualOnboardingDialogTypeProvider(),
-         onboardingDialogFactory: ContextualDaxDialogsFactory = DefaultContextualDialogViewFactory()) {
+         onboardingDialogFactory: ContextualDaxDialogsFactory = DefaultContextualDialogViewFactory(),
+         featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger) {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.bookmarkManager = bookmarkManager
         self.onboardingDialogTypeProvider = onboardingDialogTypeProvider
         self.onboardingDialogFactory = onboardingDialogFactory
+        self.featureFlagger = featureFlagger
         containerStackView = NSStackView()
 
         super.init(nibName: nil, bundle: nil)
@@ -366,7 +369,7 @@ final class BrowserTabViewController: NSViewController {
             $0.removeFromSuperview()
         }
 
-        //TODO: Add Feature Switch
+        guard featureFlagger.isFeatureOn(.highlightsOnboarding) else { return }
 
         guard let tab = tabViewModel?.tab,
               let dialogType = onboardingDialogTypeProvider.dialogTypeForTab(tab) else {

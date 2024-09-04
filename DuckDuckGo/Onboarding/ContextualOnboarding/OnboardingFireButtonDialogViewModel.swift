@@ -1,5 +1,5 @@
 //
-//  ContextualOnboardingDialogTypeProvider.swift
+//  OnboardingFireButtonDialogViewModel.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -18,24 +18,16 @@
 
 import Foundation
 
-protocol ContextualOnboardingDialogTypeProviding {
-    func dialogTypeForTab(_ tab: Tab) -> ContextualDialogType?
-}
+public struct OnboardingFireButtonDialogViewModel {
+    let onDismiss: () -> Void
 
-enum ContextualDialogType {
-    case tryASearch
-    case searchDone(shouldFollowUp: Bool)
-    case tryASite
-    case trackers(message: NSAttributedString, shouldFollowUp: Bool)
-    case tryFireButton
-    case highFive
-}
+    func skip() {
+        onDismiss()
+    }
 
-struct ContextualOnboardingDialogTypeProvider: ContextualOnboardingDialogTypeProviding {
-    func dialogTypeForTab(_ tab: Tab) -> ContextualDialogType? {
-        guard case .url = tab.content else {
-            return nil
+    func tryFireButton() {
+        DispatchQueue.main.async {
+            FireCoordinator.fireButtonAction()
         }
-        return nil
     }
 }
