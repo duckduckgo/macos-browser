@@ -25,8 +25,8 @@ import os.log
 #if SPARKLE
 
 protocol UpdateUserDriverDelegate: AnyObject {
-    func userDriverUpdateCheckEnd(_ userDriver: UpdateUserDriver, item: SUAppcastItem?, isInstalled: Bool)
-    func userDriverUpdateCheckProgress(_ userDriver: UpdateUserDriver, progress: UpdateControllerProgress)
+    func userDriverUpdateCycleEnd(_ userDriver: UpdateUserDriver, item: SUAppcastItem?, isInstalled: Bool)
+    func userDriverUpdateCycleProgress(_ userDriver: UpdateUserDriver, progress: UpdateControllerProgress)
 }
 
 final class UpdateUserDriver: NSObject, SPUUserDriver {
@@ -61,15 +61,15 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
 
     func showUserInitiatedUpdateCheck(cancellation: @escaping () -> Void) {
         Logger.updates.debug("Updater started performing the update check. (isInternalUser: \(self.internalUserDecider.isInternalUser)")
-        delegate?.userDriverUpdateCheckProgress(self, progress: .updateCycleDidStart)
+        delegate?.userDriverUpdateCycleProgress(self, progress: .updateCycleDidStart)
     }
 
     func showUpdateFound(with appcastItem: SUAppcastItem, state: SPUUserUpdateState) async -> SPUUserUpdateChoice {
         Logger.updates.debug("Updater did find valid update: \(appcastItem.displayVersionString)(\(appcastItem.versionString))")
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidFindUpdate))
 
-        delegate?.userDriverUpdateCheckEnd(self, item: appcastItem, isInstalled: false)
-        delegate?.userDriverUpdateCheckProgress(self, progress: .updateCycleDone)
+        delegate?.userDriverUpdateCycleEnd(self, item: appcastItem, isInstalled: false)
+        delegate?.userDriverUpdateCycleProgress(self, progress: .updateCycleDone)
 
         return appcastItem.isInformationOnlyUpdate ? .dismiss : .install
     }
@@ -92,7 +92,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidNotFindUpdate, error: error))
 
         // User is running the latest version
-        delegate?.userDriverUpdateCheckEnd(self, item: item, isInstalled: true)
+        delegate?.userDriverUpdateCycleEnd(self, item: item, isInstalled: true)
 
         acknowledgement()
     }
@@ -102,7 +102,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     }
 
     func showDownloadInitiated(cancellation: @escaping () -> Void) {
-        delegate?.userDriverUpdateCheckProgress(self, progress: .downloadDidStart)
+        delegate?.userDriverUpdateCycleProgress(self, progress: .downloadDidStart)
     }
 
     func showDownloadDidReceiveExpectedContentLength(_ expectedContentLength: UInt64) {
@@ -115,15 +115,15 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         if bytesDownloaded > bytesToDownload {
             bytesToDownload = bytesDownloaded
         }
-        delegate?.userDriverUpdateCheckProgress(self, progress: .downloading(bytesDownloaded, bytesToDownload))
+        delegate?.userDriverUpdateCycleProgress(self, progress: .downloading(bytesDownloaded, bytesToDownload))
     }
 
     func showDownloadDidStartExtractingUpdate() {
-        delegate?.userDriverUpdateCheckProgress(self, progress: .extractionDidStart)
+        delegate?.userDriverUpdateCycleProgress(self, progress: .extractionDidStart)
     }
 
     func showExtractionReceivedProgress(_ progress: Double) {
-        delegate?.userDriverUpdateCheckProgress(self, progress: .extracting(progress))
+        delegate?.userDriverUpdateCycleProgress(self, progress: .extracting(progress))
     }
 
     func showReady(toInstallAndRelaunch reply: @escaping (SPUUserUpdateChoice) -> Void) {
@@ -132,23 +132,24 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         } else {
             reply(.install)
         }
-        delegate?.userDriverUpdateCheckProgress(self, progress: .updateCycleDone)
+        delegate?.userDriverUpdateCycleProgress(self, progress: .updateCycleDone)
     }
 
     func showInstallingUpdate(withApplicationTerminated applicationTerminated: Bool, retryTerminatingApplication: @escaping () -> Void) {
-        delegate?.userDriverUpdateCheckProgress(self, progress: .installationDidStart)
+        delegate?.userDriverUpdateCycleProgress(self, progress: .installationDidStart)
     }
 
     func showUpdateInstalledAndRelaunched(_ relaunched: Bool, acknowledgement: @escaping () -> Void) {
-        delegate?.userDriverUpdateCheckProgress(self, progress: .installing)
+        delegate?.userDriverUpdateCycleProgress(self, progress: .installing)
         acknowledgement()
     }
 
     func showUpdateInFocus() {
+        // no-op
     }
 
     func dismissUpdateInstallation() {
-        delegate?.userDriverUpdateCheckProgress(self, progress: .updateCycleDone)
+        delegate?.userDriverUpdateCycleProgress(self, progress: .updateCycleDone)
     }
 }
 
