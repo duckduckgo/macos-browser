@@ -25,6 +25,7 @@ import WebKit
 import Subscription
 import PixelKit
 import os.log
+import Onboarding
 
 final class BrowserTabViewController: NSViewController {
 
@@ -35,12 +36,15 @@ final class BrowserTabViewController: NSViewController {
     private weak var webView: WebView?
     private weak var webViewContainer: NSView?
     private weak var webViewSnapshot: NSView?
+    private var containerStackView: NSStackView
 
     var tabViewModel: TabViewModel?
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private let bookmarkManager: BookmarkManager
     private let dockCustomizer = DockCustomizer()
+    private let onboardingDialogTypeProvider: ContextualOnboardingDialogTypeProviding
+    private let onboardingDialogFactory: ContextualDaxDialogsFactory
 
     private var tabViewModelCancellables = Set<AnyCancellable>()
     private var activeUserDialogCancellable: Cancellable?
@@ -59,9 +63,15 @@ final class BrowserTabViewController: NSViewController {
         fatalError("BrowserTabViewController: Bad initializer")
     }
 
-    init(tabCollectionViewModel: TabCollectionViewModel, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
+    init(tabCollectionViewModel: TabCollectionViewModel,
+         bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
+         onboardingDialogTypeProvider: ContextualOnboardingDialogTypeProviding = ContextualOnboardingDialogTypeProvider(),
+         onboardingDialogFactory: ContextualDaxDialogsFactory = DefaultContextualDialogViewFactory()) {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.bookmarkManager = bookmarkManager
+        self.onboardingDialogTypeProvider = onboardingDialogTypeProvider
+        self.onboardingDialogFactory = onboardingDialogFactory
+        containerStackView = NSStackView()
 
         super.init(nibName: nil, bundle: nil)
     }
@@ -107,6 +117,7 @@ final class BrowserTabViewController: NSViewController {
         subscribeToSelectedTabViewModel()
 
         view.registerForDraggedTypes([.URL, .fileURL])
+
     }
 
     override func viewWillAppear() {
@@ -257,6 +268,7 @@ final class BrowserTabViewController: NSViewController {
                 self.subscribeToUserDialogs(of: selectedTabViewModel)
 
                 self.adjustFirstResponder(force: true)
+                self.presentContextualOnboarding()
             }
             .store(in: &cancellables)
     }
@@ -328,8 +340,59 @@ final class BrowserTabViewController: NSViewController {
     private func addWebViewToViewHierarchy(_ webView: WebView, tab: Tab) {
         let container = WebViewContainerView(tab: tab, webView: webView, frame: view.bounds)
         self.webViewContainer = container
+        containerStackView.orientation = .vertical
+        containerStackView.distribution = .fill
+        containerStackView.alignment = .leading
+        containerStackView.distribution = .fillProportionally
+
         // Make sure link preview (tooltip shown in the bottom-left) is on top
-        view.addSubview(container, positioned: .below, relativeTo: hoverLabelContainer)
+        view.addSubview(containerStackView, positioned: .below, relativeTo: hoverLabelContainer)
+
+        containerStackView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            containerStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            containerStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            containerStackView.topAnchor.constraint(equalTo: view.topAnchor),
+            containerStackView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+        containerStackView.addArrangedSubview(container)
+    }
+    var daxContextualOnboardingController: NSViewController?
+
+    private func presentContextualOnboarding() {
+        // Before presenting a new dialog, remove any existing ones.
+        containerStackView.arrangedSubviews.filter({ $0 != webViewContainer }).forEach {
+            containerStackView.removeArrangedSubview($0)
+            $0.removeFromSuperview()
+        }
+
+        //TODO: Add Feature Switch
+
+        guard let tab = tabViewModel?.tab,
+              let dialogType = onboardingDialogTypeProvider.dialogTypeForTab(tab) else {
+            return
+        }
+
+        var onDismissAction: () -> Void = {}
+        if let webViewContainer {
+            onDismissAction = {
+                self.removeChild(in: self.containerStackView, webViewContainer: webViewContainer)
+            }
+        }
+        let daxView = onboardingDialogFactory.makeView(for: dialogType, delegate: tab, onDismiss: onDismissAction)
+        let hostingController = NSHostingController(rootView: AnyView(daxView))
+
+        daxContextualOnboardingController = hostingController
+        insertChild(daxContextualOnboardingController!, in: containerStackView, at: 0)
+        hostingController.view.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            hostingController.view.widthAnchor.constraint(equalTo: containerStackView.widthAnchor),
+            hostingController.view.leadingAnchor.constraint(equalTo: containerStackView.leadingAnchor),
+            hostingController.view.trailingAnchor.constraint(equalTo: containerStackView.trailingAnchor)
+        ])
+
+          containerStackView.layoutSubtreeIfNeeded()
+          webViewContainer?.layoutSubtreeIfNeeded()
     }
 
     private func changeWebView(tabViewModel: TabViewModel?) {
@@ -346,6 +409,7 @@ final class BrowserTabViewController: NSViewController {
             webView = newWebView
 
             addWebViewToViewHierarchy(newWebView, tab: tabViewModel.tab)
+
         }
 
         guard let tabViewModel = tabViewModel else {
@@ -402,6 +466,15 @@ final class BrowserTabViewController: NSViewController {
                 self?.showTabContent(of: tabViewModel)
             }
             .store(in: &tabViewModelCancellables)
+
+        tabViewModel?.tab.webViewDidFinishNavigationPublisher.sink { [weak self] in
+            self?.presentContextualOnboarding()
+        }.store(in: &tabViewModelCancellables)
+
+        tabViewModel?.tab.webViewDidStartNavigationPublisher.sink { [weak self] in
+            guard let self, let webViewContainer = self.webViewContainer else { return }
+            self.removeChild(in: self.containerStackView, webViewContainer: webViewContainer)
+        }.store(in: &tabViewModelCancellables)
     }
 
     private func subscribeToUserDialogs(of tabViewModel: TabViewModel?) {
@@ -1251,4 +1324,29 @@ extension BrowserTabViewController {
 @available(macOS 14.0, *)
 #Preview {
     BrowserTabViewController(tabCollectionViewModel: TabCollectionViewModel(tabCollection: TabCollection(tabs: [.init(content: .url(.duckDuckGo, source: .ui))])))
+}
+
+private extension NSViewController {
+
+    func insertChild(_ childController: NSViewController, in stackView: NSStackView, at index: Int) {
+        stackView.insertArrangedSubview(childController.view, at: index)
+        animateStackViewChanges(stackView)
+    }
+
+    func removeChild(in stackView: NSStackView, webViewContainer: NSView) {
+        stackView.arrangedSubviews.filter({ $0 != webViewContainer }).forEach {
+            stackView.removeArrangedSubview($0)
+            $0.removeFromSuperview()
+        }
+        animateStackViewChanges(stackView)
+    }
+
+    private func animateStackViewChanges(_ stackView: NSStackView) {
+        NSAnimationContext.runAnimationGroup { context in
+            context.duration = 0.25
+            context.allowsImplicitAnimation = true
+            stackView.layoutSubtreeIfNeeded()
+        }
+    }
+
 }

@@ -61,6 +61,7 @@ struct OnboardingTryVisitingSiteDialog: View {
 }
 
 struct OnboardingTryVisitingSiteDialogContent: View {
+    let title = UserText.ContextualOnboarding.onboardingTryASiteTitle
     let message = NSAttributedString(string: UserText.ContextualOnboarding.onboardingTryASiteMessage)
 
     let viewModel: OnboardingSiteSuggestionsViewModel
@@ -68,12 +69,22 @@ struct OnboardingTryVisitingSiteDialogContent: View {
     var body: some View {
         ContextualDaxDialogContent(
             orientation: .horizontalStack(alignment: .top),
-            title: viewModel.title,
+            title: title,
             titleFont: OnboardingDialogsContants.titleFont,
             message: message,
             messageFont: OnboardingDialogsContants.messageFont,
             list: viewModel.itemsList,
             listAction: viewModel.listItemPressed)
+    }
+}
+
+struct OnboardingTryVisitingASiteDialog: View {
+    let viewModel: OnboardingSiteSuggestionsViewModel
+
+    var body: some View {
+        DaxDialogView(logoPosition: .left) {
+            OnboardingTryVisitingSiteDialogContent(viewModel: viewModel)
+        }
     }
 }
 
@@ -157,9 +168,7 @@ struct OnboardingFireDialog: View {
 
     var body: some View {
         DaxDialogView(logoPosition: .left) {
-            VStack {
-                OnboardingFireButtonDialogContent()
-            }
+            OnboardingFireButtonDialogContent()
         }
         .padding()
 
@@ -201,6 +210,25 @@ struct OnboardingTrackersDoneDialog: View {
         }
         .padding()
 
+    }
+}
+
+struct OnboardingFinalDialog: View {
+    let title = UserText.ContextualOnboarding.onboardingFinalScreenTitle
+    let message = NSAttributedString(string: UserText.ContextualOnboarding.onboardingFinalScreenMessage)
+    let cta = UserText.ContextualOnboarding.onboardingFinalScreenButton
+
+    let highFiveAction: () -> Void
+
+    var body: some View {
+        DaxDialogView(logoPosition: .left) {
+            ContextualDaxDialogContent(orientation: .horizontalStack(alignment: .center),
+                                       title: title, 
+                                       titleFont: OnboardingDialogsContants.titleFont,
+                                       message: message,
+                                       messageFont: OnboardingDialogsContants.messageFont,
+                                       customActionView: AnyView(OnboardingPrimaryCTAButton(title: cta, action: highFiveAction)))
+        }
     }
 }
 
@@ -252,7 +280,7 @@ final class OnboardingPixelReporter: OnboardingSearchSuggestionsPixelReporting, 
 }
 
 #Preview("Try Site") {
-    OnboardingTryVisitingSiteDialog(viewModel: OnboardingSiteSuggestionsViewModel(title: UserText.ContextualOnboarding.onboardingTryASiteTitle, suggestedSitesProvider: OnboardingSuggestedSitesProvider(surpriseItemTitle: UserText.ContextualOnboarding.tryASearchOptionSurpriseMeTitle), pixelReporter: OnboardingPixelReporter()))
+    OnboardingTryVisitingSiteDialog(viewModel: OnboardingSiteSuggestionsViewModel(title: "", suggestedSitesProvider: OnboardingSuggestedSitesProvider(surpriseItemTitle: UserText.ContextualOnboarding.tryASearchOptionSurpriseMeTitle), pixelReporter: OnboardingPixelReporter()))
         .padding()
 }
 
