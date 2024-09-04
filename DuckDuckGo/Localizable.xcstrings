@@ -105,6 +105,34 @@
         }
       }
     },
+    "- Checking for update" : {
+
+    },
+    "- Downloading %@ / %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "- Downloading %1$@ / %2$@"
+          }
+        }
+      }
+    },
+    "- Downloading update" : {
+
+    },
+    "- Extracting update" : {
+
+    },
+    "- Extracting update (%lf%%)" : {
+
+    },
+    "- Installing" : {
+
+    },
+    "- Ready to install" : {
+
+    },
     "**%lld** tracking attempts blocked" : {
       "comment" : "The number of tracking attempts blocked in the last 7 days, shown on a new tab, translate as: Tracking attempts blocked: %@",
       "localizations" : {
@@ -16784,19 +16812,6 @@
         }
       }
     },
-    "Downloading %@ / %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Downloading %1$@ / %2$@"
-          }
-        }
-      }
-    },
-    "Downloading update" : {
-
-    },
     "downloads.active.alert.message.and.others" : {
       "comment" : "Alert text format element for “, and other files”",
       "extractionState" : "extracted_with_value",
@@ -21251,12 +21266,6 @@
           }
         }
       }
-    },
-    "Extracting update" : {
-
-    },
-    "Extracting update (%lf%%)" : {
-
     },
     "Favorite This Page…" : {
       "comment" : "Main Menu History item",
@@ -30141,9 +30150,6 @@
           }
         }
       }
-    },
-    "Installing" : {
-
     },
     "invite.dialog.get.started.button" : {
       "comment" : "Get Started button on an invite dialog",
@@ -52902,9 +52908,6 @@
           }
         }
       }
-    },
-    "Ready to install" : {
-
     },
     "Recently Closed" : {
       "comment" : "Main Menu History item",
