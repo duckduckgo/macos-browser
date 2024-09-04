@@ -311,8 +311,10 @@ final class MoreOptionsMenu: NSMenu {
     private func addUpdateItem() {
 #if SPARKLE
         guard NSApp.runType != .uiTests,
-            let update = Application.appDelegate.updateController.latestUpdate,
-            !update.isInstalled
+              let updateController = Application.appDelegate.updateController,
+              let update = updateController.latestUpdate,
+              !update.isInstalled,
+              updateController.updateProgress.isDone
         else {
             return
         }
