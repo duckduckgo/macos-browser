@@ -27,8 +27,8 @@ import SwiftUI
 import os.log
 
 enum UpdateControllerProgress {
-    case idle
-    case checkDidStart
+    case updateCycleNotStarted
+    case updateCycleDidStart
     case downloadDidStart
     case downloading(UInt64, UInt64)
     case extractionDidStart
@@ -36,13 +36,13 @@ enum UpdateControllerProgress {
     case readyToInstallAndRelaunch
     case installationDidStart
     case installing
-    case done
+    case updateCycleDone
 
-    static var `default` = UpdateControllerProgress.idle
+    static var `default` = UpdateControllerProgress.updateCycleNotStarted
 
     var isDone: Bool {
         switch self {
-        case .done: return true
+        case .updateCycleDone, .readyToInstallAndRelaunch: return true
         default: return false
         }
     }
@@ -273,7 +273,7 @@ extension UpdateController: SPUUpdaterDelegate {
 
     func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {
         Logger.updates.debug("Updater did finish update cycle")
-        updateProgress = .done
+        updateProgress = .updateCycleDone
     }
 
 }
