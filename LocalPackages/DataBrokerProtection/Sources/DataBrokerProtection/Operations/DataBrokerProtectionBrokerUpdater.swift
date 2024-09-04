@@ -19,6 +19,7 @@
 import Foundation
 import Common
 import SecureStorage
+import os.log
 
 protocol ResourcesRepository {
     func fetchBrokerFromResourceFiles() throws -> [DataBroker]?
@@ -38,8 +39,8 @@ final class FileResources: ResourcesRepository {
 
     func fetchBrokerFromResourceFiles() throws -> [DataBroker]? {
         guard let resourceURL = Bundle.module.resourceURL else {
+            Logger.dataBrokerProtection.fault("DataBrokerProtectionUpdater: error FileResources fetchBrokerFromResourceFiles, error: Bundle.module.resourceURL is nil")
             assertionFailure()
-            os_log("DataBrokerProtectionUpdater: error FileResources fetchBrokerFromResourceFiles, error: Bundle.module.resourceURL is nil", log: .error)
             throw FileResourcesError.bundleResourceURLNil
         }
 
@@ -56,7 +57,7 @@ final class FileResources: ResourcesRepository {
 
             return try brokerJSONFiles.map(DataBroker.initFromResource(_:))
         } catch {
-            os_log("DataBrokerProtectionUpdater: error FileResources error: fetchBrokerFromResourceFiles, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("DataBrokerProtectionUpdater: error FileResources error: fetchBrokerFromResourceFiles, error: \(error.localizedDescription, privacy: .public)")
             throw error
         }
     }
@@ -129,7 +130,7 @@ public struct DefaultDataBrokerProtectionBrokerUpdater: DataBrokerProtectionBrok
             return DefaultDataBrokerProtectionBrokerUpdater(vault: vault)
         }
 
-        os_log("Error when trying to create vault for data broker protection updater debug menu item", log: .dataBrokerProtection)
+        Logger.dataBrokerProtection.debug("Error when trying to create vault for data broker protection updater debug menu item")
         return nil
     }
 
@@ -138,7 +139,7 @@ public struct DefaultDataBrokerProtectionBrokerUpdater: DataBrokerProtectionBrok
         do {
             brokers = try resources.fetchBrokerFromResourceFiles()
         } catch {
-            os_log("DataBrokerProtectionBrokerUpdater updateBrokers, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("DataBrokerProtectionBrokerUpdater updateBrokers, error: \(error.localizedDescription, privacy: .public)")
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionBrokerUpdater.updateBrokers"))
             return
         }
@@ -148,7 +149,7 @@ public struct DefaultDataBrokerProtectionBrokerUpdater: DataBrokerProtectionBrok
             do {
                 try update(broker)
             } catch {
-                os_log("Error updating broker: %{public}@, with version: %{public}@", log: .dataBrokerProtection, broker.name, broker.version)
+                Logger.dataBrokerProtection.debug("Error updating broker: \(broker.name, privacy: .public), with version: \(broker.version, privacy: .public)")
                 pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionBrokerUpdater.updateBrokers"))
             }
         }

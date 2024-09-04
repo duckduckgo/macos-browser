@@ -18,7 +18,6 @@
 
 import Foundation
 
-@MainActor
 final class RecentlyClosedMenu: NSMenu {
 
     enum Constants {
@@ -29,12 +28,14 @@ final class RecentlyClosedMenu: NSMenu {
         fatalError("RecentlyClosedMenu: Bad initializer")
     }
 
+    @MainActor
     init(recentlyClosedCoordinator: RecentlyClosedCoordinating) {
         super.init(title: "Recently Closed")
 
         initMenuItems(recentlyClosedCoordinator: recentlyClosedCoordinator)
     }
 
+    @MainActor
     private func initMenuItems(recentlyClosedCoordinator: RecentlyClosedCoordinating) {
         var items = [NSMenuItem]()
 

@@ -28,6 +28,7 @@ protocol FileStore {
     func hasData(at url: URL) -> Bool
     func directoryContents(at path: String) throws -> [String]
     func remove(fileAtURL url: URL)
+    func move(fileAt from: URL, to: URL)
 }
 
 extension FileStore {
@@ -91,6 +92,10 @@ final class EncryptedFileStore: FileStore {
         try? fileManager.removeItem(at: url)
     }
 
+    func move(fileAt from: URL, to: URL) {
+        try? FileManager.default.moveItem(at: from, to: to)
+    }
+
 }
 
 extension FileManager: FileStore {
@@ -123,6 +128,10 @@ extension FileManager: FileStore {
 
     func remove(fileAtURL url: URL) {
         try? removeItem(at: url)
+    }
+
+    func move(fileAt from: URL, to: URL) {
+        try? moveItem(at: from, to: to)
     }
 
 }

@@ -37,7 +37,7 @@ class BookmarkNodeTests: XCTestCase {
     }
 
     func testWhenIsRootNode_ThenIsRootReturnsCorrectValue() {
-        let rootNode = BookmarkNode(representedObject: TestObject(), parent: nil)
+        let rootNode = BookmarkNode.genericRootNode()
         XCTAssertTrue(rootNode.isRoot)
 
         let childNode = BookmarkNode(representedObject: TestObject(), parent: rootNode)
@@ -162,20 +162,6 @@ class BookmarkNodeTests: XCTestCase {
 
         let foundNode = rootNode.childNodeRepresenting(object: desiredObject)
         XCTAssertNil(foundNode)
-    }
-
-    func testWhenGettingDescendantNodeForObject_AndObjectIsNotDirectChild_ThenNodeIsReturned() {
-        let desiredObject = TestObject()
-        let rootNode = BookmarkNode(representedObject: TestObject(), parent: nil)
-
-        let childOfRootNode = BookmarkNode(representedObject: TestObject(), parent: rootNode)
-        rootNode.childNodes = [childOfRootNode]
-
-        let childOfChildNode = BookmarkNode(representedObject: desiredObject, parent: childOfRootNode)
-        childOfRootNode.childNodes = [childOfChildNode]
-
-        let foundNode = rootNode.descendantNodeRepresenting(object: desiredObject)
-        XCTAssertEqual(foundNode, childOfChildNode)
     }
 
     func testWhenCheckingIfNodeIsAncestor_AndNodeIsSelf_ThenFalseIsReturned() {

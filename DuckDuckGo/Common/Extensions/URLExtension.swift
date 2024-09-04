@@ -20,6 +20,8 @@ import AppKit
 import BrowserServicesKit
 import Common
 import Foundation
+import AppKitExtensions
+import os.log
 
 extension URL.NavigationalScheme {
 
@@ -116,7 +118,7 @@ extension URL {
             return searchUrl
         }
 
-        os_log("URL extension: Making URL from %s failed", type: .error, addressBarString)
+        Logger.general.error("URL extension: Making URL from \(addressBarString) failed")
         return nil
     }
 

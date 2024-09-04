@@ -22,7 +22,7 @@ import Foundation
 import Networking
 import NetworkExtension
 import NetworkProtectionProxy
-import os.log // swiftlint:disable:this enforce_os_log_wrapper
+import os.log
 import PixelKit
 
 final class MacTransparentProxyProvider: TransparentProxyProvider {

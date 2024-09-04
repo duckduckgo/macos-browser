@@ -24,7 +24,7 @@ CODE_SIGN_STYLE[config=Debug][sdk=*] = Automatic
 
 CODE_SIGN_IDENTITY[sdk=macosx*] = 3rd Party Mac Developer Application
 CODE_SIGN_IDENTITY[config=Debug][sdk=macosx*] = Apple Development
-CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
+CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] = Developer ID Application
 
 GENERATE_INFOPLIST_FILE = YES
 INFOPLIST_FILE = VPNProxyExtension/Info.plist
@@ -41,7 +41,7 @@ PRODUCT_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(PROXY_EXTENSION_BUNDLE_ID)
 PRODUCT_BUNDLE_IDENTIFIER[config=Release][sdk=*] = $(PROXY_EXTENSION_BUNDLE_ID)
 PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(PROXY_EXTENSION_BUNDLE_ID)
 
-PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] =
+PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] = macOS VPN Proxy Extension App Store - CI
 PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = match AppStore $(AGENT_BUNDLE_ID).proxy macos
 PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = match AppStore $(AGENT_BUNDLE_ID).proxy macos
 

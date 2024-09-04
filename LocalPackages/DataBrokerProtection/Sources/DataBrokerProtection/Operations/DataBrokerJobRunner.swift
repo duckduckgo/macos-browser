@@ -19,6 +19,7 @@
 import Foundation
 import BrowserServicesKit
 import Common
+import os.log
 
 protocol WebJobRunner {
 
@@ -124,6 +125,6 @@ final class DataBrokerJobRunner: WebJobRunner {
     }
 
     deinit {
-        os_log("WebOperationRunner Deinit", log: .dataBrokerProtection)
+        Logger.dataBrokerProtection.debug("WebOperationRunner Deinit")
     }
 }

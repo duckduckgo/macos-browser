@@ -18,6 +18,7 @@
 
 import Cocoa
 import Common
+import os.log
 
 final class SuggestionTableCellView: NSTableCellView {
 
@@ -57,7 +58,7 @@ final class SuggestionTableCellView: NSTableCellView {
 
     private func updateTextField() {
         guard let attributedString = attributedString else {
-            os_log("SuggestionTableCellView: Attributed strings are nil", type: .error)
+            Logger.general.error("SuggestionTableCellView: Attributed strings are nil")
             return
         }
         if isSelected {

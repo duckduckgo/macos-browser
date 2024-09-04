@@ -118,7 +118,6 @@ final class WaitlistViewModel: ObservableObject {
         switch action {
         case .joinQueue:
             await joinWaitlist()
-            NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
         case .requestNotificationPermission:
             requestNotificationPermission()
         case .showTermsAndConditions: showTermsAndConditions()

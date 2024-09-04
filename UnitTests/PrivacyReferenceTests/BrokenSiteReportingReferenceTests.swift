@@ -63,11 +63,11 @@ final class BrokenSiteReportingReferenceTests: XCTestCase {
 
         for test in testData.reportURL.tests {
             if test.exceptPlatforms.contains(PrivacyReferenceTestHelper.privacyReferenceTestPlatformName) {
-                os_log("Skipping test, ignore platform for [%s]", type: .info, test.name)
+                Logger.general.debug("Skipping test, ignore platform for [\(test.name)]")
                 continue
             }
 
-            os_log("Testing [%s]", type: .info, test.name)
+            Logger.general.debug("Testing [\(test.name)]")
 
             var errors: [Error]?
             if let errs = test.errorDescriptions {

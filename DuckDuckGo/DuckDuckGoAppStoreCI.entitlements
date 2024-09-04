@@ -10,6 +10,7 @@
 		<string>$(NETP_APP_GROUP)</string>
 		<string>$(DBP_APP_GROUP)</string>
 		<string>$(SUBSCRIPTION_APP_GROUP)</string>
+		<string>$(APP_CONFIGURATION_APP_GROUP)</string>
 	</array>
 	<key>com.apple.security.device.audio-input</key>
 	<true/>
@@ -27,5 +28,12 @@
 	<true/>
 	<key>com.apple.security.print</key>
 	<true/>
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)com.duckduckgo.mobile.ios</string>
+		<string>$(NETP_APP_GROUP)</string>
+		<string>$(DBP_APP_GROUP)</string>
+		<string>$(SUBSCRIPTION_APP_GROUP)</string>
+	</array>
 </dict>
 </plist>

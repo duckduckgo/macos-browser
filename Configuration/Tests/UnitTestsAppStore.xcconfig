@@ -19,5 +19,6 @@
 FEATURE_FLAGS = FEEDBACK
 
 PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.mobile.ios.DuckDuckGoTests
+PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] = MacOS Unit Tests App Store CI
 
 TEST_HOST=$(BUILT_PRODUCTS_DIR)/DuckDuckGo App Store.app/Contents/MacOS/DuckDuckGo App Store

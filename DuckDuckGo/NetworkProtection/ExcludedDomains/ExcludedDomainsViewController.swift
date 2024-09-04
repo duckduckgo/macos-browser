@@ -117,6 +117,8 @@ final class ExcludedDomainsViewController: NSViewController {
         if let newRowIndex = allDomains.firstIndex(of: domain) {
             tableView.scrollRowToVisible(newRowIndex)
         }
+
+        model.askUserToReportIssues(withDomain: domain)
     }
 
     @IBAction func removeSelectedDomain(_ sender: NSButton) {

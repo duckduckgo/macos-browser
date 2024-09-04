@@ -23,7 +23,6 @@ import Foundation
 final class Application: NSApplication {
 
     private let copyHandler = CopyHandler()
-//    private var _delegate: AppDelegate!
     public static var appDelegate: AppDelegate!
 
     override init() {

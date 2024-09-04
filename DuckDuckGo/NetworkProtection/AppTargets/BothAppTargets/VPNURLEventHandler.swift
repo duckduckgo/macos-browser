@@ -67,7 +67,7 @@ final class VPNURLEventHandler {
     }
 
     func showShareFeedback() {
-        windowControllerManager.showShareFeedbackModal()
+        windowControllerManager.showShareFeedbackModal(source: .vpn)
     }
 
     func showMainWindow() {

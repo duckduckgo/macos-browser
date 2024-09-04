@@ -20,7 +20,7 @@ import BrowserServicesKit
 import Cocoa
 import Common
 import Combine
-import OSLog // swiftlint:disable:this enforce_os_log_wrapper
+import OSLog
 import SwiftUI
 import WebKit
 import Configuration
@@ -28,7 +28,6 @@ import NetworkProtection
 import Subscription
 import SubscriptionUI
 
-@MainActor
 final class MainMenu: NSMenu {
 
     enum Constants {
@@ -48,6 +47,7 @@ final class MainMenu: NSMenu {
     let closeTabMenuItem = NSMenuItem(title: UserText.closeTab, action: #selector(MainViewController.closeTab), keyEquivalent: "w")
     let importBrowserDataMenuItem = NSMenuItem(title: UserText.mainMenuFileImportBookmarksandPasswords, action: #selector(AppDelegate.openImportBrowserDataWindow))
 
+    @MainActor
     let sharingMenu = SharingMenu(title: UserText.shareMenuItem)
 
     // MARK: View
@@ -60,13 +60,17 @@ final class MainMenu: NSMenu {
     let zoomOutMenuItem = NSMenuItem(title: UserText.mainMenuViewZoomOut, action: #selector(MainViewController.zoomOut), keyEquivalent: "-")
 
     // MARK: History
+    @MainActor
     let historyMenu = HistoryMenu()
 
+    @MainActor
     var backMenuItem: NSMenuItem { historyMenu.backMenuItem }
+    @MainActor
     var forwardMenuItem: NSMenuItem { historyMenu.forwardMenuItem }
 
     // MARK: Bookmarks
-    let manageBookmarksMenuItem = NSMenuItem(title: UserText.mainMenuHistoryManageBookmarks, action: #selector(MainViewController.showManageBookmarks)).withAccessibilityIdentifier("MainMenu.manageBookmarksMenuItem")
+    let manageBookmarksMenuItem = NSMenuItem(title: UserText.mainMenuHistoryManageBookmarks, action: #selector(MainViewController.showManageBookmarks), keyEquivalent: [.command, .option, "b"])
+        .withAccessibilityIdentifier("MainMenu.manageBookmarksMenuItem")
     var bookmarksMenuToggleBookmarksBarMenuItem = NSMenuItem(title: "BookmarksBarMenuPlaceholder", action: #selector(MainViewController.toggleBookmarksBarFromMenu), keyEquivalent: "B")
     let importBookmarksMenuItem = NSMenuItem(title: UserText.importBookmarks, action: #selector(AppDelegate.openImportBrowserDataWindow))
     let bookmarksMenu = NSMenu(title: UserText.bookmarks)
@@ -101,6 +105,7 @@ final class MainMenu: NSMenu {
 
     // MARK: - Initialization
 
+    @MainActor
     init(featureFlagger: FeatureFlagger, bookmarkManager: BookmarkManager, faviconManager: FaviconManagement, copyHandler: CopyHandler) {
 
         super.init(title: UserText.duckDuckGo)
@@ -285,28 +290,30 @@ final class MainMenu: NSMenu {
     }
 
     func buildBookmarksMenu() -> NSMenuItem {
-        NSMenuItem(title: UserText.bookmarks).submenu(bookmarksMenu.buildItems {
-            NSMenuItem(title: UserText.bookmarkThisPage, action: #selector(MainViewController.bookmarkThisPage), keyEquivalent: "d")
-            NSMenuItem(title: UserText.bookmarkAllTabs, action: #selector(MainViewController.bookmarkAllOpenTabs), keyEquivalent: [.command, .shift, "d"])
-            manageBookmarksMenuItem
-            bookmarksMenuToggleBookmarksBarMenuItem
-            NSMenuItem.separator()
+        NSMenuItem(title: UserText.bookmarks)
+            .withAccessibilityIdentifier("MainMenu.bookmarks")
+            .submenu(bookmarksMenu.buildItems {
+                NSMenuItem(title: UserText.bookmarkThisPage, action: #selector(MainViewController.bookmarkThisPage), keyEquivalent: "d")
+                NSMenuItem(title: UserText.bookmarkAllTabs, action: #selector(MainViewController.bookmarkAllOpenTabs), keyEquivalent: [.command, .shift, "d"])
+                manageBookmarksMenuItem
+                bookmarksMenuToggleBookmarksBarMenuItem
+                NSMenuItem.separator()
 
-            importBookmarksMenuItem
-            NSMenuItem(title: UserText.exportBookmarks, action: #selector(AppDelegate.openExportBookmarks))
-            NSMenuItem.separator()
+                importBookmarksMenuItem
+                NSMenuItem(title: UserText.exportBookmarks, action: #selector(AppDelegate.openExportBookmarks))
+                NSMenuItem.separator()
 
-            NSMenuItem(title: UserText.favorites)
-                .submenu(favoritesMenu.buildItems {
-                    NSMenuItem(title: UserText.mainMenuHistoryFavoriteThisPage, action: #selector(MainViewController.favoriteThisPage))
-                        .withImage(.favorite)
-                        .withAccessibilityIdentifier("MainMenu.favoriteThisPage")
-                    NSMenuItem.separator()
-                })
-                .withImage(.favorite)
+                NSMenuItem(title: UserText.favorites)
+                    .submenu(favoritesMenu.buildItems {
+                        NSMenuItem(title: UserText.mainMenuHistoryFavoriteThisPage, action: #selector(MainViewController.favoriteThisPage))
+                            .withImage(.favorite)
+                            .withAccessibilityIdentifier("MainMenu.favoriteThisPage")
+                        NSMenuItem.separator()
+                    })
+                    .withImage(.favorite)
 
-            NSMenuItem.separator()
-        })
+                NSMenuItem.separator()
+            })
     }
 
     func buildWindowMenu() -> NSMenuItem {
@@ -358,6 +365,7 @@ final class MainMenu: NSMenu {
             })
     }
 
+    @MainActor
     func buildDebugMenu(featureFlagger: FeatureFlagger) -> NSMenuItem? {
 #if DEBUG || REVIEW
         NSMenuItem(title: "Debug")
@@ -408,7 +416,6 @@ final class MainMenu: NSMenu {
         updateHomeButtonMenuItem()
         updateBookmarksBarMenuItem()
         updateShortcutMenuItems()
-        updateLoggingMenuItems()
         updateInternalUserItem()
         updateRemoteConfigurationInfo()
         updateAutofillDebugScriptMenuItem()
@@ -417,6 +424,7 @@ final class MainMenu: NSMenu {
     // MARK: - Bookmarks
 
     var faviconsCancellable: AnyCancellable?
+    @MainActor
     private func subscribeToFavicons(faviconManager: FaviconManagement) {
         faviconsCancellable = faviconManager.faviconsLoadedPublisher
             .receive(on: DispatchQueue.main)
@@ -564,6 +572,7 @@ final class MainMenu: NSMenu {
 
     let internalUserItem = NSMenuItem(title: "Set Internal User State", action: #selector(MainViewController.internalUserState))
 
+    @MainActor
     private func setupDebugMenu() -> NSMenu {
         let debugMenu = NSMenu(title: "Debug") {
             NSMenuItem(title: "Open Vanilla Browser", action: #selector(MainViewController.openVanillaBrowser)).withAccessibilityIdentifier("MainMenu.openVanillaBrowser")
@@ -596,13 +605,15 @@ final class MainMenu: NSMenu {
                 NSMenuItem(title: "Reset Email Protection InContext Signup Prompt", action: #selector(MainViewController.resetEmailProtectionInContextPrompt))
                 NSMenuItem(title: "Reset Pixels Storage", action: #selector(MainViewController.resetDailyPixels))
                 NSMenuItem(title: "Reset Remote Messages", action: #selector(AppDelegate.resetRemoteMessages))
+                NSMenuItem(title: "Reset CPM Experiment Cohort (needs restart)", action: #selector(AppDelegate.resetCpmCohort))
+                NSMenuItem(title: "Reset Duck Player Onboarding", action: #selector(MainViewController.resetDuckPlayerOnboarding))
+                NSMenuItem(title: "Reset Duck Player Preferences", action: #selector(MainViewController.resetDuckPlayerPreferences))
+
             }.withAccessibilityIdentifier("MainMenu.resetData")
             NSMenuItem(title: "UI Triggers") {
                 NSMenuItem(title: "Show Save Credentials Popover", action: #selector(MainViewController.showSaveCredentialsPopover))
                 NSMenuItem(title: "Show Credentials Saved Popover", action: #selector(MainViewController.showCredentialsSavedPopover))
                 NSMenuItem(title: "Show Pop Up Window", action: #selector(MainViewController.showPopUpWindow))
-                NSMenuItem(title: "Show VPN Thank You Modal", action: #selector(MainViewController.showVPNThankYouModal))
-                NSMenuItem(title: "Reset Thank You Modal Checks", action: #selector(MainViewController.resetThankYouModalChecks))
             }
             NSMenuItem(title: "Remote Configuration") {
                 customConfigurationUrlMenuItem
@@ -665,23 +676,6 @@ final class MainMenu: NSMenu {
     private func setupLoggingMenu() -> NSMenu {
         let menu = NSMenu(title: "")
 
-        menu.addItem(NSMenuItem(title: "Enable All", action: #selector(enableAllLogsMenuItemAction), target: self))
-        menu.addItem(NSMenuItem(title: "Disable All", action: #selector(disableAllLogsMenuItemAction), target: self))
-        menu.addItem(.separator())
-
-        for category in OSLog.AllCategories.allCases.sorted() {
-            let menuItem = NSMenuItem(title: category, action: #selector(loggingMenuItemAction), target: self)
-            menuItem.identifier = .init(category)
-            menu.addItem(menuItem)
-        }
-
-        menu.addItem(autofillDebugScriptMenuItem
-            .targetting(self))
-
-        menu.addItem(.separator())
-        let debugLoggingMenuItem = NSMenuItem(title: OSLog.isRunningInDebugEnvironment ? "Disable DEBUG level logging…" : "Enable DEBUG level logging…", action: #selector(debugLoggingMenuItemAction), target: self)
-        menu.addItem(debugLoggingMenuItem)
-
         if #available(macOS 12.0, *) {
             let exportLogsMenuItem = NSMenuItem(title: "Save Logs…", action: #selector(exportLogs), target: self)
             menu.addItem(exportLogsMenuItem)
@@ -693,17 +687,6 @@ final class MainMenu: NSMenu {
 
     private func updateInternalUserItem() {
         internalUserItem.title = NSApp.delegateTyped.internalUserDecider.isInternalUser ? "Remove Internal User State" : "Set Internal User State"
-    }
-
-    private func updateLoggingMenuItems() {
-        guard let loggingMenu else { return }
-
-        let enabledCategories = OSLog.loggingCategories
-        for item in loggingMenu.items {
-            guard let category = item.identifier.map(\.rawValue) else { continue }
-
-            item.state = enabledCategories.contains(category) ? .on : .off
-        }
     }
 
     private func updateAutofillDebugScriptMenuItem() {
@@ -722,61 +705,10 @@ final class MainMenu: NSMenu {
         customConfigurationUrlMenuItem.title = "Configuration URL:  \(AppConfigurationURLProvider().url(for: .privacyConfiguration).absoluteString)"
     }
 
-    @objc private func loggingMenuItemAction(_ sender: NSMenuItem) {
-        guard let category = sender.identifier?.rawValue else { return }
-
-        if case .on = sender.state {
-            OSLog.loggingCategories.remove(category)
-        } else {
-            OSLog.loggingCategories.insert(category)
-        }
-    }
-
-    @objc private func enableAllLogsMenuItemAction(_ sender: NSMenuItem) {
-        OSLog.loggingCategories = Set(OSLog.AllCategories.allCases)
-    }
-
-    @objc private func disableAllLogsMenuItemAction(_ sender: NSMenuItem) {
-        OSLog.loggingCategories = []
-    }
-
     @objc private func toggleAutofillScriptDebugSettingsAction(_ sender: NSMenuItem) {
         AutofillPreferences().debugScriptEnabled = !AutofillPreferences().debugScriptEnabled
         NotificationCenter.default.post(name: .autofillScriptDebugSettingsDidChange, object: nil)
         updateAutofillDebugScriptMenuItem()
-    }
-
-    @objc private func debugLoggingMenuItemAction(_ sender: NSMenuItem) {
-#if APPSTORE
-        if !OSLog.isRunningInDebugEnvironment {
-            let alert = NSAlert()
-            alert.messageText = "Restart with DEBUG logging Enabled not supported for AppStore build"
-            alert.informativeText = """
-            Open terminal and run:
-            export \(ProcessInfo.Constants.osActivityMode)=\(ProcessInfo.Constants.debug)
-            "\(Bundle.main.executablePath!)"
-            """
-            alert.runModal()
-
-            return
-        }
-#endif
-
-        let alert = NSAlert()
-        alert.messageText = "Restart with DEBUG logging \(OSLog.isRunningInDebugEnvironment ? "Disabled" : "Enabled")?"
-        alert.addButton(withTitle: "Restart").tag = NSApplication.ModalResponse.OK.rawValue
-        alert.addButton(withTitle: "Cancel").tag = NSApplication.ModalResponse.cancel.rawValue
-        guard case .OK = alert.runModal() else { return }
-
-        let config = NSWorkspace.OpenConfiguration()
-        config.createsNewApplicationInstance = true
-        config.environment = [ProcessInfo.Constants.osActivityMode: (OSLog.isRunningInDebugEnvironment ? "" : ProcessInfo.Constants.debug)]
-
-        NSWorkspace.shared.openApplication(at: Bundle.main.bundleURL, configuration: config)
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            NSApp.terminate(nil)
-        }
     }
 
     @available(macOS 12.0, *)
@@ -796,8 +728,7 @@ final class MainMenu: NSMenu {
             let logStore = try OSLogStore(scope: .currentProcessIdentifier)
             try logStore.getEntries()
                 .compactMap {
-                    guard let entry = $0 as? OSLogEntryLog,
-                          entry.subsystem == OSLog.subsystem else { return nil }
+                    guard let entry = $0 as? OSLogEntryLog else { return nil }
                     return "\(formatter.string(from: entry.date)) [\(entry.category)] \(entry.composedMessage)"
                 }
                 .joined(separator: "\n")

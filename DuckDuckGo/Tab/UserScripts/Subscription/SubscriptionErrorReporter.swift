@@ -19,6 +19,7 @@
 import Foundation
 import Common
 import PixelKit
+import os.log
 
 enum SubscriptionError: Error {
     case purchaseFailed,
@@ -45,7 +46,7 @@ struct DefaultSubscriptionErrorReporter: SubscriptionErrorReporter {
 
     func report(subscriptionActivationError: SubscriptionError) {
 
-        os_log(.error, log: .subscription, "Subscription purchase error: %{public}s", subscriptionActivationError.localizedDescription)
+        Logger.subscription.error("Subscription purchase error: \(subscriptionActivationError.localizedDescription, privacy: .public)")
 
         var isStoreError = false
         var isBackendError = false

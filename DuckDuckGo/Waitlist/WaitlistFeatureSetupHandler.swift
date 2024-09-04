@@ -21,10 +21,3 @@ import Foundation
 protocol WaitlistFeatureSetupHandler {
     func confirmFeature()
 }
-
-struct NetworkProtectionWaitlistFeatureSetupHandler: WaitlistFeatureSetupHandler {
-    func confirmFeature() {
-        LocalPinningManager.shared.pin(.networkProtection)
-        NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
-    }
-}

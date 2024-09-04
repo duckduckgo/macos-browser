@@ -19,6 +19,7 @@
 import Common
 import WebKit
 import GRDB
+import os.log
 
 public protocol HTTPCookieStore {
     func allCookies() async -> [HTTPCookie]
@@ -74,7 +75,7 @@ internal class WebCacheManager {
         do {
             try fm.createDirectory(at: tmpDir, withIntermediateDirectories: false, attributes: nil)
         } catch {
-            os_log("Could not create temporary directory: %s", type: .error, "\(error)")
+            Logger.general.error("Could not create temporary directory: \(error.localizedDescription)")
             return
         }
 
@@ -104,7 +105,7 @@ internal class WebCacheManager {
         do {
             try fm.createDirectory(at: tmpDir, withIntermediateDirectories: false, attributes: nil)
         } catch {
-            os_log("Could not create temporary directory: %s", type: .error, "\(error)")
+            Logger.general.error("Could not create temporary directory: \(error.localizedDescription)")
             return
         }
 
@@ -157,7 +158,7 @@ internal class WebCacheManager {
         }
 
         for cookie in cookiesToRemove {
-            os_log("Deleting cookie for %s named %s", log: .fire, cookie.domain, cookie.name)
+            Logger.fire.debug("Deleting cookie for \(cookie.domain) named \(cookie.name)")
             await cookieStore.deleteCookie(cookie)
         }
     }
@@ -208,7 +209,7 @@ internal class WebCacheManager {
                 }
             }
         } catch {
-            os_log("Failed to clear observations database: %s", log: .fire, error.localizedDescription)
+            Logger.fire.error("Failed to clear observations database: \(error.localizedDescription)")
         }
     }
 

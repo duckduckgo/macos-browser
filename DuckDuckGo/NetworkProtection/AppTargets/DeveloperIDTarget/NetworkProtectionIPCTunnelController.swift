@@ -22,6 +22,7 @@ import NetworkProtection
 import NetworkProtectionIPC
 import PixelKit
 import UDSHelper
+import os.log
 
 /// VPN tunnel controller through IPC.
 ///
@@ -75,7 +76,7 @@ final class NetworkProtectionIPCTunnelController {
 
     private func enableLoginItems() async throws {
         do {
-            try loginItemsManager.throwingEnableLoginItems(LoginItemsManager.networkProtectionLoginItems, log: .networkProtection)
+            try loginItemsManager.throwingEnableLoginItems(LoginItemsManager.networkProtectionLoginItems)
         } catch {
             throw RequestError.internalLoginItemError(error)
         }
@@ -160,11 +161,11 @@ extension NetworkProtectionIPCTunnelController: TunnelController {
     private func log(_ error: Error) {
         switch error {
         case RequestError.notAuthorizedToEnableLoginItem:
-            os_log("🔴 IPC Controller not authorized to enable the login item", log: .networkProtection)
+            Logger.networkProtection.error("IPC Controller not authorized to enable the login item: \(error.localizedDescription)")
         case RequestError.internalLoginItemError(let error):
-            os_log("🔴 IPC Controller found an error while enabling the login item: \(error)", log: .networkProtection)
+            Logger.networkProtection.error("IPC Controller found an error while enabling the login item: \(error.localizedDescription)")
         default:
-            os_log("🔴 IPC Controller found an unknown error: \(error)", log: .networkProtection)
+            Logger.networkProtection.error("IPC Controller found an unknown error: \(error.localizedDescription)")
         }
     }
 }

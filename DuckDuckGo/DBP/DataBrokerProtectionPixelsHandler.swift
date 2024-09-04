@@ -82,6 +82,12 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .monthlyActiveUser,
                     .weeklyReportScanning,
                     .weeklyReportRemovals,
+                    .optOutJobAt7DaysConfirmed,
+                    .optOutJobAt7DaysUnconfirmed,
+                    .optOutJobAt14DaysConfirmed,
+                    .optOutJobAt14DaysUnconfirmed,
+                    .optOutJobAt21DaysConfirmed,
+                    .optOutJobAt21DaysUnconfirmed,
                     .scanningEventNewMatch,
                     .scanningEventReAppearance,
                     .webUILoadingFailed,
@@ -98,7 +104,9 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .dataBrokerMetricsWeeklyStats,
                     .dataBrokerMetricsMonthlyStats,
                     .gatekeeperNotAuthenticated,
-                    .gatekeeperEntitlementsInvalid:
+                    .gatekeeperEntitlementsInvalid,
+                    .customDataBrokerStatsOptoutSubmit,
+                    .customGlobalStatsOptoutSubmit:
 
                 PixelKit.fire(event)
 

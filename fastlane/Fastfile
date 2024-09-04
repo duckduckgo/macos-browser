@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-
+opt_out_usage
 fastlane_require 'httparty'
 fastlane_require 'rexml/document'
 

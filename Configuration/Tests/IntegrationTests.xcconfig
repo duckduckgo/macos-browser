@@ -17,10 +17,14 @@
 
 MACOSX_DEPLOYMENT_TARGET = 11.4
 
+CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] = Developer ID Application
+CODE_SIGN_STYLE[config=CI][sdk=*] = Manual
+
 FEATURE_FLAGS = FEEDBACK
 
 INFOPLIST_FILE = IntegrationTests/Info.plist
 PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.Integration-Tests
+PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] = MacOS Integration Tests CI
 
 SWIFT_OBJC_BRIDGING_HEADER = $(SRCROOT)/IntegrationTests/Common/IntegrationTestsBridging.h
 GCC_PREPROCESSOR_DEFINITIONS[arch=*][sdk=*] = uint64_t="unsigned long long" _UINT64_T=1 $(inherited)

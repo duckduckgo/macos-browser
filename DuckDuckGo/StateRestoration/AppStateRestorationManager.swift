@@ -20,6 +20,7 @@ import Foundation
 import Combine
 import Common
 import PixelKit
+import os.log
 
 @MainActor
 final class AppStateRestorationManager: NSObject {
@@ -67,11 +68,12 @@ final class AppStateRestorationManager: NSObject {
             try service.restoreState(using: { coder in
                 state = try WindowsManager.restoreState(from: coder, includePinnedTabs: isCalledAtStartup)
             })
-            clearLastSessionState()
+            // rename loaded app state file
+            service.didLoadState()
         } catch CocoaError.fileReadNoSuchFile {
             // ignore
         } catch {
-            os_log("App state could not be decoded: %s", "\(error)")
+            Logger.general.error("App state could not be decoded: \(error.localizedDescription)")
             PixelKit.fire(DebugEvent(GeneralPixel.appStateRestorationFailed, error: error),
                           withAdditionalParameters: ["interactive": String(interactive)])
         }
@@ -80,7 +82,7 @@ final class AppStateRestorationManager: NSObject {
     }
 
     func clearLastSessionState() {
-        service.removeLastSessionState()
+        service.clearState(sync: true)
     }
 
     // Cleans all stored snapshots except snapshots listed in the state
@@ -94,8 +96,10 @@ final class AppStateRestorationManager: NSObject {
     }
 
     func applicationDidFinishLaunching() {
-        let isRelaunchingAutomatically = appIsRelaunchingAutomatically
-        appIsRelaunchingAutomatically = false
+        let isRelaunchingAutomatically = self.appIsRelaunchingAutomatically
+        self.appIsRelaunchingAutomatically = false
+        // don‘t automatically restore windows if relaunched 2nd time with no recently updated app session state
+        let shouldRestorePreviousSession = self.shouldRestorePreviousSession && !service.isAppStateFileStale
         readLastSessionState(restoreWindows: shouldRestorePreviousSession || isRelaunchingAutomatically)
 
         stateChangedCancellable = WindowControllersManager.shared.stateChanged
@@ -138,7 +142,7 @@ final class AppStateRestorationManager: NSObject {
         } catch CocoaError.fileReadNoSuchFile {
             // ignore
         } catch {
-            os_log("Pinned tabs state could not be decoded: %s", "\(error)")
+            Logger.general.error("Pinned tabs state could not be decoded: \(error)")
             PixelKit.fire(DebugEvent(GeneralPixel.appStateRestorationFailed, error: error))
         }
     }

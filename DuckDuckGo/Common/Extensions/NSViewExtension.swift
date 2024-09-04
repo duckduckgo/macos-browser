@@ -19,6 +19,7 @@
 import Cocoa
 import Combine
 import Common
+import os.log
 
 extension NSView {
 
@@ -86,7 +87,7 @@ extension NSView {
 
     func makeMeFirstResponder() {
         guard let window = window else {
-            os_log("%s: Window not available", type: .error, className)
+            Logger.general.error("\(self.className): Window not available")
             return
         }
         // prevent all text selection on repeated Address Bar activation
@@ -158,7 +159,7 @@ extension NSView {
         return convert(locationInView)
     }
 
-    func mouseLocationInsideBounds(_ point: NSPoint?) -> NSPoint? {
+    func mouseLocationInsideBounds(_ point: NSPoint? = nil) -> NSPoint? {
         withMouseLocationInViewCoordinates(point) { locationInView in
             guard self.visibleRectClampedToBounds().contains(locationInView) else { return nil }
             return locationInView
