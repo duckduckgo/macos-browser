@@ -102,37 +102,42 @@ extension HomePage.Views {
                             rootView
                                 .transition(.move(edge: .leading).combined(with: .opacity))
                         case .colorPicker:
-                            BackgroundPickerView(title: UserText.solidColors, items: SolidColorBackground.predefinedColors, header: {
-                                HStack {
-                                    Text("Pick a color:")
-                                    Spacer()
+                            BackgroundPickerView(title: UserText.solidColors, items: model.solidColorPickerItems, itemView: { item in
+                                switch item {
+                                case .background:
+                                    defaultItemView(for: item)
+                                case .picker:
                                     Button {
-                                        model.openColorPanel()
-                                    } label: {
-                                        BackgroundThumbnailView(displayMode: .pickerView) {
-                                            if case .solidColor(let solidColor) = model.customBackground, !SolidColorBackground.predefinedColors.contains(solidColor) {
-                                                Color(hex: solidColor.color.hex()).scaledToFill()
-                                            } else {
-                                                Color(hex: model.lastPickedCustomColor.hex()).scaledToFill()
+                                        withAnimation {
+                                            if model.customBackground != item.customBackground {
+                                                model.customBackground = item.customBackground
                                             }
                                         }
+                                        model.openColorPanel()
+                                    } label: {
+                                        ZStack {
+                                            BackgroundThumbnailView(displayMode: .pickerView, customBackground: item.customBackground)
+                                            Image(.colorPicker)
+                                                .opacity(0.8)
+                                                .colorScheme(item.customBackground.colorScheme)
+                                        }
                                     }
-                                    .frame(width: 96, height: 64)
-                                }
-                                .buttonStyle(.plain)
-                                .onDisappear {
-                                    model.onDisappear()
+                                    .buttonStyle(.plain)
                                 }
                             })
                             .transition(.move(edge: .trailing).combined(with: .opacity))
+                            .onDisappear {
+                                model.onColorPickerDisappear()
+                            }
                         case .gradientPicker:
-                            BackgroundPickerView(title: UserText.gradients, items: GradientBackground.allCases)
+                            BackgroundPickerView(title: UserText.gradients, items: GradientBackground.allCases, itemView: defaultItemView(for:))
                                 .transition(.move(edge: .trailing).combined(with: .opacity))
                         case .customImagePicker:
                             BackgroundPickerView(
                                 title: UserText.myBackgrounds,
                                 items: model.availableUserBackgroundImages,
                                 maxItemsCount: HomePage.Models.SettingsModel.Const.maximumNumberOfUserImages,
+                                itemView: defaultItemView(for:),
                                 footer: {
                                     addBackgroundButton
                                     Text(UserText.myBackgroundsDisclaimer)
@@ -173,25 +178,6 @@ extension HomePage.Views {
             }
         }
 
-        var footer: some View {
-            VStack(spacing: 18) {
-                Divider()
-
-                Button {
-                    model.openSettings()
-                } label: {
-                    HStack {
-                        Text(UserText.allSettings)
-                        Spacer()
-                        Image(.externalAppScheme)
-                    }
-                    .foregroundColor(Color.linkBlue)
-                    .cursor(.pointingHand)
-                }
-                .buttonStyle(.plain)
-            }
-        }
-
         func backButton(title: String) -> some View {
             Button {
                 model.popToRootView()
@@ -202,6 +188,20 @@ extension HomePage.Views {
                     Spacer()
                 }
                 .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+        }
+
+        @ViewBuilder
+        func defaultItemView(for item: any Identifiable & Hashable & CustomBackgroundConvertible) -> some View {
+            Button {
+                withAnimation {
+                    if model.customBackground != item.customBackground {
+                        model.customBackground = item.customBackground
+                    }
+                }
+            } label: {
+                BackgroundThumbnailView(displayMode: .pickerView, customBackground: item.customBackground)
             }
             .buttonStyle(.plain)
         }
@@ -227,7 +227,26 @@ extension HomePage.Views {
             SettingsSection(title: UserText.homePageSections) {
                 HomeContentSectionsView(includeContinueSetUpCards: includingContinueSetUpCards)
             }
-            footer
+            rootViewFooter
+        }
+
+        var rootViewFooter: some View {
+            VStack(spacing: 18) {
+                Divider()
+
+                Button {
+                    model.openSettings()
+                } label: {
+                    HStack {
+                        Text(UserText.allSettings)
+                        Spacer()
+                        Image(.externalAppScheme)
+                    }
+                    .foregroundColor(Color.linkBlue)
+                    .cursor(.pointingHand)
+                }
+                .buttonStyle(.plain)
+            }
         }
 
         @ViewBuilder

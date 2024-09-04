@@ -20,26 +20,27 @@ import SwiftUIExtensions
 
 extension HomePage.Views {
 
-    struct BackgroundPickerView<Item, HeaderView, FooterView>: View where Item: Identifiable & Hashable & CustomBackgroundConvertible,
-                                                                          HeaderView: View,
-                                                                          FooterView: View {
+    struct BackgroundPickerView<Item, ItemView, FooterView>: View where Item: Identifiable & Hashable & CustomBackgroundConvertible,
+                                                                        ItemView: View,
+                                                                        FooterView: View {
 
         let title: String
         let items: [Item]
         let maxItemsCount: Int
-        @ViewBuilder let header: () -> HeaderView
+        @ViewBuilder let itemView: (Item) -> ItemView
         @ViewBuilder let footer: () -> FooterView
 
         init(
             title: String,
             items: [Item],
             maxItemsCount: Int = 0,
-            @ViewBuilder header: @escaping () -> HeaderView = { EmptyView() },
-            @ViewBuilder footer: @escaping () -> FooterView = { EmptyView() }) {
+            @ViewBuilder itemView: @escaping (Item) -> ItemView,
+            @ViewBuilder footer: @escaping () -> FooterView = { EmptyView() }
+        ) {
             self.title = title
             self.items = items
             self.maxItemsCount = maxItemsCount
-            self.header = header
+            self.itemView = itemView
             self.footer = footer
         }
 
@@ -48,11 +49,10 @@ extension HomePage.Views {
         var body: some View {
             VStack(spacing: 16) {
                 backButton
-                header()
                 if items.count < maxItemsCount {
                     SettingsGridWithPlaceholders(items: items, expectedMaxNumberOfItems: maxItemsCount) { item in
                         if let item {
-                            itemView(for: item)
+                            itemView(item)
                         } else {
                             Button {
                                 Task {
@@ -68,24 +68,10 @@ extension HomePage.Views {
                         }
                     }
                 } else {
-                    SettingsGrid(items: items, itemView: itemView(for:))
+                    SettingsGrid(items: items, itemView: itemView)
                 }
                 footer()
             }
-        }
-
-        @ViewBuilder
-        func itemView(for item: Item) -> some View {
-            Button {
-                withAnimation {
-                    if model.customBackground != item.customBackground {
-                        model.customBackground = item.customBackground
-                    }
-                }
-            } label: {
-                BackgroundThumbnailView(displayMode: .pickerView, customBackground: item.customBackground)
-            }
-            .buttonStyle(.plain)
         }
 
         @ViewBuilder

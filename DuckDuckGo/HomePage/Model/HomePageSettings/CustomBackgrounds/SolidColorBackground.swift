@@ -19,6 +19,22 @@
 import AppKitExtensions
 import SwiftUI
 
+enum SolidColorBackgroundPickerItem: Hashable, Equatable, Identifiable, CustomBackgroundConvertible {
+    var id: Int {
+        hashValue
+    }
+
+    case picker(SolidColorBackground)
+    case background(SolidColorBackground)
+
+    var customBackground: CustomBackground {
+        switch self {
+        case .picker(let background), .background(let background):
+            return background.customBackground
+        }
+    }
+}
+
 struct SolidColorBackground: Hashable, Equatable, Identifiable, LosslessStringConvertible, ColorSchemeProviding, CustomBackgroundConvertible {
     var id: Int {
         color.hashValue

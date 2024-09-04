@@ -39,13 +39,15 @@ extension NSColorPanel: UserColorProviding {
             self.color = color
         }
 
-        var frame = self.frame
-        frame.origin = NSEvent.mouseLocation
-        if let keyWindow = NSApp.keyWindow {
-            frame.origin.x = keyWindow.frame.maxX - frame.size.width
+        if !isVisible {
+            var frame = self.frame
+            frame.origin = NSEvent.mouseLocation
+            if let keyWindow = NSApp.keyWindow {
+                frame.origin.x = keyWindow.frame.maxX - frame.size.width
+            }
+            frame.origin.y -= frame.size.height + 40
+            setFrame(frame, display: true)
         }
-        frame.origin.y -= frame.size.height + 40
-        setFrame(frame, display: true)
 
         showsAlpha = false
         orderFront(nil)
@@ -158,7 +160,7 @@ extension HomePage.Models {
                 })
                 .assign(to: \.availableUserBackgroundImages, onWeaklyHeld: self)
 
-            customBackgroundPixelCancellable = $customBackground
+            customBackgroundPixelCancellable = $customBackground.dropFirst()
                 .throttle(for: .seconds(1), scheduler: DispatchQueue.main, latest: true)
                 .sink { customBackground in
                     switch customBackground {
@@ -225,6 +227,8 @@ extension HomePage.Models {
             }
         }
 
+        private(set) var solidColorPickerItems: [SolidColorBackgroundPickerItem] = []
+
         @MainActor
         func addNewImage() async {
             guard let customImagesManager, let url = openFilePanel() else {
@@ -242,9 +246,11 @@ extension HomePage.Models {
             }
         }
 
-        var lastPickedCustomColor: NSColor = .white {
+        @Published private(set) var lastPickedCustomColor: NSColor = .white {
             didSet {
                 lastPickedCustomColorHexValue = lastPickedCustomColor.hex()
+                let predefinedColorBackgrounds = SolidColorBackground.predefinedColors.map(SolidColorBackgroundPickerItem.background)
+                solidColorPickerItems = [.picker(.init(color: lastPickedCustomColor))] + predefinedColorBackgrounds
             }
         }
 
@@ -255,7 +261,7 @@ extension HomePage.Models {
             let provider = userColorProvider()
             provider.showColorPanel(with: NSColor(hex: lastPickedCustomColorHexValue))
 
-            userColorCancellable = provider.colorPublisher.dropFirst()
+            userColorCancellable = provider.colorPublisher
                 .handleEvents(receiveOutput: { [weak self] color in
                     self?.lastPickedCustomColor = color
                 })
@@ -263,7 +269,7 @@ extension HomePage.Models {
                 .assign(to: \.customBackground, onWeaklyHeld: self)
         }
 
-        func onDisappear() {
+        func onColorPickerDisappear() {
             userColorCancellable?.cancel()
         }
 

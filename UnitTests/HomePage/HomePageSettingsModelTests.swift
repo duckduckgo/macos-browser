@@ -34,10 +34,17 @@ fileprivate extension SettingsModel.CustomBackgroundModeModel {
 
 final class MockUserColorProvider: UserColorProviding {
     var colorPublisher: AnyPublisher<NSColor, Never> {
-        Empty<NSColor, Never>().eraseToAnyPublisher()
+        colorSubject.eraseToAnyPublisher()
     }
 
-    func showColorPanel(with color: NSColor?) {}
+    func showColorPanel(with color: NSColor?) {
+        showColorPanelCallCount += 1
+        showColorPanel(color)
+    }
+
+    var colorSubject = PassthroughSubject<NSColor, Never>()
+    var showColorPanelCallCount = 0
+    var showColorPanel: (NSColor?) -> Void = { _ in }
 }
 
 final class HomePageSettingsModelTests: XCTestCase {
@@ -52,6 +59,7 @@ final class HomePageSettingsModelTests: XCTestCase {
     var openFilePanelCallCount = 0
     var showImageFailedAlertCallCount = 0
     var imageURL: URL?
+    var userColorProvider: MockUserColorProvider!
 
     override func setUp() async throws {
         openSettingsCallCount = 0
@@ -60,6 +68,10 @@ final class HomePageSettingsModelTests: XCTestCase {
         storageLocation = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         appearancePreferences = .init(persistor: AppearancePreferencesPersistorMock())
         userBackgroundImagesManager = CapturingUserBackgroundImagesManager(storageLocation: storageLocation, maximumNumberOfImages: 4)
+        userColorProvider = MockUserColorProvider()
+
+        UserDefaultsWrapper<Any>.sharedDefaults.removeObject(forKey: UserDefaultsWrapper<Any>.Key.homePageLastPickedCustomColor.rawValue)
+
         model = SettingsModel(
             appearancePreferences: appearancePreferences,
             userBackgroundImagesManager: userBackgroundImagesManager,
@@ -68,7 +80,7 @@ final class HomePageSettingsModelTests: XCTestCase {
                 self?.openFilePanelCallCount += 1
                 return self?.openFilePanel()
             },
-            userColorProvider: MockUserColorProvider(),
+            userColorProvider: self.userColorProvider,
             showAddImageFailedAlert: { [weak self] in self?.showImageFailedAlertCallCount += 1 },
             openSettings: { [weak self] in self?.openSettingsCallCount += 1 }
         )
@@ -253,5 +265,62 @@ final class HomePageSettingsModelTests: XCTestCase {
             .solidColor(CustomBackground.placeholderColor),
             .userImage(image2)
         ])
+    }
+
+    func testThatColorPickerIsPresentedWithLastPickedColor() {
+        var colors = [NSColor?]()
+        userColorProvider.showColorPanel = { color in
+            colors.append(color)
+        }
+
+        let color = NSColor.green
+        UserDefaultsWrapper<Any>.sharedDefaults.set(color.hex(), forKey: UserDefaultsWrapper<Any>.Key.homePageLastPickedCustomColor.rawValue)
+
+        model.openColorPanel()
+        XCTAssertEqual(userColorProvider.showColorPanelCallCount, 1)
+        XCTAssertEqual(colors, [color])
+    }
+
+    func testWhenColorsArePickedThenLastPickedCustomColorIsUpdated() {
+        model.openColorPanel()
+
+        userColorProvider.colorSubject.send(.green)
+        XCTAssertEqual(model.lastPickedCustomColor, .green)
+        userColorProvider.colorSubject.send(.blue)
+        XCTAssertEqual(model.lastPickedCustomColor, .blue)
+        userColorProvider.colorSubject.send(.yellow)
+        XCTAssertEqual(model.lastPickedCustomColor, .yellow)
+        userColorProvider.colorSubject.send(.white)
+        XCTAssertEqual(model.lastPickedCustomColor, .white)
+        userColorProvider.colorSubject.send(.red)
+        XCTAssertEqual(model.lastPickedCustomColor, .red)
+    }
+
+    func testWhenColorPanelIsDismissedThenLastPickedCustomColorIsNotUpdated() {
+        model.openColorPanel()
+
+        userColorProvider.colorSubject.send(.green)
+        XCTAssertEqual(model.lastPickedCustomColor, .green)
+        model.onColorPickerDisappear()
+        userColorProvider.colorSubject.send(.blue)
+        XCTAssertEqual(model.lastPickedCustomColor, .green)
+        userColorProvider.colorSubject.send(.yellow)
+        XCTAssertEqual(model.lastPickedCustomColor, .green)
+        userColorProvider.colorSubject.send(.white)
+        XCTAssertEqual(model.lastPickedCustomColor, .green)
+        userColorProvider.colorSubject.send(.red)
+        XCTAssertEqual(model.lastPickedCustomColor, .green)
+    }
+
+    func testThatSolidColorPickerFirstItemRepresentsLastPickedCustomColor() {
+        model.openColorPanel()
+
+        userColorProvider.colorSubject.send(.green)
+        XCTAssertEqual(model.lastPickedCustomColor, .green)
+        XCTAssertEqual(model.solidColorPickerItems.first, .picker(.init(color: .green)))
+
+        userColorProvider.colorSubject.send(.orange)
+        XCTAssertEqual(model.lastPickedCustomColor, .orange)
+        XCTAssertEqual(model.solidColorPickerItems.first, .picker(.init(color: .orange)))
     }
 }
