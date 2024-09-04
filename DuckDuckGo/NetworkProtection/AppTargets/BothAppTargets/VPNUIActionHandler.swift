@@ -53,6 +53,7 @@ final class VPNUIActionHandler: VPNUIActionHandling {
     func setExclusion(_ exclude: Bool, forDomain domain: String) async {
         proxySettings.setExclusion(exclude, forDomain: domain)
         try? await vpnIPCClient.command(.restartAdapter)
+        await vpnURLEventHandler.reloadTab(showingDomain: domain)
     }
 
     public func shareFeedback() async {

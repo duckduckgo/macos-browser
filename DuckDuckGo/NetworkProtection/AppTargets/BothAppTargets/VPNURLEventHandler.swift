@@ -58,6 +58,10 @@ final class VPNURLEventHandler {
         windowControllerManager.showPreferencesTab(withSelectedPane: .vpn)
     }
 
+    func reloadTab(showingDomain domain: String) {
+        windowControllerManager.selectedTab?.reload()
+    }
+
     func showStatus() async {
         await windowControllerManager.showNetworkProtectionStatus()
     }
