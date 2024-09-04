@@ -115,6 +115,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     private(set) var userDriver: UpdateUserDriver!
     private let willRelaunchAppSubject = PassthroughSubject<Void, Never>()
     private var internalUserDecider: InternalUserDecider
+    private var updateProcessCancellable: AnyCancellable!
 
     // MARK: - Public
 
@@ -146,14 +147,26 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     private func configureUpdater() {
         // The default configuration of Sparkle updates is in Info.plist
         userDriver = UpdateUserDriver(internalUserDecider: internalUserDecider,
-                                      deferInstallation: !areAutomaticUpdatesEnabled,
-                                      delegate: self)
+                                      deferInstallation: !areAutomaticUpdatesEnabled)
         updater = SPUUpdater(hostBundle: Bundle.main, applicationBundle: Bundle.main, userDriver: userDriver, delegate: self)
         try? updater.start()
 
         if updater.automaticallyDownloadsUpdates != areAutomaticUpdatesEnabled {
             updater.automaticallyDownloadsUpdates = areAutomaticUpdatesEnabled
         }
+
+        updateProcessCancellable = userDriver.updateProgressPublisher
+            .sink { [weak self] progress in
+                switch progress {
+                case .updateFound(let item):
+                    self?.latestUpdate = Update(appcastItem: item, isInstalled: false)
+                case .updateNotFound(let item, _):
+                    self?.latestUpdate = Update(appcastItem: item, isInstalled: true)
+                default:
+                    break
+                }
+                self?.updateProgress = progress
+            }
 
 #if DEBUG
 //        updater.automaticallyChecksForUpdates = false
@@ -173,20 +186,6 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         userDriver.install()
     }
 
-}
-
-extension UpdateController: UpdateUserDriverDelegate {
-    func userDriverUpdateCycleProgress(_ userDriver: UpdateUserDriver, progress: UpdateCycleProgress) {
-        switch progress {
-        case .updateFound(let item):
-            latestUpdate = Update(appcastItem: item, isInstalled: false)
-        case .updateNotFound(let item, _):
-            latestUpdate = Update(appcastItem: item, isInstalled: true)
-        default:
-            break
-        }
-        updateProgress = progress
-    }
 }
 
 extension UpdateController: SPUUpdaterDelegate {
