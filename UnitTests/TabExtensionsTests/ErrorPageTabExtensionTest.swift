@@ -39,7 +39,7 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         scriptPublisher = PassthroughSubject<MockSpecialErrorPageScriptProvider, Never>()
         credentialCreator = MockCredentialCreator()
         let featureFlagger = MockFeatureFlagger()
-        errorPageExtention = SpecialErrorPageTabExtension(webViewPublisher: mockWebViewPublisher, scriptsPublisher: scriptPublisher, urlCredentialCreator: credentialCreator, featureFlagger: featureFlagger)
+        errorPageExtention = SpecialErrorPageTabExtension(webViewPublisher: mockWebViewPublisher, scriptsPublisher: scriptPublisher, urlCredentialCreator: credentialCreator, featureFlagger: featureFlagger, phishingDetector: MockPhishingSiteDetector(isMalicious: true), phishingStateManager: PhishingTabStateManager())
     }
 
     override func tearDownWithError() throws {

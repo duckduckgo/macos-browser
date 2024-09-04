@@ -26,7 +26,6 @@ import WebKit
 import History
 import PixelKit
 import PhishingDetection
-import SpecialErrorPages
 import os.log
 
 protocol TabDelegate: ContentOverlayUserScriptDelegate {
@@ -54,7 +53,7 @@ protocol NewWindowPolicyDecisionMaker {
         var certificateTrustEvaluator: CertificateTrustEvaluating
         var tunnelController: NetworkProtectionIPCTunnelController?
         var phishingDetector: PhishingSiteDetecting
-        var phishingStateManager: PhishingTabStateManager
+        var phishingStateManager: PhishingTabStateManaging
     }
 
     fileprivate weak var delegate: TabDelegate?
@@ -69,6 +68,7 @@ protocol NewWindowPolicyDecisionMaker {
     let pinnedTabsManager: PinnedTabsManager
 
     private let webViewConfiguration: WKWebViewConfiguration
+    private let phishingState: PhishingTabStateManaging
 
     let startupPreferences: StartupPreferences
     let tabsPreferences: TabsPreferences
@@ -115,6 +115,7 @@ protocol NewWindowPolicyDecisionMaker {
                      certificateTrustEvaluator: CertificateTrustEvaluating = CertificateTrustEvaluator(),
                      tunnelController: NetworkProtectionIPCTunnelController? = TunnelControllerProvider.shared.tunnelController,
                      phishingDetector: PhishingSiteDetecting = PhishingDetection.shared,
+                     phishingState: PhishingTabStateManaging = PhishingTabStateManager(),
                      tabsPreferences: TabsPreferences = TabsPreferences.shared
     ) {
 
@@ -159,6 +160,7 @@ protocol NewWindowPolicyDecisionMaker {
                   certificateTrustEvaluator: certificateTrustEvaluator,
                   tunnelController: tunnelController,
                   phishingDetector: phishingDetector,
+                  phishingState: phishingState,
                   tabsPreferences: tabsPreferences)
     }
 
@@ -193,6 +195,7 @@ protocol NewWindowPolicyDecisionMaker {
          certificateTrustEvaluator: CertificateTrustEvaluating,
          tunnelController: NetworkProtectionIPCTunnelController?,
          phishingDetector: PhishingSiteDetecting,
+         phishingState: PhishingTabStateManaging,
          tabsPreferences: TabsPreferences
     ) {
 
@@ -211,6 +214,7 @@ protocol NewWindowPolicyDecisionMaker {
         self.lastSelectedAt = lastSelectedAt
         self.startupPreferences = startupPreferences
         self.tabsPreferences = tabsPreferences
+        self.phishingState = phishingState
 
         self.specialPagesUserScript = SpecialPagesUserScript()
         specialPagesUserScript?
@@ -1198,8 +1202,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         if !error.isFrameLoadInterrupted, !error.isNavigationCancelled,
                    // don‘t show an error page if the error was already handled
                    // (by SearchNonexistentDomainNavigationResponder) or another navigation was triggered by `setContent`
-            self.content.urlForWebView == url || self.content == .none /* when navigation fails instantly we may have no content set yet */
-            || error.errorCode == PhishingDetectionError.detected.errorCode {
+            self.content.urlForWebView == url || self.content == .none /* when navigation fails instantly we may have no content set yet */ {
             self.error = error
             // when already displaying the error page and reload navigation fails again: don‘t navigate, just update page HTML
             if error.errorCode != NSURLErrorServerCertificateUntrusted {
