@@ -43,7 +43,7 @@ final class DefaultFreemiumPIRFeature: FreemiumPIRFeature {
             4. (Temp) In experiment cohort
          */
         featureFlagger.isFeatureOn(.freemiumPIR) // #1
-        && isAPotentialPrivacyProSubscriber // #2 & #3
+        && isPotentialPrivacyProSubscriber // #2 & #3
         // TODO: - Also check experiment cohort here
     }
 
@@ -69,7 +69,7 @@ private extension DefaultFreemiumPIRFeature {
     ///
     /// 1. Is eligible to purchase
     /// 2. Is not a current subscriber
-    var isAPotentialPrivacyProSubscriber: Bool {
+    var isPotentialPrivacyProSubscriber: Bool {
         subscriptionManager.isPrivacyProPurchaseAvailable
         && !accountManager.isUserAuthenticated
     }
@@ -78,12 +78,12 @@ private extension DefaultFreemiumPIRFeature {
     ///
     /// 1. The user did onboard to Freemium PIR
     /// 2. The feature flag is disabled
-    /// 3. The user `isAPotentialPrivacyProSubscriber` (see definition)
+    /// 3. The user `isPotentialPrivacyProSubscriber` (see definition)
     var shouldDisableAndDelete: Bool {
         guard freemiumPIRUserStateManager.didOnboard else { return false }
 
         return !featureFlagger.isFeatureOn(.freemiumPIR)
-        && isAPotentialPrivacyProSubscriber
+        && isPotentialPrivacyProSubscriber
     }
 
     /// This method offboards a Freemium user if the feature flag was disabled
