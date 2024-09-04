@@ -29,17 +29,22 @@ final class AboutPreferences: ObservableObject, PreferencesTabOpening {
 
         case upToDate
         case newVersionAvailable(UpdateControllerProgress)
+        case readyToInstallAndRelaunch
 
         var isLoading: Bool {
             switch self {
-            case .upToDate: return false
+            case .upToDate, .readyToInstallAndRelaunch: return false
             case .newVersionAvailable(let progress): return !progress.isDone
             }
         }
 
         init(from update: Update?, progress: UpdateControllerProgress) {
             if let update, !update.isInstalled {
-                self = .newVersionAvailable(progress)
+                if progress.isDone {
+                    self = .readyToInstallAndRelaunch
+                } else {
+                    self = .newVersionAvailable(progress)
+                }
             } else {
                 self = .upToDate
             }
