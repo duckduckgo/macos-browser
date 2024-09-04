@@ -40,9 +40,9 @@ enum UpdateControllerProgress {
 
     static var `default` = UpdateControllerProgress.idle
 
-    var isIdle: Bool {
+    var isDone: Bool {
         switch self {
-        case .idle, .done: return true
+        case .done: return true
         default: return false
         }
     }
@@ -198,14 +198,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
 
     @objc func runUpdate() {
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidRunUpdate))
-
-        if areAutomaticUpdatesEnabled {
-            appRestarter.restart()
-        } else {
-//            updater.userDriver.activeUpdateAlert?.hideUnnecessaryUpdateButtons()
-            shouldShowManualUpdateDialog = true
-            checkForUpdate()
-        }
+        userDriver.install()
     }
 
 }
