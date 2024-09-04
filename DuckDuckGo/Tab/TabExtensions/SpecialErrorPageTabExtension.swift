@@ -27,6 +27,8 @@ import PhishingDetection
 import PixelKit
 import SpecialErrorPages
 import os
+import Common
+import PhishingDetection
 
 protocol SpecialErrorPageScriptProvider {
     var specialErrorPageUserScript: SpecialErrorPageUserScript? { get }
@@ -70,7 +72,7 @@ final class SpecialErrorPageTabExtension {
         urlCredentialCreator: URLCredentialCreating = URLCredentialCreator(),
         featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger,
         phishingDetector: some PhishingSiteDetecting,
-        phishingStateManager: PhishingTabStateManager) {
+        phishingStateManager: PhishingTabStateManaging) {
             self.featureFlagger = featureFlagger
             self.urlCredentialCreator = urlCredentialCreator
             self.phishingDetector = phishingDetector
