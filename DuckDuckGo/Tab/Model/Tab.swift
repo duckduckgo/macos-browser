@@ -68,10 +68,10 @@ protocol NewWindowPolicyDecisionMaker {
     let pinnedTabsManager: PinnedTabsManager
 
     private let webViewConfiguration: WKWebViewConfiguration
+    private let phishingState: PhishingTabStateManaging
 
     let startupPreferences: StartupPreferences
     let tabsPreferences: TabsPreferences
-    let phishingState: PhishingTabStateManaging
     let navigationDidEndPublisher = PassthroughSubject<Tab, Never>()
 
     private var extensions: TabExtensions
