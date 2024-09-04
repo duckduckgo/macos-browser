@@ -133,8 +133,6 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         }
     }
 
-    var shouldShowManualUpdateDialog = false
-
     private(set) var updater: SPUUpdater!
     private(set) var userDriver: UpdateUserDriver!
     private let willRelaunchAppSubject = PassthroughSubject<Void, Never>()
@@ -174,7 +172,6 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
                                       delegate: self)
         updater = SPUUpdater(hostBundle: Bundle.main, applicationBundle: Bundle.main, userDriver: userDriver, delegate: self)
         try? updater.start()
-        shouldShowManualUpdateDialog = false
 
         if updater.automaticallyDownloadsUpdates != areAutomaticUpdatesEnabled {
             updater.automaticallyDownloadsUpdates = areAutomaticUpdatesEnabled
@@ -199,16 +196,6 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     }
 
 }
-
-//extension UpdateController: SPUStandardUserDriverDelegate {
-//
-//    func standardUserDriverShouldHandleShowingScheduledUpdate(_ update: SUAppcastItem, andInImmediateFocus immediateFocus: Bool) -> Bool {
-//        return shouldShowManualUpdateDialog
-//    }
-//
-//    func standardUserDriverWillHandleShowingUpdate(_ handleShowingUpdate: Bool, forUpdate update: SUAppcastItem, state: SPUUserUpdateState) {}
-//
-//}
 
 extension UpdateController: UpdateUserDriverDelegate {
     func userDriverUpdateCycleEnd(_ userDriver: UpdateUserDriver, item: SUAppcastItem?, isInstalled: Bool) {
