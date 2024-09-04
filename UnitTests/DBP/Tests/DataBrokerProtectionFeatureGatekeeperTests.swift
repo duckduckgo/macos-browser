@@ -28,7 +28,7 @@ final class DataBrokerProtectionFeatureGatekeeperTests: XCTestCase {
     private var mockFeatureDisabler: MockFeatureDisabler!
     private var mockFeatureAvailability: MockFeatureAvailability!
     private var mockAccountManager: MockAccountManager!
-    private var mockFreemiumPIRUserState: MockFreemiumPIRUserState!
+    private var mockFreemiumPIRUserStateManager: MockFreemiumPIRUserStateManager!
 
     private func userDefaults() -> UserDefaults {
         UserDefaults(suiteName: "testing_\(UUID().uuidString)")!
@@ -38,8 +38,8 @@ final class DataBrokerProtectionFeatureGatekeeperTests: XCTestCase {
         mockFeatureDisabler = MockFeatureDisabler()
         mockFeatureAvailability = MockFeatureAvailability()
         mockAccountManager = MockAccountManager()
-        mockFreemiumPIRUserState = MockFreemiumPIRUserState()
-        mockFreemiumPIRUserState.didOnboard = false
+        mockFreemiumPIRUserStateManager = MockFreemiumPIRUserStateManager()
+        mockFreemiumPIRUserStateManager.didOnboard = false
     }
 
     func testWhenNoAccessTokenIsFound_butEntitlementIs_andIsNotActiveFreemiumUser_thenFeatureIsDisabled() async {
@@ -50,7 +50,7 @@ final class DataBrokerProtectionFeatureGatekeeperTests: XCTestCase {
                                                            userDefaults: userDefaults(),
                                                            subscriptionAvailability: mockFeatureAvailability,
                                                            accountManager: mockAccountManager,
-                                                           freemiumPIRUserStateManager: mockFreemiumPIRUserState)
+                                                           freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager)
 
         // When
         let result = await sut.arePrerequisitesSatisfied()
@@ -63,12 +63,12 @@ final class DataBrokerProtectionFeatureGatekeeperTests: XCTestCase {
         // Given
         mockAccountManager.accessToken = "token"
         mockAccountManager.hasEntitlementResult = .failure(MockError.someError)
-        mockFreemiumPIRUserState.didOnboard = false
+        mockFreemiumPIRUserStateManager.didOnboard = false
         sut = DefaultDataBrokerProtectionFeatureGatekeeper(featureDisabler: mockFeatureDisabler,
                                                            userDefaults: userDefaults(),
                                                            subscriptionAvailability: mockFeatureAvailability,
                                                            accountManager: mockAccountManager,
-                                                           freemiumPIRUserStateManager: mockFreemiumPIRUserState)
+                                                           freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager)
 
         // When
         let result = await sut.arePrerequisitesSatisfied()
@@ -81,12 +81,12 @@ final class DataBrokerProtectionFeatureGatekeeperTests: XCTestCase {
         // Given
         mockAccountManager.accessToken = "token"
         mockAccountManager.hasEntitlementResult = .failure(MockError.someError)
-        mockFreemiumPIRUserState.didOnboard = true
+        mockFreemiumPIRUserStateManager.didOnboard = true
         sut = DefaultDataBrokerProtectionFeatureGatekeeper(featureDisabler: mockFeatureDisabler,
                                                            userDefaults: userDefaults(),
                                                            subscriptionAvailability: mockFeatureAvailability,
                                                            accountManager: mockAccountManager,
-                                                           freemiumPIRUserStateManager: mockFreemiumPIRUserState)
+                                                           freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager)
 
         // When
         let result = await sut.arePrerequisitesSatisfied()
@@ -99,12 +99,12 @@ final class DataBrokerProtectionFeatureGatekeeperTests: XCTestCase {
         // Given
         mockAccountManager.accessToken = nil
         mockAccountManager.hasEntitlementResult = .failure(MockError.someError)
-        mockFreemiumPIRUserState.didOnboard = false
+        mockFreemiumPIRUserStateManager.didOnboard = false
         sut = DefaultDataBrokerProtectionFeatureGatekeeper(featureDisabler: mockFeatureDisabler,
                                                            userDefaults: userDefaults(),
                                                            subscriptionAvailability: mockFeatureAvailability,
                                                            accountManager: mockAccountManager,
-                                                           freemiumPIRUserStateManager: mockFreemiumPIRUserState)
+                                                           freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager)
 
         // When
         let result = await sut.arePrerequisitesSatisfied()
@@ -117,12 +117,12 @@ final class DataBrokerProtectionFeatureGatekeeperTests: XCTestCase {
         // Given
         mockAccountManager.accessToken = "token"
         mockAccountManager.hasEntitlementResult = .success(true)
-        mockFreemiumPIRUserState.didOnboard = false
+        mockFreemiumPIRUserStateManager.didOnboard = false
         sut = DefaultDataBrokerProtectionFeatureGatekeeper(featureDisabler: mockFeatureDisabler,
                                                            userDefaults: userDefaults(),
                                                            subscriptionAvailability: mockFeatureAvailability,
                                                            accountManager: mockAccountManager,
-                                                           freemiumPIRUserStateManager: mockFreemiumPIRUserState)
+                                                           freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager)
 
         // When
         let result = await sut.arePrerequisitesSatisfied()
@@ -135,12 +135,12 @@ final class DataBrokerProtectionFeatureGatekeeperTests: XCTestCase {
         // Given
         mockAccountManager.accessToken = nil
         mockAccountManager.hasEntitlementResult = .failure(MockError.someError)
-        mockFreemiumPIRUserState.didOnboard = true
+        mockFreemiumPIRUserStateManager.didOnboard = true
         sut = DefaultDataBrokerProtectionFeatureGatekeeper(featureDisabler: mockFeatureDisabler,
                                                            userDefaults: userDefaults(),
                                                            subscriptionAvailability: mockFeatureAvailability,
                                                            accountManager: mockAccountManager,
-                                                           freemiumPIRUserStateManager: mockFreemiumPIRUserState)
+                                                           freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager)
 
         // When
         let result = await sut.arePrerequisitesSatisfied()
@@ -152,18 +152,6 @@ final class DataBrokerProtectionFeatureGatekeeperTests: XCTestCase {
 
 private enum MockError: Error {
     case someError
-}
-
-private class MockFeatureDisabler: DataBrokerProtectionFeatureDisabling {
-    var disableAndDeleteWasCalled = false
-
-    func disableAndDelete() {
-        disableAndDeleteWasCalled = true
-    }
-
-    func reset() {
-        disableAndDeleteWasCalled = false
-    }
 }
 
 private class MockFeatureAvailability: SubscriptionFeatureAvailability {
