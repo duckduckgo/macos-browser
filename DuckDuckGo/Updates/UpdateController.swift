@@ -218,15 +218,15 @@ extension UpdateController: SPUUpdaterDelegate {
 
     func updater(_ updater: SPUUpdater, didDownloadUpdate item: SUAppcastItem) {
         Logger.updates.debug("Updater did download update: \(item.displayVersionString)(\(item.versionString))")
-
-        guard areAutomaticUpdatesEnabled else {
-            // If manual are enabled, we don't download
-            return
-        }
-        // Automatic updates present the available update after it's downloaded
-        updateProgress = .updateFound(item)
-
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidDownloadUpdate))
+    }
+
+    func updater(_ updater: SPUUpdater, didExtractUpdate item: SUAppcastItem) {
+        Logger.updates.debug("Updater did extract update: \(item.displayVersionString)(\(item.versionString))")
+    }
+
+    func updater(_ updater: SPUUpdater, willInstallUpdate item: SUAppcastItem) {
+        Logger.updates.debug("Updater will install update: \(item.displayVersionString)(\(item.versionString))")
     }
 
     func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {
