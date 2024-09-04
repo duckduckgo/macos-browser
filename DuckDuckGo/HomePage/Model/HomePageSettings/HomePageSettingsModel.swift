@@ -27,6 +27,7 @@ protocol UserColorProviding {
     var colorPublisher: AnyPublisher<NSColor, Never> { get }
 
     func showColorPanel(with color: NSColor?)
+    func closeColorPanel()
 }
 
 extension NSColorPanel: UserColorProviding {
@@ -51,6 +52,10 @@ extension NSColorPanel: UserColorProviding {
 
         showsAlpha = false
         orderFront(nil)
+    }
+
+    func closeColorPanel() {
+        close()
     }
 }
 
@@ -160,8 +165,16 @@ extension HomePage.Models {
                 })
                 .assign(to: \.availableUserBackgroundImages, onWeaklyHeld: self)
 
-            customBackgroundPixelCancellable = $customBackground.dropFirst()
-                .throttle(for: .seconds(1), scheduler: DispatchQueue.main, latest: true)
+            let customBackgroundPublisher: AnyPublisher<CustomBackground?, Never> = {
+                if NSApp.runType == .unitTests {
+                    return $customBackground.dropFirst().eraseToAnyPublisher()
+                }
+                return $customBackground.dropFirst()
+                    .throttle(for: .seconds(1), scheduler: DispatchQueue.main, latest: true)
+                    .eraseToAnyPublisher()
+            }()
+
+            customBackgroundPixelCancellable = customBackgroundPublisher
                 .sink { customBackground in
                     switch customBackground {
                     case .gradient:
@@ -271,6 +284,7 @@ extension HomePage.Models {
 
         func onColorPickerDisappear() {
             userColorCancellable?.cancel()
+            userColorProvider().closeColorPanel()
         }
 
         var customBackgroundModes: [CustomBackgroundModeModel] {

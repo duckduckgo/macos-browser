@@ -52,7 +52,7 @@ extension HomePage.Views {
                         } else {
                             BackgroundThumbnailView(
                                 displayMode: .categoryView,
-                                customBackground: modeModel.customBackgroundThumbnail ?? .solidColor(.gray)
+                                customBackground: modeModel.customBackgroundThumbnail ?? .solidColor(.color01)
                             )
                         }
                     }

@@ -3291,7 +3291,7 @@
 		376731812C7E226A00EB097B /* HomePageViewBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePageViewBackground.swift; sourceTree = "<group>"; };
 		376731842C7EF97400EB097B /* ColorSchemeLosslessStringConvertibleExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorSchemeLosslessStringConvertibleExtensionTests.swift; sourceTree = "<group>"; };
 		3767318A2C7F32C500EB097B /* GradientBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientBackground.swift; sourceTree = "<group>"; };
-		3767318D2C7F32E900EB097B /* SolidColorBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolidColorBackground.swift; sourceTree = "<group>"; };
+		3767318D2C7F32E900EB097B /* SolidColorBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolidColorBackground.swift; sourceTree = "<group>"; wrapsLines = 1; };
 		376731932C7F332300EB097B /* UserBackgroundImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserBackgroundImage.swift; sourceTree = "<group>"; };
 		376731962C7F36AA00EB097B /* UserBackgroundImageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserBackgroundImageTests.swift; sourceTree = "<group>"; };
 		3767319B2C7F415200EB097B /* CustomBackgroundTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomBackgroundTests.swift; sourceTree = "<group>"; };

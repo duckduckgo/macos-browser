@@ -42,9 +42,14 @@ final class MockUserColorProvider: UserColorProviding {
         showColorPanel(color)
     }
 
+    func closeColorPanel() {
+        closeColorPanelCallCount += 1
+    }
+
     var colorSubject = PassthroughSubject<NSColor, Never>()
     var showColorPanelCallCount = 0
     var showColorPanel: (NSColor?) -> Void = { _ in }
+    var closeColorPanelCallCount = 0
 }
 
 final class HomePageSettingsModelTests: XCTestCase {
@@ -150,7 +155,7 @@ final class HomePageSettingsModelTests: XCTestCase {
     }
 
     func testWhenCustomBackgroundIsUpdatedThenPixelIsSent() {
-        model.customBackground = .solidColor(.black)
+        model.customBackground = .solidColor(.color01)
         model.customBackground = .gradient(.gradient01)
         model.customBackground = .userImage(.init(fileName: "abc", colorScheme: .light))
         model.customBackground = nil
@@ -164,8 +169,8 @@ final class HomePageSettingsModelTests: XCTestCase {
     }
 
     func testThatCustomBackgroundIsPersistedToAppearancePreferences() {
-        model.customBackground = .solidColor(.black)
-        XCTAssertEqual(appearancePreferences.homePageCustomBackground, CustomBackground.solidColor(.black))
+        model.customBackground = .solidColor(.color01)
+        XCTAssertEqual(appearancePreferences.homePageCustomBackground, CustomBackground.solidColor(.color01))
         model.customBackground = .gradient(.gradient01)
         XCTAssertEqual(appearancePreferences.homePageCustomBackground, CustomBackground.gradient(.gradient01))
         let userImage = UserBackgroundImage(fileName: "abc", colorScheme: .light)
@@ -238,10 +243,10 @@ final class HomePageSettingsModelTests: XCTestCase {
             nil
         ])
 
-        model.customBackground = .solidColor(.darkPink)
+        model.customBackground = .solidColor(.color17)
         XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundThumbnail), [
             .gradient(CustomBackground.placeholderGradient),
-            .solidColor(.darkPink),
+            .solidColor(.color17),
             nil
         ])
     }
@@ -322,5 +327,11 @@ final class HomePageSettingsModelTests: XCTestCase {
         userColorProvider.colorSubject.send(.orange)
         XCTAssertEqual(model.lastPickedCustomColor, .orange)
         XCTAssertEqual(model.solidColorPickerItems.first, .picker(.init(color: .orange)))
+    }
+
+    func testThatColorPanelIsClosedOnDisappear() {
+        XCTAssertEqual(userColorProvider.closeColorPanelCallCount, 0)
+        model.onColorPickerDisappear()
+        XCTAssertEqual(userColorProvider.closeColorPanelCallCount, 1)
     }
 }

@@ -43,7 +43,7 @@ protocol CustomBackgroundConvertible {
 /**
  * This enum represents custom New Tab Page background.
  *
- * 4 types of backgrounds are available at the moment:
+ * 3 types of backgrounds are available at the moment:
  * - gradient – uses predefined gradient images
  * - solid color – uses predefined colors
  * - user image – uses images uploaded by the user.
@@ -51,8 +51,7 @@ protocol CustomBackgroundConvertible {
 enum CustomBackground: Equatable, Hashable, ColorSchemeProviding, LosslessStringConvertible {
 
     static let placeholderGradient: GradientBackground = .gradient03
-    static let placeholderColor: SolidColorBackground = .lightPurple
-    static let placeholderCustomImage: SolidColorBackground = .gray
+    static let placeholderColor: SolidColorBackground = .color09
 
     case gradient(GradientBackground)
     case solidColor(SolidColorBackground)

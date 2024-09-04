@@ -25,13 +25,14 @@ final class CustomBackgroundTests: XCTestCase {
     func testGradient() {
         XCTAssertEqual(CustomBackground.gradient(.gradient01).gradient, .gradient01)
         XCTAssertEqual(CustomBackground.gradient(.gradient05).gradient, .gradient05)
-        XCTAssertNil(CustomBackground.solidColor(.black).gradient)
+        XCTAssertNil(CustomBackground.solidColor(.color01).gradient)
         XCTAssertNil(CustomBackground.userImage(.init(fileName: "abc.jpg", colorScheme: .light)).gradient)
     }
 
     func testSolidColor() {
-        XCTAssertEqual(CustomBackground.solidColor(.black).solidColor, .black)
-        XCTAssertEqual(CustomBackground.solidColor(.darkPink).solidColor, .darkPink)
+        XCTAssertEqual(CustomBackground.solidColor(.color01).solidColor, .color01)
+        XCTAssertEqual(CustomBackground.solidColor(.color13).solidColor, .color13)
+        XCTAssertEqual(CustomBackground.solidColor(.init(color: .green)).solidColor, .init(color: .green))
         XCTAssertNil(CustomBackground.gradient(.gradient03).solidColor)
         XCTAssertNil(CustomBackground.userImage(.init(fileName: "abc.jpg", colorScheme: .light)).solidColor)
     }
@@ -42,18 +43,18 @@ final class CustomBackgroundTests: XCTestCase {
         XCTAssertEqual(CustomBackground.userImage(userImage1).userBackgroundImage, userImage1)
         XCTAssertEqual(CustomBackground.userImage(userImage2).userBackgroundImage, userImage2)
         XCTAssertNil(CustomBackground.gradient(.gradient03).userBackgroundImage)
-        XCTAssertNil(CustomBackground.solidColor(.lightBlue).userBackgroundImage)
+        XCTAssertNil(CustomBackground.solidColor(.color14).userBackgroundImage)
     }
 
     func testColorScheme() {
         XCTAssertEqual(CustomBackground.gradient(.gradient03).colorScheme, GradientBackground.gradient03.colorScheme)
-        XCTAssertEqual(CustomBackground.solidColor(.darkBlue).colorScheme, SolidColorBackground.darkBlue.colorScheme)
+        XCTAssertEqual(CustomBackground.solidColor(.color04).colorScheme, SolidColorBackground.color04.colorScheme)
         XCTAssertEqual(CustomBackground.userImage(.init(fileName: "abc.jpg", colorScheme: .dark)).colorScheme, .dark)
     }
 
     func testDescription() {
         XCTAssertEqual(CustomBackground.gradient(.gradient01).description, "gradient|gradient01")
-        XCTAssertEqual(CustomBackground.solidColor(.darkPurple).description, "solidColor|darkPurple")
+        XCTAssertEqual(CustomBackground.solidColor(.color04).description, "solidColor|color04")
 
         let image = UserBackgroundImage(fileName: "abc.jpg", colorScheme: .dark)
         XCTAssertEqual(CustomBackground.userImage(image).description, "userImage|\(image.description)")
@@ -61,7 +62,8 @@ final class CustomBackgroundTests: XCTestCase {
 
     func testDescriptionInitializer() {
         XCTAssertEqual(CustomBackground("gradient|gradient03"), .gradient(.gradient03))
-        XCTAssertEqual(CustomBackground("solidColor|lightOrange"), .solidColor(.lightOrange))
+        XCTAssertEqual(CustomBackground("solidColor|color02"), .solidColor(.color02))
+        XCTAssertEqual(CustomBackground("solidColor|#FEFC4B"), .solidColor(.init(color: NSColor(hex: "#FEFC4B")!)))
 
         XCTAssertEqual(CustomBackground("userImage|abc.jpg|dark"), .userImage(.init(fileName: "abc.jpg", colorScheme: .dark)))
         XCTAssertEqual(CustomBackground("userImage|abc|def.jpg|light"), .userImage(.init(fileName: "abc|def.jpg", colorScheme: .light)))
@@ -73,7 +75,7 @@ final class CustomBackgroundTests: XCTestCase {
         XCTAssertNil(CustomBackground("gradient03"))
 
         XCTAssertNil(CustomBackground("solidColor"))
-        XCTAssertNil(CustomBackground("solidColor|lightBlack"))
+        XCTAssertNil(CustomBackground("solidColor|color2100"))
         XCTAssertNil(CustomBackground("solidColor|illustration01"))
         XCTAssertNil(CustomBackground("darkBlue"))
 
