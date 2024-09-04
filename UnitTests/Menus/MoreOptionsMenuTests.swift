@@ -41,7 +41,7 @@ final class MoreOptionsMenuTests: XCTestCase {
     private var mockFreemiumPIRFeatureFlagger = MockFreemiumPIRFeatureFlagger()
     private var mockFreemiumPIRPresenter = MockFreemiumPIRPresenter()
     private var freemiumPIRFeature: DefaultFreemiumPIRFeature!
-    private var mockFreemiumPIRUserState = MockFreemiumPIRUserState()
+    private var mockFreemiumPIRUserStateManager = MockFreemiumPIRUserStateManager()
 
     var moreOptionsMenu: MoreOptionsMenu!
 
@@ -64,7 +64,7 @@ final class MoreOptionsMenuTests: XCTestCase {
                                                                                                   purchasePlatform: .appStore),
                                                       canPurchase: false)
 
-        freemiumPIRFeature = DefaultFreemiumPIRFeature(featureFlagger: mockFreemiumPIRFeatureFlagger, subscriptionManager: subscriptionManager, accountManager: subscriptionManager.accountManager)
+        freemiumPIRFeature = DefaultFreemiumPIRFeature(featureFlagger: mockFreemiumPIRFeatureFlagger, subscriptionManager: subscriptionManager, accountManager: subscriptionManager.accountManager, freemiumPIRUserStateManager: MockFreemiumPIRUserStateManager(), featureDisabler: MockFeatureDisabler())
 
     }
 
@@ -89,7 +89,7 @@ final class MoreOptionsMenuTests: XCTestCase {
                                           sharingMenu: NSMenu(),
                                           internalUserDecider: internalUserDecider,
                                           subscriptionManager: subscriptionManager,
-                                          freemiumPIRUserStateManager: mockFreemiumPIRUserState,
+                                          freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager,
                                           freemiumPIRFeature: freemiumPIRFeature,
                                           freemiumPIRPresenter: mockFreemiumPIRPresenter)
 
@@ -281,7 +281,7 @@ final class MoreOptionsMenuTests: XCTestCase {
         subscriptionManager.canPurchase = true
         subscriptionManager.currentEnvironment = SubscriptionEnvironment(serviceEnvironment: .production, purchasePlatform: .stripe)
         mockFreemiumPIRFeatureFlagger.isEnabled = true
-        mockFreemiumPIRUserState.didOnboard = false
+        mockFreemiumPIRUserStateManager.didOnboard = false
         setupMoreOptionsMenu()
 
         let freemiumItemIndex = try XCTUnwrap(moreOptionsMenu.indexOfItem(withTitle: UserText.freemiumPIROptionsMenuItem))
@@ -300,7 +300,7 @@ final class MoreOptionsMenuTests: XCTestCase {
         subscriptionManager.canPurchase = true
         subscriptionManager.currentEnvironment = SubscriptionEnvironment(serviceEnvironment: .production, purchasePlatform: .stripe)
         mockFreemiumPIRFeatureFlagger.isEnabled = true
-        mockFreemiumPIRUserState.didOnboard = true
+        mockFreemiumPIRUserStateManager.didOnboard = true
         setupMoreOptionsMenu()
 
         let freemiumItemIndex = try XCTUnwrap(moreOptionsMenu.indexOfItem(withTitle: UserText.freemiumPIROptionsMenuItem))

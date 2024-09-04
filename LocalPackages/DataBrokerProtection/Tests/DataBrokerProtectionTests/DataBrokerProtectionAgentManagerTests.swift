@@ -37,7 +37,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
     private var mockConfigurationManager: MockConfigurationManager!
     private var mockPrivacyConfigurationManager: DBPPrivacyConfigurationManager!
     private var mockAuthenticationManager: MockAuthenticationManager!
-    private var mockFreemiumPIRUserState: MockFreemiumPIRUserState!
+    private var mockFreemiumPIRUserStateManager: MockFreemiumPIRUserStateManager!
 
     override func setUpWithError() throws {
 
@@ -76,7 +76,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             phones: [],
             birthYear: 1992)
 
-        mockFreemiumPIRUserState = MockFreemiumPIRUserState()
+        mockFreemiumPIRUserStateManager = MockFreemiumPIRUserStateManager()
     }
 
     func testWhenAgentStart_andProfileExists_andUserIsNotFreemium_thenActivityIsScheduled_andScheduledAllOperationsRun() async throws {
@@ -93,11 +93,11 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             configurationManager: mockConfigurationManager,
             privacyConfigurationManager: mockPrivacyConfigurationManager,
             authenticationManager: mockAuthenticationManager,
-            freemiumPIRUserStateManager: mockFreemiumPIRUserState)
+            freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager)
 
         mockDataManager.profileToReturn = mockProfile
         mockAuthenticationManager.isUserAuthenticatedValue = true
-        mockFreemiumPIRUserState.didOnboard = false
+        mockFreemiumPIRUserStateManager.didOnboard = false
 
         let schedulerStartedExpectation = XCTestExpectation(description: "Scheduler started")
         var schedulerStarted = false
@@ -136,10 +136,10 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             configurationManager: mockConfigurationManager,
             privacyConfigurationManager: mockPrivacyConfigurationManager,
             authenticationManager: mockAuthenticationManager,
-            freemiumPIRUserStateManager: mockFreemiumPIRUserState)
+            freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager)
 
         mockDataManager.profileToReturn = mockProfile
-        mockFreemiumPIRUserState.didOnboard = true
+        mockFreemiumPIRUserStateManager.didOnboard = true
 
         let schedulerStartedExpectation = XCTestExpectation(description: "Scheduler started")
         var schedulerStarted = false
@@ -171,7 +171,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
                                                                    entitlementMonitor: DataBrokerProtectionEntitlementMonitor(),
                                                                    authenticationManager: MockAuthenticationManager(),
                                                                    pixelHandler: mockPixelHandler,
-                                                                   stopAction: mockStopAction, freemiumPIRUserStateManager: MockFreemiumPIRUserState())
+                                                                   stopAction: mockStopAction, freemiumPIRUserStateManager: MockFreemiumPIRUserStateManager())
         sut = DataBrokerProtectionAgentManager(
             userNotificationService: mockNotificationService,
             activityScheduler: mockActivityScheduler,
@@ -184,10 +184,10 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             configurationManager: mockConfigurationManager,
             privacyConfigurationManager: mockPrivacyConfigurationManager,
             authenticationManager: mockAuthenticationManager,
-            freemiumPIRUserStateManager: mockFreemiumPIRUserState)
+            freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager)
 
         mockDataManager.profileToReturn = nil
-        mockFreemiumPIRUserState.didOnboard = true
+        mockFreemiumPIRUserStateManager.didOnboard = true
 
         let stopAgentExpectation = XCTestExpectation(description: "Stop agent expectation")
 
@@ -221,7 +221,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             configurationManager: mockConfigurationManager,
             privacyConfigurationManager: mockPrivacyConfigurationManager,
             authenticationManager: mockAuthenticationManager,
-            freemiumPIRUserStateManager: mockFreemiumPIRUserState)
+            freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager)
 
         mockDataManager.profileToReturn = nil
 
@@ -262,11 +262,11 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             configurationManager: mockConfigurationManager,
             privacyConfigurationManager: mockPrivacyConfigurationManager,
             authenticationManager: mockAuthenticationManager,
-            freemiumPIRUserStateManager: mockFreemiumPIRUserState)
+            freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager)
 
         mockDataManager.profileToReturn = mockProfile
         mockAuthenticationManager.isUserAuthenticatedValue = true
-        mockFreemiumPIRUserState.didOnboard = false
+        mockFreemiumPIRUserStateManager.didOnboard = false
 
         var startScheduledScansCalled = false
         mockQueueManager.startScheduledAllOperationsIfPermittedCalledCompletion = { _ in
@@ -294,10 +294,10 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             configurationManager: mockConfigurationManager,
             privacyConfigurationManager: mockPrivacyConfigurationManager,
             authenticationManager: mockAuthenticationManager,
-            freemiumPIRUserStateManager: mockFreemiumPIRUserState)
+            freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager)
 
         mockDataManager.profileToReturn = mockProfile
-        mockFreemiumPIRUserState.didOnboard = true
+        mockFreemiumPIRUserStateManager.didOnboard = true
 
         var startScheduledScansCalled = false
         mockQueueManager.startScheduledScanOperationsIfPermittedCalledCompletion = { _ in
@@ -325,10 +325,10 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             configurationManager: mockConfigurationManager,
             privacyConfigurationManager: mockPrivacyConfigurationManager,
             authenticationManager: mockAuthenticationManager,
-            freemiumPIRUserStateManager: mockFreemiumPIRUserState)
+            freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager)
 
         mockDataManager.profileToReturn = mockProfile
-        mockFreemiumPIRUserState.didOnboard = false
+        mockFreemiumPIRUserStateManager.didOnboard = false
 
         var startImmediateScansCalled = false
         mockQueueManager.startImmediateScanOperationsIfPermittedCalledCompletion = { _ in
@@ -356,10 +356,10 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             configurationManager: mockConfigurationManager,
             privacyConfigurationManager: mockPrivacyConfigurationManager,
             authenticationManager: mockAuthenticationManager,
-            freemiumPIRUserStateManager: mockFreemiumPIRUserState)
+            freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager)
 
         mockDataManager.profileToReturn = mockProfile
-        mockFreemiumPIRUserState.didOnboard = true
+        mockFreemiumPIRUserStateManager.didOnboard = true
 
         var startImmediateScansCalled = false
         mockQueueManager.startImmediateScanOperationsIfPermittedCalledCompletion = { _ in
@@ -387,7 +387,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             configurationManager: mockConfigurationManager,
             privacyConfigurationManager: mockPrivacyConfigurationManager,
             authenticationManager: mockAuthenticationManager,
-            freemiumPIRUserStateManager: mockFreemiumPIRUserState)
+            freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager)
 
         mockNotificationService.reset()
 
@@ -412,7 +412,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             configurationManager: mockConfigurationManager,
             privacyConfigurationManager: mockPrivacyConfigurationManager,
             authenticationManager: mockAuthenticationManager,
-            freemiumPIRUserStateManager: mockFreemiumPIRUserState)
+            freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager)
 
         mockNotificationService.reset()
 
@@ -437,7 +437,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             configurationManager: mockConfigurationManager,
             privacyConfigurationManager: mockPrivacyConfigurationManager,
             authenticationManager: mockAuthenticationManager,
-            freemiumPIRUserStateManager: mockFreemiumPIRUserState)
+            freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager)
 
         mockNotificationService.reset()
         mockQueueManager.startImmediateScanOperationsIfPermittedCompletionError = DataBrokerProtectionAgentErrorCollection(oneTimeError: NSError(domain: "test", code: 10))
@@ -463,7 +463,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             configurationManager: mockConfigurationManager,
             privacyConfigurationManager: mockPrivacyConfigurationManager,
             authenticationManager: mockAuthenticationManager,
-            freemiumPIRUserStateManager: mockFreemiumPIRUserState)
+            freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager)
 
         mockNotificationService.reset()
         mockDataManager.shouldReturnHasMatches = true
@@ -489,7 +489,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             configurationManager: mockConfigurationManager,
             privacyConfigurationManager: mockPrivacyConfigurationManager,
             authenticationManager: mockAuthenticationManager,
-            freemiumPIRUserStateManager: mockFreemiumPIRUserState)
+            freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager)
 
         mockNotificationService.reset()
         mockDataManager.shouldReturnHasMatches = false
@@ -515,10 +515,10 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             configurationManager: mockConfigurationManager,
             privacyConfigurationManager: mockPrivacyConfigurationManager,
             authenticationManager: mockAuthenticationManager,
-            freemiumPIRUserStateManager: mockFreemiumPIRUserState)
+            freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager)
 
         mockAuthenticationManager.isUserAuthenticatedValue = true
-        mockFreemiumPIRUserState.didOnboard = false
+        mockFreemiumPIRUserStateManager.didOnboard = false
 
         var startScheduledScansCalled = false
         mockQueueManager.startScheduledAllOperationsIfPermittedCalledCompletion = { _ in
@@ -546,9 +546,9 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             configurationManager: mockConfigurationManager,
             privacyConfigurationManager: mockPrivacyConfigurationManager,
             authenticationManager: mockAuthenticationManager,
-            freemiumPIRUserStateManager: mockFreemiumPIRUserState)
+            freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager)
 
-        mockFreemiumPIRUserState.didOnboard = true
+        mockFreemiumPIRUserStateManager.didOnboard = true
 
         var startScheduledScansCalled = false
         mockQueueManager.startScheduledScanOperationsIfPermittedCalledCompletion = { _ in
