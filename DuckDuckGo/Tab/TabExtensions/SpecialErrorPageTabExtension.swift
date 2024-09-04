@@ -127,12 +127,11 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
     @MainActor
     private func handleMaliciousURL(for navigationAction: NavigationAction, url: URL) -> NavigationActionPolicy? {
         let domain: String
-
+        errorPageType = .phishing
         if navigationAction.mainFrameTarget != nil {
             failingURL = url
             domain = url.host ?? url.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true)
-            errorData = SpecialErrorData(kind: .ssl, domain: domain, eTldPlus1: tld.eTLDplus1(failingURL?.host))
-
+            errorData = SpecialErrorData(kind: .phishing, domain: domain, eTldPlus1: tld.eTLDplus1(failingURL?.host))
             if let errorURL = generateErrorPageURL(url) {
                 _ = webView?.load(URLRequest(url: errorURL))
                 return .cancel
