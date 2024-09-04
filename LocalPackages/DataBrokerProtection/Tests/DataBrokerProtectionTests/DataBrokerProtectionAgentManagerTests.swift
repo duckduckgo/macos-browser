@@ -32,6 +32,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
     private var mockDependencies: DefaultDataBrokerOperationDependencies!
     private var mockProfile: DataBrokerProtectionProfile!
     private var mockAgentStopper: MockAgentStopper!
+    private var mockAuthenticationManager: MockAuthenticationManager!
     private var mockFreemiumPIRUserState: MockFreemiumPIRUserState!
 
     override func setUpWithError() throws {
@@ -39,6 +40,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
         mockPixelHandler = MockPixelHandler()
         mockActivityScheduler = MockDataBrokerProtectionBackgroundActivityScheduler()
         mockNotificationService = MockUserNotificationService()
+        mockAuthenticationManager = MockAuthenticationManager()
         mockAgentStopper = MockAgentStopper()
 
         let mockDatabase = MockDatabase()
@@ -82,10 +84,12 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
             agentStopper: mockAgentStopper,
+            authenticationManager: mockAuthenticationManager,
             freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         mockDataManager.profileToReturn = mockProfile
-        mockFreemiumPIRUserState.isActiveUser = false
+        mockAuthenticationManager.isUserAuthenticatedValue = true
+        mockFreemiumPIRUserState.didOnboard = false
 
         let schedulerStartedExpectation = XCTestExpectation(description: "Scheduler started")
         var schedulerStarted = false
@@ -121,10 +125,11 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
             agentStopper: mockAgentStopper,
+            authenticationManager: mockAuthenticationManager,
             freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         mockDataManager.profileToReturn = mockProfile
-        mockFreemiumPIRUserState.isActiveUser = true
+        mockFreemiumPIRUserState.didOnboard = true
 
         let schedulerStartedExpectation = XCTestExpectation(description: "Scheduler started")
         var schedulerStarted = false
@@ -166,10 +171,11 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
             agentStopper: agentStopper,
+            authenticationManager: mockAuthenticationManager,
             freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         mockDataManager.profileToReturn = nil
-        mockFreemiumPIRUserState.isActiveUser = true
+        mockFreemiumPIRUserState.didOnboard = true
 
         let stopAgentExpectation = XCTestExpectation(description: "Stop agent expectation")
 
@@ -200,6 +206,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
             agentStopper: mockAgentStopper,
+            authenticationManager: mockAuthenticationManager,
             freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         mockDataManager.profileToReturn = nil
@@ -238,10 +245,12 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
             agentStopper: mockAgentStopper,
+            authenticationManager: mockAuthenticationManager,
             freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         mockDataManager.profileToReturn = mockProfile
-        mockFreemiumPIRUserState.isActiveUser = false
+        mockAuthenticationManager.isUserAuthenticatedValue = true
+        mockFreemiumPIRUserState.didOnboard = false
 
         var startScheduledScansCalled = false
         mockQueueManager.startScheduledAllOperationsIfPermittedCalledCompletion = { _ in
@@ -266,10 +275,11 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
             agentStopper: mockAgentStopper,
+            authenticationManager: mockAuthenticationManager,
             freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         mockDataManager.profileToReturn = mockProfile
-        mockFreemiumPIRUserState.isActiveUser = true
+        mockFreemiumPIRUserState.didOnboard = true
 
         var startScheduledScansCalled = false
         mockQueueManager.startScheduledScanOperationsIfPermittedCalledCompletion = { _ in
@@ -294,10 +304,11 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
             agentStopper: mockAgentStopper,
+            authenticationManager: mockAuthenticationManager,
             freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         mockDataManager.profileToReturn = mockProfile
-        mockFreemiumPIRUserState.isActiveUser = false
+        mockFreemiumPIRUserState.didOnboard = false
 
         var startImmediateScansCalled = false
         mockQueueManager.startImmediateScanOperationsIfPermittedCalledCompletion = { _ in
@@ -322,10 +333,11 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
             agentStopper: mockAgentStopper,
+            authenticationManager: mockAuthenticationManager,
             freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         mockDataManager.profileToReturn = mockProfile
-        mockFreemiumPIRUserState.isActiveUser = true
+        mockFreemiumPIRUserState.didOnboard = true
 
         var startImmediateScansCalled = false
         mockQueueManager.startImmediateScanOperationsIfPermittedCalledCompletion = { _ in
@@ -350,6 +362,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
             agentStopper: mockAgentStopper,
+            authenticationManager: mockAuthenticationManager,
             freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         mockNotificationService.reset()
@@ -372,6 +385,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
             agentStopper: mockAgentStopper,
+            authenticationManager: mockAuthenticationManager,
             freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         mockNotificationService.reset()
@@ -394,6 +408,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
             agentStopper: mockAgentStopper,
+            authenticationManager: mockAuthenticationManager,
             freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         mockNotificationService.reset()
@@ -417,6 +432,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
             agentStopper: mockAgentStopper,
+            authenticationManager: mockAuthenticationManager,
             freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         mockNotificationService.reset()
@@ -440,6 +456,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
             agentStopper: mockAgentStopper,
+            authenticationManager: mockAuthenticationManager,
             freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
         mockNotificationService.reset()
@@ -463,9 +480,11 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
             agentStopper: mockAgentStopper,
+            authenticationManager: mockAuthenticationManager,
             freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
-        mockFreemiumPIRUserState.isActiveUser = false
+        mockAuthenticationManager.isUserAuthenticatedValue = true
+        mockFreemiumPIRUserState.didOnboard = false
 
         var startScheduledScansCalled = false
         mockQueueManager.startScheduledAllOperationsIfPermittedCalledCompletion = { _ in
@@ -490,9 +509,10 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
             agentStopper: mockAgentStopper,
+            authenticationManager: mockAuthenticationManager,
             freemiumPIRUserStateManager: mockFreemiumPIRUserState)
 
-        mockFreemiumPIRUserState.isActiveUser = true
+        mockFreemiumPIRUserState.didOnboard = true
 
         var startScheduledScansCalled = false
         mockQueueManager.startScheduledScanOperationsIfPermittedCalledCompletion = { _ in
