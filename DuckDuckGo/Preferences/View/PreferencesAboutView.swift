@@ -211,7 +211,7 @@ extension Preferences {
         }
 
         private var lastCheckedText: some View {
-            let lastChecked = !model.updateState.isLoading ? "\(lastCheckedFormattedDate(model.lastUpdateCheckDate))" : "-"
+            let lastChecked = lastCheckedFormattedDate(model.lastUpdateCheckDate)
             return Text("\(UserText.lastChecked): \(lastChecked)")
                 .foregroundColor(.secondary)
         }
