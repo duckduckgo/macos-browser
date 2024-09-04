@@ -79,6 +79,8 @@ final class SaveCredentialsViewController: NSViewController {
 
     private var passwordManagerCoordinator = PasswordManagerCoordinator.shared
 
+    private var autofillPreferences: AutofillPreferencesPersistor = AutofillPreferences()
+
     private var passwordManagerStateCancellable: AnyCancellable?
 
     private var saveButtonAction: (() -> Void)?
@@ -106,6 +108,7 @@ final class SaveCredentialsViewController: NSViewController {
         updatePasswordFieldVisibility(visible: false)
 
         subscribeToPasswordManagerState()
+        securityButton.isHidden = !autofillPreferences.isAutoLockEnabled
     }
 
     override func viewWillDisappear() {
