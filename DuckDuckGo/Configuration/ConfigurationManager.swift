@@ -186,14 +186,16 @@ final class ConfigurationManager: DefaultConfigurationManager {
 
 extension ConfigurationManager {
     override var presentedItemURL: URL? {
-        store.fileUrl(for: .privacyConfiguration)
+        store.fileUrl(for: .privacyConfiguration).deletingLastPathComponent()
     }
 
-    override func presentedItemDidChange() {
-        // Check for significant time since last install to prevent double config install in short time
-        if let lastConfigurationInstallDate, lastUpdateTime.timeIntervalSince(lastConfigurationInstallDate) < 1 {
-            return
-        }
+    override func presentedSubitemDidAppear(at url: URL) {
+        guard url == store.fileUrl(for: .privacyConfiguration) else { return }
+        updateTrackerBlockingDependencies()
+    }
+
+    override func presentedSubitemDidChange(at url: URL) {
+        guard url == store.fileUrl(for: .privacyConfiguration) else { return }
         updateTrackerBlockingDependencies()
     }
 }
