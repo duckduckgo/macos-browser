@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import CommonCrypto
 
 /**
  `URLTokenValidator` is responsible for generating and validating URL signatures to securely pass URLs around in Special Pages.
