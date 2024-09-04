@@ -152,12 +152,10 @@ extension Preferences {
                 switch model.updateState {
                 case .upToDate:
                     Text(" — " + UserText.upToDate)
+                case .readyToInstallAndRelaunch:
+                    Text(" — " + UserText.newerVersionAvailable)
                 case .newVersionAvailable(let progress):
-                    if progress.isDone {
-                        Text(" — " + UserText.newerVersionAvailable)
-                    } else {
-                        text(for: progress)
-                    }
+                    text(for: progress)
                 }
 #endif
             }
@@ -174,7 +172,7 @@ extension Preferences {
         @ViewBuilder
         private func text(for progress: UpdateControllerProgress) -> some View {
             switch progress {
-            case .checkDidStart:
+            case .updateCycleDidStart:
                 Text("- Checking for update")
             case .downloadDidStart:
                 Text("- Downloading update")
@@ -183,13 +181,13 @@ extension Preferences {
             case .extractionDidStart:
                 Text("- Extracting update")
             case .extracting(let percentage):
-                Text("- Extracting update (\(percentage * 100)%)")
+                Text("- Extracting update (\(String(format: "%.1f", percentage * 100))%)")
             case .readyToInstallAndRelaunch:
                 Text("- Ready to install")
             case .installationDidStart, .installing:
                 Text("- Installing")
-            case .idle, .done:
-                Text("")
+            case .updateCycleNotStarted, .updateCycleDone:
+                fatalError()
             }
         }
 
@@ -199,14 +197,12 @@ extension Preferences {
             case .upToDate:
                 Image(systemName: "checkmark.circle.fill")
                     .foregroundColor(.green)
-            case .newVersionAvailable(let progress):
-                if progress.isDone {
-                    Image(systemName: "exclamationmark.circle.fill")
-                        .foregroundColor(.red)
-                } else {
-                    ProgressView()
-                        .scaleEffect(0.6)
-                }
+            case .readyToInstallAndRelaunch:
+                Image(systemName: "exclamationmark.circle.fill")
+                    .foregroundColor(.red)
+            case .newVersionAvailable:
+                ProgressView()
+                    .scaleEffect(0.6)
             }
         }
 
@@ -238,19 +234,17 @@ extension Preferences {
                     model.checkForUpdate()
                 }
                 .buttonStyle(UpdateButtonStyle(enabled: true))
-            case .newVersionAvailable(let progress):
-                if progress.isDone {
-                    Button(UserText.restartToUpdate) {
-                        model.restartToUpdate()
-                    }
-                    .buttonStyle(UpdateButtonStyle(enabled: true))
-                } else {
-                    Button(UserText.checkForUpdate) {
-                        model.checkForUpdate()
-                    }
-                    .buttonStyle(UpdateButtonStyle(enabled: false))
-                    .disabled(true)
+            case .readyToInstallAndRelaunch:
+                Button(UserText.restartToUpdate) {
+                    model.restartToUpdate()
                 }
+                .buttonStyle(UpdateButtonStyle(enabled: true))
+            case .newVersionAvailable:
+                Button(UserText.checkForUpdate) {
+                    model.checkForUpdate()
+                }
+                .buttonStyle(UpdateButtonStyle(enabled: false))
+                .disabled(true)
             }
         }
 #endif
