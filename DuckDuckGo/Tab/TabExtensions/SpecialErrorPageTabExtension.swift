@@ -37,14 +37,6 @@ extension UserScripts: SpecialErrorPageScriptProvider {}
 enum ErrorType {
     case phishing
     case ssl
-    var description: String {
-        switch self {
-        case .phishing:
-            return "Phishing"
-        case .ssl:
-            return "SSL"
-        }
-    }
 }
 
 final class SpecialErrorPageTabExtension {
@@ -104,46 +96,71 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         let url = navigationAction.url
         guard url != URL(string: "about:blank")! else { return .next }
-        // Add all non-user-initiated navigations after accepting the risk to our exemptions list
-        if phishingStateManager.didBypassError && navigationAction.navigationType == .other {
-            phishingURLExemptions.insert(url)
-        }
-        self.phishingStateManager.didBypassError = phishingURLExemptions.contains(url)
 
-        if self.phishingStateManager.didBypassError || url.isDuckDuckGo || url.isDuckURLScheme {
+        handlePhishingExemptions(for: navigationAction, url: url)
+
+        if shouldAllowNavigation(for: url) {
+            phishingStateManager.isShowingPhishingError = false
             return .next
         }
 
-        // Check the URL
-        let isMalicious = await phishingDetector.checkIsMaliciousIfEnabled(url: url)
-        self.phishingStateManager.isShowingPhishingError = isMalicious
-        let errorType = PhishingDetectionError.detected.localizedDescription
-        if isMalicious {
-            errorPageType = .phishing
-            // self.specialErrorPageUserScript?.errorData.kind = "phishing"
-            if let mainFrameTarget = navigationAction.mainFrameTarget {
-                failingURL = url
-                let domain: String = url.host ?? url.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true)
-                errorData = SpecialErrorData(kind: .ssl, errorType: errorType, domain: domain, eTldPlus1: tld.eTLDplus1(failingURL?.host))
-                if let errorURL = self.generateErrorPageURL(url) {
-                    _ = webView?.load(URLRequest(url: errorURL))
-                    return .cancel
-                }
-            } else {
-                // Malicious iFrame Detected
-                // PixelKit.fire(PhishingDetectionPixels.iframeLoaded)
-                let iframeTopUrl = navigationAction.sourceFrame.url
-                failingURL = iframeTopUrl
-                let domain: String = iframeTopUrl.host ?? iframeTopUrl.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true)
-                errorData = SpecialErrorData(kind: .phishing, errorType: errorType, domain: domain, eTldPlus1: tld.eTLDplus1(failingURL?.host))
-                if let errorURL = self.generateErrorPageURL(iframeTopUrl) {
-                    _ = webView?.load(URLRequest(url: errorURL))
-                    return .cancel
-                }
-                return .next
-            }
+        return await checkForMaliciousContent(for: navigationAction, url: url)
+    }
+
+    private func handlePhishingExemptions(for navigationAction: NavigationAction, url: URL) {
+        if phishingStateManager.didBypassError && navigationAction.navigationType == .other {
+            phishingURLExemptions.insert(url)
         }
-        errorPageType = nil
+        phishingStateManager.didBypassError = phishingURLExemptions.contains(url)
+    }
+
+    private func shouldAllowNavigation(for url: URL) -> Bool {
+        return phishingStateManager.didBypassError || url.isDuckDuckGo || url.isDuckURLScheme
+    }
+
+    private func checkForMaliciousContent(for navigationAction: NavigationAction, url: URL) async -> NavigationActionPolicy? {
+        let isMalicious = await phishingDetector.checkIsMaliciousIfEnabled(url: url)
+        phishingStateManager.isShowingPhishingError = isMalicious
+
+        if isMalicious {
+            return await handleMaliciousURL(for: navigationAction, url: url)
+        }
+
+        return .next
+    }
+
+    @MainActor
+    private func handleMaliciousURL(for navigationAction: NavigationAction, url: URL) -> NavigationActionPolicy? {
+        let domain: String
+
+        if navigationAction.mainFrameTarget != nil {
+            failingURL = url
+            domain = url.host ?? url.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true)
+            errorData = SpecialErrorData(kind: .ssl, domain: domain, eTldPlus1: tld.eTLDplus1(failingURL?.host))
+
+            if let errorURL = generateErrorPageURL(url) {
+                _ = webView?.load(URLRequest(url: errorURL))
+                return .cancel
+            }
+        } else {
+            return handleMaliciousIframe(navigationAction: navigationAction)
+        }
+
+        return .next
+    }
+
+    @MainActor
+    private func handleMaliciousIframe(navigationAction: NavigationAction) -> NavigationActionPolicy? {
+        let iframeTopUrl = navigationAction.sourceFrame.url
+        failingURL = iframeTopUrl
+        let domain = iframeTopUrl.host ?? iframeTopUrl.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true)
+        errorData = SpecialErrorData(kind: .phishing, domain: domain, eTldPlus1: tld.eTLDplus1(failingURL?.host))
+
+        if let errorURL = generateErrorPageURL(iframeTopUrl) {
+            _ = webView?.load(URLRequest(url: errorURL))
+            return .cancel
+        }
+
         return .next
     }
 
@@ -207,15 +224,18 @@ extension SpecialErrorPageTabExtension: SpecialErrorPageUserScriptDelegate {
     }
 
     func visitSite() {
-        if errorPageType == .phishing {
+        switch errorPageType {
+        case .phishing:
             if let url = webView?.url {
                 // PixelKit.fire(PhishingDetectionPixels.visitSite)
                 phishingURLExemptions.insert(url)
                 self.phishingStateManager.didBypassError = true
                 self.phishingStateManager.isShowingPhishingError = false
             }
-        } else if errorPageType == .ssl {
+        case .ssl:
             shouldBypassSSLError = true
+        default:
+            break
         }
         _ = webView?.reloadPage()
     }
