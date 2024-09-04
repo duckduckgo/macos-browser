@@ -27,8 +27,6 @@ import PhishingDetection
 import PixelKit
 import SpecialErrorPages
 import os
-import Common
-import PhishingDetection
 
 protocol SpecialErrorPageScriptProvider {
     var specialErrorPageUserScript: SpecialErrorPageUserScript? { get }
