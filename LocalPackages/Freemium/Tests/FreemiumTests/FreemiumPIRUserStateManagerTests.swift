@@ -21,37 +21,67 @@ import XCTest
 
 final class FreemiumPIRUserStateManagerTests: XCTestCase {
 
+    private enum Keys {
+        static let didOnboard = "macos.browser.freemium.pir.did.onboard"
+        static let profileSavedTimestamp = "macos.browser.freemium.pir.profile.saved.timestamp"
+    }
+
     private static let testSuiteName = "test.defaults.freemium.user.state.tests"
-    private let pir = "macos.browser.freemium.pir.did.onboard"
     private let testUserDefaults = UserDefaults(suiteName: FreemiumPIRUserStateManagerTests.testSuiteName)!
 
     override func setUpWithError() throws {
         testUserDefaults.removePersistentDomain(forName: FreemiumPIRUserStateManagerTests.testSuiteName)
     }
 
-    func testSetsHasFreemiumPIR() throws {
+    func testSetsDidOnboard() throws {
         // Given
         let sut = DefaultFreemiumPIRUserStateManager(userDefaults: testUserDefaults)
-        XCTAssertFalse(testUserDefaults.bool(forKey: pir))
+        XCTAssertFalse(testUserDefaults.bool(forKey: Keys.didOnboard))
 
         // When
         sut.didOnboard = true
 
         // Then
-        XCTAssertTrue(testUserDefaults.bool(forKey: pir))
+        XCTAssertTrue(testUserDefaults.bool(forKey: Keys.didOnboard))
     }
 
-    func testGetsHasFreemiumPIR() throws {
+    func testGetsDidOnboard() throws {
         // Given
         let sut = DefaultFreemiumPIRUserStateManager(userDefaults: testUserDefaults)
         XCTAssertFalse(sut.didOnboard)
-        testUserDefaults.setValue(true, forKey: pir)
-        XCTAssertTrue(testUserDefaults.bool(forKey: pir))
+        testUserDefaults.setValue(true, forKey: Keys.didOnboard)
+        XCTAssertTrue(testUserDefaults.bool(forKey: Keys.didOnboard))
 
         // When
         let result = sut.didOnboard
 
         // Then
         XCTAssertTrue(result)
+    }
+
+    func testSetsProfileSavedTimestamp() throws {
+        // Given
+        let sut = DefaultFreemiumPIRUserStateManager(userDefaults: testUserDefaults)
+        XCTAssertNil(testUserDefaults.value(forKey: Keys.profileSavedTimestamp))
+
+        // When
+        sut.profileSavedTimestamp = "time_stamp"
+
+        // Then
+        XCTAssertNotNil(testUserDefaults.value(forKey: Keys.profileSavedTimestamp))
+    }
+
+    func testGetsProfileSavedTimestamp() throws {
+        // Given
+        let sut = DefaultFreemiumPIRUserStateManager(userDefaults: testUserDefaults)
+        XCTAssertNil(sut.profileSavedTimestamp)
+        testUserDefaults.setValue("time_stamp", forKey: Keys.profileSavedTimestamp)
+        XCTAssertNotNil(testUserDefaults.value(forKey: Keys.profileSavedTimestamp))
+
+        // When
+        let result = sut.profileSavedTimestamp
+
+        // Then
+        XCTAssertNotNil(result)
     }
 }
