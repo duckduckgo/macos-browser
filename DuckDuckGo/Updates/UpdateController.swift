@@ -81,11 +81,9 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     lazy var notificationPresenter = UpdateNotificationPresenter()
     let willRelaunchAppPublisher: AnyPublisher<Void, Never>
 
-    init(internalUserDecider: InternalUserDecider,
-         appRestarter: AppRestarting = AppRestarter()) {
+    init(internalUserDecider: InternalUserDecider) {
         willRelaunchAppPublisher = willRelaunchAppSubject.eraseToAnyPublisher()
         self.internalUserDecider = internalUserDecider
-        self.appRestarter = appRestarter
         super.init()
 
         configureUpdater()
@@ -139,7 +137,6 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
 
     private(set) var updater: SPUUpdater!
     private(set) var userDriver: UpdateUserDriver!
-    private var appRestarter: AppRestarting
     private let willRelaunchAppSubject = PassthroughSubject<Void, Never>()
     private var internalUserDecider: InternalUserDecider
 
