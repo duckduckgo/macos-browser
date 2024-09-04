@@ -28,23 +28,18 @@ final class AboutPreferences: ObservableObject, PreferencesTabOpening {
     enum UpdateState {
 
         case upToDate
-        case newVersionAvailable(UpdateControllerProgress)
-        case readyToInstallAndRelaunch
+        case updateCycle(UpdateCycleProgress)
 
         var isLoading: Bool {
             switch self {
-            case .upToDate, .readyToInstallAndRelaunch: return false
-            case .newVersionAvailable(let progress): return !progress.isDone
+            case .upToDate: return false
+            case .updateCycle(let progress): return !progress.isDone
             }
         }
 
-        init(from update: Update?, progress: UpdateControllerProgress) {
+        init(from update: Update?, progress: UpdateCycleProgress) {
             if let update, !update.isInstalled {
-                if progress.isDone {
-                    self = .readyToInstallAndRelaunch
-                } else {
-                    self = .newVersionAvailable(progress)
-                }
+                self = .updateCycle(progress)
             } else {
                 self = .upToDate
             }
