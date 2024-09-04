@@ -56,7 +56,7 @@ final class SpecialErrorPageTabExtension {
     private var urlCredentialCreator: URLCredentialCreating
     private var featureFlagger: FeatureFlagger
     private var phishingDetector: PhishingSiteDetecting
-    private var phishingStateManager: PhishingTabStateManager
+    private var phishingStateManager: PhishingTabStateManaging
     private var errorPageType: ErrorType?
     private var phishingURLExemptions: Set<URL> = []
     private let tld = TLD()

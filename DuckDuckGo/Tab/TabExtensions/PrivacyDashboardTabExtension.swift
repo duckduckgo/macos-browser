@@ -29,7 +29,7 @@ final class PrivacyDashboardTabExtension {
 
     private let contentBlocking: any ContentBlockingProtocol
     private let certificateTrustEvaluator: CertificateTrustEvaluating
-    private var phishingStateManager: PhishingTabStateManager
+    private var phishingStateManager: PhishingTabStateManaging
 
     @Published private(set) var privacyInfo: PrivacyInfo?
 
@@ -45,7 +45,7 @@ final class PrivacyDashboardTabExtension {
          didUpgradeToHttpsPublisher: some Publisher<URL, Never>,
          trackersPublisher: some Publisher<DetectedTracker, Never>,
          webViewPublisher: some Publisher<WKWebView, Never>,
-         phishingStateManager: PhishingTabStateManager) {
+         phishingStateManager: PhishingTabStateManaging) {
 
         self.contentBlocking = contentBlocking
         self.certificateTrustEvaluator = certificateTrustEvaluator

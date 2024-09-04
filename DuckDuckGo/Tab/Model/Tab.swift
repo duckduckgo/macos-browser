@@ -72,7 +72,6 @@ protocol NewWindowPolicyDecisionMaker {
 
     let startupPreferences: StartupPreferences
     let tabsPreferences: TabsPreferences
-    let phishingState: PhishingTabStateManager = PhishingTabStateManager()
     let navigationDidEndPublisher = PassthroughSubject<Tab, Never>()
 
     private var extensions: TabExtensions
