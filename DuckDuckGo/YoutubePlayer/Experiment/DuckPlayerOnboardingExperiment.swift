@@ -138,9 +138,14 @@ struct DuckPlayerOnboardingExperiment: OnboardingExperimentManager {
         userDefaults.enrollmentDate = nil
         userDefaults.experimentCohort = nil
         userDefaults.didRunEnrollment = false
-
     }
 
+    /// Checks if the weekly pixel should be fired.
+    ///
+    /// Returns `true` if the pixel has never been sent or if 7 days have passed
+    /// since the last sent date. Otherwise, returns `false`.
+    ///
+    /// - Returns: A Boolean indicating whether to fire the weekly pixel.
     private func shouldFireWeeklyPixel() -> Bool {
         guard let lastFiredDate = userDefaults.weeklyPixelSentDate else { return true }
 
