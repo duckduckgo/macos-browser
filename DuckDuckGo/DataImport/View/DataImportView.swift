@@ -117,9 +117,11 @@ struct DataImportView: ModalView {
 
                 // Bookmarks/Passwords checkboxes
                 DataImportTypePicker(viewModel: $model)
-                    .disabled(model.isImportSourcePickerDisabled).padding(.bottom, 20)
+                    .disabled(model.isImportSourcePickerDisabled)
 
-                passwordsExplainerView()
+                if model.shouldShowPasswordExplainer {
+                    passwordsExplainerView().padding(.top, 20)
+                }
 
             case .moreInfo:
                 // you will be asked for your keychain password blah blah...
@@ -158,9 +160,8 @@ struct DataImportView: ModalView {
                     model.initiateImport(fileURL: url)
                 }
 
-                if dataType == .passwords {
-                    // TODO: Check this
-                    passwordsExplainerView()
+                if dataType == .passwords, model.shouldShowPasswordExplainer {
+                    passwordsExplainerView().padding(.top, 20)
                 }
 
             case .summary(let dataTypes, let isFileImport):
