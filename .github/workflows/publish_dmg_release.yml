@@ -386,11 +386,12 @@ jobs:
 
       - name: Add a comment to the release task
         if: success()
-        uses: ./.github/actions/asana-add-comment
-        with:
-          access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          task-url: ${{ env.asana-task-url }}
-          template-name: ${{ steps.asana-templates.outputs.release-task-comment-template }}
+        env:
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        run: |
+          bundle exec fastlane run asana_add_comment 
+            task_url:"${{ env.asana-task-url }}" 
+            template_name:"${{ steps.asana-templates.outputs.release-task-comment-template }}"
 
   # This is only run for public and hotfix releases
   create-variants:

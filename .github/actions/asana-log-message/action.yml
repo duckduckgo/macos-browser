@@ -17,7 +17,7 @@ inputs:
     description: |
       Name of a template file (without extension) for the comment, relative to 'templates'
       subdirectory of the 'asana-add-comment' action.
-      The file is processed by envsubst before being sent to Asana.
+      The file is processed before being sent to Asana.
     required: false
     type: string
 runs:
@@ -54,9 +54,12 @@ runs:
         fi
 
     - id: add-comment
-      uses: ./.github/actions/asana-add-comment
-      with:
-        access-token: ${{ inputs.access-token }}
-        task-id: ${{ steps.get-automation-subtask.outputs.asana_automation_task_id }}
-        comment: ${{ inputs.comment }}
-        template-name: ${{ inputs.template-name }}
+      shell: bash
+      env:
+        ASANA_ACCESS_TOKEN: ${{ inputs.access-token }}
+      run: |
+        bundle exec fastlane run asana_add_comment 
+          task_id:"${{ steps.get-automation-subtask.outputs.asana_automation_task_id }}" 
+          comment:"${{ inputs.comment }}"
+          workflow_url:"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          template_name:"${{ inputs.template-name }}"
