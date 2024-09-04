@@ -70,21 +70,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     @Published private(set) var updateProgress = UpdateCycleProgress.default
     var updateProgressPublisher: Published<UpdateCycleProgress>.Publisher { $updateProgress }
 
-    @Published private(set) var latestUpdate: Update? {
-        didSet {
-            if let latestUpdate, !latestUpdate.isInstalled {
-                switch latestUpdate.type {
-                case .critical:
-                    notificationPresenter.showUpdateNotification(icon: NSImage.criticalUpdateNotificationInfo, text: UserText.criticalUpdateNotification, presentMultiline: true)
-                case .regular:
-                    notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: UserText.updateAvailableNotification, presentMultiline: true)
-                }
-                isUpdateAvailableToInstall = !latestUpdate.isInstalled
-            } else {
-                isUpdateAvailableToInstall = false
-            }
-        }
-    }
+    @Published private(set) var latestUpdate: Update?
 
     var latestUpdatePublisher: Published<Update?>.Publisher { $latestUpdate }
 
@@ -166,6 +152,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
                     break
                 }
                 self?.updateProgress = progress
+                self?.showUpdateNotificationIfNeeded()
             }
 
 #if DEBUG
@@ -175,6 +162,20 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
 #endif
 
 //        checkForUpdateInBackground()
+    }
+
+    private func showUpdateNotificationIfNeeded() {
+        if let latestUpdate, !latestUpdate.isInstalled, updateProgress.isDone {
+            switch latestUpdate.type {
+            case .critical:
+                notificationPresenter.showUpdateNotification(icon: NSImage.criticalUpdateNotificationInfo, text: UserText.criticalUpdateNotification, presentMultiline: true)
+            case .regular:
+                notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: UserText.updateAvailableNotification, presentMultiline: true)
+            }
+            isUpdateAvailableToInstall = !latestUpdate.isInstalled
+        } else {
+            isUpdateAvailableToInstall = false
+        }
     }
 
     @objc func openUpdatesPage() {
