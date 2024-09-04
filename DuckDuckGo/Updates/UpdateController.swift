@@ -173,7 +173,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     private func configureUpdater() {
         // The default configuration of Sparkle updates is in Info.plist
         userDriver = UpdateUserDriver(internalUserDecider: internalUserDecider,
-                                      deferInstallation: areAutomaticUpdatesEnabled,
+                                      deferInstallation: !areAutomaticUpdatesEnabled,
                                       delegate: self)
         updater = SPUUpdater(hostBundle: Bundle.main, applicationBundle: Bundle.main, userDriver: userDriver, delegate: self)
         try? updater.start()
