@@ -26,6 +26,7 @@ import WebKit
 import History
 import PixelKit
 import PhishingDetection
+import SpecialErrorPages
 import os.log
 
 protocol TabDelegate: ContentOverlayUserScriptDelegate {
@@ -72,7 +73,6 @@ protocol NewWindowPolicyDecisionMaker {
 
     let startupPreferences: StartupPreferences
     let tabsPreferences: TabsPreferences
-    let phishingState: PhishingTabStateManager = PhishingTabStateManager()
     let navigationDidEndPublisher = PassthroughSubject<Tab, Never>()
 
     private var extensions: TabExtensions
@@ -1202,7 +1202,8 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         if !error.isFrameLoadInterrupted, !error.isNavigationCancelled,
                    // don‘t show an error page if the error was already handled
                    // (by SearchNonexistentDomainNavigationResponder) or another navigation was triggered by `setContent`
-            self.content.urlForWebView == url || self.content == .none /* when navigation fails instantly we may have no content set yet */ {
+            self.content.urlForWebView == url || self.content == .none /* when navigation fails instantly we may have no content set yet */ 
+            || error.errorCode == PhishingDetectionError.detected.errorCode {
             self.error = error
             // when already displaying the error page and reload navigation fails again: don‘t navigate, just update page HTML
             if error.errorCode != NSURLErrorServerCertificateUntrusted {
