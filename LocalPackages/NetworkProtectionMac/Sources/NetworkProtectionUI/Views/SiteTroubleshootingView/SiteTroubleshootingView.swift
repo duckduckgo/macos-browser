@@ -70,29 +70,4 @@ public struct SiteTroubleshootingView: View {
             }.padding(.horizontal, 9)
         }
     }
-
-    /// Creates a menu button for the site troubleshooting view.
-    ///
-    @ViewBuilder
-    private func exclusionOptionMenuButton(title: String, selected: Bool, action: @escaping () -> Void) -> MenuItemCustomButton<some View> {
-
-        MenuItemCustomButton {
-            action()
-        } label: { isHovered in
-            if selected {
-                Image(.accordionViewCheckmark)
-                    .resizable()
-                    .font(.system(size: 8))
-                    .frame(width: Self.iconSize, height: Self.iconSize)
-            } else {
-                Rectangle()
-                    .fill(Color.clear)
-                    .frame(width: Self.iconSize, height: Self.iconSize)
-            }
-
-            Text(title)
-                .font(.system(size: 12))
-                .foregroundColor(isHovered ? .white : Color(.defaultText))
-        }
-    }
 }
