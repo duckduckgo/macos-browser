@@ -47,16 +47,14 @@ jobs:
 
       - name: Get Asana user ID
         id: get-asana-user-id
-        uses: duckduckgo/apple-toolbox/actions/asana-get-user-id-for-github-handle@main
-        with:
-          access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          github-handle: ${{ github.actor }}
+        shell: bash
+        run: bundle exec fastlane run asana_get_user_id_for_github_handle github_handle:"${{ github.actor }}"
 
       - name: Create release task
         id: create_release_task
         env:
           ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          ASSIGNEE_ID: ${{ steps.get-asana-user-id.outputs.user-id }}
+          ASSIGNEE_ID: ${{ steps.get-asana-user-id.outputs.asana_user_id }}
         run: |
           version="$(echo ${{ steps.make_release_branch.outputs.release_branch_name }} | cut -d '/' -f 2)"
           task_name="macOS App Release $version"
