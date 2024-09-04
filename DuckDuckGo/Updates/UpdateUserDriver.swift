@@ -37,12 +37,18 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     private var bytesToDownload: UInt64 = 0
     private var bytesDownloaded: UInt64 = 0
 
+    private var onManualInstall: () -> Void = {}
+
     init(internalUserDecider: InternalUserDecider,
          deferInstallation: Bool,
          delegate: UpdateUserDriverDelegate?) {
         self.internalUserDecider = internalUserDecider
         self.deferInstallation = deferInstallation
         self.delegate = delegate
+    }
+
+    func install() {
+        onManualInstall()
     }
 
     func show(_ request: SPUUpdatePermissionRequest) async -> SUUpdatePermissionResponse {
@@ -58,13 +64,17 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         delegate?.userDriverUpdateCheckProgress(self, progress: .checkDidStart)
     }
 
-    func showUpdateFound(with appcastItem: SUAppcastItem, state: SPUUserUpdateState) async -> SPUUserUpdateChoice {
+    func showUpdateFound(with appcastItem: SUAppcastItem, state: SPUUserUpdateState, reply: @escaping (SPUUserUpdateChoice) -> Void) {
         Logger.updates.debug("Updater did find valid update: \(appcastItem.displayVersionString)(\(appcastItem.versionString))")
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidFindUpdate))
 
         delegate?.userDriverUpdateCheckEnd(self, item: appcastItem, isInstalled: false)
 
-        return deferInstallation ? .dismiss : .install
+        if deferInstallation {
+            onManualInstall = { reply(.install) }
+        } else {
+            reply(.install)
+        }
     }
 
     func showUpdateReleaseNotes(with downloadData: SPUDownloadData) {

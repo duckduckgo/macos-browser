@@ -33,7 +33,7 @@ final class AboutPreferences: ObservableObject, PreferencesTabOpening {
         var isLoading: Bool {
             switch self {
             case .upToDate: return false
-            case .newVersionAvailable(let progress): return !progress.isIdle
+            case .newVersionAvailable(let progress): return !progress.isDone
             }
         }
 
