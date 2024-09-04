@@ -2677,7 +2677,6 @@
 		CBC83E3629B63D380008E19C /* Configuration in Frameworks */ = {isa = PBXBuildFile; productRef = CBC83E3529B63D380008E19C /* Configuration */; };
 		CBDD5DE329A67F2700832877 /* MockConfigurationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBDD5DE229A67F2700832877 /* MockConfigurationStore.swift */; };
 		CBDD5DE429A6800300832877 /* MockConfigurationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBDD5DE229A67F2700832877 /* MockConfigurationStore.swift */; };
-		CD2AB5BE2C82218D0019EB49 /* PhishingDetection in Frameworks */ = {isa = PBXBuildFile; productRef = CD2AB5BD2C82218D0019EB49 /* PhishingDetection */; };
 		CD2AB5BF2C8222F20019EB49 /* PhishingDetection.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE248A42C821FFE00F9399D /* PhishingDetection.swift */; };
 		CD2AB5C02C8222F20019EB49 /* PhishingDetection.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE248A42C821FFE00F9399D /* PhishingDetection.swift */; };
 		CD2AB5C12C8222F40019EB49 /* PhishingDetectionPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE248A52C821FFE00F9399D /* PhishingDetectionPreferences.swift */; };
@@ -2690,6 +2689,7 @@
 		CD2AB5C82C8223040019EB49 /* hashPrefixes.json in Resources */ = {isa = PBXBuildFile; fileRef = CDE248A32C821FFE00F9399D /* hashPrefixes.json */; };
 		CD2AB5CA2C8225E70019EB49 /* URLTokenValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2AB5C92C8225E70019EB49 /* URLTokenValidator.swift */; };
 		CD2AB5CB2C8225E70019EB49 /* URLTokenValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2AB5C92C8225E70019EB49 /* URLTokenValidator.swift */; };
+		CD3301242C8870DF009AA127 /* PhishingDetection in Frameworks */ = {isa = PBXBuildFile; productRef = CD34F0BB2C885D65006826BE /* PhishingDetection */; };
 		CD34F0C12C886482006826BE /* PhishingDetectionMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD34F0BF2C886482006826BE /* PhishingDetectionMocks.swift */; };
 		CD34F0C22C886482006826BE /* PhishingDetectionMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD34F0BF2C886482006826BE /* PhishingDetectionMocks.swift */; };
 		CD34F0C42C8869FF006826BE /* PhishingDetection in Frameworks */ = {isa = PBXBuildFile; productRef = CD34F0C32C8869FF006826BE /* PhishingDetection */; };
@@ -4392,7 +4392,6 @@
 		CB6BCDF827C6BEFF00CC76DC /* PrivacyFeatures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyFeatures.swift; sourceTree = "<group>"; };
 		CBDD5DE229A67F2700832877 /* MockConfigurationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockConfigurationStore.swift; sourceTree = "<group>"; };
 		CD2AB5C92C8225E70019EB49 /* URLTokenValidator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLTokenValidator.swift; sourceTree = "<group>"; };
-		CDE2489E2C821DE800F9399D /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../../BrowserServicesKit; sourceTree = "<group>"; };
 		CD34F0BF2C886482006826BE /* PhishingDetectionMocks.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhishingDetectionMocks.swift; sourceTree = "<group>"; };
 		CDE248A32C821FFE00F9399D /* hashPrefixes.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = hashPrefixes.json; sourceTree = "<group>"; };
 		CDE248A42C821FFE00F9399D /* PhishingDetection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhishingDetection.swift; sourceTree = "<group>"; };
@@ -4692,6 +4691,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CD3301242C8870DF009AA127 /* PhishingDetection in Frameworks */,
 				C18BF9CC2C73678500ED6B8A /* Freemium in Frameworks */,
 				F1DF95E32BD1807C0045E591 /* Crashes in Frameworks */,
 				560EB9352C7897370080DBC8 /* Onboarding in Frameworks */,
@@ -4702,7 +4702,6 @@
 				EE7295E32A545B9A008C0991 /* NetworkProtection in Frameworks */,
 				9807F645278CA16F00E1547B /* BrowserServicesKit in Frameworks */,
 				D6BC8AC62C5A95AA0025375B /* DuckPlayer in Frameworks */,
-				CD34F0BC2C885D65006826BE /* PhishingDetection in Frameworks */,
 				987799ED299998B1005D8EB6 /* Bookmarks in Frameworks */,
 				1E950E3F2912A10D0051A99B /* ContentBlocking in Frameworks */,
 				31A3A4E32B0C115F0021063C /* DataBrokerProtection in Frameworks */,
@@ -5254,7 +5253,6 @@
 			isa = PBXGroup;
 			children = (
 				9D9DE5712C63A96400D20B15 /* AppKitExtensions */,
-				CDE2489E2C821DE800F9399D /* BrowserServicesKit */,
 				7B9167A82C09E88800322310 /* AppLauncher */,
 				378E279D2970217400FCADA2 /* BuildToolPlugins */,
 				3192A2702A4C4E330084EA89 /* DataBrokerProtection */,
