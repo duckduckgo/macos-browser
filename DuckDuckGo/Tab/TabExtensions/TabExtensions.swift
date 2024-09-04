@@ -22,6 +22,7 @@ import ContentBlocking
 import Foundation
 import PrivacyDashboard
 import History
+import PhishingDetection
 
 /**
  Tab Extensions should conform to TabExtension protocol
@@ -72,6 +73,8 @@ protocol TabExtensionDependencies {
     var duckPlayer: DuckPlayer { get }
     var certificateTrustEvaluator: CertificateTrustEvaluating { get }
     var tunnelController: NetworkProtectionIPCTunnelController? { get }
+    var phishingDetector: PhishingSiteDetecting { get }
+    var phishingStateManager: PhishingTabStateManaging { get }
 }
 
 // swiftlint:disable:next large_tuple
@@ -203,7 +206,9 @@ extension TabExtensionsBuilder {
 
         add {
             SpecialErrorPageTabExtension(webViewPublisher: args.webViewFuture,
-                                  scriptsPublisher: userScripts.compactMap { $0 })
+                                  scriptsPublisher: userScripts.compactMap { $0 },
+                                  phishingDetector: dependencies.phishingDetector,
+                                  phishingStateManager: dependencies.phishingStateManager)
         }
 #if SPARKLE
         add {

@@ -118,7 +118,8 @@ extension PrivacyDashboardTabExtension {
 
         privacyInfo = PrivacyInfo(url: url,
                                   parentEntity: entity,
-                                  protectionStatus: makeProtectionStatus(for: host))
+                                  protectionStatus: makeProtectionStatus(for: host),
+                                  isPhishing: false)
 
         previousPrivacyInfosByURL[url.absoluteString] = privacyInfo
 
