@@ -61,20 +61,17 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
 
     func showUserInitiatedUpdateCheck(cancellation: @escaping () -> Void) {
         Logger.updates.debug("Updater started performing the update check. (isInternalUser: \(self.internalUserDecider.isInternalUser)")
-        delegate?.userDriverUpdateCheckProgress(self, progress: .checkDidStart)
+        delegate?.userDriverUpdateCheckProgress(self, progress: .updateCycleDidStart)
     }
 
-    func showUpdateFound(with appcastItem: SUAppcastItem, state: SPUUserUpdateState, reply: @escaping (SPUUserUpdateChoice) -> Void) {
+    func showUpdateFound(with appcastItem: SUAppcastItem, state: SPUUserUpdateState) async -> SPUUserUpdateChoice {
         Logger.updates.debug("Updater did find valid update: \(appcastItem.displayVersionString)(\(appcastItem.versionString))")
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidFindUpdate))
 
         delegate?.userDriverUpdateCheckEnd(self, item: appcastItem, isInstalled: false)
+        delegate?.userDriverUpdateCheckProgress(self, progress: .updateCycleDone)
 
-        if deferInstallation {
-            onManualInstall = { reply(.install) }
-        } else {
-            reply(.install)
-        }
+        return appcastItem.isInformationOnlyUpdate ? .dismiss : .install
     }
 
     func showUpdateReleaseNotes(with downloadData: SPUDownloadData) {
@@ -129,8 +126,13 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         delegate?.userDriverUpdateCheckProgress(self, progress: .extracting(progress))
     }
 
-    func showReadyToInstallAndRelaunch() async -> SPUUserUpdateChoice {
-        deferInstallation ? .dismiss : .install
+    func showReady(toInstallAndRelaunch reply: @escaping (SPUUserUpdateChoice) -> Void) {
+        if deferInstallation {
+            onManualInstall = { reply(.install) }
+        } else {
+            reply(.install)
+        }
+        delegate?.userDriverUpdateCheckProgress(self, progress: .updateCycleDone)
     }
 
     func showInstallingUpdate(withApplicationTerminated applicationTerminated: Bool, retryTerminatingApplication: @escaping () -> Void) {
@@ -146,7 +148,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     }
 
     func dismissUpdateInstallation() {
-        delegate?.userDriverUpdateCheckProgress(self, progress: .done)
+        delegate?.userDriverUpdateCheckProgress(self, progress: .updateCycleDone)
     }
 }
 
