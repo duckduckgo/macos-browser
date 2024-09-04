@@ -20,6 +20,7 @@ import Foundation
 import Sparkle
 import PixelKit
 import BrowserServicesKit
+import Combine
 import os.log
 
 #if SPARKLE
@@ -48,26 +49,22 @@ enum UpdateCycleProgress {
     }
 }
 
-protocol UpdateUserDriverDelegate: AnyObject {
-    func userDriverUpdateCycleProgress(_ userDriver: UpdateUserDriver, progress: UpdateCycleProgress)
-}
-
 final class UpdateUserDriver: NSObject, SPUUserDriver {
     private var internalUserDecider: InternalUserDecider
     private var deferInstallation: Bool
-    private weak var delegate: UpdateUserDriverDelegate?
 
     private var bytesToDownload: UInt64 = 0
     private var bytesDownloaded: UInt64 = 0
 
     private var onManualInstall: () -> Void = {}
 
+    private let subject = CurrentValueSubject<UpdateCycleProgress, Never>(.updateCycleNotStarted)
+    public lazy var updateProgressPublisher = subject.eraseToAnyPublisher()
+
     init(internalUserDecider: InternalUserDecider,
-         deferInstallation: Bool,
-         delegate: UpdateUserDriverDelegate?) {
+         deferInstallation: Bool) {
         self.internalUserDecider = internalUserDecider
         self.deferInstallation = deferInstallation
-        self.delegate = delegate
     }
 
     func install() {
@@ -84,14 +81,14 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
 
     func showUserInitiatedUpdateCheck(cancellation: @escaping () -> Void) {
         Logger.updates.debug("Updater started performing the update check. (isInternalUser: \(self.internalUserDecider.isInternalUser)")
-        delegate?.userDriverUpdateCycleProgress(self, progress: .updateCycleDidStart)
+        subject.send(.updateCycleDidStart)
     }
 
     func showUpdateFound(with appcastItem: SUAppcastItem, state: SPUUserUpdateState) async -> SPUUserUpdateChoice {
         Logger.updates.debug("Updater did find valid update: \(appcastItem.displayVersionString)(\(appcastItem.versionString))")
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidFindUpdate))
 
-        delegate?.userDriverUpdateCycleProgress(self, progress: .updateFound(appcastItem))
+        subject.send(.updateFound(appcastItem))
 
         return appcastItem.isInformationOnlyUpdate ? .dismiss : .install
     }
@@ -114,8 +111,8 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         Logger.updates.debug("Updater did not find update: \(String(describing: item.displayVersionString))(\(String(describing: item.versionString)))")
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidNotFindUpdate, error: error))
 
-        delegate?.userDriverUpdateCycleProgress(self, progress: .updateNotFound(item, nsError))
-        delegate?.userDriverUpdateCycleProgress(self, progress: .updateCycleDone)
+        subject.send(.updateNotFound(item, nsError))
+        subject.send(.updateCycleDone)
 
         acknowledgement()
     }
@@ -125,7 +122,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     }
 
     func showDownloadInitiated(cancellation: @escaping () -> Void) {
-        delegate?.userDriverUpdateCycleProgress(self, progress: .downloadDidStart)
+        subject.send(.downloadDidStart)
     }
 
     func showDownloadDidReceiveExpectedContentLength(_ expectedContentLength: UInt64) {
@@ -138,15 +135,15 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         if bytesDownloaded > bytesToDownload {
             bytesToDownload = bytesDownloaded
         }
-        delegate?.userDriverUpdateCycleProgress(self, progress: .downloading(bytesDownloaded, bytesToDownload))
+        subject.send(.downloading(bytesDownloaded, bytesToDownload))
     }
 
     func showDownloadDidStartExtractingUpdate() {
-        delegate?.userDriverUpdateCycleProgress(self, progress: .extractionDidStart)
+        subject.send(.extractionDidStart)
     }
 
     func showExtractionReceivedProgress(_ progress: Double) {
-        delegate?.userDriverUpdateCycleProgress(self, progress: .extracting(progress))
+        subject.send(.extracting(progress))
     }
 
     func showReady(toInstallAndRelaunch reply: @escaping (SPUUserUpdateChoice) -> Void) {
@@ -156,15 +153,15 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
             reply(.install)
         }
 
-        delegate?.userDriverUpdateCycleProgress(self, progress: .updateCycleDone)
+        subject.send(.updateCycleDone)
     }
 
     func showInstallingUpdate(withApplicationTerminated applicationTerminated: Bool, retryTerminatingApplication: @escaping () -> Void) {
-        delegate?.userDriverUpdateCycleProgress(self, progress: .installationDidStart)
+        subject.send(.installationDidStart)
     }
 
     func showUpdateInstalledAndRelaunched(_ relaunched: Bool, acknowledgement: @escaping () -> Void) {
-        delegate?.userDriverUpdateCycleProgress(self, progress: .installing)
+        subject.send(.installing)
         acknowledgement()
     }
 
@@ -173,7 +170,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     }
 
     func dismissUpdateInstallation() {
-        delegate?.userDriverUpdateCycleProgress(self, progress: .updateCycleDone)
+        subject.send(.updateCycleDone)
     }
 }
 
