@@ -91,7 +91,7 @@ public enum DataBrokerHierarchy: Int {
     case child = 0
 }
 
-struct DataBroker: Codable, Sendable {
+public struct DataBroker: Codable, Sendable {
     let id: Int64?
     let name: String
     let url: String
@@ -140,7 +140,7 @@ struct DataBroker: Codable, Sendable {
         self.mirrorSites = mirrorSites
     }
 
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         name = try container.decode(String.self, forKey: .name)
 
@@ -206,11 +206,11 @@ struct DataBroker: Codable, Sendable {
 
 extension DataBroker: Hashable {
 
-    func hash(into hasher: inout Hasher) {
+    public func hash(into hasher: inout Hasher) {
         hasher.combine(name)
     }
 
-    static func == (lhs: DataBroker, rhs: DataBroker) -> Bool {
+    public static func == (lhs: DataBroker, rhs: DataBroker) -> Bool {
         return lhs.name == rhs.name
     }
 }
