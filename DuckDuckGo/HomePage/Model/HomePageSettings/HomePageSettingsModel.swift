@@ -241,7 +241,7 @@ extension HomePage.Models {
             }
         }
 
-        private func updateSolidColorPickerItems(pickerColor: NSColor) {
+        private func updateSolidColorPickerItems(pickerColor: NSColor = Const.defaultColorPickerColor) {
             let predefinedColorBackgrounds = SolidColorBackground.predefinedColors.map(SolidColorBackgroundPickerItem.background)
             solidColorPickerItems = [.picker(.init(color: pickerColor))] + predefinedColorBackgrounds
         }
@@ -274,6 +274,20 @@ extension HomePage.Models {
                 customBackgroundModeModel(for: .customImagePicker)
             ]
                 .compactMap { $0 }
+        }
+
+        /**
+         * This function is used from Debug Menu and shouldn't otherwise be used in the code accessible to the users.
+         */
+        func resetAllCustomizations() {
+            customBackground = nil
+            lastPickedCustomColor = nil
+            lastPickedCustomColorHexValue = nil
+            customImagesManager?.availableImages.forEach { image in
+                customImagesManager?.deleteImage(image)
+            }
+            updateSolidColorPickerItems()
+            onColorPickerDisappear()
         }
 
         private func customBackgroundModeModel(for contentType: ContentType) -> CustomBackgroundModeModel? {
