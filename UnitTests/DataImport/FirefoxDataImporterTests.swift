@@ -20,9 +20,9 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-@MainActor
 class FirefoxDataImporterTests: XCTestCase {
 
+    @MainActor
     func testWhenImportingBookmarks_AndBookmarkImportSucceeds_ThenSummaryIsPopulated() async {
         let loginImporter = MockLoginImporter()
         let faviconManager = FaviconManagerMock()

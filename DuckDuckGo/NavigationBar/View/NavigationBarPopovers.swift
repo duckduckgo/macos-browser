@@ -29,6 +29,7 @@ protocol PopoverPresenter {
     func show(_ popover: NSPopover, positionedBelow view: NSView)
 }
 
+@MainActor
 protocol NetPPopoverManager: AnyObject {
     var isShown: Bool { get }
 
@@ -133,8 +134,10 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
     }
 
     func toggleNetworkProtectionPopover(from button: MouseOverButton, withDelegate delegate: NSPopoverDelegate) {
-        if let popover = networkProtectionPopoverManager.toggle(positionedBelow: button, withDelegate: delegate) {
-            bindIsMouseDownState(of: button, to: popover)
+        Task { @MainActor in
+            if let popover = networkProtectionPopoverManager.toggle(positionedBelow: button, withDelegate: delegate) {
+                bindIsMouseDownState(of: button, to: popover)
+            }
         }
     }
 
@@ -199,8 +202,10 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
             downloadsPopover?.close()
         }
 
-        if networkProtectionPopoverManager.isShown {
-            networkProtectionPopoverManager.close()
+        Task { @MainActor in
+            if networkProtectionPopoverManager.isShown {
+                networkProtectionPopoverManager.close()
+            }
         }
 
         if bookmarkPopover?.isShown ?? false {
@@ -432,8 +437,11 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
     // MARK: - VPN
 
     func showNetworkProtectionPopover(positionedBelow button: MouseOverButton, withDelegate delegate: NSPopoverDelegate) {
-        let popover = networkProtectionPopoverManager.show(positionedBelow: button, withDelegate: delegate)
-        bindIsMouseDownState(of: button, to: popover)
+
+        Task { @MainActor in
+            let popover = networkProtectionPopoverManager.show(positionedBelow: button, withDelegate: delegate)
+            bindIsMouseDownState(of: button, to: popover)
+        }
     }
 }
 

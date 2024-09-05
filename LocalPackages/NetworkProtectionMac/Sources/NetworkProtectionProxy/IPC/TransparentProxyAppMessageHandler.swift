@@ -17,15 +17,19 @@
 //
 
 import Foundation
-import OSLog // swiftlint:disable:this enforce_os_log_wrapper
+import os.log
+import NetworkExtension
 
 /// Handles app messages
 ///
 final class TransparentProxyAppMessageHandler {
 
     private let settings: TransparentProxySettings
+    private let logger: Logger
 
-    init(settings: TransparentProxySettings) {
+    init(settings: TransparentProxySettings, logger: Logger) {
+
+        self.logger = logger
         self.settings = settings
     }
 
@@ -48,11 +52,13 @@ final class TransparentProxyAppMessageHandler {
         await withCheckedContinuation { continuation in
             var request: TransparentProxyRequest
 
+            logger.log("Handling app message: \(String(describing: message), privacy: .public)")
+
             switch message {
             case .changeSetting(let change):
-                request = .changeSetting(change, responseHandler: {
+                request = .changeSetting(change) {
                     continuation.resume(returning: nil)
-                })
+                }
             }
 
             handle(request)

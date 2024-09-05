@@ -20,9 +20,6 @@ import Foundation
 
 protocol SurveyRemoteMessagingStorage {
 
-    func store(messages: [SurveyRemoteMessage]) throws
-    func storedMessages() -> [SurveyRemoteMessage]
-
     func dismissRemoteMessage(with id: String)
     func dismissedMessageIDs() -> [String]
 
@@ -61,24 +58,6 @@ final class DefaultSurveyRemoteMessagingStorage: SurveyRemoteMessagingStorage {
         self.dismissedMessageIdentifiersKey = dismissedMessageIdentifiersKey
     }
 
-    func store(messages: [SurveyRemoteMessage]) throws {
-        let encoded = try JSONEncoder().encode(messages)
-        try encoded.write(to: messagesURL)
-    }
-
-    func storedMessages() -> [SurveyRemoteMessage] {
-        do {
-            let messagesData = try Data(contentsOf: messagesURL)
-            let messages = try JSONDecoder().decode([SurveyRemoteMessage].self, from: messagesData)
-
-            return messages
-        } catch {
-            // Errors can occur if the file doesn't exist or the schema changed, in which case the app will fetch the file again later and
-            // overwrite it.
-            return []
-        }
-    }
-
     func dismissRemoteMessage(with id: String) {
         var dismissedMessages = dismissedMessageIDs()
 
@@ -93,6 +72,10 @@ final class DefaultSurveyRemoteMessagingStorage: SurveyRemoteMessagingStorage {
     func dismissedMessageIDs() -> [String] {
         let messages = userDefaults.array(forKey: dismissedMessageIdentifiersKey) as? [String]
         return messages ?? []
+    }
+
+    func removeStoredMessagesIfNecessary() {
+        try? FileManager.default.removeItem(at: messagesURL)
     }
 
     func removeStoredAndDismissedMessages() {

@@ -104,7 +104,7 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
 
     // MARK: - Presenting user notifications
 
-    func showConnectedNotification(serverLocation: String?) {
+    func showConnectedNotification(serverLocation: String?, snoozeEnded: Bool) {
         // Should include the serverLocation in the subtitle, but due to a bug with the current server in the PacketTunnelProvider
         // this is not currently working on macOS. Add the necessary copy as on iOS when this is fixed.
         let subtitle: String
@@ -141,6 +141,10 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
         let content = notificationContent(title: UserText.networkProtectionEntitlementExpiredNotificationTitle,
                                           subtitle: UserText.networkProtectionEntitlementExpiredNotificationBody)
         showNotification(.expiredEntitlement, content)
+    }
+
+    func showSnoozingNotification(duration: TimeInterval) {
+        assertionFailure("macOS does not support VPN snooze")
     }
 
     func showTestNotification() {

@@ -47,7 +47,9 @@ final class MoreOptionsMenuButton: MouseOverButton {
         super.awakeFromNib()
 
 #if SPARKLE
-        updateController = Application.appDelegate.updateController
+        if NSApp.runType != .uiTests {
+            updateController = Application.appDelegate.updateController
+        }
 #endif
         subscribeToUpdateInfo()
     }

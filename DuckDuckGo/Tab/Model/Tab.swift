@@ -25,6 +25,7 @@ import UserScript
 import WebKit
 import History
 import PixelKit
+import os.log
 
 protocol TabDelegate: ContentOverlayUserScriptDelegate {
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool)
@@ -55,7 +56,7 @@ protocol NewWindowPolicyDecisionMaker {
     fileprivate weak var delegate: TabDelegate?
     func setDelegate(_ delegate: TabDelegate) { self.delegate = delegate }
 
-    private let navigationDelegate = DistributedNavigationDelegate(log: .navigation)
+    private let navigationDelegate = DistributedNavigationDelegate()
     private var newWindowPolicyDecisionMakers: [NewWindowPolicyDecisionMaker]?
     private var onNewWindow: ((WKNavigationAction?) -> NavigationDecision)?
 
@@ -77,10 +78,11 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     private(set) var userContentController: UserContentController?
+    private(set) var specialPagesUserScript: SpecialPagesUserScript?
 
     @MainActor
     convenience init(content: TabContent,
-                     faviconManagement: FaviconManagement = FaviconManager.shared,
+                     faviconManagement: FaviconManagement? = nil,
                      webCacheManager: WebCacheManager = WebCacheManager.shared,
                      webViewConfiguration: WKWebViewConfiguration? = nil,
                      historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
@@ -122,7 +124,7 @@ protocol NewWindowPolicyDecisionMaker {
         }
 
         self.init(content: content,
-                  faviconManagement: faviconManager,
+                  faviconManagement: faviconManager ?? FaviconManager.shared,
                   webCacheManager: webCacheManager,
                   webViewConfiguration: webViewConfiguration,
                   historyCoordinating: historyCoordinating,
@@ -202,13 +204,20 @@ protocol NewWindowPolicyDecisionMaker {
         self.startupPreferences = startupPreferences
         self.tabsPreferences = tabsPreferences
 
+        self.specialPagesUserScript = SpecialPagesUserScript()
+        specialPagesUserScript?
+            .withAllSubfeatures()
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
+
         // This must be done before initializing WKWebView with the configuration
         if #available(macOS 13.1, *) {
             WebExtensionManager.shared.setUpWebExtensionController(for: configuration)
         }
-        
-        configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking, burnerMode: burnerMode)
+
+        configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking,
+                                                 burnerMode: burnerMode,
+                                                 earlyAccessHandlers: specialPagesUserScript.map { [$0] } ?? [])
+
         self.webViewConfiguration = configuration
         let userContentController = configuration.userContentController as? UserContentController
         assert(userContentController != nil)
@@ -374,7 +383,22 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     var webViewDidFinishNavigationPublisher: some Publisher<Void, Never> {
-        navigationStatePublisher.compactMap { $0 }.filter { $0.isFinished }.asVoid()
+        navigationStatePublisher
+            .combineLatest(navigationDelegate.$currentNavigation)
+            .filter { navigationState, currentNavigation in
+                guard let navigationState = navigationState, navigationState.isFinished else {
+                    return false
+                }
+                guard let currentNavigation = currentNavigation else {
+                    return false
+                }
+                return MainActor.assumeIsolated {
+                    let isSameDocumentNavigation = (currentNavigation.redirectHistory.first ?? currentNavigation.navigationAction).navigationType.isSameDocumentNavigation
+                    return !isSameDocumentNavigation
+                }
+            }
+            .map { _ in () }
+            .eraseToAnyPublisher()
     }
 
     // MARK: - Properties
@@ -694,7 +718,7 @@ protocol NewWindowPolicyDecisionMaker {
         }
 
         guard let backForwardNavigation else {
-            os_log(.error, "item `\(item.title ?? "") – \(item.url?.absoluteString ?? "")` is not in the backForwardList")
+            Logger.navigation.error("item `\(item.title ?? "") – \(item.url?.absoluteString ?? "")` is not in the backForwardList")
             return nil
         }
 
@@ -1010,13 +1034,14 @@ extension Tab: UserContentControllerDelegate {
 
     @MainActor
     func userContentController(_ userContentController: UserContentController, didInstallContentRuleLists contentRuleLists: [String: WKContentRuleList], userScripts: UserScriptsProvider, updateEvent: ContentBlockerRulesManager.UpdateEvent) {
-        os_log("didInstallContentRuleLists", log: .contentBlocking, type: .info)
+        Logger.contentBlocking.info("didInstallContentRuleLists")
         guard let userScripts = userScripts as? UserScripts else { fatalError("Unexpected UserScripts") }
 
         userScripts.debugScript.instrumentation = instrumentation
         userScripts.faviconScript.delegate = self
         userScripts.pageObserverScript.delegate = self
         userScripts.printingUserScript.delegate = self
+        specialPagesUserScript = nil
     }
 
 }
@@ -1120,6 +1145,20 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     @MainActor
     func willStart(_ navigation: Navigation) {
         if error != nil { error = nil }
+
+        /*
+         From a certain point, WebKit no longer supports loading any URL with the "about:" scheme, except for "about:blank".
+         Although "about:" requests are approved without waiting for the `decidePolicyForNavigationAction:` decision, we will only receive the `willBegin` delegate call.
+         If we receive an "about:" request pointing to an internal page like "about:preferences" or others, we should redirect to a "duck://" address by directly setting the Tab Content.
+         Other "about:" URLs will fail to load and display an error page.
+         */
+        if navigation.url.navigationalScheme == .about, navigation.url != .blankPage {
+            let tabContent = TabContent.contentFromURL(navigation.url, source: .webViewUpdated)
+            guard case .url = tabContent else {
+                setContent(tabContent)
+                return
+            }
+        }
 
         delegate?.tabWillStartNavigation(self, isUserInitiated: navigation.navigationAction.isUserInitiated)
     }

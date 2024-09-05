@@ -89,7 +89,7 @@ final class TunnelControllerIPCService {
         self.defaults = defaults
         self.pixelKit = pixelKit
 
-        udsServer = UDSServer(socketFileURL: VPNIPCResources.socketFileURL, log: .networkProtectionIPCLog)
+        udsServer = UDSServer(socketFileURL: VPNIPCResources.socketFileURL)
 
         subscribeToErrorChanges()
         subscribeToStatusUpdates()
@@ -243,6 +243,9 @@ extension TunnelControllerIPCService: XPCServerInterface {
             break
         case .removeVPNConfiguration:
             try await uninstall(.configuration)
+        case .restartAdapter:
+            // Intentional no-op: handled by the extension
+            break
         case .uninstallVPN:
             try await uninstall(.all)
         case .disableConnectOnDemandAndShutDown:

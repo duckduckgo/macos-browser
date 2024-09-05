@@ -20,19 +20,16 @@ import Foundation
 
 enum WaitlistActivationDateStoreSource {
     case netP
-    case dbp
 
     var activationDateKey: String {
         switch self {
         case .netP: return "com.duckduckgo.network-protection.activation-date"
-        case .dbp: return "com.duckduckgo.dbp.activation-date"
         }
     }
 
     var lastActiveDateKey: String {
         switch self {
         case .netP: return "com.duckduckgo.network-protection.last-active-date"
-        case .dbp: return "com.duckduckgo.dbp.last-active-date"
         }
     }
 }
@@ -54,8 +51,6 @@ struct DefaultWaitlistActivationDateStore: WaitlistActivationDateStore {
         switch source {
         case.netP:
             self.userDefaults = .netP
-        case .dbp:
-            self.userDefaults = .dbp
         }
     }
 

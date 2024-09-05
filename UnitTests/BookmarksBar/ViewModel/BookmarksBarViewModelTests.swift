@@ -19,9 +19,9 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-@MainActor
 class BookmarksBarViewModelTests: XCTestCase {
 
+    @MainActor
     func testWhenClippingTheLastBarItem_AndNoItemsCanBeClipped_ThenNoItemsAreClipped() {
         let manager = createMockBookmarksManager()
         let bookmarksBarViewModel = BookmarksBarViewModel(bookmarkManager: manager, tabCollectionViewModel: .mock())
@@ -32,6 +32,7 @@ class BookmarksBarViewModelTests: XCTestCase {
         XCTAssert(bookmarksBarViewModel.clippedItems.isEmpty)
     }
 
+    @MainActor
     func testWhenClippingTheLastBarItem_AndItemsCanBeClipped_ThenItemsAreClipped() {
         let bookmarks = [Bookmark.mock]
         let storeMock = BookmarkStoreMock()
@@ -47,6 +48,7 @@ class BookmarksBarViewModelTests: XCTestCase {
         XCTAssertEqual(bookmarksBarViewModel.clippedItems.count, 1)
     }
 
+    @MainActor
     func testWhenTheBarHasClippedItems_ThenClippedItemsCanBeRestored() {
         let bookmarks = [Bookmark.mock]
         let storeMock = BookmarkStoreMock()
@@ -67,6 +69,7 @@ class BookmarksBarViewModelTests: XCTestCase {
         XCTAssert(bookmarksBarViewModel.clippedItems.isEmpty)
     }
 
+    @MainActor
     func testWhenUpdatingFromBookmarkEntities_AndTheContainerCannotFitAnyBookmarks_ThenBookmarksAreImmediatelyClipped() {
         let bookmarks = [Bookmark.mock]
         let storeMock = BookmarkStoreMock()
@@ -79,6 +82,7 @@ class BookmarksBarViewModelTests: XCTestCase {
         XCTAssertEqual(bookmarksBarViewModel.clippedItems.count, 1)
     }
 
+    @MainActor
     func testWhenUpdatingFromBookmarkEntities_AndTheContainerCanFitAllBookmarks_ThenNoBookmarksAreClipped() {
         let bookmarks = [Bookmark.mock]
         let storeMock = BookmarkStoreMock()
@@ -93,197 +97,26 @@ class BookmarksBarViewModelTests: XCTestCase {
 
     // MARK: - Bookmarks Delegate
 
+    @MainActor
     func testWhenItemFiresClickedActionThenDelegateReceivesClickItemActionAndPreventClickIsFalse() {
         // GIVEN
         let sut = BookmarksBarViewModel(bookmarkManager: createMockBookmarksManager(), tabCollectionViewModel: .mock())
         let collectionViewItem = BookmarksBarCollectionViewItem()
         let delegateMock = BookmarksBarViewModelDelegateMock()
         sut.delegate = delegateMock
-        XCTAssertFalse(delegateMock.didCallViewModelReceivedAction)
-        XCTAssertNil(delegateMock.capturedAction)
+        XCTAssertFalse(delegateMock.didCallClickAction)
         XCTAssertNil(delegateMock.capturedItem)
 
         // WHEN
         sut.bookmarksBarCollectionViewItemClicked(collectionViewItem)
 
         // THEN
-        XCTAssertTrue(delegateMock.didCallViewModelReceivedAction)
-        XCTAssertEqual(delegateMock.capturedAction, .clickItem)
+        XCTAssertTrue(delegateMock.didCallClickAction)
         XCTAssertEqual(delegateMock.capturedItem, collectionViewItem)
 
     }
 
-    func testWhenItemFiresOpenInNewTabActionThenDelegateReceivesOpenInNewTabAction() {
-        // GIVEN
-        let sut = BookmarksBarViewModel(bookmarkManager: createMockBookmarksManager(), tabCollectionViewModel: .mock())
-        let collectionViewItem = BookmarksBarCollectionViewItem()
-        let delegateMock = BookmarksBarViewModelDelegateMock()
-        sut.delegate = delegateMock
-        XCTAssertFalse(delegateMock.didCallViewModelReceivedAction)
-        XCTAssertNil(delegateMock.capturedAction)
-        XCTAssertNil(delegateMock.capturedItem)
-
-        // WHEN
-        sut.bookmarksBarCollectionViewItemOpenInNewTabAction(collectionViewItem)
-
-        // THEN
-        XCTAssertTrue(delegateMock.didCallViewModelReceivedAction)
-        XCTAssertEqual(delegateMock.capturedAction, .openInNewTab)
-        XCTAssertEqual(delegateMock.capturedItem, collectionViewItem)
-    }
-
-    func testWhenItemFiresOpenInNewWindowActionThenDelegateReceivesOpenInNewWindowAction() {
-        // GIVEN
-        let sut = BookmarksBarViewModel(bookmarkManager: createMockBookmarksManager(), tabCollectionViewModel: .mock())
-        let collectionViewItem = BookmarksBarCollectionViewItem()
-        let delegateMock = BookmarksBarViewModelDelegateMock()
-        sut.delegate = delegateMock
-        XCTAssertFalse(delegateMock.didCallViewModelReceivedAction)
-        XCTAssertNil(delegateMock.capturedAction)
-        XCTAssertNil(delegateMock.capturedItem)
-
-        // WHEN
-        sut.bookmarksBarCollectionViewItemOpenInNewWindowAction(collectionViewItem)
-
-        // THEN
-        XCTAssertTrue(delegateMock.didCallViewModelReceivedAction)
-        XCTAssertEqual(delegateMock.capturedAction, .openInNewWindow)
-        XCTAssertEqual(delegateMock.capturedItem, collectionViewItem)
-    }
-
-    func testWhenItemFiresToggleFavoritesActionThenDelegateReceivesToggleFavoritesAction() {
-        // GIVEN
-        let sut = BookmarksBarViewModel(bookmarkManager: createMockBookmarksManager(), tabCollectionViewModel: .mock())
-        let collectionViewItem = BookmarksBarCollectionViewItem()
-        let delegateMock = BookmarksBarViewModelDelegateMock()
-        sut.delegate = delegateMock
-        XCTAssertFalse(delegateMock.didCallViewModelReceivedAction)
-        XCTAssertNil(delegateMock.capturedAction)
-        XCTAssertNil(delegateMock.capturedItem)
-
-        // WHEN
-        sut.bookmarksBarCollectionViewItemToggleFavoritesAction(collectionViewItem)
-
-        // THEN
-        XCTAssertTrue(delegateMock.didCallViewModelReceivedAction)
-        XCTAssertEqual(delegateMock.capturedAction, .toggleFavorites)
-        XCTAssertEqual(delegateMock.capturedItem, collectionViewItem)
-    }
-
-    func testWhenItemFiresEditActionThenDelegateReceivesEditAction() {
-        // GIVEN
-        let sut = BookmarksBarViewModel(bookmarkManager: createMockBookmarksManager(), tabCollectionViewModel: .mock())
-        let collectionViewItem = BookmarksBarCollectionViewItem()
-        let delegateMock = BookmarksBarViewModelDelegateMock()
-        sut.delegate = delegateMock
-        XCTAssertFalse(delegateMock.didCallViewModelReceivedAction)
-        XCTAssertNil(delegateMock.capturedAction)
-        XCTAssertNil(delegateMock.capturedItem)
-
-        // WHEN
-        sut.bookmarksBarCollectionViewEditAction(collectionViewItem)
-
-        // THEN
-        XCTAssertTrue(delegateMock.didCallViewModelReceivedAction)
-        XCTAssertEqual(delegateMock.capturedAction, .edit)
-        XCTAssertEqual(delegateMock.capturedItem, collectionViewItem)
-    }
-
-    func testWhenItemFiresMoveToEndActionThenDelegateReceivesMoveToEndAction() {
-        // GIVEN
-        let sut = BookmarksBarViewModel(bookmarkManager: createMockBookmarksManager(), tabCollectionViewModel: .mock())
-        let collectionViewItem = BookmarksBarCollectionViewItem()
-        let delegateMock = BookmarksBarViewModelDelegateMock()
-        sut.delegate = delegateMock
-        XCTAssertFalse(delegateMock.didCallViewModelReceivedAction)
-        XCTAssertNil(delegateMock.capturedAction)
-        XCTAssertNil(delegateMock.capturedItem)
-
-        // WHEN
-        sut.bookmarksBarCollectionViewItemMoveToEndAction(collectionViewItem)
-
-        // THEN
-        XCTAssertTrue(delegateMock.didCallViewModelReceivedAction)
-        XCTAssertEqual(delegateMock.capturedAction, .moveToEnd)
-        XCTAssertEqual(delegateMock.capturedItem, collectionViewItem)
-    }
-
-    func testWhenItemFiresCopyBookmarkURLActionThenDelegateReceivesCopyBookmarkURLAction() {
-        // GIVEN
-        let sut = BookmarksBarViewModel(bookmarkManager: createMockBookmarksManager(), tabCollectionViewModel: .mock())
-        let collectionViewItem = BookmarksBarCollectionViewItem()
-        let delegateMock = BookmarksBarViewModelDelegateMock()
-        sut.delegate = delegateMock
-        XCTAssertFalse(delegateMock.didCallViewModelReceivedAction)
-        XCTAssertNil(delegateMock.capturedAction)
-        XCTAssertNil(delegateMock.capturedItem)
-
-        // WHEN
-        sut.bookmarksBarCollectionViewItemCopyBookmarkURLAction(collectionViewItem)
-
-        // THEN
-        XCTAssertTrue(delegateMock.didCallViewModelReceivedAction)
-        XCTAssertEqual(delegateMock.capturedAction, .copyURL)
-        XCTAssertEqual(delegateMock.capturedItem, collectionViewItem)
-    }
-
-    func testWhenItemFiresDeleteEntityActionThenDelegateReceivesDeleteEntityAction() {
-        // GIVEN
-        let sut = BookmarksBarViewModel(bookmarkManager: createMockBookmarksManager(), tabCollectionViewModel: .mock())
-        let collectionViewItem = BookmarksBarCollectionViewItem()
-        let delegateMock = BookmarksBarViewModelDelegateMock()
-        sut.delegate = delegateMock
-        XCTAssertFalse(delegateMock.didCallViewModelReceivedAction)
-        XCTAssertNil(delegateMock.capturedAction)
-        XCTAssertNil(delegateMock.capturedItem)
-
-        // WHEN
-        sut.bookmarksBarCollectionViewItemDeleteEntityAction(collectionViewItem)
-
-        // THEN
-        XCTAssertTrue(delegateMock.didCallViewModelReceivedAction)
-        XCTAssertEqual(delegateMock.capturedAction, .deleteEntity)
-        XCTAssertEqual(delegateMock.capturedItem, collectionViewItem)
-    }
-
-    func testWhenItemFiresAddEntityActionThenDelegateReceivesAddEntityAction() {
-        // GIVEN
-        let sut = BookmarksBarViewModel(bookmarkManager: createMockBookmarksManager(), tabCollectionViewModel: .mock())
-        let collectionViewItem = BookmarksBarCollectionViewItem()
-        let delegateMock = BookmarksBarViewModelDelegateMock()
-        sut.delegate = delegateMock
-        XCTAssertFalse(delegateMock.didCallViewModelReceivedAction)
-        XCTAssertNil(delegateMock.capturedAction)
-        XCTAssertNil(delegateMock.capturedItem)
-
-        // WHEN
-        sut.bookmarksBarCollectionViewItemAddEntityAction(collectionViewItem)
-
-        // THEN
-        XCTAssertTrue(delegateMock.didCallViewModelReceivedAction)
-        XCTAssertEqual(delegateMock.capturedAction, .addFolder)
-        XCTAssertEqual(delegateMock.capturedItem, collectionViewItem)
-    }
-
-    func testWhenItemFiresManageBookmarksActionThenDelegateReceivesManageBookmarksAction() {
-        // GIVEN
-        let sut = BookmarksBarViewModel(bookmarkManager: createMockBookmarksManager(), tabCollectionViewModel: .mock())
-        let collectionViewItem = BookmarksBarCollectionViewItem()
-        let delegateMock = BookmarksBarViewModelDelegateMock()
-        sut.delegate = delegateMock
-        XCTAssertFalse(delegateMock.didCallViewModelReceivedAction)
-        XCTAssertNil(delegateMock.capturedAction)
-        XCTAssertNil(delegateMock.capturedItem)
-
-        // WHEN
-        sut.bookmarksBarCollectionViewItemManageBookmarksAction(collectionViewItem)
-
-        // THEN
-        XCTAssertTrue(delegateMock.didCallViewModelReceivedAction)
-        XCTAssertEqual(delegateMock.capturedAction, .manageBookmarks)
-        XCTAssertEqual(delegateMock.capturedItem, collectionViewItem)
-    }
-
+    @MainActor
     private func createMockBookmarksManager(mockBookmarkStore: BookmarkStoreMock = BookmarkStoreMock()) -> BookmarkManager {
         let mockFaviconManager = FaviconManagerMock()
         return LocalBookmarkManager(bookmarkStore: mockBookmarkStore, faviconManagement: mockFaviconManager)
@@ -304,13 +137,12 @@ fileprivate extension TabCollectionViewModel {
 // MARK: - BookmarksBarViewModelDelegateMock
 
 final class BookmarksBarViewModelDelegateMock: BookmarksBarViewModelDelegate {
-    private(set) var didCallViewModelReceivedAction = false
-    private(set) var capturedAction: BookmarksBarViewModel.BookmarksBarItemAction?
+
+    private(set) var didCallClickAction = false
     private(set) var capturedItem: BookmarksBarCollectionViewItem?
 
-    func bookmarksBarViewModelReceived(action: BookmarksBarViewModel.BookmarksBarItemAction, for item: BookmarksBarCollectionViewItem) {
-        didCallViewModelReceivedAction = true
-        capturedAction = action
+    func didClick(_ item: DuckDuckGo_Privacy_Browser.BookmarksBarCollectionViewItem) {
+        didCallClickAction = true
         capturedItem = item
     }
 
@@ -319,5 +151,8 @@ final class BookmarksBarViewModelDelegateMock: BookmarksBarViewModelDelegate {
     }
 
     func bookmarksBarViewModelReloadedData() {}
+    func mouseDidHover(over item: Any) {}
+    func dragging(over item: BookmarksBarCollectionViewItem?, updatedWith info: (any NSDraggingInfo)?) {}
+    func showDialog(_ dialog: any DuckDuckGo_Privacy_Browser.ModalView) {}
 
 }

@@ -226,7 +226,7 @@ final class PermissionModel {
     // MARK: - WebView delegated methods
 
     // Called before requestMediaCapturePermissionFor: to validate System Permissions
-    func checkUserMediaPermission(for url: URL, mainFrameURL: URL, decisionHandler: @escaping (String, Bool) -> Void) {
+    func checkUserMediaPermission(for url: URL?, mainFrameURL: URL?, decisionHandler: @escaping (String, Bool) -> Void) {
         // If media capture is denied in the System Preferences, reflect it in the current permissions
         // AVCaptureDevice.authorizationStatus(for:mediaType) is swizzled to determine requested media type
         // otherwise WebView won't call any other delegate methods if System Permission is denied

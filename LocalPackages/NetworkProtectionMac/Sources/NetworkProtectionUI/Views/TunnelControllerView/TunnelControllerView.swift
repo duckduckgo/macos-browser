@@ -32,6 +32,10 @@ fileprivate extension Font {
             .system(size: 13, weight: .regular, design: .default)
         }
 
+        static var currentSite: Font {
+            .system(size: 13, weight: .regular, design: .default)
+        }
+
         static var location: Font {
             .system(size: 13, weight: .regular, design: .default)
         }
@@ -102,6 +106,10 @@ fileprivate extension View {
             .foregroundColor(Color(.defaultText))
     }
 
+    func applyCurrentSiteAttributes() -> some View {
+        font(.NetworkProtection.currentSite)
+    }
+
     func applyLocationAttributes() -> some View {
         font(.NetworkProtection.location)
     }
@@ -168,6 +176,9 @@ public struct TunnelControllerView: View {
                 .disabled(on: !isEnabled)
 
             featureToggleRow()
+
+            SiteTroubleshootingView()
+                .padding(.top, 5)
 
             Divider()
                 .padding(EdgeInsets(top: 5, leading: 9, bottom: 5, trailing: 9))

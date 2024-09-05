@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if DBP
-
 import Foundation
 import DataBrokerProtection
 import AppKit
@@ -52,7 +50,8 @@ final class DBPHomeViewController: NSViewController {
                                                   credentialsSaving: false,
                                                   passwordGeneration: false,
                                                   inlineIconCredentials: false,
-                                                  thirdPartyCredentialsProvider: false)
+                                                  thirdPartyCredentialsProvider: false,
+                                                  unknownUsernameCategorization: false)
 
         let isGPCEnabled = WebTrackingProtectionPreferences.shared.isGPCEnabled
         let sessionKey = UUID().uuidString
@@ -90,16 +89,6 @@ final class DBPHomeViewController: NSViewController {
 
         setupUI()
         setupObserver()
-
-        do {
-            if try dataBrokerProtectionManager.dataManager.fetchProfile() != nil {
-                let dbpDateStore = DefaultWaitlistActivationDateStore(source: .dbp)
-                dbpDateStore.updateLastActiveDate()
-            }
-        } catch {
-            os_log("DBPHomeViewController error: viewDidLoad, error: %{public}@", log: .error, error.localizedDescription)
-            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DBPHomeViewController.viewDidLoad"))
-        }
     }
 
     override func viewDidAppear() {
@@ -126,22 +115,6 @@ final class DBPHomeViewController: NSViewController {
         observer = NotificationCenter.default.addObserver(forName: NSApplication.didBecomeActiveNotification, object: nil, queue: nil) { [weak self] _ in
             self?.setupUI()
         }
-    }
-
-    private func presentInviteCodeFlow() {
-        let viewModel = DataBrokerProtectionInviteDialogsViewModel(delegate: self)
-
-        let view = DataBrokerProtectionInviteDialogsView(viewModel: viewModel)
-        let hostingVC = NSHostingController(rootView: view)
-        presentedWindowController = hostingVC.wrappedInWindowController()
-
-        guard let newWindow = presentedWindowController?.window,
-              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
-        else {
-            assertionFailure("Failed to present \(hostingVC)")
-            return
-        }
-        parentWindowController.window?.beginSheet(newWindow)
     }
 
     private func setupUIWithCurrentStatus() {
@@ -252,5 +225,3 @@ extension DBPHomeViewController {
         }
     }
 }
-
-#endif

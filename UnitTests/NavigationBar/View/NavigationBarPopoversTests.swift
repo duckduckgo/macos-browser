@@ -27,6 +27,7 @@ final class NavigationBarPopoversTests: XCTestCase {
     private var sut: NavigationBarPopovers!
     private var autofillPopoverPresenter: MockAutofillPopoverPresenter!
 
+    @MainActor
     override func setUpWithError() throws {
         autofillPopoverPresenter = MockAutofillPopoverPresenter()
             sut = NavigationBarPopovers(networkProtectionPopoverManager: NetPPopoverManagerMock(), autofillPopoverPresenter: autofillPopoverPresenter)

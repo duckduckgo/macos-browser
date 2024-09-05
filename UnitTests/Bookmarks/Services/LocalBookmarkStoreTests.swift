@@ -30,13 +30,13 @@ extension LocalBookmarkStore {
     }
 }
 
-@MainActor
 final class LocalBookmarkStoreTests: XCTestCase {
 
     // MARK: Save/Delete
 
     let container = CoreData.bookmarkContainer()
 
+    @MainActor
     override func setUp() {
         super.setUp()
 
@@ -48,6 +48,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         }
     }
 
+    @MainActor
     func testWhenBookmarkIsSaved_ThenItMustBeLoadedFromStore() {
 
         let context = container.viewContext
@@ -78,6 +79,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         waitForExpectations(timeout: 2, handler: nil)
     }
 
+    @MainActor
     func testWhenBookmarkIsRemoved_ThenItShouldntBeLoadedFromStore() {
         let context = container.viewContext
 
@@ -113,6 +115,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         waitForExpectations(timeout: 2, handler: nil)
     }
 
+    @MainActor
     func testWhenBookmarkIsUpdated_ThenTheUpdatedVersionIsLoadedFromTheStore() {
         let context = container.viewContext
 
@@ -145,6 +148,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         waitForExpectations(timeout: 2, handler: nil)
     }
 
+    @MainActor
     func testWhenFolderIsAdded_AndItHasNoParentFolder_ThenItMustBeLoadedFromTheStore() {
         let context = container.viewContext
 
@@ -174,6 +178,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         waitForExpectations(timeout: 2, handler: nil)
     }
 
+    @MainActor
     func testWhenFolderIsAdded_AndItHasParentFolder_ThenItMustBeLoadedFromTheStore() {
         let context = container.viewContext
         let bookmarkStore = LocalBookmarkStore(context: context)
@@ -218,6 +223,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         waitForExpectations(timeout: 3, handler: nil)
     }
 
+    @MainActor
     func testWhenBookmarkIsAdded_AndFolderHasBeenProvided_ThenBookmarkIsSavedToParentFolder() {
         let context = container.viewContext
         let bookmarkStore = LocalBookmarkStore(context: context)
@@ -392,6 +398,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
     // MARK: Moving Bookmarks/Folders
 
+    @MainActor
     func testWhenMovingBookmarkWithinParentCollection_AndIndexIsValid_ThenBookmarkIsMoved() async {
         let context = container.viewContext
         let bookmarkStore = LocalBookmarkStore(context: context)
@@ -442,6 +449,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         XCTAssertEqual(expectedBookmarkUUIDs, updatedFetchedBookmarkUUIDs)
     }
 
+    @MainActor
     func testWhenMovingBookmarkWithinParentCollection_AndThereAreStubs_ThenIndexIsCalculatedAndBookmarkIsMoved() async {
         let context = container.viewContext
         let bookmarkStore = LocalBookmarkStore(context: context)
@@ -558,6 +566,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         XCTAssertEqual(result, [bookmark1MO.title, bookmark4MO.title, bookmark2MO.title, bookmark3MO.title])
     }
 
+    @MainActor
     func testWhenMovingBookmarkWithinParentCollection_AndIndexIsOutOfBounds_ThenBookmarkIsAppended() async {
         let context = container.viewContext
         let bookmarkStore = LocalBookmarkStore(context: context)
@@ -608,6 +617,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         XCTAssertEqual(expectedBookmarkUUIDs, updatedFetchedBookmarkUUIDs)
     }
 
+    @MainActor
     func testWhenMovingMultipleBookmarksWithinParentCollection_AndIndexIsValid_ThenBookmarksAreMoved() async {
         let context = container.viewContext
         let bookmarkStore = LocalBookmarkStore(context: context)
@@ -658,6 +668,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         XCTAssertEqual(expectedBookmarkUUIDs, updatedFetchedBookmarkUUIDs)
     }
 
+    @MainActor
     func testWhenMovingBookmarkToRootFolder_AndIndexIsValid_ThenBookmarkIsMoved() async {
         guard let testState = await createInitialEntityMovementTestState() else {
             XCTFail("Failed to configure test state")
@@ -691,6 +702,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         XCTAssertEqual(expectedBookmarkUUIDs, updatedFetchedBookmarkUUIDs)
     }
 
+    @MainActor
     func testWhenMovingBookmarkToRootFolder_AndIndexIsOutOfBounds_ThenBookmarkIsAppended() async {
         guard let testState = await createInitialEntityMovementTestState() else {
             XCTFail("Failed to configure test state")
@@ -715,6 +727,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         XCTAssertEqual(topLevelEntityIDs, [testState.initialParentFolder.id, testState.bookmark3.id])
     }
 
+    @MainActor
     func testWhenUpdatingBookmarkFolder_ThenBookmarkFolderTitleIsUpdated() async throws {
         let context = container.viewContext
         let bookmarkStore = LocalBookmarkStore(context: context)
@@ -745,6 +758,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         XCTAssertEqual(newFolders.first, folderToMove)
     }
 
+    @MainActor
     func testWhenUpdatingAndMovingBookmarkFolder_ThenBookmarkFolderIsMovedAndTitleUpdated() async throws {
         let context = container.viewContext
         let bookmarkStore = LocalBookmarkStore(context: context)
@@ -785,6 +799,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         XCTAssertEqual(newFolders[1], folder3)
     }
 
+    @MainActor
     func testWhenMovingBookmarkFolderToSubfolder_ThenBookmarkFolderLocationIsUpdated() async throws {
         let context = container.viewContext
         let bookmarkStore = LocalBookmarkStore(context: context)
@@ -820,6 +835,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         XCTAssertEqual(newFolders.first?.children, [expectedChildFolderAfterMove])
     }
 
+    @MainActor
     func testWhenMovingBookmarkFolderToRootFolder_ThenBookmarkFolderLocationIsUpdated() async throws {
         let context = container.viewContext
         let bookmarkStore = LocalBookmarkStore(context: context)
@@ -859,6 +875,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
     // MARK: Favorites
 
+    @MainActor
     func testThatTopLevelEntitiesDoNotContainFavoritesFolder() async {
         let context = container.viewContext
         let bookmarkStore = LocalBookmarkStore(context: context)
@@ -882,6 +899,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         XCTAssertFalse(topLevelEntities.map(\.id).contains(FavoritesFolderID.unified.rawValue))
     }
 
+    @MainActor
     func testWhenBookmarkIsMarkedAsFavorite_ThenItDoesNotChangeParentFolder() async {
         let context = container.viewContext
         let bookmarkStore = LocalBookmarkStore(context: context)
@@ -940,6 +958,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         XCTAssertTrue(updatedBookmark.isFavorite)
     }
 
+    @MainActor
     func testWhenMovingFavorite_AndIndexIsValid_ThenFavoriteIsMoved() async {
         let context = container.viewContext
         let bookmarkStore = LocalBookmarkStore(context: context)
@@ -988,6 +1007,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         XCTAssertEqual(expectedBookmarkUUIDs, updatedFetchedBookmarkUUIDs)
     }
 
+    @MainActor
     func testWhenMovingFavorite_AndThereAreStubs_ThenIndexIsCalculatedAndBookmarkIsMoved() async {
         let context = container.viewContext
         let bookmarkStore = LocalBookmarkStore(context: context)
@@ -1081,6 +1101,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         XCTAssertEqual(result, [bookmark1MO.title, bookmark2MO.title, bookmark3MO.title])
     }
 
+    @MainActor
     func testWhenMovingFavorite_AndIndexIsOutOfBounds_ThenFavoriteIsAppended() async {
         let context = container.viewContext
         let bookmarkStore = LocalBookmarkStore(context: context)
@@ -1129,6 +1150,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         XCTAssertEqual(expectedBookmarkUUIDs, updatedFetchedBookmarkUUIDs)
     }
 
+    @MainActor
     func testWhenMovingMultipleFavorites_AndIndexIsValid_ThenFavoritesAreMoved() async {
         let context = container.viewContext
         let bookmarkStore = LocalBookmarkStore(context: context)
@@ -1185,6 +1207,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let initialParentFolder: BookmarkFolder
     }
 
+    @MainActor
     private func createInitialEntityMovementTestState() async -> EntityMovementTestState? {
         let context = container.viewContext
         let bookmarkStore = LocalBookmarkStore(context: context)
@@ -1411,6 +1434,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
     // MARK: - Retrieve Bookmark Folder
 
+    @MainActor
     func testWhenFetchingBookmarkFolderWithId_AndFolderExist_ThenFolderIsReturned() async {
         // GIVEN
         let context = container.viewContext
@@ -1426,6 +1450,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         XCTAssertEqual(result, folder)
     }
 
+    @MainActor
     func testWhenFetchingBookmarkFolderWithId_AndFolderDoesNotExist_ThenNilIsReturned() {
         // GIVEN
         let context = container.viewContext
@@ -1439,6 +1464,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         XCTAssertNil(result)
     }
 
+    @MainActor
     func testWhenFetchingBookmarkFolderWithId_AndFolderHasBeenMoved_ThenFolderIsStillReturned() async {
         // GIVEN
         let context = container.viewContext
@@ -1468,6 +1494,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
     // MARK: Import
 
+    @MainActor
     func testWhenBookmarksAreImported_AndNoDuplicatesExist_ThenBookmarksAreImported() {
         let context = container.viewContext
         let bookmarkStore = LocalBookmarkStore(context: context)
@@ -1498,6 +1525,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         waitForExpectations(timeout: 3, handler: nil)
     }
 
+    @MainActor
     func testWhenBookmarksAreImported_AndDuplicatesExist_ThenBookmarksAreStillImported() async {
         let context = container.viewContext
         let bookmarkStore = LocalBookmarkStore(context: context)
@@ -1553,6 +1581,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         await validateSubsequentImport(for: .duckduckgoWebKit)
     }
 
+    @MainActor
     private func validateInitialImport(for source: BookmarkImportSource) async {
         let context = container.viewContext
         let bookmarkStore = LocalBookmarkStore(context: context)
@@ -1591,6 +1620,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         }
     }
 
+    @MainActor
     private func validateSubsequentImport(for source: BookmarkImportSource) async {
         let context = container.viewContext
         let bookmarkStore = LocalBookmarkStore(context: context)

@@ -21,6 +21,17 @@ import Combine
 
 extension NSEvent {
 
+    struct EventMonitorType: OptionSet {
+        let rawValue: UInt8
+
+        static let local  = EventMonitorType(rawValue: 1 << 0)
+        static let global = EventMonitorType(rawValue: 1 << 1)
+    }
+
+    var deviceIndependentFlags: NSEvent.ModifierFlags {
+        modifierFlags.intersection(.deviceIndependentFlagsMask)
+    }
+
     /// is NSEvent representing right mouse down event or cntrl+mouse down event
     static func isContextClick(_ event: NSEvent) -> Bool {
         let isControlClick = event.type == .leftMouseDown && (event.modifierFlags.rawValue & NSEvent.ModifierFlags.control.rawValue != 0)
@@ -48,6 +59,28 @@ extension NSEvent {
                 NSEvent.removeMonitor(monitor)
             }
         }
+    }
+
+    static func publisher(forEvents monitorType: EventMonitorType, matching mask: NSEvent.EventTypeMask) -> AnyPublisher<NSEvent, Never> {
+        let subject = PassthroughSubject<NSEvent, Never>()
+        var cancellables = Set<AnyCancellable>()
+        if monitorType.contains(.local) {
+            addLocalCancellableMonitor(forEventsMatching: mask) { event in
+                subject.send(event)
+                return event
+            }.store(in: &cancellables)
+        }
+        if monitorType.contains(.global) {
+            addGlobalCancellableMonitor(forEventsMatching: mask) { event in
+                subject.send(event)
+            }.store(in: &cancellables)
+        }
+
+        return subject
+            .handleEvents(receiveCancel: {
+                cancellables.forEach { $0.cancel() }
+            })
+            .eraseToAnyPublisher()
     }
 
 }

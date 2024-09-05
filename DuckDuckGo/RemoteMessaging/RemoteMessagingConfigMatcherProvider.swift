@@ -124,6 +124,7 @@ final class RemoteMessagingConfigMatcherProvider: RemoteMessagingConfigMatcherPr
         }
 
         let dismissedMessageIds = store.fetchDismissedRemoteMessageIDs()
+        let shownMessageIds = store.fetchShownRemoteMessageIDs()
 
 #if APPSTORE
         let isInstalledMacAppStore = true
@@ -132,6 +133,8 @@ final class RemoteMessagingConfigMatcherProvider: RemoteMessagingConfigMatcherPr
 #endif
 
         let duckPlayerPreferencesPersistor = duckPlayerPreferencesPersistor()
+
+        let deprecatedRemoteMessageStorage = DefaultSurveyRemoteMessagingStorage.surveys()
 
         return RemoteMessagingConfigMatcher(
             appAttributeMatcher: AppAttributeMatcher(statisticsStore: statisticsStore,
@@ -153,10 +156,13 @@ final class RemoteMessagingConfigMatcherProvider: RemoteMessagingConfigMatcherPr
                                                        isPrivacyProSubscriptionExpiring: isPrivacyProSubscriptionExpiring,
                                                        isPrivacyProSubscriptionExpired: isPrivacyProSubscriptionExpired,
                                                        dismissedMessageIds: dismissedMessageIds,
+                                                       shownMessageIds: shownMessageIds,
                                                        pinnedTabsCount: pinnedTabsManager.tabCollection.tabs.count,
                                                        hasCustomHomePage: startupPreferencesPersistor().launchToCustomHomePage,
                                                        isDuckPlayerOnboarded: duckPlayerPreferencesPersistor.youtubeOverlayAnyButtonPressed,
-                                                       isDuckPlayerEnabled: duckPlayerPreferencesPersistor.duckPlayerModeBool != false
+                                                       isDuckPlayerEnabled: duckPlayerPreferencesPersistor.duckPlayerModeBool != false,
+                                                       isCurrentFreemiumPIRUser: false,
+                                                       dismissedDeprecatedMacRemoteMessageIds: deprecatedRemoteMessageStorage.dismissedMessageIDs()
                                                       ),
             percentileStore: RemoteMessagingPercentileUserDefaultsStore(keyValueStore: UserDefaults.standard),
             surveyActionMapper: surveyActionMapper,

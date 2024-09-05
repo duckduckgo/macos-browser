@@ -51,6 +51,7 @@ struct AddEditBookmarkDialogView: ModalView {
             otherActionTitle: viewModel.bookmarkModel.cancelActionTitle,
             isOtherActionDisabled: viewModel.bookmarkModel.isOtherActionDisabled,
             otherAction: viewModel.bookmarkModel.cancel,
+            isOtherActionTriggeredByEscKey: true,
             defaultActionTitle: viewModel.bookmarkModel.defaultActionTitle,
             isDefaultActionDisabled: viewModel.bookmarkModel.isDefaultActionDisabled,
             defaultAction: viewModel.bookmarkModel.addOrSave

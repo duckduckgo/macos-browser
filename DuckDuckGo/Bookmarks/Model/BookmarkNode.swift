@@ -39,7 +39,7 @@ final class BookmarkNode: Hashable {
     var childNodes = [BookmarkNode]()
 
     var isRoot: Bool {
-        return parent == nil
+        return representedObject is RootNode
     }
 
     var numberOfChildNodes: Int {
@@ -79,6 +79,17 @@ final class BookmarkNode: Hashable {
         self.uniqueID = uniqueId
     }
 
+    var canBeHighlighted: Bool {
+        switch representedObject {
+        case is SpacerNode:
+            return false
+        case let menuItem as MenuItemNode:
+            return menuItem.isEnabled
+        default:
+            return true
+        }
+    }
+
     /// Creates an instance of a bookmark node.
     /// - Parameters:
     ///   - representedObject: The represented object contained in the node.
@@ -100,6 +111,17 @@ final class BookmarkNode: Hashable {
         }
 
         if self.representedObject === otherRepresentedObject {
+            return true
+        }
+
+        return false
+    }
+
+    /// Checks if two nodes represent the same base bookmark entity based only on their ID
+    func representedObjectHasSameId(_ otherRepresentedObject: AnyObject) -> Bool {
+        if let entity = otherRepresentedObject as? BaseBookmarkEntity,
+           let nodeEntity = self.representedObject as? BaseBookmarkEntity,
+           entity.id == nodeEntity.id {
             return true
         }
 
@@ -133,11 +155,7 @@ final class BookmarkNode: Hashable {
     }
 
     func childNodeRepresenting(object: AnyObject) -> BookmarkNode? {
-        return findNodeRepresenting(object: object, recursively: false)
-    }
-
-    func descendantNodeRepresenting(object: AnyObject) -> BookmarkNode? {
-        return findNodeRepresenting(object: object, recursively: true)
+        return childNodes.first { $0.representedObjectEquals(object) }
     }
 
     func isAncestor(of node: BookmarkNode) -> Bool {
@@ -156,20 +174,6 @@ final class BookmarkNode: Hashable {
 
             currentNode = parent
         }
-    }
-
-    func findNodeRepresenting(object: AnyObject, recursively: Bool = false) -> BookmarkNode? {
-        for childNode in childNodes {
-            if childNode.representedObjectEquals(object) {
-                return childNode
-            }
-
-            if recursively, let foundNode = childNode.descendantNodeRepresenting(object: object) {
-                return foundNode
-            }
-        }
-
-        return nil
     }
 
     // MARK: - Hashable

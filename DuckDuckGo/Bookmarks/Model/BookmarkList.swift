@@ -20,6 +20,7 @@ import Foundation
 import BrowserServicesKit
 import Common
 import Suggestions
+import os.log
 
 struct BookmarkList {
 
@@ -79,7 +80,7 @@ struct BookmarkList {
 
     mutating func insert(_ bookmark: Bookmark) {
         guard itemsDict[bookmark.url] == nil else {
-            os_log("BookmarkList: Adding failed, the item already is in the bookmark list", type: .error)
+            Logger.bookmarks.error("BookmarkList: Adding failed, the item already is in the bookmark list")
             return
         }
 
@@ -108,7 +109,7 @@ struct BookmarkList {
         guard !newBookmark.isFolder else { return }
 
         guard itemsDict[newBookmark.url] != nil else {
-            os_log("BookmarkList: Update failed, no such item in bookmark list")
+            Logger.bookmarks.debug("BookmarkList: Update failed, no such item in bookmark list")
             return
         }
 
@@ -136,7 +137,7 @@ struct BookmarkList {
         guard !bookmark.isFolder else { return nil }
 
         guard itemsDict[newURL] == nil else {
-            os_log("BookmarkList: Update failed, new url already in bookmark list")
+            Logger.bookmarks.debug("BookmarkList: Update failed, new url already in bookmark list")
             return nil
         }
 
@@ -154,7 +155,7 @@ private extension BookmarkList {
 
     mutating private func updateBookmarkList(newBookmark: Bookmark, oldBookmark bookmark: Bookmark) -> Bookmark? {
         guard itemsDict[bookmark.url] != nil, let index = allBookmarkURLsOrdered.firstIndex(of: IdentifiableBookmark(from: bookmark)) else {
-            os_log("BookmarkList: Update failed, no such item in bookmark list")
+            Logger.bookmarks.debug("BookmarkList: Update failed, no such item in bookmark list")
             return nil
         }
 

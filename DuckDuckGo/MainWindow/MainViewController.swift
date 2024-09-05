@@ -22,6 +22,7 @@ import Combine
 import Common
 import NetworkProtection
 import NetworkProtectionIPC
+import os.log
 
 final class MainViewController: NSViewController {
     private lazy var mainView = MainView(frame: NSRect(x: 0, y: 0, width: 600, height: 660))
@@ -198,7 +199,6 @@ final class MainViewController: NSViewController {
         updateReloadMenuItem()
         updateStopMenuItem()
         browserTabViewController.windowDidBecomeKey()
-        refreshSurveyMessages()
     }
 
     func windowDidResignKey() {
@@ -217,16 +217,6 @@ final class MainViewController: NSViewController {
         // This won't work until the bookmarks bar is actually visible which it isn't until the next ui cycle
         DispatchQueue.main.async {
             self.bookmarksBarViewController.showBookmarksBarPrompt()
-        }
-    }
-
-    private lazy var surveyMessaging: DefaultSurveyRemoteMessaging = {
-        return DefaultSurveyRemoteMessaging(subscriptionManager: Application.appDelegate.subscriptionManager)
-    }()
-
-    func refreshSurveyMessages() {
-        Task {
-            await surveyMessaging.fetchRemoteMessages()
         }
     }
 
@@ -396,7 +386,7 @@ final class MainViewController: NSViewController {
     private func updateFindInPage() {
         guard let model = tabCollectionViewModel.selectedTabViewModel?.findInPage else {
             findInPageViewController.makeMeFirstResponder()
-            os_log("MainViewController: Failed to get find in page model", type: .error)
+            Logger.general.error("MainViewController: Failed to get find in page model")
             return
         }
 
@@ -410,7 +400,7 @@ final class MainViewController: NSViewController {
     private func updateBackMenuItem() {
         guard self.view.window?.isMainWindow == true else { return }
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("MainViewController: No tab view model selected", type: .error)
+            Logger.general.error("MainViewController: No tab view model selected")
             return
         }
         NSApp.mainMenuTyped.backMenuItem.isEnabled = selectedTabViewModel.canGoBack
@@ -419,7 +409,7 @@ final class MainViewController: NSViewController {
     private func updateForwardMenuItem() {
         guard self.view.window?.isMainWindow == true else { return }
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("MainViewController: No tab view model selected", type: .error)
+            Logger.general.error("MainViewController: No tab view model selected")
             return
         }
         NSApp.mainMenuTyped.forwardMenuItem.isEnabled = selectedTabViewModel.canGoForward
@@ -428,7 +418,7 @@ final class MainViewController: NSViewController {
     private func updateReloadMenuItem() {
         guard self.view.window?.isMainWindow == true else { return }
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("MainViewController: No tab view model selected", type: .error)
+            Logger.general.error("MainViewController: No tab view model selected")
             return
         }
         NSApp.mainMenuTyped.reloadMenuItem.isEnabled = selectedTabViewModel.canReload
@@ -437,7 +427,7 @@ final class MainViewController: NSViewController {
     private func updateStopMenuItem() {
         guard self.view.window?.isMainWindow == true else { return }
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("MainViewController: No tab view model selected", type: .error)
+            Logger.general.error("MainViewController: No tab view model selected")
             return
         }
         NSApp.mainMenuTyped.stopMenuItem.isEnabled = selectedTabViewModel.isLoading

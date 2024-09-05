@@ -29,8 +29,13 @@ final class ReleaseNotesUserScript: NSObject, Subfeature {
     var messageOriginPolicy: MessageOriginPolicy = .only(rules: [.exact(hostname: "release-notes")])
     let featureName: String = "release-notes"
     weak var broker: UserScriptMessageBroker?
-    weak var webView: WKWebView?
+    weak var webView: WKWebView? {
+        didSet {
+            onUpdate()
+        }
+    }
     private var cancellables = Set<AnyCancellable>()
+    private var isInitialized = false
 
     // MARK: - MessageNames
     enum MessageNames: String, CaseIterable {
@@ -62,8 +67,8 @@ final class ReleaseNotesUserScript: NSObject, Subfeature {
     }
 
     public func onUpdate() {
-        guard let webView = webView else {
-            return assertionFailure("Could not access webView")
+        guard NSApp.runType != .uiTests, isInitialized, let webView = webView else {
+            return
         }
 
         guard webView.url?.isReleaseNotesScheme ?? false else {
@@ -84,8 +89,11 @@ final class ReleaseNotesUserScript: NSObject, Subfeature {
 }
 
 extension ReleaseNotesUserScript {
+
     @MainActor
     private func initialSetup(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        isInitialized = true
+
         // Initialize the page right after sending the initial setup result
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
             self?.onUpdate()
@@ -96,6 +104,7 @@ extension ReleaseNotesUserScript {
 #else
         let env = "production"
 #endif
+
         return InitialSetupResult(env: env, locale: Locale.current.identifier)
     }
 

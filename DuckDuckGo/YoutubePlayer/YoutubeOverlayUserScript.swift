@@ -21,6 +21,7 @@ import WebKit
 import Common
 import UserScript
 import PixelKit
+import Combine
 
 protocol YoutubeOverlayUserScriptDelegate: AnyObject {
     func youtubeOverlayUserScriptDidRequestDuckPlayer(with url: URL, in webView: WKWebView)
@@ -84,7 +85,7 @@ final class YoutubeOverlayUserScript: NSObject, Subfeature {
         case .getUserValues:
             return DuckPlayer.shared.handleGetUserValues
         case .initialSetup:
-            return handleInitialSetup
+            return DuckPlayer.shared.initialOverlaySetup(with: webView)
         case .openDuckPlayer:
             return handleOpenDuckPlayer
         case .sendDuckPlayerPixel:
@@ -95,11 +96,20 @@ final class YoutubeOverlayUserScript: NSObject, Subfeature {
         }
     }
 
+    // User values are user controled values
     public func userValuesUpdated(userValues: UserValues) {
         guard let webView = webView else {
             return assertionFailure("Could not access webView")
         }
         broker?.push(method: "onUserValuesChanged", params: userValues, for: self, into: webView)
+    }
+
+    // Temporary changes to user settings
+    public func userUISettingsUpdated(uiValues: UIUserValues) {
+        guard let webView = webView else {
+            return assertionFailure("Could not access webView")
+        }
+        broker?.push(method: "onUIValuesChanged", params: uiValues, for: self, into: webView)
     }
 
     // MARK: - Private Methods
@@ -117,21 +127,6 @@ final class YoutubeOverlayUserScript: NSObject, Subfeature {
         }
         self.delegate?.youtubeOverlayUserScriptDidRequestDuckPlayer(with: url, in: webView)
         return nil
-    }
-
-    private func handleInitialSetup(params: Any, message: UserScriptMessage) -> Encodable? {
-        encodeInitialSetup()
-    }
-
-    private func encodeInitialSetup() -> OverlaysInitialSettings {
-        let userValues = UserValues(
-            duckPlayerMode: duckPlayerPreferences.duckPlayerMode,
-            overlayInteracted: duckPlayerPreferences.youtubeOverlayInteracted
-        )
-
-        return OverlaysInitialSettings(
-            userValues: userValues
-        )
     }
 
     // MARK: - UserValuesNotification

@@ -36,8 +36,7 @@ struct DefaultRemoteMessagingStoreProvider: RemoteMessagingStoreProviding {
             database: database,
             notificationCenter: .default,
             errorEvents: RemoteMessagingStoreErrorHandling(),
-            remoteMessagingAvailabilityProvider: availabilityProvider,
-            log: .remoteMessaging
+            remoteMessagingAvailabilityProvider: availabilityProvider
         )
     }
 }
@@ -55,6 +54,7 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
         }()
     }
 
+    let database: CoreDataDatabase
     let endpoint: URL = Constants.endpoint
     let configFetcher: RemoteMessagingConfigFetching
     let configMatcherProvider: RemoteMessagingConfigMatcherProviding
@@ -97,7 +97,6 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
             configurationFetcher: ConfigurationFetcher(
                 store: configurationStore,
                 urlSession: .session(),
-                log: .remoteMessaging,
                 eventMapping: ConfigurationManager.configurationDebugEvents
             ),
             configurationStore: ConfigurationStore.shared
@@ -137,6 +136,17 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
             .sink { [weak self] in
                 self?.refreshRemoteMessages()
             }
+    }
+
+    /// It's public in order to allow refreshing on demand via Debug menu. Otherwise it shouldn't be called from outside.
+    func refreshRemoteMessages() {
+        guard let store else {
+            return
+        }
+
+        Task {
+            try? await fetchAndProcess(using: store)
+        }
     }
 
     private func stopRefreshingRemoteMessages() {
@@ -183,19 +193,9 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
         isRemoteMessagingDatabaseLoaded = true
     }
 
-    private let database: CoreDataDatabase
-    private var isRemoteMessagingDatabaseLoaded = false
+    // Publicly accessible for use in RemoteMessagingDebugMenu
+    private(set) var isRemoteMessagingDatabaseLoaded = false
     private let remoteMessagingStoreProvider: RemoteMessagingStoreProviding
     private var scheduledRefreshCancellable: AnyCancellable?
     private var featureFlagCancellable: AnyCancellable?
-
-    private func refreshRemoteMessages() {
-        guard let store else {
-            return
-        }
-
-        Task {
-            try? await fetchAndProcess(using: store)
-        }
-    }
 }

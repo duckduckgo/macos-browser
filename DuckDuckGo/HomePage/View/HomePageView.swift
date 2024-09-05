@@ -117,7 +117,10 @@ extension HomePage.Views {
                         activeRemoteMessageModel.dismissRemoteMessage(with: action)
                     },
                     onDidAppear: {
-                        activeRemoteMessageModel.markRemoteMessageAsShown()
+                        activeRemoteMessageModel.isViewOnScreen = true
+                    },
+                    onDidDisappear: {
+                        activeRemoteMessageModel.isViewOnScreen = false
                     },
                     openURLHandler: { url in
                         WindowControllersManager.shared.showTab(with: .contentFromURL(url, source: .appOpenUrl))

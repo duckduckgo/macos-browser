@@ -134,6 +134,9 @@
                   Identifier = "CoreDataEncryptionTests/testSavingIncorrectValueTypes()">
                </Test>
                <Test
+                  Identifier = "DownloadsIntegrationTests/testWhenDownloadIsStartedInNewTab_tabIsClosed()">
+               </Test>
+               <Test
                   Identifier = "EncryptionKeyStoreTests">
                </Test>
                <Test
@@ -144,6 +147,9 @@
                </Test>
                <Test
                   Identifier = "NavigationProtectionIntegrationTests/testReferrerTrimming()">
+               </Test>
+               <Test
+                  Identifier = "TabContentTests">
                </Test>
             </SkippedTests>
          </TestableReference>

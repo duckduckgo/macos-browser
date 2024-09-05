@@ -101,6 +101,7 @@ public struct PopoverMessageView: View {
                             .frame(width: 16, height: 16)
                     }
                     .buttonStyle(PlainButtonStyle())
+                    .padding(.top, viewModel.buttonText != nil ? 4 : 0)
                 }
             }
             .padding()

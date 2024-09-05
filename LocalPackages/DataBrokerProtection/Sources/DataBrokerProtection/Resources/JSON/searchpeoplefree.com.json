@@ -1,7 +1,7 @@
 {
   "name": "Search People FREE",
   "url": "searchpeoplefree.com",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "parent": "peoplefinders.com",
   "addedDatetime": 1703052000000,
   "steps": [
@@ -22,7 +22,7 @@
           "profile": {
             "name": {
               "selector": ".h2",
-              "beforeText": "in"
+              "beforeText": " in "
             },
             "alternativeNamesList": {
               "selector": ".//h2[contains(@class, 'h2')]/span[contains(@class, 'd-block')]",

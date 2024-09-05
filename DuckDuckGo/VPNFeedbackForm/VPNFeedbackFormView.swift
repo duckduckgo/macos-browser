@@ -39,7 +39,7 @@ struct VPNFeedbackFormView: View {
             switch viewModel.viewState {
             case .feedbackPending, .feedbackSending, .feedbackSendingFailed:
                 VPNFeedbackFormBodyView()
-                .padding([.top, .leading, .trailing], 20)
+                    .padding([.top, .leading, .trailing], 20)
 
                 if viewModel.viewState == .feedbackSendingFailed {
                     Text(UserText.vpnFeedbackFormSendingConfirmationError)

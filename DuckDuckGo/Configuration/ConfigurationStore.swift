@@ -20,6 +20,7 @@ import Common
 import Foundation
 import Configuration
 import PixelKit
+import os.log
 
 final class ConfigurationStore: ConfigurationStoring {
 
@@ -30,7 +31,6 @@ final class ConfigurationStore: ConfigurationStoring {
         .surrogates: "surrogates.txt",
         .privacyConfiguration: "macos-config.json",
         .trackerDataSet: "tracker-radar.json",
-        .FBConfig: "social_ctp_configuration.json",
         .remoteMessagingConfig: "remote-messaging-config.json"
     ]
 
@@ -54,9 +54,6 @@ final class ConfigurationStore: ConfigurationStoring {
     @UserDefaultsWrapper(key: .configStoragePrivacyConfigurationEtag, defaultValue: nil)
     private var privacyConfigurationEtag: String?
 
-    @UserDefaultsWrapper(key: .configFBConfigEtag, defaultValue: nil)
-    private var FBConfigEtag: String?
-
     @UserDefaultsWrapper(key: .configStorageRemoteMessagingConfigEtag, defaultValue: nil)
     private var remoteMessagingConfigEtag: String?
 
@@ -70,7 +67,6 @@ final class ConfigurationStore: ConfigurationStoring {
         case .surrogates: return surrogatesEtag
         case .trackerDataSet: return trackerRadarEtag
         case .privacyConfiguration: return privacyConfigurationEtag
-        case .FBConfig: return FBConfigEtag
         case .remoteMessagingConfig: return remoteMessagingConfigEtag
         }
     }
@@ -91,7 +87,6 @@ final class ConfigurationStore: ConfigurationStoring {
         case .surrogates: surrogatesEtag = etag
         case .trackerDataSet: trackerRadarEtag = etag
         case .privacyConfiguration: privacyConfigurationEtag = etag
-        case .FBConfig: FBConfigEtag = etag
         case .remoteMessagingConfig: remoteMessagingConfigEtag = etag
         }
     }
@@ -119,14 +114,13 @@ final class ConfigurationStore: ConfigurationStoring {
     }
 
     func log() {
-        os_log("bloomFilterBinaryEtag %{public}s", log: .config, type: .default, bloomFilterBinaryEtag ?? "")
-        os_log("bloomFilterSpecEtag %{public}s", log: .config, type: .default, bloomFilterSpecEtag ?? "")
-        os_log("bloomFilterExcludedDomainsEtag %{public}s", log: .config, type: .default, bloomFilterExcludedDomainsEtag ?? "")
-        os_log("surrogatesEtag %{public}s", log: .config, type: .default, surrogatesEtag ?? "")
-        os_log("trackerRadarEtag %{public}s", log: .config, type: .default, trackerRadarEtag ?? "")
-        os_log("privacyConfigurationEtag %{public}s", log: .config, type: .default, privacyConfigurationEtag ?? "")
-        os_log("FBConfigEtag %{public}s", log: .config, type: .default, FBConfigEtag ?? "")
-        os_log("remoteMessagingConfig %{public}s", log: .config, type: .default, remoteMessagingConfigEtag ?? "")
+        Logger.config.info("bloomFilterBinaryEtag \(self.bloomFilterBinaryEtag ?? "", privacy: .public)")
+        Logger.config.info("bloomFilterSpecEtag \(self.bloomFilterSpecEtag ?? "", privacy: .public)")
+        Logger.config.info("bloomFilterExcludedDomainsEtag \(self.self.bloomFilterExcludedDomainsEtag ?? "", privacy: .public)")
+        Logger.config.info("surrogatesEtag \(self.surrogatesEtag ?? "", privacy: .public)")
+        Logger.config.info("trackerRadarEtag \(self.trackerRadarEtag ?? "", privacy: .public)")
+        Logger.config.info("privacyConfigurationEtag \(self.privacyConfigurationEtag ?? "", privacy: .public)")
+        Logger.config.info("remoteMessagingConfig \(self.remoteMessagingConfigEtag ?? "", privacy: .public)")
     }
 
     func fileUrl(for config: Configuration) -> URL {

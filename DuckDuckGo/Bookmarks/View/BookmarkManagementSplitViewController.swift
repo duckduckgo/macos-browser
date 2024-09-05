@@ -61,6 +61,15 @@ final class BookmarkManagementSplitViewController: NSSplitViewController {
         detailViewController.delegate = self
     }
 
+    override func keyDown(with event: NSEvent) {
+        let commandKeyDown = event.modifierFlags.contains(.command)
+        if commandKeyDown && event.keyCode == 3 { // CMD + F
+            detailViewController.searchBar.makeMeFirstResponder()
+        } else {
+            super.keyDown(with: event)
+        }
+    }
+
 }
 
 extension BookmarkManagementSplitViewController: BookmarkManagementSidebarViewControllerDelegate {
@@ -79,6 +88,18 @@ extension BookmarkManagementSplitViewController: BookmarkManagementDetailViewCon
 
     func bookmarkManagementDetailViewControllerDidSelectFolder(_ folder: BookmarkFolder) {
         sidebarViewController.select(folder: folder)
+    }
+
+    func bookmarkManagementDetailViewControllerDidStartSearching() {
+        sidebarViewController.selectBookmarksFolder()
+    }
+
+    func bookmarkManagementDetailViewControllerShowInFolder(_ folder: BookmarkFolder) {
+        sidebarViewController.select(folder: folder)
+    }
+
+    func bookmarkManagementDetailViewControllerSortChanged(_ mode: BookmarksSortMode) {
+        sidebarViewController.sortModeChanged(mode)
     }
 
 }

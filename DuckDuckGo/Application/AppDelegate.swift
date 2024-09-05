@@ -39,6 +39,7 @@ import Subscription
 import NetworkProtectionIPC
 import DataBrokerProtection
 import RemoteMessaging
+import os.log
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
 
@@ -65,7 +66,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let fileStore: FileStore
 
 #if APPSTORE
-    private let crashCollection = CrashCollection(platform: .macOSAppStore, log: .default)
+    private let crashCollection = CrashCollection(platform: .macOSAppStore)
 #else
     private let crashReporter = CrashReporter()
 #endif
@@ -106,15 +107,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     // MARK: - DBP
 
-#if DBP
     private lazy var dataBrokerProtectionSubscriptionEventHandler: DataBrokerProtectionSubscriptionEventHandler = {
         let authManager = DataBrokerAuthenticationManagerBuilder.buildAuthenticationManager(subscriptionManager: subscriptionManager)
         return DataBrokerProtectionSubscriptionEventHandler(featureDisabler: DataBrokerProtectionFeatureDisabler(),
                                                             authenticationManager: authManager,
                                                             pixelHandler: DataBrokerProtectionPixelsHandler())
     }()
-
-#endif
 
     private lazy var vpnRedditSessionWorkaround: VPNRedditSessionWorkaround = {
         let ipcClient = VPNControllerXPCClient.shared
@@ -151,6 +149,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return firstLaunchDate >= Date.weekAgo
     }
 
+    @MainActor
     override init() {
         // will not add crash handlers and will fire pixel on applicationDidFinishLaunching if didCrashDuringCrashHandlersSetUp == true
         let didCrashDuringCrashHandlersSetUp = UserDefaultsWrapper(key: .didCrashDuringCrashHandlersSetUp, defaultValue: false)
@@ -159,7 +158,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
            !didCrashDuringCrashHandlersSetUp.wrappedValue {
 
             didCrashDuringCrashHandlersSetUp.wrappedValue = true
-            CrashLogMessageExtractor.setUp()
+            CrashLogMessageExtractor.setUp(swapCxaThrow: false)
             didCrashDuringCrashHandlersSetUp.wrappedValue = false
         }
 
@@ -167,7 +166,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             let encryptionKey = NSApplication.runType.requiresEnvironment ? try keyStore.readKey() : nil
             fileStore = EncryptedFileStore(encryptionKey: encryptionKey)
         } catch {
-            os_log("App Encryption Key could not be read: %s", "\(error)")
+            Logger.general.error("App Encryption Key could not be read: \(error.localizedDescription)")
             fileStore = EncryptedFileStore()
         }
 
@@ -192,18 +191,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 fatalError("Could not load DB: \(error.localizedDescription)")
             }
 
-            let preMigrationErrorHandling = EventMapping<BookmarkFormFactorFavoritesMigration.MigrationErrors> { _, error, _, _ in
+            do {
+                let formFactorFavMigration = BookmarkFormFactorFavoritesMigration()
+                let favoritesOrder = try formFactorFavMigration.getFavoritesOrderFromPreV4Model(dbContainerLocation: BookmarkDatabase.defaultDBLocation,
+                                                                                                dbFileURL: BookmarkDatabase.defaultDBFileURL)
+                BookmarkDatabase.shared.preFormFactorSpecificFavoritesFolderOrder = favoritesOrder
+            } catch {
                 PixelKit.fire(DebugEvent(GeneralPixel.bookmarksCouldNotLoadDatabase(error: error)))
                 Thread.sleep(forTimeInterval: 1)
-                fatalError("Could not create Bookmarks database stack: \(error?.localizedDescription ?? "err")")
+                fatalError("Could not create Bookmarks database stack: \(error.localizedDescription)")
             }
-
-            BookmarkDatabase.shared.preFormFactorSpecificFavoritesFolderOrder = BookmarkFormFactorFavoritesMigration
-                .getFavoritesOrderFromPreV4Model(
-                    dbContainerLocation: BookmarkDatabase.defaultDBLocation,
-                    dbFileURL: BookmarkDatabase.defaultDBFileURL,
-                    errorEvents: preMigrationErrorHandling
-                )
 
             BookmarkDatabase.shared.db.loadStore { context, error in
                 guard let context = context else {
@@ -350,7 +347,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 #if APPSTORE
         crashCollection.startAttachingCrashLogMessages { pixelParameters, payloads, completion in
-            pixelParameters.forEach { _ in PixelKit.fire(GeneralPixel.crash) }
+            pixelParameters.forEach { parameters in
+                PixelKit.fire(GeneralPixel.crash, withAdditionalParameters: parameters, includeAppVersionParameter: false)
+            }
+
             guard let lastPayload = payloads.last else {
                 return
             }
@@ -376,23 +376,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NetworkProtectionAppEvents(featureGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: subscriptionManager)).applicationDidFinishLaunching()
         UNUserNotificationCenter.current().delegate = self
 
-#if DBP
         dataBrokerProtectionSubscriptionEventHandler.registerForSubscriptionAccountManagerEvents()
-#endif
-
-#if DBP
         DataBrokerProtectionAppEvents(featureGatekeeper: DefaultDataBrokerProtectionFeatureGatekeeper(accountManager: subscriptionManager.accountManager)).applicationDidFinishLaunching()
-#endif
 
         setUpAutoClearHandler()
 
         setUpAutofillPixelReporter()
 
 #if SPARKLE
-        updateController.checkNewApplicationVersion()
+        if NSApp.runType != .uiTests {
+            updateController.checkNewApplicationVersion()
+        }
 #endif
 
         remoteMessagingClient?.startRefreshingRemoteMessages()
+
+        // This messaging system has been replaced by RMF, but we need to clean up the message manifest for any users who had it stored.
+        let deprecatedRemoteMessagingStorage = DefaultSurveyRemoteMessagingStorage.surveys()
+        deprecatedRemoteMessagingStorage.removeStoredMessagesIfNecessary()
 
         if didCrashDuringCrashHandlersSetUp {
             PixelKit.fire(GeneralPixel.crashOnCrashHandlersSetUp)
@@ -423,11 +424,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         NetworkProtectionAppEvents(featureGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: subscriptionManager)).applicationDidBecomeActive()
 
-#if DBP
         DataBrokerProtectionAppEvents(featureGatekeeper:
                                         DefaultDataBrokerProtectionFeatureGatekeeper(accountManager:
                                                                                         subscriptionManager.accountManager)).applicationDidBecomeActive()
-#endif
 
         subscriptionManager.refreshCachedSubscriptionAndEntitlements { isSubscriptionActive in
             if isSubscriptionActive {
@@ -548,7 +547,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             dataProvidersSource: syncDataProviders,
             errorEvents: SyncErrorHandler(),
             privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager,
-            log: OSLog.sync,
             environment: environment
         )
         syncService.initializeIfNeeded()
@@ -623,10 +621,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     return
                 }
                 if isLocked {
-                    os_log(.debug, log: .sync, "Screen is locked")
+                    Logger.sync.debug("Screen is locked")
                     syncService.scheduler.cancelSyncAndSuspendSyncQueue()
                 } else {
-                    os_log(.debug, log: .sync, "Screen is unlocked")
+                    Logger.sync.debug("Screen is unlocked")
                     syncService.scheduler.resumeSyncQueue()
                 }
             }

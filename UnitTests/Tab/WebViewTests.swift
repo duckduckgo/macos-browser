@@ -19,7 +19,6 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-@MainActor
 final class WebViewTests: XCTestCase {
 
     typealias WebView = DuckDuckGo_Privacy_Browser.WebView
@@ -133,6 +132,7 @@ final class WebViewTests: XCTestCase {
         XCTAssertTrue(webView.canZoomToActualSize)
     }
 
+    @MainActor
     func testThatResetZoomLevelResetsZoom() {
         let tabVM = TabViewModel(tab: Tab())
         let randomZoomLevel = DefaultZoomValue.percent300
@@ -154,6 +154,7 @@ final class WebViewTests: XCTestCase {
         XCTAssertEqual(tabVM.tab.webView.zoomLevel, .percent75)
     }
 
+    @MainActor
     func testThatResetZoomLevelResetsMagnification() {
         let tabVM = TabViewModel(tab: Tab())
 

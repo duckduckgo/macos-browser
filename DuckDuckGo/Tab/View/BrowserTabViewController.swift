@@ -24,6 +24,7 @@ import SwiftUI
 import WebKit
 import Subscription
 import PixelKit
+import os.log
 
 final class BrowserTabViewController: NSViewController {
 
@@ -43,6 +44,7 @@ final class BrowserTabViewController: NSViewController {
 
     private var tabViewModelCancellables = Set<AnyCancellable>()
     private var activeUserDialogCancellable: Cancellable?
+    private var duckPlayerConsentCancellable: AnyCancellable?
     private var pinnedTabsDelegatesCancellable: AnyCancellable?
     private var keyWindowSelectedTabCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
@@ -53,6 +55,10 @@ final class BrowserTabViewController: NSViewController {
     private var hoverLabelWorkItem: DispatchWorkItem?
 
     private(set) var transientTabContentViewController: NSViewController?
+    private lazy var duckPlayerOnboardingModalManager: DuckPlayerOnboardingModalManager = {
+        let modal = DuckPlayerOnboardingModalManager()
+        return modal
+    }()
 
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
@@ -138,7 +144,6 @@ final class BrowserTabViewController: NSViewController {
                                                name: .emailDidCloseEmailProtection,
                                                object: nil)
 
-#if DBP
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(onDBPFeatureDisabled),
                                                name: .dbpWasDisabled,
@@ -147,12 +152,6 @@ final class BrowserTabViewController: NSViewController {
                                                selector: #selector(onCloseDataBrokerProtection),
                                                name: .dbpDidClose,
                                                object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(onDataBrokerWaitlistGetStartedPressedByUser),
-                                               name: .dataBrokerProtectionUserPressedOnGetStartedOnWaitlist,
-                                               object: nil)
-
-#endif
 
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(onCloseSubscriptionPage),
@@ -195,7 +194,6 @@ final class BrowserTabViewController: NSViewController {
         self.previouslySelectedTab = nil
     }
 
-#if DBP
     @objc
     private func onDBPFeatureDisabled(_ notification: Notification) {
         Task { @MainActor in
@@ -220,8 +218,6 @@ final class BrowserTabViewController: NSViewController {
     private func onDataBrokerWaitlistGetStartedPressedByUser(_ notification: Notification) {
         WindowControllersManager.shared.showDataBrokerProtectionTab()
     }
-
-#endif
 
     @objc
     private func onCloseSubscriptionPage(_ notification: Notification) {
@@ -264,6 +260,7 @@ final class BrowserTabViewController: NSViewController {
                 self.subscribeToTabContent(of: selectedTabViewModel)
                 self.subscribeToHoveredLink(of: selectedTabViewModel)
                 self.subscribeToUserDialogs(of: selectedTabViewModel)
+                self.subscribeToDuckPlayerOnboardingPrompt(of: selectedTabViewModel)
 
                 self.adjustFirstResponder(force: true)
             }
@@ -288,13 +285,11 @@ final class BrowserTabViewController: NSViewController {
     private func removeDataBrokerViewIfNecessary() -> ([Tab]) -> Void {
         { [weak self] (tabs: [Tab]) in
             guard let self else { return }
-#if DBP
             if let dataBrokerProtectionHomeViewController,
                !tabs.contains(where: { $0.content == .dataBrokerProtection }) {
                 dataBrokerProtectionHomeViewController.removeCompletely()
                 self.dataBrokerProtectionHomeViewController = nil
             }
-#endif
         }
     }
 
@@ -441,6 +436,18 @@ final class BrowserTabViewController: NSViewController {
 #endif
     }
 
+    private func subscribeToDuckPlayerOnboardingPrompt(of tabViewModel: TabViewModel?) {
+        tabViewModel?.tab.duckPlayerOnboardingPublisher.sink { [weak self, weak tab = tabViewModel?.tab] onboardingState in
+
+            guard let self, tab != nil, let onboardingState = onboardingState, onboardingState.onboardingDecider.canDisplayOnboarding else  {
+                self?.duckPlayerOnboardingModalManager.close(animated: false, completion: nil)
+                return
+            }
+
+            self.duckPlayerOnboardingModalManager.show(on: self.view, animated: true)
+        }.store(in: &tabViewModelCancellables)
+    }
+
     private func shouldMakeContentViewFirstResponder(for tabContent: Tab.TabContent) -> Bool {
         // always steal focus when first responder is not a text field
         guard view.window?.firstResponder is NSText else {
@@ -515,7 +522,7 @@ final class BrowserTabViewController: NSViewController {
               let contentView = viewToMakeFirstResponderAfterAdding?() else { return }
 
         guard contentView.window === window else {
-            os_log("BrowserTabViewController: Content view window is \(contentView.window?.description ?? "<nil>") but expected: \(window)", type: .error)
+            Logger.general.error("BrowserTabViewController: Content view window is \(contentView.window?.description ?? "<nil>") but expected: \(window)")
             return
         }
         viewToMakeFirstResponderAfterAdding = nil
@@ -557,9 +564,7 @@ final class BrowserTabViewController: NSViewController {
         preferencesViewController?.removeCompletely()
         bookmarksViewController?.removeCompletely()
         homePageViewController?.removeCompletely()
-#if DBP
         dataBrokerProtectionHomeViewController?.removeCompletely()
-#endif
         if includingWebView {
             self.removeWebViewFromHierarchy()
         }
@@ -611,13 +616,11 @@ final class BrowserTabViewController: NSViewController {
             removeAllTabContent()
             addAndLayoutChild(homePageViewControllerCreatingIfNeeded())
 
-#if DBP
         case .dataBrokerProtection:
             removeAllTabContent()
             let dataBrokerProtectionViewController = dataBrokerProtectionHomeViewControllerCreatingIfNeeded()
             self.previouslySelectedTab = tabCollectionViewModel.selectedTab
             addAndLayoutChild(dataBrokerProtectionViewController)
-#endif
         default:
             removeAllTabContent()
         }
@@ -695,7 +698,6 @@ final class BrowserTabViewController: NSViewController {
         }()
     }
 
-#if DBP
     // MARK: - DataBrokerProtection
 
     var dataBrokerProtectionHomeViewController: DBPHomeViewController?
@@ -706,7 +708,6 @@ final class BrowserTabViewController: NSViewController {
             return dataBrokerProtectionHomeViewController
         }()
     }
-#endif
 
     // MARK: - Preferences
 
@@ -1193,7 +1194,7 @@ extension BrowserTabViewController {
 
     private func subscribeToTabSelectedInCurrentKeyWindow() {
         let lastKeyWindowOtherThanOurs = WindowControllersManager.shared.didChangeKeyWindowController
-            .map { WindowControllersManager.shared.lastKeyMainWindowController }
+            .map { $0 }
             .prepend(WindowControllersManager.shared.lastKeyMainWindowController)
             .compactMap { $0 }
             .filter { [weak self] in $0.window !== self?.view.window }
@@ -1219,7 +1220,7 @@ extension BrowserTabViewController {
         dispatchPrecondition(condition: .onQueue(.main))
 
         guard let webView = webView else {
-            os_log("BrowserTabViewController: failed to create a snapshot of webView", type: .error)
+            Logger.general.error("BrowserTabViewController: failed to create a snapshot of webView")
             return
         }
 
@@ -1228,7 +1229,7 @@ extension BrowserTabViewController {
 
         webView.takeSnapshot(with: config) { [weak self] image, _ in
             guard let image = image else {
-                os_log("BrowserTabViewController: failed to create a snapshot of webView", type: .error)
+                Logger.general.error("BrowserTabViewController: failed to create a snapshot of webView")
                 return
             }
             self?.showWebViewSnapshot(with: image)

@@ -24,7 +24,7 @@ CODE_SIGN_STYLE[config=Debug][sdk=*] = Automatic
 
 CODE_SIGN_IDENTITY[sdk=macosx*] = 3rd Party Mac Developer Application
 CODE_SIGN_IDENTITY[config=Debug][sdk=macosx*] = Apple Development
-CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
+CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] = Developer ID Application
 
 GENERATE_INFOPLIST_FILE = YES
 INFOPLIST_FILE = NetworkProtectionAppExtension/Info.plist
@@ -41,7 +41,7 @@ PRODUCT_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(TUNNEL_EXTENSION_BUNDLE_ID)
 PRODUCT_BUNDLE_IDENTIFIER[config=Release][sdk=*] = $(TUNNEL_EXTENSION_BUNDLE_ID)
 PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(TUNNEL_EXTENSION_BUNDLE_ID)
 
-PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] =
+PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] = macOS NetP VPN App XPC App Store - CI
 PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = match AppStore com.duckduckgo.mobile.ios.vpn.agent.network-protection-extension macos
 PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = match AppStore com.duckduckgo.mobile.ios.vpn.agent.review.network-protection-extension macos
 

@@ -22,6 +22,7 @@ import CoreData
 import Foundation
 import UniformTypeIdentifiers
 import PixelKit
+import AppKitExtensions
 
 protocol DownloadListStoring {
 

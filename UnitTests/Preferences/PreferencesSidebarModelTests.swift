@@ -20,7 +20,6 @@ import XCTest
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
-@MainActor
 final class PreferencesSidebarModelTests: XCTestCase {
 
     var cancellables = Set<AnyCancellable>()
@@ -30,6 +29,7 @@ final class PreferencesSidebarModelTests: XCTestCase {
         cancellables.removeAll()
     }
 
+    @MainActor
     private func PreferencesSidebarModel(loadSections: [PreferencesSection]? = nil, tabSwitcherTabs: [Tab.TabContent] = Tab.TabContent.displayableTabTypes) -> DuckDuckGo_Privacy_Browser.PreferencesSidebarModel {
         return DuckDuckGo_Privacy_Browser.PreferencesSidebarModel(
             loadSections: { loadSections ?? PreferencesSection.defaultSections(includingDuckPlayer: false, includingSync: false, includingVPN: false) },
@@ -39,6 +39,7 @@ final class PreferencesSidebarModelTests: XCTestCase {
         )
     }
 
+    @MainActor
     func testWhenInitializedThenFirstPaneInFirstSectionIsSelected() throws {
         let sections: [PreferencesSection] = [.init(id: .regularPreferencePanes, panes: [.appearance, .autofill])]
         let model = PreferencesSidebarModel(loadSections: sections)
@@ -46,6 +47,7 @@ final class PreferencesSidebarModelTests: XCTestCase {
         XCTAssertEqual(model.selectedPane, .appearance)
     }
 
+    @MainActor
     func testWhenResetTabSelectionIfNeededCalledThenPreferencesTabIsSelected() throws {
         let tabs: [Tab.TabContent] = [.anySettingsPane, .bookmarks]
         let model = PreferencesSidebarModel(tabSwitcherTabs: tabs)
@@ -56,6 +58,7 @@ final class PreferencesSidebarModelTests: XCTestCase {
         XCTAssertEqual(model.selectedTabIndex, 0)
     }
 
+    @MainActor
     func testWhenSelectPaneIsCalledWithTheSamePaneThenEventIsNotPublished() throws {
         let sections: [PreferencesSection] = [.init(id: .regularPreferencePanes, panes: [.appearance])]
         let model = PreferencesSidebarModel(loadSections: sections)
@@ -71,6 +74,7 @@ final class PreferencesSidebarModelTests: XCTestCase {
         XCTAssertTrue(selectedPaneUpdates.isEmpty)
     }
 
+    @MainActor
     func testWhenSelectPaneIsCalledWithNonexistentPaneThenItHasNoEffect() throws {
         let sections: [PreferencesSection] = [.init(id: .regularPreferencePanes, panes: [.appearance, .autofill])]
         let model = PreferencesSidebarModel(loadSections: sections)
@@ -79,6 +83,7 @@ final class PreferencesSidebarModelTests: XCTestCase {
         XCTAssertEqual(model.selectedPane, .appearance)
     }
 
+    @MainActor
     func testWhenSelectedTabIndexIsChangedThenSelectedPaneIsNotAffected() throws {
         let sections: [PreferencesSection] = [.init(id: .regularPreferencePanes, panes: [.general, .appearance, .autofill])]
         let tabs: [Tab.TabContent] = [.anySettingsPane, .bookmarks]

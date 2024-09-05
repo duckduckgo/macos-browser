@@ -30,7 +30,6 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     private let networkProtectionStatusReporter: NetworkProtectionStatusReporter
     private var status: NetworkProtection.ConnectionStatus = .default
     private let popoverManager: NetPPopoverManager
-    private let waitlistActivationDateStore: DefaultWaitlistActivationDateStore
 
     // MARK: - Subscriptions
 
@@ -85,7 +84,6 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
         isHavingConnectivityIssues = networkProtectionStatusReporter.connectivityIssuesObserver.recentValue
         buttonImage = .image(for: iconPublisher.icon)
 
-        self.waitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .netP)
         super.init()
 
         setupSubscriptions()
@@ -97,39 +95,20 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
         setupIconSubscription()
         setupStatusSubscription()
         setupInterruptionSubscription()
-        setupWaitlistAvailabilitySubscription()
     }
 
     private func setupIconSubscription() {
         iconPublisherCancellable = iconPublisher.$icon
             .receive(on: DispatchQueue.main)
             .sink { [weak self] icon in
-                self?.buttonImage = self?.buttonImageFromWaitlistState(icon: icon)
+                self?.buttonImage = .image(for: icon)!
             }
-    }
-
-    /// Temporary override used for the NetP waitlist beta, as a different asset is used for users who are invited to join the beta but haven't yet accepted.
-    /// This will be removed once the waitlist beta has ended.
-    private func buttonImageFromWaitlistState(icon: NetworkProtectionAsset?) -> NSImage {
-        let icon = icon ?? iconPublisher.icon
-#if DEBUG
-        guard [.normal, .integrationTests].contains(NSApp.runType) else { return NSImage() }
-#endif
-
-        return .image(for: icon)!
     }
 
     private func setupStatusSubscription() {
         networkProtectionStatusReporter.statusObserver.publisher.sink { [weak self] status in
             guard let self = self else {
                 return
-            }
-
-            switch status {
-            case .connected:
-                waitlistActivationDateStore.setActivationDateIfNecessary()
-                waitlistActivationDateStore.updateLastActiveDate()
-            default: break
             }
 
             Task { @MainActor in
@@ -150,21 +129,6 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
                 self.updateVisibility()
             }
         }.store(in: &cancellables)
-    }
-
-    private func setupWaitlistAvailabilitySubscription() {
-        NotificationCenter.default.publisher(for: .networkProtectionWaitlistAccessChanged)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                guard let self else { return }
-
-                self.buttonImage = self.buttonImageFromWaitlistState(icon: nil)
-
-                Task { @MainActor in
-                    self.updateVisibility()
-                }
-            }
-            .store(in: &cancellables)
     }
 
     @MainActor

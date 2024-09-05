@@ -26,6 +26,7 @@ import NetworkProtectionProxy
 import NetworkProtectionUI
 import Networking
 import PixelKit
+import os.log
 
 #if NETP_SYSTEM_EXTENSION
 import SystemExtensionManager
@@ -58,10 +59,6 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     /// This is static because we want these options to be shared across all instances of `NetworkProtectionProvider`.
     ///
     static var simulationOptions = NetworkProtectionSimulationOptions()
-
-    /// The logger that this object will use for errors that are handled by this class.
-    ///
-    private let logger: NetworkProtectionLogger
 
     /// Stores the last controller error for the purpose of updating the UI as needed.
     ///
@@ -110,13 +107,6 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     private var previousStatus: NEVPNStatus = .invalid
 
     // MARK: - User Defaults
-
-    /* Temporarily disabled - https://app.asana.com/0/0/1205766100762904/f
-    /// Test setting to exclude duckduckgo route from VPN
-    @MainActor
-    @UserDefaultsWrapper(key: .networkProtectionExcludedRoutes, defaultValue: [:])
-    private(set) var excludedRoutesPreferences: [String: Bool]
-     */
 
     @UserDefaultsWrapper(key: .networkProtectionOnboardingStatusRawValue, defaultValue: OnboardingStatus.default.rawValue, defaults: .netP)
     private(set) var onboardingStatusRawValue: OnboardingStatus.RawValue
@@ -173,10 +163,8 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
          defaults: UserDefaults,
          tokenStore: NetworkProtectionTokenStore = NetworkProtectionKeychainTokenStore(),
          notificationCenter: NotificationCenter = .default,
-         logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger(),
          accessTokenStorage: SubscriptionTokenKeychainStorage) {
 
-        self.logger = logger
         self.networkExtensionBundleID = networkExtensionBundleID
         self.networkExtensionController = networkExtensionController
         self.notificationCenter = notificationCenter
@@ -846,10 +834,10 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     private func fetchAuthToken() throws -> NSString? {
 
         if let accessToken = try? accessTokenStorage.getAccessToken() {
-            os_log(.error, log: .networkProtection, "🟢 TunnelController found token")
+            Logger.networkProtection.debug("🟢 TunnelController found token")
             return Self.adaptAccessTokenForVPN(accessToken) as NSString?
         }
-        os_log(.error, log: .networkProtection, "🔴 TunnelController found no token :(")
+        Logger.networkProtection.error("TunnelController found no token")
         return try tokenStore.fetchToken() as NSString?
     }
 

@@ -125,10 +125,58 @@
       "comment" : "Privacy - Desktop Folder Usage Description",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speichere heruntergeladene Dateien in diesem Ordner."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Allows you to save downloaded files to this folder."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Te permite guardar los archivos descargados en esta carpeta."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permet d'enregistrer les fichiers téléchargés dans ce dossier."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consente di salvare in questa cartella i file scaricati."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hiermee kun je gedownloade bestanden opslaan in deze map."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Umożliwia zapisywanie pobranych plików w tym folderze."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permite guardar ficheiros transferidos nesta pasta."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Позволяет сохранять загруженные файлы в эту папку."
           }
         }
       }
@@ -137,10 +185,58 @@
       "comment" : "Privacy - Documents Folder Usage Description",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speichere heruntergeladene Dateien in diesem Ordner."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Allows you to save downloaded files to this folder."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Te permite guardar los archivos descargados en esta carpeta."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permet d'enregistrer les fichiers téléchargés dans ce dossier."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consente di salvare in questa cartella i file scaricati."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hiermee kun je gedownloade bestanden opslaan in deze map."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Umożliwia zapisywanie pobranych plików w tym folderze."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permite guardar ficheiros transferidos nesta pasta."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Позволяет сохранять загруженные файлы в эту папку."
           }
         }
       }
@@ -149,10 +245,58 @@
       "comment" : "Privacy - Downloads Folder Usage Description",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speichere heruntergeladene Dateien in diesem Ordner."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Allows you to save downloaded files to this folder."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Te permite guardar los archivos descargados en esta carpeta."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permet d'enregistrer les fichiers téléchargés dans ce dossier."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consente di salvare in questa cartella i file scaricati."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hiermee kun je gedownloade bestanden opslaan in deze map."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Umożliwia zapisywanie pobranych plików w tym folderze."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permite guardar ficheiros transferidos nesta pasta."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Позволяет сохранять загруженные файлы в эту папку."
           }
         }
       }

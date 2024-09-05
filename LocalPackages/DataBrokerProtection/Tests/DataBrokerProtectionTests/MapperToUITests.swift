@@ -362,26 +362,28 @@ final class MapperToUITests: XCTestCase {
     func testBrokersWithMixedScanProgress_areOrderedByLastRunDate_andHaveCorrectStatus() {
 
         // Given
+        let minusTwoHours = Date.minusTwoHours
+        let minusThreeHours = Date.minusThreeHours
         let brokerProfileQueryData: [BrokerProfileQueryData] = [
             .mock(dataBrokerName: "Broker #1", lastRunDate: Date()),
             .mock(dataBrokerName: "Broker #1", lastRunDate: Date()),
-            .mock(dataBrokerName: "Broker #1", lastRunDate: .minusTwoHours),
+            .mock(dataBrokerName: "Broker #1", lastRunDate: minusTwoHours),
             .mock(dataBrokerName: "Broker #2"),
             .mock(dataBrokerName: "Broker #2", lastRunDate: .minusOneHour),
-            .mock(dataBrokerName: "Broker #2", lastRunDate: .minusThreeHours),
-            .mock(dataBrokerName: "Broker #3", lastRunDate: .minusTwoHours),
+            .mock(dataBrokerName: "Broker #2", lastRunDate: minusThreeHours),
+            .mock(dataBrokerName: "Broker #3", lastRunDate: minusTwoHours),
             .mock(dataBrokerName: "Broker #3"),
             .mock(dataBrokerName: "Broker #3", lastRunDate: Date()),
             .mock(dataBrokerName: "Broker #4"),
             .mock(dataBrokerName: "Broker #5"),
-            .mock(dataBrokerName: "Broker #7", lastRunDate: .minusThreeHours),
-            .mock(dataBrokerName: "Broker #6", lastRunDate: .minusThreeHours)
+            .mock(dataBrokerName: "Broker #7", lastRunDate: minusThreeHours),
+            .mock(dataBrokerName: "Broker #6", lastRunDate: minusThreeHours)
         ]
 
         let expected: [DBPUIScanProgress.ScannedBroker] = [
             .mock("Broker #2", status: .inProgress),
-            .mock("Broker #7", status: .completed),
             .mock("Broker #6", status: .completed),
+            .mock("Broker #7", status: .completed),
             .mock("Broker #1", status: .completed),
             .mock("Broker #3", status: .inProgress)
         ]

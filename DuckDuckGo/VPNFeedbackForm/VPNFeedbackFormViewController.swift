@@ -81,15 +81,15 @@ final class VPNFeedbackFormViewController: NSViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.updateViewHeight()
-        }
-        .store(in: &cancellables)
+            }
+            .store(in: &cancellables)
 
         viewModel.$selectedFeedbackCategory
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.updateViewHeight()
-        }
-        .store(in: &cancellables)
+            }
+            .store(in: &cancellables)
     }
 
     private func updateViewHeight() {

@@ -80,6 +80,9 @@ final class ReleaseNotesTabExtension: NavigationResponder {
 
     @MainActor
     private func setUpScript(for url: URL?) {
+        guard NSApp.runType != .uiTests else {
+            return
+        }
         let updateController = Application.appDelegate.updateController!
         Publishers.CombineLatest(updateController.isUpdateBeingLoadedPublisher, updateController.latestUpdatePublisher)
             .receive(on: DispatchQueue.main)

@@ -19,12 +19,11 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-@MainActor
 class BookmarkSidebarTreeControllerTests: XCTestCase {
 
     func testWhenBookmarkStoreHasNoFolders_ThenOnlyDefaultNodesAreReturned() {
         let dataSource = BookmarkSidebarTreeController(bookmarkManager: LocalBookmarkManager())
-        let treeController = BookmarkTreeController(dataSource: dataSource)
+        let treeController = BookmarkTreeController(dataSource: dataSource, sortMode: .manual)
         let defaultNodes = treeController.rootNode.childNodes
         let representedObjects = defaultNodes.representedObjects()
 
@@ -39,6 +38,7 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
         XCTAssert(representedObjects.first === PseudoFolder.bookmarks)
     }
 
+    @MainActor
     func testWhenBookmarkStoreHasNoTopLevelFolders_ThenTheDefaultBookmarksNodeHasNoChildren() throws {
         let bookmarkStoreMock = BookmarkStoreMock()
         let faviconManagerMock = FaviconManagerMock()
@@ -48,7 +48,7 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
         bookmarkManager.loadBookmarks()
 
         let dataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
-        let treeController = BookmarkTreeController(dataSource: dataSource)
+        let treeController = BookmarkTreeController(dataSource: dataSource, sortMode: .manual)
         let defaultNodes = treeController.rootNode.childNodes
         XCTAssertEqual(defaultNodes.count, 1)
 
@@ -59,6 +59,7 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
         XCTAssertEqual(pseudoFolder.name, "Bookmarks")
     }
 
+    @MainActor
     func testWhenBookmarkStoreHasTopLevelFolders_ThenTheDefaultBookmarksNodeHasThemAsChildren() {
         let bookmarkStoreMock = BookmarkStoreMock()
         let faviconManagerMock = FaviconManagerMock()
@@ -69,7 +70,7 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
         bookmarkManager.loadBookmarks()
 
         let dataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
-        let treeController = BookmarkTreeController(dataSource: dataSource)
+        let treeController = BookmarkTreeController(dataSource: dataSource, sortMode: .manual)
         let defaultNodes = treeController.rootNode.childNodes
         XCTAssertEqual(defaultNodes.count, 1)
 
@@ -80,6 +81,7 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
         XCTAssert(childNode.representedObjectEquals(topLevelFolder))
     }
 
+    @MainActor
     func testWhenBookmarkStoreHasNestedFolders_ThenTheTreeContainsNestedNodes() {
         let bookmarkStoreMock = BookmarkStoreMock()
         let faviconManagerMock = FaviconManagerMock()
@@ -92,7 +94,7 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
         bookmarkManager.loadBookmarks()
 
         let dataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
-        let treeController = BookmarkTreeController(dataSource: dataSource)
+        let treeController = BookmarkTreeController(dataSource: dataSource, sortMode: .manual)
         let defaultNodes = treeController.rootNode.childNodes
         XCTAssertEqual(defaultNodes.count, 1)
 
@@ -109,5 +111,4 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
         XCTAssertFalse(childFolderNode.canHaveChildNodes)
         XCTAssert(childFolderNode.representedObjectEquals(childFolder))
     }
-
 }

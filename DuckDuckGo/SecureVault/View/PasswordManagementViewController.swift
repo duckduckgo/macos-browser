@@ -25,6 +25,7 @@ import Foundation
 import SecureStorage
 import SwiftUI
 import PixelKit
+import os.log
 
 protocol PasswordManagementDelegate: AnyObject {
 
@@ -1012,7 +1013,7 @@ final class PasswordManagementViewController: NSViewController {
         guard let syncService = NSApp.delegateTyped.syncService else {
             return
         }
-        os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
+        Logger.sync.debug("Requesting sync if enabled")
         syncService.scheduler.requestSyncImmediately()
     }
 

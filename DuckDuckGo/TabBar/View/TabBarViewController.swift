@@ -22,6 +22,7 @@ import Common
 import Lottie
 import SwiftUI
 import WebKit
+import os.log
 
 final class TabBarViewController: NSViewController {
 
@@ -312,13 +313,13 @@ final class TabBarViewController: NSViewController {
             duplicateTab(at: .pinned(index))
         case let .bookmark(tab):
             guard let url = tab.url, let tabViewModel = tabCollectionViewModel.pinnedTabsManager?.tabViewModels[tab] else {
-                os_log("TabBarViewController: Failed to get url from tab")
+                Logger.general.debug("TabBarViewController: Failed to get url from tab")
                 return
             }
             bookmarkTab(with: url, title: tabViewModel.title)
         case let .removeBookmark(tab):
             guard let url = tab.url else {
-                os_log("TabBarViewController: Failed to get url from tab")
+                Logger.general.debug("TabBarViewController: Failed to get url from tab")
                 return
             }
             deleteBookmark(with: url)
@@ -342,7 +343,7 @@ final class TabBarViewController: NSViewController {
         }
 
         guard let selectionIndex = tabCollectionViewModel.selectionIndex else {
-            os_log("TabBarViewController: Selection index is nil", type: .error)
+            Logger.general.error("TabBarViewController: Selection index is nil")
             return
         }
 
@@ -581,7 +582,7 @@ final class TabBarViewController: NSViewController {
               let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
               let clipView = collectionView.clipView
         else {
-            os_log("TabBarViewController: Showing tab preview window failed", type: .error)
+            Logger.general.error("TabBarViewController: Showing tab preview window failed")
             return
         }
 
@@ -591,7 +592,7 @@ final class TabBarViewController: NSViewController {
 
     private func showPinnedTabPreview(at index: Int) {
         guard let tabViewModel = tabCollectionViewModel.pinnedTabsManager?.tabViewModel(at: index) else {
-            os_log("TabBarViewController: Showing pinned tab preview window failed", type: .error)
+            Logger.general.error("TabBarViewController: Showing pinned tab preview window failed")
             return
         }
 
@@ -607,7 +608,7 @@ final class TabBarViewController: NSViewController {
                                                                     isSelected: isSelected)
 
         guard let window = view.window else {
-            os_log("TabBarViewController: Showing tab preview window failed", type: .error)
+            Logger.general.error("TabBarViewController: Showing tab preview window failed")
             return
         }
 
@@ -788,7 +789,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
 
     private func deleteBookmark(with url: URL) {
         guard let bookmark = bookmarkManager.getBookmark(for: url) else {
-            os_log("TabBarViewController: Failed to fetch bookmark for url \(url)", type: .error)
+            Logger.general.error("TabBarViewController: Failed to fetch bookmark for url \(url)")
             return
         }
         bookmarkManager.remove(bookmark: bookmark)
@@ -796,7 +797,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
 
     private func fireproof(_ tab: Tab) {
         guard let url = tab.url, let host = url.host else {
-            os_log("TabBarViewController: Failed to get url of tab bar view item", type: .error)
+            Logger.general.error("TabBarViewController: Failed to get url of tab bar view item")
             return
         }
 
@@ -805,7 +806,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
 
     private func removeFireproofing(from tab: Tab) {
         guard let host = tab.url?.host else {
-            os_log("TabBarViewController: Failed to get url of tab bar view item", type: .error)
+            Logger.general.error("TabBarViewController: Failed to get url of tab bar view item")
             return
         }
 
@@ -820,7 +821,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
             let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
             let url = tabViewModel.tab.content.userEditableUrl
         else {
-            os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
+            Logger.general.error("TabBarViewController: Failed to get index path of tab bar view item")
             return nil
         }
 

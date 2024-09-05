@@ -19,9 +19,9 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-@MainActor
 final class MoreOptionsMenu_BookmarksTests: XCTestCase {
 
+    @MainActor
     func testWhenBookmarkSubmenuIsInitThenBookmarkAllTabsKeyIsCmdShiftD() throws {
         // GIVEN
         let sut = BookmarksSubMenu(targetting: self, tabCollectionViewModel: .init())
@@ -34,6 +34,7 @@ final class MoreOptionsMenu_BookmarksTests: XCTestCase {
         XCTAssertEqual(result.keyEquivalentModifierMask, [.command, .shift])
     }
 
+    @MainActor
     func testWhenTabCollectionCanBookmarkAllTabsThenBookmarkAllTabsMenuItemIsEnabled() throws {
         // GIVEN
         let tab1 = Tab(content: .url(.duckDuckGo, credential: nil, source: .ui))
@@ -47,6 +48,7 @@ final class MoreOptionsMenu_BookmarksTests: XCTestCase {
         XCTAssertTrue(result.isEnabled)
     }
 
+    @MainActor
     func testWhenTabCollectionCannotBookmarkAllTabsThenBookmarkAllTabsMenuItemIsDisabled() throws {
         // GIVEN
         let sut = BookmarksSubMenu(targetting: self, tabCollectionViewModel: .init(tabCollection: .init(tabs: [])))

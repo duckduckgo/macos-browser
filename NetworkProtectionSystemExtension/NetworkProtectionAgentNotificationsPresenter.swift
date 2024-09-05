@@ -32,7 +32,7 @@ final class NetworkProtectionAgentNotificationsPresenter: NetworkProtectionNotif
 
     // MARK: - Presenting user notifications
 
-    func showConnectedNotification(serverLocation: String?) {
+    func showConnectedNotification(serverLocation: String?, snoozeEnded: Bool) {
         notificationCenter.post(.showConnectedNotification, object: serverLocation)
     }
 
@@ -55,4 +55,9 @@ final class NetworkProtectionAgentNotificationsPresenter: NetworkProtectionNotif
     func showTestNotification() {
         notificationCenter.post(.showTestNotification)
     }
+
+    func showSnoozingNotification(duration: TimeInterval) {
+        assertionFailure("macOS does not support VPN snooze")
+    }
+
 }

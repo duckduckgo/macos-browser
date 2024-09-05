@@ -20,7 +20,6 @@ import XCTest
 @testable import Subscription
 @testable import DuckDuckGo_Privacy_Browser
 
-@MainActor
 final class TabBarViewItemTests: XCTestCase {
 
     var delegate: MockTabViewItemDelegate!
@@ -175,6 +174,7 @@ final class TabBarViewItemTests: XCTestCase {
         XCTAssertFalse(item?.isEnabled ?? true)
     }
 
+    @MainActor
     func testWhenFireproofableThenUrlFireProofSiteItemIsDisabled() {
         // Set up fake views for the TabBarViewItems
         let textField = NSTextField()
@@ -211,6 +211,7 @@ final class TabBarViewItemTests: XCTestCase {
         XCTAssertTrue(bookmarkItem?.isEnabled ?? false)
     }
 
+    @MainActor
     func testSubscriptionTabDisabledItems() {
         // Set up fake views for the TabBarViewItems
         let textField = NSTextField()

@@ -19,18 +19,20 @@
 import Cocoa
 import SwiftUI
 import Common
+import os.log
 
 final class UpdateNotificationPresenter {
 
     static let presentationTimeInterval: TimeInterval = 10
 
     func showUpdateNotification(icon: NSImage, text: String, buttonText: String? = nil, presentMultiline: Bool = false) {
-        os_log("Notification presented: \(text)", log: .updates)
+        Logger.updates.debug("Notification presented: \(text)")
 
         DispatchQueue.main.async {
-            guard let mainWindow = NSApp.mainWindow as? MainWindow,
-                  let windowController = mainWindow.windowController as? MainWindowController,
-                  let button = windowController.mainViewController.navigationBarViewController.optionsButton else { return }
+            guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController ?? WindowControllersManager.shared.mainWindowControllers.last,
+                  let button = windowController.mainViewController.navigationBarViewController.optionsButton else {
+                return
+            }
 
             let buttonAction: (() -> Void)? = { [weak self] in
                 self?.openUpdatesPage()
@@ -40,7 +42,7 @@ final class UpdateNotificationPresenter {
                                                               image: icon,
                                                               buttonText: buttonText,
                                                               buttonAction: buttonAction,
-                                                              shouldShowCloseButton: buttonText == nil,
+                                                              shouldShowCloseButton: true,
                                                               presentMultiline: presentMultiline,
                                                               autoDismissDuration: Self.presentationTimeInterval,
                                                               onClick: { [weak self] in

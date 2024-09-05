@@ -20,5 +20,7 @@
 	<string>1</string>
 	<key>DBP_APP_GROUP</key>
 	<string>$(DBP_APP_GROUP)</string>
+	<key>APP_CONFIGURATION_APP_GROUP</key>
+	<string>$(APP_CONFIGURATION_APP_GROUP)</string>
 </dict>
 </plist>

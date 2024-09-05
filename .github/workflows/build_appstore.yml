@@ -58,7 +58,7 @@ jobs:
 
     name: Make App Store Connect Release
 
-    runs-on: macos-13-xlarge
+    runs-on: macos-14-xlarge
 
     env:
       destination: ${{ github.event.inputs.destination || inputs.destination }}
@@ -88,6 +88,9 @@ jobs:
         submodules: recursive
         ref: ${{ env.branch }}
 
+    - name: Set up fastlane
+      run: bundle install
+
     - name: Check if this is an official release build
       id: is-official-release
       env:
@@ -101,9 +104,6 @@ jobs:
 
     - name: Select Xcode
       run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
-
-    - name: Prepare fastlane
-      run: bundle install
 
     - name: Archive and Upload the App
       env:

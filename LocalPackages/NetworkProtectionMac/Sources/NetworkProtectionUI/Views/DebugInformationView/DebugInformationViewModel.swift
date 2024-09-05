@@ -21,15 +21,19 @@ import Foundation
 import NetworkProtection
 import SwiftUI
 
-@MainActor
 public final class DebugInformationViewModel: ObservableObject {
 
-    var bundlePath: String
-    var version: String
+    let showDebugInformation: Bool
+    let bundlePath: String
+    let version: String
+    private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Initialization & Deinitialization
 
-    public init(bundle: Bundle = .main) {
+    public init(showDebugInformation: Bool,
+                bundle: Bundle = .main) {
+
+        self.showDebugInformation = showDebugInformation
         bundlePath = bundle.bundlePath
 
         // swiftlint:disable:next force_cast

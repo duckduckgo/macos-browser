@@ -79,16 +79,16 @@ public final class TransparentProxySettings {
 
     // MARK: - App routing rules logic
 
-    public func isBlocking(_ appIdentifier: String) -> Bool {
+    public func isBlocking(appIdentifier: String) -> Bool {
         appRoutingRules[appIdentifier] == .block
     }
 
-    public func isExcluding(_ appIdentifier: String) -> Bool {
+    public func isExcluding(appIdentifier: String) -> Bool {
         appRoutingRules[appIdentifier] == .exclude
     }
 
     public func toggleBlocking(for appIdentifier: String) {
-        if isBlocking(appIdentifier) {
+        if isBlocking(appIdentifier: appIdentifier) {
             appRoutingRules.removeValue(forKey: appIdentifier)
         } else {
             appRoutingRules[appIdentifier] = .block
@@ -96,10 +96,40 @@ public final class TransparentProxySettings {
     }
 
     public func toggleExclusion(for appIdentifier: String) {
-        if isExcluding(appIdentifier) {
+        if isExcluding(appIdentifier: appIdentifier) {
             appRoutingRules.removeValue(forKey: appIdentifier)
         } else {
             appRoutingRules[appIdentifier] = .exclude
+        }
+    }
+
+    // MARK: - Domain Exclusions
+
+    public func isExcluding(domain: String) -> Bool {
+        excludedDomains.contains(domain)
+    }
+
+    public func setExclusion(_ exclude: Bool, forDomain domain: String) {
+        if exclude {
+            guard !isExcluding(domain: domain) else {
+                return
+            }
+
+            excludedDomains.append(domain)
+        } else {
+            guard isExcluding(domain: domain) else {
+                return
+            }
+
+            excludedDomains.removeAll { $0 == domain }
+        }
+    }
+
+    public func toggleExclusion(domain: String) {
+        if isExcluding(domain: domain) {
+            excludedDomains.removeAll { $0 == domain }
+        } else {
+            excludedDomains.append(domain)
         }
     }
 

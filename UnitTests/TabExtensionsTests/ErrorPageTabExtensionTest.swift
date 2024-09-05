@@ -22,23 +22,24 @@ import Navigation
 import Common
 import WebKit
 import XCTest
+import SpecialErrorPages
 
 @testable import DuckDuckGo_Privacy_Browser
 
 final class ErrorPageTabExtensionTest: XCTestCase {
 
     var mockWebViewPublisher: PassthroughSubject<WKWebView, Never>!
-    var scriptPublisher: PassthroughSubject<MockSSLErrorPageScriptProvider, Never>!
-    var errorPageExtention: SSLErrorPageTabExtension!
+    var scriptPublisher: PassthroughSubject<MockSpecialErrorPageScriptProvider, Never>!
+    var errorPageExtention: SpecialErrorPageTabExtension!
     var credentialCreator: MockCredentialCreator!
     let errorURLString = "com.example.error"
 
     override func setUpWithError() throws {
         mockWebViewPublisher = PassthroughSubject<WKWebView, Never>()
-        scriptPublisher = PassthroughSubject<MockSSLErrorPageScriptProvider, Never>()
+        scriptPublisher = PassthroughSubject<MockSpecialErrorPageScriptProvider, Never>()
         credentialCreator = MockCredentialCreator()
         let featureFlagger = MockFeatureFlagger()
-        errorPageExtention = SSLErrorPageTabExtension(webViewPublisher: mockWebViewPublisher, scriptsPublisher: scriptPublisher, urlCredentialCreator: credentialCreator, featureFlagger: featureFlagger)
+        errorPageExtention = SpecialErrorPageTabExtension(webViewPublisher: mockWebViewPublisher, scriptsPublisher: scriptPublisher, urlCredentialCreator: credentialCreator, featureFlagger: featureFlagger)
     }
 
     override func tearDownWithError() throws {
@@ -59,7 +60,7 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         XCTAssertTrue(errorPageExtention.webView === aWebView)
     }
 
-    @MainActor func testWhenCertificateExpired_ThenExpectedErrorPageIsShown() {
+    @MainActor func testWhenCertificateExpired_ThenTabExtenstionErrorIsExpectedError() {
         // GIVEN
         let mockWebView = MockWKWebView(url: URL(string: errorURLString)!)
         errorPageExtention.webView = mockWebView
@@ -71,8 +72,7 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         errorPageExtention.navigation(navigation, didFailWith: error)
 
         // THEN
-        let expectedSpecificMessage = SSLErrorType.expired.specificMessage(for: errorURLString, eTldPlus1: eTldPlus1).replacingOccurrences(of: "</b>", with: "<\\/b>").escapedUnicodeHtmlString()
-        XCTAssertTrue(mockWebView.capturedHTML.contains(expectedSpecificMessage))
+        XCTAssertEqual(errorPageExtention.errorData, SpecialErrorData(kind: .ssl, errorType: "expired", domain: eTldPlus1))
     }
 
     @MainActor func testWhenCertificateSelfSigned_ThenExpectedErrorPageIsShown() {
@@ -87,8 +87,7 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         errorPageExtention.navigation(navigation, didFailWith: error)
 
         // THEN
-        let expectedSpecificMessage = SSLErrorType.selfSigned.specificMessage(for: errorURLString, eTldPlus1: eTldPlus1).replacingOccurrences(of: "</b>", with: "<\\/b>").escapedUnicodeHtmlString()
-        XCTAssertTrue(mockWebView.capturedHTML.contains(expectedSpecificMessage))
+        XCTAssertEqual(errorPageExtention.errorData, SpecialErrorData(kind: .ssl, errorType: "selfSigned", domain: eTldPlus1))
     }
 
     @MainActor func testWhenCertificateWrongHost_ThenExpectedErrorPageIsShown() {
@@ -103,27 +102,27 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         errorPageExtention.navigation(navigation, didFailWith: error)
 
         // THEN
-        let expectedSpecificMessage = SSLErrorType.wrongHost.specificMessage(for: errorURLString, eTldPlus1: eTldPlus1).replacingOccurrences(of: "</b>", with: "<\\/b>").escapedUnicodeHtmlString()
-        XCTAssertTrue(mockWebView.capturedHTML.contains(expectedSpecificMessage))
-
+        XCTAssertEqual(errorPageExtention.errorData, SpecialErrorData(kind: .ssl, errorType: "wrongHost", domain: eTldPlus1))
     }
 
     @MainActor func test_WhenUserScriptsPublisherPublishSSLErrorPageScript_ThenErrorPageExtensionIsSetAsUserScriptDelegate() {
         // GIVEN
-        let aSSLErrorUserScript = SSLErrorPageUserScript()
-        let mockScriptProvider = MockSSLErrorPageScriptProvider(script: aSSLErrorUserScript)
+        let userScript = SpecialErrorPageUserScript(localeStrings: SpecialErrorPageUserScript.localeStrings(),
+                                                    languageCode: Locale.current.languageCode ?? "en")
+        let mockScriptProvider = MockSpecialErrorPageScriptProvider(script: userScript)
 
         // WHEN
         scriptPublisher.send(mockScriptProvider)
 
         // THEN
-        XCTAssertNotNil(aSSLErrorUserScript.delegate)
+        XCTAssertNotNil(userScript.delegate)
     }
 
     @MainActor func testWhenNavigationEnded_IfNoFailure_SSLUserScriptIsNotEnabled() {
         // GIVEN
-        let userScript = SSLErrorPageUserScript()
-        let mockScriptProvider = MockSSLErrorPageScriptProvider(script: userScript)
+        let userScript = SpecialErrorPageUserScript(localeStrings: SpecialErrorPageUserScript.localeStrings(),
+                                                    languageCode: Locale.current.languageCode ?? "en")
+        let mockScriptProvider = MockSpecialErrorPageScriptProvider(script: userScript)
         let mockWebView = MockWKWebView(url: URL(string: errorURLString)!)
         let action = NavigationAction(request: URLRequest(url: URL(string: "com.example.error")!), navigationType: .custom(.userEnteredUrl), currentHistoryItemIdentity: nil, redirectHistory: nil, isUserInitiated: true, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: nil, shouldDownload: false, mainFrameNavigation: nil)
         let navigation = Navigation(identity: .init(nil), responders: .init(), state: .started, redirectHistory: [action], isCurrent: true, isCommitted: true)
@@ -135,13 +134,14 @@ final class ErrorPageTabExtensionTest: XCTestCase {
 
         // THEN
         XCTAssertFalse(userScript.isEnabled)
-        XCTAssertNil(userScript.failingURL)
+        XCTAssertNil(errorPageExtention.failingURL)
     }
 
     @MainActor func testWhenNavigationEnded_IfNonSSLFailure_SSLUserScriptIsNotEnabled() {
         // GIVEN
-        let userScript = SSLErrorPageUserScript()
-        let mockScriptProvider = MockSSLErrorPageScriptProvider(script: userScript)
+        let userScript = SpecialErrorPageUserScript(localeStrings: SpecialErrorPageUserScript.localeStrings(),
+                                                    languageCode: Locale.current.languageCode ?? "en")
+        let mockScriptProvider = MockSpecialErrorPageScriptProvider(script: userScript)
         let mockWebView = MockWKWebView(url: URL(string: errorURLString)!)
         let action = NavigationAction(request: URLRequest(url: URL(string: "com.example.error")!), navigationType: .custom(.userEnteredUrl), currentHistoryItemIdentity: nil, redirectHistory: nil, isUserInitiated: true, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: nil, shouldDownload: false, mainFrameNavigation: nil)
         let navigation = Navigation(identity: .init(nil), responders: .init(), state: .started, redirectHistory: [action], isCurrent: true, isCommitted: true)
@@ -156,13 +156,14 @@ final class ErrorPageTabExtensionTest: XCTestCase {
 
         // THEN
         XCTAssertFalse(userScript.isEnabled)
-        XCTAssertNil(userScript.failingURL)
+        XCTAssertNil(errorPageExtention.failingURL)
     }
 
     @MainActor func testWhenNavigationEnded_IfSSLFailure_AndErrorURLIsDifferentFromNavigationURL_SSLUserScriptIsNotEnabled() {
         // GIVEN
-        let userScript = SSLErrorPageUserScript()
-        let mockScriptProvider = MockSSLErrorPageScriptProvider(script: userScript)
+        let userScript = SpecialErrorPageUserScript(localeStrings: SpecialErrorPageUserScript.localeStrings(),
+                                                    languageCode: Locale.current.languageCode ?? "en")
+        let mockScriptProvider = MockSpecialErrorPageScriptProvider(script: userScript)
         let mockWebView = MockWKWebView(url: URL(string: errorURLString)!)
         let action = NavigationAction(request: URLRequest(url: URL(string: "com.different.error")!), navigationType: .custom(.userEnteredUrl), currentHistoryItemIdentity: nil, redirectHistory: nil, isUserInitiated: true, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: nil, shouldDownload: false, mainFrameNavigation: nil)
         let navigation = Navigation(identity: .init(nil), responders: .init(), state: .started, redirectHistory: [action], isCurrent: true, isCommitted: true)
@@ -176,13 +177,14 @@ final class ErrorPageTabExtensionTest: XCTestCase {
 
         // THEN
         XCTAssertFalse(userScript.isEnabled)
-        XCTAssertEqual(userScript.failingURL?.absoluteString, errorURLString)
+        XCTAssertEqual(errorPageExtention.failingURL?.absoluteString, errorURLString)
     }
 
     @MainActor func testWhenNavigationEnded_IfSSLFailure_AndErrorURLIsTheSameAsNavigationURL_SSLUserScriptIsEnabled() {
         // GIVEN
-        let userScript = SSLErrorPageUserScript()
-        let mockScriptProvider = MockSSLErrorPageScriptProvider(script: userScript)
+        let userScript = SpecialErrorPageUserScript(localeStrings: SpecialErrorPageUserScript.localeStrings(),
+                                                    languageCode: Locale.current.languageCode ?? "en")
+        let mockScriptProvider = MockSpecialErrorPageScriptProvider(script: userScript)
         let mockWebView = MockWKWebView(url: URL(string: errorURLString)!)
         let action = NavigationAction(request: URLRequest(url: URL(string: "com.example.error")!), navigationType: .custom(.userEnteredUrl), currentHistoryItemIdentity: nil, redirectHistory: nil, isUserInitiated: true, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: nil, shouldDownload: false, mainFrameNavigation: nil)
         let navigation = Navigation(identity: .init(nil), responders: .init(), state: .started, redirectHistory: [action], isCurrent: true, isCommitted: true)
@@ -196,7 +198,7 @@ final class ErrorPageTabExtensionTest: XCTestCase {
 
         // THEN
         XCTAssertTrue(userScript.isEnabled)
-        XCTAssertEqual(userScript.failingURL?.absoluteString, errorURLString)
+        XCTAssertEqual(errorPageExtention.failingURL?.absoluteString, errorURLString)
     }
 
     func testWhenLeaveSiteCalled_AndCanGoBackTrue_ThenWebViewGoesBack() {
@@ -351,11 +353,11 @@ class MockWKWebView: NSObject, ErrorPageTabExtensionNavigationDelegate {
     }
 }
 
-class MockSSLErrorPageScriptProvider: SSLErrorPageScriptProvider {
-    var sslErrorPageUserScript: SSLErrorPageUserScript?
+class MockSpecialErrorPageScriptProvider: SpecialErrorPageScriptProvider {
+    var specialErrorPageUserScript: SpecialErrorPageUserScript?
 
-    init(script: SSLErrorPageUserScript?) {
-        self.sslErrorPageUserScript = script
+    init(script: SpecialErrorPageUserScript?) {
+        self.specialErrorPageUserScript = script
     }
 }
 

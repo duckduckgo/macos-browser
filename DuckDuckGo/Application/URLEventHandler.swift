@@ -23,13 +23,15 @@ import PixelKit
 import Subscription
 import NetworkProtectionUI
 import VPNAppLauncher
-
-#if DBP
 import DataBrokerProtection
-#endif
+import os.log
+import BrowserServicesKit
 
 // @MainActor
 final class URLEventHandler {
+
+    @MainActor
+    private static let vpnURLEventHandler = VPNURLEventHandler()
 
     private let handler: (URL) -> Void
 
@@ -64,14 +66,14 @@ final class URLEventHandler {
 
     @objc func handleUrlEvent(event: NSAppleEventDescriptor, reply: NSAppleEventDescriptor) {
         guard let stringValue = event.paramDescriptor(forKeyword: keyDirectObject)?.stringValue else {
-            os_log("UrlEventListener: unable to determine path", type: .error)
+            Logger.general.error("UrlEventListener: unable to determine path")
             let error = NSError(domain: "CouldNotGetPath", code: -1, userInfo: nil)
             PixelKit.fire(DebugEvent(GeneralPixel.appOpenURLFailed, error: error))
             return
         }
 
         guard let url = URL.makeURL(from: stringValue) else {
-            os_log("UrlEventListener: failed to construct URL from path %s", type: .error, stringValue)
+            Logger.general.debug("UrlEventListener: failed to construct URL from path \(stringValue)")
             let error = NSError(domain: "CouldNotConstructURL", code: -1, userInfo: nil)
             PixelKit.fire(DebugEvent(GeneralPixel.appOpenURLFailed, error: error))
             return
@@ -109,14 +111,14 @@ final class URLEventHandler {
 
     private static func openURL(_ url: URL) {
         if url.scheme?.isNetworkProtectionScheme == true {
-            handleNetworkProtectionURL(url)
+            Task { @MainActor in
+                await vpnURLEventHandler.handle(url)
+            }
         }
 
-#if DBP
         if url.scheme?.isDataBrokerProtectionScheme == true {
             handleDataBrokerProtectionURL(url)
         }
-#endif
 
         DispatchQueue.main.async {
             if url.isFileURL && url.pathExtension == WebKitDownloadTask.downloadExtension {
@@ -135,45 +137,11 @@ final class URLEventHandler {
             }
 
             if url.scheme?.isNetworkProtectionScheme == false && url.scheme?.isDataBrokerProtectionScheme == false {
-                WaitlistModalDismisser.dismissWaitlistModalViewControllerIfNecessary(url)
                 WindowControllersManager.shared.show(url: url, source: .appOpenUrl, newTab: true)
             }
         }
     }
 
-    /// Handles NetP URLs
-    private static func handleNetworkProtectionURL(_ url: URL) {
-        DispatchQueue.main.async {
-            switch url {
-            case VPNAppLaunchCommand.showStatus.launchURL:
-                Task {
-                    await WindowControllersManager.shared.showNetworkProtectionStatus()
-                }
-            case VPNAppLaunchCommand.showSettings.launchURL:
-                WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .vpn)
-            case VPNAppLaunchCommand.shareFeedback.launchURL:
-                WindowControllersManager.shared.showShareFeedbackModal()
-            case VPNAppLaunchCommand.justOpen.launchURL:
-                WindowControllersManager.shared.showMainWindow()
-            case VPNAppLaunchCommand.showVPNLocations.launchURL:
-                WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .vpn)
-                WindowControllersManager.shared.showLocationPickerSheet()
-            case VPNAppLaunchCommand.showPrivacyPro.launchURL:
-                let url = Application.appDelegate.subscriptionManager.url(for: .purchase)
-                WindowControllersManager.shared.showTab(with: .subscription(url))
-                PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
-#if !APPSTORE && !DEBUG
-            case VPNAppLaunchCommand.moveAppToApplications.launchURL:
-                // this should be run after NSApplication.shared is set
-                PFMoveToApplicationsFolderIfNecessary(false)
-#endif
-            default:
-                return
-            }
-        }
-    }
-
-#if DBP
     /// Handles DBP URLs
     ///
     private static func handleDataBrokerProtectionURL(_ url: URL) {
@@ -187,7 +155,6 @@ final class URLEventHandler {
             return
         }
     }
-#endif
 }
 
 private extension String {

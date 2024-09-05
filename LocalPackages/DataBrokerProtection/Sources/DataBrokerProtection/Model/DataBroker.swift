@@ -18,6 +18,7 @@
 
 import Foundation
 import Common
+import os.log
 
 struct DataBrokerScheduleConfig: Codable {
     let retryError: Int
@@ -198,7 +199,7 @@ struct DataBroker: Codable, Sendable {
             let broker = try jsonDecoder.decode(DataBroker.self, from: data)
             return broker
         } catch {
-            os_log("DataBroker error: initFromResource, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("DataBroker error: initFromResource, error: \(error.localizedDescription, privacy: .public)")
             throw error
         }
     }

@@ -110,6 +110,7 @@ enum GeneralPixel: PixelKitEventV2 {
 
     // Duck Player
     case duckPlayerDailyUniqueView
+    case duckPlayerWeeklyUniqueView
     case duckPlayerViewFromYoutubeViaMainOverlay
     case duckPlayerViewFromYoutubeViaHoverButton
     case duckPlayerViewFromYoutubeAutomatic
@@ -130,18 +131,24 @@ enum GeneralPixel: PixelKitEventV2 {
     case duckPlayerAutoplaySettingsOff
     case duckPlayerNewTabSettingsOn
     case duckPlayerNewTabSettingsOff
+    case duckPlayerContingencySettingsDisplayed
+    case duckPlayerContingencyLearnMoreClicked
 
     // Dashboard
     case dashboardProtectionAllowlistAdd(triggerOrigin: String?)
     case dashboardProtectionAllowlistRemove(triggerOrigin: String?)
 
-    // Survey
-    case surveyRemoteMessageDisplayed(messageID: String)
-    case surveyRemoteMessageDismissed(messageID: String)
-    case surveyRemoteMessageOpened(messageID: String)
-
     // VPN
     case vpnBreakageReport(category: String, description: String, metadata: String)
+
+    // Unified Feedback
+    case pproFeedbackFeatureRequest(description: String, source: String)
+    case pproFeedbackGeneralFeedback(description: String, source: String)
+    case pproFeedbackReportIssue(source: String, category: String, subcategory: String, description: String, metadata: String)
+
+    case pproFeedbackFormShow
+    case pproFeedbackSubmitScreenShow(source: String, reportType: String, category: String, subcategory: String)
+    case pproFeedbackSubmitScreenFAQClick(source: String, reportType: String, category: String, subcategory: String)
 
     case networkProtectionEnabledOnSearch
     case networkProtectionGeoswitchingOpened
@@ -256,11 +263,8 @@ enum GeneralPixel: PixelKitEventV2 {
     case dbSaveBloomFilterError(error: Error?)
 
     case remoteMessagingSaveConfigError
-    case remoteMessagingInvalidateConfigError
-    case remoteMessagingSaveMessageError
     case remoteMessagingUpdateMessageShownError
     case remoteMessagingUpdateMessageStatusError
-    case remoteMessagingDeleteScheduledMessageError
 
     case configurationFetchError(error: Error)
 
@@ -367,6 +371,13 @@ enum GeneralPixel: PixelKitEventV2 {
     case bookmarksMigrationCouldNotRemoveOldStore
     case bookmarksMigrationCouldNotPrepareMultipleFavoriteFolders
 
+    // Bookmarks search and sort feature metrics
+    case bookmarksSortButtonClicked(origin: String)
+    case bookmarksSortButtonDismissed(origin: String)
+    case bookmarksSortByName(origin: String)
+    case bookmarksSearchExecuted(origin: String)
+    case bookmarksSearchResultClicked(origin: String)
+
     case syncSentUnauthenticatedRequest
     case syncMetadataCouldNotLoadDatabase
     case syncBookmarksProviderInitializationFailed
@@ -400,8 +411,6 @@ enum GeneralPixel: PixelKitEventV2 {
 
     case burnerTabMisplaced
 
-    case surveyRemoteMessageFetchingFailed
-    case surveyRemoteMessageStorageFailed
     case loginItemUpdateError(loginItemBundleID: String, action: String, buildType: String, osVersion: String)
 
     // Tracks installation without tracking retention.
@@ -565,6 +574,8 @@ enum GeneralPixel: PixelKitEventV2 {
         case .fireButton(option: let option):
             return "m_mac_fire_button_\(option)"
 
+        case .duckPlayerWeeklyUniqueView:
+            return "duckplayer_weekly-unique-view"
         case .duckPlayerDailyUniqueView:
             return "m_mac_duck-player_daily-unique-view"
         case .duckPlayerViewFromYoutubeViaMainOverlay:
@@ -607,6 +618,10 @@ enum GeneralPixel: PixelKitEventV2 {
             return "duckplayer_mac_newtab_setting-on"
         case .duckPlayerNewTabSettingsOff:
             return "duckplayer_mac_newtab_setting-off"
+        case .duckPlayerContingencySettingsDisplayed:
+            return "duckplayer_mac_contingency_settings-displayed"
+        case .duckPlayerContingencyLearnMoreClicked:
+            return "duckplayer_mac_contingency_learn-more-clicked"
         case .dashboardProtectionAllowlistAdd:
             return "m_mac_mp_wla"
         case .dashboardProtectionAllowlistRemove:
@@ -622,12 +637,19 @@ enum GeneralPixel: PixelKitEventV2 {
         case .vpnBreakageReport:
             return "m_mac_vpn_breakage_report"
 
-        case .surveyRemoteMessageDisplayed(let messageID):
-            return "m_mac_survey_remote_message_displayed_\(messageID)"
-        case .surveyRemoteMessageDismissed(let messageID):
-            return "m_mac_survey_remote_message_dismissed_\(messageID)"
-        case .surveyRemoteMessageOpened(let messageID):
-            return "m_mac_survey_remote_message_opened_\(messageID)"
+        case .pproFeedbackFeatureRequest:
+            return "m_mac_ppro_feedback_feature-request"
+        case .pproFeedbackGeneralFeedback:
+            return "m_mac_ppro_feedback_general-feedback"
+        case .pproFeedbackReportIssue:
+            return "m_mac_ppro_feedback_report-issue"
+        case .pproFeedbackFormShow:
+            return "m_mac_ppro_feedback_general-screen_show"
+        case .pproFeedbackSubmitScreenShow:
+            return "m_mac_ppro_feedback_submit-screen_show"
+        case .pproFeedbackSubmitScreenFAQClick:
+            return "m_mac_ppro_feedback_submit-screen-faq_click"
+
         case .networkProtectionEnabledOnSearch:
             return "m_mac_netp_ev_enabled_on_search"
 
@@ -764,16 +786,10 @@ enum GeneralPixel: PixelKitEventV2 {
 
         case .remoteMessagingSaveConfigError:
             return "remote_messaging_save_config_error"
-        case .remoteMessagingInvalidateConfigError:
-            return "remote_messaging_invalidate_config_error"
-        case .remoteMessagingSaveMessageError:
-            return "remote_messaging_save_message_error"
         case .remoteMessagingUpdateMessageShownError:
             return "remote_messaging_update_message_shown_error"
         case .remoteMessagingUpdateMessageStatusError:
             return "remote_messaging_update_message_status_error"
-        case .remoteMessagingDeleteScheduledMessageError:
-            return "remote_messaging_delete_scheduled_message_error"
 
         case .configurationFetchError:
             return "cfgfetch"
@@ -997,8 +1013,6 @@ enum GeneralPixel: PixelKitEventV2 {
 
         case .burnerTabMisplaced: return "burner_tab_misplaced"
 
-        case .surveyRemoteMessageFetchingFailed: return "survey_remote_message_fetching_failed"
-        case .surveyRemoteMessageStorageFailed: return "survey_remote_message_storage_failed"
         case .loginItemUpdateError: return "login-item_update-error"
 
             // Installation Attribution
@@ -1009,6 +1023,13 @@ enum GeneralPixel: PixelKitEventV2 {
         case .secureVaultKeystoreEventL2KeyPasswordMigration: return "m_mac_secure_vault_keystore_event_l2-key-password-migration"
 
         case .compilationFailed: return "compilation_failed"
+
+            // Bookmarks search and sort feature
+        case .bookmarksSortButtonClicked: return "m_mac_sort_bookmarks_button_clicked"
+        case .bookmarksSortButtonDismissed: return "m_mac_sort_bookmarks_button_dismissed"
+        case .bookmarksSortByName: return "m_mac_sort_bookmarks_by_name"
+        case .bookmarksSearchExecuted: return "m_mac_search_bookmarks_executed"
+        case .bookmarksSearchResultClicked: return "m_mac_search_result_clicked"
         }
     }
 
@@ -1082,6 +1103,39 @@ enum GeneralPixel: PixelKitEventV2 {
                 PixelKit.Parameters.vpnBreakageMetadata: metadata
             ]
 
+        case .pproFeedbackFeatureRequest(let description, let source):
+            return [
+                PixelKit.Parameters.pproIssueDescription: description,
+                PixelKit.Parameters.pproIssueSource: source,
+            ]
+        case .pproFeedbackGeneralFeedback(let description, let source):
+            return [
+                PixelKit.Parameters.pproIssueDescription: description,
+                PixelKit.Parameters.pproIssueSource: source,
+            ]
+        case .pproFeedbackReportIssue(let source, let category, let subcategory, let description, let metadata):
+            return [
+                PixelKit.Parameters.pproIssueSource: source,
+                PixelKit.Parameters.pproIssueCategory: category,
+                PixelKit.Parameters.pproIssueSubcategory: subcategory,
+                PixelKit.Parameters.pproIssueDescription: description,
+                PixelKit.Parameters.pproIssueMetadata: metadata,
+            ]
+        case .pproFeedbackSubmitScreenShow(let source, let reportType, let category, let subcategory):
+            return [
+                PixelKit.Parameters.pproIssueSource: source,
+                PixelKit.Parameters.pproIssueReportType: reportType,
+                PixelKit.Parameters.pproIssueCategory: category,
+                PixelKit.Parameters.pproIssueSubcategory: subcategory,
+            ]
+        case .pproFeedbackSubmitScreenFAQClick(let source, let reportType, let category, let subcategory):
+            return [
+                PixelKit.Parameters.pproIssueSource: source,
+                PixelKit.Parameters.pproIssueReportType: reportType,
+                PixelKit.Parameters.pproIssueCategory: category,
+                PixelKit.Parameters.pproIssueSubcategory: subcategory,
+            ]
+
         case .onboardingCohortAssigned(let cohort):
             return [PixelKit.Parameters.experimentCohort: cohort]
         case .onboardingHomeButtonEnabled(let cohort):
@@ -1110,6 +1164,39 @@ enum GeneralPixel: PixelKitEventV2 {
             return [PixelKit.Parameters.experimentCohort: cohort]
         case .onboardingDuckplayerUsed5to7(let cohort):
             return [PixelKit.Parameters.experimentCohort: cohort]
+
+        case .duckPlayerDailyUniqueView,
+                .duckPlayerViewFromYoutubeViaMainOverlay,
+                .duckPlayerViewFromYoutubeViaHoverButton,
+                .duckPlayerViewFromYoutubeAutomatic,
+                .duckPlayerViewFromSERP,
+                .duckPlayerViewFromOther,
+                .duckPlayerOverlayYoutubeImpressions,
+                .duckPlayerOverlayYoutubeWatchHere,
+                .duckPlayerSettingAlwaysDuckPlayer,
+                .duckPlayerSettingAlwaysOverlaySERP,
+                .duckPlayerSettingAlwaysOverlayYoutube,
+                .duckPlayerSettingAlwaysSettings,
+                .duckPlayerSettingNeverOverlaySERP,
+                .duckPlayerSettingNeverOverlayYoutube,
+                .duckPlayerSettingNeverSettings,
+                .duckPlayerSettingBackToDefault,
+                .duckPlayerWatchOnYoutube,
+                .duckPlayerAutoplaySettingsOn,
+                .duckPlayerAutoplaySettingsOff,
+                .duckPlayerNewTabSettingsOn,
+                .duckPlayerNewTabSettingsOff,
+                .duckPlayerContingencySettingsDisplayed,
+                .duckPlayerWeeklyUniqueView,
+                .duckPlayerContingencyLearnMoreClicked:
+            return DuckPlayerOnboardingExperiment().getPixelParameters()
+
+        case .bookmarksSortButtonClicked(let origin),
+                .bookmarksSortButtonDismissed(let origin),
+                .bookmarksSortByName(let origin),
+                .bookmarksSearchExecuted(let origin),
+                .bookmarksSearchResultClicked(let origin):
+            return ["origin": origin]
 
         default: return nil
         }

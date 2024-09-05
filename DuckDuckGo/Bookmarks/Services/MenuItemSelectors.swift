@@ -19,7 +19,7 @@
 import AppKit
 
 @objc protocol BookmarksMenuItemSelectors {
-    func newFolder(_ sender: NSMenuItem)
+    func newFolder(_ sender: Any?)
     func moveToEnd(_ sender: NSMenuItem)
     @objc optional func manageBookmarks(_ sender: NSMenuItem)
 }
@@ -43,4 +43,16 @@ import AppKit
     func openInNewTabs(_ sender: NSMenuItem)
     func openAllInNewWindow(_ sender: NSMenuItem)
 
+}
+
+@objc protocol BookmarkSearchMenuItemSelectors {
+
+    func showInFolder(_ sender: NSMenuItem)
+}
+
+@objc protocol BookmarkSortMenuItemSelectors {
+
+    func manualSort(_ sender: NSMenuItem)
+    func sortByNameAscending(_ sender: NSMenuItem)
+    func sortByNameDescending(_ sender: NSMenuItem)
 }

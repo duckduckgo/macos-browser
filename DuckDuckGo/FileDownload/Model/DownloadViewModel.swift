@@ -20,6 +20,7 @@ import Combine
 import Common
 import Foundation
 import UniformTypeIdentifiers
+import os.log
 
 final class DownloadViewModel {
 
@@ -80,7 +81,7 @@ final class DownloadViewModel {
         let oldState = self.state
         let newState = State(item: item, shouldAnimateOnAppear: state.shouldAnimateOnAppear ?? true)
         if oldState != newState {
-            os_log(.debug, log: .downloads, "DownloadViewModel: \(item.identifier): \(oldState) ➡️ \(newState)")
+            Logger.fileDownload.debug("DownloadViewModel: \(item.identifier.uuidString): \(oldState.debugDescription) ➡️ \(newState.debugDescription)")
             self.state = newState
         }
     }

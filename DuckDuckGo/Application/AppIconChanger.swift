@@ -29,7 +29,13 @@ final class AppIconChanger {
     func updateIcon(isInternalChannel: Bool) {
         let icon: NSImage?
         if isInternalChannel {
+#if DEBUG
+            icon = .internalChannelIconDebug
+#elseif REVIEW
+            icon = .internalChannelIconReview
+#else
             icon = .internalChannelIcon
+#endif
         } else {
             icon = nil
         }

@@ -41,18 +41,14 @@ struct DefaultVPNFeatureGatekeeper: VPNFeatureGatekeeper {
     private static var subscriptionAuthTokenPrefix: String { "ddg:" }
     private let vpnUninstaller: VPNUninstalling
     private let networkProtectionFeatureActivation: NetworkProtectionFeatureActivation
-    private let privacyConfigurationManager: PrivacyConfigurationManaging
     private let defaults: UserDefaults
     private let subscriptionManager: SubscriptionManager
 
-    init(privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
-         networkProtectionFeatureActivation: NetworkProtectionFeatureActivation = NetworkProtectionKeychainTokenStore(),
+    init(networkProtectionFeatureActivation: NetworkProtectionFeatureActivation = NetworkProtectionKeychainTokenStore(),
          vpnUninstaller: VPNUninstalling = VPNUninstaller(),
          defaults: UserDefaults = .netP,
-         log: OSLog = .networkProtection,
          subscriptionManager: SubscriptionManager) {
 
-        self.privacyConfigurationManager = privacyConfigurationManager
         self.networkProtectionFeatureActivation = networkProtectionFeatureActivation
         self.vpnUninstaller = vpnUninstaller
         self.defaults = defaults
@@ -125,7 +121,7 @@ struct DefaultVPNFeatureGatekeeper: VPNFeatureGatekeeper {
         }
 
         /// There's not much to be done for this error here.
-        /// The uninstall call already fires pixels to allow us to track success rate and see the errors.
+        /// The uninstall call already fires pixels to allow us to anonymously track success rate and see the errors.
         try? await vpnUninstaller.uninstall(removeSystemExtension: false)
     }
 }

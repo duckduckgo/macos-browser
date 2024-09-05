@@ -19,11 +19,11 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-@MainActor
 final class WebsiteInfoTests: XCTestCase {
 
     // MARK: - URL
 
+    @MainActor
     func testWhenInitWithTabThenSetURLWithTabURLValue() throws {
         // GIVEN
         let url = URL.duckDuckGo
@@ -38,6 +38,7 @@ final class WebsiteInfoTests: XCTestCase {
 
     // MARK: - Title
 
+    @MainActor
     func testWhenTitleIsNotNilThenDisplayTitleReturnsTitleValue() throws {
         // GIVEN
         let title = #function
@@ -50,6 +51,7 @@ final class WebsiteInfoTests: XCTestCase {
         XCTAssertEqual(result, title)
     }
 
+    @MainActor
     func testWhenTitleIsNilAndURLConformsToRFC3986ThenDisplayTitleReturnsURLHost() throws {
         // GIVEN
         let url = URL.duckDuckGo
@@ -62,6 +64,7 @@ final class WebsiteInfoTests: XCTestCase {
         XCTAssertEqual(result, url.host)
     }
 
+    @MainActor
     func testWhenTitleIsNilAndURLDoesNotConformToRFC3986ThenDisplayTitleReturnsURLAbsoluteString() throws {
         // GIVEN
         let invalidURL = try XCTUnwrap(URL(string: "duckduckgo.com"))

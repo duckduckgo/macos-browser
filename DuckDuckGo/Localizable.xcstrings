@@ -6255,126 +6255,6 @@
         }
       }
     },
-    "autofill.usernames-and-passwords" : {
-      "comment" : "Autofill autosaved data type",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Benutzernamen und Passwörter"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Usernames and passwords"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nombres de usuario y contraseñas"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Noms d'utilisateur et mots de passe"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nome utente e password"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gebruikersnamen en wachtwoorden"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nazwy użytkowników i hasła"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nomes de utilizador e palavras-passe"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Имена пользователей и пароли"
-          }
-        }
-      }
-    },
-    "autofill.view-autofill-content" : {
-      "comment" : "View Autofill Content Button name in the autofill settings",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Autovervollständigen-Inhalte anzeigen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "View Autofill Content…"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ver contenido de autocompletar..."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Afficher le contenu de saisie automatique…"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Visualizza compilazione automatica del contenuto..."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inhoud voor automatisch invullen bekijken ..."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wyświetl zawartość autouzupełniania…"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ver conteúdo de preenchimento automático…"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Просмотреть данные автозаполнения..."
-          }
-        }
-      }
-    },
     "autofill.view-autofill-content.identities" : {
       "comment" : "View Identities Content Button title in the autofill Settings",
       "extractionState" : "extracted_with_value",
@@ -10718,6 +10598,126 @@
         }
       }
     },
+    "bookmarks.empty.search.resukt..state.title" : {
+      "comment" : "Title displayed in Bookmark Panel when there is no bookmarks that match the search query",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Lesezeichen gefunden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No bookmarks found"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se han encontrado marcadores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun signet trouvé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non sono stati trovati segnalibri"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geen bladwijzers gevonden"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie znaleziono zakładek"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nenhum marcador encontrado"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Закладки не найдены"
+          }
+        }
+      }
+    },
+    "bookmarks.empty.search.result.state.message" : {
+      "comment" : "Text displayed in Bookmark Panel when there is no bookmarks that match the search query",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Probiere verschiedene Suchbegriffe aus."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Try different search terms."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prueba con diferentes términos de búsqueda."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Essayez différents termes de recherche."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prova con altri termini di ricerca."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Probeer verschillende zoektermen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spróbuj z innymi wyszukiwanymi hasłami."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Experimenta termos de pesquisa diferentes."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Попробуйте другие поисковые запросы."
+          }
+        }
+      }
+    },
     "bookmarks.empty.state.message" : {
       "comment" : "Text displayed in Bookmark Manager when there is no bookmarks yet",
       "extractionState" : "extracted_with_value",
@@ -11314,6 +11314,246 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Открыть панель закладок"
+          }
+        }
+      }
+    },
+    "bookmarks.sort.manual" : {
+      "comment" : "Button to sort bookmarks by manual",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manuell"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Manual"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manual"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manuel"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manuale"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Handmatig"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ręcznie"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manual"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вручную"
+          }
+        }
+      }
+    },
+    "bookmarks.sort.name" : {
+      "comment" : "Button to sort bookmarks by name ascending",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Name"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nombre"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nom"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nome"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Naam"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nazwa"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nome"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Название"
+          }
+        }
+      }
+    },
+    "bookmarks.sort.name.asc" : {
+      "comment" : "Button to sort bookmarks by name ascending",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aufsteigend"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Ascending"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ascendente"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ascendant"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ascendente"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oplopend"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rosnąco"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ascendente"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "По возрастанию"
+          }
+        }
+      }
+    },
+    "bookmarks.sort.name.desc" : {
+      "comment" : "Button to sort bookmarks by name descending",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Absteigend"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Descending"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descendente"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descendant"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Discendente"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aflopend"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Malejąco"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descendente"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "По убыванию"
           }
         }
       }
@@ -13026,6 +13266,1206 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Добавить справа от текущей вкладки"
+          }
+        }
+      }
+    },
+    "contextual.onboarding.final-screen.button" : {
+      "comment" : "Button on the last screen of the onboarding, it will dismiss the onboarding screen.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schlag ein!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "High five!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Choca esos cinco!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bien joué !"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Batti cinque!"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "High five!"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Piątka!"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dá cá cinco!"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дай пять!"
+          }
+        }
+      }
+    },
+    "contextual.onboarding.final-screen.message" : {
+      "comment" : "Message of the last screen of the onboarding to the browser app.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hinweis: Jedes Mal, wenn du mit mir browst, verliert eine gruselige Anzeige ihren Schrecken. 👌"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Remember: every time you browse with me a creepy ad loses its wings. 👌"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recuerda: cada vez que navegas conmigo corto las alas a un anuncio horrible. 👌"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pensez-y : chaque fois que vous naviguez avec moi, une publicité douteuse disparaît. 👌"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ricorda: quando navighi con me gli annunci inquietanti non possono seguirti. 👌"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Denk eraan: elke keer als je met mij browset, verliest een enge advertentie zijn vleugels. 👌"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pamiętaj: za każdym razem, gdy przeglądasz ze mną Internet, jakaś wstrętna reklama przestaje działać. 👌"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lembra-te: sempre que navegas comigo, um anúncio assustador perde as suas asas. 👌"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Бродить по сайтам с нами — значит подрезать крылья назойливой рекламе. 👌"
+          }
+        }
+      }
+    },
+    "contextual.onboarding.final-screen.title" : {
+      "comment" : "Title of the last screen of the onboarding to the browser app",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gut gemacht!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You’ve got this!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Lo estás haciendo muy bien!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bien joué !"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ben fatto!"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je kunt het!"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Udało się!"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Você consegue!"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Проще некуда!"
+          }
+        }
+      }
+    },
+    "contextual.onboarding.first-search-done.message" : {
+      "comment" : "After the user performs their first search using the browser, this dialog explains the advantages of using DuckDuckGo",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privat. Schnell. Weniger Werbung."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Private. Fast. Fewer ads."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privado. Rápido. Menos anuncios."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privé. Rapide. Moins de publicités."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privato. Veloce. Meno annunci."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privé. Snel. Minder advertenties."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prywatna. Szybka. Z mniejszą liczbą reklam."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privado. Rápido. Menos anúncios."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Надежно. Быстро. Меньше рекламы."
+          }
+        }
+      }
+    },
+    "contextual.onboarding.first-search-done.title" : {
+      "comment" : "After the user performs their first search using the browser, this dialog explains the advantages of using DuckDuckGo",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das ist DuckDuckGo Search."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "That’s DuckDuckGo Search."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eso es DuckDuckGo Search."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "C'est DuckDuckGo Search."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vantaggi di DuckDuckGo Search."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dat is DuckDuckGo Search."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To DuckDuckGo Search."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "É a DuckDuckGo Search."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Это — DuckDuckGo Search."
+          }
+        }
+      }
+    },
+    "contextual.onboarding.got-it.button" : {
+      "comment" : "During onboarding steps this button is shown and takes either to the next steps or closes the onboarding.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verstanden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Got it"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entendido"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "J'ai compris"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ho capito"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ik snap het"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rozumiem"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entendi"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Понятно"
+          }
+        }
+      }
+    },
+    "contextual.onboarding.ntp.try-a-site.title" : {
+      "comment" : "Title of a popover on the new tab page browser that invites the user to try a visiting a website",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versuche, eine Website zu besuchen!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Try visiting a site!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Intenta visitar un sitio!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Essayez de visiter un site !"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prova a visitare un sito!"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bezoek eens een site!"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spróbuj odwiedzić witrynę!"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Experimenta visitar um site!"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Попробуйте посетить сайт!"
+          }
+        }
+      }
+    },
+    "contextual.onboarding.try-a-search.message" : {
+      "comment" : "Message of a popover on the browser that invites the user to try a search explaining that their searches are anonymous",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine DuckDuckGo-Suchanfragen sind immer anonym."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your DuckDuckGo searches are always anonymous."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus búsquedas en DuckDuckGo son siempre anónimas."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vos recherches sur DuckDuckGo sont toujours anonymes."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le tue ricerche su DuckDuckGo sono sempre anonime."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je DuckDuckGo-zoekopdrachten zijn altijd anoniem."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyszukiwania w DuckDuckGo zawsze są anonimowe."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As tuas pesquisas no DuckDuckGo são sempre anónimas."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ваши поисковые запросы в DuckDuckGo всегда анонимны."
+          }
+        }
+      }
+    },
+    "contextual.onboarding.try-a-search.title" : {
+      "comment" : "Title of a popover on the browser that invites the user to try a search",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Probiere eine Suche aus!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Try a search!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Prueba con una búsqueda!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Essayez une recherche !"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prova una ricerca!"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Probeer een zoekopdracht!"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spróbuj coś wyszukać!"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Experimenta fazer uma pesquisa!"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Попробуйте ввести запрос!"
+          }
+        }
+      }
+    },
+    "contextual.onboarding.try-a-site.message" : {
+      "comment" : "Message of a popover on the browser that invites the user to try visiting a website to explain that we block trackers",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ich blockiere Tracker, damit sie dich nicht ausspionieren können."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "I’ll block trackers so they can’t spy on you."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bloquearé los rastreadores para que no puedan espiarte."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je bloquerai les traqueurs afin qu'ils ne puissent pas vous espionner."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bloccherò i sistemi di tracciamento in modo che non possano spiarti e"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ik blokkeer trackers zodat ze je niet kunnen bespioneren."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zablokuję skrypty śledzące, aby nie mogły Cię szpiegować."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bloquearei rastreadores para que não possam espiá-lo."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Мы заблокируем трекеры и пресечем слежку."
+          }
+        }
+      }
+    },
+    "contextual.onboarding.try-a-site.title" : {
+      "comment" : "Title of a popover on the browser that invites the user to try a visiting a website",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versuche als nächstes, eine Website zu besuchen!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Next, try visiting a site!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡A continuación, intenta visitar un sitio!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ensuite, essayez de visiter un site !"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In seguito, prova a visitare un sito!"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Probeer nu een site te bezoeken!"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Następnie spróbuj odwiedzić witrynę!"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Em seguida, experimenta visitar um site!"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "А теперь попробуйте посетить сайт!"
+          }
+        }
+      }
+    },
+    "contextual.onboarding.try-fire-button.message" : {
+      "comment" : "Message of a popover on the browser that invites the user to try visiting the browser Fire Button. Please leave the line break",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lösche deine Browseraktivitäten sofort mit dem Fire Button.\n\nProbier’s doch mal aus! 🔥"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Instantly clear your browsing activity with the Fire Button.\n\nGive it a try! 🔥"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borra al instante tu actividad de navegación con el Fire Button.\n\n¡Pruébalo! 🔥"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effacez instantanément votre activité de navigation avec le Fire Button.\n\nEssayez par vous-même ! 🔥"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancella istantaneamente la tua attività di navigazione con il Fire Button.\n\nProvalo! 🔥"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wis je browser-activiteit direct met de Fire Button.\n\nProbeer het maar! 🔥"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Natychmiast wyczyść swoją aktywność związaną z przeglądaniem za pomocą przycisku Fire Button.\n\nSpróbuj! 🔥"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Limpa instantaneamente a tua atividade de navegação com o Fire Button.\n\nExperimenta! 🔥"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кнопка Fire Button моментально стирает из браузера данные о посещении сайтов.\n\nУбедитесь сами! 🔥"
+          }
+        }
+      }
+    },
+    "contextual.onboarding.try-search.option1-English" : {
+      "comment" : "Browser Search query for how to say duck in english",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "wie sagt man „Ente“ auf Spanisch"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "how to say “duck” in spanish"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "cómo se dice «pato» en inglés"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "comment dire « duck » en espagnol"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "come si dice \"anatra\" in spagnolo"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "hoe zeg je 'eend' in het Spaans?"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "jak się mówi „kaczka” po hiszpańsku"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "como dizer \"pato\" em espanhol"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Как сказать «утка» по-испански?"
+          }
+        }
+      }
+    },
+    "contextual.onboarding.try-search.option1international" : {
+      "comment" : "Browser Search query for how to say duck in english",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "wie sagt man „Ente“ auf Englisch"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "how to say “duck” in english"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "cómo se dice «pato» en inglés"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "comment dire « canard » en anglais"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "come si dice \"anatra\" in inglese"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "hoe zeg je 'eend' in het Engels?"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "jak się mówi „kaczka” po angielsku"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "como dizer \"pato\" em inglês"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Как сказать «утка» по-английски?"
+          }
+        }
+      }
+    },
+    "contextual.onboarding.try-search.option2-english" : {
+      "comment" : "Search query for the cast of Mighty Ducks",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Besetzung von Mighty Ducks"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "mighty ducks cast"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "reparto de Mighty Ducks"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "casting de mighty ducks"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "cast delle papere potenti"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "cast van Mighty Ducks"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "obsada potężnych kaczorów"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "elenco do filme A Hora dos Campeões"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кто играет главные роли в фильме «Могучие утята»?"
+          }
+        }
+      }
+    },
+    "contextual.onboarding.try-search.option2-international" : {
+      "comment" : "Search query for the cast of Avatar",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Besetzung von Avatar"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "cast of avatar"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "reparto de Avatar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "casting d'avatar"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "cast di avatar"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "cast van avatar"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "obsada avatara"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "elenco de avatar"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "актерский состав аватара"
+          }
+        }
+      }
+    },
+    "contextual.onboarding.try-search.option3" : {
+      "comment" : "Browser Search query for local weather",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lokales Wetter"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "local weather"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "el tiempo local"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "météo locale"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "meteo locale"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "lokaal weer"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pogoda lokalna"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "meteorologia local"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Местная погода"
+          }
+        }
+      }
+    },
+    "contextual.onboarding.try-search.surprise-me-english" : {
+      "comment" : "Browser Search query for chocolate chip cookie recipes",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rezepte für Schokoladenkekse"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "chocolate chip cookie recipes"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "recetas de galletas con pepitas de chocolate"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "recettes de cookies aux pépites de chocolat"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ricette di biscotti con gocce di cioccolato"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recepten voor chocoladekoekjes"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "przepisy na ciastka z kawałkami czekolady"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "receitas de biscoitos de chocolate"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "рецепты печенья с шоколадной крошкой"
+          }
+        }
+      }
+    },
+    "contextual.onboarding.try-search.surprise-me-international" : {
+      "comment" : "Browser Search query for dinner recipes",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dinner-Rezepte"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "dinner recipes"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "recetas para la cena"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "recettes pour le dîner"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ricette per la cena"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "recepten voor het avondeten"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "przepisy na obiad"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "receitas de jantar"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "рецепты на ужин"
+          }
+        }
+      }
+    },
+    "contextual.onboarding.try-search.surprise-me-title" : {
+      "comment" : "Title for a button that triggers an unknown search query for the user.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Überrasche mich!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Surprise me!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Sorpréndeme!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Surprenez-moi !"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sorprendimi!"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verras me!"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zaskocz mnie!"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Surpreende-me!"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удиви меня!"
           }
         }
       }
@@ -16903,24 +18343,24 @@
     },
     "duck-player.autoplay-preference" : {
       "comment" : "Autoplay preference in settings",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Videos automatisch abspielen, wenn sie im Duck Player geöffnet werden"
+            "value" : "In Duck Player geöffnete Videos automatisch abspielen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Autoplay videos when opened in Duck Player"
+            "value" : "Autoplay videos opened in Duck Player"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reproducir automáticamente los vídeos cuando se abran en Duck Player"
+            "value" : "Reproducir automáticamente los vídeos abiertos en Duck Player"
           }
         },
         "fr" : {
@@ -16932,7 +18372,7 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Riproduzione automatica dei video quando li apri in Duck Player"
+            "value" : "Riproduzione automatica dei video aperti in Duck Player"
           }
         },
         "nl" : {
@@ -16944,13 +18384,13 @@
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Automatyczne odtwarzanie filmów po otwarciu w Duck Player"
+            "value" : "Automatyczne odtwarzanie filmów otwieranych w Duck Player"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reproduzir vídeos automaticamente quando abertos no Duck Player"
+            "value" : "Reproduzir automaticamente vídeos abertos no Duck Player"
           }
         },
         "ru" : {
@@ -16961,62 +18401,62 @@
         }
       }
     },
-    "duck-player.autoplay-title" : {
-      "comment" : "Autoplay title in settings",
+    "duck-player.contingency-title" : {
+      "comment" : "Title for message explaining to the user that Duck Player is not available",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Automatisches Abspielen"
+            "value" : "Duck Player nicht verfügbar"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Autoplay"
+            "value" : "Duck Player Unavailable"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reproducción automática"
+            "value" : "Duck Player no disponible"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lecture automatique"
+            "value" : "Duck Player n'est pas disponible"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Riproduzione automatica"
+            "value" : "Duck Player non disponibile"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Automatisch afspelen"
+            "value" : "Duck Player is niet beschikbaar"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Automatyczne odtwarzanie"
+            "value" : "Duck Player jest niedostępny"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reprodução automática"
+            "value" : "Duck Player indisponível"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Автовоспроизведение"
+            "value" : "Duck Player недоступен"
           }
         }
       }
@@ -17085,22 +18525,58 @@
       "comment" : "New tab preference in settings",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffne Duck Player nach Möglichkeit in einem neuen Tab"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Open Duck Player in a new tab whenever possible"
           }
-        }
-      }
-    },
-    "duck-player.newtab-title" : {
-      "comment" : "New Tab title in settings",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
+        },
+        "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "New Tab"
+            "state" : "translated",
+            "value" : "Abre Duck Player en una pestaña nueva siempre que sea posible"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvre Duck Player dans un nouvel onglet chaque fois que possible"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri sempre Duck Player in una nuova scheda quando possibile"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Duck Player waar mogelijk in een nieuw tabblad"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwieraj Duck Player w nowej karcie, gdy tylko jest to możliwe"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir o Duck Player num novo separador sempre que possível"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "По возможности открывать Duck Player в новой вкладке"
           }
         }
       }
@@ -17109,10 +18585,58 @@
       "comment" : "New tab preference extra info in settings",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beim Browsen auf YouTube im Internet"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "When browsing YouTube on the web"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Al navegar en YouTube en la web"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lorsque vous naviguez sur YouTube sur le Web"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Durante la navigazione di YouTube sul Web"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wanneer je YouTube op het web bekijkt"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Podczas przeglądania YouTube w Internecie"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ao navegar no YouTube na Internet"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "При просмотре YouTube в интернете"
           }
         }
       }
@@ -17173,6 +18697,486 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Не использовать Duck Player"
+          }
+        }
+      }
+    },
+    "duck-player.onboarding-choice-modal-CTA-confirm" : {
+      "comment" : "Confirm Button to enable Duck Player. -Duck Player- should not be translated",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck Player aktivieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Turn on Duck Player"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activar Duck Player"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activez Duck Player"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attiva Duck Player"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck Player aanzetten"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Włącz Duck Player"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ligar o Duck Player"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Включить Duck Player"
+          }
+        }
+      }
+    },
+    "duck-player.onboarding-choice-modal-CTA-deny" : {
+      "comment" : "Deny Button to enable Duck Player",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jetzt nicht"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Not Now"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ahora no"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas maintenant"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non adesso"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niet nu"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie teraz"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agora não"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не сейчас"
+          }
+        }
+      }
+    },
+    "duck-player.onboarding-choice-modal-message-body" : {
+      "comment" : "Message for a Duck Player onboarding modal screen",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mit dem Duck Player kannst du YouTube ohne gezielte Werbung in DuckDuckGo ansehen und was du dir ansiehst, hat keinen Einfluss auf deine Empfehlungen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Duck Player lets you watch YouTube without targeted ads in DuckDuckGo and what you watch won't influence your recommendations."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck Player te permite ver YouTube sin anuncios segmentados en DuckDuckGo y lo que veas no influirá en tus recomendaciones."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck Player vous permet de regarder YouTube sans publicités ciblées dans DuckDuckGo. De plus, ce que vous regardez n'influence pas vos recommandations."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck Player ti consente di guardare YouTube senza annunci mirati in DuckDuckGo e ciò che guardi non inciderà sui consigli che ricevi."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Met Duck Player kun je YouTube bekijken in DuckDuckGo, zonder gerichte advertenties. Wat je bekijkt heeft geen invloed op je aanbevelingen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck Player umożliwia oglądanie YouTube bez ukierunkowanych reklam w DuckDuckGo i wpływu oglądanych treści na rekomendacje."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Duck Player permite-te ver o YouTube sem anúncios segmentados no DuckDuckGo, e o que vês não vai influenciar as tuas recomendações."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Проигрыватель Duck Player позволяет смотреть видео из YouTube в браузере DuckDuckGo без целевой рекламы. Просмотренные ролики не влияют на рекомендации."
+          }
+        }
+      }
+    },
+    "duck-player.onboarding-choice-modal-title-bottom" : {
+      "comment" : "Bottom title for a Duck Player onboarding modal screen",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teste Duck Player!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Try Duck Player!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Prueba Duck Player!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Essayez Duck Player !"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prova Duck Player!"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Probeer Duck Player!"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wypróbuj Duck Player!"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Experimenta o Duck Player!"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Попробуйте Duck Player!"
+          }
+        }
+      }
+    },
+    "duck-player.onboarding-choice-modal-title-top" : {
+      "comment" : "Top title for a Duck Player onboarding modal screen",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ertrinkst du in Werbung auf YouTube?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Drowning in ads on YouTube?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Te ahogas en anuncios en YouTube?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YouTube vous inonde de publicités ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YouTube ti inonda di annunci?"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Te veel advertenties op YouTube?"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Za dużo reklam na YouTube?"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Já não suportas ver anúncios no YouTube?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Шквал рекламы на YouTube?"
+          }
+        }
+      }
+    },
+    "duck-player.onboarding-confirmation-modal-CTA-confirm" : {
+      "comment" : "Button to confirm on Duck Player onboarding modal confirmation screen",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verstanden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Got it"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entendido"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "J'ai compris"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ho capito"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ik snap het"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rozumiem"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entendi"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Понятно"
+          }
+        }
+      }
+    },
+    "duck-player.onboarding-confirmation-modal-message" : {
+      "comment" : "Message for a Duck Player onboarding modal confirmation screen",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähl ein Video aus, um die Magie des Duck Players zu erleben."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Pick a video to see Duck Player work its magic."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige un vídeo para ver cómo Duck Player hace su magia."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisissez une vidéo pour voir opérer la magie de Duck Player."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scegli un video per vedere Duck Player fare la sua magia."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kies een video om te zien hoe Duck Player voor je werkt."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wybierz film, aby zobaczyć, jak działa Duck Player."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escolhe um vídeo para o Duck Player fazer a sua magia."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выберите видео, чтобы оценить потрясающие возможности Duck Player в деле."
+          }
+        }
+      }
+    },
+    "duck-player.onboarding-confirmation-modal-title" : {
+      "comment" : "Title for a Duck Player onboarding modal confirmation screen",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alles bereit!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "All set!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Todo listo!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tout est prêt !"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tutto pronto!"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Helemaal klaar!"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wszystko gotowe!"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tudo pronto!"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Всё готово!"
           }
         }
       }
@@ -17293,6 +19297,246 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Проигрыватель Duck Player"
+          }
+        }
+      }
+    },
+    "duck-player.video-autoplay-preference" : {
+      "comment" : "Autoplay preference in settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Videos automatisch abspielen, wenn sie im Duck Player geöffnet werden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Autoplay videos when opened in Duck Player"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reproducir automáticamente los vídeos cuando se abran en Duck Player"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lecture automatique des vidéos ouvertes dans Duck Player"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riproduzione automatica dei video quando li apri in Duck Player"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video's automatisch afspelen wanneer ze worden geopend in Duck Player"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatyczne odtwarzanie filmów po otwarciu w Duck Player"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reproduzir vídeos automaticamente quando abertos no Duck Player"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Автоматически проигрывать видео при открытии в Duck Player"
+          }
+        }
+      }
+    },
+    "duck-player.video-contingency-cta" : {
+      "comment" : "Button for the message explaining to the user that Duck Player is not available so the user can learn more",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mehr erfahren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Learn More"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Más información"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En savoir plus"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ulteriori informazioni"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meer informatie"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dowiedz się więcej"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saiba mais"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Узнать больше"
+          }
+        }
+      }
+    },
+    "duck-player.video-contingency-message" : {
+      "comment" : "Message explaining to the user that Duck Player is not available",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Funktionalität des Duck Players wird durch die jüngsten Änderungen bei YouTube beeinträchtigt. Vielen Dank für dein Verständnis, während wir daran arbeiten, diese Probleme zu beheben."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Duck Player's functionality has been affected by recent changes to YouTube. We’re working to fix these issues and appreciate your understanding."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La funcionalidad de Duck Player se ha visto afectada por los cambios recientes en YouTube. Estamos trabajando para solucionar estos problemas y agradecemos tu comprensión."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les récents changements apportés à YouTube ont affecté la fonctionnalité de Duck Player. Nous nous efforçons de résoudre ces problèmes et vous remercions de votre compréhension."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La funzionalità di Duck Player è stata influenzata dalle recenti modifiche a YouTube. Stiamo lavorando per risolvere questi problemi. Ti ringraziamo per la comprensione."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recente wijzigingen in YouTube hebben invloed op de functionaliteit van Duck Player. We werken aan een oplossing voor deze problemen. Bedankt voor je begrip."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ostatnie zmiany w serwisie YouTube miały wpływ na działanie Duck Player. Pracujemy nad rozwiązaniem tych problemów i dziękujemy za zrozumienie."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A funcionalidade do Duck Player foi afetada por alterações recentes ao YouTube. Estamos a trabalhar para resolver estes problemas e agradecemos a tua compreensão."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Недавние изменения YouTube приводят к некорректной работе проигрывателя Duck Player. Мы занимаемся решением этой проблемы и благодарим вас за понимание."
+          }
+        }
+      }
+    },
+    "duck-player.video-preferences-title" : {
+      "comment" : "Video Preferences title in settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video-Einstellungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Video Preferences"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preferencias de vídeo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Préférences vidéo"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preferenze video"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Videovoorkeuren"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preferencje filmów"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preferências de vídeo"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настройки видео"
           }
         }
       }
@@ -17458,60 +19702,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "DuckDuckGo запрашивает разрешение на чтение файла закладок %1$@. Чтобы импортировать закладки, выберите папку %2$@."
-          }
-        }
-      }
-    },
-    "Duplicate Bookmarks Skipped:" : {
-      "comment" : "Data import summary format of how many duplicate bookmarks (%lld) were skipped during import.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Doppelte Lesezeichen übersprungen:"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Marcadores duplicados omitidos:"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Signets en double ignorés :"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Segnalibri duplicati ignorati:"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Overgeslagen dubbele bladwijzers:"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pominięte zduplikowane zakładki:"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Marcadores duplicados ignorados:"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Пропущены дубликаты:"
           }
         }
       }
@@ -23151,114 +25341,6 @@
         }
       }
     },
-    "If your computer prompts you to enter a password prior to import, DuckDuckGo will not see that password.\n\nImported passwords are stored securely using encryption." : {
-      "comment" : "Warning that Chromium data import would require entering system passwords.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wenn dein Computer dich vor dem Import auffordert, ein Passwort einzugeben, wird DuckDuckGo das Passwort nicht sehen.\n\nImportierte Passwörter werden durch Verschlüsselung sicher gespeichert."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Si tu ordenador te pide que introduzcas una contraseña antes de importar, DuckDuckGo no la verá.\n\nLas contraseñas importadas se almacenan de forma segura mediante encriptación."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Si votre ordinateur vous invite à saisir un mot de passe avant l'importation, DuckDuckGo ne verra pas ce dernier.\n\nLes mots de passe importés sont stockés en toute sécurité grâce à un cryptage."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Se il computer richiede di immettere una password prima dell'importazione, DuckDuckGo non visualizza la password.\n\nLe password importate vengono archiviate in modo sicuro tramite crittografia."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Als je computer je vraagt om vóór het importeren een wachtwoord in te voeren, zal DuckDuckGo dat wachtwoord niet zien.\n\nGeïmporteerde wachtwoorden worden veilig opgeslagen door middel van versleuteling."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jeśli komputer poprosi Cię o wprowadzenie hasła przed rozpoczęciem importowania, DuckDuckGo nie zobaczy tego hasła.\n\nZaimportowane hasła są bezpiecznie przechowywane przy użyciu szyfrowania."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Se for apresentada uma solicitação no teu computador para introduzires uma palavra-passe antes da importação, o DuckDuckGo não a irá ver.\n\nAs palavras-passe importadas são armazenadas com segurança por meio de encriptação."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Если перед импортированием компьютер попросит вас ввести пароль, DuckDuckGo его не увидит.\n\nИмпортированные пароли надежно хранятся в зашифрованном виде."
-          }
-        }
-      }
-    },
-    "Import" : {
-      "comment" : "Menu item",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Importieren"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Importar"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Importer"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Importa"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Importeren"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Import"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Importar"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Импорт"
-          }
-        }
-      }
-    },
     "Import Bookmarks" : {
       "comment" : "Title of dialog with instruction for the user to import bookmarks from another browser",
       "localizations" : {
@@ -24205,19 +26287,19 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Öffne und entsperre **%2$s**\n%3$d Wähle **Datei → Tresor exportieren** in der Menüleiste\n%4$d Wähle das Dateiformat: **.csv**\n%5$d Gib dein Bitwarden Master-Passwort ein\n%6$d Klicke auf %7$@ und speichere die Datei an einem Ort, an dem du sie finden kannst (z. B. auf dem Desktop)\n%8$d %9$@"
+            "value" : "%1$d Öffne und entsperre **%2$s**\n%3$d Wähle **Datei → Tresor exportieren** in der Menüleiste\n%4$d Wähle das Dateiformat: **.csv**\n%5$d Gib dein Bitwarden Haupt-Passwort ein\n%6$d Klicke auf %7$@ und speichere die Datei an einem Ort, an dem du sie finden kannst (z. B. auf dem Desktop)\n%8$d %9$@"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$d Open and unlock **%2$s**\n%3$d Select **File → Export vault** from the Menu Bar\n%4$d Select the File Format: **.csv**\n%5$d Enter your Bitwarden master password\n%6$d Click %7$@ and save the file someplace you can find it (e.g., Desktop)\n%8$d %9$@"
+            "value" : "%1$d Open and unlock **%2$s**\n%3$d Select **File → Export vault** from the Menu Bar\n%4$d Select the File Format: **.csv**\n%5$d Enter your Bitwarden main password\n%6$d Click %7$@ and save the file someplace you can find it (e.g., Desktop)\n%8$d %9$@"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Abre y desbloquea **%2$s**\n%3$d Selecciona **Archivo → Exportar caja fuerte** en la barra de menú\n%4$d Selecciona el formato de archivo: **.csv**\n%5$d Introduce tu contraseña maestra de Bitwarden\n%6$d Haz clic en %7$@ y guarda el archivo donde puedas encontrarlo posteriormente (por ejemplo, en el escritorio)\n%8$d %9$@"
+            "value" : "%1$d Abre y desbloquea **%2$s**\n%3$d Selecciona **Archivo → Exportar caja fuerte** en la barra de menú\n%4$d Selecciona el formato de archivo: **.csv**\n%5$d Introduce tu contraseña principal de Bitwarden\n%6$d Haz clic en %7$@ y guarda el archivo donde puedas encontrarlo posteriormente (por ejemplo, en el escritorio)\n%8$d %9$@"
           }
         },
         "fr" : {
@@ -24229,25 +26311,25 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Apri e sblocca **%2$s**\n%3$d Seleziona **File → Esporta cassaforte** dalla Barra dei menu\n%4$d Seleziona il Formato file: **.csv**\n%5$d Inserisci la tua master password Bitwarden\n%6$d Fai clic su %7$@ e salva il file dove puoi trovarlo (ad esempio, sul desktop)\n%8$d %9$@"
+            "value" : "%1$d Apri e sblocca **%2$s**\n%3$d Seleziona **File → Esporta vault** dalla Barra dei menu\n%4$d Seleziona il Formato del file: **.csv**\n%5$d Inserisci la tua password principale Bitwarden\n%6$d Clicca su %7$@ e salva il file dove puoi trovarlo (ad esempio, sul desktop)\n%8$d %9$@"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Open en ontgrendel **%2$s**\n%3$d Selecteer **Bestand → Kluis exporteren** in de menubalk\n%4$d Selecteer de bestandsindeling: **.csv**\n%5$d Voer je Bitwarden-masterwachtwoord in\n%6$d Klik op %7$@ en bewaar het bestand op een plek waar je het kunt vinden (bijv. het bureaublad)\n%8$d %9$@"
+            "value" : "%1$d Open en ontgrendel **%2$s**\n%3$d Selecteer **Bestand → Kluis exporteren** in de menubalk\n%4$d Selecteer de bestandsindeling: **.csv**\n%5$d Voer je Bitwarden-hoofdwachtwoord in\n%6$d Klik op %7$@ en bewaar het bestand op een plek waar je het kunt vinden (bijv. het bureaublad)\n%8$d %9$@"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Otwórz i odblokuj aplikację **%2$s**\n%3$d Wybierz **Plik → Eksportuj sejf** na pasku menu\n%4$d Wybierz format pliku: **.csv**\n%5$d Wprowadź hasło główne aplikacji Bitwarden\n%6$d Kliknij %7$@ i zapisz plik w łatwo dostępnym miejscu (np. na biurku)\n%8$d %9$@"
+            "value" : "%1$d Otwórz i odblokuj aplikację **%2$s**\n%3$d Wybierz **Plik → Eksportuj sejf** na pasku menu\n%4$d Wybierz format pliku: **.csv**\n%5$d Wprowadź hasło główne aplikacji Bitwarden\n%6$d Kliknij %7$@ i zapisz plik w łatwo dostępnym miejscu (np. na pulpicie)\n%8$d %9$@"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Abre e desbloqueia o **%2$s**\n%3$d Seleciona **Ficheiro → Exportar cofre** na barra de menus\n%4$d Seleciona o formato do ficheiro: **.csv**\n%5$d Introduz a tua palavra-passe mestra do Bitwarden\n%6$d Clica em %7$@ e guarda o ficheiro onde consigas encontrá-lo (por exemplo, no ambiente de trabalho)\n%8$d %9$@"
+            "value" : "%1$d Abre e desbloqueia o **%2$s**\n%3$d Seleciona **Ficheiro → Exportar cofre** na barra de menus\n%4$d Seleciona o formato do ficheiro: **.csv**\n%5$d Introduz a tua palavra-passe principal do Bitwarden\n%6$d Clica em %7$@ e guarda o ficheiro onde consigas encontrá-lo (por exemplo, no ambiente de trabalho)\n%8$d %9$@"
           }
         },
         "ru" : {
@@ -24625,19 +26707,19 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Klicke auf das **%2$s** Symbol in deinem Browser und gib dein Master-Passwort ein\n%3$d Wähle **Meinen Tresor öffnen**\n%4$d Wähle in der Seitenleiste **Erweiterte Optionen → Exportieren**\n%5$d Gib dein LastPass Master-Passwort ein\n%6$d Wähle das Dateiformat: **Comma Delimited Text (.csv)**\n%7$d %8$@"
+            "value" : "%1$d Klicke auf das **%2$s** Symbol in deinem Browser und gib dein Haupt-Passwort ein\n%3$d Wähle **Meinen Tresor öffnen**\n%4$d Wähle in der Seitenleiste **Erweiterte Optionen → Exportieren**\n%5$d Gib dein LastPass Haupt-Passwort ein\n%6$d Wähle das Dateiformat: **Comma Delimited Text (.csv)**\n%7$d %8$@"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$d Click on the **%2$s** icon in your browser and enter your master password\n%3$d Select **Open My Vault**\n%4$d From the sidebar select **Advanced Options → Export**\n%5$d Enter your LastPass master password\n%6$d Select the File Format: **Comma Delimited Text (.csv)**\n%7$d %8$@"
+            "value" : "%1$d Click on the **%2$s** icon in your browser and enter your main password\n%3$d Select **Open My Vault**\n%4$d From the sidebar select **Advanced Options → Export**\n%5$d Enter your LastPass main password\n%6$d Select the File Format: **Comma Delimited Text (.csv)**\n%7$d %8$@"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Haz clic en el icono **%2$s** de tu navegador e introduce tu contraseña maestra\n%3$d Selecciona **Abrir mi caja fuerte**\n%4$d En la barra lateral, selecciona **Opciones avanzadas → Exportar**\n%5$d Introduce tu contraseña maestra de LastPass\n%6$d Selecciona el formato de archivo: **Texto delimitado por comas (.csv)**\n%7$d %8$@."
+            "value" : "%1$d Haz clic en el icono **%2$s** de tu navegador e introduce tu contraseña principal\n%3$d Selecciona **Abrir mi caja fuerte**\n%4$d En la barra lateral, selecciona **Opciones avanzadas → Exportar**\n%5$d Introduce tu contraseña principal de LastPass\n%6$d Selecciona el formato de archivo: **Texto delimitado por comas (.csv)**\n%7$d %8$@."
           }
         },
         "fr" : {
@@ -24649,31 +26731,31 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Fai clic sull'icona **%2$s** nel browser e immetti la master password\n%3$d Seleziona **Apri la mia cassaforte**\n%4$d Dalla barra laterale seleziona **Opzioni avanzate → Esporta\n**%5$d Immetti la master password LastPass\n%6$d Seleziona il formato del file: **Testo delimitato da virgole (.csv)**\n%7$d %8$@"
+            "value" : "%1$d Clicca sull'icona **%2$s** nel browser e inserisci la tua password principale\n%3$d Seleziona **Apri il Mio Vault**\n%4$d Dalla barra laterale seleziona **Opzioni avanzate → Esporta**\n%5$d Inserisci la tua password principale LastPass\n%6$d Seleziona il formato del file: **Testo delimitato da virgolette (.csv)**\n%7$d %8$@"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Klik op het pictogram **%2$s** in je browser en voer je masterwachtwoord in\n%3$d Selecteer **Open mijn kluis**\n%4$d Klik in de zijbalk op **Geavanceerde opties → Exporteren**\n%5$d Voer je LastPass-masterwachtwoord in\n%6$d Selecteer de bestandsindeling: **Door komma's gescheiden tekst (.csv)**\n%7$d %8$@"
+            "value" : "%1$d Klik op het pictogram **%2$s** in je browser en voer je hoofdwachtwoord in\n%3$d Selecteer **Open mijn kluis**\n%4$d Klik in de zijbalk op **Geavanceerde opties → Exporteren**\n%5$d Voer je LastPass-hoofdwachtwoord in\n%6$d Selecteer de bestandsindeling: **Door komma's gescheiden tekst (.csv)**\n%7$d %8$@"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Kliknij ikonę **%2$s** w przeglądarce i wprowadź hasło główne\n%3$d Wybierz **Open My Vault**\n%4$d Na pasku bocznym wybierz **Advanced Options → Export**\n%5$d Wprowadź hasło główne narzędzia LastPass\n%6$d Wybierz format pliku: **Comma Delimited Text (.csv)**\n%7$d %8$@"
+            "value" : "%1$d Kliknij ikonę **%2$s** w przeglądarce i wprowadź hasło główne\n%3$d Wybierz **Otwórz mój sejf**\n%4$d Na pasku bocznym wybierz **Opcje zaawansowane → Eksportuj**\n%5$d Wprowadź hasło główne splikacji LastPass\n%6$d Wybierz format pliku: **Tekst rozdzielany przecinkami (.csv)**\n%7$d %8$@"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Clica no ícone da aplicação **%2$s** no teu navegador e introduz a tua palavra-passe mestra\n%3$d Seleciona **Abrir o meu cofre**\n%4$d Na barra lateral, seleciona **Opções avançadas → Exportar**\n%5$d Introduz a tua palavra-passe mestra da aplicação LastPass\n%6$d Seleciona o formato do ficheiro: **Texto delimitado por vírgula (.csv)**\n%7$d %8$@"
+            "value" : "%1$d Clica no ícone da aplicação **%2$s** no teu navegador e introduz a tua palavra-passe principal\n%3$d Seleciona **Abrir o meu cofre**\n%4$d Na barra lateral, seleciona **Opções avançadas → Exportar**\n%5$d Introduz a tua palavra-passe principal da aplicação LastPass\n%6$d Seleciona o formato do ficheiro: **Texto delimitado por vírgula (.csv)**\n%7$d %8$@"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Нажмите значок **%2$s** в браузере и введите основной пароль\n%3$d Выберите меню **Открыть мое хранилище**\n%4$d На боковой панели выберите **Дополнительные опции → Экспортировать**\n%5$d Введите основной пароль к LastPass\n%6$d Сохраните файл в формате: **текст с разделяющими запятыми (.csv)**\n%7$d %8$@"
+            "value" : "%1$d Нажмите на значок **%2$s** в браузере и введите основной пароль\n%3$d Выберите меню **Открыть мое хранилище**\n%4$d На боковой панели выберите **Дополнительные опции → Экспортировать**\n%5$d Введите основной пароль к LastPass\n%6$d Сохраните файл в формате: **текст с разделяющими запятыми (.csv)**\n%7$d %8$@"
           }
         }
       }
@@ -24685,19 +26767,19 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Öffne und entsperre **%2$s**\n%3$d Wähle den Tresor aus, den du exportieren möchtest (du kannst immer nur einen Tresor auf einmal exportieren)\n%4$d Wähle **Datei → Exportieren → Alle Elemente** aus der Menüleiste\n%5$d Gib dein 1Password Master- oder Account-Passwort ein\n%6$d Wähle das Dateiformat: **iCloud-Schlüsselbund (.csv)**\n%7$d Speichere die Passwortdatei an einem Ort, an dem du sie finden kannst (z. B. auf dem Desktop)\n%8$d %9$@"
+            "value" : "%1$d Öffne und entsperre **%2$s**\n%3$d Wähle den Tresor aus, den du exportieren möchtest (du kannst immer nur einen Tresor auf einmal exportieren)\n%4$d Wähle **Datei → Exportieren → Alle Elemente** aus der Menüleiste\n%5$d Gib dein 1Password Haupt- oder Account-Passwort ein\n%6$d Wähle das Dateiformat: **iCloud-Schlüsselbund (.csv)**\n%7$d Speichere die Passwortdatei an einem Ort, an dem du sie finden kannst (z. B. auf dem Desktop)\n%8$d %9$@"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$d Open and unlock **%2$s**\n%3$d Select the vault you want to export (you can only export one vault at a time)\n%4$d Select **File → Export → All Items** from the Menu Bar\n%5$d Enter your 1Password master or account password\n%6$d Select the File Format: **iCloud Keychain (.csv)**\n%7$d Save the passwords file someplace you can find it (e.g., Desktop)\n%8$d %9$@"
+            "value" : "%1$d Open and unlock **%2$s**\n%3$d Select the vault you want to export (you can only export one vault at a time)\n%4$d Select **File → Export → All Items** from the Menu Bar\n%5$d Enter your 1Password main or account password\n%6$d Select the File Format: **iCloud Keychain (.csv)**\n%7$d Save the passwords file someplace you can find it (e.g., Desktop)\n%8$d %9$@"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Abre y desbloquea **%2$s**\n%3$d Selecciona la caja fuerte que quieres exportar (solo puedes exportar una caja fuerte a la vez)\n%4$d Selecciona **Archivo → Exportar → Todos los elementos** en la barra de menú\n%5$d Introduce tu contraseña maestra o de cuenta de 1Password\n%6$d Selecciona el formato de archivo: **Llavero de iCloud (.csv) **\n%7$d Guarda el archivo de contraseñas donde puedas encontrarlo posteriormente (por ejemplo, en el escritorio)\n%8$d %9$@"
+            "value" : "%1$d Abre y desbloquea **%2$s**\n%3$d Selecciona la caja fuerte que quieres exportar (solo puedes exportar una caja fuerte a la vez)\n%4$d Selecciona **Archivo → Exportar → Todos los elementos** en la barra de menú\n%5$d Introduce tu contraseña principal o de cuenta de 1Password\n%6$d Selecciona el formato de archivo: **Llavero de iCloud (.csv) **\n%7$d Guarda el archivo de contraseñas donde puedas encontrarlo posteriormente (por ejemplo, en el escritorio)\n%8$d %9$@"
           }
         },
         "fr" : {
@@ -24709,25 +26791,25 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Apri e sblocca **%2$s\n**%3$d Seleziona la cassaforte da esportare (è possibile esportare solo una cassaforte alla volta)\n%4$d Seleziona **File → Esporta → Tutti gli elementi** dalla Barra dei menu\n%5$d Inserisci la master password o quella dell'account 1Password\n%6$d Seleziona il formato file: **Keychain iCloud (.csv)**\n%7$d Salva il file delle password dove puoi trovarlo (ad esempio, sul desktop)\n%8$d %9$@"
+            "value" : "%1$d Apri e sblocca **%2$s**\n%3$d Seleziona il vault da esportare (puoi esportarne solo uno per volta)\n%4$d Seleziona **File → Esporta → Tutti gli elementi** dalla Barra dei menu\n%5$d Inserisci la tua password principale o dell'account 1Password\n%6$d Seleziona il formato del file: **Portachiavi iCloud (.csv)**\n%7$d Salva il file delle password dove puoi trovarlo (ad esempio, sul desktop)\n%8$d %9$@"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Open en ontgrendel **%2$s**\n%3$d Selecteer de kluis die je wilt exporteren (je kunt slechts één kluis per keer exporteren)\n%4$d Selecteer **Bestand → Exporteren → Alle items** in de menubalk\n%5$d Voer je master- of accountwachtwoord van 1Password in\n%6$d Selecteer de bestandsindeling: **iCloud Keychain (.csv)**\n%7$d Bewaar het bestand met de wachtwoorden op een plek waar je het kunt vinden (bijv. het bureaublad)\n%8$d %9$@"
+            "value" : "%1$d Open en ontgrendel **%2$s**\n%3$d Selecteer de kluis die je wilt exporteren (je kunt slechts één kluis per keer exporteren)\n%4$d Selecteer **Bestand → Exporteren → Alle items** in de menubalk\n%5$d Voer je 1Password hoofd- of accountwachtwoord in\n%6$d Selecteer de bestandsindeling: **iCloud Keychain (.csv)**\n%7$d Bewaar het bestand met de wachtwoorden op een plek waar je het kunt vinden (bijv. het bureaublad)\n%8$d %9$@"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Otwórz i odblokuj aplikację **%2$s**\n%3$d Wybierz sejf, który chcesz wyeksportować (możesz eksportować tylko jeden sejf naraz)\n%4$d Na pasku menu wybierz **File → Export → All Items**\n%5$d Wprowadź hasło główne lub hasło konta 1Password\n%6$d Wybierz format pliku: **iCloud Keychain (.csv)**\n%7$d Zapisz plik haseł w łatwo dostępnym miejscu (np. na biurku)\n%8$d %9$@"
+            "value" : "%1$d Otwórz i odblokuj aplikację **%2$s**\n%3$d Wybierz sejf, który chcesz wyeksportować (możesz eksportować tylko jeden sejf naraz)\n%4$d Na pasku menu wybierz **Plik → Eksportuj → Wszystkie elementy**\n%5$d Wprowadź hasło główne lub hasło konta 1Password\n%6$d Wybierz format pliku: **iCloud Keychain (.csv)**\n%7$d Zapisz plik haseł w łatwo dostępnym miejscu (np. na pulpicie)\n%8$d %9$@"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Abre e desbloqueia a aplicação **%2$s**\n%3$d Seleciona o cofre que pretendes exportar (só podes exportar um cofre de cada vez)\n%4$d Seleciona **Ficheiro → Exportar → Todos os elementos** na barra de menus\n%5$d Introduz a tua palavra-passe mestra da 1Password ou a palavra-passe da conta\n%6$d Seleciona o formato do ficheiro: **Porta-chaves em iCloud (.csv)**\n%7$d Guarda o ficheiro de palavras-passe onde consigas encontrá-lo (por exemplo, no ambiente de trabalho)\n%8$d %9$@"
+            "value" : "%1$d Abre e desbloqueia a aplicação **%2$s**\n%3$d Seleciona o cofre que pretendes exportar (só podes exportar um cofre de cada vez)\n%4$d Seleciona **Ficheiro → Exportar → Todos os elementos** na barra de menus\n%5$d Introduz a tua palavra-passe principal da aplicação ou da conta 1Password\n%6$d Seleciona o formato do ficheiro: **Porta-chaves em iCloud (.csv)**\n%7$d Guarda o ficheiro de palavras-passe onde consigas encontrá-lo (por exemplo, no ambiente de trabalho)\n%8$d %9$@"
           }
         },
         "ru" : {
@@ -30636,6 +32718,66 @@
         }
       }
     },
+    "menu.show.in.folder" : {
+      "comment" : "Menu item to show where a bookmark is located",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Ordner anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show in Folder"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar en la carpeta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher dans le dossier"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra nella cartella"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weergeven in map"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokaż w folderze"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar na pasta"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показать в папке"
+          }
+        }
+      }
+    },
     "Merge All Windows" : {
       "comment" : "Main Menu Window item",
       "localizations" : {
@@ -35584,66 +37726,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "DuckDuckGo не удалось загрузить эту страницу."
-          }
-        }
-      }
-    },
-    "passsword.management" : {
-      "comment" : "Used as title for password management user interface",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Autovervollständigen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Autofill"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Autocompletar"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saisie automatique"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Compilazione automatica"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Automatisch invullen"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Autouzupełnianie"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Preenchimento automático"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Автозаполнение"
           }
         }
       }
@@ -50336,60 +52418,6 @@
         }
       }
     },
-    "Select data to import:" : {
-      "comment" : "Data Import section title for checkboxes of data type to import: Passwords or Bookmarks.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zu importierende Daten auswählen:"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Selecciona los datos a importar:"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sélectionner les données à importer :"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Seleziona i dati da importare:"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Selecteer gegevens om te importeren:"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wybierz dane do zaimportowania:"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Selecionar dados para importar:"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Выберите данные для импорта:"
-          }
-        }
-      }
-    },
     "Select Data to Import:" : {
       "comment" : "Data Import section title for checkboxes of data type to import: Passwords or Bookmarks.",
       "localizations" : {
@@ -51092,6 +53120,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Помогите улучшить браузер DuckDuckGo"
+          }
+        }
+      }
+    },
+    "send.ppro.feedback" : {
+      "comment" : "Menu with feedback commands",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feedback von Privacy Pro senden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Send Privacy Pro Feedback"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviar comentarios sobre Privacy Pro"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoyer des commentaires sur Privacy Pro"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invia feedback su Privacy Pro"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feedback sturen naar Privacy Pro"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyślij opinię na temat Privacy Pro"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviar feedback sobre o Privacy Pro"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отправить отзыв о Privacy Pro"
           }
         }
       }
@@ -52678,486 +54766,6 @@
         }
       }
     },
-    "ssl.error.certificate.expired.message" : {
-      "comment" : "Describes an SSL error where a website's security certificate is expired. '%1$@' is a placeholder for the website's domain.",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Das Sicherheitszertifikat für %1$@ ist abgelaufen."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "The security certificate for %1$@ is expired."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El certificado de seguridad de %1$@ ha caducado."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le certificat de sécurité de %1$@ a expiré."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Il certificato di sicurezza per %1$@ è scaduto."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Het beveiligingscertificaat voor %1$@ is verlopen."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Certyfikat zabezpieczeń dla %1$@ wygasł."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "O certificado de segurança de %1$@ expirou."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Срок действия сертификата безопасности сайта %1$@ истек."
-          }
-        }
-      }
-    },
-    "ssl.error.page.advanced.button" : {
-      "comment" : "Button shown in an error page that warns users of security risks on a website due to SSL issues. The buttons allows the user to see advanced options on click.",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Erweitert …"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Advanced…"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Avanzadas..."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Options avancées"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Avanzate…"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Geavanceerd ..."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zaawansowane..."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Avançado…"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Дополнительно..."
-          }
-        }
-      }
-    },
-    "ssl.error.page.advanced.info.body.expired" : {
-      "comment" : "Body of the text of the Advanced info shown in an error page that warns users of security risks on a website due to SSL issues.",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Es ist möglich, dass die Website falsch konfiguriert ist, ein Angreifer deine Verbindung kompromittiert hat oder deine Systemuhr falsch ist."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "It’s possible that the website is misconfigured, that an attacker has compromised your connection, or that your system clock is incorrect."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Es posible que el sitio web esté mal configurado, que un atacante haya comprometido tu conexión o que el reloj del sistema no sea correcto."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Il est possible que le site soit mal configuré, qu'un pirate ait compromis votre connexion ou que l'horloge de votre système soit incorrecte."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "È possibile che il sito web non sia configurato correttamente, che un aggressore abbia compromesso la tua connessione o che l'orologio del tuo sistema non sia corretto."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mogelijk is de website verkeerd geconfigureerd, heeft een aanvaller je verbinding gecompromitteerd of staat de klok van je systeem niet goed."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Możliwe, że witryna jest błędnie skonfigurowana, osoba atakująca naruszyła połączenie lub ustawienie zegara systemowego jest nieprawidłowe."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "É possível que o site esteja mal configurado, que um invasor tenha comprometido a tua ligação ou que o teu relógio do sistema esteja incorreto."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Возможно, неверно задана конфигурация сайта, соединение перехвачено злоумышленником либо неправильно настроены системные часы."
-          }
-        }
-      }
-    },
-    "ssl.error.page.advanced.info.body.wrong.host" : {
-      "comment" : "Body of the text of the Advanced info shown in an error page that warns users of security risks on a website due to SSL issues.",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Möglicherweise ist die Website falsch konfiguriert oder ein Angreifer hat deine Verbindung kompromittiert."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "It’s possible that the website is misconfigured or that an attacker has compromised your connection."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Es posible que el sitio web esté mal configurado o que un atacante haya comprometido tu conexión."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Il est possible que le site soit mal configuré ou qu'un pirate ait compromis votre connexion."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "È possibile che il sito web non sia configurato correttamente o che un malintenzionato abbia compromesso la tua connessione."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mogelijk is de website verkeerd geconfigureerd of heeft een aanvaller je verbinding gecompromitteerd."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Możliwe, że witryna jest błędnie skonfigurowana lub osoba atakująca naruszyła połączenie."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "É possível que o site esteja mal configurado ou que um invasor tenha comprometido a tua ligação."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Возможно, неверно задана конфигурация сайта либо ваше соединение перехвачено злоумышленником."
-          }
-        }
-      }
-    },
-    "ssl.error.page.advanced.info.title" : {
-      "comment" : "Title of the Advanced info section shown in an error page that warns users of security risks on a website due to SSL issues.",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DuckDuckGo warnt dich, wenn eine Website ein ungültiges Zertifikat hat."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "DuckDuckGo warns you when a website has an invalid certificate."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DuckDuckGo te avisa cuando un sitio web tiene un certificado no válido."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DuckDuckGo vous avertit lorsque le certificat d'un site Web n'est pas valide."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DuckDuckGo ti avverte quando un sito web ha un certificato non valido."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DuckDuckGo waarschuwt je wanneer een website een ongeldig certificaat heeft."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DuckDuckGo ostrzega gdy witryna internetowa ma nieprawidłowy certyfikat."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "O DuckDuckGo avisa-te quando um site tem um certificado inválido."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DuckDuckGo предупредит вас, если у сайта окажется недействительный сертификат."
-          }
-        }
-      }
-    },
-    "ssl.error.page.body" : {
-      "comment" : "Error description shown in an error page that warns users of security risks on a website due to SSL issues. %1$@ represent the site domain.",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Das Zertifikat für diese Website ist ungültig. Möglicherweise stellst du eine Verbindung zu einem Server her, der vorgibt, %1$@ zu sein, wodurch deine vertraulichen Daten in Gefahr sein könnten."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "The certificate for this site is invalid. You might be connecting to a server that is pretending to be %1$@ which could put your confidential information at risk."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El certificado de este sitio no es válido. Puede que te estés conectando a un servidor que se hace pasar por %1$@, lo que podría poner en riesgo tu información confidencial."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le certificat de ce site n'est pas valide. Vous vous connectez peut-être à un serveur qui se fait passer pour %1$@, ce qui pourrait mettre vos informations confidentielles en danger."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Il certificato di questo sito non è valido. Potresti collegarti a un server che finge di essere %1$@ e che potrebbe mettere a rischio le tue informazioni riservate."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Het certificaat voor deze website is ongeldig. Mogelijk maak je verbinding met een server die zich voordoet als %1$@, waardoor je vertrouwelijke informatie in gevaar kan komen."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Certyfikat tej witryny jest nieprawidłowy. Być może łączysz się z serwerem podszywającym się pod %1$@, co może narazić poufne informacje na niebezpieczeństwo."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "O certificado deste site é inválido. Podes estar a estabelecer ligação a um servidor que finge ser %1$@, o que pode colocar as tuas informações confidenciais em risco."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Сертификат этого сайта недействителен. Возможно, вы пытаетесь подключиться к серверу, который выдает себя за %1$@, что ставит под угрозу вашу конфиденциальную информацию."
-          }
-        }
-      }
-    },
-    "ssl.error.page.header" : {
-      "comment" : "Title shown in an error page that warn users of security risks on a website due to SSL issues",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Warnung: Diese Website ist möglicherweise unsicher"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Warning: This site may be insecure"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Advertencia: este sitio puede ser inseguro"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Avertissement : ce site n'est peut-être pas sécurisé"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Attenzione: questo sito potrebbe non essere sicuro"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Waarschuwing: Deze website is mogelijk onveilig"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ostrzeżenie: ta witryna może być niebezpieczna"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aviso: este site pode ser inseguro"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Внимание! Возможно, сайт небезопасен"
-          }
-        }
-      }
-    },
-    "ssl.error.page.leave.site.button" : {
-      "comment" : "Button shown in an error page that warns users of security risks on a website due to SSL issues. The buttons allows the user to leave the website and navigate to previous page.",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Diese Website verlassen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Leave This Site"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Salir de este sitio"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Quitter ce site"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Esci da questo sito"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Deze website verlaten"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Opuść tę stronę"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Deixar este site"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Покинуть сайт"
-          }
-        }
-      }
-    },
     "ssl.error.page.tab.title" : {
       "comment" : "Title shown in an error page tab that warn users of security risks on a website due to SSL issues",
       "extractionState" : "extracted_with_value",
@@ -53214,186 +54822,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Внимание! Возможно, сайт небезопасен"
-          }
-        }
-      }
-    },
-    "ssl.error.page.visit.site.button" : {
-      "comment" : "Button shown in an error page that warns users of security risks on a website due to SSL issues. The buttons allows the user to visit the website anyway despite the risks.",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Risiko akzeptieren und Website besuchen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Accept Risk and Visit Site"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aceptar el riesgo y visitar el sitio"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Accepter le risque et visiter le site"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Accetta il rischio e visita il sito"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Risico accepteren en site bezoeken"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zaakceptuj ryzyko i odwiedź witrynę"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aceitar o risco e visitar o site"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Принять риск и перейти на сайт"
-          }
-        }
-      }
-    },
-    "ssl.error.self.signed.message" : {
-      "comment" : "Warns the user that the site's security certificate is self-signed and not trusted. '%1$@' is the site's domain.",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Das Sicherheitszertifikat für %1$@ wird vom Betriebssystem deines Geräts als nicht vertrauenswürdig eingestuft."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "The security certificate for %1$@ is not trusted by your device's operating system."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El sistema operativo del dispositivo no confía en el certificado de seguridad de %1$@."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le certificat de sécurité de %1$@ n'est pas approuvé par le système d'exploitation de votre appareil."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Il certificato di sicurezza di %1$@ non è considerato attendibile dal sistema operativo del tuo dispositivo."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Het besturingssysteem van je apparaat vertrouwt het beveiligingscertificaat voor %1$@ niet."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Certyfikat bezpieczeństwa %1$@ nie jest zaufany przez system operacyjny urządzenia."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "O sistema operativo do teu dispositivo não confia no certificado de segurança de %1$@."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Операционная система вашего устройства не доверяет сертификату безопасности сайта %1$@."
-          }
-        }
-      }
-    },
-    "ssl.error.wrong.host.message" : {
-      "comment" : "Explains an SSL error when a site's certificate doesn't match its domain. '%1$@' is the site's domain.",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Das Sicherheitszertifikat für %1$@ stimmt nicht mit *.%2$@ überein."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "The security certificate for %1$@ does not match *.%2$@."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El certificado de seguridad de %1$@ no coincide con *.%2$@."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le certificat de sécurité de %1$@ ne correspond pas à *.%2$@."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Il certificato di protezione per %1$@ non corrisponde a *.%2$@."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Het beveiligingscertificaat voor %1$@ komt niet overeen met *.%2$@. "
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Certyfikat zabezpieczeń %1$@ nie jest zgodny z *.%2$@."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "O certificado de segurança de %1$@ não corresponde a *.%2$@."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Сертификат безопасности сайта %1$@ не подходит для домена *.%2$@."
           }
         }
       }
@@ -54909,6 +56337,66 @@
         }
       }
     },
+    "tooltip.bookmarks.search" : {
+      "comment" : "Tooltip to activate the bookmark search",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lesezeichen durchsuchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Search bookmarks"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar marcadores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechercher des favoris"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerca segnalibri"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bladwijzers zoeken"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyszukaj zakładki"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pesquisar marcadores"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поиск по закладкам"
+          }
+        }
+      }
+    },
     "tooltip.bookmarks.shortcut" : {
       "comment" : "Tooltip for the bookmarks shortcut",
       "extractionState" : "extracted_with_value",
@@ -54965,6 +56453,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Закладки"
+          }
+        }
+      }
+    },
+    "tooltip.bookmarks.sort" : {
+      "comment" : "Tooltip to activate the bookmark sort",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lesezeichen sortieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sort bookmarks"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordenar marcadores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trier les signets"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordina i segnalibri"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bladwijzers sorteren"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sortuj zakładki"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordenar marcadores"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сортировка закладок"
           }
         }
       }
@@ -56338,6 +57886,58 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Доступно обновление: перезапустить"
+          }
+        }
+      }
+    },
+    "URL" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adres URL"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL"
           }
         }
       }

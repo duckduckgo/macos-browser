@@ -30,7 +30,9 @@ final class OnboardingUITests: XCTestCase {
         app.typeKey("n", modifierFlags: .command)
         let welcomeWindow = app.windows["Welcome"]
 
-        XCTAssertFalse(welcomeWindow.buttons["NavigationBarViewController.optionsButton"].isEnabled)
+        let optionsButton = welcomeWindow.buttons["NavigationBarViewController.optionsButton"]
+        XCTAssertTrue(optionsButton.waitForExistence(timeout: UITests.Timeouts.elementExistence))
+        XCTAssertFalse(optionsButton.isEnabled)
 
         // Get Started
         XCTAssertTrue(welcomeWindow.webViews["Welcome"].staticTexts["Tired of being tracked online? We can help!"].waitForExistence(timeout: UITests.Timeouts.elementExistence))

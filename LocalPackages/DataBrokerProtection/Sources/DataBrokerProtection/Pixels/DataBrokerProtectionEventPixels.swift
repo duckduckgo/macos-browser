@@ -17,9 +17,10 @@
 //
 
 import Foundation
-import Common
+import os.log
 import BrowserServicesKit
 import PixelKit
+import Common
 
 protocol DataBrokerProtectionEventPixelsRepository {
     func markWeeklyPixelSent()
@@ -92,7 +93,7 @@ final class DataBrokerProtectionEventPixels {
         do {
             data = try database.fetchAllBrokerProfileQueryData()
         } catch {
-            os_log("Database error: when attempting to fireWeeklyReportPixels, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("Database error: when attempting to fireWeeklyReportPixels, error: \(error.localizedDescription, privacy: .public)")
             return
         }
         let dataInThePastWeek = data.filter(hadScanThisWeek(_:))

@@ -37,7 +37,7 @@ public final class StatusBarMenu: NSObject {
     private let controller: TunnelController
     private let statusReporter: NetworkProtectionStatusReporter
     private let onboardingStatusPublisher: OnboardingStatusPublisher
-    private let uiActionHandler: VPNUIActionHandler
+    private let uiActionHandler: VPNUIActionHandling
     private let menuItems: () -> [MenuItem]
     private let agentLoginItem: LoginItem?
     private let isMenuBarStatusView: Bool
@@ -64,7 +64,7 @@ public final class StatusBarMenu: NSObject {
                 statusReporter: NetworkProtectionStatusReporter,
                 controller: TunnelController,
                 iconProvider: IconProvider,
-                uiActionHandler: VPNUIActionHandler,
+                uiActionHandler: VPNUIActionHandling,
                 menuItems: @escaping () -> [MenuItem],
                 agentLoginItem: LoginItem?,
                 isMenuBarStatusView: Bool,
@@ -108,7 +108,9 @@ public final class StatusBarMenu: NSObject {
             return
         }
 
-        togglePopover(isOptionKeyPressed: isOptionKeyPressed)
+        Task { @MainActor in
+            togglePopover(isOptionKeyPressed: isOptionKeyPressed)
+        }
     }
 
     private func subscribeToIconUpdates() {
@@ -122,6 +124,7 @@ public final class StatusBarMenu: NSObject {
 
     // MARK: - Popover
 
+    @MainActor
     private func togglePopover(isOptionKeyPressed: Bool) {
         if let popover, popover.isShown {
             popover.close()
@@ -131,19 +134,33 @@ public final class StatusBarMenu: NSObject {
                 return
             }
 
-            popover = NetworkProtectionPopover(controller: controller,
-                                               onboardingStatusPublisher: onboardingStatusPublisher,
-                                               statusReporter: statusReporter,
-                                               uiActionHandler: uiActionHandler,
-                                               menuItems: menuItems,
-                                               agentLoginItem: agentLoginItem,
-                                               isMenuBarStatusView: isMenuBarStatusView,
-                                               userDefaults: userDefaults,
-                                               locationFormatter: locationFormatter,
-                                               uninstallHandler: uninstallHandler)
+            let siteTroubleshootingViewModel = SiteTroubleshootingView.Model(
+                featureFlagPublisher: Just(false).eraseToAnyPublisher(),
+                connectionStatusPublisher: Just(NetworkProtection.ConnectionStatus.disconnected).eraseToAnyPublisher(),
+                siteTroubleshootingInfoPublisher: Just(SiteTroubleshootingInfo?(nil)).eraseToAnyPublisher(),
+                uiActionHandler: uiActionHandler)
+
+            let debugInformationViewModel = DebugInformationViewModel(showDebugInformation: isOptionKeyPressed)
+
+            let statusViewModel = NetworkProtectionStatusView.Model(
+                controller: controller,
+                onboardingStatusPublisher: onboardingStatusPublisher,
+                statusReporter: statusReporter,
+                uiActionHandler: uiActionHandler,
+                menuItems: menuItems,
+                agentLoginItem: agentLoginItem,
+                isMenuBarStatusView: isMenuBarStatusView,
+                userDefaults: userDefaults,
+                locationFormatter: locationFormatter,
+                uninstallHandler: uninstallHandler)
+
+            popover = NetworkProtectionPopover(
+                statusViewModel: statusViewModel,
+                statusReporter: statusReporter,
+                siteTroubleshootingViewModel: siteTroubleshootingViewModel,
+                debugInformationViewModel: debugInformationViewModel)
             popover?.behavior = .transient
 
-            popover?.setShowsDebugInformation(isOptionKeyPressed)
             popover?.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
         }
     }

@@ -58,7 +58,7 @@ final class ApplicationUpdateDetector {
             if let currentBuild = currentBuild, let previousBuild = previousBuild {
                 if currentBuild == previousBuild {
                     updateStatus = .noChange
-                } else if currentBuild > previousBuild {
+                } else if compareSemanticVersion(currentBuild, isGreaterThan: previousBuild) {
                     updateStatus = .updated
                 } else {
                     updateStatus = .downgraded
@@ -67,7 +67,7 @@ final class ApplicationUpdateDetector {
                 updateStatus = .noChange
             }
         } else if let currentVersion = currentVersion, let previousVersion = previousVersion {
-            if currentVersion > previousVersion {
+            if compareSemanticVersion(currentVersion, isGreaterThan: previousVersion) {
                 updateStatus = .updated
             } else {
                 updateStatus = .downgraded
@@ -78,6 +78,17 @@ final class ApplicationUpdateDetector {
 
         hasCheckedForUpdate = true
         return updateStatus
+    }
+
+    private static func compareSemanticVersion(_ version1: String, isGreaterThan version2: String) -> Bool {
+        let version1Components = version1.split(separator: ".").compactMap { Int($0) }
+        let version2Components = version2.split(separator: ".").compactMap { Int($0) }
+
+        for (v1, v2) in zip(version1Components, version2Components) where v1 != v2 {
+            return v1 > v2
+        }
+
+        return version1Components.count > version2Components.count
     }
 
     private static func getCurrentAppVersion() -> String? {
@@ -93,5 +104,4 @@ final class ApplicationUpdateDetector {
         hasCheckedForUpdate = false
     }
 #endif
-
 }
