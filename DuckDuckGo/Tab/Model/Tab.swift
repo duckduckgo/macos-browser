@@ -26,6 +26,7 @@ import WebKit
 import History
 import PixelKit
 import PhishingDetection
+import SpecialErrorPages
 import os.log
 
 protocol TabDelegate: ContentOverlayUserScriptDelegate {
@@ -1201,7 +1202,8 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         if !error.isFrameLoadInterrupted, !error.isNavigationCancelled,
                    // don‘t show an error page if the error was already handled
                    // (by SearchNonexistentDomainNavigationResponder) or another navigation was triggered by `setContent`
-            self.content.urlForWebView == url || self.content == .none /* when navigation fails instantly we may have no content set yet */ {
+            self.content.urlForWebView == url || self.content == .none /* when navigation fails instantly we may have no content set yet */ 
+            || error.errorCode == PhishingDetectionError.detected.errorCode {
             self.error = error
             // when already displaying the error page and reload navigation fails again: don‘t navigate, just update page HTML
             if error.errorCode != NSURLErrorServerCertificateUntrusted {
@@ -1229,7 +1231,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
     @MainActor
     private func loadErrorHTML(_ error: WKError, header: String, forUnreachableURL url: URL, alternate: Bool) {
-        let html = ErrorPageHTMLTemplate(error: error, header: header).makeHTMLFromTemplate()
+        let html = ErrorPageHTMLFactory.html(for: error, url: url, header: header)
         if alternate {
             webView.loadAlternateHTML(html, baseURL: .error, forUnreachableURL: url)
         } else {

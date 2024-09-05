@@ -83,7 +83,6 @@ final class PrivacyDashboardTabExtension {
             }
         }
         .store(in: &cancellables)
-
     }
 
     private func updatePrivacyInfo(with trust: SecTrust?) async {
