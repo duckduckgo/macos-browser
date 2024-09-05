@@ -25523,7 +25523,7 @@
     },
     "home.page.settings.all.settings" : {
       "comment" : "Button caption",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -25757,6 +25757,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Удалить фон"
+          }
+        }
+      }
+    },
+    "home.page.settings.go.to.settings" : {
+      "comment" : "Settings button caption",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Go to Settings"
           }
         }
       }

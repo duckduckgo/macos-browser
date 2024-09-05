@@ -241,7 +241,7 @@ extension HomePage.Views {
                     model.openSettings()
                 } label: {
                     HStack {
-                        Text(UserText.allSettings)
+                        Text(UserText.goToSettings)
                         Spacer()
                         Image(.externalAppScheme)
                     }
