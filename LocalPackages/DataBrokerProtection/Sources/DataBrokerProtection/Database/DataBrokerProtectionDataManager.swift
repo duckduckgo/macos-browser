@@ -19,11 +19,25 @@
 import Foundation
 import Common
 
+public extension Notification.Name {
+    /// Notification posted when a profile is saved.
+    static let pirProfileSaved = Notification.Name("pirProfileSaved")
+}
+
+/// A protocol that defines the behavior for posting a notification when a profile is saved, if permitted by certain conditions.
+public protocol DBPProfileSavedNotifier {
+
+    /// Posts the "Profile Saved" notification if certain conditions allow it.
+    /// This method checks whether the notification can be posted, and if so, it triggers the notification.
+    func postProfileSavedNotificationIfPermitted()
+}
+
 public protocol DataBrokerProtectionDataManaging {
     var cache: InMemoryDataCache { get }
     var delegate: DataBrokerProtectionDataManagerDelegate? { get set }
 
     init(database: DataBrokerProtectionRepository?,
+         profileSavedNotifier: DBPProfileSavedNotifier?,
          pixelHandler: EventMapping<DataBrokerProtectionPixels>,
          fakeBrokerFlag: DataBrokerDebugFlag)
     func saveProfile(_ profile: DataBrokerProtectionProfile) async throws
@@ -42,6 +56,9 @@ public protocol DataBrokerProtectionDataManagerDelegate: AnyObject {
 }
 
 public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
+
+    private let profileSavedNotifier: DBPProfileSavedNotifier?
+
     public let cache = InMemoryDataCache()
 
     public weak var delegate: DataBrokerProtectionDataManagerDelegate?
@@ -49,16 +66,19 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
     internal let database: DataBrokerProtectionRepository
 
     required public init(database: DataBrokerProtectionRepository? = nil,
+                         profileSavedNotifier: DBPProfileSavedNotifier? = nil,
                          pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                          fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker()) {
         self.database = database ?? DataBrokerProtectionDatabase(fakeBrokerFlag: fakeBrokerFlag, pixelHandler: pixelHandler)
 
+        self.profileSavedNotifier = profileSavedNotifier
         cache.delegate = self
     }
 
     public func saveProfile(_ profile: DataBrokerProtectionProfile) async throws {
         do {
             try await database.save(profile)
+            profileSavedNotifier?.postProfileSavedNotificationIfPermitted()
         } catch {
             // We should still invalidate the cache if the save fails
             cache.invalidate()

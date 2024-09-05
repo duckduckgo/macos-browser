@@ -23,10 +23,13 @@ final class DataBrokerProtectionDataManagingTests: XCTestCase {
 
     private var sut: DataBrokerProtectionDataManaging!
     private var mockDatabase: MockDatabase!
+    private var mockDBPProfileSavedNotifier: MockDBPProfileSavedNotifier!
 
     override func setUpWithError() throws {
         mockDatabase = MockDatabase()
+        mockDBPProfileSavedNotifier = MockDBPProfileSavedNotifier()
         sut = DataBrokerProtectionDataManager(database: mockDatabase,
+                                              profileSavedNotifier: mockDBPProfileSavedNotifier,
                                               pixelHandler: MockPixelHandler())
     }
 
@@ -110,9 +113,66 @@ final class DataBrokerProtectionDataManagingTests: XCTestCase {
         // No profiles and removed mirror site, so count should be 0
         XCTAssertEqual(matchesCount, 0)
     }
+
+    func testWhenProfileIsSaved_thenNotifierIsCalled() async throws {
+        // Given
+        let profile = mockProfile
+        mockDatabase.saveResult = .success(())
+
+        // When
+        try await sut.saveProfile(profile)
+
+        // Then
+        XCTAssertTrue(mockDBPProfileSavedNotifier.didCallPostProfileSavedNotificationIfPermitted)
+    }
+
+    func testWhenSavingProfileFails_thenNotifierIsNotCalled() async {
+        // Given
+        let profile = mockProfile
+        mockDatabase.saveResult = .failure(MockDatabase.MockError.saveFailed)
+
+        // When
+        do {
+            try await sut.saveProfile(profile)
+            XCTFail("Expected saveProfile to throw an error but it succeeded.")
+        } catch {}
+
+        // Then
+        XCTAssertFalse(mockDBPProfileSavedNotifier.didCallPostProfileSavedNotificationIfPermitted)
+    }
 }
 
 private extension DataBrokerProtectionDataManagingTests {
+
+    var mockProfile: DataBrokerProtectionProfile {
+        let name = DataBrokerProtectionProfile.Name(
+            firstName: "John",
+            lastName: "Doe",
+            middleName: "M",
+            suffix: "Jr"
+        )
+
+        let address = DataBrokerProtectionProfile.Address(
+            city: "New York",
+            state: "NY",
+            street: "123 Main St",
+            zipCode: "10001"
+        )
+
+        let phones = ["123-456-7890"]
+
+        let birthYear = 1985
+
+        let profile = DataBrokerProtectionProfile(
+            names: [name],
+            addresses: [address],
+            phones: phones,
+            birthYear: birthYear
+        )
+
+        return profile
+    }
+
     var mockQueryData: [BrokerProfileQueryData] {
         [
             // First item: Active broker with 1 extracted profile and 2 mirror sites
