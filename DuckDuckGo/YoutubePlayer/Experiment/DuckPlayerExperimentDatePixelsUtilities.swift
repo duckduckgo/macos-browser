@@ -1,5 +1,5 @@
 //
-//  DuckPlayerExperimentDateUtils.swift
+//  DuckPlayerExperimentDatePixelsUtilities.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -23,7 +23,7 @@ enum Frequency: Int {
     case weekly = 7
 }
 
-struct DuckPlayerExperimentPixelsUtilities {
+struct DuckPlayerExperimentDatePixelsUtilities {
     private static let calendar = Calendar.current
 
     /// Determines whether a pixel should fire based on the start and end dates and the specified frequency.

@@ -139,7 +139,7 @@ struct DuckPlayerOnboardingExperiment: OnboardingExperimentManager {
 
     private func shouldFireWeeklyPixel() -> Bool {
         guard let lastFiredDate = userDefaults.weeklyPixelSentDate else { return true }
-        return DuckPlayerExperimentDateUtils.shouldFirePixel(startDate: lastFiredDate,
+        return DuckPlayerExperimentDatePixelsUtilities.shouldFirePixel(startDate: lastFiredDate,
                                                                    endDate: Date(),
                                                                    daysDifference: .weekly)
     }
