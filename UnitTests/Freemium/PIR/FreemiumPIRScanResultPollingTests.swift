@@ -109,7 +109,7 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
         // Then
         XCTAssertFalse(mockNotificationCenter.didCallAddObserver)
         XCTAssertTrue(mockDataManager.didCallMatchesFoundCount)
-        XCTAssertEqual(mockNotificationCenter.lastPostedNotification, .pirResultsFound)
+        XCTAssertEqual(mockNotificationCenter.lastPostedNotification, .freemiumPirResultsFound)
         XCTAssertNil(sut.timer)
     }
 
@@ -128,7 +128,7 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
         sut.startPollingOrObserving()
 
         // Then
-        XCTAssertEqual(mockNotificationCenter.lastPostedNotification, .pirNoResultsFound)
+        XCTAssertEqual(mockNotificationCenter.lastPostedNotification, .freemiumPirNoResultsFound)
         XCTAssertFalse(mockNotificationCenter.didCallAddObserver)
         XCTAssertTrue(mockDataManager.didCallMatchesFoundCount)
         XCTAssertNil(sut.timer)
@@ -149,7 +149,7 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
         sut.startPollingOrObserving()
 
         // Then
-        XCTAssertEqual(mockNotificationCenter.lastPostedNotification, .pirNoResultsFound)
+        XCTAssertEqual(mockNotificationCenter.lastPostedNotification, .freemiumPirNoResultsFound)
         XCTAssertFalse(mockNotificationCenter.didCallAddObserver)
         XCTAssertTrue(mockDataManager.didCallMatchesFoundCount)
         XCTAssertNil(sut.timer)

@@ -25,7 +25,7 @@ extension Notification.Name {
     static let freemiumPirResultsFound = Notification.Name("freemiumPirResultsFound")
 
     /// Notification posted when no results are found after polling for profile matches for a freemium PIR scan and the maximum check duration is exceeded.
-    static let freemiumPirNoResultsFound = Notification.Name("pirNoResultsFound")
+    static let freemiumPirNoResultsFound = Notification.Name("freemiumPirNoResultsFound")
 }
 
 /// Protocol defining the interface for PIR (Profile Information Removal) scan result polling.
@@ -165,10 +165,10 @@ private extension DefaultFreemiumPIRScanResultPolling {
         let matchesFoundCount = (try? dataManager.matchesFoundCount()) ?? 0
 
         if matchesFoundCount > 0 {
-            notificationCenter.post(name: .pirResultsFound, object: nil)
+            notificationCenter.post(name: .freemiumPirResultsFound, object: nil)
             stopTimer()
         } else if elapsedTime >= maxCheckDuration {
-            notificationCenter.post(name: .pirNoResultsFound, object: nil)
+            notificationCenter.post(name: .freemiumPirNoResultsFound, object: nil)
             stopTimer()
         }
     }
