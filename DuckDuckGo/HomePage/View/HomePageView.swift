@@ -35,8 +35,7 @@ extension HomePage.Views {
         @EnvironmentObject var favoritesModel: HomePage.Models.FavoritesModel
         @EnvironmentObject var settingsModel: HomePage.Models.SettingsModel
         @EnvironmentObject var activeRemoteMessageModel: ActiveRemoteMessageModel
-
-        @State private var isSettingsVisible = false
+        @EnvironmentObject var settingsVisibilityModel: HomePage.Models.SettingsVisibilityModel
 
         var body: some View {
             if isBurner {
@@ -54,12 +53,12 @@ extension HomePage.Views {
                         ZStack(alignment: .leading) {
                             ScrollView {
                                 innerView(includingContinueSetUpCards: includingContinueSetUpCards)
-                                    .frame(width: geometry.size.width - (isSettingsVisible ? Self.settingsPanelWidth : 0))
-                                    .offset(x: isSettingsVisible ? innerViewOffset(with: geometry) : 0)
+                                    .frame(width: geometry.size.width - (settingsVisibilityModel.isSettingsVisible ? Self.settingsPanelWidth : 0))
+                                    .offset(x: settingsVisibilityModel.isSettingsVisible ? innerViewOffset(with: geometry) : 0)
                                     .fixedColorScheme(for: settingsModel.customBackground)
                             }
                         }
-                        .frame(width: isSettingsVisible ? geometry.size.width - Self.settingsPanelWidth : geometry.size.width)
+                        .frame(width: settingsVisibilityModel.isSettingsVisible ? geometry.size.width - Self.settingsPanelWidth : geometry.size.width)
                         .contextMenu(ContextMenu {
                             if model.isContinueSetUpAvailable {
                                 Toggle(UserText.newTabMenuItemShowContinuteSetUp, isOn: $model.isContinueSetUpVisible)
@@ -72,25 +71,25 @@ extension HomePage.Views {
                                 .toggleStyle(.checkbox)
                         })
 
-                        if isSettingsVisible {
-                            SettingsView(includingContinueSetUpCards: includingContinueSetUpCards, isSettingsVisible: $isSettingsVisible)
+                        if settingsVisibilityModel.isSettingsVisible {
+                            SettingsView(includingContinueSetUpCards: includingContinueSetUpCards, isSettingsVisible: $settingsVisibilityModel.isSettingsVisible)
                                 .frame(width: Self.settingsPanelWidth)
                                 .transition(.move(edge: .trailing))
                                 .layoutPriority(1)
                                 .environmentObject(settingsModel)
                         }
                     }
-                    .animation(.easeInOut, value: isSettingsVisible)
+                    .animation(.easeInOut, value: settingsVisibilityModel.isSettingsVisible)
 
-                    if !isSettingsVisible {
-                        SettingsButtonView(isSettingsVisible: $isSettingsVisible)
+                    if !settingsVisibilityModel.isSettingsVisible {
+                        SettingsButtonView(isSettingsVisible: $settingsVisibilityModel.isSettingsVisible)
                             .padding([.bottom, .trailing], 14)
                             .fixedColorScheme(for: settingsModel.customBackground)
                     }
                 }
                 .background(
                     backgroundView
-                        .animation(.none, value: isSettingsVisible)
+                        .animation(.none, value: settingsVisibilityModel.isSettingsVisible)
                         .animation(.easeInOut(duration: 0.5), value: settingsModel.customBackground)
                 )
                 .clipped()

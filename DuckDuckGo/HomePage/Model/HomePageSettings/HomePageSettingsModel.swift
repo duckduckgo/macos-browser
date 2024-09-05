@@ -23,43 +23,13 @@ import PixelKit
 import SwiftUI
 import SwiftUIExtensions
 
-protocol UserColorProviding {
-    var colorPublisher: AnyPublisher<NSColor, Never> { get }
-
-    func showColorPanel(with color: NSColor?)
-    func closeColorPanel()
-}
-
-extension NSColorPanel: UserColorProviding {
-    var colorPublisher: AnyPublisher<NSColor, Never> {
-        publisher(for: \.color).removeDuplicates().eraseToAnyPublisher()
-    }
-
-    func showColorPanel(with color: NSColor?) {
-        if let color {
-            self.color = color
-        }
-
-        if !isVisible {
-            var frame = self.frame
-            frame.origin = NSEvent.mouseLocation
-            if let keyWindow = NSApp.keyWindow {
-                frame.origin.x = keyWindow.frame.maxX - frame.size.width
-            }
-            frame.origin.y -= frame.size.height + 40
-            setFrame(frame, display: true)
-        }
-
-        showsAlpha = false
-        orderFront(nil)
-    }
-
-    func closeColorPanel() {
-        close()
-    }
-}
-
 extension HomePage.Models {
+    /**
+     * This tiny model is used by HomePageViewController to expose a setting to control settings visibility
+     */
+    final class SettingsVisibilityModel: ObservableObject {
+        @Published var isSettingsVisible: Bool = false
+    }
 
     final class SettingsModel: ObservableObject {
 

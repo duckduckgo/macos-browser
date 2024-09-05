@@ -137,6 +137,7 @@ extension URL {
     static let blankPage = URL(string: "about:blank")!
 
     static let newtab = URL(string: "duck://newtab")!
+    static let newtabSettings = URL(string: "duck://newtab/settings")!
     static let welcome = URL(string: "duck://welcome")!
     static let settings = URL(string: "duck://settings")!
     static let bookmarks = URL(string: "duck://bookmarks")!

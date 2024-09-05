@@ -103,11 +103,22 @@ extension Preferences {
                 // SECTION 3: New Tab Page
                 PreferencePaneSection(UserText.newTabBottomPopoverTitle) {
 
-                    if model.isContinueSetUpAvailable {
-                        ToggleMenuItem(UserText.newTabSetUpSectionTitle, isOn: $model.isContinueSetUpVisible)
+                    PreferencePaneSubSection {
+                        if model.isContinueSetUpAvailable {
+                            ToggleMenuItem(UserText.newTabSetUpSectionTitle, isOn: $model.isContinueSetUpVisible)
+                        }
+                        ToggleMenuItem(UserText.newTabFavoriteSectionTitle, isOn: $model.isFavoriteVisible).accessibilityIdentifier("Preferences.AppearanceView.showFavoritesToggle")
+                        ToggleMenuItem(UserText.newTabRecentActivitySectionTitle, isOn: $model.isRecentActivityVisible)
                     }
-                    ToggleMenuItem(UserText.newTabFavoriteSectionTitle, isOn: $model.isFavoriteVisible).accessibilityIdentifier("Preferences.AppearanceView.showFavoritesToggle")
-                    ToggleMenuItem(UserText.newTabRecentActivitySectionTitle, isOn: $model.isRecentActivityVisible)
+
+                    PreferencePaneSubSection {
+                        TextButton("Customize Background", weight: .semibold) {
+                            WindowControllersManager.shared.showTab(with: .newtab)
+                            if let window = WindowControllersManager.shared.lastKeyMainWindowController {
+                                window.mainViewController.browserTabViewController.homePageViewController?.settingsVisibilityModel.isSettingsVisible = true
+                            }
+                        }
+                    }
                 }
 
                 // SECTION 4: Bookmarks Bar
