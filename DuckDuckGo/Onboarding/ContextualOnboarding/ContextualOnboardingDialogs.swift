@@ -228,7 +228,7 @@ struct OnboardingFinalDialog: View {
     var body: some View {
         DaxDialogView(logoPosition: .left) {
             ContextualDaxDialogContent(orientation: .horizontalStack(alignment: .center),
-                                       title: title, 
+                                       title: title,
                                        titleFont: OnboardingDialogsContants.titleFont,
                                        message: message,
                                        messageFont: OnboardingDialogsContants.messageFont,
@@ -306,6 +306,6 @@ final class OnboardingPixelReporter: OnboardingSearchSuggestionsPixelReporting, 
         let firstString = UserText.ContextualOnboarding.onboardingTryFireButtonMessage
         return NSMutableAttributedString(string: firstString)
     }()
-    return OnboardingTrackersDoneDialog(shouldFollowUp: true, message: message, blockedTrackersCTAAction: {}, viewModel:  OnboardingFireButtonDialogViewModel(onDismiss: {}))
+    return OnboardingTrackersDoneDialog(shouldFollowUp: true, message: message, blockedTrackersCTAAction: {}, viewModel: OnboardingFireButtonDialogViewModel(onDismiss: {}))
         .padding()
 }
