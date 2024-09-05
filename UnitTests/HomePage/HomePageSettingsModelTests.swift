@@ -37,7 +37,7 @@ final class HomePageSettingsModelTests: XCTestCase {
     fileprivate var model: SettingsModel!
     var storageLocation: URL!
     var appearancePreferences: AppearancePreferences!
-    var openSettingsCallCount = 0
+    var navigator: MockHomePageSettingsModelNavigator!
     var sendPixelEvents: [PixelKitEvent] = []
     var openFilePanel: () -> URL? = { return "file:///sample.jpg".url! }
     var openFilePanelCallCount = 0
@@ -45,7 +45,7 @@ final class HomePageSettingsModelTests: XCTestCase {
     var imageURL: URL?
 
     override func setUp() async throws {
-        openSettingsCallCount = 0
+        navigator = MockHomePageSettingsModelNavigator()
         sendPixelEvents = []
 
         storageLocation = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
@@ -53,7 +53,7 @@ final class HomePageSettingsModelTests: XCTestCase {
         model = SettingsModel(
             appearancePreferences: appearancePreferences,
             sendPixel: { [weak self] in self?.sendPixelEvents.append($0) },
-            openSettings: { [weak self] in self?.openSettingsCallCount += 1 }
+            navigator: navigator
         )
     }
 

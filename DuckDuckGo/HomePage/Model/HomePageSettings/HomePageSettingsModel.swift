@@ -46,29 +46,29 @@ extension HomePage.Models {
 
         let appearancePreferences: AppearancePreferences
         let sendPixel: (PixelKitEvent) -> Void
-        let openSettings: () -> Void
+        let navigator: HomePageSettingsModelNavigator
 
-        convenience init(openSettings: @escaping () -> Void) {
+        convenience init() {
             self.init(
                 appearancePreferences: .shared,
                 sendPixel: { pixelEvent in
                     PixelKit.fire(pixelEvent)
                 },
-                openSettings: openSettings
+                navigator: DefaultHomePageSettingsModelNavigator()
             )
         }
 
         init(
             appearancePreferences: AppearancePreferences,
             sendPixel: @escaping (PixelKitEvent) -> Void,
-            openSettings: @escaping () -> Void
+            navigator: HomePageSettingsModelNavigator
         ) {
             self.appearancePreferences = appearancePreferences
 
             customBackground = appearancePreferences.homePageCustomBackground
 
             self.sendPixel = sendPixel
-            self.openSettings = openSettings
+            self.navigator = navigator
         }
 
         func popToRootView() {
@@ -81,6 +81,10 @@ extension HomePage.Models {
             withAnimation {
                 contentType = modeModel.contentType
             }
+        }
+
+        func openSettings() {
+            navigator.openAppearanceSettings()
         }
 
         @Published private(set) var contentType: ContentType = .root
