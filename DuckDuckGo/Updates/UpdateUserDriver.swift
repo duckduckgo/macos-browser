@@ -45,6 +45,13 @@ enum UpdateCycleProgress {
         default: return false
         }
     }
+
+    var isIdle: Bool {
+        switch self {
+        case .updateCycleDone, .updateCycleNotStarted: return true
+        default: return false
+        }
+    }
 }
 
 final class UpdateUserDriver: NSObject, SPUUserDriver {
