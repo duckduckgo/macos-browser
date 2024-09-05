@@ -183,8 +183,7 @@ extension TabExtensionsBuilder {
                                 historyCoordinating: dependencies.historyCoordinating,
                                 trackersPublisher: contentBlocking.trackersPublisher,
                                 urlPublisher: args.contentPublisher.map { content in content.isUrl ? content.urlForWebView : nil },
-                                titlePublisher: args.titlePublisher,
-                                phishingStateManager: dependencies.phishingStateManager)
+                                titlePublisher: args.titlePublisher)
         }
         add {
             ExternalAppSchemeHandler(workspace: dependencies.workspace, permissionModel: args.permissionModel, contentPublisher: args.contentPublisher)
