@@ -87,6 +87,6 @@ jobs:
           RELEASE_TAG: ${{ steps.make_release_branch.outputs.last_release }}
           WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          bundle exec fastlane run asana_add_comment 
-            task_url:"${{ steps.create_release_task.outputs.asana_task_url }}" 
+          bundle exec fastlane run asana_add_comment \
+            task_url:"${{ steps.create_release_task.outputs.asana_task_url }}" \
             template_name:"hotfix-branch-ready"
