@@ -143,7 +143,7 @@ class BookmarkSortTests: XCTestCase {
         let newApp = XCUIApplication()
         newApp.launch()
 
-        app.openBookmarksPanel()
+        newApp.openBookmarksPanel()
 
         let sortBookmarksPanelButton = newApp.buttons[AccessibilityIdentifiers.sortBookmarksButtonPanel]
         sortBookmarksPanelButton.tap()
