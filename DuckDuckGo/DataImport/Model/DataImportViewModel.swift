@@ -137,14 +137,14 @@ struct DataImportViewModel {
 
 #endif
 
-    let shouldShowPasswordExplainer: Bool
+    let isPasswordManagerAutolockEnabled: Bool
 
     init(importSource: Source? = nil,
          screen: Screen? = nil,
          availableImportSources: [DataImport.Source] = Source.allCases.filter { $0.canImportData },
          preferredImportSources: [Source] = [.chrome, .firefox, .safari],
          summary: [DataTypeImportResult] = [],
-         shouldShowPasswordExplainer: Bool = AutofillPreferences().isAutoLockEnabled,
+         isPasswordManagerAutolockEnabled: Bool = AutofillPreferences().isAutoLockEnabled,
          loadProfiles: @escaping (ThirdPartyBrowser) -> BrowserProfileList = { $0.browserProfiles() },
          dataImporterFactory: @escaping DataImporterFactory = dataImporter,
          requestPrimaryPasswordCallback: @escaping @MainActor (Source) -> String? = Self.requestPrimaryPasswordCallback,
@@ -166,7 +166,7 @@ struct DataImportViewModel {
         self.selectedDataTypes = importSource.supportedDataTypes
 
         self.summary = summary
-        self.shouldShowPasswordExplainer = shouldShowPasswordExplainer
+        self.isPasswordManagerAutolockEnabled = isPasswordManagerAutolockEnabled
 
         self.requestPrimaryPasswordCallback = requestPrimaryPasswordCallback
         self.openPanelCallback = openPanelCallback
@@ -686,7 +686,7 @@ extension DataImportViewModel {
     }
 
     mutating func update(with importSource: Source) {
-        self = .init(importSource: importSource, shouldShowPasswordExplainer: shouldShowPasswordExplainer, loadProfiles: loadProfiles, dataImporterFactory: dataImporterFactory, requestPrimaryPasswordCallback: requestPrimaryPasswordCallback, reportSenderFactory: reportSenderFactory)
+        self = .init(importSource: importSource, isPasswordManagerAutolockEnabled: isPasswordManagerAutolockEnabled, loadProfiles: loadProfiles, dataImporterFactory: dataImporterFactory, requestPrimaryPasswordCallback: requestPrimaryPasswordCallback, reportSenderFactory: reportSenderFactory)
     }
 
     @MainActor

@@ -108,7 +108,6 @@ final class SaveCredentialsViewController: NSViewController {
         updatePasswordFieldVisibility(visible: false)
 
         subscribeToPasswordManagerState()
-        securityButton.isHidden = !autofillPreferences.isAutoLockEnabled
     }
 
     override func viewWillDisappear() {
@@ -374,6 +373,7 @@ final class SaveCredentialsViewController: NSViewController {
 
     @IBAction func onSecurityClicked(sender: NSButton?) {
         infoViewController?.dismiss()
+        let message = autofillPreferences.isAutoLockEnabled ? UserText.pmSaveCredentialsSecurityInfo : UserText.pmSaveCredentialsSecurityInfoAutolockOff
         infoViewController = PopoverInfoViewController(message: UserText.pmSaveCredentialsSecurityInfo) { [weak self] in
             self?.infoViewController?.removeCompletely()
             self?.infoViewController = nil

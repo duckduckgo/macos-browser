@@ -203,11 +203,12 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     private func setUpEmptyStateMessageAttributedText() {
-        let attributedString = NSMutableAttributedString(string: UserText.pmEmptyStateDefaultDescription)
-        let learnMoreString = NSAttributedString(string: UserText.learnMore)
+        guard let listModel else { return }
+        let attributedString = NSMutableAttributedString(string: listModel.emptyStateMessageDescription)
+        let messageLinkText = NSAttributedString(string: listModel.emptyStateMessageLinkText)
         attributedString.append(.init(string: " "))
-        attributedString.append(learnMoreString)
-        let range = (attributedString.string as NSString).range(of: learnMoreString.string)
+        attributedString.append(messageLinkText)
+        let range = (attributedString.string as NSString).range(of: messageLinkText.string)
         let wholeRange = NSRange(location: 0, length: attributedString.length)
 
         let font = emptyStateMessage.font ?? .systemFont(ofSize: 13)
@@ -219,7 +220,7 @@ final class PasswordManagementViewController: NSViewController {
             .cursor: NSCursor.arrow
         ], range: wholeRange)
         attributedString.setAttributes([
-            .link: URL.passwordManagerLearnMore,
+            .link: listModel.emptyStateMessageLinkURL,
             .font: font,
             .foregroundColor: NSColor.linkBlue,
             .cursor: NSCursor.pointingHand

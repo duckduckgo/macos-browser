@@ -22,13 +22,17 @@ extension UserText {
 
     static let pmSaveCredentialsEditableTitle = NSLocalizedString("pm.save-credentials.editable.title", value: "Save password in DuckDuckGo?", comment: "Title for the editable Save Credentials popover")
     static let pmSaveCredentialsNonEditableTitle = NSLocalizedString("pm.save-credentials.non-editable.title", value: "New password saved", comment: "Title for the non-editable Save Credentials popover")
-    static let pmSaveCredentialsSecurityInfo = NSLocalizedString("pm.save-credentials.security.info", value: "Passwords are encrypted and nobody but you can see them, not even us. [Learn More](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)", comment: "Info message for the save credentials dialog")
+    static let pmSaveCredentialsSecurityInfo = NSLocalizedString("pm.save-credentials.security.info", value: "Passwords are encrypted and nobody but you can see them, not even us. [Learn More]( \(URL.passwordManagerLearnMore))", comment: "Info message for the save credentials dialog")
+    static let pmSaveCredentialsSecurityInfoAutolockOff = NSLocalizedString("pm.save-credentials.security.info", value: "Passwords are encrypted. We recommend setting up Auto-lock to keep your passwords even more secure. [Go to settings](\(URL.settings))", comment: "Info message for the save credentials dialog when the autolock feature is off")
     static let pmUpdateCredentialsTitle = NSLocalizedString("pm.update-credentials.title", value: "Update password?", comment: "Title for the Update Credentials popover")
 
     static let pmEmptyStateDefaultTitle = NSLocalizedString("pm.empty.default.title", value: "No passwords or credit cards saved yet", comment: "Label for default empty state title")
     static let pmEmptyStateDefaultDescription = NSLocalizedString("pm.empty.default.description.extended.v2",
                                                                   value: "Passwords are encrypted. Nobody but you can see them, not even us.",
                                                                   comment: "Label for default empty state description")
+    static let pmEmptyStateDefaultDescriptionAutolockOff = NSLocalizedString("pm.empty.default.description.extended.v2",
+                                                                             value: "Passwords are encrypted. We recommend setting up Auto-lock to keep your passwords even more secure.",
+                                                                             comment: "Label for default empty state description when the autolock feature is off")
     static let pmEmptyStateLearnMoreLink = NSLocalizedString("pm.empty.learn.more.link", value: "Learn more", comment: "Text for link to learn more about DuckDuckGo password manager")
     static let pmEmptyStateDefaultButtonTitle = NSLocalizedString("pm.empty.default.button.title", value: "Import Passwords", comment: "Import passwords button title for default empty state")
 

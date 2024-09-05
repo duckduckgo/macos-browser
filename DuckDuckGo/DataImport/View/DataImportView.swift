@@ -119,9 +119,7 @@ struct DataImportView: ModalView {
                 DataImportTypePicker(viewModel: $model)
                     .disabled(model.isImportSourcePickerDisabled)
 
-                if model.shouldShowPasswordExplainer {
-                    passwordsExplainerView().padding(.top, 20)
-                }
+                passwordsExplainerView().padding(.top, 20)
 
             case .moreInfo:
                 // you will be asked for your keychain password blah blah...
@@ -160,7 +158,7 @@ struct DataImportView: ModalView {
                     model.initiateImport(fileURL: url)
                 }
 
-                if dataType == .passwords, model.shouldShowPasswordExplainer {
+                if dataType == .passwords {
                     passwordsExplainerView().padding(.top, 20)
                 }
 
@@ -213,7 +211,7 @@ struct DataImportView: ModalView {
     private func passwordsExplainerView() -> some View {
         HStack(alignment: .top, spacing: 8) {
             Image(.lockColor16)
-            Text(UserText.importLoginsPasswordsExplainer)
+            Text(model.isPasswordManagerAutolockEnabled ? UserText.importLoginsPasswordsExplainer : UserText.importLoginsPasswordsExplainerAutolockOff)
                 .font(.system(size: 12))
                 .foregroundColor(.secondary)
                 .frame(maxWidth: .infinity, alignment: .topLeading)
