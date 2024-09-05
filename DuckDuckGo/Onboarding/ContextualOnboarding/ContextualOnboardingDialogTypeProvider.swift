@@ -22,7 +22,7 @@ protocol ContextualOnboardingDialogTypeProviding {
     func dialogTypeForTab(_ tab: Tab) -> ContextualDialogType?
 }
 
-enum ContextualDialogType {
+enum ContextualDialogType: Equatable {
     case tryASearch
     case searchDone(shouldFollowUp: Bool)
     case tryASite
