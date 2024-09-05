@@ -106,14 +106,14 @@ final class MainMenu: NSMenu {
     // MARK: - Initialization
 
     @MainActor
-    init(featureFlagger: FeatureFlagger, bookmarkManager: BookmarkManager, faviconManager: FaviconManagement, copyHandler: CopyHandler) {
+    init(featureFlagger: FeatureFlagger, bookmarkManager: BookmarkManager, faviconManager: FaviconManagement) {
 
         super.init(title: UserText.duckDuckGo)
 
         buildItems {
             buildDuckDuckGoMenu()
             buildFileMenu()
-            buildEditMenu(copyHandler: copyHandler)
+            buildEditMenu()
             buildViewMenu()
             buildHistoryMenu()
             buildBookmarksMenu()
@@ -182,14 +182,14 @@ final class MainMenu: NSMenu {
         }
     }
 
-    func buildEditMenu(copyHandler: CopyHandler) -> NSMenuItem {
+    func buildEditMenu() -> NSMenuItem {
         NSMenuItem(title: UserText.mainMenuEdit) {
             NSMenuItem(title: UserText.mainMenuEditUndo, action: Selector(("undo:")), keyEquivalent: "z")
             NSMenuItem(title: UserText.mainMenuEditRedo, action: Selector(("redo:")), keyEquivalent: "Z")
             NSMenuItem.separator()
 
-            NSMenuItem(title: UserText.mainMenuEditCut, action: #selector(NSText.cut), keyEquivalent: "x")
-            NSMenuItem(title: UserText.mainMenuEditCopy, action: #selector(CopyHandler.copy(_:)), target: copyHandler, keyEquivalent: "c")
+            NSMenuItem(title: UserText.mainMenuEditCut, action: #selector(NSText.cut(_:)), keyEquivalent: "x")
+            NSMenuItem(title: UserText.mainMenuEditCopy, action: #selector(NSText.copy(_:)), keyEquivalent: "c")
             NSMenuItem(title: UserText.mainMenuEditPaste, action: #selector(NSText.paste), keyEquivalent: "v")
             NSMenuItem(title: UserText.mainMenuEditPasteAndMatchStyle, action: #selector(NSTextView.pasteAsPlainText), keyEquivalent: [.option, .command, .shift, "v"])
             NSMenuItem(title: UserText.mainMenuEditPasteAndMatchStyle, action: #selector(NSTextView.pasteAsPlainText), keyEquivalent: [.command, .shift, "v"])
@@ -290,28 +290,30 @@ final class MainMenu: NSMenu {
     }
 
     func buildBookmarksMenu() -> NSMenuItem {
-        NSMenuItem(title: UserText.bookmarks).submenu(bookmarksMenu.buildItems {
-            NSMenuItem(title: UserText.bookmarkThisPage, action: #selector(MainViewController.bookmarkThisPage), keyEquivalent: "d")
-            NSMenuItem(title: UserText.bookmarkAllTabs, action: #selector(MainViewController.bookmarkAllOpenTabs), keyEquivalent: [.command, .shift, "d"])
-            manageBookmarksMenuItem
-            bookmarksMenuToggleBookmarksBarMenuItem
-            NSMenuItem.separator()
+        NSMenuItem(title: UserText.bookmarks)
+            .withAccessibilityIdentifier("MainMenu.bookmarks")
+            .submenu(bookmarksMenu.buildItems {
+                NSMenuItem(title: UserText.bookmarkThisPage, action: #selector(MainViewController.bookmarkThisPage), keyEquivalent: "d")
+                NSMenuItem(title: UserText.bookmarkAllTabs, action: #selector(MainViewController.bookmarkAllOpenTabs), keyEquivalent: [.command, .shift, "d"])
+                manageBookmarksMenuItem
+                bookmarksMenuToggleBookmarksBarMenuItem
+                NSMenuItem.separator()
 
-            importBookmarksMenuItem
-            NSMenuItem(title: UserText.exportBookmarks, action: #selector(AppDelegate.openExportBookmarks))
-            NSMenuItem.separator()
+                importBookmarksMenuItem
+                NSMenuItem(title: UserText.exportBookmarks, action: #selector(AppDelegate.openExportBookmarks))
+                NSMenuItem.separator()
 
-            NSMenuItem(title: UserText.favorites)
-                .submenu(favoritesMenu.buildItems {
-                    NSMenuItem(title: UserText.mainMenuHistoryFavoriteThisPage, action: #selector(MainViewController.favoriteThisPage))
-                        .withImage(.favorite)
-                        .withAccessibilityIdentifier("MainMenu.favoriteThisPage")
-                    NSMenuItem.separator()
-                })
-                .withImage(.favorite)
+                NSMenuItem(title: UserText.favorites)
+                    .submenu(favoritesMenu.buildItems {
+                        NSMenuItem(title: UserText.mainMenuHistoryFavoriteThisPage, action: #selector(MainViewController.favoriteThisPage))
+                            .withImage(.favorite)
+                            .withAccessibilityIdentifier("MainMenu.favoriteThisPage")
+                        NSMenuItem.separator()
+                    })
+                    .withImage(.favorite)
 
-            NSMenuItem.separator()
-        })
+                NSMenuItem.separator()
+            })
     }
 
     func buildWindowMenu() -> NSMenuItem {
@@ -604,6 +606,9 @@ final class MainMenu: NSMenu {
                 NSMenuItem(title: "Reset Pixels Storage", action: #selector(MainViewController.resetDailyPixels))
                 NSMenuItem(title: "Reset Remote Messages", action: #selector(AppDelegate.resetRemoteMessages))
                 NSMenuItem(title: "Reset CPM Experiment Cohort (needs restart)", action: #selector(AppDelegate.resetCpmCohort))
+                NSMenuItem(title: "Reset Duck Player Onboarding", action: #selector(MainViewController.resetDuckPlayerOnboarding))
+                NSMenuItem(title: "Reset Duck Player Preferences", action: #selector(MainViewController.resetDuckPlayerPreferences))
+
             }.withAccessibilityIdentifier("MainMenu.resetData")
             NSMenuItem(title: "UI Triggers") {
                 NSMenuItem(title: "Show Save Credentials Popover", action: #selector(MainViewController.showSaveCredentialsPopover))
