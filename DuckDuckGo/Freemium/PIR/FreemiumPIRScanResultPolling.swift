@@ -21,11 +21,11 @@ import DataBrokerProtection
 import Freemium
 
 extension Notification.Name {
-    /// Notification posted when results are found after polling for profile matches.
-    static let pirResultsFound = Notification.Name("pirResultsFound")
+    /// Notification posted when results are found after polling for profile matches for a freemium PIR scan.
+    static let freemiumPirResultsFound = Notification.Name("freemiumPirResultsFound")
 
-    /// Notification posted when no results are found after polling for profile matches and the maximum check duration is exceeded.
-    static let pirNoResultsFound = Notification.Name("pirNoResultsFound")
+    /// Notification posted when no results are found after polling for profile matches for a freemium PIR scan and the maximum check duration is exceeded.
+    static let freemiumPirNoResultsFound = Notification.Name("pirNoResultsFound")
 }
 
 /// Protocol defining the interface for PIR (Profile Information Removal) scan result polling.

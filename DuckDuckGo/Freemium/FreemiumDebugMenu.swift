@@ -35,6 +35,7 @@ final class FreemiumDebugMenu: NSMenuItem {
 
         menu.addItem(NSMenuItem(title: "Set Freemium PIR Onboarded State TRUE", action: #selector(setFreemiumPIROnboardStateTrue), target: self))
         menu.addItem(NSMenuItem(title: "Set Freemium PIR Onboarded State FALSE", action: #selector(setFreemiumPIROnboardStateFalse), target: self))
+        menu.addItem(NSMenuItem(title: "Set Freemium PIR First Profile Saved Timestamp NIL", action: #selector(setFirstProfileSavedTimestampNil), target: self))
         menu.addItem(NSMenuItem(title: "Set Freemium DBP Did Post First Profile Saved FALSE", action: #selector(setDidPostFirstProfileSavedNotificationFalse), target: self))
         menu.addItem(.separator())
 
@@ -49,6 +50,11 @@ final class FreemiumDebugMenu: NSMenuItem {
     @objc
     func setFreemiumPIROnboardStateFalse() {
         DefaultFreemiumPIRUserStateManager(userDefaults: .dbp).didOnboard = false
+    }
+
+    @objc
+    func setFirstProfileSavedTimestampNil() {
+        DefaultFreemiumPIRUserStateManager(userDefaults: .dbp).firstProfileSavedTimestamp = nil
     }
 
     @objc
