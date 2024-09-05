@@ -25,12 +25,16 @@ struct RemoteMessageView: View {
     let viewModel: RemoteMessageViewModel
 
     @State var isHovering = false
+    @EnvironmentObject var settingsModel: HomePage.Models.SettingsModel
 
     var body: some View {
         ZStack {
+
             RoundedRectangle(cornerRadius: 12)
-                .foregroundColor(Color.blackWhite3)
-                .cornerRadius(8)
+                .stroke(Color.homeFavoritesGhost, style: StrokeStyle(lineWidth: 1.0))
+                .homePageViewBackground(settingsModel.customBackground)
+                .cornerRadius(12)
+
             VStack(spacing: 12) {
                 HStack(spacing: 8) {
                     image
@@ -81,7 +85,7 @@ struct RemoteMessageView: View {
     }
 
     private var closeButton: some View {
-        HomePage.Views.CloseButton(icon: .close) {
+        HomePage.Views.CloseButton(icon: .close, size: 16) {
             viewModel.onDidClose(.close)
         }
         .visibility(isHovering ? .visible : .invisible)
