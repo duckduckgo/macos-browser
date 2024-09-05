@@ -34,6 +34,9 @@ public enum FeatureFlag: String {
 
     // https://app.asana.com/0/1206488453854252/1207136666798700/f
     case freemiumPIR
+
+    // https://app.asana.com/0/1201462886803403/1208030658792310/f
+    case unknownUsernameCategorization
 }
 
 extension FeatureFlag: FeatureFlagSourceProviding {
@@ -47,6 +50,8 @@ extension FeatureFlag: FeatureFlagSourceProviding {
             return .remoteReleasable(.subfeature(SslCertificatesSubfeature.allowBypass))
         case .deduplicateLoginsOnImport:
             return .remoteReleasable(.subfeature(AutofillSubfeature.deduplicateLoginsOnImport))
+        case .unknownUsernameCategorization:
+            return .remoteReleasable(.subfeature(AutofillSubfeature.unknownUsernameCategorization))
         case .freemiumPIR:
             return .remoteDevelopment(.subfeature(DBPSubfeature.freemium))
         case .phishingDetectionErrorPage:

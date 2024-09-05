@@ -139,12 +139,22 @@ final class WebView: WKWebView {
     }
 
     func zoomIn() {
+        // if displaying PDF
+        if let pdfHudView = self.hudView() {
+            pdfHudView.zoomIn()
+            return
+        }
         guard canZoomIn else { return }
         zoomLevel = DefaultZoomValue.allCases[self.zoomLevel.index + 1]
         zoomLevelDelegate?.zoomWasSet(to: zoomLevel)
     }
 
     func zoomOut() {
+        // if displaying PDF
+        if let pdfHudView = self.hudView() {
+            pdfHudView.zoomOut()
+            return
+        }
         guard canZoomOut else { return }
         zoomLevel = DefaultZoomValue.allCases[self.zoomLevel.index - 1]
         zoomLevelDelegate?.zoomWasSet(to: zoomLevel)

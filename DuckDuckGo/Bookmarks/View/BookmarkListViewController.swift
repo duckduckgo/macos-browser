@@ -41,8 +41,11 @@ final class BookmarkListViewController: NSViewController {
     private lazy var stackView = NSStackView()
     private lazy var newBookmarkButton = MouseOverButton(image: .addBookmark, target: self, action: #selector(newBookmarkButtonClicked))
     private lazy var newFolderButton = MouseOverButton(image: .addFolder, target: outlineView.menu, action: #selector(FolderMenuItemSelectors.newFolder))
+        .withAccessibilityIdentifier("BookmarkListViewController.newFolderButton")
     private lazy var searchBookmarksButton = MouseOverButton(image: .searchBookmarks, target: self, action: #selector(searchBookmarkButtonClicked))
+        .withAccessibilityIdentifier("BookmarkListViewController.searchBookmarksButton")
     private lazy var sortBookmarksButton = MouseOverButton(image: .bookmarkSortAsc, target: self, action: #selector(sortBookmarksButtonClicked))
+        .withAccessibilityIdentifier("BookmarkListViewController.sortBookmarksButton")
 
     private lazy var buttonsDivider = NSBox()
     private lazy var manageBookmarksButton = MouseOverButton(title: UserText.bookmarksManage, target: self, action: #selector(openManagementInterface))
@@ -53,10 +56,14 @@ final class BookmarkListViewController: NSViewController {
 
     private lazy var emptyState = NSView()
     private lazy var emptyStateTitle = NSTextField()
+        .withAccessibilityIdentifier(BookmarksEmptyStateContent.titleAccessibilityIdentifier)
     private lazy var emptyStateMessage = NSTextField()
+        .withAccessibilityIdentifier(BookmarksEmptyStateContent.descriptionAccessibilityIdentifier)
     private lazy var emptyStateImageView = NSImageView(image: .bookmarksEmpty)
+        .withAccessibilityIdentifier(BookmarksEmptyStateContent.imageAccessibilityIdentifier)
     private lazy var importButton = NSButton(title: UserText.importBookmarksButtonTitle, target: self, action: #selector(onImportClicked))
     private lazy var searchBar = NSSearchField()
+        .withAccessibilityIdentifier("BookmarkListViewController.searchBar")
     private var boxDividerTopConstraint = NSLayoutConstraint()
 
     private let bookmarkManager: BookmarkManager
@@ -158,6 +165,9 @@ final class BookmarkListViewController: NSViewController {
         boxDivider.setContentHuggingPriority(.defaultHigh, for: .vertical)
         boxDivider.translatesAutoresizingMaskIntoConstraints = false
 
+        // keep OutlineView menu declaration before buttons as it‘s used as target
+        outlineView.menu = BookmarksContextMenu(bookmarkManager: bookmarkManager, delegate: self)
+
         stackView.orientation = .horizontal
         stackView.spacing = 4
         stackView.setHuggingPriority(.defaultHigh, for: .horizontal)
@@ -169,9 +179,6 @@ final class BookmarkListViewController: NSViewController {
         stackView.addArrangedSubview(searchBookmarksButton)
         stackView.addArrangedSubview(buttonsDivider)
         stackView.addArrangedSubview(manageBookmarksButton)
-
-        // keep OutlineView menu declaration before the buttons as it‘s their target
-        outlineView.menu = BookmarksContextMenu(bookmarkManager: bookmarkManager, delegate: self)
 
         newBookmarkButton.bezelStyle = .shadowlessSquare
         newBookmarkButton.cornerRadius = 4
@@ -254,7 +261,6 @@ final class BookmarkListViewController: NSViewController {
         outlineView.usesAutomaticRowHeights = true
         outlineView.target = self
         outlineView.action = #selector(handleClick)
-        outlineView.menu = BookmarksContextMenu(bookmarkManager: bookmarkManager, delegate: self)
         outlineView.dataSource = dataSource
         outlineView.delegate = dataSource
 
@@ -452,7 +458,7 @@ final class BookmarkListViewController: NSViewController {
         expandFoldersAndScrollUntil(folder)
         outlineView.scrollToAdjustedPositionInOutlineView(folder)
 
-        guard let node = treeController.node(representing: folder) else { return }
+        guard let node = treeController.findNodeWithId(representing: folder) else { return }
 
         outlineView.highlight(node)
     }

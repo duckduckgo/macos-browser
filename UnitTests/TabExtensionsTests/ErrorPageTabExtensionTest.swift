@@ -39,8 +39,7 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         scriptPublisher = PassthroughSubject<MockSpecialErrorPageScriptProvider, Never>()
         credentialCreator = MockCredentialCreator()
         let featureFlagger = MockFeatureFlagger()
-        let phishingSiteDetector = MockPhishingSiteDetector(isMalicious: true)
-        errorPageExtention = SpecialErrorPageTabExtension(webViewPublisher: mockWebViewPublisher, scriptsPublisher: scriptPublisher, urlCredentialCreator: credentialCreator, featureFlagger: featureFlagger, phishingDetector: phishingSiteDetector, phishingStateManager: PhishingTabStateManager())
+        errorPageExtention = SpecialErrorPageTabExtension(webViewPublisher: mockWebViewPublisher, scriptsPublisher: scriptPublisher, urlCredentialCreator: credentialCreator, featureFlagger: featureFlagger, phishingDetector: MockPhishingSiteDetector(isMalicious: true), phishingStateManager: PhishingTabStateManager())
     }
 
     override func tearDownWithError() throws {
@@ -246,7 +245,9 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         let action = NavigationAction(request: URLRequest(url: URL(string: "com.example.error")!), navigationType: .custom(.userEnteredUrl), currentHistoryItemIdentity: nil, redirectHistory: nil, isUserInitiated: true, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: nil, shouldDownload: false, mainFrameNavigation: nil)
         let navigation = Navigation(identity: .init(nil), responders: .init(), state: .started, redirectHistory: [action], isCurrent: true, isCommitted: true)
         let mockWebView = MockWKWebView(url: URL(string: errorURLString)!)
+        let error = WKError(_nsError: NSError(domain: "com.example.error", code: NSURLErrorServerCertificateUntrusted, userInfo: ["_kCFStreamErrorCodeKey": -9843, "NSErrorFailingURLKey": URL(string: errorURLString)!]))
         errorPageExtention.webView = mockWebView
+        errorPageExtention.navigation(navigation, didFailWith: error)
         errorPageExtention.visitSite()
 
         // WHEN
@@ -327,6 +328,7 @@ class MockWKWebView: NSObject, ErrorPageTabExtensionNavigationDelegate {
     var reloadCalled = false
     var loadCalled = false
     var closedCalled = false
+    var loadCalled = false
 
     init(url: URL) {
         self.url = url
@@ -356,8 +358,7 @@ class MockWKWebView: NSObject, ErrorPageTabExtensionNavigationDelegate {
 
     func load(_ request: URLRequest) -> WKNavigation? {
         loadCalled = true
-        url = request.url
-        return .none
+        return .some(WKNavigation())
     }
 }
 

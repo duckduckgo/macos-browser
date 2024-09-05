@@ -66,39 +66,30 @@ public class PhishingDetection: PhishingSiteDetecting {
         self.filterSetDataSHA = filterSetDataSHA
         self.hashPrefixURL = hashPrefixURL
         self.hashPrefixDataSHA = hashPrefixDataSHA
+        self.featureFlagger = featureFlagger ?? NSApp.delegateTyped.featureFlagger
 
-        let resolvedDataProvider = dataProvider ?? PhishingDetectionDataProvider(
+        let resolvedDependencies = PhishingDetection.resolveDependencies(
             revision: revision,
             filterSetURL: filterSetURL,
             filterSetDataSHA: filterSetDataSHA,
             hashPrefixURL: hashPrefixURL,
-            hashPrefixDataSHA: hashPrefixDataSHA
+            hashPrefixDataSHA: hashPrefixDataSHA,
+            detectionClient: detectionClient,
+            dataProvider: dataProvider,
+            dataStore: dataStore,
+            detector: detector,
+            updateManager: updateManager,
+            dataActivities: dataActivities
         )
-        self.dataStore = dataStore ?? PhishingDetectionDataStore(dataProvider: resolvedDataProvider)
-        self.detector = detector ?? PhishingDetector(apiClient: detectionClient, dataStore: self.dataStore)
-//        self.detector = detector ?? PhishingDetector(apiClient: detectionClient, dataStore: self.dataStore, eventMapping:
-//                                                        EventMapping<PhishingDetectionEvents> {event, _, params, _ in
-//            switch event {
-//            case .errorPageShown(clientSideHit: let clientSideHit):
-//                PixelKit.fire(PhishingDetectionEvents.errorPageShown(clientSideHit: clientSideHit))
-//            case .iframeLoaded:
-//                PixelKit.fire(PhishingDetectionEvents.iframeLoaded)
-//            case .visitSite:
-//                PixelKit.fire(PhishingDetectionEvents.visitSite)
-//            case .updateTaskFailed48h(error: let error):
-//                PixelKit.fire(PhishingDetectionEvents.updateTaskFailed48h(error: error))
-//            }
-//        })
-        self.updateManager = updateManager ?? PhishingDetectionUpdateManager(client: detectionClient, dataStore: self.dataStore)
-        self.dataActivities = dataActivities ?? PhishingDetectionDataActivities(phishingDetectionDataProvider: resolvedDataProvider, updateManager: self.updateManager)
+
+        self.dataStore = resolvedDependencies.dataStore
+        self.detector = resolvedDependencies.detector
+        self.updateManager = resolvedDependencies.updateManager
+        self.dataActivities = resolvedDependencies.dataActivities
         self.detectionPreferences = detectionPreferences
-        self.featureFlagger = NSApp.delegateTyped.featureFlagger
         self.config = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig
-        if let featureFlagger = featureFlagger,
-           featureFlagger.isFeatureOn(.phishingDetectionErrorPage),
-           self.detectionPreferences.isEnabled {
-            startUpdateTasks()
-        }
+
+        self.startUpdateTasksIfEnabled()
         self.setupBindings()
     }
 
@@ -112,6 +103,42 @@ public class PhishingDetection: PhishingSiteDetecting {
             detector: detector,
             dataActivities: dataActivities
         )
+    }
+
+    private static func resolveDependencies(
+        revision: Int,
+        filterSetURL: URL,
+        filterSetDataSHA: String,
+        hashPrefixURL: URL,
+        hashPrefixDataSHA: String,
+        detectionClient: PhishingDetectionAPIClient,
+        dataProvider: PhishingDetectionDataProvider?,
+        dataStore: PhishingDetectionDataSaving?,
+        detector: PhishingDetecting?,
+        updateManager: PhishingDetectionUpdateManaging?,
+        dataActivities: PhishingDetectionDataActivityHandling?
+    ) -> (dataStore: PhishingDetectionDataSaving, detector: PhishingDetecting, updateManager: PhishingDetectionUpdateManaging, dataActivities: PhishingDetectionDataActivityHandling) {
+
+        let resolvedDataProvider = dataProvider ?? PhishingDetectionDataProvider(
+            revision: revision,
+            filterSetURL: filterSetURL,
+            filterSetDataSHA: filterSetDataSHA,
+            hashPrefixURL: hashPrefixURL,
+            hashPrefixDataSHA: hashPrefixDataSHA
+        )
+
+        let resolvedDataStore = dataStore ?? PhishingDetectionDataStore(dataProvider: resolvedDataProvider)
+        let resolvedDetector = detector ?? PhishingDetector(apiClient: detectionClient, dataStore: resolvedDataStore)
+        let resolvedUpdateManager = updateManager ?? PhishingDetectionUpdateManager(client: detectionClient, dataStore: resolvedDataStore)
+        let resolvedDataActivities = dataActivities ?? PhishingDetectionDataActivities(phishingDetectionDataProvider: resolvedDataProvider, updateManager: resolvedUpdateManager)
+        return (resolvedDataStore, resolvedDetector, resolvedUpdateManager, resolvedDataActivities)
+    }
+
+    private func startUpdateTasksIfEnabled() {
+        if featureFlagger.isFeatureOn(.phishingDetection),
+           self.detectionPreferences.isEnabled {
+            startUpdateTasks()
+        }
     }
 
     private func setupBindings() {
@@ -147,5 +174,6 @@ public class PhishingDetection: PhishingSiteDetecting {
 
     deinit {
         cancellable?.cancel()
+        stopUpdateTasks()
     }
 }
