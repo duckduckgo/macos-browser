@@ -1,0 +1,36 @@
+name: Migration Test - Asana Add Comment
+
+on: 
+  push:
+  workflow_dispatch:
+
+jobs:
+  test:
+
+    name: Test
+
+    runs-on: macos-14
+
+    steps:
+ 
+    - name: Check out the code
+      uses: actions/checkout@v4
+
+    - name: Set up fastlane
+      run: bundle install
+
+    - name: Test asana-log-message comment
+      id: create-log-message
+      uses: ./.github/actions/asana-log-message
+      with:
+        access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        comment: "This is a sample comment"
+        task-url: "https://app.asana.com/0/1201392122292466/1208220644008500/f"
+
+    - name: Test asana-log-message template-name
+      id: create-log-message
+      uses: ./.github/actions/asana-log-message
+      with:
+        access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        task-url: "https://app.asana.com/0/1201392122292466/1208220644008500/f"
+        template_name: "public-release-tag-failed"
