@@ -35,6 +35,7 @@ extension HomePage.Models {
 
         enum Const {
             static let maximumNumberOfUserImages = 4
+            static let defaultColorPickerColor = NSColor.white
         }
 
         enum ContentType: Equatable {
@@ -158,9 +159,10 @@ extension HomePage.Models {
                     }
                 }
 
-            if let customColor = NSColor(hex: lastPickedCustomColorHexValue) {
+            if let lastPickedCustomColorHexValue, let customColor = NSColor(hex: lastPickedCustomColorHexValue) {
                 lastPickedCustomColor = customColor
             }
+            updateSolidColorPickerItems(pickerColor: lastPickedCustomColor ?? Const.defaultColorPickerColor)
         }
 
         var hasUserImages: Bool {
@@ -229,20 +231,28 @@ extension HomePage.Models {
             }
         }
 
-        @Published private(set) var lastPickedCustomColor: NSColor = .white {
+        @Published private(set) var lastPickedCustomColor: NSColor? {
             didSet {
+                guard let lastPickedCustomColor else {
+                    return
+                }
                 lastPickedCustomColorHexValue = lastPickedCustomColor.hex()
-                let predefinedColorBackgrounds = SolidColorBackground.predefinedColors.map(SolidColorBackgroundPickerItem.background)
-                solidColorPickerItems = [.picker(.init(color: lastPickedCustomColor))] + predefinedColorBackgrounds
+                updateSolidColorPickerItems(pickerColor: lastPickedCustomColor)
             }
         }
 
-        @UserDefaultsWrapper(key: .homePageLastPickedCustomColor, defaultValue: "#FFFFFF")
-        private var lastPickedCustomColorHexValue: String
+        private func updateSolidColorPickerItems(pickerColor: NSColor) {
+            let predefinedColorBackgrounds = SolidColorBackground.predefinedColors.map(SolidColorBackgroundPickerItem.background)
+            solidColorPickerItems = [.picker(.init(color: pickerColor))] + predefinedColorBackgrounds
+        }
+
+        @UserDefaultsWrapper(key: .homePageLastPickedCustomColor, defaultValue: nil)
+        private var lastPickedCustomColorHexValue: String?
 
         func openColorPanel() {
+            userColorCancellable?.cancel()
             let provider = userColorProvider()
-            provider.showColorPanel(with: NSColor(hex: lastPickedCustomColorHexValue))
+            provider.showColorPanel(with: lastPickedCustomColorHexValue.flatMap(NSColor.init(hex:)) ?? Const.defaultColorPickerColor)
 
             userColorCancellable = provider.colorPublisher
                 .handleEvents(receiveOutput: { [weak self] color in

@@ -108,9 +108,12 @@ extension HomePage.Views {
                                     defaultItemView(for: item)
                                 case .picker:
                                     Button {
-                                        withAnimation {
-                                            if model.customBackground != item.customBackground {
-                                                model.customBackground = item.customBackground
+                                        // Only set picker color as background if it was ever picked
+                                        if model.lastPickedCustomColor != nil {
+                                            withAnimation {
+                                                if model.customBackground != item.customBackground {
+                                                    model.customBackground = item.customBackground
+                                                }
                                             }
                                         }
                                         model.openColorPanel()

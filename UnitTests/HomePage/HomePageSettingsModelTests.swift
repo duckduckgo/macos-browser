@@ -272,6 +272,10 @@ final class HomePageSettingsModelTests: XCTestCase {
         ])
     }
 
+    func testThatSolidColorsArePopulatedUponInitialization() {
+        XCTAssertEqual(model.solidColorPickerItems.count, SolidColorBackground.predefinedColors.count + 1)
+    }
+
     func testThatColorPickerIsPresentedWithLastPickedColor() {
         var colors = [NSColor?]()
         userColorProvider.showColorPanel = { color in

@@ -29,7 +29,7 @@ protocol UserColorProviding {
 
 extension NSColorPanel: UserColorProviding {
     var colorPublisher: AnyPublisher<NSColor, Never> {
-        publisher(for: \.color).removeDuplicates().eraseToAnyPublisher()
+        publisher(for: \.color).dropFirst().removeDuplicates().eraseToAnyPublisher()
     }
 
     func showColorPanel(with color: NSColor?) {
