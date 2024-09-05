@@ -139,6 +139,10 @@ extension Preferences {
             }
         }
 
+        private var isNewVersionAvailable: Bool {
+            model.updateController?.isUpdateAvailableToInstall == true
+        }
+
         @ViewBuilder
         private var versionText: some View {
             HStack(spacing: 0) {
@@ -153,7 +157,7 @@ extension Preferences {
                 case .upToDate:
                     Text(" — " + UserText.upToDate)
                 case .updateCycle(let progress):
-                    if progress.isDone {
+                    if isNewVersionAvailable {
                         Text(" — " + UserText.newerVersionAvailable)
                     } else {
                         text(for: progress)
@@ -200,7 +204,7 @@ extension Preferences {
                 Image(systemName: "checkmark.circle.fill")
                     .foregroundColor(.green)
             case .updateCycle(let progress):
-                if progress.isDone {
+                if isNewVersionAvailable {
                     Image(systemName: "exclamationmark.circle.fill")
                         .foregroundColor(.red)
                 } else {
@@ -239,7 +243,7 @@ extension Preferences {
                 }
                 .buttonStyle(UpdateButtonStyle(enabled: true))
             case .updateCycle(let progress):
-                if progress.isDone {
+                if isNewVersionAvailable {
                     Button(UserText.restartToUpdate) {
                         model.restartToUpdate()
                     }
