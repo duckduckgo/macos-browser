@@ -828,6 +828,7 @@ extension MainViewController {
 
     @objc func resetDuckPlayerOnboarding(_ sender: Any?) {
         DefaultDuckPlayerOnboardingDecider().reset()
+        DuckPlayerOnboardingExperiment().reset()
     }
 
     @objc func resetDuckPlayerPreferences(_ sender: Any?) {
