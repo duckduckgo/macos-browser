@@ -105,7 +105,9 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     var areAutomaticUpdatesEnabled: Bool {
         didSet {
             Logger.updates.debug("areAutomaticUpdatesEnabled: \(self.areAutomaticUpdatesEnabled)")
-            try? configureUpdater()
+            if oldValue != areAutomaticUpdatesEnabled {
+                try? configureUpdater()
+            }
         }
     }
 
