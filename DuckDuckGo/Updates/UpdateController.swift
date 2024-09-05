@@ -39,8 +39,7 @@ protocol UpdateControllerProtocol: AnyObject {
 
     var lastUpdateCheckDate: Date? { get }
 
-    func checkForUpdate()
-    func checkForUpdateInBackground()
+    func checkForUpdateIfNeeded()
 
     func runUpdate()
 
@@ -121,16 +120,12 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         }
     }
 
-    func checkForUpdate() {
+    func checkForUpdateIfNeeded() {
+        guard !updater.sessionInProgress else { return }
+
         Logger.updates.debug("Checking for updates")
 
         updater.checkForUpdates()
-    }
-
-    func checkForUpdateInBackground() {
-        Logger.updates.debug("Checking for updates in background")
-
-        updater.checkForUpdatesInBackground()
     }
 
     // MARK: - Private
@@ -155,8 +150,6 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         updater.automaticallyDownloadsUpdates = false
         updater.updateCheckInterval = 0
 #endif
-
-//        checkForUpdateInBackground()
     }
 
     private func showUpdateNotificationIfNeeded() {
@@ -209,6 +202,23 @@ extension UpdateController: SPUUpdaterDelegate {
         }
 
         PixelKit.fire(DebugEvent(GeneralPixel.updaterAborted, error: error))
+    }
+
+    func updater(_ updater: SPUUpdater, didFindValidUpdate item: SUAppcastItem) {
+        Logger.updates.debug("Updater did find valid update: \(item.displayVersionString)(\(item.versionString))")
+        PixelKit.fire(DebugEvent(GeneralPixel.updaterDidFindUpdate))
+        updateProgress = .updateFound(item)
+    }
+
+    func updaterDidNotFindUpdate(_ updater: SPUUpdater, error: any Error) {
+        let nsError = error as NSError
+        guard let item = nsError.userInfo["SULatestAppcastItemFound"] as? SUAppcastItem else { return }
+
+        Logger.updates.debug("Updater did not find update: \(String(describing: item.displayVersionString))(\(String(describing: item.versionString)))")
+        PixelKit.fire(DebugEvent(GeneralPixel.updaterDidNotFindUpdate, error: error))
+
+        updateProgress = .updateNotFound(item, nsError)
+        updateProgress = .updateCycleDone
     }
 
     func updater(_ updater: SPUUpdater, didDownloadUpdate item: SUAppcastItem) {
