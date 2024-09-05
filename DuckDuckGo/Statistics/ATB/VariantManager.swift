@@ -36,6 +36,14 @@ struct Variant: BrowserServicesKit.Variant {
 
     // Note: Variants with `doNotAllocate` weight, should always be included so that previous installations are unaffected
     static let defaultVariants: [Variant] = [
+        Variant(name: HomePageExperimentVariantName.control, 
+                weight: 1,
+                isIncluded: When.always,
+                features: []),
+        Variant(name: HomePageExperimentVariantName.experiment,
+                weight: 1,
+                isIncluded: When.always,
+                features: [.startHomePage]),
     ]
 
     var name: String

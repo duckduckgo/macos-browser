@@ -317,10 +317,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             AppDelegate.firstLaunchDate = Date()
             // MARK: Enable pixel experiments here
             PixelExperiment.install()
+
         }
         AtbAndVariantCleanup.cleanup()
-        DefaultVariantManager().assignVariantIfNeeded { _ in
+        DefaultVariantManager().assignVariantIfNeeded { manager in
             // MARK: perform first time launch logic here
+            DefaultHomePageExperimentManager().setupExperiment(variantManager: manager)
         }
 
         let statisticsLoader = NSApp.runType.requiresEnvironment ? StatisticsLoader.shared : nil
