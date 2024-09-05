@@ -62,7 +62,8 @@ final class PasswordManagementViewController: NSViewController {
     @IBOutlet var emptyState: NSView!
     @IBOutlet var emptyStateImageView: NSImageView!
     @IBOutlet var emptyStateTitle: NSTextField!
-    @IBOutlet var emptyStateMessage: NSTextField!
+    @IBOutlet var emptyStateMessage: NSTextView!
+    @IBOutlet var emptyStateMessageHeight: NSLayoutConstraint!
     @IBOutlet var emptyStateButton: NSButton!
     @IBOutlet weak var exportLoginItem: NSMenuItem!
     @IBOutlet var lockScreen: NSView!
@@ -171,10 +172,7 @@ final class PasswordManagementViewController: NSViewController {
 
         emptyStateTitle.attributedStringValue = NSAttributedString.make(emptyStateTitle.stringValue, lineHeight: 1.14, kern: -0.23)
 
-        emptyStateMessage.allowsEditingTextAttributes = true
         emptyStateMessage.isSelectable = true
-        emptyStateMessage.lineBreakMode = .byWordWrapping
-        emptyStateMessage.maximumNumberOfLines = 0
         emptyStateMessage.delegate = self
         setUpEmptyStateMessageAttributedText()
 
@@ -204,28 +202,37 @@ final class PasswordManagementViewController: NSViewController {
 
     private func setUpEmptyStateMessageAttributedText() {
         guard let listModel else { return }
-        let attributedString = NSMutableAttributedString(string: listModel.emptyStateMessageDescription)
-        let messageLinkText = NSAttributedString(string: listModel.emptyStateMessageLinkText)
-        attributedString.append(.init(string: " "))
-        attributedString.append(messageLinkText)
-        let range = (attributedString.string as NSString).range(of: messageLinkText.string)
-        let wholeRange = NSRange(location: 0, length: attributedString.length)
+        emptyStateMessage.delegate = self
 
-        let font = emptyStateMessage.font ?? .systemFont(ofSize: 13)
-        let paragraph = NSMutableParagraphStyle()
-        paragraph.alignment = .center
-        attributedString.setAttributes([
-            .font: font,
-            .paragraphStyle: paragraph,
-            .cursor: NSCursor.arrow
-        ], range: wholeRange)
-        attributedString.setAttributes([
-            .link: listModel.emptyStateMessageLinkURL,
-            .font: font,
+        let linkAttributes: [NSAttributedString.Key: Any] = [
             .foregroundColor: NSColor.linkBlue,
             .cursor: NSCursor.pointingHand
-        ], range: range)
-        emptyStateMessage.attributedStringValue = attributedString
+        ]
+
+        emptyStateMessage.linkTextAttributes = linkAttributes
+
+        let string = NSMutableAttributedString(string: listModel.emptyStateMessageDescription + " ")
+        let linkString = NSMutableAttributedString(string: listModel.emptyStateMessageLinkText, attributes: [
+            .link: listModel.emptyStateMessageLinkURL
+        ])
+
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.alignment = .center
+
+        string.append(linkString)
+        string.addAttributes([
+            .cursor: NSCursor.arrow,
+            .paragraphStyle: paragraphStyle,
+            .font: NSFont.systemFont(ofSize: 13, weight: .regular),
+            .foregroundColor: NSColor.blackWhite60
+        ], range: NSRange(location: 0, length: string.length))
+
+        let maxSize = NSSize(width: 280, height: 20000)
+        let bounds = string.boundingRect(with: maxSize, options: .usesLineFragmentOrigin)
+
+        emptyStateMessageHeight.constant = bounds.height
+
+        emptyStateMessage.textStorage?.setAttributedString(string)
     }
 
     private func setupStrings() {
@@ -1076,8 +1083,12 @@ extension PasswordManagementViewController: NSTextFieldDelegate {
 extension PasswordManagementViewController: NSTextViewDelegate {
 
     func textView(_ textView: NSTextView, clickedOnLink link: Any, at charIndex: Int) -> Bool {
-        if let link = link as? URL, let pane = PreferencePaneIdentifier(url: link) {
-            WindowControllersManager.shared.showPreferencesTab(withSelectedPane: pane)
+        if let link = link as? URL {
+            if let pane = PreferencePaneIdentifier(url: link) {
+                WindowControllersManager.shared.showPreferencesTab(withSelectedPane: pane)
+            } else {
+                WindowControllersManager.shared.showTab(with: .url(link, source: .link))
+            }
             self.dismiss()
         }
 
