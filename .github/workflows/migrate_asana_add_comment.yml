@@ -30,6 +30,9 @@ jobs:
     - name: Test asana-log-message template-name
       id: create-log-message-from-template
       uses: ./.github/actions/asana-log-message
+      env:
+        ASSIGNEE_ID: "1201392122268514"
+        TASK_ID: "1208220644008500"
       with:
         access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
         task-url: "https://app.asana.com/0/1201392122292466/1208220644008500/f"
