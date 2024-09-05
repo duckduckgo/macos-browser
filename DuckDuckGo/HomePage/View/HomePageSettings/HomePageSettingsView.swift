@@ -217,7 +217,7 @@ extension HomePage.Views.BackgroundCategoryView {
 #Preview {
     @State var isSettingsVisible: Bool = true
 
-    let model = HomePage.Models.SettingsModel(openSettings: {})
+    let model = HomePage.Models.SettingsModel()
     model.customBackground = .solidColor(.lightPink)
 
     return HomePage.Views.SettingsView(includingContinueSetUpCards: true, isSettingsVisible: $isSettingsVisible)

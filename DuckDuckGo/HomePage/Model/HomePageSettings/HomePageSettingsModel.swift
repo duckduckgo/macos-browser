@@ -54,13 +54,13 @@ extension HomePage.Models {
         let sendPixel: (PixelKitEvent) -> Void
         let openFilePanel: () -> URL?
         let showAddImageFailedAlert: () -> Void
-        let openSettings: () -> Void
+        let navigator: HomePageSettingsModelNavigator
 
         @Published private(set) var availableUserBackgroundImages: [UserBackgroundImage] = []
 
         private var availableCustomImagesCancellable: AnyCancellable?
 
-        convenience init(openSettings: @escaping () -> Void) {
+        convenience init() {
             self.init(
                 appearancePreferences: .shared,
                 userBackgroundImagesManager: UserBackgroundImagesManager(
@@ -81,7 +81,7 @@ extension HomePage.Models {
                     let alert = NSAlert.cannotReadImageAlert()
                     alert.runModal()
                 },
-                openSettings: openSettings
+                navigator: DefaultHomePageSettingsModelNavigator()
             )
         }
 
@@ -91,7 +91,7 @@ extension HomePage.Models {
             sendPixel: @escaping (PixelKitEvent) -> Void,
             openFilePanel: @escaping () -> URL?,
             showAddImageFailedAlert: @escaping () -> Void,
-            openSettings: @escaping () -> Void
+            navigator: HomePageSettingsModelNavigator
         ) {
             self.appearancePreferences = appearancePreferences
             self.customImagesManager = userBackgroundImagesManager
@@ -105,7 +105,7 @@ extension HomePage.Models {
             self.sendPixel = sendPixel
             self.openFilePanel = openFilePanel
             self.showAddImageFailedAlert = showAddImageFailedAlert
-            self.openSettings = openSettings
+            self.navigator = navigator
 
             availableCustomImagesCancellable = customImagesManager?.availableImagesPublisher
                 .receive(on: DispatchQueue.main)
@@ -148,6 +148,10 @@ extension HomePage.Models {
                     contentType = modeModel.contentType
                 }
             }
+        }
+
+        func openSettings() {
+            navigator.openAppearanceSettings()
         }
 
         @Published private(set) var contentType: ContentType = .root {

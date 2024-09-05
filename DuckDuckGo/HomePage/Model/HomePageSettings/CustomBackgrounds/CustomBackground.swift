@@ -109,19 +109,23 @@ enum CustomBackground: Equatable, Hashable, ColorSchemeProviding, LosslessString
         guard components.count == 2 else {
             return nil
         }
-        switch components[0] {
+
+        let backgroundType = String(components[0])
+        let backgroundValue = String(components[1])
+
+        switch backgroundType {
         case "gradient":
-            guard let gradient = GradientBackground(rawValue: String(components[1])) else {
+            guard let gradient = GradientBackground(rawValue: backgroundValue) else {
                 return nil
             }
             self = .gradient(gradient)
         case "solidColor":
-            guard let solidColor = SolidColorBackground(rawValue: String(components[1])) else {
+            guard let solidColor = SolidColorBackground(rawValue: backgroundValue) else {
                 return nil
             }
             self = .solidColor(solidColor)
         case "illustration":
-            guard let illustration = IllustrationBackground(rawValue: String(components[1])) else {
+            guard let illustration = IllustrationBackground(rawValue: backgroundValue) else {
                 return nil
             }
             self = .illustration(illustration)
