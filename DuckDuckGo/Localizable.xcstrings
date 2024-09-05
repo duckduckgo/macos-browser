@@ -48543,6 +48543,18 @@
         }
       }
     },
+    "preferences.appearance.customize-background" : {
+      "comment" : "Button to open home page background customization options",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Customize Background"
+          }
+        }
+      }
+    },
     "preferences.appearance.show-autocomplete-suggestions" : {
       "comment" : "Option to show autocomplete suggestions in the address bar",
       "extractionState" : "extracted_with_value",

@@ -112,12 +112,18 @@ extension Preferences {
                     }
 
                     PreferencePaneSubSection {
-                        TextButton("Customize Background", weight: .semibold) {
-                            WindowControllersManager.shared.showTab(with: .newtab)
-                            if let window = WindowControllersManager.shared.lastKeyMainWindowController {
-                                window.mainViewController.browserTabViewController.homePageViewController?.settingsVisibilityModel.isSettingsVisible = true
+
+                        Button {
+                            model.openNewTabPageBackgroundCustomizationSettings()
+                        } label: {
+                            HStack {
+                                Text(UserText.customizeBackground)
+                                Image(.externalAppScheme)
                             }
+                            .foregroundColor(Color.linkBlue)
+                            .cursor(.pointingHand)
                         }
+                        .buttonStyle(.plain)
                     }
                 }
 

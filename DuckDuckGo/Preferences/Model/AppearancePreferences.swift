@@ -83,6 +83,23 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
     var homePageCustomBackground: String?
 }
 
+protocol HomePageNavigator {
+    func openNewTabPageBackgroundCustomizationSettings()
+}
+
+final class DefaultHomePageNavigator: HomePageNavigator {
+    func openNewTabPageBackgroundCustomizationSettings() {
+        Task { @MainActor in
+            WindowControllersManager.shared.showTab(with: .newtab)
+            try? await Task.sleep(interval: 0.2)
+            if let window = WindowControllersManager.shared.lastKeyMainWindowController {
+                let homePageViewController = window.mainViewController.browserTabViewController.homePageViewController
+                homePageViewController?.settingsVisibilityModel.isSettingsVisible = true
+            }
+        }
+    }
+}
+
 enum HomeButtonPosition: String, CaseIterable {
     case hidden
     case left
@@ -240,8 +257,16 @@ final class AppearancePreferences: ObservableObject {
         NSApp.appearance = currentThemeName.appearance
     }
 
-    init(persistor: AppearancePreferencesPersistor = AppearancePreferencesUserDefaultsPersistor()) {
+    func openNewTabPageBackgroundCustomizationSettings() {
+        homePageNavigator.openNewTabPageBackgroundCustomizationSettings()
+    }
+
+    init(
+        persistor: AppearancePreferencesPersistor = AppearancePreferencesUserDefaultsPersistor(),
+        homePageNavigator: HomePageNavigator = DefaultHomePageNavigator()
+    ) {
         self.persistor = persistor
+        self.homePageNavigator = homePageNavigator
         currentThemeName = .init(rawValue: persistor.currentThemeName) ?? .systemDefault
         showFullURL = persistor.showFullURL
         favoritesDisplayMode = persistor.favoritesDisplayMode.flatMap(FavoritesDisplayMode.init) ?? .default
@@ -255,6 +280,7 @@ final class AppearancePreferences: ObservableObject {
     }
 
     private var persistor: AppearancePreferencesPersistor
+    private var homePageNavigator: HomePageNavigator
 
     private func requestSync() {
         Task { @MainActor in
