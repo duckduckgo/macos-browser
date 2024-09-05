@@ -87,8 +87,6 @@ final class SaveCredentialsViewController: NSViewController {
 
     private var shouldFirePinPromptNotification = false
 
-    private var infoViewController: PopoverInfoViewController?
-
     var passwordData: Data {
         let string = hiddenPasswordField.isHidden ? visiblePasswordField.stringValue : hiddenPasswordField.stringValue
         return string.data(using: .utf8)!
@@ -372,14 +370,16 @@ final class SaveCredentialsViewController: NSViewController {
     }
 
     @IBAction func onSecurityClicked(sender: NSButton?) {
-        infoViewController?.dismiss()
-        let message = autofillPreferences.isAutoLockEnabled ? UserText.pmSaveCredentialsSecurityInfo : UserText.pmSaveCredentialsSecurityInfoAutolockOff
-        infoViewController = PopoverInfoViewController(message: UserText.pmSaveCredentialsSecurityInfo) { [weak self] in
-            self?.infoViewController?.removeCompletely()
-            self?.infoViewController = nil
+        // Only show the popover if we aren't already presenting one:
+        guard (self.presentedViewControllers ?? []).isEmpty else { return }
+
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            let message = autofillPreferences.isAutoLockEnabled ? UserText.pmSaveCredentialsSecurityInfo : UserText.pmSaveCredentialsSecurityInfoAutolockOff
+            let infoViewController = PopoverInfoViewController(message: message)
+            let relativeView = sender ?? self.view
+            infoViewController.show(onParent: self, relativeTo: relativeView)
         }
-        let relativeView = sender ?? self.view
-        infoViewController?.show(onParent: self, relativeTo: relativeView)
     }
 
     func loadFaviconForDomain(_ domain: String?) {
