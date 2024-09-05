@@ -33,20 +33,26 @@ final class FreemiumDebugMenu: NSMenuItem {
     private func makeSubmenu() -> NSMenu {
         let menu = NSMenu(title: "")
 
-        menu.addItem(NSMenuItem(title: "Set Freemium PIR Onboarded State TRUE", action: #selector(setFreemiumPIROnboardStateEnabled), target: self))
-        menu.addItem(NSMenuItem(title: "Set Freemium PIR Onboarded State FALSE", action: #selector(setFreemiumPIROnboardStateDisabled), target: self))
+        menu.addItem(NSMenuItem(title: "Set Freemium PIR Onboarded State TRUE", action: #selector(setFreemiumPIROnboardStateTrue), target: self))
+        menu.addItem(NSMenuItem(title: "Set Freemium PIR Onboarded State FALSE", action: #selector(setFreemiumPIROnboardStateFalse), target: self))
+        menu.addItem(NSMenuItem(title: "Set Freemium DBP Did Post First Profile Saved FALSE", action: #selector(setDidPostFirstProfileSavedNotificationFalse), target: self))
         menu.addItem(.separator())
 
         return menu
     }
 
     @objc
-    func setFreemiumPIROnboardStateEnabled() {
+    func setFreemiumPIROnboardStateTrue() {
         DefaultFreemiumPIRUserStateManager(userDefaults: .dbp).didOnboard = true
     }
 
     @objc
-    func setFreemiumPIROnboardStateDisabled() {
+    func setFreemiumPIROnboardStateFalse() {
         DefaultFreemiumPIRUserStateManager(userDefaults: .dbp).didOnboard = false
+    }
+
+    @objc
+    func setDidPostFirstProfileSavedNotificationFalse() {
+        DefaultFreemiumPIRUserStateManager(userDefaults: .dbp).didPostFirstProfileSavedNotification = false
     }
 }
