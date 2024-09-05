@@ -125,6 +125,13 @@ struct InfoView: View {
 
     var body: some View {
         Text(.init(info))
+            .onURLTap { url in
+                if let pane = PreferencePaneIdentifier(url: url) {
+                    WindowControllersManager.shared.showPreferencesTab(withSelectedPane: pane)
+                } else {
+                    WindowControllersManager.shared.showTab(with: .url(url, source: .link))
+                }
+            }
             .padding(16)
             .frame(width: 250, alignment: .leading)
             .frame(minHeight: 22)
