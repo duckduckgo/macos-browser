@@ -19,6 +19,8 @@
 		02589DA32C88EB5D0093940D /* Persistence in Frameworks */ = {isa = PBXBuildFile; productRef = 02589DA22C88EB5D0093940D /* Persistence */; };
 		02589DA52C88ED190093940D /* BrowserServicesKit in Frameworks */ = {isa = PBXBuildFile; productRef = 02589DA42C88ED190093940D /* BrowserServicesKit */; };
 		02589DA72C88F8E90093940D /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = 02589DA62C88F8E90093940D /* PixelKit */; };
+		02589DA92C89F0420093940D /* Configuration in Frameworks */ = {isa = PBXBuildFile; productRef = 02589DA82C89F0420093940D /* Configuration */; };
+		02589DAB2C89F0490093940D /* Persistence in Frameworks */ = {isa = PBXBuildFile; productRef = 02589DAA2C89F0490093940D /* Persistence */; };
 		026ADE1426C3010C002518EE /* macos-config.json in Resources */ = {isa = PBXBuildFile; fileRef = 026ADE1326C3010C002518EE /* macos-config.json */; };
 		028904202A7B25380028369C /* AppConfigurationURLProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0289041E2A7B23CE0028369C /* AppConfigurationURLProviderTests.swift */; };
 		028904212A7B25770028369C /* AppConfigurationURLProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0289041E2A7B23CE0028369C /* AppConfigurationURLProviderTests.swift */; };
@@ -4621,9 +4623,11 @@
 			files = (
 				7B23668A2C09FAE8002D393F /* VPNAppLauncher in Frameworks */,
 				7B624F172BA25C1F00A6C544 /* NetworkProtectionUI in Frameworks */,
+				02589DAB2C89F0490093940D /* Persistence in Frameworks */,
 				02589DA52C88ED190093940D /* BrowserServicesKit in Frameworks */,
 				37269F052B3332C2005E8E46 /* Common in Frameworks */,
 				02589DA72C88F8E90093940D /* PixelKit in Frameworks */,
+				02589DA92C89F0420093940D /* Configuration in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9145,6 +9149,8 @@
 				7B2366892C09FAE8002D393F /* VPNAppLauncher */,
 				02589DA42C88ED190093940D /* BrowserServicesKit */,
 				02589DA62C88F8E90093940D /* PixelKit */,
+				02589DA82C89F0420093940D /* Configuration */,
+				02589DAA2C89F0490093940D /* Persistence */,
 			);
 			productName = DuckDuckGoNotifications;
 			productReference = 4B4BEC202A11B4E2001D9AC5 /* DuckDuckGo Notifications.app */;
@@ -13918,6 +13924,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = PixelKit;
+		};
+		02589DA82C89F0420093940D /* Configuration */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Configuration;
+		};
+		02589DAA2C89F0490093940D /* Persistence */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Persistence;
 		};
 		02A15D8B2C88D763001A4237 /* Configuration */ = {
 			isa = XCSwiftPackageProductDependency;
