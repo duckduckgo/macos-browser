@@ -25,6 +25,7 @@ import BrowserServicesKit
 @MainActor
 protocol WindowControllersManagerProtocol {
 
+    var lastKeyMainWindowController: MainWindowController? { get }
     var pinnedTabsManager: PinnedTabsManager { get }
 
     var didRegisterWindowController: PassthroughSubject<(MainWindowController), Never> { get }
@@ -33,6 +34,30 @@ protocol WindowControllersManagerProtocol {
     func register(_ windowController: MainWindowController)
     func unregister(_ windowController: MainWindowController)
 
+    func show(url: URL?, source: Tab.TabContent.URLSource, newTab: Bool)
+    func showBookmarksTab()
+
+    @discardableResult
+    func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel?,
+                       burnerMode: BurnerMode,
+                       droppingPoint: NSPoint?,
+                       contentSize: NSSize?,
+                       showWindow: Bool,
+                       popUp: Bool,
+                       lazyLoadTabs: Bool,
+                       isMiniaturized: Bool) -> MainWindow?
+}
+extension WindowControllersManagerProtocol {
+    @discardableResult
+    func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel? = nil,
+                       burnerMode: BurnerMode = .regular,
+                       droppingPoint: NSPoint? = nil,
+                       contentSize: NSSize? = nil,
+                       showWindow: Bool = true,
+                       popUp: Bool = false,
+                       lazyLoadTabs: Bool = false) -> MainWindow? {
+        openNewWindow(with: tabCollectionViewModel, burnerMode: burnerMode, droppingPoint: droppingPoint, contentSize: contentSize, showWindow: showWindow, popUp: popUp, lazyLoadTabs: lazyLoadTabs, isMiniaturized: false)
+    }
 }
 
 @MainActor
@@ -276,6 +301,18 @@ extension WindowControllersManager {
         }
 
         parentWindowController.window?.beginSheet(locationsFormWindow)
+    }
+
+    @discardableResult
+    func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel? = nil,
+                       burnerMode: BurnerMode = .regular,
+                       droppingPoint: NSPoint? = nil,
+                       contentSize: NSSize? = nil,
+                       showWindow: Bool = true,
+                       popUp: Bool = false,
+                       lazyLoadTabs: Bool = false,
+                       isMiniaturized: Bool = false) -> MainWindow? {
+        WindowsManager.openNewWindow(with: tabCollectionViewModel, burnerMode: burnerMode, droppingPoint: droppingPoint, contentSize: contentSize, showWindow: showWindow, popUp: popUp, lazyLoadTabs: lazyLoadTabs, isMiniaturized: isMiniaturized)
     }
 
 }

@@ -1,5 +1,5 @@
 //
-//  BookmarkFolderInfo.swift
+//  NSPasteboardExtension.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -18,15 +18,10 @@
 
 import Foundation
 
-protocol BookmarksEntityIdentifiable {
-    var entityId: String { get }
-    var parentId: String? { get }
-}
-
-struct BookmarkEntityInfo: Equatable, BookmarksEntityIdentifiable {
-    let entity: BaseBookmarkEntity
-    let parent: BookmarkFolder?
-
-    var entityId: String { entity.id }
-    var parentId: String? { parent?.id }
+extension NSPasteboard {
+    static func test() -> NSPasteboard {
+        let pasteboard = NSPasteboard(name: .init("Test Pasteboard"))
+        pasteboard.prepareForNewContents()
+        return pasteboard
+    }
 }

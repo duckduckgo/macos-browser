@@ -54,7 +54,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     // MARK: - Error Reporting
 
-    private static func networkProtectionDebugEvents(controllerErrorStore: NetworkProtectionTunnelErrorStore) -> EventMapping<NetworkProtectionError>? {
+    private static func networkProtectionDebugEvents(controllerErrorStore: NetworkProtectionTunnelErrorStore) -> EventMapping<NetworkProtectionError> {
         return EventMapping { event, _, _, _ in
             let domainEvent: NetworkProtectionPixelEvent
 #if DEBUG

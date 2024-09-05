@@ -20,6 +20,10 @@ import Cocoa
 
 extension NSWindow {
 
+    var frameInWindowCoordinates: NSRect {
+        NSRect(origin: .zero, size: frame.size)
+    }
+
     func setFrameOrigin(droppingPoint: NSPoint) {
         setFrameOrigin(frame.frameOrigin(fromDroppingPoint: droppingPoint))
     }

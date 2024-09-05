@@ -58,6 +58,7 @@ final class AppContentBlocking {
     private let exceptionsSource: DefaultContentBlockerRulesExceptionsSource
 
     // keeping whole ContentBlocking state initialization in one place to avoid races between updates publishing and rules storing
+    @MainActor
     init(internalUserDecider: InternalUserDecider) {
         let configStorage = ConfigurationStore.shared
         privacyConfigurationManager = PrivacyConfigurationManager(fetchedETag: configStorage.loadEtag(for: .privacyConfiguration),

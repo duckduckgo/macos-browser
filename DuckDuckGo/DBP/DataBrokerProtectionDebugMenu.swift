@@ -24,7 +24,6 @@ import LoginItems
 import NetworkProtectionProxy
 import os.log
 
-@MainActor
 final class DataBrokerProtectionDebugMenu: NSMenu {
 
     enum EnvironmentTitle: String {
