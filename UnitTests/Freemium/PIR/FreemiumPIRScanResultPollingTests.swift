@@ -40,7 +40,7 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
     func testWhenFirstProfileIsAlreadySaved_thenPollingStartsImmediately() {
         // Given
         let timestampString = dateFormatter.string(from: Date())
-        mockFreemiumPIRUserStateManager.profileSavedTimestamp = timestampString
+        mockFreemiumPIRUserStateManager.firstProfileSavedTimestamp = timestampString
         let sut = DefaultFreemiumPIRScanResultPolling(
             dataManager: mockDataManager,
             freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager,
@@ -83,10 +83,10 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
 
         // When
         sut.startPollingOrObserving()
-        mockNotificationCenter.post(name: .pirFirstProfileSaved, object: nil)
+        mockNotificationCenter.post(name: .pirProfileSaved, object: nil)
 
         // Then
-        XCTAssertNotNil(mockFreemiumPIRUserStateManager.profileSavedTimestamp)
+        XCTAssertNotNil(mockFreemiumPIRUserStateManager.firstProfileSavedTimestamp)
         XCTAssertTrue(mockNotificationCenter.didCallAddObserver)
         XCTAssertTrue(mockDataManager.didCallMatchesFoundCount)
         XCTAssertNotNil(sut.timer)
@@ -96,7 +96,7 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
         // Given
         mockDataManager.matchesFoundCountValue = 3
         let timestampString = dateFormatter.string(from: Date.nowMinus(hours: 12))
-        mockFreemiumPIRUserStateManager.profileSavedTimestamp = timestampString
+        mockFreemiumPIRUserStateManager.firstProfileSavedTimestamp = timestampString
         let sut = DefaultFreemiumPIRScanResultPolling(
             dataManager: mockDataManager,
             freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager,
@@ -117,7 +117,7 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
         // Given
         mockDataManager.matchesFoundCountValue = 0
         let timestampString = dateFormatter.string(from: Date.nowMinus(hours: 36))
-        mockFreemiumPIRUserStateManager.profileSavedTimestamp = timestampString
+        mockFreemiumPIRUserStateManager.firstProfileSavedTimestamp = timestampString
         let sut = DefaultFreemiumPIRScanResultPolling(
             dataManager: mockDataManager,
             freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager,
@@ -138,7 +138,7 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
         // Given
         mockDataManager.matchesFoundCountValue = 0
         let timestampString = dateFormatter.string(from: Date.nowMinus(hours: 36))
-        mockFreemiumPIRUserStateManager.profileSavedTimestamp = timestampString
+        mockFreemiumPIRUserStateManager.firstProfileSavedTimestamp = timestampString
         let sut = DefaultFreemiumPIRScanResultPolling(
             dataManager: mockDataManager,
             freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager,
@@ -174,12 +174,7 @@ private extension Date {
     }
 }
 
-private final class MockFreemiumPIRUserStateManager: FreemiumPIRUserStateManager {
-    var didOnboard = false
-    var profileSavedTimestamp: String?
-}
-
-private final class MockNotificationCenter: NotificationCenter {
+final class MockNotificationCenter: NotificationCenter {
 
     var didCallAddObserver = false
     var didCallPostNotification = false
@@ -205,7 +200,10 @@ private final class MockDataBrokerProtectionDataManager: DataBrokerProtectionDat
     var cache = InMemoryDataCache()
     var delegate: DataBrokerProtection.DataBrokerProtectionDataManagerDelegate?
 
-    init(database: DataBrokerProtectionRepository? = nil, pixelHandler: EventMapping<DataBrokerProtection.DataBrokerProtectionPixels>, fakeBrokerFlag: DataBrokerProtection.DataBrokerDebugFlag) {
+    init(database: DataBrokerProtectionRepository? = nil,
+         profileSavedNotifier: DBPProfileSavedNotifier? = nil,
+         pixelHandler: EventMapping<DataBrokerProtection.DataBrokerProtectionPixels>,
+         fakeBrokerFlag: DataBrokerProtection.DataBrokerDebugFlag) {
     }
 
     init() {}

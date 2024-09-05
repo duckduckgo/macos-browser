@@ -23,7 +23,7 @@ final class FreemiumPIRUserStateManagerTests: XCTestCase {
 
     private enum Keys {
         static let didOnboard = "macos.browser.freemium.pir.did.onboard"
-        static let profileSavedTimestamp = "macos.browser.freemium.pir.profile.saved.timestamp"
+        static let firstProfileSavedTimestamp = "macos.browser.freemium.pir.profile.saved.timestamp"
     }
 
     private static let testSuiteName = "test.defaults.freemium.user.state.tests"
@@ -59,27 +59,27 @@ final class FreemiumPIRUserStateManagerTests: XCTestCase {
         XCTAssertTrue(result)
     }
 
-    func testSetsProfileSavedTimestamp() throws {
+    func testSetsfirstProfileSavedTimestamp() throws {
         // Given
         let sut = DefaultFreemiumPIRUserStateManager(userDefaults: testUserDefaults)
-        XCTAssertNil(testUserDefaults.value(forKey: Keys.profileSavedTimestamp))
+        XCTAssertNil(testUserDefaults.value(forKey: Keys.firstProfileSavedTimestamp))
 
         // When
-        sut.profileSavedTimestamp = "time_stamp"
+        sut.firstProfileSavedTimestamp = "time_stamp"
 
         // Then
-        XCTAssertNotNil(testUserDefaults.value(forKey: Keys.profileSavedTimestamp))
+        XCTAssertNotNil(testUserDefaults.value(forKey: Keys.firstProfileSavedTimestamp))
     }
 
-    func testGetsProfileSavedTimestamp() throws {
+    func testGetsfirstProfileSavedTimestamp() throws {
         // Given
         let sut = DefaultFreemiumPIRUserStateManager(userDefaults: testUserDefaults)
-        XCTAssertNil(sut.profileSavedTimestamp)
-        testUserDefaults.setValue("time_stamp", forKey: Keys.profileSavedTimestamp)
-        XCTAssertNotNil(testUserDefaults.value(forKey: Keys.profileSavedTimestamp))
+        XCTAssertNil(sut.firstProfileSavedTimestamp)
+        testUserDefaults.setValue("time_stamp", forKey: Keys.firstProfileSavedTimestamp)
+        XCTAssertNotNil(testUserDefaults.value(forKey: Keys.firstProfileSavedTimestamp))
 
         // When
-        let result = sut.profileSavedTimestamp
+        let result = sut.firstProfileSavedTimestamp
 
         // Then
         XCTAssertNotNil(result)

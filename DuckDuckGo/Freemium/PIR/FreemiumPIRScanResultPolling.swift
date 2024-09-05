@@ -21,9 +21,6 @@ import DataBrokerProtection
 import Freemium
 
 extension Notification.Name {
-    /// Notification posted when the first profile is saved.
-    static let pirFirstProfileSaved = Notification.Name("pirFirstProfileSaved")
-
     /// Notification posted when results are found after polling for profile matches.
     static let pirResultsFound = Notification.Name("pirResultsFound")
 
@@ -42,7 +39,7 @@ protocol FreemiumPIRScanResultPolling {
 /// The polling checks for results periodically and posts notifications when results are found or no results are found after a set duration.
 final class DefaultFreemiumPIRScanResultPolling: FreemiumPIRScanResultPolling {
 
-    /// - Internal for testing purposes to allow access in test cases.
+    /// Internal for testing purposes to allow access in test cases.
     var timer: Timer?
 
     private var observer: Any?
@@ -67,7 +64,7 @@ final class DefaultFreemiumPIRScanResultPolling: FreemiumPIRScanResultPolling {
         dataManager: DataBrokerProtectionDataManaging,
         freemiumPIRUserStateManager: FreemiumPIRUserStateManager,
         notificationCenter: NotificationCenter = .default,
-        timerInterval: TimeInterval = 3600,  // 1 hour interval
+        timerInterval: TimeInterval = 3600,  // 1 hour in seconds
         maxCheckDuration: TimeInterval = 86400,  // 24 hours in seconds
         dateFormatter: DateFormatter = DefaultFreemiumPIRScanResultPolling.makePOSIXDateTimeFormatter()
     ) {
@@ -100,21 +97,21 @@ private extension DefaultFreemiumPIRScanResultPolling {
 
     /// A Boolean value indicating whether the first profile has been saved.
     var firstProfileSaved: Bool {
-        freemiumPIRUserStateManager.profileSavedTimestamp != nil
+        freemiumPIRUserStateManager.firstProfileSavedTimestamp != nil
     }
 
     /// The saved timestamp of the first profile as a `Date`, or `nil` if no profile has been saved yet.
-    var profileSavedTimestamp: Date? {
+    var firstProfileSavedTimestamp: Date? {
         get {
-            guard let timestampString = freemiumPIRUserStateManager.profileSavedTimestamp else { return nil }
+            guard let timestampString = freemiumPIRUserStateManager.firstProfileSavedTimestamp else { return nil }
             return dateFormatter.date(from: timestampString)
         }
         set {
             if let newTimestamp = newValue {
                 let timestampString = dateFormatter.string(from: newTimestamp)
-                freemiumPIRUserStateManager.profileSavedTimestamp = timestampString
+                freemiumPIRUserStateManager.firstProfileSavedTimestamp = timestampString
             } else {
-                freemiumPIRUserStateManager.profileSavedTimestamp = nil
+                freemiumPIRUserStateManager.firstProfileSavedTimestamp = nil
             }
         }
     }
@@ -122,7 +119,7 @@ private extension DefaultFreemiumPIRScanResultPolling {
     /// Observes the notification for when the first profile is saved and triggers the polling process.
     func observeNotification() {
         observer = notificationCenter.addObserver(
-            forName: .pirFirstProfileSaved,
+            forName: .pirProfileSaved,
             object: nil,
             queue: .main
         ) { [weak self] _ in
@@ -140,14 +137,14 @@ private extension DefaultFreemiumPIRScanResultPolling {
 
     /// Saves the current timestamp as the time when the first profile was saved.
     func saveCurrentTimestamp() {
-        profileSavedTimestamp = Date()
+        firstProfileSavedTimestamp = Date()
     }
 
     /// Starts a timer that polls for results at regular intervals, ensuring the timer is not already running.
     func startRepeatingConditionCheck() {
         guard timer == nil else { return }
 
-        if profileSavedTimestamp == nil {
+        if firstProfileSavedTimestamp == nil {
             saveCurrentTimestamp()
         }
 
@@ -161,9 +158,9 @@ private extension DefaultFreemiumPIRScanResultPolling {
     /// Checks if any matches have been found or if the maximum polling duration has been exceeded.
     /// Posts a notification if results are found or if no results are found after the maximum duration.
     func checkCondition() {
-        guard let profileSavedTimestamp = profileSavedTimestamp else { return }
+        guard let firstProfileSavedTimestamp = firstProfileSavedTimestamp else { return }
         let currentDate = Date()
-        let elapsedTime = currentDate.timeIntervalSince(profileSavedTimestamp)
+        let elapsedTime = currentDate.timeIntervalSince(firstProfileSavedTimestamp)
 
         let matchesFoundCount = (try? dataManager.matchesFoundCount()) ?? 0
 
