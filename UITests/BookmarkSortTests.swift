@@ -141,7 +141,9 @@ class BookmarkSortTests: XCTestCase {
 
         app.terminate()
         let newApp = XCUIApplication()
+        newApp.launchEnvironment["UITEST_MODE"] = "1"
         newApp.launch()
+        newApp.enforceSingleWindow()
 
         // Wait for new application to start
         XCTAssertTrue(newApp.waitForExistence(timeout: UITests.Timeouts.elementExistence))
