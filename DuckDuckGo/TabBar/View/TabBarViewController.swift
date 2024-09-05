@@ -559,6 +559,8 @@ final class TabBarViewController: NSViewController {
     }
 
     private func setupAddTabButton() {
+        addTabButton.delegate = self
+        addTabButton.registerForDraggedTypes([.string])
         addTabButton.target = self
         addTabButton.action = #selector(addButtonAction(_:))
         addTabButton.toolTip = UserText.newTabTooltip
@@ -623,6 +625,29 @@ final class TabBarViewController: NSViewController {
         tabPreviewWindowController.hide(allowQuickRedisplay: allowQuickRedisplay)
     }
 
+}
+
+extension TabBarViewController: MouseOverButtonDelegate {
+
+    func mouseOverButton(_ sender: MouseOverButton, draggingEntered info: any NSDraggingInfo, isMouseOver: UnsafeMutablePointer<Bool>) -> NSDragOperation {
+        assert(sender === addTabButton || sender === footerAddButton)
+        let pasteboard = info.draggingPasteboard
+
+        if let types = pasteboard.types, types.contains(.string) {
+            return .copy
+        }
+        return .none
+    }
+
+    func mouseOverButton(_ sender: MouseOverButton, performDragOperation info: any NSDraggingInfo) -> Bool {
+        assert(sender === addTabButton || sender === footerAddButton)
+        if let string = info.draggingPasteboard.string(forType: .string), let url = URL.makeSearchUrl(from: string) {
+            tabCollectionViewModel.insertOrAppendNewTab(.url(url, credential: nil, source: .ui))
+            return true
+        }
+
+        return true
+    }
 }
 
 extension TabBarViewController: TabCollectionViewModelDelegate {
@@ -882,6 +907,8 @@ extension TabBarViewController: NSCollectionViewDataSource {
             footer.addButton?.action = #selector(addButtonAction(_:))
             footer.toolTip = UserText.newTabTooltip
             self.footerAddButton = footer.addButton
+            self.footerAddButton?.delegate = self
+            self.footerAddButton?.registerForDraggedTypes([.string])
         }
 
         return view
