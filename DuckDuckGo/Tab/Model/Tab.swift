@@ -1231,17 +1231,12 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
     @MainActor
     private func loadErrorHTML(_ error: WKError, header: String, forUnreachableURL url: URL, alternate: Bool) {
-        if error.localizedDescription == PhishingDetectionError.detected.localizedDescription {
-            let html = SpecialErrorPageHTMLTemplate.htmlFromTemplate
+        let html = ErrorPageHTMLFactory.html(for: error, url: url, header: header)
+        if alternate {
             webView.loadAlternateHTML(html, baseURL: .error, forUnreachableURL: url)
         } else {
-            let html = ErrorPageHTMLTemplate(error: error, header: header).makeHTMLFromTemplate()
-            if alternate {
-                webView.loadAlternateHTML(html, baseURL: .error, forUnreachableURL: url)
-            } else {
-                // this should be updated using an error page update script call when (if) we have a dynamic error page content implemented
-                webView.setDocumentHtml(html)
-            }
+            // this should be updated using an error page update script call when (if) we have a dynamic error page content implemented
+            webView.setDocumentHtml(html)
         }
     }
 
