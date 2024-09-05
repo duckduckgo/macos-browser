@@ -118,32 +118,28 @@ final class HomePageSettingsModelTests: XCTestCase {
         XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundThumbnail), [
             .gradient(CustomBackground.placeholderGradient),
             .solidColor(CustomBackground.placeholderColor),
-            .illustration(CustomBackground.placeholderIllustration),
-            nil
+            .illustration(CustomBackground.placeholderIllustration)
         ])
 
         model.customBackground = .gradient(.gradient04)
         XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundThumbnail), [
             .gradient(.gradient04),
             .solidColor(CustomBackground.placeholderColor),
-            .illustration(CustomBackground.placeholderIllustration),
-            nil
+            .illustration(CustomBackground.placeholderIllustration)
         ])
 
         model.customBackground = .solidColor(.darkPink)
         XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundThumbnail), [
             .gradient(CustomBackground.placeholderGradient),
             .solidColor(.darkPink),
-            .illustration(CustomBackground.placeholderIllustration),
-            nil
+            .illustration(CustomBackground.placeholderIllustration)
         ])
 
         model.customBackground = .illustration(.illustration02)
         XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundThumbnail), [
             .gradient(CustomBackground.placeholderGradient),
             .solidColor(CustomBackground.placeholderColor),
-            .illustration(.illustration02),
-            nil
+            .illustration(.illustration02)
         ])
     }
 }
