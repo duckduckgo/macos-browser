@@ -1,5 +1,5 @@
 //
-//  DuckPlayerExperimentDatePixelsUtilities.swift
+//  DuckPlayerExperimentDatePixelsUtilitiesTests.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -20,7 +20,7 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-class DuckPlayerExperimentDatePixelsUtilities: XCTestCase {
+class DuckPlayerExperimentDatePixelsUtilitiesTests: XCTestCase {
 
     func testShouldFirePixelDaily() {
         let startDate = Calendar.current.date(from: DateComponents(year: 2024, month: 10, day: 1))!
