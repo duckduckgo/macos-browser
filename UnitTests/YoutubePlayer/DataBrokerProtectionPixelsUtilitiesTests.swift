@@ -113,4 +113,3 @@ class DataBrokerProtectionPixelsUtilitiesTests: XCTestCase {
         XCTAssertEqual(daysDifference, -1, "The number of days should be negative when start date is after end date.")
     }
 }
-
