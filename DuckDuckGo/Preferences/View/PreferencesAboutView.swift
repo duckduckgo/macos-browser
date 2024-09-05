@@ -188,7 +188,7 @@ extension Preferences {
                 Text("- Ready to install")
             case .installationDidStart, .installing:
                 Text("- Installing")
-            case .updateCycleNotStarted, .updateCycleDone, .updateFound, .updateNotFound:
+            case .updateCycleNotStarted, .updateCycleDone:
                 EmptyView()
             }
         }
