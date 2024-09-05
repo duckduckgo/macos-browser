@@ -126,10 +126,6 @@ struct DuckPlayerOnboardingExperiment: OnboardingExperimentManager {
         return userDefaults.enrollmentDate
     }
 
-    private var isUserInExperiment: Bool {
-        return userDefaults.enrollmentDate != nil
-    }
-
     private var experimentCohort: Cohort? {
         return userDefaults.experimentCohort
     }
@@ -138,20 +134,14 @@ struct DuckPlayerOnboardingExperiment: OnboardingExperimentManager {
         userDefaults.enrollmentDate = nil
         userDefaults.experimentCohort = nil
         userDefaults.didRunEnrollment = false
+        userDefaults.weeklyPixelSentDate = nil
     }
 
-    /// Checks if the weekly pixel should be fired.
-    ///
-    /// Returns `true` if the pixel has never been sent or if 7 days have passed
-    /// since the last sent date. Otherwise, returns `false`.
-    ///
-    /// - Returns: A Boolean indicating whether to fire the weekly pixel.
     private func shouldFireWeeklyPixel() -> Bool {
         guard let lastFiredDate = userDefaults.weeklyPixelSentDate else { return true }
-
-        let calendar = Calendar.current
-        guard let date7DaysLater = calendar.date(byAdding: .day, value: 7, to: lastFiredDate) else { return false }
-        return Date() >= date7DaysLater
+        return DataBrokerProtectionPixelsUtilities.shouldFirePixel(startDate: lastFiredDate,
+                                                                   endDate: Date(),
+                                                                   daysDifference: .weekly)
     }
 }
 
