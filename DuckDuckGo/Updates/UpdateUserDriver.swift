@@ -85,12 +85,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     }
 
     func showUpdateFound(with appcastItem: SUAppcastItem, state: SPUUserUpdateState) async -> SPUUserUpdateChoice {
-        Logger.updates.debug("Updater did find valid update: \(appcastItem.displayVersionString)(\(appcastItem.versionString))")
-        PixelKit.fire(DebugEvent(GeneralPixel.updaterDidFindUpdate))
-
-        subject.send(.updateFound(appcastItem))
-
-        return appcastItem.isInformationOnlyUpdate ? .dismiss : .install
+        appcastItem.isInformationOnlyUpdate ? .dismiss : .install
     }
 
     func showUpdateReleaseNotes(with downloadData: SPUDownloadData) {
@@ -102,18 +97,6 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     }
 
     func showUpdateNotFoundWithError(_ error: any Error, acknowledgement: @escaping () -> Void) {
-        let nsError = error as NSError
-        guard let item = nsError.userInfo["SULatestAppcastItemFound"] as? SUAppcastItem else {
-            acknowledgement()
-            return
-        }
-
-        Logger.updates.debug("Updater did not find update: \(String(describing: item.displayVersionString))(\(String(describing: item.versionString)))")
-        PixelKit.fire(DebugEvent(GeneralPixel.updaterDidNotFindUpdate, error: error))
-
-        subject.send(.updateNotFound(item, nsError))
-        subject.send(.updateCycleDone)
-
         acknowledgement()
     }
 
