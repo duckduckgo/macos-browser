@@ -203,7 +203,7 @@ extension Preferences {
             case .upToDate:
                 Image(systemName: "checkmark.circle.fill")
                     .foregroundColor(.green)
-            case .updateCycle(let progress):
+            case .updateCycle:
                 if isNewVersionAvailable {
                     Image(systemName: "exclamationmark.circle.fill")
                         .foregroundColor(.red)
