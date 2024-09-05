@@ -30,13 +30,6 @@ final class AboutPreferences: ObservableObject, PreferencesTabOpening {
         case upToDate
         case updateCycle(UpdateCycleProgress)
 
-        var isLoading: Bool {
-            switch self {
-            case .upToDate: return false
-            case .updateCycle(let progress): return !progress.isDone
-            }
-        }
-
         init(from update: Update?, progress: UpdateCycleProgress) {
             if let update, !update.isInstalled {
                 self = .updateCycle(progress)

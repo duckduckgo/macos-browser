@@ -125,7 +125,7 @@ extension ReleaseNotesValues {
         let status: String
         let latestVersion: String
 
-        guard let updateController, updateController.updateProgress.isDone else {
+        guard let updateController, updateController.updateProgress.isIdle else {
             self.init(status: "loading",
                       currentVersion: currentVersion,
                       lastUpdate: lastUpdate)
