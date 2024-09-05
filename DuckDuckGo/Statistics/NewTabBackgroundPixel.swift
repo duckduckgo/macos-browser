@@ -77,7 +77,7 @@ enum NewTabBackgroundPixel: PixelKitEventV2 {
         }
     }
 
-    var parameters: [String : String]? {
+    var parameters: [String: String]? {
         nil
     }
 
