@@ -58,6 +58,13 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     lazy var notificationPresenter = UpdateNotificationPresenter()
     let willRelaunchAppPublisher: AnyPublisher<Void, Never>
 
+    // Struct used to cache data until the updater finishes checking for updates
+    struct UpdateCheckResult {
+        let item: SUAppcastItem
+        let isInstalled: Bool
+    }
+    private var updateCheckResult: UpdateCheckResult?
+
     init(internalUserDecider: InternalUserDecider) {
         willRelaunchAppPublisher = willRelaunchAppSubject.eraseToAnyPublisher()
         self.internalUserDecider = internalUserDecider
@@ -68,15 +75,16 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
 
     @Published private(set) var updateProgress = UpdateCycleProgress.default {
         didSet {
-            switch updateProgress {
-            case .updateFound(let item):
-                latestUpdate = Update(appcastItem: item, isInstalled: false)
-            case .updateNotFound(let item, _):
-                latestUpdate = Update(appcastItem: item, isInstalled: true)
-            default:
-                break
+            if let updateCheckResult {
+                latestUpdate = Update(appcastItem: updateCheckResult.item, isInstalled: updateCheckResult.isInstalled)
+            } else {
+                latestUpdate = nil
             }
             showUpdateNotificationIfNeeded()
+
+            if updateProgress.isDone {
+                updateCheckResult = nil
+            }
         }
     }
 
@@ -207,7 +215,7 @@ extension UpdateController: SPUUpdaterDelegate {
     func updater(_ updater: SPUUpdater, didFindValidUpdate item: SUAppcastItem) {
         Logger.updates.debug("Updater did find valid update: \(item.displayVersionString)(\(item.versionString))")
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidFindUpdate))
-        updateProgress = .updateFound(item)
+        updateCheckResult = UpdateCheckResult(item: item, isInstalled: false)
     }
 
     func updaterDidNotFindUpdate(_ updater: SPUUpdater, error: any Error) {
@@ -217,8 +225,7 @@ extension UpdateController: SPUUpdaterDelegate {
         Logger.updates.debug("Updater did not find update: \(String(describing: item.displayVersionString))(\(String(describing: item.versionString)))")
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidNotFindUpdate, error: error))
 
-        updateProgress = .updateNotFound(item, nsError)
-        updateProgress = .updateCycleDone
+        updateCheckResult = UpdateCheckResult(item: item, isInstalled: true)
     }
 
     func updater(_ updater: SPUUpdater, didDownloadUpdate item: SUAppcastItem) {
