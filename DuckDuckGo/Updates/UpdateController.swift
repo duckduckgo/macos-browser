@@ -67,7 +67,20 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         try? configureUpdater()
     }
 
-    @Published private(set) var updateProgress = UpdateCycleProgress.default
+    @Published private(set) var updateProgress = UpdateCycleProgress.default {
+        didSet {
+            switch updateProgress {
+            case .updateFound(let item):
+                latestUpdate = Update(appcastItem: item, isInstalled: false)
+            case .updateNotFound(let item, _):
+                latestUpdate = Update(appcastItem: item, isInstalled: true)
+            default:
+                break
+            }
+            showUpdateNotificationIfNeeded()
+        }
+    }
+
     var updateProgressPublisher: Published<UpdateCycleProgress>.Publisher { $updateProgress }
 
     @Published private(set) var latestUpdate: Update?
@@ -133,18 +146,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         }
 
         updateProcessCancellable = userDriver.updateProgressPublisher
-            .sink { [weak self] progress in
-                switch progress {
-                case .updateFound(let item):
-                    self?.latestUpdate = Update(appcastItem: item, isInstalled: false)
-                case .updateNotFound(let item, _):
-                    self?.latestUpdate = Update(appcastItem: item, isInstalled: true)
-                default:
-                    break
-                }
-                self?.updateProgress = progress
-                self?.showUpdateNotificationIfNeeded()
-            }
+            .assign(to: \.updateProgress, onWeaklyHeld: self)
 
         try updater.start()
 
