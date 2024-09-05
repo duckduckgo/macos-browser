@@ -190,6 +190,9 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         updater.updater.automaticallyChecksForUpdates = false
         updater.updater.automaticallyDownloadsUpdates = false
         updater.updater.updateCheckInterval = 0
+#else
+        // Load the appcast to retrieve information about the latest update (required for displaying Release Notes)
+        checkForUpdateInBackground()
 #endif
     }
 
