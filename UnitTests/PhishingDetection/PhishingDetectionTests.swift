@@ -50,6 +50,7 @@ final class PhishingDetectionTests: XCTestCase {
     }
 
     func testDidLoadAndStartDataActivities() async {
+        PhishingDetectionPreferences.shared.isEnabled = true
         XCTAssertTrue(mockDataActivities.started)
     }
 
