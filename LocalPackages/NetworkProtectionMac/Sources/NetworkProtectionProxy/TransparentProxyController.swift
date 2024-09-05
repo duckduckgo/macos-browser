@@ -151,15 +151,6 @@ public final class TransparentProxyController {
 
     // MARK: - Setting up NETransparentProxyManager
 
-    /// Loads a saved manager
-    ///
-    /// This is a bit of a hack that will be run just once for the instance.  The reason we want this to run only once is that
-    /// `NETransparentProxyManager.loadAllFromPreferences()` has a bug where it triggers status change
-    /// notifications.  If the code trying to retrieve the manager is the result of a notification, we may soon find outselves
-    /// in an infinite loop.
-    ///
-    private var triedLoadingManager = false
-
     /// Loads the configuration matching our ``extensionID``.
     ///
     public var manager: NETransparentProxyManager? {
@@ -168,16 +159,11 @@ public final class TransparentProxyController {
                 return internalManager
             }
 
-            if !triedLoadingManager {
-                triedLoadingManager = true
-
-                let manager = try? await NETransparentProxyManager.loadAllFromPreferences().first { manager in
-                    (manager.protocolConfiguration as? NETunnelProviderProtocol)?.providerBundleIdentifier == extensionID
-                }
-                self.internalManager = manager
+            let manager = try? await NETransparentProxyManager.loadAllFromPreferences().first { manager in
+                (manager.protocolConfiguration as? NETunnelProviderProtocol)?.providerBundleIdentifier == extensionID
             }
-
-            return internalManager
+            internalManager = manager
+            return manager
         }
     }
 
@@ -185,20 +171,24 @@ public final class TransparentProxyController {
     ///
     /// - Returns a properly configured `NETransparentProxyManager`.
     ///
-    public func loadOrCreateConfiguration() async throws -> NETransparentProxyManager {
+    public func loadOrMakeManager() async throws -> NETransparentProxyManager {
         let manager = await manager ?? {
             let manager = NETransparentProxyManager()
             internalManager = manager
             return manager
         }()
 
+        try await setupAndSave(manager)
+        return manager
+    }
+
+    @MainActor
+    private func setupAndSave(_ manager: NETransparentProxyManager) async throws {
         await setup(manager)
         try setupAdditionalProviderConfiguration(manager)
 
         try await manager.saveToPreferences()
         try await manager.loadFromPreferences()
-
-        return manager
     }
 
     private func setupAdditionalProviderConfiguration(_ manager: NETransparentProxyManager) throws {
@@ -270,7 +260,7 @@ public final class TransparentProxyController {
         let manager: NETransparentProxyManager
 
         do {
-            manager = try await loadOrCreateConfiguration()
+            manager = try await loadOrMakeManager()
         } catch {
             eventHandler?(.startFailure(error))
             throw error

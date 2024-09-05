@@ -759,7 +759,8 @@ final class AddressBarButtonsViewController: NSViewController {
             let isNotSecure = url.scheme == URL.NavigationalScheme.http.rawValue
             let isCertificateValid = tabViewModel.tab.isCertificateValid ?? true
             let isFlaggedPhishing = tabViewModel.tab.privacyInfo?.isPhishing ?? false
-            let isUnprotected = ContentBlocking.shared.privacyConfigurationManager.privacyConfig.isUserUnprotected(domain: host)
+            let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
+            let isUnprotected = configuration.isUserUnprotected(domain: host)
 
             let isShieldDotVisible = isNotSecure || isUnprotected || !isCertificateValid
 
