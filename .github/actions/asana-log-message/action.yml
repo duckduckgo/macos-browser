@@ -57,6 +57,7 @@ runs:
       shell: bash
       env:
         ASANA_ACCESS_TOKEN: ${{ inputs.access-token }}
+        WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
       run: |
         bundle exec fastlane run asana_add_comment \
           task_id:"${{ steps.get-automation-subtask.outputs.asana_automation_task_id }}" \
