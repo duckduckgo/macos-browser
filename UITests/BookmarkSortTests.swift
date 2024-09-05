@@ -143,6 +143,9 @@ class BookmarkSortTests: XCTestCase {
         let newApp = XCUIApplication()
         newApp.launch()
 
+        // Wait for new application to start
+        XCTAssertTrue(newApp.waitForExistence(timeout: UITests.Timeouts.elementExistence))
+
         newApp.openBookmarksPanel()
 
         let sortBookmarksPanelButton = newApp.buttons[AccessibilityIdentifiers.sortBookmarksButtonPanel]
