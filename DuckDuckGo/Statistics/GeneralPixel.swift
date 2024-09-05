@@ -275,6 +275,8 @@ enum GeneralPixel: PixelKitEventV2 {
     case privacyConfigurationReloadFailed
     case privacyConfigurationCouldNotBeLoaded
 
+    case configurationFileCoordinatorError
+
     case fileStoreWriteFailed
     case fileMoveToDownloadsFailed
     case fileAccessRelatedItemFailed
@@ -804,6 +806,9 @@ enum GeneralPixel: PixelKitEventV2 {
             return "pcf_r"
         case .privacyConfigurationCouldNotBeLoaded:
             return "pcf_l"
+
+        case .configurationFileCoordinatorError:
+            return "configuration_file_coordinator_error"
 
         case .fileStoreWriteFailed:
             return "fswf"

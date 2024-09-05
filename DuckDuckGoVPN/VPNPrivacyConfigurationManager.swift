@@ -20,6 +20,7 @@ import Foundation
 import BrowserServicesKit
 import Combine
 import Common
+import PixelKit
 
 public final class VPNPrivacyConfigurationManager: PrivacyConfigurationManaging {
 
@@ -92,7 +93,7 @@ public final class VPNPrivacyConfigurationManager: PrivacyConfigurationManaging 
                 let configData = try PrivacyConfigurationData(data: data)
                 fetchedConfigData = (data, configData, etag)
             } catch {
-                // TODO: Fire failed to parse pixel
+                PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionConfigurationFailedToParse(error))
                 fetchedConfigData = nil
                 return .embeddedFallback
             }

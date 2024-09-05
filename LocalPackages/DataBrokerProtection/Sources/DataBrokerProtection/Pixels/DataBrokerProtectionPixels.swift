@@ -195,6 +195,7 @@ public enum DataBrokerProtectionPixels {
     case invalidPayload(Configuration)
     case errorLoadingCachedConfig(Error)
     case pixelTest
+    case failedToParsePrivacyConfig(Error)
 
     // Measure success/failure rate of Personal Information Removal Pixels
     // https://app.asana.com/0/1204006570077678/1206889724879222/f
@@ -342,6 +343,7 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .invalidPayload(let configuration): return "m_mac_dbp_\(configuration.rawValue)_invalid_payload".lowercased()
         case .errorLoadingCachedConfig: return "m_mac_dbp_configuration_error_loading_cached_config"
         case .pixelTest: return "m_mac_dbp_configuration_pixel_test"
+        case .failedToParsePrivacyConfig: return "m_mac_dbp_configuration_failed_to_parse"
 
         case .customDataBrokerStatsOptoutSubmit: return "m_mac_dbp_databroker_custom_stats_optoutsubmit"
         case .customGlobalStatsOptoutSubmit: return "m_mac_dbp_custom_stats_optoutsubmit"
@@ -456,7 +458,8 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                 .gatekeeperNotAuthenticated,
                 .gatekeeperEntitlementsInvalid,
                 .invalidPayload,
-                .pixelTest:
+                .pixelTest,
+                .failedToParsePrivacyConfig:
             return [:]
         case .ipcServerProfileSavedCalledByApp,
                 .ipcServerProfileSavedReceivedByAgent,
@@ -541,7 +544,8 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
             case .secureVaultInitError(let error),
                     .secureVaultError(let error),
                     .secureVaultKeyStoreReadError(let error),
-                    .secureVaultKeyStoreUpdateError(let error):
+                    .secureVaultKeyStoreUpdateError(let error),
+                    .failedToParsePrivacyConfig(let error):
                 PixelKit.fire(DebugEvent(event, error: error))
             case .ipcServerProfileSavedXPCError(error: let error),
                     .ipcServerImmediateScansFinishedWithError(error: let error),

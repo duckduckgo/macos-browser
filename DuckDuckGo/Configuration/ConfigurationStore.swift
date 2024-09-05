@@ -176,7 +176,7 @@ final class ConfigurationStore: ConfigurationStoring {
         }
 
         if let coordinatorError {
-            // TODO: Fire pixel
+            PixelKit.fire(DebugEvent(GeneralPixel.configurationFileCoordinatorError, error: coordinatorError))
             Logger.config.error("Unable to read \(config.rawValue, privacy: .public): \(coordinatorError.localizedDescription, privacy: .public)")
         }
 
