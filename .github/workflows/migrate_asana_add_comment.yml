@@ -20,7 +20,7 @@ jobs:
       run: bundle install
 
     - name: Test asana-log-message comment
-      id: create-log-message
+      id: create-log-message-comment
       uses: ./.github/actions/asana-log-message
       with:
         access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
@@ -28,7 +28,7 @@ jobs:
         task-url: "https://app.asana.com/0/1201392122292466/1208220644008500/f"
 
     - name: Test asana-log-message template-name
-      id: create-log-message
+      id: create-log-message-from-template
       uses: ./.github/actions/asana-log-message
       with:
         access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
