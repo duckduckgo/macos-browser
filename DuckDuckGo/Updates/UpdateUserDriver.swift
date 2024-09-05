@@ -29,7 +29,6 @@ enum UpdateCycleProgress {
     case updateCycleNotStarted
     case updateCycleDidStart
     case updateCycleDone
-    
     case downloadDidStart
     case downloading(UInt64, UInt64)
     case extractionDidStart
