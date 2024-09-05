@@ -28,8 +28,8 @@ import os.log
 enum UpdateCycleProgress {
     case updateCycleNotStarted
     case updateCycleDidStart
-    case updateFound(SUAppcastItem)
-    case updateNotFound(SUAppcastItem, NSError)
+    case updateCycleDone
+    
     case downloadDidStart
     case downloading(UInt64, UInt64)
     case extractionDidStart
@@ -37,7 +37,6 @@ enum UpdateCycleProgress {
     case readyToInstallAndRelaunch
     case installationDidStart
     case installing
-    case updateCycleDone
 
     static var `default` = UpdateCycleProgress.updateCycleNotStarted
 
