@@ -20,7 +20,6 @@ import AppKit
 
 extension NSColor {
 
-    /// Consider using `brightnessComponent` for this
     public var brightness: CGFloat {
         guard let rgbColor = usingColorSpace(.sRGB) else {
             return 0.5
