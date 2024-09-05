@@ -50,7 +50,8 @@ final class DBPHomeViewController: NSViewController {
                                                   credentialsSaving: false,
                                                   passwordGeneration: false,
                                                   inlineIconCredentials: false,
-                                                  thirdPartyCredentialsProvider: false)
+                                                  thirdPartyCredentialsProvider: false,
+                                                  unknownUsernameCategorization: false)
 
         let isGPCEnabled = WebTrackingProtectionPreferences.shared.isGPCEnabled
         let sessionKey = UUID().uuidString
