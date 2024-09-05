@@ -20,7 +20,7 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-class DataBrokerProtectionPixelsUtilitiesTests: XCTestCase {
+class DuckPlayerExperimentPixelsUtilitiesTests: XCTestCase {
 
     func testShouldFirePixelDaily() {
         let startDate = Calendar.current.date(from: DateComponents(year: 2024, month: 10, day: 1))!

@@ -23,7 +23,7 @@ enum Frequency: Int {
     case weekly = 7
 }
 
-struct DataBrokerProtectionPixelsUtilities {
+struct DuckPlayerExperimentPixelsUtilities {
     private static let calendar = Calendar.current
 
     /// Determines whether a pixel should fire based on the start and end dates and the specified frequency.
