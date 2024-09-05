@@ -496,7 +496,7 @@ final class AddressBarButtonsViewController: NSViewController {
             bookmarkButton.position = .right
             privacyEntryPointButton.position = .left
         }
-        let isFlaggedPhishing = tabViewModel?.tab.phishingState.didBypassError ?? false
+        let isFlaggedPhishing = tabViewModel?.tab.privacyInfo?.isPhishing ?? false
         privacyEntryPointButton.isAnimationEnabled = !isFlaggedPhishing
         privacyEntryPointButton.normalTintColor = isFlaggedPhishing ? .fireButtonRedPressed : .privacyEnabled
         privacyEntryPointButton.mouseOverTintColor = isFlaggedPhishing ? .alertRedHover : privacyEntryPointButton.mouseOverTintColor
@@ -758,7 +758,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
             let isNotSecure = url.scheme == URL.NavigationalScheme.http.rawValue
             let isCertificateValid = tabViewModel.tab.isCertificateValid ?? true
-            let isFlaggedPhishing = tabViewModel.tab.phishingState.didBypassError
+            let isFlaggedPhishing = tabViewModel.tab.privacyInfo?.isPhishing ?? false
             let isUnprotected = ContentBlocking.shared.privacyConfigurationManager.privacyConfig.isUserUnprotected(domain: host)
 
             let isShieldDotVisible = isNotSecure || isUnprotected || !isCertificateValid
