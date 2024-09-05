@@ -83,19 +83,11 @@ extension HomePage.Views {
                     .animation(.easeInOut, value: isSettingsVisible)
 
                     if !isSettingsVisible {
-                        VStack {
-                            Spacer()
-                            HStack {
-                                Spacer(minLength: Self.targetWidth + (geometry.size.width - Self.targetWidth)/2)
-                                SettingsButtonView(isSettingsVisible: $isSettingsVisible)
-                                    .padding([.bottom, .trailing], 14)
-                            }
-                        }
-                        .frame(width: geometry.size.width, height: geometry.size.height)
-                        .fixedColorScheme(for: settingsModel.customBackground)
+                        SettingsButtonView(isSettingsVisible: $isSettingsVisible)
+                            .padding([.bottom, .trailing], 14)
+                            .fixedColorScheme(for: settingsModel.customBackground)
                     }
                 }
-                .frame(maxWidth: .infinity)
                 .background(
                     backgroundView
                         .animation(.none, value: isSettingsVisible)
