@@ -6,12 +6,9 @@
 #import <WebKit/_WKWebExtensionControllerPrivate.h>
 #import <WebKit/_WKWebExtensionControllerConfiguration.h>
 #import <WebKit/_WKWebExtensionControllerConfigurationPrivate.h>
-#import <WebKit/_WKWebExtensionControllerDelegate.h>
-#import <WebKit/_WKWebExtensionControllerDelegatePrivate.h>
 #import <WebKit/_WKWebExtensionControllerPrivate.h>
 #import <WebKit/_WKWebExtensionMatchPattern.h>
 #import <WebKit/_WKWebExtensionMatchPatternPrivate.h>
-#import <WebKit/_WKWebExtensionPermission.h>
 #import <WebKit/_WKWebExtensionPrivate.h>
 #import <WebKit/_WKWebExtensionTab.h>
 #import <WebKit/_WKWebExtensionTabCreationOptions.h>

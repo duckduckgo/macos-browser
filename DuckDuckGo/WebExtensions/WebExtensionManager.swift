@@ -22,17 +22,17 @@ import WebKit
 
 protocol WebExtensionManaging {
 
-    func didOpenWindow(_ window: _WKWebExtensionWindow)
-    func didCloseWindow(_ window: _WKWebExtensionWindow)
-    func didFocusWindow(_ window: _WKWebExtensionWindow)
-    func didOpenTab(_ tab: _WKWebExtensionTab)
-    func didCloseTab(_ tab: _WKWebExtensionTab, windowIsClosing: Bool)
-    func didActivateTab(_ tab: _WKWebExtensionTab, previousActiveTab: _WKWebExtensionTab?)
-    func didSelectTabs(_ tabs: [_WKWebExtensionTab])
-    func didDeselectTabs(_ tabs: [_WKWebExtensionTab])
-    func didMoveTab(_ tab: _WKWebExtensionTab, from oldIndex: Int, in oldWindow: _WKWebExtensionWindow)
-    func didReplaceTab(_ oldTab: _WKWebExtensionTab, with tab: _WKWebExtensionTab)
-    func didChangeTabProperties(_ properties: _WKWebExtensionTabChangedProperties, for tab:_WKWebExtensionTab)
+    func didOpenWindow(_ window: WKWebExtensionWindow)
+    func didCloseWindow(_ window: WKWebExtensionWindow)
+    func didFocusWindow(_ window: WKWebExtensionWindow)
+    func didOpenTab(_ tab: WKWebExtensionTab)
+    func didCloseTab(_ tab: WKWebExtensionTab, windowIsClosing: Bool)
+    func didActivateTab(_ tab: WKWebExtensionTab, previousActiveTab: WKWebExtensionTab?)
+    func didSelectTabs(_ tabs: [WKWebExtensionTab])
+    func didDeselectTabs(_ tabs: [WKWebExtensionTab])
+    func didMoveTab(_ tab: WKWebExtensionTab, from oldIndex: Int, in oldWindow: WKWebExtensionWindow)
+    func didReplaceTab(_ oldTab: WKWebExtensionTab, with tab: WKWebExtensionTab)
+    func didChangeTabProperties(_ properties: WKWebExtension.TabChangedProperties, for tab:WKWebExtensionTab)
 
 }
 
@@ -49,8 +49,8 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
     }
 
     // swiftlint:disable force_try
-    static private func makeContext(for webExtension: _WKWebExtension) -> _WKWebExtensionContext {
-        let context = _WKWebExtensionContext(for: webExtension)
+    static private func makeContext(for webExtension: _WKWebExtension) -> WKWebExtensionContext {
+        let context = WKWebExtensionContext(for: webExtension)
         context.uniqueIdentifier = UUID().uuidString
         let matchPattern = try! _WKWebExtension.MatchPattern(string: "*://*/*")
         context.setPermissionStatus(.grantedExplicitly, for: matchPattern, expirationDate: nil)
@@ -63,9 +63,6 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
     lazy var extensions: [_WKWebExtension] = {
         // Bundled extensions
         let emoji = WebExtensionManager.loadWebExtension(path: Bundle.main.path(forResource: "emoji-substitution", ofType: nil)!)
-//        let openMyPageButton = WebExtensionManager.loadWebExtension(path: Bundle.main.path(forResource: "open-my-page-button", ofType: nil)!)
-//        let tabs = WebExtensionManager.loadWebExtension(path: Bundle.main.path(forResource: "tabs-tabs-tabs", ofType: nil)!)
-//        let urlBlocker = WebExtensionManager.loadWebExtension(path: Bundle.main.path(forResource: "url-blocker", ofType: nil)!)
 
         // Popular extensions
 //        let bitwarden = WebExtensionManager.loadWebExtension(path: "/Applications/Bitwarden.app/Contents/PlugIns/safari.appex/Contents/Resources/")
@@ -75,23 +72,22 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
 //        let adBlock = WebExtensionManager.loadWebExtension(path: "/Applications/NordPass® Password Manager & Digital Vault.app/Contents/PlugIns/NordPass® Password Manager & Digital Vault Extension.appex/Contents/Resources/")
 //        let nightEye = WebExtensionManager.loadWebExtension(path: "/Applications/Night Eye.app/Contents/PlugIns/Night Eye Extension.appex/Contents/Resources/")
 
-//        return [bitwarden!]
         return [emoji!]
     }()
 
     // Context manages the extension's permissions and allows it to inject content, run background logic, show popovers, and display other web-based UI to the user.
-    lazy var contexts: [_WKWebExtensionContext] = {
+    lazy var contexts: [WKWebExtensionContext] = {
         return extensions.map {
             WebExtensionManager.makeContext(for: $0)
         }
     }()
 
     lazy var extensionController = {
-        let controller = _WKWebExtensionController()
+        let controller = WKWebExtensionController()
 
         contexts.forEach {
             do {
-                try controller.loadExtensionContext($0)
+                try controller.load($0)
             } catch {
                 fatalError("Didn't load extension")
             }
@@ -120,14 +116,14 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
         let context = contexts[index]
         // Show dashboard - perform default action
         context.performAction(for: nil)
-
+ 
         // For debug purposes
         // Show background script console
 //        showBackgroundConsole(context: context)
     }
 
     @MainActor
-    func buttonForContext(_ context: _WKWebExtensionContext) -> NSButton? {
+    func buttonForContext(_ context: WKWebExtensionContext) -> NSButton? {
         guard let index = contexts.firstIndex(of: context) else {
             assertionFailure("Unknown context")
             return nil
@@ -138,10 +134,8 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
             return nil
         }
 
-        // !TODO UNCOMMENT
         let button = mainWindowController.mainViewController.navigationBarViewController.rightButtons.arrangedSubviews[index] as? NSButton
         return button
-//        return nil
     }
 
     @MainActor
@@ -162,7 +156,7 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
     }
 
     @MainActor
-    func showBackgroundConsole(context: _WKWebExtensionContext) {
+    func showBackgroundConsole(context: WKWebExtensionContext) {
         guard let backgroundWebView = context._backgroundWebView else {
             return
         }
@@ -186,106 +180,121 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
 
     // MARK: - Context
 
-    func didOpenWindow(_ window: _WKWebExtensionWindow) {
-        extensionController.didOpen(window)
+    func didOpenWindow(_ window: WKWebExtensionWindow) {
+        extensionController.didOpenWindow(window)
     }
 
-    func didCloseWindow(_ window: _WKWebExtensionWindow) {
-        extensionController.didClose(window)
+    func didCloseWindow(_ window: WKWebExtensionWindow) {
+        extensionController.didCloseWindow(window)
     }
 
-    func didFocusWindow(_ window: _WKWebExtensionWindow) {
-        extensionController.didFocus(window)
+    func didFocusWindow(_ window: WKWebExtensionWindow) {
+        extensionController.didFocusWindow(window)
     }
 
-    func didOpenTab(_ tab: _WKWebExtensionTab) {
-        extensionController.didOpen(tab)
+    func didOpenTab(_ tab: WKWebExtensionTab) {
+        extensionController.didOpenTab(tab)
     }
 
-    func didCloseTab(_ tab: _WKWebExtensionTab, windowIsClosing: Bool) {
-        extensionController.didClose(tab, windowIsClosing: windowIsClosing)
+    func didCloseTab(_ tab: WKWebExtensionTab, windowIsClosing: Bool) {
+        extensionController.didCloseTab(tab, windowIsClosing: windowIsClosing)
     }
 
-    func didActivateTab(_ tab: _WKWebExtensionTab, previousActiveTab: _WKWebExtensionTab?) {
-        extensionController.didActivate(tab, previousActiveTab: previousActiveTab)
+    func didActivateTab(_ tab: WKWebExtensionTab, previousActiveTab: WKWebExtensionTab?) {
+        extensionController.didActivateTab(tab, previousActiveTab: previousActiveTab)
     }
 
-    func didSelectTabs(_ tabs: [_WKWebExtensionTab]) {
-//        extensionController.didSelect(NSSet(array: tabs))
+    func didSelectTabs(_ tabs: [WKWebExtensionTab]) {
+        let set = NSSet(array: tabs) as Set
+        extensionController.didSelectTabs(set)
     }
 
-    func didDeselectTabs(_ tabs: [_WKWebExtensionTab]) {
-//        extensionController.didDeselect(NSSet(array: tabs))
+    func didDeselectTabs(_ tabs: [WKWebExtensionTab]) {
+        let set = NSSet(array: tabs) as Set
+        extensionController.didDeselectTabs(set)
     }
 
-    func didMoveTab(_ tab: _WKWebExtensionTab, from oldIndex: Int, in oldWindow: _WKWebExtensionWindow) {
+    func didMoveTab(_ tab: WKWebExtensionTab, from oldIndex: Int, in oldWindow: WKWebExtensionWindow) {
         extensionController.didMoveTab(tab, from: oldIndex, in: oldWindow)
     }
 
-    func didReplaceTab(_ oldTab: _WKWebExtensionTab, with tab: _WKWebExtensionTab) {
+    func didReplaceTab(_ oldTab: WKWebExtensionTab, with tab: WKWebExtensionTab) {
         extensionController.didReplaceTab(oldTab, with: tab)
     }
 
-    func didChangeTabProperties(_ properties: _WKWebExtensionTabChangedProperties, for tab: _WKWebExtensionTab) {
+    func didChangeTabProperties(_ properties: WKWebExtension.TabChangedProperties, for tab: WKWebExtensionTab) {
         extensionController.didChangeTabProperties(properties, for: tab)
     }
 
 }
 
 @available(macOS 13.1, *)
-extension WebExtensionManager: _WKWebExtensionControllerDelegate {
+extension WebExtensionManager: WKWebExtensionControllerDelegate {
 
-    func webExtensionController(_ controller: _WKWebExtensionController, openWindowsFor extensionContext: _WKWebExtensionContext) -> [_WKWebExtensionWindow] {
-        os_log(.error, log: .extensions, "Open window for")
-        return []
-    }
+    //TODO
 
-    func webExtensionController(_ controller: _WKWebExtensionController, focusedWindowFor extensionContext: _WKWebExtensionContext) -> _WKWebExtensionWindow? {
-        os_log(.error, log: .extensions, "Focused window for")
-        return nil
-    }
+//    func webExtensionController(_ controller: WKWebExtensionController, openNewWindowWith options: WKWebExtension.WindowCreationOptions, for extensionContext: WKWebExtensionContext, completionHandler: @escaping ((any WKWebExtensionWindow)?, (any Error)?) -> Void) {
+//
+//    }
+//
+//    func webExtensionController(_ controller: WKWebExtensionController, openNewTabWith options: WKWebExtension.TabCreationOptions, for extensionContext: WKWebExtensionContext, completionHandler: @escaping ((any WKWebExtensionTab)?, (any Error)?) -> Void) {
+//        os_log(.error, log: .extensions, "Open new tab with options")
+//        let url = options.url!
+//        WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.browserTabViewController.openNewTab(with: .url(url, source: .ui))
+//        completionHandler(nil, nil)
+//    }
 
-    func webExtensionController(_ controller: _WKWebExtensionController, openNewWindowWith options: _WKWebExtensionWindowCreationOptions, for extensionContext: _WKWebExtensionContext) async throws -> _WKWebExtensionWindow? {
-        os_log(.error, log: .extensions, "Open new window with")
-        return nil
-    }
+//    func webExtensionController(_ controller: WKWebExtensionController, openWindowsFor extensionContext: WKWebExtensionContext) -> [WKWebExtensionWindow] {
+//        os_log(.error, log: .extensions, "Open window for")
+//        return []
+//    }
+//
+//    func webExtensionController(_ controller: WKWebExtensionController, focusedWindowFor extensionContext: WKWebExtensionContext) -> WKWebExtensionWindow? {
+//        os_log(.error, log: .extensions, "Focused window for")
+//        return nil
+//    }
+//
+//    func webExtensionController(_ controller: WKWebExtensionController, openNewWindowWith options: WKWebExtension.WindowCreationOptions, for extensionContext: WKWebExtensionContext) async throws -> WKWebExtensionWindow? {
+//        os_log(.error, log: .extensions, "Open new window with")
+//        return nil
+//    }
+//
+//    func webExtensionController(_ controller: WKWebExtensionController, openOptionsPageFor extensionContext: WKWebExtensionContext) async throws {
+//        os_log(.error, log: .extensions, "Open options page for")
+//    }
+//
+//    private func webExtensionController(_ controller: WKWebExtensionController, promptForPermissions permissions: Set<_WKWebExtension.Permission>, in tab: WKWebExtensionTab?, for extensionContext: WKWebExtensionContext) async -> Set<WKWebExtension.Permission> {
+//        os_log(.error, log: .extensions, "Open options page for")
+//        return Set()
+//    }
+//
+//    private func webExtensionController(_ controller: WKWebExtensionController, promptForPermissionMatchPatterns matchPatterns: Set<WKWebExtension.MatchPattern>, in tab: WKWebExtensionTab?, for extensionContext: WKWebExtensionContext) async -> Set<WKWebExtension.MatchPattern> {
+//        os_log(.error, log: .extensions, "Prompt for permission match patterns")
+//        return Set()
+//    }
+//
+//    private func webExtensionController(_ controller: WKWebExtensionController, promptForPermissionToAccess urls: Set<URL>, in tab: WKWebExtensionTab?, for extensionContext: WKWebExtensionContext) async -> Set<URL> {
+//        os_log(.error, log: .extensions, "Prompt for permission match patterns")
+//        return Set()
+//    }
+//
+//    func webExtensionController(_ controller: WKWebExtensionController, sendMessage message: Any, to applicationIdentifier: String?, for extensionContext: WKWebExtensionContext) async throws -> Any? {
+//        return message
+//    }
+//
+//    func webExtensionController(_ controller: WKWebExtensionController, connectUsingMessagePort port: WKWebExtension.MessagePort, for extensionContext: WKWebExtensionContext) async throws {
+//
+//    }
 
-    func webExtensionController(_ controller: _WKWebExtensionController, openOptionsPageFor extensionContext: _WKWebExtensionContext) async throws {
-        os_log(.error, log: .extensions, "Open options page for")
-    }
-
-    func webExtensionController(_ controller: _WKWebExtensionController, promptForPermissions permissions: Set<_WKWebExtension.Permission>, in tab: _WKWebExtensionTab?, for extensionContext: _WKWebExtensionContext) async -> Set<_WKWebExtension.Permission> {
-        os_log(.error, log: .extensions, "Open options page for")
-        return Set()
-    }
-
-    func webExtensionController(_ controller: _WKWebExtensionController, promptForPermissionMatchPatterns matchPatterns: Set<_WKWebExtension.MatchPattern>, in tab: _WKWebExtensionTab?, for extensionContext: _WKWebExtensionContext) async -> Set<_WKWebExtension.MatchPattern> {
-        os_log(.error, log: .extensions, "Prompt for permission match patterns")
-        return Set()
-    }
-
-    func webExtensionController(_ controller: _WKWebExtensionController, promptForPermissionToAccess urls: Set<URL>, in tab: _WKWebExtensionTab?, for extensionContext: _WKWebExtensionContext) async -> Set<URL> {
-        os_log(.error, log: .extensions, "Prompt for permission match patterns")
-        return Set()
-    }
-
-    func webExtensionController(_ controller: _WKWebExtensionController, sendMessage message: Any, to applicationIdentifier: String?, for extensionContext: _WKWebExtensionContext) async throws -> Any? {
-        return message
-    }
-
-    func webExtensionController(_ controller: _WKWebExtensionController, connectUsingMessagePort port: _WKWebExtension.MessagePort, for extensionContext: _WKWebExtensionContext) async throws {
-
-    }
-
-    func webExtensionController(_ controller: _WKWebExtensionController, presentPopupFor action: _WKWebExtension.Action, for context: _WKWebExtensionContext) async throws {
-        guard let button = await buttonForContext(context) else {
+    func webExtensionController(_ controller: WKWebExtensionController, presentActionPopup action: WKWebExtension.Action, for context: WKWebExtensionContext) async throws {
+        guard let button = buttonForContext(context) else {
             return
         }
         guard action.presentsPopup, let popupWebView = action.popupWebView else {
             return
         }
 
-        await showPopover(popupWebView: popupWebView, button: button)
+        showPopover(popupWebView: popupWebView, button: button)
     }
 
 }

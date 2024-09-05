@@ -19,50 +19,50 @@
 import Foundation
 import WebKit
 
-extension MainWindowController: _WKWebExtensionWindow {
- 
-    func tabs(for context: _WKWebExtensionContext) -> [_WKWebExtensionTab] {
+extension MainWindowController: WKWebExtensionWindow {
+
+    func tabs(for context: WKWebExtensionContext) -> [any WKWebExtensionTab] {
         return mainViewController.tabCollectionViewModel.tabs
     }
 
-    func activeTab(for context: _WKWebExtensionContext) -> _WKWebExtensionTab? {
+    func activeTab(for context: WKWebExtensionContext) -> (any WKWebExtensionTab)? {
         return mainViewController.tabCollectionViewModel.selectedTab
     }
 
-    func windowType(for context: _WKWebExtensionContext) -> _WKWebExtensionWindowType {
+    func windowType(for context: WKWebExtensionContext) -> WKWebExtension.WindowType {
         return .normal
     }
 
-    func windowState(for context: _WKWebExtensionContext) -> _WKWebExtensionWindowState {
+    func windowState(for context: WKWebExtensionContext) -> WKWebExtension.WindowState {
         return .normal
     }
 
-    func setWindowState(_ state: _WKWebExtensionWindowState, for context: _WKWebExtensionContext) async throws {
-
+    func setWindowState(_ state: WKWebExtension.WindowState, for context: WKWebExtensionContext, completionHandler: @escaping ((any Error)?) -> Void) {
+        assertionFailure("not supported yet")
     }
 
-    func isUsingPrivateBrowsing(for context: _WKWebExtensionContext) -> Bool {
-        return false
+    func isUsingPrivateBrowsing(for context: WKWebExtensionContext) -> Bool {
+        return self.mainViewController.isBurner
     }
 
-    func screenFrame(for context: _WKWebExtensionContext) -> CGRect {
+    func screenFrame(for context: WKWebExtensionContext) -> CGRect {
         return window?.screen?.frame ?? CGRect.zero
     }
 
-    func frame(for context: _WKWebExtensionContext) -> CGRect {
+    func frame(for context: WKWebExtensionContext) -> CGRect {
         return window?.frame ?? CGRect.zero
     }
 
-    func setFrame(_ frame: CGRect, for context: _WKWebExtensionContext) async throws {
-
+    func setFrame(_ frame: CGRect, for context: WKWebExtensionContext, completionHandler: @escaping ((any Error)?) -> Void) {
+        assertionFailure("not supported yet")
     }
 
-    func focus(for context: _WKWebExtensionContext) async throws {
-
+    func focus(for context: WKWebExtensionContext, completionHandler: @escaping ((any Error)?) -> Void) {
+        assertionFailure("not supported yet")
     }
 
-    func close(for context: _WKWebExtensionContext) async throws {
-        
+    func close(for context: WKWebExtensionContext, completionHandler: @escaping ((any Error)?) -> Void) {
+        assertionFailure("not supported yet")
     }
-    
+
 }
