@@ -386,8 +386,10 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
             setUpSubscriptionMonitoring()
 
-            if privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(BackgroundAgentPixelTestSubfeature.pixelTest) {
+            if privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(BackgroundAgentPixelTestSubfeature.pixelTest)
+                && !UserDefaults.appConfiguration.bool(forKey: BackgroundAgentPixelTestSubfeature.pixelTest.rawValue) {
                 PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionConfigurationPixelTest)
+                UserDefaults.appConfiguration.set(true, forKey: BackgroundAgentPixelTestSubfeature.pixelTest.rawValue)
             }
 
             if launchedOnStartup {

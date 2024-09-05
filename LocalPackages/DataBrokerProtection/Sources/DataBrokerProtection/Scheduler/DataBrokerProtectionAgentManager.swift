@@ -166,8 +166,10 @@ public final class DataBrokerProtectionAgentManager {
             /// While keeping the agent active with invalid entitlement has no significant risk, setting the monitoring interval at 60 minutes is a good balance to minimize backend checks.
             agentStopper.monitorEntitlementAndStopAgentIfEntitlementIsInvalid(interval: .minutes(60))
 
-            if DBPPrivacyConfigurationManager.shared.privacyConfig.isSubfeatureEnabled(BackgroundAgentPixelTestSubfeature.pixelTest) {
+            if DBPPrivacyConfigurationManager.shared.privacyConfig.isSubfeatureEnabled(BackgroundAgentPixelTestSubfeature.pixelTest)
+                && !UserDefaults.config.bool(forKey: BackgroundAgentPixelTestSubfeature.pixelTest.rawValue) {
                 PixelKit.fire(DataBrokerProtectionPixels.pixelTest)
+                UserDefaults.config.set(true, forKey: BackgroundAgentPixelTestSubfeature.pixelTest.rawValue)
             }
         }
     }
