@@ -674,6 +674,11 @@ final class MainMenu: NSMenu {
     private func setupLoggingMenu() -> NSMenu {
         let menu = NSMenu(title: "")
 
+        menu.addItem(autofillDebugScriptMenuItem
+            .targetting(self))
+
+        menu.addItem(.separator())
+
         if #available(macOS 12.0, *) {
             let exportLogsMenuItem = NSMenuItem(title: "Save Logs…", action: #selector(exportLogs), target: self)
             menu.addItem(exportLogsMenuItem)
