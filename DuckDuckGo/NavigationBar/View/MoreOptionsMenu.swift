@@ -64,6 +64,8 @@ final class MoreOptionsMenu: NSMenu {
     private let freemiumPIRPresenter: FreemiumPIRPresenter
     private let appearancePreferences: AppearancePreferences
 
+    private let notificationCenter: NotificationCenter
+
     private let vpnFeatureGatekeeper: VPNFeatureGatekeeper
     private let subscriptionFeatureAvailability: SubscriptionFeatureAvailability
 
@@ -82,7 +84,8 @@ final class MoreOptionsMenu: NSMenu {
          freemiumPIRUserStateManager: FreemiumPIRUserStateManager,
          freemiumPIRFeature: FreemiumPIRFeature,
          freemiumPIRPresenter: FreemiumPIRPresenter = DefaultFreemiumPIRPresenter(),
-         appearancePreferences: AppearancePreferences = .shared) {
+         appearancePreferences: AppearancePreferences = .shared,
+         notificationCenter: NotificationCenter = .default) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.emailManager = emailManager
@@ -95,6 +98,7 @@ final class MoreOptionsMenu: NSMenu {
         self.freemiumPIRFeature = freemiumPIRFeature
         self.freemiumPIRPresenter = freemiumPIRPresenter
         self.appearancePreferences = appearancePreferences
+        self.notificationCenter = notificationCenter
 
         super.init(title: "")
 
@@ -263,8 +267,10 @@ final class MoreOptionsMenu: NSMenu {
         // TODO: Remove this
         freemiumPIRUserStateManager.didOnboard = true
         // ------
+        
         freemiumPIRPresenter.showFreemiumPIR(didOnboard: freemiumPIRUserStateManager.didOnboard, windowControllerManager: WindowControllersManager.shared)
-        appearancePreferences.isHomePagePromotionVisible = false
+
+        notificationCenter.post(name: .freemiumDBPEntryPointActivated, object: nil)
     }
 
     @objc func findInPage(_ sender: NSMenuItem) {
