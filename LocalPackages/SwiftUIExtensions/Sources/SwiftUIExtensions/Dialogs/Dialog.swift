@@ -58,11 +58,6 @@ public struct Dialog<Content, Buttons>: View where Content: View, Buttons: View 
 
             Divider()
 
-            /*Rectangle()
-                .frame(height: 1)
-                .foregroundColor(Color(NSColor.separatorColor))
-                .padding(.bottom, 16.0)*/
-
             Group {
                 HStack {
                     buttons()
