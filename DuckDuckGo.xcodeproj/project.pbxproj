@@ -2662,6 +2662,8 @@
 		EEC8EB402982CD550065AA39 /* JSAlertViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF53E172950CED5002D78F4 /* JSAlertViewModelTests.swift */; };
 		EECE10E529DD77E60044D027 /* FeatureFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = EECE10E429DD77E60044D027 /* FeatureFlag.swift */; };
 		EECE10E629DD77E60044D027 /* FeatureFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = EECE10E429DD77E60044D027 /* FeatureFlag.swift */; };
+		EED4D3DF2C8A298D00C79EEA /* AutofillPixelEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = EED4D3DE2C8A298D00C79EEA /* AutofillPixelEvent.swift */; };
+		EED4D3E02C8A298D00C79EEA /* AutofillPixelEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = EED4D3DE2C8A298D00C79EEA /* AutofillPixelEvent.swift */; };
 		EED735362BB46B6000F173D6 /* AutocompleteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EED735352BB46B6000F173D6 /* AutocompleteTests.swift */; };
 		EED9A6752C37FE6900E0FAB9 /* login_deduplication_test_data.csv in Resources */ = {isa = PBXBuildFile; fileRef = EED9A6732C37FE6800E0FAB9 /* login_deduplication_test_data.csv */; };
 		EED9A6762C37FE6900E0FAB9 /* login_deduplication_test_data.csv in Resources */ = {isa = PBXBuildFile; fileRef = EED9A6732C37FE6800E0FAB9 /* login_deduplication_test_data.csv */; };
@@ -4289,6 +4291,7 @@
 		EEC4A6702B2C90AB00F7C0AA /* VPNLocationPreferenceItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNLocationPreferenceItem.swift; sourceTree = "<group>"; };
 		EEC7BE2D2BC6C09400F86835 /* AddressBarKeyboardShortcutsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressBarKeyboardShortcutsTests.swift; sourceTree = "<group>"; };
 		EECE10E429DD77E60044D027 /* FeatureFlag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureFlag.swift; sourceTree = "<group>"; };
+		EED4D3DE2C8A298D00C79EEA /* AutofillPixelEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillPixelEvent.swift; sourceTree = "<group>"; };
 		EED735352BB46B6000F173D6 /* AutocompleteTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutocompleteTests.swift; sourceTree = "<group>"; };
 		EED9A6732C37FE6800E0FAB9 /* login_deduplication_test_data.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = login_deduplication_test_data.csv; sourceTree = "<group>"; };
 		EED9A6742C37FE6900E0FAB9 /* login_deduplication_starting_data.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = login_deduplication_starting_data.csv; sourceTree = "<group>"; };
@@ -6144,6 +6147,7 @@
 				C13909EE2B85FD4E001626ED /* AutofillActionExecutor.swift */,
 				C1E961EE2B87AA29001760E1 /* AutofillActionBuilder.swift */,
 				C13909FA2B861039001626ED /* AutofillActionPresenter.swift */,
+				EED4D3DE2C8A298D00C79EEA /* AutofillPixelEvent.swift */,
 			);
 			path = Autofill;
 			sourceTree = "<group>";
@@ -10427,6 +10431,7 @@
 				3706FBE1293F65D500E42796 /* AppStateRestorationManager.swift in Sources */,
 				9FA173EC2B7B232200EE4E6E /* AddEditBookmarkDialogView.swift in Sources */,
 				3706FBE2293F65D500E42796 /* ClickToLoadUserScript.swift in Sources */,
+				EED4D3E02C8A298D00C79EEA /* AutofillPixelEvent.swift in Sources */,
 				3706FBE3293F65D500E42796 /* WindowControllersManager.swift in Sources */,
 				37197EAA2942443D00394917 /* ModalSheetCancellable.swift in Sources */,
 				31267C6B2B640C5200FEF811 /* DataBrokerProtectionAppEvents.swift in Sources */,
@@ -12049,6 +12054,7 @@
 				9F56CFA92B82DC4300BB7F11 /* AddEditBookmarkFolderView.swift in Sources */,
 				37445F9C2A1569F00029F789 /* SyncBookmarksAdapter.swift in Sources */,
 				C1E961EF2B87AA29001760E1 /* AutofillActionBuilder.swift in Sources */,
+				EED4D3DF2C8A298D00C79EEA /* AutofillPixelEvent.swift in Sources */,
 				4B9292AF26670F5300AD2C21 /* NSOutlineViewExtensions.swift in Sources */,
 				9F56CFAD2B84326C00BB7F11 /* AddEditBookmarkDialogViewModel.swift in Sources */,
 				1D4071AE2BD64267002D4537 /* DockCustomizer.swift in Sources */,

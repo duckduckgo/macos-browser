@@ -54,6 +54,10 @@ struct DataImportViewModel {
     /// Factory for a DataImporter for importSource
     private let reportSenderFactory: ReportSenderFactory
 
+    private let onFinished: () -> Void
+
+    private let onCancelled: () -> Void
+
     private func log(_ message: @autoclosure () -> String) {
         if NSApp.runType == .unitTests {
         } else if OSLog.dataImportExport != .disabled {
@@ -146,7 +150,9 @@ struct DataImportViewModel {
          dataImporterFactory: @escaping DataImporterFactory = dataImporter,
          requestPrimaryPasswordCallback: @escaping @MainActor (Source) -> String? = Self.requestPrimaryPasswordCallback,
          openPanelCallback: @escaping @MainActor (DataType) -> URL? = Self.openPanelCallback,
-         reportSenderFactory: @escaping ReportSenderFactory = { FeedbackSender().sendDataImportReport }) {
+         reportSenderFactory: @escaping ReportSenderFactory = { FeedbackSender().sendDataImportReport },
+         onFinished: @escaping () -> Void = {},
+         onCancelled: @escaping () -> Void = {}) {
 
         self.availableImportSources = availableImportSources
         let importSource = importSource ?? preferredImportSources.first(where: { availableImportSources.contains($0) }) ?? .csv
@@ -167,6 +173,8 @@ struct DataImportViewModel {
         self.requestPrimaryPasswordCallback = requestPrimaryPasswordCallback
         self.openPanelCallback = openPanelCallback
         self.reportSenderFactory = reportSenderFactory
+        self.onFinished = onFinished
+        self.onCancelled = onCancelled
 
         PixelExperiment.fireOnboardingImportRequestedPixel()
     }
@@ -570,6 +578,7 @@ extension DataImportViewModel {
                     return .progress(update)
                     // on completion returns new DataImportViewModel with merged import summary
                 case .completed(.success(let summary)):
+                    onFinished()
                     return await .completed(.success(self.mergingImportSummary(summary)))
                 }
             }
@@ -682,7 +691,7 @@ extension DataImportViewModel {
     }
 
     mutating func update(with importSource: Source) {
-        self = .init(importSource: importSource, loadProfiles: loadProfiles, dataImporterFactory: dataImporterFactory, requestPrimaryPasswordCallback: requestPrimaryPasswordCallback, reportSenderFactory: reportSenderFactory)
+        self = .init(importSource: importSource, loadProfiles: loadProfiles, dataImporterFactory: dataImporterFactory, requestPrimaryPasswordCallback: requestPrimaryPasswordCallback, reportSenderFactory: reportSenderFactory, onFinished: onFinished, onCancelled: onCancelled)
     }
 
     @MainActor
@@ -703,6 +712,7 @@ extension DataImportViewModel {
 
         case .cancel:
             importTask?.cancel()
+            onCancelled()
             self.dismiss(using: dismiss)
 
         case .submit:

@@ -371,6 +371,21 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
 
 extension ContentOverlayViewController: AutofillPasswordImportDelegate {
     public func autofillUserScriptDidRequestPasswordImportFlow(_ completion: @escaping () -> Void) {
-        DataImportView().show(completion: completion)
+        PixelKit.fire(AutofillPixelKitEvent.importCredentialsFlowStarted.withoutMacPrefix)
+        let viewModel = DataImportViewModel(
+            onFinished: {
+                PixelKit.fire(AutofillPixelKitEvent.importCredentialsFlowEnded.withoutMacPrefix)
+                completion()
+            },
+            onCancelled: {
+                PixelKit.fire(AutofillPixelKitEvent.importCredentialsFlowCancelled.withoutMacPrefix)
+                completion()
+            }
+        )
+        DataImportView(model: viewModel).show()
+    }
+
+    public func autofillUserScriptDidFinishImportWithImportedCredentialForCurrentDomain() {
+        PixelKit.fire(AutofillPixelKitEvent.importCredentialsFlowHadCredentials.withoutMacPrefix)
     }
 }
