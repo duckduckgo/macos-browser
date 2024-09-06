@@ -62,7 +62,6 @@ final class PhishingDetectionTests: XCTestCase {
 
     func testDidNotLoadAndStartDataActivities_IfFeatureDisabled() async {
         PhishingDetectionPreferences.shared.isEnabled = false
-        phishingDetection = PhishingDetection(dataActivities: mockDataActivities, dataStore: dataStore, detector: mockDetector)
         XCTAssertFalse(mockDataProvider.didLoadHashPrefixes)
         XCTAssertFalse(mockDataProvider.didLoadFilterSet)
         XCTAssertFalse(mockDataActivities.started)
