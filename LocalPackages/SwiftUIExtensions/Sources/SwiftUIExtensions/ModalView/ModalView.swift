@@ -47,22 +47,12 @@ public extension ModalView {
         var modalWindow: NSWindow?
 
         let rootView = self.environment(\.dismiss, {
-
-            //if parentWindow == nil {
-            //NSApplication.shared.stopModal()
             if let session {
                 NSApplication.shared.endModalSession(session)
             }
 
             modalWindow?.close()
             modalWindow = nil
-
-/*
-            if showModally {
-                NSApp.stopModal()
-            } else {
-                parentWindow?.endSheet(sheetWindow!)
-            }*/
         })
 
         let hostingView = NSHostingView(rootView: rootView)
