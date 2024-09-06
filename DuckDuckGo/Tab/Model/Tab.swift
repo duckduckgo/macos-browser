@@ -379,15 +379,11 @@ protocol NewWindowPolicyDecisionMaker {
 
     var webViewDidStartNavigationPublisher: some Publisher<Void, Never> {
         navigationStatePublisher
-            .compactMap { $0 } // Unwrap the optional state
-            .filter {
-                if case .started = $0 {
-                    return true
-                }
-                return false
-            }
+            .compactMap { $0 }
+            .filter { $0 == .started }
             .asVoid()
     }
+
     var webViewDidFinishNavigationPublisher: some Publisher<Void, Never> {
         navigationStatePublisher
             .combineLatest(navigationDelegate.$currentNavigation)

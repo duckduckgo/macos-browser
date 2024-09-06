@@ -55,7 +55,7 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
         try super.tearDownWithError()
     }
 
-    func testOnNavigationCompletedIfNoDialogOnlyWebViewVisible() throws {
+    func testWhenNavigationCompletedAndNoDialogTypeThenOnlyWebViewVisible() throws {
         let expectation = self.expectation(description: "Wait for webViewDidFinishNavigationPublisher to emit")
         tab.navigateTo(url: URL(string: "some.url")!)
 
@@ -69,7 +69,7 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
         XCTAssertNil(factory.capturedType)
     }
 
-    func testOnNavigationCompletedIfHighFiveDialogThenDialogCapturedInFactory() throws {
+    func testWhenNavigationCompletedAndHighFiveDialogTypeThenCorrectDialogCapturedInFactory() throws {
         dialogProvider.dialog = .highFive
         tab.navigateTo(url: URL(string: "some.url")!)
 
@@ -78,7 +78,7 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
         XCTAssertIdentical(factory.capturedDelegate, viewController.tabViewModel?.tab)
     }
 
-    func testOnNavigationCompletedIfSearchDoneDialogThenDialogCapturedInFactory() throws {
+    func testWhenNavigationCompletedAndSearchDoneDialogTypeThenCorrectDialogCapturedInFactory() throws {
         dialogProvider.dialog = .searchDone(shouldFollowUp: true)
         tab.navigateTo(url: URL(string: "some.url")!)
 
@@ -87,7 +87,7 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
         XCTAssertIdentical(factory.capturedDelegate, viewController.tabViewModel?.tab)
     }
 
-    func testOnNavigationCompletedIfTrackersDialogThenDialogCapturedInFactory() throws {
+    func testWhenNavigationCompletedAndTrackersDialogTypeThenCorrectDialogCapturedInFactory() throws {
         dialogProvider.dialog = .trackers(message: NSMutableAttributedString(string: ""), shouldFollowUp: true)
         tab.navigateTo(url: URL(string: "some.url")!)
 
@@ -96,7 +96,7 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
         XCTAssertIdentical(factory.capturedDelegate, viewController.tabViewModel?.tab)
     }
 
-    func testOnNavigationCompletedIfTryASearchDialogThenDialogCapturedInFactory() throws {
+    func testWhenNavigationCompletedAndTryASearchDialogTypeThenCorrectDialogCapturedInFactory() throws {
         dialogProvider.dialog = .tryASearch
         tab.navigateTo(url: URL(string: "some.url")!)
 
@@ -105,7 +105,7 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
         XCTAssertIdentical(factory.capturedDelegate, viewController.tabViewModel?.tab)
     }
 
-    func testOnNavigationCompletedIfTryASiteDialogThenDialogCapturedInFactory() throws {
+    func testWhenNavigationCompletedAndTryASiteDialogTypeThenCorrectDialogCapturedInFactory() throws {
         dialogProvider.dialog = .tryASite
         tab.navigateTo(url: URL(string: "some.url")!)
 
@@ -114,7 +114,7 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
         XCTAssertIdentical(factory.capturedDelegate, viewController.tabViewModel?.tab)
     }
 
-    func testOnNavigationCompletedIfTryFireButtonDialogThenDialogCapturedInFactory() throws {
+    func testWhenNavigationCompletedAndTryFireButtonDialogTypeThenCorrectDialogCapturedInFactory() throws {
         dialogProvider.dialog = .tryFireButton
         tab.navigateTo(url: URL(string: "some.url")!)
 

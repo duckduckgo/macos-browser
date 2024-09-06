@@ -125,7 +125,6 @@ final class BrowserTabViewController: NSViewController {
         subscribeToSelectedTabViewModel()
 
         view.registerForDraggedTypes([.URL, .fileURL])
-
     }
 
     override func viewWillAppear() {
@@ -384,7 +383,8 @@ final class BrowserTabViewController: NSViewController {
 
         var onDismissAction: () -> Void = {}
         if let webViewContainer {
-            onDismissAction = {
+            onDismissAction = { [weak self] in
+                guard let self else { return }
                 self.removeChild(in: self.containerStackView, webViewContainer: webViewContainer)
             }
         }

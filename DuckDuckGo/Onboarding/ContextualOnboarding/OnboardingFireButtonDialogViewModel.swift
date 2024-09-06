@@ -25,9 +25,8 @@ public struct OnboardingFireButtonDialogViewModel {
         onDismiss()
     }
 
+    @MainActor
     func tryFireButton() {
-        DispatchQueue.main.async {
-            FireCoordinator.fireButtonAction()
-        }
+        FireCoordinator.fireButtonAction()
     }
 }
