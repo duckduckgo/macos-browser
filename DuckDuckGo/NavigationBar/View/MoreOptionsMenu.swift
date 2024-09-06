@@ -267,7 +267,7 @@ final class MoreOptionsMenu: NSMenu {
         // TODO: Remove this
         freemiumPIRUserStateManager.didOnboard = true
         // ------
-        
+
         freemiumPIRPresenter.showFreemiumPIR(didOnboard: freemiumPIRUserStateManager.didOnboard, windowControllerManager: WindowControllersManager.shared)
 
         notificationCenter.post(name: .freemiumDBPEntryPointActivated, object: nil)

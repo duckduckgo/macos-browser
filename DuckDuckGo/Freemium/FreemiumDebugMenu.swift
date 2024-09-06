@@ -47,7 +47,6 @@ final class FreemiumDebugMenu: NSMenuItem {
         menu.addItem(.separator())
         menu.addItem(NSMenuItem(title: "RESET ALL STATE", action: #selector(resetAllState), target: self))
 
-
         return menu
     }
 

@@ -73,7 +73,7 @@ private extension DefaultFreemiumPIRFeature {
         subscriptionManager.isPrivacyProPurchaseAvailable
         && !accountManager.isUserAuthenticated
     }
-    
+
     /// Returns true IFF:
     ///
     /// 1. The user did onboard to Freemium PIR

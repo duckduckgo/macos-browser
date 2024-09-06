@@ -157,7 +157,7 @@ private extension DefaultFreemiumPIRScanResultPolling {
     /// Posts a notification if results are found or if no results are found after the maximum duration.
     func notifyMatchesFoundOrNoResults() {
         guard let firstProfileSavedTimestamp = firstProfileSavedTimestamp,
-        !freemiumPIRUserStateManager.didPostResultsNotification else { return }
+              !freemiumPIRUserStateManager.didPostResultsNotification else { return }
 
         let currentDate = Date()
         let elapsedTime = currentDate.timeIntervalSince(firstProfileSavedTimestamp)

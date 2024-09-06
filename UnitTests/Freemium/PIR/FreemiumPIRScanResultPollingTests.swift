@@ -183,10 +183,10 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
         sut?.startPollingOrObserving()
 
         // When
-        sut = nil  // Deinitialize
+        sut = nil
 
         // Then
-        XCTAssertNil(sut?.timer)  // Ensure the timer is invalidated upon deallocation
+        XCTAssertNil(sut?.timer)
     }
 
     func testWhenTimerAlreadyExists_thenSecondTimerIsNotCreated() {
@@ -200,10 +200,10 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
         let existingTimer = sut.timer
 
         // When
-        sut.startPollingOrObserving()  // Call again
+        sut.startPollingOrObserving()
 
         // Then
-        XCTAssertEqual(sut.timer, existingTimer)  // Ensure the same timer is reused, not recreated
+        XCTAssertEqual(sut.timer, existingTimer)
     }
 
     func testWhenDataManagerThrowsError_thenPollingContinuesGracefully() {
@@ -222,18 +222,17 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
         // When
         sut.startPollingOrObserving()
 
-        // Simulate error throwing in the data manager call
         XCTAssertNoThrow(try mockDataManager.matchesFoundAndBrokersCount())
 
         // Then
         XCTAssertFalse(mockNotificationCenter.didCallPostNotification)
-        XCTAssertTrue(mockDataManager.didCallMatchesFoundCount)  // Even though there's an error, polling should continue
+        XCTAssertTrue(mockDataManager.didCallMatchesFoundCount)
     }
 
     func testWhenProfileSavedButNoResultsBeforeMaxDuration_thenNoResultsNotificationNotPosted() {
         // Given
         mockDataManager.matchesFoundCountValue = (0, 0)
-        let timestampString = dateFormatter.string(from: Date.nowMinus(hours: 12))  // Still under max duration
+        let timestampString = dateFormatter.string(from: Date.nowMinus(hours: 12))
         mockFreemiumPIRUserStateManager.firstProfileSavedTimestamp = timestampString
 
         let sut = DefaultFreemiumPIRScanResultPolling(
@@ -246,9 +245,9 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
         sut.startPollingOrObserving()
 
         // Then
-        XCTAssertFalse(mockNotificationCenter.didCallPostNotification)  // No notification posted
-        XCTAssertTrue(mockDataManager.didCallMatchesFoundCount)  // Matches check still happens
-        XCTAssertNotNil(sut.timer)  // Timer should still be running
+        XCTAssertFalse(mockNotificationCenter.didCallPostNotification)
+        XCTAssertTrue(mockDataManager.didCallMatchesFoundCount)
+        XCTAssertNotNil(sut.timer)
     }
 }
 

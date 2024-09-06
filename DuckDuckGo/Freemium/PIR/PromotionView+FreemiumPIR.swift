@@ -33,9 +33,9 @@ extension PromotionViewModel {
     }
 
     static func freemiumPIRPromotionScanEngagementResults(resultCount: Int,
-                                                                brokerCount: Int,
-                                                                proceedAction: @escaping () -> Void,
-                                                                closeAction: @escaping () -> Void) -> PromotionViewModel {
+                                                          brokerCount: Int,
+                                                          proceedAction: @escaping () -> Void,
+                                                          closeAction: @escaping () -> Void) -> PromotionViewModel {
 
         var title = UserText.homePagePromotionFreemiumPIRPostScanEngagementResultsTitle
         var subtitle = ""
@@ -47,9 +47,9 @@ extension PromotionViewModel {
             subtitle = UserText.homePagePromotionFreemiumPIRPostScanEngagementResultSingleBrokerSubtitle(resultCount: resultCount)
         default:
             subtitle = UserText.homePagePromotionFreemiumPIRPostScanEngagementResultPluralSubtitle(resultCount: resultCount,
-                                                                                                       brokerCount: brokerCount)
+                                                                                                   brokerCount: brokerCount)
         }
-        
+
         let actionButtonText = UserText.homePagePromotionFreemiumPIRPostScanEngagementButtonTitle
 
         return PromotionViewModel(image: .radarCheck,
