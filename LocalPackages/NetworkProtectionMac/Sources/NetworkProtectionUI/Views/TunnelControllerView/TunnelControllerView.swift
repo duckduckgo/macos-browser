@@ -177,10 +177,11 @@ public struct TunnelControllerView: View {
 
             featureToggleRow()
 
+            SiteTroubleshootingView()
+                .padding(.top, 5)
+
             Divider()
                 .padding(EdgeInsets(top: 5, leading: 9, bottom: 5, trailing: 9))
-
-            SiteTroubleshootingView()
 
             locationView()
 
