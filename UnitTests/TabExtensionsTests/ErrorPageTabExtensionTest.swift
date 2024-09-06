@@ -337,7 +337,8 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         let policy = await errorPageExtention.decidePolicy(for: navigationAction, preferences: &preferences)
 
         // THEN
-        XCTAssertEqual(policy.debugDescription, "redirect")
+        XCTAssertEqual(policy.debugDescription, "next")
+        XCTAssertTrue(mockWebView.loadCalled)
         XCTAssertTrue(phishingStateManager.isShowingPhishingError)
     }
 
@@ -422,7 +423,7 @@ class MockWKWebView: NSObject, ErrorPageTabExtensionNavigationDelegate {
 
     func load(_ request: URLRequest) -> WKNavigation? {
         loadCalled = true
-        return .some(WKNavigation())
+        return .none
     }
 }
 
