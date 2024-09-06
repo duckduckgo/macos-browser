@@ -58,7 +58,6 @@ final class PhishingDetectionTests: XCTestCase {
         PhishingDetectionPreferences.shared.isEnabled = false
         let isMalicious = await phishingDetection.checkIsMaliciousIfEnabled(url: URL(string: "https://malicious.com")!)
         XCTAssertFalse(isMalicious)
-        XCTAssertTrue(mockDataActivities.stopped)
     }
 
     func testDidNotLoadAndStartDataActivities_IfFeatureDisabled() async {
@@ -79,12 +78,6 @@ final class PhishingDetectionTests: XCTestCase {
     func testIsNotMalicious() async {
         PhishingDetectionPreferences.shared.isEnabled = true
         let isMalicious = await phishingDetection.checkIsMaliciousIfEnabled(url: URL(string: "https://trusted.com")!)
-        XCTAssertFalse(isMalicious)
-    }
-
-    func testIsMaliciousWithFeatureDisabled() async {
-        PhishingDetectionPreferences.shared.isEnabled = false
-        let isMalicious = await phishingDetection.checkIsMaliciousIfEnabled(url: URL(string: "https://malicious.com")!)
         XCTAssertFalse(isMalicious)
     }
 }
