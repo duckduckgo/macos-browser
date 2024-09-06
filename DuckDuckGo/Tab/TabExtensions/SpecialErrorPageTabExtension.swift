@@ -134,7 +134,7 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
             errorData = SpecialErrorData(kind: .phishing, domain: domain, eTldPlus1: tld.eTLDplus1(failingURL?.host))
             if let errorURL = generateErrorPageURL(url) {
                 _ = webView?.load(URLRequest(url: errorURL))
-                return .cancel
+                return .none
             }
         } else {
             return handleMaliciousIframe(navigationAction: navigationAction)
@@ -152,7 +152,7 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
 
         if let errorURL = generateErrorPageURL(iframeTopUrl) {
             _ = webView?.load(URLRequest(url: errorURL))
-            return .cancel
+            return .none
         }
 
         return .next
