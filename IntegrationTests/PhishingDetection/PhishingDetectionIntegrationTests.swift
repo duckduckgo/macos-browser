@@ -19,6 +19,7 @@
 import Combine
 import Common
 import XCTest
+import PhishingDetection
 
 @testable import DuckDuckGo_Privacy_Browser
 
@@ -52,66 +53,75 @@ class PhishingDetectionIntegrationTests: XCTestCase {
 
     // MARK: - Tests
 
-//    @MainActor
-//    func testPhishingNotDetected_tabIsNotMarkedPhishing() async throws {
-//        try await loadUrl("http://privacy-test-pages.site/")
-//        XCTAssertFalse(tabViewModel.tab.url?.isPhishingErrorPage ?? true)
-//    }
-//
-//    @MainActor
-//    func testPhishingDetected_tabIsMarkedPhishing() async throws {
-//        try await loadUrl("http://privacy-test-pages.site/security/badware/phishing.html")
-//        XCTAssertTrue(tabViewModel.tab.url?.isPhishingErrorPage ?? false)
-//    }
-//
-//    @MainActor
-//    func testPhishingDetectedThenNotDetected_tabIsNotMarkedPhishing() async throws {
-//        try await loadUrl("http://privacy-test-pages.site/security/badware/phishing.html")
-//        XCTAssertTrue(tabViewModel.tab.url?.isPhishingErrorPage ?? false)
-//
-//        try await loadUrl("http://broken.third-party.site/")
-//        try await waitForTabToFinishLoading()
-//
-//        XCTAssertFalse(tabViewModel.tab.privacyInfo?.isPhishing ?? true)
-//        XCTAssertFalse(tabViewModel.tab.url?.isPhishingErrorPage ?? true)
-//    }
-//
-//    @MainActor
-//    func testPhishingDetectedThenDDGLoaded_tabIsNotMarkedPhishing() async throws {
-//        try await loadUrl("http://privacy-test-pages.site/security/badware/phishing.html")
-//        XCTAssertTrue(tabViewModel.tab.url?.isPhishingErrorPage ?? false)
-//
-//        try await loadUrl("http://duckduckgo.com/")
-//        try await waitForTabToFinishLoading()
-//
-//        XCTAssertFalse(tabViewModel.tab.privacyInfo?.isPhishing ?? true)
-//        XCTAssertFalse(tabViewModel.tab.url?.isPhishingErrorPage ?? true)
-//    }
-//
-//    @MainActor
-//    func testPhishingDetectedViaHTTPRedirectChain_tabIsMarkedPhishing() async throws {
-//        try await loadUrl("http://bad.third-party.site/security/badware/phishing-redirect/")
-//        XCTAssertTrue(tabViewModel.tab.url?.isPhishingErrorPage ?? false)
-//    }
-//
-//    @MainActor
-//    func testPhishingDetectedRepeatedRedirectChains_tabIsMarkedPhishing() async throws {
-//        let urls = [
-//            "http://bad.third-party.site/security/badware/phishing-js-redirector-helper.html",
-//            "http://bad.third-party.site/security/badware/phishing-js-redirector.html",
-//            "http://bad.third-party.site/security/badware/phishing-meta-redirect.html",
-//            "http://bad.third-party.site/security/badware/phishing-redirect/",
-//            "http://bad.third-party.site/security/badware/phishing-redirect/302",
-//            "http://bad.third-party.site/security/badware/phishing-redirect/js",
-//            "http://bad.third-party.site/security/badware/phishing-redirect/meta",
-//            "http://bad.third-party.site/security/badware/phishing-redirect/meta2"
-//        ]
-//
-//        for url in urls {
-//            try await loadUrl(url)
-//            XCTAssertTrue(tabViewModel.tab.url?.isPhishingErrorPage ?? false, "URL should be flagged as phishing: \(url)")
-//        }
-//    }
+    @MainActor
+    func testPhishingNotDetected_tabIsNotMarkedPhishing() async throws {
+        try await loadUrl("http://privacy-test-pages.site/")
+        let tabErrorCode2 = tabViewModel.tab.error?.errorCode
+        XCTAssertNil(tabErrorCode2)
+    }
+
+    @MainActor
+    func testPhishingDetected_tabIsMarkedPhishing() async throws {
+        try await loadUrl("http://privacy-test-pages.site/security/badware/phishing.html")
+        try await waitForTabToFinishLoading()
+        let tabErrorCode = tabViewModel.tab.error?.errorCode
+        XCTAssertEqual(tabErrorCode, PhishingDetectionError.detected.errorCode)
+    }
+
+    @MainActor
+    func testPhishingDetectedThenNotDetected_tabIsNotMarkedPhishing() async throws {
+        try await loadUrl("http://privacy-test-pages.site/security/badware/phishing.html")
+        try await waitForTabToFinishLoading()
+        let tabErrorCode = tabViewModel.tab.error?.errorCode
+        XCTAssertEqual(tabErrorCode, PhishingDetectionError.detected.errorCode)
+
+        try await loadUrl("http://broken.third-party.site/")
+        try await waitForTabToFinishLoading()
+        let tabErrorCode2 = tabViewModel.tab.error?.errorCode
+        XCTAssertNil(tabErrorCode2)
+    }
+
+    @MainActor
+    func testPhishingDetectedThenDDGLoaded_tabIsNotMarkedPhishing() async throws {
+        try await loadUrl("http://privacy-test-pages.site/security/badware/phishing.html")
+        try await waitForTabToFinishLoading()
+        let tabErrorCode = tabViewModel.tab.error?.errorCode
+        XCTAssertEqual(tabErrorCode, PhishingDetectionError.detected.errorCode)
+
+        try await loadUrl("http://duckduckgo.com/")
+        try await waitForTabToFinishLoading()
+        let tabErrorCode2 = tabViewModel.tab.error?.errorCode
+        XCTAssertNil(tabErrorCode2)
+    }
+
+    @MainActor
+    func testPhishingDetectedViaHTTPRedirectChain_tabIsMarkedPhishing() async throws {
+        try await loadUrl("http://bad.third-party.site/security/badware/phishing-redirect/")
+        try await waitForTabToFinishLoading()
+        let tabErrorCode = tabViewModel.tab.error?.errorCode
+        XCTAssertEqual(tabErrorCode, PhishingDetectionError.detected.errorCode)
+    }
+
+    @MainActor
+    func testPhishingDetectedRepeatedRedirectChains_tabIsMarkedPhishing() async throws {
+        let urls = [
+            "http://bad.third-party.site/security/badware/phishing-js-redirector-helper.html",
+            "http://bad.third-party.site/security/badware/phishing-js-redirector.html",
+            "http://bad.third-party.site/security/badware/phishing-meta-redirect.html",
+            "http://bad.third-party.site/security/badware/phishing-redirect/",
+            "http://bad.third-party.site/security/badware/phishing-redirect/302",
+            "http://bad.third-party.site/security/badware/phishing-redirect/js",
+            "http://bad.third-party.site/security/badware/phishing-redirect/meta",
+            "http://bad.third-party.site/security/badware/phishing-redirect/meta2"
+        ]
+
+        for url in urls {
+            try await loadUrl(url)
+            try await waitForTabToFinishLoading()
+            let tabErrorCode = tabViewModel.tab.error?.errorCode
+            XCTAssertEqual(tabErrorCode, PhishingDetectionError.detected.errorCode)
+        }
+    }
 
     // MARK: - Helper Methods
 
