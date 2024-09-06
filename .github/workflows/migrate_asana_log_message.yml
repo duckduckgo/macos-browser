@@ -30,7 +30,7 @@ jobs:
           task_url:"https://app.asana.com/0/1201392122292466/1208233977568870/f" \
           template_name:"debug-symbols-uploaded" \
           github_handle:"${{ github.actor }}" \
-          is_scheduled_release:"${{ github.event_name != 'schedule' }}"
+          is_scheduled_release:"${{ github.event_name == 'schedule' }}"
 
     - name: Test asana_log_message (mimicks publish_dmg_release/yml/Report status)
       if: always()
@@ -45,4 +45,4 @@ jobs:
           task_url:"https://app.asana.com/0/1201392122292466/1208233977568870/f" \
           template_name:"validate-check-for-updates-public" \
           github_handle:"${{ github.actor }}" \
-          is_scheduled_release:"${{ github.event_name != 'schedule' }}"
+          is_scheduled_release:"${{ github.event_name == 'schedule' }}"
