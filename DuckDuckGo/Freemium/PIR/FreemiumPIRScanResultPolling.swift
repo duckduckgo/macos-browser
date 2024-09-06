@@ -81,7 +81,7 @@ final class DefaultFreemiumPIRScanResultPolling: FreemiumPIRScanResultPolling {
         if firstProfileSaved {
             startRepeatingConditionCheck()
         } else {
-            observeNotification()
+            observeProfileSavedNotification()
         }
     }
 
@@ -117,18 +117,18 @@ private extension DefaultFreemiumPIRScanResultPolling {
     }
 
     /// Observes the notification for when the first profile is saved and triggers the polling process.
-    func observeNotification() {
+    func observeProfileSavedNotification() {
         observer = notificationCenter.addObserver(
             forName: .pirProfileSaved,
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            self?.notificationReceived()
+            self?.profileSavedNotificationReceived()
         }
     }
 
     /// Called when the profile saved notification is received. Saves the current timestamp and starts polling for results.
-    func notificationReceived() {
+    func profileSavedNotificationReceived() {
         if !firstProfileSaved {
             saveCurrentTimestamp()
         }
@@ -149,7 +149,7 @@ private extension DefaultFreemiumPIRScanResultPolling {
         }
 
         timer = Timer.scheduledTimer(withTimeInterval: timerInterval, repeats: true) { [weak self] _ in
-            self?.checkCondition()
+            self?.notifyMatchesFoundOrNoResults()
         }
 
         timer?.fire()
@@ -157,7 +157,7 @@ private extension DefaultFreemiumPIRScanResultPolling {
 
     /// Checks if any matches have been found or if the maximum polling duration has been exceeded.
     /// Posts a notification if results are found or if no results are found after the maximum duration.
-    func checkCondition() {
+    func notifyMatchesFoundOrNoResults() {
         guard let firstProfileSavedTimestamp = firstProfileSavedTimestamp else { return }
         let currentDate = Date()
         let elapsedTime = currentDate.timeIntervalSince(firstProfileSavedTimestamp)
