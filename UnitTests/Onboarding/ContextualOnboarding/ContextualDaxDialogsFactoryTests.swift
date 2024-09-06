@@ -30,7 +30,7 @@ final class ContextualDaxDialogsFactoryTests: XCTestCase {
         delegate = CapturingOnboardingNavigationDelegate()
     }
 
-    override func tearDownWithError() throws {
+    @MainActor override func tearDownWithError() throws {
         factory = nil
         delegate = nil
         try super.tearDownWithError()
@@ -183,6 +183,7 @@ final class ContextualDaxDialogsFactoryTests: XCTestCase {
         let expectation = self.expectation(description: "Wait for FirePopover to appear")
         self.waitForPopoverToAppear(expectation: expectation)
         wait(for: [expectation], timeout: 3.0)
+        WindowControllersManager.shared.lastKeyMainWindowController?.window?.close()
     }
 
     func testWhenMakeViewForHighFivThenFilalDialogViewCreatedAndOnActionExpectedSearchOccurs() throws {
