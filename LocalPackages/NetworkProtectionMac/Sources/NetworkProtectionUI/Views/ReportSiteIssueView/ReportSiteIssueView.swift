@@ -17,8 +17,10 @@
 //
 
 import Foundation
+import PixelKit
 import SwiftUI
 import SwiftUIExtensions
+import VPNPixels
 
 struct ReportSiteIssuesView: ModalView {
 
@@ -28,13 +30,13 @@ struct ReportSiteIssuesView: ModalView {
 
     private let cancelActionTitle = "Not Now"
     private let defaultActionTitle = "Report"
-    private let dontShowAgainTitle = "Don't ask again"
+    private let dontAskAgainTitle = "Don't ask again"
 
     let defaultAction: @MainActor (_ dismiss: () -> Void) -> Void
     let cancelAction: @MainActor (_ dismiss: () -> Void) -> Void
-    let dontShowAgainAction: @MainActor (_ dismiss: () -> Void) -> Void
+    let dontAskAgainAction: @MainActor (_ dismiss: () -> Void) -> Void
 
-    var body: some View {
+    public var body: some View {
         Dialog {
             Image(.siteBreakage128)
 
@@ -57,8 +59,8 @@ struct ReportSiteIssuesView: ModalView {
                 .multilineTextAlignment(.center)
                 .multilineText()
         } buttons: {
-            Button(dontShowAgainTitle) {
-                dontShowAgainAction(dismiss)
+            Button(dontAskAgainTitle) {
+                dontAskAgainAction(dismiss)
             }
 
             Spacer()

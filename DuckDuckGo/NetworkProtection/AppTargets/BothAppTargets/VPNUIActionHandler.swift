@@ -42,8 +42,7 @@ final class VPNUIActionHandler {
 
     func askUserToReportIssues(withDomain domain: String) async {
         let parentWindow = await WindowControllersManager.shared.lastKeyMainWindowController?.window
-        let siteIssuesReporter = ReportSiteIssueAlert()
-        await siteIssuesReporter.askUserToReportIssues(withDomain: domain, in: parentWindow)
+        await ReportSiteIssuesPresenter(userDefaults: .netP).show(withDomain: domain, in: parentWindow)
     }
 }
 
