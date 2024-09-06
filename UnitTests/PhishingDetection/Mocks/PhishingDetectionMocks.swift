@@ -58,14 +58,16 @@ class MockFileStorageManager: FileStorageManager {
 
 final class MockPhishingDataActivitites: PhishingDetectionDataActivityHandling {
     var started: Bool = false
-    var stopped: Bool = false
+    var stopped: Bool = true
 
     func start() {
         started = true
+        stopped = false
     }
 
     func stop() {
         stopped = true
+        started = false
     }
 }
 
