@@ -107,6 +107,10 @@ extension HomePage.Models {
             self.showAddImageFailedAlert = showAddImageFailedAlert
             self.navigator = navigator
 
+            subscribeToUserBackgroundImages()
+        }
+
+        private func subscribeToUserBackgroundImages() {
             availableCustomImagesCancellable = customImagesManager?.availableImagesPublisher
                 .receive(on: DispatchQueue.main)
                 .handleEvents(receiveOutput: { [weak self] images in
