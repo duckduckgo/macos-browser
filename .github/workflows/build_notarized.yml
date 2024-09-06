@@ -239,15 +239,13 @@ jobs:
 
     - name: Report success
       if: ${{ env.upload-to == 's3' }}
-      uses: ./.github/actions/asana-log-message
       env:
         DSYM_S3_PATH: ${{ steps.upload-dsyms-to-s3.outputs.dsym-s3-path }}
         TAG: ${{ env.app-version }}
         WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-      with:
-        task-url: ${{ env.asana-task-url }}
-        access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-        template-name: debug-symbols-uploaded
+        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+      run: |
+        bundle exec fastlane asana_log_message task_url:${{ env.asana-task-url }} template_name:"debug-symbols-uploaded"
 
   create-dmg:
 
@@ -335,15 +333,13 @@ jobs:
 
     - name: Report success
       if: ${{ env.upload-to == 's3' }}
-      uses: ./.github/actions/asana-log-message
       env:
         DMG_URL: ${{ vars.DMG_URL_ROOT }}${{ steps.create-dmg.outputs.dmg }}
         TAG: ${{ env.app-version }}
         WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-      with:
-        task-url: ${{ env.asana-task-url }}
-        access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-        template-name: dmg-uploaded
+        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+      run: |
+        bundle exec fastlane asana_log_message task_url:${{ env.asana-task-url }} template_name:"dmg-uploaded"
 
     - name: Extract Asana Task ID
       id: task-id
