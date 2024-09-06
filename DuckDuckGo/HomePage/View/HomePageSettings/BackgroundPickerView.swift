@@ -45,7 +45,9 @@ extension HomePage.Views {
                             itemView(for: item)
                         } else {
                             Button {
-                                // add new image when user images are supported
+                                Task {
+                                    await model.addNewImage()
+                                }
                             } label: {
                                 RoundedRectangle(cornerRadius: 4)
                                     .stroke(Color(.homeFavoritesGhost), style: StrokeStyle(lineWidth: 1.5, dash: [4.0, 2.0]))

@@ -54,10 +54,12 @@ enum CustomBackground: Equatable, Hashable, ColorSchemeProviding, LosslessString
     static let placeholderGradient: GradientBackground = .gradient03
     static let placeholderColor: SolidColorBackground = .lightPurple
     static let placeholderIllustration: IllustrationBackground = .illustration01
+    static let placeholderCustomImage: SolidColorBackground = .gray
 
     case gradient(GradientBackground)
     case solidColor(SolidColorBackground)
     case illustration(IllustrationBackground)
+    case userImage(UserBackgroundImage)
 
     var gradient: GradientBackground? {
         guard case let .gradient(gradient) = self else {
@@ -80,6 +82,13 @@ enum CustomBackground: Equatable, Hashable, ColorSchemeProviding, LosslessString
         return illustration
     }
 
+    var userBackgroundImage: UserBackgroundImage? {
+        guard case let .userImage(image) = self else {
+            return nil
+        }
+        return image
+    }
+
     var colorScheme: ColorScheme {
         switch self {
         case .gradient(let gradient):
@@ -88,6 +97,8 @@ enum CustomBackground: Equatable, Hashable, ColorSchemeProviding, LosslessString
             illustration.colorScheme
         case .solidColor(let solidColor):
             solidColor.colorScheme
+        case .userImage(let image):
+            image.colorScheme
         }
     }
 
@@ -118,6 +129,11 @@ enum CustomBackground: Equatable, Hashable, ColorSchemeProviding, LosslessString
                 return nil
             }
             self = .illustration(illustration)
+        case "userImage":
+            guard let userBackgroundImage = UserBackgroundImage(String(components[1])) else {
+                return nil
+            }
+            self = .userImage(userBackgroundImage)
         default:
             return nil
         }
@@ -131,23 +147,8 @@ enum CustomBackground: Equatable, Hashable, ColorSchemeProviding, LosslessString
             "solidColor|\(solidColor.rawValue)"
         case let .illustration(illustration):
             "illustration|\(illustration.rawValue)"
+        case let .userImage(userBackgroundImage):
+            "userImage|\(userBackgroundImage.description)"
         }
-    }
-}
-
-extension ColorScheme: LosslessStringConvertible {
-    public init?(_ description: String) {
-        switch description {
-        case "light":
-            self = .light
-        case "dark":
-            self = .dark
-        default:
-            return nil
-        }
-    }
-
-    public var description: String {
-        self == .light ? "light" : "dark"
     }
 }

@@ -42,10 +42,19 @@ extension HomePage.Views {
             Button(action: action) {
                 VStack(alignment: .leading, spacing: Const.titleSpacing) {
                     ZStack {
-                        BackgroundThumbnailView(
-                            showCheckmarkIfSelected: true,
-                            customBackground: modeModel.customBackgroundThumbnail ?? .solidColor(.gray)
-                        )
+                        if modeModel.contentType == .customImagePicker && !model.hasUserImages {
+                            BackgroundThumbnailView(showCheckmarkIfSelected: true) {
+                                ZStack {
+                                    Color.blackWhite5
+                                    Image(.share)
+                                }
+                            }
+                        } else {
+                            BackgroundThumbnailView(
+                                showCheckmarkIfSelected: true,
+                                customBackground: modeModel.customBackgroundThumbnail ?? .solidColor(.gray)
+                            )
+                        }
                     }
                     if showTitle {
                         Text(modeModel.title)

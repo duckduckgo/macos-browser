@@ -66,6 +66,17 @@ extension HomePage.Views {
                 solidColor.color.scaledToFill()
             case .illustration(let illustration):
                 illustration.image.resizable().scaledToFill()
+            case .userImage(let userBackgroundImage):
+                Group {
+                    if let image = model.customImagesManager?.thumbnailImage(for: userBackgroundImage) {
+                        Image(nsImage: image).resizable().scaledToFill()
+                    } else {
+                        EmptyView()
+                    }
+                }
+                .contextMenu {
+                    Button(UserText.deleteBackground, action: { model.customImagesManager?.deleteImage(userBackgroundImage) })
+                }
             case .none:
                 content()
             }
