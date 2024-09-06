@@ -29,12 +29,30 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
     private var mockNotificationCenter: MockNotificationCenter!
     private var mockDataManager: MockDataBrokerProtectionDataManager!
     private let dateFormatter = FreemiumPIRScanResultPollingTests.makePOSIXDateTimeFormatter()
-    private let key = "macos.browser.freemium.pir.profile.saved.timestamp"
+    private let key = "macos.browser.freemium.pir.first.profile.saved.timestamp"
 
     override func setUpWithError() throws {
         mockFreemiumPIRUserStateManager = MockFreemiumPIRUserStateManager()
         mockNotificationCenter = MockNotificationCenter()
         mockDataManager = MockDataBrokerProtectionDataManager()
+    }
+
+    func testWhenResultsAlreadyPosted_thenNoPollingOrObserving() {
+        // Given
+        mockFreemiumPIRUserStateManager.didPostResultsNotification = true
+        let sut = DefaultFreemiumPIRScanResultPolling(
+            dataManager: mockDataManager,
+            freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager,
+            notificationCenter: mockNotificationCenter
+        )
+
+        // When
+        sut.startPollingOrObserving()
+
+        // Then
+        XCTAssertFalse(mockDataManager.didCallMatchesFoundCount)
+        XCTAssertFalse(mockNotificationCenter.didCallAddObserver)
+        XCTAssertNil(sut.timer)
     }
 
     func testWhenFirstProfileIsAlreadySaved_thenPollingStartsImmediately() {
@@ -94,7 +112,7 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
 
     func testWhenResultsFoundWithinDuration_thenResultsNotificationPosted() {
         // Given
-        mockDataManager.matchesFoundCountValue = 3
+        mockDataManager.matchesFoundCountValue = (3, 2)
         let timestampString = dateFormatter.string(from: Date.nowMinus(hours: 12))
         mockFreemiumPIRUserStateManager.firstProfileSavedTimestamp = timestampString
         let sut = DefaultFreemiumPIRScanResultPolling(
@@ -109,13 +127,13 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
         // Then
         XCTAssertFalse(mockNotificationCenter.didCallAddObserver)
         XCTAssertTrue(mockDataManager.didCallMatchesFoundCount)
-        XCTAssertEqual(mockNotificationCenter.lastPostedNotification, .freemiumPirResultsFound)
+        XCTAssertEqual(mockNotificationCenter.lastPostedNotification, .freemiumDBPResultPollingComplete)
         XCTAssertNil(sut.timer)
     }
 
     func testWhenResultsFoundAndMaxDurationExpired_thenResultsNotificationPosted() {
         // Given
-        mockDataManager.matchesFoundCountValue = 0
+        mockDataManager.matchesFoundCountValue = (0, 0)
         let timestampString = dateFormatter.string(from: Date.nowMinus(hours: 36))
         mockFreemiumPIRUserStateManager.firstProfileSavedTimestamp = timestampString
         let sut = DefaultFreemiumPIRScanResultPolling(
@@ -128,7 +146,7 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
         sut.startPollingOrObserving()
 
         // Then
-        XCTAssertEqual(mockNotificationCenter.lastPostedNotification, .freemiumPirNoResultsFound)
+        XCTAssertEqual(mockNotificationCenter.lastPostedNotification, .freemiumDBPResultPollingComplete)
         XCTAssertFalse(mockNotificationCenter.didCallAddObserver)
         XCTAssertTrue(mockDataManager.didCallMatchesFoundCount)
         XCTAssertNil(sut.timer)
@@ -136,7 +154,7 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
 
     func testWhenNoResultsFoundAndMaxDurationExpired_thenNoResultsNotificationPosted() {
         // Given
-        mockDataManager.matchesFoundCountValue = 0
+        mockDataManager.matchesFoundCountValue = (0, 0)
         let timestampString = dateFormatter.string(from: Date.nowMinus(hours: 36))
         mockFreemiumPIRUserStateManager.firstProfileSavedTimestamp = timestampString
         let sut = DefaultFreemiumPIRScanResultPolling(
@@ -149,10 +167,88 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
         sut.startPollingOrObserving()
 
         // Then
-        XCTAssertEqual(mockNotificationCenter.lastPostedNotification, .freemiumPirNoResultsFound)
+        XCTAssertEqual(mockNotificationCenter.lastPostedNotification, .freemiumDBPResultPollingComplete)
         XCTAssertFalse(mockNotificationCenter.didCallAddObserver)
         XCTAssertTrue(mockDataManager.didCallMatchesFoundCount)
         XCTAssertNil(sut.timer)
+    }
+
+    func testWhenPollingIsDeinitialized_thenTimerIsInvalidated() {
+        // Given
+        var sut: DefaultFreemiumPIRScanResultPolling? = DefaultFreemiumPIRScanResultPolling(
+            dataManager: mockDataManager,
+            freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager,
+            notificationCenter: mockNotificationCenter
+        )
+        sut?.startPollingOrObserving()
+
+        // When
+        sut = nil  // Deinitialize
+
+        // Then
+        XCTAssertNil(sut?.timer)  // Ensure the timer is invalidated upon deallocation
+    }
+
+    func testWhenTimerAlreadyExists_thenSecondTimerIsNotCreated() {
+        // Given
+        let sut = DefaultFreemiumPIRScanResultPolling(
+            dataManager: mockDataManager,
+            freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager,
+            notificationCenter: mockNotificationCenter
+        )
+        sut.startPollingOrObserving()
+        let existingTimer = sut.timer
+
+        // When
+        sut.startPollingOrObserving()  // Call again
+
+        // Then
+        XCTAssertEqual(sut.timer, existingTimer)  // Ensure the same timer is reused, not recreated
+    }
+
+    func testWhenDataManagerThrowsError_thenPollingContinuesGracefully() {
+        // Given
+        mockDataManager.matchesFoundCountValue = (0, 0)
+        mockDataManager.didCallMatchesFoundCount = false  // Simulate an error
+        let timestampString = dateFormatter.string(from: Date.nowMinus(hours: 1))
+        mockFreemiumPIRUserStateManager.firstProfileSavedTimestamp = timestampString
+
+        let sut = DefaultFreemiumPIRScanResultPolling(
+            dataManager: mockDataManager,
+            freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager,
+            notificationCenter: mockNotificationCenter
+        )
+
+        // When
+        sut.startPollingOrObserving()
+
+        // Simulate error throwing in the data manager call
+        XCTAssertNoThrow(try mockDataManager.matchesFoundAndBrokersCount())
+
+        // Then
+        XCTAssertFalse(mockNotificationCenter.didCallPostNotification)
+        XCTAssertTrue(mockDataManager.didCallMatchesFoundCount)  // Even though there's an error, polling should continue
+    }
+
+    func testWhenProfileSavedButNoResultsBeforeMaxDuration_thenNoResultsNotificationNotPosted() {
+        // Given
+        mockDataManager.matchesFoundCountValue = (0, 0)
+        let timestampString = dateFormatter.string(from: Date.nowMinus(hours: 12))  // Still under max duration
+        mockFreemiumPIRUserStateManager.firstProfileSavedTimestamp = timestampString
+
+        let sut = DefaultFreemiumPIRScanResultPolling(
+            dataManager: mockDataManager,
+            freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager,
+            notificationCenter: mockNotificationCenter
+        )
+
+        // When
+        sut.startPollingOrObserving()
+
+        // Then
+        XCTAssertFalse(mockNotificationCenter.didCallPostNotification)  // No notification posted
+        XCTAssertTrue(mockDataManager.didCallMatchesFoundCount)  // Matches check still happens
+        XCTAssertNotNil(sut.timer)  // Timer should still be running
     }
 }
 
@@ -195,7 +291,7 @@ final class MockNotificationCenter: NotificationCenter {
 private final class MockDataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
 
     var didCallMatchesFoundCount = false
-    var matchesFoundCountValue = 0
+    var matchesFoundCountValue = (0, 0)
 
     var cache = InMemoryDataCache()
     var delegate: DataBrokerProtection.DataBrokerProtectionDataManagerDelegate?
@@ -220,7 +316,7 @@ private final class MockDataBrokerProtectionDataManager: DataBrokerProtectionDat
 
     func hasMatches() throws -> Bool { true }
 
-    func matchesFoundCount() throws -> Int {
+    func matchesFoundAndBrokersCount() throws -> (matchCount: Int, brokerCount: Int) {
         didCallMatchesFoundCount = true
         return matchesFoundCountValue
     }

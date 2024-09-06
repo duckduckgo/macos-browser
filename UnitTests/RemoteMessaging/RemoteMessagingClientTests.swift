@@ -32,8 +32,11 @@ struct MockRemoteMessagingStoreProvider: RemoteMessagingStoreProviding {
 
 final class MockFreemiumPIRUserStateManager: FreemiumPIRUserStateManager {
     var didOnboard = false
-    var firstProfileSavedTimestamp: String?
     var didPostFirstProfileSavedNotification = false
+    var didPostResultsNotification = false
+    var didDismissHomePagePromotion = false
+    var firstProfileSavedTimestamp: String?
+    var firstScanResults: FreemiumDBPMatchResults?
 }
 
 final class RemoteMessagingClientTests: XCTestCase {
