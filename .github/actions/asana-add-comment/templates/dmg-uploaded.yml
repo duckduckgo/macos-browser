@@ -1,8 +1,0 @@
-data:
-  html_text: |
-    <body>
-      📥 DMG for ${TAG} is available from <a href='${DMG_URL}'>${DMG_URL}</a>.
-
-
-      🔗 Workflow URL: <a href='${WORKFLOW_URL}'>${WORKFLOW_URL}</a>.
-    </body>
