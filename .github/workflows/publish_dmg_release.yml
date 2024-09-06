@@ -393,7 +393,8 @@ jobs:
         run: |
           bundle exec fastlane run asana_add_comment \
             task_url:"${{ env.asana-task-url }}" \
-            template_name:"${{ steps.asana-templates.outputs.release-task-comment-template }}"
+            template_name:"${{ steps.asana-templates.outputs.release-task-comment-template }}" \
+            is_scheduled_release:"${{ github.event_name == 'schedule' }}"
 
   # This is only run for public and hotfix releases
   create-variants:

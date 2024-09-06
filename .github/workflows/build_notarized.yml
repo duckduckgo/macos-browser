@@ -248,7 +248,8 @@ jobs:
         bundle exec fastlane run asana_log_message \
           task_url:"${{ env.asana-task-url }}" \
           template_name:"debug-symbols-uploaded" \
-          github_handle:"${{ github.actor }}"
+          github_handle:"${{ github.actor }}" \
+          is_scheduled_release:"${{ github.event_name == 'schedule' }}"
 
   create-dmg:
 
@@ -345,7 +346,8 @@ jobs:
         bundle exec fastlane run asana_log_message \
           task_url:"${{ env.asana-task-url }}" \
           template_name:"dmg-uploaded" \
-          github_handle:"${{ github.actor }}"
+          github_handle:"${{ github.actor }}" \
+          is_scheduled_release:"${{ github.event_name == 'schedule' }}"
 
     - name: Extract Asana Task ID
       id: task-id

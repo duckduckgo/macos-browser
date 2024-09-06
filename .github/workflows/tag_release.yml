@@ -203,7 +203,8 @@ jobs:
         bundle exec fastlane run asana_log_message \
           task_url:"${{ env.asana-task-url }}" \
           template_name:"${{ steps.asana-failure-templates.outputs.comment-template }}" \
-          github_handle:"${{ github.actor }}"
+          github_handle:"${{ github.actor }}" \
+          is_scheduled_release:"${{ github.event_name == 'schedule' }}"
 
     - name: Set up Asana success comment template
       if: ${{ env.MERGE_OR_DELETE_FAILED == 'false' }}
@@ -223,4 +224,5 @@ jobs:
         bundle exec fastlane run asana_log_message \
           task_url:"${{ env.asana-task-url }}" \
           template_name:"${{ steps.asana-success-template.outputs.comment-template }}" \
-          github_handle:"${{ github.actor }}"
+          github_handle:"${{ github.actor }}" \
+          is_scheduled_release:"${{ github.event_name == 'schedule' }}"
