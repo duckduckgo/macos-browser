@@ -57,15 +57,17 @@ jobs:
       - name: Find Asana release task
         id: find-asana-task
         if: github.event.inputs.asana-task-url == null
-        uses: ./.github/actions/asana-find-release-task
-        with:
-          access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        env:
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          bundle exec fastlane run asana_find_release_task platform:macos
 
       # When running on schedule, only proceed if there are changes to the release branch (i.e. HEAD is not tagged)
       - name: Check if there are changes to the release branch
         id: check-for-changes
         env:
-          release_branch: ${{ steps.find-asana-task.outputs.release-branch || github.ref_name }}
+          release_branch: ${{ steps.find-asana-task.outputs.release_branch || github.ref_name }}
         run: |
           if [[ "${{ github.event_name }}" != "schedule" ]]; then
             echo "skip-release=false" >> $GITHUB_OUTPUT
@@ -97,9 +99,9 @@ jobs:
       - name: Set parameters
         id: set-parameters
         env:
-          ASANA_TASK_URL: ${{ steps.find-asana-task.outputs.task-url || github.event.inputs.asana-task-url }}
-          RELEASE_BRANCH: ${{ steps.find-asana-task.outputs.release-branch || github.ref_name }}
-          TASK_ID: ${{ steps.find-asana-task.outputs.task-id || steps.task-id.outputs.asana_task_id }}
+          ASANA_TASK_URL: ${{ steps.find-asana-task.outputs.release_task_url || github.event.inputs.asana-task-url }}
+          RELEASE_BRANCH: ${{ steps.find-asana-task.outputs.release_branch || github.ref_name }}
+          TASK_ID: ${{ steps.find-asana-task.outputs.release_task_id || steps.task-id.outputs.asana_task_id }}
           SKIP_APPSTORE: ${{ github.event.inputs.skip-appstore || false }} # make sure this is set to false on scheduled runs
         run: |
           if [[ "${RELEASE_BRANCH}" == "main" ]]; then

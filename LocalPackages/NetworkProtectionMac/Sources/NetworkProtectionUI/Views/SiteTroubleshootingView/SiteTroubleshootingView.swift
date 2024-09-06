@@ -20,14 +20,11 @@ import Combine
 import Foundation
 import SwiftUI
 
-fileprivate extension View {
-    func applyCurrentSiteAttributes() -> some View {
-        font(.system(size: 13, weight: .regular, design: .default))
-    }
-}
-
 public struct SiteTroubleshootingView: View {
 
+    static let iconSize = CGFloat(16)
+
+    @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var model: Model
 
     // MARK: - View Contents
@@ -41,57 +38,36 @@ public struct SiteTroubleshootingView: View {
         }
     }
 
+    @ViewBuilder
     private func siteTroubleshootingView(_ siteInfo: SiteTroubleshootingInfo) -> some View {
-        Group {
-            AccordionView { _ in
-                Image(nsImage: siteInfo.icon)
-                    .resizable()
-                    .frame(width: 16, height: 16)
-                    .clipShape(RoundedRectangle(cornerRadius: 3.0))
-                Text("\(siteInfo.domain) issues?")
-                    .applyCurrentSiteAttributes()
-            } submenu: {
-                VStack {
-                    MenuItemCustomButton {
-                        model.setExclusion(true, forDomain: siteInfo.domain)
-                    } label: { _ in
-                        HStack {
-                            if siteInfo.excluded {
-                                Image(.accordionViewCheckmark)
-                                    .resizable()
-                                    .font(.system(size: 13))
-                                    .frame(width: 16, height: 16)
-                                    .applyCurrentSiteAttributes()
-                            } else {
-                                Rectangle()
-                                    .fill(Color.clear)
-                                    .frame(width: 16, height: 16)
-                            }
-                            Text("Exclude from VPN")
-                        }
-                    }
+        Divider()
+            .padding(EdgeInsets(top: 5, leading: 9, bottom: 5, trailing: 9))
 
-                    MenuItemCustomButton {
-                        model.setExclusion(false, forDomain: siteInfo.domain)
-                    } label: { _ in
-                        if !siteInfo.excluded {
-                            Image(.accordionViewCheckmark)
-                                .resizable()
-                                .font(.system(size: 13))
-                                .frame(width: 16, height: 16)
-                        } else {
-                            Rectangle()
-                                .fill(Color.clear)
-                                .frame(width: 16, height: 16)
-                        }
+        VStack(alignment: .leading) {
+            Text("Website Preferences")
+                .font(.system(size: 13, weight: .bold))
+                .padding(.vertical, 3)
+                .padding(.horizontal, 9)
+                .foregroundColor(Color(.defaultText))
 
-                        Text("Route through VPN")
-                    }
+            Toggle(isOn: Binding(get: {
+                siteInfo.excluded
+            }, set: { value in
+                model.setExclusion(value, forDomain: siteInfo.domain)
+            })) {
+                HStack(spacing: 5) {
+                    Image(nsImage: siteInfo.icon)
+                        .resizable()
+                        .frame(width: Self.iconSize, height: Self.iconSize)
+
+                    Text("Disable VPN for \(siteInfo.domain)")
+                        .font(.system(size: 12))
+                        .foregroundColor(Color(.defaultText))
+
+                    Spacer()
                 }
-            }
-
-            Divider()
-                .padding(EdgeInsets(top: 5, leading: 9, bottom: 5, trailing: 9))
+                .padding(.bottom, 5)
+            }.padding(.horizontal, 9)
         }
     }
 }
