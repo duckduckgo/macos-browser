@@ -49,22 +49,15 @@ public struct ReportSiteIssueAlert {
     public func askUserToReportIssues(withDomain domain: String, in parentWindow: NSWindow) async {
 
         let reportIssuesView = ReportSiteIssuesView(title: "Report", buttonsState: .expanded, domain: domain, cancelActionTitle: "Cancel", cancelAction: { dismiss in
+
             dismiss()
         }, defaultActionTitle: "OK") { dismiss in
+            let pixel: SiteTroubleshootingPixel = .reportIssues(domain: domain)
+            pixelKit?.fire(pixel)
+
             dismiss()
         }
 
         await reportIssuesView.show(in: parentWindow)
-/*
-        let alert = makeAlert(title: "Report Site Issues?",
-                              message: "Help us improve by anonymously reporting that \(domain) doesn't work correctly through the VPN.",
-                              buttonNames: ["Report", "Don't Report"])
-
-        let response = alert.runModal()
-
-        if response == .alertFirstButtonReturn {
-            let pixel: SiteTroubleshootingPixel = .reportIssues(domain: domain)
-            pixelKit?.fire(pixel)
-        }*/
     }
 }
