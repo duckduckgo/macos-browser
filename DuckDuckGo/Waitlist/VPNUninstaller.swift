@@ -124,7 +124,6 @@ final class VPNUninstaller: VPNUninstalling {
         }
     }
 
-    private let log: OSLog
     private let ipcServiceLauncher: IPCServiceLauncher
     private let loginItemsManager: LoginItemsManaging
     private let pinningManager: LocalPinningManager
@@ -144,16 +143,13 @@ final class VPNUninstaller: VPNUninstalling {
          settings: VPNSettings = .init(defaults: .netP),
          ipcClient: VPNControllerIPCClient = VPNControllerUDSClient(),
          vpnMenuLoginItem: LoginItem = .vpnMenu,
-         pixelKit: PixelFiring? = PixelKit.shared,
-         log: OSLog = .networkProtection) {
+         pixelKit: PixelFiring? = PixelKit.shared) {
 
         let vpnAgentBundleID = Bundle.main.vpnMenuAgentBundleId
         let appLauncher = AppLauncher(appBundleURL: Bundle.main.vpnMenuAgentURL)
         let ipcServiceLaunchMethod = IPCServiceLauncher.LaunchMethod.direct(
             bundleID: vpnAgentBundleID,
             appLauncher: appLauncher)
-
-        self.log = log
         self.ipcServiceLauncher = ipcServiceLauncher ?? IPCServiceLauncher(launchMethod: ipcServiceLaunchMethod)
         self.loginItemsManager = loginItemsManager
         self.pinningManager = pinningManager

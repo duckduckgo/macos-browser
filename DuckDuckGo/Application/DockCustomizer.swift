@@ -18,6 +18,7 @@
 
 import Foundation
 import Common
+import os.log
 
 protocol DockCustomization {
     var isAddedToDock: Bool { get }
@@ -104,7 +105,7 @@ final class DockCustomizer: DockCustomization {
             }
             return true
         } catch {
-            os_log(.error, "Error writing to Dock plist: %{public}@", error.localizedDescription)
+            Logger.general.error("Error writing to Dock plist: \(error.localizedDescription, privacy: .public)")
             return false
         }
     }

@@ -19,6 +19,7 @@
 import Foundation
 import Common
 import WebKit
+import os.log
 
 protocol WebViewSnapshotRendering {
 
@@ -32,17 +33,17 @@ final class WebViewSnapshotRenderer: WebViewSnapshotRendering {
     @MainActor
     func renderSnapshot(webView: WKWebView) async -> NSImage? {
         dispatchPrecondition(condition: .onQueue(.main))
-        os_log("Preview rendering started for \(String(describing: webView.url))", log: .tabSnapshots)
+        Logger.tabSnapshots.debug("Preview rendering started for \(String(describing: webView.url))")
 
         let configuration = WKSnapshotConfiguration.makePreviewSnapshotConfiguration()
 
         do {
             let image = try await webView.takeSnapshot(configuration: configuration)
-            os_log("Preview rendered for \(String(describing: webView.url))", log: .tabSnapshots)
+            Logger.tabSnapshots.debug("Preview rendered for \(String(describing: webView.url))")
 
             return image
         } catch {
-            os_log("Failed to render snapshot for \(String(describing: webView.url))", log: .tabSnapshots, type: .error)
+            Logger.tabSnapshots.error("Failed to render snapshot for \(String(describing: webView.url))")
             return nil
         }
     }

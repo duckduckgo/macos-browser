@@ -20,6 +20,7 @@ import Foundation
 import Combine
 import PixelKit
 import Common
+import os.log
 
 enum OnboardingSteps: String, CaseIterable {
     case summary
@@ -198,7 +199,7 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
         let message = param["message"] ?? ""
         let id = param["id"] ?? ""
         PixelKit.fire(GeneralPixel.onboardingExceptionReported(message: message, id: id), frequency: .standard)
-        os_log("Onboarding error: %{public}@", log: .error, "\(id): \(message)")
+        Logger.general.error("Onboarding error: \("\(id): \(message)", privacy: .public)")
     }
 
     private func onboardingHasFinished() {

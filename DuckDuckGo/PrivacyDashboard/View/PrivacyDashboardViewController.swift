@@ -23,6 +23,7 @@ import BrowserServicesKit
 import PrivacyDashboard
 import Common
 import PixelKit
+import os.log
 
 protocol PrivacyDashboardViewControllerSizeDelegate: AnyObject {
 
@@ -265,7 +266,7 @@ extension PrivacyDashboardViewController: PrivacyDashboardControllerDelegate {
                 let report = try await makeBrokenSiteReport(category: category, description: description, source: privacyDashboardController.source)
                 try brokenSiteReporter.report(report, reportMode: .regular)
             } catch {
-                os_log("Failed to generate or send the broken site report: \(error.localizedDescription)", type: .error)
+                Logger.general.error("Failed to generate or send the broken site report: \(error.localizedDescription)")
             }
         }
     }
@@ -283,7 +284,7 @@ extension PrivacyDashboardViewController: PrivacyDashboardControllerDelegate {
                 let report = try await makeBrokenSiteReport(source: source)
                 try toggleProtectionsOffReporter.report(report, reportMode: .toggle)
             } catch {
-                os_log("Failed to generate or send the broken site report: %@", type: .error, error.localizedDescription)
+                Logger.general.error("Failed to generate or send the broken site report: \(error.localizedDescription)")
             }
         }
     }

@@ -86,11 +86,12 @@ jobs:
           ref: ${{ github.ref_name }}
           submodules: recursive
 
+      - name: Set up fastlane
+        run: bundle install
+
       - name: Extract Asana Task ID
         id: task-id
-        uses: ./.github/actions/asana-extract-task-id
-        with:
-          task-url: ${{ github.event.inputs.asana-task-url }}
+        run: bundle exec fastlane run asana_extract_task_id task_url:"${{ github.event.inputs.asana-task-url }}"
 
       - name: Update Asana tasks for the release
         env:
@@ -101,7 +102,7 @@ jobs:
           version="$(cut -d '/' -f 2 <<< "$BRANCH")"
           # 'internal', because we start with making a build that still needs to be tested before being published
           # and we want Asana tasks to be moved to "Validation" and not already to "Done"
-          ./scripts/update_asana_for_release.sh internal ${{ steps.task-id.outputs.task-id }} ${{ vars.MACOS_APP_BOARD_VALIDATION_SECTION_ID }} "${version}"
+          ./scripts/update_asana_for_release.sh internal ${{ steps.task-id.outputs.asana_task_id }} ${{ vars.MACOS_APP_BOARD_VALIDATION_SECTION_ID }} "${version}"
 
   prepare_release:
     name: Prepare Release

@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1724097047421,
+    "version": 1725043256685,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -291,9 +291,6 @@
                     "domain": "bitsofwar.com"
                 },
                 {
-                    "domain": "mitglieder.franzspitzer.de"
-                },
-                {
                     "domain": "disneyplus.com"
                 },
                 {
@@ -321,12 +318,6 @@
                     "domain": "hertz.com"
                 },
                 {
-                    "domain": "www.thrifty.com"
-                },
-                {
-                    "domain": "sports.tipico.de"
-                },
-                {
                     "domain": "lotusbakeries.com"
                 },
                 {
@@ -337,6 +328,9 @@
                 },
                 {
                     "domain": "newsforkids.net"
+                },
+                {
+                    "domain": "dkb.de"
                 },
                 {
                     "domain": "marvel.com"
@@ -368,7 +362,7 @@
                     "state": "enabled"
                 }
             },
-            "hash": "d9a57acae7aadd9377e59b3f803728b1"
+            "hash": "0f117021faa53765286cc70d041a5bc2"
         },
         "autofillBreakageReporter": {
             "state": "disabled",
@@ -388,9 +382,12 @@
             "features": {
                 "deduplicateLoginsOnImport": {
                     "state": "enabled"
+                },
+                "unknownUsernameCategorization": {
+                    "state": "enabled"
                 }
             },
-            "hash": "1832dd4088cba6eaf3a9776a6fc9a1f5"
+            "hash": "4fb2ab2ceed78c92aac780bc7ae8d4a2"
         },
         "breakageReporting": {
             "state": "disabled",
@@ -1380,11 +1377,14 @@
                             }
                         ]
                     }
+                },
+                "freemium": {
+                    "state": "internal"
                 }
             },
             "exceptions": [],
             "minSupportedVersion": "1.70.0",
-            "hash": "b405d032a1519de3059db2e833e81c9a"
+            "hash": "3effc07d3c8c4a94732a1d14006e8d22"
         },
         "duckPlayer": {
             "exceptions": [],
@@ -1403,6 +1403,17 @@
             },
             "settings": {
                 "tryDuckPlayerLink": "https://www.youtube.com/watch?v=yKWIA-Pys4c",
+                "duckPlayerDisabledHelpPageLink": null,
+                "youtubePath": "watch",
+                "youtubeEmbedUrl": "youtube-nocookie.com",
+                "youTubeUrl": "youtube.com",
+                "youTubeReferrerHeaders": [
+                    "Referer"
+                ],
+                "youTubeReferrerQueryParams": [
+                    "embeds_referring_euri"
+                ],
+                "youTubeVideoIDQueryParam": "v",
                 "overlays": {
                     "youtube": {
                         "state": "disabled",
@@ -1465,7 +1476,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "6940b6c86bc86c501deef031208acdca"
+            "hash": "62786d2db59cb7708e5550a4c529500e"
         },
         "elementHiding": {
             "exceptions": [
@@ -3053,6 +3064,22 @@
                             },
                             {
                                 "selector": "div:has(> iframe[src*='prid=19031496'])",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": "div:has(> iframe[src*='prid=19043282'])",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": "div:has(> iframe[src*='prid=19043280'])",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": "div:has(> iframe[src*='prid=19031780'])",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": "[aria-labelledby='promo-header']",
                                 "type": "hide"
                             }
                         ]
@@ -4740,7 +4767,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "a68277763576ac92bfbbefa717bb78c0"
+            "hash": "85f1dc0d2a2bcd309d8683c058b7aa52"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -6032,8 +6059,7 @@
                             {
                                 "rule": "adserver.adtech.advertising.com/pubapi/3.0/1/",
                                 "domains": [
-                                    "collider.com",
-                                    "si.com"
+                                    "<all>"
                                 ]
                             }
                         ]
@@ -6786,6 +6812,7 @@
                             {
                                 "rule": "eccmp.com/sts/scripts/conversen-SDK.js",
                                 "domains": [
+                                    "citi.com",
                                     "pch.com"
                                 ]
                             }
@@ -8085,6 +8112,16 @@
                             }
                         ]
                     },
+                    "opecloud.com": {
+                        "rules": [
+                            {
+                                "rule": "opecloud.com/ope-asmi.js",
+                                "domains": [
+                                    "bild.de"
+                                ]
+                            }
+                        ]
+                    },
                     "openx.net": {
                         "rules": [
                             {
@@ -8370,6 +8407,12 @@
                                 "domains": [
                                     "signupgenius.com",
                                     "titantv.com"
+                                ]
+                            },
+                            {
+                                "rule": "a.pub.network/virtualpiano-net/pubfig.min.js",
+                                "domains": [
+                                    "virtualpiano.net"
                                 ]
                             }
                         ]
@@ -8862,6 +8905,16 @@
                             }
                         ]
                     },
+                    "tsyndicate.com": {
+                        "rules": [
+                            {
+                                "rule": "vacdn.tsyndicate.com",
+                                "domains": [
+                                    "pornhub.com"
+                                ]
+                            }
+                        ]
+                    },
                     "twitter.com": {
                         "rules": [
                             {
@@ -9124,6 +9177,22 @@
                             }
                         ]
                     },
+                    "scmp.com": {
+                        "rules": [
+                            {
+                                "rule": "profiles.ope.scmp.com/ope-asmi.js",
+                                "domains": [
+                                    "bild.de"
+                                ]
+                            },
+                            {
+                                "rule": "tagger.ope.scmp.com/ope-asmi.js",
+                                "domains": [
+                                    "bild.de"
+                                ]
+                            }
+                        ]
+                    },
                     "canadapost-postescanada.ca": {
                         "rules": [
                             {
@@ -9173,7 +9242,7 @@
                     "domain": "instructure.com"
                 }
             ],
-            "hash": "b5f1a24bc6fb5801f91ab2e6c5067ff4"
+            "hash": "896d7fc02c7f3f523fdf48e775ce30ef"
         },
         "trackingCookies1p": {
             "settings": {
@@ -9309,11 +9378,13 @@
             "state": "disabled",
             "hash": "728493ef7a1488e4781656d3f9db84aa"
         },
+        "webBrokenSiteForm": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
+        },
         "webCompat": {
             "exceptions": [
-                {
-                    "domain": "crocs.com"
-                },
                 {
                     "domain": "marvel.com"
                 },
@@ -9591,7 +9662,7 @@
                     }
                 ]
             },
-            "hash": "68c020008cb8344c77c40ba98f937ac7"
+            "hash": "d1b128e9ff49486fb7122c70fef0ff51"
         },
         "webViewBlobDownload": {
             "exceptions": [],
@@ -9624,6 +9695,11 @@
             "hash": "728493ef7a1488e4781656d3f9db84aa"
         },
         "windowsWaitlist": {
+            "exceptions": [],
+            "state": "disabled",
+            "hash": "728493ef7a1488e4781656d3f9db84aa"
+        },
+        "windowsWebviewFailures": {
             "exceptions": [],
             "state": "disabled",
             "hash": "728493ef7a1488e4781656d3f9db84aa"

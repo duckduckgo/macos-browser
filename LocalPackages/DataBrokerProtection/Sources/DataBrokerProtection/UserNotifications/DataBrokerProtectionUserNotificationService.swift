@@ -20,6 +20,7 @@ import Foundation
 import UserNotifications
 import Common
 import AppKit
+import os.log
 
 public enum DataBrokerProtectionNotificationCommand: String {
     case showDashboard = "databrokerprotection://show_dashboard"
@@ -76,7 +77,7 @@ public class DefaultDataBrokerProtectionUserNotificationService: NSObject, DataB
         if let days = days {
             let calendar = Calendar.current
             guard let date = calendar.date(byAdding: .day, value: days, to: Date()) else {
-                os_log("Notification scheduled for an invalid date", log: .dataBrokerProtection)
+                Logger.dataBrokerProtection.debug("Notification scheduled for an invalid date")
                 return
             }
             let components = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date)
@@ -89,9 +90,9 @@ public class DefaultDataBrokerProtectionUserNotificationService: NSObject, DataB
         userNotificationCenter.add(request) { error in
             if error == nil {
                 if days != nil {
-                    os_log("Notification scheduled", log: .dataBrokerProtection)
+                    Logger.dataBrokerProtection.debug("Notification scheduled")
                 } else {
-                    os_log("Notification sent", log: .dataBrokerProtection)
+                    Logger.dataBrokerProtection.debug("Notification sent")
                 }
             }
         }

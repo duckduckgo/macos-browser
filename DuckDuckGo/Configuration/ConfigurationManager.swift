@@ -23,6 +23,7 @@ import Configuration
 import Common
 import Networking
 import PixelKit
+import os.log
 
 final class ConfigurationManager {
 
@@ -81,7 +82,7 @@ final class ConfigurationManager {
     }
 
     func start() {
-        os_log("Starting configuration refresh timer", log: .config, type: .debug)
+        Logger.config.debug("Starting configuration refresh timer")
         timerCancellable = Timer.publish(every: Constants.refreshCheckIntervalSeconds, on: .main, in: .default)
             .autoconnect()
             .receive(on: Self.queue)
@@ -92,11 +93,6 @@ final class ConfigurationManager {
         Task {
             await refreshNow()
         }
-    }
-
-    func log() {
-        os_log("last update %{public}s", log: .config, type: .default, String(describing: lastUpdateTime))
-        os_log("last refresh check %{public}s", log: .config, type: .default, String(describing: lastRefreshCheckTime))
     }
 
     private func refreshNow(isDebug: Bool = false) async {
@@ -133,7 +129,9 @@ final class ConfigurationManager {
         await updateBloomFilterExclusionsTask.value
 
         ConfigurationStore.shared.log()
-        log()
+
+        Logger.config.info("last update \(String(describing: self.lastUpdateTime), privacy: .public)")
+        Logger.config.info("last refresh check \(String(describing: self.lastRefreshCheckTime), privacy: .public)")
     }
 
     private func fetchTrackerBlockingDependencies(isDebug: Bool) async -> Bool {
@@ -149,11 +147,7 @@ final class ConfigurationManager {
                 try await task.value
                 didFetchAnyTrackerBlockingDependencies = true
             } catch {
-                os_log("Failed to complete configuration update to %@: %@",
-                       log: .config,
-                       type: .error,
-                       configuration.rawValue,
-                       error.localizedDescription)
+                Logger.config.error("Failed to complete configuration update to \(configuration.rawValue): \(error.localizedDescription, privacy: .public)")
                 tryAgainSoon()
             }
         }
@@ -168,7 +162,7 @@ final class ConfigurationManager {
             return
         }
 
-        os_log("Failed to complete configuration update %@", log: .config, type: .error, error.localizedDescription)
+        Logger.config.error("Failed to complete configuration update \(error.localizedDescription, privacy: .public)")
         PixelKit.fire(DebugEvent(GeneralPixel.configurationFetchError(error: error)))
         tryAgainSoon()
     }
@@ -176,7 +170,7 @@ final class ConfigurationManager {
     @discardableResult
     public func refreshIfNeeded() -> Task<Void, Never>? {
         guard isReadyToRefresh else {
-            os_log("Configuration refresh is not needed at this time", log: .config, type: .debug)
+            Logger.config.debug("Configuration refresh is not needed at this time")
             return nil
         }
         return Task {

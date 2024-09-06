@@ -21,6 +21,7 @@ import Common
 import Foundation
 import Persistence
 import PixelKit
+import os.log
 
 protocol PrivacyFeaturesProtocol {
     var contentBlocking: AnyContentBlocking { get }
@@ -78,13 +79,13 @@ final class AppPrivacyFeatures: PrivacyFeaturesProtocol {
 
     convenience init(contentBlocking: AnyContentBlocking, database: CoreDataDatabase) {
         let bloomFilterDataURL = URL.sandboxApplicationSupportURL.appendingPathComponent("HttpsBloomFilter.bin")
-        let httpsUpgradeStore = AppHTTPSUpgradeStore(database: database, bloomFilterDataURL: bloomFilterDataURL, embeddedResources: Self.embeddedBloomFilterResources, errorEvents: Self.httpsUpgradeDebugEvents, log: .httpsUpgrade)
+        let httpsUpgradeStore = AppHTTPSUpgradeStore(database: database, bloomFilterDataURL: bloomFilterDataURL, embeddedResources: Self.embeddedBloomFilterResources, errorEvents: Self.httpsUpgradeDebugEvents, logger: Logger.httpsUpgrade)
         self.init(contentBlocking: contentBlocking, httpsUpgradeStore: httpsUpgradeStore)
     }
 
     init(contentBlocking: AnyContentBlocking, httpsUpgradeStore: HTTPSUpgradeStore) {
         self.contentBlocking = contentBlocking
-        self.httpsUpgrade = HTTPSUpgrade(store: httpsUpgradeStore, privacyManager: contentBlocking.privacyConfigurationManager, log: .httpsUpgrade)
+        self.httpsUpgrade = HTTPSUpgrade(store: httpsUpgradeStore, privacyManager: contentBlocking.privacyConfigurationManager, logger: Logger.httpsUpgrade)
     }
 
 }

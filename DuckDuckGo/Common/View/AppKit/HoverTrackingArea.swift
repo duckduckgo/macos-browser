@@ -59,7 +59,7 @@ final class HoverTrackingArea: NSTrackingArea {
     private var observers: [NSKeyValueObservation]?
 
     init(owner: some Hoverable) {
-        super.init(rect: .zero, options: [.mouseEnteredAndExited, .activeInKeyWindow, .enabledDuringMouseDrag, .inVisibleRect], owner: owner, userInfo: nil)
+        super.init(rect: .zero, options: [.mouseEnteredAndExited, .mouseMoved, .activeInKeyWindow, .inVisibleRect], owner: owner, userInfo: nil)
 
         observers = [
             owner.observe(\.backgroundColor) { [weak self] _, _ in self?.updateLayer() },
@@ -69,6 +69,7 @@ final class HoverTrackingArea: NSTrackingArea {
             owner.observe(\.backgroundInset) { [weak self] _, _ in self?.updateLayer() },
             (owner as? NSControl)?.observe(\.isEnabled) { [weak self] _, _ in self?.updateLayer(animated: false) },
             owner.observe(\.isMouseDown) { [weak self] _, _ in self?.mouseDownDidChange() },
+            owner.observe(\.isMouseOver, options: .new) { [weak self] _, c in self?.updateLayer(animated: !(c.newValue /* isMouseOver */ ?? false)) },
             owner.observe(\.window) { [weak self] _, _ in self?.viewWindowDidChange() },
         ].compactMap { $0 }
     }
@@ -105,13 +106,17 @@ final class HoverTrackingArea: NSTrackingArea {
 
     @objc func mouseEntered(_ event: NSEvent) {
         view?.isMouseOver = true
-        updateLayer(animated: false)
         view?.mouseEntered(with: event)
+    }
+
+    @objc func mouseMoved(_ event: NSEvent) {
+        if let view, !view.isMouseOver {
+            view.isMouseOver = true
+        }
     }
 
     @objc func mouseExited(_ event: NSEvent) {
         view?.isMouseOver = false
-        updateLayer(animated: true)
         view?.mouseExited(with: event)
     }
 
@@ -152,11 +157,11 @@ final class HoverTrackingArea: NSTrackingArea {
 
     @objc dynamic var isMouseDown: Bool { get }
 
+    @objc dynamic var isMouseOver: Bool { get set }
+
 }
 
 protocol Hoverable: NSView, HoverableProperties {
-
-    var isMouseOver: Bool { get set }
 
     func backgroundLayer(createIfNeeded: Bool) -> CALayer?
 

@@ -19,13 +19,14 @@
 import Cocoa
 import SwiftUI
 import Common
+import os.log
 
 final class UpdateNotificationPresenter {
 
     static let presentationTimeInterval: TimeInterval = 10
 
     func showUpdateNotification(icon: NSImage, text: String, buttonText: String? = nil, presentMultiline: Bool = false) {
-        os_log("Notification presented: \(text)", log: .updates)
+        Logger.updates.debug("Notification presented: \(text)")
 
         DispatchQueue.main.async {
             guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController ?? WindowControllersManager.shared.mainWindowControllers.last,

@@ -147,7 +147,30 @@ final class AddressBarTextEditor: NSTextView {
     // MARK: - Copy/Paste
 
     override func copy(_ sender: Any?) {
-        CopyHandler().copy(sender)
+        let selectedText = self.selectedText
+        guard !selectedText.isEmpty else {
+            super.copy(sender)
+            return
+        }
+
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(selectedText, forType: .string)
+
+        if let url = URL(trimmedAddressBarString: selectedText.trimmingWhitespace()) {
+            NSPasteboard.general.copy(url, withString: selectedText)
+        } else {
+            NSPasteboard.general.copy(selectedText)
+        }
+    }
+
+    override func cut(_ sender: Any?) {
+        guard !self.selectedText.isEmpty else {
+            super.cut(sender)
+            return
+        }
+
+        copy(sender)
+        self.delete(sender)
     }
 
     override func paste(_ sender: Any?) {

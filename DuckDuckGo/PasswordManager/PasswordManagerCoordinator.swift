@@ -21,6 +21,7 @@ import BrowserServicesKit
 import Combine
 import Common
 import PixelKit
+import os.log
 
 protocol PasswordManagerCoordinating: BrowserServicesKit.PasswordManager {
 
@@ -207,8 +208,8 @@ final class PasswordManagerCoordinator: PasswordManagerCoordinating {
                                  completion: @escaping (Error?) -> Void) {
         guard case let .connected(vault) = bitwardenManagement.status,
               let bitwardenCredential = BWCredential(from: credentials, vault: vault) else {
+            Logger.general.fault("Failed to store credentials: Bitwarden is not connected or bad credential")
             assertionFailure("Bitwarden is not connected or bad credential")
-            os_log("Failed to store credentials: Bitwarden is not connected or bad credential", type: .error)
             return
         }
 

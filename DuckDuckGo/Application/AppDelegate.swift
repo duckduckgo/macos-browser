@@ -39,6 +39,7 @@ import Subscription
 import NetworkProtectionIPC
 import DataBrokerProtection
 import RemoteMessaging
+import os.log
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
 
@@ -65,7 +66,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let fileStore: FileStore
 
 #if APPSTORE
-    private let crashCollection = CrashCollection(platform: .macOSAppStore, log: .default)
+    private let crashCollection = CrashCollection(platform: .macOSAppStore)
 #else
     private let crashReporter = CrashReporter()
 #endif
@@ -148,6 +149,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return firstLaunchDate >= Date.weekAgo
     }
 
+    @MainActor
     override init() {
         // will not add crash handlers and will fire pixel on applicationDidFinishLaunching if didCrashDuringCrashHandlersSetUp == true
         let didCrashDuringCrashHandlersSetUp = UserDefaultsWrapper(key: .didCrashDuringCrashHandlersSetUp, defaultValue: false)
@@ -164,7 +166,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             let encryptionKey = NSApplication.runType.requiresEnvironment ? try keyStore.readKey() : nil
             fileStore = EncryptedFileStore(encryptionKey: encryptionKey)
         } catch {
-            os_log("App Encryption Key could not be read: %s", "\(error)")
+            Logger.general.error("App Encryption Key could not be read: \(error.localizedDescription)")
             fileStore = EncryptedFileStore()
         }
 
@@ -545,7 +547,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             dataProvidersSource: syncDataProviders,
             errorEvents: SyncErrorHandler(),
             privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager,
-            log: OSLog.sync,
             environment: environment
         )
         syncService.initializeIfNeeded()
@@ -620,10 +621,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     return
                 }
                 if isLocked {
-                    os_log(.debug, log: .sync, "Screen is locked")
+                    Logger.sync.debug("Screen is locked")
                     syncService.scheduler.cancelSyncAndSuspendSyncQueue()
                 } else {
-                    os_log(.debug, log: .sync, "Screen is unlocked")
+                    Logger.sync.debug("Screen is unlocked")
                     syncService.scheduler.resumeSyncQueue()
                 }
             }

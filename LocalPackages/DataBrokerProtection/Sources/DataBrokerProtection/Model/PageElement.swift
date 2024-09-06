@@ -22,6 +22,8 @@ struct PageElement: Codable, Sendable {
     let selector: String
     let parent: ParentElement?
     let multiple: Bool?
+    let min: String?
+    let max: String?
 }
 
 struct ProfileMatch: Codable, Sendable {

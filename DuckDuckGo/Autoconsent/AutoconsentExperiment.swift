@@ -18,11 +18,12 @@
 
 import Foundation
 import Common
+import os.log
 
 enum AutoconsentFilterlistExperiment: String, CaseIterable {
     static var logic = AutoconsentExperimentLogic()
     static var cohort: AutoconsentFilterlistExperiment? {
-        os_log("🚧 requesting CPM cohort", log: .autoconsent, type: .debug)
+        Logger.autoconsent.debug("🚧 requesting CPM cohort")
         return logic.experimentCohort
     }
 
@@ -36,11 +37,11 @@ final internal class AutoconsentExperimentLogic {
            // if the stored cohort doesn't match, allocate a new one
            let cohort = AutoconsentFilterlistExperiment(rawValue: allocatedExperimentCohort)
         {
-            os_log("🚧 existing CPM cohort: %s", log: .autoconsent, type: .debug, String(describing: cohort.rawValue))
+            Logger.autoconsent.debug("🚧 existing CPM cohort: \(String(describing: cohort.rawValue))")
             return cohort
         }
         let cohort = AutoconsentFilterlistExperiment.allCases.randomElement()!
-        os_log("🚧 new CPM cohort: %s", log: .autoconsent, type: .debug, String(describing: cohort.rawValue))
+        Logger.autoconsent.debug("🚧 new CPM cohort: \(String(describing: cohort.rawValue))")
         allocatedExperimentCohort = cohort.rawValue
         return cohort
     }

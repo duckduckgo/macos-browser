@@ -19,6 +19,7 @@
 import Foundation
 import Common
 import BrowserServicesKit
+import os.log
 
 public protocol DataBrokerProtectionBackgroundActivityScheduler {
     func startScheduler()
@@ -51,9 +52,9 @@ public final class DefaultDataBrokerProtectionBackgroundActivityScheduler: DataB
         activity.schedule { completion in
 
             self.lastTriggerTimestamp = Date()
-            os_log("Scheduler running...", log: .dataBrokerProtection)
+            Logger.dataBrokerProtection.debug("Scheduler running...")
             self.delegate?.dataBrokerProtectionBackgroundActivitySchedulerDidTrigger(self) {
-                os_log("Scheduler finished...", log: .dataBrokerProtection)
+                Logger.dataBrokerProtection.debug("Scheduler finished...")
                 completion(.finished)
             }
         }

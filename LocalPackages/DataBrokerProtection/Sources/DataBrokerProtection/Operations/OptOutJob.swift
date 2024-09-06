@@ -20,6 +20,7 @@ import Foundation
 import WebKit
 import BrowserServicesKit
 import UserScript
+import os.log
 import Common
 
 final class OptOutJob: DataBrokerJob {
@@ -118,7 +119,7 @@ final class OptOutJob: DataBrokerJob {
 
     func executeNextStep() async {
         retriesCountOnError = 0 // We reset the retries on error when it is successful
-        os_log("OPTOUT Waiting %{public}f seconds...", log: .action, operationAwaitTime)
+        Logger.action.debug("OPTOUT Waiting \(self.operationAwaitTime, privacy: .public) seconds...")
         try? await Task.sleep(nanoseconds: UInt64(operationAwaitTime) * 1_000_000_000)
 
         if let action = actionsHandler?.nextAction(), self.shouldRunNextStep() {

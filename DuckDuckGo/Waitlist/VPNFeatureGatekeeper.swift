@@ -47,7 +47,6 @@ struct DefaultVPNFeatureGatekeeper: VPNFeatureGatekeeper {
     init(networkProtectionFeatureActivation: NetworkProtectionFeatureActivation = NetworkProtectionKeychainTokenStore(),
          vpnUninstaller: VPNUninstalling = VPNUninstaller(),
          defaults: UserDefaults = .netP,
-         log: OSLog = .networkProtection,
          subscriptionManager: SubscriptionManager) {
 
         self.networkProtectionFeatureActivation = networkProtectionFeatureActivation

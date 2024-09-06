@@ -19,6 +19,7 @@
 import Foundation
 import GRDB
 import Common
+import os.log
 
 enum DataBrokerProtectionDatabaseMigrationErrors: Error {
     case deleteOrphanedRecordFailed
@@ -324,7 +325,7 @@ final class DefaultDataBrokerProtectionDatabaseMigrationsProvider: DataBrokerPro
                 try database.execute(sql: sql, arguments: [violation.originRowID])
             }
         } catch {
-            os_log("Database error: error cleaning up foreign key violations, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("Database error: error cleaning up foreign key violations, error: \(error.localizedDescription, privacy: .public)")
         }
     }
 

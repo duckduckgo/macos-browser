@@ -21,6 +21,7 @@ import Foundation
 import Combine
 import History
 import PixelKit
+import os.log
 
 /**
  * The delegate callbacks are triggered for events related to unpinned tabs only.
@@ -154,7 +155,7 @@ final class TabCollectionViewModel: NSObject {
 
     func setUpLazyLoadingIfNeeded() {
         guard !isTabLazyLoadingRequested else {
-            os_log("Lazy loading already requested in this session, skipping.", log: .tabLazyLoading, type: .debug)
+            Logger.tabLazyLoading.debug("Lazy loading already requested in this session, skipping.")
             return
         }
 
@@ -164,7 +165,7 @@ final class TabCollectionViewModel: NSObject {
         tabLazyLoader?.lazyLoadingDidFinishPublisher
             .sink { [weak self] _ in
                 self?.tabLazyLoader = nil
-                os_log("Disposed of Tab Lazy Loader", log: .tabLazyLoading, type: .debug)
+                Logger.tabLazyLoading.debug("Disposed of Tab Lazy Loader")
             }
             .store(in: &cancellables)
 
@@ -229,7 +230,7 @@ final class TabCollectionViewModel: NSObject {
     func selectNext() {
         guard changesEnabled else { return }
         guard allTabsCount > 0 else {
-            os_log("TabCollectionViewModel: No tabs for selection", type: .error)
+            Logger.tabLazyLoading.error("TabCollectionViewModel: No tabs for selection")
             return
         }
 
@@ -243,7 +244,7 @@ final class TabCollectionViewModel: NSObject {
     func selectPrevious() {
         guard changesEnabled else { return }
         guard allTabsCount > 0 else {
-            os_log("TabCollectionViewModel: No tabs for selection", type: .error)
+            Logger.tabLazyLoading.debug("TabCollectionViewModel: No tabs for selection")
             return
         }
 
@@ -257,7 +258,7 @@ final class TabCollectionViewModel: NSObject {
     @discardableResult private func selectUnpinnedTab(at index: Int, forceChange: Bool = false) -> Bool {
         guard changesEnabled || forceChange else { return false }
         guard index >= 0, index < tabCollection.tabs.count else {
-            os_log("TabCollectionViewModel: Index out of bounds", type: .error)
+            Logger.tabLazyLoading.error("TabCollectionViewModel: Index out of bounds")
             selectionIndex = nil
             return false
         }
@@ -272,7 +273,7 @@ final class TabCollectionViewModel: NSObject {
         guard let pinnedTabsCollection = pinnedTabsCollection else { return false }
 
         guard index >= 0, index < pinnedTabsCollection.tabs.count else {
-            os_log("TabCollectionViewModel: Index out of bounds", type: .error)
+            Logger.tabLazyLoading.error("TabCollectionViewModel: Index out of bounds")
             selectionIndex = nil
             return false
         }
@@ -330,7 +331,7 @@ final class TabCollectionViewModel: NSObject {
     func insert(_ tab: Tab, at index: TabIndex, selected: Bool = true) {
         guard changesEnabled else { return }
         guard let tabCollection = tabCollection(for: index) else {
-            os_log("TabCollectionViewModel: Tab collection for index %s not found", type: .error, String(describing: index))
+            Logger.tabLazyLoading.error("TabCollectionViewModel: Tab collection for index \(String(describing: index)) not found")
             return
         }
 
@@ -351,7 +352,7 @@ final class TabCollectionViewModel: NSObject {
         guard changesEnabled else { return }
         guard let parentTab = parentTab ?? tab.parentTab,
               let parentTabIndex = indexInAllTabs(of: parentTab) else {
-            os_log("TabCollection: No parent tab", type: .error)
+            Logger.tabLazyLoading.error("TabCollection: No parent tab")
             return
         }
 
@@ -450,7 +451,7 @@ final class TabCollectionViewModel: NSObject {
         }
 
         guard let selectionIndex = selectionIndex else {
-            os_log("TabCollection: No tab selected", type: .error)
+            Logger.tabLazyLoading.error("TabCollection: No tab selected")
             notifyDelegate()
             return
         }
@@ -547,7 +548,7 @@ final class TabCollectionViewModel: NSObject {
     func removeTabsAndAppendNew(at indexSet: IndexSet, forceChange: Bool = false) {
         guard !indexSet.isEmpty, changesEnabled || forceChange else { return }
         guard let selectionIndex = selectionIndex?.item else {
-            os_log("TabCollection: No tab selected", type: .error)
+            Logger.tabLazyLoading.error("TabCollection: No tab selected")
             return
         }
 
@@ -573,7 +574,7 @@ final class TabCollectionViewModel: NSObject {
         guard changesEnabled || forceChange else { return }
 
         guard let selectionIndex = selectionIndex else {
-            os_log("TabCollectionViewModel: No tab selected", type: .error)
+            Logger.tabLazyLoading.error("TabCollectionViewModel: No tab selected")
             return
         }
 
@@ -586,7 +587,7 @@ final class TabCollectionViewModel: NSObject {
         guard changesEnabled else { return }
 
         guard let tab = tab(at: tabIndex) else {
-            os_log("TabCollectionViewModel: Index out of bounds", type: .error)
+            Logger.tabLazyLoading.error("TabCollectionViewModel: Index out of bounds")
             return
         }
 
@@ -606,7 +607,7 @@ final class TabCollectionViewModel: NSObject {
         guard let pinnedTabsCollection = pinnedTabsCollection else { return }
 
         guard index >= 0, index < tabCollection.tabs.count else {
-            os_log("TabCollectionViewModel: Index out of bounds", type: .error)
+            Logger.tabLazyLoading.error("TabCollectionViewModel: Index out of bounds")
             return
         }
 
@@ -625,7 +626,7 @@ final class TabCollectionViewModel: NSObject {
         }
 
         guard let tab = pinnedTabsManager?.unpinTab(at: index, published: false) else {
-            os_log("Unable to unpin a tab", type: .error)
+            Logger.tabLazyLoading.error("Unable to unpin a tab")
             return
         }
 
@@ -658,14 +659,14 @@ final class TabCollectionViewModel: NSObject {
     func replaceTab(at index: TabIndex, with tab: Tab, forceChange: Bool = false) {
         guard changesEnabled || forceChange else { return }
         guard let tabCollection = tabCollection(for: index) else {
-            os_log("TabCollectionViewModel: Tab collection for index %s not found", type: .error, String(describing: index))
+            Logger.tabLazyLoading.error("TabCollectionViewModel: Tab collection for index \(String(describing: index)) not found")
             return
         }
 
         tabCollection.replaceTab(at: index.item, with: tab)
 
         guard let selectionIndex = selectionIndex else {
-            os_log("TabCollectionViewModel: No tab selected", type: .error)
+            Logger.tabLazyLoading.error("TabCollectionViewModel: No tab selected")
             return
         }
         select(at: selectionIndex, forceChange: forceChange)

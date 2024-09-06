@@ -18,6 +18,7 @@
 
 import Foundation
 import Common
+import os.log
 
 struct MapperToUI {
 
@@ -259,10 +260,10 @@ struct MapperToUI {
             encoder.outputFormatting = .prettyPrinted
             let jsonData = try encoder.encode(metadataUI)
             if let jsonString = String(data: jsonData, encoding: .utf8) {
-                os_log("Metadata: %{public}s", log: OSLog.default, type: .info, jsonString)
+                Logger.dataBrokerProtection.debug("Metadata: \(jsonString, privacy: .public)")
             }
         } catch {
-            os_log("Error encoding struct to JSON: %{public}@", log: OSLog.default, type: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("Error encoding struct to JSON: \(error.localizedDescription, privacy: .public)")
         }
 #endif
 

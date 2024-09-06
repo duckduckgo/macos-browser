@@ -18,6 +18,7 @@
 
 import Foundation
 import Common
+import os.log
 
 typealias CaptchaTransactionId = String
 typealias CaptchaResolveData = String
@@ -183,7 +184,7 @@ struct CaptchaService: CaptchaServiceProtocol {
             throw CaptchaServiceError.cantGenerateCaptchaServiceURL
         }
 
-        os_log("Submitting captcha request ...", log: .service)
+        Logger.service.debug("Submitting captcha request ...")
         var request = URLRequest(url: url)
 
         guard let authHeader = authenticationManager.getAuthHeader() else {
@@ -232,13 +233,13 @@ struct CaptchaService: CaptchaServiceProtocol {
         switch captchaResolveResult.message {
         case .ready:
             if let data = captchaResolveResult.data {
-                os_log("Captcha ready ...", log: .service)
+                Logger.service.debug("Captcha ready ...")
                 return data
             } else {
                 throw CaptchaServiceError.nilDataWhenFetchingCaptchaResult
             }
         case .notReady:
-            os_log("Captcha not ready ...", log: .service)
+            Logger.service.debug("Captcha not ready ...")
             if retries == 0 {
                 throw CaptchaServiceError.timedOutWhenFetchingCaptchaResult
             }
@@ -249,10 +250,10 @@ struct CaptchaService: CaptchaServiceProtocol {
                                                        attemptId: attemptId,
                                                        shouldRunNextStep: shouldRunNextStep)
         case .failure:
-            os_log("Captcha failure ...", log: .service)
+            Logger.service.debug("Captcha failure ...")
             throw CaptchaServiceError.failureWhenFetchingCaptchaResult
         case .invalidRequest:
-            os_log("Captcha invalid request ...", log: .service)
+            Logger.service.debug("Captcha invalid request ...")
             throw CaptchaServiceError.invalidRequestWhenFetchingCaptchaResult
         }
     }
