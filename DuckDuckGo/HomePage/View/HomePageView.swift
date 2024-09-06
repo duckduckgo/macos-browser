@@ -33,6 +33,7 @@ extension HomePage.Views {
         @EnvironmentObject var continueSetUpModel: HomePage.Models.ContinueSetUpModel
         @EnvironmentObject var favoritesModel: HomePage.Models.FavoritesModel
         @EnvironmentObject var activeRemoteMessageModel: ActiveRemoteMessageModel
+        var freemiumDBPPromotionViewCoordinator: any FreemiumDBPPromotionViewCoordinator
 
         @State private var isHomeContentPopoverVisible = false
 
@@ -65,9 +66,7 @@ extension HomePage.Views {
                         Group {
                             remoteMessage()
 
-                            PromotionView()
-                                .padding(.bottom, 16)
-                                .visibility(model.isHomePagePromotionVisible ? .visible : .gone)
+                            freemiumPromotionView()
 
                             if includingContinueSetUpCards {
                                 ContinueSetUpView()
@@ -132,6 +131,13 @@ extension HomePage.Views {
             } else {
                 EmptyView()
             }
+        }
+
+        @ViewBuilder
+        func freemiumPromotionView() -> some View {
+           PromotionView(viewModel: freemiumDBPPromotionViewCoordinator.viewModel)
+                .padding(.bottom, 16)
+                .visibility(freemiumDBPPromotionViewCoordinator.isHomePagePromotionVisible ? .visible : .gone)
         }
 
         struct HomeContentButtonView: View {

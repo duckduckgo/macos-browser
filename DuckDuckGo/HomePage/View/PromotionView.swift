@@ -26,66 +26,93 @@ extension HomePage.Views {
     /// A `PromotionView` is intended to be displayed on the new tab home page, and used to promote a feature, product etc
     struct PromotionView: View {
 
-        @EnvironmentObject var viewModel: PromotionViewModel
+        var viewModel: PromotionViewModel
 
         @State var isHovering = false
 
         var body: some View {
-            HStack(spacing: 8) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 12)
+                    .foregroundColor(Color.blackWhite3)
+                    .cornerRadius(8)
+                VStack(spacing: 12) {
+                    HStack(spacing: 8) {
+                        image
 
-                imageView
+                        VStack(alignment: .leading, spacing: 8) {
+                            if let titleText = viewModel.title {
+                                title
+                            }
+                            subtitle
+                        }
+                        .padding(.leading, 0)
 
-                descriptionView
+                        Spacer(minLength: 4)
 
-                proceedButtonView
+                        button
 
-                closeButton
+                    }
+                    .padding(.trailing, 16)
+                }
+                .padding(.leading, 8)
+                .padding(.trailing, 16)
+                .padding(.vertical, 16)
 
+                HStack {
+                    Spacer()
+                    VStack {
+                        closeButton
+                        Spacer()
+                    }
+                }
             }
-            .padding([.horizontal], 24)
-            .padding([.vertical], 14)
-            .background(Color.blackWhite3)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .padding(.horizontal, 2)
             .onHover { isHovering in
                 self.isHovering = isHovering
             }
         }
 
-        private var imageView: some View {
-            Image(viewModel.image)
-                .resizable()
-                .frame(width: 48, height: 48)
-        }
-
-        private var descriptionView: some View {
-            Text(viewModel.description)
-                .font(.system(size: 13))
-        }
-
-        private var proceedButtonView: some View {
-            Button(action: viewModel.proceedAction) {
-                Text(viewModel.proceedButtonText)
-                    .padding([.horizontal], 16)
-                    .padding([.vertical], 5)
-                    .font(.system(size: 13).bold())
-
-            }
-                .buttonStyle(DefaultActionButtonStyle(enabled: true))
-                .cornerRadius(8)
-                .padding(.horizontal, 8)
-        }
-
         private var closeButton: some View {
-            CloseButton(icon: .close) {
+            HomePage.Views.CloseButton(icon: .close) {
                 viewModel.closeAction()
             }
             .visibility(isHovering ? .visible : .invisible)
-            .padding(.trailing, 8)
+            .padding(6)
+        }
+
+        private var image: some View {
+            Group {
+                Image(viewModel.image)
+                    .resizable()
+                    .frame(width: 48, height: 48)
+            }
+        }
+
+        private var title: some View {
+            Text(viewModel.title!)
+                .font(.system(size: 13).bold())
+       }
+
+        @ViewBuilder
+        private var subtitle: some View {
+            if #available(macOS 12.0, *), let attributed = try? AttributedString(markdown: viewModel.subtitle) {
+                Text(attributed)
+            } else {
+                Text(viewModel.subtitle)
+            }
+        }
+
+        /// Single button is always "standard" (i.e. not prominent/blue) and uses large control size.
+        private var button: some View {
+            Group {
+                Button(action: viewModel.proceedAction) {
+                    Text(viewModel.proceedButtonText)
+                }
+            }
         }
     }
 }
 
 #Preview {
-    return HomePage.Views.PromotionView()
-        .environmentObject(PromotionViewModel.freemiumPIRPromotion(proceedAction: {}, closeAction: {}))
+    return HomePage.Views.PromotionView(viewModel: PromotionViewModel.freemiumPIRPromotion(proceedAction: {}, closeAction: {}))
 }
