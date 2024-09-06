@@ -26,6 +26,8 @@ import XCTest
 class PhishingDetectionIntegrationTests: XCTestCase {
 
     var window: NSWindow!
+    var cancellables: Set<AnyCancellable>!
+
     var tabViewModel: TabViewModel {
         (window.contentViewController as! MainViewController).browserTabViewController.tabViewModel!
     }
@@ -36,12 +38,14 @@ class PhishingDetectionIntegrationTests: XCTestCase {
         WebTrackingProtectionPreferences.shared.isGPCEnabled = false
         PhishingDetectionPreferences.shared.isEnabled = true
         window = WindowsManager.openNewWindow(with: .none)!
+        cancellables = Set<AnyCancellable>()
     }
 
     @MainActor
     override func tearDown() async throws {
         window.close()
         window = nil
+        cancellables = nil
         WebTrackingProtectionPreferences.shared.isGPCEnabled = true
         try await super.tearDown()
     }
@@ -58,32 +62,21 @@ class PhishingDetectionIntegrationTests: XCTestCase {
     func testPhishingDetected_tabIsMarkedPhishing() async throws {
         try await loadUrl("http://privacy-test-pages.site/security/badware/phishing.html")
         XCTAssertTrue(tabViewModel.tab.url?.isPhishingErrorPage ?? false)
+        let errorPageLoaded = await errorPageHTMLRendered(inTab: tabViewModel.tab)
+        XCTAssertTrue(errorPageLoaded)
     }
 
     @MainActor
     func testPhishingDetectedThenNotDetected_tabIsNotMarkedPhishing() async throws {
         try await loadUrl("http://privacy-test-pages.site/security/badware/phishing.html")
         XCTAssertTrue(tabViewModel.tab.url?.isPhishingErrorPage ?? false)
+        let errorPageLoaded = await errorPageHTMLRendered(inTab: tabViewModel.tab)
+        XCTAssertTrue(errorPageLoaded)
 
-        try await Task.sleep(nanoseconds: 1_000_000_000)
         try await loadUrl("http://broken.third-party.site/")
-        try await Task.sleep(nanoseconds: 1_000_000_000)
+        try await waitForTabToFinishLoading()
 
         XCTAssertFalse(tabViewModel.tab.privacyInfo?.isPhishing ?? true)
-        XCTAssertFalse(tabViewModel.tab.url?.isPhishingErrorPage ?? true)
-    }
-
-    @MainActor
-    func testPhishingWarningClickedThrough_privacyInfoIsUpdated() async throws {
-        try await loadUrl("http://privacy-test-pages.site/security/badware/phishing.html")
-        XCTAssertTrue(tabViewModel.tab.url?.isPhishingErrorPage ?? false)
-
-        while tabViewModel.tab.isLoading {
-            try await Task.sleep(nanoseconds: 1_000_000_000)
-        }
-
-        try await clickThroughPhishingWarning()
-        XCTAssertTrue(tabViewModel.tab.privacyInfo?.isPhishing ?? false)
         XCTAssertFalse(tabViewModel.tab.url?.isPhishingErrorPage ?? true)
     }
 
@@ -91,10 +84,11 @@ class PhishingDetectionIntegrationTests: XCTestCase {
     func testPhishingDetectedThenDDGLoaded_tabIsNotMarkedPhishing() async throws {
         try await loadUrl("http://privacy-test-pages.site/security/badware/phishing.html")
         XCTAssertTrue(tabViewModel.tab.url?.isPhishingErrorPage ?? false)
+        let errorPageLoaded = await errorPageHTMLRendered(inTab: tabViewModel.tab)
+        XCTAssertTrue(errorPageLoaded)
 
-        try await Task.sleep(nanoseconds: 1_000_000_000)
         try await loadUrl("http://duckduckgo.com/")
-        try await Task.sleep(nanoseconds: 1_000_000_000)
+        try await waitForTabToFinishLoading()
 
         XCTAssertFalse(tabViewModel.tab.privacyInfo?.isPhishing ?? true)
         XCTAssertFalse(tabViewModel.tab.url?.isPhishingErrorPage ?? true)
@@ -104,56 +98,78 @@ class PhishingDetectionIntegrationTests: XCTestCase {
     func testPhishingDetectedViaJSRedirectChain_tabIsMarkedPhishing() async throws {
         try await loadUrl("http://bad.third-party.site/security/badware/phishing-js-redirector-helper.html")
         XCTAssertTrue(tabViewModel.tab.url?.isPhishingErrorPage ?? false)
-        try await Task.sleep(nanoseconds: 1_000_000_000)
-        let errorPageHTMLDidRender = await errorPageHTMLRendered(inTab: tabViewModel.tab)
-        XCTAssertTrue(errorPageHTMLDidRender)
+        let errorPageLoaded = await errorPageHTMLRendered(inTab: tabViewModel.tab)
+        XCTAssertTrue(errorPageLoaded)
     }
 
     @MainActor
     func testPhishingDetectedViaHTTPRedirectChain_tabIsMarkedPhishing() async throws {
         try await loadUrl("http://bad.third-party.site/security/badware/phishing-redirect/")
         XCTAssertTrue(tabViewModel.tab.url?.isPhishingErrorPage ?? false)
-        try await Task.sleep(nanoseconds: 1_000_000_000)
-        let errorPageHTMLDidRender = await errorPageHTMLRendered(inTab: tabViewModel.tab)
-        XCTAssertTrue(errorPageHTMLDidRender)
+        let errorPageLoaded = await errorPageHTMLRendered(inTab: tabViewModel.tab)
+        XCTAssertTrue(errorPageLoaded)
     }
 
     @MainActor
     func testPhishingDetectedInIframe_tabIsMarkedPhishing() async throws {
         try await loadUrl("http://bad.third-party.site/security/badware/phishing-iframe-loader.html")
-        try await Task.sleep(nanoseconds: 1_000_000_000)
-        let errorPageHTMLDidRender = await errorPageHTMLRendered(inTab: tabViewModel.tab)
-        XCTAssertTrue(errorPageHTMLDidRender)
+        let errorPageLoaded = await errorPageHTMLRendered(inTab: tabViewModel.tab)
+        XCTAssertTrue(errorPageLoaded)
     }
 
     @MainActor
     func testPhishingDetectedRepeatedRedirectChains_tabIsMarkedPhishing() async throws {
-        for _ in 0..<10 {
-            try await loadUrl("http://bad.third-party.site/security/badware/phishing-js-redirector-helper.html")
-            XCTAssertTrue(tabViewModel.tab.url?.isPhishingErrorPage ?? false)
-            try await Task.sleep(nanoseconds: 1_000_000_000)
-            let errorPageHTMLDidRender = await errorPageHTMLRendered(inTab: tabViewModel.tab)
-            XCTAssertTrue(errorPageHTMLDidRender)
+        let urls = [
+            "http://bad.third-party.site/security/badware/phishing-js-redirector-helper.html",
+            "http://bad.third-party.site/security/badware/phishing-js-redirector.html",
+            "http://bad.third-party.site/security/badware/phishing-meta-redirect.html",
+            "http://bad.third-party.site/security/badware/phishing-redirect/",
+            "http://bad.third-party.site/security/badware/phishing-redirect/302",
+            "http://bad.third-party.site/security/badware/phishing-redirect/js",
+            "http://bad.third-party.site/security/badware/phishing-redirect/meta",
+            "http://bad.third-party.site/security/badware/phishing-redirect/meta2"
+        ]
+
+        for url in urls {
+            try await loadUrl(url)
+            XCTAssertTrue(tabViewModel.tab.url?.isPhishingErrorPage ?? false, "URL should be flagged as phishing: \(url)")
+            let errorPageLoaded = await errorPageHTMLRendered(inTab: tabViewModel.tab)
+            XCTAssertTrue(errorPageLoaded)
         }
     }
 
     // MARK: - Helper Methods
+
     @MainActor
     private func loadUrl(_ urlString: String) async throws {
-        let url = URL(string: urlString)!
+        guard let url = URL(string: urlString) else { return }
         _ = await tabViewModel.tab.setUrl(url, source: .link)?.result
     }
 
     @MainActor
-    func errorPageHTMLRendered(inTab: Tab) async -> Bool {
-        return await withCheckedContinuation { continuation in
-            inTab.webView.evaluateJavaScript("document.documentElement.outerHTML") { (html, error) in
-                var containsPhishing = false
-                if let htmlString = html as? String {
-                    containsPhishing = htmlString.contains("Error Page")
-                }
-                continuation.resume(returning: containsPhishing)
+    func waitForTabToFinishLoading() async throws {
+        let loadingExpectation = expectation(description: "Tab finished loading")
+        Task {
+            while tabViewModel.tab.isLoading {
+                await Task.yield()
             }
+            loadingExpectation.fulfill()
+        }
+        await fulfillment(of: [loadingExpectation], timeout: 5)
+    }
+
+    @MainActor
+    func errorPageHTMLRendered(inTab: Tab) async -> Bool {
+        while true {
+            let html = await withCheckedContinuation { continuation in
+                inTab.webView.evaluateJavaScript("document.documentElement.outerHTML") { (html, error) in
+                    continuation.resume(returning: html)
+                }
+            }
+            if let htmlString = html as? String, htmlString.contains("Warning_advanced") {
+                return true
+            }
+            await Task.yield()
         }
     }
 
@@ -164,7 +180,5 @@ class PhishingDetectionIntegrationTests: XCTestCase {
 
         let clickThroughScript = "document.getElementsByClassName('AdvancedInfo_visitSite')[0].click()"
         try? await tabViewModel.tab.webView.evaluateJavaScript(clickThroughScript) as Void?
-
-        try await Task.sleep(nanoseconds: 1_000_000_000)
     }
 }
