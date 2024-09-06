@@ -21,6 +21,7 @@ import BrowserServicesKit
 import DataBrokerProtection
 import LoginItems
 import Common
+import Freemium
 
 public final class DataBrokerProtectionManager {
 
@@ -30,8 +31,16 @@ public final class DataBrokerProtectionManager {
     private let authenticationManager: DataBrokerProtectionAuthenticationManaging
     private let fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker()
 
+    private lazy var freemiumDBPFirstProfileSavedNotifier: FreemiumDBPFirstProfileSavedNotifier = {
+        let freemiumPIRUserStateManager = DefaultFreemiumPIRUserStateManager(userDefaults: .dbp)
+        let accountManager = Application.appDelegate.subscriptionManager.accountManager
+        let freemiumDBPFirstProfileSavedNotifier = FreemiumDBPFirstProfileSavedNotifier(freemiumPIRUserStateManager: freemiumPIRUserStateManager,
+                                                                                        accountManager: accountManager)
+        return freemiumDBPFirstProfileSavedNotifier
+    }()
+
     lazy var dataManager: DataBrokerProtectionDataManager = {
-        let dataManager = DataBrokerProtectionDataManager(pixelHandler: pixelHandler, fakeBrokerFlag: fakeBrokerFlag)
+        let dataManager = DataBrokerProtectionDataManager(profileSavedNotifier: freemiumDBPFirstProfileSavedNotifier, pixelHandler: pixelHandler, fakeBrokerFlag: fakeBrokerFlag)
         dataManager.delegate = self
         return dataManager
     }()
