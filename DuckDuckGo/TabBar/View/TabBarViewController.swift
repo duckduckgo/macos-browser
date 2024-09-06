@@ -969,6 +969,11 @@ extension TabBarViewController: NSCollectionViewDelegate {
         // allow dropping URLs or files
         guard draggingInfo.draggingPasteboard.url == nil else { return .copy }
 
+        // Check if the pasteboard contains string data
+        if draggingInfo.draggingPasteboard.availableType(from: [.string]) != nil {
+            return .copy
+        }
+
         // dragging a tab
         guard case .private = draggingInfo.draggingSourceOperationMask,
               draggingInfo.draggingPasteboard.types == [TabBarViewItemPasteboardWriter.utiInternalType] else { return .none }
@@ -987,6 +992,13 @@ extension TabBarViewController: NSCollectionViewDelegate {
                                           at: .unpinned(newIndex),
                                           selected: true)
 
+            return true
+        } else if let string = draggingInfo.draggingPasteboard.string(forType: .string),
+                    let url = URL.makeSearchUrl(from: string),
+                    let index = tabCollectionViewModel.selectionIndex {
+            let tab = Tab(content: .url(url, credential: nil, source: .reload), title: "\(string) at DuckDuckGo", shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
+            tabCollectionViewModel.replaceTab(at: index, with: tab, forceChange: true)
+            collectionView.reloadData()
             return true
         }
 
