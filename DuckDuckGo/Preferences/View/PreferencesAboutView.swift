@@ -242,7 +242,7 @@ extension Preferences {
                     model.checkForUpdate()
                 }
                 .buttonStyle(UpdateButtonStyle(enabled: true))
-            case .updateCycle(let progress):
+            case .updateCycle:
                 if isNewVersionAvailable {
                     Button(UserText.restartToUpdate) {
                         model.restartToUpdate()
