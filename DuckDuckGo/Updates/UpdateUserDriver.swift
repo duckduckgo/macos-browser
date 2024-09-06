@@ -55,25 +55,29 @@ enum UpdateCycleProgress {
 }
 
 final class UpdateUserDriver: NSObject, SPUUserDriver {
+    enum Checkpoint: Equatable {
+        case download
+        case restart
+    }
+
     private var internalUserDecider: InternalUserDecider
-    private var deferInstallation: Bool
+    private var checkpoint: Checkpoint
+    private var onResuming: () -> Void = {}
 
     private var bytesToDownload: UInt64 = 0
     private var bytesDownloaded: UInt64 = 0
-
-    private var onManualInstall: () -> Void = {}
 
     private let subject = CurrentValueSubject<UpdateCycleProgress, Never>(.updateCycleNotStarted)
     public lazy var updateProgressPublisher = subject.eraseToAnyPublisher()
 
     init(internalUserDecider: InternalUserDecider,
-         deferInstallation: Bool) {
+         areAutomaticUpdatesEnabled: Bool) {
         self.internalUserDecider = internalUserDecider
-        self.deferInstallation = deferInstallation
+        self.checkpoint = areAutomaticUpdatesEnabled ? .restart : .download
     }
 
-    func install() {
-        onManualInstall()
+    func resume() {
+        onResuming()
     }
 
     func show(_ request: SPUUpdatePermissionRequest) async -> SUUpdatePermissionResponse {
@@ -89,8 +93,17 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         subject.send(.updateCycleDidStart)
     }
 
-    func showUpdateFound(with appcastItem: SUAppcastItem, state: SPUUserUpdateState) async -> SPUUserUpdateChoice {
-        appcastItem.isInformationOnlyUpdate ? .dismiss : .install
+    func showUpdateFound(with appcastItem: SUAppcastItem, state: SPUUserUpdateState, reply: @escaping (SPUUserUpdateChoice) -> Void) {
+        if appcastItem.isInformationOnlyUpdate {
+            reply(.dismiss)
+        }
+
+        if checkpoint == .download {
+            onResuming = { reply(.install) }
+            subject.send(.updateCycleDone)
+        } else {
+            reply(.install)
+        }
     }
 
     func showUpdateReleaseNotes(with downloadData: SPUDownloadData) {
@@ -135,8 +148,8 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     }
 
     func showReady(toInstallAndRelaunch reply: @escaping (SPUUserUpdateChoice) -> Void) {
-        if deferInstallation {
-            onManualInstall = { reply(.install) }
+        if checkpoint == .restart {
+            onResuming = { reply(.install) }
         } else {
             reply(.install)
         }

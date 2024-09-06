@@ -81,10 +81,6 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
                 latestUpdate = nil
             }
             showUpdateNotificationIfNeeded()
-
-            if updateProgress.isDone {
-                updateCheckResult = nil
-            }
         }
     }
 
@@ -143,7 +139,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     private func configureUpdater() throws {
         // The default configuration of Sparkle updates is in Info.plist
         userDriver = UpdateUserDriver(internalUserDecider: internalUserDecider,
-                                      deferInstallation: !areAutomaticUpdatesEnabled)
+                                      areAutomaticUpdatesEnabled: areAutomaticUpdatesEnabled)
         updater = SPUUpdater(hostBundle: Bundle.main, applicationBundle: Bundle.main, userDriver: userDriver, delegate: self)
 
         if updater.automaticallyDownloadsUpdates != areAutomaticUpdatesEnabled {
@@ -170,7 +166,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
             case .regular:
                 notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: UserText.updateAvailableNotification, presentMultiline: true)
             }
-            isUpdateAvailableToInstall = !latestUpdate.isInstalled
+            isUpdateAvailableToInstall = true
         } else {
             isUpdateAvailableToInstall = false
         }
@@ -182,7 +178,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
 
     @objc func runUpdate() {
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidRunUpdate))
-        userDriver.install()
+        userDriver.resume()
     }
 
 }
