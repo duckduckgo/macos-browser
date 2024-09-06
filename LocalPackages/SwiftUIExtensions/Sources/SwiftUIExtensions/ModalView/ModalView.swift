@@ -91,6 +91,8 @@ public extension ModalView {
         // To test: comment this line, and make the alert come up as a standalone
         // modal alert (not as a sheet).
         //
+        // We'll just let ARC destroy the window once it's no longer referenced.
+        //
         window.isReleasedWhenClosed = false
 
         modalWindow = window
