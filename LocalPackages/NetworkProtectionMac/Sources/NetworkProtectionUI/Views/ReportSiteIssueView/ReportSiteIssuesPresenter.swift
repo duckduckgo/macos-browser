@@ -36,6 +36,10 @@ public extension UserDefaults {
             set(newValue, forKey: vpnReportSiteIssuesDontAskAgainKey)
         }
     }
+
+    func resetVPNReportSiteIssuesDontAskAgain() {
+        removeObject(forKey: vpnReportSiteIssuesDontAskAgainKey)
+    }
 }
 
 public final class ReportSiteIssuesPresenter {
