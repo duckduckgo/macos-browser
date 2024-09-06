@@ -31,14 +31,15 @@ public struct ReportSiteIssueAlert {
     }
 
     public func askUserToReportIssues(withDomain domain: String, in parentWindow: NSWindow?) async {
+        let reportIssuesView = ReportSiteIssuesView(domain: domain) { dismiss in
 
-        let reportIssuesView = ReportSiteIssuesView(title: "Report", buttonsState: .expanded, domain: domain, cancelActionTitle: "Cancel", cancelAction: { dismiss in
-
-            dismiss()
-        }, defaultActionTitle: "OK") { dismiss in
             let pixel: SiteTroubleshootingPixel = .reportIssues(domain: domain)
             pixelKit?.fire(pixel)
 
+            dismiss()
+        } cancelAction: { dismiss in
+            dismiss()
+        } dontShowAgainAction: { dismiss in
             dismiss()
         }
 

@@ -21,23 +21,18 @@ import SwiftUI
 import SwiftUIExtensions
 
 struct ReportSiteIssuesView: ModalView {
-    enum ButtonsState {
-        case compressed
-        case expanded
-    }
-
-    let title: String
-    let buttonsState: ButtonsState
-    @Environment(\.dismiss) private var dismiss
 
     let domain: String
-    let cancelActionTitle: String
-    let cancelAction: @MainActor (_ dismiss: () -> Void) -> Void
+    private let title = "Report"
+    @Environment(\.dismiss) private var dismiss
 
-    let defaultActionTitle: String
-    @State
-    private var isDefaultActionDisabled = true
+    private let cancelActionTitle = "Not Now"
+    private let defaultActionTitle = "Report"
+    private let dontShowAgainTitle = "Don't ask again"
+
     let defaultAction: @MainActor (_ dismiss: () -> Void) -> Void
+    let cancelAction: @MainActor (_ dismiss: () -> Void) -> Void
+    let dontShowAgainAction: @MainActor (_ dismiss: () -> Void) -> Void
 
     var body: some View {
         Dialog {
@@ -62,17 +57,17 @@ struct ReportSiteIssuesView: ModalView {
                 .multilineTextAlignment(.center)
                 .multilineText()
         } buttons: {
-            Button("Don't Ask Again") {
-                // no-op for now... change before merging
+            Button(dontShowAgainTitle) {
+                dontShowAgainAction(dismiss)
             }
 
             Spacer()
 
-            Button("Not now") {
+            Button(cancelActionTitle) {
                 cancelAction(dismiss)
             }
 
-            Button("Report") {
+            Button(defaultActionTitle) {
                 defaultAction(dismiss)
             }
         }
