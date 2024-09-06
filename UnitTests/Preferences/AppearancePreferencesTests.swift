@@ -68,7 +68,8 @@ final class AppearancePreferencesTests: XCTestCase {
                 isContinueSetUpVisible: true,
                 isFavoriteVisible: true,
                 isRecentActivityVisible: true,
-                homeButtonPosition: .left
+                homeButtonPosition: .left,
+                homePageCustomBackground: CustomBackground.gradient(.gradient01).description
             )
         )
 
@@ -79,6 +80,7 @@ final class AppearancePreferencesTests: XCTestCase {
         XCTAssertEqual(model.isContinueSetUpVisible, true)
         XCTAssertEqual(model.isRecentActivityVisible, true)
         XCTAssertEqual(model.homeButtonPosition, .left)
+        XCTAssertEqual(model.homePageCustomBackground, .gradient(.gradient01))
 
         model = AppearancePreferences(
             persistor: AppearancePreferencesPersistorMock(
@@ -88,7 +90,8 @@ final class AppearancePreferencesTests: XCTestCase {
                 isContinueSetUpVisible: false,
                 isFavoriteVisible: false,
                 isRecentActivityVisible: false,
-                homeButtonPosition: .left
+                homeButtonPosition: .left,
+                homePageCustomBackground: CustomBackground.gradient(.gradient05).description
             )
         )
         XCTAssertEqual(model.showFullURL, true)
@@ -98,6 +101,7 @@ final class AppearancePreferencesTests: XCTestCase {
         XCTAssertEqual(model.isContinueSetUpVisible, false)
         XCTAssertEqual(model.isRecentActivityVisible, false)
         XCTAssertEqual(model.homeButtonPosition, .left)
+        XCTAssertEqual(model.homePageCustomBackground, .gradient(.gradient05))
     }
 
     func testWhenInitializedWithGarbageThenThemeIsSetToSystemDefault() throws {

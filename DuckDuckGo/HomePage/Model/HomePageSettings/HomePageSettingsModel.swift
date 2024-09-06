@@ -61,7 +61,7 @@ extension HomePage.Models {
         let openFilePanel: () -> URL?
         let userColorProvider: () -> UserColorProviding
         let showAddImageFailedAlert: () -> Void
-        let openSettings: () -> Void
+        let navigator: HomePageSettingsModelNavigator
 
         @Published private(set) var availableUserBackgroundImages: [UserBackgroundImage] = []
 
@@ -69,7 +69,7 @@ extension HomePage.Models {
         private var userColorCancellable: AnyCancellable?
         private var customBackgroundPixelCancellable: AnyCancellable?
 
-        convenience init(openSettings: @escaping () -> Void) {
+        convenience init() {
             self.init(
                 appearancePreferences: .shared,
                 userBackgroundImagesManager: UserBackgroundImagesManager(
@@ -91,7 +91,7 @@ extension HomePage.Models {
                     let alert = NSAlert.cannotReadImageAlert()
                     alert.runModal()
                 },
-                openSettings: openSettings
+                navigator: DefaultHomePageSettingsModelNavigator()
             )
         }
 
@@ -102,7 +102,7 @@ extension HomePage.Models {
             openFilePanel: @escaping () -> URL?,
             userColorProvider: @autoclosure @escaping () -> UserColorProviding,
             showAddImageFailedAlert: @escaping () -> Void,
-            openSettings: @escaping () -> Void
+            navigator: HomePageSettingsModelNavigator
         ) {
             self.appearancePreferences = appearancePreferences
             self.customImagesManager = userBackgroundImagesManager
@@ -117,8 +117,18 @@ extension HomePage.Models {
             self.openFilePanel = openFilePanel
             self.userColorProvider = userColorProvider
             self.showAddImageFailedAlert = showAddImageFailedAlert
-            self.openSettings = openSettings
+            self.navigator = navigator
 
+            subscribeToUserBackgroundImages()
+            subscribeToCustomBackground()
+
+            if let lastPickedCustomColorHexValue, let customColor = NSColor(hex: lastPickedCustomColorHexValue) {
+                lastPickedCustomColor = customColor
+            }
+            updateSolidColorPickerItems(pickerColor: lastPickedCustomColor ?? Const.defaultColorPickerColor)
+        }
+
+        private func subscribeToUserBackgroundImages() {
             availableCustomImagesCancellable = customImagesManager?.availableImagesPublisher
                 .receive(on: DispatchQueue.main)
                 .handleEvents(receiveOutput: { [weak self] images in
@@ -135,7 +145,9 @@ extension HomePage.Models {
                     }
                 })
                 .assign(to: \.availableUserBackgroundImages, onWeaklyHeld: self)
+        }
 
+        private func subscribeToCustomBackground() {
             let customBackgroundPublisher: AnyPublisher<CustomBackground?, Never> = {
                 if NSApp.runType == .unitTests {
                     return $customBackground.dropFirst().eraseToAnyPublisher()
@@ -146,23 +158,18 @@ extension HomePage.Models {
             }()
 
             customBackgroundPixelCancellable = customBackgroundPublisher
-                .sink { customBackground in
+                .sink { [weak self] customBackground in
                     switch customBackground {
                     case .gradient:
-                        sendPixel(NewTabBackgroundPixel.newTabBackgroundSelectedGradient)
+                        self?.sendPixel(NewTabBackgroundPixel.newTabBackgroundSelectedGradient)
                     case .solidColor:
-                        sendPixel(NewTabBackgroundPixel.newTabBackgroundSelectedSolidColor)
+                        self?.sendPixel(NewTabBackgroundPixel.newTabBackgroundSelectedSolidColor)
                     case .userImage:
-                        sendPixel(NewTabBackgroundPixel.newTabBackgroundSelectedUserImage)
+                        self?.sendPixel(NewTabBackgroundPixel.newTabBackgroundSelectedUserImage)
                     case .none:
-                        sendPixel(NewTabBackgroundPixel.newTabBackgroundReset)
+                        self?.sendPixel(NewTabBackgroundPixel.newTabBackgroundReset)
                     }
                 }
-
-            if let lastPickedCustomColorHexValue, let customColor = NSColor(hex: lastPickedCustomColorHexValue) {
-                lastPickedCustomColor = customColor
-            }
-            updateSolidColorPickerItems(pickerColor: lastPickedCustomColor ?? Const.defaultColorPickerColor)
         }
 
         var hasUserImages: Bool {
@@ -188,6 +195,10 @@ extension HomePage.Models {
                     contentType = modeModel.contentType
                 }
             }
+        }
+
+        func openSettings() {
+            navigator.openAppearanceSettings()
         }
 
         @Published private(set) var contentType: ContentType = .root {
