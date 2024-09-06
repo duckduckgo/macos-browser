@@ -506,14 +506,3 @@ extension HistoryEvent {
         }
     }
 }
-
-fileprivate extension MirrorSite {
-
-    func shouldWeIncludeMirrorSite(for date: Date = Date()) -> Bool {
-        if let removedAt = self.removedAt {
-            return self.addedAt < date && date < removedAt
-        } else {
-            return self.addedAt < date
-        }
-    }
-}
