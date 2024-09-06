@@ -30,23 +30,7 @@ public struct ReportSiteIssueAlert {
         self.pixelKit = pixelKit
     }
 
-    private func makeAlert(title: String, message: String? = nil, buttonNames: [String] = ["Ok"]) -> NSAlert{
-
-        let alert = NSAlert()
-        alert.messageText = title
-
-        if let message = message {
-            alert.informativeText = message
-        }
-
-        for buttonName in buttonNames {
-            alert.addButton(withTitle: buttonName)
-        }
-        alert.accessoryView = NSView(frame: NSRect(x: 0, y: 0, width: 200, height: 0))
-        return alert
-    }
-
-    public func askUserToReportIssues(withDomain domain: String, in parentWindow: NSWindow) async {
+    public func askUserToReportIssues(withDomain domain: String, in parentWindow: NSWindow?) async {
 
         let reportIssuesView = ReportSiteIssuesView(title: "Report", buttonsState: .expanded, domain: domain, cancelActionTitle: "Cancel", cancelAction: { dismiss in
 

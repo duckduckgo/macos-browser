@@ -41,12 +41,7 @@ final class VPNUIActionHandler {
     }
 
     func askUserToReportIssues(withDomain domain: String) async {
-        guard let parentWindow = await WindowControllersManager.shared.lastKeyMainWindowController?.window else {
-
-            // We can't present a sheet alert without a window
-            return
-        }
-
+        let parentWindow = await WindowControllersManager.shared.lastKeyMainWindowController?.window
         let siteIssuesReporter = ReportSiteIssueAlert()
         await siteIssuesReporter.askUserToReportIssues(withDomain: domain, in: parentWindow)
     }

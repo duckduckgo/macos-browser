@@ -59,12 +59,7 @@ extension DefaultExcludedDomainsViewModel: ExcludedDomainsViewModel {
     }
 
     func askUserToReportIssues(withDomain domain: String) async {
-        guard let parentWindow = await WindowControllersManager.shared.lastKeyMainWindowController?.window else {
-
-            // Can't present a sheet alert without a parent window.
-            return
-        }
-
+        let parentWindow = await WindowControllersManager.shared.lastKeyMainWindowController?.window
         let siteIssuesReporter = ReportSiteIssueAlert(pixelKit: pixelKit)
         await siteIssuesReporter.askUserToReportIssues(withDomain: domain, in: parentWindow)
     }
