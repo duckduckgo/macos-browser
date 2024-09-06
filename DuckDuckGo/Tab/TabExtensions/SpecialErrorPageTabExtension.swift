@@ -128,13 +128,14 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
     private func handleMaliciousURL(for navigationAction: NavigationAction, url: URL) -> NavigationActionPolicy? {
         let domain: String
         errorPageType = .phishing
-        if navigationAction.mainFrameTarget != nil {
+        if let mainFrameTarget = navigationAction.mainFrameTarget {
             failingURL = url
             domain = url.host ?? url.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true)
             errorData = SpecialErrorData(kind: .phishing, domain: domain, eTldPlus1: tld.eTLDplus1(failingURL?.host))
             if let errorURL = generateErrorPageURL(url) {
-                _ = webView?.load(URLRequest(url: errorURL))
-                return .none
+                return .redirect(mainFrameTarget) { navigator in
+                    navigator.load(URLRequest(url: errorURL))
+                }
             }
         } else {
             return handleMaliciousIframe(navigationAction: navigationAction)
