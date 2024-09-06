@@ -245,7 +245,7 @@ jobs:
         WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
       run: |
-        bundle exec fastlane asana_log_message task_url:${{ env.asana-task-url }} template_name:"debug-symbols-uploaded"
+        bundle exec fastlane run asana_log_message task_url:${{ env.asana-task-url }} template_name:"debug-symbols-uploaded"
 
   create-dmg:
 
@@ -339,7 +339,7 @@ jobs:
         WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
       run: |
-        bundle exec fastlane asana_log_message task_url:${{ env.asana-task-url }} template_name:"dmg-uploaded"
+        bundle exec fastlane run asana_log_message task_url:${{ env.asana-task-url }} template_name:"dmg-uploaded"
 
     - name: Extract Asana Task ID
       id: task-id

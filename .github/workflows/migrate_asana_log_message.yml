@@ -26,7 +26,7 @@ jobs:
         WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
       run: |
-        bundle exec fastlane asana_log_message task_url:"https://app.asana.com/0/1201392122292466/1208233977568870/f" template_name:"debug-symbols-uploaded"
+        bundle exec fastlane run asana_log_message task_url:"https://app.asana.com/0/1201392122292466/1208233977568870/f" template_name:"debug-symbols-uploaded"
 
     - name: Test asana_log_message (mimicks publish_dmg_release/yml/Report status)
       if: always()
@@ -37,6 +37,6 @@ jobs:
         ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
         WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
       run: |
-        bundle exec fastlane asana_log_message \
+        bundle exec fastlane run asana_log_message \
           task_url:"https://app.asana.com/0/1201392122292466/1208233977568870/f" \
           template_name:"validate-check-for-updates-public"
