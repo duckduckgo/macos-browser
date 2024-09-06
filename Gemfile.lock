@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/duckduckgo/fastlane-plugin-ddg_apple_automation
-  revision: ce7c7447eaeeef01974eb1ff6f1e15a2d0e618f5
-  tag: 0.7.0
+  revision: 889e719804422d871d5e96f767c7ab38b36906fe
+  branch: jacek/asana-log-message
   specs:
     fastlane-plugin-ddg_apple_automation (0.7.0)
       asana
@@ -263,4 +263,4 @@ DEPENDENCIES
   httparty
 
 BUNDLED WITH
-   2.4.19
+   2.4.4
