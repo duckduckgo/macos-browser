@@ -21,7 +21,8 @@ import Foundation
 /// `FreemiumPIRUserStateManager` types provide access to Freemium PIR-related state
 public protocol FreemiumPIRUserStateManager {
     var didOnboard: Bool { get set }
-
+    var firstProfileSavedTimestamp: String? { get set }
+    var didPostFirstProfileSavedNotification: Bool { get set }
 }
 
 /// Default implementation of `FreemiumPIRUserStateManager`. `UserDefaults` is used as underlying storage.
@@ -29,16 +30,33 @@ public final class DefaultFreemiumPIRUserStateManager: FreemiumPIRUserStateManag
 
     private enum Keys {
         static let didOnboard = "macos.browser.freemium.pir.did.onboard"
+        static let firstProfileSavedTimestamp = "macos.browser.freemium.pir.first.profile.saved.timestamp"
+        static let didPostFirstProfileSavedNotification = "macos.browser.freemium.pir.did.post.first.profile.saved.notification"
     }
 
     private let userDefaults: UserDefaults
-    private let key = "macos.browser.freemium.pir.did.onboard"
 
     public var didOnboard: Bool {
         get {
             userDefaults.bool(forKey: Keys.didOnboard)
         } set {
             userDefaults.set(newValue, forKey: Keys.didOnboard)
+        }
+    }
+
+    public var firstProfileSavedTimestamp: String? {
+        get {
+            userDefaults.value(forKey: Keys.firstProfileSavedTimestamp) as? String
+        } set {
+            userDefaults.set(newValue, forKey: Keys.firstProfileSavedTimestamp)
+        }
+    }
+
+    public var didPostFirstProfileSavedNotification: Bool {
+        get {
+            userDefaults.bool(forKey: Keys.didPostFirstProfileSavedNotification)
+        } set {
+            userDefaults.set(newValue, forKey: Keys.didPostFirstProfileSavedNotification)
         }
     }
 

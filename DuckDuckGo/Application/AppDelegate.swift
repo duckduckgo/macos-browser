@@ -97,12 +97,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     public let subscriptionManager: SubscriptionManager
     public let subscriptionUIHandler: SubscriptionUIHandling
 
-    public let vpnSettings = VPNSettings(defaults: .netP)
+    // MARK: - Freemium DBP
+    private var freemiumPIRScanResultPolling: FreemiumPIRScanResultPolling?
 
     var configurationStore = ConfigurationStore()
     var configurationManager: ConfigurationManager
 
     // MARK: - VPN
+
+    public let vpnSettings = VPNSettings(defaults: .netP)
 
     private var networkProtectionSubscriptionEventHandler: NetworkProtectionSubscriptionEventHandler?
 
@@ -412,6 +415,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             PixelKit.fire(GeneralPixel.crashOnCrashHandlersSetUp)
             didCrashDuringCrashHandlersSetUp = false
         }
+
+        freemiumPIRScanResultPolling = DefaultFreemiumPIRScanResultPolling(dataManager: DataBrokerProtectionManager.shared.dataManager, freemiumPIRUserStateManager: freemiumPIRUserStateManager)
+        freemiumPIRScanResultPolling?.startPollingOrObserving()
     }
 
     private func fireFailedCompilationsPixelIfNeeded() {

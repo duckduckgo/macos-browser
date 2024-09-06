@@ -783,6 +783,11 @@ public class MockDataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProte
 }
 
 final class MockDatabase: DataBrokerProtectionRepository {
+
+    enum MockError: Error {
+        case saveFailed
+    }
+
     var wasSaveProfileCalled = false
     var wasFetchProfileCalled = false
     var wasDeleteProfileDataCalled = false
@@ -816,6 +821,8 @@ final class MockDatabase: DataBrokerProtectionRepository {
     var attemptInformation: AttemptInformation?
     var historyEvents = [HistoryEvent]()
 
+    var saveResult: Result<Void, Error> = .success(())
+
     lazy var callsList: [Bool] = [
         wasSaveProfileCalled,
         wasFetchProfileCalled,
@@ -841,6 +848,12 @@ final class MockDatabase: DataBrokerProtectionRepository {
 
     func save(_ profile: DataBrokerProtectionProfile) throws {
         wasSaveProfileCalled = true
+        switch saveResult {
+        case .success:
+            return
+        case .failure(let error):
+            throw error
+        }
     }
 
     func fetchProfile() -> DataBrokerProtectionProfile? {
@@ -1285,7 +1298,10 @@ final class MockDataBrokerProtectionDataManager: DataBrokerProtectionDataManagin
     var cache: DataBrokerProtection.InMemoryDataCache
     var delegate: DataBrokerProtection.DataBrokerProtectionDataManagerDelegate?
 
-    init(pixelHandler: Common.EventMapping<DataBrokerProtection.DataBrokerProtectionPixels>, fakeBrokerFlag: DataBrokerProtection.DataBrokerDebugFlag) {
+    init(database: DataBrokerProtectionRepository? = nil,
+         profileSavedNotifier: DBPProfileSavedNotifier? = nil,
+         pixelHandler: Common.EventMapping<DataBrokerProtection.DataBrokerProtectionPixels>,
+         fakeBrokerFlag: DataBrokerProtection.DataBrokerDebugFlag) {
         cache = InMemoryDataCache()
     }
 
@@ -1308,6 +1324,10 @@ final class MockDataBrokerProtectionDataManager: DataBrokerProtectionDataManagin
 
     func hasMatches() throws -> Bool {
         return shouldReturnHasMatches
+    }
+
+    func matchesFoundCount() throws -> Int {
+        0
     }
 
     func profileQueriesCount() throws -> Int {
@@ -1943,4 +1963,15 @@ struct MockMigrationsProvider: DataBrokerProtectionDatabaseMigrationsProvider {
 
 final class MockFreemiumPIRUserStateManager: FreemiumPIRUserStateManager {
     var didOnboard = false
+    var firstProfileSavedTimestamp: String?
+    var didPostFirstProfileSavedNotification = false
+}
+
+final class MockDBPProfileSavedNotifier: DBPProfileSavedNotifier {
+
+    var didCallPostProfileSavedNotificationIfPermitted = false
+
+    func postProfileSavedNotificationIfPermitted() {
+        didCallPostProfileSavedNotificationIfPermitted = true
+    }
 }
