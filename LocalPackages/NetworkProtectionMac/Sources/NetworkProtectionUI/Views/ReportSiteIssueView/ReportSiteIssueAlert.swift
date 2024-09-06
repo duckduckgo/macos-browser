@@ -1,5 +1,5 @@
 //
-//  SiteIssuesReporter.swift
+//  ReportSiteIssueAlert.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -19,9 +19,10 @@
 import AppKit
 import Foundation
 import PixelKit
+import SwiftUIExtensions
 import VPNPixels
 
-public struct SiteIssuesReporter {
+public struct ReportSiteIssueAlert {
 
     private let pixelKit: PixelFiring?
 
@@ -45,7 +46,16 @@ public struct SiteIssuesReporter {
         return alert
     }
 
-    public func askUserToReportIssues(withDomain domain: String) {
+    public func askUserToReportIssues(withDomain domain: String, in parentWindow: NSWindow) async {
+
+        let reportIssuesView = ReportSiteIssuesView(title: "Report", buttonsState: .expanded, domain: domain, cancelActionTitle: "Cancel", cancelAction: { dismiss in
+            dismiss()
+        }, defaultActionTitle: "OK") { dismiss in
+            dismiss()
+        }
+
+        await reportIssuesView.show(in: parentWindow)
+/*
         let alert = makeAlert(title: "Report Site Issues?",
                               message: "Help us improve by anonymously reporting that \(domain) doesn't work correctly through the VPN.",
                               buttonNames: ["Report", "Don't Report"])
@@ -55,6 +65,6 @@ public struct SiteIssuesReporter {
         if response == .alertFirstButtonReturn {
             let pixel: SiteTroubleshootingPixel = .reportIssues(domain: domain)
             pixelKit?.fire(pixel)
-        }
+        }*/
     }
 }

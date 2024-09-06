@@ -18,13 +18,31 @@
 
 import SwiftUI
 
+public struct Spacing {
+    let hSpacing: CGFloat
+    let contentsVSpacing: CGFloat
+    let buttonsVPSpacing: CGFloat
+
+    init(hSpacing: CGFloat, contentsVSpacing: CGFloat, buttonsVPSpacing: CGFloat) {
+        self.hSpacing = hSpacing
+        self.contentsVSpacing = contentsVSpacing
+        self.buttonsVPSpacing = buttonsVPSpacing
+    }
+
+    public static var defaultSpacing: Spacing {
+        Spacing(hSpacing: 20.0, contentsVSpacing: 20.0, buttonsVPSpacing: 16.0)
+    }
+}
+
 public struct Dialog<Content, Buttons>: View where Content: View, Buttons: View {
 
-    public let spacing: CGFloat
+    public let spacing: Spacing
     @ViewBuilder let content: () -> Content
     @ViewBuilder let buttons: () -> Buttons
 
-    public init(spacing: CGFloat = 16.0, @ViewBuilder content: @escaping () -> Content, @ViewBuilder buttons: @escaping () -> Buttons) {
+    public init(spacing: Spacing = Spacing.defaultSpacing,
+                @ViewBuilder content: @escaping () -> Content, @ViewBuilder buttons: @escaping () -> Buttons) {
+
         self.spacing = spacing
         self.content = content
         self.buttons = buttons
@@ -32,23 +50,27 @@ public struct Dialog<Content, Buttons>: View where Content: View, Buttons: View 
 
     public var body: some View {
         VStack(spacing: 0) {
-            content()
-                .padding(.horizontal, 20.0)
-                .padding(.bottom, spacing)
+            VStack(spacing: spacing.contentsVSpacing) {
+                content()
+                    .padding(.horizontal, spacing.hSpacing)
+            }
+            .padding(.vertical, spacing.contentsVSpacing)
 
-            Rectangle()
+            Divider()
+
+            /*Rectangle()
                 .frame(height: 1)
                 .foregroundColor(Color(NSColor.separatorColor))
-                .padding(.bottom, 16.0)
+                .padding(.bottom, 16.0)*/
 
-            HStack {
-                Spacer()
-                buttons()
+            Group {
+                HStack {
+                    buttons()
+                }
+                .padding(.horizontal, spacing.hSpacing)
+                .padding(.vertical, spacing.buttonsVPSpacing)
             }
-            .padding(.horizontal, 20.0)
         }
-        .padding(.top, spacing)
-        .padding(.bottom, 16.0)
     }
 
 }

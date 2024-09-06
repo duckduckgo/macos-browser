@@ -27,7 +27,7 @@ protocol ExcludedDomainsViewModel {
     func add(domain: String)
     func remove(domain: String)
 
-    func askUserToReportIssues(withDomain domain: String)
+    func askUserToReportIssues(withDomain domain: String) async
 }
 
 final class DefaultExcludedDomainsViewModel {
@@ -58,8 +58,14 @@ extension DefaultExcludedDomainsViewModel: ExcludedDomainsViewModel {
         }
     }
 
-    func askUserToReportIssues(withDomain domain: String) {
-        let siteIssuesReporter = SiteIssuesReporter(pixelKit: pixelKit)
-        siteIssuesReporter.askUserToReportIssues(withDomain: domain)
+    func askUserToReportIssues(withDomain domain: String) async {
+        guard let parentWindow = await WindowControllersManager.shared.lastKeyMainWindowController?.window else {
+
+            // Can't present a sheet alert without a parent window.
+            return
+        }
+
+        let siteIssuesReporter = ReportSiteIssueAlert(pixelKit: pixelKit)
+        await siteIssuesReporter.askUserToReportIssues(withDomain: domain, in: parentWindow)
     }
 }

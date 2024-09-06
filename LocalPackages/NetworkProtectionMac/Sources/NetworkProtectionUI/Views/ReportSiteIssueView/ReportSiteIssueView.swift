@@ -28,21 +28,39 @@ struct ReportSiteIssuesView: ModalView {
 
     let title: String
     let buttonsState: ButtonsState
+    @Environment(\.dismiss) private var dismiss
 
-    @State
-    private var domain = ""
-
+    let domain: String
     let cancelActionTitle: String
     let cancelAction: @MainActor (_ dismiss: () -> Void) -> Void
 
     let defaultActionTitle: String
     @State
     private var isDefaultActionDisabled = true
-    let defaultAction: @MainActor (_ domain: String, _ dismiss: () -> Void) -> Void
+    let defaultAction: @MainActor (_ dismiss: () -> Void) -> Void
 
     var body: some View {
-        Dialog(spacing: 16.0) {
+        Dialog {
+            Image(.siteBreakage128)
 
+            Text("Report an issue with \(domain)?")
+                .font(Font.custom("SF Pro", size: 17)
+                    .weight(.bold))
+                .multilineText()
+
+            Text("Please let us know if you disabled the VPN for Hulu.com because you experienced issues.")
+                .font(Font.custom("SF Pro", size: 13))
+                .fixedSize(horizontal: false, vertical: true)
+                .lineLimit(2)
+                .multilineTextAlignment(.center)
+                .multilineText()
+
+            Text("Reports do not include any personalised information other than the domain address.")
+                .font(Font.custom("SF Pro", size: 11))
+                .fixedSize(horizontal: false, vertical: true)
+                .lineLimit(2)
+                .multilineTextAlignment(.center)
+                .multilineText()
         } buttons: {
             Button("Don't Ask Again") {
                 // no-op for now... change before merging
@@ -51,12 +69,13 @@ struct ReportSiteIssuesView: ModalView {
             Spacer()
 
             Button("Not now") {
-                // no-op for now... change before merging
+                cancelAction(dismiss)
             }
 
             Button("Report") {
-                // no-op for now... change before merging
+                defaultAction(dismiss)
             }
         }
+        .frame(width: 325)
     }
 }
