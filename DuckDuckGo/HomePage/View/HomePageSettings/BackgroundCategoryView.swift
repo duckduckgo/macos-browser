@@ -49,6 +49,14 @@ extension HomePage.Views {
                                     Image(.share)
                                 }
                             }
+                        } else if modeModel.contentType == .resetBackground {
+                            BackgroundThumbnailView(displayMode: .categoryView) {
+                                ZStack {
+                                    Color.blackWhite5
+                                    Image(.restartDownload)
+                                }
+                            }
+
                         } else {
                             BackgroundThumbnailView(
                                 displayMode: .categoryView,

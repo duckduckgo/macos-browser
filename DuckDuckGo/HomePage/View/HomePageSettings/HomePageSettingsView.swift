@@ -96,8 +96,11 @@ extension HomePage.Views {
                                     Text(UserText.myBackgroundsDisclaimer)
                                         .foregroundColor(.blackWhite60)
                                         .multilineTextAlignment(.leading)
-                                })
+                                }
+                            )
                             .transition(.move(edge: .trailing).combined(with: .opacity))
+                        case .resetBackground:
+                            EmptyView() // this is never displayed
                         }
                     }
                     .animation(.none, value: model.customBackground)
@@ -165,11 +168,6 @@ extension HomePage.Views {
                 SettingsGrid(items: model.customBackgroundModes) { mode in
                     BackgroundCategoryView(modeModel: mode) {
                         model.handleRootGridSelection(mode)
-                    }
-                }
-                TextButton(UserText.resetBackground) {
-                    withAnimation {
-                        model.customBackground = nil
                     }
                 }
             }

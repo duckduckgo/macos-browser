@@ -51,7 +51,7 @@ protocol CustomBackgroundConvertible {
 enum CustomBackground: Equatable, Hashable, ColorSchemeProviding, LosslessStringConvertible {
 
     static let placeholderGradient: GradientBackground = .gradient03
-    static let placeholderColor: SolidColorBackground = .color09
+    static let placeholderColor: SolidColorBackground = .color07
 
     case gradient(GradientBackground)
     case solidColor(SolidColorBackground)

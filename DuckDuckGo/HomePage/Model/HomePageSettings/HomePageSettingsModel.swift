@@ -43,6 +43,7 @@ extension HomePage.Models {
             case gradientPicker
             case colorPicker
             case customImagePicker
+            case resetBackground
         }
 
         struct CustomBackgroundModeModel: Identifiable, Hashable {
@@ -190,6 +191,10 @@ extension HomePage.Models {
                 Task {
                     await addNewImage()
                 }
+            } else if modeModel.contentType == .resetBackground {
+                withAnimation {
+                    customBackground = nil
+                }
             } else {
                 withAnimation {
                     contentType = modeModel.contentType
@@ -203,6 +208,7 @@ extension HomePage.Models {
 
         @Published private(set) var contentType: ContentType = .root {
             didSet {
+                assert(contentType != .resetBackground, "contentType can't be set to .resetBackground")
                 if contentType == .root, oldValue == .customImagePicker {
                     customImagesManager?.sortImagesByLastUsed()
                 }
@@ -282,7 +288,8 @@ extension HomePage.Models {
             [
                 customBackgroundModeModel(for: .gradientPicker),
                 customBackgroundModeModel(for: .colorPicker),
-                customBackgroundModeModel(for: .customImagePicker)
+                customBackgroundModeModel(for: .customImagePicker),
+                customBackgroundModeModel(for: .resetBackground)
             ]
                 .compactMap { $0 }
         }
@@ -333,6 +340,8 @@ extension HomePage.Models {
                     return .userImage(lastUsedUserBackgroundImage)
                 }()
                 return CustomBackgroundModeModel(contentType: .customImagePicker, title: title, customBackgroundThumbnail: thumbnail)
+            case .resetBackground:
+                return CustomBackgroundModeModel(contentType: .resetBackground, title: UserText.resetBackground, customBackgroundThumbnail: nil)
             }
         }
     }
