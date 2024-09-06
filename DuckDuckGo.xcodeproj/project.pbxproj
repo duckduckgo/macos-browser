@@ -2585,6 +2585,8 @@
 		C13909F52B85FD79001626ED /* AutofillDeleteAllPasswordsExecutorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13909F32B85FD79001626ED /* AutofillDeleteAllPasswordsExecutorTests.swift */; };
 		C13909FB2B861039001626ED /* AutofillActionPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13909FA2B861039001626ED /* AutofillActionPresenter.swift */; };
 		C13909FC2B861039001626ED /* AutofillActionPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13909FA2B861039001626ED /* AutofillActionPresenter.swift */; };
+		C153E7C52C8B21B500B9BAD7 /* Logger+FreemiumDBP.swift in Sources */ = {isa = PBXBuildFile; fileRef = C153E7C42C8B21B500B9BAD7 /* Logger+FreemiumDBP.swift */; };
+		C153E7C62C8B21B500B9BAD7 /* Logger+FreemiumDBP.swift in Sources */ = {isa = PBXBuildFile; fileRef = C153E7C42C8B21B500B9BAD7 /* Logger+FreemiumDBP.swift */; };
 		C16127EE2BDFB46400966BB9 /* DataImportShortcutsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C16127ED2BDFB46400966BB9 /* DataImportShortcutsView.swift */; };
 		C16127EF2BDFB46400966BB9 /* DataImportShortcutsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C16127ED2BDFB46400966BB9 /* DataImportShortcutsView.swift */; };
 		C168B9AC2B31DC7E001AFAD9 /* AutofillNeverPromptWebsitesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C168B9AB2B31DC7E001AFAD9 /* AutofillNeverPromptWebsitesManager.swift */; };
@@ -4278,6 +4280,7 @@
 		C13909EE2B85FD4E001626ED /* AutofillActionExecutor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillActionExecutor.swift; sourceTree = "<group>"; };
 		C13909F32B85FD79001626ED /* AutofillDeleteAllPasswordsExecutorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillDeleteAllPasswordsExecutorTests.swift; sourceTree = "<group>"; };
 		C13909FA2B861039001626ED /* AutofillActionPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillActionPresenter.swift; sourceTree = "<group>"; };
+		C153E7C42C8B21B500B9BAD7 /* Logger+FreemiumDBP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Logger+FreemiumDBP.swift"; sourceTree = "<group>"; };
 		C16127ED2BDFB46400966BB9 /* DataImportShortcutsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportShortcutsView.swift; sourceTree = "<group>"; };
 		C168B9AB2B31DC7E001AFAD9 /* AutofillNeverPromptWebsitesManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutofillNeverPromptWebsitesManager.swift; sourceTree = "<group>"; };
 		C17CA7AC2B9B52E6008EC3C1 /* NavigationBarPopoversTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarPopoversTests.swift; sourceTree = "<group>"; };
@@ -8563,6 +8566,7 @@
 				C1C405862C7F80E50089DE8A /* PromotionView+FreemiumPIR.swift */,
 				C1CE84682C887CF60068913B /* FreemiumPIRScanResultPolling.swift */,
 				C11198302C898AB500F0272C /* FreemiumDBPFirstProfileSavedNotifier.swift */,
+				C153E7C42C8B21B500B9BAD7 /* Logger+FreemiumDBP.swift */,
 			);
 			path = PIR;
 			sourceTree = "<group>";
@@ -10408,6 +10412,7 @@
 				98779A0129999B64005D8EB6 /* Bookmark.xcdatamodeld in Sources */,
 				3706FB9E293F65D500E42796 /* AboutPreferences.swift in Sources */,
 				3706FB9F293F65D500E42796 /* PasswordManagementCreditCardItemView.swift in Sources */,
+				C153E7C62C8B21B500B9BAD7 /* Logger+FreemiumDBP.swift in Sources */,
 				9F9C4A022BC7F36D0099738D /* BookmarkAllTabsDialogCoordinatorViewModel.swift in Sources */,
 				3706FBA0293F65D500E42796 /* NSTextFieldExtension.swift in Sources */,
 				9FA173E82B7B122E00EE4E6E /* BookmarkDialogStackedContentView.swift in Sources */,
@@ -11757,6 +11762,7 @@
 				37A089FB2C510FE0003BB417 /* RemoteMessagingDebugMenu.swift in Sources */,
 				B64C852A26942AC90048FEBE /* PermissionContextMenu.swift in Sources */,
 				85D438B6256E7C9E00F3BAF8 /* ContextMenuUserScript.swift in Sources */,
+				C153E7C52C8B21B500B9BAD7 /* Logger+FreemiumDBP.swift in Sources */,
 				B693955526F04BEC0015B914 /* NSSavePanelExtension.swift in Sources */,
 				9826B0A22747DFEB0092F683 /* AppPrivacyConfigurationDataProvider.swift in Sources */,
 				B6B1E88B26D774090062C350 /* LinkButton.swift in Sources */,
