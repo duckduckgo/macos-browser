@@ -33,35 +33,38 @@ final class DataBrokerProtectionDataManagingTests: XCTestCase {
                                               pixelHandler: MockPixelHandler())
     }
 
-    func testWhenNoMatches_thenZeroMatchesFoundCountIsReturned() throws {
+    func testWhenNoMatches_thenZeroMatchesAndZeroBrokersAreReturned() throws {
         // Given
         mockDatabase.brokerProfileQueryDataToReturn = []
 
         // When
-        let matchesCount = try sut.matchesFoundCount()
+        let result = try sut.matchesFoundAndBrokersCount()
 
         // Then
-        XCTAssertEqual(matchesCount, 0)
+        XCTAssertEqual(result.matchCount, 0)
+        XCTAssertEqual(result.brokerCount, 0)
     }
 
-    func testWhenMultipleProfilesAndMirrorSites_thenCorrectMatchesFoundCountIsReturned() throws {
+    func testWhenMultipleProfilesAndMirrorSites_thenCorrectMatchesAndBrokersAreReturned() throws {
         // Given
         mockDatabase.brokerProfileQueryDataToReturn = mockQueryData
 
         // When
-        let matchesCount = try sut.matchesFoundCount()
+        let result = try sut.matchesFoundAndBrokersCount()
 
         // Then
-        // We expect 6 matches:
-         // - 1 extracted profile + 2 mirror sites for Broker A (3 total)
-         // - Broker B is deprecated, so it should be skipped (0 total)
-         // - 1 extracted profile + 1 mirror site for Broker C (2 total)
-         // - 1 more extracted profile for Broker C (1 total)
-         // - Total = 3 + 0 + 2 + 1 = 6
-        XCTAssertEqual(matchesCount, 6)
+        // We expect:
+        // - 5 matches:
+        //   - 1 extracted profile + 2 mirror sites for Broker A (3 total)
+        //   - Broker B is deprecated, so it should be skipped (0 total)
+        //   - 1 extracted profile + 1 mirror site for Broker C (2 total)
+        //   - Total = 3 + 0 + 2 + 1 = 6
+        // - 2 brokers with matches (Broker A and Broker C)
+        XCTAssertEqual(result.matchCount, 5)
+        XCTAssertEqual(result.brokerCount, 2)
     }
 
-    func testWhenAllBrokersAreDeprecated_thenZeroMatchesFoundCountIsReturned() throws {
+    func testWhenAllBrokersAreDeprecated_thenZeroMatchesAndZeroBrokersAreReturned() throws {
         // Given
         let deprecatedBrokers = [
             BrokerProfileQueryData.mock(deprecated: true),
@@ -70,13 +73,14 @@ final class DataBrokerProtectionDataManagingTests: XCTestCase {
         mockDatabase.brokerProfileQueryDataToReturn = deprecatedBrokers
 
         // When
-        let matchesCount = try sut.matchesFoundCount()
+        let result = try sut.matchesFoundAndBrokersCount()
 
         // Then
-        XCTAssertEqual(matchesCount, 0)
+        XCTAssertEqual(result.matchCount, 0)
+        XCTAssertEqual(result.brokerCount, 0)
     }
 
-    func testWhenNoExtractedProfilesButMirrorSitesExist_thenCorrectMirrorSiteCountIsReturned() throws {
+    func testWhenNoExtractedProfilesButMirrorSitesExist_thenCorrectMirrorSiteCountAndBrokerCountAreReturned() throws {
         // Given
         let brokersWithOnlyMirrorSites = [
             BrokerProfileQueryData.mock(
@@ -89,14 +93,15 @@ final class DataBrokerProtectionDataManagingTests: XCTestCase {
         mockDatabase.brokerProfileQueryDataToReturn = brokersWithOnlyMirrorSites
 
         // When
-        let matchesCount = try sut.matchesFoundCount()
+        let result = try sut.matchesFoundAndBrokersCount()
 
         // Then
-        // 1 mirror site should be counted
-        XCTAssertEqual(matchesCount, 1)
+        // 1 mirror site should be counted, and 1 broker with matches.
+        XCTAssertEqual(result.matchCount, 1)
+        XCTAssertEqual(result.brokerCount, 1)
     }
 
-    func testWhenMirrorSitesAreRemoved_thenTheyAreNotCounted() throws {
+    func testWhenMirrorSitesAreRemoved_thenTheyAreNotCountedAndBrokerCountIsZero() throws {
         // Given
         let brokerWithRemovedMirrorSites = BrokerProfileQueryData.mock(
             extractedProfile: nil,
@@ -107,11 +112,12 @@ final class DataBrokerProtectionDataManagingTests: XCTestCase {
         mockDatabase.brokerProfileQueryDataToReturn = [brokerWithRemovedMirrorSites]
 
         // When
-        let matchesCount = try sut.matchesFoundCount()
+        let result = try sut.matchesFoundAndBrokersCount()
 
         // Then
-        // No profiles and removed mirror site, so count should be 0
-        XCTAssertEqual(matchesCount, 0)
+        // No profiles and removed mirror site, so matchCount should be 0 and brokerCount should be 0.
+        XCTAssertEqual(result.matchCount, 0)
+        XCTAssertEqual(result.brokerCount, 0)
     }
 
     func testWhenProfileIsSaved_thenNotifierIsCalled() async throws {
@@ -253,36 +259,6 @@ private extension DataBrokerProtectionDataManagingTests {
                 ], mirrorSites: [
                     MirrorSite(name: "Mirror 3", url: "https://mirror3.com", addedAt: Date(), removedAt: nil)
                 ],
-                deprecated: false
-            ),
-
-            // Fourth item: Another extracted profile for Broker C, but no mirror site
-            BrokerProfileQueryData.mock(
-                dataBrokerName: "Broker C",
-                url: "https://broker-c.com",
-                extractedProfile: ExtractedProfile(
-                    id: 3,
-                    name: "Bob",
-                    alternativeNames: nil,
-                    addressFull: nil,
-                    addresses: nil,
-                    phoneNumbers: nil,
-                    relatives: nil,
-                    profileUrl: nil,
-                    reportId: nil,
-                    age: nil,
-                    email: nil,
-                    removedDate: nil,
-                    identifier: "id3"
-                ), scanHistoryEvents: [
-                    HistoryEvent(
-                        extractedProfileId: 3,
-                        brokerId: 3,
-                        profileQueryId: 3,
-                        type: .optOutConfirmed,
-                        date: Date()
-                    )
-                ], mirrorSites: [],
                 deprecated: false
             )
         ]
