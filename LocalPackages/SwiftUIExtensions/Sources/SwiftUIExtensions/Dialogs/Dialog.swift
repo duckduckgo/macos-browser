@@ -23,12 +23,6 @@ public struct Spacing {
     let contentsVSpacing: CGFloat
     let buttonsVPSpacing: CGFloat
 
-    init(hSpacing: CGFloat, contentsVSpacing: CGFloat, buttonsVPSpacing: CGFloat) {
-        self.hSpacing = hSpacing
-        self.contentsVSpacing = contentsVSpacing
-        self.buttonsVPSpacing = buttonsVPSpacing
-    }
-
     public static var defaultSpacing: Spacing {
         Spacing(hSpacing: 20.0, contentsVSpacing: 20.0, buttonsVPSpacing: 16.0)
     }
