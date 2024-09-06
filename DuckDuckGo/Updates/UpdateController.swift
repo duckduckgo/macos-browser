@@ -142,10 +142,6 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
                                       areAutomaticUpdatesEnabled: areAutomaticUpdatesEnabled)
         updater = SPUUpdater(hostBundle: Bundle.main, applicationBundle: Bundle.main, userDriver: userDriver, delegate: self)
 
-        if updater.automaticallyDownloadsUpdates != areAutomaticUpdatesEnabled {
-            updater.automaticallyDownloadsUpdates = areAutomaticUpdatesEnabled
-        }
-
         updateProcessCancellable = userDriver.updateProgressPublisher
             .assign(to: \.updateProgress, onWeaklyHeld: self)
 
