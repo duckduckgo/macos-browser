@@ -238,25 +238,25 @@ final class HomePageSettingsModelTests: XCTestCase {
     func testThatCustomBackgroundModeModelShowsPreviewOfCurrentlySelectedBackground() {
         model.customBackground = nil
         XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundThumbnail), [
-            .gradient(CustomBackground.placeholderGradient),
-            .solidColor(CustomBackground.placeholderColor),
             nil,
+            .solidColor(CustomBackground.placeholderColor),
+            .gradient(CustomBackground.placeholderGradient),
             nil
         ])
 
         model.customBackground = .gradient(.gradient04)
         XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundThumbnail), [
-            .gradient(.gradient04),
-            .solidColor(CustomBackground.placeholderColor),
             nil,
-            nil
+            .solidColor(CustomBackground.placeholderColor),
+            .gradient(.gradient04),
+            nil,
         ])
 
         model.customBackground = .solidColor(.color17)
         XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundThumbnail), [
-            .gradient(CustomBackground.placeholderGradient),
-            .solidColor(.color17),
             nil,
+            .solidColor(.color17),
+            .gradient(CustomBackground.placeholderGradient),
             nil
         ])
     }
@@ -269,19 +269,25 @@ final class HomePageSettingsModelTests: XCTestCase {
         userBackgroundImagesManager.availableImages = [image1, image2, image3]
         model.customBackground = nil
         XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundThumbnail), [
-            .gradient(CustomBackground.placeholderGradient),
+            nil,
             .solidColor(CustomBackground.placeholderColor),
-            .userImage(image1),
-            nil
+            .gradient(CustomBackground.placeholderGradient),
+            .userImage(image1)
         ])
 
         userBackgroundImagesManager.availableImages = [image2, image1, image3]
         XCTAssertEqual(model.customBackgroundModes.map(\.customBackgroundThumbnail), [
-            .gradient(CustomBackground.placeholderGradient),
+            nil,
             .solidColor(CustomBackground.placeholderColor),
-            .userImage(image2),
-            nil
+            .gradient(CustomBackground.placeholderGradient),
+            .userImage(image2)
         ])
+    }
+
+    func testWhenDefaultBackgroundIsSelectedThenCustomBackgroundIsRemoved() {
+        model.customBackground = .solidColor(.color01)
+        model.handleRootGridSelection(.defaultBackground)
+        XCTAssertNil(model.customBackground)
     }
 
     func testThatSolidColorsArePopulatedUponInitialization() {

@@ -21,8 +21,34 @@ import SwiftUIExtensions
 extension HomePage.Views {
 
     struct BackgroundThumbnailView<Content>: View where Content: View {
+
+        /**
+         * This enum describes use cases for `BackgroundThumbnailView`.
+         */
         enum DisplayMode: Equatable {
-            case categoryView, pickerView, addBackground
+            /**
+             * Represents a thumbnail that's displayed in the root view of the settings panel.
+             *
+             * This includes custom backgrounds category (solid colors, gradients or user images)
+             * or the "Default" background.
+             *
+             * > Note: The "Add Background" button uses a dedicated `addBackground` enum case.
+             */
+            case categoryView
+
+            /**
+             * Represents a single custom background choice (either a solid color, a gradient or a user image).
+             *
+             * Displayed in the child view of the settings panel (solid colors grid, gradients grid or user images grid).
+             */
+            case pickerView
+
+            /**
+             * Represents the "Add Background" item that appears in the root view as well as in the user images grid.
+             *
+             * This type of thumbnail view cannot be selected and doesn't represent any value of `customBackground`.
+             */
+            case addBackground
 
             var allowsSelection: Bool {
                 switch self {
