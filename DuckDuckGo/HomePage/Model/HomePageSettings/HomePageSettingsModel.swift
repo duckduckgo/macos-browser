@@ -287,8 +287,8 @@ extension HomePage.Models {
         var customBackgroundModes: [CustomBackgroundModeModel] {
             [
                 customBackgroundModeModel(for: .defaultBackground),
-                customBackgroundModeModel(for: .gradientPicker),
                 customBackgroundModeModel(for: .colorPicker),
+                customBackgroundModeModel(for: .gradientPicker),
                 customBackgroundModeModel(for: .customImagePicker)
             ]
                 .compactMap { $0 }

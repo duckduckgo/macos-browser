@@ -43,19 +43,20 @@ extension HomePage.Views {
                 VStack(alignment: .leading, spacing: Const.titleSpacing) {
                     ZStack {
                         if modeModel.contentType == .customImagePicker && !model.hasUserImages {
-                            BackgroundThumbnailView(displayMode: .categoryView) {
+                            BackgroundThumbnailView(displayMode: .categoryView(isSelectable: false)) {
                                 ZStack {
                                     Color.homePageAddBackground
-                                    Image(.share)
+                                    Image(.add)
+                                        .foregroundColor(.whiteBlack84)
                                 }
                             }
                         } else if modeModel.contentType == .defaultBackground {
-                            BackgroundThumbnailView(displayMode: .categoryView) {
+                            BackgroundThumbnailView(displayMode: .categoryView(isSelectable: true)) {
                                 Color.newTabPageBackground
                             }
                         } else {
                             BackgroundThumbnailView(
-                                displayMode: .categoryView,
+                                displayMode: .categoryView(isSelectable: true),
                                 customBackground: modeModel.customBackgroundThumbnail ?? .solidColor(.color01)
                             )
                         }

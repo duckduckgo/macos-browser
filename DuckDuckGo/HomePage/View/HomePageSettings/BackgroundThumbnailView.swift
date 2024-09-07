@@ -22,10 +22,24 @@ extension HomePage.Views {
 
     struct BackgroundThumbnailView<Content>: View where Content: View {
         enum DisplayMode: Equatable {
-            case categoryView, pickerView
+            case categoryView(isSelectable: Bool), pickerView
+
+            var allowsSelection: Bool {
+                switch self {
+                case .categoryView(let isSelectable):
+                    return isSelectable
+                case .pickerView:
+                    return true
+                }
+            }
 
             var showsCheckmarkIfSelected: Bool {
-                self == .categoryView
+                switch self {
+                case .categoryView:
+                    return true
+                case .pickerView:
+                    return false
+                }
             }
 
             var allowsDeletingCustomBackgrounds: Bool {
@@ -118,7 +132,7 @@ extension HomePage.Views {
 
         @ViewBuilder
         private var selectionBackground: some View {
-            if model.customBackground == customBackground {
+            if displayMode.allowsSelection, model.customBackground == customBackground {
                 ZStack {
                     RoundedRectangle(cornerRadius: 6)
                         .stroke(Color(.updateIndicator), lineWidth: 2)
