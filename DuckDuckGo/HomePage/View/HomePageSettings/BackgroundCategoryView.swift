@@ -45,18 +45,14 @@ extension HomePage.Views {
                         if modeModel.contentType == .customImagePicker && !model.hasUserImages {
                             BackgroundThumbnailView(displayMode: .categoryView) {
                                 ZStack {
-                                    Color.blackWhite5
+                                    Color.homePageAddBackground
                                     Image(.share)
                                 }
                             }
-                        } else if modeModel.contentType == .resetBackground {
+                        } else if modeModel.contentType == .defaultBackground {
                             BackgroundThumbnailView(displayMode: .categoryView) {
-                                ZStack {
-                                    Color.blackWhite5
-                                    Image(.restartDownload)
-                                }
+                                Color.newTabPageBackground
                             }
-
                         } else {
                             BackgroundThumbnailView(
                                 displayMode: .categoryView,

@@ -1150,7 +1150,7 @@ struct UserText {
     static let myBackgrounds = NSLocalizedString("home.page.settings.my.backgrounds", value: "My Backgrounds", comment: "Button caption for presenting available user-provided Home Page background images")
     static let myBackgroundsDisclaimer = NSLocalizedString("home.page.settings.my.backgrounds.disclaimer", value: "Images are stored on your device so DuckDuckGo can't see or access them.", comment: "Disclaimer explaining privacy of user-provided custom Home Page background images")
     static let addBackground = NSLocalizedString("home.page.settings.add.background", value: "Add Background", comment: "Button caption for adding user-provided Home Page background image")
-    static let resetBackground = NSLocalizedString("home.page.settings.reset.background", value: "Reset Background", comment: "Button caption to reset custom home page background")
+    static let defaultBackground = NSLocalizedString("home.page.settings.default.background", value: "Default", comment: "Default as in 'default background'")
     static let browserTheme = NSLocalizedString("home.page.settings.browser.theme", value: "Browser Theme", comment: "Section title in Home Page Settings to adjust browser theme")
     static let homePageSections = NSLocalizedString("home.page.settings.sections", value: "Sections", comment: "Section title in Home Page Settings to adjust Home Page sections visibility")
     static let deleteBackground = NSLocalizedString("home.page.settings.delete.background", value: "Delete Background", comment: "Context menu option to delete custom home page background image")

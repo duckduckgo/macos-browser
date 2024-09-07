@@ -99,7 +99,7 @@ extension HomePage.Views {
                                 }
                             )
                             .transition(.move(edge: .trailing).combined(with: .opacity))
-                        case .resetBackground:
+                        case .defaultBackground:
                             EmptyView() // this is never displayed
                         }
                     }

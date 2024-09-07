@@ -25701,6 +25701,18 @@
         }
       }
     },
+    "home.page.settings.default.background" : {
+      "comment" : "Default as in 'default background'",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Default"
+          }
+        }
+      }
+    },
     "home.page.settings.delete.background" : {
       "comment" : "Context menu option to delete custom home page background image",
       "extractionState" : "extracted_with_value",
@@ -26063,7 +26075,7 @@
     },
     "home.page.settings.reset.background" : {
       "comment" : "Button caption to reset custom home page background",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {

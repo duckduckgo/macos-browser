@@ -43,7 +43,7 @@ extension HomePage.Models {
             case gradientPicker
             case colorPicker
             case customImagePicker
-            case resetBackground
+            case defaultBackground
         }
 
         struct CustomBackgroundModeModel: Identifiable, Hashable {
@@ -191,7 +191,7 @@ extension HomePage.Models {
                 Task {
                     await addNewImage()
                 }
-            } else if modeModel.contentType == .resetBackground {
+            } else if modeModel.contentType == .defaultBackground {
                 withAnimation {
                     customBackground = nil
                 }
@@ -208,7 +208,7 @@ extension HomePage.Models {
 
         @Published private(set) var contentType: ContentType = .root {
             didSet {
-                assert(contentType != .resetBackground, "contentType can't be set to .resetBackground")
+                assert(contentType != .defaultBackground, "contentType can't be set to .defaultBackground")
                 if contentType == .root, oldValue == .customImagePicker {
                     customImagesManager?.sortImagesByLastUsed()
                 }
@@ -286,10 +286,10 @@ extension HomePage.Models {
 
         var customBackgroundModes: [CustomBackgroundModeModel] {
             [
+                customBackgroundModeModel(for: .defaultBackground),
                 customBackgroundModeModel(for: .gradientPicker),
                 customBackgroundModeModel(for: .colorPicker),
-                customBackgroundModeModel(for: .customImagePicker),
-                customBackgroundModeModel(for: .resetBackground)
+                customBackgroundModeModel(for: .customImagePicker)
             ]
                 .compactMap { $0 }
         }
@@ -340,8 +340,8 @@ extension HomePage.Models {
                     return .userImage(lastUsedUserBackgroundImage)
                 }()
                 return CustomBackgroundModeModel(contentType: .customImagePicker, title: title, customBackgroundThumbnail: thumbnail)
-            case .resetBackground:
-                return CustomBackgroundModeModel(contentType: .resetBackground, title: UserText.resetBackground, customBackgroundThumbnail: nil)
+            case .defaultBackground:
+                return CustomBackgroundModeModel(contentType: .defaultBackground, title: UserText.defaultBackground, customBackgroundThumbnail: nil)
             }
         }
     }

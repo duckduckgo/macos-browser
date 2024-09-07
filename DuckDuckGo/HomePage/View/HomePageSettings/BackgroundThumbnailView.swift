@@ -118,14 +118,16 @@ extension HomePage.Views {
 
         @ViewBuilder
         private var selectionBackground: some View {
-            if let customBackground, model.customBackground == customBackground {
+            if model.customBackground == customBackground {
                 ZStack {
                     RoundedRectangle(cornerRadius: 6)
                         .stroke(Color(.updateIndicator), lineWidth: 2)
                     if displayMode.showsCheckmarkIfSelected {
                         Image(.solidCheckmark)
                             .opacity(0.8)
-                            .colorScheme(customBackground.colorScheme)
+                            .ifLet(customBackground?.colorScheme) { view, colorScheme in
+                                view.colorScheme(colorScheme)
+                            }
                     }
                 }
                 .padding(-2)

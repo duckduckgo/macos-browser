@@ -30,7 +30,7 @@ fileprivate extension SettingsModel.CustomBackgroundModeModel {
     static let gradientPicker: Self = .init(contentType: .gradientPicker, title: "", customBackgroundThumbnail: nil)
     static let colorPicker: Self = .init(contentType: .colorPicker, title: "", customBackgroundThumbnail: nil)
     static let customImagePicker: Self = .init(contentType: .customImagePicker, title: "", customBackgroundThumbnail: nil)
-    static let resetBackground: Self = .init(contentType: .resetBackground, title: "", customBackgroundThumbnail: nil)
+    static let defaultBackground: Self = .init(contentType: .defaultBackground, title: "", customBackgroundThumbnail: nil)
 }
 
 final class MockUserColorProvider: UserColorProviding {
@@ -129,7 +129,7 @@ final class HomePageSettingsModelTests: XCTestCase {
     func testThatHandleRootGridSelectionForResetBackgroundResetsBackground() {
         let contentType = model.contentType
         model.customBackground = .gradient(.gradient04)
-        model.handleRootGridSelection(.resetBackground)
+        model.handleRootGridSelection(.defaultBackground)
         XCTAssertNil(model.customBackground)
         XCTAssertEqual(model.contentType, contentType)
     }
