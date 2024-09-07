@@ -92,7 +92,6 @@ extension HomePage.Views {
                                 maxItemsCount: HomePage.Models.SettingsModel.Const.maximumNumberOfUserImages,
                                 itemView: defaultItemView(for:),
                                 footer: {
-                                    addBackgroundButton
                                     Text(UserText.myBackgroundsDisclaimer)
                                         .foregroundColor(.blackWhite60)
                                         .multilineTextAlignment(.leading)
@@ -197,25 +196,6 @@ extension HomePage.Views {
                     .cursor(.pointingHand)
                 }
                 .buttonStyle(.plain)
-            }
-        }
-
-        @ViewBuilder
-        var addBackgroundButton: some View {
-            let button = Button {
-                Task {
-                    await model.addNewImage()
-                }
-            } label: {
-                Text(UserText.addBackground)
-                    .frame(maxWidth: .infinity)
-            }
-                .controlSize(.large)
-
-            if #available(macOS 12.0, *) {
-                button.buttonStyle(.borderedProminent)
-            } else {
-                button.buttonStyle(DefaultActionButtonStyle(enabled: true))
             }
         }
     }

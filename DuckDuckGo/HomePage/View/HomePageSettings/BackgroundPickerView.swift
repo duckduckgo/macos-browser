@@ -59,13 +59,7 @@ extension HomePage.Views {
                                     await model.addNewImage()
                                 }
                             } label: {
-                                BackgroundThumbnailView(displayMode: .categoryView(isSelectable: false)) {
-                                    ZStack {
-                                        Color.homePageAddBackground
-                                        Image(.add)
-                                            .foregroundColor(.whiteBlack84)
-                                    }
-                                }
+                                BackgroundThumbnailView(displayMode: .addBackground)
                             }
                             .buttonStyle(.plain)
                         }

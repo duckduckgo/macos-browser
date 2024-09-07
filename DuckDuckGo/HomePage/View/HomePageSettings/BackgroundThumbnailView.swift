@@ -22,14 +22,14 @@ extension HomePage.Views {
 
     struct BackgroundThumbnailView<Content>: View where Content: View {
         enum DisplayMode: Equatable {
-            case categoryView(isSelectable: Bool), pickerView
+            case categoryView, pickerView, addBackground
 
             var allowsSelection: Bool {
                 switch self {
-                case .categoryView(let isSelectable):
-                    return isSelectable
-                case .pickerView:
+                case .categoryView, .pickerView:
                     return true
+                case .addBackground:
+                    return false
                 }
             }
 
@@ -37,7 +37,7 @@ extension HomePage.Views {
                 switch self {
                 case .categoryView:
                     return true
-                case .pickerView:
+                case .pickerView, .addBackground:
                     return false
                 }
             }
@@ -64,7 +64,7 @@ extension HomePage.Views {
             self.content = content
         }
 
-        init(displayMode: DisplayMode, @ViewBuilder content: @escaping () -> Content) {
+        init(displayMode: DisplayMode, @ViewBuilder content: @escaping () -> Content = { EmptyView() }) {
             customBackground = nil
             self.displayMode = displayMode
             self.content = content
@@ -74,7 +74,7 @@ extension HomePage.Views {
             ZStack {
                 RoundedRectangle(cornerRadius: 4)
                     .fill(.clear)
-                    .background(previewContent)
+                    .background(thumbnailContent)
                     .cornerRadius(4)
                 RoundedRectangle(cornerRadius: 4)
                     .stroke(Color.homeSettingsBackgroundPreviewStroke)
@@ -102,7 +102,7 @@ extension HomePage.Views {
         }
 
         @ViewBuilder
-        private var previewContent: some View {
+        private var thumbnailContent: some View {
             switch customBackground {
             case .gradient(let gradient):
                 gradient.view
@@ -126,7 +126,16 @@ extension HomePage.Views {
                     }
                 }
             case .none:
-                content()
+                switch displayMode {
+                case .addBackground:
+                    ZStack {
+                        Color.homePageAddBackground
+                        Image(.add)
+                            .foregroundColor(.whiteBlack84)
+                    }
+                default:
+                    content()
+                }
             }
         }
 
