@@ -24,7 +24,7 @@ extension NetworkProtectionKeychainTokenStore {
     convenience init() {
         self.init(keychainType: .default,
                   errorEvents: .networkProtectionAppDebugEvents,
-                  isSubscriptionEnabled: false,
+                  useAccessTokenProvider: false,
                   accessTokenProvider: { return nil })
     }
 }

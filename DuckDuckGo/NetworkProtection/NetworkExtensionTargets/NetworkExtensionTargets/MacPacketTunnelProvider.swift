@@ -430,7 +430,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         let tokenStore = NetworkProtectionKeychainTokenStore(keychainType: Bundle.keychainType,
                                                                            serviceName: Self.tokenServiceName,
                                                                            errorEvents: debugEvents,
-                                                                           isSubscriptionEnabled: false,
+                                                                           useAccessTokenProvider: false,
                                                                            accessTokenProvider: { nil }
         )
         let entitlementsCache = UserDefaultsCache<[Entitlement]>(userDefaults: subscriptionUserDefaults,
@@ -470,7 +470,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                    providerEvents: Self.packetTunnelProviderEvents,
                    settings: settings,
                    defaults: defaults,
-                   isSubscriptionEnabled: true,
                    entitlementCheck: entitlementsCheck)
 
         setupPixels()
