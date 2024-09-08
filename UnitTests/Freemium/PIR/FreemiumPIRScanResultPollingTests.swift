@@ -128,12 +128,13 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
         XCTAssertFalse(mockNotificationCenter.didCallAddObserver)
         XCTAssertTrue(mockDataManager.didCallMatchesFoundCount)
         XCTAssertEqual(mockNotificationCenter.lastPostedNotification, .freemiumDBPResultPollingComplete)
+        XCTAssertEqual(mockFreemiumPIRUserStateManager.firstScanResults, FreemiumDBPMatchResults(matchesCount: 3, brokerCount: 2))
         XCTAssertNil(sut.timer)
     }
 
     func testWhenResultsFoundAndMaxDurationExpired_thenResultsNotificationPosted() {
         // Given
-        mockDataManager.matchesFoundCountValue = (0, 0)
+        mockDataManager.matchesFoundCountValue = (4, 2)
         let timestampString = dateFormatter.string(from: Date.nowMinus(hours: 36))
         mockFreemiumPIRUserStateManager.firstProfileSavedTimestamp = timestampString
         let sut = DefaultFreemiumPIRScanResultPolling(
@@ -147,12 +148,13 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
 
         // Then
         XCTAssertEqual(mockNotificationCenter.lastPostedNotification, .freemiumDBPResultPollingComplete)
+        XCTAssertEqual(mockFreemiumPIRUserStateManager.firstScanResults, FreemiumDBPMatchResults(matchesCount: 4, brokerCount: 2))
         XCTAssertFalse(mockNotificationCenter.didCallAddObserver)
         XCTAssertTrue(mockDataManager.didCallMatchesFoundCount)
         XCTAssertNil(sut.timer)
     }
 
-    func testWhenNoResultsFoundAndMaxDurationExpired_thenNoResultsNotificationPosted() {
+    func testWhenNoResultsFoundAndMaxDurationExpired_thenResultsNotificationPosted() {
         // Given
         mockDataManager.matchesFoundCountValue = (0, 0)
         let timestampString = dateFormatter.string(from: Date.nowMinus(hours: 36))
@@ -168,6 +170,7 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
 
         // Then
         XCTAssertEqual(mockNotificationCenter.lastPostedNotification, .freemiumDBPResultPollingComplete)
+        XCTAssertEqual(mockFreemiumPIRUserStateManager.firstScanResults, FreemiumDBPMatchResults(matchesCount: 0, brokerCount: 0))
         XCTAssertFalse(mockNotificationCenter.didCallAddObserver)
         XCTAssertTrue(mockDataManager.didCallMatchesFoundCount)
         XCTAssertNil(sut.timer)

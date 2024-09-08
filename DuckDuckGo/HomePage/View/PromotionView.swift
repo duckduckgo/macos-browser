@@ -40,7 +40,7 @@ extension HomePage.Views {
                         image
 
                         VStack(alignment: .leading, spacing: 8) {
-                            if let titleText = viewModel.title {
+                            if viewModel.title != nil {
                                 title
                             }
                             subtitle
@@ -93,16 +93,10 @@ extension HomePage.Views {
                 .font(.system(size: 13).bold())
        }
 
-        @ViewBuilder
         private var subtitle: some View {
-            if #available(macOS 12.0, *), let attributed = try? AttributedString(markdown: viewModel.subtitle) {
-                Text(attributed)
-            } else {
-                Text(viewModel.subtitle)
-            }
+            Text(viewModel.subtitle)
         }
 
-        /// Single button is always "standard" (i.e. not prominent/blue) and uses large control size.
         private var button: some View {
             Group {
                 Button(action: viewModel.proceedAction) {

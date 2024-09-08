@@ -19,7 +19,7 @@
 import Foundation
 
 /// A structure representing the results of a Freemium DBP match, including the count of matches and brokers.
-public struct FreemiumDBPMatchResults: Codable {
+public struct FreemiumDBPMatchResults: Codable, Equatable {
 
     /// The number of matches found during the Freemium DBP process.
     public let matchesCount: Int

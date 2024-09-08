@@ -162,8 +162,6 @@ private extension DefaultFreemiumPIRScanResultPolling {
         }
     }
 
-
-    
     /// Checks if any matches have been found or if the maximum polling duration has been exceeded.
     /// Posts a notification if results are found or if no results are found after the maximum duration.
     func checkResultsAndNotifyIfApplicable() {
@@ -188,13 +186,10 @@ private extension DefaultFreemiumPIRScanResultPolling {
     ///   - matchesCount: The number of matches found during the scan.
     ///   - brokerCount: The number of brokers associated with the matches found.
     func notifyOfResultsAndStopTimer(_ matchesCount: Int, _ brokerCount: Int) {
-        if matchesCount > 0 {
-            freemiumPIRUserStateManager.firstScanResults = FreemiumDBPMatchResults(matchesCount: matchesCount, brokerCount: brokerCount)
-            Logger.freemiumDBP.debug("[Freemium DBP] Posting Scan Results Notification WITH matches")
-        } else {
-            freemiumPIRUserStateManager.firstScanResults = FreemiumDBPMatchResults(matchesCount: 0, brokerCount: 0)
-            Logger.freemiumDBP.debug("[Freemium DBP] Posting Scan Results Notification WITHOUT matches")
-        }
+
+        freemiumPIRUserStateManager.firstScanResults = FreemiumDBPMatchResults(matchesCount: matchesCount, brokerCount: brokerCount)
+        let withOrWith = matchesCount > 0 ? "WITH" : "WITHOUT"
+        Logger.freemiumDBP.debug("[Freemium DBP] Posting Scan Results Notification \(withOrWith) matches")
 
         notificationCenter.post(name: .freemiumDBPResultPollingComplete, object: nil)
 
