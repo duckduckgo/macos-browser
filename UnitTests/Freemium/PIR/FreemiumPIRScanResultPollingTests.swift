@@ -106,7 +106,7 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
         // Then
         XCTAssertNotNil(mockFreemiumPIRUserStateManager.firstProfileSavedTimestamp)
         XCTAssertTrue(mockNotificationCenter.didCallAddObserver)
-        XCTAssertTrue(mockDataManager.didCallMatchesFoundCount)
+        XCTAssertFalse(mockDataManager.didCallMatchesFoundCount)
         XCTAssertNotNil(sut.timer)
     }
 
