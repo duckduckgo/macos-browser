@@ -991,14 +991,9 @@ extension TabBarViewController: NSCollectionViewDelegate {
             tabCollectionViewModel.insert(Tab(content: .url(url, source: .appOpenUrl), burnerMode: tabCollectionViewModel.burnerMode),
                                           at: .unpinned(newIndex),
                                           selected: true)
-
             return true
-        } else if let string = draggingInfo.draggingPasteboard.string(forType: .string),
-                    let url = URL.makeSearchUrl(from: string),
-                    let index = tabCollectionViewModel.selectionIndex {
-            let tab = Tab(content: .url(url, credential: nil, source: .reload), title: "\(string) at DuckDuckGo", shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
-            tabCollectionViewModel.replaceTab(at: index, with: tab, forceChange: true)
-            collectionView.reloadData()
+        } else if let string = draggingInfo.draggingPasteboard.string(forType: .string), let url = URL.makeSearchUrl(from: string) {
+            tabCollectionViewModel.insertOrAppendNewTab(.url(url, credential: nil, source: .reload))
             return true
         }
 
@@ -1259,6 +1254,21 @@ extension TabBarViewController: TabBarViewItemDelegate {
               let tab = tabCollectionViewModel.tabCollection.tabs[safe: indexPath.item] else { return nil }
 
         return tab.audioState
+    }
+
+    func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, replaceWithStringSearch: String) {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
+              let tab = tabCollectionViewModel.tabCollection.tabs[safe: indexPath.item],
+              let tabIndex = tabCollectionViewModel.indexInAllTabs(of: tab) else { return }
+
+        if let url = URL.makeSearchUrl(from: replaceWithStringSearch) {
+            let tab = Tab(content: .url(url, credential: nil, source: .reload),
+                          shouldLoadInBackground: true,
+                          burnerMode: tabCollectionViewModel.burnerMode)
+            tabCollectionViewModel.replaceTab(at: tabIndex, with: tab, forceChange: true)
+            tabCollectionViewModel.select(tab: tab)
+            collectionView.reloadData()
+        }
     }
 
     func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> OtherTabBarViewItemsState {

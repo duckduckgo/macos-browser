@@ -19,7 +19,7 @@
 import SwiftUI
 import SwiftUIExtensions
 
-struct PinnedTabView: View {
+struct PinnedTabView: View, DropDelegate {
     enum Const {
         static let dimension: CGFloat = 34
         static let cornerRadius: CGFloat = 10
@@ -49,6 +49,7 @@ struct PinnedTabView: View {
             .buttonStyle(TouchDownButtonStyle())
             .cornerRadius(Const.cornerRadius, corners: [.topLeft, .topRight])
             .contextMenu { contextMenu }
+            .onDrop(of: ["public.text"], delegate: self)
 
             BorderView(isSelected: isSelected,
                        cornerRadius: Const.cornerRadius,
@@ -62,7 +63,22 @@ struct PinnedTabView: View {
         } else {
             stack
         }
+    }
 
+    func performDrop(info: DropInfo) -> Bool {
+        if let item = info.itemProviders(for: ["public.utf8-plain-text"]).first {
+            item.loadItem(forTypeIdentifier: "public.utf8-plain-text", options: nil) { (data, _) in
+                if let data = data as? Data, let droppedString = NSString(data: data, encoding: NSUTF8StringEncoding) {
+                    print(droppedString)
+                    let url = URL.makeSearchUrl(from: droppedString as String)!
+
+                    DispatchQueue.main.async {
+                        model.setUrl(url, source: .ui)
+                    }
+                }
+            }
+        }
+        return true
     }
 
     private var isSelected: Bool {
