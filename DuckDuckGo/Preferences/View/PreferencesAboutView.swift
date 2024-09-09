@@ -277,6 +277,7 @@ extension Preferences {
                     .pickerStyle(.radioGroup)
                     .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
                     .accessibilityIdentifier("PreferencesAboutView.automaticUpdatesPicker")
+                    .disabled(model.updateController?.canCheckForUpdates == false)
                     .onChange(of: areAutomaticUpdatesEnabled) { newValue in
                         model.areAutomaticUpdatesEnabled = newValue
                     }
