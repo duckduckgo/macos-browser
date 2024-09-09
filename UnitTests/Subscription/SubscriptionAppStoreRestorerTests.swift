@@ -29,12 +29,15 @@ import enum StoreKit.StoreKitError
 final class SubscriptionAppStoreRestorerTests: XCTestCase {
 
     private struct Constants {
+        static let userDefaultsSuiteName = "SubscriptionAppStoreRestorerTests"
+
         static let authToken = UUID().uuidString
         static let accessToken = UUID().uuidString
         static let externalID = UUID().uuidString
         static let email = "dax@duck.com"
     }
 
+    var userDefaults: UserDefaults!
     var pixelKit: PixelKit!
     var uiHandler: SubscriptionUIHandlerMock!
 
@@ -52,10 +55,13 @@ final class SubscriptionAppStoreRestorerTests: XCTestCase {
     var uiEventsHappened: [SubscriptionUIHandlerMock.UIHandlerMockPerformedAction] = []
 
     override func setUp() async throws {
+        userDefaults = UserDefaults(suiteName: Constants.userDefaultsSuiteName)!
+        userDefaults.removePersistentDomain(forName: Constants.userDefaultsSuiteName)
+
         pixelKit = PixelKit(dryRun: false,
                             appVersion: "1.0.0",
                             defaultHeaders: [:],
-                            defaults: testUserDefault) { pixelName, _, _, _, _, _ in
+                            defaults: userDefaults) { pixelName, _, _, _, _, _ in
             self.pixelsFired.append(pixelName)
         }
         pixelKit.clearFrequencyHistoryForAllPixels()
@@ -86,6 +92,8 @@ final class SubscriptionAppStoreRestorerTests: XCTestCase {
     }
 
     override func tearDown() async throws {
+        userDefaults = nil
+
         PixelKit.tearDown()
         pixelKit.clearFrequencyHistoryForAllPixels()
 
@@ -104,8 +112,6 @@ final class SubscriptionAppStoreRestorerTests: XCTestCase {
 
         subscriptionAppStoreRestorer = nil
     }
-
-    let testUserDefault = UserDefaults(suiteName: #function)!
 
     // MARK: - Tests for restoreAppStoreSubscription
 
