@@ -129,7 +129,7 @@ public class PhishingDetection: PhishingSiteDetecting {
 
         let resolvedDataStore = dataStore ?? PhishingDetectionDataStore(dataProvider: resolvedDataProvider)
         let resolvedDetector = detector ?? PhishingDetector(apiClient: detectionClient, dataStore: resolvedDataStore, eventMapping:
-            EventMapping<PhishingDetectionEvents> {event, _, params, _ in
+            EventMapping<PhishingDetectionEvents> {event, _, _, _ in
             switch event {
             case .errorPageShown(clientSideHit: let clientSideHit):
                 PixelKit.fire(PhishingDetectionEvents.errorPageShown(clientSideHit: clientSideHit))
