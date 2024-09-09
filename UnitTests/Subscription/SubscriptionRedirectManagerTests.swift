@@ -72,7 +72,6 @@ final class SubscriptionRedirectManagerTests: XCTestCase {
     func testWhenURLIsPrivacyProAndPurchaseIsNotAllowedThenRedirectReturnsNil() throws {
         // GIVEN
         let url = try XCTUnwrap(URL(string: "https://www.duckduckgo.com/pro?origin=test"))
-        let expectedURL = url
 
         // WHEN
         self.canPurchase = false
