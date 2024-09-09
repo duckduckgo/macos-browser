@@ -135,7 +135,7 @@ public class PhishingDetection: PhishingSiteDetecting {
     }
     
     public func isEnabled() -> (Bool, Bool) {
-        return (featureFlagger.isFeatureOn(.phishingDetection), self.detectionPreferences.isEnabled)
+        return (featureFlagger.isFeatureOn(.phishingDetectionErrorPage), self.detectionPreferences.isEnabled)
     }
 
     private func startUpdateTasksIfEnabled() {
