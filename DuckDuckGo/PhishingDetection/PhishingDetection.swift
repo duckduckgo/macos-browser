@@ -38,7 +38,7 @@ public class PhishingDetection: PhishingSiteDetecting {
     private var detectionPreferences: PhishingDetectionPreferences
     private var dataStore: PhishingDetectionDataSaving
     private var featureFlagger: FeatureFlagger
-    private var config: PrivacyConfiguration
+    private var configManager: PrivacyConfigurationManaging
     private var cancellable: AnyCancellable?
     private let revision: Int
     private let filterSetURL: URL
@@ -59,7 +59,8 @@ public class PhishingDetection: PhishingSiteDetecting {
         updateManager: PhishingDetectionUpdateManaging? = nil,
         dataActivities: PhishingDetectionDataActivityHandling? = nil,
         detectionPreferences: PhishingDetectionPreferences = PhishingDetectionPreferences.shared,
-        featureFlagger: FeatureFlagger? = nil
+        featureFlagger: FeatureFlagger? = nil,
+        configManager: PrivacyConfigurationManaging? = nil
     ) {
         self.revision = revision
         self.filterSetURL = filterSetURL
@@ -67,6 +68,7 @@ public class PhishingDetection: PhishingSiteDetecting {
         self.hashPrefixURL = hashPrefixURL
         self.hashPrefixDataSHA = hashPrefixDataSHA
         self.featureFlagger = featureFlagger ?? NSApp.delegateTyped.featureFlagger
+        self.configManager = configManager ?? AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
 
         let resolvedDependencies = PhishingDetection.resolveDependencies(
             revision: revision,
@@ -87,7 +89,6 @@ public class PhishingDetection: PhishingSiteDetecting {
         self.updateManager = resolvedDependencies.updateManager
         self.dataActivities = resolvedDependencies.dataActivities
         self.detectionPreferences = detectionPreferences
-        self.config = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig
 
         self.startUpdateTasksIfEnabled()
         self.setupBindings()
@@ -96,12 +97,28 @@ public class PhishingDetection: PhishingSiteDetecting {
     convenience init(
         dataActivities: PhishingDetectionDataActivityHandling,
         dataStore: PhishingDetectionDataSaving,
-        detector: PhishingDetecting
+        detector: PhishingDetecting,
+        configManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
     ) {
         self.init(
-            dataStore: dataStore,
-            detector: detector,
-            dataActivities: dataActivities
+            dataStore: dataStore, detector: detector, dataActivities: dataActivities,
+            detectionPreferences: PhishingDetectionPreferences.shared,
+            featureFlagger: NSApp.delegateTyped.featureFlagger,
+            configManager: configManager
+        )
+    }
+
+    convenience init(featureFlagger: FeatureFlagger, configManager: PrivacyConfigurationManaging) {
+        self.init(
+            detectionClient: PhishingDetectionAPIClient(),
+            dataProvider: nil,
+            dataStore: nil,
+            detector: nil,
+            updateManager: nil,
+            dataActivities: nil,
+            detectionPreferences: PhishingDetectionPreferences.shared,
+            featureFlagger: featureFlagger,
+            configManager: configManager
         )
     }
 
@@ -131,6 +148,7 @@ public class PhishingDetection: PhishingSiteDetecting {
         let resolvedDetector = detector ?? PhishingDetector(apiClient: detectionClient, dataStore: resolvedDataStore)
         let resolvedUpdateManager = updateManager ?? PhishingDetectionUpdateManager(client: detectionClient, dataStore: resolvedDataStore)
         let resolvedDataActivities = dataActivities ?? PhishingDetectionDataActivities(phishingDetectionDataProvider: resolvedDataProvider, updateManager: resolvedUpdateManager)
+
         return (resolvedDataStore, resolvedDetector, resolvedUpdateManager, resolvedDataActivities)
     }
 
@@ -148,7 +166,7 @@ public class PhishingDetection: PhishingSiteDetecting {
     }
 
     public func checkIsMaliciousIfEnabled(url: URL) async -> Bool {
-        if config.isFeature(.phishingDetection, enabledForDomain: url.host),
+        if configManager.privacyConfig.isFeature(.phishingDetection, enabledForDomain: url.host),
            detectionPreferences.isEnabled {
             return await detector.isMalicious(url: url)
         } else {
