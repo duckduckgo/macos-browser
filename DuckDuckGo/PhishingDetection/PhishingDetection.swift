@@ -133,6 +133,10 @@ public class PhishingDetection: PhishingSiteDetecting {
         let resolvedDataActivities = dataActivities ?? PhishingDetectionDataActivities(phishingDetectionDataProvider: resolvedDataProvider, updateManager: resolvedUpdateManager)
         return (resolvedDataStore, resolvedDetector, resolvedUpdateManager, resolvedDataActivities)
     }
+    
+    public func isEnabled() -> (Bool, Bool) {
+        return (featureFlagger.isFeatureOn(.phishingDetection), self.detectionPreferences.isEnabled)
+    }
 
     private func startUpdateTasksIfEnabled() {
         if featureFlagger.isFeatureOn(.phishingDetection),
