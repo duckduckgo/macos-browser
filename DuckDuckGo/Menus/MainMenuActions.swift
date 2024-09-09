@@ -800,6 +800,7 @@ extension MainViewController {
                                                           installDate: nil)
         autofillPixelReporter.resetStoreDefaults()
         UserDefaults.standard.hasImportedLogins = false
+        UserDefaults.standard.credentialsImportPromptPresentationCount = 0
     }
 
     @objc func resetBookmarks(_ sender: Any?) {

@@ -21,6 +21,7 @@ import BrowserServicesKit
 extension UserDefaults: AutofillLoginImportStateProvider {
     private enum Key {
         static let hasImportedLogins: String = "com.duckduckgo.logins.hasImportedLogins"
+        static let credentialsImportPromptPresentationCount: String = "com.duckduckgo.logins.credentialsImportPromptPresentationCount"
     }
 
     public var isNewDDGUser: Bool {
@@ -37,6 +38,16 @@ extension UserDefaults: AutofillLoginImportStateProvider {
 
         set {
             set(newValue, forKey: Key.hasImportedLogins)
+        }
+    }
+
+    public var credentialsImportPromptPresentationCount: Int {
+        get {
+            integer(forKey: Key.credentialsImportPromptPresentationCount)
+        }
+
+        set {
+            set(newValue, forKey: Key.credentialsImportPromptPresentationCount)
         }
     }
 }

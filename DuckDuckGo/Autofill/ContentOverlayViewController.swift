@@ -47,6 +47,12 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         return manager
     }()
 
+    lazy var credentialsImportManager: AutofillCredentialsImportManager = {
+        let manager = AutofillCredentialsImportManager()
+        manager.presentationDelegate = self
+        return manager
+    }()
+
     lazy var autofillPreferencesModel: AutofillPreferencesModel = {
         let model = AutofillPreferencesModel()
         return model
@@ -148,7 +154,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         topAutofillUserScript.contentOverlay = self
         topAutofillUserScript.emailDelegate = emailManager
         topAutofillUserScript.vaultDelegate = vaultManager
-        topAutofillUserScript.passwordImportDelegate = self
+        topAutofillUserScript.passwordImportDelegate = credentialsImportManager
     }
 
     // EmailManagerRequestDelegate
@@ -371,23 +377,9 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
     }
 }
 
-extension ContentOverlayViewController: AutofillPasswordImportDelegate {
-    public func autofillUserScriptDidRequestPasswordImportFlow(_ completion: @escaping () -> Void) {
-        PixelKit.fire(AutofillPixelKitEvent.importCredentialsFlowStarted.withoutMacPrefix)
-        let viewModel = DataImportViewModel(
-            onFinished: {
-                PixelKit.fire(AutofillPixelKitEvent.importCredentialsFlowEnded.withoutMacPrefix)
-                completion()
-            },
-            onCancelled: {
-                PixelKit.fire(AutofillPixelKitEvent.importCredentialsFlowCancelled.withoutMacPrefix)
-                completion()
-            }
-        )
+extension ContentOverlayViewController: AutofillCredentialsImportPresentationDelegate {
+    public func autofillDidRequestCredentialsImportFlow(onFinished: @escaping () -> Void, onCancelled: @escaping () -> Void) {
+        let viewModel = DataImportViewModel(onFinished: onFinished, onCancelled: onCancelled)
         DataImportView(model: viewModel).show()
-    }
-
-    public func autofillUserScriptDidFinishImportWithImportedCredentialForCurrentDomain() {
-        PixelKit.fire(AutofillPixelKitEvent.importCredentialsFlowHadCredentials.withoutMacPrefix)
     }
 }
