@@ -110,6 +110,7 @@ enum GeneralPixel: PixelKitEventV2 {
 
     // Duck Player
     case duckPlayerDailyUniqueView
+    case duckPlayerWeeklyUniqueView
     case duckPlayerViewFromYoutubeViaMainOverlay
     case duckPlayerViewFromYoutubeViaHoverButton
     case duckPlayerViewFromYoutubeAutomatic
@@ -573,6 +574,8 @@ enum GeneralPixel: PixelKitEventV2 {
         case .fireButton(option: let option):
             return "m_mac_fire_button_\(option)"
 
+        case .duckPlayerWeeklyUniqueView:
+            return "duckplayer_weekly-unique-view"
         case .duckPlayerDailyUniqueView:
             return "m_mac_duck-player_daily-unique-view"
         case .duckPlayerViewFromYoutubeViaMainOverlay:
@@ -1184,6 +1187,7 @@ enum GeneralPixel: PixelKitEventV2 {
                 .duckPlayerNewTabSettingsOn,
                 .duckPlayerNewTabSettingsOff,
                 .duckPlayerContingencySettingsDisplayed,
+                .duckPlayerWeeklyUniqueView,
                 .duckPlayerContingencyLearnMoreClicked:
             return DuckPlayerOnboardingExperiment().getPixelParameters()
 

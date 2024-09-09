@@ -24,6 +24,7 @@ protocol OnboardingExperimentManager {
     func assignUserToCohort()
     func getPixelParameters(cohort: Bool, date: Bool, experimentName: Bool) -> [String: String]?
     var isUserAssignedToExperimentCohort: Bool { get }
+    func fireWeeklyUniqueViewPixel(extraParams: [String: String]?)
 }
 
 // https://app.asana.com/0/72649045549333/1208088257884523/f
@@ -69,8 +70,14 @@ struct DuckPlayerOnboardingExperiment: OnboardingExperimentManager {
         Logger.duckPlayerOnboardingExperiment.debug("User assigned to cohort \(cohort.rawValue)")
     }
 
-    func sendWeeklyUniqueView() {
-        // m_mac_duck-player_weekly-unique-view
+    func fireWeeklyUniqueViewPixel(extraParams: [String: String]?) {
+        guard enrollmentDate != nil else { return }
+
+        if shouldFireWeeklyPixel() {
+            PixelKit.fire(NonStandardEvent(DuckPlayerOnboardingExperimentPixel.weeklyUniqueView),
+                          withAdditionalParameters: extraParams)
+            userDefaults.weeklyPixelSentDate = Date()
+        }
     }
 
     func getPixelParameters(cohort: Bool = true,
@@ -114,6 +121,14 @@ struct DuckPlayerOnboardingExperiment: OnboardingExperimentManager {
         userDefaults.didRunEnrollment = false
 
     }
+
+    private func shouldFireWeeklyPixel() -> Bool {
+        guard let lastFiredDate = userDefaults.weeklyPixelSentDate else { return true }
+
+        let calendar = Calendar.current
+        guard let date7DaysLater = calendar.date(byAdding: .day, value: 7, to: lastFiredDate) else { return false }
+        return Date() >= date7DaysLater
+    }
 }
 
 private extension UserDefaults {
@@ -121,12 +136,17 @@ private extension UserDefaults {
         static let enrollmentDate = "duckplayer.onboarding.experiment-enrollment-date"
         static let experimentCohort = "duckplayer.onboarding.experiment-cohort"
         static let didRunEnrollment = "duckplayer.onboarding.experiment-did-run-enrollment"
-
+        static let weeklyPixelSentDate = "duckplayer.onboarding.experiment-weekly-pixel-sent-date"
     }
 
     var enrollmentDate: Date? {
         get { return object(forKey: Keys.enrollmentDate) as? Date }
         set { set(newValue, forKey: Keys.enrollmentDate) }
+    }
+
+    var weeklyPixelSentDate: Date? {
+        get { return object(forKey: Keys.weeklyPixelSentDate) as? Date }
+        set { set(newValue, forKey: Keys.weeklyPixelSentDate) }
     }
 
     var experimentCohort: DuckPlayerOnboardingExperiment.Cohort? {
