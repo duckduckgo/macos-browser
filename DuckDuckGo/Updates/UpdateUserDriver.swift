@@ -67,8 +67,8 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     private var bytesToDownload: UInt64 = 0
     private var bytesDownloaded: UInt64 = 0
 
-    private let subject = CurrentValueSubject<UpdateCycleProgress, Never>(.updateCycleNotStarted)
-    public lazy var updateProgressPublisher = subject.eraseToAnyPublisher()
+    @Published var updateProgress = UpdateCycleProgress.default
+    public var updateProgressPublisher: Published<UpdateCycleProgress>.Publisher { $updateProgress }
 
     init(internalUserDecider: InternalUserDecider,
          areAutomaticUpdatesEnabled: Bool) {
@@ -90,7 +90,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
 
     func showUserInitiatedUpdateCheck(cancellation: @escaping () -> Void) {
         Logger.updates.debug("Updater started performing the update check. (isInternalUser: \(self.internalUserDecider.isInternalUser)")
-        subject.send(.updateCycleDidStart)
+        updateProgress = .updateCycleDidStart
     }
 
     func showUpdateFound(with appcastItem: SUAppcastItem, state: SPUUserUpdateState, reply: @escaping (SPUUserUpdateChoice) -> Void) {
@@ -100,7 +100,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
 
         if checkpoint == .download {
             onResuming = { reply(.install) }
-            subject.send(.updateCycleDone)
+            updateProgress = .updateCycleDone
         } else {
             reply(.install)
         }
@@ -123,7 +123,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     }
 
     func showDownloadInitiated(cancellation: @escaping () -> Void) {
-        subject.send(.downloadDidStart)
+        updateProgress = .downloadDidStart
     }
 
     func showDownloadDidReceiveExpectedContentLength(_ expectedContentLength: UInt64) {
@@ -136,15 +136,15 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         if bytesDownloaded > bytesToDownload {
             bytesToDownload = bytesDownloaded
         }
-        subject.send(.downloading(bytesDownloaded, bytesToDownload))
+        updateProgress = .downloading(bytesDownloaded, bytesToDownload)
     }
 
     func showDownloadDidStartExtractingUpdate() {
-        subject.send(.extractionDidStart)
+        updateProgress = .extractionDidStart
     }
 
     func showExtractionReceivedProgress(_ progress: Double) {
-        subject.send(.extracting(progress))
+        updateProgress = .extracting(progress)
     }
 
     func showReady(toInstallAndRelaunch reply: @escaping (SPUUserUpdateChoice) -> Void) {
@@ -154,15 +154,15 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
             reply(.install)
         }
 
-        subject.send(.updateCycleDone)
+        updateProgress = .updateCycleDone
     }
 
     func showInstallingUpdate(withApplicationTerminated applicationTerminated: Bool, retryTerminatingApplication: @escaping () -> Void) {
-        subject.send(.installationDidStart)
+        updateProgress = .installationDidStart
     }
 
     func showUpdateInstalledAndRelaunched(_ relaunched: Bool, acknowledgement: @escaping () -> Void) {
-        subject.send(.installing)
+        updateProgress = .installing
         acknowledgement()
     }
 
@@ -171,7 +171,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     }
 
     func dismissUpdateInstallation() {
-        subject.send(.updateCycleDone)
+        updateProgress = .updateCycleDone
     }
 }
 
