@@ -77,6 +77,16 @@ class PhishingDetectionIntegrationTests: XCTestCase {
     }
 
     @MainActor
+    func testFeatureDisabledAndPhishingDetection_tabIsNotMarkedPhishing() async throws {
+        PhishingDetectionPreferences.shared.isEnabled = false
+        try await loadUrl("http://privacy-test-pages.site/security/badware/phishing.html")
+        let url = URL(string: "http://privacy-test-pages.site/security/badware/phishing.html")!
+        try await waitForTabToFinishLoading()
+        let tabErrorCode = tabViewModel.tab.error?.errorCode
+        XCTAssertNil(tabErrorCode)
+    }
+
+    @MainActor
     func testPhishingDetectedThenNotDetected_tabIsNotMarkedPhishing() async throws {
         try await loadUrl("http://privacy-test-pages.site/security/badware/phishing.html")
         try await waitForTabToFinishLoading()

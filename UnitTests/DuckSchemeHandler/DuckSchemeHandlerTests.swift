@@ -136,6 +136,7 @@ final class DuckSchemeHandlerTests: XCTestCase {
             NSURLErrorFailingURLErrorKey: phishingUrl,
             NSLocalizedDescriptionKey: error.errorUserInfo[NSLocalizedDescriptionKey] ?? "Phishing detected"
         ])
+        XCTAssertNotNil(schemeTask.error)
         XCTAssertEqual(schemeTask.error! as NSError, expectedError)
     }
 
@@ -160,6 +161,7 @@ final class DuckSchemeHandlerTests: XCTestCase {
             NSURLErrorFailingURLErrorKey: "about:blank",
             NSLocalizedDescriptionKey: "Unexpected Error"
         ])
+        XCTAssertNotNil(schemeTask.error)
         XCTAssertEqual(schemeTask.error! as NSError, expectedError)
     }
 
