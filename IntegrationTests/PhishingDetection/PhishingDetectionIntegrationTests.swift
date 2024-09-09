@@ -104,10 +104,43 @@ class PhishingDetectionIntegrationTests: XCTestCase {
 
     @MainActor
     func testPhishingDetectedViaHTTPRedirectChain_tabIsMarkedPhishing() async throws {
-        try await loadUrl("http://bad.third-party.site/security/badware/phishing-redirect/302")
+        try await loadUrl("http://bad.third-party.site/security/badware/phishing-redirect/")
         try await waitForTabToFinishLoading()
         let tabErrorCode = tabViewModel.tab.error?.errorCode
         XCTAssertEqual(tabErrorCode, PhishingDetectionError.detected.errorCode)
+    }
+
+    @MainActor
+    func testPhishingDetectedRepeatedClientRedirectChains_tabIsMarkedPhishing() async throws {
+        let urls = [
+            "http://privacy-test-pages.site/security/badware/phishing-js-redirector-helper.html",
+            "http://privacy-test-pages.site/security/badware/phishing-js-redirector.html",
+            "http://privacy-test-pages.site/security/badware/phishing-meta-redirect.html",
+        ]
+
+        for url in urls {
+            try await loadUrl(url)
+            try await waitForTabToFinishLoading()
+            let tabErrorCode = tabViewModel.tab.error?.errorCode
+            XCTAssertEqual(tabErrorCode, PhishingDetectionError.detected.errorCode)
+        }
+    }
+
+    @MainActor
+    func testPhishingDetectedRepeatedServerRedirectChains_tabIsMarkedPhishing() async throws {
+        let urls = [
+            "http://privacy-test-pages.site/security/badware/phishing-redirect/302",
+            "http://privacy-test-pages.site/security/badware/phishing-redirect/js",
+            "http://privacy-test-pages.site/security/badware/phishing-redirect/meta",
+            "http://privacy-test-pages.site/security/badware/phishing-redirect/meta2"
+        ]
+
+        for url in urls {
+            try await loadUrl(url)
+            try await waitForTabToFinishLoading()
+            let tabErrorCode = tabViewModel.tab.error?.errorCode
+            XCTAssertEqual(tabErrorCode, PhishingDetectionError.detected.errorCode)
+        }
     }
 
     // MARK: - Helper Methods
