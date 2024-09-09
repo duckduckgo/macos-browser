@@ -136,7 +136,6 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
                 return .redirect(mainFrame) { navigator in
                     navigator.load(URLRequest(url: errorURL))
                 }
-//                _ = webView?.load(URLRequest(url: errorURL))
                 return .none
             }
         } else {

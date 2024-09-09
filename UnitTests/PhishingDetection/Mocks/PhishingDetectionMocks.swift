@@ -22,6 +22,55 @@ import Combine
 import PhishingDetection
 @testable import DuckDuckGo_Privacy_Browser
 
+class MockDataProvider: PhishingDetectionDataProviding {
+    var embeddedFilterSet: Set<Filter> = []
+    var embeddedHashPrefixes: Set<String> = []
+    var embeddedRevision: Int = 0
+    var didLoadFilterSet: Bool = false
+    var didLoadHashPrefixes: Bool = false
+
+    func loadEmbeddedFilterSet() -> Set<Filter> {
+        didLoadFilterSet = true
+        return embeddedFilterSet
+    }
+
+    func loadEmbeddedHashPrefixes() -> Set<String> {
+        didLoadHashPrefixes = true
+        return embeddedHashPrefixes
+    }
+}
+
+class MockFileStorageManager: FileStorageManager {
+    private var storage: [String: Data] = [:]
+    var didWriteToDisk: Bool = false
+    var didReadFromDisk: Bool = false
+
+    func write(data: Data, to filename: String) {
+        didWriteToDisk = true
+        storage[filename] = data
+    }
+
+    func read(from filename: String) -> Data? {
+        didReadFromDisk = true
+        return storage[filename]
+    }
+}
+
+final class MockPhishingDataActivitites: PhishingDetectionDataActivityHandling {
+    var started: Bool = false
+    var stopped: Bool = true
+
+    func start() {
+        started = true
+        stopped = false
+    }
+
+    func stop() {
+        stopped = true
+        started = false
+    }
+}
+
 final class MockPhishingDetection: PhishingDetecting {
     func isMalicious(url: URL) async -> Bool {
         return url.absoluteString.contains("malicious")
