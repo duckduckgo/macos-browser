@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "sam/set-vpn-user-agent",
-        "revision" : "ee3f70eb5116b8eed14403c237b78a2afa05ec63"
+        "revision" : "660971f355c2288ebd3041e92d9674abd9e3a3e0",
+        "version" : "191.2.2"
       }
     },
     {

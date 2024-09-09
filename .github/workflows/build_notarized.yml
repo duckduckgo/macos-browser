@@ -258,7 +258,7 @@ jobs:
     if: ${{ github.event.inputs.create-dmg == true || inputs.create-dmg == true }}
 
     # use macos-12 for creating DMGs as macos-13 beta runners can't run AppleScript: https://app.asana.com/0/0/1204523592790998/f
-    runs-on: macos-12
+    runs-on: macos-14
 
     env:
       app-version: ${{ needs.export-notarized-app.outputs.app-version }}
@@ -306,7 +306,9 @@ jobs:
         dmg="duckduckgo-${{ env.app-version }}.dmg"
         curl -fLSs $(gh api https://api.github.com/repos/${{ github.repository }}/contents/scripts/assets/dmg-background.png?ref=${{ github.ref }} --jq .download_url) \
             --output dmg-background.png
+        # Using APFS filesystem as per https://github.com/actions/runner-images/issues/7522#issuecomment-2299918092
         create-dmg --volname "${{ env.app-name }}" \
+            --filesystem APFS \
             --icon "${{ env.app-name }}.app" 140 160 \
             --background "dmg-background.png" \
             --window-size 600 400 \
