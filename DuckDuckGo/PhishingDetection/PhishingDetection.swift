@@ -68,6 +68,7 @@ public class PhishingDetection: PhishingSiteDetecting {
         self.hashPrefixURL = hashPrefixURL
         self.hashPrefixDataSHA = hashPrefixDataSHA
         self.featureFlagger = featureFlagger ?? NSApp.delegateTyped.featureFlagger
+        self.configManager = configManager ?? AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
 
         let resolvedDependencies = PhishingDetection.resolveDependencies(
             revision: revision,
@@ -80,15 +81,13 @@ public class PhishingDetection: PhishingSiteDetecting {
             dataStore: dataStore,
             detector: detector,
             updateManager: updateManager,
-            dataActivities: dataActivities,
-            configManager: configManager
+            dataActivities: dataActivities
         )
 
         self.dataStore = resolvedDependencies.dataStore
         self.detector = resolvedDependencies.detector
         self.updateManager = resolvedDependencies.updateManager
         self.dataActivities = resolvedDependencies.dataActivities
-        self.configManager = resolvedDependencies.configManager
         self.detectionPreferences = detectionPreferences
 
         self.startUpdateTasksIfEnabled()
@@ -134,9 +133,8 @@ public class PhishingDetection: PhishingSiteDetecting {
         dataStore: PhishingDetectionDataSaving?,
         detector: PhishingDetecting?,
         updateManager: PhishingDetectionUpdateManaging?,
-        dataActivities: PhishingDetectionDataActivityHandling?,
-        configManager: PrivacyConfigurationManaging?
-    ) -> (dataStore: PhishingDetectionDataSaving, detector: PhishingDetecting, updateManager: PhishingDetectionUpdateManaging, dataActivities: PhishingDetectionDataActivityHandling, configManager: PrivacyConfigurationManaging) {
+        dataActivities: PhishingDetectionDataActivityHandling?
+    ) -> (dataStore: PhishingDetectionDataSaving, detector: PhishingDetecting, updateManager: PhishingDetectionUpdateManaging, dataActivities: PhishingDetectionDataActivityHandling) {
 
         let resolvedDataProvider = dataProvider ?? PhishingDetectionDataProvider(
             revision: revision,
@@ -150,9 +148,8 @@ public class PhishingDetection: PhishingSiteDetecting {
         let resolvedDetector = detector ?? PhishingDetector(apiClient: detectionClient, dataStore: resolvedDataStore)
         let resolvedUpdateManager = updateManager ?? PhishingDetectionUpdateManager(client: detectionClient, dataStore: resolvedDataStore)
         let resolvedDataActivities = dataActivities ?? PhishingDetectionDataActivities(phishingDetectionDataProvider: resolvedDataProvider, updateManager: resolvedUpdateManager)
-        let resolvedConfigManager = configManager ?? AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
 
-        return (resolvedDataStore, resolvedDetector, resolvedUpdateManager, resolvedDataActivities, resolvedConfigManager)
+        return (resolvedDataStore, resolvedDetector, resolvedUpdateManager, resolvedDataActivities)
     }
 
     private func startUpdateTasksIfEnabled() {
