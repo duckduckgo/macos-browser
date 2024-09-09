@@ -1011,12 +1011,11 @@ extension NavigationBarViewController: NSMenuDelegate {
             }
             .store(in: &cancellables)
 
-        networkProtectionButtonModel.$showButton
-            .removeDuplicates()
+        networkProtectionButtonModel.$showVPNButton
             .receive(on: RunLoop.main)
             .sink { [weak self] show in
                 let isPopUpWindow = self?.view.window?.isPopUpWindow ?? false
-                self?.networkProtectionButton.isHidden =  isPopUpWindow || !show
+                self?.networkProtectionButton.isHidden = isPopUpWindow || !show
             }
             .store(in: &cancellables)
 

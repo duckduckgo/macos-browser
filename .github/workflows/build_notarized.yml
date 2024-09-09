@@ -239,15 +239,17 @@ jobs:
 
     - name: Report success
       if: ${{ env.upload-to == 's3' }}
-      uses: ./.github/actions/asana-log-message
       env:
         DSYM_S3_PATH: ${{ steps.upload-dsyms-to-s3.outputs.dsym-s3-path }}
         TAG: ${{ env.app-version }}
         WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-      with:
-        task-url: ${{ env.asana-task-url }}
-        access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-        template-name: debug-symbols-uploaded
+        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+      run: |
+        bundle exec fastlane run asana_log_message \
+          task_url:"${{ env.asana-task-url }}" \
+          template_name:"debug-symbols-uploaded" \
+          github_handle:"${{ github.actor }}" \
+          is_scheduled_release:"${{ github.event_name == 'schedule' }}"
 
   create-dmg:
 
@@ -256,7 +258,7 @@ jobs:
     if: ${{ github.event.inputs.create-dmg == true || inputs.create-dmg == true }}
 
     # use macos-12 for creating DMGs as macos-13 beta runners can't run AppleScript: https://app.asana.com/0/0/1204523592790998/f
-    runs-on: macos-12
+    runs-on: macos-14
 
     env:
       app-version: ${{ needs.export-notarized-app.outputs.app-version }}
@@ -304,7 +306,9 @@ jobs:
         dmg="duckduckgo-${{ env.app-version }}.dmg"
         curl -fLSs $(gh api https://api.github.com/repos/${{ github.repository }}/contents/scripts/assets/dmg-background.png?ref=${{ github.ref }} --jq .download_url) \
             --output dmg-background.png
+        # Using APFS filesystem as per https://github.com/actions/runner-images/issues/7522#issuecomment-2299918092
         create-dmg --volname "${{ env.app-name }}" \
+            --filesystem APFS \
             --icon "${{ env.app-name }}.app" 140 160 \
             --background "dmg-background.png" \
             --window-size 600 400 \
@@ -335,15 +339,17 @@ jobs:
 
     - name: Report success
       if: ${{ env.upload-to == 's3' }}
-      uses: ./.github/actions/asana-log-message
       env:
         DMG_URL: ${{ vars.DMG_URL_ROOT }}${{ steps.create-dmg.outputs.dmg }}
         TAG: ${{ env.app-version }}
         WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-      with:
-        task-url: ${{ env.asana-task-url }}
-        access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-        template-name: dmg-uploaded
+        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+      run: |
+        bundle exec fastlane run asana_log_message \
+          task_url:"${{ env.asana-task-url }}" \
+          template_name:"dmg-uploaded" \
+          github_handle:"${{ github.actor }}" \
+          is_scheduled_release:"${{ github.event_name == 'schedule' }}"
 
     - name: Extract Asana Task ID
       id: task-id
