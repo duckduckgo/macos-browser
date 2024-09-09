@@ -79,7 +79,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         didSet {
             if let updateCheckResult {
                 latestUpdate = Update(appcastItem: updateCheckResult.item, isInstalled: updateCheckResult.isInstalled)
-                hasPendingUpdate = latestUpdate?.isInstalled == false
+                hasPendingUpdate = latestUpdate?.isInstalled == false && updateProgress.isIdle
             }
             showUpdateNotificationIfNeeded()
         }
@@ -142,6 +142,10 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     // MARK: - Private
 
     private func configureUpdater() throws {
+        // Workaround to restart the updater state
+        updateCheckResult = nil
+        latestUpdate = nil
+
         // The default configuration of Sparkle updates is in Info.plist
         userDriver = UpdateUserDriver(internalUserDecider: internalUserDecider,
                                       areAutomaticUpdatesEnabled: areAutomaticUpdatesEnabled)
@@ -164,7 +168,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     }
 
     private func showUpdateNotificationIfNeeded() {
-        guard let latestUpdate, hasPendingUpdate, updateProgress.isIdle else { return }
+        guard let latestUpdate, hasPendingUpdate else { return }
 
         switch latestUpdate.type {
         case .critical:
