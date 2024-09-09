@@ -28,6 +28,7 @@ import PixelKit
 import PhishingDetection
 import SpecialErrorPages
 import os.log
+import Onboarding
 
 protocol TabDelegate: ContentOverlayUserScriptDelegate {
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool)
@@ -388,6 +389,13 @@ protocol NewWindowPolicyDecisionMaker {
                 currentNavigation?.$state.map { $0 }.eraseToAnyPublisher() ?? Just(nil).eraseToAnyPublisher()
             }
         }.switchToLatest()
+    }
+
+    var webViewDidStartNavigationPublisher: some Publisher<Void, Never> {
+        navigationStatePublisher
+            .compactMap { $0 }
+            .filter { $0 == .started }
+            .asVoid()
     }
 
     var webViewDidFinishNavigationPublisher: some Publisher<Void, Never> {
@@ -1303,4 +1311,17 @@ extension Tab {
         }
     }
 
+}
+
+extension Tab: OnboardingNavigationDelegate {
+    func searchFor(_ query: String) {
+        guard let url = URL.makeSearchUrl(from: query) else { return }
+        let request = URLRequest(url: url)
+        self.webView.load(request)
+    }
+
+    func navigateTo(url: URL) {
+        let request = URLRequest(url: url)
+        self.webView.load(request)
+    }
 }
