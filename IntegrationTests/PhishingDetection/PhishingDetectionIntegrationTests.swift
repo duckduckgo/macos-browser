@@ -39,7 +39,7 @@ class PhishingDetectionIntegrationTests: XCTestCase {
         WebTrackingProtectionPreferences.shared.isGPCEnabled = false
         PhishingDetectionPreferences.shared.isEnabled = true
         let featureFlagger = MockFeatureFlagger()
-        phishingDetector = PhishingDetection(featureFlagger: featureFlagger)
+        phishingDetector = PhishingDetection(featureFlagger: featureFlagger, configManager: MockPrivacyConfigurationManager())
         tab = Tab(content: .none, phishingDetector: phishingDetector)
         tabViewModel = TabViewModel(tab: tab)
         window = WindowsManager.openNewWindow(with: tab)!
