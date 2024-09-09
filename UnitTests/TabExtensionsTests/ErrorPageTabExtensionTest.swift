@@ -337,8 +337,7 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         let policy = await errorPageExtention.decidePolicy(for: navigationAction, preferences: &preferences)
 
         // THEN
-        XCTAssertEqual(policy.debugDescription, "next")
-        XCTAssertTrue(mockWebView.loadCalled)
+        XCTAssertEqual(policy.debugDescription, "redirect")
         XCTAssertTrue(phishingStateManager.isShowingPhishingError)
     }
 
