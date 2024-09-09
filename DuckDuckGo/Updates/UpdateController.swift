@@ -31,6 +31,8 @@ protocol UpdateControllerProtocol: AnyObject {
     var latestUpdate: Update? { get }
     var latestUpdatePublisher: Published<Update?>.Publisher { get }
 
+    var canCheckForUpdates: Bool { get }
+
     var isUpdateAvailableToInstall: Bool { get }
     var isUpdateAvailableToInstallPublisher: Published<Bool>.Publisher { get }
 
@@ -94,7 +96,11 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     var isUpdateAvailableToInstallPublisher: Published<Bool>.Publisher { $isUpdateAvailableToInstall }
 
     var lastUpdateCheckDate: Date? {
-        updater.lastUpdateCheckDate
+        updater?.lastUpdateCheckDate
+    }
+
+    var canCheckForUpdates: Bool {
+        updater?.canCheckForUpdates == true
     }
 
     @UserDefaultsWrapper(key: .automaticUpdates, defaultValue: true)
@@ -107,8 +113,8 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         }
     }
 
-    private(set) var updater: SPUUpdater!
-    private(set) var userDriver: UpdateUserDriver!
+    private(set) var updater: SPUUpdater?
+    private(set) var userDriver: UpdateUserDriver?
     private let willRelaunchAppSubject = PassthroughSubject<Void, Never>()
     private var internalUserDecider: InternalUserDecider
     private var updateProcessCancellable: AnyCancellable!
@@ -127,7 +133,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     }
 
     func checkForUpdateIfNeeded() {
-        guard !updater.sessionInProgress else { return }
+        guard let updater, !updater.sessionInProgress else { return }
 
         Logger.updates.debug("Checking for updates")
 
@@ -140,18 +146,22 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         // The default configuration of Sparkle updates is in Info.plist
         userDriver = UpdateUserDriver(internalUserDecider: internalUserDecider,
                                       areAutomaticUpdatesEnabled: areAutomaticUpdatesEnabled)
+        guard let userDriver else { return }
+
         updater = SPUUpdater(hostBundle: Bundle.main, applicationBundle: Bundle.main, userDriver: userDriver, delegate: self)
 
         updateProcessCancellable = userDriver.updateProgressPublisher
             .assign(to: \.updateProgress, onWeaklyHeld: self)
 
-        try updater.start()
+        try updater?.start()
 
 #if DEBUG
 //        updater.automaticallyChecksForUpdates = false
 //        updater.automaticallyDownloadsUpdates = false
 //        updater.updateCheckInterval = 0
 #endif
+
+//        checkForUpdateIfNeeded()
     }
 
     private func showUpdateNotificationIfNeeded() {
@@ -173,8 +183,10 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     }
 
     @objc func runUpdate() {
-        PixelKit.fire(DebugEvent(GeneralPixel.updaterDidRunUpdate))
-        userDriver.resume()
+        if let userDriver {
+            PixelKit.fire(DebugEvent(GeneralPixel.updaterDidRunUpdate))
+            userDriver.resume()
+        }
     }
 
 }
