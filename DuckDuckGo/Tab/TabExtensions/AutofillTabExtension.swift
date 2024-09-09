@@ -76,6 +76,7 @@ final class AutofillTabExtension: TabExtension {
             self.vaultManager = Self.vaultManagerProvider(self)
             autofillScript.vaultDelegate = self.vaultManager
             autofillScript.passwordImportDelegate = self.credentialsImportManager
+            autofillScript.isBurnerWindow = isBurner
         }
     }
 
