@@ -23,6 +23,7 @@ import XCTest
 
 class AutoconsentMessageProtocolTests: XCTestCase {
 
+    @MainActor
     let userScript = AutoconsentUserScript(
         scriptSource: ScriptSourceProvider(configStorage: MockConfigurationStore(),
                                            privacyConfigurationManager: MockPrivacyConfigurationManager(),

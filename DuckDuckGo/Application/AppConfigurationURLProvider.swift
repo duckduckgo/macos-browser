@@ -58,7 +58,6 @@ struct AppConfigurationURLProvider: ConfigurationURLProviding {
         case .surrogates: return URL(string: "https://staticcdn.duckduckgo.com/surrogates.txt")!
         case .trackerDataSet: return URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/v6/current/macos-tds.json")!
         // In archived repo, to be refactored shortly (https://staticcdn.duckduckgo.com/useragents/social_ctp_configuration.json)
-        case .FBConfig: return URL(string: "https://staticcdn.duckduckgo.com/useragents/")!
         case .remoteMessagingConfig: return RemoteMessagingClient.Constants.endpoint
         }
     }

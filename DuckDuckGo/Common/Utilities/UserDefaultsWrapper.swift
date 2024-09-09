@@ -51,7 +51,6 @@ public struct UserDefaultsWrapper<T> {
         case configStorageBloomFilterExclusionsEtag = "config.storage.bloomfilter.exclusions.etag"
         case configStorageSurrogatesEtag = "config.storage.surrogates.etag"
         case configStoragePrivacyConfigurationEtag = "config.storage.privacyconfiguration.etag"
-        case configFBConfigEtag = "config.storage.fbconfig.etag"
         case configStorageRemoteMessagingConfigEtag = "config.storage.remotemessagingconfig.etag"
 
         case configLastInstalled = "config.last.installed"
@@ -136,8 +135,6 @@ public struct UserDefaultsWrapper<T> {
         case homePageShowImport = "home.page.show.import"
         case homePageShowDuckPlayer = "home.page.show.duck.player"
         case homePageShowEmailProtection = "home.page.show.email.protection"
-        case homePageUserInSurveyShare = "home.page.user.in.survey.share"
-        case homePageShowPermanentSurvey = "home.page.show.import.permanent.survey"
         case homePageShowPageTitles = "home.page.show.page.titles"
         case homePageShowRecentlyVisited = "home.page.show.recently.visited"
         case homePageContinueSetUpImport = "home.page.continue.set.up.import"

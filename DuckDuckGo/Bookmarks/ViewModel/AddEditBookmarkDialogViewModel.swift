@@ -78,7 +78,7 @@ final class AddEditBookmarkDialogViewModel: BookmarkDialogEditing {
     private let mode: Mode
     private let bookmarkManager: BookmarkManager
 
-    init(mode: Mode, bookmarkManager: LocalBookmarkManager = .shared) {
+    init(mode: Mode, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
         let isFavorite = mode.bookmarkURL.flatMap(bookmarkManager.isUrlFavorited) ?? false
         self.mode = mode
         self.bookmarkManager = bookmarkManager

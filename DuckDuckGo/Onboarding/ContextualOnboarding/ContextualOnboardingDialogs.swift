@@ -269,7 +269,7 @@ final class OnboardingPixelReporter: OnboardingSearchSuggestionsPixelReporting, 
 }
 
 #Preview("Trackers Dialog") {
-    var message: NSAttributedString = {
+    let message: NSAttributedString = {
         let firstString = UserText.ContextualOnboarding.onboardingTryFireButtonMessage
         return NSMutableAttributedString(string: firstString)
     }()

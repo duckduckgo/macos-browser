@@ -129,7 +129,7 @@ final class SortBookmarksUserDefaults: SortBookmarksRepository {
 
 final class SortBookmarksViewModel: NSObject {
 
-    private let metrics: BookmarksSearchAndSortMetrics
+    let metrics: BookmarksSearchAndSortMetrics
     private let origin: BookmarkOperationOrigin
     private var manager: BookmarkManager
     private var wasSortOptionSelected = false
