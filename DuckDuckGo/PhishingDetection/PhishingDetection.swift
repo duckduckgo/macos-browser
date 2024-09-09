@@ -128,7 +128,19 @@ public class PhishingDetection: PhishingSiteDetecting {
         )
 
         let resolvedDataStore = dataStore ?? PhishingDetectionDataStore(dataProvider: resolvedDataProvider)
-        let resolvedDetector = detector ?? PhishingDetector(apiClient: detectionClient, dataStore: resolvedDataStore)
+        let resolvedDetector = detector ?? PhishingDetector(apiClient: detectionClient, dataStore: resolvedDataStore, eventMapping:
+            EventMapping<PhishingDetectionEvents> {event, _, params, _ in
+            switch event {
+            case .errorPageShown(clientSideHit: let clientSideHit):
+                PixelKit.fire(PhishingDetectionEvents.errorPageShown(clientSideHit: clientSideHit))
+            case .iframeLoaded:
+                PixelKit.fire(PhishingDetectionEvents.iframeLoaded)
+            case .visitSite:
+                PixelKit.fire(PhishingDetectionEvents.visitSite)
+            case .updateTaskFailed48h(error: let error):
+                PixelKit.fire(PhishingDetectionEvents.updateTaskFailed48h(error: error))
+            }
+        })
         let resolvedUpdateManager = updateManager ?? PhishingDetectionUpdateManager(client: detectionClient, dataStore: resolvedDataStore)
         let resolvedDataActivities = dataActivities ?? PhishingDetectionDataActivities(phishingDetectionDataProvider: resolvedDataProvider, updateManager: resolvedUpdateManager)
         return (resolvedDataStore, resolvedDetector, resolvedUpdateManager, resolvedDataActivities)
