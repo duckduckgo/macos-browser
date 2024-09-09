@@ -105,6 +105,12 @@ public class PhishingDetection: PhishingSiteDetecting {
         )
     }
 
+    convenience init(featureFlagger: FeatureFlagger) {
+        self.init(
+            dataStore: nil, detector: nil, dataActivities: nil, featureFlagger: featureFlagger
+        )
+    }
+
     private static func resolveDependencies(
         revision: Int,
         filterSetURL: URL,
@@ -132,10 +138,6 @@ public class PhishingDetection: PhishingSiteDetecting {
         let resolvedUpdateManager = updateManager ?? PhishingDetectionUpdateManager(client: detectionClient, dataStore: resolvedDataStore)
         let resolvedDataActivities = dataActivities ?? PhishingDetectionDataActivities(phishingDetectionDataProvider: resolvedDataProvider, updateManager: resolvedUpdateManager)
         return (resolvedDataStore, resolvedDetector, resolvedUpdateManager, resolvedDataActivities)
-    }
-    
-    public func isEnabled() -> (Bool, Bool) {
-        return (featureFlagger.isFeatureOn(.phishingDetectionErrorPage), self.detectionPreferences.isEnabled)
     }
 
     private func startUpdateTasksIfEnabled() {

@@ -19,6 +19,7 @@
 import Combine
 import Common
 import XCTest
+import BrowserServicesKit
 import PhishingDetection
 
 @testable import DuckDuckGo_Privacy_Browser
@@ -28,17 +29,20 @@ class PhishingDetectionIntegrationTests: XCTestCase {
 
     var window: NSWindow!
     var cancellables: Set<AnyCancellable>!
-
-    var tabViewModel: TabViewModel {
-        (window.contentViewController as! MainViewController).browserTabViewController.tabViewModel!
-    }
+    var phishingDetector: PhishingSiteDetecting!
+    var tab: Tab!
+    var tabViewModel: TabViewModel!
 
     @MainActor
     override func setUp() {
         super.setUp()
         WebTrackingProtectionPreferences.shared.isGPCEnabled = false
         PhishingDetectionPreferences.shared.isEnabled = true
-        window = WindowsManager.openNewWindow(with: .none)!
+        let featureFlagger = MockFeatureFlagger()
+        phishingDetector = PhishingDetection(featureFlagger: featureFlagger)
+        tab = Tab(content: .none, phishingDetector: phishingDetector)
+        tabViewModel = TabViewModel(tab: tab)
+        window = WindowsManager.openNewWindow(with: tab)!
         cancellables = Set<AnyCancellable>()
     }
 
@@ -47,6 +51,9 @@ class PhishingDetectionIntegrationTests: XCTestCase {
         window.close()
         window = nil
         cancellables = nil
+        phishingDetector = nil
+        tab = nil
+        tabViewModel = nil
         WebTrackingProtectionPreferences.shared.isGPCEnabled = true
         try await super.tearDown()
     }
@@ -64,11 +71,6 @@ class PhishingDetectionIntegrationTests: XCTestCase {
     func testPhishingDetected_tabIsMarkedPhishing() async throws {
         try await loadUrl("http://privacy-test-pages.site/security/badware/phishing.html")
         let url = URL(string: "http://privacy-test-pages.site/security/badware/phishing.html")!
-        let (featureFlagEnabled, preferencesEnabled) = PhishingDetection.shared.isEnabled()
-        XCTAssertTrue(featureFlagEnabled, "Internal feature flag should be enabled")
-        XCTAssertTrue(preferencesEnabled, "Preferences setting should be enabled")
-        let phishingDetected = await PhishingDetection.shared.checkIsMaliciousIfEnabled(url: url)
-        XCTAssertTrue(phishingDetected, "PhishingDetection library should return malicious for \(url)")
         try await waitForTabToFinishLoading()
         let tabErrorCode = tabViewModel.tab.error?.errorCode
         XCTAssertEqual(tabErrorCode, PhishingDetectionError.detected.errorCode)
@@ -147,5 +149,11 @@ class PhishingDetectionIntegrationTests: XCTestCase {
             loadingExpectation.fulfill()
         }
         await fulfillment(of: [loadingExpectation], timeout: 5)
+    }
+}
+
+class MockFeatureFlagger: FeatureFlagger {
+    func isFeatureOn<F>(forProvider: F) -> Bool where F: BrowserServicesKit.FeatureFlagSourceProviding {
+        return true
     }
 }
