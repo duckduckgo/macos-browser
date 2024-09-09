@@ -780,9 +780,9 @@ enum GeneralPixel: PixelKitEventV2 {
         case .dbInitializationError:
             return "dbie"
         case .dbSaveExcludedHTTPSDomainsError:
-            return "dbsw"
+            return "database_save_excluded_https_domains_error"
         case .dbSaveBloomFilterError:
-            return "dbsb"
+            return "database_save_bloom_filter_error"
 
         case .remoteMessagingSaveConfigError:
             return "remote_messaging_save_config_error"
