@@ -33,8 +33,8 @@ protocol UpdateControllerProtocol: AnyObject {
 
     var canCheckForUpdates: Bool { get }
 
-    var isUpdateAvailableToInstall: Bool { get }
-    var isUpdateAvailableToInstallPublisher: Published<Bool>.Publisher { get }
+    var hasPendingUpdate: Bool { get }
+    var hasPendingUpdatePublisher: Published<Bool>.Publisher { get }
 
     var updateProgress: UpdateCycleProgress { get }
     var updateProgressPublisher: Published<UpdateCycleProgress>.Publisher { get }
@@ -79,8 +79,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         didSet {
             if let updateCheckResult {
                 latestUpdate = Update(appcastItem: updateCheckResult.item, isInstalled: updateCheckResult.isInstalled)
-            } else {
-                latestUpdate = nil
+                hasPendingUpdate = latestUpdate?.isInstalled == false
             }
             showUpdateNotificationIfNeeded()
         }
@@ -92,8 +91,8 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
 
     var latestUpdatePublisher: Published<Update?>.Publisher { $latestUpdate }
 
-    @Published private(set) var isUpdateAvailableToInstall = false
-    var isUpdateAvailableToInstallPublisher: Published<Bool>.Publisher { $isUpdateAvailableToInstall }
+    @Published private(set) var hasPendingUpdate = false
+    var hasPendingUpdatePublisher: Published<Bool>.Publisher { $hasPendingUpdate }
 
     var lastUpdateCheckDate: Date? {
         updater?.lastUpdateCheckDate
@@ -165,16 +164,13 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     }
 
     private func showUpdateNotificationIfNeeded() {
-        if let latestUpdate, !latestUpdate.isInstalled, updateProgress.isDone {
-            switch latestUpdate.type {
-            case .critical:
-                notificationPresenter.showUpdateNotification(icon: NSImage.criticalUpdateNotificationInfo, text: UserText.criticalUpdateNotification, presentMultiline: true)
-            case .regular:
-                notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: UserText.updateAvailableNotification, presentMultiline: true)
-            }
-            isUpdateAvailableToInstall = true
-        } else {
-            isUpdateAvailableToInstall = false
+        guard let latestUpdate, hasPendingUpdate, updateProgress.isIdle else { return }
+
+        switch latestUpdate.type {
+        case .critical:
+            notificationPresenter.showUpdateNotification(icon: NSImage.criticalUpdateNotificationInfo, text: UserText.criticalUpdateNotification, presentMultiline: true)
+        case .regular:
+            notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: UserText.updateAvailableNotification, presentMultiline: true)
         }
     }
 
