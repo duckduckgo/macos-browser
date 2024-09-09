@@ -803,6 +803,8 @@ extension MainViewController {
     @objc func resetBookmarks(_ sender: Any?) {
         LocalBookmarkManager.shared.resetBookmarks()
         UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageContinueSetUpImport.rawValue)
+        UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.bookmarksBarPromptShown.rawValue)
+        LocalBookmarkManager.shared.sortMode = .manual
     }
 
     @objc func resetPinnedTabs(_ sender: Any?) {
@@ -823,11 +825,11 @@ extension MainViewController {
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowImport.rawValue)
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowDuckPlayer.rawValue)
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowEmailProtection.rawValue)
-        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowPermanentSurvey.rawValue)
     }
 
     @objc func resetDuckPlayerOnboarding(_ sender: Any?) {
         DefaultDuckPlayerOnboardingDecider().reset()
+        DuckPlayerOnboardingExperiment().reset()
     }
 
     @objc func resetDuckPlayerPreferences(_ sender: Any?) {
@@ -857,14 +859,6 @@ extension MainViewController {
 
     @objc func resetDailyPixels(_ sender: Any?) {
         PixelKit.shared?.clearFrequencyHistoryForAllPixels()
-    }
-
-    @objc func inPermanentSurveyShareOn(_ sender: Any?) {
-        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool?>.Key.homePageUserInSurveyShare.rawValue)
-    }
-
-    @objc func inPermanentSurveyShareOff(_ sender: Any?) {
-        UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool?>.Key.homePageUserInSurveyShare.rawValue)
     }
 
     @objc func changePixelExperimentInstalledDateToLessMoreThan5DayAgo(_ sender: Any?) {
