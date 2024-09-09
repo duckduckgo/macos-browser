@@ -201,13 +201,16 @@ final class BrowserTabViewController: NSViewController {
 
     @objc
     private func onPasswordImportFlowFinish(_ notification: Notification) {
-        guard WindowControllersManager.shared.lastKeyMainWindowController === self.view.window?.windowController else { return }
-        if let previouslySelectedTab {
-            tabCollectionViewModel.select(tab: previouslySelectedTab)
-            previouslySelectedTab.webView.evaluateJavaScript("window.credentialsImportFinished()", in: nil, in: WKContentWorld.defaultClient)
-            self.previouslySelectedTab = nil
-        } else {
-            webView?.evaluateJavaScript("window.credentialsImportFinished()", in: nil, in: WKContentWorld.defaultClient)
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            guard WindowControllersManager.shared.lastKeyMainWindowController === self.view.window?.windowController else { return }
+            if let previouslySelectedTab {
+                tabCollectionViewModel.select(tab: previouslySelectedTab)
+                previouslySelectedTab.webView.evaluateJavaScript("window.credentialsImportFinished()", in: nil, in: WKContentWorld.defaultClient)
+                self.previouslySelectedTab = nil
+            } else {
+                webView?.evaluateJavaScript("window.credentialsImportFinished()", in: nil, in: WKContentWorld.defaultClient)
+            }
         }
     }
 
