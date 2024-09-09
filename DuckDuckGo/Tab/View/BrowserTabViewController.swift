@@ -146,7 +146,7 @@ final class BrowserTabViewController: NSViewController {
 
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(onPasswordImportFlowFinish),
-                                               name: .passwordImportFlowDidFinishWithCredentials,
+                                               name: .passwordImportDidCloseImportDialog,
                                                object: nil)
 
         NotificationCenter.default.addObserver(self,
