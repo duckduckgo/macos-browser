@@ -164,7 +164,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
 //        updater.updateCheckInterval = 0
 #endif
 
-//        checkForUpdateIfNeeded()
+        checkForUpdateIfNeeded()
     }
 
     private func showUpdateNotificationIfNeeded() {
