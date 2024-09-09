@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "tespach/phishing-detection-feature",
-        "revision" : "afd7d9555d301aead1a34cb66ee5020857d19e27"
+        "branch" : "tespach/phishing-detection-pixels",
+        "revision" : "addf4ac45d73b59d3c901f058f0236ec1a2a8c4c"
       }
     },
     {
@@ -104,8 +104,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/privacy-dashboard",
       "state" : {
-        "revision" : "665b23dc656c9f787494620494f8e56098a900b2",
-        "version" : "5.1.1"
+        "branch" : "mgurgel/phishing-warning",
+        "revision" : "24ef446823cc116d06a650df0002803f9915b10f"
       }
     },
     {
