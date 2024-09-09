@@ -106,12 +106,6 @@ final class WebView: WKWebView {
             return DefaultZoomValue(rawValue: pageZoom) ?? .percent100
         }
         set {
-            // There are cases where the pageZoom does not reflect the actual display, such as after a command-click on a link.
-            // The API may not trigger a change if the new value is the same as the current value.
-            if pageZoom == newValue.rawValue {
-                // Slightly modify the value to force the API to trigger a change.
-                pageZoom = newValue.rawValue - 0.001
-            }
             pageZoom = newValue.rawValue
         }
     }
