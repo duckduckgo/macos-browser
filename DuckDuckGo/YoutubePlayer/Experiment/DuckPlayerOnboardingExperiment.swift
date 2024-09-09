@@ -48,6 +48,7 @@ struct DuckPlayerOnboardingExperiment: OnboardingExperimentManager {
         static let variant = "variant"
         static let enrollment = "enrollment"
         static let experimentName = "expname"
+        static let onboardingCohort = "onboarding-cohort"
     }
 
     var isUserAssignedToExperimentCohort: Bool {
@@ -98,6 +99,11 @@ struct DuckPlayerOnboardingExperiment: OnboardingExperimentManager {
 
         if experimentName {
             parameters[ExperimentPixelKeys.experimentName] = ExperimentPixelValues.name
+        }
+
+        if PixelExperiment.isExperimentInstalled,
+           let onboardingExperimentCohort = PixelExperiment.logic.allocatedCohort {
+            parameters[ExperimentPixelKeys.onboardingCohort] = onboardingExperimentCohort
         }
 
         return parameters.isEmpty ? nil : parameters
