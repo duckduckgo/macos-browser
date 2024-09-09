@@ -104,7 +104,7 @@ class PhishingDetectionIntegrationTests: XCTestCase {
 
     @MainActor
     func testPhishingDetectedViaHTTPRedirectChain_tabIsMarkedPhishing() async throws {
-        try await loadUrl("http://bad.third-party.site/security/badware/phishing-redirect/")
+        try await loadUrl("http://bad.third-party.site/security/badware/phishing-redirect/302")
         try await waitForTabToFinishLoading()
         let tabErrorCode = tabViewModel.tab.error?.errorCode
         XCTAssertEqual(tabErrorCode, PhishingDetectionError.detected.errorCode)
