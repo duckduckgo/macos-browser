@@ -120,7 +120,6 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
         if isMalicious {
             return await handleMaliciousURL(for: navigationAction, url: url)
         }
-
         return .next
     }
 
@@ -136,7 +135,6 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
                 return .redirect(mainFrame) { navigator in
                     navigator.load(URLRequest(url: errorURL))
                 }
-                return .none
             }
         } else {
             return handleMaliciousIframe(navigationAction: navigationAction)
