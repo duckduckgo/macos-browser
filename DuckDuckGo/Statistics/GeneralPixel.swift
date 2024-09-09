@@ -110,6 +110,7 @@ enum GeneralPixel: PixelKitEventV2 {
 
     // Duck Player
     case duckPlayerDailyUniqueView
+    case duckPlayerWeeklyUniqueView
     case duckPlayerViewFromYoutubeViaMainOverlay
     case duckPlayerViewFromYoutubeViaHoverButton
     case duckPlayerViewFromYoutubeAutomatic
@@ -575,6 +576,8 @@ enum GeneralPixel: PixelKitEventV2 {
         case .fireButton(option: let option):
             return "m_mac_fire_button_\(option)"
 
+        case .duckPlayerWeeklyUniqueView:
+            return "duckplayer_weekly-unique-view"
         case .duckPlayerDailyUniqueView:
             return "m_mac_duck-player_daily-unique-view"
         case .duckPlayerViewFromYoutubeViaMainOverlay:
@@ -1166,6 +1169,32 @@ enum GeneralPixel: PixelKitEventV2 {
             return [PixelKit.Parameters.experimentCohort: cohort]
         case .onboardingDuckplayerUsed5to7(let cohort):
             return [PixelKit.Parameters.experimentCohort: cohort]
+
+        case .duckPlayerDailyUniqueView,
+                .duckPlayerViewFromYoutubeViaMainOverlay,
+                .duckPlayerViewFromYoutubeViaHoverButton,
+                .duckPlayerViewFromYoutubeAutomatic,
+                .duckPlayerViewFromSERP,
+                .duckPlayerViewFromOther,
+                .duckPlayerOverlayYoutubeImpressions,
+                .duckPlayerOverlayYoutubeWatchHere,
+                .duckPlayerSettingAlwaysDuckPlayer,
+                .duckPlayerSettingAlwaysOverlaySERP,
+                .duckPlayerSettingAlwaysOverlayYoutube,
+                .duckPlayerSettingAlwaysSettings,
+                .duckPlayerSettingNeverOverlaySERP,
+                .duckPlayerSettingNeverOverlayYoutube,
+                .duckPlayerSettingNeverSettings,
+                .duckPlayerSettingBackToDefault,
+                .duckPlayerWatchOnYoutube,
+                .duckPlayerAutoplaySettingsOn,
+                .duckPlayerAutoplaySettingsOff,
+                .duckPlayerNewTabSettingsOn,
+                .duckPlayerNewTabSettingsOff,
+                .duckPlayerContingencySettingsDisplayed,
+                .duckPlayerWeeklyUniqueView,
+                .duckPlayerContingencyLearnMoreClicked:
+            return DuckPlayerOnboardingExperiment().getPixelParameters()
 
         case .bookmarksSortButtonClicked(let origin),
                 .bookmarksSortButtonDismissed(let origin),

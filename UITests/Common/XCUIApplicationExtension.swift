@@ -118,7 +118,7 @@ extension XCUIApplication {
     func openBookmarksPanel() {
         let bookmarksPanelShortcutButton = buttons[AccessibilityIdentifiers.bookmarksPanelShortcutButton]
         if !bookmarksPanelShortcutButton.exists {
-            typeKey("K", modifierFlags: [.command, .shift])
+            typeKey("k", modifierFlags: [.command, .shift])
         }
 
         bookmarksPanelShortcutButton.tap()

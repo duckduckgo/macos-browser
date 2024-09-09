@@ -26,6 +26,7 @@ import WebKit
 import History
 import PixelKit
 import os.log
+import Onboarding
 
 protocol TabDelegate: ContentOverlayUserScriptDelegate {
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool)
@@ -376,8 +377,30 @@ protocol NewWindowPolicyDecisionMaker {
         }.switchToLatest()
     }
 
+    var webViewDidStartNavigationPublisher: some Publisher<Void, Never> {
+        navigationStatePublisher
+            .compactMap { $0 }
+            .filter { $0 == .started }
+            .asVoid()
+    }
+
     var webViewDidFinishNavigationPublisher: some Publisher<Void, Never> {
-        navigationStatePublisher.compactMap { $0 }.filter { $0.isFinished }.asVoid()
+        navigationStatePublisher
+            .combineLatest(navigationDelegate.$currentNavigation)
+            .filter { navigationState, currentNavigation in
+                guard let navigationState = navigationState, navigationState.isFinished else {
+                    return false
+                }
+                guard let currentNavigation = currentNavigation else {
+                    return false
+                }
+                return MainActor.assumeIsolated {
+                    let isSameDocumentNavigation = (currentNavigation.redirectHistory.first ?? currentNavigation.navigationAction).navigationType.isSameDocumentNavigation
+                    return !isSameDocumentNavigation
+                }
+            }
+            .map { _ in () }
+            .eraseToAnyPublisher()
     }
 
     // MARK: - Properties
@@ -1275,4 +1298,17 @@ extension Tab {
         }
     }
 
+}
+
+extension Tab: OnboardingNavigationDelegate {
+    func searchFor(_ query: String) {
+        guard let url = URL.makeSearchUrl(from: query) else { return }
+        let request = URLRequest(url: url)
+        self.webView.load(request)
+    }
+
+    func navigateTo(url: URL) {
+        let request = URLRequest(url: url)
+        self.webView.load(request)
+    }
 }
