@@ -139,8 +139,8 @@ extension Preferences {
             }
         }
 
-        private var isNewVersionAvailable: Bool {
-            model.updateController?.isUpdateAvailableToInstall == true
+        private var hasPendingUpdate: Bool {
+            model.updateController?.hasPendingUpdate == true
         }
 
         @ViewBuilder
@@ -157,7 +157,7 @@ extension Preferences {
                 case .upToDate:
                     Text(" — " + UserText.upToDate)
                 case .updateCycle(let progress):
-                    if isNewVersionAvailable {
+                    if hasPendingUpdate {
                         Text(" — " + UserText.newerVersionAvailable)
                     } else {
                         text(for: progress)
@@ -204,7 +204,7 @@ extension Preferences {
                 Image(systemName: "checkmark.circle.fill")
                     .foregroundColor(.green)
             case .updateCycle:
-                if isNewVersionAvailable {
+                if hasPendingUpdate {
                     Image(systemName: "exclamationmark.circle.fill")
                         .foregroundColor(.red)
                 } else {
@@ -243,7 +243,7 @@ extension Preferences {
                 }
                 .buttonStyle(UpdateButtonStyle(enabled: true))
             case .updateCycle:
-                if isNewVersionAvailable {
+                if hasPendingUpdate {
                     Button(UserText.restartToUpdate) {
                         model.restartToUpdate()
                     }
