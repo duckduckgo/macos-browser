@@ -51,7 +51,7 @@
       "location" : "https://github.com/duckduckgo/duckduckgo-autofill.git",
       "state" : {
         "branch" : "dbajpeyi/remove-response-param",
-        "revision" : "38bcdc82f8580d15d61dec1fe4b778aa223658a4"
+        "revision" : "b46dbed2e8687d11b1371ce11c25bce1d8c78398"
       }
     },
     {

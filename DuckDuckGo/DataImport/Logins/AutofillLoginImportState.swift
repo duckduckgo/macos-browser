@@ -1,5 +1,5 @@
 //
-//  UserDefaults+AutofillLoginImportStateProvider.swift
+//  AutofillLoginImportState.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -18,14 +18,16 @@
 
 import BrowserServicesKit
 
-extension UserDefaults: AutofillLoginImportStateProvider {
+final class AutofillLoginImportState: AutofillLoginImportStateProvider {
     private enum Key {
         static let hasImportedLogins: String = "com.duckduckgo.logins.hasImportedLogins"
         static let credentialsImportPromptPresentationCount: String = "com.duckduckgo.logins.credentialsImportPromptPresentationCount"
     }
 
+    private let userDefaults: UserDefaults
+
     public var isNewDDGUser: Bool {
-        guard let date = object(forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue) as? Date else {
+        guard let date = userDefaults.object(forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue) as? Date else {
             return true
         }
         return date >= Date.weekAgo
@@ -33,21 +35,33 @@ extension UserDefaults: AutofillLoginImportStateProvider {
 
     public var hasImportedLogins: Bool {
         get {
-            bool(forKey: Key.hasImportedLogins)
+            userDefaults.bool(forKey: Key.hasImportedLogins)
         }
 
         set {
-            set(newValue, forKey: Key.hasImportedLogins)
+            userDefaults.set(newValue, forKey: Key.hasImportedLogins)
         }
     }
 
     public var credentialsImportPromptPresentationCount: Int {
         get {
-            integer(forKey: Key.credentialsImportPromptPresentationCount)
+            userDefaults.integer(forKey: Key.credentialsImportPromptPresentationCount)
         }
 
         set {
-            set(newValue, forKey: Key.credentialsImportPromptPresentationCount)
+            userDefaults.set(newValue, forKey: Key.credentialsImportPromptPresentationCount)
         }
+    }
+
+    public var isAutofillEnabled: Bool {
+        userDefaults.bool(forKey: UserDefaultsWrapper<Date>.Key.askToSaveUsernamesAndPasswords.rawValue)
+    }
+
+    init(userDefaults: UserDefaults = .standard) {
+        self.userDefaults = userDefaults
+    }
+
+    func hasNeverPromptWebsitesFor(_ domain: String) -> Bool {
+        AutofillNeverPromptWebsitesManager.shared.hasNeverPromptWebsitesFor(domain: domain)
     }
 }

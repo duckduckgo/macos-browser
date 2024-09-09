@@ -21,10 +21,10 @@ import BrowserServicesKit
 import SecureStorage
 
 final class SecureVaultLoginImporter: LoginImporter {
-    private let userDefaults: UserDefaults
+    private let loginImportState: AutofillLoginImportState
 
-    init(userDefaults: UserDefaults = .standard) {
-        self.userDefaults = userDefaults
+    init(loginImportState: AutofillLoginImportState = .init()) {
+        self.loginImportState = loginImportState
     }
 
     static var featureFlagger: FeatureFlagger {
@@ -90,7 +90,7 @@ final class SecureVaultLoginImporter: LoginImporter {
             NotificationCenter.default.post(name: .autofillSaveEvent, object: nil, userInfo: nil)
         }
 
-        userDefaults.hasImportedLogins = true
+        loginImportState.hasImportedLogins = true
         return .init(successful: successful.count, duplicate: duplicates.count, failed: failed.count)
     }
 }
