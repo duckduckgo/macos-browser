@@ -145,8 +145,8 @@ final class BrowserTabViewController: NSViewController {
                                                object: nil)
 
         NotificationCenter.default.addObserver(self,
-                                               selector: #selector(onCloseInlinePasswordImportFlow),
-                                               name: .passwordImportDidCloseImportDialog,
+                                               selector: #selector(onPasswordImportFlowFinish),
+                                               name: .passwordImportFlowDidFinishWithCredentials,
                                                object: nil)
 
         NotificationCenter.default.addObserver(self,
@@ -200,7 +200,7 @@ final class BrowserTabViewController: NSViewController {
     }
 
     @objc
-    private func onCloseInlinePasswordImportFlow(_ notification: Notification) {
+    private func onPasswordImportFlowFinish(_ notification: Notification) {
         guard WindowControllersManager.shared.lastKeyMainWindowController === self.view.window?.windowController else { return }
         if let previouslySelectedTab {
             tabCollectionViewModel.select(tab: previouslySelectedTab)
