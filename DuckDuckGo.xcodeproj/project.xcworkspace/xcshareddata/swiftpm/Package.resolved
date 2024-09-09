@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "tespach/phishing-detection-pixels",
-        "revision" : "9d6d18ea8c6d99cbc0684494185dd8363ea27b0b"
+        "branch" : "tespach/phishing-detection-feature",
+        "revision" : "234ba90128a2a54b58b4888a65b94029e1797135"
       }
     },
     {
