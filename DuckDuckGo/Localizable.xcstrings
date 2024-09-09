@@ -41426,58 +41426,10 @@
       "comment" : "Title shown in an error page tab that warn users of security risks on a website that has been flagged as malicious.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Warnung: Es könnte sich um eine betrügerische Website handeln"
-          }
-        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Warning: Site May Be Deceptive"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Advertencia: el sitio puede ser engañoso"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Avertissement : le site est peut-être trompeur"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Attenzione: il sito potrebbe essere ingannevole"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Waarschuwing: website is mogelijk misleidend"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ostrzeżenie: witryna może być złośliwa"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aviso: o site pode ser enganador"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Внимание! Потенциально мошеннический сайт"
           }
         }
       }
