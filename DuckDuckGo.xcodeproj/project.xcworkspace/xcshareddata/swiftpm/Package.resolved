@@ -33,7 +33,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "graeme/promote-password-import-in-autofill-menu",
-        "revision" : "dac7befac719bdd1587fce0f28e24d30fe4e9c82"
+        "revision" : "6020a2b02cda23c0894e287be13bf9f492f87f58"
       }
     },
     {
