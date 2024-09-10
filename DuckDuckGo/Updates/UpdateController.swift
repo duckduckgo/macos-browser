@@ -36,6 +36,9 @@ protocol UpdateControllerProtocol: AnyObject {
     var hasPendingUpdate: Bool { get }
     var hasPendingUpdatePublisher: Published<Bool>.Publisher { get }
 
+    var needsNotificationDot: Bool { get }
+    var notificationDotPublisher: AnyPublisher<Bool, Never> { get }
+
     var updateProgress: UpdateCycleProgress { get }
     var updateProgressPublisher: Published<UpdateCycleProgress>.Publisher { get }
 
@@ -80,6 +83,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
             if let updateCheckResult {
                 latestUpdate = Update(appcastItem: updateCheckResult.item, isInstalled: updateCheckResult.isInstalled)
                 hasPendingUpdate = latestUpdate?.isInstalled == false && updateProgress.isIdle
+                needsNotificationDot = hasPendingUpdate
             }
             showUpdateNotificationIfNeeded()
         }
@@ -111,6 +115,16 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
             }
         }
     }
+
+    @UserDefaultsWrapper(key: .pendingUpdateShown, defaultValue: false)
+    var needsNotificationDot: Bool {
+        didSet {
+            notificationDotSubject.send(needsNotificationDot)
+        }
+    }
+
+    private let notificationDotSubject = CurrentValueSubject<Bool, Never>(false)
+    lazy var notificationDotPublisher = notificationDotSubject.eraseToAnyPublisher()
 
     private(set) var updater: SPUUpdater?
     private(set) var userDriver: UpdateUserDriver?
