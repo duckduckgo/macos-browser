@@ -113,10 +113,6 @@ class MockTabViewItemDelegate: TabBarViewItemDelegate {
 
     }
 
-    func tabBarViewItemAudioState(_ tabBarViewItem: TabBarViewItem) -> WKWebView.AudioState? {
-        return audioState
-    }
-
     func tabBarViewItemMuteUnmuteSite(_ tabBarViewItem: TabBarViewItem) {
 
     }

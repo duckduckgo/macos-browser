@@ -49,11 +49,18 @@ final class TabBarViewController: NSViewController {
 
     @IBOutlet weak var addTabButton: MouseOverButton!
 
-    var footerAddButton: MouseOverButton?
+    private var addNewTabButtonFooter: TabBarFooter? {
+        guard let indexPath = collectionView.indexPathsForVisibleSupplementaryElements(ofKind: NSCollectionView.elementKindSectionFooter).first,
+              let footerView = collectionView.supplementaryView(forElementKind: NSCollectionView.elementKindSectionFooter, at: indexPath) else { return nil }
+        return footerView as? TabBarFooter ?? {
+            assertionFailure("Unexpected \(footerView), expected TabBarFooter")
+            return nil
+        }()
+    }
     let tabCollectionViewModel: TabCollectionViewModel
     var isInteractionPrevented: Bool = false {
         didSet {
-            footerAddButton?.isEnabled = !isInteractionPrevented
+            addNewTabButtonFooter?.isEnabled = !isInteractionPrevented
         }
     }
 
@@ -450,7 +457,7 @@ final class TabBarViewController: NSViewController {
         let tabsWidth = scrollView.bounds.width
 
         let newMode: TabMode
-        if max(0, (items - 1)) * TabBarViewItem.Width.minimum.rawValue + TabBarViewItem.Width.minimumSelected.rawValue < tabsWidth {
+        if max(0, (items - 1)) * TabBarViewItem.Width.minimum + TabBarViewItem.Width.minimumSelected < tabsWidth {
             newMode = .divided
         } else {
             newMode = .overflow
@@ -495,15 +502,15 @@ final class TabBarViewController: NSViewController {
         }
 
         let tabsWidth = scrollView.bounds.width - footerCurrentWidthDimension
-        let minimumWidth = selected ? TabBarViewItem.Width.minimumSelected.rawValue : TabBarViewItem.Width.minimum.rawValue
+        let minimumWidth = selected ? TabBarViewItem.Width.minimumSelected : TabBarViewItem.Width.minimum
 
         if tabMode == .divided {
             var dividedWidth = tabsWidth / numberOfItems
             // If tabs are shorter than minimumSelected, then the selected tab takes more space
-            if dividedWidth < TabBarViewItem.Width.minimumSelected.rawValue {
-                dividedWidth = (tabsWidth - TabBarViewItem.Width.minimumSelected.rawValue) / (numberOfItems - 1)
+            if dividedWidth < TabBarViewItem.Width.minimumSelected {
+                dividedWidth = (tabsWidth - TabBarViewItem.Width.minimumSelected) / (numberOfItems - 1)
             }
-            return min(TabBarViewItem.Width.maximum.rawValue, max(minimumWidth, dividedWidth)).rounded()
+            return min(TabBarViewItem.Width.maximum, max(minimumWidth, dividedWidth)).rounded()
         } else {
             return minimumWidth
         }
@@ -835,7 +842,7 @@ extension TabBarViewController: NSCollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: NSCollectionView, layout collectionViewLayout: NSCollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> NSSize {
         let isItemSelected = tabCollectionViewModel.selectionIndex == .unpinned(indexPath.item)
-        return NSSize(width: self.currentTabWidth(selected: isItemSelected), height: TabBarViewItem.Height.standard.rawValue)
+        return NSSize(width: self.currentTabWidth(selected: isItemSelected), height: TabBarViewItem.Height.standard)
     }
 
 }
@@ -866,34 +873,22 @@ extension TabBarViewController: NSCollectionViewDataSource {
 
         tabBarViewItem.delegate = self
         tabBarViewItem.isBurner = tabCollectionViewModel.isBurner
-        tabBarViewItem.subscribe(to: tabViewModel, tabCollectionViewModel: tabCollectionViewModel)
+        tabBarViewItem.subscribe(to: tabViewModel)
 
         return tabBarViewItem
     }
 
-    func collectionView(_ collectionView: NSCollectionView,
-                        viewForSupplementaryElementOfKind kind: NSCollectionView.SupplementaryElementKind,
-                        at indexPath: IndexPath) -> NSView {
-
-        let view = collectionView.makeSupplementaryView(ofKind: kind,
-                                                        withIdentifier: TabBarFooter.identifier, for: indexPath)
-        if let footer = view as? TabBarFooter {
-            footer.addButton?.target = self
-            footer.addButton?.action = #selector(addButtonAction(_:))
-            footer.toolTip = UserText.newTabTooltip
-            self.footerAddButton = footer.addButton
-        }
-
+    func collectionView(_ collectionView: NSCollectionView, viewForSupplementaryElementOfKind kind: NSCollectionView.SupplementaryElementKind, at indexPath: IndexPath) -> NSView {
+        // swiftlint:disable:next force_cast
+        let view = collectionView.makeSupplementaryView(ofKind: kind, withIdentifier: TabBarFooter.identifier, for: indexPath) as! TabBarFooter
+        view.target = self
         return view
     }
 
-    func collectionView(
-        _ collectionView: NSCollectionView,
-        didEndDisplaying item: NSCollectionViewItem,
-        forRepresentedObjectAt indexPath: IndexPath) {
-
+    func collectionView(_ collectionView: NSCollectionView, didEndDisplaying item: NSCollectionViewItem, forRepresentedObjectAt indexPath: IndexPath) {
         (item as? TabBarViewItem)?.clear()
     }
+
 }
 
 // MARK: - NSCollectionViewDelegate
@@ -1213,13 +1208,6 @@ extension TabBarViewController: TabBarViewItemDelegate {
         }
 
         removeFireproofing(from: tab)
-    }
-
-    func tabBarViewItemAudioState(_ tabBarViewItem: TabBarViewItem) -> WKWebView.AudioState? {
-        guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
-              let tab = tabCollectionViewModel.tabCollection.tabs[safe: indexPath.item] else { return nil }
-
-        return tab.audioState
     }
 
     func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> OtherTabBarViewItemsState {

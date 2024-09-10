@@ -87,7 +87,8 @@ private final class MockWebView: WKWebView {
         return mockURL
     }
 
-    override func evaluateJavaScript(_ javaScriptString: String, completionHandler: ((Any?, Error?) -> Void)? = nil) {
+//    override func evaluateJavaScript(_ javaScriptString: String, completionHandler: ((Any?, Error?) -> Void)? = nil) {
+    override func evaluateJavaScript(_ javaScriptString: String, completionHandler: (@MainActor (Any?, (any Error)?) -> Void)? = nil) {
         completionHandler?(evaluateJavaScriptResult, nil)
     }
 }
