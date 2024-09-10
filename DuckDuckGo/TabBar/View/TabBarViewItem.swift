@@ -218,7 +218,8 @@ final class TabBarItemCellView: NSView {
         super.init(frame: frame)
         translatesAutoresizingMaskIntoConstraints = false
 
-        addSubview(mouseOverView)
+        clipsToBounds = true
+
         mouseOverView.cornerRadius = 11
         mouseOverView.maskedCorners = [
             .layerMinXMaxYCorner,
@@ -226,6 +227,7 @@ final class TabBarItemCellView: NSView {
         ]
         mouseOverView.layer?.addSublayer(borderLayer)
 
+        addSubview(mouseOverView)
         addSubview(faviconImageView)
         addSubview(mutedTabIcon)
         addSubview(titleTextField)
@@ -298,7 +300,7 @@ final class TabBarItemCellView: NSView {
     }
 
     private func layoutForCompactMode() {
-        let numberOfElements: CGFloat = (faviconImageView.isShown ? 1 : 0) + (mutedTabIcon.isShown ? 1 : 0) + (permissionButton.isShown ? 1 : 0)
+        let numberOfElements: CGFloat = (faviconImageView.isShown ? 1 : 0) + (mutedTabIcon.isShown ? 1 : 0) + (permissionButton.isShown ? 1 : 0) + (closeButton.isShown ? 1 : 0) + (titleTextField.isShown ? 1 : 0)
         let elementWidth: CGFloat = 16
         var totalWidth = numberOfElements * elementWidth
         // tighten elements to fit all
@@ -310,10 +312,10 @@ final class TabBarItemCellView: NSView {
             assert(closeButton.isHidden)
             faviconImageView.frame = NSRect(x: x.rounded(), y: bounds.midY - 8, width: 16, height: 16)
             x = faviconImageView.frame.maxX + spacing
-        } else if closeButton.isShown {
-            // close button appears in place of favicon in compact mode
-            closeButton.frame = NSRect(x: x.rounded(), y: bounds.midY - 8, width: 16, height: 16)
-            x = closeButton.frame.maxX + spacing
+        } else if titleTextField.isShown {
+            assert(closeButton.isHidden)
+            titleTextField.frame = NSRect(x: 4, y: bounds.midY - 8, width: bounds.maxX - 8, height: 16)
+            updateTitleTextFieldMask()
         }
         if mutedTabIcon.isShown {
             mutedTabIcon.frame = NSRect(x: x.rounded(), y: bounds.midY - 8, width: 16, height: 16)
@@ -380,7 +382,7 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     weak var delegate: TabBarViewItemDelegate?
 
-    var isMouseOver = false
+    private(set) var isMouseOver = false
 
     private var cell: TabBarItemCellView {
         view as! TabBarItemCellView // swiftlint:disable:this force_cast
@@ -585,10 +587,11 @@ final class TabBarViewItem: NSCollectionViewItem {
             cell.borderLayer.isHidden = !isSelected
         }
 
-        let showCloseButton = (isMouseOver && !widthStage.isCloseButtonHidden) || isSelected
-        cell.closeButton.isHidden = !showCloseButton
+        let showCloseButton = (isMouseOver && (!widthStage.isCloseButtonHidden || NSApp.isCommandPressed)) || isSelected
+        cell.closeButton.isShown = showCloseButton
+        cell.faviconImageView.isShown = (cell.faviconImageView.image != nil) && (widthStage != .withoutTitle || !showCloseButton)
         updateSeparatorView()
-        cell.titleTextField.isHidden = widthStage.isTitleHidden && cell.faviconImageView.image != nil
+        cell.titleTextField.isShown = !widthStage.isTitleHidden || (cell.faviconImageView.image == nil && !showCloseButton)
 
         // Adjust colors for burner window
         if isBurner && cell.faviconImageView.image === TabViewModel.Favicon.burnerHome {
@@ -899,7 +902,7 @@ extension TabBarViewItem: MouseClickViewDelegate {
             .init(width: TabBarViewItem.mediumWidth, title: "Test 1", favicon: .homeFavicon, usedPermissions: [
                 .camera: .disabled(systemWide: true),
             ], mutedState: .unmuted),
-            .init(width: TabBarViewItem.mediumWidth, title: "Test 2", favicon: .homeFavicon, usedPermissions: [
+            .init(width: TabBarViewItem.mediumWidth, title: "Test 2", favicon: nil, usedPermissions: [
                 .microphone: .active,
             ], mutedState: .muted),
             .init(width: TabBarViewItem.mediumWidth, title: "Test 2", favicon: .homeFavicon, mutedState: .unmuted),
@@ -922,7 +925,15 @@ extension TabBarViewItem: MouseClickViewDelegate {
             .init(width: TabBarViewItem.Width.minimum, title: "Test 14", favicon: .e, usedPermissions: [
                 .camera: .paused,
             ], mutedState: .unmuted),
-            .init(width: TabBarViewItem.Width.minimum, title: "Test 15", favicon: .f, mutedState: .muted),
+            .init(width: TabBarViewItem.Width.minimum, title: "Test 16", favicon: nil, usedPermissions: [
+                .microphone: .active,
+            ], mutedState: .muted),
+            .init(width: TabBarViewItem.Width.minimum, title: "Test 17", favicon: nil),
+            .init(width: TabBarViewItem.Width.minimum, title: "Test 18", favicon: nil, usedPermissions: [
+                .camera: .paused,
+            ], mutedState: .unmuted),
+            .init(width: TabBarViewItem.Width.minimum, title: "Test 19", favicon: nil, mutedState: .muted),
+
         ]
     ])._preview_hidingWindowControlsOnAppear()
 }
