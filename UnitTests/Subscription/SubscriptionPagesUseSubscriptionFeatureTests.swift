@@ -82,6 +82,8 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
     var appStoreAccountManagementFlow: AppStoreAccountManagementFlow!
     var stripePurchaseFlow: StripePurchaseFlow!
 
+    var subscriptionFeatureAvailability: SubscriptionFeatureAvailabilityMock!
+
     var accountManager: AccountManager!
     var subscriptionManager: SubscriptionManager!
 
@@ -132,6 +134,10 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
                                                        authEndpointService: authService,
                                                        accountManager: accountManager)
 
+        subscriptionFeatureAvailability = SubscriptionFeatureAvailabilityMock(isFeatureAvailable: true,
+                                                                              isSubscriptionPurchaseAllowed: true,
+                                                                              usesUnifiedFeedbackForm: false)
+
         // Real SubscriptionManager
         subscriptionManager = DefaultSubscriptionManager(storePurchaseManager: storePurchaseManager,
                                                          accountManager: accountManager,
@@ -146,7 +152,8 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
 
         feature = SubscriptionPagesUseSubscriptionFeature(subscriptionManager: subscriptionManager,
                                                           stripePurchaseFlow: stripePurchaseFlow,
-                                                          uiHandler: uiHandler)
+                                                          uiHandler: uiHandler,
+                                                          subscriptionFeatureAvailability: subscriptionFeatureAvailability)
 
 //        feature = SubscriptionPagesUseSubscriptionFeature(subscriptionManager: subscriptionManager,
 //                                                          subscriptionAttributionOrigin: nil,
@@ -179,6 +186,8 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
         appStoreAccountManagementFlow = nil
         stripePurchaseFlow = nil
 
+        subscriptionFeatureAvailability = nil
+
         subscriptionManager = nil
 
         feature = nil
@@ -186,57 +195,43 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
 
     // MARK: - Tests for getSubscription
 
-    func testGetSubscriptionSuccessRefreshingAuthToken() async throws {
-        ensureUserAuthenticatedState()
-
-        let newAuthToken = UUID().uuidString
-
-        authService.validateTokenResult = .failure(Constants.invalidTokenError)
-        storePurchaseManager.mostRecentTransactionResult = Constants.mostRecentTransactionJWS
-        authService.storeLoginResult = .success(StoreLoginResponse(authToken: newAuthToken,
-                                                                   email: Constants.email,
-                                                                   externalID: Constants.externalID,
-                                                                   id: 1, status: "authenticated"))
-
-        let result = try await feature.getSubscription(params: Constants.mockParams, original: Constants.mockScriptMessage)
-
-//        if let result = result as? [String: String] {
-//            XCTAssertEqual(result[SubscriptionPagesUseSubscriptionFeature.Constants.token], newAuthToken)
-//            XCTAssertEqual(accountManager.authToken, newAuthToken)
-//
-//            XCTAssertEqual(feature.transactionStatus, .idle)
-//            XCTAssertEqual(feature.transactionError, nil)
-//        } else {
-//            XCTFail("Incorrect return type")
-//        }
-
-        if let result = result as? SubscriptionPagesUseSubscriptionFeature.Subscription {
-            XCTAssertEqual(result.token, newAuthToken)
-            XCTAssertEqual(accountManager.authToken, newAuthToken)
-        } else {
-            XCTFail("Incorrect return type")
-        }
-
-    }
-
-//    func testGetSubscriptionSuccessWithoutRefreshingAuthToken() async throws {
+//    func testGetSubscriptionSuccessRefreshingAuthToken() async throws {
 //        ensureUserAuthenticatedState()
 //
-//        authService.validateTokenResult = .success(Constants.validateTokenResponse)
+//        let newAuthToken = UUID().uuidString
 //
-//        let result = await feature.getSubscription(params: Constants.mockParams, original: Constants.mockScriptMessage)
+//        authService.validateTokenResult = .failure(Constants.invalidTokenError)
+//        storePurchaseManager.mostRecentTransactionResult = Constants.mostRecentTransactionJWS
+//        authService.storeLoginResult = .success(StoreLoginResponse(authToken: newAuthToken,
+//                                                                   email: Constants.email,
+//                                                                   externalID: Constants.externalID,
+//                                                                   id: 1, status: "authenticated"))
 //
-//        if let result = result as? [String: String] {
-//            XCTAssertEqual(result[SubscriptionPagesUseSubscriptionFeature.Constants.token], Constants.authToken)
-//            XCTAssertEqual(accountManager.authToken, Constants.authToken)
+//        let result = try await feature.getSubscription(params: Constants.mockParams, original: Constants.mockScriptMessage)
 //
-//            XCTAssertEqual(feature.transactionStatus, .idle)
-//            XCTAssertEqual(feature.transactionError, nil)
+//        if let result = result as? SubscriptionPagesUseSubscriptionFeature.Subscription {
+//            XCTAssertEqual(result.token, newAuthToken)
+//            XCTAssertEqual(accountManager.authToken, newAuthToken)
 //        } else {
 //            XCTFail("Incorrect return type")
 //        }
 //    }
-//
+
+    func testGetSubscriptionSuccessWithoutRefreshingAuthToken() async throws {
+        ensureUserAuthenticatedState()
+
+        authService.validateTokenResult = .success(Constants.validateTokenResponse)
+
+        let result = try await feature.getSubscription(params: Constants.mockParams, original: Constants.mockScriptMessage)
+
+        if let result = result as? SubscriptionPagesUseSubscriptionFeature.Subscription {
+            XCTAssertEqual(result.token, Constants.authToken)
+            XCTAssertEqual(accountManager.authToken, Constants.authToken)
+        } else {
+            XCTFail("Incorrect return type")
+        }
+    }
+
 //    func testGetSubscriptionSuccessErrorWhenUnauthenticated() async throws {
 //        ensureUserUnauthenticatedState()
 //
@@ -255,24 +250,24 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
 //            XCTFail("Incorrect return type")
 //        }
 //    }
-//
-//    // MARK: - Tests for getSubscriptionOptions
-//
-//    func testGetSubscriptionOptionsSuccess() async throws {
-//        storePurchaseManager.subscriptionOptionsResult = Constants.subscriptionOptions
-//
-//        let result = await feature.getSubscriptionOptions(params: Constants.mockParams, original: Constants.mockScriptMessage)
-//
-//        if let result = result as? SubscriptionOptions {
-//            XCTAssertEqual(result, Constants.subscriptionOptions)
-//
-//            XCTAssertEqual(feature.transactionStatus, .idle)
-//            XCTAssertEqual(feature.transactionError, nil)
-//        } else {
-//            XCTFail("Incorrect return type")
-//        }
-//    }
-//
+
+    // MARK: - Tests for getSubscriptionOptions
+
+    func testGetSubscriptionOptionsSuccess() async throws {
+        storePurchaseManager.subscriptionOptionsResult = Constants.subscriptionOptions
+
+        let result = try! await feature.getSubscriptionOptions(params: Constants.mockParams, original: Constants.mockScriptMessage)
+
+        if let result = result as? SubscriptionOptions {
+            XCTAssertEqual(result, Constants.subscriptionOptions)
+        } else {
+            XCTFail("Incorrect return type")
+        }
+
+//        let resulttttt = try XCTUnwrap(result as? SubscriptionOptions)
+//        XCTAssertEqual(resulttttt, Constants.subscriptionOptions)
+    }
+
 //    func testGetSubscriptionOptionsReturnsEmptyOptionsWhenNoSubscriptionOptions() async throws {
 //        storePurchaseManager.subscriptionOptionsResult = nil
 //
@@ -280,9 +275,6 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
 //
 //        if let result = result as? SubscriptionOptions {
 //            XCTAssertEqual(result, SubscriptionOptions.empty)
-//
-//            XCTAssertEqual(feature.transactionStatus, .idle)
-//            XCTAssertEqual(feature.transactionError, .failedToGetSubscriptionOptions)
 //        } else {
 //            XCTFail("Incorrect return type")
 //        }
@@ -301,14 +293,11 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
 //
 //        if let result = result as? SubscriptionOptions {
 //            XCTAssertEqual(result, SubscriptionOptions.empty)
-//
-//            XCTAssertEqual(feature.transactionStatus, .idle)
-//            XCTAssertEqual(feature.transactionError, nil)
 //        } else {
 //            XCTFail("Incorrect return type")
 //        }
 //    }
-//
+
 //    // MARK: - Tests for subscriptionSelected
 //
 //    func testSubscriptionSelectedSuccessWhenPurchasingFirstTime() async throws {

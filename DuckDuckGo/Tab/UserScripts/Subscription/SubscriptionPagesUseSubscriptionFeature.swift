@@ -43,14 +43,18 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     let subscriptionSuccessPixelHandler: SubscriptionAttributionPixelHandler
     let uiHandler: SubscriptionUIHandling
 
+    let subscriptionFeatureAvailability: SubscriptionFeatureAvailability
+
     public init(subscriptionManager: SubscriptionManager,
                 subscriptionSuccessPixelHandler: SubscriptionAttributionPixelHandler = PrivacyProSubscriptionAttributionPixelHandler(),
                 stripePurchaseFlow: StripePurchaseFlow,
-                uiHandler: SubscriptionUIHandling) {
+                uiHandler: SubscriptionUIHandling,
+                subscriptionFeatureAvailability: SubscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability()) {
         self.subscriptionManager = subscriptionManager
         self.stripePurchaseFlow = stripePurchaseFlow
         self.subscriptionSuccessPixelHandler = subscriptionSuccessPixelHandler
         self.uiHandler = uiHandler
+        self.subscriptionFeatureAvailability = subscriptionFeatureAvailability
     }
 
     func with(broker: UserScriptMessageBroker) {
@@ -147,7 +151,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func getSubscriptionOptions(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard DefaultSubscriptionFeatureAvailability().isSubscriptionPurchaseAllowed else { return SubscriptionOptions.empty }
+        guard subscriptionFeatureAvailability.isSubscriptionPurchaseAllowed else { return SubscriptionOptions.empty }
 
         switch subscriptionPlatform {
         case .appStore:
