@@ -213,6 +213,8 @@ extension MainWindowController: NSWindowDelegate {
         if (notification.object as? NSWindow)?.isPopUpWindow == false {
             WindowControllersManager.shared.lastKeyMainWindowController = self
         }
+
+        WebExtensionManager.shared.didFocusWindow(self)
     }
 
     func windowDidResignKey(_ notification: Notification) {
