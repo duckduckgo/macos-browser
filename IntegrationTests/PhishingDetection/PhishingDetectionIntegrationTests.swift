@@ -61,109 +61,71 @@ class PhishingDetectionIntegrationTests: XCTestCase {
     // MARK: - Tests
 
     @MainActor
-    func testPhishingNotDetected_tabIsNotMarkedPhishing() {
-        loadUrl("http://privacy-test-pages.site/")
-        let expectation = XCTestExpectation()
-        tabViewModel?.tab.webViewDidFinishNavigationPublisher.sink {
-            expectation.fulfill()
-        }.store(in: &cancellables)
-        wait(for: [expectation], timeout: 5)
-        let tabErrorCode = tabViewModel.tab.error?.errorCode
-        XCTAssertNil(tabErrorCode)
+    func testWhenPhishingDetected_tabIsMarkedPhishing() async throws {
+        try await testPhishingDetection(urlString: "http://privacy-test-pages.site/security/badware/phishing.html", expectedIsPhishing: true)
     }
 
     @MainActor
-    func testPhishingDetected_tabIsMarkedPhishing() {
-        loadUrl("http://privacy-test-pages.site/security/badware/phishing.html")
-        let expectation = XCTestExpectation()
-        tabViewModel?.tab.webViewDidFinishNavigationPublisher.sink {
-            expectation.fulfill()
-        }.store(in: &cancellables)
-        wait(for: [expectation], timeout: 5)
-        let tabErrorCode = tabViewModel.tab.error?.errorCode
-        XCTAssertEqual(tabErrorCode, PhishingDetectionError.detected.errorCode)
+    func testWhenPhishingDetectedviaHTTPRedirect_tabIsMarkedPhishing() async throws {
+        try await testPhishingDetection(urlString: "http://privacy-test-pages.site/security/badware/phishing-redirect/", expectedIsPhishing: true)
     }
 
     @MainActor
-    func testFeatureDisabledAndPhishingDetection_tabIsNotMarkedPhishing() {
+    func testWhenPhishingDetectedviaJSRedirect_tabIsMarkedPhishing() async throws {
+        try await testPhishingDetection(urlString: "http://privacy-test-pages.site/security/badware/phishing-js-redirector.html", expectedIsPhishing: true)
+    }
+
+    @MainActor
+    func testWhenPhishingDetectedviaIframe_tabIsMarkedPhishing() async throws {
+        try await testPhishingDetection(urlString: "http://bad.third-party.site/security/badware/phishing-iframe-loader.html", expectedIsPhishing: true)
+    }
+
+    @MainActor
+    func testFeatureDisabledAndPhishingDetection_tabIsNotMarkedPhishing() async throws {
         PhishingDetectionPreferences.shared.isEnabled = false
-        loadUrl("http://privacy-test-pages.site/security/badware/phishing.html")
-        let expectation = XCTestExpectation()
-        tabViewModel?.tab.webViewDidFinishNavigationPublisher.sink {
-            expectation.fulfill()
-        }.store(in: &cancellables)
-        wait(for: [expectation], timeout: 5)
-        let tabErrorCode = tabViewModel.tab.error?.errorCode
-        XCTAssertNil(tabErrorCode)
+        try await testPhishingDetection(urlString: "http://privacy-test-pages.site/security/badware/phishing.html", expectedIsPhishing: false, expectedErrorCode: nil)
     }
 
     @MainActor
-    func testPhishingDetectedThenNotDetected_tabIsNotMarkedPhishing() {
-        loadUrl("http://privacy-test-pages.site/security/badware/phishing.html")
-        let expectation = XCTestExpectation()
-        tabViewModel?.tab.webViewDidFinishNavigationPublisher.sink {
-            expectation.fulfill()
-        }.store(in: &cancellables)
-        wait(for: [expectation], timeout: 5)
-        let tabErrorCode = tabViewModel.tab.error?.errorCode
-        XCTAssertEqual(tabErrorCode, PhishingDetectionError.detected.errorCode)
+    func testPhishingDetectedThenNotDetected_tabIsNotMarkedPhishing() async throws {
+        let initialUrl = "http://privacy-test-pages.site/security/badware/phishing.html"
+        let subsequentUrl = "https://privacy-test-pages.site"
 
-        loadUrl("http://broken.third-party.site/")
-        let expectation2 = XCTestExpectation()
-        tabViewModel?.tab.webViewDidFinishNavigationPublisher.sink {
-            expectation2.fulfill()
-        }.store(in: &cancellables)
-        wait(for: [expectation2], timeout: 5)
-        let tabErrorCode2 = tabViewModel.tab.error?.errorCode
-        XCTAssertNil(tabErrorCode2)
+        try await testPhishingDetection(urlString: initialUrl, expectedIsPhishing: true)
+        try await testPhishingDetection(urlString: subsequentUrl, expectedIsPhishing: false)
     }
 
     @MainActor
-    func testPhishingDetectedThenDDGLoaded_tabIsNotMarkedPhishing() {
-        loadUrl("http://privacy-test-pages.site/security/badware/phishing.html")
-        let expectation = XCTestExpectation()
-        tabViewModel?.tab.webViewDidFinishNavigationPublisher.sink {
-            expectation.fulfill()
-        }.store(in: &cancellables)
-        wait(for: [expectation], timeout: 5)
-        let tabErrorCode = tabViewModel.tab.error?.errorCode
-        XCTAssertEqual(tabErrorCode, PhishingDetectionError.detected.errorCode)
+    func testPhishingDetectedThenDDGLoaded_tabIsNotMarkedPhishing() async throws {
+        let initialUrl = "http://privacy-test-pages.site/security/badware/phishing.html"
+        let subsequentUrl = "https://duckduckgo.com"
 
-        loadUrl("http://duckduckgo.com/")
-        let expectation2 = XCTestExpectation()
-        tabViewModel?.tab.webViewDidFinishNavigationPublisher.sink {
-            expectation2.fulfill()
-        }.store(in: &cancellables)
-        wait(for: [expectation2], timeout: 5)
-        let tabErrorCode2 = tabViewModel.tab.error?.errorCode
-        XCTAssertNil(tabErrorCode2)
-    }
-
-    @MainActor
-    func testPhishingDetectedViaHTTPRedirectChain_tabIsMarkedPhishing() {
-        loadUrl("http://privacy-test-pages.site/security/badware/phishing-redirect/")
-        let expectation = XCTestExpectation()
-        tabViewModel?.tab.webViewDidFinishNavigationPublisher.sink {
-            expectation.fulfill()
-        }.store(in: &cancellables)
-        wait(for: [expectation], timeout: 5)
-        let tabErrorCode = tabViewModel.tab.error?.errorCode
-        XCTAssertEqual(tabErrorCode, PhishingDetectionError.detected.errorCode)
-    }
-
-    @MainActor
-    func testPhishingDetectedViaJSRedirectChain_tabIsMarkedPhishing() {
-        loadUrl("http://privacy-test-pages.site/security/badware/phishing-js-redirector.html")
-        let expectation = XCTestExpectation()
-        tabViewModel?.tab.webViewDidFinishNavigationPublisher.sink {
-            expectation.fulfill()
-        }.store(in: &cancellables)
-        wait(for: [expectation], timeout: 5)
-        let tabErrorCode = tabViewModel.tab.error?.errorCode
-        XCTAssertEqual(tabErrorCode, PhishingDetectionError.detected.errorCode)
+        try await testPhishingDetection(urlString: initialUrl, expectedIsPhishing: true)
+        try await testPhishingDetection(urlString: subsequentUrl, expectedIsPhishing: false)
     }
 
     // MARK: - Helper Methods
+
+    @MainActor
+    private func testPhishingDetection(urlString: String, expectedIsPhishing: Bool, expectedErrorCode: Int? = PhishingDetectionError.detected.errorCode) async throws {
+        let isPhishingPromise = tab.privacyInfoPublisher
+            .compactMap { $0?.$isPhishing }
+            .map { _ in expectedIsPhishing }
+            .timeout(10)
+            .first()
+            .promise()
+        let navigationFailedPromise = tab.$error.compactMap { $0 }.timeout(5).first().promise()
+
+        loadUrl(urlString)
+
+        let isPhishing = try await isPhishingPromise.value
+        XCTAssertEqual(isPhishing, expectedIsPhishing)
+        if expectedIsPhishing {
+            _ = try await navigationFailedPromise.value
+            XCTAssertEqual(tab.error!.errorCode, PhishingDetectionError.detected.errorCode)
+        }
+
+    }
 
     @MainActor
     private func loadUrl(_ urlString: String) {
