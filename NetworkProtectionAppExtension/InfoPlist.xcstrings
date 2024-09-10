@@ -8,55 +8,55 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "NetworkProtectionAppExtension"
+            "value" : "DuckDuckGo VPN Network Extension"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "NetworkProtectionAppExtension"
+            "value" : "DuckDuckGo VPN Network Extension"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "NetworkProtectionAppExtension"
+            "value" : "DuckDuckGo VPN Network Extension"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "NetworkProtectionAppExtension"
+            "value" : "DuckDuckGo VPN Network Extension"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "NetworkProtectionAppExtension"
+            "value" : "DuckDuckGo VPN Network Extension"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "NetworkProtectionAppExtension"
+            "value" : "DuckDuckGo VPN Network Extension"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "NetworkProtectionAppExtension"
+            "value" : "DuckDuckGo VPN Network Extension"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "NetworkProtectionAppExtension"
+            "value" : "DuckDuckGo VPN Network Extension"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "NetworkProtectionAppExtension"
+            "value" : "DuckDuckGo VPN Network Extension"
           }
         }
       }

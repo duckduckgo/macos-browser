@@ -99,7 +99,7 @@ jobs:
       ATB_VARIANT_NAME: ${{ inputs.atb-variant || github.event.inputs.atb-variant }}
       ORIGIN_VARIANT_NAME: ${{ inputs.origin-variant || github.event.inputs.origin-variant }}
 
-    runs-on: macos-12
+    runs-on: macos-14
     timeout-minutes: 15
 
     steps:
@@ -214,7 +214,9 @@ jobs:
         retries=3
 
         while [[ $retries -gt 0 ]]; do
+          # Using APFS filesystem as per https://github.com/actions/runner-images/issues/7522#issuecomment-2299918092
           if create-dmg --volname "DuckDuckGo" \
+            --filesystem APFS \
             --icon "DuckDuckGo.app" 140 160 \
             --background "scripts/assets/dmg-background.png" \
             --window-size 600 400 \

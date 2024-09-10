@@ -103,11 +103,28 @@ extension Preferences {
                 // SECTION 3: New Tab Page
                 PreferencePaneSection(UserText.newTabBottomPopoverTitle) {
 
-                    if model.isContinueSetUpAvailable {
-                        ToggleMenuItem(UserText.newTabSetUpSectionTitle, isOn: $model.isContinueSetUpVisible)
+                    PreferencePaneSubSection {
+                        if model.isContinueSetUpAvailable {
+                            ToggleMenuItem(UserText.newTabSetUpSectionTitle, isOn: $model.isContinueSetUpVisible)
+                        }
+                        ToggleMenuItem(UserText.newTabFavoriteSectionTitle, isOn: $model.isFavoriteVisible).accessibilityIdentifier("Preferences.AppearanceView.showFavoritesToggle")
+                        ToggleMenuItem(UserText.newTabRecentActivitySectionTitle, isOn: $model.isRecentActivityVisible)
                     }
-                    ToggleMenuItem(UserText.newTabFavoriteSectionTitle, isOn: $model.isFavoriteVisible).accessibilityIdentifier("Preferences.AppearanceView.showFavoritesToggle")
-                    ToggleMenuItem(UserText.newTabRecentActivitySectionTitle, isOn: $model.isRecentActivityVisible)
+
+                    PreferencePaneSubSection {
+
+                        Button {
+                            model.openNewTabPageBackgroundCustomizationSettings()
+                        } label: {
+                            HStack {
+                                Text(UserText.customizeBackground)
+                                Image(.externalAppScheme)
+                            }
+                            .foregroundColor(Color.linkBlue)
+                            .cursor(.pointingHand)
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
 
                 // SECTION 4: Bookmarks Bar

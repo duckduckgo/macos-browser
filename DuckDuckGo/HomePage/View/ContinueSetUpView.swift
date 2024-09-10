@@ -110,7 +110,7 @@ extension HomePage.Views {
                     HStack {
                         Spacer()
                         VStack {
-                            CloseButton(icon: .close) {
+                            CloseButton(icon: .close, size: 16) {
                                 model.removeItem(for: featureType)
                             }
                             .visibility(isHovering ? .visible : .gone)
@@ -145,13 +145,16 @@ extension HomePage.Views {
 
             @State var isHovering = false
             @State var isClicked = false
+            @EnvironmentObject var settingsModel: HomePage.Models.SettingsModel
 
             var body: some View {
                 ZStack(alignment: .center) {
+
                     RoundedRectangle(cornerRadius: 12)
                         .stroke(Color.homeFavoritesGhost, style: StrokeStyle(lineWidth: 1.0))
-                        .background(Color.homepageCardBackground)
+                        .homePageViewBackground(settingsModel.customBackground)
                         .cornerRadius(12)
+
                     ZStack {
                         VStack(spacing: 18) {
                             icon
