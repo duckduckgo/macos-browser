@@ -46,6 +46,7 @@ protocol WindowControllersManagerProtocol {
                        popUp: Bool,
                        lazyLoadTabs: Bool,
                        isMiniaturized: Bool) -> MainWindow?
+    func showTab(with content: Tab.TabContent)
 }
 extension WindowControllersManagerProtocol {
     @discardableResult
@@ -58,7 +59,6 @@ extension WindowControllersManagerProtocol {
                        lazyLoadTabs: Bool = false) -> MainWindow? {
         openNewWindow(with: tabCollectionViewModel, burnerMode: burnerMode, droppingPoint: droppingPoint, contentSize: contentSize, showWindow: showWindow, popUp: popUp, lazyLoadTabs: lazyLoadTabs, isMiniaturized: false)
     }
-    func showTab(with content: Tab.TabContent)
 }
 
 @MainActor
