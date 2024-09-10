@@ -678,7 +678,7 @@ final class BrowserTabViewController: NSViewController {
             let freemiumDBPUserStateManager = DefaultFreemiumPIRUserStateManager(userDefaults: .dbp)
             let freemiumPIRFeature = DefaultFreemiumPIRFeature(subscriptionManager: subscriptionManager, accountManager: subscriptionManager.accountManager, freemiumPIRUserStateManager: freemiumDBPUserStateManager)
 
-            let freemiumDBPPromotionViewCoordinator = DefaultFreemiumDBPPromotionViewCoordinator(freemiumDBPUserStateManager: freemiumDBPUserStateManager,
+            let freemiumDBPPromotionViewCoordinator = FreemiumDBPPromotionViewCoordinator(freemiumDBPUserStateManager: freemiumDBPUserStateManager,
                                                                                              freemiumPIRFeature: freemiumPIRFeature)
             let homePageViewController = HomePageViewController(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager,
                                                                 freemiumDBPPromotionViewCoordinator: freemiumDBPPromotionViewCoordinator)

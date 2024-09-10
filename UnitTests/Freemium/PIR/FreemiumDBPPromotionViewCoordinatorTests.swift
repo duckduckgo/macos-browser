@@ -22,7 +22,7 @@ import Freemium
 
 final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
 
-    private var sut: DefaultFreemiumDBPPromotionViewCoordinator!
+    private var sut: FreemiumDBPPromotionViewCoordinator!
     private var mockUserStateManager: MockFreemiumPIRUserStateManager!
     private var mockFeature: MockFreemiumPIRFeature!
     private var mockPresenter: MockFreemiumPIRPresenter!
@@ -33,7 +33,7 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         mockFeature = MockFreemiumPIRFeature()
         mockPresenter = MockFreemiumPIRPresenter()
 
-        sut = DefaultFreemiumDBPPromotionViewCoordinator(
+        sut = FreemiumDBPPromotionViewCoordinator(
             freemiumDBPUserStateManager: mockUserStateManager,
             freemiumPIRFeature: mockFeature,
             freemiumPIRPresenter: mockPresenter
@@ -54,7 +54,7 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         mockFeature.featureAvailable = true
 
         // When
-        sut = DefaultFreemiumDBPPromotionViewCoordinator(
+        sut = FreemiumDBPPromotionViewCoordinator(
             freemiumDBPUserStateManager: mockUserStateManager,
             freemiumPIRFeature: mockFeature,
             freemiumPIRPresenter: mockPresenter
@@ -71,7 +71,7 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         mockFeature.featureAvailable = true
 
         // When
-        sut = DefaultFreemiumDBPPromotionViewCoordinator(
+        sut = FreemiumDBPPromotionViewCoordinator(
             freemiumDBPUserStateManager: mockUserStateManager,
             freemiumPIRFeature: mockFeature,
             freemiumPIRPresenter: mockPresenter

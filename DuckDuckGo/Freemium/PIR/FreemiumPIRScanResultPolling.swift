@@ -113,9 +113,8 @@ private extension DefaultFreemiumPIRScanResultPolling {
 
     /// Starts the polling process for DBP scan results.
     ///
-    /// It first checks if any results are available using `notifyMatchesFoundOrNoResultsIfConditionsMet()`.
-    /// If no results are found, it starts a repeating timer to poll for results at regular intervals
-    /// using `startRepeatingConditionCheck()`.
+    /// It first checks if any results are available.
+    /// If no results are found, it starts a repeating timer to poll for results at regular intervals.
     func startPolling() {
         Logger.freemiumDBP.debug("[Freemium DBP] Starting to Poll for Scan Results")
         checkResultsAndNotifyIfApplicable()

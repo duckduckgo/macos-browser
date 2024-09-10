@@ -33,7 +33,7 @@ extension HomePage.Views {
         @EnvironmentObject var continueSetUpModel: HomePage.Models.ContinueSetUpModel
         @EnvironmentObject var favoritesModel: HomePage.Models.FavoritesModel
         @EnvironmentObject var activeRemoteMessageModel: ActiveRemoteMessageModel
-        var freemiumDBPPromotionViewCoordinator: any FreemiumDBPPromotionViewCoordinator
+        let freemiumDBPPromotionViewCoordinator: any FreemiumDBPPromotionViewCoordinating
 
         @State private var isHomeContentPopoverVisible = false
 

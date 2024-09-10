@@ -58,7 +58,7 @@ final class DataBrokerProtectionDataManagingTests: XCTestCase {
         //   - 1 extracted profile + 2 mirror sites for Broker A (3 total)
         //   - Broker B is deprecated, so it should be skipped (0 total)
         //   - 1 extracted profile + 1 mirror site for Broker C (2 total)
-        //   - Total = 3 + 0 + 2 + 1 = 6
+        //   - Total = 3 + 0 + 2 = 5
         // - 2 brokers with matches (Broker A and Broker C)
         XCTAssertEqual(result.matchCount, 5)
         XCTAssertEqual(result.brokerCount, 2)

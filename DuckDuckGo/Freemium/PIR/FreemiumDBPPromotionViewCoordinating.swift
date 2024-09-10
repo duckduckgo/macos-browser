@@ -1,5 +1,5 @@
 //
-//  FreemiumDBPPromotionViewCoordinator.swift
+//  FreemiumDBPPromotionViewCoordinating.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -24,7 +24,7 @@ import OSLog
 /// Protocol defining the interface for coordinating the visibility and interaction with the
 /// Freemium DBP (Data Broker Protection) promotion view.
 @MainActor
-protocol FreemiumDBPPromotionViewCoordinator: ObservableObject {
+protocol FreemiumDBPPromotionViewCoordinating: ObservableObject {
     /// A boolean value indicating whether the home page promotion is visible.
     var isHomePagePromotionVisible: Bool { get set }
 
@@ -32,9 +32,9 @@ protocol FreemiumDBPPromotionViewCoordinator: ObservableObject {
     var viewModel: PromotionViewModel { get }
 }
 
-/// Default implementation of `FreemiumDBPPromotionViewCoordinator`, responsible for managing
+/// Default implementation of `FreemiumDBPPromotionViewCoordinating`, responsible for managing
 /// the visibility of the promotion and responding to user interactions with the promotion view.
-final class DefaultFreemiumDBPPromotionViewCoordinator: FreemiumDBPPromotionViewCoordinator {
+final class FreemiumDBPPromotionViewCoordinator: FreemiumDBPPromotionViewCoordinating {
 
     /// Published property that determines whether the promotion is visible on the home page.
     @Published var isHomePagePromotionVisible: Bool = false
@@ -87,7 +87,7 @@ final class DefaultFreemiumDBPPromotionViewCoordinator: FreemiumDBPPromotionView
     }
 }
 
-private extension DefaultFreemiumDBPPromotionViewCoordinator {
+private extension FreemiumDBPPromotionViewCoordinator {
 
     /// Action to be executed when the user proceeds with the promotion (e.g opens DBP)
     var proceedAction: () -> Void {

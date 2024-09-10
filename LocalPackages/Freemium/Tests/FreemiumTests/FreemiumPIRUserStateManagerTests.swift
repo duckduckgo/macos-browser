@@ -193,7 +193,7 @@ final class FreemiumPIRUserStateManagerTests: XCTestCase {
 
         // When
         let scanResults = FreemiumDBPMatchResults(matchesCount: 3, brokerCount: 2)
-        let encodedResults = try! JSONEncoder().encode(scanResults)
+        let encodedResults = try JSONEncoder().encode(scanResults)
         testUserDefaults.set(encodedResults, forKey: Keys.firstScanResults)
 
         // Then
