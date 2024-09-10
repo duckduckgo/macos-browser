@@ -23,6 +23,30 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 Fetches and updates certificates and provisioning profiles for App Store distribution
 
+### mac sync_signing_dmg_release
+
+```sh
+[bundle exec] fastlane mac sync_signing_dmg_release
+```
+
+Fetches and updates certificates and provisioning profiles for DMG distribution
+
+### mac sync_signing_dmg_review
+
+```sh
+[bundle exec] fastlane mac sync_signing_dmg_review
+```
+
+Fetches and updates certificates and provisioning profiles for DMG Review builds
+
+### mac sync_signing_dmg_ci
+
+```sh
+[bundle exec] fastlane mac sync_signing_dmg_ci
+```
+
+Fetches and updates certificates and provisioning profiles for DMG CI builds
+
 ### mac release_testflight
 
 ```sh

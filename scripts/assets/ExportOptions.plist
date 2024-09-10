@@ -11,7 +11,7 @@
 		<key>com.duckduckgo.macos.browser</key>
 		<string>MacOS Browser</string>
 		<key>com.duckduckgo.macos.browser.review</key>
-		<string>MacOS Browser Product Review</string>
+		<string>match Direct com.duckduckgo.macos.browser.review macos</string>
 		<key>com.duckduckgo.macos.browser.dbp</key>
 		<string>macOS DBP Profile</string>
 		<key>com.duckduckgo.mobile.ios</key>
@@ -21,19 +21,19 @@
 		<key>com.duckduckgo.macos.DBP.backgroundAgent</key>
 		<string>macOS DBP Agent - Release</string>
 		<key>com.duckduckgo.macos.DBP.backgroundAgent.review</key>
-		<string>macOS DBP Agent - Review</string>
+		<string>match Direct com.duckduckgo.macos.DBP.backgroundAgent.review macos</string>
 		<key>com.duckduckgo.macos.vpn.network-extension</key>
 		<string>macOS NetP VPN SysEx - Release (XPC)</string>
 		<key>com.duckduckgo.macos.vpn.network-extension.review</key>
-		<string>macOS NetP VPN SysEx - Review (XPC)</string>
+		<string>match Direct com.duckduckgo.macos.vpn.network-extension.review macos</string>
 		<key>com.duckduckgo.macos.vpn</key>
 		<string>macOS NetP VPN App - Release (XPC)</string>
 		<key>com.duckduckgo.macos.vpn.review</key>
-		<string>macOS NetP VPN App - Review (XPC)</string>
+		<string>match Direct com.duckduckgo.macos.vpn.review macos</string>
 		<key>HKE973VLUW.com.duckduckgo.macos.browser.network-protection.notifications</key>
 		<string>Mac Browser NetP Developer ID Not. (Distribution)</string>
 		<key>HKE973VLUW.com.duckduckgo.macos.browser.network-protection.notifications.review</key>
-		<string>MacOS Browser NetP Notifications Product Review</string>
+		<string>match Direct HKE973VLUW.com.duckduckgo.macos.browser.network-protection.notifications.review macos</string>
 	</dict>
 	<key>signingCertificate</key>
 	<string></string>

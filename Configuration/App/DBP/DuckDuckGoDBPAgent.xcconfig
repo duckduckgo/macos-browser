@@ -41,7 +41,7 @@ PRODUCT_NAME[config=Review][arch=*][sdk=*] = $(DBP_BACKGROUND_AGENT_PRODUCT_NAME
 
 PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*] =
 PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] = macOS DBP Agent - CI
-PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = macOS DBP Agent - Review
+PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = match Direct com.duckduckgo.macos.DBP.backgroundAgent.review macos
 PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = macOS DBP Agent - Release
 
 FEATURE_FLAGS = FEEDBACK

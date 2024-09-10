@@ -36,7 +36,7 @@ PRODUCT_NAME[config=Review][arch=*][sdk=*] = $(NOTIFICATIONS_AGENT_PRODUCT_NAME)
 
 PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*] =
 PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] = Mac Browser NetP Developer ID Not. (CI)
-PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = MacOS Browser NetP Notifications Product Review
+PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = match Direct HKE973VLUW.com.duckduckgo.macos.browser.network-protection.notifications.review macos
 PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = Mac Browser NetP Developer ID Not. (Distribution)
 
 FEATURE_FLAGS[arch=*][sdk=*] = NETP_SYSTEM_EXTENSION
