@@ -40,7 +40,6 @@ extension HomePage.Models {
         let gridWidth = FeaturesGridDimensions.width
         let deleteActionTitle = UserText.newTabSetUpRemoveItemAction
         let privacyConfigurationManager: PrivacyConfigurationManaging
-        let permanentSurveyManager: SurveyManager
 
         var duckPlayerURL: String {
             let duckPlayerSettings = privacyConfigurationManager.privacyConfig.settings(for: .duckPlayer)
@@ -77,9 +76,6 @@ extension HomePage.Models {
         @UserDefaultsWrapper(key: .homePageShowEmailProtection, defaultValue: true)
         private var shouldShowEmailProtectionSetting: Bool
 
-        @UserDefaultsWrapper(key: .homePageShowPermanentSurvey, defaultValue: true)
-        private var shouldShowPermanentSurvey: Bool
-
         @UserDefaultsWrapper(key: .homePageIsFirstSession, defaultValue: true)
         private var isFirstSession: Bool
 
@@ -108,7 +104,6 @@ extension HomePage.Models {
              emailManager: EmailManager = EmailManager(),
              duckPlayerPreferences: DuckPlayerPreferencesPersistor,
              privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
-             permanentSurveyManager: SurveyManager = PermanentSurveyManager(),
              subscriptionManager: SubscriptionManager = Application.appDelegate.subscriptionManager) {
             self.defaultBrowserProvider = defaultBrowserProvider
             self.dockCustomizer = dockCustomizer
@@ -117,7 +112,6 @@ extension HomePage.Models {
             self.emailManager = emailManager
             self.duckPlayerPreferences = duckPlayerPreferences
             self.privacyConfigurationManager = privacyConfigurationManager
-            self.permanentSurveyManager = permanentSurveyManager
             self.subscriptionManager = subscriptionManager
 
             refreshFeaturesMatrix()
@@ -138,8 +132,6 @@ extension HomePage.Models {
                 performDuckPlayerAction()
             case .emailProtection:
                 performEmailProtectionAction()
-            case .permanentSurvey:
-                visitSurvey()
             }
         }
 
@@ -188,8 +180,6 @@ extension HomePage.Models {
                 shouldShowDuckPlayerSetting = false
             case .emailProtection:
                 shouldShowEmailProtectionSetting = false
-            case .permanentSurvey:
-                shouldShowPermanentSurvey = false
             }
             refreshFeaturesMatrix()
         }
@@ -218,8 +208,6 @@ extension HomePage.Models {
                 return shouldDuckPlayerCardBeVisible
             case .emailProtection:
                 return shouldEmailProtectionCardBeVisible
-            case .permanentSurvey:
-                return shouldPermanentSurveyBeVisible
             }
         }
 
@@ -242,8 +230,8 @@ extension HomePage.Models {
         }
 
         var randomisedFeatures: [FeatureType] {
-            var features: [FeatureType]  = [.permanentSurvey, .defaultBrowser]
-            var shuffledFeatures = FeatureType.allCases.filter { $0 != .defaultBrowser && $0 != .permanentSurvey }
+            var features: [FeatureType]  = [.defaultBrowser]
+            var shuffledFeatures = FeatureType.allCases.filter { $0 != .defaultBrowser }
             shuffledFeatures.shuffle()
             features.append(contentsOf: shuffledFeatures)
             return features
@@ -293,19 +281,6 @@ extension HomePage.Models {
             !emailManager.isSignedIn
         }
 
-        private var shouldPermanentSurveyBeVisible: Bool {
-            return shouldShowPermanentSurvey &&
-            permanentSurveyManager.isSurveyAvailable
-        }
-
-        @MainActor private func visitSurvey() {
-            guard let url = permanentSurveyManager.url else { return }
-
-            let tab = Tab(content: .url(url, source: .ui), shouldLoadInBackground: true)
-            tabCollectionViewModel.append(tab: tab)
-            shouldShowPermanentSurvey = false
-        }
-
     }
 
     // MARK: Feature Type
@@ -316,9 +291,9 @@ extension HomePage.Models {
         // included elsewhere.
         static var allCases: [HomePage.Models.FeatureType] {
 #if APPSTORE
-            [.duckplayer, .emailProtection, .defaultBrowser, .importBookmarksAndPasswords, .permanentSurvey]
+            [.duckplayer, .emailProtection, .defaultBrowser, .importBookmarksAndPasswords]
 #else
-            [.duckplayer, .emailProtection, .defaultBrowser, .dock, .importBookmarksAndPasswords, .permanentSurvey]
+            [.duckplayer, .emailProtection, .defaultBrowser, .dock, .importBookmarksAndPasswords]
 #endif
         }
 
@@ -327,7 +302,6 @@ extension HomePage.Models {
         case defaultBrowser
         case dock
         case importBookmarksAndPasswords
-        case permanentSurvey
 
         var title: String {
             switch self {
@@ -341,8 +315,6 @@ extension HomePage.Models {
                 return UserText.newTabSetUpDuckPlayerCardTitle
             case .emailProtection:
                 return UserText.newTabSetUpEmailProtectionCardTitle
-            case .permanentSurvey:
-                return PermanentSurveyManager.title
             }
         }
 
@@ -358,8 +330,6 @@ extension HomePage.Models {
                 return UserText.newTabSetUpDuckPlayerSummary
             case .emailProtection:
                 return UserText.newTabSetUpEmailProtectionSummary
-            case .permanentSurvey:
-                return PermanentSurveyManager.body
             }
         }
 
@@ -375,8 +345,6 @@ extension HomePage.Models {
                 return UserText.newTabSetUpDuckPlayerAction
             case .emailProtection:
                 return UserText.newTabSetUpEmailProtectionAction
-            case .permanentSurvey:
-                return PermanentSurveyManager.actionTitle
             }
         }
 
@@ -403,8 +371,6 @@ extension HomePage.Models {
                 return .cleanTube128.resized(to: iconSize)!
             case .emailProtection:
                 return .inbox128.resized(to: iconSize)!
-            case .permanentSurvey:
-                return .survey128.resized(to: iconSize)!
             }
         }
     }

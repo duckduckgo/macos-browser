@@ -296,7 +296,9 @@ create_dmg() {
 	rm -rf "${dmg_dir}" "${dmg_output_path}"
 	mkdir -p "${dmg_dir}"
 	cp -R "${app_path}" "${dmg_dir}"
+	# Using APFS filesystem as per https://github.com/actions/runner-images/issues/7522#issuecomment-2299918092
 	${filter_output} create-dmg --volname "${app_name}" \
+		--filesystem APFS \
 		--icon "${app_name}.app" 140 160 \
 		--background "${dmg_background}" \
 		--window-size 600 400 \

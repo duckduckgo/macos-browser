@@ -135,8 +135,6 @@ public struct UserDefaultsWrapper<T> {
         case homePageShowImport = "home.page.show.import"
         case homePageShowDuckPlayer = "home.page.show.duck.player"
         case homePageShowEmailProtection = "home.page.show.email.protection"
-        case homePageUserInSurveyShare = "home.page.user.in.survey.share"
-        case homePageShowPermanentSurvey = "home.page.show.import.permanent.survey"
         case homePageShowPageTitles = "home.page.show.page.titles"
         case homePageShowRecentlyVisited = "home.page.show.recently.visited"
         case homePageContinueSetUpImport = "home.page.continue.set.up.import"
@@ -144,6 +142,9 @@ public struct UserDefaultsWrapper<T> {
         case homePageIsContinueSetupVisible = "home.page.is.continue.setup.visible"
         case homePageIsRecentActivityVisible = "home.page.is.recent.activity.visible"
         case homePageIsFirstSession = "home.page.is.first.session"
+        case homePageUserBackgroundImages = "home.page.user.background.images"
+        case homePageCustomBackground = "home.page.custom.background"
+        case homePageLastPickedCustomColor = "home.page.last.picked.custom.color"
 
         case appIsRelaunchingAutomatically = "app-relaunching-automatically"
 
