@@ -61,10 +61,11 @@ final class MoreOptionsMenuButton: MouseOverButton {
 
     private func subscribeToUpdateInfo() {
 #if SPARKLE
-        cancellable = updateController?.hasPendingUpdatePublisher
+        guard let updateController else { return }
+        cancellable = Publishers.CombineLatest(updateController.hasPendingUpdatePublisher, updateController.notificationDotPublisher)
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] isAvailable in
-                self?.isNotificationVisible = isAvailable
+            .sink { [weak self] hasPendingUpdate, needsNotificationDot in
+                self?.isNotificationVisible = hasPendingUpdate && needsNotificationDot
             }
 #endif
     }
