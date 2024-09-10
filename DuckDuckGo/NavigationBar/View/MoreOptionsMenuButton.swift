@@ -40,6 +40,7 @@ final class MoreOptionsMenuButton: MouseOverButton {
     var isNotificationVisible: Bool = false {
         didSet {
             updateNotificationVisibility()
+            needsDisplay = isNotificationVisible != oldValue
         }
     }
 
