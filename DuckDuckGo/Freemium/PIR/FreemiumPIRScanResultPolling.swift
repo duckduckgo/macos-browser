@@ -19,14 +19,7 @@
 import Foundation
 import DataBrokerProtection
 import Freemium
-
-extension Notification.Name {
-    /// Notification posted when results are found after polling for profile matches for a freemium PIR scan.
-    static let freemiumPirResultsFound = Notification.Name("freemiumPirResultsFound")
-
-    /// Notification posted when no results are found after polling for profile matches for a freemium PIR scan and the maximum check duration is exceeded.
-    static let freemiumPirNoResultsFound = Notification.Name("freemiumPirNoResultsFound")
-}
+import OSLog
 
 /// Protocol defining the interface for PIR (Profile Information Removal) scan result polling.
 protocol FreemiumPIRScanResultPolling {
@@ -76,20 +69,22 @@ final class DefaultFreemiumPIRScanResultPolling: FreemiumPIRScanResultPolling {
         self.dateFormatter = dateFormatter
     }
 
+    // MARK: - Public Methods
+
     /// Starts polling for PIR scan results or observes for a profile saved notification if no profile has been saved yet.
     func startPollingOrObserving() {
+        guard !freemiumPIRUserStateManager.didPostResultsNotification else { return }
+
         if firstProfileSaved {
-            startRepeatingConditionCheck()
+            startPolling()
         } else {
-            observeProfileSavedNotification()
+            startObserving()
         }
     }
 
     deinit {
-        if let observer = observer {
-            notificationCenter.removeObserver(observer)
-        }
-        timer?.invalidate()
+        stopObserving()
+        stopTimer()
     }
 }
 
@@ -116,6 +111,22 @@ private extension DefaultFreemiumPIRScanResultPolling {
         }
     }
 
+    /// Starts the polling process for DBP scan results.
+    ///
+    /// It first checks if any results are available.
+    /// If no results are found, it starts a repeating timer to poll for results at regular intervals.
+    func startPolling() {
+        Logger.freemiumDBP.debug("[Freemium DBP] Starting to Poll for Scan Results")
+        checkResultsAndNotifyIfApplicable()
+        startPollingTimer()
+    }
+
+    /// Starts observing for the profile saved notification.
+    func startObserving() {
+        Logger.freemiumDBP.debug("[Freemium DBP] Starting to Observe for Profile Saved Notifications")
+        observeProfileSavedNotification()
+    }
+
     /// Observes the notification for when the first profile is saved and triggers the polling process.
     func observeProfileSavedNotification() {
         observer = notificationCenter.addObserver(
@@ -123,6 +134,7 @@ private extension DefaultFreemiumPIRScanResultPolling {
             object: nil,
             queue: .main
         ) { [weak self] _ in
+            Logger.freemiumDBP.debug("[Freemium DBP] Profile Saved Notification Received")
             self?.profileSavedNotificationReceived()
         }
     }
@@ -132,7 +144,7 @@ private extension DefaultFreemiumPIRScanResultPolling {
         if !firstProfileSaved {
             saveCurrentTimestamp()
         }
-        startRepeatingConditionCheck()
+        startPollingTimer()
     }
 
     /// Saves the current timestamp as the time when the first profile was saved.
@@ -141,40 +153,59 @@ private extension DefaultFreemiumPIRScanResultPolling {
     }
 
     /// Starts a timer that polls for results at regular intervals, ensuring the timer is not already running.
-    func startRepeatingConditionCheck() {
-        guard timer == nil else { return }
-
-        if firstProfileSavedTimestamp == nil {
-            saveCurrentTimestamp()
-        }
+    func startPollingTimer() {
+        guard timer == nil, !freemiumPIRUserStateManager.didPostResultsNotification else { return }
 
         timer = Timer.scheduledTimer(withTimeInterval: timerInterval, repeats: true) { [weak self] _ in
-            self?.notifyMatchesFoundOrNoResults()
+            self?.checkResultsAndNotifyIfApplicable()
         }
-
-        timer?.fire()
     }
 
     /// Checks if any matches have been found or if the maximum polling duration has been exceeded.
     /// Posts a notification if results are found or if no results are found after the maximum duration.
-    func notifyMatchesFoundOrNoResults() {
+    func checkResultsAndNotifyIfApplicable() {
         guard let firstProfileSavedTimestamp = firstProfileSavedTimestamp else { return }
+
         let currentDate = Date()
         let elapsedTime = currentDate.timeIntervalSince(firstProfileSavedTimestamp)
 
-        let matchesFoundCount = (try? dataManager.matchesFoundCount()) ?? 0
+        let (matchesCount, brokerCount) = (try? dataManager.matchesFoundAndBrokersCount()) ?? (0, 0)
 
-        if matchesFoundCount > 0 {
-            notificationCenter.post(name: .freemiumPirResultsFound, object: nil)
-            stopTimer()
-        } else if elapsedTime >= maxCheckDuration {
-            notificationCenter.post(name: .freemiumPirNoResultsFound, object: nil)
-            stopTimer()
+        if matchesCount > 0 || elapsedTime >= maxCheckDuration{
+            notifyOfResultsAndStopTimer(matchesCount, brokerCount)
+        }
+    }
+
+    /// Notifies the system of scan results and stops the polling timer.
+    ///
+    /// This method posts a notification with the results, either with or without matches, and updates the user's
+    /// state to reflect that the results have been posted. Finally, it stops the polling timer.
+    ///
+    /// - Parameters:
+    ///   - matchesCount: The number of matches found during the scan.
+    ///   - brokerCount: The number of brokers associated with the matches found.
+    func notifyOfResultsAndStopTimer(_ matchesCount: Int, _ brokerCount: Int) {
+
+        freemiumPIRUserStateManager.firstScanResults = FreemiumDBPMatchResults(matchesCount: matchesCount, brokerCount: brokerCount)
+        let withOrWith = matchesCount > 0 ? "WITH" : "WITHOUT"
+        Logger.freemiumDBP.debug("[Freemium DBP] Posting Scan Results Notification \(withOrWith) matches")
+
+        notificationCenter.post(name: .freemiumDBPResultPollingComplete, object: nil)
+
+        freemiumPIRUserStateManager.didPostResultsNotification = true
+        stopTimer()
+    }
+
+    /// Stops observing `pirProfileSaved` notifications.
+    func stopObserving() {
+        if let observer = observer {
+            notificationCenter.removeObserver(observer)
         }
     }
 
     /// Stops the polling timer and clears the timer reference.
     func stopTimer() {
+        Logger.freemiumDBP.debug("[Freemium DBP] Stopping Polling Timer")
         timer?.invalidate()
         timer = nil
     }

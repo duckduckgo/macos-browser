@@ -32,9 +32,7 @@ final class HomePageViewController: NSViewController {
     private let historyCoordinating: HistoryCoordinating
     private let fireViewModel: FireViewModel
     private let onboardingViewModel: OnboardingViewModel
-    private let freemiumPIRFeature: FreemiumPIRFeature
-    private var freemiumPIRUserStateManager: FreemiumPIRUserStateManager
-    private let freemiumPIRPresenter: FreemiumPIRPresenter
+    private let freemiumDBPPromotionViewCoordinator: any FreemiumDBPPromotionViewCoordinating
 
     private(set) lazy var faviconsFetcherOnboarding: FaviconsFetcherOnboarding? = {
         guard let syncService = NSApp.delegateTyped.syncService, let syncBookmarksAdapter = NSApp.delegateTyped.syncDataProviders?.bookmarksAdapter else {
@@ -70,9 +68,7 @@ final class HomePageViewController: NSViewController {
          accessibilityPreferences: AccessibilityPreferences = AccessibilityPreferences.shared,
          appearancePreferences: AppearancePreferences = AppearancePreferences.shared,
          defaultBrowserPreferences: DefaultBrowserPreferences = DefaultBrowserPreferences.shared,
-         freemiumPIRFeature: FreemiumPIRFeature,
-         freemiumPIRUserStateManager: FreemiumPIRUserStateManager,
-         freemiumPIRPresenter: FreemiumPIRPresenter = DefaultFreemiumPIRPresenter()) {
+         freemiumDBPPromotionViewCoordinator: any FreemiumDBPPromotionViewCoordinating) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.bookmarkManager = bookmarkManager
@@ -82,9 +78,7 @@ final class HomePageViewController: NSViewController {
         self.accessibilityPreferences = accessibilityPreferences
         self.appearancePreferences = appearancePreferences
         self.defaultBrowserPreferences = defaultBrowserPreferences
-        self.freemiumPIRFeature = freemiumPIRFeature
-        self.freemiumPIRUserStateManager = freemiumPIRUserStateManager
-        self.freemiumPIRPresenter = freemiumPIRPresenter
+        self.freemiumDBPPromotionViewCoordinator = freemiumDBPPromotionViewCoordinator
 
         super.init(nibName: nil, bundle: nil)
     }
@@ -94,11 +88,10 @@ final class HomePageViewController: NSViewController {
         defaultBrowserModel = createDefaultBrowserModel()
         recentlyVisitedModel = createRecentlyVisitedModel()
         featuresModel = createFeatureModel()
-        promotionModel = createPromotionModel()
 
         refreshModels()
 
-        let rootView = HomePage.Views.RootView(isBurner: tabCollectionViewModel.isBurner)
+        let rootView = HomePage.Views.RootView(isBurner: tabCollectionViewModel.isBurner, freemiumDBPPromotionViewCoordinator: freemiumDBPPromotionViewCoordinator)
             .environmentObject(favoritesModel)
             .environmentObject(defaultBrowserModel)
             .environmentObject(recentlyVisitedModel)
@@ -129,8 +122,6 @@ final class HomePageViewController: NSViewController {
             PixelKit.fire(GeneralPixel.newTabInitial, frequency: .legacyInitial)
         }
         subscribeToHistory()
-
-        setPromotionViewVisibilityState()
     }
 
     override func viewDidAppear() {
@@ -214,23 +205,6 @@ final class HomePageViewController: NSViewController {
         })
     }
 
-    private func setPromotionViewVisibilityState() {
-        appearancePreferences.isHomePagePromotionVisible = (!appearancePreferences.didDismissHomePagePromotion && freemiumPIRFeature.isAvailable)
-    }
-
-    private func createPromotionModel() -> PromotionViewModel {
-        return PromotionViewModel.freemiumPIRPromotion { [weak self] in
-            // TODO: Remove this
-            self?.freemiumPIRUserStateManager.didOnboard = true
-            // ------
-            self?.freemiumPIRPresenter.showFreemiumPIR(didOnboard: self?.freemiumPIRUserStateManager.didOnboard ?? false,
-                                                       windowControllerManager: WindowControllersManager.shared)
-            self?.appearancePreferences.didDismissHomePagePromotion = true
-        } closeAction: { [weak self] in
-            self?.appearancePreferences.didDismissHomePagePromotion = true
-        }
-    }
-
     func refreshFavoritesModel() {
         favoritesModel.favorites = bookmarkManager.list?.favoriteBookmarks ?? []
     }
@@ -309,5 +283,4 @@ final class HomePageViewController: NSViewController {
                 self?.refreshModels()
             }
     }
-
 }
