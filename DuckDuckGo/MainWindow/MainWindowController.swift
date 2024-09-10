@@ -54,6 +54,8 @@ final class MainWindowController: NSWindowController {
         subscribeToTrafficLightsAlpha()
         subscribeToBurningData()
         subscribeToResolutionChange()
+
+        WebExtensionManager.shared.didOpenWindow(self)
     }
 
     required init?(coder: NSCoder) {
@@ -62,6 +64,8 @@ final class MainWindowController: NSWindowController {
 
     deinit {
         NotificationCenter.default.removeObserver(self)
+
+        WebExtensionManager.shared.didCloseWindow(self)
     }
 
     private var shouldShowOnboarding: Bool {

@@ -280,6 +280,8 @@ protocol NewWindowPolicyDecisionMaker {
 
         self.audioState = webView.audioState
         addDeallocationChecks(for: webView)
+
+        WebExtensionManager.shared.didOpenTab(self)
     }
 
 #if DEBUG
@@ -354,6 +356,8 @@ protocol NewWindowPolicyDecisionMaker {
             }
 #endif
         }
+
+        WebExtensionManager.shared.didCloseTab(self, windowIsClosing: false)
     }
 
     func stopAllMediaAndLoading() {
