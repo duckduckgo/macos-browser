@@ -80,8 +80,11 @@ final class MacTransparentProxyProvider: TransparentProxyProvider {
         }
 #endif
 
+        let eventHandler = TransparentProxyProviderEventHandler(logger: Self.vpnProxyLogger)
+
         super.init(settings: settings,
                    configuration: configuration,
-                   logger: Self.vpnProxyLogger)
+                   logger: Self.vpnProxyLogger,
+                   eventHandler: eventHandler)
     }
 }

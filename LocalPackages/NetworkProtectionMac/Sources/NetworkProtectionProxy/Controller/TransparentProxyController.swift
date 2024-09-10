@@ -50,6 +50,10 @@ public final class TransparentProxyController {
     ///
     private let extensionID: String
 
+    /// The event handler
+    ///
+    private let eventHandler: TransparentProxyControllerEventHandling
+
     /// Callback to set up a ``NETransparentProxyManager``.
     ///
     public let setup: ManagerSetupCallback
@@ -88,6 +92,7 @@ public final class TransparentProxyController {
                 settings: TransparentProxySettings,
                 notificationCenter: NotificationCenter = .default,
                 dryMode: Bool = false,
+                eventHandler: TransparentProxyControllerEventHandler,
                 setup: @escaping ManagerSetupCallback) {
 
         self.dryMode = dryMode
@@ -95,6 +100,7 @@ public final class TransparentProxyController {
         self.notificationCenter = notificationCenter
         self.settings = settings
         self.setup = setup
+        self.eventHandler = eventHandler
         self.storeSettingsInProviderConfiguration = storeSettingsInProviderConfiguration
 
         subscribeToProviderConfigurationChanges()
@@ -246,11 +252,11 @@ public final class TransparentProxyController {
     public func start() async throws {
         guard isRequiredForActiveFeatures else {
             let error = StartError.attemptToStartWithoutBackingActiveFeatures
-            PixelKit.fire(StartAttempt.prevented(error), frequency: .dailyAndCount)
+            eventHandler.handle(event: .startAttempt(.prevented(error)))
             throw error
         }
 
-        PixelKit.fire(StartAttempt.begin, frequency: .dailyAndCount)
+        eventHandler.handle(event: .startAttempt(.begin))
 
         let manager: NETransparentProxyManager
 
@@ -258,24 +264,30 @@ public final class TransparentProxyController {
             manager = try await loadOrMakeManager()
             try manager.connection.startVPNTunnel(options: [:])
 
-            PixelKit.fire(StartAttempt.success, frequency: .dailyAndCount)
+            eventHandler.handle(event: .startAttempt(.success))
         } catch {
             let error = StartError.failedToStartProvider(error)
-            PixelKit.fire(StartAttempt.failure(error), frequency: .dailyAndCount)
+            eventHandler.handle(event: .startAttempt(.failure(error)))
             throw error
         }
     }
 
     public func stop() async {
         await connection?.stopVPNTunnel()
+        eventHandler.handle(event: .stopped)
     }
 }
 
-// MARK: - Pixels
+// MARK: - Events & Pixels
 
 extension TransparentProxyController {
 
-    enum StartAttempt: PixelKitEventV2 {
+    public enum Event {
+        case startAttempt(_ step: StartAttemptStep)
+        case stopped
+    }
+
+    public enum StartAttemptStep: PixelKitEventV2 {
         /// Abnormal attempt to start the proxy when it wasn't needed
         case prevented(_ error: Error)
 
@@ -288,27 +300,27 @@ extension TransparentProxyController {
         /// Attempt to start the proxy fails
         case failure(_ error: Error)
 
-        var name: String {
+        public var name: String {
             switch self {
             case .prevented:
-                return "netp_proxy_controller_start_prevented"
+                return "vpn_proxy_controller_start_prevented"
 
             case .begin:
-                return "netp_proxy_controller_start_attempt"
+                return "vpn_proxy_controller_start_attempt"
 
             case .success:
-                return "netp_proxy_controller_start_success"
+                return "vpn_proxy_controller_start_success"
 
             case .failure:
-                return "netp_proxy_controller_start_failure"
+                return "vpn_proxy_controller_start_failure"
             }
         }
 
-        var parameters: [String: String]? {
+        public var parameters: [String: String]? {
             return nil
         }
 
-        var error: Error? {
+        public var error: Error? {
             switch self {
             case .begin,
                     .success:

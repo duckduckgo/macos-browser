@@ -93,20 +93,20 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
 
     private let logger: Logger
     private let appMessageHandler: TransparentProxyAppMessageHandler
-    private let pixelKit: PixelKit?
+    private let eventHandler: TransparentProxyProviderEventHandler
 
     // MARK: - Init
 
     public init(settings: TransparentProxySettings,
                 configuration: Configuration,
                 logger: Logger,
-                pixelKit: PixelKit? = .shared) {
+                eventHandler: TransparentProxyProviderEventHandler) {
 
         appMessageHandler = TransparentProxyAppMessageHandler(settings: settings, logger: logger)
         self.configuration = configuration
         self.logger = logger
         self.settings = settings
-        self.pixelKit = pixelKit
+        self.eventHandler = eventHandler
 
         super.init()
 
@@ -194,58 +194,10 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
         return networkSettings
     }
 
-    // MARK: - Pixels
-
-    enum StartAttempt: PixelKitEventV2 {
-        /// Attempt to start the proxy begins
-        case begin
-
-        /// Attempt to start the proxy succeeds
-        case success
-
-        /// Attempt to start the proxy fails
-        case failure(_ error: Error)
-
-        var name: String {
-            switch self {
-            case .begin:
-                return "netp_proxy_start_attempt"
-
-            case .success:
-                return "netp_proxy_start_success"
-
-            case .failure:
-                return "netp_proxy_start_failure"
-            }
-        }
-
-        var parameters: [String: String]? {
-            return nil
-        }
-
-        var error: Error? {
-            switch self {
-            case .begin,
-                    .success:
-                return nil
-            case .failure(let error):
-                return error
-            }
-        }
-    }
-
     @MainActor
     override open func startProxy(options: [String: Any]? = nil) async throws {
 
-        logger.log(
-            """
-            Starting proxy\n
-            > configuration: \(String(describing: self.configuration), privacy: .public)\n
-            > settings: \(String(describing: self.settings), privacy: .public)\n
-            > options: \(String(describing: options), privacy: .public)
-            """)
-
-        pixelKit?.fire(StartAttempt.begin, frequency: .dailyAndCount)
+        eventHandler.handle(event: .startAttempt(.begin))
 
         do {
             do {
@@ -263,34 +215,31 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
             }
 
             isRunning = true
-            logger.log("🟢 Proxy started successfully")
-            pixelKit?.fire(StartAttempt.success, frequency: .dailyAndCount)
+            eventHandler.handle(event: .startAttempt(.success))
         } catch {
-            logger.log("🔴 Proxy start failure: (code \((error as NSError).code, privacy: .public))")
-            pixelKit?.fire(StartAttempt.failure(error), frequency: .dailyAndCount)
+            eventHandler.handle(event: .startAttempt(.failure(error)))
             throw error
         }
     }
 
     @MainActor
     open override func stopProxy(with reason: NEProviderStopReason) async {
-
-        logger.log("Stopping proxy with reason: \(String(reflecting: reason), privacy: .public)")
-
         stopMonitoringNetworkInterfaces()
         isRunning = false
+
+        eventHandler.handle(event: .stopped(reason))
     }
 
     @MainActor
     override public func sleep(completionHandler: @escaping () -> Void) {
+        eventHandler.handle(event: .sleep)
         stopMonitoringNetworkInterfaces()
-        logger.log("The proxy is now sleeping")
         completionHandler()
     }
 
     @MainActor
     override public func wake() {
-        logger.log("The proxy is now awake")
+        eventHandler.handle(event: .wake)
         startMonitoringNetworkInterfaces()
     }
 
@@ -309,7 +258,7 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
     private func logNewTCPFlow(_ flow: NEAppProxyFlow) {
         logFlowMessage(
             flow,
-            level: .default,
+            level: .debug,
             message: "[TCP] New flow: \(String(reflecting: flow))")
     }
 
@@ -387,6 +336,7 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
         let printableRemote = remoteEndpoint.hostname
 
         logger.log(
+            level: .debug,
             """
             [UDP] New flow: \(String(describing: flow), privacy: .public)
             - remote: \(printableRemote, privacy: .public)
@@ -517,5 +467,54 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
 
     override public func handleAppMessage(_ messageData: Data) async -> Data? {
         await appMessageHandler.handle(messageData)
+    }
+}
+
+// MARK: - Events & Pixels
+
+extension TransparentProxyProvider {
+    public enum Event {
+        case startAttempt(_ step: StartAttemptStep)
+        case stopped(_ reason: NEProviderStopReason)
+        case sleep
+        case wake
+    }
+
+    public enum StartAttemptStep: PixelKitEventV2 {
+        /// Attempt to start the proxy begins
+        case begin
+
+        /// Attempt to start the proxy succeeds
+        case success
+
+        /// Attempt to start the proxy fails
+        case failure(_ error: Error)
+
+        public var name: String {
+            switch self {
+            case .begin:
+                return "vpn_proxy_provider_start_attempt"
+
+            case .success:
+                return "vpn_proxy_provider_start_success"
+
+            case .failure:
+                return "vpn_proxy_provider_start_failure"
+            }
+        }
+
+        public var parameters: [String: String]? {
+            return nil
+        }
+
+        public var error: Error? {
+            switch self {
+            case .begin,
+                    .success:
+                return nil
+            case .failure(let error):
+                return error
+            }
+        }
     }
 }
