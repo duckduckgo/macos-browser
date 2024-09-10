@@ -47,6 +47,12 @@ public final class ReportSiteIssuesPresenter {
     private let userDefaults: UserDefaults
     private let pixelKit: PixelKit?
 
+    /// Default initializer
+    ///
+    /// - Parameters:
+    ///     - userDefaults: the user defaults to use to store the "don't ask again" option
+    ///     - pixelKit: the ``PixelKit`` instance to use for firing pixels.
+    ///
     public init(userDefaults: UserDefaults, pixelKit: PixelKit? = .shared) {
         self.userDefaults = userDefaults
         self.pixelKit = pixelKit
@@ -72,7 +78,6 @@ public final class ReportSiteIssuesPresenter {
     ///     - domain: the domain to show in the view
     ///     - parentWindow: the parent window to show the view in (as a sheet).  If no parent window is provided the view
     ///         will be presented as a stand-alone modal.
-    ///     - pixelKit: the ``PixelKit`` instance to use for firing pixels.
     ///
     public func show(withDomain domain: String, in parentWindow: NSWindow?) async {
 
