@@ -51,6 +51,9 @@ extension Preferences {
                     }
                 }
             }
+            .onAppear {
+                model.checkForUpdate()
+            }
         }
     }
 
