@@ -73,7 +73,7 @@ extension HomePage.Views {
         }
 
         private var closeButton: some View {
-            HomePage.Views.CloseButton(icon: .close) {
+            HomePage.Views.CloseButton(icon: .close, size: 16) {
                 viewModel.closeAction()
             }
             .visibility(isHovering ? .visible : .invisible)

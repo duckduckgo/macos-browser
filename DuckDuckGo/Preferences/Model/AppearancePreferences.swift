@@ -277,7 +277,6 @@ final class AppearancePreferences: ObservableObject {
         bookmarksBarAppearance = persistor.bookmarksBarAppearance
         homeButtonPosition = persistor.homeButtonPosition
         homePageCustomBackground = persistor.homePageCustomBackground.flatMap(CustomBackground.init)
-        didDismissHomePagePromotion = persistor.didDismissHomePagePromotion
     }
 
     private var persistor: AppearancePreferencesPersistor
