@@ -1302,11 +1302,51 @@ struct UserText {
     // Comment: "Title for Freemium Personal Information Removal (Scan-Only) item in the options menu"
     static let freemiumPIROptionsMenuItem = "Personal Information Scan"
 
-    // Key: "home.page.promotion.freemium.pir.description"
-    // Comment: "Description for the Freemium PIR Home Page Promotion"
-    static let homePagePromotionFreemiumPIRDescription = "Find your personal information from sites that store and sell it."
+    // Key: "home.page.promotion.freemium.pir.subtitle"
+    // Comment: "Subtitle for the Freemium PIR Home Page Promotion"
+    static let homePagePromotionFreemiumPIRSubtitle = "Find your personal info on sites that sell it."
 
     // Key: "home.page.promotion.freemium.pir.button.title"
     // Comment: "Title for the Freemium PIR Home Page Promotion Button"
-    static let homePagePromotionFreemiumPIRButtonTitle = "Scan"
+    static let homePagePromotionFreemiumPIRButtonTitle = "Free Scan"
+
+    // Key: "home.page.promotion.freemium.pir.post.scan.engagement.results.title"
+    // Comment: "Title for the Freemium PIR Home Page Post Scan Engagement Promotion When There Are Results"
+    static let homePagePromotionFreemiumPIRPostScanEngagementResultsTitle = "We found your personal info"
+
+    // Key: "home.page.promotion.freemium.pir.post.scan.engagement.result.single.match.subtitle"
+    // Comment: "Subtitle for the Freemium PIR Home Page Post Scan Engagement Promotion When Only One Record is Found"
+    static let homePagePromotionFreemiumPIRPostScanEngagementResultSingleMatchSubtitle = "1 record has been found on 1 site"
+
+    /// Generates a subtitle for the Freemium PIR Home Page Post Scan Engagement Promotion when records are found on a single broker site.
+    /// Key: "home.page.promotion.freemium.pir.post.scan.engagement.result.single.broker.subtitle"
+    ///
+    /// - Parameter resultCount: The number of records found.
+    /// - Returns: A formatted string indicating the number of records found on 1 site.
+    static func homePagePromotionFreemiumPIRPostScanEngagementResultSingleBrokerSubtitle(resultCount: Int) -> String {
+        String(format: "%d records have been found on 1 site", resultCount)
+    }
+
+    /// Generates a subtitle for the Freemium PIR Home Page Post Scan Engagement Promotion when records are found on multiple broker sites.
+    /// Key: "home.page.promotion.freemium.pir.post.scan.engagement.result.plural.subtitle"
+    ///
+    /// - Parameters:
+    ///   - resultCount: The number of records found.
+    ///   - brokerCount: The number of broker sites where records were found.
+    /// - Returns: A formatted string indicating the number of records found on multiple sites.
+    static func homePagePromotionFreemiumPIRPostScanEngagementResultPluralSubtitle(resultCount: Int, brokerCount: Int) -> String {
+        String(format: "%d records have been found on %d sites", resultCount, brokerCount)
+    }
+
+    // Key: "home.page.promotion.freemium.pir.post.scan.engagement.no.results.title"
+    // Comment: "Title for the Freemium PIR Home Page Post Scan Engagement Promotion When There Are No Results"
+    static let homePagePromotionFreemiumPIRPostScanEngagementNoResultsTitle = "Good news, we didn't find your info"
+
+    // Key: "home.page.promotion.freemium.pir.post.scan.engagement.no.results.subtitle"
+    // Comment: "Subtitle for the Freemium PIR Home Page Post Scan Engagement Promotion When There Are No Results"
+    static let homePagePromotionFreemiumPIRPostScanEngagementNoResultsSubtitle = "We’ll keep checking and let you know if we find something"
+
+    // Key: "home.page.promotion.freemium.pir.post.scan.engagement.button.title"
+    // Comment: "Title for the Freemium PIR Home Page Post Scan Engagement Promotion Button"
+    static let homePagePromotionFreemiumPIRPostScanEngagementButtonTitle = "View Details"
 }

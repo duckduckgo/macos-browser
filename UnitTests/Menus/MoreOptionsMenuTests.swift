@@ -42,6 +42,7 @@ final class MoreOptionsMenuTests: XCTestCase {
     private var mockFreemiumPIRPresenter = MockFreemiumPIRPresenter()
     private var freemiumPIRFeature: DefaultFreemiumPIRFeature!
     private var mockFreemiumPIRUserStateManager = MockFreemiumPIRUserStateManager()
+    private var mockNotificationCenter: MockNotificationCenter!
 
     var moreOptionsMenu: MoreOptionsMenu!
 
@@ -70,6 +71,8 @@ final class MoreOptionsMenuTests: XCTestCase {
 
         freemiumPIRFeature = DefaultFreemiumPIRFeature(featureFlagger: mockFreemiumPIRFeatureFlagger, subscriptionManager: subscriptionManager, accountManager: subscriptionManager.accountManager, freemiumPIRUserStateManager: MockFreemiumPIRUserStateManager(), featureDisabler: MockFeatureDisabler())
 
+        mockNotificationCenter = MockNotificationCenter()
+
     }
 
     @MainActor
@@ -95,7 +98,8 @@ final class MoreOptionsMenuTests: XCTestCase {
                                           subscriptionManager: subscriptionManager,
                                           freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager,
                                           freemiumPIRFeature: freemiumPIRFeature,
-                                          freemiumPIRPresenter: mockFreemiumPIRPresenter)
+                                          freemiumPIRPresenter: mockFreemiumPIRPresenter,
+                                          notificationCenter: mockNotificationCenter)
 
         moreOptionsMenu.actionDelegate = capturingActionDelegate
     }
@@ -280,7 +284,7 @@ final class MoreOptionsMenuTests: XCTestCase {
     }
 
     @MainActor
-    func testWhenClickingFreemiumPIROptionAndDidNotOnboardThenFreemiumPresenterIsCalledWithDidNotOnboardState() throws {
+    func testWhenClickingFreemiumPIROptionAndDidNotOnboardThenFreemiumPresenterIsCalledWithDidNotOnboardStateAndNotificationIsPosted() throws {
         // Given
         subscriptionManager.canPurchase = true
         subscriptionManager.currentEnvironment = SubscriptionEnvironment(serviceEnvironment: .production, purchasePlatform: .stripe)
@@ -296,10 +300,12 @@ final class MoreOptionsMenuTests: XCTestCase {
         // Then
         XCTAssertTrue(mockFreemiumPIRPresenter.didCallShowFreemium)
         XCTAssertTrue(mockFreemiumPIRPresenter.didOnboardState)
+        XCTAssertTrue(mockNotificationCenter.didCallPostNotification)
+        XCTAssertEqual(mockNotificationCenter.lastPostedNotification, .freemiumDBPEntryPointActivated)
     }
 
     @MainActor
-    func testWhenClickingFreemiumPIROptionAndDidOnboardThenFreemiumPresenterIsCalledWithDidOnboardState() throws {
+    func testWhenClickingFreemiumPIROptionAndDidOnboardThenFreemiumPresenterIsCalledWithDidOnboardStateAndNotificationIsPosted() throws {
         // Given
         subscriptionManager.canPurchase = true
         subscriptionManager.currentEnvironment = SubscriptionEnvironment(serviceEnvironment: .production, purchasePlatform: .stripe)
@@ -315,6 +321,8 @@ final class MoreOptionsMenuTests: XCTestCase {
         // Then
         XCTAssertTrue(mockFreemiumPIRPresenter.didCallShowFreemium)
         XCTAssertTrue(mockFreemiumPIRPresenter.didOnboardState)
+        XCTAssertTrue(mockNotificationCenter.didCallPostNotification)
+        XCTAssertEqual(mockNotificationCenter.lastPostedNotification, .freemiumDBPEntryPointActivated)
     }
 
     // MARK: Zoom
@@ -399,7 +407,7 @@ final class NetworkProtectionVisibilityMock: VPNFeatureGatekeeper {
     }
 }
 
-private final class MockFreemiumPIRFeature: FreemiumPIRFeature {
+final class MockFreemiumPIRFeature: FreemiumPIRFeature {
     var featureAvailable = false
 
     var isAvailable: Bool {
@@ -407,7 +415,7 @@ private final class MockFreemiumPIRFeature: FreemiumPIRFeature {
     }
 }
 
-private final class MockFreemiumPIRPresenter: FreemiumPIRPresenter {
+final class MockFreemiumPIRPresenter: FreemiumPIRPresenter {
     var didCallShowFreemium = false
     var didOnboardState = false
 
