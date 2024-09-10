@@ -324,6 +324,12 @@ final class TabBarItemCellView: NSView {
         if permissionButton.isShown {
             // make permission button from 16 to 24pt wide depending of available space
             permissionButton.frame = NSRect(x: x.rounded() - spacing.rounded(), y: bounds.midY - 12, width: 16 + spacing.rounded() * 2, height: 24)
+            x = permissionButton.frame.maxX
+        }
+        if closeButton.isShown {
+            // close button appears in place of favicon in compact mode
+            closeButton.frame = NSRect(x: x.rounded(), y: bounds.midY - 8, width: 16, height: 16)
+            x = closeButton.frame.maxX + spacing
         }
     }
 
@@ -808,11 +814,17 @@ extension TabBarViewItem: NSMenuDelegate {
 extension TabBarViewItem: MouseClickViewDelegate {
 
     func mouseOverView(_ mouseOverView: MouseOverView, isMouseOver: Bool) {
-        if self.isMouseOver != isMouseOver {
-            delegate?.tabBarViewItem(self, isMouseOver: isMouseOver)
-        }
-        self.isMouseOver = isMouseOver
+        guard self.isMouseOver != isMouseOver else { return }
         view.needsLayout = true
+        eventMonitor = isMouseOver ? NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) { [weak self] event in
+            if let self, widthStage.isCloseButtonHidden {
+                view.needsLayout = true
+            }
+            return event
+        } : nil
+
+        delegate?.tabBarViewItem(self, isMouseOver: isMouseOver)
+        self.isMouseOver = isMouseOver
     }
 
     func mouseClickView(_ mouseClickView: MouseClickView, otherMouseDownEvent: NSEvent) {
