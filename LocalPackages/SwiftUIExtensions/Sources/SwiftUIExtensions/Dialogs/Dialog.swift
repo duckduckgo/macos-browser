@@ -35,7 +35,8 @@ public struct Dialog<Content, Buttons>: View where Content: View, Buttons: View 
     @ViewBuilder let buttons: () -> Buttons
 
     public init(spacing: Spacing = Spacing.defaultSpacing,
-                @ViewBuilder content: @escaping () -> Content, @ViewBuilder buttons: @escaping () -> Buttons) {
+                @ViewBuilder content: @escaping () -> Content,
+                @ViewBuilder buttons: @escaping () -> Buttons) {
 
         self.spacing = spacing
         self.content = content
