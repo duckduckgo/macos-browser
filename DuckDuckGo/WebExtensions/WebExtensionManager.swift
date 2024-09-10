@@ -32,7 +32,7 @@ protocol WebExtensionManaging {
     func didDeselectTabs(_ tabs: [WKWebExtensionTab])
     func didMoveTab(_ tab: WKWebExtensionTab, from oldIndex: Int, in oldWindow: WKWebExtensionWindow)
     func didReplaceTab(_ oldTab: WKWebExtensionTab, with tab: WKWebExtensionTab)
-    func didChangeTabProperties(_ properties: WKWebExtension.TabChangedProperties, for tab:WKWebExtensionTab)
+    func didChangeTabProperties(_ properties: WKWebExtension.TabChangedProperties, for tab: WKWebExtensionTab)
 
 }
 
@@ -117,10 +117,8 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
         let context = contexts[index]
         // Show dashboard - perform default action
         context.performAction(for: nil)
- 
-        // For debug purposes
-        // Show background script console
-//        showBackgroundConsole(context: context)
+
+        showBackgroundConsole(context: context)
     }
 
     @MainActor
@@ -162,12 +160,6 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
             return
         }
         backgroundWebView.configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
-
-        guard let button = buttonForContext(context) else {
-            return
-        }
-
-        showPopover(popupWebView: backgroundWebView, button: button)
 
         guard backgroundWebView.responds(to: NSSelectorFromString("_inspector")),
               let inspector = backgroundWebView.value(forKey: "_inspector") as? NSObject,
