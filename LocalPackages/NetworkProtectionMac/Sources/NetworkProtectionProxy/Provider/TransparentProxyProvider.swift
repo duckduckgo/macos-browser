@@ -37,7 +37,7 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
             }
         }
 
-        public var errorUserInfo: [String : Any] {
+        public var errorUserInfo: [String: Any] {
             switch self {
             case .missingConfiguration:
                 return [:]
@@ -58,7 +58,7 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
             }
         }
 
-        public var errorUserInfo: [String : Any] {
+        public var errorUserInfo: [String: Any] {
             switch self {
             case .loadConfigurationError(let error),
                     .failedToUpdateNetworkSettings(let error):
