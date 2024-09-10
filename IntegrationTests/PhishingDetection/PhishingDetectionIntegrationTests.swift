@@ -1,5 +1,3 @@
-@ -0,0 +1,193 @@
-
 //
 //  PhishingDetectionIntegrationTests.swift
 //
@@ -164,7 +162,6 @@ class PhishingDetectionIntegrationTests: XCTestCase {
         let tabErrorCode = tabViewModel.tab.error?.errorCode
         XCTAssertEqual(tabErrorCode, PhishingDetectionError.detected.errorCode)
     }
-
 
     // MARK: - Helper Methods
 
