@@ -61,7 +61,7 @@ class PhishingDetectionIntegrationTests: XCTestCase {
     // MARK: - Tests
 
     @MainActor
-    func testPhishingNotDetected_tabIsNotMarkedPhishing() throws {
+    func testPhishingNotDetected_tabIsNotMarkedPhishing() {
         loadUrl("http://privacy-test-pages.site/")
         let expectation = XCTestExpectation()
         tabViewModel?.tab.webViewDidFinishNavigationPublisher.sink {
@@ -85,7 +85,7 @@ class PhishingDetectionIntegrationTests: XCTestCase {
     }
 
     @MainActor
-    func testFeatureDisabledAndPhishingDetection_tabIsNotMarkedPhishing() throws {
+    func testFeatureDisabledAndPhishingDetection_tabIsNotMarkedPhishing() {
         PhishingDetectionPreferences.shared.isEnabled = false
         loadUrl("http://privacy-test-pages.site/security/badware/phishing.html")
         let expectation = XCTestExpectation()
@@ -98,7 +98,7 @@ class PhishingDetectionIntegrationTests: XCTestCase {
     }
 
     @MainActor
-    func testPhishingDetectedThenNotDetected_tabIsNotMarkedPhishing() throws {
+    func testPhishingDetectedThenNotDetected_tabIsNotMarkedPhishing() {
         loadUrl("http://privacy-test-pages.site/security/badware/phishing.html")
         let expectation = XCTestExpectation()
         tabViewModel?.tab.webViewDidFinishNavigationPublisher.sink {
@@ -119,7 +119,7 @@ class PhishingDetectionIntegrationTests: XCTestCase {
     }
 
     @MainActor
-    func testPhishingDetectedThenDDGLoaded_tabIsNotMarkedPhishing() throws {
+    func testPhishingDetectedThenDDGLoaded_tabIsNotMarkedPhishing() {
         loadUrl("http://privacy-test-pages.site/security/badware/phishing.html")
         let expectation = XCTestExpectation()
         tabViewModel?.tab.webViewDidFinishNavigationPublisher.sink {
@@ -140,7 +140,7 @@ class PhishingDetectionIntegrationTests: XCTestCase {
     }
 
     @MainActor
-    func testPhishingDetectedViaHTTPRedirectChain_tabIsMarkedPhishing() throws {
+    func testPhishingDetectedViaHTTPRedirectChain_tabIsMarkedPhishing() {
         loadUrl("http://privacy-test-pages.site/security/badware/phishing-redirect/")
         let expectation = XCTestExpectation()
         tabViewModel?.tab.webViewDidFinishNavigationPublisher.sink {
@@ -152,7 +152,7 @@ class PhishingDetectionIntegrationTests: XCTestCase {
     }
 
     @MainActor
-    func testPhishingDetectedViaJSRedirectChain_tabIsMarkedPhishing() throws {
+    func testPhishingDetectedViaJSRedirectChain_tabIsMarkedPhishing() {
         loadUrl("http://privacy-test-pages.site/security/badware/phishing-js-redirector.html")
         let expectation = XCTestExpectation()
         tabViewModel?.tab.webViewDidFinishNavigationPublisher.sink {
@@ -169,18 +169,6 @@ class PhishingDetectionIntegrationTests: XCTestCase {
     private func loadUrl(_ urlString: String) {
         guard let url = URL(string: urlString) else { return }
         tab.navigateTo(url: url)
-    }
-
-    @MainActor
-    func waitForTabToFinishLoading() async throws {
-        let loadingExpectation = expectation(description: "Tab finished loading")
-        Task {
-            while tabViewModel.tab.isLoading {
-                await Task.yield()
-            }
-            loadingExpectation.fulfill()
-        }
-        await fulfillment(of: [loadingExpectation], timeout: 5)
     }
 }
 
