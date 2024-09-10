@@ -46,7 +46,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     private let pinningManager: PinningManager
 
     @Published
-    private(set) var showButton = false {
+    private(set) var showVPNButton = false {
         didSet {
             shortcutTitle = pinningManager.shortcutTitle(for: .networkProtection)
         }
@@ -138,11 +138,11 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
               !isHavingConnectivityIssues else {
 
             pinNetworkProtectionToNavBarIfNeverPinnedBefore()
-            showButton = true
+            showVPNButton = true
             return
         }
 
-        showButton = false
+        showVPNButton = false
     }
 
     // MARK: - Pinning
