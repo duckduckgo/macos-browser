@@ -62,7 +62,8 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
 
     lazy var extensions: [_WKWebExtension] = {
         // Bundled extensions
-        let emoji = WebExtensionManager.loadWebExtension(path: Bundle.main.path(forResource: "emoji-substitution", ofType: nil)!)
+//        let emoji = WebExtensionManager.loadWebExtension(path: Bundle.main.path(forResource: "emoji-substitution", ofType: nil)!)
+        let notifyLink = WebExtensionManager.loadWebExtension(path: Bundle.main.path(forResource: "notify-link-clicks-i18n", ofType: nil)!)
 
         // Popular extensions
 //        let bitwarden = WebExtensionManager.loadWebExtension(path: "/Applications/Bitwarden.app/Contents/PlugIns/safari.appex/Contents/Resources/")
@@ -72,7 +73,7 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
 //        let adBlock = WebExtensionManager.loadWebExtension(path: "/Applications/NordPass® Password Manager & Digital Vault.app/Contents/PlugIns/NordPass® Password Manager & Digital Vault Extension.appex/Contents/Resources/")
 //        let nightEye = WebExtensionManager.loadWebExtension(path: "/Applications/Night Eye.app/Contents/PlugIns/Night Eye Extension.appex/Contents/Resources/")
 
-        return [emoji!]
+        return [notifyLink!]
     }()
 
     // Context manages the extension's permissions and allows it to inject content, run background logic, show popovers, and display other web-based UI to the user.

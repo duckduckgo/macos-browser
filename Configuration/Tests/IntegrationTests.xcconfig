@@ -15,7 +15,7 @@
 
 #include "TestsTargetsBase.xcconfig"
 
-MACOSX_DEPLOYMENT_TARGET = 11.4
+MACOSX_DEPLOYMENT_TARGET = 13.1
 
 CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] = Developer ID Application
 CODE_SIGN_STYLE[config=CI][sdk=*] = Manual
