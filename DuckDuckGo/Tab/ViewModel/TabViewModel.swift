@@ -21,6 +21,7 @@ import Cocoa
 import Combine
 import Common
 import WebKit
+import PhishingDetection
 import PrivacyDashboard
 
 final class TabViewModel {
@@ -398,6 +399,8 @@ final class TabViewModel {
         case _ where isShowingErrorPage && (tab.error?.code != .webContentProcessTerminated || tab.title == nil):
             if tab.error?.errorCode == NSURLErrorServerCertificateUntrusted {
                 title = UserText.sslErrorPageTabTitle
+            } else if tab.error?.errorCode == PhishingDetectionError.detected.errorCode {
+                title = UserText.phishingErrorPageTabTitle
             } else {
                 title = UserText.tabErrorTitle
             }
@@ -474,7 +477,7 @@ final class TabViewModel {
     }
 
     private func errorFaviconToShow(error: WKError?) -> NSImage {
-        if error?.errorCode == NSURLErrorServerCertificateUntrusted {
+        if error?.errorCode == NSURLErrorServerCertificateUntrusted || error?.errorCode == PhishingDetectionError.detected.errorCode {
             return .redAlertCircle16
         }
         return.alertCircleColor16
