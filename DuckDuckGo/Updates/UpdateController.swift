@@ -31,18 +31,17 @@ protocol UpdateControllerProtocol: AnyObject {
     var latestUpdate: Update? { get }
     var latestUpdatePublisher: Published<Update?>.Publisher { get }
 
-    var canCheckForUpdates: Bool { get }
-
     var hasPendingUpdate: Bool { get }
     var hasPendingUpdatePublisher: Published<Bool>.Publisher { get }
 
-    var needsNotificationDot: Bool { get }
+    var needsNotificationDot: Bool { get set }
     var notificationDotPublisher: AnyPublisher<Bool, Never> { get }
 
     var updateProgress: UpdateCycleProgress { get }
     var updateProgressPublisher: Published<UpdateCycleProgress>.Publisher { get }
 
     var lastUpdateCheckDate: Date? { get }
+    var lastUpdateNotificationShownDate: Date { get }
 
     func checkForUpdateIfNeeded()
 
@@ -102,8 +101,10 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         updater?.lastUpdateCheckDate
     }
 
-    var canCheckForUpdates: Bool {
-        updater?.canCheckForUpdates == true
+    var lastUpdateNotificationShownDate: Date = .distantPast
+
+    private var shouldShowUpdateNotification: Bool {
+        Date().timeIntervalSince(lastUpdateNotificationShownDate) > .days(7)
     }
 
     @UserDefaultsWrapper(key: .automaticUpdates, defaultValue: true)
@@ -182,7 +183,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     }
 
     private func showUpdateNotificationIfNeeded() {
-        guard let latestUpdate, hasPendingUpdate else { return }
+        guard let latestUpdate, hasPendingUpdate, shouldShowUpdateNotification else { return }
 
         switch latestUpdate.type {
         case .critical:
@@ -190,6 +191,8 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         case .regular:
             notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: UserText.updateAvailableNotification, presentMultiline: true)
         }
+
+        lastUpdateNotificationShownDate = Date()
     }
 
     @objc func openUpdatesPage() {
