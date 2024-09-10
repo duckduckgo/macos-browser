@@ -84,8 +84,4 @@ final class MacTransparentProxyProvider: TransparentProxyProvider {
                    configuration: configuration,
                    logger: Self.vpnProxyLogger)
     }
-
-    private func eventHandler(_ event: PixelKitEventV2) {
-        PixelKit.fire(event)
-    }
 }
