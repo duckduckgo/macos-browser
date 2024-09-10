@@ -21,6 +21,32 @@ import RemoteMessaging
 import SwiftUI
 import SwiftUIExtensions
 
+struct AddressBarTextFieldView: NSViewRepresentable {
+    func makeNSView(context: Context) -> AddressBarTextField {
+        let textField = AddressBarTextField(frame: NSRect(origin: .zero, size: .init(width: 600, height: 40)))
+        textField.cell = AddressBarTextFieldCell()
+        textField.setEditable(true)
+        textField.delegate = textField
+
+        textField.tabCollectionViewModel = TabCollectionViewModel()
+
+        textField.suggestionContainerViewModel = SuggestionContainerViewModel(
+            isHomePage: true,
+            isBurner: false,
+            suggestionContainer: SuggestionContainer())
+
+        DispatchQueue.main.async {
+            textField.tabCollectionViewModel = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel
+        }
+
+        return textField
+    }
+
+    func updateNSView(_ nsView: AddressBarTextField, context: Context) {
+
+    }
+}
+
 extension HomePage.Views {
 
     struct RootView: View {
@@ -116,6 +142,9 @@ extension HomePage.Views {
 
                 Group {
                     remoteMessage()
+
+                    AddressBarTextFieldView()
+                        .frame(height: 40)
 
                     if includingContinueSetUpCards {
                         ContinueSetUpView()
