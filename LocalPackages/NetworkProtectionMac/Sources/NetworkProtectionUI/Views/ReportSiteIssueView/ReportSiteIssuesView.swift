@@ -45,7 +45,7 @@ struct ReportSiteIssuesView: ModalView {
                     .weight(.bold))
                 .multilineText()
 
-            Text("Please let us know if you disabled the VPN for Hulu.com because you experienced issues.")
+            Text("Please let us know if you disabled the VPN for \(domain) because you experienced issues.")
                 .font(Font.custom("SF Pro", size: 13))
                 .fixedSize(horizontal: false, vertical: true)
                 .lineLimit(2)
