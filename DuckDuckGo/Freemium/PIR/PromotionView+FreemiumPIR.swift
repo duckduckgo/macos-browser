@@ -19,13 +19,57 @@
 import Foundation
 
 extension PromotionViewModel {
-    static func freemiumPIRPromotion(proceedAction: @escaping () -> Void, closeAction: @escaping () -> Void) -> PromotionViewModel {
+    static func freemiumPIRPromotion(proceedAction: @escaping () -> Void,
+                                     closeAction: @escaping () -> Void) -> PromotionViewModel {
 
-        let description = UserText.homePagePromotionFreemiumPIRDescription
+        let subtitle = UserText.homePagePromotionFreemiumPIRSubtitle
         let actionButtonText = UserText.homePagePromotionFreemiumPIRButtonTitle
 
-        return PromotionViewModel(image: .gift96,
-                                  description: description,
+        return PromotionViewModel(image: .radarCheck,
+                                  subtitle: subtitle,
+                                  proceedButtonText: actionButtonText,
+                                  proceedAction: proceedAction,
+                                  closeAction: closeAction)
+    }
+
+    static func freemiumPIRPromotionScanEngagementResults(resultCount: Int,
+                                                          brokerCount: Int,
+                                                          proceedAction: @escaping () -> Void,
+                                                          closeAction: @escaping () -> Void) -> PromotionViewModel {
+
+        var title = UserText.homePagePromotionFreemiumPIRPostScanEngagementResultsTitle
+        var subtitle = ""
+
+        switch (resultCount, brokerCount) {
+        case (1, _):
+            subtitle = UserText.homePagePromotionFreemiumPIRPostScanEngagementResultSingleMatchSubtitle
+        case (let resultCount, 1):
+            subtitle = UserText.homePagePromotionFreemiumPIRPostScanEngagementResultSingleBrokerSubtitle(resultCount: resultCount)
+        default:
+            subtitle = UserText.homePagePromotionFreemiumPIRPostScanEngagementResultPluralSubtitle(resultCount: resultCount,
+                                                                                                   brokerCount: brokerCount)
+        }
+
+        let actionButtonText = UserText.homePagePromotionFreemiumPIRPostScanEngagementButtonTitle
+
+        return PromotionViewModel(image: .radarCheck,
+                                  title: title,
+                                  subtitle: subtitle,
+                                  proceedButtonText: actionButtonText,
+                                  proceedAction: proceedAction,
+                                  closeAction: closeAction)
+    }
+
+    static func freemiumPIRPromotionScanEngagementNoResults(proceedAction: @escaping () -> Void,
+                                                            closeAction: @escaping () -> Void) -> PromotionViewModel {
+
+        let title = UserText.homePagePromotionFreemiumPIRPostScanEngagementNoResultsTitle
+        let subtitle = UserText.homePagePromotionFreemiumPIRPostScanEngagementNoResultsSubtitle
+        let actionButtonText = UserText.homePagePromotionFreemiumPIRPostScanEngagementButtonTitle
+
+        return PromotionViewModel(image: .radarCheck,
+                                  title: title,
+                                  subtitle: subtitle,
                                   proceedButtonText: actionButtonText,
                                   proceedAction: proceedAction,
                                   closeAction: closeAction)

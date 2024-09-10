@@ -1339,8 +1339,8 @@ final class MockDataBrokerProtectionDataManager: DataBrokerProtectionDataManagin
         return shouldReturnHasMatches
     }
 
-    func matchesFoundCount() throws -> Int {
-        0
+    func matchesFoundAndBrokersCount() throws -> (matchCount: Int, brokerCount: Int) {
+        (0, 0)
     }
 
     func profileQueriesCount() throws -> Int {
@@ -1976,8 +1976,11 @@ struct MockMigrationsProvider: DataBrokerProtectionDatabaseMigrationsProvider {
 
 final class MockFreemiumPIRUserStateManager: FreemiumPIRUserStateManager {
     var didOnboard = false
-    var firstProfileSavedTimestamp: String?
     var didPostFirstProfileSavedNotification = false
+    var didPostResultsNotification = false
+    var didDismissHomePagePromotion = false
+    var firstProfileSavedTimestamp: String?
+    var firstScanResults: FreemiumDBPMatchResults?
 }
 
 final class MockDBPProfileSavedNotifier: DBPProfileSavedNotifier {

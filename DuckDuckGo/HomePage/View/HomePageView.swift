@@ -36,6 +36,9 @@ extension HomePage.Views {
         @EnvironmentObject var settingsModel: HomePage.Models.SettingsModel
         @EnvironmentObject var activeRemoteMessageModel: ActiveRemoteMessageModel
         @EnvironmentObject var settingsVisibilityModel: HomePage.Models.SettingsVisibilityModel
+        let freemiumDBPPromotionViewCoordinator: any FreemiumDBPPromotionViewCoordinating
+
+        @State private var isHomeContentPopoverVisible = false
 
         var body: some View {
             if isBurner {
@@ -48,7 +51,6 @@ extension HomePage.Views {
         func regularHomePageView(includingContinueSetUpCards: Bool) -> some View {
             GeometryReader { geometry in
                 ZStack(alignment: .top) {
-
                     HStack(spacing: 0) {
                         ZStack(alignment: .leading) {
                             ScrollView {
@@ -56,8 +58,6 @@ extension HomePage.Views {
                                     .frame(width: geometry.size.width - (settingsVisibilityModel.isSettingsVisible ? Self.settingsPanelWidth : 0))
                                     .offset(x: settingsVisibilityModel.isSettingsVisible ? innerViewOffset(with: geometry) : 0)
                                     .fixedColorScheme(for: settingsModel.customBackground)
-                            }
-                        }
                         .frame(width: settingsVisibilityModel.isSettingsVisible ? geometry.size.width - Self.settingsPanelWidth : geometry.size.width)
                         .contextMenu(ContextMenu {
                             if model.isContinueSetUpAvailable {
@@ -117,9 +117,7 @@ extension HomePage.Views {
                 Group {
                     remoteMessage()
 
-                    PromotionView()
-                        .padding(.bottom, 16)
-                        .visibility(model.isHomePagePromotionVisible ? .visible : .gone)
+                    freemiumPromotionView()
 
                     if includingContinueSetUpCards {
                         ContinueSetUpView()
@@ -164,6 +162,7 @@ extension HomePage.Views {
         }
 
         @ViewBuilder
+<<<<<<< HEAD
         var backgroundView: some View {
             switch settingsModel.customBackground {
             case .gradient(let gradient):
@@ -186,6 +185,16 @@ extension HomePage.Views {
 
         struct SettingsButtonView: View {
             let defaultColor: Color = .homeFavoritesBackground
+=======
+        func freemiumPromotionView() -> some View {
+           PromotionView(viewModel: freemiumDBPPromotionViewCoordinator.viewModel)
+                .padding(.bottom, 16)
+                .visibility(freemiumDBPPromotionViewCoordinator.isHomePagePromotionVisible ? .visible : .gone)
+        }
+
+        struct HomeContentButtonView: View {
+            let defaultColor: Color = .newTabPageBackground
+>>>>>>> d87ad62cd (Pete/feature/pir freemium scan engagement ux (#3230))
             let onHoverColor: Color = .buttonMouseOver
             let onSelectedColor: Color = .buttonMouseDown
             let iconSize = 16.02

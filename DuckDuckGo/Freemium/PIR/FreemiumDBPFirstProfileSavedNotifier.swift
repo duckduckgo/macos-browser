@@ -20,6 +20,7 @@ import Foundation
 import Freemium
 import DataBrokerProtection
 import Subscription
+import OSLog
 
 /// A concrete implementation of the `DBPProfileSavedNotifier` protocol that handles posting the "Profile Saved" notification
 /// for Freemium users based on their onboarding status, authentication state, and if this is their first saved profile. This class ensures the notification is posted only once.
@@ -52,6 +53,7 @@ final class FreemiumDBPFirstProfileSavedNotifier: DBPProfileSavedNotifier {
                 && freemiumPIRUserStateManager.didOnboard
                 && !freemiumPIRUserStateManager.didPostFirstProfileSavedNotification else { return }
 
+        Logger.freemiumDBP.debug("[Freemium DBP] Posting Profile Saved Notification")
         notificationCenter.post(name: .pirProfileSaved, object: nil)
 
         freemiumPIRUserStateManager.didPostFirstProfileSavedNotification = true

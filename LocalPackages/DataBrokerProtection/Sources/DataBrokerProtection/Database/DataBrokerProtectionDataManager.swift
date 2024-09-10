@@ -47,7 +47,8 @@ public protocol DataBrokerProtectionDataManaging {
     func fetchBrokerProfileQueryData(ignoresCache: Bool) throws -> [BrokerProfileQueryData]
     func prepareBrokerProfileQueryDataCache() throws
     func hasMatches() throws -> Bool
-    func matchesFoundCount() throws -> Int
+    /// Returns the total number of matches and brokers with matches.
+    func matchesFoundAndBrokersCount() throws -> (matchCount: Int, brokerCount: Int)
     func profileQueriesCount() throws -> Int
 }
 
@@ -144,41 +145,56 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
         return try database.hasMatches()
     }
 
-    /// Fetches all broker profile query data from the database and calculates the total number of matches found.
+    /// Fetches all broker profile query data from the database and calculates the total number of matches and brokers with matches.
     ///
     /// A match is defined as either:
     /// 1. An extracted profile associated with the broker profile query data.
     /// 2. A mirror site that should be included in the count (determined by the `shouldWeIncludeMirrorSite()` logic).
     ///
-    /// - Returns: The total number of matches found (extracted profiles + valid mirror sites).
+    /// Additionally, a broker is counted if it has at least one match (either an extracted profile or a valid mirror site).
+    ///
+    /// - Returns: A tuple containing:
+    ///   - `matchCount`: The total number of matches found (extracted profiles + valid mirror sites).
+    ///   - `brokerCount`: The number of brokers that have at least one match.
     /// - Throws: An error if fetching broker profile query data from the database fails.
-    public func matchesFoundCount() throws -> Int {
+    public func matchesFoundAndBrokersCount() throws -> (matchCount: Int, brokerCount: Int) {
         let queryData = try database.fetchAllBrokerProfileQueryData()
-        return matchesCount(forQueryData: queryData)
+        return matchesAndBrokersCount(forQueryData: queryData)
     }
 }
 
 private extension DataBrokerProtectionDataManager {
 
-    /// Calculates the total number of matches from an array of `BrokerProfileQueryData`.
+    /// Calculates the total number of matches and the number of brokers where matches were found.
     ///
-    /// For each `BrokerProfileQueryData`:
-    /// - Skips if the associated `profileQuery` is deprecated.
-    /// - Counts the number of extracted profiles associated with the data.
-    /// - Counts the number of mirror sites that should be included (as determined by `shouldWeIncludeMirrorSite()`).
+    /// This function iterates over the provided `queryData` and counts both the total number of matches
+    /// (including profiles and mirror sites) and the number of brokers that have at least one match.
+    /// Deprecated profile queries are ignored in the count.
     ///
-    /// - Parameter queryData: An array of `BrokerProfileQueryData` representing broker data.
-    /// - Returns: The total number of matches (extracted profiles and valid mirror sites).
-    func matchesCount(forQueryData queryData: [BrokerProfileQueryData]) -> Int {
-        return queryData.reduce(0) { count, data in
+    /// - Parameter queryData: An array of `BrokerProfileQueryData` containing information about profile queries and brokers.
+    /// - Returns: A tuple containing:
+    ///   - `matchCount`: The total number of matches, which is the sum of profiles and valid mirror sites.
+    ///   - `brokerCount`: The number of brokers that have at least one match.
+    ///
+    /// - Note: A broker is counted towards `brokerCount` if it has at least one profile match or a valid mirror site.
+    func matchesAndBrokersCount(forQueryData queryData: [BrokerProfileQueryData]) -> (matchCount: Int, brokerCount: Int) {
+        var brokerCount = 0
+
+        let matchCount = queryData.reduce(0) { count, data in
             guard !data.profileQuery.deprecated else { return count }
 
             let extractedProfileCount = data.extractedProfiles.count
-
             let mirrorSitesCount = data.dataBroker.mirrorSites.filter { $0.shouldWeIncludeMirrorSite() }.count
+
+            // Only increment broker count if there are matches (profiles or mirror sites)
+            if extractedProfileCount + mirrorSitesCount > 0 {
+                brokerCount += 1
+            }
 
             return count + extractedProfileCount + mirrorSitesCount
         }
+
+        return (matchCount, brokerCount)
     }
 }
 
