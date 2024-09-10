@@ -30,7 +30,7 @@ PRODUCT_NAME_PREFIX = DuckDuckGo
 
 PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*] =
 PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] = MacOS Browser CI
-PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = MacOS Browser
+PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = match Direct com.duckduckgo.macos.browser macos
 PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = match Direct com.duckduckgo.macos.browser.review macos
 
 GCC_PREPROCESSOR_DEFINITIONS[arch=*][sdk=*] = NETP_SYSTEM_EXTENSION=1 SWIFT_OBJC_INTERFACE_HEADER_NAME=$(SWIFT_OBJC_INTERFACE_HEADER_NAME) uint64_t="unsigned long long" _UINT64_T=1
