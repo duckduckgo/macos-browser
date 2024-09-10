@@ -296,7 +296,6 @@ final class AppearancePreferences: ObservableObject {
         homeButtonPosition = persistor.homeButtonPosition
         homePageCustomBackground = persistor.homePageCustomBackground.flatMap(CustomBackground.init)
         centerAlignedBookmarksBarBool = persistor.centerAlignedBookmarksBar
-        didDismissHomePagePromotion = persistor.didDismissHomePagePromotion
     }
 
     private var persistor: AppearancePreferencesPersistor
