@@ -47,7 +47,6 @@ final class HomePageViewController: NSViewController {
     var recentlyVisitedModel: HomePage.Models.RecentlyVisitedModel!
     var featuresModel: HomePage.Models.ContinueSetUpModel!
     let settingsVisibilityModel = HomePage.Models.SettingsVisibilityModel()
-    var promotionModel: PromotionViewModel!
     let accessibilityPreferences: AccessibilityPreferences
     let appearancePreferences: AppearancePreferences
     let defaultBrowserPreferences: DefaultBrowserPreferences
@@ -101,7 +100,6 @@ final class HomePageViewController: NSViewController {
             .environmentObject(appearancePreferences)
             .environmentObject(Application.appDelegate.activeRemoteMessageModel)
             .environmentObject(settingsVisibilityModel)
-            .environmentObject(promotionModel)
             .onTapGesture { [weak self] in
                 // Remove focus from the address bar if interacting with this view.
                 self?.view.makeMeFirstResponder()
