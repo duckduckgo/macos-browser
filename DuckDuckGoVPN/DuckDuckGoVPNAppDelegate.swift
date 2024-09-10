@@ -206,14 +206,8 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
                 }()
             }
 
-        controller.eventHandler = handleControllerEvent(_:)
-
         return controller
     }()
-
-    private func handleControllerEvent(_ event: TransparentProxyController.Event) {
-
-    }
 
     @MainActor
     private lazy var tunnelController = NetworkProtectionTunnelController(

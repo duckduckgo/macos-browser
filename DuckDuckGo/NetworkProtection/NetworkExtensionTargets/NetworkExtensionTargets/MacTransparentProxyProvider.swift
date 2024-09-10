@@ -55,12 +55,6 @@ final class MacTransparentProxyProvider: TransparentProxyProvider {
         let configuration = TransparentProxyProvider.Configuration(
             loadSettingsFromProviderConfiguration: loadSettingsFromStartupOptions)
 
-        super.init(settings: settings,
-                   configuration: configuration,
-                   logger: Self.vpnProxyLogger)
-
-        eventHandler = eventHandler(_:)
-
 #if !NETP_SYSTEM_EXTENSION
         let dryRun: Bool
 #if DEBUG
@@ -85,9 +79,13 @@ final class MacTransparentProxyProvider: TransparentProxyProvider {
             }
         }
 #endif
+
+        super.init(settings: settings,
+                   configuration: configuration,
+                   logger: Self.vpnProxyLogger)
     }
 
-    private func eventHandler(_ event: TransparentProxyProvider.Event) {
+    private func eventHandler(_ event: PixelKitEventV2) {
         PixelKit.fire(event)
     }
 }

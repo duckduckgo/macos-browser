@@ -21,16 +21,52 @@ import Foundation
 import NetworkExtension
 import NetworkProtection
 import os.log
+import PixelKit
 import SystemConfiguration
 
 open class TransparentProxyProvider: NETransparentProxyProvider {
 
-    public enum StartError: Error {
-        case missingProviderConfiguration
-        case failedToUpdateNetworkSettings(underlyingError: Error)
+    public enum LoadConfigurationError: CustomNSError {
+        case missingConfiguration
+        case decodingError(_ error: Error)
+
+        public var errorCode: Int {
+            switch self {
+            case .missingConfiguration: return 0
+            case .decodingError: return 1
+            }
+        }
+
+        public var errorUserInfo: [String : Any] {
+            switch self {
+            case .missingConfiguration:
+                return [:]
+            case .decodingError(let error):
+                return [NSUnderlyingErrorKey: error as NSError]
+            }
+        }
     }
 
-    public typealias EventCallback = (Event) -> Void
+    public enum StartProxyError: CustomNSError {
+        case loadConfigurationError(_ error: Error)
+        case failedToUpdateNetworkSettings(_ error: Error)
+
+        public var errorCode: Int {
+            switch self {
+            case .loadConfigurationError: return 0
+            case .failedToUpdateNetworkSettings: return 1
+            }
+        }
+
+        public var errorUserInfo: [String : Any] {
+            switch self {
+            case .loadConfigurationError(let error),
+                    .failedToUpdateNetworkSettings(let error):
+                return [NSUnderlyingErrorKey: error as NSError]
+            }
+        }
+    }
+
     public typealias LoadOptionsCallback = (_ options: [String: Any]?) throws -> Void
 
     static let dnsPort = 53
@@ -55,20 +91,22 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
     @MainActor
     public var isRunning = false
 
-    public var eventHandler: EventCallback?
     private let logger: Logger
     private let appMessageHandler: TransparentProxyAppMessageHandler
+    private let pixelKit: PixelKit?
 
     // MARK: - Init
 
     public init(settings: TransparentProxySettings,
                 configuration: Configuration,
-                logger: Logger) {
+                logger: Logger,
+                pixelKit: PixelKit? = .shared) {
 
         appMessageHandler = TransparentProxyAppMessageHandler(settings: settings, logger: logger)
         self.configuration = configuration
         self.logger = logger
         self.settings = settings
+        self.pixelKit = pixelKit
 
         super.init()
 
@@ -105,10 +143,17 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
               let encodedSettingsString = providerConfiguration[TransparentProxySettingsSnapshot.key] as? String,
               let encodedSettings = encodedSettingsString.data(using: .utf8) else {
 
-            throw StartError.missingProviderConfiguration
+            throw LoadConfigurationError.missingConfiguration
         }
 
-        let snapshot = try JSONDecoder().decode(TransparentProxySettingsSnapshot.self, from: encodedSettings)
+        let snapshot: TransparentProxySettingsSnapshot
+
+        do {
+            snapshot = try JSONDecoder().decode(TransparentProxySettingsSnapshot.self, from: encodedSettings)
+        } catch {
+            throw LoadConfigurationError.decodingError(error)
+        }
+
         settings.apply(snapshot)
     }
 
@@ -119,10 +164,9 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
                 let networkSettings = makeNetworkSettings()
                 logger.log("Updating network settings: \(String(describing: networkSettings), privacy: .public)")
 
-                setTunnelNetworkSettings(networkSettings) { [eventHandler, logger] error in
+                setTunnelNetworkSettings(networkSettings) { [logger] error in
                     if let error {
                         logger.error("Failed to update network settings: \(String(describing: error), privacy: .public)")
-                        eventHandler?(.failedToUpdateNetworkSettings(error))
                         continuation.resume(throwing: error)
                         return
                     }
@@ -150,41 +194,80 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
         return networkSettings
     }
 
+    // MARK: - Pixels
+
+    enum StartAttempt: PixelKitEventV2 {
+        /// Attempt to start the proxy begins
+        case begin
+
+        /// Attempt to start the proxy succeeds
+        case success
+
+        /// Attempt to start the proxy fails
+        case failure(_ error: Error)
+
+        var name: String {
+            switch self {
+            case .begin:
+                return "netp_proxy_start_attempt"
+
+            case .success:
+                return "netp_proxy_start_success"
+
+            case .failure:
+                return "netp_proxy_start_failure"
+            }
+        }
+
+        var parameters: [String: String]? {
+            return nil
+        }
+
+        var error: Error? {
+            switch self {
+            case .begin,
+                    .success:
+                return nil
+            case .failure(let error):
+                return error
+            }
+        }
+    }
+
     @MainActor
     override open func startProxy(options: [String: Any]? = nil) async throws {
 
-        eventHandler?(.startInitiated)
+        logger.log(
+            """
+            Starting proxy\n
+            > configuration: \(String(describing: self.configuration), privacy: .public)\n
+            > settings: \(String(describing: self.settings), privacy: .public)\n
+            > options: \(String(describing: options), privacy: .public)
+            """)
+
+        pixelKit?.fire(StartAttempt.begin, frequency: .dailyAndCount)
 
         do {
-            logger.log(
-                """
-                Starting proxy\n
-                > configuration: \(String(describing: self.configuration), privacy: .public)\n
-                > settings: \(String(describing: self.settings), privacy: .public)\n
-                > options: \(String(describing: options), privacy: .public)
-                """)
-
             do {
                 try loadProviderConfiguration()
             } catch {
-                logger.error("Failed to load provider configuration, bailing out")
-                throw error
+                throw StartProxyError.loadConfigurationError(error)
             }
+
+            startMonitoringNetworkInterfaces()
 
             do {
-                startMonitoringNetworkInterfaces()
-
                 try await updateNetworkSettings()
-                logger.log("Proxy started successfully")
-                isRunning = true
-                eventHandler?(.startSuccess)
             } catch {
-                let error = StartError.failedToUpdateNetworkSettings(underlyingError: error)
-                logger.error("Proxy failed to start \(String(reflecting: error), privacy: .public)")
-                throw error
+                throw StartProxyError.failedToUpdateNetworkSettings(error)
             }
+
+            isRunning = true
+            logger.log("🟢 Proxy started successfully")
+            pixelKit?.fire(StartAttempt.success, frequency: .dailyAndCount)
         } catch {
-            eventHandler?(.startFailure(error))
+            logger.log("🔴 Proxy start failure: (code \((error as NSError).code, privacy: .public))")
+            pixelKit?.fire(StartAttempt.failure(error), frequency: .dailyAndCount)
             throw error
         }
     }
