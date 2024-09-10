@@ -16,6 +16,8 @@
 #include "../ExtensionBase.xcconfig"
 #include "../../DeveloperID.xcconfig"
 
+INFOPLIST_KEY_CFBundleDisplayName = DuckDuckGo VPN Network Extension
+
 CODE_SIGN_ENTITLEMENTS[config=CI][sdk=macosx*] =
 CODE_SIGN_ENTITLEMENTS[config=Debug][sdk=macosx*] = NetworkProtectionSystemExtension/NetworkProtectionSystemExtension_Debug.entitlements
 CODE_SIGN_ENTITLEMENTS[config=Release][sdk=macosx*] = NetworkProtectionSystemExtension/NetworkProtectionSystemExtension_Release.entitlements
