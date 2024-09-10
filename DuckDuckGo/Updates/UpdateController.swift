@@ -178,8 +178,6 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         updater.automaticallyDownloadsUpdates = false
         updater.updateCheckInterval = 0
 #endif
-
-        checkForUpdateIfNeeded()
     }
 
     private func showUpdateNotificationIfNeeded() {
