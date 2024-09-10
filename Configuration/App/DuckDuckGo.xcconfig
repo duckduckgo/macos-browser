@@ -29,7 +29,7 @@ FEATURE_FLAGS = FEEDBACK SPARKLE STRIPE
 PRODUCT_NAME_PREFIX = DuckDuckGo
 
 PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*] =
-PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] = MacOS Browser CI
+PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] = match Direct com.duckduckgo.macos.browser.debug macos
 PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = match Direct com.duckduckgo.macos.browser macos
 PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = match Direct com.duckduckgo.macos.browser.review macos
 

@@ -39,13 +39,13 @@ Fetches and updates certificates and provisioning profiles for DMG distribution
 
 Fetches and updates certificates and provisioning profiles for DMG Review builds
 
-### mac sync_signing_dmg_ci
+### mac sync_signing_ci
 
 ```sh
-[bundle exec] fastlane mac sync_signing_dmg_ci
+[bundle exec] fastlane mac sync_signing_ci
 ```
 
-Fetches and updates certificates and provisioning profiles for DMG CI builds
+Fetches and updates certificates and provisioning profiles for CI builds
 
 ### mac release_testflight
 

@@ -65,13 +65,13 @@ platform :mac do
     do_sync_signing(options)
   end
 
-  # Fetches and updates certificates and provisioning profiles for DMG CI builds
+  # Fetches and updates certificates and provisioning profiles for CI builds
   #
   # @option [String] username (default: nil) Your DDG Apple ID. Pass it to not be asked
   #         for it a couple of times during the process.
   #
-  desc 'Fetches and updates certificates and provisioning profiles for DMG CI builds'
-  lane :sync_signing_dmg_ci do |options|
+  desc 'Fetches and updates certificates and provisioning profiles for CI builds'
+  lane :sync_signing_ci do |options|
     do_sync_signing(options)
   end
 
