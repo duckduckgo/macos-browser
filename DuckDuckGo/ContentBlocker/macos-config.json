@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1725043256685,
+    "version": 1725965154783,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -333,6 +333,12 @@
                     "domain": "dkb.de"
                 },
                 {
+                    "domain": "headphonecheck.com"
+                },
+                {
+                    "domain": "lehmannaudio.com"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -362,7 +368,7 @@
                     "state": "enabled"
                 }
             },
-            "hash": "0f117021faa53765286cc70d041a5bc2"
+            "hash": "f1a5f94177144e743b6c59eb9773ef8f"
         },
         "autofillBreakageReporter": {
             "state": "disabled",
@@ -371,6 +377,12 @@
             },
             "exceptions": [],
             "hash": "ebf35854bdf33091c165b35d418d5707"
+        },
+        "autofillSurveys": {
+            "state": "enabled",
+            "settings": {},
+            "exceptions": [],
+            "hash": "26d319ff4b2f43012a287b5f35a8db3a"
         },
         "autofill": {
             "exceptions": [
@@ -385,9 +397,12 @@
                 },
                 "unknownUsernameCategorization": {
                     "state": "enabled"
+                },
+                "credentialsImportPromotion": {
+                    "state": "enabled"
                 }
             },
-            "hash": "4fb2ab2ceed78c92aac780bc7ae8d4a2"
+            "hash": "81031a6b86bd68eec102c2ed67f48c1b"
         },
         "breakageReporting": {
             "state": "disabled",
@@ -6026,6 +6041,16 @@
                             }
                         ]
                     },
+                    "adsrvr.org": {
+                        "rules": [
+                            {
+                                "rule": "js.adsrvr.org/up_loader.1.1.0.js",
+                                "domains": [
+                                    "codot.gov"
+                                ]
+                            }
+                        ]
+                    },
                     "adswizz.com": {
                         "rules": [
                             {
@@ -8648,16 +8673,6 @@
                             }
                         ]
                     },
-                    "siteimproveanalytics.com": {
-                        "rules": [
-                            {
-                                "rule": "siteimproveanalytics.com",
-                                "domains": [
-                                    "codot.gov"
-                                ]
-                            }
-                        ]
-                    },
                     "skimresources.com": {
                         "rules": [
                             {
@@ -9242,7 +9257,7 @@
                     "domain": "instructure.com"
                 }
             ],
-            "hash": "896d7fc02c7f3f523fdf48e775ce30ef"
+            "hash": "0a7c16d6b212188091093584015f66b9"
         },
         "trackingCookies1p": {
             "settings": {

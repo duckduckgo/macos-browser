@@ -547,6 +547,8 @@ enum GeneralPixel: PixelKitEventV2 {
             // Email pixels deliberately avoid using the `m_mac_` prefix.
             if pixel.isEmailPixel {
                 return "\(pixel.pixelName)_macos_desktop"
+            } else if pixel.isCredentialsImportPromotionPixel {
+                return pixel.pixelName
             } else {
                 return "m_mac_\(pixel.pixelName)"
             }
