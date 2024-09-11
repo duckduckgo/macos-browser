@@ -63,6 +63,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     private var internalUserDecider: InternalUserDecider
     private var checkpoint: Checkpoint
     private var onResuming: () -> Void = {}
+    private var onSkipping: () -> Void = {}
 
     private var bytesToDownload: UInt64 = 0
     private var bytesDownloaded: UInt64 = 0
@@ -78,6 +79,10 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
 
     func resume() {
         onResuming()
+    }
+
+    func cancelAndDismissCurrentUpdate() {
+        onSkipping()
     }
 
     func show(_ request: SPUUpdatePermissionRequest) async -> SUUpdatePermissionResponse {
@@ -97,6 +102,8 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         if appcastItem.isInformationOnlyUpdate {
             reply(.dismiss)
         }
+
+        onSkipping = { reply(.skip) }
 
         if checkpoint == .download {
             onResuming = { reply(.install) }
@@ -148,6 +155,8 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     }
 
     func showReady(toInstallAndRelaunch reply: @escaping (SPUUserUpdateChoice) -> Void) {
+        onSkipping = { reply(.skip) }
+
         if checkpoint == .restart {
             onResuming = { reply(.install) }
         } else {
