@@ -19,7 +19,6 @@
 import Foundation
 import BrowserServicesKit
 import Common
-import Combine
 import WebKit
 import UserScript
 import Subscription
