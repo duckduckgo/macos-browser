@@ -30,8 +30,7 @@ public struct SiteTroubleshootingView: View {
     // MARK: - View Contents
 
     public var body: some View {
-        if model.isFeatureEnabled,
-           let siteInfo = model.siteInfo {
+        if let siteInfo = model.siteInfo {
             siteTroubleshootingView(siteInfo)
         } else {
             EmptyView()

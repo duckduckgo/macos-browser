@@ -104,10 +104,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
             let proxySettings = TransparentProxySettings(defaults: .netP)
             let uiActionHandler = VPNUIActionHandler(vpnURLEventHandler: vpnURLEventHandler, proxySettings: proxySettings)
 
-            let siteTroubleshootingFeatureFlagPublisher = NSApp.delegateTyped.internalUserDecider.isInternalUserPublisher.eraseToAnyPublisher()
-
             let siteTroubleshootingViewModel = SiteTroubleshootingView.Model(
-                featureFlagPublisher: siteTroubleshootingFeatureFlagPublisher,
                 connectionStatusPublisher: statusReporter.statusObserver.publisher,
                 siteTroubleshootingInfoPublisher: $siteInfo.eraseToAnyPublisher(),
                 uiActionHandler: uiActionHandler)
