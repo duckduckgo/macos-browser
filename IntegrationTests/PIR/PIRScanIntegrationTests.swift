@@ -81,17 +81,114 @@ final class PIRScanIntegrationTests: XCTestCase {
         loginItemsManager.disableLoginItems([LoginItem.dbpBackgroundAgent])
     }
 
+
+    /*
+     interface UserProfile {
+       firstName: string
+       lastName: string
+       age: number
+       city: string
+       state: string
+     }
+
+     interface UserProfileWithId extends UserProfile {
+       id: number
+     }
+
+     POST URL/profiles
+
+     request payload:
+     UserProfile
+     */
+
+    struct UserProfile: Codable {
+        let firstName: String
+        let lastName: String
+        let age: Int
+        let city: String
+        let state: String
+    }
+
+    struct ReturnedUserProfile: Codable {
+        let id: Int
+        let profileUrl: String
+        let firstName: String
+        let lastName: String
+        let age: Int
+        let city: String
+        let state: String
+    }
+
+    func mockUserProfile() -> UserProfile {
+        return UserProfile(firstName: "John", lastName: "Smith", age: 63, city: "Dallas", state: "TX")
+    }
+
+    // A useful function for debugging responses from the fake broker
+    func prettyPrintJSONData(_ data: Data) {
+        if let json = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers),
+           let jsonData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted) {
+            print(String(decoding: jsonData, as: UTF8.self))
+        } else {
+            print("json data malformed")
+        }
+    }
+
+    func validateFakeBrokerResponse(responseData: Data, response: URLResponse) {
+        let httpResponse = response as! HTTPURLResponse
+        if httpResponse.statusCode != 200 {
+            prettyPrintJSONData(responseData)
+            XCTFail("Response code indidcates failure. Check the printed response data above (if expected json)")
+        }
+    }
+
+    let fakeBrokerAPIAddress = "http://192.168.1.213:3001/api/"
+
+    func deleteAllProfilesOnFakeBroker() async {
+        let deleteProfilesURL = URL(string: fakeBrokerAPIAddress + "profiles")!
+        var deleteRequest = URLRequest(url: deleteProfilesURL)
+        deleteRequest.httpMethod = "DELETE"
+
+        let (responseData, response) = try! await URLSession.shared.data(for: deleteRequest)
+        validateFakeBrokerResponse(responseData: responseData, response: response)
+    }
+
+    func createProfileOnFakeBroker(_ profile: UserProfile) async -> ReturnedUserProfile {
+        let url = URL(string: fakeBrokerAPIAddress + "profiles")!
+        var request = URLRequest(url: url)
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpMethod = "POST"
+        let encoder = JSONEncoder()
+        let data = try! encoder.encode(profile)
+        request.httpBody = data
+
+        let (responseData, response) = try! await URLSession.shared.data(for: request)
+        validateFakeBrokerResponse(responseData: responseData, response: response)
+
+        let decoder = JSONDecoder()
+        return try! decoder.decode(ReturnedUserProfile.self, from: responseData)
+    }
+
     /*
      This test shows is where I'm developing everything
      EVERYTHING
      */
     func testWhenProfileIsSaved_ThenEVERYTHINGHAPPENS() async throws {
         // Given
+        // Local state set up
         let dataManager = pirProtectionManager.dataManager
         let database = dataManager.database
         let cache = pirProtectionManager.dataManager.cache
         try database.deleteProfileData()
         XCTAssert(try database.fetchAllBrokerProfileQueryData().isEmpty)
+
+        // I get a socket error if I use "localhost", so need to figure that out
+        // Also need to look into why it didn't work when not in dev mode
+
+        // Fake broker set up
+        await deleteAllProfilesOnFakeBroker()
+
+        let mockUserProfile = mockUserProfile()
+        let returnedUserProfile = await createProfileOnFakeBroker(mockUserProfile)
 
         /*
          // When
@@ -114,7 +211,8 @@ final class PIRScanIntegrationTests: XCTestCase {
         await awaitFulfillment(of: profileQueriesCreatedExpectation,
                                withTimeout: 3,
                                whenCondition: {
-            try! database.fetchAllBrokerProfileQueryData().count > 0 })
+            try! database.fetchAllBrokerProfileQueryData().count > 0
+        })
 
         /*
         2/ We scan brokers
@@ -146,6 +244,12 @@ final class PIRScanIntegrationTests: XCTestCase {
             return extractedProfiles.count > 0
         })
 
+        let queries3 = try! database.fetchAllBrokerProfileQueryData()
+        let brokerIDs = queries3.compactMap { $0.dataBroker.id }
+        let extractedProfiles = brokerIDs.flatMap { try! database.fetchExtractedProfiles(for: $0) }
+        //print(extractedProfiles)
+        print("Stage 3 passed: We find and save extracted profiles")
+
         /*
          4/ We create opt out jobs
          */
@@ -158,6 +262,94 @@ final class PIRScanIntegrationTests: XCTestCase {
             let optOutJobs = queries.flatMap { $0.optOutJobData }
             return optOutJobs.count > 0
         })
+
+        let queries = try! database.fetchAllBrokerProfileQueryData()
+        let thing = queries.filter { $0.optOutJobData.count > 0 }
+        let name = thing[0].dataBroker.name
+        print(name)
+        print("Stage 4 passed: We create opt out jobs")
+
+        /*
+         5/ We run those opt out jobs
+         For now we check the lastRunDate on the optOutJob, but that could always be wrong. Ideally we need this information from the fake broker
+         */
+        let optOutJobsRunExpectation = expectation(description: "Opt out jobs run")
+
+        /* Currently hard coded the cadences to get this to run
+         need to in future change them for the tests
+         Also is a big inconsistent with current QoS
+         so possibly worth changing for tests
+         */
+        await awaitFulfillment(of: optOutJobsRunExpectation,
+                               withTimeout: 300,
+                               whenCondition: {
+            let queries = try! database.fetchAllBrokerProfileQueryData()
+            let optOutJobs = queries.flatMap { $0.optOutJobData }
+            return optOutJobs[0].lastRunDate != nil
+        })
+        print("Stage 5.1 passed: We start running the opt out jobs")
+
+        let optOutRequestedExpectation = expectation(description: "Opt out requested")
+        await awaitFulfillment(of: optOutRequestedExpectation,
+                               withTimeout: 300,
+                               whenCondition: {
+            let queries = try! database.fetchAllBrokerProfileQueryData()
+            let optOutJobs = queries.flatMap { $0.optOutJobData }
+            let events = optOutJobs.flatMap { $0.historyEvents }
+            let optOutsRequested = events.filter{ $0.type == .optOutRequested }
+            return optOutsRequested.count > 0
+        })
+
+        print("Stage 5 passed: We finish running the opt out jobs")
+
+        /*
+         Okay, now kinda stuck with current fake broker
+         but possibly worth exploring what this will look like?
+        6/ The BE service receives the email
+         So fake broker will send this, nothing to do on client?
+         */
+
+        /*
+        7/ The app polls the backend service for the link
+         8/ We visit the confirmation link
+          The current only way we can check these from the app is through pixels
+          Not great to tie to pixels. Better to check from fake broker we visited confirmation page correctly
+         */
+        let optOutEmailReceivedPixelExpectation = expectation(description: "Opt out email received pixel fired")
+        let optOutEmailConfirmedPixelExpectation = expectation(description: "Opt out email confirmed pixel fired")
+
+        let optOutEmailReceivedPixel = DataBrokerProtectionPixels.optOutEmailReceive(dataBroker: "", attemptId: UUID(), duration: 0)
+        let optOutEmailConfirmedPixel = DataBrokerProtectionPixels.optOutEmailConfirm(dataBroker: "", attemptId: UUID(), duration: 0)
+
+        let pixelExpectations = [
+            PixelExpectation(pixel: optOutEmailReceivedPixel,
+                             expectation: optOutEmailReceivedPixelExpectation),
+            PixelExpectation(pixel: optOutEmailConfirmedPixel,
+                             expectation: optOutEmailConfirmedPixelExpectation)]
+        let pixelKit = pixelKitToTest(pixelExpectations)
+        PixelKit.setSharedForTesting(pixelKit: pixelKit)
+
+        await fulfillment(of: [optOutEmailReceivedPixelExpectation, optOutEmailConfirmedPixelExpectation],
+                          timeout: 300)
+
+        PixelKit.tearDown()
+        pixelKit.clearFrequencyHistoryForAllPixels()
+
+        /*
+        9/ We confirm the opt out through a scan
+         would be good to read from fake broker directly too
+         */
+
+        let optOutConfirmedExpectation = expectation(description: "Opt out confirmed")
+        await awaitFulfillment(of: optOutConfirmedExpectation,
+                               withTimeout: 300,
+                               whenCondition: {
+            let queries = try! database.fetchAllBrokerProfileQueryData()
+            let optOutJobs = queries.flatMap { $0.optOutJobData }
+            let events = optOutJobs.flatMap { $0.historyEvents }
+            let optOutsConfirmed = events.filter{ $0.type == .optOutConfirmed }
+            return optOutsConfirmed.count > 0
+        })
     }
 }
 
@@ -167,7 +359,7 @@ private extension PIRScanIntegrationTests {
         let year = Calendar(identifier: .gregorian).component(.year, from: Date())
         let birthYear = year - 63
 
-        return .init(names: [.init(firstName: "John", lastName: "Smith", middleName: "G")],
+        return .init(names: [.init(firstName: "John", lastName: "Smith")],
                      addresses: [.init(city: "Dallas", state: "TX")],
                      phones: [],
                      birthYear: birthYear)
