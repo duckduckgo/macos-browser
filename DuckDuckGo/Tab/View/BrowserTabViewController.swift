@@ -789,9 +789,8 @@ final class BrowserTabViewController: NSViewController {
     var homePageViewController: HomePageViewController?
     private func homePageViewControllerCreatingIfNeeded() -> HomePageViewController {
         return homePageViewController ?? {
-            let subscriptionManager = Application.appDelegate.subscriptionManager
-            let freemiumDBPUserStateManager = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp)
-            let freemiumDBPFeature = DefaultFreemiumDBPFeature(subscriptionManager: subscriptionManager, accountManager: subscriptionManager.accountManager, freemiumDBPUserStateManager: freemiumDBPUserStateManager)
+            let freemiumDBPUserStateManager = DefaultFreemiumPIRUserStateManager(userDefaults: .dbp)
+            let freemiumDBPFeature = Application.appDelegate.freemiumDBPFeature
 
             let freemiumDBPPromotionViewCoordinator = FreemiumDBPPromotionViewCoordinator(freemiumDBPUserStateManager: freemiumDBPUserStateManager,
                                                                                              freemiumDBPFeature: freemiumDBPFeature)
@@ -807,10 +806,9 @@ final class BrowserTabViewController: NSViewController {
     var dataBrokerProtectionHomeViewController: DBPHomeViewController?
     private func dataBrokerProtectionHomeViewControllerCreatingIfNeeded() -> DBPHomeViewController {
         return dataBrokerProtectionHomeViewController ?? {
-            let subscriptionManager = Application.appDelegate.subscriptionManager
             let freemiumDBPUserStateManager = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp)
-            let freemiumDBPFeature = DefaultFreemiumDBPFeature(subscriptionManager: subscriptionManager, accountManager: subscriptionManager.accountManager, freemiumDBPUserStateManager: freemiumDBPUserStateManager)
-            let dataBrokerProtectionHomeViewController = DBPHomeViewController(dataBrokerProtectionManager: DataBrokerProtectionManager.shared, freemiumDBPFeature: freemiumDBPFeature)
+            let freemiumDBPFeature = Application.appDelegate.freemiumDBPFeature
+            let dataBrokerProtectionHomeViewController = DBPHomeViewController(dataBrokerProtectionManager: DataBrokerProtectionManager.shared, freemiumPIRFeature: freemiumDBPFeature)
             self.dataBrokerProtectionHomeViewController = dataBrokerProtectionHomeViewController
             return dataBrokerProtectionHomeViewController
         }()

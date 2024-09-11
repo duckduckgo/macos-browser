@@ -98,6 +98,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     public let subscriptionUIHandler: SubscriptionUIHandling
 
     // MARK: - Freemium DBP
+    public let freemiumDBPFeature: FreemiumDBPFeature
     private var freemiumDBPScanResultPolling: FreemiumDBPScanResultPolling?
 
     // MARK: - VPN
@@ -267,6 +268,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         // Update DBP environment and match the Subscription environment
         DataBrokerProtectionSettings().alignTo(subscriptionEnvironment: subscriptionManager.currentEnvironment)
+
+        // Freemium DBP
+        let freemiumPIRUserStateManager = DefaultFreemiumPIRUserStateManager(userDefaults: .dbp)
+        freemiumPIRFeature = DefaultFreemiumPIRFeature(privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager,
+                                                                     subscriptionManager: subscriptionManager,
+                                                                     accountManager: subscriptionManager.accountManager,
+                                                       freemiumPIRUserStateManager: freemiumPIRUserStateManager)
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {
@@ -291,6 +299,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler(subscriptionManager: subscriptionManager,
                                                                                               tunnelController: tunnelController,
                                                                                               vpnUninstaller: vpnUninstaller)
+
+        // Freemium DBP
+        freemiumPIRFeature.subscribeToDependencyUpdates()
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
