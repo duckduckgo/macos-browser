@@ -159,9 +159,9 @@ private extension FreemiumDBPPromotionViewCoordinator {
         }
     }
 
-    /// Subscribes to feature availability updates from the `freemiumPIRFeature`'s availability publisher.
+    /// Subscribes to feature availability updates from the `freemiumDBPFeature`'s availability publisher.
     ///
-    /// This method listens to the `isAvailablePublisher` of the `freemiumPIRFeature`, which publishes
+    /// This method listens to the `isAvailablePublisher` of the `freemiumDBPFeature`, which publishes
     /// changes to the feature's availability. It performs the following actions when an update is received:
     func subscribeToFeatureAvailabilityUpdates() {
         freemiumDBPFeature.isAvailablePublisher

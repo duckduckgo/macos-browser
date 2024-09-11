@@ -205,7 +205,7 @@ final class FreemiumDBPUserStateManagerTests: XCTestCase {
 
     func testResetAllStateResetsAllProperties() {
         // Given
-        let sut = DefaultFreemiumPIRUserStateManager(userDefaults: testUserDefaults)
+        let sut = DefaultFreemiumDBPUserStateManager(userDefaults: testUserDefaults)
         sut.didOnboard = true
         sut.firstProfileSavedTimestamp = "2024-01-01T12:00:00Z"
         sut.didPostFirstProfileSavedNotification = true
