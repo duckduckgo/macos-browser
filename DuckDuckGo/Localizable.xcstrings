@@ -45064,7 +45064,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Passwords are encrypted and nobody but you can see them, not even us. [Learn More]( (URL.passwordManagerLearnMore))"
+            "value" : "Passwords are encrypted. Nobody but you can see them, not even us. [Learn More]( (URL.passwordManagerLearnMore))"
           }
         }
       }
