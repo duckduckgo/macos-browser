@@ -288,11 +288,11 @@ final class PasswordManagementItemListModel: ObservableObject {
     }
 
     var emptyStateMessageLinkText: String {
-        autofillPreferences.isAutoLockEnabled ? UserText.learnMore : UserText.goToSettings
+        UserText.learnMore
     }
 
     var emptyStateMessageLinkURL: URL {
-        autofillPreferences.isAutoLockEnabled ? URL.passwordManagerLearnMore : URL.settingsPane(.autofill)
+        URL.passwordManagerLearnMore
     }
 
     @Published private(set) var emptyState: EmptyState = .none

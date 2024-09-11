@@ -31,7 +31,7 @@ extension UserText {
                                                                   value: "Passwords are encrypted. Nobody but you can see them, not even us.",
                                                                   comment: "Label for default empty state description")
     static let pmEmptyStateDefaultDescriptionAutolockOff = NSLocalizedString("pm.empty.default.description.extended.v2",
-                                                                             value: "Passwords are encrypted. We recommend setting up Auto-lock to keep your passwords even more secure.",
+                                                                             value: "Passwords are encrypted.",
                                                                              comment: "Label for default empty state description when the autolock feature is off")
     static let pmEmptyStateLearnMoreLink = NSLocalizedString("pm.empty.learn.more.link", value: "Learn more", comment: "Text for link to learn more about DuckDuckGo password manager")
     static let pmEmptyStateDefaultButtonTitle = NSLocalizedString("pm.empty.default.button.title", value: "Import Passwords", comment: "Import passwords button title for default empty state")
