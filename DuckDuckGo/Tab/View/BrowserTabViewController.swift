@@ -43,7 +43,7 @@ final class BrowserTabViewController: NSViewController {
     private let tabCollectionViewModel: TabCollectionViewModel
     private let bookmarkManager: BookmarkManager
     private let dockCustomizer = DockCustomizer()
-    private let onboardingDialogTypeProvider: ContextualOnboardingDialogTypeProviding
+    private let onboardingDialogTypeProvider: ContextualOnboardingDialogTypeProviding & ContextualOnboardingStateUpdater
     private let onboardingDialogFactory: ContextualDaxDialogsFactory
     private let featureFlagger: FeatureFlagger
 
@@ -71,7 +71,7 @@ final class BrowserTabViewController: NSViewController {
 
     init(tabCollectionViewModel: TabCollectionViewModel,
          bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
-         onboardingDialogTypeProvider: ContextualOnboardingDialogTypeProviding = ContextualOnboardingDialogTypeProvider(),
+         onboardingDialogTypeProvider: ContextualOnboardingDialogTypeProviding & ContextualOnboardingStateUpdater = ContextualOnboardingStateMachine.shared,
          onboardingDialogFactory: ContextualDaxDialogsFactory = DefaultContextualDaxDialogViewFactory(),
          featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger) {
         self.tabCollectionViewModel = tabCollectionViewModel
@@ -124,13 +124,36 @@ final class BrowserTabViewController: NSViewController {
         subscribeToTabs()
         subscribeToSelectedTabViewModel()
 
+        if let webViewContainer {
+            removeChild(in: self.containerStackView, webViewContainer: webViewContainer)
+        }
+
         view.registerForDraggedTypes([.URL, .fileURL])
     }
+
+    // Called when the window becomes the key window (gains focus)
+     @objc func windowDidBecomeActive(notification: Notification) {
+         print("Window became key (focused) url\(tabViewModel?.tab.url)")
+//         presentContextualOnboarding()
+     }
+
+     // Called when the window resigns key status (loses focus)
+     @objc func windowDidResignActive(notification: Notification) {
+         print("Window resigned key (lost focus) url\(tabViewModel?.tab.url)")
+         guard let webViewContainer else { return }
+//         removeChild(in: self.containerStackView, webViewContainer: webViewContainer)
+     }
 
     override func viewWillAppear() {
         super.viewWillAppear()
 
         addMouseMonitors()
+
+        // Register for focus-related notifications
+        if let window = view.window {
+            NotificationCenter.default.addObserver(self, selector: #selector(windowDidBecomeActive), name: NSWindow.didBecomeKeyNotification, object: window)
+            NotificationCenter.default.addObserver(self, selector: #selector(windowDidResignActive), name: NSWindow.didResignKeyNotification, object: window)
+        }
     }
 
     override func viewWillDisappear() {
@@ -388,7 +411,7 @@ final class BrowserTabViewController: NSViewController {
                 self.removeChild(in: self.containerStackView, webViewContainer: webViewContainer)
             }
         }
-        let daxView = onboardingDialogFactory.makeView(for: dialogType, delegate: tab, onDismiss: onDismissAction)
+        let daxView = onboardingDialogFactory.makeView(for: dialogType, delegate: tab, onDismiss: onDismissAction, onGotItPressed: onboardingDialogTypeProvider.gotItPressed)
         let hostingController = NSHostingController(rootView: AnyView(daxView))
 
         daxContextualOnboardingController = hostingController
