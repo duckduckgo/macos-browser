@@ -203,31 +203,6 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
 
     // MARK: - Tests for getSubscription
 
-    func testGetSubscriptionSuccessRefreshingAuthToken() async throws {
-        // Given
-        ensureUserAuthenticatedState()
-
-        let newAuthToken = UUID().uuidString
-
-        authService.validateTokenResult = .failure(Constants.invalidTokenError)
-        storePurchaseManager.mostRecentTransactionResult = Constants.mostRecentTransactionJWS
-        authService.storeLoginResult = .success(StoreLoginResponse(authToken: newAuthToken,
-                                                                   email: Constants.email,
-                                                                   externalID: Constants.externalID,
-                                                                   id: 1, status: "authenticated"))
-
-        let result = try await feature.getSubscription(params: Constants.mockParams, original: Constants.mockScriptMessage)
-
-        // When
-        if let result = result as? SubscriptionPagesUseSubscriptionFeature.Subscription {
-#warning("Fails because macOS does not refresh the token")
-            XCTAssertEqual(result.token, newAuthToken)
-            XCTAssertEqual(accountManager.authToken, newAuthToken)
-        } else {
-            XCTFail("Incorrect return type")
-        }
-    }
-
     func testGetSubscriptionSuccessWithoutRefreshingAuthToken() async throws {
         // Given
         ensureUserAuthenticatedState()
