@@ -45,9 +45,9 @@ PRODUCT_NAME = $(AGENT_PRODUCT_NAME)
 PRODUCT_NAME[config=Review][arch=*][sdk=*] = $(AGENT_PRODUCT_NAME)
 
 PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*] =
-PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] = macOS NetP VPN App - CI (XPC)
-PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = macOS NetP VPN App - Review (XPC)
-PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = macOS NetP VPN App - Release (XPC)
+PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] = match Direct com.duckduckgo.macos.vpn.debug macos
+PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = match Direct com.duckduckgo.macos.vpn.review macos
+PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = match Direct com.duckduckgo.macos.vpn macos
 
 FEATURE_FLAGS[arch=*][sdk=*] = NETP_SYSTEM_EXTENSION
 FEATURE_FLAGS[config=CI][arch=*][sdk=*] = NETP_SYSTEM_EXTENSION
