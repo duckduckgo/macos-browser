@@ -61,8 +61,10 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     }
 
     private var internalUserDecider: InternalUserDecider
+
     private var checkpoint: Checkpoint
     private var onResuming: () -> Void = {}
+
     private var onSkipping: () -> Void = {}
 
     private var bytesToDownload: UInt64 = 0
