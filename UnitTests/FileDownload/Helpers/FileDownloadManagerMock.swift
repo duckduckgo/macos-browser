@@ -35,7 +35,7 @@ final class FileDownloadManagerMock: FileDownloadManagerProtocol, WebKitDownload
     var addDownloadBlock: ((WebKitDownload,
                             DownloadTaskDelegate?,
                             WebKitDownloadTask.DownloadDestination) -> WebKitDownloadTask)?
-    func add(_ download: WebKitDownload, fromBurnerWindow: Bool, delegate: DownloadTaskDelegate?, destination: WebKitDownloadTask.DownloadDestination) -> WebKitDownloadTask {
+    func add(_ download: any WebKitDownload, burnerWindowSession: DuckDuckGo_Privacy_Browser.BurnerWindowSession?, delegate: (any DuckDuckGo_Privacy_Browser.DownloadTaskDelegate)?, destination: DuckDuckGo_Privacy_Browser.WebKitDownloadTask.DownloadDestination) -> DuckDuckGo_Privacy_Browser.WebKitDownloadTask {
         addDownloadBlock!(download, delegate, destination)
     }
 

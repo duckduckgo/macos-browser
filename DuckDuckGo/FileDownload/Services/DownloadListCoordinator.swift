@@ -37,6 +37,34 @@ private func getFirstAvailableWebView() -> WKWebView? {
     return tab.webView
 }
 
+struct BurnerWindowSession: Hashable {
+    private weak var window: NSWindow?
+    private let identifier: ObjectIdentifier
+
+    var isActive: Bool {
+        window?.isVisible == true
+    }
+
+    init?(isBurner: Bool, window: NSWindow?) {
+        guard isBurner, let window else { return nil }
+        self.window = window
+        self.identifier = ObjectIdentifier(window)
+    }
+
+    public func onBurn(_ burnHandler: @escaping () -> Void) {
+        guard let window else { return }
+        window.onDeinit(burnHandler)
+    }
+
+    static func == (lhs: BurnerWindowSession, rhs: BurnerWindowSession) -> Bool {
+        lhs.identifier == rhs.identifier
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(identifier)
+    }
+}
+
 final class DownloadListCoordinator {
     static let shared = DownloadListCoordinator()
 
@@ -49,6 +77,7 @@ final class DownloadListCoordinator {
     private var downloadsCancellable: AnyCancellable?
     private var downloadTaskCancellables = [WebKitDownloadTask: AnyCancellable]()
     private var taskProgressCancellables = [WebKitDownloadTask: Set<AnyCancellable>]()
+    private var burnerWindowSessions = Set<BurnerWindowSession>()
 
     private var filePresenters = [UUID: (destination: FilePresenter?, tempFile: FilePresenter?)]()
     private var filePresenterCancellables = [UUID: Set<AnyCancellable>]()
@@ -231,6 +260,14 @@ final class DownloadListCoordinator {
             }
 
         self.subscribeToProgress(of: task)
+
+        if let burnerWindowSession = task.burnerWindowSession,
+           case (inserted: true, _) = self.burnerWindowSessions.insert(burnerWindowSession) {
+            // remove inactive items when the burner window is closed
+            burnerWindowSession.onBurn { [weak self] in
+                self?.cleanupBurnerWindowItems(for: burnerWindowSession)
+            }
+        }
     }
 
     @MainActor
@@ -345,7 +382,9 @@ final class DownloadListCoordinator {
         self.downloadTaskCancellables[task] = nil
 
         return updateItem(withId: initialItem.identifier) { item in
-            if item?.isBurner ?? false {
+            if let burnerWindowSession = (item ?? initialItem).burnerWindowSession,
+               !burnerWindowSession.isActive {
+                // remove finished downloads from the list instantly for downloads in already closed burner window
                 item = nil
                 return
             }
@@ -395,6 +434,7 @@ final class DownloadListCoordinator {
             filePresenters[item.identifier] = nil
             filePresenterCancellables[item.identifier] = nil
             store.remove(item)
+
         }
         return modified
     }
@@ -436,7 +476,7 @@ final class DownloadListCoordinator {
                 } else {
                     .auto
                 }
-                let task = self.downloadManager.add(download, fromBurnerWindow: item.isBurner, destination: destination)
+                let task = self.downloadManager.add(download, burnerWindowSession: item.burnerWindowSession, destination: destination)
                 self.subscribeToDownloadTask(task, updating: item)
             }
         }
@@ -502,13 +542,33 @@ final class DownloadListCoordinator {
         }
     }
 
+    enum CleanupSessionBurnerWindowPredicate {
+        case all, burnerWindowSession(_ burnerWindowSession: BurnerWindowSession?)
+        func matches(_ burnerWindowSession: BurnerWindowSession?) -> Bool {
+            switch self {
+            case .all, .burnerWindowSession(burnerWindowSession): return true
+            case .burnerWindowSession: return false
+            }
+        }
+    }
+
     @MainActor
-    func cleanupInactiveDownloads() {
+    func cleanupInactiveDownloads(for burnerWindowSession: BurnerWindowSession?) {
+        cleanupInactiveDownloads(for: .burnerWindowSession(burnerWindowSession))
+    }
+
+    @MainActor
+    func cleanupInactiveDownloads(for predicate: CleanupSessionBurnerWindowPredicate) {
         Logger.fileDownload.debug("coordinator: cleanupInactiveDownloads")
 
-        for (id, item) in self.items where item.progress == nil {
+        for (id, item) in self.items where predicate.matches(item.burnerWindowSession) && item.progress == nil {
             remove(downloadWithIdentifier: id)
         }
+    }
+
+    @MainActor
+    private func cleanupBurnerWindowItems(for burnerWindowSession: BurnerWindowSession) {
+        cleanupInactiveDownloads(for: burnerWindowSession)
     }
 
     @MainActor
@@ -562,7 +622,7 @@ private extension DownloadListItem {
                   websiteURL: task.originalRequest?.mainDocumentURL,
                   fileName: "",
                   progress: task.progress,
-                  isBurner: task.isBurner,
+                  burnerWindowSession: task.burnerWindowSession,
                   error: nil)
     }
 

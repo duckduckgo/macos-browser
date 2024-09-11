@@ -70,12 +70,14 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
     private weak var zoomPopoverDelegate: NSPopoverDelegate?
 
     private let networkProtectionPopoverManager: NetPPopoverManager
+    private let isBurner: Bool
 
     private var popoverIsShownCancellables = Set<AnyCancellable>()
 
-    init(networkProtectionPopoverManager: NetPPopoverManager, autofillPopoverPresenter: AutofillPopoverPresenter) {
+    init(networkProtectionPopoverManager: NetPPopoverManager, autofillPopoverPresenter: AutofillPopoverPresenter, isBurner: Bool) {
         self.networkProtectionPopoverManager = networkProtectionPopoverManager
         self.autofillPopoverPresenter = autofillPopoverPresenter
+        self.isBurner = isBurner
     }
 
     var passwordManagementDomain: String? {
@@ -149,7 +151,7 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
         guard closeTransientPopovers(),
               button.window != nil else { return }
 
-        let popover = DownloadsPopover()
+        let popover = DownloadsPopover(burnerWindowSession: BurnerWindowSession(isBurner: isBurner, window: button.window))
         popover.delegate = popoverDelegate
         popover.viewController.delegate = downloadsDelegate
         downloadsPopover = popover

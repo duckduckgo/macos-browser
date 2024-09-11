@@ -42,7 +42,10 @@ struct DownloadListItem: Equatable {
         }
     }
 
-    let isBurner: Bool
+    let burnerWindowSession: BurnerWindowSession?
+    var isBurner: Bool {
+        burnerWindowSession != nil
+    }
 
     /// final download destination url, will match actual file url when download is finished
     var destinationURL: URL? {

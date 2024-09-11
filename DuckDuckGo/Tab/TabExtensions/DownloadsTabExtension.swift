@@ -106,7 +106,7 @@ final class DownloadsTabExtension: NSObject {
             let destination = self.downloadDestination(for: location, suggestedFilename: webView.suggestedFilename ?? "")
             let download = await webView.startDownload(using: URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad))
 
-            self.downloadManager.add(download, fromBurnerWindow: self.isBurner, delegate: self, destination: destination)
+            self.downloadManager.add(download, burnerWindowSession: BurnerWindowSession(isBurner: isBurner, window: webView.window), delegate: self, destination: destination)
         }
 
     }
@@ -221,7 +221,7 @@ extension DownloadsTabExtension: NavigationResponder {
 
     @MainActor
     func enqueueDownload(_ download: WebKitDownload, withNavigationAction navigationAction: NavigationAction?) {
-        let task = downloadManager.add(download, fromBurnerWindow: self.isBurner, delegate: self, destination: .auto)
+        let task = downloadManager.add(download, burnerWindowSession: BurnerWindowSession(isBurner: isBurner, window: download.webView?.window), delegate: self, destination: .auto)
 
         var isMainFrameNavigationActionWithNoHistory: Bool {
             // get the first navigation action in the redirect series
@@ -266,7 +266,7 @@ extension DownloadsTabExtension: WKNavigationDelegate {
     @objc(_webView:contextMenuDidCreateDownload:)
     func webView(_ webView: WKWebView, contextMenuDidCreate download: WebKitDownload) {
         // to do: url should be cleaned up before launching download
-        downloadManager.add(download, fromBurnerWindow: isBurner, delegate: self, destination: .prompt)
+        downloadManager.add(download, burnerWindowSession: BurnerWindowSession(isBurner: isBurner, window: webView.window), delegate: self, destination: .prompt)
     }
 
 }

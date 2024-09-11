@@ -28,7 +28,7 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
     var viewController: BrowserTabViewController!
     var dialogProvider: MockDialogsProvider!
     var factory: CapturingDialogFactory!
-    var tab: Tab!
+    var tab: DuckDuckGo_Privacy_Browser.Tab!
     var cancellables: Set<AnyCancellable> = []
     let expectation = XCTestExpectation()
 
@@ -37,7 +37,7 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
         let tabCollectionViewModel = TabCollectionViewModel()
         dialogProvider = MockDialogsProvider()
         factory = CapturingDialogFactory(expectation: expectation)
-        tab = Tab()
+        tab = DuckDuckGo_Privacy_Browser.Tab()
         tab.setContent(.url(URL.duckDuckGo, credential: nil, source: .appOpenUrl))
         let tabViewModel = TabViewModel(tab: tab)
         viewController = BrowserTabViewController(tabCollectionViewModel: tabCollectionViewModel, onboardingDialogTypeProvider: dialogProvider, onboardingDialogFactory: factory, featureFlagger: MockFeatureFlagger())
@@ -128,7 +128,7 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
 class MockDialogsProvider: ContextualOnboardingDialogTypeProviding {
     var dialog: ContextualDialogType?
 
-    func dialogTypeForTab(_ tab: Tab) -> ContextualDialogType? {
+    func dialogTypeForTab(_ tab: DuckDuckGo_Privacy_Browser.Tab) -> ContextualDialogType? {
         return dialog
     }
 }

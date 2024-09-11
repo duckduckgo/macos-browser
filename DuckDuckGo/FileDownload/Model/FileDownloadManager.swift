@@ -29,7 +29,7 @@ protocol FileDownloadManagerProtocol: AnyObject {
 
     @discardableResult
     @MainActor
-    func add(_ download: WebKitDownload, fromBurnerWindow: Bool, delegate: DownloadTaskDelegate?, destination: WebKitDownloadTask.DownloadDestination) -> WebKitDownloadTask
+    func add(_ download: WebKitDownload, burnerWindowSession: BurnerWindowSession?, delegate: DownloadTaskDelegate?, destination: WebKitDownloadTask.DownloadDestination) -> WebKitDownloadTask
 
     func cancelAll(waitUntilDone: Bool)
 }
@@ -38,8 +38,8 @@ extension FileDownloadManagerProtocol {
 
     @discardableResult
     @MainActor
-    func add(_ download: WebKitDownload, fromBurnerWindow: Bool, destination: WebKitDownloadTask.DownloadDestination) -> WebKitDownloadTask {
-        add(download, fromBurnerWindow: fromBurnerWindow, delegate: nil, destination: destination)
+    func add(_ download: WebKitDownload, burnerWindowSession: BurnerWindowSession?, destination: WebKitDownloadTask.DownloadDestination) -> WebKitDownloadTask {
+        add(download, burnerWindowSession: burnerWindowSession, delegate: nil, destination: destination)
     }
 
 }
@@ -63,7 +63,7 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
 
     @discardableResult
     @MainActor
-    func add(_ download: WebKitDownload, fromBurnerWindow: Bool, delegate: DownloadTaskDelegate?, destination: WebKitDownloadTask.DownloadDestination) -> WebKitDownloadTask {
+    func add(_ download: WebKitDownload, burnerWindowSession: BurnerWindowSession?, delegate: DownloadTaskDelegate?, destination: WebKitDownloadTask.DownloadDestination) -> WebKitDownloadTask {
         dispatchPrecondition(condition: .onQueue(.main))
 
         var destination = destination
@@ -71,7 +71,7 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
         if download.originalRequest?.url?.isFileURL ?? true, case .auto = destination {
             destination = .prompt
         }
-        let task = WebKitDownloadTask(download: download, destination: destination, isBurner: fromBurnerWindow)
+        let task = WebKitDownloadTask(download: download, destination: destination, burnerWindowSession: burnerWindowSession)
         Logger.fileDownload.debug("add \(String(describing: download)): \(download.originalRequest?.url?.absoluteString ?? "<nil>") -> \(destination.debugDescription): \(task)")
 
         let shouldCancelDownloadIfDelegateIsGone = delegate != nil

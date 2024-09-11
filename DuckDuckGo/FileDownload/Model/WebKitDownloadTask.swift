@@ -100,8 +100,8 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
         }
     }
 
-    /// downloads initiated from a Burner Window won‘t stay in the Downloads panel after completion
-    let isBurner: Bool
+    /// downloads initiated from a Burner Window will be kept in the window
+    let burnerWindowSession: BurnerWindowSession?
 
     private weak var delegate: WebKitDownloadTaskDelegate?
 
@@ -131,12 +131,12 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
     }
 
     @MainActor(unsafe)
-    init(download: WebKitDownload, destination: DownloadDestination, isBurner: Bool) {
+    init(download: WebKitDownload, destination: DownloadDestination, burnerWindowSession: BurnerWindowSession?) {
         self.download = download
         self.progress = DownloadProgress(download: download)
         self.fileProgressPresenter = FileProgressPresenter(progress: progress)
         self.state = .initial(destination)
-        self.isBurner = isBurner
+        self.burnerWindowSession = burnerWindowSession
         super.init()
 
         progress.cancellationHandler = { [weak self, taskDescr=self.debugDescription] in

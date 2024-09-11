@@ -61,7 +61,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
     @MainActor
     func addDownload(tempURL: URL? = nil, destURL: URL? = nil, isBurner: Bool = false) -> (WKDownloadMock, WebKitDownloadTask, UUID) {
         let download = WKDownloadMock(url: .duckDuckGo)
-
+        assert(isBurner == false)
         let fm = FileManager.default
         let destURL = destURL ?? self.destURL!
         XCTAssertTrue(fm.createFile(atPath: destURL.path, contents: nil))
@@ -70,7 +70,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         XCTAssertTrue(fm.createFile(atPath: tempURL.path, contents: "test".utf8data))
         let tempFile = try! FilePresenter(url: tempURL)
 
-        let task = WebKitDownloadTask(download: download, destination: .resume(destination: destFile, tempFile: tempFile), isBurner: isBurner)
+        let task = WebKitDownloadTask(download: download, destination: .resume(destination: destFile, tempFile: tempFile), burnerWindowSession: nil)
 
         let e = expectation(description: "download added")
         var id: UUID!
@@ -179,7 +179,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         let destURL = fm.temporaryDirectory.appendingPathComponent("test file.pdf")
         let tempURL = fm.temporaryDirectory.appendingPathComponent("test file.duckload")
         let download = WKDownloadMock(url: .duckDuckGo)
-        let task = WebKitDownloadTask(download: download, destination: .preset(destURL), isBurner: false)
+        let task = WebKitDownloadTask(download: download, destination: .preset(destURL), burnerWindowSession: nil)
 
         let e1 = expectation(description: "download added")
         let e2 = expectation(description: "download updated")
@@ -319,7 +319,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         let downloadAdded = expectation(description: "download addeed")
         downloadManager.addDownloadBlock = { [unowned self] download, _, destination in
             downloadAdded.fulfill()
-            let task = WebKitDownloadTask(download: download, destination: destination, isBurner: false)
+            let task = WebKitDownloadTask(download: download, destination: destination, burnerWindowSession: nil)
             if case .resume(destination: let dest, tempFile: let temp) = destination {
                 XCTAssertEqual(dest.url, destURL)
                 XCTAssertEqual(temp.url, tempURL)
@@ -377,7 +377,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         let downloadAdded = expectation(description: "download addeed")
         downloadManager.addDownloadBlock = { [unowned self] download, _, destination in
             downloadAdded.fulfill()
-            let task = WebKitDownloadTask(download: download, destination: destination, isBurner: false)
+            let task = WebKitDownloadTask(download: download, destination: destination, burnerWindowSession: nil)
             self.downloadManager.downloadAddedSubject.send(task)
             task.start(delegate: self.downloadManager)
             if case .resume(destination: let dest, tempFile: let temp) = destination {
@@ -437,7 +437,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         let downloadAdded = expectation(description: "download addeed")
         downloadManager.addDownloadBlock = { [unowned self] download, _, destination in
             downloadAdded.fulfill()
-            let task = WebKitDownloadTask(download: download, destination: destination, isBurner: false)
+            let task = WebKitDownloadTask(download: download, destination: destination, burnerWindowSession: nil)
             self.downloadManager.downloadAddedSubject.send(task)
             task.start(delegate: self.downloadManager)
             if case .resume(destination: let dest, tempFile: let temp) = destination {
@@ -525,7 +525,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
             XCTAssertNotEqual(update.item.identifier, keptId)
         }
 
-        coordinator.cleanupInactiveDownloads()
+        coordinator.cleanupInactiveDownloads(for: .all)
 
         withExtendedLifetime(c) {
             waitForExpectations(timeout: 1)
@@ -622,7 +622,7 @@ private extension DownloadListItem {
                                            websiteURL: .duckDuckGo,
                                            fileName: "testItem.pdf",
                                            progress: nil,
-                                           isBurner: false,
+                                           burnerWindowSession: nil,
                                            destinationURL: FileManager.default.temporaryDirectory.appendingPathComponent("testItem.pdf"),
                                            destinationFileBookmarkData: nil,
                                            tempURL: nil,
@@ -636,7 +636,7 @@ private extension DownloadListItem {
                                                  websiteURL: .duckDuckGo,
                                                  fileName: "oldItem.pdf",
                                                  progress: nil,
-                                                 isBurner: false,
+                                                 burnerWindowSession: nil,
                                                  destinationURL: FileManager.default.temporaryDirectory.appendingPathComponent("oldItem.pdf"),
                                                  destinationFileBookmarkData: nil,
                                                  tempURL: nil,
@@ -650,7 +650,7 @@ private extension DownloadListItem {
                                             websiteURL: nil,
                                             fileName: "outdated_fileName",
                                             progress: nil,
-                                            isBurner: false,
+                                            burnerWindowSession: nil,
                                             destinationURL: FileManager.default.temporaryDirectory.appendingPathComponent("olderItem.pdf"),
                                             destinationFileBookmarkData: nil,
                                             tempURL: nil,
@@ -664,7 +664,7 @@ private extension DownloadListItem {
                                                   websiteURL: .duckDuckGo,
                                                   fileName: "fileName",
                                                   progress: nil,
-                                                  isBurner: false,
+                                                  burnerWindowSession: nil,
                                                   destinationURL: URL(fileURLWithPath: "/test/path"),
                                                   destinationFileBookmarkData: nil,
                                                   tempURL: URL(fileURLWithPath: "/temp/file/path"),
@@ -678,7 +678,7 @@ private extension DownloadListItem {
                                                  websiteURL: .duckDuckGo,
                                                  fileName: "testFailedItem.pdf",
                                                  progress: nil,
-                                                 isBurner: false,
+                                                 burnerWindowSession: nil,
                                                  destinationURL: FileManager.default.temporaryDirectory.appendingPathComponent("testFailedItem.pdf"),
                                                  destinationFileBookmarkData: nil,
                                                  tempURL: FileManager.default.temporaryDirectory.appendingPathComponent("testFailedItem.duckload"),

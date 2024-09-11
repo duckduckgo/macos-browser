@@ -131,7 +131,7 @@ final class NavigationBarViewController: NSViewController {
 
     init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, networkProtectionFeatureActivation: NetworkProtectionFeatureActivation, downloadListCoordinator: DownloadListCoordinator, dragDropManager: BookmarkDragDropManager, networkProtectionPopoverManager: NetPPopoverManager, networkProtectionStatusReporter: NetworkProtectionStatusReporter, autofillPopoverPresenter: AutofillPopoverPresenter) {
 
-        self.popovers = NavigationBarPopovers(networkProtectionPopoverManager: networkProtectionPopoverManager, autofillPopoverPresenter: autofillPopoverPresenter)
+        self.popovers = NavigationBarPopovers(networkProtectionPopoverManager: networkProtectionPopoverManager, autofillPopoverPresenter: autofillPopoverPresenter, isBurner: isBurner)
         self.tabCollectionViewModel = tabCollectionViewModel
         self.networkProtectionButtonModel = NetworkProtectionNavBarButtonModel(popoverManager: networkProtectionPopoverManager, statusReporter: networkProtectionStatusReporter)
         self.isBurner = isBurner
