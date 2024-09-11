@@ -47,6 +47,7 @@ class BookmarksAndFavoritesTests: XCTestCase {
     private var openBookmarksMenuItem: XCUIElement!
     private var optionsButton: XCUIElement!
     private var removeFavoritesContextMenuItem: XCUIElement!
+    private var resetBookMarksMenuItem: XCUIElement!
     private var settingsAppearanceButton: XCUIElement!
     private var showBookmarksBarPreferenceToggle: XCUIElement!
     private var showBookmarksBarAlways: XCUIElement!
@@ -86,6 +87,7 @@ class BookmarksAndFavoritesTests: XCTestCase {
         openBookmarksMenuItem = app.menuItems["MoreOptionsMenu.openBookmarks"]
         optionsButton = app.buttons["NavigationBarViewController.optionsButton"]
         removeFavoritesContextMenuItem = app.menuItems["HomePage.Views.removeFavorite"]
+        resetBookMarksMenuItem = app.menuItems["MainMenu.resetBookmarks"]
         settingsAppearanceButton = app.buttons["PreferencesSidebar.appearanceButton"]
         showBookmarksBarAlways = app.menuItems["Preferences.AppearanceView.showBookmarksBarAlways"]
         showBookmarksBarPopup = app.popUpButtons["Preferences.AppearanceView.showBookmarksBarPopUp"]
@@ -93,8 +95,9 @@ class BookmarksAndFavoritesTests: XCTestCase {
         showFavoritesPreferenceToggle = app.checkBoxes["Preferences.AppearanceView.showFavoritesToggle"]
 
         app.launch()
-        app.resetBookmarks()
-        app.enforceSingleWindow()
+        resetBookmarks()
+        app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Let's enforce a single window
+        app.typeKey("n", modifierFlags: .command)
     }
 
     func test_bookmarks_canBeAddedTo_withContextClickBookmarkThisPage() {
@@ -638,6 +641,15 @@ class BookmarksAndFavoritesTests: XCTestCase {
 }
 
 private extension BookmarksAndFavoritesTests {
+    /// Reset the bookmarks so we can rely on a single bookmark's existence
+    func resetBookmarks() {
+        app.typeKey("n", modifierFlags: [.command]) // Can't use debug menu without a window
+        XCTAssertTrue(
+            resetBookMarksMenuItem.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "Reset bookmarks menu item didn't become available in a reasonable timeframe."
+        )
+        resetBookMarksMenuItem.click()
+    }
 
     /// Make sure that we can reply on the bookmarks bar always appearing
     func toggleShowBookmarksBarAlwaysOn() {
