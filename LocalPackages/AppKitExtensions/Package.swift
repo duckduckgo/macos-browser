@@ -20,5 +20,14 @@ let package = Package(
                 .define("DEBUG", .when(configuration: .debug))
             ]
         ),
+        .testTarget(
+            name: "AppKitExtensionsTests",
+            dependencies: [
+                "AppKitExtensions"
+            ],
+            resources: [
+                .process("Resources")
+            ]
+        )
     ]
 )
