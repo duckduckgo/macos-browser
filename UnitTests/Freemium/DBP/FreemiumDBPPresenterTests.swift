@@ -48,6 +48,9 @@ final class FreemiumDBPPresenterTests: XCTestCase {
 
 private final class MockWindowControllerManager: WindowControllersManagerProtocol {
 
+
+    var lastKeyMainWindowController: DuckDuckGo_Privacy_Browser.MainWindowController?
+
     var showTabContent: Tab.Content = .none
 
     var pinnedTabsManager: PinnedTabsManager = PinnedTabsManager()
@@ -62,5 +65,13 @@ private final class MockWindowControllerManager: WindowControllersManagerProtoco
 
     func showTab(with content: Tab.TabContent) {
         showTabContent = content
+    }
+
+    func show(url: URL?, source: Tab.TabContent.URLSource, newTab: Bool) {}
+
+    func showBookmarksTab() {}
+
+    func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel?, burnerMode: BurnerMode, droppingPoint: NSPoint?, contentSize: NSSize?, showWindow: Bool, popUp: Bool, lazyLoadTabs: Bool, isMiniaturized: Bool) -> MainWindow? {
+        nil
     }
 }
