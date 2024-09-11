@@ -38,7 +38,7 @@ final class MoreOptionsMenuTests: XCTestCase {
 
     var subscriptionManager: SubscriptionManagerMock!
 
-    private var mockFreemiumDBPFeatureFlagger = MockFreemiumDBPFeatureFlagger()
+    private var mockPrivacyConfigurationManager: MockPrivacyConfigurationManaging!
     private var mockFreemiumDBPPresenter = MockFreemiumDBPPresenter()
     private var freemiumDBPFeature: DefaultFreemiumDBPFeature!
     private var mockFreemiumDBPUserStateManager = MockFreemiumDBPUserStateManager()
@@ -69,7 +69,8 @@ final class MoreOptionsMenuTests: XCTestCase {
                                                                                                   purchasePlatform: .appStore),
                                                       canPurchase: false)
 
-        freemiumDBPFeature = DefaultFreemiumDBPFeature(featureFlagger: mockFreemiumDBPFeatureFlagger, subscriptionManager: subscriptionManager, accountManager: subscriptionManager.accountManager, freemiumDBPUserStateManager: MockFreemiumDBPUserStateManager(), featureDisabler: MockFeatureDisabler())
+        mockPrivacyConfigurationManager = MockPrivacyConfigurationManaging()
+        freemiumDBPFeature = DefaultFreemiumDBPFeature(privacyConfigurationManager: mockPrivacyConfigurationManager, subscriptionManager: subscriptionManager, accountManager: subscriptionManager.accountManager, freemiumDBPUserStateManager: MockFreemiumDBPUserStateManager(), featureDisabler: MockFeatureDisabler())
 
         mockNotificationCenter = MockNotificationCenter()
 
@@ -148,7 +149,7 @@ final class MoreOptionsMenuTests: XCTestCase {
     func testThatMoreOptionMenuHasTheExpectedItemsWhenUnauthenticatedAndCanPurchaseSubscriptionAndFreemiumDBPFeatureFlagDisabled() {
         subscriptionManager.canPurchase = true
         subscriptionManager.currentEnvironment = SubscriptionEnvironment(serviceEnvironment: .production, purchasePlatform: .stripe)
-        mockFreemiumDBPFeatureFlagger.isEnabled = false
+        mockPrivacyConfigurationManager.mockConfig.isSubfeatureKeyEnabled = { _, _ in false }
 
         setupMoreOptionsMenu()
 
@@ -180,7 +181,7 @@ final class MoreOptionsMenuTests: XCTestCase {
     func testThatMoreOptionMenuHasTheExpectedItemsWhenUnauthenticatedAndFreemiumDBPFeatureFlagEnabled() {
         subscriptionManager.canPurchase = true
         subscriptionManager.currentEnvironment = SubscriptionEnvironment(serviceEnvironment: .production, purchasePlatform: .stripe)
-        mockFreemiumDBPFeatureFlagger.isEnabled = true
+        mockPrivacyConfigurationManager.mockConfig.isSubfeatureKeyEnabled = { _, _ in true }
 
         setupMoreOptionsMenu()
 
@@ -212,7 +213,7 @@ final class MoreOptionsMenuTests: XCTestCase {
     @MainActor
     func testThatMoreOptionMenuHasTheExpectedItemsWhenSubscriptionIsActiveAndFreemiumDBPFeatureFlagDisabled() {
         mockAuthentication()
-        mockFreemiumDBPFeatureFlagger.isEnabled = false
+        mockPrivacyConfigurationManager.mockConfig.isSubfeatureKeyEnabled = { _, _ in false }
 
         setupMoreOptionsMenu()
 
@@ -249,7 +250,7 @@ final class MoreOptionsMenuTests: XCTestCase {
     @MainActor
     func testThatMoreOptionMenuHasTheExpectedItemsWhenSubscriptionIsActiveAndFreemiumDBPFeatureFlagEnabled() {
         mockAuthentication()
-        mockFreemiumDBPFeatureFlagger.isEnabled = true
+        mockPrivacyConfigurationManager.mockConfig.isSubfeatureKeyEnabled = { _, _ in true }
 
         setupMoreOptionsMenu()
 
@@ -288,7 +289,7 @@ final class MoreOptionsMenuTests: XCTestCase {
         // Given
         subscriptionManager.canPurchase = true
         subscriptionManager.currentEnvironment = SubscriptionEnvironment(serviceEnvironment: .production, purchasePlatform: .stripe)
-        mockFreemiumDBPFeatureFlagger.isEnabled = true
+        mockPrivacyConfigurationManager.mockConfig.isSubfeatureKeyEnabled = { _, _ in true }
         mockFreemiumDBPUserStateManager.didOnboard = false
         setupMoreOptionsMenu()
 
@@ -309,7 +310,7 @@ final class MoreOptionsMenuTests: XCTestCase {
         // Given
         subscriptionManager.canPurchase = true
         subscriptionManager.currentEnvironment = SubscriptionEnvironment(serviceEnvironment: .production, purchasePlatform: .stripe)
-        mockFreemiumDBPFeatureFlagger.isEnabled = true
+        mockPrivacyConfigurationManager.mockConfig.isSubfeatureKeyEnabled = { _, _ in true }
         mockFreemiumDBPUserStateManager.didOnboard = true
         setupMoreOptionsMenu()
 
@@ -409,10 +410,17 @@ final class NetworkProtectionVisibilityMock: VPNFeatureGatekeeper {
 
 final class MockFreemiumDBPFeature: FreemiumDBPFeature {
     var featureAvailable = false
+    var isAvailableSubject = PassthroughSubject<Bool, Never>()
 
     var isAvailable: Bool {
         featureAvailable
     }
+
+    var isAvailablePublisher: AnyPublisher<Bool, Never> {
+        return isAvailableSubject.eraseToAnyPublisher()
+    }
+
+    func subscribeToDependencyUpdates() {}
 }
 
 final class MockFreemiumDBPPresenter: FreemiumDBPPresenter {
