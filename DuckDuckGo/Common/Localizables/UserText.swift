@@ -231,6 +231,8 @@ struct UserText {
     static let webProcessCrashPageHeader = NSLocalizedString("page.crash.header", value: "This webpage has crashed.", comment: "Error page heading text shown when a Web Page process had crashed")
     static let webProcessCrashPageMessage = NSLocalizedString("page.crash.message", value: "Try reloading the page or come back later.", comment: "Error page message text shown when a Web Page process had crashed")
     static let sslErrorPageTabTitle = NSLocalizedString("ssl.error.page.tab.title", value: "Warning: Site May Be Insecure", comment: "Title shown in an error page tab that warn users of security risks on a website due to SSL issues")
+    static let phishingErrorPageTabTitle = NSLocalizedString("phishing.error.page.tab.title", value: "Warning: Site May Be Deceptive", comment: "Title shown in an error page tab that warn users of security risks on a website that has been flagged as malicious.")
+    
 
     static let openSystemPreferences = NSLocalizedString("open.preferences", value: "Open System Preferences", comment: "Open System Preferences (to re-enable permission for the App) (up to and including macOS 12")
     static let openSystemSettings = NSLocalizedString("open.settings", value: "Open System Settings…", comment: "This string represents a prompt or button label prompting the user to open system settings")
@@ -410,6 +412,10 @@ struct UserText {
     static let downloadsChangeDirectory = NSLocalizedString("downloads.change", value: "Change…", comment: "Change downloads directory button")
 
     static let downloadsOpenPopupOnCompletion = NSLocalizedString("downloads.open.on.completion", value: "Automatically open the Downloads panel when downloads complete", comment: "Checkbox to open a Download Manager popover when downloads are completed")
+
+    static let phishingDetectionHeader = NSLocalizedString("phishing-detection.enabled.header", value: "Malicious Site Protection", comment: "Header for phishing site protection section in the settings page")
+    static let phishingDetectionIsEnabled = NSLocalizedString("phishing-detection.enabled.checkbox", value: "Allow DuckDuckGo to warn you before loading a webpage that has been flagged as malicious or fraudulent.", comment: "Checkbox that enables or disables the phishing detection feature in the browser")
+    static let phishingDetectionEnabledWarning = NSLocalizedString("phishing-detection.enabled.warning", value: "Disabling this feature can put your personal information at risk. Only do so if you fully understand the risk involved.", comment: "A description box to warn users away from disabling phishing protection")
 
     // MARK: Password Manager
     static let passwordManagementAllItems = NSLocalizedString("passsword.management.all-items", value: "All Items", comment: "Used as title for the Autofill All Items option")

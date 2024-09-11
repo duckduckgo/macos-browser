@@ -19,13 +19,14 @@
 import Foundation
 import SwiftUI
 
-@available(iOS, introduced: 10.15, deprecated: 12.0, message: "Use Apple's DismissAction")
+@available(macOS, introduced: 10.15, obsoleted: 12.0, message: "Use Apple's DismissAction")
 public struct DismissAction: EnvironmentKey {
     public static var defaultValue: () -> Void = {}
 }
 
-@available(iOS, introduced: 10.15, deprecated: 12.0, message: "Use Apple's DismissAction")
 public extension EnvironmentValues {
+
+    @available(macOS, introduced: 10.15, obsoleted: 12.0, message: "Use Apple's EnvironmentValues.dismiss")
     var dismiss: () -> Void {
         get {
             self[DismissAction.self]
