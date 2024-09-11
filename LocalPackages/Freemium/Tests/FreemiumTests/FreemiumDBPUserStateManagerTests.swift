@@ -1,5 +1,5 @@
 //
-//  FreemiumPIRUserStateManagerTests.swift
+//  FreemiumDBPUserStateManagerTests.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -19,27 +19,27 @@
 import XCTest
 @testable import Freemium
 
-final class FreemiumPIRUserStateManagerTests: XCTestCase {
+final class FreemiumDBPUserStateManagerTests: XCTestCase {
 
     private enum Keys {
-        static let didOnboard = "macos.browser.freemium.pir.did.onboard"
-        static let didPostFirstProfileSavedNotification = "macos.browser.freemium.pir.did.post.first.profile.saved.notification"
-        static let didPostResultsNotification = "macos.browser.freemium.pir.did.post.results.notification"
-        static let didDismissHomePagePromotion = "macos.browser.freemium.pir.did.post.dismiss.home.page.promotion"
-        static let firstProfileSavedTimestamp = "macos.browser.freemium.pir.first.profile.saved.timestamp"
-        static let firstScanResults = "macos.browser.freemium.pir.first.scan.results"
+        static let didOnboard = "macos.browser.freemium.dbp.did.onboard"
+        static let didPostFirstProfileSavedNotification = "macos.browser.freemium.dbp.did.post.first.profile.saved.notification"
+        static let didPostResultsNotification = "macos.browser.freemium.dbp.did.post.results.notification"
+        static let didDismissHomePagePromotion = "macos.browser.freemium.dbp.did.post.dismiss.home.page.promotion"
+        static let firstProfileSavedTimestamp = "macos.browser.freemium.dbp.first.profile.saved.timestamp"
+        static let firstScanResults = "macos.browser.freemium.dbp.first.scan.results"
     }
 
     private static let testSuiteName = "test.defaults.freemium.user.state.tests"
-    private let testUserDefaults = UserDefaults(suiteName: FreemiumPIRUserStateManagerTests.testSuiteName)!
+    private let testUserDefaults = UserDefaults(suiteName: FreemiumDBPUserStateManagerTests.testSuiteName)!
 
     override func setUpWithError() throws {
-        testUserDefaults.removePersistentDomain(forName: FreemiumPIRUserStateManagerTests.testSuiteName)
+        testUserDefaults.removePersistentDomain(forName: FreemiumDBPUserStateManagerTests.testSuiteName)
     }
 
     func testSetsDidOnboard() throws {
         // Given
-        let sut = DefaultFreemiumPIRUserStateManager(userDefaults: testUserDefaults)
+        let sut = DefaultFreemiumDBPUserStateManager(userDefaults: testUserDefaults)
         XCTAssertFalse(testUserDefaults.bool(forKey: Keys.didOnboard))
 
         // When
@@ -51,7 +51,7 @@ final class FreemiumPIRUserStateManagerTests: XCTestCase {
 
     func testGetsDidOnboard() throws {
         // Given
-        let sut = DefaultFreemiumPIRUserStateManager(userDefaults: testUserDefaults)
+        let sut = DefaultFreemiumDBPUserStateManager(userDefaults: testUserDefaults)
         XCTAssertFalse(sut.didOnboard)
         testUserDefaults.setValue(true, forKey: Keys.didOnboard)
         XCTAssertTrue(testUserDefaults.bool(forKey: Keys.didOnboard))
@@ -65,7 +65,7 @@ final class FreemiumPIRUserStateManagerTests: XCTestCase {
 
     func testSetsfirstProfileSavedTimestamp() throws {
         // Given
-        let sut = DefaultFreemiumPIRUserStateManager(userDefaults: testUserDefaults)
+        let sut = DefaultFreemiumDBPUserStateManager(userDefaults: testUserDefaults)
         XCTAssertNil(testUserDefaults.value(forKey: Keys.firstProfileSavedTimestamp))
 
         // When
@@ -77,7 +77,7 @@ final class FreemiumPIRUserStateManagerTests: XCTestCase {
 
     func testGetsfirstProfileSavedTimestamp() throws {
         // Given
-        let sut = DefaultFreemiumPIRUserStateManager(userDefaults: testUserDefaults)
+        let sut = DefaultFreemiumDBPUserStateManager(userDefaults: testUserDefaults)
         XCTAssertNil(sut.firstProfileSavedTimestamp)
         testUserDefaults.setValue("time_stamp", forKey: Keys.firstProfileSavedTimestamp)
         XCTAssertNotNil(testUserDefaults.value(forKey: Keys.firstProfileSavedTimestamp))
@@ -91,7 +91,7 @@ final class FreemiumPIRUserStateManagerTests: XCTestCase {
 
     func testSetsDidPostFirstProfileSavedNotification() throws {
         // Given
-        let sut = DefaultFreemiumPIRUserStateManager(userDefaults: testUserDefaults)
+        let sut = DefaultFreemiumDBPUserStateManager(userDefaults: testUserDefaults)
         XCTAssertFalse(testUserDefaults.bool(forKey: Keys.didPostFirstProfileSavedNotification))
 
         // When
@@ -103,7 +103,7 @@ final class FreemiumPIRUserStateManagerTests: XCTestCase {
 
     func testGetsDidPostFirstProfileSavedNotification() throws {
         // Given
-        let sut = DefaultFreemiumPIRUserStateManager(userDefaults: testUserDefaults)
+        let sut = DefaultFreemiumDBPUserStateManager(userDefaults: testUserDefaults)
         XCTAssertFalse(sut.didPostFirstProfileSavedNotification)
         testUserDefaults.setValue(true, forKey: Keys.didPostFirstProfileSavedNotification)
         XCTAssertTrue(testUserDefaults.bool(forKey: Keys.didPostFirstProfileSavedNotification))
@@ -117,7 +117,7 @@ final class FreemiumPIRUserStateManagerTests: XCTestCase {
 
     func testSetsDidPostResultsNotification() throws {
         // Given
-        let sut = DefaultFreemiumPIRUserStateManager(userDefaults: testUserDefaults)
+        let sut = DefaultFreemiumDBPUserStateManager(userDefaults: testUserDefaults)
         XCTAssertFalse(testUserDefaults.bool(forKey: Keys.didPostResultsNotification))
 
         // When
@@ -129,7 +129,7 @@ final class FreemiumPIRUserStateManagerTests: XCTestCase {
 
     func testGetsDidPostResultsNotification() throws {
         // Given
-        let sut = DefaultFreemiumPIRUserStateManager(userDefaults: testUserDefaults)
+        let sut = DefaultFreemiumDBPUserStateManager(userDefaults: testUserDefaults)
         XCTAssertFalse(sut.didPostResultsNotification)
         testUserDefaults.setValue(true, forKey: Keys.didPostResultsNotification)
         XCTAssertTrue(testUserDefaults.bool(forKey: Keys.didPostResultsNotification))
@@ -143,7 +143,7 @@ final class FreemiumPIRUserStateManagerTests: XCTestCase {
 
     func testSetsDidDismissHomePagePromotion() throws {
         // Given
-        let sut = DefaultFreemiumPIRUserStateManager(userDefaults: testUserDefaults)
+        let sut = DefaultFreemiumDBPUserStateManager(userDefaults: testUserDefaults)
         XCTAssertFalse(testUserDefaults.bool(forKey: Keys.didDismissHomePagePromotion))
 
         // When
@@ -155,7 +155,7 @@ final class FreemiumPIRUserStateManagerTests: XCTestCase {
 
     func testGetsDidDismissHomePagePromotion() throws {
         // Given
-        let sut = DefaultFreemiumPIRUserStateManager(userDefaults: testUserDefaults)
+        let sut = DefaultFreemiumDBPUserStateManager(userDefaults: testUserDefaults)
         XCTAssertFalse(sut.didDismissHomePagePromotion)
         testUserDefaults.setValue(true, forKey: Keys.didDismissHomePagePromotion)
         XCTAssertTrue(testUserDefaults.bool(forKey: Keys.didDismissHomePagePromotion))
@@ -169,7 +169,7 @@ final class FreemiumPIRUserStateManagerTests: XCTestCase {
 
     func testSetsFirstScanResults() throws {
         // Given
-        let sut = DefaultFreemiumPIRUserStateManager(userDefaults: testUserDefaults)
+        let sut = DefaultFreemiumDBPUserStateManager(userDefaults: testUserDefaults)
         XCTAssertNil(testUserDefaults.data(forKey: Keys.firstScanResults))
 
         // When
@@ -188,7 +188,7 @@ final class FreemiumPIRUserStateManagerTests: XCTestCase {
 
     func testGetsFirstScanResults() throws {
         // Given
-        let sut = DefaultFreemiumPIRUserStateManager(userDefaults: testUserDefaults)
+        let sut = DefaultFreemiumDBPUserStateManager(userDefaults: testUserDefaults)
         XCTAssertNil(sut.firstScanResults)
 
         // When

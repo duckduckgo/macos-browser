@@ -1,5 +1,5 @@
 //
-//  FreemiumPIRScanResultPollingTests.swift
+//  FreemiumDBPScanResultPollingTests.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -22,27 +22,27 @@ import XCTest
 import Common
 import Freemium
 
-final class FreemiumPIRScanResultPollingTests: XCTestCase {
+final class FreemiumDBPScanResultPollingTests: XCTestCase {
 
-    private var sut: FreemiumPIRScanResultPolling!
-    private var mockFreemiumPIRUserStateManager: MockFreemiumPIRUserStateManager!
+    private var sut: FreemiumDBPScanResultPolling!
+    private var mockFreemiumDBPUserStateManager: MockFreemiumDBPUserStateManager!
     private var mockNotificationCenter: MockNotificationCenter!
     private var mockDataManager: MockDataBrokerProtectionDataManager!
-    private let dateFormatter = FreemiumPIRScanResultPollingTests.makePOSIXDateTimeFormatter()
-    private let key = "macos.browser.freemium.pir.first.profile.saved.timestamp"
+    private let dateFormatter = FreemiumDBPScanResultPollingTests.makePOSIXDateTimeFormatter()
+    private let key = "macos.browser.freemium.dbp.first.profile.saved.timestamp"
 
     override func setUpWithError() throws {
-        mockFreemiumPIRUserStateManager = MockFreemiumPIRUserStateManager()
+        mockFreemiumDBPUserStateManager = MockFreemiumDBPUserStateManager()
         mockNotificationCenter = MockNotificationCenter()
         mockDataManager = MockDataBrokerProtectionDataManager()
     }
 
     func testWhenResultsAlreadyPosted_thenNoPollingOrObserving() {
         // Given
-        mockFreemiumPIRUserStateManager.didPostResultsNotification = true
-        let sut = DefaultFreemiumPIRScanResultPolling(
+        mockFreemiumDBPUserStateManager.didPostResultsNotification = true
+        let sut = DefaultFreemiumDBPScanResultPolling(
             dataManager: mockDataManager,
-            freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager,
+            freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager,
             notificationCenter: mockNotificationCenter
         )
 
@@ -58,10 +58,10 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
     func testWhenFirstProfileIsAlreadySaved_thenPollingStartsImmediately() {
         // Given
         let timestampString = dateFormatter.string(from: Date())
-        mockFreemiumPIRUserStateManager.firstProfileSavedTimestamp = timestampString
-        let sut = DefaultFreemiumPIRScanResultPolling(
+        mockFreemiumDBPUserStateManager.firstProfileSavedTimestamp = timestampString
+        let sut = DefaultFreemiumDBPScanResultPolling(
             dataManager: mockDataManager,
-            freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager,
+            freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager,
             notificationCenter: mockNotificationCenter
         )
 
@@ -76,9 +76,9 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
 
     func testWhenNoProfileIsSaved_thenObserveForNotification_andDontStartTimer() {
         // Given
-        let sut = DefaultFreemiumPIRScanResultPolling(
+        let sut = DefaultFreemiumDBPScanResultPolling(
             dataManager: mockDataManager,
-            freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager,
+            freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager,
             notificationCenter: mockNotificationCenter
         )
 
@@ -93,9 +93,9 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
 
     func testWhenIsNotifiedOfFirstProfileSaved_thenPollingStarts() {
         // Given
-        let sut = DefaultFreemiumPIRScanResultPolling(
+        let sut = DefaultFreemiumDBPScanResultPolling(
             dataManager: mockDataManager,
-            freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager,
+            freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager,
             notificationCenter: mockNotificationCenter
         )
 
@@ -104,7 +104,7 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
         mockNotificationCenter.post(name: .pirProfileSaved, object: nil)
 
         // Then
-        XCTAssertNotNil(mockFreemiumPIRUserStateManager.firstProfileSavedTimestamp)
+        XCTAssertNotNil(mockFreemiumDBPUserStateManager.firstProfileSavedTimestamp)
         XCTAssertTrue(mockNotificationCenter.didCallAddObserver)
         XCTAssertFalse(mockDataManager.didCallMatchesFoundCount)
         XCTAssertNotNil(sut.timer)
@@ -114,10 +114,10 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
         // Given
         mockDataManager.matchesFoundCountValue = (3, 2)
         let timestampString = dateFormatter.string(from: Date.nowMinus(hours: 12))
-        mockFreemiumPIRUserStateManager.firstProfileSavedTimestamp = timestampString
-        let sut = DefaultFreemiumPIRScanResultPolling(
+        mockFreemiumDBPUserStateManager.firstProfileSavedTimestamp = timestampString
+        let sut = DefaultFreemiumDBPScanResultPolling(
             dataManager: mockDataManager,
-            freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager,
+            freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager,
             notificationCenter: mockNotificationCenter
         )
 
@@ -128,7 +128,7 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
         XCTAssertFalse(mockNotificationCenter.didCallAddObserver)
         XCTAssertTrue(mockDataManager.didCallMatchesFoundCount)
         XCTAssertEqual(mockNotificationCenter.lastPostedNotification, .freemiumDBPResultPollingComplete)
-        XCTAssertEqual(mockFreemiumPIRUserStateManager.firstScanResults, FreemiumDBPMatchResults(matchesCount: 3, brokerCount: 2))
+        XCTAssertEqual(mockFreemiumDBPUserStateManager.firstScanResults, FreemiumDBPMatchResults(matchesCount: 3, brokerCount: 2))
         XCTAssertNil(sut.timer)
     }
 
@@ -136,10 +136,10 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
         // Given
         mockDataManager.matchesFoundCountValue = (4, 2)
         let timestampString = dateFormatter.string(from: Date.nowMinus(hours: 36))
-        mockFreemiumPIRUserStateManager.firstProfileSavedTimestamp = timestampString
-        let sut = DefaultFreemiumPIRScanResultPolling(
+        mockFreemiumDBPUserStateManager.firstProfileSavedTimestamp = timestampString
+        let sut = DefaultFreemiumDBPScanResultPolling(
             dataManager: mockDataManager,
-            freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager,
+            freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager,
             notificationCenter: mockNotificationCenter
         )
 
@@ -148,7 +148,7 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
 
         // Then
         XCTAssertEqual(mockNotificationCenter.lastPostedNotification, .freemiumDBPResultPollingComplete)
-        XCTAssertEqual(mockFreemiumPIRUserStateManager.firstScanResults, FreemiumDBPMatchResults(matchesCount: 4, brokerCount: 2))
+        XCTAssertEqual(mockFreemiumDBPUserStateManager.firstScanResults, FreemiumDBPMatchResults(matchesCount: 4, brokerCount: 2))
         XCTAssertFalse(mockNotificationCenter.didCallAddObserver)
         XCTAssertTrue(mockDataManager.didCallMatchesFoundCount)
         XCTAssertNil(sut.timer)
@@ -158,10 +158,10 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
         // Given
         mockDataManager.matchesFoundCountValue = (0, 0)
         let timestampString = dateFormatter.string(from: Date.nowMinus(hours: 36))
-        mockFreemiumPIRUserStateManager.firstProfileSavedTimestamp = timestampString
-        let sut = DefaultFreemiumPIRScanResultPolling(
+        mockFreemiumDBPUserStateManager.firstProfileSavedTimestamp = timestampString
+        let sut = DefaultFreemiumDBPScanResultPolling(
             dataManager: mockDataManager,
-            freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager,
+            freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager,
             notificationCenter: mockNotificationCenter
         )
 
@@ -170,7 +170,7 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
 
         // Then
         XCTAssertEqual(mockNotificationCenter.lastPostedNotification, .freemiumDBPResultPollingComplete)
-        XCTAssertEqual(mockFreemiumPIRUserStateManager.firstScanResults, FreemiumDBPMatchResults(matchesCount: 0, brokerCount: 0))
+        XCTAssertEqual(mockFreemiumDBPUserStateManager.firstScanResults, FreemiumDBPMatchResults(matchesCount: 0, brokerCount: 0))
         XCTAssertFalse(mockNotificationCenter.didCallAddObserver)
         XCTAssertTrue(mockDataManager.didCallMatchesFoundCount)
         XCTAssertNil(sut.timer)
@@ -178,9 +178,9 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
 
     func testWhenPollingIsDeinitialized_thenTimerIsInvalidated() {
         // Given
-        var sut: DefaultFreemiumPIRScanResultPolling? = DefaultFreemiumPIRScanResultPolling(
+        var sut: DefaultFreemiumDBPScanResultPolling? = DefaultFreemiumDBPScanResultPolling(
             dataManager: mockDataManager,
-            freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager,
+            freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager,
             notificationCenter: mockNotificationCenter
         )
         sut?.startPollingOrObserving()
@@ -194,9 +194,9 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
 
     func testWhenTimerAlreadyExists_thenSecondTimerIsNotCreated() {
         // Given
-        let sut = DefaultFreemiumPIRScanResultPolling(
+        let sut = DefaultFreemiumDBPScanResultPolling(
             dataManager: mockDataManager,
-            freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager,
+            freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager,
             notificationCenter: mockNotificationCenter
         )
         sut.startPollingOrObserving()
@@ -214,11 +214,11 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
         mockDataManager.matchesFoundCountValue = (0, 0)
         mockDataManager.didCallMatchesFoundCount = false  // Simulate an error
         let timestampString = dateFormatter.string(from: Date.nowMinus(hours: 1))
-        mockFreemiumPIRUserStateManager.firstProfileSavedTimestamp = timestampString
+        mockFreemiumDBPUserStateManager.firstProfileSavedTimestamp = timestampString
 
-        let sut = DefaultFreemiumPIRScanResultPolling(
+        let sut = DefaultFreemiumDBPScanResultPolling(
             dataManager: mockDataManager,
-            freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager,
+            freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager,
             notificationCenter: mockNotificationCenter
         )
 
@@ -236,11 +236,11 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
         // Given
         mockDataManager.matchesFoundCountValue = (0, 0)
         let timestampString = dateFormatter.string(from: Date.nowMinus(hours: 12))
-        mockFreemiumPIRUserStateManager.firstProfileSavedTimestamp = timestampString
+        mockFreemiumDBPUserStateManager.firstProfileSavedTimestamp = timestampString
 
-        let sut = DefaultFreemiumPIRScanResultPolling(
+        let sut = DefaultFreemiumDBPScanResultPolling(
             dataManager: mockDataManager,
-            freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager,
+            freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager,
             notificationCenter: mockNotificationCenter
         )
 
@@ -254,7 +254,7 @@ final class FreemiumPIRScanResultPollingTests: XCTestCase {
     }
 }
 
-private extension FreemiumPIRScanResultPollingTests {
+private extension FreemiumDBPScanResultPollingTests {
 
     static func makePOSIXDateTimeFormatter() -> DateFormatter {
         let dateFormatter = DateFormatter()

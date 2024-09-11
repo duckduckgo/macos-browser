@@ -98,7 +98,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     public let subscriptionUIHandler: SubscriptionUIHandling
 
     // MARK: - Freemium DBP
-    private var freemiumPIRScanResultPolling: FreemiumPIRScanResultPolling?
+    private var freemiumDBPScanResultPolling: FreemiumDBPScanResultPolling?
 
     // MARK: - VPN
 
@@ -383,10 +383,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         dataBrokerProtectionSubscriptionEventHandler.registerForSubscriptionAccountManagerEvents()
 
-        let freemiumPIRUserStateManager = DefaultFreemiumPIRUserStateManager(userDefaults: .dbp)
+        let freemiumDBPUserStateManager = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp)
         let pirGatekeeper = DefaultDataBrokerProtectionFeatureGatekeeper(accountManager:
                                                                             subscriptionManager.accountManager,
-                                                                         freemiumPIRUserStateManager: freemiumPIRUserStateManager)
+                                                                         freemiumDBPUserStateManager: freemiumDBPUserStateManager)
 
         DataBrokerProtectionAppEvents(featureGatekeeper: pirGatekeeper).applicationDidFinishLaunching()
 
@@ -411,8 +411,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             didCrashDuringCrashHandlersSetUp = false
         }
 
-        freemiumPIRScanResultPolling = DefaultFreemiumPIRScanResultPolling(dataManager: DataBrokerProtectionManager.shared.dataManager, freemiumPIRUserStateManager: freemiumPIRUserStateManager)
-        freemiumPIRScanResultPolling?.startPollingOrObserving()
+        freemiumDBPScanResultPolling = DefaultFreemiumDBPScanResultPolling(dataManager: DataBrokerProtectionManager.shared.dataManager, freemiumDBPUserStateManager: freemiumDBPUserStateManager)
+        freemiumDBPScanResultPolling?.startPollingOrObserving()
     }
 
     private func fireFailedCompilationsPixelIfNeeded() {
@@ -438,10 +438,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         NetworkProtectionAppEvents(featureGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: subscriptionManager)).applicationDidBecomeActive()
 
-        let freemiumPIRUserStateManager = DefaultFreemiumPIRUserStateManager(userDefaults: .dbp)
+        let freemiumDBPUserStateManager = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp)
         let pirGatekeeper = DefaultDataBrokerProtectionFeatureGatekeeper(accountManager:
                                                                             subscriptionManager.accountManager,
-                                                                         freemiumPIRUserStateManager: freemiumPIRUserStateManager)
+                                                                         freemiumDBPUserStateManager: freemiumDBPUserStateManager)
 
         DataBrokerProtectionAppEvents(featureGatekeeper: pirGatekeeper).applicationDidBecomeActive()
 
