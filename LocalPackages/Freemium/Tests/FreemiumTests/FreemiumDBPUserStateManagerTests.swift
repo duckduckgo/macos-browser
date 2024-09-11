@@ -202,4 +202,27 @@ final class FreemiumDBPUserStateManagerTests: XCTestCase {
         XCTAssertEqual(result?.matchesCount, scanResults.matchesCount)
         XCTAssertEqual(result?.brokerCount, scanResults.brokerCount)
     }
+
+    func testResetAllStateResetsAllProperties() {
+        // Given
+        let sut = DefaultFreemiumPIRUserStateManager(userDefaults: testUserDefaults)
+        sut.didOnboard = true
+        sut.firstProfileSavedTimestamp = "2024-01-01T12:00:00Z"
+        sut.didPostFirstProfileSavedNotification = true
+        sut.didPostResultsNotification = true
+        sut.didDismissHomePagePromotion = true
+        let scanResults = FreemiumDBPMatchResults(matchesCount: 10, brokerCount: 5)
+        sut.firstScanResults = scanResults
+
+        // When
+        sut.resetAllState()
+
+        // Then
+        XCTAssertFalse(sut.didOnboard)
+        XCTAssertNil(sut.firstProfileSavedTimestamp)
+        XCTAssertFalse(sut.didPostFirstProfileSavedNotification)
+        XCTAssertFalse(sut.didPostResultsNotification)
+        XCTAssertNil(sut.firstScanResults)
+        XCTAssertFalse(sut.didDismissHomePagePromotion)
+    }
 }
