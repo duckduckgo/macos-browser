@@ -36,20 +36,20 @@ struct DefaultDataBrokerProtectionAgentStopper: DataBrokerProtectionAgentStopper
     private let authenticationManager: DataBrokerProtectionAuthenticationManaging
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let stopAction: DataProtectionStopAction
-    private let freemiumPIRUserStateManager: FreemiumPIRUserStateManager
+    private let freemiumDBPUserStateManager: FreemiumDBPUserStateManager
 
     init(dataManager: DataBrokerProtectionDataManaging,
          entitlementMonitor: DataBrokerProtectionEntitlementMonitoring,
          authenticationManager: DataBrokerProtectionAuthenticationManaging,
          pixelHandler: EventMapping<DataBrokerProtectionPixels>,
          stopAction: DataProtectionStopAction = DefaultDataProtectionStopAction(),
-         freemiumPIRUserStateManager: FreemiumPIRUserStateManager) {
+         freemiumDBPUserStateManager: FreemiumDBPUserStateManager) {
         self.dataManager = dataManager
         self.entitlementMonitor = entitlementMonitor
         self.authenticationManager = authenticationManager
         self.pixelHandler = pixelHandler
         self.stopAction = stopAction
-        self.freemiumPIRUserStateManager = freemiumPIRUserStateManager
+        self.freemiumDBPUserStateManager = freemiumDBPUserStateManager
     }
 
     /// Checks PIR prerequisites and stops the agent if necessary
@@ -62,7 +62,7 @@ struct DefaultDataBrokerProtectionAgentStopper: DataBrokerProtectionAgentStopper
         do {
             let hasProfile = try dataManager.fetchProfile() != nil
             let isAuthenticated = authenticationManager.isUserAuthenticated
-            let didOnboardToFreemium = freemiumPIRUserStateManager.didOnboard
+            let didOnboardToFreemium = freemiumDBPUserStateManager.didOnboard
 
             if !hasProfile || (!isAuthenticated && !didOnboardToFreemium) {
                 Logger.dataBrokerProtection.debug("Prerequisites are invalid")
@@ -95,7 +95,7 @@ struct DefaultDataBrokerProtectionAgentStopper: DataBrokerProtectionAgentStopper
 
     private func satisfiesFreemiumPrerequisites() -> Bool {
         let isAuthenticated = authenticationManager.isUserAuthenticated
-        let didOnboardToFreemium = freemiumPIRUserStateManager.didOnboard
+        let didOnboardToFreemium = freemiumDBPUserStateManager.didOnboard
         return !isAuthenticated && didOnboardToFreemium
     }
 

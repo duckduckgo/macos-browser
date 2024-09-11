@@ -57,13 +57,13 @@ final class FreemiumDBPPromotionViewCoordinator: FreemiumDBPPromotionViewCoordin
     }
 
     /// The user state manager, which tracks the user's onboarding status and scan results.
-    private var freemiumDBPUserStateManager: FreemiumPIRUserStateManager
+    private var freemiumDBPUserStateManager: FreemiumDBPUserStateManager
 
     /// Responsible for determining the availability of Freemium DBP.
-    private let freemiumPIRFeature: FreemiumPIRFeature
+    private let freemiumDBPFeature: FreemiumDBPFeature
 
     /// The presenter used to show the Freemium DBP UI.
-    private let freemiumPIRPresenter: FreemiumPIRPresenter
+    private let freemiumDBPPresenter: FreemiumDBPPresenter
 
     /// A set of cancellables for managing Combine subscriptions.
     private var cancellables = Set<AnyCancellable>()
@@ -71,16 +71,16 @@ final class FreemiumDBPPromotionViewCoordinator: FreemiumDBPPromotionViewCoordin
     /// Initializes the coordinator with the necessary dependencies.
     ///
     /// - Parameters:
-    ///   - freemiumDBPUserStateManager: Manages the user's state in the Freemium PIR system.
-    ///   - freemiumPIRFeature: The feature that determines the availability of PIR.
-    ///   - freemiumPIRPresenter: The presenter used to show the Freemium PIR UI. Defaults to `DefaultFreemiumPIRPresenter`.
-    init(freemiumDBPUserStateManager: FreemiumPIRUserStateManager,
-         freemiumPIRFeature: FreemiumPIRFeature,
-         freemiumPIRPresenter: FreemiumPIRPresenter = DefaultFreemiumPIRPresenter()) {
+    ///   - freemiumDBPUserStateManager: Manages the user's state in the Freemium DBP system.
+    ///   - freemiumDBPFeature: The feature that determines the availability of DBP.
+    ///   - freemiumDBPPresenter: The presenter used to show the Freemium DBP UI. Defaults to `DefaultFreemiumDBPPresenter`.
+    init(freemiumDBPUserStateManager: FreemiumDBPUserStateManager,
+         freemiumDBPFeature: FreemiumDBPFeature,
+         freemiumDBPPresenter: FreemiumDBPPresenter = DefaultFreemiumDBPPresenter()) {
 
         self.freemiumDBPUserStateManager = freemiumDBPUserStateManager
-        self.freemiumPIRFeature = freemiumPIRFeature
-        self.freemiumPIRPresenter = freemiumPIRPresenter
+        self.freemiumDBPFeature = freemiumDBPFeature
+        self.freemiumDBPPresenter = freemiumDBPPresenter
 
         setInitialPromotionVisibilityState()
         observeFreemiumDBPNotifications()
@@ -93,7 +93,7 @@ private extension FreemiumDBPPromotionViewCoordinator {
     var proceedAction: () -> Void {
         { [weak self] in
             self?.markUserAsOnboarded()
-            self?.showFreemiumPIR()
+            self?.showFreemiumDBP()
             self?.dismissHomePagePromotion()
         }
     }
@@ -110,9 +110,9 @@ private extension FreemiumDBPPromotionViewCoordinator {
         freemiumDBPUserStateManager.didOnboard = true
     }
 
-    /// Shows the Freemium PIR user interface via the presenter.
-    func showFreemiumPIR() {
-        freemiumPIRPresenter.showFreemiumPIR(
+    /// Shows the Freemium DBP user interface via the presenter.
+    func showFreemiumDBP() {
+        freemiumDBPPresenter.showFreemiumDBP(
             didOnboard: freemiumDBPUserStateManager.didOnboard,
             windowControllerManager: WindowControllersManager.shared
         )
@@ -124,9 +124,9 @@ private extension FreemiumDBPPromotionViewCoordinator {
     }
 
     /// Sets the initial visibility state of the promotion based on whether the promotion was
-    /// previously dismissed and whether the Freemium PIR feature is available.
+    /// previously dismissed and whether the Freemium DBP feature is available.
     func setInitialPromotionVisibilityState() {
-        isHomePagePromotionVisible = (!didDismissHomePagePromotion && freemiumPIRFeature.isAvailable)
+        isHomePagePromotionVisible = (!didDismissHomePagePromotion && freemiumDBPFeature.isAvailable)
     }
 
     /// Creates the view model for the promotion, updating based on the user's scan results.
@@ -135,20 +135,20 @@ private extension FreemiumDBPPromotionViewCoordinator {
     func createViewModel() -> PromotionViewModel {
         if let results = freemiumDBPUserStateManager.firstScanResults {
             if results.matchesCount > 0 {
-                return .freemiumPIRPromotionScanEngagementResults(
+                return .freemiumDBPPromotionScanEngagementResults(
                     resultCount: results.matchesCount,
                     brokerCount: results.brokerCount,
                     proceedAction: proceedAction,
                     closeAction: closeAction
                 )
             } else {
-                return .freemiumPIRPromotionScanEngagementNoResults(
+                return .freemiumDBPPromotionScanEngagementNoResults(
                     proceedAction: proceedAction,
                     closeAction: closeAction
                 )
             }
         } else {
-            return .freemiumPIRPromotion(proceedAction: proceedAction, closeAction: closeAction)
+            return .freemiumDBPPromotion(proceedAction: proceedAction, closeAction: closeAction)
         }
     }
 

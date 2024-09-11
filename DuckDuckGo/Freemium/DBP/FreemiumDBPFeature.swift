@@ -1,5 +1,5 @@
 //
-//  FreemiumPIRFeature.swift
+//  FreemiumDBPFeature.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -21,28 +21,28 @@ import BrowserServicesKit
 import Subscription
 import Freemium
 
-/// Conforming types encapsulate logic relating to the Freemium PIR Feature (e.g Feature Availability etc.)
-protocol FreemiumPIRFeature {
+/// Conforming types encapsulate logic relating to the Freemium DBP Feature (e.g Feature Availability etc.)
+protocol FreemiumDBPFeature {
     var isAvailable: Bool { get }
 }
 
-/// Default implementation of `FreemiumPIRFeature`
-final class DefaultFreemiumPIRFeature: FreemiumPIRFeature {
+/// Default implementation of `FreemiumDBPFeature`
+final class DefaultFreemiumDBPFeature: FreemiumDBPFeature {
 
     private let featureFlagger: FeatureFlagger
     private let subscriptionManager: SubscriptionManager
     private let accountManager: AccountManager
-    private var freemiumPIRUserStateManager: FreemiumPIRUserStateManager
+    private var freemiumDBPUserStateManager: FreemiumDBPUserStateManager
     private let featureDisabler: DataBrokerProtectionFeatureDisabling
 
     var isAvailable: Bool {
-        /* Freemium PIR availability criteria:
+        /* Freemium DBP availability criteria:
             1. Feature Flag enabled
             2. Privacy Pro Available
             3. Not a current Privacy Pro subscriber
             4. (Temp) In experiment cohort
          */
-        featureFlagger.isFeatureOn(.freemiumPIR) // #1
+        featureFlagger.isFeatureOn(.freemiumDBP) // #1
         && isPotentialPrivacyProSubscriber // #2 & #3
         // TODO: - Also check experiment cohort here
     }
@@ -50,20 +50,20 @@ final class DefaultFreemiumPIRFeature: FreemiumPIRFeature {
     init(featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger,
          subscriptionManager: SubscriptionManager,
          accountManager: AccountManager,
-         freemiumPIRUserStateManager: FreemiumPIRUserStateManager,
+         freemiumDBPUserStateManager: FreemiumDBPUserStateManager,
          featureDisabler: DataBrokerProtectionFeatureDisabling = DataBrokerProtectionFeatureDisabler()) {
 
         self.featureFlagger = featureFlagger
         self.subscriptionManager = subscriptionManager
         self.accountManager = accountManager
-        self.freemiumPIRUserStateManager = freemiumPIRUserStateManager
+        self.freemiumDBPUserStateManager = freemiumDBPUserStateManager
         self.featureDisabler = featureDisabler
 
         offBoardIfNecessary()
     }
 }
 
-private extension DefaultFreemiumPIRFeature {
+private extension DefaultFreemiumDBPFeature {
 
     /// Returns true if a user is a "potential" Privacy Pro subscriber. This means:
     ///
@@ -76,24 +76,24 @@ private extension DefaultFreemiumPIRFeature {
 
     /// Returns true IFF:
     ///
-    /// 1. The user did onboard to Freemium PIR
+    /// 1. The user did onboard to Freemium DBP
     /// 2. The feature flag is disabled
     /// 3. The user `isPotentialPrivacyProSubscriber` (see definition)
     var shouldDisableAndDelete: Bool {
-        guard freemiumPIRUserStateManager.didOnboard else { return false }
+        guard freemiumDBPUserStateManager.didOnboard else { return false }
 
-        return !featureFlagger.isFeatureOn(.freemiumPIR)
+        return !featureFlagger.isFeatureOn(.freemiumDBP)
         && isPotentialPrivacyProSubscriber
     }
 
     /// This method offboards a Freemium user if the feature flag was disabled
     ///
     /// Offboarding involves:
-    /// - Resettting `FreemiumPIRUserStateManager`state
-    /// - Disabling and deleting PIR data
+    /// - Resettting `FreemiumDBPUserStateManager`state
+    /// - Disabling and deleting DBP data
     func offBoardIfNecessary() {
         if shouldDisableAndDelete {
-            freemiumPIRUserStateManager.didOnboard = false
+            freemiumDBPUserStateManager.didOnboard = false
             featureDisabler.disableAndDelete()
         }
     }

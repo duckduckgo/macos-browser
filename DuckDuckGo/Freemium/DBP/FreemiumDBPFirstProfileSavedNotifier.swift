@@ -26,18 +26,18 @@ import OSLog
 /// for Freemium users based on their onboarding status, authentication state, and if this is their first saved profile. This class ensures the notification is posted only once.
 final class FreemiumDBPFirstProfileSavedNotifier: DBPProfileSavedNotifier {
 
-    private var freemiumPIRUserStateManager: FreemiumPIRUserStateManager
+    private var freemiumDBPUserStateManager: FreemiumDBPUserStateManager
     private var accountManager: AccountManager
     private let notificationCenter: NotificationCenter
 
     /// Initializes the notifier with the necessary dependencies to check user state and post notifications.
     ///
     /// - Parameters:
-    ///   - freemiumPIRUserStateManager: Manages the user state related to Freemium PIR.
+    ///   - freemiumDBPUserStateManager: Manages the user state related to Freemium DBP.
     ///   - accountManager: Manages account-related information, such as whether the user is authenticated.
     ///   - notificationCenter: The notification center for posting notifications. Defaults to the system's default notification center.
-    init(freemiumPIRUserStateManager: FreemiumPIRUserStateManager, accountManager: AccountManager, notificationCenter: NotificationCenter = .default) {
-        self.freemiumPIRUserStateManager = freemiumPIRUserStateManager
+    init(freemiumDBPUserStateManager: FreemiumDBPUserStateManager, accountManager: AccountManager, notificationCenter: NotificationCenter = .default) {
+        self.freemiumDBPUserStateManager = freemiumDBPUserStateManager
         self.accountManager = accountManager
         self.notificationCenter = notificationCenter
     }
@@ -50,12 +50,12 @@ final class FreemiumDBPFirstProfileSavedNotifier: DBPProfileSavedNotifier {
     /// If all conditions are met, the method posts a `pirProfileSaved` notification via the `NotificationCenter` and records that the notification has been posted.
     func postProfileSavedNotificationIfPermitted() {
         guard !accountManager.isUserAuthenticated
-                && freemiumPIRUserStateManager.didOnboard
-                && !freemiumPIRUserStateManager.didPostFirstProfileSavedNotification else { return }
+                && freemiumDBPUserStateManager.didOnboard
+                && !freemiumDBPUserStateManager.didPostFirstProfileSavedNotification else { return }
 
         Logger.freemiumDBP.debug("[Freemium DBP] Posting Profile Saved Notification")
         notificationCenter.post(name: .pirProfileSaved, object: nil)
 
-        freemiumPIRUserStateManager.didPostFirstProfileSavedNotification = true
+        freemiumDBPUserStateManager.didPostFirstProfileSavedNotification = true
     }
 }

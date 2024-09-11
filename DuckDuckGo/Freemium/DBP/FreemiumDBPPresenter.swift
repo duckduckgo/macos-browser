@@ -1,5 +1,5 @@
 //
-//  FreemiumPIRPresenter.swift
+//  FreemiumDBPPresenter.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -18,20 +18,20 @@
 
 import Foundation
 
-/// Conforming types provide functionality to show Freemium PIR
-protocol FreemiumPIRPresenter {
-    func showFreemiumPIR(didOnboard: Bool, windowControllerManager: WindowControllersManagerProtocol?)
+/// Conforming types provide functionality to show Freemium DBP
+protocol FreemiumDBPPresenter {
+    func showFreemiumDBP(didOnboard: Bool, windowControllerManager: WindowControllersManagerProtocol?)
 }
 
-/// Default implementation of `FreemiumPIRPresenter`
-struct DefaultFreemiumPIRPresenter: FreemiumPIRPresenter {
+/// Default implementation of `FreemiumDBPPresenter`
+struct DefaultFreemiumDBPPresenter: FreemiumDBPPresenter {
 
     @MainActor
-    /// Displays Freemium PIR
-    /// If the `didOnboard` parameter is true, opens PIR directly
-    /// If the `didOnboard` parameter is false, opens Freemium PIR onboarding
+    /// Displays Freemium DBP
+    /// If the `didOnboard` parameter is true, opens DBP directly
+    /// If the `didOnboard` parameter is false, opens Freemium DBP onboarding
     /// - Parameter didOnboard: Bool indicating if the user has onboarded already
-    func showFreemiumPIR(didOnboard: Bool, windowControllerManager: WindowControllersManagerProtocol? = nil) {
+    func showFreemiumDBP(didOnboard: Bool, windowControllerManager: WindowControllersManagerProtocol? = nil) {
 
         let windowControllerManager = windowControllerManager ?? WindowControllersManager.shared
 
@@ -39,15 +39,15 @@ struct DefaultFreemiumPIRPresenter: FreemiumPIRPresenter {
             windowControllerManager.showTab(with: .dataBrokerProtection)
         } else  {
             // TODO: - Onboard (i.e Ts and Cs)
-            showFreemiumPIROnboarding()
+            showFreemiumDBPOnboarding()
         }
     }
 }
 
-private extension DefaultFreemiumPIRPresenter {
+private extension DefaultFreemiumDBPPresenter {
 
     @MainActor
-    func showFreemiumPIROnboarding() {
+    func showFreemiumDBPOnboarding() {
         // TODO: - Show onboarding if we decide to do this
     }
 }

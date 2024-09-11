@@ -21,16 +21,16 @@ import XCTest
 
 final class FreemiumDBPFirstProfileSavedNotifierTests: XCTestCase {
 
-    private var mockFreemiumPIRUserStateManager: MockFreemiumPIRUserStateManager!
+    private var mockFreemiumDBPUserStateManager: MockFreemiumDBPUserStateManager!
     private var mockAccountManager: MockAccountManager!
     private var mockNotificationCenter: MockNotificationCenter!
     private var sut: FreemiumDBPFirstProfileSavedNotifier!
 
     override func setUpWithError() throws {
-        mockFreemiumPIRUserStateManager = MockFreemiumPIRUserStateManager()
+        mockFreemiumDBPUserStateManager = MockFreemiumDBPUserStateManager()
         mockAccountManager = MockAccountManager()
         mockNotificationCenter = MockNotificationCenter()
-        sut = FreemiumDBPFirstProfileSavedNotifier(freemiumPIRUserStateManager: mockFreemiumPIRUserStateManager,
+        sut = FreemiumDBPFirstProfileSavedNotifier(freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager,
                                                    accountManager: mockAccountManager,
                                                    notificationCenter: mockNotificationCenter)
     }
@@ -38,8 +38,8 @@ final class FreemiumDBPFirstProfileSavedNotifierTests: XCTestCase {
     func testWhenAllCriteriaSatisfied_thenNotificationShouldBePosted() {
         // Given
         mockAccountManager.accessToken = nil
-        mockFreemiumPIRUserStateManager.didOnboard = true
-        mockFreemiumPIRUserStateManager.didPostFirstProfileSavedNotification = false
+        mockFreemiumDBPUserStateManager.didOnboard = true
+        mockFreemiumDBPUserStateManager.didPostFirstProfileSavedNotification = false
 
         // When
         sut.postProfileSavedNotificationIfPermitted()
@@ -47,14 +47,14 @@ final class FreemiumDBPFirstProfileSavedNotifierTests: XCTestCase {
         // Then
         XCTAssertTrue(mockNotificationCenter.didCallPostNotification)
         XCTAssertEqual(mockNotificationCenter.lastPostedNotification, .pirProfileSaved)
-        XCTAssertTrue(mockFreemiumPIRUserStateManager.didPostFirstProfileSavedNotification)
+        XCTAssertTrue(mockFreemiumDBPUserStateManager.didPostFirstProfileSavedNotification)
     }
 
     func testWhenUserIsAuthenticated_thenNotificationShouldNotBePosted() {
         // Given
         mockAccountManager.accessToken = "some_token"
-        mockFreemiumPIRUserStateManager.didOnboard = true
-        mockFreemiumPIRUserStateManager.didPostFirstProfileSavedNotification = false
+        mockFreemiumDBPUserStateManager.didOnboard = true
+        mockFreemiumDBPUserStateManager.didPostFirstProfileSavedNotification = false
 
         // When
         sut.postProfileSavedNotificationIfPermitted()
@@ -66,8 +66,8 @@ final class FreemiumDBPFirstProfileSavedNotifierTests: XCTestCase {
     func testWhenUserHasNotCompletedOnboarding_thenNotificationShouldNotBePosted() {
         // Given
         mockAccountManager.accessToken = nil
-        mockFreemiumPIRUserStateManager.didOnboard = false
-        mockFreemiumPIRUserStateManager.didPostFirstProfileSavedNotification = false
+        mockFreemiumDBPUserStateManager.didOnboard = false
+        mockFreemiumDBPUserStateManager.didPostFirstProfileSavedNotification = false
 
         // When
         sut.postProfileSavedNotificationIfPermitted()
@@ -79,8 +79,8 @@ final class FreemiumDBPFirstProfileSavedNotifierTests: XCTestCase {
     func testWhenNotificationAlreadyPosted_thenShouldNotPostAgain() {
         // Given
         mockAccountManager.accessToken = nil
-        mockFreemiumPIRUserStateManager.didOnboard = true
-        mockFreemiumPIRUserStateManager.didPostFirstProfileSavedNotification = true
+        mockFreemiumDBPUserStateManager.didOnboard = true
+        mockFreemiumDBPUserStateManager.didPostFirstProfileSavedNotification = true
 
         // When
         sut.postProfileSavedNotificationIfPermitted()
@@ -92,8 +92,8 @@ final class FreemiumDBPFirstProfileSavedNotifierTests: XCTestCase {
     func testWhenNotificationIsPosted_thenStateShouldBeUpdated() {
         // Given
         mockAccountManager.accessToken = nil
-        mockFreemiumPIRUserStateManager.didOnboard = true
-        mockFreemiumPIRUserStateManager.didPostFirstProfileSavedNotification = false
+        mockFreemiumDBPUserStateManager.didOnboard = true
+        mockFreemiumDBPUserStateManager.didPostFirstProfileSavedNotification = false
 
         // When
         sut.postProfileSavedNotificationIfPermitted()
@@ -101,6 +101,6 @@ final class FreemiumDBPFirstProfileSavedNotifierTests: XCTestCase {
         // Then
         XCTAssertTrue(mockNotificationCenter.didCallPostNotification)
         XCTAssertEqual(mockNotificationCenter.lastPostedNotification, .pirProfileSaved)
-        XCTAssertTrue(mockFreemiumPIRUserStateManager.didPostFirstProfileSavedNotification)
+        XCTAssertTrue(mockFreemiumDBPUserStateManager.didPostFirstProfileSavedNotification)
     }
 }

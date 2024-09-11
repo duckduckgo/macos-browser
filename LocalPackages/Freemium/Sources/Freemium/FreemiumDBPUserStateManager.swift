@@ -1,5 +1,5 @@
 //
-//  FreemiumPIRUserStateManager.swift
+//  FreemiumDBPUserStateManager.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -38,13 +38,13 @@ public struct FreemiumDBPMatchResults: Codable, Equatable {
     }
 }
 
-/// Protocol that manages the user's state in the FreemiumPIR feature.
+/// Protocol that manages the user's state in the FreemiumDBP feature.
 ///
 /// The properties in this protocol represent the various states and milestones in the user journey,
 /// such as whether onboarding is complete, notifications have been posted, and important timestamps or data points.
 ///
 /// Conforming types are responsible for persisting and retrieving these values.
-public protocol FreemiumPIRUserStateManager {
+public protocol FreemiumDBPUserStateManager {
 
     /// A boolean value indicating whether the user has completed the onboarding process.
     var didOnboard: Bool { get set }
@@ -65,28 +65,28 @@ public protocol FreemiumPIRUserStateManager {
     var firstScanResults: FreemiumDBPMatchResults? { get set }
 }
 
-/// Default implementation of `FreemiumPIRUserStateManager` that uses `UserDefaults` for underlying storage.
+/// Default implementation of `FreemiumDBPUserStateManager` that uses `UserDefaults` for underlying storage.
 ///
 /// Each property in this class corresponds to a specific `UserDefaults` key to maintain persistence across app sessions.
-public final class DefaultFreemiumPIRUserStateManager: FreemiumPIRUserStateManager {
+public final class DefaultFreemiumDBPUserStateManager: FreemiumDBPUserStateManager {
 
     /// Keys for storing the values in `UserDefaults`.
     private enum Keys {
-        static let didOnboard = "macos.browser.freemium.pir.did.onboard"
-        static let didPostFirstProfileSavedNotification = "macos.browser.freemium.pir.did.post.first.profile.saved.notification"
-        static let didPostResultsNotification = "macos.browser.freemium.pir.did.post.results.notification"
-        static let didDismissHomePagePromotion = "macos.browser.freemium.pir.did.post.dismiss.home.page.promotion"
-        static let firstProfileSavedTimestamp = "macos.browser.freemium.pir.first.profile.saved.timestamp"
-        static let firstScanResults = "macos.browser.freemium.pir.first.scan.results"
+        static let didOnboard = "macos.browser.freemium.dbp.did.onboard"
+        static let didPostFirstProfileSavedNotification = "macos.browser.freemium.dbp.did.post.first.profile.saved.notification"
+        static let didPostResultsNotification = "macos.browser.freemium.dbp.did.post.results.notification"
+        static let didDismissHomePagePromotion = "macos.browser.freemium.dbp.did.post.dismiss.home.page.promotion"
+        static let firstProfileSavedTimestamp = "macos.browser.freemium.dbp.first.profile.saved.timestamp"
+        static let firstScanResults = "macos.browser.freemium.dbp.first.scan.results"
     }
 
     private let userDefaults: UserDefaults
 
-    // MARK: - FreemiumPIRUserStateManager Properties
+    // MARK: - FreemiumDBPUserStateManager Properties
 
     /// Tracks whether the user has completed the onboarding process.
     ///
-    /// - Uses the `UserDefaults` key: `macos.browser.freemium.pir.did.onboard`.
+    /// - Uses the `UserDefaults` key: `macos.browser.freemium.dbp.did.onboard`.
     public var didOnboard: Bool {
         get {
             userDefaults.bool(forKey: Keys.didOnboard)
@@ -98,7 +98,7 @@ public final class DefaultFreemiumPIRUserStateManager: FreemiumPIRUserStateManag
 
     /// Tracks the timestamp of when the user saved their first profile.
     ///
-    /// - Uses the `UserDefaults` key: `macos.browser.freemium.pir.first.profile.saved.timestamp`.
+    /// - Uses the `UserDefaults` key: `macos.browser.freemium.dbp.first.profile.saved.timestamp`.
     public var firstProfileSavedTimestamp: String? {
         get {
             userDefaults.value(forKey: Keys.firstProfileSavedTimestamp) as? String
@@ -110,7 +110,7 @@ public final class DefaultFreemiumPIRUserStateManager: FreemiumPIRUserStateManag
 
     /// Tracks whether the "First Profile Saved" notification has been posted.
     ///
-    /// - Uses the `UserDefaults` key: `macos.browser.freemium.pir.did.post.first.profile.saved.notification`.
+    /// - Uses the `UserDefaults` key: `macos.browser.freemium.dbp.did.post.first.profile.saved.notification`.
     public var didPostFirstProfileSavedNotification: Bool {
         get {
             userDefaults.bool(forKey: Keys.didPostFirstProfileSavedNotification)
@@ -122,7 +122,7 @@ public final class DefaultFreemiumPIRUserStateManager: FreemiumPIRUserStateManag
 
     /// Tracks whether the results notification has been posted.
     ///
-    /// - Uses the `UserDefaults` key: `macos.browser.freemium.pir.did.post.results.notification`.
+    /// - Uses the `UserDefaults` key: `macos.browser.freemium.dbp.did.post.results.notification`.
     public var didPostResultsNotification: Bool {
         get {
             userDefaults.bool(forKey: Keys.didPostResultsNotification)
@@ -135,7 +135,7 @@ public final class DefaultFreemiumPIRUserStateManager: FreemiumPIRUserStateManag
     /// Tracks the results of the user's first scan.
     ///
     /// This value is stored as a `FreemiumDBPMatchResults` object, encoded and decoded using `JSONEncoder` and `JSONDecoder`.
-    /// - Uses the `UserDefaults` key: `macos.browser.freemium.pir.first.scan.results`.
+    /// - Uses the `UserDefaults` key: `macos.browser.freemium.dbp.first.scan.results`.
     public var firstScanResults: FreemiumDBPMatchResults? {
         get {
             guard let data = userDefaults.object(forKey: Keys.firstScanResults) as? Data,
@@ -151,7 +151,7 @@ public final class DefaultFreemiumPIRUserStateManager: FreemiumPIRUserStateManag
 
     /// Tracks whether the user has dismissed the homepage promotion.
     ///
-    /// - Uses the `UserDefaults` key: `macos.browser.freemium.pir.did.post.dismiss.home.page.promotion`.
+    /// - Uses the `UserDefaults` key: `macos.browser.freemium.dbp.did.post.dismiss.home.page.promotion`.
     public var didDismissHomePagePromotion: Bool {
         get {
             userDefaults.bool(forKey: Keys.didDismissHomePagePromotion)
@@ -163,7 +163,7 @@ public final class DefaultFreemiumPIRUserStateManager: FreemiumPIRUserStateManag
 
     // MARK: - Initialization
 
-    /// Initializes a new instance of `DefaultFreemiumPIRUserStateManager`.
+    /// Initializes a new instance of `DefaultFreemiumDBPUserStateManager`.
     ///
     /// - Parameter userDefaults: The `UserDefaults` instance used to store and retrieve the user's state data.
     ///

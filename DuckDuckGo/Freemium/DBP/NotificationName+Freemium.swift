@@ -19,7 +19,7 @@
 import Foundation
 
 extension Notification.Name {
-    /// Notification posted when `FreemiumPIRScanResultPolling` has finished polling for scan results
+    /// Notification posted when `FreemiumDBPScanResultPolling` has finished polling for scan results
     static let freemiumDBPResultPollingComplete = Notification.Name("freemiumDBPResultPollingComplete")
     /// Notification posted when the user has entered Freemium DBP via a non-new tab entry point (e.g. via the meatball menu item)
     static let freemiumDBPEntryPointActivated = Notification.Name("freemiumDBPEntryPointActivated")

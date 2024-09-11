@@ -36,7 +36,7 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
     private let userDefaults: UserDefaults
     private let subscriptionAvailability: SubscriptionFeatureAvailability
     private let accountManager: AccountManager
-    private let freemiumPIRUserStateManager: FreemiumPIRUserStateManager
+    private let freemiumDBPUserStateManager: FreemiumDBPUserStateManager
 
     init(privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
          featureDisabler: DataBrokerProtectionFeatureDisabling = DataBrokerProtectionFeatureDisabler(),
@@ -44,14 +44,14 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
          userDefaults: UserDefaults = .standard,
          subscriptionAvailability: SubscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability(),
          accountManager: AccountManager,
-         freemiumPIRUserStateManager: FreemiumPIRUserStateManager) {
+         freemiumDBPUserStateManager: FreemiumDBPUserStateManager) {
         self.privacyConfigurationManager = privacyConfigurationManager
         self.featureDisabler = featureDisabler
         self.pixelHandler = pixelHandler
         self.userDefaults = userDefaults
         self.subscriptionAvailability = subscriptionAvailability
         self.accountManager = accountManager
-        self.freemiumPIRUserStateManager = freemiumPIRUserStateManager
+        self.freemiumDBPUserStateManager = freemiumDBPUserStateManager
     }
 
     var isUserLocaleAllowed: Bool {
@@ -78,7 +78,7 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
         Logger.dataBrokerProtection.debug("Disabling and removing DBP for all users")
     }
 
-    /// Checks PIR prerequisites
+    /// Checks DBP prerequisites
     ///
     /// Prerequisites are satisified if either:
     /// 1. The user is an active freemium user (e.g has onboarded to freemium and is not authenticated)
@@ -88,7 +88,7 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
     func arePrerequisitesSatisfied() async -> Bool {
 
         let isAuthenticated = accountManager.isUserAuthenticated
-        if !isAuthenticated && freemiumPIRUserStateManager.didOnboard { return true }
+        if !isAuthenticated && freemiumDBPUserStateManager.didOnboard { return true }
 
         let entitlements = await accountManager.hasEntitlement(forProductName: .dataBrokerProtection,
                                                                cachePolicy: .reloadIgnoringLocalCacheData)
