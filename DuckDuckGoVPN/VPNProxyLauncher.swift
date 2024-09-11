@@ -89,12 +89,16 @@ final class VPNProxyLauncher {
 
             isControllingProxy = true
 
+            defer {
+                isControllingProxy = false
+            }
+
             // When we're auto-starting the proxy because its own status changed to
             // disconnected, we want to give it a pause because if it fails to connect again
             // we risk the proxy entering a frenetic connect / disconnect loop
             if isProxyConnectionStatusChange {
                 // If the proxy connection was stopped, let's wait a bit before trying to enable it again
-                try await Task.sleep(interval: .seconds(10))
+                try await Task.sleep(interval: .seconds(1))
 
                 // And we want to check again if the proxy still needs to start after waiting
                 guard await shouldStartProxy else {
@@ -104,9 +108,7 @@ final class VPNProxyLauncher {
 
             do {
                 try await proxyController.start()
-                isControllingProxy = false
             } catch {
-                isControllingProxy = false
                 throw error
             }
         } else if await shouldStopProxy {
