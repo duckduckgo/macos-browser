@@ -99,10 +99,10 @@ final class ExcludedDomainsViewController: NSViewController {
     }
 
     @IBAction func addDomain(_ sender: NSButton) {
-        AddExcludedDomainView(title: "Add Website Exclusion", buttonsState: .compressed, cancelActionTitle: "Cancel", cancelAction: { dismiss in
+        AddExcludedDomainView(title: UserText.vpnAddExcludedDomainTitle, buttonsState: .compressed, cancelActionTitle: UserText.vpnAddExcludedDomainCancelButtonTitle, cancelAction: { dismiss in
 
             dismiss()
-        }, defaultActionTitle: "Add Website") { [weak self] domain, dismiss in
+        }, defaultActionTitle: UserText.vpnAddExcludedDomainActionButtonTitle) { [weak self] domain, dismiss in
             guard let self else { return }
 
             addDomain(domain)
