@@ -306,6 +306,8 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         case .nonEmpty:
             emptyState.isHidden = true
             tableView.isHidden = false
+            searchBar.isEnabled = true
+            sortItemsButton.isEnabled = true
         }
     }
 
@@ -316,6 +318,8 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         emptyStateMessage.stringValue = mode.description
         emptyStateImageView.image = mode.image
         importButton.isHidden = mode.shouldHideImportButton
+        searchBar.isEnabled = mode != .noBookmarks
+        sortItemsButton.isEnabled = mode != .noBookmarks
     }
 
     @objc func onImportClicked(_ sender: NSButton) {
