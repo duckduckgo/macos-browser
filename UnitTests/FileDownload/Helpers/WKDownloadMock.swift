@@ -31,8 +31,9 @@ final class WKDownloadMock: NSObject, WebKitDownload, ProgressReporting {
     }
 
     var cancelBlock: (() -> Void)?
-    @objc func cancel() {
+    func cancel(_ completionHandler: ((Data?) -> Void)?) {
         cancelBlock?()
+        completionHandler?(nil)
     }
 
     func asWKDownload() -> WKDownload {
