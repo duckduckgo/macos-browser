@@ -85,6 +85,18 @@ extension String {
         self.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
+    func removingAccents() -> String {
+        // Normalize the string to NFD (Normalization Form Decomposition)
+        let normalizedString = self as NSString
+        let range = NSRange(location: 0, length: normalizedString.length)
+
+        // Apply the transform to remove diacritics
+        let transformedString = normalizedString.applyingTransform(.toLatin, reverse: false) ?? ""
+        let finalString = transformedString.applyingTransform(.stripCombiningMarks, reverse: false) ?? ""
+
+        return finalString
+    }
+
     // MARK: - URL
 
     var url: URL? {
