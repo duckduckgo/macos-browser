@@ -67,7 +67,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         let item: SUAppcastItem
         let isInstalled: Bool
     }
-    private var updateCheckResult: UpdateCheckResult?
+    private var cachedUpdateResult: UpdateCheckResult?
 
     init(internalUserDecider: InternalUserDecider) {
         willRelaunchAppPublisher = willRelaunchAppSubject.eraseToAnyPublisher()
@@ -79,8 +79,8 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
 
     @Published private(set) var updateProgress = UpdateCycleProgress.default {
         didSet {
-            if let updateCheckResult {
-                latestUpdate = Update(appcastItem: updateCheckResult.item, isInstalled: updateCheckResult.isInstalled)
+            if let cachedUpdateResult {
+                latestUpdate = Update(appcastItem: cachedUpdateResult.item, isInstalled: cachedUpdateResult.isInstalled)
                 hasPendingUpdate = latestUpdate?.isInstalled == false && updateProgress.isIdle
                 needsNotificationDot = hasPendingUpdate
             }
@@ -97,10 +97,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     @Published private(set) var hasPendingUpdate = false
     var hasPendingUpdatePublisher: Published<Bool>.Publisher { $hasPendingUpdate }
 
-    var lastUpdateCheckDate: Date? {
-        updater?.lastUpdateCheckDate
-    }
-
+    var lastUpdateCheckDate: Date? { updater?.lastUpdateCheckDate }
     var lastUpdateNotificationShownDate: Date = .distantPast
 
     private var shouldShowUpdateNotification: Bool {
@@ -112,6 +109,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         didSet {
             Logger.updates.debug("areAutomaticUpdatesEnabled: \(self.areAutomaticUpdatesEnabled)")
             if oldValue != areAutomaticUpdatesEnabled {
+                userDriver?.cancelAndDismissCurrentUpdate()
                 try? configureUpdater()
             }
         }
@@ -157,8 +155,8 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     // MARK: - Private
 
     private func configureUpdater() throws {
-        // Workaround to restart the updater state
-        updateCheckResult = nil
+        // Workaround to reset the updater state
+        cachedUpdateResult = nil
         latestUpdate = nil
 
         // The default configuration of Sparkle updates is in Info.plist
@@ -236,7 +234,7 @@ extension UpdateController: SPUUpdaterDelegate {
     func updater(_ updater: SPUUpdater, didFindValidUpdate item: SUAppcastItem) {
         Logger.updates.debug("Updater did find valid update: \(item.displayVersionString)(\(item.versionString))")
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidFindUpdate))
-        updateCheckResult = UpdateCheckResult(item: item, isInstalled: false)
+        cachedUpdateResult = UpdateCheckResult(item: item, isInstalled: false)
     }
 
     func updaterDidNotFindUpdate(_ updater: SPUUpdater, error: any Error) {
@@ -246,7 +244,7 @@ extension UpdateController: SPUUpdaterDelegate {
         Logger.updates.debug("Updater did not find update: \(String(describing: item.displayVersionString))(\(String(describing: item.versionString)))")
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidNotFindUpdate, error: error))
 
-        updateCheckResult = UpdateCheckResult(item: item, isInstalled: true)
+        cachedUpdateResult = UpdateCheckResult(item: item, isInstalled: true)
     }
 
     func updater(_ updater: SPUUpdater, didDownloadUpdate item: SUAppcastItem) {
