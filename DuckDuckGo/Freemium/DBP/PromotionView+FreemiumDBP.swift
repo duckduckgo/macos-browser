@@ -1,5 +1,5 @@
 //
-//  PromotionView+FreemiumPIR.swift
+//  PromotionView+FreemiumDBP.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -19,11 +19,11 @@
 import Foundation
 
 extension PromotionViewModel {
-    static func freemiumPIRPromotion(proceedAction: @escaping () -> Void,
+    static func freemiumDBPPromotion(proceedAction: @escaping () -> Void,
                                      closeAction: @escaping () -> Void) -> PromotionViewModel {
 
-        let subtitle = UserText.homePagePromotionFreemiumPIRSubtitle
-        let actionButtonText = UserText.homePagePromotionFreemiumPIRButtonTitle
+        let subtitle = UserText.homePagePromotionFreemiumDBPSubtitle
+        let actionButtonText = UserText.homePagePromotionFreemiumDBPButtonTitle
 
         return PromotionViewModel(image: .radarCheck,
                                   subtitle: subtitle,
@@ -32,25 +32,25 @@ extension PromotionViewModel {
                                   closeAction: closeAction)
     }
 
-    static func freemiumPIRPromotionScanEngagementResults(resultCount: Int,
+    static func freemiumDBPPromotionScanEngagementResults(resultCount: Int,
                                                           brokerCount: Int,
                                                           proceedAction: @escaping () -> Void,
                                                           closeAction: @escaping () -> Void) -> PromotionViewModel {
 
-        var title = UserText.homePagePromotionFreemiumPIRPostScanEngagementResultsTitle
+        var title = UserText.homePagePromotionFreemiumDBPPostScanEngagementResultsTitle
         var subtitle = ""
 
         switch (resultCount, brokerCount) {
         case (1, _):
-            subtitle = UserText.homePagePromotionFreemiumPIRPostScanEngagementResultSingleMatchSubtitle
+            subtitle = UserText.homePagePromotionFreemiumDBPPostScanEngagementResultSingleMatchSubtitle
         case (let resultCount, 1):
-            subtitle = UserText.homePagePromotionFreemiumPIRPostScanEngagementResultSingleBrokerSubtitle(resultCount: resultCount)
+            subtitle = UserText.homePagePromotionFreemiumDBPPostScanEngagementResultSingleBrokerSubtitle(resultCount: resultCount)
         default:
-            subtitle = UserText.homePagePromotionFreemiumPIRPostScanEngagementResultPluralSubtitle(resultCount: resultCount,
+            subtitle = UserText.homePagePromotionFreemiumDBPPostScanEngagementResultPluralSubtitle(resultCount: resultCount,
                                                                                                    brokerCount: brokerCount)
         }
 
-        let actionButtonText = UserText.homePagePromotionFreemiumPIRPostScanEngagementButtonTitle
+        let actionButtonText = UserText.homePagePromotionFreemiumDBPPostScanEngagementButtonTitle
 
         return PromotionViewModel(image: .radarCheck,
                                   title: title,
@@ -60,12 +60,12 @@ extension PromotionViewModel {
                                   closeAction: closeAction)
     }
 
-    static func freemiumPIRPromotionScanEngagementNoResults(proceedAction: @escaping () -> Void,
+    static func freemiumDBPPromotionScanEngagementNoResults(proceedAction: @escaping () -> Void,
                                                             closeAction: @escaping () -> Void) -> PromotionViewModel {
 
-        let title = UserText.homePagePromotionFreemiumPIRPostScanEngagementNoResultsTitle
-        let subtitle = UserText.homePagePromotionFreemiumPIRPostScanEngagementNoResultsSubtitle
-        let actionButtonText = UserText.homePagePromotionFreemiumPIRPostScanEngagementButtonTitle
+        let title = UserText.homePagePromotionFreemiumDBPPostScanEngagementNoResultsTitle
+        let subtitle = UserText.homePagePromotionFreemiumDBPPostScanEngagementNoResultsSubtitle
+        let actionButtonText = UserText.homePagePromotionFreemiumDBPPostScanEngagementButtonTitle
 
         return PromotionViewModel(image: .radarCheck,
                                   title: title,

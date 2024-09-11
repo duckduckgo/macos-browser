@@ -85,13 +85,13 @@ public class DataBrokerProtectionAgentManagerProvider {
                                                          emailService: emailService,
                                                          captchaService: captchaService)
 
-        let freemiumPIRUserStateManager = DefaultFreemiumPIRUserStateManager(userDefaults: .dbp)
+        let freemiumDBPUserStateManager = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp)
 
         let agentstopper = DefaultDataBrokerProtectionAgentStopper(dataManager: dataManager,
                                                                    entitlementMonitor: DataBrokerProtectionEntitlementMonitor(),
                                                                    authenticationManager: authenticationManager,
                                                                    pixelHandler: pixelHandler,
-                                                                   freemiumPIRUserStateManager: freemiumPIRUserStateManager)
+                                                                   freemiumDBPUserStateManager: freemiumDBPUserStateManager)
 
         let operationDependencies = DefaultDataBrokerOperationDependencies(
             database: dataManager.database,
@@ -113,7 +113,7 @@ public class DataBrokerProtectionAgentManagerProvider {
             configurationManager: configurationManager,
             privacyConfigurationManager: privacyConfigurationManager,
             authenticationManager: authenticationManager,
-            freemiumPIRUserStateManager: freemiumPIRUserStateManager)
+            freemiumDBPUserStateManager: freemiumDBPUserStateManager)
     }
 }
 
@@ -130,7 +130,7 @@ public final class DataBrokerProtectionAgentManager {
     private let configurationManger: DefaultConfigurationManager
     private let privacyConfigurationManager: DBPPrivacyConfigurationManager
     private let authenticationManager: DataBrokerProtectionAuthenticationManaging
-    private let freemiumPIRUserStateManager: FreemiumPIRUserStateManager
+    private let freemiumDBPUserStateManager: FreemiumDBPUserStateManager
 
     // Used for debug functions only, so not injected
     private lazy var browserWindowManager = BrowserWindowManager()
@@ -150,7 +150,7 @@ public final class DataBrokerProtectionAgentManager {
          configurationManager: DefaultConfigurationManager,
          privacyConfigurationManager: DBPPrivacyConfigurationManager,
          authenticationManager: DataBrokerProtectionAuthenticationManaging,
-         freemiumPIRUserStateManager: FreemiumPIRUserStateManager
+         freemiumDBPUserStateManager: FreemiumDBPUserStateManager
     ) {
         self.userNotificationService = userNotificationService
         self.activityScheduler = activityScheduler
@@ -163,7 +163,7 @@ public final class DataBrokerProtectionAgentManager {
         self.configurationManger = configurationManager
         self.privacyConfigurationManager = privacyConfigurationManager
         self.authenticationManager = authenticationManager
-        self.freemiumPIRUserStateManager = freemiumPIRUserStateManager
+        self.freemiumDBPUserStateManager = freemiumDBPUserStateManager
 
         self.activityScheduler.delegate = self
         self.ipcServer.serverDelegate = self

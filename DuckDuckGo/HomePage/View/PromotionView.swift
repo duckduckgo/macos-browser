@@ -108,5 +108,5 @@ extension HomePage.Views {
 }
 
 #Preview {
-    return HomePage.Views.PromotionView(viewModel: PromotionViewModel.freemiumPIRPromotion(proceedAction: {}, closeAction: {}))
+    return HomePage.Views.PromotionView(viewModel: PromotionViewModel.freemiumDBPPromotion(proceedAction: {}, closeAction: {}))
 }

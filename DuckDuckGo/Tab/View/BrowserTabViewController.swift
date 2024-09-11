@@ -792,11 +792,11 @@ final class BrowserTabViewController: NSViewController {
     private func homePageViewControllerCreatingIfNeeded() -> HomePageViewController {
         return homePageViewController ?? {
             let subscriptionManager = Application.appDelegate.subscriptionManager
-            let freemiumDBPUserStateManager = DefaultFreemiumPIRUserStateManager(userDefaults: .dbp)
-            let freemiumPIRFeature = DefaultFreemiumPIRFeature(subscriptionManager: subscriptionManager, accountManager: subscriptionManager.accountManager, freemiumPIRUserStateManager: freemiumDBPUserStateManager)
+            let freemiumDBPUserStateManager = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp)
+            let freemiumDBPFeature = DefaultFreemiumDBPFeature(subscriptionManager: subscriptionManager, accountManager: subscriptionManager.accountManager, freemiumDBPUserStateManager: freemiumDBPUserStateManager)
 
             let freemiumDBPPromotionViewCoordinator = FreemiumDBPPromotionViewCoordinator(freemiumDBPUserStateManager: freemiumDBPUserStateManager,
-                                                                                             freemiumPIRFeature: freemiumPIRFeature)
+                                                                                             freemiumDBPFeature: freemiumDBPFeature)
             let homePageViewController = HomePageViewController(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager,
                                                                 freemiumDBPPromotionViewCoordinator: freemiumDBPPromotionViewCoordinator)
             self.homePageViewController = homePageViewController
@@ -810,9 +810,9 @@ final class BrowserTabViewController: NSViewController {
     private func dataBrokerProtectionHomeViewControllerCreatingIfNeeded() -> DBPHomeViewController {
         return dataBrokerProtectionHomeViewController ?? {
             let subscriptionManager = Application.appDelegate.subscriptionManager
-            let freemiumPIRUserStateManager = DefaultFreemiumPIRUserStateManager(userDefaults: .dbp)
-            let freemiumPIRFeature = DefaultFreemiumPIRFeature(subscriptionManager: subscriptionManager, accountManager: subscriptionManager.accountManager, freemiumPIRUserStateManager: freemiumPIRUserStateManager)
-            let dataBrokerProtectionHomeViewController = DBPHomeViewController(dataBrokerProtectionManager: DataBrokerProtectionManager.shared, freemiumPIRFeature: freemiumPIRFeature)
+            let freemiumDBPUserStateManager = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp)
+            let freemiumDBPFeature = DefaultFreemiumDBPFeature(subscriptionManager: subscriptionManager, accountManager: subscriptionManager.accountManager, freemiumDBPUserStateManager: freemiumDBPUserStateManager)
+            let dataBrokerProtectionHomeViewController = DBPHomeViewController(dataBrokerProtectionManager: DataBrokerProtectionManager.shared, freemiumDBPFeature: freemiumDBPFeature)
             self.dataBrokerProtectionHomeViewController = dataBrokerProtectionHomeViewController
             return dataBrokerProtectionHomeViewController
         }()

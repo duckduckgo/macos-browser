@@ -23,20 +23,20 @@ import Freemium
 final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
 
     private var sut: FreemiumDBPPromotionViewCoordinator!
-    private var mockUserStateManager: MockFreemiumPIRUserStateManager!
-    private var mockFeature: MockFreemiumPIRFeature!
-    private var mockPresenter: MockFreemiumPIRPresenter!
+    private var mockUserStateManager: MockFreemiumDBPUserStateManager!
+    private var mockFeature: MockFreemiumDBPFeature!
+    private var mockPresenter: MockFreemiumDBPPresenter!
 
     @MainActor
     override func setUpWithError() throws {
-        mockUserStateManager = MockFreemiumPIRUserStateManager()
-        mockFeature = MockFreemiumPIRFeature()
-        mockPresenter = MockFreemiumPIRPresenter()
+        mockUserStateManager = MockFreemiumDBPUserStateManager()
+        mockFeature = MockFreemiumDBPFeature()
+        mockPresenter = MockFreemiumDBPPresenter()
 
         sut = FreemiumDBPPromotionViewCoordinator(
             freemiumDBPUserStateManager: mockUserStateManager,
-            freemiumPIRFeature: mockFeature,
-            freemiumPIRPresenter: mockPresenter
+            freemiumDBPFeature: mockFeature,
+            freemiumDBPPresenter: mockPresenter
         )
     }
 
@@ -56,8 +56,8 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         // When
         sut = FreemiumDBPPromotionViewCoordinator(
             freemiumDBPUserStateManager: mockUserStateManager,
-            freemiumPIRFeature: mockFeature,
-            freemiumPIRPresenter: mockPresenter
+            freemiumDBPFeature: mockFeature,
+            freemiumDBPPresenter: mockPresenter
         )
 
         // Then
@@ -73,8 +73,8 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         // When
         sut = FreemiumDBPPromotionViewCoordinator(
             freemiumDBPUserStateManager: mockUserStateManager,
-            freemiumPIRFeature: mockFeature,
-            freemiumPIRPresenter: mockPresenter
+            freemiumDBPFeature: mockFeature,
+            freemiumDBPPresenter: mockPresenter
         )
 
         // Then
@@ -115,8 +115,8 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         let viewModel = sut.viewModel
 
         // Then
-        XCTAssertEqual(viewModel.title, UserText.homePagePromotionFreemiumPIRPostScanEngagementResultsTitle)
-        XCTAssertEqual(viewModel.subtitle, UserText.homePagePromotionFreemiumPIRPostScanEngagementResultPluralSubtitle(resultCount: 5, brokerCount: 2))
+        XCTAssertEqual(viewModel.title, UserText.homePagePromotionFreemiumDBPPostScanEngagementResultsTitle)
+        XCTAssertEqual(viewModel.subtitle, UserText.homePagePromotionFreemiumDBPPostScanEngagementResultPluralSubtitle(resultCount: 5, brokerCount: 2))
     }
 
     @MainActor
@@ -128,7 +128,7 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         let viewModel = sut.viewModel
 
         // Then
-        XCTAssertEqual(viewModel.subtitle, UserText.homePagePromotionFreemiumPIRSubtitle)
+        XCTAssertEqual(viewModel.subtitle, UserText.homePagePromotionFreemiumDBPSubtitle)
     }
 
     func testNotificationObservation_updatesPromotionVisibility() {

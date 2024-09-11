@@ -2785,18 +2785,18 @@
 		C17CA7AE2B9B52E6008EC3C1 /* NavigationBarPopoversTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17CA7AC2B9B52E6008EC3C1 /* NavigationBarPopoversTests.swift */; };
 		C17CA7B22B9B5317008EC3C1 /* MockAutofillPopoverPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17CA7B12B9B5317008EC3C1 /* MockAutofillPopoverPresenter.swift */; };
 		C17CA7B32B9B5317008EC3C1 /* MockAutofillPopoverPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17CA7B12B9B5317008EC3C1 /* MockAutofillPopoverPresenter.swift */; };
-		C18194592C7CA9AB00381092 /* FreemiumPIRFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18194582C7CA9AB00381092 /* FreemiumPIRFeatureTests.swift */; };
-		C181945A2C7CA9AB00381092 /* FreemiumPIRFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18194582C7CA9AB00381092 /* FreemiumPIRFeatureTests.swift */; };
+		C18194592C7CA9AB00381092 /* FreemiumDBPFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18194582C7CA9AB00381092 /* FreemiumDBPFeatureTests.swift */; };
+		C181945A2C7CA9AB00381092 /* FreemiumDBPFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18194582C7CA9AB00381092 /* FreemiumDBPFeatureTests.swift */; };
 		C181945C2C7CDCC700381092 /* PromotionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C181945B2C7CDCC700381092 /* PromotionView.swift */; };
 		C181945D2C7CDCC700381092 /* PromotionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C181945B2C7CDCC700381092 /* PromotionView.swift */; };
 		C181945F2C7CDD0E00381092 /* PromotionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C181945E2C7CDD0E00381092 /* PromotionViewModel.swift */; };
 		C18194602C7CDD0E00381092 /* PromotionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C181945E2C7CDD0E00381092 /* PromotionViewModel.swift */; };
-		C18194642C7DF7D600381092 /* FreemiumPIRPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18194632C7DF7D600381092 /* FreemiumPIRPresenter.swift */; };
-		C18194652C7DF7D600381092 /* FreemiumPIRPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18194632C7DF7D600381092 /* FreemiumPIRPresenter.swift */; };
-		C18194672C7F60E500381092 /* FreemiumPIRPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18194662C7F60E500381092 /* FreemiumPIRPresenterTests.swift */; };
-		C18194682C7F60E500381092 /* FreemiumPIRPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18194662C7F60E500381092 /* FreemiumPIRPresenterTests.swift */; };
-		C1858CD22C7C971D00C9BEAB /* FreemiumPIRFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1858CD12C7C971D00C9BEAB /* FreemiumPIRFeature.swift */; };
-		C1858CD32C7C971D00C9BEAB /* FreemiumPIRFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1858CD12C7C971D00C9BEAB /* FreemiumPIRFeature.swift */; };
+		C18194642C7DF7D600381092 /* FreemiumDBPPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18194632C7DF7D600381092 /* FreemiumDBPPresenter.swift */; };
+		C18194652C7DF7D600381092 /* FreemiumDBPPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18194632C7DF7D600381092 /* FreemiumDBPPresenter.swift */; };
+		C18194672C7F60E500381092 /* FreemiumDBPPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18194662C7F60E500381092 /* FreemiumDBPPresenterTests.swift */; };
+		C18194682C7F60E500381092 /* FreemiumDBPPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18194662C7F60E500381092 /* FreemiumDBPPresenterTests.swift */; };
+		C1858CD22C7C971D00C9BEAB /* FreemiumDBPFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1858CD12C7C971D00C9BEAB /* FreemiumDBPFeature.swift */; };
+		C1858CD32C7C971D00C9BEAB /* FreemiumDBPFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1858CD12C7C971D00C9BEAB /* FreemiumDBPFeature.swift */; };
 		C18BF9CC2C73678500ED6B8A /* Freemium in Frameworks */ = {isa = PBXBuildFile; productRef = C18BF9CB2C73678500ED6B8A /* Freemium */; };
 		C18BF9CE2C73678C00ED6B8A /* Freemium in Frameworks */ = {isa = PBXBuildFile; productRef = C18BF9CD2C73678C00ED6B8A /* Freemium */; };
 		C18BF9D02C736C9100ED6B8A /* Freemium in Frameworks */ = {isa = PBXBuildFile; productRef = C18BF9CF2C736C9100ED6B8A /* Freemium */; };
@@ -2809,12 +2809,12 @@
 		C1935A1C2C88F9ED001AD72D /* SyncPromoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1935A1A2C88F9ED001AD72D /* SyncPromoViewModel.swift */; };
 		C1B1CBE12BE1915100B6049C /* DataImportShortcutsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B1CBE02BE1915100B6049C /* DataImportShortcutsViewModel.swift */; };
 		C1B1CBE22BE1915100B6049C /* DataImportShortcutsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B1CBE02BE1915100B6049C /* DataImportShortcutsViewModel.swift */; };
-		C1C405872C7F80E50089DE8A /* PromotionView+FreemiumPIR.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1C405862C7F80E50089DE8A /* PromotionView+FreemiumPIR.swift */; };
-		C1C405882C7F80E50089DE8A /* PromotionView+FreemiumPIR.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1C405862C7F80E50089DE8A /* PromotionView+FreemiumPIR.swift */; };
-		C1CE84692C887CF60068913B /* FreemiumPIRScanResultPolling.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1CE84682C887CF60068913B /* FreemiumPIRScanResultPolling.swift */; };
-		C1CE846A2C887CF60068913B /* FreemiumPIRScanResultPolling.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1CE84682C887CF60068913B /* FreemiumPIRScanResultPolling.swift */; };
-		C1CE846C2C88868D0068913B /* FreemiumPIRScanResultPollingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1CE846B2C88868D0068913B /* FreemiumPIRScanResultPollingTests.swift */; };
-		C1CE846D2C88868D0068913B /* FreemiumPIRScanResultPollingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1CE846B2C88868D0068913B /* FreemiumPIRScanResultPollingTests.swift */; };
+		C1C405872C7F80E50089DE8A /* PromotionView+FreemiumDBP.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1C405862C7F80E50089DE8A /* PromotionView+FreemiumDBP.swift */; };
+		C1C405882C7F80E50089DE8A /* PromotionView+FreemiumDBP.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1C405862C7F80E50089DE8A /* PromotionView+FreemiumDBP.swift */; };
+		C1CE84692C887CF60068913B /* FreemiumDBPScanResultPolling.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1CE84682C887CF60068913B /* FreemiumDBPScanResultPolling.swift */; };
+		C1CE846A2C887CF60068913B /* FreemiumDBPScanResultPolling.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1CE84682C887CF60068913B /* FreemiumDBPScanResultPolling.swift */; };
+		C1CE846C2C88868D0068913B /* FreemiumDBPScanResultPollingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1CE846B2C88868D0068913B /* FreemiumDBPScanResultPollingTests.swift */; };
+		C1CE846D2C88868D0068913B /* FreemiumDBPScanResultPollingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1CE846B2C88868D0068913B /* FreemiumDBPScanResultPollingTests.swift */; };
 		C1D8BE452C1739E70057E426 /* DataBrokerProtectionMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1D8BE442C1739E70057E426 /* DataBrokerProtectionMocks.swift */; };
 		C1D8BE462C1739EC0057E426 /* DataBrokerProtectionMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1D8BE442C1739E70057E426 /* DataBrokerProtectionMocks.swift */; };
 		C1DAF3B52B9A44860059244F /* AutofillPopoverPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1DAF3B42B9A44860059244F /* AutofillPopoverPresenter.swift */; };
@@ -4609,15 +4609,16 @@
 		C1935A172C88F9D6001AD72D /* SyncPromoManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncPromoManager.swift; sourceTree = "<group>"; };
 		C1935A1A2C88F9ED001AD72D /* SyncPromoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncPromoViewModel.swift; sourceTree = "<group>"; };
 		C18194582C7CA9AB00381092 /* FreemiumPIRFeatureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreemiumPIRFeatureTests.swift; sourceTree = "<group>"; };
+		C18194582C7CA9AB00381092 /* FreemiumDBPFeatureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreemiumDBPFeatureTests.swift; sourceTree = "<group>"; };
 		C181945B2C7CDCC700381092 /* PromotionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionView.swift; sourceTree = "<group>"; };
 		C181945E2C7CDD0E00381092 /* PromotionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionViewModel.swift; sourceTree = "<group>"; };
-		C18194632C7DF7D600381092 /* FreemiumPIRPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreemiumPIRPresenter.swift; sourceTree = "<group>"; };
-		C18194662C7F60E500381092 /* FreemiumPIRPresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreemiumPIRPresenterTests.swift; sourceTree = "<group>"; };
-		C1858CD12C7C971D00C9BEAB /* FreemiumPIRFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreemiumPIRFeature.swift; sourceTree = "<group>"; };
+		C18194632C7DF7D600381092 /* FreemiumDBPPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreemiumDBPPresenter.swift; sourceTree = "<group>"; };
+		C18194662C7F60E500381092 /* FreemiumDBPPresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreemiumDBPPresenterTests.swift; sourceTree = "<group>"; };
+		C1858CD12C7C971D00C9BEAB /* FreemiumDBPFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreemiumDBPFeature.swift; sourceTree = "<group>"; };
 		C1B1CBE02BE1915100B6049C /* DataImportShortcutsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportShortcutsViewModel.swift; sourceTree = "<group>"; };
-		C1C405862C7F80E50089DE8A /* PromotionView+FreemiumPIR.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PromotionView+FreemiumPIR.swift"; sourceTree = "<group>"; };
-		C1CE84682C887CF60068913B /* FreemiumPIRScanResultPolling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreemiumPIRScanResultPolling.swift; sourceTree = "<group>"; };
-		C1CE846B2C88868D0068913B /* FreemiumPIRScanResultPollingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreemiumPIRScanResultPollingTests.swift; sourceTree = "<group>"; };
+		C1C405862C7F80E50089DE8A /* PromotionView+FreemiumDBP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PromotionView+FreemiumDBP.swift"; sourceTree = "<group>"; };
+		C1CE84682C887CF60068913B /* FreemiumDBPScanResultPolling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreemiumDBPScanResultPolling.swift; sourceTree = "<group>"; };
+		C1CE846B2C88868D0068913B /* FreemiumDBPScanResultPollingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreemiumDBPScanResultPollingTests.swift; sourceTree = "<group>"; };
 		C1D8BE442C1739E70057E426 /* DataBrokerProtectionMocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionMocks.swift; sourceTree = "<group>"; };
 		C1DAF3B42B9A44860059244F /* AutofillPopoverPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillPopoverPresenter.swift; sourceTree = "<group>"; };
 		C1E961E72B879E4D001760E1 /* MockAutofillActionPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAutofillActionPresenter.swift; sourceTree = "<group>"; };
@@ -9101,45 +9102,45 @@
 		C18194562C7CA98500381092 /* Freemium */ = {
 			isa = PBXGroup;
 			children = (
-				C18194572C7CA99400381092 /* PIR */,
+				C18194572C7CA99400381092 /* DBP */,
 			);
 			path = Freemium;
 			sourceTree = "<group>";
 		};
-		C18194572C7CA99400381092 /* PIR */ = {
+		C18194572C7CA99400381092 /* DBP */ = {
 			isa = PBXGroup;
 			children = (
-				C18194582C7CA9AB00381092 /* FreemiumPIRFeatureTests.swift */,
-				C18194662C7F60E500381092 /* FreemiumPIRPresenterTests.swift */,
-				C1CE846B2C88868D0068913B /* FreemiumPIRScanResultPollingTests.swift */,
+				C18194582C7CA9AB00381092 /* FreemiumDBPFeatureTests.swift */,
+				C18194662C7F60E500381092 /* FreemiumDBPPresenterTests.swift */,
+				C1CE846B2C88868D0068913B /* FreemiumDBPScanResultPollingTests.swift */,
 				C11198332C89AEFA00F0272C /* FreemiumDBPFirstProfileSavedNotifierTests.swift */,
 				C1351DD32C8B53500086B058 /* FreemiumDBPPromotionViewCoordinatorTests.swift */,
 			);
-			path = PIR;
+			path = DBP;
 			sourceTree = "<group>";
 		};
 		C1858CCF2C7C95DB00C9BEAB /* Freemium */ = {
 			isa = PBXGroup;
 			children = (
-				C1858CD02C7C95E500C9BEAB /* PIR */,
+				C1858CD02C7C95E500C9BEAB /* DBP */,
 				C126B3592C820924005DC2A3 /* FreemiumDebugMenu.swift */,
 			);
 			path = Freemium;
 			sourceTree = "<group>";
 		};
-		C1858CD02C7C95E500C9BEAB /* PIR */ = {
+		C1858CD02C7C95E500C9BEAB /* DBP */ = {
 			isa = PBXGroup;
 			children = (
-				C1858CD12C7C971D00C9BEAB /* FreemiumPIRFeature.swift */,
-				C18194632C7DF7D600381092 /* FreemiumPIRPresenter.swift */,
-				C1C405862C7F80E50089DE8A /* PromotionView+FreemiumPIR.swift */,
-				C1CE84682C887CF60068913B /* FreemiumPIRScanResultPolling.swift */,
+				C1858CD12C7C971D00C9BEAB /* FreemiumDBPFeature.swift */,
+				C18194632C7DF7D600381092 /* FreemiumDBPPresenter.swift */,
+				C1C405862C7F80E50089DE8A /* PromotionView+FreemiumDBP.swift */,
+				C1CE84682C887CF60068913B /* FreemiumDBPScanResultPolling.swift */,
 				C11198302C898AB500F0272C /* FreemiumDBPFirstProfileSavedNotifier.swift */,
 				C153E7C12C8AD68D00B9BAD7 /* FreemiumDBPPromotionViewCoordinating.swift */,
 				C153E7C42C8B21B500B9BAD7 /* Logger+FreemiumDBP.swift */,
 				C1351DD02C8B31CE0086B058 /* NotificationName+Freemium.swift */,
 			);
-			path = PIR;
+			path = DBP;
 			sourceTree = "<group>";
 		};
 		C1D8BE422C1739BA0057E426 /* Mocks */ = {
@@ -10753,7 +10754,7 @@
 				1DDC84FC2B8356CE00670238 /* PreferencesDefaultBrowserView.swift in Sources */,
 				3706FAC8293F65D500E42796 /* AppTrackerDataSetProvider.swift in Sources */,
 				3706FAC9293F65D500E42796 /* EncryptionKeyGeneration.swift in Sources */,
-				C1CE846A2C887CF60068913B /* FreemiumPIRScanResultPolling.swift in Sources */,
+				C1CE846A2C887CF60068913B /* FreemiumDBPScanResultPolling.swift in Sources */,
 				3706FACA293F65D500E42796 /* TabLazyLoader.swift in Sources */,
 				3706FACC293F65D500E42796 /* SaveCredentialsViewController.swift in Sources */,
 				3706FACD293F65D500E42796 /* PopUpButton.swift in Sources */,
@@ -10856,7 +10857,7 @@
 				3706FB0B293F65D500E42796 /* DefaultBrowserPromptView.swift in Sources */,
 				3706FB0E293F65D500E42796 /* FaviconManager.swift in Sources */,
 				3706FB0F293F65D500E42796 /* ChromiumFaviconsReader.swift in Sources */,
-				C18194652C7DF7D600381092 /* FreemiumPIRPresenter.swift in Sources */,
+				C18194652C7DF7D600381092 /* FreemiumDBPPresenter.swift in Sources */,
 				4B0BD7B82A9FE6E600EF609D /* NetworkProtectionOnboardingMenu.swift in Sources */,
 				3706FB10293F65D500E42796 /* SuggestionTableRowView.swift in Sources */,
 				3706FB11293F65D500E42796 /* DownloadsPreferences.swift in Sources */,
@@ -11042,7 +11043,7 @@
 				B6BCC5502AFE4F7D002C5499 /* DataImportTypePicker.swift in Sources */,
 				7BAF9E4B2A8A3CC9002D3B6E /* UserDefaults+NetworkProtectionShared.swift in Sources */,
 				B6685E3D29A602D90043D2EE /* ExternalAppSchemeHandler.swift in Sources */,
-				C1C405882C7F80E50089DE8A /* PromotionView+FreemiumPIR.swift in Sources */,
+				C1C405882C7F80E50089DE8A /* PromotionView+FreemiumDBP.swift in Sources */,
 				B6E1491029A5C30500AAFBE8 /* ContentBlockingTabExtension.swift in Sources */,
 				3706FB82293F65D500E42796 /* PasswordManagementNoteItemView.swift in Sources */,
 				4BF97AD82B43C5B300EB4240 /* NetworkProtectionAppEvents.swift in Sources */,
@@ -11110,7 +11111,7 @@
 				3706FBA0293F65D500E42796 /* NSTextFieldExtension.swift in Sources */,
 				9FA173E82B7B122E00EE4E6E /* BookmarkDialogStackedContentView.swift in Sources */,
 				3706FBA1293F65D500E42796 /* FireproofDomainsContainer.swift in Sources */,
-				C1858CD32C7C971D00C9BEAB /* FreemiumPIRFeature.swift in Sources */,
+				C1858CD32C7C971D00C9BEAB /* FreemiumDBPFeature.swift in Sources */,
 				3706FBA2293F65D500E42796 /* GeolocationService.swift in Sources */,
 				3706FBA3293F65D500E42796 /* FireproofingURLExtensions.swift in Sources */,
 				3169132A2BD2C7570051B46D /* DataBrokerProtectionErrorViewController.swift in Sources */,
@@ -11350,7 +11351,6 @@
 				3706FC30293F65D500E42796 /* FireInfoViewController.swift in Sources */,
 				B6F1B02F2BCE6B47005E863C /* TunnelControllerProvider.swift in Sources */,
 				31A83FB62BE28D7D00F74E67 /* UserText+DBP.swift in Sources */,
-				56BA1E832BAC506F001CF69F /* SSLErrorPageUserScript.swift in Sources */,
 				C18194602C7CDD0E00381092 /* PromotionViewModel.swift in Sources */,
 				3706FC31293F65D500E42796 /* PermissionButton.swift in Sources */,
 				9F6434622BEC82B700D2D8A0 /* AttributionPixelHandler.swift in Sources */,
@@ -11663,7 +11663,7 @@
 				C13909F52B85FD79001626ED /* AutofillDeleteAllPasswordsExecutorTests.swift in Sources */,
 				37D046A52C7DAA8900AEAA50 /* ImageProcessorMock.swift in Sources */,
 				857E44642A9F70F200ED77A7 /* CampaignVariantTests.swift in Sources */,
-				C181945A2C7CA9AB00381092 /* FreemiumPIRFeatureTests.swift in Sources */,
+				C181945A2C7CA9AB00381092 /* FreemiumDBPFeatureTests.swift in Sources */,
 				561D29C72BDA74F4007B91D0 /* MockDDGSyncing.swift in Sources */,
 				3706FE1E293F661700E42796 /* GeolocationProviderTests.swift in Sources */,
 				567A23CE2C80CF3D0010F66C /* SpecialErrorPageUserScriptTests.swift in Sources */,
@@ -11807,7 +11807,7 @@
 				84DC715A2C1C1E9000033B8C /* UserDefaultsWrapperTests.swift in Sources */,
 				B60C6F7F29B1B41D007BFAA8 /* TestRunHelperInitializer.m in Sources */,
 				9F0FFFBF2BCCAF1F007C87DD /* BookmarkAllTabsDialogViewModelMock.swift in Sources */,
-				C1CE846D2C88868D0068913B /* FreemiumPIRScanResultPollingTests.swift in Sources */,
+				C1CE846D2C88868D0068913B /* FreemiumDBPScanResultPollingTests.swift in Sources */,
 				3706FE61293F661700E42796 /* PinnedTabsViewModelTests.swift in Sources */,
 				3706FE62293F661700E42796 /* PasswordManagementListSectionTests.swift in Sources */,
 				3706FE63293F661700E42796 /* RecentlyClosedCoordinatorMock.swift in Sources */,
@@ -11837,7 +11837,7 @@
 				3706FE73293F661700E42796 /* PermissionManagerMock.swift in Sources */,
 				3706FE74293F661700E42796 /* WebsiteDataStoreMock.swift in Sources */,
 				3706FE75293F661700E42796 /* WebsiteBreakageReportTests.swift in Sources */,
-				C18194682C7F60E500381092 /* FreemiumPIRPresenterTests.swift in Sources */,
+				C18194682C7F60E500381092 /* FreemiumDBPPresenterTests.swift in Sources */,
 				56D145EF29E6DAD900E3488A /* DataImportProviderTests.swift in Sources */,
 				569277C529DEE09D00B633EF /* ContinueSetUpModelTests.swift in Sources */,
 				CD89DD622C89E08D0080F9AF /* PhishingDetectionTests.swift in Sources */,
@@ -12272,7 +12272,7 @@
 				379E877629E98729001C8BB0 /* BookmarksCleanupErrorHandling.swift in Sources */,
 				B6DA06E42913ECEE00225DE2 /* ContextMenuManager.swift in Sources */,
 				B693955126F04BEB0015B914 /* GradientView.swift in Sources */,
-				C1858CD22C7C971D00C9BEAB /* FreemiumPIRFeature.swift in Sources */,
+				C1858CD22C7C971D00C9BEAB /* FreemiumDBPFeature.swift in Sources */,
 				37AFCE8527DA2D3900471A10 /* PreferencesSidebar.swift in Sources */,
 				3797C7A32C62C38800DA77FB /* HomePageSettingsModel.swift in Sources */,
 				B6C00ED5292FB21E009C73A6 /* HoveredLinkTabExtension.swift in Sources */,
@@ -12598,7 +12598,7 @@
 				4B723E0D26B0006100E14D75 /* SecureVaultLoginImporter.swift in Sources */,
 				B645D8F629FA95440024461F /* WKProcessPoolExtension.swift in Sources */,
 				9D9AE86B2AA76CF90026E7DC /* LoginItemsManager.swift in Sources */,
-				C18194642C7DF7D600381092 /* FreemiumPIRPresenter.swift in Sources */,
+				C18194642C7DF7D600381092 /* FreemiumDBPPresenter.swift in Sources */,
 				857E5AF52A79045800FC0FB4 /* PixelExperiment.swift in Sources */,
 				B6C416A7294A4AE500C4F2E7 /* DuckPlayerTabExtension.swift in Sources */,
 				BDBA859F2C5D25B700BC54F5 /* VPNMetadataCollector.swift in Sources */,
@@ -12742,8 +12742,7 @@
 				F188267C2BBEB3AA00D9AC4F /* GeneralPixel.swift in Sources */,
 				4B723E1026B0006700E14D75 /* CSVImporter.swift in Sources */,
 				37A4CEBA282E992F00D75B89 /* StartupPreferences.swift in Sources */,
-				4B41EDB12B168B1E001EEDF4 /* VPNFeedbackFormView.swift in Sources */,
-				C1CE84692C887CF60068913B /* FreemiumPIRScanResultPolling.swift in Sources */,
+				C1CE84692C887CF60068913B /* FreemiumDBPScanResultPolling.swift in Sources */,
 				1D72D59C2BFF61B200AEDE36 /* UpdateNotificationPresenter.swift in Sources */,
 				AA4BBA3B25C58FA200C4FB0F /* MainMenu.swift in Sources */,
 				AA585D84248FD31100E9A3E2 /* BrowserTabViewController.swift in Sources */,
@@ -12928,7 +12927,7 @@
 				BDBA85992C5D258100BC54F5 /* VPNFeedbackFormViewController.swift in Sources */,
 				B693955726F04BEC0015B914 /* MouseOverButton.swift in Sources */,
 				AA61C0D02722159B00E6B681 /* FireInfoViewController.swift in Sources */,
-				C1C405872C7F80E50089DE8A /* PromotionView+FreemiumPIR.swift in Sources */,
+				C1C405872C7F80E50089DE8A /* PromotionView+FreemiumDBP.swift in Sources */,
 				9D9AE8692AA76CDC0026E7DC /* LoginItem+NetworkProtection.swift in Sources */,
 				9F9C49F92BC7BC970099738D /* BookmarkAllTabsDialogView.swift in Sources */,
 				B64C85422694590B0048FEBE /* PermissionButton.swift in Sources */,
@@ -13165,7 +13164,7 @@
 				4B0219A825E0646500ED7DEA /* WebsiteDataStoreTests.swift in Sources */,
 				AAC9C01E24CB6BEB00AD1325 /* TabCollectionViewModelTests.swift in Sources */,
 				56CE77612C7DFCF800AC1ED2 /* OnboardingSuggestedSearchesProviderTests.swift in Sources */,
-				C18194592C7CA9AB00381092 /* FreemiumPIRFeatureTests.swift in Sources */,
+				C18194592C7CA9AB00381092 /* FreemiumDBPFeatureTests.swift in Sources */,
 				B662D3DE275613BB0035D4D6 /* EncryptionKeyStoreMock.swift in Sources */,
 				1D3B1ABF29369FC8006F4388 /* BWEncryptionTests.swift in Sources */,
 				B6F56567299A414300A04298 /* WKWebViewMockingExtension.swift in Sources */,
@@ -13309,7 +13308,7 @@
 				4BF4951826C08395000547B8 /* ThirdPartyBrowserTests.swift in Sources */,
 				4B98D27C28D960DD003C2B6F /* FirefoxFaviconsReaderTests.swift in Sources */,
 				9F0FFFBE2BCCAF1F007C87DD /* BookmarkAllTabsDialogViewModelMock.swift in Sources */,
-				C1CE846C2C88868D0068913B /* FreemiumPIRScanResultPollingTests.swift in Sources */,
+				C1CE846C2C88868D0068913B /* FreemiumDBPScanResultPollingTests.swift in Sources */,
 				B60C6F7E29B1B41D007BFAA8 /* TestRunHelperInitializer.m in Sources */,
 				37479F152891BC8300302FE2 /* TabCollectionViewModelTests+WithoutPinnedTabsManager.swift in Sources */,
 				AA63745424C9BF9A00AB2AC4 /* SuggestionContainerTests.swift in Sources */,
@@ -13438,7 +13437,7 @@
 				EEF53E182950CED5002D78F4 /* JSAlertViewModelTests.swift in Sources */,
 				376C4DB928A1A48A00CC0F5B /* FirePopoverViewModelTests.swift in Sources */,
 				AAEC74B62642CC6A00C2EFBC /* HistoryStoringMock.swift in Sources */,
-				C18194672C7F60E500381092 /* FreemiumPIRPresenterTests.swift in Sources */,
+				C18194672C7F60E500381092 /* FreemiumDBPPresenterTests.swift in Sources */,
 				AA652CB125DD825B009059CC /* LocalBookmarkStoreTests.swift in Sources */,
 				3199AF852C80736C003AEBDC /* DefaultDuckPlayerOnboardingDeciderTests.swift in Sources */,
 				B630794226731F5400DCEE41 /* WKDownloadMock.swift in Sources */,

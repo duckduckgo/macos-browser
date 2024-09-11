@@ -60,9 +60,9 @@ final class MoreOptionsMenu: NSMenu {
     private lazy var sharingMenu: NSMenu = SharingMenu(title: UserText.shareMenuItem)
     private var accountManager: AccountManager { subscriptionManager.accountManager }
     private let subscriptionManager: SubscriptionManager
-    private var freemiumPIRUserStateManager: FreemiumPIRUserStateManager
-    private let freemiumPIRFeature: FreemiumPIRFeature
-    private let freemiumPIRPresenter: FreemiumPIRPresenter
+    private var freemiumDBPUserStateManager: FreemiumDBPUserStateManager
+    private let freemiumDBPFeature: FreemiumDBPFeature
+    private let freemiumDBPPresenter: FreemiumDBPPresenter
     private let appearancePreferences: AppearancePreferences
 
     private let notificationCenter: NotificationCenter
@@ -83,9 +83,9 @@ final class MoreOptionsMenu: NSMenu {
          sharingMenu: NSMenu? = nil,
          internalUserDecider: InternalUserDecider,
          subscriptionManager: SubscriptionManager,
-         freemiumPIRUserStateManager: FreemiumPIRUserStateManager,
-         freemiumPIRFeature: FreemiumPIRFeature,
-         freemiumPIRPresenter: FreemiumPIRPresenter = DefaultFreemiumPIRPresenter(),
+         freemiumDBPUserStateManager: FreemiumDBPUserStateManager,
+         freemiumDBPFeature: FreemiumDBPFeature,
+         freemiumDBPPresenter: FreemiumDBPPresenter = DefaultFreemiumDBPPresenter(),
          appearancePreferences: AppearancePreferences = .shared,
          notificationCenter: NotificationCenter = .default) {
 
@@ -96,9 +96,9 @@ final class MoreOptionsMenu: NSMenu {
         self.subscriptionFeatureAvailability = subscriptionFeatureAvailability
         self.internalUserDecider = internalUserDecider
         self.subscriptionManager = subscriptionManager
-        self.freemiumPIRUserStateManager = freemiumPIRUserStateManager
-        self.freemiumPIRFeature = freemiumPIRFeature
-        self.freemiumPIRPresenter = freemiumPIRPresenter
+        self.freemiumDBPUserStateManager = freemiumDBPUserStateManager
+        self.freemiumDBPFeature = freemiumDBPFeature
+        self.freemiumDBPPresenter = freemiumDBPPresenter
         self.appearancePreferences = appearancePreferences
         self.notificationCenter = notificationCenter
 
@@ -153,7 +153,7 @@ final class MoreOptionsMenu: NSMenu {
 
         addItem(NSMenuItem.separator())
 
-        addSubscriptionAndFreemiumPIRItems()
+        addSubscriptionAndFreemiumDBPItems()
 
         addPageItems()
 
@@ -273,13 +273,13 @@ final class MoreOptionsMenu: NSMenu {
     }
 
     @MainActor
-    @objc func openFreemiumPIR(_ sender: NSMenuItem) {
+    @objc func openFreemiumDBP(_ sender: NSMenuItem) {
 
         // TODO: Remove this
-        freemiumPIRUserStateManager.didOnboard = true
+        freemiumDBPUserStateManager.didOnboard = true
         // ------
 
-        freemiumPIRPresenter.showFreemiumPIR(didOnboard: freemiumPIRUserStateManager.didOnboard, windowControllerManager: WindowControllersManager.shared)
+        freemiumDBPPresenter.showFreemiumDBP(didOnboard: freemiumDBPUserStateManager.didOnboard, windowControllerManager: WindowControllersManager.shared)
 
         notificationCenter.post(name: .freemiumDBPEntryPointActivated, object: nil)
     }
@@ -355,9 +355,9 @@ final class MoreOptionsMenu: NSMenu {
     }
 
     @MainActor
-    private func addSubscriptionAndFreemiumPIRItems() {
+    private func addSubscriptionAndFreemiumDBPItems() {
         addSubscriptionItems()
-        addFreemiumPIRItem()
+        addFreemiumDBPItem()
 
         addItem(NSMenuItem.separator())
     }
@@ -390,15 +390,15 @@ final class MoreOptionsMenu: NSMenu {
     }
 
     @MainActor
-    private func addFreemiumPIRItem() {
-        guard freemiumPIRFeature.isAvailable else { return }
+    private func addFreemiumDBPItem() {
+        guard freemiumDBPFeature.isAvailable else { return }
 
-        let freemiumPIRItem = NSMenuItem(title: UserText.freemiumPIROptionsMenuItem).withImage(.dbpIcon)
+        let freemiumDBPItem = NSMenuItem(title: UserText.freemiumDBPOptionsMenuItem).withImage(.dbpIcon)
 
-        freemiumPIRItem.target = self
-        freemiumPIRItem.action = #selector(openFreemiumPIR(_:))
+        freemiumDBPItem.target = self
+        freemiumDBPItem.action = #selector(openFreemiumDBP(_:))
 
-        addItem(freemiumPIRItem)
+        addItem(freemiumDBPItem)
     }
 
     @MainActor
