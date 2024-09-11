@@ -68,21 +68,28 @@ final class FreemiumDBPPromotionViewCoordinator: FreemiumDBPPromotionViewCoordin
     /// A set of cancellables for managing Combine subscriptions.
     private var cancellables = Set<AnyCancellable>()
 
+    /// The `NotificationCenter` instance used when subscribing to notifications
+    private let notificationCenter: NotificationCenter
+
     /// Initializes the coordinator with the necessary dependencies.
     ///
     /// - Parameters:
     ///   - freemiumDBPUserStateManager: Manages the user's state in the Freemium DBP system.
     ///   - freemiumDBPFeature: The feature that determines the availability of DBP.
     ///   - freemiumDBPPresenter: The presenter used to show the Freemium DBP UI. Defaults to `DefaultFreemiumDBPPresenter`.
+    ///   - notificationCenter: The `NotificationCenter` instance used when subscribing to notifications
     init(freemiumDBPUserStateManager: FreemiumDBPUserStateManager,
          freemiumDBPFeature: FreemiumDBPFeature,
-         freemiumDBPPresenter: FreemiumDBPPresenter = DefaultFreemiumDBPPresenter()) {
+         freemiumDBPPresenter: FreemiumDBPPresenter = DefaultFreemiumDBPPresenter(),
+         notificationCenter: NotificationCenter = .default) {
 
         self.freemiumDBPUserStateManager = freemiumDBPUserStateManager
         self.freemiumDBPFeature = freemiumDBPFeature
         self.freemiumDBPPresenter = freemiumDBPPresenter
+        self.notificationCenter = notificationCenter
 
         setInitialPromotionVisibilityState()
+        subscribeToFeatureAvailabilityUpdates()
         observeFreemiumDBPNotifications()
     }
 }
@@ -152,10 +159,24 @@ private extension FreemiumDBPPromotionViewCoordinator {
         }
     }
 
+    /// Subscribes to feature availability updates from the `freemiumPIRFeature`'s availability publisher.
+    ///
+    /// This method listens to the `isAvailablePublisher` of the `freemiumPIRFeature`, which publishes
+    /// changes to the feature's availability. It performs the following actions when an update is received:
+    func subscribeToFeatureAvailabilityUpdates() {
+        freemiumDBPFeature.isAvailablePublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isAvailable in
+                guard let self else { return }
+                isHomePagePromotionVisible = (!didDismissHomePagePromotion && isAvailable)
+            }
+            .store(in: &cancellables)
+    }
+
     /// Observes notifications related to Freemium DBP (e.g., result polling complete or entry point activated),
     /// and updates the promotion visibility state accordingly.
     func observeFreemiumDBPNotifications() {
-        NotificationCenter.default.publisher(for: .freemiumDBPResultPollingComplete)
+        notificationCenter.publisher(for: .freemiumDBPResultPollingComplete)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 Logger.freemiumDBP.debug("[Freemium DBP] Received Scan Results Notification")
@@ -163,7 +184,7 @@ private extension FreemiumDBPPromotionViewCoordinator {
             }
             .store(in: &cancellables)
 
-        NotificationCenter.default.publisher(for: .freemiumDBPEntryPointActivated)
+        notificationCenter.publisher(for: .freemiumDBPEntryPointActivated)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 Logger.freemiumDBP.debug("[Freemium DBP] Received Entry Point Activation Notification")
