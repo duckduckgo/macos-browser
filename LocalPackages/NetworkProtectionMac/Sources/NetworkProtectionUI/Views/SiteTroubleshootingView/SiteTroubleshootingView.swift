@@ -60,7 +60,7 @@ public struct SiteTroubleshootingView: View {
                         .resizable()
                         .frame(width: Self.iconSize, height: Self.iconSize)
 
-                    Text("Disable VPN for \(siteInfo.domain)")
+                    Text("Exclude \(siteInfo.domain) from VPN")
                         .font(.system(size: 12))
                         .foregroundColor(Color(.defaultText))
 
