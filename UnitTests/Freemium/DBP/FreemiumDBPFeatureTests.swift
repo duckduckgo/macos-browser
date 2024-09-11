@@ -1,5 +1,5 @@
 //
-//  FreemiumPIRFeatureTests.swift
+//  FreemiumDBPFeatureTests.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -23,18 +23,18 @@ import BrowserServicesKit
 import SubscriptionTestingUtilities
 import Freemium
 
-final class FreemiumPIRFeatureTests: XCTestCase {
+final class FreemiumDBPFeatureTests: XCTestCase {
 
-    private var sut: FreemiumPIRFeature!
-    private var mockFeatureFlagger: MockFreemiumPIRFeatureFlagger!
+    private var sut: FreemiumDBPFeature!
+    private var mockFeatureFlagger: MockFreemiumDBPFeatureFlagger!
     private var mockAccountManager: MockAccountManager!
     private var mockSubscriptionManager: SubscriptionManagerMock!
-    private var mockFreemiumPIRUserStateManagerManager: MockFreemiumPIRUserStateManager!
+    private var mockFreemiumDBPUserStateManagerManager: MockFreemiumDBPUserStateManager!
     private var mockFeatureDisabler: MockFeatureDisabler!
 
     override func setUpWithError() throws {
 
-        mockFeatureFlagger = MockFreemiumPIRFeatureFlagger()
+        mockFeatureFlagger = MockFreemiumDBPFeatureFlagger()
         mockAccountManager = MockAccountManager()
         let mockSubscriptionService = SubscriptionEndpointServiceMock()
         let mockAuthService = SubscriptionMockFactory.authEndpointService
@@ -54,20 +54,20 @@ final class FreemiumPIRFeatureTests: XCTestCase {
                                                           currentEnvironment: currentEnvironment,
                                                           canPurchase: false)
 
-        mockFreemiumPIRUserStateManagerManager = MockFreemiumPIRUserStateManager()
+        mockFreemiumDBPUserStateManagerManager = MockFreemiumDBPUserStateManager()
         mockFeatureDisabler = MockFeatureDisabler()
 
     }
 
-    func testWhenFeatureFlagDisabled_thenFreemiumPIRIsNotAvailable() throws {
+    func testWhenFeatureFlagDisabled_thenFreemiumDBPIsNotAvailable() throws {
         // Given
         mockFeatureFlagger.isEnabled = false
         mockSubscriptionManager.canPurchase = true
         mockAccountManager.accessToken = nil
-        sut = DefaultFreemiumPIRFeature(featureFlagger: mockFeatureFlagger,
+        sut = DefaultFreemiumDBPFeature(featureFlagger: mockFeatureFlagger,
                                         subscriptionManager: mockSubscriptionManager,
                                         accountManager: mockAccountManager,
-                                        freemiumPIRUserStateManager: mockFreemiumPIRUserStateManagerManager,
+                                        freemiumDBPUserStateManager: mockFreemiumDBPUserStateManagerManager,
                                         featureDisabler: mockFeatureDisabler)
         // When
         let result = sut.isAvailable
@@ -76,15 +76,15 @@ final class FreemiumPIRFeatureTests: XCTestCase {
         XCTAssertFalse(result)
     }
 
-    func testWhenPrivacyProNotAvailable_thenFreemiumPIRIsNotAvailable() throws {
+    func testWhenPrivacyProNotAvailable_thenFreemiumDBPIsNotAvailable() throws {
         // Given
         mockFeatureFlagger.isEnabled = true
         mockSubscriptionManager.canPurchase = false
         mockAccountManager.accessToken = nil
-        sut = DefaultFreemiumPIRFeature(featureFlagger: mockFeatureFlagger,
+        sut = DefaultFreemiumDBPFeature(featureFlagger: mockFeatureFlagger,
                                         subscriptionManager: mockSubscriptionManager,
                                         accountManager: mockAccountManager,
-                                        freemiumPIRUserStateManager: mockFreemiumPIRUserStateManagerManager,
+                                        freemiumDBPUserStateManager: mockFreemiumDBPUserStateManagerManager,
                                         featureDisabler: mockFeatureDisabler)
         // When
         let result = sut.isAvailable
@@ -93,15 +93,15 @@ final class FreemiumPIRFeatureTests: XCTestCase {
         XCTAssertFalse(result)
     }
 
-    func testWhenAllConditionsAreNotMet_thenFreemiumPIRIsNotAvailable() throws {
+    func testWhenAllConditionsAreNotMet_thenFreemiumDBPIsNotAvailable() throws {
         // Given
         mockFeatureFlagger.isEnabled = false
         mockSubscriptionManager.canPurchase = false
         mockAccountManager.accessToken = "some_token"
-        sut = DefaultFreemiumPIRFeature(featureFlagger: mockFeatureFlagger,
+        sut = DefaultFreemiumDBPFeature(featureFlagger: mockFeatureFlagger,
                                         subscriptionManager: mockSubscriptionManager,
                                         accountManager: mockAccountManager,
-                                        freemiumPIRUserStateManager: mockFreemiumPIRUserStateManagerManager,
+                                        freemiumDBPUserStateManager: mockFreemiumDBPUserStateManagerManager,
                                         featureDisabler: mockFeatureDisabler)
         // When
         let result = sut.isAvailable
@@ -110,15 +110,15 @@ final class FreemiumPIRFeatureTests: XCTestCase {
         XCTAssertFalse(result)
     }
 
-    func testWhenUserAlreadySubscribed_thenFreemiumPIRIsNotAvailable() throws {
+    func testWhenUserAlreadySubscribed_thenFreemiumDBPIsNotAvailable() throws {
         // Given
         mockFeatureFlagger.isEnabled = true
         mockSubscriptionManager.canPurchase = true
         mockAccountManager.accessToken = "some_token"
-        sut = DefaultFreemiumPIRFeature(featureFlagger: mockFeatureFlagger,
+        sut = DefaultFreemiumDBPFeature(featureFlagger: mockFeatureFlagger,
                                         subscriptionManager: mockSubscriptionManager,
                                         accountManager: mockAccountManager,
-                                        freemiumPIRUserStateManager: mockFreemiumPIRUserStateManagerManager,
+                                        freemiumDBPUserStateManager: mockFreemiumDBPUserStateManagerManager,
                                         featureDisabler: mockFeatureDisabler)
         // When
         let result = sut.isAvailable
@@ -129,16 +129,16 @@ final class FreemiumPIRFeatureTests: XCTestCase {
 
     func testWhenUserDidNotOnboard_thenOffboardingIsNotExecuted() {
         // Given
-        mockFreemiumPIRUserStateManagerManager.didOnboard = false
+        mockFreemiumDBPUserStateManagerManager.didOnboard = false
         mockFeatureFlagger.isEnabled = false
         mockSubscriptionManager.canPurchase = true
         mockAccountManager.accessToken = nil
 
         // When
-        sut = DefaultFreemiumPIRFeature(featureFlagger: mockFeatureFlagger,
+        sut = DefaultFreemiumDBPFeature(featureFlagger: mockFeatureFlagger,
                                         subscriptionManager: mockSubscriptionManager,
                                         accountManager: mockAccountManager,
-                                        freemiumPIRUserStateManager: mockFreemiumPIRUserStateManagerManager,
+                                        freemiumDBPUserStateManager: mockFreemiumDBPUserStateManagerManager,
                                         featureDisabler: mockFeatureDisabler)
 
         // Then
@@ -147,82 +147,82 @@ final class FreemiumPIRFeatureTests: XCTestCase {
 
     func testWhenUserDidOnboard_andFeatureIsDisabled_andUserCanPurchase_andUserIsNotSubscribed_thenOffboardingIsExecuted() {
         // Given
-        mockFreemiumPIRUserStateManagerManager.didOnboard = true
+        mockFreemiumDBPUserStateManagerManager.didOnboard = true
         mockFeatureFlagger.isEnabled = false
         mockSubscriptionManager.canPurchase = true
         mockAccountManager.accessToken = nil
 
         // When
-        sut = DefaultFreemiumPIRFeature(featureFlagger: mockFeatureFlagger,
+        sut = DefaultFreemiumDBPFeature(featureFlagger: mockFeatureFlagger,
                                         subscriptionManager: mockSubscriptionManager,
                                         accountManager: mockAccountManager,
-                                        freemiumPIRUserStateManager: mockFreemiumPIRUserStateManagerManager,
+                                        freemiumDBPUserStateManager: mockFreemiumDBPUserStateManagerManager,
                                         featureDisabler: mockFeatureDisabler)
 
         // Then
-        XCTAssertFalse(mockFreemiumPIRUserStateManagerManager.didOnboard)
+        XCTAssertFalse(mockFreemiumDBPUserStateManagerManager.didOnboard)
         XCTAssertTrue(mockFeatureDisabler.disableAndDeleteWasCalled)
     }
 
     func testWhenUserDidOnboard_andFeatureIsDisabled_andUserCanPurchase_andUserIsSubscribed_thenOffboardingIsNotExecuted() {
         // Given
-        mockFreemiumPIRUserStateManagerManager.didOnboard = true
+        mockFreemiumDBPUserStateManagerManager.didOnboard = true
         mockFeatureFlagger.isEnabled = false
         mockSubscriptionManager.canPurchase = true
         mockAccountManager.accessToken = "some_token"
 
         // When
-        sut = DefaultFreemiumPIRFeature(featureFlagger: mockFeatureFlagger,
+        sut = DefaultFreemiumDBPFeature(featureFlagger: mockFeatureFlagger,
                                         subscriptionManager: mockSubscriptionManager,
                                         accountManager: mockAccountManager,
-                                        freemiumPIRUserStateManager: mockFreemiumPIRUserStateManagerManager,
+                                        freemiumDBPUserStateManager: mockFreemiumDBPUserStateManagerManager,
                                         featureDisabler: mockFeatureDisabler)
 
         // Then
-        XCTAssertTrue(mockFreemiumPIRUserStateManagerManager.didOnboard)
+        XCTAssertTrue(mockFreemiumDBPUserStateManagerManager.didOnboard)
         XCTAssertFalse(mockFeatureDisabler.disableAndDeleteWasCalled)
     }
 
     func testWhenUserDidOnboard_andFeatureIsEnabled_andUserCanPurchase_andUserIsNotSubscribed_thenOffboardingIsNotExecuted() {
         // Given
-        mockFreemiumPIRUserStateManagerManager.didOnboard = true
+        mockFreemiumDBPUserStateManagerManager.didOnboard = true
         mockFeatureFlagger.isEnabled = true
         mockSubscriptionManager.canPurchase = true
         mockAccountManager.accessToken = nil
 
         // When
-        sut = DefaultFreemiumPIRFeature(featureFlagger: mockFeatureFlagger,
+        sut = DefaultFreemiumDBPFeature(featureFlagger: mockFeatureFlagger,
                                         subscriptionManager: mockSubscriptionManager,
                                         accountManager: mockAccountManager,
-                                        freemiumPIRUserStateManager: mockFreemiumPIRUserStateManagerManager,
+                                        freemiumDBPUserStateManager: mockFreemiumDBPUserStateManagerManager,
                                         featureDisabler: mockFeatureDisabler)
 
         // Then
-        XCTAssertTrue(mockFreemiumPIRUserStateManagerManager.didOnboard)
+        XCTAssertTrue(mockFreemiumDBPUserStateManagerManager.didOnboard)
         XCTAssertFalse(mockFeatureDisabler.disableAndDeleteWasCalled)
     }
 
     func testWhenUserDidOnboard_andFeatureIsDisabled_andUserCannotPurchase_thenOffboardingIsNotExecuted() {
         // Given
-        mockFreemiumPIRUserStateManagerManager.didOnboard = true
+        mockFreemiumDBPUserStateManagerManager.didOnboard = true
         mockFeatureFlagger.isEnabled = false
         mockSubscriptionManager.canPurchase = false
         mockAccountManager.accessToken = nil
 
         // When
-        sut = DefaultFreemiumPIRFeature(featureFlagger: mockFeatureFlagger,
+        sut = DefaultFreemiumDBPFeature(featureFlagger: mockFeatureFlagger,
                                         subscriptionManager: mockSubscriptionManager,
                                         accountManager: mockAccountManager,
-                                        freemiumPIRUserStateManager: mockFreemiumPIRUserStateManagerManager,
+                                        freemiumDBPUserStateManager: mockFreemiumDBPUserStateManagerManager,
                                         featureDisabler: mockFeatureDisabler)
 
         // Then
-        XCTAssertTrue(mockFreemiumPIRUserStateManagerManager.didOnboard)
+        XCTAssertTrue(mockFreemiumDBPUserStateManagerManager.didOnboard)
         XCTAssertFalse(mockFeatureDisabler.disableAndDeleteWasCalled)
     }
 }
 
-final class MockFreemiumPIRFeatureFlagger: FeatureFlagger {
+final class MockFreemiumDBPFeatureFlagger: FeatureFlagger {
     var isEnabled = false
 
     func isFeatureOn<F>(forProvider: F) -> Bool where F: BrowserServicesKit.FeatureFlagSourceProviding {

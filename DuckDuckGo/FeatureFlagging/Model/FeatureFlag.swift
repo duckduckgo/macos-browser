@@ -33,7 +33,7 @@ public enum FeatureFlag: String {
     case deduplicateLoginsOnImport
 
     // https://app.asana.com/0/1206488453854252/1207136666798700/f
-    case freemiumPIR
+    case freemiumDBP
 
     case highlightsOnboarding
 
@@ -54,7 +54,7 @@ extension FeatureFlag: FeatureFlagSourceProviding {
             return .remoteReleasable(.subfeature(AutofillSubfeature.deduplicateLoginsOnImport))
         case .unknownUsernameCategorization:
             return .remoteReleasable(.subfeature(AutofillSubfeature.unknownUsernameCategorization))
-        case .freemiumPIR:
+        case .freemiumDBP:
             return .remoteDevelopment(.subfeature(DBPSubfeature.freemium))
         case .phishingDetectionErrorPage:
             return .remoteReleasable(.subfeature(PhishingDetectionSubfeature.allowErrorPage))

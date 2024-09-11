@@ -1,5 +1,5 @@
 //
-//  FreemiumPIRPresenterTests.swift
+//  FreemiumDBPPresenterTests.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -20,27 +20,27 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 import Combine
 
-final class FreemiumPIRPresenterTests: XCTestCase {
+final class FreemiumDBPPresenterTests: XCTestCase {
 
     private var mockWindowControllerManager: MockWindowControllerManager!
-    private var sut = DefaultFreemiumPIRPresenter()
+    private var sut = DefaultFreemiumDBPPresenter()
 
     @MainActor
-    func testWhenCallShowFreemiumPIRAndDidOnboardThenShowPIRTabIsCalled() async throws {
+    func testWhenCallShowFreemiumDBPAndDidOnboardThenShowPIRTabIsCalled() async throws {
         // Given
         mockWindowControllerManager = MockWindowControllerManager()
         // When
-        sut.showFreemiumPIR(didOnboard: true, windowControllerManager: mockWindowControllerManager)
+        sut.showFreemiumDBP(didOnboard: true, windowControllerManager: mockWindowControllerManager)
         // Then
         XCTAssertEqual(mockWindowControllerManager.showTabContent, Tab.Content.dataBrokerProtection)
     }
 
     @MainActor
-    func testWhenCallShowFreemiumPIRAndDidNotOnboardThenShowPIRTabIsNotCalled() async throws {
+    func testWhenCallShowFreemiumDBPAndDidNotOnboardThenShowPIRTabIsNotCalled() async throws {
         // Given
         mockWindowControllerManager = MockWindowControllerManager()
         // When
-        sut.showFreemiumPIR(didOnboard: false, windowControllerManager: mockWindowControllerManager)
+        sut.showFreemiumDBP(didOnboard: false, windowControllerManager: mockWindowControllerManager)
         // Then
         XCTAssertEqual(mockWindowControllerManager.showTabContent, Tab.Content.none)
     }
