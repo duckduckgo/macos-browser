@@ -99,6 +99,7 @@ final class SaveCredentialsViewController: NSViewController {
         saveButton.becomeFirstResponder()
         updateSaveSegmentedControl()
         setUpStrings()
+        securityButton.showsBorderOnlyWhileMouseInside = true
     }
 
     override func viewWillAppear() {
