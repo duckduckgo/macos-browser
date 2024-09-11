@@ -270,11 +270,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         DataBrokerProtectionSettings().alignTo(subscriptionEnvironment: subscriptionManager.currentEnvironment)
 
         // Freemium DBP
-        let freemiumPIRUserStateManager = DefaultFreemiumPIRUserStateManager(userDefaults: .dbp)
-        freemiumPIRFeature = DefaultFreemiumPIRFeature(privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager,
+        let freemiumDBPUserStateManager = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp)
+        freemiumDBPFeature = DefaultFreemiumDBPFeature(privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager,
                                                                      subscriptionManager: subscriptionManager,
                                                                      accountManager: subscriptionManager.accountManager,
-                                                       freemiumPIRUserStateManager: freemiumPIRUserStateManager)
+                                                       freemiumDBPUserStateManager: freemiumDBPUserStateManager)
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {
@@ -301,7 +301,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                                                                                               vpnUninstaller: vpnUninstaller)
 
         // Freemium DBP
-        freemiumPIRFeature.subscribeToDependencyUpdates()
+        freemiumDBPFeature.subscribeToDependencyUpdates()
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {

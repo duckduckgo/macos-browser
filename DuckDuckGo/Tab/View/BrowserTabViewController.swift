@@ -789,7 +789,7 @@ final class BrowserTabViewController: NSViewController {
     var homePageViewController: HomePageViewController?
     private func homePageViewControllerCreatingIfNeeded() -> HomePageViewController {
         return homePageViewController ?? {
-            let freemiumDBPUserStateManager = DefaultFreemiumPIRUserStateManager(userDefaults: .dbp)
+            let freemiumDBPUserStateManager = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp)
             let freemiumDBPFeature = Application.appDelegate.freemiumDBPFeature
 
             let freemiumDBPPromotionViewCoordinator = FreemiumDBPPromotionViewCoordinator(freemiumDBPUserStateManager: freemiumDBPUserStateManager,
@@ -808,7 +808,7 @@ final class BrowserTabViewController: NSViewController {
         return dataBrokerProtectionHomeViewController ?? {
             let freemiumDBPUserStateManager = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp)
             let freemiumDBPFeature = Application.appDelegate.freemiumDBPFeature
-            let dataBrokerProtectionHomeViewController = DBPHomeViewController(dataBrokerProtectionManager: DataBrokerProtectionManager.shared, freemiumPIRFeature: freemiumDBPFeature)
+            let dataBrokerProtectionHomeViewController = DBPHomeViewController(dataBrokerProtectionManager: DataBrokerProtectionManager.shared, freemiumDBPFeature: freemiumDBPFeature)
             self.dataBrokerProtectionHomeViewController = dataBrokerProtectionHomeViewController
             return dataBrokerProtectionHomeViewController
         }()
