@@ -232,6 +232,8 @@ protocol NewWindowPolicyDecisionMaker {
 
         webView = WebView(frame: CGRect(origin: .zero, size: webViewSize), configuration: configuration)
         webView.allowsLinkPreview = false
+        webView.addsVisitedLinks = true
+
         permissions = PermissionModel(permissionManager: permissionManager,
                                       geolocationService: geolocationService)
 
