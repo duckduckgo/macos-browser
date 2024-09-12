@@ -27,7 +27,33 @@ jobs:
         WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
       run: |
         bundle exec fastlane run asana_create_action_item \
-            task_url:"https://app.asana.com/0/1201621708115095/1208137627434473/f" \
-            template_name:"update-asana-for-public-release" \
-            github_handle:"${{ github.actor }}" \
-            is_scheduled_release:"${{ github.event_name == 'schedule' }}"
+          task_url:"https://app.asana.com/0/1201621708115095/1208137627434473/f" \
+          template_name:"update-asana-for-public-release" \
+          github_handle:"${{ github.actor }}" \
+          is_scheduled_release:"${{ github.event_name == 'schedule' }}"
+
+    - name: Create Publish DMG Release task on failure
+      id: create-publish-dmg-task-on-failure
+      env:
+        ASANA_TASK_URL: "https://app.asana.com/0/1201621708115095/1208137627434473/f"
+        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      run: |
+        bundle exec fastlane run asana_create_action_item \
+          task_url:"https://app.asana.com/0/1201621708115095/1208137627434473/f" \
+          template_name:"run-publish-dmg-release" \
+          github_handle:"${{ github.actor }}" \
+          is_scheduled_release:"${{ github.event_name == 'schedule' }}"
+
+    - name: Create Asana task to announce the release
+      id: create-announcement-task
+      env:
+        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      run: |
+        bundle exec fastlane run asana_create_action_item \
+          task_url:"https://app.asana.com/0/1201621708115095/1208137627434473/f" \
+          task_name:"Announce the release to the company" \
+          html_notes:"<body><h1>Pozdrawiam</h1><br><br>Jacek 🎉<br><br>Dominik &lt;3" \
+          github_handle:"${{ github.actor }}" \
+          is_scheduled_release:"${{ github.event_name == 'schedule' }}"
