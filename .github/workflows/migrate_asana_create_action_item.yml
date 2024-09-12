@@ -22,6 +22,7 @@ jobs:
     - name: Test asana-create-action-item comment
       id: create-create-action-item
       env:
+        APP_BOARD_ASANA_PROJECT_ID: ${{ vars.MACOS_APP_BOARD_ASANA_PROJECT_ID }}
         ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
         WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
       run: |
