@@ -454,6 +454,12 @@ final class BookmarkListViewController: NSViewController {
         sortBookmarksViewModel.$selectedSortMode.sink { [weak self] newSortMode in
             self?.setupSort(mode: newSortMode)
         }.store(in: &cancellables)
+
+        dataSource.$isSearching.sink { [weak self] newValue in
+            if !newValue {
+                self?.updateDocumentViewHeight()
+            }
+        }.store(in: &cancellables)
     }
 
     private func reloadData() {
