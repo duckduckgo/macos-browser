@@ -18,7 +18,7 @@
 
 import Cocoa
 
-class FlippedView: NSView {
+final class FlippedView: NSView {
 
     override var isFlipped: Bool {
         return true

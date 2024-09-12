@@ -788,7 +788,7 @@ extension BookmarkManagementDetailViewController {
     }
 
     private func updateDocumentViewHeight() {
-        guard let _ = scrollView.documentView as? FlippedView else { return }
+        guard scrollView.documentView is FlippedView else { return }
 
         let tableViewHeight = tableView.intrinsicContentSize.height
 
