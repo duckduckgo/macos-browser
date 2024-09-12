@@ -52,7 +52,8 @@ final class FirePopoverViewModel {
          fireproofDomains: FireproofDomains,
          faviconManagement: FaviconManagement,
          initialClearingOption: ClearingOption = .allData,
-         tld: TLD) {
+         tld: TLD,
+         contextualOnboardingStateMaching: ContextualOnboardingStateUpdater = ContextualOnboardingStateMachine.shared) {
 
         self.fireViewModel = fireViewModel
         self.tabCollectionViewModel = tabCollectionViewModel
@@ -61,6 +62,7 @@ final class FirePopoverViewModel {
         self.faviconManagement = faviconManagement
         self.clearingOption = initialClearingOption
         self.tld = tld
+        self.contextualOnboardingStateMaching = contextualOnboardingStateMaching
     }
 
     var clearingOption = ClearingOption.allData {
@@ -77,6 +79,7 @@ final class FirePopoverViewModel {
     private let fireproofDomains: FireproofDomains
     private let faviconManagement: FaviconManagement
     private let tld: TLD
+    private let contextualOnboardingStateMaching: ContextualOnboardingStateUpdater
 
     private(set) var hasOnlySingleFireproofDomain: Bool = false
     @Published private(set) var selectable: [Item] = []
@@ -189,6 +192,7 @@ final class FirePopoverViewModel {
     // MARK: - Burning
 
     func burn() {
+        contextualOnboardingStateMaching.fireButtonUsed()
         PixelKit.fire(GeneralPixel.fireButtonFirstBurn, frequency: .legacyDaily)
 
         switch (clearingOption, areAllSelected) {
