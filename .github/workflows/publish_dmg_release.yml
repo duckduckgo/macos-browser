@@ -315,6 +315,7 @@ jobs:
         if: always()
         env:
           ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           bundle exec fastlane run asana_create_action_item \
             task_url:"${{ env.asana-task-url }}" \
@@ -328,6 +329,7 @@ jobs:
         env:
           APP_BOARD_ASANA_PROJECT_ID: ${{ vars.MACOS_APP_BOARD_ASANA_PROJECT_ID }}
           ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           bundle exec fastlane run asana_create_action_item \
             task_url:"${{ env.asana-task-url }}" \
@@ -340,6 +342,7 @@ jobs:
         if: ${{ env.RELEASE_TYPE != 'internal' }}
         env:
           ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           bundle exec fastlane run asana_create_action_item \
             task_url:"${{ env.asana-task-url }}" \
