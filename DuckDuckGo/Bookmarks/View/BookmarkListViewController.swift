@@ -499,6 +499,9 @@ final class BookmarkListViewController: NSViewController {
         if !isSearchVisible {
             outlineView.makeMeFirstResponder()
         }
+
+        let selectedNodes = self.selectedNodes
+        expandAndRestore(selectedNodes: selectedNodes)
     }
 
     private func expandFoldersAndScrollUntil(_ folder: BookmarkFolder) {
