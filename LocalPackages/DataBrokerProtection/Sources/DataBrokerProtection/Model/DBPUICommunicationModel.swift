@@ -76,6 +76,15 @@ struct DBPUIUserProfileAddress: Codable {
     let zipCode: String?
 }
 
+extension DBPUIUserProfileAddress {
+    init(addressCityState: AddressCityState) {
+        self.init(street: addressCityState.fullAddress,
+                  city: addressCityState.city,
+                  state: addressCityState.state,
+                  zipCode: nil)
+    }
+}
+
 /// Message Object representing a user profile containing one or more names and addresses
 /// also contains the user profile's birth year
 struct DBPUIUserProfile: Codable {
@@ -112,6 +121,10 @@ struct DBPUIDataBroker: Codable, Hashable {
         self.date = date
     }
 
+    init(dataBroker: DataBroker) {
+        self.init(name: dataBroker.name, url: dataBroker.url)
+    }
+
     func hash(into hasher: inout Hasher) {
         hasher.combine(name)
     }
@@ -136,6 +149,43 @@ struct DBPUIDataBrokerProfileMatch: Codable {
     let alternativeNames: [String]
     let relatives: [String]
     let date: Double? // Used in some methods to set the removedDate or found date
+    let foundDate: Double
+    let optOutSubmittedDate: Double?
+    let estimatedRemovalDate: Double?
+    let removedDate: Double?
+}
+
+extension DBPUIDataBrokerProfileMatch {
+    init(extractedProfile: ExtractedProfile, optOutJobData: OptOutJobData, dataBroker: DataBroker) {
+        let estimatedRemovalDate = Calendar.current.date(byAdding: .day, value: 14, to: optOutJobData.createdDate)
+        self.init(dataBroker: DBPUIDataBroker(dataBroker: dataBroker),
+                  name: extractedProfile.fullName ?? "No name",
+                  addresses: extractedProfile.addresses?.map {DBPUIUserProfileAddress(addressCityState: $0) } ?? [],
+                  alternativeNames: extractedProfile.alternativeNames ?? [String](),
+                  relatives: extractedProfile.relatives ?? [String](),
+                  date: extractedProfile.removedDate?.timeIntervalSince1970,
+                  foundDate: optOutJobData.createdDate.timeIntervalSince1970,
+                  optOutSubmittedDate: optOutJobData.submittedSuccessfullyDate?.timeIntervalSince1970,
+                  estimatedRemovalDate: estimatedRemovalDate?.timeIntervalSince1970,
+                  removedDate: extractedProfile.removedDate?.timeIntervalSince1970)
+    }
+
+    init(extractedProfile: ExtractedProfile,
+         optOutJobData: OptOutJobData,
+         dataBrokerName: String,
+         databrokerURL: String) {
+        let estimatedRemovalDate = Calendar.current.date(byAdding: .day, value: 14, to: optOutJobData.createdDate)
+        self.init(dataBroker: DBPUIDataBroker(name: dataBrokerName, url: databrokerURL),
+                  name: extractedProfile.fullName ?? "No name",
+                  addresses: extractedProfile.addresses?.map {DBPUIUserProfileAddress(addressCityState: $0) } ?? [],
+                  alternativeNames: extractedProfile.alternativeNames ?? [String](),
+                  relatives: extractedProfile.relatives ?? [String](),
+                  date: extractedProfile.removedDate?.timeIntervalSince1970,
+                  foundDate: optOutJobData.createdDate.timeIntervalSince1970,
+                  optOutSubmittedDate: optOutJobData.submittedSuccessfullyDate?.timeIntervalSince1970,
+                  estimatedRemovalDate: estimatedRemovalDate?.timeIntervalSince1970,
+                  removedDate: extractedProfile.removedDate?.timeIntervalSince1970)
+    }
 }
 
 /// Protocol to represent a message that can be passed from the host to the UI
@@ -156,6 +206,27 @@ struct DBPUIOptOutMatch: DBPUISendableMessage {
     let alternativeNames: [String]
     let addresses: [DBPUIUserProfileAddress]
     let date: Double
+    let foundDate: Double
+    let optOutSubmittedDate: Double?
+    let estimatedRemovalDate: Double?
+    let removedDate: Double?
+}
+
+extension DBPUIOptOutMatch {
+    init?(profileMatch: DBPUIDataBrokerProfileMatch, matches: Int) {
+        guard let removedDate = profileMatch.removedDate else { return nil }
+        let dataBroker = profileMatch.dataBroker
+        self.init(dataBroker: dataBroker,
+                  matches: matches,
+                  name: profileMatch.name,
+                  alternativeNames: profileMatch.alternativeNames,
+                  addresses: profileMatch.addresses,
+                  date: removedDate,
+                  foundDate: profileMatch.foundDate,
+                  optOutSubmittedDate: profileMatch.optOutSubmittedDate,
+                  estimatedRemovalDate: nil,
+                  removedDate: removedDate)
+    }
 }
 
 /// Data representing the initial scan progress
