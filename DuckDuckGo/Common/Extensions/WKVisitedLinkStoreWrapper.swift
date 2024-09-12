@@ -16,7 +16,6 @@
 //  limitations under the License.
 //
 
-@MainActor
 struct WKVisitedLinkStoreWrapper {
 
     fileprivate let visitedLinkStore: NSObject
@@ -33,10 +32,12 @@ struct WKVisitedLinkStoreWrapper {
         self.visitedLinkStore = visitedLinkStore
     }
 
+    @MainActor
     func removeVisitedLink(with url: URL) {
         visitedLinkStore.perform(Selector.removeVisitedLinkWithURL, with: url as NSURL)
     }
 
+    @MainActor
     func removeAll() {
         visitedLinkStore.perform(Selector.removeAll)
     }
