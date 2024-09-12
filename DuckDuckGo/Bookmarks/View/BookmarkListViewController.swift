@@ -19,6 +19,7 @@
 import AppKit
 import Carbon
 import Combine
+import SwiftUI
 
 protocol BookmarkListViewControllerDelegate: AnyObject {
 
@@ -121,6 +122,37 @@ final class BookmarkListViewController: NSViewController {
         return .init(syncService: syncService, syncBookmarksAdapter: syncBookmarksAdapter)
     }()
 
+    private var documentView = FlippedView()
+
+    private var documentViewHeightConstraint: NSLayoutConstraint?
+    private var outlineViewTopToPromoTopConstraint: NSLayoutConstraint?
+    private var outlineViewTopToDocumentTopConstraint: NSLayoutConstraint?
+    private var syncPromoHeightConstraint: NSLayoutConstraint?
+
+    private lazy var syncPromoManager: SyncPromoManaging = SyncPromoManager()
+
+    private lazy var syncPromoViewHostingView: NSHostingView<SyncPromoView> = {
+        let model = SyncPromoViewModel(touchpointType: .bookmarks, primaryButtonAction: { [weak self] in
+            Task { @MainActor in
+                // TODO - need to pass through the source for pixels
+                WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .sync)
+            }
+            // TODO - pixel
+            // Pixel.fire(.syncPromoConfirmed, withAdditionalParameters: ["source": SyncPromoManager.Touchpoint.bookmarks.rawValue])
+        }, dismissButtonAction: { [weak self] in
+            self?.syncPromoManager.dismissPromoFor(.bookmarks)
+            self?.updateDocumentViewHeight()
+        })
+
+        let headerView = SyncPromoView(viewModel: model)
+
+        // TODO - pixel
+        // Pixel.fire(.syncPromoDisplayed, withAdditionalParameters: ["source": SyncPromoManager.Touchpoint.bookmarks.rawValue])
+
+        let hostingController = NSHostingView(rootView: headerView)
+        return hostingController
+    }()
+
     init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
          dragDropManager: BookmarkDragDropManager = BookmarkDragDropManager.shared,
          metrics: BookmarksSearchAndSortMetrics = BookmarksSearchAndSortMetrics()) {
@@ -144,6 +176,7 @@ final class BookmarkListViewController: NSViewController {
     // MARK: View Lifecycle
 
     override func loadView() {
+        let showSyncPromo = syncPromoManager.shouldPresentPromoFor(.bookmarks)
         view = ColorView(frame: .zero, backgroundColor: .popoverBackground)
 
         view.addSubview(titleTextField)
@@ -246,11 +279,15 @@ final class BookmarkListViewController: NSViewController {
         scrollView.contentInsets = NSEdgeInsets(top: 0, left: 0, bottom: 0, right: 12)
 
         let column = NSTableColumn()
-        column.width = scrollView.frame.width - 32
+        column.width = scrollView.frame.width - (showSyncPromo ? 40 : 32)
         outlineView.addTableColumn(column)
-        outlineView.translatesAutoresizingMaskIntoConstraints = true
-        outlineView.autoresizesOutlineColumn = false
-        outlineView.autoresizingMask = [.width, .height]
+        outlineView.translatesAutoresizingMaskIntoConstraints = showSyncPromo ? false : true
+        if showSyncPromo {
+            outlineView.translatesAutoresizingMaskIntoConstraints = false
+        } else {
+            outlineView.translatesAutoresizingMaskIntoConstraints = true
+            outlineView.autoresizingMask = [.width, .height]
+        }
         outlineView.headerView = nil
         outlineView.allowsEmptySelection = false
         outlineView.allowsExpansionToolTips = true
@@ -264,12 +301,14 @@ final class BookmarkListViewController: NSViewController {
         outlineView.dataSource = dataSource
         outlineView.delegate = dataSource
 
-        let clipView = NSClipView(frame: scrollView.frame)
-        clipView.translatesAutoresizingMaskIntoConstraints = true
-        clipView.autoresizingMask = [.width, .height]
-        clipView.documentView = outlineView
-        clipView.drawsBackground = false
-        scrollView.contentView = clipView
+        if !showSyncPromo {
+            let clipView = NSClipView(frame: scrollView.frame)
+            clipView.translatesAutoresizingMaskIntoConstraints = true
+            clipView.autoresizingMask = [.width, .height]
+            clipView.documentView = outlineView
+            clipView.drawsBackground = false
+            scrollView.contentView = clipView
+        }
 
         emptyStateImageView.translatesAutoresizingMaskIntoConstraints = false
         emptyState.addSubview(emptyStateImageView)
@@ -304,6 +343,10 @@ final class BookmarkListViewController: NSViewController {
 
         importButton.translatesAutoresizingMaskIntoConstraints = false
         importButton.isHidden = true
+
+        if showSyncPromo {
+            setupSyncPromoView()
+        }
 
         setupLayout()
     }
@@ -522,6 +565,7 @@ final class BookmarkListViewController: NSViewController {
         emptyStateMessage.stringValue = mode.description
         emptyStateImageView.image = mode.image
         importButton.isHidden = mode.shouldHideImportButton
+        updateDocumentViewHeight()
     }
 
     // MARK: Actions
@@ -790,6 +834,100 @@ extension BookmarkListViewController: NSSearchFieldDelegate {
         return true
     }
 
+}
+
+// MARK: - Sync Promo
+
+extension BookmarkListViewController {
+
+    private func setupSyncPromoView() {
+        documentView.addSubview(syncPromoViewHostingView)
+        documentView.addSubview(outlineView)
+
+        scrollView.documentView = documentView
+
+        documentView.translatesAutoresizingMaskIntoConstraints = false
+        syncPromoViewHostingView.translatesAutoresizingMaskIntoConstraints = false
+
+        setupSyncPromoLayout()
+    }
+
+    private func setupSyncPromoLayout() {
+        NSLayoutConstraint.activate([
+                                        documentView.topAnchor.constraint(equalTo: scrollView.contentView.topAnchor),
+                                        documentView.leadingAnchor.constraint(equalTo: scrollView.contentView.leadingAnchor),
+                                        documentView.trailingAnchor.constraint(lessThanOrEqualTo: scrollView.contentView.trailingAnchor),
+                                        documentView.widthAnchor.constraint(equalTo: scrollView.contentView.widthAnchor, constant: -12),
+
+                                        syncPromoViewHostingView.topAnchor.constraint(equalTo: documentView.topAnchor, constant: 8),
+                                        syncPromoViewHostingView.leadingAnchor.constraint(equalTo: documentView.leadingAnchor, constant: 8),
+                                        syncPromoViewHostingView.trailingAnchor.constraint(equalTo: documentView.trailingAnchor, constant: -8),
+
+                                        outlineView.leadingAnchor.constraint(equalTo: documentView.leadingAnchor),
+                                        outlineView.trailingAnchor.constraint(equalTo: documentView.trailingAnchor),
+                                        outlineView.bottomAnchor.constraint(greaterThanOrEqualTo: documentView.bottomAnchor)
+                                    ])
+
+        outlineViewTopToDocumentTopConstraint = outlineView.topAnchor.constraint(equalTo: documentView.topAnchor)
+        outlineViewTopToDocumentTopConstraint?.isActive = false
+
+        outlineViewTopToPromoTopConstraint = outlineView.topAnchor.constraint(equalTo: syncPromoViewHostingView.bottomAnchor)
+        outlineViewTopToPromoTopConstraint?.isActive = true
+
+        let totalHeight = syncPromoViewHostingView.frame.height + outlineView.frame.height
+        documentViewHeightConstraint = documentView.heightAnchor.constraint(equalToConstant: totalHeight)
+        documentViewHeightConstraint?.isActive = true
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(outlineViewFrameDidChange),
+                                               name: NSView.frameDidChangeNotification,
+                                               object: outlineView)
+
+        outlineView.postsFrameChangedNotifications = true
+    }
+
+    private func shouldShowSyncPromo() -> Bool {
+        return emptyState.isHidden
+               && !dataSource.isSearching
+               && !outlineView.isHidden
+               && treeController.rootNode.childNodes.count > 0
+               && syncPromoManager.shouldPresentPromoFor(.bookmarks)
+    }
+
+    @objc private func outlineViewFrameDidChange(notification: Notification) {
+        updateDocumentViewHeight()
+    }
+
+    private func updateDocumentViewHeight() {
+        guard scrollView.documentView is FlippedView else { return }
+
+        let outlineViewHeight = outlineView.intrinsicContentSize.height
+
+        if shouldShowSyncPromo() {
+            if let outlineViewTopToDocumentTopConstraint = outlineViewTopToDocumentTopConstraint, outlineViewTopToDocumentTopConstraint.isActive {
+                syncPromoViewHostingView.isHidden = false
+                outlineViewTopToDocumentTopConstraint.isActive = false
+                outlineViewTopToPromoTopConstraint?.isActive = true
+            }
+
+            let promoHeight = syncPromoViewHostingView.intrinsicContentSize.height == 0 ? 80 : syncPromoViewHostingView.intrinsicContentSize.height
+            let totalHeight = promoHeight + outlineViewHeight
+            updateDocumentViewHeightIfNeeded(totalHeight)
+        } else {
+            if let outlineViewTopToPromoTopConstraint = outlineViewTopToPromoTopConstraint, outlineViewTopToPromoTopConstraint.isActive {
+                syncPromoViewHostingView.isHidden = true
+                outlineViewTopToPromoTopConstraint.isActive = false
+                outlineViewTopToDocumentTopConstraint?.isActive = true
+            }
+
+            updateDocumentViewHeightIfNeeded(outlineViewHeight)
+        }
+    }
+
+    private func updateDocumentViewHeightIfNeeded(_ newHeight: CGFloat) {
+        guard documentViewHeightConstraint?.constant != newHeight else { return }
+        documentViewHeightConstraint?.constant = newHeight
+    }
 }
 
 // MARK: - Preview
