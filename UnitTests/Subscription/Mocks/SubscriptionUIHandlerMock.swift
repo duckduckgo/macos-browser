@@ -19,7 +19,7 @@
 import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
-public class SubscriptionUIHandlerMock: SubscriptionUIHandling {
+public final class SubscriptionUIHandlerMock: SubscriptionUIHandling {
 
     public enum UIHandlerMockPerformedAction: Equatable {
         case didPresentProgressViewController
