@@ -63,6 +63,9 @@ public protocol FreemiumDBPUserStateManager {
 
     /// The results of the user's first scan, stored as a `FreemiumDBPMatchResults` object.
     var firstScanResults: FreemiumDBPMatchResults? { get set }
+
+    /// Resets all stored user state
+    func resetAllState()
 }
 
 /// Default implementation of `FreemiumDBPUserStateManager` that uses `UserDefaults` for underlying storage.
@@ -170,5 +173,16 @@ public final class DefaultFreemiumDBPUserStateManager: FreemiumDBPUserStateManag
     /// - Note: Ensure the same `UserDefaults` instance is passed throughout the app to maintain consistency in state management.
     public init(userDefaults: UserDefaults) {
         self.userDefaults = userDefaults
+    }
+
+    /// Resets all stored user state by clearing or resetting the relevant keys in `UserDefaults`.
+    public func resetAllState() {
+        // Reset each stored value to its default state
+        userDefaults.removeObject(forKey: Keys.didOnboard)
+        userDefaults.removeObject(forKey: Keys.firstProfileSavedTimestamp)
+        userDefaults.removeObject(forKey: Keys.didPostFirstProfileSavedNotification)
+        userDefaults.removeObject(forKey: Keys.didPostResultsNotification)
+        userDefaults.removeObject(forKey: Keys.firstScanResults)
+        userDefaults.removeObject(forKey: Keys.didDismissHomePagePromotion)
     }
 }

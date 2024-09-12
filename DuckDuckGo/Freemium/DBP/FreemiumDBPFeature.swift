@@ -20,46 +20,125 @@ import Foundation
 import BrowserServicesKit
 import Subscription
 import Freemium
+import Combine
+import OSLog
 
-/// Conforming types encapsulate logic relating to the Freemium DBP Feature (e.g Feature Availability etc.)
+/// A protocol that defines the behavior for the Freemium DBP feature.
+/// This protocol provides the ability to check the availability of the feature and subscribe to updates
+/// from various dependencies, such as privacy configurations and user subscriptions.
 protocol FreemiumDBPFeature {
+
+    /// A boolean value indicating whether the Freemium DBP feature is currently available.
     var isAvailable: Bool { get }
+
+    /// A publisher that emits updates when the availability of the Freemium DBP feature changes.
+    /// The publisher emits a `Bool` value indicating whether the feature is available.
+    var isAvailablePublisher: AnyPublisher<Bool, Never> { get }
+
+    /// Subscribes to updates from dependencies, including privacy configurations and notifications
+    /// such as subscription changes, and triggers updates for feature availability accordingly.
+    func subscribeToDependencyUpdates()
 }
 
-/// Default implementation of `FreemiumDBPFeature`
+/// The default implementation of the `FreemiumDBPFeature` protocol.
+/// This class manages the Freemium Personal Information Removal (DBP) feature, including
+/// determining its availability based on privacy configurations and user subscription status.
+/// It listens for updates from multiple dependencies, including privacy configurations
+/// and subscription changes, and notifies subscribers accordingly.
 final class DefaultFreemiumDBPFeature: FreemiumDBPFeature {
 
-    private let featureFlagger: FeatureFlagger
+    /// A boolean value indicating whether the Freemium DBP feature is currently available.
+    ///
+    /// The feature is considered available if:
+    /// 1. It is enabled in the privacy configuration (`DBPSubfeature.freemium`), and
+    /// 2. The user is a potential privacy pro subscriber.
+    var isAvailable: Bool {
+        privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DBPSubfeature.freemium)
+        && isPotentialPrivacyProSubscriber
+    }
+
+    /// A publisher that emits updates when the availability of the Freemium DBP feature changes.
+    ///
+    /// Subscribers receive updates when changes occur in the privacy configuration or user subscription status.
+    var isAvailablePublisher: AnyPublisher<Bool, Never> {
+        isAvailableSubject.eraseToAnyPublisher()
+    }
+
+    // MARK: - Private Properties
+    private let privacyConfigurationManager: PrivacyConfigurationManaging
     private let subscriptionManager: SubscriptionManager
     private let accountManager: AccountManager
     private var freemiumDBPUserStateManager: FreemiumDBPUserStateManager
-    private let featureDisabler: DataBrokerProtectionFeatureDisabling
+    private let notificationCenter: NotificationCenter
+    private lazy var featureDisabler: DataBrokerProtectionFeatureDisabling = DataBrokerProtectionFeatureDisabler()
 
-    var isAvailable: Bool {
-        /* Freemium DBP availability criteria:
-            1. Feature Flag enabled
-            2. Privacy Pro Available
-            3. Not a current Privacy Pro subscriber
-            4. (Temp) In experiment cohort
-         */
-        featureFlagger.isFeatureOn(.freemiumDBP) // #1
-        && isPotentialPrivacyProSubscriber // #2 & #3
-        // TODO: - Also check experiment cohort here
-    }
+    private let isAvailableSubject = PassthroughSubject<Bool, Never>()
+    private var cancellables = Set<AnyCancellable>()
 
-    init(featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger,
+    // MARK: - Initialization
+
+    /// Initializes a new instance of the `DefaultFreemiumDBPFeature`.
+    ///
+    /// - Parameters:
+    ///   - privacyConfigurationManager: Manages privacy configurations for the app.
+    ///   - subscriptionManager: Manages subscriptions for the user.
+    ///   - accountManager: Manages user account details.
+    ///   - freemiumDBPUserStateManager: Manages the user state for Freemium DBP.
+    ///   - notificationCenter: Observes notifications, defaulting to `.default`.
+    ///   - featureDisabler: Optional feature disabler. If not provided, the default `DataBrokerProtectionFeatureDisabler` is used.
+    init(privacyConfigurationManager: PrivacyConfigurationManaging,
          subscriptionManager: SubscriptionManager,
          accountManager: AccountManager,
          freemiumDBPUserStateManager: FreemiumDBPUserStateManager,
-         featureDisabler: DataBrokerProtectionFeatureDisabling = DataBrokerProtectionFeatureDisabler()) {
+         notificationCenter: NotificationCenter = .default,
+         featureDisabler: DataBrokerProtectionFeatureDisabling? = nil) {
 
-        self.featureFlagger = featureFlagger
+        self.privacyConfigurationManager = privacyConfigurationManager
         self.subscriptionManager = subscriptionManager
         self.accountManager = accountManager
         self.freemiumDBPUserStateManager = freemiumDBPUserStateManager
-        self.featureDisabler = featureDisabler
+        self.notificationCenter = notificationCenter
 
-        offBoardIfNecessary()
+        // Use the provided feature disabler if available, otherwise initialize lazily.
+        if let featureDisabler = featureDisabler {
+            self.featureDisabler = featureDisabler
+        }
+    }
+
+    // MARK: - Public Methods
+
+    /// Subscribes to updates from dependencies such as privacy configuration changes and
+    /// subscription-related notifications.
+    ///
+    /// - When the privacy configuration is updated, it checks whether the Freemium DBP feature
+    ///   is still available based on the user's subscription status and the current privacy settings.
+    /// - When the user's subscription changes, it also triggers a re-evaluation of the feature's availability.
+    func subscribeToDependencyUpdates() {
+        // Subscribe to privacy configuration updates
+        privacyConfigurationManager.updatesPublisher
+            .sink { [weak self] in
+                guard let self = self else { return }
+
+                let featureAvailable = self.isAvailable
+                Logger.freemiumDBP.debug("[Freemium DBP] Privacy Config Updated. Feature Availability = \(featureAvailable)")
+
+                self.isAvailableSubject.send(featureAvailable)
+
+                self.offBoardIfNecessary()
+            }
+            .store(in: &cancellables)
+
+        // Subscribe to notifications about subscription changes
+        notificationCenter.publisher(for: .subscriptionDidChange)
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+
+                let featureAvailable = self.isAvailable
+                Logger.freemiumDBP.debug("[Freemium DBP] Subscription Updated. Feature Availability = \(featureAvailable)")
+
+                self.isAvailableSubject.send(featureAvailable)
+            }
+            .store(in: &cancellables)
     }
 }
 
@@ -82,7 +161,7 @@ private extension DefaultFreemiumDBPFeature {
     var shouldDisableAndDelete: Bool {
         guard freemiumDBPUserStateManager.didOnboard else { return false }
 
-        return !featureFlagger.isFeatureOn(.freemiumDBP)
+        return !privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DBPSubfeature.freemium)
         && isPotentialPrivacyProSubscriber
     }
 
@@ -93,7 +172,8 @@ private extension DefaultFreemiumDBPFeature {
     /// - Disabling and deleting DBP data
     func offBoardIfNecessary() {
         if shouldDisableAndDelete {
-            freemiumDBPUserStateManager.didOnboard = false
+            Logger.freemiumDBP.debug("[Freemium DBP] Feature Disabled: Offboarding")
+            freemiumDBPUserStateManager.resetAllState()
             featureDisabler.disableAndDelete()
         }
     }

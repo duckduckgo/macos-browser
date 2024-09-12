@@ -287,7 +287,7 @@ final class NavigationBarViewController: NSViewController {
     @IBAction func optionsButtonAction(_ sender: NSButton) {
         let internalUserDecider = NSApp.delegateTyped.internalUserDecider
         let freemiumDBPUserStateManager = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp)
-        let freemiumDBPFeature = DefaultFreemiumDBPFeature(subscriptionManager: subscriptionManager, accountManager: subscriptionManager.accountManager, freemiumDBPUserStateManager: freemiumDBPUserStateManager)
+        let freemiumDBPFeature = Application.appDelegate.freemiumDBPFeature
         let menu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                    passwordManagerCoordinator: PasswordManagerCoordinator.shared,
                                    vpnFeatureGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: subscriptionManager),

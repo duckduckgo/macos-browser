@@ -98,6 +98,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     public let subscriptionUIHandler: SubscriptionUIHandling
 
     // MARK: - Freemium DBP
+    public let freemiumDBPFeature: FreemiumDBPFeature
     private var freemiumDBPScanResultPolling: FreemiumDBPScanResultPolling?
 
     var configurationStore = ConfigurationStore()
@@ -272,6 +273,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         // Update DBP environment and match the Subscription environment
         DataBrokerProtectionSettings().alignTo(subscriptionEnvironment: subscriptionManager.currentEnvironment)
+
+        // Freemium DBP
+        let freemiumDBPUserStateManager = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp)
+        freemiumDBPFeature = DefaultFreemiumDBPFeature(privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager,
+                                                                     subscriptionManager: subscriptionManager,
+                                                                     accountManager: subscriptionManager.accountManager,
+                                                       freemiumDBPUserStateManager: freemiumDBPUserStateManager)
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {
@@ -296,6 +304,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler(subscriptionManager: subscriptionManager,
                                                                                               tunnelController: tunnelController,
                                                                                               vpnUninstaller: vpnUninstaller)
+
+        // Freemium DBP
+        freemiumDBPFeature.subscribeToDependencyUpdates()
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
