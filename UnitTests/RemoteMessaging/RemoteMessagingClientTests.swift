@@ -31,12 +31,19 @@ struct MockRemoteMessagingStoreProvider: RemoteMessagingStoreProviding {
 }
 
 final class MockFreemiumDBPUserStateManager: FreemiumDBPUserStateManager {
+
+    var didCallResetAllState = false
+
     var didOnboard = false
     var didPostFirstProfileSavedNotification = false
     var didPostResultsNotification = false
     var didDismissHomePagePromotion = false
     var firstProfileSavedTimestamp: String?
     var firstScanResults: FreemiumDBPMatchResults?
+
+    func resetAllState() {
+        didCallResetAllState = true
+    }
 }
 
 final class RemoteMessagingClientTests: XCTestCase {

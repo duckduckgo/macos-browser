@@ -107,11 +107,6 @@ final class FreemiumDebugMenu: NSMenuItem {
 
     @objc
     func resetAllState() {
-        DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).didOnboard = false
-        DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).firstProfileSavedTimestamp = nil
-        DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).didPostFirstProfileSavedNotification = false
-        DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).didPostResultsNotification = false
-        DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).firstScanResults = nil
-        DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).didDismissHomePagePromotion = false
+        DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).resetAllState()
     }
 }

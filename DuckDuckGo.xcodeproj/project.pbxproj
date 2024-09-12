@@ -2720,8 +2720,8 @@
 		C126B35B2C820924005DC2A3 /* FreemiumDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = C126B3592C820924005DC2A3 /* FreemiumDebugMenu.swift */; };
 		C1351DD12C8B31CE0086B058 /* NotificationName+Freemium.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1351DD02C8B31CE0086B058 /* NotificationName+Freemium.swift */; };
 		C1351DD22C8B31CE0086B058 /* NotificationName+Freemium.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1351DD02C8B31CE0086B058 /* NotificationName+Freemium.swift */; };
-		C1351DD42C8B53500086B058 /* FreemiumDBPPromotionViewCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1351DD32C8B53500086B058 /* FreemiumDBPPromotionViewCoordinatorTests.swift */; };
-		C1351DD52C8B53500086B058 /* FreemiumDBPPromotionViewCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1351DD32C8B53500086B058 /* FreemiumDBPPromotionViewCoordinatorTests.swift */; };
+		C1351DD42C8B53500086B058 /* FreemiumDBPPromotionViewCoordinatingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1351DD32C8B53500086B058 /* FreemiumDBPPromotionViewCoordinatingTests.swift */; };
+		C1351DD52C8B53500086B058 /* FreemiumDBPPromotionViewCoordinatingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1351DD32C8B53500086B058 /* FreemiumDBPPromotionViewCoordinatingTests.swift */; };
 		C1372EF42BBC5BAD003F8793 /* SecureTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1372EF32BBC5BAD003F8793 /* SecureTextField.swift */; };
 		C1372EF52BBC5BAD003F8793 /* SecureTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1372EF32BBC5BAD003F8793 /* SecureTextField.swift */; };
 		C13909EF2B85FD4E001626ED /* AutofillActionExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13909EE2B85FD4E001626ED /* AutofillActionExecutor.swift */; };
@@ -4535,7 +4535,7 @@
 		C11198332C89AEFA00F0272C /* FreemiumDBPFirstProfileSavedNotifierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreemiumDBPFirstProfileSavedNotifierTests.swift; sourceTree = "<group>"; };
 		C126B3592C820924005DC2A3 /* FreemiumDebugMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreemiumDebugMenu.swift; sourceTree = "<group>"; };
 		C1351DD02C8B31CE0086B058 /* NotificationName+Freemium.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotificationName+Freemium.swift"; sourceTree = "<group>"; };
-		C1351DD32C8B53500086B058 /* FreemiumDBPPromotionViewCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreemiumDBPPromotionViewCoordinatorTests.swift; sourceTree = "<group>"; };
+		C1351DD32C8B53500086B058 /* FreemiumDBPPromotionViewCoordinatingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreemiumDBPPromotionViewCoordinatingTests.swift; sourceTree = "<group>"; };
 		C1372EF32BBC5BAD003F8793 /* SecureTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureTextField.swift; sourceTree = "<group>"; };
 		C13909EE2B85FD4E001626ED /* AutofillActionExecutor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillActionExecutor.swift; sourceTree = "<group>"; };
 		C13909F32B85FD79001626ED /* AutofillDeleteAllPasswordsExecutorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillDeleteAllPasswordsExecutorTests.swift; sourceTree = "<group>"; };
@@ -8988,7 +8988,7 @@
 				C18194662C7F60E500381092 /* FreemiumDBPPresenterTests.swift */,
 				C1CE846B2C88868D0068913B /* FreemiumDBPScanResultPollingTests.swift */,
 				C11198332C89AEFA00F0272C /* FreemiumDBPFirstProfileSavedNotifierTests.swift */,
-				C1351DD32C8B53500086B058 /* FreemiumDBPPromotionViewCoordinatorTests.swift */,
+				C1351DD32C8B53500086B058 /* FreemiumDBPPromotionViewCoordinatingTests.swift */,
 			);
 			path = DBP;
 			sourceTree = "<group>";
@@ -11468,7 +11468,7 @@
 				3706FE08293F661700E42796 /* WKWebsiteDataStoreExtensionTests.swift in Sources */,
 				3706FE09293F661700E42796 /* VariantManagerTests.swift in Sources */,
 				3706FE0A293F661700E42796 /* UserAgentTests.swift in Sources */,
-				C1351DD52C8B53500086B058 /* FreemiumDBPPromotionViewCoordinatorTests.swift in Sources */,
+				C1351DD52C8B53500086B058 /* FreemiumDBPPromotionViewCoordinatingTests.swift in Sources */,
 				3706FE0B293F661700E42796 /* AVCaptureDeviceMock.swift in Sources */,
 				9FBD84572BB3ACFD00220859 /* AttributionOriginFileProviderTests.swift in Sources */,
 				7B4C5CF62BE51D640007A164 /* VPNUninstallerTests.swift in Sources */,
@@ -13186,7 +13186,7 @@
 				37DB56F22C3B36B80093D4DC /* RemoteMessagingClientTests.swift in Sources */,
 				4B9292C32667103100AD2C21 /* PasteboardBookmarkTests.swift in Sources */,
 				F1AFDBD22C231B7A00710F2C /* SubscriptionAppStoreRestorerTests.swift in Sources */,
-				C1351DD42C8B53500086B058 /* FreemiumDBPPromotionViewCoordinatorTests.swift in Sources */,
+				C1351DD42C8B53500086B058 /* FreemiumDBPPromotionViewCoordinatingTests.swift in Sources */,
 				B610F2E427A8F37A00FCEBE9 /* CBRCompileTimeReporterTests.swift in Sources */,
 				AABAF59C260A7D130085060C /* FaviconManagerMock.swift in Sources */,
 				37D046A42C7DAA8900AEAA50 /* ImageProcessorMock.swift in Sources */,
