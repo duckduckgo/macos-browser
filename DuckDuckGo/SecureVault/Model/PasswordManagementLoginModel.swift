@@ -39,6 +39,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
 
     var onSaveRequested: (SecureVaultModels.WebsiteCredentials) -> Void
     var onDeleteRequested: (SecureVaultModels.WebsiteCredentials) -> Void
+    var onDismissRequested: () -> Void
     var urlMatcher: AutofillDomainNameUrlMatcher
     var emailManager: EmailManager
 
@@ -133,18 +134,21 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     private let urlSort: AutofillDomainNameUrlSort
     private static let randomColorsCount = 15
 
-    init(onSaveRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
-         onDeleteRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
-         urlMatcher: AutofillDomainNameUrlMatcher,
+    init(urlMatcher: AutofillDomainNameUrlMatcher,
          emailManager: EmailManager,
          tld: TLD = ContentBlocking.shared.tld,
-         urlSort: AutofillDomainNameUrlSort) {
-        self.onSaveRequested = onSaveRequested
-        self.onDeleteRequested = onDeleteRequested
+         urlSort: AutofillDomainNameUrlSort,
+         onSaveRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
+         onDeleteRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
+         onDismissRequested: @escaping () -> Void) {
         self.urlMatcher = urlMatcher
         self.emailManager = emailManager
         self.tld = tld
         self.urlSort = urlSort
+        self.onSaveRequested = onSaveRequested
+        self.onDeleteRequested = onDeleteRequested
+        self.onDismissRequested = onDismissRequested
+
         self.emailManager.requestDelegate = self
     }
 

@@ -434,14 +434,18 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     private func createLoginItemView() {
-        let itemModel = PasswordManagementLoginModel(onSaveRequested: { [weak self] credentials in
+        let itemModel = PasswordManagementLoginModel(urlMatcher: urlMatcher,
+                                                     emailManager: emailManager,
+                                                     urlSort: urlSort,
+                                                     onSaveRequested: { [weak self] credentials in
             self?.doSaveCredentials(credentials)
-        }, onDeleteRequested: { [weak self] credentials in
+        },
+                                                     onDeleteRequested: { [weak self] credentials in
             self?.promptToDelete(credentials: credentials)
         },
-                                                     urlMatcher: urlMatcher,
-                                                     emailManager: emailManager,
-                                                     urlSort: urlSort)
+                                                     onDismissRequested: { [weak self] in
+            self?.dismiss()
+        })
 
         self.itemModel = itemModel
 
