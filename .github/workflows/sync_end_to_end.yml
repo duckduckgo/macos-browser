@@ -12,7 +12,7 @@ jobs:
     with:
       release-type: review
       create-dmg: false
-      branch: ${{ github.ref_name }}
+      branch: ${{ github.sha }}
     secrets:
       APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
       APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
