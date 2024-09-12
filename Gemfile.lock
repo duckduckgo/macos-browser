@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/duckduckgo/fastlane-plugin-ddg_apple_automation
-  revision: 400110e0012d204382cfa23f986c27806106f99b
+  revision: 2b3be3bc65c91f08c3897cf78cb8205ff0602489
   branch: jacek/asana-create-action-item
   specs:
     fastlane-plugin-ddg_apple_automation (0.8.1)
