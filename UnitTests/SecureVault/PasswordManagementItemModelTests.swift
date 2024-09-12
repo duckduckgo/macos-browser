@@ -31,11 +31,12 @@ final class PasswordManagementItemModelTests: XCTestCase {
     var urlSort = AutofillDomainNameUrlSort()
 
     func testWhenCredentialsAreSavedThenSaveIsRequested() {
-        let model = PasswordManagementLoginModel(onSaveRequested: onSaveRequested,
-                                                 onDeleteRequested: onDeleteRequested,
-                                                 urlMatcher: urlMatcher,
+        let model = PasswordManagementLoginModel(urlMatcher: urlMatcher,
                                                  emailManager: emailManager,
-                                                 urlSort: urlSort)
+                                                 urlSort: urlSort,
+                                                 onSaveRequested: onSaveRequested,
+                                                 onDeleteRequested: onDeleteRequested,
+                                                 onDismissRequested: onDismissRequested)
 
         model.credentials = makeCredentials(id: "1")
         model.save()
@@ -45,11 +46,12 @@ final class PasswordManagementItemModelTests: XCTestCase {
     }
 
     func testWhenCredentialsAreDeletedThenDeleteIsRequested() {
-        let model = PasswordManagementLoginModel(onSaveRequested: onSaveRequested,
-                                                onDeleteRequested: onDeleteRequested,
-                                                 urlMatcher: urlMatcher,
+        let model = PasswordManagementLoginModel(urlMatcher: urlMatcher,
                                                  emailManager: emailManager,
-                                                 urlSort: urlSort)
+                                                 urlSort: urlSort,
+                                                 onSaveRequested: onSaveRequested,
+                                                 onDeleteRequested: onDeleteRequested,
+                                                 onDismissRequested: onDismissRequested)
 
         model.credentials = makeCredentials(id: "1")
         model.requestDelete()
@@ -59,11 +61,12 @@ final class PasswordManagementItemModelTests: XCTestCase {
     }
 
     func testWhenCredentialsHasNoIdThenModelStateIsNew() {
-        let model = PasswordManagementLoginModel(onSaveRequested: onSaveRequested,
-                                                onDeleteRequested: onDeleteRequested,
-                                                 urlMatcher: urlMatcher,
+        let model = PasswordManagementLoginModel(urlMatcher: urlMatcher,
                                                  emailManager: emailManager,
-                                                 urlSort: urlSort)
+                                                 urlSort: urlSort,
+                                                 onSaveRequested: onSaveRequested,
+                                                 onDeleteRequested: onDeleteRequested,
+                                                 onDismissRequested: onDismissRequested)
 
         model.createNew()
 
@@ -74,11 +77,12 @@ final class PasswordManagementItemModelTests: XCTestCase {
     }
 
     func testWhenModelIsEditedThenStateIsUpdated() {
-        let model = PasswordManagementLoginModel(onSaveRequested: onSaveRequested,
-                                                onDeleteRequested: onDeleteRequested,
-                                                 urlMatcher: urlMatcher,
+        let model = PasswordManagementLoginModel(urlMatcher: urlMatcher,
                                                  emailManager: emailManager,
-                                                 urlSort: urlSort)
+                                                 urlSort: urlSort,
+                                                 onSaveRequested: onSaveRequested,
+                                                 onDeleteRequested: onDeleteRequested,
+                                                 onDismissRequested: onDismissRequested)
 
         model.credentials = makeCredentials(id: "1")
         XCTAssertEqual(model.domain, "domain")
@@ -111,6 +115,8 @@ final class PasswordManagementItemModelTests: XCTestCase {
     func onDeleteRequested(credentials: SecureVaultModels.WebsiteCredentials) {
         deletedCredentials = credentials
     }
+
+    func onDismissRequested() {}
 
     func makeCredentials(id: String,
                          username: String = "username",
