@@ -53,6 +53,34 @@
         }
       }
     },
+    " — Checking for update" : {
+
+    },
+    " — Downloading %@ / %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : " — Downloading %1$@ / %2$@"
+          }
+        }
+      }
+    },
+    " — Downloading update" : {
+
+    },
+    " — Extracting update" : {
+
+    },
+    " — Extracting update (%@%%)" : {
+
+    },
+    " — Installing" : {
+
+    },
+    " — Ready to install" : {
+
+    },
     " %@" : {
       "localizations" : {
         "de" : {
@@ -104,37 +132,6 @@
           }
         }
       }
-    },
-    "- Checking for update" : {
-
-    },
-    "- Downloading %@ / %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "- Downloading %1$@ / %2$@"
-          }
-        }
-      }
-    },
-    "- Downloading update" : {
-
-    },
-    "- Extracting update" : {
-
-    },
-    "- Extracting update (%@%%)" : {
-
-    },
-    "- Extracting update (%lf%%)" : {
-
-    },
-    "- Installing" : {
-
-    },
-    "- Ready to install" : {
-
     },
     "**%lld** tracking attempts blocked" : {
       "comment" : "The number of tracking attempts blocked in the last 7 days, shown on a new tab, translate as: Tracking attempts blocked: %@",
