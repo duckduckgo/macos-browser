@@ -426,7 +426,7 @@ final class LocalBookmarkManager: BookmarkManager {
         while !queue.isEmpty {
             let current = queue.removeFirst()
 
-            if current.title.removingAccents().lowercased().contains(query.removingAccents().lowercased()) {
+            if current.title.cleanStringForBookmarkSearch.contains(query.cleanStringForBookmarkSearch) {
                 result.append(current)
             }
 

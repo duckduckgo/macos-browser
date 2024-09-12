@@ -85,7 +85,13 @@ extension String {
         self.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
-    func removingAccents() -> String {
+    var cleanStringForBookmarkSearch: String {
+        self.removeAccents()
+            .replacingOccurrences(of: "[^a-zA-Z0-9]", with: "", options: .regularExpression)
+            .lowercased()
+    }
+
+    private func removeAccents() -> String {
         // Normalize the string to NFD (Normalization Form Decomposition)
         let normalizedString = self as NSString
         let range = NSRange(location: 0, length: normalizedString.length)
