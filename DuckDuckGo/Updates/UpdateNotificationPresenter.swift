@@ -34,6 +34,12 @@ final class UpdateNotificationPresenter {
                 return
             }
 
+            let parentViewController = windowController.mainViewController
+
+            guard parentViewController.view.window?.isKeyWindow == true, (parentViewController.presentedViewControllers ?? []).isEmpty else {
+                return
+            }
+
             let buttonAction: (() -> Void)? = { [weak self] in
                 self?.openUpdatesPage()
             }
@@ -49,8 +55,7 @@ final class UpdateNotificationPresenter {
                 self?.openUpdatesPage()
             })
 
-            viewController.show(onParent: windowController.mainViewController,
-                                relativeTo: button)
+            viewController.show(onParent: parentViewController, relativeTo: button)
         }
     }
 
