@@ -54,6 +54,6 @@ jobs:
         bundle exec fastlane run asana_create_action_item \
           task_url:"https://app.asana.com/0/1201621708115095/1208137627434473/f" \
           task_name:"Announce the release to the company" \
-          html_notes:"<body><h1>Pozdrawiam</h1><br><br>Jacek 🎉<br><br>Dominik &lt;3" \
+          html_notes:"<body><h1>Pozdrawiam</h1><br><br>Jacek 🎉<br><br>Dominik &lt;3</body>" \
           github_handle:"${{ github.actor }}" \
           is_scheduled_release:"${{ github.event_name == 'schedule' }}"
