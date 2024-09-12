@@ -67,14 +67,6 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     }
     private var cachedUpdateResult: UpdateCheckResult?
 
-    init(internalUserDecider: InternalUserDecider) {
-        willRelaunchAppPublisher = willRelaunchAppSubject.eraseToAnyPublisher()
-        self.internalUserDecider = internalUserDecider
-        super.init()
-
-        try? configureUpdater()
-    }
-
     @Published private(set) var updateProgress = UpdateCycleProgress.default {
         didSet {
             if let cachedUpdateResult {
@@ -131,6 +123,14 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
 
     // MARK: - Public
 
+    init(internalUserDecider: InternalUserDecider) {
+        willRelaunchAppPublisher = willRelaunchAppSubject.eraseToAnyPublisher()
+        self.internalUserDecider = internalUserDecider
+        super.init()
+
+        try? configureUpdater()
+    }
+
     func checkNewApplicationVersion() {
         let updateStatus = ApplicationUpdateDetector.isApplicationUpdated()
         switch updateStatus {
@@ -170,6 +170,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         try updater?.start()
 
 #if DEBUG
+//        TODO: Uncomment this after PR approval
 //        updater.automaticallyChecksForUpdates = false
 //        updater.automaticallyDownloadsUpdates = false
 //        updater.updateCheckInterval = 0
