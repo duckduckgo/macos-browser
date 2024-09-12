@@ -22,36 +22,6 @@ import os.log
 
 struct MapperToUI {
 
-    func mapToUI(_ dataBroker: DataBroker, extractedProfile: ExtractedProfile) -> DBPUIDataBrokerProfileMatch {
-        DBPUIDataBrokerProfileMatch(
-            dataBroker: mapToUI(dataBroker),
-            name: extractedProfile.fullName ?? "No name",
-            addresses: extractedProfile.addresses?.map(mapToUI) ?? [],
-            alternativeNames: extractedProfile.alternativeNames ?? [String](),
-            relatives: extractedProfile.relatives ?? [String](),
-            date: extractedProfile.removedDate?.timeIntervalSince1970
-        )
-    }
-
-    func mapToUI(_ dataBrokerName: String, databrokerURL: String, extractedProfile: ExtractedProfile) -> DBPUIDataBrokerProfileMatch {
-        DBPUIDataBrokerProfileMatch(
-            dataBroker: DBPUIDataBroker(name: dataBrokerName, url: databrokerURL),
-            name: extractedProfile.fullName ?? "No name",
-            addresses: extractedProfile.addresses?.map(mapToUI) ?? [],
-            alternativeNames: extractedProfile.alternativeNames ?? [String](),
-            relatives: extractedProfile.relatives ?? [String](),
-            date: extractedProfile.removedDate?.timeIntervalSince1970
-        )
-    }
-
-    func mapToUI(_ dataBroker: DataBroker) -> DBPUIDataBroker {
-        DBPUIDataBroker(name: dataBroker.name, url: dataBroker.url)
-    }
-
-    func mapToUI(_ address: AddressCityState) -> DBPUIUserProfileAddress {
-        DBPUIUserProfileAddress(street: address.fullAddress, city: address.city, state: address.state, zipCode: nil)
-    }
-
     func initialScanState(_ brokerProfileQueryData: [BrokerProfileQueryData]) -> DBPUIInitialScanState {
 
         let withoutDeprecated = brokerProfileQueryData.filter { !$0.profileQuery.deprecated }
@@ -82,13 +52,18 @@ struct MapperToUI {
     private func mapMatchesToUI(_ brokerProfileQueryData: [BrokerProfileQueryData]) -> [DBPUIDataBrokerProfileMatch] {
         return brokerProfileQueryData.flatMap {
             var profiles = [DBPUIDataBrokerProfileMatch]()
-            for extractedProfile in $0.extractedProfiles where !$0.profileQuery.deprecated {
-                profiles.append(mapToUI($0.dataBroker, extractedProfile: extractedProfile))
+            for (extractedProfile, optOutJobData) in $0.extractedProfilesWithOptOutJobData where !$0.profileQuery.deprecated {
+                profiles.append(DBPUIDataBrokerProfileMatch(extractedProfile: extractedProfile,
+                                                            optOutJobData: optOutJobData,
+                                                            dataBroker: $0.dataBroker))
 
                 if !$0.dataBroker.mirrorSites.isEmpty {
                     let mirrorSitesMatches = $0.dataBroker.mirrorSites.compactMap { mirrorSite in
                         if mirrorSite.shouldWeIncludeMirrorSite() {
-                            return mapToUI(mirrorSite.name, databrokerURL: mirrorSite.url, extractedProfile: extractedProfile)
+                            return DBPUIDataBrokerProfileMatch(extractedProfile: extractedProfile,
+                                                               optOutJobData: optOutJobData,
+                                                               dataBrokerName: mirrorSite.name,
+                                                               databrokerURL: mirrorSite.url)
                         }
 
                         return nil
@@ -113,7 +88,9 @@ struct MapperToUI {
             let scanJob = $0.scanJobData
             for optOutJob in $0.optOutJobData {
                 let extractedProfile = optOutJob.extractedProfile
-                let profileMatch = mapToUI(dataBroker, extractedProfile: extractedProfile)
+                let profileMatch = DBPUIDataBrokerProfileMatch(extractedProfile: extractedProfile,
+                                                               optOutJobData: optOutJob,
+                                                               dataBroker: dataBroker)
 
                 if extractedProfile.removedDate == nil {
                     inProgressOptOuts.append(profileMatch)
@@ -123,7 +100,10 @@ struct MapperToUI {
 
                 if let closestMatchesFoundEvent = scanJob.closestMatchesFoundEvent() {
                     for mirrorSite in dataBroker.mirrorSites where mirrorSite.shouldWeIncludeMirrorSite(for: closestMatchesFoundEvent.date) {
-                        let mirrorSiteMatch = mapToUI(mirrorSite.name, databrokerURL: mirrorSite.url, extractedProfile: extractedProfile)
+                        let mirrorSiteMatch = DBPUIDataBrokerProfileMatch(extractedProfile: extractedProfile,
+                                                                          optOutJobData: optOutJob,
+                                                                          dataBrokerName: mirrorSite.name,
+                                                                          databrokerURL: mirrorSite.url)
 
                         if let extractedProfileRemovedDate = extractedProfile.removedDate,
                            mirrorSite.shouldWeIncludeMirrorSite(for: extractedProfileRemovedDate) {
@@ -137,15 +117,9 @@ struct MapperToUI {
         }
 
         let completedOptOutsDictionary = Dictionary(grouping: removedProfiles, by: { $0.dataBroker })
-        let completedOptOuts: [DBPUIOptOutMatch] = completedOptOutsDictionary.compactMap { (key: DBPUIDataBroker, value: [DBPUIDataBrokerProfileMatch]) in
+        let completedOptOuts: [DBPUIOptOutMatch] = completedOptOutsDictionary.compactMap { (_, value: [DBPUIDataBrokerProfileMatch]) in
             value.compactMap { match in
-                guard let removedDate = match.date else { return nil }
-                return DBPUIOptOutMatch(dataBroker: key,
-                                        matches: value.count,
-                                        name: match.name,
-                                        alternativeNames: match.alternativeNames,
-                                        addresses: match.addresses,
-                                        date: removedDate)
+                return DBPUIOptOutMatch(profileMatch: match, matches: value.count)
             }
         }.flatMap { $0 }
 
