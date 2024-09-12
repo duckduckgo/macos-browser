@@ -148,7 +148,6 @@ struct DBPUIDataBrokerProfileMatch: Codable {
     let addresses: [DBPUIUserProfileAddress]
     let alternativeNames: [String]
     let relatives: [String]
-    let date: Double? // Used in some methods to set the removedDate or found date
     let foundDate: Double
     let optOutSubmittedDate: Double?
     let estimatedRemovalDate: Double?
@@ -163,7 +162,6 @@ extension DBPUIDataBrokerProfileMatch {
                   addresses: extractedProfile.addresses?.map {DBPUIUserProfileAddress(addressCityState: $0) } ?? [],
                   alternativeNames: extractedProfile.alternativeNames ?? [String](),
                   relatives: extractedProfile.relatives ?? [String](),
-                  date: extractedProfile.removedDate?.timeIntervalSince1970,
                   foundDate: optOutJobData.createdDate.timeIntervalSince1970,
                   optOutSubmittedDate: optOutJobData.submittedSuccessfullyDate?.timeIntervalSince1970,
                   estimatedRemovalDate: estimatedRemovalDate?.timeIntervalSince1970,
@@ -180,7 +178,6 @@ extension DBPUIDataBrokerProfileMatch {
                   addresses: extractedProfile.addresses?.map {DBPUIUserProfileAddress(addressCityState: $0) } ?? [],
                   alternativeNames: extractedProfile.alternativeNames ?? [String](),
                   relatives: extractedProfile.relatives ?? [String](),
-                  date: extractedProfile.removedDate?.timeIntervalSince1970,
                   foundDate: optOutJobData.createdDate.timeIntervalSince1970,
                   optOutSubmittedDate: optOutJobData.submittedSuccessfullyDate?.timeIntervalSince1970,
                   estimatedRemovalDate: estimatedRemovalDate?.timeIntervalSince1970,
