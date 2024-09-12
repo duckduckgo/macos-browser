@@ -1975,12 +1975,15 @@ struct MockMigrationsProvider: DataBrokerProtectionDatabaseMigrationsProvider {
 }
 
 final class MockFreemiumDBPUserStateManager: FreemiumDBPUserStateManager {
+
     var didOnboard = false
     var didPostFirstProfileSavedNotification = false
     var didPostResultsNotification = false
     var didDismissHomePagePromotion = false
     var firstProfileSavedTimestamp: String?
     var firstScanResults: FreemiumDBPMatchResults?
+
+    func resetAllState() {}
 }
 
 final class MockDBPProfileSavedNotifier: DBPProfileSavedNotifier {
