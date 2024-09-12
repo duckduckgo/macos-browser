@@ -20,6 +20,7 @@ import Combine
 import BrowserServicesKit
 import Common
 import PixelKit
+import DDGSync
 
 final class PasswordManagementLoginModel: ObservableObject, PasswordManagementItemModel {
 
@@ -133,6 +134,25 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     private let tld: TLD
     private let urlSort: AutofillDomainNameUrlSort
     private static let randomColorsCount = 15
+
+    // MARK: Sync Promo
+    @Published var showSyncPromo: Bool = false
+    private lazy var syncPromoManager: SyncPromoManaging = SyncPromoManager()
+    lazy var syncPromoViewModel: SyncPromoViewModel = SyncPromoViewModel(touchpointType: .passwords,
+                                                                         primaryButtonAction: { [weak self] in
+        Task { @MainActor in
+            // TODO - need to pass through the source for pixels
+            WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .sync)
+        }
+        self?.onDismissRequested()
+
+        // TODO - Pixel
+        // Pixel.fire(.syncPromoConfirmed, withAdditionalParameters: ["source": SyncPromoManager.Touchpoint.passwords.rawValue])
+    },
+                                                                         dismissButtonAction: { [weak self] in
+        self?.syncPromoManager.dismissPromoFor(.passwords)
+        self?.showSyncPromo = false
+    })
 
     init(urlMatcher: AutofillDomainNameUrlMatcher,
          emailManager: EmailManager,
@@ -252,6 +272,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
             lastUpdatedDate = ""
         }
 
+        setShouldShowSyncPromo()
     }
 
     private func getPrivateEmailStatus() async throws {
@@ -331,6 +352,9 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         privateEmailRequestInProgress = true
     }
 
+    private func setShouldShowSyncPromo() {
+        showSyncPromo = !isEditing && !isNew && syncPromoManager.shouldPresentPromoFor(.passwords)
+    }
 }
 
 extension PasswordManagementLoginModel: EmailManagerRequestDelegate { }
