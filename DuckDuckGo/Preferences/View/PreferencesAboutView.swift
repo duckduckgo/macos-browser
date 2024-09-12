@@ -184,19 +184,19 @@ extension Preferences {
         private func text(for progress: UpdateCycleProgress) -> some View {
             switch progress {
             case .updateCycleDidStart:
-                Text("- Checking for update")
+                Text(" — " + UserText.checkingForUpdate)
             case .downloadDidStart:
-                Text("- Downloading update")
+                Text(" — Downloading update")
             case .downloading(let bytesDownloaded, let bytesToDownload):
-                Text("- Downloading \(formatter.string(fromByteCount: Int64(bytesDownloaded))) / \(formatter.string(fromByteCount: Int64(bytesToDownload)))")
+                Text(" — Downloading \(formatter.string(fromByteCount: Int64(bytesDownloaded))) / \(formatter.string(fromByteCount: Int64(bytesToDownload)))")
             case .extractionDidStart:
-                Text("- Extracting update")
+                Text(" — Extracting update")
             case .extracting(let percentage):
-                Text("- Extracting update (\(String(format: "%.1f", percentage * 100))%)")
+                Text(" — Extracting update (\(String(format: "%.1f", percentage * 100))%)")
             case .readyToInstallAndRelaunch:
-                Text("- Ready to install")
+                Text(" — Ready to install")
             case .installationDidStart, .installing:
-                Text("- Installing")
+                Text(" — Installing")
             case .updateCycleNotStarted, .updateCycleDone:
                 EmptyView()
             }
@@ -220,7 +220,7 @@ extension Preferences {
         }
 
         private var lastCheckedText: some View {
-            let lastChecked = lastCheckedFormattedDate(model.lastUpdateCheckDate)
+            let lastChecked = model.updateController?.updateProgress.isDone == true ? lastCheckedFormattedDate(model.lastUpdateCheckDate) : "-"
             return Text("\(UserText.lastChecked): \(lastChecked)")
                 .foregroundColor(.secondary)
         }
