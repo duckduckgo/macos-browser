@@ -348,6 +348,65 @@ final class LocalBookmarkManagerTests: XCTestCase {
         XCTAssertTrue(resultsWithNotCapitalizedQuery.count == 2)
     }
 
+    @MainActor
+    func testSearchIgnoresAccents() {
+        let coffeeBookmark = Bookmark(id: "1", url: "www.coffee.com", title: "Mi café favorito", isFavorite: true)
+        let coffeeTwoBookmark = Bookmark(id: "1", url: "www.coffee.com", title: "Mi cafe favorito", isFavorite: true)
+
+        let bookmarkStore = BookmarkStoreMock(bookmarks: [coffeeBookmark, coffeeTwoBookmark])
+        let sut = LocalBookmarkManager(bookmarkStore: bookmarkStore, faviconManagement: FaviconManagerMock())
+
+        sut.loadBookmarks()
+
+        let resultsWithoutAccent = sut.search(by: "cafe")
+        let resultsWithAccent = sut.search(by: "café")
+
+        XCTAssertTrue(resultsWithoutAccent.count == 2)
+        XCTAssertTrue(resultsWithAccent.count == 2)
+    }
+
+    @MainActor
+    func testWhenASearchIsDoneWithoutAccenttsThenItMatchesBookmarksWithoutAccent() {
+        let coffeeBookmark = Bookmark(id: "1", url: "www.coffee.com", title: "Mi café favorito", isFavorite: true)
+
+        let bookmarkStore = BookmarkStoreMock(bookmarks: [coffeeBookmark])
+        let sut = LocalBookmarkManager(bookmarkStore: bookmarkStore, faviconManagement: FaviconManagerMock())
+
+        sut.loadBookmarks()
+
+        let results = sut.search(by: "cafe")
+
+        XCTAssertTrue(results.count == 1)
+    }
+
+    @MainActor
+    func testWhenBookmarkHasASymbolThenItsIgnoredWhenSearching() {
+        let bookmark = Bookmark(id: "1", url: "www.test.com", title: "Site • Login", isFavorite: true)
+
+        let bookmarkStore = BookmarkStoreMock(bookmarks: [bookmark])
+        let sut = LocalBookmarkManager(bookmarkStore: bookmarkStore, faviconManagement: FaviconManagerMock())
+
+        sut.loadBookmarks()
+
+        let results = sut.search(by: "site login")
+
+        XCTAssertTrue(results.count == 1)
+    }
+
+    @MainActor
+    func testSearchQueryHasASymbolThenItsIgnoredWhenSearching() {
+        let bookmark = Bookmark(id: "1", url: "www.test.com", title: "Site Login", isFavorite: true)
+
+        let bookmarkStore = BookmarkStoreMock(bookmarks: [bookmark])
+        let sut = LocalBookmarkManager(bookmarkStore: bookmarkStore, faviconManagement: FaviconManagerMock())
+
+        sut.loadBookmarks()
+
+        let results = sut.search(by: "site • login")
+
+        XCTAssertTrue(results.count == 1)
+    }
+
     private func topLevelBookmarks() -> [BaseBookmarkEntity] {
         let topBookmark = Bookmark(id: "4", url: "www.favorite.com", title: "Favorite bookmark", isFavorite: true)
         let favoriteFolder = BookmarkFolder(id: "5", title: "Favorite folder", children: [topBookmark])

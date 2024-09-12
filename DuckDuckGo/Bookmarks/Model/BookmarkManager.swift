@@ -426,7 +426,7 @@ final class LocalBookmarkManager: BookmarkManager {
         while !queue.isEmpty {
             let current = queue.removeFirst()
 
-            if current.title.lowercased().contains(query.lowercased()) {
+            if current.title.cleaningStringForBookmarkSearch.contains(query.cleaningStringForBookmarkSearch) {
                 result.append(current)
             }
 
@@ -437,4 +437,36 @@ final class LocalBookmarkManager: BookmarkManager {
 
         return result
     }
+}
+
+private extension String {
+
+    /// A computed property that returns a cleaned version of the string for bookmark search purposes.
+    /// The cleaning process involves removing accents, stripping out non-alphanumeric characters,
+    /// and converting the string to lowercase.
+    ///
+    /// - Returns: A cleaned string suitable for bookmark searches.
+    var cleaningStringForBookmarkSearch: String {
+        self.removeAccents()
+            .replacingOccurrences(of: "[^a-zA-Z0-9]", with: "", options: .regularExpression)
+            .lowercased()
+    }
+
+    /// Removes accents (diacritics) from the string by normalizing it and applying transformations.
+    /// This method uses Unicode normalization to decompose characters and then strips away
+    /// the combining marks (accents).
+    ///
+    /// - Returns: A new string with accents removed. For example, café, will return cafe.
+    private func removeAccents() -> String {
+        // Normalize the string to NFD (Normalization Form Decomposition)
+        let normalizedString = self as NSString
+        let range = NSRange(location: 0, length: normalizedString.length)
+
+        // Apply the transform to remove diacritics
+        let transformedString = normalizedString.applyingTransform(.toLatin, reverse: false) ?? ""
+        let finalString = transformedString.applyingTransform(.stripCombiningMarks, reverse: false) ?? ""
+
+        return finalString
+    }
+
 }
