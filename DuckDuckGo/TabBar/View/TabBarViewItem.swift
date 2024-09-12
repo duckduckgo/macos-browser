@@ -640,9 +640,7 @@ extension TabBarViewItem: NSMenuDelegate {
 extension TabBarViewItem: MouseClickViewDelegate {
 
     func mouseOverView(_ mouseOverView: MouseOverView, isMouseOver: Bool) {
-        if self.isMouseOver != isMouseOver {
-            delegate?.tabBarViewItem(self, isMouseOver: isMouseOver)
-        }
+        delegate?.tabBarViewItem(self, isMouseOver: isMouseOver)
         self.isMouseOver = isMouseOver
         view.needsLayout = true
     }
