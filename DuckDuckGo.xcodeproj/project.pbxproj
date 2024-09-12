@@ -13236,11 +13236,11 @@
 		};
 		4B5F14FC2A15291D0060320F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = 4B5F14FB2A15291D0060320F /* plugin:InputFilesChecker */;
+			productRef = 4B5F14FB2A15291D0060320F /* InputFilesChecker */;
 		};
 		4B5F14FE2A1529230060320F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = 4B5F14FD2A1529230060320F /* plugin:InputFilesChecker */;
+			productRef = 4B5F14FD2A1529230060320F /* InputFilesChecker */;
 		};
 		4BA7C4DF2B3F6F4900AFE511 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -14459,11 +14459,11 @@
 			package = 4B5235432C7BB14D00AFAF64 /* XCRemoteSwiftPackageReference "wireguard-apple" */;
 			productName = WireGuard;
 		};
-		4B5F14FB2A15291D0060320F /* plugin:InputFilesChecker */ = {
+		4B5F14FB2A15291D0060320F /* InputFilesChecker */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = "plugin:InputFilesChecker";
 		};
-		4B5F14FD2A1529230060320F /* plugin:InputFilesChecker */ = {
+		4B5F14FD2A1529230060320F /* InputFilesChecker */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = "plugin:InputFilesChecker";
 		};
