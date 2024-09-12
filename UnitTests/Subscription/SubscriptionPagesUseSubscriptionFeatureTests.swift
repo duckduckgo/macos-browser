@@ -175,26 +175,6 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
     }
 
     override func tearDownWithError() throws {
-        if !pixelsFired.isEmpty {
-            Logger.general.log("= pixels =")
-
-            pixelsFired.forEach { pixel in
-                Logger.general.log("\(String(describing: pixel))")
-            }
-
-            Logger.general.log("==========")
-        }
-
-        if !uiEventsHappened.isEmpty {
-            Logger.general.log("= events =")
-
-            uiEventsHappened.forEach { action in
-                Logger.general.log("\(String(describing: action))")
-            }
-
-            Logger.general.log("==========")
-        }
-
         userDefaults = nil
         pixelsFired.removeAll()
         uiEventsHappened.removeAll()
