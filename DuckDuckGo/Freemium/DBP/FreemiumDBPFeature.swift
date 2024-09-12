@@ -61,7 +61,7 @@ final class DefaultFreemiumDBPFeature: FreemiumDBPFeature {
     ///
     /// Subscribers receive updates when changes occur in the privacy configuration or user subscription status.
     var isAvailablePublisher: AnyPublisher<Bool, Never> {
-        passthroughPublisher.eraseToAnyPublisher()
+        isAvailableSubject.eraseToAnyPublisher()
     }
 
     // MARK: - Private Properties
@@ -72,7 +72,7 @@ final class DefaultFreemiumDBPFeature: FreemiumDBPFeature {
     private let notificationCenter: NotificationCenter
     private lazy var featureDisabler: DataBrokerProtectionFeatureDisabling = DataBrokerProtectionFeatureDisabler()
 
-    private let passthroughPublisher = PassthroughSubject<Bool, Never>()
+    private let isAvailableSubject = PassthroughSubject<Bool, Never>()
     private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Initialization
@@ -122,7 +122,7 @@ final class DefaultFreemiumDBPFeature: FreemiumDBPFeature {
                 let featureAvailable = self.isAvailable
                 Logger.freemiumDBP.debug("[Freemium DBP] Privacy Config Updated. Feature Availability = \(featureAvailable)")
 
-                self.passthroughPublisher.send(featureAvailable)
+                self.isAvailableSubject.send(featureAvailable)
 
                 self.offBoardIfNecessary()
             }
@@ -136,7 +136,7 @@ final class DefaultFreemiumDBPFeature: FreemiumDBPFeature {
                 let featureAvailable = self.isAvailable
                 Logger.freemiumDBP.debug("[Freemium DBP] Subscription Updated. Feature Availability = \(featureAvailable)")
 
-                self.passthroughPublisher.send(featureAvailable)
+                self.isAvailableSubject.send(featureAvailable)
             }
             .store(in: &cancellables)
     }
