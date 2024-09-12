@@ -1,0 +1,32 @@
+name: Migration Test - Asana Create Action Item
+
+on: 
+  push:
+  workflow_dispatch:
+
+jobs:
+  test:
+
+    name: Test
+
+    runs-on: macos-14
+
+    steps:
+ 
+    - name: Check out the code
+      uses: actions/checkout@v4
+
+    - name: Set up fastlane
+      run: bundle install
+
+    - name: Test asana-create-action-item comment
+      id: create-create-action-item
+      env:
+        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      run: |
+        bundle exec fastlane run asana_create_action_item \
+            task_url:"https://app.asana.com/0/1201621708115095/1208137627434473/f" \
+            template_name:"update-asana-for-public-release" \
+            github_handle:"${{ github.actor }}" \
+            is_scheduled_release:"${{ github.event_name == 'schedule' }}"
