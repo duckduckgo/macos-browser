@@ -70,7 +70,7 @@ struct PinnedTabView: View, DropDelegate {
             item.loadItem(forTypeIdentifier: "public.utf8-plain-text", options: nil) { (data, _) in
                 if let data = data as? Data, let droppedString = NSString(data: data, encoding: NSUTF8StringEncoding) {
                     print(droppedString)
-                    let url = URL.makeSearchUrl(from: droppedString as String)!
+                    let url = URL.makeURL(from: droppedString as String)!
 
                     DispatchQueue.main.async {
                         model.setUrl(url, source: .ui)

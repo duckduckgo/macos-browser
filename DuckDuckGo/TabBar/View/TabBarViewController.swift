@@ -641,7 +641,7 @@ extension TabBarViewController: MouseOverButtonDelegate {
 
     func mouseOverButton(_ sender: MouseOverButton, performDragOperation info: any NSDraggingInfo) -> Bool {
         assert(sender === addTabButton || sender === footerAddButton)
-        if let string = info.draggingPasteboard.string(forType: .string), let url = URL.makeSearchUrl(from: string) {
+        if let string = info.draggingPasteboard.string(forType: .string), let url = URL.makeURL(from: string) {
             tabCollectionViewModel.insertOrAppendNewTab(.url(url, credential: nil, source: .ui))
             return true
         }
@@ -992,7 +992,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
                                           at: .unpinned(newIndex),
                                           selected: true)
             return true
-        } else if let string = draggingInfo.draggingPasteboard.string(forType: .string), let url = URL.makeSearchUrl(from: string) {
+        } else if let string = draggingInfo.draggingPasteboard.string(forType: .string), let url = URL.makeURL(from: string) {
             tabCollectionViewModel.insertOrAppendNewTab(.url(url, credential: nil, source: .reload))
             return true
         }
@@ -1258,16 +1258,10 @@ extension TabBarViewController: TabBarViewItemDelegate {
 
     func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, replaceWithStringSearch: String) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
-              let tab = tabCollectionViewModel.tabCollection.tabs[safe: indexPath.item],
-              let tabIndex = tabCollectionViewModel.indexInAllTabs(of: tab) else { return }
+              let tab = tabCollectionViewModel.tabCollection.tabs[safe: indexPath.item] else { return }
 
-        if let url = URL.makeSearchUrl(from: replaceWithStringSearch) {
-            let tab = Tab(content: .url(url, credential: nil, source: .reload),
-                          shouldLoadInBackground: true,
-                          burnerMode: tabCollectionViewModel.burnerMode)
-            tabCollectionViewModel.replaceTab(at: tabIndex, with: tab, forceChange: true)
-            tabCollectionViewModel.select(tab: tab)
-            collectionView.reloadData()
+        if let url = URL.makeURL(from: replaceWithStringSearch) {
+            tab.setContent(.url(url, credential: nil, source: .reload))
         }
     }
 
