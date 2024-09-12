@@ -65,6 +65,10 @@ extension Preferences {
         var body: some View {
             PreferencePane(UserText.passwordManagementTitle) {
 
+                if model.showSyncPromo {
+                    SyncPromoView(viewModel: model.syncPromoViewModel, hasSecondaryButton: false)
+                }
+
                 // Autofill Content  Button
                 PreferencePaneSection {
                     Button(UserText.autofillViewContentButtonPasswords) {

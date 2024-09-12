@@ -136,7 +136,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     private static let randomColorsCount = 15
 
     // MARK: Sync Promo
-    @Published var showSyncPromo: Bool = false
+    @Published private(set) var showSyncPromo: Bool = false
     private lazy var syncPromoManager: SyncPromoManaging = SyncPromoManager()
     lazy var syncPromoViewModel: SyncPromoViewModel = SyncPromoViewModel(touchpointType: .passwords,
                                                                          primaryButtonAction: { [weak self] in

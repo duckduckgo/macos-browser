@@ -18,6 +18,7 @@
 
 import Foundation
 import PixelKit
+import BrowserServicesKit
 
 final class AutofillPreferencesModel: ObservableObject {
 
@@ -70,6 +71,9 @@ final class AutofillPreferencesModel: ObservableObject {
             PasswordManagerCoordinator.shared.setEnabled(enabled)
             if enabled {
                 presentBitwardenSetupFlow()
+                showSyncPromo = false
+            } else {
+                setShouldShowSyncPromo()
             }
         }
     }
@@ -77,6 +81,8 @@ final class AutofillPreferencesModel: ObservableObject {
     @Published private(set) var isBitwardenSetupFlowPresented = false
 
     @Published private(set) var hasNeverPromptWebsites: Bool = false
+
+    @Published private(set) var showSyncPromo: Bool = false
 
     func authorizeAutoLockSettingsChange(
         isEnabled isAutoLockEnabledNewValue: Bool? = nil,
@@ -155,12 +161,30 @@ final class AutofillPreferencesModel: ObservableObject {
         autolockLocksFormFilling = persistor.autolockLocksFormFilling
         passwordManager = persistor.passwordManager
         hasNeverPromptWebsites = !neverPromptWebsitesManager.neverPromptWebsites.isEmpty
+        setShouldShowSyncPromo()
     }
 
     private var persistor: AutofillPreferencesPersistor
     private var userAuthenticator: UserAuthenticating
     private let bitwardenInstallationService: BWInstallationService
     private let neverPromptWebsitesManager: AutofillNeverPromptWebsitesManager
+    private lazy var syncPromoManager: SyncPromoManaging = SyncPromoManager()
+    lazy var syncPromoViewModel: SyncPromoViewModel = SyncPromoViewModel(touchpointType: .passwords,
+                                                                         primaryButtonAction: { [weak self] in
+        Task { @MainActor in
+            // TODO - need to pass through the source
+            WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .sync)
+        }
+//        self?.onDismissRequested()
+
+//        self.dismiss()
+
+//        Pixel.fire(.syncPromoConfirmed, withAdditionalParameters: ["source": SyncPromoManager.Touchpoint.passwords.rawValue])
+    },
+                                                                         dismissButtonAction: { [weak self] in
+        self?.syncPromoManager.dismissPromoFor(.passwords)
+        self?.showSyncPromo = false
+    })
 
     // MARK: - Password Manager
 
@@ -171,6 +195,7 @@ final class AutofillPreferencesModel: ObservableObject {
 
         connectBitwardenViewController.setupFlowCancellationHandler = { [weak self] in
             self?.passwordManager = .duckduckgo
+            self?.setShouldShowSyncPromo()
         }
 
         guard let connectBitwardenWindow = connectBitwardenWindowController.window,
@@ -192,5 +217,16 @@ final class AutofillPreferencesModel: ObservableObject {
 
     func openSettings() {
         NSWorkspace.shared.open(.fullDiskAccess)
+    }
+
+    private func setShouldShowSyncPromo() {
+        guard syncPromoManager.shouldPresentPromoFor(.passwords),
+                let vault = try? AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared),
+                let accountsCount = try? vault.accountsCount() else {
+            showSyncPromo = false
+            return
+        }
+
+        showSyncPromo = accountsCount > 0
     }
 }
