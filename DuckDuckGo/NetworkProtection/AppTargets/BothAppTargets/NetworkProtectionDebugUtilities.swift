@@ -64,6 +64,11 @@ final class NetworkProtectionDebugUtilities {
         settings.resetToDefaults()
 
         UserDefaults.netP.networkProtectionEntitlementsExpired = false
+        resetSiteIssuesAlert()
+    }
+
+    func resetSiteIssuesAlert() {
+        UserDefaults.netP.resetVPNReportSiteIssuesDontAskAgain()
     }
 
     func removeSystemExtensionAndAgents() async throws {

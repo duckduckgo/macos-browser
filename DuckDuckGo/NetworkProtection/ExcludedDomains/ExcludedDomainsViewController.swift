@@ -111,14 +111,16 @@ final class ExcludedDomainsViewController: NSViewController {
     }
 
     private func addDomain(_ domain: String) {
-        model.add(domain: domain)
-        reloadData()
+        Task {
+            model.add(domain: domain)
+            reloadData()
 
-        if let newRowIndex = allDomains.firstIndex(of: domain) {
-            tableView.scrollRowToVisible(newRowIndex)
+            if let newRowIndex = allDomains.firstIndex(of: domain) {
+                tableView.scrollRowToVisible(newRowIndex)
+            }
+
+            await model.askUserToReportIssues(withDomain: domain)
         }
-
-        model.askUserToReportIssues(withDomain: domain)
     }
 
     @IBAction func removeSelectedDomain(_ sender: NSButton) {

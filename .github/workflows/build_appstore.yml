@@ -76,11 +76,10 @@ jobs:
           *) echo "👎 Not a release or hotfix branch"; exit 1 ;;
         esac
 
-    - name: Register SSH keys for submodules access
+    - name: Register SSH key for certificates repository access
       uses: webfactory/ssh-agent@v0.7.0
       with:
-        ssh-private-key: |
-          ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
 
     - name: Check out the code
       uses: actions/checkout@v4
