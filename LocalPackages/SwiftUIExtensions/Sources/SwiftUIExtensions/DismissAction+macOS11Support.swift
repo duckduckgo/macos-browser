@@ -1,3 +1,6 @@
+//
+//  DismissAction+macOS11Support.swift
+//
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,10 +16,24 @@
 //  limitations under the License.
 //
 
-#include "IntegrationTests.xcconfig"
-#include "../AppStore.xcconfig"
+import Foundation
+import SwiftUI
 
-PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.mobile.ios.Integration-Tests
-PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] = match Direct com.duckduckgo.mobile.ios.Integration-Tests macos
+@available(macOS, introduced: 10.15, obsoleted: 12.0, message: "Use Apple's DismissAction")
+public struct DismissAction: EnvironmentKey {
+    public static var defaultValue: () -> Void = {}
+}
 
-TEST_HOST=$(BUILT_PRODUCTS_DIR)/DuckDuckGo App Store.app/Contents/MacOS/DuckDuckGo App Store
+public extension EnvironmentValues {
+
+    @available(macOS, introduced: 10.15, obsoleted: 12.0, message: "Use Apple's EnvironmentValues.dismiss")
+    var dismiss: () -> Void {
+        get {
+            self[DismissAction.self]
+        }
+
+        set {
+            self[DismissAction.self] = newValue
+        }
+    }
+}

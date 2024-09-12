@@ -1,4 +1,7 @@
-//  Copyright © 2022 DuckDuckGo. All rights reserved.
+//
+//  Logger+TransparentProxy.swift
+//
+//  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -13,10 +16,10 @@
 //  limitations under the License.
 //
 
-#include "IntegrationTests.xcconfig"
-#include "../AppStore.xcconfig"
+import Foundation
+import os.log
 
-PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.mobile.ios.Integration-Tests
-PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] = match Direct com.duckduckgo.mobile.ios.Integration-Tests macos
-
-TEST_HOST=$(BUILT_PRODUCTS_DIR)/DuckDuckGo App Store.app/Contents/MacOS/DuckDuckGo App Store
+public extension Logger {
+    fileprivate static let subsystem = "Network Protection"
+    static var transparentProxyLogger = { Logger(subsystem: Logger.subsystem, category: "Transparent Proxy") }()
+}

@@ -38,7 +38,6 @@ public final class TransparentProxyController {
         case failedToStartProvider(_ error: Error)
     }
 
-    public typealias EventCallback = (Event) -> Void
     public typealias ManagerSetupCallback = (_ manager: NETransparentProxyManager) async -> Void
 
     /// Dry mode means this won't really do anything to start or stop the proxy.
@@ -53,7 +52,7 @@ public final class TransparentProxyController {
 
     /// The event handler
     ///
-    public var eventHandler: EventCallback?
+    private let eventHandler: TransparentProxyControllerEventHandling
 
     /// Callback to set up a ``NETransparentProxyManager``.
     ///
@@ -93,6 +92,7 @@ public final class TransparentProxyController {
                 settings: TransparentProxySettings,
                 notificationCenter: NotificationCenter = .default,
                 dryMode: Bool = false,
+                eventHandler: TransparentProxyControllerEventHandler,
                 setup: @escaping ManagerSetupCallback) {
 
         self.dryMode = dryMode
@@ -100,6 +100,7 @@ public final class TransparentProxyController {
         self.notificationCenter = notificationCenter
         self.settings = settings
         self.setup = setup
+        self.eventHandler = eventHandler
         self.storeSettingsInProviderConfiguration = storeSettingsInProviderConfiguration
 
         subscribeToProviderConfigurationChanges()
@@ -249,35 +250,85 @@ public final class TransparentProxyController {
     }
 
     public func start() async throws {
-        eventHandler?(.startInitiated)
-
         guard isRequiredForActiveFeatures else {
             let error = StartError.attemptToStartWithoutBackingActiveFeatures
-            eventHandler?(.startFailure(error))
+            eventHandler.handle(event: .startAttempt(.prevented(error)))
             throw error
         }
+
+        eventHandler.handle(event: .startAttempt(.begin))
 
         let manager: NETransparentProxyManager
 
         do {
             manager = try await loadOrMakeManager()
-        } catch {
-            eventHandler?(.startFailure(error))
-            throw error
-        }
-
-        do {
             try manager.connection.startVPNTunnel(options: [:])
+
+            eventHandler.handle(event: .startAttempt(.success))
         } catch {
             let error = StartError.failedToStartProvider(error)
-            eventHandler?(.startFailure(error))
+            eventHandler.handle(event: .startAttempt(.failure(error)))
             throw error
         }
-
-        eventHandler?(.startSuccess)
     }
 
     public func stop() async {
         await connection?.stopVPNTunnel()
+        eventHandler.handle(event: .stopped)
+    }
+}
+
+// MARK: - Events & Pixels
+
+extension TransparentProxyController {
+
+    public enum Event {
+        case startAttempt(_ step: StartAttemptStep)
+        case stopped
+    }
+
+    public enum StartAttemptStep: PixelKitEventV2 {
+        /// Abnormal attempt to start the proxy when it wasn't needed
+        case prevented(_ error: Error)
+
+        /// Attempt to start the proxy begins
+        case begin
+
+        /// Attempt to start the proxy succeeds
+        case success
+
+        /// Attempt to start the proxy fails
+        case failure(_ error: Error)
+
+        public var name: String {
+            switch self {
+            case .prevented:
+                return "vpn_proxy_controller_start_prevented"
+
+            case .begin:
+                return "vpn_proxy_controller_start_attempt"
+
+            case .success:
+                return "vpn_proxy_controller_start_success"
+
+            case .failure:
+                return "vpn_proxy_controller_start_failure"
+            }
+        }
+
+        public var parameters: [String: String]? {
+            return nil
+        }
+
+        public var error: Error? {
+            switch self {
+            case .begin,
+                    .success:
+                return nil
+            case .prevented(let error),
+                    .failure(let error):
+                return error
+            }
+        }
     }
 }
