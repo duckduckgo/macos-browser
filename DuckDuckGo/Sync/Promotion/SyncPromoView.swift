@@ -23,6 +23,7 @@ struct SyncPromoView: View {
 
     let viewModel: SyncPromoViewModel
     @State var isHovering = false
+    var hasSecondaryButton: Bool = true
 
     var body: some View {
         ZStack {
@@ -30,12 +31,11 @@ struct SyncPromoView: View {
                 .foregroundColor(isHovering ? Color.black.opacity(0.06) : Color.blackWhite3)
                 .cornerRadius(8)
 
-            HStack(alignment: .top) {
-
+            HStack(alignment: hasSecondaryButton ? .top : .center) {
                 Image(viewModel.image)
                     .resizable()
                     .frame(width: 48, height: 48)
-                    .padding(.top, 14)
+                    .padding(.top, hasSecondaryButton ? 14 : 0)
 
                 VStack(alignment: .leading) {
 
@@ -45,26 +45,40 @@ struct SyncPromoView: View {
 
                     Text(viewModel.subtitle)
                         .multilineTextAlignment(.leading)
-                        .padding(.top, 1)
-                        .padding(.bottom, 6)
+                        .padding(.top, hasSecondaryButton ? 1 : 0)
+                        .padding(.bottom, hasSecondaryButton ? 6 : 2)
 
-                    HStack {
-                        Button(viewModel.secondaryButtonTitle) {
-                            viewModel.dismissButtonAction?()
-                        }
-                        .buttonStyle(DismissActionButtonStyle())
+                    if hasSecondaryButton {
+                        HStack {
+                            Button(viewModel.secondaryButtonTitle) {
+                                viewModel.dismissButtonAction?()
+                            }
+                                    .buttonStyle(DismissActionButtonStyle())
 
-                        Button(viewModel.primaryButtonTitle) {
-                            viewModel.primaryButtonAction?()
+                            Button(viewModel.primaryButtonTitle) {
+                                viewModel.primaryButtonAction?()
+                            }
+                                    .buttonStyle(DefaultActionButtonStyle(enabled: true))
                         }
-                        .buttonStyle(DefaultActionButtonStyle(enabled: true))
                     }
                 }
-                .padding(.top, 8)
-                .padding(.bottom, 14)
-                .padding(.trailing, 40)
+                .padding(.top, hasSecondaryButton ? 8 : 0)
+                .padding(.bottom, hasSecondaryButton ? 14 : 0)
+                .padding(.trailing, hasSecondaryButton ? 40 : 0)
+
+                if !hasSecondaryButton {
+                    Spacer()
+
+                    Button(viewModel.primaryButtonTitle) {
+                        viewModel.primaryButtonAction?()
+                    }
+                    .buttonStyle(DismissActionButtonStyle())
+                    .padding(.trailing, 32)
+                }
             }
             .padding(.leading, 8)
+            .padding(.vertical, hasSecondaryButton ? 0 : 8)
+
 
             HStack {
                 Spacer()
@@ -89,5 +103,5 @@ struct SyncPromoView: View {
 }
 
 #Preview {
-    SyncPromoView(viewModel: SyncPromoViewModel(touchpointType: .bookmarks, primaryButtonAction: {}, dismissButtonAction: {}))
+    SyncPromoView(viewModel: SyncPromoViewModel(touchpointType: .bookmarks, primaryButtonAction: {}, dismissButtonAction: {}), hasSecondaryButton: false)
 }
