@@ -52,6 +52,7 @@ protocol TabBarViewItemDelegate: AnyObject {
     func tabBarViewItemMuteUnmuteSite(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemRemoveFireproofing(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemAudioState(_ tabBarViewItem: TabBarViewItem) -> WKWebView.AudioState?
+    func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, replaceWithStringSearch: String)
 
     func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> OtherTabBarViewItemsState
 
@@ -393,6 +394,9 @@ final class TabBarViewItem: NSCollectionViewItem {
         } else {
             faviconImageView.contentTintColor = nil
         }
+
+        mouseOverView.registerForDraggedTypes([.string])
+        mouseOverView.delegate = self
     }
 
     private var usedPermissions = Permissions() {
@@ -664,6 +668,20 @@ extension TabBarViewItem: MouseClickViewDelegate {
         delegate?.tabBarViewItemCloseAction(self)
     }
 
+    func mouseOverView(_ sender: MouseOverView, performDragOperation info: any NSDraggingInfo) -> Bool {
+        if let droppedString = info.draggingPasteboard.string(forType: .string) {
+            delegate?.tabBarViewItem(self, replaceWithStringSearch: droppedString)
+            return true
+        }
+        return false
+    }
+
+    func mouseOverView(_ sender: MouseOverView, draggingEntered info: any NSDraggingInfo, isMouseOver: UnsafeMutablePointer<Bool>) -> NSDragOperation {
+        if info.draggingPasteboard.availableType(from: [.string]) != nil {
+            return .copy
+        }
+        return []
+    }
 }
 
 extension TabBarViewItem {
