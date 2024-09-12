@@ -41,10 +41,8 @@ protocol UpdateControllerProtocol: AnyObject {
     var updateProgressPublisher: Published<UpdateCycleProgress>.Publisher { get }
 
     var lastUpdateCheckDate: Date? { get }
-    var lastUpdateNotificationShownDate: Date { get }
 
     func checkForUpdateIfNeeded()
-
     func runUpdate()
 
     var areAutomaticUpdatesEnabled: Bool { get set }
