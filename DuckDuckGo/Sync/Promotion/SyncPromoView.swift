@@ -42,9 +42,11 @@ struct SyncPromoView: View {
                     Text(viewModel.title)
                         .font(.system(size: 13).bold())
                         .multilineTextAlignment(.leading)
+                        .multilineText()
 
-                    MultilineText(viewModel.subtitle)
+                    Text(viewModel.subtitle)
                         .multilineTextAlignment(.leading)
+                        .multilineText()
                         .padding(.top, hasSecondaryButton ? 1 : 0)
                         .padding(.bottom, hasSecondaryButton ? 6 : 2)
 
@@ -79,7 +81,6 @@ struct SyncPromoView: View {
             .padding(.leading, 8)
             .padding(.vertical, hasSecondaryButton ? 0 : 8)
 
-
             HStack {
                 Spacer()
                 VStack {
@@ -94,53 +95,13 @@ struct SyncPromoView: View {
     }
 
     private var closeButton: some View {
-        HomePage.Views.CloseButton(icon: .close) {
+        HomePage.Views.CloseButton(icon: .close, size: 16) {
             viewModel.dismissButtonAction?()
         }
         .visibility(isHovering ? .visible : .invisible)
         .padding(6)
     }
 }
-
-private struct MultilineText: View {
-
-   @State private var textSize: CGSize = .zero
-   let text: String
-
-   init(_ text: String) {
-      self.text = text
-   }
-
-   var body: some SwiftUI.View {
-      Text(text)
-           .readIntrinsicContentSize(to: $textSize)
-           .fixedSize(horizontal: false, vertical: true)
-           .frame(height: textSize.height)
-   }
-}
-
-fileprivate struct IntrinsicContentSizePreferenceKey: PreferenceKey {
-   static let defaultValue: CGSize = .zero
-
-   static func reduce(value: inout CGSize, nextValue: () -> CGSize) {
-      value = nextValue()
-   }
-}
-
-extension View {
-   fileprivate func readIntrinsicContentSize(to size: Binding<CGSize>) -> some View {
-      background(GeometryReader { proxy in
-         Color.clear.preference(
-            key: IntrinsicContentSizePreferenceKey.self,
-            value: proxy.size
-         )
-      })
-      .onPreferenceChange(IntrinsicContentSizePreferenceKey.self) {
-         size.wrappedValue = $0
-      }
-   }
-}
-
 
 #Preview {
     SyncPromoView(viewModel: SyncPromoViewModel(touchpointType: .bookmarks, primaryButtonAction: {}, dismissButtonAction: {}), hasSecondaryButton: false)
