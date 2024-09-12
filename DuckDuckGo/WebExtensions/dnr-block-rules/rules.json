@@ -1,0 +1,11 @@
+[
+  {
+    "id": 1,
+    "condition": {
+      "urlFilter": "https://bad.third-party.site/privacy-protections/request-blocking/block-me/script.js"
+    },
+    "action": {
+      "type": "block"
+    }
+  }
+]

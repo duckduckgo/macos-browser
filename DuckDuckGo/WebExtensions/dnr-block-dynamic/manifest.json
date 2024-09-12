@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "Dynamic Rule Loading Example",
+  "version": "1.0",
+  "permissions": [
+    "declarativeNetRequest"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  }
+}

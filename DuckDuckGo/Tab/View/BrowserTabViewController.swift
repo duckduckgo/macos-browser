@@ -537,16 +537,16 @@ final class BrowserTabViewController: NSViewController {
         window.makeFirstResponder(contentView)
     }
 
-    func openNewTab(with content: Tab.TabContent) {
+    func openNewTab(with content: Tab.TabContent) -> Tab? {
         guard tabCollectionViewModel.selectDisplayableTabIfPresent(content) == false else {
-            return
+            return nil
         }
 
         // shouldn't open New Tabs in PopUp window
         if view.window?.isPopUpWindow ?? true {
             // Prefer Tab's Parent
             WindowControllersManager.shared.showTab(with: content)
-            return
+            return nil
         }
 
         let tab = Tab(content: content,
@@ -555,6 +555,7 @@ final class BrowserTabViewController: NSViewController {
                       webViewSize: view.frame.size)
 
         tabCollectionViewModel.insertOrAppend(tab: tab, selected: true)
+        return tab
     }
 
     // MARK: - Browser Tabs

@@ -344,7 +344,7 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     deinit {
-        WebExtensionManager.shared.didCloseTab(self, windowIsClosing: false)
+//        WebExtensionManager.shared.didCloseTab(self, windowIsClosing: false)
 
         DispatchQueue.main.asyncOrNow { [webView, userContentController] in
             // WebKit objects must be deallocated on the main thread

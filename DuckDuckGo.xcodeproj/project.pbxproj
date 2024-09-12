@@ -28,6 +28,12 @@
 		1D01A3D82B88DF8B00FE8150 /* PreferencesSyncView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D01A3D72B88DF8B00FE8150 /* PreferencesSyncView.swift */; };
 		1D01A3D92B88DF8B00FE8150 /* PreferencesSyncView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D01A3D72B88DF8B00FE8150 /* PreferencesSyncView.swift */; };
 		1D02633628D8A9A9005CBB41 /* BWEncryption.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D02633528D8A9A9005CBB41 /* BWEncryption.m */; settings = {COMPILER_FLAGS = "-Wno-deprecated -Wno-strict-prototypes"; }; };
+		1D045E2D2C92DC3500A47682 /* webcompat in Resources */ = {isa = PBXBuildFile; fileRef = 1D045E2C2C92DC3400A47682 /* webcompat */; };
+		1D045E2E2C92DC3500A47682 /* webcompat in Resources */ = {isa = PBXBuildFile; fileRef = 1D045E2C2C92DC3400A47682 /* webcompat */; };
+		1D045E302C930F5900A47682 /* dnr-block-rules in Resources */ = {isa = PBXBuildFile; fileRef = 1D045E2F2C930F5900A47682 /* dnr-block-rules */; };
+		1D045E312C930F5900A47682 /* dnr-block-rules in Resources */ = {isa = PBXBuildFile; fileRef = 1D045E2F2C930F5900A47682 /* dnr-block-rules */; };
+		1D045E332C930F6500A47682 /* dnr-block-dynamic in Resources */ = {isa = PBXBuildFile; fileRef = 1D045E322C930F6500A47682 /* dnr-block-dynamic */; };
+		1D045E342C930F6500A47682 /* dnr-block-dynamic in Resources */ = {isa = PBXBuildFile; fileRef = 1D045E322C930F6500A47682 /* dnr-block-dynamic */; };
 		1D074B272909A433006E4AC3 /* PasswordManagerCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D074B262909A433006E4AC3 /* PasswordManagerCoordinator.swift */; };
 		1D0DE93E2C3BA9840037ABC2 /* AppRestarter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D0DE93D2C3BA9840037ABC2 /* AppRestarter.swift */; };
 		1D0DE93F2C3BA9840037ABC2 /* AppRestarter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D0DE93D2C3BA9840037ABC2 /* AppRestarter.swift */; };
@@ -3061,6 +3067,9 @@
 		1D01A3D72B88DF8B00FE8150 /* PreferencesSyncView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesSyncView.swift; sourceTree = "<group>"; };
 		1D02633428D8A9A9005CBB41 /* BWEncryption.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BWEncryption.h; sourceTree = "<group>"; };
 		1D02633528D8A9A9005CBB41 /* BWEncryption.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BWEncryption.m; sourceTree = "<group>"; };
+		1D045E2C2C92DC3400A47682 /* webcompat */ = {isa = PBXFileReference; lastKnownFileType = folder; path = webcompat; sourceTree = "<group>"; };
+		1D045E2F2C930F5900A47682 /* dnr-block-rules */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "dnr-block-rules"; sourceTree = "<group>"; };
+		1D045E322C930F6500A47682 /* dnr-block-dynamic */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "dnr-block-dynamic"; sourceTree = "<group>"; };
 		1D074B262909A433006E4AC3 /* PasswordManagerCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagerCoordinator.swift; sourceTree = "<group>"; };
 		1D0DE93D2C3BA9840037ABC2 /* AppRestarter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRestarter.swift; sourceTree = "<group>"; };
 		1D0DE9402C3BB9CC0037ABC2 /* ReleaseNotesParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReleaseNotesParser.swift; sourceTree = "<group>"; };
@@ -4803,6 +4812,9 @@
 				1DE712D02C90587C00C711A3 /* cookie-bg-picker */,
 				1DE712CD2C90324400C711A3 /* notify-link-clicks-i18n */,
 				1DCD21B42BF35CF30094C093 /* emoji-substitution */,
+				1D045E322C930F6500A47682 /* dnr-block-dynamic */,
+				1D045E2F2C930F5900A47682 /* dnr-block-rules */,
+				1D045E2C2C92DC3400A47682 /* webcompat */,
 				1D13805D2BF20900002C4C66 /* WebExtensionManager.swift */,
 				1D13805E2BF20900002C4C66 /* WebExtensions.h */,
 				1D13805F2BF20900002C4C66 /* WKWebExtensionTab.swift */,
@@ -9565,6 +9577,7 @@
 				56CEE90F2B7A725C00CF10AA /* InfoPlist.xcstrings in Resources */,
 				3706FCB9293F65D500E42796 /* FireproofDomains.storyboard in Resources */,
 				3706FCBC293F65D500E42796 /* dark-shield.json in Resources */,
+				1D045E312C930F5900A47682 /* dnr-block-rules in Resources */,
 				854DAAAE2A72B613001E2E24 /* BookmarksBarPromptAssets.xcassets in Resources */,
 				3706FCBD293F65D500E42796 /* dark-shield-mouse-over.json in Resources */,
 				3706FCBE293F65D500E42796 /* autoconsent-bundle.js in Resources */,
@@ -9602,12 +9615,14 @@
 				3706FCEA293F65D500E42796 /* PasswordManager.storyboard in Resources */,
 				BD384ACC2BBC821B00EF3735 /* vpn-light-mode.json in Resources */,
 				3706FCEB293F65D500E42796 /* dark-flame-mouse-over.json in Resources */,
+				1D045E342C930F6500A47682 /* dnr-block-dynamic in Resources */,
 				3706FCEC293F65D500E42796 /* flame-mouse-over.json in Resources */,
 				3706FCED293F65D500E42796 /* httpsMobileV2Bloom.bin in Resources */,
 				3706FCEE293F65D500E42796 /* trackers-3.json in Resources */,
 				3706FCEF293F65D500E42796 /* macos-config.json in Resources */,
 				3706FCF0293F65D500E42796 /* httpsMobileV2BloomSpec.json in Resources */,
 				3706FCF1293F65D500E42796 /* TabBarFooter.xib in Resources */,
+				1D045E2E2C92DC3500A47682 /* webcompat in Resources */,
 				3706FCF3293F65D500E42796 /* FirePopoverCollectionViewItem.xib in Resources */,
 				3706FCF5293F65D500E42796 /* dark-shield-dot.json in Resources */,
 				3706FCF6293F65D500E42796 /* trackers-2.json in Resources */,
@@ -9761,6 +9776,7 @@
 				56CEE90E2B7A725B00CF10AA /* InfoPlist.xcstrings in Resources */,
 				4B0511C3262CAA5A00F6079C /* FireproofDomains.storyboard in Resources */,
 				AA3439712754D4E900B241FA /* dark-shield.json in Resources */,
+				1D045E302C930F5900A47682 /* dnr-block-rules in Resources */,
 				859F30672A72B38500C20372 /* BookmarksBarPromptAssets.xcassets in Resources */,
 				AA7EB6EB27E880AE00036718 /* dark-shield-mouse-over.json in Resources */,
 				B31055CB27A1BA1D001AC618 /* autoconsent-bundle.js in Resources */,
@@ -9798,12 +9814,14 @@
 				85625994269C8F9600EE44BC /* PasswordManager.storyboard in Resources */,
 				BD384ACA2BBC821A00EF3735 /* vpn-light-mode.json in Resources */,
 				AA7EB6E327E7D05500036718 /* dark-flame-mouse-over.json in Resources */,
+				1D045E332C930F6500A47682 /* dnr-block-dynamic in Resources */,
 				AA7EB6E227E7D05500036718 /* flame-mouse-over.json in Resources */,
 				4B677433255DBEB800025BD8 /* httpsMobileV2Bloom.bin in Resources */,
 				AA34397B2754D55100B241FA /* trackers-3.json in Resources */,
 				026ADE1426C3010C002518EE /* macos-config.json in Resources */,
 				4B677432255DBEB800025BD8 /* httpsMobileV2BloomSpec.json in Resources */,
 				AA2CB12D2587BB5600AA6FBE /* TabBarFooter.xib in Resources */,
+				1D045E2D2C92DC3500A47682 /* webcompat in Resources */,
 				AAE246F42709EF3B00BEEAEE /* FirePopoverCollectionViewItem.xib in Resources */,
 				AA3439702754D4E900B241FA /* dark-shield-dot.json in Resources */,
 				AA34397A2754D55100B241FA /* trackers-2.json in Resources */,

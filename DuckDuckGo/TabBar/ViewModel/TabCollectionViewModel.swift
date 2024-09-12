@@ -95,6 +95,8 @@ final class TabCollectionViewModel: NSObject {
             }
             if let selectedTabViewModel {
                 WebExtensionManager.shared.didSelectTabs([selectedTabViewModel.tab])
+                WebExtensionManager.shared.didActivateTab(selectedTabViewModel.tab, 
+                                                          previousActiveTab: oldValue?.tab)
             }
         }
     }
