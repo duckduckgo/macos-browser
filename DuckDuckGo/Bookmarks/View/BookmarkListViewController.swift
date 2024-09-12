@@ -112,6 +112,7 @@ final class BookmarkListViewController: NSViewController {
         }
         return [BookmarkNode]()
     }
+    private var lastOutlineScrollPosition: NSRect?
 
     private(set) lazy var faviconsFetcherOnboarding: FaviconsFetcherOnboarding? = {
         guard let syncService = NSApp.delegateTyped.syncService, let syncBookmarksAdapter = NSApp.delegateTyped.syncDataProviders?.bookmarksAdapter else {
@@ -738,6 +739,11 @@ extension BookmarkListViewController: NSSearchFieldDelegate {
 
             if searchQuery.isBlank {
                 showTreeView()
+
+                /// Reset to the last scroll position if available
+                if let lastOutlineScrollPosition = self.lastOutlineScrollPosition {
+                    outlineView.scrollToVisible(lastOutlineScrollPosition)
+                }
             } else {
                 showSearch(forSearchQuery: searchQuery)
             }
@@ -747,6 +753,12 @@ extension BookmarkListViewController: NSSearchFieldDelegate {
     }
 
     private func showSearch(forSearchQuery searchQuery: String) {
+        /// Before searching for the first letter we store the current outline scroll position.
+        /// This is needed because we want to maintain the scroll position in case the search is cancelled.
+        if searchQuery.count == 1 {
+            self.lastOutlineScrollPosition = outlineView.visibleRect
+        }
+
         outlineView.highlightedRow = nil
         dataSource.reloadData(forSearchQuery: searchQuery, sortMode: sortBookmarksViewModel.selectedSortMode)
 
