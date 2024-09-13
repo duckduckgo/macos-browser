@@ -88,7 +88,7 @@ final class AboutPreferences: ObservableObject, PreferencesTabOpening {
         updateController?.checkForUpdateIfNeeded()
     }
 
-    func restartToUpdate() {
+    func runUpdate() {
         updateController?.runUpdate()
     }
 
