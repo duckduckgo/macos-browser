@@ -12,7 +12,7 @@ signal(SIGINT) { _ in
 }
 
 let isCI = ProcessInfo.processInfo.environment["CI"] != nil
-let appcastURLString = "https://github.com/quanganhdo/playground/raw/main/appcast2.xml"
+let appcastURLString = "https://staticcdn.duckduckgo.com/macos-desktop-browser/appcast2.xml"
 let appcastURL = URL(string: appcastURLString)!
 let tmpDir = isCI ? "." : NSString(string: "~/Developer").expandingTildeInPath
 let tmpDirURL = URL(fileURLWithPath: tmpDir, isDirectory: true)
