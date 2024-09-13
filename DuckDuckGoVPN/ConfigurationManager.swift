@@ -30,9 +30,9 @@ final class ConfigurationManager: DefaultConfigurationManager {
     private let privacyConfigManager: VPNPrivacyConfigurationManager
 
     init(privacyConfigManager: VPNPrivacyConfigurationManager,
-                  fetcher: ConfigurationFetching = ConfigurationFetcher(store: ConfigurationStore(), eventMapping: configurationDebugEvents),
-                  store: ConfigurationStoring = ConfigurationStore(),
-                  defaults: KeyValueStoring = UserDefaults.appConfiguration) {
+         fetcher: ConfigurationFetching = ConfigurationFetcher(store: ConfigurationStore(), eventMapping: configurationDebugEvents),
+         store: ConfigurationStoring = ConfigurationStore(),
+         defaults: KeyValueStoring = UserDefaults.appConfiguration) {
         self.privacyConfigManager = privacyConfigManager
         super.init(fetcher: fetcher, store: store, defaults: defaults)
     }
