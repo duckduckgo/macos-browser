@@ -559,6 +559,8 @@ final class TabBarViewController: NSViewController {
     }
 
     private func setupAddTabButton() {
+        addTabButton.delegate = self
+        addTabButton.registerForDraggedTypes([.string])
         addTabButton.target = self
         addTabButton.action = #selector(addButtonAction(_:))
         addTabButton.toolTip = UserText.newTabTooltip
@@ -623,6 +625,29 @@ final class TabBarViewController: NSViewController {
         tabPreviewWindowController.hide(allowQuickRedisplay: allowQuickRedisplay)
     }
 
+}
+
+extension TabBarViewController: MouseOverButtonDelegate {
+
+    func mouseOverButton(_ sender: MouseOverButton, draggingEntered info: any NSDraggingInfo, isMouseOver: UnsafeMutablePointer<Bool>) -> NSDragOperation {
+        assert(sender === addTabButton || sender === footerAddButton)
+        let pasteboard = info.draggingPasteboard
+
+        if let types = pasteboard.types, types.contains(.string) {
+            return .copy
+        }
+        return .none
+    }
+
+    func mouseOverButton(_ sender: MouseOverButton, performDragOperation info: any NSDraggingInfo) -> Bool {
+        assert(sender === addTabButton || sender === footerAddButton)
+        if let string = info.draggingPasteboard.string(forType: .string), let url = URL.makeURL(from: string) {
+            tabCollectionViewModel.insertOrAppendNewTab(.url(url, credential: nil, source: .ui))
+            return true
+        }
+
+        return true
+    }
 }
 
 extension TabBarViewController: TabCollectionViewModelDelegate {
@@ -882,6 +907,8 @@ extension TabBarViewController: NSCollectionViewDataSource {
             footer.addButton?.action = #selector(addButtonAction(_:))
             footer.toolTip = UserText.newTabTooltip
             self.footerAddButton = footer.addButton
+            self.footerAddButton?.delegate = self
+            self.footerAddButton?.registerForDraggedTypes([.string])
         }
 
         return view
@@ -942,6 +969,11 @@ extension TabBarViewController: NSCollectionViewDelegate {
         // allow dropping URLs or files
         guard draggingInfo.draggingPasteboard.url == nil else { return .copy }
 
+        // Check if the pasteboard contains string data
+        if draggingInfo.draggingPasteboard.availableType(from: [.string]) != nil {
+            return .copy
+        }
+
         // dragging a tab
         guard case .private = draggingInfo.draggingSourceOperationMask,
               draggingInfo.draggingPasteboard.types == [TabBarViewItemPasteboardWriter.utiInternalType] else { return .none }
@@ -959,7 +991,9 @@ extension TabBarViewController: NSCollectionViewDelegate {
             tabCollectionViewModel.insert(Tab(content: .url(url, source: .appOpenUrl), burnerMode: tabCollectionViewModel.burnerMode),
                                           at: .unpinned(newIndex),
                                           selected: true)
-
+            return true
+        } else if let string = draggingInfo.draggingPasteboard.string(forType: .string), let url = URL.makeURL(from: string) {
+            tabCollectionViewModel.insertOrAppendNewTab(.url(url, credential: nil, source: .reload))
             return true
         }
 
@@ -1220,6 +1254,15 @@ extension TabBarViewController: TabBarViewItemDelegate {
               let tab = tabCollectionViewModel.tabCollection.tabs[safe: indexPath.item] else { return nil }
 
         return tab.audioState
+    }
+
+    func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, replaceWithStringSearch: String) {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
+              let tab = tabCollectionViewModel.tabCollection.tabs[safe: indexPath.item] else { return }
+
+        if let url = URL.makeURL(from: replaceWithStringSearch) {
+            tab.setContent(.url(url, credential: nil, source: .reload))
+        }
     }
 
     func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> OtherTabBarViewItemsState {
