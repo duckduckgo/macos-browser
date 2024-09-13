@@ -436,6 +436,8 @@ final class BookmarkListViewController: NSViewController {
         self.emptyState.isHidden = !isEmpty
         self.searchBookmarksButton.isEnabled = !isEmpty
         self.sortBookmarksButton.isEnabled = !isEmpty
+        self.searchBar.isEnabled = !isEmpty
+        self.searchBar.isHidden = isEmpty
         self.outlineView.isHidden = isEmpty
 
         if isEmpty {
