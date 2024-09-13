@@ -125,6 +125,7 @@ public struct UserDefaultsWrapper<T> {
         case legacyStatisticsStoreDataCleared = "statistics.appretentionatb.legacy-data-cleared"
 
         case onboardingFinished = "onboarding.finished"
+        case contextualOnboardingState = "contextual.onboarding.state"
 
         // Home Page
         case homePageShowPagesOnHover = "home.page.show.pages.on.hover"

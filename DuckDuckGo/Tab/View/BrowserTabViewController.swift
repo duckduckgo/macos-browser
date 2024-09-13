@@ -134,14 +134,14 @@ final class BrowserTabViewController: NSViewController {
     // Called when the window becomes the key window (gains focus)
      @objc func windowDidBecomeActive(notification: Notification) {
          print("Window became key (focused) url\(tabViewModel?.tab.url)")
-         presentContextualOnboarding()
+//         presentContextualOnboarding()
      }
 
      // Called when the window resigns key status (loses focus)
      @objc func windowDidResignActive(notification: Notification) {
          print("Window resigned key (lost focus) url\(tabViewModel?.tab.url)")
          guard let webViewContainer else { return }
-         removeChild(in: self.containerStackView, webViewContainer: webViewContainer)
+//         removeChild(in: self.containerStackView, webViewContainer: webViewContainer)
      }
 
     override func viewWillAppear() {

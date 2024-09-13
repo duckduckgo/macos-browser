@@ -30,6 +30,7 @@ public class OnboardingFireButtonDialogViewModel: ObservableObject {
     }
 
     func highFive() {
+        onGotItPressed()
         onDismiss()
     }
 

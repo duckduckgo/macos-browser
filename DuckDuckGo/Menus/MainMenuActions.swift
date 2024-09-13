@@ -833,6 +833,14 @@ extension MainViewController {
         DuckPlayerOnboardingExperiment().reset()
     }
 
+    @objc func resetOnboarding(_ sender: Any?) {
+        UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.onboardingFinished.rawValue)
+    }
+
+    @objc func resetContextualOnboarding(_ sender: Any?) {
+        ContextualOnboardingStateMachine.shared.state = .notStarted
+    }
+
     @objc func resetDuckPlayerPreferences(_ sender: Any?) {
         DuckPlayerPreferences.shared.reset()
     }
