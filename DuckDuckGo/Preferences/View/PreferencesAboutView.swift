@@ -220,7 +220,7 @@ extension Preferences {
         }
 
         private var lastCheckedText: some View {
-            let lastChecked = model.updateController?.updateProgress.isDone == true ? lastCheckedFormattedDate(model.lastUpdateCheckDate) : "-"
+            let lastChecked = model.updateController?.updateProgress.isIdle == true ? lastCheckedFormattedDate(model.lastUpdateCheckDate) : "-"
             return Text("\(UserText.lastChecked): \(lastChecked)")
                 .foregroundColor(.secondary)
         }
