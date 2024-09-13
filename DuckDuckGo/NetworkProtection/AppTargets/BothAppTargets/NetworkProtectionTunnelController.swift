@@ -79,7 +79,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
     private let notificationCenter: NotificationCenter
 
-    /// The proxy manager
+    /// The tunnel manager
     ///
     /// We're keeping a reference to this because we don't want to be calling `loadAllFromPreferences` more than
     /// once.

@@ -27,7 +27,7 @@ protocol ExcludedDomainsViewModel {
     func add(domain: String)
     func remove(domain: String)
 
-    func askUserToReportIssues(withDomain domain: String)
+    func askUserToReportIssues(withDomain domain: String) async
 }
 
 final class DefaultExcludedDomainsViewModel {
@@ -58,8 +58,8 @@ extension DefaultExcludedDomainsViewModel: ExcludedDomainsViewModel {
         }
     }
 
-    func askUserToReportIssues(withDomain domain: String) {
-        let siteIssuesReporter = SiteIssuesReporter(pixelKit: pixelKit)
-        siteIssuesReporter.askUserToReportIssues(withDomain: domain)
+    func askUserToReportIssues(withDomain domain: String) async {
+        let parentWindow = await WindowControllersManager.shared.lastKeyMainWindowController?.window
+        await ReportSiteIssuesPresenter(userDefaults: .netP).show(withDomain: domain, in: parentWindow)
     }
 }

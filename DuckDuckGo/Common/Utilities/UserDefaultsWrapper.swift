@@ -113,6 +113,8 @@ public struct UserDefaultsWrapper<T> {
 
         case homeButtonPosition = "preferences.appeareance.home-button-position"
 
+        case phishingDetectionEnabled = "preferences.security.phishing-detection-enabled"
+
         // ATB
         case installDate = "statistics.installdate.key"
         case atb = "statistics.atb.key"
@@ -142,6 +144,9 @@ public struct UserDefaultsWrapper<T> {
         case homePageIsContinueSetupVisible = "home.page.is.continue.setup.visible"
         case homePageIsRecentActivityVisible = "home.page.is.recent.activity.visible"
         case homePageIsFirstSession = "home.page.is.first.session"
+        case homePageUserBackgroundImages = "home.page.user.background.images"
+        case homePageCustomBackground = "home.page.custom.background"
+        case homePageLastPickedCustomColor = "home.page.last.picked.custom.color"
 
         case appIsRelaunchingAutomatically = "app-relaunching-automatically"
 

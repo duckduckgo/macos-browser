@@ -419,6 +419,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         let defaults = UserDefaults.netP
 #endif
 
+        APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
         NetworkProtectionLastVersionRunStore(userDefaults: defaults).lastExtensionVersionRun = AppVersion.shared.versionAndBuildNumber
         let settings = VPNSettings(defaults: defaults)
 

@@ -22,6 +22,8 @@ import BrowserServicesKit
 public enum FeatureFlag: String {
     case debugMenu
     case sslCertificatesBypass
+    case phishingDetectionErrorPage
+    case phishingDetectionPreferences
 
     /// Add experimental atb parameter to SERP queries for internal users to display Privacy Reminder
     /// https://app.asana.com/0/1199230911884351/1205979030848528/f
@@ -32,6 +34,8 @@ public enum FeatureFlag: String {
 
     // https://app.asana.com/0/1206488453854252/1207136666798700/f
     case freemiumPIR
+
+    case highlightsOnboarding
 
     // https://app.asana.com/0/1201462886803403/1208030658792310/f
     case unknownUsernameCategorization
@@ -45,13 +49,19 @@ extension FeatureFlag: FeatureFlagSourceProviding {
         case .appendAtbToSerpQueries:
             return .internalOnly
         case .sslCertificatesBypass:
-            return .remoteReleasable(.subfeature(sslCertificatesSubfeature.allowBypass))
+            return .remoteReleasable(.subfeature(SslCertificatesSubfeature.allowBypass))
         case .deduplicateLoginsOnImport:
             return .remoteReleasable(.subfeature(AutofillSubfeature.deduplicateLoginsOnImport))
         case .unknownUsernameCategorization:
             return .remoteReleasable(.subfeature(AutofillSubfeature.unknownUsernameCategorization))
         case .freemiumPIR:
             return .remoteDevelopment(.subfeature(DBPSubfeature.freemium))
+        case .phishingDetectionErrorPage:
+            return .remoteReleasable(.subfeature(PhishingDetectionSubfeature.allowErrorPage))
+        case .phishingDetectionPreferences:
+            return .remoteReleasable(.subfeature(PhishingDetectionSubfeature.allowPreferencesToggle))
+        case .highlightsOnboarding:
+            return .internalOnly
         }
     }
 }
