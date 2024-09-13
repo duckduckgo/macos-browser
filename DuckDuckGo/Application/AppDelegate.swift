@@ -99,6 +99,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     // MARK: - Freemium DBP
     public let freemiumDBPFeature: FreemiumDBPFeature
+    public let freemiumDBPPromotionViewCoordinator: FreemiumDBPPromotionViewCoordinator
     private var freemiumDBPScanResultPolling: FreemiumDBPScanResultPolling?
 
     var configurationStore = ConfigurationStore()
@@ -277,9 +278,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Freemium DBP
         let freemiumDBPUserStateManager = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp)
         freemiumDBPFeature = DefaultFreemiumDBPFeature(privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager,
-                                                                     subscriptionManager: subscriptionManager,
-                                                                     accountManager: subscriptionManager.accountManager,
+                                                       subscriptionManager: subscriptionManager,
+                                                       accountManager: subscriptionManager.accountManager,
                                                        freemiumDBPUserStateManager: freemiumDBPUserStateManager)
+        freemiumDBPPromotionViewCoordinator = FreemiumDBPPromotionViewCoordinator(freemiumDBPUserStateManager: freemiumDBPUserStateManager,
+                                                                                  freemiumDBPFeature: freemiumDBPFeature)
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {
