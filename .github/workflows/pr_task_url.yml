@@ -2,7 +2,7 @@ name: Asana PR Task URL
 
 on: 
   pull_request:
-    types: [opened, edited, closed, synchronize, review_requested]
+    types: [opened, edited, closed, synchronize, review_requested, ready_for_review]
 
 jobs:
 
@@ -13,6 +13,8 @@ jobs:
     name: Add Task to App Board Project
 
     runs-on: ubuntu-latest
+
+    if: ${{ !github.event.pull_request.draft }}
 
     outputs:
       task_id: ${{ steps.get-task-id.outputs.task_id }}
