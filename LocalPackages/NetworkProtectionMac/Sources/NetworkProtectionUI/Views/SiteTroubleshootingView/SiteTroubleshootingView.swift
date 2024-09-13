@@ -54,9 +54,11 @@ public struct SiteTroubleshootingView: View {
                 model.setExclusion(value, forDomain: siteInfo.domain)
             })) {
                 HStack(spacing: 5) {
-                    Image(nsImage: siteInfo.icon)
-                        .resizable()
-                        .frame(width: Self.iconSize, height: Self.iconSize)
+                    if let icon = siteInfo.icon {
+                        Image(nsImage: icon)
+                            .resizable()
+                            .frame(width: Self.iconSize, height: Self.iconSize)
+                    }
 
                     Text("Exclude \(siteInfo.domain) from VPN")
                         .applyLabelAttributes(colorScheme: colorScheme)
