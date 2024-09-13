@@ -124,6 +124,9 @@ extension ReleaseNotesUserScript {
     }
 
     private func browserRestart(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        DispatchQueue.main.async { [weak self] in
+            self?.updateController.runUpdate()
+        }
         return nil
     }
 
