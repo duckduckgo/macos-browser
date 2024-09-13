@@ -53,9 +53,6 @@
         }
       }
     },
-    " — Checking for update" : {
-
-    },
     " — Downloading %@ / %@" : {
       "localizations" : {
         "en" : {
@@ -38098,55 +38095,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Neue Version verfügbar. Zum Aktualisieren neu starten."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "New version available. Restart to update."
+            "value" : "New version available. Click here to update."
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Nueva versión disponible. Reinicia para actualizar."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Une nouvelle version est disponible. Redémarrer pour mettre à jour."
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Nuova versione disponibile. Riavvia per aggiornare."
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Nieuwe versie beschikbaar. Start opnieuw om bij te werken."
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Dostępna nowa wersja. Uruchom ponownie, aby zaktualizować."
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Nova versão disponível. Reiniciar para atualizar."
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Доступна новая версия. Перезапустите приложение."
           }
         }
@@ -56837,55 +56834,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Zum Aktualisieren neu starten"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Restart to Update"
+            "value" : "Update DuckDuckGo"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Reiniciar para actualizar"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Redémarrer pour mettre à jour"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Riavvia per aggiornare"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Start opnieuw om bij te werken"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Uruchom ponownie, aby zaktualizować"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Reiniciar para atualizar"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Перезапустите для обновления"
           }
         }
@@ -61545,60 +61542,60 @@
       }
     },
     "update.available.menu.item" : {
-      "comment" : "Title of the menu item that informs user that a new update is available. Clicking on the menu item restarts the app and installs the update",
+      "comment" : "Title of the menu item that informs user that a new update is available. Clicking on the menu item installs the update",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Update verfügbar – Jetzt neu starten"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Update Available - Restart Now"
+            "value" : "Update Available - Install Now"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Actualización disponible - Reiniciar ahora"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Mise à jour disponible : redémarrer"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Aggiornamento disponibile - Riavvia ora"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Update beschikbaar - nu opnieuw opstarten"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Dostępna aktualizacja — uruchom ponownie teraz"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Atualização disponível – Reiniciar agora"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Доступно обновление: перезапустить"
           }
         }
