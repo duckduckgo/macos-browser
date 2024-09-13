@@ -44,10 +44,9 @@ public struct SiteTroubleshootingView: View {
 
         VStack(alignment: .leading) {
             Text("Website Preferences")
-                .font(.system(size: 13, weight: .bold))
+                .applySectionHeaderAttributes(colorScheme: colorScheme)
                 .padding(.vertical, 3)
                 .padding(.horizontal, 9)
-                .foregroundColor(Color(.defaultText))
 
             Toggle(isOn: Binding(get: {
                 siteInfo.excluded
@@ -60,8 +59,7 @@ public struct SiteTroubleshootingView: View {
                         .frame(width: Self.iconSize, height: Self.iconSize)
 
                     Text("Exclude \(siteInfo.domain) from VPN")
-                        .font(.system(size: 12))
-                        .foregroundColor(Color(.defaultText))
+                        .applyLabelAttributes(colorScheme: colorScheme)
 
                     Spacer()
                 }
