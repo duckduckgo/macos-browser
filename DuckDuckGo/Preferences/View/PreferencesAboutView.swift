@@ -249,8 +249,8 @@ extension Preferences {
                 .buttonStyle(UpdateButtonStyle(enabled: true))
             case .updateCycle:
                 if hasPendingUpdate {
-                    Button(UserText.restartToUpdate) {
-                        model.restartToUpdate()
+                    Button(UserText.runUpdate) {
+                        model.runUpdate()
                     }
                     .buttonStyle(UpdateButtonStyle(enabled: true))
                 } else {
