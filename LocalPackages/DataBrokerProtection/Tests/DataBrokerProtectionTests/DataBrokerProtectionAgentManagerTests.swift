@@ -44,6 +44,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
         mockNotificationService = MockUserNotificationService()
         mockAgentStopper = MockAgentStopper()
         mockConfigurationManager = MockConfigurationManager()
+        mockPrivacyConfigurationManager = DBPPrivacyConfigurationManager()
 
         let mockDatabase = MockDatabase()
         let mockMismatchCalculator = MockMismatchCalculator(database: mockDatabase, pixelHandler: mockPixelHandler)
