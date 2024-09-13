@@ -170,10 +170,9 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         try updater?.start()
 
 #if DEBUG
-//        TODO: Uncomment this after PR approval
-//        updater.automaticallyChecksForUpdates = false
-//        updater.automaticallyDownloadsUpdates = false
-//        updater.updateCheckInterval = 0
+        updater?.automaticallyChecksForUpdates = false
+        updater?.automaticallyDownloadsUpdates = false
+        updater?.updateCheckInterval = 0
 #endif
     }
 
