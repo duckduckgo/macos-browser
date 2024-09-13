@@ -98,7 +98,9 @@ final class ContentBlockingTabExtension: NSObject {
 extension ContentBlockingTabExtension: NavigationResponder {
 
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
-        if !navigationAction.url.isDuckDuckGo {
+        if !navigationAction.url.isDuckDuckGo
+            // ContentScopeUserScript needs to be loaded for https://duckduckgo.com/email/
+            || navigationAction.url.absoluteString.hasPrefix(URL.duckDuckGoEmailLogin.absoluteString) {
             await prepareForContentBlocking()
         }
 

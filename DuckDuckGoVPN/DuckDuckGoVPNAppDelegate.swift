@@ -173,10 +173,13 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
     @MainActor
     private lazy var proxyController: TransparentProxyController = {
+        let eventHandler = TransparentProxyControllerEventHandler(logger: .transparentProxyLogger)
+
         let controller = TransparentProxyController(
             extensionID: proxyExtensionBundleID,
             storeSettingsInProviderConfiguration: storeProxySettingsInProviderConfiguration,
-            settings: proxySettings) { [weak self] manager in
+            settings: proxySettings,
+            eventHandler: eventHandler) { [weak self] manager in
                 guard let self else { return }
 
                 manager.localizedDescription = "DuckDuckGo VPN Proxy"
@@ -209,14 +212,8 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
                 }()
             }
 
-        controller.eventHandler = handleControllerEvent(_:)
-
         return controller
     }()
-
-    private func handleControllerEvent(_ event: TransparentProxyController.Event) {
-
-    }
 
     @MainActor
     private lazy var tunnelController = NetworkProtectionTunnelController(
