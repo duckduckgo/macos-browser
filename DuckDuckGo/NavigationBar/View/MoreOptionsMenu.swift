@@ -117,7 +117,7 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
             self.sharingMenu = sharingMenu
         }
         self.emailManager.requestDelegate = self
-        
+
         delegate = self
 
         setupMenuItems()
