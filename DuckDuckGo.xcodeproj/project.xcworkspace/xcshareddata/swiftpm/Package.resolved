@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "sam/remove-feature-flag-vpn-check",
-        "revision" : "8da6071a523f14bece02332ba9f84c2aaf9d107d"
+        "branch" : "195.0.0",
+        "revision" : "f9134f887b1215779a1050134d09d7e824a8abc0"
       }
     },
     {
