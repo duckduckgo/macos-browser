@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import History
 
 import XCTest
 import Combine
@@ -107,6 +108,7 @@ final class FireTests: XCTestCase {
         let permissionManager = PermissionManagerMock()
         let faviconManager = FaviconManagerMock()
         let recentlyClosedCoordinator = RecentlyClosedCoordinatorMock()
+        let visitedLinkStore = WKVisitedLinkStoreMock()
 
         let fire = Fire(cacheManager: manager,
                         historyCoordinating: historyCoordinator,
@@ -115,7 +117,8 @@ final class FireTests: XCTestCase {
                         windowControllerManager: WindowControllersManager.shared,
                         faviconManagement: faviconManager,
                         recentlyClosedCoordinator: recentlyClosedCoordinator,
-                        tld: ContentBlocking.shared.tld)
+                        tld: ContentBlocking.shared.tld,
+                        getVisitedLinkStore: { WKVisitedLinkStoreWrapper(visitedLinkStore: visitedLinkStore) })
         let tabCollectionViewModel = TabCollectionViewModel.makeTabCollectionViewModel()
         _ = WindowsManager.openNewWindow(with: tabCollectionViewModel, lazyLoadTabs: true)
 
@@ -130,6 +133,7 @@ final class FireTests: XCTestCase {
         XCTAssert(permissionManager.burnPermissionsCalled)
         XCTAssert(recentlyClosedCoordinator.burnCacheCalled)
         XCTAssert(zoomLevelsCoordinator.burnAllZoomLevelsCalled)
+        XCTAssertTrue(visitedLinkStore.removeAllCalled)
     }
 
     @MainActor
@@ -221,6 +225,7 @@ final class FireTests: XCTestCase {
         let permissionManager = PermissionManagerMock()
         let faviconManager = FaviconManagerMock()
         let recentlyClosedCoordinator = RecentlyClosedCoordinatorMock()
+        let visitedLinkStore = WKVisitedLinkStoreMock()
 
         let fire = Fire(cacheManager: manager,
                         historyCoordinating: historyCoordinator,
@@ -228,7 +233,8 @@ final class FireTests: XCTestCase {
                         windowControllerManager: WindowControllersManager.shared,
                         faviconManagement: faviconManager,
                         recentlyClosedCoordinator: recentlyClosedCoordinator,
-                        tld: ContentBlocking.shared.tld)
+                        tld: ContentBlocking.shared.tld,
+                        getVisitedLinkStore: { WKVisitedLinkStoreWrapper(visitedLinkStore: visitedLinkStore) })
         let tabCollectionViewModel = TabCollectionViewModel.makeTabCollectionViewModel()
         _ = WindowsManager.openNewWindow(with: tabCollectionViewModel, lazyLoadTabs: true)
         XCTAssertNotEqual(tabCollectionViewModel.allTabsCount, 0)
@@ -249,6 +255,7 @@ final class FireTests: XCTestCase {
         XCTAssert(permissionManager.burnPermissionsOfDomainsCalled)
         XCTAssertFalse(permissionManager.burnPermissionsCalled)
         XCTAssert(recentlyClosedCoordinator.burnCacheCalled)
+        XCTAssertFalse(visitedLinkStore.removeAllCalled)
     }
 
     @MainActor
@@ -258,6 +265,7 @@ final class FireTests: XCTestCase {
         let permissionManager = PermissionManagerMock()
         let faviconManager = FaviconManagerMock()
         let recentlyClosedCoordinator = RecentlyClosedCoordinatorMock()
+        let visitedLinkStore = WKVisitedLinkStoreMock()
 
         let fire = Fire(cacheManager: manager,
                         historyCoordinating: historyCoordinator,
@@ -265,14 +273,22 @@ final class FireTests: XCTestCase {
                         windowControllerManager: WindowControllersManager.shared,
                         faviconManagement: faviconManager,
                         recentlyClosedCoordinator: recentlyClosedCoordinator,
-                        tld: ContentBlocking.shared.tld)
+                        tld: ContentBlocking.shared.tld,
+                        getVisitedLinkStore: { WKVisitedLinkStoreWrapper(visitedLinkStore: visitedLinkStore) })
         let tabCollectionViewModel = TabCollectionViewModel.makeTabCollectionViewModel()
         _ = WindowsManager.openNewWindow(with: tabCollectionViewModel, lazyLoadTabs: true)
         XCTAssertNotEqual(tabCollectionViewModel.allTabsCount, 0)
         let numberOfTabs = tabCollectionViewModel.allTabsCount
 
         let finishedBurningExpectation = expectation(description: "Finished burning")
-        fire.burnVisits(of: [],
+        let historyEntries = [
+            HistoryEntry(identifier: UUID(), url: .duckDuckGo, failedToLoad: false, numberOfTotalVisits: 1, lastVisit: Date(), visits: [], numberOfTrackersBlocked: 0, blockedTrackingEntities: [], trackersFound: false),
+            HistoryEntry(identifier: UUID(), url: .duckDuckGoEmail, failedToLoad: false, numberOfTotalVisits: 1, lastVisit: Date(), visits: [], numberOfTrackersBlocked: 0, blockedTrackingEntities: [], trackersFound: false),
+        ]
+        fire.burnVisits(of: [
+            Visit(date: Date(), identifier: nil, historyEntry: historyEntries[0]),
+            Visit(date: Date(), identifier: nil, historyEntry: historyEntries[1]),
+                        ],
                         except: FireproofDomains.shared,
                         isToday: false,
                         completion: {
@@ -287,6 +303,8 @@ final class FireTests: XCTestCase {
         XCTAssert(permissionManager.burnPermissionsOfDomainsCalled)
         XCTAssertFalse(permissionManager.burnPermissionsCalled)
         XCTAssert(recentlyClosedCoordinator.burnCacheCalled)
+        XCTAssertFalse(visitedLinkStore.removeAllCalled)
+        XCTAssertEqual(visitedLinkStore.removeVisitedLinkCalledWithURLs, [.duckDuckGo, .duckDuckGoEmail])
     }
 
     @MainActor
@@ -330,4 +348,19 @@ class MockSavedZoomCoordinator: SavedZoomLevelsCoordinating {
         burnZoomLevelsOfDomainsCalled = true
         domainsBurned = baseDomains
     }
+}
+
+private class WKVisitedLinkStoreMock: NSObject {
+
+    private(set) var removeAllCalled = false
+    @objc func removeAll() {
+        removeAllCalled = true
+    }
+
+    private(set) var removeVisitedLinkCalledWithURLs = Set<URL>()
+    @objc(removeVisitedLinkWithURL:)
+    func removeVisitedLink(with url: URL) {
+        removeVisitedLinkCalledWithURLs.insert(url)
+    }
+
 }

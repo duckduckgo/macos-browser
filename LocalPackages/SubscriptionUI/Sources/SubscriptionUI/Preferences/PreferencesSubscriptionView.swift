@@ -456,7 +456,7 @@ private struct SubscriptionDialog<Buttons>: View where Buttons: View {
     @ViewBuilder let buttons: () -> Buttons
 
     public var body: some View {
-        Dialog(spacing: 20) {
+        Dialog {
             Image(imageName, bundle: .module)
             Text(title)
                 .font(.title2)
