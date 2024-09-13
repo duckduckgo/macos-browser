@@ -17,6 +17,7 @@
 //
 
 import AppKit
+import Carbon
 import Combine
 
 protocol BookmarkManagementDetailViewControllerDelegate: AnyObject {
@@ -119,10 +120,10 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         toolbarButtonsStackView.translatesAutoresizingMaskIntoConstraints = false
         toolbarButtonsStackView.distribution = .fill
 
-        configureToolbar(button: newBookmarkButton, image: .addBookmark, isHidden: false)
-        configureToolbar(button: newFolderButton, image: .addFolder, isHidden: false)
-        configureToolbar(button: deleteItemsButton, image: .trash, isHidden: true)
-        configureToolbar(button: sortItemsButton, image: .sortAscending, isHidden: false)
+        configureToolbarButton(newBookmarkButton, image: .addBookmark, isHidden: false)
+        configureToolbarButton(newFolderButton, image: .addFolder, isHidden: false)
+        configureToolbarButton(deleteItemsButton, image: .trash, isHidden: false)
+        configureToolbarButton(sortItemsButton, image: .sortAscending, isHidden: false)
 
         emptyState.addSubview(emptyStateImageView)
         emptyState.addSubview(emptyStateTitle)
@@ -272,6 +273,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
             self.setupSort(mode: newSortMode)
         }.store(in: &cancellables)
     }
+    var observer: AXObserver?
 
     override func viewDidDisappear() {
         super.viewDidDisappear()
@@ -279,13 +281,13 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     }
 
     override func keyDown(with event: NSEvent) {
-        if event.charactersIgnoringModifiers == String(UnicodeScalar(NSDeleteCharacter)!) {
+        switch Int(event.keyCode) {
+        case kVK_Delete, kVK_ForwardDelete:
             deleteSelectedItems()
-        } else {
-            let commandKeyDown = event.modifierFlags.contains(.command)
-            if commandKeyDown && event.keyCode == 3 { // CMD + F
-                searchBar.makeMeFirstResponder()
-            }
+        case kVK_ANSI_F where event.deviceIndependentFlags == .command:
+            searchBar.makeMeFirstResponder()
+        default:
+            super.keyDown(with: event)
         }
     }
 
@@ -530,12 +532,12 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
     private func updateToolbarButtons() {
         newFolderButton.cell?.representedObject = selectionState.folder
 
-        let shouldShowDeleteButton = tableView.selectedRowIndexes.count > 1
+        let selectedRowsCount = tableView.selectedRowIndexes.count
         NSAnimationContext.runAnimationGroup { context in
             context.duration = 0.25
-            deleteItemsButton.animator().isHidden = !shouldShowDeleteButton
-            newBookmarkButton.animator().isHidden = shouldShowDeleteButton
-            newFolderButton.animator().isHidden = shouldShowDeleteButton
+            deleteItemsButton.animator().isEnabled = selectedRowsCount > 0
+            newBookmarkButton.animator().isHidden = selectedRowsCount > 1
+            newFolderButton.animator().isHidden = selectedRowsCount > 1
         }
     }
 
@@ -559,7 +561,7 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
 
 private extension BookmarkManagementDetailViewController {
 
-    func configureToolbar(button: MouseOverButton, image: NSImage, isHidden: Bool) {
+    func configureToolbarButton(_ button: MouseOverButton, image: NSImage, isHidden: Bool) {
         button.bezelStyle = .shadowlessSquare
         button.cornerRadius = 4
         button.normalTintColor = .button
