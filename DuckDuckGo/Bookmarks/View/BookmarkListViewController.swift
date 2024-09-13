@@ -532,6 +532,10 @@ final class BookmarkListViewController: NSViewController {
     override func keyDown(with event: NSEvent) {
         switch Int(event.keyCode) {
         case kVK_ANSI_F where event.deviceIndependentFlags == .command:
+            guard bookmarkManager.list?.totalBookmarks != 0 else {
+                return
+            }
+
             if isSearchVisible {
                 searchBar.makeMeFirstResponder()
             } else {
