@@ -27,9 +27,13 @@ import PixelKit
 
 final class ConfigurationManager: DefaultConfigurationManager {
 
-    override init(fetcher: ConfigurationFetching = ConfigurationFetcher(store: ConfigurationStore(), eventMapping: configurationDebugEvents),
+    private let privacyConfigManager: VPNPrivacyConfigurationManager
+
+    init(privacyConfigManager: VPNPrivacyConfigurationManager,
+                  fetcher: ConfigurationFetching = ConfigurationFetcher(store: ConfigurationStore(), eventMapping: configurationDebugEvents),
                   store: ConfigurationStoring = ConfigurationStore(),
                   defaults: KeyValueStoring = UserDefaults.appConfiguration) {
+        self.privacyConfigManager = privacyConfigManager
         super.init(fetcher: fetcher, store: store, defaults: defaults)
     }
 
@@ -78,7 +82,7 @@ final class ConfigurationManager: DefaultConfigurationManager {
     }
 
     func updateConfigDependencies() {
-        VPNPrivacyConfigurationManager.shared.reload(
+        privacyConfigManager.reload(
             etag: store.loadEtag(for: .privacyConfiguration),
             data: store.loadData(for: .privacyConfiguration)
         )

@@ -130,7 +130,11 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private let appLauncher = AppLauncher()
     private let accountManager: AccountManager
     private let accessTokenStorage: SubscriptionTokenKeychainStorage
-    private let configurattionManager = ConfigurationManager()
+
+    private let configurationStore = ConfigurationStore()
+    private let configurationManager: ConfigurationManager
+    private let privacyConfigurationManager = VPNPrivacyConfigurationManager()
+    private var configurationSubscription: AnyCancellable?
 
     public init(accountManager: AccountManager,
                 accessTokenStorage: SubscriptionTokenKeychainStorage,
@@ -140,6 +144,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         self.accessTokenStorage = accessTokenStorage
         self.tunnelSettings = VPNSettings(defaults: .netP)
         self.tunnelSettings.alignTo(subscriptionEnvironment: subscriptionEnvironment)
+        self.configurationManager = ConfigurationManager(privacyConfigManager: privacyConfigurationManager, store: configurationStore)
     }
 
     private var cancellables = Set<AnyCancellable>()
@@ -362,11 +367,9 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
         // Setup Remote Configuration
         Configuration.setURLProvider(VPNAgentConfigurationURLProvider())
-        configurattionManager.start()
-        let privacyConfigurationManager = VPNPrivacyConfigurationManager.shared
+        configurationManager.start()
         // Load cached config (if any)
-        let configStore = ConfigurationStore()
-        privacyConfigurationManager.reload(etag: configStore.loadEtag(for: .privacyConfiguration), data: configStore.loadData(for: .privacyConfiguration))
+        privacyConfigurationManager.reload(etag: configurationStore.loadEtag(for: .privacyConfiguration), data: configurationStore.loadData(for: .privacyConfiguration))
 
         setupMenuVisibility()
 
@@ -383,11 +386,12 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
             setUpSubscriptionMonitoring()
 
-            if privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(BackgroundAgentPixelTestSubfeature.pixelTest)
-                && !UserDefaults.appConfiguration.bool(forKey: BackgroundAgentPixelTestSubfeature.pixelTest.rawValue) {
-                PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionConfigurationPixelTest)
-                UserDefaults.appConfiguration.set(true, forKey: BackgroundAgentPixelTestSubfeature.pixelTest.rawValue)
-            }
+            configurationSubscription = privacyConfigurationManager.updatesPublisher
+                .sink { [weak self] in
+                    if self?.privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(BackgroundAgentPixelTestSubfeature.pixelTest) ?? false {
+                        PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionConfigurationPixelTest, frequency: .daily)
+                    }
+                }
 
             if launchedOnStartup {
                 Task {

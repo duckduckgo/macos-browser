@@ -24,8 +24,6 @@ import PixelKit
 
 public final class DBPPrivacyConfigurationManager: PrivacyConfigurationManaging {
 
-    static let shared = DBPPrivacyConfigurationManager()
-
     private let lock = NSLock()
 
     var embeddedConfigData: Data {
@@ -69,7 +67,10 @@ public final class DBPPrivacyConfigurationManager: PrivacyConfigurationManaging 
         return embeddedConfigData
     }
 
-    public var updatesPublisher: AnyPublisher<Void, Never> = .init(Just(()))
+    private let updatesSubject = PassthroughSubject<Void, Never>()
+    public var updatesPublisher: AnyPublisher<Void, Never> {
+        updatesSubject.eraseToAnyPublisher()
+    }
 
     public var privacyConfig: BrowserServicesKit.PrivacyConfiguration {
         guard let privacyConfigurationData = try? PrivacyConfigurationData(data: currentConfig) else {
@@ -92,6 +93,7 @@ public final class DBPPrivacyConfigurationManager: PrivacyConfigurationManaging 
             do {
                 let configData = try PrivacyConfigurationData(data: data)
                 fetchedConfigData = (data, configData, etag)
+                updatesSubject.send(())
             } catch {
                 PixelKit.fire(DebugEvent(DataBrokerProtectionPixels.failedToParsePrivacyConfig(error), error: error))
                 fetchedConfigData = nil

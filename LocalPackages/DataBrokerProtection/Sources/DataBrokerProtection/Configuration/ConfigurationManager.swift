@@ -31,9 +31,13 @@ public extension Logger {
 
 final class ConfigurationManager: DefaultConfigurationManager {
 
-    override init(fetcher: ConfigurationFetching = ConfigurationFetcher(store: ConfigurationStore(), eventMapping: configurationDebugEvents),
+    private let privacyConfigManager: DBPPrivacyConfigurationManager
+
+    init(privacyConfigManager: DBPPrivacyConfigurationManager,
+                  fetcher: ConfigurationFetching = ConfigurationFetcher(store: ConfigurationStore(), eventMapping: configurationDebugEvents),
                   store: ConfigurationStoring = ConfigurationStore(),
                   defaults: KeyValueStoring = UserDefaults.config) {
+        self.privacyConfigManager = privacyConfigManager
         super.init(fetcher: fetcher, store: store, defaults: defaults)
     }
 
@@ -82,7 +86,7 @@ final class ConfigurationManager: DefaultConfigurationManager {
     }
 
     func updateConfigDependencies() {
-        DBPPrivacyConfigurationManager.shared.reload(
+        privacyConfigManager.reload(
             etag: store.loadEtag(for: .privacyConfiguration),
             data: store.loadData(for: .privacyConfiguration)
         )

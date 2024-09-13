@@ -24,8 +24,6 @@ import PixelKit
 
 public final class VPNPrivacyConfigurationManager: PrivacyConfigurationManaging {
 
-    static let shared = VPNPrivacyConfigurationManager()
-
     private let lock = NSLock()
 
     var embeddedConfigData: Data {
@@ -69,7 +67,10 @@ public final class VPNPrivacyConfigurationManager: PrivacyConfigurationManaging 
         return embeddedConfigData
     }
 
-    public var updatesPublisher: AnyPublisher<Void, Never> = .init(Just(()))
+    private let updatesSubject = PassthroughSubject<Void, Never>()
+    public var updatesPublisher: AnyPublisher<Void, Never> {
+        updatesSubject.eraseToAnyPublisher()
+    }
 
     public var privacyConfig: BrowserServicesKit.PrivacyConfiguration {
         guard let privacyConfigurationData = try? PrivacyConfigurationData(data: currentConfig) else {

@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import Combine
 import Common
 import BrowserServicesKit
 import Configuration
@@ -34,11 +35,11 @@ public class DataBrokerProtectionAgentManagerProvider {
 
         let notificationService = DefaultDataBrokerProtectionUserNotificationService(pixelHandler: pixelHandler)
         Configuration.setURLProvider(DBPAgentConfigurationURLProvider())
-        let configurationManager = ConfigurationManager()
-        configurationManager.start()
-        let privacyConfigurationManager = DBPPrivacyConfigurationManager.shared
-        // Load cached config (if any)
         let configStore = ConfigurationStore()
+        let privacyConfigurationManager = DBPPrivacyConfigurationManager()
+        let configurationManager = ConfigurationManager(privacyConfigManager: privacyConfigurationManager, store: configStore)
+        configurationManager.start()
+        // Load cached config (if any)
         privacyConfigurationManager.reload(etag: configStore.loadEtag(for: .privacyConfiguration), data: configStore.loadData(for: .privacyConfiguration))
         let ipcServer = DefaultDataBrokerProtectionIPCServer(machServiceName: Bundle.main.bundleIdentifier!)
 
@@ -103,7 +104,8 @@ public class DataBrokerProtectionAgentManagerProvider {
             operationDependencies: operationDependencies,
             pixelHandler: pixelHandler,
             agentStopper: agentstopper,
-            configurationManager: configurationManager)
+            configurationManager: configurationManager,
+            privacyConfigurationManager: privacyConfigurationManager)
     }
 }
 
@@ -118,11 +120,14 @@ public final class DataBrokerProtectionAgentManager {
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let agentStopper: DataBrokerProtectionAgentStopper
     private let configurationManger: DefaultConfigurationManager
+    private let privacyConfigurationManager: DBPPrivacyConfigurationManager
 
     // Used for debug functions only, so not injected
     private lazy var browserWindowManager = BrowserWindowManager()
 
     private var didStartActivityScheduler = false
+
+    private var configurationSubscription: AnyCancellable?
 
     init(userNotificationService: DataBrokerProtectionUserNotificationService,
          activityScheduler: DataBrokerProtectionBackgroundActivityScheduler,
@@ -132,7 +137,8 @@ public final class DataBrokerProtectionAgentManager {
          operationDependencies: DataBrokerOperationDependencies,
          pixelHandler: EventMapping<DataBrokerProtectionPixels>,
          agentStopper: DataBrokerProtectionAgentStopper,
-         configurationManager: DefaultConfigurationManager
+         configurationManager: DefaultConfigurationManager,
+         privacyConfigurationManager: DBPPrivacyConfigurationManager
     ) {
         self.userNotificationService = userNotificationService
         self.activityScheduler = activityScheduler
@@ -143,6 +149,7 @@ public final class DataBrokerProtectionAgentManager {
         self.pixelHandler = pixelHandler
         self.agentStopper = agentStopper
         self.configurationManger = configurationManager
+        self.privacyConfigurationManager = privacyConfigurationManager
 
         self.activityScheduler.delegate = self
         self.ipcServer.serverDelegate = self
@@ -166,11 +173,12 @@ public final class DataBrokerProtectionAgentManager {
             /// While keeping the agent active with invalid entitlement has no significant risk, setting the monitoring interval at 60 minutes is a good balance to minimize backend checks.
             agentStopper.monitorEntitlementAndStopAgentIfEntitlementIsInvalid(interval: .minutes(60))
 
-            if DBPPrivacyConfigurationManager.shared.privacyConfig.isSubfeatureEnabled(BackgroundAgentPixelTestSubfeature.pixelTest)
-                && !UserDefaults.config.bool(forKey: BackgroundAgentPixelTestSubfeature.pixelTest.rawValue) {
-                PixelKit.fire(DataBrokerProtectionPixels.pixelTest)
-                UserDefaults.config.set(true, forKey: BackgroundAgentPixelTestSubfeature.pixelTest.rawValue)
-            }
+            configurationSubscription = privacyConfigurationManager.updatesPublisher
+                .sink { [weak self] _ in
+                    if self?.privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(BackgroundAgentPixelTestSubfeature.pixelTest) ?? false {
+                        PixelKit.fire(DataBrokerProtectionPixels.pixelTest, frequency: .daily)
+                    }
+                }
         }
     }
 }

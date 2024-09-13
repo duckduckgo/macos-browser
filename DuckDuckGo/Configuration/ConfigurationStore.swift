@@ -42,7 +42,6 @@ final class ConfigurationStore: ConfigurationStoring {
         static let configStorageBloomFilterExclusionsEtag = "config.storage.bloomfilter.exclusions.etag"
         static let configStorageSurrogatesEtag = "config.storage.surrogates.etag"
         static let configStoragePrivacyConfigurationEtag = "config.storage.privacyconfiguration.etag"
-        static let configFBConfigEtag = "config.storage.fbconfig.etag"
         static let configStorageRemoteMessagingConfigEtag = "config.storage.remotemessagingconfig.etag"
     }
 
@@ -99,15 +98,6 @@ final class ConfigurationStore: ConfigurationStoring {
         }
         set {
             defaults.set(newValue, forKey: Constants.configStoragePrivacyConfigurationEtag)
-        }
-    }
-
-    private var FBConfigEtag: String? {
-        get {
-            defaults.object(forKey: Constants.configFBConfigEtag) as? String
-        }
-        set {
-            defaults.set(newValue, forKey: Constants.configFBConfigEtag)
         }
     }
 
