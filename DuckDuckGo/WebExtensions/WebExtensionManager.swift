@@ -55,6 +55,12 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
         let matchPattern = try! _WKWebExtension.MatchPattern(string: "*://*/*")
         context.setPermissionStatus(.grantedExplicitly, for: matchPattern, expirationDate: nil)
 
+        // Grant all requested API permissions.
+        let permissions: [WKWebExtension.Permission] = [.activeTab, .alarms, .clipboardWrite, .contextMenus, .cookies, .declarativeNetRequest, .declarativeNetRequestFeedback, .declarativeNetRequestWithHostAccess, .menus, .nativeMessaging, .scripting, .storage, .tabs, .unlimitedStorage, .webNavigation, .webRequest]
+        for permission in permissions {
+            context.setPermissionStatus(.grantedExplicitly, for: WKWebExtension.Permission.activeTab, expirationDate: nil)
+        }
+
         // For debugging purposes
         context.isInspectable = true
         return context
