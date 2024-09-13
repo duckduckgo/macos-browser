@@ -1,5 +1,5 @@
 //
-//  NotificationName+Freemium.swift
+//  NotificationName+FreemiumDBP.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //

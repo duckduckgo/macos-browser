@@ -2718,8 +2718,8 @@
 		C11198352C89AEFA00F0272C /* FreemiumDBPFirstProfileSavedNotifierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C11198332C89AEFA00F0272C /* FreemiumDBPFirstProfileSavedNotifierTests.swift */; };
 		C126B35A2C820924005DC2A3 /* FreemiumDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = C126B3592C820924005DC2A3 /* FreemiumDebugMenu.swift */; };
 		C126B35B2C820924005DC2A3 /* FreemiumDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = C126B3592C820924005DC2A3 /* FreemiumDebugMenu.swift */; };
-		C1351DD12C8B31CE0086B058 /* NotificationName+Freemium.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1351DD02C8B31CE0086B058 /* NotificationName+Freemium.swift */; };
-		C1351DD22C8B31CE0086B058 /* NotificationName+Freemium.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1351DD02C8B31CE0086B058 /* NotificationName+Freemium.swift */; };
+		C1351DD12C8B31CE0086B058 /* NotificationName+FreemiumDBP.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1351DD02C8B31CE0086B058 /* NotificationName+FreemiumDBP.swift */; };
+		C1351DD22C8B31CE0086B058 /* NotificationName+FreemiumDBP.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1351DD02C8B31CE0086B058 /* NotificationName+FreemiumDBP.swift */; };
 		C1351DD42C8B53500086B058 /* FreemiumDBPPromotionViewCoordinatingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1351DD32C8B53500086B058 /* FreemiumDBPPromotionViewCoordinatingTests.swift */; };
 		C1351DD52C8B53500086B058 /* FreemiumDBPPromotionViewCoordinatingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1351DD32C8B53500086B058 /* FreemiumDBPPromotionViewCoordinatingTests.swift */; };
 		C1372EF42BBC5BAD003F8793 /* SecureTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1372EF32BBC5BAD003F8793 /* SecureTextField.swift */; };
@@ -4534,7 +4534,7 @@
 		C11198302C898AB500F0272C /* FreemiumDBPFirstProfileSavedNotifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreemiumDBPFirstProfileSavedNotifier.swift; sourceTree = "<group>"; };
 		C11198332C89AEFA00F0272C /* FreemiumDBPFirstProfileSavedNotifierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreemiumDBPFirstProfileSavedNotifierTests.swift; sourceTree = "<group>"; };
 		C126B3592C820924005DC2A3 /* FreemiumDebugMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreemiumDebugMenu.swift; sourceTree = "<group>"; };
-		C1351DD02C8B31CE0086B058 /* NotificationName+Freemium.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotificationName+Freemium.swift"; sourceTree = "<group>"; };
+		C1351DD02C8B31CE0086B058 /* NotificationName+FreemiumDBP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotificationName+FreemiumDBP.swift"; sourceTree = "<group>"; };
 		C1351DD32C8B53500086B058 /* FreemiumDBPPromotionViewCoordinatingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreemiumDBPPromotionViewCoordinatingTests.swift; sourceTree = "<group>"; };
 		C1372EF32BBC5BAD003F8793 /* SecureTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureTextField.swift; sourceTree = "<group>"; };
 		C13909EE2B85FD4E001626ED /* AutofillActionExecutor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillActionExecutor.swift; sourceTree = "<group>"; };
@@ -8973,6 +8973,24 @@
 			path = Mocks;
 			sourceTree = "<group>";
 		};
+		C17E10582C94887A00317F2B /* Debug */ = {
+			isa = PBXGroup;
+			children = (
+				C126B3592C820924005DC2A3 /* FreemiumDebugMenu.swift */,
+			);
+			path = Debug;
+			sourceTree = "<group>";
+		};
+		C17E10592C94888E00317F2B /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				C1C405862C7F80E50089DE8A /* PromotionView+FreemiumDBP.swift */,
+				C153E7C42C8B21B500B9BAD7 /* Logger+FreemiumDBP.swift */,
+				C1351DD02C8B31CE0086B058 /* NotificationName+FreemiumDBP.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		C18194562C7CA98500381092 /* Freemium */ = {
 			isa = PBXGroup;
 			children = (
@@ -8996,8 +9014,8 @@
 		C1858CCF2C7C95DB00C9BEAB /* Freemium */ = {
 			isa = PBXGroup;
 			children = (
+				C17E10582C94887A00317F2B /* Debug */,
 				C1858CD02C7C95E500C9BEAB /* DBP */,
-				C126B3592C820924005DC2A3 /* FreemiumDebugMenu.swift */,
 			);
 			path = Freemium;
 			sourceTree = "<group>";
@@ -9005,14 +9023,12 @@
 		C1858CD02C7C95E500C9BEAB /* DBP */ = {
 			isa = PBXGroup;
 			children = (
+				C17E10592C94888E00317F2B /* Extensions */,
 				C1858CD12C7C971D00C9BEAB /* FreemiumDBPFeature.swift */,
 				C18194632C7DF7D600381092 /* FreemiumDBPPresenter.swift */,
-				C1C405862C7F80E50089DE8A /* PromotionView+FreemiumDBP.swift */,
 				C1CE84682C887CF60068913B /* FreemiumDBPScanResultPolling.swift */,
 				C11198302C898AB500F0272C /* FreemiumDBPFirstProfileSavedNotifier.swift */,
 				C153E7C12C8AD68D00B9BAD7 /* FreemiumDBPPromotionViewCoordinating.swift */,
-				C153E7C42C8B21B500B9BAD7 /* Logger+FreemiumDBP.swift */,
-				C1351DD02C8B31CE0086B058 /* NotificationName+Freemium.swift */,
 			);
 			path = DBP;
 			sourceTree = "<group>";
@@ -11358,7 +11374,7 @@
 				3706FC98293F65D500E42796 /* CountryList.swift in Sources */,
 				1DEF3BAE2BD145A9004A2FBA /* AutoClearHandler.swift in Sources */,
 				4B37EE732B4CFF0800A89A61 /* HomePageRemoteMessagingStorage.swift in Sources */,
-				C1351DD22C8B31CE0086B058 /* NotificationName+Freemium.swift in Sources */,
+				C1351DD22C8B31CE0086B058 /* NotificationName+FreemiumDBP.swift in Sources */,
 				3706FC99293F65D500E42796 /* PreferencesSection.swift in Sources */,
 				B6C8CAA82AD010DD0060E1CD /* YandexDataImporter.swift in Sources */,
 				B655124929A79465009BFE1C /* NavigationActionExtension.swift in Sources */,
@@ -12708,7 +12724,7 @@
 				373D9B4829EEAC1B00381FDD /* SyncMetadataDatabase.swift in Sources */,
 				B68458C025C7E9E000DC17B6 /* TabCollectionViewModel+NSSecureCoding.swift in Sources */,
 				AA8EDF2724923EC70071C2E8 /* StringExtension.swift in Sources */,
-				C1351DD12C8B31CE0086B058 /* NotificationName+Freemium.swift in Sources */,
+				C1351DD12C8B31CE0086B058 /* NotificationName+FreemiumDBP.swift in Sources */,
 				85378DA2274E7F25007C5CBF /* EmailManagerRequestDelegate.swift in Sources */,
 				1D43EB36292ACE690065E5D6 /* ApplicationVersionReader.swift in Sources */,
 				566B736C2BECC3C600FF1959 /* SyncPausedStateManaging.swift in Sources */,
