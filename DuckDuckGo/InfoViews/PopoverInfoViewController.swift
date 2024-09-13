@@ -46,13 +46,13 @@ final class PopoverInfoViewController: NSHostingController<InfoView> {
     }
 
     deinit {
-        cancelAutoDismissTimer()
+        cancelAutoDismiss()
         onDismiss?()
     }
 
     override func viewDidAppear() {
         super.viewDidAppear()
-        scheduleAutoDismissTimer()
+        scheduleAutoDismiss()
         createTrackingArea()
     }
 
@@ -78,16 +78,20 @@ final class PopoverInfoViewController: NSHostingController<InfoView> {
                        of: view,
                        preferredEdge: .maxY,
                        behavior: .applicationDefined)
+        let presentingViewTrackingArea = NSTrackingArea(rect: self.view.convert(self.view.frame, from: view),
+                                                        options: [.mouseEnteredAndExited, .activeInKeyWindow],
+                                                        owner: self)
+        view.addTrackingArea(presentingViewTrackingArea)
     }
 
     // MARK: - Auto Dismissal
-    private func cancelAutoDismissTimer() {
+    func cancelAutoDismiss() {
         timer?.invalidate()
         timer = nil
     }
 
-    private func scheduleAutoDismissTimer() {
-        cancelAutoDismissTimer()
+    func scheduleAutoDismiss() {
+        cancelAutoDismiss()
         timer = Timer.scheduledTimer(withTimeInterval: autoDismissDuration, repeats: false) { [weak self] _ in
             guard let self = self else { return }
             self.presentingViewController?.dismiss(self)
@@ -104,11 +108,11 @@ final class PopoverInfoViewController: NSHostingController<InfoView> {
     }
 
     override func mouseEntered(with event: NSEvent) {
-        cancelAutoDismissTimer()
+        cancelAutoDismiss()
     }
 
     override func mouseExited(with event: NSEvent) {
-        scheduleAutoDismissTimer()
+        scheduleAutoDismiss()
     }
 
     override func mouseDown(with event: NSEvent) {

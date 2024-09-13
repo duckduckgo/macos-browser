@@ -29,6 +29,35 @@ protocol SaveCredentialsDelegate: AnyObject {
 
 }
 
+extension SaveCredentialsViewController: MouseOverViewDelegate {
+    func mouseOverView(_ mouseOverView: MouseOverView, isMouseOver: Bool) {
+        if isMouseOver {
+            presentSecurityInfoPopover()
+        } else {
+            dismissSecurityInfoPopover()
+        }
+    }
+
+    private func presentSecurityInfoPopover() {
+        // Only show the popover if we aren't already presenting one:
+        guard infoViewController == nil else {
+            infoViewController?.cancelAutoDismiss()
+            return
+        }
+
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            let message = autofillPreferences.isAutoLockEnabled ? UserText.pmSaveCredentialsSecurityInfo : UserText.pmSaveCredentialsSecurityInfoAutolockOff
+            let infoViewController = PopoverInfoViewController(message: message)
+            infoViewController.show(onParent: self, relativeTo: self.tooltipView)
+        }
+    }
+
+    private func dismissSecurityInfoPopover() {
+        infoViewController?.scheduleAutoDismiss()
+    }
+}
+
 final class SaveCredentialsViewController: NSViewController {
 
     static func create() -> SaveCredentialsViewController {
@@ -63,7 +92,14 @@ final class SaveCredentialsViewController: NSViewController {
     @IBOutlet weak var passwordManagerNotNowButton: NSButton!
     @IBOutlet var fireproofCheck: NSButton!
     @IBOutlet weak var fireproofCheckDescription: NSTextFieldCell!
-    @IBOutlet weak var securityButton: NSButton!
+    @IBOutlet weak var tooltipView: MouseOverView!
+    @IBOutlet weak var lockImageBackgroundView: NSView!
+
+    private var infoViewController: PopoverInfoViewController? {
+        presentedViewControllers?.first {
+            ($0 as? PopoverInfoViewController) != nil
+        } as? PopoverInfoViewController
+    }
 
     private enum Action {
         case displayed
@@ -99,7 +135,7 @@ final class SaveCredentialsViewController: NSViewController {
         saveButton.becomeFirstResponder()
         updateSaveSegmentedControl()
         setUpStrings()
-        securityButton.showsBorderOnlyWhileMouseInside = true
+        setUpSecurityInfoViews()
     }
 
     override func viewWillAppear() {
@@ -135,6 +171,13 @@ final class SaveCredentialsViewController: NSViewController {
         doneButton.title = UserText.done
         editButton.title = UserText.edit
         passwordManagerNotNowButton.title = UserText.notNow
+    }
+
+    private func setUpSecurityInfoViews() {
+        tooltipView.delegate = self
+        lockImageBackgroundView.wantsLayer = true
+        lockImageBackgroundView.layer?.cornerRadius = lockImageBackgroundView.bounds.height / 2
+        lockImageBackgroundView.layer?.backgroundColor = NSColor.black.withAlphaComponent(0.06).cgColor
     }
 
     /// Note that if the credentials.account.id is not nil, then we consider this an update rather than a save.
@@ -368,19 +411,6 @@ final class SaveCredentialsViewController: NSViewController {
 
     @IBAction func onTogglePasswordVisibility(sender: Any?) {
         updatePasswordFieldVisibility(visible: !hiddenPasswordField.isHidden)
-    }
-
-    @IBAction func onSecurityClicked(sender: NSButton?) {
-        // Only show the popover if we aren't already presenting one:
-        guard (self.presentedViewControllers ?? []).isEmpty else { return }
-
-        DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-            let message = autofillPreferences.isAutoLockEnabled ? UserText.pmSaveCredentialsSecurityInfo : UserText.pmSaveCredentialsSecurityInfoAutolockOff
-            let infoViewController = PopoverInfoViewController(message: message)
-            let relativeView = sender ?? self.view
-            infoViewController.show(onParent: self, relativeTo: relativeView)
-        }
     }
 
     func loadFaviconForDomain(_ domain: String?) {
