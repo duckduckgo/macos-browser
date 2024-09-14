@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/duckduckgo/fastlane-plugin-ddg_apple_automation
-  revision: 59eb2c97d452fbe6c1cbe8ce983094000c49a51d
-  tag: 0.9.0
+  revision: 8862efb64b3f9c4f25d49ca2f59b7d44c64e5d9a
+  branch: dominik/asana-extract-task-id-helper
   specs:
     fastlane-plugin-ddg_apple_automation (0.9.0)
       asana
