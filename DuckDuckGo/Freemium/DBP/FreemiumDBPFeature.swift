@@ -52,9 +52,10 @@ final class DefaultFreemiumDBPFeature: FreemiumDBPFeature {
     /// The feature is considered available if:
     /// 1. It is enabled in the privacy configuration (`DBPSubfeature.freemium`), and
     /// 2. The user is a potential privacy pro subscriber.
+    /// 3. TODO: The user is in the experiment cohort
     var isAvailable: Bool {
         privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DBPSubfeature.freemium)
-        && isPotentialPrivacyProSubscriber
+        && subscriptionManager.isPotentialPrivacyProSubscriber
     }
 
     /// A publisher that emits updates when the availability of the Freemium DBP feature changes.
@@ -144,15 +145,6 @@ final class DefaultFreemiumDBPFeature: FreemiumDBPFeature {
 
 private extension DefaultFreemiumDBPFeature {
 
-    /// Returns true if a user is a "potential" Privacy Pro subscriber. This means:
-    ///
-    /// 1. Is eligible to purchase
-    /// 2. Is not a current subscriber
-    var isPotentialPrivacyProSubscriber: Bool {
-        subscriptionManager.isPrivacyProPurchaseAvailable
-        && !accountManager.isUserAuthenticated
-    }
-
     /// Returns true IFF:
     ///
     /// 1. The user did activate Freemium DBP
@@ -162,7 +154,7 @@ private extension DefaultFreemiumDBPFeature {
         guard freemiumDBPUserStateManager.didActivate else { return false }
 
         return !privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DBPSubfeature.freemium)
-        && isPotentialPrivacyProSubscriber
+        && subscriptionManager.isPotentialPrivacyProSubscriber
     }
 
     /// This method offboards a Freemium user if the feature flag was disabled
@@ -179,9 +171,18 @@ private extension DefaultFreemiumDBPFeature {
     }
 }
 
-private extension SubscriptionManager {
+extension SubscriptionManager {
 
-    var isPrivacyProPurchaseAvailable: Bool {
+    /// Returns true if a user is a "potential" Privacy Pro subscriber. This means:
+    ///
+    /// 1. Is eligible to purchase
+    /// 2. Is not a current subscriber
+    var isPotentialPrivacyProSubscriber: Bool {
+        isPrivacyProPurchaseAvailable
+        && !accountManager.isUserAuthenticated
+    }
+
+    private var isPrivacyProPurchaseAvailable: Bool {
         let platform = currentEnvironment.purchasePlatform
         switch platform {
         case .appStore:

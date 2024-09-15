@@ -2742,6 +2742,8 @@
 		C17CA7AE2B9B52E6008EC3C1 /* NavigationBarPopoversTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17CA7AC2B9B52E6008EC3C1 /* NavigationBarPopoversTests.swift */; };
 		C17CA7B22B9B5317008EC3C1 /* MockAutofillPopoverPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17CA7B12B9B5317008EC3C1 /* MockAutofillPopoverPresenter.swift */; };
 		C17CA7B32B9B5317008EC3C1 /* MockAutofillPopoverPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17CA7B12B9B5317008EC3C1 /* MockAutofillPopoverPresenter.swift */; };
+		C17E105D2C94A10700317F2B /* FreemiumDBPPixelExperimentManagingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17E105C2C94A10700317F2B /* FreemiumDBPPixelExperimentManagingTests.swift */; };
+		C17E105E2C94A10700317F2B /* FreemiumDBPPixelExperimentManagingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17E105C2C94A10700317F2B /* FreemiumDBPPixelExperimentManagingTests.swift */; };
 		C18194592C7CA9AB00381092 /* FreemiumDBPFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18194582C7CA9AB00381092 /* FreemiumDBPFeatureTests.swift */; };
 		C181945A2C7CA9AB00381092 /* FreemiumDBPFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18194582C7CA9AB00381092 /* FreemiumDBPFeatureTests.swift */; };
 		C181945C2C7CDCC700381092 /* PromotionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C181945B2C7CDCC700381092 /* PromotionView.swift */; };
@@ -2760,6 +2762,8 @@
 		C18BF9D22C736C9700ED6B8A /* Freemium in Frameworks */ = {isa = PBXBuildFile; productRef = C18BF9D12C736C9700ED6B8A /* Freemium */; };
 		C1B1CBE12BE1915100B6049C /* DataImportShortcutsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B1CBE02BE1915100B6049C /* DataImportShortcutsViewModel.swift */; };
 		C1B1CBE22BE1915100B6049C /* DataImportShortcutsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B1CBE02BE1915100B6049C /* DataImportShortcutsViewModel.swift */; };
+		C1B51EB42C945A6700315ED8 /* FreemiumDBPPixelExperimentManaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B51EB32C945A6700315ED8 /* FreemiumDBPPixelExperimentManaging.swift */; };
+		C1B51EB52C945A6700315ED8 /* FreemiumDBPPixelExperimentManaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B51EB32C945A6700315ED8 /* FreemiumDBPPixelExperimentManaging.swift */; };
 		C1C405872C7F80E50089DE8A /* PromotionView+FreemiumDBP.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1C405862C7F80E50089DE8A /* PromotionView+FreemiumDBP.swift */; };
 		C1C405882C7F80E50089DE8A /* PromotionView+FreemiumDBP.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1C405862C7F80E50089DE8A /* PromotionView+FreemiumDBP.swift */; };
 		C1CE84692C887CF60068913B /* FreemiumDBPScanResultPolling.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1CE84682C887CF60068913B /* FreemiumDBPScanResultPolling.swift */; };
@@ -4546,6 +4550,7 @@
 		C168B9AB2B31DC7E001AFAD9 /* AutofillNeverPromptWebsitesManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutofillNeverPromptWebsitesManager.swift; sourceTree = "<group>"; };
 		C17CA7AC2B9B52E6008EC3C1 /* NavigationBarPopoversTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarPopoversTests.swift; sourceTree = "<group>"; };
 		C17CA7B12B9B5317008EC3C1 /* MockAutofillPopoverPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAutofillPopoverPresenter.swift; sourceTree = "<group>"; };
+		C17E105C2C94A10700317F2B /* FreemiumDBPPixelExperimentManagingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreemiumDBPPixelExperimentManagingTests.swift; sourceTree = "<group>"; };
 		C18194582C7CA9AB00381092 /* FreemiumDBPFeatureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreemiumDBPFeatureTests.swift; sourceTree = "<group>"; };
 		C181945B2C7CDCC700381092 /* PromotionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionView.swift; sourceTree = "<group>"; };
 		C181945E2C7CDD0E00381092 /* PromotionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionViewModel.swift; sourceTree = "<group>"; };
@@ -4553,6 +4558,7 @@
 		C18194662C7F60E500381092 /* FreemiumDBPPresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreemiumDBPPresenterTests.swift; sourceTree = "<group>"; };
 		C1858CD12C7C971D00C9BEAB /* FreemiumDBPFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreemiumDBPFeature.swift; sourceTree = "<group>"; };
 		C1B1CBE02BE1915100B6049C /* DataImportShortcutsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportShortcutsViewModel.swift; sourceTree = "<group>"; };
+		C1B51EB32C945A6700315ED8 /* FreemiumDBPPixelExperimentManaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreemiumDBPPixelExperimentManaging.swift; sourceTree = "<group>"; };
 		C1C405862C7F80E50089DE8A /* PromotionView+FreemiumDBP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PromotionView+FreemiumDBP.swift"; sourceTree = "<group>"; };
 		C1CE84682C887CF60068913B /* FreemiumDBPScanResultPolling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreemiumDBPScanResultPolling.swift; sourceTree = "<group>"; };
 		C1CE846B2C88868D0068913B /* FreemiumDBPScanResultPollingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreemiumDBPScanResultPollingTests.swift; sourceTree = "<group>"; };
@@ -7287,6 +7293,7 @@
 		AA585D75248FD31100E9A3E2 = {
 			isa = PBXGroup;
 			children = (
+				C17E105C2C94A10700317F2B /* FreemiumDBPPixelExperimentManagingTests.swift */,
 				378B5886295CF2A4002C0CC0 /* Configuration */,
 				378E279C2970217400FCADA2 /* LocalPackages */,
 				7BB108552A43375D000AB95F /* LocalThirdParty */,
@@ -8991,6 +8998,21 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
+		C17E105A2C94889B00317F2B /* Experiment */ = {
+			isa = PBXGroup;
+			children = (
+				C1B51EB32C945A6700315ED8 /* FreemiumDBPPixelExperimentManaging.swift */,
+			);
+			path = Experiment;
+			sourceTree = "<group>";
+		};
+		C17E105B2C94A06700317F2B /* Experiment */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Experiment;
+			sourceTree = "<group>";
+		};
 		C18194562C7CA98500381092 /* Freemium */ = {
 			isa = PBXGroup;
 			children = (
@@ -9002,6 +9024,7 @@
 		C18194572C7CA99400381092 /* DBP */ = {
 			isa = PBXGroup;
 			children = (
+				C17E105B2C94A06700317F2B /* Experiment */,
 				C18194582C7CA9AB00381092 /* FreemiumDBPFeatureTests.swift */,
 				C18194662C7F60E500381092 /* FreemiumDBPPresenterTests.swift */,
 				C1CE846B2C88868D0068913B /* FreemiumDBPScanResultPollingTests.swift */,
@@ -9023,6 +9046,7 @@
 		C1858CD02C7C95E500C9BEAB /* DBP */ = {
 			isa = PBXGroup;
 			children = (
+				C17E105A2C94889B00317F2B /* Experiment */,
 				C17E10592C94888E00317F2B /* Extensions */,
 				C1858CD12C7C971D00C9BEAB /* FreemiumDBPFeature.swift */,
 				C18194632C7DF7D600381092 /* FreemiumDBPPresenter.swift */,
@@ -11140,6 +11164,7 @@
 				3706FC06293F65D500E42796 /* OnboardingViewModel.swift in Sources */,
 				3706FC07293F65D500E42796 /* ScriptSourceProviding.swift in Sources */,
 				31EF1E832B63FFCA00E6DB17 /* LoginItem+DataBrokerProtection.swift in Sources */,
+				C1B51EB52C945A6700315ED8 /* FreemiumDBPPixelExperimentManaging.swift in Sources */,
 				021EA0812BD2A9D500772C9A /* TabsPreferences.swift in Sources */,
 				B6619EFC2B111CC600CD9186 /* InstructionsFormatParser.swift in Sources */,
 				3706FC08293F65D500E42796 /* CoreDataBookmarkImporter.swift in Sources */,
@@ -11542,6 +11567,7 @@
 				56A054172C1C37B0007D8FAB /* CapturingOnboardingNavigation.swift in Sources */,
 				37DB56F32C3B36B80093D4DC /* RemoteMessagingClientTests.swift in Sources */,
 				C17CA7AE2B9B52E6008EC3C1 /* NavigationBarPopoversTests.swift in Sources */,
+				C17E105E2C94A10700317F2B /* FreemiumDBPPixelExperimentManagingTests.swift in Sources */,
 				3706FE23293F661700E42796 /* SuggestionLoadingMock.swift in Sources */,
 				3706FE24293F661700E42796 /* PasteboardFolderTests.swift in Sources */,
 				B603971229B9D67E00902A34 /* PublishersExtensions.swift in Sources */,
@@ -12255,6 +12281,7 @@
 				AAAB9114288EB1D600A057A9 /* CleanThisHistoryMenuItem.swift in Sources */,
 				1D0DE9412C3BB9CC0037ABC2 /* ReleaseNotesParser.swift in Sources */,
 				B6C0B23626E732000031CB7F /* DownloadListItem.swift in Sources */,
+				C1B51EB42C945A6700315ED8 /* FreemiumDBPPixelExperimentManaging.swift in Sources */,
 				4B9DB0232A983B24000927DB /* WaitlistRequest.swift in Sources */,
 				4BE3A6C12C16BEB1003FC378 /* VPNRedditSessionWorkaround.swift in Sources */,
 				B6B1E87E26D5DA0E0062C350 /* DownloadsPopover.swift in Sources */,
@@ -13196,6 +13223,7 @@
 				1DA860722BE3AE950027B813 /* DockPositionProviderTests.swift in Sources */,
 				4BBF0925283083EC00EE1418 /* FileSystemDSLTests.swift in Sources */,
 				4B11060A25903EAC0039B979 /* CoreDataEncryptionTests.swift in Sources */,
+				C17E105D2C94A10700317F2B /* FreemiumDBPPixelExperimentManagingTests.swift in Sources */,
 				3767319E2C7F416000EB097B /* CustomBackgroundTests.swift in Sources */,
 				B603971029B9D67E00902A34 /* PublishersExtensions.swift in Sources */,
 				9F26060E2B85E17D00819292 /* AddEditBookmarkDialogCoordinatorViewModelTests.swift in Sources */,
