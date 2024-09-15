@@ -89,7 +89,7 @@ jobs:
     - name: Tag Release and merge to base branch
       id: tag-release
       run: |
-        bundle exec fastlane tag_release \
+        bundle exec fastlane run tag_release \
           asana_access_token:"${{ secrets.ASANA_ACCESS_TOKEN }}" \
           github_token:"${{ github.token }}" \
           platform:"macos" \
