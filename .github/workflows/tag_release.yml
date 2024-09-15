@@ -88,16 +88,18 @@ jobs:
 
     - name: Tag Release and merge to base branch
       id: tag-release
+      env:
+        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_ELEVATED_PERMISSIONS_TOKEN: ${{ secrets.GHA_ELEVATED_PERMISSIONS_TOKEN }}
+        WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
       run: |
         bundle exec fastlane run tag_release \
-          asana_access_token:"${{ secrets.ASANA_ACCESS_TOKEN }}" \
-          github_token:"${{ github.token }}" \
           platform:"macos" \
           asana_task_url:"${{ env.asana-task-url }}" \
           base_branch:"${{ env.BASE_BRANCH }}" \
           branch:"${{ env.BRANCH }}" \
           github_handle:${{ github.actor }} \
-          github_elevated_permissions_token:"${{ secrets.GHA_ELEVATED_PERMISSIONS_TOKEN }}" \
           is_internal_release_bump:"${{ env.internal-release-bump }}" \
           is_prerelease:"${{ env.prerelease }}" \
           is_scheduled_release:"${{ github.event_name == 'schedule' }}"
