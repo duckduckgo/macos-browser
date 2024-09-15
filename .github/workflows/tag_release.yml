@@ -65,7 +65,7 @@ jobs:
       internal-release-bump: ${{ inputs.internal-release-bump }}
 
     outputs:
-      tag: ${{ steps.create-tag.outputs.tag }}
+      tag: ${{ steps.tag-release.outputs.tag }}
 
     steps:
 
@@ -86,15 +86,24 @@ jobs:
     - name: Set up fastlane
       run: bundle install
 
-    - name: Create Tag and GitHub Release
-      id: create-tag
-      uses: ./.github/actions/create-tag-and-github-release
-      with:
-        prerelease: ${{ env.prerelease }}
-        github-token: ${{ github.token }}
+    - name: Tag Release and merge to base branch
+      id: tag-release
+      run: |
+        bundle exec fastlane tag_release \
+          asana_access_token:"${{ secrets.ASANA_ACCESS_TOKEN }}" \
+          github_token:"${{ github.token }}" \
+          platform:"macos" \
+          asana_task_url:"${{ env.asana-task-url }}" \
+          base_branch:"${{ env.BASE_BRANCH }}" \
+          branch:"${{ env.BRANCH }}" \
+          github_handle:${{ github.actor }} \
+          github_elevated_permissions_token:"${{ secrets.GHA_ELEVATED_PERMISSIONS_TOKEN }}" \
+          is_internal_release_bump:"${{ env.internal-release-bump }}" \
+          prerelease:"${{ env.prerelease }}" \
+          is_scheduled_release:"${{ github.event_name == 'schedule' }}"
 
     - name: Store created tag in a file artifact
-      run: echo ${{ steps.create-tag.outputs.tag }} > .github/tag
+      run: echo ${{ steps.tag-release.outputs.tag }} > .github/tag
 
     - name: Upload tag artifact
       uses: actions/upload-artifact@v4
@@ -102,132 +111,3 @@ jobs:
         name: tag
         path: .github/tag
         retention-days: 1
-
-    - name: Merge to base branch
-      id: merge
-      if: ${{ env.prerelease == 'true' }}
-      continue-on-error: true
-      uses: actions/github-script@v7
-      with:
-        github-token: ${{ secrets.GHA_ELEVATED_PERMISSIONS_TOKEN }}
-        script: |
-          github.rest.repos.merge({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            base: "${{ env.BASE_BRANCH }}",
-            head: "${{ env.BRANCH }}"
-          })
-
-    - name: Delete release branch
-      id: delete
-      if: ${{ env.prerelease == 'false' }}
-      continue-on-error: true
-      env:
-        GH_TOKEN: ${{ github.token }}
-      run: |
-        gh api --method DELETE /repos/${{ github.repository }}/git/refs/heads/${{ env.BRANCH }}
-
-    - name: Set common environment variables
-      if: always()
-      env:
-        GH_TOKEN: ${{ github.token }}
-        PROMOTED_TAG: ${{ steps.create-tag.outputs.promoted-tag }}
-        TAG: ${{ steps.create-tag.outputs.tag }}
-        MERGE_OR_DELETE_FAILED: ${{ (steps.merge.outcome == 'failure') || (steps.delete.outcome == 'failure') }}
-      run: |
-        echo "MERGE_OR_DELETE_FAILED=${MERGE_OR_DELETE_FAILED}" >> $GITHUB_ENV
-        echo "TAG=$TAG" >> $GITHUB_ENV
-        if [[ "${prerelease}" == "true" ]]; then
-          DMG_VERSION=${TAG//-/.}
-        else
-          # For public release, tag is x.y.z, but we need DMG version as x.y.z-N
-          DMG_VERSION=${PROMOTED_TAG//-/.}
-        fi
-        echo "WORKFLOW_URL=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_ENV
-        echo "DMG_URL=${{ vars.DMG_URL_ROOT }}duckduckgo-${DMG_VERSION}.dmg" >> $GITHUB_ENV
-        echo "RELEASE_URL=https://github.com/${{ github.repository }}/releases/tag/${TAG}" >> $GITHUB_ENV
-        if [[ ${{ steps.create-tag.outputs.tag-created }} == "false" ]]; then
-          last_release_tag=$(gh api /repos/${{ github.repository }}/releases/latest --jq '.tag_name')
-          echo "LAST_RELEASE_TAG=${last_release_tag}" >> $GITHUB_ENV
-        fi
-
-    - name: Set up Asana templates
-      if: failure() || env.MERGE_OR_DELETE_FAILED == 'true'
-      id: asana-failure-templates
-      run: |
-        if [[ ${{ steps.create-tag.outputs.tag-created }} == "true" ]]; then
-          if [[ "${prerelease}" == "true" ]]; then
-            echo "task-template=merge-failed" >> $GITHUB_OUTPUT
-            echo "comment-template=internal-release-ready-merge-failed" >> $GITHUB_OUTPUT
-          else
-            echo "task-template=delete-branch-failed" >> $GITHUB_OUTPUT
-            echo "comment-template=public-release-tagged-delete-branch-failed" >> $GITHUB_OUTPUT
-          fi
-        else
-          if [[ "${prerelease}" == "true" ]]; then
-            echo "task-template=internal-release-tag-failed" >> $GITHUB_OUTPUT
-            echo "comment-template=internal-release-ready-tag-failed" >> $GITHUB_OUTPUT
-          else
-            echo "task-template=public-release-tag-failed" >> $GITHUB_OUTPUT
-            echo "comment-template=public-release-tag-failed" >> $GITHUB_OUTPUT
-          fi
-        fi
-
-    - name: Create Asana task on failure
-      id: create-task-on-failure
-      if: failure() || env.MERGE_OR_DELETE_FAILED == 'true'
-      env: 
-        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
-      run: |
-        bundle exec fastlane run asana_create_action_item \
-          task_url:"${{ env.asana-task-url }}" \
-          template_name:${{ steps.asana-failure-templates.outputs.task-template }} \
-          github_handle:"${{ github.actor }}" \
-          is_scheduled_release:"${{ github.event_name == 'schedule' }}"
-
-    - name: Create Publish DMG Release task on failure
-      id: create-publish-dmg-task-on-failure
-      if: failure() && env.internal-release-bump == 'true'
-      env:
-        ASANA_TASK_URL: ${{ env.asana-task-url }}
-        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
-      run: |
-        bundle exec fastlane run asana_create_action_item \
-          task_url:"${{ env.asana-task-url }}" \
-          template_name:"run-publish-dmg-release" \
-          github_handle:"${{ github.actor }}" \
-          is_scheduled_release:"${{ github.event_name == 'schedule' }}"
-
-    - name: Report failure
-      if: failure() || env.MERGE_OR_DELETE_FAILED == 'true'
-      env:
-        ASSIGNEE_ID: ${{ steps.create-task-on-failure.outputs.asana_assignee_id }}
-        TASK_ID: ${{ steps.create-task-on-failure.outputs.asana_new_task_id }}
-        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
-      run: |
-        bundle exec fastlane run asana_log_message \
-          task_url:"${{ env.asana-task-url }}" \
-          template_name:"${{ steps.asana-failure-templates.outputs.comment-template }}" \
-          github_handle:"${{ github.actor }}" \
-          is_scheduled_release:"${{ github.event_name == 'schedule' }}"
-
-    - name: Set up Asana success comment template
-      if: ${{ env.MERGE_OR_DELETE_FAILED == 'false' }}
-      id: asana-success-template
-      run: |
-        if [[ "${prerelease}" == "true" ]]; then
-          echo "comment-template=internal-release-ready" >> $GITHUB_OUTPUT
-        else
-          echo "comment-template=public-release-tagged" >> $GITHUB_OUTPUT
-        fi
-
-    - name: Report success
-      if: ${{ env.MERGE_OR_DELETE_FAILED == 'false' }}
-      env:
-        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
-      run: |
-        bundle exec fastlane run asana_log_message \
-          task_url:"${{ env.asana-task-url }}" \
-          template_name:"${{ steps.asana-success-template.outputs.comment-template }}" \
-          github_handle:"${{ github.actor }}" \
-          is_scheduled_release:"${{ github.event_name == 'schedule' }}"
