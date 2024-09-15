@@ -99,7 +99,7 @@ jobs:
           github_handle:${{ github.actor }} \
           github_elevated_permissions_token:"${{ secrets.GHA_ELEVATED_PERMISSIONS_TOKEN }}" \
           is_internal_release_bump:"${{ env.internal-release-bump }}" \
-          prerelease:"${{ env.prerelease }}" \
+          is_prerelease:"${{ env.prerelease }}" \
           is_scheduled_release:"${{ github.event_name == 'schedule' }}"
 
     - name: Store created tag in a file artifact
