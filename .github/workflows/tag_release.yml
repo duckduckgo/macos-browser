@@ -62,7 +62,7 @@ jobs:
       BASE_BRANCH: ${{ inputs.base-branch || 'main' }}
       BRANCH: ${{ inputs.branch || github.ref_name }}
       prerelease: ${{ github.event.inputs.prerelease || inputs.prerelease }}
-      internal-release-bump: ${{ inputs.internal-release-bump }}
+      internal-release-bump: ${{ inputs.internal-release-bump || 'false' }}
 
     outputs:
       tag: ${{ steps.tag-release.outputs.tag }}
