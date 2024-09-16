@@ -119,7 +119,7 @@ final class ExcludedDomainsViewController: NSViewController {
                 tableView.scrollRowToVisible(newRowIndex)
             }
 
-            await model.askUserToReportIssues(withDomain: domain)
+            await model.askUserToReportIssues(withDomain: domain, in: view.window)
         }
     }
 
