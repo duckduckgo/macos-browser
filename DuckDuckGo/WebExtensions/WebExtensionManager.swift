@@ -142,11 +142,6 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
     }
 
     @MainActor
-    private func showPopover(popupPopover: NSPopover, button: NSButton) {
-        popupPopover.show(relativeTo: button.bounds, of: button, preferredEdge: .maxY)
-    }
-
-    @MainActor
     func showBackgroundConsole(context: WKWebExtensionContext) {
         guard let backgroundWebView = context._backgroundWebView else {
             return
@@ -258,11 +253,16 @@ extension WebExtensionManager: WKWebExtensionControllerDelegate {
             return
         }
 
-        guard action.presentsPopup, let popupPopover = action.popupPopover else {
+        guard action.presentsPopup,
+              let popupPopover = action.popupPopover,
+              let popupWebView = action.popupWebView
+        else {
             return
         }
 
-        showPopover(popupPopover: popupPopover, button: button)
+        popupWebView.configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
+
+        popupPopover.show(relativeTo: button.bounds, of: button, preferredEdge: .maxY)
     }
 
     func webExtensionController(_ controller: WKWebExtensionController, sendMessage message: Any, toApplicationWithIdentifier applicationIdentifier: String?, for extensionContext: WKWebExtensionContext) async throws -> Any? {
