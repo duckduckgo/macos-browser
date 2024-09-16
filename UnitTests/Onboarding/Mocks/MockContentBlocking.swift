@@ -20,6 +20,7 @@ import Foundation
 import BrowserServicesKit
 import Combine
 import Common
+import TrackerRadarKit
 @testable import DuckDuckGo_Privacy_Browser
 
 class MockContentBlocking: ContentBlockingProtocol {
@@ -55,6 +56,10 @@ class MockPrivacyConfigurationManaging: PrivacyConfigurationManaging {
 }
 
 class MockContentBlockerRulesManagerProtocol: ContentBlockerRulesManagerProtocol {
+    func entity(forHost host: String) -> Entity? {
+        return nil
+    }
+    
     var updatesPublisher: AnyPublisher<ContentBlockerRulesManager.UpdateEvent, Never> = Empty<ContentBlockerRulesManager.UpdateEvent, Never>(completeImmediately: false).eraseToAnyPublisher()
 
     var currentRules: [BrowserServicesKit.ContentBlockerRulesManager.Rules] = []

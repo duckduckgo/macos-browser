@@ -125,15 +125,20 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
 
 }
 
-class MockDialogsProvider: ContextualOnboardingDialogTypeProviding {
+class MockDialogsProvider: ContextualOnboardingDialogTypeProviding, ContextualOnboardingStateUpdater {
     var dialog: ContextualDialogType?
 
     func dialogTypeForTab(_ tab: Tab) -> ContextualDialogType? {
         return dialog
     }
+
+    func gotItPressed() {}
+
+    func fireButtonUsed() {}
 }
 
 class CapturingDialogFactory: ContextualDaxDialogsFactory {
+    
     let expectation: XCTestExpectation
     var capturedType: ContextualDialogType?
     var capturedDelegate: OnboardingNavigationDelegate?
@@ -142,7 +147,7 @@ class CapturingDialogFactory: ContextualDaxDialogsFactory {
         self.expectation = expectation
     }
 
-    func makeView(for type: ContextualDialogType, delegate: OnboardingNavigationDelegate, onDismiss: @escaping () -> Void) -> AnyView {
+    func makeView(for type: ContextualDialogType, delegate: OnboardingNavigationDelegate, onDismiss: @escaping () -> Void, onGotItPressed: @escaping () -> Void) -> AnyView {
         capturedType = type
         capturedDelegate = delegate
         expectation.fulfill()

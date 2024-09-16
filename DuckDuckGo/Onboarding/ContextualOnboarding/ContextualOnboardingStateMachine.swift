@@ -38,18 +38,17 @@ enum ContextualDialogType: Equatable {
 
 enum ContextualOnboardingState: String {
     case notStarted
-    case tryASearchShown
-    case searchDoneShown
-    case majorTrackerShown
-    case trackerShown
-    case tryASiteShown
-    case searchDoneMajorTrackerSeen
-    case searchDoneTrackersSeen
+    case showTryASearch
+    case showSearchDone
+    case showBlockedTrackers
+    case showMajorOrNoTracker
+    case showTryASite
+    case searchDoneShowBlockedTrackers
+    case searchDoneShowMajorOrNoTracker
     case fireUsedTryASearchShown
-    case fireUsedSearchDone
-    case searchDoneSiteNot
-    case fireButtonSeen
-    case highFiveSeen
+    case fireUsedShowSearchDone
+    case showFireButton
+    case showHighFive
     case onboardingCompleted
 }
 
@@ -84,7 +83,7 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
     var lastVisitTab: Tab?
     var lastVisitSite: URL?
 
-    private init(trackerMessageProvider: TrackerMessageProviding = TrackerMessageProvider(),
+    init(trackerMessageProvider: TrackerMessageProviding = TrackerMessageProvider(),
                  startupPreferences: StartupPreferences = StartupPreferences.shared) {
         self.trackerMessageProvider = trackerMessageProvider
         self.startUpPreferences = startupPreferences
@@ -99,7 +98,7 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
         }
         guard let url = tab.url else { return nil }
 
-        if lastVisitTab != nil && tab != lastVisitTab && url == URL.duckDuckGo && state != .fireButtonSeen  {
+        if lastVisitTab != nil && tab != lastVisitTab && url == URL.duckDuckGo && state != .showFireButton  {
             return nil
         }
         reviewActionFor(tab: tab)
@@ -109,36 +108,38 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
         if url.isDuckDuckGoSearch {
             return dialogPerSearch()
         } else {
-            return dialogPerSiteVisit()
+            return dialogPerSiteVisit(tab: tab)
         }
     }
 
     private func dialogPerSearch() -> ContextualDialogType? {
         switch state {
-        case .searchDoneShown, .fireUsedSearchDone:
+        case .showSearchDone, .fireUsedShowSearchDone:
             return .searchDone(shouldFollowUp: true)
-        case .majorTrackerShown, .trackerShown:
+        case .showBlockedTrackers, .showMajorOrNoTracker:
             return .searchDone(shouldFollowUp: false)
-        case .tryASiteShown:
+        case .showTryASite:
             return .tryASite
-        case .fireButtonSeen:
+        case .showFireButton:
             return .tryFireButton
-        case .highFiveSeen:
+        case .showHighFive:
             return .highFive
         default:
             return nil
         }
     }
 
-    private func dialogPerSiteVisit() -> ContextualDialogType? {
+    private func dialogPerSiteVisit(tab: Tab) -> ContextualDialogType? {
         switch state {
-        case .tryASearchShown:
+        case .showTryASearch:
             return .tryASearch
-        case .majorTrackerShown, .trackerShown, .searchDoneMajorTrackerSeen, .searchDoneTrackersSeen, .fireUsedSearchDone, .searchDoneSiteNot:
-            return .trackers(message: NSMutableAttributedString(string: "Some tracker"), shouldFollowUp: true)
-        case .fireButtonSeen:
+        case .showBlockedTrackers, .showMajorOrNoTracker, .searchDoneShowBlockedTrackers, .searchDoneShowMajorOrNoTracker, .fireUsedShowSearchDone:
+            guard let privacyInfo = tab.privacyInfo else { return nil }
+            guard let message = trackerMessageProvider.trackerMessage(privacyInfo: privacyInfo) else { return nil }
+            return .trackers(message: message, shouldFollowUp: true)
+        case .showFireButton:
             return .tryFireButton
-        case .highFiveSeen:
+        case .showHighFive:
             return .highFive
         default:
             return nil
@@ -155,49 +156,63 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
             if url.isDuckDuckGoSearch {
                 searchPerformed()
             } else {
-                siteVisited()
+                siteVisited(tab: tab)
             }
         }
     }
 
     private func searchPerformed() {
         switch state {
-        case .tryASearchShown:
-            state = .searchDoneShown
-        case .searchDoneShown:
-            state = .tryASiteShown
-        case .majorTrackerShown:
-            state = .searchDoneMajorTrackerSeen
-        case .trackerShown:
-            state = .searchDoneTrackersSeen
-        case .tryASiteShown:
-            state = .searchDoneSiteNot
-        case .searchDoneMajorTrackerSeen, .searchDoneTrackersSeen:
-            state = .fireButtonSeen
-        case .fireButtonSeen, .fireUsedSearchDone:
-            state = .highFiveSeen
-        case .highFiveSeen:
+        case .showTryASearch:
+            state = .showSearchDone
+        case .showSearchDone:
+            state = .showTryASite
+        case .showBlockedTrackers:
+            state = .searchDoneShowBlockedTrackers
+        case .showMajorOrNoTracker:
+            state = .searchDoneShowMajorOrNoTracker
+        case .searchDoneShowBlockedTrackers, .searchDoneShowMajorOrNoTracker:
+            state = .showTryASite
+        case .showFireButton, .fireUsedShowSearchDone:
+            state = .showHighFive
+        case .showHighFive:
             state = .onboardingCompleted
         case .fireUsedTryASearchShown:
-            state = .fireUsedSearchDone
+            state = .fireUsedShowSearchDone
         default:
             break
         }
     }
 
-    private func siteVisited() {
+    private func siteVisited(tab: Tab) {
+        let trackerType = trackerMessageProvider.trackersType(privacyInfo: tab.privacyInfo)
+
         switch state {
         case .notStarted:
-            state = .tryASearchShown
-        case .tryASearchShown, .searchDoneShown, .searchDoneSiteNot:
-            state = trackerMessageProvider.isMajorTracker ? .searchDoneMajorTrackerSeen : .searchDoneTrackersSeen
-        case .majorTrackerShown, .trackerShown, .searchDoneMajorTrackerSeen:
-            state = .fireButtonSeen
-        case .tryASiteShown, .searchDoneTrackersSeen, .fireUsedTryASearchShown:
-            state = trackerMessageProvider.isMajorTracker ? .majorTrackerShown : .trackerShown
-        case .fireButtonSeen, .fireUsedSearchDone:
-            state = .highFiveSeen
-        case .highFiveSeen:
+            state = .showTryASearch
+        case .showTryASearch, .showTryASite, .fireUsedTryASearchShown:
+            if case .blockedTrackers = trackerType {
+                state = .showBlockedTrackers
+            } else if trackerType != nil {
+                state = .showMajorOrNoTracker
+            }
+        case .showSearchDone:
+            if case .blockedTrackers = trackerType {
+                state = .searchDoneShowBlockedTrackers
+            } else if trackerType != nil {
+                state = .searchDoneShowMajorOrNoTracker
+            }
+        case .showBlockedTrackers, .searchDoneShowBlockedTrackers:
+            state = .showFireButton
+        case .showMajorOrNoTracker, .searchDoneShowMajorOrNoTracker:
+            if case .blockedTrackers = trackerType {
+                state = .showBlockedTrackers
+            }
+        case .fireUsedShowSearchDone:
+            state = .showFireButton
+        case .showFireButton:
+            state = .showHighFive
+        case .showHighFive:
             state = .onboardingCompleted
         case .onboardingCompleted:
             break
@@ -206,13 +221,13 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
 
     func gotItPressed() {
         switch state {
-        case .searchDoneShown, .fireUsedSearchDone:
-            state = .tryASiteShown
-        case .majorTrackerShown, .trackerShown, .searchDoneMajorTrackerSeen, .searchDoneTrackersSeen:
-            state = .fireButtonSeen
-        case .fireButtonSeen:
-            state = .highFiveSeen
-        case .highFiveSeen:
+        case .showSearchDone, .fireUsedShowSearchDone:
+            state = .showTryASite
+        case .showBlockedTrackers, .showMajorOrNoTracker, .searchDoneShowBlockedTrackers, .searchDoneShowMajorOrNoTracker:
+            state = .showFireButton
+        case .showFireButton:
+            state = .showHighFive
+        case .showHighFive:
             state = .onboardingCompleted
         default:
             break
@@ -221,26 +236,16 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
 
     func fireButtonUsed() {
         switch state {
-        case .tryASearchShown:
+        case .showTryASearch:
             state = .fireUsedTryASearchShown
-        case .fireUsedSearchDone, .searchDoneSiteNot:
-            state = .highFiveSeen
-        case .trackerShown, .tryASiteShown, .searchDoneMajorTrackerSeen, .searchDoneTrackersSeen, .searchDoneShown:
-            state = .fireButtonSeen
-        case .highFiveSeen:
+        case .fireUsedShowSearchDone:
+            state = .showHighFive
+        case .showMajorOrNoTracker, .showTryASite, .searchDoneShowBlockedTrackers, .searchDoneShowMajorOrNoTracker, .showSearchDone:
+            state = .showFireButton
+        case .showHighFive:
             state = .onboardingCompleted
         default:
             break
         }
-    }
-}
-
-protocol TrackerMessageProviding {
-    var isMajorTracker: Bool { get }
-}
-
-struct TrackerMessageProvider: TrackerMessageProviding {
-    var isMajorTracker: Bool {
-        Bool.random()
     }
 }

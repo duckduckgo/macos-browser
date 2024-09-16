@@ -18,10 +18,15 @@
 
 import BrowserServicesKit
 import Combine
+import TrackerRadarKit
 
 #if DEBUG
 
 final class ContentBlockerRulesManagerMock: NSObject, ContentBlockerRulesManagerProtocol {
+    func entity(forHost host: String) -> Entity? {
+        return nil
+    }
+    
     func scheduleCompilation() -> BrowserServicesKit.ContentBlockerRulesManager.CompletionToken {
         fatalError()
     }
