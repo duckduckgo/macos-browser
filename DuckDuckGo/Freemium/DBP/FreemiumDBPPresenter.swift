@@ -20,7 +20,7 @@ import Foundation
 
 /// Conforming types provide functionality to show Freemium DBP
 protocol FreemiumDBPPresenter {
-    func showFreemiumDBP(didOnboard: Bool, windowControllerManager: WindowControllersManagerProtocol?)
+    func showFreemiumDBP(windowControllerManager: WindowControllersManagerProtocol?)
 }
 
 /// Default implementation of `FreemiumDBPPresenter`
@@ -28,26 +28,9 @@ struct DefaultFreemiumDBPPresenter: FreemiumDBPPresenter {
 
     @MainActor
     /// Displays Freemium DBP
-    /// If the `didOnboard` parameter is true, opens DBP directly
-    /// If the `didOnboard` parameter is false, opens Freemium DBP onboarding
-    /// - Parameter didOnboard: Bool indicating if the user has onboarded already
-    func showFreemiumDBP(didOnboard: Bool, windowControllerManager: WindowControllersManagerProtocol? = nil) {
+    func showFreemiumDBP(windowControllerManager: WindowControllersManagerProtocol? = nil) {
 
         let windowControllerManager = windowControllerManager ?? WindowControllersManager.shared
-
-        if didOnboard {
-            windowControllerManager.showTab(with: .dataBrokerProtection)
-        } else  {
-            // TODO: - Onboard (i.e Ts and Cs)
-            showFreemiumDBPOnboarding()
-        }
-    }
-}
-
-private extension DefaultFreemiumDBPPresenter {
-
-    @MainActor
-    func showFreemiumDBPOnboarding() {
-        // TODO: - Show onboarding if we decide to do this
+        windowControllerManager.showTab(with: .dataBrokerProtection)
     }
 }

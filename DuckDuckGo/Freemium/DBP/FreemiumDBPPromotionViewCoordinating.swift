@@ -99,7 +99,6 @@ private extension FreemiumDBPPromotionViewCoordinator {
     /// Action to be executed when the user proceeds with the promotion (e.g opens DBP)
     var proceedAction: () -> Void {
         { [weak self] in
-            self?.markUserAsOnboarded()
             self?.showFreemiumDBP()
             self?.dismissHomePagePromotion()
         }
@@ -112,17 +111,9 @@ private extension FreemiumDBPPromotionViewCoordinator {
         }
     }
 
-    /// Marks the user as onboarded in the Freemium DBP system.
-    func markUserAsOnboarded() {
-        freemiumDBPUserStateManager.didOnboard = true
-    }
-
     /// Shows the Freemium DBP user interface via the presenter.
     func showFreemiumDBP() {
-        freemiumDBPPresenter.showFreemiumDBP(
-            didOnboard: freemiumDBPUserStateManager.didOnboard,
-            windowControllerManager: WindowControllersManager.shared
-        )
+        freemiumDBPPresenter.showFreemiumDBP(windowControllerManager: WindowControllersManager.shared)
     }
 
     /// Dismisses the home page promotion and updates the user state to reflect this.

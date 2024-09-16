@@ -26,23 +26,13 @@ final class FreemiumDBPPresenterTests: XCTestCase {
     private var sut = DefaultFreemiumDBPPresenter()
 
     @MainActor
-    func testWhenCallShowFreemiumDBPAndDidOnboardThenShowPIRTabIsCalled() async throws {
+    func testWhenCallShowFreemiumDBPThenShowPIRTabIsCalled() async throws {
         // Given
         mockWindowControllerManager = MockWindowControllerManager()
         // When
-        sut.showFreemiumDBP(didOnboard: true, windowControllerManager: mockWindowControllerManager)
+        sut.showFreemiumDBP(windowControllerManager: mockWindowControllerManager)
         // Then
         XCTAssertEqual(mockWindowControllerManager.showTabContent, Tab.Content.dataBrokerProtection)
-    }
-
-    @MainActor
-    func testWhenCallShowFreemiumDBPAndDidNotOnboardThenShowPIRTabIsNotCalled() async throws {
-        // Given
-        mockWindowControllerManager = MockWindowControllerManager()
-        // When
-        sut.showFreemiumDBP(didOnboard: false, windowControllerManager: mockWindowControllerManager)
-        // Then
-        XCTAssertEqual(mockWindowControllerManager.showTabContent, Tab.Content.none)
     }
 }
 
