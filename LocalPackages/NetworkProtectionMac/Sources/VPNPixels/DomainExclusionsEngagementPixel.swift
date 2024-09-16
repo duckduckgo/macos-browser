@@ -25,11 +25,15 @@ public enum DomainExclusionsEngagementPixel: VPNPixel {
 
     /// One or more exclusions were added.
     ///
-    case exclusionAdded(domain: String)
+    case exclusionAdded
 
     /// One or more exclusions were removed.
     ///
     case exclusionRemoved
+
+    public init(added: Bool) {
+        self = added ? .exclusionAdded : .exclusionRemoved
+    }
 
     // The name is provided by the convenience implementation in VPNPixel,
     // so we don't need to implement it here.
@@ -47,8 +51,8 @@ public enum DomainExclusionsEngagementPixel: VPNPixel {
 
     public var parameters: [String: String]? {
         switch self {
-        case .exclusionAdded(let domain):
-            return [PixelKit.Parameters.domain: domain]
+        case .exclusionAdded:
+            return [:]
         case .exclusionRemoved:
             return [:]
         }
