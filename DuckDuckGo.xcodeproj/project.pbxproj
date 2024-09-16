@@ -2726,6 +2726,10 @@
 		C168B9AD2B31DC7F001AFAD9 /* AutofillNeverPromptWebsitesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C168B9AB2B31DC7E001AFAD9 /* AutofillNeverPromptWebsitesManager.swift */; };
 		C172E72F2C9329D300521D9A /* FlippedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C172E72E2C9329D300521D9A /* FlippedView.swift */; };
 		C172E7302C9329D300521D9A /* FlippedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C172E72E2C9329D300521D9A /* FlippedView.swift */; };
+		C172E7332C93759C00521D9A /* SyncPromoManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C172E7322C93759C00521D9A /* SyncPromoManagerTests.swift */; };
+		C172E7342C937FBA00521D9A /* SyncPromoManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C172E7322C93759C00521D9A /* SyncPromoManagerTests.swift */; };
+		C172E7372C93968E00521D9A /* SyncPromoPixelKitEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = C172E7362C93968E00521D9A /* SyncPromoPixelKitEvent.swift */; };
+		C172E7382C93968E00521D9A /* SyncPromoPixelKitEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = C172E7362C93968E00521D9A /* SyncPromoPixelKitEvent.swift */; };
 		C17CA7AD2B9B52E6008EC3C1 /* NavigationBarPopoversTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17CA7AC2B9B52E6008EC3C1 /* NavigationBarPopoversTests.swift */; };
 		C17CA7AE2B9B52E6008EC3C1 /* NavigationBarPopoversTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17CA7AC2B9B52E6008EC3C1 /* NavigationBarPopoversTests.swift */; };
 		C17CA7B22B9B5317008EC3C1 /* MockAutofillPopoverPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17CA7B12B9B5317008EC3C1 /* MockAutofillPopoverPresenter.swift */; };
@@ -4514,6 +4518,8 @@
 		C16127ED2BDFB46400966BB9 /* DataImportShortcutsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportShortcutsView.swift; sourceTree = "<group>"; };
 		C168B9AB2B31DC7E001AFAD9 /* AutofillNeverPromptWebsitesManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutofillNeverPromptWebsitesManager.swift; sourceTree = "<group>"; };
 		C172E72E2C9329D300521D9A /* FlippedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlippedView.swift; sourceTree = "<group>"; };
+		C172E7322C93759C00521D9A /* SyncPromoManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncPromoManagerTests.swift; sourceTree = "<group>"; };
+		C172E7362C93968E00521D9A /* SyncPromoPixelKitEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncPromoPixelKitEvent.swift; sourceTree = "<group>"; };
 		C17CA7AC2B9B52E6008EC3C1 /* NavigationBarPopoversTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarPopoversTests.swift; sourceTree = "<group>"; };
 		C17CA7B12B9B5317008EC3C1 /* MockAutofillPopoverPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAutofillPopoverPresenter.swift; sourceTree = "<group>"; };
 		C1935A132C88F958001AD72D /* SyncPromoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncPromoView.swift; sourceTree = "<group>"; };
@@ -6457,6 +6463,7 @@
 		5629846D2AC460DF00AC20EB /* Sync */ = {
 			isa = PBXGroup;
 			children = (
+				C172E7312C93757800521D9A /* Promotion */,
 				561D29BF2BDA7419007B91D0 /* Mocks */,
 				5629846E2AC4610100AC20EB /* SyncPreferencesTests.swift */,
 				5681ED3F2BDB955100F59729 /* SyncCredentialsAdapterTests.swift */,
@@ -8919,6 +8926,14 @@
 			path = Tests;
 			sourceTree = "<group>";
 		};
+		C172E7312C93757800521D9A /* Promotion */ = {
+			isa = PBXGroup;
+			children = (
+				C172E7322C93759C00521D9A /* SyncPromoManagerTests.swift */,
+			);
+			path = Promotion;
+			sourceTree = "<group>";
+		};
 		C17CA7AF2B9B52EB008EC3C1 /* View */ = {
 			isa = PBXGroup;
 			children = (
@@ -8941,6 +8956,7 @@
 				C1935A132C88F958001AD72D /* SyncPromoView.swift */,
 				C1935A172C88F9D6001AD72D /* SyncPromoManager.swift */,
 				C1935A1A2C88F9ED001AD72D /* SyncPromoViewModel.swift */,
+				C172E7362C93968E00521D9A /* SyncPromoPixelKitEvent.swift */,
 			);
 			path = Promotion;
 			sourceTree = "<group>";
@@ -10766,6 +10782,7 @@
 				372BC2A22A4AFA47001D8FD5 /* SyncCredentialsAdapter.swift in Sources */,
 				3706FB66293F65D500E42796 /* AppearancePreferences.swift in Sources */,
 				3706FB67293F65D500E42796 /* DownloadListCoordinator.swift in Sources */,
+				C172E7382C93968E00521D9A /* SyncPromoPixelKitEvent.swift in Sources */,
 				3706FB68293F65D500E42796 /* NSNotificationName+Debug.swift in Sources */,
 				3706FB69293F65D500E42796 /* NavigationBarBadgeAnimationView.swift in Sources */,
 				1D39E5782C2BFD5700757339 /* ReleaseNotesTabExtension.swift in Sources */,
@@ -11389,6 +11406,7 @@
 				3706FE08293F661700E42796 /* WKWebsiteDataStoreExtensionTests.swift in Sources */,
 				3706FE09293F661700E42796 /* VariantManagerTests.swift in Sources */,
 				3706FE0A293F661700E42796 /* UserAgentTests.swift in Sources */,
+				C172E7342C937FBA00521D9A /* SyncPromoManagerTests.swift in Sources */,
 				3706FE0B293F661700E42796 /* AVCaptureDeviceMock.swift in Sources */,
 				9FBD84572BB3ACFD00220859 /* AttributionOriginFileProviderTests.swift in Sources */,
 				7B4C5CF62BE51D640007A164 /* VPNUninstallerTests.swift in Sources */,
@@ -12028,6 +12046,7 @@
 				4BF0E5122AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift in Sources */,
 				AA6EF9AD25066F42004754E6 /* WindowsManager.swift in Sources */,
 				1D43EB3A292B63B00065E5D6 /* BWRequest.swift in Sources */,
+				C172E7372C93968E00521D9A /* SyncPromoPixelKitEvent.swift in Sources */,
 				B684121C2B6A1D880092F66A /* ErrorPageHTMLTemplate.swift in Sources */,
 				B65C7DFB2B886CF0001E2D5C /* WKPDFHUDViewWrapper.swift in Sources */,
 				B68458CD25C7EB9000DC17B6 /* WKWebViewConfigurationExtensions.swift in Sources */,
@@ -13024,6 +13043,7 @@
 				B63ED0DC26AE7B1E00A9DAD1 /* WebViewMock.swift in Sources */,
 				56A053FF2C1AEFA1007D8FAB /* OnboardingManagerTests.swift in Sources */,
 				4B4F72EC266B2ED300814C60 /* CollectionExtension.swift in Sources */,
+				C172E7332C93759C00521D9A /* SyncPromoManagerTests.swift in Sources */,
 				31D5CE662C89ABC200BCB0D7 /* DuckPlayerExperimentDatePixelsUtilitiesTests.swift in Sources */,
 				AAE39D1B24F44885008EF28B /* TabCollectionViewModelDelegateMock.swift in Sources */,
 				9F0A2CF82B96A58600C5B8C0 /* BaseBookmarkEntityTests.swift in Sources */,
