@@ -48,6 +48,11 @@ final class MainWindow: NSWindow {
     // To avoid beep sounds, this keyDown method catches events that go through the
     // responder chain when no other responders process it
     override func keyDown(with event: NSEvent) {
+        if event.keyEquivalent == [.command, "f"] {
+            // beep on Cmd+F when Find In Page is unavailable
+            super.keyDown(with: event)
+            return
+        }
         super.performKeyEquivalent(with: event)
     }
 

@@ -197,6 +197,12 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         searchBar.placeholderString = UserText.bookmarksSearch
         searchBar.delegate = self
 
+        view.addSubview(KeyEquivalentView(keyEquivalents: [
+            [.command, "f"]: { [weak self] in
+                return self?.handleCmdF($0) ?? false
+            }
+        ]))
+
         setupLayout()
     }
 
@@ -281,12 +287,16 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     override func keyDown(with event: NSEvent) {
         if event.charactersIgnoringModifiers == String(UnicodeScalar(NSDeleteCharacter)!) {
             deleteSelectedItems()
-        } else {
-            let commandKeyDown = event.modifierFlags.contains(.command)
-            if commandKeyDown && event.keyCode == 3 { // CMD + F
-                searchBar.makeMeFirstResponder()
-            }
         }
+    }
+
+    private func handleCmdF(_ event: NSEvent) -> Bool {
+        guard case .nonEmpty = managementDetailViewModel.contentState else {
+            __NSBeep()
+            return true
+        }
+        searchBar.makeMeFirstResponder()
+        return true
     }
 
     fileprivate func reloadData() {
@@ -668,6 +678,22 @@ extension BookmarkManagementDetailViewController: NSSearchFieldDelegate {
             reloadData()
         }
     }
+
+    func control(_ control: NSControl, textView: NSTextView, doCommandBy selector: Selector) -> Bool {
+        guard control === searchBar else {
+            assertionFailure("Unexpected delegating control")
+            return false
+        }
+        switch selector {
+        case #selector(cancelOperation):
+            // handle Esc key press while in search mode
+            self.tableView.makeMeFirstResponder()
+        default:
+            return false
+        }
+        return true
+    }
+
 }
 
 #if DEBUG
