@@ -182,13 +182,6 @@ extension DataBrokerJob {
         let webSiteStartLoadingTime = Date()
 
         do {
-            // https://app.asana.com/0/1204167627774280/1206912494469284/f
-            if query.dataBroker.url == "spokeo.com" {
-                if let cookies = await cookieHandler.getAllCookiesFromDomain(url) {
-                    await webViewHandler?.setCookies(cookies)
-                }
-            }
-
             let successNextSteps = {
                 self.fireSiteLoadingPixel(startTime: webSiteStartLoadingTime, hasError: false)
                 self.postLoadingSiteStartTime = Date()
