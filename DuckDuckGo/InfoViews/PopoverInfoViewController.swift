@@ -23,7 +23,7 @@ import SwiftUIExtensions
 final class PopoverInfoViewController: NSHostingController<InfoView> {
 
     enum Constants {
-        static let autoDismissDuration: TimeInterval = 2.5
+        static let autoDismissDuration: TimeInterval = 0.5
     }
 
     let onDismiss: (() -> Void)?
