@@ -63,7 +63,7 @@ final class FreemiumDBPFirstProfileSavedNotifierTests: XCTestCase {
         XCTAssertFalse(mockNotificationCenter.didCallPostNotification)
     }
 
-    func testWhenUserHasNotCompletedOnboarding_thenNotificationShouldNotBePosted() {
+    func testWhenUserHasNotActivated_thenNotificationShouldNotBePosted() {
         // Given
         mockAccountManager.accessToken = nil
         mockFreemiumDBPUserStateManager.didActivate = false

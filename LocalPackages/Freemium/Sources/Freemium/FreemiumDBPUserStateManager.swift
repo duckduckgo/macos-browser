@@ -41,7 +41,7 @@ public struct FreemiumDBPMatchResults: Codable, Equatable {
 /// Protocol that manages the user's state in the FreemiumDBP feature.
 ///
 /// The properties in this protocol represent the various states and milestones in the user journey,
-/// such as whether onboarding is complete, notifications have been posted, and important timestamps or data points.
+/// such as whether Freemium is activated (i.e was accessed), notifications have been posted, and important timestamps or data points.
 ///
 /// Conforming types are responsible for persisting and retrieving these values.
 public protocol FreemiumDBPUserStateManager {

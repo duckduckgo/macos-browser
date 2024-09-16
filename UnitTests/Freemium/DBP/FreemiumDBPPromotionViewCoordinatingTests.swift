@@ -86,7 +86,7 @@ final class FreemiumDBPPromotionViewCoordinatingTests: XCTestCase {
     }
 
     @MainActor
-    func testProceedAction_marksUserAsOnboarded_andDismissesPromotion() {
+    func testProceedAction_dismissesPromotion_andCallsShowFreemium() {
         // Given
         mockUserStateManager.didActivate = false
 
@@ -95,7 +95,6 @@ final class FreemiumDBPPromotionViewCoordinatingTests: XCTestCase {
         viewModel.proceedAction()
 
         // Then
-        XCTAssertTrue(mockUserStateManager.didActivate)
         XCTAssertTrue(mockUserStateManager.didDismissHomePagePromotion)
         XCTAssertTrue(mockPresenter.didCallShowFreemium)
     }

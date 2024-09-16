@@ -56,7 +56,7 @@ final class FreemiumDBPPromotionViewCoordinator: FreemiumDBPPromotionViewCoordin
         }
     }
 
-    /// The user state manager, which tracks the user's onboarding status and scan results.
+    /// The user state manager, which tracks the user's activation status and scan results.
     private var freemiumDBPUserStateManager: FreemiumDBPUserStateManager
 
     /// Responsible for determining the availability of Freemium DBP.

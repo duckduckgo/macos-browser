@@ -147,7 +147,7 @@ final class FreemiumDBPFeatureTests: XCTestCase {
         XCTAssertFalse(result)
     }
 
-    func testWhenUserDidNotOnboard_thenOffboardingIsNotExecuted() {
+    func testWhenUserDidNotActivate_thenOffboardingIsNotExecuted() {
         // Given
         mockFreemiumDBPUserStateManagerManager.didActivate = false
         mockPrivacyConfigurationManager.mockConfig.isSubfeatureKeyEnabled = { _, _ in false }

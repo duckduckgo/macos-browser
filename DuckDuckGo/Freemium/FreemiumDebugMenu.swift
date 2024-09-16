@@ -34,8 +34,8 @@ final class FreemiumDebugMenu: NSMenuItem {
     private func makeSubmenu() -> NSMenu {
         let menu = NSMenu(title: "")
 
-        menu.addItem(NSMenuItem(title: "Set Freemium DBP Onboarded State TRUE", action: #selector(setFreemiumDBPActivateStateTrue), target: self))
-        menu.addItem(NSMenuItem(title: "Set Freemium DBP Onboarded State FALSE", action: #selector(setFreemiumDBPActivateStateFalse), target: self))
+        menu.addItem(NSMenuItem(title: "Set Freemium DBP Activated State TRUE", action: #selector(setFreemiumDBPActivateStateTrue), target: self))
+        menu.addItem(NSMenuItem(title: "Set Freemium DBP Activated State FALSE", action: #selector(setFreemiumDBPActivateStateFalse), target: self))
         menu.addItem(NSMenuItem(title: "Set Freemium DBP First Profile Saved Timestamp NIL", action: #selector(setFirstProfileSavedTimestampNil), target: self))
         menu.addItem(NSMenuItem(title: "Set Freemium DBP Did Post First Profile Saved FALSE", action: #selector(setDidPostFirstProfileSavedNotificationFalse), target: self))
         menu.addItem(NSMenuItem(title: "Set Freemium DBP Did Post Results FALSE", action: #selector(setDidPostResultsNotificationFalse), target: self))

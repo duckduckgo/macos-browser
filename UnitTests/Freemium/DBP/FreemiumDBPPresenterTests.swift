@@ -30,7 +30,7 @@ final class FreemiumDBPPresenterTests: XCTestCase {
         // Given
         mockWindowControllerManager = MockWindowControllerManager()
         mockFreemiumDBPStateManager = MockFreemiumDBPUserStateManager()
-        let sut = DefaultFreemiumDBPPresenter(freemiumDBFPStateManager: mockFreemiumDBPStateManager)
+        let sut = DefaultFreemiumDBPPresenter(freemiumDBPStateManager: mockFreemiumDBPStateManager)
         XCTAssertFalse(mockFreemiumDBPStateManager.didActivate)
         // When
         sut.showFreemiumDBPAndSetActivated(windowControllerManager: mockWindowControllerManager)
