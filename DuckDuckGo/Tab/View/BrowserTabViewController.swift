@@ -131,10 +131,6 @@ final class BrowserTabViewController: NSViewController {
         view.registerForDraggedTypes([.URL, .fileURL])
     }
 
-     @objc func windowDidBecomeActive(notification: Notification) {
-//         presentContextualOnboarding()
-     }
-
      @objc func windowDidResignActive(notification: Notification) {
          guard let webViewContainer else { return }
          containerStackView.arrangedSubviews.filter({ $0 != webViewContainer }).forEach {
