@@ -83,7 +83,7 @@ extension Preferences {
                     }, label: {})
                     .pickerStyle(.radioGroup)
                     .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
-                    
+
                     VStack(alignment: .leading) {
                         TextMenuItemCaption(UserText.duckPlayerExplanation)
                         TextButton(UserText.learnMore) {

@@ -415,7 +415,7 @@ extension URL {
     static var duckPlayerHelpPages: URL {
         return URL(string: "https://duckduckgo.com/duckduckgo-help-pages/duck-player/")!
     }
-    
+
     var isDuckDuckGo: Bool {
         absoluteString.starts(with: Self.duckDuckGo.absoluteString)
     }
