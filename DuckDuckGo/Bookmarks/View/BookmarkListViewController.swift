@@ -305,6 +305,12 @@ final class BookmarkListViewController: NSViewController {
         importButton.translatesAutoresizingMaskIntoConstraints = false
         importButton.isHidden = true
 
+        view.addSubview(KeyEquivalentView(keyEquivalents: [
+            [.command, "f"]: { [weak self] in
+                return self?.handleCmdF($0) ?? false
+            }
+        ]))
+
         setupLayout()
     }
 
@@ -434,10 +440,14 @@ final class BookmarkListViewController: NSViewController {
 
         let isEmpty = (outlineView.numberOfRows == 0)
         self.emptyState.isHidden = !isEmpty
-        self.searchBookmarksButton.isHidden = isEmpty
+        self.searchBookmarksButton.isEnabled = !isEmpty
+        self.sortBookmarksButton.isEnabled = !isEmpty
+        self.searchBar.isEnabled = !isEmpty
+        self.searchBar.isHidden = isEmpty
         self.outlineView.isHidden = isEmpty
 
         if isEmpty {
+            self.hideSearchBar()
             self.showEmptyStateView(for: .noBookmarks)
         }
     }
@@ -483,7 +493,9 @@ final class BookmarkListViewController: NSViewController {
     private func hideSearchBar() {
         isSearchVisible = false
         outlineView.highlightedRow = nil
-        outlineView.makeMeFirstResponder()
+        if outlineView.isShown {
+            outlineView.makeMeFirstResponder()
+        }
         searchBar.stringValue = ""
         searchBar.removeFromSuperview()
         boxDividerTopConstraint.isActive = true
@@ -518,6 +530,9 @@ final class BookmarkListViewController: NSViewController {
     private func showEmptyStateView(for mode: BookmarksEmptyStateContent) {
         emptyState.isHidden = false
         outlineView.isHidden = true
+        if !isSearchVisible {
+            view.makeMeFirstResponder()
+        }
         emptyStateTitle.stringValue = mode.title
         emptyStateMessage.stringValue = mode.description
         emptyStateImageView.image = mode.image
@@ -526,15 +541,23 @@ final class BookmarkListViewController: NSViewController {
 
     // MARK: Actions
 
+    private func handleCmdF(_ event: NSEvent) -> Bool {
+        // start search on cmd+f when bookmarks are available
+        guard bookmarkManager.list?.totalBookmarks != 0 else {
+            __NSBeep()
+            return true
+        }
+
+        if isSearchVisible {
+            searchBar.makeMeFirstResponder()
+        } else {
+            showSearchBar()
+        }
+        return true
+    }
+
     override func keyDown(with event: NSEvent) {
         switch Int(event.keyCode) {
-        case kVK_ANSI_F where event.deviceIndependentFlags == .command:
-            if isSearchVisible {
-                searchBar.makeMeFirstResponder()
-            } else {
-                showSearchBar()
-            }
-
         case kVK_Return, kVK_ANSI_KeypadEnter, kVK_Space:
             if outlineView.highlightedRow != nil {
                 // submit action when there‘s a highlighted row
@@ -549,9 +572,10 @@ final class BookmarkListViewController: NSViewController {
             delegate?.closeBookmarksPopover(self)
 
         default:
-            // start search when letters are typed
-            if let characters = event.characters,
-               !characters.isEmpty {
+            // start search when letters are typed when bookmarks are available
+            if event.deviceIndependentFlags.isEmpty,
+               let characters = event.characters, !characters.isEmpty,
+               bookmarkManager.list?.totalBookmarks != 0 {
 
                 showSearchBar()
                 searchBar.currentEditor()?.keyDown(with: event)
