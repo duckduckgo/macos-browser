@@ -103,7 +103,6 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
             lastVisitSite = url
             return nil
         }
-//        reviewActionFor(tab: tab)
         lastVisitTab = tab
         lastVisitSite = url
         if url.isDuckDuckGoSearch {
