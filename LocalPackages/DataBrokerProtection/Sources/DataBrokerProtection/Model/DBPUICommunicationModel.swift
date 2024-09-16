@@ -155,14 +155,39 @@ extension DBPUIDataBrokerProfileMatch {
          optOutJobData: OptOutJobData,
          dataBrokerName: String,
          databrokerURL: String) {
-        let estimatedRemovalDate = Calendar.current.date(byAdding: .day, value: 14, to: optOutJobData.createdDate)
+        /*
+         createdDate used to not exist in the DB, so in the migration we defaulted it to Unix Epoch zero (i.e. 1970)
+         If that's the case, we should rely on the events instead
+         We don't do that all the time since it's unnecssarily expensive trawling through events, and
+         this is involved in some already heavy endpoints
+
+         optOutSubmittedDate also used to not exist, but instead defaults to nil
+         However, it could be nil simply because the opt out hasn't been submitted yet. So since we don't want to
+         look through events unneccesarily, we instead only look for it if the createdDate is 1970
+         */
+        var foundDate = optOutJobData.createdDate
+        var optOutSubmittedDate = optOutJobData.submittedSuccessfullyDate
+        if foundDate == Date(timeIntervalSince1970: 0) {
+            let foundEvents = optOutJobData.historyEvents.filter { $0.isMatchesFoundEvent() }
+            let firstFoundEvent = foundEvents.min(by: { $0.date < $1.date })
+            if let firstFoundEventDate = firstFoundEvent?.date {
+                foundDate = firstFoundEventDate
+            } else {
+                assertionFailure("No matching MatchFound event for an extract profile found")
+            }
+
+            let optOutSubmittedEvents = optOutJobData.historyEvents.filter { $0.type == .optOutRequested }
+            let firstOptOutEvent = optOutSubmittedEvents.min(by: { $0.date < $1.date })
+            optOutSubmittedDate = firstOptOutEvent?.date
+        }
+        let estimatedRemovalDate = Calendar.current.date(byAdding: .day, value: 14, to: foundDate)
         self.init(dataBroker: DBPUIDataBroker(name: dataBrokerName, url: databrokerURL),
                   name: extractedProfile.fullName ?? "No name",
                   addresses: extractedProfile.addresses?.map {DBPUIUserProfileAddress(addressCityState: $0) } ?? [],
                   alternativeNames: extractedProfile.alternativeNames ?? [String](),
                   relatives: extractedProfile.relatives ?? [String](),
-                  foundDate: optOutJobData.createdDate.timeIntervalSince1970,
-                  optOutSubmittedDate: optOutJobData.submittedSuccessfullyDate?.timeIntervalSince1970,
+                  foundDate: foundDate.timeIntervalSince1970,
+                  optOutSubmittedDate: optOutSubmittedDate?.timeIntervalSince1970,
                   estimatedRemovalDate: estimatedRemovalDate?.timeIntervalSince1970,
                   removedDate: extractedProfile.removedDate?.timeIntervalSince1970)
     }
