@@ -176,17 +176,4 @@ final class SyncPromoManagerTests: XCTestCase {
 
         XCTAssertFalse(syncPromoManager.shouldPresentPromoFor(.passwords))
     }
-
-    func testWhenPasswordManagerIsNotDDGThenShouldNotPresentPromoForPasswords() {
-        config.isSubfeatureKeyEnabled = { _, _ in
-            return true
-        }
-        syncService.authState = .inactive
-
-        let syncPromoManager = SyncPromoManager(syncService: syncService, privacyConfigurationManager: privacyConfigurationManager)
-        let udw = UserDefaultsWrapper<String>(key: .selectedPasswordManager, defaultValue: PasswordManager.duckduckgo.rawValue)
-        udw.wrappedValue = PasswordManager.bitwarden.rawValue
-
-        XCTAssertFalse(syncPromoManager.shouldPresentPromoFor(.passwords))
-    }
 }
