@@ -46,8 +46,8 @@ public struct FreemiumDBPMatchResults: Codable, Equatable {
 /// Conforming types are responsible for persisting and retrieving these values.
 public protocol FreemiumDBPUserStateManager {
 
-    /// A boolean value indicating whether the user has completed the onboarding process.
-    var didOnboard: Bool { get set }
+    /// A boolean value indicating whether the user has accessed the Freemium DBP feature
+    var didActivate: Bool { get set }
 
     /// A boolean value indicating whether the "First Profile Saved" notification has been posted.
     var didPostFirstProfileSavedNotification: Bool { get set }
@@ -75,7 +75,7 @@ public final class DefaultFreemiumDBPUserStateManager: FreemiumDBPUserStateManag
 
     /// Keys for storing the values in `UserDefaults`.
     private enum Keys {
-        static let didOnboard = "macos.browser.freemium.dbp.did.onboard"
+        static let didActivate = "macos.browser.freemium.dbp.did.activate"
         static let didPostFirstProfileSavedNotification = "macos.browser.freemium.dbp.did.post.first.profile.saved.notification"
         static let didPostResultsNotification = "macos.browser.freemium.dbp.did.post.results.notification"
         static let didDismissHomePagePromotion = "macos.browser.freemium.dbp.did.post.dismiss.home.page.promotion"
@@ -87,15 +87,15 @@ public final class DefaultFreemiumDBPUserStateManager: FreemiumDBPUserStateManag
 
     // MARK: - FreemiumDBPUserStateManager Properties
 
-    /// Tracks whether the user has completed the onboarding process.
+    /// Tracks whether the user has accessed the Freemium DBP feature.
     ///
-    /// - Uses the `UserDefaults` key: `macos.browser.freemium.dbp.did.onboard`.
-    public var didOnboard: Bool {
+    /// - Uses the `UserDefaults` key: `macos.browser.freemium.dbp.did.activate`.
+    public var didActivate: Bool {
         get {
-            userDefaults.bool(forKey: Keys.didOnboard)
+            userDefaults.bool(forKey: Keys.didActivate)
         }
         set {
-            userDefaults.set(newValue, forKey: Keys.didOnboard)
+            userDefaults.set(newValue, forKey: Keys.didActivate)
         }
     }
 
@@ -178,7 +178,7 @@ public final class DefaultFreemiumDBPUserStateManager: FreemiumDBPUserStateManag
     /// Resets all stored user state by clearing or resetting the relevant keys in `UserDefaults`.
     public func resetAllState() {
         // Reset each stored value to its default state
-        userDefaults.removeObject(forKey: Keys.didOnboard)
+        userDefaults.removeObject(forKey: Keys.didActivate)
         userDefaults.removeObject(forKey: Keys.firstProfileSavedTimestamp)
         userDefaults.removeObject(forKey: Keys.didPostFirstProfileSavedNotification)
         userDefaults.removeObject(forKey: Keys.didPostResultsNotification)

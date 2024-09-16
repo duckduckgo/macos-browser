@@ -50,7 +50,7 @@ final class FreemiumDBPFirstProfileSavedNotifier: DBPProfileSavedNotifier {
     /// If all conditions are met, the method posts a `pirProfileSaved` notification via the `NotificationCenter` and records that the notification has been posted.
     func postProfileSavedNotificationIfPermitted() {
         guard !accountManager.isUserAuthenticated
-                && freemiumDBPUserStateManager.didOnboard
+                && freemiumDBPUserStateManager.didActivate
                 && !freemiumDBPUserStateManager.didPostFirstProfileSavedNotification else { return }
 
         Logger.freemiumDBP.debug("[Freemium DBP] Posting Profile Saved Notification")

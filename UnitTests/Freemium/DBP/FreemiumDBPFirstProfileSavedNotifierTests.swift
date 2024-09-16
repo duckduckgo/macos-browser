@@ -38,7 +38,7 @@ final class FreemiumDBPFirstProfileSavedNotifierTests: XCTestCase {
     func testWhenAllCriteriaSatisfied_thenNotificationShouldBePosted() {
         // Given
         mockAccountManager.accessToken = nil
-        mockFreemiumDBPUserStateManager.didOnboard = true
+        mockFreemiumDBPUserStateManager.didActivate = true
         mockFreemiumDBPUserStateManager.didPostFirstProfileSavedNotification = false
 
         // When
@@ -53,7 +53,7 @@ final class FreemiumDBPFirstProfileSavedNotifierTests: XCTestCase {
     func testWhenUserIsAuthenticated_thenNotificationShouldNotBePosted() {
         // Given
         mockAccountManager.accessToken = "some_token"
-        mockFreemiumDBPUserStateManager.didOnboard = true
+        mockFreemiumDBPUserStateManager.didActivate = true
         mockFreemiumDBPUserStateManager.didPostFirstProfileSavedNotification = false
 
         // When
@@ -66,7 +66,7 @@ final class FreemiumDBPFirstProfileSavedNotifierTests: XCTestCase {
     func testWhenUserHasNotCompletedOnboarding_thenNotificationShouldNotBePosted() {
         // Given
         mockAccountManager.accessToken = nil
-        mockFreemiumDBPUserStateManager.didOnboard = false
+        mockFreemiumDBPUserStateManager.didActivate = false
         mockFreemiumDBPUserStateManager.didPostFirstProfileSavedNotification = false
 
         // When
@@ -79,7 +79,7 @@ final class FreemiumDBPFirstProfileSavedNotifierTests: XCTestCase {
     func testWhenNotificationAlreadyPosted_thenShouldNotPostAgain() {
         // Given
         mockAccountManager.accessToken = nil
-        mockFreemiumDBPUserStateManager.didOnboard = true
+        mockFreemiumDBPUserStateManager.didActivate = true
         mockFreemiumDBPUserStateManager.didPostFirstProfileSavedNotification = true
 
         // When
@@ -92,7 +92,7 @@ final class FreemiumDBPFirstProfileSavedNotifierTests: XCTestCase {
     func testWhenNotificationIsPosted_thenStateShouldBeUpdated() {
         // Given
         mockAccountManager.accessToken = nil
-        mockFreemiumDBPUserStateManager.didOnboard = true
+        mockFreemiumDBPUserStateManager.didActivate = true
         mockFreemiumDBPUserStateManager.didPostFirstProfileSavedNotification = false
 
         // When

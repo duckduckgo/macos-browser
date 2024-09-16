@@ -62,9 +62,9 @@ struct DefaultDataBrokerProtectionAgentStopper: DataBrokerProtectionAgentStopper
         do {
             let hasProfile = try dataManager.fetchProfile() != nil
             let isAuthenticated = authenticationManager.isUserAuthenticated
-            let didOnboardToFreemium = freemiumDBPUserStateManager.didOnboard
+            let didActivateFreemium = freemiumDBPUserStateManager.didActivate
 
-            if !hasProfile || (!isAuthenticated && !didOnboardToFreemium) {
+            if !hasProfile || (!isAuthenticated && !didActivateFreemium) {
                 Logger.dataBrokerProtection.debug("Prerequisites are invalid")
                 stopAgent()
                 return
@@ -95,8 +95,8 @@ struct DefaultDataBrokerProtectionAgentStopper: DataBrokerProtectionAgentStopper
 
     private func satisfiesFreemiumPrerequisites() -> Bool {
         let isAuthenticated = authenticationManager.isUserAuthenticated
-        let didOnboardToFreemium = freemiumDBPUserStateManager.didOnboard
-        return !isAuthenticated && didOnboardToFreemium
+        let didActivateFreemium = freemiumDBPUserStateManager.didActivate
+        return !isAuthenticated && didActivateFreemium
     }
 
     private func stopAgent() {

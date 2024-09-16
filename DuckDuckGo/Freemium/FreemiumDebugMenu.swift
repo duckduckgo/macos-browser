@@ -34,8 +34,8 @@ final class FreemiumDebugMenu: NSMenuItem {
     private func makeSubmenu() -> NSMenu {
         let menu = NSMenu(title: "")
 
-        menu.addItem(NSMenuItem(title: "Set Freemium DBP Onboarded State TRUE", action: #selector(setFreemiumDBPOnboardStateTrue), target: self))
-        menu.addItem(NSMenuItem(title: "Set Freemium DBP Onboarded State FALSE", action: #selector(setFreemiumDBPOnboardStateFalse), target: self))
+        menu.addItem(NSMenuItem(title: "Set Freemium DBP Onboarded State TRUE", action: #selector(setFreemiumDBPActivateStateTrue), target: self))
+        menu.addItem(NSMenuItem(title: "Set Freemium DBP Onboarded State FALSE", action: #selector(setFreemiumDBPActivateStateFalse), target: self))
         menu.addItem(NSMenuItem(title: "Set Freemium DBP First Profile Saved Timestamp NIL", action: #selector(setFirstProfileSavedTimestampNil), target: self))
         menu.addItem(NSMenuItem(title: "Set Freemium DBP Did Post First Profile Saved FALSE", action: #selector(setDidPostFirstProfileSavedNotificationFalse), target: self))
         menu.addItem(NSMenuItem(title: "Set Freemium DBP Did Post Results FALSE", action: #selector(setDidPostResultsNotificationFalse), target: self))
@@ -51,13 +51,13 @@ final class FreemiumDebugMenu: NSMenuItem {
     }
 
     @objc
-    func setFreemiumDBPOnboardStateTrue() {
-        DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).didOnboard = true
+    func setFreemiumDBPActivateStateTrue() {
+        DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).didActivate = true
     }
 
     @objc
-    func setFreemiumDBPOnboardStateFalse() {
-        DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).didOnboard = false
+    func setFreemiumDBPActivateStateFalse() {
+        DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).didActivate = false
     }
 
     @objc
@@ -93,7 +93,7 @@ final class FreemiumDebugMenu: NSMenuItem {
     @objc
     func logAllState() {
 
-        Logger.freemiumDBP.debug("FREEMIUM DBP: DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).didOnboard \(DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).didOnboard)")
+        Logger.freemiumDBP.debug("FREEMIUM DBP: DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).didActivate \(DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).didActivate)")
         Logger.freemiumDBP.debug("FREEMIUM DBP: DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).firstProfileSavedTimestamp \(DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).firstProfileSavedTimestamp ?? "Nil")")
         Logger.freemiumDBP.debug("FREEMIUM DBP: DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).didPostFirstProfileSavedNotification \(DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).didPostFirstProfileSavedNotification)")
         Logger.freemiumDBP.debug("FREEMIUM DBP: DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).didPostResultsNotification \(DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).didPostResultsNotification)")

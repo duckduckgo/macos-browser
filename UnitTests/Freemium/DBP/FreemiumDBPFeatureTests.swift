@@ -149,7 +149,7 @@ final class FreemiumDBPFeatureTests: XCTestCase {
 
     func testWhenUserDidNotOnboard_thenOffboardingIsNotExecuted() {
         // Given
-        mockFreemiumDBPUserStateManagerManager.didOnboard = false
+        mockFreemiumDBPUserStateManagerManager.didActivate = false
         mockPrivacyConfigurationManager.mockConfig.isSubfeatureKeyEnabled = { _, _ in false }
         mockSubscriptionManager.canPurchase = true
         mockAccountManager.accessToken = nil
@@ -165,9 +165,9 @@ final class FreemiumDBPFeatureTests: XCTestCase {
         XCTAssertFalse(mockFeatureDisabler.disableAndDeleteWasCalled)
     }
 
-    func testWhenUserDidOnboard_andFeatureIsDisabled_andUserCanPurchase_andUserIsNotSubscribed_thenOffboardingIsExecuted() {
+    func testWhenUserdidActivate_andFeatureIsDisabled_andUserCanPurchase_andUserIsNotSubscribed_thenOffboardingIsExecuted() {
         // Given
-        mockFreemiumDBPUserStateManagerManager.didOnboard = true
+        mockFreemiumDBPUserStateManagerManager.didActivate = true
         mockPrivacyConfigurationManager.mockConfig.isSubfeatureKeyEnabled = { _, _ in false }
         mockSubscriptionManager.canPurchase = true
         mockAccountManager.accessToken = nil
@@ -187,9 +187,9 @@ final class FreemiumDBPFeatureTests: XCTestCase {
         XCTAssertTrue(mockFeatureDisabler.disableAndDeleteWasCalled)
     }
 
-    func testWhenUserDidOnboard_andFeatureIsDisabled_andUserCanPurchase_andUserIsSubscribed_thenOffboardingIsNotExecuted() {
+    func testWhenUserdidActivate_andFeatureIsDisabled_andUserCanPurchase_andUserIsSubscribed_thenOffboardingIsNotExecuted() {
         // Given
-        mockFreemiumDBPUserStateManagerManager.didOnboard = true
+        mockFreemiumDBPUserStateManagerManager.didActivate = true
         mockPrivacyConfigurationManager.mockConfig.isSubfeatureKeyEnabled = { _, _ in false }
         mockSubscriptionManager.canPurchase = true
         mockAccountManager.accessToken = "some_token"
@@ -209,9 +209,9 @@ final class FreemiumDBPFeatureTests: XCTestCase {
         XCTAssertFalse(mockFeatureDisabler.disableAndDeleteWasCalled)
     }
 
-    func testWhenUserDidOnboard_andFeatureIsEnabled_andUserCanPurchase_andUserIsNotSubscribed_thenOffboardingIsNotExecuted() {
+    func testWhenUserdidActivate_andFeatureIsEnabled_andUserCanPurchase_andUserIsNotSubscribed_thenOffboardingIsNotExecuted() {
         // Given
-        mockFreemiumDBPUserStateManagerManager.didOnboard = true
+        mockFreemiumDBPUserStateManagerManager.didActivate = true
         mockPrivacyConfigurationManager.mockConfig.isSubfeatureKeyEnabled = { _, _ in true }
         mockSubscriptionManager.canPurchase = true
         mockAccountManager.accessToken = nil
@@ -224,13 +224,13 @@ final class FreemiumDBPFeatureTests: XCTestCase {
                                         featureDisabler: mockFeatureDisabler)
 
         // Then
-        XCTAssertTrue(mockFreemiumDBPUserStateManagerManager.didOnboard)
+        XCTAssertTrue(mockFreemiumDBPUserStateManagerManager.didActivate)
         XCTAssertFalse(mockFeatureDisabler.disableAndDeleteWasCalled)
     }
 
-    func testWhenUserDidOnboard_andFeatureIsDisabled_andUserCannotPurchase_thenOffboardingIsNotExecuted() {
+    func testWhenUserdidActivate_andFeatureIsDisabled_andUserCannotPurchase_thenOffboardingIsNotExecuted() {
         // Given
-        mockFreemiumDBPUserStateManagerManager.didOnboard = true
+        mockFreemiumDBPUserStateManagerManager.didActivate = true
         mockPrivacyConfigurationManager.mockConfig.isSubfeatureKeyEnabled = { _, _ in true }
         mockSubscriptionManager.canPurchase = false
         mockAccountManager.accessToken = nil
@@ -243,13 +243,13 @@ final class FreemiumDBPFeatureTests: XCTestCase {
                                         featureDisabler: mockFeatureDisabler)
 
         // Then
-        XCTAssertTrue(mockFreemiumDBPUserStateManagerManager.didOnboard)
+        XCTAssertTrue(mockFreemiumDBPUserStateManagerManager.didActivate)
         XCTAssertFalse(mockFeatureDisabler.disableAndDeleteWasCalled)
     }
 
     func testWhenFeatureFlagValueChangesToEnabled_thenIsAvailablePublisherEmitsCorrectValue() {
         // Given
-        mockFreemiumDBPUserStateManagerManager.didOnboard = false
+        mockFreemiumDBPUserStateManagerManager.didActivate = false
         mockPrivacyConfigurationManager.mockConfig.isSubfeatureKeyEnabled = { _, _ in false }
         mockSubscriptionManager.canPurchase = true
         mockAccountManager.accessToken = nil
@@ -283,7 +283,7 @@ final class FreemiumDBPFeatureTests: XCTestCase {
 
     func testWhenFeatureFlagValueChangesToDisabled_thenIsAvailablePublisherEmitsCorrectValue() {
         // Given
-        mockFreemiumDBPUserStateManagerManager.didOnboard = true
+        mockFreemiumDBPUserStateManagerManager.didActivate = true
         mockPrivacyConfigurationManager.mockConfig.isSubfeatureKeyEnabled = { _, _ in true }
         mockSubscriptionManager.canPurchase = true
         mockAccountManager.accessToken = nil
@@ -317,7 +317,7 @@ final class FreemiumDBPFeatureTests: XCTestCase {
 
     func testSubscriptionStatusChangesToSubscribed_thenIsAvailablePublisherEmitsCorrectValue() {
         // Given
-        mockFreemiumDBPUserStateManagerManager.didOnboard = true
+        mockFreemiumDBPUserStateManagerManager.didActivate = true
         mockPrivacyConfigurationManager.mockConfig.isSubfeatureKeyEnabled = { _, _ in true }
         mockSubscriptionManager.canPurchase = true
         mockAccountManager.accessToken = nil
@@ -351,7 +351,7 @@ final class FreemiumDBPFeatureTests: XCTestCase {
 
     func testSubscriptionStatusChangesToUnsubscribed_thenIsAvailablePublisherEmitsCorrectValue() {
         // Given
-        mockFreemiumDBPUserStateManagerManager.didOnboard = true
+        mockFreemiumDBPUserStateManagerManager.didActivate = true
         mockPrivacyConfigurationManager.mockConfig.isSubfeatureKeyEnabled = { _, _ in true }
         mockSubscriptionManager.canPurchase = true
         mockAccountManager.accessToken = "some_token"

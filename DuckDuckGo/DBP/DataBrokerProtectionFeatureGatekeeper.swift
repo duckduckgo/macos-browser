@@ -88,7 +88,7 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
     func arePrerequisitesSatisfied() async -> Bool {
 
         let isAuthenticated = accountManager.isUserAuthenticated
-        if !isAuthenticated && freemiumDBPUserStateManager.didOnboard { return true }
+        if !isAuthenticated && freemiumDBPUserStateManager.didActivate { return true }
 
         let entitlements = await accountManager.hasEntitlement(forProductName: .dataBrokerProtection,
                                                                cachePolicy: .reloadIgnoringLocalCacheData)

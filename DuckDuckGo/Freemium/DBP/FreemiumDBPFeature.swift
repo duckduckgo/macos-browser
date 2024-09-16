@@ -159,7 +159,7 @@ private extension DefaultFreemiumDBPFeature {
     /// 2. The feature flag is disabled
     /// 3. The user `isPotentialPrivacyProSubscriber` (see definition)
     var shouldDisableAndDelete: Bool {
-        guard freemiumDBPUserStateManager.didOnboard else { return false }
+        guard freemiumDBPUserStateManager.didActivate else { return false }
 
         return !privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DBPSubfeature.freemium)
         && isPotentialPrivacyProSubscriber
