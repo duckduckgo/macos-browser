@@ -18,6 +18,7 @@
 
 import Cocoa
 import Common
+import os.log
 
 final class TabBarCollectionView: NSCollectionView {
 
@@ -32,7 +33,7 @@ final class TabBarCollectionView: NSCollectionView {
         register(nib, forItemWithIdentifier: TabBarViewItem.identifier)
 
         // Register for the dropped object types we can accept.
-        registerForDraggedTypes([.URL, .fileURL, TabBarViewItemPasteboardWriter.utiInternalType])
+        registerForDraggedTypes([.URL, .fileURL, TabBarViewItemPasteboardWriter.utiInternalType, .string])
         // Enable dragging items within and into our CollectionView.
         setDraggingSourceOperationMask([.private], forLocal: true)
     }
@@ -53,7 +54,7 @@ final class TabBarCollectionView: NSCollectionView {
 
     func scrollToSelected() {
         guard selectionIndexPaths.count == 1, let indexPath = selectionIndexPaths.first else {
-            os_log("TabBarCollectionView: More than 1 item or no item highlighted", type: .error)
+            Logger.general.error("TabBarCollectionView: More than 1 item or no item highlighted")
             return
         }
         scroll(to: indexPath)
@@ -104,7 +105,7 @@ extension NSCollectionView {
 
     var isAtEndScrollPosition: Bool {
         guard let clipView = clipView else {
-            os_log("TabBarCollectionView: Clip view is nil", type: .error)
+            Logger.general.error("TabBarCollectionView: Clip view is nil")
             return false
         }
 
@@ -113,7 +114,7 @@ extension NSCollectionView {
 
     var isAtStartScrollPosition: Bool {
         guard let clipView = clipView else {
-            os_log("TabBarCollectionView: Clip view is nil", type: .error)
+            Logger.general.error("TabBarCollectionView: Clip view is nil")
             return false
         }
 

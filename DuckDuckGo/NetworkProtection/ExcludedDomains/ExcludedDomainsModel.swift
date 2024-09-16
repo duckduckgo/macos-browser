@@ -18,18 +18,24 @@
 
 import Foundation
 import NetworkProtectionProxy
+import NetworkProtectionUI
+import PixelKit
 
 protocol ExcludedDomainsViewModel {
     var domains: [String] { get }
 
     func add(domain: String)
     func remove(domain: String)
+
+    func askUserToReportIssues(withDomain domain: String) async
 }
 
 final class DefaultExcludedDomainsViewModel {
     let proxySettings = TransparentProxySettings(defaults: .netP)
+    private let pixelKit: PixelFiring?
 
-    init() {
+    init(pixelKit: PixelFiring? = PixelKit.shared) {
+        self.pixelKit = pixelKit
     }
 }
 
@@ -50,5 +56,10 @@ extension DefaultExcludedDomainsViewModel: ExcludedDomainsViewModel {
         proxySettings.excludedDomains.removeAll { cursor in
             domain == cursor
         }
+    }
+
+    func askUserToReportIssues(withDomain domain: String) async {
+        let parentWindow = await WindowControllersManager.shared.lastKeyMainWindowController?.window
+        await ReportSiteIssuesPresenter(userDefaults: .netP).show(withDomain: domain, in: parentWindow)
     }
 }

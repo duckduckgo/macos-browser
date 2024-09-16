@@ -21,6 +21,7 @@ import BrowserServicesKit
 import Common
 import DataBrokerProtection
 import Subscription
+import os.log
 
 protocol DataBrokerProtectionFeatureGatekeeper {
     func isFeatureVisible() -> Bool
@@ -76,7 +77,7 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
     func disableAndDeleteForAllUsers() {
         featureDisabler.disableAndDelete()
 
-        os_log("Disabling and removing DBP for all users", log: .dataBrokerProtection)
+        Logger.dataBrokerProtection.debug("Disabling and removing DBP for all users")
     }
 
     /// If we want to prevent new users from joining the waitlist while still allowing waitlist users to continue using it,
@@ -118,12 +119,12 @@ private extension DefaultDataBrokerProtectionFeatureGatekeeper {
     func firePrerequisitePixelsAndLogIfNecessary(hasEntitlements: Bool, isAuthenticatedResult: Bool) {
         if !hasEntitlements {
             pixelHandler.fire(.gatekeeperEntitlementsInvalid)
-            os_log("🔴 DBP feature Gatekeeper: Entitlement check failed", log: .dataBrokerProtection)
+            Logger.dataBrokerProtection.error("DBP feature Gatekeeper: Entitlement check failed")
         }
 
         if !isAuthenticatedResult {
             pixelHandler.fire(.gatekeeperNotAuthenticated)
-            os_log("🔴 DBP feature Gatekeeper: Authentication check failed", log: .dataBrokerProtection)
+            Logger.dataBrokerProtection.error("DBP feature Gatekeeper: Authentication check failed")
         }
     }
 }

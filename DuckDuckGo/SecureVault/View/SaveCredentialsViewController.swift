@@ -21,6 +21,7 @@ import BrowserServicesKit
 import Combine
 import Common
 import PixelKit
+import os.log
 
 protocol SaveCredentialsDelegate: AnyObject {
 
@@ -278,27 +279,27 @@ final class SaveCredentialsViewController: NSViewController {
         do {
             if passwordManagerCoordinator.isEnabled {
                 guard !passwordManagerCoordinator.isLocked else {
-                    os_log("Failed to store credentials: Password manager is locked")
+                    Logger.sync.error("Failed to store credentials: Password manager is locked")
                     return
                 }
 
                 passwordManagerCoordinator.storeWebsiteCredentials(credentials) { error in
                     if let error = error {
-                        os_log("Failed to store credentials: %s", type: .error, error.localizedDescription)
+                        Logger.sync.error("Failed to store credentials: \(error.localizedDescription)")
                     }
                 }
             } else {
                 let vault = try AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared)
                 _ = try vault.storeWebsiteCredentials(credentials)
                 NSApp.delegateTyped.syncService?.scheduler.notifyDataChanged()
-                os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
+                Logger.sync.debug("Requesting sync if enabled")
 
                 if existingCredentials?.account.id == nil, !LocalPinningManager.shared.isPinned(.autofill), let count = try? vault.accountsCount(), count == 1 {
                     shouldFirePinPromptNotification = true
                 }
             }
         } catch {
-            os_log("%s:%s: failed to store credentials %s", type: .error, className, #function, error.localizedDescription)
+            Logger.sync.error("failed to store credentials \(error.localizedDescription)")
             PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
         }
 
@@ -367,7 +368,7 @@ final class SaveCredentialsViewController: NSViewController {
         }
 
         guard let window = view.window else {
-            os_log("%s: Window is nil", type: .error, className)
+            Logger.sync.error("Window is nil")
             notifyDelegate()
             return
         }
@@ -393,7 +394,7 @@ final class SaveCredentialsViewController: NSViewController {
         do {
             _ = try AutofillNeverPromptWebsitesManager.shared.saveNeverPromptWebsite(domainLabel.stringValue)
         } catch {
-            os_log("%: failed to save never prompt for website %s", type: .error, #function, error.localizedDescription)
+            Logger.sync.error("failed to save never prompt for website \(error.localizedDescription)")
         }
         PixelKit.fire(GeneralPixel.autofillLoginsSaveLoginModalExcludeSiteConfirmed)
 
@@ -455,7 +456,7 @@ final class SaveCredentialsViewController: NSViewController {
 
         if passwordManagerCoordinator.isEnabled {
             guard !passwordManagerCoordinator.isLocked else {
-                os_log("Failed to access credentials: Password manager is locked")
+                Logger.sync.debug("Failed to access credentials: Password manager is locked")
                 return existingCredentials
             }
 

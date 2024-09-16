@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1723142919820,
+    "version": 1726240116406,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -291,9 +291,6 @@
                     "domain": "bitsofwar.com"
                 },
                 {
-                    "domain": "mitglieder.franzspitzer.de"
-                },
-                {
                     "domain": "disneyplus.com"
                 },
                 {
@@ -321,12 +318,6 @@
                     "domain": "hertz.com"
                 },
                 {
-                    "domain": "www.thrifty.com"
-                },
-                {
-                    "domain": "sports.tipico.de"
-                },
-                {
                     "domain": "lotusbakeries.com"
                 },
                 {
@@ -337,6 +328,15 @@
                 },
                 {
                     "domain": "newsforkids.net"
+                },
+                {
+                    "domain": "dkb.de"
+                },
+                {
+                    "domain": "headphonecheck.com"
+                },
+                {
+                    "domain": "lehmannaudio.com"
                 },
                 {
                     "domain": "marvel.com"
@@ -363,7 +363,12 @@
                 ]
             },
             "state": "enabled",
-            "hash": "ee9a64bd4f869975e27812b48f8a2061"
+            "features": {
+                "filterlistExperiment": {
+                    "state": "enabled"
+                }
+            },
+            "hash": "f1a5f94177144e743b6c59eb9773ef8f"
         },
         "autofillBreakageReporter": {
             "state": "disabled",
@@ -372,6 +377,12 @@
             },
             "exceptions": [],
             "hash": "ebf35854bdf33091c165b35d418d5707"
+        },
+        "autofillSurveys": {
+            "state": "enabled",
+            "settings": {},
+            "exceptions": [],
+            "hash": "26d319ff4b2f43012a287b5f35a8db3a"
         },
         "autofill": {
             "exceptions": [
@@ -383,9 +394,51 @@
             "features": {
                 "deduplicateLoginsOnImport": {
                     "state": "enabled"
+                },
+                "unknownUsernameCategorization": {
+                    "state": "enabled"
+                },
+                "credentialsImportPromotion": {
+                    "state": "enabled"
                 }
             },
-            "hash": "1832dd4088cba6eaf3a9776a6fc9a1f5"
+            "hash": "81031a6b86bd68eec102c2ed67f48c1b"
+        },
+        "bookmarks": {
+            "state": "enabled",
+            "exceptions": [],
+            "hash": "697382e31649d84b01166f1dc6f790d6"
+        },
+        "breakageReporting": {
+            "state": "disabled",
+            "exceptions": [
+                {
+                    "domain": "marvel.com"
+                },
+                {
+                    "domain": "sundancecatalog.com"
+                },
+                {
+                    "domain": "noaprints.com"
+                },
+                {
+                    "domain": "flexmls.com"
+                },
+                {
+                    "domain": "instructure.com"
+                }
+            ],
+            "hash": "37e0cf88badfc8b01b6394f0884502f6"
+        },
+        "brokenSitePrompt": {
+            "state": "disabled",
+            "exceptions": [],
+            "settings": {
+                "maxDismissStreak": 3,
+                "dismissStreakResetDays": 30,
+                "coolDownDays": 7
+            },
+            "hash": "f93d54aff00a2110443fffcd8b3f26c9"
         },
         "brokenSiteReportExperiment": {
             "exceptions": [],
@@ -1297,6 +1350,10 @@
                     {
                         "domain": "beta.maps.apple.com",
                         "reason": "Unsupported browser warning"
+                    },
+                    {
+                        "domain": "adobe.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2289"
                     }
                 ],
                 "webViewDefault": [
@@ -1324,7 +1381,7 @@
             },
             "exceptions": [],
             "state": "enabled",
-            "hash": "93b410d9c0c7c1cb954d3be40b0247f6"
+            "hash": "44894f4c1d1c0b085900118fd0b66c9d"
         },
         "dbp": {
             "state": "enabled",
@@ -1344,11 +1401,14 @@
                             }
                         ]
                     }
+                },
+                "freemium": {
+                    "state": "internal"
                 }
             },
             "exceptions": [],
             "minSupportedVersion": "1.70.0",
-            "hash": "b405d032a1519de3059db2e833e81c9a"
+            "hash": "3effc07d3c8c4a94732a1d14006e8d22"
         },
         "duckPlayer": {
             "exceptions": [],
@@ -1357,14 +1417,27 @@
                     "state": "enabled"
                 },
                 "autoplay": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "1.103.0"
                 },
                 "openInNewTab": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "minSupportedVersion": "1.101.0"
                 }
             },
             "settings": {
                 "tryDuckPlayerLink": "https://www.youtube.com/watch?v=yKWIA-Pys4c",
+                "duckPlayerDisabledHelpPageLink": null,
+                "youtubePath": "watch",
+                "youtubeEmbedUrl": "youtube-nocookie.com",
+                "youTubeUrl": "youtube.com",
+                "youTubeReferrerHeaders": [
+                    "Referer"
+                ],
+                "youTubeReferrerQueryParams": [
+                    "embeds_referring_euri"
+                ],
+                "youTubeVideoIDQueryParam": "v",
                 "overlays": {
                     "youtube": {
                         "state": "disabled",
@@ -1423,11 +1496,21 @@
                                 "value": "enabled"
                             }
                         ]
+                    },
+                    {
+                        "domain": "m.youtube.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/overlays/youtube/state",
+                                "value": "enabled"
+                            }
+                        ]
                     }
                 ]
             },
             "state": "enabled",
-            "hash": "5ccb9e0379c691ea67bb2e73ba0ac194"
+            "hash": "a22c997161337594616c850542cee336"
         },
         "elementHiding": {
             "exceptions": [
@@ -3016,6 +3099,22 @@
                             {
                                 "selector": "div:has(> iframe[src*='prid=19031496'])",
                                 "type": "hide"
+                            },
+                            {
+                                "selector": "div:has(> iframe[src*='prid=19043282'])",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": "div:has(> iframe[src*='prid=19043280'])",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": "div:has(> iframe[src*='prid=19031780'])",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": "[aria-labelledby='promo-header']",
+                                "type": "hide"
                             }
                         ]
                     },
@@ -4027,6 +4126,15 @@
                         ]
                     },
                     {
+                        "domain": "signupgenius.com",
+                        "rules": [
+                            {
+                                "selector": ".mktg",
+                                "type": "hide"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "skysports.com",
                         "rules": [
                             {
@@ -4693,7 +4801,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "4e344fae2b186575742da5eedccb5e86"
+            "hash": "85f1dc0d2a2bcd309d8683c058b7aa52"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -5142,6 +5250,12 @@
                     "domain": "npr.org"
                 },
                 {
+                    "domain": "norton.com"
+                },
+                {
+                    "domain": "jcrew.com"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -5166,7 +5280,7 @@
                     "privacy-test-pages.site"
                 ]
             },
-            "hash": "c299dcdfe928b8fb57fcb671d22680c8"
+            "hash": "70264848cdb2f1e2ac1e21429405319d"
         },
         "harmfulApis": {
             "settings": {
@@ -5349,6 +5463,11 @@
             },
             "exceptions": [],
             "hash": "39a36ca9002bd5aea4dd7b6bdb5b79d4"
+        },
+        "marketplaceAdPostback": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
         },
         "mediaPlaybackRequiresUserGesture": {
             "exceptions": [],
@@ -5738,6 +5857,19 @@
             },
             "hash": "abe9584048f7f8157f71a14e7914cb1c"
         },
+        "syncPromotion": {
+            "state": "enabled",
+            "features": {
+                "bookmarks": {
+                    "state": "enabled"
+                },
+                "passwords": {
+                    "state": "enabled"
+                }
+            },
+            "exceptions": [],
+            "hash": "8081a0cf08f5bbda622df55361c72cfe"
+        },
         "sync": {
             "state": "enabled",
             "features": {
@@ -5922,6 +6054,12 @@
                                 ]
                             },
                             {
+                                "rule": "static.adsafeprotected.com/skeleton.gif",
+                                "domains": [
+                                    "<all>"
+                                ]
+                            },
+                            {
                                 "rule": "static.adsafeprotected.com/iasPET.1.js",
                                 "domains": [
                                     "corriere.it",
@@ -5932,6 +6070,16 @@
                                 "rule": "static.adsafeprotected.com/vans-adapter-google-ima.js",
                                 "domains": [
                                     "nhl.com"
+                                ]
+                            }
+                        ]
+                    },
+                    "adsrvr.org": {
+                        "rules": [
+                            {
+                                "rule": "js.adsrvr.org/up_loader.1.1.0.js",
+                                "domains": [
+                                    "codot.gov"
                                 ]
                             }
                         ]
@@ -5969,8 +6117,7 @@
                             {
                                 "rule": "adserver.adtech.advertising.com/pubapi/3.0/1/",
                                 "domains": [
-                                    "collider.com",
-                                    "si.com"
+                                    "<all>"
                                 ]
                             }
                         ]
@@ -6043,16 +6190,6 @@
                                 "rule": "z-na.amazon-adsystem.com/widgets/onejs",
                                 "domains": [
                                     "oceanofcompressed.xyz"
-                                ]
-                            }
-                        ]
-                    },
-                    "amazon.dev": {
-                        "rules": [
-                            {
-                                "rule": "prime.amazon.dev",
-                                "domains": [
-                                    "<all>"
                                 ]
                             }
                         ]
@@ -6733,6 +6870,7 @@
                             {
                                 "rule": "eccmp.com/sts/scripts/conversen-SDK.js",
                                 "domains": [
+                                    "citi.com",
                                     "pch.com"
                                 ]
                             }
@@ -7376,6 +7514,7 @@
                                     "pointstreaksites.com",
                                     "post-gazette.com",
                                     "raleighcw.com",
+                                    "signupgenius.com",
                                     "siouxlandnews.com",
                                     "southernoregoncw.com",
                                     "star64.tv",
@@ -8031,6 +8170,16 @@
                             }
                         ]
                     },
+                    "opecloud.com": {
+                        "rules": [
+                            {
+                                "rule": "opecloud.com/ope-asmi.js",
+                                "domains": [
+                                    "bild.de"
+                                ]
+                            }
+                        ]
+                    },
                     "openx.net": {
                         "rules": [
                             {
@@ -8314,7 +8463,14 @@
                             {
                                 "rule": "a.pub.network/core/prebid-universal-creative.js",
                                 "domains": [
+                                    "signupgenius.com",
                                     "titantv.com"
+                                ]
+                            },
+                            {
+                                "rule": "a.pub.network/virtualpiano-net/pubfig.min.js",
+                                "domains": [
+                                    "virtualpiano.net"
                                 ]
                             }
                         ]
@@ -8546,16 +8702,6 @@
                                 "rule": "cdn.shortpixel.ai/assets/js/bundles/spai-lib-bg",
                                 "domains": [
                                     "<all>"
-                                ]
-                            }
-                        ]
-                    },
-                    "siteimproveanalytics.com": {
-                        "rules": [
-                            {
-                                "rule": "siteimproveanalytics.com",
-                                "domains": [
-                                    "codot.gov"
                                 ]
                             }
                         ]
@@ -8803,6 +8949,16 @@
                                 "rule": "widget.trustpilot.com/bootstrap/v5/tp.widget.sync.bootstrap.min.js",
                                 "domains": [
                                     "<all>"
+                                ]
+                            }
+                        ]
+                    },
+                    "tsyndicate.com": {
+                        "rules": [
+                            {
+                                "rule": "vacdn.tsyndicate.com",
+                                "domains": [
+                                    "pornhub.com"
                                 ]
                             }
                         ]
@@ -9069,6 +9225,22 @@
                             }
                         ]
                     },
+                    "scmp.com": {
+                        "rules": [
+                            {
+                                "rule": "profiles.ope.scmp.com/ope-asmi.js",
+                                "domains": [
+                                    "bild.de"
+                                ]
+                            },
+                            {
+                                "rule": "tagger.ope.scmp.com/ope-asmi.js",
+                                "domains": [
+                                    "bild.de"
+                                ]
+                            }
+                        ]
+                    },
                     "canadapost-postescanada.ca": {
                         "rules": [
                             {
@@ -9118,7 +9290,7 @@
                     "domain": "instructure.com"
                 }
             ],
-            "hash": "5b165417204a223eecb181ae535bc194"
+            "hash": "fd5733aa1c2795ec2226f300eec2957f"
         },
         "trackingCookies1p": {
             "settings": {
@@ -9254,11 +9426,13 @@
             "state": "disabled",
             "hash": "728493ef7a1488e4781656d3f9db84aa"
         },
+        "webBrokenSiteForm": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
+        },
         "webCompat": {
             "exceptions": [
-                {
-                    "domain": "crocs.com"
-                },
                 {
                     "domain": "marvel.com"
                 },
@@ -9536,9 +9710,14 @@
                     }
                 ]
             },
-            "hash": "68c020008cb8344c77c40ba98f937ac7"
+            "hash": "d1b128e9ff49486fb7122c70fef0ff51"
         },
         "webViewBlobDownload": {
+            "exceptions": [],
+            "state": "disabled",
+            "hash": "728493ef7a1488e4781656d3f9db84aa"
+        },
+        "windowsDownloadLink": {
             "exceptions": [],
             "state": "disabled",
             "hash": "728493ef7a1488e4781656d3f9db84aa"
@@ -9573,7 +9752,7 @@
             "state": "disabled",
             "hash": "728493ef7a1488e4781656d3f9db84aa"
         },
-        "windowsDownloadLink": {
+        "windowsWebviewFailures": {
             "exceptions": [],
             "state": "disabled",
             "hash": "728493ef7a1488e4781656d3f9db84aa"

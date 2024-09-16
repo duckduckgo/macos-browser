@@ -20,6 +20,7 @@ import AppKit
 import Common
 import UniformTypeIdentifiers
 import PixelKit
+import os.log
 
 struct DataImportViewModel {
 
@@ -54,14 +55,9 @@ struct DataImportViewModel {
     /// Factory for a DataImporter for importSource
     private let reportSenderFactory: ReportSenderFactory
 
-    private func log(_ message: @autoclosure () -> String) {
-        if NSApp.runType == .unitTests {
-        } else if OSLog.dataImportExport != .disabled {
-            os_log(log: .dataImportExport, message())
-        } else if NSApp.runType == .xcPreviews {
-            print(message())
-        }
-    }
+    private let onFinished: () -> Void
+
+    private let onCancelled: () -> Void
 
     enum Screen: Hashable {
         case profileAndDataTypesPicker
@@ -149,7 +145,9 @@ struct DataImportViewModel {
          dataImporterFactory: @escaping DataImporterFactory = dataImporter,
          requestPrimaryPasswordCallback: @escaping @MainActor (Source) -> String? = Self.requestPrimaryPasswordCallback,
          openPanelCallback: @escaping @MainActor (DataType) -> URL? = Self.openPanelCallback,
-         reportSenderFactory: @escaping ReportSenderFactory = { FeedbackSender().sendDataImportReport }) {
+         reportSenderFactory: @escaping ReportSenderFactory = { FeedbackSender().sendDataImportReport },
+         onFinished: @escaping () -> Void = {},
+         onCancelled: @escaping () -> Void = {}) {
 
         self.availableImportSources = availableImportSources
         let importSource = importSource ?? preferredImportSources.first(where: { availableImportSources.contains($0) }) ?? .csv
@@ -171,6 +169,8 @@ struct DataImportViewModel {
         self.requestPrimaryPasswordCallback = requestPrimaryPasswordCallback
         self.openPanelCallback = openPanelCallback
         self.reportSenderFactory = reportSenderFactory
+        self.onFinished = onFinished
+        self.onCancelled = onCancelled
 
         PixelExperiment.fireOnboardingImportRequestedPixel()
     }
@@ -192,7 +192,7 @@ struct DataImportViewModel {
             ?? selectedDataTypes.subtracting(self.summary.filter { $0.result.isSuccess }.map(\.dataType))
         let importer = dataImporterFactory(importSource, dataType, url, primaryPassword)
 
-        log("import \(dataTypes) at \"\(url.path)\" using \(type(of: importer))")
+        Logger.dataImportExport.debug("import \(dataTypes) at \"\(url.path)\" using \(type(of: importer))")
 
         // validate file access/encryption password requirement before starting import
         if let errors = importer.validateAccess(for: dataTypes),
@@ -230,7 +230,7 @@ struct DataImportViewModel {
     private mutating func mergeImportSummary(with summary: DataImportSummary) {
         self.importTask = nil
 
-        log("merging summary \(summary)")
+        Logger.dataImportExport.debug("merging summary \(summary)")
 
         // append successful import results first keeping the original DataType sorting order
         self.summary.append(contentsOf: DataType.allCases.compactMap { dataType in
@@ -265,23 +265,23 @@ struct DataImportViewModel {
         }
 
         if let nextScreen {
-            log("mergeImportSummary: next screen: \(nextScreen)")
+            Logger.dataImportExport.debug("mergeImportSummary: next screen: \(String(describing: nextScreen))")
             self.screen = nextScreen
         } else if screenForNextDataTypeRemainingToImport(after: DataType.allCases.last(where: summary.keys.contains)) == nil, // no next data type manual import screen
            // and there should be failed data types (and non-recovered)
            selectedDataTypes.contains(where: { dataType in self.summary.last(where: { $0.dataType == dataType })?.result.error != nil }) {
-            log("mergeImportSummary: feedback")
+            Logger.dataImportExport.debug("mergeImportSummary: feedback")
             // after last failed datatype show feedback
             self.screen = .feedback
         } else if self.screen.isFileImport, let dataType = self.screen.fileImportDataType {
-            log("mergeImportSummary: file import summary(\(dataType))")
+            Logger.dataImportExport.debug("mergeImportSummary: file import summary(\(dataType))")
             self.screen = .summary([dataType], isFileImport: true)
         } else if screenForNextDataTypeRemainingToImport(after: DataType.allCases.last(where: summary.keys.contains)) == nil { // no next data type manual import screen
             let allKeys = self.summary.reduce(into: Set()) { $0.insert($1.dataType) }
-            log("mergeImportSummary: final summary(\(Set(allKeys)))")
+            Logger.dataImportExport.debug("mergeImportSummary: final summary(\(Set(allKeys)))")
             self.screen = .summary(allKeys)
         } else {
-            log("mergeImportSummary: intermediary summary(\(Set(summary.keys)))")
+            Logger.dataImportExport.debug("mergeImportSummary: intermediary summary(\(Set(summary.keys)))")
             self.screen = .summary(Set(summary.keys))
         }
 
@@ -305,7 +305,7 @@ struct DataImportViewModel {
             // firefox passwords db is main-password protected: request password
             case let error as FirefoxLoginReader.ImportError where error.type == .requiresPrimaryPassword:
 
-                log("primary password required")
+                Logger.dataImportExport.debug("primary password required")
                 // stay on the same screen but request password synchronously
                 if let password = self.requestPrimaryPasswordCallback(importSource) {
                     self.initiateImport(primaryPassword: password)
@@ -319,7 +319,7 @@ struct DataImportViewModel {
                     assertionFailure("No url")
                     break
                 }
-                log("file read no permission for \(url.path)")
+                Logger.dataImportExport.debug("file read no permission for \(url.path)")
 
                 if url != selectedProfile?.profileURL.appendingPathComponent(SafariDataImporter.bookmarksFileName) {
                     PixelKit.fire(GeneralPixel.dataImportFailed(source: importSource, sourceVersion: importSource.installedAppsMajorVersionDescription(selectedProfile: selectedProfile), error: importError))
@@ -570,10 +570,11 @@ extension DataImportViewModel {
             for await event in importTask.progress {
                 switch event {
                 case .progress(let update):
-                    log("progress: \(update)")
+                    Logger.dataImportExport.debug("progress: \(String(describing: update))")
                     return .progress(update)
                     // on completion returns new DataImportViewModel with merged import summary
                 case .completed(.success(let summary)):
+                    onFinished()
                     return await .completed(.success(self.mergingImportSummary(summary)))
                 }
             }
@@ -686,7 +687,7 @@ extension DataImportViewModel {
     }
 
     mutating func update(with importSource: Source) {
-        self = .init(importSource: importSource, isPasswordManagerAutolockEnabled: isPasswordManagerAutolockEnabled, loadProfiles: loadProfiles, dataImporterFactory: dataImporterFactory, requestPrimaryPasswordCallback: requestPrimaryPasswordCallback, reportSenderFactory: reportSenderFactory)
+        self = .init(importSource: importSource, isPasswordManagerAutolockEnabled: isPasswordManagerAutolockEnabled, loadProfiles: loadProfiles, dataImporterFactory: dataImporterFactory, requestPrimaryPasswordCallback: requestPrimaryPasswordCallback, reportSenderFactory: reportSenderFactory, onFinished: onFinished, onCancelled: onCancelled)
     }
 
     @MainActor
@@ -707,6 +708,7 @@ extension DataImportViewModel {
 
         case .cancel:
             importTask?.cancel()
+            onCancelled()
             self.dismiss(using: dismiss)
 
         case .submit:
@@ -725,7 +727,7 @@ extension DataImportViewModel {
             }
         }
 
-        log("dismiss")
+        Logger.dataImportExport.debug("dismiss")
         dismiss()
         if case .xcPreviews = NSApp.runType {
             self.update(with: importSource) // reset

@@ -25,6 +25,7 @@ extension UserDefaults {
     static let netP = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .netP))!
     static let dbp = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .dbp))!
     static let subs = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .subs))!
+    static let appConfiguration = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .appConfiguration))!
 }
 
 public struct UserDefaultsWrapperKey: RawRepresentable {
@@ -50,7 +51,6 @@ public struct UserDefaultsWrapper<T> {
         case configStorageBloomFilterExclusionsEtag = "config.storage.bloomfilter.exclusions.etag"
         case configStorageSurrogatesEtag = "config.storage.surrogates.etag"
         case configStoragePrivacyConfigurationEtag = "config.storage.privacyconfiguration.etag"
-        case configFBConfigEtag = "config.storage.fbconfig.etag"
         case configStorageRemoteMessagingConfigEtag = "config.storage.remotemessagingconfig.etag"
 
         case configLastInstalled = "config.last.installed"
@@ -74,6 +74,7 @@ public struct UserDefaultsWrapper<T> {
         case alwaysRequestDownloadLocationKey = "preferences.download-location.always-request"
         case openDownloadsPopupOnCompletionKey = "preferences.downloads.open.on.completion"
         case autoconsentEnabled = "preferences.autoconsent-enabled"
+        case autoconsentFilterlistExperimentCohort = "preferences.autoconsent.filterListExperimentCohort"
         case duckPlayerMode = "preferences.duck-player"
         case youtubeOverlayInteracted = "preferences.youtube-overlay-interacted"
         case youtubeOverlayButtonsUsed = "preferences.youtube-overlay-user-used-buttons"
@@ -112,6 +113,8 @@ public struct UserDefaultsWrapper<T> {
 
         case homeButtonPosition = "preferences.appeareance.home-button-position"
 
+        case phishingDetectionEnabled = "preferences.security.phishing-detection-enabled"
+
         // ATB
         case installDate = "statistics.installdate.key"
         case atb = "statistics.atb.key"
@@ -134,8 +137,6 @@ public struct UserDefaultsWrapper<T> {
         case homePageShowImport = "home.page.show.import"
         case homePageShowDuckPlayer = "home.page.show.duck.player"
         case homePageShowEmailProtection = "home.page.show.email.protection"
-        case homePageUserInSurveyShare = "home.page.user.in.survey.share"
-        case homePageShowPermanentSurvey = "home.page.show.import.permanent.survey"
         case homePageShowPageTitles = "home.page.show.page.titles"
         case homePageShowRecentlyVisited = "home.page.show.recently.visited"
         case homePageContinueSetUpImport = "home.page.continue.set.up.import"
@@ -143,6 +144,9 @@ public struct UserDefaultsWrapper<T> {
         case homePageIsContinueSetupVisible = "home.page.is.continue.setup.visible"
         case homePageIsRecentActivityVisible = "home.page.is.recent.activity.visible"
         case homePageIsFirstSession = "home.page.is.first.session"
+        case homePageUserBackgroundImages = "home.page.user.background.images"
+        case homePageCustomBackground = "home.page.custom.background"
+        case homePageLastPickedCustomColor = "home.page.last.picked.custom.color"
 
         case appIsRelaunchingAutomatically = "app-relaunching-automatically"
 

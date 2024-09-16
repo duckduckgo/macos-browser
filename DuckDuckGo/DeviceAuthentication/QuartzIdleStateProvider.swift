@@ -19,6 +19,7 @@
 import Foundation
 import Common
 import CoreGraphics
+import os.log
 
 final class QuartzIdleStateProvider: DeviceIdleStateProvider {
 
@@ -26,7 +27,7 @@ final class QuartzIdleStateProvider: DeviceIdleStateProvider {
         let anyInputEventType = CGEventType(rawValue: ~0)!
         let seconds = CGEventSource.secondsSinceLastEventType(.hidSystemState, eventType: anyInputEventType)
 
-        os_log("Idle duration since last user input event: %f", log: .autoLock, seconds)
+        Logger.autoLock.debug("Idle duration since last user input event: \(seconds)")
 
         return seconds
     }

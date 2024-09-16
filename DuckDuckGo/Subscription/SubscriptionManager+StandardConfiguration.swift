@@ -19,6 +19,7 @@
 import Foundation
 import Subscription
 import Common
+import PixelKit
 
 extension DefaultSubscriptionManager {
 
@@ -53,5 +54,15 @@ extension DefaultSubscriptionManager {
                       authEndpointService: authEndpointService,
                       subscriptionEnvironment: subscriptionEnvironment)
         }
+
+        accountManager.delegate = self
+    }
+}
+
+extension DefaultSubscriptionManager: AccountManagerKeychainAccessDelegate {
+
+    public func accountManagerKeychainAccessFailed(accessType: AccountKeychainAccessType, error: AccountKeychainAccessError) {
+        PixelKit.fire(PrivacyProErrorPixel.privacyProKeychainAccessError(accessType: accessType, accessError: error),
+                      frequency: .dailyAndCount)
     }
 }

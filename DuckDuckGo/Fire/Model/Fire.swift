@@ -24,6 +24,7 @@ import PrivacyDashboard
 import WebKit
 import SecureStorage
 import History
+import os.log
 
 final class Fire {
 
@@ -44,6 +45,7 @@ final class Fire {
     let tabCleanupPreparer = TabCleanupPreparer()
     let secureVaultFactory: AutofillVaultFactory
     let tld: TLD
+    let getVisitedLinkStore: () -> WKVisitedLinkStoreWrapper?
 
     private var dispatchGroup: DispatchGroup?
 
@@ -91,32 +93,34 @@ final class Fire {
          permissionManager: PermissionManagerProtocol = PermissionManager.shared,
          savedZoomLevelsCoordinating: SavedZoomLevelsCoordinating = AccessibilityPreferences.shared,
          downloadListCoordinator: DownloadListCoordinator = DownloadListCoordinator.shared,
-         windowControllerManager: WindowControllersManager = WindowControllersManager.shared,
+         windowControllerManager: WindowControllersManager? = nil,
          faviconManagement: FaviconManagement = FaviconManager.shared,
          autoconsentManagement: AutoconsentManagement? = nil,
          stateRestorationManager: AppStateRestorationManager? = nil,
-         recentlyClosedCoordinator: RecentlyClosedCoordinating? = RecentlyClosedCoordinator.shared,
+         recentlyClosedCoordinator: RecentlyClosedCoordinating? = nil,
          pinnedTabsManager: PinnedTabsManager? = nil,
          tld: TLD,
          bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
          syncService: DDGSyncing? = nil,
          syncDataProviders: SyncDataProviders? = nil,
-         secureVaultFactory: AutofillVaultFactory = AutofillSecureVaultFactory
+         secureVaultFactory: AutofillVaultFactory = AutofillSecureVaultFactory,
+         getVisitedLinkStore: (() -> WKVisitedLinkStoreWrapper?)? = nil
     ) {
         self.webCacheManager = cacheManager
         self.historyCoordinating = historyCoordinating
         self.permissionManager = permissionManager
         self.savedZoomLevelsCoordinating = savedZoomLevelsCoordinating
         self.downloadListCoordinator = downloadListCoordinator
-        self.windowControllerManager = windowControllerManager
+        self.windowControllerManager = windowControllerManager ?? WindowControllersManager.shared
         self.faviconManagement = faviconManagement
-        self.recentlyClosedCoordinator = recentlyClosedCoordinator
+        self.recentlyClosedCoordinator = recentlyClosedCoordinator ?? RecentlyClosedCoordinator.shared
         self.pinnedTabsManager = pinnedTabsManager ?? WindowControllersManager.shared.pinnedTabsManager
         self.bookmarkManager = bookmarkManager
         self.syncService = syncService ?? NSApp.delegateTyped.syncService
         self.syncDataProviders = syncDataProviders ?? NSApp.delegateTyped.syncDataProviders
         self.secureVaultFactory = secureVaultFactory
         self.tld = tld
+        self.getVisitedLinkStore = getVisitedLinkStore ?? { WKWebViewConfiguration.sharedVisitedLinkStore }
         self.autoconsentManagement = autoconsentManagement ?? AutoconsentManagement.shared
         if let stateRestorationManager = stateRestorationManager {
             self.stateRestorationManager = stateRestorationManager
@@ -129,7 +133,7 @@ final class Fire {
     func burnEntity(entity: BurningEntity,
                     includingHistory: Bool = true,
                     completion: (() -> Void)? = nil) {
-        os_log("Fire started", log: .fire)
+        Logger.fire.debug("Fire started")
 
         let group = DispatchGroup()
         dispatchGroup = group
@@ -180,14 +184,14 @@ final class Fire {
 
                 completion?()
 
-                os_log("Fire finished", log: .fire)
+                Logger.fire.debug("Fire finished")
             }
         }
     }
 
     @MainActor
     func burnAll(completion: (() -> Void)? = nil) {
-        os_log("Fire started", log: .fire)
+        Logger.fire.debug("Fire started")
 
         let group = DispatchGroup()
         dispatchGroup = group
@@ -209,7 +213,8 @@ final class Fire {
             self.burnTabs(burningEntity: .allWindows(mainWindowControllers: windowControllers, selectedDomains: Set())) {
                 Task { @MainActor in
                     await self.burnWebCache()
-                    self.burnHistory {
+                    self.burnAllVisitedLinks()
+                    self.burnAllHistory {
                         self.burnPermissions {
                             self.burnFavicons {
                                 self.burnDownloads()
@@ -231,7 +236,7 @@ final class Fire {
                 self.burningData = nil
                 completion?()
 
-                os_log("Fire finished", log: .fire)
+                Logger.fire.debug("Fire finished")
             }
         }
     }
@@ -259,6 +264,7 @@ final class Fire {
         // Convert to eTLD+1 domains
         domains = domains.convertedToETLDPlus1(tld: tld)
 
+        burnVisitedLinks(visits)
         historyCoordinating.burnVisits(visits) {
             let entity: BurningEntity
 
@@ -331,48 +337,74 @@ final class Fire {
     // MARK: - Web cache
 
     private func burnWebCache() async {
-        os_log("WebsiteDataStore began cookie deletion", log: .fire)
+        Logger.fire.debug("WebsiteDataStore began cookie deletion")
         await webCacheManager.clear()
-        os_log("WebsiteDataStore completed cookie deletion", log: .fire)
+        Logger.fire.debug("WebsiteDataStore completed cookie deletion")
     }
 
     private func burnWebCache(baseDomains: Set<String>? = nil) async {
-        os_log("WebsiteDataStore began cookie deletion", log: .fire)
+        Logger.fire.debug("WebsiteDataStore began cookie deletion")
         await webCacheManager.clear(baseDomains: baseDomains)
-        os_log("WebsiteDataStore completed cookie deletion", log: .fire)
+        Logger.fire.debug("WebsiteDataStore completed cookie deletion")
     }
 
     // MARK: - History
-
-    private func burnHistory(completion: @escaping () -> Void) {
-        historyCoordinating.burnAll(completion: completion)
-    }
 
     @MainActor
     private func burnHistory(ofEntity entity: BurningEntity, completion: @escaping () -> Void) {
         let visits: [Visit]
         switch entity {
         case .none(selectedDomains: let domains):
-            burnHistory(of: domains, completion: completion)
+            burnHistory(of: domains) { urls in
+                self.burnVisitedLinks(urls)
+                completion()
+            }
             return
         case .tab(tabViewModel: let tabViewModel, selectedDomains: _, parentTabCollectionViewModel: _):
             visits = tabViewModel.tab.localHistory
         case .window(tabCollectionViewModel: let tabCollectionViewModel, selectedDomains: _):
             visits = tabCollectionViewModel.localHistory
+
         case .allWindows:
+            burnAllVisitedLinks()
             burnAllHistory(completion: completion)
             return
         }
 
+        burnVisitedLinks(visits)
         historyCoordinating.burnVisits(visits, completion: completion)
     }
 
-    private func burnHistory(of baseDomains: Set<String>, completion: @escaping () -> Void) {
+    private func burnHistory(of baseDomains: Set<String>, completion: @escaping (Set<URL>) -> Void) {
         historyCoordinating.burnDomains(baseDomains, tld: ContentBlocking.shared.tld, completion: completion)
     }
 
     private func burnAllHistory(completion: @escaping () -> Void) {
         historyCoordinating.burnAll(completion: completion)
+    }
+
+    // MARK: - Visited links
+
+    @MainActor
+    private func burnAllVisitedLinks() {
+        getVisitedLinkStore()?.removeAll()
+    }
+
+    @MainActor
+    private func burnVisitedLinks(_ visits: [Visit]) {
+        guard let visitedLinkStore = getVisitedLinkStore() else { return }
+        for visit in visits {
+            guard let url = visit.historyEntry?.url else { continue }
+            visitedLinkStore.removeVisitedLink(with: url)
+        }
+    }
+
+    @MainActor
+    private func burnVisitedLinks(_ urls: Set<URL>) {
+        guard let visitedLinkStore = getVisitedLinkStore() else { return }
+        for url in urls {
+            visitedLinkStore.removeVisitedLink(with: url)
+        }
     }
 
     // MARK: - Zoom levels

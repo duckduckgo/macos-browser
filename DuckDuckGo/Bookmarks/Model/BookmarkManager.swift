@@ -20,6 +20,7 @@ import Bookmarks
 import Cocoa
 import Combine
 import Common
+import os.log
 
 protocol BookmarkManager: AnyObject {
 
@@ -116,19 +117,19 @@ final class LocalBookmarkManager: BookmarkManager {
     func loadBookmarks() {
         bookmarkStore.loadAll(type: .topLevelEntities) { [weak self] (topLevelEntities, error) in
             guard error == nil, let topLevelEntities = topLevelEntities else {
-                os_log("LocalBookmarkManager: Failed to fetch entities.", type: .error)
+                Logger.bookmarks.error("LocalBookmarkManager: Failed to fetch entities.")
                 return
             }
 
             self?.bookmarkStore.loadAll(type: .bookmarks) { [weak self] (bookmarks, error) in
                 guard error == nil, let bookmarks = bookmarks else {
-                    os_log("LocalBookmarkManager: Failed to fetch bookmarks.", type: .error)
+                    Logger.bookmarks.error("LocalBookmarkManager: Failed to fetch bookmarks.")
                     return
                 }
 
                 self?.bookmarkStore.loadAll(type: .favorites) { [weak self] (favorites, error) in
                     guard error == nil, let favorites = favorites else {
-                        os_log("LocalBookmarkManager: Failed to fetch favorites.", type: .error)
+                        Logger.bookmarks.error("LocalBookmarkManager: Failed to fetch favorites.")
                         return
                     }
 
@@ -170,7 +171,7 @@ final class LocalBookmarkManager: BookmarkManager {
         guard list != nil else { return nil }
 
         guard !isUrlBookmarked(url: url) else {
-            os_log("LocalBookmarkManager: Url is already bookmarked", type: .error)
+            Logger.bookmarks.error("LocalBookmarkManager: Url is already bookmarked")
             return nil
         }
 
@@ -200,7 +201,7 @@ final class LocalBookmarkManager: BookmarkManager {
     func remove(bookmark: Bookmark) {
         guard list != nil else { return }
         guard let latestBookmark = getBookmark(forUrl: bookmark.url) else {
-            os_log("LocalBookmarkManager: Attempt to remove already removed bookmark", type: .error)
+            Logger.bookmarks.error("LocalBookmarkManager: Attempt to remove already removed bookmark")
             return
         }
 
@@ -232,7 +233,7 @@ final class LocalBookmarkManager: BookmarkManager {
     func update(bookmark: Bookmark) {
         guard list != nil else { return }
         guard getBookmark(forUrl: bookmark.url) != nil else {
-            os_log("LocalBookmarkManager: Failed to update bookmark - not in the list.", type: .error)
+            Logger.bookmarks.error("LocalBookmarkManager: Failed to update bookmark - not in the list.")
             return
         }
 
@@ -246,12 +247,12 @@ final class LocalBookmarkManager: BookmarkManager {
     func update(bookmark: Bookmark, withURL url: URL, title: String, isFavorite: Bool) {
         guard list != nil else { return }
         guard getBookmark(forUrl: bookmark.url) != nil else {
-            os_log("LocalBookmarkManager: Failed to update bookmark url - not in the list.", type: .error)
+            Logger.bookmarks.error("LocalBookmarkManager: Failed to update bookmark url - not in the list.")
             return
         }
 
         guard let newBookmark = list?.update(bookmark: bookmark, newURL: url.absoluteString, newTitle: title, newIsFavorite: isFavorite) else {
-            os_log("LocalBookmarkManager: Failed to update URL of bookmark.", type: .error)
+            Logger.bookmarks.error("LocalBookmarkManager: Failed to update URL of bookmark.")
             return
         }
 
@@ -275,12 +276,12 @@ final class LocalBookmarkManager: BookmarkManager {
     func updateUrl(of bookmark: Bookmark, to newUrl: URL) -> Bookmark? {
         guard list != nil else { return nil }
         guard getBookmark(forUrl: bookmark.url) != nil else {
-            os_log("LocalBookmarkManager: Failed to update bookmark url - not in the list.", type: .error)
+            Logger.bookmarks.error("LocalBookmarkManager: Failed to update bookmark url - not in the list.")
             return nil
         }
 
         guard let newBookmark = list?.updateUrl(of: bookmark, to: newUrl.absoluteString) else {
-            os_log("LocalBookmarkManager: Failed to update URL of bookmark.", type: .error)
+            Logger.bookmarks.error("LocalBookmarkManager: Failed to update URL of bookmark.")
             return nil
         }
 
@@ -389,7 +390,7 @@ final class LocalBookmarkManager: BookmarkManager {
             guard let syncService = NSApp.delegateTyped.syncService else {
                 return
             }
-            os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
+            Logger.bookmarks.debug("Requesting sync if enabled")
             syncService.scheduler.notifyDataChanged()
         }
     }
@@ -425,7 +426,7 @@ final class LocalBookmarkManager: BookmarkManager {
         while !queue.isEmpty {
             let current = queue.removeFirst()
 
-            if current.title.lowercased().contains(query.lowercased()) {
+            if current.title.cleaningStringForBookmarkSearch.contains(query.cleaningStringForBookmarkSearch) {
                 result.append(current)
             }
 
@@ -436,4 +437,36 @@ final class LocalBookmarkManager: BookmarkManager {
 
         return result
     }
+}
+
+private extension String {
+
+    /// A computed property that returns a cleaned version of the string for bookmark search purposes.
+    /// The cleaning process involves removing accents, stripping out non-alphanumeric characters,
+    /// and converting the string to lowercase.
+    ///
+    /// - Returns: A cleaned string suitable for bookmark searches.
+    var cleaningStringForBookmarkSearch: String {
+        self.removeAccents()
+            .replacingOccurrences(of: "[^a-zA-Z0-9]", with: "", options: .regularExpression)
+            .lowercased()
+    }
+
+    /// Removes accents (diacritics) from the string by normalizing it and applying transformations.
+    /// This method uses Unicode normalization to decompose characters and then strips away
+    /// the combining marks (accents).
+    ///
+    /// - Returns: A new string with accents removed. For example, café, will return cafe.
+    private func removeAccents() -> String {
+        // Normalize the string to NFD (Normalization Form Decomposition)
+        let normalizedString = self as NSString
+        let range = NSRange(location: 0, length: normalizedString.length)
+
+        // Apply the transform to remove diacritics
+        let transformedString = normalizedString.applyingTransform(.toLatin, reverse: false) ?? ""
+        let finalString = transformedString.applyingTransform(.stripCombiningMarks, reverse: false) ?? ""
+
+        return finalString
+    }
+
 }

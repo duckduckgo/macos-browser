@@ -123,12 +123,15 @@ private class MockFeatureDisabler: DataBrokerProtectionFeatureDisabling {
 private class MockFeatureAvailability: SubscriptionFeatureAvailability {
     var mockFeatureAvailable: Bool = false
     var mockSubscriptionPurchaseAllowed: Bool = false
+    var mockUsesUnifiedFeedbackForm: Bool = false
 
     var isFeatureAvailable: Bool { mockFeatureAvailable }
     var isSubscriptionPurchaseAllowed: Bool { mockSubscriptionPurchaseAllowed }
+    var usesUnifiedFeedbackForm: Bool { mockUsesUnifiedFeedbackForm }
 
     func reset() {
         mockFeatureAvailable = false
         mockSubscriptionPurchaseAllowed = false
+        mockUsesUnifiedFeedbackForm = false
     }
 }

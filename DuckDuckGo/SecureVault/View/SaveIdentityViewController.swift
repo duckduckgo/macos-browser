@@ -21,6 +21,7 @@ import BrowserServicesKit
 import Combine
 import Common
 import PixelKit
+import os.log
 
 protocol SaveIdentityDelegate: AnyObject {
 
@@ -74,7 +75,7 @@ final class SaveIdentityViewController: NSViewController {
             try AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared).storeIdentity(identity)
             PixelKit.fire(GeneralPixel.autofillItemSaved(kind: .identity))
         } catch {
-            os_log("%s:%s: failed to store identity %s", type: .error, className, #function, error.localizedDescription)
+            Logger.general.error("Failed to store identity \(error.localizedDescription)")
             PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
         }
     }

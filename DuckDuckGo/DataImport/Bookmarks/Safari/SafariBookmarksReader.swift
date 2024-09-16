@@ -18,6 +18,7 @@
 
 import Common
 import Foundation
+import os.log
 
 final class SafariBookmarksReader {
 
@@ -71,7 +72,7 @@ final class SafariBookmarksReader {
             let bookmarks = try reallyReadBookmarks()
             return .success(bookmarks)
         } catch {
-            os_log("Failed to read Safari Bookmarks Plist at \"%s\": %s", log: .dataImportExport, type: .error, safariBookmarksFileURL.path, error.localizedDescription)
+            Logger.dataImportExport.error("Failed to read Safari Bookmarks Plist at \(self.safariBookmarksFileURL.path): \(error.localizedDescription)")
             switch error {
             case let error as ImportError:
                 return .failure(error)

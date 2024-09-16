@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "b7f595594d9e5d8500a93704d36a5521553bd314",
-        "version" : "184.0.1"
+        "branch" : "196.0.0",
+        "revision" : "ae3dbec01b8b72dc2ea4c510aecbc802862eab63"
       }
     },
     {
@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "f97053d24c21ea301d4067adbbe0899ff940526a",
-        "version" : "6.7.0"
+        "revision" : "9f3717b3913a12956f1386fe7b657f68545fba83",
+        "version" : "6.15.0"
       }
     },
     {
@@ -50,8 +50,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/duckduckgo-autofill.git",
       "state" : {
-        "revision" : "1f12b78d9bac4a1d9b6bad18dc2ef0593bed34a3",
-        "version" : "13.0.0"
+        "revision" : "1fee787458d13f8ed07f9fe81aecd6e59609339e",
+        "version" : "13.1.0"
       }
     },
     {
@@ -104,8 +104,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/privacy-dashboard",
       "state" : {
-        "revision" : "36dc07cba4bc1e7e0c1d1fb679c3cd077694a072",
-        "version" : "5.0.0"
+        "revision" : "9de2b2aa317a48d3ee31116dc15b0feeb2cc9414",
+        "version" : "5.3.0"
       }
     },
     {
@@ -176,8 +176,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/TrackerRadarKit",
       "state" : {
-        "revision" : "1403e17eeeb8493b92fb9d11eb8c846bb9776581",
-        "version" : "2.1.2"
+        "revision" : "5de0a610a7927b638a5fd463a53032c9934a2c3b",
+        "version" : "3.0.0"
       }
     },
     {

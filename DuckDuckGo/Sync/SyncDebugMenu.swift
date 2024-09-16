@@ -20,7 +20,6 @@ import AppKit
 import DDGSync
 import Bookmarks
 
-@MainActor
 final class SyncDebugMenu: NSMenu {
 
     private let environmentMenu = NSMenu()

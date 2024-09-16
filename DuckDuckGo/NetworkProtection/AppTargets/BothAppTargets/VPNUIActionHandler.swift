@@ -25,7 +25,7 @@ import VPNAppLauncher
 
 /// Main App's VPN UI action handler
 ///
-final class VPNUIActionHandler: VPNUIActionHandling {
+final class VPNUIActionHandler {
 
     private let vpnIPCClient: VPNControllerXPCClient
     private let proxySettings: TransparentProxySettings
@@ -40,7 +40,15 @@ final class VPNUIActionHandler: VPNUIActionHandling {
         self.proxySettings = proxySettings
     }
 
-    public func moveAppToApplications() async {
+    func askUserToReportIssues(withDomain domain: String) async {
+        let parentWindow = await WindowControllersManager.shared.lastKeyMainWindowController?.window
+        await ReportSiteIssuesPresenter(userDefaults: .netP).show(withDomain: domain, in: parentWindow)
+    }
+}
+
+extension VPNUIActionHandler: VPNUIActionHandling {
+
+    func moveAppToApplications() async {
 #if !APPSTORE && !DEBUG
         await vpnURLEventHandler.moveAppToApplicationsFolder()
 #endif
@@ -49,17 +57,23 @@ final class VPNUIActionHandler: VPNUIActionHandling {
     func setExclusion(_ exclude: Bool, forDomain domain: String) async {
         proxySettings.setExclusion(exclude, forDomain: domain)
         try? await vpnIPCClient.command(.restartAdapter)
+
+        if exclude {
+            await askUserToReportIssues(withDomain: domain)
+        }
+
+        await vpnURLEventHandler.reloadTab(showingDomain: domain)
     }
 
-    public func shareFeedback() async {
+    func shareFeedback() async {
         await vpnURLEventHandler.showShareFeedback()
     }
 
-    public func showVPNLocations() async {
+    func showVPNLocations() async {
         await vpnURLEventHandler.showLocations()
     }
 
-    public func showPrivacyPro() async {
+    func showPrivacyPro() async {
         await vpnURLEventHandler.showPrivacyPro()
     }
 }

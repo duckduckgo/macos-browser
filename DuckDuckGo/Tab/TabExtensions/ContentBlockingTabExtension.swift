@@ -22,6 +22,7 @@ import Common
 import ContentBlocking
 import Foundation
 import Navigation
+import os.log
 
 struct DetectedTracker {
     enum TrackerType {
@@ -97,7 +98,9 @@ final class ContentBlockingTabExtension: NSObject {
 extension ContentBlockingTabExtension: NavigationResponder {
 
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
-        if !navigationAction.url.isDuckDuckGo {
+        if !navigationAction.url.isDuckDuckGo
+            // ContentScopeUserScript needs to be loaded for https://duckduckgo.com/email/
+            || navigationAction.url.absoluteString.hasPrefix(URL.duckDuckGoEmailLogin.absoluteString) {
             await prepareForContentBlocking()
         }
 
@@ -109,7 +112,7 @@ extension ContentBlockingTabExtension: NavigationResponder {
         // Ensure Content Blocking Assets (WKContentRuleList&UserScripts) are installed
         if userContentController?.contentBlockingAssetsInstalled == false
             && privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking) {
-            os_log("%d: tabWillWaitForRulesCompilation", log: .contentBlocking, identifier)
+            Logger.contentBlocking.log("\(self.identifier) tabWillWaitForRulesCompilation")
             cbaTimeReporter?.tabWillWaitForRulesCompilation(identifier)
 
             disableLongDecisionMakingChecks()
@@ -118,7 +121,7 @@ extension ContentBlockingTabExtension: NavigationResponder {
             }
 
             await userContentController?.awaitContentBlockingAssetsInstalled()
-            os_log("%d: Rules Compilation done", log: .contentBlocking, identifier)
+            Logger.contentBlocking.log("\(self.identifier) Rules Compilation done")
             cbaTimeReporter?.reportWaitTimeForTabFinishedWaitingForRules(identifier)
         } else {
             cbaTimeReporter?.reportNavigationDidNotWaitForRules()

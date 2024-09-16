@@ -54,6 +54,9 @@ extension Tab: NavigationResponder {
             // Duck Player overlay navigations handling
             .weak(nullable: self.duckPlayer),
 
+            // Duck Player onboarding banner
+            .weak(nullable: self.duckPlayerOnboarding),
+
             // open external scheme link in another app
             .weak(nullable: self.externalAppSchemeHandler),
 

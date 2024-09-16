@@ -13,6 +13,7 @@
 	<array>
 		<string>$(SUBSCRIPTION_APP_GROUP)</string>
 		<string>$(NETP_APP_GROUP)</string>
+		<string>$(APP_CONFIGURATION_APP_GROUP)</string>
 	</array>
 	<key>com.apple.security.network.client</key>
 	<true/>

@@ -17,8 +17,9 @@
 //
 
 import Foundation
-import Common
 import BrowserServicesKit
+import os.log
+import Common
 
 enum MismatchValues: Int {
     case parentSiteHasMoreMatches
@@ -50,7 +51,7 @@ struct DefaultMismatchCalculator: MismatchCalculator {
         do {
             brokerProfileQueryData = try database.fetchAllBrokerProfileQueryData()
         } catch {
-            os_log("MismatchCalculatorUseCase error: calculateMismatches, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("MismatchCalculatorUseCase error: calculateMismatches, error: \(error.localizedDescription, privacy: .public)")
             return
         }
 

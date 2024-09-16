@@ -134,6 +134,9 @@
                   Identifier = "CoreDataEncryptionTests/testSavingIncorrectValueTypes()">
                </Test>
                <Test
+                  Identifier = "DownloadsIntegrationTests/testWhenDownloadIsStartedInNewTab_tabIsClosed()">
+               </Test>
+               <Test
                   Identifier = "EncryptionKeyStoreTests">
                </Test>
                <Test
@@ -146,10 +149,10 @@
                   Identifier = "NavigationProtectionIntegrationTests/testReferrerTrimming()">
                </Test>
                <Test
-                  Identifier = "TabContentTests/testWhenPDFContextMenuPrintChosen_printDialogOpens()">
+                  Identifier = "PhishingDetectionIntegrationTests">
                </Test>
                <Test
-                  Identifier = "TabContentTests/testWhenPDFMainMenuPrintChosen_printDialogOpens()">
+                  Identifier = "TabContentTests">
                </Test>
             </SkippedTests>
          </TestableReference>
@@ -205,18 +208,6 @@
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
-      <EnvironmentVariables>
-         <EnvironmentVariable
-            key = "OS_ACTIVITY_DT_MODE"
-            value = "YES"
-            isEnabled = "YES">
-         </EnvironmentVariable>
-         <EnvironmentVariable
-            key = "OS_ACTIVITY_MODE"
-            value = "debug"
-            isEnabled = "YES">
-         </EnvironmentVariable>
-      </EnvironmentVariables>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"

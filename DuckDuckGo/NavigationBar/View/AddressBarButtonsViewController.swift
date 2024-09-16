@@ -22,6 +22,7 @@ import Cocoa
 import Combine
 import Common
 import Lottie
+import os.log
 
 protocol AddressBarButtonsViewControllerDelegate: AnyObject {
 
@@ -400,7 +401,7 @@ final class AddressBarButtonsViewController: NSViewController {
         guard let tabViewModel,
               let state = tabViewModel.usedPermissions.microphone
         else {
-            os_log("%s: Selected tab view model is nil or no microphone state", type: .error, className)
+            Logger.general.error("Selected tab view model is nil or no microphone state")
             return
         }
         if case .requested(let query) = state {
@@ -419,7 +420,7 @@ final class AddressBarButtonsViewController: NSViewController {
         guard let tabViewModel,
               let state = tabViewModel.usedPermissions.geolocation
         else {
-            os_log("%s: Selected tab view model is nil or no geolocation state", type: .error, className)
+            Logger.general.error("Selected tab view model is nil or no geolocation state")
             return
         }
         if case .requested(let query) = state {
@@ -438,7 +439,7 @@ final class AddressBarButtonsViewController: NSViewController {
         guard let tabViewModel,
               let state = tabViewModel.usedPermissions.popups
         else {
-            os_log("%s: Selected tab view model is nil or no popups state", type: .error, className)
+            Logger.general.error("Selected tab view model is nil or no popups state")
             return
         }
 
@@ -463,7 +464,7 @@ final class AddressBarButtonsViewController: NSViewController {
         guard let tabViewModel,
               let (permissionType, state) = tabViewModel.usedPermissions.first(where: { $0.key.isExternalScheme })
         else {
-            os_log("%s: Selected tab view model is nil or no externalScheme state", type: .error, className)
+            Logger.general.error("Selected tab view model is nil or no externalScheme state")
             return
         }
 
@@ -495,8 +496,11 @@ final class AddressBarButtonsViewController: NSViewController {
             bookmarkButton.position = .right
             privacyEntryPointButton.position = .left
         }
-
-        privacyEntryPointButton.contentTintColor = .privacyEnabled
+        let isFlaggedPhishing = tabViewModel?.tab.privacyInfo?.isPhishing ?? false
+        privacyEntryPointButton.isAnimationEnabled = !isFlaggedPhishing
+        privacyEntryPointButton.normalTintColor = isFlaggedPhishing ? .fireButtonRedPressed : .privacyEnabled
+        privacyEntryPointButton.mouseOverTintColor = isFlaggedPhishing ? .alertRedHover : privacyEntryPointButton.mouseOverTintColor
+        privacyEntryPointButton.mouseDownTintColor = isFlaggedPhishing ? .alertRedPressed : privacyEntryPointButton.mouseDownTintColor
         privacyEntryPointButton.sendAction(on: .leftMouseUp)
 
         imageButton.applyFaviconStyle()
@@ -754,19 +758,28 @@ final class AddressBarButtonsViewController: NSViewController {
 
             let isNotSecure = url.scheme == URL.NavigationalScheme.http.rawValue
             let isCertificateValid = tabViewModel.tab.isCertificateValid ?? true
-
+            let isFlaggedPhishing = tabViewModel.tab.privacyInfo?.isPhishing ?? false
             let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
             let isUnprotected = configuration.isUserUnprotected(domain: host)
 
             let isShieldDotVisible = isNotSecure || isUnprotected || !isCertificateValid
 
-            privacyEntryPointButton.image = isShieldDotVisible ? .shieldDot : .shield
+            if isFlaggedPhishing {
+                privacyEntryPointButton.isAnimationEnabled = false
+                privacyEntryPointButton.image = .redAlertCircle16
+                privacyEntryPointButton.normalTintColor = .alertRed
+                privacyEntryPointButton.mouseOverTintColor = .alertRedHover
+                privacyEntryPointButton.mouseDownTintColor = .alertRedPressed
+            } else {
+                privacyEntryPointButton.image = isShieldDotVisible ? .shieldDot : .shield
+                privacyEntryPointButton.isAnimationEnabled = true
 
-            let shieldDotMouseOverAnimationNames = MouseOverAnimationButton.AnimationNames(aqua: "shield-dot-mouse-over",
-                                                                                           dark: "dark-shield-dot-mouse-over")
-            let shieldMouseOverAnimationNames = MouseOverAnimationButton.AnimationNames(aqua: "shield-mouse-over",
-                                                                                        dark: "dark-shield-mouse-over")
-            privacyEntryPointButton.animationNames = isShieldDotVisible ? shieldDotMouseOverAnimationNames: shieldMouseOverAnimationNames
+                let animationNames = MouseOverAnimationButton.AnimationNames(
+                    aqua: isShieldDotVisible ? "shield-dot-mouse-over" : "shield-mouse-over",
+                    dark: isShieldDotVisible ? "dark-shield-dot-mouse-over" : "dark-shield-mouse-over"
+                )
+                privacyEntryPointButton.animationNames = animationNames
+            }
         default:
             break
         }

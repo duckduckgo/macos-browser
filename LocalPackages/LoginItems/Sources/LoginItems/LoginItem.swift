@@ -17,9 +17,9 @@
 //
 
 import AppKit
-import os.log // swiftlint:disable:this enforce_os_log_wrapper
 import Foundation
 import ServiceManagement
+import os.log
 
 public enum SMLoginItemSetEnabledError: Error {
     case failed
@@ -28,11 +28,10 @@ public enum SMLoginItemSetEnabledError: Error {
 /// Takes care of enabling and disabling a login item.
 ///
 public struct LoginItem: Equatable, Hashable {
-
     public let agentBundleID: String
     private let launchInformation: LoginItemLaunchInformation
     private let defaults: UserDefaults
-    private let log: OSLog
+    private let logger: Logger
 
     public var isRunning: Bool {
         !runningApplications.isEmpty
@@ -74,21 +73,21 @@ public struct LoginItem: Equatable, Hashable {
                 $0["Label"] as? String == agentBundleID
             }) else { return .notRegistered }
 
-            os_log("🟢 found login item job: %{public}@", log: log, job.debugDescription)
+            logger.debug("🟢 found login item job: \(job.debugDescription, privacy: .public)")
             return job["OnDemand"] as? Bool == true ? .enabled : .requiresApproval
         }
         return Status(SMAppService.loginItem(identifier: agentBundleID).status)
     }
 
-    public init(bundleId: String, defaults: UserDefaults, log: OSLog = .disabled) {
+    public init(bundleId: String, defaults: UserDefaults, logger: Logger) {
         self.agentBundleID = bundleId
         self.defaults = defaults
         self.launchInformation = LoginItemLaunchInformation(agentBundleID: bundleId, defaults: defaults)
-        self.log = log
+        self.logger = logger
     }
 
     public func enable() throws {
-        os_log("🟢 registering login item %{public}@", log: log, self.debugDescription)
+        logger.debug("🟢 registering login item \(self.debugDescription, privacy: .public)")
 
         if #available(macOS 13.0, *) {
             try SMAppService.loginItem(identifier: agentBundleID).register()
@@ -103,7 +102,7 @@ public struct LoginItem: Equatable, Hashable {
     }
 
     public func disable() throws {
-        os_log("🟢 unregistering login item %{public}@", log: log, self.debugDescription)
+        logger.debug("🟢 unregistering login item \(self.debugDescription, privacy: .public)")
 
         if #available(macOS 13.0, *) {
             try SMAppService.loginItem(identifier: agentBundleID).unregister()
@@ -121,7 +120,7 @@ public struct LoginItem: Equatable, Hashable {
     ///
     public func restart() throws {
         guard [.enabled].contains(status) else {
-            os_log("🟢 restart not needed for login item %{public}@", log: log, self.debugDescription)
+            logger.debug("🟢 restart not needed for login item \(self.debugDescription, privacy: .public)")
             return
         }
         try? disable()
@@ -130,8 +129,17 @@ public struct LoginItem: Equatable, Hashable {
 
     public func forceStop() {
         let runningApplications = runningApplications
-        os_log("🟢 stopping %{public}@", log: log, runningApplications.map { $0.processIdentifier }.description)
+        logger.debug("🟢 stopping \(runningApplications.map { $0.processIdentifier }.description, privacy: .public)")
         runningApplications.forEach { $0.terminate() }
+    }
+
+    public static func == (lhs: LoginItem, rhs: LoginItem) -> Bool {
+        lhs.agentBundleID == rhs.agentBundleID && lhs.launchInformation == rhs.launchInformation
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(agentBundleID)
+        hasher.combine(launchInformation)
     }
 }
 

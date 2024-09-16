@@ -25,6 +25,10 @@ import UserScript
 import WebKit
 import History
 import PixelKit
+import PhishingDetection
+import SpecialErrorPages
+import os.log
+import Onboarding
 
 protocol TabDelegate: ContentOverlayUserScriptDelegate {
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool)
@@ -50,12 +54,14 @@ protocol NewWindowPolicyDecisionMaker {
         var downloadManager: FileDownloadManagerProtocol
         var certificateTrustEvaluator: CertificateTrustEvaluating
         var tunnelController: NetworkProtectionIPCTunnelController?
+        var phishingDetector: PhishingSiteDetecting
+        var phishingStateManager: PhishingTabStateManaging
     }
 
     fileprivate weak var delegate: TabDelegate?
     func setDelegate(_ delegate: TabDelegate) { self.delegate = delegate }
 
-    private let navigationDelegate = DistributedNavigationDelegate(log: .navigation)
+    private let navigationDelegate = DistributedNavigationDelegate()
     private var newWindowPolicyDecisionMakers: [NewWindowPolicyDecisionMaker]?
     private var onNewWindow: ((WKNavigationAction?) -> NavigationDecision)?
 
@@ -64,6 +70,7 @@ protocol NewWindowPolicyDecisionMaker {
     let pinnedTabsManager: PinnedTabsManager
 
     private let webViewConfiguration: WKWebViewConfiguration
+    private let phishingState: PhishingTabStateManaging
 
     let startupPreferences: StartupPreferences
     let tabsPreferences: TabsPreferences
@@ -81,7 +88,7 @@ protocol NewWindowPolicyDecisionMaker {
 
     @MainActor
     convenience init(content: TabContent,
-                     faviconManagement: FaviconManagement = FaviconManager.shared,
+                     faviconManagement: FaviconManagement? = nil,
                      webCacheManager: WebCacheManager = WebCacheManager.shared,
                      webViewConfiguration: WKWebViewConfiguration? = nil,
                      historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
@@ -108,6 +115,8 @@ protocol NewWindowPolicyDecisionMaker {
                      startupPreferences: StartupPreferences = StartupPreferences.shared,
                      certificateTrustEvaluator: CertificateTrustEvaluating = CertificateTrustEvaluator(),
                      tunnelController: NetworkProtectionIPCTunnelController? = TunnelControllerProvider.shared.tunnelController,
+                     phishingDetector: PhishingSiteDetecting = PhishingDetection.shared,
+                     phishingState: PhishingTabStateManaging = PhishingTabStateManager(),
                      tabsPreferences: TabsPreferences = TabsPreferences.shared
     ) {
 
@@ -123,7 +132,7 @@ protocol NewWindowPolicyDecisionMaker {
         }
 
         self.init(content: content,
-                  faviconManagement: faviconManager,
+                  faviconManagement: faviconManager ?? FaviconManager.shared,
                   webCacheManager: webCacheManager,
                   webViewConfiguration: webViewConfiguration,
                   historyCoordinating: historyCoordinating,
@@ -151,6 +160,8 @@ protocol NewWindowPolicyDecisionMaker {
                   startupPreferences: startupPreferences,
                   certificateTrustEvaluator: certificateTrustEvaluator,
                   tunnelController: tunnelController,
+                  phishingDetector: phishingDetector,
+                  phishingState: phishingState,
                   tabsPreferences: tabsPreferences)
     }
 
@@ -184,6 +195,8 @@ protocol NewWindowPolicyDecisionMaker {
          startupPreferences: StartupPreferences,
          certificateTrustEvaluator: CertificateTrustEvaluating,
          tunnelController: NetworkProtectionIPCTunnelController?,
+         phishingDetector: PhishingSiteDetecting,
+         phishingState: PhishingTabStateManaging,
          tabsPreferences: TabsPreferences
     ) {
 
@@ -202,6 +215,7 @@ protocol NewWindowPolicyDecisionMaker {
         self.lastSelectedAt = lastSelectedAt
         self.startupPreferences = startupPreferences
         self.tabsPreferences = tabsPreferences
+        self.phishingState = phishingState
 
         self.specialPagesUserScript = SpecialPagesUserScript()
         specialPagesUserScript?
@@ -218,6 +232,8 @@ protocol NewWindowPolicyDecisionMaker {
 
         webView = WebView(frame: CGRect(origin: .zero, size: webViewSize), configuration: configuration)
         webView.allowsLinkPreview = false
+        webView.addsVisitedLinks = true
+
         permissions = PermissionModel(permissionManager: permissionManager,
                                       geolocationService: geolocationService)
 
@@ -250,7 +266,9 @@ protocol NewWindowPolicyDecisionMaker {
                                                        duckPlayer: duckPlayer,
                                                        downloadManager: downloadManager,
                                                        certificateTrustEvaluator: certificateTrustEvaluator,
-                                                       tunnelController: tunnelController))
+                                                       tunnelController: tunnelController,
+                                                       phishingDetector: phishingDetector,
+                                                       phishingStateManager: phishingState))
 
         super.init()
         tabGetter = { [weak self] in self }
@@ -375,8 +393,30 @@ protocol NewWindowPolicyDecisionMaker {
         }.switchToLatest()
     }
 
+    var webViewDidStartNavigationPublisher: some Publisher<Void, Never> {
+        navigationStatePublisher
+            .compactMap { $0 }
+            .filter { $0 == .started }
+            .asVoid()
+    }
+
     var webViewDidFinishNavigationPublisher: some Publisher<Void, Never> {
-        navigationStatePublisher.compactMap { $0 }.filter { $0.isFinished }.asVoid()
+        navigationStatePublisher
+            .combineLatest(navigationDelegate.$currentNavigation)
+            .filter { navigationState, currentNavigation in
+                guard let navigationState = navigationState, navigationState.isFinished else {
+                    return false
+                }
+                guard let currentNavigation = currentNavigation else {
+                    return false
+                }
+                return MainActor.assumeIsolated {
+                    let isSameDocumentNavigation = (currentNavigation.redirectHistory.first ?? currentNavigation.navigationAction).navigationType.isSameDocumentNavigation
+                    return !isSameDocumentNavigation
+                }
+            }
+            .map { _ in () }
+            .eraseToAnyPublisher()
     }
 
     // MARK: - Properties
@@ -696,7 +736,7 @@ protocol NewWindowPolicyDecisionMaker {
         }
 
         guard let backForwardNavigation else {
-            os_log(.error, "item `\(item.title ?? "") – \(item.url?.absoluteString ?? "")` is not in the backForwardList")
+            Logger.navigation.error("item `\(item.title ?? "") – \(item.url?.absoluteString ?? "")` is not in the backForwardList")
             return nil
         }
 
@@ -1012,7 +1052,7 @@ extension Tab: UserContentControllerDelegate {
 
     @MainActor
     func userContentController(_ userContentController: UserContentController, didInstallContentRuleLists contentRuleLists: [String: WKContentRuleList], userScripts: UserScriptsProvider, updateEvent: ContentBlockerRulesManager.UpdateEvent) {
-        os_log("didInstallContentRuleLists", log: .contentBlocking, type: .info)
+        Logger.contentBlocking.info("didInstallContentRuleLists")
         guard let userScripts = userScripts as? UserScripts else { fatalError("Unexpected UserScripts") }
 
         userScripts.debugScript.instrumentation = instrumentation
@@ -1182,14 +1222,13 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     func navigation(_ navigation: Navigation, didFailWith error: WKError) {
         let url = error.failingUrl ?? navigation.url
         guard navigation.isCurrent else { return }
-
         invalidateInteractionStateData()
 
         if !error.isFrameLoadInterrupted, !error.isNavigationCancelled,
                    // don‘t show an error page if the error was already handled
                    // (by SearchNonexistentDomainNavigationResponder) or another navigation was triggered by `setContent`
-            self.content.urlForWebView == url || self.content == .none /* when navigation fails instantly we may have no content set yet */ {
-
+            self.content.urlForWebView == url || self.content == .none /* when navigation fails instantly we may have no content set yet */ 
+            || error.errorCode == PhishingDetectionError.detected.errorCode {
             self.error = error
             // when already displaying the error page and reload navigation fails again: don‘t navigate, just update page HTML
             if error.errorCode != NSURLErrorServerCertificateUntrusted {
@@ -1217,7 +1256,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
     @MainActor
     private func loadErrorHTML(_ error: WKError, header: String, forUnreachableURL url: URL, alternate: Bool) {
-        let html = ErrorPageHTMLTemplate(error: error, header: header).makeHTMLFromTemplate()
+        let html = ErrorPageHTMLFactory.html(for: error, url: url, header: header)
         if alternate {
             webView.loadAlternateHTML(html, baseURL: .error, forUnreachableURL: url)
         } else {
@@ -1274,4 +1313,17 @@ extension Tab {
         }
     }
 
+}
+
+extension Tab: OnboardingNavigationDelegate {
+    func searchFor(_ query: String) {
+        guard let url = URL.makeSearchUrl(from: query) else { return }
+        let request = URLRequest(url: url)
+        self.webView.load(request)
+    }
+
+    func navigateTo(url: URL) {
+        let request = URLRequest(url: url)
+        self.webView.load(request)
+    }
 }

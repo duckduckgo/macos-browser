@@ -18,7 +18,7 @@
 
 import Foundation
 
-/// A type that provides the `origin` used to track installations without tracking retention.
+/// A type that provides the `origin` used to anonymously track installations without tracking retention.
 protocol AttributionOriginProvider: AnyObject {
     /// A string representing the acquisition funnel.
     var origin: String? { get }
