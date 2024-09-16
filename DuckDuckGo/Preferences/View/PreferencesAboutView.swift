@@ -144,9 +144,11 @@ extension Preferences {
             }
         }
 
+#if SPARKLE
         private var hasPendingUpdate: Bool {
             model.updateController?.hasPendingUpdate == true
         }
+#endif
 
         @ViewBuilder
         private var versionText: some View {
