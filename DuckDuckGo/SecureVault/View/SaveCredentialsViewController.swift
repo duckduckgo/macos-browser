@@ -32,6 +32,7 @@ protocol SaveCredentialsDelegate: AnyObject {
 extension SaveCredentialsViewController: MouseOverViewDelegate {
     func mouseOverView(_ mouseOverView: MouseOverView, isMouseOver: Bool) {
         if isMouseOver {
+            lockImageBackgroundView.layer?.backgroundColor = NSColor.infoHoverButtonHovered.cgColor
             presentSecurityInfoPopover()
         } else {
             dismissSecurityInfoPopover()
@@ -48,7 +49,9 @@ extension SaveCredentialsViewController: MouseOverViewDelegate {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
             let message = autofillPreferences.isAutoLockEnabled ? UserText.pmSaveCredentialsSecurityInfo : UserText.pmSaveCredentialsSecurityInfoAutolockOff
-            let infoViewController = PopoverInfoViewController(message: message)
+            let infoViewController = PopoverInfoViewController(message: message) { [weak self] in
+                self?.lockImageBackgroundView.layer?.backgroundColor = NSColor.infoHoverButton.cgColor
+            }
             infoViewController.show(onParent: self, relativeTo: self.tooltipView)
         }
     }
@@ -177,7 +180,7 @@ final class SaveCredentialsViewController: NSViewController {
         tooltipView.delegate = self
         lockImageBackgroundView.wantsLayer = true
         lockImageBackgroundView.layer?.cornerRadius = lockImageBackgroundView.bounds.height / 2
-        lockImageBackgroundView.layer?.backgroundColor = NSColor.black.withAlphaComponent(0.06).cgColor
+        lockImageBackgroundView.layer?.backgroundColor = NSColor.buttonMouseOver.cgColor
     }
 
     /// Note that if the credentials.account.id is not nil, then we consider this an update rather than a save.
