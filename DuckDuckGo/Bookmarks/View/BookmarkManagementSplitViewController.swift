@@ -61,15 +61,6 @@ final class BookmarkManagementSplitViewController: NSSplitViewController {
         detailViewController.delegate = self
     }
 
-    override func keyDown(with event: NSEvent) {
-        let commandKeyDown = event.modifierFlags.contains(.command)
-        if commandKeyDown && event.keyCode == 3 { // CMD + F
-            detailViewController.searchBar.makeMeFirstResponder()
-        } else {
-            super.keyDown(with: event)
-        }
-    }
-
 }
 
 extension BookmarkManagementSplitViewController: BookmarkManagementSidebarViewControllerDelegate {

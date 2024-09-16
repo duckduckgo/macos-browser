@@ -26,6 +26,7 @@ protocol ContextualDaxDialogsFactory {
 
 struct DefaultContextualDaxDialogViewFactory: ContextualDaxDialogsFactory {
     func makeView(for type: ContextualDialogType, delegate: any OnboardingNavigationDelegate, onDismiss: @escaping () -> Void, onGotItPressed: @escaping () -> Void) -> AnyView {
+
         let dialogView: AnyView
         switch type {
         case .tryASearch:

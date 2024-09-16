@@ -254,6 +254,7 @@ extension AppDelegate {
 
         DeviceAuthenticator.shared.authenticateUser(reason: .exportLogins) { authenticationResult in
             guard authenticationResult.authenticated else {
+
                 return
             }
 
@@ -328,6 +329,10 @@ extension AppDelegate {
 
     @objc func resetRemoteMessages(_ sender: Any?) {
         remoteMessagingClient.store?.resetRemoteMessages()
+    }
+
+    @objc func resetNewTabPageCustomization(_ sender: Any?) {
+        homePageSettingsModel.resetAllCustomizations()
     }
 
     @objc func resetCpmCohort(_ sender: Any?) {
@@ -798,12 +803,13 @@ extension MainViewController {
                                                           eventMapping: EventMapping<AutofillPixelEvent> { _, _, _, _ in },
                                                           installDate: nil)
         autofillPixelReporter.resetStoreDefaults()
+        AutofillLoginImportState().hasImportedLogins = false
+        AutofillLoginImportState().credentialsImportPromptPresentationCount = 0
     }
 
     @objc func resetBookmarks(_ sender: Any?) {
         LocalBookmarkManager.shared.resetBookmarks()
         UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageContinueSetUpImport.rawValue)
-        UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.bookmarksBarPromptShown.rawValue)
         LocalBookmarkManager.shared.sortMode = .manual
     }
 
@@ -825,7 +831,6 @@ extension MainViewController {
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowImport.rawValue)
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowDuckPlayer.rawValue)
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowEmailProtection.rawValue)
-        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowPermanentSurvey.rawValue)
     }
 
     @objc func resetDuckPlayerOnboarding(_ sender: Any?) {
@@ -868,14 +873,6 @@ extension MainViewController {
 
     @objc func resetDailyPixels(_ sender: Any?) {
         PixelKit.shared?.clearFrequencyHistoryForAllPixels()
-    }
-
-    @objc func inPermanentSurveyShareOn(_ sender: Any?) {
-        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool?>.Key.homePageUserInSurveyShare.rawValue)
-    }
-
-    @objc func inPermanentSurveyShareOff(_ sender: Any?) {
-        UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool?>.Key.homePageUserInSurveyShare.rawValue)
     }
 
     @objc func changePixelExperimentInstalledDateToLessMoreThan5DayAgo(_ sender: Any?) {

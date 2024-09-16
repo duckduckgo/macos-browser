@@ -166,6 +166,7 @@ final class PrivacyConfigurationManagingMock: PrivacyConfigurationManaging {
 
 final class PrivacyConfigurationMock: PrivacyConfiguration {
     var identifier: String = "mock"
+    var version: String? = "123456789"
 
     var userUnprotectedDomains = [String]()
 

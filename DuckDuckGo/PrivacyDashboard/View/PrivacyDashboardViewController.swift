@@ -349,6 +349,7 @@ extension PrivacyDashboardViewController {
                                                manufacturer: "Apple",
                                                upgradedHttps: currentTab.privacyInfo?.connectionUpgradedTo != nil,
                                                tdsETag: ContentBlocking.shared.contentBlockingManager.currentRules.first?.etag,
+                                               configVersion: configuration.version,
                                                blockedTrackerDomains: blockedTrackerDomains,
                                                installedSurrogates: installedSurrogates,
                                                isGPCEnabled: WebTrackingProtectionPreferences.shared.isGPCEnabled,

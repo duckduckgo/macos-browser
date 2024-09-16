@@ -44,6 +44,7 @@ final class BrowserTabViewController: NSViewController {
     private let bookmarkManager: BookmarkManager
     private let dockCustomizer = DockCustomizer()
     private let onboardingDialogTypeProvider: ContextualOnboardingDialogTypeProviding & ContextualOnboardingStateUpdater
+
     private let onboardingDialogFactory: ContextualDaxDialogsFactory
     private let featureFlagger: FeatureFlagger
 
@@ -175,6 +176,11 @@ final class BrowserTabViewController: NSViewController {
                                                object: nil)
 
         NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onPasswordImportFlowFinish),
+                                               name: .passwordImportDidCloseImportDialog,
+                                               object: nil)
+
+        NotificationCenter.default.addObserver(self,
                                                selector: #selector(onDBPFeatureDisabled),
                                                name: .dbpWasDisabled,
                                                object: nil)
@@ -222,6 +228,21 @@ final class BrowserTabViewController: NSViewController {
         tabCollectionViewModel.select(tab: previouslySelectedTab)
         previouslySelectedTab.webView.evaluateJavaScript("window.openAutofillAfterClosingEmailProtectionTab()", in: nil, in: WKContentWorld.defaultClient)
         self.previouslySelectedTab = nil
+    }
+
+    @objc
+    private func onPasswordImportFlowFinish(_ notification: Notification) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            guard WindowControllersManager.shared.lastKeyMainWindowController === self.view.window?.windowController else { return }
+            if let previouslySelectedTab {
+                tabCollectionViewModel.select(tab: previouslySelectedTab)
+                previouslySelectedTab.webView.evaluateJavaScript("window.credentialsImportFinished()", in: nil, in: WKContentWorld.defaultClient)
+                self.previouslySelectedTab = nil
+            } else {
+                webView?.evaluateJavaScript("window.credentialsImportFinished()", in: nil, in: WKContentWorld.defaultClient)
+            }
+        }
     }
 
     @objc

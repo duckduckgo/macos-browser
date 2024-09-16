@@ -96,11 +96,6 @@ extension SiteTroubleshootingView {
                 pixelKit?.fire(engagementPixel)
 
                 await uiActionHandler.setExclusion(exclude, forDomain: domain)
-
-                if exclude && true {
-                    let siteIssuesReporter = SiteIssuesReporter(pixelKit: pixelKit)
-                    siteIssuesReporter.askUserToReportIssues(withDomain: domain)
-                }
             }
         }
     }
