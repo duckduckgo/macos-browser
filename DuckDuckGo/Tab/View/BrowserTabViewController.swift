@@ -146,7 +146,6 @@ final class BrowserTabViewController: NSViewController {
 
         // Register for focus-related notifications
         if let window = view.window {
-            NotificationCenter.default.addObserver(self, selector: #selector(windowDidBecomeActive), name: NSWindow.didBecomeKeyNotification, object: window)
             NotificationCenter.default.addObserver(self, selector: #selector(windowDidResignActive), name: NSWindow.didResignKeyNotification, object: window)
         }
     }
