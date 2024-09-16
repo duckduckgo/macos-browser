@@ -41,9 +41,11 @@ final class AboutPreferences: ObservableObject, PreferencesTabOpening {
 
     @Published var updateState = UpdateState.upToDate
 
+#if SPARKLE
     var updateController: UpdateControllerProtocol? {
         return Application.appDelegate.updateController
     }
+#endif
 
     var areAutomaticUpdatesEnabled: Bool {
         get {
