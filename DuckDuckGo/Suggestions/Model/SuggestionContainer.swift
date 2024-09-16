@@ -43,7 +43,6 @@ final class SuggestionContainer {
         self.historyCoordinating = historyCoordinating
         self.startupPreferences = startupPreferences
         self.loading = suggestionLoading
-        self.loading.dataSource = self
     }
 
     convenience init () {
@@ -58,7 +57,7 @@ final class SuggestionContainer {
 
     func getSuggestions(for query: String) {
         latestQuery = query
-        loading.getSuggestions(query: query) { [weak self] result, error in
+        loading.getSuggestions(query: query, usingDataSource: self) { [weak self] result, error in
             dispatchPrecondition(condition: .onQueue(.main))
 
             guard self?.latestQuery == query else { return }
@@ -86,6 +85,10 @@ final class SuggestionContainer {
 
 extension SuggestionContainer: SuggestionLoadingDataSource {
 
+    var platform: Platform {
+        return .desktop
+    }
+
     func history(for suggestionLoading: SuggestionLoading) -> [HistorySuggestion] {
         return historyCoordinating.history ?? []
     }
@@ -108,6 +111,10 @@ extension SuggestionContainer: SuggestionLoadingDataSource {
 
     @MainActor func bookmarks(for suggestionLoading: SuggestionLoading) -> [Suggestions.Bookmark] {
         bookmarkManager.list?.bookmarks() ?? []
+    }
+
+    @MainActor func openTabs(for suggestionLoading: any Suggestions.SuggestionLoading) -> [any Suggestions.BrowserTab] {
+        []
     }
 
     func suggestionLoading(_ suggestionLoading: SuggestionLoading,
