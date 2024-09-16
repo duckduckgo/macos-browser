@@ -84,7 +84,7 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
     var lastVisitSite: URL?
 
     init(trackerMessageProvider: TrackerMessageProviding = TrackerMessageProvider(),
-                 startupPreferences: StartupPreferences = StartupPreferences.shared) {
+         startupPreferences: StartupPreferences = StartupPreferences.shared) {
         self.trackerMessageProvider = trackerMessageProvider
         self.startUpPreferences = startupPreferences
     }
@@ -92,19 +92,19 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
     static let shared = ContextualOnboardingStateMachine()
 
     func dialogTypeForTab(_ tab: Tab) -> ContextualDialogType? {
-        print("STATE START \(state)")
         guard case .url = tab.content else {
             return nil
         }
         guard let url = tab.url else { return nil }
 
         if lastVisitTab != nil && tab != lastVisitTab && url == URL.duckDuckGo && state != .showFireButton  {
+            lastVisitTab = tab
+            lastVisitSite = url
             return nil
         }
         reviewActionFor(tab: tab)
         lastVisitTab = tab
         lastVisitSite = url
-        print("STATE END \(state)")
         if url.isDuckDuckGoSearch {
             return dialogPerSearch()
         } else {

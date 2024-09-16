@@ -132,12 +132,15 @@ final class BrowserTabViewController: NSViewController {
     }
 
      @objc func windowDidBecomeActive(notification: Notification) {
-         presentContextualOnboarding()
+//         presentContextualOnboarding()
      }
 
      @objc func windowDidResignActive(notification: Notification) {
          guard let webViewContainer else { return }
-         removeChild(in: self.containerStackView, webViewContainer: webViewContainer)
+         containerStackView.arrangedSubviews.filter({ $0 != webViewContainer }).forEach {
+             containerStackView.removeArrangedSubview($0)
+             $0.removeFromSuperview()
+         }
      }
 
     override func viewWillAppear() {
@@ -295,7 +298,10 @@ final class BrowserTabViewController: NSViewController {
                 self.subscribeToDuckPlayerOnboardingPrompt(of: selectedTabViewModel)
 
                 self.adjustFirstResponder(force: true)
-                self.presentContextualOnboarding()
+                containerStackView.arrangedSubviews.filter({ $0 != self.webViewContainer }).forEach {
+                    self.containerStackView.removeArrangedSubview($0)
+                    $0.removeFromSuperview()
+                }
             }
             .store(in: &cancellables)
     }
