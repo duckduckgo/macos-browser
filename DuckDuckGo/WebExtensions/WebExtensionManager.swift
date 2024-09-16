@@ -142,20 +142,8 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
     }
 
     @MainActor
-    private func showPopover(popupWebView: WKWebView, button: NSButton) {
-        popupWebView.configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
-
-        let popover = NSPopover()
-        popover.behavior = .applicationDefined
-        let viewController = NSViewController()
-        viewController.view.addSubview(popupWebView)
-        popupWebView.translatesAutoresizingMaskIntoConstraints = false
-        popupWebView.topAnchor.constraint(equalTo: viewController.view.topAnchor, constant: 0).isActive = true
-        popupWebView.leftAnchor.constraint(equalTo: viewController.view.leftAnchor, constant: 0).isActive = true
-        popupWebView.rightAnchor.constraint(equalTo: viewController.view.rightAnchor, constant: 0).isActive = true
-        popupWebView.bottomAnchor.constraint(equalTo: viewController.view.bottomAnchor, constant: 0).isActive = true
-        popover.contentViewController = viewController
-        popover.show(relativeTo: button.bounds, of: button, preferredEdge: .maxY)
+    private func showPopover(popupPopover: NSPopover, button: NSButton) {
+        popupPopover.show(relativeTo: button.bounds, of: button, preferredEdge: .maxY)
     }
 
     @MainActor
@@ -270,11 +258,11 @@ extension WebExtensionManager: WKWebExtensionControllerDelegate {
             return
         }
 
-        guard action.presentsPopup, let popupWebView = action.popupWebView else {
+        guard action.presentsPopup, let popupPopover = action.popupPopover else {
             return
         }
 
-        showPopover(popupWebView: popupWebView, button: button)
+        showPopover(popupPopover: popupPopover, button: button)
     }
 
     func webExtensionController(_ controller: WKWebExtensionController, sendMessage message: Any, toApplicationWithIdentifier applicationIdentifier: String?, for extensionContext: WKWebExtensionContext) async throws -> Any? {
