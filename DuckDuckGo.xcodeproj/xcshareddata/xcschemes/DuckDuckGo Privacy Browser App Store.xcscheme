@@ -149,6 +149,9 @@
                   Identifier = "NavigationProtectionIntegrationTests/testReferrerTrimming()">
                </Test>
                <Test
+                  Identifier = "PhishingDetectionIntegrationTests">
+               </Test>
+               <Test
                   Identifier = "TabContentTests">
                </Test>
             </SkippedTests>
