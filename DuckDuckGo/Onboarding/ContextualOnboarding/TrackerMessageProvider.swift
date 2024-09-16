@@ -131,7 +131,7 @@ struct TrackerMessageProvider: TrackerMessageProviding {
             return String(format: message, args)
 
         case 2:
-            let args = entitiesBlocked[0]
+            let args: [CVarArg]  = [entitiesBlocked[0], entitiesBlocked[1]]
             let message = UserText.ContextualOnboarding.daxDialogBrowsingWithTwoTrackers
             return String(format: message, args)
 

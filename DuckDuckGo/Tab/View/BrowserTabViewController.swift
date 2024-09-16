@@ -396,8 +396,9 @@ final class BrowserTabViewController: NSViewController {
 
         guard featureFlagger.isFeatureOn(.highlightsOnboarding) else { return }
 
-        guard let tab = tabViewModel?.tab,
-              let dialogType = onboardingDialogTypeProvider.dialogTypeForTab(tab) else {
+        guard let tab = tabViewModel?.tab else { return }
+        onboardingDialogTypeProvider.updateStateFor(tab: tab)
+        guard let dialogType = onboardingDialogTypeProvider.dialogTypeForTab(tab) else {
             return
         }
 
@@ -409,7 +410,6 @@ final class BrowserTabViewController: NSViewController {
             }
         }
         let daxView = onboardingDialogFactory.makeView(for: dialogType, delegate: tab, onDismiss: onDismissAction, onGotItPressed: onboardingDialogTypeProvider.gotItPressed)
-//        onboardingDialogTypeProvider.dialogDidShow(dialog: dialogType)
         let hostingController = NSHostingController(rootView: AnyView(daxView))
 
         daxContextualOnboardingController = hostingController

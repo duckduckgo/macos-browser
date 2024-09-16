@@ -13271,13 +13271,13 @@
       }
     },
     "contextual.onboarding.browsing.multiple.trackers" : {
-      "comment" : "First parameter is a count of additional trackers, second and third are names of the tracker networks (strings)\n   Parameters are names of the tracker networks (strings)",
+      "comment" : "First parameter is a count of additional trackers, second and third are names of the tracker networks (strings)",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "*%2$@ and %3$@* were trying to track you here. I blocked them!"
+            "value" : "*%2$@, %3$@* and others (%d) were trying to track you here. I blocked them!"
           }
         }
       }
@@ -13290,6 +13290,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "*%1$@* was trying to track you here. I blocked them!\n\n☝️ Tap the shield for more info."
+          }
+        }
+      }
+    },
+    "contextual.onboarding.browsing.two.trackers" : {
+      "comment" : "Parameters are names of the tracker networks (strings)",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "*%1$@ and %2$@* were trying to track you here. I blocked them!"
           }
         }
       }

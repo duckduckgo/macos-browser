@@ -23,6 +23,7 @@ protocol ContextualOnboardingDialogTypeProviding {
 }
 
 protocol ContextualOnboardingStateUpdater {
+    func updateStateFor(tab: Tab)
     func gotItPressed()
     func fireButtonUsed()
 }
@@ -102,7 +103,7 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
             lastVisitSite = url
             return nil
         }
-        reviewActionFor(tab: tab)
+//        reviewActionFor(tab: tab)
         lastVisitTab = tab
         lastVisitSite = url
         if url.isDuckDuckGoSearch {
@@ -147,8 +148,17 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
 
     }
 
-    private func reviewActionFor(tab: Tab) {
+    func updateStateFor(tab: Tab) {
+        guard case .url = tab.content else {
+            return
+        }
         guard let url = tab.url else { return }
+
+        if lastVisitTab != nil && tab != lastVisitTab && url == URL.duckDuckGo && state != .showFireButton  {
+            lastVisitTab = tab
+            lastVisitSite = url
+            return
+        }
 
         if tab != lastVisitTab || url != lastVisitSite {
             lastVisitTab = tab
