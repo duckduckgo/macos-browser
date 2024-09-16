@@ -429,10 +429,12 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
     }
 
     func menuWillOpen(_ menu: NSMenu) {
+#if SPARKLE
         guard let updateController = Application.appDelegate.updateController else { return }
         if updateController.hasPendingUpdate && updateController.needsNotificationDot {
             updateController.needsNotificationDot = false
         }
+#endif
     }
 }
 
