@@ -434,6 +434,6 @@ final class MockConfigurationManager: DefaultConfigurationManager {
     override init(fetcher: ConfigurationFetching = MockConfigurationFetcher(),
                   store: ConfigurationStoring = MockConfigurationStore(),
                   defaults: KeyValueStoring = UserDefaults()) {
-        super.init(fetcher: fetcher, store: store)
+        super.init(fetcher: fetcher, store: store, defaults: defaults)
     }
 }
