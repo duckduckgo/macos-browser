@@ -117,6 +117,11 @@ final class DuckPlayerPreferences: ObservableObject {
         duckPlayerContingencyHandler.shouldDisplayContingencyMessage
     }
 
+    @MainActor
+    func openNewTab(with url: URL) {
+        WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
+    }
+
     func reset() {
         youtubeOverlayAnyButtonPressed = false
         youtubeOverlayInteracted = false

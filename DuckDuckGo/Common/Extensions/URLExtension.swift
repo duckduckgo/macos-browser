@@ -412,6 +412,10 @@ extension URL {
     static var duckDuckGoEmailInfo = URL(string: "https://duckduckgo.com/duckduckgo-help-pages/email-protection/what-is-duckduckgo-email-protection/")!
     static var duckDuckGoMorePrivacyInfo = URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/atb/")!
 
+    static var duckPlayerHelpPages: URL {
+        return URL(string: "https://duckduckgo.com/duckduckgo-help-pages/duck-player/")!
+    }
+    
     var isDuckDuckGo: Bool {
         absoluteString.starts(with: Self.duckDuckGo.absoluteString)
     }

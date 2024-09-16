@@ -83,8 +83,14 @@ extension Preferences {
                     }, label: {})
                     .pickerStyle(.radioGroup)
                     .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
+                    
+                    VStack(alignment: .leading) {
+                        TextMenuItemCaption(UserText.duckPlayerExplanation)
+                        TextButton(UserText.learnMore) {
+                            model.openNewTab(with: .duckPlayerHelpPages)
+                        }
+                    }
 
-                    TextMenuItemCaption(UserText.duckPlayerExplanation)
                 }.disabled(model.shouldDisplayContingencyMessage)
 
                 if model.shouldDisplayAutoPlaySettings || model.isOpenInNewTabSettingsAvailable {
