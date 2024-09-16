@@ -37,6 +37,7 @@ final class MockPrivacyConfiguration: PrivacyConfiguration {
     }
 
     var identifier: String = "MockPrivacyConfiguration"
+    var version: String? = "1234567890"
     var userUnprotectedDomains: [String] = []
     var tempUnprotectedDomains: [String] = []
     var trackerAllowlist: PrivacyConfigurationData.TrackerAllowlist = .init(entries: [:],
