@@ -18,6 +18,7 @@
 
 import SwiftUI
 import SwiftUIExtensions
+import PixelKit
 
 struct SyncPromoView: View {
 
@@ -42,6 +43,9 @@ struct SyncPromoView: View {
             case .vertical:
                 verticalLayoutView
             }
+        }
+        .onAppear {
+            PixelKit.fire(SyncPromoPixelKitEvent.syncPromoDisplayed.withoutMacPrefix, withAdditionalParameters: ["source": viewModel.touchpointType.rawValue])
         }
         .onHover { isHovering in
             self.isHovering = isHovering
@@ -212,10 +216,12 @@ struct SyncPromoView: View {
 
     private func primaryAction() {
         viewModel.primaryButtonAction?()
+        PixelKit.fire(SyncPromoPixelKitEvent.syncPromoConfirmed.withoutMacPrefix, withAdditionalParameters: ["source": viewModel.touchpointType.rawValue])
     }
 
     private func dismissAction() {
         viewModel.dismissButtonAction?()
+        PixelKit.fire(SyncPromoPixelKitEvent.syncPromoDismissed.withoutMacPrefix, withAdditionalParameters: ["source": viewModel.touchpointType.rawValue])
     }
 }
 
