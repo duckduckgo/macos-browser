@@ -52,11 +52,6 @@ struct PasswordManagementLoginItemView: View {
                     ScrollView(.vertical) {
                         VStack(alignment: .leading, spacing: 0) {
 
-                            if model.showSyncPromo {
-                                SyncPromoView(viewModel: model.syncPromoViewModel)
-                                    .padding(.bottom, 16)
-                            }
-
                             HeaderView()
                                 .padding(.bottom, editMode ? 20 : 30)
 

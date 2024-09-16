@@ -20,7 +20,6 @@ import Combine
 import BrowserServicesKit
 import Common
 import PixelKit
-import DDGSync
 
 final class PasswordManagementLoginModel: ObservableObject, PasswordManagementItemModel {
 
@@ -40,7 +39,6 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
 
     var onSaveRequested: (SecureVaultModels.WebsiteCredentials) -> Void
     var onDeleteRequested: (SecureVaultModels.WebsiteCredentials) -> Void
-    var onDismissRequested: () -> Void
     var urlMatcher: AutofillDomainNameUrlMatcher
     var emailManager: EmailManager
 
@@ -135,37 +133,18 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     private let urlSort: AutofillDomainNameUrlSort
     private static let randomColorsCount = 15
 
-    // MARK: Sync Promo
-    @Published private(set) var showSyncPromo: Bool = false
-    private lazy var syncPromoManager: SyncPromoManaging = SyncPromoManager()
-    lazy var syncPromoViewModel: SyncPromoViewModel = SyncPromoViewModel(touchpointType: .passwords,
-                                                                         primaryButtonAction: { [weak self] in
-        Task { @MainActor in
-            // TODO - need to pass through the source for pixels
-            WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .sync)
-        }
-        self?.onDismissRequested()
-    },
-                                                                         dismissButtonAction: { [weak self] in
-        self?.syncPromoManager.dismissPromoFor(.passwords)
-        self?.showSyncPromo = false
-    })
-
-    init(urlMatcher: AutofillDomainNameUrlMatcher,
+    init(onSaveRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
+         onDeleteRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
+         urlMatcher: AutofillDomainNameUrlMatcher,
          emailManager: EmailManager,
          tld: TLD = ContentBlocking.shared.tld,
-         urlSort: AutofillDomainNameUrlSort,
-         onSaveRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
-         onDeleteRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
-         onDismissRequested: @escaping () -> Void) {
+         urlSort: AutofillDomainNameUrlSort) {
+        self.onSaveRequested = onSaveRequested
+        self.onDeleteRequested = onDeleteRequested
         self.urlMatcher = urlMatcher
         self.emailManager = emailManager
         self.tld = tld
         self.urlSort = urlSort
-        self.onSaveRequested = onSaveRequested
-        self.onDeleteRequested = onDeleteRequested
-        self.onDismissRequested = onDismissRequested
-
         self.emailManager.requestDelegate = self
     }
 
@@ -269,7 +248,6 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
             lastUpdatedDate = ""
         }
 
-        setShouldShowSyncPromo()
     }
 
     private func getPrivateEmailStatus() async throws {
@@ -349,9 +327,6 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         privateEmailRequestInProgress = true
     }
 
-    private func setShouldShowSyncPromo() {
-        showSyncPromo = !isEditing && !isNew && syncPromoManager.shouldPresentPromoFor(.passwords)
-    }
 }
 
 extension PasswordManagementLoginModel: EmailManagerRequestDelegate { }
