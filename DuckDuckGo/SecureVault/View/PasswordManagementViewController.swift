@@ -728,9 +728,10 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     var passwordManagerSelectionCancellable: AnyCancellable?
+    var syncPromoSelectionCancellable: AnyCancellable?
 
     private func createListView() {
-        let listModel = PasswordManagementItemListModel(passwordManagerCoordinator: self.passwordManagerCoordinator, onItemSelected: { [weak self] previousValue, newValue in
+        let listModel = PasswordManagementItemListModel(passwordManagerCoordinator: self.passwordManagerCoordinator, syncPromoManager: self.syncPromoManager, onItemSelected: { [weak self] previousValue, newValue in
             guard let newValue = newValue,
                   let id = newValue.secureVaultID,
                   let window = self?.view.window else {
@@ -812,6 +813,16 @@ final class PasswordManagementViewController: NSViewController {
                     self?.displayExternalPasswordManagerView()
                 }
             }
+
+        syncPromoSelectionCancellable = listModel.$showSyncPromoSelected
+            .receive(on: DispatchQueue.main)
+            .removeDuplicates()
+            .sink { [weak self] value in
+                if value {
+                    self?.displaySyncPromoView()
+                }
+            }
+
     }
 
     private func displayExternalPasswordManagerView() {
@@ -820,6 +831,27 @@ final class PasswordManagementViewController: NSViewController {
         }
 
         let view = NSHostingView(rootView: passwordManagerView)
+        replaceItemContainerChildView(with: view)
+    }
+
+    private lazy var syncPromoManager: SyncPromoManaging = SyncPromoManager()
+    lazy var syncPromoViewModel: SyncPromoViewModel = SyncPromoViewModel(touchpointType: .passwords,
+                                                                         primaryButtonAction: { [weak self] in
+        Task { @MainActor in
+            // TODO - need to pass through the source for pixels
+            WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .sync)
+        }
+        self?.dismiss()
+    },
+                                                                         dismissButtonAction: { [weak self] in
+        self?.syncPromoManager.dismissPromoFor(.passwords)
+        self?.refreshData()
+    })
+
+    private func displaySyncPromoView() {
+
+        let syncPromoView = SyncPromoView(viewModel: syncPromoViewModel, layout: .vertical)
+        let view = NSHostingView(rootView: syncPromoView)
         replaceItemContainerChildView(with: view)
     }
 

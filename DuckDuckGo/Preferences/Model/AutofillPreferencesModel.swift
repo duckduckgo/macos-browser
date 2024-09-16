@@ -18,7 +18,6 @@
 
 import Foundation
 import PixelKit
-import BrowserServicesKit
 
 final class AutofillPreferencesModel: ObservableObject {
 
@@ -175,11 +174,6 @@ final class AutofillPreferencesModel: ObservableObject {
             // TODO - need to pass through the source
             WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .sync)
         }
-//        self?.onDismissRequested()
-
-//        self.dismiss()
-
-//        Pixel.fire(.syncPromoConfirmed, withAdditionalParameters: ["source": SyncPromoManager.Touchpoint.passwords.rawValue])
     },
                                                                          dismissButtonAction: { [weak self] in
         self?.syncPromoManager.dismissPromoFor(.passwords)
