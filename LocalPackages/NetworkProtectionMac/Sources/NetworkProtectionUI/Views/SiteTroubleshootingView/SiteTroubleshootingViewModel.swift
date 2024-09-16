@@ -80,7 +80,14 @@ extension SiteTroubleshootingView {
                     return
                 }
 
-                let engagementPixel = DomainExclusionsEngagementPixel(added: exclude)
+                let engagementPixel: DomainExclusionsEngagementPixel
+
+                if exclude {
+                    engagementPixel = .exclusionAdded(domain: domain)
+                } else {
+                    engagementPixel = .exclusionRemoved
+                }
+
                 pixelKit?.fire(engagementPixel)
 
                 await uiActionHandler.setExclusion(exclude, forDomain: domain)
