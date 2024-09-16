@@ -51,10 +51,11 @@ final class DefaultFreemiumDBPFeature: FreemiumDBPFeature {
     ///
     /// The feature is considered available if:
     /// 1. It is enabled in the privacy configuration (`DBPSubfeature.freemium`), and
-    /// 2. The user is a potential privacy pro subscriber.
-    /// 3. TODO: The user is in the experiment cohort
+    /// 2. User is in the experiement treatment cohort
+    /// 3. The user is a potential privacy pro subscriber.
     var isAvailable: Bool {
         privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DBPSubfeature.freemium)
+        && experimentManager.isTreatment
         && subscriptionManager.isPotentialPrivacyProSubscriber
     }
 
@@ -67,6 +68,7 @@ final class DefaultFreemiumDBPFeature: FreemiumDBPFeature {
 
     // MARK: - Private Properties
     private let privacyConfigurationManager: PrivacyConfigurationManaging
+    private let experimentManager: FreemiumDBPPixelExperimentManaging
     private let subscriptionManager: SubscriptionManager
     private let accountManager: AccountManager
     private var freemiumDBPUserStateManager: FreemiumDBPUserStateManager
@@ -88,6 +90,7 @@ final class DefaultFreemiumDBPFeature: FreemiumDBPFeature {
     ///   - notificationCenter: Observes notifications, defaulting to `.default`.
     ///   - featureDisabler: Optional feature disabler. If not provided, the default `DataBrokerProtectionFeatureDisabler` is used.
     init(privacyConfigurationManager: PrivacyConfigurationManaging,
+         experimentManager: FreemiumDBPPixelExperimentManaging,
          subscriptionManager: SubscriptionManager,
          accountManager: AccountManager,
          freemiumDBPUserStateManager: FreemiumDBPUserStateManager,
@@ -95,6 +98,7 @@ final class DefaultFreemiumDBPFeature: FreemiumDBPFeature {
          featureDisabler: DataBrokerProtectionFeatureDisabling? = nil) {
 
         self.privacyConfigurationManager = privacyConfigurationManager
+        self.experimentManager = experimentManager
         self.subscriptionManager = subscriptionManager
         self.accountManager = accountManager
         self.freemiumDBPUserStateManager = freemiumDBPUserStateManager

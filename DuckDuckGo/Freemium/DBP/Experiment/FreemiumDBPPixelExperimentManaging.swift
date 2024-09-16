@@ -22,6 +22,10 @@ import OSLog
 
 /// Protocol defining the interface for managing Freemium DBP pixel experiments.
 protocol FreemiumDBPPixelExperimentManaging {
+    
+    /// Property indicating if the user is in the treatment cohort or not
+    var isTreatment: Bool { get }
+
     /// Parameters to be sent with pixel events, representing the user's experiment cohort and enrollment date.
     var pixelParameters: [String: String]? { get }
 
@@ -67,6 +71,10 @@ final class FreemiumDBPPixelExperimentManager: FreemiumDBPPixelExperimentManagin
     }
 
     // MARK: - FreemiumDBPPixelExperimentManaging
+
+    var isTreatment: Bool {
+        experimentCohort == .treatment
+    }
 
     var pixelParameters: [String: String]? {
         var parameters: [String: String] = [:]
@@ -182,7 +190,7 @@ private extension UserDefaults {
 
     /// Stores or retrieves the user's assigned experiment cohort.
     var experimentCohort: FreemiumDBPPixelExperimentManager.Cohort? {
-        get { return FreemiumDBPPixelExperimentManager.Cohort(rawValue: string(forKey: Keys.experimentCohort) ?? "") }
+        get { FreemiumDBPPixelExperimentManager.Cohort(rawValue: string(forKey: Keys.experimentCohort) ?? "") }
         set { set(newValue?.rawValue, forKey: Keys.experimentCohort) }
     }
 }

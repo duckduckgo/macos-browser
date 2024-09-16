@@ -200,6 +200,41 @@ final class FreemiumDBPPixelExperimentManagingTests: XCTestCase {
         let enrollmentDate = mockUserDefaults.object(forKey: MockUserDefaults.Keys.enrollmentDate) as? Date
         XCTAssertNil(enrollmentDate)
     }
+
+    // MARK: - isTreatment Property Tests
+
+    func testIsTreatment_whenCohortIsTreatment_returnsTrue() {
+        // Given
+        mockUserDefaults.set("treatment", forKey: MockUserDefaults.Keys.experimentCohort)
+
+        // When
+        let isTreatment = sut.isTreatment
+
+        // Then
+        XCTAssertTrue(isTreatment)
+    }
+
+    func testIsTreatment_whenCohortIsControl_returnsFalse() {
+        // Given
+        mockUserDefaults.set("control", forKey: MockUserDefaults.Keys.experimentCohort)
+
+        // When
+        let isTreatment = sut.isTreatment
+
+        // Then
+        XCTAssertFalse(isTreatment)
+    }
+
+    func testIsTreatment_whenCohortIsNil_returnsFalse() {
+        // Given
+        mockUserDefaults.removeObject(forKey: MockUserDefaults.Keys.experimentCohort)
+
+        // When
+        let isTreatment = sut.isTreatment
+
+        // Then
+        XCTAssertFalse(isTreatment)
+    }
 }
 
 // MARK: - Mock Dependencies
