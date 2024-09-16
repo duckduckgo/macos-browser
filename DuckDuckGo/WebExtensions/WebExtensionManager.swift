@@ -121,7 +121,8 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
         // Show dashboard - perform default action
         context.performAction(for: nil)
 
-        showBackgroundConsole(context: context)
+        // Uncomment the line below to enable debugging of the background script
+//        showBackgroundConsole(context: context)
     }
 
     @MainActor
