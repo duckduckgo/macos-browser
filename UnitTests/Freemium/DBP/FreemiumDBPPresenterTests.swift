@@ -23,16 +23,20 @@ import Combine
 final class FreemiumDBPPresenterTests: XCTestCase {
 
     private var mockWindowControllerManager: MockWindowControllerManager!
-    private var sut = DefaultFreemiumDBPPresenter()
+    private var mockFreemiumDBPStateManager: MockFreemiumDBPUserStateManager!
 
     @MainActor
-    func testWhenCallShowFreemiumDBPThenShowPIRTabIsCalled() async throws {
+    func testWhenCallShowFreemiumDBPThenShowPIRTabIsCalledAndActivatedStateIsSet() async throws {
         // Given
         mockWindowControllerManager = MockWindowControllerManager()
+        mockFreemiumDBPStateManager = MockFreemiumDBPUserStateManager()
+        let sut = DefaultFreemiumDBPPresenter(freemiumDBFPStateManager: mockFreemiumDBPStateManager)
+        XCTAssertFalse(mockFreemiumDBPStateManager.didActivate)
         // When
-        sut.showFreemiumDBP(windowControllerManager: mockWindowControllerManager)
+        sut.showFreemiumDBPAndSetActivated(windowControllerManager: mockWindowControllerManager)
         // Then
         XCTAssertEqual(mockWindowControllerManager.showTabContent, Tab.Content.dataBrokerProtection)
+        XCTAssertTrue(mockFreemiumDBPStateManager.didActivate)
     }
 }
 

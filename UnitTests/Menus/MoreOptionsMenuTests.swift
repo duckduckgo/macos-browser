@@ -401,7 +401,7 @@ final class MockFreemiumDBPFeature: FreemiumDBPFeature {
 final class MockFreemiumDBPPresenter: FreemiumDBPPresenter {
     var didCallShowFreemium = false
 
-    func showFreemiumDBP(windowControllerManager: WindowControllersManagerProtocol? = nil) {
+    func showFreemiumDBPAndSetActivated(windowControllerManager: WindowControllersManagerProtocol? = nil) {
         didCallShowFreemium = true
     }
 }

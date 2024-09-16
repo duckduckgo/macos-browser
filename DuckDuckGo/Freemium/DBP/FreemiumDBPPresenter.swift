@@ -17,20 +17,28 @@
 //
 
 import Foundation
+import Freemium
 
 /// Conforming types provide functionality to show Freemium DBP
 protocol FreemiumDBPPresenter {
-    func showFreemiumDBP(windowControllerManager: WindowControllersManagerProtocol?)
+    func showFreemiumDBPAndSetActivated(windowControllerManager: WindowControllersManagerProtocol?)
 }
 
 /// Default implementation of `FreemiumDBPPresenter`
-struct DefaultFreemiumDBPPresenter: FreemiumDBPPresenter {
+final class DefaultFreemiumDBPPresenter: FreemiumDBPPresenter {
+
+    private var freemiumDBPStateManager: FreemiumDBPUserStateManager
+
+    init(freemiumDBPStateManager: FreemiumDBPUserStateManager = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp)) {
+        self.freemiumDBPStateManager = freemiumDBPStateManager
+    }
 
     @MainActor
     /// Displays Freemium DBP
-    func showFreemiumDBP(windowControllerManager: WindowControllersManagerProtocol? = nil) {
+    func showFreemiumDBPAndSetActivated(windowControllerManager: WindowControllersManagerProtocol? = nil) {
 
         let windowControllerManager = windowControllerManager ?? WindowControllersManager.shared
+        freemiumDBPStateManager.didActivate = true
         windowControllerManager.showTab(with: .dataBrokerProtection)
     }
 }

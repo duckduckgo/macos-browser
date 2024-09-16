@@ -271,7 +271,7 @@ final class MoreOptionsMenu: NSMenu {
 
     @MainActor
     @objc func openFreemiumDBP(_ sender: NSMenuItem) {
-        freemiumDBPPresenter.showFreemiumDBP(windowControllerManager: WindowControllersManager.shared)
+        freemiumDBPPresenter.showFreemiumDBPAndSetActivated(windowControllerManager: WindowControllersManager.shared)
         notificationCenter.post(name: .freemiumDBPEntryPointActivated, object: nil)
     }
 
