@@ -110,7 +110,7 @@ enum KeyEquivalentElement: ExpressibleByStringLiteral, Hashable {
     }
 }
 
-extension NSEvent.KeyEquivalent: @retroactive ExpressibleByStringLiteral, @retroactive ExpressibleByUnicodeScalarLiteral, @retroactive ExpressibleByExtendedGraphemeClusterLiteral {
+extension NSEvent.KeyEquivalent: ExpressibleByStringLiteral, ExpressibleByUnicodeScalarLiteral, ExpressibleByExtendedGraphemeClusterLiteral {
     public typealias StringLiteralType = String
 
     public init(stringLiteral value: String) {
