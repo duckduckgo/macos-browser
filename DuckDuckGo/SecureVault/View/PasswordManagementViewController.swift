@@ -834,7 +834,6 @@ final class PasswordManagementViewController: NSViewController {
     lazy var syncPromoViewModel: SyncPromoViewModel = SyncPromoViewModel(touchpointType: .passwords,
                                                                          primaryButtonAction: { [weak self] in
         Task { @MainActor in
-            // TODO - need to pass through the source for pixels
             WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .sync)
         }
         self?.dismiss()

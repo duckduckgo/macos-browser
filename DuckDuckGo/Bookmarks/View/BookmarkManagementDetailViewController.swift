@@ -84,7 +84,6 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     private lazy var syncPromoViewHostingView: NSHostingView<SyncPromoView> = {
         let model = SyncPromoViewModel(touchpointType: .bookmarks, primaryButtonAction: { [weak self] in
             Task { @MainActor in
-                // TODO - need to pass through the source for pixels
                 WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .sync)
             }
         }, dismissButtonAction: { [weak self] in
