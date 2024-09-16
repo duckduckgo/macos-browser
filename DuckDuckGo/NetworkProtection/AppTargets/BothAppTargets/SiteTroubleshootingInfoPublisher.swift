@@ -81,18 +81,18 @@ final class SiteTroubleshootingInfoPublisher {
             return nil
         }
 
-        return site(forDomain: activeDomain)
+        return site(forDomain: activeDomain.droppingWwwPrefix())
     }
 
     private func site(forDomain domain: String) -> SiteTroubleshootingInfo? {
         let icon: NSImage?
         let currentSite: NetworkProtectionUI.SiteTroubleshootingInfo?
 
-        icon = FaviconManager.shared.getCachedFavicon(for: domain, sizeCategory: .small)?.image
+        icon = FaviconManager.shared.getCachedFavicon(forDomainOrAnySubdomain: domain, sizeCategory: .small)?.image
         let proxySettings = TransparentProxySettings(defaults: .netP)
         currentSite = NetworkProtectionUI.SiteTroubleshootingInfo(
             icon: icon,
-            domain: domain.droppingWwwPrefix(),
+            domain: domain,
             excluded: proxySettings.isExcluding(domain: domain))
 
         return currentSite
