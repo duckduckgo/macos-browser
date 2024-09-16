@@ -81,7 +81,7 @@ final class SiteTroubleshootingInfoPublisher {
             return nil
         }
 
-        return site(forDomain: activeDomain.droppingWwwPrefix())
+        return site(forDomain: activeDomain)
     }
 
     private func site(forDomain domain: String) -> SiteTroubleshootingInfo? {
@@ -92,7 +92,7 @@ final class SiteTroubleshootingInfoPublisher {
         let proxySettings = TransparentProxySettings(defaults: .netP)
         currentSite = NetworkProtectionUI.SiteTroubleshootingInfo(
             icon: icon,
-            domain: domain,
+            domain: domain.droppingWwwPrefix(),
             excluded: proxySettings.isExcluding(domain: domain))
 
         return currentSite

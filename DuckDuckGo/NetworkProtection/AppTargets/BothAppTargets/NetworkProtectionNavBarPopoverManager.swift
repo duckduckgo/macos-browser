@@ -84,6 +84,10 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
     }
 
     func show(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate) -> NSPopover {
+
+        /// Since the favicon doesn't have a publisher we force refreshing here
+        siteTroubleshootingInfoPublisher.refreshSiteTroubleshootingInfo()
+
         let popover: NSPopover = {
             let controller = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
 
