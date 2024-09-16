@@ -21,72 +21,26 @@ import SwiftUIExtensions
 
 struct SyncPromoView: View {
 
+    enum Layout {
+        case compact
+        case horizontal
+        case vertical
+    }
+
+    @State private var isHovering = false
+
     let viewModel: SyncPromoViewModel
-    @State var isHovering = false
-    var hasSecondaryButton: Bool = true
+    var layout: Layout = .compact
 
     var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 12)
-                .foregroundColor(isHovering ? Color.black.opacity(0.06) : Color.blackWhite3)
-                .cornerRadius(8)
-
-            HStack(alignment: hasSecondaryButton ? .top : .center) {
-                Image(viewModel.image)
-                    .resizable()
-                    .frame(width: 48, height: 48)
-                    .padding(.top, hasSecondaryButton ? 14 : 0)
-
-                VStack(alignment: .leading) {
-
-                    Text(viewModel.title)
-                        .font(.system(size: 13).bold())
-                        .multilineTextAlignment(.leading)
-                        .multilineText()
-
-                    Text(viewModel.subtitle)
-                        .multilineTextAlignment(.leading)
-                        .multilineText()
-                        .padding(.top, hasSecondaryButton ? 1 : 0)
-                        .padding(.bottom, hasSecondaryButton ? 6 : 2)
-
-                    if hasSecondaryButton {
-                        HStack {
-                            Button(viewModel.secondaryButtonTitle) {
-                                viewModel.dismissButtonAction?()
-                            }
-                                    .buttonStyle(DismissActionButtonStyle())
-
-                            Button(viewModel.primaryButtonTitle) {
-                                viewModel.primaryButtonAction?()
-                            }
-                                    .buttonStyle(DefaultActionButtonStyle(enabled: true))
-                        }
-                    }
-                }
-                .padding(.top, hasSecondaryButton ? 8 : 0)
-                .padding(.bottom, hasSecondaryButton ? 14 : 0)
-                .padding(.trailing, hasSecondaryButton ? 40 : 0)
-
-                if !hasSecondaryButton {
-                    Spacer()
-
-                    Button(viewModel.primaryButtonTitle) {
-                        viewModel.primaryButtonAction?()
-                    }
-                    .buttonStyle(DismissActionButtonStyle())
-                    .padding(.trailing, 32)
-                }
-            }
-            .padding(.leading, 8)
-            .padding(.vertical, hasSecondaryButton ? 0 : 8)
-
-            HStack {
-                Spacer()
-                VStack {
-                    closeButton
-                    Spacer()
-                }
+        Group {
+            switch layout {
+            case .compact:
+                compactLayoutView
+            case .horizontal:
+                horizontalLayoutView
+            case .vertical:
+                verticalLayoutView
             }
         }
         .onHover { isHovering in
@@ -95,14 +49,176 @@ struct SyncPromoView: View {
     }
 
     private var closeButton: some View {
-        HomePage.Views.CloseButton(icon: .close, size: 16) {
-            viewModel.dismissButtonAction?()
+        HStack {
+            Spacer()
+            VStack {
+                HomePage.Views.CloseButton(icon: .close, size: 16) {
+                    dismissAction()
+                }
+                .visibility(isHovering ? .visible : .invisible)
+                .padding(6)
+
+                Spacer()
+            }
         }
-        .visibility(isHovering ? .visible : .invisible)
-        .padding(6)
+    }
+
+    private var backgroundRectangle: some View {
+        RoundedRectangle(cornerRadius: 12)
+            .foregroundColor(isHovering ? Color.black.opacity(0.06) : Color.blackWhite3)
+            .cornerRadius(8)
+    }
+
+    private var image: some View {
+        Image(viewModel.image)
+            .resizable()
+            .frame(width: 48, height: 48)
+    }
+
+    private var title: some View {
+        Text(viewModel.title)
+            .font(.system(size: layout == .vertical ? 15 : 13).bold())
+            .multilineTextAlignment(layout == .vertical ? .center : .leading)
+            .multilineText()
+    }
+
+    private var subtitle: some View {
+        Text(viewModel.subtitle)
+            .multilineTextAlignment(layout == .vertical ? .center : .leading)
+            .multilineText()
+    }
+
+    private var compactLayoutView: some View {
+        ZStack {
+            backgroundRectangle
+
+            HStack(alignment: .top) {
+                image
+                    .padding(.top, 14)
+
+                VStack(alignment: .leading) {
+
+                    title
+
+                    subtitle
+                        .padding(.top, 1)
+                        .padding(.bottom, 6)
+
+                    HStack {
+                        Button(viewModel.secondaryButtonTitle) {
+                            dismissAction()
+                        }
+                        .buttonStyle(DismissActionButtonStyle())
+
+                        Button(viewModel.primaryButtonTitle) {
+                            primaryAction()
+                        }
+                        .buttonStyle(DefaultActionButtonStyle(enabled: true))
+                    }
+                }
+                .padding(.top, 8)
+                .padding(.bottom, 14)
+                .padding(.trailing, 40)
+            }
+            .padding(.leading, 8)
+
+            closeButton
+        }
+    }
+
+    private var horizontalLayoutView: some View {
+        ZStack {
+            backgroundRectangle
+
+            HStack(alignment: .center) {
+                image
+
+                VStack(alignment: .leading) {
+
+                    title
+
+                    subtitle
+                        .padding(.bottom, 2)
+                }
+
+                Spacer()
+
+                Button(viewModel.primaryButtonTitle) {
+                    primaryAction()
+                }
+                .buttonStyle(DismissActionButtonStyle())
+                .padding(.trailing, 32)
+            }
+            .padding(.leading, 8)
+            .padding(.vertical, 8)
+
+            closeButton
+        }
+    }
+
+    private var verticalLayoutView: some View {
+        VStack(alignment: .center, spacing: 16) {
+
+            Image(.syncStart128)
+                .resizable()
+                .frame(width: 96, height: 72)
+
+            VStack(spacing: 8) {
+                title
+
+                subtitle
+            }
+            .frame(width: 192)
+
+            HStack {
+
+                Button {
+                    dismissAction()
+                } label: {
+                    Text(viewModel.secondaryButtonTitle)
+                        .multilineTextAlignment(.center)
+                        .padding(.top, 5)
+                        .padding(.bottom, 5)
+                        .padding(.horizontal, 12)
+                        .background(
+                            RoundedRectangle(cornerRadius: 6)
+                                .fill(Color(.blackWhite10))
+                        )
+                }
+                .buttonStyle(.plain)
+
+                Button {
+                    primaryAction()
+                } label: {
+                    Text(viewModel.primaryButtonTitle)
+                        .foregroundColor(.white)
+                        .multilineTextAlignment(.center)
+                        .padding(.top, 5)
+                        .padding(.bottom, 5)
+                        .padding(.horizontal, 12)
+                        .background(
+                            RoundedRectangle(cornerRadius: 6)
+                                .fill(Color(NSColor.controlAccentColor))
+                        )
+                }
+                .buttonStyle(.plain)
+            }
+
+            Spacer()
+        }
+        .frame(width: 224)
+        .padding(.top, 70)
+    }
+
+    private func primaryAction() {
+        viewModel.primaryButtonAction?()
+    }
+
+    private func dismissAction() {
+        viewModel.dismissButtonAction?()
     }
 }
 
 #Preview {
-    SyncPromoView(viewModel: SyncPromoViewModel(touchpointType: .bookmarks, primaryButtonAction: {}, dismissButtonAction: {}), hasSecondaryButton: false)
+    SyncPromoView(viewModel: SyncPromoViewModel(touchpointType: .bookmarks, primaryButtonAction: {}, dismissButtonAction: {}))
 }

@@ -145,9 +145,6 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
             WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .sync)
         }
         self?.onDismissRequested()
-
-        // TODO - Pixel
-        // Pixel.fire(.syncPromoConfirmed, withAdditionalParameters: ["source": SyncPromoManager.Touchpoint.passwords.rawValue])
     },
                                                                          dismissButtonAction: { [weak self] in
         self?.syncPromoManager.dismissPromoFor(.passwords)

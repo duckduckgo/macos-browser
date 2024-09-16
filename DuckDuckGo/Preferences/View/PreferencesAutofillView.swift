@@ -66,7 +66,7 @@ extension Preferences {
             PreferencePane(UserText.passwordManagementTitle) {
 
                 if model.showSyncPromo {
-                    SyncPromoView(viewModel: model.syncPromoViewModel, hasSecondaryButton: false)
+                    SyncPromoView(viewModel: model.syncPromoViewModel, layout: .horizontal)
                 }
 
                 // Autofill Content  Button

@@ -87,16 +87,13 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
                 // TODO - need to pass through the source for pixels
                 WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .sync)
             }
-            // Pixel.fire(.syncPromoConfirmed, withAdditionalParameters: ["source": SyncPromoManager.Touchpoint.bookmarks.rawValue])
         }, dismissButtonAction: { [weak self] in
             self?.syncPromoManager.dismissPromoFor(.bookmarks)
             self?.updateDocumentViewHeight()
         })
 
         let headerView = SyncPromoView(viewModel: model,
-                                       hasSecondaryButton: false)
-
-        // Pixel.fire(.syncPromoDisplayed, withAdditionalParameters: ["source": SyncPromoManager.Touchpoint.bookmarks.rawValue])
+                                       layout: .horizontal)
 
         let hostingController = NSHostingView(rootView: headerView)
         return hostingController

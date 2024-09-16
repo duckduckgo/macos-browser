@@ -56377,6 +56377,30 @@
         }
       }
     },
+    "sync.promo.passwords.side.panel.subtitle" : {
+      "comment" : "Subtitle for the Sync Promotion in passwords side panel",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sync & Backup"
+          }
+        }
+      }
+    },
+    "sync.promo.passwords.side.panel.title" : {
+      "comment" : "Title for the Sync Promotion in passwords side panel",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Setup"
+          }
+        }
+      }
+    },
     "sync.promo.passwords.title" : {
       "comment" : "Title for the Sync Promotion banner",
       "extractionState" : "extracted_with_value",

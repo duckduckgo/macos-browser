@@ -1305,5 +1305,8 @@ struct UserText {
     static let syncPromoPasswordsMessage = NSLocalizedString("sync.promo.passwords.message", value:"No account needed. End-to-end encryption means nobody but you can see your passwords, not even us.", comment: "Message for the Sync Promotion banner when user has passwords that can be synced")
     static let syncPromoConfirmAction = NSLocalizedString("sync.promo.confirm.action", value:"Set Up Sync", comment: "Title for a button in the Sync Promotion banner to set up Sync")
     static let syncPromoDismissAction = NSLocalizedString("sync.promo.dismiss.action", value:"No Thanks", comment: "Title for a button in the Sync Promotion banner to dismiss Sync promotion banner")
+    static let syncPromoSidePanelTitle = NSLocalizedString("sync.promo.passwords.side.panel.title", value:"Setup", comment: "Title for the Sync Promotion in passwords side panel")
+    static let syncPromoSidePanelSubtitle = NSLocalizedString("sync.promo.passwords.side.panel.subtitle", value:"Sync & Backup", comment: "Subtitle for the Sync Promotion in passwords side panel")
+
 
 }

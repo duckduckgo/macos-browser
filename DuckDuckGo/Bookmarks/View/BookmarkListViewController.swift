@@ -137,17 +137,12 @@ final class BookmarkListViewController: NSViewController {
                 // TODO - need to pass through the source for pixels
                 WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .sync)
             }
-            // TODO - pixel
-            // Pixel.fire(.syncPromoConfirmed, withAdditionalParameters: ["source": SyncPromoManager.Touchpoint.bookmarks.rawValue])
         }, dismissButtonAction: { [weak self] in
             self?.syncPromoManager.dismissPromoFor(.bookmarks)
             self?.updateDocumentViewHeight()
         })
 
         let headerView = SyncPromoView(viewModel: model)
-
-        // TODO - pixel
-        // Pixel.fire(.syncPromoDisplayed, withAdditionalParameters: ["source": SyncPromoManager.Touchpoint.bookmarks.rawValue])
 
         let hostingController = NSHostingView(rootView: headerView)
         return hostingController

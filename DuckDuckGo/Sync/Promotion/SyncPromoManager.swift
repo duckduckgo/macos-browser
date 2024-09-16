@@ -39,7 +39,6 @@ final class SyncPromoManager: SyncPromoManaging {
 
     private let syncService: DDGSyncing?
     private let privacyConfigurationManager: PrivacyConfigurationManaging
-    // TODO - update to inject
     private let autofillPrefs = AutofillPreferences()
 
     @UserDefaultsWrapper(key: .syncPromoBookmarksDismissed, defaultValue: nil)
@@ -88,9 +87,6 @@ final class SyncPromoManager: SyncPromoManaging {
         case .passwords:
             syncPromoPasswordsDismissed = Date()
         }
-
-        // TODO - pixel
-//        Pixel.fire(.syncPromoDismissed, withAdditionalParameters: ["source": touchpoint.rawValue])
     }
 
     func resetPromos() {
