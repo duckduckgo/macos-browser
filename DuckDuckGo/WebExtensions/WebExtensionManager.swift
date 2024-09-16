@@ -52,13 +52,17 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
     static private func makeContext(for webExtension: _WKWebExtension) -> WKWebExtensionContext {
         let context = WKWebExtensionContext(for: webExtension)
         context.uniqueIdentifier = UUID().uuidString
-        let matchPattern = try! _WKWebExtension.MatchPattern(string: "*://*/*")
-        context.setPermissionStatus(.grantedExplicitly, for: matchPattern, expirationDate: nil)
 
-        // Grant all requested API permissions.
+        // TODO: We should consult what the extension requests to decide what to grant.
+        let matchPatterns = context.webExtension.allRequestedMatchPatterns
+        for pattern in matchPatterns {
+            context.setPermissionStatus(.grantedExplicitly, for: pattern, expirationDate: nil)
+        }
+
+        // TODO: Grant only what the extension requests.
         let permissions: [WKWebExtension.Permission] = [.activeTab, .alarms, .clipboardWrite, .contextMenus, .cookies, .declarativeNetRequest, .declarativeNetRequestFeedback, .declarativeNetRequestWithHostAccess, .menus, .nativeMessaging, .scripting, .storage, .tabs, .unlimitedStorage, .webNavigation, .webRequest]
         for permission in permissions {
-            context.setPermissionStatus(.grantedExplicitly, for: WKWebExtension.Permission.activeTab, expirationDate: nil)
+            context.setPermissionStatus(.grantedExplicitly, for: permission, expirationDate: nil)
         }
 
         // For debugging purposes
@@ -68,7 +72,7 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
     // swiftlint:disable force_try
 
     lazy var extensions: [_WKWebExtension] = {
-        guard let loadedExtension = WebExtensionManager.loadWebExtension(path: Bundle.main.path(forResource: "dnr-block-dynamic", ofType: nil)!) else {
+        guard let loadedExtension = WebExtensionManager.loadWebExtension(path: Bundle.main.path(forResource: "emoji-substitution", ofType: nil)!) else {
             return []
         }
 
