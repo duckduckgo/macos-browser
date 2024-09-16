@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import BrowserServicesKit
 import PixelKit
 
 final class AutofillPreferencesModel: ObservableObject {
