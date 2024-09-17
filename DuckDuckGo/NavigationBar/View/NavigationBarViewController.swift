@@ -586,7 +586,7 @@ final class NavigationBarViewController: NSViewController {
 
         fileprivate var topPadding: CGFloat {
             switch self {
-            case .homePage: 16
+            case .homePage: 10
             case .popUpWindow: 0
             case .default: 6
             }
@@ -594,7 +594,7 @@ final class NavigationBarViewController: NSViewController {
 
         fileprivate var bottomPadding: CGFloat {
             switch self {
-            case .homePage: 2
+            case .homePage: 8
             case .popUpWindow: 0
             case .default: 6
             }
@@ -1011,12 +1011,11 @@ extension NavigationBarViewController: NSMenuDelegate {
             }
             .store(in: &cancellables)
 
-        networkProtectionButtonModel.$showButton
-            .removeDuplicates()
+        networkProtectionButtonModel.$showVPNButton
             .receive(on: RunLoop.main)
             .sink { [weak self] show in
                 let isPopUpWindow = self?.view.window?.isPopUpWindow ?? false
-                self?.networkProtectionButton.isHidden =  isPopUpWindow || !show
+                self?.networkProtectionButton.isHidden = isPopUpWindow || !show
             }
             .store(in: &cancellables)
 

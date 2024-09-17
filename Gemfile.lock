@@ -1,9 +1,9 @@
 GIT
   remote: https://github.com/duckduckgo/fastlane-plugin-ddg_apple_automation
-  revision: ce7c7447eaeeef01974eb1ff6f1e15a2d0e618f5
-  tag: 0.7.0
+  revision: 925026552f68d1d2a50fe4d1ccd683e0949f5528
+  tag: 0.10.1
   specs:
-    fastlane-plugin-ddg_apple_automation (0.7.0)
+    fastlane-plugin-ddg_apple_automation (0.10.1)
       asana
       climate_control
       httpparty
@@ -26,17 +26,17 @@ GEM
       oauth2 (>= 1.4, < 3)
     atomos (0.1.3)
     aws-eventstream (1.3.0)
-    aws-partitions (1.971.0)
-    aws-sdk-core (3.203.0)
+    aws-partitions (1.975.0)
+    aws-sdk-core (3.205.0)
       aws-eventstream (~> 1, >= 1.3.0)
       aws-partitions (~> 1, >= 1.651.0)
       aws-sigv4 (~> 1.9)
       jmespath (~> 1, >= 1.6.1)
-    aws-sdk-kms (1.89.0)
-      aws-sdk-core (~> 3, >= 3.203.0)
+    aws-sdk-kms (1.91.0)
+      aws-sdk-core (~> 3, >= 3.205.0)
       aws-sigv4 (~> 1.5)
-    aws-sdk-s3 (1.160.0)
-      aws-sdk-core (~> 3, >= 3.203.0)
+    aws-sdk-s3 (1.162.0)
+      aws-sdk-core (~> 3, >= 3.205.0)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.5)
     aws-sigv4 (1.9.1)
@@ -180,7 +180,7 @@ GEM
       httparty (> 0)
     jmespath (1.6.2)
     json (2.7.2)
-    jwt (2.8.2)
+    jwt (2.9.0)
       base64
     mini_magick (4.13.2)
     mini_mime (1.1.5)
@@ -239,7 +239,7 @@ GEM
     tty-spinner (0.9.3)
       tty-cursor (~> 0.7)
     uber (0.1.0)
-    unicode-display_width (2.5.0)
+    unicode-display_width (2.6.0)
     version_gem (1.1.4)
     word_wrap (1.0.0)
     xcodeproj (1.25.0)

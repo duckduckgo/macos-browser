@@ -69,6 +69,9 @@ final class NetworkProtectionDebugMenu: NSMenu {
                 NSMenuItem(title: "Reset All State", action: #selector(NetworkProtectionDebugMenu.resetAllState))
                     .targetting(self)
 
+                NSMenuItem(title: "Reset Site Issue Alert", action: #selector(NetworkProtectionDebugMenu.resetSiteIssuesAlert(_:)))
+                    .targetting(self)
+
                 resetToDefaults
                     .targetting(self)
 
@@ -180,6 +183,10 @@ final class NetworkProtectionDebugMenu: NSMenu {
                 Logger.networkProtection.error("Error in resetAllState: \(error.localizedDescription, privacy: .public)")
             }
         }
+    }
+
+    @objc func resetSiteIssuesAlert(_ sender: Any?) {
+        debugUtilities.resetSiteIssuesAlert()
     }
 
     /// Resets all state for NetworkProtection.

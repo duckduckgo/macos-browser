@@ -276,6 +276,8 @@ enum GeneralPixel: PixelKitEventV2 {
     case privacyConfigurationReloadFailed
     case privacyConfigurationCouldNotBeLoaded
 
+    case configurationFileCoordinatorError
+
     case fileStoreWriteFailed
     case fileMoveToDownloadsFailed
     case fileAccessRelatedItemFailed
@@ -547,6 +549,8 @@ enum GeneralPixel: PixelKitEventV2 {
             // Email pixels deliberately avoid using the `m_mac_` prefix.
             if pixel.isEmailPixel {
                 return "\(pixel.pixelName)_macos_desktop"
+            } else if pixel.isCredentialsImportPromotionPixel {
+                return pixel.pixelName
             } else {
                 return "m_mac_\(pixel.pixelName)"
             }
@@ -780,9 +784,9 @@ enum GeneralPixel: PixelKitEventV2 {
         case .dbInitializationError:
             return "dbie"
         case .dbSaveExcludedHTTPSDomainsError:
-            return "dbsw"
+            return "database_save_excluded_https_domains_error"
         case .dbSaveBloomFilterError:
-            return "dbsb"
+            return "database_save_bloom_filter_error"
 
         case .remoteMessagingSaveConfigError:
             return "remote_messaging_save_config_error"
@@ -807,6 +811,9 @@ enum GeneralPixel: PixelKitEventV2 {
             return "pcf_r"
         case .privacyConfigurationCouldNotBeLoaded:
             return "pcf_l"
+
+        case .configurationFileCoordinatorError:
+            return "configuration_file_coordinator_error"
 
         case .fileStoreWriteFailed:
             return "fswf"

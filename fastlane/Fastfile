@@ -45,6 +45,36 @@ platform :mac do
     do_sync_signing(options)
   end
 
+  # Fetches and updates certificates and provisioning profiles for DMG distribution
+  #
+  # @option [String] username (default: nil) Your DDG Apple ID. Pass it to not be asked
+  #         for it a couple of times during the process.
+  #
+  desc 'Fetches and updates certificates and provisioning profiles for DMG distribution'
+  lane :sync_signing_dmg_release do |options|
+    do_sync_signing(options)
+  end
+
+  # Fetches and updates certificates and provisioning profiles for DMG Review builds
+  #
+  # @option [String] username (default: nil) Your DDG Apple ID. Pass it to not be asked
+  #         for it a couple of times during the process.
+  #
+  desc 'Fetches and updates certificates and provisioning profiles for DMG Review builds'
+  lane :sync_signing_dmg_review do |options|
+    do_sync_signing(options)
+  end
+
+  # Fetches and updates certificates and provisioning profiles for CI builds
+  #
+  # @option [String] username (default: nil) Your DDG Apple ID. Pass it to not be asked
+  #         for it a couple of times during the process.
+  #
+  desc 'Fetches and updates certificates and provisioning profiles for CI builds'
+  lane :sync_signing_ci do |options|
+    do_sync_signing(options)
+  end
+
   # Makes App Store release build and uploads it to TestFlight without managing App Store listing.
   #
   # @option [String] username (default: nil) Your DDG Apple ID. Pass it to not be asked

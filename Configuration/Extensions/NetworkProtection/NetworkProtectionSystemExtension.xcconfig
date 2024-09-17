@@ -16,6 +16,8 @@
 #include "../ExtensionBase.xcconfig"
 #include "../../DeveloperID.xcconfig"
 
+INFOPLIST_KEY_CFBundleDisplayName = DuckDuckGo VPN Network Extension
+
 CODE_SIGN_ENTITLEMENTS[config=CI][sdk=macosx*] =
 CODE_SIGN_ENTITLEMENTS[config=Debug][sdk=macosx*] = NetworkProtectionSystemExtension/NetworkProtectionSystemExtension_Debug.entitlements
 CODE_SIGN_ENTITLEMENTS[config=Release][sdk=macosx*] = NetworkProtectionSystemExtension/NetworkProtectionSystemExtension_Release.entitlements
@@ -49,8 +51,8 @@ PRODUCT_NAME[config=Release][sdk=*] = $(SYSEX_BUNDLE_ID)
 PRODUCT_NAME[config=Review][sdk=*] = $(SYSEX_BUNDLE_ID)
 
 PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] =
-PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = macOS NetP VPN SysEx - Release (XPC)
-PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = macOS NetP VPN SysEx - Review (XPC)
+PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = match Direct com.duckduckgo.macos.vpn.network-extension macos
+PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = match Direct com.duckduckgo.macos.vpn.network-extension.review macos
 
 SDKROOT = macosx
 SKIP_INSTALL = YES

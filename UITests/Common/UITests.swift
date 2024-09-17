@@ -40,7 +40,7 @@ enum UITests {
             <title>\(title)</title>
             </head>
             <body>
-            <p>Sample text</p>
+            <p>Sample text for \(title)</p>
             </body>
             </html>
             """.utf8data)

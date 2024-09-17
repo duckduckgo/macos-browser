@@ -176,33 +176,40 @@ jobs:
     - name: Create Asana task on failure
       id: create-task-on-failure
       if: failure() || env.MERGE_OR_DELETE_FAILED == 'true'
-      uses: ./.github/actions/asana-create-action-item
-      with:
-        access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-        release-task-url: ${{ env.asana-task-url }}
-        template-name: ${{ steps.asana-failure-templates.outputs.task-template }}
+      env: 
+        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+      run: |
+        bundle exec fastlane run asana_create_action_item \
+          task_url:"${{ env.asana-task-url }}" \
+          template_name:${{ steps.asana-failure-templates.outputs.task-template }} \
+          github_handle:"${{ github.actor }}" \
+          is_scheduled_release:"${{ github.event_name == 'schedule' }}"
 
     - name: Create Publish DMG Release task on failure
       id: create-publish-dmg-task-on-failure
       if: failure() && env.internal-release-bump == 'true'
-      uses: ./.github/actions/asana-create-action-item
       env:
         ASANA_TASK_URL: ${{ env.asana-task-url }}
-      with:
-        access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-        release-task-url: ${{ env.asana-task-url }}
-        template-name: run-publish-dmg-release
+        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+      run: |
+        bundle exec fastlane run asana_create_action_item \
+          task_url:"${{ env.asana-task-url }}" \
+          template_name:"run-publish-dmg-release" \
+          github_handle:"${{ github.actor }}" \
+          is_scheduled_release:"${{ github.event_name == 'schedule' }}"
 
     - name: Report failure
       if: failure() || env.MERGE_OR_DELETE_FAILED == 'true'
-      uses: ./.github/actions/asana-log-message
       env:
-        ASSIGNEE_ID: ${{ steps.create-task-on-failure.outputs.assignee-id }}
-        TASK_ID: ${{ steps.create-task-on-failure.outputs.new-task-id }}
-      with:
-        access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-        task-url: ${{ env.asana-task-url }}
-        template-name: ${{ steps.asana-failure-templates.outputs.comment-template }}
+        ASSIGNEE_ID: ${{ steps.create-task-on-failure.outputs.asana_assignee_id }}
+        TASK_ID: ${{ steps.create-task-on-failure.outputs.asana_new_task_id }}
+        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+      run: |
+        bundle exec fastlane run asana_log_message \
+          task_url:"${{ env.asana-task-url }}" \
+          template_name:"${{ steps.asana-failure-templates.outputs.comment-template }}" \
+          github_handle:"${{ github.actor }}" \
+          is_scheduled_release:"${{ github.event_name == 'schedule' }}"
 
     - name: Set up Asana success comment template
       if: ${{ env.MERGE_OR_DELETE_FAILED == 'false' }}
@@ -216,8 +223,11 @@ jobs:
 
     - name: Report success
       if: ${{ env.MERGE_OR_DELETE_FAILED == 'false' }}
-      uses: ./.github/actions/asana-log-message
-      with:
-        access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-        task-url: ${{ env.asana-task-url }}
-        template-name: ${{ steps.asana-success-template.outputs.comment-template }}
+      env:
+        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+      run: |
+        bundle exec fastlane run asana_log_message \
+          task_url:"${{ env.asana-task-url }}" \
+          template_name:"${{ steps.asana-success-template.outputs.comment-template }}" \
+          github_handle:"${{ github.actor }}" \
+          is_scheduled_release:"${{ github.event_name == 'schedule' }}"
