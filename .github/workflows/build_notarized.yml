@@ -20,6 +20,11 @@ on:
         description: "Asana release task URL"
         required: false
         type: string
+      skip-mm:
+        description: "Skip Mattermost message"
+        required: false
+        default: false
+        type: boolean
   workflow_call:
     inputs:
       release-type:
@@ -40,6 +45,11 @@ on:
         description: "Branch name"
         required: false
         type: string
+      skip-mm:
+        description: "Skip Mattermost message"
+        required: false
+        default: false
+        type: boolean
     secrets:
       APPLE_API_KEY_BASE64:
         required: true
@@ -310,7 +320,7 @@ jobs:
     name: Send Mattermost message
 
     needs: [export-notarized-app, create-dmg]
-    if: always()
+    if: always() && ${{ inputs.skip-mm == 'false' }}
 
     runs-on: ubuntu-latest
 
