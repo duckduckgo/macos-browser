@@ -89,7 +89,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
 
         mockDataManager.profileToReturn = mockProfile
         mockAuthenticationManager.isUserAuthenticatedValue = true
-        mockFreemiumDBPUserStateManager.didOnboard = false
+        mockFreemiumDBPUserStateManager.didActivate = false
 
         let schedulerStartedExpectation = XCTestExpectation(description: "Scheduler started")
         var schedulerStarted = false
@@ -129,7 +129,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager)
 
         mockDataManager.profileToReturn = mockProfile
-        mockFreemiumDBPUserStateManager.didOnboard = true
+        mockFreemiumDBPUserStateManager.didActivate = true
 
         let schedulerStartedExpectation = XCTestExpectation(description: "Scheduler started")
         var schedulerStarted = false
@@ -175,7 +175,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager)
 
         mockDataManager.profileToReturn = nil
-        mockFreemiumDBPUserStateManager.didOnboard = true
+        mockFreemiumDBPUserStateManager.didActivate = true
 
         let stopAgentExpectation = XCTestExpectation(description: "Stop agent expectation")
 
@@ -250,7 +250,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
 
         mockDataManager.profileToReturn = mockProfile
         mockAuthenticationManager.isUserAuthenticatedValue = true
-        mockFreemiumDBPUserStateManager.didOnboard = false
+        mockFreemiumDBPUserStateManager.didActivate = false
 
         var startScheduledScansCalled = false
         mockQueueManager.startScheduledAllOperationsIfPermittedCalledCompletion = { _ in
@@ -279,7 +279,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager)
 
         mockDataManager.profileToReturn = mockProfile
-        mockFreemiumDBPUserStateManager.didOnboard = true
+        mockFreemiumDBPUserStateManager.didActivate = true
 
         var startScheduledScansCalled = false
         mockQueueManager.startScheduledScanOperationsIfPermittedCalledCompletion = { _ in
@@ -308,7 +308,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager)
 
         mockDataManager.profileToReturn = mockProfile
-        mockFreemiumDBPUserStateManager.didOnboard = false
+        mockFreemiumDBPUserStateManager.didActivate = false
 
         var startImmediateScansCalled = false
         mockQueueManager.startImmediateScanOperationsIfPermittedCalledCompletion = { _ in
@@ -337,7 +337,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager)
 
         mockDataManager.profileToReturn = mockProfile
-        mockFreemiumDBPUserStateManager.didOnboard = true
+        mockFreemiumDBPUserStateManager.didActivate = true
 
         var startImmediateScansCalled = false
         mockQueueManager.startImmediateScanOperationsIfPermittedCalledCompletion = { _ in
@@ -484,7 +484,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager)
 
         mockAuthenticationManager.isUserAuthenticatedValue = true
-        mockFreemiumDBPUserStateManager.didOnboard = false
+        mockFreemiumDBPUserStateManager.didActivate = false
 
         var startScheduledScansCalled = false
         mockQueueManager.startScheduledAllOperationsIfPermittedCalledCompletion = { _ in
@@ -512,7 +512,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             authenticationManager: mockAuthenticationManager,
             freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager)
 
-        mockFreemiumDBPUserStateManager.didOnboard = true
+        mockFreemiumDBPUserStateManager.didActivate = true
 
         var startScheduledScansCalled = false
         mockQueueManager.startScheduledScanOperationsIfPermittedCalledCompletion = { _ in
