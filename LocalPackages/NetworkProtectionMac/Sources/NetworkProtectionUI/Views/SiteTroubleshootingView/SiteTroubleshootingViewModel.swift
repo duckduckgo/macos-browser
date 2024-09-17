@@ -28,9 +28,6 @@ extension SiteTroubleshootingView {
     public final class Model: ObservableObject {
 
         @Published
-        private(set) var isFeatureEnabled = false
-
-        @Published
         private(set) var connectionStatus: ConnectionStatus = .disconnected
 
         @Published
@@ -48,8 +45,7 @@ extension SiteTroubleshootingView {
         private let pixelKit: PixelFiring?
         private var cancellables = Set<AnyCancellable>()
 
-        public init(featureFlagPublisher: AnyPublisher<Bool, Never>,
-                    connectionStatusPublisher: AnyPublisher<ConnectionStatus, Never>,
+        public init(connectionStatusPublisher: AnyPublisher<ConnectionStatus, Never>,
                     siteTroubleshootingInfoPublisher: AnyPublisher<SiteTroubleshootingInfo?, Never>,
                     uiActionHandler: VPNUIActionHandling,
                     pixelKit: PixelFiring? = PixelKit.shared) {
@@ -59,7 +55,6 @@ extension SiteTroubleshootingView {
 
             subscribeToConnectionStatusChanges(connectionStatusPublisher)
             subscribeToSiteTroubleshootingInfoChanges(siteTroubleshootingInfoPublisher)
-            subscribeToFeatureFlagChanges(featureFlagPublisher)
         }
 
         private func subscribeToConnectionStatusChanges(_ publisher: AnyPublisher<ConnectionStatus, Never>) {
@@ -78,13 +73,6 @@ extension SiteTroubleshootingView {
                 .store(in: &cancellables)
         }
 
-        private func subscribeToFeatureFlagChanges(_ publisher: AnyPublisher<Bool, Never>) {
-            publisher
-                .receive(on: DispatchQueue.main)
-                .assign(to: \.isFeatureEnabled, onWeaklyHeld: self)
-                .store(in: &cancellables)
-        }
-
         func setExclusion(_ exclude: Bool, forDomain domain: String) {
             Task { @MainActor in
                 guard let siteInfo,
@@ -96,11 +84,6 @@ extension SiteTroubleshootingView {
                 pixelKit?.fire(engagementPixel)
 
                 await uiActionHandler.setExclusion(exclude, forDomain: domain)
-
-                if exclude && true {
-                    let siteIssuesReporter = SiteIssuesReporter(pixelKit: pixelKit)
-                    siteIssuesReporter.askUserToReportIssues(withDomain: domain)
-                }
             }
         }
     }

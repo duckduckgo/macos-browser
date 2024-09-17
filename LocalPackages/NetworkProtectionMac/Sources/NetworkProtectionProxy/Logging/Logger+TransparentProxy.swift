@@ -1,7 +1,7 @@
 //
-//  NetworkProtection+VPNAgentConvenienceInitializers.swift
+//  Logger+TransparentProxy.swift
 //
-//  Copyright © 2024 DuckDuckGo. All rights reserved.
+//  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -17,14 +17,9 @@
 //
 
 import Foundation
-import NetworkProtection
-import Subscription
+import os.log
 
-extension NetworkProtectionKeychainTokenStore {
-    convenience init() {
-        self.init(keychainType: .default,
-                  errorEvents: .networkProtectionAppDebugEvents,
-                  isSubscriptionEnabled: false,
-                  accessTokenProvider: { return nil })
-    }
+public extension Logger {
+    fileprivate static let subsystem = "Network Protection"
+    static var transparentProxyLogger = { Logger(subsystem: Logger.subsystem, category: "Transparent Proxy") }()
 }
