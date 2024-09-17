@@ -138,7 +138,7 @@ final class RemoteMessagingConfigMatcherProvider: RemoteMessagingConfigMatcherPr
         let deprecatedRemoteMessageStorage = DefaultSurveyRemoteMessagingStorage.surveys()
 
         let freemiumDBPUserStateManager = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp)
-        let isCurrentFreemiumDBPUser = !subscriptionManager.accountManager.isUserAuthenticated && freemiumDBPUserStateManager.didOnboard
+        let isCurrentFreemiumDBPUser = !subscriptionManager.accountManager.isUserAuthenticated && freemiumDBPUserStateManager.didActivate
 
         return RemoteMessagingConfigMatcher(
             appAttributeMatcher: AppAttributeMatcher(statisticsStore: statisticsStore,

@@ -34,7 +34,7 @@ final class MockFreemiumDBPUserStateManager: FreemiumDBPUserStateManager {
 
     var didCallResetAllState = false
 
-    var didOnboard = false
+    var didActivate = false
     var didPostFirstProfileSavedNotification = false
     var didPostResultsNotification = false
     var didDismissHomePagePromotion = false

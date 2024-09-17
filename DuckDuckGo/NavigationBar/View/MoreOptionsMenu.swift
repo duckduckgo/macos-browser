@@ -60,7 +60,6 @@ final class MoreOptionsMenu: NSMenu {
     private lazy var sharingMenu: NSMenu = SharingMenu(title: UserText.shareMenuItem)
     private var accountManager: AccountManager { subscriptionManager.accountManager }
     private let subscriptionManager: SubscriptionManager
-    private var freemiumDBPUserStateManager: FreemiumDBPUserStateManager
     private let freemiumDBPFeature: FreemiumDBPFeature
     private let freemiumDBPPresenter: FreemiumDBPPresenter
     private let appearancePreferences: AppearancePreferences
@@ -83,7 +82,6 @@ final class MoreOptionsMenu: NSMenu {
          sharingMenu: NSMenu? = nil,
          internalUserDecider: InternalUserDecider,
          subscriptionManager: SubscriptionManager,
-         freemiumDBPUserStateManager: FreemiumDBPUserStateManager,
          freemiumDBPFeature: FreemiumDBPFeature,
          freemiumDBPPresenter: FreemiumDBPPresenter = DefaultFreemiumDBPPresenter(),
          appearancePreferences: AppearancePreferences = .shared,
@@ -96,7 +94,6 @@ final class MoreOptionsMenu: NSMenu {
         self.subscriptionFeatureAvailability = subscriptionFeatureAvailability
         self.internalUserDecider = internalUserDecider
         self.subscriptionManager = subscriptionManager
-        self.freemiumDBPUserStateManager = freemiumDBPUserStateManager
         self.freemiumDBPFeature = freemiumDBPFeature
         self.freemiumDBPPresenter = freemiumDBPPresenter
         self.appearancePreferences = appearancePreferences
@@ -274,13 +271,7 @@ final class MoreOptionsMenu: NSMenu {
 
     @MainActor
     @objc func openFreemiumDBP(_ sender: NSMenuItem) {
-
-        // TODO: Remove this
-        freemiumDBPUserStateManager.didOnboard = true
-        // ------
-
-        freemiumDBPPresenter.showFreemiumDBP(didOnboard: freemiumDBPUserStateManager.didOnboard, windowControllerManager: WindowControllersManager.shared)
-
+        freemiumDBPPresenter.showFreemiumDBPAndSetActivated(windowControllerManager: WindowControllersManager.shared)
         notificationCenter.post(name: .freemiumDBPEntryPointActivated, object: nil)
     }
 
