@@ -203,6 +203,7 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
 /// Could maybe even abstract a bunch of this code to be more generic re-usable styled list for use elsewhere.
 final class PasswordManagementItemListModel: ObservableObject {
     let passwordManagerCoordinator: PasswordManagerCoordinating
+    let syncPromoManager: SyncPromoManaging
 
     enum EmptyState {
         /// Displays nothing for the empty state. Used when data is still loading, or when filtering the All Items list.
@@ -239,6 +240,13 @@ final class PasswordManagementItemListModel: ObservableObject {
             updateFilteredData()
             calculateEmptyState()
         }
+    }
+
+    private var shouldDisplaySyncPromoRow: Bool {
+        syncPromoManager.shouldPresentPromoFor(.passwords) &&
+        (sortDescriptor.category == .allItems || sortDescriptor.category == .logins) &&
+        emptyState == .none &&
+        filter.isEmpty
     }
 
     @Published var sortDescriptor = SecureVaultSorting.default {
@@ -282,6 +290,13 @@ final class PasswordManagementItemListModel: ObservableObject {
             }
         }
     }
+    @Published var syncPromoSelected: Bool = false {
+        didSet {
+            if syncPromoSelected {
+                selected = nil
+            }
+        }
+    }
     @Published private(set) var emptyState: EmptyState = .none
     @Published var canChangeCategory: Bool = true
 
@@ -292,6 +307,7 @@ final class PasswordManagementItemListModel: ObservableObject {
     private static let randomColorsCount = 15
 
     init(passwordManagerCoordinator: PasswordManagerCoordinating,
+         syncPromoManager: SyncPromoManaging,
          urlMatcher: AutofillDomainNameUrlMatcher = AutofillDomainNameUrlMatcher(),
          tld: TLD = ContentBlocking.shared.tld,
          onItemSelected: @escaping (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void,
@@ -299,6 +315,7 @@ final class PasswordManagementItemListModel: ObservableObject {
         self.onItemSelected = onItemSelected
         self.onAddItemSelected = onAddItemSelected
         self.passwordManagerCoordinator = passwordManagerCoordinator
+        self.syncPromoManager = syncPromoManager
         self.urlMatcher = urlMatcher
         self.tld = tld
     }
@@ -318,6 +335,7 @@ final class PasswordManagementItemListModel: ObservableObject {
 
         if selected != nil {
             externalPasswordManagerSelected = false
+            syncPromoSelected = false
         }
 
         if notify {
@@ -415,9 +433,12 @@ final class PasswordManagementItemListModel: ObservableObject {
 
     func selectFirst() {
         selected = nil
+        syncPromoSelected = false
 
         if passwordManagerCoordinator.isEnabled && (sortDescriptor.category == .allItems || sortDescriptor.category == .logins) {
             externalPasswordManagerSelected = true
+        } else if shouldDisplaySyncPromoRow {
+            syncPromoSelected = true
         } else if let firstSection = displayedSections.first, let selectedItem = firstSection.items.first {
             selected(item: selectedItem)
         } else {

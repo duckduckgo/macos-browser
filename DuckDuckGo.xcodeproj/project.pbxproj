@@ -2728,6 +2728,12 @@
 		C16127EF2BDFB46400966BB9 /* DataImportShortcutsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C16127ED2BDFB46400966BB9 /* DataImportShortcutsView.swift */; };
 		C168B9AC2B31DC7E001AFAD9 /* AutofillNeverPromptWebsitesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C168B9AB2B31DC7E001AFAD9 /* AutofillNeverPromptWebsitesManager.swift */; };
 		C168B9AD2B31DC7F001AFAD9 /* AutofillNeverPromptWebsitesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C168B9AB2B31DC7E001AFAD9 /* AutofillNeverPromptWebsitesManager.swift */; };
+		C172E72F2C9329D300521D9A /* FlippedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C172E72E2C9329D300521D9A /* FlippedView.swift */; };
+		C172E7302C9329D300521D9A /* FlippedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C172E72E2C9329D300521D9A /* FlippedView.swift */; };
+		C172E7332C93759C00521D9A /* SyncPromoManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C172E7322C93759C00521D9A /* SyncPromoManagerTests.swift */; };
+		C172E7342C937FBA00521D9A /* SyncPromoManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C172E7322C93759C00521D9A /* SyncPromoManagerTests.swift */; };
+		C172E7372C93968E00521D9A /* SyncPromoPixelKitEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = C172E7362C93968E00521D9A /* SyncPromoPixelKitEvent.swift */; };
+		C172E7382C93968E00521D9A /* SyncPromoPixelKitEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = C172E7362C93968E00521D9A /* SyncPromoPixelKitEvent.swift */; };
 		C17CA7AD2B9B52E6008EC3C1 /* NavigationBarPopoversTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17CA7AC2B9B52E6008EC3C1 /* NavigationBarPopoversTests.swift */; };
 		C17CA7AE2B9B52E6008EC3C1 /* NavigationBarPopoversTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17CA7AC2B9B52E6008EC3C1 /* NavigationBarPopoversTests.swift */; };
 		C17CA7B22B9B5317008EC3C1 /* MockAutofillPopoverPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17CA7B12B9B5317008EC3C1 /* MockAutofillPopoverPresenter.swift */; };
@@ -2736,6 +2742,12 @@
 		C18BF9CE2C73678C00ED6B8A /* Freemium in Frameworks */ = {isa = PBXBuildFile; productRef = C18BF9CD2C73678C00ED6B8A /* Freemium */; };
 		C18BF9D02C736C9100ED6B8A /* Freemium in Frameworks */ = {isa = PBXBuildFile; productRef = C18BF9CF2C736C9100ED6B8A /* Freemium */; };
 		C18BF9D22C736C9700ED6B8A /* Freemium in Frameworks */ = {isa = PBXBuildFile; productRef = C18BF9D12C736C9700ED6B8A /* Freemium */; };
+		C1935A142C88F958001AD72D /* SyncPromoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1935A132C88F958001AD72D /* SyncPromoView.swift */; };
+		C1935A152C88F958001AD72D /* SyncPromoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1935A132C88F958001AD72D /* SyncPromoView.swift */; };
+		C1935A182C88F9D6001AD72D /* SyncPromoManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1935A172C88F9D6001AD72D /* SyncPromoManager.swift */; };
+		C1935A192C88F9D6001AD72D /* SyncPromoManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1935A172C88F9D6001AD72D /* SyncPromoManager.swift */; };
+		C1935A1B2C88F9ED001AD72D /* SyncPromoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1935A1A2C88F9ED001AD72D /* SyncPromoViewModel.swift */; };
+		C1935A1C2C88F9ED001AD72D /* SyncPromoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1935A1A2C88F9ED001AD72D /* SyncPromoViewModel.swift */; };
 		C1B1CBE12BE1915100B6049C /* DataImportShortcutsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B1CBE02BE1915100B6049C /* DataImportShortcutsViewModel.swift */; };
 		C1B1CBE22BE1915100B6049C /* DataImportShortcutsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B1CBE02BE1915100B6049C /* DataImportShortcutsViewModel.swift */; };
 		C1D8BE452C1739E70057E426 /* DataBrokerProtectionMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1D8BE442C1739E70057E426 /* DataBrokerProtectionMocks.swift */; };
@@ -4509,8 +4521,14 @@
 		C13909FA2B861039001626ED /* AutofillActionPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillActionPresenter.swift; sourceTree = "<group>"; };
 		C16127ED2BDFB46400966BB9 /* DataImportShortcutsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportShortcutsView.swift; sourceTree = "<group>"; };
 		C168B9AB2B31DC7E001AFAD9 /* AutofillNeverPromptWebsitesManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutofillNeverPromptWebsitesManager.swift; sourceTree = "<group>"; };
+		C172E72E2C9329D300521D9A /* FlippedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlippedView.swift; sourceTree = "<group>"; };
+		C172E7322C93759C00521D9A /* SyncPromoManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncPromoManagerTests.swift; sourceTree = "<group>"; };
+		C172E7362C93968E00521D9A /* SyncPromoPixelKitEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncPromoPixelKitEvent.swift; sourceTree = "<group>"; };
 		C17CA7AC2B9B52E6008EC3C1 /* NavigationBarPopoversTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarPopoversTests.swift; sourceTree = "<group>"; };
 		C17CA7B12B9B5317008EC3C1 /* MockAutofillPopoverPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAutofillPopoverPresenter.swift; sourceTree = "<group>"; };
+		C1935A132C88F958001AD72D /* SyncPromoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncPromoView.swift; sourceTree = "<group>"; };
+		C1935A172C88F9D6001AD72D /* SyncPromoManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncPromoManager.swift; sourceTree = "<group>"; };
+		C1935A1A2C88F9ED001AD72D /* SyncPromoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncPromoViewModel.swift; sourceTree = "<group>"; };
 		C1B1CBE02BE1915100B6049C /* DataImportShortcutsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportShortcutsViewModel.swift; sourceTree = "<group>"; };
 		C1D8BE442C1739E70057E426 /* DataBrokerProtectionMocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionMocks.swift; sourceTree = "<group>"; };
 		C1DAF3B42B9A44860059244F /* AutofillPopoverPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillPopoverPresenter.swift; sourceTree = "<group>"; };
@@ -5339,6 +5357,7 @@
 		3775913429AB99DA00E26367 /* Sync */ = {
 			isa = PBXGroup;
 			children = (
+				C1935A162C88F9AA001AD72D /* Promotion */,
 				566B73672BECBF4400FF1959 /* Utilities */,
 				377D801A2AB47FA1002AF251 /* SettingSyncHandlers */,
 				370A34B02AB24E3700C77F7C /* SyncDebugMenu.swift */,
@@ -6447,6 +6466,7 @@
 		5629846D2AC460DF00AC20EB /* Sync */ = {
 			isa = PBXGroup;
 			children = (
+				C172E7312C93757800521D9A /* Promotion */,
 				561D29BF2BDA7419007B91D0 /* Mocks */,
 				5629846E2AC4610100AC20EB /* SyncPreferencesTests.swift */,
 				5681ED3F2BDB955100F59729 /* SyncCredentialsAdapterTests.swift */,
@@ -6787,6 +6807,7 @@
 				8400DC4D2C6E2770006509D2 /* SteppedScrollView.swift */,
 				4BDFA4AD27BF19E500648192 /* ToggleableScrollView.swift */,
 				B693954526F04BEA0015B914 /* WindowDraggingView.swift */,
+				C172E72E2C9329D300521D9A /* FlippedView.swift */,
 			);
 			path = AppKit;
 			sourceTree = "<group>";
@@ -8909,6 +8930,14 @@
 			path = Tests;
 			sourceTree = "<group>";
 		};
+		C172E7312C93757800521D9A /* Promotion */ = {
+			isa = PBXGroup;
+			children = (
+				C172E7322C93759C00521D9A /* SyncPromoManagerTests.swift */,
+			);
+			path = Promotion;
+			sourceTree = "<group>";
+		};
 		C17CA7AF2B9B52EB008EC3C1 /* View */ = {
 			isa = PBXGroup;
 			children = (
@@ -8923,6 +8952,17 @@
 				C17CA7B12B9B5317008EC3C1 /* MockAutofillPopoverPresenter.swift */,
 			);
 			path = Mocks;
+			sourceTree = "<group>";
+		};
+		C1935A162C88F9AA001AD72D /* Promotion */ = {
+			isa = PBXGroup;
+			children = (
+				C1935A132C88F958001AD72D /* SyncPromoView.swift */,
+				C1935A172C88F9D6001AD72D /* SyncPromoManager.swift */,
+				C1935A1A2C88F9ED001AD72D /* SyncPromoViewModel.swift */,
+				C172E7362C93968E00521D9A /* SyncPromoPixelKitEvent.swift */,
+			);
+			path = Promotion;
 			sourceTree = "<group>";
 		};
 		C1D8BE422C1739BA0057E426 /* Mocks */ = {
@@ -10425,6 +10465,7 @@
 				3706FA8B293F65D500E42796 /* PreferencesRootView.swift in Sources */,
 				3706FA8C293F65D500E42796 /* AppStateChangedPublisher.swift in Sources */,
 				9FEE986E2B85BA17002E44E8 /* AddEditBookmarkDialogCoordinatorViewModel.swift in Sources */,
+				C1935A192C88F9D6001AD72D /* SyncPromoManager.swift in Sources */,
 				3706FA8D293F65D500E42796 /* BookmarkTableCellView.swift in Sources */,
 				3706FA8E293F65D500E42796 /* BookmarkManagementSidebarViewController.swift in Sources */,
 				7BD7B0022C19D3830039D20A /* VPNIPCResources.swift in Sources */,
@@ -10553,6 +10594,7 @@
 				1D36E65C298ACD2900AA485D /* AppIconChanger.swift in Sources */,
 				3706FAE9293F65D500E42796 /* PDFSearchTextMenuItemHandler.swift in Sources */,
 				3706FAEB293F65D500E42796 /* HistoryMenu.swift in Sources */,
+				C1935A1C2C88F9ED001AD72D /* SyncPromoViewModel.swift in Sources */,
 				84F1C8D02C7705B500716446 /* BookmarksBarMenuPopover.swift in Sources */,
 				3797C7A42C62C38800DA77FB /* HomePageSettingsModel.swift in Sources */,
 				3706FAEC293F65D500E42796 /* ContentScopeFeatureFlagging.swift in Sources */,
@@ -10657,6 +10699,7 @@
 				3706FB2C293F65D500E42796 /* UserDefaultsWrapper.swift in Sources */,
 				3706FB2D293F65D500E42796 /* PasswordManagementPopover.swift in Sources */,
 				3706FB2F293F65D500E42796 /* HomePageRecentlyVisitedModel.swift in Sources */,
+				C1935A152C88F958001AD72D /* SyncPromoView.swift in Sources */,
 				3707C718294B5D0F00682A9F /* AdClickAttributionTabExtension.swift in Sources */,
 				31EF1E812B63FFB800E6DB17 /* DataBrokerProtectionManager.swift in Sources */,
 				3706FEBA293F6EFF00E42796 /* BWStatus.swift in Sources */,
@@ -10744,6 +10787,7 @@
 				3706FB66293F65D500E42796 /* AppearancePreferences.swift in Sources */,
 				844D7DA52C9443EA00BE61D4 /* NSPrintInfoExtension.swift in Sources */,
 				3706FB67293F65D500E42796 /* DownloadListCoordinator.swift in Sources */,
+				C172E7382C93968E00521D9A /* SyncPromoPixelKitEvent.swift in Sources */,
 				3706FB68293F65D500E42796 /* NSNotificationName+Debug.swift in Sources */,
 				3706FB69293F65D500E42796 /* NavigationBarBadgeAnimationView.swift in Sources */,
 				1D39E5782C2BFD5700757339 /* ReleaseNotesTabExtension.swift in Sources */,
@@ -11215,6 +11259,7 @@
 				3706FC78293F65D500E42796 /* SecureVaultReporter.swift in Sources */,
 				3706FC79293F65D500E42796 /* NSImageExtensions.swift in Sources */,
 				3706FEBD293F6EFF00E42796 /* BWCommand.swift in Sources */,
+				C172E7302C9329D300521D9A /* FlippedView.swift in Sources */,
 				3706FC7B293F65D500E42796 /* PasswordManagementViewController.swift in Sources */,
 				CD2AB5C02C8222F20019EB49 /* PhishingDetection.swift in Sources */,
 				3706FC7C293F65D500E42796 /* ImportedBookmarks.swift in Sources */,
@@ -11367,6 +11412,7 @@
 				3706FE08293F661700E42796 /* WKWebsiteDataStoreExtensionTests.swift in Sources */,
 				3706FE09293F661700E42796 /* VariantManagerTests.swift in Sources */,
 				3706FE0A293F661700E42796 /* UserAgentTests.swift in Sources */,
+				C172E7342C937FBA00521D9A /* SyncPromoManagerTests.swift in Sources */,
 				3706FE0B293F661700E42796 /* AVCaptureDeviceMock.swift in Sources */,
 				9FBD84572BB3ACFD00220859 /* AttributionOriginFileProviderTests.swift in Sources */,
 				7B4C5CF62BE51D640007A164 /* VPNUninstallerTests.swift in Sources */,
@@ -11954,6 +12000,7 @@
 				B6E3E55B2BC0041900A41922 /* DownloadListStoreMock.swift in Sources */,
 				9FA5A0A52BC8F34900153786 /* UserDefaultsBookmarkFoldersStore.swift in Sources */,
 				B6C0B23026E61D630031CB7F /* DownloadListStore.swift in Sources */,
+				C1935A182C88F9D6001AD72D /* SyncPromoManager.swift in Sources */,
 				85799C1825DEBB3F0007EC87 /* Logger+Multiple.swift in Sources */,
 				AAC30A2E268F1EE300D2D9CD /* CrashReportPromptPresenter.swift in Sources */,
 				1D2DC00629016798008083A1 /* BWCredential.swift in Sources */,
@@ -12003,6 +12050,7 @@
 				4BF0E5122AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift in Sources */,
 				AA6EF9AD25066F42004754E6 /* WindowsManager.swift in Sources */,
 				1D43EB3A292B63B00065E5D6 /* BWRequest.swift in Sources */,
+				C172E7372C93968E00521D9A /* SyncPromoPixelKitEvent.swift in Sources */,
 				B684121C2B6A1D880092F66A /* ErrorPageHTMLTemplate.swift in Sources */,
 				B65C7DFB2B886CF0001E2D5C /* WKPDFHUDViewWrapper.swift in Sources */,
 				B68458CD25C7EB9000DC17B6 /* WKWebViewConfigurationExtensions.swift in Sources */,
@@ -12066,6 +12114,7 @@
 				1D6216B229069BBF00386B2C /* BWKeyStorage.swift in Sources */,
 				AA7E919F287872EA00AB6B62 /* VisitViewModel.swift in Sources */,
 				7BD7B0012C19D3830039D20A /* VPNIPCResources.swift in Sources */,
+				C1935A1B2C88F9ED001AD72D /* SyncPromoViewModel.swift in Sources */,
 				B6676BE12AA986A700525A21 /* AddressBarTextEditor.swift in Sources */,
 				B69B503B2726A12500758A2B /* Atb.swift in Sources */,
 				37A6A8F12AFCC988008580A3 /* FaviconsFetcherOnboarding.swift in Sources */,
@@ -12277,6 +12326,7 @@
 				B6B1E88B26D774090062C350 /* LinkButton.swift in Sources */,
 				4BBF0915282DD40100EE1418 /* TemporaryFileHandler.swift in Sources */,
 				B602E8162A1E2570006D261F /* URL+NetworkProtection.swift in Sources */,
+				C1935A142C88F958001AD72D /* SyncPromoView.swift in Sources */,
 				CB6BCDF927C6BEFF00CC76DC /* PrivacyFeatures.swift in Sources */,
 				378F44EB29B4C73E00899924 /* ViewExtension.swift in Sources */,
 				B6DB3CF926A00E2D00D459B7 /* AVCaptureDevice+SwizzledAuthState.swift in Sources */,
@@ -12400,6 +12450,7 @@
 				4B02198925E05FAC00ED7DEA /* FireproofingURLExtensions.swift in Sources */,
 				3168506D2AF3AD1D009A2828 /* WaitlistViewControllerPresenter.swift in Sources */,
 				7B1E819E27C8874900FF0E60 /* ContentOverlayPopover.swift in Sources */,
+				C172E72F2C9329D300521D9A /* FlippedView.swift in Sources */,
 				3154FD1428E6011A00909769 /* TabShadowView.swift in Sources */,
 				1D43EB3C292B664A0065E5D6 /* BWMessageIdGenerator.swift in Sources */,
 				B6E6B9E32BA1F5F1008AA7E1 /* FilePresenter.swift in Sources */,
@@ -12998,6 +13049,7 @@
 				B63ED0DC26AE7B1E00A9DAD1 /* WebViewMock.swift in Sources */,
 				56A053FF2C1AEFA1007D8FAB /* OnboardingManagerTests.swift in Sources */,
 				4B4F72EC266B2ED300814C60 /* CollectionExtension.swift in Sources */,
+				C172E7332C93759C00521D9A /* SyncPromoManagerTests.swift in Sources */,
 				31D5CE662C89ABC200BCB0D7 /* DuckPlayerExperimentDatePixelsUtilitiesTests.swift in Sources */,
 				AAE39D1B24F44885008EF28B /* TabCollectionViewModelDelegateMock.swift in Sources */,
 				9F0A2CF82B96A58600C5B8C0 /* BaseBookmarkEntityTests.swift in Sources */,
