@@ -1,7 +1,7 @@
 //
-//  DBPMocks.swift
+//  DBPAgentConfigurationURLProvider.swift
 //
-//  Copyright © 2023 DuckDuckGo. All rights reserved.
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -18,19 +18,12 @@
 
 import Foundation
 import BrowserServicesKit
+import Configuration
 
-final class MockDomainsProtectionStore: DomainsProtectionStore {
-    var unprotectedDomains = Set<String>()
+struct DBPAgentConfigurationURLProvider: ConfigurationURLProviding {
+    func url(for configuration: Configuration) -> URL {
+        guard configuration == .privacyConfiguration else { fatalError("\(configuration.rawValue) is not supported on this target") }
 
-    func disableProtection(forDomain domain: String) {
-        unprotectedDomains.insert(domain)
+        return URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/config/v4/macos-config.json")!
     }
-
-    func enableProtection(forDomain domain: String) {
-        unprotectedDomains.remove(domain)
-    }
-}
-
-final class InternalUserDeciderStoreMock: InternalUserStoring {
-    var isInternalUser: Bool = false
 }

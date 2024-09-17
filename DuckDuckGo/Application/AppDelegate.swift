@@ -98,6 +98,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     public let vpnSettings = VPNSettings(defaults: .netP)
 
+    var configurationStore = ConfigurationStore()
+    var configurationManager: ConfigurationManager
+
     // MARK: - VPN
 
     private var networkProtectionSubscriptionEventHandler: NetworkProtectionSubscriptionEventHandler?
@@ -174,6 +177,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let internalUserDeciderStore = InternalUserDeciderStore(fileStore: fileStore)
         internalUserDecider = DefaultInternalUserDecider(store: internalUserDeciderStore)
 
+        configurationManager = ConfigurationManager(store: configurationStore)
+
         if NSApplication.runType.requiresEnvironment {
             Self.configurePixelKit()
 
@@ -221,10 +226,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #if DEBUG
         AppPrivacyFeatures.shared = NSApplication.runType.requiresEnvironment
         // runtime mock-replacement for Unit Tests, to be redone when we‘ll be doing Dependency Injection
-        ? AppPrivacyFeatures(contentBlocking: AppContentBlocking(internalUserDecider: internalUserDecider), database: Database.shared)
+        ? AppPrivacyFeatures(contentBlocking: AppContentBlocking(internalUserDecider: internalUserDecider, configurationStore: configurationStore), database: Database.shared)
         : AppPrivacyFeatures(contentBlocking: ContentBlockingMock(), httpsUpgradeStore: HTTPSUpgradeStoreMock())
 #else
-        AppPrivacyFeatures.shared = AppPrivacyFeatures(contentBlocking: AppContentBlocking(internalUserDecider: internalUserDecider), database: Database.shared)
+        AppPrivacyFeatures.shared = AppPrivacyFeatures(contentBlocking: AppContentBlocking(internalUserDecider: internalUserDecider, configurationStore: configurationStore), database: Database.shared)
 #endif
         if NSApplication.runType.requiresEnvironment {
             remoteMessagingClient = RemoteMessagingClient(
@@ -233,7 +238,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 appearancePreferences: .shared,
                 pinnedTabsManager: pinnedTabsManager,
                 internalUserDecider: internalUserDecider,
-                configurationStore: ConfigurationStore.shared,
+                configurationStore: configurationStore,
                 remoteMessagingAvailabilityProvider: PrivacyConfigurationRemoteMessagingAvailabilityProvider(
                     privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager
                 )
@@ -310,7 +315,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if case .normal = NSApp.runType {
             FaviconManager.shared.loadFavicons()
         }
-        ConfigurationManager.shared.start()
+        configurationManager.start()
         _ = DownloadListCoordinator.shared
         _ = RecentlyClosedCoordinator.shared
 

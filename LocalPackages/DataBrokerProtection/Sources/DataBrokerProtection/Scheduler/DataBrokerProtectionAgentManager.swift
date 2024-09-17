@@ -17,8 +17,10 @@
 //
 
 import Foundation
+import Combine
 import Common
 import BrowserServicesKit
+import Configuration
 import PixelKit
 import os.log
 
@@ -32,7 +34,13 @@ public class DataBrokerProtectionAgentManagerProvider {
         let activityScheduler = DefaultDataBrokerProtectionBackgroundActivityScheduler(config: executionConfig)
 
         let notificationService = DefaultDataBrokerProtectionUserNotificationService(pixelHandler: pixelHandler)
-        let privacyConfigurationManager = PrivacyConfigurationManagingMock() // Forgive me, for I have sinned
+        Configuration.setURLProvider(DBPAgentConfigurationURLProvider())
+        let configStore = ConfigurationStore()
+        let privacyConfigurationManager = DBPPrivacyConfigurationManager()
+        let configurationManager = ConfigurationManager(privacyConfigManager: privacyConfigurationManager, store: configStore)
+        configurationManager.start()
+        // Load cached config (if any)
+        privacyConfigurationManager.reload(etag: configStore.loadEtag(for: .privacyConfiguration), data: configStore.loadData(for: .privacyConfiguration))
         let ipcServer = DefaultDataBrokerProtectionIPCServer(machServiceName: Bundle.main.bundleIdentifier!)
 
         let features = ContentScopeFeatureToggles(emailProtection: false,
@@ -95,7 +103,9 @@ public class DataBrokerProtectionAgentManagerProvider {
             dataManager: dataManager,
             operationDependencies: operationDependencies,
             pixelHandler: pixelHandler,
-            agentStopper: agentstopper)
+            agentStopper: agentstopper,
+            configurationManager: configurationManager,
+            privacyConfigurationManager: privacyConfigurationManager)
     }
 }
 
@@ -109,11 +119,15 @@ public final class DataBrokerProtectionAgentManager {
     private let operationDependencies: DataBrokerOperationDependencies
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let agentStopper: DataBrokerProtectionAgentStopper
+    private let configurationManger: DefaultConfigurationManager
+    private let privacyConfigurationManager: DBPPrivacyConfigurationManager
 
     // Used for debug functions only, so not injected
     private lazy var browserWindowManager = BrowserWindowManager()
 
     private var didStartActivityScheduler = false
+
+    private var configurationSubscription: AnyCancellable?
 
     init(userNotificationService: DataBrokerProtectionUserNotificationService,
          activityScheduler: DataBrokerProtectionBackgroundActivityScheduler,
@@ -122,7 +136,9 @@ public final class DataBrokerProtectionAgentManager {
          dataManager: DataBrokerProtectionDataManaging,
          operationDependencies: DataBrokerOperationDependencies,
          pixelHandler: EventMapping<DataBrokerProtectionPixels>,
-         agentStopper: DataBrokerProtectionAgentStopper
+         agentStopper: DataBrokerProtectionAgentStopper,
+         configurationManager: DefaultConfigurationManager,
+         privacyConfigurationManager: DBPPrivacyConfigurationManager
     ) {
         self.userNotificationService = userNotificationService
         self.activityScheduler = activityScheduler
@@ -132,6 +148,8 @@ public final class DataBrokerProtectionAgentManager {
         self.operationDependencies = operationDependencies
         self.pixelHandler = pixelHandler
         self.agentStopper = agentStopper
+        self.configurationManger = configurationManager
+        self.privacyConfigurationManager = privacyConfigurationManager
 
         self.activityScheduler.delegate = self
         self.ipcServer.serverDelegate = self
@@ -154,6 +172,13 @@ public final class DataBrokerProtectionAgentManager {
             /// Monitors entitlement changes every 60 minutes to optimize system performance and resource utilization by avoiding unnecessary operations when entitlement is invalid.
             /// While keeping the agent active with invalid entitlement has no significant risk, setting the monitoring interval at 60 minutes is a good balance to minimize backend checks.
             agentStopper.monitorEntitlementAndStopAgentIfEntitlementIsInvalid(interval: .minutes(60))
+
+            configurationSubscription = privacyConfigurationManager.updatesPublisher
+                .sink { [weak self] _ in
+                    if self?.privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(BackgroundAgentPixelTestSubfeature.pixelTest) ?? false {
+                        PixelKit.fire(DataBrokerProtectionPixels.pixelTest, frequency: .daily)
+                    }
+                }
         }
     }
 }
