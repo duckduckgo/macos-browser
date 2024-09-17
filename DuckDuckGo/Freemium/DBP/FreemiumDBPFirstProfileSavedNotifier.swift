@@ -23,7 +23,7 @@ import Subscription
 import OSLog
 
 /// A concrete implementation of the `DBPProfileSavedNotifier` protocol that handles posting the "Profile Saved" notification
-/// for Freemium users based on their onboarding status, authentication state, and if this is their first saved profile. This class ensures the notification is posted only once.
+/// for Freemium users based on their Freemium activation state, authentication state, and if this is their first saved profile. This class ensures the notification is posted only once.
 final class FreemiumDBPFirstProfileSavedNotifier: DBPProfileSavedNotifier {
 
     private var freemiumDBPUserStateManager: FreemiumDBPUserStateManager
@@ -44,13 +44,13 @@ final class FreemiumDBPFirstProfileSavedNotifier: DBPProfileSavedNotifier {
 
     /// Posts the "Profile Saved" notification if the following conditions are met:
     /// - The user is not authenticated
-    /// - The user has completed the freemium onboarding process.
+    /// - The user has activated Freemium (i.e accessed the feature).
     /// - The "Profile Saved" notification has not already been posted.
     ///
     /// If all conditions are met, the method posts a `pirProfileSaved` notification via the `NotificationCenter` and records that the notification has been posted.
     func postProfileSavedNotificationIfPermitted() {
         guard !accountManager.isUserAuthenticated
-                && freemiumDBPUserStateManager.didOnboard
+                && freemiumDBPUserStateManager.didActivate
                 && !freemiumDBPUserStateManager.didPostFirstProfileSavedNotification else { return }
 
         Logger.freemiumDBP.debug("[Freemium DBP] Posting Profile Saved Notification")

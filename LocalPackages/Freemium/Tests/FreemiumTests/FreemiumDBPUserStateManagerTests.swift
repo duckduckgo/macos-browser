@@ -22,7 +22,7 @@ import XCTest
 final class FreemiumDBPUserStateManagerTests: XCTestCase {
 
     private enum Keys {
-        static let didOnboard = "macos.browser.freemium.dbp.did.onboard"
+        static let didActivate = "macos.browser.freemium.dbp.did.activate"
         static let didPostFirstProfileSavedNotification = "macos.browser.freemium.dbp.did.post.first.profile.saved.notification"
         static let didPostResultsNotification = "macos.browser.freemium.dbp.did.post.results.notification"
         static let didDismissHomePagePromotion = "macos.browser.freemium.dbp.did.post.dismiss.home.page.promotion"
@@ -37,27 +37,27 @@ final class FreemiumDBPUserStateManagerTests: XCTestCase {
         testUserDefaults.removePersistentDomain(forName: FreemiumDBPUserStateManagerTests.testSuiteName)
     }
 
-    func testSetsDidOnboard() throws {
+    func testSetsdidActivate() throws {
         // Given
         let sut = DefaultFreemiumDBPUserStateManager(userDefaults: testUserDefaults)
-        XCTAssertFalse(testUserDefaults.bool(forKey: Keys.didOnboard))
+        XCTAssertFalse(testUserDefaults.bool(forKey: Keys.didActivate))
 
         // When
-        sut.didOnboard = true
+        sut.didActivate = true
 
         // Then
-        XCTAssertTrue(testUserDefaults.bool(forKey: Keys.didOnboard))
+        XCTAssertTrue(testUserDefaults.bool(forKey: Keys.didActivate))
     }
 
-    func testGetsDidOnboard() throws {
+    func testGetsdidActivate() throws {
         // Given
         let sut = DefaultFreemiumDBPUserStateManager(userDefaults: testUserDefaults)
-        XCTAssertFalse(sut.didOnboard)
-        testUserDefaults.setValue(true, forKey: Keys.didOnboard)
-        XCTAssertTrue(testUserDefaults.bool(forKey: Keys.didOnboard))
+        XCTAssertFalse(sut.didActivate)
+        testUserDefaults.setValue(true, forKey: Keys.didActivate)
+        XCTAssertTrue(testUserDefaults.bool(forKey: Keys.didActivate))
 
         // When
-        let result = sut.didOnboard
+        let result = sut.didActivate
 
         // Then
         XCTAssertTrue(result)
@@ -206,7 +206,7 @@ final class FreemiumDBPUserStateManagerTests: XCTestCase {
     func testResetAllStateResetsAllProperties() {
         // Given
         let sut = DefaultFreemiumDBPUserStateManager(userDefaults: testUserDefaults)
-        sut.didOnboard = true
+        sut.didActivate = true
         sut.firstProfileSavedTimestamp = "2024-01-01T12:00:00Z"
         sut.didPostFirstProfileSavedNotification = true
         sut.didPostResultsNotification = true
@@ -218,7 +218,7 @@ final class FreemiumDBPUserStateManagerTests: XCTestCase {
         sut.resetAllState()
 
         // Then
-        XCTAssertFalse(sut.didOnboard)
+        XCTAssertFalse(sut.didActivate)
         XCTAssertNil(sut.firstProfileSavedTimestamp)
         XCTAssertFalse(sut.didPostFirstProfileSavedNotification)
         XCTAssertFalse(sut.didPostResultsNotification)
