@@ -848,6 +848,7 @@ extension BookmarkListViewController {
 
         documentView.translatesAutoresizingMaskIntoConstraints = false
         syncPromoViewHostingView.translatesAutoresizingMaskIntoConstraints = false
+        syncPromoViewHostingView.setContentHuggingPriority(.required, for: .vertical)
 
         setupSyncPromoLayout()
     }
