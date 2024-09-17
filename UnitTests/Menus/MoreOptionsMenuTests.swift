@@ -40,7 +40,6 @@ final class MoreOptionsMenuTests: XCTestCase {
 
     private var mockFreemiumDBPPresenter = MockFreemiumDBPPresenter()
     private var mockFreemiumDBPFeature: MockFreemiumDBPFeature!
-    private var mockFreemiumDBPUserStateManager = MockFreemiumDBPUserStateManager()
     private var mockNotificationCenter: MockNotificationCenter!
 
     var moreOptionsMenu: MoreOptionsMenu!
@@ -94,7 +93,6 @@ final class MoreOptionsMenuTests: XCTestCase {
                                           sharingMenu: NSMenu(),
                                           internalUserDecider: internalUserDecider,
                                           subscriptionManager: subscriptionManager,
-                                          freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager,
                                           freemiumDBPFeature: mockFreemiumDBPFeature,
                                           freemiumDBPPresenter: mockFreemiumDBPPresenter,
                                           notificationCenter: mockNotificationCenter)
@@ -208,12 +206,11 @@ final class MoreOptionsMenuTests: XCTestCase {
     }
 
     @MainActor
-    func testWhenClickingFreemiumDBPOptionAndDidNotOnboardThenFreemiumPresenterIsCalledWithDidNotOnboardStateAndNotificationIsPosted() throws {
+    func testWhenClickingFreemiumDBPOptionThenFreemiumPresenterIsCalledAndNotificationIsPosted() throws {
         // Given
         subscriptionManager.canPurchase = true
         subscriptionManager.currentEnvironment = SubscriptionEnvironment(serviceEnvironment: .production, purchasePlatform: .stripe)
         mockFreemiumDBPFeature.featureAvailable = true
-        mockFreemiumDBPUserStateManager.didOnboard = false
         setupMoreOptionsMenu()
 
         let freemiumItemIndex = try XCTUnwrap(moreOptionsMenu.indexOfItem(withTitle: UserText.freemiumDBPOptionsMenuItem))
@@ -226,28 +223,7 @@ final class MoreOptionsMenuTests: XCTestCase {
         XCTAssertTrue(mockNotificationCenter.didCallPostNotification)
         XCTAssertEqual(mockNotificationCenter.lastPostedNotification, .freemiumDBPEntryPointActivated)
     }
-
-    @MainActor
-    func testWhenClickingFreemiumDBPOptionAndDidOnboardThenFreemiumPresenterIsCalledWithDidOnboardStateAndNotificationIsPosted() throws {
-        // Given
-        subscriptionManager.canPurchase = true
-        subscriptionManager.currentEnvironment = SubscriptionEnvironment(serviceEnvironment: .production, purchasePlatform: .stripe)
-        mockFreemiumDBPFeature.featureAvailable = true
-        mockFreemiumDBPUserStateManager.didOnboard = true
-        setupMoreOptionsMenu()
-
-        let freemiumItemIndex = try XCTUnwrap(moreOptionsMenu.indexOfItem(withTitle: UserText.freemiumDBPOptionsMenuItem))
-
-        // When
-        moreOptionsMenu.performActionForItem(at: freemiumItemIndex)
-
-        // Then
-        XCTAssertTrue(mockFreemiumDBPPresenter.didCallShowFreemium)
-        XCTAssertTrue(mockFreemiumDBPPresenter.didOnboardState)
-        XCTAssertTrue(mockNotificationCenter.didCallPostNotification)
-        XCTAssertEqual(mockNotificationCenter.lastPostedNotification, .freemiumDBPEntryPointActivated)
-    }
-
+    
     // MARK: Zoom
 
     @MainActor
