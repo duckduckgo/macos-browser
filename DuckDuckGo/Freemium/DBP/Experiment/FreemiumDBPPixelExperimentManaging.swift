@@ -22,7 +22,7 @@ import OSLog
 
 /// Protocol defining the interface for managing Freemium DBP pixel experiments.
 protocol FreemiumDBPPixelExperimentManaging {
-    
+
     /// Property indicating if the user is in the treatment cohort or not
     var isTreatment: Bool { get }
 

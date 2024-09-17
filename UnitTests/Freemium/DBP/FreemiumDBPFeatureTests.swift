@@ -459,6 +459,6 @@ final class MockFreemiumDBPExperimentManager: FreemiumDBPPixelExperimentManaging
     var isTreatment = false
 
     var pixelParameters: [String: String]?
-    
+
     func assignUserToCohort() {}
 }

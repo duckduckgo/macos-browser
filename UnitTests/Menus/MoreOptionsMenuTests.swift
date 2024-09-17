@@ -223,7 +223,7 @@ final class MoreOptionsMenuTests: XCTestCase {
         XCTAssertTrue(mockNotificationCenter.didCallPostNotification)
         XCTAssertEqual(mockNotificationCenter.lastPostedNotification, .freemiumDBPEntryPointActivated)
     }
-    
+
     // MARK: Zoom
 
     @MainActor
