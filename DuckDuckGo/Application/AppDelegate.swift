@@ -449,9 +449,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         if !FileDownloadManager.shared.downloads.isEmpty {
             // if there‘re downloads without location chosen yet (save dialog should display) - ignore them
-            if FileDownloadManager.shared.downloads.contains(where: { $0.state.isDownloading }) {
+            let activeDownloads = Set(FileDownloadManager.shared.downloads.filter { $0.state.isDownloading })
+            if !activeDownloads.isEmpty {
                 let alert = NSAlert.activeDownloadsTerminationAlert(for: FileDownloadManager.shared.downloads)
-                if alert.runModal() == .cancel {
+                let downloadsFinishedCancellable = FileDownloadManager.observeDownloadsFinished(activeDownloads) {
+                    // close alert and burn the window when all downloads finished
+                    NSApp.stopModal(withCode: .OK)
+                }
+                let response = alert.runModal()
+                downloadsFinishedCancellable.cancel()
+                if response == .cancel {
                     return .terminateCancel
                 }
             }

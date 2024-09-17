@@ -24,19 +24,19 @@ import os.log
 @MainActor
 final class DownloadListViewModel {
 
-    private let burnerWindowSession: BurnerWindowSession?
+    private let fireWindowSession: FireWindowSessionRef?
     private let coordinator: DownloadListCoordinator
     private var viewModels: [UUID: DownloadViewModel]
     private var cancellable: AnyCancellable?
 
     @Published private(set) var items: [DownloadViewModel]
 
-    init(burnerWindowSession: BurnerWindowSession?, coordinator: DownloadListCoordinator = DownloadListCoordinator.shared) {
-        self.burnerWindowSession = burnerWindowSession
+    init(fireWindowSession: FireWindowSessionRef?, coordinator: DownloadListCoordinator = DownloadListCoordinator.shared) {
+        self.fireWindowSession = fireWindowSession
         self.coordinator = coordinator
 
         let items = coordinator.downloads(sortedBy: \.added, ascending: false)
-            .filter { $0.burnerWindowSession == burnerWindowSession }
+            .filter { $0.fireWindowSession == fireWindowSession }
             .map(DownloadViewModel.init)
         self.items = items
         self.viewModels = items.reduce(into: [:]) { $0[$1.id] = $1 }
@@ -51,7 +51,7 @@ final class DownloadListViewModel {
         dispatchPrecondition(condition: .onQueue(.main))
         switch kind {
         case .added:
-            guard item.burnerWindowSession == self.burnerWindowSession else { return }
+            guard item.fireWindowSession == self.fireWindowSession else { return }
 
             let viewModel = DownloadViewModel(item: item)
             self.viewModels[item.identifier] = viewModel
@@ -66,7 +66,7 @@ final class DownloadListViewModel {
     }
 
     func cleanupInactiveDownloads() {
-        coordinator.cleanupInactiveDownloads(for: burnerWindowSession)
+        coordinator.cleanupInactiveDownloads(for: fireWindowSession)
     }
 
     func cancelDownload(at index: Int) {

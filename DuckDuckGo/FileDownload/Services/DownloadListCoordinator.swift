@@ -37,34 +37,6 @@ private func getFirstAvailableWebView() -> WKWebView? {
     return tab.webView
 }
 
-struct BurnerWindowSession: Hashable {
-    private weak var window: NSWindow?
-    private let identifier: ObjectIdentifier
-
-    var isActive: Bool {
-        window?.isVisible == true
-    }
-
-    init?(isBurner: Bool, window: NSWindow?) {
-        guard isBurner, let window else { return nil }
-        self.window = window
-        self.identifier = ObjectIdentifier(window)
-    }
-
-    public func onBurn(_ burnHandler: @escaping () -> Void) {
-        guard let window else { return }
-        window.onDeinit(burnHandler)
-    }
-
-    static func == (lhs: BurnerWindowSession, rhs: BurnerWindowSession) -> Bool {
-        lhs.identifier == rhs.identifier
-    }
-
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(identifier)
-    }
-}
-
 final class DownloadListCoordinator {
     static let shared = DownloadListCoordinator()
 
@@ -77,7 +49,7 @@ final class DownloadListCoordinator {
     private var downloadsCancellable: AnyCancellable?
     private var downloadTaskCancellables = [WebKitDownloadTask: AnyCancellable]()
     private var taskProgressCancellables = [WebKitDownloadTask: Set<AnyCancellable>]()
-    private var burnerWindowSessions = Set<BurnerWindowSession>()
+    @MainActor private var fireWindowSessions = Set<FireWindowSessionRef>()
 
     private var filePresenters = [UUID: (destination: FilePresenter?, tempFile: FilePresenter?)]()
     private var filePresenterCancellables = [UUID: Set<AnyCancellable>]()
@@ -93,7 +65,8 @@ final class DownloadListCoordinator {
     }
     private let updatesSubject = PassthroughSubject<Update, Never>()
 
-    let progress = Progress()
+    private let regularWindowDownloadProgress = Progress()
+    @MainActor private var fireWindowSessionsProgress = [FireWindowSessionRef: Progress]()
 
     init(store: DownloadListStoring = DownloadListStore(),
          downloadManager: FileDownloadManagerProtocol = FileDownloadManager.shared,
@@ -259,15 +232,15 @@ final class DownloadListCoordinator {
                 }
             }
 
-        self.subscribeToProgress(of: task)
-
-        if let burnerWindowSession = task.burnerWindowSession,
-           case (inserted: true, _) = self.burnerWindowSessions.insert(burnerWindowSession) {
+        if let fireWindowSession = task.fireWindowSession,
+           case (inserted: true, _) = self.fireWindowSessions.insert(fireWindowSession) {
             // remove inactive items when the burner window is closed
-            burnerWindowSession.onBurn { [weak self] in
-                self?.cleanupBurnerWindowItems(for: burnerWindowSession)
+            fireWindowSession.onBurn { [weak self] in
+                self?.clearBurnerWindowItems(for: fireWindowSession)
             }
         }
+
+        self.subscribeToProgress(of: task)
     }
 
     @MainActor
@@ -347,15 +320,28 @@ final class DownloadListCoordinator {
         return false
     }
 
+    @MainActor
+    func combinedDownloadProgressCreatingIfNeeded(for fireWindowSession: FireWindowSessionRef?) -> Progress {
+        guard let fireWindowSession else { return regularWindowDownloadProgress }
+
+        return fireWindowSessionsProgress[fireWindowSession] ?? {
+            let progress = Progress()
+            fireWindowSessionsProgress[fireWindowSession] = progress
+            return progress
+        }()
+    }
+
+    @MainActor
     private func subscribeToProgress(of task: WebKitDownloadTask) {
         dispatchPrecondition(condition: .onQueue(.main))
 
         var lastKnownProgress = (total: Int64(0), completed: Int64(0))
+        let progress = self.combinedDownloadProgressCreatingIfNeeded(for: task.fireWindowSession)
         task.progress.publisher(for: \.totalUnitCount)
             .combineLatest(task.progress.publisher(for: \.completedUnitCount))
             .throttle(for: 0.2, scheduler: DispatchQueue.main, latest: true)
-            .sink { [weak self] (total, completed) in
-                guard let self = self, total > 0, completed > 0 else { return }
+            .sink { (total, completed) in
+                guard total > 0, completed > 0 else { return }
 
                 progress.totalUnitCount += (total - lastKnownProgress.total)
                 progress.completedUnitCount += (completed - lastKnownProgress.completed)
@@ -382,8 +368,8 @@ final class DownloadListCoordinator {
         self.downloadTaskCancellables[task] = nil
 
         return updateItem(withId: initialItem.identifier) { item in
-            if let burnerWindowSession = (item ?? initialItem).burnerWindowSession,
-               !burnerWindowSession.isActive {
+            if let fireWindowSession = (item ?? initialItem).fireWindowSession,
+               !fireWindowSession.isActive {
                 // remove finished downloads from the list instantly for downloads in already closed burner window
                 item = nil
                 return
@@ -434,7 +420,6 @@ final class DownloadListCoordinator {
             filePresenters[item.identifier] = nil
             filePresenterCancellables[item.identifier] = nil
             store.remove(item)
-
         }
         return modified
     }
@@ -476,7 +461,7 @@ final class DownloadListCoordinator {
                 } else {
                     .auto
                 }
-                let task = self.downloadManager.add(download, burnerWindowSession: item.burnerWindowSession, destination: destination)
+                let task = self.downloadManager.add(download, fireWindowSession: item.fireWindowSession, destination: destination)
                 self.subscribeToDownloadTask(task, updating: item)
             }
         }
@@ -484,8 +469,11 @@ final class DownloadListCoordinator {
 
     // MARK: interface
 
-    var hasActiveDownloads: Bool {
-        !downloadTaskCancellables.isEmpty
+    func hasActiveDownloads(for fireWindowSession: FireWindowSessionRef?) -> Bool {
+        for task in downloadTaskCancellables.keys where task.fireWindowSession == fireWindowSession {
+            return true
+        }
+        return false
     }
 
     var isEmpty: Bool {
@@ -542,33 +530,24 @@ final class DownloadListCoordinator {
         }
     }
 
-    enum CleanupSessionBurnerWindowPredicate {
-        case all, burnerWindowSession(_ burnerWindowSession: BurnerWindowSession?)
-        func matches(_ burnerWindowSession: BurnerWindowSession?) -> Bool {
-            switch self {
-            case .all, .burnerWindowSession(burnerWindowSession): return true
-            case .burnerWindowSession: return false
-            }
-        }
-    }
-
     @MainActor
-    func cleanupInactiveDownloads(for burnerWindowSession: BurnerWindowSession?) {
-        cleanupInactiveDownloads(for: .burnerWindowSession(burnerWindowSession))
-    }
-
-    @MainActor
-    func cleanupInactiveDownloads(for predicate: CleanupSessionBurnerWindowPredicate) {
+    func cleanupInactiveDownloads(for fireWindowSession: FireWindowSessionRef?) {
         Logger.fileDownload.debug("coordinator: cleanupInactiveDownloads")
 
-        for (id, item) in self.items where predicate.matches(item.burnerWindowSession) && item.progress == nil {
+        for (id, item) in self.items where item.fireWindowSession == fireWindowSession && item.progress == nil {
             remove(downloadWithIdentifier: id)
         }
     }
 
     @MainActor
-    private func cleanupBurnerWindowItems(for burnerWindowSession: BurnerWindowSession) {
-        cleanupInactiveDownloads(for: burnerWindowSession)
+    private func clearBurnerWindowItems(for fireWindowSession: FireWindowSessionRef) {
+        Logger.fileDownload.debug("coordinator: cleanup Fire Window Downloads")
+
+        for (id, item) in self.items where item.fireWindowSession == fireWindowSession {
+            item.progress?.cancel()
+            remove(downloadWithIdentifier: id)
+        }
+        fireWindowSessionsProgress[fireWindowSession] = nil
     }
 
     @MainActor
@@ -622,7 +601,7 @@ private extension DownloadListItem {
                   websiteURL: task.originalRequest?.mainDocumentURL,
                   fileName: "",
                   progress: task.progress,
-                  burnerWindowSession: task.burnerWindowSession,
+                  fireWindowSession: task.fireWindowSession,
                   error: nil)
     }
 

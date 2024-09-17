@@ -486,7 +486,7 @@ extension DownloadsViewController: NSTableViewDataSource, NSTableViewDelegate {
     store.fetchBlock = { completion in
         completion(.success(previewDownloadListItems))
     }
-    let viewModel = DownloadListViewModel(burnerWindowSession: nil, coordinator: DownloadListCoordinator(store: store))
+    let viewModel = DownloadListViewModel(fireWindowSession: nil, coordinator: DownloadListCoordinator(store: store))
     return DownloadsViewController(viewModel: viewModel)
 }() }
 #endif

@@ -143,6 +143,7 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
         }
     }
 
+    @MainActor
     func toggleDownloadsPopover(from button: MouseOverButton, popoverDelegate: NSPopoverDelegate, downloadsDelegate: DownloadsViewControllerDelegate) {
         if downloadsPopover?.isShown ?? false {
             downloadsPopover?.close()
@@ -151,7 +152,7 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
         guard closeTransientPopovers(),
               button.window != nil else { return }
 
-        let popover = DownloadsPopover(burnerWindowSession: BurnerWindowSession(isBurner: isBurner, window: button.window))
+        let popover = DownloadsPopover(fireWindowSession: FireWindowSessionRef(window: button.window))
         popover.delegate = popoverDelegate
         popover.viewController.delegate = downloadsDelegate
         downloadsPopover = popover
@@ -168,6 +169,7 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
     }
 
     private var downloadsPopoverTimer: Timer?
+    @MainActor
     func showDownloadsPopoverAndAutoHide(from button: MouseOverButton, popoverDelegate: NSPopoverDelegate, downloadsDelegate: DownloadsViewControllerDelegate) {
         let timerBlock: (Timer) -> Void = { [weak self] _ in
             self?.downloadsPopoverTimer?.invalidate()

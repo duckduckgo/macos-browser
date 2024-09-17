@@ -69,7 +69,7 @@ final class FileDownloadManagerTests: XCTestCase {
         }
 
         let download = WKDownloadMock(url: .duckDuckGo)
-        dm.add(download, burnerWindowSession: nil, delegate: nil, destination: .auto)
+        dm.add(download, fireWindowSession: nil, delegate: nil, destination: .auto)
 
         withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 0.3)
@@ -84,7 +84,7 @@ final class FileDownloadManagerTests: XCTestCase {
         }
 
         let download = WKDownloadMock(url: .duckDuckGo)
-        dm.add(download, burnerWindowSession: nil, delegate: nil, destination: .auto)
+        dm.add(download, fireWindowSession: nil, delegate: nil, destination: .auto)
 
         struct TestError: Error {}
         download.delegate?.download!(download.asWKDownload(), didFailWithError: TestError(), resumeData: nil)
@@ -104,7 +104,7 @@ final class FileDownloadManagerTests: XCTestCase {
 
         let download = WKDownloadMock(url: .duckDuckGo)
         let tempURL = fm.temporaryDirectory.appendingPathComponent("download")
-        dm.add(download, burnerWindowSession: nil, delegate: nil, destination: .preset(tempURL))
+        dm.add(download, fireWindowSession: nil, delegate: nil, destination: .preset(tempURL))
         let url = await download.delegate?.download(download.asWKDownload(), decideDestinationUsing: URLResponse(url: .duckDuckGo, mimeType: nil, expectedContentLength: 1, textEncodingName: nil), suggestedFilename: "sf")
         XCTAssertNotNil(url)
         XCTAssertTrue(fm.createFile(atPath: url?.path ?? "", contents: nil))
@@ -140,7 +140,7 @@ final class FileDownloadManagerTests: XCTestCase {
         }
 
         let download = WKDownloadMock(url: .duckDuckGo)
-        dm.add(download, burnerWindowSession: nil, delegate: self, destination: .prompt)
+        dm.add(download, fireWindowSession: nil, delegate: self, destination: .prompt)
 
         let url = URL(string: "https://duckduckgo.com/somefile.html")!
         let response = URLResponse(url: url, mimeType: UTType.pdf.preferredMIMEType, expectedContentLength: 1, textEncodingName: "utf-8")
@@ -174,7 +174,7 @@ final class FileDownloadManagerTests: XCTestCase {
         }
 
         let download = WKDownloadMock(url: .duckDuckGo)
-        dm.add(download, burnerWindowSession: nil, delegate: self, destination: .auto)
+        dm.add(download, fireWindowSession: nil, delegate: self, destination: .auto)
 
         let url = URL(string: "https://duckduckgo.com/somefile.html")!
         let response = URLResponse(url: url, mimeType: UTType.html.preferredMIMEType, expectedContentLength: 1, textEncodingName: "utf-8")
@@ -196,7 +196,7 @@ final class FileDownloadManagerTests: XCTestCase {
         XCTAssertTrue(fm.createFile(atPath: localURL.path, contents: nil, attributes: nil))
 
         let download = WKDownloadMock(url: .duckDuckGo)
-        dm.add(download, burnerWindowSession: nil, delegate: self, destination: .prompt)
+        dm.add(download, fireWindowSession: nil, delegate: self, destination: .prompt)
         self.chooseDestination = { _, _, callback in
             callback(localURL, nil)
         }
@@ -228,7 +228,7 @@ final class FileDownloadManagerTests: XCTestCase {
             callback(localURL, .html)
         }
 
-        dm.add(download, burnerWindowSession: nil, delegate: self, destination: .auto)
+        dm.add(download, fireWindowSession: nil, delegate: self, destination: .auto)
 
         let e2 = expectation(description: "WKDownload called")
         download.delegate?.download(download.asWKDownload(), decideDestinationUsing: response, suggestedFilename: testFile) { url in
@@ -245,7 +245,7 @@ final class FileDownloadManagerTests: XCTestCase {
         preferences.selectedDownloadLocation = downloadsURL
 
         let download = WKDownloadMock(url: .duckDuckGo)
-        dm.add(download, burnerWindowSession: nil, delegate: self, destination: .auto)
+        dm.add(download, fireWindowSession: nil, delegate: self, destination: .auto)
         self.chooseDestination = { _, _, _ in
             XCTFail("Unpected chooseDestination call")
         }
@@ -265,7 +265,7 @@ final class FileDownloadManagerTests: XCTestCase {
         preferences.selectedDownloadLocation = downloadsURL
 
         let download = WKDownloadMock(url: .duckDuckGo)
-        dm.add(download, burnerWindowSession: nil, delegate: self, destination: .auto)
+        dm.add(download, fireWindowSession: nil, delegate: self, destination: .auto)
         self.chooseDestination = { _, _, _ in
             XCTFail("Unpected chooseDestination call")
         }
@@ -288,7 +288,7 @@ final class FileDownloadManagerTests: XCTestCase {
         }
 
         let download = WKDownloadMock(url: .duckDuckGo)
-        dm.add(download, burnerWindowSession: nil, delegate: self, destination: .auto)
+        dm.add(download, fireWindowSession: nil, delegate: self, destination: .auto)
 
         let e1 = expectation(description: "download location requested")
         self.chooseDestination = { suggestedFilename, fileTypes, callback in

@@ -101,7 +101,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
     }
 
     /// downloads initiated from a Burner Window will be kept in the window
-    let burnerWindowSession: BurnerWindowSession?
+    let fireWindowSession: FireWindowSessionRef?
 
     private weak var delegate: WebKitDownloadTaskDelegate?
 
@@ -131,12 +131,12 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
     }
 
     @MainActor(unsafe)
-    init(download: WebKitDownload, destination: DownloadDestination, burnerWindowSession: BurnerWindowSession?) {
+    init(download: WebKitDownload, destination: DownloadDestination, fireWindowSession: FireWindowSessionRef?) {
         self.download = download
         self.progress = DownloadProgress(download: download)
         self.fileProgressPresenter = FileProgressPresenter(progress: progress)
         self.state = .initial(destination)
-        self.burnerWindowSession = burnerWindowSession
+        self.fireWindowSession = fireWindowSession
         super.init()
 
         progress.cancellationHandler = { [weak self, taskDescr=self.debugDescription] in
