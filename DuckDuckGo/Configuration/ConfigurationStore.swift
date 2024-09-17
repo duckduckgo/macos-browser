@@ -35,7 +35,7 @@ final class ConfigurationStore: ConfigurationStoring {
         .remoteMessagingConfig: "remote-messaging-config.json"
     ]
 
-    private enum Constants {
+    private enum Etag {
         static let configStorageTrackerRadarEtag = "config.storage.trackerradar.etag"
         static let configStorageBloomFilterSpecEtag = "config.storage.bloomfilter.spec.etag"
         static let configStorageBloomFilterBinaryEtag = "config.storage.bloomfilter.binary.etag"
@@ -49,64 +49,64 @@ final class ConfigurationStore: ConfigurationStoring {
 
     private var trackerRadarEtag: String? {
         get {
-            defaults.object(forKey: Constants.configStorageTrackerRadarEtag) as? String
+            defaults.object(forKey: Etag.configStorageTrackerRadarEtag) as? String
         }
         set {
-            defaults.set(newValue, forKey: Constants.configStorageTrackerRadarEtag)
+            defaults.set(newValue, forKey: Etag.configStorageTrackerRadarEtag)
         }
     }
 
     private var bloomFilterSpecEtag: String? {
         get {
-            defaults.object(forKey: Constants.configStorageBloomFilterSpecEtag) as? String
+            defaults.object(forKey: Etag.configStorageBloomFilterSpecEtag) as? String
         }
         set {
-            defaults.set(newValue, forKey: Constants.configStorageBloomFilterSpecEtag)
+            defaults.set(newValue, forKey: Etag.configStorageBloomFilterSpecEtag)
         }
     }
 
     private var bloomFilterBinaryEtag: String? {
         get {
-            defaults.object(forKey: Constants.configStorageBloomFilterBinaryEtag) as? String
+            defaults.object(forKey: Etag.configStorageBloomFilterBinaryEtag) as? String
         }
         set {
-            defaults.set(newValue, forKey: Constants.configStorageBloomFilterBinaryEtag)
+            defaults.set(newValue, forKey: Etag.configStorageBloomFilterBinaryEtag)
         }
     }
 
     private var bloomFilterExcludedDomainsEtag: String? {
         get {
-            defaults.object(forKey: Constants.configStorageBloomFilterExclusionsEtag) as? String
+            defaults.object(forKey: Etag.configStorageBloomFilterExclusionsEtag) as? String
         }
         set {
-            defaults.set(newValue, forKey: Constants.configStorageBloomFilterExclusionsEtag)
+            defaults.set(newValue, forKey: Etag.configStorageBloomFilterExclusionsEtag)
         }
     }
 
     private var surrogatesEtag: String? {
         get {
-            defaults.object(forKey: Constants.configStorageSurrogatesEtag) as? String
+            defaults.object(forKey: Etag.configStorageSurrogatesEtag) as? String
         }
         set {
-            defaults.set(newValue, forKey: Constants.configStorageSurrogatesEtag)
+            defaults.set(newValue, forKey: Etag.configStorageSurrogatesEtag)
         }
     }
 
     private var privacyConfigurationEtag: String? {
         get {
-            defaults.object(forKey: Constants.configStoragePrivacyConfigurationEtag) as? String
+            defaults.object(forKey: Etag.configStoragePrivacyConfigurationEtag) as? String
         }
         set {
-            defaults.set(newValue, forKey: Constants.configStoragePrivacyConfigurationEtag)
+            defaults.set(newValue, forKey: Etag.configStoragePrivacyConfigurationEtag)
         }
     }
 
     private var remoteMessagingConfigEtag: String? {
         get {
-            defaults.object(forKey: Constants.configStorageRemoteMessagingConfigEtag) as? String
+            defaults.object(forKey: Etag.configStorageRemoteMessagingConfigEtag) as? String
         }
         set {
-            defaults.set(newValue, forKey: Constants.configStorageRemoteMessagingConfigEtag)
+            defaults.set(newValue, forKey: Etag.configStorageRemoteMessagingConfigEtag)
         }
     }
 

@@ -23,7 +23,7 @@ import Combine
 
 final class ContentBlockerRulesManagerMock: NSObject, ContentBlockerRulesManagerProtocol {
     func scheduleCompilation() -> BrowserServicesKit.ContentBlockerRulesManager.CompletionToken {
-        return BrowserServicesKit.ContentBlockerRulesManager.CompletionToken()
+        BrowserServicesKit.ContentBlockerRulesManager.CompletionToken()
     }
 
     var currentMainRules: BrowserServicesKit.ContentBlockerRulesManager.Rules?
