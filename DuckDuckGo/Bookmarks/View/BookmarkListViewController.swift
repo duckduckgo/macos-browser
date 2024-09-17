@@ -133,9 +133,7 @@ final class BookmarkListViewController: NSViewController {
 
     private lazy var syncPromoViewHostingView: NSHostingView<SyncPromoView> = {
         let model = SyncPromoViewModel(touchpointType: .bookmarks, primaryButtonAction: { [weak self] in
-            Task { @MainActor in
-                WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .sync)
-            }
+            self?.syncPromoManager.goToSyncSettings(for: .bookmarks)
         }, dismissButtonAction: { [weak self] in
             self?.syncPromoManager.dismissPromoFor(.bookmarks)
             self?.updateDocumentViewHeight()
@@ -273,7 +271,7 @@ final class BookmarkListViewController: NSViewController {
         scrollView.contentInsets = NSEdgeInsets(top: 0, left: 0, bottom: 0, right: 12)
 
         let column = NSTableColumn()
-        column.width = scrollView.frame.width - (showSyncPromo ? 40 : 32)
+        column.width = scrollView.frame.width - (showSyncPromo ? 44 : 32)
         outlineView.addTableColumn(column)
         outlineView.translatesAutoresizingMaskIntoConstraints = showSyncPromo ? false : true
         if showSyncPromo {
@@ -853,6 +851,8 @@ extension BookmarkListViewController {
     }
 
     private func setupSyncPromoLayout() {
+        syncPromoViewHostingView.setContentHuggingPriority(.required, for: .vertical)
+
         NSLayoutConstraint.activate([
                                         documentView.topAnchor.constraint(equalTo: scrollView.contentView.topAnchor),
                                         documentView.leadingAnchor.constraint(equalTo: scrollView.contentView.leadingAnchor),
@@ -890,7 +890,7 @@ extension BookmarkListViewController {
         return emptyState.isHidden
                && !dataSource.isSearching
                && !outlineView.isHidden
-               && treeController.rootNode.childNodes.count > 0
+               && (bookmarkManager.list?.bookmarks().count ?? 0) > 0
                && syncPromoManager.shouldPresentPromoFor(.bookmarks)
     }
 

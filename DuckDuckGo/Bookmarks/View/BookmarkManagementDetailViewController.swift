@@ -83,9 +83,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
 
     private lazy var syncPromoViewHostingView: NSHostingView<SyncPromoView> = {
         let model = SyncPromoViewModel(touchpointType: .bookmarks, primaryButtonAction: { [weak self] in
-            Task { @MainActor in
-                WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .sync)
-            }
+            self?.syncPromoManager.goToSyncSettings(for: .bookmarks)
         }, dismissButtonAction: { [weak self] in
             self?.syncPromoManager.dismissPromoFor(.bookmarks)
             self?.updateDocumentViewHeight()
@@ -771,6 +769,7 @@ extension BookmarkManagementDetailViewController {
                && !managementDetailViewModel.isSearching
                && !tableView.isHidden
                && parentFolder == nil
+               && (bookmarkManager.list?.totalBookmarks ?? 0) > 0
                && totalRows() > 0
                && syncPromoManager.shouldPresentPromoFor(.bookmarks)
     }

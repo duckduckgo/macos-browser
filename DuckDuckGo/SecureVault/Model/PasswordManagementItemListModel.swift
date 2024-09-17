@@ -242,6 +242,13 @@ final class PasswordManagementItemListModel: ObservableObject {
         }
     }
 
+    private var shouldDisplaySyncPromoRow: Bool {
+        syncPromoManager.shouldPresentPromoFor(.passwords) &&
+        (sortDescriptor.category == .allItems || sortDescriptor.category == .logins) &&
+        emptyState == .none &&
+        filter.isEmpty
+    }
+
     @Published var sortDescriptor = SecureVaultSorting.default {
         didSet {
             guard oldValue != sortDescriptor else {
@@ -430,7 +437,7 @@ final class PasswordManagementItemListModel: ObservableObject {
 
         if passwordManagerCoordinator.isEnabled && (sortDescriptor.category == .allItems || sortDescriptor.category == .logins) {
             externalPasswordManagerSelected = true
-        } else if syncPromoManager.shouldPresentPromoFor(.passwords) && (sortDescriptor.category == .allItems || sortDescriptor.category == .logins) && emptyState == .none && filter.isEmpty {
+        } else if shouldDisplaySyncPromoRow {
             syncPromoSelected = true
         } else if let firstSection = displayedSections.first, let selectedItem = firstSection.items.first {
             selected(item: selectedItem)
