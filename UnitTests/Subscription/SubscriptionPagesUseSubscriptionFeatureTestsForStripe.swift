@@ -397,4 +397,3 @@ extension SubscriptionPagesUseSubscriptionFeatureTestsForStripe {
                       line: line)
     }
 }
-
