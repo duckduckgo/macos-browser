@@ -187,7 +187,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
             switch update.kind {
             case .added:
                 XCTAssertEqual(update.item.progress, task.progress)
-                XCTAssertTrue(coordinator!.hasActiveDownloads)
+                XCTAssertTrue(coordinator!.hasActiveDownloads(for: nil))
                 e1.fulfill()
             case .updated:
                 guard let tempUrlValue = update.item.tempURL else { return }
@@ -208,7 +208,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
 
         await fulfillment(of: [e1, e2], timeout: 5.0)
         withExtendedLifetime(c) {}
-        XCTAssertTrue(coordinator.hasActiveDownloads)
+        XCTAssertTrue(coordinator.hasActiveDownloads(for: nil))
     }
 
     @MainActor
@@ -233,7 +233,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         waitForExpectations(timeout: 1)
         c = nil
 
-        XCTAssertFalse(coordinator.hasActiveDownloads)
+        XCTAssertFalse(coordinator.hasActiveDownloads(for: nil))
     }
 
     @MainActor
@@ -258,7 +258,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         withExtendedLifetime(c) {
             waitForExpectations(timeout: 1)
         }
-        XCTAssertFalse(coordinator.hasActiveDownloads)
+        XCTAssertFalse(coordinator.hasActiveDownloads(for: nil))
     }
 
     @MainActor
@@ -287,7 +287,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         waitForExpectations(timeout: 1)
         c = nil
 
-        XCTAssertFalse(coordinator.hasActiveDownloads)
+        XCTAssertFalse(coordinator.hasActiveDownloads(for: nil))
     }
 
     @MainActor
@@ -525,13 +525,13 @@ final class DownloadListCoordinatorTests: XCTestCase {
             XCTAssertNotEqual(update.item.identifier, keptId)
         }
 
-        coordinator.cleanupInactiveDownloads(for: .all)
+        coordinator.cleanupInactiveDownloads(for: nil)
 
         withExtendedLifetime(c) {
             waitForExpectations(timeout: 1)
         }
 
-        XCTAssertTrue(coordinator.hasActiveDownloads)
+        XCTAssertTrue(coordinator.hasActiveDownloads(for: nil))
         XCTAssertEqual(coordinator.downloads(sortedBy: \.modified, ascending: true).count, 1)
 
         task1.download(download1.asWKDownload(), didFailWithError: TestError(), resumeData: nil)
