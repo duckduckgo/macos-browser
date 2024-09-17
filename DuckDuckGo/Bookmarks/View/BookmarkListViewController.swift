@@ -394,8 +394,6 @@ final class BookmarkListViewController: NSViewController {
     }
 
     override func viewDidLoad() {
-        preferredContentSize = Constants.preferredContentSize
-
         outlineView.setDraggingSourceOperationMask([.move], forLocal: true)
         outlineView.registerForDraggedTypes(BookmarkDragDropManager.draggedTypes)
     }
@@ -407,6 +405,40 @@ final class BookmarkListViewController: NSViewController {
 
     override func viewWillDisappear() {
         cancellables = []
+    }
+
+    func adjustPreferredContentSize(positionedRelativeTo positioningRect: NSRect,
+                                    of positioningView: NSView,
+                                    at preferredEdge: NSRectEdge) {
+        _=view // Load view if needed
+
+        guard let mainWindow = positioningView.window,
+              let screenFrame = mainWindow.screen?.visibleFrame else { return }
+
+        self.reloadData()
+
+        guard outlineView.numberOfRows > 0 else {
+            preferredContentSize = Constants.preferredContentSize
+            return
+        }
+
+        let windowRect = positioningView.convert(positioningRect, to: nil)
+        let screenPosRect = mainWindow.convertToScreen(windowRect)
+        let insetMargin = 48.0
+        let availableHeightBelow = screenPosRect.minY - screenFrame.minY - insetMargin
+        let availableHeightAbove = screenFrame.maxY - screenPosRect.maxY - insetMargin
+        let availableHeight = max(availableHeightAbove, availableHeightBelow)
+
+        let totalHeightForRootBookmarks = CGFloat(outlineView.numberOfRows) * BookmarkOutlineCellView.rowHeight
+        var contentSize = Constants.preferredContentSize
+
+        if totalHeightForRootBookmarks > availableHeight {
+            contentSize.height = availableHeight
+        } else if totalHeightForRootBookmarks > Constants.preferredContentSize.height {
+            contentSize.height = totalHeightForRootBookmarks
+        }
+
+        preferredContentSize = contentSize
     }
 
     private func subscribeToModelEvents() {
