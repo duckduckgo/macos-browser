@@ -848,12 +848,13 @@ extension BookmarkListViewController {
 
         documentView.translatesAutoresizingMaskIntoConstraints = false
         syncPromoViewHostingView.translatesAutoresizingMaskIntoConstraints = false
-        syncPromoViewHostingView.setContentHuggingPriority(.required, for: .vertical)
 
         setupSyncPromoLayout()
     }
 
     private func setupSyncPromoLayout() {
+        syncPromoViewHostingView.setContentHuggingPriority(.required, for: .vertical)
+
         NSLayoutConstraint.activate([
                                         documentView.topAnchor.constraint(equalTo: scrollView.contentView.topAnchor),
                                         documentView.leadingAnchor.constraint(equalTo: scrollView.contentView.leadingAnchor),
