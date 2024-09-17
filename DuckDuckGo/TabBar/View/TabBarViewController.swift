@@ -656,24 +656,26 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         appendToCollectionView(selected: selected)
     }
 
-    func tabCollectionViewModelDidInsert(_ tabCollectionViewModel: TabCollectionViewModel,
-                                         at index: Int,
-                                         selected: Bool) {
+    func tabCollectionViewModelDidInsert(_ tabCollectionViewModel: TabCollectionViewModel, at index: Int, selected: Bool) {
         let indexPathSet = Set(arrayLiteral: IndexPath(item: index))
-        if selected {
-            collectionView.clearSelection(animated: true)
-        }
-        collectionView.animator().insertItems(at: indexPathSet)
-        if selected {
-            collectionView.selectItems(at: indexPathSet, scrollPosition: .centeredHorizontally)
-            collectionView.scrollToSelected()
-        }
 
-        updateTabMode()
-        updateEmptyTabArea()
-        hideTabPreview()
-        if tabMode == .overflow {
-            collectionView.scroll(to: IndexPath(item: index))
+        collectionView.animator().performBatchUpdates {
+            if selected {
+                collectionView.clearSelection(animated: true)
+            }
+            collectionView.animator().insertItems(at: indexPathSet)
+            if selected {
+                collectionView.selectItems(at: indexPathSet, scrollPosition: .centeredHorizontally)
+                collectionView.scrollToSelected()
+            }
+
+            updateTabMode()
+            updateEmptyTabArea()
+            hideTabPreview()
+        } completionHandler: { _ in
+            if self.tabMode == .overflow {
+                self.collectionView.scroll(to: IndexPath(item: index))
+            }
         }
     }
 

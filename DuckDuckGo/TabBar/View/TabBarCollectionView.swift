@@ -61,8 +61,8 @@ final class TabBarCollectionView: NSCollectionView {
     }
 
     func scroll(to indexPath: IndexPath) {
-        let rect = frameForItem(at: indexPath.item)
         animator().performBatchUpdates({
+            let rect = animator().frameForItem(at: indexPath.item)
             animator().scrollToVisible(rect)
         }, completionHandler: nil)
     }
