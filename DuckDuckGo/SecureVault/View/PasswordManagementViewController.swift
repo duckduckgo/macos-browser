@@ -833,9 +833,7 @@ final class PasswordManagementViewController: NSViewController {
     private lazy var syncPromoManager: SyncPromoManaging = SyncPromoManager()
     lazy var syncPromoViewModel: SyncPromoViewModel = SyncPromoViewModel(touchpointType: .passwords,
                                                                          primaryButtonAction: { [weak self] in
-        Task { @MainActor in
-            WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .sync)
-        }
+        self?.syncPromoManager.goToSyncSettings(for: .passwords)
         self?.dismiss()
     },
                                                                          dismissButtonAction: { [weak self] in

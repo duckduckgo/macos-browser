@@ -47,9 +47,6 @@ struct SyncPromoView: View {
         .onAppear {
             PixelKit.fire(SyncPromoPixelKitEvent.syncPromoDisplayed.withoutMacPrefix, withAdditionalParameters: ["source": viewModel.touchpointType.rawValue])
         }
-        .onHover { isHovering in
-            self.isHovering = isHovering
-        }
     }
 
     private var closeButton: some View {
@@ -68,9 +65,8 @@ struct SyncPromoView: View {
     }
 
     private var backgroundRectangle: some View {
-        RoundedRectangle(cornerRadius: 12)
+        RoundedRectangle(cornerRadius: 8)
             .foregroundColor(isHovering ? Color.black.opacity(0.06) : Color.blackWhite3)
-            .cornerRadius(8)
     }
 
     private var image: some View {
@@ -157,6 +153,9 @@ struct SyncPromoView: View {
             .padding(.vertical, 8)
 
             closeButton
+        }
+        .onHover { isHovering in
+            self.isHovering = isHovering
         }
     }
 

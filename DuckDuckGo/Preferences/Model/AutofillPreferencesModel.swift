@@ -171,9 +171,7 @@ final class AutofillPreferencesModel: ObservableObject {
     private lazy var syncPromoManager: SyncPromoManaging = SyncPromoManager()
     lazy var syncPromoViewModel: SyncPromoViewModel = SyncPromoViewModel(touchpointType: .passwords,
                                                                          primaryButtonAction: { [weak self] in
-        Task { @MainActor in
-            WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .sync)
-        }
+        self?.syncPromoManager.goToSyncSettings(for: .passwords)
     },
                                                                          dismissButtonAction: { [weak self] in
         self?.syncPromoManager.dismissPromoFor(.passwords)

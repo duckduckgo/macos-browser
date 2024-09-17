@@ -22,6 +22,7 @@ import DDGSync
 
 protocol SyncPromoManaging {
     func shouldPresentPromoFor(_ touchpoint: SyncPromoManager.Touchpoint) -> Bool
+    func goToSyncSettings(for touchpoint: SyncPromoManager.Touchpoint)
     func dismissPromoFor(_ touchpoint: SyncPromoManager.Touchpoint)
     func resetPromos()
 }
@@ -35,6 +36,13 @@ final class SyncPromoManager: SyncPromoManaging {
 
     public struct SyncPromoManagerNotifications {
         public static let didDismissPromo = NSNotification.Name(rawValue: "com.duckduckgo.syncPromo.didDismiss")
+        public static let didGoToSync = NSNotification.Name(rawValue: "com.duckduckgo.syncPromo.didGoToSync")
+    }
+
+    public struct Constants {
+        public static let syncPromoSourceKey = "source"
+        public static let syncPromoBookmarksSource = "promotion_bookmarks"
+        public static let syncPromoPasswordsSource = "promotion_passwords"
     }
 
     private let syncService: DDGSyncing?
@@ -77,6 +85,24 @@ final class SyncPromoManager: SyncPromoManaging {
         }
 
         return false
+    }
+
+    @MainActor func goToSyncSettings(for touchpoint: Touchpoint) {
+        WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .sync)
+
+        var source: String
+        switch touchpoint {
+        case .bookmarks:
+            source = Constants.syncPromoBookmarksSource
+        case .passwords:
+            source = Constants.syncPromoPasswordsSource
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [self] in
+            NotificationCenter.default.post(name: SyncPromoManagerNotifications.didGoToSync, object: self, userInfo: [
+                Constants.syncPromoSourceKey: source
+            ])
+        }
     }
 
     func dismissPromoFor(_ touchpoint: Touchpoint) {
