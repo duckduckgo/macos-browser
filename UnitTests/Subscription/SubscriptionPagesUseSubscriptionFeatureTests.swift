@@ -344,6 +344,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
 
     func testGetSubscriptionOptionsSuccess() async throws {
         // Given
+        XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .appStore)
         storePurchaseManager.subscriptionOptionsResult = Constants.subscriptionOptions
 
         // When
@@ -357,6 +358,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
 
     func testGetSubscriptionOptionsReturnsEmptyOptionsWhenNoSubscriptionOptions() async throws {
         // Given
+        XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .appStore)
         storePurchaseManager.subscriptionOptionsResult = nil
 
         // When
@@ -370,6 +372,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
 
     func testGetSubscriptionOptionsReturnsEmptyOptionsWhenPurchaseNotAllowed() async throws {
         // Given
+        XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .appStore)
         subscriptionFeatureAvailability.isSubscriptionPurchaseAllowed = false
 
         storePurchaseManager.subscriptionOptionsResult = Constants.subscriptionOptions
@@ -388,7 +391,6 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
     func testSubscriptionSelectedSuccessWhenPurchasingFirstTime() async throws {
         // Given
         ensureUserUnauthenticatedState()
-
         XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .appStore)
         XCTAssertFalse(accountManager.isUserAuthenticated)
 
@@ -424,7 +426,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
     func testSubscriptionSelectedSuccessWhenRepurchasingForExpiredAppleSubscription() async throws {
         // Given
         ensureUserAuthenticatedState()
-
+        XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .appStore)
         XCTAssertTrue(accountManager.isUserAuthenticated)
 
         storePurchaseManager.hasActiveSubscriptionResult = false
@@ -464,7 +466,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
     func testSubscriptionSelectedSuccessWhenRepurchasingForExpiredStripeSubscription() async throws {
         // Given
         ensureUserAuthenticatedState()
-
+        XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .appStore)
         XCTAssertTrue(accountManager.isUserAuthenticated)
 
         storePurchaseManager.hasActiveSubscriptionResult = false
@@ -495,6 +497,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
     func testSubscriptionSelectedErrorWhenPurchasingWhenHavingActiveSubscription() async throws {
         // Given
         ensureUserAuthenticatedState()
+        XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .appStore)
 
         storePurchaseManager.hasActiveSubscriptionResult = true
         await uiHandler.setAlertResponse(alertResponse: .alertFirstButtonReturn)
@@ -521,6 +524,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
     func testSubscriptionSelectedErrorWhenPurchasingWhenUnauthenticatedAndHavingActiveSubscriptionOnAppleID() async throws {
         // Given
         ensureUserUnauthenticatedState()
+        XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .appStore)
 
         storePurchaseManager.hasActiveSubscriptionResult = true
         await uiHandler.setAlertResponse(alertResponse: .alertFirstButtonReturn)
@@ -547,6 +551,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
     func testSubscriptionSelectedErrorWhenUnauthenticatedAndAccountCreationFails() async throws {
         // Given
         ensureUserUnauthenticatedState()
+        XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .appStore)
 
         storePurchaseManager.hasActiveSubscriptionResult = false
         storePurchaseManager.mostRecentTransactionResult = nil
@@ -577,6 +582,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
     func testSubscriptionSelectedErrorWhenPurchaseCancelledByUser() async throws {
         // Given
         ensureUserAuthenticatedState()
+        XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .appStore)
 
         storePurchaseManager.hasActiveSubscriptionResult = false
         subscriptionService.getSubscriptionResult = .success(SubscriptionMockFactory.expiredStripeSubscription)
@@ -597,6 +603,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
     func testSubscriptionSelectedErrorWhenProductNotFound() async throws {
         // Given
         ensureUserAuthenticatedState()
+        XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .appStore)
 
         storePurchaseManager.hasActiveSubscriptionResult = false
         subscriptionService.getSubscriptionResult = .success(SubscriptionMockFactory.expiredStripeSubscription)
@@ -626,6 +633,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
     func testSubscriptionSelectedErrorWhenExternalIDIsNotValidUUID() async throws {
         // Given
         ensureUserAuthenticatedState()
+        XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .appStore)
 
         storePurchaseManager.hasActiveSubscriptionResult = false
         subscriptionService.getSubscriptionResult = .success(SubscriptionMockFactory.expiredStripeSubscription)
@@ -655,6 +663,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
     func testSubscriptionSelectedErrorWhenPurchaseFailed() async throws {
         // Given
         ensureUserAuthenticatedState()
+        XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .appStore)
 
         storePurchaseManager.hasActiveSubscriptionResult = false
         subscriptionService.getSubscriptionResult = .success(SubscriptionMockFactory.expiredStripeSubscription)
@@ -684,6 +693,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
     func testSubscriptionSelectedErrorWhenTransactionCannotBeVerified() async throws {
         // Given
         ensureUserAuthenticatedState()
+        XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .appStore)
 
         storePurchaseManager.hasActiveSubscriptionResult = false
         subscriptionService.getSubscriptionResult = .success(SubscriptionMockFactory.expiredStripeSubscription)
@@ -713,6 +723,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
     func testSubscriptionSelectedErrorWhenTransactionPendingAuthentication() async throws {
         // Given
         ensureUserAuthenticatedState()
+        XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .appStore)
 
         storePurchaseManager.hasActiveSubscriptionResult = false
         subscriptionService.getSubscriptionResult = .success(SubscriptionMockFactory.expiredStripeSubscription)
@@ -742,6 +753,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
     func testSubscriptionSelectedErrorDueToUnknownPurchaseError() async throws {
         // Given
         ensureUserAuthenticatedState()
+        XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .appStore)
 
         storePurchaseManager.hasActiveSubscriptionResult = false
         subscriptionService.getSubscriptionResult = .success(SubscriptionMockFactory.expiredStripeSubscription)
