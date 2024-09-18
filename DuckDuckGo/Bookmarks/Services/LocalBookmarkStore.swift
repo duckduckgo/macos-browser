@@ -552,12 +552,8 @@ final class LocalBookmarkStore: BookmarkStore {
 
     func update(objectsWithUUIDs uuids: [String], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void) {
 
-        applyChangesAndSave(changes: { [weak self] context in
-            guard let self = self else {
-                throw BookmarkStoreError.storeDeallocated
-            }
-
-            let bookmarksFetchRequest = BaseBookmarkEntity.entities(with: uuids)
+        applyChangesAndSave(changes: { [favoritesDisplayMode] context in
+            let bookmarksFetchRequest = BaseBookmarkEntity.entities(with: uuids, includingPendingDeletion: false)
             bookmarksFetchRequest.returnsObjectsAsFaults = false
             let bookmarksResults = try? context.fetch(bookmarksFetchRequest)
 
