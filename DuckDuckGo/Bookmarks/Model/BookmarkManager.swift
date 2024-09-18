@@ -34,9 +34,9 @@ protocol BookmarkManager: AnyObject {
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool, index: Int?, parent: BookmarkFolder?) -> Bookmark?
     func makeBookmarks(for websitesInfo: [WebsiteInfo], inNewFolderNamed folderName: String, withinParentFolder parent: ParentFolderType)
     func makeFolder(for title: String, parent: BookmarkFolder?, completion: @escaping (BookmarkFolder) -> Void)
-    func remove(bookmark: Bookmark)
-    func remove(folder: BookmarkFolder)
-    func remove(objectsWithUUIDs uuids: [String])
+    func remove(bookmark: Bookmark, undoManager: UndoManager?)
+    func remove(folder: BookmarkFolder, undoManager: UndoManager?)
+    func remove(objectsWithUUIDs uuids: [String], undoManager: UndoManager?)
     func restore(_ objects: [BaseBookmarkEntity], undoManager: UndoManager?)
     func update(bookmark: Bookmark)
     func update(bookmark: Bookmark, withURL url: URL, title: String, isFavorite: Bool)

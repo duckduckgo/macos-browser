@@ -92,6 +92,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
         XCTAssertNil(bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", isFavorite: false))
     }
 
+    @MainActor
     func testWhenBookmarkIsRemoved_ThenManagerRemovesItFromStore() {
         let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
         let bookmark = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", isFavorite: false)!
@@ -103,6 +104,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
         XCTAssert(bookmarkStoreMock.removeCalled)
     }
 
+    @MainActor
     func testWhenRemovalFails_ThenManagerPutsBookmarkBackToList() {
         let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
         let bookmark = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", isFavorite: false)!
@@ -116,6 +118,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
         XCTAssert(bookmarkStoreMock.removeCalled)
     }
 
+    @MainActor
     func testWhenBookmarkNoLongerExist_ThenManagerIgnoresAttemptToRemoval() {
         let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
 

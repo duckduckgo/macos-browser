@@ -374,7 +374,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 throw BookmarkStoreError.storeDeallocated
             }
 
-            let fetchRequest = BaseBookmarkEntity.entities(with: identifiers)
+            let fetchRequest = BaseBookmarkEntity.entities(with: identifiers, includingPendingDeletion: false)
             let fetchResults = (try? context.fetch(fetchRequest)) ?? []
 
             if fetchResults.count != identifiers.count {
