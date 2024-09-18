@@ -180,7 +180,7 @@ extension DBPUIDataBrokerProfileMatch {
             let firstOptOutEvent = optOutSubmittedEvents.min(by: { $0.date < $1.date })
             optOutSubmittedDate = firstOptOutEvent?.date
         }
-        let estimatedRemovalDate = Calendar.current.date(byAdding: .day, value: 14, to: foundDate)
+        let estimatedRemovalDate = Calendar.current.date(byAdding: .day, value: 14, to: optOutSubmittedDate ?? foundDate)
         self.init(dataBroker: DBPUIDataBroker(name: dataBrokerName, url: databrokerURL),
                   name: extractedProfile.fullName ?? "No name",
                   addresses: extractedProfile.addresses?.map {DBPUIUserProfileAddress(addressCityState: $0) } ?? [],
