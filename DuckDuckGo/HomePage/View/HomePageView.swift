@@ -187,11 +187,16 @@ extension HomePage.Views {
 
         @ViewBuilder
         func addressBar() -> some View {
-            AddressBarTextFieldView(
-                tabCollectionViewModel: continueSetUpModel.tabCollectionViewModel,
-                addressBarViewController: addressBarViewController
-            )
-            .frame(height: 40)
+            VStack(spacing: 24) {
+                Image(nsImage: .onboardingDax)
+                    .resizable()
+                    .frame(width: 96, height: 96)
+                AddressBarTextFieldView(
+                    tabCollectionViewModel: continueSetUpModel.tabCollectionViewModel,
+                    addressBarViewController: addressBarViewController
+                )
+                .frame(height: 40)
+            }
         }
 
         @ViewBuilder
