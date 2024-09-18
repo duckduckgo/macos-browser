@@ -42,10 +42,10 @@ final class DBPUICommunicationModelTests: XCTestCase {
                                         submittedSuccessfullyDate: submittedDate)
 
         // When
-        let profileMatch = DBPUIDataBrokerProfileMatch(extractedProfile: extractedProfile,
-                                                       optOutJobData: optOut,
+        let profileMatch = DBPUIDataBrokerProfileMatch(optOutJobData: optOut,
                                                        dataBrokerName: "doesn't matter for the test",
-                                                       databrokerURL: "see above")
+                                                       databrokerURL: "see above",
+                                                       parentBrokerOptOutJobData: nil)
 
         // Then
         XCTAssertEqual(profileMatch.foundDate, createdDate.timeIntervalSince1970)
@@ -72,10 +72,10 @@ final class DBPUICommunicationModelTests: XCTestCase {
                                         submittedSuccessfullyDate: submittedDate)
 
         // When
-        let profileMatch = DBPUIDataBrokerProfileMatch(extractedProfile: extractedProfile,
-                                                       optOutJobData: optOut,
+        let profileMatch = DBPUIDataBrokerProfileMatch(optOutJobData: optOut,
                                                        dataBrokerName: "doesn't matter for the test",
-                                                       databrokerURL: "see above")
+                                                       databrokerURL: "see above",
+                                                       parentBrokerOptOutJobData: nil)
 
         // Then
         XCTAssertEqual(profileMatch.foundDate, foundEventDate.timeIntervalSince1970)
@@ -110,14 +110,117 @@ final class DBPUICommunicationModelTests: XCTestCase {
                                         submittedSuccessfullyDate: submittedDate)
 
         // When
-        let profileMatch = DBPUIDataBrokerProfileMatch(extractedProfile: extractedProfile,
-                                                       optOutJobData: optOut,
+        let profileMatch = DBPUIDataBrokerProfileMatch(optOutJobData: optOut,
                                                        dataBrokerName: "doesn't matter for the test",
-                                                       databrokerURL: "see above")
+                                                       databrokerURL: "see above",
+                                                       parentBrokerOptOutJobData: nil)
 
         // Then
         XCTAssertEqual(profileMatch.foundDate, foundEventDate2.timeIntervalSince1970)
         XCTAssertEqual(profileMatch.optOutSubmittedDate, submittedEventDate2.timeIntervalSince1970)
     }
 
+    /*
+     test cases
+     one exact matching parent
+     one exact matching parent mixed in the array (probs can combnie with above
+     no match
+     partial match
+     */
+
+    func testProfileMatchInit_whenThereIsExactParentMatch_thenHasMatchingRecordOnParentBrokerIsTrue() {
+
+        // Given
+        let extractedProfile = ExtractedProfile.mockWithName("Steve Jones", age: "20", addresses: [AddressCityState(city: "New York", state: "NY")])
+        let parentProfile = ExtractedProfile.mockWithName("Steve Jones", age: "20", addresses: [AddressCityState(city: "New York", state: "NY")])
+
+        let optOut = OptOutJobData.mock(with: extractedProfile,
+                                        historyEvents: [])
+        let parentOptOut = OptOutJobData.mock(with: parentProfile,
+                                              historyEvents: [])
+
+        // When
+        let profileMatch = DBPUIDataBrokerProfileMatch(optOutJobData: optOut,
+                                                       dataBrokerName: "doesn't matter for the test",
+                                                       databrokerURL: "see above",
+                                                       parentBrokerOptOutJobData: [parentOptOut])
+
+        // Then
+        XCTAssertTrue(profileMatch.hasMatchingRecordOnParentBroker)
+    }
+
+    func testProfileMatchInit_whenThereAreMultipleNonMatchingProfilesAndAnExactParentMatch_thenHasMatchingRecordOnParentBrokerIsTrue() {
+
+        // Given
+        let extractedProfile = ExtractedProfile.mockWithName("Steve Jones", age: "20", addresses: [AddressCityState(city: "New York", state: "NY")])
+        let parentProfileMatching = ExtractedProfile.mockWithName("Steve Jones", age: "20", addresses: [AddressCityState(city: "New York", state: "NY")])
+        let parentProfileNonmatching1 = ExtractedProfile.mockWithName("Steve Jones", age: "30", addresses: [AddressCityState(city: "New York", state: "NY")])
+        let parentProfileNonmatching2 = ExtractedProfile.mockWithName("Jamie Jones", age: "20", addresses: [AddressCityState(city: "New York", state: "NY")])
+
+        let optOut = OptOutJobData.mock(with: extractedProfile,
+                                        historyEvents: [])
+        let parentOptOutMatching = OptOutJobData.mock(with: parentProfileMatching,
+                                                      historyEvents: [])
+        let parentOptOutNonmatching1 = OptOutJobData.mock(with: parentProfileNonmatching1,
+                                                      historyEvents: [])
+        let parentOptOutNonmatching2 = OptOutJobData.mock(with: parentProfileNonmatching2,
+                                                      historyEvents: [])
+
+        // When
+        let profileMatch = DBPUIDataBrokerProfileMatch(optOutJobData: optOut,
+                                                       dataBrokerName: "doesn't matter for the test",
+                                                       databrokerURL: "see above",
+                                                       parentBrokerOptOutJobData: [parentOptOutNonmatching1,
+                                                                                   parentOptOutMatching,
+                                                                                   parentOptOutNonmatching2])
+
+        // Then
+        XCTAssertTrue(profileMatch.hasMatchingRecordOnParentBroker)
+    }
+
+    func testProfileMatchInit_whenThereIsNoParentMatch_thenHasMatchingRecordOnParentBrokerIsFalse() {
+
+        // Given
+        let extractedProfile = ExtractedProfile.mockWithName("Steve Jones", age: "20", addresses: [AddressCityState(city: "New York", state: "NY")])
+        let parentProfileNonmatching1 = ExtractedProfile.mockWithName("Steve Jones", age: "30", addresses: [AddressCityState(city: "New York", state: "NY")])
+        let parentProfileNonmatching2 = ExtractedProfile.mockWithName("Jamie Jones", age: "20", addresses: [AddressCityState(city: "New York", state: "NY")])
+
+        let optOut = OptOutJobData.mock(with: extractedProfile,
+                                        historyEvents: [])
+        let parentOptOutNonmatching1 = OptOutJobData.mock(with: parentProfileNonmatching1,
+                                                      historyEvents: [])
+        let parentOptOutNonmatching2 = OptOutJobData.mock(with: parentProfileNonmatching2,
+                                                      historyEvents: [])
+
+        // When
+        let profileMatch = DBPUIDataBrokerProfileMatch(optOutJobData: optOut,
+                                                       dataBrokerName: "doesn't matter for the test",
+                                                       databrokerURL: "see above",
+                                                       parentBrokerOptOutJobData: [parentOptOutNonmatching1,
+                                                                                   parentOptOutNonmatching2])
+
+        // Then
+        XCTAssertFalse(profileMatch.hasMatchingRecordOnParentBroker)
+    }
+
+    func testProfileMatchInit_whenThereIsANonExactParentMatch_thenHasMatchingRecordOnParentBrokerIsTrue() {
+
+        // Given
+        let extractedProfile = ExtractedProfile.mockWithName("Steve Jones", age: "20", addresses: [AddressCityState(city: "New York", state: "NY")])
+        let parentProfile = ExtractedProfile.mockWithName("Steve Jones", age: "20", addresses: [AddressCityState(city: "New York", state: "NY"), AddressCityState(city: "Atlanta", state: "GA")])
+
+        let optOut = OptOutJobData.mock(with: extractedProfile,
+                                        historyEvents: [])
+        let parentOptOut = OptOutJobData.mock(with: parentProfile,
+                                              historyEvents: [])
+
+        // When
+        let profileMatch = DBPUIDataBrokerProfileMatch(optOutJobData: optOut,
+                                                       dataBrokerName: "doesn't matter for the test",
+                                                       databrokerURL: "see above",
+                                                       parentBrokerOptOutJobData: [parentOptOut])
+
+        // Then
+        XCTAssertTrue(profileMatch.hasMatchingRecordOnParentBroker)
+    }
 }
