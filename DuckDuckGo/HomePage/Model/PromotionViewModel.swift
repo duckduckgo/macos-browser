@@ -24,16 +24,14 @@ extension HomePage.Models {
     final class PromotionViewModel: ObservableObject {
 
         let image: ImageResource
-        let title: String?
-        let subtitle: String
+        let text: String
         let proceedButtonText: String
         let proceedAction: () -> Void
         let closeAction: () -> Void
 
-        init(image: ImageResource, title: String? = nil, subtitle: String, proceedButtonText: String, proceedAction: @escaping () -> Void, closeAction: @escaping () -> Void) {
+        init(image: ImageResource, text: String, proceedButtonText: String, proceedAction: @escaping () -> Void, closeAction: @escaping () -> Void) {
             self.image = image
-            self.title = title
-            self.subtitle = subtitle
+            self.text = text
             self.proceedButtonText = proceedButtonText
             self.proceedAction = proceedAction
             self.closeAction = closeAction
