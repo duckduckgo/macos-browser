@@ -148,13 +148,16 @@ struct DBPUIDataBrokerProfileMatch: Codable {
     let optOutSubmittedDate: Double?
     let estimatedRemovalDate: Double?
     let removedDate: Double?
+    let hasMatchingRecordOnParentBroker: Bool
 }
 
 extension DBPUIDataBrokerProfileMatch {
-    init(extractedProfile: ExtractedProfile,
-         optOutJobData: OptOutJobData,
+    init(optOutJobData: OptOutJobData,
          dataBrokerName: String,
-         databrokerURL: String) {
+         databrokerURL: String,
+         parentBrokerOptOutJobData: [OptOutJobData]?) {
+        let extractedProfile = optOutJobData.extractedProfile
+
         /*
          createdDate used to not exist in the DB, so in the migration we defaulted it to Unix Epoch zero (i.e. 1970)
          If that's the case, we should rely on the events instead
@@ -181,6 +184,19 @@ extension DBPUIDataBrokerProfileMatch {
             optOutSubmittedDate = firstOptOutEvent?.date
         }
         let estimatedRemovalDate = Calendar.current.date(byAdding: .day, value: 14, to: optOutSubmittedDate ?? foundDate)
+
+        // Check for any matching records on the parent broker
+        var hasFoundParentMatch = false
+        if let parentBrokerOptOutJobData = parentBrokerOptOutJobData {
+            for parentOptOut in parentBrokerOptOutJobData {
+                let parentProfile = parentOptOut.extractedProfile
+                if extractedProfile.doesMatchExtractedProfile(parentProfile) {
+                    hasFoundParentMatch = true
+                    break
+                }
+            }
+        }
+
         self.init(dataBroker: DBPUIDataBroker(name: dataBrokerName, url: databrokerURL),
                   name: extractedProfile.fullName ?? "No name",
                   addresses: extractedProfile.addresses?.map {DBPUIUserProfileAddress(addressCityState: $0) } ?? [],
@@ -189,14 +205,15 @@ extension DBPUIDataBrokerProfileMatch {
                   foundDate: foundDate.timeIntervalSince1970,
                   optOutSubmittedDate: optOutSubmittedDate?.timeIntervalSince1970,
                   estimatedRemovalDate: estimatedRemovalDate?.timeIntervalSince1970,
-                  removedDate: extractedProfile.removedDate?.timeIntervalSince1970)
+                  removedDate: extractedProfile.removedDate?.timeIntervalSince1970,
+                  hasMatchingRecordOnParentBroker: hasFoundParentMatch)
     }
 
-    init(extractedProfile: ExtractedProfile, optOutJobData: OptOutJobData, dataBroker: DataBroker) {
-        self.init(extractedProfile: extractedProfile,
-                  optOutJobData: optOutJobData,
+    init(optOutJobData: OptOutJobData, dataBroker: DataBroker, parentBrokerOptOutJobData: [OptOutJobData]?) {
+        self.init(optOutJobData: optOutJobData,
                   dataBrokerName: dataBroker.name,
-                  databrokerURL: dataBroker.url)
+                  databrokerURL: dataBroker.url,
+                  parentBrokerOptOutJobData: parentBrokerOptOutJobData)
     }
 }
 

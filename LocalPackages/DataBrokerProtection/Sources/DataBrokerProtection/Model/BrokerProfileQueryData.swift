@@ -33,10 +33,6 @@ public struct BrokerProfileQueryData: Sendable {
         optOutJobData.map { $0.extractedProfile }
     }
 
-    var extractedProfilesWithOptOutJobData: [(ExtractedProfile, OptOutJobData)] {
-        optOutJobData.map { ($0.extractedProfile, $0) }
-    }
-
     var events: [HistoryEvent] {
         operationsData.flatMap { $0.historyEvents }.sorted { $0.date < $1.date }
     }

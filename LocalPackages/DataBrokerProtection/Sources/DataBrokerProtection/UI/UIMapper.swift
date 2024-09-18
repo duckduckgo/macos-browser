@@ -44,26 +44,36 @@ struct MapperToUI {
                                              totalScans: totalScans,
                                              scannedBrokers: partiallyScannedBrokers)
 
-        let matches = mapMatchesToUI(brokerProfileQueryData)
+        let matches = mapMatchesToUI(withoutDeprecated)
 
         return .init(resultsFound: matches, scanProgress: scanProgress)
     }
 
     private func mapMatchesToUI(_ brokerProfileQueryData: [BrokerProfileQueryData]) -> [DBPUIDataBrokerProfileMatch] {
+
+        // Used to find opt outs on the parent
+        let brokerURLsToQueryData =  Dictionary(grouping: brokerProfileQueryData, by: { $0.dataBroker.name })
+
         return brokerProfileQueryData.flatMap {
             var profiles = [DBPUIDataBrokerProfileMatch]()
-            for (extractedProfile, optOutJobData) in $0.extractedProfilesWithOptOutJobData where !$0.profileQuery.deprecated {
-                profiles.append(DBPUIDataBrokerProfileMatch(extractedProfile: extractedProfile,
-                                                            optOutJobData: optOutJobData,
-                                                            dataBroker: $0.dataBroker))
+            for optOutJobData in $0.optOutJobData {
+                var parentBrokerOptOutJobData: [OptOutJobData]?
+                if let parent = $0.dataBroker.parent,
+                   let parentsQueryData = brokerURLsToQueryData[parent] {
+                    parentBrokerOptOutJobData = parentsQueryData.flatMap { $0.optOutJobData }
+                }
+
+                profiles.append(DBPUIDataBrokerProfileMatch(optOutJobData: optOutJobData,
+                                                            dataBroker: $0.dataBroker,
+                                                            parentBrokerOptOutJobData: parentBrokerOptOutJobData))
 
                 if !$0.dataBroker.mirrorSites.isEmpty {
                     let mirrorSitesMatches = $0.dataBroker.mirrorSites.compactMap { mirrorSite in
                         if mirrorSite.shouldWeIncludeMirrorSite() {
-                            return DBPUIDataBrokerProfileMatch(extractedProfile: extractedProfile,
-                                                               optOutJobData: optOutJobData,
+                            return DBPUIDataBrokerProfileMatch(optOutJobData: optOutJobData,
                                                                dataBrokerName: mirrorSite.name,
-                                                               databrokerURL: mirrorSite.url)
+                                                               databrokerURL: mirrorSite.url,
+                                                               parentBrokerOptOutJobData: parentBrokerOptOutJobData)
                         }
 
                         return nil
@@ -83,14 +93,24 @@ struct MapperToUI {
         let scansThatRanAtLeastOnce = brokerProfileQueryData.flatMap { $0.sitesScanned }
         let sitesScanned = Dictionary(grouping: scansThatRanAtLeastOnce, by: { $0 }).count
 
+        // Used to find opt outs on the parent
+        let brokerURLsToQueryData =  Dictionary(grouping: brokerProfileQueryData, by: { $0.dataBroker.name })
+
         brokerProfileQueryData.forEach {
             let dataBroker = $0.dataBroker
             let scanJob = $0.scanJobData
             for optOutJob in $0.optOutJobData {
                 let extractedProfile = optOutJob.extractedProfile
-                let profileMatch = DBPUIDataBrokerProfileMatch(extractedProfile: extractedProfile,
-                                                               optOutJobData: optOutJob,
-                                                               dataBroker: dataBroker)
+
+                var parentBrokerOptOutJobData: [OptOutJobData]?
+                if let parent = $0.dataBroker.parent,
+                   let parentsQueryData = brokerURLsToQueryData[parent] {
+                    parentBrokerOptOutJobData = parentsQueryData.flatMap { $0.optOutJobData }
+                }
+
+                let profileMatch = DBPUIDataBrokerProfileMatch(optOutJobData: optOutJob,
+                                                               dataBroker: dataBroker,
+                                                               parentBrokerOptOutJobData: parentBrokerOptOutJobData)
 
                 if extractedProfile.removedDate == nil {
                     inProgressOptOuts.append(profileMatch)
@@ -100,10 +120,10 @@ struct MapperToUI {
 
                 if let closestMatchesFoundEvent = scanJob.closestMatchesFoundEvent() {
                     for mirrorSite in dataBroker.mirrorSites where mirrorSite.shouldWeIncludeMirrorSite(for: closestMatchesFoundEvent.date) {
-                        let mirrorSiteMatch = DBPUIDataBrokerProfileMatch(extractedProfile: extractedProfile,
-                                                                          optOutJobData: optOutJob,
+                        let mirrorSiteMatch = DBPUIDataBrokerProfileMatch(optOutJobData: optOutJob,
                                                                           dataBrokerName: mirrorSite.name,
-                                                                          databrokerURL: mirrorSite.url)
+                                                                          databrokerURL: mirrorSite.url,
+                                                                          parentBrokerOptOutJobData: parentBrokerOptOutJobData)
 
                         if let extractedProfileRemovedDate = extractedProfile.removedDate,
                            mirrorSite.shouldWeIncludeMirrorSite(for: extractedProfileRemovedDate) {
