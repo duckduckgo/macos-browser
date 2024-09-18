@@ -30,10 +30,9 @@ protocol BookmarkManager: AnyObject {
     func getBookmark(for url: URL) -> Bookmark?
     func getBookmark(forUrl url: String) -> Bookmark?
     func getBookmarkFolder(withId id: String) -> BookmarkFolder?
-    @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark?
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool, index: Int?, parent: BookmarkFolder?) -> Bookmark?
     func makeBookmarks(for websitesInfo: [WebsiteInfo], inNewFolderNamed folderName: String, withinParentFolder parent: ParentFolderType)
-    func makeFolder(for title: String, parent: BookmarkFolder?, completion: @escaping (BookmarkFolder) -> Void)
+    func makeFolder(withTitle title: String, parent: BookmarkFolder?, completion: @escaping (Result<BookmarkFolder, Error>) -> Void)
     func remove(bookmark: Bookmark, undoManager: UndoManager?)
     func remove(folder: BookmarkFolder, undoManager: UndoManager?)
     func remove(objectsWithUUIDs uuids: [String], undoManager: UndoManager?)
@@ -67,7 +66,14 @@ protocol BookmarkManager: AnyObject {
     var sortMode: BookmarksSortMode { get set }
 
     func requestSync()
-
+}
+extension BookmarkManager {
+    @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark? {
+        makeBookmark(for: url, title: title, isFavorite: isFavorite, index: nil, parent: nil)
+    }
+    @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool, index: Int?, parent: BookmarkFolder?) -> Bookmark? {
+        makeBookmark(for: url, title: title, isFavorite: isFavorite, index: index, parent: parent)
+    }
 }
 
 final class LocalBookmarkManager: BookmarkManager {
@@ -164,11 +170,7 @@ final class LocalBookmarkManager: BookmarkManager {
         bookmarkStore.bookmarkFolder(withId: id)
     }
 
-    @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark? {
-        makeBookmark(for: url, title: title, isFavorite: isFavorite, index: nil, parent: nil)
-    }
-
-    @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool, index: Int? = nil, parent: BookmarkFolder? = nil) -> Bookmark? {
+    @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool, index: Int?, parent: BookmarkFolder?) -> Bookmark? {
         guard list != nil else { return nil }
 
         guard !isUrlBookmarked(url: url) else {
@@ -180,8 +182,8 @@ final class LocalBookmarkManager: BookmarkManager {
         let bookmark = Bookmark(id: id, url: url.absoluteString, title: title, isFavorite: isFavorite, parentFolderUUID: parent?.id)
 
         list?.insert(bookmark)
-        bookmarkStore.save(bookmark: bookmark, parent: parent, index: index) { [weak self] success, _  in
-            guard success else {
+        bookmarkStore.save(bookmark: bookmark, parent: parent, index: index) { [weak self] error  in
+            if error != nil {
                 self?.list?.remove(bookmark)
                 return
             }
@@ -209,8 +211,8 @@ final class LocalBookmarkManager: BookmarkManager {
 
         undoManager?.registerUndoDeleteEntities([bookmark], bookmarkManager: self)
         list?.remove(latestBookmark)
-        bookmarkStore.remove(objectsWithUUIDs: [bookmark.id]) { [weak self] success, _ in
-            if !success {
+        bookmarkStore.remove(objectsWithUUIDs: [bookmark.id]) { [weak self] error in
+            if error != nil {
                 self?.list?.insert(bookmark)
             }
 
@@ -222,7 +224,7 @@ final class LocalBookmarkManager: BookmarkManager {
     @MainActor
     func remove(folder: BookmarkFolder, undoManager: UndoManager?) {
         undoManager?.registerUndoDeleteEntities([folder], bookmarkManager: self)
-        bookmarkStore.remove(objectsWithUUIDs: [folder.id]) { [weak self] _, _ in
+        bookmarkStore.remove(objectsWithUUIDs: [folder.id]) { [weak self] _ in
             self?.loadBookmarks()
             self?.requestSync()
         }
@@ -233,7 +235,7 @@ final class LocalBookmarkManager: BookmarkManager {
         if let undoManager, let entities = bookmarkStore.bookmarkEntities(withIds: uuids) {
             undoManager.registerUndoDeleteEntities(entities, bookmarkManager: self)
         }
-        bookmarkStore.remove(objectsWithUUIDs: uuids) { [weak self] _, _ in
+        bookmarkStore.remove(objectsWithUUIDs: uuids) { [weak self] _ in
             self?.loadBookmarks()
             self?.requestSync()
         }
@@ -315,17 +317,17 @@ final class LocalBookmarkManager: BookmarkManager {
 
     // MARK: - Folders
 
-    func makeFolder(for title: String, parent: BookmarkFolder?, completion: @escaping (BookmarkFolder) -> Void) {
-
+    func makeFolder(withTitle title: String, parent: BookmarkFolder?, completion: @escaping (Result<BookmarkFolder, Error>) -> Void) {
         let folder = BookmarkFolder(id: UUID().uuidString, title: title, parentFolderUUID: parent?.id, children: [])
 
-        bookmarkStore.save(folder: folder, parent: parent) { [weak self] success, _  in
-            guard success else {
+        bookmarkStore.save(folder: folder, parent: parent) { [weak self] error  in
+            if let error {
+                completion(.failure(error))
                 return
             }
             self?.loadBookmarks()
             self?.requestSync()
-            completion(folder)
+            completion(.success(folder))
         }
     }
 
@@ -503,7 +505,6 @@ private extension String {
     private func removeAccents() -> String {
         // Normalize the string to NFD (Normalization Form Decomposition)
         let normalizedString = self as NSString
-        let range = NSRange(location: 0, length: normalizedString.length)
 
         // Apply the transform to remove diacritics
         let transformedString = normalizedString.applyingTransform(.toLatin, reverse: false) ?? ""

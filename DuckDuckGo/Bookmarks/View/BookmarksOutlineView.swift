@@ -233,6 +233,7 @@ final class BookmarksOutlineView: NSOutlineView {
             if event.modifierFlags.contains(.option) || event.keyCode == kVK_PageDown,
                let lastRow = bookmarksDataSource?.lastHighlightableRow(for: self) {
                 self.highlightedRow = lastRow
+                //  TODO: doesn‘t highlight next nested row in folder
             } else if let nextRow = bookmarksDataSource?.nextHighlightableRow(inNextSection: event.modifierFlags.contains(.command), for: self, after: highlightedRow) {
                 self.highlightedRow = nextRow
             }

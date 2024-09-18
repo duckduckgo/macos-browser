@@ -47,10 +47,10 @@ protocol BookmarkStore {
     func applyFavoritesDisplayMode(_ configuration: FavoritesDisplayMode)
 
     func loadAll(type: BookmarkStoreFetchPredicateType, completion: @escaping ([BaseBookmarkEntity]?, Error?) -> Void)
-    func save(bookmark: Bookmark, parent: BookmarkFolder?, index: Int?, completion: @escaping (Bool, Error?) -> Void)
+    func save(bookmark: Bookmark, parent: BookmarkFolder?, index: Int?, completion: @escaping (Error?) -> Void)
     func saveBookmarks(for websitesInfo: [WebsiteInfo], inNewFolderNamed folderName: String, withinParentFolder parent: ParentFolderType)
-    func save(folder: BookmarkFolder, parent: BookmarkFolder?, completion: @escaping (Bool, Error?) -> Void)
-    func remove(objectsWithUUIDs: [String], completion: @escaping (Bool, Error?) -> Void)
+    func save(folder: BookmarkFolder, parent: BookmarkFolder?, completion: @escaping (Error?) -> Void)
+    func remove(objectsWithUUIDs: [String], completion: @escaping (Error?) -> Void)
     func restore(_ objects: [BaseBookmarkEntity], completion: @escaping (Error?) -> Void)
     func update(bookmark: Bookmark)
     func bookmarkEntities(withIds ids: [String]) -> [BaseBookmarkEntity]?
