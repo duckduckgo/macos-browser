@@ -146,4 +146,7 @@ class MockBookmarkManager: BookmarkManager {
     var sortModePublisher: Published<BookmarksSortMode>.Publisher { $sortMode }
 
     @Published var sortMode: BookmarksSortMode = .manual
+
+    func restore(_ objects: [DuckDuckGo_Privacy_Browser.BaseBookmarkEntity], undoManager: UndoManager?) {}
+
 }
