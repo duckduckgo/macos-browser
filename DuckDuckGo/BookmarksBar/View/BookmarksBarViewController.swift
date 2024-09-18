@@ -98,7 +98,7 @@ final class BookmarksBarViewController: NSViewController {
 
         bookmarksBarCollectionView.delegate = viewModel
         bookmarksBarCollectionView.dataSource = viewModel
-        bookmarksBarCollectionView.collectionViewLayout = createCenteredCollectionViewLayout()
+        bookmarksBarCollectionView.collectionViewLayout = createLeftAlignedCollectionViewLayout()
 
         view.postsFrameChangedNotifications = true
         bookmarksBarCollectionView.setAccessibilityIdentifier("BookmarksBarViewController.bookmarksBarCollectionView")
@@ -228,14 +228,14 @@ final class BookmarksBarViewController: NSViewController {
 
     // MARK: - Layout
 
-    private func createCenteredLayout(centered: Bool) -> NSCollectionLayoutSection {
-        let group = NSCollectionLayoutGroup.horizontallyCentered(cellSizes: viewModel.cellSizes, interItemSpacing: BookmarksBarViewModel.Constants.buttonSpacing, centered: centered)
+    private func createLeftAlignedLayout() -> NSCollectionLayoutSection {
+        let group = NSCollectionLayoutGroup.leftAligned(cellSizes: viewModel.cellSizes, interItemSpacing: BookmarksBarViewModel.Constants.buttonSpacing)
         return NSCollectionLayoutSection(group: group)
     }
 
-    func createCenteredCollectionViewLayout() -> NSCollectionViewLayout {
-        return BookmarksBarCenteredLayout { [unowned self] _, _ in
-            return createCenteredLayout(centered: viewModel.clippedItems.isEmpty)
+    private func createLeftAlignedCollectionViewLayout() -> NSCollectionViewLayout {
+        return BookmarksBarLeftAlignedLayout { [unowned self] _, _ in
+            return createLeftAlignedLayout()
         }
     }
 
