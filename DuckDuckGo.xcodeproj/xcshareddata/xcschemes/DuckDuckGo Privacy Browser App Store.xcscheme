@@ -113,6 +113,12 @@
                   Identifier = "StatisticsLoaderTests/testWhenRefreshRetentionAtbIsPerformedForNavigationThenAppRetentionAtbRequested()">
                </Test>
                <Test
+                  Identifier = "SubscriptionPagesUseSubscriptionFeatureTests/testBackToSettingsErrorOnFetchingAccountDetails()">
+               </Test>
+               <Test
+                  Identifier = "SubscriptionPagesUseSubscriptionFeatureTests/testBackToSettingsSuccess()">
+               </Test>
+               <Test
                   Identifier = "WindowManagerStateRestorationTests/testWindowManagerStateRestoration()">
                </Test>
             </SkippedTests>
@@ -147,6 +153,9 @@
                </Test>
                <Test
                   Identifier = "NavigationProtectionIntegrationTests/testReferrerTrimming()">
+               </Test>
+               <Test
+                  Identifier = "PhishingDetectionIntegrationTests">
                </Test>
                <Test
                   Identifier = "TabContentTests">

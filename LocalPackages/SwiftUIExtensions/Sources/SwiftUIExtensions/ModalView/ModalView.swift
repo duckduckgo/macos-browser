@@ -44,15 +44,19 @@ public extension ModalView {
             }
         }
 
-        var modalWindow: NSWindow?
+        var capturedWeakWindow: NSWindow?
 
         let rootView = self.environment(\.dismiss, {
-            if let session {
-                NSApplication.shared.endModalSession(session)
+            guard let window = capturedWeakWindow else {
+                return
             }
 
-            modalWindow?.close()
-            modalWindow = nil
+            if let session {
+                NSApplication.shared.endModalSession(session)
+                window.close()
+            } else {
+                parentWindow?.endSheet(window)
+            }
         })
 
         let hostingView = NSHostingView(rootView: rootView)
@@ -95,7 +99,7 @@ public extension ModalView {
         //
         window.isReleasedWhenClosed = false
 
-        modalWindow = window
+        capturedWeakWindow = window
 
         if let parentWindow {
             await parentWindow.beginSheet(window)

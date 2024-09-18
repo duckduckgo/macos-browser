@@ -199,7 +199,7 @@ extension UserText {
     // "vpn.location.title" - Location section title in VPN settings
     static let vpnLocationTitle = "Location"
     // "vpn.excluded.sites.title" - Excluded Sites title in VPN settings
-    static let vpnExcludedSitesTitle = "Excluded Sites"
+    static let vpnExcludedSitesTitle = "Excluded Websites"
     // "vpn.general.title" - General section title in VPN settings
     static let vpnGeneralTitle = "General"
     // "vpn.shortcuts.settings.title" - Shortcuts section title in VPN settings
@@ -239,13 +239,21 @@ extension UserText {
 
     // MARK: - Excluded Domains
     // "vpn.setting.excluded.domains.description" - Excluded Sites description
-    static let vpnExcludedDomainsDescription = "Websites you selected to be excluded even when the VPN is connected."
+    static let vpnExcludedDomainsDescription = "Excluded websites will bypass the VPN."
     // "vpn.setting.excluded.domains.manage.button.title" - Excluded Sites management button title
-    static let vpnExcludedDomainsManageButtonTitle = "Manage Excluded Sites…"
+    static let vpnExcludedDomainsManageButtonTitle = "Manage Excluded Websites…"
     // "vpn.excluded.domains.add.domain" - Add Domain button for the excluded sites view
     static let vpnExcludedDomainsAddDomain = "Add Website"
     // "vpn.excluded.domains.title" - Title for the excluded sites view
     static let vpnExcludedDomainsTitle = "Excluded Websites"
+
+    // MARK: - Add Excluded Domain
+    // "vpn.setting.add.excluded.domain.title" - Add excluded domain title
+    static let vpnAddExcludedDomainTitle = "Exclude Website From VPN"
+    // "vpn.setting.add.excluded.domain.action.button.title" - Add excluded domain button title
+    static let vpnAddExcludedDomainActionButtonTitle = "Exclude Website"
+    // "vpn.setting.add.excluded.domain.cancel.button.title" - Add excluded domain cancel button title
+    static let vpnAddExcludedDomainCancelButtonTitle = "Cancel"
 
     // MARK: - DNS
     // "vpn.dns.server.title" - Title of the DNS Server section

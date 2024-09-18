@@ -30,7 +30,7 @@ struct ReportSiteIssuesView: ModalView {
 
     private let cancelActionTitle = "Not Now"
     private let defaultActionTitle = "Report"
-    private let dontAskAgainTitle = "Don't ask again"
+    private let dontAskAgainTitle = "Don't Ask Again"
 
     let defaultAction: @MainActor (_ dismiss: () -> Void) -> Void
     let cancelAction: @MainActor (_ dismiss: () -> Void) -> Void
@@ -45,14 +45,14 @@ struct ReportSiteIssuesView: ModalView {
                     .weight(.bold))
                 .multilineText()
 
-            Text("Please let us know if you disabled the VPN for \(domain) because you experienced issues.")
+            Text("Please let us know if you excluded \(domain) from the VPN because you experienced issues.")
                 .font(Font.custom("SF Pro", size: 13))
                 .fixedSize(horizontal: false, vertical: true)
                 .lineLimit(2)
                 .multilineTextAlignment(.center)
                 .multilineText()
 
-            Text("Reports do not include any personalised information other than the domain address.")
+            Text("Reports only include the domain of the affected website.")
                 .font(Font.custom("SF Pro", size: 11))
                 .fixedSize(horizontal: false, vertical: true)
                 .lineLimit(2)
@@ -73,6 +73,6 @@ struct ReportSiteIssuesView: ModalView {
                 defaultAction(dismiss)
             }
         }
-        .frame(width: 325)
+        .frame(width: 365)
     }
 }
