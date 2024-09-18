@@ -1210,6 +1210,7 @@ struct UserText {
     static let automaticUpdates = NSLocalizedString("settings.automatic.updates", value: "Automatically install updates (recommended)", comment: "Title of the checkbox item to set up automatic updates of the browser")
     static let manualUpdates = NSLocalizedString("settings.manual.updates", value: "Check for updates but let you choose to install them", comment: "Title of the checkbox item to set up manual updates of the browser")
     static let checkingForUpdate = NSLocalizedString("settings.checking.for.update", value: "Checking for update", comment: "Label informing users the app is currently checking for new update")
+    static let downloadingUpdate = NSLocalizedString("settings.downloading.update", value: "Downloading update %@", comment: "Label informing users the app is currently downloading the update. This will contain a percentage")
     static let upToDate = NSLocalizedString("settings.up.to.date", value: "DuckDuckGo is up to date", comment: "Label informing users the app is currently up to date and no update is required.")
     static let newerVersionAvailable = NSLocalizedString("settings.newer.version.available", value: "Newer version available", comment: "Label informing users the newer version of the app is available to install.")
     static let lastChecked = NSLocalizedString("settings.last.checked", value: "Last checked", comment: "Label informing users what is the last time the app checked for the update.")

@@ -30,7 +30,7 @@ enum UpdateCycleProgress {
     case updateCycleDidStart
     case updateCycleDone
     case downloadDidStart
-    case downloading(UInt64, UInt64)
+    case downloading(Double)
     case extractionDidStart
     case extracting(Double)
     case readyToInstallAndRelaunch
@@ -145,7 +145,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         if bytesDownloaded > bytesToDownload {
             bytesToDownload = bytesDownloaded
         }
-        updateProgress = .downloading(bytesDownloaded, bytesToDownload)
+        updateProgress = .downloading(Double(bytesDownloaded) / Double(bytesToDownload))
     }
 
     func showDownloadDidStartExtractingUpdate() {

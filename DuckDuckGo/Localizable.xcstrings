@@ -53,31 +53,6 @@
         }
       }
     },
-    " — Downloading %@ / %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : " — Downloading %1$@ / %2$@"
-          }
-        }
-      }
-    },
-    " — Downloading update" : {
-
-    },
-    " — Extracting update" : {
-
-    },
-    " — Extracting update (%@%%)" : {
-
-    },
-    " — Installing" : {
-
-    },
-    " — Ready to install" : {
-
-    },
     " %@" : {
       "localizations" : {
         "de" : {
@@ -55012,6 +54987,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Проверка обновлений"
+          }
+        }
+      }
+    },
+    "settings.downloading.update" : {
+      "comment" : "Label informing users the app is currently downloading the update. This will contain a percentage",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Downloading update %@"
           }
         }
       }
