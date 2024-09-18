@@ -20,7 +20,8 @@ import Cocoa
 import Combine
 import Lottie
 
-final class AddressBarViewController: NSViewController {
+final class AddressBarViewController: NSViewController, ObservableObject {
+    var isSearchBox = false
 
     @IBOutlet var addressBarTextField: AddressBarTextField!
     @IBOutlet var passiveTextField: NSTextField!
@@ -31,10 +32,11 @@ final class AddressBarViewController: NSViewController {
     @IBOutlet var progressIndicator: LoadingProgressView!
     @IBOutlet var passiveTextFieldMinXConstraint: NSLayoutConstraint!
     @IBOutlet var activeTextFieldMinXConstraint: NSLayoutConstraint!
+    @IBOutlet var buttonsContainerView: NSView!
     private static let defaultActiveTextFieldMinX: CGFloat = 40
 
-    private let popovers: NavigationBarPopovers
-    private(set) var addressBarButtonsViewController: AddressBarButtonsViewController?
+    private let popovers: NavigationBarPopovers?
+    var addressBarButtonsViewController: AddressBarButtonsViewController?
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private var tabViewModel: TabViewModel?
@@ -82,7 +84,7 @@ final class AddressBarViewController: NSViewController {
         fatalError("AddressBarViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, popovers: NavigationBarPopovers) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, popovers: NavigationBarPopovers?) {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.popovers = popovers
         self.suggestionContainerViewModel = SuggestionContainerViewModel(
@@ -144,10 +146,8 @@ final class AddressBarViewController: NSViewController {
         }
         subscribeToSelectedTabViewModel()
         subscribeToAddressBarValue()
-        registerForMouseEnteredAndExitedEvents()
         subscribeToButtonsWidth()
         subscribeForShadowViewUpdates()
-
     }
 
     // swiftlint:disable notification_center_detachment
@@ -292,9 +292,12 @@ final class AddressBarViewController: NSViewController {
             .store(in: &cancellables)
     }
 
+    @Published var isSuggestionsWindowVisible: Bool = false
+
     private func subscribeForShadowViewUpdates() {
         addressBarTextField.isSuggestionWindowVisiblePublisher
             .sink { [weak self] isSuggestionsWindowVisible in
+                self?.isSuggestionsWindowVisible = isSuggestionsWindowVisible
                 self?.updateShadowView(isSuggestionsWindowVisible)
             }
             .store(in: &cancellables)

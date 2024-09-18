@@ -45,6 +45,7 @@ final class HomePageViewController: NSViewController {
     var recentlyVisitedModel: HomePage.Models.RecentlyVisitedModel!
     var featuresModel: HomePage.Models.ContinueSetUpModel!
     let settingsVisibilityModel = HomePage.Models.SettingsVisibilityModel()
+    var addressBarViewController: AddressBarViewController!
     let accessibilityPreferences: AccessibilityPreferences
     let appearancePreferences: AppearancePreferences
     let defaultBrowserPreferences: DefaultBrowserPreferences
@@ -83,6 +84,7 @@ final class HomePageViewController: NSViewController {
         defaultBrowserModel = createDefaultBrowserModel()
         recentlyVisitedModel = createRecentlyVisitedModel()
         featuresModel = createFeatureModel()
+        addressBarViewController = createAddressBarViewController()
 
         refreshModels()
 
@@ -96,10 +98,7 @@ final class HomePageViewController: NSViewController {
             .environmentObject(appearancePreferences)
             .environmentObject(Application.appDelegate.activeRemoteMessageModel)
             .environmentObject(settingsVisibilityModel)
-            .onTapGesture { [weak self] in
-                // Remove focus from the address bar if interacting with this view.
-                self?.view.makeMeFirstResponder()
-            }
+            .environmentObject(addressBarViewController)
 
         self.view = NSHostingView(rootView: rootView)
     }
@@ -121,6 +120,7 @@ final class HomePageViewController: NSViewController {
     override func viewDidAppear() {
         super.viewDidAppear()
         refreshModels()
+        addressBarViewController.addressBarTextField.makeMeFirstResponder()
     }
 
     override func viewWillDisappear() {
@@ -197,6 +197,25 @@ final class HomePageViewController: NSViewController {
         }, onFaviconMissing: { [weak self] in
             self?.faviconsFetcherOnboarding?.presentOnboardingIfNeeded()
         })
+    }
+
+    func createAddressBarViewController() -> AddressBarViewController {
+        let storyboard = NSStoryboard(name: "NavigationBar", bundle: .main)
+        let controller: AddressBarViewController = storyboard.instantiateController(identifier: "AddressBarViewController") { [weak self] coder in
+            guard let self else {
+                return nil
+            }
+            return AddressBarViewController(coder: coder, tabCollectionViewModel: self.tabCollectionViewModel, isBurner: false, popovers: nil)
+        }
+        controller.loadView()
+
+        let buttonsController: AddressBarButtonsViewController = storyboard.instantiateController(identifier: "AddressBarButtonsViewController") { coder in
+            controller.createAddressBarButtonsViewController(coder)
+        }
+        controller.addAndLayoutChild(buttonsController, into: controller.buttonsContainerView)
+
+        controller.isSearchBox = true
+        return controller
     }
 
     func refreshFavoritesModel() {

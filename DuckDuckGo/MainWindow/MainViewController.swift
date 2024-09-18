@@ -442,7 +442,11 @@ final class MainViewController: NSViewController {
         let tabContent = tabContent ?? selectedTabViewModel.tab.content
 
         if case .newtab = tabContent {
-            navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
+            if let homeAddressBarTextField = browserTabViewController.homePageViewController?.addressBarViewController?.addressBarTextField {
+                homeAddressBarTextField.makeMeFirstResponder()
+            } else {
+                navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
+            }
 
         } else {
             // ignore published tab switch: BrowserTabViewController
@@ -514,6 +518,9 @@ extension MainViewController {
             }
             if let addressBarVC = navigationBarViewController.addressBarViewController {
                 isHandled = isHandled || addressBarVC.escapeKeyDown()
+            }
+            if let homeAddressBarVC = browserTabViewController.homePageViewController?.addressBarViewController {
+                isHandled = isHandled || homeAddressBarVC.escapeKeyDown()
             }
             return isHandled
 

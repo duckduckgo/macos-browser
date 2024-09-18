@@ -22,28 +22,15 @@ import SwiftUI
 import SwiftUIExtensions
 
 struct AddressBarTextFieldView: NSViewRepresentable {
-    func makeNSView(context: Context) -> AddressBarTextField {
-        let textField = AddressBarTextField(frame: NSRect(origin: .zero, size: .init(width: 600, height: 40)))
-        textField.cell = AddressBarTextFieldCell()
-        textField.setEditable(true)
-        textField.delegate = textField
 
-        textField.tabCollectionViewModel = TabCollectionViewModel()
+    let tabCollectionViewModel: TabCollectionViewModel
+    let addressBarViewController: AddressBarViewController
 
-        textField.suggestionContainerViewModel = SuggestionContainerViewModel(
-            isHomePage: true,
-            isBurner: false,
-            suggestionContainer: SuggestionContainer())
-
-        DispatchQueue.main.async {
-            textField.tabCollectionViewModel = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel
-        }
-
-        return textField
+    func makeNSView(context: Context) -> NSView {
+        return addressBarViewController.view
     }
 
-    func updateNSView(_ nsView: AddressBarTextField, context: Context) {
-
+    func updateNSView(_ nsView: NSView, context: Context) {
     }
 }
 
@@ -62,6 +49,7 @@ extension HomePage.Views {
         @EnvironmentObject var settingsModel: HomePage.Models.SettingsModel
         @EnvironmentObject var activeRemoteMessageModel: ActiveRemoteMessageModel
         @EnvironmentObject var settingsVisibilityModel: HomePage.Models.SettingsVisibilityModel
+        @EnvironmentObject var addressBarViewController: AddressBarViewController
 
         var body: some View {
             if isBurner {
@@ -77,11 +65,21 @@ extension HomePage.Views {
 
                     HStack(spacing: 0) {
                         ZStack(alignment: .leading) {
-                            ScrollView {
-                                innerView(includingContinueSetUpCards: includingContinueSetUpCards)
-                                    .frame(width: geometry.size.width - (settingsVisibilityModel.isSettingsVisible ? Self.settingsPanelWidth : 0))
-                                    .offset(x: settingsVisibilityModel.isSettingsVisible ? innerViewOffset(with: geometry) : 0)
-                                    .fixedColorScheme(for: settingsModel.customBackground)
+                            if #available(macOS 13.0, *) {
+                                ScrollView {
+                                    innerView(includingContinueSetUpCards: includingContinueSetUpCards)
+                                        .frame(width: geometry.size.width - (settingsVisibilityModel.isSettingsVisible ? Self.settingsPanelWidth : 0))
+                                        .offset(x: settingsVisibilityModel.isSettingsVisible ? innerViewOffset(with: geometry) : 0)
+                                        .fixedColorScheme(for: settingsModel.customBackground)
+                                }
+                                .scrollDisabled(addressBarViewController.isSuggestionsWindowVisible)
+                            } else {
+                                ScrollView {
+                                    innerView(includingContinueSetUpCards: includingContinueSetUpCards)
+                                        .frame(width: geometry.size.width - (settingsVisibilityModel.isSettingsVisible ? Self.settingsPanelWidth : 0))
+                                        .offset(x: settingsVisibilityModel.isSettingsVisible ? innerViewOffset(with: geometry) : 0)
+                                        .fixedColorScheme(for: settingsModel.customBackground)
+                                }
                             }
                         }
                         .frame(width: settingsVisibilityModel.isSettingsVisible ? geometry.size.width - Self.settingsPanelWidth : geometry.size.width)
@@ -143,8 +141,7 @@ extension HomePage.Views {
                 Group {
                     remoteMessage()
 
-                    AddressBarTextFieldView()
-                        .frame(height: 40)
+                    addressBar()
 
                     if includingContinueSetUpCards {
                         ContinueSetUpView()
@@ -186,6 +183,15 @@ extension HomePage.Views {
             } else {
                 EmptyView()
             }
+        }
+
+        @ViewBuilder
+        func addressBar() -> some View {
+            AddressBarTextFieldView(
+                tabCollectionViewModel: continueSetUpModel.tabCollectionViewModel,
+                addressBarViewController: addressBarViewController
+            )
+            .frame(height: 40)
         }
 
         @ViewBuilder
