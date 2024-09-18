@@ -194,6 +194,8 @@ extension Preferences {
                                     formatter.string(from: NSNumber(value: percentage)) ?? ""))
             case .extractionDidStart, .extracting, .readyToInstallAndRelaunch, .installationDidStart, .installing:
                 Text(" — " + String(format: UserText.downloadingUpdate, "100%"))
+            case .updaterError:
+                Text(" — " + UserText.updateFailed)
             case .updateCycleNotStarted, .updateCycleDone:
                 EmptyView()
             }
@@ -205,8 +207,8 @@ extension Preferences {
             case .upToDate:
                 Image(systemName: "checkmark.circle.fill")
                     .foregroundColor(.green)
-            case .updateCycle:
-                if hasPendingUpdate {
+            case .updateCycle(let progress):
+                if hasPendingUpdate || progress.isFailed {
                     Image(systemName: "exclamationmark.circle.fill")
                         .foregroundColor(.red)
                 } else {
@@ -244,10 +246,15 @@ extension Preferences {
                     model.checkForUpdate()
                 }
                 .buttonStyle(UpdateButtonStyle(enabled: true))
-            case .updateCycle:
+            case .updateCycle(let progress):
                 if hasPendingUpdate {
                     Button(UserText.runUpdate) {
                         model.runUpdate()
+                    }
+                    .buttonStyle(UpdateButtonStyle(enabled: true))
+                } else if progress.isFailed {
+                    Button(UserText.retryUpdate) {
+                        model.checkForUpdate()
                     }
                     .buttonStyle(UpdateButtonStyle(enabled: true))
                 } else {

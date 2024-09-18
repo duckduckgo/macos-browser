@@ -12384,9 +12384,6 @@
         }
       }
     },
-    "Checking for update" : {
-
-    },
     "clear" : {
       "comment" : "Clear button",
       "extractionState" : "extracted_with_value",
@@ -55184,7 +55181,7 @@
       }
     },
     "settings.restart.to.update" : {
-      "comment" : "Button label trigering restart and update of the application.",
+      "comment" : "Button label triggering restart and update of the application.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -55239,6 +55236,18 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Перезапустите для обновления"
+          }
+        }
+      }
+    },
+    "settings.retry.update" : {
+      "comment" : "Button label triggering a retry of the update.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Retry Update"
           }
         }
       }
@@ -55299,6 +55308,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "DuckDuckGo обновлен"
+          }
+        }
+      }
+    },
+    "settings.update.failed" : {
+      "comment" : "Label informing users the app is unable to update.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Update failed"
           }
         }
       }
