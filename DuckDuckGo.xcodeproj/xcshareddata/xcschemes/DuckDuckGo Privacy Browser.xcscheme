@@ -145,6 +145,9 @@
                   Identifier = "StatisticsLoaderTests/testWhenRefreshRetentionAtbIsPerformedForNavigationThenAppRetentionAtbRequested()">
                </Test>
                <Test
+                  Identifier = "SubscriptionPagesUseSubscriptionFeatureTests/testBackToSettingsErrorOnFetchingAccountDetails()">
+               </Test>
+               <Test
                   Identifier = "TabSnapshotExtensionTests/testWhenSnapshotIsRestored_ThenRenderingIsSkippedAfterLoading()">
                </Test>
                <Test
