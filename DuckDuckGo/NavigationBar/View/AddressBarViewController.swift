@@ -299,6 +299,9 @@ final class AddressBarViewController: NSViewController, ObservableObject {
             .sink { [weak self] isSuggestionsWindowVisible in
                 self?.isSuggestionsWindowVisible = isSuggestionsWindowVisible
                 self?.updateShadowView(isSuggestionsWindowVisible)
+                if isSuggestionsWindowVisible {
+                    self?.layoutShadowView()
+                }
             }
             .store(in: &cancellables)
 
