@@ -36,7 +36,7 @@ public class DataBrokerProtectionAgentManagerProvider {
         let executionConfig = DataBrokerExecutionConfig()
         let activityScheduler = DefaultDataBrokerProtectionBackgroundActivityScheduler(config: executionConfig)
 
-        let notificationService = DefaultDataBrokerProtectionUserNotificationService(pixelHandler: pixelHandler)
+        let notificationService = DefaultDataBrokerProtectionUserNotificationService(pixelHandler: pixelHandler, authenticationManager: authenticationManager)
         Configuration.setURLProvider(DBPAgentConfigurationURLProvider())
         let configStore = ConfigurationStore()
         let privacyConfigurationManager = DBPPrivacyConfigurationManager()
