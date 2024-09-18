@@ -39,6 +39,7 @@ jobs:
         WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
       run: |
         bundle exec fastlane run asana_create_action_item \
+          branch:"${{ github.ref_name }}" \
           task_url:"https://app.asana.com/0/1201621708115095/1208137627434473/f" \
           template_name:"run-publish-dmg-release" \
           github_handle:"${{ github.actor }}" \
