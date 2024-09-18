@@ -49,7 +49,8 @@ final class BookmarkDragDropManager {
         // If the dragged values contain both folders and bookmarks, only validate the move if all objects can be moved.
         case (true, true), (true, nil), (nil, true):
             return .move
-        case (false, _), (_, false): return .none
+        case (false, _), (_, false):
+            return .none
         default:
             if info.draggingPasteboard.availableType(from: [.URL]) != nil {
                 return .copy
