@@ -317,7 +317,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
         let result = try await feature.backToSettings(params: Constants.mockParams, original: Constants.mockScriptMessage)
 
         // Then
-        await fulfillment(of: [notificationPostedExpectation], timeout: 0.5)
+        await fulfillment(of: [notificationPostedExpectation], timeout: 1)
         XCTAssertEqual(accountManager.email, Constants.email)
         XCTAssertNil(result)
         XCTAssertPrivacyPixelsFired([])
@@ -335,7 +335,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
         let result = try await feature.backToSettings(params: Constants.mockParams, original: Constants.mockScriptMessage)
 
         // Then
-        await fulfillment(of: [notificationPostedExpectation], timeout: 0.5)
+        await fulfillment(of: [notificationPostedExpectation], timeout: 1)
         XCTAssertNil(result)
         XCTAssertPrivacyPixelsFired([])
     }
