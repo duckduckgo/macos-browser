@@ -51,10 +51,12 @@ final class DefaultFreemiumDBPFeature: FreemiumDBPFeature {
     ///
     /// The feature is considered available if:
     /// 1. It is enabled in the privacy configuration (`DBPSubfeature.freemium`), and
-    /// 2. The user is a potential privacy pro subscriber.
+    /// 2. User is in the experiement treatment cohort
+    /// 3. The user is a potential privacy pro subscriber.
     var isAvailable: Bool {
         privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DBPSubfeature.freemium)
-        && isPotentialPrivacyProSubscriber
+        && experimentManager.isTreatment
+        && subscriptionManager.isPotentialPrivacyProSubscriber
     }
 
     /// A publisher that emits updates when the availability of the Freemium DBP feature changes.
@@ -66,6 +68,7 @@ final class DefaultFreemiumDBPFeature: FreemiumDBPFeature {
 
     // MARK: - Private Properties
     private let privacyConfigurationManager: PrivacyConfigurationManaging
+    private let experimentManager: FreemiumDBPPixelExperimentManaging
     private let subscriptionManager: SubscriptionManager
     private let accountManager: AccountManager
     private var freemiumDBPUserStateManager: FreemiumDBPUserStateManager
@@ -87,6 +90,7 @@ final class DefaultFreemiumDBPFeature: FreemiumDBPFeature {
     ///   - notificationCenter: Observes notifications, defaulting to `.default`.
     ///   - featureDisabler: Optional feature disabler. If not provided, the default `DataBrokerProtectionFeatureDisabler` is used.
     init(privacyConfigurationManager: PrivacyConfigurationManaging,
+         experimentManager: FreemiumDBPPixelExperimentManaging,
          subscriptionManager: SubscriptionManager,
          accountManager: AccountManager,
          freemiumDBPUserStateManager: FreemiumDBPUserStateManager,
@@ -94,6 +98,7 @@ final class DefaultFreemiumDBPFeature: FreemiumDBPFeature {
          featureDisabler: DataBrokerProtectionFeatureDisabling? = nil) {
 
         self.privacyConfigurationManager = privacyConfigurationManager
+        self.experimentManager = experimentManager
         self.subscriptionManager = subscriptionManager
         self.accountManager = accountManager
         self.freemiumDBPUserStateManager = freemiumDBPUserStateManager
@@ -144,15 +149,6 @@ final class DefaultFreemiumDBPFeature: FreemiumDBPFeature {
 
 private extension DefaultFreemiumDBPFeature {
 
-    /// Returns true if a user is a "potential" Privacy Pro subscriber. This means:
-    ///
-    /// 1. Is eligible to purchase
-    /// 2. Is not a current subscriber
-    var isPotentialPrivacyProSubscriber: Bool {
-        subscriptionManager.isPrivacyProPurchaseAvailable
-        && !accountManager.isUserAuthenticated
-    }
-
     /// Returns true IFF:
     ///
     /// 1. The user did activate Freemium DBP
@@ -162,7 +158,7 @@ private extension DefaultFreemiumDBPFeature {
         guard freemiumDBPUserStateManager.didActivate else { return false }
 
         return !privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DBPSubfeature.freemium)
-        && isPotentialPrivacyProSubscriber
+        && subscriptionManager.isPotentialPrivacyProSubscriber
     }
 
     /// This method offboards a Freemium user if the feature flag was disabled
@@ -179,9 +175,18 @@ private extension DefaultFreemiumDBPFeature {
     }
 }
 
-private extension SubscriptionManager {
+extension SubscriptionManager {
 
-    var isPrivacyProPurchaseAvailable: Bool {
+    /// Returns true if a user is a "potential" Privacy Pro subscriber. This means:
+    ///
+    /// 1. Is eligible to purchase
+    /// 2. Is not a current subscriber
+    var isPotentialPrivacyProSubscriber: Bool {
+        isPrivacyProPurchaseAvailable
+        && !accountManager.isUserAuthenticated
+    }
+
+    private var isPrivacyProPurchaseAvailable: Bool {
         let platform = currentEnvironment.purchasePlatform
         switch platform {
         case .appStore:
