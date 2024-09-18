@@ -26,11 +26,22 @@ struct AddressBarTextFieldView: NSViewRepresentable {
     let tabCollectionViewModel: TabCollectionViewModel
     let addressBarViewController: AddressBarViewController
 
+    @EnvironmentObject var settingsModel: HomePage.Models.SettingsModel
+
     func makeNSView(context: Context) -> NSView {
         return addressBarViewController.view
     }
 
     func updateNSView(_ nsView: NSView, context: Context) {
+        switch settingsModel.customBackground?.colorScheme {
+        case .light:
+            nsView.appearance = NSAppearance(named: .aqua)
+        case .dark:
+            nsView.appearance = NSAppearance(named: .darkAqua)
+        default:
+            nsView.appearance = nil
+        }
+        nsView.subviews.forEach { $0.setNeedsDisplay($0.bounds) }
     }
 }
 
