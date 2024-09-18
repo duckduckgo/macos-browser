@@ -37,6 +37,7 @@ jobs:
         ASANA_TASK_URL: "https://app.asana.com/0/1201621708115095/1208137627434473/f"
         ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
         BRANCH: ${{ github.ref_name }}
+        TAG: "1.0.0"
         WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
       run: |
         bundle exec fastlane run asana_create_action_item \
