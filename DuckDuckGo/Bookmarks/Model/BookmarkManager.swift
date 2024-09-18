@@ -241,7 +241,7 @@ final class LocalBookmarkManager: BookmarkManager {
 
     func restore(_ objects: [BaseBookmarkEntity], undoManager: UndoManager?) {
         if let undoManager {
-            undoManager.registerUndo(withTarget: self) { [ids=objects.map(\.id)] this in
+            undoManager.registerUndo(withTarget: self) { @MainActor [ids=objects.map(\.id)] this in
                 this.remove(objectsWithUUIDs: ids, undoManager: undoManager)
             }
         }
