@@ -32,12 +32,8 @@ final class FreemiumDBPPixelExperimentManagingTests: XCTestCase {
        super.setUp()
         mockAccountManager = MockAccountManager()
         let mockSubscriptionService = SubscriptionEndpointServiceMock()
-        let mockAuthService = SubscriptionMockFactory.authEndpointService
-        let mockStorePurchaseManager = StorePurchaseManagerMock(purchasedProductIDs: ["a", "b"],
-                                                        purchaseQueue: [],
-                                                        areProductsAvailable: true,
-                                                        hasActiveSubscriptionResult: false,
-                                                        purchaseSubscriptionResult: .success(""))
+        let mockAuthService = AuthEndpointServiceMock()
+        let mockStorePurchaseManager = StorePurchaseManagerMock()
 
         let currentEnvironment = SubscriptionEnvironment(serviceEnvironment: .production,
                                                          purchasePlatform: .appStore)
