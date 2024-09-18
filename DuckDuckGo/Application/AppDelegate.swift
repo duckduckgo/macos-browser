@@ -277,7 +277,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         // Freemium DBP
         let freemiumDBPUserStateManager = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp)
+
+        let experimentManager = FreemiumDBPPixelExperimentManager(subscriptionManager: subscriptionManager)
+        experimentManager.assignUserToCohort()
+
         freemiumDBPFeature = DefaultFreemiumDBPFeature(privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager,
+                                                       experimentManager: experimentManager,
                                                        subscriptionManager: subscriptionManager,
                                                        accountManager: subscriptionManager.accountManager,
                                                        freemiumDBPUserStateManager: freemiumDBPUserStateManager)
