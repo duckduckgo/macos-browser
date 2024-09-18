@@ -38,9 +38,8 @@ final class MoreOptionsMenuTests: XCTestCase {
 
     var subscriptionManager: SubscriptionManagerMock!
 
-    private var mockPrivacyConfigurationManager: MockPrivacyConfigurationManaging!
     private var mockFreemiumDBPPresenter = MockFreemiumDBPPresenter()
-    private var freemiumDBPFeature: DefaultFreemiumDBPFeature!
+    private var mockFreemiumDBPFeature: MockFreemiumDBPFeature!
     private var mockNotificationCenter: MockNotificationCenter!
 
     var moreOptionsMenu: MoreOptionsMenu!
@@ -68,11 +67,9 @@ final class MoreOptionsMenuTests: XCTestCase {
                                                                                                   purchasePlatform: .appStore),
                                                       canPurchase: false)
 
-        mockPrivacyConfigurationManager = MockPrivacyConfigurationManaging()
-        freemiumDBPFeature = DefaultFreemiumDBPFeature(privacyConfigurationManager: mockPrivacyConfigurationManager, subscriptionManager: subscriptionManager, accountManager: subscriptionManager.accountManager, freemiumDBPUserStateManager: MockFreemiumDBPUserStateManager(), featureDisabler: MockFeatureDisabler())
+        mockFreemiumDBPFeature = MockFreemiumDBPFeature()
 
         mockNotificationCenter = MockNotificationCenter()
-
     }
 
     @MainActor
@@ -96,7 +93,7 @@ final class MoreOptionsMenuTests: XCTestCase {
                                           sharingMenu: NSMenu(),
                                           internalUserDecider: internalUserDecider,
                                           subscriptionManager: subscriptionManager,
-                                          freemiumDBPFeature: freemiumDBPFeature,
+                                          freemiumDBPFeature: mockFreemiumDBPFeature,
                                           freemiumDBPPresenter: mockFreemiumDBPPresenter,
                                           notificationCenter: mockNotificationCenter)
 
@@ -144,10 +141,10 @@ final class MoreOptionsMenuTests: XCTestCase {
     }
 
     @MainActor
-    func testThatMoreOptionMenuHasTheExpectedItemsWhenUnauthenticatedAndCanPurchaseSubscriptionAndFreemiumDBPFeatureFlagDisabled() {
+    func testThatMoreOptionMenuHasTheExpectedItemsWhenFreemiumFeatureUnavailable() {
         subscriptionManager.canPurchase = true
         subscriptionManager.currentEnvironment = SubscriptionEnvironment(serviceEnvironment: .production, purchasePlatform: .stripe)
-        mockPrivacyConfigurationManager.mockConfig.isSubfeatureKeyEnabled = { _, _ in false }
+        mockFreemiumDBPFeature.featureAvailable = false
 
         setupMoreOptionsMenu()
 
@@ -176,10 +173,10 @@ final class MoreOptionsMenuTests: XCTestCase {
     }
 
     @MainActor
-    func testThatMoreOptionMenuHasTheExpectedItemsWhenUnauthenticatedAndFreemiumDBPFeatureFlagEnabled() {
+    func testThatMoreOptionMenuHasTheExpectedItemsWhenFreemiumFeatureAvailable() {
         subscriptionManager.canPurchase = true
         subscriptionManager.currentEnvironment = SubscriptionEnvironment(serviceEnvironment: .production, purchasePlatform: .stripe)
-        mockPrivacyConfigurationManager.mockConfig.isSubfeatureKeyEnabled = { _, _ in true }
+        mockFreemiumDBPFeature.featureAvailable = true
 
         setupMoreOptionsMenu()
 
@@ -209,85 +206,11 @@ final class MoreOptionsMenuTests: XCTestCase {
     }
 
     @MainActor
-    func testThatMoreOptionMenuHasTheExpectedItemsWhenSubscriptionIsActiveAndFreemiumDBPFeatureFlagDisabled() {
-        mockAuthentication()
-        mockPrivacyConfigurationManager.mockConfig.isSubfeatureKeyEnabled = { _, _ in false }
-
-        setupMoreOptionsMenu()
-
-        XCTAssertTrue(subscriptionManager.accountManager.isUserAuthenticated)
-
-        XCTAssertEqual(moreOptionsMenu.items[0].title, UserText.sendFeedback)
-        XCTAssertTrue(moreOptionsMenu.items[1].isSeparatorItem)
-        XCTAssertEqual(moreOptionsMenu.items[2].title, UserText.plusButtonNewTabMenuItem)
-        XCTAssertEqual(moreOptionsMenu.items[3].title, UserText.newWindowMenuItem)
-        XCTAssertEqual(moreOptionsMenu.items[4].title, UserText.newBurnerWindowMenuItem)
-        XCTAssertTrue(moreOptionsMenu.items[5].isSeparatorItem)
-        XCTAssertEqual(moreOptionsMenu.items[6].title, UserText.zoom)
-        XCTAssertTrue(moreOptionsMenu.items[7].isSeparatorItem)
-        XCTAssertEqual(moreOptionsMenu.items[8].title, UserText.bookmarks)
-        XCTAssertEqual(moreOptionsMenu.items[9].title, UserText.downloads)
-        XCTAssertEqual(moreOptionsMenu.items[10].title, UserText.passwordManagementTitle)
-        XCTAssertTrue(moreOptionsMenu.items[11].isSeparatorItem)
-        XCTAssertEqual(moreOptionsMenu.items[12].title, UserText.emailOptionsMenuItem)
-        XCTAssertTrue(moreOptionsMenu.items[13].isSeparatorItem)
-
-        XCTAssertEqual(moreOptionsMenu.items[14].title, UserText.subscriptionOptionsMenuItem)
-        XCTAssertTrue(moreOptionsMenu.items[14].hasSubmenu)
-        XCTAssertEqual(moreOptionsMenu.items[14].submenu?.items[0].title, UserText.networkProtection)
-        XCTAssertEqual(moreOptionsMenu.items[14].submenu?.items[1].title, UserText.dataBrokerProtectionOptionsMenuItem)
-        XCTAssertEqual(moreOptionsMenu.items[14].submenu?.items[2].title, UserText.identityTheftRestorationOptionsMenuItem)
-        XCTAssertTrue(moreOptionsMenu.items[14].submenu!.items[3].isSeparatorItem)
-        XCTAssertEqual(moreOptionsMenu.items[14].submenu?.items[4].title, UserText.subscriptionSettingsOptionsMenuItem)
-
-        XCTAssertTrue(moreOptionsMenu.items[15].isSeparatorItem)
-        XCTAssertEqual(moreOptionsMenu.items[16].title, UserText.mainMenuHelp)
-        XCTAssertEqual(moreOptionsMenu.items[17].title, UserText.settings)
-    }
-
-    @MainActor
-    func testThatMoreOptionMenuHasTheExpectedItemsWhenSubscriptionIsActiveAndFreemiumDBPFeatureFlagEnabled() {
-        mockAuthentication()
-        mockPrivacyConfigurationManager.mockConfig.isSubfeatureKeyEnabled = { _, _ in true }
-
-        setupMoreOptionsMenu()
-
-        XCTAssertTrue(subscriptionManager.accountManager.isUserAuthenticated)
-
-        XCTAssertEqual(moreOptionsMenu.items[0].title, UserText.sendFeedback)
-        XCTAssertTrue(moreOptionsMenu.items[1].isSeparatorItem)
-        XCTAssertEqual(moreOptionsMenu.items[2].title, UserText.plusButtonNewTabMenuItem)
-        XCTAssertEqual(moreOptionsMenu.items[3].title, UserText.newWindowMenuItem)
-        XCTAssertEqual(moreOptionsMenu.items[4].title, UserText.newBurnerWindowMenuItem)
-        XCTAssertTrue(moreOptionsMenu.items[5].isSeparatorItem)
-        XCTAssertEqual(moreOptionsMenu.items[6].title, UserText.zoom)
-        XCTAssertTrue(moreOptionsMenu.items[7].isSeparatorItem)
-        XCTAssertEqual(moreOptionsMenu.items[8].title, UserText.bookmarks)
-        XCTAssertEqual(moreOptionsMenu.items[9].title, UserText.downloads)
-        XCTAssertEqual(moreOptionsMenu.items[10].title, UserText.passwordManagementTitle)
-        XCTAssertTrue(moreOptionsMenu.items[11].isSeparatorItem)
-        XCTAssertEqual(moreOptionsMenu.items[12].title, UserText.emailOptionsMenuItem)
-        XCTAssertTrue(moreOptionsMenu.items[13].isSeparatorItem)
-
-        XCTAssertEqual(moreOptionsMenu.items[14].title, UserText.subscriptionOptionsMenuItem)
-        XCTAssertTrue(moreOptionsMenu.items[14].hasSubmenu)
-        XCTAssertEqual(moreOptionsMenu.items[14].submenu?.items[0].title, UserText.networkProtection)
-        XCTAssertEqual(moreOptionsMenu.items[14].submenu?.items[1].title, UserText.dataBrokerProtectionOptionsMenuItem)
-        XCTAssertEqual(moreOptionsMenu.items[14].submenu?.items[2].title, UserText.identityTheftRestorationOptionsMenuItem)
-        XCTAssertTrue(moreOptionsMenu.items[14].submenu!.items[3].isSeparatorItem)
-        XCTAssertEqual(moreOptionsMenu.items[14].submenu?.items[4].title, UserText.subscriptionSettingsOptionsMenuItem)
-
-        XCTAssertTrue(moreOptionsMenu.items[15].isSeparatorItem)
-        XCTAssertEqual(moreOptionsMenu.items[16].title, UserText.mainMenuHelp)
-        XCTAssertEqual(moreOptionsMenu.items[17].title, UserText.settings)
-    }
-
-    @MainActor
     func testWhenClickingFreemiumDBPOptionThenFreemiumPresenterIsCalledAndNotificationIsPosted() throws {
         // Given
         subscriptionManager.canPurchase = true
         subscriptionManager.currentEnvironment = SubscriptionEnvironment(serviceEnvironment: .production, purchasePlatform: .stripe)
-        mockPrivacyConfigurationManager.mockConfig.isSubfeatureKeyEnabled = { _, _ in true }
+        mockFreemiumDBPFeature.featureAvailable = true
         setupMoreOptionsMenu()
 
         let freemiumItemIndex = try XCTUnwrap(moreOptionsMenu.indexOfItem(withTitle: UserText.freemiumDBPOptionsMenuItem))

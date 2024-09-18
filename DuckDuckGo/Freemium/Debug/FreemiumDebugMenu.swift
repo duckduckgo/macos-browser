@@ -22,6 +22,11 @@ import OSLog
 
 final class FreemiumDebugMenu: NSMenuItem {
 
+    private enum Keys {
+        static let enrollmentDate = "freemium.dbp.experiment.enrollment-date"
+        static let experimentCohort = "freemium.dbp.experiment.cohort"
+    }
+
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -45,7 +50,9 @@ final class FreemiumDebugMenu: NSMenuItem {
         menu.addItem(.separator())
         menu.addItem(NSMenuItem(title: "Log all state", action: #selector(logAllState), target: self))
         menu.addItem(.separator())
-        menu.addItem(NSMenuItem(title: "RESET ALL STATE", action: #selector(resetAllState), target: self))
+        menu.addItem(NSMenuItem(title: "Reset Freemium DBP Experiment State", action: #selector(resetFreemiumDBPExperimentState), target: self))
+        menu.addItem(.separator())
+        menu.addItem(NSMenuItem(title: "Reset all Freemium Feature State", action: #selector(resetAllState), target: self))
 
         return menu
     }
@@ -103,6 +110,19 @@ final class FreemiumDebugMenu: NSMenuItem {
             Logger.freemiumDBP.debug("FREEMIUM DBP: DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).firstScanResults Nil")
         }
         Logger.freemiumDBP.debug("FREEMIUM DBP: DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).didDismissHomePagePromotion \(DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).didDismissHomePagePromotion)")
+
+        if let enrollmentDate = UserDefaults.dbp.object(forKey: Keys.enrollmentDate) as? Date {
+            Logger.freemiumDBP.debug("FREEMIUM DBP: freemium.dbp.experiment.enrollment-date \(enrollmentDate)")
+        }
+        if let cohortValue = UserDefaults.dbp.string(forKey: Keys.experimentCohort) {
+            Logger.freemiumDBP.debug("FREEMIUM DBP: freemium.dbp.experiment.cohort \(cohortValue)")
+        }
+    }
+
+    @objc
+    func resetFreemiumDBPExperimentState() {
+        UserDefaults.dbp.removeObject(forKey: Keys.enrollmentDate)
+        UserDefaults.dbp.removeObject(forKey: Keys.experimentCohort)
     }
 
     @objc
