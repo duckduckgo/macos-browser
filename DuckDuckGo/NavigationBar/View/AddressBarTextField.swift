@@ -592,7 +592,7 @@ final class AddressBarTextField: NSTextField {
         NotificationCenter.default.post(name: .suggestionWindowOpen, object: nil)
     }
 
-    private func hideSuggestionWindow() {
+    func hideSuggestionWindow() {
         guard let window = window, let suggestionWindow = suggestionWindowController?.window else {
             return
         }

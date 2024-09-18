@@ -59,26 +59,34 @@ extension HomePage.Views {
             }
         }
 
+        @State var scrollPosition: CGFloat = 0
+
         func regularHomePageView(includingContinueSetUpCards: Bool) -> some View {
             GeometryReader { geometry in
                 ZStack(alignment: .top) {
 
                     HStack(spacing: 0) {
                         ZStack(alignment: .leading) {
-                            if #available(macOS 13.0, *) {
-                                ScrollView {
+                            ScrollView {
+                                VStack(spacing: 0) {
                                     innerView(includingContinueSetUpCards: includingContinueSetUpCards)
                                         .frame(width: geometry.size.width - (settingsVisibilityModel.isSettingsVisible ? Self.settingsPanelWidth : 0))
                                         .offset(x: settingsVisibilityModel.isSettingsVisible ? innerViewOffset(with: geometry) : 0)
                                         .fixedColorScheme(for: settingsModel.customBackground)
+                                    GeometryReader { geometry in
+                                        Color.clear
+                                            .preference(key: ScrollOffsetPreferenceKey.self, value: geometry.frame(in: .named("scroll")).minY)
+                                    }
+                                    .frame(height: 0)
                                 }
-                                .scrollDisabled(addressBarViewController.isSuggestionsWindowVisible)
-                            } else {
-                                ScrollView {
-                                    innerView(includingContinueSetUpCards: includingContinueSetUpCards)
-                                        .frame(width: geometry.size.width - (settingsVisibilityModel.isSettingsVisible ? Self.settingsPanelWidth : 0))
-                                        .offset(x: settingsVisibilityModel.isSettingsVisible ? innerViewOffset(with: geometry) : 0)
-                                        .fixedColorScheme(for: settingsModel.customBackground)
+                            }
+                            .coordinateSpace(name: "scroll")
+                            .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
+                                if abs(scrollPosition - value) > 1 {
+                                    scrollPosition = value
+                                    if addressBarViewController.isSuggestionsWindowVisible {
+                                        addressBarViewController.addressBarTextField?.hideSuggestionWindow()
+                                    }
                                 }
                             }
                         }
@@ -308,6 +316,15 @@ extension HomePage.Views {
         }
 
         struct WidthPreferenceKey: PreferenceKey {
+            typealias Value = CGFloat
+            static var defaultValue: CGFloat = 0
+
+            static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+                value = nextValue()
+            }
+        }
+
+        struct ScrollOffsetPreferenceKey: PreferenceKey {
             typealias Value = CGFloat
             static var defaultValue: CGFloat = 0
 
