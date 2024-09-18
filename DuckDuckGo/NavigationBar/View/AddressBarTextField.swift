@@ -28,6 +28,14 @@ import os.log
 
 final class AddressBarTextField: NSTextField {
 
+    var homePagePreferredAppearance: NSAppearance? {
+        didSet {
+            if suggestionWindowController != nil {
+                suggestionViewController.view.appearance = homePagePreferredAppearance
+            }
+        }
+    }
+
     var tabCollectionViewModel: TabCollectionViewModel! {
         didSet {
             subscribeToSelectedTabViewModel()
@@ -580,6 +588,8 @@ final class AddressBarTextField: NSTextField {
             Logger.general.error("AddressBarTextField: Window not available")
             return
         }
+
+        suggestionViewController.view.appearance = homePagePreferredAppearance
 
         guard !suggestionWindow.isVisible, isFirstResponder else { return }
 
