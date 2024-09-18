@@ -74,17 +74,17 @@ class MockBookmarkManager: BookmarkManager {
     func makeFolder(for title: String, parent: DuckDuckGo_Privacy_Browser.BookmarkFolder?, completion: (DuckDuckGo_Privacy_Browser.BookmarkFolder) -> Void) {}
 
     var removeBookmarkCalled = false
-    func remove(bookmark: DuckDuckGo_Privacy_Browser.Bookmark) {
+    func remove(bookmark: DuckDuckGo_Privacy_Browser.Bookmark, undoManager: UndoManager?) {
         removeBookmarkCalled = true
     }
 
     var removeFolderCalled = false
-    func remove(folder: DuckDuckGo_Privacy_Browser.BookmarkFolder) {
+    func remove(folder: DuckDuckGo_Privacy_Browser.BookmarkFolder, undoManager: UndoManager?) {
         removeFolderCalled = true
     }
 
     var removeObjectsCalled: [String]?
-    func remove(objectsWithUUIDs uuids: [String]) {
+    func remove(objectsWithUUIDs uuids: [String], undoManager: UndoManager?) {
         removeObjectsCalled = uuids
     }
 

@@ -281,15 +281,22 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     }
     var observer: AXObserver?
 
-    override func viewDidDisappear() {
-        super.viewDidDisappear()
+    override func viewWillAppear() {
+        NotificationCenter.default.addObserver(self, selector: #selector(firstReponderDidChange), name: .firstResponder, object: nil)
+
         reloadData()
+    }
+
+    override func viewDidDisappear() {
+        NotificationCenter.default.removeObserver(self, name: .firstResponder, object: nil)
     }
 
     override func keyDown(with event: NSEvent) {
         switch Int(event.keyCode) {
         case kVK_Delete, kVK_ForwardDelete:
             deleteSelectedItems()
+        default:
+            super.keyDown(with: event)
         }
     }
 
@@ -376,6 +383,13 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
             .show(in: view.window)
     }
 
+    @objc func firstReponderDidChange(notification: Notification) {
+        // clear delete undo history when activating the Address Bar
+        if notification.object is AddressBarTextEditor {
+            undoManager?.removeAllActions(withTarget: self)
+        }
+    }
+
     @objc func delete(_ sender: AnyObject) {
         deleteSelectedItems()
     }
@@ -387,11 +401,12 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     }
 
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
-        if menuItem.action == #selector(BookmarkManagementDetailViewController.delete(_:)) {
+        switch menuItem.action {
+        case #selector(BookmarkManagementDetailViewController.delete(_:)):
             return !tableView.selectedRowIndexes.isEmpty
+        default:
+            return true
         }
-
-        return true
     }
 
     private func setupSort(mode: BookmarksSortMode) {
@@ -414,7 +429,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         let entities = tableView.selectedRowIndexes.compactMap { fetchEntity(at: $0) }
         let entityUUIDs = entities.map(\.id)
 
-        bookmarkManager.remove(objectsWithUUIDs: entityUUIDs)
+        bookmarkManager.remove(objectsWithUUIDs: entityUUIDs, undoManager: undoManager)
     }
 
     private(set) lazy var faviconsFetcherOnboarding: FaviconsFetcherOnboarding? = {

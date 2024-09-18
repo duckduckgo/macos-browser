@@ -105,12 +105,26 @@ public final class BookmarkStoreMock: BookmarkStore {
     }
 
     var bookmarkFolderWithIdCalled = false
-    var capturedFolderId: String?
+    var capturedEntityIds: [String]?
+    var capturedFolderId: String? { capturedEntityIds?.last }
     var bookmarkFolderWithId: ((String) -> BookmarkFolder?)?
-    func bookmarkFolder(withId id: String) -> BookmarkFolder? {
+    var bookmarkEntitiesWithIds: (([String]) -> [BaseBookmarkEntity])?
+    func bookmarkEntities(withIds ids: [String]) -> [BaseBookmarkEntity]? {
         bookmarkFolderWithIdCalled = true
-        capturedFolderId = id
-        return bookmarkFolderWithId?(id)
+        capturedEntityIds = ids
+        return bookmarkEntitiesWithIds?(ids) ?? ids.compactMap { bookmarkFolder(withId: $0) }
+    }
+
+    var restoreCalledEntities: [BaseBookmarkEntity]?
+    var restoreError: Error?
+    func restore(_ objects: [BaseBookmarkEntity], completion: @escaping ((any Error)?) -> Void) {
+        restoreCalledEntities = objects
+
+        if restoreError == nil {
+            // TBD: restore bookmarks?
+        }
+
+        completion(restoreError)
     }
 
     var updateFolderCalled = false

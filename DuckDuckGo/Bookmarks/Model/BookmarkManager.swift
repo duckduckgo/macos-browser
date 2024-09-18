@@ -37,6 +37,7 @@ protocol BookmarkManager: AnyObject {
     func remove(bookmark: Bookmark)
     func remove(folder: BookmarkFolder)
     func remove(objectsWithUUIDs uuids: [String])
+    func restore(_ objects: [BaseBookmarkEntity], undoManager: UndoManager?)
     func update(bookmark: Bookmark)
     func update(bookmark: Bookmark, withURL url: URL, title: String, isFavorite: Bool)
     func update(folder: BookmarkFolder)
@@ -198,13 +199,15 @@ final class LocalBookmarkManager: BookmarkManager {
         requestSync()
     }
 
-    func remove(bookmark: Bookmark) {
+    @MainActor
+    func remove(bookmark: Bookmark, undoManager: UndoManager?) {
         guard list != nil else { return }
         guard let latestBookmark = getBookmark(forUrl: bookmark.url) else {
             Logger.bookmarks.error("LocalBookmarkManager: Attempt to remove already removed bookmark")
             return
         }
 
+        undoManager?.registerUndoDeleteEntities([bookmark], bookmarkManager: self)
         list?.remove(latestBookmark)
         bookmarkStore.remove(objectsWithUUIDs: [bookmark.id]) { [weak self] success, _ in
             if !success {
@@ -216,15 +219,33 @@ final class LocalBookmarkManager: BookmarkManager {
         }
     }
 
-    func remove(folder: BookmarkFolder) {
+    @MainActor
+    func remove(folder: BookmarkFolder, undoManager: UndoManager?) {
+        undoManager?.registerUndoDeleteEntities([folder], bookmarkManager: self)
         bookmarkStore.remove(objectsWithUUIDs: [folder.id]) { [weak self] _, _ in
             self?.loadBookmarks()
             self?.requestSync()
         }
     }
 
-    func remove(objectsWithUUIDs uuids: [String]) {
+    @MainActor
+    func remove(objectsWithUUIDs uuids: [String], undoManager: UndoManager?) {
+        if let undoManager, let entities = bookmarkStore.bookmarkEntities(withIds: uuids) {
+            undoManager.registerUndoDeleteEntities(entities, bookmarkManager: self)
+        }
         bookmarkStore.remove(objectsWithUUIDs: uuids) { [weak self] _, _ in
+            self?.loadBookmarks()
+            self?.requestSync()
+        }
+    }
+
+    func restore(_ objects: [BaseBookmarkEntity], undoManager: UndoManager?) {
+        if let undoManager {
+            undoManager.registerUndo(withTarget: self) { [ids=objects.map(\.id)] this in
+                this.remove(objectsWithUUIDs: ids, undoManager: undoManager)
+            }
+        }
+        bookmarkStore.restore(objects) { [weak self] _ in
             self?.loadBookmarks()
             self?.requestSync()
         }
@@ -436,6 +457,28 @@ final class LocalBookmarkManager: BookmarkManager {
         }
 
         return result
+    }
+
+}
+// MARK: - UndoManager
+private extension UndoManager {
+    @MainActor
+    func registerUndoDeleteEntities(_ entities: [BaseBookmarkEntity], bookmarkManager: some BookmarkManager) {
+        registerUndo(withTarget: bookmarkManager) { bookmarkManager in
+            bookmarkManager.restore(entities, undoManager: self)
+        }
+        if !isUndoing {
+            let actionName = if entities.count == 1 {
+                if entities[0].isFolder {
+                    UserText.deleteFolder
+                } else {
+                    UserText.deleteBookmark
+                }
+            } else {
+                UserText.mainMenuEditDelete
+            }
+            setActionName(actionName)
+        }
     }
 }
 
