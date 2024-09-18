@@ -44,7 +44,8 @@ final class DBPUICommunicationModelTests: XCTestCase {
         // When
         let profileMatch = DBPUIDataBrokerProfileMatch(optOutJobData: optOut,
                                                        dataBrokerName: "doesn't matter for the test",
-                                                       databrokerURL: "see above",
+                                                       dataBrokerURL: "see above",
+                                                       dataBrokerParentURL: "whatever",
                                                        parentBrokerOptOutJobData: nil)
 
         // Then
@@ -74,7 +75,8 @@ final class DBPUICommunicationModelTests: XCTestCase {
         // When
         let profileMatch = DBPUIDataBrokerProfileMatch(optOutJobData: optOut,
                                                        dataBrokerName: "doesn't matter for the test",
-                                                       databrokerURL: "see above",
+                                                       dataBrokerURL: "see above",
+                                                       dataBrokerParentURL: "whatever",
                                                        parentBrokerOptOutJobData: nil)
 
         // Then
@@ -112,7 +114,8 @@ final class DBPUICommunicationModelTests: XCTestCase {
         // When
         let profileMatch = DBPUIDataBrokerProfileMatch(optOutJobData: optOut,
                                                        dataBrokerName: "doesn't matter for the test",
-                                                       databrokerURL: "see above",
+                                                       dataBrokerURL: "see above",
+                                                       dataBrokerParentURL: "whatever",
                                                        parentBrokerOptOutJobData: nil)
 
         // Then
@@ -142,7 +145,8 @@ final class DBPUICommunicationModelTests: XCTestCase {
         // When
         let profileMatch = DBPUIDataBrokerProfileMatch(optOutJobData: optOut,
                                                        dataBrokerName: "doesn't matter for the test",
-                                                       databrokerURL: "see above",
+                                                       dataBrokerURL: "see above",
+                                                       dataBrokerParentURL: "whatever",
                                                        parentBrokerOptOutJobData: [parentOptOut])
 
         // Then
@@ -169,7 +173,8 @@ final class DBPUICommunicationModelTests: XCTestCase {
         // When
         let profileMatch = DBPUIDataBrokerProfileMatch(optOutJobData: optOut,
                                                        dataBrokerName: "doesn't matter for the test",
-                                                       databrokerURL: "see above",
+                                                       dataBrokerURL: "see above",
+                                                       dataBrokerParentURL: "whatever",
                                                        parentBrokerOptOutJobData: [parentOptOutNonmatching1,
                                                                                    parentOptOutMatching,
                                                                                    parentOptOutNonmatching2])
@@ -195,7 +200,8 @@ final class DBPUICommunicationModelTests: XCTestCase {
         // When
         let profileMatch = DBPUIDataBrokerProfileMatch(optOutJobData: optOut,
                                                        dataBrokerName: "doesn't matter for the test",
-                                                       databrokerURL: "see above",
+                                                       dataBrokerURL: "see above",
+                                                       dataBrokerParentURL: "whatever",
                                                        parentBrokerOptOutJobData: [parentOptOutNonmatching1,
                                                                                    parentOptOutNonmatching2])
 
@@ -217,7 +223,8 @@ final class DBPUICommunicationModelTests: XCTestCase {
         // When
         let profileMatch = DBPUIDataBrokerProfileMatch(optOutJobData: optOut,
                                                        dataBrokerName: "doesn't matter for the test",
-                                                       databrokerURL: "see above",
+                                                       dataBrokerURL: "see above",
+                                                       dataBrokerParentURL: "whatever",
                                                        parentBrokerOptOutJobData: [parentOptOut])
 
         // Then

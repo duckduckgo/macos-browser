@@ -114,11 +114,13 @@ struct DBPUIDataBroker: Codable, Hashable {
     let name: String
     let url: String
     let date: Double?
+    let parentURL: String?
 
-    init(name: String, url: String, date: Double? = nil) {
+    init(name: String, url: String, date: Double? = nil, parentURL: String?) {
         self.name = name
         self.url = url
         self.date = date
+        self.parentURL = parentURL
     }
 
     func hash(into hasher: inout Hasher) {
@@ -154,7 +156,8 @@ struct DBPUIDataBrokerProfileMatch: Codable {
 extension DBPUIDataBrokerProfileMatch {
     init(optOutJobData: OptOutJobData,
          dataBrokerName: String,
-         databrokerURL: String,
+         dataBrokerURL: String,
+         dataBrokerParentURL: String?,
          parentBrokerOptOutJobData: [OptOutJobData]?) {
         let extractedProfile = optOutJobData.extractedProfile
 
@@ -197,7 +200,7 @@ extension DBPUIDataBrokerProfileMatch {
             }
         }
 
-        self.init(dataBroker: DBPUIDataBroker(name: dataBrokerName, url: databrokerURL),
+        self.init(dataBroker: DBPUIDataBroker(name: dataBrokerName, url: dataBrokerURL, parentURL: dataBrokerParentURL),
                   name: extractedProfile.fullName ?? "No name",
                   addresses: extractedProfile.addresses?.map {DBPUIUserProfileAddress(addressCityState: $0) } ?? [],
                   alternativeNames: extractedProfile.alternativeNames ?? [String](),
@@ -212,7 +215,8 @@ extension DBPUIDataBrokerProfileMatch {
     init(optOutJobData: OptOutJobData, dataBroker: DataBroker, parentBrokerOptOutJobData: [OptOutJobData]?) {
         self.init(optOutJobData: optOutJobData,
                   dataBrokerName: dataBroker.name,
-                  databrokerURL: dataBroker.url,
+                  dataBrokerURL: dataBroker.url,
+                  dataBrokerParentURL: dataBroker.parent,
                   parentBrokerOptOutJobData: parentBrokerOptOutJobData)
     }
 }

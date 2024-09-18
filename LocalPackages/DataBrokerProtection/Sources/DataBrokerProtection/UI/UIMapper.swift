@@ -57,22 +57,25 @@ struct MapperToUI {
         return brokerProfileQueryData.flatMap {
             var profiles = [DBPUIDataBrokerProfileMatch]()
             for optOutJobData in $0.optOutJobData {
+                let dataBroker = $0.dataBroker
+
                 var parentBrokerOptOutJobData: [OptOutJobData]?
-                if let parent = $0.dataBroker.parent,
+                if let parent = dataBroker.parent,
                    let parentsQueryData = brokerURLsToQueryData[parent] {
                     parentBrokerOptOutJobData = parentsQueryData.flatMap { $0.optOutJobData }
                 }
 
                 profiles.append(DBPUIDataBrokerProfileMatch(optOutJobData: optOutJobData,
-                                                            dataBroker: $0.dataBroker,
+                                                            dataBroker: dataBroker,
                                                             parentBrokerOptOutJobData: parentBrokerOptOutJobData))
 
-                if !$0.dataBroker.mirrorSites.isEmpty {
-                    let mirrorSitesMatches = $0.dataBroker.mirrorSites.compactMap { mirrorSite in
+                if !dataBroker.mirrorSites.isEmpty {
+                    let mirrorSitesMatches = dataBroker.mirrorSites.compactMap { mirrorSite in
                         if mirrorSite.shouldWeIncludeMirrorSite() {
                             return DBPUIDataBrokerProfileMatch(optOutJobData: optOutJobData,
                                                                dataBrokerName: mirrorSite.name,
-                                                               databrokerURL: mirrorSite.url,
+                                                               dataBrokerURL: mirrorSite.url,
+                                                               dataBrokerParentURL: dataBroker.parent,
                                                                parentBrokerOptOutJobData: parentBrokerOptOutJobData)
                         }
 
@@ -122,7 +125,8 @@ struct MapperToUI {
                     for mirrorSite in dataBroker.mirrorSites where mirrorSite.shouldWeIncludeMirrorSite(for: closestMatchesFoundEvent.date) {
                         let mirrorSiteMatch = DBPUIDataBrokerProfileMatch(optOutJobData: optOutJob,
                                                                           dataBrokerName: mirrorSite.name,
-                                                                          databrokerURL: mirrorSite.url,
+                                                                          dataBrokerURL: mirrorSite.url,
+                                                                          dataBrokerParentURL: dataBroker.parent,
                                                                           parentBrokerOptOutJobData: parentBrokerOptOutJobData)
 
                         if let extractedProfileRemovedDate = extractedProfile.removedDate,
@@ -168,10 +172,16 @@ struct MapperToUI {
             }
             .flatMap {
                 var brokers = [DBPUIDataBroker]()
-                brokers.append(DBPUIDataBroker(name: $0.dataBroker.name, url: $0.dataBroker.url, date: $0.scanJobData.lastRunDate!.timeIntervalSince1970))
+                brokers.append(DBPUIDataBroker(name: $0.dataBroker.name,
+                                               url: $0.dataBroker.url,
+                                               date: $0.scanJobData.lastRunDate!.timeIntervalSince1970,
+                                               parentURL: $0.dataBroker.parent))
 
                 for mirrorSite in $0.dataBroker.mirrorSites where mirrorSite.addedAt < $0.scanJobData.lastRunDate! {
-                    brokers.append(DBPUIDataBroker(name: mirrorSite.name, url: mirrorSite.url, date: $0.scanJobData.lastRunDate!.timeIntervalSince1970))
+                    brokers.append(DBPUIDataBroker(name: mirrorSite.name,
+                                                   url: mirrorSite.url,
+                                                   date: $0.scanJobData.lastRunDate!.timeIntervalSince1970,
+                                                   parentURL: $0.dataBroker.parent))
                 }
 
                 return brokers
@@ -198,15 +208,24 @@ struct MapperToUI {
             }
             .flatMap {
                 var brokers = [DBPUIDataBroker]()
-                brokers.append(DBPUIDataBroker(name: $0.dataBroker.name, url: $0.dataBroker.url, date: $0.scanJobData.preferredRunDate!.timeIntervalSince1970))
+                brokers.append(DBPUIDataBroker(name: $0.dataBroker.name,
+                                               url: $0.dataBroker.url,
+                                               date: $0.scanJobData.preferredRunDate!.timeIntervalSince1970,
+                                               parentURL: $0.dataBroker.parent))
 
                 for mirrorSite in $0.dataBroker.mirrorSites {
                     if let removedDate = mirrorSite.removedAt {
                         if removedDate > $0.scanJobData.preferredRunDate! {
-                            brokers.append(DBPUIDataBroker(name: mirrorSite.name, url: mirrorSite.url, date: $0.scanJobData.preferredRunDate!.timeIntervalSince1970))
+                            brokers.append(DBPUIDataBroker(name: mirrorSite.name,
+                                                           url: mirrorSite.url,
+                                                           date: $0.scanJobData.preferredRunDate!.timeIntervalSince1970,
+                                                           parentURL: $0.dataBroker.parent))
                         }
                     } else {
-                        brokers.append(DBPUIDataBroker(name: mirrorSite.name, url: mirrorSite.url, date: $0.scanJobData.preferredRunDate!.timeIntervalSince1970))
+                        brokers.append(DBPUIDataBroker(name: mirrorSite.name,
+                                                       url: mirrorSite.url,
+                                                       date: $0.scanJobData.preferredRunDate!.timeIntervalSince1970,
+                                                       parentURL: $0.dataBroker.parent))
                     }
                 }
 
