@@ -150,8 +150,10 @@ extension HomePage.Views {
                     remoteMessage()
 
                     logo()
+                        .visibility(model.isDaxLogoVisible ? .visible : .gone)
 
-                    addressBar()
+                    searchField()
+                        .visibility(model.isSearchFieldVisible ? .visible : .gone)
 
                     if includingContinueSetUpCards {
                         ContinueSetUpView()
@@ -204,7 +206,7 @@ extension HomePage.Views {
         }
 
         @ViewBuilder
-        func addressBar() -> some View {
+        func searchField() -> some View {
             AddressBarTextFieldView(
                 tabCollectionViewModel: continueSetUpModel.tabCollectionViewModel,
                 addressBarViewController: addressBarViewController

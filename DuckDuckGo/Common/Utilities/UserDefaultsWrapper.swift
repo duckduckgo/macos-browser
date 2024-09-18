@@ -129,6 +129,8 @@ public struct UserDefaultsWrapper<T> {
         case homePageShowPageTitles = "home.page.show.page.titles"
         case homePageShowRecentlyVisited = "home.page.show.recently.visited"
         case homePageContinueSetUpImport = "home.page.continue.set.up.import"
+        case homePageIsDaxLogoVisible = "home.page.is.dax.logo.visible"
+        case homePageIsSearchFieldVisible = "home.page.is.search.field.visible"
         case homePageIsFavoriteVisible = "home.page.is.favorite.visible"
         case homePageIsContinueSetupVisible = "home.page.is.continue.setup.visible"
         case homePageIsRecentActivityVisible = "home.page.is.recent.activity.visible"

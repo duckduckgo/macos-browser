@@ -29,6 +29,26 @@ extension HomePage.Views {
 
         var body: some View {
             VStack(alignment: .leading, spacing: 12) {
+                Toggle(isOn: $model.isDaxLogoVisible) {
+                    HStack {
+                        Image(.daxIcon)
+                            .frame(width: iconSize, height: iconSize)
+                        Text(UserText.newTabDaxLogoSectionTitle)
+                        Spacer()
+                    }
+                }
+                .toggleStyle(.switch)
+
+                Toggle(isOn: $model.isSearchFieldVisible) {
+                    HStack {
+                        Image(.findSearch)
+                            .frame(width: iconSize, height: iconSize)
+                        Text(UserText.newTabSearchFieldSectionTitle)
+                        Spacer()
+                    }
+                }
+                .toggleStyle(.switch)
+
                 if includeContinueSetUpCards {
                     Toggle(isOn: $model.isContinueSetUpVisible) {
                         HStack {

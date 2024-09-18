@@ -34677,6 +34677,18 @@
         }
       }
     },
+    "newTab.dax.logo.section.title" : {
+      "comment" : "Title of the setup section in the home page",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Logo"
+          }
+        }
+      }
+    },
     "newTab.favorites.section.title" : {
       "comment" : "Title of the Favorites section in the home page",
       "extractionState" : "extracted_with_value",
@@ -34973,6 +34985,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Недавняя активность"
+          }
+        }
+      }
+    },
+    "newTab.search.field.section.title" : {
+      "comment" : "Title of the setup section in the home page",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Search Field"
           }
         }
       }
