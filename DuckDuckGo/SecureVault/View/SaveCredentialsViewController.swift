@@ -33,7 +33,7 @@ protocol SaveCredentialsDelegate: AnyObject {
 extension SaveCredentialsViewController: MouseOverViewDelegate {
     func mouseOverView(_ mouseOverView: MouseOverView, isMouseOver: Bool) {
         if isMouseOver {
-            lockImageBackgroundView.layer?.backgroundColor = NSColor.infoHoverButtonHovered.cgColor
+            lockImageBackgroundView.fillColor = NSColor.infoHoverButtonHovered
             presentSecurityInfoPopover()
         } else {
             dismissSecurityInfoPopover()
@@ -51,7 +51,7 @@ extension SaveCredentialsViewController: MouseOverViewDelegate {
             guard let self else { return }
             let message = autofillPreferences.isAutoLockEnabled ? UserText.pmSaveCredentialsSecurityInfo : UserText.pmSaveCredentialsSecurityInfoAutolockOff
             let infoViewController = PopoverInfoViewController(message: message) { [weak self] in
-                self?.lockImageBackgroundView.layer?.backgroundColor = NSColor.infoHoverButton.cgColor
+                self?.lockImageBackgroundView.fillColor = NSColor.infoHoverButton
             }
             infoViewController.show(onParent: self, relativeTo: self.tooltipView)
         }
@@ -97,7 +97,7 @@ final class SaveCredentialsViewController: NSViewController {
     @IBOutlet var fireproofCheck: NSButton!
     @IBOutlet weak var fireproofCheckDescription: NSTextFieldCell!
     @IBOutlet weak var tooltipView: MouseOverView!
-    @IBOutlet weak var lockImageBackgroundView: NSView!
+    @IBOutlet weak var lockImageBackgroundView: NSBox!
 
     private var infoViewController: PopoverInfoViewController? {
         presentedViewControllers?.first {
@@ -179,9 +179,9 @@ final class SaveCredentialsViewController: NSViewController {
 
     private func setUpSecurityInfoViews() {
         tooltipView.delegate = self
-        lockImageBackgroundView.wantsLayer = true
-        lockImageBackgroundView.layer?.cornerRadius = lockImageBackgroundView.bounds.height / 2
-        lockImageBackgroundView.layer?.backgroundColor = NSColor.buttonMouseOver.cgColor
+        lockImageBackgroundView.cornerRadius = lockImageBackgroundView.bounds.height / 2
+        lockImageBackgroundView.fillColor = NSColor.infoHoverButton
+        lockImageBackgroundView.boxType = .custom
     }
 
     /// Note that if the credentials.account.id is not nil, then we consider this an update rather than a save.
