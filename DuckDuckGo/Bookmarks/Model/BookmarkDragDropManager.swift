@@ -52,6 +52,8 @@ final class BookmarkDragDropManager {
         case (false, _), (_, false):
             return .none
         default:
+            guard destination is BookmarkFolder || destination is PseudoFolder else { return .none }
+
             if info.draggingPasteboard.availableType(from: [.URL]) != nil {
                 return .copy
             }
