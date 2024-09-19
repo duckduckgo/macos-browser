@@ -27,8 +27,6 @@ protocol AppearancePreferencesPersistor {
     var showFullURL: Bool { get set }
     var currentThemeName: String { get set }
     var favoritesDisplayMode: String? { get set }
-    var isDaxLogoVisible: Bool { get set }
-    var isSearchFieldVisible: Bool { get set }
     var isFavoriteVisible: Bool { get set }
     var isContinueSetUpVisible: Bool { get set }
     var isRecentActivityVisible: Bool { get set }
@@ -47,12 +45,6 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
 
     @UserDefaultsWrapper(key: .favoritesDisplayMode, defaultValue: FavoritesDisplayMode.displayNative(.desktop).description)
     var favoritesDisplayMode: String?
-
-    @UserDefaultsWrapper(key: .homePageIsDaxLogoVisible, defaultValue: true)
-    var isDaxLogoVisible: Bool
-
-    @UserDefaultsWrapper(key: .homePageIsSearchFieldVisible, defaultValue: true)
-    var isSearchFieldVisible: Bool
 
     @UserDefaultsWrapper(key: .homePageIsFavoriteVisible, defaultValue: true)
     var isFavoriteVisible: Bool
@@ -196,18 +188,6 @@ final class AppearancePreferences: ObservableObject {
         }
     }
 
-    @Published var isDaxLogoVisible: Bool {
-        didSet {
-            persistor.isDaxLogoVisible = isDaxLogoVisible
-        }
-    }
-
-    @Published var isSearchFieldVisible: Bool {
-        didSet {
-            persistor.isSearchFieldVisible = isSearchFieldVisible
-        }
-    }
-
     @Published var isFavoriteVisible: Bool {
         didSet {
             persistor.isFavoriteVisible = isFavoriteVisible
@@ -290,8 +270,6 @@ final class AppearancePreferences: ObservableObject {
         currentThemeName = .init(rawValue: persistor.currentThemeName) ?? .systemDefault
         showFullURL = persistor.showFullURL
         favoritesDisplayMode = persistor.favoritesDisplayMode.flatMap(FavoritesDisplayMode.init) ?? .default
-        isDaxLogoVisible = persistor.isDaxLogoVisible
-        isSearchFieldVisible = persistor.isSearchFieldVisible
         isFavoriteVisible = persistor.isFavoriteVisible
         isRecentActivityVisible = persistor.isRecentActivityVisible
         isContinueSetUpVisible = persistor.isContinueSetUpVisible

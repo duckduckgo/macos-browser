@@ -124,9 +124,7 @@ extension HomePage.Views {
                                         }
                                     }
                                     .onChange(of: addressBarValue) {
-                                        if model.isSearchFieldVisible {
-                                            proxy.scrollTo("search bar")
-                                        }
+                                        proxy.scrollTo("search bar")
                                     }
                                 }
                             } else {
@@ -215,10 +213,7 @@ extension HomePage.Views {
 
                     Group {
                         logo()
-                            .visibility(model.isDaxLogoVisible ? .visible : .gone)
-
                         searchField()
-                            .visibility(model.isSearchFieldVisible ? .visible : .gone)
                     }
                     .id("search bar")
 

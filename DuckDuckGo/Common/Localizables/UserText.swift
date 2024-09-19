@@ -1102,10 +1102,6 @@ struct UserText {
     // Favorites
     static let newTabFavoriteSectionTitle = NSLocalizedString("newTab.favorites.section.title", value: "Favorites", comment: "Title of the Favorites section in the home page")
 
-    // Logo + Search Field
-    static let newTabDaxLogoSectionTitle = NSLocalizedString("newTab.dax.logo.section.title", value: "Logo", comment: "Title of the setup section in the home page")
-    static let newTabSearchFieldSectionTitle = NSLocalizedString("newTab.search.field.section.title", value: "Search Field", comment: "Title of the setup section in the home page")
-
     // Set Up
     static let newTabSetUpSectionTitle = NSLocalizedString("newTab.setup.section.title", value: "Next Steps", comment: "Title of the setup section in the home page")
     static let newTabSetUpDefaultBrowserCardTitle = NSLocalizedString("newTab.setup.default.browser.title", value: "Default to Privacy", comment: "Title of the Default Browser card of the Set Up section in the home page")
