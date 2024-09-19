@@ -25,6 +25,7 @@ import PixelKit
 import os.log
 import Freemium
 import Subscription
+import UserNotifications
 
 // This is to avoid exposing all the dependancies outside of the DBP package
 public class DataBrokerProtectionAgentManagerProvider {
@@ -36,7 +37,7 @@ public class DataBrokerProtectionAgentManagerProvider {
         let executionConfig = DataBrokerExecutionConfig()
         let activityScheduler = DefaultDataBrokerProtectionBackgroundActivityScheduler(config: executionConfig)
 
-        let notificationService = DefaultDataBrokerProtectionUserNotificationService(pixelHandler: pixelHandler)
+        let notificationService = DefaultDataBrokerProtectionUserNotificationService(pixelHandler: pixelHandler, userNotificationCenter: UNUserNotificationCenter.current(), authenticationManager: authenticationManager)
         Configuration.setURLProvider(DBPAgentConfigurationURLProvider())
         let configStore = ConfigurationStore()
         let privacyConfigurationManager = DBPPrivacyConfigurationManager()

@@ -38,18 +38,32 @@ public protocol DataBrokerProtectionUserNotificationService {
     func scheduleCheckInNotificationIfPossible()
 }
 
+// Protocol to enable injection and testing of `DataBrokerProtectionUserNotificationService`
+public protocol DBPUserNotificationCenter {
+    var delegate: (any UNUserNotificationCenterDelegate)? { get set }
+    func add(_ request: UNNotificationRequest, withCompletionHandler completionHandler: (((any Error)?) -> Void)?)
+    func getNotificationSettings(completionHandler: @escaping (UNNotificationSettings) -> Void)
+    func requestAuthorization(options: UNAuthorizationOptions, completionHandler: @escaping (Bool, (any Error)?) -> Void)
+}
+
+// Conform system `UNUserNotificationCenter` to `DBPUserNotificationCenter` protocol
+extension UNUserNotificationCenter: DBPUserNotificationCenter {}
+
 public class DefaultDataBrokerProtectionUserNotificationService: NSObject, DataBrokerProtectionUserNotificationService {
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let userDefaults: UserDefaults
-    private let userNotificationCenter: UNUserNotificationCenter
+    private var userNotificationCenter: DBPUserNotificationCenter
+    private let authenticationManager: DataBrokerProtectionAuthenticationManaging
     private let areNotificationsEnabled = true
 
     public init(pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                 userDefaults: UserDefaults = .standard,
-                userNotificationCenter: UNUserNotificationCenter = .current()) {
+                userNotificationCenter: DBPUserNotificationCenter,
+                authenticationManager: DataBrokerProtectionAuthenticationManaging) {
         self.pixelHandler = pixelHandler
         self.userDefaults = userDefaults
         self.userNotificationCenter = userNotificationCenter
+        self.authenticationManager = authenticationManager
 
         super.init()
 
@@ -109,7 +123,12 @@ public class DefaultDataBrokerProtectionUserNotificationService: NSObject, DataB
     public func sendFirstScanCompletedNotification() {
         guard areNotificationsEnabled else { return }
 
-        sendNotification(.firstScanComplete)
+        // If the user is not authenticated, this is a Freemium scan
+        if !authenticationManager.isUserAuthenticated {
+            sendNotification(.firstFreemiumScanComplete)
+        } else {
+            sendNotification(.firstScanComplete)
+        }
         pixelHandler.fire(.dataBrokerProtectionNotificationSentFirstScanComplete)
     }
 
@@ -163,7 +182,7 @@ extension DefaultDataBrokerProtectionUserNotificationService: UNUserNotification
                                                                                            .twoWeeksCheckIn: .dataBrokerProtectionNotificationOpened2WeeksCheckIn]
 
         switch identifier {
-        case .firstScanComplete, .firstProfileRemoved, .allInfoRemoved, .twoWeeksCheckIn:
+        case .firstFreemiumScanComplete, .firstScanComplete, .firstProfileRemoved, .allInfoRemoved, .twoWeeksCheckIn:
             NSWorkspace.shared.open(DataBrokerProtectionNotificationCommand.showDashboard.url)
 
             if let pixel = pixelMapper[identifier] {
@@ -176,6 +195,7 @@ extension DefaultDataBrokerProtectionUserNotificationService: UNUserNotification
 extension UNNotificationRequest {
 
     enum Identifier: String {
+        case firstFreemiumScanComplete = "dbp.freemium.scan.complete"
         case firstScanComplete = "dbp.scan.complete"
         case firstProfileRemoved = "dbp.first.removed"
         case allInfoRemoved = "dbp.all.removed"
@@ -184,6 +204,7 @@ extension UNNotificationRequest {
 }
 
 private enum UserNotification {
+    case firstFreemiumScanComplete
     case firstScanComplete
     case firstProfileRemoved
     case allInfoRemoved
@@ -191,6 +212,8 @@ private enum UserNotification {
 
     var title: String {
         switch self {
+        case .firstFreemiumScanComplete:
+            return "Free Personal Information Scan"
         case .firstScanComplete:
             return "Scan complete!"
         case .firstProfileRemoved:
@@ -204,6 +227,8 @@ private enum UserNotification {
 
     var message: String {
         switch self {
+        case .firstFreemiumScanComplete:
+            return "Your free personal info scan is now complete. Check out the results..."
         case .firstScanComplete:
             return "DuckDuckGo has started the process to remove records matching your personal info online. See what we found..."
         case .firstProfileRemoved:
@@ -217,6 +242,8 @@ private enum UserNotification {
 
     var identifier: String {
         switch self {
+        case .firstFreemiumScanComplete:
+            return UNNotificationRequest.Identifier.firstFreemiumScanComplete.rawValue
         case .firstScanComplete:
             return UNNotificationRequest.Identifier.firstScanComplete.rawValue
         case .firstProfileRemoved:

@@ -44,12 +44,14 @@ final class FreemiumDebugMenu: NSMenuItem {
         menu.addItem(NSMenuItem(title: "Set Freemium DBP First Profile Saved Timestamp NIL", action: #selector(setFirstProfileSavedTimestampNil), target: self))
         menu.addItem(NSMenuItem(title: "Set Freemium DBP Did Post First Profile Saved FALSE", action: #selector(setDidPostFirstProfileSavedNotificationFalse), target: self))
         menu.addItem(NSMenuItem(title: "Set Freemium DBP Did Post Results FALSE", action: #selector(setDidPostResultsNotificationFalse), target: self))
-        menu.addItem(NSMenuItem(title: "Trigger Engagement UX Results", action: #selector(triggerEngagementUXResults), target: self))
+        menu.addItem(NSMenuItem(title: "Set Results and Trigger Post-Scan Banner", action: #selector(setResultsAndTriggerPostScanBanner), target: self))
+        menu.addItem(NSMenuItem(title: "Set No Results and Trigger Post-Scan Banner", action: #selector(setNoResultsAndTriggerPostScanBanner), target: self))
         menu.addItem(.separator())
         menu.addItem(NSMenuItem(title: "Set New Tab Promotion Did Dismiss FALSE", action: #selector(setNewTabPromotionDidDismissFalse), target: self))
         menu.addItem(.separator())
         menu.addItem(NSMenuItem(title: "Log all state", action: #selector(logAllState), target: self))
         menu.addItem(.separator())
+        menu.addItem(NSMenuItem(title: "Set Experiment Cohort to Treatment", action: #selector(setCohortToTreatment), target: self))
         menu.addItem(NSMenuItem(title: "Reset Freemium DBP Experiment State", action: #selector(resetFreemiumDBPExperimentState), target: self))
         menu.addItem(.separator())
         menu.addItem(NSMenuItem(title: "Reset all Freemium Feature State", action: #selector(resetAllState), target: self))
@@ -83,7 +85,16 @@ final class FreemiumDebugMenu: NSMenuItem {
     }
 
     @objc
-    func triggerEngagementUXResults() {
+    func setResultsAndTriggerPostScanBanner() {
+        let results = FreemiumDBPMatchResults(matchesCount: 19, brokerCount: 3)
+        DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).firstScanResults = results
+        NotificationCenter.default.post(name: .freemiumDBPResultPollingComplete, object: nil)
+    }
+
+    @objc
+    func setNoResultsAndTriggerPostScanBanner() {
+        let noResults = FreemiumDBPMatchResults(matchesCount: 0, brokerCount: 0)
+        DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).firstScanResults = noResults
         NotificationCenter.default.post(name: .freemiumDBPResultPollingComplete, object: nil)
     }
 
@@ -117,6 +128,11 @@ final class FreemiumDebugMenu: NSMenuItem {
         if let cohortValue = UserDefaults.dbp.string(forKey: Keys.experimentCohort) {
             Logger.freemiumDBP.debug("FREEMIUM DBP: freemium.dbp.experiment.cohort \(cohortValue)")
         }
+    }
+
+    @objc
+    func setCohortToTreatment() {
+        UserDefaults.dbp.set("treatment", forKey: Keys.experimentCohort)
     }
 
     @objc
