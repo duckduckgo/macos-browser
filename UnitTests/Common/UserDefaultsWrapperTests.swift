@@ -304,24 +304,24 @@ final class UserDefaultsWrapperTests: XCTestCase {
     // MARK: Optional<RawRepresentable> with enum Key
 
     func testOptionalRawRepresentableValueDefaultValueWithEnumKey() {
-        let wrapper = UserDefaultsWrapper<MyRawRepresentable?>(key: .configLastUpdated, defaultValue: MyRawRepresentable(rawValue: "value"), defaults: defaults)
+        let wrapper = UserDefaultsWrapper<MyRawRepresentable?>(key: .lastCrashReportCheckDate, defaultValue: MyRawRepresentable(rawValue: "value"), defaults: defaults)
         XCTAssertEqual(wrapper.wrappedValue, MyRawRepresentable(rawValue: "value"))
     }
 
     func testOptionalRawRepresentableValueNilValueWithEnumKey() {
-        let wrapper = UserDefaultsWrapper<MyRawRepresentable?>(key: .configLastUpdated, defaults: defaults)
+        let wrapper = UserDefaultsWrapper<MyRawRepresentable?>(key: .lastCrashReportCheckDate, defaults: defaults)
         XCTAssertNil(wrapper.wrappedValue)
     }
 
     func testOptionalRawRepresentableValueUpdatingWithEnumKey() {
-        let wrapper = UserDefaultsWrapper<MyRawRepresentable?>(key: .configLastUpdated, defaults: defaults)
+        let wrapper = UserDefaultsWrapper<MyRawRepresentable?>(key: .lastCrashReportCheckDate, defaults: defaults)
         wrapper.wrappedValue = MyRawRepresentable(rawValue: "new")
         XCTAssertEqual(wrapper.wrappedValue, MyRawRepresentable(rawValue: "new"))
-        XCTAssertEqual(defaults.dictionary as! [String: String], [UserDefaultsWrapper<Any>.Key.configLastUpdated.rawValue: "new"])
+        XCTAssertEqual(defaults.dictionary as! [String: String], [UserDefaultsWrapper<Any>.Key.lastCrashReportCheckDate.rawValue: "new"])
     }
 
     func testOptionalRawRepresentableValueRemovalWithEnumKey() {
-        let wrapper = UserDefaultsWrapper<MyRawRepresentable?>(key: .configLastUpdated, defaults: defaults)
+        let wrapper = UserDefaultsWrapper<MyRawRepresentable?>(key: .lastCrashReportCheckDate, defaults: defaults)
         wrapper.wrappedValue = MyRawRepresentable(rawValue: "new")
         wrapper.wrappedValue = nil
         XCTAssertNil(wrapper.wrappedValue)
@@ -329,7 +329,7 @@ final class UserDefaultsWrapperTests: XCTestCase {
     }
 
     func testOptionalRawRepresentableValueClearWithEnumKey() {
-        let wrapper = UserDefaultsWrapper<MyRawRepresentable?>(key: .configLastUpdated, defaults: defaults)
+        let wrapper = UserDefaultsWrapper<MyRawRepresentable?>(key: .lastCrashReportCheckDate, defaults: defaults)
         wrapper.wrappedValue = MyRawRepresentable(rawValue: "new")
         wrapper.clear()
         XCTAssertNil(wrapper.wrappedValue)
@@ -337,14 +337,14 @@ final class UserDefaultsWrapperTests: XCTestCase {
     }
 
     func testOptionalRawRepresentableValueSharedDefaultsWithEnumKey() {
-        let wrapper = UserDefaultsWrapper<MyRawRepresentable?>(key: .configLastUpdated)
+        let wrapper = UserDefaultsWrapper<MyRawRepresentable?>(key: .lastCrashReportCheckDate)
         XCTAssertNil(wrapper.wrappedValue)
         wrapper.wrappedValue = MyRawRepresentable(rawValue: "new")
         XCTAssertEqual(wrapper.wrappedValue, MyRawRepresentable(rawValue: "new"))
 
-        UserDefaultsWrapper.clear(.configLastUpdated)
+        UserDefaultsWrapper.clear(.lastCrashReportCheckDate)
         XCTAssertNil(wrapper.wrappedValue)
-        XCTAssertNil(UserDefaultsWrapper<Any>.sharedDefaults.object(forKey: UserDefaultsWrapper<Any>.Key.configLastUpdated.rawValue))
+        XCTAssertNil(UserDefaultsWrapper<Any>.sharedDefaults.object(forKey: UserDefaultsWrapper<Any>.Key.lastCrashReportCheckDate.rawValue))
     }
 
     // MARK: Date
@@ -353,19 +353,19 @@ final class UserDefaultsWrapperTests: XCTestCase {
     let date2 = Date().addingTimeInterval(1)
 
     func testDateValueDefaultValue() {
-        let wrapper = UserDefaultsWrapper(key: .configLastUpdated, defaultValue: date1, defaults: defaults)
+        let wrapper = UserDefaultsWrapper(key: .lastCrashReportCheckDate, defaultValue: date1, defaults: defaults)
         XCTAssertEqual(wrapper.wrappedValue, date1)
     }
 
     func testDateValueUpdating() {
-        let wrapper = UserDefaultsWrapper(key: .configLastUpdated, defaultValue: date1, defaults: defaults)
+        let wrapper = UserDefaultsWrapper(key: .lastCrashReportCheckDate, defaultValue: date1, defaults: defaults)
         wrapper.wrappedValue = date2
         XCTAssertEqual(wrapper.wrappedValue, date2)
-        XCTAssertEqual(defaults.dictionary as! [String: Date], [UserDefaultsWrapper<Any>.Key.configLastUpdated.rawValue: date2])
+        XCTAssertEqual(defaults.dictionary as! [String: Date], [UserDefaultsWrapper<Any>.Key.lastCrashReportCheckDate.rawValue: date2])
     }
 
     func testDateValueClear() {
-        let wrapper = UserDefaultsWrapper(key: .configLastUpdated, defaultValue: date1, defaults: defaults)
+        let wrapper = UserDefaultsWrapper(key: .lastCrashReportCheckDate, defaultValue: date1, defaults: defaults)
         wrapper.wrappedValue = date2
         wrapper.clear()
         XCTAssertEqual(wrapper.wrappedValue, date1)
@@ -373,37 +373,37 @@ final class UserDefaultsWrapperTests: XCTestCase {
     }
 
     func testDateValueSharedDefaults() {
-        let wrapper = UserDefaultsWrapper(key: .configLastUpdated, defaultValue: date1)
+        let wrapper = UserDefaultsWrapper(key: .lastCrashReportCheckDate, defaultValue: date1)
         XCTAssertEqual(wrapper.wrappedValue, date1)
         wrapper.wrappedValue = date2
         XCTAssertEqual(wrapper.wrappedValue, date2)
 
-        UserDefaultsWrapper.clear(.configLastUpdated)
+        UserDefaultsWrapper.clear(.lastCrashReportCheckDate)
         XCTAssertEqual(wrapper.wrappedValue, date1)
-        XCTAssertNil(UserDefaultsWrapper<Any>.sharedDefaults.object(forKey: UserDefaultsWrapper<Any>.Key.configLastUpdated.rawValue))
+        XCTAssertNil(UserDefaultsWrapper<Any>.sharedDefaults.object(forKey: UserDefaultsWrapper<Any>.Key.lastCrashReportCheckDate.rawValue))
     }
 
     // MARK: Optional<Date>
 
     func testOptionalDateValueDefaultValue() {
-        let wrapper = UserDefaultsWrapper<Date?>(key: .configLastUpdated, defaultValue: date1, defaults: defaults)
+        let wrapper = UserDefaultsWrapper<Date?>(key: .lastCrashReportCheckDate, defaultValue: date1, defaults: defaults)
         XCTAssertEqual(wrapper.wrappedValue, date1)
     }
 
     func testOptionalDateValueNilValue() {
-        let wrapper = UserDefaultsWrapper<Date?>(key: .configLastUpdated, defaults: defaults)
+        let wrapper = UserDefaultsWrapper<Date?>(key: .lastCrashReportCheckDate, defaults: defaults)
         XCTAssertNil(wrapper.wrappedValue)
     }
 
     func testOptionalDateValueUpdating() {
-        let wrapper = UserDefaultsWrapper<Date?>(key: .configLastUpdated, defaults: defaults)
+        let wrapper = UserDefaultsWrapper<Date?>(key: .lastCrashReportCheckDate, defaults: defaults)
         wrapper.wrappedValue = date2
         XCTAssertEqual(wrapper.wrappedValue, date2)
-        XCTAssertEqual(defaults.dictionary as! [String: Date], [UserDefaultsWrapper<Any>.Key.configLastUpdated.rawValue: date2])
+        XCTAssertEqual(defaults.dictionary as! [String: Date], [UserDefaultsWrapper<Any>.Key.lastCrashReportCheckDate.rawValue: date2])
     }
 
     func testOptionalDateValueRemoval() {
-        let wrapper = UserDefaultsWrapper<Date?>(key: .configLastUpdated, defaults: defaults)
+        let wrapper = UserDefaultsWrapper<Date?>(key: .lastCrashReportCheckDate, defaults: defaults)
         wrapper.wrappedValue = date2
         wrapper.wrappedValue = nil
         XCTAssertNil(wrapper.wrappedValue)
@@ -411,7 +411,7 @@ final class UserDefaultsWrapperTests: XCTestCase {
     }
 
     func testOptionalDateValueClear() {
-        let wrapper = UserDefaultsWrapper<Date?>(key: .configLastUpdated, defaults: defaults)
+        let wrapper = UserDefaultsWrapper<Date?>(key: .lastCrashReportCheckDate, defaults: defaults)
         wrapper.wrappedValue = date2
         wrapper.clear()
         XCTAssertNil(wrapper.wrappedValue)
@@ -419,14 +419,14 @@ final class UserDefaultsWrapperTests: XCTestCase {
     }
 
     func testOptionalDateValueSharedDefaults() {
-        let wrapper = UserDefaultsWrapper<Date?>(key: .configLastUpdated)
+        let wrapper = UserDefaultsWrapper<Date?>(key: .lastCrashReportCheckDate)
         XCTAssertNil(wrapper.wrappedValue)
         wrapper.wrappedValue = date2
         XCTAssertEqual(wrapper.wrappedValue, date2)
 
-        UserDefaultsWrapper.clear(.configLastUpdated)
+        UserDefaultsWrapper.clear(.lastCrashReportCheckDate)
         XCTAssertNil(wrapper.wrappedValue)
-        XCTAssertNil(UserDefaultsWrapper<Any>.sharedDefaults.object(forKey: UserDefaultsWrapper<Any>.Key.configLastUpdated.rawValue))
+        XCTAssertNil(UserDefaultsWrapper<Any>.sharedDefaults.object(forKey: UserDefaultsWrapper<Any>.Key.lastCrashReportCheckDate.rawValue))
     }
 
 }

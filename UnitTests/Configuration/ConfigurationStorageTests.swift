@@ -23,10 +23,12 @@ import Configuration
 
 final class ConfigurationStorageTests: XCTestCase {
 
+    var configurationStore: ConfigurationStore = ConfigurationStore()
+
     override func tearDown() {
         super.tearDown()
         for config in Configuration.allCases {
-            let url = ConfigurationStore.shared.fileUrl(for: config)
+            let url = configurationStore.fileUrl(for: config)
             try? FileManager.default.removeItem(at: url)
         }
     }
@@ -34,16 +36,16 @@ final class ConfigurationStorageTests: XCTestCase {
     func test_when_data_is_saved_for_config_then_it_can_be_loaded_correctly() {
         for config in Configuration.allCases {
             let uuid = UUID().uuidString
-            try? ConfigurationStore.shared.saveData(uuid.data(using: .utf8)!, for: config)
-            XCTAssertEqual(uuid, ConfigurationStore.shared.loadData(for: config)?.utf8String())
+            try? configurationStore.saveData(uuid.data(using: .utf8)!, for: config)
+            XCTAssertEqual(uuid, configurationStore.loadData(for: config)?.utf8String())
         }
     }
 
     func test_when_etag_is_saved_for_config_then_it_can_be_loaded_correctly() {
         for config in Configuration.allCases {
             let etag = UUID().uuidString
-            try? ConfigurationStore.shared.saveEtag(etag, for: config)
-            XCTAssertEqual(etag, ConfigurationStore.shared.loadEtag(for: config))
+            try? configurationStore.saveEtag(etag, for: config)
+            XCTAssertEqual(etag, configurationStore.loadEtag(for: config))
         }
     }
 

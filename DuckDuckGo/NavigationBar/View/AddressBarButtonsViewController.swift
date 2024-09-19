@@ -579,7 +579,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.sink { [weak self] tabViewModel in
-            guard let self, let tabViewModel else { return }
+            guard let self else { return }
 
             stopAnimations()
             closePrivacyDashboard()

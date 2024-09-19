@@ -56377,6 +56377,486 @@
         }
       }
     },
+    "sync.promo.bookmarks.message" : {
+      "comment" : "Message for the Sync Promotion banner when user has bookmarks that can be synced",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein Konto erforderlich. Ende-zu-Ende-Verschlüsselung bedeutet, dass niemand außer dir deine Lesezeichen sehen kann, nicht einmal wir."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No account needed. End-to-end encryption means nobody but you can see your bookmarks, not even us."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No necesitas ninguna cuenta. El cifrado de extremo a extremo significa que nadie más que tú puede ver tus marcadores, ni siquiera nosotros."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun compte n'est nécessaire. Le cryptage de bout en bout signifie que personne d'autre ne peut voir vos signets, pas même nous."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non è necessario un account. Con la crittografia end-to-end, nessuno, a parte te, può vedere i tuoi segnalibri, nemmeno noi."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geen account nodig. End-to-end versleuteling betekent dat niemand anders dan jij je bladwijzers kan zien, zelfs wij niet."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konto nie jest wymagane. Kompleksowe szyfrowanie oznacza, że nikt poza Tobą nie może zobaczyć Twoich zakładek, nawet my."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não precisas de uma conta. A encriptação ponta a ponta significa que ninguém além de ti pode ver os teus favoritos, nem mesmo nós."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Учетная запись не требуется. Сквозное шифрование означает, что ваши закладки видны только вам. Даже у нас нет к ним доступа."
+          }
+        }
+      }
+    },
+    "sync.promo.bookmarks.title" : {
+      "comment" : "Title for the Sync Promotion banner",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lesezeichen synchronisieren und sichern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sync & Back Up Your Bookmarks"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincroniza y haz copias de seguridad de tus marcadores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisez et sauvegardez vos signets"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronizza ed esegui il backup dei tuoi segnalibri"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchroniseer en back-up je bladwijzers"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronizuj i twórz kopie zapasowe zakładek"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincroniza e faz uma cópia de segurança dos teus favoritos"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Синхронизация и резервное копирование закладок"
+          }
+        }
+      }
+    },
+    "sync.promo.confirm.action" : {
+      "comment" : "Title for a button in the Sync Promotion banner to set up Sync",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sync einrichten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Set Up Sync"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurar la sincronización"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurer la synchronisation"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configura la sincronizzazione"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisatie instellen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skonfiguruj synchronizację"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurar sincronização"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настройка синхронизации"
+          }
+        }
+      }
+    },
+    "sync.promo.dismiss.action" : {
+      "comment" : "Title for a button in the Sync Promotion banner to dismiss Sync promotion banner",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nein, danke"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No Thanks"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No, gracias"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non merci"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No, grazie"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nee, bedankt"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie, dziękuję"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não, obrigado"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет, спасибо"
+          }
+        }
+      }
+    },
+    "sync.promo.passwords.message" : {
+      "comment" : "Message for the Sync Promotion banner when user has passwords that can be synced",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein Konto erforderlich. Ende-zu-Ende-Verschlüsselung bedeutet, dass niemand außer dir deine Passwörter sehen kann, nicht einmal wir."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No account needed. End-to-end encryption means nobody but you can see your passwords, not even us."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No necesitas ninguna cuenta. El cifrado de extremo a extremo significa que nadie más que tú puede ver tus contraseñas, ni siquiera nosotros."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun compte n'est nécessaire. Le cryptage de bout en bout signifie que personne d'autre ne peut voir vos mots de passe, pas même nous."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non è necessario un account. Con la crittografia end-to-end, nessuno a parte te può vedere le tue password, nemmeno noi."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geen account nodig. Dankzij end-to-end versleuteling kan niemand behalve jij je wachtwoorden zien, zelfs wij niet."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konto nie jest wymagane. Kompleksowe szyfrowanie oznacza, że nikt poza Tobą nie może zobaczyć Twoich haseł, nawet my."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não precisas de uma conta. A encriptação ponta a ponta significa que ninguém além de ti pode ver as tuas palavras-passe, nem mesmo nós."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Учетная запись не требуется. Сквозное шифрование означает, что ваши пароли видны только вам. Даже у нас нет к ним доступа."
+          }
+        }
+      }
+    },
+    "sync.promo.passwords.side.panel.subtitle" : {
+      "comment" : "Subtitle for the Sync Promotion in passwords side panel",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisieren und sichern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sync & Backup"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronización y copia de seguridad"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisation et sauvegarde"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronizzazione e backup"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisatie en back-up"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronizacja i kopia zapasowa"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronização e cópia de segurança"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Синхронизация и резервное копирование"
+          }
+        }
+      }
+    },
+    "sync.promo.passwords.side.panel.title" : {
+      "comment" : "Title for the Sync Promotion in passwords side panel",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einrichtung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Setup"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configuración"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installation"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurazione"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Instellen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konfiguracja"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configuração"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настройка"
+          }
+        }
+      }
+    },
+    "sync.promo.passwords.title" : {
+      "comment" : "Title for the Sync Promotion banner",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwörter synchronisieren und sichern  "
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sync & Back Up Your Passwords  "
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincroniza y haz copias de seguridad de tus contraseñas  "
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisez et sauvegardez vos mots de passe  "
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronizza e fai il backup delle password  "
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchroniseer en maak een back-up van je wachtwoorden  "
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronizuj i twórz kopie zapasowe haseł  "
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincroniza e faz uma cópia de segurança das tuas palavras-passe  "
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Синхронизация и резервное копирование паролей  "
+          }
+        }
+      }
+    },
     "tab.bookmarks.title" : {
       "comment" : "Tab bookmarks title",
       "extractionState" : "extracted_with_value",
