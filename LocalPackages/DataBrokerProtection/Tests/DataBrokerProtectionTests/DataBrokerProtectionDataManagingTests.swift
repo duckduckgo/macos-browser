@@ -96,9 +96,9 @@ final class DataBrokerProtectionDataManagingTests: XCTestCase {
         let result = try sut.matchesFoundAndBrokersCount()
 
         // Then
-        // 1 mirror site should be counted, and 1 broker with matches.
-        XCTAssertEqual(result.matchCount, 1)
-        XCTAssertEqual(result.brokerCount, 1)
+        // No extracted profiles, so count should be zero
+        XCTAssertEqual(result.matchCount, 0)
+        XCTAssertEqual(result.brokerCount, 0)
     }
 
     func testWhenMirrorSitesAreRemoved_thenTheyAreNotCountedAndBrokerCountIsZero() throws {

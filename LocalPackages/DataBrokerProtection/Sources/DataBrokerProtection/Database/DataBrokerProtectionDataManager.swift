@@ -147,14 +147,12 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
 
     /// Fetches all broker profile query data from the database and calculates the total number of matches and brokers with matches.
     ///
-    /// A match is defined as either:
-    /// 1. An extracted profile associated with the broker profile query data.
-    /// 2. A mirror site that should be included in the count (determined by the `shouldWeIncludeMirrorSite()` logic).
+    /// A match is defined as: An extracted profile associated with the broker profile query data.
     ///
-    /// Additionally, a broker is counted if it has at least one match (either an extracted profile or a valid mirror site).
+    /// Additionally, a broker is counted if it has at least one match (either an extracted profile).
     ///
     /// - Returns: A tuple containing:
-    ///   - `matchCount`: The total number of matches found (extracted profiles + valid mirror sites).
+    ///   - `matchCount`: The total number of matches found (extracted profiles).
     ///   - `brokerCount`: The number of brokers that have at least one match.
     /// - Throws: An error if fetching broker profile query data from the database fails.
     public func matchesFoundAndBrokersCount() throws -> (matchCount: Int, brokerCount: Int) {
@@ -183,15 +181,19 @@ private extension DataBrokerProtectionDataManager {
         let matchCount = queryData.reduce(0) { count, data in
             guard !data.profileQuery.deprecated else { return count }
 
-            let extractedProfileCount = data.extractedProfiles.count
-            let mirrorSitesCount = data.dataBroker.mirrorSites.filter { $0.shouldWeIncludeMirrorSite() }.count
+            let profilesCount = data.extractedProfiles.count
+            var validMirrorSitesCount = 0
 
-            // Only increment broker count if there are matches (profiles or mirror sites)
-            if extractedProfileCount + mirrorSitesCount > 0 {
+            data.extractedProfiles.forEach { _ in
+                let mirrorSitesMatches = data.dataBroker.mirrorSites.filter { $0.shouldWeIncludeMirrorSite() }
+                validMirrorSitesCount += mirrorSitesMatches.count
+            }
+
+            if profilesCount + validMirrorSitesCount > 0 {
                 brokerCount += 1
             }
 
-            return count + extractedProfileCount + mirrorSitesCount
+            return count + profilesCount + validMirrorSitesCount
         }
 
         return (matchCount, brokerCount)
