@@ -133,15 +133,14 @@ struct DataImportViewModel {
 
 #endif
 
-    lazy var isPasswordManagerAutolockEnabled: Bool = {
-        AutofillPreferences().isAutoLockEnabled
-    }()
+    let isPasswordManagerAutolockEnabled: Bool
 
     init(importSource: Source? = nil,
          screen: Screen? = nil,
          availableImportSources: [DataImport.Source] = Source.allCases.filter { $0.canImportData },
          preferredImportSources: [Source] = [.chrome, .firefox, .safari],
          summary: [DataTypeImportResult] = [],
+         isPasswordManagerAutolockEnabled: Bool = AutofillPreferences().isAutoLockEnabled,
          loadProfiles: @escaping (ThirdPartyBrowser) -> BrowserProfileList = { $0.browserProfiles() },
          dataImporterFactory: @escaping DataImporterFactory = dataImporter,
          requestPrimaryPasswordCallback: @escaping @MainActor (Source) -> String? = Self.requestPrimaryPasswordCallback,
@@ -165,6 +164,7 @@ struct DataImportViewModel {
         self.selectedDataTypes = importSource.supportedDataTypes
 
         self.summary = summary
+        self.isPasswordManagerAutolockEnabled = isPasswordManagerAutolockEnabled
 
         self.requestPrimaryPasswordCallback = requestPrimaryPasswordCallback
         self.openPanelCallback = openPanelCallback
@@ -687,7 +687,7 @@ extension DataImportViewModel {
     }
 
     mutating func update(with importSource: Source) {
-        self = .init(importSource: importSource, loadProfiles: loadProfiles, dataImporterFactory: dataImporterFactory, requestPrimaryPasswordCallback: requestPrimaryPasswordCallback, reportSenderFactory: reportSenderFactory, onFinished: onFinished, onCancelled: onCancelled)
+        self = .init(importSource: importSource, isPasswordManagerAutolockEnabled: isPasswordManagerAutolockEnabled, loadProfiles: loadProfiles, dataImporterFactory: dataImporterFactory, requestPrimaryPasswordCallback: requestPrimaryPasswordCallback, reportSenderFactory: reportSenderFactory, onFinished: onFinished, onCancelled: onCancelled)
     }
 
     @MainActor
