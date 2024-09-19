@@ -1331,7 +1331,7 @@ struct UserText {
     ///   - brokerCount: The number of broker sites where records were found.
     /// - Returns: A formatted string indicating the number of records found on multiple sites.
     static func homePagePromotionFreemiumDBPPostScanEngagementResultPluralText(resultCount: Int, brokerCount: Int) -> String {
-        String(format: "Your free personal info scan found %d records about you on %d sites.", resultCount, brokerCount)
+        String(format: "Your free personal info scan found %d records about you on %d different sites.", resultCount, brokerCount)
     }
 
     // Key: "home.page.promotion.freemium.dbp.post.scan.engagement.no.results.text"
