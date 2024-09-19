@@ -7392,7 +7392,6 @@
 		AA585D75248FD31100E9A3E2 = {
 			isa = PBXGroup;
 			children = (
-				C17E105C2C94A10700317F2B /* FreemiumDBPPixelExperimentManagingTests.swift */,
 				378B5886295CF2A4002C0CC0 /* Configuration */,
 				378E279C2970217400FCADA2 /* LocalPackages */,
 				7BB108552A43375D000AB95F /* LocalThirdParty */,
@@ -9136,6 +9135,7 @@
 		C17E105B2C94A06700317F2B /* Experiment */ = {
 			isa = PBXGroup;
 			children = (
+				C17E105C2C94A10700317F2B /* FreemiumDBPPixelExperimentManagingTests.swift */,
 			);
 			path = Experiment;
 			sourceTree = "<group>";

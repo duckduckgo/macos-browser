@@ -39,12 +39,7 @@ extension HomePage.Views {
                     HStack(spacing: 8) {
                         image
 
-                        VStack(alignment: .leading, spacing: 8) {
-                            if viewModel.title != nil {
-                                title
-                            }
-                            subtitle
-                        }
+                        text
                         .padding(.leading, 0)
 
                         Spacer(minLength: 4)
@@ -88,13 +83,8 @@ extension HomePage.Views {
             }
         }
 
-        private var title: some View {
-            Text(viewModel.title!)
-                .font(.system(size: 13).bold())
-       }
-
-        private var subtitle: some View {
-            Text(viewModel.subtitle)
+        private var text: some View {
+            Text(viewModel.text)
         }
 
         private var button: some View {

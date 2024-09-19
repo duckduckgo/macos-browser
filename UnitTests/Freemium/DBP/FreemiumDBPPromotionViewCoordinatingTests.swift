@@ -118,8 +118,7 @@ final class FreemiumDBPPromotionViewCoordinatingTests: XCTestCase {
         let viewModel = sut.viewModel
 
         // Then
-        XCTAssertEqual(viewModel.title, UserText.homePagePromotionFreemiumDBPPostScanEngagementResultsTitle)
-        XCTAssertEqual(viewModel.subtitle, UserText.homePagePromotionFreemiumDBPPostScanEngagementResultPluralSubtitle(resultCount: 5, brokerCount: 2))
+        XCTAssertEqual(viewModel.text, UserText.homePagePromotionFreemiumDBPPostScanEngagementResultPluralText(resultCount: 5, brokerCount: 2))
     }
 
     @MainActor
@@ -131,7 +130,7 @@ final class FreemiumDBPPromotionViewCoordinatingTests: XCTestCase {
         let viewModel = sut.viewModel
 
         // Then
-        XCTAssertEqual(viewModel.subtitle, UserText.homePagePromotionFreemiumDBPSubtitle)
+        XCTAssertEqual(viewModel.text, UserText.homePagePromotionFreemiumDBPText)
     }
 
     func testNotificationObservation_updatesPromotionVisibility() {
