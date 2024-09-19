@@ -290,6 +290,7 @@ final class PasswordManagementItemListModel: ObservableObject {
             }
         }
     }
+
     @Published var syncPromoSelected: Bool = false {
         didSet {
             if syncPromoSelected {
@@ -297,12 +298,26 @@ final class PasswordManagementItemListModel: ObservableObject {
             }
         }
     }
+
+    var emptyStateMessageDescription: String {
+        autofillPreferences.isAutoLockEnabled ? UserText.pmEmptyStateDefaultDescription : UserText.pmEmptyStateDefaultDescriptionAutolockOff
+    }
+
+    var emptyStateMessageLinkText: String {
+        UserText.learnMore
+    }
+
+    var emptyStateMessageLinkURL: URL {
+        URL.passwordManagerLearnMore
+    }
+
     @Published private(set) var emptyState: EmptyState = .none
     @Published var canChangeCategory: Bool = true
 
     private var onItemSelected: (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void
     private var onAddItemSelected: (_ category: SecureVaultSorting.Category) -> Void
     private let tld: TLD
+    private let autofillPreferences: AutofillPreferencesPersistor
     private let urlMatcher: AutofillDomainNameUrlMatcher
     private static let randomColorsCount = 15
 
@@ -310,6 +325,7 @@ final class PasswordManagementItemListModel: ObservableObject {
          syncPromoManager: SyncPromoManaging,
          urlMatcher: AutofillDomainNameUrlMatcher = AutofillDomainNameUrlMatcher(),
          tld: TLD = ContentBlocking.shared.tld,
+         autofillPreferences: AutofillPreferencesPersistor = AutofillPreferences(),
          onItemSelected: @escaping (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void,
          onAddItemSelected: @escaping (_ category: SecureVaultSorting.Category) -> Void) {
         self.onItemSelected = onItemSelected
@@ -318,6 +334,7 @@ final class PasswordManagementItemListModel: ObservableObject {
         self.syncPromoManager = syncPromoManager
         self.urlMatcher = urlMatcher
         self.tld = tld
+        self.autofillPreferences = autofillPreferences
     }
 
     func update(items: [SecureVaultItem]) {
