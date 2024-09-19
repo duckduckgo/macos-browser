@@ -20,12 +20,12 @@ import AppKit
 import Foundation
 
 public struct SiteTroubleshootingInfo {
-    public let icon: NSImage
+    public let icon: NSImage?
     public let domain: String
     public let excluded: Bool
 
     public init(icon: NSImage?, domain: String, excluded: Bool) {
-        self.icon = icon ?? NSImage(systemSymbolName: "globe", accessibilityDescription: nil)!
+        self.icon = icon
         self.domain = domain
         self.excluded = excluded
     }
