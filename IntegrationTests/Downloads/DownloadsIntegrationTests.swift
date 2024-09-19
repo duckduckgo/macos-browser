@@ -249,6 +249,48 @@ class DownloadsIntegrationTests: XCTestCase {
     }
 
     @MainActor
+    func testWhenDownloadIsStartedAfterAppOpensURL_tabIsClosed() async throws {
+        let preferences = DownloadsPreferences.shared
+        preferences.alwaysRequestDownloadLocation = false
+        preferences.selectedDownloadLocation = FileManager.default.temporaryDirectory
+        let dirURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: dirURL, withIntermediateDirectories: true)
+        let tab = tabViewModel.tab
+
+        let downloadUrl = URL.testsServer
+            .appendingPathComponent("fname.dat")
+            .appendingTestParameters(data: data.html,
+                                     headers: ["Content-Disposition": "attachment; filename=\"fname.dat\"",
+                                               "Content-Type": "text/html"])
+
+        let downloadTaskFuture = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
+
+        let e1 = expectation(description: "new tab opened")
+        var e2: XCTestExpectation!
+        let c = tabCollectionViewModel.$selectedTabViewModel.dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [unowned self] tabViewModel in
+                guard let tabViewModel else { return }
+                print("tabViewModel", tabViewModel.tab, tab)
+                if tabViewModel.tab !== tab {
+                    e1.fulfill()
+                    e2 = expectation(description: "new tab closed")
+                } else {
+                    e2.fulfill()
+                }
+            }
+
+        _=try await NSWorkspace.shared.open([downloadUrl], withApplicationAt: Bundle.main.bundleURL, configuration: .init())
+
+        // download should start in the background tab
+        _=try await downloadTaskFuture.get()
+
+        // expect for the download tab to close
+        await fulfillment(of: [e1, e2], timeout: 10)
+        withExtendedLifetime(c, {})
+    }
+
+    @MainActor
     func testWhenDownloadIsStartedInNewTabAfterRedirect_tabIsClosed() async throws {
         let preferences = DownloadsPreferences.shared
         preferences.alwaysRequestDownloadLocation = false
