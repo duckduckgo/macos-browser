@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Combine
 import PixelKit
 import RemoteMessaging
 import SwiftUI
@@ -23,12 +24,14 @@ import SwiftUIExtensions
 
 struct AddressBarTextFieldView: NSViewRepresentable {
 
-    let tabCollectionViewModel: TabCollectionViewModel
+    @Binding var value: AddressBarTextField.Value
+
     let addressBarViewController: AddressBarViewController
 
     @EnvironmentObject var settingsModel: HomePage.Models.SettingsModel
 
     func makeNSView(context: Context) -> NSView {
+        let textField = addressBarViewController.addressBarTextField
         return addressBarViewController.view
     }
 
@@ -42,6 +45,23 @@ struct AddressBarTextFieldView: NSViewRepresentable {
             nsView.appearance = nil
         }
         nsView.subviews.forEach { $0.setNeedsDisplay($0.bounds) }
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+
+    class Coordinator: NSObject {
+        var parent: AddressBarTextFieldView
+        var cancellable: AnyCancellable
+
+        init(_ parent: AddressBarTextFieldView) {
+            self.parent = parent
+            cancellable = parent.addressBarViewController.addressBarTextField.$value
+                .sink { value in
+                    parent.value = value
+                }
+        }
     }
 }
 
@@ -70,7 +90,8 @@ extension HomePage.Views {
             }
         }
 
-        @State var scrollPosition: CGFloat = 0
+        @State private var addressBarValue: AddressBarTextField.Value = .text("", userTyped: false)
+        @State private var scrollPosition: CGFloat = 0
 
         func regularHomePageView(includingContinueSetUpCards: Bool) -> some View {
             GeometryReader { geometry in
@@ -78,25 +99,57 @@ extension HomePage.Views {
 
                     HStack(spacing: 0) {
                         ZStack(alignment: .leading) {
-                            ScrollView {
-                                VStack(spacing: 0) {
-                                    innerView(includingContinueSetUpCards: includingContinueSetUpCards)
-                                        .frame(width: geometry.size.width - (settingsVisibilityModel.isSettingsVisible ? Self.settingsPanelWidth : 0))
-                                        .offset(x: settingsVisibilityModel.isSettingsVisible ? innerViewOffset(with: geometry) : 0)
-                                        .fixedColorScheme(for: settingsModel.customBackground)
-                                    GeometryReader { geometry in
-                                        Color.clear
-                                            .preference(key: ScrollOffsetPreferenceKey.self, value: geometry.frame(in: .named("scroll")).minY)
+                            if #available(macOS 14.0, *) {
+                                ScrollViewReader { proxy in
+                                    ScrollView {
+                                        VStack(spacing: 0) {
+                                            innerView(includingContinueSetUpCards: includingContinueSetUpCards)
+                                                .frame(width: geometry.size.width - (settingsVisibilityModel.isSettingsVisible ? Self.settingsPanelWidth : 0))
+                                                .offset(x: settingsVisibilityModel.isSettingsVisible ? innerViewOffset(with: geometry) : 0)
+                                                .fixedColorScheme(for: settingsModel.customBackground)
+                                            GeometryReader { geometry in
+                                                Color.clear
+                                                    .preference(key: ScrollOffsetPreferenceKey.self, value: geometry.frame(in: .named("scroll")).minY)
+                                            }
+                                            .frame(height: 0)
+                                        }
                                     }
-                                    .frame(height: 0)
+                                    .coordinateSpace(name: "scroll")
+                                    .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
+                                        if abs(scrollPosition - value) > 1 {
+                                            scrollPosition = value
+                                            if addressBarViewController.isSuggestionsWindowVisible {
+                                                addressBarViewController.addressBarTextField?.hideSuggestionWindow()
+                                            }
+                                        }
+                                    }
+                                    .onChange(of: addressBarValue) {
+                                        if model.isSearchFieldVisible {
+                                            proxy.scrollTo("search bar")
+                                        }
+                                    }
                                 }
-                            }
-                            .coordinateSpace(name: "scroll")
-                            .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
-                                if abs(scrollPosition - value) > 1 {
-                                    scrollPosition = value
-                                    if addressBarViewController.isSuggestionsWindowVisible {
-                                        addressBarViewController.addressBarTextField?.hideSuggestionWindow()
+                            } else {
+                                ScrollView {
+                                    VStack(spacing: 0) {
+                                        innerView(includingContinueSetUpCards: includingContinueSetUpCards)
+                                            .frame(width: geometry.size.width - (settingsVisibilityModel.isSettingsVisible ? Self.settingsPanelWidth : 0))
+                                            .offset(x: settingsVisibilityModel.isSettingsVisible ? innerViewOffset(with: geometry) : 0)
+                                            .fixedColorScheme(for: settingsModel.customBackground)
+                                        GeometryReader { geometry in
+                                            Color.clear
+                                                .preference(key: ScrollOffsetPreferenceKey.self, value: geometry.frame(in: .named("scroll")).minY)
+                                        }
+                                        .frame(height: 0)
+                                    }
+                                }
+                                .coordinateSpace(name: "scroll")
+                                .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
+                                    if abs(scrollPosition - value) > 1 {
+                                        scrollPosition = value
+                                        if addressBarViewController.isSuggestionsWindowVisible {
+                                            addressBarViewController.addressBarTextField?.hideSuggestionWindow()
+                                        }
                                     }
                                 }
                             }
@@ -160,11 +213,14 @@ extension HomePage.Views {
                 Group {
                     remoteMessage()
 
-                    logo()
-                        .visibility(model.isDaxLogoVisible ? .visible : .gone)
+                    Group {
+                        logo()
+                            .visibility(model.isDaxLogoVisible ? .visible : .gone)
 
-                    searchField()
-                        .visibility(model.isSearchFieldVisible ? .visible : .gone)
+                        searchField()
+                            .visibility(model.isSearchFieldVisible ? .visible : .gone)
+                    }
+                    .id("search bar")
 
                     if includingContinueSetUpCards {
                         ContinueSetUpView()
@@ -218,11 +274,8 @@ extension HomePage.Views {
 
         @ViewBuilder
         func searchField() -> some View {
-            AddressBarTextFieldView(
-                tabCollectionViewModel: continueSetUpModel.tabCollectionViewModel,
-                addressBarViewController: addressBarViewController
-            )
-            .frame(height: 40)
+            AddressBarTextFieldView(value: $addressBarValue, addressBarViewController: addressBarViewController)
+                .frame(height: 40)
         }
 
         @ViewBuilder
