@@ -1,7 +1,7 @@
 {
   "name": "Spokeo",
   "url": "spokeo.com",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "addedDatetime": 1692572400000,
   "mirrorSites": [
     {
@@ -42,27 +42,36 @@
         {
           "actionType": "extract",
           "id": "bd52ece4-55ba-4839-8360-a201c99d6ae6",
-          "selector": ".single-column-list-item",
+          "selector": "div[role='listitem']",
           "noResultsSelector": ".no_results_container",
           "profile": {
             "name": {
-              "selector": ".title",
+              "selector": "h3",
               "beforeText": ","
             },
             "age": {
-              "selector": ".title",
+              "selector": "h3",
               "afterText": ","
             },
             "addressCityState": {
-              "selector": ".//div[@type='display']",
-              "afterText": "RESIDES IN"
+              "selector": ".//div[contains(text(), 'Reside')]",
+              "afterText": "Resides in"
+            },
+            "addressCityStateList": {
+              "selector": ".//div[span[text() = 'Lived In']]",
+              "afterText": "Lived In",
+              "separator": ","
             },
             "relativesList": {
-              "selector": ".//a[contains(@id, 'relative')]",
+              "selector": ".//div[span[text() = 'Related To']]/a",
               "findElements": true
             },
+            "alternativeNamesList": {
+              "selector": ".//div[span[text() = 'Also known as']]",
+              "afterText": "Also known as"
+            },
             "profileUrl": {
-              "selector": ".title",
+              "selector": "a",
               "identifierType": "path",
               "identifier": "https://www.spokeo.com/${firstName}-${lastName}/${state|stateFull}/${city|hyphenated}/${id}"
             }
