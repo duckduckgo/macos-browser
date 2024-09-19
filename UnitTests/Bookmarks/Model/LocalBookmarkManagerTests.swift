@@ -105,6 +105,51 @@ final class LocalBookmarkManagerTests: XCTestCase {
     }
 
     @MainActor
+    func testWhenFolderIsRemoved_ThenManagerRemovesItFromStore() {
+        let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
+        var folder: BookmarkFolder!
+        let e = expectation(description: "Folder created")
+        bookmarkManager.makeFolder(withTitle: "Folder", parent: nil) { result in
+            folder = try? result.get()
+            e.fulfill()
+        }
+        waitForExpectations(timeout: 1)
+        guard let folder else { XCTFail("Folder not loaded"); return }
+
+        bookmarkStoreMock.bookmarkFolderWithId = {
+            XCTAssertEqual($0, folder.id)
+            return folder
+        }
+        let loadedFolder = bookmarkManager.getBookmarkFolder(withId: folder.id)
+        XCTAssertEqual(folder, loadedFolder)
+
+        bookmarkManager.remove(folder: folder, undoManager: nil)
+        bookmarkStoreMock.bookmarkFolderWithId = { _ in nil }
+
+        XCTAssertNil(bookmarkManager.getBookmarkFolder(withId: folder.id))
+        XCTAssert(bookmarkStoreMock.saveFolderCalled)
+        XCTAssertEqual(bookmarkStoreMock.removeCalledWithIds, [folder.id])
+    }
+
+    @MainActor
+    func testWhenBookmarkAndFolderAreRemoved_ThenManagerRemovesThemFromStore() {
+        let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
+        let bookmark = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", isFavorite: false)!
+        var folder: BookmarkFolder!
+        let e = expectation(description: "Folder created")
+        bookmarkManager.makeFolder(withTitle: "Folder", parent: nil) { result in
+            folder = try? result.get()
+            e.fulfill()
+        }
+        waitForExpectations(timeout: 1)
+        guard let folder else { XCTFail("Folder not loaded"); return }
+
+        bookmarkManager.remove(objectsWithUUIDs: [folder.id, bookmark.id], undoManager: nil)
+
+        XCTAssertEqual(Set(bookmarkStoreMock.removeCalledWithIds ?? []), Set([folder.id, bookmark.id]))
+    }
+
+    @MainActor
     func testWhenRemovalFails_ThenManagerPutsBookmarkBackToList() {
         let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
         let bookmark = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", isFavorite: false)!
@@ -115,6 +160,96 @@ final class LocalBookmarkManagerTests: XCTestCase {
         XCTAssert(bookmarkManager.isUrlBookmarked(url: bookmark.urlObject!))
         XCTAssert(bookmarkStoreMock.saveBookmarkCalled)
         XCTAssert(bookmarkStoreMock.removeCalled)
+    }
+
+    @MainActor
+    func testWhenBookmarkRemovalIsUndone_ThenRestoreBookmarkIsCalled() {
+        let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
+        let bookmark = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", isFavorite: false)!
+
+        let undoManager = UndoManager()
+        bookmarkStoreMock.bookmarkEntitiesWithIds = { ids in
+            XCTAssertEqual(ids, [bookmark.id])
+            return [bookmark]
+        }
+
+        bookmarkManager.remove(bookmark: bookmark, undoManager: undoManager)
+
+        XCTAssertTrue(undoManager.canUndo)
+        undoManager.undo()
+
+        XCTAssertEqual(bookmarkStoreMock.restoreCalledEntities, [bookmark])
+
+        bookmarkStoreMock.removeCalledWithIds = nil
+        XCTAssertTrue(undoManager.canRedo)
+
+        undoManager.redo()
+        XCTAssertEqual(Set(bookmarkStoreMock.removeCalledWithIds ?? []), Set([bookmark.id]))
+    }
+
+    @MainActor
+    func testWhenFolderRemovalIsUndone_ThenRestoreFolderIsCalled() {
+        let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
+        var folder: BookmarkFolder!
+        let e = expectation(description: "Folder created")
+        bookmarkManager.makeFolder(withTitle: "Folder", parent: nil) { result in
+            folder = try? result.get()
+            e.fulfill()
+        }
+        waitForExpectations(timeout: 1)
+        guard let folder else { XCTFail("Folder not loaded"); return }
+
+        let undoManager = UndoManager()
+        bookmarkStoreMock.bookmarkFolderWithId = {
+            XCTAssertEqual($0, folder.id)
+            return folder
+        }
+
+        bookmarkManager.remove(folder: folder, undoManager: undoManager)
+
+        XCTAssertTrue(undoManager.canUndo)
+        undoManager.undo()
+
+        XCTAssertEqual(bookmarkStoreMock.restoreCalledEntities, [folder])
+
+        bookmarkStoreMock.removeCalledWithIds = nil
+        XCTAssertTrue(undoManager.canRedo)
+
+        undoManager.redo()
+        XCTAssertEqual(Set(bookmarkStoreMock.removeCalledWithIds ?? []), Set([folder.id]))
+    }
+
+    @MainActor
+    func testWhenBookmarkAndFolderRemovalIsUndone_ThenRestoreEntitiesIsCalled() {
+        let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
+        let bookmark = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", isFavorite: false)!
+        var folder: BookmarkFolder!
+        let e = expectation(description: "Folder created")
+        bookmarkManager.makeFolder(withTitle: "Folder", parent: nil) { result in
+            folder = try? result.get()
+            e.fulfill()
+        }
+        waitForExpectations(timeout: 1)
+        guard let folder else { XCTFail("Folder not loaded"); return }
+
+        let undoManager = UndoManager()
+        bookmarkStoreMock.bookmarkEntitiesWithIds = { ids in
+            XCTAssertEqual(Set(ids), [folder.id, bookmark.id])
+            return [folder, bookmark]
+        }
+
+        bookmarkManager.remove(objectsWithUUIDs: [folder.id, bookmark.id], undoManager: undoManager)
+
+        XCTAssertTrue(undoManager.canUndo)
+        undoManager.undo()
+
+        XCTAssertEqual(bookmarkStoreMock.restoreCalledEntities, [folder, bookmark])
+
+        bookmarkStoreMock.removeCalledWithIds = nil
+        XCTAssertTrue(undoManager.canRedo)
+
+        undoManager.redo()
+        XCTAssertEqual(Set(bookmarkStoreMock.removeCalledWithIds ?? []), Set([folder.id, bookmark.id]))
     }
 
     @MainActor

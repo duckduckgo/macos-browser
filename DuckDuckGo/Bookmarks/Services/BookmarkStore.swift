@@ -65,7 +65,74 @@ protocol BookmarkStore {
     func handleFavoritesAfterDisablingSync()
 }
 extension BookmarkStore {
+
+    func loadAll(type: BookmarkStoreFetchPredicateType) async throws -> [BaseBookmarkEntity] {
+        return try await withCheckedThrowingContinuation { continuation in
+            loadAll(type: type) { result, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+
+                continuation.resume(returning: result ?? [])
+            }
+        }
+    }
+
     func bookmarkFolder(withId id: String) -> BookmarkFolder? {
         bookmarkEntities(withIds: [id])?.first as? BookmarkFolder
     }
+
+    func save(folder: BookmarkFolder, parent: BookmarkFolder?) async throws {
+        return try await withCheckedThrowingContinuation { continuation in
+            save(folder: folder, parent: parent) { error in
+                if let error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+
+                continuation.resume()
+            }
+        }
+    }
+
+    func save(bookmark: Bookmark, parent: BookmarkFolder?, index: Int?) async throws {
+        return try await withCheckedThrowingContinuation { continuation in
+            save(bookmark: bookmark, parent: parent, index: index) { error in
+                if let error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+
+                continuation.resume()
+            }
+        }
+    }
+
+    func remove(objectsWithUUIDs uuids: [String]) async throws {
+        return try await withCheckedThrowingContinuation { continuation in
+            remove(objectsWithUUIDs: uuids) { error in
+                if let error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+
+                continuation.resume()
+            }
+        }
+    }
+
+    func restore(_ objects: [BaseBookmarkEntity]) async throws {
+        return try await withCheckedThrowingContinuation { continuation in
+            restore(objects) { error in
+                if let error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+
+                continuation.resume()
+            }
+        }
+    }
+
 }

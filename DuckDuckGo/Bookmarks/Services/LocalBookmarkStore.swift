@@ -1017,49 +1017,6 @@ final class LocalBookmarkStore: BookmarkStore {
 
     // MARK: - Concurrency
 
-    func loadAll(type: BookmarkStoreFetchPredicateType) async -> Result<[BaseBookmarkEntity], Error> {
-        return await withCheckedContinuation { continuation in
-            loadAll(type: type) { result, error in
-                if let error = error {
-                    continuation.resume(returning: .failure(error))
-                    return
-                }
-
-                guard let result = result else {
-                    fatalError("Expected non-nil result 'result' for nil error")
-                }
-
-                continuation.resume(returning: .success(result))
-            }
-        }
-    }
-
-    func save(folder: BookmarkFolder, parent: BookmarkFolder?) async -> Result<Void, Error> {
-        return await withCheckedContinuation { continuation in
-            save(folder: folder, parent: parent) { error in
-                if let error = error {
-                    continuation.resume(returning: .failure(error))
-                    return
-                }
-
-                continuation.resume(returning: .success(()))
-            }
-        }
-    }
-
-    func save(bookmark: Bookmark, parent: BookmarkFolder?, index: Int?) async -> Result<Void, Error> {
-        return await withCheckedContinuation { continuation in
-            save(bookmark: bookmark, parent: parent, index: index) { error in
-                if let error = error {
-                    continuation.resume(returning: .failure(error))
-                    return
-                }
-
-                continuation.resume(returning: .success(()))
-            }
-        }
-    }
-
     func move(objectUUIDs: [String], toIndex index: Int?, withinParentFolder parent: ParentFolderType) async -> Error? {
         return await withCheckedContinuation { continuation in
             move(objectUUIDs: objectUUIDs, toIndex: index, withinParentFolder: parent) { error in
