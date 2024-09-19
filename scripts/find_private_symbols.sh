@@ -60,7 +60,8 @@ find_private_objc_selectors() {
 	# 4. Print only selectors starting with and underscore.
 	otool -v -s __DATA __objc_selrefs "${app_binary}" \
 		| sed -n -e 's/^.*__TEXT:__objc_methname://' \
-			-e '/^__swift_objectForKeyedSubscript/d' \
+            -e '/^__swift_objectForKeyedSubscript/d' \
+			-e '/^__swift_setObject:forKeyedSubscript:/d' \
 			-e '/^_/P' \
 		| sort | uniq
 }
