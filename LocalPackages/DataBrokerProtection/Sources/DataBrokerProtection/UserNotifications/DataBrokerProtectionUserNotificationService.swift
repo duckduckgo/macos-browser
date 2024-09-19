@@ -38,16 +38,27 @@ public protocol DataBrokerProtectionUserNotificationService {
     func scheduleCheckInNotificationIfPossible()
 }
 
+// Protocol to enable injection and testing of `DataBrokerProtectionUserNotificationService`
+public protocol DBPUserNotificationCenter {
+    var delegate: (any UNUserNotificationCenterDelegate)? { get set }
+    func add(_ request: UNNotificationRequest, withCompletionHandler completionHandler: (((any Error)?) -> Void)?)
+    func getNotificationSettings(completionHandler: @escaping (UNNotificationSettings) -> Void)
+    func requestAuthorization(options: UNAuthorizationOptions, completionHandler: @escaping (Bool, (any Error)?) -> Void)
+}
+
+// Conform system `UNUserNotificationCenter` to `DBPUserNotificationCenter` protocol
+extension UNUserNotificationCenter: DBPUserNotificationCenter {}
+
 public class DefaultDataBrokerProtectionUserNotificationService: NSObject, DataBrokerProtectionUserNotificationService {
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let userDefaults: UserDefaults
-    private let userNotificationCenter: UNUserNotificationCenter
+    private var userNotificationCenter: DBPUserNotificationCenter
     private let authenticationManager: DataBrokerProtectionAuthenticationManaging
     private let areNotificationsEnabled = true
 
     public init(pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                 userDefaults: UserDefaults = .standard,
-                userNotificationCenter: UNUserNotificationCenter = .current(),
+                userNotificationCenter: DBPUserNotificationCenter,
                 authenticationManager: DataBrokerProtectionAuthenticationManaging) {
         self.pixelHandler = pixelHandler
         self.userDefaults = userDefaults
