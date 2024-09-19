@@ -16,54 +16,10 @@
 //  limitations under the License.
 //
 
-import Combine
 import PixelKit
 import RemoteMessaging
 import SwiftUI
 import SwiftUIExtensions
-
-struct AddressBarTextFieldView: NSViewRepresentable {
-
-    @Binding var value: AddressBarTextField.Value
-
-    let addressBarViewController: AddressBarViewController
-
-    @EnvironmentObject var settingsModel: HomePage.Models.SettingsModel
-
-    func makeNSView(context: Context) -> NSView {
-        let textField = addressBarViewController.addressBarTextField
-        return addressBarViewController.view
-    }
-
-    func updateNSView(_ nsView: NSView, context: Context) {
-        switch settingsModel.customBackground?.colorScheme {
-        case .light:
-            nsView.appearance = NSAppearance(named: .aqua)
-        case .dark:
-            nsView.appearance = NSAppearance(named: .darkAqua)
-        default:
-            nsView.appearance = nil
-        }
-        nsView.subviews.forEach { $0.setNeedsDisplay($0.bounds) }
-    }
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-
-    class Coordinator: NSObject {
-        var parent: AddressBarTextFieldView
-        var cancellable: AnyCancellable
-
-        init(_ parent: AddressBarTextFieldView) {
-            self.parent = parent
-            cancellable = parent.addressBarViewController.addressBarTextField.$value
-                .sink { value in
-                    parent.value = value
-                }
-        }
-    }
-}
 
 extension HomePage.Views {
 
@@ -90,6 +46,11 @@ extension HomePage.Views {
             }
         }
 
+        enum Const {
+            static let scrollViewCoordinateSpaceName = "scroll"
+            static let searchBarIdentifier = "search bar"
+        }
+
         @State private var addressBarValue: AddressBarTextField.Value = .text("", userTyped: false)
         @State private var scrollPosition: CGFloat = 0
 
@@ -99,71 +60,25 @@ extension HomePage.Views {
 
                     HStack(spacing: 0) {
                         ZStack(alignment: .leading) {
-                            if #available(macOS 14.0, *) {
-                                ScrollViewReader { proxy in
-                                    ScrollView {
-                                        VStack(spacing: 0) {
-                                            innerView(includingContinueSetUpCards: includingContinueSetUpCards)
-                                                .frame(width: geometry.size.width - (settingsVisibilityModel.isSettingsVisible ? Self.settingsPanelWidth : 0))
-                                                .offset(x: settingsVisibilityModel.isSettingsVisible ? innerViewOffset(with: geometry) : 0)
-                                                .fixedColorScheme(for: settingsModel.customBackground)
-                                            GeometryReader { geometry in
-                                                Color.clear
-                                                    .preference(key: ScrollOffsetPreferenceKey.self, value: geometry.frame(in: .named("scroll")).minY)
-                                            }
-                                            .frame(height: 0)
-                                        }
-                                    }
-                                    .coordinateSpace(name: "scroll")
-                                    .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
-                                        if abs(scrollPosition - value) > 1 {
-                                            scrollPosition = value
-                                            if addressBarViewController.isSuggestionsWindowVisible {
-                                                addressBarViewController.addressBarTextField?.hideSuggestionWindow()
-                                            }
-                                        }
-                                    }
-                                    .onChange(of: addressBarValue) {
-                                        proxy.scrollTo("search bar")
-                                    }
-                                }
-                            } else {
+                            ScrollViewReader { proxy in
                                 ScrollView {
                                     VStack(spacing: 0) {
                                         innerView(includingContinueSetUpCards: includingContinueSetUpCards)
                                             .frame(width: geometry.size.width - (settingsVisibilityModel.isSettingsVisible ? Self.settingsPanelWidth : 0))
                                             .offset(x: settingsVisibilityModel.isSettingsVisible ? innerViewOffset(with: geometry) : 0)
                                             .fixedColorScheme(for: settingsModel.customBackground)
-                                        GeometryReader { geometry in
-                                            Color.clear
-                                                .preference(key: ScrollOffsetPreferenceKey.self, value: geometry.frame(in: .named("scroll")).minY)
-                                        }
-                                        .frame(height: 0)
+                                        scrollOffsetReader
                                     }
                                 }
-                                .coordinateSpace(name: "scroll")
-                                .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
-                                    if abs(scrollPosition - value) > 1 {
-                                        scrollPosition = value
-                                        if addressBarViewController.isSuggestionsWindowVisible {
-                                            addressBarViewController.addressBarTextField?.hideSuggestionWindow()
-                                        }
-                                    }
+                                .coordinateSpace(name: Const.scrollViewCoordinateSpaceName)
+                                .onPreferenceChange(ScrollOffsetPreferenceKey.self, perform: hideSuggestionWindowIfScrolled)
+                                .onChange(of: addressBarViewController.addressBarTextField.value) { _ in
+                                    proxy.scrollTo(Const.searchBarIdentifier)
                                 }
                             }
                         }
                         .frame(width: settingsVisibilityModel.isSettingsVisible ? geometry.size.width - Self.settingsPanelWidth : geometry.size.width)
-                        .contextMenu(ContextMenu {
-                            if model.isContinueSetUpAvailable {
-                                Toggle(UserText.newTabMenuItemShowContinuteSetUp, isOn: $model.isContinueSetUpVisible)
-                                    .toggleStyle(.checkbox)
-                                    .visibility(continueSetUpModel.hasContent ? .visible : .gone)
-                            }
-                            Toggle(UserText.newTabMenuItemShowFavorite, isOn: $model.isFavoriteVisible)
-                                .toggleStyle(.checkbox)
-                            Toggle(UserText.newTabMenuItemShowRecentActivity, isOn: $model.isRecentActivityVisible)
-                                .toggleStyle(.checkbox)
-                        })
+                        .contextMenu(menuItems: sectionsVisibilityContextMenuItems)
 
                         if settingsVisibilityModel.isSettingsVisible {
                             SettingsView(includingContinueSetUpCards: includingContinueSetUpCards, isSettingsVisible: $settingsVisibilityModel.isSettingsVisible)
@@ -215,7 +130,7 @@ extension HomePage.Views {
                         logo()
                         searchField()
                     }
-                    .id("search bar")
+                    .id(Const.searchBarIdentifier)
 
                     if includingContinueSetUpCards {
                         ContinueSetUpView()
@@ -253,24 +168,10 @@ extension HomePage.Views {
                     },
                     openURLHandler: { url in
                         WindowControllersManager.shared.showTab(with: .contentFromURL(url, source: .appOpenUrl))
-                }))
+                    }))
             } else {
                 EmptyView()
             }
-        }
-
-        @ViewBuilder
-        func logo() -> some View {
-            Image(nsImage: .onboardingDax)
-                .resizable()
-                .frame(width: 96, height: 96)
-                .padding(.bottom, -8)
-        }
-
-        @ViewBuilder
-        func searchField() -> some View {
-            AddressBarTextFieldView(value: $addressBarValue, addressBarViewController: addressBarViewController)
-                .frame(height: 40)
         }
 
         @ViewBuilder
@@ -292,6 +193,19 @@ extension HomePage.Views {
             case .none:
                 Color.newTabPageBackground
             }
+        }
+
+        @ViewBuilder
+        func sectionsVisibilityContextMenuItems() -> some View {
+            if model.isContinueSetUpAvailable {
+                Toggle(UserText.newTabMenuItemShowContinuteSetUp, isOn: $model.isContinueSetUpVisible)
+                    .toggleStyle(.checkbox)
+                    .visibility(continueSetUpModel.hasContent ? .visible : .gone)
+            }
+            Toggle(UserText.newTabMenuItemShowFavorite, isOn: $model.isFavoriteVisible)
+                .toggleStyle(.checkbox)
+            Toggle(UserText.newTabMenuItemShowRecentActivity, isOn: $model.isRecentActivityVisible)
+                .toggleStyle(.checkbox)
         }
 
         struct SettingsButtonView: View {
@@ -389,14 +303,53 @@ extension HomePage.Views {
                 value = nextValue()
             }
         }
+    }
+}
 
-        struct ScrollOffsetPreferenceKey: PreferenceKey {
-            typealias Value = CGFloat
-            static var defaultValue: CGFloat = 0
+/// This extension defines views and objects related to displaying Big Search Box.
+extension HomePage.Views.RootView {
 
-            static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-                value = nextValue()
+    @ViewBuilder
+    func logo() -> some View {
+        Image(nsImage: .onboardingDax)
+            .resizable()
+            .frame(width: 96, height: 96)
+            .padding(.bottom, -8)
+    }
+
+    @ViewBuilder
+    func searchField() -> some View {
+        AddressBarTextFieldView()
+            .frame(height: 40)
+    }
+
+    @ViewBuilder
+    var scrollOffsetReader: some View {
+        GeometryReader { geometry in
+            Color.clear
+                .preference(
+                    key: ScrollOffsetPreferenceKey.self,
+                    value: geometry.frame(in: .named(Const.scrollViewCoordinateSpaceName)).minY
+                )
+        }
+        .frame(height: 0)
+    }
+
+    private func hideSuggestionWindowIfScrolled(_ value: CGFloat) {
+        if abs(scrollPosition - value) > 1 {
+            scrollPosition = value
+            if addressBarViewController.isSuggestionsWindowVisible {
+                addressBarViewController.addressBarTextField?.hideSuggestionWindow()
             }
+        }
+    }
+
+    struct ScrollOffsetPreferenceKey: PreferenceKey {
+        typealias Value = CGFloat
+        static var defaultValue: CGFloat = 0
+
+        static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+            value = nextValue()
         }
     }
 }
