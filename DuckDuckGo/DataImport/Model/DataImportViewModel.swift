@@ -133,11 +133,9 @@ struct DataImportViewModel {
 
 #endif
 
-    var isPasswordManagerAutolockEnabled: Bool {
-        autofillPreferencesFactory().isAutoLockEnabled
-    }
-
-    private let autofillPreferencesFactory: () -> AutofillPreferencesPersistor
+    lazy var isPasswordManagerAutolockEnabled: Bool = {
+        AutofillPreferences().isAutoLockEnabled
+    }()
 
     init(importSource: Source? = nil,
          screen: Screen? = nil,
@@ -149,7 +147,6 @@ struct DataImportViewModel {
          requestPrimaryPasswordCallback: @escaping @MainActor (Source) -> String? = Self.requestPrimaryPasswordCallback,
          openPanelCallback: @escaping @MainActor (DataType) -> URL? = Self.openPanelCallback,
          reportSenderFactory: @escaping ReportSenderFactory = { FeedbackSender().sendDataImportReport },
-         autofillPreferencesFactory: @escaping () -> AutofillPreferencesPersistor = { AutofillPreferences() },
          onFinished: @escaping () -> Void = {},
          onCancelled: @escaping () -> Void = {}) {
 
@@ -164,7 +161,6 @@ struct DataImportViewModel {
 
         self.browserProfiles = ThirdPartyBrowser.browser(for: importSource).map(loadProfiles)
         self.selectedProfile = browserProfiles?.defaultProfile
-        self.autofillPreferencesFactory = autofillPreferencesFactory
 
         self.selectedDataTypes = importSource.supportedDataTypes
 
