@@ -23,7 +23,7 @@ import Foundation
 
 public final class BookmarkStoreMock: BookmarkStore {
 
-    init(loadAllCalled: Bool = false, bookmarks: [BaseBookmarkEntity]? = nil, loadError: Error? = nil, saveBookmarkCalled: Bool = false, saveBookmarkSuccess: Bool = true, saveBookmarkError: Error? = nil, saveFolderCalled: Bool = false, saveFolderSuccess: Bool = true, saveFolderError: Error? = nil, removeCalled: Bool = false, removeSuccess: Bool = true, removeError: Error? = nil, updateBookmarkCalled: Bool = false, updateFolderCalled: Bool = false, addChildCalled: Bool = false, updateObjectsCalled: Bool = false, importBookmarksCalled: Bool = false, canMoveObjectWithUUIDCalled: Bool = false, moveObjectUUIDCalled: Bool = false, updateFavoriteIndexCalled: Bool = false) {
+    init(loadAllCalled: Bool = false, bookmarks: [BaseBookmarkEntity]? = nil, loadError: Error? = nil, saveBookmarkCalled: Bool = false, saveBookmarkSuccess: Bool = true, saveBookmarkError: Error? = nil, saveFolderCalled: Bool = false, saveFolderSuccess: Bool = true, saveFolderError: Error? = nil, removeSuccess: Bool = true, removeError: Error? = nil, updateBookmarkCalled: Bool = false, updateFolderCalled: Bool = false, addChildCalled: Bool = false, updateObjectsCalled: Bool = false, importBookmarksCalled: Bool = false, canMoveObjectWithUUIDCalled: Bool = false, moveObjectUUIDCalled: Bool = false, updateFavoriteIndexCalled: Bool = false) {
         self.loadAllCalled = loadAllCalled
         self.bookmarks = bookmarks
         self.loadError = loadError
@@ -33,7 +33,6 @@ public final class BookmarkStoreMock: BookmarkStore {
         self.saveFolderCalled = saveFolderCalled
         self.saveFolderSuccess = saveFolderSuccess
         self.saveFolderError = saveFolderError
-        self.removeCalled = removeCalled
         self.removeSuccess = removeSuccess
         self.removeError = removeError
         self.updateBookmarkCalled = updateBookmarkCalled
@@ -80,11 +79,12 @@ public final class BookmarkStoreMock: BookmarkStore {
         completion(saveFolderSuccess, saveFolderError)
     }
 
-    var removeCalled = false
+    var removeCalled: Bool { removeCalledWithIds != nil }
+    var removeCalledWithIds: [String]?
     var removeSuccess = true
     var removeError: Error?
     func remove(objectsWithUUIDs uuids: [String], completion: @escaping (Bool, Error?) -> Void) {
-        removeCalled = true
+        removeCalledWithIds = uuids
 
         // For the purpose of the mock, only remove bookmarks if `removeSuccess` is true.
         if removeSuccess {
@@ -112,7 +112,7 @@ public final class BookmarkStoreMock: BookmarkStore {
     func bookmarkEntities(withIds ids: [String]) -> [BaseBookmarkEntity]? {
         bookmarkFolderWithIdCalled = true
         capturedEntityIds = ids
-        return bookmarkEntitiesWithIds?(ids) ?? ids.compactMap { bookmarkFolder(withId: $0) }
+        return bookmarkEntitiesWithIds?(ids) ?? ids.compactMap { bookmarkFolderWithId?($0) }
     }
 
     var restoreCalledEntities: [BaseBookmarkEntity]?
