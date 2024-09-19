@@ -49,7 +49,7 @@ extension HomePage.Models {
         private let defaultBrowserProvider: DefaultBrowserProvider
         private let dockCustomizer: DockCustomization
         private let dataImportProvider: DataImportStatusProviding
-        let tabCollectionViewModel: TabCollectionViewModel
+        private let tabCollectionViewModel: TabCollectionViewModel
         private let emailManager: EmailManager
         private let duckPlayerPreferences: DuckPlayerPreferencesPersistor
         private let subscriptionManager: SubscriptionManager
