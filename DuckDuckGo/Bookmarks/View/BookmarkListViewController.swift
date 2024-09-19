@@ -424,12 +424,12 @@ final class BookmarkListViewController: NSViewController {
 
         let windowRect = positioningView.convert(positioningRect, to: nil)
         let screenPosRect = mainWindow.convertToScreen(windowRect)
-        let insetMargin = 48.0
-        let availableHeightBelow = screenPosRect.minY - screenFrame.minY - insetMargin
-        let availableHeightAbove = screenFrame.maxY - screenPosRect.maxY - insetMargin
+        let bookmarkHeaderHeight = 48.0
+        let availableHeightBelow = screenPosRect.minY - screenFrame.minY - bookmarkHeaderHeight
+        let availableHeightAbove = screenFrame.maxY - screenPosRect.maxY - bookmarkHeaderHeight
         let availableHeight = max(availableHeightAbove, availableHeightBelow)
 
-        let totalHeightForRootBookmarks = CGFloat(outlineView.numberOfRows) * BookmarkOutlineCellView.rowHeight
+        let totalHeightForRootBookmarks = (CGFloat(outlineView.numberOfRows) * BookmarkOutlineCellView.rowHeight) + bookmarkHeaderHeight + 12.0
         var contentSize = Constants.preferredContentSize
 
         if totalHeightForRootBookmarks > availableHeight {
