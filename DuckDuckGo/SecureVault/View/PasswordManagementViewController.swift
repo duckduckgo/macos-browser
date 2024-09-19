@@ -212,20 +212,28 @@ final class PasswordManagementViewController: NSViewController {
 
         emptyStateMessage.linkTextAttributes = linkAttributes
 
-        let string = NSMutableAttributedString(string: listModel.emptyStateMessageDescription + " ")
+        let attachment = NSTextAttachment()
+        attachment.image = NSImage(resource: .lockSolid16).tinted(with: NSColor.blackWhite80)
+        attachment.bounds = CGRect(x: 0, y: -1, width: 12, height: 12)
+        let attributedTextImage = NSMutableAttributedString(attachment: attachment)
+
+        let string = NSMutableAttributedString(attributedString: attributedTextImage)
+
+        let messageString = NSMutableAttributedString(string: " " + listModel.emptyStateMessageDescription + " ")
+        string.append(messageString)
+
         let linkString = NSMutableAttributedString(string: listModel.emptyStateMessageLinkText, attributes: [
             .link: listModel.emptyStateMessageLinkURL
         ])
+        string.append(linkString)
 
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = .center
-
-        string.append(linkString)
         string.addAttributes([
             .cursor: NSCursor.arrow,
             .paragraphStyle: paragraphStyle,
             .font: NSFont.systemFont(ofSize: 13, weight: .regular),
-            .foregroundColor: NSColor.blackWhite60
+            .foregroundColor: NSColor.blackWhite80
         ], range: NSRange(location: 0, length: string.length))
 
         let maxSize = NSSize(width: 280, height: 20000)
