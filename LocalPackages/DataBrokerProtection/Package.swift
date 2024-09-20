@@ -44,7 +44,7 @@ let package = Package(
                 .product(name: "Configuration", package: "BrowserServicesKit"),
                 .product(name: "Persistence", package: "BrowserServicesKit"),
             ],
-            resources: [.process("Resources")],
+            resources: [.copy("Resources")],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))
             ]
@@ -56,7 +56,7 @@ let package = Package(
                 "BrowserServicesKit",
             ],
             resources: [
-                .process("Resources")
+                .copy("Resources")
             ]
         )
     ]
