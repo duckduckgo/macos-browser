@@ -210,6 +210,8 @@ public struct UserDefaultsWrapper<T> {
         case syncCurrentAllPausedError = "sync.current-all-paused-error"
         case syncCurrentBookmarksPausedError = "sync.current-bookmarks-paused-error"
         case syncCurrentCredentialsPausedError = "sync.current-credentials-paused-error"
+        case syncPromoBookmarksDismissed = "sync.promotion-bookmarks-dismissed"
+        case syncPromoPasswordsDismissed = "sync.promotion-passwords-dismissed"
 
         // Subscription
 

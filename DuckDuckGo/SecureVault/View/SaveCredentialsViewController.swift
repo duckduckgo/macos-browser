@@ -30,6 +30,38 @@ protocol SaveCredentialsDelegate: AnyObject {
 
 }
 
+extension SaveCredentialsViewController: MouseOverViewDelegate {
+    func mouseOverView(_ mouseOverView: MouseOverView, isMouseOver: Bool) {
+        if isMouseOver {
+            lockImageBackgroundView.fillColor = NSColor.infoHoverButtonHovered
+            presentSecurityInfoPopover()
+        } else {
+            dismissSecurityInfoPopover()
+        }
+    }
+
+    private func presentSecurityInfoPopover() {
+        // Only show the popover if we aren't already presenting one:
+        guard infoViewController == nil else {
+            infoViewController?.cancelAutoDismiss()
+            return
+        }
+
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            let message = autofillPreferences.isAutoLockEnabled ? UserText.pmSaveCredentialsSecurityInfo : UserText.pmSaveCredentialsSecurityInfoAutolockOff
+            let infoViewController = PopoverInfoViewController(message: message) { [weak self] in
+                self?.lockImageBackgroundView.fillColor = NSColor.infoHoverButton
+            }
+            infoViewController.show(onParent: self, relativeTo: self.tooltipView)
+        }
+    }
+
+    private func dismissSecurityInfoPopover() {
+        infoViewController?.scheduleAutoDismiss()
+    }
+}
+
 final class SaveCredentialsViewController: NSViewController {
 
     static func create() -> SaveCredentialsViewController {
@@ -64,6 +96,14 @@ final class SaveCredentialsViewController: NSViewController {
     @IBOutlet weak var passwordManagerNotNowButton: NSButton!
     @IBOutlet var fireproofCheck: NSButton!
     @IBOutlet weak var fireproofCheckDescription: NSTextFieldCell!
+    @IBOutlet weak var tooltipView: MouseOverView!
+    @IBOutlet weak var lockImageBackgroundView: NSBox!
+
+    private var infoViewController: PopoverInfoViewController? {
+        presentedViewControllers?.first {
+            ($0 as? PopoverInfoViewController) != nil
+        } as? PopoverInfoViewController
+    }
 
     private enum Action {
         case displayed
@@ -78,6 +118,8 @@ final class SaveCredentialsViewController: NSViewController {
     private var faviconManagement: FaviconManagement = FaviconManager.shared
 
     private var passwordManagerCoordinator = PasswordManagerCoordinator.shared
+
+    private var autofillPreferences: AutofillPreferencesPersistor = AutofillPreferences()
 
     private var passwordManagerStateCancellable: AnyCancellable?
 
@@ -97,6 +139,7 @@ final class SaveCredentialsViewController: NSViewController {
         saveButton.becomeFirstResponder()
         updateSaveSegmentedControl()
         setUpStrings()
+        setUpSecurityInfoViews()
     }
 
     override func viewWillAppear() {
@@ -132,6 +175,13 @@ final class SaveCredentialsViewController: NSViewController {
         doneButton.title = UserText.done
         editButton.title = UserText.edit
         passwordManagerNotNowButton.title = UserText.notNow
+    }
+
+    private func setUpSecurityInfoViews() {
+        tooltipView.delegate = self
+        lockImageBackgroundView.cornerRadius = lockImageBackgroundView.bounds.height / 2
+        lockImageBackgroundView.fillColor = NSColor.infoHoverButton
+        lockImageBackgroundView.boxType = .custom
     }
 
     /// Note that if the credentials.account.id is not nil, then we consider this an update rather than a save.
