@@ -30,6 +30,8 @@ extension UserAgent {
 
     static let defaultPolicyConfigKey = "defaultPolicy"
     static let defaultSitesConfigKey = "defaultSites"
+    static let ddgDefaultSitesConfigKey = "ddgDefaultSites"
+    static let webviewDefaultKey = "webViewDefault"
 
     static let brandPolicy = "brand"
 
@@ -70,10 +72,7 @@ extension UserAgent {
 
     static let localUserAgentConfiguration: KeyValuePairs<RegEx, String> = [
         // use safari when serving up PDFs from duckduckgo directly
-        regex("https://duckduckgo\\.com/[^?]*\\.pdf"): UserAgent.safari,
-
-        // use default WKWebView user agent for duckduckgo domain to remove CTA
-        regex("https://duckduckgo\\.com/.*"): UserAgent.webViewDefault
+        regex("https://duckduckgo\\.com/[^?]*\\.pdf"): UserAgent.safari
     ]
 
     static func `for`(_ url: URL?,
@@ -88,9 +87,13 @@ extension UserAgent {
 
         guard privacyConfig.isEnabled(featureKey: .customUserAgent) else { return Self.default }
 
+        if isURLPartOfDDGDefaultSitesList(url: url, privacyConfig: privacyConfig) {
+            return UserAgent.webViewDefault
+        }
         if isURLPartOfWebviewDefaultList(url: url, privacyConfig: privacyConfig) {
             return UserAgent.webViewDefault
-        } else if isURLPartOfDefaultSitesList(url: url) {
+        }
+        if isURLPartOfDefaultSitesList(url: url) {
             return Self.default
         }
 
@@ -103,29 +106,28 @@ extension UserAgent {
 
     // MARK: - Remote user agent configuration
 
-    static let webviewDefaultKey = "webViewDefault"
     static let domainKey = "domain"
 
-    private static func isURLPartOfWebviewDefaultList(url: URL?,
-                                                      privacyConfig: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig) -> Bool {
-        let settings = privacyConfig.settings(for: .customUserAgent)
-        let webViewDefaultList = settings[webviewDefaultKey] as? [[String: String]] ?? []
-        let domains = webViewDefaultList.map { $0[domainKey] ?? "" }
+    private static func isURL(_ url: URL?, partOfDomainsList listKey: String, of privacyConfig: PrivacyConfiguration) -> Bool {
+        let uaSettings = privacyConfig.settings(for: .customUserAgent)
+        let domainsList = uaSettings[listKey] as? [[String: String]] ?? []
+        let domains = domainsList.map { $0[domainKey] ?? "" }
 
         return domains.contains(where: { domain in
             url?.isPart(ofDomain: domain) ?? false
         })
     }
 
+    private static func isURLPartOfWebviewDefaultList(url: URL?, privacyConfig: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig) -> Bool {
+        isURL(url, partOfDomainsList: webviewDefaultKey, of: privacyConfig)
+    }
+
     private static func isURLPartOfDefaultSitesList(url: URL?, privacyConfig: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig) -> Bool {
+        isURL(url, partOfDomainsList: defaultSitesConfigKey, of: privacyConfig)
+    }
 
-        let uaSettings = privacyConfig.settings(for: .customUserAgent)
-        let defaultSitesObjs = uaSettings[defaultSitesConfigKey] as? [[String: String]] ?? []
-        let domains = defaultSitesObjs.map { $0[domainKey] ?? "" }
-
-        return domains.contains(where: { domain in
-            url?.isPart(ofDomain: domain) ?? false
-        })
+    private static func isURLPartOfDDGDefaultSitesList(url: URL?, privacyConfig: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig) -> Bool {
+        isURL(url, partOfDomainsList: ddgDefaultSitesConfigKey, of: privacyConfig)
     }
 
     private static func isBrandPolicy(forConfig config: PrivacyConfiguration) -> Bool {
