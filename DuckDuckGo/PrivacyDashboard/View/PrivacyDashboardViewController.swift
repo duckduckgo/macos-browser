@@ -176,10 +176,10 @@ final class PrivacyDashboardViewController: NSViewController {
         let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
         if state.isProtected && configuration.isUserUnprotected(domain: domain) {
             configuration.userEnabledProtection(forDomain: domain)
-            PixelKit.fire(NonStandardEvent(GeneralPixel.dashboardProtectionAllowlistRemove(triggerOrigin: state.eventOrigin.screen.rawValue)), includeAppVersionParameter: false)
+            PixelKit.fire(NonStandardEvent(GeneralPixel.dashboardProtectionAllowlistRemove(triggerOrigin: state.eventOrigin.screen.rawValue)))
         } else {
             configuration.userDisabledProtection(forDomain: domain)
-            PixelKit.fire(NonStandardEvent(GeneralPixel.dashboardProtectionAllowlistAdd(triggerOrigin: state.eventOrigin.screen.rawValue)), includeAppVersionParameter: false)
+            PixelKit.fire(NonStandardEvent(GeneralPixel.dashboardProtectionAllowlistAdd(triggerOrigin: state.eventOrigin.screen.rawValue)))
         }
 
         let completionToken = ContentBlocking.shared.contentBlockingManager.scheduleCompilation()
