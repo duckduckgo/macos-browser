@@ -50,7 +50,8 @@ final class YoutubeOverlayUserScript: NSObject, Subfeature {
     weak var webView: WKWebView?
     let messageOriginPolicy: MessageOriginPolicy = .only(rules: [
         .exact(hostname: "www.youtube.com"),
-        .exact(hostname: "duckduckgo.com")
+        .exact(hostname: "duckduckgo.com"),
+        .exact(hostname: "use-devtesting18.duckduckgo.com")
     ])
     public var featureName: String = "duckPlayer"
 
