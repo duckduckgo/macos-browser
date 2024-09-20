@@ -82,5 +82,6 @@ struct BigSearchBox: View {
     func searchField() -> some View {
         AddressBarTextFieldView(usesFixedColorScheme: usesFixedColorScheme)
             .frame(height: Const.searchBoxHeight)
+            .shadow(color: Color.blackWhite100.opacity(0.1), radius: 2, x: 0, y: 2)
     }
 }
