@@ -52,7 +52,7 @@ struct MapperToUI {
     private func mapMatchesToUI(_ brokerProfileQueryData: [BrokerProfileQueryData]) -> [DBPUIDataBrokerProfileMatch] {
 
         // Used to find opt outs on the parent
-        let brokerURLsToQueryData =  Dictionary(grouping: brokerProfileQueryData, by: { $0.dataBroker.name })
+        let brokerURLsToQueryData =  Dictionary(grouping: brokerProfileQueryData, by: { $0.dataBroker.url })
 
         return brokerProfileQueryData.flatMap {
             var profiles = [DBPUIDataBrokerProfileMatch]()
@@ -97,7 +97,7 @@ struct MapperToUI {
         let sitesScanned = Dictionary(grouping: scansThatRanAtLeastOnce, by: { $0 }).count
 
         // Used to find opt outs on the parent
-        let brokerURLsToQueryData =  Dictionary(grouping: brokerProfileQueryData, by: { $0.dataBroker.name })
+        let brokerURLsToQueryData =  Dictionary(grouping: brokerProfileQueryData, by: { $0.dataBroker.url })
 
         brokerProfileQueryData.forEach {
             let dataBroker = $0.dataBroker
