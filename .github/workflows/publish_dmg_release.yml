@@ -267,6 +267,7 @@ jobs:
         id: get-tasks-since-last-internal-release
         if: contains(github.event.inputs.release-type, '') || github.event.inputs.release-type == 'internal'
         env:
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
           GH_TOKEN: ${{ github.token }}
         run: |
           tasks="$(./scripts/update_asana_for_release.sh list-tasks-in-last-internal-release)"
