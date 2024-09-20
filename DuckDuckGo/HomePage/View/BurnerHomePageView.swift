@@ -61,7 +61,7 @@ extension HomePage.Views {
             return colorScheme == .dark ? Color.black.opacity(0.12) : Color.black.opacity(0.05)
         }
 
-        @State var shouldShowSearchBox: Bool = true
+        @State private var shouldShowSearchBox: Bool = true
 
         var body: some View {
             GeometryReader { geometry in

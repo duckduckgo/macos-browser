@@ -53,6 +53,7 @@ extension HomePage.Views {
 
         @State private var addressBarValue: AddressBarTextField.Value = .text("", userTyped: false)
         @State private var scrollPosition: CGFloat = 0
+        @State private var shouldShowSearchBox: Bool = true
 
         func regularHomePageView(includingContinueSetUpCards: Bool) -> some View {
             GeometryReader { geometry in
@@ -119,20 +120,33 @@ extension HomePage.Views {
             max(0, ((Self.settingsPanelWidth + Self.minWindowWidth) - geometry.size.width) / 2)
         }
 
+        var continueSetUpCardsTopPadding: CGFloat {
+            if shouldShowSearchBox || activeRemoteMessageModel.shouldShowRemoteMessage {
+                return 24
+            }
+            return 0
+        }
+
         func innerView(includingContinueSetUpCards: Bool) -> some View {
             VStack(spacing: 32) {
-                Spacer(minLength: 32)
+
+                if !shouldShowSearchBox || !activeRemoteMessageModel.shouldShowRemoteMessage {
+                    Spacer(minLength: 32)
+                }
 
                 Group {
                     remoteMessage()
+                        .padding(.top, shouldShowSearchBox ? 16 : 0)
 
-                    BigSearchBox()
-                        .id(Const.searchBarIdentifier)
+                    if shouldShowSearchBox {
+                        BigSearchBox()
+                            .id(Const.searchBarIdentifier)
+                    }
 
                     if includingContinueSetUpCards {
                         ContinueSetUpView()
                             .visibility(model.isContinueSetUpVisible ? .visible : .gone)
-                            .padding(.top, activeRemoteMessageModel.shouldShowRemoteMessage ? 24 : 0)
+                            .padding(.top, continueSetUpCardsTopPadding)
                     }
 
                     Favorites()
