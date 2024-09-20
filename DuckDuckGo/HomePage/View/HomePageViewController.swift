@@ -215,19 +215,21 @@ final class HomePageViewController: NSViewController {
         controller.addAndLayoutChild(buttonsController, into: controller.buttonsContainerView)
 
         controller.isSearchBox = true
-        Application.appDelegate.homePageSettingsModel.$customBackground
-            .map(\.?.colorScheme)
-            .sink { colorScheme in
-                switch colorScheme {
-                case .dark:
-                    controller.addressBarTextField.homePagePreferredAppearance = NSAppearance(named: .darkAqua)
-                case .light:
-                    controller.addressBarTextField.homePagePreferredAppearance = NSAppearance(named: .aqua)
-                default:
-                    controller.addressBarTextField.homePagePreferredAppearance = nil
+        if !tabCollectionViewModel.isBurner {
+            Application.appDelegate.homePageSettingsModel.$customBackground
+                .map(\.?.colorScheme)
+                .sink { colorScheme in
+                    switch colorScheme {
+                    case .dark:
+                        controller.addressBarTextField.homePagePreferredAppearance = NSAppearance(named: .darkAqua)
+                    case .light:
+                        controller.addressBarTextField.homePagePreferredAppearance = NSAppearance(named: .aqua)
+                    default:
+                        controller.addressBarTextField.homePagePreferredAppearance = nil
+                    }
                 }
-            }
-            .store(in: &cancellables)
+                .store(in: &cancellables)
+        }
 
         return controller
     }

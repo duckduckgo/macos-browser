@@ -24,19 +24,63 @@ struct AddressBarTextFieldView: NSViewRepresentable {
     @EnvironmentObject var addressBarViewController: AddressBarViewController
     @EnvironmentObject var settingsModel: HomePage.Models.SettingsModel
 
+    let usesFixedColorScheme: Bool
+
+    init(usesFixedColorScheme: Bool = true) {
+        self.usesFixedColorScheme = usesFixedColorScheme
+    }
+
     func makeNSView(context: Context) -> NSView {
         return addressBarViewController.view
     }
 
     func updateNSView(_ nsView: NSView, context: Context) {
-        switch settingsModel.customBackground?.colorScheme {
-        case .light:
-            nsView.appearance = NSAppearance(named: .aqua)
-        case .dark:
-            nsView.appearance = NSAppearance(named: .darkAqua)
-        default:
-            nsView.appearance = nil
+        if usesFixedColorScheme {
+            switch settingsModel.customBackground?.colorScheme {
+            case .light:
+                nsView.appearance = NSAppearance(named: .aqua)
+            case .dark:
+                nsView.appearance = NSAppearance(named: .darkAqua)
+            default:
+                nsView.appearance = nil
+            }
+            nsView.subviews.forEach { $0.setNeedsDisplay($0.bounds) }
         }
-        nsView.subviews.forEach { $0.setNeedsDisplay($0.bounds) }
+    }
+}
+
+struct BigSearchBox: View {
+    enum Const {
+        static let searchBoxHeight = 40.0
+        static let logoHeight = 96.0
+        static let spacing = 24.0
+
+        static let totalHeight = searchBoxHeight + logoHeight + spacing
+    }
+
+    let usesFixedColorScheme: Bool
+
+    init(usesFixedColorScheme: Bool = true) {
+        self.usesFixedColorScheme = usesFixedColorScheme
+    }
+
+    var body: some View {
+        VStack(spacing: Const.spacing) {
+            logo()
+            searchField()
+        }
+    }
+
+    @ViewBuilder
+    func logo() -> some View {
+        Image(nsImage: .onboardingDax)
+            .resizable()
+            .frame(width: Const.logoHeight, height: Const.logoHeight)
+    }
+
+    @ViewBuilder
+    func searchField() -> some View {
+        AddressBarTextFieldView(usesFixedColorScheme: usesFixedColorScheme)
+            .frame(height: Const.searchBoxHeight)
     }
 }

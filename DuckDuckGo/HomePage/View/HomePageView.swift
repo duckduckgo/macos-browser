@@ -126,11 +126,8 @@ extension HomePage.Views {
                 Group {
                     remoteMessage()
 
-                    Group {
-                        logo()
-                        searchField()
-                    }
-                    .id(Const.searchBarIdentifier)
+                    BigSearchBox()
+                        .id(Const.searchBarIdentifier)
 
                     if includingContinueSetUpCards {
                         ContinueSetUpView()
@@ -308,20 +305,6 @@ extension HomePage.Views {
 
 /// This extension defines views and objects related to displaying Big Search Box.
 extension HomePage.Views.RootView {
-
-    @ViewBuilder
-    func logo() -> some View {
-        Image(nsImage: .onboardingDax)
-            .resizable()
-            .frame(width: 96, height: 96)
-            .padding(.bottom, -8)
-    }
-
-    @ViewBuilder
-    func searchField() -> some View {
-        AddressBarTextFieldView()
-            .frame(height: 40)
-    }
 
     @ViewBuilder
     var scrollOffsetReader: some View {
