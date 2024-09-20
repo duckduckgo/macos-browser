@@ -216,6 +216,10 @@ public struct UserDefaultsWrapper<T> {
         // Subscription
 
         case subscriptionEnvironment = "subscription.environment"
+        
+        // Duck Player
+        
+        case lastRenderedVideoID = "duckplayer.lastRenderedVideoID"
     }
 
     enum RemovedKeys: String, CaseIterable {

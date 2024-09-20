@@ -56,6 +56,12 @@ final class DuckPlayerTabExtension {
     private let onboardingDecider: DuckPlayerOnboardingDecider
     private var shouldSelectNextNewTab: Bool?
     private let experimentManager: OnboardingExperimentManager
+    
+    private struct Constants {
+        static let watchInYoutubeVideoParameter = "v"
+        static let watchInYoutubePath = "openInYoutube"
+        static let duckPlayerScheme = URL.NavigationalScheme.duck.rawValue
+    }
 
     init(duckPlayer: DuckPlayer,
          isBurner: Bool,
@@ -84,6 +90,26 @@ final class DuckPlayerTabExtension {
                 self?.setUpYoutubeScriptsIfNeeded(for: self?.webView?.url)
             }
         }.store(in: &cancellables)
+    }
+    
+    private func isWatchInYouTubeURL(url: URL) -> Bool {
+        guard url.scheme == Constants.duckPlayerScheme,
+              let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false),
+              urlComponents.path == "/\(Constants.watchInYoutubePath)" else {
+            return false
+        }
+        return true
+    }
+    
+    private func getYoutubeURLFromOpenInYoutubeLink(url: URL) -> URL? {
+        guard isWatchInYouTubeURL(url: url),
+              let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false),
+              let videoParameterItem = urlComponents.queryItems?.first(where: { $0.name == Constants.watchInYoutubeVideoParameter }),
+              let id = videoParameterItem.value,
+              let newURL = URL.youtube(id, timestamp: nil).addingWatchInYoutubeQueryParameter() else {
+            return nil
+        }
+        return newURL
     }
 
     @MainActor
@@ -191,6 +217,22 @@ extension DuckPlayerTabExtension: NavigationResponder {
             return decidePolicyWithDisabledDuckPlayer(for: navigationAction)
         }
 
+        // Handle Open in Youtube Links
+        // duck://player/openInYoutube?v=12345
+        if let newURL = getYoutubeURLFromOpenInYoutubeLink(url: navigationAction.url) {
+
+            // Attempt to open a clean YouTubeURL load in webView
+            guard let mainFrame = navigationAction.mainFrameTarget,
+                  let (videoID, timestamp) = newURL.youtubeVideoParams else {
+                return .cancel
+            }
+
+            return .redirect(mainFrame) { navigator in
+                navigator.load(URLRequest(url: newURL.appendingPathComponent("lamadrequetepario")))
+            }
+
+        }
+
         // session restoration will try to load real www.youtube-nocookie.com url
         // we need to redirect it to custom duck:// scheme handler which will load
         // www.youtube-nocookie.com as a simulated request
@@ -249,6 +291,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
 
     @MainActor
     private func handleYoutubeNavigation(for navigationAction: NavigationAction) -> NavigationActionPolicy? {
+                
         guard navigationAction.url.isYoutubeVideo,
               let (videoID, timestamp) = navigationAction.url.youtubeVideoParams else {
             return .next
@@ -285,7 +328,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
                   let mainFrame = navigationAction.mainFrameTarget else {
                 return .cancel
             }
-
+            
             return .redirect(mainFrame) { navigator in
                 navigator.load(URLRequest(url: .youtube(videoID, timestamp: timestamp)))
             }
