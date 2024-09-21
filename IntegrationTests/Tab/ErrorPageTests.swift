@@ -622,9 +622,12 @@ class ErrorPageTests: XCTestCase {
             eServerQueried.fulfill()
             return .failure(NSError.connectionLost)
         }]
+
+        /// Set content before subscribing to `tab.$error.compactMap { $0 }` to allow
+        /// for error to be nullified first by the call to `setContent`.
+        tab.setContent(.url(.test, source: .userEntered(URL.test.absoluteString)))
         let eNavigationFailed2 = tab.$error.compactMap { $0 }.timeout(5).first().promise()
 
-        tab.setContent(.url(.test, source: .userEntered(URL.test.absoluteString)))
         _=try await eNavigationFailed2.value
         await fulfillment(of: [eServerQueried])
 
@@ -698,9 +701,12 @@ class ErrorPageTests: XCTestCase {
             eServerQueried.fulfill()
             return .failure(NSError.connectionLost)
         }]
+
+        /// Set content before subscribing to `tab.$error.compactMap { $0 }` to allow
+        /// for error to be nullified first by the call to `setContent`.
+        tab.setContent(.url(.alternative, source: .userEntered(URL.alternative.absoluteString)))
         let eNavigationFailed2 = tab.$error.compactMap { $0 }.timeout(5).first().promise()
 
-        tab.setContent(.url(.alternative, source: .userEntered(URL.alternative.absoluteString)))
         _=try await eNavigationFailed2.value
         await fulfillment(of: [eServerQueried])
 
