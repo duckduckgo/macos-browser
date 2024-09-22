@@ -229,7 +229,7 @@ struct PinnedTabInnerView: View {
     }
 
     @ViewBuilder
-    var mutedTabIndicator: some View {
+    var audioStateView: some View {
         switch model.webView.audioState {
         case .muted:
             audioIndicator(isMuted: true)
@@ -273,7 +273,7 @@ struct PinnedTabInnerView: View {
             ZStack(alignment: .topTrailing) {
                 Image(nsImage: favicon)
                     .resizable()
-                mutedTabIndicator
+                audioStateView
             }
         } else if let domain = model.content.userEditableUrl?.host,
                   let eTLDplus1 = ContentBlocking.shared.tld.eTLDplus1(domain),
@@ -284,14 +284,14 @@ struct PinnedTabInnerView: View {
                 Text(firstLetter)
                     .font(.caption)
                     .foregroundColor(.white)
-                mutedTabIndicator
+                audioStateView
             }
             .cornerRadius(4.0)
         } else {
             ZStack {
                 Image(nsImage: .web)
                     .resizable()
-                mutedTabIndicator
+                audioStateView
             }
         }
     }
