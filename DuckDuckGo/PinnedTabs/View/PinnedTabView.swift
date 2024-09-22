@@ -231,18 +231,18 @@ struct PinnedTabInnerView: View {
     @ViewBuilder
     var mutedTabIndicator: some View {
         switch model.webView.audioState {
-        case .muted(let isPlayingAudio):
-            audioIndicator(isPlayingAudio: isPlayingAudio, isMuted: true)
+        case .muted:
+            audioIndicator(isMuted: true)
         case .unmuted(let isPlayingAudio):
             if isPlayingAudio {
-                audioIndicator(isPlayingAudio: isPlayingAudio, isMuted: false)
+                audioIndicator(isMuted: false)
             } else {
                 EmptyView()
             }
         }
     }
 
-    private func audioIndicator(isPlayingAudio: Bool, isMuted: Bool) -> some View {
+    private func audioIndicator(isMuted: Bool) -> some View {
         ZStack {
             Circle()
                 .stroke(Color.gray.opacity(0.5), lineWidth: 0.5)
