@@ -72,11 +72,16 @@ public final class DataBrokerProtectionManager {
 }
 
 extension DataBrokerProtectionManager: DataBrokerProtectionDataManagerDelegate {
+
     public func dataBrokerProtectionDataManagerDidUpdateData() {
         loginItemInterface.profileSaved()
     }
 
     public func dataBrokerProtectionDataManagerDidDeleteData() {
         loginItemInterface.dataDeleted()
+    }
+
+    public func isAuthenticatedUser() -> Bool {
+        isUserAuthenticated()
     }
 }

@@ -55,6 +55,7 @@ public protocol DataBrokerProtectionDataManaging {
 public protocol DataBrokerProtectionDataManagerDelegate: AnyObject {
     func dataBrokerProtectionDataManagerDidUpdateData()
     func dataBrokerProtectionDataManagerDidDeleteData()
+    func isAuthenticatedUser() -> Bool
 }
 
 public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
@@ -200,6 +201,7 @@ private extension DataBrokerProtectionDataManager {
 }
 
 extension DataBrokerProtectionDataManager: InMemoryDataCacheDelegate {
+
     public func saveCachedProfileToDatabase(_ profile: DataBrokerProtectionProfile) async throws {
         try await saveProfile(profile)
 
@@ -212,11 +214,16 @@ extension DataBrokerProtectionDataManager: InMemoryDataCacheDelegate {
 
         delegate?.dataBrokerProtectionDataManagerDidDeleteData()
     }
+
+    public func isAuthenticatedUser() -> Bool {
+        delegate?.isAuthenticatedUser() ?? true
+    }
 }
 
 public protocol InMemoryDataCacheDelegate: AnyObject {
     func saveCachedProfileToDatabase(_ profile: DataBrokerProtectionProfile) async throws
     func removeAllData() throws
+    func isAuthenticatedUser() -> Bool
 }
 
 public final class InMemoryDataCache {
@@ -238,6 +245,12 @@ public final class InMemoryDataCache {
 }
 
 extension InMemoryDataCache: DBPUICommunicationDelegate {
+
+    func getHandshakeUserData() -> DBPUIHandshakeUserData? {
+        let isAuthenticatedUser = delegate?.isAuthenticatedUser() ?? true
+        return DBPUIHandshakeUserData(isAuthenticatedUser: isAuthenticatedUser)
+    }
+
     func saveProfile() async throws {
         guard let profile = profile else { return }
         try await delegate?.saveCachedProfileToDatabase(profile)
