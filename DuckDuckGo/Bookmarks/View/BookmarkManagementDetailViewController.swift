@@ -391,6 +391,15 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     }
 
     @objc func delete(_ sender: AnyObject) {
+        if tableView.selectedRowIndexes.isEmpty {
+            guard let folder = selectionState.folder else {
+                assertionFailure("Cannot delete root folder")
+                return
+            }
+            bookmarkManager.remove(folder: folder, undoManager: undoManager)
+            return
+        }
+
         deleteSelectedItems()
     }
 
@@ -563,9 +572,19 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
         newFolderButton.cell?.representedObject = selectionState.folder
 
         let selectedRowsCount = tableView.selectedRowIndexes.count
+        let canDeleteFolder = selectionState.folder != nil
         NSAnimationContext.runAnimationGroup { context in
             context.duration = 0.25
-            deleteItemsButton.animator().isEnabled = selectedRowsCount > 0
+            if selectedRowsCount > 0 {
+                deleteItemsButton.animator().title = UserText.delete
+                deleteItemsButton.animator().isEnabled = true
+            } else if canDeleteFolder {
+                deleteItemsButton.animator().title = UserText.deleteFolder
+                deleteItemsButton.animator().isEnabled = true
+            } else {
+                deleteItemsButton.animator().title = UserText.delete
+                deleteItemsButton.animator().isEnabled = false
+            }
             newBookmarkButton.animator().isHidden = selectedRowsCount > 1
             newFolderButton.animator().isHidden = selectedRowsCount > 1
         }
