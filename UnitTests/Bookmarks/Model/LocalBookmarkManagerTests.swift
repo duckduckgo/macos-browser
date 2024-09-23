@@ -92,172 +92,34 @@ final class LocalBookmarkManagerTests: XCTestCase {
         XCTAssertNil(bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", isFavorite: false))
     }
 
-    @MainActor
     func testWhenBookmarkIsRemoved_ThenManagerRemovesItFromStore() {
         let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
         let bookmark = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", isFavorite: false)!
 
-        bookmarkManager.remove(bookmark: bookmark, undoManager: nil)
+        bookmarkManager.remove(bookmark: bookmark)
 
         XCTAssertFalse(bookmarkManager.isUrlBookmarked(url: bookmark.urlObject!))
         XCTAssert(bookmarkStoreMock.saveBookmarkCalled)
         XCTAssert(bookmarkStoreMock.removeCalled)
     }
 
-    @MainActor
-    func testWhenFolderIsRemoved_ThenManagerRemovesItFromStore() {
-        let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
-        var folder: BookmarkFolder!
-        let e = expectation(description: "Folder created")
-        bookmarkManager.makeFolder(for: "Folder", parent: nil) { result in
-            folder = result
-            e.fulfill()
-        }
-        waitForExpectations(timeout: 1)
-        guard let folder else { XCTFail("Folder not loaded"); return }
-
-        bookmarkStoreMock.bookmarkFolderWithId = {
-            XCTAssertEqual($0, folder.id)
-            return folder
-        }
-        let loadedFolder = bookmarkManager.getBookmarkFolder(withId: folder.id)
-        XCTAssertEqual(folder, loadedFolder)
-
-        bookmarkManager.remove(folder: folder, undoManager: nil)
-        bookmarkStoreMock.bookmarkFolderWithId = { _ in nil }
-
-        XCTAssertNil(bookmarkManager.getBookmarkFolder(withId: folder.id))
-        XCTAssert(bookmarkStoreMock.saveFolderCalled)
-        XCTAssertEqual(bookmarkStoreMock.removeCalledWithIds, [folder.id])
-    }
-
-    @MainActor
-    func testWhenBookmarkAndFolderAreRemoved_ThenManagerRemovesThemFromStore() {
-        let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
-        let bookmark = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", isFavorite: false)!
-        var folder: BookmarkFolder!
-        let e = expectation(description: "Folder created")
-        bookmarkManager.makeFolder(for: "Folder", parent: nil) { result in
-            folder = result
-            e.fulfill()
-        }
-        waitForExpectations(timeout: 1)
-        guard let folder else { XCTFail("Folder not loaded"); return }
-
-        bookmarkManager.remove(objectsWithUUIDs: [folder.id, bookmark.id], undoManager: nil)
-
-        XCTAssertEqual(Set(bookmarkStoreMock.removeCalledWithIds ?? []), Set([folder.id, bookmark.id]))
-    }
-
-    @MainActor
     func testWhenRemovalFails_ThenManagerPutsBookmarkBackToList() {
         let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
         let bookmark = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", isFavorite: false)!
 
         bookmarkStoreMock.removeSuccess = false
         bookmarkStoreMock.removeError = BookmarkManagerError.somethingReallyBad
-        bookmarkManager.remove(bookmark: bookmark, undoManager: nil)
+        bookmarkManager.remove(bookmark: bookmark)
 
         XCTAssert(bookmarkManager.isUrlBookmarked(url: bookmark.urlObject!))
         XCTAssert(bookmarkStoreMock.saveBookmarkCalled)
         XCTAssert(bookmarkStoreMock.removeCalled)
     }
 
-    @MainActor
-    func testWhenBookmarkRemovalIsUndone_ThenRestoreBookmarkIsCalled() {
-        let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
-        let bookmark = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", isFavorite: false)!
-
-        let undoManager = UndoManager()
-        bookmarkStoreMock.bookmarkEntitiesWithIds = { ids in
-            XCTAssertEqual(ids, [bookmark.id])
-            return [bookmark]
-        }
-
-        bookmarkManager.remove(bookmark: bookmark, undoManager: undoManager)
-
-        XCTAssertTrue(undoManager.canUndo)
-        undoManager.undo()
-
-        XCTAssertEqual(bookmarkStoreMock.restoreCalledEntities, [bookmark])
-
-        bookmarkStoreMock.removeCalledWithIds = nil
-        XCTAssertTrue(undoManager.canRedo)
-
-        undoManager.redo()
-        XCTAssertEqual(Set(bookmarkStoreMock.removeCalledWithIds ?? []), Set([bookmark.id]))
-    }
-
-    @MainActor
-    func testWhenFolderRemovalIsUndone_ThenRestoreFolderIsCalled() {
-        let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
-        var folder: BookmarkFolder!
-        let e = expectation(description: "Folder created")
-        bookmarkManager.makeFolder(for: "Folder", parent: nil) { result in
-            folder = result
-            e.fulfill()
-        }
-        waitForExpectations(timeout: 1)
-        guard let folder else { XCTFail("Folder not loaded"); return }
-
-        let undoManager = UndoManager()
-        bookmarkStoreMock.bookmarkFolderWithId = {
-            XCTAssertEqual($0, folder.id)
-            return folder
-        }
-
-        bookmarkManager.remove(folder: folder, undoManager: undoManager)
-
-        XCTAssertTrue(undoManager.canUndo)
-        undoManager.undo()
-
-        XCTAssertEqual(bookmarkStoreMock.restoreCalledEntities, [folder])
-
-        bookmarkStoreMock.removeCalledWithIds = nil
-        XCTAssertTrue(undoManager.canRedo)
-
-        undoManager.redo()
-        XCTAssertEqual(Set(bookmarkStoreMock.removeCalledWithIds ?? []), Set([folder.id]))
-    }
-
-    @MainActor
-    func testWhenBookmarkAndFolderRemovalIsUndone_ThenRestoreEntitiesIsCalled() {
-        let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
-        let bookmark = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", isFavorite: false)!
-        var folder: BookmarkFolder!
-        let e = expectation(description: "Folder created")
-        bookmarkManager.makeFolder(for: "Folder", parent: nil) { result in
-            folder = result
-            e.fulfill()
-        }
-        waitForExpectations(timeout: 1)
-        guard let folder else { XCTFail("Folder not loaded"); return }
-
-        let undoManager = UndoManager()
-        bookmarkStoreMock.bookmarkEntitiesWithIds = { ids in
-            XCTAssertEqual(Set(ids), [folder.id, bookmark.id])
-            return [folder, bookmark]
-        }
-
-        bookmarkManager.remove(objectsWithUUIDs: [folder.id, bookmark.id], undoManager: undoManager)
-
-        XCTAssertTrue(undoManager.canUndo)
-        undoManager.undo()
-
-        XCTAssertEqual(bookmarkStoreMock.restoreCalledEntities, [folder, bookmark])
-
-        bookmarkStoreMock.removeCalledWithIds = nil
-        XCTAssertTrue(undoManager.canRedo)
-
-        undoManager.redo()
-        XCTAssertEqual(Set(bookmarkStoreMock.removeCalledWithIds ?? []), Set([folder.id, bookmark.id]))
-    }
-
-    @MainActor
     func testWhenBookmarkNoLongerExist_ThenManagerIgnoresAttemptToRemoval() {
         let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
 
-        bookmarkManager.remove(bookmark: Bookmark.aBookmark, undoManager: nil)
+        bookmarkManager.remove(bookmark: Bookmark.aBookmark)
 
         XCTAssertFalse(bookmarkManager.isUrlBookmarked(url: Bookmark.aBookmark.urlObject!))
         XCTAssertFalse(bookmarkStoreMock.removeCalled)

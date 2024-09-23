@@ -51,9 +51,8 @@ protocol BookmarkStore {
     func saveBookmarks(for websitesInfo: [WebsiteInfo], inNewFolderNamed folderName: String, withinParentFolder parent: ParentFolderType)
     func save(folder: BookmarkFolder, parent: BookmarkFolder?, completion: @escaping (Bool, Error?) -> Void)
     func remove(objectsWithUUIDs: [String], completion: @escaping (Bool, Error?) -> Void)
-    func restore(_ objects: [BaseBookmarkEntity], completion: @escaping (Error?) -> Void)
     func update(bookmark: Bookmark)
-    func bookmarkEntities(withIds ids: [String]) -> [BaseBookmarkEntity]?
+    func bookmarkFolder(withId id: String) -> BookmarkFolder?
     func update(folder: BookmarkFolder)
     func update(folder: BookmarkFolder, andMoveToParent parent: ParentFolderType)
     func add(objectsWithUUIDs: [String], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void)
@@ -63,76 +62,4 @@ protocol BookmarkStore {
     func moveFavorites(with objectUUIDs: [String], toIndex: Int?, completion: @escaping (Error?) -> Void)
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarksImportSummary
     func handleFavoritesAfterDisablingSync()
-}
-extension BookmarkStore {
-
-    func loadAll(type: BookmarkStoreFetchPredicateType) async throws -> [BaseBookmarkEntity] {
-        return try await withCheckedThrowingContinuation { continuation in
-            loadAll(type: type) { result, error in
-                if let error {
-                    continuation.resume(throwing: error)
-                    return
-                }
-
-                continuation.resume(returning: result ?? [])
-            }
-        }
-    }
-
-    func bookmarkFolder(withId id: String) -> BookmarkFolder? {
-        bookmarkEntities(withIds: [id])?.first as? BookmarkFolder
-    }
-
-    func save(folder: BookmarkFolder, parent: BookmarkFolder?) async throws {
-        return try await withCheckedThrowingContinuation { continuation in
-            save(folder: folder, parent: parent) { _, error in
-                if let error {
-                    continuation.resume(throwing: error)
-                    return
-                }
-
-                continuation.resume()
-            }
-        }
-    }
-
-    func save(bookmark: Bookmark, parent: BookmarkFolder?, index: Int?) async throws {
-        return try await withCheckedThrowingContinuation { continuation in
-            save(bookmark: bookmark, parent: parent, index: index) { _, error in
-                if let error {
-                    continuation.resume(throwing: error)
-                    return
-                }
-
-                continuation.resume()
-            }
-        }
-    }
-
-    func remove(objectsWithUUIDs uuids: [String]) async throws {
-        return try await withCheckedThrowingContinuation { continuation in
-            remove(objectsWithUUIDs: uuids) { _, error in
-                if let error {
-                    continuation.resume(throwing: error)
-                    return
-                }
-
-                continuation.resume()
-            }
-        }
-    }
-
-    func restore(_ objects: [BaseBookmarkEntity]) async throws {
-        return try await withCheckedThrowingContinuation { continuation in
-            restore(objects) { error in
-                if let error {
-                    continuation.resume(throwing: error)
-                    return
-                }
-
-                continuation.resume()
-            }
-        }
-    }
-
 }

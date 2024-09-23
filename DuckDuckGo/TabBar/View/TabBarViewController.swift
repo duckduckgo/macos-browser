@@ -817,7 +817,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
             Logger.general.error("TabBarViewController: Failed to fetch bookmark for url \(url)")
             return
         }
-        bookmarkManager.remove(bookmark: bookmark, undoManager: nil)
+        bookmarkManager.remove(bookmark: bookmark)
     }
 
     private func fireproof(_ tab: Tab) {

@@ -202,7 +202,7 @@ final class LocalBookmarkStore: BookmarkStore {
     private func commonOnSaveErrorHandler(_ error: Error, source: String = #function) {
         guard NSApp.runType.requiresEnvironment else { return }
 
-        assertionFailure("LocalBookmarkStore: Saving of context failed: \(error)")
+        assertionFailure("LocalBookmarkStore: Saving of context failed")
 
         if let localError = error as? BookmarkStoreError {
             if case BookmarkStoreError.saveLoopError(let innerError) = localError, let innerError {
@@ -374,7 +374,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 throw BookmarkStoreError.storeDeallocated
             }
 
-            let fetchRequest = BaseBookmarkEntity.entities(with: identifiers, includingPendingDeletion: false)
+            let fetchRequest = BaseBookmarkEntity.entities(with: identifiers)
             let fetchResults = (try? context.fetch(fetchRequest)) ?? []
 
             if fetchResults.count != identifiers.count {
@@ -418,67 +418,36 @@ final class LocalBookmarkStore: BookmarkStore {
         }
     }
 
-    func restore(_ objects: [BaseBookmarkEntity], completion: @escaping (Error?) -> Void) {
-        applyChangesAndSave(changes: { [favoritesDisplayMode] context in
-            var objects = objects
-            var objectMap = [String: BaseBookmarkEntity]()
-            while let object = objects.popLast() {
-                objectMap[object.id] = object
-                if let folder = object as? BookmarkFolder {
-                    objects.append(contentsOf: folder.children)
-                }
-            }
-
-            let bookmarksFetchRequest = BaseBookmarkEntity.entities(with: Array(objectMap.keys), includingPendingDeletion: true)
-            bookmarksFetchRequest.returnsObjectsAsFaults = false
-            let bookmarksResults = try? context.fetch(bookmarksFetchRequest)
-
-            guard let bookmarkManagedObjects = bookmarksResults else {
-                assertionFailure("\(#file): Failed to get BookmarkEntity from the context")
-                throw BookmarkStoreError.missingEntity
-            }
-
-            let favoritesFolders = BookmarkUtils.fetchFavoritesFolders(for: favoritesDisplayMode, in: context)
-            assert(bookmarkManagedObjects.count == objectMap.count)
-            bookmarkManagedObjects.forEach { managedObject in
-                managedObject.cancelDeletion()
-                guard let id = managedObject.uuid, let entity = objectMap[id] else {
-                    assertionFailure("No id or object not in the map")
-                    return
-                }
-                managedObject.update(with: entity, favoritesFoldersToAddFavorite: favoritesFolders, favoritesDisplayMode: favoritesDisplayMode)
-            }
-        }, onError: { [weak self] error in
-            self?.commonOnSaveErrorHandler(error)
-            DispatchQueue.main.async { completion(error) }
-        }, onDidSave: {
-            DispatchQueue.main.async { completion(nil) }
-        })
-    }
-
-    func bookmarkEntities(withIds ids: [String]) -> [BaseBookmarkEntity]? {
+    func bookmarkFolder(withId id: String) -> BookmarkFolder? {
         let context = makeContext()
 
-        var entitiesToReturn: [BaseBookmarkEntity]?
+        var bookmarkFolderToReturn: BookmarkFolder?
+        let favoritesDisplayMode = self.favoritesDisplayMode
 
-        context.performAndWait { [favoritesDisplayMode] in
-            let fetchRequest = BaseBookmarkEntity.entities(with: ids, includingPendingDeletion: false)
-            fetchRequest.returnsObjectsAsFaults = false
+        context.performAndWait {
+            let folderFetchRequest = BaseBookmarkEntity.singleEntity(with: id)
             do {
-                let results = try context.fetch(fetchRequest)
+                let folderFetchRequestResult = try context.fetch(folderFetchRequest)
+                guard let bookmarkFolderManagedObject = folderFetchRequestResult.first else { return }
 
-                entitiesToReturn = results.compactMap { entity in
-                    BaseBookmarkEntity.from(managedObject: entity,
-                                            parentFolderUUID: entity.parent?.uuid,
-                                            favoritesDisplayMode: favoritesDisplayMode)
+                guard let bookmarkFolder = BaseBookmarkEntity.from(
+                    managedObject: bookmarkFolderManagedObject,
+                    parentFolderUUID: bookmarkFolderManagedObject.parent?.uuid,
+                    favoritesDisplayMode: favoritesDisplayMode
+                ) as? BookmarkFolder
+                else {
+                    throw BookmarkStoreError.badModelMapping
                 }
+                bookmarkFolderToReturn = bookmarkFolder
 
+            } catch BookmarkStoreError.badModelMapping {
+                Logger.bookmarks.error("Failed to map BookmarkEntity to BookmarkFolder, with error: BookmarkStoreError.badModelMapping")
             } catch {
-                Logger.bookmarks.error("Failed to fetch bookmark entitis, with error: \(error.localizedDescription, privacy: .public)")
+                Logger.bookmarks.error("Failed to fetch last saved folder for bookmarks all tabs, with error: \(error.localizedDescription, privacy: .public)")
             }
         }
 
-        return entitiesToReturn
+        return bookmarkFolderToReturn
     }
 
     func update(folder: BookmarkFolder) {
@@ -517,7 +486,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 throw BookmarkStoreError.storeDeallocated
             }
 
-            let bookmarksFetchRequest = BaseBookmarkEntity.entities(with: uuids, includingPendingDeletion: false)
+            let bookmarksFetchRequest = BaseBookmarkEntity.entities(with: uuids)
             bookmarksFetchRequest.returnsObjectsAsFaults = false
             let bookmarksResults = try? context.fetch(bookmarksFetchRequest)
 
@@ -552,8 +521,12 @@ final class LocalBookmarkStore: BookmarkStore {
 
     func update(objectsWithUUIDs uuids: [String], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void) {
 
-        applyChangesAndSave(changes: { [favoritesDisplayMode] context in
-            let bookmarksFetchRequest = BaseBookmarkEntity.entities(with: uuids, includingPendingDeletion: false)
+        applyChangesAndSave(changes: { [weak self] context in
+            guard let self = self else {
+                throw BookmarkStoreError.storeDeallocated
+            }
+
+            let bookmarksFetchRequest = BaseBookmarkEntity.entities(with: uuids)
             bookmarksFetchRequest.returnsObjectsAsFaults = false
             let bookmarksResults = try? context.fetch(bookmarksFetchRequest)
 
@@ -1033,6 +1006,49 @@ final class LocalBookmarkStore: BookmarkStore {
     }
 
     // MARK: - Concurrency
+
+    func loadAll(type: BookmarkStoreFetchPredicateType) async -> Result<[BaseBookmarkEntity], Error> {
+        return await withCheckedContinuation { continuation in
+            loadAll(type: type) { result, error in
+                if let error = error {
+                    continuation.resume(returning: .failure(error))
+                    return
+                }
+
+                guard let result = result else {
+                    fatalError("Expected non-nil result 'result' for nil error")
+                }
+
+                continuation.resume(returning: .success(result))
+            }
+        }
+    }
+
+    func save(folder: BookmarkFolder, parent: BookmarkFolder?) async -> Result<Bool, Error> {
+        return await withCheckedContinuation { continuation in
+            save(folder: folder, parent: parent) { result, error in
+                if let error = error {
+                    continuation.resume(returning: .failure(error))
+                    return
+                }
+
+                continuation.resume(returning: .success(result))
+            }
+        }
+    }
+
+    func save(bookmark: Bookmark, parent: BookmarkFolder?, index: Int?) async -> Result<Bool, Error> {
+        return await withCheckedContinuation { continuation in
+            save(bookmark: bookmark, parent: parent, index: index) { result, error in
+                if let error = error {
+                    continuation.resume(returning: .failure(error))
+                    return
+                }
+
+                continuation.resume(returning: .success(result))
+            }
+        }
+    }
 
     func move(objectUUIDs: [String], toIndex index: Int?, withinParentFolder parent: ParentFolderType) async -> Error? {
         return await withCheckedContinuation { continuation in

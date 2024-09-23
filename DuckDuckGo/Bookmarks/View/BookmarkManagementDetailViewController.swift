@@ -279,16 +279,10 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
             self.setupSort(mode: newSortMode)
         }.store(in: &cancellables)
     }
-    var observer: AXObserver?
-
-    override func viewWillAppear() {
-        NotificationCenter.default.addObserver(self, selector: #selector(firstReponderDidChange), name: .firstResponder, object: nil)
-
-        reloadData()
-    }
 
     override func viewDidDisappear() {
-        NotificationCenter.default.removeObserver(self, name: .firstResponder, object: nil)
+        super.viewDidDisappear()
+        reloadData()
     }
 
     override func keyDown(with event: NSEvent) {
@@ -383,20 +377,13 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
             .show(in: view.window)
     }
 
-    @objc func firstReponderDidChange(notification: Notification) {
-        // clear delete undo history when activating the Address Bar
-        if notification.object is AddressBarTextEditor {
-            undoManager?.removeAllActions(withTarget: bookmarkManager)
-        }
-    }
-
     @objc func delete(_ sender: AnyObject) {
         if tableView.selectedRowIndexes.isEmpty {
             guard let folder = selectionState.folder else {
                 assertionFailure("Cannot delete root folder")
                 return
             }
-            bookmarkManager.remove(folder: folder, undoManager: undoManager)
+            bookmarkManager.remove(folder: folder)
             return
         }
 
@@ -438,7 +425,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         let entities = tableView.selectedRowIndexes.compactMap { fetchEntity(at: $0) }
         let entityUUIDs = entities.map(\.id)
 
-        bookmarkManager.remove(objectsWithUUIDs: entityUUIDs, undoManager: undoManager)
+        bookmarkManager.remove(objectsWithUUIDs: entityUUIDs)
     }
 
     private(set) lazy var faviconsFetcherOnboarding: FaviconsFetcherOnboarding? = {

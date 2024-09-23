@@ -43,14 +43,12 @@ internal class BaseBookmarkEntity: Identifiable, Equatable, Hashable {
         return request
     }
 
-    static func entities(with identifiers: [String], includingPendingDeletion: Bool) -> NSFetchRequest<BookmarkEntity> {
+    static func entities(with identifiers: [String]) -> NSFetchRequest<BookmarkEntity> {
         let request = BookmarkEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "%K IN %@ \(!includingPendingDeletion ? "AND %K == NO" : "") AND (%K == NO OR %K == nil)",
-                                        argumentArray: [
-                                            #keyPath(BookmarkEntity.uuid), identifiers,
-                                            !includingPendingDeletion ? #keyPath(BookmarkEntity.isPendingDeletion) : nil,
-                                            #keyPath(BookmarkEntity.isStub), #keyPath(BookmarkEntity.isStub)
-                                        ].compactMap { $0 })
+        request.predicate = NSPredicate(format: "%K IN %@ AND %K == NO AND (%K == NO OR %K == nil)",
+                                        #keyPath(BookmarkEntity.uuid), identifiers,
+                                        #keyPath(BookmarkEntity.isPendingDeletion),
+                                        #keyPath(BookmarkEntity.isStub), #keyPath(BookmarkEntity.isStub))
         return request
     }
 

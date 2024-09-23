@@ -74,17 +74,17 @@ class MockBookmarkManager: BookmarkManager {
     func makeFolder(for title: String, parent: DuckDuckGo_Privacy_Browser.BookmarkFolder?, completion: (DuckDuckGo_Privacy_Browser.BookmarkFolder) -> Void) {}
 
     var removeBookmarkCalled = false
-    func remove(bookmark: DuckDuckGo_Privacy_Browser.Bookmark, undoManager: UndoManager?) {
+    func remove(bookmark: DuckDuckGo_Privacy_Browser.Bookmark) {
         removeBookmarkCalled = true
     }
 
     var removeFolderCalled = false
-    func remove(folder: DuckDuckGo_Privacy_Browser.BookmarkFolder, undoManager: UndoManager?) {
+    func remove(folder: DuckDuckGo_Privacy_Browser.BookmarkFolder) {
         removeFolderCalled = true
     }
 
     var removeObjectsCalled: [String]?
-    func remove(objectsWithUUIDs uuids: [String], undoManager: UndoManager?) {
+    func remove(objectsWithUUIDs uuids: [String]) {
         removeObjectsCalled = uuids
     }
 
@@ -146,7 +146,4 @@ class MockBookmarkManager: BookmarkManager {
     var sortModePublisher: Published<BookmarksSortMode>.Publisher { $sortMode }
 
     @Published var sortMode: BookmarksSortMode = .manual
-
-    func restore(_ objects: [DuckDuckGo_Privacy_Browser.BaseBookmarkEntity], undoManager: UndoManager?) {}
-
 }
