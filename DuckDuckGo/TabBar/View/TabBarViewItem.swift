@@ -276,13 +276,9 @@ final class TabBarViewItem: NSCollectionViewItem {
 
         tabViewModel.$usedPermissions.assign(to: \.usedPermissions, onWeaklyHeld: self).store(in: &cancellables)
 
-        tabViewModel.tab.webView.isPlayingAudioPublisher
+        tabViewModel.tab.$isPlayingAudio
             .sink { isPlaying in
-                if let isPlaying = isPlaying {
-                    self.updateAudioPlayState(isPlaying: isPlaying)
-                } else {
-                    print("Could not retrieve audio playing status")
-                }
+                self.updateAudioPlayState(isPlaying: isPlaying)
             }.store(in: &cancellables)
     }
 
@@ -373,7 +369,9 @@ final class TabBarViewItem: NSCollectionViewItem {
             mouseOverView.mouseOverColor = isSelected || isDragged ? .clear : .tabMouseOver
         }
 
-        mutedTabIcon.onClick = {
+        mutedTabIcon.onClick = { [weak self] in
+            guard let self = self else { return }
+
             self.delegate?.tabBarViewItemMuteUnmuteSite(self)
             self.setupMuteOrUnmutedIcon()
         }
@@ -507,7 +505,6 @@ final class TabBarViewItem: NSCollectionViewItem {
     }
 
     private func updateAudioPlayState(isPlaying: Bool) {
-        // TODO: This should probably not return but update the thing anyway
         guard let audioState = delegate?.tabBarViewItemAudioState(self) else { return }
 
         if audioState.isMuted {
@@ -533,7 +530,7 @@ final class TabBarViewItem: NSCollectionViewItem {
         showAudioIcon(image: .audio)
     }
 
-    private func showAudioIcon(image: NSImage?, tintColor: NSColor = .mutedTabIcon) {
+    private func showAudioIcon(image: NSImage?, tintColor: NSColor = .audioTabIcon) {
         mutedTabIcon.image = image
         mutedTabIcon.isHidden = false
         mutedTabIcon.image?.isTemplate = true

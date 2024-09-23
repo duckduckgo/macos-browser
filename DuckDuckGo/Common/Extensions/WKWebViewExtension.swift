@@ -40,12 +40,10 @@ extension WKWebView {
         }
 
         var isMuted: Bool {
-            switch self {
-            case .muted:
+            if case .muted = self {
                 return true
-            case .unmuted:
-                return false
             }
+            return false
         }
 
         mutating func toggle() {

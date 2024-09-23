@@ -57,7 +57,7 @@ final class KVOListener<ObjectType: NSObject, ValueType>: Publisher {
         }
 
         func request(_ demand: Subscribers.Demand) {
-            // We don't need to handle backpressure in this simple example
+            // We don't need to handle backpressure for this.
         }
 
         func cancel() {

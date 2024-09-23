@@ -357,7 +357,6 @@ protocol NewWindowPolicyDecisionMaker {
             webView.stopAllMedia(shouldStopLoading: true)
 
             userContentController?.cleanUpBeforeClosing()
-
 #if DEBUG
             if case .normal = NSApp.runType {
                 webView.assertObjectDeallocated(after: 4.0)
@@ -1001,7 +1000,7 @@ protocol NewWindowPolicyDecisionMaker {
             self?.updateCanGoBackForward(withCurrentNavigation: navigation)
         }.store(in: &webViewCancellables)
 
-        webView.isPlayingAudioPublisher .sink { [weak self] value in
+        webView.isPlayingAudioPublisher.sink { [weak self] value in
             self?.isPlayingAudio = value ?? false
         }.store(in: &webViewCancellables)
 
