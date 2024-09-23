@@ -1,5 +1,5 @@
 //
-//  HorizontallyCenteredLayout.swift
+//  LeftAlignedLayout.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -23,26 +23,15 @@ extension NSCollectionView {
 
 extension NSCollectionLayoutGroup {
 
-    static func horizontallyCentered(cellSizes: [CGSize], interItemSpacing: CGFloat, centered: Bool = true) -> NSCollectionLayoutGroup {
+    static func leftAligned(cellSizes: [CGSize], interItemSpacing: CGFloat) -> NSCollectionLayoutGroup {
         let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(28))
 
         return custom(layoutSize: groupSize) { environment in
             let verticalPosition: CGFloat = environment.container.contentInsets.top
-            let totalWidth = cellSizes.map(\.width).reduce(0) { $0 == 0 ? $1 : $0 + interItemSpacing + $1 }
             let maxItemHeight = cellSizes.map(\.height).max() ?? 0
 
             var items: [NSCollectionLayoutGroupCustomItem] = []
-            var horizontalPosition: CGFloat
-
-            // Derive initial horizontal position:
-
-            if centered {
-                horizontalPosition = (environment.container.effectiveContentSize.width - totalWidth) / 2 + environment.container.contentInsets.leading
-            } else {
-                horizontalPosition = interItemSpacing
-            }
-
-            // Calculate frames for layout group items:
+            var horizontalPosition: CGFloat = interItemSpacing
 
             let rowItems: [NSCollectionLayoutGroupCustomItem] = cellSizes.map { size in
                 let origin = CGPoint(x: ceil(horizontalPosition), y: verticalPosition + (maxItemHeight - size.height) / 2)
@@ -59,9 +48,9 @@ extension NSCollectionLayoutGroup {
     }
 }
 
-final class BookmarksBarCenteredLayout: NSCollectionViewCompositionalLayout {
+final class BookmarksBarLeftAlignedLayout: NSCollectionViewCompositionalLayout {
 
-    private static let interItemGapWidth: CGFloat = 16
+    private static let interItemGapWidth: CGFloat = 2
 
     private var lastKnownInterItemGapIndicatorLayoutAttributes: NSCollectionViewLayoutAttributes?
 

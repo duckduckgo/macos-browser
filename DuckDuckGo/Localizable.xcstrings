@@ -29340,6 +29340,30 @@
         }
       }
     },
+    "import.logins.passwords.explainer" : {
+      "comment" : "Explanatory text for the Passwords import option to alleviate security concerns and explain usage.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Passwords are encrypted. Viewing them or filling out forms requires Touch ID or a password. Nobody but you can see your passwords, not even us. Find Passwords in DuckDuckGo Settings > Passwords & Autofill."
+          }
+        }
+      }
+    },
+    "import.logins.passwords.explainer.autolock.off" : {
+      "comment" : "Explanatory text for the Passwords import option to alleviate security concerns and explain usage when autolock is disabled",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Passwords are encrypted. We recommend setting up Auto-lock to keep your passwords even more secure. Set it up in DuckDuckGo Settings > Passwords & Autofill."
+          }
+        }
+      }
+    },
     "import.logins.select-csv-file" : {
       "comment" : "Button text for selecting a CSV file",
       "extractionState" : "extracted_with_value",
@@ -44489,7 +44513,7 @@
     },
     "pm.empty.default.description" : {
       "comment" : "Label for default empty state description",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -44543,6 +44567,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Если вы уже храните пароли в другом браузере, вы можете импортировать их в DuckDuckGo."
+          }
+        }
+      }
+    },
+    "pm.empty.default.description.extended.v2" : {
+      "comment" : "Label for default empty state description\n   Label for default empty state description when the autolock feature is off",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Passwords are encrypted. Nobody but you can see them, not even us."
           }
         }
       }
@@ -44663,6 +44699,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Нет учетных данных"
+          }
+        }
+      }
+    },
+    "pm.empty.learn.more.link" : {
+      "comment" : "Text for link to learn more about DuckDuckGo password manager",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Learn more"
           }
         }
       }
@@ -47363,6 +47411,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Новый пароль сохранен"
+          }
+        }
+      }
+    },
+    "pm.save-credentials.security.info" : {
+      "comment" : "Info message for the save credentials dialog\n   Info message for the save credentials dialog when the autolock feature is off",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Passwords are encrypted. Nobody but you can see them, not even us. [Learn More]( (URL.passwordManagerLearnMore))"
           }
         }
       }

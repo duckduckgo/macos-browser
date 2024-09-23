@@ -382,6 +382,10 @@ extension URL {
         return URL(string: "https://duckduckgo.com/duckduckgo-help-pages/search-privacy/")!
     }
 
+    static var passwordManagerLearnMore: URL {
+        return URL(string: "https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/")!
+    }
+
     static var searchSettings: URL {
         return URL(string: "https://duckduckgo.com/settings/")!
     }
