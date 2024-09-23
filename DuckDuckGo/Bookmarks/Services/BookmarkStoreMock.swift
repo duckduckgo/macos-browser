@@ -91,6 +91,9 @@ final class BookmarkStoreMock: BookmarkStore {
     var saveFolderCalled: Bool {
         saveEntitiesAtIndicesCalledWith?.contains(where: { $0.entity is BookmarkFolder }) == true
     }
+    func savedFolder(withTitle title: String) -> BookmarkFolder? {
+        saveEntitiesAtIndicesCalledWith?.first(where: { $0.entity.title == title })?.entity as? BookmarkFolder
+    }
     var saveEntitiesError: Error?
     func save(entitiesAtIndices: [(entity: BaseBookmarkEntity, index: Int?)], completion: @escaping ((any Error)?) -> Void) {
         saveEntitiesAtIndicesCalledWith = entitiesAtIndices

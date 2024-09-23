@@ -560,17 +560,29 @@ enum RestorableBookmarkEntity {
             return parent
         }
     }
+    var index: Int? {
+        switch self {
+        case .bookmark(_, _, _, _, index: let index),
+             .folder(_, _, index: let index, originalId: _):
+            return index
+        }
+    }
 }
 extension [RestorableBookmarkEntity] {
     @MainActor
     init(entities: [BaseBookmarkEntity], bookmarkManager: some BookmarkManager) {
+        assert(Set(entities.map(\.parentFolderUUID)).count == 1, "Removing multiple items at different levels has not been implemented/tested!")
+        assert(Set(entities.map(\.id)).count == entities.count, "Some entities are repeated in the passed array")
+
         var folderCache = [String: BookmarkFolder]()
-        var stack = [entities]
+        var queue = [entities]
         var isFirstChunk = true
         self = []
-        while let chunk = stack.popLast() {
+        while !queue.isEmpty {
+            let chunk = queue.removeFirst()
             for entity in chunk {
                 var index: Int?
+                // children items of a removed folder are inserted in the original order so we don‘t need to track their indices
                 if isFirstChunk {
                     let parent = if let parentId = entity.parentFolderUUID {
                         folderCache[parentId] ?? {
@@ -586,12 +598,12 @@ extension [RestorableBookmarkEntity] {
                 self.append(RestorableBookmarkEntity(bookmarkEntity: entity, index: index))
 
                 if let folder = entity as? BookmarkFolder {
-                    stack.append(folder.children)
+                    queue.append(folder.children)
                 }
             }
-            // children items are inserted in the original order so we don‘t need to track their indices
             isFirstChunk = false
         }
+        self.sort { $0.index ?? Int.max < $1.index ?? Int.max }
     }
 }
 private extension UndoManager {

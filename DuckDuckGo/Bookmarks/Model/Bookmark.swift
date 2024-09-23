@@ -281,7 +281,7 @@ extension BookmarkFolder {
 }
 extension Bookmark {
     fileprivate var bookmarkDebugDescription: String {
-        "<Bookmark\(isFavorite ? "⭐️" : "") \(id) title: \"\(title)\" url: \(url) parent: \(parentFolderUUID ?? "root")>"
+        "<Bookmark\(isFavorite ? "⭐️" : "") \(id) title: \"\(title)\" url: \"\(url)\" parent: \(parentFolderUUID ?? "root")>"
     }
 }
 

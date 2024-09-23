@@ -202,14 +202,15 @@ final class LocalBookmarkManagerTests: XCTestCase {
     }
 
     @MainActor
-    func testWhenFolderRemovalIsUndone_ThenRestoreFolderIsCalled() {
-        let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.manager(with: {
+    func testWhenFolderRemovalIsUndone_ThenRestoreFolderIsCalled() async throws {
+        let (bookmarkManager, bookmarkStoreMock) = await LocalBookmarkManager.manager(with: {
             bookmark(.duckDuckGo)
             folder(id: "1", "Folder") {
                 bookmark(.duckDuckGoEmailLogin)
                 bookmark(.duckDuckGoEmailInfo, isFavorite: true)
                 folder("Subfolder") {
                     bookmark(.duckDuckGoAutocomplete, isFavorite: true)
+                    bookmark(.aboutDuckDuckGo, isFavorite: false)
                 }
             }
             bookmark(.duckDuckGoEmail)
@@ -225,13 +226,18 @@ final class LocalBookmarkManagerTests: XCTestCase {
         undoManager.undo()
 
         // validate entities are restored
-        guard let removedFolder = bookmarkStoreMock.saveEntitiesAtIndicesCalledWith?[safe: 0]?.entity as? BookmarkFolder else { XCTFail("1. Could not fetch folder"); return }
+        guard let removedFolder1 = bookmarkStoreMock.saveEntitiesAtIndicesCalledWith?[safe: 0]?.entity as? BookmarkFolder,
+              let removedFolder2 = bookmarkStoreMock.saveEntitiesAtIndicesCalledWith?[safe: 3]?.entity as? BookmarkFolder else {
+            XCTFail("1. Could not fetch folder")
+            return
+        }
         assertEqual(bookmarkStoreMock.saveEntitiesAtIndicesCalledWith, [
-            (removedFolder, 1),
-            (Bookmark(.duckDuckGoEmailLogin, parentId: removedFolder.id), nil),
-            (Bookmark(.duckDuckGoEmailInfo, isFavorite: true, parentId: removedFolder.id), nil),
-            (BookmarkFolder("Subfolder"), nil),
-            (Bookmark(.duckDuckGoAutocomplete, isFavorite: true, parentId: removedFolder.id), nil),
+            (removedFolder1, 1),
+            (Bookmark(.duckDuckGoEmailLogin, parentId: removedFolder1.id), nil),
+            (Bookmark(.duckDuckGoEmailInfo, isFavorite: true, parentId: removedFolder1.id), nil),
+            (removedFolder2, nil),
+            (Bookmark(.duckDuckGoAutocomplete, isFavorite: true, parentId: removedFolder2.id), nil),
+            (Bookmark(.aboutDuckDuckGo, isFavorite: false, parentId: removedFolder2.id), nil),
         ])
 
         // redo remove
@@ -240,56 +246,109 @@ final class LocalBookmarkManagerTests: XCTestCase {
 
         // validate bookmark is removed
         undoManager.redo()
-        XCTAssertEqual(bookmarkStoreMock.removeCalledWithIds ?? [], [removedFolder.id])
+        XCTAssertEqual(bookmarkStoreMock.removeCalledWithIds ?? [], [removedFolder1.id])
 
         // undo again
         XCTAssertTrue(undoManager.canUndo)
         undoManager.undo()
 
         // validate entities are restored
-        guard let removedFolder = bookmarkStoreMock.saveEntitiesAtIndicesCalledWith?[safe: 0]?.entity as? BookmarkFolder else { XCTFail("2. Could not fetch folder"); return }
+        guard let removedFolder1 = bookmarkStoreMock.saveEntitiesAtIndicesCalledWith?[safe: 0]?.entity as? BookmarkFolder,
+              let removedFolder2 = bookmarkStoreMock.saveEntitiesAtIndicesCalledWith?[safe: 3]?.entity as? BookmarkFolder else {
+            XCTFail("2. Could not fetch folder")
+            return
+        }
         assertEqual(bookmarkStoreMock.saveEntitiesAtIndicesCalledWith, [
-            (removedFolder, 1),
-            (Bookmark(.duckDuckGoEmailLogin, parentId: removedFolder.id), nil),
-            (Bookmark(.duckDuckGoEmailInfo, parentId: removedFolder.id), nil),
-            (BookmarkFolder("Subfolder"), nil),
-            (Bookmark(.duckDuckGoAutocomplete, isFavorite: true, parentId: removedFolder.id), nil),
+            (removedFolder1, 1),
+            (Bookmark(.duckDuckGoEmailLogin, parentId: removedFolder1.id), nil),
+            (Bookmark(.duckDuckGoEmailInfo, isFavorite: true, parentId: removedFolder1.id), nil),
+            (removedFolder2, nil),
+            (Bookmark(.duckDuckGoAutocomplete, isFavorite: true, parentId: removedFolder2.id), nil),
+            (Bookmark(.aboutDuckDuckGo, isFavorite: false, parentId: removedFolder2.id), nil),
         ])
         XCTAssertTrue(undoManager.canRedo)
     }
 
-//    @MainActor
-//    func testWhenBookmarkAndFolderRemovalIsUndone_ThenRestoreEntitiesIsCalled() {
-//        let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
-//        let bookmark = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", isFavorite: false)!
-//        var folder: BookmarkFolder!
-//        let e = expectation(description: "Folder created")
-//        bookmarkManager.makeFolder(for: "Folder", parent: nil) { result in
-//            folder = try? result.get()
-//            e.fulfill()
-//        }
-//        waitForExpectations(timeout: 1)
-//        guard let folder else { XCTFail("Folder not loaded"); return }
-//
-//        let undoManager = UndoManager()
-//        bookmarkStoreMock.bookmarkEntitiesWithIds = { ids in
-//            XCTAssertEqual(Set(ids), [folder.id, bookmark.id])
-//            return [folder, bookmark]
-//        }
-//
-//        bookmarkManager.remove(objectsWithUUIDs: [folder.id, bookmark.id], undoManager: undoManager)
-//
-//        XCTAssertTrue(undoManager.canUndo)
-//        undoManager.undo()
-//
-//        XCTAssertEqual(bookmarkStoreMock.restoreCalledEntities, [folder, bookmark])
-//
-//        bookmarkStoreMock.removeCalledWithIds = nil
-//        XCTAssertTrue(undoManager.canRedo)
-//
-//        undoManager.redo()
-//        XCTAssertEqual(Set(bookmarkStoreMock.removeCalledWithIds ?? []), Set([folder.id, bookmark.id]))
-//    }
+    @MainActor
+    func testWhenBookmarkAndFolderRemovalIsUndone_ThenRestoreEntitiesIsCalled() async throws {
+        let (bookmarkManager, bookmarkStoreMock) = await LocalBookmarkManager.manager(with: {
+            bookmark(.duckDuckGo)
+            bookmark(.aboutDuckDuckGo)
+            folder(id: "1", "Folder") {
+                bookmark(.duckDuckGoEmailLogin)
+                bookmark(.duckDuckGoEmailInfo, isFavorite: true)
+                folder(id: "2", "Subfolder") {
+                    bookmark(.duckDuckGoAutocomplete, isFavorite: true)
+                }
+            }
+            bookmark(.duckDuckGoEmail)
+            folder(id: "3", "Folder 2") {
+                bookmark(.ddgLearnMore, isFavorite: false)
+            }
+            bookmark(.duckDuckGoMorePrivacyInfo)
+        })
+        let undoManager = UndoManager()
+        let removedEntities = [
+            bookmarkManager.getBookmarkFolder(withId: "3")!,
+            bookmarkManager.getBookmark(for: .duckDuckGoEmail)!,
+            bookmarkManager.getBookmark(for: .duckDuckGo)!,
+            bookmarkManager.getBookmarkFolder(withId: "1")!,
+            bookmarkManager.getBookmark(for: .duckDuckGoMorePrivacyInfo)!,
+        ] as [BaseBookmarkEntity]
+
+        bookmarkManager.remove(objectsWithUUIDs: removedEntities.map(\.id), undoManager: undoManager)
+
+        // undo remove
+        XCTAssertTrue(undoManager.canUndo)
+        undoManager.undo()
+
+        // validate entities are restored
+        guard let removedFolder1 = bookmarkStoreMock.savedFolder(withTitle: "Folder") else { return XCTFail("1. Could not fetch Folder") }
+        guard let removedFolder2 = bookmarkStoreMock.savedFolder(withTitle: "Subfolder") else { return XCTFail("1. Could not fetch Subfolder") }
+        guard let removedFolder3 = bookmarkStoreMock.savedFolder(withTitle: "Folder 2") else { return XCTFail("1. Could not fetch Folder 2") }
+        assertEqual(bookmarkStoreMock.saveEntitiesAtIndicesCalledWith, [
+            (Bookmark(.duckDuckGo), 0),
+            (removedFolder1, 2),
+            (Bookmark(.duckDuckGoEmail), 3),
+            (removedFolder3, 4),
+            (Bookmark(.duckDuckGoMorePrivacyInfo, isFavorite: false), 5),
+            (Bookmark(.duckDuckGoEmailLogin, parentId: removedFolder1.id), nil),
+            (Bookmark(.duckDuckGoEmailInfo, isFavorite: true, parentId: removedFolder1.id), nil),
+            (removedFolder2, nil),
+            (Bookmark(.ddgLearnMore, isFavorite: false, parentId: removedFolder3.id), nil),
+            (Bookmark(.duckDuckGoAutocomplete, isFavorite: true, parentId: removedFolder2.id), nil),
+        ])
+
+        // redo remove
+        bookmarkStoreMock.removeCalledWithIds = nil
+        XCTAssertTrue(undoManager.canRedo)
+
+        // validate bookmark is removed
+        undoManager.redo()
+        XCTAssertEqual(bookmarkStoreMock.removeCalledWithIds?.count, 5)
+
+        // undo again
+        XCTAssertTrue(undoManager.canUndo)
+        undoManager.undo()
+
+        // validate entities are restored
+        guard let removedFolder1 = bookmarkStoreMock.savedFolder(withTitle: "Folder") else { return XCTFail("2. Could not fetch Folder") }
+        guard let removedFolder2 = bookmarkStoreMock.savedFolder(withTitle: "Subfolder") else { return XCTFail("2. Could not fetch Subfolder") }
+        guard let removedFolder3 = bookmarkStoreMock.savedFolder(withTitle: "Folder 2") else { return XCTFail("2. Could not fetch Folder 2") }
+        assertEqual(bookmarkStoreMock.saveEntitiesAtIndicesCalledWith, [
+            (Bookmark(.duckDuckGo), 0),
+            (removedFolder1, 2),
+            (Bookmark(.duckDuckGoEmail), 3),
+            (removedFolder3, 4),
+            (Bookmark(.duckDuckGoMorePrivacyInfo, isFavorite: false), 5),
+            (Bookmark(.duckDuckGoEmailLogin, parentId: removedFolder1.id), nil),
+            (Bookmark(.duckDuckGoEmailInfo, isFavorite: true, parentId: removedFolder1.id), nil),
+            (removedFolder2, nil),
+            (Bookmark(.ddgLearnMore, isFavorite: false, parentId: removedFolder3.id), nil),
+            (Bookmark(.duckDuckGoAutocomplete, isFavorite: true, parentId: removedFolder2.id), nil),
+        ])
+        XCTAssertTrue(undoManager.canRedo)
+    }
 
     @MainActor
     func testWhenBookmarkNoLongerExist_ThenManagerIgnoresAttemptToRemoval() {
@@ -621,7 +680,7 @@ fileprivate extension Bookmark {
                                               title: "Title",
                                               isFavorite: false)
     convenience init(_ url: URL, isFavorite: Bool = false, parentId: String? = nil) {
-        self.init(id: UUID().uuidString, url: url.absoluteString, title: url.absoluteString.dropping(prefix: url.navigationalScheme?.separated() ?? ""), isFavorite: isFavorite)
+        self.init(id: UUID().uuidString, url: url.absoluteString, title: url.absoluteString.dropping(prefix: url.navigationalScheme?.separated() ?? ""), isFavorite: isFavorite, parentFolderUUID: parentId)
     }
 }
 fileprivate extension BookmarkFolder {
@@ -634,7 +693,9 @@ fileprivate extension BaseBookmarkEntity {
 
     func matchesBookmark(withTitle title: String, url: URL, isFavorite: Bool, parent: String? = nil) -> Bool {
         guard let bookmark = self as? Bookmark else { return false }
-        return bookmark.title == title && bookmark.url == url.absoluteString && bookmark.isFavorite == isFavorite && bookmark.parentFolderUUID == parent
+        let lhsIsInRoot = bookmark.parentFolderUUID == nil || bookmark.parentFolderUUID == "bookmarks_root" || bookmark.parentFolderUUID == PseudoFolder.bookmarks.id
+        let rhsIsInRoot = parent == nil || parent == "bookmarks_root" || parent == PseudoFolder.bookmarks.id
+        return bookmark.title == title && bookmark.url == url.absoluteString && bookmark.isFavorite == isFavorite && lhsIsInRoot == rhsIsInRoot
     }
 
     func matchesBookmark(withTitle title: String, url: URL, isFavorite: Bool, parent: BookmarkFolder? = nil) -> Bool {
@@ -642,7 +703,7 @@ fileprivate extension BaseBookmarkEntity {
     }
 
     func matches(_ entity: BaseBookmarkEntity) -> Bool {
-        switch self {
+        switch entity {
         case let bookmark as Bookmark:
             return matchesBookmark(withTitle: bookmark.title, url: URL(string: bookmark.url)!, isFavorite: bookmark.isFavorite, parent: bookmark.parentFolderUUID)
         case let folder as BookmarkFolder:
@@ -654,7 +715,7 @@ fileprivate extension BaseBookmarkEntity {
 
     func matchesFolder(withTitle title: String, parent: String? = nil) -> Bool {
         guard self.isFolder else { return false }
-        return self.title == title && self.parentFolderUUID == parent
+        return self.title == title && self.parentFolderUUID ?? "bookmarks_root" == parent ?? "bookmarks_root"
     }
 
     func matchesFolder(withTitle title: String, parent: BookmarkFolder? = nil) -> Bool {
@@ -718,7 +779,7 @@ private extension LocalBookmarkManagerTests {
         func fail(_ message: String) {
             if !overviewPrinted {
                 overviewPrinted = true
-                XCTFail("\(lhs.map { "\($0)" } ?? "<nil>")\n  is not equal to\n\(rhs.map { "\($0)" } ?? "<nil>")", file: file, line: line)
+                XCTFail("\(lhs.map { "\($0)" } ?? "<nil>")\n  is not equal to\n\(rhs?.map { "\($0)" }.joined(separator: ",\n") ?? "<nil>")", file: file, line: line)
             }
             XCTFail(message, file: file, line: line)
         }
@@ -735,9 +796,9 @@ private extension LocalBookmarkManagerTests {
             }
             switch (lhsItem.entity.matches(rhsItem.entity), lhsItem.index == rhsItem.index) {
             case (true, true): continue
-            case (true, false): fail("#\(idx): index \(lhsItem.index.map(String.init) ?? "<nil>") != \(rhsItem.index.map(String.init) ?? "<nil>")")
-            case (false, true): fail("#\(idx): \(lhsItem.entity) != \(rhsItem.entity)")
-            case (false, false): fail("#\(idx): \(lhsItem.entity) at \(lhsItem.index.map(String.init) ?? "<nil>") != \(rhsItem.entity) at \(rhsItem.index.map(String.init) ?? "<nil>")")
+            case (true, false): fail("#\(idx): index \(lhsItem.index.map(String.init) ?? "<nil>") ≠ \(rhsItem.index.map(String.init) ?? "<nil>")")
+            case (false, true): fail("#\(idx): \(lhsItem.entity) ≠ \(rhsItem.entity)")
+            case (false, false): fail("#\(idx): \(lhsItem.entity) at \(lhsItem.index.map(String.init) ?? "<nil>") ≠ \(rhsItem.entity) at \(rhsItem.index.map(String.init) ?? "<nil>")")
             }
         }
     }
@@ -745,7 +806,7 @@ private extension LocalBookmarkManagerTests {
 
 extension [BookmarksBuilderItem] {
     func build(withParentId parentId: String? = nil) -> [BaseBookmarkEntity] {
-        self.map { $0.build() }
+        self.map { $0.build(withParentId: parentId) }
     }
 }
 
