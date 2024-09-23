@@ -44,19 +44,19 @@
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DuckDuckGo VPN Network Extension"
+            "value" : "Rozszerzenie sieci VPN DuckDuckGo"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DuckDuckGo VPN Network Extension"
+            "value" : "Extensão de rede da DuckDuckGo VPN"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DuckDuckGo VPN Network Extension"
+            "value" : "Сетевое расширение DuckDuckGo VPN"
           }
         }
       }

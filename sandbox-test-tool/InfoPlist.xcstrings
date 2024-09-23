@@ -40,6 +40,24 @@
             "state" : "translated",
             "value" : "sandbox-test-tool"
           }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sandbox-test-tool"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sandbox-test-tool"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sandbox-test-tool"
+          }
         }
       }
     },
@@ -81,6 +99,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Copyright © 2024 DuckDuckGo. Alle rechten voorbehouden."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copyright © 2024 DuckDuckGo. Wszelkie prawa zastrzeżone."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copyright © 2024 DuckDuckGo. Todos os direitos reservados."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "© 2024 DuckDuckGo. Все права защищены."
           }
         }
       }
