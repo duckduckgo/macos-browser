@@ -47614,55 +47614,55 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Passwörter sind verschlüsselt. Niemand außer dir kann sie sehen, nicht einmal wir. [Mehr erfahren]( (URL.passwordManagerLearnMore))"
+            "value" : "Passwörter sind verschlüsselt. Niemand außer dir kann sie sehen, nicht einmal wir. [Mehr erfahren](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
           }
         },
         "en" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Passwords are encrypted. Nobody but you can see them, not even us. [Learn More]( (URL.passwordManagerLearnMore))"
+            "state" : "translated",
+            "value" : "Passwords are encrypted. Nobody but you can see them, not even us. [Learn More](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Las contraseñas están cifradas. Nadie más que tú puede verlas, ni siquiera nosotros. [Más información]( (URL.passwordManagerLearnMore))"
+            "value" : "Las contraseñas están cifradas. Nadie más que tú puede verlas, ni siquiera nosotros. [Más información](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Les mots de passe sont cryptés. Personne d'autre que vous ne peut les voir, pas même nous. [En savoir plus]( (URL.passwordManagerLearnMore))"
+            "value" : "Les mots de passe sont cryptés. Personne d&apos;autre que vous ne peut les voir, pas même nous. [En savoir plus](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Le password sono crittografate. Nessuno tranne te può vederle, nemmeno noi. [Scopri di più]( (URL.passwordManagerLearnMore))"
+            "value" : "Le password sono crittografate. Nessuno tranne te può vederle, nemmeno noi. [Scopri di più](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wachtwoorden worden versleuteld. Niemand anders kan ze zien, zelfs wij niet. [Meer informatie] ( (URL.passwordManagerLearnMore))"
+            "value" : "Wachtwoorden worden versleuteld. Niemand anders kan ze zien, zelfs wij niet. [Meer informatie] (https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hasła są szyfrowane. Nikt poza Tobą ich nie widzi, nawet my. [Więcej informacji]( (URL.passwordManagerLearnMore))"
+            "value" : "Hasła są szyfrowane. Nikt poza Tobą ich nie widzi, nawet my. [Więcej informacji](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "As palavras-passe estão encriptadas. Ninguém além de ti pode vê-las, nem mesmo nós. [Sabe mais]( (URL.passwordManagerLearnMore))"
+            "value" : "As palavras-passe estão encriptadas. Ninguém além de ti pode vê-las, nem mesmo nós. [Sabe mais](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Пароли подвергаются шифрованию. Никто, кроме вас, их не увидит. Даже мы. [Подробнее...]( (URL.passwordManagerLearnMore))"
+            "value" : "Пароли подвергаются шифрованию. Никто, кроме вас, их не увидит. Даже мы. [Подробнее...](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
           }
         }
       }
