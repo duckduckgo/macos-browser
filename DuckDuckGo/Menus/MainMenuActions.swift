@@ -158,7 +158,7 @@ extension AppDelegate {
 
     @MainActor
     @objc func showWhatIsNew(_ sender: Any?) {
-        WindowControllersManager.shared.showTab(with: .url(.updates, source: .appOpenUrl))
+        WindowControllersManager.shared.showTab(with: .url(.updates, source: .ui))
     }
 
     #if FEEDBACK

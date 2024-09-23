@@ -52,7 +52,7 @@ protocol TabBarViewItemDelegate: AnyObject {
     func tabBarViewItemMuteUnmuteSite(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemRemoveFireproofing(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemAudioState(_ tabBarViewItem: TabBarViewItem) -> WKWebView.AudioState?
-    func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, replaceWithStringSearch: String)
+    func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, replaceContentWithDroppedStringValue: String)
 
     func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> OtherTabBarViewItemsState
 
@@ -670,7 +670,7 @@ extension TabBarViewItem: MouseClickViewDelegate {
 
     func mouseOverView(_ sender: MouseOverView, performDragOperation info: any NSDraggingInfo) -> Bool {
         if let droppedString = info.draggingPasteboard.string(forType: .string) {
-            delegate?.tabBarViewItem(self, replaceWithStringSearch: droppedString)
+            delegate?.tabBarViewItem(self, replaceContentWithDroppedStringValue: droppedString)
             return true
         }
         return false
