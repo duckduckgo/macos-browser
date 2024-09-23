@@ -20,6 +20,7 @@ import Combine
 import Common
 import Foundation
 import Navigation
+import os.log
 import UniformTypeIdentifiers
 import WebKit
 
@@ -231,9 +232,10 @@ extension DownloadsTabExtension: NavigationResponder {
             }
             // get the first navigation action in the redirect series
             let initialNavigationAction = navigationAction.redirectHistory?.first ?? navigationAction
-            if initialNavigationAction.isForMainFrame, navigationAction.isTargetingNewWindow || initialNavigationAction.navigationType == .custom(.appOpenUrl),
+            if initialNavigationAction.isForMainFrame,
+               initialNavigationAction.isTargetingNewWindow || navigationAction.isTargetingNewWindow || initialNavigationAction.navigationType == .custom(.appOpenUrl),
                // download is started in a new tab with no navigation history (downloaded navigationAction has started from an empty state)
-               navigationAction.fromHistoryItemIdentity == nil {
+               initialNavigationAction.fromHistoryItemIdentity == nil {
                 return true
             }
 

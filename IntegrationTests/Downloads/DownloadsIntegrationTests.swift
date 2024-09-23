@@ -57,6 +57,7 @@ class DownloadsIntegrationTests: XCTestCase {
         window = autoreleasepool {
             WindowsManager.openNewWindow(with: tabCollectionViewModel)!
         }
+        NSApp.activate(ignoringOtherApps: true)
     }
 
     @MainActor
