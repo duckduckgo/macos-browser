@@ -47609,7 +47609,6 @@
     },
     "pm.save-credentials.security.info" : {
       "comment" : "Info message for the save credentials dialog\n   Info message for the save credentials dialog when the autolock feature is off",
-      "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
