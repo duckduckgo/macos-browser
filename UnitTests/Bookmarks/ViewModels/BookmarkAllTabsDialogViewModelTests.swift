@@ -27,8 +27,7 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
     @MainActor
     override func setUpWithError() throws {
         try super.setUpWithError()
-        bookmarkStoreMock = BookmarkStoreMock()
-        bookmarkStoreMock.bookmarks = [BookmarkFolder.mock]
+        bookmarkStoreMock = BookmarkStoreMock(bookmarks: [BookmarkFolder.mock])
         bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
         bookmarkManager.loadBookmarks()
         foldersStoreMock = .init()
@@ -172,7 +171,8 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
     func testWhenInitThenFoldersAreSetFromBookmarkList() {
         // GIVEN
         let folder = BookmarkFolder(id: "1", title: #function)
-        bookmarkStoreMock.bookmarks = [folder]
+        bookmarkStoreMock = BookmarkStoreMock(bookmarks: [folder])
+        bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
         bookmarkManager.loadBookmarks()
         let websitesInfo = WebsiteInfo.makeWebsitesInfo(url: .duckDuckGo)
         let sut = BookmarkAllTabsDialogViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
@@ -218,10 +218,6 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
     func testWhenFoldersStoreLastUsedFolderIsNotNilAndBookmarkStoreDoesNotContainFolderThenSelectedFolderIsNil() throws {
         // GIVEN
         foldersStoreMock.lastBookmarkAllTabsFolderIdUsed = "1"
-        bookmarkStoreMock.bookmarkFolderWithId = {
-            XCTAssertEqual($0, "1")
-            return nil
-        }
         bookmarkManager.loadBookmarks()
         let websitesInfo = WebsiteInfo.makeWebsitesInfo(url: .duckDuckGo)
         let sut = BookmarkAllTabsDialogViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
@@ -238,11 +234,8 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
         // GIVEN
         let folder = BookmarkFolder(id: "1", title: #function)
         foldersStoreMock.lastBookmarkAllTabsFolderIdUsed = "1"
-        bookmarkStoreMock.bookmarkFolderWithId = {
-            XCTAssertEqual($0, folder.id)
-            return folder
-        }
-        bookmarkStoreMock.bookmarks = [folder]
+        bookmarkStoreMock = BookmarkStoreMock(bookmarks: [folder])
+        bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
         bookmarkManager.loadBookmarks()
         let websitesInfo = WebsiteInfo.makeWebsitesInfo(url: .duckDuckGo)
         let sut = BookmarkAllTabsDialogViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
@@ -261,7 +254,8 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
         expectation.expectedFulfillmentCount = 2
         let folder = BookmarkFolder(id: "1", title: #function)
         let folder2 = BookmarkFolder(id: "2", title: "Test")
-        bookmarkStoreMock.bookmarks = [folder]
+        bookmarkStoreMock = BookmarkStoreMock(bookmarks: [folder])
+        bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
         bookmarkManager.loadBookmarks()
         let websitesInfo = WebsiteInfo.makeWebsitesInfo(url: .duckDuckGo)
         let sut = BookmarkAllTabsDialogViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
@@ -269,7 +263,7 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
         XCTAssertEqual(sut.folders.first?.entity, folder)
 
         // Simulate Bookmark store changing data set
-        bookmarkStoreMock.bookmarks = [folder, folder2]
+        bookmarkStoreMock.save(entitiesAtIndices: [(folder2, nil)], completion: { _ in })
         var expectedFolder: [BookmarkFolder] = []
         let c = sut.$folders
             .dropFirst()

@@ -26,8 +26,7 @@ final class AddEditBookmarkDialogViewModelTests: XCTestCase {
     @MainActor
     override func setUpWithError() throws {
         try super.setUpWithError()
-        bookmarkStoreMock = BookmarkStoreMock()
-        bookmarkStoreMock.bookmarks = [BookmarkFolder.mock]
+        bookmarkStoreMock = BookmarkStoreMock(bookmarks: [BookmarkFolder.mock])
         bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
         bookmarkManager.loadBookmarks()
     }
@@ -186,7 +185,8 @@ final class AddEditBookmarkDialogViewModelTests: XCTestCase {
         let tab = Tab(content: .url(URL.duckDuckGo, source: .link), title: "Test")
         let websiteInfo = try XCTUnwrap(WebsiteInfo(tab))
         let bookmark = Bookmark(id: "1", url: websiteInfo.url.absoluteString, title: websiteInfo.title, isFavorite: false)
-        bookmarkStoreMock.bookmarks = [bookmark]
+        bookmarkStoreMock = BookmarkStoreMock(bookmarks: [bookmark])
+        bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
         bookmarkManager.loadBookmarks()
         let sut = AddEditBookmarkDialogViewModel(mode: .add(tabWebsite: WebsiteInfo(tab)), bookmarkManager: bookmarkManager)
 
@@ -216,7 +216,8 @@ final class AddEditBookmarkDialogViewModelTests: XCTestCase {
     func testShouldSetFoldersFromBookmarkListWhenInitAndModeIsAdd() {
         // GIVEN
         let folder = BookmarkFolder(id: "1", title: #function)
-        bookmarkStoreMock.bookmarks = [folder]
+        bookmarkStoreMock = BookmarkStoreMock(bookmarks: [folder])
+        bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
         bookmarkManager.loadBookmarks()
         let sut = AddEditBookmarkDialogViewModel(mode: .add(), bookmarkManager: bookmarkManager)
 
@@ -232,7 +233,8 @@ final class AddEditBookmarkDialogViewModelTests: XCTestCase {
     func testShouldSetFoldersFromBookmarkListWhenInitAndModeIsEdit() {
         // GIVEN
         let folder = BookmarkFolder(id: "1", title: #function)
-        bookmarkStoreMock.bookmarks = [folder]
+        bookmarkStoreMock = BookmarkStoreMock(bookmarks: [folder])
+        bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
         bookmarkManager.loadBookmarks()
         let sut = AddEditBookmarkDialogViewModel(mode: .edit(bookmark: .mock), bookmarkManager: bookmarkManager)
 
@@ -248,7 +250,8 @@ final class AddEditBookmarkDialogViewModelTests: XCTestCase {
     func testShouldSetSelectedFolderToNilWhenBookmarkParentFolderIsNilAndModeIsAdd() {
         // GIVEN
         let folder = BookmarkFolder(id: "1", title: #function)
-        bookmarkStoreMock.bookmarks = [folder]
+        bookmarkStoreMock = BookmarkStoreMock(bookmarks: [folder])
+        bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
         bookmarkManager.loadBookmarks()
         let sut = AddEditBookmarkDialogViewModel(mode: .add(), bookmarkManager: bookmarkManager)
 
@@ -263,7 +266,8 @@ final class AddEditBookmarkDialogViewModelTests: XCTestCase {
     func testShouldSetSelectedFolderToValueWhenParentFolderIsNotNilAndModeIsAdd() {
         // GIVEN
         let folder = BookmarkFolder(id: "1", title: #function)
-        bookmarkStoreMock.bookmarks = [folder]
+        bookmarkStoreMock = BookmarkStoreMock(bookmarks: [folder])
+        bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
         bookmarkManager.loadBookmarks()
         let sut = AddEditBookmarkDialogViewModel(mode: .add(parentFolder: folder), bookmarkManager: bookmarkManager)
 
@@ -279,7 +283,8 @@ final class AddEditBookmarkDialogViewModelTests: XCTestCase {
         // GIVEN
         let folder = BookmarkFolder(id: "1", title: #function)
         let bookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: #function, isFavorite: false, parentFolderUUID: "2")
-        bookmarkStoreMock.bookmarks = [folder]
+        bookmarkStoreMock = BookmarkStoreMock(bookmarks: [folder])
+        bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
         bookmarkManager.loadBookmarks()
         let sut = AddEditBookmarkDialogViewModel(mode: .edit(bookmark: bookmark), bookmarkManager: bookmarkManager)
 
@@ -295,7 +300,8 @@ final class AddEditBookmarkDialogViewModelTests: XCTestCase {
         // GIVEN
         let folder = BookmarkFolder(id: "1", title: #function)
         let bookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: #function, isFavorite: false, parentFolderUUID: "1")
-        bookmarkStoreMock.bookmarks = [folder]
+        bookmarkStoreMock = BookmarkStoreMock(bookmarks: [folder])
+        bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
         bookmarkManager.loadBookmarks()
         let sut = AddEditBookmarkDialogViewModel(mode: .edit(bookmark: bookmark), bookmarkManager: bookmarkManager)
 
@@ -505,7 +511,8 @@ final class AddEditBookmarkDialogViewModelTests: XCTestCase {
         // GIVEN
         let folder = BookmarkFolder(id: #file, title: #function)
         let existingBookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: true)
-        bookmarkStoreMock.bookmarks = [existingBookmark]
+        bookmarkStoreMock = BookmarkStoreMock(bookmarks: [existingBookmark])
+        bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
         bookmarkManager.loadBookmarks()
         let sut = AddEditBookmarkDialogViewModel(mode: .add(parentFolder: folder), bookmarkManager: bookmarkManager)
         sut.bookmarkName = "DDG"
@@ -562,7 +569,8 @@ final class AddEditBookmarkDialogViewModelTests: XCTestCase {
         let expectedBookmark = Bookmark(id: "1", url: URL.exti, title: #function, isFavorite: false)
         let sut = AddEditBookmarkDialogViewModel(mode: .edit(bookmark: bookmark), bookmarkManager: bookmarkManager)
         sut.bookmarkURLPath = expectedBookmark.url
-        bookmarkStoreMock.bookmarks = [bookmark]
+        bookmarkStoreMock = BookmarkStoreMock(bookmarks: [bookmark])
+        bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
         bookmarkManager.loadBookmarks()
         XCTAssertFalse(bookmarkStoreMock.saveBookmarkCalled)
         XCTAssertFalse(bookmarkStoreMock.moveObjectUUIDCalled)
@@ -585,7 +593,8 @@ final class AddEditBookmarkDialogViewModelTests: XCTestCase {
         let bookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: #function, isFavorite: false)
         let sut = AddEditBookmarkDialogViewModel(mode: .edit(bookmark: bookmark), bookmarkManager: bookmarkManager)
         sut.bookmarkURLPath = URL.duckDuckGo.absoluteString
-        bookmarkStoreMock.bookmarks = [bookmark]
+        bookmarkStoreMock = BookmarkStoreMock(bookmarks: [bookmark])
+        bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
         bookmarkManager.loadBookmarks()
         XCTAssertFalse(bookmarkStoreMock.saveBookmarkCalled)
         XCTAssertFalse(bookmarkStoreMock.moveObjectUUIDCalled)
@@ -608,7 +617,8 @@ final class AddEditBookmarkDialogViewModelTests: XCTestCase {
         let bookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: #function, isFavorite: false)
         let expectedBookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: false)
         let sut = AddEditBookmarkDialogViewModel(mode: .edit(bookmark: bookmark), bookmarkManager: bookmarkManager)
-        bookmarkStoreMock.bookmarks = [bookmark]
+        bookmarkStoreMock = BookmarkStoreMock(bookmarks: [bookmark])
+        bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
         bookmarkManager.loadBookmarks()
         sut.bookmarkName = expectedBookmark.title
         XCTAssertFalse(bookmarkStoreMock.saveBookmarkCalled)
@@ -631,7 +641,8 @@ final class AddEditBookmarkDialogViewModelTests: XCTestCase {
         // GIVEN
         let bookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: #function, isFavorite: false)
         let sut = AddEditBookmarkDialogViewModel(mode: .edit(bookmark: bookmark), bookmarkManager: bookmarkManager)
-        bookmarkStoreMock.bookmarks = [bookmark]
+        bookmarkStoreMock = BookmarkStoreMock(bookmarks: [bookmark])
+        bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
         bookmarkManager.loadBookmarks()
         sut.bookmarkName = #function
         XCTAssertFalse(bookmarkStoreMock.saveBookmarkCalled)
@@ -655,7 +666,8 @@ final class AddEditBookmarkDialogViewModelTests: XCTestCase {
         let bookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: #function, isFavorite: false)
         let expectedBookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: #function, isFavorite: true)
         let sut = AddEditBookmarkDialogViewModel(mode: .edit(bookmark: bookmark), bookmarkManager: bookmarkManager)
-        bookmarkStoreMock.bookmarks = [bookmark]
+        bookmarkStoreMock = BookmarkStoreMock(bookmarks: [bookmark])
+        bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
         bookmarkManager.loadBookmarks()
         sut.isBookmarkFavorite = expectedBookmark.isFavorite
         XCTAssertFalse(bookmarkStoreMock.saveBookmarkCalled)
@@ -678,7 +690,8 @@ final class AddEditBookmarkDialogViewModelTests: XCTestCase {
         // GIVEN
         let bookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: #function, isFavorite: false)
         let sut = AddEditBookmarkDialogViewModel(mode: .edit(bookmark: bookmark), bookmarkManager: bookmarkManager)
-        bookmarkStoreMock.bookmarks = [bookmark]
+        bookmarkStoreMock = BookmarkStoreMock(bookmarks: [bookmark])
+        bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
         bookmarkManager.loadBookmarks()
         sut.isBookmarkFavorite = false
         XCTAssertFalse(bookmarkStoreMock.saveBookmarkCalled)
@@ -702,7 +715,8 @@ final class AddEditBookmarkDialogViewModelTests: XCTestCase {
         let bookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: #function, isFavorite: false)
         let expectedBookmark = Bookmark(id: "1", url: URL.exti, title: "DDG", isFavorite: true)
         let sut = AddEditBookmarkDialogViewModel(mode: .edit(bookmark: bookmark), bookmarkManager: bookmarkManager)
-        bookmarkStoreMock.bookmarks = [bookmark]
+        bookmarkStoreMock = BookmarkStoreMock(bookmarks: [bookmark])
+        bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
         bookmarkManager.loadBookmarks()
         sut.bookmarkURLPath = expectedBookmark.url
         sut.bookmarkName = expectedBookmark.title
@@ -728,7 +742,8 @@ final class AddEditBookmarkDialogViewModelTests: XCTestCase {
         let folder = BookmarkFolder(id: "ABCDE", title: "Test Folder")
         let bookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: #function, isFavorite: false)
         let sut = AddEditBookmarkDialogViewModel(mode: .edit(bookmark: bookmark), bookmarkManager: bookmarkManager)
-        bookmarkStoreMock.bookmarks = [folder, bookmark]
+        bookmarkStoreMock = BookmarkStoreMock(bookmarks: [folder, bookmark])
+        bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
         bookmarkManager.loadBookmarks()
         sut.selectedFolder = folder
         XCTAssertFalse(bookmarkStoreMock.saveBookmarkCalled)
@@ -754,7 +769,8 @@ final class AddEditBookmarkDialogViewModelTests: XCTestCase {
         let bookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: #function, isFavorite: false, parentFolderUUID: "ABCDE")
         let folder = BookmarkFolder(id: "ABCDE", title: "Test Folder", children: [bookmark])
         let sut = AddEditBookmarkDialogViewModel(mode: .edit(bookmark: bookmark), bookmarkManager: bookmarkManager)
-        bookmarkStoreMock.bookmarks = [folder, bookmark]
+        bookmarkStoreMock = BookmarkStoreMock(bookmarks: [folder, bookmark])
+        bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
         bookmarkManager.loadBookmarks()
         sut.selectedFolder = nil
         XCTAssertFalse(bookmarkStoreMock.saveBookmarkCalled)
@@ -780,7 +796,8 @@ final class AddEditBookmarkDialogViewModelTests: XCTestCase {
         let bookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: #function, isFavorite: false, parentFolderUUID: "ABCDE")
         let folder = BookmarkFolder(id: "ABCDE", title: "Test Folder", children: [bookmark])
         let sut = AddEditBookmarkDialogViewModel(mode: .edit(bookmark: bookmark), bookmarkManager: bookmarkManager)
-        bookmarkStoreMock.bookmarks = [bookmark]
+        bookmarkStoreMock = BookmarkStoreMock(bookmarks: [bookmark])
+        bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
         bookmarkManager.loadBookmarks()
         sut.selectedFolder = folder
         XCTAssertFalse(bookmarkStoreMock.saveBookmarkCalled)
@@ -805,7 +822,8 @@ final class AddEditBookmarkDialogViewModelTests: XCTestCase {
         // GIVEN
         let bookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: #function, isFavorite: false, parentFolderUUID: "bookmarks_root")
         let sut = AddEditBookmarkDialogViewModel(mode: .edit(bookmark: bookmark), bookmarkManager: bookmarkManager)
-        bookmarkStoreMock.bookmarks = [bookmark]
+        bookmarkStoreMock = BookmarkStoreMock(bookmarks: [bookmark])
+        bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
         bookmarkManager.loadBookmarks()
         sut.selectedFolder = nil
         XCTAssertFalse(bookmarkStoreMock.saveBookmarkCalled)

@@ -280,9 +280,14 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         }.store(in: &cancellables)
     }
 
-    override func viewDidDisappear() {
-        super.viewDidDisappear()
+    override func viewWillAppear() {
+        NotificationCenter.default.addObserver(self, selector: #selector(firstReponderDidChange), name: .firstResponder, object: nil)
+
         reloadData()
+    }
+
+    override func viewDidDisappear() {
+        NotificationCenter.default.removeObserver(self, name: .firstResponder, object: nil)
     }
 
     override func keyDown(with event: NSEvent) {
@@ -377,16 +382,14 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
             .show(in: view.window)
     }
 
-    @objc func delete(_ sender: AnyObject) {
-        if tableView.selectedRowIndexes.isEmpty {
-            guard let folder = selectionState.folder else {
-                assertionFailure("Cannot delete root folder")
-                return
-            }
-            bookmarkManager.remove(folder: folder)
-            return
+    @objc func firstReponderDidChange(notification: Notification) {
+        // clear delete undo history when activating the Address Bar
+        if notification.object is AddressBarTextEditor {
+            undoManager?.removeAllActions(withTarget: bookmarkManager)
         }
+    }
 
+    @objc func delete(_ sender: AnyObject) {
         deleteSelectedItems()
     }
 
@@ -425,7 +428,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         let entities = tableView.selectedRowIndexes.compactMap { fetchEntity(at: $0) }
         let entityUUIDs = entities.map(\.id)
 
-        bookmarkManager.remove(objectsWithUUIDs: entityUUIDs)
+        bookmarkManager.remove(objectsWithUUIDs: entityUUIDs, undoManager: undoManager)
     }
 
     private(set) lazy var faviconsFetcherOnboarding: FaviconsFetcherOnboarding? = {
@@ -559,19 +562,9 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
         newFolderButton.cell?.representedObject = selectionState.folder
 
         let selectedRowsCount = tableView.selectedRowIndexes.count
-        let canDeleteFolder = selectionState.folder != nil
         NSAnimationContext.runAnimationGroup { context in
             context.duration = 0.25
-            if selectedRowsCount > 0 {
-                deleteItemsButton.animator().title = UserText.delete
-                deleteItemsButton.animator().isEnabled = true
-            } else if canDeleteFolder {
-                deleteItemsButton.animator().title = UserText.deleteFolder
-                deleteItemsButton.animator().isEnabled = true
-            } else {
-                deleteItemsButton.animator().title = UserText.delete
-                deleteItemsButton.animator().isEnabled = false
-            }
+            deleteItemsButton.animator().isEnabled = selectedRowsCount > 0
             newBookmarkButton.animator().isHidden = selectedRowsCount > 1
             newFolderButton.animator().isHidden = selectedRowsCount > 1
         }
