@@ -29344,10 +29344,58 @@
       "comment" : "Explanatory text for the Passwords import option to alleviate security concerns and explain usage.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwörter sind verschlüsselt. Für das Anzeigen oder Ausfüllen von Formularen ist eine Touch-ID oder ein Passwort erforderlich. Niemand außer dir kann deine Passwörter sehen, nicht einmal wir. Finde Passwörter unter DuckDuckGo-Einstellungen > Passwörter & Autovervollständigen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Passwords are encrypted. Viewing them or filling out forms requires Touch ID or a password. Nobody but you can see your passwords, not even us. Find Passwords in DuckDuckGo Settings > Passwords & Autofill."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las contraseñas están cifradas. Para verlas o rellenar formularios, se requiere Touch ID o una contraseña. Nadie más que tú puede ver tus contraseñas, ni siquiera nosotros. Encuentra las contraseñas en Ajustes de DuckDuckGo > Contraseñas y autocompletar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les mots de passe sont cryptés. Pour les consulter ou remplir des formulaires, il vous faut Touch ID ou un mot de passe. Personne d'autre que vous ne peut voir vos mots de passe, pas même nous. Vous trouverez vos mots de passe dans Paramètres de DuckDuckGo > Mots de passe et saisie automatique."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le password sono crittografate. Per visualizzarle o compilare moduli occorre il Touch ID o una password. Nessuno, a parte te, può vedere le tue password, nemmeno noi. Trova le password in Impostazioni di DuckDuckGo > Password e compilazione automatica."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wachtwoorden worden versleuteld. Je hebt een Touch-ID of wachtwoord nodig om ze te bekijken of formulieren in te vullen. Niemand anders kan je wachtwoorden zien, zelfs wij niet. Vind wachtwoorden in DuckDuckGo via 'Instellingen' > 'Wachtwoorden en automatisch aanvullen'."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hasła są szyfrowane. Ich przeglądanie lub wypełnianie formularzy wymaga Touch ID lub hasła. Nikt poza Tobą nie może zobaczyć Twoich haseł, nawet my. Aby uzyskać dostęp do haseł, wybierz kolejno Ustawienia DuckDuckGo > Hasła i autouzupełnianie."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As palavras-passe estão encriptadas. Para as veres ou preencheres formulários é necessário o Touch ID ou uma palavra-passe. Ninguém além de ti pode ver as tuas palavras-passe, nem mesmo nós. Encontra as palavras-passe em Definições do DuckDuckGo > Palavras-passe e preenchimento automático."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пароли подвергаются шифрованию. Для их просмотра или заполнения требуется Touch ID или пароль. Никто кроме вас не увидит ваши пароли. Даже мы. Ищите их в разделе «Настройки DuckDuckGo > Пароли и автозаполнение»."
           }
         }
       }
@@ -29356,10 +29404,58 @@
       "comment" : "Explanatory text for the Passwords import option to alleviate security concerns and explain usage when autolock is disabled",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwörter sind verschlüsselt. Wir empfehlen dir, Auto-Lock einzurichten, um deine Passwörter noch sicherer zu machen. Dies kannst du unter DuckDuckGo-Einstellungen > Passwörter & Autovervollständigen tun."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Passwords are encrypted. We recommend setting up Auto-lock to keep your passwords even more secure. Set it up in DuckDuckGo Settings > Passwords & Autofill."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las contraseñas están cifradas. Te recomendamos que configures Auto-lock para mantener tus contraseñas aún más seguras. Configúralo en Ajustes de DuckDuckGo > Contraseñas y autocompletar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les mots de passe sont cryptés. Nous recommandons de configurer le verrouillage automatique pour renforcer la sécurité de vos mots de passe. Pour ce faire, allez dans les Paramètres de DuckDuckGo > Mots de passe et saisie automatique."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le password sono crittografate. Ti consigliamo di impostare il blocco automatico per rendere le tue password ancora più sicure. Impostalo nelle impostazioni di DuckDuckGo > Password e compilazione automatica."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wachtwoorden worden versleuteld. We raden aan om 'Automatisch vergrendelen' in te stellen om je wachtwoorden nog beter te beveiligen. Je kunt dit doen in DuckDuckGo via 'Instellingen' > 'Wachtwoorden en automatisch aanvullen'."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hasła są szyfrowane. Zalecamy skonfigurowanie funkcji automatycznej blokady, aby hasła były jeszcze bezpieczniejsze. Skonfiguruj tę opcję, wybierając kolejno Ustawienia DuckDuckGo > Hasła i autouzupełnianie."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As palavras-passe estão encriptadas. Recomendamos a configuração do Bloqueio automático para manter as tuas palavras-passe ainda mais seguras. Configura-o nas Definições do DuckDuckGo > Palavras-passe e preenchimento automático."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пароли подвергаются шифрованию. Для дополнительной защиты рекомендуем включить автоматическую блокировку в разделе «Настройки DuckDuckGo > Пароли и автозаполнение»."
           }
         }
       }
@@ -44575,10 +44671,58 @@
       "comment" : "Label for default empty state description\n   Label for default empty state description when the autolock feature is off",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwörter sind verschlüsselt. Niemand außer dir kann sie sehen, nicht einmal wir."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Passwords are encrypted. Nobody but you can see them, not even us."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las contraseñas están cifradas. Nadie más que tú puede verlas, ni siquiera nosotros."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les mots de passe sont cryptés. Personne d'autre que vous ne peut les voir, pas même nous."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le password sono crittografate. Nessuno tranne te può vederle, nemmeno noi."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wachtwoorden worden versleuteld. Niemand anders kan ze zien, zelfs wij niet."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hasła są szyfrowane. Nikt poza Tobą ich nie widzi, nawet my."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As palavras-passe estão encriptadas. Ninguém além de ti pode vê-las, nem mesmo nós."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пароли подвергаются шифрованию. Никто, кроме вас, их не увидит. Даже мы."
           }
         }
       }
@@ -44707,10 +44851,58 @@
       "comment" : "Text for link to learn more about DuckDuckGo password manager",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mehr erfahren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Learn more"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Más información"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En savoir plus"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ulteriori informazioni"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meer informatie"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dowiedz się więcej"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saiba mais"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подробнее"
           }
         }
       }
@@ -47419,10 +47611,58 @@
       "comment" : "Info message for the save credentials dialog\n   Info message for the save credentials dialog when the autolock feature is off",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwörter sind verschlüsselt. Niemand außer dir kann sie sehen, nicht einmal wir. [Mehr erfahren](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        },
         "en" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Passwords are encrypted. Nobody but you can see them, not even us. [Learn More]( (URL.passwordManagerLearnMore))"
+            "state" : "translated",
+            "value" : "Passwords are encrypted. Nobody but you can see them, not even us. [Learn More](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las contraseñas están cifradas. Nadie más que tú puede verlas, ni siquiera nosotros. [Más información](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les mots de passe sont cryptés. Personne d&apos;autre que vous ne peut les voir, pas même nous. [En savoir plus](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le password sono crittografate. Nessuno tranne te può vederle, nemmeno noi. [Scopri di più](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wachtwoorden worden versleuteld. Niemand anders kan ze zien, zelfs wij niet. [Meer informatie] (https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hasła są szyfrowane. Nikt poza Tobą ich nie widzi, nawet my. [Więcej informacji](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As palavras-passe estão encriptadas. Ninguém além de ti pode vê-las, nem mesmo nós. [Sabe mais](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пароли подвергаются шифрованию. Никто, кроме вас, их не увидит. Даже мы. [Подробнее...](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
           }
         }
       }
