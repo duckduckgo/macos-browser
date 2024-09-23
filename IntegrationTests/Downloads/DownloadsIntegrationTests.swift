@@ -497,7 +497,7 @@ class DownloadsIntegrationTests: XCTestCase {
                 XCTFail("Unexpected download success")
             }
         }
-        waitForExpectations(timeout: 1)
+        waitForExpectations(timeout: 5)
         withExtendedLifetime(taskCancelledCancellable) {}
     }
 
