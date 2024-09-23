@@ -70,13 +70,13 @@ final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, Us
         self.delegate?.autoconsentUserScript(consentStatus: consentStatus)
     }
 
-    @MainActor
-    func userContentController(_ userContentController: WKUserContentController,
-                               didReceive message: WKScriptMessage,
-                               replyHandler: @escaping (Any?, String?) -> Void) {
-        Logger.autoconsent.debug("Message received: \(String(describing: message.body))")
-        return handleMessage(replyHandler: replyHandler, message: message)
-    }
+//    @MainActor
+//    func userContentController(_ userContentController: WKUserContentController,
+//                               didReceive message: WKScriptMessage,
+//                               replyHandler: @escaping (Any?, String?) -> Void) {
+//        Logger.autoconsent.debug("Message received: \(String(describing: message.body))")
+//        return handleMessage(replyHandler: replyHandler, message: message)
+//    }
 
     @MainActor
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) async -> (Any?, String?) {

@@ -18,11 +18,11 @@
 
 
 #import <WebKit/WebKit.h>
-#import <WebKit/_WKWebExtensionController.h>
+#import <WebKit/WKWebExtensionController.h>
 
 @interface WKWebViewConfiguration (Private)
 
-- (void)_setWebExtensionController:(_WKWebExtensionController *)webExtensionController API_AVAILABLE(macos(13.1), ios(NA));
+- (void)_setWebExtensionController:(WKWebExtensionController *)webExtensionController API_AVAILABLE(macos(13.1), ios(NA));
 
 @end
 

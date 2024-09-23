@@ -13507,7 +13507,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37DD516C296EAEDC00837F27 /* DuckDuckGoAppStore.xcconfig */;
 			buildSettings = {
-				MACOSX_DEPLOYMENT_TARGET = 13.1;
 			};
 			name = Debug;
 		};
@@ -13515,7 +13514,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37DD516C296EAEDC00837F27 /* DuckDuckGoAppStore.xcconfig */;
 			buildSettings = {
-				MACOSX_DEPLOYMENT_TARGET = 13.1;
 			};
 			name = CI;
 		};
@@ -13523,7 +13521,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37DD516C296EAEDC00837F27 /* DuckDuckGoAppStore.xcconfig */;
 			buildSettings = {
-				MACOSX_DEPLOYMENT_TARGET = 13.1;
 			};
 			name = Release;
 		};
@@ -13531,7 +13528,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37DD516C296EAEDC00837F27 /* DuckDuckGoAppStore.xcconfig */;
 			buildSettings = {
-				MACOSX_DEPLOYMENT_TARGET = 13.1;
 			};
 			name = Review;
 		};
@@ -13644,7 +13640,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */;
 			buildSettings = {
-				MACOSX_DEPLOYMENT_TARGET = 13.1;
 			};
 			name = CI;
 		};
@@ -13965,7 +13960,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */;
 			buildSettings = {
-				MACOSX_DEPLOYMENT_TARGET = 13.1;
 			};
 			name = Debug;
 		};
@@ -13973,7 +13967,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */;
 			buildSettings = {
-				MACOSX_DEPLOYMENT_TARGET = 13.1;
 			};
 			name = Release;
 		};
@@ -14002,7 +13995,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */;
 			buildSettings = {
-				MACOSX_DEPLOYMENT_TARGET = 13.1;
 			};
 			name = Review;
 		};

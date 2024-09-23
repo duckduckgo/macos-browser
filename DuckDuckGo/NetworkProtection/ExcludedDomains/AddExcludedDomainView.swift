@@ -87,7 +87,7 @@ struct AddExcludedDomainView: ModalView {
             },
             rightColumn: {
                 TextField("", text: $domain)
-                    .focusedOnAppear()
+//                    .focusedOnAppear()
                     .onChange(of: domain) { domain in
                         guard let url = URL(trimmedAddressBarString: domain) else { return }
                         isDefaultActionDisabled = domain.trimmingWhitespace().isEmpty || !url.isValid

@@ -42,14 +42,14 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
 
     static let shared = WebExtensionManager()
 
-    static private func loadWebExtension(path: String) -> _WKWebExtension? {
+    static private func loadWebExtension(path: String) -> WKWebExtension? {
         let extensionURL = URL(fileURLWithPath: path)
-        let webExtension = try? _WKWebExtension(resourceBaseURL: extensionURL)
+        let webExtension = try? WKWebExtension(resourceBaseURL: extensionURL)
         return webExtension
     }
 
     // swiftlint:disable force_try
-    static private func makeContext(for webExtension: _WKWebExtension) -> WKWebExtensionContext {
+    static private func makeContext(for webExtension: WKWebExtension) -> WKWebExtensionContext {
         let context = WKWebExtensionContext(for: webExtension)
         context.uniqueIdentifier = UUID().uuidString
 
@@ -71,7 +71,7 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
     }
     // swiftlint:disable force_try
 
-    lazy var extensions: [_WKWebExtension] = {
+    lazy var extensions: [WKWebExtension] = {
         guard let loadedExtension = WebExtensionManager.loadWebExtension(path: Bundle.main.path(forResource: "emoji-substitution", ofType: nil)!) else {
             return []
         }
@@ -224,7 +224,7 @@ extension WebExtensionManager: WKWebExtensionControllerDelegate {
     }
 
     func webExtensionController(_ controller: WKWebExtensionController, openNewTabUsing configuration: WKWebExtension.TabConfiguration, for extensionContext: WKWebExtensionContext) async throws -> (any WKWebExtensionTab)? {
-        if let url = configuration.url {
+        if let url = configuration.value(forKey: "url") as? URL {
             let tab = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.browserTabViewController.openNewTab(with: .url(url, source: .ui))
             return tab
         }
