@@ -19,7 +19,9 @@
 import AppLauncher
 import Cocoa
 import Combine
+import BrowserServicesKit
 import Common
+import Configuration
 import LoginItems
 import Networking
 import NetworkExtension
@@ -129,6 +131,11 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private let accountManager: AccountManager
     private let accessTokenStorage: SubscriptionTokenKeychainStorage
 
+    private let configurationStore = ConfigurationStore()
+    private let configurationManager: ConfigurationManager
+    private let privacyConfigurationManager = VPNPrivacyConfigurationManager()
+    private var configurationSubscription: AnyCancellable?
+
     public init(accountManager: AccountManager,
                 accessTokenStorage: SubscriptionTokenKeychainStorage,
                 subscriptionEnvironment: SubscriptionEnvironment) {
@@ -137,6 +144,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         self.accessTokenStorage = accessTokenStorage
         self.tunnelSettings = VPNSettings(defaults: .netP)
         self.tunnelSettings.alignTo(subscriptionEnvironment: subscriptionEnvironment)
+        self.configurationManager = ConfigurationManager(privacyConfigManager: privacyConfigurationManager, store: configurationStore)
     }
 
     private var cancellables = Set<AnyCancellable>()
@@ -170,10 +178,13 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
     @MainActor
     private lazy var proxyController: TransparentProxyController = {
+        let eventHandler = TransparentProxyControllerEventHandler(logger: .transparentProxyLogger)
+
         let controller = TransparentProxyController(
             extensionID: proxyExtensionBundleID,
             storeSettingsInProviderConfiguration: storeProxySettingsInProviderConfiguration,
-            settings: proxySettings) { [weak self] manager in
+            settings: proxySettings,
+            eventHandler: eventHandler) { [weak self] manager in
                 guard let self else { return }
 
                 manager.localizedDescription = "DuckDuckGo VPN Proxy"
@@ -206,14 +217,8 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
                 }()
             }
 
-        controller.eventHandler = handleControllerEvent(_:)
-
         return controller
     }()
-
-    private func handleControllerEvent(_ event: TransparentProxyController.Event) {
-
-    }
 
     @MainActor
     private lazy var tunnelController = NetworkProtectionTunnelController(
@@ -360,6 +365,12 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
         Logger.networkProtection.info("DuckDuckGoVPN started")
 
+        // Setup Remote Configuration
+        Configuration.setURLProvider(VPNAgentConfigurationURLProvider())
+        configurationManager.start()
+        // Load cached config (if any)
+        privacyConfigurationManager.reload(etag: configurationStore.loadEtag(for: .privacyConfiguration), data: configurationStore.loadData(for: .privacyConfiguration))
+
         setupMenuVisibility()
 
         Task { @MainActor in
@@ -374,6 +385,13 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             launchInformation.update()
 
             setUpSubscriptionMonitoring()
+
+            configurationSubscription = privacyConfigurationManager.updatesPublisher
+                .sink { [weak self] in
+                    if self?.privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(BackgroundAgentPixelTestSubfeature.pixelTest) ?? false {
+                        PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionConfigurationPixelTest, frequency: .daily)
+                    }
+                }
 
             if launchedOnStartup {
                 Task {

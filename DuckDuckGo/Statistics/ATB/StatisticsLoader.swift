@@ -46,12 +46,6 @@ final class StatisticsLoader {
     }
 
     func refreshRetentionAtb(isSearch: Bool, completion: @escaping Completion = {}) {
-        // Search ATB is the only call being used currently. This guard statement can be removed to re-enable app retention ATB.
-        guard isSearch else {
-            completion()
-            return
-        }
-
         load {
             dispatchPrecondition(condition: .onQueue(.main))
 

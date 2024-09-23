@@ -145,6 +145,12 @@
                   Identifier = "StatisticsLoaderTests/testWhenRefreshRetentionAtbIsPerformedForNavigationThenAppRetentionAtbRequested()">
                </Test>
                <Test
+                  Identifier = "SubscriptionPagesUseSubscriptionFeatureTests/testBackToSettingsErrorOnFetchingAccountDetails()">
+               </Test>
+               <Test
+                  Identifier = "SubscriptionPagesUseSubscriptionFeatureTests/testBackToSettingsSuccess()">
+               </Test>
+               <Test
                   Identifier = "TabSnapshotExtensionTests/testWhenSnapshotIsRestored_ThenRenderingIsSkippedAfterLoading()">
                </Test>
                <Test
@@ -169,9 +175,6 @@
                   Identifier = "CoreDataEncryptionTests/testSavingIncorrectValueTypes()">
                </Test>
                <Test
-                  Identifier = "DownloadsIntegrationTests/testWhenDownloadIsStartedInNewTab_tabIsClosed()">
-               </Test>
-               <Test
                   Identifier = "EncryptionKeyStoreTests">
                </Test>
                <Test
@@ -182,6 +185,9 @@
                </Test>
                <Test
                   Identifier = "NavigationProtectionIntegrationTests/testReferrerTrimming()">
+               </Test>
+               <Test
+                  Identifier = "PhishingDetectionIntegrationTests">
                </Test>
                <Test
                   Identifier = "TabContentTests/testWhenPDFContextMenuPrintChosen_printDialogOpens()">
@@ -234,6 +240,16 @@
                ReferencedContainer = "container:LocalPackages/UDSHelper">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "AppKitExtensionsTests"
+               BuildableName = "AppKitExtensionsTests"
+               BlueprintName = "AppKitExtensionsTests"
+               ReferencedContainer = "container:LocalPackages/AppKitExtensions">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
@@ -267,28 +283,6 @@
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
-      <EnvironmentVariables>
-         <EnvironmentVariable
-            key = "OS_ACTIVITY_DT_MODE"
-            value = "YES"
-            isEnabled = "YES">
-         </EnvironmentVariable>
-         <EnvironmentVariable
-            key = "OS_ACTIVITY_MODE"
-            value = "debug"
-            isEnabled = "YES">
-         </EnvironmentVariable>
-         <EnvironmentVariable
-            key = "DYLD_LIBRARY_PATH"
-            value = "$(WEBKIT_FRAMEWORK_SEARCH_PATH)"
-            isEnabled = "YES">
-         </EnvironmentVariable>
-         <EnvironmentVariable
-            key = "DYLD_FRAMEWORK_PATH"
-            value = "$(WEBKIT_FRAMEWORK_SEARCH_PATH)"
-            isEnabled = "YES">
-         </EnvironmentVariable>
-      </EnvironmentVariables>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"

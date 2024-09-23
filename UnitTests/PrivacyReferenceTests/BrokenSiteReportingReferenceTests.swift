@@ -81,6 +81,7 @@ final class BrokenSiteReportingReferenceTests: XCTestCase {
                                             manufacturer: "Apple",
                                             upgradedHttps: test.wasUpgraded,
                                             tdsETag: test.blocklistVersion,
+                                            configVersion: test.remoteConfigVersion,
                                             blockedTrackerDomains: test.blockedTrackers,
                                             installedSurrogates: test.surrogates,
                                             isGPCEnabled: test.gpcEnabled ?? false,
@@ -165,6 +166,7 @@ private struct Test: Codable {
     let providedDescription: String?
     let blockedTrackers, surrogates: [String]
     let atb, blocklistVersion: String
+    let remoteConfigVersion: String?
     let expectReportURLPrefix: String
     let expectReportURLParams: [ExpectReportURLParam]
     let exceptPlatforms: [String]

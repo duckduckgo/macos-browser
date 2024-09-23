@@ -419,6 +419,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         let defaults = UserDefaults.netP
 #endif
 
+        APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
         NetworkProtectionLastVersionRunStore(userDefaults: defaults).lastExtensionVersionRun = AppVersion.shared.versionAndBuildNumber
         let settings = VPNSettings(defaults: defaults)
 
@@ -430,7 +431,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         let tokenStore = NetworkProtectionKeychainTokenStore(keychainType: Bundle.keychainType,
                                                                            serviceName: Self.tokenServiceName,
                                                                            errorEvents: debugEvents,
-                                                                           isSubscriptionEnabled: false,
+                                                                           useAccessTokenProvider: false,
                                                                            accessTokenProvider: { nil }
         )
         let entitlementsCache = UserDefaultsCache<[Entitlement]>(userDefaults: subscriptionUserDefaults,
@@ -470,7 +471,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                    providerEvents: Self.packetTunnelProviderEvents,
                    settings: settings,
                    defaults: defaults,
-                   isSubscriptionEnabled: true,
                    entitlementCheck: entitlementsCheck)
 
         setupPixels()

@@ -26,7 +26,7 @@ extension NSMenuItem {
         return item
     }
 
-    convenience init(title string: String, action selector: Selector? = nil, target: AnyObject? = nil, keyEquivalent: [KeyEquivalentElement] = [], representedObject: Any? = nil, state: NSControl.StateValue = .off, items: [NSMenuItem]? = nil) {
+    convenience init(title string: String, action selector: Selector? = nil, target: AnyObject? = nil, keyEquivalent: NSEvent.KeyEquivalent = [], representedObject: Any? = nil, state: NSControl.StateValue = .off, items: [NSMenuItem]? = nil) {
         self.init(title: string, action: selector, keyEquivalent: keyEquivalent.charCode)
         if !keyEquivalent.modifierMask.isEmpty {
             self.keyEquivalentModifierMask = keyEquivalent.modifierMask
@@ -40,7 +40,7 @@ extension NSMenuItem {
         }
     }
 
-    convenience init(title string: String, action selector: Selector? = nil, target: AnyObject? = nil, keyEquivalent: [KeyEquivalentElement] = [], representedObject: Any? = nil, state: NSControl.StateValue = .off, @MenuBuilder items: () -> [NSMenuItem]) {
+    convenience init(title string: String, action selector: Selector? = nil, target: AnyObject? = nil, keyEquivalent: NSEvent.KeyEquivalent = [], representedObject: Any? = nil, state: NSControl.StateValue = .off, @MenuBuilder items: () -> [NSMenuItem]) {
         self.init(title: string, action: selector, target: target, keyEquivalent: keyEquivalent, representedObject: representedObject, state: state, items: items())
     }
 
@@ -126,61 +126,6 @@ extension NSMenuItem {
     func withModifierMask(_ mask: NSEvent.ModifierFlags) -> NSMenuItem {
         self.keyEquivalentModifierMask = mask
         return self
-    }
-
-}
-
-enum KeyEquivalentElement: ExpressibleByStringLiteral {
-    public typealias StringLiteralType = String
-
-    case charCode(String)
-    case command
-    case shift
-    case option
-    case control
-
-    static let backspace = KeyEquivalentElement.charCode("\u{8}")
-    static let tab = KeyEquivalentElement.charCode("\t")
-    static let left = KeyEquivalentElement.charCode("\u{2190}")
-    static let right = KeyEquivalentElement.charCode("\u{2192}")
-
-    init(stringLiteral value: String) {
-        self = .charCode(value)
-    }
-}
-
-extension [KeyEquivalentElement]: ExpressibleByStringLiteral, ExpressibleByUnicodeScalarLiteral, ExpressibleByExtendedGraphemeClusterLiteral {
-    public typealias StringLiteralType = String
-
-    public init(stringLiteral value: String) {
-        self = [.charCode(value)]
-    }
-
-    var charCode: String {
-        for item in self {
-            if case .charCode(let value) = item {
-                return value
-            }
-        }
-        return ""
-    }
-
-    var modifierMask: NSEvent.ModifierFlags {
-        var result: NSEvent.ModifierFlags = []
-        for item in self {
-            switch item {
-            case .charCode: continue
-            case .command:
-                result.insert(.command)
-            case .shift:
-                result.insert(.shift)
-            case .option:
-                result.insert(.option)
-            case .control:
-                result.insert(.control)
-            }
-        }
-        return result
     }
 
 }

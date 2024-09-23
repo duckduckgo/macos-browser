@@ -44,9 +44,10 @@ final class FileResources: ResourcesRepository {
             throw FileResourcesError.bundleResourceURLNil
         }
 
+        let brokersURL = resourceURL.appendingPathComponent("Resources").appendingPathComponent("JSON")
         do {
             let fileURLs = try fileManager.contentsOfDirectory(
-                at: resourceURL,
+                at: brokersURL,
                 includingPropertiesForKeys: nil,
                 options: [.skipsHiddenFiles]
             )

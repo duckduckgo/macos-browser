@@ -86,4 +86,25 @@ class PrivacyDashboardIntegrationTests: XCTestCase {
         XCTAssertEqual(trackersCount2, 0)
     }
 
+    @MainActor
+    func testWhenPhishingDetected_phishingInfoUpdated() async throws {
+        let tabViewModel = self.tabViewModel
+        let tab = tabViewModel.tab
+
+        let isPhishingPromise = tab.privacyInfoPublisher
+            .compactMap {
+                $0?.$isPhishing
+            }
+            .map { _ in true }
+            .timeout(10)
+            .first()
+            .promise()
+        // Load the test page
+        let url = URL(string: "http://privacy-test-pages.site/security/badware/phishing.html")!
+        _ = await tab.setUrl(url, source: .link)?.result
+
+        let isPhishing = try await isPhishingPromise.value
+        XCTAssertTrue(isPhishing)
+    }
+
 }

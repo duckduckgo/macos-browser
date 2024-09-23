@@ -79,10 +79,6 @@ struct DefaultDuckPlayerOnboardingDecider: DuckPlayerOnboardingDecider {
         return onboardingExperiment.isUserAssignedToExperimentCohort && !defaults.onboardingWasDisplayed && preferences.duckPlayerMode == .alwaysAsk
     }
 
-    private var isUserInExperiment: Bool {
-        return false
-    }
-
     var shouldOpenFirstVideoOnDuckPlayer: Bool {
         return defaults.shouldOpenFirstVideoInDuckPlayer && !defaults.firstVideoWasOpenedInDuckPlayer
     }

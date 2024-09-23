@@ -12151,6 +12151,66 @@
         }
       }
     },
+    "cannot.read.image.alert.message" : {
+      "comment" : "Header of the alert dialog informing user that the app failed to load the provided custom background image",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beim Hochladen dieser Datei ist ein Problem aufgetreten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "There was an issue uploading this file"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se ha producido una incidencia al cargar este archivo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un problème est survenu lors du téléchargement de ce fichier"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si è verificato un problema durante il caricamento di questo file"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Er is een probleem opgetreden bij het uploaden van dit bestand"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wystąpił problem podczas przesyłania tego pliku"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocorreu um problema ao carregar este ficheiro"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Проблемы с загрузкой файла"
+          }
+        }
+      }
+    },
     "Capitalize" : {
       "comment" : "Main Menu Edit-Transformations item",
       "localizations" : {
@@ -12493,6 +12553,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Очистить и выйти"
+          }
+        }
+      }
+    },
+    "close" : {
+      "comment" : "Close button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schließen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Close"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerrar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fermer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiudi"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sluiten"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zamknij"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fechar"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Закрыть"
           }
         }
       }
@@ -25341,6 +25461,846 @@
         }
       }
     },
+    "home.page.settings.add.background" : {
+      "comment" : "Button caption for adding user-provided Home Page background image",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hintergrund hinzufügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add Background"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir fondo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter un arrière-plan"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi sfondo"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Achtergrond toevoegen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodaj tło"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicionar fundo"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить фон"
+          }
+        }
+      }
+    },
+    "home.page.settings.all.settings" : {
+      "comment" : "Button caption",
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Einstellungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "All Settings"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todos los ajustes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tous les paramètres"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tutte le impostazioni"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Instellingen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wszystkie ustawienia"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todas as definições"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все настройки"
+          }
+        }
+      }
+    },
+    "home.page.settings.background" : {
+      "comment" : "Section title in Home Page Settings to customization Home Page background",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hintergrund"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Background"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fondo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrière-plan :"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sfondo"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Achtergrond"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tło"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fundo"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фон"
+          }
+        }
+      }
+    },
+    "home.page.settings.browser.theme" : {
+      "comment" : "Section title in Home Page Settings to adjust browser theme",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Browser-Thema"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Browser Theme"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tema del navegador"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thème du navigateur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tema del browser"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Browserthema"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Motyw przeglądarki"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tema do navegador"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тема браузера"
+          }
+        }
+      }
+    },
+    "home.page.settings.default.background" : {
+      "comment" : "Default as in 'default background'",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standard"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Default"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Predeterminado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Défaut"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Predefinito"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standaard"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Domyślne"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pré-definido"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "По умолчанию"
+          }
+        }
+      }
+    },
+    "home.page.settings.delete.background" : {
+      "comment" : "Context menu option to delete custom home page background image",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hintergrund löschen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Delete Background"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar fondo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer l'arrière-plan"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elimina sfondo"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Achtergrond verwijderen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usuń tło"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar fundo"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить фон"
+          }
+        }
+      }
+    },
+    "home.page.settings.go.to.settings" : {
+      "comment" : "Settings button caption",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gehe zu Einstellungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Go to Settings"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ir a Ajustes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accéder à Paramètres"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vai a Impostazioni"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ga naar Instellingen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przejdź do ustawień"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aceder às Definições"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть «Настройки»"
+          }
+        }
+      }
+    },
+    "home.page.settings.gradients" : {
+      "comment" : "Button caption for presenting available Home Page background gradients",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Farbverläufe"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Gradients"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gradientes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gradients"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gradienti"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kleurverlopen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gradienty"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gradientes"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Градиенты"
+          }
+        }
+      }
+    },
+    "home.page.settings.header" : {
+      "comment" : "Home Page Settings title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anpassen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Customize"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personalizar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personnaliser"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personalizza"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aanpassen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spersonalizuj"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personalizar"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Собственная настройка"
+          }
+        }
+      }
+    },
+    "home.page.settings.my.backgrounds" : {
+      "comment" : "Button caption for presenting available user-provided Home Page background images",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meine Hintergründe"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "My Backgrounds"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mis fondos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mes arrière-plans"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I miei sfondi"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mijn achtergronden"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moje tła"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Os meus fundos"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Мои фоны"
+          }
+        }
+      }
+    },
+    "home.page.settings.my.backgrounds.disclaimer" : {
+      "comment" : "Disclaimer explaining privacy of user-provided custom Home Page background images",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Bilder werden auf deinem Gerät gespeichert, sodass DuckDuckGo sie nicht sehen oder darauf zugreifen kann."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Images are stored on your device so DuckDuckGo can't see or access them."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las imágenes se almacenan en tu dispositivo, por lo que DuckDuckGo no puede verlas ni acceder a ellas."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les images sont stockées sur votre appareil afin que DuckDuckGo ne puisse pas les voir ni y accéder."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le immagini sono memorizzate sul tuo dispositivo, quindi DuckDuckGo non può vederle o accedervi."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afbeeldingen worden opgeslagen op je apparaat zodat DuckDuckGo ze niet kan zien of openen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obrazy są przechowywane na Twoim urządzeniu, więc DuckDuckGo nie może ich zobaczyć ani uzyskać do nich dostępu."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As imagens são armazenadas no teu dispositivo, pelo que o DuckDuckGo não consegue aceder às imagens nem vê-las."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Изображения хранятся на вашем устройстве, поэтому у DuckDuckGo нет к ним доступа (даже для просмотра)."
+          }
+        }
+      }
+    },
+    "home.page.settings.reset.background" : {
+      "comment" : "Button caption to reset custom home page background",
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hintergrund zurücksetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Reset Background"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restablecer fondo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réinitialiser l'arrière-plan"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reimposta sfondo"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Achtergrond opnieuw instellen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zresetuj tło"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Redefinir fundo"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сбросить фон"
+          }
+        }
+      }
+    },
+    "home.page.settings.sections" : {
+      "comment" : "Section title in Home Page Settings to adjust Home Page sections visibility",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abschnitte"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sections"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Secciones"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sections"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sezioni"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Secties"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sekcje"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Secções"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Разделы"
+          }
+        }
+      }
+    },
+    "home.page.settings.solid.colors" : {
+      "comment" : "Button caption for presenting available solid-color Home Page backgrounds",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solide Farben"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Solid Colors"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Colores sólidos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couleurs unies"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Colori a tinta unita"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effen kleuren"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jednolite kolory"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cores sólidas"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сплошные цвета"
+          }
+        }
+      }
+    },
     "Import Bookmarks" : {
       "comment" : "Title of dialog with instruction for the user to import bookmarks from another browser",
       "localizations" : {
@@ -28376,6 +29336,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Пароли"
+          }
+        }
+      }
+    },
+    "import.logins.passwords.explainer" : {
+      "comment" : "Explanatory text for the Passwords import option to alleviate security concerns and explain usage.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Passwords are encrypted. Viewing them or filling out forms requires Touch ID or a password. Nobody but you can see your passwords, not even us. Find Passwords in DuckDuckGo Settings > Passwords & Autofill."
+          }
+        }
+      }
+    },
+    "import.logins.passwords.explainer.autolock.off" : {
+      "comment" : "Explanatory text for the Passwords import option to alleviate security concerns and explain usage when autolock is disabled",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Passwords are encrypted. We recommend setting up Auto-lock to keep your passwords even more secure. Set it up in DuckDuckGo Settings > Passwords & Autofill."
           }
         }
       }
@@ -41242,6 +42226,198 @@
         }
       }
     },
+    "phishing-detection.enabled.checkbox" : {
+      "comment" : "Checkbox that enables or disables the phishing detection feature in the browser",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erlaube DuckDuckGo, dich zu warnen, bevor eine Webseite geladen wird, die als bösartig oder betrügerisch gekennzeichnet wurde."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Allow DuckDuckGo to warn you before loading a webpage that has been flagged as malicious or fraudulent."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permite que DuckDuckGo te avise antes de cargar una página web que se haya marcado como maliciosa o fraudulenta."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autorisez DuckDuckGo à vous avertir avant de charger une page Web signalée comme malveillante ou frauduleuse."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consenti a DuckDuckGo di avvisarti prima di caricare una pagina web contrassegnata come dannosa o fraudolenta."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laat DuckDuckGo je waarschuwen voordat je een webpagina laadt die als kwaadaardig of frauduleus is gemarkeerd."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zezwól DuckDuckGo na ostrzeganie przed załadowaniem strony internetowej, która została oznaczona jako złośliwa lub jako oszustwo."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permitir que o DuckDuckGo te avise antes de carregar uma página que foi sinalizada como maliciosa ou fraudulenta."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Разрешить DuckDuckGo предупреждать вас о потенциально вредоносных или мошеннических сайтах перед загрузкой страницы."
+          }
+        }
+      }
+    },
+    "phishing-detection.enabled.header" : {
+      "comment" : "Header for phishing site protection section in the settings page",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schutz vor bösartigen Websites"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Malicious Site Protection"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Protección contra sitios maliciosos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Protection contre les sites malveillants"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Protezione dai siti dannosi"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bescherming tegen schadelijke sites"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ochrona przed złośliwymi witrynami"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Proteção contra sites maliciosos"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Защита от вредоносных сайтов"
+          }
+        }
+      }
+    },
+    "phishing-detection.enabled.warning" : {
+      "comment" : "A description box to warn users away from disabling phishing protection",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Deaktivieren dieser Funktion kann deine persönlichen Daten gefährden. Wenn du dir über die damit verbundenen Risiken im Klaren bist, kannst du trotzdem fortfahren."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Disabling this feature can put your personal information at risk. Only do so if you fully understand the risk involved."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desactivar esta función puede poner en riesgo tu información personal. Hazlo solo si entiendes completamente el riesgo que implica."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La désactivation de cette fonctionnalité peut mettre vos informations personnelles en danger. Faites-le uniquement si vous comprenez parfaitement les risques encourus."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disabilitando questa funzione, potresti mettere a rischio i tuoi dati personali. Fallo solo se comprendi appieno il rischio che comporta."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Als je deze functie uitschakelt, kunnen je persoonlijke gegevens in gevaar komen. Doe dit alleen als je het risico volledig begrijpt."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyłączenie tej funkcji może narazić Twoje dane osobowe na ryzyko. Rób to tylko wtedy, gdy rozumiesz związane z tym zagrożenie."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desativar esta funcionalidade pode pôr em risco as tuas informações pessoais. Não desatives a menos que compreendas os riscos."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "При отключении этой функции ваши личные данные могут оказаться под угрозой. Эту функцию следует деактивировать только в том случае, если вы осознаете связанные с этим риски."
+          }
+        }
+      }
+    },
+    "phishing.error.page.tab.title" : {
+      "comment" : "Title shown in an error page tab that warn users of security risks on a website that has been flagged as malicious.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Warning: Site May Be Deceptive"
+          }
+        }
+      }
+    },
     "pin.tab" : {
       "comment" : "Menu item. Pin as a verb",
       "extractionState" : "extracted_with_value",
@@ -43337,7 +44513,7 @@
     },
     "pm.empty.default.description" : {
       "comment" : "Label for default empty state description",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -43391,6 +44567,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Если вы уже храните пароли в другом браузере, вы можете импортировать их в DuckDuckGo."
+          }
+        }
+      }
+    },
+    "pm.empty.default.description.extended.v2" : {
+      "comment" : "Label for default empty state description\n   Label for default empty state description when the autolock feature is off",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Passwords are encrypted. Nobody but you can see them, not even us."
           }
         }
       }
@@ -43511,6 +44699,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Нет учетных данных"
+          }
+        }
+      }
+    },
+    "pm.empty.learn.more.link" : {
+      "comment" : "Text for link to learn more about DuckDuckGo password manager",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Learn more"
           }
         }
       }
@@ -46215,6 +47415,18 @@
         }
       }
     },
+    "pm.save-credentials.security.info" : {
+      "comment" : "Info message for the save credentials dialog\n   Info message for the save credentials dialog when the autolock feature is off",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Passwords are encrypted. Nobody but you can see them, not even us. [Learn More]( (URL.passwordManagerLearnMore))"
+          }
+        }
+      }
+    },
     "pm.signin.to.manage" : {
       "comment" : "Message displayed to the user when they are logged out of Email protection.",
       "extractionState" : "extracted_with_value",
@@ -48371,6 +49583,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Адресная строка"
+          }
+        }
+      }
+    },
+    "preferences.appearance.customize-background" : {
+      "comment" : "Button to open home page background customization options",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hintergrund anpassen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Customize Background"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personalizar fondo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personnaliser l'arrière-plan"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personalizza sfondo"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Achtergrond aanpassen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dostosuj tło"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personalizar fundo"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настроить фон"
           }
         }
       }
@@ -55101,6 +56373,486 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Отправить жалобу"
+          }
+        }
+      }
+    },
+    "sync.promo.bookmarks.message" : {
+      "comment" : "Message for the Sync Promotion banner when user has bookmarks that can be synced",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein Konto erforderlich. Ende-zu-Ende-Verschlüsselung bedeutet, dass niemand außer dir deine Lesezeichen sehen kann, nicht einmal wir."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No account needed. End-to-end encryption means nobody but you can see your bookmarks, not even us."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No necesitas ninguna cuenta. El cifrado de extremo a extremo significa que nadie más que tú puede ver tus marcadores, ni siquiera nosotros."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun compte n'est nécessaire. Le cryptage de bout en bout signifie que personne d'autre ne peut voir vos signets, pas même nous."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non è necessario un account. Con la crittografia end-to-end, nessuno, a parte te, può vedere i tuoi segnalibri, nemmeno noi."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geen account nodig. End-to-end versleuteling betekent dat niemand anders dan jij je bladwijzers kan zien, zelfs wij niet."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konto nie jest wymagane. Kompleksowe szyfrowanie oznacza, że nikt poza Tobą nie może zobaczyć Twoich zakładek, nawet my."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não precisas de uma conta. A encriptação ponta a ponta significa que ninguém além de ti pode ver os teus favoritos, nem mesmo nós."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Учетная запись не требуется. Сквозное шифрование означает, что ваши закладки видны только вам. Даже у нас нет к ним доступа."
+          }
+        }
+      }
+    },
+    "sync.promo.bookmarks.title" : {
+      "comment" : "Title for the Sync Promotion banner",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lesezeichen synchronisieren und sichern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sync & Back Up Your Bookmarks"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincroniza y haz copias de seguridad de tus marcadores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisez et sauvegardez vos signets"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronizza ed esegui il backup dei tuoi segnalibri"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchroniseer en back-up je bladwijzers"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronizuj i twórz kopie zapasowe zakładek"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincroniza e faz uma cópia de segurança dos teus favoritos"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Синхронизация и резервное копирование закладок"
+          }
+        }
+      }
+    },
+    "sync.promo.confirm.action" : {
+      "comment" : "Title for a button in the Sync Promotion banner to set up Sync",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sync einrichten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Set Up Sync"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurar la sincronización"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurer la synchronisation"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configura la sincronizzazione"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisatie instellen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skonfiguruj synchronizację"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurar sincronização"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настройка синхронизации"
+          }
+        }
+      }
+    },
+    "sync.promo.dismiss.action" : {
+      "comment" : "Title for a button in the Sync Promotion banner to dismiss Sync promotion banner",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nein, danke"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No Thanks"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No, gracias"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non merci"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No, grazie"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nee, bedankt"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie, dziękuję"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não, obrigado"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет, спасибо"
+          }
+        }
+      }
+    },
+    "sync.promo.passwords.message" : {
+      "comment" : "Message for the Sync Promotion banner when user has passwords that can be synced",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein Konto erforderlich. Ende-zu-Ende-Verschlüsselung bedeutet, dass niemand außer dir deine Passwörter sehen kann, nicht einmal wir."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No account needed. End-to-end encryption means nobody but you can see your passwords, not even us."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No necesitas ninguna cuenta. El cifrado de extremo a extremo significa que nadie más que tú puede ver tus contraseñas, ni siquiera nosotros."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun compte n'est nécessaire. Le cryptage de bout en bout signifie que personne d'autre ne peut voir vos mots de passe, pas même nous."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non è necessario un account. Con la crittografia end-to-end, nessuno a parte te può vedere le tue password, nemmeno noi."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geen account nodig. Dankzij end-to-end versleuteling kan niemand behalve jij je wachtwoorden zien, zelfs wij niet."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konto nie jest wymagane. Kompleksowe szyfrowanie oznacza, że nikt poza Tobą nie może zobaczyć Twoich haseł, nawet my."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não precisas de uma conta. A encriptação ponta a ponta significa que ninguém além de ti pode ver as tuas palavras-passe, nem mesmo nós."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Учетная запись не требуется. Сквозное шифрование означает, что ваши пароли видны только вам. Даже у нас нет к ним доступа."
+          }
+        }
+      }
+    },
+    "sync.promo.passwords.side.panel.subtitle" : {
+      "comment" : "Subtitle for the Sync Promotion in passwords side panel",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisieren und sichern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sync & Backup"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronización y copia de seguridad"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisation et sauvegarde"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronizzazione e backup"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisatie en back-up"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronizacja i kopia zapasowa"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronização e cópia de segurança"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Синхронизация и резервное копирование"
+          }
+        }
+      }
+    },
+    "sync.promo.passwords.side.panel.title" : {
+      "comment" : "Title for the Sync Promotion in passwords side panel",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einrichtung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Setup"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configuración"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installation"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurazione"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Instellen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konfiguracja"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configuração"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настройка"
+          }
+        }
+      }
+    },
+    "sync.promo.passwords.title" : {
+      "comment" : "Title for the Sync Promotion banner",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwörter synchronisieren und sichern  "
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sync & Back Up Your Passwords  "
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincroniza y haz copias de seguridad de tus contraseñas  "
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisez et sauvegardez vos mots de passe  "
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronizza e fai il backup delle password  "
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchroniseer en maak een back-up van je wachtwoorden  "
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronizuj i twórz kopie zapasowe haseł  "
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincroniza e faz uma cópia de segurança das tuas palavras-passe  "
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Синхронизация и резервное копирование паролей  "
           }
         }
       }

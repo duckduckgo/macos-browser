@@ -55,6 +55,7 @@ final class AutofillTabExtension: TabExtension {
 
     private var emailManager: AutofillEmailDelegate?
     private var vaultManager: AutofillSecureVaultDelegate?
+    private let credentialsImportManager: AutofillCredentialsImportManager
     private var passwordManagerCoordinator: PasswordManagerCoordinating = PasswordManagerCoordinator.shared
     private let privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
     private let isBurner: Bool
@@ -64,6 +65,7 @@ final class AutofillTabExtension: TabExtension {
     init(autofillUserScriptPublisher: some Publisher<WebsiteAutofillUserScript?, Never>,
          isBurner: Bool) {
         self.isBurner = isBurner
+        self.credentialsImportManager = AutofillCredentialsImportManager()
 
         autofillUserScriptCancellable = autofillUserScriptPublisher.sink { [weak self] autofillScript in
             guard let self, let autofillScript else { return }
@@ -73,6 +75,8 @@ final class AutofillTabExtension: TabExtension {
             autofillScript.emailDelegate = self.emailManager
             self.vaultManager = Self.vaultManagerProvider(self)
             autofillScript.vaultDelegate = self.vaultManager
+            autofillScript.passwordImportDelegate = self.credentialsImportManager
+            autofillScript.isBurnerWindow = isBurner
         }
     }
 

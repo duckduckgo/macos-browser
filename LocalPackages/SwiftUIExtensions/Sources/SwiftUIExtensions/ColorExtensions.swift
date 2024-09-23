@@ -21,8 +21,14 @@ import SwiftUI
 public extension Color {
 
     init(hex: String) {
+        var hexString = hex.uppercased()
+
+        if hexString.hasPrefix("#") {
+            hexString.remove(at: hexString.startIndex)
+        }
+
         var rgbValue: UInt64 = 0
-        Scanner(string: hex).scanHexInt64(&rgbValue)
+        Scanner(string: hexString).scanHexInt64(&rgbValue)
 
         self.init(
             red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,

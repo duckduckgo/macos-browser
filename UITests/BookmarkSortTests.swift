@@ -41,7 +41,24 @@ class BookmarkSortTests: XCTestCase {
         app.enforceSingleWindow()
     }
 
+    func testWhenNoBookmarksThenSortIsDisabledOnThePanel() {
+        app.openBookmarksPanel()
+
+        let bookmarksPanelPopover = app.popovers.firstMatch
+        let sortBookmarksButton = bookmarksPanelPopover.buttons[AccessibilityIdentifiers.sortBookmarksButtonPanel]
+        XCTAssertFalse(sortBookmarksButton.isEnabled)
+    }
+
+    func testWhenNoBookmarksThenSortIsDisabledOnTheManager() {
+        app.openBookmarksManager()
+
+        let sortBookmarksButton = app.buttons[AccessibilityIdentifiers.sortBookmarksButtonManager]
+        XCTAssertFalse(sortBookmarksButton.isEnabled)
+    }
+
     func testWhenChangingSortingInThePanelIsReflectedInTheManager() {
+        addBookmark(pageTitle: "Bookmark #1")
+        app.dismissPopover(buttonIdentifier: "Hide")
         app.openBookmarksPanel()
         selectSortByName(mode: .panel)
         app.openBookmarksManager()
@@ -54,6 +71,8 @@ class BookmarkSortTests: XCTestCase {
     }
 
     func testWhenChangingSortingInTheManagerIsReflectedInThePanel() {
+        addBookmark(pageTitle: "Bookmark #1")
+        app.dismissPopover(buttonIdentifier: "Hide")
         app.openBookmarksManager()
         selectSortByName(mode: .manager)
         app.openBookmarksPanel()
@@ -136,14 +155,20 @@ class BookmarkSortTests: XCTestCase {
     }
 
     func testThatSortIsPersistedThroughBrowserRestarts() {
+        addBookmark(pageTitle: "Bookmark #1")
         app.openBookmarksPanel()
         selectSortByName(mode: .panel)
 
         app.terminate()
         let newApp = XCUIApplication()
+        newApp.launchEnvironment["UITEST_MODE"] = "1"
         newApp.launch()
+        newApp.enforceSingleWindow()
 
-        app.openBookmarksPanel()
+        // Wait for new application to start
+        XCTAssertTrue(newApp.waitForExistence(timeout: UITests.Timeouts.elementExistence))
+
+        newApp.openBookmarksPanel()
 
         let sortBookmarksPanelButton = newApp.buttons[AccessibilityIdentifiers.sortBookmarksButtonPanel]
         sortBookmarksPanelButton.tap()
