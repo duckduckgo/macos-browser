@@ -528,6 +528,15 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
 
         storePurchaseManager.hasActiveSubscriptionResult = true
         await uiHandler.setAlertResponse(alertResponse: .alertFirstButtonReturn)
+        storePurchaseManager.mostRecentTransactionResult = Constants.mostRecentTransactionJWS
+        authService.storeLoginResult = .success(StoreLoginResponse(authToken: Constants.authToken,
+                                                                   email: Constants.email,
+                                                                   externalID: Constants.externalID,
+                                                                   id: 1,
+                                                                   status: "authenticated"))
+        authService.getAccessTokenResult = .success(AccessTokenResponse(accessToken: Constants.accessToken))
+        authService.validateTokenResult = .success(Constants.validateTokenResponse)
+        subscriptionService.getSubscriptionResult = .success(SubscriptionMockFactory.subscription)
 
         // When
         let subscriptionSelectedParams = ["id": "some-subscription-id"]
@@ -545,7 +554,9 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
                                      PrivacyProPixel.privacyProPurchaseFailureStoreError.name + "_d",
                                      PrivacyProPixel.privacyProPurchaseFailureStoreError.name + "_c",
                                      PrivacyProPixel.privacyProPurchaseFailureBackendError.name + "_d",
-                                     PrivacyProPixel.privacyProPurchaseFailureBackendError.name + "_c"])
+                                     PrivacyProPixel.privacyProPurchaseFailureBackendError.name + "_c",
+                                     PrivacyProPixel.privacyProRestorePurchaseStoreSuccess.name + "_d",
+                                     PrivacyProPixel.privacyProRestorePurchaseStoreSuccess.name + "_c"])
     }
 
     func testSubscriptionSelectedErrorWhenUnauthenticatedAndAccountCreationFails() async throws {

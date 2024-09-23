@@ -39,3 +39,7 @@ extension NSPasteboard {
     }
 
 }
+
+extension NSPasteboard.PasteboardType {
+    static let urlName = NSPasteboard.PasteboardType(rawValue: "public.url-name")
+}

@@ -63,7 +63,8 @@ final class PasswordManagementViewController: NSViewController {
     @IBOutlet var emptyState: NSView!
     @IBOutlet var emptyStateImageView: NSImageView!
     @IBOutlet var emptyStateTitle: NSTextField!
-    @IBOutlet var emptyStateMessage: NSTextField!
+    @IBOutlet var emptyStateMessage: NSTextView!
+    @IBOutlet var emptyStateMessageHeight: NSLayoutConstraint!
     @IBOutlet var emptyStateButton: NSButton!
     @IBOutlet weak var exportLoginItem: NSMenuItem!
     @IBOutlet var lockScreen: NSView!
@@ -171,7 +172,10 @@ final class PasswordManagementViewController: NSViewController {
         reloadDataAfterSyncCancellable = bindSyncDidFinish()
 
         emptyStateTitle.attributedStringValue = NSAttributedString.make(emptyStateTitle.stringValue, lineHeight: 1.14, kern: -0.23)
-        emptyStateMessage.attributedStringValue = NSAttributedString.make(emptyStateMessage.stringValue, lineHeight: 1.05, kern: -0.08)
+
+        emptyStateMessage.isSelectable = true
+        emptyStateMessage.delegate = self
+        setUpEmptyStateMessageAttributedText()
 
         addVaultItemButton.toolTip = UserText.addItemTooltip
         moreButton.toolTip = UserText.moreOptionsTooltip
@@ -197,6 +201,49 @@ final class PasswordManagementViewController: NSViewController {
             .store(in: &cancellables)
     }
 
+    private func setUpEmptyStateMessageAttributedText() {
+        guard let listModel else { return }
+        emptyStateMessage.delegate = self
+
+        let linkAttributes: [NSAttributedString.Key: Any] = [
+            .foregroundColor: NSColor.linkBlue,
+            .cursor: NSCursor.pointingHand
+        ]
+
+        emptyStateMessage.linkTextAttributes = linkAttributes
+
+        let attachment = NSTextAttachment()
+        attachment.image = NSImage(resource: .lockSolid16).tinted(with: NSColor.blackWhite80)
+        attachment.bounds = CGRect(x: 0, y: -1, width: 12, height: 12)
+        let attributedTextImage = NSMutableAttributedString(attachment: attachment)
+
+        let string = NSMutableAttributedString(attributedString: attributedTextImage)
+
+        let messageString = NSMutableAttributedString(string: " " + listModel.emptyStateMessageDescription + " ")
+        string.append(messageString)
+
+        let linkString = NSMutableAttributedString(string: listModel.emptyStateMessageLinkText, attributes: [
+            .link: listModel.emptyStateMessageLinkURL
+        ])
+        string.append(linkString)
+
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.alignment = .center
+        string.addAttributes([
+            .cursor: NSCursor.arrow,
+            .paragraphStyle: paragraphStyle,
+            .font: NSFont.systemFont(ofSize: 13, weight: .regular),
+            .foregroundColor: NSColor.blackWhite80
+        ], range: NSRange(location: 0, length: string.length))
+
+        let maxSize = NSSize(width: 280, height: 20000)
+        let bounds = string.boundingRect(with: maxSize, options: .usesLineFragmentOrigin)
+
+        emptyStateMessageHeight.constant = bounds.height
+
+        emptyStateMessage.textStorage?.setAttributedString(string)
+    }
+
     private func setupStrings() {
         importPasswordMenuItem.title = UserText.importPasswords
         exportLoginItem.title = UserText.exportLogins
@@ -205,7 +252,7 @@ final class PasswordManagementViewController: NSViewController {
         unlockYourAutofillLabel.title = UserText.passwordManagerUnlockAutofill
         autofillTitleLabel.stringValue = UserText.passwordManagementTitle
         emptyStateTitle.stringValue = UserText.pmEmptyStateDefaultTitle
-        emptyStateMessage.stringValue = UserText.pmEmptyStateDefaultDescription
+        setUpEmptyStateMessageAttributedText()
         emptyStateButton.title = UserText.pmEmptyStateDefaultButtonTitle
     }
 
@@ -1016,7 +1063,7 @@ final class PasswordManagementViewController: NSViewController {
 
     private func showEmptyState(category: SecureVaultSorting.Category) {
         switch category {
-        case .allItems: showEmptyState(image: .passwordsAdd128, title: UserText.pmEmptyStateDefaultTitle, message: UserText.pmEmptyStateDefaultDescription, hideMessage: false, hideButton: false)
+        case .allItems: showEmptyState(image: .passwordsAdd128, title: UserText.pmEmptyStateDefaultTitle, hideMessage: false, hideButton: false)
         case .logins: showEmptyState(image: .passwordsAdd128, title: UserText.pmEmptyStateLoginsTitle, hideMessage: false, hideButton: false)
         case .identities: showEmptyState(image: .identityAdd128, title: UserText.pmEmptyStateIdentitiesTitle)
         case .cards: showEmptyState(image: .creditCardsAdd128, title: UserText.pmEmptyStateCardsTitle)
@@ -1027,12 +1074,12 @@ final class PasswordManagementViewController: NSViewController {
         emptyState.isHidden = true
     }
 
-    private func showEmptyState(image: NSImage, title: String, message: String? = nil, hideMessage: Bool = true, hideButton: Bool = true) {
+    private func showEmptyState(image: NSImage, title: String, hideMessage: Bool = true, hideButton: Bool = true) {
         emptyState.isHidden = false
         emptyStateImageView.image = image
         emptyStateTitle.attributedStringValue = NSAttributedString.make(title, lineHeight: 1.14, kern: -0.23)
-        if let message {
-            emptyStateMessage.attributedStringValue = NSAttributedString.make(message, lineHeight: 1.05, kern: -0.08)
+        if !hideMessage {
+            setUpEmptyStateMessageAttributedText()
         }
         emptyStateMessage.isHidden = hideMessage
         emptyStateButton.isHidden = hideButton
@@ -1069,14 +1116,17 @@ extension PasswordManagementViewController: NSTextFieldDelegate {
     func controlTextDidChange(_ obj: Notification) {
         updateFilter()
     }
-
 }
 
 extension PasswordManagementViewController: NSTextViewDelegate {
 
     func textView(_ textView: NSTextView, clickedOnLink link: Any, at charIndex: Int) -> Bool {
-        if let link = link as? URL, let pane = PreferencePaneIdentifier(url: link) {
-            WindowControllersManager.shared.showPreferencesTab(withSelectedPane: pane)
+        if let link = link as? URL {
+            if let pane = PreferencePaneIdentifier(url: link) {
+                WindowControllersManager.shared.showPreferencesTab(withSelectedPane: pane)
+            } else {
+                WindowControllersManager.shared.showTab(with: .url(link, source: .link))
+            }
             self.dismiss()
         }
 

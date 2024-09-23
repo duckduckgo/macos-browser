@@ -56,7 +56,7 @@ final class DataBrokerProtectionDatabaseProviderTests: XCTestCase {
         do {
             // Sets up a test vault and restores data (with violations) from a `test-vault.sql` file
             sut = try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key, registerMigrationsHandler: Migrations.v2Migrations)
-            let fileURL = Bundle.module.url(forResource: "test-vault", withExtension: "sql")!
+            let fileURL = Bundle.module.url(forResource: "test-vault", withExtension: "sql", subdirectory: "Resources")!
             try sut.restoreDatabase(from: fileURL)
         } catch {
             XCTFail("Failed to create test-vault and insert data")
