@@ -58,15 +58,6 @@ protocol TabBarViewItemDelegate: AnyObject {
 
 }
 
-final class TappableImageView: NSImageView {
-    var onClick: (() -> Void)?
-
-    override func mouseDown(with event: NSEvent) {
-        super.mouseDown(with: event)
-        onClick?() // Call the onClick closure when the image is clicked
-    }
-}
-
 final class TabBarViewItem: NSCollectionViewItem {
 
     enum Constants {

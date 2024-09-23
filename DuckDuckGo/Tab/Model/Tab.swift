@@ -289,12 +289,6 @@ protocol NewWindowPolicyDecisionMaker {
                 self?.onDuckDuckGoEmailSignOut(notification)
             }
 
-        webView.isPlayingAudioPublisher
-            .sink { [weak self] value in
-                self?.isPlayingAudio = value ?? false
-            }
-            .store(in: &webViewCancellables)
-
         addDeallocationChecks(for: webView)
     }
 
@@ -1005,6 +999,10 @@ protocol NewWindowPolicyDecisionMaker {
 
         navigationDelegate.$currentNavigation.sink { [weak self] navigation in
             self?.updateCanGoBackForward(withCurrentNavigation: navigation)
+        }.store(in: &webViewCancellables)
+
+        webView.isPlayingAudioPublisher .sink { [weak self] value in
+            self?.isPlayingAudio = value ?? false
         }.store(in: &webViewCancellables)
 
         // background tab loading should start immediately

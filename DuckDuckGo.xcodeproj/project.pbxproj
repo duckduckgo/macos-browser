@@ -2686,6 +2686,10 @@
 		B6F9BDE52B45CD1900677B33 /* ModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F9BDE32B45CD1900677B33 /* ModalView.swift */; };
 		B6FA893F269C424500588ECD /* PrivacyDashboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FA893E269C424500588ECD /* PrivacyDashboardViewController.swift */; };
 		B6FA8941269C425400588ECD /* PrivacyDashboardPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FA8940269C425400588ECD /* PrivacyDashboardPopover.swift */; };
+		BB18901A2CA1A8B000DE6574 /* KVOListenerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1890172CA1A8A900DE6574 /* KVOListenerTests.swift */; };
+		BB18901B2CA1A8B000DE6574 /* KVOListenerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1890172CA1A8A900DE6574 /* KVOListenerTests.swift */; };
+		BB18901D2CA1AD2E00DE6574 /* TappableImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB18901C2CA1AD2A00DE6574 /* TappableImageView.swift */; };
+		BB18901E2CA1AD2E00DE6574 /* TappableImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB18901C2CA1AD2A00DE6574 /* TappableImageView.swift */; };
 		BB4339DB2C7F9606005D7ED7 /* PinnedTabsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB4339DA2C7F9606005D7ED7 /* PinnedTabsTests.swift */; };
 		BB470EBB2C5A66D6002EE91D /* BookmarkManagementDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB470EBA2C5A66D6002EE91D /* BookmarkManagementDetailViewModel.swift */; };
 		BB470EBC2C5A66D6002EE91D /* BookmarkManagementDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB470EBA2C5A66D6002EE91D /* BookmarkManagementDetailViewModel.swift */; };
@@ -4528,6 +4532,8 @@
 		B6F9BDE32B45CD1900677B33 /* ModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModalView.swift; sourceTree = "<group>"; };
 		B6FA893E269C424500588ECD /* PrivacyDashboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardViewController.swift; sourceTree = "<group>"; };
 		B6FA8940269C425400588ECD /* PrivacyDashboardPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardPopover.swift; sourceTree = "<group>"; };
+		BB1890172CA1A8A900DE6574 /* KVOListenerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KVOListenerTests.swift; sourceTree = "<group>"; };
+		BB18901C2CA1AD2A00DE6574 /* TappableImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TappableImageView.swift; sourceTree = "<group>"; };
 		BB4339DA2C7F9606005D7ED7 /* PinnedTabsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedTabsTests.swift; sourceTree = "<group>"; };
 		BB470EBA2C5A66D6002EE91D /* BookmarkManagementDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkManagementDetailViewModel.swift; sourceTree = "<group>"; };
 		BB5789712B2CA70F0009DFE2 /* DataBrokerProtectionSubscriptionEventHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionSubscriptionEventHandler.swift; sourceTree = "<group>"; };
@@ -6859,6 +6865,7 @@
 		8585B63626D6E61500C1416F /* AppKit */ = {
 			isa = PBXGroup;
 			children = (
+				BB18901C2CA1AD2A00DE6574 /* TappableImageView.swift */,
 				85774B022A71CDD000DE0561 /* BlockMenuItem.swift */,
 				B65E6B9D26D9EC0800095F96 /* CircularProgressView.swift */,
 				B693954626F04BEA0015B914 /* ColorView.swift */,
@@ -7079,6 +7086,7 @@
 		85F69B3A25EDE7F800978E59 /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				BB1890172CA1A8A900DE6574 /* KVOListenerTests.swift */,
 				4B723E1726B000DC00E14D75 /* TemporaryFileCreator.swift */,
 				4BBF09222830812900EE1418 /* FileSystemDSL.swift */,
 				4BBF0924283083EC00EE1418 /* FileSystemDSLTests.swift */,
@@ -10932,6 +10940,7 @@
 				3706FB7F293F65D500E42796 /* GeolocationProvider.swift in Sources */,
 				B603FD9F2A02712E00F3FCA9 /* CIImageExtension.swift in Sources */,
 				3706FB80293F65D500E42796 /* NSAlert+ActiveDownloadsTermination.swift in Sources */,
+				BB18901E2CA1AD2E00DE6574 /* TappableImageView.swift in Sources */,
 				B677FC552B064A9C0099EB04 /* DataImportViewModel.swift in Sources */,
 				D64A5FF92AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift in Sources */,
 				4BE3A6C22C16BEB1003FC378 /* VPNRedditSessionWorkaround.swift in Sources */,
@@ -11738,6 +11747,7 @@
 				3706FE78293F661700E42796 /* HistoryCoordinatingMock.swift in Sources */,
 				3706FE79293F661700E42796 /* AppearancePreferencesTests.swift in Sources */,
 				3706FE7A293F661700E42796 /* FirePopoverViewModelTests.swift in Sources */,
+				BB18901A2CA1A8B000DE6574 /* KVOListenerTests.swift in Sources */,
 				7B09CBAA2BA4BE8200CF245B /* NetworkProtectionPixelEventTests.swift in Sources */,
 				3706FE7B293F661700E42796 /* HistoryStoringMock.swift in Sources */,
 				562984702AC4610100AC20EB /* SyncPreferencesTests.swift in Sources */,
@@ -12131,6 +12141,7 @@
 				4BE65477271FCD41008D1D63 /* PasswordManagementLoginItemView.swift in Sources */,
 				85D0327B2B8E3D090041D1FB /* HistoryCoordinatorExtension.swift in Sources */,
 				AA80EC54256BE3BC007083E7 /* UserText.swift in Sources */,
+				BB18901D2CA1AD2E00DE6574 /* TappableImageView.swift in Sources */,
 				B61EF3EC266F91E700B4D78F /* WKWebView+Download.swift in Sources */,
 				311B262728E73E0A00FD181A /* TabShadowConfig.swift in Sources */,
 				BB7B5F982C4ED73800BA4AF8 /* BookmarksSearchAndSortMetrics.swift in Sources */,
@@ -13228,6 +13239,7 @@
 				B6A5A2A825BAA35500AA7ADA /* WindowManagerStateRestorationTests.swift in Sources */,
 				B6AE39F129373AF200C37AA4 /* EmptyAttributionRulesProver.swift in Sources */,
 				4BB99D1126FE1A84001E4761 /* SafariBookmarksReaderTests.swift in Sources */,
+				BB18901B2CA1A8B000DE6574 /* KVOListenerTests.swift in Sources */,
 				BBC063E82C5A9E4B007BDC18 /* BookmarkManagementDetailViewModelTests.swift in Sources */,
 				1DA860722BE3AE950027B813 /* DockPositionProviderTests.swift in Sources */,
 				4BBF0925283083EC00EE1418 /* FileSystemDSLTests.swift in Sources */,
