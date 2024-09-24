@@ -54,8 +54,16 @@ struct BookmarksBarMenuFactory {
             },
             BlockMenuItem(title: UserText.mainMenuBookmarksShowBookmarksBarNever, isChecked: !prefs.showBookmarksBar) {
                 prefs.showBookmarksBar = false
+            },
+            NSMenuItem.separator(),
+            BlockMenuItem(title: UserText.mainMenuBookmarksLeftAlignBookmarksBar, isChecked: !prefs.centerAlignedBookmarksBarBool) {
+                prefs.centerAlignedBookmarksBarBool = false
+            },
+            BlockMenuItem(title: UserText.mainMenuBookmarksCenterAlignBookmarksBar, isChecked: prefs.centerAlignedBookmarksBarBool) {
+                prefs.centerAlignedBookmarksBarBool = true
             }
         ])
+
         return item
     }
 

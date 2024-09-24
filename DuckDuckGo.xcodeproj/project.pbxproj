@@ -751,7 +751,7 @@
 		3706FC93293F65D500E42796 /* PreferencesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE8027DA2CA600471A10 /* PreferencesViewController.swift */; };
 		3706FC94293F65D500E42796 /* FireproofDomains.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B02198125E05FAC00ED7DEA /* FireproofDomains.swift */; };
 		3706FC95293F65D500E42796 /* Database.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B677440255DBEEA00025BD8 /* Database.swift */; };
-		3706FC96293F65D500E42796 /* LeftAlignedLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE5336D286915A10019DBFD /* LeftAlignedLayout.swift */; };
+		3706FC96293F65D500E42796 /* BookmarksBarCenterAlignedLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE5336D286915A10019DBFD /* BookmarksBarCenterAlignedLayout.swift */; };
 		3706FC97293F65D500E42796 /* BookmarksOutlineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B92928526670D1600AD2C21 /* BookmarksOutlineView.swift */; };
 		3706FC98293F65D500E42796 /* CountryList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE65482271FCD53008D1D63 /* CountryList.swift */; };
 		3706FC99293F65D500E42796 /* PreferencesSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CD54C427F2FDD100F1F7B9 /* PreferencesSection.swift */; };
@@ -1504,7 +1504,7 @@
 		4BE41A5E28446EAD00760399 /* BookmarksBarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE41A5D28446EAD00760399 /* BookmarksBarViewModel.swift */; };
 		4BE5336B286912D40019DBFD /* BookmarksBarCollectionViewItem.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4BE53369286912D40019DBFD /* BookmarksBarCollectionViewItem.xib */; };
 		4BE5336C286912D40019DBFD /* BookmarksBarCollectionViewItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE5336A286912D40019DBFD /* BookmarksBarCollectionViewItem.swift */; };
-		4BE5336E286915A10019DBFD /* LeftAlignedLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE5336D286915A10019DBFD /* LeftAlignedLayout.swift */; };
+		4BE5336E286915A10019DBFD /* BookmarksBarCenterAlignedLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE5336D286915A10019DBFD /* BookmarksBarCenterAlignedLayout.swift */; };
 		4BE53374286E39F10019DBFD /* ChromiumKeychainPrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE53373286E39F10019DBFD /* ChromiumKeychainPrompt.swift */; };
 		4BE65474271FCD40008D1D63 /* PasswordManagementIdentityItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE6546E271FCD40008D1D63 /* PasswordManagementIdentityItemView.swift */; };
 		4BE65476271FCD41008D1D63 /* PasswordManagementCreditCardItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE65470271FCD40008D1D63 /* PasswordManagementCreditCardItemView.swift */; };
@@ -3724,7 +3724,7 @@
 		4BE41A5D28446EAD00760399 /* BookmarksBarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarViewModel.swift; sourceTree = "<group>"; };
 		4BE53369286912D40019DBFD /* BookmarksBarCollectionViewItem.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = BookmarksBarCollectionViewItem.xib; sourceTree = "<group>"; };
 		4BE5336A286912D40019DBFD /* BookmarksBarCollectionViewItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarksBarCollectionViewItem.swift; sourceTree = "<group>"; };
-		4BE5336D286915A10019DBFD /* LeftAlignedLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LeftAlignedLayout.swift; sourceTree = "<group>"; };
+		4BE5336D286915A10019DBFD /* BookmarksBarCenterAlignedLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarksBarCenterAlignedLayout.swift; sourceTree = "<group>"; };
 		4BE53373286E39F10019DBFD /* ChromiumKeychainPrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromiumKeychainPrompt.swift; sourceTree = "<group>"; };
 		4BE6546E271FCD40008D1D63 /* PasswordManagementIdentityItemView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementIdentityItemView.swift; sourceTree = "<group>"; };
 		4BE65470271FCD40008D1D63 /* PasswordManagementCreditCardItemView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementCreditCardItemView.swift; sourceTree = "<group>"; };
@@ -6442,7 +6442,7 @@
 				848648A02C76F4B20082282D /* BookmarksBarMenuViewController.swift */,
 				4BD18EFF283F0BC500058124 /* BookmarksBarViewController.swift */,
 				4BE41A5D28446EAD00760399 /* BookmarksBarViewModel.swift */,
-				4BE5336D286915A10019DBFD /* LeftAlignedLayout.swift */,
+				4BE5336D286915A10019DBFD /* BookmarksBarCenterAlignedLayout.swift */,
 				8400DC4A2C6E26AE006509D2 /* ItemCachingCollectionView.swift */,
 			);
 			path = View;
@@ -11398,7 +11398,7 @@
 				3706FC94293F65D500E42796 /* FireproofDomains.swift in Sources */,
 				3706FC95293F65D500E42796 /* Database.swift in Sources */,
 				3707C71B294B5D0F00682A9F /* AutofillTabExtension.swift in Sources */,
-				3706FC96293F65D500E42796 /* LeftAlignedLayout.swift in Sources */,
+				3706FC96293F65D500E42796 /* BookmarksBarCenterAlignedLayout.swift in Sources */,
 				3706FC97293F65D500E42796 /* BookmarksOutlineView.swift in Sources */,
 				3706FC98293F65D500E42796 /* CountryList.swift in Sources */,
 				1DEF3BAE2BD145A9004A2FBA /* AutoClearHandler.swift in Sources */,
@@ -12957,7 +12957,7 @@
 				4B02198A25E05FAC00ED7DEA /* FireproofDomains.swift in Sources */,
 				4B677442255DBEEA00025BD8 /* Database.swift in Sources */,
 				1DDC85032B83903E00670238 /* PreferencesWebTrackingProtectionView.swift in Sources */,
-				4BE5336E286915A10019DBFD /* LeftAlignedLayout.swift in Sources */,
+				4BE5336E286915A10019DBFD /* BookmarksBarCenterAlignedLayout.swift in Sources */,
 				B6BCC5232AFCDABB002C5499 /* DataImportSourceViewModel.swift in Sources */,
 				4B92928B26670D1700AD2C21 /* BookmarksOutlineView.swift in Sources */,
 				4BF01C00272AE74C00884A61 /* CountryList.swift in Sources */,
