@@ -53,7 +53,10 @@ extension HomePage.Views {
 
         @State private var addressBarValue: AddressBarTextField.Value = .text("", userTyped: false)
         @State private var scrollPosition: CGFloat = 0
-        @State private var shouldShowSearchBox: Bool = true
+
+        var continueSetUpCardsTopPadding: CGFloat {
+            addressBarModel.shouldShowAddressBar || activeRemoteMessageModel.shouldShowRemoteMessage ? 24 : 0
+        }
 
         func regularHomePageView(includingContinueSetUpCards: Bool) -> some View {
             GeometryReader { geometry in
@@ -120,25 +123,18 @@ extension HomePage.Views {
             max(0, ((Self.settingsPanelWidth + Self.minWindowWidth) - geometry.size.width) / 2)
         }
 
-        var continueSetUpCardsTopPadding: CGFloat {
-            if shouldShowSearchBox || activeRemoteMessageModel.shouldShowRemoteMessage {
-                return 24
-            }
-            return 0
-        }
-
         func innerView(includingContinueSetUpCards: Bool) -> some View {
             VStack(spacing: 32) {
 
-                if !shouldShowSearchBox || !activeRemoteMessageModel.shouldShowRemoteMessage {
+                if !addressBarModel.shouldShowAddressBar || !activeRemoteMessageModel.shouldShowRemoteMessage {
                     Spacer(minLength: 32)
                 }
 
                 Group {
                     remoteMessage()
-                        .padding(.top, shouldShowSearchBox ? 16 : 0)
+                        .padding(.top, addressBarModel.shouldShowAddressBar ? 16 : 0)
 
-                    if shouldShowSearchBox {
+                    if addressBarModel.shouldShowAddressBar {
                         BigSearchBox()
                             .id(Const.searchBarIdentifier)
                     }

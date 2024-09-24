@@ -31,11 +31,10 @@ extension HomePage.Views {
         }
 
         var totalHeight: CGFloat {
-            let spacing = 24.0
 
             var totalHeight = Self.height + 2 * Const.verticalPadding
 
-            if shouldShowSearchBox {
+            if addressBarModel.shouldShowAddressBar {
                 totalHeight += Const.searchBoxVerticalSpacing + BigSearchBox.Const.totalHeight
             }
             return totalHeight
@@ -61,8 +60,6 @@ extension HomePage.Views {
             return colorScheme == .dark ? Color.black.opacity(0.12) : Color.black.opacity(0.05)
         }
 
-        @State private var shouldShowSearchBox: Bool = true
-
         var body: some View {
             GeometryReader { geometry in
                 ZStack {
@@ -71,7 +68,7 @@ extension HomePage.Views {
                             Spacer(minLength: Const.verticalPadding)
 
                             Group {
-                                if shouldShowSearchBox {
+                                if addressBarModel.shouldShowAddressBar {
                                     BigSearchBox(usesFixedColorScheme: false)
                                 }
 

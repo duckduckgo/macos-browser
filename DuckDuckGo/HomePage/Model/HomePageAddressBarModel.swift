@@ -25,7 +25,7 @@ extension HomePage.Models {
     @MainActor
     final class AddressBarModel: ObservableObject {
 
-        @Published var shouldShow: Bool = false
+        @Published var shouldShowAddressBar: Bool = true
         let tabCollectionViewModel: TabCollectionViewModel
         private(set) lazy var addressBarViewController: AddressBarViewController = createAddressBarViewController()
 
@@ -34,7 +34,7 @@ extension HomePage.Models {
         init(tabCollectionViewModel: TabCollectionViewModel, privacyConfigurationManager: PrivacyConfigurationManaging) {
             self.tabCollectionViewModel = tabCollectionViewModel
             privacyConfigurationManager.updatesPublisher.sink { [weak self, weak privacyConfigurationManager] in
-                self?.shouldShow = privacyConfigurationManager?.privacyConfig.isEnabled(featureKey: .adClickAttribution) == true
+                self?.shouldShowAddressBar = privacyConfigurationManager?.privacyConfig.isEnabled(featureKey: .adClickAttribution) == true
             }
             .store(in: &cancellables)
 
