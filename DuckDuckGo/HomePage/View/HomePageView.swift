@@ -18,7 +18,6 @@
 
 import PixelKit
 import RemoteMessaging
-import SwiftUI
 import SwiftUIExtensions
 
 extension HomePage.Views {
@@ -75,8 +74,10 @@ extension HomePage.Views {
                                 }
                                 .coordinateSpace(name: Const.scrollViewCoordinateSpaceName)
                                 .onPreferenceChange(ScrollOffsetPreferenceKey.self, perform: hideSuggestionWindowIfScrolled)
-                                .onChange(of: addressBarModel.value) { value in
-                                    proxy.scrollTo(Const.searchBarIdentifier)
+                                .if(addressBarModel.shouldShowAddressBar) { view in
+                                    view.onChange(of: addressBarModel.value) { _ in
+                                        proxy.scrollTo(Const.searchBarIdentifier)
+                                    }
                                 }
                             }
                         }
@@ -130,12 +131,14 @@ extension HomePage.Views {
                 }
 
                 Group {
-                    remoteMessage()
-                        .padding(.top, addressBarModel.shouldShowAddressBar ? 16 : 0)
-
                     if addressBarModel.shouldShowAddressBar {
+                        remoteMessage()
+                            .padding(.top, 16)
+
                         BigSearchBox()
                             .id(Const.searchBarIdentifier)
+                    } else {
+                        remoteMessage()
                     }
 
                     if includingContinueSetUpCards {
@@ -328,12 +331,11 @@ extension HomePage.Views.RootView {
     }
 
     private func hideSuggestionWindowIfScrolled(_ value: CGFloat) {
-        if abs(scrollPosition - value) > 1 {
-            scrollPosition = value
-            if addressBarModel.addressBarViewController.isSuggestionsWindowVisible {
-                addressBarModel.addressBarViewController.addressBarTextField?.hideSuggestionWindow()
-            }
+        guard addressBarModel.shouldShowAddressBar, abs(scrollPosition - value) > 1 else {
+            return
         }
+        scrollPosition = value
+        addressBarModel.hideSuggestionsWindow()
     }
 
     struct ScrollOffsetPreferenceKey: PreferenceKey {

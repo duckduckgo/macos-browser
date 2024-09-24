@@ -25,61 +25,128 @@ extension HomePage.Models {
     @MainActor
     final class AddressBarModel: ObservableObject {
 
-        @Published var shouldShowAddressBar: Bool
+        @Published var shouldShowAddressBar: Bool {
+            didSet {
+                if shouldShowAddressBar != oldValue {
+                    if shouldShowAddressBar {
+                        addressBarViewController = createAddressBarViewController()
+                    } else {
+                        addressBarViewController = nil
+                        addressBarViewControllerCancellables.removeAll()
+                    }
+                }
+            }
+        }
         @Published var value: AddressBarTextField.Value = .text("", userTyped: false)
 
-        let tabCollectionViewModel: TabCollectionViewModel
-        private(set) lazy var addressBarViewController: AddressBarViewController = createAddressBarViewController()
+        var addressBarTextField: AddressBarTextField? {
+            guard shouldShowAddressBar else {
+                return nil
+            }
+            return addressBarViewController?.addressBarTextField
+        }
 
-        private var cancellables = Set<AnyCancellable>()
+        var isSuggestionsWindowVisible: Bool {
+            guard shouldShowAddressBar else {
+                return false
+            }
+            return addressBarViewController?.isSuggestionsWindowVisible == true
+        }
+
+        func hideSuggestionsWindow() {
+            guard shouldShowAddressBar, isSuggestionsWindowVisible else {
+                return
+            }
+            addressBarTextField?.hideSuggestionWindow()
+        }
+
+        func escapeKeyDown() -> Bool {
+            guard shouldShowAddressBar else {
+                return false
+            }
+            return addressBarViewController?.escapeKeyDown() == true
+        }
+
+        func makeView() -> NSView {
+            guard shouldShowAddressBar else {
+                return NSView()
+            }
+            guard let addressBarViewController else {
+                assertionFailure("addressBarViewController is nil")
+                return NSView()
+            }
+            return addressBarViewController.view
+        }
+
+        let tabCollectionViewModel: TabCollectionViewModel
+
+        private var privacyConfigCancellable: AnyCancellable?
+        private var addressBarViewControllerCancellables = Set<AnyCancellable>()
 
         init(tabCollectionViewModel: TabCollectionViewModel, privacyConfigurationManager: PrivacyConfigurationManaging) {
             self.tabCollectionViewModel = tabCollectionViewModel
             self.shouldShowAddressBar = privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .newTabSearchField)
-            privacyConfigurationManager.updatesPublisher.sink { [weak self, weak privacyConfigurationManager] in
+
+            privacyConfigCancellable = privacyConfigurationManager.updatesPublisher.sink { [weak self, weak privacyConfigurationManager] in
                 self?.shouldShowAddressBar = privacyConfigurationManager?.privacyConfig.isEnabled(featureKey: .newTabSearchField) == true
             }
-            .store(in: &cancellables)
         }
 
-        func createAddressBarViewController() -> AddressBarViewController! {
+        private lazy var addressBarViewController: AddressBarViewController? = createAddressBarViewController()
+
+        private func createAddressBarViewController() -> AddressBarViewController? {
+            let viewController = instantiateFromStoryboard()
+            viewController.isSearchBox = true
+            subscribeToTextFieldValue(viewController)
+            subscribeToCustomBackground(viewController)
+            return viewController
+        }
+
+        private func instantiateFromStoryboard() -> AddressBarViewController {
             let storyboard = NSStoryboard(name: "NavigationBar", bundle: .main)
-            let controller: AddressBarViewController = storyboard.instantiateController(identifier: "AddressBarViewController") { [weak self] coder in
-                guard let self else {
-                    return nil
-                }
-                return AddressBarViewController(coder: coder, tabCollectionViewModel: self.tabCollectionViewModel, isBurner: false, popovers: nil)
-            }
-            controller.loadView()
-
-            let buttonsController: AddressBarButtonsViewController = storyboard.instantiateController(identifier: "AddressBarButtonsViewController") { coder in
-                controller.createAddressBarButtonsViewController(coder)
-            }
-            controller.addAndLayoutChild(buttonsController, into: controller.buttonsContainerView)
-
-            controller.isSearchBox = true
-            if !tabCollectionViewModel.isBurner {
-                Application.appDelegate.homePageSettingsModel.$customBackground
-                    .map(\.?.colorScheme)
-                    .sink { colorScheme in
-                        switch colorScheme {
-                        case .dark:
-                            controller.addressBarTextField.homePagePreferredAppearance = NSAppearance(named: .darkAqua)
-                        case .light:
-                            controller.addressBarTextField.homePagePreferredAppearance = NSAppearance(named: .aqua)
-                        default:
-                            controller.addressBarTextField.homePagePreferredAppearance = nil
-                        }
+            let viewController: AddressBarViewController = storyboard
+                .instantiateController(identifier: "AddressBarViewController") { [weak self] coder in
+                    guard let self else {
+                        return nil
                     }
-                    .store(in: &cancellables)
+                    return AddressBarViewController(coder: coder, tabCollectionViewModel: self.tabCollectionViewModel, isBurner: false, popovers: nil)
+                }
+
+            viewController.loadView()
+
+            let buttonsViewController: AddressBarButtonsViewController = storyboard
+                .instantiateController(identifier: "AddressBarButtonsViewController") { coder in
+                    viewController.createAddressBarButtonsViewController(coder)
+                }
+
+            viewController.addAndLayoutChild(buttonsViewController, into: viewController.buttonsContainerView)
+            return viewController
+        }
+
+        private func subscribeToTextFieldValue(_ viewController: AddressBarViewController) {
+            viewController.addressBarTextField.$value
+                .assign(to: \.value, onWeaklyHeld: self)
+                .store(in: &addressBarViewControllerCancellables)
+        }
+
+        private func subscribeToCustomBackground(_ viewController: AddressBarViewController) {
+            guard !tabCollectionViewModel.isBurner else {
+                return
             }
 
-            controller.addressBarTextField.$value
-                .assign(to: \.value, onWeaklyHeld: self)
-                .store(in: &cancellables)
-
-            return controller
+            Application.appDelegate.homePageSettingsModel.$customBackground
+                .map(\.?.colorScheme)
+                .sink { colorScheme in
+                    switch colorScheme {
+                    case .dark:
+                        viewController.addressBarTextField.homePagePreferredAppearance = NSAppearance(named: .darkAqua)
+                    case .light:
+                        viewController.addressBarTextField.homePagePreferredAppearance = NSAppearance(named: .aqua)
+                    default:
+                        viewController.addressBarTextField.homePagePreferredAppearance = nil
+                    }
+                }
+                .store(in: &addressBarViewControllerCancellables)
         }
     }
-
 }

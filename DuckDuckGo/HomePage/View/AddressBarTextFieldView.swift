@@ -31,7 +31,7 @@ struct AddressBarTextFieldView: NSViewRepresentable {
     }
 
     func makeNSView(context: Context) -> NSView {
-        return addressBarModel.addressBarViewController.view
+        return addressBarModel.makeView()
     }
 
     func updateNSView(_ nsView: NSView, context: Context) {

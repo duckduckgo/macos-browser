@@ -126,9 +126,7 @@ final class HomePageViewController: NSViewController {
     override func viewDidAppear() {
         super.viewDidAppear()
         refreshModels()
-        if isShowingSearchBar {
-            addressBarModel.addressBarViewController.addressBarTextField.makeMeFirstResponder()
-        }
+        addressBarModel.addressBarTextField?.makeMeFirstResponder()
     }
 
     override func viewWillDisappear() {
