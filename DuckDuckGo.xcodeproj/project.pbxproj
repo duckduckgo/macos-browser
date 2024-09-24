@@ -3051,6 +3051,20 @@
 			remoteGlobalIDString = 3706FA6A293F65D500E42796;
 			remoteInfo = "DuckDuckGo Privacy Browser App Store";
 		};
+		37878E502CA2F1B500CC9EB5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4B4BEC1F2A11B4E2001D9AC5;
+			remoteInfo = DuckDuckGoNotifications;
+		};
+		37878E522CA2F1C800CC9EB5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4B2D06382A11CFBA00DE1F49;
+			remoteInfo = DuckDuckGoVPN;
+		};
 		4BA7C4DE2B3F6F4900AFE511 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
@@ -9689,6 +9703,8 @@
 			buildRules = (
 			);
 			dependencies = (
+				37878E532CA2F1C800CC9EB5 /* PBXTargetDependency */,
+				37878E512CA2F1B500CC9EB5 /* PBXTargetDependency */,
 				7B4627742B9AF2C8004ACE0B /* PBXTargetDependency */,
 				4B5F14FC2A15291D0060320F /* PBXTargetDependency */,
 				31C6E9AD2B0C07BA0086DC30 /* PBXTargetDependency */,
@@ -13371,6 +13387,16 @@
 			isa = PBXTargetDependency;
 			target = 3706FA6A293F65D500E42796 /* DuckDuckGo Privacy Browser App Store */;
 			targetProxy = 376113D52B29CD6800E794BB /* PBXContainerItemProxy */;
+		};
+		37878E512CA2F1B500CC9EB5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4B4BEC1F2A11B4E2001D9AC5 /* DuckDuckGoNotifications */;
+			targetProxy = 37878E502CA2F1B500CC9EB5 /* PBXContainerItemProxy */;
+		};
+		37878E532CA2F1C800CC9EB5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4B2D06382A11CFBA00DE1F49 /* DuckDuckGoVPN */;
+			targetProxy = 37878E522CA2F1C800CC9EB5 /* PBXContainerItemProxy */;
 		};
 		4B4BEC4A2A11B627001D9AC5 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
