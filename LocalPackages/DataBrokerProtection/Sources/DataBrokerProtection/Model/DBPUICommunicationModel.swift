@@ -189,16 +189,9 @@ extension DBPUIDataBrokerProfileMatch {
         let estimatedRemovalDate = Calendar.current.date(byAdding: .day, value: 14, to: optOutSubmittedDate ?? foundDate)
 
         // Check for any matching records on the parent broker
-        var hasFoundParentMatch = false
-        if let parentBrokerOptOutJobData = parentBrokerOptOutJobData {
-            for parentOptOut in parentBrokerOptOutJobData {
-                let parentProfile = parentOptOut.extractedProfile
-                if extractedProfile.doesMatchExtractedProfile(parentProfile) {
-                    hasFoundParentMatch = true
-                    break
-                }
-            }
-        }
+        let hasFoundParentMatch = parentBrokerOptOutJobData?.contains { parentOptOut in
+            extractedProfile.doesMatchExtractedProfile(parentOptOut.extractedProfile)
+        } ?? false
 
         self.init(dataBroker: DBPUIDataBroker(name: dataBrokerName, url: dataBrokerURL, parentURL: dataBrokerParentURL),
                   name: extractedProfile.fullName ?? "No name",
