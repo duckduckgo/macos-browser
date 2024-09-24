@@ -38,6 +38,8 @@ public struct TiledImageView: View {
     }
 
     private func createTiledImage(rows: Int, columns: Int) -> some View {
+        /// Using ScrollView with LazyVStack and LazyHStack for performance benefits
+        /// when rendering a large number of tiles.
         ScrollView([.vertical, .horizontal], showsIndicators: false) {
             LazyVStack(spacing: 0) {
                 ForEach(0..<rows, id: \.self) { _ in
