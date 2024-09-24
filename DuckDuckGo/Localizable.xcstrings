@@ -55180,6 +55180,18 @@
         }
       }
     },
+    "settings.preparing.update" : {
+      "comment" : "Label informing users the app is preparing to update.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Preparing update"
+          }
+        }
+      }
+    },
     "settings.restart.to.update" : {
       "comment" : "Button label triggering restart and update of the application.",
       "extractionState" : "extracted_with_value",

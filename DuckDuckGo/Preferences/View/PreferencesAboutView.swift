@@ -193,7 +193,7 @@ extension Preferences {
                 Text(" — " + String(format: UserText.downloadingUpdate,
                                     formatter.string(from: NSNumber(value: percentage)) ?? ""))
             case .extractionDidStart, .extracting, .readyToInstallAndRelaunch, .installationDidStart, .installing:
-                Text(" — " + String(format: UserText.downloadingUpdate, "100%"))
+                Text(" — " + UserText.preparingUpdate)
             case .updaterError:
                 Text(" — " + UserText.updateFailed)
             case .updateCycleNotStarted, .updateCycleDone:
