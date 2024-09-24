@@ -42,7 +42,7 @@ extension HomePage.Views {
         }
 
         @Environment(\.colorScheme) var colorScheme
-        @EnvironmentObject var addressBarViewController: AddressBarViewController
+        @EnvironmentObject var addressBarModel: HomePage.Models.AddressBarModel
 
         let backgroundColor = Color(.newTabPageBackground)
         private var infoBackgroundColor: Color {

@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Cocoa
 import Combine
 import SwiftUI
@@ -45,11 +46,14 @@ final class HomePageViewController: NSViewController {
     var recentlyVisitedModel: HomePage.Models.RecentlyVisitedModel!
     var featuresModel: HomePage.Models.ContinueSetUpModel!
     let settingsVisibilityModel = HomePage.Models.SettingsVisibilityModel()
-    var addressBarViewController: AddressBarViewController!
+    private(set) var addressBarModel: HomePage.Models.AddressBarModel!
     let accessibilityPreferences: AccessibilityPreferences
     let appearancePreferences: AppearancePreferences
     let defaultBrowserPreferences: DefaultBrowserPreferences
+    let privacyConfigurationManager: PrivacyConfigurationManaging
     var cancellables = Set<AnyCancellable>()
+
+    private var isShowingSearchBar: Bool = false
 
     @UserDefaultsWrapper(key: .defaultBrowserDismissed, defaultValue: false)
     var defaultBrowserDismissed: Bool
@@ -65,7 +69,8 @@ final class HomePageViewController: NSViewController {
          onboardingViewModel: OnboardingViewModel = OnboardingViewModel(),
          accessibilityPreferences: AccessibilityPreferences = AccessibilityPreferences.shared,
          appearancePreferences: AppearancePreferences = AppearancePreferences.shared,
-         defaultBrowserPreferences: DefaultBrowserPreferences = DefaultBrowserPreferences.shared) {
+         defaultBrowserPreferences: DefaultBrowserPreferences = DefaultBrowserPreferences.shared,
+         privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.bookmarkManager = bookmarkManager
@@ -75,6 +80,7 @@ final class HomePageViewController: NSViewController {
         self.accessibilityPreferences = accessibilityPreferences
         self.appearancePreferences = appearancePreferences
         self.defaultBrowserPreferences = defaultBrowserPreferences
+        self.privacyConfigurationManager = privacyConfigurationManager
 
         super.init(nibName: nil, bundle: nil)
     }
@@ -84,7 +90,7 @@ final class HomePageViewController: NSViewController {
         defaultBrowserModel = createDefaultBrowserModel()
         recentlyVisitedModel = createRecentlyVisitedModel()
         featuresModel = createFeatureModel()
-        addressBarViewController = createAddressBarViewController()
+        addressBarModel = createAddressBarModel()
 
         refreshModels()
 
@@ -98,7 +104,7 @@ final class HomePageViewController: NSViewController {
             .environmentObject(appearancePreferences)
             .environmentObject(Application.appDelegate.activeRemoteMessageModel)
             .environmentObject(settingsVisibilityModel)
-            .environmentObject(addressBarViewController)
+            .environmentObject(addressBarModel)
 
         self.view = NSHostingView(rootView: rootView)
     }
@@ -120,7 +126,9 @@ final class HomePageViewController: NSViewController {
     override func viewDidAppear() {
         super.viewDidAppear()
         refreshModels()
-        addressBarViewController.addressBarTextField.makeMeFirstResponder()
+        if isShowingSearchBar {
+            addressBarModel.addressBarViewController.addressBarTextField.makeMeFirstResponder()
+        }
     }
 
     override func viewWillDisappear() {
@@ -199,39 +207,11 @@ final class HomePageViewController: NSViewController {
         })
     }
 
-    func createAddressBarViewController() -> AddressBarViewController {
-        let storyboard = NSStoryboard(name: "NavigationBar", bundle: .main)
-        let controller: AddressBarViewController = storyboard.instantiateController(identifier: "AddressBarViewController") { [weak self] coder in
-            guard let self else {
-                return nil
-            }
-            return AddressBarViewController(coder: coder, tabCollectionViewModel: self.tabCollectionViewModel, isBurner: false, popovers: nil)
-        }
-        controller.loadView()
-
-        let buttonsController: AddressBarButtonsViewController = storyboard.instantiateController(identifier: "AddressBarButtonsViewController") { coder in
-            controller.createAddressBarButtonsViewController(coder)
-        }
-        controller.addAndLayoutChild(buttonsController, into: controller.buttonsContainerView)
-
-        controller.isSearchBox = true
-        if !tabCollectionViewModel.isBurner {
-            Application.appDelegate.homePageSettingsModel.$customBackground
-                .map(\.?.colorScheme)
-                .sink { colorScheme in
-                    switch colorScheme {
-                    case .dark:
-                        controller.addressBarTextField.homePagePreferredAppearance = NSAppearance(named: .darkAqua)
-                    case .light:
-                        controller.addressBarTextField.homePagePreferredAppearance = NSAppearance(named: .aqua)
-                    default:
-                        controller.addressBarTextField.homePagePreferredAppearance = nil
-                    }
-                }
-                .store(in: &cancellables)
-        }
-
-        return controller
+    func createAddressBarModel() -> HomePage.Models.AddressBarModel {
+        HomePage.Models.AddressBarModel(
+            tabCollectionViewModel: tabCollectionViewModel,
+            privacyConfigurationManager: privacyConfigurationManager
+        )
     }
 
     func refreshFavoritesModel() {

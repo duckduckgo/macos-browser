@@ -36,7 +36,7 @@ extension HomePage.Views {
         @EnvironmentObject var settingsModel: HomePage.Models.SettingsModel
         @EnvironmentObject var activeRemoteMessageModel: ActiveRemoteMessageModel
         @EnvironmentObject var settingsVisibilityModel: HomePage.Models.SettingsVisibilityModel
-        @EnvironmentObject var addressBarViewController: AddressBarViewController
+        @EnvironmentObject var addressBarModel: HomePage.Models.AddressBarModel
 
         var body: some View {
             if isBurner {
@@ -73,7 +73,7 @@ extension HomePage.Views {
                                 }
                                 .coordinateSpace(name: Const.scrollViewCoordinateSpaceName)
                                 .onPreferenceChange(ScrollOffsetPreferenceKey.self, perform: hideSuggestionWindowIfScrolled)
-                                .onChange(of: addressBarViewController.addressBarTextField.value) { _ in
+                                .onChange(of: addressBarModel.addressBarViewController.addressBarTextField.value) { _ in
                                     proxy.scrollTo(Const.searchBarIdentifier)
                                 }
                             }
@@ -335,8 +335,8 @@ extension HomePage.Views.RootView {
     private func hideSuggestionWindowIfScrolled(_ value: CGFloat) {
         if abs(scrollPosition - value) > 1 {
             scrollPosition = value
-            if addressBarViewController.isSuggestionsWindowVisible {
-                addressBarViewController.addressBarTextField?.hideSuggestionWindow()
+            if addressBarModel.addressBarViewController.isSuggestionsWindowVisible {
+                addressBarModel.addressBarViewController.addressBarTextField?.hideSuggestionWindow()
             }
         }
     }

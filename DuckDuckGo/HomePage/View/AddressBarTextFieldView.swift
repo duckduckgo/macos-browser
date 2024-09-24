@@ -21,7 +21,7 @@ import SwiftUIExtensions
 
 struct AddressBarTextFieldView: NSViewRepresentable {
 
-    @EnvironmentObject var addressBarViewController: AddressBarViewController
+    @EnvironmentObject var addressBarModel: HomePage.Models.AddressBarModel
     @EnvironmentObject var settingsModel: HomePage.Models.SettingsModel
 
     let usesFixedColorScheme: Bool
@@ -31,7 +31,7 @@ struct AddressBarTextFieldView: NSViewRepresentable {
     }
 
     func makeNSView(context: Context) -> NSView {
-        return addressBarViewController.view
+        return addressBarModel.addressBarViewController.view
     }
 
     func updateNSView(_ nsView: NSView, context: Context) {
