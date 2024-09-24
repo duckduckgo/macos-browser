@@ -51,7 +51,6 @@ extension HomePage.Views {
             static let searchBarIdentifier = "search bar"
         }
 
-        @State private var addressBarValue: AddressBarTextField.Value = .text("", userTyped: false)
         @State private var scrollPosition: CGFloat = 0
 
         var continueSetUpCardsTopPadding: CGFloat {
@@ -76,7 +75,7 @@ extension HomePage.Views {
                                 }
                                 .coordinateSpace(name: Const.scrollViewCoordinateSpaceName)
                                 .onPreferenceChange(ScrollOffsetPreferenceKey.self, perform: hideSuggestionWindowIfScrolled)
-                                .onChange(of: addressBarModel.addressBarViewController.addressBarTextField.value) { _ in
+                                .onChange(of: addressBarModel.value) { value in
                                     proxy.scrollTo(Const.searchBarIdentifier)
                                 }
                             }

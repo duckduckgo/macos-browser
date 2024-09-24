@@ -26,6 +26,8 @@ extension HomePage.Models {
     final class AddressBarModel: ObservableObject {
 
         @Published var shouldShowAddressBar: Bool
+        @Published var value: AddressBarTextField.Value = .text("", userTyped: false)
+
         let tabCollectionViewModel: TabCollectionViewModel
         private(set) lazy var addressBarViewController: AddressBarViewController = createAddressBarViewController()
 
@@ -71,6 +73,10 @@ extension HomePage.Models {
                     }
                     .store(in: &cancellables)
             }
+
+            controller.addressBarTextField.$value
+                .assign(to: \.value, onWeaklyHeld: self)
+                .store(in: &cancellables)
 
             return controller
         }
