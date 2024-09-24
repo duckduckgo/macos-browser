@@ -29,22 +29,30 @@ public struct TiledImageView: View {
 
     public var body: some View {
         GeometryReader { geometry in
-            self.createTiledImage(in: geometry.size)
+            let rows = Int(ceil(geometry.size.height / tileSize.height))
+            let columns = Int(ceil(geometry.size.width / tileSize.width))
+            createTiledImage(rows: rows, columns: columns)
+                .frame(width: geometry.size.width, height: geometry.size.height)
+                .clipped()
         }
     }
 
-    private func createTiledImage(in size: CGSize) -> some View {
-        let rows = Int(ceil(size.height / tileSize.height))
-        let columns = Int(ceil(size.width / tileSize.width))
-
-        return ForEach(0..<rows, id: \.self) { row in
-            ForEach(0..<columns, id: \.self) { column in
-                self.image
-                    .resizable()
-                    .frame(width: tileSize.width, height: tileSize.height)
-                    .position(x: CGFloat(column) * tileSize.width + tileSize.width / 2,
-                              y: CGFloat(row) * tileSize.height + tileSize.height / 2)
+    private func createTiledImage(rows: Int, columns: Int) -> some View {
+        /// Using ScrollView with LazyVStack and LazyHStack for performance benefits
+        /// when rendering a large number of tiles.
+        ScrollView([.vertical, .horizontal], showsIndicators: false) {
+            LazyVStack(spacing: 0) {
+                ForEach(0..<rows, id: \.self) { _ in
+                    LazyHStack(spacing: 0) {
+                        ForEach(0..<columns, id: \.self) { _ in
+                            self.image
+                                .resizable()
+                                .frame(width: tileSize.width, height: tileSize.height)
+                        }
+                    }
+                }
             }
         }
+        .disabled(true)
     }
 }
