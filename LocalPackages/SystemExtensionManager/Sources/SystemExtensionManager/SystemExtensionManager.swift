@@ -47,21 +47,9 @@ public struct SystemExtensionManager {
     /// - Returns: The system extension version when it's updated, otherwise `nil`.
     ///
     public func activate(waitingForUserApproval: @escaping () -> Void) async throws -> String? {
-        /// Documenting a workaround for the issue discussed in https://app.asana.com/0/0/1205275221447702/f
-        ///     Background: For a lot of users, the system won't show the system-extension-blocked alert if there's a previous request
-        ///         to activate the extension.  You can see active requests in your console using command `systemextensionsctl list`.
-        ///
-        ///     Proposed workaround: Just open system settings into the right section when we detect a previous activation request already exists.
-        ///
-        ///     Tradeoffs: Unfortunately we don't know if the previous request was sent out by the currently runing-instance of this App
-        ///         or if an activation request was made, and then the App was reopened.
-        ///         This means we don't know if we'll be notified when the previous activation request completes or fails.  Because we
-        ///         need to update our UI once the extension is allowed, we can't avoid sending a new activation request every time.
-        ///         For the users that don't see the alert come up more than once this should be invisible.  For users (like myself) that
-        ///         see the alert every single time, they'll see both the alert and system settings being opened automatically.
-        ///
-        if hasPendingActivationRequests() {
-            openSystemSettingsSecurity()
+
+        if #unavailable(macOS 15) {
+            workaroundToActivateBeforeSequoia()
         }
 
         let activationRequest = SystemExtensionRequest.activationRequest(
@@ -72,6 +60,47 @@ public struct SystemExtensionManager {
         try await activationRequest.submit()
 
         return activationRequest.version
+    }
+
+    /// Workaround to help make activation easier for users.
+    ///
+    /// ## Starting on macOS 15:
+    /// This workaround is not necessary on macOS 15 or later.  We show the
+    /// activation request each time just fine, and dismissing it won't
+    /// open System Settings.
+    ///
+    /// In Sequoia the onboarding step instructs the user to click the right
+    /// button, which is a cleaner approach.
+    ///
+    /// ## Before macOS 15
+    ///
+    /// Documenting a workaround for the issue discussed in https://app.asana.com/0/0/1205275221447702/f
+    ///
+    /// ## Background:
+    ///
+    /// For a lot of users, the system won't show the system-extension-blocked alert if there's a previous request
+    /// to activate the extension.  You can see active requests in your console using command
+    /// `systemextensionsctl list`.
+    ///
+    /// Proposed workaround: Just open system settings into the right section when we detect a previous
+    /// activation request already exists.
+    ///
+    /// ## Tradeoffs
+    ///
+    /// Unfortunately we don't know if the previous request was sent out by the currently runing-instance of this App
+    /// or if an activation request was made, and then the App was reopened.
+    ///
+    /// This means we don't know if we'll be notified when the previous activation request completes or fails.  Because we
+    /// need to update our UI once the extension is allowed, we can't avoid sending a new activation request every time.
+    ///
+    /// For the users that don't see the alert come up more than once this should be invisible.  For users (like myself) that
+    /// see the alert every single time, they'll see both the alert and system settings being opened automatically.
+    ///
+    @available(macOS, introduced: 11, obsoleted: 15, message: "No longer used")
+    private func workaroundToActivateBeforeSequoia() {
+        if hasPendingActivationRequests() {
+            openSystemSettingsSecurity()
+        }
     }
 
     public func deactivate() async throws {
