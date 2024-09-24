@@ -28,7 +28,13 @@ public enum SystemExtensionRequestError: Error {
 
 public struct SystemExtensionManager {
 
-    private static let systemSettingsSecurityURL = "x-apple.systempreferences:com.apple.preference.security?Security"
+    private static var systemSettingsSecurityURL: String {
+        if #available(macOS 15, *) {
+            return "x-apple.systempreferences:com.apple.LoginItems-Settings.extension?ExtensionItems"
+        } else {
+            return "x-apple.systempreferences:com.apple.preference.security?Security"
+        }
+    }
 
     private let extensionBundleID: String
     private let manager: OSSystemExtensionManager
@@ -48,9 +54,7 @@ public struct SystemExtensionManager {
     ///
     public func activate(waitingForUserApproval: @escaping () -> Void) async throws -> String? {
 
-        if #unavailable(macOS 15) {
-            workaroundToActivateBeforeSequoia()
-        }
+        workaroundToActivateBeforeSequoia()
 
         let activationRequest = SystemExtensionRequest.activationRequest(
             forExtensionWithIdentifier: extensionBundleID,
@@ -63,16 +67,6 @@ public struct SystemExtensionManager {
     }
 
     /// Workaround to help make activation easier for users.
-    ///
-    /// ## Starting on macOS 15:
-    /// This workaround is not necessary on macOS 15 or later.  We show the
-    /// activation request each time just fine, and dismissing it won't
-    /// open System Settings.
-    ///
-    /// In Sequoia the onboarding step instructs the user to click the right
-    /// button, which is a cleaner approach.
-    ///
-    /// ## Before macOS 15
     ///
     /// Documenting a workaround for the issue discussed in https://app.asana.com/0/0/1205275221447702/f
     ///
@@ -96,7 +90,6 @@ public struct SystemExtensionManager {
     /// For the users that don't see the alert come up more than once this should be invisible.  For users (like myself) that
     /// see the alert every single time, they'll see both the alert and system settings being opened automatically.
     ///
-    @available(macOS, introduced: 11, obsoleted: 15, message: "No longer used")
     private func workaroundToActivateBeforeSequoia() {
         if hasPendingActivationRequests() {
             openSystemSettingsSecurity()
@@ -215,19 +208,23 @@ extension SystemExtensionRequest: OSSystemExtensionRequestDelegate {
         case .completed:
             updateVersionNumberIfMissing()
             continuation?.resume()
+            continuation = nil
         case .willCompleteAfterReboot:
             continuation?.resume(throwing: SystemExtensionRequestError.willActivateAfterReboot)
+            continuation = nil
             return
         @unknown default:
             // Not much we can do about this, so we just let the owning app decide
             // what to do about this.
             continuation?.resume(throwing: SystemExtensionRequestError.unknownRequestResult)
+            continuation = nil
             return
         }
     }
 
     func request(_ request: OSSystemExtensionRequest, didFailWithError error: Error) {
         continuation?.resume(throwing: error)
+        continuation = nil
     }
 
 }
