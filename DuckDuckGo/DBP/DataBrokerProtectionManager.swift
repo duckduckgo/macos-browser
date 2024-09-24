@@ -72,6 +72,7 @@ public final class DataBrokerProtectionManager {
 }
 
 extension DataBrokerProtectionManager: DataBrokerProtectionDataManagerDelegate {
+
     public func dataBrokerProtectionDataManagerDidUpdateData() {
         loginItemInterface.profileSaved()
     }
@@ -82,5 +83,9 @@ extension DataBrokerProtectionManager: DataBrokerProtectionDataManagerDelegate {
 
     public func dataBrokerProtectionDataManagerWillOpenSendFeedbackForm() {
         NotificationCenter.default.post(name: .OpenUnifiedFeedbackForm, object: nil, userInfo: UnifiedFeedbackSource.userInfo(source: .pir))
+    }
+
+    public func isAuthenticatedUser() -> Bool {
+        isUserAuthenticated()
     }
 }
