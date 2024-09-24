@@ -85,7 +85,7 @@ extension MirrorSite {
     func scannedBroker(withStatus status: ScannedBroker.Status) -> ScannedBroker {
         ScannedBroker(name: name, url: url, status: status)
     }
-    
+
     /// Determines whether a mirror site should be included in scan result calculations based on the provided date.
     ///
     /// - Parameter date: The date for which to check if the mirror site should be included. Defaults to the current date.
