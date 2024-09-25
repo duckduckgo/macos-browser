@@ -39,6 +39,7 @@ protocol DBPUICommunicationDelegate: AnyObject {
     func getMaintananceScanState() async -> DBPUIScanAndOptOutMaintenanceState
     func getDataBrokers() async -> [DBPUIDataBroker]
     func getBackgroundAgentMetadata() async -> DBPUIDebugMetadata
+    func openSendFeedbackModal() async
 }
 
 enum DBPUIReceivedMethodName: String {
@@ -58,6 +59,8 @@ enum DBPUIReceivedMethodName: String {
     case maintenanceScanStatus
     case getDataBrokers
     case getBackgroundAgentMetadata
+    case getFeatureConfig
+    case openSendFeedbackModal
 }
 
 enum DBPUISendableMethodName: String {
@@ -66,6 +69,7 @@ enum DBPUISendableMethodName: String {
 
 struct DBPUICommunicationLayer: Subfeature {
     private let webURLSettings: DataBrokerProtectionWebUIURLSettingsRepresentable
+    private let privacyConfig: PrivacyConfigurationManaging
 
     var messageOriginPolicy: MessageOriginPolicy
     var featureName: String = "dbpuiCommunication"
@@ -74,11 +78,13 @@ struct DBPUICommunicationLayer: Subfeature {
     weak var delegate: DBPUICommunicationDelegate?
 
     private enum Constants {
-        static let version = 4
+        static let version = 5
     }
 
-    internal init(webURLSettings: DataBrokerProtectionWebUIURLSettingsRepresentable) {
+    internal init(webURLSettings: DataBrokerProtectionWebUIURLSettingsRepresentable,
+                  privacyConfig: PrivacyConfigurationManaging) {
         self.webURLSettings = webURLSettings
+        self.privacyConfig = privacyConfig
         self.messageOriginPolicy = .only(rules: [
             .exact(hostname: webURLSettings.selectedURLHostname)
         ])
@@ -107,6 +113,8 @@ struct DBPUICommunicationLayer: Subfeature {
         case .maintenanceScanStatus: return maintenanceScanStatus
         case .getDataBrokers: return getDataBrokers
         case .getBackgroundAgentMetadata: return getBackgroundAgentMetadata
+        case .getFeatureConfig: return getFeatureConfig
+        case .openSendFeedbackModal: return openSendFeedbackModal
         }
 
     }
@@ -290,5 +298,14 @@ struct DBPUICommunicationLayer: Subfeature {
 
     func sendMessageToUI(method: DBPUISendableMethodName, params: DBPUISendableMessage, into webView: WKWebView) {
         broker?.push(method: method.rawValue, params: params, for: self, into: webView)
+    }
+
+    func getFeatureConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        [PrivacyProSubfeature.useUnifiedFeedback.rawValue: privacyConfig.privacyConfig.isSubfeatureEnabled(PrivacyProSubfeature.useUnifiedFeedback)]
+    }
+
+    func openSendFeedbackModal(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        await delegate?.openSendFeedbackModal()
+        return nil
     }
 }
