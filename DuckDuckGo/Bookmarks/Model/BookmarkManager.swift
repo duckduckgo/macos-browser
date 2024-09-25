@@ -170,7 +170,7 @@ final class LocalBookmarkManager: BookmarkManager {
     }
 
     private func findBookmark(forVariantUrl url: URL) -> Bookmark? {
-        let urlVariants = url.bookmarkButtonVariants()
+        let urlVariants = url.bookmarkButtonUrlVariants()
 
         for variant in urlVariants {
             if let bookmark = getBookmark(for: variant) {
