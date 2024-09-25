@@ -28,7 +28,7 @@ final class AddressBarViewController: NSViewController, ObservableObject {
     @IBOutlet var inactiveBackgroundView: NSView!
     @IBOutlet var activeBackgroundView: ColorView!
     @IBOutlet var activeOuterBorderView: ColorView!
-    @IBOutlet var activeBackgroundViewWithSuggestions: NSView!
+    @IBOutlet var activeBackgroundViewWithSuggestions: ColorView!
     @IBOutlet var progressIndicator: LoadingProgressView!
     @IBOutlet var passiveTextFieldMinXConstraint: NSLayoutConstraint!
     @IBOutlet var activeTextFieldMinXConstraint: NSLayoutConstraint!
@@ -328,9 +328,14 @@ final class AddressBarViewController: NSViewController, ObservableObject {
         activeBackgroundView.alphaValue = isFirstResponderOrBigSearchBox ? 1 : 0
 
         if isSearchBox {
-            activeBackgroundView.borderColor = .clear
-            activeBackgroundView.borderWidth = 0
-            activeOuterBorderView.isHidden = true
+            let appearance = addressBarTextField.homePagePreferredAppearance ?? NSApp.effectiveAppearance
+
+            appearance.performAsCurrentDrawingAppearance {
+                activeOuterBorderView.isHidden = true
+                activeBackgroundView.borderWidth = 1.0
+                activeBackgroundView.borderColor = NSColor.homePageAddressBarBorder
+                activeBackgroundView.backgroundColor = NSColor.homePageAddressBarBackground
+            }
         } else {
             let isKey = self.view.window?.isKeyWindow == true
             activeOuterBorderView.alphaValue = isKey && isFirstResponder && isHomePage ? 1 : 0
@@ -394,23 +399,25 @@ final class AddressBarViewController: NSViewController, ObservableObject {
 
             appearance.performAsCurrentDrawingAppearance {
                 activeOuterBorderView.isHidden = true
-                activeBackgroundView.layer?.borderWidth = 0
-                activeBackgroundView.layer?.borderColor = nil
-                activeBackgroundView.layer?.backgroundColor = NSColor.addressBarBackground.cgColor
+                activeBackgroundView.borderWidth = 1.0
+                activeBackgroundView.borderColor = NSColor.homePageAddressBarBorder
+                activeBackgroundView.backgroundColor = NSColor.homePageAddressBarBackground
+                activeBackgroundViewWithSuggestions.borderColor = NSColor.homePageAddressBarBorder
+                activeBackgroundViewWithSuggestions.backgroundColor = NSColor.homePageAddressBarBackground
             }
 
         } else {
             NSAppearance.withAppAppearance {
                 if window.isKeyWindow {
-                    activeBackgroundView.layer?.borderWidth = 2.0
-                    activeBackgroundView.layer?.borderColor = accentColor.withAlphaComponent(0.6).cgColor
-                    activeBackgroundView.layer?.backgroundColor = NSColor.addressBarBackground.cgColor
+                    activeBackgroundView.borderWidth = 2.0
+                    activeBackgroundView.borderColor = accentColor.withAlphaComponent(0.6)
+                    activeBackgroundView.backgroundColor = NSColor.addressBarBackground
 
                     activeOuterBorderView.isHidden = !isHomePage
                 } else {
-                    activeBackgroundView.layer?.borderWidth = 0
-                    activeBackgroundView.layer?.borderColor = nil
-                    activeBackgroundView.layer?.backgroundColor = NSColor.inactiveSearchBarBackground.cgColor
+                    activeBackgroundView.borderWidth = 0
+                    activeBackgroundView.borderColor = nil
+                    activeBackgroundView.backgroundColor = NSColor.inactiveSearchBarBackground
 
                     activeOuterBorderView.isHidden = true
                 }
