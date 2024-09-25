@@ -29,8 +29,8 @@ final class TabBarCollectionView: NSCollectionView {
     override func awakeFromNib() {
         super.awakeFromNib()
 
-        let nib = NSNib(nibNamed: "TabBarViewItem", bundle: nil)
-        register(nib, forItemWithIdentifier: TabBarViewItem.identifier)
+        register(TabBarViewItem.self, forItemWithIdentifier: TabBarViewItem.identifier)
+        register(TabBarFooter.self, forSupplementaryViewOfKind: NSCollectionView.elementKindSectionFooter, withIdentifier: TabBarFooter.identifier)
 
         // Register for the dropped object types we can accept.
         registerForDraggedTypes([.URL, .fileURL, TabBarViewItemPasteboardWriter.utiInternalType, .string])
@@ -95,6 +95,7 @@ final class TabBarCollectionView: NSCollectionView {
             (item(at: leftToSelectionIndexPath) as? TabBarViewItem)?.isLeftToSelected = true
         }
     }
+
 }
 
 extension NSCollectionView {

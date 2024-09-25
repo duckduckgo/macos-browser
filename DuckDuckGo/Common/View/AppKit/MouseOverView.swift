@@ -21,18 +21,18 @@ import Combine
 
 @objc protocol MouseOverViewDelegate: AnyObject {
 
-    @objc optional func mouseOverView(_ mouseOverView: MouseOverView, isMouseOver: Bool)
+    @objc @MainActor optional func mouseOverView(_ mouseOverView: MouseOverView, isMouseOver: Bool)
 
-    @objc optional func mouseClickView(_ mouseClickView: MouseClickView, mouseDownEvent: NSEvent)
-    @objc optional func mouseClickView(_ mouseClickView: MouseClickView, mouseUpEvent: NSEvent)
-    @objc optional func mouseClickView(_ mouseClickView: MouseClickView, rightMouseDownEvent: NSEvent)
-    @objc optional func mouseClickView(_ mouseClickView: MouseClickView, otherMouseDownEvent: NSEvent)
+    @objc @MainActor optional func mouseClickView(_ mouseClickView: MouseClickView, mouseDownEvent: NSEvent)
+    @objc @MainActor optional func mouseClickView(_ mouseClickView: MouseClickView, mouseUpEvent: NSEvent)
+    @objc @MainActor optional func mouseClickView(_ mouseClickView: MouseClickView, rightMouseDownEvent: NSEvent)
+    @objc @MainActor optional func mouseClickView(_ mouseClickView: MouseClickView, otherMouseDownEvent: NSEvent)
 
-    @objc optional func mouseOverView(_ sender: MouseOverView, draggingEntered info: NSDraggingInfo, isMouseOver: UnsafeMutablePointer<Bool>) -> NSDragOperation
-    @objc optional func mouseOverView(_ sender: MouseOverView, draggingUpdatedWith info: NSDraggingInfo, isMouseOver: UnsafeMutablePointer<Bool>) -> NSDragOperation
-    @objc optional func mouseOverView(_ sender: MouseOverView, performDragOperation info: NSDraggingInfo) -> Bool
-    @objc optional func mouseOverView(_ sender: MouseOverView, draggingEndedWith info: NSDraggingInfo)
-    @objc optional func mouseOverView(_ sender: MouseOverView, draggingExitedWith info: NSDraggingInfo?)
+    @objc @MainActor optional func mouseOverView(_ sender: MouseOverView, draggingEntered info: NSDraggingInfo, isMouseOver: UnsafeMutablePointer<Bool>) -> NSDragOperation
+    @objc @MainActor optional func mouseOverView(_ sender: MouseOverView, draggingUpdatedWith info: NSDraggingInfo, isMouseOver: UnsafeMutablePointer<Bool>) -> NSDragOperation
+    @objc @MainActor optional func mouseOverView(_ sender: MouseOverView, performDragOperation info: NSDraggingInfo) -> Bool
+    @objc @MainActor optional func mouseOverView(_ sender: MouseOverView, draggingEndedWith info: NSDraggingInfo)
+    @objc @MainActor optional func mouseOverView(_ sender: MouseOverView, draggingExitedWith info: NSDraggingInfo?)
 
 }
 typealias MouseClickViewDelegate = MouseOverViewDelegate
@@ -52,6 +52,15 @@ internal class MouseOverView: NSControl, Hoverable {
     @IBInspectable dynamic var backgroundColor: NSColor?
 
     @IBInspectable dynamic var cornerRadius: CGFloat = 0.0
+    var maskedCorners: CACornerMask {
+        get {
+            backgroundLayer(createIfNeeded: true)?.maskedCorners ?? []
+        }
+        set {
+            backgroundLayer(createIfNeeded: true)?.maskedCorners = newValue
+        }
+    }
+
     @IBInspectable dynamic var backgroundInset: NSPoint = .zero
     @IBInspectable dynamic var mouseDownColor: NSColor?
 

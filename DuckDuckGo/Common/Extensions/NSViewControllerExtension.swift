@@ -92,19 +92,19 @@ extension NSViewController {
         view.removeFromSuperview()
     }
 
-    func withoutAnimation(_ closure: () -> Void) {
-        CATransaction.begin()
-        CATransaction.setDisableActions(true)
-        closure()
-        CATransaction.commit()
-    }
-
     /// #Preview helper to hide Window controls on View Controller appearance
     func _preview_hidingWindowControlsOnAppear() -> Self { // swiftlint:disable:this identifier_name
         Preview_ViewControllerWindowObserver().attach(to: self)
         return self
     }
 
+}
+
+func withoutAnimation(_ closure: () -> Void) {
+    CATransaction.begin()
+    CATransaction.setDisableActions(true)
+    closure()
+    CATransaction.commit()
 }
 
 /// #Preview helper to hide Window controls on View Controller appearance
