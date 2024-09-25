@@ -21,6 +21,7 @@ import AppKit
 import Bookmarks
 import Common
 import PixelKit
+import os.log
 
 protocol AppearancePreferencesPersistor {
     var showFullURL: Bool { get set }
@@ -32,6 +33,7 @@ protocol AppearancePreferencesPersistor {
     var showBookmarksBar: Bool { get set }
     var bookmarksBarAppearance: BookmarksBarAppearance { get set }
     var homeButtonPosition: HomeButtonPosition { get set }
+    var homePageCustomBackground: String? { get set }
 }
 
 struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersistor {
@@ -73,6 +75,26 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
         didSet {
             if homeButtonPosition != .hidden {
                 PixelExperiment.fireOnboardingHomeButtonEnabledPixel()
+            }
+        }
+    }
+
+    @UserDefaultsWrapper(key: .homePageCustomBackground, defaultValue: nil)
+    var homePageCustomBackground: String?
+}
+
+protocol HomePageNavigator {
+    func openNewTabPageBackgroundCustomizationSettings()
+}
+
+final class DefaultHomePageNavigator: HomePageNavigator {
+    func openNewTabPageBackgroundCustomizationSettings() {
+        Task { @MainActor in
+            WindowControllersManager.shared.showTab(with: .newtab)
+            try? await Task.sleep(interval: 0.2)
+            if let window = WindowControllersManager.shared.lastKeyMainWindowController {
+                let homePageViewController = window.mainViewController.browserTabViewController.homePageViewController
+                homePageViewController?.settingsVisibilityModel.isSettingsVisible = true
             }
         }
     }
@@ -218,6 +240,12 @@ final class AppearancePreferences: ObservableObject {
         }
     }
 
+    @Published var homePageCustomBackground: CustomBackground? {
+        didSet {
+            persistor.homePageCustomBackground = homePageCustomBackground?.description
+        }
+    }
+
     var isContinueSetUpAvailable: Bool {
         let osVersion = ProcessInfo.processInfo.operatingSystemVersion
 
@@ -229,8 +257,16 @@ final class AppearancePreferences: ObservableObject {
         NSApp.appearance = currentThemeName.appearance
     }
 
-    init(persistor: AppearancePreferencesPersistor = AppearancePreferencesUserDefaultsPersistor()) {
+    func openNewTabPageBackgroundCustomizationSettings() {
+        homePageNavigator.openNewTabPageBackgroundCustomizationSettings()
+    }
+
+    init(
+        persistor: AppearancePreferencesPersistor = AppearancePreferencesUserDefaultsPersistor(),
+        homePageNavigator: HomePageNavigator = DefaultHomePageNavigator()
+    ) {
         self.persistor = persistor
+        self.homePageNavigator = homePageNavigator
         currentThemeName = .init(rawValue: persistor.currentThemeName) ?? .systemDefault
         showFullURL = persistor.showFullURL
         favoritesDisplayMode = persistor.favoritesDisplayMode.flatMap(FavoritesDisplayMode.init) ?? .default
@@ -240,16 +276,18 @@ final class AppearancePreferences: ObservableObject {
         showBookmarksBar = persistor.showBookmarksBar
         bookmarksBarAppearance = persistor.bookmarksBarAppearance
         homeButtonPosition = persistor.homeButtonPosition
+        homePageCustomBackground = persistor.homePageCustomBackground.flatMap(CustomBackground.init)
     }
 
     private var persistor: AppearancePreferencesPersistor
+    private var homePageNavigator: HomePageNavigator
 
     private func requestSync() {
         Task { @MainActor in
             guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService else {
                 return
             }
-            os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
+            Logger.sync.debug("Requesting sync if enabled")
             syncService.scheduler.notifyDataChanged()
         }
     }

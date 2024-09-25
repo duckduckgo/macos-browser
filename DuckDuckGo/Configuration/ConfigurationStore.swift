@@ -17,8 +17,10 @@
 //
 
 import Common
+import os.log
 import Foundation
 import Configuration
+import Persistence
 import PixelKit
 
 final class ConfigurationStore: ConfigurationStoring {
@@ -30,37 +32,87 @@ final class ConfigurationStore: ConfigurationStoring {
         .surrogates: "surrogates.txt",
         .privacyConfiguration: "macos-config.json",
         .trackerDataSet: "tracker-radar.json",
-        .FBConfig: "social_ctp_configuration.json",
         .remoteMessagingConfig: "remote-messaging-config.json"
     ]
 
-    static let shared = ConfigurationStore()
+    private enum Etag {
+        static let configStorageTrackerRadarEtag = "config.storage.trackerradar.etag"
+        static let configStorageBloomFilterSpecEtag = "config.storage.bloomfilter.spec.etag"
+        static let configStorageBloomFilterBinaryEtag = "config.storage.bloomfilter.binary.etag"
+        static let configStorageBloomFilterExclusionsEtag = "config.storage.bloomfilter.exclusions.etag"
+        static let configStorageSurrogatesEtag = "config.storage.surrogates.etag"
+        static let configStoragePrivacyConfigurationEtag = "config.storage.privacyconfiguration.etag"
+        static let configStorageRemoteMessagingConfigEtag = "config.storage.remotemessagingconfig.etag"
+    }
 
-    @UserDefaultsWrapper(key: .configStorageTrackerRadarEtag, defaultValue: nil)
-    private var trackerRadarEtag: String?
+    private let defaults: KeyValueStoring
 
-    @UserDefaultsWrapper(key: .configStorageBloomFilterSpecEtag, defaultValue: nil)
-    private var bloomFilterSpecEtag: String?
+    private var trackerRadarEtag: String? {
+        get {
+            defaults.object(forKey: Etag.configStorageTrackerRadarEtag) as? String
+        }
+        set {
+            defaults.set(newValue, forKey: Etag.configStorageTrackerRadarEtag)
+        }
+    }
 
-    @UserDefaultsWrapper(key: .configStorageBloomFilterBinaryEtag, defaultValue: nil)
-    private var bloomFilterBinaryEtag: String?
+    private var bloomFilterSpecEtag: String? {
+        get {
+            defaults.object(forKey: Etag.configStorageBloomFilterSpecEtag) as? String
+        }
+        set {
+            defaults.set(newValue, forKey: Etag.configStorageBloomFilterSpecEtag)
+        }
+    }
 
-    @UserDefaultsWrapper(key: .configStorageBloomFilterExclusionsEtag, defaultValue: nil)
-    private var bloomFilterExcludedDomainsEtag: String?
+    private var bloomFilterBinaryEtag: String? {
+        get {
+            defaults.object(forKey: Etag.configStorageBloomFilterBinaryEtag) as? String
+        }
+        set {
+            defaults.set(newValue, forKey: Etag.configStorageBloomFilterBinaryEtag)
+        }
+    }
 
-    @UserDefaultsWrapper(key: .configStorageSurrogatesEtag, defaultValue: nil)
-    private var surrogatesEtag: String?
+    private var bloomFilterExcludedDomainsEtag: String? {
+        get {
+            defaults.object(forKey: Etag.configStorageBloomFilterExclusionsEtag) as? String
+        }
+        set {
+            defaults.set(newValue, forKey: Etag.configStorageBloomFilterExclusionsEtag)
+        }
+    }
 
-    @UserDefaultsWrapper(key: .configStoragePrivacyConfigurationEtag, defaultValue: nil)
-    private var privacyConfigurationEtag: String?
+    private var surrogatesEtag: String? {
+        get {
+            defaults.object(forKey: Etag.configStorageSurrogatesEtag) as? String
+        }
+        set {
+            defaults.set(newValue, forKey: Etag.configStorageSurrogatesEtag)
+        }
+    }
 
-    @UserDefaultsWrapper(key: .configFBConfigEtag, defaultValue: nil)
-    private var FBConfigEtag: String?
+    private var privacyConfigurationEtag: String? {
+        get {
+            defaults.object(forKey: Etag.configStoragePrivacyConfigurationEtag) as? String
+        }
+        set {
+            defaults.set(newValue, forKey: Etag.configStoragePrivacyConfigurationEtag)
+        }
+    }
 
-    @UserDefaultsWrapper(key: .configStorageRemoteMessagingConfigEtag, defaultValue: nil)
-    private var remoteMessagingConfigEtag: String?
+    private var remoteMessagingConfigEtag: String? {
+        get {
+            defaults.object(forKey: Etag.configStorageRemoteMessagingConfigEtag) as? String
+        }
+        set {
+            defaults.set(newValue, forKey: Etag.configStorageRemoteMessagingConfigEtag)
+        }
+    }
 
-    private init() { }
+    init(defaults: KeyValueStoring = UserDefaults.appConfiguration) {
+        self.defaults = defaults
+    }
 
     func loadEtag(for configuration: Configuration) -> String? {
         switch configuration {
@@ -70,7 +122,6 @@ final class ConfigurationStore: ConfigurationStoring {
         case .surrogates: return surrogatesEtag
         case .trackerDataSet: return trackerRadarEtag
         case .privacyConfiguration: return privacyConfigurationEtag
-        case .FBConfig: return FBConfigEtag
         case .remoteMessagingConfig: return remoteMessagingConfigEtag
         }
     }
@@ -91,48 +142,70 @@ final class ConfigurationStore: ConfigurationStoring {
         case .surrogates: surrogatesEtag = etag
         case .trackerDataSet: trackerRadarEtag = etag
         case .privacyConfiguration: privacyConfigurationEtag = etag
-        case .FBConfig: FBConfigEtag = etag
         case .remoteMessagingConfig: remoteMessagingConfigEtag = etag
         }
     }
 
     func loadData(for config: Configuration) -> Data? {
         let file = fileUrl(for: config)
-        do {
-            return try Data(contentsOf: file)
-        } catch {
-            guard NSApp.runType.requiresEnvironment else { return nil }
+        var data: Data?
+        var coordinatorError: NSError?
 
-            let nserror = error as NSError
+        NSFileCoordinator().coordinate(readingItemAt: file, error: &coordinatorError) { fileUrl in
+            do {
+                data = try Data(contentsOf: fileUrl)
+            } catch {
+                guard NSApp.runType.requiresEnvironment else { return }
 
-            if nserror.domain != NSCocoaErrorDomain || nserror.code != NSFileReadNoSuchFileError {
-                PixelKit.fire(DebugEvent(GeneralPixel.trackerDataCouldNotBeLoaded, error: error))
+                let nserror = error as NSError
+
+                if nserror.domain != NSCocoaErrorDomain || nserror.code != NSFileReadNoSuchFileError {
+                    PixelKit.fire(DebugEvent(GeneralPixel.trackerDataCouldNotBeLoaded, error: error))
+                }
             }
-
-            return nil
         }
+
+        if let coordinatorError {
+            PixelKit.fire(DebugEvent(GeneralPixel.configurationFileCoordinatorError, error: coordinatorError))
+            Logger.config.error("Unable to read \(config.rawValue, privacy: .public): \(coordinatorError.localizedDescription, privacy: .public)")
+        }
+
+        return data
     }
 
     func saveData(_ data: Data, for config: Configuration) throws {
         let file = fileUrl(for: config)
-        try data.write(to: file, options: .atomic)
+        var coordinatorError: NSError?
+
+        NSFileCoordinator().coordinate(writingItemAt: file, options: .forReplacing, error: &coordinatorError) { fileUrl in
+            do {
+                try data.write(to: fileUrl, options: .atomic)
+            } catch {
+                Logger.config.error("Unable to write \(config.rawValue, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            }
+        }
+
+        if let coordinatorError {
+            Logger.config.error("Unable to write \(config.rawValue, privacy: .public): \(coordinatorError.localizedDescription, privacy: .public)")
+        }
     }
 
     func log() {
-        os_log("bloomFilterBinaryEtag %{public}s", log: .config, type: .default, bloomFilterBinaryEtag ?? "")
-        os_log("bloomFilterSpecEtag %{public}s", log: .config, type: .default, bloomFilterSpecEtag ?? "")
-        os_log("bloomFilterExcludedDomainsEtag %{public}s", log: .config, type: .default, bloomFilterExcludedDomainsEtag ?? "")
-        os_log("surrogatesEtag %{public}s", log: .config, type: .default, surrogatesEtag ?? "")
-        os_log("trackerRadarEtag %{public}s", log: .config, type: .default, trackerRadarEtag ?? "")
-        os_log("privacyConfigurationEtag %{public}s", log: .config, type: .default, privacyConfigurationEtag ?? "")
-        os_log("FBConfigEtag %{public}s", log: .config, type: .default, FBConfigEtag ?? "")
-        os_log("remoteMessagingConfig %{public}s", log: .config, type: .default, remoteMessagingConfigEtag ?? "")
+        Logger.config.info("bloomFilterBinaryEtag \(self.bloomFilterBinaryEtag ?? "", privacy: .public)")
+        Logger.config.info("bloomFilterSpecEtag \(self.bloomFilterSpecEtag ?? "", privacy: .public)")
+        Logger.config.info("bloomFilterExcludedDomainsEtag \(self.self.bloomFilterExcludedDomainsEtag ?? "", privacy: .public)")
+        Logger.config.info("surrogatesEtag \(self.surrogatesEtag ?? "", privacy: .public)")
+        Logger.config.info("trackerRadarEtag \(self.trackerRadarEtag ?? "", privacy: .public)")
+        Logger.config.info("privacyConfigurationEtag \(self.privacyConfigurationEtag ?? "", privacy: .public)")
+        Logger.config.info("remoteMessagingConfig \(self.remoteMessagingConfigEtag ?? "", privacy: .public)")
     }
 
     func fileUrl(for config: Configuration) -> URL {
         let fm = FileManager.default
 
-        let dir = URL.sandboxApplicationSupportURL
+        guard let dir = fm.containerURL(forSecurityApplicationGroupIdentifier: Bundle.main.appGroup(bundle: .appConfiguration)) else {
+            fatalError("Failed to get application group URL")
+        }
         let subDir = dir.appendingPathComponent("Configuration")
 
         var isDir: ObjCBool = false

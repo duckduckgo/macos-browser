@@ -49,15 +49,11 @@ final class MoreOptionsMenuTests: XCTestCase {
         capturingActionDelegate = CapturingOptionsButtonMenuDelegate()
         internalUserDecider = InternalUserDeciderMock()
 
-        storePurchaseManager = StorePurchaseManagerMock(purchasedProductIDs: ["a", "b"],
-                                                        purchaseQueue: [],
-                                                        areProductsAvailable: true,
-                                                        hasActiveSubscriptionResult: false,
-                                                        purchaseSubscriptionResult: .success(""))
+        storePurchaseManager = StorePurchaseManagerMock()
 
         subscriptionManager = SubscriptionManagerMock(accountManager: AccountManagerMock(),
                                                       subscriptionEndpointService: SubscriptionEndpointServiceMock(),
-                                                      authEndpointService: SubscriptionMockFactory.authEndpointService,
+                                                      authEndpointService: AuthEndpointServiceMock(),
                                                       storePurchaseManager: storePurchaseManager,
                                                       currentEnvironment: SubscriptionEnvironment(serviceEnvironment: .production,
                                                                                                   purchasePlatform: .appStore),
@@ -81,7 +77,8 @@ final class MoreOptionsMenuTests: XCTestCase {
                                           passwordManagerCoordinator: passwordManagerCoordinator,
                                           vpnFeatureGatekeeper: networkProtectionVisibilityMock,
                                           subscriptionFeatureAvailability: SubscriptionFeatureAvailabilityMock(isFeatureAvailable: true,
-                                                                                                               isSubscriptionPurchaseAllowed: true),
+                                                                                                               isSubscriptionPurchaseAllowed: true,
+                                                                                                               usesUnifiedFeedbackForm: false),
                                           sharingMenu: NSMenu(),
                                           internalUserDecider: internalUserDecider,
                                           subscriptionManager: subscriptionManager)

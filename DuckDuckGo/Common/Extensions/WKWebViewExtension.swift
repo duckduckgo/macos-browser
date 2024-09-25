@@ -19,6 +19,7 @@
 import Common
 import Navigation
 import WebKit
+import os.log
 
 extension WKWebView {
 
@@ -274,7 +275,7 @@ extension WKWebView {
     func loadAlternateHTML(_ html: String, baseURL: URL, forUnreachableURL failingURL: URL) {
         guard responds(to: Selector.loadAlternateHTMLString) else {
             if #available(macOS 12.0, *) {
-                os_log(.error, log: .navigation, "WKWebView._loadAlternateHTMLString not available")
+                Logger.navigation.error("WKWebView._loadAlternateHTMLString not available")
                 loadSimulatedRequest(URLRequest(url: failingURL), responseHTML: html)
             }
             return
@@ -347,12 +348,31 @@ extension WKWebView {
         try await evaluateJavaScript("window.getSelection().removeAllRanges()") as Void?
     }
 
+    var addsVisitedLinks: Bool {
+        get {
+            guard self.responds(to: Selector.addsVisitedLinks) else {
+                assertionFailure("WKWebView doesn‘t respond to _addsVisitedLinks")
+                return false
+            }
+            return self.value(forKey: NSStringFromSelector(Selector.addsVisitedLinks)) as? Bool ?? false
+        }
+        set {
+            guard self.responds(to: Selector.addsVisitedLinks) else {
+                assertionFailure("WKWebView doesn‘t respond to _setAddsVisitedLinks:")
+                return
+            }
+            self.perform(Selector.setAddsVisitedLinks, with: newValue ? true : nil)
+        }
+    }
+
     enum Selector {
         static let fullScreenPlaceholderView = NSSelectorFromString("_fullScreenPlaceholderView")
         static let printOperationWithPrintInfoForFrame = NSSelectorFromString("_printOperationWithPrintInfo:forFrame:")
         static let loadAlternateHTMLString = NSSelectorFromString("_loadAlternateHTMLString:baseURL:forUnreachableURL:")
         static let mediaMutedState = NSSelectorFromString("_mediaMutedState")
         static let setPageMuted = NSSelectorFromString("_setPageMuted:")
+        static let setAddsVisitedLinks = NSSelectorFromString("_setAddsVisitedLinks:")
+        static let addsVisitedLinks = NSSelectorFromString("_addsVisitedLinks")
     }
 
 }

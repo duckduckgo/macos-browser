@@ -22,6 +22,7 @@ import Common
 import Lottie
 import SwiftUI
 import WebKit
+import os.log
 
 final class TabBarViewController: NSViewController {
 
@@ -312,13 +313,13 @@ final class TabBarViewController: NSViewController {
             duplicateTab(at: .pinned(index))
         case let .bookmark(tab):
             guard let url = tab.url, let tabViewModel = tabCollectionViewModel.pinnedTabsManager?.tabViewModels[tab] else {
-                os_log("TabBarViewController: Failed to get url from tab")
+                Logger.general.debug("TabBarViewController: Failed to get url from tab")
                 return
             }
             bookmarkTab(with: url, title: tabViewModel.title)
         case let .removeBookmark(tab):
             guard let url = tab.url else {
-                os_log("TabBarViewController: Failed to get url from tab")
+                Logger.general.debug("TabBarViewController: Failed to get url from tab")
                 return
             }
             deleteBookmark(with: url)
@@ -342,7 +343,7 @@ final class TabBarViewController: NSViewController {
         }
 
         guard let selectionIndex = tabCollectionViewModel.selectionIndex else {
-            os_log("TabBarViewController: Selection index is nil", type: .error)
+            Logger.general.error("TabBarViewController: Selection index is nil")
             return
         }
 
@@ -558,6 +559,8 @@ final class TabBarViewController: NSViewController {
     }
 
     private func setupAddTabButton() {
+        addTabButton.delegate = self
+        addTabButton.registerForDraggedTypes([.string])
         addTabButton.target = self
         addTabButton.action = #selector(addButtonAction(_:))
         addTabButton.toolTip = UserText.newTabTooltip
@@ -581,7 +584,7 @@ final class TabBarViewController: NSViewController {
               let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
               let clipView = collectionView.clipView
         else {
-            os_log("TabBarViewController: Showing tab preview window failed", type: .error)
+            Logger.general.error("TabBarViewController: Showing tab preview window failed")
             return
         }
 
@@ -591,7 +594,7 @@ final class TabBarViewController: NSViewController {
 
     private func showPinnedTabPreview(at index: Int) {
         guard let tabViewModel = tabCollectionViewModel.pinnedTabsManager?.tabViewModel(at: index) else {
-            os_log("TabBarViewController: Showing pinned tab preview window failed", type: .error)
+            Logger.general.error("TabBarViewController: Showing pinned tab preview window failed")
             return
         }
 
@@ -607,7 +610,7 @@ final class TabBarViewController: NSViewController {
                                                                     isSelected: isSelected)
 
         guard let window = view.window else {
-            os_log("TabBarViewController: Showing tab preview window failed", type: .error)
+            Logger.general.error("TabBarViewController: Showing tab preview window failed")
             return
         }
 
@@ -622,6 +625,29 @@ final class TabBarViewController: NSViewController {
         tabPreviewWindowController.hide(allowQuickRedisplay: allowQuickRedisplay)
     }
 
+}
+
+extension TabBarViewController: MouseOverButtonDelegate {
+
+    func mouseOverButton(_ sender: MouseOverButton, draggingEntered info: any NSDraggingInfo, isMouseOver: UnsafeMutablePointer<Bool>) -> NSDragOperation {
+        assert(sender === addTabButton || sender === footerAddButton)
+        let pasteboard = info.draggingPasteboard
+
+        if let types = pasteboard.types, types.contains(.string) {
+            return .copy
+        }
+        return .none
+    }
+
+    func mouseOverButton(_ sender: MouseOverButton, performDragOperation info: any NSDraggingInfo) -> Bool {
+        assert(sender === addTabButton || sender === footerAddButton)
+        if let string = info.draggingPasteboard.string(forType: .string), let url = URL.makeURL(from: string) {
+            tabCollectionViewModel.insertOrAppendNewTab(.url(url, credential: nil, source: .appOpenUrl))
+            return true
+        }
+
+        return true
+    }
 }
 
 extension TabBarViewController: TabCollectionViewModelDelegate {
@@ -788,7 +814,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
 
     private func deleteBookmark(with url: URL) {
         guard let bookmark = bookmarkManager.getBookmark(for: url) else {
-            os_log("TabBarViewController: Failed to fetch bookmark for url \(url)", type: .error)
+            Logger.general.error("TabBarViewController: Failed to fetch bookmark for url \(url)")
             return
         }
         bookmarkManager.remove(bookmark: bookmark)
@@ -796,7 +822,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
 
     private func fireproof(_ tab: Tab) {
         guard let url = tab.url, let host = url.host else {
-            os_log("TabBarViewController: Failed to get url of tab bar view item", type: .error)
+            Logger.general.error("TabBarViewController: Failed to get url of tab bar view item")
             return
         }
 
@@ -805,7 +831,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
 
     private func removeFireproofing(from tab: Tab) {
         guard let host = tab.url?.host else {
-            os_log("TabBarViewController: Failed to get url of tab bar view item", type: .error)
+            Logger.general.error("TabBarViewController: Failed to get url of tab bar view item")
             return
         }
 
@@ -820,7 +846,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
             let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
             let url = tabViewModel.tab.content.userEditableUrl
         else {
-            os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
+            Logger.general.error("TabBarViewController: Failed to get index path of tab bar view item")
             return nil
         }
 
@@ -881,6 +907,8 @@ extension TabBarViewController: NSCollectionViewDataSource {
             footer.addButton?.action = #selector(addButtonAction(_:))
             footer.toolTip = UserText.newTabTooltip
             self.footerAddButton = footer.addButton
+            self.footerAddButton?.delegate = self
+            self.footerAddButton?.registerForDraggedTypes([.string])
         }
 
         return view
@@ -941,6 +969,11 @@ extension TabBarViewController: NSCollectionViewDelegate {
         // allow dropping URLs or files
         guard draggingInfo.draggingPasteboard.url == nil else { return .copy }
 
+        // Check if the pasteboard contains string data
+        if draggingInfo.draggingPasteboard.availableType(from: [.string]) != nil {
+            return .copy
+        }
+
         // dragging a tab
         guard case .private = draggingInfo.draggingSourceOperationMask,
               draggingInfo.draggingPasteboard.types == [TabBarViewItemPasteboardWriter.utiInternalType] else { return .none }
@@ -958,7 +991,9 @@ extension TabBarViewController: NSCollectionViewDelegate {
             tabCollectionViewModel.insert(Tab(content: .url(url, source: .appOpenUrl), burnerMode: tabCollectionViewModel.burnerMode),
                                           at: .unpinned(newIndex),
                                           selected: true)
-
+            return true
+        } else if let string = draggingInfo.draggingPasteboard.string(forType: .string), let url = URL.makeURL(from: string) {
+            tabCollectionViewModel.insertOrAppendNewTab(.url(url, credential: nil, source: .appOpenUrl))
             return true
         }
 
@@ -1219,6 +1254,15 @@ extension TabBarViewController: TabBarViewItemDelegate {
               let tab = tabCollectionViewModel.tabCollection.tabs[safe: indexPath.item] else { return nil }
 
         return tab.audioState
+    }
+
+    func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, replaceContentWithDroppedStringValue stringValue: String) {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
+              let tab = tabCollectionViewModel.tabCollection.tabs[safe: indexPath.item] else { return }
+
+        if let url = URL.makeURL(from: stringValue) {
+            tab.setContent(.url(url, credential: nil, source: .userEntered(stringValue, downloadRequested: false)))
+        }
     }
 
     func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> OtherTabBarViewItemsState {

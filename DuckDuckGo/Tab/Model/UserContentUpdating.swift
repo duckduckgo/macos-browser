@@ -46,6 +46,7 @@ final class UserContentUpdating {
 
     private(set) var userContentBlockingAssets: AnyPublisher<UserContentUpdating.NewContent, Never>!
 
+    @MainActor
     init(contentBlockerRulesManager: ContentBlockerRulesManagerProtocol,
          privacyConfigurationManager: PrivacyConfigurationManaging,
          trackerDataManager: TrackerDataManager,

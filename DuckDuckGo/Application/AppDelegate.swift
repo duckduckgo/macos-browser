@@ -39,6 +39,7 @@ import Subscription
 import NetworkProtectionIPC
 import DataBrokerProtection
 import RemoteMessaging
+import os.log
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
 
@@ -65,7 +66,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let fileStore: FileStore
 
 #if APPSTORE
-    private let crashCollection = CrashCollection(platform: .macOSAppStore, log: .default)
+    private let crashCollection = CrashCollection(platform: .macOSAppStore)
 #else
     private let crashReporter = CrashReporter()
 #endif
@@ -89,12 +90,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var privacyDashboardWindow: NSWindow?
 
     let activeRemoteMessageModel: ActiveRemoteMessageModel
+    let homePageSettingsModel = HomePage.Models.SettingsModel()
     let remoteMessagingClient: RemoteMessagingClient!
 
     public let subscriptionManager: SubscriptionManager
     public let subscriptionUIHandler: SubscriptionUIHandling
 
     public let vpnSettings = VPNSettings(defaults: .netP)
+
+    var configurationStore = ConfigurationStore()
+    var configurationManager: ConfigurationManager
 
     // MARK: - VPN
 
@@ -148,6 +153,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return firstLaunchDate >= Date.weekAgo
     }
 
+    @MainActor
     override init() {
         // will not add crash handlers and will fire pixel on applicationDidFinishLaunching if didCrashDuringCrashHandlersSetUp == true
         let didCrashDuringCrashHandlersSetUp = UserDefaultsWrapper(key: .didCrashDuringCrashHandlersSetUp, defaultValue: false)
@@ -164,12 +170,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             let encryptionKey = NSApplication.runType.requiresEnvironment ? try keyStore.readKey() : nil
             fileStore = EncryptedFileStore(encryptionKey: encryptionKey)
         } catch {
-            os_log("App Encryption Key could not be read: %s", "\(error)")
+            Logger.general.error("App Encryption Key could not be read: \(error.localizedDescription)")
             fileStore = EncryptedFileStore()
         }
 
         let internalUserDeciderStore = InternalUserDeciderStore(fileStore: fileStore)
         internalUserDecider = DefaultInternalUserDecider(store: internalUserDeciderStore)
+
+        configurationManager = ConfigurationManager(store: configurationStore)
 
         if NSApplication.runType.requiresEnvironment {
             Self.configurePixelKit()
@@ -218,10 +226,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #if DEBUG
         AppPrivacyFeatures.shared = NSApplication.runType.requiresEnvironment
         // runtime mock-replacement for Unit Tests, to be redone when we‘ll be doing Dependency Injection
-        ? AppPrivacyFeatures(contentBlocking: AppContentBlocking(internalUserDecider: internalUserDecider), database: Database.shared)
+        ? AppPrivacyFeatures(contentBlocking: AppContentBlocking(internalUserDecider: internalUserDecider, configurationStore: configurationStore), database: Database.shared)
         : AppPrivacyFeatures(contentBlocking: ContentBlockingMock(), httpsUpgradeStore: HTTPSUpgradeStoreMock())
 #else
-        AppPrivacyFeatures.shared = AppPrivacyFeatures(contentBlocking: AppContentBlocking(internalUserDecider: internalUserDecider), database: Database.shared)
+        AppPrivacyFeatures.shared = AppPrivacyFeatures(contentBlocking: AppContentBlocking(internalUserDecider: internalUserDecider, configurationStore: configurationStore), database: Database.shared)
 #endif
         if NSApplication.runType.requiresEnvironment {
             remoteMessagingClient = RemoteMessagingClient(
@@ -230,7 +238,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 appearancePreferences: .shared,
                 pinnedTabsManager: pinnedTabsManager,
                 internalUserDecider: internalUserDecider,
-                configurationStore: ConfigurationStore.shared,
+                configurationStore: configurationStore,
                 remoteMessagingAvailabilityProvider: PrivacyConfigurationRemoteMessagingAvailabilityProvider(
                     privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager
                 )
@@ -307,7 +315,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if case .normal = NSApp.runType {
             FaviconManager.shared.loadFavicons()
         }
-        ConfigurationManager.shared.start()
+        configurationManager.start()
         _ = DownloadListCoordinator.shared
         _ = RecentlyClosedCoordinator.shared
 
@@ -545,7 +553,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             dataProvidersSource: syncDataProviders,
             errorEvents: SyncErrorHandler(),
             privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager,
-            log: OSLog.sync,
             environment: environment
         )
         syncService.initializeIfNeeded()
@@ -620,10 +627,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     return
                 }
                 if isLocked {
-                    os_log(.debug, log: .sync, "Screen is locked")
+                    Logger.sync.debug("Screen is locked")
                     syncService.scheduler.cancelSyncAndSuspendSyncQueue()
                 } else {
-                    os_log(.debug, log: .sync, "Screen is unlocked")
+                    Logger.sync.debug("Screen is unlocked")
                     syncService.scheduler.resumeSyncQueue()
                 }
             }

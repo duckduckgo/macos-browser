@@ -84,7 +84,6 @@ final class AdClickAttributionTabExtension: TabExtension {
                                                     tld: dependencies.tld,
                                                     eventReporting: dependencies.attributionEvents,
                                                     errorReporting: dependencies.attributionDebugEvents,
-                                                    log: OSLog.attribution,
                                                     cpmExperimentOn: cpmExperimentOn)
         detection.delegate = delegate
         return detection
@@ -96,8 +95,7 @@ final class AdClickAttributionTabExtension: TabExtension {
                                        rulesProvider: dependencies.adClickAttributionRulesProvider,
                                        tld: dependencies.tld,
                                        eventReporting: dependencies.attributionEvents,
-                                       errorReporting: dependencies.attributionDebugEvents,
-                                       log: OSLog.attribution)
+                                       errorReporting: dependencies.attributionDebugEvents)
     }
 
     private static func makeAdClickAttribution(with dependencies: any AdClickAttributionDependencies, cpmExperimentOn: Bool?) -> (AdClickLogicProtocol, AdClickAttributionDetecting) {

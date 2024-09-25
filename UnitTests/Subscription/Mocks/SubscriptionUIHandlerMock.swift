@@ -19,9 +19,9 @@
 import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
-public struct SubscriptionUIHandlerMock: SubscriptionUIHandling {
+public final class SubscriptionUIHandlerMock: SubscriptionUIHandling {
 
-    public enum UIHandlerMockPerformedAction {
+    public enum UIHandlerMockPerformedAction: Equatable {
         case didPresentProgressViewController
         case didDismissProgressViewController
         case didUpdateProgressViewController
@@ -30,11 +30,21 @@ public struct SubscriptionUIHandlerMock: SubscriptionUIHandling {
         case didShowTab(Tab.TabContent)
     }
 
-    let didPerformActionCallback: (_ action: UIHandlerMockPerformedAction) -> Void
+    var didPerformActionCallback: (_ action: UIHandlerMockPerformedAction) -> Void
 
     public init(alertResponse: NSApplication.ModalResponse? = nil,
                 didPerformActionCallback: @escaping (UIHandlerMockPerformedAction) -> Void) {
         self.didPerformActionCallback = didPerformActionCallback
+        self.alertResponse = alertResponse
+    }
+
+    @MainActor
+    public func setDidPerformActionCallback(callback: @escaping (_ action: UIHandlerMockPerformedAction) -> Void) {
+        self.didPerformActionCallback = callback
+    }
+
+    @MainActor
+    public func setAlertResponse(alertResponse: NSApplication.ModalResponse?) {
         self.alertResponse = alertResponse
     }
 

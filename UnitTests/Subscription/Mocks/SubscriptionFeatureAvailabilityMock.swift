@@ -20,12 +20,14 @@ import Foundation
 import Subscription
 import BrowserServicesKit
 
-public struct SubscriptionFeatureAvailabilityMock: SubscriptionFeatureAvailability {
+public final class SubscriptionFeatureAvailabilityMock: SubscriptionFeatureAvailability {
     public var isFeatureAvailable: Bool
     public var isSubscriptionPurchaseAllowed: Bool
+    public var usesUnifiedFeedbackForm: Bool
 
-    public init(isFeatureAvailable: Bool, isSubscriptionPurchaseAllowed: Bool) {
+    public init(isFeatureAvailable: Bool, isSubscriptionPurchaseAllowed: Bool, usesUnifiedFeedbackForm: Bool) {
         self.isFeatureAvailable = isFeatureAvailable
         self.isSubscriptionPurchaseAllowed = isSubscriptionPurchaseAllowed
+        self.usesUnifiedFeedbackForm = usesUnifiedFeedbackForm
     }
 }

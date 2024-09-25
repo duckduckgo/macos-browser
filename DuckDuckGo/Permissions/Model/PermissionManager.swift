@@ -19,6 +19,7 @@
 import Foundation
 import Combine
 import Common
+import os.log
 
 protocol PermissionManagerProtocol: AnyObject {
 
@@ -55,7 +56,7 @@ final class PermissionManager: PermissionManagerProtocol {
                 self.set(entity.permission, forDomain: entity.domain.droppingWwwPrefix(), permissionType: entity.type)
             }
         } catch {
-            os_log("PermissionStore: Failed to load permissions", type: .error)
+            Logger.general.error("PermissionStore: Failed to load permissions")
         }
     }
 
@@ -93,7 +94,7 @@ final class PermissionManager: PermissionManagerProtocol {
             do {
                 storedPermission = try store.add(domain: domain, permissionType: permissionType, decision: decision)
             } catch {
-                os_log("PermissionStore: Failed to store permission", type: .error)
+                Logger.general.error("PermissionStore: Failed to store permission")
                 return
             }
         }

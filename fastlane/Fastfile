@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-
+opt_out_usage
 fastlane_require 'httparty'
 fastlane_require 'rexml/document'
 
@@ -42,6 +42,36 @@ platform :mac do
   #
   desc 'Fetches and updates certificates and provisioning profiles for App Store distribution'
   lane :sync_signing do |options|
+    do_sync_signing(options)
+  end
+
+  # Fetches and updates certificates and provisioning profiles for DMG distribution
+  #
+  # @option [String] username (default: nil) Your DDG Apple ID. Pass it to not be asked
+  #         for it a couple of times during the process.
+  #
+  desc 'Fetches and updates certificates and provisioning profiles for DMG distribution'
+  lane :sync_signing_dmg_release do |options|
+    do_sync_signing(options)
+  end
+
+  # Fetches and updates certificates and provisioning profiles for DMG Review builds
+  #
+  # @option [String] username (default: nil) Your DDG Apple ID. Pass it to not be asked
+  #         for it a couple of times during the process.
+  #
+  desc 'Fetches and updates certificates and provisioning profiles for DMG Review builds'
+  lane :sync_signing_dmg_review do |options|
+    do_sync_signing(options)
+  end
+
+  # Fetches and updates certificates and provisioning profiles for CI builds
+  #
+  # @option [String] username (default: nil) Your DDG Apple ID. Pass it to not be asked
+  #         for it a couple of times during the process.
+  #
+  desc 'Fetches and updates certificates and provisioning profiles for CI builds'
+  lane :sync_signing_ci do |options|
     do_sync_signing(options)
   end
 
@@ -544,7 +574,7 @@ release in progress and you're making a follow-up internal release that includes
 
     # Create the branch and push
     if is_ci
-      sha = Action.sh('git', 'rev-parse', source_version).chomp
+      sha = Action.sh('git', 'rev-parse', "#{source_version}^{}").chomp
       Action.sh('gh', 'api', '--method', 'POST', '/repos/duckduckgo/macos-browser/git/refs', '-f', "ref=refs/heads/#{release_branch}", '-f', "sha=#{sha}")
       Action.sh('git', 'fetch', 'origin')
       Action.sh('git', 'checkout', release_branch)

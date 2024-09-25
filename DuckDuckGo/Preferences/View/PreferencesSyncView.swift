@@ -21,6 +21,7 @@ import Common
 import SyncUI
 import SwiftUIExtensions
 import BrowserServicesKit
+import os.log
 
 struct SyncView: View {
 
@@ -46,7 +47,7 @@ struct SyncView: View {
             guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService else {
                 return
             }
-            os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
+            Logger.sync.debug("Requesting sync if enabled")
             syncService.scheduler.notifyDataChanged()
         }
     }

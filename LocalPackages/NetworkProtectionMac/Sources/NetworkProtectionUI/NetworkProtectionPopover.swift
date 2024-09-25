@@ -20,26 +20,9 @@ import AppKit
 import Combine
 import Foundation
 import SwiftUI
+import SwiftUIExtensions
 import NetworkProtection
 import LoginItems
-
-@available(iOS, introduced: 10.15, deprecated: 12.0, message: "Use Apple's DismissAction")
-public struct DismissAction: EnvironmentKey {
-    public static var defaultValue: () -> Void = {}
-}
-
-@available(iOS, introduced: 10.15, deprecated: 12.0, message: "Use Apple's DismissAction")
-public extension EnvironmentValues {
-    var dismiss: () -> Void {
-        get {
-            self[DismissAction.self]
-        }
-
-        set {
-            self[DismissAction.self] = newValue
-        }
-    }
-}
 
 public final class NetworkProtectionPopover: NSPopover {
 

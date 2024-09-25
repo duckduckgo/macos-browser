@@ -76,17 +76,19 @@ jobs:
           *) echo "👎 Not a release or hotfix branch"; exit 1 ;;
         esac
 
-    - name: Register SSH keys for submodules access
+    - name: Register SSH key for certificates repository access
       uses: webfactory/ssh-agent@v0.7.0
       with:
-        ssh-private-key: |
-          ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
 
     - name: Check out the code
       uses: actions/checkout@v4
       with:
         submodules: recursive
         ref: ${{ env.branch }}
+
+    - name: Set up fastlane
+      run: bundle install
 
     - name: Check if this is an official release build
       id: is-official-release
@@ -101,9 +103,6 @@ jobs:
 
     - name: Select Xcode
       run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
-
-    - name: Prepare fastlane
-      run: bundle install
 
     - name: Archive and Upload the App
       env:
@@ -139,15 +138,17 @@ jobs:
         aws s3 cp ${{ env.dsym-path }} ${{ env.DSYM_S3_PATH }}
 
     - name: Report success
-      uses: ./.github/actions/asana-log-message
       env:
         DSYM_S3_PATH: ${{ steps.upload-dsyms-to-s3.outputs.dsym-s3-path }}
         TAG: ${{ env.app-version }}
         WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-      with:
-        task-url: ${{ env.asana-task-url }}
-        access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-        template-name: debug-symbols-uploaded
+        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+      run: |
+        bundle exec fastlane run asana_log_message \
+          task_url:"${{ env.asana-task-url }}" \
+          template_name:"debug-symbols-uploaded" \
+          github_handle:"${{ github.actor }}" \
+          is_scheduled_release:"${{ github.event_name == 'schedule' }}"
 
     - name: Send Mattermost message
       if: success() || failure() # Don't execute when cancelled

@@ -22,8 +22,6 @@ import Foundation
 @objc(Application)
 final class Application: NSApplication {
 
-    private let copyHandler = CopyHandler()
-//    private var _delegate: AppDelegate!
     public static var appDelegate: AppDelegate!
 
     override init() {
@@ -35,8 +33,7 @@ final class Application: NSApplication {
 
         let mainMenu = MainMenu(featureFlagger: delegate.featureFlagger,
                                 bookmarkManager: delegate.bookmarksManager,
-                                faviconManager: FaviconManager.shared,
-                                copyHandler: copyHandler)
+                                faviconManager: FaviconManager.shared)
         self.mainMenu = mainMenu
 
         // Makes sure Spotlight search is part of Help menu

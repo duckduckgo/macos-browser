@@ -19,23 +19,13 @@
 import Combine
 import Common
 import Foundation
+import os.log
 
 private protocol FilePresenterDelegate: AnyObject {
-    var logger: FilePresenterLogger { get }
     var url: URL? { get }
     func presentedItemDidMove(to newURL: URL)
     func accommodatePresentedItemDeletion() throws
     func accommodatePresentedItemEviction() throws
-}
-
-protocol FilePresenterLogger {
-    func log(_ message: @autoclosure () -> String)
-}
-
-extension OSLog: FilePresenterLogger {
-    func log(_ message: @autoclosure () -> String) {
-        os_log(.debug, log: self, message())
-    }
 }
 
 internal class FilePresenter {
@@ -111,8 +101,6 @@ internal class FilePresenter {
     private var innerPresenters = [DelegatingFilePresenter]()
     private var dispatchSourceCancellable: AnyCancellable?
 
-    fileprivate let logger: any FilePresenterLogger
-
     private var urlController: SecurityScopedFileURLController?
     final var url: URL? {
         lock.withLock {
@@ -140,7 +128,7 @@ internal class FilePresenter {
            urlController.isManagingSecurityScope {
             urlController.updateUrlKeepingSandboxExtensionRetainCount(newURL)
         } else {
-            urlController = SecurityScopedFileURLController(url: newURL, logger: logger)
+            urlController = SecurityScopedFileURLController(url: newURL)
         }
 
         return oldValue
@@ -155,14 +143,12 @@ internal class FilePresenter {
     /// - Parameter consumeUnbalancedStartAccessingResource: assume the `url` is already accessible (e.g. after choosing the file using Open Panel).
     ///   would cause an unbalanced `stopAccessingSecurityScopedResource` call on the File Presenter deallocation.
     /// - Note: see https://stackoverflow.com/questions/25627628/sandboxed-mac-app-exhausting-security-scoped-url-resources
-    init(url: URL, consumeUnbalancedStartAccessingResource: Bool = false, logger: FilePresenterLogger = OSLog.disabled, createIfNeededCallback: ((URL) throws -> URL)? = nil) throws {
-        self.urlController = SecurityScopedFileURLController(url: url, manageSecurityScope: consumeUnbalancedStartAccessingResource, logger: logger)
-
-        self.logger = logger
+    init(url: URL, consumeUnbalancedStartAccessingResource: Bool = false, createIfNeededCallback: ((URL) throws -> URL)? = nil) throws {
+        self.urlController = SecurityScopedFileURLController(url: url, manageSecurityScope: consumeUnbalancedStartAccessingResource)
 
         do {
             try setupInnerPresenter(for: url, primaryItemURL: nil, createIfNeededCallback: createIfNeededCallback)
-            logger.log("🗄️  added file presenter for \"\(url.path)\"")
+            Logger.fileDownload.debug("🗄️  added file presenter for \"\(url.path)\"")
         } catch {
             removeFilePresenters()
             throw error
@@ -176,13 +162,12 @@ internal class FilePresenter {
     /// - Note: when presenting a related item the security scoped resource access will always be stopped on the File Presenter deallocation
     /// - Parameter consumeUnbalancedStartAccessingResource: assume the `url` is already accessible (e.g. after choosing the file using Open Panel).
     ///   would cause an unbalanced `stopAccessingSecurityScopedResource` call on the File Presenter deallocation.
-    init(url: URL, primaryItemURL: URL, logger: FilePresenterLogger = OSLog.disabled, createIfNeededCallback: ((URL) throws -> URL)? = nil) throws {
-        self.urlController = SecurityScopedFileURLController(url: url, logger: logger)
-        self.logger = logger
+    init(url: URL, primaryItemURL: URL, createIfNeededCallback: ((URL) throws -> URL)? = nil) throws {
+        self.urlController = SecurityScopedFileURLController(url: url)
 
         do {
             try setupInnerPresenter(for: url, primaryItemURL: primaryItemURL, createIfNeededCallback: createIfNeededCallback)
-            logger.log("🗄️  added file presenter for \"\(url.path) primary item: \"\(primaryItemURL.path)\"")
+            Logger.fileDownload.debug("🗄️  added file presenter for \"\(url.path) primary item: \"\(primaryItemURL.path)\"")
         } catch {
             removeFilePresenters()
             throw error
@@ -203,7 +188,7 @@ internal class FilePresenter {
             guard let createFile = createIfNeededCallback else {
                 throw CocoaError(.fileReadNoSuchFile, userInfo: [NSFilePathErrorKey: url.path])
             }
-            logger.log("🗄️💥 creating file for presenter at \"\(url.path)\"")
+            Logger.fileDownload.debug("🗄️💥 creating file for presenter at \"\(url.path)\"")
             // create new file at the presented URL using the provided callback and update URL if needed
             _=self._setURL(
                 try coordinateWrite(at: url, using: createFile)
@@ -237,7 +222,7 @@ internal class FilePresenter {
 
         guard fileDescriptor != -1 else {
             let err = errno
-            logger.log("🗄️❌ error opening \(url.path): \(err) – \(String(cString: strerror(err)))")
+            Logger.fileDownload.debug("🗄️❌ error opening \(url.path): \(err) – \(String(cString: strerror(err)))")
             return
         }
 
@@ -246,7 +231,7 @@ internal class FilePresenter {
 
         dispatchSource.setEventHandler { [weak self] in
             guard let self, let url = self.url else { return }
-            self.logger.log("🗄️⚠️ file delete event handler: \"\(url.path)\"")
+            Logger.fileDownload.debug("🗄️⚠️ file delete event handler: \"\(url.path)\"")
             var resolvedBookmarkData: URL? {
                 var isStale = false
                 guard let presenter = self as? BookmarkFilePresenter,
@@ -258,7 +243,7 @@ internal class FilePresenter {
                 return url
             }
             if let existingUrl = resolvedBookmarkData {
-                self.logger.log("🗄️⚠️ ignoring file delete event handler as file exists: \"\(url.path)\"")
+                Logger.fileDownload.debug("🗄️⚠️ ignoring file delete event handler as file exists: \"\(url.path)\"")
                 presentedItemDidMove(to: existingUrl)
                 return
             }
@@ -281,7 +266,7 @@ internal class FilePresenter {
             if innerPresenter.fallbackPresentedItemURL == nil {
                 innerPresenter.fallbackPresentedItemURL = urlController?.url
             }
-            logger.log("🗄️  removing file presenter \(idx) for \"\(innerPresenter.presentedItemURL?.path ?? "<nil>")\"")
+            Logger.fileDownload.debug("🗄️  removing file presenter \(idx) for \"\(innerPresenter.presentedItemURL?.path ?? "<nil>")\"")
             NSFileCoordinator.removeFilePresenter(innerPresenter)
         }
         if innerPresenters.count > 1 {
@@ -294,7 +279,7 @@ internal class FilePresenter {
 
     fileprivate func didSetURL(_ newValue: URL?, oldValue: URL?) {
         assert(newValue == nil || newValue != oldValue)
-        logger.log("🗄️  did update url from \"\(oldValue?.path ?? "<nil>")\" to \"\(newValue?.path ?? "<nil>")\"")
+        Logger.fileDownload.debug("🗄️  did update url from \"\(oldValue?.path ?? "<nil>")\" to \"\(newValue?.path ?? "<nil>")\"")
         urlSubject.send(newValue)
     }
 
@@ -307,19 +292,19 @@ internal class FilePresenter {
 extension FilePresenter: FilePresenterDelegate {
 
     func presentedItemDidMove(to newURL: URL) {
-        logger.log("🗄️  presented item did move to \"\(newURL.path)\"")
+        Logger.fileDownload.debug("🗄️  presented item did move to \"\(newURL.path)\"")
         setURL(newURL)
     }
 
     func accommodatePresentedItemDeletion() throws {
-        logger.log("🗄️  accommodatePresentedItemDeletion (\"\(url?.path ?? "<nil>")\")")
+        Logger.fileDownload.debug("🗄️  accommodatePresentedItemDeletion (\"\(self.url?.path ?? "<nil>")\")")
         // should go before resetting the URL to correctly remove File Presenter
         removeFilePresenters()
         setURL(nil)
     }
 
     func accommodatePresentedItemEviction() throws {
-        logger.log("🗄️  accommodatePresentedItemEviction (\"\(url?.path ?? "<nil>")\")")
+        Logger.fileDownload.debug("🗄️  accommodatePresentedItemEviction (\"\(self.url?.path ?? "<nil>")\")")
         try accommodatePresentedItemDeletion()
     }
 
@@ -345,17 +330,17 @@ final class BookmarkFilePresenter: FilePresenter {
     /// - Parameter url: represented file URL access to which is coordinated by the File Presenter.
     /// - Parameter consumeUnbalancedStartAccessingResource: assume the `url` is already accessible (e.g. after choosing the file using Open Panel).
     ///   would cause an unbalanced `stopAccessingSecurityScopedResource` call on the File Presenter deallocation.
-    override init(url: URL, consumeUnbalancedStartAccessingResource: Bool = false, logger: FilePresenterLogger = OSLog.disabled, createIfNeededCallback: ((URL) throws -> URL)? = nil) throws {
+    override init(url: URL, consumeUnbalancedStartAccessingResource: Bool = false, createIfNeededCallback: ((URL) throws -> URL)? = nil) throws {
 
-        try super.init(url: url, consumeUnbalancedStartAccessingResource: consumeUnbalancedStartAccessingResource, logger: logger, createIfNeededCallback: createIfNeededCallback)
+        try super.init(url: url, consumeUnbalancedStartAccessingResource: consumeUnbalancedStartAccessingResource, createIfNeededCallback: createIfNeededCallback)
 
         do {
             try self.coordinateRead(at: url, with: .withoutChanges) { url in
-                logger.log("📒 updating bookmark data for \"\(url.path)\"")
+                Logger.fileDownload.debug("📒 updating bookmark data for \"\(url.path)\"")
                 self._fileBookmarkData = try url.bookmarkData(options: .withSecurityScope)
             }
         } catch {
-            logger.log("📕 bookmark data retreival failed for \"\(url.path)\": \(error)")
+            Logger.fileDownload.debug("📕 bookmark data retreival failed for \"\(url.path)\": \(error)")
             throw error
         }
     }
@@ -367,28 +352,28 @@ final class BookmarkFilePresenter: FilePresenter {
     /// - Note: when presenting a related item the security scoped resource access will always be stopped on the File Presenter deallocation
     /// - Parameter consumeUnbalancedStartAccessingResource: assume the `url` is already accessible (e.g. after choosing the file using Open Panel).
     ///   would cause an unbalanced `stopAccessingSecurityScopedResource` call on the File Presenter deallocation.
-    override init(url: URL, primaryItemURL: URL, logger: FilePresenterLogger = OSLog.disabled, createIfNeededCallback: ((URL) throws -> URL)? = nil) throws {
-        try super.init(url: url, primaryItemURL: primaryItemURL, logger: logger, createIfNeededCallback: createIfNeededCallback)
+    override init(url: URL, primaryItemURL: URL, createIfNeededCallback: ((URL) throws -> URL)? = nil) throws {
+        try super.init(url: url, primaryItemURL: primaryItemURL, createIfNeededCallback: createIfNeededCallback)
 
         do {
             try self.coordinateRead(at: url, with: .withoutChanges) { url in
-                logger.log("📒 updating bookmark data for \"\(url.path)\"")
+                Logger.fileDownload.debug("📒 updating bookmark data for \"\(url.path)\"")
                 self._fileBookmarkData = try url.bookmarkData(options: .withSecurityScope)
             }
         } catch {
-            logger.log("📕 bookmark data retreival failed for \"\(url.path)\": \(error)")
+            Logger.fileDownload.debug("📕 bookmark data retreival failed for \"\(url.path)\": \(error)")
             throw error
         }
     }
 
-    init(fileBookmarkData: Data, logger: FilePresenterLogger = OSLog.disabled) throws {
+    init(fileBookmarkData: Data) throws {
         self._fileBookmarkData = fileBookmarkData
 
         var isStale = false
-        logger.log("📒 resolving url from bookmark data")
+        Logger.fileDownload.debug("📒 resolving url from bookmark data")
         let url = try URL(resolvingBookmarkData: fileBookmarkData, options: .withSecurityScope, bookmarkDataIsStale: &isStale)
 
-        try super.init(url: url, consumeUnbalancedStartAccessingResource: true, logger: logger)
+        try super.init(url: url, consumeUnbalancedStartAccessingResource: true)
 
         if isStale {
             DispatchQueue.global().async { [weak self] in
@@ -403,13 +388,13 @@ final class BookmarkFilePresenter: FilePresenter {
     }
 
     fileprivate func updateFileBookmarkData(for url: URL?) {
-        logger.log("📒 updateFileBookmarkData for \"\(url?.path ?? "<nil>")\"")
+        Logger.fileDownload.debug("📒 updateFileBookmarkData for \"\(url?.path ?? "<nil>")\"")
 
         var fileBookmarkData: Data?
         do {
             fileBookmarkData = try url?.bookmarkData(options: .withSecurityScope)
         } catch {
-            logger.log("📕 updateFileBookmarkData failed with \(error)")
+            Logger.fileDownload.debug("📕 updateFileBookmarkData failed with \(error)")
         }
 
         guard lock.withLock({

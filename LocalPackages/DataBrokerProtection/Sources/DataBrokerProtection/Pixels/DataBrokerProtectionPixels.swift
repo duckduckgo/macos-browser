@@ -19,6 +19,7 @@
 import Foundation
 import Common
 import BrowserServicesKit
+import Configuration
 import PixelKit
 
 enum ErrorCategory: Equatable {
@@ -54,6 +55,7 @@ public enum DataBrokerProtectionPixels {
         static let triesKey = "tries"
         static let errorCategoryKey = "error_category"
         static let errorDetailsKey = "error_details"
+        static let errorDomainKey = "error_domain"
         static let pattern = "pattern"
         static let isParent = "is_parent"
         static let actionIDKey = "action_id"
@@ -78,6 +80,7 @@ public enum DataBrokerProtectionPixels {
         static let durationOfFirstOptOut = "duration_firstoptout"
         static let numberOfNewRecordsFound = "num_new_found"
         static let numberOfReappereances = "num_reappeared"
+        static let optOutSubmitSuccessRate = "optout_submit_success_rate"
     }
 
     case error(error: DataBrokerProtectionError, dataBroker: String)
@@ -188,6 +191,12 @@ public enum DataBrokerProtectionPixels {
     case entitlementCheckInvalid
     case entitlementCheckError
 
+    // Configuration
+    case invalidPayload(Configuration)
+    case errorLoadingCachedConfig(Error)
+    case pixelTest
+    case failedToParsePrivacyConfig(Error)
+
     // Measure success/failure rate of Personal Information Removal Pixels
     // https://app.asana.com/0/1204006570077678/1206889724879222/f
     case globalMetricsWeeklyStats(profilesFound: Int, optOutsInProgress: Int, successfulOptOuts: Int, failedOptOuts: Int, durationOfFirstOptOut: Int, numberOfNewRecordsFound: Int)
@@ -198,6 +207,10 @@ public enum DataBrokerProtectionPixels {
     // Feature Gatekeeper
     case gatekeeperNotAuthenticated
     case gatekeeperEntitlementsInvalid
+
+    // Custom stats
+    case customDataBrokerStatsOptoutSubmit(dataBrokerName: String, optOutSubmitSuccessRate: Double)
+    case customGlobalStatsOptoutSubmit(optOutSubmitSuccessRate: Double)
 }
 
 extension DataBrokerProtectionPixels: PixelKitEvent {
@@ -325,6 +338,15 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             // Feature Gatekeeper
         case .gatekeeperNotAuthenticated: return "m_mac_dbp_gatekeeper_not_authenticated"
         case .gatekeeperEntitlementsInvalid: return "m_mac_dbp_gatekeeper_entitlements_invalid"
+
+            // Configuration
+        case .invalidPayload(let configuration): return "m_mac_dbp_\(configuration.rawValue)_invalid_payload".lowercased()
+        case .errorLoadingCachedConfig: return "m_mac_dbp_configuration_error_loading_cached_config"
+        case .pixelTest: return "m_mac_dbp_configuration_pixel_test"
+        case .failedToParsePrivacyConfig: return "m_mac_dbp_configuration_failed_to_parse"
+
+        case .customDataBrokerStatsOptoutSubmit: return "m_mac_dbp_databroker_custom_stats_optoutsubmit"
+        case .customGlobalStatsOptoutSubmit: return "m_mac_dbp_custom_stats_optoutsubmit"
         }
     }
 
@@ -434,7 +456,10 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                 .secureVaultKeyStoreUpdateError,
                 .secureVaultError,
                 .gatekeeperNotAuthenticated,
-                .gatekeeperEntitlementsInvalid:
+                .gatekeeperEntitlementsInvalid,
+                .invalidPayload,
+                .pixelTest,
+                .failedToParsePrivacyConfig:
             return [:]
         case .ipcServerProfileSavedCalledByApp,
                 .ipcServerProfileSavedReceivedByAgent,
@@ -490,6 +515,13 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                            Consts.durationOfFirstOptOut: String(durationOfFirstOptOut),
                            Consts.numberOfNewRecordsFound: String(numberOfNewRecordsFound),
                            Consts.numberOfReappereances: String(numberOfReappereances)]
+        case .errorLoadingCachedConfig(let error):
+            return [Consts.errorDomainKey: (error as NSError).domain]
+        case .customDataBrokerStatsOptoutSubmit(let dataBrokerName, let optOutSubmitSuccessRate):
+            return [Consts.dataBrokerParamKey: dataBrokerName,
+                    Consts.optOutSubmitSuccessRate: String(optOutSubmitSuccessRate)]
+        case .customGlobalStatsOptoutSubmit(let optOutSubmitSuccessRate):
+            return [Consts.optOutSubmitSuccessRate: String(optOutSubmitSuccessRate)]
         }
     }
 }
@@ -507,10 +539,13 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                 PixelKit.fire(DebugEvent(event, error: error))
             case .generalError(let error, _):
                 PixelKit.fire(DebugEvent(event, error: error))
+            case .errorLoadingCachedConfig(let error):
+                PixelKit.fire(DebugEvent(event, error: error))
             case .secureVaultInitError(let error),
                     .secureVaultError(let error),
                     .secureVaultKeyStoreReadError(let error),
-                    .secureVaultKeyStoreUpdateError(let error):
+                    .secureVaultKeyStoreUpdateError(let error),
+                    .failedToParsePrivacyConfig(let error):
                 PixelKit.fire(DebugEvent(event, error: error))
             case .ipcServerProfileSavedXPCError(error: let error),
                     .ipcServerImmediateScansFinishedWithError(error: let error),
@@ -580,7 +615,11 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .dataBrokerMetricsWeeklyStats,
                     .dataBrokerMetricsMonthlyStats,
                     .gatekeeperNotAuthenticated,
-                    .gatekeeperEntitlementsInvalid:
+                    .gatekeeperEntitlementsInvalid,
+                    .invalidPayload,
+                    .pixelTest,
+                    .customDataBrokerStatsOptoutSubmit,
+                    .customGlobalStatsOptoutSubmit:
 
                 PixelKit.fire(event)
 

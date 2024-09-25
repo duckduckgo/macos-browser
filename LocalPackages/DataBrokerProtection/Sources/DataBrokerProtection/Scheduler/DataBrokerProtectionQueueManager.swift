@@ -18,15 +18,26 @@
 
 import Common
 import Foundation
+import os.log
 
 protocol DataBrokerProtectionOperationQueue {
     var maxConcurrentOperationCount: Int { get set }
     func cancelAllOperations()
     func addOperation(_ op: Operation)
-    func addBarrierBlock(_ barrier: @escaping @Sendable () -> Void)
+    func addBarrierCompletionBlock(_ barrier: @escaping @Sendable () -> Void)
 }
 
-extension OperationQueue: DataBrokerProtectionOperationQueue {}
+extension OperationQueue: DataBrokerProtectionOperationQueue {
+    /*
+     An unfortunute necessarity due to an issue with xcode 16 and building for Product Review Release
+     Originally we just used addBarrierBlock directly, but now it won't build as it says
+     the extension doesn't conform to the protocol
+     The docs however say the method signiture is unchanged, so we've decided to blame the build system
+     */
+    func addBarrierCompletionBlock(_ barrier: @escaping @Sendable () -> Void) {
+        addBarrierBlock(barrier)
+    }
+}
 
 enum DataBrokerProtectionQueueMode {
     case idle
@@ -226,12 +237,12 @@ private extension DefaultDataBrokerProtectionQueueManager {
                 operationQueue.addOperation(collection)
             }
         } catch {
-            os_log("DataBrokerProtectionProcessor error: addOperations, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("DataBrokerProtectionProcessor error: addOperations, error: \(error.localizedDescription, privacy: .public)")
             completion?(DataBrokerProtectionAgentErrorCollection(oneTimeError: error))
             return
         }
 
-        operationQueue.addBarrierBlock { [weak self] in
+        operationQueue.addBarrierCompletionBlock { [weak self] in
             let errorCollection = DataBrokerProtectionAgentErrorCollection(oneTimeError: nil, operationErrors: self?.operationErrorsForCurrentOperations())
             completion?(errorCollection)
             self?.resetModeAndClearErrors()

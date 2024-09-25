@@ -18,6 +18,7 @@
 
 import Cocoa
 import Common
+import os.log
 
 protocol TabSnapshotStoring {
 
@@ -40,7 +41,7 @@ final class TabSnapshotStore: TabSnapshotStoring {
 
     func persistSnapshot(_ snapshot: NSImage, id: UUID) {
         guard let data = snapshot.tiffRepresentation else {
-            os_log("TabSnapshotPersistenceService: Failed to create tiff representation", type: .error)
+            Logger.tabSnapshots.error("TabSnapshotPersistenceService: Failed to create tiff representation")
             return
         }
 
@@ -48,7 +49,7 @@ final class TabSnapshotStore: TabSnapshotStoring {
             let url = URL.persistenceLocation(for: id)
             createDirectoryIfNeeded()
             guard fileStore.persist(data, url: url) else {
-                os_log("TabSnapshotPersistenceService: Saving of snapshot failed", type: .error)
+                Logger.tabSnapshots.error("TabSnapshotPersistenceService: Saving of snapshot failed")
                 return
             }
         }
@@ -68,7 +69,7 @@ final class TabSnapshotStore: TabSnapshotStoring {
            let image = NSImage(data: data) {
             return image as NSImageSendable
         } else {
-            os_log("TabSnapshotPersistenceService: Loading of snapshot failed", type: .error)
+            Logger.tabSnapshots.error("TabSnapshotPersistenceService: Loading of snapshot failed")
             return nil
         }
     }
@@ -101,7 +102,7 @@ final class TabSnapshotStore: TabSnapshotStoring {
                 uuids.append(uuid)
             }
         } catch {
-            os_log("Failed to load stored snapshot ids: %@", type: .error, error.localizedDescription)
+            Logger.tabSnapshots.error("Failed to load stored snapshot ids: \(error.localizedDescription, privacy: .public)")
         }
 
         return uuids

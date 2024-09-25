@@ -21,6 +21,7 @@ import Suggestions
 import Common
 import History
 import PixelKit
+import os.log
 
 final class SuggestionContainer {
 
@@ -42,7 +43,6 @@ final class SuggestionContainer {
         self.historyCoordinating = historyCoordinating
         self.startupPreferences = startupPreferences
         self.loading = suggestionLoading
-        self.loading.dataSource = self
     }
 
     convenience init () {
@@ -57,24 +57,20 @@ final class SuggestionContainer {
 
     func getSuggestions(for query: String) {
         latestQuery = query
-        loading.getSuggestions(query: query) { [weak self] result, error in
+        loading.getSuggestions(query: query, usingDataSource: self) { [weak self] result, error in
             dispatchPrecondition(condition: .onQueue(.main))
 
             guard self?.latestQuery == query else { return }
             guard let result = result else {
                 self?.result = nil
-                os_log("Suggestions: Failed to get suggestions - %s",
-                       type: .error,
-                       "\(String(describing: error))")
+                Logger.general.error("Suggestions: Failed to get suggestions - \(String(describing: error))")
                 PixelKit.fire(DebugEvent(GeneralPixel.suggestionsFetchFailed, error: error))
                 return
             }
 
             if let error = error {
                 // Fetching remote suggestions failed but local can be presented
-                os_log("Suggestions: Error when getting suggestions - %s",
-                       type: .error,
-                       "\(String(describing: error))")
+                Logger.general.error("Suggestions: Error when getting suggestions - \(error.localizedDescription)")
             }
 
             self?.result = result
@@ -88,6 +84,10 @@ final class SuggestionContainer {
 }
 
 extension SuggestionContainer: SuggestionLoadingDataSource {
+
+    var platform: Platform {
+        return .desktop
+    }
 
     func history(for suggestionLoading: SuggestionLoading) -> [HistorySuggestion] {
         return historyCoordinating.history ?? []
@@ -111,6 +111,11 @@ extension SuggestionContainer: SuggestionLoadingDataSource {
 
     @MainActor func bookmarks(for suggestionLoading: SuggestionLoading) -> [Suggestions.Bookmark] {
         bookmarkManager.list?.bookmarks() ?? []
+    }
+
+    @MainActor func openTabs(for suggestionLoading: any Suggestions.SuggestionLoading) -> [any Suggestions.BrowserTab] {
+        // Support for this on macOS will come later.
+        []
     }
 
     func suggestionLoading(_ suggestionLoading: SuggestionLoading,

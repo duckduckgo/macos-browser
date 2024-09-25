@@ -21,6 +21,23 @@ import Combine
 
 extension NSEvent {
 
+    struct EventMonitorType: OptionSet {
+        let rawValue: UInt8
+
+        static let local  = EventMonitorType(rawValue: 1 << 0)
+        static let global = EventMonitorType(rawValue: 1 << 1)
+    }
+
+    var deviceIndependentFlags: NSEvent.ModifierFlags {
+        modifierFlags.intersection(.deviceIndependentFlagsMask)
+    }
+
+    typealias KeyEquivalent = Set<KeyEquivalentElement>
+
+    var keyEquivalent: KeyEquivalent? {
+        KeyEquivalent(event: self)
+    }
+
     /// is NSEvent representing right mouse down event or cntrl+mouse down event
     static func isContextClick(_ event: NSEvent) -> Bool {
         let isControlClick = event.type == .leftMouseDown && (event.modifierFlags.rawValue & NSEvent.ModifierFlags.control.rawValue != 0)
@@ -48,6 +65,104 @@ extension NSEvent {
                 NSEvent.removeMonitor(monitor)
             }
         }
+    }
+
+    static func publisher(forEvents monitorType: EventMonitorType, matching mask: NSEvent.EventTypeMask) -> AnyPublisher<NSEvent, Never> {
+        let subject = PassthroughSubject<NSEvent, Never>()
+        var cancellables = Set<AnyCancellable>()
+        if monitorType.contains(.local) {
+            addLocalCancellableMonitor(forEventsMatching: mask) { event in
+                subject.send(event)
+                return event
+            }.store(in: &cancellables)
+        }
+        if monitorType.contains(.global) {
+            addGlobalCancellableMonitor(forEventsMatching: mask) { event in
+                subject.send(event)
+            }.store(in: &cancellables)
+        }
+
+        return subject
+            .handleEvents(receiveCancel: {
+                cancellables.forEach { $0.cancel() }
+            })
+            .eraseToAnyPublisher()
+    }
+
+}
+
+enum KeyEquivalentElement: ExpressibleByStringLiteral, Hashable {
+    public typealias StringLiteralType = String
+
+    case charCode(String)
+    case command
+    case shift
+    case option
+    case control
+
+    static let backspace = KeyEquivalentElement.charCode("\u{8}")
+    static let tab = KeyEquivalentElement.charCode("\t")
+    static let left = KeyEquivalentElement.charCode("\u{2190}")
+    static let right = KeyEquivalentElement.charCode("\u{2192}")
+
+    init(stringLiteral value: String) {
+        self = .charCode(value)
+    }
+}
+
+extension NSEvent.KeyEquivalent: ExpressibleByStringLiteral, ExpressibleByUnicodeScalarLiteral, ExpressibleByExtendedGraphemeClusterLiteral {
+    public typealias StringLiteralType = String
+
+    public init(stringLiteral value: String) {
+        self = [.charCode(value)]
+    }
+
+    init?(event: NSEvent) {
+        guard [.keyDown, .keyUp].contains(event.type) else {
+            assertionFailure("wrong type of event \(event)")
+            return nil
+        }
+        guard let characters = event.characters else { return nil }
+        self = [.charCode(characters)]
+        if event.modifierFlags.contains(.command) {
+            self.insert(.command)
+        }
+        if event.modifierFlags.contains(.shift) {
+            self.insert(.shift)
+        }
+        if event.modifierFlags.contains(.option) {
+            self.insert(.option)
+        }
+        if event.modifierFlags.contains(.control) {
+            self.insert(.control)
+        }
+    }
+
+    var charCode: String {
+        for item in self {
+            if case .charCode(let value) = item {
+                return value
+            }
+        }
+        return ""
+    }
+
+    var modifierMask: NSEvent.ModifierFlags {
+        var result: NSEvent.ModifierFlags = []
+        for item in self {
+            switch item {
+            case .charCode: continue
+            case .command:
+                result.insert(.command)
+            case .shift:
+                result.insert(.shift)
+            case .option:
+                result.insert(.option)
+            case .control:
+                result.insert(.control)
+            }
+        }
+        return result
     }
 
 }

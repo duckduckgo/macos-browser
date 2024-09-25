@@ -26,6 +26,7 @@ import NetworkProtectionProxy
 import NetworkProtectionUI
 import Networking
 import PixelKit
+import os.log
 
 #if NETP_SYSTEM_EXTENSION
 import SystemExtensionManager
@@ -59,20 +60,11 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     ///
     static var simulationOptions = NetworkProtectionSimulationOptions()
 
-    /// The logger that this object will use for errors that are handled by this class.
-    ///
-    private let logger: NetworkProtectionLogger
-
     /// Stores the last controller error for the purpose of updating the UI as needed.
     ///
     private let controllerErrorStore = NetworkProtectionControllerErrorStore()
 
     private let knownFailureStore = NetworkProtectionKnownFailureStore()
-
-    // MARK: - VPN Tunnel & Configuration
-
-    /// Auth token store
-    private let tokenStore: NetworkProtectionTokenStore
 
     // MARK: - Subscriptions
 
@@ -87,7 +79,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
     private let notificationCenter: NotificationCenter
 
-    /// The proxy manager
+    /// The tunnel manager
     ///
     /// We're keeping a reference to this because we don't want to be calling `loadAllFromPreferences` more than
     /// once.
@@ -164,18 +156,14 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
          networkExtensionController: NetworkExtensionController,
          settings: VPNSettings,
          defaults: UserDefaults,
-         tokenStore: NetworkProtectionTokenStore = NetworkProtectionKeychainTokenStore(),
          notificationCenter: NotificationCenter = .default,
-         logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger(),
          accessTokenStorage: SubscriptionTokenKeychainStorage) {
 
-        self.logger = logger
         self.networkExtensionBundleID = networkExtensionBundleID
         self.networkExtensionController = networkExtensionController
         self.notificationCenter = notificationCenter
         self.settings = settings
         self.defaults = defaults
-        self.tokenStore = tokenStore
         self.accessTokenStorage = accessTokenStorage
 
         subscribeToSettingsChanges()
@@ -187,7 +175,9 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
     private func subscribeToStatusChanges() {
         notificationCenter.publisher(for: .NEVPNStatusDidChange)
-            .sink(receiveValue: handleStatusChange(_:))
+            .sink { [weak self] status in
+                self?.handleStatusChange(status)
+            }
             .store(in: &cancellables)
     }
 
@@ -217,7 +207,9 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     private func subscribeToConfigurationChanges() {
         notificationCenter.publisher(for: .NEVPNConfigurationChange)
             .receive(on: DispatchQueue.main)
-            .sink { _ in
+            .sink { [weak self] _ in
+                guard let self else { return }
+
                 Task { @MainActor in
                     guard let manager = await self.manager else {
                         return
@@ -837,13 +829,13 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     }
 
     private func fetchAuthToken() throws -> NSString? {
-
         if let accessToken = try? accessTokenStorage.getAccessToken() {
-            os_log(.error, log: .networkProtection, "🟢 TunnelController found token")
+            Logger.networkProtection.debug("🟢 TunnelController found token")
             return Self.adaptAccessTokenForVPN(accessToken) as NSString?
+        } else {
+            Logger.networkProtection.error("TunnelController found no token")
+            return nil
         }
-        os_log(.error, log: .networkProtection, "🔴 TunnelController found no token :(")
-        return try tokenStore.fetchToken() as NSString?
     }
 
     private static func adaptAccessTokenForVPN(_ token: String) -> String {

@@ -27,7 +27,12 @@ struct WKPDFHUDViewWrapper {
     static let performActionForControlSelector = NSSelectorFromString("_performActionForControl:")
     static let visibleKey = "_visible"
     static let setVisibleSelector = NSSelectorFromString("_setVisible:")
-    static let savePDFControlId = "arrow.down.circle"
+
+    private enum ControlId: String {
+        case savePDF = "arrow.down.circle"
+        case zoomIn = "plus.magnifyingglass"
+        case zoomOut = "minus.magnifyingglass"
+    }
 
     private let hudView: NSView
 
@@ -72,6 +77,18 @@ struct WKPDFHUDViewWrapper {
     }
 
     func savePDF() {
+        performAction(for: .savePDF)
+    }
+
+    func zoomIn() {
+        performAction(for: .zoomIn)
+    }
+
+    func zoomOut() {
+        performAction(for: .zoomOut)
+    }
+
+    private func performAction(for controlId: ControlId) {
         let wasVisible = isVisible
         self.setIsVisibleIVar(true)
         defer {
@@ -79,7 +96,7 @@ struct WKPDFHUDViewWrapper {
                 self.setIsVisibleIVar(false)
             }
         }
-        hudView.perform(Self.performActionForControlSelector, with: Self.savePDFControlId)
+        hudView.perform(Self.performActionForControlSelector, with: controlId.rawValue)
     }
 
     // try to set _visible ivar value directly to avoid actually showing the HUD

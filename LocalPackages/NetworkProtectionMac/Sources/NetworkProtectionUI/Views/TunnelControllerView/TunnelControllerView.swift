@@ -22,134 +22,6 @@ import Combine
 import NetworkProtection
 import Lottie
 
-fileprivate extension Font {
-    enum NetworkProtection {
-        static var connectionStatusDetail: Font {
-            .system(size: 13, weight: .regular, design: .default)
-        }
-
-        static var dataVolume: Font {
-            .system(size: 13, weight: .regular, design: .default)
-        }
-
-        static var currentSite: Font {
-            .system(size: 13, weight: .regular, design: .default)
-        }
-
-        static var location: Font {
-            .system(size: 13, weight: .regular, design: .default)
-        }
-
-        static var content: Font {
-            .system(size: 13, weight: .regular, design: .default)
-        }
-
-        static var description: Font {
-            .system(size: 13, weight: .regular, design: .default)
-        }
-
-        static var label: Font {
-            .system(size: 13, weight: .regular, design: .default)
-        }
-
-        static var sectionHeader: Font {
-            .system(size: 12, weight: .semibold, design: .default)
-        }
-
-        static var timer: Font {
-            .system(size: 13, weight: .regular, design: .default)
-            .monospacedDigit()
-        }
-
-        static var title: Font {
-            .system(size: 15, weight: .semibold, design: .default)
-        }
-    }
-}
-
-private enum Opacity {
-    static func connectionStatusDetail(colorScheme: ColorScheme) -> Double {
-        colorScheme == .light ? Double(0.6) : Double(0.5)
-    }
-
-    static func dataVolume(colorScheme: ColorScheme) -> Double {
-        colorScheme == .light ? Double(0.6) : Double(0.5)
-    }
-
-    static let content = Double(0.58)
-    static let label = Double(0.9)
-    static let link = Double(1)
-
-    static func sectionHeader(colorScheme: ColorScheme) -> Double {
-        colorScheme == .light ? Double(0.84) : Double(0.85)
-    }
-
-    static func timer(colorScheme: ColorScheme) -> Double {
-        colorScheme == .light ? Double(0.6) : Double(0.5)
-    }
-
-    static func title(colorScheme: ColorScheme) -> Double {
-        colorScheme == .light ? Double(0.84) : Double(0.85)
-    }
-}
-
-fileprivate extension View {
-    func applyConnectionStatusDetailAttributes(colorScheme: ColorScheme) -> some View {
-        opacity(Opacity.connectionStatusDetail(colorScheme: colorScheme))
-            .font(.NetworkProtection.connectionStatusDetail)
-            .foregroundColor(Color(.defaultText))
-    }
-
-    func applyDataVolumeAttributes(colorScheme: ColorScheme) -> some View {
-        opacity(Opacity.dataVolume(colorScheme: colorScheme))
-            .font(.NetworkProtection.dataVolume)
-            .foregroundColor(Color(.defaultText))
-    }
-
-    func applyCurrentSiteAttributes() -> some View {
-        font(.NetworkProtection.currentSite)
-    }
-
-    func applyLocationAttributes() -> some View {
-        font(.NetworkProtection.location)
-    }
-
-    func applyContentAttributes(colorScheme: ColorScheme) -> some View {
-        opacity(Opacity.content)
-            .font(.NetworkProtection.content)
-            .foregroundColor(Color(.defaultText))
-    }
-
-    func applyDescriptionAttributes() -> some View {
-        font(.NetworkProtection.description)
-            .foregroundColor(Color(.secondaryText))
-    }
-
-    func applyLabelAttributes(colorScheme: ColorScheme) -> some View {
-        opacity(Opacity.label)
-            .font(.NetworkProtection.label)
-            .foregroundColor(Color(.defaultText))
-    }
-
-    func applySectionHeaderAttributes(colorScheme: ColorScheme) -> some View {
-        opacity(Opacity.sectionHeader(colorScheme: colorScheme))
-            .font(.NetworkProtection.sectionHeader)
-            .foregroundColor(Color(.defaultText))
-    }
-
-    func applyTimerAttributes(colorScheme: ColorScheme) -> some View {
-        opacity(Opacity.timer(colorScheme: colorScheme))
-            .font(.NetworkProtection.timer)
-            .foregroundColor(Color(.defaultText))
-    }
-
-    func applyTitleAttributes(colorScheme: ColorScheme) -> some View {
-        opacity(Opacity.title(colorScheme: colorScheme))
-            .font(.NetworkProtection.title)
-            .foregroundColor(Color(.defaultText))
-    }
-}
-
 public struct TunnelControllerView: View {
 
     @Environment(\.colorScheme) private var colorScheme
@@ -177,10 +49,11 @@ public struct TunnelControllerView: View {
 
             featureToggleRow()
 
+            SiteTroubleshootingView()
+                .padding(.top, 5)
+
             Divider()
                 .padding(EdgeInsets(top: 5, leading: 9, bottom: 5, trailing: 9))
-
-            SiteTroubleshootingView()
 
             locationView()
 

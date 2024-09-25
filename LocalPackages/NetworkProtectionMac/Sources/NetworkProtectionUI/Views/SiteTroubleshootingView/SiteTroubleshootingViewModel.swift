@@ -16,16 +16,16 @@
 //  limitations under the License.
 //
 
+import AppKit
 import Combine
 import Foundation
 import NetworkProtection
+import PixelKit
+import VPNPixels
 
 extension SiteTroubleshootingView {
 
     public final class Model: ObservableObject {
-
-        @Published
-        private(set) var isFeatureEnabled = false
 
         @Published
         private(set) var connectionStatus: ConnectionStatus = .disconnected
@@ -42,18 +42,19 @@ extension SiteTroubleshootingView {
         }
 
         private let uiActionHandler: VPNUIActionHandling
+        private let pixelKit: PixelFiring?
         private var cancellables = Set<AnyCancellable>()
 
-        public init(featureFlagPublisher: AnyPublisher<Bool, Never>,
-                    connectionStatusPublisher: AnyPublisher<ConnectionStatus, Never>,
+        public init(connectionStatusPublisher: AnyPublisher<ConnectionStatus, Never>,
                     siteTroubleshootingInfoPublisher: AnyPublisher<SiteTroubleshootingInfo?, Never>,
-                    uiActionHandler: VPNUIActionHandling) {
+                    uiActionHandler: VPNUIActionHandling,
+                    pixelKit: PixelFiring? = PixelKit.shared) {
 
             self.uiActionHandler = uiActionHandler
+            self.pixelKit = pixelKit
 
             subscribeToConnectionStatusChanges(connectionStatusPublisher)
             subscribeToSiteTroubleshootingInfoChanges(siteTroubleshootingInfoPublisher)
-            subscribeToFeatureFlagChanges(featureFlagPublisher)
         }
 
         private func subscribeToConnectionStatusChanges(_ publisher: AnyPublisher<ConnectionStatus, Never>) {
@@ -72,15 +73,16 @@ extension SiteTroubleshootingView {
                 .store(in: &cancellables)
         }
 
-        private func subscribeToFeatureFlagChanges(_ publisher: AnyPublisher<Bool, Never>) {
-            publisher
-                .receive(on: DispatchQueue.main)
-                .assign(to: \.isFeatureEnabled, onWeaklyHeld: self)
-                .store(in: &cancellables)
-        }
-
         func setExclusion(_ exclude: Bool, forDomain domain: String) {
             Task { @MainActor in
+                guard let siteInfo,
+                      siteInfo.excluded != exclude else {
+                    return
+                }
+
+                let engagementPixel = DomainExclusionsEngagementPixel(added: exclude)
+                pixelKit?.fire(engagementPixel)
+
                 await uiActionHandler.setExclusion(exclude, forDomain: domain)
             }
         }

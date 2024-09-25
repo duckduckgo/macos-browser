@@ -19,6 +19,7 @@
 import Foundation
 import Combine
 import Common
+import os.log
 
 final class PinnedTabsViewModel: ObservableObject {
 
@@ -164,7 +165,7 @@ extension PinnedTabsViewModel {
 
     func unpin(_ tab: Tab) {
         guard let index = items.firstIndex(of: tab) else {
-            os_log("PinnedTabsViewModel: Failed to get index of a tab", type: .error)
+            Logger.bitWarden.error("PinnedTabsViewModel: Failed to get index of a tab")
             return
         }
         contextMenuActionSubject.send(.unpin(index))
@@ -172,7 +173,7 @@ extension PinnedTabsViewModel {
 
     func duplicate(_ tab: Tab) {
         guard let index = items.firstIndex(of: tab) else {
-            os_log("PinnedTabsViewModel: Failed to get index of a tab", type: .error)
+            Logger.bitWarden.error("PinnedTabsViewModel: Failed to get index of a tab")
             return
         }
         contextMenuActionSubject.send(.duplicate(index))
@@ -180,7 +181,7 @@ extension PinnedTabsViewModel {
 
     func close(_ tab: Tab) {
         guard let index = items.firstIndex(of: tab) else {
-            os_log("PinnedTabsViewModel: Failed to get index of a tab", type: .error)
+            Logger.bitWarden.error("PinnedTabsViewModel: Failed to get index of a tab")
             return
         }
         contextMenuActionSubject.send(.close(index))

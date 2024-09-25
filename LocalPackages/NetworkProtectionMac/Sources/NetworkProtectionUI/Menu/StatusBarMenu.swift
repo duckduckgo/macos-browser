@@ -135,7 +135,6 @@ public final class StatusBarMenu: NSObject {
             }
 
             let siteTroubleshootingViewModel = SiteTroubleshootingView.Model(
-                featureFlagPublisher: Just(false).eraseToAnyPublisher(),
                 connectionStatusPublisher: Just(NetworkProtection.ConnectionStatus.disconnected).eraseToAnyPublisher(),
                 siteTroubleshootingInfoPublisher: Just(SiteTroubleshootingInfo?(nil)).eraseToAnyPublisher(),
                 uiActionHandler: uiActionHandler)

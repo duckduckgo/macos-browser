@@ -33,31 +33,20 @@ extension NetworkProtectionDeviceManager {
         return NetworkProtectionDeviceManager(environment: settings.selectedEnvironment,
                                               tokenStore: tokenStore,
                                               keyStore: keyStore,
-                                              errorEvents: .networkProtectionAppDebugEvents,
-                                              isSubscriptionEnabled: DefaultSubscriptionFeatureAvailability().isFeatureAvailable)
-    }
-}
-
-extension NetworkProtectionCodeRedemptionCoordinator {
-    convenience init() {
-        let settings = Application.appDelegate.vpnSettings
-        self.init(environment: settings.selectedEnvironment,
-                  tokenStore: NetworkProtectionKeychainTokenStore(),
-                  errorEvents: .networkProtectionAppDebugEvents,
-                  isSubscriptionEnabled: DefaultSubscriptionFeatureAvailability().isFeatureAvailable)
+                                              errorEvents: .networkProtectionAppDebugEvents)
     }
 }
 
 extension NetworkProtectionKeychainTokenStore {
     convenience init() {
-        self.init(isSubscriptionEnabled: DefaultSubscriptionFeatureAvailability().isFeatureAvailable)
+        self.init(useAccessTokenProvider: true)
     }
 
-    convenience init(isSubscriptionEnabled: Bool) {
+    convenience init(useAccessTokenProvider: Bool) {
         let accessTokenProvider: () -> String? = { Application.appDelegate.subscriptionManager.accountManager.accessToken }
         self.init(keychainType: .default,
                   errorEvents: .networkProtectionAppDebugEvents,
-                  isSubscriptionEnabled: isSubscriptionEnabled,
+                  useAccessTokenProvider: useAccessTokenProvider,
                   accessTokenProvider: accessTokenProvider)
     }
 }
@@ -75,8 +64,7 @@ extension NetworkProtectionLocationListCompositeRepository {
         self.init(
             environment: settings.selectedEnvironment,
             tokenStore: NetworkProtectionKeychainTokenStore(),
-            errorEvents: .networkProtectionAppDebugEvents,
-            isSubscriptionEnabled: DefaultSubscriptionFeatureAvailability().isFeatureAvailable
+            errorEvents: .networkProtectionAppDebugEvents
         )
     }
 }

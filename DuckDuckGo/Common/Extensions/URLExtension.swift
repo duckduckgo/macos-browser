@@ -21,6 +21,7 @@ import BrowserServicesKit
 import Common
 import Foundation
 import AppKitExtensions
+import os.log
 
 extension URL.NavigationalScheme {
 
@@ -117,7 +118,7 @@ extension URL {
             return searchUrl
         }
 
-        os_log("URL extension: Making URL from %s failed", type: .error, addressBarString)
+        Logger.general.error("URL extension: Making URL from \(addressBarString) failed")
         return nil
     }
 
@@ -225,10 +226,6 @@ extension URL {
         func separated() -> String {
             self.rawValue + "."
         }
-    }
-
-    var navigationalScheme: NavigationalScheme? {
-        self.scheme.map(NavigationalScheme.init(rawValue:))
     }
 
     var separatedScheme: String? {
@@ -383,6 +380,10 @@ extension URL {
 
     static var privateSearchLearnMore: URL {
         return URL(string: "https://duckduckgo.com/duckduckgo-help-pages/search-privacy/")!
+    }
+
+    static var passwordManagerLearnMore: URL {
+        return URL(string: "https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/")!
     }
 
     static var searchSettings: URL {

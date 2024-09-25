@@ -53,18 +53,22 @@ final class DuckPlayerTabExtension {
     }
     private weak var youtubeOverlayScript: YoutubeOverlayUserScript?
     private weak var youtubePlayerScript: YoutubePlayerUserScript?
-
+    private let onboardingDecider: DuckPlayerOnboardingDecider
     private var shouldSelectNextNewTab: Bool?
+    private let experimentManager: OnboardingExperimentManager
 
     init(duckPlayer: DuckPlayer,
          isBurner: Bool,
          scriptsPublisher: some Publisher<some YoutubeScriptsProvider, Never>,
          webViewPublisher: some Publisher<WKWebView, Never>,
-         preferences: DuckPlayerPreferences = .shared) {
+         preferences: DuckPlayerPreferences = .shared,
+         onboardingDecider: DuckPlayerOnboardingDecider,
+         experimentManager: OnboardingExperimentManager = DuckPlayerOnboardingExperiment()) {
         self.duckPlayer = duckPlayer
         self.isBurner = isBurner
         self.preferences = preferences
-
+        self.onboardingDecider = onboardingDecider
+        self.experimentManager = experimentManager
         webViewPublisher.sink { [weak self] webView in
             self?.webView = webView
         }.store(in: &cancellables)
@@ -86,6 +90,12 @@ final class DuckPlayerTabExtension {
     private func setUpYoutubeScriptsIfNeeded(for url: URL?) {
         youtubePlayerCancellables.removeAll()
         guard duckPlayer.isAvailable else { return }
+
+        onboardingDecider.valueChangedPublisher.sink {[weak self] _ in
+            guard let self = self else { return }
+
+            self.youtubeOverlayScript?.userUISettingsUpdated(uiValues: UIUserValues(onboardingDecider: self.onboardingDecider))
+        }.store(in: &youtubePlayerCancellables)
 
         if let hostname = url?.host, let script = youtubeOverlayScript {
             if script.messageOriginPolicy.isAllowed(hostname) {
@@ -176,6 +186,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         // only proceed when Private Player is enabled
+
         guard duckPlayer.isAvailable, duckPlayer.mode != .disabled else {
             return decidePolicyWithDisabledDuckPlayer(for: navigationAction)
         }
@@ -254,7 +265,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
 
     func navigation(_ navigation: Navigation, didSameDocumentNavigationOf navigationType: WKSameDocumentNavigationType) {
         // Navigating to a Youtube URL without page reload
-        if duckPlayer.mode == .enabled,
+        if shouldOpenDuckPlayerDirectly,
            case .sessionStatePush = navigationType,
            let webView, let url = webView.url,
            url.isYoutubeVideo,
@@ -270,13 +281,14 @@ extension DuckPlayerTabExtension: NavigationResponder {
         // When the feature is disabled but the webView still gets a Private Player URL,
         // convert it back to a regular YouTube video URL.
         if navigationAction.url.isDuckPlayer {
-            guard let (videoID, timestamp) = navigationAction.url.youtubeVideoParams,
-                  let mainFrame = navigationAction.mainFrameTarget else {
+            guard let (videoID, timestamp) = navigationAction.url.youtubeVideoParams else {
                 return .cancel
             }
 
-            return .redirect(mainFrame) { navigator in
-                navigator.load(URLRequest(url: .youtube(videoID, timestamp: timestamp)))
+            if let mainFrame = navigationAction.mainFrameTarget {
+                return .redirect(mainFrame) { navigator in
+                    navigator.load(URLRequest(url: .youtube(videoID, timestamp: timestamp)))
+                }
             }
         }
         return .next
@@ -295,7 +307,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
         // SERP+Video <<<< YT (redirected to DP) <- Duck Player
         //
         if case .backForward(distance: let distance) = navigationAction.navigationType, distance < 0,
-           duckPlayer.mode == .enabled,
+           shouldOpenDuckPlayerDirectly,
            navigationAction.sourceFrame.url.isDuckPlayer,
            navigationAction.url.youtubeVideoID == navigationAction.sourceFrame.url.youtubeVideoID,
            let mainFrame = navigationAction.mainFrameTarget {
@@ -319,7 +331,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
         }
 
         // Redirect youtube urls to Duck Player when [Always enable] preference is set
-        if duckPlayer.mode == .enabled
+        if shouldOpenDuckPlayerDirectly
             // - or - recommendations must always be opened in the Duck Player
             || (navigationAction.sourceFrame.url.isDuckPlayer && navigationAction.url.isYoutubeVideoRecommendation),
            let mainFrame = navigationAction.mainFrameTarget {
@@ -353,15 +365,19 @@ extension DuckPlayerTabExtension: NavigationResponder {
             return
         }
         if navigation.url.isDuckPlayer {
-            let setting = duckPlayer.mode == .enabled ? "always" : "default"
+            let setting = preferences.duckPlayerMode == .enabled ? "always" : "default"
             let newTabSettings = preferences.duckPlayerOpenInNewTab ? "true" : "false"
             let autoplay = preferences.duckPlayerAutoplay ? "true" : "false"
 
+            let params = ["setting": setting,
+                          "newtab": newTabSettings,
+                          "autoplay": autoplay]
+
             PixelKit.fire(GeneralPixel.duckPlayerDailyUniqueView,
                           frequency: .legacyDaily,
-                          withAdditionalParameters: ["setting": setting,
-                                                     "newtab": newTabSettings,
-                                                     "autoplay": autoplay])
+                          withAdditionalParameters: params)
+
+            experimentManager.fireWeeklyUniqueViewPixel(extraParams: params)
         }
     }
 
@@ -380,5 +396,7 @@ extension DuckPlayerTabExtension: DuckPlayerExtensionProtocol, TabExtension {
 }
 
 extension TabExtensions {
-    var duckPlayer: DuckPlayerExtensionProtocol? { resolve(DuckPlayerTabExtension.self) }
+    var duckPlayer: DuckPlayerExtensionProtocol? {
+        resolve(DuckPlayerTabExtension.self)
+    }
 }

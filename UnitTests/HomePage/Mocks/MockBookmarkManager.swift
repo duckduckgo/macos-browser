@@ -23,6 +23,19 @@ class MockBookmarkManager: BookmarkManager {
     var bookmarksReturnedForSearch = [BaseBookmarkEntity]()
     var wasSearchByQueryCalled = false
 
+    init(bookmarksReturnedForSearch: [BaseBookmarkEntity] = [BaseBookmarkEntity](), wasSearchByQueryCalled: Bool = false, isUrlBookmarked: Bool = false, removeBookmarkCalled: Bool = false, removeFolderCalled: Bool = false, removeObjectsCalled: [String]? = nil, updateBookmarkCalled: Bookmark? = nil, moveObjectsCalled: MoveArgs? = nil, list: BookmarkList? = nil, sortMode: BookmarksSortMode = .manual) {
+        self.bookmarksReturnedForSearch = bookmarksReturnedForSearch
+        self.wasSearchByQueryCalled = wasSearchByQueryCalled
+        self.isUrlBookmarked = isUrlBookmarked
+        self.removeBookmarkCalled = removeBookmarkCalled
+        self.removeFolderCalled = removeFolderCalled
+        self.removeObjectsCalled = removeObjectsCalled
+        self.updateBookmarkCalled = updateBookmarkCalled
+        self.moveObjectsCalled = moveObjectsCalled
+        self.list = list
+        self.sortMode = sortMode
+    }
+
     func isUrlFavorited(url: URL) -> Bool {
         return false
     }
@@ -60,13 +73,25 @@ class MockBookmarkManager: BookmarkManager {
 
     func makeFolder(for title: String, parent: DuckDuckGo_Privacy_Browser.BookmarkFolder?, completion: (DuckDuckGo_Privacy_Browser.BookmarkFolder) -> Void) {}
 
-    func remove(bookmark: DuckDuckGo_Privacy_Browser.Bookmark) {}
+    var removeBookmarkCalled = false
+    func remove(bookmark: DuckDuckGo_Privacy_Browser.Bookmark) {
+        removeBookmarkCalled = true
+    }
 
-    func remove(folder: DuckDuckGo_Privacy_Browser.BookmarkFolder) {}
+    var removeFolderCalled = false
+    func remove(folder: DuckDuckGo_Privacy_Browser.BookmarkFolder) {
+        removeFolderCalled = true
+    }
 
-    func remove(objectsWithUUIDs uuids: [String]) {}
+    var removeObjectsCalled: [String]?
+    func remove(objectsWithUUIDs uuids: [String]) {
+        removeObjectsCalled = uuids
+    }
 
-    func update(bookmark: DuckDuckGo_Privacy_Browser.Bookmark) {}
+    var updateBookmarkCalled: Bookmark?
+    func update(bookmark: DuckDuckGo_Privacy_Browser.Bookmark) {
+        updateBookmarkCalled = bookmark
+    }
 
     func update(bookmark: DuckDuckGo_Privacy_Browser.Bookmark, withURL url: URL, title: String, isFavorite: Bool) {}
 
@@ -88,7 +113,15 @@ class MockBookmarkManager: BookmarkManager {
         return false
     }
 
-    func move(objectUUIDs: [String], toIndex: Int?, withinParentFolder: DuckDuckGo_Privacy_Browser.ParentFolderType, completion: @escaping (Error?) -> Void) {}
+    struct MoveArgs: Equatable {
+        var objectUUIDs: [String] = []
+        var toIndex: Int?
+        var withinParentFolder: DuckDuckGo_Privacy_Browser.ParentFolderType
+    }
+    var moveObjectsCalled: MoveArgs?
+    func move(objectUUIDs: [String], toIndex: Int?, withinParentFolder: DuckDuckGo_Privacy_Browser.ParentFolderType, completion: @escaping (Error?) -> Void) {
+        moveObjectsCalled = .init(objectUUIDs: objectUUIDs, toIndex: toIndex, withinParentFolder: withinParentFolder)
+    }
 
     func moveFavorites(with objectUUIDs: [String], toIndex: Int?, completion: @escaping (Error?) -> Void) {}
 

@@ -23,6 +23,7 @@ import BrowserServicesKit
 import PrivacyDashboard
 import Common
 import PixelKit
+import os.log
 
 protocol PrivacyDashboardViewControllerSizeDelegate: AnyObject {
 
@@ -175,10 +176,10 @@ final class PrivacyDashboardViewController: NSViewController {
         let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
         if state.isProtected && configuration.isUserUnprotected(domain: domain) {
             configuration.userEnabledProtection(forDomain: domain)
-            PixelKit.fire(GeneralPixel.dashboardProtectionAllowlistRemove(triggerOrigin: state.eventOrigin.screen.rawValue), includeAppVersionParameter: false)
+            PixelKit.fire(NonStandardEvent(GeneralPixel.dashboardProtectionAllowlistRemove(triggerOrigin: state.eventOrigin.screen.rawValue)))
         } else {
             configuration.userDisabledProtection(forDomain: domain)
-            PixelKit.fire(GeneralPixel.dashboardProtectionAllowlistAdd(triggerOrigin: state.eventOrigin.screen.rawValue), includeAppVersionParameter: false)
+            PixelKit.fire(NonStandardEvent(GeneralPixel.dashboardProtectionAllowlistAdd(triggerOrigin: state.eventOrigin.screen.rawValue)))
         }
 
         let completionToken = ContentBlocking.shared.contentBlockingManager.scheduleCompilation()
@@ -265,7 +266,7 @@ extension PrivacyDashboardViewController: PrivacyDashboardControllerDelegate {
                 let report = try await makeBrokenSiteReport(category: category, description: description, source: privacyDashboardController.source)
                 try brokenSiteReporter.report(report, reportMode: .regular)
             } catch {
-                os_log("Failed to generate or send the broken site report: \(error.localizedDescription)", type: .error)
+                Logger.general.error("Failed to generate or send the broken site report: \(error.localizedDescription)")
             }
         }
     }
@@ -283,7 +284,7 @@ extension PrivacyDashboardViewController: PrivacyDashboardControllerDelegate {
                 let report = try await makeBrokenSiteReport(source: source)
                 try toggleProtectionsOffReporter.report(report, reportMode: .toggle)
             } catch {
-                os_log("Failed to generate or send the broken site report: %@", type: .error, error.localizedDescription)
+                Logger.general.error("Failed to generate or send the broken site report: \(error.localizedDescription)")
             }
         }
     }
@@ -348,6 +349,7 @@ extension PrivacyDashboardViewController {
                                                manufacturer: "Apple",
                                                upgradedHttps: currentTab.privacyInfo?.connectionUpgradedTo != nil,
                                                tdsETag: ContentBlocking.shared.contentBlockingManager.currentRules.first?.etag,
+                                               configVersion: configuration.version,
                                                blockedTrackerDomains: blockedTrackerDomains,
                                                installedSurrogates: installedSurrogates,
                                                isGPCEnabled: WebTrackingProtectionPreferences.shared.isGPCEnabled,

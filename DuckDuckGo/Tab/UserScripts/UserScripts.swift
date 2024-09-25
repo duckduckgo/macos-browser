@@ -21,6 +21,7 @@ import BrowserServicesKit
 import UserScript
 import WebKit
 import Subscription
+import SpecialErrorPages
 
 @MainActor
 final class UserScripts: UserScriptsProvider {
@@ -44,7 +45,7 @@ final class UserScripts: UserScriptsProvider {
     let autoconsentUserScript: UserScriptWithAutoconsent
     let youtubeOverlayScript: YoutubeOverlayUserScript?
     let youtubePlayerUserScript: YoutubePlayerUserScript?
-    let sslErrorPageUserScript: SSLErrorPageUserScript?
+    let specialErrorPageUserScript: SpecialErrorPageUserScript?
     let onboardingUserScript: OnboardingUserScript?
 #if SPARKLE
     let releaseNotesUserScript: ReleaseNotesUserScript?
@@ -64,11 +65,13 @@ final class UserScripts: UserScriptsProvider {
         contentScopeUserScript = ContentScopeUserScript(sourceProvider.privacyConfigurationManager, properties: prefs)
         contentScopeUserScriptIsolated = ContentScopeUserScript(sourceProvider.privacyConfigurationManager, properties: prefs, isIsolated: true)
 
-        autofillScript = WebsiteAutofillUserScript(scriptSourceProvider: sourceProvider.autofillSourceProvider!)
+        autofillScript = WebsiteAutofillUserScript(scriptSourceProvider: sourceProvider.autofillSourceProvider!, loginImportStateProvider: AutofillLoginImportState())
 
         autoconsentUserScript = AutoconsentUserScript(scriptSource: sourceProvider, config: sourceProvider.privacyConfigurationManager.privacyConfig)
 
-        sslErrorPageUserScript = SSLErrorPageUserScript()
+        let lenguageCode = Locale.current.languageCode ?? "en"
+        specialErrorPageUserScript = SpecialErrorPageUserScript(localeStrings: SpecialErrorPageUserScript.localeStrings(for: lenguageCode),
+                                                                    languageCode: lenguageCode)
 
         onboardingUserScript = OnboardingUserScript(onboardingActionsManager: sourceProvider.onboardingActionsManager!)
 
@@ -95,8 +98,8 @@ final class UserScripts: UserScriptsProvider {
         }
 
         if let specialPages = specialPages {
-            if let sslErrorPageUserScript {
-                specialPages.registerSubfeature(delegate: sslErrorPageUserScript)
+            if let specialErrorPageUserScript {
+                specialPages.registerSubfeature(delegate: specialErrorPageUserScript)
             }
             if let youtubePlayerUserScript {
                 specialPages.registerSubfeature(delegate: youtubePlayerUserScript)

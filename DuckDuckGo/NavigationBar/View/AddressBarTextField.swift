@@ -24,6 +24,7 @@ import Common
 import PixelKit
 import Suggestions
 import Subscription
+import os.log
 
 final class AddressBarTextField: NSTextField {
 
@@ -235,7 +236,7 @@ final class AddressBarTextField: NSTextField {
         case .suggestion(let suggestionViewModel):
             let suggestion = suggestionViewModel.suggestion
             switch suggestion {
-            case .website, .bookmark, .historyEntry, .internalPage:
+            case .website, .bookmark, .historyEntry, .internalPage, .openTab:
                 restoreValue(Value(stringValue: suggestionViewModel.autocompletionString, userTyped: true))
             case .phrase(phrase: let phase):
                 restoreValue(Value.text(phase, userTyped: false))
@@ -261,7 +262,7 @@ final class AddressBarTextField: NSTextField {
             switch self.value {
             case .suggestion(let suggestionViewModel):
                 switch suggestionViewModel.suggestion {
-                case .phrase, .website, .bookmark, .historyEntry, .internalPage: return false
+                case .phrase, .website, .bookmark, .historyEntry, .internalPage, .openTab: return false
                 case .unknown: return true
                 }
             case .text(_, userTyped: true), .url(_, _, userTyped: true): return false
@@ -348,7 +349,7 @@ final class AddressBarTextField: NSTextField {
 
     private func updateTabUrlWithUrl(_ providedUrl: URL, userEnteredValue: String, downloadRequested: Bool, suggestion: Suggestion?) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("AddressBarTextField: Selected tab view model is nil", type: .error)
+            Logger.general.error("AddressBarTextField: Selected tab view model is nil")
             return
         }
 
@@ -410,7 +411,7 @@ final class AddressBarTextField: NSTextField {
         makeUrl(suggestion: suggestion,
                 stringValueWithoutSuffix: stringValueWithoutSuffix) { [weak self] url, userEnteredValue, isUpgraded in
             guard let self, let url else {
-                os_log("AddressBarTextField: Making url from address bar string failed", type: .error)
+                Logger.general.error("AddressBarTextField: Making url from address bar string failed")
                 return
             }
             let tab = Tab(content: .url(url, source: .userEntered(userEnteredValue)),
@@ -442,7 +443,8 @@ final class AddressBarTextField: NSTextField {
         case .bookmark(title: _, url: let url, isFavorite: _, allowedInTopHits: _),
              .historyEntry(title: _, url: let url, allowedInTopHits: _),
              .website(url: let url),
-             .internalPage(title: _, url: let url):
+             .internalPage(title: _, url: let url),
+             .openTab(title: _, url: let url):
             finalUrl = url
             userEnteredValue = url.absoluteString
         case .phrase(phrase: let phrase),
@@ -500,7 +502,7 @@ final class AddressBarTextField: NSTextField {
 
     private func displaySelectedSuggestionViewModel() {
         guard let suggestionWindow = suggestionWindowController?.window else {
-            os_log("AddressBarTextField: Window not available", type: .error)
+            Logger.general.error("AddressBarTextField: Window not available")
             return
         }
         guard suggestionWindow.isVisible else { return }
@@ -575,7 +577,7 @@ final class AddressBarTextField: NSTextField {
 
     private func showSuggestionWindow() {
         guard let window = window, let suggestionWindow = suggestionWindowController?.window else {
-            os_log("AddressBarTextField: Window not available", type: .error)
+            Logger.general.error("AddressBarTextField: Window not available")
             return
         }
 
@@ -607,7 +609,7 @@ final class AddressBarTextField: NSTextField {
             return
         }
         guard let superview = superview else {
-            os_log("AddressBarTextField: Superview not available", type: .error)
+            Logger.general.error("AddressBarTextField: Superview not available")
             return
         }
 
@@ -827,7 +829,8 @@ extension AddressBarTextField {
 
             case .bookmark(title: _, url: let url, isFavorite: _, allowedInTopHits: _),
                  .historyEntry(title: _, url: let url, allowedInTopHits: _),
-                 .internalPage(title: _, url: let url):
+                 .internalPage(title: _, url: let url),
+                 .openTab(title: _, url: let url):
                 if let title = suggestionViewModel.title,
                    !title.isEmpty,
                    suggestionViewModel.autocompletionString != title {

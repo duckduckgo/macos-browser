@@ -29,13 +29,15 @@ final class ContentBlockingUpdatingTests: XCTestCase {
     let rulesManager = ContentBlockerRulesManagerMock()
     var updating: UserContentUpdating!
 
+    @MainActor
     override func setUp() {
+        let configStore = ConfigurationStore()
         updating = UserContentUpdating(contentBlockerRulesManager: rulesManager,
                                        privacyConfigurationManager: MockPrivacyConfigurationManager(),
-                                       trackerDataManager: TrackerDataManager(etag: ConfigurationStore.shared.loadEtag(for: .trackerDataSet),
-                                                                                                                                              data: ConfigurationStore.shared.loadData(for: .trackerDataSet),
-                                                                                                                                              embeddedDataProvider: AppTrackerDataSetProvider(),
-                                                                                                                                              errorReporting: nil),
+                                       trackerDataManager: TrackerDataManager(etag: configStore.loadEtag(for: .trackerDataSet),
+                                                                              data: configStore.loadData(for: .trackerDataSet),
+                                                                              embeddedDataProvider: AppTrackerDataSetProvider(),
+                                                                              errorReporting: nil),
                                        configStorage: MockConfigurationStore(),
                                        webTrackingProtectionPreferences: preferences,
                                        tld: TLD())
@@ -143,7 +145,8 @@ final class ContentBlockingUpdatingTests: XCTestCase {
     static let tracker = KnownTracker(domain: "tracker.com",
                                defaultAction: .block,
                                owner: KnownTracker.Owner(name: "Tracker Inc",
-                                                         displayName: "Tracker Inc company"),
+                                                         displayName: "Tracker Inc company",
+                                                         ownedBy: "Owner"),
                                prevalence: 0.1,
                                subdomains: nil,
                                categories: nil,
