@@ -99,10 +99,10 @@ final class ExcludedDomainsViewController: NSViewController {
     }
 
     @IBAction func addDomain(_ sender: NSButton) {
-        AddExcludedDomainView(title: "Add Website Exclusion", buttonsState: .compressed, cancelActionTitle: "Cancel", cancelAction: { dismiss in
+        AddExcludedDomainView(title: UserText.vpnAddExcludedDomainTitle, buttonsState: .compressed, cancelActionTitle: UserText.vpnAddExcludedDomainCancelButtonTitle, cancelAction: { dismiss in
 
             dismiss()
-        }, defaultActionTitle: "Add Website") { [weak self] domain, dismiss in
+        }, defaultActionTitle: UserText.vpnAddExcludedDomainActionButtonTitle) { [weak self] domain, dismiss in
             guard let self else { return }
 
             addDomain(domain)
@@ -119,7 +119,7 @@ final class ExcludedDomainsViewController: NSViewController {
                 tableView.scrollRowToVisible(newRowIndex)
             }
 
-            await model.askUserToReportIssues(withDomain: domain)
+            await model.askUserToReportIssues(withDomain: domain, in: view.window)
         }
     }
 
@@ -154,7 +154,7 @@ extension ExcludedDomainsViewController: NSTableViewDataSource, NSTableViewDeleg
         let domain = visibleDomains[row]
 
         cell.textField?.stringValue = domain
-        cell.imageView?.image = faviconManagement.getCachedFavicon(for: domain, sizeCategory: .small)?.image
+        cell.imageView?.image = faviconManagement.getCachedFavicon(forDomainOrAnySubdomain: domain, sizeCategory: .small)?.image
         cell.imageView?.applyFaviconStyle()
 
         return cell

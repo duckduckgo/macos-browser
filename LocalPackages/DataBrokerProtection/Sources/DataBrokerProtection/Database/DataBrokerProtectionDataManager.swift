@@ -37,6 +37,7 @@ public protocol DataBrokerProtectionDataManaging {
 public protocol DataBrokerProtectionDataManagerDelegate: AnyObject {
     func dataBrokerProtectionDataManagerDidUpdateData()
     func dataBrokerProtectionDataManagerDidDeleteData()
+    func dataBrokerProtectionDataManagerWillOpenSendFeedbackForm()
 }
 
 public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
@@ -132,11 +133,16 @@ extension DataBrokerProtectionDataManager: InMemoryDataCacheDelegate {
 
         delegate?.dataBrokerProtectionDataManagerDidDeleteData()
     }
+
+    public func willOpenSendFeedbackForm() {
+        delegate?.dataBrokerProtectionDataManagerWillOpenSendFeedbackForm()
+    }
 }
 
 public protocol InMemoryDataCacheDelegate: AnyObject {
     func saveCachedProfileToDatabase(_ profile: DataBrokerProtectionProfile) async throws
     func removeAllData() throws
+    func willOpenSendFeedbackForm()
 }
 
 public final class InMemoryDataCache {
@@ -339,5 +345,9 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
         let metadata = await scanDelegate?.getBackgroundAgentMetadata()
 
         return mapper.mapToUIDebugMetadata(metadata: metadata, brokerProfileQueryData: brokerProfileQueryData)
+    }
+
+    func openSendFeedbackModal() async {
+        delegate?.willOpenSendFeedbackForm()
     }
 }

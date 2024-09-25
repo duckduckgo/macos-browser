@@ -84,6 +84,10 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
     }
 
     func show(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate) -> NSPopover {
+
+        /// Since the favicon doesn't have a publisher we force refreshing here
+        siteTroubleshootingInfoPublisher.refreshSiteTroubleshootingInfo()
+
         let popover: NSPopover = {
             let controller = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
 
@@ -104,10 +108,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
             let proxySettings = TransparentProxySettings(defaults: .netP)
             let uiActionHandler = VPNUIActionHandler(vpnURLEventHandler: vpnURLEventHandler, proxySettings: proxySettings)
 
-            let siteTroubleshootingFeatureFlagPublisher = NSApp.delegateTyped.internalUserDecider.isInternalUserPublisher.eraseToAnyPublisher()
-
             let siteTroubleshootingViewModel = SiteTroubleshootingView.Model(
-                featureFlagPublisher: siteTroubleshootingFeatureFlagPublisher,
                 connectionStatusPublisher: statusReporter.statusObserver.publisher,
                 siteTroubleshootingInfoPublisher: $siteInfo.eraseToAnyPublisher(),
                 uiActionHandler: uiActionHandler)

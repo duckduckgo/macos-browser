@@ -158,7 +158,7 @@ extension AppDelegate {
 
     @MainActor
     @objc func showWhatIsNew(_ sender: Any?) {
-        WindowControllersManager.shared.showTab(with: .url(.updates, source: .appOpenUrl))
+        WindowControllersManager.shared.showTab(with: .url(.updates, source: .ui))
     }
 
     #if FEEDBACK
@@ -842,6 +842,10 @@ extension MainViewController {
         DuckPlayerPreferences.shared.reset()
     }
 
+    @objc func resetSyncPromoPrompts(_ sender: Any?) {
+        SyncPromoManager().resetPromos()
+    }
+
     @objc func internalUserState(_ sender: Any?) {
         guard let internalUserDecider = NSApp.delegateTyped.internalUserDecider as? DefaultInternalUserDecider else { return }
         let state = internalUserDecider.isInternalUser
@@ -925,7 +929,7 @@ extension MainViewController {
     }
 
     @objc func reloadConfigurationNow(_ sender: Any?) {
-        ConfigurationManager.shared.forceRefresh(isDebug: true)
+        Application.appDelegate.configurationManager.forceRefresh(isDebug: true)
     }
 
     private func setConfigurationUrl(_ configurationUrl: URL?) {
@@ -934,11 +938,11 @@ extension MainViewController {
             configurationProvider.resetToDefaultConfigurationUrl()
         }
         Configuration.setURLProvider(configurationProvider)
-        ConfigurationManager.shared.forceRefresh(isDebug: true)
+        Application.appDelegate.configurationManager.forceRefresh(isDebug: true)
         if let configurationUrl {
-            Logger.general.debug("New configuration URL set to \(configurationUrl.absoluteString)")
+            Logger.config.debug("New configuration URL set to \(configurationUrl.absoluteString)")
         } else {
-            Logger.general.log("New configuration URL reset to default")
+            Logger.config.log("New configuration URL reset to default")
         }
     }
 
@@ -948,7 +952,7 @@ extension MainViewController {
         if alert.runModal() != .cancel {
             guard let textField = alert.accessoryView as? NSTextField,
                   let newConfigurationUrl = URL(string: textField.stringValue) else {
-                Logger.general.error("Failed to set custom configuration URL")
+                Logger.config.error("Failed to set custom configuration URL")
                 return
             }
 

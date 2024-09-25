@@ -40,7 +40,7 @@ extension NSPasteboardItem {
         }
 
         // WKWebView pasteboard items include the name of the link under the `public.url-name` type.
-        let name = string(forType: NSPasteboard.PasteboardType(rawValue: "public.url-name"))
+        let name = string(forType: .urlName)
         return (title: name, url: url)
     }
 
