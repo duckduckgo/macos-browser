@@ -126,6 +126,7 @@ final class AddressBarViewController: NSViewController, ObservableObject {
             addressBarTextField.suggestionContainerViewModel = suggestionContainerViewModel
 
             registerForMouseEnteredAndExitedEvents()
+            refreshAddressBarAppearance(self)
 
             NotificationCenter.default.addObserver(self,
                                                    selector: #selector(refreshAddressBarAppearance(_:)),
