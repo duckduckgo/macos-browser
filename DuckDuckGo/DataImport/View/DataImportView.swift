@@ -119,7 +119,7 @@ struct DataImportView: ModalView {
                 DataImportTypePicker(viewModel: $model)
                     .disabled(model.isImportSourcePickerDisabled)
 
-                importPasswordSubtitle()
+                passwordsExplainerView().padding(.top, 20)
 
             case .moreInfo:
                 // you will be asked for your keychain password blah blah...
@@ -159,7 +159,7 @@ struct DataImportView: ModalView {
                 }
 
                 if dataType == .passwords {
-                    importPasswordSubtitle()
+                    passwordsExplainerView().padding(.top, 20)
                 }
 
             case .summary(let dataTypes, let isFileImport):
@@ -208,11 +208,18 @@ struct DataImportView: ModalView {
         }
     }
 
-    private func importPasswordSubtitle() -> some View {
-        Text(UserText.importDataSubtitle)
-            .font(.subheadline)
-            .foregroundColor(Color(.greyText))
-            .padding(.top, 16)
+    private func passwordsExplainerView() -> some View {
+        HStack(alignment: .top, spacing: 8) {
+            Image(.lockColor16)
+            Text(model.isPasswordManagerAutolockEnabled ? UserText.importLoginsPasswordsExplainer : UserText.importLoginsPasswordsExplainerAutolockOff)
+                .font(.system(size: 12))
+                .foregroundColor(.secondary)
+                .frame(maxWidth: .infinity, alignment: .topLeading)
+        }
+        .frame(idealWidth: .infinity, maxWidth: .infinity, alignment: .topLeading)
+        .padding(14)
+        .background(Color.blackWhite1)
+        .roundedBorder()
     }
 
     private func handleImportProgress(_ progress: TaskProgress<DataImportViewModel, Never, DataImportProgressEvent>) async {

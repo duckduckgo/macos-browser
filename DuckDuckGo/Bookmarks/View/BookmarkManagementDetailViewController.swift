@@ -18,6 +18,7 @@
 
 import AppKit
 import Combine
+import SwiftUI
 
 protocol BookmarkManagementDetailViewControllerDelegate: AnyObject {
 
@@ -72,6 +73,29 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     }
     private var cancellables = Set<AnyCancellable>()
 
+    private var documentView = FlippedView()
+
+    private var documentViewHeightConstraint: NSLayoutConstraint?
+    private var tableViewTopToPromoTopConstraint: NSLayoutConstraint?
+    private var tableViewTopToDocumentTopConstraint: NSLayoutConstraint?
+
+    private lazy var syncPromoManager: SyncPromoManaging = SyncPromoManager()
+
+    private lazy var syncPromoViewHostingView: NSHostingView<SyncPromoView> = {
+        let model = SyncPromoViewModel(touchpointType: .bookmarks, primaryButtonAction: { [weak self] in
+            self?.syncPromoManager.goToSyncSettings(for: .bookmarks)
+        }, dismissButtonAction: { [weak self] in
+            self?.syncPromoManager.dismissPromoFor(.bookmarks)
+            self?.updateDocumentViewHeight()
+        })
+
+        let headerView = SyncPromoView(viewModel: model,
+                                       layout: .horizontal)
+
+        let hostingController = NSHostingView(rootView: headerView)
+        return hostingController
+    }()
+
     func update(selectionState: BookmarkManagementSidebarViewController.SelectionState) {
         if case .folder = selectionState {
             clearSearch()
@@ -101,6 +125,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     }
 
     override func loadView() {
+        let showSyncPromo = syncPromoManager.shouldPresentPromoFor(.bookmarks)
         view = ColorView(frame: .zero, backgroundColor: .bookmarkPageBackground)
         view.translatesAutoresizingMaskIntoConstraints = false
 
@@ -168,12 +193,16 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         scrollView.contentInsets = NSEdgeInsets(top: 22, left: 0, bottom: 22, right: 0)
 
         let clipView = NSClipView()
-        clipView.documentView = tableView
 
-        clipView.autoresizingMask = [.width, .height]
-        clipView.backgroundColor = .clear
-        clipView.drawsBackground = false
-        clipView.frame = CGRect(x: 0, y: 0, width: 640, height: 601)
+        if !showSyncPromo {
+            clipView.documentView = tableView
+
+            clipView.autoresizingMask = [.width, .height]
+            clipView.backgroundColor = .clear
+            clipView.drawsBackground = false
+            clipView.frame = CGRect(x: 0, y: 0, width: 640, height: 601)
+            scrollView.contentView = clipView
+        }
 
         tableView.addTableColumn(NSTableColumn())
         tableView.headerView = nil
@@ -187,8 +216,6 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         tableView.delegate = self
         tableView.dataSource = self
 
-        scrollView.contentView = clipView
-
         separator.boxType = .separator
         separator.setContentHuggingPriority(.defaultHigh, for: .vertical)
         separator.translatesAutoresizingMaskIntoConstraints = false
@@ -196,6 +223,15 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         searchBar.placeholderString = UserText.bookmarksSearch
         searchBar.delegate = self
+
+        view.addSubview(KeyEquivalentView(keyEquivalents: [
+            [.command, "f"]: { [weak self] in
+                return self?.handleCmdF($0) ?? false
+            }
+        ]))
+        if showSyncPromo {
+            setupSyncPromoView()
+        }
 
         setupLayout()
     }
@@ -281,12 +317,16 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     override func keyDown(with event: NSEvent) {
         if event.charactersIgnoringModifiers == String(UnicodeScalar(NSDeleteCharacter)!) {
             deleteSelectedItems()
-        } else {
-            let commandKeyDown = event.modifierFlags.contains(.command)
-            if commandKeyDown && event.keyCode == 3 { // CMD + F
-                searchBar.makeMeFirstResponder()
-            }
         }
+    }
+
+    private func handleCmdF(_ event: NSEvent) -> Bool {
+        guard case .nonEmpty = managementDetailViewModel.contentState else {
+            __NSBeep()
+            return true
+        }
+        searchBar.makeMeFirstResponder()
+        return true
     }
 
     fileprivate func reloadData() {
@@ -306,6 +346,8 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         case .nonEmpty:
             emptyState.isHidden = true
             tableView.isHidden = false
+            searchBar.isEnabled = true
+            sortItemsButton.isEnabled = true
         }
     }
 
@@ -316,6 +358,9 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         emptyStateMessage.stringValue = mode.description
         emptyStateImageView.image = mode.image
         importButton.isHidden = mode.shouldHideImportButton
+        searchBar.isEnabled = mode != .noBookmarks
+        sortItemsButton.isEnabled = mode != .noBookmarks
+        updateDocumentViewHeight()
     }
 
     @objc func onImportClicked(_ sender: NSButton) {
@@ -663,6 +708,138 @@ extension BookmarkManagementDetailViewController: NSSearchFieldDelegate {
             delegate?.bookmarkManagementDetailViewControllerDidStartSearching()
             reloadData()
         }
+    }
+
+    func control(_ control: NSControl, textView: NSTextView, doCommandBy selector: Selector) -> Bool {
+        guard control === searchBar else {
+            assertionFailure("Unexpected delegating control")
+            return false
+        }
+        switch selector {
+        case #selector(cancelOperation):
+            // handle Esc key press while in search mode
+            self.tableView.makeMeFirstResponder()
+        default:
+            return false
+        }
+        return true
+    }
+
+}
+
+// MARK: - Sync Promo
+
+extension BookmarkManagementDetailViewController {
+
+    private func setupSyncPromoView() {
+        documentView.addSubview(syncPromoViewHostingView)
+        documentView.addSubview(tableView)
+
+        scrollView.contentView.backgroundColor = .clear
+        scrollView.contentView.drawsBackground = false
+        scrollView.documentView = documentView
+
+        documentView.translatesAutoresizingMaskIntoConstraints = false
+        syncPromoViewHostingView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+
+        tableView.focusRingType = .none
+
+        setupSyncPromoLayout()
+    }
+
+    private func setupSyncPromoLayout() {
+         NSLayoutConstraint.activate([
+                                        documentView.topAnchor.constraint(equalTo: scrollView.contentView.topAnchor),
+                                        documentView.leadingAnchor.constraint(equalTo: scrollView.contentView.leadingAnchor),
+                                        documentView.trailingAnchor.constraint(lessThanOrEqualTo: scrollView.contentView.trailingAnchor),
+                                        documentView.widthAnchor.constraint(equalTo: scrollView.contentView.widthAnchor, constant: -12),
+                                        scrollView.widthAnchor.constraint(greaterThanOrEqualToConstant: 400),
+                                        scrollView.heightAnchor.constraint(greaterThanOrEqualToConstant: 220)
+                                    ])
+
+        NSLayoutConstraint.activate([
+                                        syncPromoViewHostingView.topAnchor.constraint(equalTo: documentView.topAnchor, constant: 0),
+                                        syncPromoViewHostingView.leadingAnchor.constraint(equalTo: documentView.leadingAnchor, constant: 2),
+                                        syncPromoViewHostingView.trailingAnchor.constraint(equalTo: documentView.trailingAnchor, constant: -2),
+
+                                        tableView.leadingAnchor.constraint(equalTo: documentView.leadingAnchor),
+                                        tableView.trailingAnchor.constraint(equalTo: documentView.trailingAnchor),
+                                        tableView.bottomAnchor.constraint(greaterThanOrEqualTo: documentView.bottomAnchor),
+                                    ])
+
+        tableViewTopToDocumentTopConstraint = tableView.topAnchor.constraint(equalTo: documentView.topAnchor)
+        tableViewTopToDocumentTopConstraint?.isActive = false
+        tableViewTopToPromoTopConstraint = tableView.topAnchor.constraint(equalTo: syncPromoViewHostingView.bottomAnchor, constant: 4)
+        tableViewTopToPromoTopConstraint?.isActive = true
+
+        let totalHeight = syncPromoViewHostingView.frame.height + tableView.frame.height
+        documentViewHeightConstraint = documentView.heightAnchor.constraint(equalToConstant: totalHeight)
+        documentViewHeightConstraint?.isActive = true
+
+        NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(syncPromoDismissed),
+                name: SyncPromoManager.SyncPromoManagerNotifications.didDismissPromo,
+                object: nil)
+
+        NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(tableViewFrameDidChange),
+                name: NSView.frameDidChangeNotification,
+                object: tableView
+        )
+
+        tableView.postsFrameChangedNotifications = true
+    }
+
+    private func shouldShowSyncPromo() -> Bool {
+        return emptyState.isHidden
+               && !managementDetailViewModel.isSearching
+               && !tableView.isHidden
+               && parentFolder == nil
+               && (bookmarkManager.list?.totalBookmarks ?? 0) > 0
+               && totalRows() > 0
+               && syncPromoManager.shouldPresentPromoFor(.bookmarks)
+    }
+
+    @objc private func syncPromoDismissed(notification: Notification) {
+        updateDocumentViewHeight()
+    }
+
+    @objc private func tableViewFrameDidChange(notification: Notification) {
+        updateDocumentViewHeight()
+    }
+
+    private func updateDocumentViewHeight() {
+        guard scrollView.documentView is FlippedView else { return }
+
+        let tableViewHeight = tableView.intrinsicContentSize.height
+
+        if shouldShowSyncPromo() {
+            if let tableViewTopToDocumentTopConstraint = tableViewTopToDocumentTopConstraint, tableViewTopToDocumentTopConstraint.isActive {
+                syncPromoViewHostingView.isHidden = false
+                tableViewTopToDocumentTopConstraint.isActive = false
+                tableViewTopToPromoTopConstraint?.isActive = true
+            }
+
+            let promoHeight = syncPromoViewHostingView.intrinsicContentSize.height == 0 ? 80 : syncPromoViewHostingView.intrinsicContentSize.height
+            let totalHeight = promoHeight + tableViewHeight
+            updateDocumentViewHeightIfNeeded(totalHeight)
+        } else {
+            if let tableViewTopToPromoTopConstraint = tableViewTopToPromoTopConstraint, tableViewTopToPromoTopConstraint.isActive {
+                syncPromoViewHostingView.isHidden = true
+                tableViewTopToPromoTopConstraint.isActive = false
+                tableViewTopToDocumentTopConstraint?.isActive = true
+            }
+
+            updateDocumentViewHeightIfNeeded(tableViewHeight)
+        }
+    }
+
+    private func updateDocumentViewHeightIfNeeded(_ newHeight: CGFloat) {
+        guard documentViewHeightConstraint?.constant != newHeight else { return }
+        documentViewHeightConstraint?.constant = newHeight
     }
 }
 

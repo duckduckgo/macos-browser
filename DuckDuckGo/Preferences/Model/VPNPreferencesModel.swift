@@ -91,19 +91,16 @@ final class VPNPreferencesModel: ObservableObject {
     private let vpnXPCClient: VPNControllerXPCClient
     private let settings: VPNSettings
     private let pinningManager: PinningManager
-    private let internalUserDecider: InternalUserDecider
     private var cancellables = Set<AnyCancellable>()
 
     init(vpnXPCClient: VPNControllerXPCClient = .shared,
          settings: VPNSettings = .init(defaults: .netP),
          pinningManager: PinningManager = LocalPinningManager.shared,
-         defaults: UserDefaults = .netP,
-         internalUserDecider: InternalUserDecider = NSApp.delegateTyped.internalUserDecider) {
+         defaults: UserDefaults = .netP) {
 
         self.vpnXPCClient = vpnXPCClient
         self.settings = settings
         self.pinningManager = pinningManager
-        self.internalUserDecider = internalUserDecider
 
         connectOnLogin = settings.connectOnLogin
         excludeLocalNetworks = settings.excludeLocalNetworks
@@ -111,7 +108,7 @@ final class VPNPreferencesModel: ObservableObject {
         showInMenuBar = settings.showInMenuBar
         showInBrowserToolbar = pinningManager.isPinned(.networkProtection)
         showUninstallVPN = defaults.networkProtectionOnboardingStatus != .default
-        showExcludedSites = internalUserDecider.isInternalUser
+        showExcludedSites = true
         onboardingStatus = defaults.networkProtectionOnboardingStatus
         locationItem = VPNLocationPreferenceItemModel(selectedLocation: settings.selectedLocation)
 
@@ -120,7 +117,6 @@ final class VPNPreferencesModel: ObservableObject {
         subscribeToShowInBrowserToolbarSettingsChanges()
         subscribeToLocationSettingChanges()
         subscribeToDNSSettingsChanges()
-        subscribeToInternalUserChanges()
     }
 
     func subscribeToOnboardingStatusChanges(defaults: UserDefaults) {
@@ -167,12 +163,6 @@ final class VPNPreferencesModel: ObservableObject {
             .store(in: &cancellables)
         isCustomDNSSelected = settings.dnsSettings.usesCustomDNS
         customDNSServers = settings.dnsSettings.dnsServersText
-    }
-
-    private func subscribeToInternalUserChanges() {
-        internalUserDecider.isInternalUserPublisher
-            .assign(to: \.showExcludedSites, onWeaklyHeld: self)
-            .store(in: &cancellables)
     }
 
     func resetDNSSettings() {

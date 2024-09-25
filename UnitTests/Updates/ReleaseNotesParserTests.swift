@@ -49,7 +49,7 @@ class ReleaseNotesParserTests: XCTestCase {
 
         func testParseReleaseNotes_withOnlyPrivacyProNotes() {
             let description = """
-            <h2>For Privacy Pro subscribers</h2>
+            <h3>For Privacy Pro subscribers</h3>
             <ul>
                 <li>Exclusive feature X</li>
                 <li>Exclusive improvement Y</li>
@@ -68,7 +68,7 @@ class ReleaseNotesParserTests: XCTestCase {
                 <li>New feature A</li>
                 <li>Improvement B</li>
             </ul>
-            <h2>For Privacy Pro subscribers</h2>
+            <h3>For Privacy Pro subscribers</h3>
             <ul>
                 <li>Exclusive feature X</li>
                 <li>Exclusive improvement Y</li>
@@ -87,7 +87,7 @@ class ReleaseNotesParserTests: XCTestCase {
                 <li>New feature A</li>
                 <li>Improvement B
             </ul>
-            <h2>For Privacy Pro subscribers</h2>
+            <h3>For Privacy Pro subscribers</h3>
             <ul>
                 <li>Exclusive feature X</li>
                 <li>Exclusive improvement Y</li>

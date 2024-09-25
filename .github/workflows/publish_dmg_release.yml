@@ -267,6 +267,7 @@ jobs:
         id: get-tasks-since-last-internal-release
         if: contains(github.event.inputs.release-type, '') || github.event.inputs.release-type == 'internal'
         env:
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
           GH_TOKEN: ${{ github.token }}
         run: |
           tasks="$(./scripts/update_asana_for_release.sh list-tasks-in-last-internal-release)"
@@ -389,7 +390,8 @@ jobs:
           bundle exec fastlane run asana_log_message \
             task_url:"${{ env.asana-task-url }}" \
             template_name:"${{ steps.asana-templates.outputs.comment-template }}" \
-            github_handle:"${{ github.actor }}"
+            github_handle:"${{ github.actor }}" \
+            is_scheduled_release:"${{ github.event_name == 'schedule' }}"
 
       - name: Add a comment to the release task
         if: success()

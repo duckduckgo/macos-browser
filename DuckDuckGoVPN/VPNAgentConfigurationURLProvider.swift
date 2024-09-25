@@ -1,5 +1,5 @@
 //
-//  NetworkProtection+VPNAgentConvenienceInitializers.swift
+//  VPNAgentConfigurationURLProvider.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -17,14 +17,13 @@
 //
 
 import Foundation
-import NetworkProtection
-import Subscription
+import BrowserServicesKit
+import Configuration
 
-extension NetworkProtectionKeychainTokenStore {
-    convenience init() {
-        self.init(keychainType: .default,
-                  errorEvents: .networkProtectionAppDebugEvents,
-                  isSubscriptionEnabled: false,
-                  accessTokenProvider: { return nil })
+struct VPNAgentConfigurationURLProvider: ConfigurationURLProviding {
+    func url(for configuration: Configuration) -> URL {
+        guard configuration == .privacyConfiguration else { fatalError("\(configuration.rawValue) is not supported on this target") }
+
+        return URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/config/v4/macos-config.json")!
     }
 }

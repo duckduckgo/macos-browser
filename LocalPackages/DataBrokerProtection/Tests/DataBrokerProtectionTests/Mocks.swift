@@ -19,6 +19,7 @@
 import BrowserServicesKit
 import Combine
 import Common
+import Configuration
 import Foundation
 import GRDB
 import SecureStorage
@@ -168,6 +169,7 @@ final class PrivacyConfigurationManagingMock: PrivacyConfigurationManaging {
 
 final class PrivacyConfigurationMock: PrivacyConfiguration {
     var identifier: String = "mock"
+    var version: String? = "123456789"
 
     var userUnprotectedDomains = [String]()
 
@@ -1384,7 +1386,7 @@ final class MockDataBrokerProtectionOperationQueue: DataBrokerProtectionOperatio
         self.operations.append(op)
     }
 
-    func addBarrierBlock(_ barrier: @escaping @Sendable () -> Void) {
+    func addBarrierCompletionBlock(_ barrier: @escaping @Sendable () -> Void) {
         didCallAddBarrierBlockCount += 1
         self.barrierBlock = barrier
     }

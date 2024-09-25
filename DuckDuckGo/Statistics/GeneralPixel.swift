@@ -276,6 +276,8 @@ enum GeneralPixel: PixelKitEventV2 {
     case privacyConfigurationReloadFailed
     case privacyConfigurationCouldNotBeLoaded
 
+    case configurationFileCoordinatorError
+
     case fileStoreWriteFailed
     case fileMoveToDownloadsFailed
     case fileAccessRelatedItemFailed
@@ -625,9 +627,9 @@ enum GeneralPixel: PixelKitEventV2 {
         case .duckPlayerContingencyLearnMoreClicked:
             return "duckplayer_mac_contingency_learn-more-clicked"
         case .dashboardProtectionAllowlistAdd:
-            return "m_mac_mp_wla"
+            return "mp_wla"
         case .dashboardProtectionAllowlistRemove:
-            return "m_mac_mp_wlr"
+            return "mp_wlr"
 
         case .launchInitial:
             return "m_mac_first-launch"
@@ -809,6 +811,9 @@ enum GeneralPixel: PixelKitEventV2 {
             return "pcf_r"
         case .privacyConfigurationCouldNotBeLoaded:
             return "pcf_l"
+
+        case .configurationFileCoordinatorError:
+            return "configuration_file_coordinator_error"
 
         case .fileStoreWriteFailed:
             return "fswf"

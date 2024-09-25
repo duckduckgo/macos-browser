@@ -30,8 +30,7 @@ public struct SiteTroubleshootingView: View {
     // MARK: - View Contents
 
     public var body: some View {
-        if model.isFeatureEnabled,
-           let siteInfo = model.siteInfo {
+        if let siteInfo = model.siteInfo {
             siteTroubleshootingView(siteInfo)
         } else {
             EmptyView()
@@ -45,10 +44,9 @@ public struct SiteTroubleshootingView: View {
 
         VStack(alignment: .leading) {
             Text("Website Preferences")
-                .font(.system(size: 13, weight: .bold))
+                .applySectionHeaderAttributes(colorScheme: colorScheme)
                 .padding(.vertical, 3)
                 .padding(.horizontal, 9)
-                .foregroundColor(Color(.defaultText))
 
             Toggle(isOn: Binding(get: {
                 siteInfo.excluded
@@ -56,13 +54,14 @@ public struct SiteTroubleshootingView: View {
                 model.setExclusion(value, forDomain: siteInfo.domain)
             })) {
                 HStack(spacing: 5) {
-                    Image(nsImage: siteInfo.icon)
-                        .resizable()
-                        .frame(width: Self.iconSize, height: Self.iconSize)
+                    if let icon = siteInfo.icon {
+                        Image(nsImage: icon)
+                            .resizable()
+                            .frame(width: Self.iconSize, height: Self.iconSize)
+                    }
 
-                    Text("Disable VPN for \(siteInfo.domain)")
-                        .font(.system(size: 12))
-                        .foregroundColor(Color(.defaultText))
+                    Text("Exclude \(siteInfo.domain) from VPN")
+                        .applyLabelAttributes(colorScheme: colorScheme)
 
                     Spacer()
                 }

@@ -250,7 +250,7 @@ extension DBPUIOptOutMatch {
                   date: removedDate,
                   foundDate: profileMatch.foundDate,
                   optOutSubmittedDate: profileMatch.optOutSubmittedDate,
-                  estimatedRemovalDate: nil,
+                  estimatedRemovalDate: profileMatch.estimatedRemovalDate,
                   removedDate: removedDate)
     }
 }

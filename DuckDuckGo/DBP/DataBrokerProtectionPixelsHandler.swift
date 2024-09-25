@@ -32,7 +32,9 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .secureVaultInitError(let error),
                     .secureVaultError(let error),
                     .secureVaultKeyStoreReadError(let error),
-                    .secureVaultKeyStoreUpdateError(let error):
+                    .secureVaultKeyStoreUpdateError(let error),
+                    .errorLoadingCachedConfig(let error),
+                    .failedToParsePrivacyConfig(let error):
                 PixelKit.fire(DebugEvent(event, error: error))
             case .ipcServerProfileSavedXPCError(error: let error),
                     .ipcServerImmediateScansFinishedWithError(error: let error),
@@ -105,6 +107,8 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .dataBrokerMetricsMonthlyStats,
                     .gatekeeperNotAuthenticated,
                     .gatekeeperEntitlementsInvalid,
+                    .invalidPayload,
+                    .pixelTest,
                     .customDataBrokerStatsOptoutSubmit,
                     .customGlobalStatsOptoutSubmit,
                     .weeklyChildBrokerOrphanedOptOuts:

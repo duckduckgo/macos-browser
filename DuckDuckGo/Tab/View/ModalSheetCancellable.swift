@@ -36,9 +36,11 @@ final class ModalSheetCancellable: Cancellable {
         self.returnCode = returnCode
         self.condition = condition
         self.cancellationHandler = cancellationHandler
+        // cancel the request when dialog owning window is closed
+        NotificationCenter.default.addObserver(self, selector: #selector(cancel), name: NSWindow.willCloseNotification, object: ownerWindow)
     }
 
-    func cancel() {
+    @objc func cancel() {
         guard let ownerWindow, let modalSheet,
               ownerWindow.sheets.contains(modalSheet),
               condition() == true

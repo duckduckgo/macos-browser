@@ -119,7 +119,7 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable, CaseIt
     case autofill
     case accessibility
     case duckPlayer = "duckplayer"
-    case otherPlatforms = "https://duckduckgo.com/app"
+    case otherPlatforms = "https://duckduckgo.com/app?origin=funnel_app_macos"
     case about
 
     var id: Self {

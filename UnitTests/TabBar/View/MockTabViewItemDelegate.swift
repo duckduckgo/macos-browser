@@ -125,7 +125,7 @@ class MockTabViewItemDelegate: TabBarViewItemDelegate {
         OtherTabBarViewItemsState(hasItemsToTheLeft: hasItemsToTheLeft, hasItemsToTheRight: hasItemsToTheRight)
     }
 
-    func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, replaceWithStringSearch: String) {
+    func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, replaceContentWithDroppedStringValue: String) {
 
     }
 

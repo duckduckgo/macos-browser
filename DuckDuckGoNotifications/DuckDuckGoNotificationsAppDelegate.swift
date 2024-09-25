@@ -19,7 +19,6 @@
 import AppLauncher
 import Cocoa
 import Combine
-import Common
 import NetworkExtension
 import NetworkProtection
 import VPNAppLauncher
