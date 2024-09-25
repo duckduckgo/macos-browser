@@ -25,6 +25,7 @@ final class MainWindowController: NSWindowController {
 
     private var fireViewModel: FireViewModel
     private static var knownFullScreenMouseDetectionWindows = Set<NSValue>()
+    let fireWindowSession: FireWindowSession?
 
     var mainViewController: MainViewController {
         // swiftlint:disable force_cast
@@ -36,7 +37,7 @@ final class MainWindowController: NSWindowController {
         return window?.standardWindowButton(.closeButton)?.superview
     }
 
-    init(mainViewController: MainViewController, popUp: Bool, fireViewModel: FireViewModel? = nil) {
+    init(mainViewController: MainViewController, popUp: Bool, fireWindowSession: FireWindowSession? = nil, fireViewModel: FireViewModel? = nil) {
         let size = mainViewController.view.frame.size
         let moveToCenter = CGAffineTransform(translationX: ((NSScreen.main?.frame.width ?? 1024) - size.width) / 2,
                                              y: ((NSScreen.main?.frame.height ?? 790) - size.height) / 2)
@@ -46,6 +47,10 @@ final class MainWindowController: NSWindowController {
         let window = popUp ? PopUpWindow(frame: frame) : MainWindow(frame: frame)
         window.contentViewController = mainViewController
         self.fireViewModel = fireViewModel ?? FireCoordinator.fireViewModel
+
+        assert(!mainViewController.isBurner || fireWindowSession != nil)
+        self.fireWindowSession = fireWindowSession
+        fireWindowSession?.addWindow(window)
 
         super.init(window: window)
 
@@ -284,17 +289,58 @@ extension MainWindowController: NSWindowDelegate {
         WindowControllersManager.shared.unregister(self)
     }
 
-    func windowShouldClose(_ sender: NSWindow) -> Bool {
-        // Animate fire for Burner Window when closing
-        guard mainViewController.tabCollectionViewModel.isBurner && !sender.isPopUpWindow else {
-            return true
+    func windowShouldClose(_ window: NSWindow) -> Bool {
+        guard mainViewController.tabCollectionViewModel.isBurner else { return true }
+
+        if showAlertIfActiveDownloadsPresent(in: window) {
+            return false
+        }
+
+        animateBurningIfNeededAndClose(window)
+        return false
+    }
+
+    private func showAlertIfActiveDownloadsPresent(in window: NSWindow) -> Bool {
+        guard let fireWindowSessionRef = FireWindowSessionRef(window: window),
+              let fireWindowSession = fireWindowSessionRef.fireWindowSession else {
+            assertionFailure("No FireWindowSession in Fire Window \(window)")
+            return false
+        }
+        // only check if it‘s the last Fire Window from the Burner Session
+        guard fireWindowSession.windows == [window] else { return false }
+        let fireWindowDownloads = Set(FileDownloadManager.shared.downloads.filter { $0.fireWindowSession == fireWindowSessionRef && $0.state.isDownloading })
+        guard !fireWindowDownloads.isEmpty else { return false }
+
+        let alert = NSAlert.activeDownloadsFireWindowClosingAlert(for: fireWindowDownloads)
+        let downloadsFinishedCancellable = FileDownloadManager.observeDownloadsFinished(fireWindowDownloads) {
+            // close alert and burn the window when all downloads finished
+            window.endSheet(alert.window, returnCode: .OK)
+        }
+        alert.beginSheetModal(for: window) { response in
+            downloadsFinishedCancellable.cancel()
+            if response == .OK {
+                self.animateBurningIfNeededAndClose(window)
+                return
+            } else if self.mainViewController.tabCollectionViewModel.tabs.isEmpty {
+                // reopen last closed tab if the window stays open
+                DispatchQueue.main.async {
+                    self.mainViewController.browserTabViewController.openNewTab(with: .newtab)
+                }
+            }
+        }
+        return true
+    }
+
+    private func animateBurningIfNeededAndClose(_ window: NSWindow) {
+        guard !window.isPopUpWindow else {
+            window.close()
+            return
         }
         Task {
             moveTabBarView(toTitlebarView: false)
             await mainViewController.fireViewController.animateFireWhenClosing()
-            sender.close()
+            window.close()
         }
-        return false
     }
 
 }

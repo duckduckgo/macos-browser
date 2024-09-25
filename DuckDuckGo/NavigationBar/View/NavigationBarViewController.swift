@@ -131,7 +131,7 @@ final class NavigationBarViewController: NSViewController {
 
     init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, networkProtectionFeatureActivation: NetworkProtectionFeatureActivation, downloadListCoordinator: DownloadListCoordinator, dragDropManager: BookmarkDragDropManager, networkProtectionPopoverManager: NetPPopoverManager, networkProtectionStatusReporter: NetworkProtectionStatusReporter, autofillPopoverPresenter: AutofillPopoverPresenter) {
 
-        self.popovers = NavigationBarPopovers(networkProtectionPopoverManager: networkProtectionPopoverManager, autofillPopoverPresenter: autofillPopoverPresenter)
+        self.popovers = NavigationBarPopovers(networkProtectionPopoverManager: networkProtectionPopoverManager, autofillPopoverPresenter: autofillPopoverPresenter, isBurner: isBurner)
         self.tabCollectionViewModel = tabCollectionViewModel
         self.networkProtectionButtonModel = NetworkProtectionNavBarButtonModel(popoverManager: networkProtectionPopoverManager, statusReporter: networkProtectionStatusReporter)
         self.isBurner = isBurner
@@ -156,13 +156,6 @@ final class NavigationBarViewController: NSViewController {
         addressBarContainer.layer?.masksToBounds = false
 
         setupNavigationButtonMenus()
-        subscribeToSelectedTabViewModel()
-        listenToVPNToggleNotifications()
-        listenToPasswordManagerNotifications()
-        listenToPinningManagerNotifications()
-        listenToMessageNotifications()
-        listenToFeedbackFormNotifications()
-        subscribeToDownloads()
         addContextMenu()
 
         optionsButton.sendAction(on: .leftMouseDown)
@@ -187,6 +180,14 @@ final class NavigationBarViewController: NSViewController {
     }
 
     override func viewWillAppear() {
+        subscribeToSelectedTabViewModel()
+        listenToVPNToggleNotifications()
+        listenToPasswordManagerNotifications()
+        listenToPinningManagerNotifications()
+        listenToMessageNotifications()
+        listenToFeedbackFormNotifications()
+        subscribeToDownloads()
+
         updateDownloadsButton()
         updatePasswordManagementButton()
         updateBookmarksButton()
@@ -698,8 +699,9 @@ final class NavigationBarViewController: NSViewController {
             .store(in: &downloadsCancellables)
 
         // update Downloads button total progress indicator
-        downloadListCoordinator.progress.publisher(for: \.totalUnitCount)
-            .combineLatest(downloadListCoordinator.progress.publisher(for: \.completedUnitCount))
+        let combinedDownloadProgress = downloadListCoordinator.combinedDownloadProgressCreatingIfNeeded(for: FireWindowSessionRef(window: view.window))
+        combinedDownloadProgress.publisher(for: \.totalUnitCount)
+            .combineLatest(combinedDownloadProgress.publisher(for: \.completedUnitCount))
             .map { (total, completed) -> Double? in
                 guard total > 0, completed < total else { return nil }
                 return Double(completed) / Double(total)
@@ -800,7 +802,7 @@ final class NavigationBarViewController: NSViewController {
             return
         }
 
-        let hasActiveDownloads = downloadListCoordinator.hasActiveDownloads
+        let hasActiveDownloads = downloadListCoordinator.hasActiveDownloads(for: FireWindowSessionRef(window: view.window))
         downloadsButton.image = hasActiveDownloads ? .downloadsActive : .downloads
 
         if downloadListCoordinator.isEmpty {
@@ -851,7 +853,7 @@ final class NavigationBarViewController: NSViewController {
 
     private func hideDownloadButtonIfPossible() {
         if LocalPinningManager.shared.isPinned(.downloads) ||
-            downloadListCoordinator.hasActiveDownloads ||
+            downloadListCoordinator.hasActiveDownloads(for: FireWindowSessionRef(window: view.window)) ||
             popovers.isDownloadsPopoverShown { return }
 
         downloadsButton.isHidden = true

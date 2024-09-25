@@ -642,7 +642,7 @@ extension TabBarViewController: MouseOverButtonDelegate {
     func mouseOverButton(_ sender: MouseOverButton, performDragOperation info: any NSDraggingInfo) -> Bool {
         assert(sender === addTabButton || sender === footerAddButton)
         if let string = info.draggingPasteboard.string(forType: .string), let url = URL.makeURL(from: string) {
-            tabCollectionViewModel.insertOrAppendNewTab(.url(url, credential: nil, source: .ui))
+            tabCollectionViewModel.insertOrAppendNewTab(.url(url, credential: nil, source: .appOpenUrl))
             return true
         }
 
@@ -993,7 +993,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
                                           selected: true)
             return true
         } else if let string = draggingInfo.draggingPasteboard.string(forType: .string), let url = URL.makeURL(from: string) {
-            tabCollectionViewModel.insertOrAppendNewTab(.url(url, credential: nil, source: .reload))
+            tabCollectionViewModel.insertOrAppendNewTab(.url(url, credential: nil, source: .appOpenUrl))
             return true
         }
 
@@ -1256,12 +1256,12 @@ extension TabBarViewController: TabBarViewItemDelegate {
         return tab.audioState
     }
 
-    func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, replaceWithStringSearch: String) {
+    func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, replaceContentWithDroppedStringValue stringValue: String) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
               let tab = tabCollectionViewModel.tabCollection.tabs[safe: indexPath.item] else { return }
 
-        if let url = URL.makeURL(from: replaceWithStringSearch) {
-            tab.setContent(.url(url, credential: nil, source: .reload))
+        if let url = URL.makeURL(from: stringValue) {
+            tab.setContent(.url(url, credential: nil, source: .userEntered(stringValue, downloadRequested: false)))
         }
     }
 
