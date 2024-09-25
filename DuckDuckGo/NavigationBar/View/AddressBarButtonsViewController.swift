@@ -257,9 +257,13 @@ final class AddressBarButtonsViewController: NSViewController {
             guard let tabViewModel, tabViewModel.canBeBookmarked else { return false }
 
             var isUrlBookmarked = false
-            if let url = tabViewModel.tab.content.userEditableUrl,
-               bookmarkManager.isUrlBookmarked(url: url) {
-                isUrlBookmarked = true
+            if let url = tabViewModel.tab.content.userEditableUrl {
+                let urlVariants = url.bookmarkButtonVariants()
+
+                // Check if any of the URL variants is bookmarked
+                isUrlBookmarked = urlVariants.contains { variant in
+                        return bookmarkManager.isUrlBookmarked(url: variant)
+                }
             }
 
             return clearButton.isHidden && !hasEmptyAddressBar && (isMouseOverNavigationBar || popovers.isEditBookmarkPopoverShown || isUrlBookmarked)
@@ -688,7 +692,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     private func updateBookmarkButtonImage(isUrlBookmarked: Bool = false) {
         if let url = tabViewModel?.tab.content.userEditableUrl,
-           isUrlBookmarked || bookmarkManager.isUrlBookmarked(url: url)
+           isUrlBookmarked || bookmarkManager.isAnyUrlVariantBookmarked(url: url)
         {
             bookmarkButton.image = .bookmarkFilled
             bookmarkButton.mouseOverTintColor = NSColor.bookmarkFilledTint
@@ -896,7 +900,7 @@ final class AddressBarButtonsViewController: NSViewController {
             return (nil, false)
         }
 
-        if let bookmark = bookmarkManager.getBookmark(forUrl: url.absoluteString) {
+        if let bookmark = bookmarkManager.getBookmark(forVariantUrl: url) {
             if setFavorite {
                 bookmark.isFavorite = true
                 bookmarkManager.update(bookmark: bookmark)
@@ -1039,5 +1043,53 @@ extension URL {
             }
         }
         return false
+    }
+}
+
+extension URL {
+
+    func bookmarkButtonVariants() -> [URL] {
+        var urlString = self.absoluteString
+
+        // Remove the scheme (http:// or https://)
+        if urlString.hasPrefix("https://") {
+            urlString = String(urlString.dropFirst("https://".count))
+        } else if urlString.hasPrefix("http://") {
+            urlString = String(urlString.dropFirst("http://".count))
+        }
+
+        // Create two variants: one without a trailing slash and one with it
+        let withoutTrailingSlash = urlString.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+        let withTrailingSlash = withoutTrailingSlash + "/"
+
+        // Determine the scheme-swapped variants
+        let httpVariant = "http://" + withoutTrailingSlash
+        let httpsVariant = "https://" + withoutTrailingSlash
+
+        let httpVariantWithSlash = "http://" + withTrailingSlash
+        let httpsVariantWithSlash = "https://" + withTrailingSlash
+
+        // Convert all to URLs, including the original URL
+        let variants: [URL?] = [
+            self,                                  // Original URL
+            URL(string: "http://" + urlString),    // http original
+            URL(string: "https://" + urlString),   // https original
+            URL(string: httpVariant),              // http without trailing slash
+            URL(string: httpsVariant),             // https without trailing slash
+            URL(string: httpVariantWithSlash),     // http with trailing slash
+            URL(string: httpsVariantWithSlash)     // https with trailing slash
+        ]
+
+        // Filter out nil values and remove duplicates while preserving order
+        var seen = Set<String>()  // A set to keep track of unique URLs
+        return variants.compactMap { variant in
+            guard let url = variant else { return nil }
+            let normalizedUrl = url.absoluteString.lowercased() // Normalize for comparison
+            if seen.contains(normalizedUrl) {
+                return nil  // Skip if already added
+            }
+            seen.insert(normalizedUrl)
+            return url
+        }
     }
 }

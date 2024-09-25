@@ -25,10 +25,12 @@ import os.log
 protocol BookmarkManager: AnyObject {
 
     func isUrlBookmarked(url: URL) -> Bool
+    func isAnyUrlVariantBookmarked(url: URL) -> Bool
     func isUrlFavorited(url: URL) -> Bool
     func allHosts() -> Set<String>
     func getBookmark(for url: URL) -> Bookmark?
     func getBookmark(forUrl url: String) -> Bookmark?
+    func getBookmark(forVariantUrl variantURL: URL) -> Bookmark?
     func getBookmarkFolder(withId id: String) -> BookmarkFolder?
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark?
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool, index: Int?, parent: BookmarkFolder?) -> Bookmark?
@@ -143,6 +145,10 @@ final class LocalBookmarkManager: BookmarkManager {
         return list?[url.absoluteString] != nil
     }
 
+    func isAnyUrlVariantBookmarked(url: URL) -> Bool {
+        return findBookmark(forVariantUrl: url) != nil
+    }
+
     func isUrlFavorited(url: URL) -> Bool {
         return list?[url.absoluteString]?.isFavorite == true
     }
@@ -157,6 +163,22 @@ final class LocalBookmarkManager: BookmarkManager {
 
     func getBookmark(forUrl url: String) -> Bookmark? {
         return list?[url]
+    }
+
+    func getBookmark(forVariantUrl variantURL: URL) -> Bookmark? {
+        return findBookmark(forVariantUrl: variantURL)
+    }
+
+    private func findBookmark(forVariantUrl url: URL) -> Bookmark? {
+        let urlVariants = url.bookmarkButtonVariants()
+
+        for variant in urlVariants {
+            if let bookmark = getBookmark(for: variant) {
+                return bookmark
+            }
+        }
+
+        return nil
     }
 
     func getBookmarkFolder(withId id: String) -> BookmarkFolder? {
