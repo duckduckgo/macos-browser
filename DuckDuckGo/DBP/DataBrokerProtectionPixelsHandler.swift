@@ -106,7 +106,8 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .gatekeeperNotAuthenticated,
                     .gatekeeperEntitlementsInvalid,
                     .customDataBrokerStatsOptoutSubmit,
-                    .customGlobalStatsOptoutSubmit:
+                    .customGlobalStatsOptoutSubmit,
+                    .weeklyChildBrokerOrphanedOptOuts:
 
                 PixelKit.fire(event)
 
