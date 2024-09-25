@@ -20,7 +20,7 @@ import Foundation
 import Subscription
 import BrowserServicesKit
 
-public struct SubscriptionFeatureAvailabilityMock: SubscriptionFeatureAvailability {
+public final class SubscriptionFeatureAvailabilityMock: SubscriptionFeatureAvailability {
     public var isFeatureAvailable: Bool
     public var isSubscriptionPurchaseAllowed: Bool
     public var usesUnifiedFeedbackForm: Bool

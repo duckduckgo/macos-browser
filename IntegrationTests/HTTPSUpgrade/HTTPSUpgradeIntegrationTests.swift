@@ -43,7 +43,6 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
         window = WindowsManager.openNewWindow(with: .none)!
 
         XCTAssertTrue(AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig.isFeature(.httpsUpgrade, enabledForDomain: "privacy-test-pages.site"))
-        await ConfigurationManager.shared.refreshIfNeeded()?.value
     }
 
     @MainActor

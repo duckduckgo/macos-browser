@@ -49,15 +49,11 @@ final class MoreOptionsMenuTests: XCTestCase {
         capturingActionDelegate = CapturingOptionsButtonMenuDelegate()
         internalUserDecider = InternalUserDeciderMock()
 
-        storePurchaseManager = StorePurchaseManagerMock(purchasedProductIDs: ["a", "b"],
-                                                        purchaseQueue: [],
-                                                        areProductsAvailable: true,
-                                                        hasActiveSubscriptionResult: false,
-                                                        purchaseSubscriptionResult: .success(""))
+        storePurchaseManager = StorePurchaseManagerMock()
 
         subscriptionManager = SubscriptionManagerMock(accountManager: AccountManagerMock(),
                                                       subscriptionEndpointService: SubscriptionEndpointServiceMock(),
-                                                      authEndpointService: SubscriptionMockFactory.authEndpointService,
+                                                      authEndpointService: AuthEndpointServiceMock(),
                                                       storePurchaseManager: storePurchaseManager,
                                                       currentEnvironment: SubscriptionEnvironment(serviceEnvironment: .production,
                                                                                                   purchasePlatform: .appStore),
