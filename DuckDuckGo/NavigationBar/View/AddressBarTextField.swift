@@ -28,6 +28,8 @@ import os.log
 
 final class AddressBarTextField: NSTextField {
 
+    var isSearchBox: Bool = false
+
     var homePagePreferredAppearance: NSAppearance? {
         didSet {
             if suggestionWindowController != nil {
@@ -589,7 +591,19 @@ final class AddressBarTextField: NSTextField {
             return
         }
 
-        suggestionViewController.view.appearance = homePagePreferredAppearance
+        if isSearchBox {
+            suggestionViewController.innerBorderViewTopConstraint.constant = 0
+            suggestionViewController.innerBorderViewBottomConstraint.constant = 0
+            suggestionViewController.innerBorderViewLeadingConstraint.constant = 0
+            suggestionViewController.innerBorderViewTrailingConstraint.constant = 0
+            suggestionViewController.backgroundView.borderWidth = 0
+
+            suggestionViewController.view.appearance = homePagePreferredAppearance
+            suggestionViewController.view.effectiveAppearance.performAsCurrentDrawingAppearance {
+                suggestionViewController.backgroundView.backgroundColor = .homePageAddressBarBackground
+                suggestionViewController.innerBorderView.borderColor = .homePageAddressBarBorder
+            }
+        }
 
         guard !suggestionWindow.isVisible, isFirstResponder else { return }
 

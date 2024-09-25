@@ -21,7 +21,6 @@ import Combine
 import Lottie
 
 final class AddressBarViewController: NSViewController, ObservableObject {
-    var isSearchBox = false
 
     @IBOutlet var addressBarTextField: AddressBarTextField!
     @IBOutlet var passiveTextField: NSTextField!
@@ -43,6 +42,7 @@ final class AddressBarViewController: NSViewController, ObservableObject {
     private var tabViewModel: TabViewModel?
     private let suggestionContainerViewModel: SuggestionContainerViewModel
     private let isBurner: Bool
+    let isSearchBox: Bool
 
     enum Mode: Equatable {
         case editing(isUrl: Bool)
@@ -85,7 +85,7 @@ final class AddressBarViewController: NSViewController, ObservableObject {
         fatalError("AddressBarViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, popovers: NavigationBarPopovers?) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, popovers: NavigationBarPopovers?, isSearchBox: Bool = false) {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.popovers = popovers
         self.suggestionContainerViewModel = SuggestionContainerViewModel(
@@ -93,6 +93,7 @@ final class AddressBarViewController: NSViewController, ObservableObject {
             isBurner: isBurner,
             suggestionContainer: SuggestionContainer())
         self.isBurner = isBurner
+        self.isSearchBox = isSearchBox
 
         super.init(coder: coder)
     }
@@ -103,6 +104,7 @@ final class AddressBarViewController: NSViewController, ObservableObject {
         view.wantsLayer = true
         view.layer?.masksToBounds = false
 
+        addressBarTextField.isSearchBox = isSearchBox
         addressBarTextField.placeholderString = UserText.addressBarPlaceholder
         addressBarTextField.setAccessibilityIdentifier("AddressBarViewController.addressBarTextField")
 

@@ -96,7 +96,6 @@ extension HomePage.Models {
 
         private func createAddressBarViewController() -> AddressBarViewController? {
             let viewController = instantiateFromStoryboard()
-            viewController.isSearchBox = true
             subscribeToTextFieldValue(viewController)
             subscribeToCustomBackground(viewController)
             return viewController
@@ -109,7 +108,13 @@ extension HomePage.Models {
                     guard let self else {
                         return nil
                     }
-                    return AddressBarViewController(coder: coder, tabCollectionViewModel: self.tabCollectionViewModel, isBurner: false, popovers: nil)
+                    return AddressBarViewController(
+                        coder: coder,
+                        tabCollectionViewModel: self.tabCollectionViewModel,
+                        isBurner: false,
+                        popovers: nil,
+                        isSearchBox: true
+                    )
                 }
 
             viewController.loadView()
