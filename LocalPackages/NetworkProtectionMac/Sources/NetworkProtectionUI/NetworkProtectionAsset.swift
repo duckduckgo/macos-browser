@@ -48,7 +48,8 @@ public enum NetworkProtectionAsset: String, CaseIterable {
     case statusbarBrandedVPNOffIcon = "statusbar-branded-vpn-off"
     case statusbarBrandedVPNIssueIcon = "statusbar-branded-vpn-issue"
 
-    // Images:
+    // Images
+    case enableSysexImage = "enable-sysex-bottom"
     case allowSysexScreenshot = "allow-sysex-screenshot"
     case allowSysexScreenshotBigSur = "allow-sysex-screenshot-bigsur"
 

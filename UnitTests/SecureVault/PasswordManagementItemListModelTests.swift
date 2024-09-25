@@ -205,7 +205,7 @@ extension PasswordManagementItemListModel {
 
     convenience init(onItemSelected: @escaping (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void,
                      onAddItemSelected: @escaping (_ category: SecureVaultSorting.Category) -> Void) {
-        self.init(passwordManagerCoordinator: PasswordManagerCoordinatingMock(),
+        self.init(passwordManagerCoordinator: PasswordManagerCoordinatingMock(), syncPromoManager: SyncPromoManager(),
                   onItemSelected: onItemSelected,
                   onAddItemSelected: onAddItemSelected)
     }

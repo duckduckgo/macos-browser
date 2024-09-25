@@ -158,6 +158,11 @@ final class BrowserTabViewController: NSViewController {
                                                object: nil)
 
         NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onPasswordImportFlowFinish),
+                                               name: .passwordImportDidCloseImportDialog,
+                                               object: nil)
+
+        NotificationCenter.default.addObserver(self,
                                                selector: #selector(onDBPFeatureDisabled),
                                                name: .dbpWasDisabled,
                                                object: nil)
@@ -205,6 +210,21 @@ final class BrowserTabViewController: NSViewController {
         tabCollectionViewModel.select(tab: previouslySelectedTab)
         previouslySelectedTab.webView.evaluateJavaScript("window.openAutofillAfterClosingEmailProtectionTab()", in: nil, in: WKContentWorld.defaultClient)
         self.previouslySelectedTab = nil
+    }
+
+    @objc
+    private func onPasswordImportFlowFinish(_ notification: Notification) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            guard WindowControllersManager.shared.lastKeyMainWindowController === self.view.window?.windowController else { return }
+            if let previouslySelectedTab {
+                tabCollectionViewModel.select(tab: previouslySelectedTab)
+                previouslySelectedTab.webView.evaluateJavaScript("window.credentialsImportFinished()", in: nil, in: WKContentWorld.defaultClient)
+                self.previouslySelectedTab = nil
+            } else {
+                webView?.evaluateJavaScript("window.credentialsImportFinished()", in: nil, in: WKContentWorld.defaultClient)
+            }
+        }
     }
 
     @objc
@@ -493,7 +513,9 @@ final class BrowserTabViewController: NSViewController {
             tabViewModel.tab.$userInteractionDialog,
             tabViewModel.tab.downloads?.savePanelDialogPublisher ?? Just(nil).eraseToAnyPublisher()
         )
-        .map { $1 ?? $0 }
+        .map { userDialog, saveDialog in
+            return saveDialog ?? userDialog
+        }
         .removeDuplicates()
         .sink { [weak self] dialog in
             self?.show(dialog)
@@ -1129,6 +1151,10 @@ extension BrowserTabViewController: TabDelegate {
               let webView = tabViewModel?.tab.webView else { return nil }
 
         let printOperation = request.parameters
+        // prevent running already started operation (e.g. when the same pinned tab is open in 2 windows)
+        guard !printOperation.printInfo.isStarted else { return nil }
+        printOperation.printInfo.isStarted = true
+
         let didRunSelector = #selector(printOperationDidRun(printOperation:success:contextInfo:))
 
         let windowSheetsBeforPrintOperation = window.sheets

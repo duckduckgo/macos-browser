@@ -22,15 +22,22 @@ import SubscriptionTestingUtilities
 @testable import DuckDuckGo_Privacy_Browser
 
 final class SubscriptionRedirectManagerTests: XCTestCase {
+
+    private struct Constants {
+        static let environment = SubscriptionEnvironment(serviceEnvironment: .production, purchasePlatform: .appStore)
+        static let redirectURL = SubscriptionURL.baseURL.subscriptionURL(environment: .production)
+    }
+
+    private var canPurchase: Bool = true
     private var sut: PrivacyProSubscriptionRedirectManager!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
+
         sut = PrivacyProSubscriptionRedirectManager(featureAvailabiltyProvider: true,
-                                                    subscriptionEnvironment: SubscriptionEnvironment(serviceEnvironment: .production,
-                                                                                                     purchasePlatform: .appStore),
-                                                    baseURL: SubscriptionURL.baseURL.subscriptionURL(environment: .production),
-                                                    canPurchase: { true })
+                                                    subscriptionEnvironment: Constants.environment,
+                                                    baseURL: Constants.redirectURL,
+                                                    canPurchase: { [self] in canPurchase })
     }
 
     override func tearDownWithError() throws {
@@ -38,20 +45,7 @@ final class SubscriptionRedirectManagerTests: XCTestCase {
         try super.tearDownWithError()
     }
 
-    func testWhenURLIsPrivacyProAndHasOriginQueryParameterThenRedirectToSubscriptionBaseURLAndAppendQueryParameter() throws {
-        // GIVEN
-        let url = try XCTUnwrap(URL(string: "https://www.duckduckgo.com/pro?origin=test"))
-        let baseURL = SubscriptionURL.baseURL.subscriptionURL(environment: .production)
-        let expectedURL = baseURL.appending(percentEncodedQueryItem: .init(name: "origin", value: "test"))
-
-        // WHEN
-        let result = sut.redirectURL(for: url)
-
-        // THEN
-        XCTAssertEqual(result, expectedURL)
-    }
-
-    func testWhenURLIsPrivacyProAndDoesNotHaveOriginQueryParameterThenRedirectToSubscriptionBaseURL() throws {
+    func testWhenURLIsPrivacyProThenRedirectToSubscriptionBaseURL() throws {
         // GIVEN
         let url = try XCTUnwrap(URL(string: "https://www.duckduckgo.com/pro"))
         let expectedURL = SubscriptionURL.baseURL.subscriptionURL(environment: .production)
@@ -63,4 +57,27 @@ final class SubscriptionRedirectManagerTests: XCTestCase {
         XCTAssertEqual(result, expectedURL)
     }
 
+    func testWhenURLIsPrivacyProAndHasOriginQueryParameterThenRedirectToSubscriptionBaseURLAndAppendQueryParameter() throws {
+        // GIVEN
+        let url = try XCTUnwrap(URL(string: "https://www.duckduckgo.com/pro?origin=test"))
+        let expectedURL = Constants.redirectURL.appending(percentEncodedQueryItem: .init(name: "origin", value: "test"))
+
+        // WHEN
+        let result = sut.redirectURL(for: url)
+
+        // THEN
+        XCTAssertEqual(result, expectedURL)
+    }
+
+    func testWhenURLIsPrivacyProAndPurchaseIsNotAllowedThenRedirectReturnsNil() throws {
+        // GIVEN
+        let url = try XCTUnwrap(URL(string: "https://www.duckduckgo.com/pro?origin=test"))
+
+        // WHEN
+        self.canPurchase = false
+        let result = sut.redirectURL(for: url)
+
+        // THEN
+        XCTAssertNil(result)
+    }
 }

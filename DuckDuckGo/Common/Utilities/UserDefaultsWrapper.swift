@@ -44,17 +44,6 @@ public struct UserDefaultsWrapper<T> {
         /// system setting defining window title double-click action
         case appleActionOnDoubleClick = "AppleActionOnDoubleClick"
 
-        case configLastUpdated = "config.last.updated"
-        case configStorageTrackerRadarEtag = "config.storage.trackerradar.etag"
-        case configStorageBloomFilterSpecEtag = "config.storage.bloomfilter.spec.etag"
-        case configStorageBloomFilterBinaryEtag = "config.storage.bloomfilter.binary.etag"
-        case configStorageBloomFilterExclusionsEtag = "config.storage.bloomfilter.exclusions.etag"
-        case configStorageSurrogatesEtag = "config.storage.surrogates.etag"
-        case configStoragePrivacyConfigurationEtag = "config.storage.privacyconfiguration.etag"
-        case configStorageRemoteMessagingConfigEtag = "config.storage.remotemessagingconfig.etag"
-
-        case configLastInstalled = "config.last.installed"
-
         case fireproofDomains = "com.duckduckgo.fireproofing.allowedDomains"
         case areDomainsMigratedToETLDPlus1 = "com.duckduckgo.are-domains-migrated-to-etldplus1"
         case unprotectedDomains = "com.duckduckgo.contentblocker.unprotectedDomains"
@@ -112,6 +101,8 @@ public struct UserDefaultsWrapper<T> {
         case bookmarksBarAppearance = "preferences.appearance.bookmarks-bar"
 
         case homeButtonPosition = "preferences.appeareance.home-button-position"
+
+        case phishingDetectionEnabled = "preferences.security.phishing-detection-enabled"
 
         // ATB
         case installDate = "statistics.installdate.key"
@@ -219,6 +210,8 @@ public struct UserDefaultsWrapper<T> {
         case syncCurrentAllPausedError = "sync.current-all-paused-error"
         case syncCurrentBookmarksPausedError = "sync.current-bookmarks-paused-error"
         case syncCurrentCredentialsPausedError = "sync.current-credentials-paused-error"
+        case syncPromoBookmarksDismissed = "sync.promotion-bookmarks-dismissed"
+        case syncPromoPasswordsDismissed = "sync.promotion-passwords-dismissed"
 
         // Subscription
 

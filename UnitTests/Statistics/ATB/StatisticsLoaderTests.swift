@@ -295,15 +295,15 @@ class StatisticsLoaderTests: XCTestCase {
         waitForExpectations(timeout: 1, handler: nil)
     }
 
-    func testWhenRefreshRetentionAtbIsPerformedForNonSearchAndNoInstallStatisticsExistThenAtbNotRequested() {
+    func testWhenRefreshRetentionAtbIsPerformedForNonSearchAndNoInstallStatisticsExistThenAtbRequested() {
         loadSuccessfulUpdateAtbStub()
 
-        let expect = expectation(description: "App retention ATB not requested")
+        let expect = expectation(description: "App retention ATB requested")
         testee.refreshRetentionAtb(isSearch: false) {
-            XCTAssertNil(self.mockStatisticsStore.atb)
-            XCTAssertNil(self.mockStatisticsStore.appRetentionAtb)
+            XCTAssertEqual(self.mockStatisticsStore.atb, "v20-1")
+            XCTAssertEqual(self.mockStatisticsStore.appRetentionAtb, "v77-5")
             XCTAssertNil(self.mockStatisticsStore.searchRetentionAtb)
-            XCTAssertFalse(self.mockStatisticsStore.isAppRetentionFiredToday)
+            XCTAssertTrue(self.mockStatisticsStore.isAppRetentionFiredToday)
             expect.fulfill()
         }
 

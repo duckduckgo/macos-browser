@@ -24,12 +24,13 @@ final class TabBarFooter: NSView, NSCollectionViewElement {
 
     let addButton = MouseOverButton(image: .add, target: nil, action: #selector(TabBarViewController.addButtonAction))
 
-    var target: AnyObject? {
+    var target: MouseOverButtonDelegate? {
         get {
-            addButton.target
+            addButton.delegate
         }
         set {
             addButton.target = newValue
+            addButton.delegate = newValue
         }
     }
 
@@ -57,6 +58,7 @@ final class TabBarFooter: NSView, NSCollectionViewElement {
         addButton.mouseOverColor = .buttonMouseOver
         addButton.imagePosition = .imageOnly
         addButton.imageScaling = .scaleNone
+        addButton.registerForDraggedTypes([.string])
         toolTip = UserText.newTabTooltip
 
         addSubview(addButton)

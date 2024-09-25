@@ -49,7 +49,20 @@ final class BookmarkDragDropManager {
         // If the dragged values contain both folders and bookmarks, only validate the move if all objects can be moved.
         case (true, true), (true, nil), (nil, true):
             return .move
+        case (false, _), (_, false):
+            return .none
         default:
+            guard destination is BookmarkFolder || destination is PseudoFolder else { return .none }
+
+            if info.draggingPasteboard.availableType(from: [.URL]) != nil {
+                return .copy
+            }
+
+            if let string = info.draggingPasteboard.string(forType: .string),
+                URL(trimmedAddressBarString: string.trimmingWhitespace()) != nil {
+                return .copy
+            }
+
             return .none
         }
     }
@@ -176,7 +189,7 @@ final class BookmarkDragDropManager {
                 url = webViewItem.url
                 title = webViewItem.title ?? self.title(forTabWith: webViewItem.url, in: window) ?? titleFromUrlDroppingSchemeIfNeeded(url)
             } else if let draggedString = item.string(forType: .string),
-                      let draggedURL = URL(string: draggedString) {
+                      let draggedURL = URL(trimmedAddressBarString: draggedString.trimmingWhitespace()) {
                 url = draggedURL
                 title = self.title(forTabWith: draggedURL, in: window) ?? titleFromUrlDroppingSchemeIfNeeded(url)
             } else {

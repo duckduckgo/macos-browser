@@ -231,3 +231,23 @@ final class LocalStatisticsStore: StatisticsStore {
     }
 
 }
+
+#if DEBUG
+
+// For use in tests to avoid indirect access of Database.makeDatabase
+
+final class StubStatisticsStore: StatisticsStore {
+    var installDate: Date?
+    var atb: String?
+    var searchRetentionAtb: String?
+    var appRetentionAtb: String?
+    var variant: String?
+    var lastAppRetentionRequestDate: Date?
+
+    var waitlistUnlocked: Bool = false
+
+    var autoLockEnabled: Bool = false
+    var autoLockThreshold: String?
+}
+
+#endif

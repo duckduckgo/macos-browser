@@ -21,9 +21,10 @@ import BrowserServicesKit
 import SecureStorage
 
 final class SecureVaultLoginImporter: LoginImporter {
+    private let loginImportState: AutofillLoginImportState
 
-    static var featureFlagger: FeatureFlagger {
-        NSApp.delegateTyped.featureFlagger
+    init(loginImportState: AutofillLoginImportState = .init()) {
+        self.loginImportState = loginImportState
     }
 
     private enum ImporterError: Error {
@@ -56,8 +57,7 @@ final class SecureVaultLoginImporter: LoginImporter {
                 }
 
                 do {
-                    if Self.featureFlagger.isFeatureOn(.deduplicateLoginsOnImport),
-                        let signature = try vault.encryptPassword(for: credentials, key: encryptionKey, salt: hashingSalt).account.signature {
+                    if let signature = try vault.encryptPassword(for: credentials, key: encryptionKey, salt: hashingSalt).account.signature {
                         let isDuplicate = accounts.contains {
                             $0.isDuplicateOf(accountToBeImported: account, signatureOfAccountToBeImported: signature, passwordToBeImported: login.password)
                         }
@@ -85,6 +85,7 @@ final class SecureVaultLoginImporter: LoginImporter {
             NotificationCenter.default.post(name: .autofillSaveEvent, object: nil, userInfo: nil)
         }
 
+        loginImportState.hasImportedLogins = true
         return .init(successful: successful.count, duplicate: duplicates.count, failed: failed.count)
     }
 }

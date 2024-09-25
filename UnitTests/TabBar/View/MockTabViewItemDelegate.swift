@@ -121,6 +121,10 @@ class MockTabViewItemDelegate: TabBarViewItemDelegate {
         OtherTabBarViewItemsState(hasItemsToTheLeft: hasItemsToTheLeft, hasItemsToTheRight: hasItemsToTheRight)
     }
 
+    func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, replaceContentWithDroppedStringValue: String) {
+
+    }
+
     func clear() {
         self.audioState = nil
     }

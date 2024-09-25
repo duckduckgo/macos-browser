@@ -47,6 +47,12 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         return manager
     }()
 
+    lazy var credentialsImportManager: AutofillCredentialsImportManager = {
+        let manager = AutofillCredentialsImportManager()
+        manager.presentationDelegate = self
+        return manager
+    }()
+
     lazy var autofillPreferencesModel: AutofillPreferencesModel = {
         let model = AutofillPreferencesModel()
         return model
@@ -129,7 +135,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
 
     private func initWebView() {
         let scriptSourceProvider = buildAutofillSource()
-        self.topAutofillUserScript = OverlayAutofillUserScript(scriptSourceProvider: scriptSourceProvider, overlay: self)
+        self.topAutofillUserScript = OverlayAutofillUserScript(scriptSourceProvider: scriptSourceProvider, overlay: self, loginImportStateProvider: AutofillLoginImportState())
         guard let topAutofillUserScript = topAutofillUserScript else { return }
         let configuration = WKWebViewConfiguration()
 
@@ -148,6 +154,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         topAutofillUserScript.contentOverlay = self
         topAutofillUserScript.emailDelegate = emailManager
         topAutofillUserScript.vaultDelegate = vaultManager
+        topAutofillUserScript.passwordImportDelegate = credentialsImportManager
     }
 
     // EmailManagerRequestDelegate
@@ -328,6 +335,8 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
 
             PixelKit.fire(NonStandardEvent(GeneralPixel.jsPixel(pixel)), withAdditionalParameters: pixelParameters)
             NotificationCenter.default.post(name: .autofillFillEvent, object: nil)
+        } else if pixel.isCredentialsImportPromotionPixel {
+            PixelKit.fire(NonStandardEvent(GeneralPixel.jsPixel(pixel)))
         } else {
             if pixel.isIdentityPixel {
                 NotificationCenter.default.post(name: .autofillFillEvent, object: nil)
@@ -365,5 +374,12 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
             .buildRuntimeConfigResponse()
 
         completionHandler(runtimeConfiguration)
+    }
+}
+
+extension ContentOverlayViewController: AutofillCredentialsImportPresentationDelegate {
+    public func autofillDidRequestCredentialsImportFlow(onFinished: @escaping () -> Void, onCancelled: @escaping () -> Void) {
+        let viewModel = DataImportViewModel(onFinished: onFinished, onCancelled: onCancelled)
+        DataImportView(model: viewModel).show()
     }
 }

@@ -42,6 +42,7 @@ class WebsiteBreakageReportTests: XCTestCase {
             manufacturer: "Apple",
             upgradedHttps: true,
             tdsETag: "abc123",
+            configVersion: "123456789",
             blockedTrackerDomains: [
                 "bad.tracker.test",
                 "tracking.test"
@@ -89,6 +90,7 @@ class WebsiteBreakageReportTests: XCTestCase {
             manufacturer: "Apple",
             upgradedHttps: false,
             tdsETag: "abc123",
+            configVersion: "123456789",
             blockedTrackerDomains: [
                 "bad.tracker.test",
                 "tracking.test"

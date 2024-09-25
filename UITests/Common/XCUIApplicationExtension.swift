@@ -33,11 +33,19 @@ extension XCUIApplication {
         static let resetBookmarksMenuItem = "MainMenu.resetBookmarks"
     }
 
-    /// Dismiss popover with the passed button identifier
+    /// Dismiss popover with the passed button identifier if exists. If it does not exist it continues the execution without failing.
     /// - Parameter buttonIdentifier: The button identifier we want to tap from the popover
     func dismissPopover(buttonIdentifier: String) {
         let popover = popovers.firstMatch
+        guard popover.exists else {
+            return
+        }
+
         let button = popover.buttons[buttonIdentifier]
+        guard button.exists else {
+            return
+        }
+
         button.tap()
     }
 

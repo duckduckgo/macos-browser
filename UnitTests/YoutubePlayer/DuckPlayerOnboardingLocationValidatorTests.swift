@@ -87,8 +87,41 @@ private final class MockWebView: WKWebView {
         return mockURL
     }
 
-//    override func evaluateJavaScript(_ javaScriptString: String, completionHandler: ((Any?, Error?) -> Void)? = nil) {
-    override func evaluateJavaScript(_ javaScriptString: String, completionHandler: (@MainActor (Any?, (any Error)?) -> Void)? = nil) {
-        completionHandler?(evaluateJavaScriptResult, nil)
+    convenience init() {
+        self.init(frame: .zero, configuration: WKWebViewConfiguration())
     }
+
+    override init(frame: CGRect, configuration: WKWebViewConfiguration) {
+        _=Self.swizzleEvaluateJavaScriptOnce
+        super.init(frame: frame, configuration: configuration)
+    }
+
+    required init?(coder: NSCoder) {
+        _=Self.swizzleEvaluateJavaScriptOnce
+        super.init(coder: coder)
+    }
+
+}
+private extension WKWebView {
+
+    static let swizzleEvaluateJavaScriptOnce: () = {
+        guard let originalMethod = class_getInstanceMethod(WKWebView.self, #selector(evaluateJavaScript(_:completionHandler:))),
+              let swizzledMethod = class_getInstanceMethod(WKWebView.self, #selector(swizzled_evaluateJavaScript(_:completionHandler:))) else {
+            assertionFailure("Methods not available")
+            return
+        }
+
+        method_exchangeImplementations(originalMethod, swizzledMethod)
+    }()
+
+    // place popover inside bounds of its owner Main Window
+    @objc(swizzled_evaluateJavaScript:completionHandler:)
+    private dynamic func swizzled_evaluateJavaScript(_ javaScriptString: String, completionHandler: ((Any?, (any Error)?) -> Void)? = nil) {
+        if let mockWebView = self as? MockWebView {
+            completionHandler?(mockWebView.evaluateJavaScriptResult, nil)
+            return
+        }
+        self.swizzled_evaluateJavaScript(javaScriptString, completionHandler: completionHandler) // call the original
+    }
+
 }
