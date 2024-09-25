@@ -185,12 +185,12 @@ extension WKWebView {
     }
 
     var isPlayingAudioPublisher: AnyPublisher<Bool?, Never> {
-        KVOListener(object: self, keyPath: "_isPlayingAudio")
+        KVOListener(object: self, keyPath: NSStringFromSelector(Selector.isPlayingAudio))
             .eraseToAnyPublisher()
     }
 
     private var isPlayingAudio: Bool? {
-        return self.value(forKey: "_isPlayingAudio") as? Bool
+        return self.value(forKey: NSStringFromSelector(Selector.isPlayingAudio)) as? Bool
     }
 
     func stopMediaCapture() {
@@ -390,6 +390,7 @@ extension WKWebView {
         static let setPageMuted = NSSelectorFromString("_setPageMuted:")
         static let setAddsVisitedLinks = NSSelectorFromString("_setAddsVisitedLinks:")
         static let addsVisitedLinks = NSSelectorFromString("_addsVisitedLinks")
+        static let isPlayingAudio = NSSelectorFromString("_isPlayingAudio")
     }
 
 }
