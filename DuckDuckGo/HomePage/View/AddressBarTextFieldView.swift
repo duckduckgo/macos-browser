@@ -73,15 +73,19 @@ struct BigSearchBox: View {
 
     @ViewBuilder
     func logo() -> some View {
-        Image(nsImage: .onboardingDax)
-            .resizable()
-            .frame(width: Const.logoHeight, height: Const.logoHeight)
+        VStack(spacing: 12) {
+            Image(nsImage: .onboardingDax)
+                .resizable()
+                .frame(width: Const.logoHeight, height: Const.logoHeight)
+            Image(nsImage: .duckDuckGoWordmark)
+        }
     }
 
     @ViewBuilder
     func searchField() -> some View {
         AddressBarTextFieldView(usesFixedColorScheme: usesFixedColorScheme)
             .frame(height: Const.searchBoxHeight)
-            .shadow(color: Color.blackWhite100.opacity(0.1), radius: 2, x: 0, y: 2)
+            .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 3)
+            .shadow(color: .black.opacity(0.15), radius: 0, x: 0, y: 0)
     }
 }
