@@ -327,14 +327,14 @@ final class AddressBarViewController: NSViewController, ObservableObject {
         inactiveBackgroundView.alphaValue = isFirstResponderOrBigSearchBox ? 0 : 1
         activeBackgroundView.alphaValue = isFirstResponderOrBigSearchBox ? 1 : 0
 
-        let isKey = self.view.window?.isKeyWindow == true
-        activeOuterBorderView.alphaValue = isKey && isFirstResponder && (isHomePage || isSearchBox) ? 1 : 0
-
-        activeOuterBorderView.backgroundColor = accentColor.withAlphaComponent(0.2)
         if isSearchBox {
-            activeBackgroundView.borderColor = (isFirstResponder && isKey) ? accentColor.withAlphaComponent(0.8) : NSColor.blackWhite100.withAlphaComponent(0.18)
-            activeBackgroundView.borderWidth = (isFirstResponder && isKey) ? 2.0 : 0.5
+            activeBackgroundView.borderColor = .clear
+            activeBackgroundView.borderWidth = 0
+            activeOuterBorderView.isHidden = true
         } else {
+            let isKey = self.view.window?.isKeyWindow == true
+            activeOuterBorderView.alphaValue = isKey && isFirstResponder && isHomePage ? 1 : 0
+            activeOuterBorderView.backgroundColor = accentColor.withAlphaComponent(0.2)
             activeBackgroundView.borderColor = accentColor.withAlphaComponent(0.8)
         }
 
@@ -393,18 +393,10 @@ final class AddressBarViewController: NSViewController, ObservableObject {
             let appearance = addressBarTextField.homePagePreferredAppearance ?? NSApp.effectiveAppearance
 
             appearance.performAsCurrentDrawingAppearance {
+                activeOuterBorderView.isHidden = true
+                activeBackgroundView.layer?.borderWidth = 0
+                activeBackgroundView.layer?.borderColor = nil
                 activeBackgroundView.layer?.backgroundColor = NSColor.addressBarBackground.cgColor
-                if window.isKeyWindow {
-                    activeBackgroundView.layer?.borderWidth = 2.0
-                    activeBackgroundView.layer?.borderColor = accentColor.withAlphaComponent(0.6).cgColor
-
-                    activeOuterBorderView.isHidden = false
-                } else {
-                    activeBackgroundView.layer?.borderWidth = 0
-                    activeBackgroundView.layer?.borderColor = nil
-
-                    activeOuterBorderView.isHidden = true
-                }
             }
 
         } else {
