@@ -314,19 +314,24 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
     }
 
     func mouseDidHover(over sender: Any) {
-        guard let bookmarkMenuPopover, bookmarkMenuPopover.isShown else { return }
-        var bookmarkFolder: BookmarkFolder?
+        guard let bookmarkMenuPopover, bookmarkMenuPopover.isShown,
+              NSApp.currentEvent.map({ NSPoint(x: $0.deltaX, y: $0.deltaY) }) != .zero else { return }
+        var bookmarkFolder: (() -> BookmarkFolder?)?
+        var bookmarkFolderId: String?
         var view: NSView?
         if let item = sender as? BookmarksBarCollectionViewItem {
-            bookmarkFolder = item.representedObject as? BookmarkFolder
+            let folder = item.representedObject as? BookmarkFolder
+            bookmarkFolder = { folder }
+            bookmarkFolderId = folder?.id
             view = item.view
         } else if let button = sender as? NSButton, button === clippedItemsIndicator {
-            bookmarkFolder = clippedItemsBookmarkFolder()
+            bookmarkFolder = { self.clippedItemsBookmarkFolder() }
+            bookmarkFolderId = PseudoFolder.bookmarks.id
             view = button
         }
-        if let bookmarkFolder, let view {
+        if let bookmarkFolderId, let view {
             // already shown?
-            guard bookmarkMenuPopover.rootFolder?.id != bookmarkFolder.id else { return }
+            guard bookmarkMenuPopover.rootFolder?.id != bookmarkFolderId, let bookmarkFolder = bookmarkFolder?() else { return }
             showSubmenu(for: bookmarkFolder, from: view)
         } else {
             bookmarkMenuPopover.close()

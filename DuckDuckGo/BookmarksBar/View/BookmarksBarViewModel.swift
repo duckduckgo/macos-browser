@@ -400,10 +400,8 @@ extension BookmarksBarViewModel: BookmarksBarCollectionViewItemDelegate {
         delegate?.showDialog(dialog)
     }
 
-    func bookmarksBarCollectionViewItem(_ item: BookmarksBarCollectionViewItem, isMouseOver: Bool) {
-        if isMouseOver {
-            delegate?.mouseDidHover(over: item)
-        }
+    func bookmarksBarCollectionViewItemMouseDidHover(_ item: BookmarksBarCollectionViewItem) {
+        delegate?.mouseDidHover(over: item)
     }
 
 }
