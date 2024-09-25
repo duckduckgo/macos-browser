@@ -16854,7 +16854,7 @@
       }
     },
     "downloads.active.alert.message.format" : {
-      "comment" : "Alert text format when trying to quit application while file “filename”[, and others] are being downloaded",
+      "comment" : "Alert text format when trying to quit application while file “filename (%@)”[, and others (%@)] are being downloaded; If you quit now, DuckDuckGo won‘t finish downloading [this file|these files](%@).",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -16866,7 +16866,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Are you sure you want to quit? DuckDuckGo Privacy Browser is currently downloading “%1$@”%2$@. If you quit now DuckDuckGo Privacy Browser won’t finish downloading this file."
+            "value" : "DuckDuckGo is currently downloading “%1$@”%2$@. If you quit now, DuckDuckGo won‘t finish downloading %3$@."
           }
         },
         "es" : {
@@ -16909,6 +16909,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Действительно закрыть приложение? DuckDuckGo Privacy Browser загружает «%1$@» %2$@. Если вы закроете его, прервется загрузка файла."
+          }
+        }
+      }
+    },
+    "downloads.active.alert.message.these.files" : {
+      "comment" : "Alert text format element for “DuckDuckGo won‘t finish downloading ->these file<-”",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "this file"
+          }
+        }
+      }
+    },
+    "downloads.active.alert.message.this.file" : {
+      "comment" : "Alert text format element for “DuckDuckGo won‘t finish downloading ->this file<-”",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "this file"
           }
         }
       }
@@ -21782,13 +21806,13 @@
       }
     },
     "fire-window.downloads.active.alert.message.format" : {
-      "comment" : "Alert text format when trying to close a Fire Window while file “filename”[, and others] are being downloaded in it.",
+      "comment" : "Alert text format when trying to close a Fire Window while file “filename (%@)”[, and others (%@)] are being downloaded in it. If you close the Fire Window, DuckDuckGo will delete [this file|these files](%@).",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "DuckDuckGo Privacy Browser is currently downloading “%1$@”%2$@. If you close the Fire Window, DuckDuckGo Privacy Browser will delete this file."
+            "value" : "DuckDuckGo is currently downloading “%1$@”%2$@. If you close the Fire Window, DuckDuckGo will delete %3$@."
           }
         }
       }
