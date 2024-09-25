@@ -140,11 +140,10 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
 
     /// It's public in order to allow refreshing on demand via Debug menu. Otherwise it shouldn't be called from outside.
     func refreshRemoteMessages() {
-        guard let store else {
-            return
-        }
-
         Task {
+            guard let store else {
+                return
+            }
             try? await fetchAndProcess(using: store)
         }
     }
