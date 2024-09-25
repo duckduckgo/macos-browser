@@ -1147,6 +1147,13 @@ extension OptOutJobData {
         .init(brokerId: 1, profileQueryId: 1, createdDate: Date(), historyEvents: historyEvents, extractedProfile: extractedProfile)
     }
 
+    static func mock(with extractedProfile: ExtractedProfile,
+                     historyEvents: [HistoryEvent] = [HistoryEvent](),
+                     createdDate: Date,
+                     submittedSuccessfullyDate: Date?) -> OptOutJobData {
+        .init(brokerId: 1, profileQueryId: 1, createdDate: createdDate, historyEvents: historyEvents, submittedSuccessfullyDate: submittedSuccessfullyDate, extractedProfile: extractedProfile)
+    }
+
     static func mock(with type: HistoryEvent.EventType,
                      submittedDate: Date?,
                      sevenDaysConfirmationPixelFired: Bool,

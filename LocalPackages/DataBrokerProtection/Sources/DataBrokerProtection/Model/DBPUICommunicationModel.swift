@@ -76,6 +76,15 @@ struct DBPUIUserProfileAddress: Codable {
     let zipCode: String?
 }
 
+extension DBPUIUserProfileAddress {
+    init(addressCityState: AddressCityState) {
+        self.init(street: addressCityState.fullAddress,
+                  city: addressCityState.city,
+                  state: addressCityState.state,
+                  zipCode: nil)
+    }
+}
+
 /// Message Object representing a user profile containing one or more names and addresses
 /// also contains the user profile's birth year
 struct DBPUIUserProfile: Codable {
@@ -105,11 +114,13 @@ struct DBPUIDataBroker: Codable, Hashable {
     let name: String
     let url: String
     let date: Double?
+    let parentURL: String?
 
-    init(name: String, url: String, date: Double? = nil) {
+    init(name: String, url: String, date: Double? = nil, parentURL: String?) {
         self.name = name
         self.url = url
         self.date = date
+        self.parentURL = parentURL
     }
 
     func hash(into hasher: inout Hasher) {
@@ -135,7 +146,72 @@ struct DBPUIDataBrokerProfileMatch: Codable {
     let addresses: [DBPUIUserProfileAddress]
     let alternativeNames: [String]
     let relatives: [String]
-    let date: Double? // Used in some methods to set the removedDate or found date
+    let foundDate: Double
+    let optOutSubmittedDate: Double?
+    let estimatedRemovalDate: Double?
+    let removedDate: Double?
+    let hasMatchingRecordOnParentBroker: Bool
+}
+
+extension DBPUIDataBrokerProfileMatch {
+    init(optOutJobData: OptOutJobData,
+         dataBrokerName: String,
+         dataBrokerURL: String,
+         dataBrokerParentURL: String?,
+         parentBrokerOptOutJobData: [OptOutJobData]?) {
+        let extractedProfile = optOutJobData.extractedProfile
+
+        /*
+         createdDate used to not exist in the DB, so in the migration we defaulted it to Unix Epoch zero (i.e. 1970)
+         If that's the case, we should rely on the events instead
+         We don't do that all the time since it's unnecssarily expensive trawling through events, and
+         this is involved in some already heavy endpoints
+
+         optOutSubmittedDate also used to not exist, but instead defaults to nil
+         However, it could be nil simply because the opt out hasn't been submitted yet. So since we don't want to
+         look through events unneccesarily, we instead only look for it if the createdDate is 1970
+         */
+        var foundDate = optOutJobData.createdDate
+        var optOutSubmittedDate = optOutJobData.submittedSuccessfullyDate
+        if foundDate == Date(timeIntervalSince1970: 0) {
+            let foundEvents = optOutJobData.historyEvents.filter { $0.isMatchesFoundEvent() }
+            let firstFoundEvent = foundEvents.min(by: { $0.date < $1.date })
+            if let firstFoundEventDate = firstFoundEvent?.date {
+                foundDate = firstFoundEventDate
+            } else {
+                assertionFailure("No matching MatchFound event for an extract profile found")
+            }
+
+            let optOutSubmittedEvents = optOutJobData.historyEvents.filter { $0.type == .optOutRequested }
+            let firstOptOutEvent = optOutSubmittedEvents.min(by: { $0.date < $1.date })
+            optOutSubmittedDate = firstOptOutEvent?.date
+        }
+        let estimatedRemovalDate = Calendar.current.date(byAdding: .day, value: 14, to: optOutSubmittedDate ?? foundDate)
+
+        // Check for any matching records on the parent broker
+        let hasFoundParentMatch = parentBrokerOptOutJobData?.contains { parentOptOut in
+            extractedProfile.doesMatchExtractedProfile(parentOptOut.extractedProfile)
+        } ?? false
+
+        self.init(dataBroker: DBPUIDataBroker(name: dataBrokerName, url: dataBrokerURL, parentURL: dataBrokerParentURL),
+                  name: extractedProfile.fullName ?? "No name",
+                  addresses: extractedProfile.addresses?.map {DBPUIUserProfileAddress(addressCityState: $0) } ?? [],
+                  alternativeNames: extractedProfile.alternativeNames ?? [String](),
+                  relatives: extractedProfile.relatives ?? [String](),
+                  foundDate: foundDate.timeIntervalSince1970,
+                  optOutSubmittedDate: optOutSubmittedDate?.timeIntervalSince1970,
+                  estimatedRemovalDate: estimatedRemovalDate?.timeIntervalSince1970,
+                  removedDate: extractedProfile.removedDate?.timeIntervalSince1970,
+                  hasMatchingRecordOnParentBroker: hasFoundParentMatch)
+    }
+
+    init(optOutJobData: OptOutJobData, dataBroker: DataBroker, parentBrokerOptOutJobData: [OptOutJobData]?) {
+        self.init(optOutJobData: optOutJobData,
+                  dataBrokerName: dataBroker.name,
+                  dataBrokerURL: dataBroker.url,
+                  dataBrokerParentURL: dataBroker.parent,
+                  parentBrokerOptOutJobData: parentBrokerOptOutJobData)
+    }
 }
 
 /// Protocol to represent a message that can be passed from the host to the UI
@@ -156,6 +232,27 @@ struct DBPUIOptOutMatch: DBPUISendableMessage {
     let alternativeNames: [String]
     let addresses: [DBPUIUserProfileAddress]
     let date: Double
+    let foundDate: Double
+    let optOutSubmittedDate: Double?
+    let estimatedRemovalDate: Double?
+    let removedDate: Double?
+}
+
+extension DBPUIOptOutMatch {
+    init?(profileMatch: DBPUIDataBrokerProfileMatch, matches: Int) {
+        guard let removedDate = profileMatch.removedDate else { return nil }
+        let dataBroker = profileMatch.dataBroker
+        self.init(dataBroker: dataBroker,
+                  matches: matches,
+                  name: profileMatch.name,
+                  alternativeNames: profileMatch.alternativeNames,
+                  addresses: profileMatch.addresses,
+                  date: removedDate,
+                  foundDate: profileMatch.foundDate,
+                  optOutSubmittedDate: profileMatch.optOutSubmittedDate,
+                  estimatedRemovalDate: profileMatch.estimatedRemovalDate,
+                  removedDate: removedDate)
+    }
 }
 
 /// Data representing the initial scan progress
