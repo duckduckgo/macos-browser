@@ -60,7 +60,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
         let bookmark = Bookmark(id: UUID().uuidString, url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: true, parentFolderUUID: "bookmarks_root")
 
-        bookmarkStore.save(bookmark: bookmark, parent: nil, index: nil) { error in
+        bookmarkStore.save(bookmark: bookmark, index: nil) { error in
             XCTAssertNil(error)
 
             savingExpectation.fulfill()
@@ -89,7 +89,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let loadingExpectation = self.expectation(description: "Loading")
 
         let bookmark = Bookmark(id: UUID().uuidString, url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: true)
-        bookmarkStore.save(bookmark: bookmark, parent: nil, index: nil) { error in
+        bookmarkStore.save(bookmark: bookmark, index: nil) { error in
             XCTAssertNil(error)
 
             savingExpectation.fulfill()
@@ -113,33 +113,6 @@ final class LocalBookmarkStoreTests: XCTestCase {
     }
 
     @MainActor
-    func testWhenEntitiesAreRestored_ThenTheyAreLoadedFromStore() async throws {
-        let context = container.viewContext
-
-        let bookmarkStore = LocalBookmarkStore(context: context)
-
-        let rootBookmark = Bookmark(id: UUID().uuidString, url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: true, parentFolderUUID: "bookmarks_root")
-        let folderId = UUID().uuidString
-        let childBookmark = Bookmark(id: UUID().uuidString, url: URL.duckDuckGoEmail.absoluteString, title: "Email", isFavorite: true, parentFolderUUID: folderId)
-        let folder = BookmarkFolder(id: folderId, title: "Folder", parentFolderUUID: "bookmarks_root", children: [childBookmark])
-
-        _=try await bookmarkStore.save(bookmark: rootBookmark, parent: nil, index: nil)
-        _=try await bookmarkStore.save(folder: folder, parent: nil)
-        _=try await bookmarkStore.save(bookmark: childBookmark, parent: folder, index: nil)
-
-        try await bookmarkStore.remove(objectsWithUUIDs: [rootBookmark.id, folder.id])
-
-        let bookmarksAfterRemoval = try await bookmarkStore.loadAll(type: .topLevelEntities)
-        XCTAssertEqual(bookmarksAfterRemoval.count, 0)
-
-        try await bookmarkStore.restore([rootBookmark, folder])
-
-        let bookmarksAfterRestore = try await bookmarkStore.loadAll(type: .topLevelEntities)
-        XCTAssertEqual(bookmarksAfterRestore, [rootBookmark, folder])
-        XCTAssertEqual((bookmarksAfterRestore[safe: 1] as? BookmarkFolder)?.children, [childBookmark])
-    }
-
-    @MainActor
     func testWhenBookmarkIsUpdated_ThenTheUpdatedVersionIsLoadedFromTheStore() {
         let context = container.viewContext
 
@@ -150,7 +123,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
         let bookmark = Bookmark(id: UUID().uuidString, url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: true)
 
-        bookmarkStore.save(bookmark: bookmark, parent: nil, index: nil) { error in
+        bookmarkStore.save(bookmark: bookmark, index: nil) { error in
             XCTAssertNil(error)
 
             savingExpectation.fulfill()
@@ -182,7 +155,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
         let folder = BookmarkFolder(id: UUID().uuidString, title: "Folder", parentFolderUUID: "bookmarks_root")
 
-        bookmarkStore.save(folder: folder, parent: nil) { error in
+        bookmarkStore.save(folder: folder) { error in
             XCTAssertNil(error)
 
             savingExpectation.fulfill()
@@ -213,12 +186,12 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let childFolder = BookmarkFolder(id: UUID().uuidString, title: "Child", parentFolderUUID: parentId)
         let parentFolder = BookmarkFolder(id: parentId, title: "Parent", parentFolderUUID: "bookmarks_root", children: [childFolder])
 
-        bookmarkStore.save(folder: parentFolder, parent: nil) { error in
+        bookmarkStore.save(folder: parentFolder) { error in
             XCTAssertNil(error)
 
             saveParentExpectation.fulfill()
 
-            bookmarkStore.save(folder: childFolder, parent: parentFolder) { error in
+            bookmarkStore.save(folder: childFolder) { error in
                 XCTAssertNil(error)
 
                 saveChildExpectation.fulfill()
@@ -256,12 +229,12 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let bookmark = Bookmark(id: UUID().uuidString, url: "https://example.com", title: "Example", isFavorite: false, parentFolderUUID: parentId)
         let folder = BookmarkFolder(id: parentId, title: "Parent", parentFolderUUID: "bookmarks_root", children: [bookmark])
 
-        bookmarkStore.save(folder: folder, parent: nil) { error in
+        bookmarkStore.save(folder: folder) { error in
             XCTAssertNil(error)
 
             saveFolderExpectation.fulfill()
 
-            bookmarkStore.save(bookmark: bookmark, parent: folder, index: nil) { error in
+            bookmarkStore.save(bookmark: bookmark, index: nil) { error in
                 XCTAssertNil(error)
 
                 saveBookmarkExpectation.fulfill()
@@ -325,7 +298,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let newFolderName = "Bookmark All Open Tabs"
         let websites = WebsiteInfo.makeWebsitesInfo(url: .duckDuckGo, occurrences: 50)
         let parentFolderToInsert = BookmarkFolder(id: "ABCDE", title: "Subfolder")
-        _ = try await sut.save(folder: parentFolderToInsert, parent: nil)
+        _ = try await sut.save(folder: parentFolderToInsert)
         var bookmarksEntity = try await sut.loadAll(type: .bookmarks)
         var topLevelEntities = try await sut.loadAll(type: .topLevelEntities)
         XCTAssertEqual(bookmarksEntity.count, 0)
@@ -422,16 +395,16 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let bookmarkStore = LocalBookmarkStore(context: context)
 
         let folder = BookmarkFolder(id: UUID().uuidString, title: "Parent")
-        let bookmark1 = Bookmark(id: UUID().uuidString, url: "https://example1.com", title: "Example 1", isFavorite: false)
-        let bookmark2 = Bookmark(id: UUID().uuidString, url: "https://example2.com", title: "Example 2", isFavorite: false)
-        let bookmark3 = Bookmark(id: UUID().uuidString, url: "https://example3.com", title: "Example 3", isFavorite: false)
+        let bookmark1 = Bookmark(id: UUID().uuidString, url: "https://example1.com", title: "Example 1", isFavorite: false, parentFolderUUID: folder.id)
+        let bookmark2 = Bookmark(id: UUID().uuidString, url: "https://example2.com", title: "Example 2", isFavorite: false, parentFolderUUID: folder.id)
+        let bookmark3 = Bookmark(id: UUID().uuidString, url: "https://example3.com", title: "Example 3", isFavorite: false, parentFolderUUID: folder.id)
 
         // Save the initial bookmarks state:
 
-        _ = try await bookmarkStore.save(folder: folder, parent: nil)
-        _ = try await bookmarkStore.save(bookmark: bookmark1, parent: folder, index: nil)
-        _ = try await bookmarkStore.save(bookmark: bookmark2, parent: folder, index: nil)
-        _ = try await bookmarkStore.save(bookmark: bookmark3, parent: folder, index: nil)
+        _ = try await bookmarkStore.save(folder: folder)
+        _ = try await bookmarkStore.save(bookmark: bookmark1, index: nil)
+        _ = try await bookmarkStore.save(bookmark: bookmark2, index: nil)
+        _ = try await bookmarkStore.save(bookmark: bookmark3, index: nil)
 
         // Fetch persisted bookmarks back from the store:
 
@@ -590,16 +563,16 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let bookmarkStore = LocalBookmarkStore(context: context)
 
         let initialParentFolder = BookmarkFolder(id: UUID().uuidString, title: "Parent")
-        let bookmark1 = Bookmark(id: UUID().uuidString, url: "https://example1.com", title: "Example 1", isFavorite: false)
-        let bookmark2 = Bookmark(id: UUID().uuidString, url: "https://example2.com", title: "Example 2", isFavorite: false)
-        let bookmark3 = Bookmark(id: UUID().uuidString, url: "https://example3.com", title: "Example 3", isFavorite: false)
+        let bookmark1 = Bookmark(id: UUID().uuidString, url: "https://example1.com", title: "Example 1", isFavorite: false, parentFolderUUID: initialParentFolder.id)
+        let bookmark2 = Bookmark(id: UUID().uuidString, url: "https://example2.com", title: "Example 2", isFavorite: false, parentFolderUUID: initialParentFolder.id)
+        let bookmark3 = Bookmark(id: UUID().uuidString, url: "https://example3.com", title: "Example 3", isFavorite: false, parentFolderUUID: initialParentFolder.id)
 
         // Save the initial bookmarks state:
 
-        _ = try await bookmarkStore.save(folder: initialParentFolder, parent: nil)
-        _ = try await bookmarkStore.save(bookmark: bookmark1, parent: initialParentFolder, index: nil)
-        _ = try await bookmarkStore.save(bookmark: bookmark2, parent: initialParentFolder, index: nil)
-        _ = try await bookmarkStore.save(bookmark: bookmark3, parent: initialParentFolder, index: nil)
+        _ = try await bookmarkStore.save(folder: initialParentFolder)
+        _ = try await bookmarkStore.save(bookmark: bookmark1, index: nil)
+        _ = try await bookmarkStore.save(bookmark: bookmark2, index: nil)
+        _ = try await bookmarkStore.save(bookmark: bookmark3, index: nil)
 
         // Fetch persisted bookmarks back from the store:
 
@@ -641,16 +614,16 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let bookmarkStore = LocalBookmarkStore(context: context)
 
         let folder = BookmarkFolder(id: UUID().uuidString, title: "Parent")
-        let bookmark1 = Bookmark(id: UUID().uuidString, url: "https://example1.com", title: "Example 1", isFavorite: false)
-        let bookmark2 = Bookmark(id: UUID().uuidString, url: "https://example2.com", title: "Example 2", isFavorite: false)
-        let bookmark3 = Bookmark(id: UUID().uuidString, url: "https://example3.com", title: "Example 3", isFavorite: false)
+        let bookmark1 = Bookmark(id: UUID().uuidString, url: "https://example1.com", title: "Example 1", isFavorite: false, parentFolderUUID: folder.id)
+        let bookmark2 = Bookmark(id: UUID().uuidString, url: "https://example2.com", title: "Example 2", isFavorite: false, parentFolderUUID: folder.id)
+        let bookmark3 = Bookmark(id: UUID().uuidString, url: "https://example3.com", title: "Example 3", isFavorite: false, parentFolderUUID: folder.id)
 
         // Save the initial bookmarks state:
 
-        _ = try await bookmarkStore.save(folder: folder, parent: nil)
-        _ = try await bookmarkStore.save(bookmark: bookmark1, parent: folder, index: nil)
-        _ = try await bookmarkStore.save(bookmark: bookmark2, parent: folder, index: nil)
-        _ = try await bookmarkStore.save(bookmark: bookmark3, parent: folder, index: nil)
+        _ = try await bookmarkStore.save(folder: folder)
+        _ = try await bookmarkStore.save(bookmark: bookmark1, index: nil)
+        _ = try await bookmarkStore.save(bookmark: bookmark2, index: nil)
+        _ = try await bookmarkStore.save(bookmark: bookmark3, index: nil)
 
         // Fetch persisted bookmarks back from the store:
 
@@ -747,7 +720,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
         // Save the initial bookmarks state:
 
-        _ = try await bookmarkStore.save(folder: folder1, parent: nil)
+        _ = try await bookmarkStore.save(folder: folder1)
 
         // Fetch persisted bookmark folders back from the store:
 
@@ -781,9 +754,9 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
         // Save the initial bookmarks state:
 
-        _ = try await bookmarkStore.save(folder: folder1, parent: nil)
-        _ = try await bookmarkStore.save(folder: folder2, parent: nil)
-        _ = try await bookmarkStore.save(folder: folder3, parent: nil)
+        _ = try await bookmarkStore.save(folder: folder1)
+        _ = try await bookmarkStore.save(folder: folder2)
+        _ = try await bookmarkStore.save(folder: folder3)
 
         // Fetch persisted bookmark folders back from the store:
 
@@ -821,8 +794,8 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
         // Save the initial bookmarks state:
 
-        _ = try await bookmarkStore.save(folder: folder1, parent: nil)
-        _ = try await bookmarkStore.save(folder: folder2, parent: nil)
+        _ = try await bookmarkStore.save(folder: folder1)
+        _ = try await bookmarkStore.save(folder: folder2)
 
         // Fetch persisted bookmark folders back from the store:
 
@@ -858,8 +831,8 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
         // Save the initial bookmarks state:
 
-        _ = try await bookmarkStore.save(folder: folder2, parent: nil)
-        _ = try await bookmarkStore.save(folder: folder1, parent: folder2)
+        _ = try await bookmarkStore.save(folder: folder2)
+        _ = try await bookmarkStore.save(folder: folder1)
 
         // Fetch persisted bookmark folders back from the store:
 
@@ -897,8 +870,8 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let bookmark1 = Bookmark(id: UUID().uuidString, url: "https://example1.com", title: "Example 1", isFavorite: true)
         let bookmark2 = Bookmark(id: UUID().uuidString, url: "https://example2.com", title: "Example 2", isFavorite: true)
 
-        _ = try await bookmarkStore.save(bookmark: bookmark1, parent: nil, index: nil)
-        _ = try await bookmarkStore.save(bookmark: bookmark2, parent: nil, index: nil)
+        _ = try await bookmarkStore.save(bookmark: bookmark1, index: nil)
+        _ = try await bookmarkStore.save(bookmark: bookmark2, index: nil)
 
         // Fetch top level entities:
 
@@ -915,13 +888,13 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
         let folder1 = BookmarkFolder(id: UUID().uuidString, title: "Folder 1")
         let folder2 = BookmarkFolder(id: UUID().uuidString, title: "Folder 2")
-        let bookmark = Bookmark(id: UUID().uuidString, url: "https://example1.com", title: "Example", isFavorite: false)
+        let bookmark = Bookmark(id: UUID().uuidString, url: "https://example1.com", title: "Example", isFavorite: false, parentFolderUUID: folder1.id)
 
         // Save the initial bookmarks state:
 
-        _ = try await bookmarkStore.save(folder: folder1, parent: nil)
-        _ = try await bookmarkStore.save(folder: folder2, parent: nil)
-        _ = try await bookmarkStore.save(bookmark: bookmark, parent: folder1, index: nil)
+        _ = try await bookmarkStore.save(folder: folder1)
+        _ = try await bookmarkStore.save(folder: folder2)
+        _ = try await bookmarkStore.save(bookmark: bookmark, index: nil)
 
         // Fetch persisted bookmarks back from the store:
 
@@ -979,10 +952,10 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
         // Save the initial bookmarks state:
 
-        _ = try await bookmarkStore.save(folder: folder, parent: nil)
-        _ = try await bookmarkStore.save(bookmark: bookmark1, parent: folder, index: nil)
-        _ = try await bookmarkStore.save(bookmark: bookmark2, parent: folder, index: nil)
-        _ = try await bookmarkStore.save(bookmark: bookmark3, parent: folder, index: nil)
+        _ = try await bookmarkStore.save(folder: folder)
+        _ = try await bookmarkStore.save(bookmark: bookmark1, index: nil)
+        _ = try await bookmarkStore.save(bookmark: bookmark2, index: nil)
+        _ = try await bookmarkStore.save(bookmark: bookmark3, index: nil)
 
         // Fetch persisted favorites back from the store:
 
@@ -1110,10 +1083,10 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
         // Save the initial bookmarks state:
 
-        _ = try await bookmarkStore.save(folder: initialParentFolder, parent: nil)
-        _ = try await bookmarkStore.save(bookmark: bookmark1, parent: initialParentFolder, index: nil)
-        _ = try await bookmarkStore.save(bookmark: bookmark2, parent: initialParentFolder, index: nil)
-        _ = try await bookmarkStore.save(bookmark: bookmark3, parent: initialParentFolder, index: nil)
+        _ = try await bookmarkStore.save(folder: initialParentFolder)
+        _ = try await bookmarkStore.save(bookmark: bookmark1, index: nil)
+        _ = try await bookmarkStore.save(bookmark: bookmark2, index: nil)
+        _ = try await bookmarkStore.save(bookmark: bookmark3, index: nil)
 
         // Fetch persisted favorites back from the store:
 
@@ -1153,10 +1126,10 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
         // Save the initial bookmarks state:
 
-        _ = try await bookmarkStore.save(folder: folder, parent: nil)
-        _ = try await bookmarkStore.save(bookmark: bookmark1, parent: folder, index: nil)
-        _ = try await bookmarkStore.save(bookmark: bookmark2, parent: folder, index: nil)
-        _ = try await bookmarkStore.save(bookmark: bookmark3, parent: folder, index: nil)
+        _ = try await bookmarkStore.save(folder: folder)
+        _ = try await bookmarkStore.save(bookmark: bookmark1, index: nil)
+        _ = try await bookmarkStore.save(bookmark: bookmark2, index: nil)
+        _ = try await bookmarkStore.save(bookmark: bookmark3, index: nil)
 
         // Fetch persisted favorites back from the store:
 
@@ -1198,16 +1171,16 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let bookmarkStore = LocalBookmarkStore(context: context)
 
         let initialParentFolder = BookmarkFolder(id: UUID().uuidString, title: "Parent")
-        let bookmark1 = Bookmark(id: UUID().uuidString, url: "https://example1.com", title: "Example 1", isFavorite: false)
-        let bookmark2 = Bookmark(id: UUID().uuidString, url: "https://example2.com", title: "Example 2", isFavorite: false)
-        let bookmark3 = Bookmark(id: UUID().uuidString, url: "https://example3.com", title: "Example 3", isFavorite: false)
+        let bookmark1 = Bookmark(id: UUID().uuidString, url: "https://example1.com", title: "Example 1", isFavorite: false, parentFolderUUID: initialParentFolder.id)
+        let bookmark2 = Bookmark(id: UUID().uuidString, url: "https://example2.com", title: "Example 2", isFavorite: false, parentFolderUUID: initialParentFolder.id)
+        let bookmark3 = Bookmark(id: UUID().uuidString, url: "https://example3.com", title: "Example 3", isFavorite: false, parentFolderUUID: initialParentFolder.id)
 
         // Save the initial bookmarks state:
 
-        _ = try await bookmarkStore.save(folder: initialParentFolder, parent: nil)
-        _ = try await bookmarkStore.save(bookmark: bookmark1, parent: initialParentFolder, index: nil)
-        _ = try await bookmarkStore.save(bookmark: bookmark2, parent: initialParentFolder, index: nil)
-        _ = try await bookmarkStore.save(bookmark: bookmark3, parent: initialParentFolder, index: nil)
+        _ = try await bookmarkStore.save(folder: initialParentFolder)
+        _ = try await bookmarkStore.save(bookmark: bookmark1, index: nil)
+        _ = try await bookmarkStore.save(bookmark: bookmark2, index: nil)
+        _ = try await bookmarkStore.save(bookmark: bookmark3, index: nil)
 
         // Fetch persisted bookmarks back from the store:
 
@@ -1240,7 +1213,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         bookmarkStore.applyFavoritesDisplayMode(.displayNative(.desktop))
 
         let bookmark = Bookmark(id: UUID().uuidString, url: "https://example1.com", title: "Example", isFavorite: true)
-        _ = try await bookmarkStore.save(bookmark: bookmark, parent: nil, index: nil)
+        _ = try await bookmarkStore.save(bookmark: bookmark, index: nil)
 
         context.performAndWait {
             let rootFolder = BookmarkUtils.fetchRootFolder(context)!
@@ -1342,7 +1315,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         bookmarkStore.applyFavoritesDisplayMode(.displayUnified(native: .desktop))
 
         let bookmark = Bookmark(id: UUID().uuidString, url: "https://example1.com", title: "Example", isFavorite: true)
-        _ = try await bookmarkStore.save(bookmark: bookmark, parent: nil, index: nil)
+        _ = try await bookmarkStore.save(bookmark: bookmark, index: nil)
 
         context.performAndWait {
             let rootFolder = BookmarkUtils.fetchRootFolder(context)!
@@ -1426,7 +1399,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let sut = LocalBookmarkStore(context: context)
         let folderId = "ABCDE"
         let folder = BookmarkFolder(id: folderId, title: "Test")
-        _ = try await sut.save(folder: folder, parent: nil)
+        _ = try await sut.save(folder: folder)
 
         // WHEN
         let result = sut.bookmarkFolder(withId: folderId)
@@ -1458,8 +1431,8 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let folder1 = BookmarkFolder(id: UUID().uuidString, title: "Test")
         let folder2 = BookmarkFolder(id: folderId, title: "Test")
         let expectedFolder = BookmarkFolder(id: folderId, title: "Test", parentFolderUUID: folder1.id)
-        _ = try await sut.save(folder: folder1, parent: nil)
-        _ = try await sut.save(folder: folder2, parent: nil)
+        _ = try await sut.save(folder: folder1)
+        _ = try await sut.save(folder: folder2)
 
         // WHEN
         let firstFetchResult = sut.bookmarkFolder(withId: folderId)

@@ -139,7 +139,7 @@ private extension AddEditBookmarkFolderDialogViewModel {
     }
 
     func add(folderWithName name: String, to parent: BookmarkFolder?) {
-        bookmarkManager.makeFolder(withTitle: name, parent: parent) { [weak self] bookmarkFolder in
+        bookmarkManager.makeFolder(named: name, parent: parent) { [weak self] bookmarkFolder in
             guard case .success(let bookmarkFolder) = bookmarkFolder else { return }
             self?.addFolderSubject.send(bookmarkFolder)
         }

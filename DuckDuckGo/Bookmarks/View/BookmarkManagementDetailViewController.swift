@@ -279,7 +279,6 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
             self.setupSort(mode: newSortMode)
         }.store(in: &cancellables)
     }
-    var observer: AXObserver?
 
     override func viewWillAppear() {
         NotificationCenter.default.addObserver(self, selector: #selector(firstReponderDidChange), name: .firstResponder, object: nil)

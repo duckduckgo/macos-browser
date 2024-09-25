@@ -43,14 +43,12 @@ internal class BaseBookmarkEntity: Identifiable, Equatable, Hashable {
         return request
     }
 
-    static func entities(with identifiers: [String], includingPendingDeletion: Bool) -> NSFetchRequest<BookmarkEntity> {
+    static func entities(with identifiers: [String]) -> NSFetchRequest<BookmarkEntity> {
         let request = BookmarkEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "%K IN %@ \(!includingPendingDeletion ? "AND %K == NO" : "") AND (%K == NO OR %K == nil)",
-                                        argumentArray: [
-                                            #keyPath(BookmarkEntity.uuid), identifiers,
-                                            !includingPendingDeletion ? #keyPath(BookmarkEntity.isPendingDeletion) : nil,
-                                            #keyPath(BookmarkEntity.isStub), #keyPath(BookmarkEntity.isStub)
-                                        ].compactMap { $0 })
+        request.predicate = NSPredicate(format: "%K IN %@ AND %K == NO AND (%K == NO OR %K == nil)",
+                                        #keyPath(BookmarkEntity.uuid), identifiers,
+                                        #keyPath(BookmarkEntity.isPendingDeletion),
+                                        #keyPath(BookmarkEntity.isStub), #keyPath(BookmarkEntity.isStub))
         return request
     }
 
@@ -263,6 +261,28 @@ final class Bookmark: BaseBookmarkEntity {
         hasher.combine(parentFolderUUID)
     }
 
+}
+extension BaseBookmarkEntity: CustomDebugStringConvertible {
+    var debugDescription: String {
+        switch self {
+        case let folder as BookmarkFolder:
+            folder.folderDebugDescription
+        case let bookmark as Bookmark:
+            bookmark.bookmarkDebugDescription
+        default:
+            fatalError("Unexpected entity type: \(self)")
+        }
+    }
+}
+extension BookmarkFolder {
+    fileprivate var folderDebugDescription: String {
+        "<BookmarkFolder \(id) \"\(title)\" parent: \(parentFolderUUID ?? "root") children: [\(children.map(\.debugDescription))]>"
+    }
+}
+extension Bookmark {
+    fileprivate var bookmarkDebugDescription: String {
+        "<Bookmark\(isFavorite ? "⭐️" : "") \(id) title: \"\(title)\" url: \"\(url)\" parent: \(parentFolderUUID ?? "root")>"
+    }
 }
 
 extension Array where Element == BaseBookmarkEntity {

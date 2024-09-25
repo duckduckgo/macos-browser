@@ -67,7 +67,7 @@ class MockBookmarkManager: BookmarkManager {
 
     func makeBookmarks(for websitesInfo: [DuckDuckGo_Privacy_Browser.WebsiteInfo], inNewFolderNamed folderName: String, withinParentFolder parent: DuckDuckGo_Privacy_Browser.ParentFolderType) {}
 
-    func makeFolder(withTitle title: String, parent: BookmarkFolder?, completion: @escaping (Result<DuckDuckGo_Privacy_Browser.BookmarkFolder, any Error>) -> Void) {}
+    func makeFolder(for title: String, parent: BookmarkFolder?, completion: @escaping (Result<BookmarkFolder, Error>) -> Void) {}
 
     var removeBookmarkCalled = false
     func remove(bookmark: DuckDuckGo_Privacy_Browser.Bookmark, undoManager: UndoManager?) {
@@ -143,6 +143,6 @@ class MockBookmarkManager: BookmarkManager {
 
     @Published var sortMode: BookmarksSortMode = .manual
 
-    func restore(_ objects: [DuckDuckGo_Privacy_Browser.BaseBookmarkEntity], undoManager: UndoManager?) {}
+    func restore(_ entities: [RestorableBookmarkEntity], undoManager: UndoManager) {}
 
 }
