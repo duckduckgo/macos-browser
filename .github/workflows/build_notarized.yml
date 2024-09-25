@@ -71,7 +71,7 @@ jobs:
 
     name: Export Notarized App
 
-    runs-on: macos-14-xlarge
+    runs-on: macos-15-xlarge
 
     outputs:
       app-version: ${{ steps.set-outputs.outputs.app-version }}
@@ -198,7 +198,7 @@ jobs:
     if: ${{ github.event.inputs.create-dmg == true || inputs.create-dmg == true }}
 
     # use macos-12 for creating DMGs as macos-13 beta runners can't run AppleScript: https://app.asana.com/0/0/1204523592790998/f
-    runs-on: macos-14
+    runs-on: macos-15
 
     env:
       app-version: ${{ needs.export-notarized-app.outputs.app-version }}
