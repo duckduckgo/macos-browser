@@ -30,6 +30,7 @@ extension BrokerProfileQueryData {
     static func mock(with steps: [Step] = [Step](),
                      dataBrokerName: String = "test",
                      url: String = "test.com",
+                     parentURL: String? = nil,
                      lastRunDate: Date? = nil,
                      preferredRunDate: Date? = nil,
                      extractedProfile: ExtractedProfile? = nil,
@@ -44,6 +45,7 @@ extension BrokerProfileQueryData {
                 steps: steps,
                 version: "1.0.0",
                 schedulingConfig: DataBrokerScheduleConfig.mock,
+                parent: parentURL,
                 mirrorSites: mirrorSites
             ),
             profileQuery: ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", birthYear: 50, deprecated: deprecated),
@@ -52,7 +54,7 @@ extension BrokerProfileQueryData {
                                      preferredRunDate: preferredRunDate,
                                      historyEvents: scanHistoryEvents,
                                      lastRunDate: lastRunDate),
-            optOutJobData: extractedProfile != nil ? [.mock(with: extractedProfile!)] : [OptOutJobData]()
+            optOutJobData: optOutJobData ?? (extractedProfile != nil ? [.mock(with: extractedProfile!)] : [OptOutJobData]())
         )
     }
 
@@ -1143,6 +1145,10 @@ extension OptOutJobData {
     static func mock(with extractedProfile: ExtractedProfile,
                      historyEvents: [HistoryEvent] = [HistoryEvent]()) -> OptOutJobData {
         .init(brokerId: 1, profileQueryId: 1, createdDate: Date(), historyEvents: historyEvents, extractedProfile: extractedProfile)
+    }
+
+    static func mock(with createdDate: Date) -> OptOutJobData {
+        .init(brokerId: 1, profileQueryId: 1, createdDate: createdDate, historyEvents: [], submittedSuccessfullyDate: nil, extractedProfile: .mockWithoutRemovedDate)
     }
 
     static func mock(with extractedProfile: ExtractedProfile,
