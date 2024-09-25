@@ -182,8 +182,12 @@ final class MainViewController: NSViewController {
             mainView.navigationBarContainerView.wantsLayer = true
             mainView.navigationBarContainerView.layer?.masksToBounds = false
 
-            resizeNavigationBar(isHomePage: tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab,
-                                animated: false)
+            if tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab,
+               browserTabViewController.homePageViewController?.addressBarModel.shouldShowAddressBar == false {
+                resizeNavigationBar(isHomePage: true, animated: lastTabContent != .newtab)
+            } else {
+                resizeNavigationBar(isHomePage: false, animated: false)
+            }
         }
 
         updateDividerColor(isShowingHomePage: tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab)
@@ -338,7 +342,15 @@ final class MainViewController: NSViewController {
                 guard let self, let selectedTabViewModel else { return }
                 defer { lastTabContent = content }
 
-                resizeNavigationBar(isHomePage: content == .newtab, animated: content == .newtab && lastTabContent != .newtab)
+                if content == .newtab {
+                    if browserTabViewController.homePageViewController?.addressBarModel.shouldShowAddressBar == true {
+                        resizeNavigationBar(isHomePage: false, animated: false)
+                    } else {
+                        resizeNavigationBar(isHomePage: true, animated: lastTabContent != .newtab)
+                    }
+                } else {
+                    resizeNavigationBar(isHomePage: false, animated: false)
+                }
                 adjustFirstResponder(selectedTabViewModel: selectedTabViewModel, tabContent: content)
             }
             .store(in: &self.tabViewModelCancellables)
