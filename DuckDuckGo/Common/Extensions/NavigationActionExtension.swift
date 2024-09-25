@@ -42,6 +42,12 @@ extension NavigationAction {
 
 extension CustomNavigationType {
     static let userEnteredUrl = CustomNavigationType(rawValue: "userEnteredUrl")
-    static let tabContentUpdate = CustomNavigationType(rawValue: "tabContentUpdate")
+    static let loadedByStateRestoration = CustomNavigationType(rawValue: "loadedByStateRestoration")
+    static let appOpenUrl = CustomNavigationType(rawValue: "appOpenUrl")
+    static let historyEntry = CustomNavigationType(rawValue: "historyEntry")
+    static let bookmark = CustomNavigationType(rawValue: "bookmark")
+    static let ui = CustomNavigationType(rawValue: "ui")
+    static let link = CustomNavigationType(rawValue: "link")
+    static let webViewUpdated = CustomNavigationType(rawValue: "webViewUpdated")
     static let userRequestedPageDownload = CustomNavigationType(rawValue: "userRequestedPageDownload")
 }

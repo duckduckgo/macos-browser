@@ -73,7 +73,7 @@ jobs:
             echo "skip-release=false" >> $GITHUB_OUTPUT
           else
             latest_tag="$(git describe --tags --abbrev=0)"
-            latest_tag_sha="$(git rev-parse "$latest_tag")"
+            latest_tag_sha="$(git rev-parse "$latest_tag"^{})"
             release_branch_sha="$(git rev-parse "origin/${release_branch}")"
 
             if [[ "${latest_tag_sha}" == "${release_branch_sha}" ]]; then

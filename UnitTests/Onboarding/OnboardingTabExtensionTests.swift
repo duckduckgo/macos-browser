@@ -40,7 +40,7 @@ final class OnboardingTabExtensionTests: XCTestCase {
     @MainActor
     func test_WhenNavigatingToOnboardingURL_thenNavigationPolicyIsAllow() async throws {
         // Given
-        let navigationAction = NavigationAction(request: URLRequest(url: URL(string: "duck://onboarding://")!), navigationType: .custom(.tabContentUpdate), currentHistoryItemIdentity: nil, redirectHistory: nil, isUserInitiated: false, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: nil, shouldDownload: false, mainFrameNavigation: nil)
+        let navigationAction = NavigationAction(request: URLRequest(url: URL(string: "duck://onboarding://")!), navigationType: .custom(.ui), currentHistoryItemIdentity: nil, redirectHistory: nil, isUserInitiated: false, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: nil, shouldDownload: false, mainFrameNavigation: nil)
 
         // When
         let navigationPolicy = await onboardingTabExtension.decidePolicy(for: navigationAction, preferences: &navigationPreferences)
@@ -52,7 +52,7 @@ final class OnboardingTabExtensionTests: XCTestCase {
     @MainActor
     func test_WhenNavigatingNotToOnboardingURL_thenNavigationPolicyIsNext() async throws {
         // Given
-        let navigationAction = NavigationAction(request: URLRequest(url: URL(string: "someUrl://")!), navigationType: .custom(.tabContentUpdate), currentHistoryItemIdentity: nil, redirectHistory: nil, isUserInitiated: false, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: nil, shouldDownload: false, mainFrameNavigation: nil)
+        let navigationAction = NavigationAction(request: URLRequest(url: URL(string: "someUrl://")!), navigationType: .custom(.ui), currentHistoryItemIdentity: nil, redirectHistory: nil, isUserInitiated: false, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: nil, shouldDownload: false, mainFrameNavigation: nil)
 
         // When
         let navigationPolicy = await onboardingTabExtension.decidePolicy(for: navigationAction, preferences: &navigationPreferences)

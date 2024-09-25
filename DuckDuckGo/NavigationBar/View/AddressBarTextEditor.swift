@@ -465,6 +465,19 @@ final class AddressBarTextEditor: NSTextView {
         self.scrollRangeToVisible(endRange)
     }
 
+    override func draggingSession(_ session: NSDraggingSession, willBeginAt screenPoint: NSPoint) {
+        // add URL and Title to the dragging pasteboard
+        if let draggedString = session.draggingPasteboard.string(forType: .string),
+           let url = URL(trimmedAddressBarString: draggedString) {
+            session.draggingPasteboard.setString(url.absoluteString, forType: .URL)
+            // if the address matches currently loaded URL
+            if let title = addressBar?.tabCollectionViewModel.selectedTabViewModel?.title, !title.isEmpty,
+               addressBar?.tabCollectionViewModel.selectedTabViewModel?.tab.url == url {
+                session.draggingPasteboard.setString(title, forType: .urlName)
+            }
+        }
+    }
+
 }
 
 final class AddressBarTextFieldCell: NSTextFieldCell {

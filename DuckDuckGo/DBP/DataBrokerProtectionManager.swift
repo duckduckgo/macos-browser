@@ -70,4 +70,8 @@ extension DataBrokerProtectionManager: DataBrokerProtectionDataManagerDelegate {
     public func dataBrokerProtectionDataManagerDidDeleteData() {
         loginItemInterface.dataDeleted()
     }
+
+    public func dataBrokerProtectionDataManagerWillOpenSendFeedbackForm() {
+        NotificationCenter.default.post(name: .OpenUnifiedFeedbackForm, object: nil, userInfo: UnifiedFeedbackSource.userInfo(source: .pir))
+    }
 }

@@ -390,7 +390,8 @@ jobs:
           bundle exec fastlane run asana_log_message \
             task_url:"${{ env.asana-task-url }}" \
             template_name:"${{ steps.asana-templates.outputs.comment-template }}" \
-            github_handle:"${{ github.actor }}"
+            github_handle:"${{ github.actor }}" \
+            is_scheduled_release:"${{ github.event_name == 'schedule' }}"
 
       - name: Add a comment to the release task
         if: success()

@@ -24,11 +24,12 @@ final class SuggestionLoadingMock: SuggestionLoading {
 
     var getSuggestionsCalled = false
     var completion: ((SuggestionResult?, Error?) -> Void)?
-    func getSuggestions(query: Query, completion: @escaping (SuggestionResult?, Error?) -> Void) {
+
+    func getSuggestions(query: Query,
+                        usingDataSource dataSource: SuggestionLoadingDataSource,
+                        completion: @escaping (SuggestionResult?, Error?) -> Void) {
         getSuggestionsCalled = true
         self.completion = completion
     }
-
-    var dataSource: SuggestionLoadingDataSource?
 
 }

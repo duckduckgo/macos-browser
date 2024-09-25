@@ -68,6 +68,20 @@ extension NavigationProtectionTabExtension: NavigationResponder {
         guard !navigationAction.navigationType.isBackForward,
               navigationAction.isForMainFrame
         else { return .next }
+        var isNewlyInitiatedAction: Bool {
+            switch navigationAction.navigationType {
+            case .custom(.userEnteredUrl),
+                 .custom(.loadedByStateRestoration),
+                 .custom(.appOpenUrl),
+                 .custom(.historyEntry),
+                 .custom(.bookmark),
+                 .custom(.ui),
+                 .custom(.link),
+                 .custom(.webViewUpdated),
+                 .reload: true
+            default: false
+            }
+        }
 
         // IMPORTANT: WebView navigationDidFinish event may race with Client Redirect NavigationAction
         // that‘s why it‘s been standardized to delay navigationDidFinish until decidePolicy(for:navigationAction) is handled
@@ -75,7 +89,7 @@ extension NavigationProtectionTabExtension: NavigationResponder {
         // when client redirect happens ReferrerTrimming.state should be `idle`, that‘s why we‘re resetting it here
         if navigationAction.navigationType.redirect?.isClient == true
             // if otherwise newly initiated action is racing with an active navigation - also reset it
-            || [.linkActivated(isMiddleClick: false), .custom(.userEnteredUrl), .custom(.tabContentUpdate), .reload].contains(navigationAction.navigationType)
+            || navigationAction.navigationType == .linkActivated(isMiddleClick: false) || isNewlyInitiatedAction
             || navigationAction.isUserInitiated {
 
             resetNavigation()
@@ -85,7 +99,7 @@ extension NavigationProtectionTabExtension: NavigationResponder {
 
         // getCleanURL for user or ui-initiated navigations
         // https://app.asana.com/0/0/1203538050625396/f
-        if [.custom(.userEnteredUrl), .custom(.tabContentUpdate)].contains(navigationAction.navigationType) {
+        if isNewlyInitiatedAction {
             let cleanUrl = await linkProtection.getCleanURL(from: request.url!, onStartExtracting: {}, onFinishExtracting: {})
             if cleanUrl != request.url {
                 request.url = cleanUrl

@@ -22,6 +22,20 @@ import PixelKit
 enum UnifiedFeedbackSource: String, StringRepresentable {
     case settings, ppro, vpn, pir, itr, unknown
     static var `default` = UnifiedFeedbackSource.unknown
+
+    private static let sourceKey = "source"
+
+    static func userInfo(source: UnifiedFeedbackSource) -> [String: Any] {
+        return [sourceKey: source.rawValue]
+    }
+
+    init(userInfo: [AnyHashable: Any]?) {
+        if let userInfo = userInfo as? [String: Any], let source = userInfo[Self.sourceKey] as? String {
+            self = UnifiedFeedbackSource(rawValue: source) ?? .default
+        } else {
+            self = .default
+        }
+    }
 }
 
 protocol UnifiedFeedbackSender {

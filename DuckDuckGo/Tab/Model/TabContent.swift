@@ -70,26 +70,38 @@ extension TabContent {
         var navigationType: NavigationType {
             switch self {
             case .userEntered(_, downloadRequested: true):
-                    .custom(.userRequestedPageDownload)
+                .custom(.userRequestedPageDownload)
             case .userEntered:
-                    .custom(.userEnteredUrl)
+                .custom(.userEnteredUrl)
             case .pendingStateRestoration:
-                    .sessionRestoration
-            case .loadedByStateRestoration, .appOpenUrl, .historyEntry, .bookmark, .ui, .link, .webViewUpdated:
-                    .custom(.tabContentUpdate)
+                .sessionRestoration
+            case .loadedByStateRestoration:
+                .custom(.loadedByStateRestoration)
+            case .appOpenUrl:
+                .custom(.appOpenUrl)
+            case .historyEntry:
+                .custom(.historyEntry)
+            case .bookmark:
+                .custom(.bookmark)
+            case .ui:
+                .custom(.ui)
+            case .link:
+                .custom(.link)
+            case .webViewUpdated:
+                .custom(.webViewUpdated)
             case .reload:
-                    .reload
+                .reload
             }
         }
 
         var cachePolicy: URLRequest.CachePolicy {
             switch self {
             case .pendingStateRestoration, .historyEntry:
-                    .returnCacheDataElseLoad
+                .returnCacheDataElseLoad
             case .reload, .loadedByStateRestoration:
-                    .reloadIgnoringCacheData
+                .reloadIgnoringCacheData
             case .userEntered, .bookmark, .ui, .link, .appOpenUrl, .webViewUpdated:
-                    .useProtocolCachePolicy
+                .useProtocolCachePolicy
             }
         }
 

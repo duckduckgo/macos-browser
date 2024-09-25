@@ -78,7 +78,15 @@ struct PromptActionView: View {
             .padding(.horizontal, 10)
 
             if let actionScreenshot = model.actionScreenshot {
-                Image(actionScreenshot)
+                // This is done this way because the change was introduced as a hotfix
+                // for macOS Sequoia and we want to avoid breakage
+                if #available(macOS 15, *) {
+                    Image(actionScreenshot)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                } else {
+                    Image(actionScreenshot)
+                }
             }
         }
         .cornerRadius(8)

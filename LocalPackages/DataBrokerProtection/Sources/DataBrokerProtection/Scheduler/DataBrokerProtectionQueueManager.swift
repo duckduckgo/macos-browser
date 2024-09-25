@@ -24,11 +24,17 @@ protocol DataBrokerProtectionOperationQueue {
     var maxConcurrentOperationCount: Int { get set }
     func cancelAllOperations()
     func addOperation(_ op: Operation)
-    func addBarrierBlock1(_ barrier: @escaping @Sendable () -> Void)
+    func addBarrierCompletionBlock(_ barrier: @escaping @Sendable () -> Void)
 }
 
 extension OperationQueue: DataBrokerProtectionOperationQueue {
-    func addBarrierBlock1(_ barrier: @escaping () -> Void) {
+    /*
+     An unfortunute necessarity due to an issue with xcode 16 and building for Product Review Release
+     Originally we just used addBarrierBlock directly, but now it won't build as it says
+     the extension doesn't conform to the protocol
+     The docs however say the method signiture is unchanged, so we've decided to blame the build system
+     */
+    func addBarrierCompletionBlock(_ barrier: @escaping @Sendable () -> Void) {
         addBarrierBlock(barrier)
     }
 }
@@ -236,7 +242,7 @@ private extension DefaultDataBrokerProtectionQueueManager {
             return
         }
 
-        operationQueue.addBarrierBlock1 { [weak self] in
+        operationQueue.addBarrierCompletionBlock { [weak self] in
             let errorCollection = DataBrokerProtectionAgentErrorCollection(oneTimeError: nil, operationErrors: self?.operationErrorsForCurrentOperations())
             completion?(errorCollection)
             self?.resetModeAndClearErrors()

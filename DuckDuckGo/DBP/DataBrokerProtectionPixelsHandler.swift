@@ -110,7 +110,8 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .invalidPayload,
                     .pixelTest,
                     .customDataBrokerStatsOptoutSubmit,
-                    .customGlobalStatsOptoutSubmit:
+                    .customGlobalStatsOptoutSubmit,
+                    .weeklyChildBrokerOrphanedOptOuts:
 
                 PixelKit.fire(event)
 
