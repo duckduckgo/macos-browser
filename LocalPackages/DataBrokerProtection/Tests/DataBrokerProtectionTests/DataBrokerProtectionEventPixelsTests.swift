@@ -26,7 +26,7 @@ final class DataBrokerProtectionEventPixelsTests: XCTestCase {
     let repository = MockDataBrokerProtectionEventPixelsRepository()
     let handler = MockDataBrokerProtectionPixelsHandler()
     let calendar = Calendar.current
-    let eighDaysSinceToday = Calendar.current.date(byAdding: .day, value: -8, to: Date())!
+    let eightDaysSinceToday = Calendar.current.date(byAdding: .day, value: -8, to: Date())!
 
     override func tearDown() {
         handler.clear()
