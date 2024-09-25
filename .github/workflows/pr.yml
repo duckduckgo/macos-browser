@@ -314,7 +314,7 @@ jobs:
         echo "commit_author=${author}" >> $GITHUB_OUTPUT
 
     - name: Stop containers
-        run: docker stop $(docker ps -q --filter ancestor=ghcr.io/duckduckgo/pir-fake-broker:latest)
+      run: docker stop $(docker ps -q --filter ancestor=ghcr.io/duckduckgo/pir-fake-broker:latest)
 
   private-api:
     name: Private API Report
