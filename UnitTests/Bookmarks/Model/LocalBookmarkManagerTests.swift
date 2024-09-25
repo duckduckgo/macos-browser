@@ -176,10 +176,12 @@ final class LocalBookmarkManagerTests: XCTestCase {
 
         // remove
         bookmarkManager.remove(bookmark: removedBookmark, undoManager: undoManager)
+        _=try await bookmarkManager.$list.filter { $0?.topLevelEntities.count == 2 }.timeout(1).first().promise().get()
 
         // undo remove
         XCTAssertTrue(undoManager.canUndo)
         undoManager.undo()
+        _=try await bookmarkManager.$list.filter { $0?.topLevelEntities.count == 3 }.timeout(1).first().promise().get()
 
         assertEqual(bookmarkStoreMock.saveEntitiesAtIndicesCalledWith, [(removedBookmark, 1)])
         // update the bookmark because it‘s recreated with a new id
@@ -191,6 +193,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
 
         // validate bookmark is removed
         undoManager.redo()
+        _=try await bookmarkManager.$list.filter { $0?.topLevelEntities.count == 2 }.timeout(1).first().promise().get()
         XCTAssertEqual(bookmarkStoreMock.removeCalledWithIds ?? [], [removedBookmark.id])
 
         // undo again
@@ -220,10 +223,12 @@ final class LocalBookmarkManagerTests: XCTestCase {
 
         // remove
         bookmarkManager.remove(folder: removedFolder, undoManager: undoManager)
+        _=try await bookmarkManager.$list.filter { $0?.topLevelEntities.count == 2 }.timeout(1).first().promise().get()
 
         // undo remove
         XCTAssertTrue(undoManager.canUndo)
         undoManager.undo()
+        _=try await bookmarkManager.$list.filter { $0?.topLevelEntities.count == 3 }.timeout(1).first().promise().get()
 
         // validate entities are restored
         guard let removedFolder1 = bookmarkStoreMock.saveEntitiesAtIndicesCalledWith?[safe: 0]?.entity as? BookmarkFolder,
@@ -246,6 +251,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
 
         // validate bookmark is removed
         undoManager.redo()
+        _=try await bookmarkManager.$list.filter { $0?.topLevelEntities.count == 2 }.timeout(1).first().promise().get()
         XCTAssertEqual(bookmarkStoreMock.removeCalledWithIds ?? [], [removedFolder1.id])
 
         // undo again
@@ -297,10 +303,12 @@ final class LocalBookmarkManagerTests: XCTestCase {
         ] as [BaseBookmarkEntity]
 
         bookmarkManager.remove(objectsWithUUIDs: removedEntities.map(\.id), undoManager: undoManager)
+        _=try await bookmarkManager.$list.filter { $0?.topLevelEntities.count == 1 }.timeout(1).first().promise().get()
 
         // undo remove
         XCTAssertTrue(undoManager.canUndo)
         undoManager.undo()
+        _=try await bookmarkManager.$list.filter { $0?.topLevelEntities.count == 6 }.timeout(1).first().promise().get()
 
         // validate entities are restored
         guard let removedFolder1 = bookmarkStoreMock.savedFolder(withTitle: "Folder") else { return XCTFail("1. Could not fetch Folder") }
@@ -315,8 +323,8 @@ final class LocalBookmarkManagerTests: XCTestCase {
             (Bookmark(.duckDuckGoEmailLogin, parentId: removedFolder1.id), nil),
             (Bookmark(.duckDuckGoEmailInfo, isFavorite: true, parentId: removedFolder1.id), nil),
             (removedFolder2, nil),
-            (Bookmark(.ddgLearnMore, isFavorite: false, parentId: removedFolder3.id), nil),
             (Bookmark(.duckDuckGoAutocomplete, isFavorite: true, parentId: removedFolder2.id), nil),
+            (Bookmark(.ddgLearnMore, isFavorite: false, parentId: removedFolder3.id), nil),
         ])
 
         // redo remove
@@ -325,11 +333,13 @@ final class LocalBookmarkManagerTests: XCTestCase {
 
         // validate bookmark is removed
         undoManager.redo()
+        _=try await bookmarkManager.$list.filter { $0?.topLevelEntities.count == 1 }.timeout(1).first().promise().get()
         XCTAssertEqual(bookmarkStoreMock.removeCalledWithIds?.count, 5)
 
         // undo again
         XCTAssertTrue(undoManager.canUndo)
         undoManager.undo()
+        _=try await bookmarkManager.$list.filter { $0?.topLevelEntities.count == 6 }.timeout(1).first().promise().get()
 
         // validate entities are restored
         guard let removedFolder1 = bookmarkStoreMock.savedFolder(withTitle: "Folder") else { return XCTFail("2. Could not fetch Folder") }
@@ -344,10 +354,114 @@ final class LocalBookmarkManagerTests: XCTestCase {
             (Bookmark(.duckDuckGoEmailLogin, parentId: removedFolder1.id), nil),
             (Bookmark(.duckDuckGoEmailInfo, isFavorite: true, parentId: removedFolder1.id), nil),
             (removedFolder2, nil),
-            (Bookmark(.ddgLearnMore, isFavorite: false, parentId: removedFolder3.id), nil),
             (Bookmark(.duckDuckGoAutocomplete, isFavorite: true, parentId: removedFolder2.id), nil),
+            (Bookmark(.ddgLearnMore, isFavorite: false, parentId: removedFolder3.id), nil),
         ])
         XCTAssertTrue(undoManager.canRedo)
+    }
+
+    // Validate bookmark ordering indexes adjustment considering deleted and stub records
+    func testInsertionIndicesAdjustment() {
+        let collection1: [Int?] = [nil, 100, 200, 300]
+        let indices1: IndexSet = [0, 1, 2, 3, 4, 5]
+        let adjusted1 = collection1.adjustInsertionIndices(indices1, isCountedItem: { $0 != nil }).enumerated().map { (indices1.map(\.self)[$0.offset], $0.element) }
+        let result1 = adjusted1.reduce(into: collection1) { $0.insert($1.0, at: $1.1) }
+        XCTAssertEqual(result1, [nil, 0, 1, 2, 3, 4, 5, 100, 200, 300])
+
+        let collection2: [Int?] = [100, 200, nil, nil, 300, 400, nil, nil, 500]
+        let indices2: IndexSet = [2, 3, 6, 7, 9, 10, 11]
+        let adjusted2 = collection2.adjustInsertionIndices(indices2, isCountedItem: { $0 != nil }).enumerated().map { (indices2.map(\.self)[$0.offset], $0.element) }
+        let result2 = adjusted2.reduce(into: collection2) { $0.insert($1.0, at: $1.1) }
+        XCTAssertEqual(result2, [100, 200, nil, nil, 2, 3, 300, 400, nil, nil, 6, 7, 500, 9, 10, 11])
+
+        let collection3: [Int?] = []
+        let indices3: IndexSet = [0, 1, 2]
+        let adjusted3 = collection3.adjustInsertionIndices(indices3, isCountedItem: { $0 != nil }).enumerated().map { (indices3.map(\.self)[$0.offset], $0.element) }
+        let result3 = adjusted3.reduce(into: collection3) { $0.insert($1.0, at: $1.1) }
+        XCTAssertEqual(result3, [0, 1, 2])
+
+        let collection4: [Int?] = [100, 200, 300]
+        let indices4: IndexSet = [0, 2, 4, 6, 7]
+        let adjusted4 = collection4.adjustInsertionIndices(indices4, isCountedItem: { $0 != nil }).enumerated().map { (indices4.map(\.self)[$0.offset], $0.element) }
+        let result4 = adjusted4.reduce(into: collection4) { $0.insert($1.0, at: $1.1) }
+        XCTAssertEqual(result4, [0, 100, 2, 200, 4, 300, 6, 7])
+
+        let collection5: [Int?] = [100, 200, nil, nil, nil, 300, 400, nil, nil, nil, 500]
+        let indices5: IndexSet = [0, 2, 3, 6, 7, 9, 10, 11, 13, 14]
+        let adjusted5 = collection5.adjustInsertionIndices(indices5, isCountedItem: { $0 != nil }).enumerated().map { (indices5.map(\.self)[$0.offset], $0.element) }
+        let result5 = adjusted5.reduce(into: collection5) { $0.insert($1.0, at: $1.1) }
+        XCTAssertEqual(result5, [0, 100, 2, 3, 200, nil, nil, nil, 300, 6, 7, 400, nil, nil, nil, 9, 10, 11, 500, 13, 14])
+    }
+
+    @MainActor
+    func testWhenBookmarkMovedAfterRestoration_ThenMovePositionIsCorrect() async throws {
+        // create bookmarks
+        let bookmarks: [BaseBookmarkEntity] = [
+            BookmarkFolder("Folder 1"),
+            BookmarkFolder("Folder 2"),
+            Bookmark(.duckDuckGo.appending("1")),
+            Bookmark(.duckDuckGo.appending("2")),
+            Bookmark(.duckDuckGo.appending("3")),
+            Bookmark(.duckDuckGo.appending("4")),
+            Bookmark(.duckDuckGo.appending("5")),
+            Bookmark(.duckDuckGo.appending("6")),
+            Bookmark(.duckDuckGo.appending("7")),
+            Bookmark(.duckDuckGo.appending("8")),
+        ]
+        let (bookmarkManager, _) = await LocalBookmarkManager.manager(with: { bookmarks })
+
+        let undoManager = UndoManager()
+        let removedEntities = [
+            bookmarkManager.getBookmark(for: .duckDuckGo.appending("1"))!,
+            bookmarkManager.getBookmark(for: .duckDuckGo.appending("4"))!,
+            bookmarkManager.getBookmark(for: .duckDuckGo.appending("5"))!,
+            bookmarkManager.getBookmark(for: .duckDuckGo.appending("7"))!,
+        ] as [BaseBookmarkEntity]
+
+        // remove bookmarks at random positions
+        bookmarkManager.remove(objectsWithUUIDs: removedEntities.map(\.id), undoManager: undoManager)
+        _=try await bookmarkManager.$list.filter { $0?.topLevelEntities.count == 6 }.timeout(1).first().promise().get()
+
+        // undo remove
+        XCTAssertTrue(undoManager.canUndo)
+        undoManager.undo()
+
+        let updatedBookmarks = try await bookmarkManager.$list.filter { $0?.topLevelEntities.count == 10 }.timeout(1).first().promise().get()?.topLevelEntities ?? []
+        for idx in 0..<max(bookmarks.count, updatedBookmarks.count) {
+            XCTAssert(updatedBookmarks[safe: idx]?.matches(bookmarks[safe: idx]) == true, "#\(idx): \(updatedBookmarks[safe: idx]?.debugDescription ?? "<nil>") ≠ \(bookmarks[safe: idx]?.debugDescription ?? "<nil>")")
+        }
+
+        guard let bookmark1 = bookmarkManager.getBookmark(for: .duckDuckGo.appending("1")) else { return XCTFail("Could not fetch Bookmark 1") }
+        guard let bookmark2 = bookmarkManager.getBookmark(for: .duckDuckGo.appending("2")) else { return XCTFail("Could not fetch Bookmark 2") }
+        guard let bookmark4 = bookmarkManager.getBookmark(for: .duckDuckGo.appending("4")) else { return XCTFail("Could not fetch Bookmark 4") }
+        guard let bookmark5 = bookmarkManager.getBookmark(for: .duckDuckGo.appending("5")) else { return XCTFail("Could not fetch Bookmark 5") }
+        guard let bookmark7 = bookmarkManager.getBookmark(for: .duckDuckGo.appending("7")) else { return XCTFail("Could not fetch Bookmark 7") }
+
+        // reorder a removed bookmark to some position close to the end of the list
+        bookmarkManager.move(objectUUIDs: [bookmark1.id], toIndex: 9, withinParentFolder: .root)
+        bookmarkManager.move(objectUUIDs: [bookmark4.id], toIndex: 10, withinParentFolder: .root)
+        bookmarkManager.move(objectUUIDs: [bookmark7.id], toIndex: 0, withinParentFolder: .root)
+        bookmarkManager.move(objectUUIDs: [bookmark5.id], toIndex: 8, withinParentFolder: .root)
+        bookmarkManager.move(objectUUIDs: [bookmark4.id], toIndex: 2, withinParentFolder: .root)
+        bookmarkManager.move(objectUUIDs: [bookmark2.id], toIndex: 6, withinParentFolder: .root)
+        let result = try await bookmarkManager.$list.dropFirst(6).timeout(1).first().promise().get()?.topLevelEntities ?? []
+
+        // validate order
+        let expectedBookmarks = [
+            Bookmark(.duckDuckGo.appending("7")),
+            BookmarkFolder("Folder 1"),
+            Bookmark(.duckDuckGo.appending("4")),
+            BookmarkFolder("Folder 2"),
+            Bookmark(.duckDuckGo.appending("3")),
+            Bookmark(.duckDuckGo.appending("2")),
+            Bookmark(.duckDuckGo.appending("6")),
+            Bookmark(.duckDuckGo.appending("1")),
+            Bookmark(.duckDuckGo.appending("5")),
+            Bookmark(.duckDuckGo.appending("8")),
+        ]
+        for idx in 0..<max(expectedBookmarks.count, result.count) {
+            XCTAssert(result[safe: idx]?.matches(expectedBookmarks[safe: idx]) == true, "#\(idx): \(result[safe: idx]?.debugDescription ?? "<nil>") ≠ \(expectedBookmarks[safe: idx]?.debugDescription ?? "<nil>")")
+        }
     }
 
     @MainActor
@@ -638,16 +752,14 @@ fileprivate extension LocalBookmarkManager {
         manager(with: {})
     }
 
-    @MainActor
     private static func makeManager(@BookmarksBuilder with bookmarks: () -> [BookmarksBuilderItem]) -> (LocalBookmarkManager, BookmarkStoreMock) {
         let bookmarkStoreMock = BookmarkStoreMock(contextProvider: { Self.context }, bookmarks: bookmarks().build())
-        let faviconManagerMock = FaviconManagerMock()
+        let faviconManagerMock = MainActor.assumeIsolated { FaviconManagerMock() }
         let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
 
         return (bookmarkManager, bookmarkStoreMock)
     }
 
-    @MainActor(unsafe)
     static func manager(loadBookmarks: Bool = true, @BookmarksBuilder with bookmarks: () -> [BookmarksBuilderItem]) -> (LocalBookmarkManager, BookmarkStoreMock) {
         let (bookmarkManager, bookmarkStoreMock) = makeManager(with: bookmarks)
         if loadBookmarks {
@@ -702,13 +814,15 @@ fileprivate extension BaseBookmarkEntity {
         matchesBookmark(withTitle: title, url: url, isFavorite: isFavorite, parent: parent?.id)
     }
 
-    func matches(_ entity: BaseBookmarkEntity) -> Bool {
+    func matches(_ entity: BaseBookmarkEntity?) -> Bool {
         switch entity {
         case let bookmark as Bookmark:
             return matchesBookmark(withTitle: bookmark.title, url: URL(string: bookmark.url)!, isFavorite: bookmark.isFavorite, parent: bookmark.parentFolderUUID)
         case let folder as BookmarkFolder:
             return matchesFolder(withTitle: folder.title, parent: folder.parentFolderUUID)
-        default:
+        case .none:
+            return false
+        case .some(let entity):
             fatalError("Unexpected entity type \(entity)")
         }
     }
@@ -736,14 +850,16 @@ extension BookmarksBuilderItem {
         build(withParentId: nil)
     }
 }
-extension Bookmark: BookmarksBuilderItem {
+extension BaseBookmarkEntity: BookmarksBuilderItem {
     func build(withParentId parentId: String?) -> BaseBookmarkEntity {
-        Bookmark(id: id, url: url, title: title, isFavorite: isFavorite, parentFolderUUID: parentId, faviconManagement: faviconManagement)
-    }
-}
-extension BookmarkFolder: BookmarksBuilderItem {
-    func build(withParentId parentId: String?) -> BaseBookmarkEntity {
-        BookmarkFolder(id: id, title: title, parentFolderUUID: parentId, children: children)
+        switch self {
+        case let bookmark as Bookmark:
+            Bookmark(id: bookmark.id, url: bookmark.url, title: bookmark.title, isFavorite: bookmark.isFavorite, parentFolderUUID: bookmark.parentFolderUUID, faviconManagement: bookmark.faviconManagement)
+        case let folder as BookmarkFolder:
+            BookmarkFolder(id: folder.id, title: folder.title, parentFolderUUID: folder.parentFolderUUID, children: folder.children)
+        default:
+            fatalError("Unexpected entity type \(self)")
+        }
     }
 }
 private typealias BookmarksBuilder = ArrayBuilder<BookmarksBuilderItem>

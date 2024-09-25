@@ -83,6 +83,9 @@ extension BookmarkManager {
         }
     }
 
+    func move(objectUUIDs: [String], toIndex index: Int?, withinParentFolder parent: ParentFolderType) {
+        move(objectUUIDs: objectUUIDs, toIndex: index, withinParentFolder: parent) { _ in }
+    }
 }
 final class LocalBookmarkManager: BookmarkManager {
     static let shared = LocalBookmarkManager()
@@ -268,7 +271,7 @@ final class LocalBookmarkManager: BookmarkManager {
         }
 
         var subfolderIds = Set<String>()
-        let topLevelUuids = entitiesAtIndices.reduce(into: Set<String>()) { (uuids, item) in
+        let topLevelUuids = entitiesAtIndices.reduce(into: [String]()) { (uuids, item) in
             if item.entity.isFolder {
                 subfolderIds.insert(item.entity.id)
             }
@@ -276,10 +279,10 @@ final class LocalBookmarkManager: BookmarkManager {
                 // don‘t include a nested item id as its parent will be removed with all its descendants
                 return
             }
-            uuids.insert(item.entity.id)
+            uuids.append(item.entity.id)
         }
         undoManager.registerUndo(withTarget: self) { @MainActor this in
-            this.remove(objectsWithUUIDs: Array(topLevelUuids), undoManager: undoManager)
+            this.remove(objectsWithUUIDs: topLevelUuids, undoManager: undoManager)
         }
     }
 
@@ -396,7 +399,6 @@ final class LocalBookmarkManager: BookmarkManager {
                 self?.requestSync()
             }
             completion(error)
-
         }
     }
 
@@ -567,6 +569,13 @@ enum RestorableBookmarkEntity {
             return index
         }
     }
+    var title: String {
+        switch self {
+        case .bookmark(_, title: let title, _, _, _),
+             .folder(title: let title, _, _, originalId: _):
+            return title
+        }
+    }
 }
 extension [RestorableBookmarkEntity] {
     @MainActor
@@ -575,35 +584,43 @@ extension [RestorableBookmarkEntity] {
         assert(Set(entities.map(\.id)).count == entities.count, "Some entities are repeated in the passed array")
 
         var folderCache = [String: BookmarkFolder]()
-        var queue = [entities]
-        var isFirstChunk = true
-        self = []
-        while !queue.isEmpty {
-            let chunk = queue.removeFirst()
-            for entity in chunk {
-                var index: Int?
-                // children items of a removed folder are inserted in the original order so we don‘t need to track their indices
-                if isFirstChunk {
-                    let parent = if let parentId = entity.parentFolderUUID {
-                        folderCache[parentId] ?? {
-                            guard let folder = bookmarkManager.getBookmarkFolder(withId: parentId) else { return nil }
-                            folderCache[folder.id] = folder
-                            return folder
-                        }()
-                    } else { BookmarkFolder?.none }
-                    let siblings = parent?.children ?? bookmarkManager.list?.topLevelEntities
-                    index = siblings?.firstIndex(where: { $0.id == entity.id }) ?? -1
-                }
+        var removedFolderStack = [(folder: BookmarkFolder, index: Int?)]()
+        self = entities.map { entity in
+            // find index
+            let parent = if let parentId = entity.parentFolderUUID {
+                // cache already fetched parent folders
+                folderCache[parentId] ?? {
+                    guard let folder = bookmarkManager.getBookmarkFolder(withId: parentId) else { return nil }
+                    folderCache[folder.id] = folder
+                    return folder
+                }()
+            } else { BookmarkFolder?.none }
 
-                self.append(RestorableBookmarkEntity(bookmarkEntity: entity, index: index))
+            let siblings = parent?.children ?? bookmarkManager.list?.topLevelEntities
+            let index = siblings?.firstIndex(where: { $0.id == entity.id }) ?? -1
+
+            if let folder = entity as? BookmarkFolder {
+                removedFolderStack.append((folder, index))
+            }
+
+            return RestorableBookmarkEntity(bookmarkEntity: entity, index: index)
+        }.sorted {
+            $0.index ?? Int.max < $1.index ?? Int.max
+        }
+        removedFolderStack.sort {
+            $0.index ?? Int.max > $1.index ?? Int.max
+        }
+
+        while let (folder, _) = removedFolderStack.popLast() {
+            for entity in folder.children {
+                // children items of a removed folder are inserted in the original order so we don‘t need to track their indices
+                self.append(RestorableBookmarkEntity(bookmarkEntity: entity, index: nil))
 
                 if let folder = entity as? BookmarkFolder {
-                    queue.append(folder.children)
+                    removedFolderStack.append((folder, nil))
                 }
             }
-            isFirstChunk = false
         }
-        self.sort { $0.index ?? Int.max < $1.index ?? Int.max }
     }
 }
 private extension UndoManager {
