@@ -29,6 +29,7 @@ final class AddressBarViewController: NSViewController, ObservableObject {
     @IBOutlet var activeBackgroundView: ColorView!
     @IBOutlet var activeOuterBorderView: ColorView!
     @IBOutlet var activeBackgroundViewWithSuggestions: ColorView!
+    @IBOutlet var innerBorderView: ColorView!
     @IBOutlet var progressIndicator: LoadingProgressView!
     @IBOutlet var passiveTextFieldMinXConstraint: NSLayoutConstraint!
     @IBOutlet var activeTextFieldMinXConstraint: NSLayoutConstraint!
@@ -366,6 +367,9 @@ final class AddressBarViewController: NSViewController, ObservableObject {
         activeOuterBorderView.isHidden = isSuggestionsWindowVisible
         activeBackgroundView.isHidden = isSuggestionsWindowVisible
         activeBackgroundViewWithSuggestions.isHidden = !isSuggestionsWindowVisible
+        if isSearchBox {
+            innerBorderView.isHidden = true
+        }
     }
 
     private func layoutShadowView() {
