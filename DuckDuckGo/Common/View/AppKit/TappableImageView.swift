@@ -19,8 +19,10 @@
 final class TappableImageView: NSImageView {
     var onClick: (() -> Void)?
 
+    /// We do not call super.mouseDown(with: event) because we do not want to trigger a mouseDown event on any of the super views.
+    ///
+    /// For example, when the audio button on tabs is tapped we do not want the tab to be selected if it is not.
     override func mouseDown(with event: NSEvent) {
-        super.mouseDown(with: event)
         onClick?()
     }
 }
