@@ -104,6 +104,15 @@ jobs:
         echo "${{ matrix.xcode-version }}" > .xcode-version
         sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
+    # This first bit is a hack to stop the app building package dependencies that isn't needed by the test runner
+    # Otherwise xcodebuild will attempt building BSK and linking GRDB framework that is incompatible with Xcode 15
+    - name: Build test runner
+      run: |
+        rm -rf LocalPackages
+        rm -rf /Users/runner/work/macos-browser/macos-browser/DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+        sed -i '' '/\/\* Begin XCSwiftPackageProductDependency section \*\//,/\/\* End XCSwiftPackageProductDependency section \*\//d' DuckDuckGo.xcodeproj/project.pbxproj
+        sed -i '' '/\/\* Begin XCRemoteSwiftPackageReference section \*\//,/\/\* End XCRemoteSwiftPackageReference section \*\//d' DuckDuckGo.xcodeproj/project.pbxproj
+
     - name: Build for testing
       run: |
         set -o pipefail && xcodebuild build-for-testing \
