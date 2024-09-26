@@ -54,8 +54,10 @@ struct BigSearchBox: View {
         static let searchBoxHeight = 40.0
         static let logoHeight = 96.0
         static let spacing = 24.0
+        static let logoSpacing = 12.0
+        static let wordmarkHeight = 22.0
 
-        static let totalHeight = searchBoxHeight + logoHeight + spacing
+        static let totalHeight = searchBoxHeight + logoHeight + logoSpacing + wordmarkHeight + spacing
     }
 
     let usesFixedColorScheme: Bool
@@ -73,7 +75,7 @@ struct BigSearchBox: View {
 
     @ViewBuilder
     func logo() -> some View {
-        VStack(spacing: 12) {
+        VStack(spacing: Const.logoSpacing) {
             Image(nsImage: .onboardingDax)
                 .resizable()
                 .frame(width: Const.logoHeight, height: Const.logoHeight)
