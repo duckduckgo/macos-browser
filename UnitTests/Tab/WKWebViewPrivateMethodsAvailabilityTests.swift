@@ -61,7 +61,7 @@ final class WKWebViewPrivateMethodsAvailabilityTests: XCTestCase {
     }
 
     func testWebViewRespondsTo_isPlayingAudio() {
-        XCTAssertTrue(WKWebView.instancesRespond(to: WKWebView.Selector.isPlayingAudio))
+        XCTAssertTrue(WKWebView.instancesRespond(to: NSSelectorFromString(WKWebView.Selector.isPlayingAudio)))
     }
 
 }

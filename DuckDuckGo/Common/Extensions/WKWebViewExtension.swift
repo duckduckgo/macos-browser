@@ -172,7 +172,7 @@ extension WKWebView {
     ///            `unmuted` if the web view is unmuted
     var audioState: AudioState {
         get {
-            AudioState(wkMediaMutedState: mediaMutedState, isPlayingAudio: isPlayingAudio ?? false)
+            AudioState(wkMediaMutedState: mediaMutedState, isPlayingAudio: isPlayingAudio)
         }
         set {
             switch newValue {
@@ -184,13 +184,14 @@ extension WKWebView {
         }
     }
 
-    var isPlayingAudioPublisher: AnyPublisher<Bool?, Never> {
-        KVOListener(object: self, keyPath: NSStringFromSelector(Selector.isPlayingAudio))
-            .eraseToAnyPublisher()
+    @objc(webViewIsPlayingAudio) // named this way to avoid clashing with a real method when (in case) it becomes public
+    var isPlayingAudio: Bool {
+        return self.value(forKey: Selector.isPlayingAudio) as? Bool ?? false
     }
 
-    private var isPlayingAudio: Bool? {
-        return self.value(forKey: NSStringFromSelector(Selector.isPlayingAudio)) as? Bool
+    @objc(keyPathsForValuesAffectingWebViewIsPlayingAudio)
+    static func keyPathsForValuesAffectingIsPlayingAudio() -> Set<String> {
+        return [NSStringFromSelector(Selector.mediaMutedState), Selector.isPlayingAudio]
     }
 
     func stopMediaCapture() {
@@ -390,7 +391,13 @@ extension WKWebView {
         static let setPageMuted = NSSelectorFromString("_setPageMuted:")
         static let setAddsVisitedLinks = NSSelectorFromString("_setAddsVisitedLinks:")
         static let addsVisitedLinks = NSSelectorFromString("_addsVisitedLinks")
-        static let isPlayingAudio = NSSelectorFromString("_isPlayingAudio")
+        static let isPlayingAudio = "_isPlayingAudio"
+    }
+
+    // prevent exception if private API keys go missing
+    open override func value(forUndefinedKey key: String) -> Any? {
+        assertionFailure("valueForUndefinedKey: \(key)")
+        return nil
     }
 
 }

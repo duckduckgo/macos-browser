@@ -1000,8 +1000,8 @@ protocol NewWindowPolicyDecisionMaker {
             self?.updateCanGoBackForward(withCurrentNavigation: navigation)
         }.store(in: &webViewCancellables)
 
-        webView.isPlayingAudioPublisher.sink { [weak self] value in
-            self?.isPlayingAudio = value ?? false
+        webView.publisher(for: \.isPlayingAudio).sink { [weak self] value in
+            self?.isPlayingAudio = value
         }.store(in: &webViewCancellables)
 
         // background tab loading should start immediately
