@@ -28,15 +28,6 @@
       }
     },
     {
-      "identity" : "browserserviceskit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/BrowserServicesKit",
-      "state" : {
-        "branch" : "graeme/enable-import-prompt-for-all-users",
-        "revision" : "44b1d8f50f04948f0c086299f1b87216558d2e0a"
-      }
-    },
-    {
       "identity" : "content-scope-scripts",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
@@ -51,7 +42,7 @@
       "location" : "https://github.com/duckduckgo/duckduckgo-autofill.git",
       "state" : {
         "branch" : "dbajpeyi/feature/dismiss-password-import-flow",
-        "revision" : "bf31f3f2c55d0183ff67bea8bf95d145116f6366"
+        "revision" : "b4f575c5192247790fbc39fb9c03f640ff1de8db"
       }
     },
     {
