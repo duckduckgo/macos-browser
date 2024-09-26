@@ -193,6 +193,8 @@ final class LocalBookmarkManager: BookmarkManager {
     }
 
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool, index: Int? = nil, parent: BookmarkFolder? = nil) -> Bookmark? {
+        assert(url.absoluteString.lowercased() == url.absoluteString)
+
         guard list != nil else { return nil }
 
         guard !isUrlBookmarked(url: url) else {
