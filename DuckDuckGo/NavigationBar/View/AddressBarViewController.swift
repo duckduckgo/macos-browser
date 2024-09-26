@@ -331,17 +331,19 @@ final class AddressBarViewController: NSViewController, ObservableObject {
         inactiveBackgroundView.alphaValue = isFirstResponderOrBigSearchBox ? 0 : 1
         activeBackgroundView.alphaValue = isFirstResponderOrBigSearchBox ? 1 : 0
 
+        let isKey = self.view.window?.isKeyWindow == true
+
         if isSearchBox {
             let appearance = addressBarTextField.homePagePreferredAppearance ?? NSApp.effectiveAppearance
 
             appearance.performAsCurrentDrawingAppearance {
-                activeOuterBorderView.isHidden = true
+                activeOuterBorderView.alphaValue = isKey && isFirstResponder ? 1 : 0
+                activeOuterBorderView.backgroundColor = accentColor.withAlphaComponent(0.2)
                 activeBackgroundView.borderWidth = 1.0
-                activeBackgroundView.borderColor = NSColor.homePageAddressBarBorder
+                activeBackgroundView.borderColor = isKey && isFirstResponder ? accentColor.withAlphaComponent(0.8) : NSColor.homePageAddressBarBorder
                 activeBackgroundView.backgroundColor = NSColor.homePageAddressBarBackground
             }
         } else {
-            let isKey = self.view.window?.isKeyWindow == true
             activeOuterBorderView.alphaValue = isKey && isFirstResponder && isHomePage ? 1 : 0
             activeOuterBorderView.backgroundColor = accentColor.withAlphaComponent(0.2)
             activeBackgroundView.borderColor = accentColor.withAlphaComponent(0.8)
@@ -405,7 +407,6 @@ final class AddressBarViewController: NSViewController, ObservableObject {
             let appearance = addressBarTextField.homePagePreferredAppearance ?? NSApp.effectiveAppearance
 
             appearance.performAsCurrentDrawingAppearance {
-                activeOuterBorderView.isHidden = true
                 activeBackgroundView.borderWidth = 1.0
                 activeBackgroundView.borderColor = NSColor.homePageAddressBarBorder
                 activeBackgroundView.backgroundColor = NSColor.homePageAddressBarBackground
