@@ -26,7 +26,7 @@ final class AutofillLoginImportState: AutofillLoginImportStateProvider {
 
     private let userDefaults: UserDefaults
 
-    public var isNewDDGUser: Bool {
+    public var isEligibleDDGUser: Bool {
         guard let date = userDefaults.object(forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue) as? Date else {
             return true
         }
