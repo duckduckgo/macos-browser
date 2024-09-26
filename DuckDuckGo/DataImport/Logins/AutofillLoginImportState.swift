@@ -18,10 +18,15 @@
 
 import BrowserServicesKit
 
-final class AutofillLoginImportState: AutofillLoginImportStateProvider {
+protocol AutofillLoginImportStateStoring {
+    var isCredentialsImportPromptPermanantlyDismissed: Bool { get set }
+}
+
+final class AutofillLoginImportState: AutofillLoginImportStateProvider, AutofillLoginImportStateStoring {
     private enum Key {
         static let hasImportedLogins: String = "com.duckduckgo.logins.hasImportedLogins"
         static let credentialsImportPromptPresentationCount: String = "com.duckduckgo.logins.credentialsImportPromptPresentationCount"
+        static let isCredentialsImportPromptPermanantlyDismissed: String = "com.duckduckgo.logins.isCredentialsImportPromptPermanantlyDismissed"
     }
 
     private let userDefaults: UserDefaults
@@ -55,6 +60,16 @@ final class AutofillLoginImportState: AutofillLoginImportStateProvider {
 
     public var isAutofillEnabled: Bool {
         AutofillPreferences().askToSaveUsernamesAndPasswords
+    }
+
+    public var isCredentialsImportPromptPermanantlyDismissed: Bool {
+        get {
+            userDefaults.bool(forKey: Key.credentialsImportPromptPresentationCount)
+        }
+
+        set {
+            userDefaults.set(newValue, forKey: Key.credentialsImportPromptPresentationCount)
+        }
     }
 
     init(userDefaults: UserDefaults = .standard) {

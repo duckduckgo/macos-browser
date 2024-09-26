@@ -803,8 +803,10 @@ extension MainViewController {
                                                           eventMapping: EventMapping<AutofillPixelEvent> { _, _, _, _ in },
                                                           installDate: nil)
         autofillPixelReporter.resetStoreDefaults()
-        AutofillLoginImportState().hasImportedLogins = false
-        AutofillLoginImportState().credentialsImportPromptPresentationCount = 0
+        var loginImportState = AutofillLoginImportState()
+        loginImportState.hasImportedLogins = false
+        loginImportState.credentialsImportPromptPresentationCount = 0
+        loginImportState.isCredentialsImportPromptPermanantlyDismissed = false
     }
 
     @objc func resetBookmarks(_ sender: Any?) {

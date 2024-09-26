@@ -25,17 +25,16 @@ public protocol AutofillCredentialsImportPresentationDelegate: AnyObject {
 }
 
 final public class AutofillCredentialsImportManager {
-    private let userDefaults: UserDefaults
+    private var stateStore: AutofillLoginImportStateStoring
 
     weak var presentationDelegate: AutofillCredentialsImportPresentationDelegate?
 
-    init(userDefaults: UserDefaults = .standard) {
-        self.userDefaults = userDefaults
+    init(stateStore: AutofillLoginImportStateStoring = AutofillLoginImportState()) {
+        self.stateStore = stateStore
     }
 }
 
 extension AutofillCredentialsImportManager: AutofillPasswordImportDelegate {
-
     private struct CredentialsImportInputContext: Decodable {
         var inputType: String
         var credentialsImport: Bool
@@ -57,6 +56,10 @@ extension AutofillCredentialsImportManager: AutofillPasswordImportDelegate {
 
     public func autofillUserScriptDidFinishImportWithImportedCredentialForCurrentDomain() {
         PixelKit.fire(AutofillPixelKitEvent.importCredentialsFlowHadCredentials.withoutMacPrefix)
+    }
+
+    public func autofillUserScriptDidRequestPermanentCredentialsImportPromptDismissal() {
+        stateStore.isCredentialsImportPromptPermanantlyDismissed = true
     }
 
     public func autofillUserScriptWillDisplayOverlay(_ serializedInputContext: String) {
