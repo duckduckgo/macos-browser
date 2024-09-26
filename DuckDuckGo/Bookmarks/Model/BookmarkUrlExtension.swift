@@ -21,29 +21,33 @@ extension URL {
     func bookmarkButtonUrlVariants() -> [URL] {
         var baseUrlString = self.absoluteString
 
-        // Remove the scheme if it's http or https
-        if let scheme = self.scheme.map(NavigationalScheme.init),
-           scheme.isHypertextScheme {
-            baseUrlString = baseUrlString.replacingOccurrences(of: "\(scheme.separated())", with: "")
+        guard let scheme = self.scheme.map(NavigationalScheme.init),
+              scheme.isHypertextScheme else {
+            return [self]
         }
 
-        // Generate variants
+        baseUrlString = baseUrlString.replacingOccurrences(of: "\(scheme.separated())", with: "")
+
+        // Generate variants without trailing slash
         let withoutTrailingSlash = baseUrlString.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
-        let withTrailingSlash = withoutTrailingSlash + "/"
+
+        // Only append trailing slash if there are no query or fragment components
+        let shouldAddTrailingSlash = self.query == nil && self.fragment == nil
+        let withTrailingSlash = shouldAddTrailingSlash ? withoutTrailingSlash + "/" : withoutTrailingSlash
+
+        // Create variants
         let httpVariant = NavigationalScheme.http.separated() + withoutTrailingSlash
         let httpsVariant = NavigationalScheme.https.separated() + withoutTrailingSlash
         let httpVariantWithSlash = NavigationalScheme.http.separated() + withTrailingSlash
         let httpsVariantWithSlash = NavigationalScheme.https.separated() + withTrailingSlash
-
         let variants: [URL?] = [
-            self,                                  // Original URL
-            URL(string: httpVariant),              // http without trailing slash
-            URL(string: httpsVariant),             // https without trailing slash
-            URL(string: httpVariantWithSlash),     // http with trailing slash
-            URL(string: httpsVariantWithSlash)     // https with trailing slash
+            self,
+            URL(string: httpVariant),
+            URL(string: httpsVariant),
+            shouldAddTrailingSlash ? URL(string: httpVariantWithSlash) : nil,
+            shouldAddTrailingSlash ? URL(string: httpsVariantWithSlash) : nil
         ]
 
-        // Filter out nil values and remove duplicates while preserving order
         var seen = Set<String>()
         return variants.compactMap { variant in
             guard let url = variant else { return nil }
