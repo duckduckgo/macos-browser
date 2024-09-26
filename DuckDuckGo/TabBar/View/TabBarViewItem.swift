@@ -596,7 +596,7 @@ final class TabBarViewItem: NSCollectionViewItem {
             cell.borderLayer.isHidden = !isSelected
         }
 
-        let showCloseButton = (isMouseOver && !widthStage.isCloseButtonHidden) || isSelected
+        let showCloseButton = (isMouseOver && (!widthStage.isCloseButtonHidden || NSApp.isCommandPressed)) || isSelected
         cell.closeButton.isShown = showCloseButton
         cell.faviconImageView.isShown = (cell.faviconImageView.image != nil) && (widthStage != .withoutTitle || !showCloseButton)
         updateSeparatorView()
