@@ -78,8 +78,8 @@ jobs:
       app-name: ${{ steps.set-outputs.outputs.app-name }}
       upload-to: ${{ steps.is-official-release.outputs.upload-to }}
       test-build-s3-path: ${{ steps.upload-dsyms-to-s3.outputs.test-build-s3-path }}
-      dsym-s3-path: ${{ steps.upload-dsyms-to-s3.outputs.dsym-s3-path }}
-      dsym-url: ${{ steps.upload-dsyms-to-s3.outputs.dsym-url }}
+      dsym-s3-path: ${{ steps.upload-dsyms-to-s3-test-build.outputs.dsym-s3-path }}
+      dsym-url: ${{ steps.upload-dsyms-to-s3-test-build.outputs.dsym-url }}
 
     env:
       release-type: ${{ github.event.inputs.release-type || inputs.release-type }}
@@ -169,6 +169,7 @@ jobs:
         path: ${{ github.workspace }}/release/${{ steps.set-outputs.outputs.dsym-name }}
 
     - name: Upload dSYMs to S3
+      if: ${{ env.upload-to == 's3' }}
       id: upload-dsyms-to-s3
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -178,26 +179,35 @@ jobs:
         DSYM_BUCKET_PREFIX: ${{ vars.DSYM_BUCKET_PREFIX }}
         DSYM_NAME: ${{ steps.set-outputs.outputs.dsym-name }}
         DSYM_LOCAL_PATH: "${{ github.workspace }}/release/${{ steps.set-outputs.outputs.dsym-name }}"
+      run: |
+        dsym_s3_path="s3://${DSYM_BUCKET_NAME}/${DSYM_BUCKET_PREFIX}/${DSYM_NAME}"
+        aws s3 cp $DSYM_LOCAL_PATH $dsym_s3_path
+        echo "dsym-s3-path=${dsym_s3_path}" >> $GITHUB_OUTPUT
+
+    - name: Upload dSYMs to S3 (test build)
+      if: ${{ env.upload-to == 's3testbuilds' }}
+      id: upload-dsyms-to-s3-test-build
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_RELEASE_S3 }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
+        AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
+        DSYM_NAME: ${{ steps.set-outputs.outputs.dsym-name }}
+        DSYM_LOCAL_PATH: "${{ github.workspace }}/release/${{ steps.set-outputs.outputs.dsym-name }}"
         DSYM_URL_ROOT: ${{ vars.DMG_URL_ROOT }}
         RELEASE_BUCKET_NAME: ${{ vars.RELEASE_BUCKET_NAME }}
         RELEASE_BUCKET_PREFIX: ${{ vars.RELEASE_BUCKET_PREFIX }}
         REVIEW_BUILDS_BUCKET_PREFIX: ${{ vars.REVIEW_BUILDS_BUCKET_PREFIX }}
       run: |
-        if [[ "${{ env.upload-to }}" == 's3' ]]; then
-          dsym_s3_path="s3://${DSYM_BUCKET_NAME}/${DSYM_BUCKET_PREFIX}/${DSYM_NAME}"
-          aws s3 cp $DSYM_LOCAL_PATH $dsym_s3_path
-        else
-          ref_sha="$(git rev-parse --short HEAD)"
-          test_build_s3_path="s3://${RELEASE_BUCKET_NAME}/${RELEASE_BUCKET_PREFIX}/${REVIEW_BUILDS_BUCKET_PREFIX}/${ref_sha}/"
-          dsym_s3_path="${test_build_s3_path}${DSYM_NAME}"
-          echo "test-build-s3-path=${test_build_s3_path}" >> $GITHUB_OUTPUT
+        ref_sha="$(git rev-parse --short HEAD)"
+        test_build_s3_path="s3://${RELEASE_BUCKET_NAME}/${RELEASE_BUCKET_PREFIX}/${REVIEW_BUILDS_BUCKET_PREFIX}/${ref_sha}/"
+        dsym_s3_path="${test_build_s3_path}${DSYM_NAME}"
+        echo "test-build-s3-path=${test_build_s3_path}" >> $GITHUB_OUTPUT
 
-          # Calculate the URL for the dSYM to report it later
-          s3_bucket_url="s3://${RELEASE_BUCKET_NAME}/"
-          dsym_url="${DSYM_S3_PATH/#${s3_bucket_url}/${DSYM_URL_ROOT}}" # replace S3 bucket url with CDN URL
-          echo "dsym-url=${dsym_url}" >> $GITHUB_OUTPUT
-          aws s3 cp $DSYM_LOCAL_PATH $dsym_s3_path --acl public-read
-        fi
+        # Calculate the URL for the dSYM to report it later
+        s3_bucket_url="s3://${RELEASE_BUCKET_NAME}/"
+        dsym_url="${DSYM_S3_PATH/#${s3_bucket_url}/${DSYM_URL_ROOT}}" # replace S3 bucket url with CDN URL
+        echo "dsym-url=${dsym_url}" >> $GITHUB_OUTPUT
+        aws s3 cp $DSYM_LOCAL_PATH $dsym_s3_path --acl public-read
         echo "dsym-s3-path=${dsym_s3_path}" >> $GITHUB_OUTPUT
 
     - name: Report success
