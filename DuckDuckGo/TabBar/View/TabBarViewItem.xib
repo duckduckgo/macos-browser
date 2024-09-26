@@ -19,7 +19,7 @@
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
-                    <color key="contentTintColor" name="ButtonColor"/>
+                    <color key="contentTintColor" name="AudioTabIconColor"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="16" id="1YU-l0-MNA"/>
                         <constraint firstAttribute="height" constant="16" id="hpl-ud-gl9"/>
@@ -47,7 +47,7 @@
                         </userDefinedRuntimeAttribute>
                     </userDefinedRuntimeAttributes>
                 </customView>
-                <textField wantsLayer="YES" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DFD-8r-YGx" userLabel="Title Text Field">
+                <textField wantsLayer="YES" focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DFD-8r-YGx" userLabel="Title Text Field">
                     <rect key="frame" x="30" y="8" width="264" height="16"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="16" id="vWW-sG-CAf"/>
@@ -203,6 +203,9 @@
         <image name="Audio" width="12" height="12"/>
         <image name="Camera-Tab-Active" width="16" height="12"/>
         <image name="Close" width="16" height="16"/>
+        <namedColor name="AudioTabIconColor">
+            <color red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
         <namedColor name="ButtonColor">
             <color red="0.28627450980392155" green="0.28627450980392155" blue="0.28627450980392155" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
