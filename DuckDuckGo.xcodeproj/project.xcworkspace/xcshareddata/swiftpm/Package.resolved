@@ -1,4 +1,5 @@
 {
+  "originHash" : "733e03047e060ab329e517055580052eeeb8980809fdf47ad605310b5d41b279",
   "pins" : [
     {
       "identity" : "apple-toolbox",
@@ -190,5 +191,5 @@
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }
