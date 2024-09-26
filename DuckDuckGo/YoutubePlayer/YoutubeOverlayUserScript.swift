@@ -28,6 +28,7 @@ protocol YoutubeOverlayUserScriptDelegate: AnyObject {
 }
 
 final class YoutubeOverlayUserScript: NSObject, Subfeature {
+    private let duckPlayer: DuckPlayer
 
     enum MessageOrigin {
         case duckPlayer, serpOverlay, youtubeOverlay
@@ -54,8 +55,10 @@ final class YoutubeOverlayUserScript: NSObject, Subfeature {
     ])
     public var featureName: String = "duckPlayer"
 
-    init(duckPlayerPreferences: DuckPlayerPreferences = DuckPlayerPreferences.shared) {
+    init(duckPlayerPreferences: DuckPlayerPreferences = DuckPlayerPreferences.shared,
+         duckPlayer: DuckPlayer) {
         self.duckPlayerPreferences = duckPlayerPreferences
+        self.duckPlayer = duckPlayer
     }
 
     // MARK: - Subfeature
@@ -81,11 +84,11 @@ final class YoutubeOverlayUserScript: NSObject, Subfeature {
                 assertionFailure("YoutubeOverlayUserScript: Unexpected message origin: \(String(describing: webView?.url))")
                 return nil
             }
-            return DuckPlayer.shared.handleSetUserValuesMessage(from: origin)
+            return duckPlayer.handleSetUserValuesMessage(from: origin)
         case .getUserValues:
-            return DuckPlayer.shared.handleGetUserValues
+            return duckPlayer.handleGetUserValues
         case .initialSetup:
-            return DuckPlayer.shared.initialOverlaySetup(with: webView)
+            return duckPlayer.initialOverlaySetup(with: webView)
         case .openDuckPlayer:
             return handleOpenDuckPlayer
         case .sendDuckPlayerPixel:
@@ -96,7 +99,7 @@ final class YoutubeOverlayUserScript: NSObject, Subfeature {
         }
     }
 
-    // User values are user controled values
+    // User values are user controlled values
     public func userValuesUpdated(userValues: UserValues) {
         guard let webView = webView else {
             return assertionFailure("Could not access webView")

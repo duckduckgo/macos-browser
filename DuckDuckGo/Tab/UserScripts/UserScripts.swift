@@ -50,8 +50,10 @@ final class UserScripts: UserScriptsProvider {
 #if SPARKLE
     let releaseNotesUserScript: ReleaseNotesUserScript?
 #endif
+    let duckPlayer: DuckPlayer
 
-    init(with sourceProvider: ScriptSourceProviding) {
+    init(with sourceProvider: ScriptSourceProviding, duckPlayer: DuckPlayer) {
+        self.duckPlayer = duckPlayer
         clickToLoadScript = ClickToLoadUserScript()
         contentBlockerRulesScript = ContentBlockerRulesUserScript(configuration: sourceProvider.contentBlockerRulesConfig!)
         surrogatesScript = SurrogatesUserScript(configuration: sourceProvider.surrogatesConfig!)
@@ -77,9 +79,10 @@ final class UserScripts: UserScriptsProvider {
 
         specialPages = SpecialPagesUserScript()
 
-        if DuckPlayer.shared.isAvailable {
-            youtubeOverlayScript = YoutubeOverlayUserScript()
-            youtubePlayerUserScript = YoutubePlayerUserScript()
+        if DuckPlayerAvailability().isAvailable {
+
+            youtubeOverlayScript = YoutubeOverlayUserScript(duckPlayer: duckPlayer)
+            youtubePlayerUserScript = YoutubePlayerUserScript(duckPlayer: duckPlayer)
         } else {
             youtubeOverlayScript = nil
             youtubePlayerUserScript = nil

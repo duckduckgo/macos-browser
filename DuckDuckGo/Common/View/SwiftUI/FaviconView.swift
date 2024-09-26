@@ -46,7 +46,7 @@ struct FaviconView: View {
 
     @MainActor(unsafe)
     func refreshImage() {
-        if let duckPlayerImage = DuckPlayer.shared.image(for: self) {
+        if let duckPlayerImage = DuckPlayerResources().image(for: self) {
             image = duckPlayerImage
             return
         }

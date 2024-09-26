@@ -51,7 +51,7 @@ final class SharingMenu: NSMenu {
               !tabViewModel.isShowingErrorPage,
               let url = tabViewModel.tab.content.userEditableUrl else { return nil }
 
-        let sharingData = DuckPlayer.shared.sharingData(for: tabViewModel.title, url: url) ?? (tabViewModel.title, url)
+        let sharingData = DuckPlayerResources().sharingData(for: tabViewModel.title, url: url) ?? (tabViewModel.title, url)
 
         return (sharingData.title, [url, url.absoluteString])
     }

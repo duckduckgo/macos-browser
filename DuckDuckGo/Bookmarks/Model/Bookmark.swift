@@ -205,7 +205,7 @@ final class Bookmark: BaseBookmarkEntity {
     let faviconManagement: FaviconManagement
     @MainActor(unsafe)
     func favicon(_ sizeCategory: Favicon.SizeCategory) -> NSImage? {
-        if let duckPlayerFavicon = DuckPlayer.shared.image(for: self) {
+        if let duckPlayerFavicon = DuckPlayerResources().image(for: self) {
             return duckPlayerFavicon
         }
 

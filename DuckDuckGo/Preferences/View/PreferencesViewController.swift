@@ -33,10 +33,10 @@ final class PreferencesViewController: NSViewController {
 
     private var bitwardenManager: BWManagement = BWManager.shared
 
-    init(syncService: DDGSyncing, duckPlayer: DuckPlayer = DuckPlayer.shared) {
+    init(syncService: DDGSyncing, duckPlayerAvailability: DuckPlayerAvailability = DuckPlayerAvailability()) {
         model = PreferencesSidebarModel(syncService: syncService,
                                         vpnGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: Application.appDelegate.subscriptionManager),
-                                        includeDuckPlayer: duckPlayer.shouldDisplayPreferencesSideBar)
+                                        includeDuckPlayer: duckPlayerAvailability.shouldDisplayPreferencesSideBar)
         super.init(nibName: nil, bundle: nil)
     }
 

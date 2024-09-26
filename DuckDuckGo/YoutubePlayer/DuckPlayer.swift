@@ -128,13 +128,17 @@ public struct UserValues: Codable {
 public struct UIUserValues: Codable {
     /// If this value is true, we force the FE layer to play in duck player even if the settings is off
     let playInDuckPlayer: Bool
+    let allowFirstVideo: Bool
 
-    init(onboardingDecider: DuckPlayerOnboardingDecider) {
+    init(onboardingDecider: DuckPlayerOnboardingDecider, allowFirstVideo: Bool = false) {
         self.playInDuckPlayer = onboardingDecider.shouldOpenFirstVideoOnDuckPlayer
+        self.allowFirstVideo = allowFirstVideo
     }
 }
 
 final class DuckPlayer {
+    var shouldShowVideoInYoutube: Bool = false
+
     static let usesSimulatedRequests: Bool = {
         if #available(macOS 12.0, *) {
             return true
@@ -144,9 +148,6 @@ final class DuckPlayer {
     }()
 
     static let duckPlayerHost: String = "player"
-    static let commonName = UserText.duckPlayer
-
-    static let shared = DuckPlayer()
 
     var isAvailable: Bool {
         if SupportedOSChecker.isCurrentOSReceivingUpdates {
@@ -307,13 +308,17 @@ final class DuckPlayer {
     @MainActor
     private func encodedOverlaySettings(with webView: WKWebView?) async -> InitialOverlaySettings {
         let userValues = encodeUserValues()
+        var allowfirstVideo = shouldShowVideoInYoutube
 
-        return InitialOverlaySettings(userValues: userValues, ui: UIUserValues(onboardingDecider: onboardingDecider))
+        shouldShowVideoInYoutube = false
+        print("ALLOW \(allowfirstVideo)")
+        return InitialOverlaySettings(userValues: userValues,
+                                      ui: UIUserValues(onboardingDecider: onboardingDecider,
+                                                       allowFirstVideo: allowfirstVideo))
     }
 
     // MARK: - Private
 
-    private static let websiteTitlePrefix = "\(commonName) - "
     private let preferences: DuckPlayerPreferences
 
     private var isFeatureEnabled: Bool = false {
@@ -340,12 +345,51 @@ final class DuckPlayer {
     }
 }
 
-// MARK: - Privacy Feed
+public struct DuckPlayerAvailability {
+    private let preferences: DuckPlayerPreferences
+    private let privacyConfigurationManager: PrivacyConfigurationManaging
 
-extension DuckPlayer {
+    init(preferences: DuckPlayerPreferences = .shared,
+         privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager) {
+        self.preferences = preferences
+        self.privacyConfigurationManager = privacyConfigurationManager
+    }
+
+    var isFeatureEnabled: Bool {
+        privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .duckPlayer)
+    }
+
+    var isAvailable: Bool {
+        if SupportedOSChecker.isCurrentOSReceivingUpdates {
+            return isFeatureEnabled
+        } else {
+            return false
+        }
+    }
+
+    var mode: DuckPlayerMode {
+        preferences.duckPlayerMode
+    }
+
+    var shouldDisplayPreferencesSideBar: Bool {
+        isAvailable || preferences.shouldDisplayContingencyMessage
+    }
+}
+
+public struct DuckPlayerResources {
+    static let commonName = UserText.duckPlayer
+    private static let websiteTitlePrefix = "\(commonName) - "
+
+    private let duckPlayerAvailability: DuckPlayerAvailability
+
+    init(duckPlayerAvailability: DuckPlayerAvailability = DuckPlayerAvailability()) {
+        self.duckPlayerAvailability = duckPlayerAvailability
+    }
 
     func image(for faviconView: FaviconView) -> NSImage? {
-        guard isAvailable, mode != .disabled, faviconView.url?.isDuckPlayer == true else {
+        guard duckPlayerAvailability.isAvailable,
+                duckPlayerAvailability.mode != .disabled,
+                faviconView.url?.isDuckPlayer == true else {
             return nil
         }
         return .duckPlayer
@@ -358,15 +402,15 @@ extension DuckPlayer {
     }
 
     func domainForRecentlyVisitedSite(with url: URL) -> String? {
-        guard isAvailable, mode != .disabled else {
+        guard duckPlayerAvailability.isAvailable, duckPlayerAvailability.mode != .disabled else {
             return nil
         }
 
-        return url.isDuckPlayer ? DuckPlayer.commonName : nil
+        return url.isDuckPlayer ? DuckPlayerResources.commonName : nil
     }
 
     func sharingData(for title: String, url: URL) -> (title: String, url: URL)? {
-        guard isAvailable, mode != .disabled, url.isDuckURLScheme, let (videoID, timestamp) = url.youtubeVideoParams else {
+        guard duckPlayerAvailability.isAvailable, duckPlayerAvailability.mode != .disabled, url.isDuckURLScheme, let (videoID, timestamp) = url.youtubeVideoParams else {
             return nil
         }
 
@@ -377,7 +421,7 @@ extension DuckPlayer {
     }
 
     func title(for page: HomePage.Models.RecentlyVisitedPageModel) -> String? {
-        guard isAvailable, mode != .disabled else {
+        guard duckPlayerAvailability.isAvailable, duckPlayerAvailability.mode != .disabled else {
             return nil
         }
 
@@ -394,6 +438,7 @@ extension DuckPlayer {
     }
 
 }
+
 
 #if DEBUG
 

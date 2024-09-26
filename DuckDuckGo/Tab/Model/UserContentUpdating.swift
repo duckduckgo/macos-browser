@@ -33,10 +33,11 @@ final class UserContentUpdating {
     struct NewContent: UserContentControllerNewContent {
         let rulesUpdate: ContentBlockerRulesManager.UpdateEvent
         let sourceProvider: ScriptSourceProviding
+        let duckPlayer: DuckPlayer
 
         var makeUserScripts: @MainActor (ScriptSourceProviding) -> UserScripts {
             { sourceProvider in
-                UserScripts(with: sourceProvider)
+                UserScripts(with: sourceProvider, duckPlayer: duckPlayer)
             }
         }
     }
@@ -45,6 +46,7 @@ final class UserContentUpdating {
     private var cancellable: AnyCancellable?
 
     private(set) var userContentBlockingAssets: AnyPublisher<UserContentUpdating.NewContent, Never>!
+    private let duckPlayer: DuckPlayer
 
     @MainActor
     init(contentBlockerRulesManager: ContentBlockerRulesManagerProtocol,
@@ -52,7 +54,9 @@ final class UserContentUpdating {
          trackerDataManager: TrackerDataManager,
          configStorage: ConfigurationStoring,
          webTrackingProtectionPreferences: WebTrackingProtectionPreferences,
-         tld: TLD) {
+         tld: TLD,
+         duckPlayer: DuckPlayer) {
+        self.duckPlayer = duckPlayer
 
         let makeValue: (Update) -> NewContent = { rulesUpdate in
             let sourceProvider = ScriptSourceProvider(configStorage: configStorage,
@@ -61,7 +65,7 @@ final class UserContentUpdating {
                                                       contentBlockingManager: contentBlockerRulesManager,
                                                       trackerDataManager: trackerDataManager,
                                                       tld: tld)
-            return NewContent(rulesUpdate: rulesUpdate, sourceProvider: sourceProvider)
+            return NewContent(rulesUpdate: rulesUpdate, sourceProvider: sourceProvider, duckPlayer: duckPlayer)
         }
 
         func onNotificationWithInitial(_ name: Notification.Name) -> AnyPublisher<Notification, Never> {

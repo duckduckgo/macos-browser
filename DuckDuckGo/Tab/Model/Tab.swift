@@ -121,7 +121,7 @@ protocol NewWindowPolicyDecisionMaker {
     ) {
 
         let duckPlayer = duckPlayer
-            ?? (NSApp.runType.requiresEnvironment ? DuckPlayer.shared : DuckPlayer.mock(withMode: .enabled))
+            ?? (NSApp.runType.requiresEnvironment ? DuckPlayer() : DuckPlayer.mock(withMode: .enabled))
         let statisticsLoader = statisticsLoader
             ?? (NSApp.runType.requiresEnvironment ? StatisticsLoader.shared : nil)
         let privacyFeatures = privacyFeatures ?? PrivacyFeatures
@@ -219,7 +219,7 @@ protocol NewWindowPolicyDecisionMaker {
 
         self.specialPagesUserScript = SpecialPagesUserScript()
         specialPagesUserScript?
-            .withAllSubfeatures()
+            .withAllSubfeatures(duckPlayer: duckPlayer)
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
         configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking,
                                                  burnerMode: burnerMode,

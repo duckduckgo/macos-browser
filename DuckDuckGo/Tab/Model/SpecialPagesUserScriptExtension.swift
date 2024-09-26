@@ -28,10 +28,10 @@ extension SpecialPagesUserScript {
         self.registerSubfeature(delegate: onboardingScript)
     }
 
-    func withDuckPlayerIfAvailable() {
+    func withDuckPlayerIfAvailable(duckPlayer: DuckPlayer) {
         var youtubePlayerUserScript: YoutubePlayerUserScript?
-        if DuckPlayer.shared.isAvailable {
-            youtubePlayerUserScript = YoutubePlayerUserScript()
+        if DuckPlayerAvailability().isAvailable {
+            youtubePlayerUserScript = YoutubePlayerUserScript(duckPlayer: duckPlayer)
         }
         if let youtubePlayerUserScript {
             self.registerSubfeature(delegate: youtubePlayerUserScript)
@@ -46,10 +46,10 @@ extension SpecialPagesUserScript {
     }
 
     @MainActor
-    func withAllSubfeatures() {
+    func withAllSubfeatures(duckPlayer: DuckPlayer) {
         withOnboarding()
         withErrorPages()
-        withDuckPlayerIfAvailable()
+        withDuckPlayerIfAvailable(duckPlayer: duckPlayer)
     }
 
     @MainActor
