@@ -185,6 +185,7 @@ jobs:
       run: |
         if [[ "${{ env.upload-to }}" == 's3' ]]; then
           dsym_s3_path="s3://${DSYM_BUCKET_NAME}/${DSYM_BUCKET_PREFIX}/${DSYM_NAME}"
+          aws s3 cp $DSYM_LOCAL_PATH $dsym_s3_path
         else
           ref_sha="$(git rev-parse --short HEAD)"
           test_build_s3_path="s3://${RELEASE_BUCKET_NAME}/${RELEASE_BUCKET_PREFIX}/${REVIEW_BUILDS_BUCKET_PREFIX}/${ref_sha}/"
@@ -195,9 +196,9 @@ jobs:
           s3_bucket_url="s3://${RELEASE_BUCKET_NAME}/"
           dsym_url="${DSYM_S3_PATH/#${s3_bucket_url}/${DSYM_URL_ROOT}}" # replace S3 bucket url with CDN URL
           echo "dsym-url=${dsym_url}" >> $GITHUB_OUTPUT
+          aws s3 cp $DSYM_LOCAL_PATH $dsym_s3_path --acl public-read
         fi
         echo "dsym-s3-path=${dsym_s3_path}" >> $GITHUB_OUTPUT
-        aws s3 cp $DSYM_LOCAL_PATH $dsym_s3_path
 
     - name: Report success
       if: ${{ env.upload-to == 's3' }}
