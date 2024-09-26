@@ -114,7 +114,7 @@ final class TabBarViewItem: NSCollectionViewItem {
     @IBOutlet var permissionCloseButtonTrailingConstraint: NSLayoutConstraint!
     @IBOutlet var tabLoadingPermissionLeadingConstraint: NSLayoutConstraint!
     @IBOutlet var closeButtonTrailingConstraint: NSLayoutConstraint!
-    @IBOutlet weak var mutedTabIcon: TappableImageView!
+    @IBOutlet weak var audioButton: MouseOverButton!
     private let titleTextFieldMaskLayer = CAGradientLayer()
 
     private var currentURL: URL?
@@ -233,6 +233,11 @@ final class TabBarViewItem: NSCollectionViewItem {
 
         self.lastKnownIndexPath = indexPath
         delegate?.tabBarViewItemCloseAction(self)
+    }
+
+    @IBAction func audioButtonAction(_ sender: NSButton) {
+        self.delegate?.tabBarViewItemMuteUnmuteSite(self)
+        self.setupMuteOrUnmutedIcon()
     }
 
     @IBAction func permissionButtonAction(_ sender: NSButton) {
@@ -369,13 +374,6 @@ final class TabBarViewItem: NSCollectionViewItem {
             mouseOverView.mouseOverColor = isSelected || isDragged ? .clear : .tabMouseOver
         }
 
-        mutedTabIcon.onClick = { [weak self] in
-            guard let self = self else { return }
-
-            self.delegate?.tabBarViewItemMuteUnmuteSite(self)
-            self.setupMuteOrUnmutedIcon()
-        }
-
         let showCloseButton = (isMouseOver && !widthStage.isCloseButtonHidden) || isSelected
         closeButton.isHidden = !showCloseButton
         updateSeparatorView()
@@ -383,7 +381,7 @@ final class TabBarViewItem: NSCollectionViewItem {
         titleTextField.isHidden = widthStage.isTitleHidden && faviconImageView.image != nil
         setupMuteOrUnmutedIcon()
 
-        if mutedTabIcon.isHidden {
+        if audioButton.isHidden {
             faviconWrapperViewCenterConstraint.priority = titleTextField.isHidden ? .defaultHigh : .defaultLow
             faviconWrapperViewLeadingConstraint.priority = titleTextField.isHidden ? .defaultLow : .defaultHigh
         } else {
@@ -489,7 +487,7 @@ final class TabBarViewItem: NSCollectionViewItem {
     }
 
     private func setupMutedTabIconPosition() {
-        if mutedTabIcon.isHidden {
+        if audioButton.isHidden {
             titleTextFieldLeadingConstraint.priority = .defaultHigh
             titleTextFieldLeadingMuteConstraint.priority = .defaultLow
             titleTextFieldLeadingConstraint.constant = faviconWrapperView.isHidden ? Constants.textFieldPaddingNoFavicon : Constants.textFieldPadding
@@ -531,13 +529,13 @@ final class TabBarViewItem: NSCollectionViewItem {
     }
 
     private func showAudioIcon(image: NSImage?, tintColor: NSColor = .audioTabIcon) {
-        mutedTabIcon.image = image
-        mutedTabIcon.isHidden = false
-        mutedTabIcon.contentTintColor = tintColor
+        audioButton.image = image
+        audioButton.isHidden = false
+        audioButton.contentTintColor = tintColor
     }
 
     private func hideAudioIcon() {
-        self.mutedTabIcon.isHidden = true
+        self.audioButton.isHidden = true
     }
 }
 

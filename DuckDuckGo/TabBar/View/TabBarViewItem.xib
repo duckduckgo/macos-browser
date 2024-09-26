@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="23094" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22690"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23094"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -13,15 +13,32 @@
             <rect key="frame" x="0.0" y="0.0" width="300" height="32"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <imageView hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Dwg-SU-uiu" userLabel="Muted Tab Icon" customClass="TappableImageView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                <button translatesAutoresizingMaskIntoConstraints="NO" id="ybQ-CJ-2Ua" userLabel="Audio Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                     <rect key="frame" x="29" y="8" width="16" height="16"/>
+                    <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Audio" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="iqS-pa-p0P">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <color key="contentTintColor" name="ButtonColor"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="16" id="ILs-aB-D7E"/>
-                        <constraint firstAttribute="width" constant="16" id="Qyf-Aw-VnE"/>
+                        <constraint firstAttribute="width" constant="16" id="1YU-l0-MNA"/>
+                        <constraint firstAttribute="height" constant="16" id="hpl-ud-gl9"/>
                     </constraints>
-                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Audio-Mute" id="nSg-1b-1pf"/>
-                    <color key="contentTintColor" red="0.0" green="0.0" blue="0.0" alpha="0.83999999999999997" colorSpace="custom" customColorSpace="sRGB"/>
-                </imageView>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <real key="value" value="2"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                            <color key="value" name="ButtonMouseOverColor"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                            <color key="value" name="ButtonMouseDownColor"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <action selector="audioButtonAction:" target="4MN-w4-aCk" id="P1g-k1-03y"/>
+                    </connections>
+                </button>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="jlg-2n-tzm" customClass="MouseOverView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                     <rect key="frame" x="0.0" y="1" width="300" height="31"/>
                     <userDefinedRuntimeAttributes>
@@ -30,7 +47,7 @@
                         </userDefinedRuntimeAttribute>
                     </userDefinedRuntimeAttributes>
                 </customView>
-                <textField wantsLayer="YES" focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DFD-8r-YGx" userLabel="Title Text Field">
+                <textField wantsLayer="YES" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DFD-8r-YGx" userLabel="Title Text Field">
                     <rect key="frame" x="30" y="8" width="264" height="16"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="16" id="vWW-sG-CAf"/>
@@ -135,7 +152,7 @@
                 <constraint firstAttribute="trailing" secondItem="jlg-2n-tzm" secondAttribute="trailing" id="0eL-gX-odc"/>
                 <constraint firstItem="vuD-rY-Vzl" firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" id="1O2-c9-rXM"/>
                 <constraint firstItem="DFD-8r-YGx" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="32" id="4P8-mH-XGb"/>
-                <constraint firstItem="Dwg-SU-uiu" firstAttribute="top" secondItem="Kky-kZ-lU9" secondAttribute="top" id="4Se-Lc-LhL"/>
+                <constraint firstItem="ybQ-CJ-2Ua" firstAttribute="top" secondItem="Kky-kZ-lU9" secondAttribute="top" id="4Se-Lc-LhL"/>
                 <constraint firstItem="XdB-Qn-iD9" firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" id="6wl-2B-Woa"/>
                 <constraint firstAttribute="trailing" secondItem="XdB-Qn-iD9" secondAttribute="trailing" priority="900" constant="8" id="BAO-r4-OkC"/>
                 <constraint firstItem="jlg-2n-tzm" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="DOd-Y3-APh"/>
@@ -148,9 +165,9 @@
                 <constraint firstItem="A6g-eG-dOW" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="5" id="TSx-41-S2A"/>
                 <constraint firstAttribute="trailing" secondItem="opQ-Od-dCO" secondAttribute="trailing" id="WPC-fb-K22"/>
                 <constraint firstItem="A6g-eG-dOW" firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" id="aQg-CK-diJ"/>
-                <constraint firstItem="DFD-8r-YGx" firstAttribute="leading" secondItem="Dwg-SU-uiu" secondAttribute="trailing" priority="250" constant="4" id="cnx-Mc-8eH"/>
+                <constraint firstItem="DFD-8r-YGx" firstAttribute="leading" secondItem="ybQ-CJ-2Ua" secondAttribute="trailing" priority="250" constant="4" id="cnx-Mc-8eH"/>
                 <constraint firstItem="890-3t-v5O" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="giH-0s-4s4"/>
-                <constraint firstItem="Dwg-SU-uiu" firstAttribute="leading" secondItem="A6g-eG-dOW" secondAttribute="trailing" id="h0G-ek-exQ"/>
+                <constraint firstItem="ybQ-CJ-2Ua" firstAttribute="leading" secondItem="A6g-eG-dOW" secondAttribute="trailing" id="h0G-ek-exQ"/>
                 <constraint firstItem="vuD-rY-Vzl" firstAttribute="leading" secondItem="XdB-Qn-iD9" secondAttribute="trailing" constant="4" id="lqC-R5-KOi"/>
                 <constraint firstItem="DFD-8r-YGx" firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" id="oUc-dt-omj"/>
                 <constraint firstAttribute="trailing" secondItem="890-3t-v5O" secondAttribute="trailing" id="pJ6-DF-7Q7"/>
@@ -163,6 +180,7 @@
         </customView>
         <collectionViewItem id="4MN-w4-aCk" customClass="TabBarViewItem" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
             <connections>
+                <outlet property="audioButton" destination="ybQ-CJ-2Ua" id="lDh-zV-loB"/>
                 <outlet property="closeButton" destination="vuD-rY-Vzl" id="JGv-Ac-mRi"/>
                 <outlet property="closeButtonTrailingConstraint" destination="web-9k-BYT" id="UkK-vj-qp9"/>
                 <outlet property="faviconImageView" destination="Kky-kZ-lU9" id="96Z-4T-ONB"/>
@@ -170,7 +188,6 @@
                 <outlet property="faviconWrapperViewCenterConstraint" destination="PF1-mZ-U4m" id="5KT-Cu-bbm"/>
                 <outlet property="faviconWrapperViewLeadingConstraint" destination="TSx-41-S2A" id="342-tk-EzF"/>
                 <outlet property="mouseOverView" destination="jlg-2n-tzm" id="mX4-Hq-XHD"/>
-                <outlet property="mutedTabIcon" destination="Dwg-SU-uiu" id="Ldr-sj-ufG"/>
                 <outlet property="permissionButton" destination="XdB-Qn-iD9" id="Cav-HW-zvK"/>
                 <outlet property="permissionCloseButtonTrailingConstraint" destination="lqC-R5-KOi" id="G6L-Zh-eBV"/>
                 <outlet property="rightSeparatorView" destination="opQ-Od-dCO" id="k6U-n5-y4S"/>
@@ -183,7 +200,7 @@
         </collectionViewItem>
     </objects>
     <resources>
-        <image name="Audio-Mute" width="12" height="12"/>
+        <image name="Audio" width="12" height="12"/>
         <image name="Camera-Tab-Active" width="16" height="12"/>
         <image name="Close" width="16" height="16"/>
         <namedColor name="ButtonColor">
