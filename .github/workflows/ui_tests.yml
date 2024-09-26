@@ -110,8 +110,9 @@ jobs:
       run: |
         rm -rf LocalPackages
         rm -rf DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
-        sed -i '' '/\/\* Begin XCSwiftPackageProductDependency section \*\//,/\/\* End XCSwiftPackageProductDependency section \*\//d' DuckDuckGo.xcodeproj/project.pbxproj
-        sed -i '' '/\/\* Begin XCRemoteSwiftPackageReference section \*\//,/\/\* End XCRemoteSwiftPackageReference section \*\//d' DuckDuckGo.xcodeproj/project.pbxproj
+        git apply dependencies.patch
+        # sed -i '' '/\/\* Begin XCSwiftPackageProductDependency section \*\//,/\/\* End XCSwiftPackageProductDependency section \*\//d' DuckDuckGo.xcodeproj/project.pbxproj
+        # sed -i '' '/\/\* Begin XCRemoteSwiftPackageReference section \*\//,/\/\* End XCRemoteSwiftPackageReference section \*\//d' DuckDuckGo.xcodeproj/project.pbxproj
 
     - name: Build for testing
       run: |
