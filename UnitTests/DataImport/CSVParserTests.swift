@@ -64,13 +64,17 @@ final class CSVParserTests: XCTestCase {
     }
 
     func testWhenParsingMalformedCsvWithExtraQuote_ParserAddsItToOutput() throws {
-        let string = """
+        let string = #"""
         "url","user"name","password",""
-        """
+        "a.b.com/usdf","my@name.is","\"mypass\wrd\",""
+        """#
 
         let parsed = try CSVParser().parse(string: string)
 
-        XCTAssertEqual(parsed, [["url", #"user"name"#, "password", ""]])
+        XCTAssertEqual(parsed, [
+            ["url", #"user"name"#, "password", ""],
+            ["a.b.com/usdf", "my@name.is", #""mypass\wrd\"#, ""],
+        ])
     }
 
     func testWhenParsingRowsWithDoubleQuoteEscapedQuoteThenQuoteIsUnescaped() throws {
