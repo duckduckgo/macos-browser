@@ -204,7 +204,7 @@ jobs:
         echo "test-build-s3-path=${test_build_s3_path}" >> $GITHUB_OUTPUT
 
         # Calculate the URL for the dSYM to report it later
-        s3_bucket_url="s3://${RELEASE_BUCKET_NAME}/"
+        s3_bucket_url="s3://${RELEASE_BUCKET_NAME}/${RELEASE_BUCKET_PREFIX}/"
         dsym_url="${DSYM_S3_PATH/#${s3_bucket_url}/${DSYM_URL_ROOT}}" # replace S3 bucket url with CDN URL
         echo "dsym-url=${dsym_url}" >> $GITHUB_OUTPUT
         aws s3 cp $DSYM_LOCAL_PATH $dsym_s3_path --acl public-read
@@ -313,7 +313,7 @@ jobs:
           dmg_s3_path="${TEST_BUILD_S3_PATH}${{ steps.create-dmg.outputs.dmg }}"
 
           # Calculate the URL for the dSYM to report it later
-          s3_bucket_url="s3://${RELEASE_BUCKET_NAME}/"
+          s3_bucket_url="s3://${RELEASE_BUCKET_NAME}/${RELEASE_BUCKET_PREFIX}/"
           dmg_url="${dmg_s3_path/#${s3_bucket_url}/${DMG_URL_ROOT}}" # replace S3 bucket url with CDN URL
           echo "dmg-url=${dmg_url}" >> $GITHUB_OUTPUT
         fi
@@ -344,10 +344,10 @@ jobs:
         WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
       run: |
-        echo "# Build Artifacts" >> $GITHUB_STEP_SUMMARY
+        echo "## Build Artifacts" >> $GITHUB_STEP_SUMMARY
         echo "---" >> $GITHUB_STEP_SUMMARY
-        echo "[🔗 ${DMG_S3_PATH}](${DMG_URL})" >> $GITHUB_STEP_SUMMARY
-        echo "[🔗 ${DSYM_S3_PATH}](${DSYM_URL})" >> $GITHUB_STEP_SUMMARY
+        echo "🔗 [${DMG_S3_PATH}](${DMG_URL})" >> $GITHUB_STEP_SUMMARY
+        echo "🔗 [${DSYM_S3_PATH}](${DSYM_URL})" >> $GITHUB_STEP_SUMMARY
 
         bundle exec fastlane run asana_add_comment \
           task_url:"${{ env.asana-task-url }}" \
