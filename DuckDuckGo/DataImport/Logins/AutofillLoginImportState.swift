@@ -64,11 +64,11 @@ final class AutofillLoginImportState: AutofillLoginImportStateProvider, Autofill
 
     public var isCredentialsImportPromptPermanantlyDismissed: Bool {
         get {
-            userDefaults.bool(forKey: Key.credentialsImportPromptPresentationCount)
+            userDefaults.bool(forKey: Key.isCredentialsImportPromptPermanantlyDismissed)
         }
 
         set {
-            userDefaults.set(newValue, forKey: Key.credentialsImportPromptPresentationCount)
+            userDefaults.set(newValue, forKey: Key.isCredentialsImportPromptPermanantlyDismissed)
         }
     }
 
