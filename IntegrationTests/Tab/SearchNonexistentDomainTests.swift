@@ -22,6 +22,7 @@ import Combine
 import Navigation
 import XCTest
 import History
+import Common
 
 @testable import DuckDuckGo_Privacy_Browser
 

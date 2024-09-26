@@ -49,7 +49,7 @@ final class BookmarkOutlineViewDataSource: NSObject, BookmarksOutlineViewDataSou
 
     private let contentMode: ContentMode
     private(set) var expandedNodesIDs = Set<String>()
-    private(set) var isSearching = false
+    @Published private(set) var isSearching = false
 
     /// Currently highlighted drag destination folder.
     /// When a drag and drop to a folder happens while in search, we need to stor the destination folder

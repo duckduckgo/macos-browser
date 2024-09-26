@@ -132,6 +132,7 @@ final class TabPreviewWindowController: NSWindowController {
         if delay {
             // Set up a new timer to hide the preview after 0.05 seconds
             // It makes the transition from one preview to another more fluent
+            hideTimer?.invalidate()
             hideTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: false) { _ in
                 removePreview(allowQuickRedisplay: allowQuickRedisplay)
             }

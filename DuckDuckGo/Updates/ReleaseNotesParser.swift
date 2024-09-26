@@ -28,7 +28,7 @@ final class ReleaseNotesParser {
 
         // Patterns for the two sections with more flexible spacing
         let standardPattern = "<h3[^>]*>What's new</h3>\\s*<ul>(.*?)</ul>"
-        let privacyProPattern = "<h2[^>]*>For Privacy Pro subscribers</h2>\\s*<ul>(.*?)</ul>"
+        let privacyProPattern = "<h3[^>]*>For Privacy Pro subscribers</h3>\\s*<ul>(.*?)</ul>"
 
         do {
             let standardRegex = try NSRegularExpression(pattern: standardPattern, options: .dotMatchesLineSeparators)

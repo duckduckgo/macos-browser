@@ -37,6 +37,7 @@ final class MockPrivacyConfiguration: PrivacyConfiguration {
     }
 
     var identifier: String = "MockPrivacyConfiguration"
+    var version: String? = "1234567890"
     var userUnprotectedDomains: [String] = []
     var tempUnprotectedDomains: [String] = []
     var trackerAllowlist: PrivacyConfigurationData.TrackerAllowlist = .init(entries: [:],
@@ -91,7 +92,7 @@ final class MockPrivacyConfigurationManager: NSObject, PrivacyConfigurationManag
     }
 
     func reload(etag: String?, data: Data?) -> BrowserServicesKit.PrivacyConfigurationManager.ReloadResult {
-        fatalError("not implemented")
+        return .embedded
     }
 
     var updatesPublisher: AnyPublisher<Void, Never> = Just(()).eraseToAnyPublisher()

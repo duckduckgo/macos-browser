@@ -66,6 +66,7 @@ protocol TabBarViewItemDelegate: AnyObject {
     @MainActor func tabBarViewItemFireproofSite(_: TabBarViewItem)
     @MainActor func tabBarViewItemMuteUnmuteSite(_: TabBarViewItem)
     @MainActor func tabBarViewItemRemoveFireproofing(_: TabBarViewItem)
+    @MainActor func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, replaceContentWithDroppedStringValue: String)
 
     @MainActor func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> OtherTabBarViewItemsState
 
@@ -406,6 +407,7 @@ final class TabBarViewItem: NSCollectionViewItem {
 
         cell.target = self
         cell.mouseOverView.delegate = self
+        cell.mouseOverView.registerForDraggedTypes([.string])
 
         updateSubviews()
         setupMenu()
@@ -808,9 +810,7 @@ extension TabBarViewItem: NSMenuDelegate {
 extension TabBarViewItem: MouseClickViewDelegate {
 
     func mouseOverView(_ mouseOverView: MouseOverView, isMouseOver: Bool) {
-        if self.isMouseOver != isMouseOver {
-            delegate?.tabBarViewItem(self, isMouseOver: isMouseOver)
-        }
+        delegate?.tabBarViewItem(self, isMouseOver: isMouseOver)
         self.isMouseOver = isMouseOver
         view.needsLayout = true
     }
@@ -834,6 +834,20 @@ extension TabBarViewItem: MouseClickViewDelegate {
         delegate?.tabBarViewItemCloseAction(self)
     }
 
+    func mouseOverView(_ sender: MouseOverView, performDragOperation info: any NSDraggingInfo) -> Bool {
+        if let droppedString = info.draggingPasteboard.string(forType: .string) {
+            delegate?.tabBarViewItem(self, replaceContentWithDroppedStringValue: droppedString)
+            return true
+        }
+        return false
+    }
+
+    func mouseOverView(_ sender: MouseOverView, draggingEntered info: any NSDraggingInfo, isMouseOver: UnsafeMutablePointer<Bool>) -> NSDragOperation {
+        if info.draggingPasteboard.availableType(from: [.string]) != nil {
+            return .copy
+        }
+        return []
+    }
 }
 
 // MARK: - Preview
@@ -1094,6 +1108,7 @@ extension TabBarViewItem {
             }
         }
         func tabBarViewItemRemoveFireproofing(_: TabBarViewItem) {}
+        func tabBarViewItem(_: TabBarViewItem, replaceContentWithDroppedStringValue: String) {}
         func otherTabBarViewItemsState(for: TabBarViewItem) -> OtherTabBarViewItemsState {
             .init(hasItemsToTheLeft: false, hasItemsToTheRight: false)
         }

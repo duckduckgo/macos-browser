@@ -94,6 +94,7 @@ enum Preferences {
                                 searchModel: SearchPreferences.shared,
                                 tabsModel: TabsPreferences.shared,
                                 dataClearingModel: DataClearingPreferences.shared,
+                                phishingDetectionModel: PhishingDetectionPreferences.shared,
                                 dockCustomizer: DockCustomizer())
                 case .sync:
                     SyncView()
@@ -138,7 +139,9 @@ enum Preferences {
                         PixelKit.fire(PrivacyProPixel.privacyProVPNSettings)
                         NotificationCenter.default.post(name: .ToggleNetworkProtectionInMainWindow, object: self, userInfo: nil)
                     case .openFeedback:
-                        NotificationCenter.default.post(name: .OpenUnifiedFeedbackForm, object: self, userInfo: nil)
+                        NotificationCenter.default.post(name: .OpenUnifiedFeedbackForm,
+                                                        object: self,
+                                                        userInfo: UnifiedFeedbackSource.userInfo(source: .ppro))
                     case .openDB:
                         PixelKit.fire(PrivacyProPixel.privacyProPersonalInformationRemovalSettings)
                         WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
