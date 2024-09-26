@@ -177,20 +177,6 @@ final class TabBarViewItemTests: XCTestCase {
 
     @MainActor
     func testWhenFireproofableThenUrlFireProofSiteItemIsDisabled() {
-        // Set up fake views for the TabBarViewItems
-//        let textField = NSTextField()
-//        let imageView = NSImageView()
-//        let constraints = NSLayoutConstraint()
-//        let button = NSButton()
-//        let mouseButton = MouseOverButton()
-//        tabBarViewItem.titleTextField = textField
-//        tabBarViewItem.faviconImageView = imageView
-//        tabBarViewItem.faviconWrapperView = imageView
-//        tabBarViewItem.titleTextFieldLeadingConstraint = constraints
-//        tabBarViewItem.permissionButton = button
-//        tabBarViewItem.tabLoadingPermissionLeadingConstraint = constraints
-//        tabBarViewItem.closeButton = mouseButton
-
         // Update url
         let tab = Tab()
         tab.url = URL(string: "https://www.apple.com")!
@@ -214,20 +200,6 @@ final class TabBarViewItemTests: XCTestCase {
 
     @MainActor
     func testSubscriptionTabDisabledItems() {
-        // Set up fake views for the TabBarViewItems
-//        let textField = NSTextField()
-//        let imageView = NSImageView()
-//        let constraints = NSLayoutConstraint()
-//        let button = NSButton()
-//        let mouseButton = MouseOverButton()
-//        tabBarViewItem.titleTextField = textField
-//        tabBarViewItem.faviconImageView = imageView
-//        tabBarViewItem.faviconWrapperView = imageView
-//        tabBarViewItem.titleTextFieldLeadingConstraint = constraints
-//        tabBarViewItem.permissionButton = button
-//        tabBarViewItem.tabLoadingPermissionLeadingConstraint = constraints
-//        tabBarViewItem.closeButton = mouseButton
-
         // Update url
         let url = SubscriptionURL.purchase.subscriptionURL(environment: .production)
         let tab = Tab(content: .subscription(url))

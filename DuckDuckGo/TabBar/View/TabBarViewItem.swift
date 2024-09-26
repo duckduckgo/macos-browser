@@ -414,6 +414,7 @@ final class TabBarViewItem: NSCollectionViewItem {
         cell.target = self
         cell.mouseOverView.registerForDraggedTypes([.string])
         cell.mouseOverView.delegate = self
+        cell.mouseOverView.registerForDraggedTypes([.string])
 
         updateSubviews()
         setupMenu()
@@ -430,7 +431,7 @@ final class TabBarViewItem: NSCollectionViewItem {
     }
 
     deinit {
-        if let eventMonitor = eventMonitor {
+        if let eventMonitor {
             NSEvent.removeMonitor(eventMonitor)
         }
     }
@@ -595,7 +596,7 @@ final class TabBarViewItem: NSCollectionViewItem {
             cell.borderLayer.isHidden = !isSelected
         }
 
-        let showCloseButton = (isMouseOver && (!widthStage.isCloseButtonHidden || NSApp.isCommandPressed)) || isSelected
+        let showCloseButton = (isMouseOver && !widthStage.isCloseButtonHidden) || isSelected
         cell.closeButton.isShown = showCloseButton
         cell.faviconImageView.isShown = (cell.faviconImageView.image != nil) && (widthStage != .withoutTitle || !showCloseButton)
         updateSeparatorView()
