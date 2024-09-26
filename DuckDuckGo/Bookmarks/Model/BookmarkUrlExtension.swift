@@ -18,6 +18,8 @@
 
 extension URL {
 
+    // Generates all possible URL variants for bookmark comparison, including http/https and optional trailing slashes.
+    // Variants are only created for URLs with http/https schemes, and trailing slashes are added only if there are no query or fragment components.
     func bookmarkButtonUrlVariants() -> [URL] {
         var baseUrlString = self.absoluteString
 

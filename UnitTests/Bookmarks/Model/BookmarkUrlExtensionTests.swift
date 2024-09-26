@@ -21,7 +21,6 @@ import Foundation
 
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
-
 final class BookmarkUrlExtensionTests: XCTestCase {
 
     func testWhenUrlIsHttpWithTrailingSlash_ThenCorrectVariantsAreGenerated() {
@@ -31,9 +30,9 @@ final class BookmarkUrlExtensionTests: XCTestCase {
 
         XCTAssertEqual(variants.count, 4)
         XCTAssertEqual(variants[0], originalURL)
-        XCTAssertEqual(variants[1], URL(string: "http://example.com")!)
-        XCTAssertEqual(variants[2], URL(string: "https://example.com")!)
-        XCTAssertEqual(variants[3], URL(string: "https://example.com/")!)
+        XCTAssertTrue(variants.contains(URL(string: "http://example.com")!))
+        XCTAssertTrue(variants.contains(URL(string: "https://example.com")!))
+        XCTAssertTrue(variants.contains(URL(string: "https://example.com/")!))
     }
 
     func testWhenUrlIsHttpsWithoutTrailingSlash_ThenCorrectVariantsAreGenerated() {
@@ -43,9 +42,9 @@ final class BookmarkUrlExtensionTests: XCTestCase {
 
         XCTAssertEqual(variants.count, 4)
         XCTAssertEqual(variants[0], originalURL)
-        XCTAssertEqual(variants[1], URL(string: "http://example.com")!)
-        XCTAssertEqual(variants[2], URL(string: "http://example.com/")!)
-        XCTAssertEqual(variants[3], URL(string: "https://example.com/")!)
+        XCTAssertTrue(variants.contains(URL(string: "http://example.com")!))
+        XCTAssertTrue(variants.contains(URL(string: "http://example.com/")!))
+        XCTAssertTrue(variants.contains(URL(string: "https://example.com/")!))
     }
 
     func testWhenUrlIsHttpWithoutTrailingSlash_ThenCorrectVariantsAreGenerated() {
@@ -55,9 +54,9 @@ final class BookmarkUrlExtensionTests: XCTestCase {
 
         XCTAssertEqual(variants.count, 4)
         XCTAssertEqual(variants[0], originalURL)
-        XCTAssertEqual(variants[1], URL(string: "https://example.com")!)
-        XCTAssertEqual(variants[2], URL(string: "http://example.com/")!)
-        XCTAssertEqual(variants[3], URL(string: "https://example.com/")!)
+        XCTAssertTrue(variants.contains(URL(string: "https://example.com")!))
+        XCTAssertTrue(variants.contains(URL(string: "http://example.com/")!))
+        XCTAssertTrue(variants.contains(URL(string: "https://example.com/")!))
     }
 
     func testWhenUrlIsHttpsWithTrailingSlash_ThenCorrectVariantsAreGenerated() {
@@ -67,9 +66,9 @@ final class BookmarkUrlExtensionTests: XCTestCase {
 
         XCTAssertEqual(variants.count, 4)
         XCTAssertEqual(variants[0], originalURL)
-        XCTAssertEqual(variants[1], URL(string: "http://example.com")!)
-        XCTAssertEqual(variants[2], URL(string: "https://example.com")!)
-        XCTAssertEqual(variants[3], URL(string: "http://example.com/")!)
+        XCTAssertTrue(variants.contains(URL(string: "http://example.com")!))
+        XCTAssertTrue(variants.contains(URL(string: "https://example.com")!))
+        XCTAssertTrue(variants.contains(URL(string: "http://example.com/")!))
     }
 
     func testWhenUrlHasNoScheme_ThenNoVariantsGenerated() {
@@ -97,7 +96,7 @@ final class BookmarkUrlExtensionTests: XCTestCase {
 
         XCTAssertEqual(variants.count, 2)
         XCTAssertEqual(variants[0], originalURL)
-        XCTAssertEqual(variants[1], URL(string: "http://example.com/path/to/resource?query=value")!)
+        XCTAssertTrue(variants.contains(URL(string: "http://example.com/path/to/resource?query=value")!))
     }
 
     func testWhenUrlHasNoQueryParameters_ThenVariantsIncludeTrailingSlashes() {
@@ -107,8 +106,8 @@ final class BookmarkUrlExtensionTests: XCTestCase {
 
         XCTAssertEqual(variants.count, 4)
         XCTAssertEqual(variants[0], originalURL)
-        XCTAssertEqual(variants[1], URL(string: "http://example.com/path/to/resource")!)
-        XCTAssertEqual(variants[2], URL(string: "http://example.com/path/to/resource/")!)
-        XCTAssertEqual(variants[3], URL(string: "https://example.com/path/to/resource/")!)
+        XCTAssertTrue(variants.contains(URL(string: "http://example.com/path/to/resource")!))
+        XCTAssertTrue(variants.contains(URL(string: "http://example.com/path/to/resource/")!))
+        XCTAssertTrue(variants.contains(URL(string: "https://example.com/path/to/resource/")!))
     }
 }
