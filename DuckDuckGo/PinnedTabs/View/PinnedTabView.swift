@@ -252,12 +252,10 @@ struct PinnedTabInnerView: View {
             if isMuted {
                 Image(.audioMute)
                     .resizable()
-                    .renderingMode(.template)
                     .frame(width: 12, height: 12)
             } else {
                 Image(.audio)
                     .resizable()
-                    .renderingMode(.template)
                     .frame(width: 12, height: 12)
             }
         }

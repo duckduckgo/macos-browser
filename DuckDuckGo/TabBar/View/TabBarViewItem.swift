@@ -533,7 +533,6 @@ final class TabBarViewItem: NSCollectionViewItem {
     private func showAudioIcon(image: NSImage?, tintColor: NSColor = .audioTabIcon) {
         mutedTabIcon.image = image
         mutedTabIcon.isHidden = false
-        mutedTabIcon.image?.isTemplate = true
         mutedTabIcon.contentTintColor = tintColor
     }
 
