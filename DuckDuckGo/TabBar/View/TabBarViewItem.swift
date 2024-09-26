@@ -473,8 +473,12 @@ final class TabBarViewItem: NSCollectionViewItem {
         }
 
         switch audioState {
-        case .muted:
-            showMutedTabIcon()
+        case .muted(let isPlayingAudio):
+            if isPlayingAudio {
+                showMutedTabIcon()
+            } else {
+                hideAudioIcon()
+            }
         case .unmuted(let isPlayingAudio):
             if isPlayingAudio {
                 showAudioPlayingIcon()
@@ -505,16 +509,12 @@ final class TabBarViewItem: NSCollectionViewItem {
     private func updateAudioPlayState(isPlaying: Bool) {
         guard let audioState = delegate?.tabBarViewItemAudioState(self) else { return }
 
-        if audioState.isMuted {
-            showMutedTabIcon()
-            setupMutedTabIconPosition()
-            return
-        }
-
-        if isPlaying {
-            showAudioPlayingIcon()
-        } else {
+        if !isPlaying {
             hideAudioIcon()
+        } else if audioState.isMuted {
+            showMutedTabIcon()
+        } else {
+            showAudioPlayingIcon()
         }
 
         setupMutedTabIconPosition()

@@ -231,8 +231,12 @@ struct PinnedTabInnerView: View {
     @ViewBuilder
     var audioStateView: some View {
         switch model.webView.audioState {
-        case .muted:
-            audioIndicator(isMuted: true)
+        case .muted(let isPlayingAudio):
+            if isPlayingAudio {
+                audioIndicator(isMuted: true)
+            } else {
+                EmptyView()
+            }
         case .unmuted(let isPlayingAudio):
             if isPlayingAudio {
                 audioIndicator(isMuted: false)
