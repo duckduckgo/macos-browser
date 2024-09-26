@@ -77,7 +77,7 @@ jobs:
       app-version: ${{ steps.set-outputs.outputs.app-version }}
       app-name: ${{ steps.set-outputs.outputs.app-name }}
       upload-to: ${{ steps.is-official-release.outputs.upload-to }}
-      test-build-s3-path: ${{ steps.upload-dsyms-to-s3.outputs.test-build-s3-path }}
+      test-build-s3-path: ${{ steps.upload-dsyms-to-s3-test-build.outputs.test-build-s3-path }}
       dsym-s3-path: ${{ steps.upload-dsyms-to-s3-test-build.outputs.dsym-s3-path }}
       dsym-url: ${{ steps.upload-dsyms-to-s3-test-build.outputs.dsym-url }}
 
