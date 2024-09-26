@@ -977,6 +977,90 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
         XCTAssertTrue(tokenResponse.isEmpty)
         XCTAssertPrivacyPixelsFired([])
     }
+
+    func testSubscriptionUpgradeNotificationSentWhenSubscriptionSelectedSuccessFromFreemium() async throws {
+        // Given
+        ensureUserUnauthenticatedState()
+        XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .appStore)
+        XCTAssertFalse(accountManager.isUserAuthenticated)
+
+        storePurchaseManager.hasActiveSubscriptionResult = false
+        storePurchaseManager.mostRecentTransactionResult = nil
+
+        authService.createAccountResult = .success(CreateAccountResponse(authToken: Constants.authToken,
+                                                                         externalID: Constants.externalID,
+                                                                         status: "created"))
+        authService.getAccessTokenResult = .success(AccessTokenResponse(accessToken: Constants.accessToken))
+        authService.validateTokenResult = .success(Constants.validateTokenResponse)
+        storePurchaseManager.purchaseSubscriptionResult = .success(Constants.mostRecentTransactionJWS)
+        subscriptionService.confirmPurchaseResult = .success(ConfirmPurchaseResponse(email: Constants.email,
+                                                                                     entitlements: Constants.entitlements,
+                                                                                     subscription: SubscriptionMockFactory.subscription))
+
+        let mockfreemiumDBPUserStateManager = MockFreemiumDBPUserStateManager()
+        mockfreemiumDBPUserStateManager.didActivate = true
+
+        let mockNotificationCenter = MockNotificationCenter()
+
+        feature = SubscriptionPagesUseSubscriptionFeature(subscriptionManager: subscriptionManager,
+                                                          stripePurchaseFlow: stripePurchaseFlow,
+                                                          uiHandler: uiHandler,
+                                                          subscriptionFeatureAvailability: subscriptionFeatureAvailability,
+                                                          freemiumDBPUserStateManager: mockfreemiumDBPUserStateManager,
+                                                          notificationCenter: mockNotificationCenter)
+        feature.with(broker: broker)
+
+        // When
+        let subscriptionSelectedParams = ["id": "some-subscription-id"]
+        let result = try await feature.subscriptionSelected(params: subscriptionSelectedParams, original: Constants.mockScriptMessage)
+
+        // Then
+        XCTAssertNil(result)
+        XCTAssertTrue(mockNotificationCenter.didCallPostNotification)
+        XCTAssertEqual(mockNotificationCenter.lastPostedNotification, .subscriptionUpgradeFromFreemium)
+    }
+
+    func testSubscriptionUpgradeNotificationNotSentWhenSubscriptionSelectedSuccessNotFromFreemium() async throws {
+        // Given
+        ensureUserUnauthenticatedState()
+        XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .appStore)
+        XCTAssertFalse(accountManager.isUserAuthenticated)
+
+        storePurchaseManager.hasActiveSubscriptionResult = false
+        storePurchaseManager.mostRecentTransactionResult = nil
+
+        authService.createAccountResult = .success(CreateAccountResponse(authToken: Constants.authToken,
+                                                                         externalID: Constants.externalID,
+                                                                         status: "created"))
+        authService.getAccessTokenResult = .success(AccessTokenResponse(accessToken: Constants.accessToken))
+        authService.validateTokenResult = .success(Constants.validateTokenResponse)
+        storePurchaseManager.purchaseSubscriptionResult = .success(Constants.mostRecentTransactionJWS)
+        subscriptionService.confirmPurchaseResult = .success(ConfirmPurchaseResponse(email: Constants.email,
+                                                                                     entitlements: Constants.entitlements,
+                                                                                     subscription: SubscriptionMockFactory.subscription))
+
+        let mockfreemiumDBPUserStateManager = MockFreemiumDBPUserStateManager()
+        mockfreemiumDBPUserStateManager.didActivate = false
+
+        let mockNotificationCenter = MockNotificationCenter()
+
+        feature = SubscriptionPagesUseSubscriptionFeature(subscriptionManager: subscriptionManager,
+                                                          stripePurchaseFlow: stripePurchaseFlow,
+                                                          uiHandler: uiHandler,
+                                                          subscriptionFeatureAvailability: subscriptionFeatureAvailability,
+                                                          freemiumDBPUserStateManager: mockfreemiumDBPUserStateManager,
+                                                          notificationCenter: mockNotificationCenter)
+        feature.with(broker: broker)
+
+        // When
+        let subscriptionSelectedParams = ["id": "some-subscription-id"]
+        let result = try await feature.subscriptionSelected(params: subscriptionSelectedParams, original: Constants.mockScriptMessage)
+
+        // Then
+        XCTAssertNil(result)
+        XCTAssertFalse(mockNotificationCenter.didCallPostNotification)
+        XCTAssertNil(mockNotificationCenter.lastPostedNotification)
+    }
 }
 
 @available(macOS 12.0, *)

@@ -24,6 +24,7 @@ import UserScript
 import Subscription
 import PixelKit
 import os.log
+import Freemium
 
 /// Use Subscription sub-feature
 final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
@@ -44,16 +45,23 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
     let subscriptionFeatureAvailability: SubscriptionFeatureAvailability
 
+    private let freemiumDBPUserStateManager: FreemiumDBPUserStateManager
+    private let notificationCenter: NotificationCenter
+
     public init(subscriptionManager: SubscriptionManager,
                 subscriptionSuccessPixelHandler: SubscriptionAttributionPixelHandler = PrivacyProSubscriptionAttributionPixelHandler(),
                 stripePurchaseFlow: StripePurchaseFlow,
                 uiHandler: SubscriptionUIHandling,
-                subscriptionFeatureAvailability: SubscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability()) {
+                subscriptionFeatureAvailability: SubscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability(),
+                freemiumDBPUserStateManager: FreemiumDBPUserStateManager = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp),
+                notificationCenter: NotificationCenter = .default) {
         self.subscriptionManager = subscriptionManager
         self.stripePurchaseFlow = stripePurchaseFlow
         self.subscriptionSuccessPixelHandler = subscriptionSuccessPixelHandler
         self.uiHandler = uiHandler
         self.subscriptionFeatureAvailability = subscriptionFeatureAvailability
+        self.freemiumDBPUserStateManager = freemiumDBPUserStateManager
+        self.notificationCenter = notificationCenter
     }
 
     func with(broker: UserScriptMessageBroker) {
@@ -142,8 +150,8 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             accountManager.storeAccount(token: accessToken, email: accountDetails.email, externalID: accountDetails.externalID)
         }
 
-        DispatchQueue.main.async {
-            NotificationCenter.default.post(name: .subscriptionPageCloseAndOpenPreferences, object: self)
+        DispatchQueue.main.async { [weak self] in
+            self?.notificationCenter.post(name: .subscriptionPageCloseAndOpenPreferences, object: self)
         }
 
         return nil
@@ -259,6 +267,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                     PixelKit.fire(PrivacyProPixel.privacyProPurchaseSuccess, frequency: .dailyAndCount)
                     PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActivated, frequency: .unique)
                     subscriptionSuccessPixelHandler.fireSuccessfulSubscriptionAttributionPixel()
+                    sendSubscriptionUpgradeFromFreemiumNotificationIfFreemiumActivated()
                     await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: purchaseUpdate)
                 case .failure(let error):
                     switch error {
@@ -276,8 +285,8 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                         subscriptionErrorReporter.report(subscriptionActivationError: .cancelledByUser)
                     case .missingEntitlements:
                         subscriptionErrorReporter.report(subscriptionActivationError: .missingEntitlements)
-                        DispatchQueue.main.async {
-                            NotificationCenter.default.post(name: .subscriptionPageCloseAndOpenPreferences, object: self)
+                        DispatchQueue.main.async { [weak self] in
+                            self?.notificationCenter.post(name: .subscriptionPageCloseAndOpenPreferences, object: self)
                         }
                         await uiHandler.dismissProgressViewController()
                         return nil
@@ -337,19 +346,19 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
         switch subscriptionFeatureName {
         case .privateBrowsing:
-            NotificationCenter.default.post(name: .openPrivateBrowsing, object: self, userInfo: nil)
+            notificationCenter.post(name: .openPrivateBrowsing, object: self, userInfo: nil)
         case .privateSearch:
-            NotificationCenter.default.post(name: .openPrivateSearch, object: self, userInfo: nil)
+            notificationCenter.post(name: .openPrivateSearch, object: self, userInfo: nil)
         case .emailProtection:
-            NotificationCenter.default.post(name: .openEmailProtection, object: self, userInfo: nil)
+            notificationCenter.post(name: .openEmailProtection, object: self, userInfo: nil)
         case .appTrackingProtection:
-            NotificationCenter.default.post(name: .openAppTrackingProtection, object: self, userInfo: nil)
+            notificationCenter.post(name: .openAppTrackingProtection, object: self, userInfo: nil)
         case .vpn:
             PixelKit.fire(PrivacyProPixel.privacyProWelcomeVPN, frequency: .unique)
-            NotificationCenter.default.post(name: .ToggleNetworkProtectionInMainWindow, object: self, userInfo: nil)
+            notificationCenter.post(name: .ToggleNetworkProtectionInMainWindow, object: self, userInfo: nil)
         case .personalInformationRemoval:
             PixelKit.fire(PrivacyProPixel.privacyProWelcomePersonalInformationRemoval, frequency: .unique)
-            NotificationCenter.default.post(name: .openPersonalInformationRemoval, object: self, userInfo: nil)
+            notificationCenter.post(name: .openPersonalInformationRemoval, object: self, userInfo: nil)
             await uiHandler.showTab(with: .dataBrokerProtection)
         case .identityTheftRestoration:
             PixelKit.fire(PrivacyProPixel.privacyProWelcomeIdentityRestoration, frequency: .unique)
@@ -367,6 +376,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
         PixelKit.fire(PrivacyProPixel.privacyProPurchaseStripeSuccess, frequency: .dailyAndCount)
         subscriptionSuccessPixelHandler.fireSuccessfulSubscriptionAttributionPixel()
+        sendSubscriptionUpgradeFromFreemiumNotificationIfFreemiumActivated()
         return [String: String]() // cannot be nil, the web app expect something back before redirecting the user to the final page
     }
 
@@ -496,6 +506,25 @@ extension SubscriptionPagesUseSubscriptionFeature: SubscriptionAccessActionHandl
         case .activateAddEmailClick:
             PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseEmailStart, frequency: .dailyAndCount)
         default: break
+        }
+    }
+}
+
+private extension SubscriptionPagesUseSubscriptionFeature {
+
+    /**
+     Sends a subscription upgrade notification if the freemium state is activated.
+
+     This function checks if the freemium state has been activated by verifying the
+     `didActivate` property in `freemiumDBPUserStateManager`. If the freemium activation
+     is detected, it posts a `subscriptionUpgradeFromFreemium` notification via
+     `notificationCenter`.
+
+     - Important: The notification will only be posted if `didActivate` is `true`.
+    */
+    func sendSubscriptionUpgradeFromFreemiumNotificationIfFreemiumActivated() {
+        if freemiumDBPUserStateManager.didActivate {
+            notificationCenter.post(name: .subscriptionUpgradeFromFreemium, object: nil)
         }
     }
 }
