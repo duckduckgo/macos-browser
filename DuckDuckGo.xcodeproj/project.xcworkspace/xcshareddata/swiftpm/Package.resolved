@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "michal/fix-owned-by-first-party",
-        "revision" : "574306795e8988f1fc32a448c363e0bb4b11f5d1"
+        "revision" : "20469bbeeff33fcd18e78f672a544ee82b4a741c",
+        "version" : "198.2.0"
       }
     },
     {
