@@ -30,8 +30,12 @@ final class AutofillLoginImportState: AutofillLoginImportStateProvider, Autofill
     }
 
     private let userDefaults: UserDefaults
+    private let featureFlagger: FeatureFlagger
 
     public var isEligibleDDGUser: Bool {
+        guard !featureFlagger.isFeatureOn(.credentialsImportPromptForAllUsers) else {
+            return true
+        }
         guard let date = userDefaults.object(forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue) as? Date else {
             return true
         }
@@ -72,8 +76,9 @@ final class AutofillLoginImportState: AutofillLoginImportStateProvider, Autofill
         }
     }
 
-    init(userDefaults: UserDefaults = .standard) {
+    init(userDefaults: UserDefaults = .standard, featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger) {
         self.userDefaults = userDefaults
+        self.featureFlagger = featureFlagger
     }
 
     func hasNeverPromptWebsitesFor(_ domain: String) -> Bool {
