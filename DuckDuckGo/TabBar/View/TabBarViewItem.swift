@@ -682,10 +682,6 @@ extension TabBarViewItem: NSMenuDelegate {
         }
         menu.addItem(.separator())
 
-        // Share Section
-        let shareItem = NSMenuItem(title: UserText.shareMenuItem)
-        shareItem.submenu = SharingMenu(title: UserText.shareMenuItem)
-
         // Bookmark All Section
         addBookmarkAllTabsMenuItem(to: menu)
         menu.addItem(.separator())

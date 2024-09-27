@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Combine
 import XCTest
 @testable import Subscription
 @testable import DuckDuckGo_Privacy_Browser
@@ -38,22 +39,27 @@ final class TabBarViewItemTests: XCTestCase {
         delegate.clear()
     }
 
+    @MainActor
     func testThatAllExpectedItemsAreShown() {
+        let tabBarViewModel = TabBarViewModelMock(mutedState: .unmuted)
+        tabBarViewItem.subscribe(to: tabBarViewModel)
         tabBarViewItem.menuNeedsUpdate(menu)
 
         XCTAssertEqual(menu.item(at: 0)?.title, UserText.duplicateTab)
         XCTAssertEqual(menu.item(at: 1)?.title, UserText.pinTab)
-        XCTAssertTrue(menu.item(at: 2)?.isSeparatorItem ?? false)
-        XCTAssertEqual(menu.item(at: 3)?.title, UserText.fireproofSite)
-        XCTAssertTrue(menu.item(at: 5)?.isSeparatorItem ?? false)
-        XCTAssertEqual(menu.item(at: 6)?.title, UserText.bookmarkAllTabs)
-        XCTAssertTrue(menu.item(at: 7)?.isSeparatorItem ?? false)
-        XCTAssertEqual(menu.item(at: 8)?.title, UserText.closeTab)
-        XCTAssertEqual(menu.item(at: 9)?.title, UserText.closeOtherTabs)
-        XCTAssertEqual(menu.item(at: 10)?.title, UserText.moveTabToNewWindow)
+        XCTAssertEqual(menu.item(at: 2)?.title, UserText.muteTab)
+        XCTAssertTrue(menu.item(at: 3)?.isSeparatorItem ?? false)
+        XCTAssertEqual(menu.item(at: 4)?.title, UserText.fireproofSite)
+        XCTAssertEqual(menu.item(at: 5)?.title, UserText.bookmarkThisPage)
+        XCTAssertTrue(menu.item(at: 6)?.isSeparatorItem ?? false)
+        XCTAssertEqual(menu.item(at: 7)?.title, UserText.bookmarkAllTabs)
+        XCTAssertTrue(menu.item(at: 8)?.isSeparatorItem ?? false)
+        XCTAssertEqual(menu.item(at: 9)?.title, UserText.closeTab)
+        XCTAssertEqual(menu.item(at: 10)?.title, UserText.closeOtherTabs)
+        XCTAssertEqual(menu.item(at: 11)?.title, UserText.moveTabToNewWindow)
 
         // Check "Close Other Tabs" submenu
-        guard let submenu = menu.item(at: 9)?.submenu else {
+        guard let submenu = menu.item(at: 10)?.submenu else {
             XCTFail("\"Close Other Tabs\" menu item should have a submenu")
             return
         }
@@ -62,8 +68,10 @@ final class TabBarViewItemTests: XCTestCase {
         XCTAssertEqual(submenu.item(at: 2)?.title, UserText.closeAllOtherTabs)
     }
 
+    @MainActor
     func testThatMuteIsShownWhenCurrentAudioStateIsUnmuted() {
-        delegate.audioState = .unmuted
+        let tabBarViewModel = TabBarViewModelMock(mutedState: .unmuted)
+        tabBarViewItem.subscribe(to: tabBarViewModel)
         tabBarViewItem.menuNeedsUpdate(menu)
 
         XCTAssertFalse(menu.item(at: 1)?.isSeparatorItem ?? true)
@@ -88,7 +96,8 @@ final class TabBarViewItemTests: XCTestCase {
         tabBarViewItem.menuNeedsUpdate(menu)
 
         // THEN
-        XCTAssertEqual(menu.item(at: 4)?.title, UserText.bookmarkThisPage)
+        let bookmarkItem = menu.item(withTitle: UserText.deleteBookmark) ?? menu.item(withTitle: UserText.bookmarkThisPage)
+        XCTAssertEqual(bookmarkItem?.title, UserText.bookmarkThisPage)
     }
 
     func testWhenURLIsBookmarkedThenDeleteBookmarkIsShown() {
@@ -99,7 +108,8 @@ final class TabBarViewItemTests: XCTestCase {
         tabBarViewItem.menuNeedsUpdate(menu)
 
         // THEN
-        XCTAssertEqual(menu.item(at: 4)?.title, UserText.deleteBookmark)
+        let bookmarkItem = menu.item(withTitle: UserText.deleteBookmark) ?? menu.item(withTitle: UserText.bookmarkThisPage)
+        XCTAssertEqual(bookmarkItem?.title, UserText.deleteBookmark)
     }
 
     func testWhenOneTabCloseThenOtherTabsItemIsDisabled() {
@@ -282,4 +292,30 @@ final class TabBarViewItemTests: XCTestCase {
         XCTAssertTrue(delegate.tabBarViewItemRemoveBookmarkActionCalled)
     }
 
+}
+
+private class TabBarViewModelMock: TabBarViewModel {
+    var width: CGFloat
+    var isSelected: Bool
+    @Published var title: String = ""
+    var titlePublisher: Published<String>.Publisher { $title }
+    @Published var favicon: NSImage?
+    var faviconPublisher: Published<NSImage?>.Publisher { $favicon }
+    @Published var tabContent: Tab.TabContent = .none
+    var tabContentPublisher: AnyPublisher<Tab.TabContent, Never> { $tabContent.eraseToAnyPublisher() }
+    @Published var usedPermissions = Permissions()
+    var usedPermissionsPublisher: Published<Permissions>.Publisher { $usedPermissions }
+    @Published var mutedState: WKWebView.AudioState?
+    var mutedStatePublisher: Published<WKWebView.AudioState?>.Publisher {
+        $mutedState
+    }
+    init(width: CGFloat = 0, title: String = "Test Title", favicon: NSImage? = .aDark, tabContent: Tab.TabContent = .none, usedPermissions: Permissions = Permissions(), mutedState: WKWebView.AudioState? = nil, selected: Bool = false) {
+        self.width = width
+        self.title = title
+        self.favicon = favicon
+        self.tabContent = tabContent
+        self.usedPermissions = usedPermissions
+        self.mutedState = mutedState
+        self.isSelected = selected
+    }
 }
