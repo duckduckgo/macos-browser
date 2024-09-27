@@ -60,6 +60,7 @@ extension AutofillCredentialsImportManager: AutofillPasswordImportDelegate {
 
     public func autofillUserScriptDidRequestPermanentCredentialsImportPromptDismissal() {
         stateStore.isCredentialsImportPromptPermanantlyDismissed = true
+        PixelKit.fire(AutofillPixelKitEvent.importCredentialsPromptNeverAgainClicked.withoutMacPrefix)
     }
 
     public func autofillUserScriptWillDisplayOverlay(_ serializedInputContext: String) {
