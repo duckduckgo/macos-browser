@@ -2425,6 +2425,12 @@
     "Align Bookmarks" : {
       "comment" : "Preference title aligning the bookmarks bar"
     },
+    "Align Bookmarks to Center" : {
+      "comment" : "Preference for center aligning the bookmarks bar"
+    },
+    "Align Bookmarks to Left" : {
+      "comment" : "Preference for left aligning the bookmarks bar"
+    },
     "allow.integration" : {
       "comment" : "Setup of the integration with Bitwarden app",
       "extractionState" : "extracted_with_value",
@@ -12266,9 +12272,6 @@
           }
         }
       }
-    },
-    "Center Align Bookmarks" : {
-      "comment" : "Preference for center aligning the bookmarks bar"
     },
     "check.allow.integration" : {
       "comment" : "Setup of the integration with Bitwarden app",
@@ -30358,9 +30361,6 @@
           }
         }
       }
-    },
-    "Left Align Bookmarks" : {
-      "comment" : "Preference for left aligning the bookmarks bar"
     },
     "Let’s try doing it manually. It won’t take long." : {
       "comment" : "Suggestion to switch to a Manual File Data Import when data import fails.",

@@ -186,8 +186,8 @@ struct UserText {
     static let mainMenuBookmarksShowBookmarksBarAlways = NSLocalizedString("Always Show", comment: "Preference for always showing the bookmarks bar")
     static let mainMenuBookmarksShowBookmarksBarNewTabOnly = NSLocalizedString("Only Show on New Tab", comment: "Preference for only showing the bookmarks bar on new tab")
     static let mainMenuBookmarksShowBookmarksBarNever = NSLocalizedString("Never Show", comment: "Preference for never showing the bookmarks bar on new tab")
-    static let mainMenuBookmarksLeftAlignBookmarksBar = NSLocalizedString("Left Align Bookmarks", comment: "Preference for left aligning the bookmarks bar")
-    static let mainMenuBookmarksCenterAlignBookmarksBar = NSLocalizedString("Center Align Bookmarks", comment: "Preference for center aligning the bookmarks bar")
+    static let mainMenuBookmarksLeftAlignBookmarksBar = NSLocalizedString("Align Bookmarks to Left", comment: "Preference for left aligning the bookmarks bar")
+    static let mainMenuBookmarksCenterAlignBookmarksBar = NSLocalizedString("Align Bookmarks to Center", comment: "Preference for center aligning the bookmarks bar")
     static let preferencesBookmarksCenterAlignBookmarksBarTitle = NSLocalizedString("Align Bookmarks", comment: "Preference title aligning the bookmarks bar")
 
     // MARK: - Main Menu -> Window
