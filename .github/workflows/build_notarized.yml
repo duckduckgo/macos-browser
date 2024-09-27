@@ -205,7 +205,7 @@ jobs:
 
         # Calculate the URL for the dSYM to report it later
         s3_bucket_url="s3://${RELEASE_BUCKET_NAME}/${RELEASE_BUCKET_PREFIX}/"
-        dsym_url="${DSYM_S3_PATH/#${s3_bucket_url}/${DSYM_URL_ROOT}}" # replace S3 bucket url with CDN URL
+        dsym_url="${dsym_s3_path/#${s3_bucket_url}/${DSYM_URL_ROOT}}" # replace S3 bucket url with CDN URL
         echo "dsym-url=${dsym_url}" >> $GITHUB_OUTPUT
         aws s3 cp $DSYM_LOCAL_PATH $dsym_s3_path --acl public-read
         echo "dsym-s3-path=${dsym_s3_path}" >> $GITHUB_OUTPUT
