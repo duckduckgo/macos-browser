@@ -119,6 +119,22 @@ final class CSVParserTests: XCTestCase {
         ])
     }
 
+    func testWhenParsingRowsWithEscapedQuotesAndLineBreaksQuotesUnescapedAndLinebreaksParsed() throws {
+        let string = #"""
+        Title,Url,Username,Password,OTPAuth,Notes
+        "А",,"",,,"It's\",
+        B,,,,you! 🖐 se\" ect Edit to fill in more details, like your address and contact
+        information.",
+        """#
+
+        let parsed = try CSVParser().parse(string: string)
+
+        XCTAssertEqual(parsed, [
+            ["Title", "Url", "Username", "Password", "OTPAuth", "Notes"],
+            ["А", "", "", "", "", "It's\",\nB,,,,you! 🖐 se\" ect Edit to fill in more details, like your address and contact\ninformation.", ""]
+        ])
+    }
+
     func testWhenParsingQuotedRowsContainingCommasThenTheyAreTreatedAsOneColumnEntry() throws {
         let string = """
         "url","username","password,with,commas"
