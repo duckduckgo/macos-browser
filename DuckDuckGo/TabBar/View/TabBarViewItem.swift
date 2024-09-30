@@ -412,7 +412,6 @@ final class TabBarViewItem: NSCollectionViewItem {
         super.viewDidLoad()
 
         cell.target = self
-        cell.mouseOverView.registerForDraggedTypes([.string])
         cell.mouseOverView.delegate = self
         cell.mouseOverView.registerForDraggedTypes([.string])
 
@@ -688,10 +687,6 @@ extension TabBarViewItem: NSMenuDelegate {
             addBookmarkMenuItem(to: menu)
         }
         menu.addItem(.separator())
-
-        // Share Section
-        let shareItem = NSMenuItem(title: UserText.shareMenuItem)
-        shareItem.submenu = SharingMenu(title: UserText.shareMenuItem)
 
         // Bookmark All Section
         addBookmarkAllTabsMenuItem(to: menu)
