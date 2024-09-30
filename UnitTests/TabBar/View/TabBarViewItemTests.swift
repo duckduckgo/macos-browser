@@ -79,8 +79,10 @@ final class TabBarViewItemTests: XCTestCase {
         XCTAssertTrue(menu.item(at: 3)?.isSeparatorItem ?? false)
     }
 
+    @MainActor
     func testThatUnmuteIsShownWhenCurrentAudioStateIsMuted() {
-        delegate.audioState = .muted(isPlayingAudio: false)
+        let tabBarViewModel = TabBarViewModelMock(audioState: .muted(isPlayingAudio: false))
+        tabBarViewItem.subscribe(to: tabBarViewModel)
         tabBarViewItem.menuNeedsUpdate(menu)
 
         XCTAssertFalse(menu.item(at: 1)?.isSeparatorItem ?? true)
