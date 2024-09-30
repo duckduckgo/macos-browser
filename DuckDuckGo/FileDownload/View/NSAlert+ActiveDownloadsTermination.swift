@@ -24,7 +24,8 @@ extension NSAlert {
         assert(!downloads.isEmpty)
 
         let activeDownload = downloads.first(where: { $0.state.isDownloading })
-        let firstFileName = activeDownload?.state.destinationFilePresenter?.url?.lastPathComponent ?? ""
+        let firstFileName = activeDownload?.state.destinationFilePresenter?.url?.lastPathComponent
+            .truncated(length: MainMenu.Constants.maxTitleLength, middle: "…") ?? ""
         let andOthers = downloads.count > 1 ? UserText.downloadsActiveAlertMessageAndOthers : ""
         let thisTheseFiles = downloads.count > 1 ? UserText.downloadsActiveAlertMessageTheseFiles : UserText.downloadsActiveAlertMessageThisFile
 
@@ -41,7 +42,8 @@ extension NSAlert {
         assert(!downloads.isEmpty)
 
         let activeDownload = downloads.first(where: { $0.state.isDownloading })
-        let firstFileName = activeDownload?.state.destinationFilePresenter?.url?.lastPathComponent ?? ""
+        let firstFileName = activeDownload?.state.destinationFilePresenter?.url?.lastPathComponent
+            .truncated(length: MainMenu.Constants.maxTitleLength, middle: "…") ?? ""
         let andOthers = downloads.count > 1 ? UserText.downloadsActiveAlertMessageAndOthers : ""
         let thisTheseFiles = downloads.count > 1 ? UserText.downloadsActiveAlertMessageTheseFiles : UserText.downloadsActiveAlertMessageThisFile
 

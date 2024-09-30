@@ -16866,7 +16866,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "DuckDuckGo is currently downloading “%1$@”%2$@. If you quit now, DuckDuckGo won‘t finish downloading %3$@."
+            "value" : "Are you sure you want to quit?\n\nDuckDuckGo is currently downloading “%1$@”%2$@. If you quit now, DuckDuckGo won‘t finish downloading %3$@."
           }
         },
         "es" : {
@@ -16877,37 +16877,37 @@
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Voulez-vous vraiment abandonner ? DuckDuckGo Privacy Browser télécharge actuellement « %1$@”%2$@ ». Si vous abandonnez maintenant, le navigateur ne terminera pas le téléchargement de ce fichier."
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Uscire? DuckDuckGo Privacy Browser sta attualmente scaricando \"%1$@\"%2$@. Se esci ora, DuckDuckGo Privacy Browser non completerà il download di questo file."
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Weet je zeker dat je wilt afsluiten? DuckDuckGo Privacy Browser downloadt momenteel \"%1$@\"%2$@. Als je nu afsluit, zal DuckDuckGo Privacy Browser dit bestand niet verder downloaden."
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Czy na pewno chcesz wyjść? DuckDuckGo Privacy Browser obecnie pobiera „%1$@”%2$@. Jeśli teraz wyjdziesz, DuckDuckGo Privacy Browser nie zakończy pobierania tego pliku."
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Tens a certeza de que pretendes sair? O DuckDuckGo Privacy Browser está a transferir “%1$@”%2$@. Se saíres agora, o DuckDuckGo Privacy Browser não irá concluir a transferência deste ficheiro."
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Действительно закрыть приложение? DuckDuckGo Privacy Browser загружает «%1$@» %2$@. Если вы закроете его, прервется загрузка файла."
           }
         }
@@ -21812,7 +21812,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "DuckDuckGo is currently downloading “%1$@”%2$@. If you close the Fire Window, DuckDuckGo will delete %3$@."
+            "value" : "Are you sure you want to close the Fire Window?\n\nDuckDuckGo is currently downloading “%1$@”%2$@. If you close the Fire Window, DuckDuckGo will delete %3$@."
           }
         }
       }
