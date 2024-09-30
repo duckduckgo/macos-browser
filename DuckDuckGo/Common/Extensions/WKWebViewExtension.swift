@@ -16,11 +16,11 @@
 //  limitations under the License.
 //
 
+import Combine
 import Common
 import Navigation
 import WebKit
 import os.log
-import Combine
 
 extension WKWebView {
 
@@ -182,6 +182,13 @@ extension WKWebView {
                 self.mediaMutedState.remove(.audioMuted)
             }
         }
+    }
+
+    var audioStatePublisher: AnyPublisher<AudioState, Never> {
+        publisher(for: \.mediaMutedState)
+            .combineLatest(publisher(for: \.isPlayingAudio))
+            .map { AudioState(wkMediaMutedState: $0, isPlayingAudio: $1) }
+            .eraseToAnyPublisher()
     }
 
     @objc(webViewIsPlayingAudio) // named this way to avoid clashing with a real method when (in case) it becomes public

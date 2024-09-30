@@ -320,6 +320,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
         // “Watch in YouTube” selected
         // when currently displayed content is the Duck Player and loading a YouTube URL, don‘t override it
         if didUserSelectWatchInYoutubeFromDuckPlayer(navigationAction, preferences: preferences, videoID: videoID) {
+            duckPlayer.setNextVideoToOpenOnYoutube()
             PixelKit.fire(GeneralPixel.duckPlayerWatchOnYoutube)
             return .next
 
