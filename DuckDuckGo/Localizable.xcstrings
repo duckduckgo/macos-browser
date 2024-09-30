@@ -44668,7 +44668,7 @@
       }
     },
     "pm.empty.default.description.extended.v2" : {
-      "comment" : "Label for default empty state description\n   Label for default empty state description when the autolock feature is off",
+      "comment" : "Label for default empty state description",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -44723,6 +44723,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Пароли подвергаются шифрованию. Никто, кроме вас, их не увидит. Даже мы."
+          }
+        }
+      }
+    },
+    "pm.empty.default.description.extended.v2.autolock.off" : {
+      "comment" : "Label for default empty state description when the autolock feature is off",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Passwords are encrypted."
           }
         }
       }
@@ -47608,7 +47620,7 @@
       }
     },
     "pm.save-credentials.security.info" : {
-      "comment" : "Info message for the save credentials dialog\n   Info message for the save credentials dialog when the autolock feature is off",
+      "comment" : "Info message for the save credentials dialog",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -47662,6 +47674,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Пароли подвергаются шифрованию. Никто, кроме вас, их не увидит. Даже мы. [Подробнее...](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        }
+      }
+    },
+    "pm.save-credentials.security.info.autolock.off" : {
+      "comment" : "Info message for the save credentials dialog when the autolock feature is off",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Passwords are encrypted. We recommend setting up Auto-lock to keep your passwords even more secure. [Go to Settings]((URL.settingsPane(.autofill)))"
           }
         }
       }
