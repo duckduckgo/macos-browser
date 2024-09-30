@@ -476,8 +476,10 @@ final class DownloadListCoordinator {
         return false
     }
 
-    var isEmpty: Bool {
-        items.isEmpty
+    func hasDownloads(for fireWindowSession: FireWindowSessionRef?) -> Bool {
+        return items.contains { _, item in
+            item.fireWindowSession == fireWindowSession
+        }
     }
 
     @MainActor

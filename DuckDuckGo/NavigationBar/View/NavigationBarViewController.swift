@@ -188,7 +188,7 @@ final class NavigationBarViewController: NSViewController {
         listenToFeedbackFormNotifications()
         subscribeToDownloads()
 
-        updateDownloadsButton()
+        updateDownloadsButton(source: .default)
         updatePasswordManagementButton()
         updateBookmarksButton()
         updateHomeButton()
@@ -361,7 +361,7 @@ final class NavigationBarViewController: NSViewController {
                 case .bookmarks:
                     self.updateBookmarksButton()
                 case .downloads:
-                    self.updateDownloadsButton(updatingFromPinnedViewsNotification: true)
+                    self.updateDownloadsButton(source: .pinnedViewsNotification)
                 case .homeButton:
                     self.updateHomeButton()
                 case .networkProtection:
@@ -694,8 +694,8 @@ final class NavigationBarViewController: NSViewController {
         // update Downloads button visibility and state
         downloadListCoordinator.updates
             .throttle(for: 1.0, scheduler: DispatchQueue.main, latest: true)
-            .sink { [weak self] _ in
-                self?.updateDownloadsButton()
+            .sink { [weak self] update in
+                self?.updateDownloadsButton(source: .update(update))
             }
             .store(in: &downloadsCancellables)
 
@@ -790,7 +790,13 @@ final class NavigationBarViewController: NSViewController {
         }
     }
 
-    private func updateDownloadsButton(updatingFromPinnedViewsNotification: Bool = false) {
+    private enum DownloadsButtonUpdateSource {
+        case pinnedViewsNotification
+        case popoverDidClose
+        case update(DownloadListCoordinator.Update)
+        case `default`
+    }
+    private func updateDownloadsButton(source: DownloadsButtonUpdateSource) {
         downloadsButton.menu = NSMenu {
             NSMenuItem(title: LocalPinningManager.shared.shortcutTitle(for: .downloads),
                        action: #selector(toggleDownloadsPanelPinning(_:)),
@@ -803,15 +809,23 @@ final class NavigationBarViewController: NSViewController {
             return
         }
 
-        let hasActiveDownloads = downloadListCoordinator.hasActiveDownloads(for: FireWindowSessionRef(window: view.window))
+        let fireWindowSession = FireWindowSessionRef(window: view.window)
+        let hasActiveDownloads = downloadListCoordinator.hasActiveDownloads(for: fireWindowSession)
         downloadsButton.image = hasActiveDownloads ? .downloadsActive : .downloads
 
-        if downloadListCoordinator.isEmpty {
+        let hasDownloads = downloadListCoordinator.hasDownloads(for: fireWindowSession)
+        if !hasDownloads {
             invalidateDownloadButtonHidingTimer()
         }
         let isTimerActive = downloadsButtonHidingTimer != nil
 
         downloadsButton.isShown = if popovers.isDownloadsPopoverShown {
+            true
+        } else if case .popoverDidClose = source, hasDownloads {
+            true
+        } else if hasDownloads, case .update(let update) = source,
+                  update.item.fireWindowSession == fireWindowSession,
+                  update.item.added.addingTimeInterval(Constants.downloadsButtonAutoHidingInterval) > Date() {
             true
         } else {
             hasActiveDownloads || isTimerActive
@@ -823,7 +837,7 @@ final class NavigationBarViewController: NSViewController {
 
         // If the user has selected Hide Downloads from the navigation bar context menu, and no downloads are active, then force it to be hidden
         // even if the timer is active.
-        if updatingFromPinnedViewsNotification {
+        if case .pinnedViewsNotification = source {
             if !LocalPinningManager.shared.isPinned(.downloads) {
                 invalidateDownloadButtonHidingTimer()
                 downloadsButton.isShown = hasActiveDownloads
@@ -1121,7 +1135,7 @@ extension NavigationBarViewController: NSPopoverDelegate {
     func popoverDidClose(_ notification: Notification) {
         if let popover = popovers.downloadsPopover, notification.object as AnyObject? === popover {
             popovers.downloadsPopoverClosed()
-            updateDownloadsButton()
+            updateDownloadsButton(source: .popoverDidClose)
         } else if let popover = popovers.bookmarkListPopover, notification.object as AnyObject? === popover {
             popovers.bookmarkListPopoverClosed()
             updateBookmarksButton()
