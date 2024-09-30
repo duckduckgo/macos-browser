@@ -12273,6 +12273,9 @@
         }
       }
     },
+    "Center" : {
+      "comment" : "Preference title aligning the bookmarks bar"
+    },
     "check.allow.integration" : {
       "comment" : "Setup of the integration with Bitwarden app",
       "extractionState" : "extracted_with_value",
@@ -30361,6 +30364,9 @@
           }
         }
       }
+    },
+    "Left" : {
+      "comment" : "Preference title aligning the bookmarks bar"
     },
     "Let’s try doing it manually. It won’t take long." : {
       "comment" : "Suggestion to switch to a Manual File Data Import when data import fails.",

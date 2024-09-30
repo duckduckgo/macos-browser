@@ -156,10 +156,10 @@ extension Preferences {
                             let button = NSPopUpButton()
                             button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
 
-                            let leftAligned = button.menu?.addItem(withTitle: UserText.mainMenuBookmarksLeftAlignBookmarksBar, action: nil, keyEquivalent: "")
+                            let leftAligned = button.menu?.addItem(withTitle: UserText.preferencesBookmarksLeftAlignBookmarksBare, action: nil, keyEquivalent: "")
                             leftAligned?.representedObject = false
 
-                            let centerAligned = button.menu?.addItem(withTitle: UserText.mainMenuBookmarksCenterAlignBookmarksBar, action: nil, keyEquivalent: "")
+                            let centerAligned = button.menu?.addItem(withTitle: UserText.preferencesBookmarksCenterAlignBookmarksBar, action: nil, keyEquivalent: "")
                             centerAligned?.representedObject = true
 
                             return button
