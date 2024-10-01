@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/duckduckgo/fastlane-plugin-ddg_apple_automation
-  revision: 7613ee453b98503684a761ea37d6cb6aac7a6ba5
+  revision: db4f149013f4babd7fb5d676adfc93ef68df21ac
   branch: dominik/start-new-release
   specs:
     fastlane-plugin-ddg_apple_automation (0.11.1)
@@ -27,7 +27,7 @@ GEM
       oauth2 (>= 1.4, < 3)
     atomos (0.1.3)
     aws-eventstream (1.3.0)
-    aws-partitions (1.980.0)
+    aws-partitions (1.982.0)
     aws-sdk-core (3.209.1)
       aws-eventstream (~> 1, >= 1.3.0)
       aws-partitions (~> 1, >= 1.651.0)
@@ -57,7 +57,7 @@ GEM
     domain_name (0.6.20240107)
     dotenv (2.8.1)
     emoji_regex (3.2.3)
-    excon (0.111.0)
+    excon (0.112.0)
     faraday (1.10.4)
       faraday-em_http (~> 1.0)
       faraday-em_synchrony (~> 1.0)
@@ -212,7 +212,7 @@ GEM
       trailblazer-option (>= 0.1.1, < 0.2.0)
       uber (< 0.2.0)
     retriable (3.1.2)
-    rexml (3.3.7)
+    rexml (3.3.8)
     rouge (2.0.7)
     ruby2_keywords (0.0.5)
     rubyzip (2.3.2)
