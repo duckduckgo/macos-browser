@@ -22,8 +22,8 @@ extension UserText {
 
     static let pmSaveCredentialsEditableTitle = NSLocalizedString("pm.save-credentials.editable.title", value: "Save password in DuckDuckGo?", comment: "Title for the editable Save Credentials popover")
     static let pmSaveCredentialsNonEditableTitle = NSLocalizedString("pm.save-credentials.non-editable.title", value: "New password saved", comment: "Title for the non-editable Save Credentials popover")
-    static let pmSaveCredentialsSecurityInfo = NSLocalizedString("pm.save-credentials.security.info", value: "Passwords are encrypted. Nobody but you can see them, not even us. [Learn More]( \(URL.passwordManagerLearnMore))", comment: "Info message for the save credentials dialog")
-    static let pmSaveCredentialsSecurityInfoAutolockOff = NSLocalizedString("pm.save-credentials.security.info.autolock.off", value: "Passwords are encrypted. We recommend setting up Auto-lock to keep your passwords even more secure. [Go to Settings](\(URL.settingsPane(.autofill)))", comment: "Info message for the save credentials dialog when the autolock feature is off")
+    static let pmSaveCredentialsSecurityInfo = NSLocalizedString("pm.save-credentials.security.info", value: "Passwords are encrypted. Nobody but you can see them, not even us. [Learn More](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)", comment: "Info message for the save credentials dialog")
+    static let pmSaveCredentialsSecurityInfoAutolockOff = NSLocalizedString("pm.save-credentials.security.info.autolock.off", value: "Passwords are encrypted. We recommend setting up Auto-lock to keep your passwords even more secure. [Go to Settings](duck://settings/autofill)", comment: "Info message for the save credentials dialog when the autolock feature is off")
     static let pmUpdateCredentialsTitle = NSLocalizedString("pm.update-credentials.title", value: "Update password?", comment: "Title for the Update Credentials popover")
 
     static let pmEmptyStateDefaultTitle = NSLocalizedString("pm.empty.default.title", value: "No passwords or credit cards saved yet", comment: "Label for default empty state title")

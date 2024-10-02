@@ -44607,66 +44607,6 @@
         }
       }
     },
-    "pm.empty.default.description" : {
-      "comment" : "Label for default empty state description",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wenn deine Passwörter in einem anderen Browser gespeichert sind, kannst du sie in DuckDuckGo importieren."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "If your passwords are saved in another browser, you can import them into DuckDuckGo."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Si tienes contraseñas guardadas en otro navegador, puedes importarlas a DuckDuckGo."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Si vos mots de passe sont enregistrés dans un autre navigateur, vous pouvez les importer dans DuckDuckGo."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Se le password vengono salvate in un altro browser, è possibile importarle in DuckDuckGo."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Als je wachtwoorden in een andere browser zijn opgeslagen, kun je ze in DuckDuckGo importeren."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jeśli Twoje hasła są zapisane w innej przeglądarce, możesz je zaimportować do DuckDuckGo."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Se as tuas palavras-passe estão guardadas noutro navegador, podes importá-las para o DuckDuckGo."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Если вы уже храните пароли в другом браузере, вы можете импортировать их в DuckDuckGo."
-          }
-        }
-      }
-    },
     "pm.empty.default.description.extended.v2" : {
       "comment" : "Label for default empty state description",
       "extractionState" : "extracted_with_value",
@@ -44731,10 +44671,58 @@
       "comment" : "Label for default empty state description when the autolock feature is off",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwörter sind verschlüsselt."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Passwords are encrypted."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las contraseñas están cifradas."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les mots de passe sont cryptés."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le password sono crittografate."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wachtwoorden worden versleuteld."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hasła są szyfrowane."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As palavras-passe estão encriptadas."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пароли подвергаются шифрованию."
           }
         }
       }
@@ -47643,7 +47631,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Les mots de passe sont cryptés. Personne d&apos;autre que vous ne peut les voir, pas même nous. [En savoir plus](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+            "value" : "Les mots de passe sont cryptés. Personne d'autre que vous ne peut les voir, pas même nous. [En savoir plus](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
           }
         },
         "it" : {
@@ -47655,13 +47643,13 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wachtwoorden worden versleuteld. Niemand anders kan ze zien, zelfs wij niet. [Meer informatie] (https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+            "value" : "Wachtwoorden worden versleuteld. Niemand anders dan jij kunt ze zien, zelfs wij niet. [Meer informatie](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hasła są szyfrowane. Nikt poza Tobą ich nie widzi, nawet my. [Więcej informacji](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+            "value" : "Hasła są szyfrowane. Nikt poza Tobą ich nie widzi, nawet my. [Więcek informacji](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
           }
         },
         "pt" : {
@@ -47682,10 +47670,58 @@
       "comment" : "Info message for the save credentials dialog when the autolock feature is off",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwörter sind verschlüsselt. Wir empfehlen dir, Auto-Lock einzurichten, um deine Passwörter noch sicherer zu machen. [Gehe zu Einstellungen](duck://settings/autofill)"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Passwords are encrypted. We recommend setting up Auto-lock to keep your passwords even more secure. [Go to Settings]((URL.settingsPane(.autofill)))"
+            "value" : "Passwords are encrypted. We recommend setting up Auto-lock to keep your passwords even more secure. [Go to Settings](duck://settings/autofill)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Las contraseñas están cifradas. Te recomendamos que configures Auto-lock para mantener las contraseñas aún más seguras. [Ve a Ajustes](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Les mots de passe sont cryptés. Nous recommandons de configurer le verrouillage automatique pour renforcer la sécurité de vos mots de passe. [Accéder aux Réglages] (https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Le password sono crittografate. Ti consigliamo di impostare il blocco automatico per rendere le tue password ancora più sicure. [Vai a Impostazioni](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Wachtwoorden worden versleuteld. We raden aan om 'Automatisch vergrendelen' in te stellen om je wachtwoorden nog beter te beveiligen. [Ga naar Instellingen](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Hasła są szyfrowane. Zalecamy skonfigurowanie funkcji automatycznej blokady, aby hasła były jeszcze bezpieczniejsze. [Przejdź do ustawień](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "As palavras-passe estão encriptadas. Recomendamos a configuração do Bloqueio automático para manter as tuas palavras-passe ainda mais seguras. [Acede a Definições](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Все пароли шифруются. Для их дополнительной защиты рекомендуем включить автоблокировку. [Перейти к настройкам](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
           }
         }
       }
