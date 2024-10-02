@@ -45,24 +45,11 @@ jobs:
           ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
           GITHUB_TOKEN: ${{ github.token }}
         run: |
-          git config --global user.name "Dax the Duck"
-          git config --global user.email "dax@duckduckgo.com"
           bundle exec fastlane run start_new_release \
             platform:"macos" \
             version:"${{ inputs.version }}" \
             github_handle:"${{ github.actor }}" \
             validation_section_id:"${{ vars.TEST_MACOS_APP_BOARD_VALIDATION_SECTION_ID }}" \
-
-      # - name: Update Asana tasks for the release
-      #   env:
-      #     ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
-      #     GH_TOKEN: ${{ github.token }}
-      #   run: |
-      #     ./scripts/update_asana_for_release.sh \
-      #       internal \
-      #       ${{ steps.create_release_task.outputs.asana_task_id }} \
-      #       ${{ vars.MACOS_APP_BOARD_VALIDATION_SECTION_ID }} \
-      #       ${{ steps.create_release_task.outputs.marketing_version }}
 
   # run_tests:
 
