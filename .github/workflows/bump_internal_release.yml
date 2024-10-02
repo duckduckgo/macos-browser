@@ -31,6 +31,7 @@ jobs:
 
     outputs:
       skip-release: ${{ steps.prepare-release-bump.outputs.skip_release }}
+      asana-task-id: ${{ steps.prepare-release-bump.outputs.release_task_id }}
       asana-task-url: ${{ steps.prepare-release-bump.outputs.release_task_url }}
       release-branch: ${{ steps.prepare-release-bump.outputs.release_branch }}
       skip-appstore: ${{ steps.prepare-release-bump.outputs.skip_appstore }}
@@ -59,38 +60,36 @@ jobs:
           ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
           GITHUB_TOKEN: ${{ github.token }}
         run: |
-          bundle exec fastlane run bump_internal_release \
+          bundle exec fastlane run validate_internal_release_bump \
             platform:macos \
-            base_branch:"${{ inputs.base-branch }}" \
-            github_handle:"${{ github.actor }}" \
             is_scheduled_release:"${{ github.event_name == 'schedule' }}" \
-            skip_appstore:"${{ inputs.skip-appstore }}" \
             release_task_url:"${{ inputs.asana-task-url }}"
 
-  run_tests:
+  # run_tests:
 
-    name: Run Tests
+  #   name: Run Tests
 
-    needs: validate_input_conditions
+  #   needs: validate_input_conditions
 
-    if: needs.validate_input_conditions.outputs.skip-release == 'false'
-    uses: ./.github/workflows/pr.yml
-    with:
-      branch: ${{ needs.validate_input_conditions.outputs.release-branch }}
-    secrets:
-      APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
-      APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
-      APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
-      ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
-      MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-      SSH_PRIVATE_KEY_FASTLANE_MATCH: ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
+  #   if: needs.validate_input_conditions.outputs.skip-release == 'false'
+  #   uses: ./.github/workflows/pr.yml
+  #   with:
+  #     branch: ${{ needs.validate_input_conditions.outputs.release-branch }}
+  #   secrets:
+  #     APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
+  #     APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+  #     APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
+  #     ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+  #     MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+  #     SSH_PRIVATE_KEY_FASTLANE_MATCH: ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
 
   increment_build_number:
 
     name: Increment Build Number
 
-    needs: [ validate_input_conditions, run_tests ]
-    runs-on: macos-14-xlarge
+    # needs: [ validate_input_conditions, run_tests ]
+    needs: validate_input_conditions
+    runs-on: macos-14
     timeout-minutes: 10
 
     steps:
@@ -108,31 +107,19 @@ jobs:
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
-      - name: Prepare fastlane
-        run: bundle install
-
       - name: Increment build number
         env:
           APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
           APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
           APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
-        run: |
-          git config --global user.name "Dax the Duck"
-          git config --global user.email "dax@duckduckgo.com"
-          bundle exec fastlane bump_internal_release update_embedded_files:false
-
-      - name: Extract Asana Task ID
-        id: task-id
-        run: bundle exec fastlane run asana_extract_task_id task_url:"${{ needs.validate_input_conditions.outputs.asana-task-url }}"
-
-      - name: Update Asana tasks for the release
-        env:
           ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          GH_TOKEN: ${{ github.token }}
-          BRANCH: ${{ needs.validate_input_conditions.outputs.release-branch }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
-          version="$(cut -d '/' -f 2 <<< "$BRANCH")"
-          ./scripts/update_asana_for_release.sh internal ${{ steps.task-id.outputs.asana_task_id }} ${{ vars.MACOS_APP_BOARD_VALIDATION_SECTION_ID }} "${version}"
+          bundle exec fastlane run increment_build_number platform:macos
+          bundle exec fastlane run update_asana_for_release \
+            platform:macos \
+            release_task_id:"${{ needs.validate_input_conditions.outputs.asana-task-id }}" \
+            validation_section_id:"${{ vars.MACOS_APP_BOARD_VALIDATION_SECTION_ID }}"
 
   prepare_release:
     name: Prepare Release

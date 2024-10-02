@@ -67,34 +67,35 @@ jobs:
   #     MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
   #     SSH_PRIVATE_KEY_FASTLANE_MATCH: ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
 
-  # increment_build_number:
+  increment_build_number:
 
-  #   name: Increment Build Number
+    name: Increment Build Number
 
-  #   needs: [ create_release_branch, run_tests ]
-  #   runs-on: macos-14-xlarge
-  #   timeout-minutes: 10
+    # needs: [ create_release_branch, run_tests ]
+    needs: create_release_branch
+    runs-on: macos-14
+    timeout-minutes: 10
 
-  #   steps:
+    steps:
 
-  #     - name: Check out the code
-  #       uses: actions/checkout@v4
-  #       with:
-  #         submodules: recursive
-  #         ref: ${{ needs.create_release_branch.outputs.release_branch_name }}
+      - name: Check out the code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          ref: ${{ needs.create_release_branch.outputs.release_branch_name }}
 
-  #     - name: Prepare fastlane
-  #       run: bundle install
+      - name: Prepare fastlane
+        run: bundle install
 
-  #     - name: Increment build number
-  #       env:
-  #         APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
-  #         APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
-  #         APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
-  #       run: |
-  #         git config --global user.name "Dax the Duck"
-  #         git config --global user.email "dax@duckduckgo.com"
-  #         bundle exec fastlane bump_internal_release update_embedded_files:false
+      - name: Increment build number
+        env:
+          APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          bundle exec fastlane run increment_build_number platform:"macos"
 
   # prepare_release:
   #   name: Prepare Release
