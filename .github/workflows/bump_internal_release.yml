@@ -146,7 +146,7 @@ jobs:
   tag_and_merge:
     name: Tag and Merge Branch
     # needs: [ validate_input_conditions, prepare_release ]
-    needs: validate_input_conditions
+    needs: [ validate_input_conditions, increment_build_number ]
     uses: ./.github/workflows/tag_release.yml
     with:
       asana-task-url: ${{ needs.validate_input_conditions.outputs.asana-task-url }}
