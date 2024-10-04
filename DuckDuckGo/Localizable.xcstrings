@@ -47504,14 +47504,14 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Las contraseñas están cifradas. Te recomendamos que configures Auto-lock para mantener las contraseñas aún más seguras. [Ve a Ajustes](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Les mots de passe sont cryptés. Nous recommandons de configurer le verrouillage automatique pour renforcer la sécurité de vos mots de passe. [Accéder aux Réglages] (https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+            "state" : "translated",
+            "value" : "Les mots de passe sont cryptés. Nous recommandons de configurer le verrouillage automatique pour renforcer la sécurité de vos mots de passe. [Accéder aux Réglages](duck://settings/autofill)"
           }
         },
         "it" : {
