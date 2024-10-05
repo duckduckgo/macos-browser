@@ -61,7 +61,6 @@ final class DownloadListCoordinatorTests: XCTestCase {
     @MainActor
     func addDownload(tempURL: URL? = nil, destURL: URL? = nil, isBurner: Bool = false) -> (WKDownloadMock, WebKitDownloadTask, UUID) {
         let download = WKDownloadMock(url: .duckDuckGo)
-        assert(isBurner == false)
         let fm = FileManager.default
         let destURL = destURL ?? self.destURL!
         XCTAssertTrue(fm.createFile(atPath: destURL.path, contents: nil))
@@ -70,7 +69,13 @@ final class DownloadListCoordinatorTests: XCTestCase {
         XCTAssertTrue(fm.createFile(atPath: tempURL.path, contents: "test".utf8data))
         let tempFile = try! FilePresenter(url: tempURL)
 
-        let task = WebKitDownloadTask(download: download, destination: .resume(destination: destFile, tempFile: tempFile), fireWindowSession: nil)
+        var fireWindowSession: FireWindowSessionRef?
+        if isBurner {
+            let mainViewController = MainViewController(tabCollectionViewModel: TabCollectionViewModel(tabCollection: TabCollection(tabs: []), burnerMode: .init(isBurner: true)), autofillPopoverPresenter: DefaultAutofillPopoverPresenter())
+            let mainWindowController = MainWindowController(mainViewController: mainViewController, popUp: false, fireWindowSession: .init())
+            fireWindowSession = FireWindowSessionRef(window: mainWindowController.window)
+        }
+        let task = WebKitDownloadTask(download: download, destination: .resume(destination: destFile, tempFile: tempFile), fireWindowSession: fireWindowSession)
 
         let e = expectation(description: "download added")
         var id: UUID!
