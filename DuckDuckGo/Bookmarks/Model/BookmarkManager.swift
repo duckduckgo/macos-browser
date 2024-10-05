@@ -74,6 +74,9 @@ extension BookmarkManager {
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool, index: Int?, parent: BookmarkFolder?) -> Bookmark? {
         makeBookmark(for: url, title: title, isFavorite: isFavorite, index: index, parent: parent)
     }
+    func move(objectUUIDs: [String], toIndex index: Int?, withinParentFolder parent: ParentFolderType) {
+        move(objectUUIDs: objectUUIDs, toIndex: index, withinParentFolder: parent) { _ in }
+    }
 }
 final class LocalBookmarkManager: BookmarkManager {
     static let shared = LocalBookmarkManager()

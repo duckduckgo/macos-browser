@@ -84,7 +84,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
     func testWhenBookmarkIsCreatedAndStoringFails_ThenManagerRemovesItFromList() {
         let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
 
-        bookmarkStoreMock.saveBookmarkError = BookmarkManagerError.somethingReallyBad
+        bookmarkStoreMock.saveEntitiesError = BookmarkManagerError.somethingReallyBad
         let bookmark = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", isFavorite: false)!
 
         XCTAssertFalse(bookmarkManager.isUrlBookmarked(url: bookmark.urlObject!))
