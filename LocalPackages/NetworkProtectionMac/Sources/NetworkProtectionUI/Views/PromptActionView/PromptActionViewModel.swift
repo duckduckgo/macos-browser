@@ -114,11 +114,19 @@ extension OnboardingStep {
     func description(isMenuBar: Bool) -> [StyledTextFragment] {
         switch self {
         case .userNeedsToAllowExtension:
-            return [
-                .init(text: UserText.networkProtectionOnboardingAllowExtensionDescPrefix),
-                .init(text: UserText.networkProtectionOnboardingAllowExtensionDescAllow, isEmphasized: true),
-                .init(text: UserText.networkProtectionOnboardingAllowExtensionDescSuffix),
-            ]
+            if #available(macOS 15, *) {
+                return [
+                    .init(text: UserText.networkProtectionOnboardingAllowExtensionDescPrefixForSequoia),
+                    .init(text: UserText.networkProtectionOnboardingAllowExtensionDescEmphasized, isEmphasized: true),
+                    .init(text: UserText.networkProtectionOnboardingAllowExtensionDescSuffixForSequoia),
+                ]
+            } else {
+                return [
+                    .init(text: UserText.networkProtectionOnboardingAllowExtensionDescPrefix),
+                    .init(text: UserText.networkProtectionOnboardingAllowExtensionDescAllow, isEmphasized: true),
+                    .init(text: UserText.networkProtectionOnboardingAllowExtensionDescSuffix),
+                ]
+            }
         case .userNeedsToAllowVPNConfiguration:
             if isMenuBar {
                 return [
@@ -148,7 +156,9 @@ extension OnboardingStep {
     var actionScreenshot: NetworkProtectionAsset? {
         switch self {
         case .userNeedsToAllowExtension:
-            if #available(macOS 12, *) {
+            if #available(macOS 15, *) {
+                return .enableSysexImage
+            } else if #available(macOS 12, *) {
                 return .allowSysexScreenshot
             } else {
                 return .allowSysexScreenshotBigSur
