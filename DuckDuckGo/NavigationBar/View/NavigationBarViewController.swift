@@ -695,7 +695,8 @@ final class NavigationBarViewController: NSViewController {
         downloadListCoordinator.updates
             .throttle(for: 1.0, scheduler: DispatchQueue.main, latest: true)
             .sink { [weak self] update in
-                self?.updateDownloadsButton(source: .update(update))
+                guard let self, self.view.window?.isVisible == true else { return }
+                self.updateDownloadsButton(source: .update(update))
             }
             .store(in: &downloadsCancellables)
 
@@ -1133,6 +1134,7 @@ extension NavigationBarViewController: NSPopoverDelegate {
 
     /// We check references here because these popovers might be on other windows.
     func popoverDidClose(_ notification: Notification) {
+        guard view.window?.isVisible == true else { return }
         if let popover = popovers.downloadsPopover, notification.object as AnyObject? === popover {
             popovers.downloadsPopoverClosed()
             updateDownloadsButton(source: .popoverDidClose)
