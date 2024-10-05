@@ -30,17 +30,13 @@ final class ActiveDomainPublisher {
     private var activeTabViewModelCancellable: AnyCancellable?
     private var activeTabContentCancellable: AnyCancellable?
 
-    @MainActor
-    @Published
-    private var activeWindowController: MainWindowController? {
+    @MainActor private weak var activeWindowController: MainWindowController? {
         didSet {
             subscribeToActiveTabViewModel()
         }
     }
 
-    @MainActor
-    @Published
-    private var activeTab: Tab? {
+    @MainActor private weak var activeTab: Tab? {
         didSet {
             subscribeToActiveTabContentChanges()
         }

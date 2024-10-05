@@ -627,9 +627,9 @@ enum GeneralPixel: PixelKitEventV2 {
         case .duckPlayerContingencyLearnMoreClicked:
             return "duckplayer_mac_contingency_learn-more-clicked"
         case .dashboardProtectionAllowlistAdd:
-            return "m_mac_mp_wla"
+            return "mp_wla"
         case .dashboardProtectionAllowlistRemove:
-            return "m_mac_mp_wlr"
+            return "mp_wlr"
 
         case .launchInitial:
             return "m_mac_first-launch"

@@ -113,10 +113,6 @@ class MockTabViewItemDelegate: TabBarViewItemDelegate {
 
     }
 
-    func tabBarViewItemAudioState(_ tabBarViewItem: TabBarViewItem) -> WKWebView.AudioState? {
-        return audioState
-    }
-
     func tabBarViewItemMuteUnmuteSite(_ tabBarViewItem: TabBarViewItem) {
 
     }
@@ -125,7 +121,7 @@ class MockTabViewItemDelegate: TabBarViewItemDelegate {
         OtherTabBarViewItemsState(hasItemsToTheLeft: hasItemsToTheLeft, hasItemsToTheRight: hasItemsToTheRight)
     }
 
-    func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, replaceWithStringSearch: String) {
+    func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, replaceContentWithDroppedStringValue: String) {
 
     }
 

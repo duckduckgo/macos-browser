@@ -71,6 +71,7 @@ extension IdentityTheftRestorationPagesUserScript: WKScriptMessageHandler {
 ///
 final class IdentityTheftRestorationPagesFeature: Subfeature {
     weak var broker: UserScriptMessageBroker?
+    private let subscriptionFeatureAvailability: SubscriptionFeatureAvailability
 
     var featureName = "useIdentityTheftRestoration"
 
@@ -79,6 +80,10 @@ final class IdentityTheftRestorationPagesFeature: Subfeature {
         .exact(hostname: "abrown.duckduckgo.com")
     ])
 
+    init(subscriptionFeatureAvailability: SubscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability()) {
+        self.subscriptionFeatureAvailability = subscriptionFeatureAvailability
+    }
+
     func with(broker: UserScriptMessageBroker) {
         self.broker = broker
     }
@@ -86,6 +91,8 @@ final class IdentityTheftRestorationPagesFeature: Subfeature {
     func handler(forMethodNamed methodName: String) -> Subfeature.Handler? {
         switch methodName {
         case "getAccessToken": return getAccessToken
+        case "getFeatureConfig": return getFeatureConfig
+        case "openSendFeedbackModal": return openSendFeedbackModal
         default:
             return nil
         }
@@ -97,5 +104,14 @@ final class IdentityTheftRestorationPagesFeature: Subfeature {
         } else {
             return [String: String]()
         }
+    }
+
+    func getFeatureConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        [PrivacyProSubfeature.useUnifiedFeedback.rawValue: subscriptionFeatureAvailability.usesUnifiedFeedbackForm]
+    }
+
+    func openSendFeedbackModal(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        NotificationCenter.default.post(name: .OpenUnifiedFeedbackForm, object: nil, userInfo: UnifiedFeedbackSource.userInfo(source: .itr))
+        return nil
     }
 }

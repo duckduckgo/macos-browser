@@ -94,10 +94,10 @@ class BookmarkSearchTests: XCTestCase {
         testDragAndDropToReorder(in: .manager)
     }
 
-    func testSearchActionIsHiddenOnBookmarksPanelWhenUserHasNoBookmarks() {
+    func testSearchActionIsDisabledOnBookmarksPanelWhenUserHasNoBookmarks() {
         app.openBookmarksPanel()
         let bookmarksPanelPopover = app.popovers.firstMatch
-        XCTAssertFalse(bookmarksPanelPopover.buttons[AccessibilityIdentifiers.searchBookmarksButton].exists)
+        XCTAssertFalse(bookmarksPanelPopover.buttons[AccessibilityIdentifiers.searchBookmarksButton].isEnabled)
     }
 
     // MARK: - Utilities
