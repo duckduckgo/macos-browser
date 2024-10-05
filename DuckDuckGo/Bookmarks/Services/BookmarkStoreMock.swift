@@ -25,11 +25,10 @@ final class BookmarkStoreMock: BookmarkStore {
 
     private let store: LocalBookmarkStore?
 
-    init(contextProvider: (() -> NSManagedObjectContext)? = nil, loadAllCalled: Bool = false, bookmarks: [BaseBookmarkEntity]? = nil, loadError: Error? = nil, removeSuccess: Bool = true, removeError: Error? = nil, updateBookmarkCalled: Bool = false, updateFolderCalled: Bool = false, addChildCalled: Bool = false, updateObjectsCalled: Bool = false, importBookmarksCalled: Bool = false, canMoveObjectWithUUIDCalled: Bool = false, moveObjectUUIDCalled: Bool = false, updateFavoriteIndexCalled: Bool = false) {
+    init(contextProvider: (() -> NSManagedObjectContext)? = nil, loadAllCalled: Bool = false, bookmarks: [BaseBookmarkEntity]? = nil, loadError: Error? = nil, removeError: Error? = nil, updateBookmarkCalled: Bool = false, updateFolderCalled: Bool = false, addChildCalled: Bool = false, updateObjectsCalled: Bool = false, importBookmarksCalled: Bool = false, canMoveObjectWithUUIDCalled: Bool = false, moveObjectUUIDCalled: Bool = false, updateFavoriteIndexCalled: Bool = false) {
         self.loadAllCalled = loadAllCalled
         self.bookmarks = bookmarks
         self.loadError = loadError
-        self.removeSuccess = removeSuccess
         self.removeError = removeError
         self.updateBookmarkCalled = updateBookmarkCalled
         self.updateFolderCalled = updateFolderCalled
@@ -138,19 +137,18 @@ final class BookmarkStoreMock: BookmarkStore {
 
     var removeCalled: Bool { removeCalledWithIds != nil }
     var removeCalledWithIds: [String]?
-    var removeSuccess = true
     var removeError: Error?
-    func remove(objectsWithUUIDs uuids: [String], completion: @escaping (Bool, Error?) -> Void) {
+    func remove(objectsWithUUIDs uuids: [String], completion: @escaping (Error?) -> Void) {
         removeCalledWithIds = uuids
 
         // For the purpose of the mock, only remove bookmarks if `removeSuccess` is true.
-        guard removeSuccess else {
-            completion(removeSuccess, removeError)
+        guard removeError == nil else {
+            completion(removeError)
             return
         }
 
         store?.remove(objectsWithUUIDs: uuids, completion: completion) ?? { bookmarks?.removeAll { uuids.contains($0.id) }
-            completion(removeSuccess, removeError)
+            completion(removeError)
         }()
     }
 

@@ -61,13 +61,13 @@ class MockBookmarkManager: BookmarkManager {
         return nil
     }
 
-    func makeBookmark(for url: URL, title: String, isFavorite: Bool, index: Int?, parent: DuckDuckGo_Privacy_Browser.BookmarkFolder?) -> DuckDuckGo_Privacy_Browser.Bookmark? {
+    func makeBookmark(for url: URL, title: String, isFavorite: Bool, index: Int?, parent: BookmarkFolder?) -> DuckDuckGo_Privacy_Browser.Bookmark? {
         return nil
     }
 
     func makeBookmarks(for websitesInfo: [DuckDuckGo_Privacy_Browser.WebsiteInfo], inNewFolderNamed folderName: String, withinParentFolder parent: DuckDuckGo_Privacy_Browser.ParentFolderType) {}
 
-    func makeFolder(for title: String, parent: BookmarkFolder?, completion: @escaping (Result<BookmarkFolder, Error>) -> Void) {}
+    func makeFolder(named title: String, parent: BookmarkFolder?, completion: @escaping (Result<BookmarkFolder, Error>) -> Void) {}
 
     var removeBookmarkCalled = false
     func remove(bookmark: DuckDuckGo_Privacy_Browser.Bookmark, undoManager: UndoManager?) {

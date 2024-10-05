@@ -84,7 +84,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
     func testWhenBookmarkIsCreatedAndStoringFails_ThenManagerRemovesItFromList() {
         let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
 
-        bookmarkStoreMock.saveBookmarkSuccess = false
+        bookmarkStoreMock.saveEntitiesError = BookmarkManagerError.somethingReallyBad
         let bookmark = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", isFavorite: false)!
 
         XCTAssertFalse(bookmarkManager.isUrlBookmarked(url: bookmark.urlObject!))
@@ -115,7 +115,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
         let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
         var folder: BookmarkFolder!
         let e = expectation(description: "Folder created")
-        bookmarkManager.makeFolder(for: "Folder", parent: nil) { result in
+        bookmarkManager.makeFolder(named: "Folder", parent: nil) { result in
             folder = try? result.get()
             e.fulfill()
         }
@@ -138,7 +138,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
         let bookmark = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", isFavorite: false)!
         var folder: BookmarkFolder!
         let e = expectation(description: "Folder created")
-        bookmarkManager.makeFolder(for: "Folder", parent: nil) { result in
+        bookmarkManager.makeFolder(named: "Folder", parent: nil) { result in
             folder = try? result.get()
             e.fulfill()
         }
@@ -155,7 +155,6 @@ final class LocalBookmarkManagerTests: XCTestCase {
         let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
         let bookmark = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", isFavorite: false)!
 
-        bookmarkStoreMock.removeSuccess = false
         bookmarkStoreMock.removeError = BookmarkManagerError.somethingReallyBad
         bookmarkManager.remove(bookmark: bookmark, undoManager: nil)
 
