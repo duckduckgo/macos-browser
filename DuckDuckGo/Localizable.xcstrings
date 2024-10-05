@@ -16422,13 +16422,61 @@
       }
     },
     "dont.close" : {
-      "comment" : "Don’t Close button",
+      "comment" : "Don’t Close the window button title",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht schließen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Don’t Close"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No cerrar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ne pas fermer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non chiudere"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niet sluiten"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie zamykaj"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não fechar"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не закрывать"
           }
         }
       }
@@ -16440,7 +16488,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nicht aufgeben"
+            "value" : "Nicht verlassen"
           }
         },
         "en" : {
@@ -16458,7 +16506,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ne pas abandonner"
+            "value" : "Ne pas quitter"
           }
         },
         "it" : {
@@ -16470,7 +16518,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Niet verlaten"
+            "value" : "Niet afsluiten"
           }
         },
         "pl" : {
@@ -16488,7 +16536,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Не закрывать"
+            "value" : "Не выходить"
           }
         }
       }
@@ -16860,7 +16908,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Möchtest du wirklich aufhören? Der DuckDuckGo Privacy Browser lädt gerade „%1$@“%2$@ herunter. Wenn du ihn jetzt verlässt, wird DuckDuckGo Privacy Browser den Download nicht beenden."
+            "value" : "Möchtest du wirklich beenden?\n\nDuckDuckGo lädt derzeit „%@“%@ herunter. Wenn du jetzt aufhörst, wird DuckDuckGo den Download %@ nicht beenden."
           }
         },
         "en" : {
@@ -16872,43 +16920,43 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¿Seguro que quieres salir? DuckDuckGo Privacy Browser está descargando \"%1$@\"%2$@. Si sales ahora, DuckDuckGo Privacy Browser no terminará de descargar este archivo."
+            "value" : "¿Seguro que quieres salir?\n\nDuckDuckGo está descargando \"%@\"%@. Si sales ahora, DuckDuckGo no terminará de descargar %@."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Voulez-vous vraiment abandonner ? DuckDuckGo Privacy Browser télécharge actuellement « %1$@”%2$@ ». Si vous abandonnez maintenant, le navigateur ne terminera pas le téléchargement de ce fichier."
+            "state" : "translated",
+            "value" : "Voulez-vous vraiment abandonner ?\n\nDuckDuckGo télécharge actuellement “%@”%@. Si vous abandonnez maintenant, DuckDuckGo ne terminera pas le téléchargement de %@."
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Uscire? DuckDuckGo Privacy Browser sta attualmente scaricando \"%1$@\"%2$@. Se esci ora, DuckDuckGo Privacy Browser non completerà il download di questo file."
+            "state" : "translated",
+            "value" : "Vuoi davvero uscire?\n\nDuckDuckGo sta attualmente scaricando “%@”%@. Se esci ora, DuckDuckGo non completerà il download di %@."
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Weet je zeker dat je wilt afsluiten? DuckDuckGo Privacy Browser downloadt momenteel \"%1$@\"%2$@. Als je nu afsluit, zal DuckDuckGo Privacy Browser dit bestand niet verder downloaden."
+            "state" : "translated",
+            "value" : "Weet je zeker dat je wilt stoppen?\n\nDuckDuckGo downloadt op dit moment \"%@\"%@. Als je nu stopt, wordt het downloaden van %@ niet voltooid."
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Czy na pewno chcesz wyjść? DuckDuckGo Privacy Browser obecnie pobiera „%1$@”%2$@. Jeśli teraz wyjdziesz, DuckDuckGo Privacy Browser nie zakończy pobierania tego pliku."
+            "state" : "translated",
+            "value" : "Czy na pewno chcesz zrezygnować?\n\nDuckDuckGo aktualnie pobiera „%@”%@. Jeśli teraz wyjdziesz, DuckDuckGo nie dokończy pobierania %@."
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Tens a certeza de que pretendes sair? O DuckDuckGo Privacy Browser está a transferir “%1$@”%2$@. Se saíres agora, o DuckDuckGo Privacy Browser não irá concluir a transferência deste ficheiro."
+            "state" : "translated",
+            "value" : "Tens a certeza de que pretendes sair?\n\nO DuckDuckGo está a transferir “%@”%@. Se saíres agora, o DuckDuckGo não vai transferir %@ até ao fim."
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Действительно закрыть приложение? DuckDuckGo Privacy Browser загружает «%1$@» %2$@. Если вы закроете его, прервется загрузка файла."
+            "state" : "translated",
+            "value" : "Действительно закрыть приложение?\n\nDuckDuckGo сейчас загружает «%@»%@. Если закрыть приложение, DuckDuckGo не загрузит %@."
           }
         }
       }
@@ -16917,10 +16965,58 @@
       "comment" : "Alert text format element for “DuckDuckGo won‘t finish downloading ->these file<-”",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "diese Dateien"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "these files"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "estos archivos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ces fichiers"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "questi file"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "deze bestanden"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "tych plików"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "estes ficheiros"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "эти файлы"
           }
         }
       }
@@ -16929,10 +17025,58 @@
       "comment" : "Alert text format element for “DuckDuckGo won‘t finish downloading ->this file<-”",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "diese Datei"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "this file"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "este archivo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ce fichier"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "questo file"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "dit bestand"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "tego pliku"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "este ficheiro"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "этот файл"
           }
         }
       }
@@ -21809,10 +21953,58 @@
       "comment" : "Alert text format when trying to close a Fire Window while file “filename (%@)”[, and others (%@)] are being downloaded in it. If you close the Fire Window, DuckDuckGo will delete [this file|these files](%@).",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bist du sicher, dass du das Fire Window schließen willst?\n\nDuckDuckGo lädt gerade „%@“%@ herunter. Wenn du das Fire Window schließt, löscht DuckDuckGo %@."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Are you sure you want to close the Fire Window?\n\nDuckDuckGo is currently downloading “%1$@”%2$@. If you close the Fire Window, DuckDuckGo will delete %3$@."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Seguro que quieres cerrar la Fire Window?\n\nDuckDuckGo está descargando \"%@\"%@. Si cierras la Fire Window, DuckDuckGo eliminará %@."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voulez-vous vraiment fermer la Fire Window ?\n\nDuckDuckGo télécharge actuellement “%@”%@. Si vous fermez la Fire Window, DuckDuckGo supprimera %@."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vuoi davvero chiudere la Fire Window?\n\nDuckDuckGo sta attualmente scaricando “%@”%@. Se la chiudi, DuckDuckGo eliminerà %@."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weet je zeker dat je het Fire Window wilt sluiten?\n\nDuckDuckGo downloadt op dit moment \"%@\"%@. Als je het Fire Window sluit, wordt %@ verwijderd."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Czy na pewno chcesz zamknąć okno Fire Window?\n\nDuckDuckGo aktualnie pobiera „%@”%@. Jeśli zamkniesz okno Fire Window, DuckDuckGo usunie %@."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tens a certeza de que pretendes fechar a Fire Window?\n\nO DuckDuckGo está a transferir “%@”%@. Se fechares a Fire Window, o DuckDuckGo vai eliminar %@."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Действительно закрыть окно Fire Window?\n\nDuckDuckGo сейчас загружает «%@»%@. В случае закрытия DuckDuckGo удалит %@."
           }
         }
       }
@@ -31162,7 +31354,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Завершить DuckDuckGo"
+            "value" : "Закрыть DuckDuckGo"
           }
         }
       }
@@ -47656,7 +47848,7 @@
       }
     },
     "pm.save-credentials.security.info" : {
-      "comment" : "Info message for the save credentials dialog\n   Info message for the save credentials dialog when the autolock feature is off",
+      "comment" : "Info message for the save credentials dialog\nInfo message for the save credentials dialog when the autolock feature is off",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -52837,7 +53029,7 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Esci"
+            "value" : "Uscire"
           }
         },
         "nl" : {

@@ -34,7 +34,7 @@ struct UserText {
     static let neverForThisSite = NSLocalizedString("never.for.this.site", value: "Never Ask for This Site", comment: "Never ask to save login credentials for this site button")
     static let open = NSLocalizedString("open", value: "Open", comment: "Open button")
     static let close = NSLocalizedString("close", value: "Close", comment: "Close button")
-    static let dontClose = NSLocalizedString("dont.close", value: "Don’t Close", comment: "Don’t Close button")
+    static let dontClose = NSLocalizedString("dont.close", value: "Don’t Close", comment: "Don’t Close the window button title")
     static let save = NSLocalizedString("save", value: "Save", comment: "Save button")
     static let dontSave = NSLocalizedString("dont.save", value: "Don't Save", comment: "Don't Save button")
     static let update = NSLocalizedString("update", value: "Update", comment: "Update button")
