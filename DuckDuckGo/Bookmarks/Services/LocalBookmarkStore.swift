@@ -626,6 +626,7 @@ final class LocalBookmarkStore: BookmarkStore {
         // make pairs of objects and insertion indices (appending at the end if no matching index)
         let bookmarkManagedObjectsAndInsertionIndices = bookmarkManagedObjects.enumerated().map { idx, obj in (indices[safe: idx] ?? Int.max, obj) }
 
+        var insertionIndexShift = 0
         for (var insertionIndex, bookmarkManagedObject) in bookmarkManagedObjectsAndInsertionIndices {
             // moving within the same folder?
             if bookmarkManagedObject.parent?.id == newParentFolder.id {
@@ -636,12 +637,14 @@ final class LocalBookmarkStore: BookmarkStore {
                 allChildren.remove(at: currentIndex)
                 guard currentIndex != insertionIndex else { continue }
                 // decrement insertion index if moving object within the same folder to a higher index
-                insertionIndex -= (insertionIndex > currentIndex) ? 1 : 0
+                if insertionIndex > currentIndex {
+                    insertionIndexShift -= 1
+                }
             }
 
             bookmarkManagedObject.parent = nil
 
-            insertionIndex = max(min(insertionIndex, allChildren.count), 0)
+            insertionIndex = max(min(insertionIndex + insertionIndexShift, allChildren.count), 0)
             newParentFolder.insertIntoChildren(bookmarkManagedObject, at: insertionIndex)
             allChildren.insert(bookmarkManagedObject, at: insertionIndex)
         }

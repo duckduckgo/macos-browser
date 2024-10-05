@@ -123,11 +123,16 @@ final class BookmarkStoreMock: BookmarkStore {
             completion(saveEntitiesError)
             return
         }
-        store?.save(entitiesAtIndices: entitiesAtIndices, completion: completion) ?? {
+        let ids = Set(entitiesAtIndices.map(\.entity.id))
+        if let store {
+            store.save(entitiesAtIndices: entitiesAtIndices, completion: completion)
+            bookmarks?.removeAll(where: { ids.contains($0.id) })
+            bookmarks?.append(contentsOf: entitiesAtIndices.map(\.entity))
+        } else {
+            bookmarks?.removeAll(where: { ids.contains($0.id) })
             bookmarks?.append(contentsOf: entitiesAtIndices.map(\.entity))
             completion(saveEntitiesError)
-        }()
-        bookmarks?.append(contentsOf: entitiesAtIndices.map(\.entity))
+        }
     }
 
     var removeCalled: Bool { removeCalledWithIds != nil }

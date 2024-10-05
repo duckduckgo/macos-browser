@@ -178,6 +178,7 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         let folder = BookmarkFolder(id: "1", title: #function)
         bookmarkStoreMock = BookmarkStoreMock(bookmarks: [folder])
         bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
+        bookmarkManager.loadBookmarks()
         let sut = AddEditBookmarkFolderDialogViewModel(mode: .add(), bookmarkManager: bookmarkManager)
 
         // WHEN
@@ -193,6 +194,7 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         let folder = BookmarkFolder(id: "1", title: #function)
         bookmarkStoreMock = BookmarkStoreMock(bookmarks: [folder])
         bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
+        bookmarkManager.loadBookmarks()
         let sut = AddEditBookmarkFolderDialogViewModel(mode: .add(parentFolder: .mock), bookmarkManager: bookmarkManager)
 
         // WHEN
@@ -208,6 +210,7 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         let folder = BookmarkFolder(id: "1", title: #function)
         bookmarkStoreMock = BookmarkStoreMock(bookmarks: [folder])
         bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
+        bookmarkManager.loadBookmarks()
         let sut = AddEditBookmarkFolderDialogViewModel(mode: .edit(folder: folder, parentFolder: nil), bookmarkManager: bookmarkManager)
 
         // WHEN
@@ -223,6 +226,7 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         let folder = BookmarkFolder(id: "1", title: #function)
         bookmarkStoreMock = BookmarkStoreMock(bookmarks: [folder])
         bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
+        bookmarkManager.loadBookmarks()
         let sut = AddEditBookmarkFolderDialogViewModel(mode: .edit(folder: folder, parentFolder: .mock), bookmarkManager: bookmarkManager)
 
         // WHEN
@@ -356,9 +360,9 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
 
         // THEN
         XCTAssertFalse(bookmarkStoreMock.updateFolderCalled)
-        XCTAssertTrue(bookmarkStoreMock.saveFolderCalled)
-        XCTAssertEqual(bookmarkStoreMock.capturedFolder?.title, #function)
-        XCTAssertEqual(bookmarkStoreMock.capturedParentFolder, folder)
+        let result = bookmarkStoreMock.saveEntitiesAtIndicesCalledWith?.first?.entity as? BookmarkFolder
+        XCTAssertEqual(result?.title, #function)
+        XCTAssertEqual(result?.parentFolderUUID, folder.id)
     }
 
     @MainActor
