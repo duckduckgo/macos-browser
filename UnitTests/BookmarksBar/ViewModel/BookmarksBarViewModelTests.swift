@@ -35,8 +35,7 @@ class BookmarksBarViewModelTests: XCTestCase {
     @MainActor
     func testWhenClippingTheLastBarItem_AndItemsCanBeClipped_ThenItemsAreClipped() {
         let bookmarks = [Bookmark.mock]
-        let storeMock = BookmarkStoreMock()
-        storeMock.bookmarks = bookmarks
+        let storeMock = BookmarkStoreMock(bookmarks: bookmarks)
 
         let manager = createMockBookmarksManager(mockBookmarkStore: storeMock)
         let bookmarksBarViewModel = BookmarksBarViewModel(bookmarkManager: manager, tabCollectionViewModel: .mock())
@@ -51,8 +50,7 @@ class BookmarksBarViewModelTests: XCTestCase {
     @MainActor
     func testWhenTheBarHasClippedItems_ThenClippedItemsCanBeRestored() {
         let bookmarks = [Bookmark.mock]
-        let storeMock = BookmarkStoreMock()
-        storeMock.bookmarks = bookmarks
+        let storeMock = BookmarkStoreMock(bookmarks: bookmarks)
 
         let manager = createMockBookmarksManager(mockBookmarkStore: storeMock)
         let bookmarksBarViewModel = BookmarksBarViewModel(bookmarkManager: manager, tabCollectionViewModel: .mock())
@@ -72,8 +70,7 @@ class BookmarksBarViewModelTests: XCTestCase {
     @MainActor
     func testWhenUpdatingFromBookmarkEntities_AndTheContainerCannotFitAnyBookmarks_ThenBookmarksAreImmediatelyClipped() {
         let bookmarks = [Bookmark.mock]
-        let storeMock = BookmarkStoreMock()
-        storeMock.bookmarks = bookmarks
+        let storeMock = BookmarkStoreMock(bookmarks: bookmarks)
 
         let manager = createMockBookmarksManager(mockBookmarkStore: storeMock)
         let bookmarksBarViewModel = BookmarksBarViewModel(bookmarkManager: manager, tabCollectionViewModel: .mock())
@@ -85,8 +82,7 @@ class BookmarksBarViewModelTests: XCTestCase {
     @MainActor
     func testWhenUpdatingFromBookmarkEntities_AndTheContainerCanFitAllBookmarks_ThenNoBookmarksAreClipped() {
         let bookmarks = [Bookmark.mock]
-        let storeMock = BookmarkStoreMock()
-        storeMock.bookmarks = bookmarks
+        let storeMock = BookmarkStoreMock(bookmarks: bookmarks)
 
         let manager = createMockBookmarksManager(mockBookmarkStore: storeMock)
         let bookmarksBarViewModel = BookmarksBarViewModel(bookmarkManager: manager, tabCollectionViewModel: .mock())

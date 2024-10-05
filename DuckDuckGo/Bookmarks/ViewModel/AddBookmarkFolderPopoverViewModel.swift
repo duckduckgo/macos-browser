@@ -73,7 +73,7 @@ final class AddBookmarkFolderPopoverViewModel: ObservableObject {
 
         isDisabled = true
         bookmarkManager.makeFolder(for: folderName.trimmingWhitespace(), parent: parent) { [completionHandler] result in
-            completionHandler(result)
+            completionHandler(try? result.get())
         }
     }
 

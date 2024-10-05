@@ -22,6 +22,7 @@ protocol BookmarksContextMenuDelegate: NSMenuDelegate, BookmarkSearchMenuItemSel
     var isSearching: Bool { get }
     var parentFolder: BookmarkFolder? { get }
     var shouldIncludeManageBookmarksItem: Bool { get }
+    var undoManager: UndoManager? { get }
 
     func selectedItems() -> [Any]
     func showDialog(_ dialog: any ModalView)
@@ -342,7 +343,7 @@ extension BookmarksContextMenu: BookmarkMenuItemSelectors {
             return
         }
 
-        bookmarkManager.remove(bookmark: bookmark)
+        bookmarkManager.remove(bookmark: bookmark, undoManager: bookmarksContextMenuDelegate?.undoManager)
     }
 
     @objc func deleteEntities(_ sender: NSMenuItem) {
@@ -351,7 +352,7 @@ extension BookmarksContextMenu: BookmarkMenuItemSelectors {
             return
         }
 
-        bookmarkManager.remove(objectsWithUUIDs: uuids)
+        bookmarkManager.remove(objectsWithUUIDs: uuids, undoManager: bookmarksContextMenuDelegate?.undoManager)
     }
 
     @MainActor
@@ -418,7 +419,7 @@ extension BookmarksContextMenu: FolderMenuItemSelectors {
             return
         }
 
-        bookmarkManager.remove(folder: folder)
+        bookmarkManager.remove(folder: folder, undoManager: bookmarksContextMenuDelegate?.undoManager)
     }
 
     @MainActor

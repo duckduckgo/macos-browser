@@ -135,8 +135,7 @@ final class AddEditBookmarkDialogCoordinatorViewModelTests: XCTestCase {
         let expectation = self.expectation(description: #function)
         let folder = BookmarkFolder(id: "1", title: "Folder")
         bookmarkViewModelMock.selectedFolder = folder
-        let bookmarkStoreMock = BookmarkStoreMock()
-        bookmarkStoreMock.bookmarks = [folder]
+        let bookmarkStoreMock = BookmarkStoreMock(bookmarks: [folder])
         let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
         bookmarkManager.loadBookmarks()
         let folderModel = AddEditBookmarkFolderDialogViewModel(mode: .add(parentFolder: nil), bookmarkManager: bookmarkManager)

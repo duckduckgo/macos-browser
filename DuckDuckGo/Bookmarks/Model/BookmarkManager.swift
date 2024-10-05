@@ -30,13 +30,13 @@ protocol BookmarkManager: AnyObject {
     func getBookmark(for url: URL) -> Bookmark?
     func getBookmark(forUrl url: String) -> Bookmark?
     func getBookmarkFolder(withId id: String) -> BookmarkFolder?
-    @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark?
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool, index: Int?, parent: BookmarkFolder?) -> Bookmark?
     func makeBookmarks(for websitesInfo: [WebsiteInfo], inNewFolderNamed folderName: String, withinParentFolder parent: ParentFolderType)
-    func makeFolder(for title: String, parent: BookmarkFolder?, completion: @escaping (BookmarkFolder) -> Void)
-    func remove(bookmark: Bookmark)
-    func remove(folder: BookmarkFolder)
-    func remove(objectsWithUUIDs uuids: [String])
+    func makeFolder(for title: String, parent: BookmarkFolder?, completion: @escaping (Result<BookmarkFolder, Error>) -> Void)
+    func remove(bookmark: Bookmark, undoManager: UndoManager?)
+    func remove(folder: BookmarkFolder, undoManager: UndoManager?)
+    func remove(objectsWithUUIDs uuids: [String], undoManager: UndoManager?)
+    func restore(_ entities: [RestorableBookmarkEntity], undoManager: UndoManager)
     func update(bookmark: Bookmark)
     func update(bookmark: Bookmark, withURL url: URL, title: String, isFavorite: Bool)
     func update(folder: BookmarkFolder)
@@ -68,7 +68,25 @@ protocol BookmarkManager: AnyObject {
     func requestSync()
 
 }
+extension BookmarkManager {
+    @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark? {
+        makeBookmark(for: url, title: title, isFavorite: isFavorite, index: nil, parent: nil)
+    }
+    func makeFolder(for title: String, completion: @escaping (Result<BookmarkFolder, Error>) -> Void) {
+        makeFolder(for: title, parent: nil, completion: completion)
+    }
+    func makeFolder(named title: String, parent: BookmarkFolder? = nil) async throws -> BookmarkFolder {
+        try await withCheckedThrowingContinuation { continuation in
+            makeFolder(for: title, parent: parent) { result in
+                continuation.resume(with: result)
+            }
+        }
+    }
 
+    func move(objectUUIDs: [String], toIndex index: Int?, withinParentFolder parent: ParentFolderType) {
+        move(objectUUIDs: objectUUIDs, toIndex: index, withinParentFolder: parent) { _ in }
+    }
+}
 final class LocalBookmarkManager: BookmarkManager {
     static let shared = LocalBookmarkManager()
 
@@ -163,10 +181,6 @@ final class LocalBookmarkManager: BookmarkManager {
         bookmarkStore.bookmarkFolder(withId: id)
     }
 
-    @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark? {
-        makeBookmark(for: url, title: title, isFavorite: isFavorite, index: nil, parent: nil)
-    }
-
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool, index: Int? = nil, parent: BookmarkFolder? = nil) -> Bookmark? {
         guard list != nil else { return nil }
 
@@ -179,7 +193,7 @@ final class LocalBookmarkManager: BookmarkManager {
         let bookmark = Bookmark(id: id, url: url.absoluteString, title: title, isFavorite: isFavorite, parentFolderUUID: parent?.id)
 
         list?.insert(bookmark)
-        bookmarkStore.save(bookmark: bookmark, parent: parent, index: index) { [weak self] success, _  in
+        bookmarkStore.save(bookmark: bookmark, index: index) { [weak self] success, _  in
             guard success else {
                 self?.list?.remove(bookmark)
                 return
@@ -198,13 +212,15 @@ final class LocalBookmarkManager: BookmarkManager {
         requestSync()
     }
 
-    func remove(bookmark: Bookmark) {
+    @MainActor
+    func remove(bookmark: Bookmark, undoManager: UndoManager?) {
         guard list != nil else { return }
         guard let latestBookmark = getBookmark(forUrl: bookmark.url) else {
             Logger.bookmarks.error("LocalBookmarkManager: Attempt to remove already removed bookmark")
             return
         }
 
+        undoManager?.registerUndoDeleteEntities([bookmark], bookmarkManager: self)
         list?.remove(latestBookmark)
         bookmarkStore.remove(objectsWithUUIDs: [bookmark.id]) { [weak self] success, _ in
             if !success {
@@ -216,17 +232,57 @@ final class LocalBookmarkManager: BookmarkManager {
         }
     }
 
-    func remove(folder: BookmarkFolder) {
+    @MainActor
+    func remove(folder: BookmarkFolder, undoManager: UndoManager?) {
+        undoManager?.registerUndoDeleteEntities([folder], bookmarkManager: self)
         bookmarkStore.remove(objectsWithUUIDs: [folder.id]) { [weak self] _, _ in
             self?.loadBookmarks()
             self?.requestSync()
         }
     }
 
-    func remove(objectsWithUUIDs uuids: [String]) {
+    @MainActor
+    func remove(objectsWithUUIDs uuids: [String], undoManager: UndoManager?) {
+        if let undoManager, let entities = bookmarkStore.bookmarkEntities(withIds: uuids) {
+            undoManager.registerUndoDeleteEntities(entities, bookmarkManager: self)
+        }
         bookmarkStore.remove(objectsWithUUIDs: uuids) { [weak self] _, _ in
             self?.loadBookmarks()
             self?.requestSync()
+        }
+    }
+
+    @MainActor
+    func restore(_ restorableEntities: [RestorableBookmarkEntity], undoManager: UndoManager) {
+        let entitiesAtIndices = restorableEntities.map { entity -> (entity: BaseBookmarkEntity, index: Int?) in
+            switch entity {
+            case let .bookmark(url: url, title: title, isFavorite: isFavorite, parent: parent, index: index):
+                let bookmark = Bookmark(id: UUID().uuidString, url: url, title: title, isFavorite: isFavorite, parentFolderUUID: parent?.actualId)
+                list?.insert(bookmark)
+                return (bookmark, index)
+
+            case let .folder(title: title, parent: parent, index: index, originalId: originalId):
+                return (BookmarkFolder(id: originalId.newId(), title: title, parentFolderUUID: parent?.actualId, children: []), index)
+            }
+        }
+        bookmarkStore.save(entitiesAtIndices: entitiesAtIndices) { [weak self] _ in
+            self?.loadBookmarks()
+            self?.requestSync()
+        }
+
+        var subfolderIds = Set<String>()
+        let topLevelUuids = entitiesAtIndices.reduce(into: [String]()) { (uuids, item) in
+            if item.entity.isFolder {
+                subfolderIds.insert(item.entity.id)
+            }
+            if let parentId = item.entity.parentFolderUUID, subfolderIds.contains(parentId) {
+                // don‘t include a nested item id as its parent will be removed with all its descendants
+                return
+            }
+            uuids.append(item.entity.id)
+        }
+        undoManager.registerUndo(withTarget: self) { @MainActor this in
+            this.remove(objectsWithUUIDs: topLevelUuids, undoManager: undoManager)
         }
     }
 
@@ -294,17 +350,17 @@ final class LocalBookmarkManager: BookmarkManager {
 
     // MARK: - Folders
 
-    func makeFolder(for title: String, parent: BookmarkFolder?, completion: @escaping (BookmarkFolder) -> Void) {
-
+    func makeFolder(for title: String, parent: BookmarkFolder?, completion: @escaping (Result<BookmarkFolder, Error>) -> Void) {
         let folder = BookmarkFolder(id: UUID().uuidString, title: title, parentFolderUUID: parent?.id, children: [])
 
-        bookmarkStore.save(folder: folder, parent: parent) { [weak self] success, _  in
-            guard success else {
+        bookmarkStore.save(folder: folder) { [weak self] _, error in
+            if let error {
+                completion(.failure(error))
                 return
             }
             self?.loadBookmarks()
             self?.requestSync()
-            completion(folder)
+            completion(.success(folder))
         }
     }
 
@@ -343,7 +399,6 @@ final class LocalBookmarkManager: BookmarkManager {
                 self?.requestSync()
             }
             completion(error)
-
         }
     }
 
@@ -436,6 +491,158 @@ final class LocalBookmarkManager: BookmarkManager {
         }
 
         return result
+    }
+
+}
+// MARK: - UndoManager
+@MainActor
+final class KnownBookmarkFolderIdList {
+    struct WeakRef {
+        weak var value: KnownBookmarkFolderIdList?
+    }
+    static var restorableFolders = [String: WeakRef]()
+
+    var knownIds: Set<String>
+    var actualId: String?
+
+    private init(uuid: String) {
+        self.knownIds = [uuid]
+        self.actualId = uuid
+    }
+
+    static func list(withId uuid: String) -> KnownBookmarkFolderIdList {
+        if let list = restorableFolders[uuid]?.value {
+            return list
+        }
+        let list = KnownBookmarkFolderIdList(uuid: uuid)
+        restorableFolders[uuid] = WeakRef(value: list)
+        return list
+    }
+
+    func resolve(withId actualId: String) {
+        self.knownIds.insert(actualId)
+        self.actualId = actualId
+    }
+
+    /// update known folder (ex) id list with actual id so the restored bookmarks referencing an old id are restored to this folder
+    func newId() -> String {
+        let newId = UUID().uuidString
+        self.resolve(withId: newId)
+        return newId
+    }
+
+    deinit {
+        MainActor.assumeIsolated {
+            for id in knownIds {
+                Self.restorableFolders[id] = nil
+            }
+        }
+    }
+}
+enum RestorableBookmarkEntity {
+    case bookmark(url: String, title: String, isFavorite: Bool, parent: KnownBookmarkFolderIdList?, index: Int?)
+    case folder(title: String, parent: KnownBookmarkFolderIdList?, index: Int?, originalId: KnownBookmarkFolderIdList)
+
+    @MainActor
+    init(bookmarkEntity: BaseBookmarkEntity, index: Int?) {
+        switch bookmarkEntity {
+        case let bookmark as Bookmark:
+            self = .bookmark(url: bookmark.url, title: bookmark.title, isFavorite: bookmark.isFavorite, parent: bookmark.parentFolderUUID.map(KnownBookmarkFolderIdList.list(withId:)), index: index)
+        case let folder as BookmarkFolder:
+            self = .folder(title: folder.title, parent: folder.parentFolderUUID.map(KnownBookmarkFolderIdList.list(withId:)), index: index, originalId: .list(withId: folder.id))
+        default:
+            fatalError("Unexpected entity type \(bookmarkEntity)")
+        }
+    }
+
+    var parent: KnownBookmarkFolderIdList? {
+        switch self {
+        case .bookmark(_, _, _, parent: let parent, index: _),
+             .folder(_, parent: let parent, index: _, originalId: _):
+            return parent
+        }
+    }
+    var index: Int? {
+        switch self {
+        case .bookmark(_, _, _, _, index: let index),
+             .folder(_, _, index: let index, originalId: _):
+            return index
+        }
+    }
+    var title: String {
+        switch self {
+        case .bookmark(_, title: let title, _, _, _),
+             .folder(title: let title, _, _, originalId: _):
+            return title
+        }
+    }
+}
+extension [RestorableBookmarkEntity] {
+    @MainActor
+    init(entities: [BaseBookmarkEntity], bookmarkManager: some BookmarkManager) {
+        assert(Set(entities.map(\.parentFolderUUID)).count == 1, "Removing multiple items at different levels has not been implemented/tested!")
+        assert(Set(entities.map(\.id)).count == entities.count, "Some entities are repeated in the passed array")
+
+        var folderCache = [String: BookmarkFolder]()
+        var removedFolderStack = [(folder: BookmarkFolder, index: Int?)]()
+        self = entities.map { entity in
+            // find index
+            let parent = if let parentId = entity.parentFolderUUID {
+                // cache already fetched parent folders
+                folderCache[parentId] ?? {
+                    guard let folder = bookmarkManager.getBookmarkFolder(withId: parentId) else { return nil }
+                    folderCache[folder.id] = folder
+                    return folder
+                }()
+            } else { BookmarkFolder?.none }
+
+            let siblings = parent?.children ?? bookmarkManager.list?.topLevelEntities
+            let index = siblings?.firstIndex(where: { $0.id == entity.id }) ?? -1
+
+            if let folder = entity as? BookmarkFolder {
+                removedFolderStack.append((folder, index))
+            }
+
+            return RestorableBookmarkEntity(bookmarkEntity: entity, index: index)
+        }.sorted {
+            $0.index ?? Int.max < $1.index ?? Int.max
+        }
+        removedFolderStack.sort {
+            $0.index ?? Int.max > $1.index ?? Int.max
+        }
+
+        while let (folder, _) = removedFolderStack.popLast() {
+            for entity in folder.children {
+                // children items of a removed folder are inserted in the original order so we don‘t need to track their indices
+                self.append(RestorableBookmarkEntity(bookmarkEntity: entity, index: nil))
+
+                if let folder = entity as? BookmarkFolder {
+                    removedFolderStack.append((folder, nil))
+                }
+            }
+        }
+    }
+}
+private extension UndoManager {
+
+    @MainActor
+    func registerUndoDeleteEntities(_ entities: [BaseBookmarkEntity], bookmarkManager: some BookmarkManager) {
+        let restorableEntities = [RestorableBookmarkEntity].init(entities: entities, bookmarkManager: bookmarkManager)
+        registerUndo(withTarget: bookmarkManager) { bookmarkManager in
+            bookmarkManager.restore(restorableEntities, undoManager: self)
+        }
+        if !isUndoing {
+            let actionName = if entities.count == 1 {
+                if entities[0].isFolder {
+                    UserText.deleteFolder
+                } else {
+                    UserText.deleteBookmark
+                }
+            } else {
+                UserText.mainMenuEditDelete
+            }
+            setActionName(actionName)
+        }
     }
 }
 
