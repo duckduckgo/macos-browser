@@ -108,7 +108,7 @@ extension Tab {
         }
 
         static func == (lhs: Tab.UserDialog, rhs: Tab.UserDialog) -> Bool {
-            lhs.sender == rhs.sender && rhs.dialog == rhs.dialog
+            lhs.sender == rhs.sender && lhs.dialog == rhs.dialog
         }
 
     }

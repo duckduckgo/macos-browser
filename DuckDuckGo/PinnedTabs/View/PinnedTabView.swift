@@ -49,7 +49,10 @@ struct PinnedTabView: View, DropDelegate {
             .buttonStyle(TouchDownButtonStyle())
             .cornerRadius(Const.cornerRadius, corners: [.topLeft, .topRight])
             .contextMenu { contextMenu }
-            .onDrop(of: ["public.text"], delegate: self)
+            .onDrop(of: [
+                NSPasteboard.PasteboardType.URL.rawValue,
+                NSPasteboard.PasteboardType.string.rawValue,
+            ], delegate: self)
 
             BorderView(isSelected: isSelected,
                        cornerRadius: Const.cornerRadius,
@@ -66,16 +69,16 @@ struct PinnedTabView: View, DropDelegate {
     }
 
     func performDrop(info: DropInfo) -> Bool {
-        if let item = info.itemProviders(for: ["public.utf8-plain-text"]).first {
-            item.loadItem(forTypeIdentifier: "public.utf8-plain-text", options: nil) { (data, _) in
-                if let data = data as? Data, let droppedString = NSString(data: data, encoding: NSUTF8StringEncoding) {
-                    print(droppedString)
-                    let url = URL.makeURL(from: droppedString as String)!
+        guard let item = info.itemProviders(for: [.url, .text, .data]).first,
+              let typeIdentifier = [
+                NSPasteboard.PasteboardType.URL.rawValue,
+                NSPasteboard.PasteboardType.string.rawValue
+              ].first(where: { item.registeredTypeIdentifiers.contains($0) }) else { return false }
 
-                    DispatchQueue.main.async {
-                        model.setUrl(url, source: .ui)
-                    }
-                }
+        item.loadItem(forTypeIdentifier: typeIdentifier) { (result, _) in
+            guard let url = result as? URL ?? ((result as? Data)?.utf8String() ?? result as? String).flatMap(URL.makeURL(from:)) else { return }
+            DispatchQueue.main.async {
+                model.setUrl(url, source: .userEntered(url.absoluteString, downloadRequested: false))
             }
         }
         return true

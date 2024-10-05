@@ -128,9 +128,11 @@ public struct UserValues: Codable {
 public struct UIUserValues: Codable {
     /// If this value is true, we force the FE layer to play in duck player even if the settings is off
     let playInDuckPlayer: Bool
+    let allowFirstVideo: Bool
 
-    init(onboardingDecider: DuckPlayerOnboardingDecider) {
+    init(onboardingDecider: DuckPlayerOnboardingDecider, allowFirstVideo: Bool = false) {
         self.playInDuckPlayer = onboardingDecider.shouldOpenFirstVideoOnDuckPlayer
+        self.allowFirstVideo = allowFirstVideo
     }
 }
 
@@ -308,7 +310,18 @@ final class DuckPlayer {
     private func encodedOverlaySettings(with webView: WKWebView?) async -> InitialOverlaySettings {
         let userValues = encodeUserValues()
 
-        return InitialOverlaySettings(userValues: userValues, ui: UIUserValues(onboardingDecider: onboardingDecider))
+        /// If the user clicked on "Watch on Youtube" the next vide should open directly on youtube instead of displaying the overlay
+        var allowFirstVideo = shouldOpenNextVideoOnYoutube
+
+        /// Reset the flag for subsequent videos
+        shouldOpenNextVideoOnYoutube = false
+        return InitialOverlaySettings(userValues: userValues,
+                                      ui: UIUserValues(onboardingDecider: onboardingDecider,
+                                                       allowFirstVideo: allowFirstVideo))
+    }
+
+    public func setNextVideoToOpenOnYoutube() {
+        self.shouldOpenNextVideoOnYoutube = true
     }
 
     // MARK: - Private
@@ -326,6 +339,7 @@ final class DuckPlayer {
     private var isPiPFeatureEnabled: Bool
     private var isAutoplayFeatureEnabled: Bool
     private let onboardingDecider: DuckPlayerOnboardingDecider
+    private var shouldOpenNextVideoOnYoutube: Bool = false
 
     private func bindDuckPlayerModeIfNeeded() {
         if isFeatureEnabled {

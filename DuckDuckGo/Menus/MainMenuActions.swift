@@ -158,7 +158,7 @@ extension AppDelegate {
 
     @MainActor
     @objc func showWhatIsNew(_ sender: Any?) {
-        WindowControllersManager.shared.showTab(with: .url(.updates, source: .appOpenUrl))
+        WindowControllersManager.shared.showTab(with: .url(.updates, source: .ui))
     }
 
     #if FEEDBACK
@@ -840,6 +840,10 @@ extension MainViewController {
 
     @objc func resetDuckPlayerPreferences(_ sender: Any?) {
         DuckPlayerPreferences.shared.reset()
+    }
+
+    @objc func resetSyncPromoPrompts(_ sender: Any?) {
+        SyncPromoManager().resetPromos()
     }
 
     @objc func internalUserState(_ sender: Any?) {

@@ -38,6 +38,7 @@ final class BookmarksBarViewController: NSViewController {
     private let dragDropManager: BookmarkDragDropManager
     private let viewModel: BookmarksBarViewModel
     private let tabCollectionViewModel: TabCollectionViewModel
+    private let appereancePreferences: AppearancePreferencesPersistor
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -59,9 +60,14 @@ final class BookmarksBarViewController: NSViewController {
         }!
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared, dragDropManager: BookmarkDragDropManager = BookmarkDragDropManager.shared) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel,
+          bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
+          dragDropManager: BookmarkDragDropManager = BookmarkDragDropManager.shared,
+          appereancePreferences: AppearancePreferencesPersistor = AppearancePreferencesUserDefaultsPersistor()
+    ) {
         self.bookmarkManager = bookmarkManager
         self.dragDropManager = dragDropManager
+        self.appereancePreferences = appereancePreferences
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.viewModel = BookmarksBarViewModel(bookmarkManager: bookmarkManager, dragDropManager: dragDropManager, tabCollectionViewModel: tabCollectionViewModel)
@@ -98,7 +104,6 @@ final class BookmarksBarViewController: NSViewController {
 
         bookmarksBarCollectionView.delegate = viewModel
         bookmarksBarCollectionView.dataSource = viewModel
-        bookmarksBarCollectionView.collectionViewLayout = createCenteredCollectionViewLayout()
 
         view.postsFrameChangedNotifications = true
         bookmarksBarCollectionView.setAccessibilityIdentifier("BookmarksBarViewController.bookmarksBarCollectionView")
@@ -120,6 +125,7 @@ final class BookmarksBarViewController: NSViewController {
 
         subscribeToEvents()
         refreshFavicons()
+        bookmarksBarCollectionView.collectionViewLayout = createCenterAlignedCollectionViewLayout(centered: appereancePreferences.centerAlignedBookmarksBar)
     }
 
     override func viewDidAppear() {
@@ -164,6 +170,13 @@ final class BookmarksBarViewController: NSViewController {
         NotificationCenter.default.publisher(for: .faviconCacheUpdated)
             .sink { [weak self] _ in
                 self?.refreshFavicons()
+            }
+            .store(in: &cancellables)
+
+        NotificationCenter.default.publisher(for: AppearancePreferences.Notifications.bookmarksBarAlignmentChanged)
+            .compactMap { $0.userInfo?[AppearancePreferences.Constants.bookmarksBarAlignmentChangedIsCenterAlignedParameter] as? Bool }
+            .sink { [weak self] isCenterAligned in
+                self?.bookmarksBarCollectionView.collectionViewLayout = self?.createCenterAlignedCollectionViewLayout(centered: isCenterAligned)
             }
             .store(in: &cancellables)
 
@@ -228,14 +241,14 @@ final class BookmarksBarViewController: NSViewController {
 
     // MARK: - Layout
 
-    private func createCenteredLayout(centered: Bool) -> NSCollectionLayoutSection {
-        let group = NSCollectionLayoutGroup.horizontallyCentered(cellSizes: viewModel.cellSizes, interItemSpacing: BookmarksBarViewModel.Constants.buttonSpacing, centered: centered)
+    private func createAlignedLayout(centered: Bool) -> NSCollectionLayoutSection {
+        let group = NSCollectionLayoutGroup.align(cellSizes: viewModel.cellSizes, interItemSpacing: BookmarksBarViewModel.Constants.buttonSpacing, centered: centered)
         return NSCollectionLayoutSection(group: group)
     }
 
-    func createCenteredCollectionViewLayout() -> NSCollectionViewLayout {
-        return BookmarksBarCenteredLayout { [unowned self] _, _ in
-            return createCenteredLayout(centered: viewModel.clippedItems.isEmpty)
+    private func createCenterAlignedCollectionViewLayout(centered: Bool) -> NSCollectionViewLayout {
+        return BookmarksBarCenterAlignedLayout { [unowned self] _, _ in
+            return createAlignedLayout(centered: centered && viewModel.clippedItems.isEmpty)
         }
     }
 

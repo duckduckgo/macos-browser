@@ -64,7 +64,9 @@ final class BookmarkStoreMock: BookmarkStore {
     var loadError: Error?
     func loadAll(type: BookmarkStoreFetchPredicateType, completion: @escaping ([BaseBookmarkEntity]?, Error?) -> Void) {
         loadAllCalled = true
-        store?.loadAll(type: type, completion: completion)
+        store?.loadAll(type: type, completion: completion) ?? {
+            completion(bookmarks, loadError)
+        }()
     }
 
     var saveBookmarkSuccess: Bool {

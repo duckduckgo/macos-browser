@@ -129,7 +129,6 @@ extension Preferences {
 
                 // SECTION 4: Bookmarks Bar
                 PreferencePaneSection(UserText.showBookmarksBar) {
-
                     HStack {
                         ToggleMenuItem(UserText.showBookmarksBarPreference, isOn: $model.showBookmarksBar)
                             .accessibilityIdentifier("Preferences.AppearanceView.showBookmarksBarPreferenceToggle")
@@ -149,6 +148,22 @@ extension Preferences {
                             return button
                         }
                         .disabled(!model.showBookmarksBar)
+                    }
+
+                    HStack {
+                        Text(UserText.preferencesBookmarksCenterAlignBookmarksBarTitle)
+                        NSPopUpButtonView(selection: $model.centerAlignedBookmarksBarBool) {
+                            let button = NSPopUpButton()
+                            button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+
+                            let leftAligned = button.menu?.addItem(withTitle: UserText.preferencesBookmarksLeftAlignBookmarksBare, action: nil, keyEquivalent: "")
+                            leftAligned?.representedObject = false
+
+                            let centerAligned = button.menu?.addItem(withTitle: UserText.preferencesBookmarksCenterAlignBookmarksBar, action: nil, keyEquivalent: "")
+                            centerAligned?.representedObject = true
+
+                            return button
+                        }
                     }
                 }
             }

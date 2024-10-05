@@ -29,9 +29,6 @@ public enum FeatureFlag: String {
     /// https://app.asana.com/0/1199230911884351/1205979030848528/f
     case appendAtbToSerpQueries
 
-    // https://app.asana.com/0/72649045549333/1207597760316574/f
-    case deduplicateLoginsOnImport
-
     // https://app.asana.com/0/1206488453854252/1207136666798700/f
     case freemiumPIR
 
@@ -50,8 +47,6 @@ extension FeatureFlag: FeatureFlagSourceProviding {
             return .internalOnly
         case .sslCertificatesBypass:
             return .remoteReleasable(.subfeature(SslCertificatesSubfeature.allowBypass))
-        case .deduplicateLoginsOnImport:
-            return .remoteReleasable(.subfeature(AutofillSubfeature.deduplicateLoginsOnImport))
         case .unknownUsernameCategorization:
             return .remoteReleasable(.subfeature(AutofillSubfeature.unknownUsernameCategorization))
         case .freemiumPIR:

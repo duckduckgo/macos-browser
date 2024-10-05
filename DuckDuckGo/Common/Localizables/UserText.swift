@@ -186,6 +186,11 @@ struct UserText {
     static let mainMenuBookmarksShowBookmarksBarAlways = NSLocalizedString("Always Show", comment: "Preference for always showing the bookmarks bar")
     static let mainMenuBookmarksShowBookmarksBarNewTabOnly = NSLocalizedString("Only Show on New Tab", comment: "Preference for only showing the bookmarks bar on new tab")
     static let mainMenuBookmarksShowBookmarksBarNever = NSLocalizedString("Never Show", comment: "Preference for never showing the bookmarks bar on new tab")
+    static let mainMenuBookmarksLeftAlignBookmarksBar = NSLocalizedString("Align Bookmarks to Left", comment: "Preference for left aligning the bookmarks bar")
+    static let mainMenuBookmarksCenterAlignBookmarksBar = NSLocalizedString("Align Bookmarks to Center", comment: "Preference for center aligning the bookmarks bar")
+    static let preferencesBookmarksCenterAlignBookmarksBarTitle = NSLocalizedString("Align Bookmarks", comment: "Preference title aligning the bookmarks bar")
+    static let preferencesBookmarksCenterAlignBookmarksBar = NSLocalizedString("Center", comment: "Preference title aligning the bookmarks bar")
+    static let preferencesBookmarksLeftAlignBookmarksBare = NSLocalizedString("Left", comment: "Preference title aligning the bookmarks bar")
 
     // MARK: - Main Menu -> Window
     static let mainMenuWindow = NSLocalizedString("Window", comment: "Main Menu ")
@@ -727,6 +732,8 @@ struct UserText {
     }
 
     static let importLoginsPasswords = NSLocalizedString("import.logins.passwords", value: "Passwords", comment: "Title text for the Passwords import option")
+    static let importLoginsPasswordsExplainer = NSLocalizedString("import.logins.passwords.explainer", value: "Passwords are encrypted. Viewing them or filling out forms requires Touch ID or a password. Nobody but you can see your passwords, not even us. Find Passwords in DuckDuckGo Settings > Passwords & Autofill.", comment: "Explanatory text for the Passwords import option to alleviate security concerns and explain usage.")
+    static let importLoginsPasswordsExplainerAutolockOff = NSLocalizedString("import.logins.passwords.explainer.autolock.off", value: "Passwords are encrypted. We recommend setting up Auto-lock to keep your passwords even more secure. Set it up in DuckDuckGo Settings > Passwords & Autofill.", comment: "Explanatory text for the Passwords import option to alleviate security concerns and explain usage when autolock is disabled")
 
     static let importBookmarksButtonTitle = NSLocalizedString("bookmarks.import.button.title", value: "Import", comment: "Button text to open bookmark import dialog")
     static let initiateImport = NSLocalizedString("import.data.initiate", value: "Import", comment: "Button text for importing data")
@@ -988,7 +995,8 @@ struct UserText {
     static let manageBookmarksTooltip = NSLocalizedString("tooltip.bookmarks.manage-bookmarks", value: "Manage bookmarks", comment: "Tooltip for the Manage Bookmarks button")
     static let bookmarksManage = NSLocalizedString("bookmarks.manage", value: "Manage", comment: "Button for opening the bookmarks management interface")
     static let bookmarksSearch = NSLocalizedString("tooltip.bookmarks.search", value: "Search bookmarks", comment: "Tooltip to activate the bookmark search")
-    static let bookmarksSort = NSLocalizedString("tooltip.bookmarks.sort", value: "Sort bookmarks", comment: "Tooltip to activate the bookmark sort")
+    static let bookmarksSort = NSLocalizedString("tooltip.bookmarks.sort", value: "Sort", comment: "Tooltip to activate the bookmark sort")
+    static let bookmarksSortByNameTitle = NSLocalizedString("tooltip.bookmarks.sort.name.title", value: "Sort by Name", comment: "Title when bookmark sort by name is enabled")
     static let bookmarksSortManual = NSLocalizedString("bookmarks.sort.manual", value: "Manual", comment: "Button to sort bookmarks by manual")
     static let bookmarksSortByName = NSLocalizedString("bookmarks.sort.name", value: "Name", comment: "Button to sort bookmarks by name ascending")
     static let bookmarksSortByNameAscending = NSLocalizedString("bookmarks.sort.name.asc", value: "Ascending", comment: "Button to sort bookmarks by name ascending")
@@ -1297,5 +1305,16 @@ struct UserText {
     // Key: "subscription.progress.view.completing.purchase"
     // Comment: "Progress view title when completing the purchase"
     static let completingPurchaseTitle = "Completing purchase..."
+
+    // Mark: Sync Promo
+    static let syncPromoBookmarksTitle = NSLocalizedString("sync.promo.bookmarks.title", value:"Sync & Back Up Your Bookmarks", comment: "Title for the Sync Promotion banner")
+    static let syncPromoPasswordsTitle = NSLocalizedString("sync.promo.passwords.title", value:"Sync & Back Up Your Passwords  ", comment: "Title for the Sync Promotion banner")
+    static let syncPromoBookmarksMessage = NSLocalizedString("sync.promo.bookmarks.message", value:"No account needed. End-to-end encryption means nobody but you can see your bookmarks, not even us.", comment: "Message for the Sync Promotion banner when user has bookmarks that can be synced")
+    static let syncPromoPasswordsMessage = NSLocalizedString("sync.promo.passwords.message", value:"No account needed. End-to-end encryption means nobody but you can see your passwords, not even us.", comment: "Message for the Sync Promotion banner when user has passwords that can be synced")
+    static let syncPromoConfirmAction = NSLocalizedString("sync.promo.confirm.action", value:"Set Up Sync", comment: "Title for a button in the Sync Promotion banner to set up Sync")
+    static let syncPromoDismissAction = NSLocalizedString("sync.promo.dismiss.action", value:"No Thanks", comment: "Title for a button in the Sync Promotion banner to dismiss Sync promotion banner")
+    static let syncPromoSidePanelTitle = NSLocalizedString("sync.promo.passwords.side.panel.title", value:"Setup", comment: "Title for the Sync Promotion in passwords side panel")
+    static let syncPromoSidePanelSubtitle = NSLocalizedString("sync.promo.passwords.side.panel.subtitle", value:"Sync & Backup", comment: "Subtitle for the Sync Promotion in passwords side panel")
+
 
 }
