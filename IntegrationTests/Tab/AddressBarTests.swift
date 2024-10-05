@@ -196,7 +196,7 @@ class AddressBarTests: XCTestCase {
     }
 
     @MainActor
-    func testWhenAddressIsTyped_LoadedTopHitSuggestionIsCorrectlyAppendedAndSelected() /*async throws*/ {
+    func testWhenAddressIsTyped_LoadedTopHitSuggestionIsCorrectlyAppendedAndSelected() {
         let tab = Tab(content: .newtab)
         window = WindowsManager.openNewWindow(with: tab)!
 
