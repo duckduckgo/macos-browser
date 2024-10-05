@@ -49,7 +49,7 @@ jobs:
             platform:"macos" \
             version:"${{ inputs.version }}" \
             github_handle:"${{ github.actor }}" \
-            validation_section_id:"${{ vars.TEST_MACOS_APP_BOARD_VALIDATION_SECTION_ID }}" \
+            target_section_id:"${{ vars.TEST_MACOS_APP_BOARD_VALIDATION_SECTION_ID }}" \
 
   # run_tests:
 
