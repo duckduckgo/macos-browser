@@ -163,6 +163,12 @@ final class AutofillPreferences: AutofillPreferencesPersistor {
 
     private let injectedDependencyStore: StatisticsStore?
     private lazy var defaultDependencyStore: StatisticsStore = {
+#if DEBUG
+        // To prevent an assertion failure deep within dependencies in Database.makeDatabase
+        if [.unitTests, .xcPreviews].contains(NSApp.runType) {
+            return StubStatisticsStore()
+        }
+#endif
         return LocalStatisticsStore()
     }()
 

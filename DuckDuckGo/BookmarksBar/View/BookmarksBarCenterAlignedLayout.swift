@@ -1,5 +1,5 @@
 //
-//  HorizontallyCenteredLayout.swift
+//  BookmarksBarCenterAlignedLayout.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -23,7 +23,7 @@ extension NSCollectionView {
 
 extension NSCollectionLayoutGroup {
 
-    static func horizontallyCentered(cellSizes: [CGSize], interItemSpacing: CGFloat, centered: Bool = true) -> NSCollectionLayoutGroup {
+    static func align(cellSizes: [CGSize], interItemSpacing: CGFloat, centered: Bool) -> NSCollectionLayoutGroup {
         let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(28))
 
         return custom(layoutSize: groupSize) { environment in
@@ -34,15 +34,11 @@ extension NSCollectionLayoutGroup {
             var items: [NSCollectionLayoutGroupCustomItem] = []
             var horizontalPosition: CGFloat
 
-            // Derive initial horizontal position:
-
             if centered {
                 horizontalPosition = (environment.container.effectiveContentSize.width - totalWidth) / 2 + environment.container.contentInsets.leading
             } else {
                 horizontalPosition = interItemSpacing
             }
-
-            // Calculate frames for layout group items:
 
             let rowItems: [NSCollectionLayoutGroupCustomItem] = cellSizes.map { size in
                 let origin = CGPoint(x: ceil(horizontalPosition), y: verticalPosition + (maxItemHeight - size.height) / 2)
@@ -59,9 +55,9 @@ extension NSCollectionLayoutGroup {
     }
 }
 
-final class BookmarksBarCenteredLayout: NSCollectionViewCompositionalLayout {
+final class BookmarksBarCenterAlignedLayout: NSCollectionViewCompositionalLayout {
 
-    private static let interItemGapWidth: CGFloat = 16
+    private static let interItemGapWidth: CGFloat = 2.0
 
     private var lastKnownInterItemGapIndicatorLayoutAttributes: NSCollectionViewLayoutAttributes?
 

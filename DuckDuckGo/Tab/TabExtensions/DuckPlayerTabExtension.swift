@@ -281,13 +281,14 @@ extension DuckPlayerTabExtension: NavigationResponder {
         // When the feature is disabled but the webView still gets a Private Player URL,
         // convert it back to a regular YouTube video URL.
         if navigationAction.url.isDuckPlayer {
-            guard let (videoID, timestamp) = navigationAction.url.youtubeVideoParams,
-                  let mainFrame = navigationAction.mainFrameTarget else {
+            guard let (videoID, timestamp) = navigationAction.url.youtubeVideoParams else {
                 return .cancel
             }
 
-            return .redirect(mainFrame) { navigator in
-                navigator.load(URLRequest(url: .youtube(videoID, timestamp: timestamp)))
+            if let mainFrame = navigationAction.mainFrameTarget {
+                return .redirect(mainFrame) { navigator in
+                    navigator.load(URLRequest(url: .youtube(videoID, timestamp: timestamp)))
+                }
             }
         }
         return .next
@@ -319,6 +320,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
         // “Watch in YouTube” selected
         // when currently displayed content is the Duck Player and loading a YouTube URL, don‘t override it
         if didUserSelectWatchInYoutubeFromDuckPlayer(navigationAction, preferences: preferences, videoID: videoID) {
+            duckPlayer.setNextVideoToOpenOnYoutube()
             PixelKit.fire(GeneralPixel.duckPlayerWatchOnYoutube)
             return .next
 

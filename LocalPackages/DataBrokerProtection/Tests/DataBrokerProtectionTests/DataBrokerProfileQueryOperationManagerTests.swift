@@ -1074,6 +1074,10 @@ extension ExtractedProfile {
     static func mockWithRemoveDate(_ date: Date) -> ExtractedProfile {
         ExtractedProfile(id: 1, name: "Some name", profileUrl: "someURL", removedDate: date, identifier: "someURL")
     }
+
+    static func mockWithName(_ name: String, alternativeNames: [String]? = nil, age: String, addresses: [AddressCityState], relatives: [String]? = nil) -> ExtractedProfile {
+        ExtractedProfile(id: 1, name: name, alternativeNames: [], addressFull: nil, addresses: addresses, phoneNumbers: nil, relatives: nil, profileUrl: "someUrl", age: age, identifier: "someUrl")
+    }
 }
 
 extension AttemptInformation {
