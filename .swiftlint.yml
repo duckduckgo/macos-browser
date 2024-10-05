@@ -67,6 +67,8 @@ file_header:
 excluded:
   - DuckDuckGo/Common/Localizables/UserText.swift
   - LocalPackages/*/Package.swift
+  - scripts
+  - DerivedData
   - release
   - vendor
   - DerivedData

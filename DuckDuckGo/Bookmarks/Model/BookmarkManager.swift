@@ -353,7 +353,7 @@ final class LocalBookmarkManager: BookmarkManager {
     func makeFolder(for title: String, parent: BookmarkFolder?, completion: @escaping (Result<BookmarkFolder, Error>) -> Void) {
         let folder = BookmarkFolder(id: UUID().uuidString, title: title, parentFolderUUID: parent?.id, children: [])
 
-        bookmarkStore.save(folder: folder) { [weak self] success, error  in
+        bookmarkStore.save(folder: folder) { [weak self] _, error in
             if let error {
                 completion(.failure(error))
                 return
