@@ -63,9 +63,30 @@ final class BookmarkStoreMock: BookmarkStore {
     private var bookmarks: [BaseBookmarkEntity]?
     var loadError: Error?
     func loadAll(type: BookmarkStoreFetchPredicateType, completion: @escaping ([BaseBookmarkEntity]?, Error?) -> Void) {
+        func flattenedBookmarks(_ entities: [BaseBookmarkEntity]) -> [BaseBookmarkEntity] {
+            var result = [BaseBookmarkEntity]()
+            for entity in entities {
+                if let bookmark = entity as? Bookmark {
+                    result.append(bookmark)
+                } else if let folder = entity as? BookmarkFolder {
+                    result.append(contentsOf: flattenedBookmarks(folder.children))
+                }
+            }
+            return result
+        }
+
         loadAllCalled = true
         store?.loadAll(type: type, completion: completion) ?? {
-            completion(bookmarks, loadError)
+            let result: [BaseBookmarkEntity]
+            switch type {
+            case .bookmarks:
+                result = flattenedBookmarks(bookmarks ?? [])
+            case .favorites:
+                result = flattenedBookmarks(bookmarks ?? []).filter { ($0 as? Bookmark)!.isFavorite }
+            case .topLevelEntities:
+                result = bookmarks ?? []
+            }
+            completion(result, loadError)
         }()
     }
 
