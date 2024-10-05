@@ -34,6 +34,7 @@ protocol AppearancePreferencesPersistor {
     var bookmarksBarAppearance: BookmarksBarAppearance { get set }
     var homeButtonPosition: HomeButtonPosition { get set }
     var homePageCustomBackground: String? { get set }
+    var centerAlignedBookmarksBar: Bool { get set }
 }
 
 struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersistor {
@@ -81,6 +82,9 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
 
     @UserDefaultsWrapper(key: .homePageCustomBackground, defaultValue: nil)
     var homePageCustomBackground: String?
+
+    @UserDefaultsWrapper(key: .centerAlignedBookmarksBar, defaultValue: true)
+    var centerAlignedBookmarksBar: Bool
 }
 
 protocol HomePageNavigator {
@@ -165,6 +169,11 @@ final class AppearancePreferences: ObservableObject {
     struct Notifications {
         static let showBookmarksBarSettingChanged = NSNotification.Name("ShowBookmarksBarSettingChanged")
         static let bookmarksBarSettingAppearanceChanged = NSNotification.Name("BookmarksBarSettingAppearanceChanged")
+        static let bookmarksBarAlignmentChanged = NSNotification.Name("BookmarksBarAlignmentChanged")
+    }
+
+    struct Constants {
+        static let bookmarksBarAlignmentChangedIsCenterAlignedParameter = "isCenterAligned"
     }
 
     static let shared = AppearancePreferences()
@@ -246,6 +255,15 @@ final class AppearancePreferences: ObservableObject {
         }
     }
 
+    @Published var centerAlignedBookmarksBarBool: Bool {
+        didSet {
+            persistor.centerAlignedBookmarksBar = centerAlignedBookmarksBarBool
+            NotificationCenter.default.post(name: Notifications.bookmarksBarAlignmentChanged,
+                                            object: nil,
+                                            userInfo: [Constants.bookmarksBarAlignmentChangedIsCenterAlignedParameter: centerAlignedBookmarksBarBool])
+        }
+    }
+
     var isContinueSetUpAvailable: Bool {
         let osVersion = ProcessInfo.processInfo.operatingSystemVersion
 
@@ -277,6 +295,7 @@ final class AppearancePreferences: ObservableObject {
         bookmarksBarAppearance = persistor.bookmarksBarAppearance
         homeButtonPosition = persistor.homeButtonPosition
         homePageCustomBackground = persistor.homePageCustomBackground.flatMap(CustomBackground.init)
+        centerAlignedBookmarksBarBool = persistor.centerAlignedBookmarksBar
     }
 
     private var persistor: AppearancePreferencesPersistor

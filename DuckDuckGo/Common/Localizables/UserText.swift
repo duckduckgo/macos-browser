@@ -187,6 +187,11 @@ struct UserText {
     static let mainMenuBookmarksShowBookmarksBarAlways = NSLocalizedString("Always Show", comment: "Preference for always showing the bookmarks bar")
     static let mainMenuBookmarksShowBookmarksBarNewTabOnly = NSLocalizedString("Only Show on New Tab", comment: "Preference for only showing the bookmarks bar on new tab")
     static let mainMenuBookmarksShowBookmarksBarNever = NSLocalizedString("Never Show", comment: "Preference for never showing the bookmarks bar on new tab")
+    static let mainMenuBookmarksLeftAlignBookmarksBar = NSLocalizedString("Align Bookmarks to Left", comment: "Preference for left aligning the bookmarks bar")
+    static let mainMenuBookmarksCenterAlignBookmarksBar = NSLocalizedString("Align Bookmarks to Center", comment: "Preference for center aligning the bookmarks bar")
+    static let preferencesBookmarksCenterAlignBookmarksBarTitle = NSLocalizedString("Align Bookmarks", comment: "Preference title aligning the bookmarks bar")
+    static let preferencesBookmarksCenterAlignBookmarksBar = NSLocalizedString("Center", comment: "Preference title aligning the bookmarks bar")
+    static let preferencesBookmarksLeftAlignBookmarksBare = NSLocalizedString("Left", comment: "Preference title aligning the bookmarks bar")
 
     // MARK: - Main Menu -> Window
     static let mainMenuWindow = NSLocalizedString("Window", comment: "Main Menu ")
@@ -995,7 +1000,8 @@ struct UserText {
     static let manageBookmarksTooltip = NSLocalizedString("tooltip.bookmarks.manage-bookmarks", value: "Manage bookmarks", comment: "Tooltip for the Manage Bookmarks button")
     static let bookmarksManage = NSLocalizedString("bookmarks.manage", value: "Manage", comment: "Button for opening the bookmarks management interface")
     static let bookmarksSearch = NSLocalizedString("tooltip.bookmarks.search", value: "Search bookmarks", comment: "Tooltip to activate the bookmark search")
-    static let bookmarksSort = NSLocalizedString("tooltip.bookmarks.sort", value: "Sort bookmarks", comment: "Tooltip to activate the bookmark sort")
+    static let bookmarksSort = NSLocalizedString("tooltip.bookmarks.sort", value: "Sort", comment: "Tooltip to activate the bookmark sort")
+    static let bookmarksSortByNameTitle = NSLocalizedString("tooltip.bookmarks.sort.name.title", value: "Sort by Name", comment: "Title when bookmark sort by name is enabled")
     static let bookmarksSortManual = NSLocalizedString("bookmarks.sort.manual", value: "Manual", comment: "Button to sort bookmarks by manual")
     static let bookmarksSortByName = NSLocalizedString("bookmarks.sort.name", value: "Name", comment: "Button to sort bookmarks by name ascending")
     static let bookmarksSortByNameAscending = NSLocalizedString("bookmarks.sort.name.asc", value: "Ascending", comment: "Button to sort bookmarks by name ascending")
