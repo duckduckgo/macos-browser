@@ -95,7 +95,7 @@ jobs:
           ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
           GITHUB_TOKEN: ${{ github.token }}
         run: |
-          bundle exec fastlane run increment_build_number platform:"macos"
+          bundle exec fastlane run bump_build_number platform:"macos"
 
   # prepare_release:
   #   name: Prepare Release
