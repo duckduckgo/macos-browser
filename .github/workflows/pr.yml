@@ -138,6 +138,8 @@ jobs:
       run: |
         cd pir-fake-broker 
         ./scripts/install-prerequisites.sh
+        echo "${{ secrets.PIR_FAKE_BROKER_SETUP }}" > packages/server/.env
+        pnpm start:all
 
     - name: Register SSH key for certificates repository access
       uses: webfactory/ssh-agent@v0.7.0
