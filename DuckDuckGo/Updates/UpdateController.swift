@@ -259,8 +259,12 @@ extension UpdateController: SPUUpdaterDelegate {
     }
 
     func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {
-        Logger.updates.debug("Updater did finish update cycle")
-        updateProgress = .updateCycleDone
+        if error == nil {
+            Logger.updates.debug("Updater did finish update cycle")
+            updateProgress = .updateCycleDone
+        } else {
+            Logger.updates.debug("Updater did finish update cycle with error")
+        }
     }
 
 }
