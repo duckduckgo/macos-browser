@@ -175,10 +175,10 @@ extension Preferences {
         }
 
 #if SPARKLE
-        private var formatter: ByteCountFormatter {
-            let formatter = ByteCountFormatter()
-            formatter.allowsNonnumericFormatting = false
-            formatter.allowedUnits = [.useKB, .useMB, .useGB]
+        private var formatter: NumberFormatter {
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .percent
+            formatter.maximumFractionDigits = 0
             return formatter
         }
 
@@ -188,17 +188,14 @@ extension Preferences {
             case .updateCycleDidStart:
                 Text(" — " + UserText.checkingForUpdate)
             case .downloadDidStart:
-                Text(" — Downloading update")
-            case .downloading(let bytesDownloaded, let bytesToDownload):
-                Text(" — Downloading \(formatter.string(fromByteCount: Int64(bytesDownloaded))) / \(formatter.string(fromByteCount: Int64(bytesToDownload)))")
-            case .extractionDidStart:
-                Text(" — Extracting update")
-            case .extracting(let percentage):
-                Text(" — Extracting update (\(String(format: "%.1f", percentage * 100))%)")
-            case .readyToInstallAndRelaunch:
-                Text(" — Ready to install")
-            case .installationDidStart, .installing:
-                Text(" — Installing")
+                Text(" — " + String(format: UserText.downloadingUpdate, ""))
+            case .downloading(let percentage):
+                Text(" — " + String(format: UserText.downloadingUpdate,
+                                    formatter.string(from: NSNumber(value: percentage)) ?? ""))
+            case .extractionDidStart, .extracting, .readyToInstallAndRelaunch, .installationDidStart, .installing:
+                Text(" — " + UserText.preparingUpdate)
+            case .updaterError:
+                Text(" — " + UserText.updateFailed)
             case .updateCycleNotStarted, .updateCycleDone:
                 EmptyView()
             }
@@ -210,8 +207,8 @@ extension Preferences {
             case .upToDate:
                 Image(systemName: "checkmark.circle.fill")
                     .foregroundColor(.green)
-            case .updateCycle:
-                if hasPendingUpdate {
+            case .updateCycle(let progress):
+                if hasPendingUpdate || progress.isFailed {
                     Image(systemName: "exclamationmark.circle.fill")
                         .foregroundColor(.red)
                 } else {
@@ -249,10 +246,15 @@ extension Preferences {
                     model.checkForUpdate()
                 }
                 .buttonStyle(UpdateButtonStyle(enabled: true))
-            case .updateCycle:
+            case .updateCycle(let progress):
                 if hasPendingUpdate {
                     Button(UserText.runUpdate) {
                         model.runUpdate()
+                    }
+                    .buttonStyle(UpdateButtonStyle(enabled: true))
+                } else if progress.isFailed {
+                    Button(UserText.retryUpdate) {
+                        model.checkForUpdate()
                     }
                     .buttonStyle(UpdateButtonStyle(enabled: true))
                 } else {
