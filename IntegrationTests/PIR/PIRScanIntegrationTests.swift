@@ -61,7 +61,7 @@ final class PIRScanIntegrationTests: XCTestCase {
     override func setUpWithError() throws {
         loginItemsManager = LoginItemsManager()
         loginItemsManager.disableLoginItems([LoginItem.dbpBackgroundAgent])
-        loginItemsManager.enableLoginItems([LoginItem.dbpBackgroundAgent], log: .dbp)
+        loginItemsManager.enableLoginItems([LoginItem.dbpBackgroundAgent])
 
         communicationLayer = DBPUICommunicationLayer(webURLSettings: DataBrokerProtectionWebUIURLSettings(UserDefaults.standard))
         communicationLayer.delegate = pirProtectionManager.dataManager.cache
@@ -141,7 +141,7 @@ final class PIRScanIntegrationTests: XCTestCase {
         }
     }
 
-    let fakeBrokerAPIAddress = "http://192.168.1.213:3001/api/"
+    let fakeBrokerAPIAddress = "http://127.0.0.1:3001/api/"
 
     func deleteAllProfilesOnFakeBroker() async {
         let deleteProfilesURL = URL(string: fakeBrokerAPIAddress + "profiles")!

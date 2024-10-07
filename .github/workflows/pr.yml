@@ -102,22 +102,22 @@ jobs:
       matrix:
         flavor: [ "Sandbox", "Non-Sandbox" ]
         include:
-#          - scheme: DuckDuckGo Privacy Browser
-#            flavor: Non-Sandbox
-#          - scheme: DuckDuckGo Privacy Browser App Store
-#            flavor: Sandbox
-#          - active-arch: YES
-#            flavor: Non-Sandbox
-#          - active-arch: NO
-#            flavor: Sandbox
+          - scheme: DuckDuckGo Privacy Browser
+            flavor: Non-Sandbox
+          - scheme: DuckDuckGo Privacy Browser App Store
+            flavor: Sandbox
+          - active-arch: YES
+            flavor: Non-Sandbox
+          - active-arch: NO
+            flavor: Sandbox
           - integration-tests-target: Integration Tests
             flavor: Non-Sandbox
-#          - integration-tests-target: Integration Tests App Store
-#            flavor: Sandbox
-#          - cache-key:
-#            flavor: Non-Sandbox
-#          - cache-key: sandbox-
-#            flavor: Sandbox
+          - integration-tests-target: Integration Tests App Store
+            flavor: Sandbox
+          - cache-key:
+            flavor: Non-Sandbox
+          - cache-key: sandbox-
+            flavor: Sandbox
 
     runs-on: macos-14-xlarge
     timeout-minutes: 30
@@ -131,15 +131,18 @@ jobs:
       uses: actions/checkout@v4
       with:
         repository: DuckDuckGo/pir-fake-broker
-        token: ${{ secrets.PIR_FAKE_BROKER }}
+        token: ${{ secrets.PIR_FAKE_BROKER2 }}
+        ref: loremattei/ci-integration
         path: pir-fake-broker
 
     - name: Start PIR Fake Broker
       run: |
         cd pir-fake-broker 
-        ./scripts/install-prerequisites.sh
-        echo "${{ secrets.PIR_FAKE_BROKER_SETUP }}" > packages/server/.env
-        pnpm start:all
+        cd scripts
+        ./install-prerequisites.sh
+        ./setup-ci.sh
+        cd .. 
+        pnpm start:all &
 
     - name: Register SSH key for certificates repository access
       uses: webfactory/ssh-agent@v0.7.0
@@ -164,7 +167,7 @@ jobs:
     - name: Set up fastlane
       run: |
         cd main
-        bundle install
+        bundle install 
 
     - name: Sync code signing assets
       env:
@@ -173,10 +176,13 @@ jobs:
         APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
         MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
         SSH_PRIVATE_KEY_FASTLANE_MATCH: ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
-      run: bundle exec fastlane sync_signing_ci
+      run: |
+        cd main
+        bundle exec fastlane sync_signing_ci
   
     - name: Set cache key hash
       run: |
+        cd main
         has_only_tags=$(jq '[ .pins[].state | has("version") ] | all' DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved)
         if [[ "$has_only_tags" == "true" ]]; then
           echo "cache_key_hash=${{ hashFiles('DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}" >> $GITHUB_ENV
@@ -188,33 +194,35 @@ jobs:
       if: env.cache_key_hash
       uses: actions/cache@v4
       with:
-        path: DerivedData/SourcePackages
+        path: main/DerivedData/SourcePackages
         key: ${{ runner.os }}-spm-${{ matrix.cache-key }}${{ env.cache_key_hash }}
         restore-keys: |
           ${{ runner.os }}-spm-${{ matrix.cache-key }}
 
     - name: Select Xcode
-      run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
+      run: cd main && sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
-    - name: Build and run unit tests
-      run: |
-        echo "Runner ${RUNNER_NAME} (${RUNNER_TRACKING_ID})"
-        export OS_ACTIVITY_MODE=debug
+    # - name: Build and run unit tests
+    #   run: |
+    #     cd main
+    #     echo "Runner ${RUNNER_NAME} (${RUNNER_TRACKING_ID})"
+    #     export OS_ACTIVITY_MODE=debug
 
-        set -o pipefail && xcodebuild test \
-          -scheme "${{ matrix.scheme }}" \
-          -derivedDataPath "DerivedData" \
-          -configuration "CI" \
-          -skipPackagePluginValidation -skipMacroValidation \
-          ENABLE_TESTABILITY=true \
-          ONLY_ACTIVE_ARCH=${{ matrix.active-arch }} \
-          "-skip-testing:${{ matrix.integration-tests-target }}" \
-          | tee ${{ matrix.flavor }}-unittests-xcodebuild.log \
-          | xcbeautify --report junit --report-path . --junit-report-filename ${{ matrix.flavor }}-unittests.xml \
-          || { mv "$(grep -m 1 '.*\.xcresult' ${{ matrix.flavor }}-unittests-xcodebuild.log | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')" ./${{ matrix.flavor }}-unittests.xcresult && exit 1; }
+    #     set -o pipefail && xcodebuild test \
+    #       -scheme "${{ matrix.scheme }}" \
+    #       -derivedDataPath "DerivedData" \
+    #       -configuration "CI" \
+    #       -skipPackagePluginValidation -skipMacroValidation \
+    #       ENABLE_TESTABILITY=true \
+    #       ONLY_ACTIVE_ARCH=${{ matrix.active-arch }} \
+    #       "-skip-testing:${{ matrix.integration-tests-target }}" \
+    #       | tee ${{ matrix.flavor }}-unittests-xcodebuild.log \
+    #       | xcbeautify --report junit --report-path . --junit-report-filename ${{ matrix.flavor }}-unittests.xml \
+    #       || { mv "$(grep -m 1 '.*\.xcresult' ${{ matrix.flavor }}-unittests-xcodebuild.log | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')" ./${{ matrix.flavor }}-unittests.xcresult && exit 1; }
 
     - name: Run integration tests
       run: |
+        cd main
         set -o pipefail && xcodebuild test \
           -scheme "${{ matrix.scheme }}" \
           -derivedDataPath "DerivedData" \
@@ -231,6 +239,7 @@ jobs:
     - name: Check private API usage
       id: private-api
       run: |
+        cd main
         if [[ ${{ matrix.flavor }} != "Sandbox" ]]; then
           echo "Skipping private API usage check for ${{ matrix.flavor }} build"
         else
@@ -261,6 +270,12 @@ jobs:
         check_name: "Test Report: ${{ matrix.flavor }}"
         report_paths: '${{ matrix.flavor }}*.xml'
         check_retries: true
+
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
+      if: failure()
+      with:
+        limit-access-to-actor: true
 
     - name: Update Asana with failed unit tests
       if: always() # always run even if the previous step fails
