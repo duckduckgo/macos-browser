@@ -30,12 +30,13 @@ enum UpdateCycleProgress {
     case updateCycleDidStart
     case updateCycleDone
     case downloadDidStart
-    case downloading(UInt64, UInt64)
+    case downloading(Double)
     case extractionDidStart
     case extracting(Double)
     case readyToInstallAndRelaunch
     case installationDidStart
     case installing
+    case updaterError(Error)
 
     static var `default` = UpdateCycleProgress.updateCycleNotStarted
 
@@ -48,7 +49,14 @@ enum UpdateCycleProgress {
 
     var isIdle: Bool {
         switch self {
-        case .updateCycleDone, .updateCycleNotStarted: return true
+        case .updateCycleDone, .updateCycleNotStarted, .updaterError: return true
+        default: return false
+        }
+    }
+
+    var isFailed: Bool {
+        switch self {
+        case .updaterError: return true
         default: return false
         }
     }
@@ -128,7 +136,8 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     }
 
     func showUpdaterError(_ error: any Error, acknowledgement: @escaping () -> Void) {
-        // no-op
+        updateProgress = .updaterError(error)
+        acknowledgement()
     }
 
     func showDownloadInitiated(cancellation: @escaping () -> Void) {
@@ -145,7 +154,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         if bytesDownloaded > bytesToDownload {
             bytesToDownload = bytesDownloaded
         }
-        updateProgress = .downloading(bytesDownloaded, bytesToDownload)
+        updateProgress = .downloading(Double(bytesDownloaded) / Double(bytesToDownload))
     }
 
     func showDownloadDidStartExtractingUpdate() {
@@ -182,6 +191,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     }
 
     func dismissUpdateInstallation() {
+        guard !updateProgress.isFailed else { return }
         updateProgress = .updateCycleDone
     }
 }

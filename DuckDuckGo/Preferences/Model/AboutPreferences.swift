@@ -33,6 +33,8 @@ final class AboutPreferences: ObservableObject, PreferencesTabOpening {
         init(from update: Update?, progress: UpdateCycleProgress) {
             if let update, !update.isInstalled {
                 self = .updateCycle(progress)
+            } else if progress.isFailed {
+                self = .updateCycle(progress)
             } else {
                 self = .upToDate
             }
