@@ -55,7 +55,7 @@ extension FeatureFlag: FeatureFlagSourceProviding {
         case .unknownUsernameCategorization:
             return .remoteReleasable(.subfeature(AutofillSubfeature.unknownUsernameCategorization))
         case .freemiumDBP:
-            return .remoteDevelopment(.subfeature(DBPSubfeature.freemium))
+            return .remoteReleasable(.subfeature(DBPSubfeature.freemium))
         case .phishingDetectionErrorPage:
             return .remoteReleasable(.subfeature(PhishingDetectionSubfeature.allowErrorPage))
         case .phishingDetectionPreferences:
