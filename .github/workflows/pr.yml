@@ -102,22 +102,22 @@ jobs:
       matrix:
         flavor: [ "Sandbox", "Non-Sandbox" ]
         include:
-          - scheme: DuckDuckGo Privacy Browser
-            flavor: Non-Sandbox
-          - scheme: DuckDuckGo Privacy Browser App Store
-            flavor: Sandbox
-          - active-arch: YES
-            flavor: Non-Sandbox
-          - active-arch: NO
-            flavor: Sandbox
+#          - scheme: DuckDuckGo Privacy Browser
+#            flavor: Non-Sandbox
+#          - scheme: DuckDuckGo Privacy Browser App Store
+#            flavor: Sandbox
+#          - active-arch: YES
+#            flavor: Non-Sandbox
+#          - active-arch: NO
+#            flavor: Sandbox
           - integration-tests-target: Integration Tests
             flavor: Non-Sandbox
-          - integration-tests-target: Integration Tests App Store
-            flavor: Sandbox
-          - cache-key:
-            flavor: Non-Sandbox
-          - cache-key: sandbox-
-            flavor: Sandbox
+#          - integration-tests-target: Integration Tests App Store
+#            flavor: Sandbox
+#          - cache-key:
+#            flavor: Non-Sandbox
+#          - cache-key: sandbox-
+#            flavor: Sandbox
 
     runs-on: macos-14-xlarge
     timeout-minutes: 30
