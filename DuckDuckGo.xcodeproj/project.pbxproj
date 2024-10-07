@@ -2745,6 +2745,10 @@
 		BDCB66D92C7CE1A700E8ABC9 /* VPNFeedbackFormViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDCB66D72C7CE1A600E8ABC9 /* VPNFeedbackFormViewModelTests.swift */; };
 		BDE981D92BBD10D600645880 /* vpn-dark-mode.json in Resources */ = {isa = PBXBuildFile; fileRef = BD384AC82BBC821100EF3735 /* vpn-dark-mode.json */; };
 		BDE981DA2BBD10D600645880 /* vpn-light-mode.json in Resources */ = {isa = PBXBuildFile; fileRef = BD384AC72BBC821100EF3735 /* vpn-light-mode.json */; };
+		C10529432C9CC18B0041E502 /* AutofillCredentialsDebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10529422C9CC18B0041E502 /* AutofillCredentialsDebugView.swift */; };
+		C10529442C9CC18B0041E502 /* AutofillCredentialsDebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10529422C9CC18B0041E502 /* AutofillCredentialsDebugView.swift */; };
+		C10529462C9F456C0041E502 /* AutofillCredentialsDebugViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10529452C9F456C0041E502 /* AutofillCredentialsDebugViewModel.swift */; };
+		C10529472C9F456C0041E502 /* AutofillCredentialsDebugViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10529452C9F456C0041E502 /* AutofillCredentialsDebugViewModel.swift */; };
 		C1372EF42BBC5BAD003F8793 /* SecureTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1372EF32BBC5BAD003F8793 /* SecureTextField.swift */; };
 		C1372EF52BBC5BAD003F8793 /* SecureTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1372EF32BBC5BAD003F8793 /* SecureTextField.swift */; };
 		C13909EF2B85FD4E001626ED /* AutofillActionExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13909EE2B85FD4E001626ED /* AutofillActionExecutor.swift */; };
@@ -4549,6 +4553,8 @@
 		BDBA859B2C5D25A300BC54F5 /* VPNFeedbackFormViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNFeedbackFormViewModel.swift; sourceTree = "<group>"; };
 		BDBA859E2C5D25B700BC54F5 /* VPNMetadataCollector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNMetadataCollector.swift; sourceTree = "<group>"; };
 		BDCB66D72C7CE1A600E8ABC9 /* VPNFeedbackFormViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNFeedbackFormViewModelTests.swift; sourceTree = "<group>"; };
+		C10529422C9CC18B0041E502 /* AutofillCredentialsDebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillCredentialsDebugView.swift; sourceTree = "<group>"; };
+		C10529452C9F456C0041E502 /* AutofillCredentialsDebugViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillCredentialsDebugViewModel.swift; sourceTree = "<group>"; };
 		C1372EF32BBC5BAD003F8793 /* SecureTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureTextField.swift; sourceTree = "<group>"; };
 		C13909EE2B85FD4E001626ED /* AutofillActionExecutor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillActionExecutor.swift; sourceTree = "<group>"; };
 		C13909F32B85FD79001626ED /* AutofillDeleteAllPasswordsExecutorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillDeleteAllPasswordsExecutorTests.swift; sourceTree = "<group>"; };
@@ -6601,6 +6607,7 @@
 		7B1E819A27C8874900FF0E60 /* Autofill */ = {
 			isa = PBXGroup;
 			children = (
+				C10529482C9F45720041E502 /* Debug */,
 				7B1E819B27C8874900FF0E60 /* ContentOverlayPopover.swift */,
 				7B1E819C27C8874900FF0E60 /* ContentOverlay.storyboard */,
 				7B1E819D27C8874900FF0E60 /* ContentOverlayViewController.swift */,
@@ -8978,6 +8985,15 @@
 			path = Assets;
 			sourceTree = "<group>";
 		};
+		C10529482C9F45720041E502 /* Debug */ = {
+			isa = PBXGroup;
+			children = (
+				C10529422C9CC18B0041E502 /* AutofillCredentialsDebugView.swift */,
+				C10529452C9F456C0041E502 /* AutofillCredentialsDebugViewModel.swift */,
+			);
+			path = Debug;
+			sourceTree = "<group>";
+		};
 		C13909F22B85FD60001626ED /* Autofill */ = {
 			isa = PBXGroup;
 			children = (
@@ -10713,6 +10729,7 @@
 				3706FAF7293F65D500E42796 /* FireproofDomainsViewController.swift in Sources */,
 				F18826852BBEE31700D9AC4F /* PixelKit+Assertion.swift in Sources */,
 				4BF0E5062AD2551A00FFEC9E /* NetworkProtectionPixelEvent.swift in Sources */,
+				C10529442C9CC18B0041E502 /* AutofillCredentialsDebugView.swift in Sources */,
 				3706FAF8293F65D500E42796 /* URLEventHandler.swift in Sources */,
 				9FBD84742BB3E15D00220859 /* InstallationAttributionPixelHandler.swift in Sources */,
 				BBFB72802C48047C0088884C /* SortBookmarksViewModel.swift in Sources */,
@@ -11128,6 +11145,7 @@
 				567A23D52C81E2180010F66C /* ContextualDaxDialogsFactory.swift in Sources */,
 				3706FBF3293F65D500E42796 /* PseudoFolder.swift in Sources */,
 				1D26EBAD2B74BECB0002A93F /* NSImageSendable.swift in Sources */,
+				C10529472C9F456C0041E502 /* AutofillCredentialsDebugViewModel.swift in Sources */,
 				7B7F5D252C52725A00826256 /* AddExcludedDomainButtonsView.swift in Sources */,
 				1D220BFD2B87AACF00F8BBC6 /* PrivacyProtectionStatus.swift in Sources */,
 				3706FBF8293F65D500E42796 /* TabBarFooter.swift in Sources */,
@@ -12449,6 +12467,7 @@
 				B647EFBB2922584B00BA628D /* AdClickAttributionTabExtension.swift in Sources */,
 				B677FC542B064A9C0099EB04 /* DataImportViewModel.swift in Sources */,
 				4B980E212817604000282EE1 /* NSNotificationName+Debug.swift in Sources */,
+				C10529432C9CC18B0041E502 /* AutofillCredentialsDebugView.swift in Sources */,
 				B690152C2ACBF4DA00AD0BAB /* MenuPreview.swift in Sources */,
 				31F7F2A6288AD2CA001C0D64 /* NavigationBarBadgeAnimationView.swift in Sources */,
 				AAC5E4F125D6BF10007F5990 /* AddressBarButton.swift in Sources */,
@@ -12570,6 +12589,7 @@
 				B63D466925BEB6C200874977 /* WKWebView+SessionState.swift in Sources */,
 				B6F1B0222BCE5658005E863C /* BrokenSiteInfoTabExtension.swift in Sources */,
 				3199AF7F2C80734A003AEBDC /* TabModalManageable.swift in Sources */,
+				C10529462C9F456C0041E502 /* AutofillCredentialsDebugViewModel.swift in Sources */,
 				4B4D60C02A0C848D00BCD287 /* NetworkProtectionControllerErrorStore.swift in Sources */,
 				4B723E1226B0006E00E14D75 /* DataImport.swift in Sources */,
 				7BE146072A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift in Sources */,
