@@ -136,6 +136,7 @@ jobs:
 
     - name: Start PIR Fake Broker
       run: |
+        cd pir-fake-broker 
         ./scripts/install-prerequisites.sh
 
     - name: Register SSH key for certificates repository access
