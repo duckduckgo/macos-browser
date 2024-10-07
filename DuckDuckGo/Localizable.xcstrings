@@ -53,31 +53,6 @@
         }
       }
     },
-    " — Downloading %@ / %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : " — Downloading %1$@ / %2$@"
-          }
-        }
-      }
-    },
-    " — Downloading update" : {
-
-    },
-    " — Extracting update" : {
-
-    },
-    " — Extracting update (%@%%)" : {
-
-    },
-    " — Installing" : {
-
-    },
-    " — Ready to install" : {
-
-    },
     " %@" : {
       "localizations" : {
         "de" : {
@@ -12920,9 +12895,6 @@
           }
         }
       }
-    },
-    "Checking for update" : {
-
     },
     "clear" : {
       "comment" : "Clear button",
@@ -56108,6 +56080,18 @@
         }
       }
     },
+    "settings.downloading.update" : {
+      "comment" : "Label informing users the app is currently downloading the update. This will contain a percentage",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Downloading update %@"
+          }
+        }
+      }
+    },
     "settings.last.checked" : {
       "comment" : "Label informing users what is the last time the app checked for the update.",
       "extractionState" : "extracted_with_value",
@@ -56288,8 +56272,20 @@
         }
       }
     },
+    "settings.preparing.update" : {
+      "comment" : "Label informing users the app is preparing to update.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Preparing update"
+          }
+        }
+      }
+    },
     "settings.restart.to.update" : {
-      "comment" : "Button label trigering restart and update of the application.",
+      "comment" : "Button label triggering restart and update of the application.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -56344,6 +56340,18 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Перезапустите для обновления"
+          }
+        }
+      }
+    },
+    "settings.retry.update" : {
+      "comment" : "Button label triggering a retry of the update.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Retry Update"
           }
         }
       }
@@ -56404,6 +56412,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "DuckDuckGo обновлен"
+          }
+        }
+      }
+    },
+    "settings.update.failed" : {
+      "comment" : "Label informing users the app is unable to update.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Update failed"
           }
         }
       }
