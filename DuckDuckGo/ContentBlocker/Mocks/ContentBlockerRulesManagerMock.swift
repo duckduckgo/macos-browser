@@ -28,7 +28,7 @@ final class ContentBlockerRulesManagerMock: NSObject, ContentBlockerRulesManager
     }
 
     func scheduleCompilation() -> BrowserServicesKit.ContentBlockerRulesManager.CompletionToken {
-        fatalError()
+        BrowserServicesKit.ContentBlockerRulesManager.CompletionToken()
     }
 
     var currentMainRules: BrowserServicesKit.ContentBlockerRulesManager.Rules?

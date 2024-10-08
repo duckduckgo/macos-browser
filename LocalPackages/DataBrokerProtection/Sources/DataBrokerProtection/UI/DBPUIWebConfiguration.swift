@@ -70,7 +70,7 @@ final class DBPUIUserScript: UserScriptsProvider {
         self.webUISettings = webUISettings
         contentScopeUserScriptIsolated = ContentScopeUserScript(privacyConfig, properties: prefs, isIsolated: false)
         contentScopeUserScriptIsolated.messageNames = ["dbpui"]
-        dbpUICommunicationLayer = DBPUICommunicationLayer(webURLSettings: webUISettings)
+        dbpUICommunicationLayer = DBPUICommunicationLayer(webURLSettings: webUISettings, privacyConfig: privacyConfig)
         dbpUICommunicationLayer.delegate = delegate
         dbpUICommunicationLayer.broker = contentScopeUserScriptIsolated.broker
         contentScopeUserScriptIsolated.registerSubfeature(delegate: dbpUICommunicationLayer)

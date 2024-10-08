@@ -145,6 +145,12 @@
                   Identifier = "StatisticsLoaderTests/testWhenRefreshRetentionAtbIsPerformedForNavigationThenAppRetentionAtbRequested()">
                </Test>
                <Test
+                  Identifier = "SubscriptionPagesUseSubscriptionFeatureTests/testBackToSettingsErrorOnFetchingAccountDetails()">
+               </Test>
+               <Test
+                  Identifier = "SubscriptionPagesUseSubscriptionFeatureTests/testBackToSettingsSuccess()">
+               </Test>
+               <Test
                   Identifier = "TabSnapshotExtensionTests/testWhenSnapshotIsRestored_ThenRenderingIsSkippedAfterLoading()">
                </Test>
                <Test
@@ -167,9 +173,6 @@
                </Test>
                <Test
                   Identifier = "CoreDataEncryptionTests/testSavingIncorrectValueTypes()">
-               </Test>
-               <Test
-                  Identifier = "DownloadsIntegrationTests/testWhenDownloadIsStartedInNewTab_tabIsClosed()">
                </Test>
                <Test
                   Identifier = "EncryptionKeyStoreTests">

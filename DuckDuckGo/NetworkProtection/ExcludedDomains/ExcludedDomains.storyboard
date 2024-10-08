@@ -13,24 +13,24 @@
                         <rect key="frame" x="0.0" y="0.0" width="475" height="307"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DEQ-Uh-Y7p">
-                                <rect key="frame" x="13" y="13" width="83" height="32"/>
-                                <buttonCell key="cell" type="push" title="Remove" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="0Dz-eI-5jh">
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DEQ-Uh-Y7p" userLabel="Add Domain Button">
+                                <rect key="frame" x="13" y="13" width="111" height="32"/>
+                                <buttonCell key="cell" type="push" title="Add Website" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="0Dz-eI-5jh">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
-                                    <action selector="removeSelectedDomain:" target="Clu-Bo-JRW" id="xJY-aP-kN6"/>
+                                    <action selector="addDomain:" target="Clu-Bo-JRW" id="JMt-9k-Pgn"/>
                                 </connections>
                             </button>
-                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="KAc-ZW-ZAV">
-                                <rect key="frame" x="94" y="13" width="111" height="32"/>
-                                <buttonCell key="cell" type="push" title="Add Website" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="atA-bI-IOY">
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="KAc-ZW-ZAV" userLabel="Remove Domain Button">
+                                <rect key="frame" x="122" y="13" width="83" height="32"/>
+                                <buttonCell key="cell" type="push" title="Remove" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="atA-bI-IOY">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
-                                    <action selector="addDomain:" target="Clu-Bo-JRW" id="DcY-dR-cTx"/>
+                                    <action selector="removeSelectedDomain:" target="Clu-Bo-JRW" id="SDb-ij-rx7"/>
                                 </connections>
                             </button>
                             <scrollView autohidesScrollers="YES" horizontalLineScroll="24" horizontalPageScroll="10" verticalLineScroll="24" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aPG-Pg-rGL">
@@ -169,10 +169,10 @@ DQ
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="addDomainButton" destination="KAc-ZW-ZAV" id="24L-wi-b08"/>
+                        <outlet property="addDomainButton" destination="DEQ-Uh-Y7p" id="Qkv-iR-eiu"/>
                         <outlet property="doneButton" destination="goL-jl-7Gp" id="8Yb-2X-umJ"/>
                         <outlet property="excludedDomainsLabel" destination="aur-0h-QzR" id="B5V-iN-MUj"/>
-                        <outlet property="removeDomainButton" destination="DEQ-Uh-Y7p" id="Zne-M8-g88"/>
+                        <outlet property="removeDomainButton" destination="KAc-ZW-ZAV" id="8KQ-H9-MnP"/>
                         <outlet property="tableView" destination="pIp-Qw-5G1" id="kNl-PR-zGb"/>
                     </connections>
                 </viewController>

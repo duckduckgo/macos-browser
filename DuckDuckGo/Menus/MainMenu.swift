@@ -609,6 +609,7 @@ final class MainMenu: NSMenu {
                 NSMenuItem(title: "Reset Duck Player Preferences", action: #selector(MainViewController.resetDuckPlayerPreferences))
                 NSMenuItem(title: "Reset Onboarding", action: #selector(MainViewController.resetOnboarding(_:)))
                 NSMenuItem(title: "Reset Contextual Onboarding", action: #selector(MainViewController.resetContextualOnboarding(_:)))
+                NSMenuItem(title: "Reset Sync Promo prompts", action: #selector(MainViewController.resetSyncPromoPrompts))
 
             }.withAccessibilityIdentifier("MainMenu.resetData")
             NSMenuItem(title: "UI Triggers") {
@@ -639,6 +640,12 @@ final class MainMenu: NSMenu {
             if case .normal = NSApp.runType {
                 NSMenuItem(title: "VPN")
                     .submenu(NetworkProtectionDebugMenu())
+            }
+
+            if #available(macOS 13.5, *) {
+                NSMenuItem(title: "Autofill") {
+                    NSMenuItem(title: "View all Credentials", action: #selector(MainViewController.showAllCredentials)).withAccessibilityIdentifier("MainMenu.showAllCredentials")
+                }
             }
 
             NSMenuItem(title: "Simulate crash") {
@@ -701,7 +708,7 @@ final class MainMenu: NSMenu {
 
     private func updateRemoteConfigurationInfo() {
         var dateString: String
-        if let date = ConfigurationManager.shared.lastConfigurationInstallDate {
+        if let date = Application.appDelegate.configurationManager.lastConfigurationInstallDate {
             dateString = DateFormatter.localizedString(from: date, dateStyle: .short, timeStyle: .medium)
             configurationDateAndTimeMenuItem.title = "Last Update Time: \(dateString)"
         } else {

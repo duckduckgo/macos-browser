@@ -26,6 +26,7 @@ import PixelKit
 import Subscription
 import WebKit
 import os.log
+import SwiftUI
 
 // Actions are sent to objects of responder chain
 
@@ -158,7 +159,7 @@ extension AppDelegate {
 
     @MainActor
     @objc func showWhatIsNew(_ sender: Any?) {
-        WindowControllersManager.shared.showTab(with: .url(.updates, source: .appOpenUrl))
+        WindowControllersManager.shared.showTab(with: .url(.updates, source: .ui))
     }
 
     #if FEEDBACK
@@ -850,6 +851,10 @@ extension MainViewController {
         DuckPlayerPreferences.shared.reset()
     }
 
+    @objc func resetSyncPromoPrompts(_ sender: Any?) {
+        SyncPromoManager().resetPromos()
+    }
+
     @objc func internalUserState(_ sender: Any?) {
         guard let internalUserDecider = NSApp.delegateTyped.internalUserDecider as? DefaultInternalUserDecider else { return }
         let state = internalUserDecider.isInternalUser
@@ -933,7 +938,7 @@ extension MainViewController {
     }
 
     @objc func reloadConfigurationNow(_ sender: Any?) {
-        ConfigurationManager.shared.forceRefresh(isDebug: true)
+        Application.appDelegate.configurationManager.forceRefresh(isDebug: true)
     }
 
     private func setConfigurationUrl(_ configurationUrl: URL?) {
@@ -942,11 +947,11 @@ extension MainViewController {
             configurationProvider.resetToDefaultConfigurationUrl()
         }
         Configuration.setURLProvider(configurationProvider)
-        ConfigurationManager.shared.forceRefresh(isDebug: true)
+        Application.appDelegate.configurationManager.forceRefresh(isDebug: true)
         if let configurationUrl {
-            Logger.general.debug("New configuration URL set to \(configurationUrl.absoluteString)")
+            Logger.config.debug("New configuration URL set to \(configurationUrl.absoluteString)")
         } else {
-            Logger.general.log("New configuration URL reset to default")
+            Logger.config.log("New configuration URL reset to default")
         }
     }
 
@@ -956,7 +961,7 @@ extension MainViewController {
         if alert.runModal() != .cancel {
             guard let textField = alert.accessoryView as? NSTextField,
                   let newConfigurationUrl = URL(string: textField.stringValue) else {
-                Logger.general.error("Failed to set custom configuration URL")
+                Logger.config.error("Failed to set custom configuration URL")
                 return
             }
 
@@ -966,6 +971,24 @@ extension MainViewController {
 
     @objc func resetConfigurationToDefault(_ sender: Any?) {
         setConfigurationUrl(nil)
+    }
+
+    @available(macOS 13.5, *)
+    @objc func showAllCredentials(_ sender: Any?) {
+        let hostingView = NSHostingView(rootView: AutofillCredentialsDebugView())
+        hostingView.translatesAutoresizingMaskIntoConstraints = false
+        hostingView.frame.size = hostingView.intrinsicContentSize
+
+        let window = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 1400, height: 700),
+                styleMask: [.titled, .closable, .resizable],
+                backing: .buffered, defer: false)
+
+        window.center()
+        window.title = "Credentials"
+        window.contentView = hostingView
+        window.isReleasedWhenClosed = false
+        window.makeKeyAndOrderFront(nil)
     }
 
     // MARK: - Developer Tools

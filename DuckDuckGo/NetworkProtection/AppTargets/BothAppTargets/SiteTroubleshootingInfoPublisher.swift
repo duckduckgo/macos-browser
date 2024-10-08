@@ -88,7 +88,7 @@ final class SiteTroubleshootingInfoPublisher {
         let icon: NSImage?
         let currentSite: NetworkProtectionUI.SiteTroubleshootingInfo?
 
-        icon = FaviconManager.shared.getCachedFavicon(for: domain, sizeCategory: .small)?.image
+        icon = FaviconManager.shared.getCachedFavicon(forDomainOrAnySubdomain: domain, sizeCategory: .small)?.image
         let proxySettings = TransparentProxySettings(defaults: .netP)
         currentSite = NetworkProtectionUI.SiteTroubleshootingInfo(
             icon: icon,

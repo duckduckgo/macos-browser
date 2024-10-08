@@ -77,6 +77,9 @@ jobs:
       app-version: ${{ steps.set-outputs.outputs.app-version }}
       app-name: ${{ steps.set-outputs.outputs.app-name }}
       upload-to: ${{ steps.is-official-release.outputs.upload-to }}
+      test-build-s3-path: ${{ steps.upload-dsyms-to-s3-test-build.outputs.test-build-s3-path }}
+      dsym-s3-path: ${{ steps.upload-dsyms-to-s3-test-build.outputs.dsym-s3-path }}
+      dsym-url: ${{ steps.upload-dsyms-to-s3-test-build.outputs.dsym-url }}
 
     env:
       release-type: ${{ github.event.inputs.release-type || inputs.release-type }}
@@ -121,8 +124,8 @@ jobs:
           echo "upload-to=s3" >> $GITHUB_OUTPUT
           echo "upload-to=s3" >> $GITHUB_ENV
         elif [[ -n "${{ env.asana-task-url }}" ]]; then
-          echo "upload-to=asana" >> $GITHUB_OUTPUT
-          echo "upload-to=asana" >> $GITHUB_ENV
+          echo "upload-to=s3testbuilds" >> $GITHUB_OUTPUT
+          echo "upload-to=s3testbuilds" >> $GITHUB_ENV
         fi
 
     - name: Select Xcode
@@ -166,16 +169,46 @@ jobs:
         path: ${{ github.workspace }}/release/${{ steps.set-outputs.outputs.dsym-name }}
 
     - name: Upload dSYMs to S3
-      id: upload-dsyms-to-s3
       if: ${{ env.upload-to == 's3' }}
+      id: upload-dsyms-to-s3
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
-        DSYM_S3_PATH: s3://${{ vars.DSYM_BUCKET_NAME }}/${{ vars.DSYM_BUCKET_PREFIX }}/${{ steps.set-outputs.outputs.dsym-name }}
+        DSYM_BUCKET_NAME: ${{ vars.DSYM_BUCKET_NAME }}
+        DSYM_BUCKET_PREFIX: ${{ vars.DSYM_BUCKET_PREFIX }}
+        DSYM_NAME: ${{ steps.set-outputs.outputs.dsym-name }}
+        DSYM_LOCAL_PATH: "${{ github.workspace }}/release/${{ steps.set-outputs.outputs.dsym-name }}"
       run: |
-        echo "dsym-s3-path=${DSYM_S3_PATH}" >> $GITHUB_OUTPUT
-        aws s3 cp ${{ github.workspace }}/release/${{ steps.set-outputs.outputs.dsym-name }} ${{ env.DSYM_S3_PATH }}
+        dsym_s3_path="s3://${DSYM_BUCKET_NAME}/${DSYM_BUCKET_PREFIX}/${DSYM_NAME}"
+        aws s3 cp $DSYM_LOCAL_PATH $dsym_s3_path
+        echo "dsym-s3-path=${dsym_s3_path}" >> $GITHUB_OUTPUT
+
+    - name: Upload dSYMs to S3 (test build)
+      if: ${{ env.upload-to == 's3testbuilds' }}
+      id: upload-dsyms-to-s3-test-build
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_RELEASE_S3 }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
+        AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
+        DSYM_NAME: ${{ steps.set-outputs.outputs.dsym-name }}
+        DSYM_LOCAL_PATH: "${{ github.workspace }}/release/${{ steps.set-outputs.outputs.dsym-name }}"
+        DSYM_URL_ROOT: ${{ vars.DMG_URL_ROOT }}
+        RELEASE_BUCKET_NAME: ${{ vars.RELEASE_BUCKET_NAME }}
+        RELEASE_BUCKET_PREFIX: ${{ vars.RELEASE_BUCKET_PREFIX }}
+        REVIEW_BUILDS_BUCKET_PREFIX: ${{ vars.REVIEW_BUILDS_BUCKET_PREFIX }}
+      run: |
+        ref_sha="$(git rev-parse --short HEAD)"
+        test_build_s3_path="s3://${RELEASE_BUCKET_NAME}/${RELEASE_BUCKET_PREFIX}/${REVIEW_BUILDS_BUCKET_PREFIX}/${ref_sha}/"
+        dsym_s3_path="${test_build_s3_path}${DSYM_NAME}"
+        echo "test-build-s3-path=${test_build_s3_path}" >> $GITHUB_OUTPUT
+
+        # Calculate the URL for the dSYM to report it later
+        s3_bucket_url="s3://${RELEASE_BUCKET_NAME}/${RELEASE_BUCKET_PREFIX}/"
+        dsym_url="${dsym_s3_path/#${s3_bucket_url}/${DSYM_URL_ROOT}}" # replace S3 bucket url with CDN URL
+        echo "dsym-url=${dsym_url}" >> $GITHUB_OUTPUT
+        aws s3 cp $DSYM_LOCAL_PATH $dsym_s3_path --acl public-read
+        echo "dsym-s3-path=${dsym_s3_path}" >> $GITHUB_OUTPUT
 
     - name: Report success
       if: ${{ env.upload-to == 's3' }}
@@ -197,7 +230,6 @@ jobs:
     needs: export-notarized-app
     if: ${{ github.event.inputs.create-dmg == true || inputs.create-dmg == true }}
 
-    # use macos-12 for creating DMGs as macos-13 beta runners can't run AppleScript: https://app.asana.com/0/0/1204523592790998/f
     runs-on: macos-14
 
     env:
@@ -264,18 +296,29 @@ jobs:
         path: ${{ github.workspace }}/${{ steps.create-dmg.outputs.dmg }}
 
     - name: Upload DMG to S3
-      if: ${{ env.upload-to == 's3' }}
+      id: upload-dmg-to-s3
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_RELEASE_S3 }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
         AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
+        TEST_BUILD_S3_PATH: ${{ needs.export-notarized-app.outputs.test-build-s3-path }}
+        DMG_LOCAL_PATH: "${{ github.workspace }}/${{ steps.create-dmg.outputs.dmg }}"
+        DMG_URL_ROOT: ${{ vars.DMG_URL_ROOT }}
         RELEASE_BUCKET_NAME: ${{ vars.RELEASE_BUCKET_NAME }}
         RELEASE_BUCKET_PREFIX: ${{ vars.RELEASE_BUCKET_PREFIX }}
       run: |
-        aws s3 cp \
-          ${{ github.workspace }}/${{ steps.create-dmg.outputs.dmg }} \
-          s3://${{ env.RELEASE_BUCKET_NAME }}/${{ env.RELEASE_BUCKET_PREFIX }}/ \
-          --acl public-read
+        if [[ "${{ env.upload-to }}" == 's3' ]]; then
+          dmg_s3_path="s3://${RELEASE_BUCKET_NAME}/${RELEASE_BUCKET_PREFIX}/${{ steps.create-dmg.outputs.dmg }}"
+        else
+          dmg_s3_path="${TEST_BUILD_S3_PATH}${{ steps.create-dmg.outputs.dmg }}"
+
+          # Calculate the URL for the dSYM to report it later
+          s3_bucket_url="s3://${RELEASE_BUCKET_NAME}/${RELEASE_BUCKET_PREFIX}/"
+          dmg_url="${dmg_s3_path/#${s3_bucket_url}/${DMG_URL_ROOT}}" # replace S3 bucket url with CDN URL
+          echo "dmg-url=${dmg_url}" >> $GITHUB_OUTPUT
+        fi
+        aws s3 cp $DMG_LOCAL_PATH $dmg_s3_path --acl public-read
+        echo "dmg-s3-path=${dmg_s3_path}" >> $GITHUB_OUTPUT
 
     - name: Report success
       if: ${{ env.upload-to == 's3' }}
@@ -291,19 +334,24 @@ jobs:
           github_handle:"${{ github.actor }}" \
           is_scheduled_release:"${{ github.event_name == 'schedule' }}"
 
-    - name: Extract Asana Task ID
-      id: task-id
-      if: ${{ env.upload-to == 'asana' }}
-      run: bundle exec fastlane run asana_extract_task_id task_url:"${{ env.asana-task-url }}"
-
-    - name: Upload DMG to Asana
-      if: ${{ env.upload-to == 'asana' }}
+    - name: Report success (test build)
+      if: ${{ env.upload-to == 's3testbuilds' }}
       env:
-          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        DMG_URL: ${{ steps.upload-dmg-to-s3.outputs.dmg-url }}
+        DMG_S3_PATH: ${{ steps.upload-dmg-to-s3.outputs.dmg-s3-path }}
+        DSYM_URL: ${{ needs.export-notarized-app.outputs.dsym-url }}
+        DSYM_S3_PATH: ${{ needs.export-notarized-app.outputs.dsym-s3-path }}
+        WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
       run: |
-        bundle exec fastlane run asana_upload \
-          file_name:"${{ github.workspace }}/duckduckgo-${{ env.app-version }}.dmg" \
-          task_id:"${{ steps.task-id.outputs.asana_task_id }}" 
+        echo "## Build Artifacts" >> $GITHUB_STEP_SUMMARY
+        echo "---" >> $GITHUB_STEP_SUMMARY
+        echo "🔗 [${DMG_S3_PATH}](${DMG_URL})" >> $GITHUB_STEP_SUMMARY
+        echo "🔗 [${DSYM_S3_PATH}](${DSYM_URL})" >> $GITHUB_STEP_SUMMARY
+
+        bundle exec fastlane run asana_add_comment \
+          task_url:"${{ env.asana-task-url }}" \
+          comment:"New build is available at ${DMG_URL}."
 
   mattermost:
 

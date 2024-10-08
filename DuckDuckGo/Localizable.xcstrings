@@ -2422,6 +2422,165 @@
         }
       }
     },
+    "Align Bookmarks" : {
+      "comment" : "Preference title aligning the bookmarks bar",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lesezeichen ausrichten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alinear marcadores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aligner les signets"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allinea segnalibri"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bladwijzers uitlijnen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyrównaj zakładki"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alinhar marcadores"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выравнивание панели закладок"
+          }
+        }
+      }
+    },
+    "Align Bookmarks to Center" : {
+      "comment" : "Preference for center aligning the bookmarks bar",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lesezeichen zentriert ausrichten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alinear marcadores en el centro"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aligner les signets au centre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allinea i segnalibri al centro"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bladwijzers centraal uitlijnen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyrównaj zakładki do środka"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alinhar marcadores ao centro"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выровнять по центру"
+          }
+        }
+      }
+    },
+    "Align Bookmarks to Left" : {
+      "comment" : "Preference for left aligning the bookmarks bar",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lesezeichen linksbündig ausrichten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alinea marcadores a la izquierda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aligner les signets à gauche"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allinea i segnalibri a sinistra"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bladwijzers naar links uitlijnen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyrównaj zakładki do lewej"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alinhar marcadores à esquerda"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выровнять по левому краю"
+          }
+        }
+      }
+    },
     "allow.integration" : {
       "comment" : "Setup of the integration with Bitwarden app",
       "extractionState" : "extracted_with_value",
@@ -12264,6 +12423,59 @@
         }
       }
     },
+    "Center" : {
+      "comment" : "Preference title aligning the bookmarks bar",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mittig"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centro"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centro"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Midden"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Środek"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centro"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "По центру"
+          }
+        }
+      }
+    },
     "check.allow.integration" : {
       "comment" : "Setup of the integration with Bitwarden app",
       "extractionState" : "extracted_with_value",
@@ -18528,66 +18740,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Всегда открывать видео из YouTube в Duck Player"
-          }
-        }
-      }
-    },
-    "duck-player.autoplay-preference" : {
-      "comment" : "Autoplay preference in settings",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "In Duck Player geöffnete Videos automatisch abspielen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Autoplay videos opened in Duck Player"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reproducir automáticamente los vídeos abiertos en Duck Player"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lecture automatique des vidéos ouvertes dans Duck Player"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Riproduzione automatica dei video aperti in Duck Player"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Video's automatisch afspelen wanneer ze worden geopend in Duck Player"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Automatyczne odtwarzanie filmów otwieranych w Duck Player"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reproduzir automaticamente vídeos abertos no Duck Player"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Автоматически проигрывать видео при открытии в Duck Player"
           }
         }
       }
@@ -25592,66 +25744,6 @@
         }
       }
     },
-    "home.page.settings.all.settings" : {
-      "comment" : "Button caption",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alle Einstellungen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "All Settings"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Todos los ajustes"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tous les paramètres"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tutte le impostazioni"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alle Instellingen"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wszystkie ustawienia"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Todas as definições"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Все настройки"
-          }
-        }
-      }
-    },
     "home.page.settings.background" : {
       "comment" : "Section title in Home Page Settings to customization Home Page background",
       "extractionState" : "extracted_with_value",
@@ -26188,66 +26280,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Изображения хранятся на вашем устройстве, поэтому у DuckDuckGo нет к ним доступа (даже для просмотра)."
-          }
-        }
-      }
-    },
-    "home.page.settings.reset.background" : {
-      "comment" : "Button caption to reset custom home page background",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hintergrund zurücksetzen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Reset Background"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Restablecer fondo"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Réinitialiser l'arrière-plan"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reimposta sfondo"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Achtergrond opnieuw instellen"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zresetuj tło"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Redefinir fundo"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Сбросить фон"
           }
         }
       }
@@ -29411,6 +29443,126 @@
         }
       }
     },
+    "import.logins.passwords.explainer" : {
+      "comment" : "Explanatory text for the Passwords import option to alleviate security concerns and explain usage.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwörter sind verschlüsselt. Für das Anzeigen oder Ausfüllen von Formularen ist eine Touch-ID oder ein Passwort erforderlich. Niemand außer dir kann deine Passwörter sehen, nicht einmal wir. Finde Passwörter unter DuckDuckGo-Einstellungen > Passwörter & Autovervollständigen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Passwords are encrypted. Viewing them or filling out forms requires Touch ID or a password. Nobody but you can see your passwords, not even us. Find Passwords in DuckDuckGo Settings > Passwords & Autofill."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las contraseñas están cifradas. Para verlas o rellenar formularios, se requiere Touch ID o una contraseña. Nadie más que tú puede ver tus contraseñas, ni siquiera nosotros. Encuentra las contraseñas en Ajustes de DuckDuckGo > Contraseñas y autocompletar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les mots de passe sont cryptés. Pour les consulter ou remplir des formulaires, il vous faut Touch ID ou un mot de passe. Personne d'autre que vous ne peut voir vos mots de passe, pas même nous. Vous trouverez vos mots de passe dans Paramètres de DuckDuckGo > Mots de passe et saisie automatique."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le password sono crittografate. Per visualizzarle o compilare moduli occorre il Touch ID o una password. Nessuno, a parte te, può vedere le tue password, nemmeno noi. Trova le password in Impostazioni di DuckDuckGo > Password e compilazione automatica."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wachtwoorden worden versleuteld. Je hebt een Touch-ID of wachtwoord nodig om ze te bekijken of formulieren in te vullen. Niemand anders kan je wachtwoorden zien, zelfs wij niet. Vind wachtwoorden in DuckDuckGo via 'Instellingen' > 'Wachtwoorden en automatisch aanvullen'."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hasła są szyfrowane. Ich przeglądanie lub wypełnianie formularzy wymaga Touch ID lub hasła. Nikt poza Tobą nie może zobaczyć Twoich haseł, nawet my. Aby uzyskać dostęp do haseł, wybierz kolejno Ustawienia DuckDuckGo > Hasła i autouzupełnianie."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As palavras-passe estão encriptadas. Para as veres ou preencheres formulários é necessário o Touch ID ou uma palavra-passe. Ninguém além de ti pode ver as tuas palavras-passe, nem mesmo nós. Encontra as palavras-passe em Definições do DuckDuckGo > Palavras-passe e preenchimento automático."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пароли подвергаются шифрованию. Для их просмотра или заполнения требуется Touch ID или пароль. Никто кроме вас не увидит ваши пароли. Даже мы. Ищите их в разделе «Настройки DuckDuckGo > Пароли и автозаполнение»."
+          }
+        }
+      }
+    },
+    "import.logins.passwords.explainer.autolock.off" : {
+      "comment" : "Explanatory text for the Passwords import option to alleviate security concerns and explain usage when autolock is disabled",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwörter sind verschlüsselt. Wir empfehlen dir, Auto-Lock einzurichten, um deine Passwörter noch sicherer zu machen. Dies kannst du unter DuckDuckGo-Einstellungen > Passwörter & Autovervollständigen tun."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Passwords are encrypted. We recommend setting up Auto-lock to keep your passwords even more secure. Set it up in DuckDuckGo Settings > Passwords & Autofill."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las contraseñas están cifradas. Te recomendamos que configures Auto-lock para mantener tus contraseñas aún más seguras. Configúralo en Ajustes de DuckDuckGo > Contraseñas y autocompletar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les mots de passe sont cryptés. Nous recommandons de configurer le verrouillage automatique pour renforcer la sécurité de vos mots de passe. Pour ce faire, allez dans les Paramètres de DuckDuckGo > Mots de passe et saisie automatique."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le password sono crittografate. Ti consigliamo di impostare il blocco automatico per rendere le tue password ancora più sicure. Impostalo nelle impostazioni di DuckDuckGo > Password e compilazione automatica."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wachtwoorden worden versleuteld. We raden aan om 'Automatisch vergrendelen' in te stellen om je wachtwoorden nog beter te beveiligen. Je kunt dit doen in DuckDuckGo via 'Instellingen' > 'Wachtwoorden en automatisch aanvullen'."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hasła są szyfrowane. Zalecamy skonfigurowanie funkcji automatycznej blokady, aby hasła były jeszcze bezpieczniejsze. Skonfiguruj tę opcję, wybierając kolejno Ustawienia DuckDuckGo > Hasła i autouzupełnianie."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As palavras-passe estão encriptadas. Recomendamos a configuração do Bloqueio automático para manter as tuas palavras-passe ainda mais seguras. Configura-o nas Definições do DuckDuckGo > Palavras-passe e preenchimento automático."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пароли подвергаются шифрованию. Для дополнительной защиты рекомендуем включить автоматическую блокировку в разделе «Настройки DuckDuckGo > Пароли и автозаполнение»."
+          }
+        }
+      }
+    },
     "import.logins.select-csv-file" : {
       "comment" : "Button text for selecting a CSV file",
       "extractionState" : "extracted_with_value",
@@ -30300,6 +30452,59 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Узнать больше"
+          }
+        }
+      }
+    },
+    "Left" : {
+      "comment" : "Preference title aligning the bookmarks bar",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Links"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Izquierda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À gauche"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Left"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Links"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lewo"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esquerdo"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Left"
           }
         }
       }
@@ -37154,55 +37359,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Du bist bereit! Du kannst mich jederzeit im Dock antreffen.\nMöchtest du sehen, wie ich dich beschütze? Versuche, eine deiner Lieblingsseiten zu besuchen 👆\n\nBehalte die Adressleiste im Auge. Ich werde Tracker blockieren und die Sicherheit deiner Verbindung verbessern, wenn möglichu{00A0}🔒"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "You’re all set! You can find me hanging out in the Dock anytime.\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possibleu{00A0}🔒"
+            "value" : "You’re all set! You can find me hanging out in the Dock anytime.\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possible 🔒"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "¡Ya está todo listo! Puedes encontrarme en el Dock en cualquier momento.\n¿Quieres ver cómo te protejo? Prueba a visitar uno de tus sitios favoritos 👆\n\nNo pierdas de vista la barra de direcciones al navegar. Bloquearé los rastreadores y mejoraré la seguridad de tu conexión cuando sea posible{00A0}🔒"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Tout est prêt ! Vous pouvez me trouver sur le Dock à tout moment.\nVous voulez voir comment je vous protège ? Essayez de visiter l'un de vos sites préférés 👆\n\nContinuez à regarder la barre d'adresse au fur et à mesure. Je bloquerai les traqueurs et mettrai à niveau la sécurité de votre connexion si possible 🔒"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Tutto pronto! Puoi trovarmi nel dock in qualsiasi momento.\nVuoi vedere come ti proteggo? Prova a visitare uno dei tuoi siti preferiti 👆\n\nContinua a controllare la barra degli indirizzi mentre esplori. Bloccherò i sistemi di tracciamento e aggiornerò la sicurezza della tua connessione quando possibile{00A0} 🔒"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Je bent helemaal klaar! Je kunt me altijd vinden in het Dock.\nWil je zien hoe ik je bescherm? Ga eens naar een van je favoriete websites 👆\n\nKijk tijdens het surfen goed naar de adresbalk. Ik blokkeer trackers en werk de beveiliging van je verbinding bij wanneer mogelijk 🔒"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Wszystko gotowe! W każdej chwili możesz mnie znaleźć w Docku.\nChcesz zobaczyć, jak Cię chronię? Spróbuj odwiedzić jedną z ulubionych stron 👆\n\nW międzyczasie obserwuj pasek adresu. Będę blokować mechanizmy śledzące i w miarę możliwości poprawiać bezpieczeństwo połączenia 🔒"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Está tudo pronto! Podes encontrar-me na Dock em qualquer altura.\nQueres ver como te protejo? Experimenta visitar um dos teus sites favoritos 👆\n\nContinua a observar a barra de endereço à medida que vais avançando. Vou bloquear os rastreadores e melhorar a segurança da tua ligação sempre que possível 🔒"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Готово! Теперь меня всегда можно найти на док-панели.\nВам интересно, как я защищаю вашу конфиденциальность? Зайдите на свой любимый сайт...👆\n\nИ следите за адресной строкой. По возможности я заблокирую все трекеры и сделаю соединение более безопасным {00A0}🔒"
           }
         }
@@ -37214,55 +37419,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Du bist bereit!\n\nMöchtest du sehen, wie ich dich beschütze? Versuche, eine deiner Lieblingsseiten zu besuchen 👆\n\nBehalte die Adressleiste im Auge. Ich werde Tracker blockieren und die Sicherheit deiner Verbindung verbessern, wenn möglich 🔒"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "You’re all set!\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possibleu{00A0}🔒"
+            "value" : "You’re all set!\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possible 🔒"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "¡Ya está todo listo!\n\n¿Quieres ver cómo te protejo? Prueba a visitar uno de tus sitios favoritos 👆\n\nSigue viendo la barra de direcciones sobre la marcha. Bloquearé los rastreadores y mejoraré la seguridad de tu conexión cuando sea posible 🔒"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Tout est prêt !\n\nVous voulez voir comment je vous protège ? Essayez de visiter l'un de vos sites préférés 👆\n\n Continuez à regarder la barre d'adresse au fur et à mesure. Je bloquerai les traqueurs et mettrai à niveau la sécurité de votre connexion si possible 🔒"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Tutto pronto.\n\nVuoi vedere come ti proteggo? Prova a visitare uno dei tuoi siti preferiti 👆Continua a controllare la barra degli indirizzi mentre esplori. Bloccherò i sistemi di tracciamento e aggiornerò la sicurezza della tua connessione quando possibile 🔒"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Je bent helemaal klaar!\n\nWil je zien hoe ik je bescherm? Ga eens naar een van je favoriete websites 👆 \n\n Kijk tijdens het surfen goed naar de adresbalk. Ik blokkeer trackers en werk de beveiliging van je verbinding bij wanneer mogelijk 🔒"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Wszystko gotowe!\n\nChcesz zobaczyć, jak Cię chronię? Spróbuj odwiedzić jedną z ulubionych stron 👆\n\nW międzyczasie obserwuj pasek adresu. Będę blokować mechanizmy śledzące i w miarę możliwości poprawiać bezpieczeństwo połączenia 🔒"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Estás tudo pronto!\n\nQueres ver como te protejo? Experimenta visitar um dos teus sites favoritos 👆\n\nContinua a observar a barra de endereço à medida que vais avançando. Vou bloquear os rastreadores e melhorar a segurança da tua ligação sempre que possível 🔒"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Все готово!\n\nХотите увидеть, как я вас защищаю? Зайдите на один из любимых сайтов 👆\n\nСледите за адресной строкой. Я по возможности буду блокировать трекеры и обеспечивать вам более безопасное соединение 🔒"
           }
         }
@@ -44558,62 +44763,122 @@
         }
       }
     },
-    "pm.empty.default.description" : {
+    "pm.empty.default.description.extended.v2" : {
       "comment" : "Label for default empty state description",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wenn deine Passwörter in einem anderen Browser gespeichert sind, kannst du sie in DuckDuckGo importieren."
+            "value" : "Passwörter sind verschlüsselt. Niemand außer dir kann sie sehen, nicht einmal wir."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "If your passwords are saved in another browser, you can import them into DuckDuckGo."
+            "value" : "Passwords are encrypted. Nobody but you can see them, not even us."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Si tienes contraseñas guardadas en otro navegador, puedes importarlas a DuckDuckGo."
+            "value" : "Las contraseñas están cifradas. Nadie más que tú puede verlas, ni siquiera nosotros."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Si vos mots de passe sont enregistrés dans un autre navigateur, vous pouvez les importer dans DuckDuckGo."
+            "value" : "Les mots de passe sont cryptés. Personne d'autre que vous ne peut les voir, pas même nous."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Se le password vengono salvate in un altro browser, è possibile importarle in DuckDuckGo."
+            "value" : "Le password sono crittografate. Nessuno tranne te può vederle, nemmeno noi."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Als je wachtwoorden in een andere browser zijn opgeslagen, kun je ze in DuckDuckGo importeren."
+            "value" : "Wachtwoorden worden versleuteld. Niemand anders kan ze zien, zelfs wij niet."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Jeśli Twoje hasła są zapisane w innej przeglądarce, możesz je zaimportować do DuckDuckGo."
+            "value" : "Hasła są szyfrowane. Nikt poza Tobą ich nie widzi, nawet my."
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Se as tuas palavras-passe estão guardadas noutro navegador, podes importá-las para o DuckDuckGo."
+            "value" : "As palavras-passe estão encriptadas. Ninguém além de ti pode vê-las, nem mesmo nós."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Если вы уже храните пароли в другом браузере, вы можете импортировать их в DuckDuckGo."
+            "value" : "Пароли подвергаются шифрованию. Никто, кроме вас, их не увидит. Даже мы."
+          }
+        }
+      }
+    },
+    "pm.empty.default.description.extended.v2.autolock.off" : {
+      "comment" : "Label for default empty state description when the autolock feature is off",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwörter sind verschlüsselt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Passwords are encrypted."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las contraseñas están cifradas."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les mots de passe sont cryptés."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le password sono crittografate."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wachtwoorden worden versleuteld."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hasła są szyfrowane."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As palavras-passe estão encriptadas."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пароли подвергаются шифрованию."
           }
         }
       }
@@ -44734,6 +44999,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Нет учетных данных"
+          }
+        }
+      }
+    },
+    "pm.empty.learn.more.link" : {
+      "comment" : "Text for link to learn more about DuckDuckGo password manager",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mehr erfahren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Learn more"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Más información"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En savoir plus"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ulteriori informazioni"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meer informatie"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dowiedz się więcej"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saiba mais"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подробнее"
           }
         }
       }
@@ -47434,6 +47759,125 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Новый пароль сохранен"
+          }
+        }
+      }
+    },
+    "pm.save-credentials.security.info" : {
+      "comment" : "Info message for the save credentials dialog",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwörter sind verschlüsselt. Niemand außer dir kann sie sehen, nicht einmal wir. [Mehr erfahren](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwords are encrypted. Nobody but you can see them, not even us. [Learn More](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las contraseñas están cifradas. Nadie más que tú puede verlas, ni siquiera nosotros. [Más información](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les mots de passe sont cryptés. Personne d'autre que vous ne peut les voir, pas même nous. [En savoir plus](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le password sono crittografate. Nessuno tranne te può vederle, nemmeno noi. [Scopri di più](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wachtwoorden worden versleuteld. Niemand anders dan jij kunt ze zien, zelfs wij niet. [Meer informatie](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hasła są szyfrowane. Nikt poza Tobą ich nie widzi, nawet my. [Więcek informacji](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As palavras-passe estão encriptadas. Ninguém além de ti pode vê-las, nem mesmo nós. [Sabe mais](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пароли подвергаются шифрованию. Никто, кроме вас, их не увидит. Даже мы. [Подробнее...](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        }
+      }
+    },
+    "pm.save-credentials.security.info.autolock.off" : {
+      "comment" : "Info message for the save credentials dialog when the autolock feature is off",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwörter sind verschlüsselt. Wir empfehlen dir, Auto-Lock einzurichten, um deine Passwörter noch sicherer zu machen. [Gehe zu Einstellungen](duck://settings/autofill)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Passwords are encrypted. We recommend setting up Auto-lock to keep your passwords even more secure. [Go to Settings](duck://settings/autofill)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las contraseñas están cifradas. Te recomendamos que configures Auto-lock para mantener las contraseñas aún más seguras. [Ve a Ajustes](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les mots de passe sont cryptés. Nous recommandons de configurer le verrouillage automatique pour renforcer la sécurité de vos mots de passe. [Accéder aux Réglages](duck://settings/autofill)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Le password sono crittografate. Ti consigliamo di impostare il blocco automatico per rendere le tue password ancora più sicure. [Vai a Impostazioni](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Wachtwoorden worden versleuteld. We raden aan om 'Automatisch vergrendelen' in te stellen om je wachtwoorden nog beter te beveiligen. [Ga naar Instellingen](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Hasła są szyfrowane. Zalecamy skonfigurowanie funkcji automatycznej blokady, aby hasła były jeszcze bezpieczniejsze. [Przejdź do ustawień](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "As palavras-passe estão encriptadas. Recomendamos a configuração do Bloqueio automático para manter as tuas palavras-passe ainda mais seguras. [Acede a Definições](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Все пароли шифруются. Для их дополнительной защиты рекомендуем включить автоблокировку. [Перейти к настройкам](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
           }
         }
       }
@@ -56388,6 +56832,486 @@
         }
       }
     },
+    "sync.promo.bookmarks.message" : {
+      "comment" : "Message for the Sync Promotion banner when user has bookmarks that can be synced",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein Konto erforderlich. Ende-zu-Ende-Verschlüsselung bedeutet, dass niemand außer dir deine Lesezeichen sehen kann, nicht einmal wir."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No account needed. End-to-end encryption means nobody but you can see your bookmarks, not even us."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No necesitas ninguna cuenta. El cifrado de extremo a extremo significa que nadie más que tú puede ver tus marcadores, ni siquiera nosotros."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun compte n'est nécessaire. Le cryptage de bout en bout signifie que personne d'autre ne peut voir vos signets, pas même nous."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non è necessario un account. Con la crittografia end-to-end, nessuno, a parte te, può vedere i tuoi segnalibri, nemmeno noi."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geen account nodig. End-to-end versleuteling betekent dat niemand anders dan jij je bladwijzers kan zien, zelfs wij niet."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konto nie jest wymagane. Kompleksowe szyfrowanie oznacza, że nikt poza Tobą nie może zobaczyć Twoich zakładek, nawet my."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não precisas de uma conta. A encriptação ponta a ponta significa que ninguém além de ti pode ver os teus favoritos, nem mesmo nós."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Учетная запись не требуется. Сквозное шифрование означает, что ваши закладки видны только вам. Даже у нас нет к ним доступа."
+          }
+        }
+      }
+    },
+    "sync.promo.bookmarks.title" : {
+      "comment" : "Title for the Sync Promotion banner",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lesezeichen synchronisieren und sichern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sync & Back Up Your Bookmarks"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincroniza y haz copias de seguridad de tus marcadores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisez et sauvegardez vos signets"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronizza ed esegui il backup dei tuoi segnalibri"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchroniseer en back-up je bladwijzers"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronizuj i twórz kopie zapasowe zakładek"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincroniza e faz uma cópia de segurança dos teus favoritos"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Синхронизация и резервное копирование закладок"
+          }
+        }
+      }
+    },
+    "sync.promo.confirm.action" : {
+      "comment" : "Title for a button in the Sync Promotion banner to set up Sync",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sync einrichten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Set Up Sync"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurar la sincronización"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurer la synchronisation"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configura la sincronizzazione"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisatie instellen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skonfiguruj synchronizację"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurar sincronização"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настройка синхронизации"
+          }
+        }
+      }
+    },
+    "sync.promo.dismiss.action" : {
+      "comment" : "Title for a button in the Sync Promotion banner to dismiss Sync promotion banner",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nein, danke"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No Thanks"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No, gracias"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non merci"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No, grazie"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nee, bedankt"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie, dziękuję"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não, obrigado"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет, спасибо"
+          }
+        }
+      }
+    },
+    "sync.promo.passwords.message" : {
+      "comment" : "Message for the Sync Promotion banner when user has passwords that can be synced",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein Konto erforderlich. Ende-zu-Ende-Verschlüsselung bedeutet, dass niemand außer dir deine Passwörter sehen kann, nicht einmal wir."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No account needed. End-to-end encryption means nobody but you can see your passwords, not even us."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No necesitas ninguna cuenta. El cifrado de extremo a extremo significa que nadie más que tú puede ver tus contraseñas, ni siquiera nosotros."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun compte n'est nécessaire. Le cryptage de bout en bout signifie que personne d'autre ne peut voir vos mots de passe, pas même nous."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non è necessario un account. Con la crittografia end-to-end, nessuno a parte te può vedere le tue password, nemmeno noi."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geen account nodig. Dankzij end-to-end versleuteling kan niemand behalve jij je wachtwoorden zien, zelfs wij niet."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konto nie jest wymagane. Kompleksowe szyfrowanie oznacza, że nikt poza Tobą nie może zobaczyć Twoich haseł, nawet my."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não precisas de uma conta. A encriptação ponta a ponta significa que ninguém além de ti pode ver as tuas palavras-passe, nem mesmo nós."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Учетная запись не требуется. Сквозное шифрование означает, что ваши пароли видны только вам. Даже у нас нет к ним доступа."
+          }
+        }
+      }
+    },
+    "sync.promo.passwords.side.panel.subtitle" : {
+      "comment" : "Subtitle for the Sync Promotion in passwords side panel",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisieren und sichern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sync & Backup"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronización y copia de seguridad"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisation et sauvegarde"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronizzazione e backup"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisatie en back-up"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronizacja i kopia zapasowa"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronização e cópia de segurança"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Синхронизация и резервное копирование"
+          }
+        }
+      }
+    },
+    "sync.promo.passwords.side.panel.title" : {
+      "comment" : "Title for the Sync Promotion in passwords side panel",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einrichtung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Setup"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configuración"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installation"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurazione"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Instellen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konfiguracja"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configuração"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настройка"
+          }
+        }
+      }
+    },
+    "sync.promo.passwords.title" : {
+      "comment" : "Title for the Sync Promotion banner",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwörter synchronisieren und sichern  "
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sync & Back Up Your Passwords  "
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincroniza y haz copias de seguridad de tus contraseñas  "
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisez et sauvegardez vos mots de passe  "
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronizza e fai il backup delle password  "
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchroniseer en maak een back-up van je wachtwoorden  "
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronizuj i twórz kopie zapasowe haseł  "
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincroniza e faz uma cópia de segurança das tuas palavras-passe  "
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Синхронизация и резервное копирование паролей  "
+          }
+        }
+      }
+    },
     "tab.bookmarks.title" : {
       "comment" : "Tab bookmarks title",
       "extractionState" : "extracted_with_value",
@@ -57747,55 +58671,115 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lesezeichen sortieren"
+            "value" : "Sortieren"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Sort bookmarks"
+            "value" : "Sort"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ordenar marcadores"
+            "value" : "Ordenar"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Trier les signets"
+            "value" : "Trier"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ordina i segnalibri"
+            "value" : "Ordina"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bladwijzers sorteren"
+            "value" : "Sorteren"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sortuj zakładki"
+            "value" : "Sortuj"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ordenar marcadores"
+            "value" : "Ordenar"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Сортировка закладок"
+            "value" : "Сортировать"
+          }
+        }
+      }
+    },
+    "tooltip.bookmarks.sort.name.title" : {
+      "comment" : "Title when bookmark sort by name is enabled",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach Namen sortieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sort by Name"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordenar por nombre"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trier par nom"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordina per nome"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sorteren op naam"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sortuj według nazwy"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordenar por nome"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сортировать по названию"
           }
         }
       }

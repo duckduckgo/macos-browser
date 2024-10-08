@@ -36,7 +36,7 @@ final class BookmarksBarViewModel: NSObject {
     // MARK: Enums
 
     enum Constants {
-        static let buttonSpacing: CGFloat = 6
+        static let buttonSpacing: CGFloat = 2
         static let buttonHeight: CGFloat = 28
         static let maximumButtonWidth: CGFloat = 128
         static let labelFont = NSFont.systemFont(ofSize: 12)
@@ -400,10 +400,8 @@ extension BookmarksBarViewModel: BookmarksBarCollectionViewItemDelegate {
         delegate?.showDialog(dialog)
     }
 
-    func bookmarksBarCollectionViewItem(_ item: BookmarksBarCollectionViewItem, isMouseOver: Bool) {
-        if isMouseOver {
-            delegate?.mouseDidHover(over: item)
-        }
+    func bookmarksBarCollectionViewItemMouseDidHover(_ item: BookmarksBarCollectionViewItem) {
+        delegate?.mouseDidHover(over: item)
     }
 
 }

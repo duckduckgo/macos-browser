@@ -59,17 +59,16 @@ final class AppContentBlocking {
 
     // keeping whole ContentBlocking state initialization in one place to avoid races between updates publishing and rules storing
     @MainActor
-    init(internalUserDecider: InternalUserDecider) {
-        let configStorage = ConfigurationStore.shared
-        privacyConfigurationManager = PrivacyConfigurationManager(fetchedETag: configStorage.loadEtag(for: .privacyConfiguration),
-                                                                  fetchedData: configStorage.loadData(for: .privacyConfiguration),
+    init(internalUserDecider: InternalUserDecider, configurationStore: ConfigurationStore) {
+        privacyConfigurationManager = PrivacyConfigurationManager(fetchedETag: configurationStore.loadEtag(for: .privacyConfiguration),
+                                                                  fetchedData: configurationStore.loadData(for: .privacyConfiguration),
                                                                   embeddedDataProvider: AppPrivacyConfigurationDataProvider(),
                                                                   localProtection: LocalUnprotectedDomains.shared,
                                                                   errorReporting: Self.debugEvents,
                                                                   internalUserDecider: internalUserDecider)
 
-        trackerDataManager = TrackerDataManager(etag: ConfigurationStore.shared.loadEtag(for: .trackerDataSet),
-                                                data: ConfigurationStore.shared.loadData(for: .trackerDataSet),
+        trackerDataManager = TrackerDataManager(etag: configurationStore.loadEtag(for: .trackerDataSet),
+                                                data: configurationStore.loadData(for: .trackerDataSet),
                                                 embeddedDataProvider: AppTrackerDataSetProvider(),
                                                 errorReporting: Self.debugEvents)
 
@@ -85,7 +84,7 @@ final class AppContentBlocking {
         userContentUpdating = UserContentUpdating(contentBlockerRulesManager: contentBlockingManager,
                                                   privacyConfigurationManager: privacyConfigurationManager,
                                                   trackerDataManager: trackerDataManager,
-                                                  configStorage: configStorage,
+                                                  configStorage: configurationStore,
                                                   webTrackingProtectionPreferences: WebTrackingProtectionPreferences.shared,
                                                   tld: tld)
 

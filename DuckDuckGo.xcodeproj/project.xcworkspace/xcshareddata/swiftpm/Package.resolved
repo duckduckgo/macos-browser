@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "196.0.0",
-        "revision" : "ae3dbec01b8b72dc2ea4c510aecbc802862eab63"
+        "revision" : "4e6a8da6a088439565ed7f6a2ac83e83ad7fd10e",
+        "version" : "198.3.1"
       }
     },
     {
@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "9f3717b3913a12956f1386fe7b657f68545fba83",
-        "version" : "6.15.0"
+        "revision" : "1ed569676555d493c9c5575eaed22aa02569aac9",
+        "version" : "6.19.0"
       }
     },
     {
@@ -75,7 +75,7 @@
     {
       "identity" : "lottie-spm",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/airbnb/lottie-spm",
+      "location" : "https://github.com/airbnb/lottie-spm.git",
       "state" : {
         "revision" : "1d29eccc24cc8b75bff9f6804155112c0ffc9605",
         "version" : "4.4.3"
@@ -113,8 +113,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/gumob/PunycodeSwift.git",
       "state" : {
-        "revision" : "4356ec54e073741449640d3d50a1fd24fd1e1b8b",
-        "version" : "2.1.0"
+        "revision" : "30a462bdb4398ea835a3585472229e0d74b36ba5",
+        "version" : "3.0.0"
       }
     },
     {

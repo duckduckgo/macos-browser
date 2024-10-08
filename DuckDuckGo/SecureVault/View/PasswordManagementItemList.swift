@@ -162,6 +162,19 @@ private struct ExternalPasswordManagerItemSection: View {
     }
 }
 
+private struct SyncPromoItemSection: View {
+    @ObservedObject var model: PasswordManagementItemListModel
+
+    var body: some View {
+        Section {
+            SyncPromoItemView(model: model) {
+                model.syncPromoSelected = true
+            }
+            .padding(.horizontal, 10)
+        }
+    }
+}
+
 private struct PasswordManagementItemStackContentsView: View {
 
     @EnvironmentObject var model: PasswordManagementItemListModel
@@ -171,11 +184,20 @@ private struct PasswordManagementItemStackContentsView: View {
         (model.sortDescriptor.category == .allItems || model.sortDescriptor.category == .logins)
     }
 
+    private var shouldDisplaySyncPromoRow: Bool {
+        model.syncPromoManager.shouldPresentPromoFor(.passwords) &&
+        model.emptyState == .none &&
+        (model.sortDescriptor.category == .allItems || model.sortDescriptor.category == .logins) &&
+        model.filter.isEmpty
+    }
+
     var body: some View {
         Spacer(minLength: 10)
 
         if shouldDisplayExternalPasswordManagerRow {
             ExternalPasswordManagerItemSection(model: model)
+        } else if shouldDisplaySyncPromoRow {
+            SyncPromoItemSection(model: model)
         }
 
         ForEach(Array(model.displayedSections.enumerated()), id: \.offset) { index, section in
@@ -245,6 +267,46 @@ private struct PasswordManagerItemView: View {
                          PasswordManagerItemButtonStyle(bgColor: Color.accentColor) :
                             // Almost clear, so that whole view is clickable
                          PasswordManagerItemButtonStyle(bgColor: Color(NSColor.windowBackgroundColor.withAlphaComponent(0.001))))
+    }
+}
+
+private struct SyncPromoItemView: View {
+    @ObservedObject var model: PasswordManagementItemListModel
+
+    let action: () -> Void
+
+    private var selected: Bool {
+        model.syncPromoSelected
+    }
+
+    var body: some View {
+        let textColor = selected ? .white : Color(NSColor.controlTextColor)
+        let font = Font.system(size: 13)
+
+        Button(action: action, label: {
+            HStack(spacing: 2) {
+
+                Image(.syncOK32)
+                    .frame(width: 32)
+                    .padding(.leading, 6)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(UserText.syncPromoSidePanelTitle)
+                        .foregroundColor(textColor)
+                        .font(font)
+                    Text(UserText.syncPromoSidePanelSubtitle)
+                        .foregroundColor(textColor.opacity(0.8))
+                        .font(font)
+                }
+                .padding(.leading, 4)
+            }
+        })
+        .frame(maxHeight: 48)
+        .buttonStyle(selected ?
+                     PasswordManagerItemButtonStyle(bgColor: Color.accentColor) :
+                        // Almost clear, so that whole view is clickable
+                     PasswordManagerItemButtonStyle(bgColor: Color(NSColor.windowBackground.withAlphaComponent(0.001))))
+
     }
 }
 

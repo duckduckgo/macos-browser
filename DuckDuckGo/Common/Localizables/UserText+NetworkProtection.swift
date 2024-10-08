@@ -133,15 +133,15 @@ extension UserText {
     static let itrFeedbackFormCategorySomethingElse = "Something else"
 
     // "ppro.feedback-form.text-1" - Text for the body of the PPro feedback form
-    static let pproFeedbackFormText1 = "Found an issue not cover in our [help center](duck://)? We definitely want to know about it.\n\nTell us what's going on:"
+    static let pproFeedbackFormText1 = "Found an issue not covered in our [help center](duck://)? We definitely want to know about it.\n\nTell us what's going on:"
     // "ppro.feedback-form.text-2" - Text for the body of the PPro feedback form
-    static let pproFeedbackFormText2 = "In addition to the details entered above, we send some anonymized info with your feedback:"
+    static let pproFeedbackFormText2 = "In addition to the details entered into this form, your app issue report will contain:"
     // "ppro.feedback-form.text-3" - Bullet text for the body of the PPro feedback form
-    static let pproFeedbackFormText3 = "• Whether specific browser features are active"
+    static let pproFeedbackFormText3 = "• Whether specific DuckDuckGo features are enabled"
     // "ppro.feedback-form.text-4" - Bullet text for the body of the PPro feedback form
-    static let pproFeedbackFormText4 = "• Aggregate app diagnostics (e.g., error codes)"
+    static let pproFeedbackFormText4 = "• Aggregate DuckDuckGo app diagnostics"
     // "ppro.feedback-form.text-5" - Text for the body of the PPro feedback form
-    static let pproFeedbackFormText5 = "By clicking \"Submit\" you agree that DuckDuckGo may use information submitted to improve the app."
+    static let pproFeedbackFormText5 = "By clicking \"Submit\" I agree that DuckDuckGo may use the information in this report for purposes of improving the app's features."
     // "ppro.feedback-form.disclaimer" - Text for the disclaimer of the PPro feedback form
     static let pproFeedbackFormDisclaimer = "Reports are anonymous and sent to DuckDuckGo to help improve our service"
 
@@ -199,7 +199,7 @@ extension UserText {
     // "vpn.location.title" - Location section title in VPN settings
     static let vpnLocationTitle = "Location"
     // "vpn.excluded.sites.title" - Excluded Sites title in VPN settings
-    static let vpnExcludedSitesTitle = "Excluded Sites"
+    static let vpnExcludedSitesTitle = "Excluded Websites"
     // "vpn.general.title" - General section title in VPN settings
     static let vpnGeneralTitle = "General"
     // "vpn.shortcuts.settings.title" - Shortcuts section title in VPN settings
@@ -239,13 +239,21 @@ extension UserText {
 
     // MARK: - Excluded Domains
     // "vpn.setting.excluded.domains.description" - Excluded Sites description
-    static let vpnExcludedDomainsDescription = "Websites you selected to be excluded even when the VPN is connected."
+    static let vpnExcludedDomainsDescription = "Excluded websites will bypass the VPN."
     // "vpn.setting.excluded.domains.manage.button.title" - Excluded Sites management button title
-    static let vpnExcludedDomainsManageButtonTitle = "Manage Excluded Sites…"
+    static let vpnExcludedDomainsManageButtonTitle = "Manage Excluded Websites…"
     // "vpn.excluded.domains.add.domain" - Add Domain button for the excluded sites view
     static let vpnExcludedDomainsAddDomain = "Add Website"
     // "vpn.excluded.domains.title" - Title for the excluded sites view
     static let vpnExcludedDomainsTitle = "Excluded Websites"
+
+    // MARK: - Add Excluded Domain
+    // "vpn.setting.add.excluded.domain.title" - Add excluded domain title
+    static let vpnAddExcludedDomainTitle = "Exclude Website From VPN"
+    // "vpn.setting.add.excluded.domain.action.button.title" - Add excluded domain button title
+    static let vpnAddExcludedDomainActionButtonTitle = "Exclude Website"
+    // "vpn.setting.add.excluded.domain.cancel.button.title" - Add excluded domain cancel button title
+    static let vpnAddExcludedDomainCancelButtonTitle = "Cancel"
 
     // MARK: - DNS
     // "vpn.dns.server.title" - Title of the DNS Server section

@@ -228,10 +228,6 @@ extension URL {
         }
     }
 
-    var navigationalScheme: NavigationalScheme? {
-        self.scheme.map(NavigationalScheme.init(rawValue:))
-    }
-
     var separatedScheme: String? {
         self.scheme.map { $0 + NavigationalScheme.separator }
     }
@@ -384,6 +380,10 @@ extension URL {
 
     static var privateSearchLearnMore: URL {
         return URL(string: "https://duckduckgo.com/duckduckgo-help-pages/search-privacy/")!
+    }
+
+    static var passwordManagerLearnMore: URL {
+        return URL(string: "https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/")!
     }
 
     static var searchSettings: URL {
