@@ -100,6 +100,7 @@ final class HomePageSettingsModelTests: XCTestCase {
 
     func testThatCustomBackgroundIsNilByDefault() {
         XCTAssertNil(model.customBackground)
+        XCTAssertNil(model.customBackgroundImage)
     }
 
     func testThatHasUserImagesFollowsAvailableImagesArray() {
@@ -159,6 +160,36 @@ final class HomePageSettingsModelTests: XCTestCase {
 
         model.popToRootView()
         XCTAssertEqual(userBackgroundImagesManager.sortImagesByLastUsedCallCount, 1)
+    }
+
+    func testWhenCustomBackgroundIsSetToImageThenImageIsCached() {
+        let testImage1 = NSImage()
+        let testImage2 = NSImage()
+        let testBackground1 = UserBackgroundImage(fileName: "testImage1", colorScheme: .light)
+        let testBackground2 = UserBackgroundImage(fileName: "testImage2", colorScheme: .light)
+
+        userBackgroundImagesManager.imageForUserBackgroundImage = { userBackgroundImage in
+            switch userBackgroundImage {
+            case testBackground1: return testImage1
+            case testBackground2: return testImage2
+            default: return nil
+            }
+        }
+
+        model.customBackground = .userImage(.init(fileName: "testImage1", colorScheme: .light))
+        XCTAssertIdentical(model.customBackgroundImage, testImage1)
+
+        model.customBackground = .userImage(.init(fileName: "testImage2", colorScheme: .light))
+        XCTAssertIdentical(model.customBackgroundImage, testImage2)
+
+        model.customBackground = .solidColor(.color03)
+        XCTAssertNil(model.customBackgroundImage)
+
+        model.customBackground = .userImage(.init(fileName: "testImage2", colorScheme: .light))
+        XCTAssertIdentical(model.customBackgroundImage, testImage2)
+
+        model.customBackground = nil
+        XCTAssertNil(model.customBackgroundImage)
     }
 
     func testWhenCustomBackgroundIsUpdatedThenPixelIsSent() {
