@@ -126,10 +126,8 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
 }
 
 class MockDialogsProvider: ContextualOnboardingDialogTypeProviding, ContextualOnboardingStateUpdater {
-    func updateStateFor(tab: DuckDuckGo_Privacy_Browser.Tab) {
-        
-    }
-    
+    func updateStateFor(tab: DuckDuckGo_Privacy_Browser.Tab) {}
+
     var dialog: ContextualDialogType?
 
     func dialogTypeForTab(_ tab: Tab) -> ContextualDialogType? {

@@ -59,7 +59,7 @@ class MockContentBlockerRulesManagerProtocol: ContentBlockerRulesManagerProtocol
     func entity(forHost host: String) -> Entity? {
         return nil
     }
-    
+
     var updatesPublisher: AnyPublisher<ContentBlockerRulesManager.UpdateEvent, Never> = Empty<ContentBlockerRulesManager.UpdateEvent, Never>(completeImmediately: false).eraseToAnyPublisher()
 
     var currentRules: [BrowserServicesKit.ContentBlockerRulesManager.Rules] = []

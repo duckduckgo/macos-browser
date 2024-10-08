@@ -249,7 +249,7 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
             state = .fireUsedTryASearchShown
         case .fireUsedShowSearchDone:
             state = .showHighFive
-        case .showMajorOrNoTracker, .showTryASite, .searchDoneShowBlockedTrackers, .searchDoneShowMajorOrNoTracker, .showSearchDone:
+        case .showBlockedTrackers, .showMajorOrNoTracker, .showTryASite, .searchDoneShowBlockedTrackers, .searchDoneShowMajorOrNoTracker, .showSearchDone:
             state = .showFireButton
         case .showHighFive:
             state = .onboardingCompleted

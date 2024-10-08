@@ -22,14 +22,52 @@ import XCTest
 final class FirePopoverViewModelTests: XCTestCase {
 
     @MainActor
-    private func makeViewModel(with tabCollectionViewModel: TabCollectionViewModel) -> FirePopoverViewModel {
+    private func makeViewModel(with tabCollectionViewModel: TabCollectionViewModel, contextualOnboardingStateMaching: ContextualOnboardingStateUpdater = ContextualOnboardingStateMachine.shared) -> FirePopoverViewModel {
         FirePopoverViewModel(
             fireViewModel: .init(),
             tabCollectionViewModel: tabCollectionViewModel,
             historyCoordinating: HistoryCoordinatingMock(),
             fireproofDomains: FireproofDomains(store: FireproofDomainsStoreMock()),
             faviconManagement: FaviconManagerMock(),
-            tld: ContentBlocking.shared.tld
+            tld: ContentBlocking.shared.tld,
+            contextualOnboardingStateMaching: contextualOnboardingStateMaching
         )
     }
+
+    @MainActor func testOnBurn_OnboardingStateMachineFireButtonUsedCalled() {
+        // Given
+        let tabCollectionVM = TabCollectionViewModel()
+        let stateMachine = CapturingContextualOnboardingStateUpdater()
+        let vm = makeViewModel(with: tabCollectionVM, contextualOnboardingStateMaching: stateMachine)
+        XCTAssertNil(stateMachine.updatedForTab)
+        XCTAssertFalse(stateMachine.gotItPressedCalled)
+        XCTAssertFalse(stateMachine.fireButtonUsedCalled)
+
+        // When
+        vm.burn()
+
+        // Then
+        XCTAssertNil(stateMachine.updatedForTab)
+        XCTAssertFalse(stateMachine.gotItPressedCalled)
+        XCTAssertTrue(stateMachine.fireButtonUsedCalled)
+    }
+}
+
+class CapturingContextualOnboardingStateUpdater: ContextualOnboardingStateUpdater {
+    var updatedForTab: Tab?
+    var gotItPressedCalled = false
+    var fireButtonUsedCalled = false
+
+    func updateStateFor(tab: Tab) {
+        updatedForTab = tab
+    }
+
+    func gotItPressed() {
+        gotItPressedCalled = true
+    }
+
+    func fireButtonUsed() {
+        fireButtonUsedCalled = true
+    }
+
 }

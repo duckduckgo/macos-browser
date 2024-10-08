@@ -26,7 +26,7 @@ final class ContentBlockerRulesManagerMock: NSObject, ContentBlockerRulesManager
     func entity(forHost host: String) -> Entity? {
         return nil
     }
-    
+
     func scheduleCompilation() -> BrowserServicesKit.ContentBlockerRulesManager.CompletionToken {
         fatalError()
     }

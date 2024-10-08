@@ -1617,6 +1617,8 @@
 		56A054472C22536A007D8FAB /* CapturingOnboardingActionsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A054462C22536A007D8FAB /* CapturingOnboardingActionsManager.swift */; };
 		56A054482C22536A007D8FAB /* CapturingOnboardingActionsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A054462C22536A007D8FAB /* CapturingOnboardingActionsManager.swift */; };
 		56A054532C2592CE007D8FAB /* OnboardingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A054522C2592CE007D8FAB /* OnboardingUITests.swift */; };
+		56A214AF2CB583BF00E5BC0E /* TrackerMessageProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A214AE2CB583BF00E5BC0E /* TrackerMessageProviderTests.swift */; };
+		56A214B02CB583BF00E5BC0E /* TrackerMessageProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A214AE2CB583BF00E5BC0E /* TrackerMessageProviderTests.swift */; };
 		56AC09C72C2D7DD6002D70E0 /* BookmarksBarViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56AC09C62C2D7DD6002D70E0 /* BookmarksBarViewControllerTests.swift */; };
 		56AC09C82C2D7DD6002D70E0 /* BookmarksBarViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56AC09C62C2D7DD6002D70E0 /* BookmarksBarViewControllerTests.swift */; };
 		56B234BF2A84EFD200F2A1CC /* NavigationBarUrlExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56B234BE2A84EFD200F2A1CC /* NavigationBarUrlExtensionsTests.swift */; };
@@ -3749,6 +3751,7 @@
 		56A054432C2252CE007D8FAB /* OnboardingUserScriptTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingUserScriptTests.swift; sourceTree = "<group>"; };
 		56A054462C22536A007D8FAB /* CapturingOnboardingActionsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturingOnboardingActionsManager.swift; sourceTree = "<group>"; };
 		56A054522C2592CE007D8FAB /* OnboardingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingUITests.swift; sourceTree = "<group>"; };
+		56A214AE2CB583BF00E5BC0E /* TrackerMessageProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerMessageProviderTests.swift; sourceTree = "<group>"; };
 		56AC09C62C2D7DD6002D70E0 /* BookmarksBarViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarViewControllerTests.swift; sourceTree = "<group>"; };
 		56B234BE2A84EFD200F2A1CC /* NavigationBarUrlExtensionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarUrlExtensionsTests.swift; sourceTree = "<group>"; };
 		56BA1E742BAAF70F001CF69F /* SpecialErrorPageTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpecialErrorPageTabExtension.swift; sourceTree = "<group>"; };
@@ -6509,6 +6512,7 @@
 				567A23DD2C89980A0010F66C /* OnboardingNavigationDelegateTests.swift */,
 				567A23E02C89B1EE0010F66C /* BrowserTabViewControllerOnboardingTests.swift */,
 				5677A9392C983FF100DA7B0A /* ContextualOnboardingStateMachineTests.swift */,
+				56A214AE2CB583BF00E5BC0E /* TrackerMessageProviderTests.swift */,
 			);
 			path = ContextualOnboarding;
 			sourceTree = "<group>";
@@ -11617,6 +11621,7 @@
 				CD33012A2C887B1C009AA127 /* URLTokenValidatorTests.swift in Sources */,
 				9F0660742BECC71200B8EEF1 /* SubscriptionAttributionPixelHandlerTests.swift in Sources */,
 				9FBD847B2BB3EC3300220859 /* MockAttributionOriginProvider.swift in Sources */,
+				56A214B02CB583BF00E5BC0E /* TrackerMessageProviderTests.swift in Sources */,
 				3706FE82293F661700E42796 /* MockStatisticsStore.swift in Sources */,
 				9FBD84712BB3DD8400220859 /* MockAttributionsPixelHandler.swift in Sources */,
 				3706FE83293F661700E42796 /* AutofillPreferencesModelTests.swift in Sources */,
@@ -13143,6 +13148,7 @@
 				B6CA4824298CDC2E0067ECCE /* AdClickAttributionTabExtensionTests.swift in Sources */,
 				AAEC74B22642C57200C2EFBC /* HistoryCoordinatingMock.swift in Sources */,
 				37D046A12C7DA9A200AEAA50 /* UserBackgroundImagesManagerTests.swift in Sources */,
+				56A214AF2CB583BF00E5BC0E /* TrackerMessageProviderTests.swift in Sources */,
 				37CD54B927F1F8AC00F1F7B9 /* AppearancePreferencesTests.swift in Sources */,
 				EEF53E182950CED5002D78F4 /* JSAlertViewModelTests.swift in Sources */,
 				376C4DB928A1A48A00CC0F5B /* FirePopoverViewModelTests.swift in Sources */,

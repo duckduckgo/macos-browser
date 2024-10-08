@@ -25,11 +25,12 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
     var stateMachine: ContextualOnboardingStateMachine!
     var mockTrackerMessageProvider: MockTrackerMessageProvider!
     var tab: Tab!
+    let expectation = XCTestExpectation()
 
     @MainActor override func setUp() {
         super.setUp()
         UserDefaultsWrapper<Any>.clearAll()
-        mockTrackerMessageProvider = MockTrackerMessageProvider()
+        mockTrackerMessageProvider = MockTrackerMessageProvider(expectation: expectation)
         stateMachine = ContextualOnboardingStateMachine(trackerMessageProvider: mockTrackerMessageProvider)
         tab = Tab(url: URL.duckDuckGo)
     }
@@ -117,10 +118,204 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         }
     }
 
+    func test_OnSiteVisit_WhenStateIsShowTryASearch_returnsTryASearch() {
+        let states: [ContextualOnboardingState] = [.showTryASearch]
+        tab.url = URL.duckDuckGo
+
+        for state in states {
+            stateMachine.state = state
+            let dialogType = stateMachine.dialogTypeForTab(tab)
+            XCTAssertEqual(dialogType, .tryASearch)
+        }
+    }
+
+    func test_OnSiteVisit_WhenStateIsTrackerRelatedOrFireUsedShowSearchDone_andPrivacyInfoNil_returnsNil() {
+        let states: [ContextualOnboardingState] = [.showBlockedTrackers, .showMajorOrNoTracker, .searchDoneShowBlockedTrackers, .searchDoneShowMajorOrNoTracker, .fireUsedShowSearchDone]
+        tab.url = URL.duckDuckGo
+
+        for state in states {
+            stateMachine.state = state
+            let dialogType = stateMachine.dialogTypeForTab(tab)
+            XCTAssertNil(dialogType)
+        }
+    }
+
+    func test_OnSiteVisit_WhenStateIsTrackerRelatedOrFireUsedShowSearchDone_() {
+        //TODO 
+    }
+
+    func test_OnSiteVisit_WhenStateIsShowFireButton_returnsTryFireButton() {
+        let states: [ContextualOnboardingState] = [.showFireButton]
+        tab.url = URL.duckDuckGo
+
+        for state in states {
+            stateMachine.state = state
+            let dialogType = stateMachine.dialogTypeForTab(tab)
+            XCTAssertEqual(dialogType, .tryFireButton)
+        }
+    }
+
+    func test_OnSiteVisit_WhenStateIsShowHighFive_returnsHighFive() {
+        let states: [ContextualOnboardingState] = [.showHighFive]
+        tab.url = URL.duckDuckGo
+
+        for state in states {
+            stateMachine.state = state
+            let dialogType = stateMachine.dialogTypeForTab(tab)
+            XCTAssertEqual(dialogType, .highFive)
+        }
+    }
+
+    func test_OnSiteVisit_WhenOtherStates_returnsNil() {
+        let states: [ContextualOnboardingState] = [
+            .notStarted,
+            .showTryASite,
+            .fireUsedTryASearchShown,
+            .onboardingCompleted]
+        tab.url = URL.duckDuckGo
+
+        for state in states {
+            stateMachine.state = state
+            let dialogType = stateMachine.dialogTypeForTab(tab)
+            XCTAssertEqual(dialogType, nil)
+        }
+    }
+
+    func test_OnGotItPressed_WhenStateIsShowSearchDoneOrfireUsedShowSearchDone_ThenStateTransitionsToShowTryASite() {
+           let states: [ContextualOnboardingState] = [
+               .showSearchDone,
+               .fireUsedShowSearchDone]
+
+        for state in states {
+            stateMachine.state = state
+            stateMachine.gotItPressed()
+            XCTAssertEqual(stateMachine.state, .showTryASite)
+        }
+    }
+
+    func test_OnGotItPressed_WhenStateIsTrackerRelated_ThenStateTransitionsToShowFireButton() {
+           let states: [ContextualOnboardingState] = [
+               .showBlockedTrackers,
+               .showMajorOrNoTracker,
+               .searchDoneShowBlockedTrackers,
+               .searchDoneShowMajorOrNoTracker]
+
+        for state in states {
+            stateMachine.state = state
+            stateMachine.gotItPressed()
+            XCTAssertEqual(stateMachine.state, .showFireButton)
+        }
+    }
+
+    func test_OnGotItPressed_WhenStateIsShowFireButton_ThenStateTransitionsToShowHighFive() {
+           let states: [ContextualOnboardingState] = [
+               .showFireButton]
+
+        for state in states {
+            stateMachine.state = state
+            stateMachine.gotItPressed()
+            XCTAssertEqual(stateMachine.state, .showHighFive)
+        }
+    }
+
+    func test_OnGotItPressed_WhenStateIsShowHighFive_ThenStateTransitionsToOnboardingCompleted() {
+           let states: [ContextualOnboardingState] = [
+               .showHighFive]
+
+        for state in states {
+            stateMachine.state = state
+            stateMachine.gotItPressed()
+            XCTAssertEqual(stateMachine.state, .onboardingCompleted)
+        }
+    }
+
+    func test_OnGotItPressed_WhenOtherState_ThenNoStateTransition() {
+           let states: [ContextualOnboardingState] = [
+               .notStarted,
+               .showTryASearch,
+               .showTryASite,
+               .fireUsedTryASearchShown,
+               .onboardingCompleted]
+
+        for state in states {
+            stateMachine.state = state
+            stateMachine.gotItPressed()
+            XCTAssertEqual(stateMachine.state, state)
+        }
+    }
+
+    func test_OnFireButtonUsed_WhenStateIsShowTryASearch_ThenStateTransitionsToFireUsedTryASearchShown() {
+           let states: [ContextualOnboardingState] = [
+               .showTryASearch]
+
+        for state in states {
+            stateMachine.state = state
+            stateMachine.fireButtonUsed()
+            XCTAssertEqual(stateMachine.state, .fireUsedTryASearchShown)
+        }
+    }
+
+    func test_OnFireButtonUsed_WhenStateIsFireUsedShowSearchDone_ThenStateTransitionsToShowHighFive() {
+           let states: [ContextualOnboardingState] = [
+               .fireUsedShowSearchDone]
+
+        for state in states {
+            stateMachine.state = state
+            stateMachine.fireButtonUsed()
+            XCTAssertEqual(stateMachine.state, .showHighFive)
+        }
+    }
+
+    func test_OnFireButtonUsed_WhenStateIsTrackerRelatedOrOrShowTryASiteOrShowSearchDone_ThenStateTransitionsToShowFireButton() {
+        let states: [ContextualOnboardingState] = [
+            .showMajorOrNoTracker,
+            .showBlockedTrackers,
+            .showTryASite,
+            .searchDoneShowBlockedTrackers,
+            .searchDoneShowMajorOrNoTracker,
+            .showSearchDone]
+
+        for state in states {
+            stateMachine.state = state
+            stateMachine.fireButtonUsed()
+            XCTAssertEqual(stateMachine.state, .showFireButton)
+        }
+    }
+
+    func test_OnFireButtonUsed_WhenStateIsShowHighFive_ThenNoStateTransition() {
+           let states: [ContextualOnboardingState] = [
+               .notStarted,
+               .fireUsedTryASearchShown,
+               .showFireButton,
+               .onboardingCompleted]
+
+        for state in states {
+            stateMachine.state = state
+            stateMachine.fireButtonUsed()
+            XCTAssertEqual(stateMachine.state, state)
+        }
+    }
+
+//    @MainActor
+//    func test_OnSiteVisit_WhenStateIsTrackerRelatedOrFireUsedShowSearchDone_andPrivacyInfoNotNil_returnsNil() async {
+//        let states: [ContextualOnboardingState] = [.showBlockedTrackers, .showMajorOrNoTracker, .searchDoneShowBlockedTrackers, .searchDoneShowMajorOrNoTracker, .fireUsedShowSearchDone]
+//        let expectedURL = URL(string: "bbc.com")!
+////        tab.navigateTo(url: expectedURL)
+//        _=await tab.setUrl(expectedURL, source: .link)?.result
+//
+//    }
+
 }
 
 class MockTrackerMessageProvider: TrackerMessageProviding {
+    let expectation: XCTestExpectation
+
+    init(expectation: XCTestExpectation) {
+        self.expectation = expectation
+    }
+
     func trackerMessage(privacyInfo: PrivacyInfo?) -> NSAttributedString? {
+        expectation.fulfill()
         return NSAttributedString(string: "Trackers Detected")
     }
 

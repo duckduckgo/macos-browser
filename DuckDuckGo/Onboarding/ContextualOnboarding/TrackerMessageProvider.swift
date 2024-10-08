@@ -33,7 +33,7 @@ struct MajorTrackers {
     static let domains = [facebookDomain, googleDomain]
 }
 
-enum OnboardingTrackersType {
+enum OnboardingTrackersType: Equatable {
     case majorTracker
     case ownedByMajorTracker(owner: Entity)
     case blockedTrackers(entityNames: [String])
@@ -103,7 +103,7 @@ struct TrackerMessageProvider: TrackerMessageProviding {
         return String(format: message, entityName, host)
     }
 
-    func majorTrackerOwnerMessage(_ host: String, _ majorTrackerEntity: Entity) -> String? {
+    private func majorTrackerOwnerMessage(_ host: String, _ majorTrackerEntity: Entity) -> String? {
         guard let entityName = majorTrackerEntity.displayName,
             let entityPrevalence = majorTrackerEntity.prevalence else { return nil }
         let message = UserText.ContextualOnboarding.daxDialogBrowsingSiteOwnedByMajorTracker
