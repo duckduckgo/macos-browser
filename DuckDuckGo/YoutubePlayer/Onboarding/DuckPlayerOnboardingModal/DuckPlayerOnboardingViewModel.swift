@@ -45,13 +45,11 @@ final class DuckPlayerOnboardingViewModel: ObservableObject {
 
         onboardingDecider.setOpenFirstVideoOnDuckPlayer()
         onboardingDecider.setOnboardingAsDone()
-        PixelKit.fire(NonStandardEvent(DuckPlayerOnboardingExperimentPixel.modalAccept))
     }
 
     func handleNotNowCTA() {
         delegate?.duckPlayerOnboardingViewModelDidSelectNotNow(self)
         onboardingDecider.setOnboardingAsDone()
-        PixelKit.fire(NonStandardEvent(DuckPlayerOnboardingExperimentPixel.modalReject))
     }
 
     func handleGotItCTA() {
