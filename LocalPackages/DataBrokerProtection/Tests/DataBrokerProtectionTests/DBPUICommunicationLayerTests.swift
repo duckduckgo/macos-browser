@@ -27,7 +27,7 @@ final class DBPUICommunicationLayerTests: XCTestCase {
         let mockDelegate = MockDelegate()
         let handshakeUserData = DBPUIHandshakeUserData(isAuthenticatedUser: true)
         mockDelegate.handshakeUserDataToReturn = handshakeUserData
-        var sut = DBPUICommunicationLayer(webURLSettings: MockWebSettings())
+        var sut = DBPUICommunicationLayer(webURLSettings: MockWebSettings(), privacyConfig: PrivacyConfigurationManagingMock())
         sut.delegate = mockDelegate
         let handshakeParams: [String: Any] = ["version": 4]
         let scriptMessage = await WKScriptMessage()
@@ -52,7 +52,7 @@ final class DBPUICommunicationLayerTests: XCTestCase {
         let mockDelegate = MockDelegate()
         let handshakeUserData = DBPUIHandshakeUserData(isAuthenticatedUser: false)
         mockDelegate.handshakeUserDataToReturn = handshakeUserData
-        var sut = DBPUICommunicationLayer(webURLSettings: MockWebSettings())
+        var sut = DBPUICommunicationLayer(webURLSettings: MockWebSettings(), privacyConfig: PrivacyConfigurationManagingMock())
         sut.delegate = mockDelegate
         let handshakeParams: [String: Any] = ["version": 4]
         let scriptMessage = await WKScriptMessage()
@@ -74,8 +74,7 @@ final class DBPUICommunicationLayerTests: XCTestCase {
 
     func testWhenHandshakeCalled_andDelegateIsNil_thenHandshakeUserDataIsDefaultTrue() async throws {
         // Given
-        let handshakeUserData = DBPUIHandshakeUserData(isAuthenticatedUser: true)
-        var sut = DBPUICommunicationLayer(webURLSettings: MockWebSettings())
+        let sut = DBPUICommunicationLayer(webURLSettings: MockWebSettings(), privacyConfig: PrivacyConfigurationManagingMock())
         let handshakeParams: [String: Any] = ["version": 4]
         let scriptMessage = await WKScriptMessage()
 
@@ -96,7 +95,6 @@ final class DBPUICommunicationLayerTests: XCTestCase {
 // MARK: - Mock Classes
 
 private final class MockDelegate: DBPUICommunicationDelegate {
-
     var handshakeUserDataCalled = false
     var handshakeUserDataToReturn: DBPUIHandshakeUserData?
 
@@ -137,6 +135,8 @@ private final class MockDelegate: DBPUICommunicationDelegate {
     func getBackgroundAgentMetadata() async -> DataBrokerProtection.DBPUIDebugMetadata {
         DBPUIDebugMetadata(lastRunAppVersion: "")
     }
+
+    func openSendFeedbackModal() async {}
 }
 
 private final class MockWebSettings: DataBrokerProtectionWebUIURLSettingsRepresentable {
