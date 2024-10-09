@@ -91,8 +91,6 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
         self.startUpPreferences = startupPreferences
     }
 
-    static let shared = ContextualOnboardingStateMachine()
-
     func dialogTypeForTab(_ tab: Tab, privacyInfo: PrivacyInfo? = nil) -> ContextualDialogType? {
         let info = privacyInfo ?? tab.privacyInfo
         guard case .url = tab.content else {

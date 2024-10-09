@@ -844,7 +844,7 @@ extension MainViewController {
     }
 
     @objc func resetContextualOnboarding(_ sender: Any?) {
-        ContextualOnboardingStateMachine.shared.state = .notStarted
+        Application.appDelegate.onboardingStateMachine.state = .notStarted
     }
 
     @objc func resetDuckPlayerPreferences(_ sender: Any?) {

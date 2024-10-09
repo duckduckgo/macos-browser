@@ -22,7 +22,7 @@ import XCTest
 final class FirePopoverViewModelTests: XCTestCase {
 
     @MainActor
-    private func makeViewModel(with tabCollectionViewModel: TabCollectionViewModel, contextualOnboardingStateMaching: ContextualOnboardingStateUpdater = ContextualOnboardingStateMachine.shared) -> FirePopoverViewModel {
+    private func makeViewModel(with tabCollectionViewModel: TabCollectionViewModel, contextualOnboardingStateMaching: ContextualOnboardingStateUpdater = ContextualOnboardingStateMachine()) -> FirePopoverViewModel {
         FirePopoverViewModel(
             fireViewModel: .init(),
             tabCollectionViewModel: tabCollectionViewModel,

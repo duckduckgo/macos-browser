@@ -53,7 +53,7 @@ final class FirePopoverViewModel {
          faviconManagement: FaviconManagement,
          initialClearingOption: ClearingOption = .allData,
          tld: TLD,
-         contextualOnboardingStateMaching: ContextualOnboardingStateUpdater = ContextualOnboardingStateMachine.shared) {
+         contextualOnboardingStateMaching: ContextualOnboardingStateUpdater) {
 
         self.fireViewModel = fireViewModel
         self.tabCollectionViewModel = tabCollectionViewModel
