@@ -52,6 +52,7 @@ extension HomePage.Views {
         }
 
         @State private var scrollPosition: CGFloat = 0
+        @State private var remoteMessageHeight: CGFloat = 0
 
         var continueSetUpCardsTopPadding: CGFloat {
             addressBarModel.shouldShowAddressBar || activeRemoteMessageModel.shouldShowRemoteMessage ? 24 : 0
@@ -124,22 +125,6 @@ extension HomePage.Views {
             max(0, ((Self.settingsPanelWidth + Self.minWindowWidth) - geometry.size.width) / 2)
         }
 
-        func shouldCenterContent(with geometry: GeometryProxy) -> Bool {
-            if model.isContinueSetUpAvailable && model.isContinueSetUpVisible && continueSetUpModel.shouldShowAllFeatures {
-                return false
-            }
-            if model.isFavoriteVisible && favoritesModel.showAllFavorites {
-                return false
-            }
-            if model.isRecentActivityVisible && recentlyVisitedModel.showRecentlyVisited {
-                return false
-            }
-            if activeRemoteMessageModel.shouldShowRemoteMessage {
-                return geometry.size.height > totalHeight + 2 * 112
-            }
-            return true
-        }
-
         func innerView(geometryProxy: GeometryProxy) -> some View {
             VStack(spacing: 32) {
 
@@ -178,6 +163,9 @@ extension HomePage.Views {
                         }
                     }
                     .frame(width: Self.targetWidth)
+                    .onPreferenceChange(RemoteMessageHeightPreferenceKey.self) { value in
+                        remoteMessageHeight = value
+                    }
 
                 } else {
                     if !addressBarModel.shouldShowAddressBar || !activeRemoteMessageModel.shouldShowRemoteMessage {
@@ -236,21 +224,24 @@ extension HomePage.Views {
         @ViewBuilder
         func remoteMessage() -> some View {
             if let remoteMessage = activeRemoteMessageModel.remoteMessage, let modelType = remoteMessage.content, modelType.isSupported {
-                RemoteMessageView(viewModel: .init(
-                    messageId: remoteMessage.id,
-                    modelType: modelType,
-                    onDidClose: { action in
-                        activeRemoteMessageModel.dismissRemoteMessage(with: action)
-                    },
-                    onDidAppear: {
-                        activeRemoteMessageModel.isViewOnScreen = true
-                    },
-                    onDidDisappear: {
-                        activeRemoteMessageModel.isViewOnScreen = false
-                    },
-                    openURLHandler: { url in
-                        WindowControllersManager.shared.showTab(with: .contentFromURL(url, source: .appOpenUrl))
-                    }))
+                ZStack {
+                    RemoteMessageView(viewModel: .init(
+                        messageId: remoteMessage.id,
+                        modelType: modelType,
+                        onDidClose: { action in
+                            activeRemoteMessageModel.dismissRemoteMessage(with: action)
+                        },
+                        onDidAppear: {
+                            activeRemoteMessageModel.isViewOnScreen = true
+                        },
+                        onDidDisappear: {
+                            activeRemoteMessageModel.isViewOnScreen = false
+                        },
+                        openURLHandler: { url in
+                            WindowControllersManager.shared.showTab(with: .contentFromURL(url, source: .appOpenUrl))
+                        }))
+                    RemoteMessageHeightGetter()
+                }
             } else {
                 EmptyView()
             }
@@ -391,6 +382,22 @@ extension HomePage.Views {
 /// This extension defines views and objects related to displaying Big Search Box.
 extension HomePage.Views.RootView {
 
+    func shouldCenterContent(with geometry: GeometryProxy) -> Bool {
+        if model.isContinueSetUpAvailable && model.isContinueSetUpVisible && continueSetUpModel.shouldShowAllFeatures {
+            return false
+        }
+        if model.isFavoriteVisible && favoritesModel.showAllFavorites {
+            return false
+        }
+        if model.isRecentActivityVisible && recentlyVisitedModel.showRecentlyVisited {
+            return false
+        }
+        if activeRemoteMessageModel.shouldShowRemoteMessage {
+            return geometry.size.height > totalHeight + 2 * remoteMessageHeight
+        }
+        return true
+    }
+
     @ViewBuilder
     var scrollOffsetReader: some View {
         GeometryReader { geometry in
@@ -412,6 +419,24 @@ extension HomePage.Views.RootView {
     }
 
     struct ScrollOffsetPreferenceKey: PreferenceKey {
+        typealias Value = CGFloat
+        static var defaultValue: CGFloat = 0
+
+        static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+            value = nextValue()
+        }
+    }
+
+    struct RemoteMessageHeightGetter: View {
+        var body: some View {
+            GeometryReader { geometry in
+                Color.clear
+                    .preference(key: RemoteMessageHeightPreferenceKey.self, value: geometry.size.height)
+            }
+        }
+    }
+
+    struct RemoteMessageHeightPreferenceKey: PreferenceKey {
         typealias Value = CGFloat
         static var defaultValue: CGFloat = 0
 
