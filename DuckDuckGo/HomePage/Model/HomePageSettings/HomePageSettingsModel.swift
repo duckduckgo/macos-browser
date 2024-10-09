@@ -112,9 +112,6 @@ extension HomePage.Models {
                 customBackground = nil
             } else {
                 customBackground = appearancePreferences.homePageCustomBackground
-                if let userBackgroundImage = appearancePreferences.homePageCustomBackground?.userBackgroundImage {
-                    customBackgroundImage = userBackgroundImagesManager?.image(for: userBackgroundImage)
-                }
             }
 
             self.sendPixel = sendPixel
@@ -223,9 +220,6 @@ extension HomePage.Models {
                 appearancePreferences.homePageCustomBackground = customBackground
                 if case .userImage(let userBackgroundImage) = customBackground {
                     customImagesManager?.updateSelectedTimestamp(for: userBackgroundImage)
-                    customBackgroundImage = customImagesManager?.image(for: userBackgroundImage)
-                } else {
-                    customBackgroundImage = nil
                 }
                 if let customBackground {
                     Logger.homePageSettings.debug("Home page background updated: \(customBackground), color scheme: \(customBackground.colorScheme)")
@@ -235,7 +229,6 @@ extension HomePage.Models {
             }
         }
 
-        private(set) var customBackgroundImage: NSImage?
         private(set) var solidColorPickerItems: [SolidColorBackgroundPickerItem] = []
 
         @MainActor
