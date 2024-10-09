@@ -134,7 +134,7 @@ extension HomePage.Views {
                             Spacer(minLength: 40)
 
                             if addressBarModel.shouldShowAddressBar {
-                                BigSearchBox()
+                                BigSearchBox(isCompact: isCompactSearchBar(with: geometryProxy))
                                     .id(Const.searchBarIdentifier)
                             }
 
@@ -151,7 +151,7 @@ extension HomePage.Views {
                                 .visibility(model.isRecentActivityVisible ? .visible : .gone)
                             Spacer(minLength: 40)
                         }
-                        .frame(height: totalHeight)
+                        .frame(height: totalHeight(with: geometryProxy))
 
                         VStack(spacing: 0) {
                             remoteMessage()
@@ -179,7 +179,7 @@ extension HomePage.Views {
                             }
 
                         if addressBarModel.shouldShowAddressBar {
-                            BigSearchBox()
+                            BigSearchBox(isCompact: isCompactSearchBar(with: geometryProxy))
                                 .id(Const.searchBarIdentifier)
                         }
 
@@ -201,13 +201,17 @@ extension HomePage.Views {
             }
             .frame(maxWidth: .infinity)
             .if(shouldCenterContent(with: geometryProxy)) { view in
-                view.frame(height: max(geometryProxy.size.height, totalHeight))
+                view.frame(height: max(geometryProxy.size.height, totalHeight(with: geometryProxy)))
             }
         }
 
-        private var totalHeight: CGFloat {
+        func isCompactSearchBar(with geometry: GeometryProxy) -> Bool {
+            return geometry.size.height < 650
+        }
+
+        private func totalHeight(with geometry: GeometryProxy) -> CGFloat {
             let spacers = 40.0 * 2
-            var height = BigSearchBox.Const.totalHeight + spacers
+            var height = (isCompactSearchBar(with: geometry) ? BigSearchBox.Const.compactHeight : BigSearchBox.Const.totalHeight) + spacers
             if model.isContinueSetUpAvailable && model.isContinueSetUpVisible {
                 height += continueSetUpModel.isMoreOrLessButtonNeeded ? 208 : 184
                 height += 32 + continueSetUpCardsTopPadding
@@ -393,7 +397,7 @@ extension HomePage.Views.RootView {
             return false
         }
         if activeRemoteMessageModel.shouldShowRemoteMessage {
-            return geometry.size.height > totalHeight + 2 * remoteMessageHeight
+            return geometry.size.height > totalHeight(with: geometry) + 2 * remoteMessageHeight
         }
         return true
     }

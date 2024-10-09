@@ -53,16 +53,20 @@ struct BigSearchBox: View {
     enum Const {
         static let searchBoxHeight = 40.0
         static let logoHeight = 96.0
+        static let compactLogoHeight = 64.0
         static let spacing = 24.0
         static let logoSpacing = 12.0
         static let wordmarkHeight = 22.0
 
         static let totalHeight = searchBoxHeight + logoHeight + logoSpacing + wordmarkHeight + spacing
+        static let compactHeight = searchBoxHeight + compactLogoHeight + spacing
     }
 
+    let isCompact: Bool
     let usesFixedColorScheme: Bool
 
-    init(usesFixedColorScheme: Bool = true) {
+    init(isCompact: Bool, usesFixedColorScheme: Bool = true) {
+        self.isCompact = isCompact
         self.usesFixedColorScheme = usesFixedColorScheme
     }
 
@@ -75,11 +79,20 @@ struct BigSearchBox: View {
 
     @ViewBuilder
     func logo() -> some View {
-        VStack(spacing: Const.logoSpacing) {
-            Image(nsImage: .onboardingDax)
-                .resizable()
-                .frame(width: Const.logoHeight, height: Const.logoHeight)
-            Image(nsImage: .duckDuckGoWordmark)
+        if isCompact {
+            HStack(spacing: Const.logoSpacing) {
+                Image(nsImage: .onboardingDax)
+                    .resizable()
+                    .frame(width: Const.compactLogoHeight, height: Const.compactLogoHeight)
+                Image(nsImage: .duckDuckGoWordmark)
+            }
+        } else {
+            VStack(spacing: Const.logoSpacing) {
+                Image(nsImage: .onboardingDax)
+                    .resizable()
+                    .frame(width: Const.logoHeight, height: Const.logoHeight)
+                Image(nsImage: .duckDuckGoWordmark)
+            }
         }
     }
 
