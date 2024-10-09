@@ -43,7 +43,8 @@ final class BrowserTabViewController: NSViewController {
     private let tabCollectionViewModel: TabCollectionViewModel
     private let bookmarkManager: BookmarkManager
     private let dockCustomizer = DockCustomizer()
-    private let onboardingDialogTypeProvider: ContextualOnboardingDialogTypeProviding
+    private let onboardingDialogTypeProvider: ContextualOnboardingDialogTypeProviding & ContextualOnboardingStateUpdater
+
     private let onboardingDialogFactory: ContextualDaxDialogsFactory
     private let featureFlagger: FeatureFlagger
 
@@ -71,7 +72,7 @@ final class BrowserTabViewController: NSViewController {
 
     init(tabCollectionViewModel: TabCollectionViewModel,
          bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
-         onboardingDialogTypeProvider: ContextualOnboardingDialogTypeProviding = ContextualOnboardingDialogTypeProvider(),
+         onboardingDialogTypeProvider: ContextualOnboardingDialogTypeProviding & ContextualOnboardingStateUpdater = Application.appDelegate.onboardingStateMachine,
          onboardingDialogFactory: ContextualDaxDialogsFactory = DefaultContextualDaxDialogViewFactory(),
          featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger) {
         self.tabCollectionViewModel = tabCollectionViewModel
@@ -124,13 +125,30 @@ final class BrowserTabViewController: NSViewController {
         subscribeToTabs()
         subscribeToSelectedTabViewModel()
 
+        if let webViewContainer {
+            removeChild(in: self.containerStackView, webViewContainer: webViewContainer)
+        }
+
         view.registerForDraggedTypes([.URL, .fileURL])
     }
+
+     @objc func windowDidResignActive(notification: Notification) {
+         guard let webViewContainer else { return }
+         containerStackView.arrangedSubviews.filter({ $0 != webViewContainer }).forEach {
+             containerStackView.removeArrangedSubview($0)
+             $0.removeFromSuperview()
+         }
+     }
 
     override func viewWillAppear() {
         super.viewWillAppear()
 
         addMouseMonitors()
+
+        // Register for focus-related notifications
+        if let window = view.window {
+            NotificationCenter.default.addObserver(self, selector: #selector(windowDidResignActive), name: NSWindow.didResignKeyNotification, object: window)
+        }
     }
 
     override func viewWillDisappear() {
@@ -296,7 +314,10 @@ final class BrowserTabViewController: NSViewController {
                 self.subscribeToDuckPlayerOnboardingPrompt(of: selectedTabViewModel)
 
                 self.adjustFirstResponder(force: true)
-                self.presentContextualOnboarding()
+                containerStackView.arrangedSubviews.filter({ $0 != self.webViewContainer }).forEach {
+                    self.containerStackView.removeArrangedSubview($0)
+                    $0.removeFromSuperview()
+                }
             }
             .store(in: &cancellables)
     }
@@ -396,8 +417,9 @@ final class BrowserTabViewController: NSViewController {
 
         guard featureFlagger.isFeatureOn(.highlightsOnboarding) else { return }
 
-        guard let tab = tabViewModel?.tab,
-              let dialogType = onboardingDialogTypeProvider.dialogTypeForTab(tab) else {
+        guard let tab = tabViewModel?.tab else { return }
+        onboardingDialogTypeProvider.updateStateFor(tab: tab)
+        guard let dialogType = onboardingDialogTypeProvider.dialogTypeForTab(tab, privacyInfo: tab.privacyInfo) else {
             return
         }
 
@@ -408,7 +430,7 @@ final class BrowserTabViewController: NSViewController {
                 self.removeChild(in: self.containerStackView, webViewContainer: webViewContainer)
             }
         }
-        let daxView = onboardingDialogFactory.makeView(for: dialogType, delegate: tab, onDismiss: onDismissAction)
+        let daxView = onboardingDialogFactory.makeView(for: dialogType, delegate: tab, onDismiss: onDismissAction, onGotItPressed: onboardingDialogTypeProvider.gotItPressed)
         let hostingController = NSHostingController(rootView: AnyView(daxView))
 
         daxContextualOnboardingController = hostingController

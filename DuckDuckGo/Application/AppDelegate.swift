@@ -92,6 +92,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let activeRemoteMessageModel: ActiveRemoteMessageModel
     let homePageSettingsModel = HomePage.Models.SettingsModel()
     let remoteMessagingClient: RemoteMessagingClient!
+    let onboardingStateMachine: ContextualOnboardingStateMachine & ContextualOnboardingStateUpdater
 
     public let subscriptionManager: SubscriptionManager
     public let subscriptionUIHandler: SubscriptionUIHandling
@@ -256,6 +257,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             internalUserDecider: internalUserDecider,
             privacyConfigManager: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
         )
+
+        onboardingStateMachine = ContextualOnboardingStateMachine()
 
         // Configure Subscription
         subscriptionManager = DefaultSubscriptionManager()

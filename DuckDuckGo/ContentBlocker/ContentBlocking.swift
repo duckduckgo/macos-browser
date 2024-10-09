@@ -193,7 +193,7 @@ final class AppContentBlocking {
     }
 }
 
-protocol ContentBlockerRulesManagerProtocol: CompiledRuleListsSource {
+protocol ContentBlockerRulesManagerProtocol: CompiledRuleListsSource, EntityProviding {
     var updatesPublisher: AnyPublisher<ContentBlockerRulesManager.UpdateEvent, Never> { get }
     var currentRules: [ContentBlockerRulesManager.Rules] { get }
     @discardableResult func scheduleCompilation() -> ContentBlockerRulesManager.CompletionToken
