@@ -84,6 +84,21 @@ final class UserBackgroundImagesManagerTests: XCTestCase {
         XCTAssertEqual(sendPixelEvents.map(\.name), [NewTabBackgroundPixel.newTabBackgroundImageNotFound.name])
     }
 
+    func testImageWhenUserImageFileWasManuallyRemovedFromDiskAfterAccessingThenCachedNSImageIsReturned() throws {
+        let image = NSImage.sampleImage(with: .black)
+        let imageURL = manager.storageLocation.appending("abc.jpg")
+        try image.save(to: imageURL)
+        let userBackgroundImage = UserBackgroundImage(fileName: "abc.jpg", colorScheme: .light)
+
+        let savedImage = manager.image(for: userBackgroundImage)
+        XCTAssertNotNil(savedImage)
+
+        try FileManager.default.removeItem(at: imageURL)
+        XCTAssertIdentical(manager.image(for: userBackgroundImage), savedImage)
+
+        XCTAssertTrue(sendPixelEvents.isEmpty)
+    }
+
     func testImageWhenCalledMultipleTimesAndUserImageFileDoesNotExistThenOnlyOnePixelIsSent() throws {
         let userBackgroundImage1 = UserBackgroundImage(fileName: "abc.jpg", colorScheme: .light)
         let userBackgroundImage2 = UserBackgroundImage(fileName: "def.jpg", colorScheme: .light)
@@ -130,6 +145,21 @@ final class UserBackgroundImagesManagerTests: XCTestCase {
 
         XCTAssertNotNil(manager.thumbnailImage(for: userBackgroundImage))
         XCTAssertEqual(sendPixelEvents.map(\.name), [NewTabBackgroundPixel.newTabBackgroundThumbnailNotFound.name])
+    }
+
+    func testThumbnailImageWhenUserImageFileWasManuallyRemovedFromDiskAfterAccessingThenCachedNSImageIsReturned() throws {
+        let image = NSImage.sampleImage(with: .black)
+        let imageURL = manager.thumbnailsStorageLocation.appending("abc.jpg")
+        try image.save(to: imageURL)
+        let userBackgroundImage = UserBackgroundImage(fileName: "abc.jpg", colorScheme: .light)
+
+        let savedImage = manager.thumbnailImage(for: userBackgroundImage)
+        XCTAssertNotNil(savedImage)
+
+        try FileManager.default.removeItem(at: imageURL)
+        XCTAssertIdentical(manager.thumbnailImage(for: userBackgroundImage), savedImage)
+
+        XCTAssertTrue(sendPixelEvents.isEmpty)
     }
 
     func testThumbnailImageWhenCalledMultipleTimesAndThumbnailFileDoesNotExistThenOnlyOnePixelIsSent() throws {
