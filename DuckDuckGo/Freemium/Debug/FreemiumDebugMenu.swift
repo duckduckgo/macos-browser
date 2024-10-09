@@ -50,8 +50,9 @@ final class FreemiumDebugMenu: NSMenuItem {
         menu.addItem(NSMenuItem(title: "Set New Tab Promotion Did Dismiss FALSE", action: #selector(setNewTabPromotionDidDismissFalse), target: self))
         menu.addItem(.separator())
         menu.addItem(NSMenuItem(title: "Log all state", action: #selector(logAllState), target: self))
+        menu.addItem(NSMenuItem(title: "Display all state", action: #selector(displayAllState), target: self))
         menu.addItem(.separator())
-        menu.addItem(NSMenuItem(title: "Set Experiment Cohort to Treatment", action: #selector(setCohortToTreatment), target: self))
+        menu.addItem(NSMenuItem(title: "Enroll into Experiment", action: #selector(enrollIntoExperiment), target: self))
         menu.addItem(NSMenuItem(title: "Reset Freemium DBP Experiment State", action: #selector(resetFreemiumDBPExperimentState), target: self))
         menu.addItem(.separator())
         menu.addItem(NSMenuItem(title: "Reset all Freemium Feature State", action: #selector(resetAllState), target: self))
@@ -131,8 +132,37 @@ final class FreemiumDebugMenu: NSMenuItem {
     }
 
     @objc
-    func setCohortToTreatment() {
+    func displayAllState() {
+        let didActivate = "Activated: \(DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).didActivate)"
+        let firstProfileSavedTimestamp = "First Profile Saved Timestamp: \(DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).firstProfileSavedTimestamp ?? "Nil")"
+        let didPostFirstProfileSavedNotification = "Posted First Profile Saved Notification: \(DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).didPostFirstProfileSavedNotification)"
+        let didPostResultsNotification = "Posted Results Notification: \(DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).didPostResultsNotification)"
+        let firstScanResults = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).firstScanResults.map { "First Scan Results: \($0.matchesCount) matches, \($0.brokerCount) brokers" } ?? "First Scan Results: Nil"
+        let didDismissHomePagePromotion = "Dismissed Home Page Promotion: \(DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).didDismissHomePagePromotion)"
+        let enrollmentDateLog = UserDefaults.dbp.object(forKey: Keys.enrollmentDate).flatMap { $0 as? Date }.map { "Enrollment Date: \($0)" } ?? "Enrollment Date: Not set"
+        let cohortValueLog = UserDefaults.dbp.string(forKey: Keys.experimentCohort).map { "Cohort: \($0)" } ?? "Cohort: Not set"
+
+        let alert = NSAlert()
+        alert.messageText = "State Information"
+        alert.informativeText = """
+        • \(didActivate)
+        • \(firstProfileSavedTimestamp)
+        • \(didPostFirstProfileSavedNotification)
+        • \(didPostResultsNotification)
+        • \(firstScanResults)
+        • \(didDismissHomePagePromotion)
+        • \(enrollmentDateLog)
+        • \(cohortValueLog)
+        """
+        alert.alertStyle = .informational
+        alert.addButton(withTitle: "OK")
+        alert.runModal()
+    }
+
+    @objc
+    func enrollIntoExperiment() {
         UserDefaults.dbp.set("treatment", forKey: Keys.experimentCohort)
+        UserDefaults.dbp.set(Date(), forKey: Keys.enrollmentDate)
     }
 
     @objc
