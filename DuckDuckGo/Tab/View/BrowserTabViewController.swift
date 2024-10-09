@@ -419,7 +419,7 @@ final class BrowserTabViewController: NSViewController {
 
         guard let tab = tabViewModel?.tab else { return }
         onboardingDialogTypeProvider.updateStateFor(tab: tab)
-        guard let dialogType = onboardingDialogTypeProvider.dialogTypeForTab(tab) else {
+        guard let dialogType = onboardingDialogTypeProvider.dialogTypeForTab(tab, privacyInfo: tab.privacyInfo) else {
             return
         }
 

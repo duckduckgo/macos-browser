@@ -21,6 +21,7 @@ import SwiftUI
 import Onboarding
 import Combine
 import BrowserServicesKit
+import PrivacyDashboard
 @testable import DuckDuckGo_Privacy_Browser
 
 final class BrowserTabViewControllerOnboardingTests: XCTestCase {
@@ -130,7 +131,7 @@ class MockDialogsProvider: ContextualOnboardingDialogTypeProviding, ContextualOn
 
     var dialog: ContextualDialogType?
 
-    func dialogTypeForTab(_ tab: Tab) -> ContextualDialogType? {
+    func dialogTypeForTab(_ tab: Tab, privacyInfo: PrivacyInfo?) -> ContextualDialogType? {
         return dialog
     }
 

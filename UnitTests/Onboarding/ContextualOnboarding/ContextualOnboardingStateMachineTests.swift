@@ -20,15 +20,23 @@ import XCTest
 import PrivacyDashboard
 @testable import DuckDuckGo_Privacy_Browser
 
+@available(macOS 12.0, *)
 class ContextualOnboardingStateMachineTests: XCTestCase {
 
     var stateMachine: ContextualOnboardingStateMachine!
     var mockTrackerMessageProvider: MockTrackerMessageProvider!
     var tab: Tab!
     let expectation = XCTestExpectation()
+    var window: NSWindow!
+    var tabViewModel: TabViewModel {
+        (window.contentViewController as! MainViewController).browserTabViewController.tabViewModel!
+    }
 
     @MainActor override func setUp() {
         super.setUp()
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = false
+
+        window = WindowsManager.openNewWindow(with: .none)!
         UserDefaultsWrapper<Any>.clearAll()
         mockTrackerMessageProvider = MockTrackerMessageProvider(expectation: expectation)
         stateMachine = ContextualOnboardingStateMachine(trackerMessageProvider: mockTrackerMessageProvider)
@@ -39,6 +47,10 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         stateMachine = nil
         mockTrackerMessageProvider = nil
         tab = nil
+        window.close()
+        window = nil
+
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = true
         super.tearDown()
     }
 
@@ -140,8 +152,16 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         }
     }
 
-    func test_OnSiteVisit_WhenStateIsTrackerRelatedOrFireUsedShowSearchDone_() {
-        //TODO 
+    func test_OnSiteVisit_WhenStateIsTrackerRelatedOrFireUsedShowSearchDone_returnsTrackersShouldFollowUp() {
+        let states: [ContextualOnboardingState] = [.showBlockedTrackers, .showMajorOrNoTracker, .searchDoneShowBlockedTrackers, .searchDoneShowMajorOrNoTracker, .fireUsedShowSearchDone]
+        tab.url = URL.duckDuckGo
+        let privacyInfo = PrivacyInfo(url: tab.url!, parentEntity: nil, protectionStatus: ProtectionStatus(unprotectedTemporary: true, enabledFeatures: [], allowlisted: false, denylisted: false), isPhishing: false, shouldCheckServerTrust: true)
+
+        for state in states {
+            stateMachine.state = state
+            let dialogType = stateMachine.dialogTypeForTab(tab, privacyInfo: privacyInfo)
+            XCTAssertEqual(dialogType, .trackers(message: mockTrackerMessageProvider.message, shouldFollowUp: true))
+        }
     }
 
     func test_OnSiteVisit_WhenStateIsShowFireButton_returnsTryFireButton() {
@@ -296,19 +316,11 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         }
     }
 
-//    @MainActor
-//    func test_OnSiteVisit_WhenStateIsTrackerRelatedOrFireUsedShowSearchDone_andPrivacyInfoNotNil_returnsNil() async {
-//        let states: [ContextualOnboardingState] = [.showBlockedTrackers, .showMajorOrNoTracker, .searchDoneShowBlockedTrackers, .searchDoneShowMajorOrNoTracker, .fireUsedShowSearchDone]
-//        let expectedURL = URL(string: "bbc.com")!
-////        tab.navigateTo(url: expectedURL)
-//        _=await tab.setUrl(expectedURL, source: .link)?.result
-//
-//    }
-
 }
 
 class MockTrackerMessageProvider: TrackerMessageProviding {
     let expectation: XCTestExpectation
+    let message = NSAttributedString(string: "Trackers Detected")
 
     init(expectation: XCTestExpectation) {
         self.expectation = expectation
@@ -316,7 +328,7 @@ class MockTrackerMessageProvider: TrackerMessageProviding {
 
     func trackerMessage(privacyInfo: PrivacyInfo?) -> NSAttributedString? {
         expectation.fulfill()
-        return NSAttributedString(string: "Trackers Detected")
+        return message
     }
 
     func trackersType(privacyInfo: PrivacyInfo?) -> OnboardingTrackersType? {

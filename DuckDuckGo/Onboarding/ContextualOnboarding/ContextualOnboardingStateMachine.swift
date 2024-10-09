@@ -17,9 +17,10 @@
 //
 
 import Foundation
+import PrivacyDashboard
 
 protocol ContextualOnboardingDialogTypeProviding {
-    func dialogTypeForTab(_ tab: Tab) -> ContextualDialogType?
+    func dialogTypeForTab(_ tab: Tab, privacyInfo: PrivacyInfo?) -> ContextualDialogType?
 }
 
 protocol ContextualOnboardingStateUpdater {
@@ -92,7 +93,8 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
 
     static let shared = ContextualOnboardingStateMachine()
 
-    func dialogTypeForTab(_ tab: Tab) -> ContextualDialogType? {
+    func dialogTypeForTab(_ tab: Tab, privacyInfo: PrivacyInfo? = nil) -> ContextualDialogType? {
+        let info = privacyInfo ?? tab.privacyInfo
         guard case .url = tab.content else {
             return nil
         }
@@ -108,7 +110,7 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
         if url.isDuckDuckGoSearch {
             return dialogPerSearch()
         } else {
-            return dialogPerSiteVisit(tab: tab)
+            return dialogPerSiteVisit(privacyInfo: info)
         }
     }
 
@@ -129,12 +131,12 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
         }
     }
 
-    private func dialogPerSiteVisit(tab: Tab) -> ContextualDialogType? {
+    private func dialogPerSiteVisit(privacyInfo: PrivacyInfo?) -> ContextualDialogType? {
         switch state {
         case .showTryASearch:
             return .tryASearch
         case .showBlockedTrackers, .showMajorOrNoTracker, .searchDoneShowBlockedTrackers, .searchDoneShowMajorOrNoTracker, .fireUsedShowSearchDone:
-            guard let privacyInfo = tab.privacyInfo else { return nil }
+            guard let privacyInfo else { return nil }
             guard let message = trackerMessageProvider.trackerMessage(privacyInfo: privacyInfo) else { return nil }
             return .trackers(message: message, shouldFollowUp: true)
         case .showFireButton:
