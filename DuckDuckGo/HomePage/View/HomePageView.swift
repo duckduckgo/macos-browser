@@ -124,7 +124,7 @@ extension HomePage.Views {
             max(0, ((Self.settingsPanelWidth + Self.minWindowWidth) - geometry.size.width) / 2)
         }
 
-        var shouldCenterContent: Bool {
+        func shouldCenterContent(with geometry: GeometryProxy) -> Bool {
             if model.isContinueSetUpAvailable && model.isContinueSetUpVisible && continueSetUpModel.shouldShowAllFeatures {
                 return false
             }
@@ -134,40 +134,50 @@ extension HomePage.Views {
             if model.isRecentActivityVisible && recentlyVisitedModel.showRecentlyVisited {
                 return false
             }
+            if activeRemoteMessageModel.shouldShowRemoteMessage {
+                return geometry.size.height > totalHeight + 2 * 112
+            }
             return true
         }
 
         func innerView(geometryProxy: GeometryProxy) -> some View {
             VStack(spacing: 32) {
 
-                if shouldCenterContent {
-                    VStack(spacing: 32) {
-                        Spacer(minLength: 40)
-                        if addressBarModel.shouldShowAddressBar {
-                            remoteMessage()
-                                .padding(.top, 16)
+                if shouldCenterContent(with: geometryProxy) {
+                    ZStack {
+                        VStack(spacing: 32) {
+                            Spacer(minLength: 40)
 
-                            BigSearchBox()
-                                .id(Const.searchBarIdentifier)
-                        } else {
-                            remoteMessage()
+                            if addressBarModel.shouldShowAddressBar {
+                                BigSearchBox()
+                                    .id(Const.searchBarIdentifier)
+                            }
+
+                            if model.isContinueSetUpAvailable {
+                                ContinueSetUpView()
+                                    .visibility(model.isContinueSetUpVisible ? .visible : .gone)
+                                    .padding(.top, continueSetUpCardsTopPadding)
+                            }
+
+                            Favorites()
+                                .visibility(model.isFavoriteVisible ? .visible : .gone)
+
+                            RecentlyVisited()
+                                .visibility(model.isRecentActivityVisible ? .visible : .gone)
+                            Spacer(minLength: 40)
                         }
+                        .frame(height: totalHeight)
 
-                        if model.isContinueSetUpAvailable {
-                            ContinueSetUpView()
-                                .visibility(model.isContinueSetUpVisible ? .visible : .gone)
-                                .padding(.top, continueSetUpCardsTopPadding)
+                        VStack(spacing: 0) {
+                            remoteMessage()
+                                .if(addressBarModel.shouldShowAddressBar) { view in
+                                    view.padding(.top, 16)
+                                }
+                            Spacer()
+                                .layoutPriority(1)
                         }
-
-                        Favorites()
-                            .visibility(model.isFavoriteVisible ? .visible : .gone)
-
-                        RecentlyVisited()
-                            .padding(.bottom, 16)
-                            .visibility(model.isRecentActivityVisible ? .visible : .gone)
-                        Spacer(minLength: 40)
                     }
-                    .frame(width: Self.targetWidth, height: totalHeight)
+                    .frame(width: Self.targetWidth)
 
                 } else {
                     if !addressBarModel.shouldShowAddressBar || !activeRemoteMessageModel.shouldShowRemoteMessage {
@@ -175,14 +185,14 @@ extension HomePage.Views {
                     }
 
                     Group {
-                        if addressBarModel.shouldShowAddressBar {
-                            remoteMessage()
-                                .padding(.top, 16)
+                        remoteMessage()
+                            .if(addressBarModel.shouldShowAddressBar) { view in
+                                view.padding(.top, 16)
+                            }
 
+                        if addressBarModel.shouldShowAddressBar {
                             BigSearchBox()
                                 .id(Const.searchBarIdentifier)
-                        } else {
-                            remoteMessage()
                         }
 
                         if model.isContinueSetUpAvailable {
@@ -202,7 +212,7 @@ extension HomePage.Views {
                 }
             }
             .frame(maxWidth: .infinity)
-            .if(shouldCenterContent) { view in
+            .if(shouldCenterContent(with: geometryProxy)) { view in
                 view.frame(height: max(geometryProxy.size.height, totalHeight))
             }
         }
@@ -218,7 +228,7 @@ extension HomePage.Views {
                 height += 126 + 32
             }
             if model.isRecentActivityVisible {
-                height += 90 + 32 + 16
+                height += 90 + 32
             }
             return height
         }

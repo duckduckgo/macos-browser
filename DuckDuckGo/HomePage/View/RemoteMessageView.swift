@@ -106,14 +106,20 @@ struct RemoteMessageView: View {
     private var title: some View {
         Text(viewModel.title)
             .font(.system(size: 13).bold())
+            .multilineTextAlignment(.leading)
+            .fixMultilineScrollableText()
    }
 
     @ViewBuilder
     private var subtitle: some View {
         if #available(macOS 12.0, *), let attributed = try? AttributedString(markdown: viewModel.subtitle) {
             Text(attributed)
+                .multilineTextAlignment(.leading)
+                .fixMultilineScrollableText()
         } else {
             Text(viewModel.subtitle)
+                .multilineTextAlignment(.leading)
+                .fixMultilineScrollableText()
         }
     }
 
