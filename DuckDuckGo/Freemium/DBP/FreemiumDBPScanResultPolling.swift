@@ -50,14 +50,14 @@ final class DefaultFreemiumDBPScanResultPolling: FreemiumDBPScanResultPolling {
     ///   - dataManager: The data manager responsible for managing broker protection data.
     ///   - freemiumDBPUserStateManager: Manages the state of the user's profile in Freemium DBP.
     ///   - notificationCenter: The notification center used for posting and observing notifications. Defaults to `.default`.
-    ///   - timerInterval: The interval in seconds between polling checks. Defaults to 1 hour.
+    ///   - timerInterval: The interval in seconds between polling checks. Defaults to 30 mins.
     ///   - maxCheckDuration: The maximum time allowed before stopping polling without results. Defaults to 24 hours.
     ///   - dateFormatter: A `DateFormatter` for formatting dates. Defaults to a POSIX date-time formatter.
     init(
         dataManager: DataBrokerProtectionDataManaging,
         freemiumDBPUserStateManager: FreemiumDBPUserStateManager,
         notificationCenter: NotificationCenter = .default,
-        timerInterval: TimeInterval = 3600,  // 1 hour in seconds
+        timerInterval: TimeInterval = 1800,  // 30 mins in seconds
         maxCheckDuration: TimeInterval = 86400,  // 24 hours in seconds
         dateFormatter: DateFormatter = DefaultFreemiumDBPScanResultPolling.makePOSIXDateTimeFormatter()
     ) {
