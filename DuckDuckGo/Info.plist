@@ -503,6 +503,8 @@
 	<string>$(DISTRIBUTED_NOTIFICATIONS_PREFIX)</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>LSMultipleInstancesProhibited</key>
+	<true/>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.productivity</string>
 	<key>LSMinimumSystemVersion</key>
