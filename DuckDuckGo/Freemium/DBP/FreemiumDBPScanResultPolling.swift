@@ -57,7 +57,7 @@ final class DefaultFreemiumDBPScanResultPolling: FreemiumDBPScanResultPolling {
         dataManager: DataBrokerProtectionDataManaging,
         freemiumDBPUserStateManager: FreemiumDBPUserStateManager,
         notificationCenter: NotificationCenter = .default,
-        timerInterval: TimeInterval = 3600,  // 1 hour in seconds
+        timerInterval: TimeInterval = 120,  // 1 hour in seconds
         maxCheckDuration: TimeInterval = 86400,  // 24 hours in seconds
         dateFormatter: DateFormatter = DefaultFreemiumDBPScanResultPolling.makePOSIXDateTimeFormatter()
     ) {
