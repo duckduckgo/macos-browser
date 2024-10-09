@@ -640,6 +640,12 @@ final class MainMenu: NSMenu {
                     .submenu(NetworkProtectionDebugMenu())
             }
 
+            if #available(macOS 13.5, *) {
+                NSMenuItem(title: "Autofill") {
+                    NSMenuItem(title: "View all Credentials", action: #selector(MainViewController.showAllCredentials)).withAccessibilityIdentifier("MainMenu.showAllCredentials")
+                }
+            }
+
             NSMenuItem(title: "Simulate crash") {
                 NSMenuItem(title: "fatalError", action: #selector(MainViewController.triggerFatalError))
                 NSMenuItem(title: "NSException", action: #selector(MainViewController.crashOnException))

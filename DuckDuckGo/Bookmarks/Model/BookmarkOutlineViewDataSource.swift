@@ -172,30 +172,34 @@ final class BookmarkOutlineViewDataSource: NSObject, BookmarksOutlineViewDataSou
         }
     }
 
-    func firstHighlightableRow(for _: BookmarksOutlineView) -> Int? {
-        nodeForItem(nil).childNodes.firstIndex { $0.canBeHighlighted }
+    func firstHighlightableRow(for outlineView: BookmarksOutlineView) -> Int? {
+        return (0..<outlineView.numberOfRows).first { row in
+            nodeForItem(outlineView.item(atRow: row)).canBeHighlighted
+        }
     }
 
     func nextHighlightableRow(inNextSection: Bool, for outlineView: BookmarksOutlineView, after row: Int) -> Int? {
         if inNextSection {
             return lastHighlightableRow(for: outlineView) // no sections support for now
         }
-        let nodes = nodeForItem(nil).childNodes
-        guard nodes.indices.contains(row + 1) else { return nil }
-        return nodes[(row + 1)...].firstIndex { $0.canBeHighlighted }
+        return ((row + 1)..<outlineView.numberOfRows).first { row in
+            nodeForItem(outlineView.item(atRow: row)).canBeHighlighted
+        }
     }
 
     func previousHighlightableRow(inPreviousSection: Bool, for outlineView: BookmarksOutlineView, before row: Int) -> Int? {
         if inPreviousSection {
             return firstHighlightableRow(for: outlineView) // no sections support for now
         }
-        let nodes = nodeForItem(nil).childNodes
-        guard nodes.indices.contains(row) else { return nil }
-        return nodes[..<row].lastIndex { $0.canBeHighlighted }
+        return (0..<row).last { row in
+            nodeForItem(outlineView.item(atRow: row)).canBeHighlighted
+        }
     }
 
-    func lastHighlightableRow(for _: BookmarksOutlineView) -> Int? {
-        nodeForItem(nil).childNodes.lastIndex { $0.canBeHighlighted }
+    func lastHighlightableRow(for outlineView: BookmarksOutlineView) -> Int? {
+        return (0..<outlineView.numberOfRows).last { row in
+            nodeForItem(outlineView.item(atRow: row)).canBeHighlighted
+        }
     }
 
     func outlineView(_ outlineView: NSOutlineView, viewFor tableColumn: NSTableColumn?, item: Any) -> NSView? {

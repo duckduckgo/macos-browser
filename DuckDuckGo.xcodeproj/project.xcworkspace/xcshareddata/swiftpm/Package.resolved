@@ -33,7 +33,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "dominik/ntp-search-bar",
-        "revision" : "9f1afadfbeee5ac0a0dad5937e1f255f719f37ea"
+        "revision" : "e4de78df894372a68570c189f13dc9cf48ff3715"
       }
     },
     {
@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "4f0d109f13beec7e8beaf0bd5c0e2c1d528677f8",
-        "version" : "6.16.0"
+        "revision" : "1ed569676555d493c9c5575eaed22aa02569aac9",
+        "version" : "6.19.0"
       }
     },
     {

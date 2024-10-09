@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1727210383241,
+    "version": 1728095993160,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -5903,6 +5903,12 @@
             "settings": {},
             "hash": "dfede9f06b9e322e198736703d013d15"
         },
+        "sendFullPackageInstallSource": {
+            "state": "enabled",
+            "settings": {},
+            "exceptions": [],
+            "hash": "26d319ff4b2f43012a287b5f35a8db3a"
+        },
         "serviceworkerInitiatedRequests": {
             "exceptions": [
                 {
@@ -6855,6 +6861,7 @@
                                     "nytimes.com",
                                     "realmadrid.com",
                                     "rocketnews24.com",
+                                    "solitaired.com",
                                     "stuff.co.nz",
                                     "uwbadgers.com",
                                     "wunderground.com",
@@ -7101,7 +7108,8 @@
                                     "bandsintown.com",
                                     "mytrackman.com",
                                     "nextdoor.co.uk",
-                                    "nextdoor.com"
+                                    "nextdoor.com",
+                                    "solitaired.com"
                                 ]
                             },
                             {
@@ -9353,7 +9361,7 @@
                     "domain": "instructure.com"
                 }
             ],
-            "hash": "a25d6ff5573cba01207d2793440b370b"
+            "hash": "1cf339c9f618be0304f90f0f48a7b6cf"
         },
         "trackingCookies1p": {
             "settings": {
