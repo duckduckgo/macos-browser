@@ -84,7 +84,7 @@ final class UserBackgroundImagesManagerTests: XCTestCase {
         XCTAssertEqual(sendPixelEvents.map(\.name), [NewTabBackgroundPixel.newTabBackgroundImageNotFound.name])
     }
 
-    func testImageWhenUserImageFileWasDeletedAfterAccessingThenCachedNSImageIsReturned() throws {
+    func testImageWhenUserImageFileWasManuallyRemovedFromDiskAfterAccessingThenCachedNSImageIsReturned() throws {
         let image = NSImage.sampleImage(with: .black)
         let imageURL = manager.storageLocation.appending("abc.jpg")
         try image.save(to: imageURL)
@@ -147,7 +147,7 @@ final class UserBackgroundImagesManagerTests: XCTestCase {
         XCTAssertEqual(sendPixelEvents.map(\.name), [NewTabBackgroundPixel.newTabBackgroundThumbnailNotFound.name])
     }
 
-    func testThumbnailImageWhenUserImageFileWasDeletedAfterAccessingThenCachedNSImageIsReturned() throws {
+    func testThumbnailImageWhenUserImageFileWasManuallyRemovedFromDiskAfterAccessingThenCachedNSImageIsReturned() throws {
         let image = NSImage.sampleImage(with: .black)
         let imageURL = manager.thumbnailsStorageLocation.appending("abc.jpg")
         try image.save(to: imageURL)
