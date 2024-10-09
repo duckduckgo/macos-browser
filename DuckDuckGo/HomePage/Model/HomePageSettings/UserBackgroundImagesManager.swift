@@ -110,6 +110,9 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
         }
     }
 
+    /**
+     * These caches store up to 4 images each, as enforced by the app UI where you can't add more images.
+     */
     private var imagesCache: [UserBackgroundImage: NSImage] = [:]
     private var thumbnailsCache: [UserBackgroundImage: NSImage] = [:]
 
