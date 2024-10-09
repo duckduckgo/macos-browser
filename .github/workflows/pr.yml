@@ -271,12 +271,6 @@ jobs:
         report_paths: '${{ matrix.flavor }}*.xml'
         check_retries: true
 
-    - name: Setup tmate session
-      uses: mxschmitt/action-tmate@v3
-      if: failure()
-      with:
-        limit-access-to-actor: true
-
     - name: Update Asana with failed unit tests
       if: always() # always run even if the previous step fails
       env:
