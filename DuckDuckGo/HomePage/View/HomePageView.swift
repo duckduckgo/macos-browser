@@ -36,12 +36,13 @@ extension HomePage.Views {
         @EnvironmentObject var activeRemoteMessageModel: ActiveRemoteMessageModel
         @EnvironmentObject var settingsVisibilityModel: HomePage.Models.SettingsVisibilityModel
         @EnvironmentObject var addressBarModel: HomePage.Models.AddressBarModel
+        @EnvironmentObject var recentlyVisitedModel: HomePage.Models.RecentlyVisitedModel
 
         var body: some View {
             if isBurner {
                 BurnerHomePageView()
             } else {
-                regularHomePageView(includingContinueSetUpCards: model.isContinueSetUpAvailable)
+                regularHomePageView()
             }
         }
 
@@ -56,7 +57,7 @@ extension HomePage.Views {
             addressBarModel.shouldShowAddressBar || activeRemoteMessageModel.shouldShowRemoteMessage ? 24 : 0
         }
 
-        func regularHomePageView(includingContinueSetUpCards: Bool) -> some View {
+        func regularHomePageView() -> some View {
             GeometryReader { geometry in
                 ZStack(alignment: .top) {
 
@@ -65,7 +66,7 @@ extension HomePage.Views {
                             ScrollViewReader { proxy in
                                 ScrollView {
                                     VStack(spacing: 0) {
-                                        innerView(includingContinueSetUpCards: includingContinueSetUpCards)
+                                        innerView(geometryProxy: geometry)
                                             .frame(width: geometry.size.width - (settingsVisibilityModel.isSettingsVisible ? Self.settingsPanelWidth : 0))
                                             .offset(x: settingsVisibilityModel.isSettingsVisible ? innerViewOffset(with: geometry) : 0)
                                             .fixedColorScheme(for: settingsModel.customBackground)
@@ -85,7 +86,7 @@ extension HomePage.Views {
                         .contextMenu(menuItems: sectionsVisibilityContextMenuItems)
 
                         if settingsVisibilityModel.isSettingsVisible {
-                            SettingsView(includingContinueSetUpCards: includingContinueSetUpCards, isSettingsVisible: $settingsVisibilityModel.isSettingsVisible)
+                            SettingsView(includingContinueSetUpCards: model.isContinueSetUpAvailable, isSettingsVisible: $settingsVisibilityModel.isSettingsVisible)
                                 .frame(width: Self.settingsPanelWidth)
                                 .transition(.move(edge: .trailing))
                                 .layoutPriority(1)
@@ -123,41 +124,103 @@ extension HomePage.Views {
             max(0, ((Self.settingsPanelWidth + Self.minWindowWidth) - geometry.size.width) / 2)
         }
 
-        func innerView(includingContinueSetUpCards: Bool) -> some View {
+        var shouldCenterContent: Bool {
+            if model.isContinueSetUpAvailable && model.isContinueSetUpVisible && continueSetUpModel.shouldShowAllFeatures {
+                return false
+            }
+            if model.isFavoriteVisible && favoritesModel.showAllFavorites {
+                return false
+            }
+            if model.isRecentActivityVisible && recentlyVisitedModel.showRecentlyVisited {
+                return false
+            }
+            return true
+        }
+
+        func innerView(geometryProxy: GeometryProxy) -> some View {
             VStack(spacing: 32) {
 
-                if !addressBarModel.shouldShowAddressBar || !activeRemoteMessageModel.shouldShowRemoteMessage {
-                    Spacer(minLength: 32)
-                }
+                if shouldCenterContent {
+                    VStack(spacing: 32) {
+                        Spacer(minLength: 40)
+                        if addressBarModel.shouldShowAddressBar {
+                            remoteMessage()
+                                .padding(.top, 16)
 
-                Group {
-                    if addressBarModel.shouldShowAddressBar {
-                        remoteMessage()
-                            .padding(.top, 16)
+                            BigSearchBox()
+                                .id(Const.searchBarIdentifier)
+                        } else {
+                            remoteMessage()
+                        }
 
-                        BigSearchBox()
-                            .id(Const.searchBarIdentifier)
-                    } else {
-                        remoteMessage()
+                        if model.isContinueSetUpAvailable {
+                            ContinueSetUpView()
+                                .visibility(model.isContinueSetUpVisible ? .visible : .gone)
+                                .padding(.top, continueSetUpCardsTopPadding)
+                        }
+
+                        Favorites()
+                            .visibility(model.isFavoriteVisible ? .visible : .gone)
+
+                        RecentlyVisited()
+                            .padding(.bottom, 16)
+                            .visibility(model.isRecentActivityVisible ? .visible : .gone)
+                        Spacer(minLength: 40)
+                    }
+                    .frame(width: Self.targetWidth, height: totalHeight)
+
+                } else {
+                    if !addressBarModel.shouldShowAddressBar || !activeRemoteMessageModel.shouldShowRemoteMessage {
+                        Spacer(minLength: 32)
                     }
 
-                    if includingContinueSetUpCards {
-                        ContinueSetUpView()
-                            .visibility(model.isContinueSetUpVisible ? .visible : .gone)
-                            .padding(.top, continueSetUpCardsTopPadding)
+                    Group {
+                        if addressBarModel.shouldShowAddressBar {
+                            remoteMessage()
+                                .padding(.top, 16)
+
+                            BigSearchBox()
+                                .id(Const.searchBarIdentifier)
+                        } else {
+                            remoteMessage()
+                        }
+
+                        if model.isContinueSetUpAvailable {
+                            ContinueSetUpView()
+                                .visibility(model.isContinueSetUpVisible ? .visible : .gone)
+                                .padding(.top, continueSetUpCardsTopPadding)
+                        }
+
+                        Favorites()
+                            .visibility(model.isFavoriteVisible ? .visible : .gone)
+
+                        RecentlyVisited()
+                            .padding(.bottom, 16)
+                            .visibility(model.isRecentActivityVisible ? .visible : .gone)
                     }
-
-                    Favorites()
-                        .visibility(model.isFavoriteVisible ? .visible : .gone)
-
-                    RecentlyVisited()
-                        .padding(.bottom, 16)
-                        .visibility(model.isRecentActivityVisible ? .visible : .gone)
-
+                    .frame(width: Self.targetWidth)
                 }
-                .frame(width: Self.targetWidth)
             }
             .frame(maxWidth: .infinity)
+            .if(shouldCenterContent) { view in
+                view.frame(height: max(geometryProxy.size.height, totalHeight))
+            }
+        }
+
+        private var totalHeight: CGFloat {
+            let spacers = 40.0 * 2
+            var height = BigSearchBox.Const.totalHeight + spacers
+            if model.isContinueSetUpAvailable && model.isContinueSetUpVisible {
+                height += continueSetUpModel.isMoreOrLessButtonNeeded ? 208 : 184
+                height += 32 + continueSetUpCardsTopPadding
+            }
+            if model.isFavoriteVisible {
+                height += 126 + 32
+            }
+            if model.isRecentActivityVisible {
+                height += 90 + 32 + 16
+            }
+            return height
         }
 
         @ViewBuilder
