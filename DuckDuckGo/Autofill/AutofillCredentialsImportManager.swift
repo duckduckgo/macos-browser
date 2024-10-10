@@ -63,12 +63,13 @@ extension AutofillCredentialsImportManager: AutofillPasswordImportDelegate {
         PixelKit.fire(AutofillPixelKitEvent.importCredentialsPromptNeverAgainClicked.withoutMacPrefix)
     }
 
-    public func autofillUserScriptWillDisplayOverlay(_ serializedInputContext: String) {
+    public func autofillUserScriptShouldDisplayOverlay(_ serializedInputContext: String) -> Bool {
         if let data = serializedInputContext.data(using: .utf8),
            let decoded = try? JSONDecoder().decode(CredentialsImportInputContext.self, from: data) {
             if decoded.credentialsImport {
-                AutofillLoginImportState().credentialsImportPromptPresentationCount += 1
+                return !AutofillLoginImportState().isCredentialsImportPromptPermanantlyDismissed
             }
         }
+        return true
     }
 }
