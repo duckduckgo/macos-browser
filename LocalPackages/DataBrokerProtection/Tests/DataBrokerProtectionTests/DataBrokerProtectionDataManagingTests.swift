@@ -56,12 +56,14 @@ final class DataBrokerProtectionDataManagingTests: XCTestCase {
         // We expect:
         // - 5 matches:
         //   - 1 extracted profile + 2 mirror sites for Broker A (3 total)
+        //   - 1 extracted profile + 0 mirror sites for Broker A again (1 total)
         //   - Broker B is deprecated, so it should be skipped (0 total)
         //   - 1 extracted profile + 1 mirror site for Broker C (2 total)
-        //   - Total = 3 + 0 + 2 = 5
-        // - 2 brokers with matches (Broker A and Broker C)
-        XCTAssertEqual(result.matchCount, 5)
-        XCTAssertEqual(result.brokerCount, 2)
+        //   - 1 extracted profile + 1 mirror site for Broker D (2 total)
+        //   - Total = 3 + 1 + 0 + 2 + 1 = 7
+        // - 6 brokers with matches (Broker A (with Mirror 1 & 2), Broker C (with Mirror 3), Broker D)
+        XCTAssertEqual(result.matchCount, 7)
+        XCTAssertEqual(result.brokerCount, 6)
     }
 
     func testWhenAllBrokersAreDeprecated_thenZeroMatchesAndZeroBrokersAreReturned() throws {
@@ -214,7 +216,37 @@ private extension DataBrokerProtectionDataManagingTests {
                 deprecated: false
             ),
 
-            // Second item: Deprecated broker with no matches
+            // Second item: Broker A again
+            BrokerProfileQueryData.mock(
+                dataBrokerName: "Broker A",
+                url: "https://broker-a.com",
+                extractedProfile: ExtractedProfile(
+                    id: 1,
+                    name: "John Doe",
+                    alternativeNames: nil,
+                    addressFull: nil,
+                    addresses: nil,
+                    phoneNumbers: nil,
+                    relatives: nil,
+                    profileUrl: nil,
+                    reportId: nil,
+                    age: nil,
+                    email: nil,
+                    removedDate: nil,
+                    identifier: "id1"
+                ), scanHistoryEvents: [
+                    HistoryEvent(
+                        extractedProfileId: 1,
+                        brokerId: 1,
+                        profileQueryId: 1,
+                        type: .scanStarted,
+                        date: Date()
+                    )
+                ], mirrorSites: [],
+                deprecated: false
+            ),
+
+            // Third item: Deprecated broker with no matches
             BrokerProfileQueryData.mock(
                 dataBrokerName: "Broker B",
                 url: "https://broker-b.com",
@@ -230,7 +262,7 @@ private extension DataBrokerProtectionDataManagingTests {
                 deprecated: true
             ),
 
-            // Third item: Active broker with 2 extracted profiles and 1 mirror site
+            // Fourth item: Active broker with 2 extracted profiles and 1 mirror site
             BrokerProfileQueryData.mock(
                 dataBrokerName: "Broker C",
                 url: "https://broker-c.com",
@@ -259,6 +291,36 @@ private extension DataBrokerProtectionDataManagingTests {
                 ], mirrorSites: [
                     MirrorSite(name: "Mirror 3", url: "https://mirror3.com", addedAt: Date(), removedAt: nil)
                 ],
+                deprecated: false
+            ),
+
+            // Third item: Active broker with 2 extracted profiles and 1 mirror site
+            BrokerProfileQueryData.mock(
+                dataBrokerName: "Broker D",
+                url: "https://broker-d.com",
+                extractedProfile: ExtractedProfile(
+                    id: 2,
+                    name: "Alice",
+                    alternativeNames: nil,
+                    addressFull: nil,
+                    addresses: nil,
+                    phoneNumbers: nil,
+                    relatives: nil,
+                    profileUrl: nil,
+                    reportId: nil,
+                    age: nil,
+                    email: nil,
+                    removedDate: nil,
+                    identifier: "id2"
+                ), scanHistoryEvents: [
+                    HistoryEvent(
+                        extractedProfileId: 2,
+                        brokerId: 3,
+                        profileQueryId: 3,
+                        type: .scanStarted,
+                        date: Date()
+                    )
+                ], mirrorSites: [],
                 deprecated: false
             )
         ]
