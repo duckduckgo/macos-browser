@@ -20,6 +20,8 @@ import Combine
 import Foundation
 import Freemium
 import OSLog
+import DataBrokerProtection
+import Common
 
 /// Protocol defining the interface for coordinating the visibility and interaction with the
 /// Freemium DBP (Data Broker Protection) promotion view.
@@ -71,6 +73,9 @@ final class FreemiumDBPPromotionViewCoordinator: FreemiumDBPPromotionViewCoordin
     /// The `NotificationCenter` instance used when subscribing to notifications
     private let notificationCenter: NotificationCenter
 
+    /// The `FreemiumDBPExperimentPixelHandler` instance used to fire pixels
+    private let freemiumDBPExperimentPixelHandler: EventMapping<FreemiumDBPExperimentPixel>
+
     /// Initializes the coordinator with the necessary dependencies.
     ///
     /// - Parameters:
@@ -81,12 +86,14 @@ final class FreemiumDBPPromotionViewCoordinator: FreemiumDBPPromotionViewCoordin
     init(freemiumDBPUserStateManager: FreemiumDBPUserStateManager,
          freemiumDBPFeature: FreemiumDBPFeature,
          freemiumDBPPresenter: FreemiumDBPPresenter = DefaultFreemiumDBPPresenter(),
-         notificationCenter: NotificationCenter = .default) {
+         notificationCenter: NotificationCenter = .default,
+         freemiumDBPExperimentPixelHandler: EventMapping<FreemiumDBPExperimentPixel> = FreemiumDBPExperimentPixelHandler()) {
 
         self.freemiumDBPUserStateManager = freemiumDBPUserStateManager
         self.freemiumDBPFeature = freemiumDBPFeature
         self.freemiumDBPPresenter = freemiumDBPPresenter
         self.notificationCenter = notificationCenter
+        self.freemiumDBPExperimentPixelHandler = freemiumDBPExperimentPixelHandler
 
         setInitialPromotionVisibilityState()
         subscribeToFeatureAvailabilityUpdates()
@@ -99,15 +106,35 @@ private extension FreemiumDBPPromotionViewCoordinator {
     /// Action to be executed when the user proceeds with the promotion (e.g opens DBP)
     var proceedAction: () -> Void {
         { [weak self] in
-            self?.showFreemiumDBP()
-            self?.dismissHomePagePromotion()
+            guard let self else { return }
+
+            execute(resultsAction: {
+                self.freemiumDBPExperimentPixelHandler.fire(FreemiumDBPExperimentPixel.newTabResultsClick)
+            }, orNoResultsAction: {
+                self.freemiumDBPExperimentPixelHandler.fire(FreemiumDBPExperimentPixel.newTabNoResultsClick)
+            }, orPromotionAction: {
+                self.freemiumDBPExperimentPixelHandler.fire(FreemiumDBPExperimentPixel.newTabScanClick)
+            })
+
+            showFreemiumDBP()
+            dismissHomePagePromotion()
         }
     }
 
     /// Action to be executed when the user closes the promotion.
     var closeAction: () -> Void {
         { [weak self] in
-            self?.dismissHomePagePromotion()
+            guard let self else { return }
+
+            execute(resultsAction: {
+                self.freemiumDBPExperimentPixelHandler.fire(FreemiumDBPExperimentPixel.newTabResultsDismiss)
+            }, orNoResultsAction: {
+                self.freemiumDBPExperimentPixelHandler.fire(FreemiumDBPExperimentPixel.newTabNoResultsDismiss)
+            }, orPromotionAction: {
+                self.freemiumDBPExperimentPixelHandler.fire(FreemiumDBPExperimentPixel.newTabScanDismiss)
+            })
+
+            dismissHomePagePromotion()
         }
     }
 
@@ -131,8 +158,10 @@ private extension FreemiumDBPPromotionViewCoordinator {
     ///
     /// - Returns: The `PromotionViewModel` that represents the current state of the promotion.
     func createViewModel() -> PromotionViewModel {
+
         if let results = freemiumDBPUserStateManager.firstScanResults {
             if results.matchesCount > 0 {
+                self.freemiumDBPExperimentPixelHandler.fire(FreemiumDBPExperimentPixel.newTabResultsImpression)
                 return .freemiumDBPPromotionScanEngagementResults(
                     resultCount: results.matchesCount,
                     brokerCount: results.brokerCount,
@@ -140,12 +169,14 @@ private extension FreemiumDBPPromotionViewCoordinator {
                     closeAction: closeAction
                 )
             } else {
+                self.freemiumDBPExperimentPixelHandler.fire(FreemiumDBPExperimentPixel.newTabNoResultsImpression)
                 return .freemiumDBPPromotionScanEngagementNoResults(
                     proceedAction: proceedAction,
                     closeAction: closeAction
                 )
             }
         } else {
+            self.freemiumDBPExperimentPixelHandler.fire(FreemiumDBPExperimentPixel.newTabScanImpression)
             return .freemiumDBPPromotion(proceedAction: proceedAction, closeAction: closeAction)
         }
     }
@@ -182,5 +213,29 @@ private extension FreemiumDBPPromotionViewCoordinator {
                 self?.didDismissHomePagePromotion = true
             }
             .store(in: &cancellables)
+    }
+
+    /// Executes one of three possible actions based on the state of the user's first scan results.
+    ///
+    /// This function checks the results of the user's first scan, stored in `freemiumDBPUserStateManager`.
+    /// Depending on the state of the scan results, it executes one of the provided actions:
+    /// - If there are scan results with a `matchesCount` greater than 0, it calls `resultsAction`.
+    /// - If there are scan results, but `matchesCount` is 0, it calls `noResultsAction`.
+    /// - If no scan results are available, it calls `promotionAction`.
+    ///
+    /// - Parameters:
+    ///   - resultsAction: The action to execute when there are scan results with one or more matches.
+    ///   - noResultsAction: The action to execute when there are scan results but no matches.
+    ///   - promotionAction: The action to execute when there are no scan results available.
+    func execute(resultsAction: () -> Void, orNoResultsAction noResultsAction: () -> Void, orPromotionAction promotionAction: () -> Void) {
+        if let results = freemiumDBPUserStateManager.firstScanResults {
+            if results.matchesCount > 0 {
+                resultsAction()
+            } else {
+                noResultsAction()
+            }
+        } else {
+            promotionAction()
+        }
     }
 }

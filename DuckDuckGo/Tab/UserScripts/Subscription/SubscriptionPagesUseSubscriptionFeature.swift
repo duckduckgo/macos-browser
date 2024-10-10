@@ -25,6 +25,7 @@ import Subscription
 import PixelKit
 import os.log
 import Freemium
+import DataBrokerProtection
 
 /// Use Subscription sub-feature
 final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
@@ -45,8 +46,12 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
     let subscriptionFeatureAvailability: SubscriptionFeatureAvailability
 
-    private let freemiumDBPUserStateManager: FreemiumDBPUserStateManager
+    private var freemiumDBPUserStateManager: FreemiumDBPUserStateManager
+    private let freemiumDBPPixelExperimentManager: FreemiumDBPPixelExperimentManaging
     private let notificationCenter: NotificationCenter
+
+    /// The `FreemiumDBPExperimentPixelHandler` instance used to fire pixels
+    private let freemiumDBPExperimentPixelHandler: EventMapping<FreemiumDBPExperimentPixel>
 
     public init(subscriptionManager: SubscriptionManager,
                 subscriptionSuccessPixelHandler: SubscriptionAttributionPixelHandler = PrivacyProSubscriptionAttributionPixelHandler(),
@@ -54,14 +59,18 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                 uiHandler: SubscriptionUIHandling,
                 subscriptionFeatureAvailability: SubscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability(),
                 freemiumDBPUserStateManager: FreemiumDBPUserStateManager = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp),
-                notificationCenter: NotificationCenter = .default) {
+                freemiumDBPPixelExperimentManager: FreemiumDBPPixelExperimentManaging,
+                notificationCenter: NotificationCenter = .default,
+                freemiumDBPExperimentPixelHandler: EventMapping<FreemiumDBPExperimentPixel> = FreemiumDBPExperimentPixelHandler()) {
         self.subscriptionManager = subscriptionManager
         self.stripePurchaseFlow = stripePurchaseFlow
         self.subscriptionSuccessPixelHandler = subscriptionSuccessPixelHandler
         self.uiHandler = uiHandler
         self.subscriptionFeatureAvailability = subscriptionFeatureAvailability
         self.freemiumDBPUserStateManager = freemiumDBPUserStateManager
+        self.freemiumDBPPixelExperimentManager = freemiumDBPPixelExperimentManager
         self.notificationCenter = notificationCenter
+        self.freemiumDBPExperimentPixelHandler = freemiumDBPExperimentPixelHandler
     }
 
     func with(broker: UserScriptMessageBroker) {
@@ -265,6 +274,8 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                 case .success(let purchaseUpdate):
                     Logger.subscription.info("[Purchase] Purchase complete")
                     PixelKit.fire(PrivacyProPixel.privacyProPurchaseSuccess, frequency: .dailyAndCount)
+                    sendFreemiumSubscriptionPixelIfFreemiumActivated()
+                    saveSubscriptionUpgradeTimestampIfFreemiumActivated()
                     PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActivated, frequency: .unique)
                     subscriptionSuccessPixelHandler.fireSuccessfulSubscriptionAttributionPixel()
                     sendSubscriptionUpgradeFromFreemiumNotificationIfFreemiumActivated()
@@ -375,6 +386,8 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         await uiHandler.dismissProgressViewController()
 
         PixelKit.fire(PrivacyProPixel.privacyProPurchaseStripeSuccess, frequency: .dailyAndCount)
+        sendFreemiumSubscriptionPixelIfFreemiumActivated()
+        saveSubscriptionUpgradeTimestampIfFreemiumActivated()
         subscriptionSuccessPixelHandler.fireSuccessfulSubscriptionAttributionPixel()
         sendSubscriptionUpgradeFromFreemiumNotificationIfFreemiumActivated()
         return [String: String]() // cannot be nil, the web app expect something back before redirecting the user to the final page
@@ -525,6 +538,27 @@ private extension SubscriptionPagesUseSubscriptionFeature {
     func sendSubscriptionUpgradeFromFreemiumNotificationIfFreemiumActivated() {
         if freemiumDBPUserStateManager.didActivate {
             notificationCenter.post(name: .subscriptionUpgradeFromFreemium, object: nil)
+        }
+    }
+
+    /// Sends a freemium subscription pixel event if the freemium feature has been activated.
+    ///
+    /// This function checks whether the user has activated the freemium feature by querying the `freemiumDBPUserStateManager`.
+    /// If the feature is activated (`didActivate` returns `true`), it fires a unique subscription-related pixel event using `PixelKit`.
+    func sendFreemiumSubscriptionPixelIfFreemiumActivated() {
+        if freemiumDBPUserStateManager.didActivate {
+            freemiumDBPExperimentPixelHandler.fire(FreemiumDBPExperimentPixel.subscription, parameters: freemiumDBPPixelExperimentManager.pixelParameters)
+        }
+    }
+
+    /// Saves the current timestamp for a subscription upgrade if the freemium feature has been activated.
+    ///
+    /// This function checks whether the user has activated the freemium feature and if the subscription upgrade timestamp
+    /// has not already been set. If the user has activated the freemium feature and no upgrade timestamp exists, it assigns
+    /// the current date and time to `freemiumDBPUserStateManager.upgradeToSubscriptionTimestamp`.
+    func saveSubscriptionUpgradeTimestampIfFreemiumActivated() {
+        if freemiumDBPUserStateManager.didActivate && freemiumDBPUserStateManager.upgradeToSubscriptionTimestamp == nil {
+            freemiumDBPUserStateManager.upgradeToSubscriptionTimestamp = Date()
         }
     }
 }

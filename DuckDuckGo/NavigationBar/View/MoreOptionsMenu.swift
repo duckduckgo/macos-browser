@@ -25,6 +25,7 @@ import NetworkProtection
 import Subscription
 import os.log
 import Freemium
+import DataBrokerProtection
 
 protocol OptionsButtonMenuDelegate: AnyObject {
 
@@ -60,6 +61,7 @@ final class MoreOptionsMenu: NSMenu {
     private lazy var sharingMenu: NSMenu = SharingMenu(title: UserText.shareMenuItem)
     private var accountManager: AccountManager { subscriptionManager.accountManager }
     private let subscriptionManager: SubscriptionManager
+    private let freemiumDBPUserStateManager: FreemiumDBPUserStateManager
     private let freemiumDBPFeature: FreemiumDBPFeature
     private let freemiumDBPPresenter: FreemiumDBPPresenter
     private let appearancePreferences: AppearancePreferences
@@ -68,6 +70,9 @@ final class MoreOptionsMenu: NSMenu {
 
     private let vpnFeatureGatekeeper: VPNFeatureGatekeeper
     private let subscriptionFeatureAvailability: SubscriptionFeatureAvailability
+
+    /// The `FreemiumDBPExperimentPixelHandler` instance used to fire pixels
+    private let freemiumDBPExperimentPixelHandler: EventMapping<FreemiumDBPExperimentPixel>
 
     required init(coder: NSCoder) {
         fatalError("MoreOptionsMenu: Bad initializer")
@@ -82,10 +87,12 @@ final class MoreOptionsMenu: NSMenu {
          sharingMenu: NSMenu? = nil,
          internalUserDecider: InternalUserDecider,
          subscriptionManager: SubscriptionManager,
+         freemiumDBPUserStateManager: FreemiumDBPUserStateManager = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp),
          freemiumDBPFeature: FreemiumDBPFeature,
          freemiumDBPPresenter: FreemiumDBPPresenter = DefaultFreemiumDBPPresenter(),
          appearancePreferences: AppearancePreferences = .shared,
-         notificationCenter: NotificationCenter = .default) {
+         notificationCenter: NotificationCenter = .default,
+         freemiumDBPExperimentPixelHandler: EventMapping<FreemiumDBPExperimentPixel> = FreemiumDBPExperimentPixelHandler()) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.emailManager = emailManager
@@ -94,10 +101,12 @@ final class MoreOptionsMenu: NSMenu {
         self.subscriptionFeatureAvailability = subscriptionFeatureAvailability
         self.internalUserDecider = internalUserDecider
         self.subscriptionManager = subscriptionManager
+        self.freemiumDBPUserStateManager = freemiumDBPUserStateManager
         self.freemiumDBPFeature = freemiumDBPFeature
         self.freemiumDBPPresenter = freemiumDBPPresenter
         self.appearancePreferences = appearancePreferences
         self.notificationCenter = notificationCenter
+        self.freemiumDBPExperimentPixelHandler = freemiumDBPExperimentPixelHandler
 
         super.init(title: "")
 
@@ -271,6 +280,13 @@ final class MoreOptionsMenu: NSMenu {
 
     @MainActor
     @objc func openFreemiumDBP(_ sender: NSMenuItem) {
+
+        if freemiumDBPUserStateManager.didPostFirstProfileSavedNotification {
+            freemiumDBPExperimentPixelHandler.fire(FreemiumDBPExperimentPixel.overFlowResults)
+        } else {
+            freemiumDBPExperimentPixelHandler.fire(FreemiumDBPExperimentPixel.overFlowScan)
+        }
+
         freemiumDBPPresenter.showFreemiumDBPAndSetActivated(windowControllerManager: WindowControllersManager.shared)
         notificationCenter.post(name: .freemiumDBPEntryPointActivated, object: nil)
     }

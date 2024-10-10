@@ -28,6 +28,7 @@ final class FreemiumDBPUserStateManagerTests: XCTestCase {
         static let didDismissHomePagePromotion = "macos.browser.freemium.dbp.did.post.dismiss.home.page.promotion"
         static let firstProfileSavedTimestamp = "macos.browser.freemium.dbp.first.profile.saved.timestamp"
         static let firstScanResults = "macos.browser.freemium.dbp.first.scan.results"
+        static let upgradeToSubscriptionTimestamp = "macos.browser.freemium.dbp.upgrade.to.subscription.timestamp"
     }
 
     private static let testSuiteName = "test.defaults.freemium.user.state.tests"
@@ -69,7 +70,7 @@ final class FreemiumDBPUserStateManagerTests: XCTestCase {
         XCTAssertNil(testUserDefaults.value(forKey: Keys.firstProfileSavedTimestamp))
 
         // When
-        sut.firstProfileSavedTimestamp = "time_stamp"
+        sut.firstProfileSavedTimestamp = Date()
 
         // Then
         XCTAssertNotNil(testUserDefaults.value(forKey: Keys.firstProfileSavedTimestamp))
@@ -79,7 +80,7 @@ final class FreemiumDBPUserStateManagerTests: XCTestCase {
         // Given
         let sut = DefaultFreemiumDBPUserStateManager(userDefaults: testUserDefaults)
         XCTAssertNil(sut.firstProfileSavedTimestamp)
-        testUserDefaults.setValue("time_stamp", forKey: Keys.firstProfileSavedTimestamp)
+        testUserDefaults.setValue(Date(), forKey: Keys.firstProfileSavedTimestamp)
         XCTAssertNotNil(testUserDefaults.value(forKey: Keys.firstProfileSavedTimestamp))
 
         // When
@@ -207,7 +208,7 @@ final class FreemiumDBPUserStateManagerTests: XCTestCase {
         // Given
         let sut = DefaultFreemiumDBPUserStateManager(userDefaults: testUserDefaults)
         sut.didActivate = true
-        sut.firstProfileSavedTimestamp = "2024-01-01T12:00:00Z"
+        sut.firstProfileSavedTimestamp = Date()
         sut.didPostFirstProfileSavedNotification = true
         sut.didPostResultsNotification = true
         sut.didDismissHomePagePromotion = true
@@ -225,4 +226,31 @@ final class FreemiumDBPUserStateManagerTests: XCTestCase {
         XCTAssertNil(sut.firstScanResults)
         XCTAssertFalse(sut.didDismissHomePagePromotion)
     }
+
+    func testSetsUpgradeToSubscriptionTimestamp() throws {
+        // Given
+        let sut = DefaultFreemiumDBPUserStateManager(userDefaults: testUserDefaults)
+        XCTAssertNil(testUserDefaults.value(forKey: Keys.upgradeToSubscriptionTimestamp))
+
+        // When
+        sut.upgradeToSubscriptionTimestamp = Date()
+
+        // Then
+        XCTAssertNotNil(testUserDefaults.value(forKey: Keys.upgradeToSubscriptionTimestamp))
+    }
+
+    func testGetsUpgradeToSubscriptionTimestamp() throws {
+        // Given
+        let sut = DefaultFreemiumDBPUserStateManager(userDefaults: testUserDefaults)
+        XCTAssertNil(sut.upgradeToSubscriptionTimestamp)
+        testUserDefaults.setValue(Date(), forKey: Keys.upgradeToSubscriptionTimestamp)
+        XCTAssertNotNil(testUserDefaults.value(forKey: Keys.upgradeToSubscriptionTimestamp))
+
+        // When
+        let result = sut.upgradeToSubscriptionTimestamp
+
+        // Then
+        XCTAssertNotNil(result)
+    }
+
 }

@@ -21,6 +21,7 @@ import UserNotifications
 import Common
 import AppKit
 import os.log
+import PixelKit
 
 public enum DataBrokerProtectionNotificationCommand: String {
     case showDashboard = "databrokerprotection://show_dashboard"
@@ -56,14 +57,19 @@ public class DefaultDataBrokerProtectionUserNotificationService: NSObject, DataB
     private let authenticationManager: DataBrokerProtectionAuthenticationManaging
     private let areNotificationsEnabled = true
 
+    /// The `FreemiumDBPExperimentPixelHandler` instance used to fire pixels
+    private let freemiumDBPExperimentPixelHandler: EventMapping<FreemiumDBPExperimentPixel>
+
     public init(pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                 userDefaults: UserDefaults = .standard,
                 userNotificationCenter: DBPUserNotificationCenter,
-                authenticationManager: DataBrokerProtectionAuthenticationManaging) {
+                authenticationManager: DataBrokerProtectionAuthenticationManaging,
+                freemiumDBPExperimentPixelHandler: EventMapping<FreemiumDBPExperimentPixel> = FreemiumDBPExperimentPixelHandler()) {
         self.pixelHandler = pixelHandler
         self.userDefaults = userDefaults
         self.userNotificationCenter = userNotificationCenter
         self.authenticationManager = authenticationManager
+        self.freemiumDBPExperimentPixelHandler = freemiumDBPExperimentPixelHandler
 
         super.init()
 
@@ -126,10 +132,11 @@ public class DefaultDataBrokerProtectionUserNotificationService: NSObject, DataB
         // If the user is not authenticated, this is a Freemium scan
         if !authenticationManager.isUserAuthenticated {
             sendNotification(.firstFreemiumScanComplete)
+            freemiumDBPExperimentPixelHandler.fire(FreemiumDBPExperimentPixel.firstScanCompleteNotificationSent)
         } else {
             sendNotification(.firstScanComplete)
+            pixelHandler.fire(.dataBrokerProtectionNotificationSentFirstScanComplete)
         }
-        pixelHandler.fire(.dataBrokerProtectionNotificationSentFirstScanComplete)
     }
 
     public func sendFirstRemovedNotificationIfPossible() {
@@ -182,12 +189,16 @@ extension DefaultDataBrokerProtectionUserNotificationService: UNUserNotification
                                                                                            .twoWeeksCheckIn: .dataBrokerProtectionNotificationOpened2WeeksCheckIn]
 
         switch identifier {
-        case .firstFreemiumScanComplete, .firstScanComplete, .firstProfileRemoved, .allInfoRemoved, .twoWeeksCheckIn:
+        case .firstScanComplete, .firstProfileRemoved, .allInfoRemoved, .twoWeeksCheckIn:
             NSWorkspace.shared.open(DataBrokerProtectionNotificationCommand.showDashboard.url)
 
             if let pixel = pixelMapper[identifier] {
                 pixelHandler.fire(pixel)
             }
+        case .firstFreemiumScanComplete:
+            NSWorkspace.shared.open(DataBrokerProtectionNotificationCommand.showDashboard.url)
+
+            freemiumDBPExperimentPixelHandler.fire(FreemiumDBPExperimentPixel.firstScanCompleteNotificationClicked)
         }
     }
 }

@@ -56,66 +56,6 @@ final class FreemiumDBPPixelExperimentManagingTests: XCTestCase {
        super.tearDown()
    }
 
-    // MARK: - Pixel Parameters Tests
-
-    func testPixelParameters_withCohortAndEnrollmentDate_returnsCorrectParameters() {
-        // Given
-        let cohort = FreemiumDBPPixelExperimentManager.Cohort.treatment
-        let enrollmentDate = Date(timeIntervalSince1970: 0) // 19700101
-        mockUserDefaults.set(cohort.rawValue, forKey: MockUserDefaults.Keys.experimentCohort)
-        mockUserDefaults.set(enrollmentDate, forKey: MockUserDefaults.Keys.enrollmentDate)
-
-        // When
-        let parameters = sut.pixelParameters
-
-        // Then
-        XCTAssertNotNil(parameters)
-        XCTAssertEqual(parameters?["variant"], cohort.rawValue)
-        XCTAssertEqual(parameters?["enrollment"], "19700101")
-    }
-
-    func testPixelParameters_withNoCohortAndNoEnrollmentDate_returnsNil() {
-        // Given
-        mockUserDefaults.removeObject(forKey: MockUserDefaults.Keys.experimentCohort)
-        mockUserDefaults.removeObject(forKey: MockUserDefaults.Keys.enrollmentDate)
-
-        // When
-        let parameters = sut.pixelParameters
-
-        // Then
-        XCTAssertNil(parameters)
-    }
-
-    func testPixelParameters_withOnlyCohort_returnsParametersWithVariantOnly() {
-        // Given
-        let cohort = FreemiumDBPPixelExperimentManager.Cohort.control
-        mockUserDefaults.set(cohort.rawValue, forKey: MockUserDefaults.Keys.experimentCohort)
-        mockUserDefaults.removeObject(forKey: MockUserDefaults.Keys.enrollmentDate)
-
-        // When
-        let parameters = sut.pixelParameters
-
-        // Then
-        XCTAssertNotNil(parameters)
-        XCTAssertEqual(parameters?["variant"], cohort.rawValue)
-        XCTAssertNil(parameters?["enrollment"])
-    }
-
-    func testPixelParameters_withOnlyEnrollmentDate_returnsParametersWithEnrollmentOnly() {
-        // Given
-        let enrollmentDate = Date(timeIntervalSince1970: 86400) // 19700102
-        mockUserDefaults.removeObject(forKey: MockUserDefaults.Keys.experimentCohort)
-        mockUserDefaults.set(enrollmentDate, forKey: MockUserDefaults.Keys.enrollmentDate)
-
-        // When
-        let parameters = sut.pixelParameters
-
-        // Then
-        XCTAssertNotNil(parameters)
-        XCTAssertNil(parameters?["variant"])
-        XCTAssertEqual(parameters?["enrollment"], "19700102")
-    }
-
     // MARK: - Cohort Assignment Tests
 
     func testAssignUserToCohort_whenUserEligibleAndNotEnrolled_assignsToCohort() {
@@ -230,6 +170,21 @@ final class FreemiumDBPPixelExperimentManagingTests: XCTestCase {
 
         // Then
         XCTAssertFalse(isTreatment)
+    }
+
+    // MARK: - Pixel Parameter Tests
+
+    func testReturnsCorrectEnrollmentDateParameter_whenUserIsEnrolled() throws {
+        // Given
+        let calendar = Calendar.current
+        let twoDaysAgo = calendar.date(byAdding: .day, value: -2, to: Date())
+        mockUserDefaults.set(twoDaysAgo, forKey: MockUserDefaults.Keys.enrollmentDate)
+
+        // When
+        let parameters = sut.pixelParameters
+
+        // Then
+        XCTAssertEqual("2", parameters?["daysEnrolled"])
     }
 }
 

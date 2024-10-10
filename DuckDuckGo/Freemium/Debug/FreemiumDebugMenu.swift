@@ -113,7 +113,7 @@ final class FreemiumDebugMenu: NSMenuItem {
     func logAllState() {
 
         Logger.freemiumDBP.debug("FREEMIUM DBP: DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).didActivate \(DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).didActivate)")
-        Logger.freemiumDBP.debug("FREEMIUM DBP: DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).firstProfileSavedTimestamp \(DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).firstProfileSavedTimestamp ?? "Nil")")
+        Logger.freemiumDBP.debug("FREEMIUM DBP: DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).firstProfileSavedTimestamp \(DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).firstProfileSavedTimestamp?.description ?? "Nil")")
         Logger.freemiumDBP.debug("FREEMIUM DBP: DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).didPostFirstProfileSavedNotification \(DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).didPostFirstProfileSavedNotification)")
         Logger.freemiumDBP.debug("FREEMIUM DBP: DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).didPostResultsNotification \(DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).didPostResultsNotification)")
         if let results = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).firstScanResults {
@@ -134,7 +134,7 @@ final class FreemiumDebugMenu: NSMenuItem {
     @objc
     func displayAllState() {
         let didActivate = "Activated: \(DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).didActivate)"
-        let firstProfileSavedTimestamp = "First Profile Saved Timestamp: \(DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).firstProfileSavedTimestamp ?? "Nil")"
+        let firstProfileSavedTimestamp = "First Profile Saved Timestamp: \(DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).firstProfileSavedTimestamp?.description ?? "Nil")"
         let didPostFirstProfileSavedNotification = "Posted First Profile Saved Notification: \(DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).didPostFirstProfileSavedNotification)"
         let didPostResultsNotification = "Posted Results Notification: \(DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).didPostResultsNotification)"
         let firstScanResults = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp).firstScanResults.map { "First Scan Results: \($0.matchesCount) matches, \($0.brokerCount) brokers" } ?? "First Scan Results: Nil"
