@@ -37,6 +37,8 @@ extension HomePage.Views {
         @EnvironmentObject var activeRemoteMessageModel: ActiveRemoteMessageModel
         @EnvironmentObject var settingsVisibilityModel: HomePage.Models.SettingsVisibilityModel
 
+        let freemiumDBPPromotionViewCoordinator: any FreemiumDBPPromotionViewCoordinating
+
         var body: some View {
             if isBurner {
                 BurnerHomePageView()
@@ -117,6 +119,8 @@ extension HomePage.Views {
                 Group {
                     remoteMessage()
 
+                    freemiumPromotionView()
+
                     if includingContinueSetUpCards {
                         ContinueSetUpView()
                             .visibility(model.isContinueSetUpVisible ? .visible : .gone)
@@ -178,6 +182,12 @@ extension HomePage.Views {
             case .none:
                 Color.newTabPageBackground
             }
+        }
+
+        func freemiumPromotionView() -> some View {
+           PromotionView(viewModel: freemiumDBPPromotionViewCoordinator.viewModel)
+                .padding(.bottom, 16)
+                .visibility(freemiumDBPPromotionViewCoordinator.isHomePagePromotionVisible ? .visible : .gone)
         }
 
         struct SettingsButtonView: View {

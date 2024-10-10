@@ -20,12 +20,29 @@ import Bookmarks
 import Foundation
 import Persistence
 import RemoteMessaging
+import Freemium
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 struct MockRemoteMessagingStoreProvider: RemoteMessagingStoreProviding {
     func makeRemoteMessagingStore(database: CoreDataDatabase, availabilityProvider: RemoteMessagingAvailabilityProviding) -> RemoteMessagingStoring {
         RemoteMessagingStore(database: database, errorEvents: nil, remoteMessagingAvailabilityProvider: availabilityProvider)
+    }
+}
+
+final class MockFreemiumDBPUserStateManager: FreemiumDBPUserStateManager {
+    var didCallResetAllState = false
+
+    var didActivate = false
+    var didPostFirstProfileSavedNotification = false
+    var didPostResultsNotification = false
+    var didDismissHomePagePromotion = false
+    var firstProfileSavedTimestamp: Date?
+    var upgradeToSubscriptionTimestamp: Date?
+    var firstScanResults: FreemiumDBPMatchResults?
+
+    func resetAllState() {
+        didCallResetAllState = true
     }
 }
 

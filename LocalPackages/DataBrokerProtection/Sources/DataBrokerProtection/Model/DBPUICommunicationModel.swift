@@ -43,6 +43,18 @@ struct DBPUIHandshake: Codable {
     let version: Int
 }
 
+/// User-related data intended to be returned as part of a hardshake response
+struct DBPUIHandshakeUserData: Codable, Equatable {
+    let isAuthenticatedUser: Bool
+}
+
+/// Data type returned in response to a handshake request
+struct DBPUIHandshakeResponse: Codable {
+    let version: Int
+    let success: Bool
+    let userdata: DBPUIHandshakeUserData
+}
+
 /// Standard response from the host to the UI. The response contains the
 /// current version of the host's communication protocol and a bool value
 /// indicating if the requested operation was successful.

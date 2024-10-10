@@ -24,6 +24,7 @@ import Common
 import os.log
 
 protocol DBPUICommunicationDelegate: AnyObject {
+    func getHandshakeUserData() -> DBPUIHandshakeUserData?
     func saveProfile() async throws
     func getUserProfile() -> DBPUIUserProfile?
     func deleteProfileData() throws
@@ -126,13 +127,16 @@ struct DBPUICommunicationLayer: Subfeature {
             throw DBPUIError.malformedRequest
         }
 
+        // Attempt to get handshake user data, but fallback to a default
+        let userData = delegate?.getHandshakeUserData() ?? DBPUIHandshakeUserData(isAuthenticatedUser: true)
+
         if result.version != Constants.version {
             Logger.dataBrokerProtection.debug("Incorrect protocol version presented by UI")
-            return DBPUIStandardResponse(version: Constants.version, success: false)
+            return DBPUIHandshakeResponse(version: Constants.version, success: false, userdata: userData)
         }
 
         Logger.dataBrokerProtection.debug("Successful handshake made by UI")
-        return DBPUIStandardResponse(version: Constants.version, success: true)
+        return DBPUIHandshakeResponse(version: Constants.version, success: true, userdata: userData)
     }
 
     func saveProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {

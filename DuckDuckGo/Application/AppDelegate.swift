@@ -40,6 +40,7 @@ import NetworkProtectionIPC
 import DataBrokerProtection
 import RemoteMessaging
 import os.log
+import Freemium
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
 
@@ -96,12 +97,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     public let subscriptionManager: SubscriptionManager
     public let subscriptionUIHandler: SubscriptionUIHandling
 
-    public let vpnSettings = VPNSettings(defaults: .netP)
+    // MARK: - Freemium DBP
+    public let freemiumDBPFeature: FreemiumDBPFeature
+    public let freemiumDBPPromotionViewCoordinator: FreemiumDBPPromotionViewCoordinator
+    private var freemiumDBPScanResultPolling: FreemiumDBPScanResultPolling?
 
     var configurationStore = ConfigurationStore()
     var configurationManager: ConfigurationManager
 
     // MARK: - VPN
+
+    public let vpnSettings = VPNSettings(defaults: .netP)
 
     private var networkProtectionSubscriptionEventHandler: NetworkProtectionSubscriptionEventHandler?
 
@@ -268,6 +274,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         // Update DBP environment and match the Subscription environment
         DataBrokerProtectionSettings().alignTo(subscriptionEnvironment: subscriptionManager.currentEnvironment)
+
+        // Freemium DBP
+        let freemiumDBPUserStateManager = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp)
+
+        let experimentManager = FreemiumDBPPixelExperimentManager(subscriptionManager: subscriptionManager)
+        experimentManager.assignUserToCohort()
+
+        freemiumDBPFeature = DefaultFreemiumDBPFeature(privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager,
+                                                       experimentManager: experimentManager,
+                                                       subscriptionManager: subscriptionManager,
+                                                       accountManager: subscriptionManager.accountManager,
+                                                       freemiumDBPUserStateManager: freemiumDBPUserStateManager)
+        freemiumDBPPromotionViewCoordinator = FreemiumDBPPromotionViewCoordinator(freemiumDBPUserStateManager: freemiumDBPUserStateManager,
+                                                                                  freemiumDBPFeature: freemiumDBPFeature)
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {
@@ -292,6 +312,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler(subscriptionManager: subscriptionManager,
                                                                                               tunnelController: tunnelController,
                                                                                               vpnUninstaller: vpnUninstaller)
+
+        // Freemium DBP
+        freemiumDBPFeature.subscribeToDependencyUpdates()
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -383,7 +406,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         UNUserNotificationCenter.current().delegate = self
 
         dataBrokerProtectionSubscriptionEventHandler.registerForSubscriptionAccountManagerEvents()
-        DataBrokerProtectionAppEvents(featureGatekeeper: DefaultDataBrokerProtectionFeatureGatekeeper(accountManager: subscriptionManager.accountManager)).applicationDidFinishLaunching()
+
+        let freemiumDBPUserStateManager = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp)
+        let pirGatekeeper = DefaultDataBrokerProtectionFeatureGatekeeper(accountManager:
+                                                                            subscriptionManager.accountManager,
+                                                                         freemiumDBPUserStateManager: freemiumDBPUserStateManager)
+
+        DataBrokerProtectionAppEvents(featureGatekeeper: pirGatekeeper).applicationDidFinishLaunching()
 
         setUpAutoClearHandler()
 
@@ -405,6 +434,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             PixelKit.fire(GeneralPixel.crashOnCrashHandlersSetUp)
             didCrashDuringCrashHandlersSetUp = false
         }
+
+        freemiumDBPScanResultPolling = DefaultFreemiumDBPScanResultPolling(dataManager: DataBrokerProtectionManager.shared.dataManager, freemiumDBPUserStateManager: freemiumDBPUserStateManager)
+        freemiumDBPScanResultPolling?.startPollingOrObserving()
     }
 
     private func fireFailedCompilationsPixelIfNeeded() {
@@ -430,9 +462,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         NetworkProtectionAppEvents(featureGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: subscriptionManager)).applicationDidBecomeActive()
 
-        DataBrokerProtectionAppEvents(featureGatekeeper:
-                                        DefaultDataBrokerProtectionFeatureGatekeeper(accountManager:
-                                                                                        subscriptionManager.accountManager)).applicationDidBecomeActive()
+        let freemiumDBPUserStateManager = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp)
+        let pirGatekeeper = DefaultDataBrokerProtectionFeatureGatekeeper(accountManager:
+                                                                            subscriptionManager.accountManager,
+                                                                         freemiumDBPUserStateManager: freemiumDBPUserStateManager)
+
+        DataBrokerProtectionAppEvents(featureGatekeeper: pirGatekeeper).applicationDidBecomeActive()
 
         subscriptionManager.refreshCachedSubscriptionAndEntitlements { isSubscriptionActive in
             if isSubscriptionActive {

@@ -84,12 +84,15 @@ protocol DataBrokerProtectionQueueManager {
          brokerUpdater: DataBrokerProtectionBrokerUpdater?,
          pixelHandler: EventMapping<DataBrokerProtectionPixels>)
 
-    func startImmediateOperationsIfPermitted(showWebView: Bool,
-                                             operationDependencies: DataBrokerOperationDependencies,
-                                             completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?)
-    func startScheduledOperationsIfPermitted(showWebView: Bool,
-                                             operationDependencies: DataBrokerOperationDependencies,
-                                             completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?)
+    func startImmediateScanOperationsIfPermitted(showWebView: Bool,
+                                                 operationDependencies: DataBrokerOperationDependencies,
+                                                 completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?)
+    func startScheduledAllOperationsIfPermitted(showWebView: Bool,
+                                                operationDependencies: DataBrokerOperationDependencies,
+                                                completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?)
+    func startScheduledScanOperationsIfPermitted(showWebView: Bool,
+                                                 operationDependencies: DataBrokerOperationDependencies,
+                                                 completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?)
 
     func execute(_ command: DataBrokerProtectionQueueManagerDebugCommand)
     var debugRunningStatusString: String { get }
@@ -129,13 +132,13 @@ final class DefaultDataBrokerProtectionQueueManager: DataBrokerProtectionQueueMa
         self.pixelHandler = pixelHandler
     }
 
-    func startImmediateOperationsIfPermitted(showWebView: Bool,
-                                             operationDependencies: DataBrokerOperationDependencies,
-                                             completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
+    func startImmediateScanOperationsIfPermitted(showWebView: Bool,
+                                                 operationDependencies: DataBrokerOperationDependencies,
+                                                 completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
 
         let newMode = DataBrokerProtectionQueueMode.immediate(completion: completion)
         startOperationsIfPermitted(forNewMode: newMode,
-                                   type: .scan,
+                                   type: .manualScan,
                                    showWebView: showWebView,
                                    operationDependencies: operationDependencies) { [weak self] errors in
             completion?(errors)
@@ -143,15 +146,22 @@ final class DefaultDataBrokerProtectionQueueManager: DataBrokerProtectionQueueMa
         }
     }
 
-    func startScheduledOperationsIfPermitted(showWebView: Bool,
-                                             operationDependencies: DataBrokerOperationDependencies,
-                                             completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
-        let newMode = DataBrokerProtectionQueueMode.scheduled(completion: completion)
-        startOperationsIfPermitted(forNewMode: newMode,
-                                   type: .all,
-                                   showWebView: showWebView,
-                                   operationDependencies: operationDependencies,
-                                   completion: completion)
+    func startScheduledAllOperationsIfPermitted(showWebView: Bool,
+                                                operationDependencies: DataBrokerOperationDependencies,
+                                                completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
+        startScheduleOperationsIfPermitted(withOperationType: .all,
+                                           showWebView: showWebView,
+                                           operationDependencies: operationDependencies,
+                                           completion: completion)
+    }
+
+    func startScheduledScanOperationsIfPermitted(showWebView: Bool,
+                                                 operationDependencies: DataBrokerOperationDependencies,
+                                                 completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
+        startScheduleOperationsIfPermitted(withOperationType: .scheduledScan,
+                                           showWebView: showWebView,
+                                           operationDependencies: operationDependencies,
+                                           completion: completion)
     }
 
     func execute(_ command: DataBrokerProtectionQueueManagerDebugCommand) {
@@ -167,6 +177,18 @@ final class DefaultDataBrokerProtectionQueueManager: DataBrokerProtectionQueueMa
 }
 
 private extension DefaultDataBrokerProtectionQueueManager {
+
+    func startScheduleOperationsIfPermitted(withOperationType operationType: OperationType,
+                                            showWebView: Bool,
+                                            operationDependencies: DataBrokerOperationDependencies,
+                                            completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
+        let newMode = DataBrokerProtectionQueueMode.scheduled(completion: completion)
+        startOperationsIfPermitted(forNewMode: newMode,
+                                   type: operationType,
+                                   showWebView: showWebView,
+                                   operationDependencies: operationDependencies,
+                                   completion: completion)
+    }
 
     func startOperationsIfPermitted(forNewMode newMode: DataBrokerProtectionQueueMode,
                                     type: OperationType,

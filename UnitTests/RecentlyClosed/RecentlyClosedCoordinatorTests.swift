@@ -88,7 +88,6 @@ private extension RecentlyClosedWindow {
 }
 
 final class WindowControllersManagerMock: WindowControllersManagerProtocol {
-
     var pinnedTabsManager = PinnedTabsManager(tabCollection: .init())
 
     var didRegisterWindowController = PassthroughSubject<(MainWindowController), Never>()
@@ -121,5 +120,5 @@ final class WindowControllersManagerMock: WindowControllersManagerProtocol {
         openNewWindowCalled = .init(contents: tabCollectionViewModel?.tabs.map(\.content), burnerMode: burnerMode, droppingPoint: droppingPoint, contentSize: contentSize, showWindow: showWindow, popUp: popUp, lazyLoadTabs: lazyLoadTabs, isMiniaturized: isMiniaturized)
         return nil
     }
-
+    func showTab(with content: DuckDuckGo_Privacy_Browser.Tab.TabContent) { }
 }
