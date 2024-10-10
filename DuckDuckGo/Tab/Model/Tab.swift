@@ -421,7 +421,12 @@ protocol NewWindowPolicyDecisionMaker {
 
     let webView: WebView
 
-    @Published var audioState: WebView.AudioState = .unmuted(isPlayingAudio: false)
+    var audioState: WebView.AudioState {
+        webView.audioState
+    }
+
+    @Published private(set) var audioStateTest: WebView.AudioState = .unmuted(isPlayingAudio: false)
+
     var audioStatePublisher: AnyPublisher<WebView.AudioState, Never> {
         webView.audioStatePublisher
     }
@@ -1003,9 +1008,8 @@ protocol NewWindowPolicyDecisionMaker {
             self?.updateCanGoBackForward(withCurrentNavigation: navigation)
         }.store(in: &webViewCancellables)
 
-        webView.audioStatePublisher
-            .receive(on: RunLoop.main)
-            .assign(to: \.audioState, on: self)
+        audioStatePublisher
+            .assign(to: \.audioStateTest, onWeaklyHeld: self)
             .store(in: &webViewCancellables)
 
         // background tab loading should start immediately
