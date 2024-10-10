@@ -147,7 +147,7 @@ final class LocalBookmarkManager: BookmarkManager {
 
     /// Checks if any variant of the given URL (http/https, trailing slash) is bookmarked.
     func isAnyUrlVariantBookmarked(url: URL) -> Bool {
-        return findBookmark(forVariantUrl: url) != nil
+        findBookmark(forVariantUrl: url) != nil
     }
 
     func isUrlFavorited(url: URL) -> Bool {
@@ -168,7 +168,7 @@ final class LocalBookmarkManager: BookmarkManager {
 
     /// Returns the bookmark for the given URL or any of its variants (http/https, trailing slash), if it exists.
     func getBookmark(forVariantUrl variantURL: URL) -> Bookmark? {
-        return findBookmark(forVariantUrl: variantURL)
+        findBookmark(forVariantUrl: variantURL)
     }
 
     /// Finds a bookmark by checking all possible URL variants (http/https, trailing slash).
