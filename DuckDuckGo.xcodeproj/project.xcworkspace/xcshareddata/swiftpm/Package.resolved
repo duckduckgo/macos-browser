@@ -33,7 +33,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "graeme/enable-import-prompt-for-all-users",
-        "revision" : "f4a78d32fc6ab79d077cf38c501b7e72f0225a81"
+        "revision" : "aec7c42d3928ef62be3ac65e5da3979c375b75bb"
       }
     },
     {
@@ -51,7 +51,7 @@
       "location" : "https://github.com/duckduckgo/duckduckgo-autofill.git",
       "state" : {
         "branch" : "dbajpeyi/feature/dismiss-password-import-flow",
-        "revision" : "1230a9271cf383654dd5b50243da495aeaca34c9"
+        "revision" : "cc23669514be5c2b9ec167a706dd20aeadb8c444"
       }
     },
     {
