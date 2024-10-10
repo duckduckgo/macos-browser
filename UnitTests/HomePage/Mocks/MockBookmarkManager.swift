@@ -61,30 +61,26 @@ class MockBookmarkManager: BookmarkManager {
         return nil
     }
 
-    func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> DuckDuckGo_Privacy_Browser.Bookmark? {
-        return nil
-    }
-
     func makeBookmark(for url: URL, title: String, isFavorite: Bool, index: Int?, parent: DuckDuckGo_Privacy_Browser.BookmarkFolder?) -> DuckDuckGo_Privacy_Browser.Bookmark? {
         return nil
     }
 
     func makeBookmarks(for websitesInfo: [DuckDuckGo_Privacy_Browser.WebsiteInfo], inNewFolderNamed folderName: String, withinParentFolder parent: DuckDuckGo_Privacy_Browser.ParentFolderType) {}
 
-    func makeFolder(for title: String, parent: DuckDuckGo_Privacy_Browser.BookmarkFolder?, completion: (DuckDuckGo_Privacy_Browser.BookmarkFolder) -> Void) {}
+    func makeFolder(for title: String, parent: BookmarkFolder?, completion: @escaping (Result<BookmarkFolder, Error>) -> Void) {}
 
     var removeBookmarkCalled = false
-    func remove(bookmark: DuckDuckGo_Privacy_Browser.Bookmark) {
+    func remove(bookmark: DuckDuckGo_Privacy_Browser.Bookmark, undoManager: UndoManager?) {
         removeBookmarkCalled = true
     }
 
     var removeFolderCalled = false
-    func remove(folder: DuckDuckGo_Privacy_Browser.BookmarkFolder) {
+    func remove(folder: DuckDuckGo_Privacy_Browser.BookmarkFolder, undoManager: UndoManager?) {
         removeFolderCalled = true
     }
 
     var removeObjectsCalled: [String]?
-    func remove(objectsWithUUIDs uuids: [String]) {
+    func remove(objectsWithUUIDs uuids: [String], undoManager: UndoManager?) {
         removeObjectsCalled = uuids
     }
 
@@ -146,4 +142,7 @@ class MockBookmarkManager: BookmarkManager {
     var sortModePublisher: Published<BookmarksSortMode>.Publisher { $sortMode }
 
     @Published var sortMode: BookmarksSortMode = .manual
+
+    func restore(_ entities: [RestorableBookmarkEntity], undoManager: UndoManager) {}
+
 }

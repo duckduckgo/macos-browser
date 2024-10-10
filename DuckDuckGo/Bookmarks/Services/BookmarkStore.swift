@@ -47,12 +47,11 @@ protocol BookmarkStore {
     func applyFavoritesDisplayMode(_ configuration: FavoritesDisplayMode)
 
     func loadAll(type: BookmarkStoreFetchPredicateType, completion: @escaping ([BaseBookmarkEntity]?, Error?) -> Void)
-    func save(bookmark: Bookmark, parent: BookmarkFolder?, index: Int?, completion: @escaping (Bool, Error?) -> Void)
+    func save(entitiesAtIndices: [(entity: BaseBookmarkEntity, index: Int?)], completion: @escaping (Error?) -> Void)
     func saveBookmarks(for websitesInfo: [WebsiteInfo], inNewFolderNamed folderName: String, withinParentFolder parent: ParentFolderType)
-    func save(folder: BookmarkFolder, parent: BookmarkFolder?, completion: @escaping (Bool, Error?) -> Void)
     func remove(objectsWithUUIDs: [String], completion: @escaping (Bool, Error?) -> Void)
     func update(bookmark: Bookmark)
-    func bookmarkFolder(withId id: String) -> BookmarkFolder?
+    func bookmarkEntities(withIds ids: [String]) -> [BaseBookmarkEntity]?
     func update(folder: BookmarkFolder)
     func update(folder: BookmarkFolder, andMoveToParent parent: ParentFolderType)
     func add(objectsWithUUIDs: [String], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void)
@@ -62,4 +61,75 @@ protocol BookmarkStore {
     func moveFavorites(with objectUUIDs: [String], toIndex: Int?, completion: @escaping (Error?) -> Void)
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarksImportSummary
     func handleFavoritesAfterDisablingSync()
+}
+extension BookmarkStore {
+
+    func loadAll(type: BookmarkStoreFetchPredicateType) async throws -> [BaseBookmarkEntity] {
+        return try await withCheckedThrowingContinuation { continuation in
+            loadAll(type: type) { result, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+
+                continuation.resume(returning: result ?? [])
+            }
+        }
+    }
+
+    func bookmarkFolder(withId id: String) -> BookmarkFolder? {
+        bookmarkEntities(withIds: [id])?.first as? BookmarkFolder
+    }
+
+    func save(folder: BookmarkFolder, index: Int? = nil, completion: @escaping (Bool, Error?) -> Void) {
+        save(entitiesAtIndices: [(folder, index)]) { error in
+            completion(error == nil, error)
+        }
+    }
+
+    func save(folder: BookmarkFolder, index: Int? = nil) async throws {
+        return try await withCheckedThrowingContinuation { continuation in
+            save(folder: folder, index: index) { _, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+
+                continuation.resume()
+            }
+        }
+    }
+
+    func save(bookmark: Bookmark, index: Int? = nil, completion: @escaping (Bool, Error?) -> Void) {
+        save(entitiesAtIndices: [(bookmark, index)]) { error in
+            completion(error == nil, error)
+        }
+    }
+
+    func save(bookmark: Bookmark, index: Int? = nil) async throws {
+        return try await withCheckedThrowingContinuation { continuation in
+            save(bookmark: bookmark, index: index) { _, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+
+                continuation.resume()
+            }
+        }
+    }
+
+    func remove(objectsWithUUIDs uuids: [String]) async throws {
+        return try await withCheckedThrowingContinuation { continuation in
+            remove(objectsWithUUIDs: uuids) { _, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+
+                continuation.resume()
+            }
+        }
+    }
+
 }
