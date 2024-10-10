@@ -198,7 +198,7 @@ extension DefaultDataBrokerProtectionUserNotificationService: UNUserNotification
         case .firstFreemiumScanComplete:
             NSWorkspace.shared.open(DataBrokerProtectionNotificationCommand.showDashboard.url)
 
-            PixelKit.fire(FreemiumDBPExperimentPixel.firstScanCompleteNotificationClicked, frequency: .unique)
+            freemiumDBPExperimentPixelHandler.fire(FreemiumDBPExperimentPixel.firstScanCompleteNotificationClicked)
         }
     }
 }
