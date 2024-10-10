@@ -67,7 +67,7 @@ extension AutofillCredentialsImportManager: AutofillPasswordImportDelegate {
         if let data = serializedInputContext.data(using: .utf8),
            let decoded = try? JSONDecoder().decode(CredentialsImportInputContext.self, from: data) {
             if decoded.credentialsImport {
-                return !AutofillLoginImportState().isCredentialsImportPromptPermanantlyDismissed
+                return !stateStore.isCredentialsImportPromptPermanantlyDismissed
             }
         }
         return true
