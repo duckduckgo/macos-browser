@@ -152,6 +152,7 @@ extension HomePage.Views {
                             Spacer(minLength: 40)
                         }
                         .frame(height: totalHeight(with: geometryProxy))
+                        .offset(y: -geometryProxy.size.height * 0.1)
 
                         VStack(spacing: 0) {
                             remoteMessage()
@@ -390,14 +391,15 @@ extension HomePage.Views.RootView {
         if model.isContinueSetUpAvailable && model.isContinueSetUpVisible && continueSetUpModel.shouldShowAllFeatures {
             return false
         }
-        if model.isFavoriteVisible && favoritesModel.showAllFavorites {
+        if model.isFavoriteVisible && favoritesModel.showAllFavorites && favoritesModel.models.count > HomePage.favoritesPerRow {
             return false
         }
         if model.isRecentActivityVisible && recentlyVisitedModel.showRecentlyVisited {
             return false
         }
         if activeRemoteMessageModel.shouldShowRemoteMessage {
-            return geometry.size.height > totalHeight(with: geometry) + 2 * remoteMessageHeight
+            // 32px is the VStack spacing and 38px I don't really know (16px top padding of a Remote Message, 22px not sure)
+            return geometry.size.height > (totalHeight(with: geometry) + 2 * remoteMessageHeight + 38 + 32 + 0.1 * geometry.size.height)
         }
         return true
     }
