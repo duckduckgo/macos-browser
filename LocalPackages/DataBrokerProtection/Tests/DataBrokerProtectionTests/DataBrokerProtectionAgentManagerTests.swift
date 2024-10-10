@@ -99,7 +99,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
 
         let scanCalledExpectation = XCTestExpectation(description: "Scan called")
         var startScheduledScansCalled = false
-        mockQueueManager.startScheduledOperationsIfPermittedCalledCompletion = { _ in
+        mockQueueManager.startScheduledOperationsIfPermittedCalledCompletion = {
             startScheduledScansCalled = true
             scanCalledExpectation.fulfill()
         }
@@ -209,7 +209,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
         mockDataManager.profileToReturn = mockProfile
 
         var startScheduledScansCalled = false
-        mockQueueManager.startScheduledOperationsIfPermittedCalledCompletion = { _ in
+        mockQueueManager.startScheduledOperationsIfPermittedCalledCompletion = {
             startScheduledScansCalled = true
         }
 
@@ -237,7 +237,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
         mockDataManager.profileToReturn = mockProfile
 
         var startImmediateScansCalled = false
-        mockQueueManager.startImmediateOperationsIfPermittedCalledCompletion = { _ in
+        mockQueueManager.startImmediateOperationsIfPermittedCalledCompletion = {
             startImmediateScansCalled = true
         }
 
@@ -381,7 +381,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             privacyConfigurationManager: mockPrivacyConfigurationManager)
 
         var startScheduledScansCalled = false
-        mockQueueManager.startScheduledOperationsIfPermittedCalledCompletion = { _ in
+        mockQueueManager.startScheduledOperationsIfPermittedCalledCompletion = {
             startScheduledScansCalled = true
         }
 

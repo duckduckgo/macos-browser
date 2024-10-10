@@ -26,7 +26,7 @@ final class DataBrokerProtectionQueueModeTests: XCTestCase {
         let sut = DataBrokerProtectionQueueMode.idle
 
         // When
-        let result = sut.canBeInterruptedBy(newMode: .immediate(completion: nil))
+        let result = sut.canBeInterruptedBy(newMode: .immediate(errorHandler: nil, completion: nil))
 
         // Then
         XCTAssertTrue(result)
@@ -37,7 +37,7 @@ final class DataBrokerProtectionQueueModeTests: XCTestCase {
         let sut = DataBrokerProtectionQueueMode.idle
 
         // When
-        let result = sut.canBeInterruptedBy(newMode: .scheduled(completion: nil))
+        let result = sut.canBeInterruptedBy(newMode: .scheduled(errorHandler: nil, completion: nil))
 
         // Then
         XCTAssertTrue(result)
@@ -45,10 +45,10 @@ final class DataBrokerProtectionQueueModeTests: XCTestCase {
 
     func testCurrentModeImmediate_andNewModeImmediate_thenInterruptionAllowed() throws {
         // Given
-        let sut = DataBrokerProtectionQueueMode.immediate(completion: nil)
+        let sut = DataBrokerProtectionQueueMode.immediate(errorHandler: nil, completion: nil)
 
         // When
-        let result = sut.canBeInterruptedBy(newMode: .immediate(completion: { _ in }))
+        let result = sut.canBeInterruptedBy(newMode: .immediate(errorHandler: { _ in }, completion: {}))
 
         // Then
         XCTAssertTrue(result)
@@ -56,10 +56,10 @@ final class DataBrokerProtectionQueueModeTests: XCTestCase {
 
     func testCurrentModeImmediate_andNewModeScheduled_thenInterruptionNotAllowed() throws {
         // Given
-        let sut = DataBrokerProtectionQueueMode.immediate(completion: nil)
+        let sut = DataBrokerProtectionQueueMode.immediate(errorHandler: nil, completion: nil)
 
         // When
-        let result = sut.canBeInterruptedBy(newMode: .scheduled(completion: nil))
+        let result = sut.canBeInterruptedBy(newMode: .scheduled(errorHandler: nil, completion: nil))
 
         // Then
         XCTAssertFalse(result)
@@ -67,10 +67,10 @@ final class DataBrokerProtectionQueueModeTests: XCTestCase {
 
     func testCurrentModeScheduled_andNewModeImmediate_thenInterruptionAllowed() throws {
         // Given
-        let sut = DataBrokerProtectionQueueMode.scheduled(completion: nil)
+        let sut = DataBrokerProtectionQueueMode.scheduled(errorHandler: nil, completion: nil)
 
         // When
-        let result = sut.canBeInterruptedBy(newMode: .immediate(completion: nil))
+        let result = sut.canBeInterruptedBy(newMode: .immediate(errorHandler: nil, completion: nil))
 
         // Then
         XCTAssertTrue(result)
@@ -78,10 +78,10 @@ final class DataBrokerProtectionQueueModeTests: XCTestCase {
 
     func testCurrentModeScheduled_andNewModeScheduled_thenInterruptionNotAllowed() throws {
         // Given
-        let sut = DataBrokerProtectionQueueMode.scheduled(completion: nil)
+        let sut = DataBrokerProtectionQueueMode.scheduled(errorHandler: nil, completion: nil)
 
         // When
-        let result = sut.canBeInterruptedBy(newMode: .scheduled(completion: nil))
+        let result = sut.canBeInterruptedBy(newMode: .scheduled(errorHandler: nil, completion: nil))
 
         // Then
         XCTAssertFalse(result)
@@ -100,7 +100,7 @@ final class DataBrokerProtectionQueueModeTests: XCTestCase {
 
     func testWhenModeIsImmediate_thenPriorityDateIsNil() throws {
         // Given
-        let sut = DataBrokerProtectionQueueMode.immediate(completion: nil)
+        let sut = DataBrokerProtectionQueueMode.immediate(errorHandler: nil, completion: nil)
 
         // When
         let result = sut.priorityDate
@@ -111,7 +111,7 @@ final class DataBrokerProtectionQueueModeTests: XCTestCase {
 
     func testWhenModeIsScheduled_thenPriorityDateIsNotNil() throws {
         // Given
-        let sut = DataBrokerProtectionQueueMode.scheduled(completion: nil)
+        let sut = DataBrokerProtectionQueueMode.scheduled(errorHandler: nil, completion: nil)
 
         // When
         let result = sut.priorityDate
