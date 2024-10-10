@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "4e6a8da6a088439565ed7f6a2ac83e83ad7fd10e",
-        "version" : "198.3.1"
+        "branch" : "dominik/rmf-store",
+        "revision" : "e78c1874e836a1d9b9c7599c060e1a100d08cdd3"
       }
     },
     {
