@@ -164,38 +164,28 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
 
 private extension DataBrokerProtectionDataManager {
 
-    /// Calculates the total number of matches and the number of brokers where matches were found.
+    /// Calculates the number of profile matches and the unique broker count based on the provided query data.
     ///
-    /// This function iterates over the provided `queryData` and counts both the total number of matches
-    /// (including profiles and mirror sites) and the number of brokers that have at least one match.
-    /// Deprecated profile queries are ignored in the count.
+    /// This method filters out deprecated profile queries from the input `queryData`, generates the profile matches,
+    /// and then calculates two counts:
+    /// - The total number of profile matches (`matchCount`).
+    /// - The number of unique data brokers involved in those matches (`brokerCount`).
     ///
-    /// - Parameter queryData: An array of `BrokerProfileQueryData` containing information about profile queries and brokers.
+    /// The method groups the profile matches by data broker to ensure that each broker is counted only once.
+    ///
+    /// - Parameter queryData: An array of `BrokerProfileQueryData` that contains data brokers and profile queries.
     /// - Returns: A tuple containing:
-    ///   - `matchCount`: The total number of matches, which is the sum of profiles and valid mirror sites.
-    ///   - `brokerCount`: The number of brokers that have at least one match.
-    ///
-    /// - Note: A broker is counted towards `brokerCount` if it has at least one profile match or a valid mirror site.
+    ///   - `matchCount`: The total number of profile matches after filtering out deprecated queries.
+    ///   - `brokerCount`: The number of unique data brokers involved in the profile matches.
     func matchesAndBrokersCount(forQueryData queryData: [BrokerProfileQueryData]) -> (matchCount: Int, brokerCount: Int) {
-        var brokerCount = 0
+        let withoutDeprecated = queryData.filter { !$0.profileQuery.deprecated }
+        let profileMatches = DBPUIDataBrokerProfileMatch.profileMatches(from: withoutDeprecated)
 
-        let matchCount = queryData.reduce(0) { count, data in
-            guard !data.profileQuery.deprecated else { return count }
+        // Calculate the total number of profile matches.
+        let matchCount = profileMatches.count
 
-            let profilesCount = data.extractedProfiles.count
-            var validMirrorSitesCount = 0
-
-            data.extractedProfiles.forEach { _ in
-                let mirrorSitesMatches = data.dataBroker.mirrorSites.filter { $0.shouldWeIncludeMirrorSite() }
-                validMirrorSitesCount += mirrorSitesMatches.count
-            }
-
-            if profilesCount + validMirrorSitesCount > 0 {
-                brokerCount += 1
-            }
-
-            return count + profilesCount + validMirrorSitesCount
-        }
+        // Calculate the number of unique brokers by grouping the matches by data broker.
+        let brokerCount = Dictionary(grouping: profileMatches, by: { $0.dataBroker }).values.count
 
         return (matchCount, brokerCount)
     }
