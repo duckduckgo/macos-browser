@@ -276,7 +276,7 @@ final class LocalBookmarkStore: BookmarkStore {
         }
 
         let context = makeContext()
-        context.perform {
+        context.perform { [favoritesDisplayMode] in
             do {
                 let results: [BookmarkEntity]
 
@@ -298,7 +298,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 let entities: [BaseBookmarkEntity] = results.compactMap { entity in
                     BaseBookmarkEntity.from(managedObject: entity,
                                             parentFolderUUID: entity.parent?.uuid,
-                                            favoritesDisplayMode: self.favoritesDisplayMode)
+                                            favoritesDisplayMode: favoritesDisplayMode)
                 }
 
                 mainQueueCompletion(bookmarks: entities, error: nil)
@@ -379,13 +379,9 @@ final class LocalBookmarkStore: BookmarkStore {
         }
     }
 
-    func remove(objectsWithUUIDs identifiers: [String], completion: @escaping (Bool, Error?) -> Void) {
+    func remove(objectsWithUUIDs identifiers: [String], completion: @escaping (Error?) -> Void) {
 
-        applyChangesAndSave(changes: { [weak self] context in
-            guard self != nil else {
-                throw BookmarkStoreError.storeDeallocated
-            }
-
+        applyChangesAndSave(changes: { context in
             let fetchRequest = BaseBookmarkEntity.entities(with: identifiers)
             let fetchResults = (try? context.fetch(fetchRequest)) ?? []
 
@@ -398,20 +394,16 @@ final class LocalBookmarkStore: BookmarkStore {
             }
         }, onError: { [weak self] error in
             self?.commonOnSaveErrorHandler(error)
-            DispatchQueue.main.async { completion(false, error) }
+            DispatchQueue.main.async { completion(error) }
         }, onDidSave: {
-            DispatchQueue.main.async { completion(true, nil) }
+            DispatchQueue.main.async { completion(nil) }
         })
     }
 
     func update(bookmark: Bookmark) {
 
         do {
-            try applyChangesAndSave(changes: { [weak self] context in
-                guard let self = self else {
-                    throw BookmarkStoreError.storeDeallocated
-                }
-
+            try applyChangesAndSave(changes: { [favoritesDisplayMode] context in
                 let bookmarkFetchRequest = BaseBookmarkEntity.singleEntity(with: bookmark.id)
                 let bookmarkFetchRequestResults = try? context.fetch(bookmarkFetchRequest)
 
@@ -538,9 +530,9 @@ final class LocalBookmarkStore: BookmarkStore {
 
             let favoritesFolders = BookmarkUtils.fetchFavoritesFolders(for: favoritesDisplayMode, in: context)
             bookmarkManagedObjects.forEach { managedObject in
-                if let entity = BaseBookmarkEntity.from(managedObject: managedObject, parentFolderUUID: nil, favoritesDisplayMode: self.favoritesDisplayMode) {
+                if let entity = BaseBookmarkEntity.from(managedObject: managedObject, parentFolderUUID: nil, favoritesDisplayMode: favoritesDisplayMode) {
                     update(entity)
-                    managedObject.update(with: entity, favoritesFoldersToAddFavorite: favoritesFolders, favoritesDisplayMode: self.favoritesDisplayMode)
+                    managedObject.update(with: entity, favoritesFoldersToAddFavorite: favoritesFolders, favoritesDisplayMode: favoritesDisplayMode)
                 }
             }
         }, onError: { [weak self] error in
@@ -660,11 +652,7 @@ final class LocalBookmarkStore: BookmarkStore {
 
     func moveFavorites(with objectUUIDs: [String], toIndex index: Int?, completion: @escaping (Error?) -> Void) {
 
-        applyChangesAndSave(changes: { [weak self] context in
-            guard let self = self else {
-                throw BookmarkStoreError.storeDeallocated
-            }
-
+        applyChangesAndSave(changes: { [favoritesDisplayMode] context in
             let displayedFavoritesFolderUUID = favoritesDisplayMode.displayedFolder.rawValue
             guard let displayedFavoritesFolder = BookmarkUtils.fetchFavoritesFolder(withUUID: displayedFavoritesFolderUUID, in: context) else {
                 throw BookmarkStoreError.missingFavoritesRoot
@@ -947,11 +935,8 @@ final class LocalBookmarkStore: BookmarkStore {
     // MARK: - Sync
 
     func handleFavoritesAfterDisablingSync() {
-        applyChangesAndSave { [weak self] context in
-            guard let self else {
-                return
-            }
-            if self.favoritesDisplayMode.isDisplayUnified {
+        applyChangesAndSave { [favoritesDisplayMode] context in
+            if favoritesDisplayMode.isDisplayUnified {
                 BookmarkUtils.copyFavorites(from: .unified, to: .desktop, clearingNonNativeFavoritesFolder: .mobile, in: context)
             } else {
                 BookmarkUtils.copyFavorites(from: .desktop, to: .unified, clearingNonNativeFavoritesFolder: .mobile, in: context)
