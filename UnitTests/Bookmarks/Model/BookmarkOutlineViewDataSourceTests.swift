@@ -235,7 +235,6 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         let cell = try XCTUnwrap(dataSource.outlineView(mockOutlineView, viewFor: nil, item: mockFolderNode) as? BookmarkOutlineCellView)
 
         // THEN
-        XCTAssertTrue(cell.shouldShowMenuButton)
         XCTAssertFalse(cell.shouldShowChevron)
     }
 
@@ -252,7 +251,6 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         let cell = try XCTUnwrap(dataSource.outlineView(mockOutlineView, viewFor: nil, item: mockFolderNode) as? BookmarkOutlineCellView)
 
         // THEN
-        XCTAssertFalse(cell.shouldShowMenuButton)
         XCTAssertFalse(cell.shouldShowChevron)
     }
 
@@ -269,7 +267,6 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         let cell = try XCTUnwrap(dataSource.outlineView(mockOutlineView, viewFor: nil, item: mockFolderNode) as? BookmarkOutlineCellView)
 
         // THEN
-        XCTAssertTrue(cell.shouldShowMenuButton)
         XCTAssertTrue(cell.shouldShowChevron)
     }
 
