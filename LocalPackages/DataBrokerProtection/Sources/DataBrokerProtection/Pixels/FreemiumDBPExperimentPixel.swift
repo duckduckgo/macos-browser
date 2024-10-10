@@ -61,7 +61,6 @@ public enum FreemiumDBPExperimentPixel: PixelKitEventV2 {
     // Subscription
     case subscription
 
-
     public var name: String {
         switch self {
         case .newTabScanImpression:
