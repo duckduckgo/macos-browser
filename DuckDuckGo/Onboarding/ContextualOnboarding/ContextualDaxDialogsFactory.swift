@@ -46,7 +46,7 @@ struct DefaultContextualDaxDialogViewFactory: ContextualDaxDialogsFactory {
             HStack {
                 Spacer()
                 dialogView
-                    .frame(maxWidth: 800.0)
+                    .frame(maxWidth: 640.0)
                 Spacer()
             }
             .padding()
