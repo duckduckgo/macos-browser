@@ -2422,6 +2422,165 @@
         }
       }
     },
+    "Align Bookmarks" : {
+      "comment" : "Preference title aligning the bookmarks bar",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lesezeichen ausrichten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alinear marcadores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aligner les signets"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allinea segnalibri"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bladwijzers uitlijnen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyrównaj zakładki"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alinhar marcadores"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выравнивание панели закладок"
+          }
+        }
+      }
+    },
+    "Align Bookmarks to Center" : {
+      "comment" : "Preference for center aligning the bookmarks bar",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lesezeichen zentriert ausrichten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alinear marcadores en el centro"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aligner les signets au centre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allinea i segnalibri al centro"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bladwijzers centraal uitlijnen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyrównaj zakładki do środka"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alinhar marcadores ao centro"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выровнять по центру"
+          }
+        }
+      }
+    },
+    "Align Bookmarks to Left" : {
+      "comment" : "Preference for left aligning the bookmarks bar",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lesezeichen linksbündig ausrichten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alinea marcadores a la izquierda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aligner les signets à gauche"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allinea i segnalibri a sinistra"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bladwijzers naar links uitlijnen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyrównaj zakładki do lewej"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alinhar marcadores à esquerda"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выровнять по левому краю"
+          }
+        }
+      }
+    },
     "allow.integration" : {
       "comment" : "Setup of the integration with Bitwarden app",
       "extractionState" : "extracted_with_value",
@@ -12264,6 +12423,59 @@
         }
       }
     },
+    "Center" : {
+      "comment" : "Preference title aligning the bookmarks bar",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mittig"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centro"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centro"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Midden"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Środek"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centro"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "По центру"
+          }
+        }
+      }
+    },
     "check.allow.integration" : {
       "comment" : "Setup of the integration with Bitwarden app",
       "extractionState" : "extracted_with_value",
@@ -18457,66 +18669,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Всегда открывать видео из YouTube в Duck Player"
-          }
-        }
-      }
-    },
-    "duck-player.autoplay-preference" : {
-      "comment" : "Autoplay preference in settings",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "In Duck Player geöffnete Videos automatisch abspielen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Autoplay videos opened in Duck Player"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reproducir automáticamente los vídeos abiertos en Duck Player"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lecture automatique des vidéos ouvertes dans Duck Player"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Riproduzione automatica dei video aperti in Duck Player"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Video's automatisch afspelen wanneer ze worden geopend in Duck Player"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Automatyczne odtwarzanie filmów otwieranych w Duck Player"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reproduzir automaticamente vídeos abertos no Duck Player"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Автоматически проигрывать видео при открытии в Duck Player"
           }
         }
       }
@@ -25521,66 +25673,6 @@
         }
       }
     },
-    "home.page.settings.all.settings" : {
-      "comment" : "Button caption",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alle Einstellungen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "All Settings"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Todos los ajustes"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tous les paramètres"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tutte le impostazioni"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alle Instellingen"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wszystkie ustawienia"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Todas as definições"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Все настройки"
-          }
-        }
-      }
-    },
     "home.page.settings.background" : {
       "comment" : "Section title in Home Page Settings to customization Home Page background",
       "extractionState" : "extracted_with_value",
@@ -26117,66 +26209,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Изображения хранятся на вашем устройстве, поэтому у DuckDuckGo нет к ним доступа (даже для просмотра)."
-          }
-        }
-      }
-    },
-    "home.page.settings.reset.background" : {
-      "comment" : "Button caption to reset custom home page background",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hintergrund zurücksetzen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Reset Background"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Restablecer fondo"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Réinitialiser l'arrière-plan"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reimposta sfondo"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Achtergrond opnieuw instellen"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zresetuj tło"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Redefinir fundo"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Сбросить фон"
           }
         }
       }
@@ -30349,6 +30381,59 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Узнать больше"
+          }
+        }
+      }
+    },
+    "Left" : {
+      "comment" : "Preference title aligning the bookmarks bar",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Links"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Izquierda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À gauche"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Left"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Links"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lewo"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esquerdo"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Left"
           }
         }
       }
@@ -37203,55 +37288,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Du bist bereit! Du kannst mich jederzeit im Dock antreffen.\nMöchtest du sehen, wie ich dich beschütze? Versuche, eine deiner Lieblingsseiten zu besuchen 👆\n\nBehalte die Adressleiste im Auge. Ich werde Tracker blockieren und die Sicherheit deiner Verbindung verbessern, wenn möglichu{00A0}🔒"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "You’re all set! You can find me hanging out in the Dock anytime.\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possibleu{00A0}🔒"
+            "value" : "You’re all set! You can find me hanging out in the Dock anytime.\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possible 🔒"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "¡Ya está todo listo! Puedes encontrarme en el Dock en cualquier momento.\n¿Quieres ver cómo te protejo? Prueba a visitar uno de tus sitios favoritos 👆\n\nNo pierdas de vista la barra de direcciones al navegar. Bloquearé los rastreadores y mejoraré la seguridad de tu conexión cuando sea posible{00A0}🔒"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Tout est prêt ! Vous pouvez me trouver sur le Dock à tout moment.\nVous voulez voir comment je vous protège ? Essayez de visiter l'un de vos sites préférés 👆\n\nContinuez à regarder la barre d'adresse au fur et à mesure. Je bloquerai les traqueurs et mettrai à niveau la sécurité de votre connexion si possible 🔒"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Tutto pronto! Puoi trovarmi nel dock in qualsiasi momento.\nVuoi vedere come ti proteggo? Prova a visitare uno dei tuoi siti preferiti 👆\n\nContinua a controllare la barra degli indirizzi mentre esplori. Bloccherò i sistemi di tracciamento e aggiornerò la sicurezza della tua connessione quando possibile{00A0} 🔒"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Je bent helemaal klaar! Je kunt me altijd vinden in het Dock.\nWil je zien hoe ik je bescherm? Ga eens naar een van je favoriete websites 👆\n\nKijk tijdens het surfen goed naar de adresbalk. Ik blokkeer trackers en werk de beveiliging van je verbinding bij wanneer mogelijk 🔒"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Wszystko gotowe! W każdej chwili możesz mnie znaleźć w Docku.\nChcesz zobaczyć, jak Cię chronię? Spróbuj odwiedzić jedną z ulubionych stron 👆\n\nW międzyczasie obserwuj pasek adresu. Będę blokować mechanizmy śledzące i w miarę możliwości poprawiać bezpieczeństwo połączenia 🔒"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Está tudo pronto! Podes encontrar-me na Dock em qualquer altura.\nQueres ver como te protejo? Experimenta visitar um dos teus sites favoritos 👆\n\nContinua a observar a barra de endereço à medida que vais avançando. Vou bloquear os rastreadores e melhorar a segurança da tua ligação sempre que possível 🔒"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Готово! Теперь меня всегда можно найти на док-панели.\nВам интересно, как я защищаю вашу конфиденциальность? Зайдите на свой любимый сайт...👆\n\nИ следите за адресной строкой. По возможности я заблокирую все трекеры и сделаю соединение более безопасным {00A0}🔒"
           }
         }
@@ -37263,55 +37348,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Du bist bereit!\n\nMöchtest du sehen, wie ich dich beschütze? Versuche, eine deiner Lieblingsseiten zu besuchen 👆\n\nBehalte die Adressleiste im Auge. Ich werde Tracker blockieren und die Sicherheit deiner Verbindung verbessern, wenn möglich 🔒"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "You’re all set!\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possibleu{00A0}🔒"
+            "value" : "You’re all set!\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possible 🔒"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "¡Ya está todo listo!\n\n¿Quieres ver cómo te protejo? Prueba a visitar uno de tus sitios favoritos 👆\n\nSigue viendo la barra de direcciones sobre la marcha. Bloquearé los rastreadores y mejoraré la seguridad de tu conexión cuando sea posible 🔒"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Tout est prêt !\n\nVous voulez voir comment je vous protège ? Essayez de visiter l'un de vos sites préférés 👆\n\n Continuez à regarder la barre d'adresse au fur et à mesure. Je bloquerai les traqueurs et mettrai à niveau la sécurité de votre connexion si possible 🔒"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Tutto pronto.\n\nVuoi vedere come ti proteggo? Prova a visitare uno dei tuoi siti preferiti 👆Continua a controllare la barra degli indirizzi mentre esplori. Bloccherò i sistemi di tracciamento e aggiornerò la sicurezza della tua connessione quando possibile 🔒"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Je bent helemaal klaar!\n\nWil je zien hoe ik je bescherm? Ga eens naar een van je favoriete websites 👆 \n\n Kijk tijdens het surfen goed naar de adresbalk. Ik blokkeer trackers en werk de beveiliging van je verbinding bij wanneer mogelijk 🔒"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Wszystko gotowe!\n\nChcesz zobaczyć, jak Cię chronię? Spróbuj odwiedzić jedną z ulubionych stron 👆\n\nW międzyczasie obserwuj pasek adresu. Będę blokować mechanizmy śledzące i w miarę możliwości poprawiać bezpieczeństwo połączenia 🔒"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Estás tudo pronto!\n\nQueres ver como te protejo? Experimenta visitar um dos teus sites favoritos 👆\n\nContinua a observar a barra de endereço à medida que vais avançando. Vou bloquear os rastreadores e melhorar a segurança da tua ligação sempre que possível 🔒"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Все готово!\n\nХотите увидеть, как я вас защищаю? Зайдите на один из любимых сайтов 👆\n\nСледите за адресной строкой. Я по возможности буду блокировать трекеры и обеспечивать вам более безопасное соединение 🔒"
           }
         }
@@ -44607,68 +44692,8 @@
         }
       }
     },
-    "pm.empty.default.description" : {
-      "comment" : "Label for default empty state description",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wenn deine Passwörter in einem anderen Browser gespeichert sind, kannst du sie in DuckDuckGo importieren."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "If your passwords are saved in another browser, you can import them into DuckDuckGo."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Si tienes contraseñas guardadas en otro navegador, puedes importarlas a DuckDuckGo."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Si vos mots de passe sont enregistrés dans un autre navigateur, vous pouvez les importer dans DuckDuckGo."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Se le password vengono salvate in un altro browser, è possibile importarle in DuckDuckGo."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Als je wachtwoorden in een andere browser zijn opgeslagen, kun je ze in DuckDuckGo importeren."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jeśli Twoje hasła są zapisane w innej przeglądarce, możesz je zaimportować do DuckDuckGo."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Se as tuas palavras-passe estão guardadas noutro navegador, podes importá-las para o DuckDuckGo."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Если вы уже храните пароли в другом браузере, вы можете импортировать их в DuckDuckGo."
-          }
-        }
-      }
-    },
     "pm.empty.default.description.extended.v2" : {
-      "comment" : "Label for default empty state description\n   Label for default empty state description when the autolock feature is off",
+      "comment" : "Label for default empty state description",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -44723,6 +44748,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Пароли подвергаются шифрованию. Никто, кроме вас, их не увидит. Даже мы."
+          }
+        }
+      }
+    },
+    "pm.empty.default.description.extended.v2.autolock.off" : {
+      "comment" : "Label for default empty state description when the autolock feature is off",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwörter sind verschlüsselt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Passwords are encrypted."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las contraseñas están cifradas."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les mots de passe sont cryptés."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le password sono crittografate."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wachtwoorden worden versleuteld."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hasła są szyfrowane."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As palavras-passe estão encriptadas."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пароли подвергаются шифрованию."
           }
         }
       }
@@ -47608,7 +47693,7 @@
       }
     },
     "pm.save-credentials.security.info" : {
-      "comment" : "Info message for the save credentials dialog\n   Info message for the save credentials dialog when the autolock feature is off",
+      "comment" : "Info message for the save credentials dialog",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -47631,7 +47716,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Les mots de passe sont cryptés. Personne d&apos;autre que vous ne peut les voir, pas même nous. [En savoir plus](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+            "value" : "Les mots de passe sont cryptés. Personne d'autre que vous ne peut les voir, pas même nous. [En savoir plus](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
           }
         },
         "it" : {
@@ -47643,13 +47728,13 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wachtwoorden worden versleuteld. Niemand anders kan ze zien, zelfs wij niet. [Meer informatie] (https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+            "value" : "Wachtwoorden worden versleuteld. Niemand anders dan jij kunt ze zien, zelfs wij niet. [Meer informatie](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hasła są szyfrowane. Nikt poza Tobą ich nie widzi, nawet my. [Więcej informacji](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+            "value" : "Hasła są szyfrowane. Nikt poza Tobą ich nie widzi, nawet my. [Więcek informacji](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
           }
         },
         "pt" : {
@@ -47662,6 +47747,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Пароли подвергаются шифрованию. Никто, кроме вас, их не увидит. Даже мы. [Подробнее...](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        }
+      }
+    },
+    "pm.save-credentials.security.info.autolock.off" : {
+      "comment" : "Info message for the save credentials dialog when the autolock feature is off",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwörter sind verschlüsselt. Wir empfehlen dir, Auto-Lock einzurichten, um deine Passwörter noch sicherer zu machen. [Gehe zu Einstellungen](duck://settings/autofill)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Passwords are encrypted. We recommend setting up Auto-lock to keep your passwords even more secure. [Go to Settings](duck://settings/autofill)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las contraseñas están cifradas. Te recomendamos que configures Auto-lock para mantener las contraseñas aún más seguras. [Ve a Ajustes](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les mots de passe sont cryptés. Nous recommandons de configurer le verrouillage automatique pour renforcer la sécurité de vos mots de passe. [Accéder aux Réglages](duck://settings/autofill)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Le password sono crittografate. Ti consigliamo di impostare il blocco automatico per rendere le tue password ancora più sicure. [Vai a Impostazioni](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Wachtwoorden worden versleuteld. We raden aan om 'Automatisch vergrendelen' in te stellen om je wachtwoorden nog beter te beveiligen. [Ga naar Instellingen](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Hasła są szyfrowane. Zalecamy skonfigurowanie funkcji automatycznej blokady, aby hasła były jeszcze bezpieczniejsze. [Przejdź do ustawień](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "As palavras-passe estão encriptadas. Recomendamos a configuração do Bloqueio automático para manter as tuas palavras-passe ainda mais seguras. [Acede a Definições](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Все пароли шифруются. Для их дополнительной защиты рекомендуем включить автоблокировку. [Перейти к настройкам](https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/)"
           }
         }
       }
@@ -58455,55 +58600,115 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lesezeichen sortieren"
+            "value" : "Sortieren"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Sort bookmarks"
+            "value" : "Sort"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ordenar marcadores"
+            "value" : "Ordenar"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Trier les signets"
+            "value" : "Trier"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ordina i segnalibri"
+            "value" : "Ordina"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bladwijzers sorteren"
+            "value" : "Sorteren"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sortuj zakładki"
+            "value" : "Sortuj"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ordenar marcadores"
+            "value" : "Ordenar"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Сортировка закладок"
+            "value" : "Сортировать"
+          }
+        }
+      }
+    },
+    "tooltip.bookmarks.sort.name.title" : {
+      "comment" : "Title when bookmark sort by name is enabled",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach Namen sortieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sort by Name"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordenar por nombre"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trier par nom"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordina per nome"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sorteren op naam"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sortuj według nazwy"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordenar por nome"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сортировать по названию"
           }
         }
       }

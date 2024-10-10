@@ -29,6 +29,7 @@ final class ActiveDomainPublisher {
     private var activeWindowControllerCancellable: AnyCancellable?
     private var activeTabViewModelCancellable: AnyCancellable?
     private var activeTabContentCancellable: AnyCancellable?
+    private var unregisterWindowControllerCancellable: AnyCancellable?
 
     @MainActor private weak var activeWindowController: MainWindowController? {
         didSet {
@@ -47,6 +48,7 @@ final class ActiveDomainPublisher {
 
         Task { @MainActor in
             subscribeToKeyWindowControllerChanges()
+            subscribeToUnregisteringWindowController()
         }
     }
 
@@ -74,6 +76,16 @@ final class ActiveDomainPublisher {
             .map(domain(from:))
             .removeDuplicates()
             .assign(to: \.activeDomain, onWeaklyHeld: self)
+    }
+
+    @MainActor
+    private func subscribeToUnregisteringWindowController() {
+        unregisterWindowControllerCancellable = windowControllersManager.didUnregisterWindowController.sink { [weak self] in
+            guard let self else { return }
+            if self.activeWindowController == $0 {
+                self.activeWindowController = nil
+            }
+        }
     }
 
     private func domain(from tabContent: Tab.TabContent) -> String? {

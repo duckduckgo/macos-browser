@@ -299,8 +299,13 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
 
             switch newSortMode {
             case .nameDescending:
+                self.sortItemsButton.title = UserText.bookmarksSortByNameTitle
                 self.sortItemsButton.image = .bookmarkSortDesc
-            default:
+            case .nameAscending:
+                self.sortItemsButton.title = UserText.bookmarksSortByNameTitle
+                self.sortItemsButton.image = .bookmarkSortAsc
+            case .manual:
+                self.sortItemsButton.title = UserText.bookmarksSort
                 self.sortItemsButton.image = .bookmarkSortAsc
             }
 

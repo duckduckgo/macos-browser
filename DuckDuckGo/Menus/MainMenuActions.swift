@@ -26,6 +26,7 @@ import PixelKit
 import Subscription
 import WebKit
 import os.log
+import SwiftUI
 
 // Actions are sent to objects of responder chain
 
@@ -962,6 +963,24 @@ extension MainViewController {
 
     @objc func resetConfigurationToDefault(_ sender: Any?) {
         setConfigurationUrl(nil)
+    }
+
+    @available(macOS 13.5, *)
+    @objc func showAllCredentials(_ sender: Any?) {
+        let hostingView = NSHostingView(rootView: AutofillCredentialsDebugView())
+        hostingView.translatesAutoresizingMaskIntoConstraints = false
+        hostingView.frame.size = hostingView.intrinsicContentSize
+
+        let window = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 1400, height: 700),
+                styleMask: [.titled, .closable, .resizable],
+                backing: .buffered, defer: false)
+
+        window.center()
+        window.title = "Credentials"
+        window.contentView = hostingView
+        window.isReleasedWhenClosed = false
+        window.makeKeyAndOrderFront(nil)
     }
 
     // MARK: - Developer Tools
