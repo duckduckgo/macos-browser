@@ -31,7 +31,7 @@ final class AddressBarViewController: NSViewController {
     @IBOutlet var progressIndicator: LoadingProgressView!
     @IBOutlet var passiveTextFieldMinXConstraint: NSLayoutConstraint!
     @IBOutlet var activeTextFieldMinXConstraint: NSLayoutConstraint!
-    private static let defaultActiveTextFieldMinX: CGFloat = 40
+    private static let defaultActiveTextFieldMinX: CGFloat = 30
 
     private let popovers: NavigationBarPopovers
     private(set) var addressBarButtonsViewController: AddressBarButtonsViewController?
