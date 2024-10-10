@@ -1118,8 +1118,28 @@ final class MockRunnerProvider: JobRunnerProvider {
 
 final class MockPixelHandler: EventMapping<DataBrokerProtectionPixels> {
 
+    var lastFiredEvent: DataBrokerProtectionPixels?
+    var lastPassedParameters: [String: String]?
+
     init() {
-        super.init { event, _, _, _ in }
+        var mockMapping: Mapping! = nil
+
+        super.init(mapping: { event, error, params, onComplete in
+            // Call the closure after initialization
+            mockMapping(event, error, params, onComplete)
+        })
+
+        // Now, set the real closure that captures self and stores parameters.
+        mockMapping = { [weak self] (event, error, params, onComplete) in
+            // Capture the inputs when fire is called
+            self?.lastFiredEvent = event
+            self?.lastPassedParameters = params
+        }
+    }
+
+    func resetCapturedData() {
+        lastFiredEvent = nil
+        lastPassedParameters = nil
     }
 }
 

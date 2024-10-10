@@ -202,6 +202,9 @@ public final class DataBrokerProtectionAgentManager {
 
 extension DataBrokerProtectionAgentManager {
     func fireMonitoringPixels() {
+        // Only send pixels for authenticated users
+        guard authenticationManager.isUserAuthenticated else { return }
+
         let database = operationDependencies.database
 
         let engagementPixels = DataBrokerProtectionEngagementPixels(database: database, handler: pixelHandler)
@@ -214,6 +217,10 @@ extension DataBrokerProtectionAgentManager {
         eventPixels.tryToFireWeeklyPixels()
         // This will try to fire the stats pixels
         statsPixels.tryToFireStatsPixels()
+
+        // If a user upgraded from Freemium, don't send 24-hour opt-out submit pixels
+        guard !freemiumDBPUserStateManager.didActivate else { return }
+
         // Fire custom stats pixels if needed
         statsPixels.fireCustomStatsPixelsIfNeeded()
     }

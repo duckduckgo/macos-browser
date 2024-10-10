@@ -561,6 +561,59 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
         // Then
         XCTAssertTrue(startScheduledScansCalled)
     }
+
+    func testWhenFirePixelsCalled_andUserIsAuthenticated_thenPixelsAreFired() async throws {
+        // Given
+        sut = DataBrokerProtectionAgentManager(
+            userNotificationService: mockNotificationService,
+            activityScheduler: mockActivityScheduler,
+            ipcServer: mockIPCServer,
+            queueManager: mockQueueManager,
+            dataManager: mockDataManager,
+            operationDependencies: mockDependencies,
+            pixelHandler: mockPixelHandler,
+            agentStopper: mockAgentStopper,
+            configurationManager: mockConfigurationManager,
+            privacyConfigurationManager: mockPrivacyConfigurationManager,
+            authenticationManager: mockAuthenticationManager,
+            freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager)
+
+        mockAuthenticationManager.isUserAuthenticatedValue = true
+        mockFreemiumDBPUserStateManager.didActivate = false
+
+        // When
+        sut.fireMonitoringPixels()
+
+        // Then
+        XCTAssertNotNil(mockPixelHandler.lastFiredEvent)
+    }
+
+    func testWhenFirePixelsCalled_andUserIsNotAuthenticated_thenPixelsAreNotFired() async throws {
+        // Given
+        sut = DataBrokerProtectionAgentManager(
+            userNotificationService: mockNotificationService,
+            activityScheduler: mockActivityScheduler,
+            ipcServer: mockIPCServer,
+            queueManager: mockQueueManager,
+            dataManager: mockDataManager,
+            operationDependencies: mockDependencies,
+            pixelHandler: mockPixelHandler,
+            agentStopper: mockAgentStopper,
+            configurationManager: mockConfigurationManager,
+            privacyConfigurationManager: mockPrivacyConfigurationManager,
+            authenticationManager: mockAuthenticationManager,
+            freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager)
+
+        mockAuthenticationManager.isUserAuthenticatedValue = false
+        mockFreemiumDBPUserStateManager.didActivate = false
+
+        // When
+        sut.fireMonitoringPixels()
+
+        // Then
+        XCTAssertNil(mockPixelHandler.lastFiredEvent)
+    }
+
 }
 
 struct MockConfigurationFetcher: ConfigurationFetching {
