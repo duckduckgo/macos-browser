@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1726240116406,
+    "version": 1728095993160,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -87,6 +87,9 @@
                     "domain": "flexmls.com"
                 },
                 {
+                    "domain": "publicmediasignin.org"
+                },
+                {
                     "domain": "instructure.com"
                 }
             ],
@@ -114,7 +117,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "fa5f86bac5946c528cd6bc7449a2718a"
+            "hash": "ceea252d7f8479da1bfd92e710203963"
         },
         "androidBrowserConfig": {
             "exceptions": [],
@@ -125,6 +128,11 @@
             "exceptions": [],
             "state": "disabled",
             "hash": "728493ef7a1488e4781656d3f9db84aa"
+        },
+        "autocompleteTabs": {
+            "state": "enabled",
+            "exceptions": [],
+            "hash": "697382e31649d84b01166f1dc6f790d6"
         },
         "autoconsent": {
             "exceptions": [
@@ -339,6 +347,15 @@
                     "domain": "lehmannaudio.com"
                 },
                 {
+                    "domain": "rivergrandrapids.com"
+                },
+                {
+                    "domain": "97x.com"
+                },
+                {
+                    "domain": "speedweek.com"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -365,10 +382,10 @@
             "state": "enabled",
             "features": {
                 "filterlistExperiment": {
-                    "state": "enabled"
+                    "state": "disabled"
                 }
             },
-            "hash": "f1a5f94177144e743b6c59eb9773ef8f"
+            "hash": "a24d4efe9deb2a73284d7beab93c0d32"
         },
         "autofillBreakageReporter": {
             "state": "disabled",
@@ -403,6 +420,23 @@
                 }
             },
             "hash": "81031a6b86bd68eec102c2ed67f48c1b"
+        },
+        "backgroundAgentPixelTest": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "pixelTest": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 10
+                            }
+                        ]
+                    }
+                }
+            },
+            "hash": "75ff21cf9a4181783c06965edd6fe746"
         },
         "bookmarks": {
             "state": "enabled",
@@ -441,6 +475,11 @@
             "hash": "f93d54aff00a2110443fffcd8b3f26c9"
         },
         "brokenSiteReportExperiment": {
+            "exceptions": [],
+            "state": "disabled",
+            "hash": "728493ef7a1488e4781656d3f9db84aa"
+        },
+        "changeOmnibarPosition": {
             "exceptions": [],
             "state": "disabled",
             "hash": "728493ef7a1488e4781656d3f9db84aa"
@@ -1222,10 +1261,13 @@
                     "domain": "flexmls.com"
                 },
                 {
+                    "domain": "wjla.com"
+                },
+                {
                     "domain": "instructure.com"
                 }
             ],
-            "hash": "96b2f778bab196aa424e9c859ddea778"
+            "hash": "d02882dcee87a42b7d29bb6f2e21b4ca"
         },
         "cookie": {
             "settings": {
@@ -1344,8 +1386,8 @@
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2149"
                     },
                     {
-                        "domain": "manage.wix.com",
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2166"
+                        "domain": "wix.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2316"
                     },
                     {
                         "domain": "beta.maps.apple.com",
@@ -1381,7 +1423,7 @@
             },
             "exceptions": [],
             "state": "enabled",
-            "hash": "44894f4c1d1c0b085900118fd0b66c9d"
+            "hash": "6e1e9af5fb146e16b5f9f3090b41ca89"
         },
         "dbp": {
             "state": "enabled",
@@ -1812,6 +1854,10 @@
                         "type": "hide-empty"
                     },
                     {
+                        "selector": ".inline-ad",
+                        "type": "closest-empty"
+                    },
+                    {
                         "selector": ".ads__inline",
                         "type": "closest-empty"
                     },
@@ -1994,6 +2040,10 @@
                     {
                         "selector": ".m-in-content-ad-row",
                         "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".clsy-c-advsection",
+                        "type": "hide-empty"
                     }
                 ],
                 "styleTagExceptions": [
@@ -2069,7 +2119,8 @@
                     "continue reading the main story",
                     "this advertisement has not loaded yet, but your article continues below.",
                     "story continues below\nthis advertisement has not loaded yet, but your article continues below.",
-                    "upgrade to flickr pro to hide these ads"
+                    "upgrade to flickr pro to hide these ads",
+                    "video of the day"
                 ],
                 "domains": [
                     {
@@ -4247,6 +4298,19 @@
                         ]
                     },
                     {
+                        "domain": "techwalla.com",
+                        "rules": [
+                            {
+                                "selector": ".component-header-sticky-ad",
+                                "type": "closest-empty"
+                            },
+                            {
+                                "selector": ".component-article-section-votd-wrapper",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "theatlantic.com",
                         "rules": [
                             {
@@ -4801,7 +4865,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "85f1dc0d2a2bcd309d8683c058b7aa52"
+            "hash": "81b9ba9f3245da9eb799ec916e6b916b"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -5464,6 +5528,11 @@
             "exceptions": [],
             "hash": "39a36ca9002bd5aea4dd7b6bdb5b79d4"
         },
+        "loadingBarExp": {
+            "exceptions": [],
+            "state": "disabled",
+            "hash": "728493ef7a1488e4781656d3f9db84aa"
+        },
         "marketplaceAdPostback": {
             "state": "disabled",
             "exceptions": [],
@@ -5535,11 +5604,14 @@
                             }
                         ]
                     }
+                },
+                "userTips": {
+                    "state": "enabled"
                 }
             },
             "exceptions": [],
             "minSupportedVersion": "1.57.1",
-            "hash": "4bacd51337ffd170f9947420bf36b875"
+            "hash": "8e20176b0569977f35a9897a40882627"
         },
         "newTabContinueSetUp": {
             "exceptions": [],
@@ -5558,6 +5630,11 @@
                 }
             },
             "hash": "cbd62a1a63a829da0277ca045a311eb2"
+        },
+        "newTabSearchField": {
+            "state": "internal",
+            "exceptions": [],
+            "hash": "f1daaefe788583c2a00d7d19a23864a7"
         },
         "nonTracking3pCookies": {
             "settings": {
@@ -5826,6 +5903,12 @@
             "settings": {},
             "hash": "dfede9f06b9e322e198736703d013d15"
         },
+        "sendFullPackageInstallSource": {
+            "state": "enabled",
+            "settings": {},
+            "exceptions": [],
+            "hash": "26d319ff4b2f43012a287b5f35a8db3a"
+        },
         "serviceworkerInitiatedRequests": {
             "exceptions": [
                 {
@@ -6054,7 +6137,7 @@
                                 ]
                             },
                             {
-                                "rule": "static.adsafeprotected.com/skeleton.gif",
+                                "rule": "static.adsafeprotected.com/skeleton",
                                 "domains": [
                                     "<all>"
                                 ]
@@ -6778,6 +6861,7 @@
                                     "nytimes.com",
                                     "realmadrid.com",
                                     "rocketnews24.com",
+                                    "solitaired.com",
                                     "stuff.co.nz",
                                     "uwbadgers.com",
                                     "wunderground.com",
@@ -7024,7 +7108,8 @@
                                     "bandsintown.com",
                                     "mytrackman.com",
                                     "nextdoor.co.uk",
-                                    "nextdoor.com"
+                                    "nextdoor.com",
+                                    "solitaired.com"
                                 ]
                             },
                             {
@@ -7198,7 +7283,6 @@
                             {
                                 "rule": "google-analytics.com/analytics.js",
                                 "domains": [
-                                    "docs.llamaindex.ai",
                                     "doterra.com",
                                     "easyjet.com",
                                     "edx.org",
@@ -7331,20 +7415,7 @@
                             {
                                 "rule": "pagead2.googlesyndication.com/pagead/js/adsbygoogle.js",
                                 "domains": [
-                                    "air-journal.fr",
-                                    "arcadepunks.com",
-                                    "daotranslate.com",
-                                    "drakescans.com",
-                                    "duden.de",
-                                    "edealinfo.com",
-                                    "freetubetv.net",
-                                    "hscprojects.com",
-                                    "kits4beats.com",
-                                    "magicgameworld.com",
-                                    "ncaa.com",
-                                    "rocketnews24.com",
-                                    "youmath.it",
-                                    "zefoy.com"
+                                    "<all>"
                                 ]
                             },
                             {
@@ -7382,7 +7453,6 @@
                                     "algomalegalclinic.com",
                                     "bodyelectricvitality.com.au",
                                     "cosmicbook.news",
-                                    "docs.llamaindex.ai",
                                     "eatroyo.com",
                                     "thesimsresource.com",
                                     "tradersync.com",
@@ -8808,7 +8878,8 @@
                                 "rule": "sundaysky.com",
                                 "domains": [
                                     "bankofamerica.com",
-                                    "idnotify.com"
+                                    "idnotify.com",
+                                    "united.com"
                                 ]
                             }
                         ]
@@ -9290,7 +9361,7 @@
                     "domain": "instructure.com"
                 }
             ],
-            "hash": "fd5733aa1c2795ec2226f300eec2957f"
+            "hash": "1cf339c9f618be0304f90f0f48a7b6cf"
         },
         "trackingCookies1p": {
             "settings": {
@@ -9723,6 +9794,11 @@
             "hash": "728493ef7a1488e4781656d3f9db84aa"
         },
         "windowsExternalPreviewReleases": {
+            "exceptions": [],
+            "state": "disabled",
+            "hash": "728493ef7a1488e4781656d3f9db84aa"
+        },
+        "windowsFireWindow": {
             "exceptions": [],
             "state": "disabled",
             "hash": "728493ef7a1488e4781656d3f9db84aa"

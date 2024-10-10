@@ -574,7 +574,7 @@ release in progress and you're making a follow-up internal release that includes
 
     # Create the branch and push
     if is_ci
-      sha = Action.sh('git', 'rev-parse', source_version).chomp
+      sha = Action.sh('git', 'rev-parse', "#{source_version}^{}").chomp
       Action.sh('gh', 'api', '--method', 'POST', '/repos/duckduckgo/macos-browser/git/refs', '-f', "ref=refs/heads/#{release_branch}", '-f', "sha=#{sha}")
       Action.sh('git', 'fetch', 'origin')
       Action.sh('git', 'checkout', release_branch)

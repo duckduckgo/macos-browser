@@ -36,6 +36,9 @@ public enum FeatureFlag: String {
 
     // https://app.asana.com/0/1201462886803403/1208030658792310/f
     case unknownUsernameCategorization
+
+    /// https://app.asana.com/0/72649045549333/1208231259093710/f
+    case networkProtectionUserTips
 }
 
 extension FeatureFlag: FeatureFlagSourceProviding {
@@ -57,6 +60,8 @@ extension FeatureFlag: FeatureFlagSourceProviding {
             return .remoteReleasable(.subfeature(PhishingDetectionSubfeature.allowPreferencesToggle))
         case .highlightsOnboarding:
             return .internalOnly
+        case .networkProtectionUserTips:
+            return .remoteDevelopment(.subfeature(NetworkProtectionSubfeature.userTips))
         }
     }
 }

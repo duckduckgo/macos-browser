@@ -82,7 +82,7 @@ final class HoverTrackingArea: NSTrackingArea {
         view?.backgroundLayer(createIfNeeded: createIfNeeded)
     }
 
-    func updateLayer(animated: Bool = true) {
+    func updateLayer(animated: Bool = !CATransaction.disableActions()) {
         let color = currentBackgroundColor ?? .clear
         guard let view, let layer = layer(createIfNeeded: color != .clear) else { return }
 
@@ -113,6 +113,7 @@ final class HoverTrackingArea: NSTrackingArea {
         if let view, !view.isMouseOver {
             view.isMouseOver = true
         }
+        view?.mouseMoved(with: event)
     }
 
     @objc func mouseExited(_ event: NSEvent) {
