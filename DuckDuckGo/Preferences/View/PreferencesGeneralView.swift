@@ -22,6 +22,7 @@ import PreferencesViews
 import SwiftUI
 import SwiftUIExtensions
 import PixelKit
+import PhishingDetection
 
 extension Preferences {
 
@@ -199,6 +200,9 @@ extension Preferences {
                         PreferencePaneSubSection {
                             ToggleMenuItem(UserText.phishingDetectionIsEnabled,
                                            isOn: $phishingDetectionModel.isEnabled)
+                                .onChange(of: phishingDetectionModel.isEnabled) { newValue in
+                                    PixelKit.fire(PhishingDetectionEvents.settingToggled(to: newValue))
+                                }
                         }.padding(.bottom, 5)
                         Text(UserText.phishingDetectionEnabledWarning)
                             .font(.footnote)

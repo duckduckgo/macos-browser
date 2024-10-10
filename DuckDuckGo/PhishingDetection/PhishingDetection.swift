@@ -156,6 +156,8 @@ public class PhishingDetection: PhishingSiteDetecting {
                 PixelKit.fire(PhishingDetectionEvents.visitSite)
             case .updateTaskFailed48h(error: let error):
                 PixelKit.fire(PhishingDetectionEvents.updateTaskFailed48h(error: error))
+            case .settingToggled(to: let settingState):
+                PixelKit.fire(PhishingDetectionEvents.settingToggled(to: settingState))
             }
         })
         let resolvedUpdateManager = updateManager ?? PhishingDetectionUpdateManager(client: detectionClient, dataStore: resolvedDataStore)
