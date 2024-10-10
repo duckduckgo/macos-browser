@@ -172,42 +172,19 @@ final class FreemiumDBPPixelExperimentManagingTests: XCTestCase {
         XCTAssertFalse(isTreatment)
     }
 
-    // MARK: - Pixel-Related Tests
+    // MARK: - Pixel Parameter Tests
 
-    func testCalendarDaysCalculationIsCorrect() throws {
+    func testReturnsCorrectEnrollmentDateParameter_whenUserIsEnrolled() throws {
         // Given
-        let startDate = Date()
-        let endDate = Date().addingTimeInterval(60 * 60 * 24)
+        let calendar = Calendar.current
+        let twoDaysAgo = calendar.date(byAdding: .day, value: -2, to: Date())
+        mockUserDefaults.set(twoDaysAgo, forKey: MockUserDefaults.Keys.enrollmentDate)
 
         // When
-        let calendarDays = Calendar.days(from: startDate, to: endDate)
+        let parameters = sut.pixelParameters
 
         // Then
-        XCTAssertEqual(calendarDays, "1")
-    }
-
-    func testCalendarDaysForMultipleDays() throws {
-        // Given
-        let startDate = Date()
-        let endDate = Date().addingTimeInterval(60 * 60 * 24 * 5)
-
-        // When
-        let calendarDays = Calendar.days(from: startDate, to: endDate)
-
-        // Then
-        XCTAssertEqual(calendarDays, "5")
-    }
-
-    func testCalendarDaysForSameDay() throws {
-        // Given
-        let startDate = Date()
-        let endDate = Date()
-
-        // When
-        let calendarDays = Calendar.days(from: startDate, to: endDate)
-
-        // Then
-        XCTAssertEqual(calendarDays, "0")
+        XCTAssertEqual("2", parameters?["daysEnrolled"])
     }
 }
 

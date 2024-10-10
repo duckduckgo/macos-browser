@@ -28,7 +28,6 @@ final class FreemiumDBPScanResultPollingTests: XCTestCase {
     private var mockFreemiumDBPUserStateManager: MockFreemiumDBPUserStateManager!
     private var mockNotificationCenter: MockNotificationCenter!
     private var mockDataManager: MockDataBrokerProtectionDataManager!
-    private let dateFormatter = FreemiumDBPScanResultPollingTests.makePOSIXDateTimeFormatter()
     private let key = "macos.browser.freemium.dbp.first.profile.saved.timestamp"
 
     override func setUpWithError() throws {
@@ -57,8 +56,7 @@ final class FreemiumDBPScanResultPollingTests: XCTestCase {
 
     func testWhenFirstProfileIsAlreadySaved_thenPollingStartsImmediately() {
         // Given
-        let timestampString = dateFormatter.string(from: Date())
-        mockFreemiumDBPUserStateManager.firstProfileSavedTimestamp = timestampString
+        mockFreemiumDBPUserStateManager.firstProfileSavedTimestamp = Date()
         let sut = DefaultFreemiumDBPScanResultPolling(
             dataManager: mockDataManager,
             freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager,
@@ -113,8 +111,7 @@ final class FreemiumDBPScanResultPollingTests: XCTestCase {
     func testWhenResultsFoundWithinDuration_thenResultsNotificationPosted() {
         // Given
         mockDataManager.matchesFoundCountValue = (3, 2)
-        let timestampString = dateFormatter.string(from: Date.nowMinus(hours: 12))
-        mockFreemiumDBPUserStateManager.firstProfileSavedTimestamp = timestampString
+        mockFreemiumDBPUserStateManager.firstProfileSavedTimestamp = Date.nowMinus(hours: 12)
         let sut = DefaultFreemiumDBPScanResultPolling(
             dataManager: mockDataManager,
             freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager,
@@ -135,8 +132,7 @@ final class FreemiumDBPScanResultPollingTests: XCTestCase {
     func testWhenResultsFoundAndMaxDurationExpired_thenResultsNotificationPosted() {
         // Given
         mockDataManager.matchesFoundCountValue = (4, 2)
-        let timestampString = dateFormatter.string(from: Date.nowMinus(hours: 36))
-        mockFreemiumDBPUserStateManager.firstProfileSavedTimestamp = timestampString
+        mockFreemiumDBPUserStateManager.firstProfileSavedTimestamp = Date.nowMinus(hours: 36)
         let sut = DefaultFreemiumDBPScanResultPolling(
             dataManager: mockDataManager,
             freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager,
@@ -157,8 +153,7 @@ final class FreemiumDBPScanResultPollingTests: XCTestCase {
     func testWhenNoResultsFoundAndMaxDurationExpired_thenResultsNotificationPosted() {
         // Given
         mockDataManager.matchesFoundCountValue = (0, 0)
-        let timestampString = dateFormatter.string(from: Date.nowMinus(hours: 36))
-        mockFreemiumDBPUserStateManager.firstProfileSavedTimestamp = timestampString
+        mockFreemiumDBPUserStateManager.firstProfileSavedTimestamp = Date.nowMinus(hours: 36)
         let sut = DefaultFreemiumDBPScanResultPolling(
             dataManager: mockDataManager,
             freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager,
@@ -212,9 +207,8 @@ final class FreemiumDBPScanResultPollingTests: XCTestCase {
     func testWhenDataManagerThrowsError_thenPollingContinuesGracefully() {
         // Given
         mockDataManager.matchesFoundCountValue = (0, 0)
-        mockDataManager.didCallMatchesFoundCount = false  // Simulate an error
-        let timestampString = dateFormatter.string(from: Date.nowMinus(hours: 1))
-        mockFreemiumDBPUserStateManager.firstProfileSavedTimestamp = timestampString
+        mockDataManager.didCallMatchesFoundCount = false
+        mockFreemiumDBPUserStateManager.firstProfileSavedTimestamp = Date.nowMinus(hours: 1)
 
         let sut = DefaultFreemiumDBPScanResultPolling(
             dataManager: mockDataManager,
@@ -235,8 +229,7 @@ final class FreemiumDBPScanResultPollingTests: XCTestCase {
     func testWhenProfileSavedButNoResultsBeforeMaxDuration_thenNoResultsNotificationNotPosted() {
         // Given
         mockDataManager.matchesFoundCountValue = (0, 0)
-        let timestampString = dateFormatter.string(from: Date.nowMinus(hours: 12))
-        mockFreemiumDBPUserStateManager.firstProfileSavedTimestamp = timestampString
+        mockFreemiumDBPUserStateManager.firstProfileSavedTimestamp = Date.nowMinus(hours: 12)
 
         let sut = DefaultFreemiumDBPScanResultPolling(
             dataManager: mockDataManager,
@@ -251,17 +244,6 @@ final class FreemiumDBPScanResultPollingTests: XCTestCase {
         XCTAssertFalse(mockNotificationCenter.didCallPostNotification)
         XCTAssertTrue(mockDataManager.didCallMatchesFoundCount)
         XCTAssertNotNil(sut.timer)
-    }
-}
-
-private extension FreemiumDBPScanResultPollingTests {
-
-    static func makePOSIXDateTimeFormatter() -> DateFormatter {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
-        return dateFormatter
     }
 }
 

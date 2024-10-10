@@ -20,6 +20,8 @@ import XCTest
 import Freemium
 @testable import DuckDuckGo_Privacy_Browser
 import Combine
+import Common
+import DataBrokerProtection
 
 final class FreemiumDBPPromotionViewCoordinatingTests: XCTestCase {
 
@@ -28,6 +30,7 @@ final class FreemiumDBPPromotionViewCoordinatingTests: XCTestCase {
     private var mockFeature: MockFreemiumDBPFeature!
     private var mockPresenter: MockFreemiumDBPPresenter!
     private let notificationCenter: NotificationCenter = .default
+    private var mockPixelHandler: MockFreemiumDBPExperimentPixelHandler!
     private var cancellables: Set<AnyCancellable> = []
 
     @MainActor
@@ -35,12 +38,14 @@ final class FreemiumDBPPromotionViewCoordinatingTests: XCTestCase {
         mockUserStateManager = MockFreemiumDBPUserStateManager()
         mockFeature = MockFreemiumDBPFeature()
         mockPresenter = MockFreemiumDBPPresenter()
+        mockPixelHandler = MockFreemiumDBPExperimentPixelHandler()
 
         sut = FreemiumDBPPromotionViewCoordinator(
             freemiumDBPUserStateManager: mockUserStateManager,
             freemiumDBPFeature: mockFeature,
             freemiumDBPPresenter: mockPresenter,
-            notificationCenter: notificationCenter
+            notificationCenter: notificationCenter,
+            freemiumDBPExperimentPixelHandler: mockPixelHandler
         )
     }
 
@@ -86,7 +91,7 @@ final class FreemiumDBPPromotionViewCoordinatingTests: XCTestCase {
     }
 
     @MainActor
-    func testProceedAction_dismissesPromotion_andCallsShowFreemium() {
+    func testProceedAction_dismissesPromotion_callsShowFreemium_andFiresPixel() {
         // Given
         mockUserStateManager.didActivate = false
 
@@ -97,16 +102,78 @@ final class FreemiumDBPPromotionViewCoordinatingTests: XCTestCase {
         // Then
         XCTAssertTrue(mockUserStateManager.didDismissHomePagePromotion)
         XCTAssertTrue(mockPresenter.didCallShowFreemium)
+        XCTAssertEqual(mockPixelHandler.lastFiredEvent, FreemiumDBPExperimentPixel.newTabScanClick)
     }
 
     @MainActor
-    func testCloseAction_dismissesPromotion() {
+    func testCloseAction_dismissesPromotion_andFiresPixel() {
         // When
         let viewModel = sut.viewModel
         viewModel.closeAction()
 
         // Then
         XCTAssertTrue(mockUserStateManager.didDismissHomePagePromotion)
+        XCTAssertEqual(mockPixelHandler.lastFiredEvent, FreemiumDBPExperimentPixel.newTabScanDismiss)
+    }
+
+    @MainActor
+    func testProceedAction_dismissesResults_callsShowFreemium_andFiresPixel() {
+        // Given
+        mockUserStateManager.didActivate = false
+        mockUserStateManager.firstScanResults = FreemiumDBPMatchResults(matchesCount: 5, brokerCount: 2)
+
+        // When
+        let viewModel = sut.viewModel
+        viewModel.proceedAction()
+
+        // Then
+        XCTAssertTrue(mockUserStateManager.didDismissHomePagePromotion)
+        XCTAssertTrue(mockPresenter.didCallShowFreemium)
+        XCTAssertEqual(mockPixelHandler.lastFiredEvent, FreemiumDBPExperimentPixel.newTabResultsClick)
+    }
+
+    @MainActor
+    func testCloseAction_dismissesResults_andFiresPixel() {
+        // Given
+        mockUserStateManager.firstScanResults = FreemiumDBPMatchResults(matchesCount: 5, brokerCount: 2)
+
+        // When
+        let viewModel = sut.viewModel
+        viewModel.closeAction()
+
+        // Then
+        XCTAssertTrue(mockUserStateManager.didDismissHomePagePromotion)
+        XCTAssertEqual(mockPixelHandler.lastFiredEvent, FreemiumDBPExperimentPixel.newTabResultsDismiss)
+    }
+
+    @MainActor
+    func testProceedAction_dismissesNoResults_callsShowFreemium_andFiresPixel() {
+        // Given
+        mockUserStateManager.didActivate = false
+        mockUserStateManager.firstScanResults = FreemiumDBPMatchResults(matchesCount: 0, brokerCount: 0)
+
+        // When
+        let viewModel = sut.viewModel
+        viewModel.proceedAction()
+
+        // Then
+        XCTAssertTrue(mockUserStateManager.didDismissHomePagePromotion)
+        XCTAssertTrue(mockPresenter.didCallShowFreemium)
+        XCTAssertEqual(mockPixelHandler.lastFiredEvent, FreemiumDBPExperimentPixel.newTabNoResultsClick)
+    }
+
+    @MainActor
+    func testCloseAction_dismissesNoResults_andFiresPixel() {
+        // Given
+        mockUserStateManager.firstScanResults = FreemiumDBPMatchResults(matchesCount: 0, brokerCount: 0)
+
+        // When
+        let viewModel = sut.viewModel
+        viewModel.closeAction()
+
+        // Then
+        XCTAssertTrue(mockUserStateManager.didDismissHomePagePromotion)
+        XCTAssertEqual(mockPixelHandler.lastFiredEvent, FreemiumDBPExperimentPixel.newTabNoResultsDismiss)
     }
 
     @MainActor
@@ -265,5 +332,32 @@ final class FreemiumDBPPromotionViewCoordinatingTests: XCTestCase {
 
         // Then
         XCTAssertFalse(sut.isHomePagePromotionVisible)
+    }
+}
+
+class MockFreemiumDBPExperimentPixelHandler: EventMapping<FreemiumDBPExperimentPixel> {
+
+    var lastFiredEvent: FreemiumDBPExperimentPixel?
+    var lastPassedParameters: [String: String]?
+
+    init() {
+        var mockMapping: Mapping! = nil
+
+        super.init(mapping: { event, error, params, onComplete in
+            // Call the closure after initialization
+            mockMapping(event, error, params, onComplete)
+        })
+
+        // Now, set the real closure that captures self and stores parameters.
+        mockMapping = { [weak self] (event, error, params, onComplete) in
+            // Capture the inputs when fire is called
+            self?.lastFiredEvent = event
+            self?.lastPassedParameters = params
+        }
+    }
+
+    func resetCapturedData() {
+        lastFiredEvent = nil
+        lastPassedParameters = nil
     }
 }

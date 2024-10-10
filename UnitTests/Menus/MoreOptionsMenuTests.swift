@@ -23,6 +23,7 @@ import XCTest
 import Subscription
 import SubscriptionTestingUtilities
 import BrowserServicesKit
+import DataBrokerProtection
 
 @testable import DuckDuckGo_Privacy_Browser
 
@@ -41,6 +42,8 @@ final class MoreOptionsMenuTests: XCTestCase {
     private var mockFreemiumDBPPresenter = MockFreemiumDBPPresenter()
     private var mockFreemiumDBPFeature: MockFreemiumDBPFeature!
     private var mockNotificationCenter: MockNotificationCenter!
+    private var mockPixelHandler: MockFreemiumDBPExperimentPixelHandler!
+    private var mockFreemiumDBPUserStateManager: MockFreemiumDBPUserStateManager!
 
     var moreOptionsMenu: MoreOptionsMenu!
 
@@ -66,6 +69,8 @@ final class MoreOptionsMenuTests: XCTestCase {
         mockFreemiumDBPFeature = MockFreemiumDBPFeature()
 
         mockNotificationCenter = MockNotificationCenter()
+        mockPixelHandler = MockFreemiumDBPExperimentPixelHandler()
+        mockFreemiumDBPUserStateManager = MockFreemiumDBPUserStateManager()
     }
 
     @MainActor
@@ -89,9 +94,11 @@ final class MoreOptionsMenuTests: XCTestCase {
                                           sharingMenu: NSMenu(),
                                           internalUserDecider: internalUserDecider,
                                           subscriptionManager: subscriptionManager,
+                                          freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager,
                                           freemiumDBPFeature: mockFreemiumDBPFeature,
                                           freemiumDBPPresenter: mockFreemiumDBPPresenter,
-                                          notificationCenter: mockNotificationCenter)
+                                          notificationCenter: mockNotificationCenter,
+                                          freemiumDBPExperimentPixelHandler: mockPixelHandler)
 
         moreOptionsMenu.actionDelegate = capturingActionDelegate
     }
@@ -202,7 +209,7 @@ final class MoreOptionsMenuTests: XCTestCase {
     }
 
     @MainActor
-    func testWhenClickingFreemiumDBPOptionThenFreemiumPresenterIsCalledAndNotificationIsPosted() throws {
+    func testWhenClickingFreemiumDBPOptionThenFreemiumPresenterIsCalledAndNotificationIsPostedAndPixelFired() throws {
         // Given
         subscriptionManager.canPurchase = true
         subscriptionManager.currentEnvironment = SubscriptionEnvironment(serviceEnvironment: .production, purchasePlatform: .stripe)
@@ -218,6 +225,28 @@ final class MoreOptionsMenuTests: XCTestCase {
         XCTAssertTrue(mockFreemiumDBPPresenter.didCallShowFreemium)
         XCTAssertTrue(mockNotificationCenter.didCallPostNotification)
         XCTAssertEqual(mockNotificationCenter.lastPostedNotification, .freemiumDBPEntryPointActivated)
+        XCTAssertEqual(mockPixelHandler.lastFiredEvent, FreemiumDBPExperimentPixel.overFlowScan)
+    }
+
+    @MainActor
+    func testWhenClickingFreemiumDBPOptionAndFreemiumActivatedThenFreemiumPresenterIsCalledAndNotificationIsPostedAndPixelFired() throws {
+        // Given
+        mockFreemiumDBPUserStateManager.didPostFirstProfileSavedNotification = true
+        subscriptionManager.canPurchase = true
+        subscriptionManager.currentEnvironment = SubscriptionEnvironment(serviceEnvironment: .production, purchasePlatform: .stripe)
+        mockFreemiumDBPFeature.featureAvailable = true
+        setupMoreOptionsMenu()
+
+        let freemiumItemIndex = try XCTUnwrap(moreOptionsMenu.indexOfItem(withTitle: UserText.freemiumDBPOptionsMenuItem))
+
+        // When
+        moreOptionsMenu.performActionForItem(at: freemiumItemIndex)
+
+        // Then
+        XCTAssertTrue(mockFreemiumDBPPresenter.didCallShowFreemium)
+        XCTAssertTrue(mockNotificationCenter.didCallPostNotification)
+        XCTAssertEqual(mockNotificationCenter.lastPostedNotification, .freemiumDBPEntryPointActivated)
+        XCTAssertEqual(mockPixelHandler.lastFiredEvent, FreemiumDBPExperimentPixel.overFlowResults)
     }
 
     // MARK: Zoom
