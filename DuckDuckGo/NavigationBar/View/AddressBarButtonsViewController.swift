@@ -262,7 +262,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
                 // Check if any of the URL variants is bookmarked
                 isUrlBookmarked = urlVariants.contains { variant in
-                        return bookmarkManager.isUrlBookmarked(url: variant)
+                    return bookmarkManager.isUrlBookmarked(url: variant)
                 }
             }
 
