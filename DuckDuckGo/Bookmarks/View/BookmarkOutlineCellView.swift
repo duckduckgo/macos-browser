@@ -69,9 +69,6 @@ final class BookmarkOutlineCellView: NSTableCellView {
         }
     }
 
-    var shouldShowMenuButton: Bool {
-        contentMode != .foldersOnly
-    }
     var shouldShowChevron: Bool {
         contentMode == .bookmarksMenu
     }
@@ -232,12 +229,12 @@ final class BookmarkOutlineCellView: NSTableCellView {
     }
 
     private func updateUI() {
-        if shouldShowMenuButton && titleLabel.isEnabled {
-            let isHighlighted = self.highlight && self.isInKeyWindow
+        if titleLabel.isEnabled {
+            let isHighlighted = self.highlight && (self.isInKeyWindow || self.contentMode == .foldersOnly)
             countLabel.isHidden = isHighlighted || countLabel.stringValue.isEmpty
             favoriteImageView.isHidden = isHighlighted || favoriteImageView.image == nil
             menuButton.isShown = isHighlighted && faviconImageView.image != nil // don‘t show for custom menu item
-            menuButton.contentTintColor = isHighlighted ? .selectedMenuItemTextColor : .button
+            menuButton.contentTintColor = isHighlighted && contentMode != .foldersOnly ? .selectedMenuItemTextColor : .button
             urlLabel.isShown = isHighlighted && !urlLabel.stringValue.isEmpty
         } else {
             menuButton.isHidden = true
