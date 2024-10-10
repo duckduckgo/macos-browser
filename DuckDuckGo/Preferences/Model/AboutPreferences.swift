@@ -27,28 +27,27 @@ final class AboutPreferences: ObservableObject, PreferencesTabOpening {
 #if SPARKLE
     enum UpdateState {
 
-        case loading
         case upToDate
-        case newVersionAvailable
+        case updateCycle(UpdateCycleProgress)
 
-        init(from update: Update?, isLoading: Bool) {
-            if isLoading {
-                self = .loading
+        init(from update: Update?, progress: UpdateCycleProgress) {
+            if let update, !update.isInstalled {
+                self = .updateCycle(progress)
+            } else if progress.isFailed {
+                self = .updateCycle(progress)
             } else {
-                if let update, !update.isInstalled {
-                    self = .newVersionAvailable
-                } else {
-                    self = .upToDate
-                }
+                self = .upToDate
             }
         }
     }
 
     @Published var updateState = UpdateState.upToDate
 
+#if SPARKLE
     var updateController: UpdateControllerProtocol? {
         return Application.appDelegate.updateController
     }
+#endif
 
     var areAutomaticUpdatesEnabled: Bool {
         get {
@@ -90,10 +89,10 @@ final class AboutPreferences: ObservableObject, PreferencesTabOpening {
 
 #if SPARKLE
     func checkForUpdate() {
-        updateController?.checkForUpdateInBackground()
+        updateController?.checkForUpdateIfNeeded()
     }
 
-    func restartToUpdate() {
+    func runUpdate() {
         updateController?.runUpdate()
     }
 
@@ -101,7 +100,7 @@ final class AboutPreferences: ObservableObject, PreferencesTabOpening {
         guard let updateController, !subscribed else { return }
 
         cancellable = updateController.latestUpdatePublisher
-            .combineLatest(updateController.isUpdateBeingLoadedPublisher)
+            .combineLatest(updateController.updateProgressPublisher)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.refreshUpdateState()
@@ -114,7 +113,7 @@ final class AboutPreferences: ObservableObject, PreferencesTabOpening {
 
     private func refreshUpdateState() {
         guard let updateController else { return }
-        updateState = UpdateState(from: updateController.latestUpdate, isLoading: updateController.isUpdateBeingLoaded)
+        updateState = UpdateState(from: updateController.latestUpdate, progress: updateController.updateProgress)
     }
 #endif
 

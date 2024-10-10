@@ -84,7 +84,7 @@ final class ReleaseNotesTabExtension: NavigationResponder {
             return
         }
         let updateController = Application.appDelegate.updateController!
-        Publishers.CombineLatest(updateController.isUpdateBeingLoadedPublisher, updateController.latestUpdatePublisher)
+        Publishers.CombineLatest(updateController.updateProgressPublisher, updateController.latestUpdatePublisher)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 guard let self else { return }
@@ -93,6 +93,14 @@ final class ReleaseNotesTabExtension: NavigationResponder {
             .store(in: &cancellables)
     }
 
+    @MainActor
+    func navigationDidFinish(_ navigation: Navigation) {
+#if !DEBUG
+        guard NSApp.runType != .uiTests, navigation.url.isReleaseNotesScheme else { return }
+        let updateController = Application.appDelegate.updateController!
+        updateController.checkForUpdateIfNeeded()
+#endif
+    }
 }
 
 protocol ReleaseNotesTabExtensionProtocol: AnyObject, NavigationResponder {}
@@ -125,7 +133,7 @@ extension ReleaseNotesValues {
         let status: String
         let latestVersion: String
 
-        guard let updateController, !updateController.isUpdateBeingLoaded else {
+        guard let updateController, updateController.updateProgress.isIdle else {
             self.init(status: "loading",
                       currentVersion: currentVersion,
                       lastUpdate: lastUpdate)
