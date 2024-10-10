@@ -41,7 +41,6 @@ final class DefaultFreemiumDBPScanResultPolling: FreemiumDBPScanResultPolling {
     private var freemiumDBPUserStateManager: FreemiumDBPUserStateManager
     private let notificationCenter: NotificationCenter
     private let timerInterval: TimeInterval
-    private let dateFormatter: DateFormatter
     private let maxCheckDuration: TimeInterval
 
     /// Initializes the `DefaultFreemiumDBPScanResultPolling` instance with the necessary dependencies.
@@ -52,21 +51,18 @@ final class DefaultFreemiumDBPScanResultPolling: FreemiumDBPScanResultPolling {
     ///   - notificationCenter: The notification center used for posting and observing notifications. Defaults to `.default`.
     ///   - timerInterval: The interval in seconds between polling checks. Defaults to 30 mins.
     ///   - maxCheckDuration: The maximum time allowed before stopping polling without results. Defaults to 24 hours.
-    ///   - dateFormatter: A `DateFormatter` for formatting dates. Defaults to a POSIX date-time formatter.
     init(
         dataManager: DataBrokerProtectionDataManaging,
         freemiumDBPUserStateManager: FreemiumDBPUserStateManager,
         notificationCenter: NotificationCenter = .default,
         timerInterval: TimeInterval = 1800,  // 30 mins in seconds
-        maxCheckDuration: TimeInterval = 86400,  // 24 hours in seconds
-        dateFormatter: DateFormatter = DefaultFreemiumDBPScanResultPolling.makePOSIXDateTimeFormatter()
+        maxCheckDuration: TimeInterval = 86400  // 24 hours in seconds
     ) {
         self.dataManager = dataManager
         self.freemiumDBPUserStateManager = freemiumDBPUserStateManager
         self.notificationCenter = notificationCenter
         self.timerInterval = timerInterval
         self.maxCheckDuration = maxCheckDuration
-        self.dateFormatter = dateFormatter
     }
 
     // MARK: - Public Methods
@@ -98,16 +94,10 @@ private extension DefaultFreemiumDBPScanResultPolling {
     /// The saved timestamp of the first profile as a `Date`, or `nil` if no profile has been saved yet.
     var firstProfileSavedTimestamp: Date? {
         get {
-            guard let timestampString = freemiumDBPUserStateManager.firstProfileSavedTimestamp else { return nil }
-            return dateFormatter.date(from: timestampString)
+            freemiumDBPUserStateManager.firstProfileSavedTimestamp
         }
         set {
-            if let newTimestamp = newValue {
-                let timestampString = dateFormatter.string(from: newTimestamp)
-                freemiumDBPUserStateManager.firstProfileSavedTimestamp = timestampString
-            } else {
-                freemiumDBPUserStateManager.firstProfileSavedTimestamp = nil
-            }
+            freemiumDBPUserStateManager.firstProfileSavedTimestamp = newValue
         }
     }
 
@@ -208,16 +198,5 @@ private extension DefaultFreemiumDBPScanResultPolling {
         Logger.freemiumDBP.debug("[Freemium DBP] Stopping Polling Timer")
         timer?.invalidate()
         timer = nil
-    }
-
-    /// Creates a POSIX-compliant `DateFormatter` that formats date-time strings in the "yyyy-MM-dd HH:mm:ss" format.
-    ///
-    /// - Returns: A `DateFormatter` set to the POSIX locale and GMT time zone.
-    static func makePOSIXDateTimeFormatter() -> DateFormatter {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
-        return dateFormatter
     }
 }

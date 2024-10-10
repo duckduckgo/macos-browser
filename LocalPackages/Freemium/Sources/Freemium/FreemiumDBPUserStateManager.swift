@@ -58,11 +58,14 @@ public protocol FreemiumDBPUserStateManager {
     /// A boolean value indicating whether the user has dismissed the homepage promotion.
     var didDismissHomePagePromotion: Bool { get set }
 
-    /// A string value that stores the timestamp of when the user saved their first profile.
-    var firstProfileSavedTimestamp: String? { get set }
+    /// A Date value that stores the timestamp of when the user saved their first profile.
+    var firstProfileSavedTimestamp: Date? { get set }
 
     /// The results of the user's first scan, stored as a `FreemiumDBPMatchResults` object.
     var firstScanResults: FreemiumDBPMatchResults? { get set }
+
+    /// A Date value that stores the timestamp of when the user upgraded from Freemium to a Paid Subscription
+    var upgradeToSubscriptionTimestamp: Date? { get set }
 
     /// Resets all stored user state
     func resetAllState()
@@ -81,6 +84,7 @@ public final class DefaultFreemiumDBPUserStateManager: FreemiumDBPUserStateManag
         static let didDismissHomePagePromotion = "macos.browser.freemium.dbp.did.post.dismiss.home.page.promotion"
         static let firstProfileSavedTimestamp = "macos.browser.freemium.dbp.first.profile.saved.timestamp"
         static let firstScanResults = "macos.browser.freemium.dbp.first.scan.results"
+        static let upgradeToSubscriptionTimestamp = "macos.browser.freemium.dbp.upgrade.to.subscription.timestamp"
     }
 
     private let userDefaults: UserDefaults
@@ -102,9 +106,9 @@ public final class DefaultFreemiumDBPUserStateManager: FreemiumDBPUserStateManag
     /// Tracks the timestamp of when the user saved their first profile.
     ///
     /// - Uses the `UserDefaults` key: `macos.browser.freemium.dbp.first.profile.saved.timestamp`.
-    public var firstProfileSavedTimestamp: String? {
+    public var firstProfileSavedTimestamp: Date? {
         get {
-            userDefaults.value(forKey: Keys.firstProfileSavedTimestamp) as? String
+            userDefaults.value(forKey: Keys.firstProfileSavedTimestamp) as? Date
         }
         set {
             userDefaults.set(newValue, forKey: Keys.firstProfileSavedTimestamp)
@@ -164,6 +168,18 @@ public final class DefaultFreemiumDBPUserStateManager: FreemiumDBPUserStateManag
         }
     }
 
+    /// Tracks the timestamp of when the user upgraded from Freemium to paid Subscription.
+    ///
+    /// - Uses the `UserDefaults` key: `macos.browser.freemium.dbp.upgrade.to.subscription.timestamp`.
+    public var upgradeToSubscriptionTimestamp: Date? {
+        get {
+            userDefaults.value(forKey: Keys.upgradeToSubscriptionTimestamp) as? Date
+        }
+        set {
+            userDefaults.set(newValue, forKey: Keys.upgradeToSubscriptionTimestamp)
+        }
+    }
+
     // MARK: - Initialization
 
     /// Initializes a new instance of `DefaultFreemiumDBPUserStateManager`.
@@ -184,5 +200,6 @@ public final class DefaultFreemiumDBPUserStateManager: FreemiumDBPUserStateManag
         userDefaults.removeObject(forKey: Keys.didPostResultsNotification)
         userDefaults.removeObject(forKey: Keys.firstScanResults)
         userDefaults.removeObject(forKey: Keys.didDismissHomePagePromotion)
+        userDefaults.removeObject(forKey: Keys.upgradeToSubscriptionTimestamp)
     }
 }
