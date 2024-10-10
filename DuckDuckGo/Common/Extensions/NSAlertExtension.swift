@@ -21,6 +21,17 @@ import Cocoa
 
 extension NSAlert {
 
+    @discardableResult
+    func addButton(withTitle title: String, response: NSApplication.ModalResponse, keyEquivalent: NSEvent.KeyEquivalent? = nil) -> NSButton {
+        let button = addButton(withTitle: title)
+        button.tag = response.rawValue
+        if let keyEquivalent {
+            button.keyEquivalent = keyEquivalent.charCode
+            button.keyEquivalentModifierMask = keyEquivalent.modifierMask
+        }
+        return button
+    }
+
     static func fireproofAlert(with domain: String) -> NSAlert {
         let alert = NSAlert()
         alert.messageText = UserText.fireproofConfirmationTitle(domain: domain)

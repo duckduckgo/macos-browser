@@ -20,13 +20,13 @@ import AppKit
 
 final class DownloadsPopover: NSPopover {
 
-    override init() {
+    init(fireWindowSession: FireWindowSessionRef?) {
         super.init()
 
         self.animates = false
         self.behavior = .semitransient
 
-        setupContentController()
+        setupContentController(fireWindowSession: fireWindowSession)
     }
 
     required init?(coder: NSCoder) {
@@ -37,8 +37,8 @@ final class DownloadsPopover: NSPopover {
     var viewController: DownloadsViewController { contentViewController as! DownloadsViewController }
     // swiftlint:enable force_cast
 
-    private func setupContentController() {
-        let controller = DownloadsViewController()
+    private func setupContentController(fireWindowSession: FireWindowSessionRef?) {
+        let controller = DownloadsViewController(viewModel: DownloadListViewModel(fireWindowSession: fireWindowSession))
         contentViewController = controller
     }
 

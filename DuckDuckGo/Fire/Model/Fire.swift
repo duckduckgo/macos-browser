@@ -431,7 +431,7 @@ final class Fire {
 
     @MainActor
     private func burnDownloads() {
-        self.downloadListCoordinator.cleanupInactiveDownloads()
+        self.downloadListCoordinator.cleanupInactiveDownloads(for: nil)
     }
 
     @MainActor

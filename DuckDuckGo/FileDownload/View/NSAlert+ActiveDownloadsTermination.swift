@@ -24,14 +24,34 @@ extension NSAlert {
         assert(!downloads.isEmpty)
 
         let activeDownload = downloads.first(where: { $0.state.isDownloading })
-        let firstFileName = activeDownload?.state.destinationFilePresenter?.url?.lastPathComponent ?? ""
+        let firstFileName = activeDownload?.state.destinationFilePresenter?.url?.lastPathComponent
+            .truncated(length: MainMenu.Constants.maxTitleLength, middle: "…") ?? ""
         let andOthers = downloads.count > 1 ? UserText.downloadsActiveAlertMessageAndOthers : ""
+        let thisTheseFiles = downloads.count > 1 ? UserText.downloadsActiveAlertMessageTheseFiles : UserText.downloadsActiveAlertMessageThisFile
 
         let alert = NSAlert()
         alert.messageText = UserText.downloadsActiveAlertTitle
-        alert.informativeText = String(format: UserText.downloadsActiveAlertMessageFormat, firstFileName, andOthers)
-        alert.addButton(withTitle: UserText.quit).tag = NSApplication.ModalResponse.OK.rawValue
-        alert.addButton(withTitle: UserText.dontQuit).tag = NSApplication.ModalResponse.cancel.rawValue
+        alert.informativeText = String(format: UserText.downloadsActiveAlertMessageFormat, firstFileName, andOthers, thisTheseFiles)
+        alert.addButton(withTitle: UserText.quit, response: .OK)
+        alert.addButton(withTitle: UserText.dontQuit, response: .cancel, keyEquivalent: .escape)
+
+        return alert
+    }
+
+    static func activeDownloadsFireWindowClosingAlert(for downloads: Set<WebKitDownloadTask>) -> NSAlert {
+        assert(!downloads.isEmpty)
+
+        let activeDownload = downloads.first(where: { $0.state.isDownloading })
+        let firstFileName = activeDownload?.state.destinationFilePresenter?.url?.lastPathComponent
+            .truncated(length: MainMenu.Constants.maxTitleLength, middle: "…") ?? ""
+        let andOthers = downloads.count > 1 ? UserText.downloadsActiveAlertMessageAndOthers : ""
+        let thisTheseFiles = downloads.count > 1 ? UserText.downloadsActiveAlertMessageTheseFiles : UserText.downloadsActiveAlertMessageThisFile
+
+        let alert = NSAlert()
+        alert.messageText = UserText.downloadsActiveAlertTitle
+        alert.informativeText = String(format: UserText.downloadsActiveInFireWindowAlertMessageFormat, firstFileName, andOthers, thisTheseFiles)
+        alert.addButton(withTitle: UserText.close, response: .OK)
+        alert.addButton(withTitle: UserText.dontClose, response: .cancel, keyEquivalent: .escape)
 
         return alert
     }
