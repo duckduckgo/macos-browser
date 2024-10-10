@@ -27,6 +27,9 @@ protocol FreemiumDBPPixelExperimentManaging {
     /// Property indicating if the user is in the treatment cohort or not
     var isTreatment: Bool { get }
 
+    /// Property which provides parameters for experiment pixels
+    var pixelParameters: [String: String]? { get }
+
     /// Assigns the user to an experimental cohort if eligible.
     func assignUserToCohort()
 }
@@ -38,6 +41,10 @@ final class FreemiumDBPPixelExperimentManager: FreemiumDBPPixelExperimentManagin
     enum Cohort: String {
         case control
         case treatment
+    }
+
+    private enum PixelKeys {
+        static let daysEnrolled = "daysEnrolled"
     }
 
     // MARK: - Dependencies
@@ -66,6 +73,21 @@ final class FreemiumDBPPixelExperimentManager: FreemiumDBPPixelExperimentManagin
 
     var isTreatment: Bool {
         experimentCohort == .treatment
+    }
+
+    /// Constructs a dictionary of pixel parameters used for pixel events related to the experiment.
+    ///
+    /// This property creates a dictionary of key-value pairs for parameters to be passed with a pixel event.
+    /// The key for the number of days enrolled is added if `daysEnrolled` has a valid value. If there are no valid parameters,
+    /// it returns `nil` to indicate that no parameters are needed for the event.
+    var pixelParameters: [String: String]? {
+        var parameters: [String: String] = [:]
+
+        if let daysEnrolled = daysEnrolled {
+            parameters[PixelKeys.daysEnrolled] = daysEnrolled
+        }
+
+        return parameters.isEmpty ? nil : parameters
     }
 
     /// Assigns the user to a cohort (`control` or `treatment`) if eligible and not already enrolled.
@@ -114,80 +136,6 @@ private extension FreemiumDBPPixelExperimentManager {
     var experimentCohort: Cohort? {
         userDefaults.experimentCohort
     }
-}
-
-// MARK: - FreemiumDBPExperimentPixel
-
-enum FreemiumDBPExperimentPixel: PixelKitEventV2 {
-
-    private enum PixelKeys {
-        static let daysEnrolled = "daysEnrolled"
-    }
-
-    // Before the first scan
-    case newTabScanImpression
-    case newTabScanClick
-    case newTabScanDismiss
-    // When receiving results
-    case newTabResultsImpression
-    case newTabResultsClick
-    case newTabResultsDismiss
-    // When receiving no results
-    case newTabNoResultsImpression
-    case newTabNoResultsClick
-    case newTabNoResultsDismiss
-    // Overflow menu
-    case overFlowScan
-    case overFlowResults
-    // Subscription
-    case subscription
-
-    var name: String {
-        switch self {
-        case .newTabScanImpression:
-            return "dbp-free_newtab_scan_impression"
-        case .newTabScanClick:
-            return "dbp-free_newtab_scan_click"
-        case .newTabScanDismiss:
-            return "dbp-free_newtab_scan_dismiss"
-        case .newTabResultsImpression:
-            return "dbp-free_newtab_results_impression"
-        case .newTabResultsClick:
-            return "dbp-free_newtab_results_click"
-        case .newTabResultsDismiss:
-            return "dbp-free_newtab_results_dismiss"
-        case .newTabNoResultsImpression:
-            return "dbp-free_newtab_no-results_impression"
-        case .newTabNoResultsClick:
-            return "dbp-free_newtab_no-results_click"
-        case .newTabNoResultsDismiss:
-            return "dbp-free_newtab_no-results_dismiss"
-        case .overFlowScan:
-            return "dbp-free_overflow_scan"
-        case .overFlowResults:
-            return "dbp-free_overflow_results"
-        case .subscription:
-            return "dbp-free.subscription"
-        }
-    }
-
-    var parameters: [String: String]? {
-        switch self {
-        case .subscription:
-            return pixelParameters
-        default:
-            return nil
-        }
-    }
-
-    var error: (any Error)? {
-        nil
-    }
-}
-
-// MARK: - FreemiumDBPExperimentPixel Private Extension
-
-private extension FreemiumDBPExperimentPixel {
 
     /// Calculates the number of days the user has been enrolled in the experiment.
     ///
@@ -195,30 +143,14 @@ private extension FreemiumDBPExperimentPixel {
     /// of days from that date to the current date using the `Calendar.days(from:to:)` method. Returns `nil` if there is no
     /// enrollment date.
     var daysEnrolled: String? {
-        guard let enrollmentDate = UserDefaults.dbp.enrollmentDate else { return nil }
+        guard let enrollmentDate = userDefaults.enrollmentDate else { return nil }
         return Calendar.days(from: enrollmentDate, to: Date())
-    }
-
-    /// Constructs a dictionary of pixel parameters used for pixel events related to the experiment.
-    ///
-    /// This property creates a dictionary of key-value pairs for parameters to be passed with a pixel event.
-    /// The key for the number of days enrolled is added if `daysEnrolled` has a valid value. If there are no valid parameters,
-    /// it returns `nil` to indicate that no parameters are needed for the event.
-    var pixelParameters: [String: String]? {
-        var parameters: [String: String] = [:]
-
-        if let daysEnrolled = daysEnrolled {
-            parameters[PixelKeys.daysEnrolled] = daysEnrolled
-        }
-
-        return parameters.isEmpty ? nil : parameters
     }
 }
 
 // MARK: - Other Extensions
 
-// Internal for testing
-extension Calendar {
+private extension Calendar {
 
     /// Calculates the number of days between two dates.
     ///
