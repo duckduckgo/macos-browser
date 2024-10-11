@@ -249,15 +249,17 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentAppEvents {
                 self.pixelHandler.fire(.ipcServerImmediateScansFinishedWithoutError)
                 self.userNotificationService.sendFirstScanCompletedNotification()
             }
-
+        } completion: { [weak self] in
+            guard let self else { return }
+            
             if let hasMatches = try? self.dataManager.hasMatches(),
                hasMatches {
                 self.userNotificationService.scheduleCheckInNotificationIfPossible()
             }
 
             fireImmediateScansCompletionPixel(startTime: backgroundAgentInitialScanStartTime)
-        } completion: { [weak self] in
-            self?.startScheduledOperations(completion: nil)
+
+            self.startScheduledOperations(completion: nil)
         }
     }
 

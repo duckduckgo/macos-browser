@@ -1217,11 +1217,13 @@ final class MockDataBrokerProtectionOperationQueueManager: DataBrokerProtectionQ
 
     func startImmediateOperationsIfPermitted(showWebView: Bool, operationDependencies: any DataBrokerProtection.DataBrokerOperationDependencies, errorHandler: ((DataBrokerProtection.DataBrokerProtectionAgentErrorCollection?) -> Void)?, completion: (() -> Void)?) {
         errorHandler?(startImmediateOperationsIfPermittedCompletionError)
+        completion?()
         startImmediateOperationsIfPermittedCalledCompletion?()
     }
 
     func startScheduledOperationsIfPermitted(showWebView: Bool, operationDependencies: any DataBrokerProtection.DataBrokerOperationDependencies, errorHandler: ((DataBrokerProtection.DataBrokerProtectionAgentErrorCollection?) -> Void)?, completion: (() -> Void)?) {
         errorHandler?(startScheduledOperationsIfPermittedCompletionError)
+        completion?()
         startScheduledOperationsIfPermittedCalledCompletion?()
     }
 
