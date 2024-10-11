@@ -62,7 +62,7 @@ final class ContextualDaxDialogsFactoryTests: XCTestCase {
         var onGotItPressedRun = false
         let dialogType = ContextualDialogType.searchDone(shouldFollowUp: true)
         let onDismiss = { onDismissRun = true }
-        let onGotItPressed = {onGotItPressedRun = true }
+        let onGotItPressed = { onGotItPressedRun = true }
 
         // WHEN
         let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: onDismiss, onGotItPressed: onGotItPressed)
@@ -86,7 +86,7 @@ final class ContextualDaxDialogsFactoryTests: XCTestCase {
         var onGotItPressedRun = false
         let dialogType = ContextualDialogType.searchDone(shouldFollowUp: false)
         let onDismiss = { onDismissRun = true }
-        let onGotItPressed = {onGotItPressedRun = true }
+        let onGotItPressed = { onGotItPressedRun = true }
 
         // WHEN
         let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: onDismiss, onGotItPressed: onGotItPressed)
@@ -131,7 +131,7 @@ final class ContextualDaxDialogsFactoryTests: XCTestCase {
         let trackerMessage = NSMutableAttributedString(string: "some trackers")
         let dialogType = ContextualDialogType.trackers(message: trackerMessage, shouldFollowUp: true)
         let onDismiss = { onDismissRun = true }
-        let onGotItPressed = {onGotItPressedRun = true }
+        let onGotItPressed = { onGotItPressedRun = true }
 
         // WHEN
         let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: onDismiss, onGotItPressed: onGotItPressed)
@@ -156,7 +156,7 @@ final class ContextualDaxDialogsFactoryTests: XCTestCase {
         let trackerMessage = NSMutableAttributedString(string: "some trackers")
         let dialogType = ContextualDialogType.trackers(message: trackerMessage, shouldFollowUp: false)
         let onDismiss = { onDismissRun = true }
-        let onGotItPressed = {onGotItPressedRun = true }
+        let onGotItPressed = { onGotItPressedRun = true }
 
         // WHEN
         let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: onDismiss, onGotItPressed: onGotItPressed)

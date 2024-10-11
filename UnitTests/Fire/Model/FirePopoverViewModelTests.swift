@@ -22,7 +22,7 @@ import XCTest
 final class FirePopoverViewModelTests: XCTestCase {
 
     @MainActor
-    private func makeViewModel(with tabCollectionViewModel: TabCollectionViewModel, contextualOnboardingStateMaching: ContextualOnboardingStateUpdater = ContextualOnboardingStateMachine()) -> FirePopoverViewModel {
+    private func makeViewModel(with tabCollectionViewModel: TabCollectionViewModel, contextualOnboardingStateMachine: ContextualOnboardingStateUpdater = ContextualOnboardingStateMachine()) -> FirePopoverViewModel {
         FirePopoverViewModel(
             fireViewModel: .init(),
             tabCollectionViewModel: tabCollectionViewModel,
@@ -30,7 +30,7 @@ final class FirePopoverViewModelTests: XCTestCase {
             fireproofDomains: FireproofDomains(store: FireproofDomainsStoreMock()),
             faviconManagement: FaviconManagerMock(),
             tld: ContentBlocking.shared.tld,
-            contextualOnboardingStateMaching: contextualOnboardingStateMaching
+            contextualOnboardingStateMachine: contextualOnboardingStateMachine
         )
     }
 
@@ -38,7 +38,7 @@ final class FirePopoverViewModelTests: XCTestCase {
         // Given
         let tabCollectionVM = TabCollectionViewModel()
         let stateMachine = CapturingContextualOnboardingStateUpdater()
-        let vm = makeViewModel(with: tabCollectionVM, contextualOnboardingStateMaching: stateMachine)
+        let vm = makeViewModel(with: tabCollectionVM, contextualOnboardingStateMachine: stateMachine)
         XCTAssertNil(stateMachine.updatedForTab)
         XCTAssertFalse(stateMachine.gotItPressedCalled)
         XCTAssertFalse(stateMachine.fireButtonUsedCalled)

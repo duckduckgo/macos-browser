@@ -150,16 +150,14 @@ struct OnboardingFireButtonDialogContent: View {
     @State private var showNextScreen: Bool = false
 
     var body: some View {
-        VStack {
-            if showNextScreen {
-                OnboardingFinalDialogContent(highFiveAction: viewModel.highFive)
-            } else {
-                ContextualDaxDialogContent(
-                    orientation: .horizontalStack(alignment: .center),
-                    message: attributedMessage,
-                    messageFont: OnboardingDialogsContants.messageFont,
-                    customActionView: AnyView(actionView))
-            }
+        if showNextScreen {
+            OnboardingFinalDialogContent(highFiveAction: viewModel.highFive)
+        } else {
+            ContextualDaxDialogContent(
+                orientation: .horizontalStack(alignment: .center),
+                message: attributedMessage,
+                messageFont: OnboardingDialogsContants.messageFont,
+                customActionView: AnyView(actionView))
         }
     }
 
@@ -169,7 +167,8 @@ struct OnboardingFireButtonDialogContent: View {
             OnboardingPrimaryCTAButton(title: "Try it", action: viewModel.tryFireButton)
             OnboardingSecondaryCTAButton(title: UserText.skip, action: {
                 showNextScreen = true
-                viewModel.skip()})
+                viewModel.skip()
+            })
         }
     }
 
@@ -181,15 +180,10 @@ struct OnboardingFireDialog: View {
 
     var body: some View {
         DaxDialogView(logoPosition: .left) {
-            VStack {
-                if showNextScreen {
-                    OnboardingFinalDialogContent(highFiveAction: viewModel.highFive)
-                } else {
-                    let action = {
-                        showNextScreen = true
-                    }
-                    OnboardingFireButtonDialogContent(viewModel: viewModel)
-                }
+            if showNextScreen {
+                OnboardingFinalDialogContent(highFiveAction: viewModel.highFive)
+            } else {
+                OnboardingFireButtonDialogContent(viewModel: viewModel)
             }
         }
         .padding()

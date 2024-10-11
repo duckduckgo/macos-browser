@@ -27,16 +27,9 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
     var mockTrackerMessageProvider: MockTrackerMessageProvider!
     var tab: Tab!
     let expectation = XCTestExpectation()
-    var window: NSWindow!
-    var tabViewModel: TabViewModel {
-        (window.contentViewController as! MainViewController).browserTabViewController.tabViewModel!
-    }
 
     @MainActor override func setUp() {
         super.setUp()
-        WebTrackingProtectionPreferences.shared.isGPCEnabled = false
-
-        window = WindowsManager.openNewWindow(with: .none)!
         UserDefaultsWrapper<Any>.clearAll()
         mockTrackerMessageProvider = MockTrackerMessageProvider(expectation: expectation)
         stateMachine = ContextualOnboardingStateMachine(trackerMessageProvider: mockTrackerMessageProvider)
@@ -47,10 +40,6 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         stateMachine = nil
         mockTrackerMessageProvider = nil
         tab = nil
-        window.close()
-        window = nil
-
-        WebTrackingProtectionPreferences.shared.isGPCEnabled = true
         super.tearDown()
     }
 

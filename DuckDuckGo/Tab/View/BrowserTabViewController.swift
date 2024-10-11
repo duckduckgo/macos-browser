@@ -134,10 +134,7 @@ final class BrowserTabViewController: NSViewController {
 
      @objc func windowDidResignActive(notification: Notification) {
          guard let webViewContainer else { return }
-         containerStackView.arrangedSubviews.filter({ $0 != webViewContainer }).forEach {
-             containerStackView.removeArrangedSubview($0)
-             $0.removeFromSuperview()
-         }
+         removeExistingDialog()
      }
 
     override func viewWillAppear() {
@@ -314,10 +311,7 @@ final class BrowserTabViewController: NSViewController {
                 self.subscribeToDuckPlayerOnboardingPrompt(of: selectedTabViewModel)
 
                 self.adjustFirstResponder(force: true)
-                containerStackView.arrangedSubviews.filter({ $0 != self.webViewContainer }).forEach {
-                    self.containerStackView.removeArrangedSubview($0)
-                    $0.removeFromSuperview()
-                }
+                removeExistingDialog()
             }
             .store(in: &cancellables)
     }
@@ -408,13 +402,16 @@ final class BrowserTabViewController: NSViewController {
     }
     var daxContextualOnboardingController: NSViewController?
 
-    private func presentContextualOnboarding() {
-        // Before presenting a new dialog, remove any existing ones.
+    private func removeExistingDialog() {
         containerStackView.arrangedSubviews.filter({ $0 != webViewContainer }).forEach {
             containerStackView.removeArrangedSubview($0)
             $0.removeFromSuperview()
         }
+    }
 
+    private func presentContextualOnboarding() {
+        // Before presenting a new dialog, remove any existing ones.
+        removeExistingDialog()
         guard featureFlagger.isFeatureOn(.highlightsOnboarding) else { return }
 
         guard let tab = tabViewModel?.tab else { return }
