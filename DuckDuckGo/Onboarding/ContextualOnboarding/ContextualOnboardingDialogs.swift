@@ -21,9 +21,10 @@ import Onboarding
 import SwiftUIExtensions
 
 struct OnboardingDialogsContants {
-    static let titleFont = Font.system(size: 20, weight: .bold, design: .rounded)
+    static let titleFont = Font.system(size: Self.titleFontSize, weight: .bold, design: .rounded)
     static let messageFont = Font.system(size: Self.messageFontSize, weight: .regular, design: .rounded)
     static let messageFontSize = 16.0
+    static let titleFontSize = 20.0
 }
 
 struct OnboardingTrySearchDialog: View {
@@ -132,19 +133,32 @@ struct OnboardingFirstSearchDoneDialog: View {
 
 struct OnboardingFireButtonDialogContent: View {
     private let attributedMessage: NSAttributedString = {
-        let firstString = UserText.ContextualOnboarding.onboardingTryFireButtonMessage
+        let firstString = String(format: UserText.ContextualOnboarding.onboardingTryFireButtonTitle, UserText.ContextualOnboarding.onboardingTryFireButtonMessage)
+
         let boldString = "Fire Button"
         let attributedString = NSMutableAttributedString(string: firstString)
         let boldFontAttribute: [NSAttributedString.Key: Any] = [
-            .font: NSFont.systemFont(ofSize: OnboardingDialogsContants.messageFontSize, weight: .bold)
+            .font: NSFont.systemFont(ofSize: OnboardingDialogsContants.titleFontSize, weight: .bold)
         ]
         if let boldRange = firstString.range(of: boldString) {
             let nsBoldRange = NSRange(boldRange, in: firstString)
             attributedString.addAttributes(boldFontAttribute, range: nsBoldRange)
         }
 
+        let smallString = UserText.ContextualOnboarding.onboardingTryFireButtonMessage
+        let smallFont = NSFont.systemFont(ofSize: OnboardingDialogsContants.messageFontSize)
+        let smallFontAttribute: [NSAttributedString.Key: Any] = [.font: smallFont]
+
+        let fullText = attributedString.string as NSString
+        let smallRange = fullText.range(of: smallString)
+
+        if smallRange.location != NSNotFound {
+            attributedString.addAttributes(smallFontAttribute, range: smallRange)
+        }
+
         return attributedString
     }()
+    let fireTitleFont = Font.system(size: OnboardingDialogsContants.titleFontSize, weight: .regular, design: .rounded)
 
     let viewModel: OnboardingFireButtonDialogViewModel
     @State private var showNextScreen: Bool = false
@@ -157,7 +171,7 @@ struct OnboardingFireButtonDialogContent: View {
                 ContextualDaxDialogContent(
                     orientation: .horizontalStack(alignment: .center),
                     message: attributedMessage,
-                    messageFont: OnboardingDialogsContants.messageFont,
+                    messageFont: fireTitleFont,
                     customActionView: AnyView(actionView))
             }
         }

@@ -83,7 +83,7 @@ struct TrackerMessageProvider: TrackerMessageProviding {
             message = UserText.ContextualOnboarding.daxDialogBrowsingWithoutTrackers
         }
         guard let message else { return nil }
-        return attributedString(from: message, fontSize: OnboardingDialogsContants.messageFontSize)
+        return attributedString(from: message, fontSize: OnboardingDialogsContants.titleFontSize)
     }
 
     private func isFacebookOrGoogle(_ url: URL) -> Bool {
@@ -121,22 +121,23 @@ struct TrackerMessageProvider: TrackerMessageProviding {
     }
 
     private func trackersBlockedMessage(_ entitiesBlocked: [String]) -> String? {
+        let tapShield = UserText.ContextualOnboarding.daxDialogTapTheShield
         switch entitiesBlocked.count {
         case 0:
             return nil
 
         case 1:
-            let args = entitiesBlocked[0]
+            let args = [entitiesBlocked[0], tapShield]
             let message = UserText.ContextualOnboarding.daxDialogBrowsingWithOneTracker
             return String(format: message, args)
 
         case 2:
-            let args: [CVarArg]  = [entitiesBlocked[0], entitiesBlocked[1]]
+            let args: [CVarArg]  = [entitiesBlocked[0], entitiesBlocked[1], tapShield]
             let message = UserText.ContextualOnboarding.daxDialogBrowsingWithTwoTrackers
             return String(format: message, args)
 
         default:
-            let args: [CVarArg] = [entitiesBlocked.count - 2, entitiesBlocked[0], entitiesBlocked[1]]
+            let args: [CVarArg] = [entitiesBlocked.count - 2, entitiesBlocked[0], entitiesBlocked[1], tapShield]
             let message = UserText.ContextualOnboarding.daxDialogBrowsingWithMultipleTrackers
             return String(format: message, args)
         }
@@ -148,12 +149,15 @@ struct TrackerMessageProvider: TrackerMessageProviding {
         var isBold = false
         var currentText = ""
 
+        let boldFont = NSFont.systemFont(ofSize: fontSize, weight: .bold)
+        let regularFont = NSFont.systemFont(ofSize: fontSize)
+
         for character in string {
             if character == "*" {
                 if !currentText.isEmpty {
                     let attributes: [NSAttributedString.Key: Any] = isBold ?
-                        [.font: NSFont.systemFont(ofSize: fontSize, weight: .bold)] :
-                        [:]
+                        [.font: boldFont] :
+                        [.font: regularFont]
                     attributedString.append(NSAttributedString(string: currentText, attributes: attributes))
                     currentText = ""
                 }
@@ -165,9 +169,20 @@ struct TrackerMessageProvider: TrackerMessageProviding {
 
         if !currentText.isEmpty {
             let attributes: [NSAttributedString.Key: Any] = isBold ?
-                [.font: NSFont.systemFont(ofSize: fontSize, weight: .bold)] :
-                [:]
+                [.font: boldFont] :
+                [.font: regularFont]
             attributedString.append(NSAttributedString(string: currentText, attributes: attributes))
+        }
+
+        let smallString = UserText.ContextualOnboarding.daxDialogTapTheShield
+        let smallFont = NSFont.systemFont(ofSize: OnboardingDialogsContants.messageFontSize)
+        let smallFontAttribute: [NSAttributedString.Key: Any] = [.font: smallFont]
+
+        let fullText = attributedString.string as NSString
+        let smallRange = fullText.range(of: smallString)
+
+        if smallRange.location != NSNotFound {
+            attributedString.addAttributes(smallFontAttribute, range: smallRange)
         }
 
         return attributedString
