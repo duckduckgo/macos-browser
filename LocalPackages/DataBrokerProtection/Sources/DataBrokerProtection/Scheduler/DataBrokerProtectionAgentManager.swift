@@ -251,7 +251,7 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentAppEvents {
             }
         } completion: { [weak self] in
             guard let self else { return }
-            
+
             if let hasMatches = try? self.dataManager.hasMatches(),
                hasMatches {
                 self.userNotificationService.scheduleCheckInNotificationIfPossible()
