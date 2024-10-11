@@ -130,6 +130,9 @@
                   Identifier = "CBRCompileTimeReporterTests">
                </Test>
                <Test
+                  Identifier = "FireTests/testWhenBurnAll_ThenPinnedTabsArePersisted()">
+               </Test>
+               <Test
                   Identifier = "PixelExperimentTests">
                </Test>
                <Test
