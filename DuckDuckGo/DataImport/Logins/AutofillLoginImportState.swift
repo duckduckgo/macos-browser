@@ -33,7 +33,7 @@ final class AutofillLoginImportState: AutofillLoginImportStateProvider, Autofill
     private let featureFlagger: FeatureFlagger
 
     public var isEligibleDDGUser: Bool {
-        guard !featureFlagger.isFeatureOn(.credentialsImportPromptForAllUsers) else {
+        guard !featureFlagger.isFeatureOn(.credentialsImportPromotionForExistingUsers) else {
             return true
         }
         guard let date = userDefaults.object(forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue) as? Date else {

@@ -24,13 +24,28 @@ public protocol AutofillCredentialsImportPresentationDelegate: AnyObject {
     func autofillDidRequestCredentialsImportFlow(onFinished: @escaping () -> Void, onCancelled: @escaping () -> Void)
 }
 
+public protocol AutofillLoginImportStateProvider {
+    var isEligibleDDGUser: Bool { get }
+    var hasImportedLogins: Bool { get }
+    var credentialsImportPromptPresentationCount: Int { get }
+    var isAutofillEnabled: Bool { get }
+    var isCredentialsImportPromptPermanantlyDismissed: Bool { get }
+    func hasNeverPromptWebsitesFor(_ domain: String) -> Bool
+}
+
 final public class AutofillCredentialsImportManager {
     private var stateStore: AutofillLoginImportStateStoring
+    private var loginImportStateProvider: AutofillLoginImportStateProvider
+    private let isBurnerWindow: Bool
 
     weak var presentationDelegate: AutofillCredentialsImportPresentationDelegate?
 
-    init(stateStore: AutofillLoginImportStateStoring = AutofillLoginImportState()) {
+    init(stateStore: AutofillLoginImportStateStoring = AutofillLoginImportState(),
+         loginImportStateProvider: AutofillLoginImportStateProvider = AutofillLoginImportState(),
+         isBurnerWindow: Bool) {
         self.stateStore = stateStore
+        self.loginImportStateProvider = loginImportStateProvider
+        self.isBurnerWindow = isBurnerWindow
     }
 }
 
@@ -63,12 +78,52 @@ extension AutofillCredentialsImportManager: AutofillPasswordImportDelegate {
         PixelKit.fire(AutofillPixelKitEvent.importCredentialsPromptNeverAgainClicked.withoutMacPrefix)
     }
 
-    public func autofillUserScriptShouldDisplayOverlay(_ serializedInputContext: String) -> Bool {
+    public func autofillUserScriptShouldDisplayOverlay(_ serializedInputContext: String, for domain: String) -> Bool {
         if let data = serializedInputContext.data(using: .utf8),
            let decoded = try? JSONDecoder().decode(CredentialsImportInputContext.self, from: data) {
             if decoded.credentialsImport {
                 return !stateStore.isCredentialsImportPromptPermanantlyDismissed
             }
+        }
+        return true
+    }
+
+    public func autofillUserScriptShouldShowPasswordImportDialog(domain: String, credentials: [SecureVaultModels.WebsiteCredentials], credentialsProvider: SecureVaultModels.CredentialsProvider, totalCredentialsCount: Int) -> Bool {
+        guard credentialsProvider.name != .bitwarden else {
+            return false
+        }
+        guard !isBurnerWindow else {
+            return false
+        }
+        guard credentials.isEmpty else {
+            return false
+        }
+        guard totalCredentialsCount < 10 else {
+            return false
+        }
+        guard loginImportStateProvider.shouldShowPasswordImportDialog(for: domain) else {
+            return false
+        }
+        return true
+    }
+}
+
+private extension AutofillLoginImportStateProvider {
+    func shouldShowPasswordImportDialog(for domain: String) -> Bool {
+        guard isAutofillEnabled else {
+            return false
+        }
+        guard !hasImportedLogins else {
+            return false
+        }
+        guard isEligibleDDGUser else {
+            return false
+        }
+        guard !hasNeverPromptWebsitesFor(domain) else {
+            return false
+        }
+        guard !isCredentialsImportPromptPermanantlyDismissed else {
+            return false
         }
         return true
     }
