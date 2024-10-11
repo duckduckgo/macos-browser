@@ -308,13 +308,9 @@ final class BrowserTabViewController: NSViewController {
                 self.subscribeToTabContent(of: selectedTabViewModel)
                 self.subscribeToHoveredLink(of: selectedTabViewModel)
                 self.subscribeToUserDialogs(of: selectedTabViewModel)
-                self.subscribeToDuckPlayerOnboardingPrompt(of: selectedTabViewModel)
 
                 self.adjustFirstResponder(force: true)
-                containerStackView.arrangedSubviews.filter({ $0 != self.webViewContainer }).forEach {
-                    self.containerStackView.removeArrangedSubview($0)
-                    $0.removeFromSuperview()
-                }
+                removeExistingDialog()
             }
             .store(in: &cancellables)
     }
@@ -411,13 +407,16 @@ final class BrowserTabViewController: NSViewController {
         presentContextualOnboarding()
     }
 
-    private func presentContextualOnboarding() {
-        // Before presenting a new dialog, remove any existing ones.
+    private func removeExistingDialog() {
         containerStackView.arrangedSubviews.filter({ $0 != webViewContainer }).forEach {
             containerStackView.removeArrangedSubview($0)
             $0.removeFromSuperview()
         }
+    }
 
+    private func presentContextualOnboarding() {
+        // Before presenting a new dialog, remove any existing ones.
+        removeExistingDialog()
         guard featureFlagger.isFeatureOn(.highlightsOnboarding) else { return }
 
         guard let tab = tabViewModel?.tab else { return }
@@ -556,18 +555,6 @@ final class BrowserTabViewController: NSViewController {
             self.scheduleHoverLabelUpdatesForUrl(.duckDuckGo)
         }
 #endif
-    }
-
-    private func subscribeToDuckPlayerOnboardingPrompt(of tabViewModel: TabViewModel?) {
-        tabViewModel?.tab.duckPlayerOnboardingPublisher.sink { [weak self, weak tab = tabViewModel?.tab] onboardingState in
-
-            guard let self, tab != nil, let onboardingState = onboardingState, onboardingState.onboardingDecider.canDisplayOnboarding else  {
-                self?.duckPlayerOnboardingModalManager.close(animated: false, completion: nil)
-                return
-            }
-
-            self.duckPlayerOnboardingModalManager.show(on: self.view, animated: true)
-        }.store(in: &tabViewModelCancellables)
     }
 
     private func shouldMakeContentViewFirstResponder(for tabContent: Tab.TabContent) -> Bool {

@@ -27,16 +27,9 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
     var mockTrackerMessageProvider: MockTrackerMessageProvider!
     var tab: Tab!
     let expectation = XCTestExpectation()
-    var window: NSWindow!
-    var tabViewModel: TabViewModel {
-        (window.contentViewController as! MainViewController).browserTabViewController.tabViewModel!
-    }
 
     @MainActor override func setUp() {
         super.setUp()
-        WebTrackingProtectionPreferences.shared.isGPCEnabled = false
-
-        window = WindowsManager.openNewWindow(with: .none)!
         UserDefaultsWrapper<Any>.clearAll()
         mockTrackerMessageProvider = MockTrackerMessageProvider(expectation: expectation)
         stateMachine = ContextualOnboardingStateMachine(trackerMessageProvider: mockTrackerMessageProvider)
@@ -47,10 +40,6 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         stateMachine = nil
         mockTrackerMessageProvider = nil
         tab = nil
-        window.close()
-        window = nil
-
-        WebTrackingProtectionPreferences.shared.isGPCEnabled = true
         super.tearDown()
     }
 
@@ -91,6 +80,17 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         }
     }
 
+    func test_OnSearch_WhenStateIsSearchDoneShowBlockedTrackersOrSearchSoneShowMajorOrNoTracker_returnSearchDoneShouldFollowUpFalse() {
+        let states: [ContextualOnboardingState] = [.searchDoneShowBlockedTrackers, .searchDoneShowMajorOrNoTracker]
+        tab.url = URL.makeSearchUrl(from: "query something")
+
+        for state in states {
+            stateMachine.state = state
+            let dialogType = stateMachine.dialogTypeForTab(tab)
+            XCTAssertEqual(dialogType, .searchDone(shouldFollowUp: false))
+        }
+    }
+
     func test_OnSearch_WhenStateIsShowFireButton_returnsTryFireButton() {
         let states: [ContextualOnboardingState] = [.showFireButton]
         tab.url = URL.makeSearchUrl(from: "query something")
@@ -117,10 +117,9 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         let states: [ContextualOnboardingState] = [
             .notStarted,
             .showTryASearch,
-            .searchDoneShowBlockedTrackers,
-            .searchDoneShowMajorOrNoTracker,
             .fireUsedTryASearchShown,
-            .onboardingCompleted]
+            .onboardingCompleted
+        ]
         tab.url = URL.makeSearchUrl(from: "query something")
 
         for state in states {

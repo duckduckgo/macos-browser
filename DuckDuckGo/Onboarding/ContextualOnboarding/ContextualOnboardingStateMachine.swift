@@ -39,36 +39,87 @@ enum ContextualDialogType: Equatable {
 }
 
 enum ContextualOnboardingState: String {
+
+    // The contextual onboarding has not started. This state should apply only during the linear onboarding.
     case notStarted
+
+    // State as soon as we load the initial page after onboarding.
+    // It will show the "Try a search" dialog after the first visit.
+    // From this state, after a website visit, it will show a "Tracker" dialog.
+    // From this state, after a search, it will show the "Try visit a site" dialog.
     case showTryASearch
+
+    // State applied after the first search if no website visit occurred before.
+    // From this state, after a website visit, it will show a "Tracker" dialog.
+    // From this state, after a search, it will show nothing.
     case showSearchDone
+
+    // State applied after the first time a site is visited where trackers were blocked, and no search occurred before.
+    // From this state, after a website visit, it will show the "Try Fire Button" dialog.
+    // From this state, after a search, it will show the "Search Done" dialog.
     case showBlockedTrackers
+
+    // State applied after the first time a site is visited where no trackers were blocked, and no search occurred before.
+    // From this state, after a website visit, it will show a "Tracker" dialog if a tracker is blocked; otherwise, nothing.
+    // From this state, after a search, it will show the "Search Done" dialog.
     case showMajorOrNoTracker
+
+    // State applied after the first search and the "Search Done" dialog has been seen.
+    // From this state, after a website visit, it will show a "Tracker" dialog.
+    // From this state, after a search, it will show nothing.
     case showTryASite
+
+    // State applied after the first time a site is visited where trackers were blocked, and a search occurred before.
+    // From this state, after a website visit, it will show the "Try Fire Button" dialog.
+    // From this state, after a search, it will show nothing.
     case searchDoneShowBlockedTrackers
+
+    // State applied after the first time a site is visited where no trackers were blocked, and a search occurred before.
+    // From this state, after a website visit, it will show a "Tracker" dialog if a tracker is blocked; otherwise, nothing.
+    // From this state, after a search, it will show nothing.
     case searchDoneShowMajorOrNoTracker
+
+    // State applied when, after the "Try a search" dialog is displayed, the fire button is used.
+    // From this state, after a website visit, it will show a "Tracker" dialog.
+    // From this state, after a search, it will transition to "fireUsedShowSearchDone".
     case fireUsedTryASearchShown
+
+    // State applied after a search is performed in the "fireUsedTryASearchShown" state.
+    // From this state, after a website visit, it will show a "Tracker" dialog.
+    // From this state, after a search, it will show the "Search Done" dialog.
     case fireUsedShowSearchDone
+
+    // State applied when "Got it" is pressed on a tracker or after a visit if performed after blocked trackers.
+    // From this state, after a website visit, it will show the "Try Fire Button" dialog.
+    // From this state, after a search, it will show the "Try Fire Button" dialog.
     case showFireButton
+
+    // State applied after any action once the "Try Fire Button" dialog is shown.
+    // From this state, after a website visit, it will show the "High Five" dialog.
+    // From this state, after a search, it will show the "High Five" dialog.
     case showHighFive
+
+    // State applied after any action once the "High Five" dialog is shown, indicating the end of the contextual onboarding.
+    // From this state, after a website visit, it will show nothing.
+    // From this state, after a search, it will show nothing.
     case onboardingCompleted
 }
 
 final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProviding, ContextualOnboardingStateUpdater {
 
-    let trackerMessageProvider: TrackerMessageProviding
-    let startUpPreferences: StartupPreferences
+    private let trackerMessageProvider: TrackerMessageProviding
+    private let startUpPreferences: StartupPreferences
 
     @UserDefaultsWrapper(key: .contextualOnboardingState, defaultValue: ContextualOnboardingState.onboardingCompleted.rawValue)
     private var stateString: String {
         didSet {
             if stateString == ContextualOnboardingState.notStarted.rawValue {
                 startUpPreferences.launchToCustomHomePage = true
-                lastVisitTab = nil
-                lastVisitSite = nil
+                resetData()
             }
             if stateString == ContextualOnboardingState.onboardingCompleted.rawValue {
                 startUpPreferences.launchToCustomHomePage = false
+                resetData()
             }
         }
     }
@@ -82,8 +133,9 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
         }
     }
 
-    var lastVisitTab: Tab?
-    var lastVisitSite: URL?
+    private var lastVisitTab: Tab?
+    private var lastVisitSite: URL?
+    private var notBlockedTrackerSeen: Bool = false
 
     init(trackerMessageProvider: TrackerMessageProviding = TrackerMessageProvider(),
          startupPreferences: StartupPreferences = StartupPreferences.shared) {
@@ -98,11 +150,13 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
         }
         guard let url = tab.url else { return nil }
 
-        if lastVisitTab != nil && tab != lastVisitTab && url == URL.duckDuckGo && state != .showFireButton  {
+        // This is to avoid showing a dialog immediately when the user opens a new Window
+        if isANewWindow(tab: tab, url: url) {
             lastVisitTab = tab
             lastVisitSite = url
             return nil
         }
+
         lastVisitTab = tab
         lastVisitSite = url
         if url.isDuckDuckGoSearch {
@@ -116,7 +170,7 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
         switch state {
         case .showSearchDone, .fireUsedShowSearchDone:
             return .searchDone(shouldFollowUp: true)
-        case .showBlockedTrackers, .showMajorOrNoTracker:
+        case .showBlockedTrackers, .showMajorOrNoTracker, .searchDoneShowBlockedTrackers, .searchDoneShowMajorOrNoTracker:
             return .searchDone(shouldFollowUp: false)
         case .showTryASite:
             return .tryASite
@@ -133,10 +187,13 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
         switch state {
         case .showTryASearch:
             return .tryASearch
-        case .showBlockedTrackers, .showMajorOrNoTracker, .searchDoneShowBlockedTrackers, .searchDoneShowMajorOrNoTracker, .fireUsedShowSearchDone:
-            guard let privacyInfo else { return nil }
-            guard let message = trackerMessageProvider.trackerMessage(privacyInfo: privacyInfo) else { return nil }
-            return .trackers(message: message, shouldFollowUp: true)
+        case .showMajorOrNoTracker, .searchDoneShowMajorOrNoTracker:
+            if !notBlockedTrackerSeen {
+                return trackerDialog(for: privacyInfo)
+            }
+            return nil
+        case .showBlockedTrackers, .searchDoneShowBlockedTrackers, .fireUsedShowSearchDone:
+            return trackerDialog(for: privacyInfo)
         case .showFireButton:
             return .tryFireButton
         case .showHighFive:
@@ -144,7 +201,26 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
         default:
             return nil
         }
+    }
 
+    private func resetData() {
+        lastVisitTab = nil
+        lastVisitSite = nil
+        notBlockedTrackerSeen = false
+    }
+
+    // To determine if it's a new Window we do the following:
+    // Check if some action has been taken (e.g. it is not the start of the contextual onboarding)
+    // If lastVisitedTab is not the same as current tab (e.g. it's not a reload)
+    // And the state is not showFireButton (e.g. we have not used the Fire button on the same Window)
+    private func isANewWindow(tab: Tab, url: URL) -> Bool {
+        return lastVisitTab != nil && tab != lastVisitTab && url == URL.duckDuckGo && state != .showFireButton
+    }
+
+    private func trackerDialog(for privacyInfo: PrivacyInfo?) -> ContextualDialogType? {
+        guard let privacyInfo else { return nil }
+        guard let message = trackerMessageProvider.trackerMessage(privacyInfo: privacyInfo) else { return nil }
+        return .trackers(message: message, shouldFollowUp: true)
     }
 
     func updateStateFor(tab: Tab) {
@@ -153,7 +229,8 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
         }
         guard let url = tab.url else { return }
 
-        if lastVisitTab != nil && tab != lastVisitTab && url == URL.duckDuckGo && state != .showFireButton  {
+        // This is to avoid updating the state immediately when the user opens a new Window (and DuckDuckGo site is loaded)
+        if isANewWindow(tab: tab, url: url) {
             lastVisitTab = tab
             lastVisitSite = url
             return
@@ -216,6 +293,8 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
         case .showMajorOrNoTracker, .searchDoneShowMajorOrNoTracker:
             if case .blockedTrackers = trackerType {
                 state = .showBlockedTrackers
+            } else {
+                notBlockedTrackerSeen = true
             }
         case .fireUsedShowSearchDone:
             state = .showFireButton

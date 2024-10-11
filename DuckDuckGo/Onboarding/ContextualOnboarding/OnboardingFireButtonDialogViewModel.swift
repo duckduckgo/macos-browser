@@ -21,8 +21,8 @@ import Combine
 
 public class OnboardingFireButtonDialogViewModel: ObservableObject {
 
-    var onDismiss: () -> Void
-    var onGotItPressed: () -> Void
+    private var onDismiss: () -> Void
+    private var onGotItPressed: () -> Void
 
     init(onDismiss: @escaping () -> Void, onGotItPressed: @escaping () -> Void) {
         self.onDismiss = onDismiss
