@@ -19,6 +19,9 @@
 import XCTest
 import Freemium
 @testable import DuckDuckGo_Privacy_Browser
+import Combine
+import Common
+import DataBrokerProtection
 
 final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
 
@@ -26,17 +29,23 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
     private var mockUserStateManager: MockFreemiumDBPUserStateManager!
     private var mockFeature: MockFreemiumDBPFeature!
     private var mockPresenter: MockFreemiumDBPPresenter!
+    private let notificationCenter: NotificationCenter = .default
+    private var mockPixelHandler: MockFreemiumDBPExperimentPixelHandler!
+    private var cancellables: Set<AnyCancellable> = []
 
     @MainActor
     override func setUpWithError() throws {
         mockUserStateManager = MockFreemiumDBPUserStateManager()
         mockFeature = MockFreemiumDBPFeature()
         mockPresenter = MockFreemiumDBPPresenter()
+        mockPixelHandler = MockFreemiumDBPExperimentPixelHandler()
 
         sut = FreemiumDBPPromotionViewCoordinator(
             freemiumDBPUserStateManager: mockUserStateManager,
             freemiumDBPFeature: mockFeature,
-            freemiumDBPPresenter: mockPresenter
+            freemiumDBPPresenter: mockPresenter,
+            notificationCenter: notificationCenter,
+            freemiumDBPExperimentPixelHandler: mockPixelHandler
         )
     }
 
@@ -82,28 +91,89 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
     }
 
     @MainActor
-    func testProceedAction_marksUserAsOnboarded_andDismissesPromotion() {
+    func testProceedAction_dismissesPromotion_callsShowFreemium_andFiresPixel() {
         // Given
-        mockUserStateManager.didOnboard = false
+        mockUserStateManager.didActivate = false
 
         // When
         let viewModel = sut.viewModel
         viewModel.proceedAction()
 
         // Then
-        XCTAssertTrue(mockUserStateManager.didOnboard)
         XCTAssertTrue(mockUserStateManager.didDismissHomePagePromotion)
         XCTAssertTrue(mockPresenter.didCallShowFreemium)
+        XCTAssertEqual(mockPixelHandler.lastFiredEvent, FreemiumDBPExperimentPixel.newTabScanClick)
     }
 
     @MainActor
-    func testCloseAction_dismissesPromotion() {
+    func testCloseAction_dismissesPromotion_andFiresPixel() {
         // When
         let viewModel = sut.viewModel
         viewModel.closeAction()
 
         // Then
         XCTAssertTrue(mockUserStateManager.didDismissHomePagePromotion)
+        XCTAssertEqual(mockPixelHandler.lastFiredEvent, FreemiumDBPExperimentPixel.newTabScanDismiss)
+    }
+
+    @MainActor
+    func testProceedAction_dismissesResults_callsShowFreemium_andFiresPixel() {
+        // Given
+        mockUserStateManager.didActivate = false
+        mockUserStateManager.firstScanResults = FreemiumDBPMatchResults(matchesCount: 5, brokerCount: 2)
+
+        // When
+        let viewModel = sut.viewModel
+        viewModel.proceedAction()
+
+        // Then
+        XCTAssertTrue(mockUserStateManager.didDismissHomePagePromotion)
+        XCTAssertTrue(mockPresenter.didCallShowFreemium)
+        XCTAssertEqual(mockPixelHandler.lastFiredEvent, FreemiumDBPExperimentPixel.newTabResultsClick)
+    }
+
+    @MainActor
+    func testCloseAction_dismissesResults_andFiresPixel() {
+        // Given
+        mockUserStateManager.firstScanResults = FreemiumDBPMatchResults(matchesCount: 5, brokerCount: 2)
+
+        // When
+        let viewModel = sut.viewModel
+        viewModel.closeAction()
+
+        // Then
+        XCTAssertTrue(mockUserStateManager.didDismissHomePagePromotion)
+        XCTAssertEqual(mockPixelHandler.lastFiredEvent, FreemiumDBPExperimentPixel.newTabResultsDismiss)
+    }
+
+    @MainActor
+    func testProceedAction_dismissesNoResults_callsShowFreemium_andFiresPixel() {
+        // Given
+        mockUserStateManager.didActivate = false
+        mockUserStateManager.firstScanResults = FreemiumDBPMatchResults(matchesCount: 0, brokerCount: 0)
+
+        // When
+        let viewModel = sut.viewModel
+        viewModel.proceedAction()
+
+        // Then
+        XCTAssertTrue(mockUserStateManager.didDismissHomePagePromotion)
+        XCTAssertTrue(mockPresenter.didCallShowFreemium)
+        XCTAssertEqual(mockPixelHandler.lastFiredEvent, FreemiumDBPExperimentPixel.newTabNoResultsClick)
+    }
+
+    @MainActor
+    func testCloseAction_dismissesNoResults_andFiresPixel() {
+        // Given
+        mockUserStateManager.firstScanResults = FreemiumDBPMatchResults(matchesCount: 0, brokerCount: 0)
+
+        // When
+        let viewModel = sut.viewModel
+        viewModel.closeAction()
+
+        // Then
+        XCTAssertTrue(mockUserStateManager.didDismissHomePagePromotion)
+        XCTAssertEqual(mockPixelHandler.lastFiredEvent, FreemiumDBPExperimentPixel.newTabNoResultsDismiss)
     }
 
     @MainActor
@@ -115,8 +185,7 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         let viewModel = sut.viewModel
 
         // Then
-        XCTAssertEqual(viewModel.title, UserText.homePagePromotionFreemiumDBPPostScanEngagementResultsTitle)
-        XCTAssertEqual(viewModel.subtitle, UserText.homePagePromotionFreemiumDBPPostScanEngagementResultPluralSubtitle(resultCount: 5, brokerCount: 2))
+        XCTAssertEqual(viewModel.text, UserText.homePagePromotionFreemiumDBPPostScanEngagementResultPluralText(resultCount: 5, brokerCount: 2))
     }
 
     @MainActor
@@ -128,20 +197,168 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         let viewModel = sut.viewModel
 
         // Then
-        XCTAssertEqual(viewModel.subtitle, UserText.homePagePromotionFreemiumDBPSubtitle)
+        XCTAssertEqual(viewModel.text, UserText.homePagePromotionFreemiumDBPText)
     }
 
     func testNotificationObservation_updatesPromotionVisibility() {
         // When
-        NotificationCenter.default.post(name: .freemiumDBPResultPollingComplete, object: nil)
+        notificationCenter.post(name: .freemiumDBPResultPollingComplete, object: nil)
 
         // Then
         XCTAssertFalse(mockUserStateManager.didDismissHomePagePromotion)
 
         // When
-        NotificationCenter.default.post(name: .freemiumDBPEntryPointActivated, object: nil)
+        notificationCenter.post(name: .freemiumDBPEntryPointActivated, object: nil)
 
         // Then
         XCTAssertFalse(mockUserStateManager.didDismissHomePagePromotion)
     }
+
+    @MainActor
+    func testHomePageBecomesVisible_whenFeatureBecomesAvailable_andDidDismissFalse() {
+        // Given
+        mockUserStateManager.didDismissHomePagePromotion = false
+        mockFeature.featureAvailable = false
+        let expectation = XCTestExpectation(description: "isHomePagePromotionVisible becomes true")
+        sut = FreemiumDBPPromotionViewCoordinator(
+            freemiumDBPUserStateManager: mockUserStateManager,
+            freemiumDBPFeature: mockFeature,
+            freemiumDBPPresenter: mockPresenter
+        )
+        XCTAssertFalse(sut.isHomePagePromotionVisible)
+
+        // When
+        mockFeature.isAvailableSubject.send(true)
+
+        sut.$isHomePagePromotionVisible
+            .sink { isVisible in
+                if isVisible {
+                    expectation.fulfill()
+                }
+            }
+            .store(in: &cancellables)
+
+        wait(for: [expectation], timeout: 2.0)
+
+        // Then
+        XCTAssertTrue(sut.isHomePagePromotionVisible)
+    }
+
+    @MainActor
+    func testHomePageBecomesInVisible_whenFeatureBecomesUnAvailable_andDidDismissFalse() {
+        // Given
+        mockUserStateManager.didDismissHomePagePromotion = false
+        mockFeature.featureAvailable = true
+        let expectation = XCTestExpectation(description: "isHomePagePromotionVisible becomes true")
+        sut = FreemiumDBPPromotionViewCoordinator(
+            freemiumDBPUserStateManager: mockUserStateManager,
+            freemiumDBPFeature: mockFeature,
+            freemiumDBPPresenter: mockPresenter
+        )
+        XCTAssertTrue(sut.isHomePagePromotionVisible)
+
+        // When
+        mockFeature.isAvailableSubject.send(false)
+
+        sut.$isHomePagePromotionVisible
+            .sink { isVisible in
+                if !isVisible {
+                    expectation.fulfill()
+                }
+            }
+            .store(in: &cancellables)
+
+        wait(for: [expectation], timeout: 2.0)
+
+        // Then
+        XCTAssertFalse(sut.isHomePagePromotionVisible)
+    }
+
+    @MainActor
+    func testHomePageDoesNotBecomeVisible_whenFeatureBecomesAvailable_andDidDismissTrue() {
+        // Given
+        mockUserStateManager.didDismissHomePagePromotion = true
+        mockFeature.featureAvailable = false
+        let expectation = XCTestExpectation(description: "isHomePagePromotionVisible becomes true")
+        sut = FreemiumDBPPromotionViewCoordinator(
+            freemiumDBPUserStateManager: mockUserStateManager,
+            freemiumDBPFeature: mockFeature,
+            freemiumDBPPresenter: mockPresenter
+        )
+        XCTAssertFalse(sut.isHomePagePromotionVisible)
+
+        // When
+        mockFeature.isAvailableSubject.send(true)
+
+        sut.$isHomePagePromotionVisible
+            .sink { isVisible in
+                if !isVisible {
+                    expectation.fulfill()
+                }
+            }
+            .store(in: &cancellables)
+
+        wait(for: [expectation], timeout: 2.0)
+
+        // Then
+        XCTAssertFalse(sut.isHomePagePromotionVisible)
+    }
+
+    @MainActor
+    func testHomePageDoesNotBecomeVisible_whenFeatureBecomesUnAvailable_andDidDismissTrue() {
+        // Given
+        mockUserStateManager.didDismissHomePagePromotion = true
+        mockFeature.featureAvailable = true
+        let expectation = XCTestExpectation(description: "isHomePagePromotionVisible becomes true")
+        sut = FreemiumDBPPromotionViewCoordinator(
+            freemiumDBPUserStateManager: mockUserStateManager,
+            freemiumDBPFeature: mockFeature,
+            freemiumDBPPresenter: mockPresenter
+        )
+        XCTAssertFalse(sut.isHomePagePromotionVisible)
+
+        // When
+        mockFeature.isAvailableSubject.send(false)
+
+        sut.$isHomePagePromotionVisible
+            .sink { isVisible in
+                if !isVisible {
+                    expectation.fulfill()
+                }
+            }
+            .store(in: &cancellables)
+
+        wait(for: [expectation], timeout: 2.0)
+
+        // Then
+        XCTAssertFalse(sut.isHomePagePromotionVisible)
+    }
 }
+
+class MockFreemiumDBPExperimentPixelHandler: EventMapping<FreemiumDBPExperimentPixel> {
+
+    var lastFiredEvent: FreemiumDBPExperimentPixel?
+    var lastPassedParameters: [String: String]?
+
+    init() {
+        var mockMapping: Mapping! = nil
+
+        super.init(mapping: { event, error, params, onComplete in
+            // Call the closure after initialization
+            mockMapping(event, error, params, onComplete)
+        })
+
+        // Now, set the real closure that captures self and stores parameters.
+        mockMapping = { [weak self] (event, error, params, onComplete) in
+            // Capture the inputs when fire is called
+            self?.lastFiredEvent = event
+            self?.lastPassedParameters = params
+        }
+    }
+
+    func resetCapturedData() {
+        lastFiredEvent = nil
+        lastPassedParameters = nil
+    }
+}
+
