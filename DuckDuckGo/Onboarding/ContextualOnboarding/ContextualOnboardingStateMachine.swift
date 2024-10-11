@@ -116,7 +116,7 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
         switch state {
         case .showSearchDone, .fireUsedShowSearchDone:
             return .searchDone(shouldFollowUp: true)
-        case .showBlockedTrackers, .showMajorOrNoTracker:
+        case .showBlockedTrackers, .showMajorOrNoTracker, .searchDoneShowBlockedTrackers, .searchDoneShowMajorOrNoTracker:
             return .searchDone(shouldFollowUp: false)
         case .showTryASite:
             return .tryASite

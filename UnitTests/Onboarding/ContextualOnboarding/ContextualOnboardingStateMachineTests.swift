@@ -91,6 +91,17 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         }
     }
 
+    func test_OnSearch_WhenStateIsSearchDoneShowBlockedTrackersOrSearchSoneShowMajorOrNoTracker_returnSearchDoneShouldFollowUpFalse() {
+        let states: [ContextualOnboardingState] = [.searchDoneShowBlockedTrackers, .searchDoneShowMajorOrNoTracker]
+        tab.url = URL.makeSearchUrl(from: "query something")
+
+        for state in states {
+            stateMachine.state = state
+            let dialogType = stateMachine.dialogTypeForTab(tab)
+            XCTAssertEqual(dialogType, .searchDone(shouldFollowUp: false))
+        }
+    }
+
     func test_OnSearch_WhenStateIsShowFireButton_returnsTryFireButton() {
         let states: [ContextualOnboardingState] = [.showFireButton]
         tab.url = URL.makeSearchUrl(from: "query something")
@@ -117,10 +128,9 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         let states: [ContextualOnboardingState] = [
             .notStarted,
             .showTryASearch,
-            .searchDoneShowBlockedTrackers,
-            .searchDoneShowMajorOrNoTracker,
             .fireUsedTryASearchShown,
-            .onboardingCompleted]
+            .onboardingCompleted
+        ]
         tab.url = URL.makeSearchUrl(from: "query something")
 
         for state in states {
