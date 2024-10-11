@@ -329,7 +329,9 @@ extension AppDelegate {
     }
 
     @objc func resetRemoteMessages(_ sender: Any?) {
-        remoteMessagingClient.store?.resetRemoteMessages()
+        Task {
+            await remoteMessagingClient.store?.resetRemoteMessages()
+        }
     }
 
     @objc func resetNewTabPageCustomization(_ sender: Any?) {

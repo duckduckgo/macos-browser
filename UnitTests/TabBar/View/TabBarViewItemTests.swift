@@ -41,7 +41,7 @@ final class TabBarViewItemTests: XCTestCase {
 
     @MainActor
     func testThatAllExpectedItemsAreShown() {
-        let tabBarViewModel = TabBarViewModelMock(mutedState: .unmuted)
+        let tabBarViewModel = TabBarViewModelMock(audioState: .unmuted(isPlayingAudio: true))
         tabBarViewItem.subscribe(to: tabBarViewModel)
         tabBarViewItem.menuNeedsUpdate(menu)
 
@@ -70,7 +70,7 @@ final class TabBarViewItemTests: XCTestCase {
 
     @MainActor
     func testThatMuteIsShownWhenCurrentAudioStateIsUnmuted() {
-        let tabBarViewModel = TabBarViewModelMock(mutedState: .unmuted)
+        let tabBarViewModel = TabBarViewModelMock()
         tabBarViewItem.subscribe(to: tabBarViewModel)
         tabBarViewItem.menuNeedsUpdate(menu)
 
@@ -79,8 +79,10 @@ final class TabBarViewItemTests: XCTestCase {
         XCTAssertTrue(menu.item(at: 3)?.isSeparatorItem ?? false)
     }
 
+    @MainActor
     func testThatUnmuteIsShownWhenCurrentAudioStateIsMuted() {
-        delegate.audioState = .muted
+        let tabBarViewModel = TabBarViewModelMock(audioState: .muted(isPlayingAudio: false))
+        tabBarViewItem.subscribe(to: tabBarViewModel)
         tabBarViewItem.menuNeedsUpdate(menu)
 
         XCTAssertFalse(menu.item(at: 1)?.isSeparatorItem ?? true)
@@ -305,17 +307,17 @@ private class TabBarViewModelMock: TabBarViewModel {
     var tabContentPublisher: AnyPublisher<Tab.TabContent, Never> { $tabContent.eraseToAnyPublisher() }
     @Published var usedPermissions = Permissions()
     var usedPermissionsPublisher: Published<Permissions>.Publisher { $usedPermissions }
-    @Published var mutedState: WKWebView.AudioState?
-    var mutedStatePublisher: Published<WKWebView.AudioState?>.Publisher {
-        $mutedState
+    @Published var audioState: WKWebView.AudioState
+    var audioStatePublisher: AnyPublisher<WKWebView.AudioState, Never> {
+        $audioState.eraseToAnyPublisher()
     }
-    init(width: CGFloat = 0, title: String = "Test Title", favicon: NSImage? = .aDark, tabContent: Tab.TabContent = .none, usedPermissions: Permissions = Permissions(), mutedState: WKWebView.AudioState? = nil, selected: Bool = false) {
+    init(width: CGFloat = 0, title: String = "Test Title", favicon: NSImage? = .aDark, tabContent: Tab.TabContent = .none, usedPermissions: Permissions = Permissions(), audioState: WKWebView.AudioState? = nil, selected: Bool = false) {
         self.width = width
         self.title = title
         self.favicon = favicon
         self.tabContent = tabContent
         self.usedPermissions = usedPermissions
-        self.mutedState = mutedState
+        self.audioState = audioState ?? .unmuted(isPlayingAudio: false)
         self.isSelected = selected
     }
 }

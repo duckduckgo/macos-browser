@@ -1208,21 +1208,23 @@ final class MockDataBrokerProtectionOperationQueueManager: DataBrokerProtectionQ
     var startImmediateOperationsIfPermittedCompletionError: DataBrokerProtectionAgentErrorCollection?
     var startScheduledOperationsIfPermittedCompletionError: DataBrokerProtectionAgentErrorCollection?
 
-    var startImmediateOperationsIfPermittedCalledCompletion: ((DataBrokerProtection.DataBrokerProtectionAgentErrorCollection?) -> Void)?
-    var startScheduledOperationsIfPermittedCalledCompletion: ((DataBrokerProtection.DataBrokerProtectionAgentErrorCollection?) -> Void)?
+    var startImmediateOperationsIfPermittedCalledCompletion: (() -> Void)?
+    var startScheduledOperationsIfPermittedCalledCompletion: (() -> Void)?
 
     init(operationQueue: DataBrokerProtection.DataBrokerProtectionOperationQueue, operationsCreator: DataBrokerProtection.DataBrokerOperationsCreator, mismatchCalculator: DataBrokerProtection.MismatchCalculator, brokerUpdater: DataBrokerProtection.DataBrokerProtectionBrokerUpdater?, pixelHandler: Common.EventMapping<DataBrokerProtection.DataBrokerProtectionPixels>) {
 
     }
 
-    func startImmediateOperationsIfPermitted(showWebView: Bool, operationDependencies: DataBrokerProtection.DataBrokerOperationDependencies, completion: ((DataBrokerProtection.DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
-        completion?(startImmediateOperationsIfPermittedCompletionError)
-        startImmediateOperationsIfPermittedCalledCompletion?(startImmediateOperationsIfPermittedCompletionError)
+    func startImmediateOperationsIfPermitted(showWebView: Bool, operationDependencies: any DataBrokerProtection.DataBrokerOperationDependencies, errorHandler: ((DataBrokerProtection.DataBrokerProtectionAgentErrorCollection?) -> Void)?, completion: (() -> Void)?) {
+        errorHandler?(startImmediateOperationsIfPermittedCompletionError)
+        completion?()
+        startImmediateOperationsIfPermittedCalledCompletion?()
     }
 
-    func startScheduledOperationsIfPermitted(showWebView: Bool, operationDependencies: DataBrokerProtection.DataBrokerOperationDependencies, completion: ((DataBrokerProtection.DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
-        completion?(startScheduledOperationsIfPermittedCompletionError)
-        startScheduledOperationsIfPermittedCalledCompletion?(startScheduledOperationsIfPermittedCompletionError)
+    func startScheduledOperationsIfPermitted(showWebView: Bool, operationDependencies: any DataBrokerProtection.DataBrokerOperationDependencies, errorHandler: ((DataBrokerProtection.DataBrokerProtectionAgentErrorCollection?) -> Void)?, completion: (() -> Void)?) {
+        errorHandler?(startScheduledOperationsIfPermittedCompletionError)
+        completion?()
+        startScheduledOperationsIfPermittedCalledCompletion?()
     }
 
     func execute(_ command: DataBrokerProtection.DataBrokerProtectionQueueManagerDebugCommand) {
@@ -1386,7 +1388,7 @@ final class MockDataBrokerProtectionOperationQueue: DataBrokerProtectionOperatio
         self.operations.append(op)
     }
 
-    func addBarrierCompletionBlock(_ barrier: @escaping @Sendable () -> Void) {
+    func addBarrierBlock(_ barrier: @escaping @Sendable () -> Void) {
         didCallAddBarrierBlockCount += 1
         self.barrierBlock = barrier
     }

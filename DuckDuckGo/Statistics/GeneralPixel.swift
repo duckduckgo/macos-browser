@@ -1172,6 +1172,7 @@ enum GeneralPixel: PixelKitEventV2 {
         case .onboardingDuckplayerUsed5to7(let cohort):
             return [PixelKit.Parameters.experimentCohort: cohort]
 
+            /// Duck Player pixels
         case .duckPlayerDailyUniqueView,
                 .duckPlayerViewFromYoutubeViaMainOverlay,
                 .duckPlayerViewFromYoutubeViaHoverButton,
@@ -1196,7 +1197,7 @@ enum GeneralPixel: PixelKitEventV2 {
                 .duckPlayerContingencySettingsDisplayed,
                 .duckPlayerWeeklyUniqueView,
                 .duckPlayerContingencyLearnMoreClicked:
-            return DuckPlayerOnboardingExperiment().getPixelParameters()
+            return nil
 
         case .bookmarksSortButtonClicked(let origin),
                 .bookmarksSortButtonDismissed(let origin),

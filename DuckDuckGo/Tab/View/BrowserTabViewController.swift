@@ -308,7 +308,6 @@ final class BrowserTabViewController: NSViewController {
                 self.subscribeToTabContent(of: selectedTabViewModel)
                 self.subscribeToHoveredLink(of: selectedTabViewModel)
                 self.subscribeToUserDialogs(of: selectedTabViewModel)
-                self.subscribeToDuckPlayerOnboardingPrompt(of: selectedTabViewModel)
 
                 self.adjustFirstResponder(force: true)
                 removeExistingDialog()
@@ -551,18 +550,6 @@ final class BrowserTabViewController: NSViewController {
             self.scheduleHoverLabelUpdatesForUrl(.duckDuckGo)
         }
 #endif
-    }
-
-    private func subscribeToDuckPlayerOnboardingPrompt(of tabViewModel: TabViewModel?) {
-        tabViewModel?.tab.duckPlayerOnboardingPublisher.sink { [weak self, weak tab = tabViewModel?.tab] onboardingState in
-
-            guard let self, tab != nil, let onboardingState = onboardingState, onboardingState.onboardingDecider.canDisplayOnboarding else  {
-                self?.duckPlayerOnboardingModalManager.close(animated: false, completion: nil)
-                return
-            }
-
-            self.duckPlayerOnboardingModalManager.show(on: self.view, animated: true)
-        }.store(in: &tabViewModelCancellables)
     }
 
     private func shouldMakeContentViewFirstResponder(for tabContent: Tab.TabContent) -> Bool {
