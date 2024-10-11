@@ -167,7 +167,7 @@ public final class DataBrokerProtectionAgentManager {
             activityScheduler.startScheduler()
             didStartActivityScheduler = true
             fireMonitoringPixels()
-            queueManager.startScheduledOperationsIfPermitted(showWebView: false, operationDependencies: operationDependencies, completion: nil)
+            queueManager.startScheduledOperationsIfPermitted(showWebView: false, operationDependencies: operationDependencies, errorHandler: nil, completion: nil)
 
             /// Monitors entitlement changes every 60 minutes to optimize system performance and resource utilization by avoiding unnecessary operations when entitlement is invalid.
             /// While keeping the agent active with invalid entitlement has no significant risk, setting the monitoring interval at 60 minutes is a good balance to minimize backend checks.
@@ -207,15 +207,19 @@ extension DataBrokerProtectionAgentManager {
 extension DataBrokerProtectionAgentManager: DataBrokerProtectionBackgroundActivitySchedulerDelegate {
 
     public func dataBrokerProtectionBackgroundActivitySchedulerDidTrigger(_ activityScheduler: DataBrokerProtection.DataBrokerProtectionBackgroundActivityScheduler, completion: (() -> Void)?) {
+        startScheduledOperations(completion: completion)
+    }
+
+    func startScheduledOperations(completion: (() -> Void)?) {
         fireMonitoringPixels()
-        queueManager.startScheduledOperationsIfPermitted(showWebView: false, operationDependencies: operationDependencies) { _ in
-            completion?()
-        }
+        queueManager.startScheduledOperationsIfPermitted(showWebView: false,
+                                                         operationDependencies: operationDependencies,
+                                                         errorHandler: nil,
+                                                         completion: completion)
     }
 }
 
 extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentAppEvents {
-
     public func profileSaved() {
         let backgroundAgentInitialScanStartTime = Date()
 
@@ -245,21 +249,25 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentAppEvents {
                 self.pixelHandler.fire(.ipcServerImmediateScansFinishedWithoutError)
                 self.userNotificationService.sendFirstScanCompletedNotification()
             }
+        } completion: { [weak self] in
+            guard let self else { return }
 
             if let hasMatches = try? self.dataManager.hasMatches(),
-                hasMatches {
+               hasMatches {
                 self.userNotificationService.scheduleCheckInNotificationIfPossible()
             }
 
             fireImmediateScansCompletionPixel(startTime: backgroundAgentInitialScanStartTime)
+
+            self.startScheduledOperations(completion: nil)
         }
     }
 
     public func appLaunched() {
         fireMonitoringPixels()
         queueManager.startScheduledOperationsIfPermitted(showWebView: false,
-                                                         operationDependencies:
-                                                            operationDependencies) { [weak self] errors in
+                                                         operationDependencies: operationDependencies,
+                                                         errorHandler: { [weak self] errors in
             guard let self = self else { return }
 
             if let errors = errors {
@@ -285,7 +293,7 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentAppEvents {
             if errors?.oneTimeError == nil {
                 self.pixelHandler.fire(.ipcServerAppLaunchedScheduledScansFinishedWithoutError)
             }
-        }
+        }, completion: nil)
     }
 
     private func fireImmediateScansCompletionPixel(startTime: Date) {
@@ -310,18 +318,21 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentDebugComman
     public func startImmediateOperations(showWebView: Bool) {
         queueManager.startImmediateOperationsIfPermitted(showWebView: showWebView,
                                                          operationDependencies: operationDependencies,
+                                                         errorHandler: nil,
                                                          completion: nil)
     }
 
     public func startScheduledOperations(showWebView: Bool) {
         queueManager.startScheduledOperationsIfPermitted(showWebView: showWebView,
                                                          operationDependencies: operationDependencies,
+                                                         errorHandler: nil,
                                                          completion: nil)
     }
 
     public func runAllOptOuts(showWebView: Bool) {
         queueManager.execute(.startOptOutOperations(showWebView: showWebView,
                                                     operationDependencies: operationDependencies,
+                                                    errorHandler: nil,
                                                     completion: nil))
     }
 
