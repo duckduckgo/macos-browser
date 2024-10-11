@@ -13602,6 +13602,42 @@
         }
       }
     },
+    "contextual.onboarding.browsing.multiple.trackers" : {
+      "comment" : "First parameter is a count of additional trackers, second and third are names of the tracker networks (strings)",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "*%2$@, %3$@* and others (%d) were trying to track you here. I blocked them!"
+          }
+        }
+      }
+    },
+    "contextual.onboarding.browsing.one.tracker" : {
+      "comment" : "Parameter is domain name (string)",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "*%1$@* was trying to track you here. I blocked them!\n\n☝️ Tap the shield for more info."
+          }
+        }
+      }
+    },
+    "contextual.onboarding.browsing.two.trackers" : {
+      "comment" : "Parameters are names of the tracker networks (strings)",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "*%1$@ and %2$@* were trying to track you here. I blocked them!"
+          }
+        }
+      }
+    },
     "contextual.onboarding.final-screen.button" : {
       "comment" : "Button on the last screen of the onboarding, it will dismiss the onboarding screen.",
       "extractionState" : "extracted_with_value",
@@ -15924,6 +15960,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "При запуске базы данных произошла ошибка"
+          }
+        }
+      }
+    },
+    "dax.onboarding.browsing.site.is.major.tracker" : {
+      "comment" : "First parameter is a string - network name, 2nd parameter is a string - domain name",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Heads up! I can’t stop %1$@ from seeing your activity on %2$@.\n\nBut browse with me, and I can reduce what %1$@ knows about you overall by blocking their trackers on lots of other sites."
+          }
+        }
+      }
+    },
+    "dax.onboarding.browsing.site.owned.by.major.tracker" : {
+      "comment" : "Parameters are domain names (strings)",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Heads up! Since %2$@ owns %1$@, I can’t stop them from seeing your activity here.\n\nBut browse with me, and I can reduce what %2$@ knows about you overall by blocking their trackers on lots of other sites."
+          }
+        }
+      }
+    },
+    "dax.onboarding.browsing.without.trackers" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "As you tap and scroll, I’ll block pesky trackers.\n\nGo ahead - keep browsing!"
           }
         }
       }
@@ -37295,7 +37366,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "You’re all set! You can find me hanging out in the Dock anytime.\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possible 🔒"
+            "value" : "You’re all set! You can find me hanging out in the Dock anytime.\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possibleu{00A0}🔒"
           }
         },
         "es" : {
@@ -37355,7 +37426,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "You’re all set!\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possible 🔒"
+            "value" : "You’re all set!\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possibleu{00A0}🔒"
           }
         },
         "es" : {
