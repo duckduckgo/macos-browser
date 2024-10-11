@@ -37,7 +37,7 @@ extension HomePage.Views {
         @EnvironmentObject var activeRemoteMessageModel: ActiveRemoteMessageModel
         @EnvironmentObject var settingsVisibilityModel: HomePage.Models.SettingsVisibilityModel
 
-        let freemiumDBPPromotionViewCoordinator: any FreemiumDBPPromotionViewCoordinating
+        @ObservedObject var freemiumDBPPromotionViewCoordinator: FreemiumDBPPromotionViewCoordinator
 
         var body: some View {
             if isBurner {

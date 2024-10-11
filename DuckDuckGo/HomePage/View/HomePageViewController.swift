@@ -32,7 +32,7 @@ final class HomePageViewController: NSViewController {
     private let historyCoordinating: HistoryCoordinating
     private let fireViewModel: FireViewModel
     private let onboardingViewModel: OnboardingViewModel
-    private let freemiumDBPPromotionViewCoordinator: any FreemiumDBPPromotionViewCoordinating
+    private let freemiumDBPPromotionViewCoordinator: FreemiumDBPPromotionViewCoordinator
 
     private(set) lazy var faviconsFetcherOnboarding: FaviconsFetcherOnboarding? = {
         guard let syncService = NSApp.delegateTyped.syncService, let syncBookmarksAdapter = NSApp.delegateTyped.syncDataProviders?.bookmarksAdapter else {
@@ -67,7 +67,7 @@ final class HomePageViewController: NSViewController {
          accessibilityPreferences: AccessibilityPreferences = AccessibilityPreferences.shared,
          appearancePreferences: AppearancePreferences = AppearancePreferences.shared,
          defaultBrowserPreferences: DefaultBrowserPreferences = DefaultBrowserPreferences.shared,
-         freemiumDBPPromotionViewCoordinator: any FreemiumDBPPromotionViewCoordinating) {
+         freemiumDBPPromotionViewCoordinator: FreemiumDBPPromotionViewCoordinator) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.bookmarkManager = bookmarkManager
