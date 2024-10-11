@@ -836,11 +836,6 @@ extension MainViewController {
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowEmailProtection.rawValue)
     }
 
-    @objc func resetDuckPlayerOnboarding(_ sender: Any?) {
-        DefaultDuckPlayerOnboardingDecider().reset()
-        DuckPlayerOnboardingExperiment().reset()
-    }
-
     @objc func resetOnboarding(_ sender: Any?) {
         UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.onboardingFinished.rawValue)
     }

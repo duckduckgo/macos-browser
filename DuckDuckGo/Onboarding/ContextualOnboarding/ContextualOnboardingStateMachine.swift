@@ -105,7 +105,6 @@ enum ContextualOnboardingState: String {
     case onboardingCompleted
 }
 
-
 final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProviding, ContextualOnboardingStateUpdater {
 
     private let trackerMessageProvider: TrackerMessageProviding
