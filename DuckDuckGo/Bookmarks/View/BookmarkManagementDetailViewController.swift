@@ -17,6 +17,7 @@
 //
 
 import AppKit
+import Carbon
 import Combine
 import SwiftUI
 
@@ -144,10 +145,10 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         toolbarButtonsStackView.translatesAutoresizingMaskIntoConstraints = false
         toolbarButtonsStackView.distribution = .fill
 
-        configureToolbar(button: newBookmarkButton, image: .addBookmark, isHidden: false)
-        configureToolbar(button: newFolderButton, image: .addFolder, isHidden: false)
-        configureToolbar(button: deleteItemsButton, image: .trash, isHidden: true)
-        configureToolbar(button: sortItemsButton, image: .sortAscending, isHidden: false)
+        configureToolbarButton(newBookmarkButton, image: .addBookmark, isHidden: false)
+        configureToolbarButton(newFolderButton, image: .addFolder, isHidden: false)
+        configureToolbarButton(deleteItemsButton, image: .trash, isHidden: false)
+        configureToolbarButton(sortItemsButton, image: .sortAscending, isHidden: false)
 
         emptyState.addSubview(emptyStateImageView)
         emptyState.addSubview(emptyStateTitle)
@@ -320,8 +321,11 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     }
 
     override func keyDown(with event: NSEvent) {
-        if event.charactersIgnoringModifiers == String(UnicodeScalar(NSDeleteCharacter)!) {
+        switch Int(event.keyCode) {
+        case kVK_Delete, kVK_ForwardDelete:
             deleteSelectedItems()
+        default:
+            super.keyDown(with: event)
         }
     }
 
@@ -410,6 +414,15 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     }
 
     @objc func delete(_ sender: AnyObject) {
+        if tableView.selectedRowIndexes.isEmpty {
+            guard let folder = selectionState.folder else {
+                assertionFailure("Cannot delete root folder")
+                return
+            }
+            bookmarkManager.remove(folder: folder)
+            return
+        }
+
         deleteSelectedItems()
     }
 
@@ -420,11 +433,12 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     }
 
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
-        if menuItem.action == #selector(BookmarkManagementDetailViewController.delete(_:)) {
+        switch menuItem.action {
+        case #selector(BookmarkManagementDetailViewController.delete(_:)):
             return !tableView.selectedRowIndexes.isEmpty
+        default:
+            return true
         }
-
-        return true
     }
 
     private func setupSort(mode: BookmarksSortMode) {
@@ -580,12 +594,22 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
     private func updateToolbarButtons() {
         newFolderButton.cell?.representedObject = selectionState.folder
 
-        let shouldShowDeleteButton = tableView.selectedRowIndexes.count > 1
+        let selectedRowsCount = tableView.selectedRowIndexes.count
+        let canDeleteFolder = selectionState.folder != nil
         NSAnimationContext.runAnimationGroup { context in
             context.duration = 0.25
-            deleteItemsButton.animator().isHidden = !shouldShowDeleteButton
-            newBookmarkButton.animator().isHidden = shouldShowDeleteButton
-            newFolderButton.animator().isHidden = shouldShowDeleteButton
+            if selectedRowsCount > 0 {
+                deleteItemsButton.animator().title = UserText.delete
+                deleteItemsButton.animator().isEnabled = true
+            } else if canDeleteFolder {
+                deleteItemsButton.animator().title = UserText.deleteFolder
+                deleteItemsButton.animator().isEnabled = true
+            } else {
+                deleteItemsButton.animator().title = UserText.delete
+                deleteItemsButton.animator().isEnabled = false
+            }
+            newBookmarkButton.animator().isHidden = selectedRowsCount > 1
+            newFolderButton.animator().isHidden = selectedRowsCount > 1
         }
     }
 
@@ -609,7 +633,7 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
 
 private extension BookmarkManagementDetailViewController {
 
-    func configureToolbar(button: MouseOverButton, image: NSImage, isHidden: Bool) {
+    func configureToolbarButton(_ button: MouseOverButton, image: NSImage, isHidden: Bool) {
         button.bezelStyle = .shadowlessSquare
         button.cornerRadius = 4
         button.normalTintColor = .button
