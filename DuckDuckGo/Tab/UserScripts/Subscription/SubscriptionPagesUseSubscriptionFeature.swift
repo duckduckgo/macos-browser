@@ -576,7 +576,7 @@ private extension SubscriptionPagesUseSubscriptionFeature {
 
     /// Sets the origin for attribution if the user has started their first Freemium PIR scan
     ///
-    /// This method checks whether the user has started their first Freemim PIR scan.
+    /// This method checks whether the user has started their first Freemium PIR scan.
     /// If they have, the method sets the subscription success tracking origin to `"funnel_pro_mac_freemium"` and returns `true`.
     ///
     /// - Returns:
