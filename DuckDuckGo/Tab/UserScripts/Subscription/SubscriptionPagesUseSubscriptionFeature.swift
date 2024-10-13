@@ -574,14 +574,14 @@ private extension SubscriptionPagesUseSubscriptionFeature {
         }
     }
 
-    /// Sets the origin for attribution if the user has posted their first profile saved notification.
+    /// Sets the origin for attribution if the user has started their first Freemium PIR scan
     ///
-    /// This method checks whether the user has completed the action of posting their first profile saved notification.
+    /// This method checks whether the user has started their first Freemim PIR scan.
     /// If they have, the method sets the subscription success tracking origin to `"funnel_pro_mac_freemium"` and returns `true`.
     ///
     /// - Returns:
-    ///   - `true` if the origin is set because the user has posted their first profile saved notification.
-    ///   - `false` if the notification has not been posted and the origin is not set.
+    ///   - `true` if the origin is set because the user has started their first Freemim PIR scan.
+    ///   - `false` if a first scan has not been started and the origin is not set.
     func setFreemiumOriginIfScanPerformed() -> Bool {
         let origin = "funnel_pro_mac_freemium"
         if freemiumDBPUserStateManager.didPostFirstProfileSavedNotification {
