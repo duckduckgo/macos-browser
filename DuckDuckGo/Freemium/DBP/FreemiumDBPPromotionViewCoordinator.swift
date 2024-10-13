@@ -23,7 +23,6 @@ import OSLog
 import DataBrokerProtection
 import Common
 
-
 /// Default implementation of `FreemiumDBPPromotionViewCoordinating`, responsible for managing
 /// the visibility of the promotion and responding to user interactions with the promotion view.
 @MainActor

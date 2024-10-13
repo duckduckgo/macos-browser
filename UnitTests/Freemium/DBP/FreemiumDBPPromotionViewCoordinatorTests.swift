@@ -361,4 +361,3 @@ class MockFreemiumDBPExperimentPixelHandler: EventMapping<FreemiumDBPExperimentP
         lastPassedParameters = nil
     }
 }
-
