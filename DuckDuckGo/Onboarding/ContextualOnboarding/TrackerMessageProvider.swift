@@ -127,7 +127,7 @@ struct TrackerMessageProvider: TrackerMessageProviding {
             return nil
 
         case 1:
-            let args = [entitiesBlocked[0], tapShield]
+            let args: [CVarArg] = [entitiesBlocked[0], tapShield]
             let message = UserText.ContextualOnboarding.daxDialogBrowsingWithOneTracker
             return String(format: message, args)
 
@@ -156,8 +156,8 @@ struct TrackerMessageProvider: TrackerMessageProviding {
             if character == "*" {
                 if !currentText.isEmpty {
                     let attributes: [NSAttributedString.Key: Any] = isBold ?
-                        [.font: boldFont] :
-                        [.font: regularFont]
+                    [.font: boldFont] :
+                    [.font: regularFont]
                     attributedString.append(NSAttributedString(string: currentText, attributes: attributes))
                     currentText = ""
                 }
@@ -169,8 +169,8 @@ struct TrackerMessageProvider: TrackerMessageProviding {
 
         if !currentText.isEmpty {
             let attributes: [NSAttributedString.Key: Any] = isBold ?
-                [.font: boldFont] :
-                [.font: regularFont]
+            [.font: boldFont] :
+            [.font: regularFont]
             attributedString.append(NSAttributedString(string: currentText, attributes: attributes))
         }
 

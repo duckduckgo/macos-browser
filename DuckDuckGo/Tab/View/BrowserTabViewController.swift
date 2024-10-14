@@ -133,7 +133,6 @@ final class BrowserTabViewController: NSViewController {
     }
 
     @objc func windowDidBecomeActive(notification: Notification) {
-        guard let webViewContainer else { return }
         presentContextualOnboarding()
     }
 

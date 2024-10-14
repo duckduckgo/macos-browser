@@ -23,6 +23,7 @@ import SwiftUIExtensions
 struct OnboardingDialogsContants {
     static let titleFont = Font.system(size: Self.titleFontSize, weight: .bold, design: .rounded)
     static let messageFont = Font.system(size: Self.messageFontSize, weight: .regular, design: .rounded)
+    static let titleFontNotBold = Font.system(size: Self.titleFontSize, weight: .regular, design: .rounded)
     static let messageFontSize = 16.0
     static let titleFontSize = 20.0
 }
@@ -170,7 +171,7 @@ struct OnboardingFireButtonDialogContent: View {
             ContextualDaxDialogContent(
                 orientation: .horizontalStack(alignment: .center),
                 message: attributedMessage,
-                messageFont: OnboardingDialogsContants.messageFont,
+                messageFont: OnboardingDialogsContants.titleFontNotBold,
                 customActionView: AnyView(actionView))
         }
     }
@@ -281,7 +282,7 @@ struct OnboardingPrimaryCTAButton: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .padding(.vertical, 3)
+                .padding(.vertical, 5)
                 .padding(.horizontal, 24)
         }
         .buttonStyle(DefaultActionButtonStyle(enabled: true))
@@ -292,6 +293,9 @@ struct OnboardingPrimaryCTAButton: View {
 
 struct OnboardingSecondaryCTAButton: View {
     @Environment(\.colorScheme) var colorScheme
+    private var strokeColor: Color {
+        return (colorScheme == .dark) ? Color.white.opacity(0.12) : Color.black.opacity(0.09)
+    }
 
     let title: String
     let action: () -> Void
@@ -299,10 +303,14 @@ struct OnboardingSecondaryCTAButton: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-            .padding(.vertical, 3)
-            .padding(.horizontal, 26)
+            .padding(.horizontal, 18)
         }
-        .buttonStyle(DismissActionButtonStyle())
+        .buttonStyle(OnboardingStyles.ListButtonStyle(maxWidth: nil))
+        .overlay(
+            RoundedRectangle(cornerRadius: 5)
+                .inset(by: 0.5)
+                .stroke(strokeColor, lineWidth: 1)
+        )
     }
 
 }
