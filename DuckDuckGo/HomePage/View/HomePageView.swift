@@ -58,6 +58,10 @@ extension HomePage.Views {
             addressBarModel.shouldShowAddressBar || activeRemoteMessageModel.shouldShowRemoteMessage ? 24 : 0
         }
 
+        private func innerViewOffset(with geometry: GeometryProxy) -> CGFloat {
+            max(0, ((Self.settingsPanelWidth + Self.minWindowWidth) - geometry.size.width) / 2)
+        }
+
         func regularHomePageView() -> some View {
             GeometryReader { geometry in
                 ZStack(alignment: .top) {
@@ -67,10 +71,17 @@ extension HomePage.Views {
                             ScrollViewReader { proxy in
                                 ScrollView {
                                     VStack(spacing: 0) {
-                                        innerView(geometryProxy: geometry)
-                                            .frame(width: geometry.size.width - (settingsVisibilityModel.isSettingsVisible ? Self.settingsPanelWidth : 0))
-                                            .offset(x: settingsVisibilityModel.isSettingsVisible ? innerViewOffset(with: geometry) : 0)
-                                            .fixedColorScheme(for: settingsModel.customBackground)
+                                        if shouldCenterContent(with: geometry) {
+                                            innerViewCenteredVertically(geometryProxy: geometry)
+                                                .frame(width: geometry.size.width - (settingsVisibilityModel.isSettingsVisible ? Self.settingsPanelWidth : 0))
+                                                .offset(x: settingsVisibilityModel.isSettingsVisible ? innerViewOffset(with: geometry) : 0)
+                                                .fixedColorScheme(for: settingsModel.customBackground)
+                                        } else {
+                                            innerView(geometryProxy: geometry)
+                                                .frame(width: geometry.size.width - (settingsVisibilityModel.isSettingsVisible ? Self.settingsPanelWidth : 0))
+                                                .offset(x: settingsVisibilityModel.isSettingsVisible ? innerViewOffset(with: geometry) : 0)
+                                                .fixedColorScheme(for: settingsModel.customBackground)
+                                        }
                                         scrollOffsetReader
                                     }
                                 }
@@ -121,109 +132,76 @@ extension HomePage.Views {
             }
         }
 
-        private func innerViewOffset(with geometry: GeometryProxy) -> CGFloat {
-            max(0, ((Self.settingsPanelWidth + Self.minWindowWidth) - geometry.size.width) / 2)
+        func innerViewCenteredVertically(geometryProxy: GeometryProxy) -> some View {
+            ZStack {
+                VStack(spacing: 32) {
+                    BigSearchBox(isCompact: isCompactSearchBar(with: geometryProxy))
+                        .id(Const.searchBarIdentifier)
+
+                    if model.isContinueSetUpAvailable {
+                        ContinueSetUpView()
+                            .visibility(model.isContinueSetUpVisible ? .visible : .gone)
+                            .padding(.top, continueSetUpCardsTopPadding)
+                    }
+
+                    Favorites()
+                        .visibility(model.isFavoriteVisible ? .visible : .gone)
+
+                    RecentlyVisited()
+                        .visibility(model.isRecentActivityVisible ? .visible : .gone)
+                }
+                .padding(.vertical, 32)
+                .frame(height: totalHeight(with: geometryProxy))
+                .offset(y: -geometryProxy.size.height * 0.1)
+
+                VStack(spacing: 0) {
+                    remoteMessage()
+                        .padding(.top, 16)
+                    Spacer()
+                        .layoutPriority(1)
+                }
+            }
+            .frame(width: Self.targetWidth, height: max(geometryProxy.size.height, totalHeight(with: geometryProxy)))
+            .frame(maxWidth: .infinity)
+            .onPreferenceChange(RemoteMessageHeightPreferenceKey.self) { value in
+                remoteMessageHeight = value
+            }
         }
 
         func innerView(geometryProxy: GeometryProxy) -> some View {
             VStack(spacing: 32) {
 
-                if shouldCenterContent(with: geometryProxy) {
-                    ZStack {
-                        VStack(spacing: 32) {
-                            Spacer(minLength: 40)
-
-                            if addressBarModel.shouldShowAddressBar {
-                                BigSearchBox(isCompact: isCompactSearchBar(with: geometryProxy))
-                                    .id(Const.searchBarIdentifier)
-                            }
-
-                            if model.isContinueSetUpAvailable {
-                                ContinueSetUpView()
-                                    .visibility(model.isContinueSetUpVisible ? .visible : .gone)
-                                    .padding(.top, continueSetUpCardsTopPadding)
-                            }
-
-                            Favorites()
-                                .visibility(model.isFavoriteVisible ? .visible : .gone)
-
-                            RecentlyVisited()
-                                .visibility(model.isRecentActivityVisible ? .visible : .gone)
-                            Spacer(minLength: 40)
-                        }
-                        .frame(height: totalHeight(with: geometryProxy))
-                        .offset(y: -geometryProxy.size.height * 0.1)
-
-                        VStack(spacing: 0) {
-                            remoteMessage()
-                                .if(addressBarModel.shouldShowAddressBar) { view in
-                                    view.padding(.top, 16)
-                                }
-                            Spacer()
-                                .layoutPriority(1)
-                        }
-                    }
-                    .frame(width: Self.targetWidth)
-                    .onPreferenceChange(RemoteMessageHeightPreferenceKey.self) { value in
-                        remoteMessageHeight = value
-                    }
-
-                } else {
-                    if !addressBarModel.shouldShowAddressBar || !activeRemoteMessageModel.shouldShowRemoteMessage {
-                        Spacer(minLength: 32)
-                    }
-
-                    Group {
-                        remoteMessage()
-                            .if(addressBarModel.shouldShowAddressBar) { view in
-                                view.padding(.top, 16)
-                            }
-
-                        if addressBarModel.shouldShowAddressBar {
-                            BigSearchBox(isCompact: isCompactSearchBar(with: geometryProxy))
-                                .id(Const.searchBarIdentifier)
-                        }
-
-                        if model.isContinueSetUpAvailable {
-                            ContinueSetUpView()
-                                .visibility(model.isContinueSetUpVisible ? .visible : .gone)
-                                .padding(.top, continueSetUpCardsTopPadding)
-                        }
-
-                        Favorites()
-                            .visibility(model.isFavoriteVisible ? .visible : .gone)
-
-                        RecentlyVisited()
-                            .padding(.bottom, 16)
-                            .visibility(model.isRecentActivityVisible ? .visible : .gone)
-                    }
-                    .frame(width: Self.targetWidth)
+                if !addressBarModel.shouldShowAddressBar || !activeRemoteMessageModel.shouldShowRemoteMessage {
+                    Spacer(minLength: 32)
                 }
+
+                Group {
+                    remoteMessage()
+                        .if(addressBarModel.shouldShowAddressBar) { view in
+                            view.padding(.top, 16)
+                        }
+
+                    if addressBarModel.shouldShowAddressBar {
+                        BigSearchBox(isCompact: isCompactSearchBar(with: geometryProxy))
+                            .id(Const.searchBarIdentifier)
+                    }
+
+                    if model.isContinueSetUpAvailable {
+                        ContinueSetUpView()
+                            .visibility(model.isContinueSetUpVisible ? .visible : .gone)
+                            .padding(.top, continueSetUpCardsTopPadding)
+                    }
+
+                    Favorites()
+                        .visibility(model.isFavoriteVisible ? .visible : .gone)
+
+                    RecentlyVisited()
+                        .padding(.bottom, 16)
+                        .visibility(model.isRecentActivityVisible ? .visible : .gone)
+                }
+                .frame(width: Self.targetWidth)
             }
             .frame(maxWidth: .infinity)
-            .if(shouldCenterContent(with: geometryProxy)) { view in
-                view.frame(height: max(geometryProxy.size.height, totalHeight(with: geometryProxy)))
-            }
-        }
-
-        func isCompactSearchBar(with geometry: GeometryProxy) -> Bool {
-            return geometry.size.height < 650
-        }
-
-        private func totalHeight(with geometry: GeometryProxy) -> CGFloat {
-            let spacers = 40.0 * 2
-            var height = (isCompactSearchBar(with: geometry) ? BigSearchBox.Const.compactHeight : BigSearchBox.Const.totalHeight) + spacers
-            if model.isContinueSetUpAvailable && model.isContinueSetUpVisible {
-                height += continueSetUpModel.isMoreOrLessButtonNeeded ? 208 : 184
-                height += 32 + continueSetUpCardsTopPadding
-            }
-            if model.isFavoriteVisible {
-                height += 126 + 32
-            }
-            if model.isRecentActivityVisible {
-                height += 90 + 32
-            }
-            return height
         }
 
         @ViewBuilder
@@ -385,7 +363,7 @@ extension HomePage.Views {
 }
 
 /// This extension defines views and objects related to displaying Big Search Box.
-extension HomePage.Views.RootView {
+fileprivate extension HomePage.Views.RootView {
 
     func shouldCenterContent(with geometry: GeometryProxy) -> Bool {
         guard addressBarModel.shouldShowAddressBar else {
@@ -404,7 +382,27 @@ extension HomePage.Views.RootView {
             // 32px is the VStack spacing and 38px I don't really know (16px top padding of a Remote Message, 22px not sure)
             return geometry.size.height > (totalHeight(with: geometry) + 2 * remoteMessageHeight + 38 + 32 + 0.1 * geometry.size.height)
         }
-        return true
+        return geometry.size.height * 0.5 > (totalHeight(with: geometry) * 0.5 + 32 + 12 + 0.1 * geometry.size.height)
+    }
+
+    func totalHeight(with geometry: GeometryProxy) -> CGFloat {
+        let spacers = 32.0 * 2
+        var height = (isCompactSearchBar(with: geometry) ? BigSearchBox.Const.compactHeight : BigSearchBox.Const.totalHeight) + spacers
+        if model.isContinueSetUpAvailable && model.isContinueSetUpVisible {
+            height += continueSetUpModel.isMoreOrLessButtonNeeded ? 208 : 184
+            height += 32 + continueSetUpCardsTopPadding
+        }
+        if model.isFavoriteVisible {
+            height += 126 + 32
+        }
+        if model.isRecentActivityVisible {
+            height += 90 + 32
+        }
+        return height
+    }
+
+    func isCompactSearchBar(with geometry: GeometryProxy) -> Bool {
+        geometry.size.height < 650
     }
 
     @ViewBuilder
