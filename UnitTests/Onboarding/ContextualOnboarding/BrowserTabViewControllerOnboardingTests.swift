@@ -220,6 +220,23 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
         XCTAssertTrue(delegate.didCallHighlightFireButton)
     }
 
+    func testWhenFireButtonPressedThenAskDelegateToRemoveViewHighlights() throws {
+        // GIVEN
+        dialogProvider.dialog = .tryFireButton
+        let url = try XCTUnwrap(URL(string: "some.url"))
+        let delegate = BrowserTabViewControllerDelegateMock()
+        viewController.delegate = delegate
+        XCTAssertFalse(delegate.didCallDismissViewHighlight)
+        tab.navigateTo(url: url)
+        wait(for: [expectation], timeout: 3.0)
+
+        // WHEN
+        factory.performOnFireButtonPressed()
+
+        // THEN
+        XCTAssertTrue(delegate.didCallDismissViewHighlight)
+    }
+
 }
 
 class MockDialogsProvider: ContextualOnboardingDialogTypeProviding, ContextualOnboardingStateUpdater {
@@ -245,21 +262,27 @@ class CapturingDialogFactory: ContextualDaxDialogsFactory {
     var capturedDelegate: OnboardingNavigationDelegate?
 
     private var onGotItPressed: (() -> Void)?
+    private var onFireButtonPressed: (() -> Void)?
 
     init(expectation: XCTestExpectation) {
         self.expectation = expectation
     }
 
-    func makeView(for type: ContextualDialogType, delegate: OnboardingNavigationDelegate, onDismiss: @escaping () -> Void, onGotItPressed: @escaping () -> Void) -> AnyView {
+    func makeView(for type: ContextualDialogType, delegate: OnboardingNavigationDelegate, onDismiss: @escaping () -> Void, onGotItPressed: @escaping () -> Void, onFireButtonPressed: @escaping () -> Void) -> AnyView {
         capturedType = type
         capturedDelegate = delegate
         self.onGotItPressed = onGotItPressed
+        self.onFireButtonPressed = onFireButtonPressed
         expectation.fulfill()
         return AnyView(OnboardingFinalDialog(highFiveAction: {}))
     }
 
     func performOnGotItPressed() {
         onGotItPressed?()
+    }
+
+    func performOnFireButtonPressed() {
+        onFireButtonPressed?()
     }
 
 }
