@@ -24,10 +24,14 @@ protocol DataBrokerProtectionOperationQueue {
     var maxConcurrentOperationCount: Int { get set }
     func cancelAllOperations()
     func addOperation(_ op: Operation)
-    func addBarrierBlock(_ barrier: @escaping @Sendable () -> Void)
+    func addBarrierBlock1(_ barrier: @escaping @Sendable () -> Void)
 }
 
-extension OperationQueue: DataBrokerProtectionOperationQueue {}
+extension OperationQueue: DataBrokerProtectionOperationQueue {
+    func addBarrierBlock1(_ barrier: @escaping () -> Void) {
+        addBarrierBlock(barrier)
+    }
+}
 
 enum DataBrokerProtectionQueueMode {
     case idle
@@ -251,7 +255,7 @@ private extension DefaultDataBrokerProtectionQueueManager {
             return
         }
 
-        operationQueue.addBarrierBlock { [weak self] in
+        operationQueue.addBarrierBlock1 { [weak self] in
             let errorCollection = DataBrokerProtectionAgentErrorCollection(oneTimeError: nil, operationErrors: self?.operationErrorsForCurrentOperations())
             errorHandler?(errorCollection)
             self?.resetMode(clearErrors: true)

@@ -16,12 +16,12 @@
 //  limitations under the License.
 //
 
-import XCTest
-import SwiftUI
-import Onboarding
-import Combine
 import BrowserServicesKit
+import Combine
+import Onboarding
 import PrivacyDashboard
+import struct SwiftUI.AnyView
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class BrowserTabViewControllerOnboardingTests: XCTestCase {
