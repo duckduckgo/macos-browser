@@ -450,6 +450,8 @@ final class BrowserTabViewController: NSViewController {
             if case .showFireButton = currentState {
                 delegate?.highlightFireButton()
             }
+        }, onFireButtonPressed: { [weak delegate] in
+            delegate?.dismissViewHighlight()
         })
         let hostingController = NSHostingController(rootView: AnyView(daxView))
 
