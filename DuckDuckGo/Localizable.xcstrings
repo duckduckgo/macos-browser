@@ -14371,13 +14371,13 @@
       }
     },
     "contextual.onboarding.try-fire-button.title" : {
-      "comment" : "Message of a popover on the browser that invites the user to try visiting the browser Fire Button, the parameter is another string (do not remove \n\n%1$@",
+      "comment" : "Message of a popover on the browser that invites the user to try visiting the browser Fire Button, the parameter is another string (do not remove * and \n\n%1$@",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Instantly clear your browsing activity with the Fire Button.\n\n%1$@"
+            "value" : "Instantly clear your browsing activity with the *Fire Button*.\n\n%1$@"
           }
         }
       }

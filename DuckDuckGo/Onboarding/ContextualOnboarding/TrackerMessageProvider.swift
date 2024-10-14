@@ -83,7 +83,14 @@ struct TrackerMessageProvider: TrackerMessageProviding {
             message = UserText.ContextualOnboarding.daxDialogBrowsingWithoutTrackers
         }
         guard let message else { return nil }
-        return attributedString(from: message, fontSize: OnboardingDialogsContants.titleFontSize)
+        let smallString = UserText.ContextualOnboarding.daxDialogTapTheShield
+        return NSMutableAttributedString.attributedString(
+            from: message,
+            defaultFontSize: OnboardingDialogsContants.titleFontSize,
+            boldFontSize: OnboardingDialogsContants.titleFontSize,
+            customPart: smallString,
+            customFontSize: OnboardingDialogsContants.messageFontSize
+        )
     }
 
     private func isFacebookOrGoogle(_ url: URL) -> Bool {

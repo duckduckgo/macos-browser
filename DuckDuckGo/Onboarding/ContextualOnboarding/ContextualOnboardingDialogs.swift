@@ -133,33 +133,14 @@ struct OnboardingFirstSearchDoneDialog: View {
 }
 
 struct OnboardingFireButtonDialogContent: View {
-    private let attributedMessage: NSAttributedString = {
-        let firstString = String(format: UserText.ContextualOnboarding.onboardingTryFireButtonTitle, UserText.ContextualOnboarding.onboardingTryFireButtonMessage)
-
-        let boldString = "Fire Button"
-        let attributedString = NSMutableAttributedString(string: firstString)
-        let boldFontAttribute: [NSAttributedString.Key: Any] = [
-            .font: NSFont.systemFont(ofSize: OnboardingDialogsContants.titleFontSize, weight: .bold)
-        ]
-        if let boldRange = firstString.range(of: boldString) {
-            let nsBoldRange = NSRange(boldRange, in: firstString)
-            attributedString.addAttributes(boldFontAttribute, range: nsBoldRange)
-        }
-
-        let smallString = UserText.ContextualOnboarding.onboardingTryFireButtonMessage
-        let smallFont = NSFont.systemFont(ofSize: OnboardingDialogsContants.messageFontSize)
-        let smallFontAttribute: [NSAttributedString.Key: Any] = [.font: smallFont]
-
-        let fullText = attributedString.string as NSString
-        let smallRange = fullText.range(of: smallString)
-
-        if smallRange.location != NSNotFound {
-            attributedString.addAttributes(smallFontAttribute, range: smallRange)
-        }
-
-        return attributedString
-    }()
-    let fireTitleFont = Font.system(size: OnboardingDialogsContants.titleFontSize, weight: .regular, design: .rounded)
+    static let firstString = String(format: UserText.ContextualOnboarding.onboardingTryFireButtonTitle, UserText.ContextualOnboarding.onboardingTryFireButtonMessage)
+    private let attributedMessage = NSMutableAttributedString.attributedString(
+        from: Self.firstString,
+        defaultFontSize: OnboardingDialogsContants.titleFontSize,
+        boldFontSize: OnboardingDialogsContants.titleFontSize,
+        customPart: UserText.ContextualOnboarding.onboardingTryFireButtonMessage,
+        customFontSize: OnboardingDialogsContants.messageFontSize
+    )
 
     let viewModel: OnboardingFireButtonDialogViewModel
     @State private var showNextScreen: Bool = false
