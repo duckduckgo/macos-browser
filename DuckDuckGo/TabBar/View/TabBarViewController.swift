@@ -1262,6 +1262,18 @@ extension TabBarViewController: TabBarViewItemDelegate {
 
 }
 
+extension TabBarViewController {
+
+    func startFireButtonPulseAnimation() {
+        ContextualOnboardingViewHighlighter.highlight(view: fireButton, inParent: view)
+    }
+
+    func stopFireButtonPulseAnimation() {
+        ContextualOnboardingViewHighlighter.stopHighlighting(view: fireButton)
+    }
+
+}
+
 // MARK: - TabBarViewItemPasteboardWriter
 
 final class TabBarViewItemPasteboardWriter: NSObject, NSPasteboardWriting {

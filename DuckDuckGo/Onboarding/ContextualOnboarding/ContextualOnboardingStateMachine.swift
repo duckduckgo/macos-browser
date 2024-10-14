@@ -24,6 +24,7 @@ protocol ContextualOnboardingDialogTypeProviding {
 }
 
 protocol ContextualOnboardingStateUpdater {
+    var state: ContextualOnboardingState { get }
     func updateStateFor(tab: Tab)
     func gotItPressed()
     func fireButtonUsed()
