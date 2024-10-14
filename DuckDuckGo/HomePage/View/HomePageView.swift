@@ -388,6 +388,9 @@ extension HomePage.Views {
 extension HomePage.Views.RootView {
 
     func shouldCenterContent(with geometry: GeometryProxy) -> Bool {
+        guard addressBarModel.shouldShowAddressBar else {
+            return false
+        }
         if model.isContinueSetUpAvailable && model.isContinueSetUpVisible && continueSetUpModel.shouldShowAllFeatures {
             return false
         }
