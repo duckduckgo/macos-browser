@@ -329,7 +329,9 @@ extension AppDelegate {
     }
 
     @objc func resetRemoteMessages(_ sender: Any?) {
-        remoteMessagingClient.store?.resetRemoteMessages()
+        Task {
+            await remoteMessagingClient.store?.resetRemoteMessages()
+        }
     }
 
     @objc func resetNewTabPageCustomization(_ sender: Any?) {
@@ -834,9 +836,12 @@ extension MainViewController {
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowEmailProtection.rawValue)
     }
 
-    @objc func resetDuckPlayerOnboarding(_ sender: Any?) {
-        DefaultDuckPlayerOnboardingDecider().reset()
-        DuckPlayerOnboardingExperiment().reset()
+    @objc func resetOnboarding(_ sender: Any?) {
+        UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.onboardingFinished.rawValue)
+    }
+
+    @objc func resetContextualOnboarding(_ sender: Any?) {
+        Application.appDelegate.onboardingStateMachine.state = .notStarted
     }
 
     @objc func resetDuckPlayerPreferences(_ sender: Any?) {

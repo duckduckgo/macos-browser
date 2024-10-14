@@ -234,7 +234,7 @@ extension HomePage.Views {
                         messageId: remoteMessage.id,
                         modelType: modelType,
                         onDidClose: { action in
-                            activeRemoteMessageModel.dismissRemoteMessage(with: action)
+                            await activeRemoteMessageModel.dismissRemoteMessage(with: action)
                         },
                         onDidAppear: {
                             activeRemoteMessageModel.isViewOnScreen = true

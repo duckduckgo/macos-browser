@@ -202,10 +202,6 @@ extension TabExtensionsBuilder {
         }
 
         add {
-            DuckPlayerOnboardingTabExtension(onboardingDecider: duckPlayerOnboardingDecider)
-        }
-
-        add {
             SpecialErrorPageTabExtension(webViewPublisher: args.webViewFuture,
                                   scriptsPublisher: userScripts.compactMap { $0 },
                                   phishingDetector: dependencies.phishingDetector,

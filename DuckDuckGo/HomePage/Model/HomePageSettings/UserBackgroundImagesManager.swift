@@ -110,7 +110,17 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
         }
     }
 
+    /**
+     * These caches store up to 4 images each, as enforced by the app UI where you can't add more images.
+     */
+    private var imagesCache: [UserBackgroundImage: NSImage] = [:]
+    private var thumbnailsCache: [UserBackgroundImage: NSImage] = [:]
+
     func image(for userBackgroundImage: UserBackgroundImage) -> NSImage? {
+        if let cachedImage = imagesCache[userBackgroundImage] {
+            return cachedImage
+        }
+
         let imagePath = storageLocation.appendingPathComponent(userBackgroundImage.fileName).path
         guard let image = NSImage(contentsOfFile: imagePath) else {
             if !pathsForNotFoundImages.contains(imagePath) {
@@ -120,10 +130,15 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
             Logger.homePageSettings.error("Image for \(userBackgroundImage.fileName) not found")
             return nil
         }
+        imagesCache[userBackgroundImage] = image
         return image
     }
 
     func thumbnailImage(for userBackgroundImage: UserBackgroundImage) -> NSImage? {
+        if let cachedThumbnail = thumbnailsCache[userBackgroundImage] {
+            return cachedThumbnail
+        }
+
         let thumbnailPath = thumbnailsStorageLocation.appendingPathComponent(userBackgroundImage.fileName).path
         guard let thumbnail = NSImage(contentsOfFile: thumbnailPath) else {
             if !pathsForNotFoundImages.contains(thumbnailPath) {
@@ -133,6 +148,7 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
             Logger.homePageSettings.error("Thumbnail for \(userBackgroundImage.fileName) not found, using full-size image as thumbnail")
             return image(for: userBackgroundImage)
         }
+        thumbnailsCache[userBackgroundImage] = thumbnail
         return thumbnail
     }
 
@@ -222,6 +238,8 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
     private func deleteImageFiles(for userBackgroundImage: UserBackgroundImage) {
         FileManager.default.remove(fileAtURL: storageLocation.appendingPathComponent(userBackgroundImage.fileName))
         FileManager.default.remove(fileAtURL: thumbnailsStorageLocation.appendingPathComponent(userBackgroundImage.fileName))
+        imagesCache.removeValue(forKey: userBackgroundImage)
+        thumbnailsCache.removeValue(forKey: userBackgroundImage)
         Logger.homePageSettings.debug("Deleted user background image files for \(userBackgroundImage.fileName)")
     }
 

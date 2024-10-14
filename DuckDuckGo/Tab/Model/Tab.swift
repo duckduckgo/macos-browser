@@ -289,7 +289,6 @@ protocol NewWindowPolicyDecisionMaker {
                 self?.onDuckDuckGoEmailSignOut(notification)
             }
 
-        self.audioState = webView.audioState
         addDeallocationChecks(for: webView)
     }
 
@@ -358,7 +357,6 @@ protocol NewWindowPolicyDecisionMaker {
             webView.stopAllMedia(shouldStopLoading: true)
 
             userContentController?.cleanUpBeforeClosing()
-
 #if DEBUG
             if case .normal = NSApp.runType {
                 webView.assertObjectDeallocated(after: 4.0)
@@ -422,6 +420,16 @@ protocol NewWindowPolicyDecisionMaker {
     // MARK: - Properties
 
     let webView: WebView
+
+    var audioState: WebView.AudioState {
+        webView.audioState
+    }
+
+    @Published private(set) var audioStateTest: WebView.AudioState = .unmuted(isPlayingAudio: false)
+
+    var audioStatePublisher: AnyPublisher<WebView.AudioState, Never> {
+        webView.audioStatePublisher
+    }
 
     var contentChangeEnabled = true
 
@@ -810,11 +818,9 @@ protocol NewWindowPolicyDecisionMaker {
         }
     }
 
-    @Published private(set) var audioState: WKWebView.AudioState?
-
     func muteUnmuteTab() {
         webView.audioState.toggle()
-        audioState = webView.audioState
+        objectWillChange.send()
     }
 
     private enum ReloadIfNeededSource {
@@ -1001,6 +1007,10 @@ protocol NewWindowPolicyDecisionMaker {
         navigationDelegate.$currentNavigation.sink { [weak self] navigation in
             self?.updateCanGoBackForward(withCurrentNavigation: navigation)
         }.store(in: &webViewCancellables)
+
+        audioStatePublisher
+            .assign(to: \.audioStateTest, onWeaklyHeld: self)
+            .store(in: &webViewCancellables)
 
         // background tab loading should start immediately
         DispatchQueue.main.async {

@@ -55,20 +55,17 @@ final class DuckPlayerTabExtension {
     private weak var youtubePlayerScript: YoutubePlayerUserScript?
     private let onboardingDecider: DuckPlayerOnboardingDecider
     private var shouldSelectNextNewTab: Bool?
-    private let experimentManager: OnboardingExperimentManager
 
     init(duckPlayer: DuckPlayer,
          isBurner: Bool,
          scriptsPublisher: some Publisher<some YoutubeScriptsProvider, Never>,
          webViewPublisher: some Publisher<WKWebView, Never>,
          preferences: DuckPlayerPreferences = .shared,
-         onboardingDecider: DuckPlayerOnboardingDecider,
-         experimentManager: OnboardingExperimentManager = DuckPlayerOnboardingExperiment()) {
+         onboardingDecider: DuckPlayerOnboardingDecider) {
         self.duckPlayer = duckPlayer
         self.isBurner = isBurner
         self.preferences = preferences
         self.onboardingDecider = onboardingDecider
-        self.experimentManager = experimentManager
         webViewPublisher.sink { [weak self] webView in
             self?.webView = webView
         }.store(in: &cancellables)
@@ -378,7 +375,6 @@ extension DuckPlayerTabExtension: NavigationResponder {
                           frequency: .legacyDaily,
                           withAdditionalParameters: params)
 
-            experimentManager.fireWeeklyUniqueViewPixel(extraParams: params)
         }
     }
 

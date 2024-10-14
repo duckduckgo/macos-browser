@@ -21,6 +21,7 @@ import SwiftUI
 import Onboarding
 import Combine
 import BrowserServicesKit
+import PrivacyDashboard
 @testable import DuckDuckGo_Privacy_Browser
 
 final class BrowserTabViewControllerOnboardingTests: XCTestCase {
@@ -28,7 +29,7 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
     var viewController: BrowserTabViewController!
     var dialogProvider: MockDialogsProvider!
     var factory: CapturingDialogFactory!
-    var tab: DuckDuckGo_Privacy_Browser.Tab!
+    var tab: Tab!
     var cancellables: Set<AnyCancellable> = []
     let expectation = XCTestExpectation()
 
@@ -37,7 +38,7 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
         let tabCollectionViewModel = TabCollectionViewModel()
         dialogProvider = MockDialogsProvider()
         factory = CapturingDialogFactory(expectation: expectation)
-        tab = DuckDuckGo_Privacy_Browser.Tab()
+        tab = Tab()
         tab.setContent(.url(URL.duckDuckGo, credential: nil, source: .appOpenUrl))
         let tabViewModel = TabViewModel(tab: tab)
         viewController = BrowserTabViewController(tabCollectionViewModel: tabCollectionViewModel, onboardingDialogTypeProvider: dialogProvider, onboardingDialogFactory: factory, featureFlagger: MockFeatureFlagger())
@@ -125,15 +126,22 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
 
 }
 
-class MockDialogsProvider: ContextualOnboardingDialogTypeProviding {
+class MockDialogsProvider: ContextualOnboardingDialogTypeProviding, ContextualOnboardingStateUpdater {
+    func updateStateFor(tab: DuckDuckGo_Privacy_Browser.Tab) {}
+
     var dialog: ContextualDialogType?
 
-    func dialogTypeForTab(_ tab: DuckDuckGo_Privacy_Browser.Tab) -> ContextualDialogType? {
+    func dialogTypeForTab(_ tab: Tab, privacyInfo: PrivacyInfo?) -> ContextualDialogType? {
         return dialog
     }
+
+    func gotItPressed() {}
+
+    func fireButtonUsed() {}
 }
 
 class CapturingDialogFactory: ContextualDaxDialogsFactory {
+
     let expectation: XCTestExpectation
     var capturedType: ContextualDialogType?
     var capturedDelegate: OnboardingNavigationDelegate?
@@ -142,7 +150,7 @@ class CapturingDialogFactory: ContextualDaxDialogsFactory {
         self.expectation = expectation
     }
 
-    func makeView(for type: ContextualDialogType, delegate: OnboardingNavigationDelegate, onDismiss: @escaping () -> Void) -> AnyView {
+    func makeView(for type: ContextualDialogType, delegate: OnboardingNavigationDelegate, onDismiss: @escaping () -> Void, onGotItPressed: @escaping () -> Void) -> AnyView {
         capturedType = type
         capturedDelegate = delegate
         expectation.fulfill()
