@@ -291,17 +291,12 @@ final class BrowserTabViewControllerDelegateMock: BrowserTabViewControllerDelega
     private(set) var didCallHighlightFireButton = false
     private(set) var didCallDismissViewHighlight = false
 
-
     func highlightFireButton() {
         didCallHighlightFireButton = true
     }
 
     func dismissViewHighlight() {
         didCallDismissViewHighlight = true
-    }
-
-    func highlightPrivacyShield() {
-
     }
 
 }
