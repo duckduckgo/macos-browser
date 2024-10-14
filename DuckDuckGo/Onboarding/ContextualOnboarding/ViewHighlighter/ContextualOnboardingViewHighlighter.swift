@@ -51,20 +51,17 @@ enum ContextualOnboardingViewHighlighter {
 
     private static func findViewWithIdentifier(in view: NSView, identifier: NSUserInterfaceItemIdentifier) -> NSView? {
         // Check the current view's superview
-        if let superview = view.superview {
-            // Check all subviews of the superview
-            for subview in superview.subviews {
-                if subview.identifier == identifier {
-                    return subview
-                }
-            }
+        // If no matching view is found, return nil
+        guard let superview = view.superview else { return nil }
 
-            // Recursively check the superview's superview
-            return findViewWithIdentifier(in: superview, identifier: identifier)
+        // Check all subviews of the superview
+        for subview in superview.subviews where subview.identifier == identifier {
+            return subview
         }
 
-        // If no matching view is found, return nil
-        return nil
+        // Recursively check the superview's superview
+        return findViewWithIdentifier(in: superview, identifier: identifier)
+
     }
 
 }
