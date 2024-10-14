@@ -1,5 +1,4 @@
 {
-  "originHash" : "733e03047e060ab329e517055580052eeeb8980809fdf47ad605310b5d41b279",
   "pins" : [
     {
       "identity" : "apple-toolbox",
@@ -34,7 +33,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "dominik/xcode-16",
-        "revision" : "d93ca97bec5cbfd00bf60e8b9e96737c71a4ab50"
+        "revision" : "c4aaa669840308ecc1d73216f73a101900a73459"
       }
     },
     {
@@ -191,5 +190,5 @@
       }
     }
   ],
-  "version" : 3
+  "version" : 2
 }
