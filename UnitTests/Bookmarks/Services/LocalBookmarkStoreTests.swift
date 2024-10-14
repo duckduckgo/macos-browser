@@ -60,8 +60,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
         let bookmark = Bookmark(id: UUID().uuidString, url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: true, parentFolderUUID: "bookmarks_root")
 
-        bookmarkStore.save(bookmark: bookmark, index: nil) { (success, error) in
-            XCTAssert(success)
+        bookmarkStore.save(bookmark: bookmark, index: nil) { error in
             XCTAssertNil(error)
 
             savingExpectation.fulfill()
@@ -90,14 +89,12 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let loadingExpectation = self.expectation(description: "Loading")
 
         let bookmark = Bookmark(id: UUID().uuidString, url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: true)
-        bookmarkStore.save(bookmark: bookmark, index: nil) { (success, error) in
-            XCTAssert(success)
+        bookmarkStore.save(bookmark: bookmark, index: nil) { error in
             XCTAssertNil(error)
 
             savingExpectation.fulfill()
 
-            bookmarkStore.remove(objectsWithUUIDs: [bookmark.id]) { (success, error) in
-                XCTAssert(success)
+            bookmarkStore.remove(objectsWithUUIDs: [bookmark.id]) { error in
                 XCTAssertNil(error)
 
                 removingExpectation.fulfill()
@@ -126,8 +123,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
         let bookmark = Bookmark(id: UUID().uuidString, url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: true)
 
-        bookmarkStore.save(bookmark: bookmark, index: nil) { (success, error) in
-            XCTAssert(success)
+        bookmarkStore.save(bookmark: bookmark, index: nil) { error in
             XCTAssertNil(error)
 
             savingExpectation.fulfill()
@@ -159,8 +155,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
         let folder = BookmarkFolder(id: UUID().uuidString, title: "Folder", parentFolderUUID: "bookmarks_root")
 
-        bookmarkStore.save(folder: folder) { (success, error) in
-            XCTAssert(success)
+        bookmarkStore.save(folder: folder) { error in
             XCTAssertNil(error)
 
             savingExpectation.fulfill()
@@ -191,14 +186,12 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let childFolder = BookmarkFolder(id: UUID().uuidString, title: "Child", parentFolderUUID: parentId)
         let parentFolder = BookmarkFolder(id: parentId, title: "Parent", parentFolderUUID: "bookmarks_root", children: [childFolder])
 
-        bookmarkStore.save(folder: parentFolder) { (success, error) in
-            XCTAssert(success)
+        bookmarkStore.save(folder: parentFolder) { error in
             XCTAssertNil(error)
 
             saveParentExpectation.fulfill()
 
-            bookmarkStore.save(folder: childFolder) { (success, error) in
-                XCTAssert(success)
+            bookmarkStore.save(folder: childFolder) { error in
                 XCTAssertNil(error)
 
                 saveChildExpectation.fulfill()
@@ -236,14 +229,12 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let bookmark = Bookmark(id: UUID().uuidString, url: "https://example.com", title: "Example", isFavorite: false, parentFolderUUID: parentId)
         let folder = BookmarkFolder(id: parentId, title: "Parent", parentFolderUUID: "bookmarks_root", children: [bookmark])
 
-        bookmarkStore.save(folder: folder) { (success, error) in
-            XCTAssert(success)
+        bookmarkStore.save(folder: folder) { error in
             XCTAssertNil(error)
 
             saveFolderExpectation.fulfill()
 
-            bookmarkStore.save(bookmark: bookmark, index: nil) { (success, error) in
-                XCTAssert(success)
+            bookmarkStore.save(bookmark: bookmark, index: nil) { error in
                 XCTAssertNil(error)
 
                 saveBookmarkExpectation.fulfill()
