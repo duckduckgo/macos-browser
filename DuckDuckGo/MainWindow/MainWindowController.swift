@@ -319,6 +319,9 @@ extension MainWindowController: NSWindowDelegate {
         alert.beginSheetModal(for: window) { response in
             downloadsFinishedCancellable.cancel()
             if response == .OK {
+                fireWindowDownloads.forEach { download in
+                    download.cancel()
+                }
                 self.animateBurningIfNeededAndClose(window)
                 return
             } else if self.mainViewController.tabCollectionViewModel.tabs.isEmpty {
