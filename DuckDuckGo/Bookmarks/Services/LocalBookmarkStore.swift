@@ -308,12 +308,13 @@ final class LocalBookmarkStore: BookmarkStore {
         }
     }
 
-    func save(entitiesAtIndices: [(entity: BaseBookmarkEntity, index: Int?)], completion: @escaping (Error?) -> Void) {
+    func save(entitiesAtIndices: [(entity: BaseBookmarkEntity, index: Int?, indexInFavoritesArray: Int?)], completion: @escaping (Error?) -> Void) {
         applyChangesAndSave(changes: { [weak self] context in
             guard let self else { throw BookmarkStoreError.storeDeallocated }
 
+            var entitiesByUUID: [String: BookmarkEntity] = [:]
             var objectsToInsertIntoParent = [BookmarkEntity: ([BookmarkEntity], IndexSet)]()
-            for (entity, index) in entitiesAtIndices.sorted(by: { $0.index ?? Int.max < $1.index ?? Int.max }) {
+            for (entity, index, _) in entitiesAtIndices.sorted(by: { $0.index ?? Int.max < $1.index ?? Int.max }) {
                 let parentEntity: BookmarkEntity
                 if let parentId = entity.parentFolderUUID, parentId != PseudoFolder.bookmarks.id, parentId != "bookmarks_root",
                    let parentFetchRequestResult = try? context.fetch(BaseBookmarkEntity.singleEntity(with: parentId)).first {
@@ -326,6 +327,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 }
 
                 let bookmarkMO = BookmarkEntity(context: context)
+
                 switch entity {
                 case let folder as BookmarkFolder:
                     bookmarkMO.title = folder.title
@@ -334,15 +336,13 @@ final class LocalBookmarkStore: BookmarkStore {
                     bookmarkMO.title = bookmark.title
                     bookmarkMO.url = bookmark.url
                     bookmarkMO.isFolder = false
-
-                    if bookmark.isFavorite {
-                        bookmarkMO.addToFavorites(with: favoritesDisplayMode, in: context)
-                    }
                 default:
                     fatalError("Unexpected Bookmark Entity type \(entity)")
                 }
 
                 bookmarkMO.uuid = entity.id
+                entitiesByUUID[entity.id] = bookmarkMO
+
                 withUnsafeMutablePointer(to: &objectsToInsertIntoParent[parentEntity, default: ([], IndexSet())]) {
                     $0.pointee.0.append(bookmarkMO)
                     if let index {
@@ -350,6 +350,27 @@ final class LocalBookmarkStore: BookmarkStore {
                     }
                 }
             }
+
+            let favoritesRoot = favoritesRoot(in: context)
+            let displayedFavoritesFolderUUID = favoritesDisplayMode.displayedFolder.rawValue
+            let displayedFavoritesFolder = BookmarkUtils.fetchFavoritesFolder(withUUID: displayedFavoritesFolderUUID, in: context)
+            let sortedEntitiesByFavoritesIndex = entitiesAtIndices
+                .sorted { ($0.indexInFavoritesArray ?? Int.max) < ($1.indexInFavoritesArray ?? Int.max) }
+
+            for (entity, _, indexInFavoritesArray) in sortedEntitiesByFavoritesIndex {
+                guard let bookmarkMO = entitiesByUUID[entity.id] else {
+                    return
+                }
+
+                if let bookmark = entity as? Bookmark,
+                   bookmark.isFavorite,
+                   let favoritesRoot = favoritesRoot,
+                   let displayedFavoritesFolder = displayedFavoritesFolder {
+                    bookmarkMO.addToFavorites(insertAt: indexInFavoritesArray, favoritesRoot: favoritesRoot)
+                    bookmarkMO.addToFavorites(favoritesRoot: displayedFavoritesFolder)
+                }
+            }
+
             for (parentEntity, (managedObjects, insertionIndices)) in objectsToInsertIntoParent {
                 move(entities: managedObjects, to: insertionIndices, within: parentEntity)
             }
@@ -732,7 +753,6 @@ final class LocalBookmarkStore: BookmarkStore {
         }, onDidSave: {
             DispatchQueue.main.async { completion(nil) }
         })
-
     }
 
     // MARK: - Import

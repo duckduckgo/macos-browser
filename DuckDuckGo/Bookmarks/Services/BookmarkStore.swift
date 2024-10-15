@@ -47,7 +47,7 @@ protocol BookmarkStore {
     func applyFavoritesDisplayMode(_ configuration: FavoritesDisplayMode)
 
     func loadAll(type: BookmarkStoreFetchPredicateType, completion: @escaping ([BaseBookmarkEntity]?, Error?) -> Void)
-    func save(entitiesAtIndices: [(entity: BaseBookmarkEntity, index: Int?)], completion: @escaping (Error?) -> Void)
+    func save(entitiesAtIndices: [(entity: BaseBookmarkEntity, index: Int?, indexInFavoritesArray: Int?)], completion: @escaping (Error?) -> Void)
     func saveBookmarks(for websitesInfo: [WebsiteInfo], inNewFolderNamed folderName: String, withinParentFolder parent: ParentFolderType)
     func remove(objectsWithUUIDs: [String], completion: @escaping (Bool, Error?) -> Void)
     func update(bookmark: Bookmark)
@@ -82,7 +82,7 @@ extension BookmarkStore {
     }
 
     func save(folder: BookmarkFolder, index: Int? = nil, completion: @escaping (Bool, Error?) -> Void) {
-        save(entitiesAtIndices: [(folder, index)]) { error in
+        save(entitiesAtIndices: [(folder, index, nil)]) { error in
             completion(error == nil, error)
         }
     }
@@ -101,7 +101,7 @@ extension BookmarkStore {
     }
 
     func save(bookmark: Bookmark, index: Int? = nil, completion: @escaping (Bool, Error?) -> Void) {
-        save(entitiesAtIndices: [(bookmark, index)]) { error in
+        save(entitiesAtIndices: [(bookmark, index, nil)]) { error in
             completion(error == nil, error)
         }
     }

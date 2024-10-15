@@ -254,15 +254,15 @@ final class LocalBookmarkManager: BookmarkManager {
 
     @MainActor
     func restore(_ restorableEntities: [RestorableBookmarkEntity], undoManager: UndoManager) {
-        let entitiesAtIndices = restorableEntities.map { entity -> (entity: BaseBookmarkEntity, index: Int?) in
+        let entitiesAtIndices = restorableEntities.map { entity -> (entity: BaseBookmarkEntity, index: Int?, indexInFavoritesArray: Int?) in
             switch entity {
-            case let .bookmark(url: url, title: title, isFavorite: isFavorite, parent: parent, index: index):
+            case let .bookmark(url: url, title: title, isFavorite: isFavorite, parent: parent, index: index, indexInFavoritesArray: indexInFavoritesArray):
                 let bookmark = Bookmark(id: UUID().uuidString, url: url, title: title, isFavorite: isFavorite, parentFolderUUID: parent?.actualId)
                 list?.insert(bookmark)
-                return (bookmark, index)
+                return (bookmark, index, indexInFavoritesArray)
 
             case let .folder(title: title, parent: parent, index: index, originalId: originalId):
-                return (BookmarkFolder(id: originalId.newId(), title: title, parentFolderUUID: parent?.actualId, children: []), index)
+                return (BookmarkFolder(id: originalId.newId(), title: title, parentFolderUUID: parent?.actualId, children: []), index, nil)
             }
         }
         bookmarkStore.save(entitiesAtIndices: entitiesAtIndices) { [weak self] _ in
@@ -540,14 +540,14 @@ final class KnownBookmarkFolderIdList {
     }
 }
 enum RestorableBookmarkEntity {
-    case bookmark(url: String, title: String, isFavorite: Bool, parent: KnownBookmarkFolderIdList?, index: Int?)
+    case bookmark(url: String, title: String, isFavorite: Bool, parent: KnownBookmarkFolderIdList?, index: Int?, indexInFavoritesArray: Int?)
     case folder(title: String, parent: KnownBookmarkFolderIdList?, index: Int?, originalId: KnownBookmarkFolderIdList)
 
     @MainActor
-    init(bookmarkEntity: BaseBookmarkEntity, index: Int?) {
+    init(bookmarkEntity: BaseBookmarkEntity, index: Int?, indexInFavoritesArray: Int?) {
         switch bookmarkEntity {
         case let bookmark as Bookmark:
-            self = .bookmark(url: bookmark.url, title: bookmark.title, isFavorite: bookmark.isFavorite, parent: bookmark.parentFolderUUID.map(KnownBookmarkFolderIdList.list(withId:)), index: index)
+            self = .bookmark(url: bookmark.url, title: bookmark.title, isFavorite: bookmark.isFavorite, parent: bookmark.parentFolderUUID.map(KnownBookmarkFolderIdList.list(withId:)), index: index, indexInFavoritesArray: indexInFavoritesArray)
         case let folder as BookmarkFolder:
             self = .folder(title: folder.title, parent: folder.parentFolderUUID.map(KnownBookmarkFolderIdList.list(withId:)), index: index, originalId: .list(withId: folder.id))
         default:
@@ -557,21 +557,21 @@ enum RestorableBookmarkEntity {
 
     var parent: KnownBookmarkFolderIdList? {
         switch self {
-        case .bookmark(_, _, _, parent: let parent, index: _),
+        case .bookmark(_, _, _, parent: let parent, index: _, indexInFavoritesArray: _),
              .folder(_, parent: let parent, index: _, originalId: _):
             return parent
         }
     }
     var index: Int? {
         switch self {
-        case .bookmark(_, _, _, _, index: let index),
+        case .bookmark(_, _, _, _, index: let index, indexInFavoritesArray: _),
              .folder(_, _, index: let index, originalId: _):
             return index
         }
     }
     var title: String {
         switch self {
-        case .bookmark(_, title: let title, _, _, _),
+        case .bookmark(_, title: let title, _, _, _, _),
              .folder(title: let title, _, _, originalId: _):
             return title
         }
@@ -603,7 +603,12 @@ extension [RestorableBookmarkEntity] {
                 removedFolderStack.append((folder, index))
             }
 
-            return RestorableBookmarkEntity(bookmarkEntity: entity, index: index)
+            if let bookmark = entity as? Bookmark, bookmark.isFavorite {
+                let indexInFavoritesArray = bookmarkManager.list?.favoriteBookmarks.firstIndex(of: bookmark)
+                return RestorableBookmarkEntity(bookmarkEntity: bookmark, index: index, indexInFavoritesArray: indexInFavoritesArray)
+            }
+
+            return RestorableBookmarkEntity(bookmarkEntity: entity, index: index, indexInFavoritesArray: nil)
         }.sorted {
             $0.index ?? Int.max < $1.index ?? Int.max
         }
@@ -614,7 +619,7 @@ extension [RestorableBookmarkEntity] {
         while let (folder, _) = removedFolderStack.popLast() {
             for entity in folder.children {
                 // children items of a removed folder are inserted in the original order so we don‘t need to track their indices
-                self.append(RestorableBookmarkEntity(bookmarkEntity: entity, index: nil))
+                self.append(RestorableBookmarkEntity(bookmarkEntity: entity, index: nil, indexInFavoritesArray: nil))
 
                 if let folder = entity as? BookmarkFolder {
                     removedFolderStack.append((folder, nil))

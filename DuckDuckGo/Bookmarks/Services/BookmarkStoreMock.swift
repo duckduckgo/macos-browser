@@ -51,7 +51,7 @@ final class BookmarkStoreMock: BookmarkStore {
                     queue.append(contentsOf: folder.children)
                 }
             }
-            store?.save(entitiesAtIndices: entities.map { ($0, nil) }, completion: { _ in })
+            store?.save(entitiesAtIndices: entities.map { ($0, nil, nil) }, completion: { _ in })
         }
     }
 
@@ -99,7 +99,7 @@ final class BookmarkStoreMock: BookmarkStore {
             saveEntitiesError = newValue ? nil : NSError(domain: "SaveBookmarkError", code: 1)
         }
     }
-    var saveEntitiesAtIndicesCalledWith: [(entity: BaseBookmarkEntity, index: Int?)]?
+    var saveEntitiesAtIndicesCalledWith: [(entity: BaseBookmarkEntity, index: Int?, indexInFavoritesArray: Int?)]?
     var saveBookmarkCalled: Bool {
         saveEntitiesAtIndicesCalledWith?.contains(where: { $0.entity is Bookmark }) == true
     }
@@ -118,7 +118,7 @@ final class BookmarkStoreMock: BookmarkStore {
         saveEntitiesAtIndicesCalledWith?.first(where: { $0.entity.title == title })?.entity as? BookmarkFolder
     }
     var saveEntitiesError: Error?
-    func save(entitiesAtIndices: [(entity: BaseBookmarkEntity, index: Int?)], completion: @escaping ((any Error)?) -> Void) {
+    func save(entitiesAtIndices: [(entity: BaseBookmarkEntity, index: Int?, indexInFavoritesArray: Int?)], completion: @escaping ((any Error)?) -> Void) {
         saveEntitiesAtIndicesCalledWith = entitiesAtIndices
         guard saveBookmarkSuccess else {
             completion(saveEntitiesError)
