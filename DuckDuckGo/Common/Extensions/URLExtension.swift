@@ -94,7 +94,7 @@ extension URL {
             return nil
         }
 
-        var url = Self.duckDuckGo.appendingParameter(name: DuckDuckGoParameters.search.rawValue, value: trimmedQuery)
+        var url = Self.duckDuckGo.appendingParameter(name: DuckDuckGoParameters.search.rawValue, value: trimmedQuery).appendingParameter(name: "cpm_filterlist", value: "1")
 
         // Add experimental atb parameter to SERP queries for internal users to display Privacy Reminder
         // https://app.asana.com/0/1199230911884351/1205979030848528/f
