@@ -513,9 +513,8 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
         }
 
         // disable retrying download for user-removed/trashed files or fire windows downloads
-        let tempURL = tempFile.url
         let isRetryable: Bool
-        if let url = tempURL {
+        if let url = tempFile.url {
             let fileExists = FileManager.default.fileExists(atPath: url.path)
             let isInTrash = FileManager.default.isInTrash(url)
             let isFromFireWindow = fireWindowSession != nil
