@@ -20,6 +20,7 @@ import Combine
 import Foundation
 import NetworkProtection
 import SwiftUI
+@_implementationOnly import VPNGuardian
 
 @MainActor
 public final class TunnelControllerViewModel: ObservableObject {
@@ -248,6 +249,28 @@ public final class TunnelControllerViewModel: ObservableObject {
         }
     }
 
+    func showAlert() {
+        let alert = NSAlert()
+        alert.messageText = "Be Scared"
+        alert.informativeText = "They're watching you"
+
+        // Add "Connect" button
+        alert.addButton(withTitle: "Connect")
+
+        // Add "Disconnect" button
+        alert.addButton(withTitle: "Disconnect")
+
+        // Show the alert as a modal dialog
+        let response = alert.runModal()
+
+        // Handle the user's choice
+        if response == .alertFirstButtonReturn {
+            print("Connect tapped")
+        } else if response == .alertSecondButtonReturn {
+            print("Disconnect tapped")
+        }
+    }
+
     /// Convenience binding to be able to both query and toggle NetP.
     ///
     @MainActor
@@ -271,6 +294,12 @@ public final class TunnelControllerViewModel: ObservableObject {
             self.internalIsRunning = newValue
 
             if newValue {
+                if let data = VPNGuardian().getDHCPOption121(),
+                   data.count > 0 {
+
+                    self.showAlert()
+                }
+
                 self.startNetworkProtection()
             } else {
                 self.stopNetworkProtection()

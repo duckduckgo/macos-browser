@@ -1,0 +1,4 @@
+module VPNGuardian {
+    header "VPNGuardian.h" // or any other public header you want to expose
+    export *
+}
