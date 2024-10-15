@@ -98,7 +98,7 @@ extension AutofillCredentialsImportManager: AutofillPasswordImportDelegate {
         guard credentials.isEmpty else {
             return false
         }
-        guard totalCredentialsCount < 10 else {
+        guard totalCredentialsCount < 50 else {
             return false
         }
         guard loginImportStateProvider.shouldShowPasswordImportDialog(for: domain) else {
