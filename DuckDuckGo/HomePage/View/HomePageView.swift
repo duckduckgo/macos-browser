@@ -389,7 +389,7 @@ fileprivate extension HomePage.Views.RootView {
         let spacers = 32.0 * 2
         var height = (isCompactSearchBar(with: geometry) ? BigSearchBox.Const.compactHeight : BigSearchBox.Const.totalHeight) + spacers
         if model.isContinueSetUpAvailable && model.isContinueSetUpVisible {
-            height += continueSetUpModel.isMoreOrLessButtonNeeded ? 208 : 184
+            height += continueSetUpModel.isMoreOrLessButtonNeeded ? 184 : 160
             height += 32 + continueSetUpCardsTopPadding
         }
         if model.isFavoriteVisible {
