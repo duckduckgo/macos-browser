@@ -70,6 +70,9 @@ public struct UserDefaultsWrapper<T> {
         case duckPlayerAutoplay = "preferences.duckplayer.autoplay"
         case duckPlayerOpenInNewTab = "preferences.duckplayer.open-new-tab"
 
+        case showAIChatShortcutInToolbar = "preferences.aichat.show-toolbar"
+        case showAIChatShortcutInApplicationsMenu = "preferences.aichat.show-application-menu"
+        
         case selectedPasswordManager = "preferences.autofill.selected-password-manager"
 
         case askToSaveUsernamesAndPasswords = "preferences.ask-to-save.usernames-passwords"
