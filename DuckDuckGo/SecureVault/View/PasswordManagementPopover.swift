@@ -71,4 +71,8 @@ extension PasswordManagementPopover: NSPopoverDelegate {
         }
     }
 
+    @MainActor func popoverShouldClose(_ popover: NSPopover) -> Bool {
+        !viewController.isEditing
+    }
+
 }
