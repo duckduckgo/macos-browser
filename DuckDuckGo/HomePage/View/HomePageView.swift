@@ -378,11 +378,8 @@ fileprivate extension HomePage.Views.RootView {
         if model.isRecentActivityVisible && recentlyVisitedModel.showRecentlyVisited {
             return false
         }
-        if activeRemoteMessageModel.shouldShowRemoteMessage {
-            // 32px is the VStack spacing and 38px I don't really know (16px top padding of a Remote Message, 22px not sure)
-            return geometry.size.height > (totalHeight(with: geometry) + 2 * remoteMessageHeight + 38 + 32 + 0.1 * geometry.size.height)
-        }
-        return geometry.size.height * 0.5 > (totalHeight(with: geometry) * 0.5 + 32 + 12 + 0.1 * geometry.size.height)
+        let topSpacing = activeRemoteMessageModel.shouldShowRemoteMessage ? remoteMessageHeight + 16 : 32
+        return geometry.size.height * 0.5 > (totalHeight(with: geometry) * 0.5 + topSpacing + 12 + 0.1 * geometry.size.height)
     }
 
     func totalHeight(with geometry: GeometryProxy) -> CGFloat {
