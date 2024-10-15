@@ -160,7 +160,7 @@ struct OnboardingFireButtonDialogContent: View {
     @ViewBuilder
     private var actionView: some View {
         VStack {
-            OnboardingPrimaryCTAButton(title: "Try it", action: viewModel.tryFireButton)
+            OnboardingPrimaryCTAButton(title: UserText.ContextualOnboarding.onboardingTryFireButtonButton, action: viewModel.tryFireButton)
             OnboardingSecondaryCTAButton(title: UserText.skip, action: {
                 showNextScreen = true
                 viewModel.skip()

@@ -14310,6 +14310,18 @@
         }
       }
     },
+    "contextual.onboarding.try-fire-button.button" : {
+      "comment" : "Button on the browser that invites the user to try the Fire Button.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Try it"
+          }
+        }
+      }
+    },
     "contextual.onboarding.try-fire-button.message" : {
       "comment" : "Message of a popover on the browser that invites the user to try visiting the browser Fire Button.",
       "extractionState" : "extracted_with_value",
