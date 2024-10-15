@@ -470,6 +470,9 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     }
 
     private func deleteSelectedItems() {
+        guard !tableView.selectedRowIndexes.isEmpty else {
+            return
+        }
         let entities = tableView.selectedRowIndexes.compactMap { fetchEntity(at: $0) }
         let entityUUIDs = entities.map(\.id)
 
