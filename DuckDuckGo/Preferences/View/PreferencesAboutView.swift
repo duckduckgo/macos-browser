@@ -108,7 +108,7 @@ extension Preferences {
                 #if APPSTORE
                 Text(UserText.duckDuckGoForMacAppStore).font(.companyName)
 
-                Text(UserText.privacySimplified).font(.privacySimplified)
+                Text(UserText.duckduckgoTagline).font(.privacySimplified)
                     .fixedSize(horizontal: false, vertical: true)
                     .multilineTextAlignment(.leading)
 
@@ -121,7 +121,7 @@ extension Preferences {
                 #else
                 Text(UserText.duckDuckGo).font(.companyName)
 
-                Text(UserText.privacySimplified).font(.privacySimplified)
+                Text(UserText.duckduckgoTagline).font(.privacySimplified)
                     .fixedSize(horizontal: false, vertical: true)
                     .multilineTextAlignment(.leading)
 

@@ -49418,6 +49418,18 @@
         }
       }
     },
+    "preferences.about.duckduckgo-tagline" : {
+      "comment" : "About screen",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your protection, our priority."
+          }
+        }
+      }
+    },
     "preferences.about.more-at" : {
       "comment" : "Link to the about page",
       "extractionState" : "extracted_with_value",
@@ -49540,7 +49552,7 @@
     },
     "preferences.about.privacy-simplified" : {
       "comment" : "About screen",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
