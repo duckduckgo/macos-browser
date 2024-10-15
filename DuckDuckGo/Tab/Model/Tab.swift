@@ -771,8 +771,15 @@ protocol NewWindowPolicyDecisionMaker {
         }
     }
 
+    @MainActor
     func startOnboarding() {
         userInteractionDialog = nil
+
+        if NSApp.delegateTyped.featureFlagger.isFeatureOn(.highlightsOnboarding) {
+            Application.appDelegate.onboardingStateMachine.state = .notStarted
+            setContent(.onboarding)
+            return
+        }
 
 #if DEBUG || REVIEW
         if Application.runType == .uiTestsOnboarding {
