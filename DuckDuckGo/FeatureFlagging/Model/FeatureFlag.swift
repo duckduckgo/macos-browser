@@ -60,7 +60,7 @@ extension FeatureFlag: FeatureFlagSourceProviding {
         case .highlightsOnboarding:
             return .internalOnly
         case .credentialsImportPromotionForExistingUsers:
-            return .internalOnly
+            return .remoteReleasable(.subfeature(AutofillSubfeature.credentialsImportPromotionForExistingUsers))
         }
     }
 }
