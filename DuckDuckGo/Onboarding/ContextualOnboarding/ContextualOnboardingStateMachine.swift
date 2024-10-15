@@ -133,7 +133,7 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
         }
     }
 
-    private var lastVisitTab: Tab?
+    private weak var lastVisitTab: Tab?
     private var lastVisitSite: URL?
     private var notBlockedTrackerSeen: Bool = false
 
