@@ -110,8 +110,8 @@ final class OnboardingUITests: XCTestCase {
         startBrowsingButton.click()
 
         // AfterOnboarding
-        let duckduckgoPrivacySimplifiedWindow = app.windows["DuckDuckGo — Privacy, simplified."]
-        XCTAssertTrue(duckduckgoPrivacySimplifiedWindow.webViews["DuckDuckGo — Privacy, simplified."].waitForExistence(timeout: UITests.Timeouts.elementExistence))
+        let duckduckgoPrivacySimplifiedWindow = app.windows["DuckDuckGo — Your protection, our priority."]
+        XCTAssertTrue(duckduckgoPrivacySimplifiedWindow.webViews["DuckDuckGo — Your protection, our priority."].waitForExistence(timeout: UITests.Timeouts.elementExistence))
         XCTAssertTrue(duckduckgoPrivacySimplifiedWindow.buttons["NavigationBarViewController.optionsButton"].isEnabled)
     }
 
