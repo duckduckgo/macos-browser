@@ -27,20 +27,21 @@ extension Preferences {
 
         var body: some View {
             PreferencePane {
-                TextMenuTitle("AI Chat")
+                TextMenuTitle(UserText.aiChat)
                 PreferencePaneSubSection {
                     VStack(alignment: .leading, spacing: 1) {
-                        TextMenuItemCaption("Launch AI Chat faster by adding shortcuts to your browser toolbar or menu")
-                        TextButton("Learn More") {
+                        TextMenuItemCaption(UserText.aiChatPreferencesCaption)
+                        TextButton(UserText.aiChatPreferencesLearnMoreButton) {
                             model.openLearnMoreLink()
                         }
                     }
                 }
 
                 PreferencePaneSection {
-                    ToggleMenuItem("Show AI Chat shortcut in browser toolbar", isOn: $model.showShortcutInToolbar)
-                    ToggleMenuItem("Show “New AI Chat” in File and application menus", isOn: $model.showShortcutInApplicationMenu)
-
+                    ToggleMenuItem(UserText.aiChatShowInToolbarToggle,
+                                   isOn: $model.showShortcutInToolbar)
+                    ToggleMenuItem(UserText.aiChatShowInApplicationMenuToggle,
+                                   isOn: $model.showShortcutInApplicationMenu)
                 }
             }
         }

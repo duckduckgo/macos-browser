@@ -35,6 +35,7 @@ struct AIChatUserDefaultPreferencesPersistor: AIChatPreferencesPersistor {
 final class AIChatPreferences: ObservableObject {
     static let shared = AIChatPreferences()
     private var persistor: AIChatPreferencesPersistor
+    private let learnMoreURL = URL(string: "https://duckduckgo.com/duckduckgo-help-pages/aichat/")!
 
     init(persistor: AIChatPreferencesPersistor = AIChatUserDefaultPreferencesPersistor()) {
         self.persistor = persistor
@@ -65,6 +66,6 @@ final class AIChatPreferences: ObservableObject {
     }
 
     @MainActor func openLearnMoreLink() {
-        //WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
+        WindowControllersManager.shared.show(url: learnMoreURL, source: .ui, newTab: true)
     }
 }

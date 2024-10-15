@@ -122,7 +122,7 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable, CaseIt
     case accessibility
     case duckPlayer = "duckplayer"
     case otherPlatforms = "https://duckduckgo.com/app?origin=funnel_app_macos"
-    case aiChat
+    case aiChat = "aichat"
     case about
 
     var id: Self {
@@ -182,7 +182,7 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable, CaseIt
         case .duckPlayer:
             return UserText.duckPlayer
         case .aiChat:
-            return "AI Chat" //TODO FIX
+            return UserText.aiChat
         case .about:
             return UserText.about
         case .otherPlatforms:
@@ -225,7 +225,7 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable, CaseIt
         case .otherPlatforms:
             return "OtherPlatformsPreferences"
         case .aiChat:
-            return "Sync" // TODO FIX
+            return "AiChatPreferences"
         }
     }
 }
