@@ -107,7 +107,7 @@ struct DefaultFeedbackSender: UnifiedFeedbackSender {
                                                                          category: Category.from(category),
                                                                          subcategory: Subcategory.from(subcategory),
                                                                          description: description,
-                                                                         metadata: metadata?.toBase64() ?? ""))
+                                                                         metadata: metadata?.toString() ?? ""))
     }
 
     func sendFormShowPixel() {
