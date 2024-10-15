@@ -53,7 +53,7 @@ struct OnboardingSuggestedSearchesProvider: OnboardingSuggestionsItemsProviding 
 
     private var option2: ContextualOnboardingListItem {
         var search: String
-        if country == "us" {
+        if country == "US" {
             search = UserText.ContextualOnboarding.tryASearchOption2English
         } else {
             search = UserText.ContextualOnboarding.tryASearchOption2International
@@ -68,7 +68,7 @@ struct OnboardingSuggestedSearchesProvider: OnboardingSuggestionsItemsProviding 
 
     private var surpriseMe: ContextualOnboardingListItem {
         var search: String
-        if country == "us" {
+        if country == "US" {
             search = UserText.ContextualOnboarding.tryASearchOptionSurpriseMeEnglish
         } else {
             search = UserText.ContextualOnboarding.tryASearchOptionSurpriseMeInternational

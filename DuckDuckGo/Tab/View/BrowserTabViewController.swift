@@ -132,10 +132,9 @@ final class BrowserTabViewController: NSViewController {
         view.registerForDraggedTypes([.URL, .fileURL])
     }
 
-     @objc func windowDidResignActive(notification: Notification) {
-         guard let webViewContainer else { return }
-         removeExistingDialog()
-     }
+    @objc func windowDidBecomeActive(notification: Notification) {
+        presentContextualOnboarding()
+    }
 
     override func viewWillAppear() {
         super.viewWillAppear()
@@ -144,7 +143,7 @@ final class BrowserTabViewController: NSViewController {
 
         // Register for focus-related notifications
         if let window = view.window {
-            NotificationCenter.default.addObserver(self, selector: #selector(windowDidResignActive), name: NSWindow.didResignKeyNotification, object: window)
+            NotificationCenter.default.addObserver(self, selector: #selector(windowDidBecomeActive), name: NSWindow.didBecomeKeyNotification, object: window)
         }
     }
 
@@ -401,6 +400,12 @@ final class BrowserTabViewController: NSViewController {
     }
     var daxContextualOnboardingController: NSViewController?
 
+    private func updateStateAndPresentContextualOnboarding() {
+        guard let tab = tabViewModel?.tab else { return }
+        onboardingDialogTypeProvider.updateStateFor(tab: tab)
+        presentContextualOnboarding()
+    }
+
     private func removeExistingDialog() {
         containerStackView.arrangedSubviews.filter({ $0 != webViewContainer }).forEach {
             containerStackView.removeArrangedSubview($0)
@@ -414,7 +419,6 @@ final class BrowserTabViewController: NSViewController {
         guard featureFlagger.isFeatureOn(.highlightsOnboarding) else { return }
 
         guard let tab = tabViewModel?.tab else { return }
-        onboardingDialogTypeProvider.updateStateFor(tab: tab)
         guard let dialogType = onboardingDialogTypeProvider.dialogTypeForTab(tab, privacyInfo: tab.privacyInfo) else {
             return
         }
@@ -515,7 +519,7 @@ final class BrowserTabViewController: NSViewController {
             .store(in: &tabViewModelCancellables)
 
         tabViewModel?.tab.webViewDidFinishNavigationPublisher.sink { [weak self] in
-            self?.presentContextualOnboarding()
+            self?.updateStateAndPresentContextualOnboarding()
         }.store(in: &tabViewModelCancellables)
 
         tabViewModel?.tab.webViewDidStartNavigationPublisher.sink { [weak self] in
