@@ -154,7 +154,14 @@ final class AddressBarButtonsViewController: NSViewController {
     private var privacyEntryPointIconUpdateCancellable: AnyCancellable?
     private var isMouseOverAnimationVisibleCancellable: AnyCancellable?
 
-    private lazy var buttonsBadgeAnimator = NavigationBarBadgeAnimator()
+    private lazy var buttonsBadgeAnimator = {
+        let animator = NavigationBarBadgeAnimator()
+        animator.delegate = self
+        return animator
+    }()
+
+    private var hasPrivacyInfoPulseQueuedAnimation = false
+
 
     required init?(coder: NSCoder) {
         fatalError("AddressBarButtonsViewController: Bad initializer")
@@ -210,6 +217,13 @@ final class AddressBarButtonsViewController: NSViewController {
                     self.buttonsBadgeAnimator.queuedAnimation = nil
                 }
             }
+        }
+    }
+
+    private func playPrivacyInfoHighlightAnimationIfNecessary() {
+        if hasPrivacyInfoPulseQueuedAnimation {
+            hasPrivacyInfoPulseQueuedAnimation = false
+            ContextualOnboardingViewHighlighter.highlight(view: privacyEntryPointButton, inParent: self.view)
         }
     }
 
@@ -840,6 +854,14 @@ final class AddressBarButtonsViewController: NSViewController {
                 self?.updatePermissionButtons()
                 self?.playBadgeAnimationIfNecessary()
                 self?.updateZoomButtonVisibility(animation: false)
+                guard let self else { return }
+                updatePrivacyEntryPointIcon()
+                updatePermissionButtons()
+                playBadgeAnimationIfNecessary()
+                updateZoomButtonVisibility(animation: false)
+                if buttonsBadgeAnimator.queuedAnimation == nil {
+                    playPrivacyInfoHighlightAnimationIfNecessary()
+                }
             }
         }
 
@@ -946,6 +968,31 @@ final class AddressBarButtonsViewController: NSViewController {
                     self?.updatePrivacyEntryPointIcon()
                 }
             }
+    }
+
+}
+
+extension AddressBarButtonsViewController {
+
+    func highlightPrivacyShield() {
+        if !isAnyShieldAnimationPlaying && buttonsBadgeAnimator.queuedAnimation == nil {
+            ContextualOnboardingViewHighlighter.highlight(view: privacyEntryPointButton, inParent: self.view)
+        } else {
+            hasPrivacyInfoPulseQueuedAnimation = true
+        }
+    }
+
+    func stopHighlightingPrivacyShield() {
+        hasPrivacyInfoPulseQueuedAnimation = false
+        ContextualOnboardingViewHighlighter.stopHighlighting(view: privacyEntryPointButton)
+    }
+
+}
+
+extension AddressBarButtonsViewController: NavigationBarBadgeAnimatorDelegate {
+
+    func didFinishAnimating() {
+        playPrivacyInfoHighlightAnimationIfNecessary()
     }
 
 }
