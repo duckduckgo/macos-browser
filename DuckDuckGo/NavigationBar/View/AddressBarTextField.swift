@@ -106,9 +106,8 @@ final class AddressBarTextField: NSTextField {
 
     private func subscribeToSelectedSuggestionViewModel() {
         selectedSuggestionViewModelCancellable = suggestionContainerViewModel?.$selectedSuggestionViewModel
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.displaySelectedSuggestionViewModel()
+            .sink { [weak self] selectedSuggestionViewModel in
+                self?.displaySelectedSuggestionViewModel(selectedSuggestionViewModel)
             }
     }
 
@@ -500,14 +499,14 @@ final class AddressBarTextField: NSTextField {
 
     // MARK: - Suggestion window
 
-    private func displaySelectedSuggestionViewModel() {
+    private func displaySelectedSuggestionViewModel(_ selectedSuggestionViewModel: SuggestionViewModel?) {
         guard let suggestionWindow = suggestionWindowController?.window else {
             Logger.general.error("AddressBarTextField: Window not available")
             return
         }
         guard suggestionWindow.isVisible else { return }
 
-        guard let selectedSuggestionViewModel = suggestionContainerViewModel?.selectedSuggestionViewModel else {
+        guard let selectedSuggestionViewModel else {
             if let originalStringValue = suggestionContainerViewModel?.userStringValue {
                 self.value = Value(stringValue: originalStringValue, userTyped: true)
             } else {
@@ -909,6 +908,13 @@ extension AddressBarTextField: NSTextFieldDelegate {
             self.currentTextDidChangeEvent = .none
         }
 
+        if stringValue.isEmpty {
+            suggestionContainerViewModel?.clearUserStringValue()
+            hideSuggestionWindow()
+        } else {
+            suggestionContainerViewModel?.setUserStringValue(stringValueWithoutSuffix, userAppendedStringToTheEnd: currentTextDidChangeEvent == .userAppendingTextToTheEnd)
+        }
+
         // if user continues typing letters from displayed Suggestion
         // don't blink and keep the Suggestion displayed
         if case .userAppendingTextToTheEnd = currentTextDidChangeEvent,
@@ -918,13 +924,6 @@ extension AddressBarTextField: NSTextFieldDelegate {
         } else {
             suggestionContainerViewModel?.clearSelection()
             self.value = Value(stringValue: stringValueWithoutSuffix, userTyped: true)
-        }
-
-        if stringValue.isEmpty {
-            suggestionContainerViewModel?.clearUserStringValue()
-            hideSuggestionWindow()
-        } else {
-            suggestionContainerViewModel?.setUserStringValue(stringValueWithoutSuffix, userAppendedStringToTheEnd: currentTextDidChangeEvent == .userAppendingTextToTheEnd)
         }
     }
 

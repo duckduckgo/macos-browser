@@ -67,9 +67,7 @@ final class SuggestionContainerViewModel {
     private func subscribeToSuggestionResult() {
         suggestionResultCancellable = suggestionContainer.$result.receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-            guard let self = self,
-                  self.shouldSelectTopSuggestion
-            else { return }
+            guard let self, shouldSelectTopSuggestion else { return }
 
             self.select(at: 0)
         }
