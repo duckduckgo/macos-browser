@@ -33,6 +33,7 @@ import PixelKit
 import Subscription
 import VPNAppLauncher
 import os.log
+import SystemConfiguration
 
 @objc(Application)
 final class DuckDuckGoVPNApplication: NSApplication {
