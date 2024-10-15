@@ -59,13 +59,14 @@ public struct DefaultActionButtonStyle: ButtonStyle {
 
         var body: some View {
             let enabledBackgroundColor = configuration.isPressed
-                ? Color("PrimaryButtonPressed").opacity(0.5)
+                ? Color("PrimaryButtonPressed")
                 : (isHovered
-                    ? Color("PrimaryButtonHover").opacity(0.8)
+                    ? Color("PrimaryButtonHover")
                     : Color("PrimaryButtonRest"))
 
             let disabledBackgroundColor = Color.gray.opacity(0.1)
-            let labelColor = enabled ? Color.white : Color.primary.opacity(0.3)
+            let enabledLabelColor = configuration.isPressed ? Color.white.opacity(0.8) : Color.white
+            let disabledLabelColor = Color.primary.opacity(0.3)
 
             configuration.label
                 .font(.system(size: 13))
@@ -76,7 +77,7 @@ public struct DefaultActionButtonStyle: ButtonStyle {
                 .padding(.bottom, 3)
                 .padding(.horizontal, 7.5)
                 .background(enabled ? enabledBackgroundColor : disabledBackgroundColor)
-                .foregroundColor(labelColor)
+                .foregroundColor(enabled ? enabledLabelColor : disabledLabelColor)
                 .cornerRadius(5)
                 .onHover { hovering in
                     isHovered = hovering
