@@ -40,11 +40,12 @@ final class PIRScanIntegrationTests: XCTestCase {
     }
 
     private func awaitFulfillment(of expectation: XCTestExpectation, withTimeout timeout: TimeInterval, whenCondition condition: @escaping () async -> Bool) async {
-        Task {
+        let task = Task {
             await fulfillExpecation(expectation, whenCondition: condition)
         }
 
         await fulfillment(of: [expectation], timeout: timeout)
+        task.cancel()
     }
 
     typealias PixelExpectation = (pixel: DataBrokerProtectionPixels, expectation: XCTestExpectation)
