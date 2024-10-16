@@ -131,7 +131,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         repository: DuckDuckGo/pir-fake-broker
-        token: ${{ secrets.PIR_FAKE_BROKER_SETUP }}
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_PIR_FAKE_BROKER }}
         ref: loremattei/ci-integration
         path: pir-fake-broker
 
