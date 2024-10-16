@@ -32,7 +32,7 @@ extension HomePage.Models {
     @MainActor
     final class AddressBarModel: ObservableObject {
 
-        @Published var shouldShowAddressBar: Bool {
+        @Published var shouldShowAddressBar: Bool = false {
             didSet {
                 if shouldShowAddressBar != oldValue {
                     if shouldShowAddressBar {
@@ -87,15 +87,29 @@ extension HomePage.Models {
 
         let tabCollectionViewModel: TabCollectionViewModel
 
+        private var isExperimentActive: Bool = false {
+            didSet {
+                if isExperimentActive {
+                    let ntpExperiment = NewTabPageSearchBoxExperiment()
+                    ntpExperiment.assignUserToCohort()
+                    shouldShowAddressBar = ntpExperiment.cohort == .experiment
+                }
+            }
+        }
         private var privacyConfigCancellable: AnyCancellable?
         private var addressBarViewControllerCancellables = Set<AnyCancellable>()
 
         init(tabCollectionViewModel: TabCollectionViewModel, privacyConfigurationManager: PrivacyConfigurationManaging) {
             self.tabCollectionViewModel = tabCollectionViewModel
-            self.shouldShowAddressBar = privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .newTabSearchField)
+            self.isExperimentActive = privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .newTabSearchField)
+            if self.isExperimentActive {
+                let ntpExperiment = NewTabPageSearchBoxExperiment()
+                ntpExperiment.assignUserToCohort()
+                self.shouldShowAddressBar = ntpExperiment.cohort == .experiment
+            }
 
             privacyConfigCancellable = privacyConfigurationManager.updatesPublisher.sink { [weak self, weak privacyConfigurationManager] in
-                self?.shouldShowAddressBar = privacyConfigurationManager?.privacyConfig.isEnabled(featureKey: .newTabSearchField) == true
+                self?.isExperimentActive = privacyConfigurationManager?.privacyConfig.isEnabled(featureKey: .newTabSearchField) == true
             }
         }
 
