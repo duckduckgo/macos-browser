@@ -1,5 +1,5 @@
 //
-//  ContextualOnboardingViewHighlighter.swift
+//  ViewHighlighter.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -19,7 +19,7 @@
 import AppKit
 import Lottie
 
-enum ContextualOnboardingViewHighlighter {
+enum ViewHighlighter {
 
     private static let identifier = "lottie_pulse_animation_view"
 
@@ -66,7 +66,7 @@ enum ContextualOnboardingViewHighlighter {
 
 }
 
-extension LottieAnimationView {
+private extension LottieAnimationView {
 
     static func makePulseAnimationView() -> LottieAnimationView {
         let animation = LottieAnimation.named("view_highlight")

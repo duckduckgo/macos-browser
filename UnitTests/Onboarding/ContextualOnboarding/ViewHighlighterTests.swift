@@ -1,5 +1,5 @@
 //
-//  ContextualOnboardingViewHighlighterTests.swift
+//  ViewHighlighterTests.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -19,14 +19,14 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-final class ContextualOnboardingViewHighlighterTests: XCTestCase {
+final class ViewHighlighterTests: XCTestCase {
 
     func testWhenHighlightViewIsCalledThenViewShouldContainAnimationView() {
         // GIVEN
         let (parent, child) = makeDummyViews()
 
         // WHEN
-        ContextualOnboardingViewHighlighter.highlight(view: child, inParent: parent)
+        ViewHighlighter.highlight(view: child, inParent: parent)
 
         // THEN
         XCTAssertNotNil(findFirstAnimationView(in: parent))
@@ -35,23 +35,23 @@ final class ContextualOnboardingViewHighlighterTests: XCTestCase {
     func testWhenIsViewIsHighligthedIsCalledAndViewIsHighlightedThenReturnTrue() {
         // GIVEN
         let (parent, child) = makeDummyViews()
-        XCTAssertFalse(ContextualOnboardingViewHighlighter.isViewHighlighted(child))
-        ContextualOnboardingViewHighlighter.highlight(view: child, inParent: parent)
+        XCTAssertFalse(ViewHighlighter.isViewHighlighted(child))
+        ViewHighlighter.highlight(view: child, inParent: parent)
 
         // WHEN
-        let result = ContextualOnboardingViewHighlighter.isViewHighlighted(child)
+        let result = ViewHighlighter.isViewHighlighted(child)
 
         // THEN
         XCTAssertTrue(result)
     }
 
-    func testWhenIsViewIsNotHighligthedIsCalledAndViewIsHighlightedThenReturnFalse() {
+    func testWhenIsViewHighligthedIsCalledAndViewIsNotHighlightedThenReturnFalse() {
         // GIVEN
         let (_, child) = makeDummyViews()
-        XCTAssertFalse(ContextualOnboardingViewHighlighter.isViewHighlighted(child))
+        XCTAssertFalse(ViewHighlighter.isViewHighlighted(child))
 
         // WHEN
-        let result = ContextualOnboardingViewHighlighter.isViewHighlighted(child)
+        let result = ViewHighlighter.isViewHighlighted(child)
 
         // THEN
         XCTAssertFalse(result)
@@ -60,11 +60,11 @@ final class ContextualOnboardingViewHighlighterTests: XCTestCase {
     func testWhenStopHighlightingViewIsCalledThenAnimationViewIsRemoved() {
         // GIVEN
         let (parent, child) = makeDummyViews()
-        ContextualOnboardingViewHighlighter.highlight(view: child, inParent: parent)
+        ViewHighlighter.highlight(view: child, inParent: parent)
         XCTAssertNotNil(findAllAnimationView(in: parent))
 
         // WHEN
-        ContextualOnboardingViewHighlighter.stopHighlighting(view: child)
+        ViewHighlighter.stopHighlighting(view: child)
 
         // THEN
         XCTAssertNil(findFirstAnimationView(in: parent))
@@ -73,11 +73,11 @@ final class ContextualOnboardingViewHighlighterTests: XCTestCase {
     func testWhenViewIsHighlightedAndHighlightViewIsCalledThenNothingHappens() {
         // GIVEN
         let (parent, child) = makeDummyViews()
-        ContextualOnboardingViewHighlighter.highlight(view: child, inParent: parent)
+        ViewHighlighter.highlight(view: child, inParent: parent)
         XCTAssertEqual(findAllAnimationView(in: parent).count, 1)
 
         // WHEN
-        ContextualOnboardingViewHighlighter.highlight(view: child, inParent: parent)
+        ViewHighlighter.highlight(view: child, inParent: parent)
 
         // THEN
         XCTAssertEqual(findAllAnimationView(in: parent).count, 1)
@@ -85,7 +85,7 @@ final class ContextualOnboardingViewHighlighterTests: XCTestCase {
 
 }
 
-private extension ContextualOnboardingViewHighlighterTests {
+private extension ViewHighlighterTests {
 
     func makeDummyViews() -> (parent: NSView, child: NSView) {
         let parent = NSView()
