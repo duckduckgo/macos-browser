@@ -206,6 +206,7 @@ final class PIRScanIntegrationTests: XCTestCase {
 
         let mockUserProfile = mockUserProfile()
         let returnedUserProfile = await createProfileOnFakeBroker(mockUserProfile)
+        XCTAssertEqual(mockUserProfile.firstName, returnedUserProfile.firstName)
 
         /*
          // When
