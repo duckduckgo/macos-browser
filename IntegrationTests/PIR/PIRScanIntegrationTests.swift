@@ -17,9 +17,11 @@
 //
 
 @testable import DataBrokerProtection
+import BrowserServicesKit
 import LoginItems
 import XCTest
 import PixelKitTestingUtilities
+import Combine
 @testable import DuckDuckGo_Privacy_Browser
 @testable import PixelKit
 
@@ -63,7 +65,8 @@ final class PIRScanIntegrationTests: XCTestCase {
         loginItemsManager.disableLoginItems([LoginItem.dbpBackgroundAgent])
         loginItemsManager.enableLoginItems([LoginItem.dbpBackgroundAgent])
 
-        communicationLayer = DBPUICommunicationLayer(webURLSettings: DataBrokerProtectionWebUIURLSettings(UserDefaults.standard))
+        communicationLayer = DBPUICommunicationLayer(webURLSettings:
+                                                        DataBrokerProtectionWebUIURLSettings(UserDefaults.standard), privacyConfig: PrivacyConfigurationManagingMock())
         communicationLayer.delegate = pirProtectionManager.dataManager.cache
 
         communicationDelegate = pirProtectionManager.dataManager.cache
@@ -362,5 +365,86 @@ private extension PIRScanIntegrationTests {
                      addresses: [.init(city: "Dallas", state: "TX")],
                      phones: [],
                      birthYear: birthYear)
+    }
+
+    final class PrivacyConfigurationManagingMock: PrivacyConfigurationManaging {
+        var currentConfig: Data = Data()
+
+        var updatesPublisher: AnyPublisher<Void, Never> = .init(Just(()))
+
+        var privacyConfig: BrowserServicesKit.PrivacyConfiguration = PrivacyConfigurationMock()
+
+        var internalUserDecider: InternalUserDecider = DefaultInternalUserDecider(store: InternalUserDeciderStoreMock())
+
+        func reload(etag: String?, data: Data?) -> PrivacyConfigurationManager.ReloadResult {
+            .downloaded
+        }
+    }
+
+    final class PrivacyConfigurationMock: PrivacyConfiguration {
+        var identifier: String = "mock"
+        var version: String? = "123456789"
+
+        var userUnprotectedDomains = [String]()
+
+        var tempUnprotectedDomains = [String]()
+
+        var trackerAllowlist = BrowserServicesKit.PrivacyConfigurationData.TrackerAllowlist(entries: [String: [PrivacyConfigurationData.TrackerAllowlist.Entry]](), state: "mock")
+
+        func isEnabled(featureKey: BrowserServicesKit.PrivacyFeature, versionProvider: BrowserServicesKit.AppVersionProvider) -> Bool {
+            false
+        }
+
+        func stateFor(featureKey: BrowserServicesKit.PrivacyFeature, versionProvider: BrowserServicesKit.AppVersionProvider) -> BrowserServicesKit.PrivacyConfigurationFeatureState {
+            .disabled(.disabledInConfig)
+        }
+
+        func isSubfeatureEnabled(_ subfeature: any PrivacySubfeature, versionProvider: BrowserServicesKit.AppVersionProvider) -> Bool {
+            false
+        }
+
+        func stateFor(_ subfeature: any PrivacySubfeature, versionProvider: BrowserServicesKit.AppVersionProvider, randomizer: (Range<Double>) -> Double) -> BrowserServicesKit.PrivacyConfigurationFeatureState {
+            .disabled(.disabledInConfig)
+        }
+
+        func exceptionsList(forFeature featureKey: BrowserServicesKit.PrivacyFeature) -> [String] {
+            [String]()
+        }
+
+        func isFeature(_ feature: BrowserServicesKit.PrivacyFeature, enabledForDomain: String?) -> Bool {
+            false
+        }
+
+        func isProtected(domain: String?) -> Bool {
+            false
+        }
+
+        func isUserUnprotected(domain: String?) -> Bool {
+            false
+        }
+
+        func isTempUnprotected(domain: String?) -> Bool {
+            false
+        }
+
+        func isInExceptionList(domain: String?, forFeature featureKey: BrowserServicesKit.PrivacyFeature) -> Bool {
+            false
+        }
+
+        func settings(for feature: BrowserServicesKit.PrivacyFeature) -> BrowserServicesKit.PrivacyConfigurationData.PrivacyFeature.FeatureSettings {
+            [String: Any]()
+        }
+
+        func userEnabledProtection(forDomain: String) {
+
+        }
+
+        func userDisabledProtection(forDomain: String) {
+
+        }
+
+        func isSubfeatureEnabled(_ subfeature: any BrowserServicesKit.PrivacySubfeature, versionProvider: BrowserServicesKit.AppVersionProvider, randomizer: (Range<Double>) -> Double) -> Bool {
+            false
+        }
     }
 }
