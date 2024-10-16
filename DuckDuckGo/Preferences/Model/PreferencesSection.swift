@@ -42,8 +42,6 @@ struct PreferencesSection: Hashable, Identifiable {
                 panes.append(.duckPlayer)
             }
 
-#warning("TODO This needs to use a feature flag")
-            panes.append(.aiChat)
             return panes
         }()
 
