@@ -17,45 +17,73 @@
 //
 
 import Combine
-
-protocol AIChatPreferencesPersistor {
-    var showShortcutInToolbar: Bool { get set }
-    var showShortcutInApplicationMenu: Bool { get set }
-}
-
-struct AIChatUserDefaultPreferencesPersistor: AIChatPreferencesPersistor {
-    @UserDefaultsWrapper(key: .showAIChatShortcutInToolbar, defaultValue: false)
-    var showShortcutInToolbar: Bool
-
-    @UserDefaultsWrapper(key: .showAIChatShortcutInApplicationsMenu, defaultValue: false)
-    var showShortcutInApplicationMenu: Bool
-}
+import Foundation
 
 final class AIChatPreferences: ObservableObject {
     static let shared = AIChatPreferences()
 
-    private var preferencesPersistor: AIChatPreferencesPersistor
+    private var preferencesStorage: AIChatPreferencesStorage
     private let learnMoreURL = URL(string: "https://duckduckgo.com/duckduckgo-help-pages/aichat/")!
 
-    init(persistor: AIChatPreferencesPersistor = AIChatUserDefaultPreferencesPersistor()) {
-        self.preferencesPersistor = persistor
-        self.showShortcutInToolbar = persistor.showShortcutInToolbar
-        self.showShortcutInApplicationMenu = persistor.showShortcutInApplicationMenu
+    init(storage: AIChatPreferencesStorage = AIChatPreferencesUserDefaultsStorage()) {
+        self.preferencesStorage = storage
+        self.showShortcutInToolbar = storage.showShortcutInToolbar
+        self.showShortcutInApplicationMenu = storage.showShortcutInApplicationMenu
     }
 
     @Published var showShortcutInToolbar: Bool {
         didSet {
-            preferencesPersistor.showShortcutInToolbar = showShortcutInToolbar
+            preferencesStorage.showShortcutInToolbar = showShortcutInToolbar
         }
     }
 
     @Published var showShortcutInApplicationMenu: Bool {
         didSet {
-            preferencesPersistor.showShortcutInApplicationMenu = showShortcutInApplicationMenu
+            preferencesStorage.showShortcutInApplicationMenu = showShortcutInApplicationMenu
         }
     }
 
     @MainActor func openLearnMoreLink() {
         WindowControllersManager.shared.show(url: learnMoreURL, source: .ui, newTab: true)
+    }
+}
+
+protocol AIChatPreferencesStorage {
+    var showShortcutInToolbar: Bool { get set }
+    var showShortcutInApplicationMenu: Bool { get set }
+}
+
+struct AIChatPreferencesUserDefaultsStorage: AIChatPreferencesStorage {
+    private let userDefaults: UserDefaults
+
+    init(userDefaults: UserDefaults = .standard) {
+        self.userDefaults = userDefaults
+    }
+
+    var showShortcutInToolbar: Bool {
+        get { userDefaults.showAIChatShortcutInToolbar }
+        set { userDefaults.showAIChatShortcutInToolbar = newValue }
+    }
+
+    var showShortcutInApplicationMenu: Bool {
+        get { userDefaults.showAIChatShortcutInApplicationMenu }
+        set { userDefaults.showAIChatShortcutInApplicationMenu = newValue }
+    }
+}
+
+private extension UserDefaults {
+    enum Keys {
+        static let showAIChatShortcutInToolbar = "aichat.showAIChatShortcutInToolbar"
+        static let showAIChatShortcutInApplicationMenu = "aichat.showAIChatShortcutInApplicationMenu"
+    }
+
+    var showAIChatShortcutInApplicationMenu: Bool {
+        get { bool(forKey: Keys.showAIChatShortcutInApplicationMenu) }
+        set { set(newValue, forKey: Keys.showAIChatShortcutInApplicationMenu) }
+    }
+
+    var showAIChatShortcutInToolbar: Bool {
+        get { bool(forKey: Keys.showAIChatShortcutInToolbar) }
+        set { set(newValue, forKey: Keys.showAIChatShortcutInToolbar) }
     }
 }

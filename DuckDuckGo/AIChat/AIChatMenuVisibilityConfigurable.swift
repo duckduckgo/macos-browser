@@ -28,22 +28,22 @@ struct AIChatMenuConfiguration: AIChatMenuVisibilityConfigurable {
         case toolbar
     }
 
-    private let preferencesPersistor: AIChatPreferencesPersistor
+    private let preferencesStorage: AIChatPreferencesStorage
 
     var shouldDisplayApplicationMenuShortcut: Bool {
-        return isFeatureEnabledFor(shortcutType: .applicationMenu) && preferencesPersistor.showShortcutInApplicationMenu
+        return isFeatureEnabledFor(shortcutType: .applicationMenu) && preferencesStorage.showShortcutInApplicationMenu
     }
 
     var shouldDisplayToolbarShortcut: Bool {
-        return isFeatureEnabledFor(shortcutType: .toolbar) && preferencesPersistor.showShortcutInToolbar
+        return isFeatureEnabledFor(shortcutType: .toolbar) && preferencesStorage.showShortcutInToolbar
     }
 
     var shortcutURL: URL {
         URL(string: "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=2")!
     }
 
-    init(preferencesPersistor: AIChatPreferencesPersistor = AIChatUserDefaultPreferencesPersistor()) {
-        self.preferencesPersistor = preferencesPersistor
+    init(preferencesStorage: AIChatPreferencesStorage = AIChatPreferencesUserDefaultsStorage()) {
+        self.preferencesStorage = preferencesStorage
     }
 
     private func isFeatureEnabledFor(shortcutType: ShortcutType) -> Bool {
