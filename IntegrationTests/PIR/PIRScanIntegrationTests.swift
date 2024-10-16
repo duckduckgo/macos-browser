@@ -141,7 +141,9 @@ final class PIRScanIntegrationTests: XCTestCase {
         }
     }
 
-    let fakeBrokerAPIAddress = "http://127.0.0.1:3001/api/"
+    var fakeBrokerAPIAddress: String {
+        "http://localhost:3001/api/"
+    }
 
     func deleteAllProfilesOnFakeBroker() async {
         let deleteProfilesURL = URL(string: fakeBrokerAPIAddress + "profiles")!
