@@ -132,7 +132,7 @@ jobs:
       with:
         repository: DuckDuckGo/pir-fake-broker
         token: ${{ secrets.PIR_FAKE_BROKER2 }}
-        ref: loremattei/ci-integration
+        ref: main
         path: pir-fake-broker
 
     - name: Start PIR Fake Broker
