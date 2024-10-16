@@ -162,7 +162,7 @@ public final class DataBrokerProtectionAgentManager {
             // The browser shouldn't start the agent if these prerequisites aren't met.
             // However, since the agent can auto-start after a reboot without the browser, we need to validate it again.
             // If the agent needs to be stopped, this function will stop it, so the subsequent calls after it will not be made.
-            await agentStopper.validateRunPrerequisitesAndStopAgentIfNecessary()
+            //await agentStopper.validateRunPrerequisitesAndStopAgentIfNecessary()
 
             activityScheduler.startScheduler()
             didStartActivityScheduler = true
@@ -171,7 +171,7 @@ public final class DataBrokerProtectionAgentManager {
 
             /// Monitors entitlement changes every 60 minutes to optimize system performance and resource utilization by avoiding unnecessary operations when entitlement is invalid.
             /// While keeping the agent active with invalid entitlement has no significant risk, setting the monitoring interval at 60 minutes is a good balance to minimize backend checks.
-            agentStopper.monitorEntitlementAndStopAgentIfEntitlementIsInvalid(interval: .minutes(60))
+            //agentStopper.monitorEntitlementAndStopAgentIfEntitlementIsInvalid(interval: .minutes(60))
 
             configurationSubscription = privacyConfigurationManager.updatesPublisher
                 .sink { [weak self] _ in
