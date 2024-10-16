@@ -56958,7 +56958,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Update DuckDuckGo"
+            "value" : "Restart to Update"
           }
         },
         "es" : {
@@ -57013,6 +57013,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Retry Update"
+          }
+        }
+      }
+    },
+    "settings.run.update" : {
+      "comment" : "Button label triggering update of the application.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Update DuckDuckGo"
           }
         }
       }

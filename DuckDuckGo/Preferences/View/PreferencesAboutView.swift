@@ -248,7 +248,7 @@ extension Preferences {
                 .buttonStyle(UpdateButtonStyle(enabled: true))
             case .updateCycle(let progress):
                 if hasPendingUpdate {
-                    Button(UserText.runUpdate) {
+                    Button(model.areAutomaticUpdatesEnabled ? UserText.restartToUpdate : UserText.runUpdate) {
                         model.runUpdate()
                     }
                     .buttonStyle(UpdateButtonStyle(enabled: true))
