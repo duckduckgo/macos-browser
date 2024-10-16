@@ -24,16 +24,20 @@ import os.log
 @MainActor
 final class DownloadListViewModel {
 
+    private let fireWindowSession: FireWindowSessionRef?
     private let coordinator: DownloadListCoordinator
     private var viewModels: [UUID: DownloadViewModel]
     private var cancellable: AnyCancellable?
 
     @Published private(set) var items: [DownloadViewModel]
 
-    init(coordinator: DownloadListCoordinator = DownloadListCoordinator.shared) {
+    init(fireWindowSession: FireWindowSessionRef?, coordinator: DownloadListCoordinator = DownloadListCoordinator.shared) {
+        self.fireWindowSession = fireWindowSession
         self.coordinator = coordinator
 
-        let items = coordinator.downloads(sortedBy: \.added, ascending: false).map(DownloadViewModel.init)
+        let items = coordinator.downloads(sortedBy: \.added, ascending: false)
+            .filter { $0.fireWindowSession == fireWindowSession }
+            .map(DownloadViewModel.init)
         self.items = items
         self.viewModels = items.reduce(into: [:]) { $0[$1.id] = $1 }
         cancellable = coordinator.updates.receive(on: DispatchQueue.main).sink { [weak self] update in
@@ -47,22 +51,22 @@ final class DownloadListViewModel {
         dispatchPrecondition(condition: .onQueue(.main))
         switch kind {
         case .added:
+            guard item.fireWindowSession == self.fireWindowSession else { return }
+
             let viewModel = DownloadViewModel(item: item)
             self.viewModels[item.identifier] = viewModel
             self.items.insert(viewModel, at: 0)
         case .updated:
             self.viewModels[item.identifier]?.update(with: item)
         case .removed:
-            guard let index = self.items.firstIndex(where: { $0.id == item.identifier }) else {
-                return
-            }
+            guard let index = self.items.firstIndex(where: { $0.id == item.identifier }) else { return }
             self.viewModels[item.identifier] = nil
             self.items.remove(at: index)
         }
     }
 
     func cleanupInactiveDownloads() {
-        coordinator.cleanupInactiveDownloads()
+        coordinator.cleanupInactiveDownloads(for: fireWindowSession)
     }
 
     func cancelDownload(at index: Int) {
