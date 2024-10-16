@@ -141,9 +141,7 @@ final class PIRScanIntegrationTests: XCTestCase {
         }
     }
 
-    var fakeBrokerAPIAddress: String {
-        "http://localhost:3001/api/"
-    }
+    let fakeBrokerAPIAddress = "http://localhost:3001/api/"
 
     func deleteAllProfilesOnFakeBroker() async {
         let deleteProfilesURL = URL(string: fakeBrokerAPIAddress + "profiles")!
@@ -183,7 +181,6 @@ final class PIRScanIntegrationTests: XCTestCase {
         try database.deleteProfileData()
         XCTAssert(try database.fetchAllBrokerProfileQueryData().isEmpty)
 
-        // I get a socket error if I use "localhost", so need to figure that out
         // Also need to look into why it didn't work when not in dev mode
 
         // Fake broker set up
