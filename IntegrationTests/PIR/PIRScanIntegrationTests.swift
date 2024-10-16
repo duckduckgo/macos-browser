@@ -187,8 +187,6 @@ final class PIRScanIntegrationTests: XCTestCase {
         try database.deleteProfileData()
         XCTAssert(try database.fetchAllBrokerProfileQueryData().isEmpty)
 
-        // Also need to look into why it didn't work when not in dev mode
-
         // Fake broker set up
         await deleteAllProfilesOnFakeBroker()
 
@@ -218,6 +216,7 @@ final class PIRScanIntegrationTests: XCTestCase {
                                whenCondition: {
             try! database.fetchAllBrokerProfileQueryData().count > 0
         })
+        print("Stage 1 passed: We save a profile")
 
         /*
         2/ We scan brokers
@@ -234,6 +233,7 @@ final class PIRScanIntegrationTests: XCTestCase {
 
         let metaData = await communicationDelegate.getBackgroundAgentMetadata()
         XCTAssertNotNil(metaData.lastStartedSchedulerOperationBrokerUrl)
+        print("Stage 2 passed: We scan brokers")
 
         /*
         3/ We find and save extracted profiles
@@ -308,18 +308,22 @@ final class PIRScanIntegrationTests: XCTestCase {
         print("Stage 5 passed: We finish running the opt out jobs")
 
         /*
-         Okay, now kinda stuck with current fake broker
-         but possibly worth exploring what this will look like?
         6/ The BE service receives the email
-         So fake broker will send this, nothing to do on client?
+         The fake broker currently doesn't, but will eventually send this,
+         so there's nothing to do on the client to test this step.
          */
 
         /*
         7/ The app polls the backend service for the link
          8/ We visit the confirmation link
+
+         Since the fake broker doesn't send emails at the moment, we can't actually test these steps
+         Once it does, we can use the below code.
+
           The current only way we can check these from the app is through pixels
           Not great to tie to pixels. Better to check from fake broker we visited confirmation page correctly
          */
+        /*
         let optOutEmailReceivedPixelExpectation = expectation(description: "Opt out email received pixel fired")
         let optOutEmailConfirmedPixelExpectation = expectation(description: "Opt out email confirmed pixel fired")
 
@@ -337,13 +341,14 @@ final class PIRScanIntegrationTests: XCTestCase {
         await fulfillment(of: [optOutEmailReceivedPixelExpectation, optOutEmailConfirmedPixelExpectation],
                           timeout: 300)
 
-        PixelKit.tearDown()
-        pixelKit.clearFrequencyHistoryForAllPixels()
+         PixelKit.tearDown()
+         pixelKit.clearFrequencyHistoryForAllPixels()
+         */
 
         /*
         9/ We confirm the opt out through a scan
-         would be good to read from fake broker directly too
          */
+        //TODO would be good to read from fake broker directly too
 
         let optOutConfirmedExpectation = expectation(description: "Opt out confirmed")
         await awaitFulfillment(of: optOutConfirmedExpectation,
