@@ -805,7 +805,6 @@ extension MainViewController {
         autofillPixelReporter.resetStoreDefaults()
         var loginImportState = AutofillLoginImportState()
         loginImportState.hasImportedLogins = false
-        loginImportState.credentialsImportPromptPresentationCount = 0
         loginImportState.isCredentialsImportPromptPermanantlyDismissed = false
     }
 

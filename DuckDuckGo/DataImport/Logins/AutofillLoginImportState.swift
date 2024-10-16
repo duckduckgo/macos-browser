@@ -52,16 +52,6 @@ final class AutofillLoginImportState: AutofillLoginImportStateProvider, Autofill
         }
     }
 
-    public var credentialsImportPromptPresentationCount: Int {
-        get {
-            userDefaults.integer(forKey: Key.credentialsImportPromptPresentationCount)
-        }
-
-        set {
-            userDefaults.set(newValue, forKey: Key.credentialsImportPromptPresentationCount)
-        }
-    }
-
     public var isAutofillEnabled: Bool {
         AutofillPreferences().askToSaveUsernamesAndPasswords
     }

@@ -27,7 +27,6 @@ public protocol AutofillCredentialsImportPresentationDelegate: AnyObject {
 public protocol AutofillLoginImportStateProvider {
     var isEligibleDDGUser: Bool { get }
     var hasImportedLogins: Bool { get }
-    var credentialsImportPromptPresentationCount: Int { get }
     var isAutofillEnabled: Bool { get }
     var isCredentialsImportPromptPermanantlyDismissed: Bool { get }
     func hasNeverPromptWebsitesFor(_ domain: String) -> Bool
