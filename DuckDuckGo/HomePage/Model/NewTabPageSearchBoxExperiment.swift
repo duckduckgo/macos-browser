@@ -38,6 +38,18 @@ final class NewTabPageSearchBoxExperiment {
         case ntpSearchBox = "ntp_search_box"
     }
 
+    var isActive: Bool {
+        (daySinceEnrollment() ?? Int.max) <= 7
+    }
+
+    var cohort: Cohort? {
+        isActive ? userDefaults.experimentCohort : nil
+    }
+
+    var onboardingCohort: PixelExperiment? {
+        isActive ? PixelExperiment.logic.cohort : nil
+    }
+
     func assignUserToCohort() {
         guard !userDefaults.didRunEnrollment else {
             Logger.newTabPageSearchBoxExperiment.debug("Cohort already assigned, skipping...")
@@ -85,6 +97,8 @@ final class NewTabPageSearchBoxExperiment {
                 cohort: cohort,
                 onboardingCohort: PixelExperiment.logic.cohort)
             )
+            userDefaults.lastPixelTimestamp = Date()
+            userDefaults.numberOfSearches = numberOfSearches
         }
     }
 
