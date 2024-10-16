@@ -49,7 +49,7 @@ final class PrivacyDashboardViewController: NSViewController {
             let privacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager
             var updatedParameters = parameters
             // do not enroll users who have CPM disabled
-            if CookiePopupProtectionPreferences.shared.isAutoconsentEnabled && privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(AutoconsentSubfeature.filterlistExperiment) {
+            if CookiePopupProtectionPreferences.shared.isAutoconsentEnabled && privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(AutoconsentSubfeature.filterlistExperiment2) {
                 updatedParameters["cpmExperiment"] = AutoconsentFilterlistExperiment.cohort == AutoconsentFilterlistExperiment.test ? "1" : "0"
             }
             PixelKit.fire(NonStandardEvent(NonStandardPixel.brokenSiteReport),
