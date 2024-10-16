@@ -227,7 +227,7 @@ final class AddressBarButtonsViewController: NSViewController {
             hasPrivacyInfoPulseQueuedAnimation = false
             // Give a bit of delay to have a better animation effect
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-                ContextualOnboardingViewHighlighter.highlight(view: self.privacyEntryPointButton, inParent: self.view)
+                ViewHighlighter.highlight(view: self.privacyEntryPointButton, inParent: self.view)
             }
         }
     }
@@ -989,7 +989,7 @@ extension AddressBarButtonsViewController {
 
     func highlightPrivacyShield() {
         if !isAnyShieldAnimationPlaying && buttonsBadgeAnimator.queuedAnimation == nil {
-            ContextualOnboardingViewHighlighter.highlight(view: privacyEntryPointButton, inParent: self.view)
+            ViewHighlighter.highlight(view: privacyEntryPointButton, inParent: self.view)
         } else {
             hasPrivacyInfoPulseQueuedAnimation = true
         }
@@ -997,7 +997,7 @@ extension AddressBarButtonsViewController {
 
     func stopHighlightingPrivacyShield() {
         hasPrivacyInfoPulseQueuedAnimation = false
-        ContextualOnboardingViewHighlighter.stopHighlighting(view: privacyEntryPointButton)
+        ViewHighlighter.stopHighlighting(view: privacyEntryPointButton)
     }
 
 }

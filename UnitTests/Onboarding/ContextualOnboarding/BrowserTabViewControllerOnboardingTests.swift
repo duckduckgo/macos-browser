@@ -166,7 +166,7 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
         dialogProvider.dialog = .trackers(message: .init(string: ""), shouldFollowUp: true)
         dialogProvider.state = .showBlockedTrackers
         let url = try XCTUnwrap(URL(string: "some.url"))
-        let delegate = BrowserTabViewControllerDelegateMock()
+        let delegate = BrowserTabViewControllerDelegateSpy()
         viewController.delegate = delegate
         XCTAssertFalse(delegate.didCallHighlightPrivacyShield)
 
