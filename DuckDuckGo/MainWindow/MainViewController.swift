@@ -574,9 +574,11 @@ extension MainViewController: BrowserTabViewControllerDelegate {
 
     func dismissViewHighlight() {
         tabBarViewController.stopFireButtonPulseAnimation()
+        navigationBarViewController.addressBarViewController?.addressBarButtonsViewController?.stopHighlightingPrivacyShield()
     }
 
     func highlightPrivacyShield() {
+        navigationBarViewController.addressBarViewController?.addressBarButtonsViewController?.highlightPrivacyShield()
     }
 
 }
