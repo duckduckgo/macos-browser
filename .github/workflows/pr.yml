@@ -134,7 +134,6 @@ jobs:
         token: ${{ secrets.PIR_FAKE_BROKER2 }}
         ref: loremattei/ci-integration
         path: pir-fake-broker
-        persist-credentials: false
 
     - name: Start PIR Fake Broker
       run: |
