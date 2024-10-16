@@ -129,6 +129,7 @@ final class AddressBarButtonsViewController: NSViewController {
     var isTextFieldEditorFirstResponder = false {
         didSet {
             updateButtons()
+            stopHighlightingPrivacyShield()
         }
     }
     var textFieldValue: AddressBarTextField.Value? {
