@@ -25,7 +25,6 @@ protocol AutofillLoginImportStateStoring {
 final class AutofillLoginImportState: AutofillLoginImportStateProvider, AutofillLoginImportStateStoring {
     private enum Key {
         static let hasImportedLogins: String = "com.duckduckgo.logins.hasImportedLogins"
-        static let credentialsImportPromptPresentationCount: String = "com.duckduckgo.logins.credentialsImportPromptPresentationCount"
         static let isCredentialsImportPromptPermanantlyDismissed: String = "com.duckduckgo.logins.isCredentialsImportPromptPermanantlyDismissed"
     }
 
