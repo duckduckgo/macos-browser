@@ -48,7 +48,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
     }()
 
     lazy var credentialsImportManager: AutofillCredentialsImportManager = {
-        let manager = AutofillCredentialsImportManager()
+        let manager = AutofillCredentialsImportManager(isBurnerWindow: false)
         manager.presentationDelegate = self
         return manager
     }()
@@ -135,7 +135,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
 
     private func initWebView() {
         let scriptSourceProvider = buildAutofillSource()
-        self.topAutofillUserScript = OverlayAutofillUserScript(scriptSourceProvider: scriptSourceProvider, overlay: self, loginImportStateProvider: AutofillLoginImportState())
+        self.topAutofillUserScript = OverlayAutofillUserScript(scriptSourceProvider: scriptSourceProvider, overlay: self)
         guard let topAutofillUserScript = topAutofillUserScript else { return }
         let configuration = WKWebViewConfiguration()
 

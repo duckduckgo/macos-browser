@@ -18,15 +18,23 @@
 
 import BrowserServicesKit
 
-final class AutofillLoginImportState: AutofillLoginImportStateProvider {
+protocol AutofillLoginImportStateStoring {
+    var isCredentialsImportPromptPermanantlyDismissed: Bool { get set }
+}
+
+final class AutofillLoginImportState: AutofillLoginImportStateProvider, AutofillLoginImportStateStoring {
     private enum Key {
         static let hasImportedLogins: String = "com.duckduckgo.logins.hasImportedLogins"
-        static let credentialsImportPromptPresentationCount: String = "com.duckduckgo.logins.credentialsImportPromptPresentationCount"
+        static let isCredentialsImportPromptPermanantlyDismissed: String = "com.duckduckgo.logins.isCredentialsImportPromptPermanantlyDismissed"
     }
 
     private let userDefaults: UserDefaults
+    private let featureFlagger: FeatureFlagger
 
-    public var isNewDDGUser: Bool {
+    public var isEligibleDDGUser: Bool {
+        guard !featureFlagger.isFeatureOn(.credentialsImportPromotionForExistingUsers) else {
+            return true
+        }
         guard let date = userDefaults.object(forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue) as? Date else {
             return true
         }
@@ -43,22 +51,23 @@ final class AutofillLoginImportState: AutofillLoginImportStateProvider {
         }
     }
 
-    public var credentialsImportPromptPresentationCount: Int {
-        get {
-            userDefaults.integer(forKey: Key.credentialsImportPromptPresentationCount)
-        }
-
-        set {
-            userDefaults.set(newValue, forKey: Key.credentialsImportPromptPresentationCount)
-        }
-    }
-
     public var isAutofillEnabled: Bool {
         AutofillPreferences().askToSaveUsernamesAndPasswords
     }
 
-    init(userDefaults: UserDefaults = .standard) {
+    public var isCredentialsImportPromptPermanantlyDismissed: Bool {
+        get {
+            userDefaults.bool(forKey: Key.isCredentialsImportPromptPermanantlyDismissed)
+        }
+
+        set {
+            userDefaults.set(newValue, forKey: Key.isCredentialsImportPromptPermanantlyDismissed)
+        }
+    }
+
+    init(userDefaults: UserDefaults = .standard, featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger) {
         self.userDefaults = userDefaults
+        self.featureFlagger = featureFlagger
     }
 
     func hasNeverPromptWebsitesFor(_ domain: String) -> Bool {
