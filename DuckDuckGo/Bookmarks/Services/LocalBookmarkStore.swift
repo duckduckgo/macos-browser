@@ -351,31 +351,44 @@ final class LocalBookmarkStore: BookmarkStore {
                 }
             }
 
-            let favoritesRoot = favoritesRoot(in: context)
+            for (parentEntity, (managedObjects, insertionIndices)) in objectsToInsertIntoParent {
+                move(entities: managedObjects, to: insertionIndices, within: parentEntity)
+            }
+
             let displayedFavoritesFolderUUID = favoritesDisplayMode.displayedFolder.rawValue
             guard let displayedFavoritesFolder = BookmarkUtils.fetchFavoritesFolder(withUUID: displayedFavoritesFolderUUID, in: context) else {
                 throw BookmarkStoreError.missingFavoritesRoot
             }
-
             let favoritesFolders = BookmarkUtils.fetchFavoritesFolders(for: favoritesDisplayMode, in: context)
             let favoritesFoldersWithoutDisplayed = favoritesFolders.filter { $0.uuid != displayedFavoritesFolderUUID }
-            let sortedEntitiesByFavoritesIndex = entitiesAtIndices
+
+            let favoritesAtIndices = entitiesAtIndices.filter { $0.indexInFavoritesArray != nil }
+            let sortedEntitiesByFavoritesIndex = favoritesAtIndices
                 .sorted { ($0.indexInFavoritesArray ?? Int.max) < ($1.indexInFavoritesArray ?? Int.max) }
 
-            for (entity, _, indexInFavoritesArray) in sortedEntitiesByFavoritesIndex {
+            let indicesInFavoritesArray = sortedEntitiesByFavoritesIndex.compactMap(\.indexInFavoritesArray)
+
+            let adjustedIndices = displayedFavoritesFolder.favorites?.array.adjustInsertionIndices(IndexSet(indicesInFavoritesArray)) { object in
+                guard let bookmarkMO = object as? BookmarkEntity else {
+                    return false
+                }
+                return !(bookmarkMO.isStub || bookmarkMO.isPendingDeletion)
+            } ?? IndexSet()
+
+            assert(adjustedIndices.count == sortedEntitiesByFavoritesIndex.count, "Adjusted indices array size is different than sorted entities array size")
+
+            let adjustedEntitiesByFavoritesIndex = zip(sortedEntitiesByFavoritesIndex.map(\.entity), adjustedIndices)
+
+            for (entity, indexInFavoritesArray) in adjustedEntitiesByFavoritesIndex {
                 guard let bookmarkMO = entitiesByUUID[entity.id] else {
                     return
                 }
 
-                if let bookmark = entity as? Bookmark, bookmark.isFavorite, let favoritesRoot = favoritesRoot {
+                if let bookmark = entity as? Bookmark, bookmark.isFavorite {
                     bookmarkMO.addToFavorites(insertAt: indexInFavoritesArray,
                                               favoritesRoot: displayedFavoritesFolder)
                     bookmarkMO.addToFavorites(folders: favoritesFoldersWithoutDisplayed)
                 }
-            }
-
-            for (parentEntity, (managedObjects, insertionIndices)) in objectsToInsertIntoParent {
-                move(entities: managedObjects, to: insertionIndices, within: parentEntity)
             }
 
         }, onError: { [weak self] error in
