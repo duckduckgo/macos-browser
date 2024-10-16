@@ -25,6 +25,21 @@ import os.log
 
 #if SPARKLE
 
+enum UpdateState {
+    case upToDate
+    case updateCycle(UpdateCycleProgress)
+
+    init(from update: Update?, progress: UpdateCycleProgress) {
+        if let update, !update.isInstalled {
+            self = .updateCycle(progress)
+        } else if progress.isFailed {
+            self = .updateCycle(progress)
+        } else {
+            self = .upToDate
+        }
+    }
+}
+
 enum UpdateCycleProgress {
     case updateCycleNotStarted
     case updateCycleDidStart
