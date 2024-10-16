@@ -324,23 +324,48 @@ final class AddressBarTextField: NSTextField {
     }
 
     private func navigate(suggestion: Suggestion?) {
-        let pixel: GeneralPixel? = {
+        let ntpExperiment = NewTabPageSearchBoxExperiment()
+        let source: NewTabPageSearchBoxExperiment.SearchSource? = {
+            guard ntpExperiment.isActive else {
+                return nil
+            }
+            let isNewTab = tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab
+            guard isNewTab else {
+                return .addressBar
+            }
+            return isSearchBox ? .ntpSearchBox : .ntpAddressBar
+        }()
+
+        switch suggestion {
+        case .phrase, .none:
+            if let source {
+                ntpExperiment.recordSearch(from: source)
+            }
+        default:
+            break
+        }
+
+        let autocompletePixel: GeneralPixel? = {
             switch suggestion {
             case .phrase:
-                return .autocompleteClickPhrase(from: nil, cohort: nil, onboardingCohort: nil)
+                return .autocompleteClickPhrase(from: source, cohort: ntpExperiment.cohort, onboardingCohort: ntpExperiment.onboardingCohort)
             case .website:
-                return .autocompleteClickWebsite(from: nil, cohort: nil, onboardingCohort: nil)
+                return .autocompleteClickWebsite(from: source, cohort: ntpExperiment.cohort, onboardingCohort: ntpExperiment.onboardingCohort)
             case .bookmark(_, _, let isFavorite, _):
-                return isFavorite ? .autocompleteClickFavorite(from: nil, cohort: nil, onboardingCohort: nil) : .autocompleteClickBookmark(from: nil, cohort: nil, onboardingCohort: nil)
+                if isFavorite {
+                    return .autocompleteClickFavorite(from: source, cohort: ntpExperiment.cohort, onboardingCohort: ntpExperiment.onboardingCohort)
+                } else {
+                    return .autocompleteClickBookmark(from: source, cohort: ntpExperiment.cohort, onboardingCohort: ntpExperiment.onboardingCohort)
+                }
             case .historyEntry:
-                return .autocompleteClickHistory(from: nil, cohort: nil, onboardingCohort: nil)
+                return .autocompleteClickHistory(from: source, cohort: ntpExperiment.cohort, onboardingCohort: ntpExperiment.onboardingCohort)
             default:
                 return nil
             }
         }()
 
-        if let pixel {
-            PixelKit.fire(pixel)
+        if let autocompletePixel {
+            PixelKit.fire(autocompletePixel)
         }
 
         if NSApp.isCommandPressed {
