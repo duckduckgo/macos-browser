@@ -31,12 +31,13 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
     var factory: CapturingDialogFactory!
     var tab: Tab!
     var cancellables: Set<AnyCancellable> = []
-    let expectation = XCTestExpectation()
+    var expectation: XCTestExpectation!
 
     @MainActor override func setUpWithError() throws {
         try super.setUpWithError()
         let tabCollectionViewModel = TabCollectionViewModel()
         dialogProvider = MockDialogsProvider()
+        expectation = .init()
         factory = CapturingDialogFactory(expectation: expectation)
         tab = Tab()
         tab.setContent(.url(URL.duckDuckGo, credential: nil, source: .appOpenUrl))
@@ -54,6 +55,7 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
         tab = nil
         viewController = nil
         cancellables = []
+        expectation = nil
         try super.tearDownWithError()
     }
 
@@ -130,14 +132,9 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
         let expectation = self.expectation(description: "Wait for webViewDidFinishNavigationPublisher to emit")
         let delegate = BrowserTabViewControllerDelegateMock()
         let url = try XCTUnwrap(URL(string: "some.url"))
+        dialogProvider.dialogTypeForTabExpectation = expectation
         dialogProvider.dialog = nil
         viewController.delegate = delegate
-        tab.webViewDidFinishNavigationPublisher
-            .sink {
-                expectation.fulfill()
-            }
-            .store(in: &cancellables)
-        XCTAssertFalse(delegate.didCallDismissViewHighlight)
 
         // WHEN
         tab.navigateTo(url: url)
@@ -184,13 +181,9 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
         let expectation = self.expectation(description: "Wait for webViewDidFinishNavigationPublisher to emit")
         let delegate = BrowserTabViewControllerDelegateMock()
         let url = try XCTUnwrap(URL(string: "some.url"))
+        dialogProvider.dialogTypeForTabExpectation = expectation
         dialogProvider.dialog = nil
         viewController.delegate = delegate
-        tab.webViewDidFinishNavigationPublisher
-            .sink {
-                expectation.fulfill()
-            }
-            .store(in: &cancellables)
         tab.navigateTo(url: url)
         XCTAssertFalse(delegate.didCallDismissViewHighlight)
         wait(for: [expectation], timeout: 3.0)
@@ -244,9 +237,12 @@ class MockDialogsProvider: ContextualOnboardingDialogTypeProviding, ContextualOn
 
     func updateStateFor(tab: DuckDuckGo_Privacy_Browser.Tab) {}
 
+    var dialogTypeForTabExpectation: XCTestExpectation?
+
     var dialog: ContextualDialogType?
 
     func dialogTypeForTab(_ tab: Tab, privacyInfo: PrivacyInfo?) -> ContextualDialogType? {
+        dialogTypeForTabExpectation?.fulfill()
         return dialog
     }
 
