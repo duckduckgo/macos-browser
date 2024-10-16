@@ -328,9 +328,6 @@ jobs:
         author=$(gh api https://api.github.com/repos/${{ github.repository }}/commits/${head_commit} --jq .author.login)
         echo "commit_author=${author}" >> $GITHUB_OUTPUT
 
-    - name: Stop containers
-      run: docker stop $(docker ps -q --filter ancestor=ghcr.io/duckduckgo/pir-fake-broker:latest)
-
   private-api:
     name: Private API Report
     needs: tests
