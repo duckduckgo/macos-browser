@@ -22,6 +22,13 @@ import Foundation
 
 extension HomePage.Models {
 
+    /**
+     * This class is responsible for exposing Address Bar logic to `AddressBarTextFieldView`
+     * that's an `NSViewRepresentable`-wrapped `AddressBarTextField` view.
+     *
+     * It manages an instance of `AddressBarViewController` and `AddressBarButtonsViewController`
+     * and serves as a facade for the API needed by SwiftUI views.
+     */
     @MainActor
     final class AddressBarModel: ObservableObject {
 
