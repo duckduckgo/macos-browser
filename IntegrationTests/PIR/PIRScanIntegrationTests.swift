@@ -62,6 +62,8 @@ final class PIRScanIntegrationTests: XCTestCase {
     }
 
     override func setUpWithError() throws {
+        continueAfterFailure = false
+
         loginItemsManager = LoginItemsManager()
         loginItemsManager.disableLoginItems([LoginItem.dbpBackgroundAgent])
         loginItemsManager.enableLoginItems([LoginItem.dbpBackgroundAgent])
