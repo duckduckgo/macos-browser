@@ -144,9 +144,8 @@ extension ReleaseNotesValues {
     init(from updateController: UpdateController?) {
         let currentVersion = "\(AppVersion().versionNumber) (\(AppVersion().buildNumber))"
         let lastUpdate = UInt((updateController?.lastUpdateCheckDate ?? Date()).timeIntervalSince1970)
-        let latestVersion: String
 
-        guard let updateController else {
+        guard let updateController, let latestUpdate = updateController.latestUpdate else {
             self.init(status: .loaded,
                       currentVersion: currentVersion,
                       lastUpdate: lastUpdate)
@@ -160,25 +159,28 @@ extension ReleaseNotesValues {
         case .upToDate:
             self.init(status: .loaded,
                       currentVersion: currentVersion,
-                      lastUpdate: lastUpdate)
+                      latestVersion: latestUpdate.versionString,
+                      lastUpdate: lastUpdate,
+                      releaseTitle: latestUpdate.title,
+                      releaseNotes: latestUpdate.releaseNotes,
+                      releaseNotesPrivacyPro: latestUpdate.releaseNotesPrivacyPro)
         case .updateCycle(let progress):
-            if let latestUpdate = updateController.latestUpdate {
-                latestVersion = "\(latestUpdate.version) (\(latestUpdate.build))"
-                let status = hasPendingUpdate ? .updateReady : progress.toStatus
-                self.init(status: status,
-                          currentVersion: currentVersion,
-                          latestVersion: latestVersion,
-                          lastUpdate: lastUpdate,
-                          releaseTitle: latestUpdate.title,
-                          releaseNotes: latestUpdate.releaseNotes,
-                          releaseNotesPrivacyPro: latestUpdate.releaseNotesPrivacyPro,
-                          downloadProgress: progress.toDownloadProgress)
-            } else {
-                self.init(status: .loaded,
-                          currentVersion: currentVersion,
-                          lastUpdate: lastUpdate)
-            }
+            let status = hasPendingUpdate ? .updateReady : progress.toStatus
+            self.init(status: status,
+                      currentVersion: currentVersion,
+                      latestVersion: latestUpdate.versionString,
+                      lastUpdate: lastUpdate,
+                      releaseTitle: latestUpdate.title,
+                      releaseNotes: latestUpdate.releaseNotes,
+                      releaseNotesPrivacyPro: latestUpdate.releaseNotesPrivacyPro,
+                      downloadProgress: progress.toDownloadProgress)
         }
+    }
+}
+
+private extension Update {
+    var versionString: String? {
+        "\(version) \(build)"
     }
 }
 
