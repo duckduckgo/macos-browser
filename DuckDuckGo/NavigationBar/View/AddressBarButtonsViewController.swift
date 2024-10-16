@@ -608,7 +608,6 @@ final class AddressBarButtonsViewController: NSViewController {
             subscribeToUrl()
             subscribeToPermissions()
             subscribeToPrivacyEntryPointIconUpdateTrigger()
-            subscribeToTrackerAnimationTrigger()
 
             updatePrivacyEntryPointIcon()
         }
@@ -627,6 +626,7 @@ final class AddressBarButtonsViewController: NSViewController {
                 stopAnimations()
                 updateBookmarkButtonImage()
                 updateButtons()
+                subscribeToTrackerAnimationTrigger()
             }
     }
 
@@ -643,6 +643,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     private func subscribeToTrackerAnimationTrigger() {
         trackerAnimationTriggerCancellable = tabViewModel?.trackersAnimationTriggerPublisher
+            .first()
             .sink { [weak self] _ in
                 self?.animateTrackers()
             }
