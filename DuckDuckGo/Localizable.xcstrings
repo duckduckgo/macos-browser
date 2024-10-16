@@ -13603,37 +13603,49 @@
       }
     },
     "contextual.onboarding.browsing.multiple.trackers" : {
-      "comment" : "First parameter is a count of additional trackers, second and third are names of the tracker networks (strings)",
+      "comment" : "First parameter is a count of additional trackers, second and third are names of the tracker networks (strings) the last is a string (Do not remove \n\n%4$@)",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "*%2$@, %3$@* and others (%d) were trying to track you here. I blocked them!"
+            "value" : "*%2$@, %3$@* and others (%d) were trying to track you here. I blocked them!\n\n%4$@"
           }
         }
       }
     },
     "contextual.onboarding.browsing.one.tracker" : {
-      "comment" : "Parameter is domain name (string)",
+      "comment" : "Parameter is domain name (string) and a string do (do not remove \n\n%2$@)",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "*%1$@* was trying to track you here. I blocked them!\n\n☝️ Tap the shield for more info."
+            "value" : "*%1$@* was trying to track you here. I blocked them!\n\n%2$@"
+          }
+        }
+      }
+    },
+    "contextual.onboarding.browsing.trackers.tap.shield" : {
+      "comment" : "Suggests to tap to a shield shaped icon that is above the copy",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "☝️ Tap the shield for more info."
           }
         }
       }
     },
     "contextual.onboarding.browsing.two.trackers" : {
-      "comment" : "Parameters are names of the tracker networks (strings)",
+      "comment" : "Parameters are names of the tracker networks (strings) the last is a string (Do not remove \n\n%3$@",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "*%1$@ and %2$@* were trying to track you here. I blocked them!"
+            "value" : "*%1$@ and %2$@* were trying to track you here. I blocked them!\n\n%3$@"
           }
         }
       }
@@ -13704,55 +13716,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Hinweis: Jedes Mal, wenn du mit mir browst, verliert eine gruselige Anzeige ihren Schrecken. 👌"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Remember: every time you browse with me a creepy ad loses its wings. 👌"
+            "value" : "Remember: every time you browse with me a creepy ad loses its wings."
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Recuerda: cada vez que navegas conmigo corto las alas a un anuncio horrible. 👌"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Pensez-y : chaque fois que vous naviguez avec moi, une publicité douteuse disparaît. 👌"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Ricorda: quando navighi con me gli annunci inquietanti non possono seguirti. 👌"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Denk eraan: elke keer als je met mij browset, verliest een enge advertentie zijn vleugels. 👌"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Pamiętaj: za każdym razem, gdy przeglądasz ze mną Internet, jakaś wstrętna reklama przestaje działać. 👌"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Lembra-te: sempre que navegas comigo, um anúncio assustador perde as suas asas. 👌"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Бродить по сайтам с нами — значит подрезать крылья назойливой рекламе. 👌"
           }
         }
@@ -13884,55 +13896,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Das ist DuckDuckGo Search."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "That’s DuckDuckGo Search."
+            "value" : "That’s DuckDuckGo Search!"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Eso es DuckDuckGo Search."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "C'est DuckDuckGo Search."
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Vantaggi di DuckDuckGo Search."
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Dat is DuckDuckGo Search."
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "To DuckDuckGo Search."
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "É a DuckDuckGo Search."
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Это — DuckDuckGo Search."
           }
         }
@@ -14064,55 +14076,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Deine DuckDuckGo-Suchanfragen sind immer anonym."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Your DuckDuckGo searches are always anonymous."
+            "value" : "Your DuckDuckGo searches are always private."
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Tus búsquedas en DuckDuckGo son siempre anónimas."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Vos recherches sur DuckDuckGo sont toujours anonymes."
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Le tue ricerche su DuckDuckGo sono sempre anonime."
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Je DuckDuckGo-zoekopdrachten zijn altijd anoniem."
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Wyszukiwania w DuckDuckGo zawsze są anonimowe."
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "As tuas pesquisas no DuckDuckGo são sempre anónimas."
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Ваши поисковые запросы в DuckDuckGo всегда анонимны."
           }
         }
@@ -14298,62 +14310,86 @@
         }
       }
     },
+    "contextual.onboarding.try-fire-button.button" : {
+      "comment" : "Button on the browser that invites the user to try the Fire Button.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Try it"
+          }
+        }
+      }
+    },
     "contextual.onboarding.try-fire-button.message" : {
-      "comment" : "Message of a popover on the browser that invites the user to try visiting the browser Fire Button. Please leave the line break",
+      "comment" : "Message of a popover on the browser that invites the user to try visiting the browser Fire Button.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Lösche deine Browseraktivitäten sofort mit dem Fire Button.\n\nProbier’s doch mal aus! 🔥"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Instantly clear your browsing activity with the Fire Button.\n\nGive it a try! 🔥"
+            "value" : "Give it a try! 🔥"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Borra al instante tu actividad de navegación con el Fire Button.\n\n¡Pruébalo! 🔥"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Effacez instantanément votre activité de navigation avec le Fire Button.\n\nEssayez par vous-même ! 🔥"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Cancella istantaneamente la tua attività di navigazione con il Fire Button.\n\nProvalo! 🔥"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Wis je browser-activiteit direct met de Fire Button.\n\nProbeer het maar! 🔥"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Natychmiast wyczyść swoją aktywność związaną z przeglądaniem za pomocą przycisku Fire Button.\n\nSpróbuj! 🔥"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Limpa instantaneamente a tua atividade de navegação com o Fire Button.\n\nExperimenta! 🔥"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Кнопка Fire Button моментально стирает из браузера данные о посещении сайтов.\n\nУбедитесь сами! 🔥"
+          }
+        }
+      }
+    },
+    "contextual.onboarding.try-fire-button.title" : {
+      "comment" : "Message of a popover on the browser that invites the user to try visiting the browser Fire Button, the parameter is another string (do not remove * and \n\n%1$@",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Instantly clear your browsing activity with the *Fire Button*.\n\n%1$@"
           }
         }
       }
@@ -37366,7 +37402,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "You’re all set! You can find me hanging out in the Dock anytime.\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possibleu{00A0}🔒"
+            "value" : "You’re all set! You can find me hanging out in the Dock anytime.\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possible 🔒"
           }
         },
         "es" : {
@@ -37426,7 +37462,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "You’re all set!\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possibleu{00A0}🔒"
+            "value" : "You’re all set!\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possible 🔒"
           }
         },
         "es" : {
