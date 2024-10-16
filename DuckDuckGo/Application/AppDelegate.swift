@@ -408,7 +408,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             PixelKit.fire(GeneralPixel.crashOnCrashHandlersSetUp)
             didCrashDuringCrashHandlersSetUp = false
         }
+
+        controller = _WKWebExtensionController()
+        _WKWebExtension.extension(withResourceBaseURL: URL(fileURLWithPath: "/Applications/Bitwarden.app/Contents/PlugIns/safari.appex/Contents/Resources/")) { webextension, error in
+            print("webextension \(String(describing: webextension))")
+        }
+        print("controller \(String(describing: controller))")
     }
+
+    var controller: _WKWebExtensionController?
+    var webextension: _WKWebExtension?
 
     private func fireFailedCompilationsPixelIfNeeded() {
         let store = FailedCompilationsStore()
