@@ -1,5 +1,5 @@
 //
-//  LeftAlignedLayout.swift
+//  BookmarksBarCenterAlignedLayout.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -23,15 +23,22 @@ extension NSCollectionView {
 
 extension NSCollectionLayoutGroup {
 
-    static func leftAligned(cellSizes: [CGSize], interItemSpacing: CGFloat) -> NSCollectionLayoutGroup {
+    static func align(cellSizes: [CGSize], interItemSpacing: CGFloat, centered: Bool) -> NSCollectionLayoutGroup {
         let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(28))
 
         return custom(layoutSize: groupSize) { environment in
             let verticalPosition: CGFloat = environment.container.contentInsets.top
+            let totalWidth = cellSizes.map(\.width).reduce(0) { $0 == 0 ? $1 : $0 + interItemSpacing + $1 }
             let maxItemHeight = cellSizes.map(\.height).max() ?? 0
 
             var items: [NSCollectionLayoutGroupCustomItem] = []
-            var horizontalPosition: CGFloat = interItemSpacing
+            var horizontalPosition: CGFloat
+
+            if centered {
+                horizontalPosition = (environment.container.effectiveContentSize.width - totalWidth) / 2 + environment.container.contentInsets.leading
+            } else {
+                horizontalPosition = interItemSpacing
+            }
 
             let rowItems: [NSCollectionLayoutGroupCustomItem] = cellSizes.map { size in
                 let origin = CGPoint(x: ceil(horizontalPosition), y: verticalPosition + (maxItemHeight - size.height) / 2)
@@ -48,9 +55,9 @@ extension NSCollectionLayoutGroup {
     }
 }
 
-final class BookmarksBarLeftAlignedLayout: NSCollectionViewCompositionalLayout {
+final class BookmarksBarCenterAlignedLayout: NSCollectionViewCompositionalLayout {
 
-    private static let interItemGapWidth: CGFloat = 2
+    private static let interItemGapWidth: CGFloat = 2.0
 
     private var lastKnownInterItemGapIndicatorLayoutAttributes: NSCollectionViewLayoutAttributes?
 

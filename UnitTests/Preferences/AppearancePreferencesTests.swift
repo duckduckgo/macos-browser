@@ -31,6 +31,7 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
     var bookmarksBarAppearance: BookmarksBarAppearance
     var homeButtonPosition: HomeButtonPosition
     var homePageCustomBackground: String?
+    var centerAlignedBookmarksBar: Bool
 
     init(
         showFullURL: Bool = false,
@@ -42,7 +43,8 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
         showBookmarksBar: Bool = true,
         bookmarksBarAppearance: BookmarksBarAppearance = .alwaysOn,
         homeButtonPosition: HomeButtonPosition = .right,
-        homePageCustomBackground: String? = nil
+        homePageCustomBackground: String? = nil,
+        centerAlignedBookmarksBar: Bool = true
     ) {
         self.showFullURL = showFullURL
         self.currentThemeName = currentThemeName
@@ -54,6 +56,7 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
         self.bookmarksBarAppearance = bookmarksBarAppearance
         self.homeButtonPosition = homeButtonPosition
         self.homePageCustomBackground = homePageCustomBackground
+        self.centerAlignedBookmarksBar = centerAlignedBookmarksBar
     }
 }
 
@@ -69,7 +72,8 @@ final class AppearancePreferencesTests: XCTestCase {
                 isFavoriteVisible: true,
                 isRecentActivityVisible: true,
                 homeButtonPosition: .left,
-                homePageCustomBackground: CustomBackground.gradient(.gradient01).description
+                homePageCustomBackground: CustomBackground.gradient(.gradient01).description,
+                centerAlignedBookmarksBar: true
             )
         )
 
@@ -81,6 +85,7 @@ final class AppearancePreferencesTests: XCTestCase {
         XCTAssertEqual(model.isRecentActivityVisible, true)
         XCTAssertEqual(model.homeButtonPosition, .left)
         XCTAssertEqual(model.homePageCustomBackground, .gradient(.gradient01))
+        XCTAssertTrue(model.centerAlignedBookmarksBarBool)
 
         model = AppearancePreferences(
             persistor: AppearancePreferencesPersistorMock(
@@ -91,7 +96,8 @@ final class AppearancePreferencesTests: XCTestCase {
                 isFavoriteVisible: false,
                 isRecentActivityVisible: false,
                 homeButtonPosition: .left,
-                homePageCustomBackground: CustomBackground.gradient(.gradient05).description
+                homePageCustomBackground: CustomBackground.gradient(.gradient05).description,
+                centerAlignedBookmarksBar: false
             )
         )
         XCTAssertEqual(model.showFullURL, true)
@@ -102,6 +108,7 @@ final class AppearancePreferencesTests: XCTestCase {
         XCTAssertEqual(model.isRecentActivityVisible, false)
         XCTAssertEqual(model.homeButtonPosition, .left)
         XCTAssertEqual(model.homePageCustomBackground, .gradient(.gradient05))
+        XCTAssertFalse(model.centerAlignedBookmarksBarBool)
     }
 
     func testWhenInitializedWithGarbageThenThemeIsSetToSystemDefault() throws {

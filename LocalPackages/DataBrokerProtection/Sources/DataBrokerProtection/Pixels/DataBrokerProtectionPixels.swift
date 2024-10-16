@@ -81,6 +81,8 @@ public enum DataBrokerProtectionPixels {
         static let numberOfNewRecordsFound = "num_new_found"
         static let numberOfReappereances = "num_reappeared"
         static let optOutSubmitSuccessRate = "optout_submit_success_rate"
+        static let childParentRecordDifference = "child-parent-record-difference"
+        static let calculatedOrphanedRecords = "calculated-orphaned-records"
     }
 
     case error(error: DataBrokerProtectionError, dataBroker: String)
@@ -211,6 +213,7 @@ public enum DataBrokerProtectionPixels {
     // Custom stats
     case customDataBrokerStatsOptoutSubmit(dataBrokerName: String, optOutSubmitSuccessRate: Double)
     case customGlobalStatsOptoutSubmit(optOutSubmitSuccessRate: Double)
+    case weeklyChildBrokerOrphanedOptOuts(dataBrokerName: String, childParentRecordDifference: Int, calculatedOrphanedRecords: Int)
 }
 
 extension DataBrokerProtectionPixels: PixelKitEvent {
@@ -345,8 +348,10 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .pixelTest: return "m_mac_dbp_configuration_pixel_test"
         case .failedToParsePrivacyConfig: return "m_mac_dbp_configuration_failed_to_parse"
 
+            // Various monitoring pixels
         case .customDataBrokerStatsOptoutSubmit: return "m_mac_dbp_databroker_custom_stats_optoutsubmit"
         case .customGlobalStatsOptoutSubmit: return "m_mac_dbp_custom_stats_optoutsubmit"
+        case .weeklyChildBrokerOrphanedOptOuts: return "m_mac_dbp_weekly_child-broker_orphaned-optouts"
         }
     }
 
@@ -522,6 +527,10 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                     Consts.optOutSubmitSuccessRate: String(optOutSubmitSuccessRate)]
         case .customGlobalStatsOptoutSubmit(let optOutSubmitSuccessRate):
             return [Consts.optOutSubmitSuccessRate: String(optOutSubmitSuccessRate)]
+        case .weeklyChildBrokerOrphanedOptOuts(let dataBrokerName, let childParentRecordDifference, let calculatedOrphanedRecords):
+            return [Consts.dataBrokerParamKey: dataBrokerName,
+                    Consts.childParentRecordDifference: String(childParentRecordDifference),
+                    Consts.calculatedOrphanedRecords: String(calculatedOrphanedRecords)]
         }
     }
 }
@@ -619,7 +628,8 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .invalidPayload,
                     .pixelTest,
                     .customDataBrokerStatsOptoutSubmit,
-                    .customGlobalStatsOptoutSubmit:
+                    .customGlobalStatsOptoutSubmit,
+                    .weeklyChildBrokerOrphanedOptOuts:
 
                 PixelKit.fire(event)
 

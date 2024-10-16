@@ -38,6 +38,9 @@ public enum FeatureFlag: String {
     case unknownUsernameCategorization
 
     case credentialsImportPromotionForExistingUsers
+
+    /// https://app.asana.com/0/72649045549333/1208231259093710/f
+    case networkProtectionUserTips
 }
 
 extension FeatureFlag: FeatureFlagSourceProviding {
@@ -61,6 +64,8 @@ extension FeatureFlag: FeatureFlagSourceProviding {
             return .internalOnly
         case .credentialsImportPromotionForExistingUsers:
             return .remoteReleasable(.subfeature(AutofillSubfeature.credentialsImportPromotionForExistingUsers))
+        case .networkProtectionUserTips:
+            return .remoteDevelopment(.subfeature(NetworkProtectionSubfeature.userTips))
         }
     }
 }

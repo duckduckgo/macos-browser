@@ -17,12 +17,25 @@
 //
 
 import Foundation
+import Combine
 
-public struct OnboardingFireButtonDialogViewModel {
-    let onDismiss: () -> Void
+public class OnboardingFireButtonDialogViewModel: ObservableObject {
+
+    private var onDismiss: () -> Void
+    private var onGotItPressed: () -> Void
+
+    init(onDismiss: @escaping () -> Void, onGotItPressed: @escaping () -> Void) {
+        self.onDismiss = onDismiss
+        self.onGotItPressed = onGotItPressed
+    }
+
+    func highFive() {
+        onGotItPressed()
+        onDismiss()
+    }
 
     func skip() {
-        onDismiss()
+        onGotItPressed()
     }
 
     @MainActor
