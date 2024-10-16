@@ -153,6 +153,7 @@ final class AddressBarButtonsViewController: NSViewController {
     private var trackerAnimationTriggerCancellable: AnyCancellable?
     private var privacyEntryPointIconUpdateCancellable: AnyCancellable?
     private var isMouseOverAnimationVisibleCancellable: AnyCancellable?
+    private var privacyEntryPointIsMouseOverCancellable: AnyCancellable?
 
     private lazy var buttonsBadgeAnimator = {
         let animator = NavigationBarBadgeAnimator()
@@ -186,6 +187,7 @@ final class AddressBarButtonsViewController: NSViewController {
         subscribeToEffectiveAppearance()
         subscribeToIsMouseOverAnimationVisible()
         updateBookmarkButtonVisibility()
+        subscribeToPrivacyEntryPointIsMouseOver()
         bookmarkButton.sendAction(on: .leftMouseDown)
 
         privacyEntryPointButton.toolTip = UserText.privacyDashboardTooltip
@@ -968,6 +970,14 @@ final class AddressBarButtonsViewController: NSViewController {
                     self?.updatePrivacyEntryPointIcon()
                 }
             }
+    }
+
+    private func subscribeToPrivacyEntryPointIsMouseOver() {
+        privacyEntryPointIsMouseOverCancellable = privacyEntryPointButton.publisher(for: \.isMouseOver)
+            .first(where: { $0 }) // only interested when mouse is over
+            .sink(receiveValue: { [weak self] _ in
+                self?.stopHighlightingPrivacyShield()
+            })
     }
 
 }
