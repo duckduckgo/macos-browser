@@ -32,6 +32,14 @@ protocol ReleaseNotesUserScriptProvider {
 extension UserScripts: ReleaseNotesUserScriptProvider {}
 
 public struct ReleaseNotesValues: Codable {
+    enum Status: String {
+        case loaded
+        case loading
+        case updateReady
+        case updateDownloading
+        case updatePreparing
+        case updateError
+    }
 
     let status: String
     let currentVersion: String
@@ -40,7 +48,7 @@ public struct ReleaseNotesValues: Codable {
     let releaseTitle: String?
     let releaseNotes: [String]?
     let releaseNotesPrivacyPro: [String]?
-
+    let downloadProgress: Double?
 }
 
 final class ReleaseNotesTabExtension: NavigationResponder {
@@ -115,49 +123,82 @@ extension TabExtensions {
 
 extension ReleaseNotesValues {
 
-    init(status: String,
+    init(status: Status,
          currentVersion: String,
-         lastUpdate: UInt) {
-        self.init(status: status,
-                  currentVersion: currentVersion,
-                  latestVersion: nil,
-                  lastUpdate: lastUpdate,
-                  releaseTitle: nil,
-                  releaseNotes: nil,
-                  releaseNotesPrivacyPro: nil)
+         latestVersion: String? = nil,
+         lastUpdate: UInt,
+         releaseTitle: String? = nil,
+         releaseNotes: [String]? = nil,
+         releaseNotesPrivacyPro: [String]? = nil,
+         downloadProgress: Double? = nil) {
+        self.status = status.rawValue
+        self.currentVersion = currentVersion
+        self.latestVersion = latestVersion
+        self.lastUpdate = lastUpdate
+        self.releaseTitle = releaseTitle
+        self.releaseNotes = releaseNotes
+        self.releaseNotesPrivacyPro = releaseNotesPrivacyPro
+        self.downloadProgress = downloadProgress
     }
 
     init(from updateController: UpdateController?) {
         let currentVersion = "\(AppVersion().versionNumber) (\(AppVersion().buildNumber))"
         let lastUpdate = UInt((updateController?.lastUpdateCheckDate ?? Date()).timeIntervalSince1970)
-        let status: String
         let latestVersion: String
 
-        guard let updateController, updateController.updateProgress.isIdle else {
-            self.init(status: "loading",
+        guard let updateController else {
+            self.init(status: .loaded,
                       currentVersion: currentVersion,
                       lastUpdate: lastUpdate)
             return
         }
 
-        if let latestUpdate = updateController.latestUpdate {
-            status = latestUpdate.isInstalled ? "loaded" : "updateReady"
-            latestVersion = "\(latestUpdate.version) (\(latestUpdate.build))"
-            self.init(status: status,
-                      currentVersion: currentVersion,
-                      latestVersion: latestVersion,
-                      lastUpdate: lastUpdate,
-                      releaseTitle: latestUpdate.title,
-                      releaseNotes: latestUpdate.releaseNotes,
-                      releaseNotesPrivacyPro: latestUpdate.releaseNotesPrivacyPro)
-            return
-        } else {
-            self.init(status: "loaded",
+        let updateState = UpdateState(from: updateController.latestUpdate, progress: updateController.updateProgress)
+        let hasPendingUpdate = updateController.hasPendingUpdate
+
+        switch updateState {
+        case .upToDate:
+            self.init(status: .loaded,
                       currentVersion: currentVersion,
                       lastUpdate: lastUpdate)
+        case .updateCycle(let progress):
+            if let latestUpdate = updateController.latestUpdate {
+                latestVersion = "\(latestUpdate.version) (\(latestUpdate.build))"
+                let status = hasPendingUpdate ? .updateReady : progress.toStatus
+                self.init(status: status,
+                          currentVersion: currentVersion,
+                          latestVersion: latestVersion,
+                          lastUpdate: lastUpdate,
+                          releaseTitle: latestUpdate.title,
+                          releaseNotes: latestUpdate.releaseNotes,
+                          releaseNotesPrivacyPro: latestUpdate.releaseNotesPrivacyPro,
+                          downloadProgress: progress.toDownloadProgress)
+            } else {
+                self.init(status: .loaded,
+                          currentVersion: currentVersion,
+                          lastUpdate: lastUpdate)
+            }
+        }
+    }
+}
+
+private extension UpdateCycleProgress {
+    var toStatus: ReleaseNotesValues.Status {
+        switch self {
+        case .updateCycleDidStart: return .loading
+        case .downloadDidStart, .downloading: return .updateDownloading
+        case .extractionDidStart, .extracting, .readyToInstallAndRelaunch, .installationDidStart, .installing: return .updatePreparing
+        case .updaterError: return .updateError
+        case .updateCycleNotStarted, .updateCycleDone: return .updateReady
         }
     }
 
+    var toDownloadProgress: Double? {
+        guard case .downloading(let percentage) = self else {
+            return nil
+        }
+        return percentage
+    }
 }
 
 #else
