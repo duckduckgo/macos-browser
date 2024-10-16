@@ -106,13 +106,16 @@ final class MainMenu: NSMenu {
     // MARK: - Initialization
 
     @MainActor
-    init(featureFlagger: FeatureFlagger, bookmarkManager: BookmarkManager, faviconManager: FaviconManagement) {
+    init(featureFlagger: FeatureFlagger,
+         bookmarkManager: BookmarkManager,
+         faviconManager: FaviconManagement,
+         aiChatMenuConfig: AIChatMenuVisibilityConfigurable) {
 
         super.init(title: UserText.duckDuckGo)
 
         buildItems {
             buildDuckDuckGoMenu()
-            buildFileMenu()
+            buildFileMenu(aiChatMenuConfig: aiChatMenuConfig)
             buildEditMenu()
             buildViewMenu()
             buildHistoryMenu()
@@ -153,10 +156,16 @@ final class MainMenu: NSMenu {
         }
     }
 
-    func buildFileMenu() -> NSMenuItem {
+    func buildFileMenu(aiChatMenuConfig: AIChatMenuVisibilityConfigurable) -> NSMenuItem {
         NSMenuItem(title: UserText.mainMenuFile) {
             newWindowMenuItem
             NSMenuItem(title: UserText.newBurnerWindowMenuItem, action: #selector(AppDelegate.newBurnerWindow), keyEquivalent: "N")
+
+            if aiChatMenuConfig.shouldDisplayApplicationMenuShortcut {
+                #warning("TODO This needs to be observed")
+                NSMenuItem(title: UserText.newAIChatMenuItem, action: #selector(AppDelegate.newAIChat), keyEquivalent: [.option, .command, "n"])
+            }
+
             newTabMenuItem
             openLocationMenuItem
             NSMenuItem.separator()

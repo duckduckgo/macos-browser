@@ -65,6 +65,12 @@ extension AppDelegate {
         }
     }
 
+    @objc func newAIChat(_ sender: Any?) {
+        DispatchQueue.main.async {
+            WindowControllersManager.shared.showTab(with: .url(AIChatMenuConfiguration().shortcutURL, credential: nil, source: .ui))
+        }
+    }
+
     @objc func newTab(_ sender: Any?) {
         DispatchQueue.main.async {
             WindowsManager.openNewWindow()

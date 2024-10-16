@@ -356,7 +356,7 @@ struct UserText {
 
     // Misc
 
-    // AI Chat Preferences
+    // AI Chat
     static let aiChatShowInToolbarToggle = NSLocalizedString("ai-chat.show-in-toolbar.toggle", value: "Show AI Chat shortcut in browser toolbar", comment: "Show AI Chat in toolbar")
 
     static let aiChatShowInApplicationMenuToggle = NSLocalizedString("ai-chat.show-in-application-menu.toggle", value: "Show “New AI Chat” in File and application menus", comment: "Show AI Chat in application menus")
@@ -364,6 +364,7 @@ struct UserText {
     static let aiChatPreferencesCaption = NSLocalizedString("ai-chat.preferences.caption", value: "Launch AI Chat faster by adding shortcuts to your browser toolbar or menu", comment: "Ai Chat preferences explanation")
     static let aiChatPreferencesLearnMoreButton = NSLocalizedString("ai-chat.preferences.learn-more", value: "Learn More", comment: "AI Chat preferences button to learn more about it")
 
+    static let newAIChatMenuItem = NSLocalizedString("ai-chat.menu.new", value: "New AI Chat", comment: "Menu item to launch AI Chat")
 
     // Duck Player Preferences
     static let duckPlayerSettingsTitle = NSLocalizedString("duck-player.title", value: "Duck Player", comment: "Private YouTube Player settings title")
