@@ -29,6 +29,7 @@ import Onboarding
 
 protocol BrowserTabViewControllerDelegate: AnyObject {
     func highlightFireButton()
+    func highlightPrivacyShield()
     func dismissViewHighlight()
 }
 
@@ -479,8 +480,11 @@ final class BrowserTabViewController: NSViewController {
           containerStackView.layoutSubtreeIfNeeded()
           webViewContainer?.layoutSubtreeIfNeeded()
 
-        if dialogType == .tryFireButton {
+        let currentState = onboardingDialogTypeProvider.state
+        if currentState == .showFireButton {
             delegate?.highlightFireButton()
+        } else if currentState == .showBlockedTrackers {
+            delegate?.highlightPrivacyShield()
         }
     }
 

@@ -147,6 +147,7 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
     func testWhenNavigationCompletedAndStateIsShowFireButtonThenAskDelegateToHighlightFireButton() throws {
         // GIVEN
         dialogProvider.dialog = .tryFireButton
+        dialogProvider.state = .showFireButton
         let url = try XCTUnwrap(URL(string: "some.url"))
         let delegate = BrowserTabViewControllerDelegateSpy()
         viewController.delegate = delegate
@@ -158,6 +159,23 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
         // THEN
         wait(for: [expectation], timeout: 3.0)
         XCTAssertTrue(delegate.didCallHighlightFireButton)
+    }
+
+    func testWhenNavigationCompletedAndStateIsShowBlockedTrackersThenAskDelegateToHighlightPrivacyShield() throws {
+        // GIVEN
+        dialogProvider.dialog = .trackers(message: .init(string: ""), shouldFollowUp: true)
+        dialogProvider.state = .showBlockedTrackers
+        let url = try XCTUnwrap(URL(string: "some.url"))
+        let delegate = BrowserTabViewControllerDelegateMock()
+        viewController.delegate = delegate
+        XCTAssertFalse(delegate.didCallHighlightPrivacyShield)
+
+        // WHEN
+        tab.navigateTo(url: url)
+
+        // THEN
+        wait(for: [expectation], timeout: 3.0)
+        XCTAssertTrue(delegate.didCallHighlightPrivacyShield)
     }
 
     func testWhenNavigationCompletedViewHighlightsAreRemoved() throws {
@@ -285,14 +303,18 @@ class CapturingDialogFactory: ContextualDaxDialogsFactory {
 
 final class BrowserTabViewControllerDelegateSpy: BrowserTabViewControllerDelegate {
     private(set) var didCallHighlightFireButton = false
+    private(set) var didCallHighlightPrivacyShield = false
     private(set) var didCallDismissViewHighlight = false
 
     func highlightFireButton() {
         didCallHighlightFireButton = true
     }
 
+    func highlightPrivacyShield() {
+        didCallHighlightPrivacyShield = true
+    }
+
     func dismissViewHighlight() {
         didCallDismissViewHighlight = true
     }
-
 }

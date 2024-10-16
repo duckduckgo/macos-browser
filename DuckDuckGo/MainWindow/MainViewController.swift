@@ -576,6 +576,9 @@ extension MainViewController: BrowserTabViewControllerDelegate {
         tabBarViewController.stopFireButtonPulseAnimation()
     }
 
+    func highlightPrivacyShield() {
+    }
+
 }
 
 #if DEBUG
