@@ -82,7 +82,7 @@ final class MainMenu: NSMenu {
     let toggleAutofillShortcutMenuItem = NSMenuItem(title: UserText.mainMenuViewShowAutofillShortcut, action: #selector(MainViewController.toggleAutofillShortcut), keyEquivalent: "A")
     let toggleBookmarksShortcutMenuItem = NSMenuItem(title: UserText.mainMenuViewShowBookmarksShortcut, action: #selector(MainViewController.toggleBookmarksShortcut), keyEquivalent: "K")
     let toggleDownloadsShortcutMenuItem = NSMenuItem(title: UserText.mainMenuViewShowDownloadsShortcut, action: #selector(MainViewController.toggleDownloadsShortcut), keyEquivalent: "J")
-
+    var aiChatMenu = NSMenuItem(title: UserText.newAIChatMenuItem, action: #selector(AppDelegate.newAIChat), keyEquivalent: [.option, .command, "n"])
     let toggleNetworkProtectionShortcutMenuItem = NSMenuItem(title: UserText.showNetworkProtectionShortcut, action: #selector(MainViewController.toggleNetworkProtectionShortcut), keyEquivalent: "N")
 
     // MARK: Window
@@ -102,6 +102,7 @@ final class MainMenu: NSMenu {
     let releaseNotesMenuItem = NSMenuItem(title: UserText.releaseNotesMenuItem, action: #selector(AppDelegate.showReleaseNotes))
     let whatIsNewMenuItem = NSMenuItem(title: UserText.whatsNewMenuItem, action: #selector(AppDelegate.showWhatIsNew))
     let sendFeedbackMenuItem = NSMenuItem(title: UserText.sendFeedback, action: #selector(AppDelegate.openFeedback))
+    private let aiChatMenuConfig: AIChatMenuVisibilityConfigurable
 
     // MARK: - Initialization
 
@@ -111,11 +112,12 @@ final class MainMenu: NSMenu {
          faviconManager: FaviconManagement,
          aiChatMenuConfig: AIChatMenuVisibilityConfigurable) {
 
+        self.aiChatMenuConfig = aiChatMenuConfig
         super.init(title: UserText.duckDuckGo)
 
         buildItems {
             buildDuckDuckGoMenu()
-            buildFileMenu(aiChatMenuConfig: aiChatMenuConfig)
+            buildFileMenu()
             buildEditMenu()
             buildViewMenu()
             buildHistoryMenu()
@@ -127,6 +129,9 @@ final class MainMenu: NSMenu {
 
         subscribeToBookmarkList(bookmarkManager: bookmarkManager)
         subscribeToFavicons(faviconManager: faviconManager)
+
+        setupAIChatMenu()
+        subscribeToAIChatPreferences(aiChatMenuConfig: aiChatMenuConfig)
     }
 
     func buildDuckDuckGoMenu() -> NSMenuItem {
@@ -156,15 +161,12 @@ final class MainMenu: NSMenu {
         }
     }
 
-    func buildFileMenu(aiChatMenuConfig: AIChatMenuVisibilityConfigurable) -> NSMenuItem {
+    func buildFileMenu() -> NSMenuItem {
         NSMenuItem(title: UserText.mainMenuFile) {
             newWindowMenuItem
             NSMenuItem(title: UserText.newBurnerWindowMenuItem, action: #selector(AppDelegate.newBurnerWindow), keyEquivalent: "N")
 
-            if aiChatMenuConfig.shouldDisplayApplicationMenuShortcut {
-                #warning("TODO This needs to be observed")
-                NSMenuItem(title: UserText.newAIChatMenuItem, action: #selector(AppDelegate.newAIChat), keyEquivalent: [.option, .command, "n"])
-            }
+            aiChatMenu
 
             newTabMenuItem
             openLocationMenuItem
@@ -471,6 +473,15 @@ final class MainMenu: NSMenu {
             }
     }
 
+    var aiChatCancellable: AnyCancellable?
+    private func subscribeToAIChatPreferences(aiChatMenuConfig: AIChatMenuVisibilityConfigurable) {
+        aiChatCancellable = aiChatMenuConfig.valuesChangedPublisher
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] in
+                self?.setupAIChatMenu()
+            })
+    }
+
     // Nested recursing functions cause body length
     func updateBookmarksMenu(favoriteViewModels: [BookmarkViewModel], topLevelBookmarkViewModels: [BookmarkViewModel]) {
 
@@ -704,6 +715,10 @@ final class MainMenu: NSMenu {
 
         self.loggingMenu = menu
         return menu
+    }
+
+    private func setupAIChatMenu() {
+        aiChatMenu.isHidden = !aiChatMenuConfig.shouldDisplayApplicationMenuShortcut
     }
 
     private func updateInternalUserItem() {

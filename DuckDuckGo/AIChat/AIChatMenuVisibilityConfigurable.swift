@@ -16,34 +16,54 @@
 //  limitations under the License.
 //
 
+import Combine
+
 protocol AIChatMenuVisibilityConfigurable {
     var shouldDisplayApplicationMenuShortcut: Bool { get }
     var shouldDisplayToolbarShortcut: Bool { get }
     var shortcutURL: URL { get }
+    var valuesChangedPublisher: PassthroughSubject<Void, Never> { get }
 }
 
-struct AIChatMenuConfiguration: AIChatMenuVisibilityConfigurable {
+final class AIChatMenuConfiguration: AIChatMenuVisibilityConfigurable {
+    var valuesChangedPublisher = PassthroughSubject<Void, Never>()
+    private var cancellables = Set<AnyCancellable>()
+    private let preferences: AIChatPreferences
+
     enum ShortcutType {
         case applicationMenu
         case toolbar
     }
 
-    private let preferencesStorage: AIChatPreferencesStorage
+    // MARK: - Public
 
     var shouldDisplayApplicationMenuShortcut: Bool {
-        return isFeatureEnabledFor(shortcutType: .applicationMenu) && preferencesStorage.showShortcutInApplicationMenu
+        return isFeatureEnabledFor(shortcutType: .applicationMenu) && preferences.showShortcutInApplicationMenu
     }
 
     var shouldDisplayToolbarShortcut: Bool {
-        return isFeatureEnabledFor(shortcutType: .toolbar) && preferencesStorage.showShortcutInToolbar
+        return isFeatureEnabledFor(shortcutType: .toolbar) && preferences.showShortcutInToolbar
     }
 
     var shortcutURL: URL {
         URL(string: "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=2")!
     }
 
-    init(preferencesStorage: AIChatPreferencesStorage = AIChatPreferencesUserDefaultsStorage()) {
-        self.preferencesStorage = preferencesStorage
+    init(preferences: AIChatPreferences = .shared) {
+        self.preferences = preferences
+        subscribeToValueChanges()
+    }
+
+    // MARK: - Private
+
+    private func subscribeToValueChanges() {
+        preferences.$showShortcutInToolbar
+            .merge(with: preferences.$showShortcutInApplicationMenu)
+            .dropFirst()
+            .sink { [weak self] _ in
+                self?.valuesChangedPublisher.send(())
+            }
+            .store(in: &cancellables)
     }
 
     private func isFeatureEnabledFor(shortcutType: ShortcutType) -> Bool {
