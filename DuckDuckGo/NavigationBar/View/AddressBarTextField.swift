@@ -327,13 +327,13 @@ final class AddressBarTextField: NSTextField {
         let pixel: GeneralPixel? = {
             switch suggestion {
             case .phrase:
-                return .autocompleteClickPhrase
+                return .autocompleteClickPhrase(from: nil, cohort: nil, onboardingCohort: nil)
             case .website:
-                return .autocompleteClickWebsite
+                return .autocompleteClickWebsite(from: nil, cohort: nil, onboardingCohort: nil)
             case .bookmark(_, _, let isFavorite, _):
-                return isFavorite ? .autocompleteClickFavorite : .autocompleteClickBookmark
+                return isFavorite ? .autocompleteClickFavorite(from: nil, cohort: nil, onboardingCohort: nil) : .autocompleteClickBookmark(from: nil, cohort: nil, onboardingCohort: nil)
             case .historyEntry:
-                return .autocompleteClickHistory
+                return .autocompleteClickHistory(from: nil, cohort: nil, onboardingCohort: nil)
             default:
                 return nil
             }
