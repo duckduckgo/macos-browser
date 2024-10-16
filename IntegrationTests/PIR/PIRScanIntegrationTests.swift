@@ -175,6 +175,20 @@ final class PIRScanIntegrationTests: XCTestCase {
     }
 
     /*
+     This test shows a test which asserts that the login item starts
+     */
+    func testLoginItemIsRunning() async throws {
+        try await Task.sleep(nanoseconds: 3_000_000_000)
+
+        // When
+        try await pirProtectionManager.dataManager.saveProfile(mockProfile)
+
+        XCTAssertTrue(loginItemsManager.isAnyEnabled([.dbpBackgroundAgent]))
+        // Failing, likely due to missing profile and background agent being killed
+        XCTAssertTrue(LoginItem.dbpBackgroundAgent.isRunning)
+    }
+
+    /*
      This test shows is where I'm developing everything
      EVERYTHING
      */
