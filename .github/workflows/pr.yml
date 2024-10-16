@@ -127,11 +127,15 @@ jobs:
       commit_author: ${{ steps.fetch_commit_author.outputs.commit_author }}
 
     steps:
+    - name: Register SSH key for PIR fake broker repository access
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_PIR_FAKE_BROKER }}
+
     - name: Check out the code
       uses: actions/checkout@v4
       with:
         repository: DuckDuckGo/pir-fake-broker
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_PIR_FAKE_BROKER }}
         ref: loremattei/ci-integration
         path: pir-fake-broker
 
