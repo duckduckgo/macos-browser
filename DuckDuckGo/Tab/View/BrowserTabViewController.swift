@@ -389,7 +389,6 @@ final class BrowserTabViewController: NSViewController {
         let container = WebViewContainerView(tab: tab, webView: webView, frame: view.bounds)
         self.webViewContainer = container
         containerStackView.orientation = .vertical
-        containerStackView.distribution = .fill
         containerStackView.alignment = .leading
         containerStackView.distribution = .fillProportionally
 
@@ -477,8 +476,8 @@ final class BrowserTabViewController: NSViewController {
             hostingController.view.trailingAnchor.constraint(equalTo: containerStackView.trailingAnchor)
         ])
 
-          containerStackView.layoutSubtreeIfNeeded()
-          webViewContainer?.layoutSubtreeIfNeeded()
+        containerStackView.layoutSubtreeIfNeeded()
+        webViewContainer?.layoutSubtreeIfNeeded()
 
         let currentState = onboardingDialogTypeProvider.state
         if currentState == .showFireButton {
