@@ -21,7 +21,7 @@ import Cocoa
 protocol BookmarksBarCollectionViewItemDelegate: AnyObject {
 
     @MainActor func bookmarksBarCollectionViewItemClicked(_ item: BookmarksBarCollectionViewItem)
-    @MainActor func bookmarksBarCollectionViewItem(_ item: BookmarksBarCollectionViewItem, isMouseOver: Bool)
+    @MainActor func bookmarksBarCollectionViewItemMouseDidHover(_ item: BookmarksBarCollectionViewItem)
 
     func showDialog(_ dialog: any ModalView)
 
@@ -158,7 +158,13 @@ extension BookmarksBarCollectionViewItem: BookmarksContextMenuDelegate {
 extension BookmarksBarCollectionViewItem: MouseOverViewDelegate {
 
     func mouseOverView(_ mouseOverView: MouseOverView, isMouseOver: Bool) {
-        delegate?.bookmarksBarCollectionViewItem(self, isMouseOver: isMouseOver)
+        if isMouseOver {
+            delegate?.bookmarksBarCollectionViewItemMouseDidHover(self)
+        }
+    }
+
+    override func mouseMoved(with event: NSEvent) {
+        delegate?.bookmarksBarCollectionViewItemMouseDidHover(self)
     }
 
 }

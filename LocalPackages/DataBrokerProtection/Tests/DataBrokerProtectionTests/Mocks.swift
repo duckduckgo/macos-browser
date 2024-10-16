@@ -31,6 +31,7 @@ extension BrokerProfileQueryData {
     static func mock(with steps: [Step] = [Step](),
                      dataBrokerName: String = "test",
                      url: String = "test.com",
+                     parentURL: String? = nil,
                      lastRunDate: Date? = nil,
                      preferredRunDate: Date? = nil,
                      extractedProfile: ExtractedProfile? = nil,
@@ -45,6 +46,7 @@ extension BrokerProfileQueryData {
                 steps: steps,
                 version: "1.0.0",
                 schedulingConfig: DataBrokerScheduleConfig.mock,
+                parent: parentURL,
                 mirrorSites: mirrorSites
             ),
             profileQuery: ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", birthYear: 50, deprecated: deprecated),
@@ -53,7 +55,7 @@ extension BrokerProfileQueryData {
                                      preferredRunDate: preferredRunDate,
                                      historyEvents: scanHistoryEvents,
                                      lastRunDate: lastRunDate),
-            optOutJobData: extractedProfile != nil ? [.mock(with: extractedProfile!)] : [OptOutJobData]()
+            optOutJobData: optOutJobData ?? (extractedProfile != nil ? [.mock(with: extractedProfile!)] : [OptOutJobData]())
         )
     }
 
@@ -1147,6 +1149,17 @@ extension OptOutJobData {
         .init(brokerId: 1, profileQueryId: 1, createdDate: Date(), historyEvents: historyEvents, extractedProfile: extractedProfile)
     }
 
+    static func mock(with createdDate: Date) -> OptOutJobData {
+        .init(brokerId: 1, profileQueryId: 1, createdDate: createdDate, historyEvents: [], submittedSuccessfullyDate: nil, extractedProfile: .mockWithoutRemovedDate)
+    }
+
+    static func mock(with extractedProfile: ExtractedProfile,
+                     historyEvents: [HistoryEvent] = [HistoryEvent](),
+                     createdDate: Date,
+                     submittedSuccessfullyDate: Date?) -> OptOutJobData {
+        .init(brokerId: 1, profileQueryId: 1, createdDate: createdDate, historyEvents: historyEvents, submittedSuccessfullyDate: submittedSuccessfullyDate, extractedProfile: extractedProfile)
+    }
+
     static func mock(with type: HistoryEvent.EventType,
                      submittedDate: Date?,
                      sevenDaysConfirmationPixelFired: Bool,
@@ -1195,21 +1208,23 @@ final class MockDataBrokerProtectionOperationQueueManager: DataBrokerProtectionQ
     var startImmediateOperationsIfPermittedCompletionError: DataBrokerProtectionAgentErrorCollection?
     var startScheduledOperationsIfPermittedCompletionError: DataBrokerProtectionAgentErrorCollection?
 
-    var startImmediateOperationsIfPermittedCalledCompletion: ((DataBrokerProtection.DataBrokerProtectionAgentErrorCollection?) -> Void)?
-    var startScheduledOperationsIfPermittedCalledCompletion: ((DataBrokerProtection.DataBrokerProtectionAgentErrorCollection?) -> Void)?
+    var startImmediateOperationsIfPermittedCalledCompletion: (() -> Void)?
+    var startScheduledOperationsIfPermittedCalledCompletion: (() -> Void)?
 
     init(operationQueue: DataBrokerProtection.DataBrokerProtectionOperationQueue, operationsCreator: DataBrokerProtection.DataBrokerOperationsCreator, mismatchCalculator: DataBrokerProtection.MismatchCalculator, brokerUpdater: DataBrokerProtection.DataBrokerProtectionBrokerUpdater?, pixelHandler: Common.EventMapping<DataBrokerProtection.DataBrokerProtectionPixels>) {
 
     }
 
-    func startImmediateOperationsIfPermitted(showWebView: Bool, operationDependencies: DataBrokerProtection.DataBrokerOperationDependencies, completion: ((DataBrokerProtection.DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
-        completion?(startImmediateOperationsIfPermittedCompletionError)
-        startImmediateOperationsIfPermittedCalledCompletion?(startImmediateOperationsIfPermittedCompletionError)
+    func startImmediateOperationsIfPermitted(showWebView: Bool, operationDependencies: any DataBrokerProtection.DataBrokerOperationDependencies, errorHandler: ((DataBrokerProtection.DataBrokerProtectionAgentErrorCollection?) -> Void)?, completion: (() -> Void)?) {
+        errorHandler?(startImmediateOperationsIfPermittedCompletionError)
+        completion?()
+        startImmediateOperationsIfPermittedCalledCompletion?()
     }
 
-    func startScheduledOperationsIfPermitted(showWebView: Bool, operationDependencies: DataBrokerProtection.DataBrokerOperationDependencies, completion: ((DataBrokerProtection.DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
-        completion?(startScheduledOperationsIfPermittedCompletionError)
-        startScheduledOperationsIfPermittedCalledCompletion?(startScheduledOperationsIfPermittedCompletionError)
+    func startScheduledOperationsIfPermitted(showWebView: Bool, operationDependencies: any DataBrokerProtection.DataBrokerOperationDependencies, errorHandler: ((DataBrokerProtection.DataBrokerProtectionAgentErrorCollection?) -> Void)?, completion: (() -> Void)?) {
+        errorHandler?(startScheduledOperationsIfPermittedCompletionError)
+        completion?()
+        startScheduledOperationsIfPermittedCalledCompletion?()
     }
 
     func execute(_ command: DataBrokerProtection.DataBrokerProtectionQueueManagerDebugCommand) {
@@ -1373,7 +1388,7 @@ final class MockDataBrokerProtectionOperationQueue: DataBrokerProtectionOperatio
         self.operations.append(op)
     }
 
-    func addBarrierCompletionBlock(_ barrier: @escaping @Sendable () -> Void) {
+    func addBarrierBlock(_ barrier: @escaping @Sendable () -> Void) {
         didCallAddBarrierBlockCount += 1
         self.barrierBlock = barrier
     }

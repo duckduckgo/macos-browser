@@ -86,7 +86,10 @@ final class ActiveRemoteMessageModel: ObservableObject {
             }
             .store(in: &cancellables)
 
-        let remoteMessagePublisher = $remoteMessage.compactMap({ $0 }).asVoid()
+        let remoteMessagePublisher = $remoteMessage
+            .compactMap({ $0 })
+            .filter { [weak self] _ in self?.isViewOnScreen == true }
+            .asVoid()
         let isViewOnScreenPublisher = $isViewOnScreen.removeDuplicates().filter({ $0 }).asVoid()
         Publishers.Merge(remoteMessagePublisher, isViewOnScreenPublisher)
             .receive(on: DispatchQueue.main)
@@ -94,8 +97,8 @@ final class ActiveRemoteMessageModel: ObservableObject {
                 guard let self else {
                     return
                 }
-                if isViewOnScreen {
-                    markRemoteMessageAsShown()
+                Task {
+                    await self.markRemoteMessageAsShown()
                 }
             }
             .store(in: &cancellables)
@@ -103,12 +106,13 @@ final class ActiveRemoteMessageModel: ObservableObject {
         updateRemoteMessage()
     }
 
-    func dismissRemoteMessage(with action: RemoteMessageViewModel.ButtonAction?) {
+    @MainActor
+    func dismissRemoteMessage(with action: RemoteMessageViewModel.ButtonAction?) async {
         guard let remoteMessage else {
             return
         }
 
-        store()?.dismissRemoteMessage(withID: remoteMessage.id)
+        await store()?.dismissRemoteMessage(withID: remoteMessage.id)
         self.remoteMessage = nil
 
         let pixel: GeneralPixel? = {
@@ -134,7 +138,7 @@ final class ActiveRemoteMessageModel: ObservableObject {
         }
     }
 
-    func markRemoteMessageAsShown() {
+    func markRemoteMessageAsShown() async {
         guard let remoteMessage, let store = store() else {
             return
         }
@@ -147,7 +151,7 @@ final class ActiveRemoteMessageModel: ObservableObject {
             if remoteMessage.isMetricsEnabled {
                 PixelKit.fire(GeneralPixel.remoteMessageShownUnique, withAdditionalParameters: ["message": remoteMessage.id])
             }
-            store.updateRemoteMessage(withID: remoteMessage.id, asShown: true)
+            await store.updateRemoteMessage(withID: remoteMessage.id, asShown: true)
         }
     }
 

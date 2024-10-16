@@ -257,9 +257,13 @@ final class AddressBarButtonsViewController: NSViewController {
             guard let tabViewModel, tabViewModel.canBeBookmarked else { return false }
 
             var isUrlBookmarked = false
-            if let url = tabViewModel.tab.content.userEditableUrl,
-               bookmarkManager.isUrlBookmarked(url: url) {
-                isUrlBookmarked = true
+            if let url = tabViewModel.tab.content.userEditableUrl {
+                let urlVariants = url.bookmarkButtonUrlVariants()
+
+                // Check if any of the URL variants is bookmarked
+                isUrlBookmarked = urlVariants.contains { variant in
+                    return bookmarkManager.isUrlBookmarked(url: variant)
+                }
             }
 
             return clearButton.isHidden && !hasEmptyAddressBar && (isMouseOverNavigationBar || popovers.isEditBookmarkPopoverShown || isUrlBookmarked)
@@ -688,7 +692,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     private func updateBookmarkButtonImage(isUrlBookmarked: Bool = false) {
         if let url = tabViewModel?.tab.content.userEditableUrl,
-           isUrlBookmarked || bookmarkManager.isUrlBookmarked(url: url)
+           isUrlBookmarked || bookmarkManager.isAnyUrlVariantBookmarked(url: url)
         {
             bookmarkButton.image = .bookmarkFilled
             bookmarkButton.mouseOverTintColor = NSColor.bookmarkFilledTint
@@ -896,7 +900,7 @@ final class AddressBarButtonsViewController: NSViewController {
             return (nil, false)
         }
 
-        if let bookmark = bookmarkManager.getBookmark(forUrl: url.absoluteString) {
+        if let bookmark = bookmarkManager.getBookmark(forVariantUrl: url) {
             if setFavorite {
                 bookmark.isFavorite = true
                 bookmarkManager.update(bookmark: bookmark)

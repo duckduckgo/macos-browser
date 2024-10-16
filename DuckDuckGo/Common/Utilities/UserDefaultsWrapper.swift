@@ -116,6 +116,7 @@ public struct UserDefaultsWrapper<T> {
         case legacyStatisticsStoreDataCleared = "statistics.appretentionatb.legacy-data-cleared"
 
         case onboardingFinished = "onboarding.finished"
+        case contextualOnboardingState = "contextual.onboarding.state"
 
         // Home Page
         case homePageShowPagesOnHover = "home.page.show.pages.on.hover"
@@ -144,6 +145,7 @@ public struct UserDefaultsWrapper<T> {
 
         case bookmarksBarPromptShown = "bookmarks.bar.prompt.shown"
         case showBookmarksBar = "bookmarks.bar.show"
+        case centerAlignedBookmarksBar = "bookmarks.bar.center.aligned"
         case lastBookmarksBarUsagePixelSendDate = "bookmarks.bar.last-usage-pixel-send-date"
 
         case pinnedViews = "pinning.pinned-views"

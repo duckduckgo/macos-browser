@@ -110,7 +110,7 @@ final class AddEditBookmarkDialogViewModel: BookmarkDialogEditing {
     }
 
     func addOrSave(dismiss: () -> Void) {
-        guard let url = bookmarkURLPath.url else {
+        guard let url = bookmarkURLPath.lowercased().url else {
             assertionFailure("Invalid URL, default action button should be disabled.")
             return
         }
