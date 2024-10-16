@@ -25,29 +25,11 @@ final class AboutPreferences: ObservableObject, PreferencesTabOpening {
     static let shared = AboutPreferences()
 
 #if SPARKLE
-    enum UpdateState {
-
-        case upToDate
-        case updateCycle(UpdateCycleProgress)
-
-        init(from update: Update?, progress: UpdateCycleProgress) {
-            if let update, !update.isInstalled {
-                self = .updateCycle(progress)
-            } else if progress.isFailed {
-                self = .updateCycle(progress)
-            } else {
-                self = .upToDate
-            }
-        }
-    }
-
     @Published var updateState = UpdateState.upToDate
 
-#if SPARKLE
     var updateController: UpdateControllerProtocol? {
         return Application.appDelegate.updateController
     }
-#endif
 
     var areAutomaticUpdatesEnabled: Bool {
         get {
