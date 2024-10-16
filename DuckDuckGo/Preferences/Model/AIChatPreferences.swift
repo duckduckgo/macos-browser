@@ -24,7 +24,6 @@ protocol AIChatPreferencesPersistor {
 }
 
 struct AIChatUserDefaultPreferencesPersistor: AIChatPreferencesPersistor {
-
     @UserDefaultsWrapper(key: .showAIChatShortcutInToolbar, defaultValue: false)
     var showShortcutInToolbar: Bool
 
@@ -34,34 +33,25 @@ struct AIChatUserDefaultPreferencesPersistor: AIChatPreferencesPersistor {
 
 final class AIChatPreferences: ObservableObject {
     static let shared = AIChatPreferences()
-    private var persistor: AIChatPreferencesPersistor
+
+    private var preferencesPersistor: AIChatPreferencesPersistor
     private let learnMoreURL = URL(string: "https://duckduckgo.com/duckduckgo-help-pages/aichat/")!
 
     init(persistor: AIChatPreferencesPersistor = AIChatUserDefaultPreferencesPersistor()) {
-        self.persistor = persistor
-        showShortcutInToolbar = persistor.showShortcutInToolbar
-        showShortcutInApplicationMenu = persistor.showShortcutInApplicationMenu
+        self.preferencesPersistor = persistor
+        self.showShortcutInToolbar = persistor.showShortcutInToolbar
+        self.showShortcutInApplicationMenu = persistor.showShortcutInApplicationMenu
     }
 
     @Published var showShortcutInToolbar: Bool {
         didSet {
-            persistor.showShortcutInToolbar = showShortcutInToolbar
-            if showShortcutInToolbar {
-                // pixel A
-            } else {
-                // pixel B
-            }
+            preferencesPersistor.showShortcutInToolbar = showShortcutInToolbar
         }
     }
 
     @Published var showShortcutInApplicationMenu: Bool {
         didSet {
-            persistor.showShortcutInApplicationMenu = showShortcutInApplicationMenu
-            if showShortcutInApplicationMenu {
-                // pixel A
-            } else {
-                // pixel B
-            }
+            preferencesPersistor.showShortcutInApplicationMenu = showShortcutInApplicationMenu
         }
     }
 
