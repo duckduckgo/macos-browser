@@ -358,6 +358,7 @@ final class PIRScanIntegrationTests: XCTestCase {
          PixelKit.tearDown()
          pixelKit.clearFrequencyHistoryForAllPixels()
          */
+        print("Stages 6-8 skipped: Fake brokerd doesn't support sending emails")
 
         /*
         9/ We confirm the opt out through a scan
@@ -374,6 +375,7 @@ final class PIRScanIntegrationTests: XCTestCase {
             let optOutsConfirmed = events.filter{ $0.type == .optOutConfirmed }
             return optOutsConfirmed.count > 0
         })
+        print("Stage 9 passed: We confirm the opt out through a scan")
     }
 }
 
