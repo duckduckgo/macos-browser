@@ -353,7 +353,12 @@ final class LocalBookmarkStore: BookmarkStore {
 
             let favoritesRoot = favoritesRoot(in: context)
             let displayedFavoritesFolderUUID = favoritesDisplayMode.displayedFolder.rawValue
-            let displayedFavoritesFolder = BookmarkUtils.fetchFavoritesFolder(withUUID: displayedFavoritesFolderUUID, in: context)
+            guard let displayedFavoritesFolder = BookmarkUtils.fetchFavoritesFolder(withUUID: displayedFavoritesFolderUUID, in: context) else {
+                throw BookmarkStoreError.missingFavoritesRoot
+            }
+
+            let favoritesFolders = BookmarkUtils.fetchFavoritesFolders(for: favoritesDisplayMode, in: context)
+            let favoritesFoldersWithoutDisplayed = favoritesFolders.filter { $0.uuid != displayedFavoritesFolderUUID }
             let sortedEntitiesByFavoritesIndex = entitiesAtIndices
                 .sorted { ($0.indexInFavoritesArray ?? Int.max) < ($1.indexInFavoritesArray ?? Int.max) }
 
@@ -362,12 +367,10 @@ final class LocalBookmarkStore: BookmarkStore {
                     return
                 }
 
-                if let bookmark = entity as? Bookmark,
-                   bookmark.isFavorite,
-                   let favoritesRoot = favoritesRoot,
-                   let displayedFavoritesFolder = displayedFavoritesFolder {
-                    bookmarkMO.addToFavorites(insertAt: indexInFavoritesArray, favoritesRoot: favoritesRoot)
-                    bookmarkMO.addToFavorites(favoritesRoot: displayedFavoritesFolder)
+                if let bookmark = entity as? Bookmark, bookmark.isFavorite, let favoritesRoot = favoritesRoot {
+                    bookmarkMO.addToFavorites(insertAt: indexInFavoritesArray,
+                                              favoritesRoot: displayedFavoritesFolder)
+                    bookmarkMO.addToFavorites(folders: favoritesFoldersWithoutDisplayed)
                 }
             }
 
