@@ -69,7 +69,7 @@ extension HomePage.Views {
 
                             Group {
                                 if addressBarModel.shouldShowAddressBar {
-                                    BigSearchBox(isCompact: false, usesFixedColorScheme: false)
+                                    BigSearchBox(isCompact: false, supportsFixedColorScheme: false)
                                 }
 
                                 ZStack {

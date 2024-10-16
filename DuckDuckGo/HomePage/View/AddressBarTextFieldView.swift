@@ -24,10 +24,15 @@ struct AddressBarTextFieldView: NSViewRepresentable {
     @EnvironmentObject var addressBarModel: HomePage.Models.AddressBarModel
     @EnvironmentObject var settingsModel: HomePage.Models.SettingsModel
 
-    let usesFixedColorScheme: Bool
+    /**
+     * If this property is `true`, this view follows NTP custom background's
+     * color scheme. It needs to be set to `false` for Burner Window that doesn't
+     * support background customization.
+     */
+    let supportsFixedColorScheme: Bool
 
-    init(usesFixedColorScheme: Bool = true) {
-        self.usesFixedColorScheme = usesFixedColorScheme
+    init(supportsFixedColorScheme: Bool = true) {
+        self.supportsFixedColorScheme = supportsFixedColorScheme
     }
 
     func makeNSView(context: Context) -> NSView {
@@ -35,7 +40,7 @@ struct AddressBarTextFieldView: NSViewRepresentable {
     }
 
     func updateNSView(_ nsView: NSView, context: Context) {
-        if usesFixedColorScheme {
+        if supportsFixedColorScheme {
             switch settingsModel.customBackground?.colorScheme {
             case .light:
                 nsView.appearance = NSAppearance(named: .aqua)
@@ -63,11 +68,11 @@ struct BigSearchBox: View {
     }
 
     let isCompact: Bool
-    let usesFixedColorScheme: Bool
+    let supportsFixedColorScheme: Bool
 
-    init(isCompact: Bool, usesFixedColorScheme: Bool = true) {
+    init(isCompact: Bool, supportsFixedColorScheme: Bool = true) {
         self.isCompact = isCompact
-        self.usesFixedColorScheme = usesFixedColorScheme
+        self.supportsFixedColorScheme = supportsFixedColorScheme
     }
 
     var body: some View {
@@ -98,7 +103,7 @@ struct BigSearchBox: View {
 
     @ViewBuilder
     func searchField() -> some View {
-        AddressBarTextFieldView(usesFixedColorScheme: usesFixedColorScheme)
+        AddressBarTextFieldView(supportsFixedColorScheme: supportsFixedColorScheme)
             .frame(height: Const.searchBoxHeight)
             .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 3)
             .shadow(color: .black.opacity(0.15), radius: 0, x: 0, y: 0)
