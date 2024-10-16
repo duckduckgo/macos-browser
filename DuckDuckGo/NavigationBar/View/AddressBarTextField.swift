@@ -28,8 +28,21 @@ import os.log
 
 final class AddressBarTextField: NSTextField {
 
+    /**
+     * This property controls address bar mode and influences view styling.
+     *
+     * If set to `false` (default), the view is styled for displaying as the regular address bar
+     * in the navigation bar. If set to `true`, it's styled for displaying as a standalone view
+     * on the New Tab Page.
+     */
     var isSearchBox: Bool = false
 
+    /**
+     * This property keeps the preferred appearance (color scheme) of the New Tab Page.
+     *
+     * It's non-nil when a custom NTP background is in use. Its value is used to properly
+     * style the suggestion window when it's shown.
+     */
     var homePagePreferredAppearance: NSAppearance? {
         didSet {
             if suggestionWindowController != nil {
