@@ -108,9 +108,13 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
             let proxySettings = TransparentProxySettings(defaults: .netP)
             let uiActionHandler = VPNUIActionHandler(vpnURLEventHandler: vpnURLEventHandler, proxySettings: proxySettings)
 
+            let activeSitePublisher = CurrentValuePublisher(
+                initialValue: nil,
+                publisher: $siteInfo.eraseToAnyPublisher())
+
             let siteTroubleshootingViewModel = SiteTroubleshootingView.Model(
                 connectionStatusPublisher: statusReporter.statusObserver.publisher,
-                activeSitePublisher: $siteInfo.eraseToAnyPublisher(),
+                activeSitePublisher: activeSitePublisher.eraseToAnyPublisher(),
                 uiActionHandler: uiActionHandler)
 
             let statusViewModel = NetworkProtectionStatusView.Model(controller: controller,
@@ -161,6 +165,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
 
             let tipsModel = VPNTipsModel(featureFlagPublisher: tipsFeatureFlagPublisher,
                                          statusObserver: statusReporter.statusObserver,
+                                         activeSitePublisher: activeSitePublisher,
                                          forMenuApp: false)
 
             let popover = NetworkProtectionPopover(

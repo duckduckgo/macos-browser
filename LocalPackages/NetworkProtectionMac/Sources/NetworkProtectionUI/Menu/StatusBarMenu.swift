@@ -136,9 +136,11 @@ public final class StatusBarMenu: NSObject {
                 return
             }
 
+            let activeSitePublisher = CurrentValuePublisher(initialValue: nil, publisher: Just(ActiveSiteInfo?(nil)).eraseToAnyPublisher())
+
             let siteTroubleshootingViewModel = SiteTroubleshootingView.Model(
                 connectionStatusPublisher: Just(NetworkProtection.ConnectionStatus.disconnected).eraseToAnyPublisher(),
-                activeSitePublisher: Just(ActiveSiteInfo?(nil)).eraseToAnyPublisher(),
+                activeSitePublisher: activeSitePublisher.eraseToAnyPublisher(),
                 uiActionHandler: uiActionHandler)
 
             // TODO: replace with access to actual feature flag
@@ -146,7 +148,7 @@ public final class StatusBarMenu: NSObject {
 
             let tipsModel = VPNTipsModel(featureFlagPublisher: tipsFeatureFlagPublisher,
                                          statusObserver: statusReporter.statusObserver,
-                                         activeSitePublisher: Just(ActiveSiteInfo?(nil)).eraseToAnyPublisher(),
+                                         activeSitePublisher: activeSitePublisher,
                                          forMenuApp: true)
 
             let debugInformationViewModel = DebugInformationViewModel(showDebugInformation: isOptionKeyPressed)

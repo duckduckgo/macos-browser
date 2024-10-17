@@ -31,6 +31,9 @@ extension VPNDomainExclusionsTip: Tip {
     @Parameter(.transient)
     static var vpnEnabled: Bool = false
 
+    @Parameter(.transient)
+    static var hasActiveSite: Bool = false
+
     /// The containing view was opened when the VPN was already connected.
     ///
     /// This condition may be indicative that the user is struggling, so they might want
@@ -55,6 +58,9 @@ extension VPNDomainExclusionsTip: Tip {
     }
 
     var rules: [Rule] {
+        #Rule(Self.$hasActiveSite) {
+            $0 == true
+        }
         #Rule(Self.$vpnEnabled) {
             $0 == true
         }

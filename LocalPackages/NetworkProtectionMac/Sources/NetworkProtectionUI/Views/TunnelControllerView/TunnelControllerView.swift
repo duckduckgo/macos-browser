@@ -57,6 +57,10 @@ public struct TunnelControllerView: View {
                 VPNDomainExclusionsTipView()
                     .padding(.horizontal, 9)
                     .padding(.vertical, 6)
+
+                VPNAutoconnectTipView()
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 6)
             }
 
             Divider()
@@ -182,12 +186,6 @@ public struct TunnelControllerView: View {
 
             if #available(macOS 15.0, *) {
                 VPNGeoswitchingTipView()
-                    .padding(.horizontal, 9)
-                    .padding(.vertical, 6)
-            }
-
-            if #available(macOS 15.0, *) {
-                VPNAutoconnectTipView()
                     .padding(.horizontal, 9)
                     .padding(.vertical, 6)
             }

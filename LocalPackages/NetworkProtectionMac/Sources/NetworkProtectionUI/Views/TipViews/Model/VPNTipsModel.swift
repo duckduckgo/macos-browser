@@ -25,6 +25,35 @@ import TipKitUtils
 public final class VPNTipsModel: ObservableObject {
 
     @Published
+    private(set) var activeSiteInfo: ActiveSiteInfo? {
+        didSet {
+            guard #available(macOS 14.0, *) else {
+                return
+            }
+
+            VPNDomainExclusionsTip.hasActiveSite = (activeSiteInfo != nil)
+        }
+    }
+
+    @Published
+    private(set) var connectionStatus: ConnectionStatus {
+        didSet {
+            guard #available(macOS 14.0, *) else {
+                return
+            }
+
+            switch connectionStatus {
+            case .connected:
+                VPNAutoconnectTip.vpnEnabled = true
+                VPNDomainExclusionsTip.vpnEnabled = true
+            default:
+                VPNAutoconnectTip.vpnEnabled = false
+                VPNDomainExclusionsTip.vpnEnabled = false
+            }
+        }
+    }
+
+    @Published
     private(set) var featureFlag: Bool
     let tips: TipGrouping
 
@@ -68,21 +97,25 @@ public final class VPNTipsModel: ObservableObject {
 
     public init(featureFlagPublisher: CurrentValuePublisher<Bool, Never>,
                 statusObserver: ConnectionStatusObserver,
-                activeSitePublisher: AnyPublisher<ActiveSiteInfo?, Never>,
+                activeSitePublisher: CurrentValuePublisher<ActiveSiteInfo?, Never>,
                 forMenuApp isMenuApp: Bool) {
 
+        self.activeSiteInfo = activeSitePublisher.value
+        self.connectionStatus = statusObserver.recentValue
         self.featureFlag = featureFlagPublisher.value
         self.tips = Self.makeTips(forMenuApp: isMenuApp)
 
         if #available(macOS 14.0, *) {
             subscribeToConnectionStatusChanges(statusObserver)
             subscribeToFeatureFlagChanges(featureFlagPublisher)
+            subscribeToActiveSiteChanges(activeSitePublisher)
         }
     }
 
     @available(macOS 14.0, *)
     private func subscribeToFeatureFlagChanges(_ publisher: CurrentValuePublisher<Bool, Never>) {
         publisher
+            .removeDuplicates()
             .receive(on: DispatchQueue.main)
             .assign(to: \.featureFlag, onWeaklyHeld: self)
             .store(in: &cancellables)
@@ -93,23 +126,17 @@ public final class VPNTipsModel: ObservableObject {
         statusObserver.publisher
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] status in
-                self?.updateVPNConnectionStatusInWidgets(status)
-            }
+            .assign(to: \.connectionStatus, onWeaklyHeld: self)
             .store(in: &cancellables)
     }
 
-    // MARK: - Refreshing Tips
-
     @available(macOS 14.0, *)
-    private func updateVPNConnectionStatusInWidgets(_ status: ConnectionStatus) {
-        switch status {
-        case .connected:
-            VPNAutoconnectTip.vpnEnabled = true
-            VPNDomainExclusionsTip.vpnEnabled = true
-        default:
-            VPNAutoconnectTip.vpnEnabled = false
-            VPNDomainExclusionsTip.vpnEnabled = false
-        }
+    private func subscribeToActiveSiteChanges(_ publisher: CurrentValuePublisher<ActiveSiteInfo?, Never>) {
+
+        publisher
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .assign(to: \.activeSiteInfo, onWeaklyHeld: self)
+            .store(in: &cancellables)
     }
 }
