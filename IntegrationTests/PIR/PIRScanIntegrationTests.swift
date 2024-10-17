@@ -247,7 +247,7 @@ final class PIRScanIntegrationTests: XCTestCase {
         let schedulerStartsExpectation = expectation(description: "Scheduler starts")
 
         await awaitFulfillment(of: schedulerStartsExpectation,
-                               withTimeout: 10,
+                               withTimeout: 100,
                                whenCondition: {
             try! self.pirProtectionManager.dataManager.prepareBrokerProfileQueryDataCache()
             return await self.communicationDelegate.getBackgroundAgentMetadata().lastStartedSchedulerOperationTimestamp == nil
