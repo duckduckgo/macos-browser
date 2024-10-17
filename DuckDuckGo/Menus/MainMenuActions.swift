@@ -65,6 +65,10 @@ extension AppDelegate {
         }
     }
 
+    @objc func newAIChat(_ sender: Any?) {
+        AIChatTabOpener.openAIChatTab()
+    }
+
     @objc func newTab(_ sender: Any?) {
         DispatchQueue.main.async {
             WindowsManager.openNewWindow()

@@ -94,7 +94,7 @@ class MainMenuTests: XCTestCase {
     @MainActor
     func testWhenBookmarksMenuIsInitialized_ThenSecondItemIsBookmarkAllTabs() throws {
         // GIVEN
-        let sut = MainMenu(featureFlagger: DummyFeatureFlagger(), bookmarkManager: MockBookmarkManager(), faviconManager: FaviconManagerMock())
+        let sut = MainMenu(featureFlagger: DummyFeatureFlagger(), bookmarkManager: MockBookmarkManager(), faviconManager: FaviconManagerMock(), aiChatMenuConfig: DummyAIChatConfig())
         let bookmarksMenu = try XCTUnwrap(sut.item(withTitle: UserText.bookmarks))
 
         // WHEN
@@ -109,5 +109,15 @@ class MainMenuTests: XCTestCase {
 private class DummyFeatureFlagger: FeatureFlagger {
     func isFeatureOn<F: BrowserServicesKit.FeatureFlagSourceProviding>(forProvider: F) -> Bool {
         false
+    }
+}
+
+private class DummyAIChatConfig: AIChatMenuVisibilityConfigurable {
+    var shouldDisplayApplicationMenuShortcut: Bool { false }
+    var shouldDisplayToolbarShortcut: Bool { false }
+    var shortcutURL: URL { URL(string: "https://example.com")! }
+
+    var valuesChangedPublisher: PassthroughSubject<Void, Never> {
+        return PassthroughSubject<Void, Never>()
     }
 }
