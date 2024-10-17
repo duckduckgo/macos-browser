@@ -49,6 +49,7 @@ public struct ReleaseNotesValues: Codable {
     let releaseNotes: [String]?
     let releaseNotesPrivacyPro: [String]?
     let downloadProgress: Double?
+    let automaticUpdate: Bool?
 }
 
 final class ReleaseNotesTabExtension: NavigationResponder {
@@ -130,7 +131,8 @@ extension ReleaseNotesValues {
          releaseTitle: String? = nil,
          releaseNotes: [String]? = nil,
          releaseNotesPrivacyPro: [String]? = nil,
-         downloadProgress: Double? = nil) {
+         downloadProgress: Double? = nil,
+         automaticUpdate: Bool? = nil) {
         self.status = status.rawValue
         self.currentVersion = currentVersion
         self.latestVersion = latestVersion
@@ -139,6 +141,7 @@ extension ReleaseNotesValues {
         self.releaseNotes = releaseNotes
         self.releaseNotesPrivacyPro = releaseNotesPrivacyPro
         self.downloadProgress = downloadProgress
+        self.automaticUpdate = automaticUpdate
     }
 
     init(from updateController: UpdateController?) {
@@ -153,28 +156,27 @@ extension ReleaseNotesValues {
         }
 
         let updateState = UpdateState(from: updateController.latestUpdate, progress: updateController.updateProgress)
-        let hasPendingUpdate = updateController.hasPendingUpdate
 
+        let status: Status
+        let downloadProgress: Double?
         switch updateState {
         case .upToDate:
-            self.init(status: .loaded,
-                      currentVersion: currentVersion,
-                      latestVersion: latestUpdate.versionString,
-                      lastUpdate: lastUpdate,
-                      releaseTitle: latestUpdate.title,
-                      releaseNotes: latestUpdate.releaseNotes,
-                      releaseNotesPrivacyPro: latestUpdate.releaseNotesPrivacyPro)
+            status = .loaded
+            downloadProgress = nil
         case .updateCycle(let progress):
-            let status = hasPendingUpdate ? .updateReady : progress.toStatus
-            self.init(status: status,
-                      currentVersion: currentVersion,
-                      latestVersion: latestUpdate.versionString,
-                      lastUpdate: lastUpdate,
-                      releaseTitle: latestUpdate.title,
-                      releaseNotes: latestUpdate.releaseNotes,
-                      releaseNotesPrivacyPro: latestUpdate.releaseNotesPrivacyPro,
-                      downloadProgress: progress.toDownloadProgress)
+            status = updateController.hasPendingUpdate ? .updateReady : progress.toStatus
+            downloadProgress = progress.toDownloadProgress
         }
+
+        self.init(status: status,
+                  currentVersion: currentVersion,
+                  latestVersion: latestUpdate.versionString,
+                  lastUpdate: lastUpdate,
+                  releaseTitle: latestUpdate.title,
+                  releaseNotes: latestUpdate.releaseNotes,
+                  releaseNotesPrivacyPro: latestUpdate.releaseNotesPrivacyPro,
+                  downloadProgress: downloadProgress,
+                  automaticUpdate: updateController.areAutomaticUpdatesEnabled)
     }
 }
 
@@ -196,9 +198,7 @@ private extension UpdateCycleProgress {
     }
 
     var toDownloadProgress: Double? {
-        guard case .downloading(let percentage) = self else {
-            return nil
-        }
+        guard case .downloading(let percentage) = self else { return nil }
         return percentage
     }
 }
