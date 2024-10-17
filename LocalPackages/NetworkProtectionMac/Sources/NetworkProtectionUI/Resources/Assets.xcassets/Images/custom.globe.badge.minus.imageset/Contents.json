@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "custom.globe.badge.minus.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

@@ -51,7 +51,7 @@ extension VPNDomainExclusionsTip: Tip {
     }
 
     var image: Image? {
-        Image(systemName: "custom.globe.badge.xmark")
+        Image(.customGlobeBadgeMinus)
     }
 
     var rules: [Rule] {

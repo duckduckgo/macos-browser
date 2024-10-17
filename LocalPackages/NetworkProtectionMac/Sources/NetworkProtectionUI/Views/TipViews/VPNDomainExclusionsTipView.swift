@@ -34,12 +34,9 @@ struct VPNDomainExclusionsTipView: View {
     public var body: some View {
 
         if tipsModel.featureFlag,
-           let tip = tipsModel.tips.currentTip as? VPNGeoswitchingTip {
+           let tip = tipsModel.tips.currentTip as? VPNDomainExclusionsTip {
 
             TipView(tip)
-                //.removeGroupedListStyleInsets()
-                //.tipCornerRadius(0)
-                //.tipBackground(Color(designSystemColor: .surface))
         }
     }
 }

@@ -52,12 +52,12 @@ public final class VPNTipsModel: ObservableObject {
             if isMenuApp {
                 return LegacyTipGroup(.ordered) {
                     VPNGeoswitchingTip()
-                    VPNDomainExclusionsTip()
                     VPNAutoconnectTip()
                 }
             } else {
                 return LegacyTipGroup(.ordered) {
                     VPNGeoswitchingTip()
+                    VPNDomainExclusionsTip()
                     VPNAutoconnectTip()
                 }
             }

@@ -37,9 +37,6 @@ struct VPNAutoconnectTipView: View {
            let tip = tipsModel.tips.currentTip as? VPNAutoconnectTip {
 
             TipView(tip)
-                //.removeGroupedListStyleInsets()
-                //.tipCornerRadius(0)
-                //.tipBackground(Color(designSystemColor: .surface))
         }
     }
 }
