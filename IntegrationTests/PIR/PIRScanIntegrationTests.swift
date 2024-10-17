@@ -234,6 +234,11 @@ final class PIRScanIntegrationTests: XCTestCase {
         })
         print("Stage 1 passed: We save a profile")
 
+        let queries9 = try! database.fetchAllBrokerProfileQueryData()
+        let initialBrokers = queries9.compactMap { $0.dataBroker }
+        XCTAssertEqual(initialBrokers.count, 1)
+        XCTAssertEqual(initialBrokers.first!.name, "DDG Fake Broker")
+
         /*
         2/ We scan brokers
         */
