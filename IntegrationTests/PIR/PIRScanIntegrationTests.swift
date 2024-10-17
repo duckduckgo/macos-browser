@@ -206,6 +206,7 @@ final class PIRScanIntegrationTests: XCTestCase {
 
         let mockUserProfile = mockUserProfile()
         let returnedUserProfile = await createProfileOnFakeBroker(mockUserProfile)
+        print(returnedUserProfile)
         XCTAssertEqual(mockUserProfile.firstName, returnedUserProfile.firstName)
 
         /*
@@ -247,7 +248,7 @@ final class PIRScanIntegrationTests: XCTestCase {
         })
 
         let metaData = await communicationDelegate.getBackgroundAgentMetadata()
-        //XCTAssertNotNil(metaData.lastStartedSchedulerOperationBrokerUrl)
+        XCTAssertNotNil(metaData.lastStartedSchedulerOperationBrokerUrl)
         print("Stage 2 passed: We scan brokers")
 
         /*
