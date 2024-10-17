@@ -38,6 +38,9 @@ extension BookmarkEntity: BookmarkEntityProtocol {
 }
 
 final class LocalBookmarkStore: BookmarkStore {
+    typealias BookmarkEntityAtIndex = (entity: BaseBookmarkEntity,
+                                       index: Int?,
+                                       indexInFavoritesArray: Int?)
 
     convenience init(bookmarkDatabase: BookmarkDatabase) {
         self.init(
@@ -308,89 +311,17 @@ final class LocalBookmarkStore: BookmarkStore {
         }
     }
 
-    func save(entitiesAtIndices: [(entity: BaseBookmarkEntity, index: Int?, indexInFavoritesArray: Int?)], completion: @escaping (Error?) -> Void) {
+    func save(entitiesAtIndices: [BookmarkEntityAtIndex], completion: @escaping (Error?) -> Void) {
         applyChangesAndSave(changes: { [weak self] context in
             guard let self else { throw BookmarkStoreError.storeDeallocated }
 
-            var entitiesByUUID: [String: BookmarkEntity] = [:]
-            var objectsToInsertIntoParent = [BookmarkEntity: ([BookmarkEntity], IndexSet)]()
-            for (entity, index, _) in entitiesAtIndices.sorted(by: { $0.index ?? Int.max < $1.index ?? Int.max }) {
-                let parentEntity: BookmarkEntity
-                if let parentId = entity.parentFolderUUID, parentId != PseudoFolder.bookmarks.id, parentId != "bookmarks_root",
-                   let parentFetchRequestResult = try? context.fetch(BaseBookmarkEntity.singleEntity(with: parentId)).first {
-                    parentEntity = parentFetchRequestResult
-                } else if let root = bookmarksRoot(in: context) {
-                    parentEntity = root
-                } else {
-                    PixelKit.fire(DebugEvent(GeneralPixel.missingParent))
-                    throw BookmarkStoreError.missingParent
-                }
-
-                let bookmarkMO = BookmarkEntity(context: context)
-
-                switch entity {
-                case let folder as BookmarkFolder:
-                    bookmarkMO.title = folder.title
-                    bookmarkMO.isFolder = true
-                case let bookmark as Bookmark:
-                    bookmarkMO.title = bookmark.title
-                    bookmarkMO.url = bookmark.url
-                    bookmarkMO.isFolder = false
-                default:
-                    fatalError("Unexpected Bookmark Entity type \(entity)")
-                }
-
-                bookmarkMO.uuid = entity.id
-                entitiesByUUID[entity.id] = bookmarkMO
-
-                withUnsafeMutablePointer(to: &objectsToInsertIntoParent[parentEntity, default: ([], IndexSet())]) {
-                    $0.pointee.0.append(bookmarkMO)
-                    if let index {
-                        $0.pointee.1.insert(index)
-                    }
-                }
-            }
+            let (entitiesByUUID, objectsToInsertIntoParent) = try restoreBookmarksInParentEntity(entitiesAtIndices, in: context)
 
             for (parentEntity, (managedObjects, insertionIndices)) in objectsToInsertIntoParent {
                 move(entities: managedObjects, to: insertionIndices, within: parentEntity)
             }
 
-            let displayedFavoritesFolderUUID = favoritesDisplayMode.displayedFolder.rawValue
-            guard let displayedFavoritesFolder = BookmarkUtils.fetchFavoritesFolder(withUUID: displayedFavoritesFolderUUID, in: context) else {
-                throw BookmarkStoreError.missingFavoritesRoot
-            }
-            let favoritesFolders = BookmarkUtils.fetchFavoritesFolders(for: favoritesDisplayMode, in: context)
-            let favoritesFoldersWithoutDisplayed = favoritesFolders.filter { $0.uuid != displayedFavoritesFolderUUID }
-
-            let favoritesAtIndices = entitiesAtIndices.filter { $0.indexInFavoritesArray != nil }
-            let sortedEntitiesByFavoritesIndex = favoritesAtIndices
-                .sorted { ($0.indexInFavoritesArray ?? Int.max) < ($1.indexInFavoritesArray ?? Int.max) }
-
-            let indicesInFavoritesArray = sortedEntitiesByFavoritesIndex.compactMap(\.indexInFavoritesArray)
-
-            let adjustedIndices = displayedFavoritesFolder.favorites?.array.adjustInsertionIndices(IndexSet(indicesInFavoritesArray)) { object in
-                guard let bookmarkMO = object as? BookmarkEntity else {
-                    return false
-                }
-                return !(bookmarkMO.isStub || bookmarkMO.isPendingDeletion)
-            } ?? IndexSet()
-
-            assert(adjustedIndices.count == sortedEntitiesByFavoritesIndex.count, "Adjusted indices array size is different than sorted entities array size")
-
-            let adjustedEntitiesByFavoritesIndex = zip(sortedEntitiesByFavoritesIndex.map(\.entity), adjustedIndices)
-
-            for (entity, indexInFavoritesArray) in adjustedEntitiesByFavoritesIndex {
-                guard let bookmarkMO = entitiesByUUID[entity.id] else {
-                    return
-                }
-
-                if let bookmark = entity as? Bookmark, bookmark.isFavorite {
-                    bookmarkMO.addToFavorites(insertAt: indexInFavoritesArray,
-                                              favoritesRoot: displayedFavoritesFolder)
-                    bookmarkMO.addToFavorites(folders: favoritesFoldersWithoutDisplayed)
-                }
-            }
-
+            try restoreFavorites(entitiesAtIndices, entitiesByUUID: entitiesByUUID, in: context)
         }, onError: { [weak self] error in
             self?.commonOnSaveErrorHandler(error)
             DispatchQueue.main.async { completion(error) }
@@ -1028,6 +959,137 @@ final class LocalBookmarkStore: BookmarkStore {
         }
     }
 
+    // MARK: - Restore boomarks helper functions
+
+    /// Restores bookmarks within their respective parent entities and maps them by their UUID.
+    /// - Parameters:
+    ///   - entitiesAtIndices: An array of `BookmarkEntityAtIndex`, containing entities with their target indices.
+    ///   - context: The managed object context for interacting with Core Data.
+    /// - Returns: A tuple containing a dictionary that maps UUID strings to `BookmarkEntity` instances and a mapping of parent entities to their children and insertion indices.
+    /// - Throws: An error if a parent entity cannot be retrieved.
+    private func restoreBookmarksInParentEntity(_ entitiesAtIndices: [BookmarkEntityAtIndex],
+                                                in context: NSManagedObjectContext) throws
+                            -> ([String: BookmarkEntity], [BookmarkEntity: ([BookmarkEntity], IndexSet)]) {
+        var entitiesByUUID: [String: BookmarkEntity] = [:]
+        var objectsToInsertIntoParent = [BookmarkEntity: ([BookmarkEntity], IndexSet)]()
+
+        for (entity, index, _) in entitiesAtIndices.sorted(by: { $0.index ?? Int.max < $1.index ?? Int.max }) {
+            let parentEntity = try parent(for: entity, in: context)
+            let bookmarkMO = createBookmarkDatabaseObject(from: entity, in: context)
+            entitiesByUUID[entity.id] = bookmarkMO
+
+            withUnsafeMutablePointer(to: &objectsToInsertIntoParent[parentEntity, default: ([], IndexSet())]) {
+                $0.pointee.0.append(bookmarkMO)
+                if let index {
+                    $0.pointee.1.insert(index)
+                }
+            }
+        }
+
+        return (entitiesByUUID, objectsToInsertIntoParent)
+    }
+
+    /// Restores entities marked as favorites into the appropriate favorites folder.
+    /// - Parameters:
+    ///   - entitiesAtIndices: An array of `BookmarkEntityAtIndex`, containing entities with their target indices.
+    ///   - entitiesByUUID: A dictionary mapping UUID strings to corresponding `BookmarkEntity` objects.
+    ///   - context: The managed object context for interacting with Core Data.
+    /// - Throws: An error if the displayed favorites folder cannot be retrieved.
+    private func restoreFavorites(_ entitiesAtIndices: [BookmarkEntityAtIndex],
+                                  entitiesByUUID: [String: BookmarkEntity],
+                                  in context: NSManagedObjectContext) throws {
+        let displayedFavoritesFolder = try fetchDisplayedFavoritesFolder(in: context)
+        let favoritesFoldersWithoutDisplayed = fetchOtherFavoritesFolders(in: context)
+
+        let sortedEntitiesByFavoritesIndex = sortEntitiesByFavoritesIndex(entitiesAtIndices)
+        let adjustedIndices = calculateAdjustedIndices(for: sortedEntitiesByFavoritesIndex, in: displayedFavoritesFolder)
+
+        assert(adjustedIndices.count == sortedEntitiesByFavoritesIndex.count,
+               "Adjusted indices array size is different than sorted entities array size")
+
+        zip(sortedEntitiesByFavoritesIndex.map(\.entity), adjustedIndices).forEach { entity, indexInFavoritesArray in
+            try? addEntityToFavorites(entity, at: indexInFavoritesArray, entitiesByUUID: entitiesByUUID, favoritesFolder: displayedFavoritesFolder, otherFolders: favoritesFoldersWithoutDisplayed)
+        }
+    }
+
+    private func fetchDisplayedFavoritesFolder(in context: NSManagedObjectContext) throws -> BookmarkEntity {
+        let displayedFavoritesFolderUUID = favoritesDisplayMode.displayedFolder.rawValue
+        guard let displayedFavoritesFolder = BookmarkUtils.fetchFavoritesFolder(withUUID: displayedFavoritesFolderUUID, in: context) else {
+            throw BookmarkStoreError.missingFavoritesRoot
+        }
+        return displayedFavoritesFolder
+    }
+
+    private func fetchOtherFavoritesFolders(in context: NSManagedObjectContext) -> [BookmarkEntity] {
+        let displayedFavoritesFolderUUID = favoritesDisplayMode.displayedFolder.rawValue
+        let favoritesFolders = BookmarkUtils.fetchFavoritesFolders(for: favoritesDisplayMode, in: context)
+        return favoritesFolders.filter { $0.uuid != displayedFavoritesFolderUUID }
+    }
+
+    private func sortEntitiesByFavoritesIndex(_ entitiesAtIndices: [BookmarkEntityAtIndex]) -> [BookmarkEntityAtIndex] {
+        return entitiesAtIndices
+            .filter { $0.indexInFavoritesArray != nil }
+            .sorted { ($0.indexInFavoritesArray ?? Int.max) < ($1.indexInFavoritesArray ?? Int.max) }
+    }
+
+    private func calculateAdjustedIndices(for sortedEntities: [BookmarkEntityAtIndex], in folder: BookmarkEntity) -> IndexSet {
+        let indicesInFavoritesArray = sortedEntities.compactMap(\.indexInFavoritesArray)
+        return folder.favorites?.array.adjustInsertionIndices(IndexSet(indicesInFavoritesArray)) { object in
+            guard let bookmarkMO = object as? BookmarkEntity else {
+                return false
+            }
+            return !(bookmarkMO.isStub || bookmarkMO.isPendingDeletion)
+        } ?? IndexSet()
+    }
+
+    private func addEntityToFavorites(_ entity: BaseBookmarkEntity,
+                                      at index: Int,
+                                      entitiesByUUID: [String: BookmarkEntity],
+                                      favoritesFolder: BookmarkEntity,
+                                      otherFolders: [BookmarkEntity]) throws {
+        guard let bookmarkMO = entitiesByUUID[entity.id] else {
+            throw BookmarkStoreError.missingEntity
+        }
+
+        if let bookmark = entity as? Bookmark, bookmark.isFavorite {
+            bookmarkMO.addToFavorites(insertAt: index, favoritesRoot: favoritesFolder)
+            bookmarkMO.addToFavorites(folders: otherFolders)
+        }
+    }
+
+    private func parent(for entity: BaseBookmarkEntity, in context: NSManagedObjectContext) throws -> BookmarkEntity {
+        let parentEntity: BookmarkEntity
+        if let parentId = entity.parentFolderUUID, parentId != PseudoFolder.bookmarks.id, parentId != "bookmarks_root",
+           let parentFetchRequestResult = try? context.fetch(BaseBookmarkEntity.singleEntity(with: parentId)).first {
+            return parentFetchRequestResult
+        } else if let root = bookmarksRoot(in: context) {
+            return root
+        } else {
+            PixelKit.fire(DebugEvent(GeneralPixel.missingParent))
+            throw BookmarkStoreError.missingParent
+        }
+    }
+
+    private func createBookmarkDatabaseObject(from entity: BaseBookmarkEntity,
+                                              in context: NSManagedObjectContext) -> BookmarkEntity {
+        let bookmarkMO = BookmarkEntity(context: context)
+
+        switch entity {
+        case let folder as BookmarkFolder:
+            bookmarkMO.title = folder.title
+            bookmarkMO.isFolder = true
+        case let bookmark as Bookmark:
+            bookmarkMO.title = bookmark.title
+            bookmarkMO.url = bookmark.url
+            bookmarkMO.isFolder = false
+        default:
+            fatalError("Unexpected Bookmark Entity type \(entity)")
+        }
+
+        bookmarkMO.uuid = entity.id
+
+        return bookmarkMO
+    }
 }
 
 private extension LocalBookmarkStore {
