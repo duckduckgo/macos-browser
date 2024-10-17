@@ -370,3 +370,13 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
     }
 
 }
+
+extension Tab: WKInspectorDelegate {
+    @MainActor
+    func inspector(_ inspector: NSObject, openURLExternally url: NSURL?) {
+        let tab = Tab(content: url.map { Tab.Content.url($0 as URL, source: .link) } ?? .none,
+                      burnerMode: BurnerMode(isBurner: burnerMode.isBurner),
+                      webViewSize: webView.superview?.bounds.size ?? .zero)
+        delegate?.tab(self, createdChild: tab, of: .window(active: true, burner: burnerMode.isBurner))
+    }
+}
