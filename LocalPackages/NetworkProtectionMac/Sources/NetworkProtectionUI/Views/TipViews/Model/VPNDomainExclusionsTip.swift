@@ -54,7 +54,7 @@ extension VPNDomainExclusionsTip: Tip {
     }
 
     var image: Image? {
-        Image(.customGlobeBadgeMinus)
+        Image(.domainExclusionsTip)
     }
 
     var rules: [Rule] {

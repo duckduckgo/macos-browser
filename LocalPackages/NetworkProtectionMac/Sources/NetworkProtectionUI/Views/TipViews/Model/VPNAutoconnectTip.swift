@@ -48,7 +48,7 @@ extension VPNAutoconnectTip: Tip {
     }
 
     var image: Image? {
-        Image(systemName: "point.3.filled.connected.trianglepath.dotted")
+        Image(.autoconnectTip)
     }
 
     var actions: [Action] {
