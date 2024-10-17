@@ -108,8 +108,17 @@ platform :mac do
 
   desc 'Promotes the latest testflight build to appstore without submitting for review'
   lane :promote_latest_testflight_to_appstore do |options|
-    build_number = fetch_testflight_build_number(options)
-    UI.message("Fetched TestFlight build number: #{build_number}")
+    UI.message("Options passed to this lane: #{options.inspect}")
+
+    latest_test_flight_version = app_store_build_number(
+      api_key: get_api_key,
+      live: false,
+      platform: 'osx'             
+    )
+
+    latest_build_number = fetch_testflight_build_number(options)
+    UI.message("Fetched latest version number: #{latest_test_flight_version}")
+    UI.message("Fetched TestFlight build number: #{latest_build_number}")
   end
   # Makes App Store release build, uploads it to TestFlight, and prepares App Store listing for submission.
   #
