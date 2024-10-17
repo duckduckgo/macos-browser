@@ -116,7 +116,7 @@ final class MainViewController: NSViewController {
         bookmarksBarViewController = BookmarksBarViewController.create(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager)
 
         super.init(nibName: nil, bundle: nil)
-
+        browserTabViewController.delegate = self
         findInPageViewController.delegate = self
     }
 
@@ -562,6 +562,20 @@ extension MainViewController {
         return event
 
     }
+}
+
+// MARK: - BrowserTabViewControllerDelegate
+
+extension MainViewController: BrowserTabViewControllerDelegate {
+
+    func highlightFireButton() {
+        tabBarViewController.startFireButtonPulseAnimation()
+    }
+
+    func dismissViewHighlight() {
+        tabBarViewController.stopFireButtonPulseAnimation()
+    }
+
 }
 
 #if DEBUG
