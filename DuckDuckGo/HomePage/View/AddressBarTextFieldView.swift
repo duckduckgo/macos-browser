@@ -63,6 +63,8 @@ struct BigSearchBox: View {
         static let logoSpacing = 12.0
         static let wordmarkHeight = 22.0
 
+        static let searchBarWidth = 620.0
+
         static let totalHeight = searchBoxHeight + logoHeight + logoSpacing + wordmarkHeight + spacing
         static let compactHeight = searchBoxHeight + compactLogoHeight + spacing
     }
@@ -80,6 +82,7 @@ struct BigSearchBox: View {
             logo()
             searchField()
         }
+        .frame(width: Const.searchBarWidth)
     }
 
     @ViewBuilder
