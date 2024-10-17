@@ -234,6 +234,9 @@ final class PIRScanIntegrationTests: XCTestCase {
         })
         print("Stage 1 passed: We save a profile")
 
+        XCTAssertTrue(loginItemsManager.isAnyEnabled([.dbpBackgroundAgent]))
+        XCTAssertTrue(LoginItem.dbpBackgroundAgent.isRunning)
+
         /*
         2/ We scan brokers
         */
@@ -252,9 +255,6 @@ final class PIRScanIntegrationTests: XCTestCase {
         XCTAssertEqual(initialBrokers.count, 1)
         XCTAssertEqual(initialBrokers.first?.name, "DDG Fake Broker")
         XCTAssertEqual(queries9.count, 1)
-
-        XCTAssertTrue(loginItemsManager.isAnyEnabled([.dbpBackgroundAgent]))
-        XCTAssertTrue(LoginItem.dbpBackgroundAgent.isRunning)
 
         let metaData = await communicationDelegate.getBackgroundAgentMetadata()
         XCTAssertNotNil(metaData.lastStartedSchedulerOperationBrokerUrl)
