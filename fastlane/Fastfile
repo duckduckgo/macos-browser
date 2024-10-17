@@ -112,7 +112,7 @@ platform :mac do
     UI.message("Promoting build number: #{latest_build_number} from TestFlight to App Store")
   
     upload_metadata(options.merge({
-      build_number: latest_build_number.ts
+      build_number: latest_build_number.to_s
     }))
   end
   # Makes App Store release build, uploads it to TestFlight, and prepares App Store listing for submission.
