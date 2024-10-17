@@ -577,15 +577,20 @@ extension [RestorableBookmarkEntity] {
         var folderCache = [String: BookmarkFolder]()
         var removedFolderStack = [(folder: BookmarkFolder, index: Int?)]()
         self = entities.map { entity in
-            // find index
-            let parent = if let parentId = entity.parentFolderUUID {
-                // cache already fetched parent folders
-                folderCache[parentId] ?? {
-                    guard let folder = bookmarkManager.getBookmarkFolder(withId: parentId) else { return nil }
-                    folderCache[folder.id] = folder
-                    return folder
-                }()
-            } else { BookmarkFolder?.none }
+
+            let parent: BookmarkFolder? = {
+                guard let parentId = entity.parentFolderUUID else {
+                    return nil
+                }
+                if let cachedFolder = folderCache[parentId] {
+                    return cachedFolder
+                }
+                guard let folder = bookmarkManager.getBookmarkFolder(withId: parentId) else {
+                    return nil
+                }
+                folderCache[folder.id] = folder
+                return folder
+            }()
 
             let siblings = parent?.children ?? bookmarkManager.list?.topLevelEntities
             let index = siblings?.firstIndex(where: { $0.id == entity.id }) ?? -1
@@ -619,6 +624,7 @@ extension [RestorableBookmarkEntity] {
         }
     }
 }
+
 private extension UndoManager {
 
     @MainActor
