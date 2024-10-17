@@ -122,6 +122,7 @@ internal class FirefoxDataImporter: DataImporter {
     private func importFavicons() async {
         let faviconsReader = FirefoxFaviconsReader(firefoxDataDirectoryURL: profile.profileURL)
         let faviconsResult = faviconsReader.readFavicons()
+        let sourceVersion = profile.installedAppsMajorVersionDescription()
 
         switch faviconsResult {
         case .success(let faviconsByURL):
@@ -138,9 +139,10 @@ internal class FirefoxDataImporter: DataImporter {
                 result[pageURL] = favicons
             }
             await faviconManager.handleFaviconsByDocumentUrl(faviconsByDocument)
+            PixelKit.fire(GeneralPixel.dataImportSucceeded(action: .favicons, source: source, sourceVersion: sourceVersion))
 
         case .failure(let error):
-            PixelKit.fire(GeneralPixel.dataImportFailed(source: source, sourceVersion: profile.installedAppsMajorVersionDescription(), error: error))
+            PixelKit.fire(GeneralPixel.dataImportFailed(source: source, sourceVersion: sourceVersion, error: error))
         }
     }
 
