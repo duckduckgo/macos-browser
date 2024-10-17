@@ -159,6 +159,15 @@ final class NewTabPageSearchBoxExperiment {
         case experiment = "ntp_search_box"
         case controlExistingUser = "control_existing_user"
         case experimentExistingUser = "ntp_search_box_existing_user"
+
+        var isExperiment: Bool {
+            switch self {
+            case .experiment, .experimentExistingUser:
+                return true
+            default:
+                return false
+            }
+        }
     }
 
     enum SearchSource: String {
