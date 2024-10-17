@@ -992,8 +992,14 @@ final class LocalBookmarkStore: BookmarkStore {
         assert(adjustedIndices.count == sortedEntitiesByFavoritesIndex.count,
                "Adjusted indices array size is different than sorted entities array size")
 
-        zip(sortedEntitiesByFavoritesIndex.map(\.entity), adjustedIndices).forEach { entity, indexInFavoritesArray in
-            try? addEntityToFavorites(entity, at: indexInFavoritesArray, entitiesByUUID: entitiesByUUID, favoritesFolder: displayedFavoritesFolder, otherFolders: favoritesFoldersWithoutDisplayed)
+        try zip(sortedEntitiesByFavoritesIndex.map(\.entity), adjustedIndices).forEach { entity, indexInFavoritesArray in
+            try addEntityToFavorites(
+                entity,
+                at: indexInFavoritesArray,
+                entitiesByUUID: entitiesByUUID,
+                displayedFavoritesFolder: displayedFavoritesFolder,
+                otherFavoritesFolders: favoritesFoldersWithoutDisplayed
+            )
         }
     }
 
@@ -1030,15 +1036,15 @@ final class LocalBookmarkStore: BookmarkStore {
     private func addEntityToFavorites(_ entity: BaseBookmarkEntity,
                                       at index: Int,
                                       entitiesByUUID: [String: BookmarkEntity],
-                                      favoritesFolder: BookmarkEntity,
-                                      otherFolders: [BookmarkEntity]) throws {
+                                      displayedFavoritesFolder: BookmarkEntity,
+                                      otherFavoritesFolders: [BookmarkEntity]) throws {
         guard let bookmarkMO = entitiesByUUID[entity.id] else {
             throw BookmarkStoreError.missingEntity
         }
 
         if let bookmark = entity as? Bookmark, bookmark.isFavorite {
-            bookmarkMO.addToFavorites(insertAt: index, favoritesRoot: favoritesFolder)
-            bookmarkMO.addToFavorites(folders: otherFolders)
+            bookmarkMO.addToFavorites(insertAt: index, favoritesRoot: displayedFavoritesFolder)
+            bookmarkMO.addToFavorites(folders: otherFavoritesFolders)
         }
     }
 
