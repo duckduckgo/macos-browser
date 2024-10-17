@@ -50,15 +50,17 @@ public struct TunnelControllerView: View {
 
             featureToggleRow()
 
+            if #available(macOS 15.0, *) {
+                VPNAutoconnectTipView()
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 6)
+            }
+
             SiteTroubleshootingView()
                 .padding(.top, 5)
 
             if #available(macOS 15.0, *) {
                 VPNDomainExclusionsTipView()
-                    .padding(.horizontal, 9)
-                    .padding(.vertical, 6)
-
-                VPNAutoconnectTipView()
                     .padding(.horizontal, 9)
                     .padding(.vertical, 6)
             }

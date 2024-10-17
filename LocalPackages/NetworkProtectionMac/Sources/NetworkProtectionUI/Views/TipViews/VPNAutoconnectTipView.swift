@@ -36,7 +36,7 @@ struct VPNAutoconnectTipView: View {
         if tipsModel.featureFlag,
            let tip = tipsModel.tips.currentTip as? VPNAutoconnectTip {
 
-            TipView(tip)
+            TipView(tip, action: tipsModel.autoconnectTipActionHandler)
         }
     }
 }

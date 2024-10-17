@@ -149,7 +149,8 @@ public final class StatusBarMenu: NSObject {
             let tipsModel = VPNTipsModel(featureFlagPublisher: tipsFeatureFlagPublisher,
                                          statusObserver: statusReporter.statusObserver,
                                          activeSitePublisher: activeSitePublisher,
-                                         forMenuApp: true)
+                                         forMenuApp: true,
+                                         vpnSettings: VPNSettings(defaults: userDefaults))
 
             let debugInformationViewModel = DebugInformationViewModel(showDebugInformation: isOptionKeyPressed)
 

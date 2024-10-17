@@ -89,6 +89,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
         activeSitePublisher.refreshActiveSiteInfo()
 
         let popover: NSPopover = {
+            let vpnSettings = VPNSettings(defaults: .netP)
             let controller = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
 
             let statusReporter = DefaultNetworkProtectionStatusReporter(
@@ -102,7 +103,6 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
             )
 
             let onboardingStatusPublisher = UserDefaults.netP.networkProtectionOnboardingStatusPublisher
-            _ = VPNSettings(defaults: .netP)
             let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
             let vpnURLEventHandler = VPNURLEventHandler()
             let proxySettings = TransparentProxySettings(defaults: .netP)
@@ -166,7 +166,8 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
             let tipsModel = VPNTipsModel(featureFlagPublisher: tipsFeatureFlagPublisher,
                                          statusObserver: statusReporter.statusObserver,
                                          activeSitePublisher: activeSitePublisher,
-                                         forMenuApp: false)
+                                         forMenuApp: false,
+                                         vpnSettings: vpnSettings)
 
             let popover = NetworkProtectionPopover(
                 statusViewModel: statusViewModel,

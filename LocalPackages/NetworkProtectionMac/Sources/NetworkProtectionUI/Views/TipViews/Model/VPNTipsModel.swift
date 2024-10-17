@@ -20,6 +20,7 @@ import AppKit
 import Combine
 import Common
 import NetworkProtection
+import TipKit
 import TipKitUtils
 
 public final class VPNTipsModel: ObservableObject {
@@ -57,6 +58,7 @@ public final class VPNTipsModel: ObservableObject {
     private(set) var featureFlag: Bool
     let tips: TipGrouping
 
+    private let vpnSettings: VPNSettings
     private var cancellables = Set<AnyCancellable>()
 
     static func makeTips(forMenuApp isMenuApp: Bool) -> TipGrouping {
@@ -98,12 +100,14 @@ public final class VPNTipsModel: ObservableObject {
     public init(featureFlagPublisher: CurrentValuePublisher<Bool, Never>,
                 statusObserver: ConnectionStatusObserver,
                 activeSitePublisher: CurrentValuePublisher<ActiveSiteInfo?, Never>,
-                forMenuApp isMenuApp: Bool) {
+                forMenuApp isMenuApp: Bool,
+                vpnSettings: VPNSettings) {
 
         self.activeSiteInfo = activeSitePublisher.value
         self.connectionStatus = statusObserver.recentValue
         self.featureFlag = featureFlagPublisher.value
         self.tips = Self.makeTips(forMenuApp: isMenuApp)
+        self.vpnSettings = vpnSettings
 
         if #available(macOS 14.0, *) {
             subscribeToConnectionStatusChanges(statusObserver)
@@ -138,5 +142,14 @@ public final class VPNTipsModel: ObservableObject {
             .receive(on: DispatchQueue.main)
             .assign(to: \.activeSiteInfo, onWeaklyHeld: self)
             .store(in: &cancellables)
+    }
+
+    // MARK: - Tip Action handling
+
+    @available(macOS 14.0, *)
+    func autoconnectTipActionHandler(_ action: Tip.Action) {
+        if action.id == VPNAutoconnectTip.ActionIdentifiers.enable.rawValue {
+            vpnSettings.connectOnLogin = true
+        }
     }
 }
