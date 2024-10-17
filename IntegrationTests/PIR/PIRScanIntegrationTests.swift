@@ -244,7 +244,7 @@ final class PIRScanIntegrationTests: XCTestCase {
                                withTimeout: 100,
                                whenCondition: {
             try! self.pirProtectionManager.dataManager.prepareBrokerProfileQueryDataCache()
-            return await self.communicationDelegate.getBackgroundAgentMetadata().lastStartedSchedulerOperationTimestamp == nil
+            return await self.communicationDelegate.getBackgroundAgentMetadata().lastStartedSchedulerOperationTimestamp != nil
         })
 
         let queries9 = try! database.fetchAllBrokerProfileQueryData()
