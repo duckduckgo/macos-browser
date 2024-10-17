@@ -27,6 +27,11 @@ import PixelKit
 import os.log
 import Onboarding
 
+protocol BrowserTabViewControllerDelegate: AnyObject {
+    func highlightFireButton()
+    func dismissViewHighlight()
+}
+
 final class BrowserTabViewController: NSViewController {
 
     private lazy var browserTabView = BrowserTabView(frame: .zero, backgroundColor: .browserTabBackground)
@@ -38,6 +43,7 @@ final class BrowserTabViewController: NSViewController {
     private weak var webViewSnapshot: NSView?
     private var containerStackView: NSStackView
 
+    weak var delegate: BrowserTabViewControllerDelegate?
     var tabViewModel: TabViewModel?
 
     private let tabCollectionViewModel: TabCollectionViewModel
@@ -416,10 +422,14 @@ final class BrowserTabViewController: NSViewController {
     private func presentContextualOnboarding() {
         // Before presenting a new dialog, remove any existing ones.
         removeExistingDialog()
+        // Remove any existing higlights animation
+        delegate?.dismissViewHighlight()
+
         guard featureFlagger.isFeatureOn(.highlightsOnboarding) else { return }
 
         guard let tab = tabViewModel?.tab else { return }
         guard let dialogType = onboardingDialogTypeProvider.dialogTypeForTab(tab, privacyInfo: tab.privacyInfo) else {
+            delegate?.dismissViewHighlight()
             return
         }
 
@@ -430,7 +440,31 @@ final class BrowserTabViewController: NSViewController {
                 self.removeChild(in: self.containerStackView, webViewContainer: webViewContainer)
             }
         }
-        let daxView = onboardingDialogFactory.makeView(for: dialogType, delegate: tab, onDismiss: onDismissAction, onGotItPressed: onboardingDialogTypeProvider.gotItPressed)
+
+        let onGotItPressed = { [weak self] in
+            guard let self else { return }
+
+            onboardingDialogTypeProvider.gotItPressed()
+
+            let currentState = onboardingDialogTypeProvider.state
+
+            // Reset highlight animations
+            delegate?.dismissViewHighlight()
+
+            // Process state
+            if case .showFireButton = currentState {
+                delegate?.highlightFireButton()
+            }
+        }
+
+        let daxView = onboardingDialogFactory.makeView(
+            for: dialogType,
+            delegate: tab,
+            onDismiss: onDismissAction,
+            onGotItPressed: onGotItPressed,
+            onFireButtonPressed: { [weak delegate] in
+                delegate?.dismissViewHighlight()
+            })
         let hostingController = NSHostingController(rootView: AnyView(daxView))
 
         daxContextualOnboardingController = hostingController
@@ -444,6 +478,10 @@ final class BrowserTabViewController: NSViewController {
 
           containerStackView.layoutSubtreeIfNeeded()
           webViewContainer?.layoutSubtreeIfNeeded()
+
+        if dialogType == .tryFireButton {
+            delegate?.highlightFireButton()
+        }
     }
 
     private func changeWebView(tabViewModel: TabViewModel?) {
