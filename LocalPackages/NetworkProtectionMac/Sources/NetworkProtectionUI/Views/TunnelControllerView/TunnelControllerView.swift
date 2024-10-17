@@ -21,6 +21,7 @@ import SwiftUIExtensions
 import Combine
 import NetworkProtection
 import Lottie
+import TipKit
 
 public struct TunnelControllerView: View {
 
@@ -52,6 +53,12 @@ public struct TunnelControllerView: View {
             SiteTroubleshootingView()
                 .padding(.top, 5)
 
+            if #available(macOS 15.0, *) {
+                VPNDomainExclusionsTipView()
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 6)
+            }
+
             Divider()
                 .padding(EdgeInsets(top: 5, leading: 9, bottom: 5, trailing: 9))
 
@@ -60,6 +67,11 @@ public struct TunnelControllerView: View {
             if model.showServerDetails {
                 connectionStatusView()
                     .disabled(on: !isEnabled)
+            }
+        }
+        .onAppear {
+            Task {
+                await model.handleTunnelControllerShown()
             }
         }
     }
@@ -105,7 +117,7 @@ public struct TunnelControllerView: View {
                     introEndFrame: 100,
                     loopStartFrame: 130,
                     loopEndFrame: 370
-                ), isAnimating: $model.isVPNEnabled)
+                ), isAnimating: model.isVPNEnabled)
     }
 
     @ViewBuilder
@@ -166,6 +178,12 @@ public struct TunnelControllerView: View {
                             .foregroundColor(isHovered ? .white: Color(.defaultText))
                     }
                 }
+            }
+
+            if #available(macOS 15.0, *) {
+                VPNGeoswitchingTipView()
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 6)
             }
 
             dividerRow()

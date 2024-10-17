@@ -35,6 +35,7 @@ let package = Package(
         .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "199.1.0"),
         .package(url: "https://github.com/airbnb/lottie-spm", exact: "4.4.3"),
         .package(path: "../AppLauncher"),
+        .package(path: "../CombineExtensions"),
         .package(path: "../UDSHelper"),
         .package(path: "../XPCHelper"),
         .package(path: "../SwiftUIExtensions"),
@@ -101,9 +102,11 @@ let package = Package(
         .target(
             name: "NetworkProtectionUI",
             dependencies: [
+                "CombineExtensions",
                 "VPNPixels",
                 .product(name: "NetworkProtection", package: "BrowserServicesKit"),
                 .product(name: "PixelKit", package: "BrowserServicesKit"),
+                .product(name: "TipKitUtils", package: "BrowserServicesKit"),
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions"),
                 .product(name: "LoginItems", package: "LoginItems"),
                 .product(name: "Lottie", package: "lottie-spm")

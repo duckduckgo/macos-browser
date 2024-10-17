@@ -27,6 +27,7 @@ import Subscription
 import WebKit
 import os.log
 import SwiftUI
+import TipKitUtils
 
 // Actions are sent to objects of responder chain
 
@@ -850,6 +851,10 @@ extension MainViewController {
 
     @objc func resetSyncPromoPrompts(_ sender: Any?) {
         SyncPromoManager().resetPromos()
+    }
+
+    @objc func resetTipKit(_ sender: Any?) {
+        TipKitDebugOptionsUIActionHandler().resetTipKitTapped()
     }
 
     @objc func internalUserState(_ sender: Any?) {

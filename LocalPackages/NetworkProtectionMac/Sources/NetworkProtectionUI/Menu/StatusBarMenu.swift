@@ -19,9 +19,11 @@
 import AppKit
 import Foundation
 import Combine
+import CombineExtensions
 import SwiftUI
 import NetworkProtection
 import LoginItems
+import TipKitUtils
 
 /// Abstraction of the the VPN status bar menu with a simple interface.
 ///
@@ -139,6 +141,12 @@ public final class StatusBarMenu: NSObject {
                 siteTroubleshootingInfoPublisher: Just(SiteTroubleshootingInfo?(nil)).eraseToAnyPublisher(),
                 uiActionHandler: uiActionHandler)
 
+            // TODO: replace with access to actual feature flag
+            let tipsFeatureFlagPublisher = CurrentValuePublisher(initialValue: true, publisher: Just(true).eraseToAnyPublisher())
+
+            let tipsModel = VPNTipsModel(featureFlagPublisher: tipsFeatureFlagPublisher,
+                                         forMenuApp: true)
+
             let debugInformationViewModel = DebugInformationViewModel(showDebugInformation: isOptionKeyPressed)
 
             let statusViewModel = NetworkProtectionStatusView.Model(
@@ -157,6 +165,7 @@ public final class StatusBarMenu: NSObject {
                 statusViewModel: statusViewModel,
                 statusReporter: statusReporter,
                 siteTroubleshootingViewModel: siteTroubleshootingViewModel,
+                tipsModel: tipsModel,
                 debugInformationViewModel: debugInformationViewModel)
             popover?.behavior = .transient
 

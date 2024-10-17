@@ -32,16 +32,19 @@ public final class NetworkProtectionPopover: NSPopover {
     private let debugInformationViewModel: DebugInformationViewModel
     private let siteTroubleshootingViewModel: SiteTroubleshootingView.Model
     private let statusViewModel: NetworkProtectionStatusView.Model
+    private let tipsModel: VPNTipsModel
     private var appLifecycleCancellables = Set<AnyCancellable>()
 
     public required init(statusViewModel: NetworkProtectionStatusView.Model,
                          statusReporter: NetworkProtectionStatusReporter,
                          siteTroubleshootingViewModel: SiteTroubleshootingView.Model,
+                         tipsModel: VPNTipsModel,
                          debugInformationViewModel: DebugInformationViewModel) {
 
         self.statusReporter = statusReporter
         self.debugInformationViewModel = debugInformationViewModel
         self.siteTroubleshootingViewModel = siteTroubleshootingViewModel
+        self.tipsModel = tipsModel
         self.statusViewModel = statusViewModel
 
         super.init()
@@ -62,6 +65,7 @@ public final class NetworkProtectionPopover: NSPopover {
             .environmentObject(debugInformationViewModel)
             .environmentObject(siteTroubleshootingViewModel)
             .environmentObject(statusViewModel)
+            .environmentObject(tipsModel)
             .environment(\.dismiss, { [weak self] in
             self?.close()
         }).fixedSize()

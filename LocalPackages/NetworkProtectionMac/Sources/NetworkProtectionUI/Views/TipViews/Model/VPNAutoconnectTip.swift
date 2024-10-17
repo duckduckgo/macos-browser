@@ -1,5 +1,5 @@
 //
-//  VPNAddWidgetTip.swift
+//  VPNAutoconnectTip.swift
 //  DuckDuckGo
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
@@ -19,50 +19,48 @@
 
 import TipKit
 
-/// A tip to suggest to the user that they add our VPN widget for quick access to the VPN
+/// A tip to suggest to the user to use the autoconnect option for the VPN.
 ///
-struct VPNAddWidgetTip {}
+struct VPNAutoconnectTip {}
 
 /// Necessary split to support older iOS versions.
 ///
 @available(macOS 14.0, *)
-extension VPNAddWidgetTip: Tip {
+extension VPNAutoconnectTip: Tip {
 
     enum ActionIdentifiers: String {
-        case addWidget = "com.duckduckgo.tipkit.VPNAddWidgetTip.addWidget"
+        case learnMore = "com.duckduckgo.tipkit.VPNUseSnoozeTip.learnMoreId"
     }
 
-    @Parameter(.transient)
-    static var vpnEnabled: Bool = false
-
-    private static let vpnDisconnectedEvent = Tips.Event(id: "com.duckduckgo.tipkit.VPNAddWidgetTip.vpnDisconnectedEvent")
+    //@Parameter(.transient)
+    //static var vpnEnabled: Bool = false
 
     var id: String {
-        "com.duckduckgo.tipkit.VPNAddWidgetTip"
+        "com.duckduckgo.vpn.tip.autoconnect"
     }
 
     var title: Text {
-        Text("Add VPN Widget")
+        Text("Connect Automatically")
     }
 
     var message: Text? {
-        Text("Turn the VPN on and off right from the Home Screen.")
+        Text("The VPN can connect on its own when you log in to your computer.")
     }
 
     var image: Image? {
-        Image(systemName: "rectangle.and.hand.point.up.left.fill")
+        Image(systemName: "powersleep")
     }
 
     var actions: [Action] {
-        [Action(id: ActionIdentifiers.addWidget.rawValue) {
-            Text("Add widget")
+        [Action(id: ActionIdentifiers.learnMore.rawValue) {
+            Text("Enable")
                 .foregroundStyle(Color(.linkColor))
         }]
     }
-
+/*
     var rules: [Rule] {
         #Rule(Self.$vpnEnabled) {
-            $0 == false
+            $0 == true
         }
-    }
+    }*/
 }

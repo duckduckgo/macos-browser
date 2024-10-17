@@ -19,6 +19,7 @@
 import AppLauncher
 import AppKit
 import Combine
+import CombineExtensions
 import Common
 import Foundation
 import LoginItems
@@ -156,10 +157,17 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
                 _ = try? await self?.vpnUninstaller.uninstall(removeSystemExtension: true)
             })
 
+            // TODO: replace with access to actual feature flag
+            let tipsFeatureFlagPublisher = CurrentValuePublisher(initialValue: true, publisher: Just(true).eraseToAnyPublisher())
+
+            let tipsModel = VPNTipsModel(featureFlagPublisher: tipsFeatureFlagPublisher,
+                                         forMenuApp: false)
+
             let popover = NetworkProtectionPopover(
                 statusViewModel: statusViewModel,
                 statusReporter: statusReporter,
                 siteTroubleshootingViewModel: siteTroubleshootingViewModel,
+                tipsModel: tipsModel,
                 debugInformationViewModel: DebugInformationViewModel(showDebugInformation: false))
             popover.delegate = delegate
 

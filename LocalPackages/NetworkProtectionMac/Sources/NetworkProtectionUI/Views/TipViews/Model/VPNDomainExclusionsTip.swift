@@ -1,5 +1,5 @@
 //
-//  VPNUseSnoozeTip.swift
+//  VPNDomainExclusionsTip.swift
 //  DuckDuckGo
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
@@ -19,48 +19,47 @@
 
 import TipKit
 
-/// A tip to suggest to the user to use the snooze feature to momentarily disable the VPN
+/// A tip to suggest using domain exclusions when a site doesn't work.
 ///
-struct VPNUseSnoozeTip {}
+struct VPNDomainExclusionsTip {}
 
 /// Necessary split to support older iOS versions.
 ///
 @available(macOS 14.0, *)
-extension VPNUseSnoozeTip: Tip {
-
-    enum ActionIdentifiers: String {
-        case learnMore = "com.duckduckgo.tipkit.VPNUseSnoozeTip.learnMoreId"
-    }
+extension VPNDomainExclusionsTip: Tip {
 
     @Parameter(.transient)
     static var vpnEnabled: Bool = false
 
+    /// The containing view was opened when the VPN was already connected.
+    ///
+    /// This condition may be indicative that the user is struggling, so they might want
+    /// to exclude a site.
+    ///
+    static let viewOpenedWhehVPNAlreadyConnectedEvent = Tips.Event(id: "com.duckduckgo.vpn.tip.domainExclusions.popoverOpenedWhileAlreadyConnected")
+
     var id: String {
-        "com.duckduckgo.tipkit.VPNUseSnoozeTip"
+        "com.duckduckgo.vpn.tip.domainExclusions"
     }
 
     var title: Text {
-        Text("Avoid VPN Conflicts")
+        Text("Website not working?")
     }
 
     var message: Text? {
-        Text("Snooze briefly disconnects the VPN so you can use sites or apps that block VPN traffic.")
+        Text("Exclude websites that block VPN traffic so you can use them without turning the VPN off.")
     }
 
     var image: Image? {
-        Image(systemName: "powersleep")
-    }
-
-    var actions: [Action] {
-        [Action(id: ActionIdentifiers.learnMore.rawValue) {
-            Text("Learn more")
-                .foregroundStyle(Color(.linkColor))
-        }]
+        Image(systemName: "custom.globe.badge.xmark")
     }
 
     var rules: [Rule] {
         #Rule(Self.$vpnEnabled) {
-            $0 == true
+            $0 == false
+        }
+        #Rule(Self.viewOpenedWhehVPNAlreadyConnectedEvent) {
+            $0.donations.count > 1
         }
     }
 }

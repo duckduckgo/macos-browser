@@ -362,6 +362,8 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     @MainActor
     func applicationDidFinishLaunching(_ aNotification: Notification) {
 
+        TipKitAppEventHandler().appDidFinishLaunching()
+
         APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
         Logger.networkProtection.info("DuckDuckGoVPN started")
 

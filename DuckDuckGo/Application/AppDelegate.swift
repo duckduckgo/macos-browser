@@ -388,6 +388,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         dataBrokerProtectionSubscriptionEventHandler.registerForSubscriptionAccountManagerEvents()
         DataBrokerProtectionAppEvents(featureGatekeeper: DefaultDataBrokerProtectionFeatureGatekeeper(accountManager: subscriptionManager.accountManager)).applicationDidFinishLaunching()
 
+        TipKitAppEventHandler().appDidFinishLaunching()
+
         setUpAutoClearHandler()
 
         setUpAutofillPixelReporter()
