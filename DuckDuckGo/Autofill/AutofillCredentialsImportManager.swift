@@ -33,16 +33,13 @@ public protocol AutofillLoginImportStateProvider {
 }
 
 final public class AutofillCredentialsImportManager {
-    private var stateStore: AutofillLoginImportStateStoring
-    private var loginImportStateProvider: AutofillLoginImportStateProvider
+    private var loginImportStateProvider: AutofillLoginImportStateProvider & AutofillLoginImportStateStoring
     private let isBurnerWindow: Bool
 
     weak var presentationDelegate: AutofillCredentialsImportPresentationDelegate?
 
-    init(stateStore: AutofillLoginImportStateStoring = AutofillLoginImportState(),
-         loginImportStateProvider: AutofillLoginImportStateProvider = AutofillLoginImportState(),
+    init(loginImportStateProvider: AutofillLoginImportStateProvider & AutofillLoginImportStateStoring = AutofillLoginImportState(),
          isBurnerWindow: Bool) {
-        self.stateStore = stateStore
         self.loginImportStateProvider = loginImportStateProvider
         self.isBurnerWindow = isBurnerWindow
     }
@@ -73,7 +70,7 @@ extension AutofillCredentialsImportManager: AutofillPasswordImportDelegate {
     }
 
     public func autofillUserScriptDidRequestPermanentCredentialsImportPromptDismissal() {
-        stateStore.isCredentialsImportPromptPermanantlyDismissed = true
+        loginImportStateProvider.isCredentialsImportPromptPermanantlyDismissed = true
         PixelKit.fire(AutofillPixelKitEvent.importCredentialsPromptNeverAgainClicked.withoutMacPrefix)
     }
 
@@ -81,7 +78,7 @@ extension AutofillCredentialsImportManager: AutofillPasswordImportDelegate {
         if let data = serializedInputContext.data(using: .utf8),
            let decoded = try? JSONDecoder().decode(CredentialsImportInputContext.self, from: data) {
             if decoded.credentialsImport {
-                return !stateStore.isCredentialsImportPromptPermanantlyDismissed
+                return !loginImportStateProvider.isCredentialsImportPromptPermanantlyDismissed
             }
         }
         return true
