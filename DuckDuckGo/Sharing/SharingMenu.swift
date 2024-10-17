@@ -53,7 +53,7 @@ final class SharingMenu: NSMenu {
 
         let sharingData = DuckPlayer.shared.sharingData(for: tabViewModel.title, url: url) ?? (tabViewModel.title, url)
 
-        return (sharingData.title, [url, url.absoluteString])
+        return (sharingData.title, [url])
     }
 
     @objc func openSharingPreferences(_ sender: NSMenuItem) {
