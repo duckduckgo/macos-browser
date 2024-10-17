@@ -38,19 +38,21 @@ struct DataImportSummaryView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            {
-                switch model.summaryKind {
-                case .results, .importComplete(.passwords):
-                    Text("Import Results:", comment: "Data Import result summary headline")
-
-                case .importComplete(.bookmarks),
-                        .fileImportComplete(.bookmarks):
-                    Text("Bookmarks Import Complete:", comment: "Bookmarks Data Import result summary headline")
-
-                case .fileImportComplete(.passwords):
-                    Text("Password import complete. You can now delete the saved passwords file.", comment: "message about Passwords Data Import completion")
-                }
-            }().padding(.bottom, 4)
+//            {
+//                switch model.summaryKind {
+//                case .results, .importComplete(.passwords):
+//                    Text("Import Results:", comment: "Data Import result summary headline")
+//
+//                case .importComplete(.bookmarks),
+//                        .fileImportComplete(.bookmarks):
+//                    Text("Bookmarks Import Complete:", comment: "Bookmarks Data Import result summary headline")
+//
+//                case .fileImportComplete(.passwords):
+//                    Text("Password import complete. You can now delete the saved passwords file.", comment: "message about Passwords Data Import completion")
+//                }
+//            }().padding(.bottom, 4)
+//            Image("Success-96")
+//            Text("Import complete!", comment: "message about Passwords and or bookmarks Data Import completion")
 
             VStack {
                 ForEach(model.resultsFiltered(by: .bookmarks), id: \.dataType) { item in
