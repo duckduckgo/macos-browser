@@ -31,9 +31,9 @@ extension SiteTroubleshootingView {
         private(set) var connectionStatus: ConnectionStatus = .disconnected
 
         @Published
-        private var internalSiteInfo: SiteTroubleshootingInfo?
+        private var internalSiteInfo: ActiveSiteInfo?
 
-        var siteInfo: SiteTroubleshootingInfo? {
+        var siteInfo: ActiveSiteInfo? {
             guard case .connected = connectionStatus else {
                 return nil
             }
@@ -46,7 +46,7 @@ extension SiteTroubleshootingView {
         private var cancellables = Set<AnyCancellable>()
 
         public init(connectionStatusPublisher: AnyPublisher<ConnectionStatus, Never>,
-                    siteTroubleshootingInfoPublisher: AnyPublisher<SiteTroubleshootingInfo?, Never>,
+                    activeSitePublisher: AnyPublisher<ActiveSiteInfo?, Never>,
                     uiActionHandler: VPNUIActionHandling,
                     pixelKit: PixelFiring? = PixelKit.shared) {
 
@@ -54,7 +54,7 @@ extension SiteTroubleshootingView {
             self.pixelKit = pixelKit
 
             subscribeToConnectionStatusChanges(connectionStatusPublisher)
-            subscribeToSiteTroubleshootingInfoChanges(siteTroubleshootingInfoPublisher)
+            subscribeToActiveSiteInfoChanges(activeSitePublisher)
         }
 
         private func subscribeToConnectionStatusChanges(_ publisher: AnyPublisher<ConnectionStatus, Never>) {
@@ -65,7 +65,7 @@ extension SiteTroubleshootingView {
                 .store(in: &cancellables)
         }
 
-        private func subscribeToSiteTroubleshootingInfoChanges(_ publisher: AnyPublisher<SiteTroubleshootingInfo?, Never>) {
+        private func subscribeToActiveSiteInfoChanges(_ publisher: AnyPublisher<ActiveSiteInfo?, Never>) {
 
             publisher
                 .receive(on: DispatchQueue.main)

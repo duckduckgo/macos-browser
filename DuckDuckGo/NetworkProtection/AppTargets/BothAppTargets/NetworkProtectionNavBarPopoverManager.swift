@@ -54,8 +54,8 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
     let vpnUninstaller: VPNUninstalling
 
     @Published
-    private var siteInfo: SiteTroubleshootingInfo?
-    private let siteTroubleshootingInfoPublisher: SiteTroubleshootingInfoPublisher
+    private var siteInfo: ActiveSiteInfo?
+    private let activeSitePublisher: ActiveSiteInfoPublisher
     private var cancellables = Set<AnyCancellable>()
 
     init(ipcClient: VPNControllerXPCClient,
@@ -66,7 +66,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
 
         let activeDomainPublisher = ActiveDomainPublisher(windowControllersManager: .shared)
 
-        siteTroubleshootingInfoPublisher = SiteTroubleshootingInfoPublisher(
+        activeSitePublisher = ActiveSiteInfoPublisher(
             activeDomainPublisher: activeDomainPublisher.eraseToAnyPublisher(),
             proxySettings: TransparentProxySettings(defaults: .netP))
 
@@ -74,7 +74,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
     }
 
     private func subscribeToCurrentSitePublisher() {
-        siteTroubleshootingInfoPublisher
+        activeSitePublisher
             .assign(to: \.siteInfo, onWeaklyHeld: self)
             .store(in: &cancellables)
     }
@@ -86,7 +86,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
     func show(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate) -> NSPopover {
 
         /// Since the favicon doesn't have a publisher we force refreshing here
-        siteTroubleshootingInfoPublisher.refreshSiteTroubleshootingInfo()
+        activeSitePublisher.refreshActiveSiteInfo()
 
         let popover: NSPopover = {
             let controller = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
@@ -110,7 +110,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
 
             let siteTroubleshootingViewModel = SiteTroubleshootingView.Model(
                 connectionStatusPublisher: statusReporter.statusObserver.publisher,
-                siteTroubleshootingInfoPublisher: $siteInfo.eraseToAnyPublisher(),
+                activeSitePublisher: $siteInfo.eraseToAnyPublisher(),
                 uiActionHandler: uiActionHandler)
 
             let statusViewModel = NetworkProtectionStatusView.Model(controller: controller,

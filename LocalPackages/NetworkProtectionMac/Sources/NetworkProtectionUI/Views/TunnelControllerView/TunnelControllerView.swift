@@ -186,6 +186,12 @@ public struct TunnelControllerView: View {
                     .padding(.vertical, 6)
             }
 
+            if #available(macOS 15.0, *) {
+                VPNAutoconnectTipView()
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 6)
+            }
+
             dividerRow()
         }
     }

@@ -38,7 +38,7 @@ public struct SiteTroubleshootingView: View {
     }
 
     @ViewBuilder
-    private func siteTroubleshootingView(_ siteInfo: SiteTroubleshootingInfo) -> some View {
+    private func siteTroubleshootingView(_ siteInfo: ActiveSiteInfo) -> some View {
         Divider()
             .padding(EdgeInsets(top: 5, leading: 9, bottom: 5, trailing: 9))
 

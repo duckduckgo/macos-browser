@@ -68,6 +68,7 @@ public final class VPNTipsModel: ObservableObject {
 
     public init(featureFlagPublisher: CurrentValuePublisher<Bool, Never>,
                 statusObserver: ConnectionStatusObserver,
+                activeSitePublisher: AnyPublisher<ActiveSiteInfo?, Never>,
                 forMenuApp isMenuApp: Bool) {
 
         self.featureFlag = featureFlagPublisher.value
@@ -104,8 +105,10 @@ public final class VPNTipsModel: ObservableObject {
     private func updateVPNConnectionStatusInWidgets(_ status: ConnectionStatus) {
         switch status {
         case .connected:
+            VPNAutoconnectTip.vpnEnabled = true
             VPNDomainExclusionsTip.vpnEnabled = true
         default:
+            VPNAutoconnectTip.vpnEnabled = false
             VPNDomainExclusionsTip.vpnEnabled = false
         }
     }

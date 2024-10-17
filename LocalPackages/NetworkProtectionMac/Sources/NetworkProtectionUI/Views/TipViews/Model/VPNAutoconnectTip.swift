@@ -29,11 +29,11 @@ struct VPNAutoconnectTip {}
 extension VPNAutoconnectTip: Tip {
 
     enum ActionIdentifiers: String {
-        case learnMore = "com.duckduckgo.tipkit.VPNUseSnoozeTip.learnMoreId"
+        case enable = "com.duckduckgo.vpn.tip.autoconnect.action.enable"
     }
 
-    //@Parameter(.transient)
-    //static var vpnEnabled: Bool = false
+    @Parameter(.transient)
+    static var vpnEnabled: Bool = false
 
     var id: String {
         "com.duckduckgo.vpn.tip.autoconnect"
@@ -48,19 +48,19 @@ extension VPNAutoconnectTip: Tip {
     }
 
     var image: Image? {
-        Image(systemName: "powersleep")
+        Image(systemName: "point.3.filled.connected.trianglepath.dotted")
     }
 
     var actions: [Action] {
-        [Action(id: ActionIdentifiers.learnMore.rawValue) {
+        [Action(id: ActionIdentifiers.enable.rawValue) {
             Text("Enable")
                 .foregroundStyle(Color(.linkColor))
         }]
     }
-/*
+
     var rules: [Rule] {
         #Rule(Self.$vpnEnabled) {
             $0 == true
         }
-    }*/
+    }
 }

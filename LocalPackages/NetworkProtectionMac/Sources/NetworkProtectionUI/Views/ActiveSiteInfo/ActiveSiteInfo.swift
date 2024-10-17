@@ -1,5 +1,5 @@
 //
-//  SiteTroubleshootingInfo.swift
+//  ActiveSiteInfo.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -19,7 +19,7 @@
 import AppKit
 import Foundation
 
-public struct SiteTroubleshootingInfo {
+public struct ActiveSiteInfo {
     public let icon: NSImage?
     public let domain: String
     public let excluded: Bool
@@ -31,6 +31,4 @@ public struct SiteTroubleshootingInfo {
     }
 }
 
-extension SiteTroubleshootingInfo: Equatable {
-
-}
+extension ActiveSiteInfo: Equatable {}
