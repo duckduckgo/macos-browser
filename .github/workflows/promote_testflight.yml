@@ -1,9 +1,6 @@
 name: Promote TestFlight to App Store
 
 on: 
-  push:
-    branches:
-      - kieran/release-changes
   workflow_dispatch:
     inputs:
       asana-task-url:
@@ -14,7 +11,6 @@ on:
 jobs:
   promote-testflight-to-appstore:
     runs-on: macos-14-xlarge
-
     env:
       asana-task-url: ${{ github.event.inputs.asana-task-url || inputs.asana-task-url }}
 
@@ -34,6 +30,9 @@ jobs:
       run: bundle install
 
     - name: Promote TestFlight to App Store
+      env:
+        APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
+        APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
       run: |
         bundle exec fastlane promote_latest_testflight_to_appstore
     
