@@ -92,7 +92,7 @@ extension HomePage.Models {
                 if isExperimentActive {
                     let ntpExperiment = NewTabPageSearchBoxExperiment()
                     ntpExperiment.assignUserToCohort()
-                    shouldShowAddressBar = ntpExperiment.cohort == .experiment
+                    shouldShowAddressBar = ntpExperiment.cohort?.isExperiment == true
                 }
             }
         }
@@ -105,7 +105,7 @@ extension HomePage.Models {
             if self.isExperimentActive {
                 let ntpExperiment = NewTabPageSearchBoxExperiment()
                 ntpExperiment.assignUserToCohort()
-                self.shouldShowAddressBar = ntpExperiment.cohort == .experiment
+                self.shouldShowAddressBar = ntpExperiment.cohort?.isExperiment == true
             }
 
             privacyConfigCancellable = privacyConfigurationManager.updatesPublisher.sink { [weak self, weak privacyConfigurationManager] in
