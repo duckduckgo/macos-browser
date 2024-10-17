@@ -40,11 +40,9 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
 
     @MainActor
     func testWhenBookmarkStoreHasNoTopLevelFolders_ThenTheDefaultBookmarksNodeHasNoChildren() throws {
-        let bookmarkStoreMock = BookmarkStoreMock()
+        let bookmarkStoreMock = BookmarkStoreMock(bookmarks: [Bookmark.mock])
         let faviconManagerMock = FaviconManagerMock()
         let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
-
-        bookmarkStoreMock.bookmarks = [Bookmark.mock]
         bookmarkManager.loadBookmarks()
 
         let dataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
@@ -61,12 +59,10 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
 
     @MainActor
     func testWhenBookmarkStoreHasTopLevelFolders_ThenTheDefaultBookmarksNodeHasThemAsChildren() {
-        let bookmarkStoreMock = BookmarkStoreMock()
+        let topLevelFolder = BookmarkFolder.mock
+        let bookmarkStoreMock = BookmarkStoreMock(bookmarks: [topLevelFolder])
         let faviconManagerMock = FaviconManagerMock()
         let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
-        let topLevelFolder = BookmarkFolder.mock
-
-        bookmarkStoreMock.bookmarks = [topLevelFolder]
         bookmarkManager.loadBookmarks()
 
         let dataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
@@ -83,14 +79,12 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
 
     @MainActor
     func testWhenBookmarkStoreHasNestedFolders_ThenTheTreeContainsNestedNodes() {
-        let bookmarkStoreMock = BookmarkStoreMock()
-        let faviconManagerMock = FaviconManagerMock()
-        let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
-
         let childFolder = BookmarkFolder(id: UUID().uuidString, title: "Child")
         let rootFolder = BookmarkFolder(id: UUID().uuidString, title: "Root", children: [childFolder])
 
-        bookmarkStoreMock.bookmarks = [rootFolder]
+        let bookmarkStoreMock = BookmarkStoreMock(bookmarks: [rootFolder])
+        let faviconManagerMock = FaviconManagerMock()
+        let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
         bookmarkManager.loadBookmarks()
 
         let dataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)

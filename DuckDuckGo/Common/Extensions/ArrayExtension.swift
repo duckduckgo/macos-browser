@@ -26,4 +26,27 @@ extension Array {
         }
     }
 
+    /// Map collection insertion indexes for a filtered collection into a non-filtered collection
+    /// Used to skip `stub` or `pendingDeletion` object indices in a full (non-filtered) database
+    /// items collection and use insertion indexes of a filtered collection, the one that‘s displaying non-stub, non-deleted items.
+    /// Stubs may appear in Sync when user has more than 1 device and they modify folder contents at or around the same time
+    func adjustInsertionIndices(_ indices: IndexSet, isCountedItem: (Element) -> Bool) -> IndexSet {
+        var storeIndex = 0
+        var userIndex = 0
+        var result = IndexSet()
+        var shift = 0
+        while userIndex <= indices.last ?? -1 {
+            defer { storeIndex += 1 }
+            guard !self.indices.contains(storeIndex) || isCountedItem(self[storeIndex]) else { continue }
+
+            while indices.contains(userIndex) {
+                result.insert(storeIndex + shift)
+                shift += 1 // indices are shifted 1 up when item is inserted at the index
+                userIndex += 1
+            }
+            userIndex += 1
+        }
+        return result
+    }
+
 }

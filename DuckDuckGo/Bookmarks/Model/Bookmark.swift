@@ -262,6 +262,28 @@ final class Bookmark: BaseBookmarkEntity {
     }
 
 }
+extension BaseBookmarkEntity: CustomDebugStringConvertible {
+    var debugDescription: String {
+        switch self {
+        case let folder as BookmarkFolder:
+            folder.folderDebugDescription
+        case let bookmark as Bookmark:
+            bookmark.bookmarkDebugDescription
+        default:
+            fatalError("Unexpected entity type: \(self)")
+        }
+    }
+}
+extension BookmarkFolder {
+    fileprivate var folderDebugDescription: String {
+        "<BookmarkFolder \(id) \"\(title)\" parent: \(parentFolderUUID ?? "root") children: [\(children.map(\.debugDescription))]>"
+    }
+}
+extension Bookmark {
+    fileprivate var bookmarkDebugDescription: String {
+        "<Bookmark\(isFavorite ? "⭐️" : "") \(id) title: \"\(title)\" url: \"\(url)\" parent: \(parentFolderUUID ?? "root")>"
+    }
+}
 
 extension Array where Element == BaseBookmarkEntity {
     func sorted(by sortMode: BookmarksSortMode) -> [BaseBookmarkEntity] {
