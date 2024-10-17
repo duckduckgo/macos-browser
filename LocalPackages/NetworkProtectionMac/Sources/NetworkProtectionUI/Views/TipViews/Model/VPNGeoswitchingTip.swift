@@ -41,7 +41,7 @@ extension VPNGeoswitchingTip: Tip {
     }
 
     var image: Image? {
-        Image(systemName: "globe.americas.fill")
+        Image(.geolocationTip)
     }
 
     var rules: [Rule] {
