@@ -19,7 +19,7 @@
 import AppKit
 import Foundation
 import Combine
-import CombineExtensions
+import Common
 import SwiftUI
 import NetworkProtection
 import LoginItems
@@ -145,6 +145,7 @@ public final class StatusBarMenu: NSObject {
             let tipsFeatureFlagPublisher = CurrentValuePublisher(initialValue: true, publisher: Just(true).eraseToAnyPublisher())
 
             let tipsModel = VPNTipsModel(featureFlagPublisher: tipsFeatureFlagPublisher,
+                                         statusObserver: statusReporter.statusObserver,
                                          forMenuApp: true)
 
             let debugInformationViewModel = DebugInformationViewModel(showDebugInformation: isOptionKeyPressed)

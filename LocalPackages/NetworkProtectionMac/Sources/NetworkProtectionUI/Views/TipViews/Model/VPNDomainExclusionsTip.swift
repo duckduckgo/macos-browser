@@ -56,7 +56,7 @@ extension VPNDomainExclusionsTip: Tip {
 
     var rules: [Rule] {
         #Rule(Self.$vpnEnabled) {
-            $0 == false
+            $0 == true
         }
         #Rule(Self.viewOpenedWhehVPNAlreadyConnectedEvent) {
             $0.donations.count > 1

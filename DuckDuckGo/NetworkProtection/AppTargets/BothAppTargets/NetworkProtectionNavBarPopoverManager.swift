@@ -19,7 +19,6 @@
 import AppLauncher
 import AppKit
 import Combine
-import CombineExtensions
 import Common
 import Foundation
 import LoginItems
@@ -161,6 +160,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
             let tipsFeatureFlagPublisher = CurrentValuePublisher(initialValue: true, publisher: Just(true).eraseToAnyPublisher())
 
             let tipsModel = VPNTipsModel(featureFlagPublisher: tipsFeatureFlagPublisher,
+                                         statusObserver: statusReporter.statusObserver,
                                          forMenuApp: false)
 
             let popover = NetworkProtectionPopover(

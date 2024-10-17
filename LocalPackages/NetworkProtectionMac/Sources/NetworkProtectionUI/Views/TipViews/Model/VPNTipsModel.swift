@@ -18,7 +18,7 @@
 
 import AppKit
 import Combine
-import CombineExtensions
+import Common
 import NetworkProtection
 import TipKitUtils
 
@@ -67,18 +67,46 @@ public final class VPNTipsModel: ObservableObject {
     }
 
     public init(featureFlagPublisher: CurrentValuePublisher<Bool, Never>,
+                statusObserver: ConnectionStatusObserver,
                 forMenuApp isMenuApp: Bool) {
 
         self.featureFlag = featureFlagPublisher.value
         self.tips = Self.makeTips(forMenuApp: isMenuApp)
 
-        subscribeToFeatureFlagChanges(featureFlagPublisher)
+        if #available(macOS 14.0, *) {
+            subscribeToConnectionStatusChanges(statusObserver)
+            subscribeToFeatureFlagChanges(featureFlagPublisher)
+        }
     }
 
+    @available(macOS 14.0, *)
     private func subscribeToFeatureFlagChanges(_ publisher: CurrentValuePublisher<Bool, Never>) {
         publisher
             .receive(on: DispatchQueue.main)
             .assign(to: \.featureFlag, onWeaklyHeld: self)
             .store(in: &cancellables)
+    }
+
+    @available(macOS 14.0, *)
+    private func subscribeToConnectionStatusChanges(_ statusObserver: ConnectionStatusObserver) {
+        statusObserver.publisher
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] status in
+                self?.updateVPNConnectionStatusInWidgets(status)
+            }
+            .store(in: &cancellables)
+    }
+
+    // MARK: - Refreshing Tips
+
+    @available(macOS 14.0, *)
+    private func updateVPNConnectionStatusInWidgets(_ status: ConnectionStatus) {
+        switch status {
+        case .connected:
+            VPNDomainExclusionsTip.vpnEnabled = true
+        default:
+            VPNDomainExclusionsTip.vpnEnabled = false
+        }
     }
 }

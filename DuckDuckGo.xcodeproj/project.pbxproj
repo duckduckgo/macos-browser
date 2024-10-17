@@ -3886,7 +3886,6 @@
 		7BDBAD112CBFF633000379B7 /* TipKitAppEventHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TipKitAppEventHandling.swift; sourceTree = "<group>"; };
 		7BDBAD122CBFF633000379B7 /* TipKitController+ConvenienceInitializers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TipKitController+ConvenienceInitializers.swift"; sourceTree = "<group>"; };
 		7BDBAD132CBFF633000379B7 /* TipKitDebugOptionsUIActionHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TipKitDebugOptionsUIActionHandling.swift; sourceTree = "<group>"; };
-		7BDBAD252CC02612000379B7 /* CombineExtensions */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = CombineExtensions; sourceTree = "<group>"; };
 		7BE146062A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionDebugMenu.swift; sourceTree = "<group>"; };
 		7BEC182D2AD5D89C00D30536 /* SystemExtensionManager */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = SystemExtensionManager; sourceTree = "<group>"; };
 		7BEC20402B0F505F00243D3E /* AddBookmarkPopoverView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddBookmarkPopoverView.swift; sourceTree = "<group>"; };
@@ -5535,7 +5534,6 @@
 				7BEC182D2AD5D89C00D30536 /* SystemExtensionManager */,
 				7B8594172B5B25FB0007EB3E /* UDSHelper */,
 				7B76E6852AD5D77600186A84 /* XPCHelper */,
-				7BDBAD252CC02612000379B7 /* CombineExtensions */,
 			);
 			path = LocalPackages;
 			sourceTree = "<group>";
