@@ -1,0 +1,39 @@
+name: Promote TestFlight to App Store
+
+on: 
+  push:
+    branches:
+      - kieran/release-changes
+  workflow_dispatch:
+    inputs:
+      asana-task-url:
+        description: "Asana release task URL"
+        required: false
+        type: string
+
+jobs:
+  promote-testflight-to-appstore:
+    runs-on: macos-14-xlarge
+
+    env:
+      asana-task-url: ${{ github.event.inputs.asana-task-url || inputs.asana-task-url }}
+
+    steps:
+    - name: Check out the code
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.ref_name }}
+        sparse-checkout: |
+          .github
+          Gemfile
+          Gemfile.lock
+          fastlane
+          scripts
+
+    - name: Set up fastlane
+      run: bundle install
+
+    - name: Promote TestFlight to App Store
+      run: |
+        bundle exec fastlane promote_latest_testflight_to_appstore
+    
