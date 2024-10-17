@@ -20,16 +20,145 @@ import Foundation
 import os.log
 import PixelKit
 
-final class NewTabPageSearchBoxExperiment {
+protocol NewTabPageSearchBoxExperimentDataStoring: AnyObject {
+    var enrollmentDate: Date? { get set }
+    var experimentCohort: NewTabPageSearchBoxExperiment.Cohort? { get set }
+    var didRunEnrollment: Bool { get set }
+    var numberOfSearches: Int { get set }
+    var lastPixelTimestamp: Date? { get set }
+}
+
+final class DefaultNewTabPageSearchBoxExperimentDataStore: NewTabPageSearchBoxExperimentDataStoring {
+    enum Keys {
+        static let enrollmentDate = "homepage.searchbox.experiment.enrollment-date"
+        static let experimentCohort = "homepage.searchbox.experiment.cohort"
+        static let didRunEnrollment = "homepage.searchbox.experiment.did-run-enrollment"
+        static let numberOfSearches = "homepage.searchbox.experiment.number-of-searches"
+        static let lastPixelTimestamp = "homepage.searchbox.experiment.last-pixel-timestamp"
+    }
+
     private let userDefaults: UserDefaults
 
     init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
     }
 
+    var enrollmentDate: Date? {
+        get { return userDefaults.object(forKey: Keys.enrollmentDate) as? Date }
+        set { userDefaults.set(newValue, forKey: Keys.enrollmentDate) }
+    }
+
+    var experimentCohort: NewTabPageSearchBoxExperiment.Cohort? {
+        get { return NewTabPageSearchBoxExperiment.Cohort(rawValue: userDefaults.string(forKey: Keys.experimentCohort) ?? "") }
+        set { userDefaults.set(newValue?.rawValue, forKey: Keys.experimentCohort) }
+    }
+
+    var didRunEnrollment: Bool {
+        get { return userDefaults.bool(forKey: Keys.didRunEnrollment) }
+        set { userDefaults.set(newValue, forKey: Keys.didRunEnrollment) }
+    }
+
+    var numberOfSearches: Int {
+        get { return userDefaults.integer(forKey: Keys.numberOfSearches) }
+        set { userDefaults.set(newValue, forKey: Keys.numberOfSearches) }
+    }
+
+    var lastPixelTimestamp: Date? {
+        get { return userDefaults.object(forKey: Keys.lastPixelTimestamp) as? Date }
+        set { userDefaults.set(newValue, forKey: Keys.lastPixelTimestamp) }
+    }
+}
+
+protocol NewTabPageSearchBoxExperimentCohortDeciding {
+    var cohort: NewTabPageSearchBoxExperiment.Cohort? { get }
+}
+
+struct DefaultNewTabPageSearchBoxExperimentCohortDecider: NewTabPageSearchBoxExperimentCohortDeciding {
+    var cohort: NewTabPageSearchBoxExperiment.Cohort? {
+
+        // We enroll all new users
+        if AppDelegate.isNewUser {
+            return Bool.random() ? .experiment : .control
+        }
+
+        // We also enroll some users that have used the app for more than 1 month
+        guard AppDelegate.firstLaunchDate < Date.monthAgo else {
+            return nil
+        }
+
+        // 5% control group and 5% experiment
+        switch Int.random(in: 0..<100) {
+        case 0..<5: return .experimentExistingUser
+        case 5..<10: return .controlExistingUser
+        default: return nil
+        }
+    }
+}
+
+protocol NewTabPageSearchBoxExperimentPixelReporting {
+    func fireNTPSearchBoxExperimentPixel(
+        day: Int,
+        count: Int,
+        from: NewTabPageSearchBoxExperiment.SearchSource,
+        cohort: NewTabPageSearchBoxExperiment.Cohort,
+        onboardingCohort: PixelExperiment?
+    )
+}
+
+struct DefaultNewTabPageSearchBoxExperimentPixelReporter: NewTabPageSearchBoxExperimentPixelReporting {
+    func fireNTPSearchBoxExperimentPixel(
+        day: Int,
+        count: Int,
+        from: NewTabPageSearchBoxExperiment.SearchSource,
+        cohort: NewTabPageSearchBoxExperiment.Cohort,
+        onboardingCohort: PixelExperiment?
+    ) {
+        PixelKit.fire(
+            NewTabSearchBoxExperimentPixel.initialSearch(
+                day: day,
+                count: count,
+                from: from,
+                cohort: cohort,
+                onboardingCohort: onboardingCohort
+            )
+        )
+    }
+}
+
+protocol OnboardingExperimentCohortProviding {
+    var onboardingExperimentCohort: PixelExperiment? { get }
+}
+
+struct DefaultOnboardingExperimentCohortProvider: OnboardingExperimentCohortProviding {
+    var onboardingExperimentCohort: PixelExperiment? {
+        PixelExperiment.logic.cohort
+    }
+}
+
+final class NewTabPageSearchBoxExperiment {
+
+    private let dataStore: NewTabPageSearchBoxExperimentDataStoring
+    private let cohortDecider: NewTabPageSearchBoxExperimentCohortDeciding
+    private let onboardingExperimentCohortProvider: OnboardingExperimentCohortProviding
+    private let pixelReporter: NewTabPageSearchBoxExperimentPixelReporting
+
+    init(
+        dataStore: NewTabPageSearchBoxExperimentDataStoring = DefaultNewTabPageSearchBoxExperimentDataStore(),
+        cohortDecider: NewTabPageSearchBoxExperimentCohortDeciding = DefaultNewTabPageSearchBoxExperimentCohortDecider(),
+        onboardingExperimentCohortProvider: OnboardingExperimentCohortProviding = DefaultOnboardingExperimentCohortProvider(),
+        pixelReporter: NewTabPageSearchBoxExperimentPixelReporting = DefaultNewTabPageSearchBoxExperimentPixelReporter()
+    ) {
+        self.dataStore = dataStore
+        self.cohortDecider = cohortDecider
+        self.onboardingExperimentCohortProvider = onboardingExperimentCohortProvider
+        self.pixelReporter = pixelReporter
+    }
+
     enum Cohort: String {
         case control
-        case experiment
+        case experiment = "ntp_search_box"
+        case controlExistingUser = "control_existing_user"
+        case experimentExistingUser = "ntp_search_box_existing_user"
     }
 
     enum SearchSource: String {
@@ -38,12 +167,17 @@ final class NewTabPageSearchBoxExperiment {
         case ntpSearchBox = "ntp_search_box"
     }
 
+    enum Const {
+        static let experimentDurationInDays: Int = 7
+        static let maxNumberOfSearchesPerDay: Int = 10
+    }
+
     var isActive: Bool {
-        (daySinceEnrollment() ?? Int.max) <= 7
+        (daySinceEnrollment() ?? Int.max) <= Const.experimentDurationInDays
     }
 
     var cohort: Cohort? {
-        isActive ? userDefaults.experimentCohort : nil
+        isActive ? dataStore.experimentCohort : nil
     }
 
     var onboardingCohort: PixelExperiment? {
@@ -51,21 +185,25 @@ final class NewTabPageSearchBoxExperiment {
     }
 
     func assignUserToCohort() {
-        guard !userDefaults.didRunEnrollment else {
+        guard !dataStore.didRunEnrollment else {
             Logger.newTabPageSearchBoxExperiment.debug("Cohort already assigned, skipping...")
             return
         }
 
-        let cohort: Cohort = Bool.random() ? .experiment : .control
-        userDefaults.experimentCohort = cohort
-        userDefaults.enrollmentDate = Date()
-        userDefaults.didRunEnrollment = true
+        guard let cohort = cohortDecider.cohort else {
+            Logger.newTabPageSearchBoxExperiment.debug("User is not eligible for the experiment, skipping cohort assignment...")
+            return
+        }
+
+        dataStore.experimentCohort = cohort
+        dataStore.enrollmentDate = Date()
+        dataStore.didRunEnrollment = true
 
         Logger.newTabPageSearchBoxExperiment.debug("User assigned to cohort \(cohort.rawValue)")
     }
 
     func recordSearch(from source: SearchSource) {
-        guard let daySinceEnrollment = daySinceEnrollment(), daySinceEnrollment <= 7, let cohort = userDefaults.experimentCohort else {
+        guard isActive, let daySinceEnrollment = daySinceEnrollment(), let cohort = dataStore.experimentCohort else {
             return
         }
 
@@ -76,10 +214,10 @@ final class NewTabPageSearchBoxExperiment {
             // if a pixel has already been fired today
             if daySinceEnrollment == daySinceLastPixel {
                 // only fire if it's been fewer than 10 searches
-                if userDefaults.numberOfSearches < 10 {
-                    numberOfSearches = userDefaults.numberOfSearches + 1
+                if dataStore.numberOfSearches < Const.maxNumberOfSearchesPerDay {
+                    numberOfSearches = dataStore.numberOfSearches + 1
                 } else {
-                    Logger.newTabPageSearchBoxExperiment.debug("Maximum number of searches (10) already reported for day \(daySinceEnrollment), skipping pixel.")
+                    Logger.newTabPageSearchBoxExperiment.debug("Maximum number of searches (\(Const.maxNumberOfSearchesPerDay)) already reported for day \(daySinceEnrollment), skipping pixel.")
                 }
             } else {
                 // it's the first pixel for a given day
@@ -90,27 +228,27 @@ final class NewTabPageSearchBoxExperiment {
         }
 
         if let numberOfSearches {
-            PixelKit.fire(NewTabSearchBoxExperimentPixel.initialSearch(
+            pixelReporter.fireNTPSearchBoxExperimentPixel(
                 day: daySinceEnrollment,
                 count: numberOfSearches,
                 from: source,
                 cohort: cohort,
-                onboardingCohort: PixelExperiment.logic.cohort)
+                onboardingCohort: PixelExperiment.logic.cohort
             )
-            userDefaults.lastPixelTimestamp = Date()
-            userDefaults.numberOfSearches = numberOfSearches
+            dataStore.lastPixelTimestamp = Date()
+            dataStore.numberOfSearches = numberOfSearches
         }
     }
 
     private var daySinceLastSearchPixel: Int? {
-        guard let lastPixelTimestamp = userDefaults.lastPixelTimestamp else {
+        guard let lastPixelTimestamp = dataStore.lastPixelTimestamp else {
             return nil
         }
         return daySinceEnrollment(until: lastPixelTimestamp)
     }
 
     private func daySinceEnrollment(until date: Date = Date()) -> Int? {
-        guard let enrollmentDate = userDefaults.enrollmentDate else {
+        guard let enrollmentDate = dataStore.enrollmentDate else {
             return nil
         }
         let numberOfDays = Calendar.current.dateComponents([.day], from: enrollmentDate, to: date)
@@ -119,40 +257,5 @@ final class NewTabPageSearchBoxExperiment {
             return nil
         }
         return day + 1
-    }
-}
-
-private extension UserDefaults {
-    enum Keys {
-        static let enrollmentDate = "homepage.searchbox.experiment.enrollment-date"
-        static let experimentCohort = "homepage.searchbox.experiment.cohort"
-        static let didRunEnrollment = "homepage.searchbox.experiment.did-run-enrollment"
-        static let numberOfSearches = "homepage.searchbox.experiment.number-of-searches"
-        static let lastPixelTimestamp = "homepage.searchbox.experiment.last-pixel-timestamp"
-    }
-
-    var enrollmentDate: Date? {
-        get { return object(forKey: Keys.enrollmentDate) as? Date }
-        set { set(newValue, forKey: Keys.enrollmentDate) }
-    }
-
-    var experimentCohort: NewTabPageSearchBoxExperiment.Cohort? {
-        get { return NewTabPageSearchBoxExperiment.Cohort(rawValue: string(forKey: Keys.experimentCohort) ?? "") }
-        set { set(newValue?.rawValue, forKey: Keys.experimentCohort) }
-    }
-
-    var didRunEnrollment: Bool {
-        get { return bool(forKey: Keys.didRunEnrollment) }
-        set { set(newValue, forKey: Keys.didRunEnrollment) }
-    }
-
-    var numberOfSearches: Int {
-        get { return integer(forKey: Keys.numberOfSearches) }
-        set { set(newValue, forKey: Keys.numberOfSearches) }
-    }
-
-    var lastPixelTimestamp: Date? {
-        get { return object(forKey: Keys.lastPixelTimestamp) as? Date }
-        set { set(newValue, forKey: Keys.lastPixelTimestamp) }
     }
 }
