@@ -17,7 +17,7 @@
 //
 
 import XCTest
-import SwiftUI
+import struct SwiftUI.AnyView
 import Onboarding
 import Combine
 import BrowserServicesKit
