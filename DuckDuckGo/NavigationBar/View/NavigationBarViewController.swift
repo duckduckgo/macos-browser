@@ -365,6 +365,8 @@ final class NavigationBarViewController: NSViewController {
                     self.updateHomeButton()
                 case .networkProtection:
                     self.networkProtectionButtonModel.updateVisibility()
+                case .aiChat:
+                    self.updateAIChatButton()
                 }
             } else {
                 assertionFailure("Failed to get changed pinned view type")
@@ -873,6 +875,21 @@ final class NavigationBarViewController: NSViewController {
         }
     }
 
+    private func updateAIChatButton() {
+        let menu = NSMenu()
+        let title = LocalPinningManager.shared.shortcutTitle(for: .aiChat)
+        menu.addItem(withTitle: title, action: #selector(toggleAIChatPanelPinning(_:)), keyEquivalent: "")
+
+        bookmarkListButton.menu = menu
+        bookmarkListButton.toolTip = UserText.bookmarksShortcutTooltip
+
+        if LocalPinningManager.shared.isPinned(.bookmarks) {
+            bookmarkListButton.isHidden = false
+        } else {
+            bookmarkListButton.isHidden = !popovers.bookmarkListPopoverShown
+        }
+    }
+
     private func subscribeToCredentialsToSave() {
         credentialsToSaveCancellable = tabCollectionViewModel.selectedTabViewModel?.tab.autofillDataToSavePublisher
             .receive(on: DispatchQueue.main)
@@ -965,6 +982,11 @@ extension NavigationBarViewController: NSMenuDelegate {
             let networkProtectionTitle = LocalPinningManager.shared.shortcutTitle(for: .networkProtection)
             menu.addItem(withTitle: networkProtectionTitle, action: #selector(toggleNetworkProtectionPanelPinning), keyEquivalent: "")
         }
+
+#warning("TODO Feature flag")
+        let aiChatTitle = LocalPinningManager.shared.shortcutTitle(for: .aiChat)
+        menu.addItem(withTitle: aiChatTitle, action: #selector(toggleAIChatPanelPinning), keyEquivalent: "L")
+
     }
 
     @objc
@@ -980,6 +1002,11 @@ extension NavigationBarViewController: NSMenuDelegate {
     @objc
     private func toggleDownloadsPanelPinning(_ sender: NSMenuItem) {
         LocalPinningManager.shared.togglePinning(for: .downloads)
+    }
+
+    @objc
+    private func toggleAIChatPanelPinning(_ sender: NSMenuItem) {
+        LocalPinningManager.shared.togglePinning(for: .aiChat)
     }
 
     @objc
