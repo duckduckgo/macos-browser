@@ -30,6 +30,13 @@ final class SuggestionViewController: NSViewController {
 
     weak var delegate: SuggestionViewControllerDelegate?
 
+    @IBOutlet weak var backgroundView: ColorView!
+    @IBOutlet weak var innerBorderView: ColorView!
+    @IBOutlet weak var innerBorderViewTopConstraint: NSLayoutConstraint!
+    @IBOutlet weak var innerBorderViewBottomConstraint: NSLayoutConstraint!
+    @IBOutlet weak var innerBorderViewLeadingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var innerBorderViewTrailingConstraint: NSLayoutConstraint!
+
     @IBOutlet weak var tableView: NSTableView!
     @IBOutlet weak var tableViewHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var pixelPerfectConstraint: NSLayoutConstraint!

@@ -118,7 +118,7 @@ final class AddressBarButtonsViewController: NSViewController {
         }
     }
 
-    private let popovers: NavigationBarPopovers
+    private let popovers: NavigationBarPopovers?
 
     private var bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
     var controllerMode: AddressBarViewController.Mode? {
@@ -163,7 +163,7 @@ final class AddressBarButtonsViewController: NSViewController {
     init?(coder: NSCoder,
           tabCollectionViewModel: TabCollectionViewModel,
           accessibilityPreferences: AccessibilityPreferences = AccessibilityPreferences.shared,
-          popovers: NavigationBarPopovers) {
+          popovers: NavigationBarPopovers?) {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.accessibilityPreferences = accessibilityPreferences
         self.popovers = popovers
@@ -246,7 +246,7 @@ final class AddressBarButtonsViewController: NSViewController {
         }
         popupBlockedPopover?.close()
 
-        popovers.togglePrivacyDashboardPopover(for: tabViewModel, from: privacyEntryPointButton)
+        popovers?.togglePrivacyDashboardPopover(for: tabViewModel, from: privacyEntryPointButton)
     }
 
     private func updateBookmarkButtonVisibility() {
@@ -266,7 +266,7 @@ final class AddressBarButtonsViewController: NSViewController {
                 }
             }
 
-            return clearButton.isHidden && !hasEmptyAddressBar && (isMouseOverNavigationBar || popovers.isEditBookmarkPopoverShown || isUrlBookmarked)
+            return clearButton.isHidden && !hasEmptyAddressBar && (isMouseOverNavigationBar || popovers?.isEditBookmarkPopoverShown == true || isUrlBookmarked)
         }
 
         bookmarkButton.isShown = shouldShowBookmarkButton
@@ -288,12 +288,15 @@ final class AddressBarButtonsViewController: NSViewController {
         && !isTextFieldValueText
         && !isTextFieldEditorFirstResponder
         && !animation
-        && (hasNonDefaultZoom || popovers.isZoomPopoverShown == true || popovers.zoomPopover != nil)
+        && (hasNonDefaultZoom || popovers?.isZoomPopoverShown == true || popovers?.zoomPopover != nil)
 
         zoomButton.isHidden = !shouldShowZoom
     }
 
     func openBookmarkPopover(setFavorite: Bool, accessPoint: GeneralPixel.AccessPoint) {
+        guard let popovers else {
+            return
+        }
         let result = bookmarkForCurrentUrl(setFavorite: setFavorite, accessPoint: accessPoint)
         guard let bookmark = result.bookmark else {
             assertionFailure("Failed to get a bookmark for the popover")
@@ -349,12 +352,12 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     func closePrivacyDashboard() {
-        popovers.closePrivacyDashboard()
+        popovers?.closePrivacyDashboard()
     }
 
     func openPrivacyDashboard() {
         guard let tabViewModel else { return }
-        popovers.openPrivacyDashboard(for: tabViewModel, from: privacyEntryPointButton)
+        popovers?.openPrivacyDashboard(for: tabViewModel, from: privacyEntryPointButton)
     }
 
     func updateButtons() {
@@ -370,6 +373,9 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     @IBAction func zoomButtonAction(_ sender: Any) {
+        guard let popovers else {
+            return
+        }
         if popovers.isZoomPopoverShown {
             popovers.closeZoomPopover()
         } else {
@@ -979,6 +985,9 @@ extension AddressBarButtonsViewController: PermissionContextMenuDelegate {
 extension AddressBarButtonsViewController: NSPopoverDelegate {
 
     func popoverDidClose(_ notification: Notification) {
+        guard let popovers else {
+            return
+        }
         switch notification.object as? NSPopover {
         case popovers.bookmarkPopover:
             if popovers.bookmarkPopover?.isNew == true {

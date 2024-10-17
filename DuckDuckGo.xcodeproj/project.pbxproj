@@ -1125,6 +1125,8 @@
 		378205F8283BC6A600D1D4AA /* StartupPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378205F7283BC6A600D1D4AA /* StartupPreferencesTests.swift */; };
 		378205FB283C277800D1D4AA /* MainMenuTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378205FA283C277800D1D4AA /* MainMenuTests.swift */; };
 		3783F92329432E1800BCA897 /* WebViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3783F92229432E1800BCA897 /* WebViewTests.swift */; };
+		37878E552CA3330300CC9EB5 /* HomePageAddressBarModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37878E542CA332F800CC9EB5 /* HomePageAddressBarModel.swift */; };
+		37878E562CA3330300CC9EB5 /* HomePageAddressBarModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37878E542CA332F800CC9EB5 /* HomePageAddressBarModel.swift */; };
 		378F44E429B4BDE900899924 /* SwiftUIExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 378F44E329B4BDE900899924 /* SwiftUIExtensions */; };
 		378F44E629B4BDEE00899924 /* SwiftUIExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 378F44E529B4BDEE00899924 /* SwiftUIExtensions */; };
 		378F44EB29B4C73E00899924 /* ViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378F44EA29B4C73E00899924 /* ViewExtension.swift */; };
@@ -1147,6 +1149,8 @@
 		37A6A8F62AFCCA59008580A3 /* FaviconsFetcherOnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A6A8F52AFCCA59008580A3 /* FaviconsFetcherOnboardingViewController.swift */; };
 		37A6A8F72AFCCA59008580A3 /* FaviconsFetcherOnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A6A8F52AFCCA59008580A3 /* FaviconsFetcherOnboardingViewController.swift */; };
 		37A803DB27FD69D300052F4C /* DataImportResources in Resources */ = {isa = PBXBuildFile; fileRef = 37A803DA27FD69D300052F4C /* DataImportResources */; };
+		37AAA41C2C9CB9C0002A5377 /* AddressBarTextFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AAA41B2C9CB9C0002A5377 /* AddressBarTextFieldView.swift */; };
+		37AAA41D2C9CB9C0002A5377 /* AddressBarTextFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AAA41B2C9CB9C0002A5377 /* AddressBarTextFieldView.swift */; };
 		37AFCE8127DA2CA600471A10 /* PreferencesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE8027DA2CA600471A10 /* PreferencesViewController.swift */; };
 		37AFCE8527DA2D3900471A10 /* PreferencesSidebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE8427DA2D3900471A10 /* PreferencesSidebar.swift */; };
 		37AFCE8727DA334800471A10 /* PreferencesRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE8627DA334800471A10 /* PreferencesRootView.swift */; };
@@ -3424,6 +3428,7 @@
 		378205F7283BC6A600D1D4AA /* StartupPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartupPreferencesTests.swift; sourceTree = "<group>"; };
 		378205FA283C277800D1D4AA /* MainMenuTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenuTests.swift; sourceTree = "<group>"; };
 		3783F92229432E1800BCA897 /* WebViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewTests.swift; sourceTree = "<group>"; };
+		37878E542CA332F800CC9EB5 /* HomePageAddressBarModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePageAddressBarModel.swift; sourceTree = "<group>"; };
 		378B5887295CF2A4002C0CC0 /* Version.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Version.xcconfig; sourceTree = "<group>"; };
 		378B5888295CF2A4002C0CC0 /* Common.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Common.xcconfig; sourceTree = "<group>"; };
 		378B588B295CF3B9002C0CC0 /* AppTargetsBase.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = AppTargetsBase.xcconfig; sourceTree = "<group>"; };
@@ -3445,6 +3450,7 @@
 		37A6A8F02AFCC988008580A3 /* FaviconsFetcherOnboarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconsFetcherOnboarding.swift; sourceTree = "<group>"; };
 		37A6A8F52AFCCA59008580A3 /* FaviconsFetcherOnboardingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconsFetcherOnboardingViewController.swift; sourceTree = "<group>"; };
 		37A803DA27FD69D300052F4C /* DataImportResources */ = {isa = PBXFileReference; lastKnownFileType = folder; path = DataImportResources; sourceTree = "<group>"; };
+		37AAA41B2C9CB9C0002A5377 /* AddressBarTextFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBarTextFieldView.swift; sourceTree = "<group>"; };
 		37AFCE8027DA2CA600471A10 /* PreferencesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesViewController.swift; sourceTree = "<group>"; };
 		37AFCE8427DA2D3900471A10 /* PreferencesSidebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesSidebar.swift; sourceTree = "<group>"; };
 		37AFCE8627DA334800471A10 /* PreferencesRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesRootView.swift; sourceTree = "<group>"; };
@@ -6794,6 +6800,7 @@
 		85589E8527BBB8DD0038AD11 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				37878E542CA332F800CC9EB5 /* HomePageAddressBarModel.swift */,
 				370C23172C77C47700A80A3E /* HomePageSettings */,
 				85589E8627BBB8F20038AD11 /* HomePageFavoritesModel.swift */,
 				85AC7ADC27BEB6EE00FFB69B /* HomePageDefaultBrowserModel.swift */,
@@ -8370,6 +8377,7 @@
 				85589E9327BFE1E70038AD11 /* FavoritesView.swift */,
 				56D6A3D529DB2BAB0055215A /* ContinueSetUpView.swift */,
 				85589E7C27BBB8630038AD11 /* HomePageView.swift */,
+				37AAA41B2C9CB9C0002A5377 /* AddressBarTextFieldView.swift */,
 				1DCFBC8929ADF32B00313531 /* BurnerHomePageView.swift */,
 				85589E7D27BBB8630038AD11 /* HomePageViewController.swift */,
 				857FFEBF27D239DC00415E7A /* HyperLink.swift */,
@@ -10619,6 +10627,7 @@
 				56A054202C1CA1F5007D8FAB /* OnboardingTabExtension.swift in Sources */,
 				3706FABA293F65D500E42796 /* BookmarkOutlineViewDataSource.swift in Sources */,
 				560EB9332C78946F0080DBC8 /* ContextualOnboardingDialogs.swift in Sources */,
+				37878E552CA3330300CC9EB5 /* HomePageAddressBarModel.swift in Sources */,
 				3706FABB293F65D500E42796 /* PasswordManagementBitwardenItemView.swift in Sources */,
 				CD2AB5CB2C8225E70019EB49 /* URLTokenValidator.swift in Sources */,
 				1D220BF92B86192200F8BBC6 /* PreferencesEmailProtectionView.swift in Sources */,
@@ -10955,6 +10964,7 @@
 				3706FB8D293F65D500E42796 /* BookmarkTreeController.swift in Sources */,
 				B66260E129AC6EBD00E9E3EE /* HistoryTabExtension.swift in Sources */,
 				3706FB8E293F65D500E42796 /* FirefoxEncryptionKeyReader.swift in Sources */,
+				37AAA41D2C9CB9C0002A5377 /* AddressBarTextFieldView.swift in Sources */,
 				3706FB8F293F65D500E42796 /* BookmarkManagementSplitViewController.swift in Sources */,
 				316913272BD2B76F0051B46D /* DataBrokerPrerequisitesStatusVerifier.swift in Sources */,
 				3706FB90293F65D500E42796 /* CookieManagedNotificationContainerView.swift in Sources */,
@@ -12227,6 +12237,7 @@
 				B6B1E88026D5DA9B0062C350 /* DownloadsViewController.swift in Sources */,
 				BD7090D62C540D5D009EED82 /* EmptyMetadataCollector.swift in Sources */,
 				85AC3AF725D5DBFD00C7D2AA /* DataExtension.swift in Sources */,
+				37878E562CA3330300CC9EB5 /* HomePageAddressBarModel.swift in Sources */,
 				85480FCF25D1AA22009424E3 /* ConfigurationStore.swift in Sources */,
 				AA3D531B27A2F57E00074EC1 /* Feedback.swift in Sources */,
 				4B0A63E8289DB58E00378EF7 /* FirefoxFaviconsReader.swift in Sources */,
@@ -12841,6 +12852,7 @@
 				B65536A62685B82B00085A79 /* Permissions.swift in Sources */,
 				AAC82C60258B6CB5009B6B42 /* TabPreviewWindowController.swift in Sources */,
 				AAC5E4E425D6BA9C007F5990 /* NSSizeExtension.swift in Sources */,
+				37AAA41C2C9CB9C0002A5377 /* AddressBarTextFieldView.swift in Sources */,
 				AA6820EB25503D6A005ED0D5 /* Fire.swift in Sources */,
 				3158B1492B0BF73000AF130C /* DBPHomeViewController.swift in Sources */,
 				9F56CFA92B82DC4300BB7F11 /* AddEditBookmarkFolderView.swift in Sources */,
@@ -14313,8 +14325,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 199.3.0;
+				branch = "dominik/ntp-search-bar";
+				kind = branch;
 			};
 		};
 		9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */ = {

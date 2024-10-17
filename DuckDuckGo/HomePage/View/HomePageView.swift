@@ -18,7 +18,6 @@
 
 import PixelKit
 import RemoteMessaging
-import SwiftUI
 import SwiftUIExtensions
 
 extension HomePage.Views {
@@ -36,43 +35,72 @@ extension HomePage.Views {
         @EnvironmentObject var settingsModel: HomePage.Models.SettingsModel
         @EnvironmentObject var activeRemoteMessageModel: ActiveRemoteMessageModel
         @EnvironmentObject var settingsVisibilityModel: HomePage.Models.SettingsVisibilityModel
+        @EnvironmentObject var addressBarModel: HomePage.Models.AddressBarModel
+        @EnvironmentObject var recentlyVisitedModel: HomePage.Models.RecentlyVisitedModel
 
         var body: some View {
             if isBurner {
                 BurnerHomePageView()
             } else {
-                regularHomePageView(includingContinueSetUpCards: model.isContinueSetUpAvailable)
+                regularHomePageView()
             }
         }
 
-        func regularHomePageView(includingContinueSetUpCards: Bool) -> some View {
+        enum Const {
+            static let scrollViewCoordinateSpaceName = "scroll"
+            static let searchBarIdentifier = "search bar"
+            static let itemSpacing: CGFloat = 32
+            static let remoteMessageTopPadding: CGFloat = 32
+        }
+
+        @State private var scrollPosition: CGFloat = 0
+        @State private var remoteMessageHeight: CGFloat = 0
+
+        var continueSetUpCardsTopPadding: CGFloat {
+            addressBarModel.shouldShowAddressBar || activeRemoteMessageModel.shouldShowRemoteMessage ? 24 : 0
+        }
+
+        private func innerViewOffset(with geometry: GeometryProxy) -> CGFloat {
+            max(0, ((Self.settingsPanelWidth + Self.minWindowWidth) - geometry.size.width) / 2)
+        }
+
+        func regularHomePageView() -> some View {
             GeometryReader { geometry in
                 ZStack(alignment: .top) {
 
                     HStack(spacing: 0) {
                         ZStack(alignment: .leading) {
-                            ScrollView {
-                                innerView(includingContinueSetUpCards: includingContinueSetUpCards)
-                                    .frame(width: geometry.size.width - (settingsVisibilityModel.isSettingsVisible ? Self.settingsPanelWidth : 0))
-                                    .offset(x: settingsVisibilityModel.isSettingsVisible ? innerViewOffset(with: geometry) : 0)
-                                    .fixedColorScheme(for: settingsModel.customBackground)
+                            ScrollViewReader { proxy in
+                                ScrollView {
+                                    VStack(spacing: 0) {
+                                        if shouldCenterContent(with: geometry) {
+                                            innerViewCenteredVertically(geometry: geometry)
+                                                .frame(width: geometry.size.width - (settingsVisibilityModel.isSettingsVisible ? Self.settingsPanelWidth : 0))
+                                                .offset(x: settingsVisibilityModel.isSettingsVisible ? innerViewOffset(with: geometry) : 0)
+                                                .fixedColorScheme(for: settingsModel.customBackground)
+                                        } else {
+                                            innerView(geometry: geometry)
+                                                .frame(width: geometry.size.width - (settingsVisibilityModel.isSettingsVisible ? Self.settingsPanelWidth : 0))
+                                                .offset(x: settingsVisibilityModel.isSettingsVisible ? innerViewOffset(with: geometry) : 0)
+                                                .fixedColorScheme(for: settingsModel.customBackground)
+                                        }
+                                        scrollOffsetReader
+                                    }
+                                }
+                                .coordinateSpace(name: Const.scrollViewCoordinateSpaceName)
+                                .onPreferenceChange(ScrollOffsetPreferenceKey.self, perform: hideSuggestionWindowIfScrolled)
+                                .if(addressBarModel.shouldShowAddressBar) { view in
+                                    view.onChange(of: addressBarModel.value) { _ in
+                                        proxy.scrollTo(Const.searchBarIdentifier)
+                                    }
+                                }
                             }
                         }
                         .frame(width: settingsVisibilityModel.isSettingsVisible ? geometry.size.width - Self.settingsPanelWidth : geometry.size.width)
-                        .contextMenu(ContextMenu {
-                            if model.isContinueSetUpAvailable {
-                                Toggle(UserText.newTabMenuItemShowContinuteSetUp, isOn: $model.isContinueSetUpVisible)
-                                    .toggleStyle(.checkbox)
-                                    .visibility(continueSetUpModel.hasContent ? .visible : .gone)
-                            }
-                            Toggle(UserText.newTabMenuItemShowFavorite, isOn: $model.isFavoriteVisible)
-                                .toggleStyle(.checkbox)
-                            Toggle(UserText.newTabMenuItemShowRecentActivity, isOn: $model.isRecentActivityVisible)
-                                .toggleStyle(.checkbox)
-                        })
+                        .contextMenu(menuItems: sectionsVisibilityContextMenuItems)
 
                         if settingsVisibilityModel.isSettingsVisible {
-                            SettingsView(includingContinueSetUpCards: includingContinueSetUpCards, isSettingsVisible: $settingsVisibilityModel.isSettingsVisible)
+                            SettingsView(includingContinueSetUpCards: model.isContinueSetUpAvailable, isSettingsVisible: $settingsVisibilityModel.isSettingsVisible)
                                 .frame(width: Self.settingsPanelWidth)
                                 .transition(.move(edge: .trailing))
                                 .layoutPriority(1)
@@ -106,21 +134,28 @@ extension HomePage.Views {
             }
         }
 
-        private func innerViewOffset(with geometry: GeometryProxy) -> CGFloat {
-            max(0, ((Self.settingsPanelWidth + Self.minWindowWidth) - geometry.size.width) / 2)
-        }
+        func innerView(geometry: GeometryProxy) -> some View {
+            VStack(spacing: Const.itemSpacing) {
 
-        func innerView(includingContinueSetUpCards: Bool) -> some View {
-            VStack(spacing: 32) {
-                Spacer(minLength: 32)
+                if !addressBarModel.shouldShowAddressBar || !activeRemoteMessageModel.shouldShowRemoteMessage {
+                    Spacer(minLength: Const.itemSpacing)
+                }
 
                 Group {
                     remoteMessage()
+                        .if(addressBarModel.shouldShowAddressBar) { view in
+                            view.padding(.top, Const.remoteMessageTopPaddingWithSearchBar)
+                        }
 
-                    if includingContinueSetUpCards {
+                    if addressBarModel.shouldShowAddressBar {
+                        BigSearchBox(isCompact: isCompactLogo(with: geometry))
+                            .id(Const.searchBarIdentifier)
+                    }
+
+                    if model.isContinueSetUpAvailable {
                         ContinueSetUpView()
                             .visibility(model.isContinueSetUpVisible ? .visible : .gone)
-                            .padding(.top, activeRemoteMessageModel.shouldShowRemoteMessage ? 24 : 0)
+                            .padding(.top, continueSetUpCardsTopPadding)
                     }
 
                     Favorites()
@@ -129,7 +164,6 @@ extension HomePage.Views {
                     RecentlyVisited()
                         .padding(.bottom, 16)
                         .visibility(model.isRecentActivityVisible ? .visible : .gone)
-
                 }
                 .frame(width: Self.targetWidth)
             }
@@ -139,21 +173,24 @@ extension HomePage.Views {
         @ViewBuilder
         func remoteMessage() -> some View {
             if let remoteMessage = activeRemoteMessageModel.remoteMessage, let modelType = remoteMessage.content, modelType.isSupported {
-                RemoteMessageView(viewModel: .init(
-                    messageId: remoteMessage.id,
-                    modelType: modelType,
-                    onDidClose: { action in
-                        await activeRemoteMessageModel.dismissRemoteMessage(with: action)
-                    },
-                    onDidAppear: {
-                        activeRemoteMessageModel.isViewOnScreen = true
-                    },
-                    onDidDisappear: {
-                        activeRemoteMessageModel.isViewOnScreen = false
-                    },
-                    openURLHandler: { url in
-                        WindowControllersManager.shared.showTab(with: .contentFromURL(url, source: .appOpenUrl))
-                }))
+                ZStack {
+                    RemoteMessageView(viewModel: .init(
+                        messageId: remoteMessage.id,
+                        modelType: modelType,
+                        onDidClose: { action in
+                            await activeRemoteMessageModel.dismissRemoteMessage(with: action)
+                        },
+                        onDidAppear: {
+                            activeRemoteMessageModel.isViewOnScreen = true
+                        },
+                        onDidDisappear: {
+                            activeRemoteMessageModel.isViewOnScreen = false
+                        },
+                        openURLHandler: { url in
+                            WindowControllersManager.shared.showTab(with: .contentFromURL(url, source: .appOpenUrl))
+                        }))
+                    RemoteMessageHeightGetter()
+                }
             } else {
                 EmptyView()
             }
@@ -178,6 +215,19 @@ extension HomePage.Views {
             case .none:
                 Color.newTabPageBackground
             }
+        }
+
+        @ViewBuilder
+        func sectionsVisibilityContextMenuItems() -> some View {
+            if model.isContinueSetUpAvailable {
+                Toggle(UserText.newTabMenuItemShowContinuteSetUp, isOn: $model.isContinueSetUpVisible)
+                    .toggleStyle(.checkbox)
+                    .visibility(continueSetUpModel.hasContent ? .visible : .gone)
+            }
+            Toggle(UserText.newTabMenuItemShowFavorite, isOn: $model.isFavoriteVisible)
+                .toggleStyle(.checkbox)
+            Toggle(UserText.newTabMenuItemShowRecentActivity, isOn: $model.isRecentActivityVisible)
+                .toggleStyle(.checkbox)
         }
 
         struct SettingsButtonView: View {
@@ -274,6 +324,151 @@ extension HomePage.Views {
             static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
                 value = nextValue()
             }
+        }
+    }
+}
+
+fileprivate extension HomePage.Views.RootView.Const {
+    static let remoteMessageTopPaddingWithSearchBar: CGFloat = 16
+}
+
+/// This extension defines views and objects related to displaying Big Search Box.
+fileprivate extension HomePage.Views.RootView {
+
+    private typealias ContinueSetUpView = HomePage.Views.ContinueSetUpView
+    private typealias Favorites = HomePage.Views.Favorites
+    private typealias RecentlyVisited = HomePage.Views.RecentlyVisited
+
+    func innerViewCenteredVertically(geometry: GeometryProxy) -> some View {
+        ZStack {
+            VStack(spacing: Const.itemSpacing) {
+                BigSearchBox(isCompact: isCompactLogo(with: geometry))
+                    .id(Const.searchBarIdentifier)
+
+                if model.isContinueSetUpAvailable {
+                    ContinueSetUpView()
+                        .visibility(model.isContinueSetUpVisible ? .visible : .gone)
+                        .padding(.top, continueSetUpCardsTopPadding)
+                }
+
+                Favorites()
+                    .visibility(model.isFavoriteVisible ? .visible : .gone)
+
+                RecentlyVisited()
+                    .visibility(model.isRecentActivityVisible ? .visible : .gone)
+            }
+            .padding(.vertical, Const.itemSpacing)
+            .frame(height: totalHeight(with: geometry))
+            .offset(y: -centeredViewVerticalOffset(with: geometry))
+
+            VStack(spacing: 0) {
+                remoteMessage()
+                    .padding(.top, Const.remoteMessageTopPaddingWithSearchBar)
+                Spacer()
+                    .layoutPriority(1)
+            }
+        }
+        .frame(width: Self.targetWidth, height: max(geometry.size.height, totalHeight(with: geometry)))
+        .frame(maxWidth: .infinity)
+        .onPreferenceChange(RemoteMessageHeightPreferenceKey.self) { value in
+            remoteMessageHeight = value
+        }
+    }
+
+    func centeredViewVerticalOffset(with geometry: GeometryProxy) -> CGFloat {
+        0.1 * geometry.size.height
+    }
+
+    func shouldCenterContent(with geometry: GeometryProxy) -> Bool {
+        guard addressBarModel.shouldShowAddressBar else {
+            return false
+        }
+        if model.isContinueSetUpAvailable && model.isContinueSetUpVisible && continueSetUpModel.shouldShowAllFeatures {
+            return false
+        }
+        if model.isFavoriteVisible && favoritesModel.showAllFavorites && favoritesModel.models.count > HomePage.favoritesPerRow {
+            return false
+        }
+        if model.isRecentActivityVisible && recentlyVisitedModel.showRecentlyVisited {
+            return false
+        }
+        let topSpacing: CGFloat = {
+            if activeRemoteMessageModel.shouldShowRemoteMessage {
+                return remoteMessageHeight + Const.remoteMessageTopPaddingWithSearchBar
+            }
+            return Const.remoteMessageTopPadding
+        }()
+        return geometry.size.height * 0.5 > (totalHeight(with: geometry) * 0.5 + topSpacing + centeredViewVerticalOffset(with: geometry))
+    }
+
+    func totalHeight(with geometry: GeometryProxy) -> CGFloat {
+        let topAndBottomSpacers = Const.itemSpacing * 2
+        var height = (isCompactLogo(with: geometry) ? BigSearchBox.Const.compactHeight : BigSearchBox.Const.totalHeight) + topAndBottomSpacers
+        if model.isContinueSetUpAvailable && model.isContinueSetUpVisible {
+            height += continueSetUpModel.isMoreOrLessButtonNeeded ? 184 : 160
+            height += Const.itemSpacing + continueSetUpCardsTopPadding
+        }
+        if model.isFavoriteVisible {
+            height += 126 + Const.itemSpacing
+        }
+        if model.isRecentActivityVisible {
+            height += 90 + Const.itemSpacing
+        }
+        return height
+    }
+
+    func isCompactLogo(with geometry: GeometryProxy) -> Bool {
+        geometry.size.height < 650
+    }
+
+    @ViewBuilder
+    var scrollOffsetReader: some View {
+        GeometryReader { geometry in
+            Color.clear
+                .preference(
+                    key: ScrollOffsetPreferenceKey.self,
+                    value: geometry.frame(in: .named(Const.scrollViewCoordinateSpaceName)).minY
+                )
+        }
+        .frame(height: 0)
+    }
+
+    /**
+     * The suggestion window is not designed to follow the moving address bar,
+     * so we're hiding it whenever the user scrolls the new tab page.
+     */
+    private func hideSuggestionWindowIfScrolled(_ value: CGFloat) {
+        guard addressBarModel.shouldShowAddressBar, abs(scrollPosition - value) > 1 else {
+            return
+        }
+        scrollPosition = value
+        addressBarModel.hideSuggestionsWindow()
+    }
+
+    struct ScrollOffsetPreferenceKey: PreferenceKey {
+        typealias Value = CGFloat
+        static var defaultValue: CGFloat = 0
+
+        static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+            value = nextValue()
+        }
+    }
+
+    struct RemoteMessageHeightGetter: View {
+        var body: some View {
+            GeometryReader { geometry in
+                Color.clear
+                    .preference(key: RemoteMessageHeightPreferenceKey.self, value: geometry.size.height)
+            }
+        }
+    }
+
+    struct RemoteMessageHeightPreferenceKey: PreferenceKey {
+        typealias Value = CGFloat
+        static var defaultValue: CGFloat = 0
+
+        static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+            value = nextValue()
         }
     }
 }
