@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="o2v-eH-jTI">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="23094" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="o2v-eH-jTI">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22505"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23094"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -483,7 +483,7 @@
                                 </textFieldCell>
                             </textField>
                             <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zaX-wZ-E3D" customClass="AddressBarTextField" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="38" y="8" width="645" height="16"/>
+                                <rect key="frame" x="33" y="8" width="650" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" focusRingType="none" tag="5" placeholderString="Search or enter address" usesSingleLineMode="YES" id="1ah-Qg-8lr" customClass="AddressBarTextFieldCell" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -538,7 +538,7 @@
                             <constraint firstItem="ENV-0H-Fcc" firstAttribute="leading" secondItem="wj6-L2-5rJ" secondAttribute="leading" constant="2" id="WGn-g2-wT7"/>
                             <constraint firstAttribute="bottom" secondItem="bOl-8Z-hTh" secondAttribute="bottom" constant="3" id="WNn-YA-PHP"/>
                             <constraint firstItem="Ij9-fc-CLI" firstAttribute="top" secondItem="wj6-L2-5rJ" secondAttribute="top" id="XhY-ag-U21"/>
-                            <constraint firstItem="zaX-wZ-E3D" firstAttribute="leading" secondItem="wj6-L2-5rJ" secondAttribute="leading" constant="40" id="bY3-LA-cuF"/>
+                            <constraint firstItem="zaX-wZ-E3D" firstAttribute="leading" secondItem="wj6-L2-5rJ" secondAttribute="leading" constant="35" id="bY3-LA-cuF"/>
                             <constraint firstAttribute="trailing" secondItem="Zjk-bE-Xft" secondAttribute="trailing" constant="-3" id="ctZ-aw-6Ck"/>
                             <constraint firstItem="le0-Hn-ZAC" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="wj6-L2-5rJ" secondAttribute="leading" constant="37" id="eJI-rp-ptx"/>
                             <constraint firstAttribute="bottom" secondItem="Zjk-bE-Xft" secondAttribute="bottom" constant="-3" id="ic3-He-fz0"/>
@@ -642,7 +642,7 @@
                                 </connections>
                             </button>
                             <stackView distribution="equalSpacing" orientation="horizontal" alignment="centerY" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HEu-ro-RSA">
-                                <rect key="frame" x="0.0" y="1" width="194" height="32"/>
+                                <rect key="frame" x="0.0" y="1" width="189" height="32"/>
                                 <subviews>
                                     <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nOW-iY-XmO" customClass="MouseOverAnimationButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="32" height="32"/>
@@ -671,10 +671,10 @@
                                         </connections>
                                     </button>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="3Iv-YW-zn2">
-                                        <rect key="frame" x="0.0" y="0.0" width="34" height="32"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="29" height="32"/>
                                         <subviews>
                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="psi-hX-Kh9">
-                                                <rect key="frame" x="15" y="8" width="16" height="16"/>
+                                                <rect key="frame" x="8" y="8" width="16" height="16"/>
                                                 <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Search" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="NBl-r8-f28">
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                     <font key="font" metaFont="system"/>
@@ -687,8 +687,8 @@
                                         </subviews>
                                         <constraints>
                                             <constraint firstItem="psi-hX-Kh9" firstAttribute="centerY" secondItem="3Iv-YW-zn2" secondAttribute="centerY" id="0Ul-G5-HXF"/>
-                                            <constraint firstItem="psi-hX-Kh9" firstAttribute="centerX" secondItem="3Iv-YW-zn2" secondAttribute="centerX" constant="6" id="2X2-AK-TfF"/>
-                                            <constraint firstAttribute="width" constant="34" id="Elf-ZT-HxV"/>
+                                            <constraint firstItem="psi-hX-Kh9" firstAttribute="centerX" secondItem="3Iv-YW-zn2" secondAttribute="centerX" constant="1" id="2X2-AK-TfF"/>
+                                            <constraint firstAttribute="width" constant="29" id="Elf-ZT-HxV"/>
                                             <constraint firstAttribute="height" constant="32" id="fQf-sl-KYI"/>
                                         </constraints>
                                     </customView>
@@ -717,7 +717,7 @@
                                         </connections>
                                     </button>
                                     <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8UU-A8-1nD">
-                                        <rect key="frame" x="34" y="0.0" width="160" height="32"/>
+                                        <rect key="frame" x="29" y="0.0" width="160" height="32"/>
                                         <subviews>
                                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="CN6-fJ-o2J" userLabel="Geolocation Button" customClass="PermissionButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                                 <rect key="frame" x="0.0" y="0.0" width="32" height="32"/>
