@@ -47,11 +47,11 @@ public class PhishingDetection: PhishingSiteDetecting {
     private let hashPrefixDataSHA: String
 
     private init(
-        revision: Int = 1653367,
+        revision: Int = 1681795,
         filterSetURL: URL = Bundle.main.url(forResource: "filterSet", withExtension: "json")!,
-        filterSetDataSHA: String = "edd913cb0a579c2b163a01347531ed78976bfaf1d14b96a658c4a39d34a70ffc",
+        filterSetDataSHA: String = "f6f2353a1010bbe00362d7baab3b09622a6be7b2c5aafcba4942f17ebf389696",
         hashPrefixURL: URL = Bundle.main.url(forResource: "hashPrefixes", withExtension: "json")!,
-        hashPrefixDataSHA: String = "c61349d196c46db9155ca654a0d33368ee0f33766fcd63e5a20f1d5c92026dc5",
+        hashPrefixDataSHA: String = "59b68be9a54feb714f660bee23ffb4205a78e6f5b9c6ad1722af29a215733023",
         detectionClient: PhishingDetectionAPIClient = PhishingDetectionAPIClient(),
         dataProvider: PhishingDetectionDataProvider? = nil,
         dataStore: PhishingDetectionDataSaving? = nil,
