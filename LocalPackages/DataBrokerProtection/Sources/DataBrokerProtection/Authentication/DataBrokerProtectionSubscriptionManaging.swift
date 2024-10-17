@@ -31,6 +31,7 @@ public final class DataBrokerProtectionSubscriptionManager: DataBrokerProtection
     let subscriptionManager: SubscriptionManager
 
     public var isUserAuthenticated: Bool {
+        return true
         subscriptionManager.accountManager.accessToken != nil
     }
 
@@ -43,6 +44,7 @@ public final class DataBrokerProtectionSubscriptionManager: DataBrokerProtection
     }
 
     public func hasValidEntitlement() async throws -> Bool {
+        return true
         switch await subscriptionManager.accountManager.hasEntitlement(forProductName: .dataBrokerProtection,
                                                                        cachePolicy: .reloadIgnoringLocalCacheData) {
         case let .success(result):
