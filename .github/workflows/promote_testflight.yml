@@ -33,6 +33,9 @@ jobs:
       env:
         APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
         APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+        APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
       run: |
+        git config --global user.name "Dax the Duck"
+        git config --global user.email "dax@duckduckgo.com"
         bundle exec fastlane promote_latest_testflight_to_appstore
-    
+  
