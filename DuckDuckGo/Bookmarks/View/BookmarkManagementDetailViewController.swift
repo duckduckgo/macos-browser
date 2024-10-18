@@ -315,9 +315,14 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         }.store(in: &cancellables)
     }
 
-    override func viewDidDisappear() {
-        super.viewDidDisappear()
+    override func viewWillAppear() {
+        NotificationCenter.default.addObserver(self, selector: #selector(firstReponderDidChange), name: .firstResponder, object: nil)
+
         reloadData()
+    }
+
+    override func viewDidDisappear() {
+        NotificationCenter.default.removeObserver(self, name: .firstResponder, object: nil)
     }
 
     override func keyDown(with event: NSEvent) {
@@ -413,13 +418,20 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
             .show(in: view.window)
     }
 
+    @objc func firstReponderDidChange(notification: Notification) {
+        // clear delete undo history when activating the Address Bar
+        if notification.object is AddressBarTextEditor {
+            undoManager?.removeAllActions(withTarget: bookmarkManager)
+        }
+    }
+
     @objc func delete(_ sender: AnyObject) {
         if tableView.selectedRowIndexes.isEmpty {
             guard let folder = selectionState.folder else {
                 assertionFailure("Cannot delete root folder")
                 return
             }
-            bookmarkManager.remove(folder: folder)
+            bookmarkManager.remove(folder: folder, undoManager: undoManager)
             return
         }
 
@@ -458,10 +470,13 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     }
 
     private func deleteSelectedItems() {
+        guard !tableView.selectedRowIndexes.isEmpty else {
+            return
+        }
         let entities = tableView.selectedRowIndexes.compactMap { fetchEntity(at: $0) }
         let entityUUIDs = entities.map(\.id)
 
-        bookmarkManager.remove(objectsWithUUIDs: entityUUIDs)
+        bookmarkManager.remove(objectsWithUUIDs: entityUUIDs, undoManager: undoManager)
     }
 
     private(set) lazy var faviconsFetcherOnboarding: FaviconsFetcherOnboarding? = {
