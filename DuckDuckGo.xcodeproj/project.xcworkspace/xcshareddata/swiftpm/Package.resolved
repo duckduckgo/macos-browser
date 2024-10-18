@@ -33,7 +33,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "sabrina/update-css-dependency",
-        "revision" : "12f9131bef1ce88b67becdd84af78f72d9032c10"
+        "revision" : "f6d44525c81213fa970f06d173fc5f490d060bf2"
       }
     },
     {
@@ -42,7 +42,7 @@
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
         "branch" : "pr-releases/pr-1059",
-        "revision" : "3ea12cf94ab83b85c7ff06740e3a033b3be0ef92"
+        "revision" : "5156cce3b54ee55efb9e28a66ff831840b2ab82d"
       }
     },
     {

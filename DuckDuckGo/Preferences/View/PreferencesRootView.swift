@@ -118,6 +118,8 @@ enum Preferences {
                     Spacer()
                 case .about:
                     AboutView(model: AboutPreferences.shared)
+                case .aiChat:
+                    AIChatView(model: AIChatPreferences.shared)
                 }
             }
             .frame(maxWidth: Const.paneContentWidth, maxHeight: .infinity, alignment: .topLeading)
