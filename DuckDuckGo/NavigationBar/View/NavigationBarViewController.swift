@@ -52,6 +52,7 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var daxLogo: NSImageView!
     @IBOutlet weak var addressBarStack: NSStackView!
 
+    @IBOutlet weak var aiChatButton: MouseOverButton!
     @IBOutlet var addressBarLeftToNavButtonsConstraint: NSLayoutConstraint!
     @IBOutlet var addressBarProportionalWidthConstraint: NSLayoutConstraint!
     @IBOutlet var navigationBarButtonsLeadingConstraint: NSLayoutConstraint!
@@ -173,6 +174,7 @@ final class NavigationBarViewController: NSViewController {
         downloadsButton.sendAction(on: .leftMouseDown)
         networkProtectionButton.sendAction(on: .leftMouseDown)
         passwordManagementButton.sendAction(on: .leftMouseDown)
+        aiChatButton.sendAction(on: .leftMouseDown)
 
         optionsButton.toolTip = UserText.applicationMenuTooltip
         optionsButton.setAccessibilityIdentifier("NavigationBarViewController.optionsButton")
@@ -191,6 +193,7 @@ final class NavigationBarViewController: NSViewController {
         updatePasswordManagementButton()
         updateBookmarksButton()
         updateHomeButton()
+        updateAIChatButton()
 
         if view.window?.isPopUpWindow == true {
             goBackButton.isHidden = true
@@ -318,6 +321,10 @@ final class NavigationBarViewController: NSViewController {
 
     @IBAction func downloadsButtonAction(_ sender: NSButton) {
         toggleDownloadsPopover(keepButtonVisible: false)
+    }
+
+    @IBAction func aiChatButtonAction(_ sender: NSButton) {
+        AIChatTabOpener.openAIChatTab()
     }
 
     override func mouseDown(with event: NSEvent) {
@@ -880,13 +887,13 @@ final class NavigationBarViewController: NSViewController {
         let title = LocalPinningManager.shared.shortcutTitle(for: .aiChat)
         menu.addItem(withTitle: title, action: #selector(toggleAIChatPanelPinning(_:)), keyEquivalent: "")
 
-        bookmarkListButton.menu = menu
-        bookmarkListButton.toolTip = UserText.bookmarksShortcutTooltip
+        aiChatButton.menu = menu
+        aiChatButton.toolTip = UserText.aiChat
 
-        if LocalPinningManager.shared.isPinned(.bookmarks) {
-            bookmarkListButton.isHidden = false
+         if LocalPinningManager.shared.isPinned(.aiChat) {
+            aiChatButton.isHidden = false
         } else {
-            bookmarkListButton.isHidden = !popovers.bookmarkListPopoverShown
+            aiChatButton.isHidden = !popovers.bookmarkListPopoverShown
         }
     }
 
