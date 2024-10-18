@@ -389,7 +389,6 @@ final class BrowserTabViewController: NSViewController {
         let container = WebViewContainerView(tab: tab, webView: webView, frame: view.bounds)
         self.webViewContainer = container
         containerStackView.orientation = .vertical
-        containerStackView.distribution = .fill
         containerStackView.alignment = .leading
         containerStackView.distribution = .fillProportionally
 
@@ -441,7 +440,8 @@ final class BrowserTabViewController: NSViewController {
                 self.removeChild(in: self.containerStackView, webViewContainer: webViewContainer)
             }
         }
-        let daxView = onboardingDialogFactory.makeView(for: dialogType, delegate: tab, onDismiss: onDismissAction, onGotItPressed: { [weak self] in
+
+        let onGotItPressed = { [weak self] in
             guard let self else { return }
 
             onboardingDialogTypeProvider.gotItPressed()
@@ -455,9 +455,16 @@ final class BrowserTabViewController: NSViewController {
             if case .showFireButton = currentState {
                 delegate?.highlightFireButton()
             }
-        }, onFireButtonPressed: { [weak delegate] in
-            delegate?.dismissViewHighlight()
-        })
+        }
+
+        let daxView = onboardingDialogFactory.makeView(
+            for: dialogType,
+            delegate: tab,
+            onDismiss: onDismissAction,
+            onGotItPressed: onGotItPressed,
+            onFireButtonPressed: { [weak delegate] in
+                delegate?.dismissViewHighlight()
+            })
         let hostingController = NSHostingController(rootView: AnyView(daxView))
 
         daxContextualOnboardingController = hostingController
@@ -469,8 +476,8 @@ final class BrowserTabViewController: NSViewController {
             hostingController.view.trailingAnchor.constraint(equalTo: containerStackView.trailingAnchor)
         ])
 
-          containerStackView.layoutSubtreeIfNeeded()
-          webViewContainer?.layoutSubtreeIfNeeded()
+        containerStackView.layoutSubtreeIfNeeded()
+        webViewContainer?.layoutSubtreeIfNeeded()
 
         let currentState = onboardingDialogTypeProvider.state
         if currentState == .showFireButton {

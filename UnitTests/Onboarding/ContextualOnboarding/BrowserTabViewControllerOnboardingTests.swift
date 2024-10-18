@@ -17,7 +17,7 @@
 //
 
 import XCTest
-import SwiftUI
+import struct SwiftUI.AnyView
 import Onboarding
 import Combine
 import BrowserServicesKit
@@ -31,12 +31,13 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
     var factory: CapturingDialogFactory!
     var tab: Tab!
     var cancellables: Set<AnyCancellable> = []
-    let expectation = XCTestExpectation()
+    var expectation: XCTestExpectation!
 
     @MainActor override func setUpWithError() throws {
         try super.setUpWithError()
         let tabCollectionViewModel = TabCollectionViewModel()
         dialogProvider = MockDialogsProvider()
+        expectation = .init()
         factory = CapturingDialogFactory(expectation: expectation)
         tab = Tab()
         tab.setContent(.url(URL.duckDuckGo, credential: nil, source: .appOpenUrl))
@@ -54,6 +55,7 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
         tab = nil
         viewController = nil
         cancellables = []
+        expectation = nil
         try super.tearDownWithError()
     }
 
@@ -128,16 +130,11 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
     func testWhenNavigationCompletedAndDialogTypeNilThenAskDelegateToRemoveViewHighlights() throws {
         // GIVEN
         let expectation = self.expectation(description: "Wait for webViewDidFinishNavigationPublisher to emit")
-        let delegate = BrowserTabViewControllerDelegateMock()
+        let delegate = BrowserTabViewControllerDelegateSpy()
         let url = try XCTUnwrap(URL(string: "some.url"))
+        dialogProvider.dialogTypeForTabExpectation = expectation
         dialogProvider.dialog = nil
         viewController.delegate = delegate
-        tab.webViewDidFinishNavigationPublisher
-            .sink {
-                expectation.fulfill()
-            }
-            .store(in: &cancellables)
-        XCTAssertFalse(delegate.didCallDismissViewHighlight)
 
         // WHEN
         tab.navigateTo(url: url)
@@ -150,8 +147,9 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
     func testWhenNavigationCompletedAndStateIsShowFireButtonThenAskDelegateToHighlightFireButton() throws {
         // GIVEN
         dialogProvider.dialog = .tryFireButton
+        dialogProvider.state = .showFireButton
         let url = try XCTUnwrap(URL(string: "some.url"))
-        let delegate = BrowserTabViewControllerDelegateMock()
+        let delegate = BrowserTabViewControllerDelegateSpy()
         viewController.delegate = delegate
         XCTAssertFalse(delegate.didCallHighlightFireButton)
 
@@ -163,11 +161,28 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
         XCTAssertTrue(delegate.didCallHighlightFireButton)
     }
 
+    func testWhenNavigationCompletedAndStateIsShowBlockedTrackersThenAskDelegateToHighlightPrivacyShield() throws {
+        // GIVEN
+        dialogProvider.dialog = .trackers(message: .init(string: ""), shouldFollowUp: true)
+        dialogProvider.state = .showBlockedTrackers
+        let url = try XCTUnwrap(URL(string: "some.url"))
+        let delegate = BrowserTabViewControllerDelegateSpy()
+        viewController.delegate = delegate
+        XCTAssertFalse(delegate.didCallHighlightPrivacyShield)
+
+        // WHEN
+        tab.navigateTo(url: url)
+
+        // THEN
+        wait(for: [expectation], timeout: 3.0)
+        XCTAssertTrue(delegate.didCallHighlightPrivacyShield)
+    }
+
     func testWhenNavigationCompletedViewHighlightsAreRemoved() throws {
         // GIVEN
         dialogProvider.dialog = .searchDone(shouldFollowUp: false)
         let url = try XCTUnwrap(URL(string: "some.url"))
-        let delegate = BrowserTabViewControllerDelegateMock()
+        let delegate = BrowserTabViewControllerDelegateSpy()
         viewController.delegate = delegate
         XCTAssertFalse(delegate.didCallDismissViewHighlight)
 
@@ -182,15 +197,11 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
     func testWhenGotItButtonPressedThenAskDelegateToRemoveViewHighlights() throws {
         // GIVEN
         let expectation = self.expectation(description: "Wait for webViewDidFinishNavigationPublisher to emit")
-        let delegate = BrowserTabViewControllerDelegateMock()
+        let delegate = BrowserTabViewControllerDelegateSpy()
         let url = try XCTUnwrap(URL(string: "some.url"))
+        dialogProvider.dialogTypeForTabExpectation = expectation
         dialogProvider.dialog = nil
         viewController.delegate = delegate
-        tab.webViewDidFinishNavigationPublisher
-            .sink {
-                expectation.fulfill()
-            }
-            .store(in: &cancellables)
         tab.navigateTo(url: url)
         XCTAssertFalse(delegate.didCallDismissViewHighlight)
         wait(for: [expectation], timeout: 3.0)
@@ -207,7 +218,7 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
         dialogProvider.dialog = .trackers(message: .init(string: ""), shouldFollowUp: true)
         dialogProvider.state = .showFireButton
         let url = try XCTUnwrap(URL(string: "some.url"))
-        let delegate = BrowserTabViewControllerDelegateMock()
+        let delegate = BrowserTabViewControllerDelegateSpy()
         viewController.delegate = delegate
         XCTAssertFalse(delegate.didCallHighlightFireButton)
         tab.navigateTo(url: url)
@@ -224,7 +235,7 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
         // GIVEN
         dialogProvider.dialog = .tryFireButton
         let url = try XCTUnwrap(URL(string: "some.url"))
-        let delegate = BrowserTabViewControllerDelegateMock()
+        let delegate = BrowserTabViewControllerDelegateSpy()
         viewController.delegate = delegate
         XCTAssertFalse(delegate.didCallDismissViewHighlight)
         tab.navigateTo(url: url)
@@ -244,9 +255,12 @@ class MockDialogsProvider: ContextualOnboardingDialogTypeProviding, ContextualOn
 
     func updateStateFor(tab: DuckDuckGo_Privacy_Browser.Tab) {}
 
+    var dialogTypeForTabExpectation: XCTestExpectation?
+
     var dialog: ContextualDialogType?
 
     func dialogTypeForTab(_ tab: Tab, privacyInfo: PrivacyInfo?) -> ContextualDialogType? {
+        dialogTypeForTabExpectation?.fulfill()
         return dialog
     }
 
@@ -287,16 +301,20 @@ class CapturingDialogFactory: ContextualDaxDialogsFactory {
 
 }
 
-final class BrowserTabViewControllerDelegateMock: BrowserTabViewControllerDelegate {
+final class BrowserTabViewControllerDelegateSpy: BrowserTabViewControllerDelegate {
     private(set) var didCallHighlightFireButton = false
+    private(set) var didCallHighlightPrivacyShield = false
     private(set) var didCallDismissViewHighlight = false
 
     func highlightFireButton() {
         didCallHighlightFireButton = true
     }
 
+    func highlightPrivacyShield() {
+        didCallHighlightPrivacyShield = true
+    }
+
     func dismissViewHighlight() {
         didCallDismissViewHighlight = true
     }
-
 }

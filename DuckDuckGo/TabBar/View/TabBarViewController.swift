@@ -1272,11 +1272,11 @@ extension TabBarViewController: TabBarViewItemDelegate {
 extension TabBarViewController {
 
     func startFireButtonPulseAnimation() {
-        ContextualOnboardingViewHighlighter.highlight(view: fireButton, inParent: view)
+        ViewHighlighter.highlight(view: fireButton, inParent: view)
     }
 
     func stopFireButtonPulseAnimation() {
-        ContextualOnboardingViewHighlighter.stopHighlighting(view: fireButton)
+        ViewHighlighter.stopHighlighting(view: fireButton)
     }
 
 }
