@@ -615,7 +615,12 @@ extension [RestorableBookmarkEntity] {
         while let (folder, _) = removedFolderStack.popLast() {
             for entity in folder.children {
                 // children items of a removed folder are inserted in the original order so we don‘t need to track their indices
-                self.append(RestorableBookmarkEntity(bookmarkEntity: entity, index: nil, indexInFavoritesArray: nil))
+                if let bookmark = entity as? Bookmark, bookmark.isFavorite {
+                    let indexInFavoritesArray = bookmarkManager.list?.favoriteBookmarks.firstIndex(of: bookmark)
+                    self.append(RestorableBookmarkEntity(bookmarkEntity: entity, index: nil, indexInFavoritesArray: indexInFavoritesArray))
+                } else {
+                    self.append(RestorableBookmarkEntity(bookmarkEntity: entity, index: nil, indexInFavoritesArray: nil))
+                }
 
                 if let folder = entity as? BookmarkFolder {
                     removedFolderStack.append((folder, nil))

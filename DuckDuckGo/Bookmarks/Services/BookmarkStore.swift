@@ -100,15 +100,18 @@ extension BookmarkStore {
         }
     }
 
-    func save(bookmark: Bookmark, index: Int? = nil, completion: @escaping (Error?) -> Void) {
-        save(entitiesAtIndices: [(bookmark, index, nil)]) { error in
+    func save(bookmark: Bookmark,
+              index: Int? = nil,
+              indexInFavoritesArray: Int? = nil,
+              completion: @escaping (Error?) -> Void) {
+        save(entitiesAtIndices: [(bookmark, index, indexInFavoritesArray)]) { error in
             completion(error)
         }
     }
 
-    func save(bookmark: Bookmark, index: Int? = nil) async throws {
+    func save(bookmark: Bookmark, index: Int? = nil, indexInFavoritesArray: Int? = nil) async throws {
         return try await withCheckedThrowingContinuation { continuation in
-            save(bookmark: bookmark, index: index) { error in
+            save(bookmark: bookmark, index: index, indexInFavoritesArray: indexInFavoritesArray) { error in
                 if let error {
                     continuation.resume(throwing: error)
                     return

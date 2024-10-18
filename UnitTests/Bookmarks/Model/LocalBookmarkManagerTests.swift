@@ -238,9 +238,9 @@ final class LocalBookmarkManagerTests: XCTestCase {
         assertEqual(bookmarkStoreMock.saveEntitiesAtIndicesCalledWith, [
             (removedFolder1, 1, nil),
             (Bookmark(.duckDuckGoEmailLogin, parentId: removedFolder1.id), nil, nil),
-            (Bookmark(.duckDuckGoEmailInfo, isFavorite: false, parentId: removedFolder1.id), nil, nil),
+            (Bookmark(.duckDuckGoEmailInfo, isFavorite: true, parentId: removedFolder1.id), nil, nil),
             (removedFolder2, nil, nil),
-            (Bookmark(.duckDuckGoAutocomplete, isFavorite: false, parentId: removedFolder2.id), nil, nil),
+            (Bookmark(.duckDuckGoAutocomplete, isFavorite: true, parentId: removedFolder2.id), nil, nil),
             (Bookmark(.aboutDuckDuckGo, isFavorite: false, parentId: removedFolder2.id), nil, nil),
         ])
 
@@ -266,9 +266,9 @@ final class LocalBookmarkManagerTests: XCTestCase {
         assertEqual(bookmarkStoreMock.saveEntitiesAtIndicesCalledWith, [
             (removedFolder1, 1, nil),
             (Bookmark(.duckDuckGoEmailLogin, parentId: removedFolder1.id), nil, nil),
-            (Bookmark(.duckDuckGoEmailInfo, isFavorite: false, parentId: removedFolder1.id), nil, nil),
+            (Bookmark(.duckDuckGoEmailInfo, isFavorite: true, parentId: removedFolder1.id), nil, nil),
             (removedFolder2, nil, nil),
-            (Bookmark(.duckDuckGoAutocomplete, isFavorite: false, parentId: removedFolder2.id), nil, nil),
+            (Bookmark(.duckDuckGoAutocomplete, isFavorite: true, parentId: removedFolder2.id), nil, nil),
             (Bookmark(.aboutDuckDuckGo, isFavorite: false, parentId: removedFolder2.id), nil, nil),
         ])
         XCTAssertTrue(undoManager.canRedo)
@@ -320,9 +320,9 @@ final class LocalBookmarkManagerTests: XCTestCase {
             (removedFolder3, 4, nil),
             (Bookmark(.duckDuckGoMorePrivacyInfo, isFavorite: false), 5, nil),
             (Bookmark(.duckDuckGoEmailLogin, parentId: removedFolder1.id), nil, nil),
-            (Bookmark(.duckDuckGoEmailInfo, isFavorite: false, parentId: removedFolder1.id), nil, nil),
+            (Bookmark(.duckDuckGoEmailInfo, isFavorite: true, parentId: removedFolder1.id), nil, nil),
             (removedFolder2, nil, nil),
-            (Bookmark(.duckDuckGoAutocomplete, isFavorite: false, parentId: removedFolder2.id), nil, nil),
+            (Bookmark(.duckDuckGoAutocomplete, isFavorite: true, parentId: removedFolder2.id), nil, nil),
             (Bookmark(.ddgLearnMore, isFavorite: false, parentId: removedFolder3.id), nil, nil),
         ])
 
@@ -351,9 +351,9 @@ final class LocalBookmarkManagerTests: XCTestCase {
             (removedFolder3, 4, nil),
             (Bookmark(.duckDuckGoMorePrivacyInfo, isFavorite: false), 5, nil),
             (Bookmark(.duckDuckGoEmailLogin, parentId: removedFolder1.id), nil, nil),
-            (Bookmark(.duckDuckGoEmailInfo, isFavorite: false, parentId: removedFolder1.id), nil, nil),
+            (Bookmark(.duckDuckGoEmailInfo, isFavorite: true, parentId: removedFolder1.id), nil, nil),
             (removedFolder2, nil, nil),
-            (Bookmark(.duckDuckGoAutocomplete, isFavorite: false, parentId: removedFolder2.id), nil, nil),
+            (Bookmark(.duckDuckGoAutocomplete, isFavorite: true, parentId: removedFolder2.id), nil, nil),
             (Bookmark(.ddgLearnMore, isFavorite: false, parentId: removedFolder3.id), nil, nil),
         ])
         XCTAssertTrue(undoManager.canRedo)
