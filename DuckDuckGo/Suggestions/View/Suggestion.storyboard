@@ -94,7 +94,7 @@
                                                 <rect key="frame" x="0.0" y="0.0" width="613" height="270"/>
                                                 <subviews>
                                                     <customView misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MtO-b9-tF8" userLabel="Inner Border View" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                        <rect key="frame" x="1" y="0.0" width="612" height="270"/>
+                                                        <rect key="frame" x="1" y="1" width="611" height="121"/>
                                                         <userDefinedRuntimeAttributes>
                                                             <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
                                                                 <color key="value" name="AddressBarInnerBorderColor"/>
@@ -107,19 +107,19 @@
                                                             </userDefinedRuntimeAttribute>
                                                         </userDefinedRuntimeAttributes>
                                                     </customView>
-                                                    <scrollView borderType="none" horizontalLineScroll="28" horizontalPageScroll="10" verticalLineScroll="28" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cx3-LG-ZUH">
-                                                        <rect key="frame" x="4" y="0.0" width="608" height="76"/>
+                                                    <scrollView misplaced="YES" borderType="none" horizontalLineScroll="28" horizontalPageScroll="10" verticalLineScroll="28" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cx3-LG-ZUH">
+                                                        <rect key="frame" x="4" y="0.0" width="609" height="76"/>
                                                         <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="pb8-sX-fSc">
-                                                            <rect key="frame" x="0.0" y="0.0" width="608" height="76"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="609" height="76"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="28" viewBased="YES" id="4Z2-d8-NA2">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="608" height="63"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="689" height="102"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <color key="backgroundColor" name="ClearColor"/>
                                                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                                     <tableColumns>
-                                                                        <tableColumn width="572" minWidth="40" maxWidth="2000" id="0zj-Uc-AlR">
+                                                                        <tableColumn width="657" minWidth="40" maxWidth="2000" id="0zj-Uc-AlR">
                                                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
                                                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                                 <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
@@ -132,11 +132,11 @@
                                                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                                             <prototypeCellViews>
                                                                                 <customView identifier="SuggestionTableRowView" id="9zN-fn-Ri0" customClass="SuggestionTableRowView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                                                    <rect key="frame" x="10" y="0.0" width="584" height="22"/>
+                                                                                    <rect key="frame" x="10" y="0.0" width="669" height="22"/>
                                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                                 </customView>
                                                                                 <tableCellView identifier="SuggestionTableCellView" id="kX2-C1-38Y" customClass="SuggestionTableCellView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                                                    <rect key="frame" x="10" y="22" width="584" height="80"/>
+                                                                                    <rect key="frame" x="10" y="22" width="669" height="80"/>
                                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                                     <subviews>
                                                                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="vli-IP-Nr8">
@@ -156,7 +156,7 @@
                                                                                             </textFieldCell>
                                                                                         </textField>
                                                                                         <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="252" translatesAutoresizingMaskIntoConstraints="NO" id="efo-Vy-aEh">
-                                                                                            <rect key="frame" x="149" y="33" width="429" height="15"/>
+                                                                                            <rect key="frame" x="149" y="33" width="514" height="15"/>
                                                                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title=" – Search with DuckDuckGo" id="UZv-CE-fbV">
                                                                                                 <font key="font" metaFont="cellTitle"/>
                                                                                                 <color key="textColor" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
@@ -164,7 +164,7 @@
                                                                                             </textFieldCell>
                                                                                         </textField>
                                                                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="5Rx-2z-uI7" userLabel="Confirm Button">
-                                                                                            <rect key="frame" x="0.0" y="0.0" width="584" height="80"/>
+                                                                                            <rect key="frame" x="0.0" y="0.0" width="669" height="80"/>
                                                                                             <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="0t6-3l-16q">
                                                                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                                                 <font key="font" metaFont="system"/>
@@ -174,7 +174,7 @@
                                                                                             </connections>
                                                                                         </button>
                                                                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="ofA-eI-PSe">
-                                                                                            <rect key="frame" x="564" y="30" width="20" height="20"/>
+                                                                                            <rect key="frame" x="649" y="30" width="20" height="20"/>
                                                                                             <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Trash" imagePosition="only" alignment="center" inset="2" id="6YI-sN-iij">
                                                                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                                                 <font key="font" metaFont="system"/>
@@ -255,7 +255,7 @@
                                                 </userDefinedRuntimeAttributes>
                                             </customView>
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="ATb-xt-XAg" userLabel="Separator" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                <rect key="frame" x="1" y="89" width="614" height="1"/>
+                                                <rect key="frame" x="1" y="102" width="695" height="1"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="1" id="G3c-nz-oCJ"/>
                                                 </constraints>
