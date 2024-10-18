@@ -235,6 +235,7 @@ final class PIRScanIntegrationTests: XCTestCase {
         })
         print("Stage 1 passed: We save a profile")
 
+        try await Task.sleep(nanoseconds: 3_000_000_000)
         let queries9 = try! database.fetchAllBrokerProfileQueryData()
         let initialBrokers = queries9.compactMap { $0.dataBroker }
         XCTAssertEqual(initialBrokers.count, 1)
