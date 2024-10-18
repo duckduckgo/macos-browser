@@ -236,6 +236,11 @@ final class PIRScanIntegrationTests: XCTestCase {
 
         XCTAssertTrue(loginItemsManager.isAnyEnabled([.dbpBackgroundAgent]))
         XCTAssertTrue(LoginItem.dbpBackgroundAgent.isRunning)
+        let queries9 = try! database.fetchAllBrokerProfileQueryData()
+        let initialBrokers = queries9.compactMap { $0.dataBroker }
+        XCTAssertEqual(initialBrokers.count, 1)
+        XCTAssertEqual(initialBrokers.first?.name, "DDG Fake Broker")
+        XCTAssertEqual(queries9.count, 1)
 
         /*
         2/ We scan brokers
@@ -249,12 +254,6 @@ final class PIRScanIntegrationTests: XCTestCase {
             try! self.pirProtectionManager.dataManager.prepareBrokerProfileQueryDataCache()
             return await self.communicationDelegate.getBackgroundAgentMetadata().lastStartedSchedulerOperationTimestamp != nil
         })
-
-        let queries9 = try! database.fetchAllBrokerProfileQueryData()
-        let initialBrokers = queries9.compactMap { $0.dataBroker }
-        XCTAssertEqual(initialBrokers.count, 1)
-        XCTAssertEqual(initialBrokers.first?.name, "DDG Fake Broker")
-        XCTAssertEqual(queries9.count, 1)
 
         let metaData = await communicationDelegate.getBackgroundAgentMetadata()
         XCTAssertNotNil(metaData.lastStartedSchedulerOperationBrokerUrl)
