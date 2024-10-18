@@ -27,7 +27,7 @@ class OnboardingSuggestedSearchesProviderTests: XCTestCase {
     let userText = UserText.ContextualOnboarding.self
 
     func testSearchesListForEnglishLanguageAndUsRegion() {
-        let mockProvider = MockOnboardingRegionAndLanguageProvider(regionCode: "us", languageCode: "en")
+        let mockProvider = MockOnboardingRegionAndLanguageProvider(regionCode: "US", languageCode: "en")
         let provider = OnboardingSuggestedSearchesProvider(countryAndLanguageProvider: mockProvider)
 
         let expectedSearches = [
@@ -40,7 +40,7 @@ class OnboardingSuggestedSearchesProviderTests: XCTestCase {
     }
 
     func testSearchesListForNonEnglishLanguageAndNonUSRegion() {
-        let mockProvider = MockOnboardingRegionAndLanguageProvider(regionCode: "fr", languageCode: "fr")
+        let mockProvider = MockOnboardingRegionAndLanguageProvider(regionCode: "FR", languageCode: "fr")
         let provider = OnboardingSuggestedSearchesProvider(countryAndLanguageProvider: mockProvider)
 
         let expectedSearches = [
@@ -53,7 +53,7 @@ class OnboardingSuggestedSearchesProviderTests: XCTestCase {
     }
 
     func testSearchesListForUSRegionAndNonEnglishLanguage() {
-        let mockProvider = MockOnboardingRegionAndLanguageProvider(regionCode: "us", languageCode: "es")
+        let mockProvider = MockOnboardingRegionAndLanguageProvider(regionCode: "US", languageCode: "es")
         let provider = OnboardingSuggestedSearchesProvider(countryAndLanguageProvider: mockProvider)
 
         let expectedSearches = [

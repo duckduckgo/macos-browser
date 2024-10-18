@@ -25,10 +25,12 @@ import os.log
 protocol BookmarkManager: AnyObject {
 
     func isUrlBookmarked(url: URL) -> Bool
+    func isAnyUrlVariantBookmarked(url: URL) -> Bool
     func isUrlFavorited(url: URL) -> Bool
     func allHosts() -> Set<String>
     func getBookmark(for url: URL) -> Bookmark?
     func getBookmark(forUrl url: String) -> Bookmark?
+    func getBookmark(forVariantUrl variantURL: URL) -> Bookmark?
     func getBookmarkFolder(withId id: String) -> BookmarkFolder?
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool, index: Int?, parent: BookmarkFolder?) -> Bookmark?
     func makeBookmarks(for websitesInfo: [WebsiteInfo], inNewFolderNamed folderName: String, withinParentFolder parent: ParentFolderType)
@@ -152,6 +154,11 @@ final class LocalBookmarkManager: BookmarkManager {
         return list?[url.absoluteString] != nil
     }
 
+    /// Checks if any variant of the given URL (http/https, trailing slash) is bookmarked.
+    func isAnyUrlVariantBookmarked(url: URL) -> Bool {
+        findBookmark(forVariantUrl: url) != nil
+    }
+
     func isUrlFavorited(url: URL) -> Bool {
         return list?[url.absoluteString]?.isFavorite == true
     }
@@ -168,11 +175,35 @@ final class LocalBookmarkManager: BookmarkManager {
         return list?[url]
     }
 
+    /// Returns the bookmark for the given URL or any of its variants (http/https, trailing slash), if it exists.
+    func getBookmark(forVariantUrl variantURL: URL) -> Bookmark? {
+        findBookmark(forVariantUrl: variantURL)
+    }
+
+    /// Finds a bookmark by checking all possible URL variants (http/https, trailing slash).
+    private func findBookmark(forVariantUrl url: URL) -> Bookmark? {
+        let urlVariants = url.bookmarkButtonUrlVariants()
+
+        for variant in urlVariants {
+            if let bookmark = getBookmark(for: variant) {
+                return bookmark
+            }
+        }
+
+        return nil
+    }
+
     func getBookmarkFolder(withId id: String) -> BookmarkFolder? {
         bookmarkStore.bookmarkFolder(withId: id)
     }
 
-    @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool, index: Int?, parent: BookmarkFolder?) -> Bookmark? {
+    @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark? {
+        makeBookmark(for: url, title: title, isFavorite: isFavorite, index: nil, parent: nil)
+    }
+
+    @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool, index: Int? = nil, parent: BookmarkFolder? = nil) -> Bookmark? {
+        assert(url.absoluteString.lowercased() == url.absoluteString)
+
         guard list != nil else { return nil }
 
         guard !isUrlBookmarked(url: url) else {

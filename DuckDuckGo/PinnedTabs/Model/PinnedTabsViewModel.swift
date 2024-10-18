@@ -123,14 +123,12 @@ final class PinnedTabsViewModel: ObservableObject {
     }
 
     private func updateTabAudioState(tab: Tab) {
-        let audioState = tab.audioState
+        let audioState = tab.webView.audioState
         switch audioState {
         case .muted:
             audioStateView = .muted
         case .unmuted:
             audioStateView = .unmuted
-        case .none:
-            audioStateView = .notSupported
         }
     }
 }

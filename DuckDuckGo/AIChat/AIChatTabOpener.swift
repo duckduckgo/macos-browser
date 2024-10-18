@@ -1,5 +1,5 @@
 //
-//  DuckPlayerOnboardingExperiment+Logger.swift
+//  AIChatTabOpener.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -16,9 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
-import os.log
-
-public extension Logger {
-    static var duckPlayerOnboardingExperiment: Logger = { Logger(subsystem: "DuckPlayer Onboarding Experiment", category: "DuckPlayer") }()
+struct AIChatTabOpener {
+    @MainActor static func openAIChatTab() {
+        WindowControllersManager.shared.showTab(with: .url(AIChatMenuConfiguration().shortcutURL, credential: nil, source: .ui))
+    }
 }

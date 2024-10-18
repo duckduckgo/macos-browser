@@ -45,6 +45,11 @@ class MockBookmarkManager: BookmarkManager {
         return isUrlBookmarked
     }
 
+    var isAnyUrlVariantBookmarked = false
+    func isAnyUrlVariantBookmarked(url: URL) -> Bool {
+        return isAnyUrlVariantBookmarked
+    }
+
     func allHosts() -> Set<String> {
         return []
     }
@@ -54,6 +59,10 @@ class MockBookmarkManager: BookmarkManager {
     }
 
     func getBookmark(forUrl url: String) -> DuckDuckGo_Privacy_Browser.Bookmark? {
+        return nil
+    }
+
+    func getBookmark(forVariantUrl url: URL) -> DuckDuckGo_Privacy_Browser.Bookmark? {
         return nil
     }
 

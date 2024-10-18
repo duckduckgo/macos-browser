@@ -69,32 +69,32 @@ struct RemoteMessageViewModel {
         }
     }
 
-    let onDidClose: (ButtonAction?) -> Void
+    let onDidClose: (ButtonAction?) async -> Void
     let onDidAppear: () -> Void
     let onDidDisappear: () -> Void
     let openURLHandler: (URL) -> Void
 
     func mapActionToViewModel(remoteAction: RemoteAction,
                               buttonAction: RemoteMessageViewModel.ButtonAction,
-                              onDidClose: @escaping (RemoteMessageViewModel.ButtonAction?) -> Void) -> () -> Void {
+                              onDidClose: @escaping (RemoteMessageViewModel.ButtonAction?) async -> Void) -> () async -> Void {
 
         switch remoteAction {
         case .url(let value), .share(let value, _), .survey(let value):
-            return {
+            return { @MainActor in
                 if let url = URL.makeURL(from: value) {
                     openURLHandler(url)
                 }
-                onDidClose(buttonAction)
+                await onDidClose(buttonAction)
             }
         case .appStore:
-            return {
+            return { @MainActor in
                 let url = URL(string: "https://apps.apple.com/app/duckduckgo-privacy-browser/id663592361")!
                 openURLHandler(url)
-                onDidClose(buttonAction)
+                await onDidClose(buttonAction)
             }
         case .dismiss:
-            return {
-                onDidClose(buttonAction)
+            return { @MainActor in
+                await onDidClose(buttonAction)
             }
         }
     }
@@ -108,7 +108,7 @@ struct RemoteMessageButtonViewModel {
 
     let title: String
     var actionStyle: ActionStyle = .default
-    let action: () -> Void
+    let action: () async -> Void
 }
 
 extension RemoteAction {

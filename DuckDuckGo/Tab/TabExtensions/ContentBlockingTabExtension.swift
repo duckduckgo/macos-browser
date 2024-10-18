@@ -103,7 +103,9 @@ extension ContentBlockingTabExtension: NavigationResponder {
             // ContentScopeUserScript needs to be loaded for https://duckduckgo.com/email/
             || navigationAction.url.absoluteString.hasPrefix(URL.duckDuckGoEmailLogin.absoluteString)
             // ContentScopeUserScript needs to be loaded for https://duckduckgo.com/subscriptions
-            || navigationAction.url.absoluteString.hasPrefix(SubscriptionURL.baseURL.subscriptionURL(environment: .production).absoluteString) {
+            || navigationAction.url.absoluteString.hasPrefix(SubscriptionURL.baseURL.subscriptionURL(environment: .production).absoluteString)
+            // ContentScopeUserScript needs to be loaded for https://duckduckgo.com/identity-theft-restoration
+            || navigationAction.url.absoluteString.hasPrefix(SubscriptionURL.identityTheftRestoration.subscriptionURL(environment: .production).absoluteString) {
             await prepareForContentBlocking()
         }
 

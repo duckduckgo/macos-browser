@@ -741,6 +741,61 @@ final class LocalBookmarkManagerTests: XCTestCase {
             Bookmark(id: "4", url: "www.favorite.com", title: "Favorite bookmark", isFavorite: true)
         }
     }
+
+    func testWhenVariantUrlIsBookmarked_ThenGetBookmarkForVariantReturnsBookmark() {
+        let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
+        let originalURL = URL(string: "http://example.com")!
+        let variantURL = URL(string: "https://example.com/")!
+
+        let bookmark = Bookmark(id: UUID().uuidString, url: variantURL.absoluteString, title: "Title", isFavorite: false)
+        bookmarkStoreMock.bookmarks = [bookmark]
+        bookmarkManager.loadBookmarks()
+
+        let result = bookmarkManager.getBookmark(forVariantUrl: originalURL)
+
+        XCTAssertEqual(result, bookmark)
+        XCTAssert(bookmarkStoreMock.loadAllCalled)
+    }
+
+    func testWhenNoVariantUrlIsBookmarked_ThenGetBookmarkForVariantReturnsNil() {
+        let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
+        let originalURL = URL(string: "http://example.com")!
+        let variantURL = URL(string: "https://example.com/")!
+
+        bookmarkStoreMock.bookmarks = []
+        bookmarkManager.loadBookmarks()
+
+        let result = bookmarkManager.getBookmark(forVariantUrl: originalURL)
+
+        XCTAssertNil(result)
+    }
+
+    func testWhenVariantUrlIsBookmarked_ThenIsAnyUrlVariantBookmarkedReturnsTrue() {
+        let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
+        let originalURL = URL(string: "http://example.com")!
+        let variantURL = URL(string: "https://example.com/")!
+
+        let bookmark = Bookmark(id: UUID().uuidString, url: variantURL.absoluteString, title: "Title", isFavorite: false)
+        bookmarkStoreMock.bookmarks = [bookmark]
+        bookmarkManager.loadBookmarks()
+
+        let result = bookmarkManager.isAnyUrlVariantBookmarked(url: originalURL)
+
+        XCTAssertTrue(result)
+    }
+
+    func testWhenNoVariantUrlIsBookmarked_ThenIsAnyUrlVariantBookmarkedReturnsFalse() {
+        let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
+        let originalURL = URL(string: "http://example.com")!
+
+        bookmarkStoreMock.bookmarks = []
+        bookmarkManager.loadBookmarks()
+
+        let result = bookmarkManager.isAnyUrlVariantBookmarked(url: originalURL)
+
+        XCTAssertFalse(result)
+    }
+
 }
 
 fileprivate extension LocalBookmarkManager {
