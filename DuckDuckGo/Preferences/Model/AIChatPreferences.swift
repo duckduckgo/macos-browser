@@ -22,18 +22,27 @@ import Foundation
 final class AIChatPreferences: ObservableObject {
     static let shared = AIChatPreferences()
 
+    private let pinningManager: PinningManager
     private var preferencesStorage: AIChatPreferencesStorage
     private let learnMoreURL = URL(string: "https://duckduckgo.com/duckduckgo-help-pages/aichat/")!
+    private var cancellables = Set<AnyCancellable>()
 
-    init(storage: AIChatPreferencesStorage = AIChatPreferencesUserDefaultsStorage()) {
+    init(storage: AIChatPreferencesStorage = AIChatPreferencesUserDefaultsStorage(),
+         pinningManager: PinningManager = LocalPinningManager.shared) {
         self.preferencesStorage = storage
-        self.showShortcutInToolbar = storage.showShortcutInToolbar
         self.showShortcutInApplicationMenu = storage.showShortcutInApplicationMenu
+        self.pinningManager = pinningManager
+        self.showShortcutInToolbar = pinningManager.isPinned(.aiChat)
+        subscribeToShowInBrowserToolbarSettingsChanges()
     }
 
     @Published var showShortcutInToolbar: Bool {
         didSet {
-            preferencesStorage.showShortcutInToolbar = showShortcutInToolbar
+            if showShortcutInToolbar {
+                pinningManager.pin(.aiChat)
+            } else {
+                pinningManager.unpin(.aiChat)
+            }
         }
     }
 
@@ -46,10 +55,27 @@ final class AIChatPreferences: ObservableObject {
     @MainActor func openLearnMoreLink() {
         WindowControllersManager.shared.show(url: learnMoreURL, source: .ui, newTab: true)
     }
+
+    private func subscribeToShowInBrowserToolbarSettingsChanges() {
+        NotificationCenter.default.publisher(for: .PinnedViewsChanged).sink { [weak self] notification in
+            guard let self = self else {
+                return
+            }
+
+            if let userInfo = notification.userInfo as? [String: Any],
+               let viewType = userInfo[LocalPinningManager.pinnedViewChangedNotificationViewTypeKey] as? String,
+               let view = PinnableView(rawValue: viewType) {
+                switch view {
+                case .aiChat: self.showShortcutInToolbar = self.pinningManager.isPinned(.aiChat)
+                default: break
+                }
+            }
+        }
+        .store(in: &cancellables)
+    }
 }
 
 protocol AIChatPreferencesStorage {
-    var showShortcutInToolbar: Bool { get set }
     var showShortcutInApplicationMenu: Bool { get set }
 }
 
@@ -60,11 +86,6 @@ struct AIChatPreferencesUserDefaultsStorage: AIChatPreferencesStorage {
         self.userDefaults = userDefaults
     }
 
-    var showShortcutInToolbar: Bool {
-        get { userDefaults.showAIChatShortcutInToolbar }
-        set { userDefaults.showAIChatShortcutInToolbar = newValue }
-    }
-
     var showShortcutInApplicationMenu: Bool {
         get { userDefaults.showAIChatShortcutInApplicationMenu }
         set { userDefaults.showAIChatShortcutInApplicationMenu = newValue }
@@ -73,17 +94,11 @@ struct AIChatPreferencesUserDefaultsStorage: AIChatPreferencesStorage {
 
 private extension UserDefaults {
     enum Keys {
-        static let showAIChatShortcutInToolbar = "aichat.showAIChatShortcutInToolbar"
         static let showAIChatShortcutInApplicationMenu = "aichat.showAIChatShortcutInApplicationMenu"
     }
 
     var showAIChatShortcutInApplicationMenu: Bool {
         get { bool(forKey: Keys.showAIChatShortcutInApplicationMenu) }
         set { set(newValue, forKey: Keys.showAIChatShortcutInApplicationMenu) }
-    }
-
-    var showAIChatShortcutInToolbar: Bool {
-        get { bool(forKey: Keys.showAIChatShortcutInToolbar) }
-        set { set(newValue, forKey: Keys.showAIChatShortcutInToolbar) }
     }
 }
