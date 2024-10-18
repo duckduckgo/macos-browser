@@ -34,13 +34,14 @@ extension HomePage.Views {
 
             var totalHeight = Self.height + 2 * Const.verticalPadding
 
-            if addressBarModel.shouldShowAddressBar {
+            if addressBarModel.shouldShowAddressBar && model.isSearchBarVisible {
                 totalHeight += Const.searchBoxVerticalSpacing + BigSearchBox.Const.totalHeight
             }
             return totalHeight
         }
 
         @Environment(\.colorScheme) var colorScheme
+        @EnvironmentObject var model: AppearancePreferences
         @EnvironmentObject var addressBarModel: HomePage.Models.AddressBarModel
 
         let backgroundColor = Color(.newTabPageBackground)
@@ -70,6 +71,7 @@ extension HomePage.Views {
                             Group {
                                 if addressBarModel.shouldShowAddressBar {
                                     BigSearchBox(isCompact: false, supportsFixedColorScheme: false)
+                                        .visibility(model.isSearchBarVisible ? .visible : .gone)
                                 }
 
                                 ZStack {

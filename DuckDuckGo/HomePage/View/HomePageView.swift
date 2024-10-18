@@ -150,6 +150,7 @@ extension HomePage.Views {
                     if addressBarModel.shouldShowAddressBar {
                         BigSearchBox(isCompact: isCompactLogo(with: geometry))
                             .id(Const.searchBarIdentifier)
+                            .visibility(model.isSearchBarVisible ? .visible : .gone)
                     }
 
                     if model.isContinueSetUpAvailable {
@@ -344,6 +345,7 @@ fileprivate extension HomePage.Views.RootView {
             VStack(spacing: Const.itemSpacing) {
                 BigSearchBox(isCompact: isCompactLogo(with: geometry))
                     .id(Const.searchBarIdentifier)
+                    .visibility(model.isSearchBarVisible ? .visible : .gone)
 
                 if model.isContinueSetUpAvailable {
                     ContinueSetUpView()
@@ -403,7 +405,10 @@ fileprivate extension HomePage.Views.RootView {
 
     func totalHeight(with geometry: GeometryProxy) -> CGFloat {
         let topAndBottomSpacers = Const.itemSpacing * 2
-        var height = (isCompactLogo(with: geometry) ? BigSearchBox.Const.compactHeight : BigSearchBox.Const.totalHeight) + topAndBottomSpacers
+        var height = topAndBottomSpacers
+        if model.isSearchBarVisible {
+            height += isCompactLogo(with: geometry) ? BigSearchBox.Const.compactHeight : BigSearchBox.Const.totalHeight
+        }
         if model.isContinueSetUpAvailable && model.isContinueSetUpVisible {
             height += continueSetUpModel.isMoreOrLessButtonNeeded ? 184 : 160
             height += Const.itemSpacing + continueSetUpCardsTopPadding

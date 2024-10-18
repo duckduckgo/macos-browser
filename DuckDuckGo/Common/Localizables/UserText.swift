@@ -1105,6 +1105,9 @@ struct UserText {
     static let newTabMenuItemShowContinuteSetUp = NSLocalizedString("newTab.menu.item.show.continue.setup", value: "Show Next Steps", comment: "Title of the menu item in the home page to show/hide continue setup section")
     static let newTabMenuItemShowRecentActivity = NSLocalizedString("newTab.menu.item.show.recent.activity", value: "Show Recent Activity", comment: "Title of the menu item in the home page to show/hide recent activity section")
 
+    // Search Bar
+    static let newTabSearchBarSectionTitle = NSLocalizedString("newTab.search.bar.section.title", value: "Search Field", comment: "Title of the Search Field section in the home page")
+
     // Favorites
     static let newTabFavoriteSectionTitle = NSLocalizedString("newTab.favorites.section.title", value: "Favorites", comment: "Title of the Favorites section in the home page")
 
