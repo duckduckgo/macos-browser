@@ -83,7 +83,8 @@ struct DataImportView: ModalView {
 
     private func viewHeader() -> some View {
         return VStack(alignment: .leading, spacing: 0) {
-            if case .summary = model.screen {
+            // If there are no errors show summary success header
+            if case .summary = model.screen, !model.hasAnySummaryError {
                 VStack(alignment: .leading) {
                     Image(.success96)
                     Text(UserText.importDataSuccessTitle)
