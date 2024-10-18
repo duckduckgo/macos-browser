@@ -41,7 +41,7 @@ final class ContextualDaxDialogsFactoryTests: XCTestCase {
         let dialogType = ContextualDialogType.tryASearch
 
         // WHEN
-        let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: {}, onGotItPressed: {})
+        let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: {}, onGotItPressed: {}, onFireButtonPressed: {})
 
         // THEN
         let view = try XCTUnwrap(find(OnboardingTrySearchDialog.self, in: result))
@@ -65,7 +65,7 @@ final class ContextualDaxDialogsFactoryTests: XCTestCase {
         let onGotItPressed = { onGotItPressedRun = true }
 
         // WHEN
-        let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: onDismiss, onGotItPressed: onGotItPressed)
+        let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: onDismiss, onGotItPressed: onGotItPressed, onFireButtonPressed: {})
 
         // THEN
         let view = try XCTUnwrap(find(OnboardingFirstSearchDoneDialog.self, in: result))
@@ -89,7 +89,7 @@ final class ContextualDaxDialogsFactoryTests: XCTestCase {
         let onGotItPressed = { onGotItPressedRun = true }
 
         // WHEN
-        let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: onDismiss, onGotItPressed: onGotItPressed)
+        let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: onDismiss, onGotItPressed: onGotItPressed, onFireButtonPressed: {})
 
         // THEN
         let view = try XCTUnwrap(find(OnboardingFirstSearchDoneDialog.self, in: result))
@@ -109,7 +109,7 @@ final class ContextualDaxDialogsFactoryTests: XCTestCase {
         let dialogType = ContextualDialogType.tryASite
 
         // WHEN
-        let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: {}, onGotItPressed: {})
+        let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: {}, onGotItPressed: {}, onFireButtonPressed: {})
 
         // THEN
         let view = try XCTUnwrap(find(OnboardingTryVisitingASiteDialog.self, in: result))
@@ -134,7 +134,7 @@ final class ContextualDaxDialogsFactoryTests: XCTestCase {
         let onGotItPressed = { onGotItPressedRun = true }
 
         // WHEN
-        let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: onDismiss, onGotItPressed: onGotItPressed)
+        let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: onDismiss, onGotItPressed: onGotItPressed, onFireButtonPressed: {})
 
         // THEN
         let view = try XCTUnwrap(find(OnboardingTrackersDoneDialog.self, in: result))
@@ -159,7 +159,7 @@ final class ContextualDaxDialogsFactoryTests: XCTestCase {
         let onGotItPressed = { onGotItPressedRun = true }
 
         // WHEN
-        let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: onDismiss, onGotItPressed: onGotItPressed)
+        let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: onDismiss, onGotItPressed: onGotItPressed, onFireButtonPressed: {})
 
         // THEN
         let view = try XCTUnwrap(find(OnboardingTrackersDoneDialog.self, in: result))
@@ -183,7 +183,7 @@ final class ContextualDaxDialogsFactoryTests: XCTestCase {
         let onGotItPressed = { onGotItPressedRun = true }
 
         // WHEN
-        let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: onDismiss, onGotItPressed: onGotItPressed)
+        let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: onDismiss, onGotItPressed: onGotItPressed, onFireButtonPressed: {})
 
         // THEN
         let view = try XCTUnwrap(find(OnboardingFireDialog.self, in: result))
@@ -210,7 +210,7 @@ final class ContextualDaxDialogsFactoryTests: XCTestCase {
         let onGotItPressed = { onGotItPressedRun = true }
 
         // WHEN
-        let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: onDismiss, onGotItPressed: onGotItPressed)
+        let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: onDismiss, onGotItPressed: onGotItPressed, onFireButtonPressed: {})
 
         // THEN
         let view = try XCTUnwrap(find(OnboardingFinalDialog.self, in: result))
@@ -221,6 +221,26 @@ final class ContextualDaxDialogsFactoryTests: XCTestCase {
         // THEN
         XCTAssertTrue(onDismissRun)
         XCTAssertTrue(onGotItPressedRun)
+    }
+
+    @MainActor
+    func testWhenMakeViewForTryFireButtonAndFireButtonIsPressedThenOnFireButtonPressedActionIsCalled() throws {
+        // GIVEN
+        var onFireButtonRun = false
+        let dialogType = ContextualDialogType.tryFireButton
+        let onFireButtonPressed = { onFireButtonRun = true }
+
+        // WHEN
+        let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: {}, onGotItPressed: {}, onFireButtonPressed: onFireButtonPressed)
+
+        // THEN
+        let view = try XCTUnwrap(find(OnboardingFireDialog.self, in: result))
+
+        // WHEN
+        view.viewModel.tryFireButton()
+
+        // THEN
+        XCTAssertTrue(onFireButtonRun)
     }
 
     @MainActor private func waitForPopoverToAppear(expectation: XCTestExpectation) {

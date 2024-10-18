@@ -85,15 +85,14 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
         )
     }
 
-    init(
+    convenience init(
         database: CoreDataDatabase,
         configMatcherProvider: RemoteMessagingConfigMatcherProviding,
         configurationStore: ConfigurationStoring,
         remoteMessagingAvailabilityProvider: RemoteMessagingAvailabilityProviding,
         remoteMessagingStoreProvider: RemoteMessagingStoreProviding = DefaultRemoteMessagingStoreProvider()
     ) {
-        self.database = database
-        self.configFetcher = RemoteMessagingConfigFetcher(
+        let configFetcher = RemoteMessagingConfigFetcher(
             configurationFetcher: ConfigurationFetcher(
                 store: configurationStore,
                 urlSession: .session(),
@@ -101,6 +100,28 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
             ),
             configurationStore: configurationStore
         )
+
+        self.init(
+            database: database,
+            configFetcher: configFetcher,
+            configMatcherProvider: configMatcherProvider,
+            remoteMessagingAvailabilityProvider: remoteMessagingAvailabilityProvider,
+            remoteMessagingStoreProvider: remoteMessagingStoreProvider
+        )
+    }
+
+    /**
+     * This designated initializer is used in unit tests where `configFetcher` needs mocking.
+     */
+    init(
+        database: CoreDataDatabase,
+        configFetcher: RemoteMessagingConfigFetching,
+        configMatcherProvider: RemoteMessagingConfigMatcherProviding,
+        remoteMessagingAvailabilityProvider: RemoteMessagingAvailabilityProviding,
+        remoteMessagingStoreProvider: RemoteMessagingStoreProviding = DefaultRemoteMessagingStoreProvider()
+    ) {
+        self.database = database
+        self.configFetcher = configFetcher
         self.configMatcherProvider = configMatcherProvider
         self.remoteMessagingAvailabilityProvider = remoteMessagingAvailabilityProvider
         self.remoteMessagingStoreProvider = remoteMessagingStoreProvider
