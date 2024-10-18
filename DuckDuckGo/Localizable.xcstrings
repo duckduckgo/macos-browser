@@ -1462,6 +1462,306 @@
         }
       }
     },
+    "ai-chat.menu.new" : {
+      "comment" : "Menu item to launch AI Chat",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neuer AI Chat"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "New AI Chat"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuevo AI Chat"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nouvel AI Chat"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuova AI Chat"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nieuwe AI Chat"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nowy AI Chat"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Novo AI Chat"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Запустить AI Chat"
+          }
+        }
+      }
+    },
+    "ai-chat.preferences.caption" : {
+      "comment" : "Ai Chat preferences explanation",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Starte den AI Chat schneller, indem du Verknüpfungen zur Symbolleiste oder zum Menü deines Browsers hinzufügst"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Launch AI Chat faster by adding shortcuts to your browser toolbar or menu"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre AI Chat más rápido añadiendo accesos directos a la barra de herramientas o al menú de tu navegador"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accélérez le lancement d'AI Chat en ajoutant des raccourcis à la barre d'outils ou au menu de votre navigateur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avvia AI Chat più velocemente aggiungendo scorciatoie alla barra degli strumenti o al menu del browser"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start AI Chat sneller door snelkoppelingen toe te voegen aan de werkbalk of het menu van je browser"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Szybciej uruchamiaj AI Chat, dodając skróty do paska narzędzi lub menu przeglądarki"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inicia o AI Chat mais rapidamente ao adicionar atalhos à barra de ferramentas ou ao menu do navegador"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Чтобы быстрее запускать функцию AI Chat, добавьте ее ярлык на панель инструментов или в меню браузера."
+          }
+        }
+      }
+    },
+    "ai-chat.preferences.learn-more" : {
+      "comment" : "AI Chat preferences button to learn more about it",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mehr erfahren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Learn More"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Más información"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En savoir plus"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ulteriori informazioni"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meer informatie"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dowiedz się więcej"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saiba mais"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Узнать больше"
+          }
+        }
+      }
+    },
+    "ai-chat.show-in-application-menu.toggle" : {
+      "comment" : "Show AI Chat in application menus",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„Neuer AI Chat“ in den Datei- und Anwendungsmenüs anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show “New AI Chat” in File and application menus"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar «Nuevo AI Chat» en los menús Archivo y Aplicación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher « Nouvel AI Chat » dans les menus Fichier et Application"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra \"AI Chat\" nel menu File e in quello delle applicazioni"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "'Nieuwe AI Chat' toevoegen aan de menu's 'Bestand' en 'Toepassing'"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokaż „Nowy AI Chat” w menu plików i aplikacji"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar “Novo AI Chat” nos menus de ficheiro e aplicação"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать опцию «Запустить AI Chat» в меню «Файл» и меню приложения"
+          }
+        }
+      }
+    },
+    "ai-chat.show-in-toolbar.toggle" : {
+      "comment" : "Show AI Chat in toolbar",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI Chat in der Browser-Symbolleiste anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show AI Chat shortcut in browser toolbar"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar el acceso directo a AI Chat en la barra de herramientas del navegador"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher le raccourci AI Chat dans la barre d'outils du navigateur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra la scorciatoia AI Chat nella barra degli strumenti del browser"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Snelkoppeling naar AI Chat weergeven op browserwerkbalk"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokaż skrót AI Chat na pasku narzędzi przeglądarki"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar atalho do AI Chat na barra de ferramentas do navegador"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать ярлык функции AI Chat на панели инструментов браузера"
+          }
+        }
+      }
+    },
     "alert.sync-bookmarks-bad-data-error-description" : {
       "comment" : "Description for alert shown when sync error occurs because of bad data",
       "extractionState" : "extracted_with_value",
@@ -37828,55 +38128,55 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Du bist bereit! Du kannst mich jederzeit im Dock antreffen.\nMöchtest du sehen, wie ich dich beschütze? Versuche, eine deiner Lieblingsseiten zu besuchen 👆\n\nBehalte die Adressleiste im Auge. Ich werde Tracker blockieren und die Sicherheit deiner Verbindung verbessern, wenn möglichu{00A0}🔒"
+            "value" : "Du bist bereit! Du kannst mich jederzeit im Dock antreffen.\n\nMöchtest du sehen, wie ich dich beschütze? Versuche, eine deiner Lieblingsseiten aufzurufen 👆\n\nBehalte die Adressleiste im Auge. Ich werde Tracker blockieren und, wenn möglich, die Sicherheit deiner Verbindung verbessern 🔒"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "You’re all set! You can find me hanging out in the Dock anytime.\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possibleu{00A0}🔒"
+            "value" : "You’re all set! You can find me hanging out in the Dock anytime.\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possible 🔒"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¡Ya está todo listo! Puedes encontrarme en el Dock en cualquier momento.\n¿Quieres ver cómo te protejo? Prueba a visitar uno de tus sitios favoritos 👆\n\nNo pierdas de vista la barra de direcciones al navegar. Bloquearé los rastreadores y mejoraré la seguridad de tu conexión cuando sea posible{00A0}🔒"
+            "value" : "¡Ya está todo listo! Puedes encontrarme en el Dock en cualquier momento.\n¿Quieres ver cómo te protejo? Prueba a visitar uno de tus sitios favoritos 👆\n\nNo pierdas de vista la barra de direcciones al navegar. Bloquearé los rastreadores y mejoraré la seguridad de tu conexión cuando sea posible 🔒"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tout est prêt ! Vous pouvez me trouver sur le Dock à tout moment.\nVous voulez voir comment je vous protège ? Essayez de visiter l'un de vos sites préférés 👆\n\nContinuez à regarder la barre d'adresse au fur et à mesure. Je bloquerai les traqueurs et mettrai à niveau la sécurité de votre connexion si possible 🔒"
+            "value" : "Tout est prêt ! Vous pouvez me trouver sur le Dock à tout moment.\nVous voulez voir comment je vous protège ? Essayez de visiter l'un de vos sites préférés 👆\n\nContinuez à regarder la barre d'adresse au fur et à mesure. Je bloquerai les traqueurs et mettrai à niveau la sécurité de votre connexion si possible 🔒"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tutto pronto! Puoi trovarmi nel dock in qualsiasi momento.\nVuoi vedere come ti proteggo? Prova a visitare uno dei tuoi siti preferiti 👆\n\nContinua a controllare la barra degli indirizzi mentre esplori. Bloccherò i sistemi di tracciamento e aggiornerò la sicurezza della tua connessione quando possibile{00A0} 🔒"
+            "value" : "Tutto pronto! Mi puoi trovare in qualsiasi momento sul Dock.\n\nVuoi vedere come ti proteggo? Prova a visitare uno dei tuoi siti preferiti 👆\n\nContinua a controllare la barra degli indirizzi mentre esplori. Bloccherò i sistemi di tracciamento e aggiornerò la sicurezza della tua connessione quando possibile 🔒"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Je bent helemaal klaar! Je kunt me altijd vinden in het Dock.\nWil je zien hoe ik je bescherm? Ga eens naar een van je favoriete websites 👆\n\nKijk tijdens het surfen goed naar de adresbalk. Ik blokkeer trackers en werk de beveiliging van je verbinding bij wanneer mogelijk 🔒"
+            "value" : "Je bent helemaal klaar! Je kunt me altijd vinden in de Dock.\n\nWil je zien hoe ik je bescherm? Ga eens naar een van je favoriete websites 👆\n\nKijk tijdens het surfen goed naar de adresbalk. Ik blokkeer trackers en werk de beveiliging van je verbinding bij wanneer mogelijk 🔒"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wszystko gotowe! W każdej chwili możesz mnie znaleźć w Docku.\nChcesz zobaczyć, jak Cię chronię? Spróbuj odwiedzić jedną z ulubionych stron 👆\n\nW międzyczasie obserwuj pasek adresu. Będę blokować mechanizmy śledzące i w miarę możliwości poprawiać bezpieczeństwo połączenia 🔒"
+            "value" : "Wszystko gotowe! W każdej chwili możesz mnie znaleźć w Docku.\n\nChcesz zobaczyć, jak Cię chronię? Spróbuj odwiedzić jedną z ulubionych stron 👆\n\nW międzyczasie obserwuj pasek adresu. Będę blokować mechanizmy śledzące i w miarę możliwości poprawiać bezpieczeństwo połączenia 🔒"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Está tudo pronto! Podes encontrar-me na Dock em qualquer altura.\nQueres ver como te protejo? Experimenta visitar um dos teus sites favoritos 👆\n\nContinua a observar a barra de endereço à medida que vais avançando. Vou bloquear os rastreadores e melhorar a segurança da tua ligação sempre que possível 🔒"
+            "value" : "Está tudo pronto! Podes encontrar-me na Dock em qualquer altura.\nQueres ver como te protejo? Experimenta visitar um dos teus sites favoritos 👆\n\nContinua a observar a barra de endereço à medida que vais avançando. Vou bloquear os rastreadores e melhorar a segurança da tua ligação sempre que possível 🔒"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Готово! Теперь меня всегда можно найти на док-панели.\nВам интересно, как я защищаю вашу конфиденциальность? Зайдите на свой любимый сайт...👆\n\nИ следите за адресной строкой. По возможности я заблокирую все трекеры и сделаю соединение более безопасным {00A0}🔒"
+            "value" : "Готово! Теперь меня всегда можно найти на док-панели.\n\nХотите узнать, как я защищаю вашу конфиденциальность? Зайдите на свой любимый сайт...👆\n\nИ следите за адресной строкой. Я по возможности буду блокировать трекеры и обеспечивать вам более безопасное соединение 🔒"
           }
         }
       }
@@ -37888,55 +38188,55 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Du bist bereit!\n\nMöchtest du sehen, wie ich dich beschütze? Versuche, eine deiner Lieblingsseiten zu besuchen 👆\n\nBehalte die Adressleiste im Auge. Ich werde Tracker blockieren und die Sicherheit deiner Verbindung verbessern, wenn möglich 🔒"
+            "value" : "Du bist bereit!\n\nMöchtest du sehen, wie ich dich beschütze? Versuche, eine deiner Lieblingsseiten aufzurufen 👆\n\nBehalte die Adressleiste im Auge. Ich werde Tracker blockieren und, wenn möglich, die Sicherheit deiner Verbindung verbessern 🔒"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "You’re all set!\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possibleu{00A0}🔒"
+            "value" : "You’re all set!\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possible 🔒"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¡Ya está todo listo!\n\n¿Quieres ver cómo te protejo? Prueba a visitar uno de tus sitios favoritos 👆\n\nSigue viendo la barra de direcciones sobre la marcha. Bloquearé los rastreadores y mejoraré la seguridad de tu conexión cuando sea posible 🔒"
+            "value" : "¡Ya está todo listo!\n\n¿Quieres ver cómo te protejo? Prueba a visitar uno de tus sitios favoritos 👆\n\nNo pierdas de vista la barra de direcciones al navegar. Bloquearé los rastreadores y mejoraré la seguridad de tu conexión cuando sea posible 🔒"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tout est prêt !\n\nVous voulez voir comment je vous protège ? Essayez de visiter l'un de vos sites préférés 👆\n\n Continuez à regarder la barre d'adresse au fur et à mesure. Je bloquerai les traqueurs et mettrai à niveau la sécurité de votre connexion si possible 🔒"
+            "value" : "Tout est prêt !\n\nVous voulez voir comment je vous protège ? Essayez de visiter l'un de vos sites préférés 👆\n\nContinuez à regarder la barre d'adresse au fur et à mesure. Je bloquerai les traqueurs et mettrai à niveau la sécurité de votre connexion si possible 🔒"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tutto pronto.\n\nVuoi vedere come ti proteggo? Prova a visitare uno dei tuoi siti preferiti 👆Continua a controllare la barra degli indirizzi mentre esplori. Bloccherò i sistemi di tracciamento e aggiornerò la sicurezza della tua connessione quando possibile 🔒"
+            "value" : "Tutto pronto!Vuoi vedere come ti proteggo? Prova a visitare uno dei tuoi siti preferiti 👆\n\nContinua a controllare la barra degli indirizzi mentre esplori. Bloccherò i sistemi di tracciamento e aggiornerò la sicurezza della tua connessione quando possibile 🔒"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Je bent helemaal klaar!\n\nWil je zien hoe ik je bescherm? Ga eens naar een van je favoriete websites 👆 \n\n Kijk tijdens het surfen goed naar de adresbalk. Ik blokkeer trackers en werk de beveiliging van je verbinding bij wanneer mogelijk 🔒"
+            "value" : "Je bent helemaal klaar!\n\nWil je zien hoe ik je bescherm? Ga eens naar een van je favoriete websites 👆\n\nKijk tijdens het surfen goed naar de adresbalk. Ik blokkeer trackers en werk de beveiliging van je verbinding bij wanneer mogelijk 🔒"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wszystko gotowe!\n\nChcesz zobaczyć, jak Cię chronię? Spróbuj odwiedzić jedną z ulubionych stron 👆\n\nW międzyczasie obserwuj pasek adresu. Będę blokować mechanizmy śledzące i w miarę możliwości poprawiać bezpieczeństwo połączenia 🔒"
+            "value" : "Wszystko gotowe!\n\nChcesz zobaczyć, jak Cię chronię? Spróbuj odwiedzić jedną z ulubionych stron 👆\n\nW międzyczasie obserwuj pasek adresu. Będę blokować mechanizmy śledzące i w miarę możliwości poprawiać bezpieczeństwo połączenia 🔒"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Estás tudo pronto!\n\nQueres ver como te protejo? Experimenta visitar um dos teus sites favoritos 👆\n\nContinua a observar a barra de endereço à medida que vais avançando. Vou bloquear os rastreadores e melhorar a segurança da tua ligação sempre que possível 🔒"
+            "value" : "Está tudo pronto!\n\nQueres ver como te protejo? Experimenta visitar um dos teus sites favoritos 👆\n\nContinua a observar a barra de endereço à medida que vais avançando. Vou bloquear os rastreadores e melhorar a segurança da tua ligação sempre que possível 🔒"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Все готово!\n\nХотите увидеть, как я вас защищаю? Зайдите на один из любимых сайтов 👆\n\nСледите за адресной строкой. Я по возможности буду блокировать трекеры и обеспечивать вам более безопасное соединение 🔒"
+            "value" : "Готово!\n\nХотите узнать, как я защищаю вашу конфиденциальность? Зайдите на свой любимый сайт...👆\n\nИ следите за адресной строкой. Я по возможности буду блокировать трекеры и обеспечивать вам более безопасное соединение 🔒"
           }
         }
       }
@@ -50374,6 +50674,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Добавить на док-панель…"
+          }
+        }
+      }
+    },
+    "preferences.ai-chat" : {
+      "comment" : "Title of the option to show AI Chat in preferences",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "KI-Chat"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "AI Chat"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chat de IA"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chat IA"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chat IA"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI-chat"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Czat AI"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chat com IA"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Чат с ИИ"
           }
         }
       }
