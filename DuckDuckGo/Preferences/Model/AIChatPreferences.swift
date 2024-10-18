@@ -18,87 +18,64 @@
 
 import Combine
 import Foundation
+import BrowserServicesKit
 
 final class AIChatPreferences: ObservableObject {
     static let shared = AIChatPreferences()
-
-    private let pinningManager: PinningManager
-    private var preferencesStorage: AIChatPreferencesStorage
-    private let learnMoreURL = URL(string: "https://duckduckgo.com/duckduckgo-help-pages/aichat/")!
+    private var storage: AIChatPreferencesStorage
     private var cancellables = Set<AnyCancellable>()
+    private let configuration: AIChatMenuVisibilityConfigurable
+    private let learnMoreURL = URL(string: "https://duckduckgo.com/duckduckgo-help-pages/aichat/")!
 
-    init(storage: AIChatPreferencesStorage = AIChatPreferencesUserDefaultsStorage(),
-         pinningManager: PinningManager = LocalPinningManager.shared) {
-        self.preferencesStorage = storage
-        self.showShortcutInApplicationMenu = storage.showShortcutInApplicationMenu
-        self.pinningManager = pinningManager
-        self.showShortcutInToolbar = pinningManager.isPinned(.aiChat)
-        subscribeToShowInBrowserToolbarSettingsChanges()
+    init(storage: AIChatPreferencesStorage = DefaultAIChatPreferencesStorage(),
+         configuration: AIChatMenuVisibilityConfigurable = AIChatMenuConfiguration()) {
+        self.storage = storage
+        self.configuration = configuration
+
+        showShortcutInToolbar = storage.shouldDisplayToolbarShortcut
+        showShortcutInApplicationMenu = storage.showShortcutInApplicationMenu
+
+        subscribeToShowInToolbarSettingsChanges()
+        subscribeToShowInApplicationMenuSettingsChanges()
+    }
+
+    func subscribeToShowInToolbarSettingsChanges() {
+        storage.shouldDisplayToolbarShortcutPublisher
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .assign(to: \.showShortcutInToolbar, onWeaklyHeld: self)
+            .store(in: &cancellables)
+    }
+
+    func subscribeToShowInApplicationMenuSettingsChanges() {
+        storage.showShortcutInApplicationMenuPublisher
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .assign(to: \.showShortcutInApplicationMenu, onWeaklyHeld: self)
+            .store(in: &cancellables)
+    }
+
+    var shouldShowToolBarShortcutOption: Bool {
+        self.configuration.isFeatureEnabledForToolbarShortcut
+    }
+
+    var shouldShowApplicationMenuShortcutOption: Bool {
+        self.configuration.isFeatureEnabledForApplicationMenuShortcut
     }
 
     @Published var showShortcutInToolbar: Bool {
         didSet {
-            if showShortcutInToolbar {
-                pinningManager.pin(.aiChat)
-            } else {
-                pinningManager.unpin(.aiChat)
-            }
+            storage.shouldDisplayToolbarShortcut = showShortcutInToolbar
         }
     }
 
     @Published var showShortcutInApplicationMenu: Bool {
         didSet {
-            preferencesStorage.showShortcutInApplicationMenu = showShortcutInApplicationMenu
+            storage.showShortcutInApplicationMenu = showShortcutInApplicationMenu
         }
     }
 
     @MainActor func openLearnMoreLink() {
         WindowControllersManager.shared.show(url: learnMoreURL, source: .ui, newTab: true)
-    }
-
-    private func subscribeToShowInBrowserToolbarSettingsChanges() {
-        NotificationCenter.default.publisher(for: .PinnedViewsChanged).sink { [weak self] notification in
-            guard let self = self else {
-                return
-            }
-
-            if let userInfo = notification.userInfo as? [String: Any],
-               let viewType = userInfo[LocalPinningManager.pinnedViewChangedNotificationViewTypeKey] as? String,
-               let view = PinnableView(rawValue: viewType) {
-                switch view {
-                case .aiChat: self.showShortcutInToolbar = self.pinningManager.isPinned(.aiChat)
-                default: break
-                }
-            }
-        }
-        .store(in: &cancellables)
-    }
-}
-
-protocol AIChatPreferencesStorage {
-    var showShortcutInApplicationMenu: Bool { get set }
-}
-
-struct AIChatPreferencesUserDefaultsStorage: AIChatPreferencesStorage {
-    private let userDefaults: UserDefaults
-
-    init(userDefaults: UserDefaults = .standard) {
-        self.userDefaults = userDefaults
-    }
-
-    var showShortcutInApplicationMenu: Bool {
-        get { userDefaults.showAIChatShortcutInApplicationMenu }
-        set { userDefaults.showAIChatShortcutInApplicationMenu = newValue }
-    }
-}
-
-private extension UserDefaults {
-    enum Keys {
-        static let showAIChatShortcutInApplicationMenu = "aichat.showAIChatShortcutInApplicationMenu"
-    }
-
-    var showAIChatShortcutInApplicationMenu: Bool {
-        get { bool(forKey: Keys.showAIChatShortcutInApplicationMenu) }
-        set { set(newValue, forKey: Keys.showAIChatShortcutInApplicationMenu) }
     }
 }

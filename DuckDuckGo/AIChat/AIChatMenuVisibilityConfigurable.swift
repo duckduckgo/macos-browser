@@ -21,57 +21,72 @@ import Combine
 protocol AIChatMenuVisibilityConfigurable {
     var shouldDisplayApplicationMenuShortcut: Bool { get }
     var shouldDisplayToolbarShortcut: Bool { get }
+
+    var isFeatureEnabledForApplicationMenuShortcut: Bool { get }
+    var isFeatureEnabledForToolbarShortcut: Bool { get }
+
     var shortcutURL: URL { get }
     var valuesChangedPublisher: PassthroughSubject<Void, Never> { get }
 }
 
 final class AIChatMenuConfiguration: AIChatMenuVisibilityConfigurable {
-    var valuesChangedPublisher = PassthroughSubject<Void, Never>()
-    private var cancellables = Set<AnyCancellable>()
-    private let preferences: AIChatPreferences
-
     enum ShortcutType {
         case applicationMenu
         case toolbar
     }
 
-    // MARK: - Public
+    private var cancellables = Set<AnyCancellable>()
+    private var storage: AIChatPreferencesStorage
 
-    var shouldDisplayApplicationMenuShortcut: Bool {
-        return isFeatureEnabledFor(shortcutType: .applicationMenu) && preferences.showShortcutInApplicationMenu
+    var valuesChangedPublisher = PassthroughSubject<Void, Never>()
+
+    var isFeatureEnabledForApplicationMenuShortcut: Bool {
+        isFeatureEnabledFor(shortcutType: .applicationMenu)
+    }
+
+    var isFeatureEnabledForToolbarShortcut: Bool {
+        isFeatureEnabledFor(shortcutType: .toolbar)
     }
 
     var shouldDisplayToolbarShortcut: Bool {
-        return isFeatureEnabledFor(shortcutType: .toolbar) && preferences.showShortcutInToolbar
+        return isFeatureEnabledForToolbarShortcut && storage.shouldDisplayToolbarShortcut
+    }
+
+    var shouldDisplayApplicationMenuShortcut: Bool {
+        return isFeatureEnabledForApplicationMenuShortcut && storage.showShortcutInApplicationMenu
     }
 
     var shortcutURL: URL {
         URL(string: "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=2")!
     }
 
-    init(preferences: AIChatPreferences = .shared) {
-        self.preferences = preferences
-        subscribeToValueChanges()
+    init(storage: AIChatPreferencesStorage = DefaultAIChatPreferencesStorage()) {
+        self.storage = storage
+        self.subscribeToValuesChanged()
     }
 
-    // MARK: - Private
-
-    private func subscribeToValueChanges() {
-        preferences.$showShortcutInToolbar
-            .merge(with: preferences.$showShortcutInApplicationMenu)
-            .dropFirst()
+    private func subscribeToValuesChanged() {
+        storage.shouldDisplayToolbarShortcutPublisher
+            .removeDuplicates()
             .sink { [weak self] _ in
-                self?.valuesChangedPublisher.send(())
-            }
-            .store(in: &cancellables)
+                self?.valuesChangedPublisher.send()
+            }.store(in: &cancellables)
+
+        storage.showShortcutInApplicationMenuPublisher
+            .removeDuplicates()
+            .sink { [weak self] _ in
+                self?.valuesChangedPublisher.send()
+            }.store(in: &cancellables)
     }
 
     private func isFeatureEnabledFor(shortcutType: ShortcutType) -> Bool {
         switch shortcutType {
         case .applicationMenu:
-            return true
+            // Use privacy config here
+            return false
         case .toolbar:
-            return true
+            // Use privacy config here
+            return false
         }
     }
 }

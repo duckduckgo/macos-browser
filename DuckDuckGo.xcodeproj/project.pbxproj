@@ -250,6 +250,8 @@
 		316913272BD2B76F0051B46D /* DataBrokerPrerequisitesStatusVerifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316913252BD2B76F0051B46D /* DataBrokerPrerequisitesStatusVerifier.swift */; };
 		316913292BD2C7570051B46D /* DataBrokerProtectionErrorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316913282BD2C7570051B46D /* DataBrokerProtectionErrorViewController.swift */; };
 		3169132A2BD2C7570051B46D /* DataBrokerProtectionErrorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316913282BD2C7570051B46D /* DataBrokerProtectionErrorViewController.swift */; };
+		316C48EF2CC2B232000B08C1 /* AIChatPreferencesStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316C48EE2CC2B231000B08C1 /* AIChatPreferencesStorage.swift */; };
+		316C48F02CC2B232000B08C1 /* AIChatPreferencesStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316C48EE2CC2B231000B08C1 /* AIChatPreferencesStorage.swift */; };
 		3171D6B82889849F0068632A /* CookieManagedNotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3171D6B72889849F0068632A /* CookieManagedNotificationView.swift */; };
 		3171D6BA288984D00068632A /* BadgeAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3171D6B9288984D00068632A /* BadgeAnimationView.swift */; };
 		3171D6DB2889B64D0068632A /* CookieManagedNotificationContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3171D6DA2889B64D0068632A /* CookieManagedNotificationContainerView.swift */; };
@@ -3320,6 +3322,7 @@
 		316913222BD2B6250051B46D /* DataBrokerProtectionPixelsHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionPixelsHandler.swift; sourceTree = "<group>"; };
 		316913252BD2B76F0051B46D /* DataBrokerPrerequisitesStatusVerifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerPrerequisitesStatusVerifier.swift; sourceTree = "<group>"; };
 		316913282BD2C7570051B46D /* DataBrokerProtectionErrorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionErrorViewController.swift; sourceTree = "<group>"; };
+		316C48EE2CC2B231000B08C1 /* AIChatPreferencesStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIChatPreferencesStorage.swift; sourceTree = "<group>"; };
 		3171D6B72889849F0068632A /* CookieManagedNotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieManagedNotificationView.swift; sourceTree = "<group>"; };
 		3171D6B9288984D00068632A /* BadgeAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeAnimationView.swift; sourceTree = "<group>"; };
 		3171D6DA2889B64D0068632A /* CookieManagedNotificationContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieManagedNotificationContainerView.swift; sourceTree = "<group>"; };
@@ -5193,6 +5196,7 @@
 		31521ABE2CC0139C00248E6F /* AIChat */ = {
 			isa = PBXGroup;
 			children = (
+				316C48EE2CC2B231000B08C1 /* AIChatPreferencesStorage.swift */,
 				31521AC22CC01BC300248E6F /* AIChatTabOpener.swift */,
 				31521ABF2CC013A400248E6F /* AIChatMenuVisibilityConfigurable.swift */,
 			);
@@ -10875,6 +10879,7 @@
 				3706FB56293F65D500E42796 /* NSSavePanelExtension.swift in Sources */,
 				B6B5F5802B024105008DB58A /* DataImportSummaryView.swift in Sources */,
 				4B9DB0422A983B24000927DB /* WaitlistDialogView.swift in Sources */,
+				316C48EF2CC2B232000B08C1 /* AIChatPreferencesStorage.swift in Sources */,
 				3706FB57293F65D500E42796 /* AppPrivacyConfigurationDataProvider.swift in Sources */,
 				3199AF7A2C80734A003AEBDC /* DuckPlayerOnboardingViewModel.swift in Sources */,
 				C1B1CBE22BE1915100B6049C /* DataImportShortcutsViewModel.swift in Sources */,
@@ -12578,6 +12583,7 @@
 				4BE65476271FCD41008D1D63 /* PasswordManagementCreditCardItemView.swift in Sources */,
 				AA5C8F59258FE21F00748EB7 /* NSTextFieldExtension.swift in Sources */,
 				3706FEC8293F6F7500E42796 /* BWManagement.swift in Sources */,
+				316C48F02CC2B232000B08C1 /* AIChatPreferencesStorage.swift in Sources */,
 				B6830961274CDE99004B46BB /* FireproofDomainsContainer.swift in Sources */,
 				B687B7CC2947A1E9001DEA6F /* ExternalAppSchemeHandler.swift in Sources */,
 				B65536AE2685E17200085A79 /* GeolocationService.swift in Sources */,
