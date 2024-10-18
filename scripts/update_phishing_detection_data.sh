@@ -34,7 +34,7 @@ performUpdate() {
 
 	if [ "$old_revision" -lt "$new_revision" ]; then
         curl -o "$temp_filename" -s "${API_URL}/${data_type}"
-		jq -r '.insert' "$temp_filename" > "$data_path"
+		jq -rc '.insert' "$temp_filename" > "$data_path"
 
 		new_sha="$(shasum -a 256 "$data_path" | awk -F ' ' '{print $1}')"
 
