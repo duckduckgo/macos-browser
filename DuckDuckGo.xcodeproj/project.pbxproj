@@ -1051,6 +1051,8 @@
 		37219B382CBFBC8200C9D7A8 /* NewTabSearchBoxExperimentPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37219B362CBFBC8200C9D7A8 /* NewTabSearchBoxExperimentPixel.swift */; };
 		37219B3A2CBFD4F300C9D7A8 /* NewTabPageSearchBoxExperiment+Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37219B392CBFD4F300C9D7A8 /* NewTabPageSearchBoxExperiment+Logger.swift */; };
 		37219B3B2CBFD4F300C9D7A8 /* NewTabPageSearchBoxExperiment+Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37219B392CBFD4F300C9D7A8 /* NewTabPageSearchBoxExperiment+Logger.swift */; };
+		37219B3D2CC27DB700C9D7A8 /* NewTabPageSearchBoxExperimentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37219B3C2CC27DB300C9D7A8 /* NewTabPageSearchBoxExperimentTests.swift */; };
+		37219B3E2CC27DB700C9D7A8 /* NewTabPageSearchBoxExperimentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37219B3C2CC27DB300C9D7A8 /* NewTabPageSearchBoxExperimentTests.swift */; };
 		372217802B3337FE00B8E9C2 /* TestUtils in Frameworks */ = {isa = PBXBuildFile; productRef = 3722177F2B3337FE00B8E9C2 /* TestUtils */; };
 		372217822B33380700B8E9C2 /* TestUtils in Frameworks */ = {isa = PBXBuildFile; productRef = 372217812B33380700B8E9C2 /* TestUtils */; };
 		37269EFB2B332F9E005E8E46 /* Common in Frameworks */ = {isa = PBXBuildFile; productRef = 37269EFA2B332F9E005E8E46 /* Common */; };
@@ -3387,6 +3389,7 @@
 		37219B332CBFBBDB00C9D7A8 /* NewTabPageSearchBoxExperiment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageSearchBoxExperiment.swift; sourceTree = "<group>"; };
 		37219B362CBFBC8200C9D7A8 /* NewTabSearchBoxExperimentPixel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabSearchBoxExperimentPixel.swift; sourceTree = "<group>"; };
 		37219B392CBFD4F300C9D7A8 /* NewTabPageSearchBoxExperiment+Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NewTabPageSearchBoxExperiment+Logger.swift"; sourceTree = "<group>"; };
+		37219B3C2CC27DB300C9D7A8 /* NewTabPageSearchBoxExperimentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageSearchBoxExperimentTests.swift; sourceTree = "<group>"; };
 		372A0FEB2B2379310033BF7F /* SyncMetricsEventsHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncMetricsEventsHandler.swift; sourceTree = "<group>"; };
 		372BC2A02A4AFA47001D8FD5 /* SyncCredentialsAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncCredentialsAdapter.swift; sourceTree = "<group>"; };
 		373A1AA7283ED1B900586521 /* BookmarkHTMLReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkHTMLReader.swift; sourceTree = "<group>"; };
@@ -6465,6 +6468,7 @@
 		4BF6961B28BE90E800D402D4 /* HomePage */ = {
 			isa = PBXGroup;
 			children = (
+				37219B3C2CC27DB300C9D7A8 /* NewTabPageSearchBoxExperimentTests.swift */,
 				56534DEB29DF251C00121467 /* Mocks */,
 				4BF6961C28BE911100D402D4 /* RecentlyVisitedSiteModelTests.swift */,
 				569277C329DEE09D00B633EF /* ContinueSetUpModelTests.swift */,
@@ -11670,6 +11674,7 @@
 				EEC8EB402982CD550065AA39 /* JSAlertViewModelTests.swift in Sources */,
 				BDA764922BC4E57200D0400C /* MockVPNLocationFormatter.swift in Sources */,
 				3706FE4B293F661700E42796 /* BookmarksHTMLImporterTests.swift in Sources */,
+				37219B3E2CC27DB700C9D7A8 /* NewTabPageSearchBoxExperimentTests.swift in Sources */,
 				9FA75A3F2BA00E1400DA5FA6 /* BookmarksBarMenuFactoryTests.swift in Sources */,
 				56D145E929E6BB6300E3488A /* CapturingDataImportProvider.swift in Sources */,
 				3706FE4C293F661700E42796 /* CSVParserTests.swift in Sources */,
@@ -13035,6 +13040,7 @@
 				9FAD623A2BCFDB32007F3A65 /* WebsiteInfoHelpers.swift in Sources */,
 				56A054282C201D04007D8FAB /* MockSchemeTask.swift in Sources */,
 				56A054472C22536A007D8FAB /* CapturingOnboardingActionsManager.swift in Sources */,
+				37219B3D2CC27DB700C9D7A8 /* NewTabPageSearchBoxExperimentTests.swift in Sources */,
 				C13909F42B85FD79001626ED /* AutofillDeleteAllPasswordsExecutorTests.swift in Sources */,
 				37534C9E28104D9B002621E7 /* TabLazyLoaderTests.swift in Sources */,
 				37D046992C7D037500AEAA50 /* CapturingUserBackgroundImagesManager.swift in Sources */,
