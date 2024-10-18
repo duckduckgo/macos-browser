@@ -66,7 +66,9 @@ extension AppDelegate {
     }
 
     @objc func newAIChat(_ sender: Any?) {
-        AIChatTabOpener.openAIChatTab()
+        DispatchQueue.main.async {
+            AIChatTabOpener.openAIChatTab()
+        }
     }
 
     @objc func newTab(_ sender: Any?) {
