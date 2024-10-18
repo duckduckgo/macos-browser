@@ -70,7 +70,7 @@ final class BookmarkStoreMock: BookmarkStore {
     var capturedBookmark: Bookmark?
 
     var loadAllCalled = false
-    private var bookmarks: [BaseBookmarkEntity]?
+    var bookmarks: [BaseBookmarkEntity]?
     var loadError: Error?
     func loadAll(type: BookmarkStoreFetchPredicateType, completion: @escaping ([BaseBookmarkEntity]?, Error?) -> Void) {
         func flattenedBookmarks(_ entities: [BaseBookmarkEntity]) -> [BaseBookmarkEntity] {
