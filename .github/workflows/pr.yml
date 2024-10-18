@@ -306,7 +306,7 @@ jobs:
 
     - name: Upload failed integration tests log
       uses: actions/upload-artifact@v4
-      if: failure()
+      if: failure() || cancelled()
       with:
         name: ${{ matrix.flavor }}-integrationtests-xcodebuild.log
         path: ${{ matrix.flavor }}-integrationtests-xcodebuild.log
@@ -314,7 +314,7 @@ jobs:
 
     - name: Upload failed integration tests xcresult
       uses: actions/upload-artifact@v4
-      if: failure()
+      if: failure() || cancelled()
       with:
         name: ${{ matrix.flavor }}-integrationtests.xcresult
         path: ${{ matrix.flavor }}-integrationtests.xcresult
