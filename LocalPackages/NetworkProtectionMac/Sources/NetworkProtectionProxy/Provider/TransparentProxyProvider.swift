@@ -80,8 +80,11 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
     private let monitor = nw_path_monitor_create()
     var directInterface: nw_interface_t?
 
+    var vpnPath: nw_interface_t?
+
     private let bMonitor = NWPathMonitor()
     var interface: NWInterface?
+    var vpnInterface: NWInterface?
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -287,7 +290,7 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
             return false
         }
 
-        guard let interface else {
+        guard let interface, let vpnInterface else {
             logger.error("[TCP: \(String(describing: flow), privacy: .public)] Expected an interface to exclude traffic through")
             return false
         }
@@ -300,6 +303,7 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
             case .domainRule:
                 logger.debug("[TCP: \(String(describing: flow), privacy: .public)] Blocking traffic due to domain rule")
             }
+            return true
         case .excludeFromVPN(let reason):
             switch reason {
             case .appRule:
@@ -308,6 +312,15 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
                 logger.debug("[TCP: \(String(describing: flow), privacy: .public)] Excluding traffic due to domain rule")
             }
         case .routeThroughVPN:
+            if ["34.160.111.145", "ifconfig.me"].contains(remoteEndpoint.hostname),
+               let flowInterface = flow.networkInterface,
+               let directInterface,
+               nw_interface_get_index(flowInterface) == nw_interface_get_index(directInterface) {
+
+                logger.debug("[UDP: \(String(describing: flow), privacy: .public)] 🔴 TUNNELVISION PREVENTED!")
+
+                return true
+            }
             return false
         }
 
@@ -325,6 +338,34 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
 
         return true
     }
+
+    func getInterfaceName(from interface: nw_interface_t) -> String {
+        let interfaceName = nw_interface_get_name(interface)
+        return String(cString: interfaceName)
+    }
+/*
+    func getInterfaceIPAddress(from endpoint: nw_endpoint_t) -> String? {
+        let address = nw_endpoint_get_address(endpoint)
+
+        // Convert sockaddr to a readable string
+        var hostname = [CChar](repeating: 0, count: Int(NI_MAXHOST))
+
+        let result = getnameinfo(
+            address,
+            socklen_t(address.pointee.sa_len),
+            &hostname,
+            socklen_t(hostname.count),
+            nil,
+            0,
+            NI_NUMERICHOST
+        )
+
+        if result == 0 {
+            return String(cString: hostname)
+        }
+
+        return nil
+    }*/
 
     override public func handleNewUDPFlow(_ flow: NEAppProxyUDPFlow, initialRemoteEndpoint remoteEndpoint: NWEndpoint) -> Bool {
 
@@ -391,6 +432,10 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
             self?.interface = path.availableInterfaces.first { interface in
                 interface.type != .other
             }
+
+            self?.vpnInterface = path.availableInterfaces.first { interface in
+                interface.name.hasPrefix("utun")
+            }
         }
         bMonitor.start(queue: .main)
 
@@ -401,13 +446,17 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
             let interfaces = SCNetworkInterfaceCopyAll()
             logger.log("Available interfaces updated: \(String(reflecting: interfaces), privacy: .public)")
 
-            nw_path_enumerate_interfaces(path) { interface in
-                guard nw_interface_get_type(interface) != nw_interface_type_other else {
-                    return true
+            nw_path_enumerate_interfaces(path) { [weak self] interface in
+                guard let self else {
+                    return false
                 }
 
-                self.directInterface = interface
-                return false
+                if nw_interface_get_type(interface) != nw_interface_type_other {
+                    self.directInterface = interface
+                    return false
+                }
+
+                return true
             }
         }
 
