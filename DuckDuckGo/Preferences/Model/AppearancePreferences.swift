@@ -30,6 +30,7 @@ protocol AppearancePreferencesPersistor {
     var isFavoriteVisible: Bool { get set }
     var isContinueSetUpVisible: Bool { get set }
     var isRecentActivityVisible: Bool { get set }
+    var isSearchBarVisible: Bool { get set }
     var showBookmarksBar: Bool { get set }
     var bookmarksBarAppearance: BookmarksBarAppearance { get set }
     var homeButtonPosition: HomeButtonPosition { get set }
@@ -55,6 +56,9 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
 
     @UserDefaultsWrapper(key: .homePageIsRecentActivityVisible, defaultValue: true)
     var isRecentActivityVisible: Bool
+
+    @UserDefaultsWrapper(key: .homePageIsSearchBarVisible, defaultValue: true)
+    var isSearchBarVisible: Bool
 
     @UserDefaultsWrapper(key: .showBookmarksBar, defaultValue: false)
     var showBookmarksBar: Bool
@@ -227,6 +231,12 @@ final class AppearancePreferences: ObservableObject {
         }
     }
 
+    @Published var isSearchBarVisible: Bool {
+        didSet {
+            persistor.isSearchBarVisible = isSearchBarVisible
+        }
+    }
+
     @Published var showBookmarksBar: Bool {
         didSet {
             persistor.showBookmarksBar = showBookmarksBar
@@ -291,6 +301,7 @@ final class AppearancePreferences: ObservableObject {
         isFavoriteVisible = persistor.isFavoriteVisible
         isRecentActivityVisible = persistor.isRecentActivityVisible
         isContinueSetUpVisible = persistor.isContinueSetUpVisible
+        isSearchBarVisible = persistor.isSearchBarVisible
         showBookmarksBar = persistor.showBookmarksBar
         bookmarksBarAppearance = persistor.bookmarksBarAppearance
         homeButtonPosition = persistor.homeButtonPosition
