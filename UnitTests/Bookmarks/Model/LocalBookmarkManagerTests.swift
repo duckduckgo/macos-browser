@@ -182,7 +182,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
         undoManager.undo()
         _=try await bookmarkManager.$list.filter { $0?.topLevelEntities.count == 3 }.timeout(1).first().promise().get()
 
-        assertEqual(bookmarkStoreMock.saveEntitiesAtIndicesCalledWith, [(removedBookmark, 1)])
+        assertEqual(bookmarkStoreMock.saveEntitiesAtIndicesCalledWith, [(removedBookmark, 1, nil)])
         // update the bookmark because it‘s recreated with a new id
         guard let removedBookmark = bookmarkManager.getBookmark(for: .duckDuckGoEmail) else { XCTFail("Could not fetch bookmark"); return }
 
@@ -199,7 +199,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
         XCTAssertTrue(undoManager.canUndo)
         undoManager.undo()
 
-        assertEqual(bookmarkStoreMock.saveEntitiesAtIndicesCalledWith, [(removedBookmark, 1)])
+        assertEqual(bookmarkStoreMock.saveEntitiesAtIndicesCalledWith, [(removedBookmark, 1, nil)])
         XCTAssertTrue(undoManager.canRedo)
     }
 
@@ -236,12 +236,12 @@ final class LocalBookmarkManagerTests: XCTestCase {
             return
         }
         assertEqual(bookmarkStoreMock.saveEntitiesAtIndicesCalledWith, [
-            (removedFolder1, 1),
-            (Bookmark(.duckDuckGoEmailLogin, parentId: removedFolder1.id), nil),
-            (Bookmark(.duckDuckGoEmailInfo, isFavorite: true, parentId: removedFolder1.id), nil),
-            (removedFolder2, nil),
-            (Bookmark(.duckDuckGoAutocomplete, isFavorite: true, parentId: removedFolder2.id), nil),
-            (Bookmark(.aboutDuckDuckGo, isFavorite: false, parentId: removedFolder2.id), nil),
+            (removedFolder1, 1, nil),
+            (Bookmark(.duckDuckGoEmailLogin, parentId: removedFolder1.id), nil, nil),
+            (Bookmark(.duckDuckGoEmailInfo, isFavorite: false, parentId: removedFolder1.id), nil, nil),
+            (removedFolder2, nil, nil),
+            (Bookmark(.duckDuckGoAutocomplete, isFavorite: false, parentId: removedFolder2.id), nil, nil),
+            (Bookmark(.aboutDuckDuckGo, isFavorite: false, parentId: removedFolder2.id), nil, nil),
         ])
 
         // redo remove
@@ -264,12 +264,12 @@ final class LocalBookmarkManagerTests: XCTestCase {
             return
         }
         assertEqual(bookmarkStoreMock.saveEntitiesAtIndicesCalledWith, [
-            (removedFolder1, 1),
-            (Bookmark(.duckDuckGoEmailLogin, parentId: removedFolder1.id), nil),
-            (Bookmark(.duckDuckGoEmailInfo, isFavorite: true, parentId: removedFolder1.id), nil),
-            (removedFolder2, nil),
-            (Bookmark(.duckDuckGoAutocomplete, isFavorite: true, parentId: removedFolder2.id), nil),
-            (Bookmark(.aboutDuckDuckGo, isFavorite: false, parentId: removedFolder2.id), nil),
+            (removedFolder1, 1, nil),
+            (Bookmark(.duckDuckGoEmailLogin, parentId: removedFolder1.id), nil, nil),
+            (Bookmark(.duckDuckGoEmailInfo, isFavorite: false, parentId: removedFolder1.id), nil, nil),
+            (removedFolder2, nil, nil),
+            (Bookmark(.duckDuckGoAutocomplete, isFavorite: false, parentId: removedFolder2.id), nil, nil),
+            (Bookmark(.aboutDuckDuckGo, isFavorite: false, parentId: removedFolder2.id), nil, nil),
         ])
         XCTAssertTrue(undoManager.canRedo)
     }
@@ -314,16 +314,16 @@ final class LocalBookmarkManagerTests: XCTestCase {
         guard let removedFolder2 = bookmarkStoreMock.savedFolder(withTitle: "Subfolder") else { return XCTFail("1. Could not fetch Subfolder") }
         guard let removedFolder3 = bookmarkStoreMock.savedFolder(withTitle: "Folder 2") else { return XCTFail("1. Could not fetch Folder 2") }
         assertEqual(bookmarkStoreMock.saveEntitiesAtIndicesCalledWith, [
-            (Bookmark(.duckDuckGo), 0),
-            (removedFolder1, 2),
-            (Bookmark(.duckDuckGoEmail), 3),
-            (removedFolder3, 4),
-            (Bookmark(.duckDuckGoMorePrivacyInfo, isFavorite: false), 5),
-            (Bookmark(.duckDuckGoEmailLogin, parentId: removedFolder1.id), nil),
-            (Bookmark(.duckDuckGoEmailInfo, isFavorite: true, parentId: removedFolder1.id), nil),
-            (removedFolder2, nil),
-            (Bookmark(.duckDuckGoAutocomplete, isFavorite: true, parentId: removedFolder2.id), nil),
-            (Bookmark(.ddgLearnMore, isFavorite: false, parentId: removedFolder3.id), nil),
+            (Bookmark(.duckDuckGo), 0, nil),
+            (removedFolder1, 2, nil),
+            (Bookmark(.duckDuckGoEmail), 3, nil),
+            (removedFolder3, 4, nil),
+            (Bookmark(.duckDuckGoMorePrivacyInfo, isFavorite: false), 5, nil),
+            (Bookmark(.duckDuckGoEmailLogin, parentId: removedFolder1.id), nil, nil),
+            (Bookmark(.duckDuckGoEmailInfo, isFavorite: false, parentId: removedFolder1.id), nil, nil),
+            (removedFolder2, nil, nil),
+            (Bookmark(.duckDuckGoAutocomplete, isFavorite: false, parentId: removedFolder2.id), nil, nil),
+            (Bookmark(.ddgLearnMore, isFavorite: false, parentId: removedFolder3.id), nil, nil),
         ])
 
         // redo remove
@@ -345,16 +345,16 @@ final class LocalBookmarkManagerTests: XCTestCase {
         guard let removedFolder2 = bookmarkStoreMock.savedFolder(withTitle: "Subfolder") else { return XCTFail("2. Could not fetch Subfolder") }
         guard let removedFolder3 = bookmarkStoreMock.savedFolder(withTitle: "Folder 2") else { return XCTFail("2. Could not fetch Folder 2") }
         assertEqual(bookmarkStoreMock.saveEntitiesAtIndicesCalledWith, [
-            (Bookmark(.duckDuckGo), 0),
-            (removedFolder1, 2),
-            (Bookmark(.duckDuckGoEmail), 3),
-            (removedFolder3, 4),
-            (Bookmark(.duckDuckGoMorePrivacyInfo, isFavorite: false), 5),
-            (Bookmark(.duckDuckGoEmailLogin, parentId: removedFolder1.id), nil),
-            (Bookmark(.duckDuckGoEmailInfo, isFavorite: true, parentId: removedFolder1.id), nil),
-            (removedFolder2, nil),
-            (Bookmark(.duckDuckGoAutocomplete, isFavorite: true, parentId: removedFolder2.id), nil),
-            (Bookmark(.ddgLearnMore, isFavorite: false, parentId: removedFolder3.id), nil),
+            (Bookmark(.duckDuckGo), 0, nil),
+            (removedFolder1, 2, nil),
+            (Bookmark(.duckDuckGoEmail), 3, nil),
+            (removedFolder3, 4, nil),
+            (Bookmark(.duckDuckGoMorePrivacyInfo, isFavorite: false), 5, nil),
+            (Bookmark(.duckDuckGoEmailLogin, parentId: removedFolder1.id), nil, nil),
+            (Bookmark(.duckDuckGoEmailInfo, isFavorite: false, parentId: removedFolder1.id), nil, nil),
+            (removedFolder2, nil, nil),
+            (Bookmark(.duckDuckGoAutocomplete, isFavorite: false, parentId: removedFolder2.id), nil, nil),
+            (Bookmark(.ddgLearnMore, isFavorite: false, parentId: removedFolder3.id), nil, nil),
         ])
         XCTAssertTrue(undoManager.canRedo)
     }
@@ -888,7 +888,7 @@ private extension LocalBookmarkManagerTests {
     func folder(id: String = UUID().uuidString, _ title: String) -> BookmarksBuilderItem {
         BookmarksBuilderItemMock.folder(id: id, title: title, items: [])
     }
-    func assertEqual(_ lhs: [(entity: BaseBookmarkEntity, index: Int?)]?, _ rhs: [(entity: BaseBookmarkEntity, index: Int?)]?, file: StaticString = #file, line: UInt = #line) {
+    func assertEqual(_ lhs: [(entity: BaseBookmarkEntity, index: Int?, indexInFavoritesArray: Int?)]?, _ rhs: [(entity: BaseBookmarkEntity, index: Int?, indexInFavoritesArray: Int?)]?, file: StaticString = #file, line: UInt = #line) {
         if lhs == nil, rhs == nil { return }
         var overviewPrinted = false
         func fail(_ message: String) {

@@ -263,7 +263,7 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
         XCTAssertEqual(sut.folders.first?.entity, folder)
 
         // Simulate Bookmark store changing data set
-        bookmarkStoreMock.save(entitiesAtIndices: [(folder2, nil)], completion: { _ in })
+        bookmarkStoreMock.save(entitiesAtIndices: [(folder2, nil, nil)], completion: { _ in })
         var expectedFolder: [BookmarkFolder] = []
         let c = sut.$folders
             .dropFirst()
