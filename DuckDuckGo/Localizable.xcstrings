@@ -35169,6 +35169,18 @@
         }
       }
     },
+    "newTab.search.bar.section.title" : {
+      "comment" : "Title of the Search Field section in the home page",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Search Field"
+          }
+        }
+      }
+    },
     "newTab.setup.default.browser.action" : {
       "comment" : "Action title on the action menu of the Default Browser card",
       "extractionState" : "extracted_with_value",
