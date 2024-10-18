@@ -25,7 +25,7 @@ import XCTest
 
 struct MockRemoteMessagingStoreProvider: RemoteMessagingStoreProviding {
     func makeRemoteMessagingStore(database: CoreDataDatabase, availabilityProvider: RemoteMessagingAvailabilityProviding) -> RemoteMessagingStoring {
-        RemoteMessagingStore(database: database, errorEvents: nil, remoteMessagingAvailabilityProvider: availabilityProvider)
+        MockRemoteMessagingStore()
     }
 }
 
