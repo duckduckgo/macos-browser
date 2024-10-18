@@ -220,6 +220,10 @@ extension HomePage.Views {
 
         @ViewBuilder
         func sectionsVisibilityContextMenuItems() -> some View {
+            if addressBarModel.shouldShowAddressBar {
+                Toggle(UserText.newTabMenuItemShowSearchBar, isOn: $model.isSearchBarVisible)
+                    .toggleStyle(.checkbox)
+            }
             if model.isContinueSetUpAvailable {
                 Toggle(UserText.newTabMenuItemShowContinuteSetUp, isOn: $model.isContinueSetUpVisible)
                     .toggleStyle(.checkbox)

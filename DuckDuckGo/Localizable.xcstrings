@@ -35109,6 +35109,18 @@
         }
       }
     },
+    "newTab.menu.item.show.search.bar" : {
+      "comment" : "Title of the menu item in the home page to show/hide search bar section",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show Search Field"
+          }
+        }
+      }
+    },
     "newTab.recent.activity.section.title" : {
       "comment" : "Title of the RecentActivity section in the home page",
       "extractionState" : "extracted_with_value",
