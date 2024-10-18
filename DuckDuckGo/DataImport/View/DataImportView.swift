@@ -25,11 +25,11 @@ struct DataImportView: ModalView {
     @Environment(\.dismiss) private var dismiss
 
     @State var model: DataImportViewModel
-    let isFromOnboarding: Bool
+    let title: String
 
-    init(model: DataImportViewModel = DataImportViewModel(), isFromOnboarding: Bool = false) {
+    init(model: DataImportViewModel = DataImportViewModel(), title: String = UserText.importDataTitle) {
         self._model = State(initialValue: model)
-        self.isFromOnboarding = isFromOnboarding
+        self.title = title
     }
 
     struct ProgressState {
@@ -82,13 +82,15 @@ struct DataImportView: ModalView {
     }
 
     private func viewHeader() -> some View {
-        let title = isFromOnboarding ? UserText.importDataTitleOnboarding : UserText.importDataTitle
         return VStack(alignment: .leading, spacing: 0) {
-            if case .summary(let dataTypes, let isFileImport) = model.screen {
-                VStack {
-                    Image("Success-96")
-                    Text("Import complete!", comment: "message about Passwords and or bookmarks Data Import completion")
+            if case .summary = model.screen {
+                VStack(alignment: .leading) {
+                    Image(.success96)
+                    Text(UserText.importDataSuccessTitle)
+                        .foregroundColor(.primary)
+                        .font(.system(size: 17, weight: .bold))
                 }
+                .padding(.bottom, 16)
             } else if case .shortcuts = model.screen {
                 Text(UserText.importDataShortcutsTitle)
                     .font(.title2.weight(.semibold))

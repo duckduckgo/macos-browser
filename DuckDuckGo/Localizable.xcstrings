@@ -8973,7 +8973,6 @@
     },
     "Bookmarks Import Complete:" : {
       "comment" : "Bookmarks Data Import result summary headline",
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -26552,7 +26551,6 @@
     },
     "Import Results:" : {
       "comment" : "Data Import result summary headline",
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -27392,6 +27390,18 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Импорт из"
+          }
+        }
+      }
+    },
+    "import.browser.data.success.title" : {
+      "comment" : "message about Passwords and or bookmarks Data Import completion",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Import complete!"
           }
         }
       }
@@ -40521,7 +40531,6 @@
     },
     "Password import complete. You can now delete the saved passwords file." : {
       "comment" : "message about Passwords Data Import completion",
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
