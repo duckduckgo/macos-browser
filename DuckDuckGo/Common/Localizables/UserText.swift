@@ -1221,21 +1221,25 @@ struct UserText {
     static let downloadsOpenDownloadsFolder = NSLocalizedString("downloads.open-downloads-folder", value: "Open Downloads Folder", comment: "Button in the downloads manager that allows the user to open the downloads folder")
 
     // MARK: Updates
-    static let updateAvailableMenuItem = NSLocalizedString("update.available.menu.item", value: "Update Available - Restart Now", comment: "Title of the menu item that informs user that a new update is available. Clicking on the menu item restarts the app and installs the update")
+    static let updateAvailableMenuItem = NSLocalizedString("update.available.menu.item", value: "Update Available - Install Now", comment: "Title of the menu item that informs user that a new update is available. Clicking on the menu item installs the update")
     static let releaseNotesMenuItem = NSLocalizedString("release.notes.menu.item", value: "Release Notes", comment: "Title of the dialog menu item that opens release notes")
     static let whatsNewMenuItem = NSLocalizedString("whats.new.menu.item", value: "What's New", comment: "Title of the dialog menu item that opens the 'What's New' page")
     static let browserUpdatesTitle = NSLocalizedString("settings.browser.updates.title", value: "Browser Updates", comment: "Title of the section in Settings where people set up automatic vs manual updates")
     static let automaticUpdates = NSLocalizedString("settings.automatic.updates", value: "Automatically install updates (recommended)", comment: "Title of the checkbox item to set up automatic updates of the browser")
     static let manualUpdates = NSLocalizedString("settings.manual.updates", value: "Check for updates but let you choose to install them", comment: "Title of the checkbox item to set up manual updates of the browser")
     static let checkingForUpdate = NSLocalizedString("settings.checking.for.update", value: "Checking for update", comment: "Label informing users the app is currently checking for new update")
+    static let downloadingUpdate = NSLocalizedString("settings.downloading.update", value: "Downloading update %@", comment: "Label informing users the app is currently downloading the update. This will contain a percentage")
+    static let preparingUpdate = NSLocalizedString("settings.preparing.update", value: "Preparing update", comment: "Label informing users the app is preparing to update.")
+    static let updateFailed = NSLocalizedString("settings.update.failed", value: "Update failed", comment: "Label informing users the app is unable to update.")
     static let upToDate = NSLocalizedString("settings.up.to.date", value: "DuckDuckGo is up to date", comment: "Label informing users the app is currently up to date and no update is required.")
     static let newerVersionAvailable = NSLocalizedString("settings.newer.version.available", value: "Newer version available", comment: "Label informing users the newer version of the app is available to install.")
     static let lastChecked = NSLocalizedString("settings.last.checked", value: "Last checked", comment: "Label informing users what is the last time the app checked for the update.")
-    static let restartToUpdate = NSLocalizedString("settings.restart.to.update", value: "Restart to Update", comment: "Button label trigering restart and update of the application.")
+    static let runUpdate = NSLocalizedString("settings.restart.to.update", value: "Update DuckDuckGo", comment: "Button label triggering restart and update of the application.")
+    static let retryUpdate = NSLocalizedString("settings.retry.update", value: "Retry Update", comment: "Button label triggering a retry of the update.")
     static let browserUpdatedNotification = NSLocalizedString("notification.browser.updated", value: "Browser Updated", comment: "Notification informing user the app has been updated")
     static let browserDowngradedNotification = NSLocalizedString("notification.browser.downgraded", value: "Browser Downgraded", comment: "Notification informing user the app has been downgraded")
     static let criticalUpdateNotification = NSLocalizedString("notification.critical.update", value: "Critical update required. Restart to update.", comment: "Notification informing user a critical update is required.")
-    static let updateAvailableNotification = NSLocalizedString("notification.update.available", value: "New version available. Restart to update.", comment: "Notification informing user the a version of app is available")
+    static let updateAvailableNotification = NSLocalizedString("notification.update.available", value: "New version available. Click here to update.", comment: "Notification informing user the a version of app is available")
     static let viewDetails = NSLocalizedString("view.details.button", value: "View Details", comment: "Button title to open more details about the update")
 
     enum Bookmarks {
