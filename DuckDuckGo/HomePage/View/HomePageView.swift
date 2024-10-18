@@ -369,6 +369,7 @@ fileprivate extension HomePage.Views.RootView {
                 Spacer()
                     .layoutPriority(1)
             }
+            .frame(width: Self.targetWidth)
         }
         .frame(width: Self.targetWidth, height: max(geometry.size.height, totalHeight(with: geometry)))
         .frame(maxWidth: .infinity)
