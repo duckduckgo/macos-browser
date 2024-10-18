@@ -109,6 +109,7 @@ final class NavigationBarViewController: NSViewController {
     private var navigationButtonsCancellables = Set<AnyCancellable>()
     private var downloadsCancellables = Set<AnyCancellable>()
     private var cancellables = Set<AnyCancellable>()
+    private let aiChatMenuConfig: AIChatMenuVisibilityConfigurable
 
     @UserDefaultsWrapper(key: .homeButtonPosition, defaultValue: .right)
     static private var homeButtonPosition: HomeButtonPosition
@@ -124,13 +125,15 @@ final class NavigationBarViewController: NSViewController {
                        dragDropManager: BookmarkDragDropManager = .shared,
                        networkProtectionPopoverManager: NetPPopoverManager,
                        networkProtectionStatusReporter: NetworkProtectionStatusReporter,
-                       autofillPopoverPresenter: AutofillPopoverPresenter) -> NavigationBarViewController {
+                       autofillPopoverPresenter: AutofillPopoverPresenter,
+                       aiChatMenuConfig: AIChatMenuVisibilityConfigurable) -> NavigationBarViewController {
         NSStoryboard(name: "NavigationBar", bundle: nil).instantiateInitialController { coder in
-            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner, networkProtectionFeatureActivation: networkProtectionFeatureActivation, downloadListCoordinator: downloadListCoordinator, dragDropManager: dragDropManager, networkProtectionPopoverManager: networkProtectionPopoverManager, networkProtectionStatusReporter: networkProtectionStatusReporter, autofillPopoverPresenter: autofillPopoverPresenter)
+            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner, networkProtectionFeatureActivation: networkProtectionFeatureActivation, downloadListCoordinator: downloadListCoordinator, dragDropManager: dragDropManager, networkProtectionPopoverManager: networkProtectionPopoverManager, networkProtectionStatusReporter: networkProtectionStatusReporter, autofillPopoverPresenter: autofillPopoverPresenter, aiChatMenuConfig: aiChatMenuConfig)
         }!
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, networkProtectionFeatureActivation: NetworkProtectionFeatureActivation, downloadListCoordinator: DownloadListCoordinator, dragDropManager: BookmarkDragDropManager, networkProtectionPopoverManager: NetPPopoverManager, networkProtectionStatusReporter: NetworkProtectionStatusReporter, autofillPopoverPresenter: AutofillPopoverPresenter) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, networkProtectionFeatureActivation: NetworkProtectionFeatureActivation, downloadListCoordinator: DownloadListCoordinator, dragDropManager: BookmarkDragDropManager, networkProtectionPopoverManager: NetPPopoverManager, networkProtectionStatusReporter: NetworkProtectionStatusReporter, autofillPopoverPresenter: AutofillPopoverPresenter,
+          aiChatMenuConfig: AIChatMenuVisibilityConfigurable) {
 
         self.popovers = NavigationBarPopovers(networkProtectionPopoverManager: networkProtectionPopoverManager, autofillPopoverPresenter: autofillPopoverPresenter)
         self.tabCollectionViewModel = tabCollectionViewModel
@@ -139,6 +142,7 @@ final class NavigationBarViewController: NSViewController {
         self.networkProtectionFeatureActivation = networkProtectionFeatureActivation
         self.downloadListCoordinator = downloadListCoordinator
         self.dragDropManager = dragDropManager
+        self.aiChatMenuConfig = aiChatMenuConfig
         goBackButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .back, tabCollectionViewModel: tabCollectionViewModel)
         goForwardButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .forward, tabCollectionViewModel: tabCollectionViewModel)
         super.init(coder: coder)
@@ -883,6 +887,7 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func updateAIChatButton() {
+
         let menu = NSMenu()
         let title = LocalPinningManager.shared.shortcutTitle(for: .aiChat)
         menu.addItem(withTitle: title, action: #selector(toggleAIChatPanelPinning(_:)), keyEquivalent: "")
@@ -890,11 +895,7 @@ final class NavigationBarViewController: NSViewController {
         aiChatButton.menu = menu
         aiChatButton.toolTip = UserText.aiChat
 
-         if LocalPinningManager.shared.isPinned(.aiChat) {
-            aiChatButton.isHidden = false
-        } else {
-            aiChatButton.isHidden = !popovers.bookmarkListPopoverShown
-        }
+        aiChatButton.isHidden = !(LocalPinningManager.shared.isPinned(.aiChat) && aiChatMenuConfig.isFeatureEnabledForToolbarShortcut)
     }
 
     private func subscribeToCredentialsToSave() {
@@ -990,10 +991,10 @@ extension NavigationBarViewController: NSMenuDelegate {
             menu.addItem(withTitle: networkProtectionTitle, action: #selector(toggleNetworkProtectionPanelPinning), keyEquivalent: "")
         }
 
-#warning("TODO Feature flag")
-        let aiChatTitle = LocalPinningManager.shared.shortcutTitle(for: .aiChat)
-        menu.addItem(withTitle: aiChatTitle, action: #selector(toggleAIChatPanelPinning), keyEquivalent: "L")
-
+        if aiChatMenuConfig.isFeatureEnabledForToolbarShortcut {
+            let aiChatTitle = LocalPinningManager.shared.shortcutTitle(for: .aiChat)
+            menu.addItem(withTitle: aiChatTitle, action: #selector(toggleAIChatPanelPinning), keyEquivalent: "L")
+        }
     }
 
     @objc

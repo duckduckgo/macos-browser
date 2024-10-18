@@ -278,7 +278,9 @@ final class MainMenu: NSMenu {
 
             toggleNetworkProtectionShortcutMenuItem
 
-            toggleAIChatShortcutMenuItem
+            if aiChatMenuConfig.shouldDisplayToolbarShortcut {
+                toggleAIChatShortcutMenuItem
+            }
 
             NSMenuItem.separator()
 

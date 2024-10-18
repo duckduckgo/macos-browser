@@ -83,10 +83,10 @@ final class AIChatMenuConfiguration: AIChatMenuVisibilityConfigurable {
         switch shortcutType {
         case .applicationMenu:
             // Use privacy config here
-            return false
+            return true
         case .toolbar:
             // Use privacy config here
-            return false
+            return true
         }
     }
 }
