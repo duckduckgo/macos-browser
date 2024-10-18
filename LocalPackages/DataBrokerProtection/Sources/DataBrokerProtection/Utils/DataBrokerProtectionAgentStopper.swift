@@ -49,6 +49,7 @@ struct DefaultDataBrokerProtectionAgentStopper: DataBrokerProtectionAgentStopper
     }
 
     public func validateRunPrerequisitesAndStopAgentIfNecessary() async {
+        return
         do {
             guard try dataManager.fetchProfile() != nil,
                   authenticationManager.isUserAuthenticated else {
