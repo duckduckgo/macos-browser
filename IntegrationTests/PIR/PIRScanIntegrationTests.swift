@@ -296,7 +296,7 @@ final class PIRScanIntegrationTests: XCTestCase {
 
         let queries = try! database.fetchAllBrokerProfileQueryData()
         let thing = queries.filter { $0.optOutJobData.count > 0 }
-        let name = thing[0].dataBroker.name
+        let name = thing.first?.dataBroker.name
         print(name)
         print("Stage 4 passed: We create opt out jobs")
 
