@@ -32,7 +32,7 @@ final class SuggestionTableCellView: NSTableCellView {
     static let selectedTintColor: NSColor = .selectedSuggestionTint
 
     @IBOutlet weak var iconImageView: NSImageView!
-    @IBOutlet weak var deleteButton: NSButton!
+    @IBOutlet weak var removeButton: NSButton!
     @IBOutlet weak var suffixTextField: NSTextField!
 
     var suggestion: Suggestion?
@@ -56,7 +56,7 @@ final class SuggestionTableCellView: NSTableCellView {
         attributedString = suggestionViewModel.tableCellViewAttributedString
         iconImageView.image = suggestionViewModel.icon
         suffixTextField.stringValue = suggestionViewModel.suffix
-        deleteButton.isHidden = true
+        removeButton.isHidden = true
 
         updateTextField()
     }
@@ -85,7 +85,7 @@ final class SuggestionTableCellView: NSTableCellView {
 
     private func updateImageViews() {
         iconImageView.contentTintColor = isSelected ? Self.selectedTintColor : Self.iconColor
-        deleteButton.contentTintColor = isSelected ? Self.selectedTintColor : Self.iconColor
+        removeButton.contentTintColor = isSelected ? Self.selectedTintColor : Self.iconColor
     }
 
     private func updateDeleteImageViewVisibility() {
@@ -96,9 +96,9 @@ final class SuggestionTableCellView: NSTableCellView {
         // If the suggestion is based on history, if the mouse is inside the window's frame and
         // the suggestion is selected, show the delete button
         if let suggestion, suggestion.isHistoryEntry, windowFrameInScreen.contains(mouseLocation) {
-            deleteButton.isHidden = !isSelected
+            removeButton.isHidden = !isSelected
         } else {
-            deleteButton.isHidden = true
+            removeButton.isHidden = true
         }
     }
 

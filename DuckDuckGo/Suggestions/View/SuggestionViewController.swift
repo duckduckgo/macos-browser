@@ -106,7 +106,7 @@ final class SuggestionViewController: NSViewController {
         closeWindow()
     }
 
-    @IBAction func deleteButtonAction(_ sender: NSButton) {
+    @IBAction func removeButtonAction(_ sender: NSButton) {
         guard let cell = sender.superview as? SuggestionTableCellView,
         let suggestion = cell.suggestion else {
             assertionFailure("Correct cell or url are not available")

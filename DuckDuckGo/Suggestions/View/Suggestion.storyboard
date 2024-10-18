@@ -114,7 +114,7 @@
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="28" viewBased="YES" id="4Z2-d8-NA2">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="608" height="102"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="608" height="63"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <color key="backgroundColor" name="ClearColor"/>
                                                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
@@ -184,7 +184,7 @@
                                                                                                 <constraint firstAttribute="height" constant="20" id="bZn-8L-xg8"/>
                                                                                             </constraints>
                                                                                             <connections>
-                                                                                                <action selector="deleteButtonAction:" target="JbS-WE-3yw" id="bQm-Zr-V5V"/>
+                                                                                                <action selector="removeButtonAction:" target="JbS-WE-3yw" id="bQm-Zr-V5V"/>
                                                                                             </connections>
                                                                                         </button>
                                                                                     </subviews>
@@ -205,8 +205,8 @@
                                                                                         <constraint firstItem="vli-IP-Nr8" firstAttribute="leading" secondItem="kX2-C1-38Y" secondAttribute="leading" constant="13" id="zgq-le-RHJ"/>
                                                                                     </constraints>
                                                                                     <connections>
-                                                                                        <outlet property="deleteButton" destination="ofA-eI-PSe" id="zJW-zP-qSs"/>
                                                                                         <outlet property="iconImageView" destination="vli-IP-Nr8" id="5lX-7Q-4Cw"/>
+                                                                                        <outlet property="removeButton" destination="ofA-eI-PSe" id="zJW-zP-qSs"/>
                                                                                         <outlet property="suffixTextField" destination="efo-Vy-aEh" id="vDH-Af-pkR"/>
                                                                                         <outlet property="textField" destination="bOr-Go-gyW" id="wxi-1N-Bc4"/>
                                                                                     </connections>
