@@ -149,7 +149,7 @@ extension ReleaseNotesValues {
         let lastUpdate = UInt((updateController?.lastUpdateCheckDate ?? Date()).timeIntervalSince1970)
 
         guard let updateController, let latestUpdate = updateController.latestUpdate else {
-            self.init(status: .loaded,
+            self.init(status: updateController?.updateProgress.toStatus ?? .loaded,
                       currentVersion: currentVersion,
                       lastUpdate: lastUpdate)
             return
