@@ -94,9 +94,9 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
         var order = "v3"
         let platform = OnboardingPlatform(name: "macos")
 #if APPSTORE
-        systemSettings = SystemSettings(rows: ["import", "default-browser"])
+        systemSettings = SystemSettings(rows: ["import"])
 #else
-        systemSettings = SystemSettings(rows: ["dock", "import", "default-browser"])
+        systemSettings = SystemSettings(rows: ["dock", "import"])
 #endif
         let stepDefinitions = StepDefinitions(systemSettings: systemSettings)
         let preferredLocale = Bundle.main.preferredLocalizations.first ?? "en"
