@@ -190,7 +190,7 @@ final class NewTabPageSearchBoxExperiment {
     }
 
     var onboardingCohort: PixelExperiment? {
-        isActive ? PixelExperiment.logic.cohort : nil
+        isActive ? onboardingExperimentCohortProvider.onboardingExperimentCohort : nil
     }
 
     func assignUserToCohort() {
@@ -201,6 +201,8 @@ final class NewTabPageSearchBoxExperiment {
 
         guard let cohort = cohortDecider.cohort else {
             Logger.newTabPageSearchBoxExperiment.debug("User is not eligible for the experiment, skipping cohort assignment...")
+            dataStore.experimentCohort = nil
+            dataStore.didRunEnrollment = true
             return
         }
 
@@ -242,7 +244,7 @@ final class NewTabPageSearchBoxExperiment {
                 count: numberOfSearches,
                 from: source,
                 cohort: cohort,
-                onboardingCohort: PixelExperiment.logic.cohort
+                onboardingCohort: onboardingExperimentCohortProvider.onboardingExperimentCohort
             )
             dataStore.lastPixelTimestamp = Date()
             dataStore.numberOfSearches = numberOfSearches
