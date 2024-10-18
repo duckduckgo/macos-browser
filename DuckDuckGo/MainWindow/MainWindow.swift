@@ -67,7 +67,7 @@ final class MainWindow: NSWindow {
         collectionBehavior = .fullScreenPrimary
 
         // Setting minimum width to fit the wide NTP search bar
-        minSize = .init(width: BigSearchBox.Const.searchBarWidth + 40, height: 0)
+        minSize = .init(width: HomePage.Views.RootView.minWindowWidth, height: 0)
     }
 
     // MARK: - First Responder Notification

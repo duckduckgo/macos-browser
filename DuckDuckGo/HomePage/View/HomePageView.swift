@@ -25,7 +25,7 @@ extension HomePage.Views {
     struct RootView: View {
 
         static let targetWidth: CGFloat = 508
-        static let minWindowWidth: CGFloat = 600
+        static let minWindowWidth: CGFloat = 660
         static let settingsPanelWidth: CGFloat = 236
         let isBurner: Bool
 
