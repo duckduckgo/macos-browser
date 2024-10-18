@@ -18,10 +18,11 @@
 
 import Cocoa
 import Combine
+import History
+import Suggestions
 
 protocol SuggestionViewControllerDelegate: AnyObject {
 
-    func shouldCloseSuggestionWindow(forMouseEvent event: NSEvent) -> Bool
     func suggestionViewControllerDidConfirmSelection(_ suggestionViewController: SuggestionViewController)
 
 }
@@ -100,18 +101,23 @@ final class SuggestionViewController: NSViewController {
         tableView.addTrackingArea(trackingArea)
     }
 
+    @IBAction func confirmButtonAction(_ sender: NSButton) {
+        delegate?.suggestionViewControllerDidConfirmSelection(self)
+        closeWindow()
+    }
+
+    @IBAction func deleteButtonAction(_ sender: NSButton) {
+        guard let cell = sender.superview as? SuggestionTableCellView,
+        let suggestion = cell.suggestion else {
+            assertionFailure("Correct cell or url are not available")
+            return
+        }
+
+        removeHistory(for: suggestion)
+    }
+
     private func addEventMonitors() {
         eventMonitorCancellables.removeAll()
-
-        NSEvent.addLocalCancellableMonitor(forEventsMatching: [.leftMouseUp, .rightMouseUp]) { [weak self] event in
-            guard let self else { return event }
-            return self.mouseUp(with: event)
-        }.store(in: &eventMonitorCancellables)
-
-        NSEvent.addLocalCancellableMonitor(forEventsMatching: [.leftMouseDown, .rightMouseDown]) { [weak self] event in
-            guard let self else { return event }
-            return self.mouseDown(with: event)
-        }.store(in: &eventMonitorCancellables)
 
         NotificationCenter.default.publisher(for: NSApplication.didResignActiveNotification).sink { [weak self] _ in
             self?.closeWindow()
@@ -181,28 +187,6 @@ final class SuggestionViewController: NSViewController {
         clearSelection()
     }
 
-    func mouseDown(with event: NSEvent) -> NSEvent? {
-        if event.window === view.window {
-            return nil
-        }
-        if delegate?.shouldCloseSuggestionWindow(forMouseEvent: event) ?? true {
-            closeWindow()
-        }
-
-        return event
-    }
-
-    func mouseUp(with event: NSEvent) -> NSEvent? {
-        if event.window === view.window,
-           tableView.isMouseLocationInsideBounds(event.locationInWindow) {
-
-            delegate?.suggestionViewControllerDidConfirmSelection(self)
-            closeWindow()
-            return nil
-        }
-        return event
-    }
-
     private func updateHeight() {
         guard suggestionContainerViewModel.numberOfSuggestions > 0 else {
             tableViewHeightConstraint.constant = 0
@@ -223,6 +207,23 @@ final class SuggestionViewController: NSViewController {
 
         window.parent?.removeChildWindow(window)
         window.orderOut(nil)
+    }
+
+    private func removeHistory(for suggestion: Suggestion) {
+        assert(suggestion.isHistoryEntry)
+
+        guard let url = suggestion.url else {
+            assertionFailure("URL not available")
+            return
+        }
+
+        HistoryCoordinator.shared.removeUrlEntry(url) { [weak self] error in
+            guard error == nil else {
+                return
+            }
+
+            self?.suggestionContainerViewModel.removeSuggestionFromResult(suggestion: suggestion)
+        }
     }
 
 }

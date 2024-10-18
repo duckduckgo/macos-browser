@@ -21,6 +21,7 @@ import Combine
 import Common
 import BrowserServicesKit
 import os.log
+import Suggestions
 
 final class SuggestionContainerViewModel {
 
@@ -168,6 +169,15 @@ final class SuggestionContainerViewModel {
 
         let newIndex = max(0, selectionIndex - 1)
         select(at: newIndex)
+    }
+
+    func removeSuggestionFromResult(suggestion: Suggestion) {
+        suggestionContainer.result?.topHits = suggestionContainer.result?.topHits.filter({
+            !($0 == suggestion && $0.isHistoryEntry)
+        }) ?? []
+        suggestionContainer.result?.localSuggestions = suggestionContainer.result?.localSuggestions.filter({
+            !($0 == suggestion && $0.isHistoryEntry)
+        }) ?? []
     }
 
 }

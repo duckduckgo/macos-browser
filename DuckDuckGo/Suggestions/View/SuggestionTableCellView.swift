@@ -19,6 +19,7 @@
 import Cocoa
 import Common
 import os.log
+import Suggestions
 
 final class SuggestionTableCellView: NSTableCellView {
 
@@ -31,7 +32,10 @@ final class SuggestionTableCellView: NSTableCellView {
     static let selectedTintColor: NSColor = .selectedSuggestionTint
 
     @IBOutlet weak var iconImageView: NSImageView!
+    @IBOutlet weak var deleteButton: NSButton!
     @IBOutlet weak var suffixTextField: NSTextField!
+
+    var suggestion: Suggestion?
 
     override func awakeFromNib() {
         suffixTextField.textColor = Self.suffixColor
@@ -39,17 +43,20 @@ final class SuggestionTableCellView: NSTableCellView {
 
     var isSelected: Bool = false {
         didSet {
-            updateIconImageView()
+            updateImageViews()
             updateTextField()
+            updateDeleteImageViewVisibility()
         }
     }
 
     var isBurner: Bool = false
 
     func display(_ suggestionViewModel: SuggestionViewModel) {
+        self.suggestion = suggestionViewModel.suggestion
         attributedString = suggestionViewModel.tableCellViewAttributedString
         iconImageView.image = suggestionViewModel.icon
         suffixTextField.stringValue = suggestionViewModel.suffix
+        deleteButton.isHidden = true
 
         updateTextField()
     }
@@ -76,8 +83,23 @@ final class SuggestionTableCellView: NSTableCellView {
         }
     }
 
-    private func updateIconImageView() {
+    private func updateImageViews() {
         iconImageView.contentTintColor = isSelected ? Self.selectedTintColor : Self.iconColor
+        deleteButton.contentTintColor = isSelected ? Self.selectedTintColor : Self.iconColor
+    }
+
+    private func updateDeleteImageViewVisibility() {
+        guard let window = window else { return }
+        let mouseLocation = NSEvent.mouseLocation
+        let windowFrameInScreen = window.frame
+
+        // If the suggestion is based on history, if the mouse is inside the window's frame and
+        // the suggestion is selected, show the delete button
+        if let suggestion, suggestion.isHistoryEntry, windowFrameInScreen.contains(mouseLocation) {
+            deleteButton.isHidden = !isSelected
+        } else {
+            deleteButton.isHidden = true
+        }
     }
 
 }
