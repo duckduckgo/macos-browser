@@ -77,7 +77,7 @@ class AIChatMenuConfigurationTests: XCTestCase {
         }
         cancellable.cancel()
     }
-    
+
     func testApplicationMenuValuesChangedPublisher() {
         let expectation = self.expectation(description: "Values changed publisher should emit a value.")
         var receivedValue: Void?
@@ -103,13 +103,13 @@ class MockAIChatPreferencesStorage: AIChatPreferencesStorage {
             showShortcutInApplicationMenuSubject.send(showShortcutInApplicationMenu)
         }
     }
-    
+
     var shouldDisplayToolbarShortcut: Bool = false {
         didSet {
             shouldDisplayToolbarShortcutSubject.send(shouldDisplayToolbarShortcut)
         }
     }
-    
+
     private var showShortcutInApplicationMenuSubject = PassthroughSubject<Bool, Never>()
     private var shouldDisplayToolbarShortcutSubject = PassthroughSubject<Bool, Never>()
 
