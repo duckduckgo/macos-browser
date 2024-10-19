@@ -115,6 +115,9 @@ private class DummyFeatureFlagger: FeatureFlagger {
 private class DummyAIChatConfig: AIChatMenuVisibilityConfigurable {
     var shouldDisplayApplicationMenuShortcut: Bool { false }
     var shouldDisplayToolbarShortcut: Bool { false }
+    var isFeatureEnabledForApplicationMenuShortcut: Bool { false }
+    var isFeatureEnabledForToolbarShortcut: Bool { false }
+
     var shortcutURL: URL { URL(string: "https://example.com")! }
 
     var valuesChangedPublisher: PassthroughSubject<Void, Never> {
