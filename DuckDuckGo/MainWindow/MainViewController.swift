@@ -344,7 +344,7 @@ final class MainViewController: NSViewController {
 
                 if content == .newtab {
                     if browserTabViewController.homePageViewController?.addressBarModel.shouldShowAddressBar == true {
-                        resizeNavigationBar(isHomePage: false, animated: false)
+                        subscribeToNTPAddressBarVisibility(of: selectedTabViewModel)
                     } else {
                         resizeNavigationBar(isHomePage: true, animated: lastTabContent != .newtab)
                     }
@@ -354,6 +354,18 @@ final class MainViewController: NSViewController {
                 adjustFirstResponder(selectedTabViewModel: selectedTabViewModel, tabContent: content)
             }
             .store(in: &self.tabViewModelCancellables)
+    }
+
+    private var ntpAddressBarVisibilityCancellable: AnyCancellable?
+
+    private func subscribeToNTPAddressBarVisibility(of selectedTabViewModel: TabViewModel) {
+        ntpAddressBarVisibilityCancellable = browserTabViewController.homePageViewController?.appearancePreferences.$isSearchBarVisible
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isAddressBarVisible in
+                guard let self else { return }
+                resizeNavigationBar(isHomePage: !isAddressBarVisible, animated: true)
+                adjustFirstResponder(selectedTabViewModel: selectedTabViewModel, tabContent: .newtab)
+            }
     }
 
     private func subscribeToFirstResponder() {
@@ -454,7 +466,9 @@ final class MainViewController: NSViewController {
         let tabContent = tabContent ?? selectedTabViewModel.tab.content
 
         if case .newtab = tabContent {
-            if let homeAddressBarTextField = browserTabViewController.homePageViewController?.addressBarModel?.addressBarTextField {
+            let homeAddressBarTextField = browserTabViewController.homePageViewController?.addressBarModel?.addressBarTextField
+            let isHomeAddressBarVisible = browserTabViewController.homePageViewController?.appearancePreferences.isSearchBarVisible == true
+            if isHomeAddressBarVisible, let homeAddressBarTextField {
                 homeAddressBarTextField.makeMeFirstResponder()
             } else {
                 navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
