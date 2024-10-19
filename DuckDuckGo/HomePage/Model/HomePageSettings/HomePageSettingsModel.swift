@@ -23,12 +23,37 @@ import PixelKit
 import SwiftUI
 import SwiftUIExtensions
 
+protocol SettingsVisibilityModelPersistor {
+    var didShowSettingsOnboarding: Bool { get set }
+}
+
+final class UserDefaultsSettingsVisibilityModelPersistor: SettingsVisibilityModelPersistor {
+    @UserDefaultsWrapper(key: .homePageDidShowSettingsOnboarding, defaultValue: false)
+    var didShowSettingsOnboarding: Bool
+}
+
 extension HomePage.Models {
     /**
-     * This tiny model is used by HomePageViewController to expose a setting to control settings visibility
+     * This tiny model is used by HomePageViewController to expose a setting to control settings visibility,
+     * as well as to keep track of the settings onboarding popover.
      */
     final class SettingsVisibilityModel: ObservableObject {
         @Published var isSettingsVisible: Bool = false
+
+        var didShowSettingsOnboarding: Bool {
+            get {
+                persistor.didShowSettingsOnboarding
+            }
+            set {
+                persistor.didShowSettingsOnboarding = newValue
+            }
+        }
+
+        init(persistor: SettingsVisibilityModelPersistor = UserDefaultsSettingsVisibilityModelPersistor()) {
+            self.persistor = persistor
+        }
+
+        private var persistor: SettingsVisibilityModelPersistor
     }
 
     final class SettingsModel: ObservableObject {
@@ -64,6 +89,7 @@ extension HomePage.Models {
         let showAddImageFailedAlert: () -> Void
         let navigator: HomePageSettingsModelNavigator
 
+        @Published var settingsButtonWidth: CGFloat = .infinity
         @Published private(set) var availableUserBackgroundImages: [UserBackgroundImage] = []
 
         private var availableCustomImagesCancellable: AnyCancellable?

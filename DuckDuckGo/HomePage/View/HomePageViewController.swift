@@ -127,12 +127,16 @@ final class HomePageViewController: NSViewController {
         super.viewDidAppear()
         refreshModels()
         addressBarModel.addressBarTextField?.makeMeFirstResponder()
+
+        showSettingsOnboardingIfNeeded()
     }
 
     override func viewWillDisappear() {
         super.viewWillDisappear()
 
         historyCancellable = nil
+
+        presentedViewControllers?.forEach { $0.dismiss() }
     }
 
     func refreshModelsOnAppBecomingActive() {
@@ -269,6 +273,44 @@ final class HomePageViewController: NSViewController {
     private func showEditController(for bookmark: Bookmark) {
         BookmarksDialogViewFactory.makeEditBookmarkView(bookmark: bookmark)
             .show(in: view.window)
+    }
+
+    private func showSettingsOnboardingIfNeeded() {
+        if !settingsVisibilityModel.didShowSettingsOnboarding {
+            DispatchQueue.main.async {
+                let bounds = self.view.bounds
+                let settingsButtonWidth = Application.appDelegate.homePageSettingsModel.settingsButtonWidth
+
+                let rect = NSRect(
+                    x: bounds.maxX - HomePage.Views.RootView.customizeButtonPadding - settingsButtonWidth,
+                    y: bounds.maxY - HomePage.Views.RootView.customizeButtonPadding - HomePage.Views.RootView.SettingsButtonView.height,
+                    width: settingsButtonWidth,
+                    height: HomePage.Views.RootView.SettingsButtonView.height)
+
+                let viewController = PopoverMessageViewController(
+                    title: "Add extra personality to your new tab page",
+                    message: "Now you can customize your new tab page background, theme, and even what content you see. Give it a try!",
+                    image: .settingsOnboardingPopover,
+                    shouldShowCloseButton: true,
+                    presentMultiline: true,
+                    autoDismissDuration: nil,
+                    onClick: { [weak self] in
+                        self?.settingsVisibilityModel.isSettingsVisible = true
+                    }
+                )
+                viewController.show(onParent: self, rect: rect, of: self.view, preferredEdge: .minY)
+                self.settingsVisibilityModel.didShowSettingsOnboarding = true
+
+                // Hide the popover as soon as settings is shown ('Customize' button is clicked).
+                self.settingsVisibilityModel.$isSettingsVisible
+                    .filter { $0 }
+                    .prefix(1)
+                    .sink { [weak viewController] _ in
+                        viewController?.dismiss()
+                    }
+                    .store(in: &self.cancellables)
+            }
+        }
     }
 
     private var burningDataCancellable: AnyCancellable?
