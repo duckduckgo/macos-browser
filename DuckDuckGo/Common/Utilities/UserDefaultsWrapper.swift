@@ -135,6 +135,7 @@ public struct UserDefaultsWrapper<T> {
         case homePageIsRecentActivityVisible = "home.page.is.recent.activity.visible"
         case homePageIsSearchBarVisible = "home.page.is.search.bar.visible"
         case homePageIsFirstSession = "home.page.is.first.session"
+        case homePageDidShowSettingsOnboarding = "home.page.did.show.settings.onboarding"
         case homePageUserBackgroundImages = "home.page.user.background.images"
         case homePageCustomBackground = "home.page.custom.background"
         case homePageLastPickedCustomColor = "home.page.last.picked.custom.color"
