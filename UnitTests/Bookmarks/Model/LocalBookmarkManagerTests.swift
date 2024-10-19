@@ -742,13 +742,13 @@ final class LocalBookmarkManagerTests: XCTestCase {
         }
     }
 
-    func testWhenVariantUrlIsBookmarked_ThenGetBookmarkForVariantReturnsBookmark() {
-        let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
+    func testWhenVariantUrlIsBookmarked_ThenGetBookmarkForVariantReturnsBookmark() async throws {
         let originalURL = URL(string: "http://example.com")!
         let variantURL = URL(string: "https://example.com/")!
-
-        let bookmark = Bookmark(id: UUID().uuidString, url: variantURL.absoluteString, title: "Title", isFavorite: false)
-        bookmarkStoreMock.bookmarks = [bookmark]
+        let bookmark = Bookmark(id: UUID().uuidString, url: variantURL.absoluteString, title: "Title", isFavorite: false, parentFolderUUID: "bookmarks_root")
+        let (bookmarkManager, bookmarkStoreMock) = await LocalBookmarkManager.manager(with: {
+            bookmark
+        })
         bookmarkManager.loadBookmarks()
 
         let result = bookmarkManager.getBookmark(forVariantUrl: originalURL)
@@ -770,13 +770,13 @@ final class LocalBookmarkManagerTests: XCTestCase {
         XCTAssertNil(result)
     }
 
-    func testWhenVariantUrlIsBookmarked_ThenIsAnyUrlVariantBookmarkedReturnsTrue() {
-        let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
+    func testWhenVariantUrlIsBookmarked_ThenIsAnyUrlVariantBookmarkedReturnsTrue() async throws {
         let originalURL = URL(string: "http://example.com")!
         let variantURL = URL(string: "https://example.com/")!
-
-        let bookmark = Bookmark(id: UUID().uuidString, url: variantURL.absoluteString, title: "Title", isFavorite: false)
-        bookmarkStoreMock.bookmarks = [bookmark]
+        let bookmark = Bookmark(id: UUID().uuidString, url: variantURL.absoluteString, title: "Title", isFavorite: false, parentFolderUUID: "bookmarks_root")
+        let (bookmarkManager, bookmarkStoreMock) = await LocalBookmarkManager.manager(with: {
+            bookmark
+        })
         bookmarkManager.loadBookmarks()
 
         let result = bookmarkManager.isAnyUrlVariantBookmarked(url: originalURL)
