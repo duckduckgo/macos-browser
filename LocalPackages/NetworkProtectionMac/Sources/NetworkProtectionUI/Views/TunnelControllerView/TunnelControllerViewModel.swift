@@ -503,10 +503,6 @@ public final class TunnelControllerViewModel: ObservableObject {
         }
 
         Task { @MainActor in
-            if #available(macOS 14.0, *) {
-                await VPNGeoswitchingTip.vpnConnectedEvent.donate()
-            }
-
             await tunnelController.start()
             refreshInternalIsRunning()
         }
@@ -541,7 +537,7 @@ public final class TunnelControllerViewModel: ObservableObject {
 
     func handleTunnelControllerShown() async {
         if #available(macOS 14.0, *) {
-            await VPNDomainExclusionsTip.viewOpenedWhehVPNAlreadyConnectedEvent.donate()
+            await VPNDomainExclusionsTip.viewOpenedWhenVPNAlreadyConnectedEvent.donate()
         }
     }
 }

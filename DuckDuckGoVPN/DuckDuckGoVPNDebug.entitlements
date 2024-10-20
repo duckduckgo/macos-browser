@@ -14,6 +14,7 @@
 		<string>$(NETP_APP_GROUP)</string>
 		<string>$(IPC_APP_GROUP)</string>
 		<string>$(SUBSCRIPTION_APP_GROUP)</string>
+		<string>$(APP_CONFIGURATION_APP_GROUP)</string>
 	</array>
 	<key>keychain-access-groups</key>
 	<array>

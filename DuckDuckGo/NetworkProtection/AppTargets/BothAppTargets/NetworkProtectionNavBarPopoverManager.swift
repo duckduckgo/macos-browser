@@ -24,11 +24,12 @@ import Foundation
 import LoginItems
 import NetworkProtection
 import NetworkProtectionIPC
-import NetworkProtectionUI
-import Subscription
-import VPNAppLauncher
-import SwiftUI
 import NetworkProtectionProxy
+import NetworkProtectionUI
+import os.log
+import Subscription
+import SwiftUI
+import VPNAppLauncher
 
 protocol NetworkProtectionIPCClient {
     var ipcStatusObserver: ConnectionStatusObserver { get }
@@ -167,7 +168,8 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
                                          statusObserver: statusReporter.statusObserver,
                                          activeSitePublisher: activeSitePublisher,
                                          forMenuApp: false,
-                                         vpnSettings: vpnSettings)
+                                         vpnSettings: vpnSettings,
+                                         logger: Logger(subsystem: "DuckDuckGo", category: "TipKit"))
 
             let popover = NetworkProtectionPopover(
                 statusViewModel: statusViewModel,

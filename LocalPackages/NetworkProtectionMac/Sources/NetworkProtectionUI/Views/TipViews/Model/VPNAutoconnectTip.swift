@@ -21,12 +21,8 @@ import TipKit
 
 /// A tip to suggest to the user to use the autoconnect option for the VPN.
 ///
-struct VPNAutoconnectTip {}
-
-/// Necessary split to support older iOS versions.
-///
 @available(macOS 14.0, *)
-extension VPNAutoconnectTip: Tip {
+struct VPNAutoconnectTip: Tip {
 
     enum ActionIdentifiers: String {
         case enable = "com.duckduckgo.vpn.tip.autoconnect.action.enable"

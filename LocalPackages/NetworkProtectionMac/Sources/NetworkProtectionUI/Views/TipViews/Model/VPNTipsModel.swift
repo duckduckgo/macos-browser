@@ -20,9 +20,11 @@ import AppKit
 import Combine
 import Common
 import NetworkProtection
+import os.log
 import TipKit
 import TipKitUtils
 
+@MainActor
 public final class VPNTipsModel: ObservableObject {
 
     @Published
@@ -45,11 +47,18 @@ public final class VPNTipsModel: ObservableObject {
 
             switch connectionStatus {
             case .connected:
+                if case oldValue = .connecting {
+                    Task {
+                        await VPNGeoswitchingTip.vpnConnectedEvent.donate()
+                    }
+                }
+
                 VPNAutoconnectTip.vpnEnabled = true
                 VPNDomainExclusionsTip.vpnEnabled = true
             default:
                 VPNAutoconnectTip.vpnEnabled = false
                 VPNDomainExclusionsTip.vpnEnabled = false
+                break
             }
         }
     }
@@ -59,41 +68,55 @@ public final class VPNTipsModel: ObservableObject {
     let tips: TipGrouping
 
     private let vpnSettings: VPNSettings
+    private let logger: Logger
     private var cancellables = Set<AnyCancellable>()
 
-    static func makeTips(forMenuApp isMenuApp: Bool) -> TipGrouping {
+    static func makeTips(forMenuApp isMenuApp: Bool, logger: Logger) -> TipGrouping {
+
+        guard #available(macOS 14.0, *) else {
+            return EmptyTipGroup()
+        }
+
+        let autoconnectTip = VPNAutoconnectTip()
+        let domainExclusionsTip = VPNDomainExclusionsTip()
+        let geoswitchingTip = VPNGeoswitchingTip()
+        let tips: [any Tip] = {
+            if isMenuApp {
+                return [
+                    geoswitchingTip,
+                    autoconnectTip
+                ]
+            } else {
+                return [
+                    geoswitchingTip,
+                    domainExclusionsTip,
+                    autoconnectTip
+                ]
+            }
+        }()
+
+        Task {
+            for await statusUpdate in geoswitchingTip.statusUpdates {
+                logger.debug("🪙 VPNGeoswitchingTip status updated: \(String(describing: statusUpdate), privacy: .public)")
+            }
+        }
+
+        Task {
+            for await statusUpdate in domainExclusionsTip.statusUpdates {
+                logger.debug("🪙 VPNDomainExclusionsTip status updated: \(String(describing: statusUpdate), privacy: .public)")
+            }
+        }
+
         // This is temporarily disabled until Xcode 16 is available.
         // Ref: https://app.asana.com/0/414235014887631/1208528787265444/f
         //
         // if #available(macOS 15.0, *) {
-        //     if isMenuApp {
-        //         return TipGroup(.ordered) {
-        //             VPNGeoswitchingTip()
-        //             VPNAutoconnectTip()
-        //         }
-        //     } else {
-        //         return TipGroup(.ordered) {
-        //             VPNGeoswitchingTip()
-        //             VPNDomainExclusionsTip()
-        //             VPNAutoconnectTip()
-        //         }
+        //     return TipGroup(.ordered) {
+        //         tips
         //     }
-        // }
-        if #available(macOS 14, *) {
-            if isMenuApp {
-                return LegacyTipGroup(.ordered) {
-                    VPNGeoswitchingTip()
-                    VPNAutoconnectTip()
-                }
-            } else {
-                return LegacyTipGroup(.ordered) {
-                    VPNGeoswitchingTip()
-                    VPNDomainExclusionsTip()
-                    VPNAutoconnectTip()
-                }
-            }
-        } else {
-            return EmptyTipGroup()
+        // } else { ... what's below
+        return LegacyTipGroup(.ordered) {
+            tips
         }
     }
 
@@ -101,12 +124,14 @@ public final class VPNTipsModel: ObservableObject {
                 statusObserver: ConnectionStatusObserver,
                 activeSitePublisher: CurrentValuePublisher<ActiveSiteInfo?, Never>,
                 forMenuApp isMenuApp: Bool,
-                vpnSettings: VPNSettings) {
+                vpnSettings: VPNSettings,
+                logger: Logger) {
 
         self.activeSiteInfo = activeSitePublisher.value
         self.connectionStatus = statusObserver.recentValue
         self.featureFlag = featureFlagPublisher.value
-        self.tips = Self.makeTips(forMenuApp: isMenuApp)
+        self.logger = logger
+        self.tips = Self.makeTips(forMenuApp: isMenuApp, logger: logger)
         self.vpnSettings = vpnSettings
 
         if #available(macOS 14.0, *) {

@@ -41,6 +41,9 @@ public struct TunnelControllerView: View {
         self.model = model
     }
 
+    @EnvironmentObject
+    private var tipsModel: VPNTipsModel
+
     // MARK: - View Contents
 
     public var body: some View {
@@ -60,9 +63,17 @@ public struct TunnelControllerView: View {
                 .padding(.top, 5)
 
             if #available(macOS 15.0, *) {
-                VPNDomainExclusionsTipView()
-                    .padding(.horizontal, 9)
-                    .padding(.vertical, 6)
+                //VPNDomainExclusionsTipView()
+                //.padding(.horizontal, 9)
+                //.padding(.vertical, 6)
+
+                if tipsModel.featureFlag,
+                   let tip = tipsModel.tips.currentTip as? VPNDomainExclusionsTip {
+
+                    TipView(tip)
+                        .padding(.horizontal, 9)
+                        .padding(.vertical, 6)
+                }
             }
 
             Divider()

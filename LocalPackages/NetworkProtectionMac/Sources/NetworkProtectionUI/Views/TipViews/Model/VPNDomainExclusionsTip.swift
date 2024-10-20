@@ -21,12 +21,8 @@ import TipKit
 
 /// A tip to suggest using domain exclusions when a site doesn't work.
 ///
-struct VPNDomainExclusionsTip {}
-
-/// Necessary split to support older iOS versions.
-///
 @available(macOS 14.0, *)
-extension VPNDomainExclusionsTip: Tip {
+struct VPNDomainExclusionsTip: Tip {
 
     @Parameter(.transient)
     static var vpnEnabled: Bool = false
@@ -39,7 +35,7 @@ extension VPNDomainExclusionsTip: Tip {
     /// This condition may be indicative that the user is struggling, so they might want
     /// to exclude a site.
     ///
-    static let viewOpenedWhehVPNAlreadyConnectedEvent = Tips.Event(id: "com.duckduckgo.vpn.tip.domainExclusions.popoverOpenedWhileAlreadyConnected")
+    static let viewOpenedWhenVPNAlreadyConnectedEvent = Tips.Event(id: "com.duckduckgo.vpn.tip.domainExclusions.popoverOpenedWhileAlreadyConnected")
 
     var id: String {
         "com.duckduckgo.vpn.tip.domainExclusions"
@@ -64,7 +60,7 @@ extension VPNDomainExclusionsTip: Tip {
         #Rule(Self.$vpnEnabled) {
             $0 == true
         }
-        #Rule(Self.viewOpenedWhehVPNAlreadyConnectedEvent) {
+        #Rule(Self.viewOpenedWhenVPNAlreadyConnectedEvent) {
             $0.donations.count > 1
         }
     }

@@ -20,9 +20,10 @@ import AppKit
 import Foundation
 import Combine
 import Common
-import SwiftUI
-import NetworkProtection
 import LoginItems
+import NetworkProtection
+import os.log
+import SwiftUI
 import TipKitUtils
 
 /// Abstraction of the the VPN status bar menu with a simple interface.
@@ -150,7 +151,8 @@ public final class StatusBarMenu: NSObject {
                                          statusObserver: statusReporter.statusObserver,
                                          activeSitePublisher: activeSitePublisher,
                                          forMenuApp: true,
-                                         vpnSettings: VPNSettings(defaults: userDefaults))
+                                         vpnSettings: VPNSettings(defaults: userDefaults),
+                                         logger: Logger.init(subsystem: "DuckDuckGo", category: "TipKit"))
 
             let debugInformationViewModel = DebugInformationViewModel(showDebugInformation: isOptionKeyPressed)
 
