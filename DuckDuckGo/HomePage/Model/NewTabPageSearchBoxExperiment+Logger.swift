@@ -1,5 +1,5 @@
 //
-//  NewTabPageSearchBoxExperiment.swift
+//  NewTabPageSearchBoxExperiment+Logger.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
