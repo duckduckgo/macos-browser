@@ -101,7 +101,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
     @MainActor
     func testWhenBookmarkIsRemoved_ThenManagerRemovesItFromStore() {
         let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
-        let bookmark = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", isFavorite: false)!
+        let bookmark = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", isFavorite: false, index: 0)!
 
         bookmarkManager.remove(bookmark: bookmark, undoManager: nil)
 
