@@ -21,18 +21,24 @@ import Combine
 protocol AIChatPreferencesStorage {
     var showShortcutInApplicationMenu: Bool { get set }
     var shouldDisplayToolbarShortcut: Bool { get set }
+    var didDisplayAIChatToolbarOnboarding: Bool { get set }
 
     var showShortcutInApplicationMenuPublisher: AnyPublisher<Bool, Never> { get }
     var shouldDisplayToolbarShortcutPublisher: AnyPublisher<Bool, Never> { get }
+
 }
 
 struct DefaultAIChatPreferencesStorage: AIChatPreferencesStorage {
+    private let userDefaults: UserDefaults
+    private let pinningManager: PinningManager
+    private let notificationCenter: NotificationCenter
+
     var showShortcutInApplicationMenuPublisher: AnyPublisher<Bool, Never> {
         userDefaults.showAIChatShortcutInApplicationMenuPublisher
     }
 
     var shouldDisplayToolbarShortcutPublisher: AnyPublisher<Bool, Never> {
-        NotificationCenter.default.publisher(for: .PinnedViewsChanged)
+        notificationCenter.publisher(for: .PinnedViewsChanged)
             .compactMap { notification -> PinnableView? in
                 guard let userInfo = notification.userInfo as? [String: Any],
                       let viewType = userInfo[LocalPinningManager.pinnedViewChangedNotificationViewTypeKey] as? String,
@@ -47,13 +53,12 @@ struct DefaultAIChatPreferencesStorage: AIChatPreferencesStorage {
             .eraseToAnyPublisher()
     }
 
-    private let userDefaults: UserDefaults
-    private let pinningManager: PinningManager
-
     init(userDefaults: UserDefaults = .standard,
-         pinningManager: PinningManager = LocalPinningManager.shared) {
+         pinningManager: PinningManager = LocalPinningManager.shared,
+         notificationCenter: NotificationCenter = .default) {
         self.userDefaults = userDefaults
         self.pinningManager = pinningManager
+        self.notificationCenter = notificationCenter
     }
 
     var shouldDisplayToolbarShortcut: Bool {
@@ -71,31 +76,49 @@ struct DefaultAIChatPreferencesStorage: AIChatPreferencesStorage {
         get { userDefaults.showAIChatShortcutInApplicationMenu }
         set { userDefaults.showAIChatShortcutInApplicationMenu = newValue }
     }
+
+    var didDisplayAIChatToolbarOnboarding: Bool {
+        get { userDefaults.didDisplayAIChatToolbarOnboarding }
+        set { userDefaults.didDisplayAIChatToolbarOnboarding = newValue }
+    }
 }
 
 private extension UserDefaults {
-    private var showAIChatShortcutInApplicationMenuKey: String {
-        "aichat.showAIChatShortcutInApplicationMenu"
+    enum Keys {
+        static let showAIChatShortcutInApplicationMenuKey = "aichat.showAIChatShortcutInApplicationMenu"
+        static let didDisplayAIChatToolbarOnboardingKey = "aichat.didDisplayAIChatToolbarOnboarding"
     }
 
     static let showAIChatShortcutInApplicationMenuDefaultValue = false
+    static let didDisplayAIChatToolbarOnboardingDefaultValue = false
 
-    @objc
-    dynamic var showAIChatShortcutInApplicationMenu: Bool {
+    @objc dynamic var showAIChatShortcutInApplicationMenu: Bool {
         get {
-            value(forKey: showAIChatShortcutInApplicationMenuKey) as? Bool ?? Self.showAIChatShortcutInApplicationMenuDefaultValue
+            value(forKey: Keys.showAIChatShortcutInApplicationMenuKey) as? Bool ?? Self.showAIChatShortcutInApplicationMenuDefaultValue
         }
 
         set {
-            guard newValue != showAIChatShortcutInApplicationMenu else {
-                return
-            }
+            guard newValue != showAIChatShortcutInApplicationMenu else { return }
+            set(newValue, forKey: Keys.showAIChatShortcutInApplicationMenuKey)
+        }
+    }
 
-            set(newValue, forKey: showAIChatShortcutInApplicationMenuKey)
+    @objc dynamic var didDisplayAIChatToolbarOnboarding: Bool {
+        get {
+            value(forKey: Keys.didDisplayAIChatToolbarOnboardingKey) as? Bool ?? Self.didDisplayAIChatToolbarOnboardingDefaultValue
+        }
+
+        set {
+            guard newValue != didDisplayAIChatToolbarOnboarding else { return }
+            set(newValue, forKey: Keys.didDisplayAIChatToolbarOnboardingKey)
         }
     }
 
     var showAIChatShortcutInApplicationMenuPublisher: AnyPublisher<Bool, Never> {
         publisher(for: \.showAIChatShortcutInApplicationMenu).eraseToAnyPublisher()
+    }
+
+    var didDisplayAIChatToolbarOnboardingPublisher: AnyPublisher<Bool, Never> {
+        publisher(for: \.didDisplayAIChatToolbarOnboarding).eraseToAnyPublisher()
     }
 }
