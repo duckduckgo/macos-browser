@@ -28,7 +28,7 @@ final class AutofillCredentialsImportManagerTests: XCTestCase {
     override func setUp() {
         super.setUp()
         importState = MockAutofillLoginImportState()
-        manager = AutofillCredentialsImportManager(stateStore: importState, loginImportStateProvider: importState, isBurnerWindow: false)
+        manager = AutofillCredentialsImportManager(loginImportStateProvider: importState, isBurnerWindow: false)
     }
 
     override func tearDown() {
