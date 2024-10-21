@@ -23,7 +23,40 @@ import Suggestions
 
 final class SuggestionContainerViewModelTests: XCTestCase {
 
+    var suggestionLoadingMock: SuggestionLoadingMock!
+    var historyCoordinatingMock: HistoryCoordinatingMock!
+    var suggestionContainer: SuggestionContainer!
+    var suggestionContainerViewModel: SuggestionContainerViewModel!
+
     var cancellables = Set<AnyCancellable>()
+
+    override func setUp() {
+        SearchPreferences.shared.showAutocompleteSuggestions = true
+        suggestionLoadingMock = SuggestionLoadingMock()
+        historyCoordinatingMock = HistoryCoordinatingMock()
+        suggestionContainer = SuggestionContainer(suggestionLoading: suggestionLoadingMock,
+                                                  historyCoordinating: historyCoordinatingMock,
+                                                  bookmarkManager: LocalBookmarkManager.shared)
+        suggestionContainerViewModel = SuggestionContainerViewModel(suggestionContainer: suggestionContainer)
+    }
+
+    override func tearDown() {
+        suggestionLoadingMock = nil
+        historyCoordinatingMock = nil
+        suggestionContainer = nil
+        suggestionContainerViewModel = nil
+        cancellables.removeAll()
+    }
+
+    private func waitForMainQueueToFlush(for timeout: TimeInterval) {
+        let e = expectation(description: "Main Queue flushed")
+        DispatchQueue.main.async {
+            e.fulfill()
+        }
+        wait(for: [e], timeout: timeout)
+    }
+
+    // MARK: - Tests
 
     func testWhenSelectionIndexIsNilThenSelectedSuggestionViewModelIsNil() {
         let suggestionContainer = SuggestionContainer()
@@ -33,21 +66,24 @@ final class SuggestionContainerViewModelTests: XCTestCase {
         XCTAssertNil(suggestionContainerViewModel.selectedSuggestionViewModel)
     }
 
-    func testWhenSuggestionIsSelectedThenSelectedSuggestionViewModelMatchSuggestions() {
-        let suggestionContainerViewModel = SuggestionContainerViewModel.aSuggestionContainerViewModel
+    func testWhenSuggestionIsSelectedThenSelectedSuggestionViewModelMatchesSuggestion() {
+        suggestionContainer.getSuggestions(for: "Test")
+        suggestionLoadingMock.completion?(SuggestionResult.aSuggestionResult, nil )
 
         let index = 0
 
         let selectedSuggestionViewModelExpectation = expectation(description: "Selected suggestion view model expectation")
-        suggestionContainerViewModel.$selectedSuggestionViewModel.sink { selectedSuggestionViewModel in
-            if let selectedSuggestionViewModel = selectedSuggestionViewModel {
-                XCTAssertEqual(suggestionContainerViewModel.suggestionContainer.result?.all[index], selectedSuggestionViewModel.suggestion)
+        suggestionContainerViewModel.$selectedSuggestionViewModel
+            .dropFirst()
+            .sink { [unowned self] selectedSuggestionViewModel in
+                XCTAssertNotNil(selectedSuggestionViewModel)
+                XCTAssertEqual(suggestionContainerViewModel.suggestionContainer.result?.all[index], selectedSuggestionViewModel?.suggestion)
                 selectedSuggestionViewModelExpectation.fulfill()
             }
-        } .store(in: &cancellables)
+            .store(in: &cancellables)
 
         suggestionContainerViewModel.select(at: index)
-        waitForExpectations(timeout: 1, handler: nil)
+        waitForExpectations(timeout: 0, handler: nil)
     }
 
     func testWhenSelectCalledWithIndexOutOfBoundsThenSelectedSuggestionViewModelIsNil() {
@@ -58,86 +94,211 @@ final class SuggestionContainerViewModelTests: XCTestCase {
 
         let selectedSuggestionViewModelExpectation = expectation(description: "Selected suggestion view model expectation")
 
-        suggestionListViewModel.$selectedSuggestionViewModel.debounce(for: 0.1, scheduler: RunLoop.main).sink { selectedSuggestionViewModel in
-            XCTAssertNil(suggestionListViewModel.selectionIndex)
-            XCTAssertNil(selectedSuggestionViewModel)
-            selectedSuggestionViewModelExpectation.fulfill()
-        } .store(in: &cancellables)
+        suggestionListViewModel.$selectedSuggestionViewModel
+            .debounce(for: 0.1, scheduler: RunLoop.main)
+            .sink { selectedSuggestionViewModel in
+                XCTAssertNil(suggestionListViewModel.selectionIndex)
+                XCTAssertNil(selectedSuggestionViewModel)
+                selectedSuggestionViewModelExpectation.fulfill()
+            }
+            .store(in: &cancellables)
         waitForExpectations(timeout: 1, handler: nil)
     }
 
     func testWhenClearSelectionIsCalledThenNoSuggestonIsSeleted() {
-        let suggestionListViewModel = SuggestionContainerViewModel.aSuggestionContainerViewModel
+        suggestionContainer.getSuggestions(for: "Test")
+        suggestionLoadingMock.completion?(SuggestionResult.aSuggestionResult, nil )
 
-        suggestionListViewModel.select(at: 0)
+        suggestionContainerViewModel.select(at: 0)
 
-        suggestionListViewModel.clearSelection()
+        suggestionContainerViewModel.clearSelection()
 
         let selectedSuggestionViewModelExpectation2 = expectation(description: "Selected suggestion view model expectation")
 
-        suggestionListViewModel.$selectedSuggestionViewModel.debounce(for: 0.1, scheduler: RunLoop.main).sink { _ in
-            XCTAssertNil(suggestionListViewModel.selectionIndex)
-            XCTAssertNil(suggestionListViewModel.selectedSuggestionViewModel)
-            selectedSuggestionViewModelExpectation2.fulfill()
-        } .store(in: &cancellables)
+        suggestionContainerViewModel.$selectedSuggestionViewModel
+            .debounce(for: 0.1, scheduler: RunLoop.main)
+            .sink { [unowned self] _ in
+                XCTAssertNil(suggestionContainerViewModel.selectionIndex)
+                XCTAssertNil(suggestionContainerViewModel.selectedSuggestionViewModel)
+                selectedSuggestionViewModelExpectation2.fulfill()
+            }
+            .store(in: &cancellables)
         waitForExpectations(timeout: 1, handler: nil)
     }
 
     func testSelectNextIfPossible() {
-        let suggestionListViewModel = SuggestionContainerViewModel.aSuggestionContainerViewModel
+        suggestionContainer.getSuggestions(for: "Test")
+        suggestionLoadingMock.completion?(SuggestionResult.aSuggestionResult, nil )
 
-        suggestionListViewModel.selectNextIfPossible()
-        XCTAssertEqual(suggestionListViewModel.selectionIndex, 0)
+        suggestionContainerViewModel.selectNextIfPossible()
+        XCTAssertEqual(suggestionContainerViewModel.selectionIndex, 0)
 
-        suggestionListViewModel.selectNextIfPossible()
-        XCTAssertEqual(suggestionListViewModel.selectionIndex, 1)
+        suggestionContainerViewModel.selectNextIfPossible()
+        XCTAssertEqual(suggestionContainerViewModel.selectionIndex, 1)
 
-        let lastIndex = suggestionListViewModel.numberOfSuggestions - 1
-        suggestionListViewModel.select(at: lastIndex)
-        XCTAssertEqual(suggestionListViewModel.selectionIndex, lastIndex)
+        let lastIndex = suggestionContainerViewModel.numberOfSuggestions - 1
+        suggestionContainerViewModel.select(at: lastIndex)
+        XCTAssertEqual(suggestionContainerViewModel.selectionIndex, lastIndex)
 
-        suggestionListViewModel.selectNextIfPossible()
-        XCTAssertNil(suggestionListViewModel.selectionIndex)
+        suggestionContainerViewModel.selectNextIfPossible()
+        XCTAssertNil(suggestionContainerViewModel.selectionIndex)
     }
 
     func testSelectPreviousIfPossible() {
-        let suggestionListViewModel = SuggestionContainerViewModel.aSuggestionContainerViewModel
+        suggestionContainer.getSuggestions(for: "Test")
+        suggestionLoadingMock.completion?(SuggestionResult.aSuggestionResult, nil )
 
-        suggestionListViewModel.selectPreviousIfPossible()
-        XCTAssertEqual(suggestionListViewModel.selectionIndex, suggestionListViewModel.numberOfSuggestions - 1)
+        suggestionContainerViewModel.selectPreviousIfPossible()
+        XCTAssertEqual(suggestionContainerViewModel.selectionIndex, suggestionContainerViewModel.numberOfSuggestions - 1)
 
-        suggestionListViewModel.selectPreviousIfPossible()
-        XCTAssertEqual(suggestionListViewModel.selectionIndex, suggestionListViewModel.numberOfSuggestions - 2)
+        suggestionContainerViewModel.selectPreviousIfPossible()
+        XCTAssertEqual(suggestionContainerViewModel.selectionIndex, suggestionContainerViewModel.numberOfSuggestions - 2)
 
         let firstIndex = 0
-        suggestionListViewModel.select(at: firstIndex)
-        XCTAssertEqual(suggestionListViewModel.selectionIndex, firstIndex)
+        suggestionContainerViewModel.select(at: firstIndex)
+        XCTAssertEqual(suggestionContainerViewModel.selectionIndex, firstIndex)
 
-        suggestionListViewModel.selectPreviousIfPossible()
-        XCTAssertNil(suggestionListViewModel.selectionIndex)
+        suggestionContainerViewModel.selectPreviousIfPossible()
+        XCTAssertNil(suggestionContainerViewModel.selectionIndex)
+    }
+
+    func testWhenUserAppendsText_suggestionsLoadingInitiatedAndTopHitIsSelected() {
+        XCTAssertFalse(suggestionLoadingMock.getSuggestionsCalled)
+        suggestionContainerViewModel.setUserStringValue("duck", userAppendedStringToTheEnd: true)
+        XCTAssertTrue(suggestionLoadingMock.getSuggestionsCalled)
+
+        let selectedSuggestionViewModelExpectation = expectation(description: "Selected suggestion view model")
+        suggestionContainerViewModel.$selectedSuggestionViewModel
+            .dropFirst()
+            .sink { selectedSuggestionViewModel in
+                XCTAssertNotNil(selectedSuggestionViewModel)
+                XCTAssertEqual(selectedSuggestionViewModel?.suggestion, SuggestionResult.aSuggestionResult.topHits.first)
+                selectedSuggestionViewModelExpectation.fulfill()
+            }
+            .store(in: &cancellables)
+
+        XCTAssertNotNil(suggestionLoadingMock.completion)
+        suggestionLoadingMock.completion?(SuggestionResult.aSuggestionResult, nil)
+
+        wait(for: [selectedSuggestionViewModelExpectation], timeout: 0)
+    }
+
+    func testWhenUserAppendsSpace_suggestionsLoadingInitiatedWithoutTopSuggestionSelection() {
+        suggestionContainerViewModel.setUserStringValue("duck ", userAppendedStringToTheEnd: true)
+        XCTAssertTrue(suggestionLoadingMock.getSuggestionsCalled)
+
+        suggestionContainerViewModel.$selectedSuggestionViewModel
+            .dropFirst()
+            .sink { _ in
+                XCTFail("Unexpected suggestion view model selection")
+            }
+            .store(in: &cancellables)
+
+        suggestionLoadingMock.completion?(SuggestionResult.aSuggestionResult, nil)
+
+        waitForMainQueueToFlush(for: 1)
+    }
+
+    func testWhenUserInsertsTextInTheMiddle_suggestionsLoadingInitiatedWithoutTopSuggestionSelection() {
+        suggestionContainerViewModel.setUserStringValue("duck", userAppendedStringToTheEnd: false)
+        XCTAssertTrue(suggestionLoadingMock.getSuggestionsCalled)
+
+        suggestionContainerViewModel.$selectedSuggestionViewModel
+            .dropFirst()
+            .sink { _ in
+                XCTFail("Unexpected suggestion view model selection")
+            }
+            .store(in: &cancellables)
+
+        suggestionLoadingMock.completion?(SuggestionResult.aSuggestionResult, nil)
+
+        waitForMainQueueToFlush(for: 1)
+    }
+
+    func testWhenNoTopHitsLoaded_topSuggestionIsNotSelected() {
+        suggestionContainerViewModel.setUserStringValue("duck", userAppendedStringToTheEnd: true)
+        XCTAssertTrue(suggestionLoadingMock.getSuggestionsCalled)
+
+        suggestionContainerViewModel.$selectedSuggestionViewModel
+            .dropFirst()
+            .sink { _ in
+                XCTFail("Unexpected suggestion view model selection")
+            }
+            .store(in: &cancellables)
+
+        suggestionLoadingMock.completion?(SuggestionResult.noTopHitsResult, nil)
+
+        waitForMainQueueToFlush(for: 1)
+    }
+
+    func testWhenSuggestionsLoadedAfterUserModifiesText_oldSuggestionsAreNotSelected() {
+        suggestionContainerViewModel.setUserStringValue("duc", userAppendedStringToTheEnd: true)
+        XCTAssertTrue(suggestionLoadingMock.getSuggestionsCalled)
+        suggestionLoadingMock.getSuggestionsCalled = false
+
+        suggestionContainerViewModel.setUserStringValue("duce", userAppendedStringToTheEnd: true)
+        XCTAssertTrue(suggestionLoadingMock.getSuggestionsCalled)
+
+        suggestionContainerViewModel.$selectedSuggestionViewModel
+            .dropFirst()
+            .sink { _ in
+                XCTFail("Unexpected suggestion view model selection")
+            }
+            .store(in: &cancellables)
+
+        suggestionLoadingMock.completion?(SuggestionResult.noTopHitsResult, nil)
+
+        waitForMainQueueToFlush(for: 1)
+    }
+
+    func testWhenOldSuggestionsLoadedAfterUserContinuesTypingText_topHitSuggestionsIsSelectedWithCorrectUserEnteredText() {
+        suggestionContainerViewModel.setUserStringValue("duc", userAppendedStringToTheEnd: true)
+        XCTAssertTrue(suggestionLoadingMock.getSuggestionsCalled)
+        suggestionLoadingMock.getSuggestionsCalled = false
+
+        suggestionContainerViewModel.setUserStringValue("duck", userAppendedStringToTheEnd: true)
+        XCTAssertTrue(suggestionLoadingMock.getSuggestionsCalled)
+
+        let selectedSuggestionViewModelExpectation = expectation(description: "Selected suggestion view model")
+        suggestionContainerViewModel.$selectedSuggestionViewModel
+            .dropFirst()
+            .sink { selectedSuggestionViewModel in
+                XCTAssertNotNil(selectedSuggestionViewModel)
+                XCTAssertEqual(selectedSuggestionViewModel?.suggestion, SuggestionResult.aSuggestionResult.topHits.first)
+                XCTAssertEqual(selectedSuggestionViewModel?.userStringValue, "duck")
+                selectedSuggestionViewModelExpectation.fulfill()
+            }
+            .store(in: &cancellables)
+
+        XCTAssertNotNil(suggestionLoadingMock.completion)
+        suggestionLoadingMock.completion?(SuggestionResult.aSuggestionResult, nil)
+
+        wait(for: [selectedSuggestionViewModelExpectation], timeout: 0)
+    }
+
+    func testWhenUserClearsText_suggestionsLoadingIsCancelled() {
+        suggestionContainerViewModel.setUserStringValue("duck", userAppendedStringToTheEnd: true)
+        XCTAssertTrue(suggestionLoadingMock.getSuggestionsCalled)
+        suggestionLoadingMock.getSuggestionsCalled = false
+
+        suggestionContainerViewModel.setUserStringValue("", userAppendedStringToTheEnd: true)
+        XCTAssertFalse(suggestionLoadingMock.getSuggestionsCalled)
+
+        suggestionContainerViewModel.$selectedSuggestionViewModel
+            .dropFirst()
+            .sink { _ in
+                XCTFail("Unexpected suggestion view model selection")
+            }
+            .store(in: &cancellables)
+
+        suggestionLoadingMock.completion?(SuggestionResult.noTopHitsResult, nil)
+
+        waitForMainQueueToFlush(for: 1)
     }
 
 }
 
 extension SuggestionContainerViewModel {
-
-    static var aSuggestionContainerViewModel: SuggestionContainerViewModel {
-        let suggestionLoadingMock = SuggestionLoadingMock()
-        let historyCoordinatingMock = HistoryCoordinatingMock()
-        let suggestionContainer = SuggestionContainer(suggestionLoading: suggestionLoadingMock,
-                                                      historyCoordinating: historyCoordinatingMock,
-                                                      bookmarkManager: LocalBookmarkManager.shared)
-        let suggestionContainerViewModel = SuggestionContainerViewModel(suggestionContainer: suggestionContainer)
-
-        suggestionContainer.getSuggestions(for: "Test")
-        suggestionLoadingMock.completion?(SuggestionResult.aSuggestionResult, nil )
-
-        while suggestionContainer.result == nil {
-            RunLoop.current.run(mode: .default, before: Date().addingTimeInterval(0.05))
-        }
-
-        return suggestionContainerViewModel
-    }
 
     convenience init(suggestionContainer: SuggestionContainer) {
         self.init(isHomePage: false, isBurner: false, suggestionContainer: suggestionContainer)
@@ -149,11 +310,21 @@ extension SuggestionResult {
 
     static var aSuggestionResult: SuggestionResult {
         let topHits = [
-            Suggestion.website(url: URL.duckDuckGo),
+            Suggestion.bookmark(title: "DuckDuckGo", url: URL.duckDuckGo, isFavorite: true, allowedInTopHits: true),
             Suggestion.website(url: URL.duckDuckGoAutocomplete)
         ]
         return SuggestionResult(topHits: topHits,
                                 duckduckgoSuggestions: [],
+                                localSuggestions: [])
+    }
+
+    static var noTopHitsResult: SuggestionResult {
+        let suggestions = [
+            Suggestion.website(url: URL.duckDuckGo),
+            Suggestion.website(url: URL.duckDuckGoAutocomplete)
+        ]
+        return SuggestionResult(topHits: [],
+                                duckduckgoSuggestions: suggestions,
                                 localSuggestions: [])
     }
 
