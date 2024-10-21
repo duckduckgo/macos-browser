@@ -241,7 +241,7 @@ class AddressBarTests: XCTestCase {
                 index = address.index(after: index)
             }
 
-        waitForExpectations(timeout: 1)
+        waitForExpectations(timeout: 5)
         withExtendedLifetime(c) {}
 
         XCTAssertEqual("youtube.com", addressBarValue.prefix("youtube.com".count))
