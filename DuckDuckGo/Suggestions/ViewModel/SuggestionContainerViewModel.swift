@@ -81,33 +81,24 @@ final class SuggestionContainerViewModel {
                     try validateShouldSelectTopSuggestion(from: result)
                 } catch {
                     Logger.general.debug("SuggestionContainerViewModel: ignoring top suggestion from \( result.map(String.init(describing:)) ?? "<nil>"): \(error)")
-                    print("SuggestionContainerViewModel: ignoring top suggestion from \( result.map(String.init(describing:)) ?? "<nil>"): \(error)")
                     return
                 }
-                print("🦋🍋 selecting at 0 for result for", self.suggestionContainer.latestQuery!)
 
                 self.select(at: 0)
         }
     }
 
     func setUserStringValue(_ userStringValue: String, userAppendedStringToTheEnd: Bool) {
-        guard SearchPreferences.shared.showAutocompleteSuggestions else {
-            print("🦋!SearchPreferences.shared.showAutocompleteSuggestions")
-            return
-        }
+        guard SearchPreferences.shared.showAutocompleteSuggestions else { return }
 
         let oldValue = self.userStringValue
         self.userStringValue = userStringValue
 
         guard !userStringValue.isEmpty else {
-            print("🦋userStringValue.isEmpty")
             suggestionContainer.stopGettingSuggestions()
             return
         }
-        guard userStringValue.lowercased() != oldValue?.lowercased() else {
-            print("🦋\(userStringValue.lowercased()) != \(oldValue?.lowercased() ?? "<nil>")")
-            return
-        }
+        guard userStringValue.lowercased() != oldValue?.lowercased() else { return }
 
         self.isTopSuggestionSelectionExpected = userAppendedStringToTheEnd && !userStringValue.contains(" ")
 
@@ -147,8 +138,6 @@ final class SuggestionContainerViewModel {
 
         if suggestionViewModel(at: index) != self.selectedSuggestionViewModel {
             selectionIndex = index
-        } else {
-            print("🦋selectionIndex == index", index)
         }
     }
 

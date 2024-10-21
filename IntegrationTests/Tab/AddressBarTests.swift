@@ -19,10 +19,12 @@
 import Carbon
 import Combine
 import Foundation
+import History
 import OHHTTPStubs
 import OHHTTPStubsSwift
 import Suggestions
 import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
 @available(macOS 12.0, *)
@@ -197,6 +199,8 @@ class AddressBarTests: XCTestCase {
 
     @MainActor
     func testWhenAddressIsTyped_LoadedTopHitSuggestionIsCorrectlyAppendedAndSelected() {
+        // top hits should only work for visited urls
+        HistoryCoordinator.shared.addVisit(of: URL(string: "https://youtube.com")!)
         let tab = Tab(content: .newtab)
         window = WindowsManager.openNewWindow(with: tab)!
 

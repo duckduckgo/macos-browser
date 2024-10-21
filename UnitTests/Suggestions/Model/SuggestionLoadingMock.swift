@@ -28,7 +28,6 @@ final class SuggestionLoadingMock: SuggestionLoading {
     func getSuggestions(query: Query,
                         usingDataSource dataSource: SuggestionLoadingDataSource,
                         completion: @escaping (SuggestionResult?, Error?) -> Void) {
-        print("🦋SuggestionLoadingMock.getSuggestions: \(query)")
         getSuggestionsCalled = true
         self.completion = completion
     }
