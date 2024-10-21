@@ -54,7 +54,7 @@ final class SuggestionContainerViewModel {
     private enum IgnoreTopSuggestionError: Error {
         case emptyResult
         case topSuggestionSelectionNotExpected
-        case cantBeAutocompleted(SuggestionResult, Bool, Bool, [Suggestion])
+        case cantBeAutocompleted
         case noUserStringValue
         case noSuggestionViewModel
         case notEqual(lhs: String, rhs: String)
@@ -64,7 +64,7 @@ final class SuggestionContainerViewModel {
         guard let result, !result.isEmpty else { throw IgnoreTopSuggestionError.emptyResult }
         guard self.isTopSuggestionSelectionExpected else { throw IgnoreTopSuggestionError.topSuggestionSelectionNotExpected }
         guard result.canBeAutocompleted else {
-            throw IgnoreTopSuggestionError.cantBeAutocompleted(result, result.canBeAutocompleted, result.topHits.isEmpty, result.topHits)
+            throw IgnoreTopSuggestionError.cantBeAutocompleted
         }
         guard let userStringValue else { throw IgnoreTopSuggestionError.noUserStringValue }
         guard let firstSuggestion = self.suggestionViewModel(at: 0) else { throw IgnoreTopSuggestionError.noSuggestionViewModel }
@@ -85,7 +85,7 @@ final class SuggestionContainerViewModel {
                 }
 
                 self.select(at: 0)
-        }
+            }
     }
 
     func setUserStringValue(_ userStringValue: String, userAppendedStringToTheEnd: Bool) {

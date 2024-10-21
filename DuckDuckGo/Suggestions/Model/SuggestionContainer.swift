@@ -34,7 +34,7 @@ final class SuggestionContainer {
     private let startupPreferences: StartupPreferences
     private let loading: SuggestionLoading
 
-    var latestQuery: Query?
+    private var latestQuery: Query?
 
     fileprivate let suggestionsURLSession = URLSession(configuration: .ephemeral)
 
