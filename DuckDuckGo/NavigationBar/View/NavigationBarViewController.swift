@@ -329,7 +329,8 @@ final class NavigationBarViewController: NSViewController {
     }
 
     @IBAction func aiChatButtonAction(_ sender: NSButton) {
-        AIChatTabOpener.openAIChatTab()
+//        AIChatTabOpener.openAIChatTab()
+        popovers.showAIChatOnboardingPopover(from: aiChatButton, withDelegate: self)
     }
 
     override func mouseDown(with event: NSEvent) {
@@ -1185,6 +1186,8 @@ extension NavigationBarViewController: NSPopoverDelegate {
         } else if let popover = popovers.savePaymentMethodPopover, notification.object as AnyObject? === popover {
             popovers.savePaymentMethodPopoverClosed()
             updatePasswordManagementButton()
+        } else if let popover = popovers.aiChatOnboardingPopover, notification.object as AnyObject? === popover {
+            popovers.aiChatOnboardingPopoverClosed()
         }
     }
 
