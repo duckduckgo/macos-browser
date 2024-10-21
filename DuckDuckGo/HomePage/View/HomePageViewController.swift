@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Cocoa
 import Combine
 import SwiftUI
@@ -45,10 +46,14 @@ final class HomePageViewController: NSViewController {
     var recentlyVisitedModel: HomePage.Models.RecentlyVisitedModel!
     var featuresModel: HomePage.Models.ContinueSetUpModel!
     let settingsVisibilityModel = HomePage.Models.SettingsVisibilityModel()
+    private(set) var addressBarModel: HomePage.Models.AddressBarModel!
     let accessibilityPreferences: AccessibilityPreferences
     let appearancePreferences: AppearancePreferences
     let defaultBrowserPreferences: DefaultBrowserPreferences
+    let privacyConfigurationManager: PrivacyConfigurationManaging
     var cancellables = Set<AnyCancellable>()
+
+    private var isShowingSearchBar: Bool = false
 
     @UserDefaultsWrapper(key: .defaultBrowserDismissed, defaultValue: false)
     var defaultBrowserDismissed: Bool
@@ -64,7 +69,8 @@ final class HomePageViewController: NSViewController {
          onboardingViewModel: OnboardingViewModel = OnboardingViewModel(),
          accessibilityPreferences: AccessibilityPreferences = AccessibilityPreferences.shared,
          appearancePreferences: AppearancePreferences = AppearancePreferences.shared,
-         defaultBrowserPreferences: DefaultBrowserPreferences = DefaultBrowserPreferences.shared) {
+         defaultBrowserPreferences: DefaultBrowserPreferences = DefaultBrowserPreferences.shared,
+         privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.bookmarkManager = bookmarkManager
@@ -74,6 +80,7 @@ final class HomePageViewController: NSViewController {
         self.accessibilityPreferences = accessibilityPreferences
         self.appearancePreferences = appearancePreferences
         self.defaultBrowserPreferences = defaultBrowserPreferences
+        self.privacyConfigurationManager = privacyConfigurationManager
 
         super.init(nibName: nil, bundle: nil)
     }
@@ -83,6 +90,7 @@ final class HomePageViewController: NSViewController {
         defaultBrowserModel = createDefaultBrowserModel()
         recentlyVisitedModel = createRecentlyVisitedModel()
         featuresModel = createFeatureModel()
+        addressBarModel = createAddressBarModel()
 
         refreshModels()
 
@@ -96,10 +104,7 @@ final class HomePageViewController: NSViewController {
             .environmentObject(appearancePreferences)
             .environmentObject(Application.appDelegate.activeRemoteMessageModel)
             .environmentObject(settingsVisibilityModel)
-            .onTapGesture { [weak self] in
-                // Remove focus from the address bar if interacting with this view.
-                self?.view.makeMeFirstResponder()
-            }
+            .environmentObject(addressBarModel)
 
         self.view = NSHostingView(rootView: rootView)
     }
@@ -121,6 +126,7 @@ final class HomePageViewController: NSViewController {
     override func viewDidAppear() {
         super.viewDidAppear()
         refreshModels()
+        addressBarModel.addressBarTextField?.makeMeFirstResponder()
     }
 
     override func viewWillDisappear() {
@@ -197,6 +203,13 @@ final class HomePageViewController: NSViewController {
         }, onFaviconMissing: { [weak self] in
             self?.faviconsFetcherOnboarding?.presentOnboardingIfNeeded()
         })
+    }
+
+    func createAddressBarModel() -> HomePage.Models.AddressBarModel {
+        HomePage.Models.AddressBarModel(
+            tabCollectionViewModel: tabCollectionViewModel,
+            privacyConfigurationManager: privacyConfigurationManager
+        )
     }
 
     func refreshFavoritesModel() {
