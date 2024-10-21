@@ -50,25 +50,38 @@ final class SuggestionContainerViewModel {
 
     private var isTopSuggestionSelectionExpected = false
 
-    private var shouldSelectTopSuggestion: Bool {
-        guard let result = suggestionContainer.result, !result.isEmpty else { return false }
+    private var shouldSelectTopSuggestion: String? {
+        guard let result = suggestionContainer.result, !result.isEmpty else { return "result is \(suggestionContainer.result == nil ? "<nil>" : "empty")" }
 
-        if self.isTopSuggestionSelectionExpected,
-           result.canBeAutocompleted,
-           let userStringValue = self.userStringValue,
-           let firstSuggestion = self.suggestionViewModel(at: 0),
-           firstSuggestion.autocompletionString.lowercased().hasPrefix(userStringValue.lowercased()) {
-            return true
-        } else {
-            return false
+        guard self.isTopSuggestionSelectionExpected else {
+            return "\(result): !isTopSuggestionSelectionExpected"
         }
+        guard result.canBeAutocompleted else {
+            return "\(result): !canBeAutocompleted"
+        }
+        guard let userStringValue = self.userStringValue else {
+            return "\(result): userStringValue == nil"
+        }
+        guard let firstSuggestion = self.suggestionViewModel(at: 0) else {
+            return "\(result): suggestionViewModel(at: 0) == nil"
+        }
+        guard firstSuggestion.autocompletionString.lowercased().hasPrefix(userStringValue.lowercased()) else {
+            return "\(result): `\(firstSuggestion.autocompletionString.lowercased())` has no `\(userStringValue.lowercased())` prefix"
+        }
+        return nil
     }
 
     private func subscribeToSuggestionResult() {
-        suggestionResultCancellable = suggestionContainer.$result.sink { [weak self] r in
-            print("🦋$result", r)
-            guard let self, shouldSelectTopSuggestion else { print("🦋!shouldSelectTopSuggestion"); return }
-
+        suggestionResultCancellable = suggestionContainer.$result
+            .sink { [weak self] r in
+                guard let self else {
+                    fatalError()
+                }
+                if let shouldSelectTopSuggestion {
+                    print("🦋❗️ignoring top suggestion:", shouldSelectTopSuggestion)
+                    return
+                }
+                print("🦋🍋 selecting at 0 for result for", self.suggestionContainer.latestQuery!)
             self.select(at: 0)
         }
     }
