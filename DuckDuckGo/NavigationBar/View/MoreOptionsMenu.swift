@@ -62,6 +62,7 @@ final class MoreOptionsMenu: NSMenu {
 
     private let vpnFeatureGatekeeper: VPNFeatureGatekeeper
     private let subscriptionFeatureAvailability: SubscriptionFeatureAvailability
+    private let aiChatMenuConfiguration: AIChatMenuVisibilityConfigurable
 
     required init(coder: NSCoder) {
         fatalError("MoreOptionsMenu: Bad initializer")
@@ -75,7 +76,8 @@ final class MoreOptionsMenu: NSMenu {
          subscriptionFeatureAvailability: SubscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability(),
          sharingMenu: NSMenu? = nil,
          internalUserDecider: InternalUserDecider,
-         subscriptionManager: SubscriptionManager) {
+         subscriptionManager: SubscriptionManager,
+         aiChatMenuConfiguration: AIChatMenuVisibilityConfigurable = AIChatMenuConfiguration()) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.emailManager = emailManager
@@ -84,6 +86,7 @@ final class MoreOptionsMenu: NSMenu {
         self.subscriptionFeatureAvailability = subscriptionFeatureAvailability
         self.internalUserDecider = internalUserDecider
         self.subscriptionManager = subscriptionManager
+        self.aiChatMenuConfiguration = aiChatMenuConfiguration
 
         super.init(title: "")
 
@@ -171,6 +174,11 @@ final class MoreOptionsMenu: NSMenu {
     @MainActor
     @objc func newBurnerWindow(_ sender: NSMenuItem) {
         WindowsManager.openNewWindow(burnerMode: BurnerMode(isBurner: true))
+    }
+
+    @MainActor
+    @objc func newAiChat(_ sender: NSMenuItem) {
+        AIChatTabOpener.openAIChatTab()
     }
 
     @MainActor
@@ -296,6 +304,17 @@ final class MoreOptionsMenu: NSMenu {
         burnerWindowItem.keyEquivalentModifierMask = [.command, .shift]
         burnerWindowItem.image = .newBurnerWindow
         addItem(burnerWindowItem)
+
+        // New AI Chat
+        if aiChatMenuConfiguration.shouldDisplayApplicationMenuShortcut {
+            let aiChatItem = NSMenuItem(title: UserText.newAIChatMenuItem,
+                                        action: #selector(newAiChat(_:)),
+                                        target: self)
+            aiChatItem.keyEquivalent = "n"
+            aiChatItem.keyEquivalentModifierMask = [.command, .option]
+            aiChatItem.image = .aiChat
+            addItem(aiChatItem)
+        }
 
         addItem(NSMenuItem.separator())
     }

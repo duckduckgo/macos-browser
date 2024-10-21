@@ -83,7 +83,7 @@ final class AddBookmarkPopoverViewModel: ObservableObject {
     }
 
     func removeButtonAction(dismiss: () -> Void) {
-        bookmarkManager.remove(bookmark: bookmark)
+        bookmarkManager.remove(bookmark: bookmark, undoManager: nil)
         dismiss()
     }
 

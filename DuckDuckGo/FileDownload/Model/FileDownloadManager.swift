@@ -29,7 +29,7 @@ protocol FileDownloadManagerProtocol: AnyObject {
 
     @discardableResult
     @MainActor
-    func add(_ download: WebKitDownload, fromBurnerWindow: Bool, delegate: DownloadTaskDelegate?, destination: WebKitDownloadTask.DownloadDestination) -> WebKitDownloadTask
+    func add(_ download: WebKitDownload, fireWindowSession: FireWindowSessionRef?, delegate: DownloadTaskDelegate?, destination: WebKitDownloadTask.DownloadDestination) -> WebKitDownloadTask
 
     func cancelAll(waitUntilDone: Bool)
 }
@@ -38,8 +38,8 @@ extension FileDownloadManagerProtocol {
 
     @discardableResult
     @MainActor
-    func add(_ download: WebKitDownload, fromBurnerWindow: Bool, destination: WebKitDownloadTask.DownloadDestination) -> WebKitDownloadTask {
-        add(download, fromBurnerWindow: fromBurnerWindow, delegate: nil, destination: destination)
+    func add(_ download: WebKitDownload, fireWindowSession: FireWindowSessionRef?, destination: WebKitDownloadTask.DownloadDestination) -> WebKitDownloadTask {
+        add(download, fireWindowSession: fireWindowSession, delegate: nil, destination: destination)
     }
 
 }
@@ -63,7 +63,7 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
 
     @discardableResult
     @MainActor
-    func add(_ download: WebKitDownload, fromBurnerWindow: Bool, delegate: DownloadTaskDelegate?, destination: WebKitDownloadTask.DownloadDestination) -> WebKitDownloadTask {
+    func add(_ download: WebKitDownload, fireWindowSession: FireWindowSessionRef?, delegate: DownloadTaskDelegate?, destination: WebKitDownloadTask.DownloadDestination) -> WebKitDownloadTask {
         dispatchPrecondition(condition: .onQueue(.main))
 
         var destination = destination
@@ -71,7 +71,7 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
         if download.originalRequest?.url?.isFileURL ?? true, case .auto = destination {
             destination = .prompt
         }
-        let task = WebKitDownloadTask(download: download, destination: destination, isBurner: fromBurnerWindow)
+        let task = WebKitDownloadTask(download: download, destination: destination, fireWindowSession: fireWindowSession)
         Logger.fileDownload.debug("add \(String(describing: download)): \(download.originalRequest?.url?.absoluteString ?? "<nil>") -> \(destination.debugDescription): \(task)")
 
         let shouldCancelDownloadIfDelegateIsGone = delegate != nil
@@ -243,6 +243,27 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
         self.downloadTaskDelegates[task] = nil
 
         Logger.fileDownload.debug("❎ removed task \(task)")
+    }
+
+}
+
+extension FileDownloadManager {
+
+    static func observeDownloadsFinished(_ downloads: Set<WebKitDownloadTask>, callback: @escaping () -> Void) -> AnyCancellable {
+        var cancellables = [WebKitDownloadTask: AnyCancellable]()
+        for download in downloads {
+            cancellables[download] = download.$state.sink {
+                if !$0.isDownloading {
+                    cancellables[download] = nil
+                    if cancellables.isEmpty {
+                        callback()
+                    }
+                }
+            }
+        }
+        return AnyCancellable {
+            cancellables.removeAll()
+        }
     }
 
 }
