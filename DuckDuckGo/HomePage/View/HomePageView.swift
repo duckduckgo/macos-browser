@@ -368,7 +368,7 @@ fileprivate extension HomePage.Views.RootView {
                     .visibility(model.isRecentActivityVisible ? .visible : .gone)
             }
             .padding(.vertical, Const.itemSpacing)
-            .frame(height: totalHeight(with: geometry))
+            .frame(width: Self.targetWidth, height: totalHeight(with: geometry))
             .offset(y: -centeredViewVerticalOffset(with: geometry))
 
             VStack(spacing: 0) {
@@ -379,7 +379,7 @@ fileprivate extension HomePage.Views.RootView {
             }
             .frame(width: Self.targetWidth)
         }
-        .frame(width: Self.targetWidth, height: max(geometry.size.height, totalHeight(with: geometry)))
+        .frame(height: max(geometry.size.height, totalHeight(with: geometry)))
         .frame(maxWidth: .infinity)
         .onPreferenceChange(RemoteMessageHeightPreferenceKey.self) { value in
             remoteMessageHeight = value
@@ -423,7 +423,7 @@ fileprivate extension HomePage.Views.RootView {
             height += Const.itemSpacing + continueSetUpCardsTopPadding
         }
         if model.isFavoriteVisible {
-            height += 126 + Const.itemSpacing
+            height += 122 + Const.itemSpacing
         }
         if model.isRecentActivityVisible {
             height += 90 + Const.itemSpacing
