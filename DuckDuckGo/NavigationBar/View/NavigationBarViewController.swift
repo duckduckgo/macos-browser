@@ -183,6 +183,8 @@ final class NavigationBarViewController: NSViewController {
 #if DEBUG || REVIEW
         addDebugNotificationListeners()
 #endif
+
+        subscribeToAIChatOnboarding()
     }
 
     override func viewWillAppear() {
@@ -326,11 +328,6 @@ final class NavigationBarViewController: NSViewController {
 
     @IBAction func downloadsButtonAction(_ sender: NSButton) {
         toggleDownloadsPopover(keepButtonVisible: false)
-    }
-
-    @IBAction func aiChatButtonAction(_ sender: NSButton) {
-//        AIChatTabOpener.openAIChatTab()
-        popovers.showAIChatOnboardingPopover(from: aiChatButton, withDelegate: self)
     }
 
     override func mouseDown(with event: NSEvent) {
@@ -904,18 +901,6 @@ final class NavigationBarViewController: NSViewController {
         }
     }
 
-    private func updateAIChatButton() {
-
-        let menu = NSMenu()
-        let title = LocalPinningManager.shared.shortcutTitle(for: .aiChat)
-        menu.addItem(withTitle: title, action: #selector(toggleAIChatPanelPinning(_:)), keyEquivalent: "")
-
-        aiChatButton.menu = menu
-        aiChatButton.toolTip = UserText.aiChat
-
-        aiChatButton.isHidden = !(LocalPinningManager.shared.isPinned(.aiChat) && aiChatMenuConfig.isFeatureEnabledForToolbarShortcut)
-    }
-
     private func subscribeToCredentialsToSave() {
         credentialsToSaveCancellable = tabCollectionViewModel.selectedTabViewModel?.tab.autofillDataToSavePublisher
             .receive(on: DispatchQueue.main)
@@ -979,6 +964,39 @@ final class NavigationBarViewController: NSViewController {
                 refreshOrStopButton?.toolTip = isLoading ? UserText.stopLoadingTooltip : UserText.refreshPageTooltip
             }
             .store(in: &navigationButtonsCancellables)
+    }
+
+    // MARK: - AI Chat
+
+    private func subscribeToAIChatOnboarding() {
+        aiChatMenuConfig.shouldDisplayToolbarOnboardingPopover
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self]  in
+                guard let self = self else { return }
+                self.automaticallyShowAIChatOnboardingPopover()
+        }.store(in: &cancellables)
+    }
+
+    private func automaticallyShowAIChatOnboardingPopover() {
+        popovers.showAIChatOnboardingPopover(from: aiChatButton,
+                                             withDelegate: self)
+        aiChatMenuConfig.markToolbarOnboardingPopoverAsShown()
+    }
+
+    @IBAction func aiChatButtonAction(_ sender: NSButton) {
+        AIChatTabOpener.openAIChatTab()
+        popovers.showAIChatOnboardingPopover(from: aiChatButton, withDelegate: self)
+    }
+
+    private func updateAIChatButton() {
+        let menu = NSMenu()
+        let title = LocalPinningManager.shared.shortcutTitle(for: .aiChat)
+        menu.addItem(withTitle: title, action: #selector(toggleAIChatPanelPinning(_:)), keyEquivalent: "")
+
+        aiChatButton.menu = menu
+        aiChatButton.toolTip = UserText.aiChat
+
+        aiChatButton.isHidden = !(LocalPinningManager.shared.isPinned(.aiChat) && aiChatMenuConfig.isFeatureEnabledForToolbarShortcut)
     }
 }
 

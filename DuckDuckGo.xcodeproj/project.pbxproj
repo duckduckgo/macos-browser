@@ -236,6 +236,8 @@
 		314872792CC689AD00EEF89B /* AIChatToolBarPopUpOnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314872772CC689AD00EEF89B /* AIChatToolBarPopUpOnboardingViewController.swift */; };
 		3148727B2CC689C200EEF89B /* AIChatToolBarPopUpOnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3148727A2CC689C200EEF89B /* AIChatToolBarPopUpOnboardingViewModel.swift */; };
 		3148727C2CC689C200EEF89B /* AIChatToolBarPopUpOnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3148727A2CC689C200EEF89B /* AIChatToolBarPopUpOnboardingViewModel.swift */; };
+		3148727E2CC68F6900EEF89B /* AIChatOnboardingTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3148727D2CC68F6200EEF89B /* AIChatOnboardingTabExtension.swift */; };
+		3148727F2CC68F6900EEF89B /* AIChatOnboardingTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3148727D2CC68F6200EEF89B /* AIChatOnboardingTabExtension.swift */; };
 		31521AC02CC013AD00248E6F /* AIChatMenuVisibilityConfigurable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31521ABF2CC013A400248E6F /* AIChatMenuVisibilityConfigurable.swift */; };
 		31521AC12CC013AD00248E6F /* AIChatMenuVisibilityConfigurable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31521ABF2CC013A400248E6F /* AIChatMenuVisibilityConfigurable.swift */; };
 		31521AC32CC01BC700248E6F /* AIChatTabOpener.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31521AC22CC01BC300248E6F /* AIChatTabOpener.swift */; };
@@ -3333,6 +3335,7 @@
 		314872732CC653C700EEF89B /* AIChatOnboardingPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIChatOnboardingPopover.swift; sourceTree = "<group>"; };
 		314872772CC689AD00EEF89B /* AIChatToolBarPopUpOnboardingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIChatToolBarPopUpOnboardingViewController.swift; sourceTree = "<group>"; };
 		3148727A2CC689C200EEF89B /* AIChatToolBarPopUpOnboardingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIChatToolBarPopUpOnboardingViewModel.swift; sourceTree = "<group>"; };
+		3148727D2CC68F6200EEF89B /* AIChatOnboardingTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIChatOnboardingTabExtension.swift; sourceTree = "<group>"; };
 		31521ABF2CC013A400248E6F /* AIChatMenuVisibilityConfigurable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIChatMenuVisibilityConfigurable.swift; sourceTree = "<group>"; };
 		31521AC22CC01BC300248E6F /* AIChatTabOpener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIChatTabOpener.swift; sourceTree = "<group>"; };
 		3154FD1328E6011A00909769 /* TabShadowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabShadowView.swift; sourceTree = "<group>"; };
@@ -5218,7 +5221,7 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
-		314872762CC6898C00EEF89B /* OnboardingPoover */ = {
+		314872762CC6898C00EEF89B /* OnboardingPopover */ = {
 			isa = PBXGroup;
 			children = (
 				314872772CC689AD00EEF89B /* AIChatToolBarPopUpOnboardingViewController.swift */,
@@ -5226,13 +5229,13 @@
 				3148727A2CC689C200EEF89B /* AIChatToolBarPopUpOnboardingViewModel.swift */,
 				314872392CC64A5400EEF89B /* AIChatToolBarPopUpOnboardingView.swift */,
 			);
-			path = OnboardingPoover;
+			path = OnboardingPopover;
 			sourceTree = "<group>";
 		};
 		31521ABE2CC0139C00248E6F /* AIChat */ = {
 			isa = PBXGroup;
 			children = (
-				314872762CC6898C00EEF89B /* OnboardingPoover */,
+				314872762CC6898C00EEF89B /* OnboardingPopover */,
 				316C48EE2CC2B231000B08C1 /* AIChatPreferencesStorage.swift */,
 				31521AC22CC01BC300248E6F /* AIChatTabOpener.swift */,
 				31521ABF2CC013A400248E6F /* AIChatMenuVisibilityConfigurable.swift */,
@@ -8660,6 +8663,7 @@
 		B647EFB32922539400BA628D /* TabExtensions */ = {
 			isa = PBXGroup;
 			children = (
+				3148727D2CC68F6200EEF89B /* AIChatOnboardingTabExtension.swift */,
 				B647EFBA2922584B00BA628D /* AdClickAttributionTabExtension.swift */,
 				B6C00ECA292F839D009C73A6 /* AutofillTabExtension.swift */,
 				B6F1B0212BCE5658005E863C /* BrokenSiteInfoTabExtension.swift */,
@@ -11384,6 +11388,7 @@
 				B6B4D1D02B0E0DD000C26286 /* DataImportNoDataView.swift in Sources */,
 				3707EC4B2C47E36A00B67CBE /* CloseButton.swift in Sources */,
 				3706FC57293F65D500E42796 /* TabPreviewWindowController.swift in Sources */,
+				3148727E2CC68F6900EEF89B /* AIChatOnboardingTabExtension.swift in Sources */,
 				1D9A37682BD8EA8800EBC58D /* DockPositionProvider.swift in Sources */,
 				3706FC58293F65D500E42796 /* NSSizeExtension.swift in Sources */,
 				3706FC59293F65D500E42796 /* Fire.swift in Sources */,
@@ -12378,6 +12383,7 @@
 				B6C0B23626E732000031CB7F /* DownloadListItem.swift in Sources */,
 				4B9DB0232A983B24000927DB /* WaitlistRequest.swift in Sources */,
 				4BE3A6C12C16BEB1003FC378 /* VPNRedditSessionWorkaround.swift in Sources */,
+				3148727F2CC68F6900EEF89B /* AIChatOnboardingTabExtension.swift in Sources */,
 				B6B1E87E26D5DA0E0062C350 /* DownloadsPopover.swift in Sources */,
 				85774AFF2A713D3B00DE0561 /* BookmarksBarMenuFactory.swift in Sources */,
 				4B9292A026670D2A00AD2C21 /* SpacerNode.swift in Sources */,

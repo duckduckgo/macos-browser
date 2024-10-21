@@ -27,6 +27,10 @@ protocol AIChatMenuVisibilityConfigurable {
 
     var shortcutURL: URL { get }
     var valuesChangedPublisher: PassthroughSubject<Void, Never> { get }
+
+    var shouldDisplayToolbarOnboardingPopover: PassthroughSubject<Void, Never> { get }
+
+    func markToolbarOnboardingPopoverAsShown()
 }
 
 final class AIChatMenuConfiguration: AIChatMenuVisibilityConfigurable {
@@ -37,8 +41,10 @@ final class AIChatMenuConfiguration: AIChatMenuVisibilityConfigurable {
 
     private var cancellables = Set<AnyCancellable>()
     private var storage: AIChatPreferencesStorage
+    private let notificationCenter: NotificationCenter
 
     var valuesChangedPublisher = PassthroughSubject<Void, Never>()
+    var shouldDisplayToolbarOnboardingPopover = PassthroughSubject<Void, Never>()
 
     var isFeatureEnabledForApplicationMenuShortcut: Bool {
         isFeatureEnabledFor(shortcutType: .applicationMenu)
@@ -60,9 +66,26 @@ final class AIChatMenuConfiguration: AIChatMenuVisibilityConfigurable {
         URL(string: "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=2")!
     }
 
-    init(storage: AIChatPreferencesStorage = DefaultAIChatPreferencesStorage()) {
+    func markToolbarOnboardingPopoverAsShown() {
+        storage.didDisplayAIChatToolbarOnboarding = true
+    }
+
+    init(storage: AIChatPreferencesStorage = DefaultAIChatPreferencesStorage(),
+         notificationCenter: NotificationCenter = .default) {
         self.storage = storage
+        self.notificationCenter = notificationCenter
         self.subscribeToValuesChanged()
+        self.subscribeToAIChatLoadedNotification()
+    }
+
+    private func subscribeToAIChatLoadedNotification() {
+        notificationCenter.publisher(for: .AIChatOpenedForReturningUser)
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                if !self.storage.didDisplayAIChatToolbarOnboarding {
+                    self.shouldDisplayToolbarOnboardingPopover.send()
+                }
+            }.store(in: &cancellables)
     }
 
     private func subscribeToValuesChanged() {
