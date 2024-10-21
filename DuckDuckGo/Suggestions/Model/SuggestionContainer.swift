@@ -27,7 +27,7 @@ final class SuggestionContainer {
 
     static let maximumNumberOfSuggestions = 9
 
-    @Published private(set) var result: SuggestionResult?
+    @PublishedAfter private(set) var result: SuggestionResult?
 
     private let historyCoordinating: HistoryCoordinating
     private let bookmarkManager: BookmarkManager
@@ -60,9 +60,9 @@ final class SuggestionContainer {
         loading.getSuggestions(query: query, usingDataSource: self) { [weak self] result, error in
             dispatchPrecondition(condition: .onQueue(.main))
 
-            guard self?.latestQuery == query else { return }
-            guard let result = result else {
-                self?.result = nil
+            guard let self, self.latestQuery == query else { return }
+            guard let result else {
+                self.result = nil
                 Logger.general.error("Suggestions: Failed to get suggestions - \(String(describing: error))")
                 PixelKit.fire(DebugEvent(GeneralPixel.suggestionsFetchFailed, error: error))
                 return
@@ -73,7 +73,7 @@ final class SuggestionContainer {
                 Logger.general.error("Suggestions: Error when getting suggestions - \(error.localizedDescription)")
             }
 
-            self?.result = result
+            self.result = result
         }
     }
 
