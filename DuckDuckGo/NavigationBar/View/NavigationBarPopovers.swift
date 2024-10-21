@@ -58,6 +58,7 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
     private(set) var savePaymentMethodPopover: SavePaymentMethodPopover?
     private(set) var autofillPopoverPresenter: AutofillPopoverPresenter
     private(set) var downloadsPopover: DownloadsPopover?
+    private(set) var aiChatOnboardingPopover: AIChatOnboardingPopover?
 
     private var privacyDashboardPopover: PrivacyDashboardPopover?
     private var privacyInfoCancellable: AnyCancellable?
@@ -224,7 +225,20 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
             privacyDashboardPopover?.close()
         }
 
+        if aiChatOnboardingPopover?.isShown ?? false {
+            aiChatOnboardingPopover?.close()
+        }
+
         return true
+    }
+
+    func showAIChatOnboardingPopover(from button: MouseOverButton, withDelegate delegate: NSPopoverDelegate) {
+        guard closeTransientPopovers() else { return }
+        let popover = aiChatOnboardingPopover ?? AIChatOnboardingPopover()
+
+        popover.delegate = delegate
+        aiChatOnboardingPopover = popover
+        show(popover, positionedBelow: button)
     }
 
     func showBookmarkListPopover(from button: MouseOverButton, withDelegate delegate: NSPopoverDelegate, forTab tab: Tab?) {
@@ -375,6 +389,10 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
 
     func bookmarkListPopoverClosed() {
         bookmarkListPopover = nil
+    }
+
+    func aiChatOnboardingPopoverClosed() {
+        aiChatOnboardingPopover = nil
     }
 
     func saveIdentityPopoverClosed() {

@@ -358,6 +358,13 @@ struct UserText {
     // Misc
 
     // AI Chat
+    static let aiChatOnboardingPopoverTitle = NSLocalizedString("ai-chat.onboarding.popover.title", value: "Launch AI Chat directly from your toolbar", comment: "AI Chat onboarding popover title")
+    static let aiChatOnboardingPopoverMessage1 = NSLocalizedString("ai-chat.onboarding.popover.message1", value: "You can adjust this and other AI Chat features in", comment: "AI Chat onboarding popover message")
+    static let aiChatOnboardingPopoverMessage2 = NSLocalizedString("ai-chat.onboarding.popover.message2", value: "Settings > AI Chat.", comment: "AI Chat onboarding popover message continuation")
+    static let aiChatOnboardingPopoverCTAReject = NSLocalizedString("ai-chat.onboarding.popover.reject", value: "No Thanks", comment: "AI Chat onboarding CTA for rejection")
+    static let aiChatOnboardingPopoverCTAAccept = NSLocalizedString("ai-chat.onboarding.popover.accept", value: "Add Shortcut", comment: "AI Chat onboarding CTA for approval")
+
+
     static let aiChatShowInToolbarToggle = NSLocalizedString("ai-chat.show-in-toolbar.toggle", value: "Show AI Chat shortcut in browser toolbar", comment: "Show AI Chat in toolbar")
 
     static let aiChatShowInApplicationMenuToggle = NSLocalizedString("ai-chat.show-in-application-menu.toggle", value: "Show “New AI Chat” in File and application menus", comment: "Show AI Chat in application menus")
