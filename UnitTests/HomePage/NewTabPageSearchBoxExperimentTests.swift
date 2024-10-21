@@ -49,7 +49,6 @@ class CapturingNewTabPageSearchBoxExperimentPixelReporter: NewTabPageSearchBoxEx
     }
 }
 
-
 final class NewTabPageSearchBoxExperimentTests: XCTestCase {
     var experiment: NewTabPageSearchBoxExperiment!
     var suiteName: String!
