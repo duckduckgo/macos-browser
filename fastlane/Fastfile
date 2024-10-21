@@ -83,7 +83,7 @@ platform :mac do
   desc 'Makes App Store release build and uploads it to TestFlight'
   lane :release_testflight do |options|
     build_release(options)
-    
+
     upload_to_testflight(options.merge({api_key: get_api_key}))
   end
 

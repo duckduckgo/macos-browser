@@ -62,28 +62,28 @@ on:
         required: true
 
 jobs:
-  # KS: TODO revert
-  # dmg-release:
-  #   name: Prepare DMG Release
-  #   uses: ./.github/workflows/build_notarized.yml
-  #   with:
-  #     release-type: release
-  #     create-dmg: true
-  #     asana-task-url: ${{ inputs.asana-task-url }}
-  #     branch: ${{ inputs.branch }}
-  #   secrets:
-  #     APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
-  #     APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
-  #     APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
-  #     ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
-  #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #     AWS_ACCESS_KEY_ID_RELEASE_S3: ${{ secrets.AWS_ACCESS_KEY_ID_RELEASE_S3 }}
-  #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #     AWS_SECRET_ACCESS_KEY_RELEASE_S3: ${{ secrets.AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
-  #     MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-  #     MM_HANDLES_BASE64: ${{ secrets.MM_HANDLES_BASE64 }}
-  #     MM_WEBHOOK_URL: ${{ secrets.MM_WEBHOOK_URL }}
-  #     SSH_PRIVATE_KEY_FASTLANE_MATCH: ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
+
+  dmg-release:
+    name: Prepare DMG Release
+    uses: ./.github/workflows/build_notarized.yml
+    with:
+      release-type: release
+      create-dmg: true
+      asana-task-url: ${{ inputs.asana-task-url }}
+      branch: ${{ inputs.branch }}
+    secrets:
+      APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
+      APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+      APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
+      ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_ACCESS_KEY_ID_RELEASE_S3: ${{ secrets.AWS_ACCESS_KEY_ID_RELEASE_S3 }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_SECRET_ACCESS_KEY_RELEASE_S3: ${{ secrets.AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
+      MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+      MM_HANDLES_BASE64: ${{ secrets.MM_HANDLES_BASE64 }}
+      MM_WEBHOOK_URL: ${{ secrets.MM_WEBHOOK_URL }}
+      SSH_PRIVATE_KEY_FASTLANE_MATCH: ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
 
   appstore-release:
     name: Prepare AppStore Release

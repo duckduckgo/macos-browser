@@ -1,18 +1,11 @@
 name: Promote TestFlight to App Store
 
 on: 
-  workflow_dispatch:
-    inputs:
-      asana-task-url:
-        description: "Asana release task URL"
-        required: false
-        type: string
+  workflow_dispatch: {}
 
 jobs:
   promote-testflight-to-appstore:
-    runs-on: macos-14-xlarge
-    env:
-      asana-task-url: ${{ github.event.inputs.asana-task-url || inputs.asana-task-url }}
+    runs-on: macos-14
 
     steps:
     - name: Check out the code
