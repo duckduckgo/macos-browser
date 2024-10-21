@@ -6,7 +6,7 @@ on:
       destination:
         description: "Upload destination (TestFlight or App Store)"
         required: true
-        default: appstore
+        default: testflight
         type: choice
         options:
         - testflight
@@ -21,7 +21,7 @@ on:
       destination:
         description: "Upload destination (TestFlight or App Store)"
         required: true
-        default: appstore
+        default: testflight
         type: string
       asana-task-url:
         description: "Asana release task URL"
@@ -113,7 +113,7 @@ jobs:
         APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
         MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
       run: |
-        bundle exec fastlane release_${{ env.destination }}_review
+        bundle exec fastlane release_${{ env.destination }}
         dsym_path="${{ github.workspace }}/DuckDuckGo-AppStore.app.dSYM.zip"
         mv -f "${{ github.workspace }}/DuckDuckGo App Store.app.dSYM.zip" "${dsym_path}"
         version="$(cut -d ' ' -f 3 < Configuration/Version.xcconfig)"

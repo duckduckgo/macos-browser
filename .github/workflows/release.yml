@@ -11,6 +11,11 @@ on:
         description: "Skip App Store release and only make a DMG build"
         default: false
         type: boolean
+      destination: 
+        description: "Upload destination (TestFlight or App Store)"
+        required: false
+        default: testflight
+        type: string
   workflow_call:
     inputs:
       asana-task-url:
@@ -25,6 +30,11 @@ on:
         description: "Skip App Store release and only make a DMG build"
         default: false
         type: boolean
+      destination: 
+        description: "Upload destination (TestFlight or App Store)"
+        required: false
+        default: testflight
+        type: string
     secrets:
       APPLE_API_KEY_BASE64:
         required: true
@@ -82,7 +92,7 @@ jobs:
 
     uses: ./.github/workflows/build_appstore.yml
     with:
-      destination: testflight
+      destination: ${{ inputs.destination }}
       asana-task-url: ${{ inputs.asana-task-url }}
       branch: ${{ inputs.branch }}
     secrets:
