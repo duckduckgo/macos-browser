@@ -67,7 +67,7 @@ jobs:
 
     steps:
 
-    # # KS: TODO remove _review
+     # KS: TODO check for testflight now too?
     - name: Assert release branch
       if: env.destination == 'appstore'
       run: |
@@ -105,7 +105,7 @@ jobs:
     - name: Select Xcode
       run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
-    # TODO remove _review
+    # KS: TODO remove _review
     - name: Archive and Upload the App
       env:
         APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
@@ -113,7 +113,7 @@ jobs:
         APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
         MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
       run: |
-        bundle exec fastlane release_${{ env.destination }}
+        bundle exec fastlane release_${{ env.destination }}_review
         dsym_path="${{ github.workspace }}/DuckDuckGo-AppStore.app.dSYM.zip"
         mv -f "${{ github.workspace }}/DuckDuckGo App Store.app.dSYM.zip" "${dsym_path}"
         version="$(cut -d ' ' -f 3 < Configuration/Version.xcconfig)"
