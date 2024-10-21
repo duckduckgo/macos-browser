@@ -288,8 +288,8 @@ final class HomePageViewController: NSViewController {
                     height: HomePage.Views.RootView.SettingsButtonView.height)
 
                 let viewController = PopoverMessageViewController(
-                    title: "Add extra personality to your new tab page",
-                    message: "Now you can customize your new tab page background, theme, and even what content you see. Give it a try!",
+                    title: UserText.homePageSettingsOnboardingTitle,
+                    message: UserText.homePageSettingsOnboardingMessage,
                     image: .settingsOnboardingPopover,
                     shouldShowCloseButton: true,
                     presentMultiline: true,

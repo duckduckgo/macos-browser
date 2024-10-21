@@ -27292,6 +27292,30 @@
         }
       }
     },
+    "home.page.settings.onboarding.message" : {
+      "comment" : "Home Page Settings Onboarding message",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Customize the background, theme, and even what content you see. Give it a try!"
+          }
+        }
+      }
+    },
+    "home.page.settings.onboarding.title" : {
+      "comment" : "Home Page Settings Onboarding message title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add extra personality to your new tab page"
+          }
+        }
+      }
+    },
     "home.page.settings.sections" : {
       "comment" : "Section title in Home Page Settings to adjust Home Page sections visibility",
       "extractionState" : "extracted_with_value",
