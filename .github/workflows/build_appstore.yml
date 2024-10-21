@@ -67,7 +67,7 @@ jobs:
 
     steps:
 
-     # KS: TODO check for testflight now too?
+     # KS: TODO add || env.destination == 'testflight'
     - name: Assert release branch
       if: env.destination == 'appstore'
       run: |
@@ -94,7 +94,7 @@ jobs:
     - name: Check if this is an official release build
       id: is-official-release
       env:
-        is-official-release: ${{ env.destination == 'appstore' && (startsWith(env.branch, 'release') || startsWith(env.branch, 'hotfix')) }}
+        is-official-release: ${{ (env.destination == 'appstore' || env.destination == 'testflight') && (startsWith(env.branch, 'release') || startsWith(env.branch, 'hotfix')) }}
       run: |
         if [[ "${{ env.is-official-release }}" == "true" ]]; then
           upload_to=s3
@@ -113,7 +113,7 @@ jobs:
         APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
         MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
       run: |
-        bundle exec fastlane release_${{ env.destination }}_review
+        bundle exec fastlane release_${{ env.destination }}
         dsym_path="${{ github.workspace }}/DuckDuckGo-AppStore.app.dSYM.zip"
         mv -f "${{ github.workspace }}/DuckDuckGo App Store.app.dSYM.zip" "${dsym_path}"
         version="$(cut -d ' ' -f 3 < Configuration/Version.xcconfig)"
