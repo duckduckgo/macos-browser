@@ -221,9 +221,9 @@ final class NewTabPageSearchBoxExperiment {
         var numberOfSearches: Int?
 
         // if a pixel has ever been fired
-        if let daySinceLastPixel = daySinceLastSearchPixel {
+        if let daySinceEnrollmentForLastSearchPixelTimestamp {
             // if a pixel has already been fired today
-            if daySinceEnrollment == daySinceLastPixel {
+            if daySinceEnrollmentForLastSearchPixelTimestamp == daySinceEnrollment {
                 // only fire if it's been fewer than 10 searches
                 if dataStore.numberOfSearches < Const.maxNumberOfSearchesPerDay {
                     numberOfSearches = dataStore.numberOfSearches + 1
@@ -251,7 +251,7 @@ final class NewTabPageSearchBoxExperiment {
         }
     }
 
-    private var daySinceLastSearchPixel: Int? {
+    private var daySinceEnrollmentForLastSearchPixelTimestamp: Int? {
         guard let lastPixelTimestamp = dataStore.lastPixelTimestamp else {
             return nil
         }
