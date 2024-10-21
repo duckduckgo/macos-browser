@@ -31,6 +31,7 @@ final class SuggestionContainerViewModelTests: XCTestCase {
     var cancellables = Set<AnyCancellable>()
 
     override func setUp() {
+        SearchPreferences.shared.showAutocompleteSuggestions = true
         suggestionLoadingMock = SuggestionLoadingMock()
         historyCoordinatingMock = HistoryCoordinatingMock()
         suggestionContainer = SuggestionContainer(suggestionLoading: suggestionLoadingMock,
@@ -176,9 +177,9 @@ final class SuggestionContainerViewModelTests: XCTestCase {
             }
             .store(in: &cancellables)
 
+        XCTAssertNotNil(suggestionLoadingMock.completion)
         suggestionLoadingMock.completion?(SuggestionResult.aSuggestionResult, nil)
 
-        waitForMainQueueToFlush(for: 1)
         wait(for: [selectedSuggestionViewModelExpectation], timeout: 0)
     }
 
@@ -269,9 +270,9 @@ final class SuggestionContainerViewModelTests: XCTestCase {
             }
             .store(in: &cancellables)
 
+        XCTAssertNotNil(suggestionLoadingMock.completion)
         suggestionLoadingMock.completion?(SuggestionResult.aSuggestionResult, nil)
 
-        waitForMainQueueToFlush(for: 1)
         wait(for: [selectedSuggestionViewModelExpectation], timeout: 0)
     }
 
