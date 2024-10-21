@@ -88,7 +88,7 @@
   ],
   "schedulingConfig": {
     "retryError": 48,
-    "confirmOptOutScan": 72,
+    "confirmOptOutScan": 0,
     "maintenanceScan": 240
   },
   "addedDatetime": 1725632531153,
