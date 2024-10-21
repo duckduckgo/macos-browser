@@ -28,7 +28,7 @@ class MockOnboardingExperimentCohortProvider: OnboardingExperimentCohortProvidin
     var onboardingExperimentCohort: PixelExperiment?
 }
 
-class MockNewTabPageSearchBoxExperimentPixelReporter: NewTabPageSearchBoxExperimentPixelReporting {
+class CapturingNewTabPageSearchBoxExperimentPixelReporter: NewTabPageSearchBoxExperimentPixelReporting {
     struct PixelArguments: Equatable {
         var day: Int
         var count: Int
@@ -57,7 +57,7 @@ final class NewTabPageSearchBoxExperimentTests: XCTestCase {
     var dataStore: DefaultNewTabPageSearchBoxExperimentDataStore!
     var cohortDecider: MockNewTabPageSearchBoxExperimentCohortDecider!
     var onboardingExperimentCohortProvider: MockOnboardingExperimentCohortProvider!
-    var pixelReporter: MockNewTabPageSearchBoxExperimentPixelReporter!
+    var pixelReporter: CapturingNewTabPageSearchBoxExperimentPixelReporter!
 
     override func setUp() {
         super.setUp()
@@ -67,7 +67,7 @@ final class NewTabPageSearchBoxExperimentTests: XCTestCase {
         dataStore = DefaultNewTabPageSearchBoxExperimentDataStore(userDefaults: userDefaults)
         cohortDecider = MockNewTabPageSearchBoxExperimentCohortDecider()
         onboardingExperimentCohortProvider = MockOnboardingExperimentCohortProvider()
-        pixelReporter = MockNewTabPageSearchBoxExperimentPixelReporter()
+        pixelReporter = CapturingNewTabPageSearchBoxExperimentPixelReporter()
 
         experiment = NewTabPageSearchBoxExperiment(
             dataStore: DefaultNewTabPageSearchBoxExperimentDataStore(userDefaults: userDefaults),
@@ -162,7 +162,7 @@ final class NewTabPageSearchBoxExperimentTests: XCTestCase {
         XCTAssertEqual(
             pixelReporter.calls,
             [
-                MockNewTabPageSearchBoxExperimentPixelReporter
+                CapturingNewTabPageSearchBoxExperimentPixelReporter
                     .PixelArguments(day: 1, count: 1, from: .addressBar, cohort: .control, onboardingCohort: .newOnboarding),
                 .init(day: 1, count: 2, from: .addressBar, cohort: .control, onboardingCohort: .newOnboarding),
                 .init(day: 1, count: 3, from: .addressBar, cohort: .control, onboardingCohort: .newOnboarding),
@@ -208,7 +208,7 @@ final class NewTabPageSearchBoxExperimentTests: XCTestCase {
         XCTAssertEqual(
             pixelReporter.calls,
             [
-                MockNewTabPageSearchBoxExperimentPixelReporter
+                CapturingNewTabPageSearchBoxExperimentPixelReporter
                     .PixelArguments(day: 1, count: 1, from: .addressBar, cohort: .control, onboardingCohort: .newOnboarding),
                 .init(day: 1, count: 2, from: .ntpAddressBar, cohort: .control, onboardingCohort: .newOnboarding),
                 .init(day: 2, count: 1, from: .ntpSearchBox, cohort: .control, onboardingCohort: .newOnboarding),
@@ -240,7 +240,7 @@ final class NewTabPageSearchBoxExperimentTests: XCTestCase {
         XCTAssertEqual(
             pixelReporter.calls,
             [
-                MockNewTabPageSearchBoxExperimentPixelReporter
+                CapturingNewTabPageSearchBoxExperimentPixelReporter
                     .PixelArguments(day: 5, count: 1, from: .addressBar, cohort: .control, onboardingCohort: .newOnboarding),
                 .init(day: 5, count: 2, from: .ntpAddressBar, cohort: .control, onboardingCohort: .newOnboarding)
             ]
