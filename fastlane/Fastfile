@@ -84,12 +84,7 @@ platform :mac do
   lane :release_testflight do |options|
     build_release(options)
     
-    latest_build_info = fetch_testflight_build_number(options)
-    latest_build_number = lane_context[SharedValues::LATEST_TESTFLIGHT_BUILD_NUMBER]   
-    latest_build_version = lane_context[SharedValues::LATEST_TESTFLIGHT_VERSION]
-
-    UI.message("The latest build number #{latest_build_number} of the latest version: #{latest_build_version}")
-    #upload_to_testflight(options.merge({api_key: get_api_key}))
+    upload_to_testflight(options.merge({api_key: get_api_key}))
   end
 
   # Makes App Store Review build and uploads it to TestFlight without managing App Store listing.
