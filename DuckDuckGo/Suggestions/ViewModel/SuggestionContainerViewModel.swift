@@ -74,6 +74,7 @@ final class SuggestionContainerViewModel {
 
     func setUserStringValue(_ userStringValue: String, userAppendedStringToTheEnd: Bool) {
         guard SearchPreferences.shared.showAutocompleteSuggestions else {
+            print("🦋!SearchPreferences.shared.showAutocompleteSuggestions")
             return
         }
 
@@ -81,10 +82,14 @@ final class SuggestionContainerViewModel {
         self.userStringValue = userStringValue
 
         guard !userStringValue.isEmpty else {
+            print("🦋userStringValue.isEmpty")
             suggestionContainer.stopGettingSuggestions()
             return
         }
-        guard userStringValue.lowercased() != oldValue?.lowercased() else { return }
+        guard userStringValue.lowercased() != oldValue?.lowercased() else {
+            print("🦋\(userStringValue.lowercased()) != \(oldValue?.lowercased() ?? "<nil>")")
+            return
+        }
 
         self.isTopSuggestionSelectionExpected = userAppendedStringToTheEnd && !userStringValue.contains(" ")
 

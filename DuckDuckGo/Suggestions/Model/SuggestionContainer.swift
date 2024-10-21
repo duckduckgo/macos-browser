@@ -57,11 +57,16 @@ final class SuggestionContainer {
 
     func getSuggestions(for query: String) {
         latestQuery = query
+        print("🦋getSuggestions for `\(query)`")
         loading.getSuggestions(query: query, usingDataSource: self) { [weak self] result, error in
             dispatchPrecondition(condition: .onQueue(.main))
 
-            guard self?.latestQuery == query else { return }
+            guard self?.latestQuery == query else {
+                print("🦋latestQuery `\(self?.latestQuery ?? "<nil>")` != `\(query)`")
+                return
+            }
             guard let result = result else {
+                print("🦋result is nil")
                 self?.result = nil
                 Logger.general.error("Suggestions: Failed to get suggestions - \(String(describing: error))")
                 PixelKit.fire(DebugEvent(GeneralPixel.suggestionsFetchFailed, error: error))
@@ -73,6 +78,7 @@ final class SuggestionContainer {
                 Logger.general.error("Suggestions: Error when getting suggestions - \(error.localizedDescription)")
             }
 
+            print("🦋assign \(result)")
             self?.result = result
         }
     }

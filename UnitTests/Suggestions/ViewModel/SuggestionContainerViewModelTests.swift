@@ -169,8 +169,13 @@ final class SuggestionContainerViewModelTests: XCTestCase {
 
         let selectedSuggestionViewModelExpectation = expectation(description: "Selected suggestion view model")
         suggestionContainerViewModel.$selectedSuggestionViewModel
+            .map {
+                print("🦋$selectedSuggestionViewModel: `\(String(describing: $0))`")
+                return $0
+            }
             .dropFirst()
             .sink { selectedSuggestionViewModel in
+                print("🦋sink \(String(describing: selectedSuggestionViewModel))")
                 XCTAssertNotNil(selectedSuggestionViewModel)
                 XCTAssertEqual(selectedSuggestionViewModel?.suggestion, SuggestionResult.aSuggestionResult.topHits.first)
                 selectedSuggestionViewModelExpectation.fulfill()
@@ -261,8 +266,13 @@ final class SuggestionContainerViewModelTests: XCTestCase {
 
         let selectedSuggestionViewModelExpectation = expectation(description: "Selected suggestion view model")
         suggestionContainerViewModel.$selectedSuggestionViewModel
+            .map {
+                print("🦋$selectedSuggestionViewModel: `\(String(describing: $0))`")
+                return $0
+            }
             .dropFirst()
             .sink { selectedSuggestionViewModel in
+                print("🦋sink \(String(describing: selectedSuggestionViewModel))")
                 XCTAssertNotNil(selectedSuggestionViewModel)
                 XCTAssertEqual(selectedSuggestionViewModel?.suggestion, SuggestionResult.aSuggestionResult.topHits.first)
                 XCTAssertEqual(selectedSuggestionViewModel?.userStringValue, "duck")
