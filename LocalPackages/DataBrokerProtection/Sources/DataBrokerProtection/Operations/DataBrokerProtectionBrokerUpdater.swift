@@ -18,6 +18,8 @@
 
 import Foundation
 import Common
+import AppKitExtensions
+import Cocoa
 import SecureStorage
 import os.log
 
@@ -44,6 +46,8 @@ final class FileResources: ResourcesRepository {
             throw FileResourcesError.bundleResourceURLNil
         }
 
+        //absolutely must change this back, hardcoding for ci testing at the moment
+        let shouldUseFakeBrokers = true //(NSApp.runType == .integrationTests)
         let brokersURL = resourceURL.appendingPathComponent("Resources").appendingPathComponent("JSON")
         do {
             let fileURLs = try fileManager.contentsOfDirectory(
@@ -53,7 +57,9 @@ final class FileResources: ResourcesRepository {
             )
 
             let brokerJSONFiles = fileURLs.filter {
-                $0.isJSON && !$0.hasFakePrefix
+                $0.isJSON && (
+                (shouldUseFakeBrokers && $0.hasFakePrefix) ||
+                (!shouldUseFakeBrokers && !$0.hasFakePrefix))
             }
 
             return try brokerJSONFiles.map(DataBroker.initFromResource(_:))
