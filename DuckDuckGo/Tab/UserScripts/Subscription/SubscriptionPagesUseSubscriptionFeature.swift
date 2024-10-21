@@ -196,8 +196,8 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
         let message = original
 
-        // Extract the origin from the webview URL to use for attribution pixel.
-        subscriptionSuccessPixelHandler.origin = await originFrom(originalMessage: message)
+        await setPixelOrigin(from: message)
+
         if subscriptionManager.currentEnvironment.purchasePlatform == .appStore {
             if #available(macOS 12.0, *) {
                 guard let subscriptionSelection: SubscriptionSelection = DecodableHelper.decode(from: params) else {
@@ -488,6 +488,18 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         default: return
         }
     }
+
+    // MARK: - Attribution
+    /// Sets the appropriate origin for the subscription success tracking pixel.
+    ///
+    /// - Note: This method is asynchronous when extracting the origin from the webview URL.
+    private func setPixelOrigin(from message: WKScriptMessage) async {
+        // If the user has performed a Freemium scan, set a Freemium origin and return
+        guard !setFreemiumOriginIfScanPerformed() else { return }
+
+        // Else, Extract the origin from the webview URL to use for attribution pixel.
+        subscriptionSuccessPixelHandler.origin = await originFrom(originalMessage: message)
+    }
 }
 
 extension SubscriptionPagesUseSubscriptionFeature: SubscriptionAccessActionHandling {
@@ -560,5 +572,22 @@ private extension SubscriptionPagesUseSubscriptionFeature {
         if freemiumDBPUserStateManager.didActivate && freemiumDBPUserStateManager.upgradeToSubscriptionTimestamp == nil {
             freemiumDBPUserStateManager.upgradeToSubscriptionTimestamp = Date()
         }
+    }
+
+    /// Sets the origin for attribution if the user has started their first Freemium PIR scan
+    ///
+    /// This method checks whether the user has started their first Freemium PIR scan.
+    /// If they have, the method sets the subscription success tracking origin to `"funnel_pro_mac_freemium"` and returns `true`.
+    ///
+    /// - Returns:
+    ///   - `true` if the origin is set because the user has started their first Freemim PIR scan.
+    ///   - `false` if a first scan has not been started and the origin is not set.
+    func setFreemiumOriginIfScanPerformed() -> Bool {
+        let origin = PrivacyProSubscriptionAttributionPixelHandler.Consts.freemiumOrigin
+        if freemiumDBPUserStateManager.didPostFirstProfileSavedNotification {
+            subscriptionSuccessPixelHandler.origin = origin
+            return true
+        }
+        return false
     }
 }
