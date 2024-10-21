@@ -226,10 +226,15 @@ class AddressBarTests: XCTestCase {
         var index = address.startIndex
         let e = expectation(description: "typing done")
         let c = addressBarTextField.suggestionContainerViewModel!.$selectedSuggestionViewModel
+            .receive(on: DispatchQueue.main)
             .sink { [unowned self] suggestion in
-                guard suggestion != nil || index == address.startIndex else { return }
+                guard suggestion != nil /* suggestion shown */
+                        || index == address.startIndex /* address is empty (first iteration) */ else {
+
+                    return
+                }
                 guard index < address.endIndex else {
-                    e.fulfill()
+                    e.fulfill() // typing done
                     return
                 }
                 type(String(address[index]))

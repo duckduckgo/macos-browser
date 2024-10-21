@@ -23,18 +23,28 @@ import Suggestions
 
 final class SuggestionContainerViewModelTests: XCTestCase {
 
-    let suggestionLoadingMock = SuggestionLoadingMock()
-    let historyCoordinatingMock = HistoryCoordinatingMock()
+    var suggestionLoadingMock: SuggestionLoadingMock!
+    var historyCoordinatingMock: HistoryCoordinatingMock!
     var suggestionContainer: SuggestionContainer!
     var suggestionContainerViewModel: SuggestionContainerViewModel!
 
     var cancellables = Set<AnyCancellable>()
 
     override func setUp() {
+        suggestionLoadingMock = SuggestionLoadingMock()
+        historyCoordinatingMock = HistoryCoordinatingMock()
         suggestionContainer = SuggestionContainer(suggestionLoading: suggestionLoadingMock,
                                                   historyCoordinating: historyCoordinatingMock,
                                                   bookmarkManager: LocalBookmarkManager.shared)
         suggestionContainerViewModel = SuggestionContainerViewModel(suggestionContainer: suggestionContainer)
+    }
+
+    override func tearDown() {
+        suggestionLoadingMock = nil
+        historyCoordinatingMock = nil
+        suggestionContainer = nil
+        suggestionContainerViewModel = nil
+        cancellables.removeAll()
     }
 
     private func waitForMainQueueToFlush(for timeout: TimeInterval) {

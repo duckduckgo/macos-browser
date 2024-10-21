@@ -27,7 +27,7 @@ final class SuggestionContainer {
 
     static let maximumNumberOfSuggestions = 9
 
-    @Published private(set) var result: SuggestionResult?
+    @PublishedAfter private(set) var result: SuggestionResult?
 
     private let historyCoordinating: HistoryCoordinating
     private let bookmarkManager: BookmarkManager
