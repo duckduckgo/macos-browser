@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1726941271398,
+    "version": 1728900024972,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -373,10 +373,7 @@
             ],
             "settings": {
                 "disabledCMPs": [
-                    "generic-cosmetic",
-                    "termsfeed3",
-                    "healthline-media",
-                    "ketch"
+                    "healthline-media"
                 ]
             },
             "state": "enabled",
@@ -385,7 +382,7 @@
                     "state": "disabled"
                 }
             },
-            "hash": "a24d4efe9deb2a73284d7beab93c0d32"
+            "hash": "69add087dec44523d540bf49f1ec1b0f"
         },
         "autofillBreakageReporter": {
             "state": "disabled",
@@ -417,9 +414,12 @@
                 },
                 "credentialsImportPromotion": {
                     "state": "enabled"
+                },
+                "credentialsImportPromotionForExistingUsers": {
+                    "state": "enabled"
                 }
             },
-            "hash": "81031a6b86bd68eec102c2ed67f48c1b"
+            "hash": "22709d939c21d127514fd009c54ee987"
         },
         "backgroundAgentPixelTest": {
             "state": "enabled",
@@ -475,6 +475,11 @@
             "hash": "f93d54aff00a2110443fffcd8b3f26c9"
         },
         "brokenSiteReportExperiment": {
+            "exceptions": [],
+            "state": "disabled",
+            "hash": "728493ef7a1488e4781656d3f9db84aa"
+        },
+        "changeOmnibarPosition": {
             "exceptions": [],
             "state": "disabled",
             "hash": "728493ef7a1488e4781656d3f9db84aa"
@@ -1256,10 +1261,13 @@
                     "domain": "flexmls.com"
                 },
                 {
+                    "domain": "wjla.com"
+                },
+                {
                     "domain": "instructure.com"
                 }
             ],
-            "hash": "96b2f778bab196aa424e9c859ddea778"
+            "hash": "d02882dcee87a42b7d29bb6f2e21b4ca"
         },
         "cookie": {
             "settings": {
@@ -1493,7 +1501,8 @@
                                 ".ytd-video-preview",
                                 "#thumbnail-container",
                                 "#video-title-link",
-                                "#video-title"
+                                "#video-title",
+                                "video.video-stream.html5-main-video"
                             ]
                         },
                         "thumbnailOverlays": {
@@ -1544,7 +1553,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "a22c997161337594616c850542cee336"
+            "hash": "6d2484ffb4609f98336632cdd1487f34"
         },
         "elementHiding": {
             "exceptions": [
@@ -3442,6 +3451,15 @@
                         ]
                     },
                     {
+                        "domain": "livebeaches.com",
+                        "rules": [
+                            {
+                                "selector": "[class*='random-ad']",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "livemint.com",
                         "rules": [
                             {
@@ -4857,7 +4875,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "81b9ba9f3245da9eb799ec916e6b916b"
+            "hash": "9cbafdd3b48aabf71f6cfb2f986a7181"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -5312,6 +5330,9 @@
                     "domain": "jcrew.com"
                 },
                 {
+                    "domain": "pgealerts.alerts.pge.com"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -5336,7 +5357,7 @@
                     "privacy-test-pages.site"
                 ]
             },
-            "hash": "70264848cdb2f1e2ac1e21429405319d"
+            "hash": "4df9d206561ea1251d6348865362de63"
         },
         "harmfulApis": {
             "settings": {
@@ -5596,11 +5617,14 @@
                             }
                         ]
                     }
+                },
+                "userTips": {
+                    "state": "enabled"
                 }
             },
             "exceptions": [],
             "minSupportedVersion": "1.57.1",
-            "hash": "4bacd51337ffd170f9947420bf36b875"
+            "hash": "8e20176b0569977f35a9897a40882627"
         },
         "newTabContinueSetUp": {
             "exceptions": [],
@@ -5619,6 +5643,11 @@
                 }
             },
             "hash": "cbd62a1a63a829da0277ca045a311eb2"
+        },
+        "newTabSearchField": {
+            "state": "internal",
+            "exceptions": [],
+            "hash": "f1daaefe788583c2a00d7d19a23864a7"
         },
         "nonTracking3pCookies": {
             "settings": {
@@ -5886,6 +5915,12 @@
             ],
             "settings": {},
             "hash": "dfede9f06b9e322e198736703d013d15"
+        },
+        "sendFullPackageInstallSource": {
+            "state": "enabled",
+            "settings": {},
+            "exceptions": [],
+            "hash": "26d319ff4b2f43012a287b5f35a8db3a"
         },
         "serviceworkerInitiatedRequests": {
             "exceptions": [
@@ -6839,6 +6874,7 @@
                                     "nytimes.com",
                                     "realmadrid.com",
                                     "rocketnews24.com",
+                                    "solitaired.com",
                                     "stuff.co.nz",
                                     "uwbadgers.com",
                                     "wunderground.com",
@@ -7085,7 +7121,8 @@
                                     "bandsintown.com",
                                     "mytrackman.com",
                                     "nextdoor.co.uk",
-                                    "nextdoor.com"
+                                    "nextdoor.com",
+                                    "solitaired.com"
                                 ]
                             },
                             {
@@ -7531,6 +7568,7 @@
                                     "local12.com",
                                     "local21news.com",
                                     "midmichigannow.com",
+                                    "mlb.com",
                                     "my15wtcn.com",
                                     "my24milwaukee.com",
                                     "my48.tv",
@@ -8124,7 +8162,7 @@
                     "nosto.com": {
                         "rules": [
                             {
-                                "rule": "connect.nosto.com/script/shopify/nosto.js",
+                                "rule": "connect.nosto.com",
                                 "domains": [
                                     "<all>"
                                 ]
@@ -8510,6 +8548,7 @@
                                 "rule": "a.pub.network/core/prebid-universal-creative.js",
                                 "domains": [
                                     "signupgenius.com",
+                                    "smithsonianmag.com",
                                     "titantv.com"
                                 ]
                             },
@@ -8654,6 +8693,16 @@
                             }
                         ]
                     },
+                    "sascdn.com": {
+                        "rules": [
+                            {
+                                "rule": "sascdn.com/tag/",
+                                "domains": [
+                                    "filmweb.pl"
+                                ]
+                            }
+                        ]
+                    },
                     "scene7.com": {
                         "rules": [
                             {
@@ -8774,6 +8823,16 @@
                                 "rule": "c.slickstream.com/app/",
                                 "domains": [
                                     "<all>"
+                                ]
+                            }
+                        ]
+                    },
+                    "smartadserver.com": {
+                        "rules": [
+                            {
+                                "rule": "smartadserver.com/genericpost",
+                                "domains": [
+                                    "filmweb.pl"
                                 ]
                             }
                         ]
@@ -9308,6 +9367,16 @@
                             }
                         ]
                     },
+                    "eltiempo.co": {
+                        "rules": [
+                            {
+                                "rule": "ads.eltiempo.co/genericpost",
+                                "domains": [
+                                    "filmweb.pl"
+                                ]
+                            }
+                        ]
+                    },
                     "yandex.tm": {
                         "rules": [
                             {
@@ -9337,7 +9406,7 @@
                     "domain": "instructure.com"
                 }
             ],
-            "hash": "a25d6ff5573cba01207d2793440b370b"
+            "hash": "decc4b889c1d10bde764604562463b3c"
         },
         "trackingCookies1p": {
             "settings": {
@@ -9770,6 +9839,11 @@
             "hash": "728493ef7a1488e4781656d3f9db84aa"
         },
         "windowsExternalPreviewReleases": {
+            "exceptions": [],
+            "state": "disabled",
+            "hash": "728493ef7a1488e4781656d3f9db84aa"
+        },
+        "windowsFireWindow": {
             "exceptions": [],
             "state": "disabled",
             "hash": "728493ef7a1488e4781656d3f9db84aa"

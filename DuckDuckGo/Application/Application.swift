@@ -33,7 +33,8 @@ final class Application: NSApplication {
 
         let mainMenu = MainMenu(featureFlagger: delegate.featureFlagger,
                                 bookmarkManager: delegate.bookmarksManager,
-                                faviconManager: FaviconManager.shared)
+                                faviconManager: FaviconManager.shared,
+                                aiChatMenuConfig: AIChatMenuConfiguration())
         self.mainMenu = mainMenu
 
         // Makes sure Spotlight search is part of Help menu

@@ -700,6 +700,7 @@ class MockBookmarksContextMenuDelegate: NSObject, BookmarksContextMenuDelegate {
     var isSearching: Bool = false
     var parentFolder: DuckDuckGo_Privacy_Browser.BookmarkFolder?
     var shouldIncludeManageBookmarksItem: Bool = true
+    var undoManager: UndoManager?
 
     var selectedBookmarkItems: [Any] = []
     func selectedItems() -> [Any] {

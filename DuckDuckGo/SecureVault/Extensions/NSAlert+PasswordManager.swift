@@ -25,7 +25,7 @@ extension NSAlert {
         alert.messageText = UserText.passwordManagerAlertRemovePasswordConfirmation
         alert.informativeText = UserText.thisActionCannotBeUndone
         alert.alertStyle = .warning
-        alert.addButton(withTitle: UserText.passwordManagerAlerDeleteButton)
+        alert.addButton(withTitle: UserText.passwordManagerAlertDeleteButton)
         alert.addButton(withTitle: UserText.cancel)
         return alert
     }
@@ -54,7 +54,7 @@ extension NSAlert {
         alert.messageText = UserText.passwordManagerAlertRemoveCardConfirmation
         alert.informativeText = UserText.thisActionCannotBeUndone
         alert.alertStyle = .warning
-        alert.addButton(withTitle: UserText.passwordManagerAlerDeleteButton)
+        alert.addButton(withTitle: UserText.passwordManagerAlertDeleteButton)
         alert.addButton(withTitle: UserText.cancel)
         return alert
     }
@@ -64,7 +64,7 @@ extension NSAlert {
         alert.messageText = UserText.passwordManagerAlertRemoveIdentityConfirmation
         alert.informativeText = UserText.thisActionCannotBeUndone
         alert.alertStyle = .warning
-        alert.addButton(withTitle: UserText.passwordManagerAlerDeleteButton)
+        alert.addButton(withTitle: UserText.passwordManagerAlertDeleteButton)
         alert.addButton(withTitle: UserText.cancel)
         return alert
     }
@@ -74,7 +74,7 @@ extension NSAlert {
         alert.messageText = UserText.passwordManagerAlertRemoveNoteConfirmation
         alert.informativeText = UserText.thisActionCannotBeUndone
         alert.alertStyle = .warning
-        alert.addButton(withTitle: UserText.passwordManagerAlerDeleteButton)
+        alert.addButton(withTitle: UserText.passwordManagerAlertDeleteButton)
         alert.addButton(withTitle: UserText.cancel)
         return alert
     }
@@ -84,7 +84,7 @@ extension NSAlert {
         let informationText = UserText.deleteAllPasswordsConfirmationInformationText(syncEnabled: syncEnabled)
         return autofillActionConfirmationAlert(messageText: messageText,
                                         informationText: informationText,
-                                        confirmButtonText: UserText.passwordManagerAlerDeleteButton)
+                                        confirmButtonText: UserText.passwordManagerAlertDeleteButton)
     }
 
     private static func autofillActionConfirmationAlert(messageText: String,

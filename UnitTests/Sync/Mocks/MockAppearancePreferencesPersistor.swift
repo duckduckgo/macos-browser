@@ -45,4 +45,6 @@ class MockAppearancePreferencesPersistor: AppearancePreferencesPersistor {
 
     var bookmarksBarAppearance: BookmarksBarAppearance = .alwaysOn
 
+    var centerAlignedBookmarksBar: Bool = false
+
 }

@@ -31,14 +31,16 @@ protocol TabBarViewModel {
     var faviconPublisher: Published<NSImage?>.Publisher { get }
     var tabContentPublisher: AnyPublisher<Tab.TabContent, Never> { get }
     var usedPermissionsPublisher: Published<Permissions>.Publisher { get }
-    var mutedStatePublisher: Published<WKWebView.AudioState?>.Publisher { get }
+    var audioState: WKWebView.AudioState { get }
+    var audioStatePublisher: AnyPublisher<WKWebView.AudioState, Never> { get }
 }
 extension TabViewModel: TabBarViewModel {
     var titlePublisher: Published<String>.Publisher { $title }
     var faviconPublisher: Published<NSImage?>.Publisher { $favicon }
     var tabContentPublisher: AnyPublisher<Tab.TabContent, Never> { tab.$content.eraseToAnyPublisher() }
     var usedPermissionsPublisher: Published<Permissions>.Publisher { $usedPermissions }
-    var mutedStatePublisher: Published<WKWebView.AudioState?>.Publisher { tab.$audioState }
+    var audioState: WKWebView.AudioState { tab.audioState }
+    var audioStatePublisher: AnyPublisher<WKWebView.AudioState, Never> { tab.audioStatePublisher }
 }
 
 protocol TabBarViewItemDelegate: AnyObject {
@@ -113,11 +115,16 @@ final class TabBarItemCellView: NSView {
         return faviconImageView
     }()
 
-    fileprivate let mutedTabIcon = {
-        let mutedTabIcon = NSImageView(image: .audioMute)
-        mutedTabIcon.contentTintColor = .mutedTabIcon
-        mutedTabIcon.imageScaling = .scaleNone
-        return mutedTabIcon
+    fileprivate let audioButton = {
+        let audioButton = MouseOverButton(title: "", target: nil, action: #selector(TabBarViewItem.audioButtonAction))
+        audioButton.bezelStyle = .shadowlessSquare
+        audioButton.cornerRadius = 2
+        audioButton.normalTintColor = .audioTabIcon
+        audioButton.mouseDownColor = .buttonMouseDown
+        audioButton.mouseOverColor = .buttonMouseOver
+        audioButton.imagePosition = .imageOnly
+        audioButton.imageScaling = .scaleNone
+        return audioButton
     }()
 
     fileprivate let titleTextField = {
@@ -163,6 +170,7 @@ final class TabBarItemCellView: NSView {
         }
         set {
             closeButton.target = newValue
+            audioButton.target = newValue
             permissionButton.target = newValue
         }
     }
@@ -230,7 +238,7 @@ final class TabBarItemCellView: NSView {
 
         addSubview(mouseOverView)
         addSubview(faviconImageView)
-        addSubview(mutedTabIcon)
+        addSubview(audioButton)
         addSubview(titleTextField)
         addSubview(permissionButton)
         addSubview(closeButton)
@@ -268,9 +276,9 @@ final class TabBarItemCellView: NSView {
             faviconImageView.frame = NSRect(x: minX, y: bounds.midY - 8, width: 16, height: 16)
             minX = faviconImageView.frame.maxX + 4
         }
-        if mutedTabIcon.isShown {
-            mutedTabIcon.frame = NSRect(x: minX, y: bounds.midY - 8, width: 16, height: 16)
-            minX = mutedTabIcon.frame.maxX
+        if audioButton.isShown {
+            audioButton.frame = NSRect(x: minX, y: bounds.midY - 8, width: 16, height: 16)
+            minX = audioButton.frame.maxX
         }
         var maxX = bounds.maxX - 9
         if closeButton.isShown {
@@ -301,7 +309,7 @@ final class TabBarItemCellView: NSView {
     }
 
     private func layoutForCompactMode() {
-        let numberOfElements: CGFloat = (faviconImageView.isShown ? 1 : 0) + (mutedTabIcon.isShown ? 1 : 0) + (permissionButton.isShown ? 1 : 0) + (closeButton.isShown ? 1 : 0) + (titleTextField.isShown ? 1 : 0)
+        let numberOfElements: CGFloat = (faviconImageView.isShown ? 1 : 0) + (audioButton.isShown ? 1 : 0) + (permissionButton.isShown ? 1 : 0) + (closeButton.isShown ? 1 : 0) + (titleTextField.isShown ? 1 : 0)
         let elementWidth: CGFloat = 16
         var totalWidth = numberOfElements * elementWidth
         // tighten elements to fit all
@@ -318,13 +326,19 @@ final class TabBarItemCellView: NSView {
             titleTextField.frame = NSRect(x: 4, y: bounds.midY - 8, width: bounds.maxX - 8, height: 16)
             updateTitleTextFieldMask()
         }
-        if mutedTabIcon.isShown {
-            mutedTabIcon.frame = NSRect(x: x.rounded(), y: bounds.midY - 8, width: 16, height: 16)
-            x = mutedTabIcon.frame.maxX + spacing
+        if audioButton.isShown {
+            audioButton.frame = NSRect(x: x.rounded(), y: bounds.midY - 8, width: 16, height: 16)
+            x = audioButton.frame.maxX + spacing
         }
         if permissionButton.isShown {
             // make permission button from 16 to 24pt wide depending of available space
             permissionButton.frame = NSRect(x: x.rounded() - spacing.rounded(), y: bounds.midY - 12, width: 16 + spacing.rounded() * 2, height: 24)
+            x = permissionButton.frame.maxX
+        }
+        if closeButton.isShown {
+            // close button appears in place of favicon in compact mode
+            closeButton.frame = NSRect(x: x.rounded(), y: bounds.midY - 8, width: 16, height: 16)
+            x = closeButton.frame.maxX + spacing
         }
     }
 
@@ -382,6 +396,14 @@ final class TabBarViewItem: NSCollectionViewItem {
     private var cancellables = Set<AnyCancellable>()
 
     weak var delegate: TabBarViewItemDelegate?
+    var tabViewModel: TabBarViewModel? {
+        guard let representedObject else { return nil }
+        guard let tabViewModel = representedObject as? TabBarViewModel else {
+            assertionFailure("Unexpected representedObject \(representedObject)")
+            return nil
+        }
+        return tabViewModel
+    }
 
     private(set) var isMouseOver = false
 
@@ -510,6 +532,10 @@ final class TabBarViewItem: NSCollectionViewItem {
         delegate?.tabBarViewItemCloseAction(self)
     }
 
+    @objc fileprivate func audioButtonAction(_ sender: NSButton) {
+        self.delegate?.tabBarViewItemMuteUnmuteSite(self)
+    }
+
     @objc fileprivate func permissionButtonAction(_ sender: NSButton) {
         delegate?.tabBarViewItemTogglePermissionAction(self)
     }
@@ -554,8 +580,8 @@ final class TabBarViewItem: NSCollectionViewItem {
             .assign(to: \.usedPermissions, onWeaklyHeld: self)
             .store(in: &cancellables)
 
-        tabViewModel.mutedStatePublisher.sink { [weak self] mutedState in
-            self?.updateAudioMutedState(mutedState)
+        tabViewModel.audioStatePublisher.sink { [weak self] audioState in
+            self?.updateAudioPlayState(audioState)
         }.store(in: &cancellables)
     }
 
@@ -589,7 +615,7 @@ final class TabBarViewItem: NSCollectionViewItem {
             cell.borderLayer.isHidden = !isSelected
         }
 
-        let showCloseButton = (isMouseOver && !widthStage.isCloseButtonHidden) || isSelected
+        let showCloseButton = (isMouseOver && (!widthStage.isCloseButtonHidden || NSApp.isCommandPressed)) || isSelected
         cell.closeButton.isShown = showCloseButton
         cell.faviconImageView.isShown = (cell.faviconImageView.image != nil) && (widthStage != .withoutTitle || !showCloseButton)
         updateSeparatorView()
@@ -645,13 +671,20 @@ final class TabBarViewItem: NSCollectionViewItem {
         cell.faviconImageView.image = favicon
     }
 
-    private func updateAudioMutedState(_ mutedState: WKWebView.AudioState?) {
+    private func updateAudioPlayState(_ audioState: WKWebView.AudioState) {
         cell.needsLayout = true
-        switch mutedState {
-        case .muted:
-            cell.mutedTabIcon.isHidden = false
-        case .unmuted, .none:
-            cell.mutedTabIcon.isHidden = true
+        switch audioState {
+        case .unmuted(isPlayingAudio: false),
+             .muted(isPlayingAudio: false):
+            cell.audioButton.isHidden = true
+
+        case .muted(isPlayingAudio: true):
+            cell.audioButton.image = .audioMute
+            cell.audioButton.isHidden = false
+
+        case .unmuted(isPlayingAudio: true):
+            cell.audioButton.image = .audio
+            cell.audioButton.isHidden = false
         }
     }
 
@@ -743,8 +776,9 @@ extension TabBarViewItem: NSMenuDelegate {
     }
 
     private func addMuteUnmuteMenuItem(to menu: NSMenu) {
-        let isMuted = cell.mutedTabIcon.isShown
-        let menuItemTitle = isMuted ? UserText.unmuteTab : UserText.muteTab
+        guard let audioState = tabViewModel?.audioState else { return }
+
+        let menuItemTitle = audioState.isMuted ? UserText.unmuteTab : UserText.muteTab
         let muteUnmuteMenuItem = NSMenuItem(title: menuItemTitle, action: #selector(muteUnmuteSiteAction(_:)), keyEquivalent: "")
         muteUnmuteMenuItem.target = self
         menu.addItem(muteUnmuteMenuItem)
@@ -809,6 +843,15 @@ extension TabBarViewItem: MouseClickViewDelegate {
         delegate?.tabBarViewItem(self, isMouseOver: isMouseOver)
         self.isMouseOver = isMouseOver
         view.needsLayout = true
+        eventMonitor = isMouseOver ? NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) { [weak self] event in
+            if let self, widthStage.isCloseButtonHidden {
+                view.needsLayout = true
+            }
+            return event
+        } : nil
+
+        delegate?.tabBarViewItem(self, isMouseOver: isMouseOver)
+        self.isMouseOver = isMouseOver
     }
 
     func mouseClickView(_ mouseClickView: MouseClickView, otherMouseDownEvent: NSEvent) {
@@ -866,18 +909,18 @@ extension TabBarViewItem: MouseClickViewDelegate {
             .init(width: TabBarViewItem.Width.maximum, title: "Somewhere all we go now to get totally drunk", favicon: nil),
             .init(width: TabBarViewItem.Width.maximum, title: "Long Previewable Title with Permissions", favicon: .h, usedPermissions: [
                 .camera: .paused,
-            ], mutedState: .muted),
+            ], audioState: .muted(isPlayingAudio: true)),
         ],
         [
             .init(width: TabBarViewItem.Width.maximum, title: "Something in the tab title to be shrunk", favicon: .aDark, usedPermissions: [
                 .camera: .active
-            ], mutedState: .muted, selected: true),
+            ], audioState: .muted(isPlayingAudio: true), selected: true),
             .init(width: TabBarViewItem.Width.maximum, title: "Test 1", favicon: .homeFavicon, usedPermissions: [
                 .camera: .disabled(systemWide: true),
-            ], mutedState: .muted),
+            ], audioState: .muted(isPlayingAudio: true)),
             .init(width: TabBarViewItem.Width.maximum, title: "Test 2", favicon: .homeFavicon, usedPermissions: [
                 .camera: .paused,
-            ], mutedState: .muted),
+            ], audioState: .muted(isPlayingAudio: true)),
         ],
         [
             .init(width: TabBarViewItem.mediumWidth, title: "", favicon: nil, selected: true),
@@ -900,7 +943,7 @@ extension TabBarViewItem: MouseClickViewDelegate {
             .init(width: TabBarViewItem.mediumWidth, title: "Somewhere all we go now to get totally drunk", favicon: nil),
             .init(width: TabBarViewItem.mediumWidth, title: "Long Previewable Title with Permissions", favicon: .b, usedPermissions: [
                 .camera: .paused,
-            ], mutedState: .muted),
+            ], audioState: .muted(isPlayingAudio: true)),
             .init(width: TabBarViewItem.mediumWidth, title: "Long Previewable Title with Permissions", favicon: .h, usedPermissions: [
                 .camera: .active,
             ]),
@@ -908,41 +951,41 @@ extension TabBarViewItem: MouseClickViewDelegate {
         [
             .init(width: TabBarViewItem.Width.maximum, title: "Something in the tab title to be shrunk", favicon: .aDark, usedPermissions: [
                 .camera: .active
-            ], mutedState: .muted, selected: true),
+            ], audioState: .muted(isPlayingAudio: true), selected: true),
             .init(width: TabBarViewItem.mediumWidth, title: "Test 1", favicon: .homeFavicon, usedPermissions: [
                 .camera: .disabled(systemWide: true),
-            ], mutedState: .unmuted),
+            ], audioState: .unmuted(isPlayingAudio: true)),
             .init(width: TabBarViewItem.mediumWidth, title: "Test 2", favicon: nil, usedPermissions: [
                 .microphone: .active,
-            ], mutedState: .muted),
-            .init(width: TabBarViewItem.mediumWidth, title: "Test 2", favicon: .homeFavicon, mutedState: .unmuted),
+            ], audioState: .muted(isPlayingAudio: true)),
+                  .init(width: TabBarViewItem.mediumWidth, title: "Test 2", favicon: .homeFavicon, audioState: .unmuted(isPlayingAudio: true)),
         ],
 
         [
             .init(width: TabBarViewItem.Width.minimum, title: "Test 9", favicon: .a, usedPermissions: [
                 .microphone: .active,
-            ], mutedState: nil),
+            ]),
             .init(width: TabBarViewItem.Width.maximum, title: "Test 10", favicon: .error, usedPermissions: [
                 .camera: .paused,
-            ], mutedState: .unmuted, selected: true),
+            ], audioState: .unmuted(isPlayingAudio: true), selected: true),
             .init(width: TabBarViewItem.Width.minimum, title: "Test 11", favicon: .b, usedPermissions: [
                 .camera: .active,
-            ], mutedState: .unmuted),
+            ], audioState: .unmuted(isPlayingAudio: true)),
             .init(width: TabBarViewItem.Width.minimum, title: "Test 12", favicon: .c, usedPermissions: [
                 .microphone: .active,
-            ], mutedState: .muted),
+            ], audioState: .muted(isPlayingAudio: true)),
             .init(width: TabBarViewItem.Width.minimum, title: "Test 13", favicon: .d),
             .init(width: TabBarViewItem.Width.minimum, title: "Test 14", favicon: .e, usedPermissions: [
                 .camera: .paused,
-            ], mutedState: .unmuted),
+            ], audioState: .unmuted(isPlayingAudio: true)),
             .init(width: TabBarViewItem.Width.minimum, title: "Test 16", favicon: nil, usedPermissions: [
                 .microphone: .active,
-            ], mutedState: .muted),
+            ], audioState: .muted(isPlayingAudio: true)),
             .init(width: TabBarViewItem.Width.minimum, title: "Test 17", favicon: nil),
             .init(width: TabBarViewItem.Width.minimum, title: "Test 18", favicon: nil, usedPermissions: [
                 .camera: .paused,
-            ], mutedState: .unmuted),
-            .init(width: TabBarViewItem.Width.minimum, title: "Test 19", favicon: nil, mutedState: .muted),
+            ], audioState: .unmuted(isPlayingAudio: true)),
+                  .init(width: TabBarViewItem.Width.minimum, title: "Test 19", favicon: nil, audioState: .muted(isPlayingAudio: true)),
 
         ]
     ])._preview_hidingWindowControlsOnAppear()
@@ -964,17 +1007,17 @@ extension TabBarViewItem {
             var tabContentPublisher: AnyPublisher<Tab.TabContent, Never> { $tabContent.eraseToAnyPublisher() }
             @Published var usedPermissions = Permissions()
             var usedPermissionsPublisher: Published<Permissions>.Publisher { $usedPermissions }
-            @Published var mutedState: WKWebView.AudioState?
-            var mutedStatePublisher: Published<WKWebView.AudioState?>.Publisher {
-                $mutedState
+            @Published var audioState: WKWebView.AudioState
+            var audioStatePublisher: AnyPublisher<WKWebView.AudioState, Never> {
+                $audioState.eraseToAnyPublisher()
             }
-            init(width: CGFloat, title: String = "Test Title", favicon: NSImage? = .aDark, tabContent: Tab.TabContent = .none, usedPermissions: Permissions = Permissions(), mutedState: WKWebView.AudioState? = nil, selected: Bool = false) {
+            init(width: CGFloat, title: String = "Test Title", favicon: NSImage? = .aDark, tabContent: Tab.TabContent = .none, usedPermissions: Permissions = Permissions(), audioState: WKWebView.AudioState? = nil, selected: Bool = false) {
                 self.width = width
                 self.title = title
                 self.favicon = favicon
                 self.tabContent = tabContent
                 self.usedPermissions = usedPermissions
-                self.mutedState = mutedState
+                self.audioState = audioState ?? .unmuted(isPlayingAudio: false)
                 self.isSelected = selected
             }
         }
@@ -1097,10 +1140,15 @@ extension TabBarViewItem {
         func tabBarViewItemMuteUnmuteSite(_ item: TabBarViewItem) {
             // swiftlint:disable:next force_cast
             let item = item.representedObject as! TabBarViewModelMock
-            switch item.mutedState {
-            case .muted: item.mutedState = .unmuted
-            case .unmuted: item.mutedState = .none
-            case .none: item.mutedState = .muted
+            switch item.audioState {
+            case .unmuted(isPlayingAudio: false):
+                item.audioState = .unmuted(isPlayingAudio: true)
+            case .unmuted(isPlayingAudio: true):
+                item.audioState = .muted(isPlayingAudio: true)
+            case .muted(isPlayingAudio: true):
+                item.audioState = .muted(isPlayingAudio: false)
+            case .muted(isPlayingAudio: false):
+                item.audioState = .unmuted(isPlayingAudio: false)
             }
         }
         func tabBarViewItemRemoveFireproofing(_: TabBarViewItem) {}

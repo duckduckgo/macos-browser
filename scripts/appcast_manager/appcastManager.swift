@@ -346,6 +346,7 @@ final class AppcastDownloader {
         prepareDirectories()
         downloadAppcast()
         dispatchGroup.wait()
+        backupAppcast()
         parseAndDownloadFilesFromAppcast()
         dispatchGroup.wait()
 
@@ -511,6 +512,26 @@ final class AppcastDownloader {
                 print("✅ Appcast downloaded to: \(appcastFilePath.path)")
                 self.dispatchGroup.leave()
             }
+        }
+    }
+
+    private func backupAppcast() {
+        // Check if backup file already exists and remove it
+        if FileManager.default.fileExists(atPath: backupFileURL.path) {
+            do {
+                try FileManager.default.removeItem(at: backupFileURL)
+            } catch {
+                print("❌ Error removing existing backup file: \(error)")
+                exit(1)
+            }
+        }
+
+        // Create a new backup of the appcast file
+        do {
+            try FileManager.default.copyItem(at: appcastFilePath, to: backupFileURL)
+        } catch {
+            print("❌ Error backing up appcast2.xml: \(error)")
+            exit(1)
         }
     }
 
@@ -773,24 +794,6 @@ func writeAppcastContent(_ content: String, to filePath: URL) {
 // MARK: - Generating of New Appcast
 
 func runGenerateAppcast(with versionNumber: String, channel: String? = nil, rolloutInterval: String? = nil, keyFile: String? = nil) {
-    // Check if backup file already exists and remove it
-    if FileManager.default.fileExists(atPath: backupFileURL.path) {
-        do {
-            try FileManager.default.removeItem(at: backupFileURL)
-        } catch {
-            print("❌ Error removing existing backup file: \(error)")
-            exit(1)
-        }
-    }
-
-    // Create a new backup of the appcast file
-    do {
-        try FileManager.default.copyItem(at: appcastFilePath, to: backupFileURL)
-    } catch {
-        print("❌ Error backing up appcast2.xml: \(error)")
-        exit(1)
-    }
-
     let maximumVersions = "2"
     let maximumDeltas = "2"
 
