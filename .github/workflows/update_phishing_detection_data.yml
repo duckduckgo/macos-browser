@@ -1,12 +1,13 @@
 name: Update Phishing Detection Datasets
 on:
-  push:
+  schedule:
+    - cron: '0 0 * * 0'  # Midnight UTC every Sunday
 jobs:
   update_data:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: duckduckgo/macos-browser
           path: macos/
