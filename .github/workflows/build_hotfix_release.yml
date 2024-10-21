@@ -89,6 +89,7 @@ jobs:
     uses: ./.github/workflows/release.yml
     with:
       asana-task-url: ${{ github.event.inputs.asana-task-url }}
+      destination: appstore
     secrets:
       APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
       APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}

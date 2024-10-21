@@ -6,7 +6,7 @@ on:
       destination:
         description: "Upload destination (TestFlight or App Store)"
         required: true
-        default: appstore
+        default: testflight
         type: choice
         options:
         - testflight
@@ -21,7 +21,7 @@ on:
       destination:
         description: "Upload destination (TestFlight or App Store)"
         required: true
-        default: appstore
+        default: testflight
         type: string
       asana-task-url:
         description: "Asana release task URL"
@@ -68,7 +68,7 @@ jobs:
     steps:
 
     - name: Assert release branch
-      if: env.destination == 'appstore'
+      if: env.destination == 'appstore' || env.destination == 'testflight'
       run: |
         case "${branch}" in
           release/*) ;;
@@ -93,7 +93,7 @@ jobs:
     - name: Check if this is an official release build
       id: is-official-release
       env:
-        is-official-release: ${{ env.destination == 'appstore' && (startsWith(env.branch, 'release') || startsWith(env.branch, 'hotfix')) }}
+        is-official-release: ${{ (env.destination == 'appstore' || env.destination == 'testflight') && (startsWith(env.branch, 'release') || startsWith(env.branch, 'hotfix')) }}
       run: |
         if [[ "${{ env.is-official-release }}" == "true" ]]; then
           upload_to=s3

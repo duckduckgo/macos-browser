@@ -104,6 +104,7 @@ enum KeyEquivalentElement: ExpressibleByStringLiteral, Hashable {
     static let tab = KeyEquivalentElement.charCode("\t")
     static let left = KeyEquivalentElement.charCode("\u{2190}")
     static let right = KeyEquivalentElement.charCode("\u{2192}")
+    static let escape = KeyEquivalentElement.charCode("\u{1B}")
 
     init(stringLiteral value: String) {
         self = .charCode(value)
@@ -112,6 +113,12 @@ enum KeyEquivalentElement: ExpressibleByStringLiteral, Hashable {
 
 extension NSEvent.KeyEquivalent: ExpressibleByStringLiteral, ExpressibleByUnicodeScalarLiteral, ExpressibleByExtendedGraphemeClusterLiteral {
     public typealias StringLiteralType = String
+
+    static let backspace: Self = [.backspace]
+    static let tab: Self = [.tab]
+    static let left: Self = [.left]
+    static let right: Self = [.right]
+    static let escape: Self = [.escape]
 
     public init(stringLiteral value: String) {
         self = [.charCode(value)]

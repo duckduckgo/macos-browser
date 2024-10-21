@@ -131,7 +131,7 @@ final class NavigationBarViewController: NSViewController {
 
     init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, networkProtectionFeatureActivation: NetworkProtectionFeatureActivation, downloadListCoordinator: DownloadListCoordinator, dragDropManager: BookmarkDragDropManager, networkProtectionPopoverManager: NetPPopoverManager, networkProtectionStatusReporter: NetworkProtectionStatusReporter, autofillPopoverPresenter: AutofillPopoverPresenter) {
 
-        self.popovers = NavigationBarPopovers(networkProtectionPopoverManager: networkProtectionPopoverManager, autofillPopoverPresenter: autofillPopoverPresenter)
+        self.popovers = NavigationBarPopovers(networkProtectionPopoverManager: networkProtectionPopoverManager, autofillPopoverPresenter: autofillPopoverPresenter, isBurner: isBurner)
         self.tabCollectionViewModel = tabCollectionViewModel
         self.networkProtectionButtonModel = NetworkProtectionNavBarButtonModel(popoverManager: networkProtectionPopoverManager, statusReporter: networkProtectionStatusReporter)
         self.isBurner = isBurner
@@ -156,13 +156,6 @@ final class NavigationBarViewController: NSViewController {
         addressBarContainer.layer?.masksToBounds = false
 
         setupNavigationButtonMenus()
-        subscribeToSelectedTabViewModel()
-        listenToVPNToggleNotifications()
-        listenToPasswordManagerNotifications()
-        listenToPinningManagerNotifications()
-        listenToMessageNotifications()
-        listenToFeedbackFormNotifications()
-        subscribeToDownloads()
         addContextMenu()
 
         optionsButton.sendAction(on: .leftMouseDown)
@@ -187,7 +180,15 @@ final class NavigationBarViewController: NSViewController {
     }
 
     override func viewWillAppear() {
-        updateDownloadsButton()
+        subscribeToSelectedTabViewModel()
+        listenToVPNToggleNotifications()
+        listenToPasswordManagerNotifications()
+        listenToPinningManagerNotifications()
+        listenToMessageNotifications()
+        listenToFeedbackFormNotifications()
+        subscribeToDownloads()
+
+        updateDownloadsButton(source: .default)
         updatePasswordManagementButton()
         updateBookmarksButton()
         updateHomeButton()
@@ -360,7 +361,7 @@ final class NavigationBarViewController: NSViewController {
                 case .bookmarks:
                     self.updateBookmarksButton()
                 case .downloads:
-                    self.updateDownloadsButton(updatingFromPinnedViewsNotification: true)
+                    self.updateDownloadsButton(source: .pinnedViewsNotification)
                 case .homeButton:
                     self.updateHomeButton()
                 case .networkProtection:
@@ -693,14 +694,16 @@ final class NavigationBarViewController: NSViewController {
         // update Downloads button visibility and state
         downloadListCoordinator.updates
             .throttle(for: 1.0, scheduler: DispatchQueue.main, latest: true)
-            .sink { [weak self] _ in
-                self?.updateDownloadsButton()
+            .sink { [weak self] update in
+                guard let self, self.view.window?.isVisible == true else { return }
+                self.updateDownloadsButton(source: .update(update))
             }
             .store(in: &downloadsCancellables)
 
         // update Downloads button total progress indicator
-        downloadListCoordinator.progress.publisher(for: \.totalUnitCount)
-            .combineLatest(downloadListCoordinator.progress.publisher(for: \.completedUnitCount))
+        let combinedDownloadProgress = downloadListCoordinator.combinedDownloadProgressCreatingIfNeeded(for: FireWindowSessionRef(window: view.window))
+        combinedDownloadProgress.publisher(for: \.totalUnitCount)
+            .combineLatest(combinedDownloadProgress.publisher(for: \.completedUnitCount))
             .map { (total, completed) -> Double? in
                 guard total > 0, completed < total else { return nil }
                 return Double(completed) / Double(total)
@@ -788,7 +791,13 @@ final class NavigationBarViewController: NSViewController {
         }
     }
 
-    private func updateDownloadsButton(updatingFromPinnedViewsNotification: Bool = false) {
+    private enum DownloadsButtonUpdateSource {
+        case pinnedViewsNotification
+        case popoverDidClose
+        case update(DownloadListCoordinator.Update)
+        case `default`
+    }
+    private func updateDownloadsButton(source: DownloadsButtonUpdateSource) {
         downloadsButton.menu = NSMenu {
             NSMenuItem(title: LocalPinningManager.shared.shortcutTitle(for: .downloads),
                        action: #selector(toggleDownloadsPanelPinning(_:)),
@@ -801,15 +810,23 @@ final class NavigationBarViewController: NSViewController {
             return
         }
 
-        let hasActiveDownloads = downloadListCoordinator.hasActiveDownloads
+        let fireWindowSession = FireWindowSessionRef(window: view.window)
+        let hasActiveDownloads = downloadListCoordinator.hasActiveDownloads(for: fireWindowSession)
         downloadsButton.image = hasActiveDownloads ? .downloadsActive : .downloads
 
-        if downloadListCoordinator.isEmpty {
+        let hasDownloads = downloadListCoordinator.hasDownloads(for: fireWindowSession)
+        if !hasDownloads {
             invalidateDownloadButtonHidingTimer()
         }
         let isTimerActive = downloadsButtonHidingTimer != nil
 
         downloadsButton.isShown = if popovers.isDownloadsPopoverShown {
+            true
+        } else if case .popoverDidClose = source, hasDownloads {
+            true
+        } else if hasDownloads, case .update(let update) = source,
+                  update.item.fireWindowSession == fireWindowSession,
+                  update.item.added.addingTimeInterval(Constants.downloadsButtonAutoHidingInterval) > Date() {
             true
         } else {
             hasActiveDownloads || isTimerActive
@@ -821,7 +838,7 @@ final class NavigationBarViewController: NSViewController {
 
         // If the user has selected Hide Downloads from the navigation bar context menu, and no downloads are active, then force it to be hidden
         // even if the timer is active.
-        if updatingFromPinnedViewsNotification {
+        if case .pinnedViewsNotification = source {
             if !LocalPinningManager.shared.isPinned(.downloads) {
                 invalidateDownloadButtonHidingTimer()
                 downloadsButton.isShown = hasActiveDownloads
@@ -852,7 +869,7 @@ final class NavigationBarViewController: NSViewController {
 
     private func hideDownloadButtonIfPossible() {
         if LocalPinningManager.shared.isPinned(.downloads) ||
-            downloadListCoordinator.hasActiveDownloads ||
+            downloadListCoordinator.hasActiveDownloads(for: FireWindowSessionRef(window: view.window)) ||
             popovers.isDownloadsPopoverShown { return }
 
         downloadsButton.isHidden = true
@@ -1117,9 +1134,10 @@ extension NavigationBarViewController: NSPopoverDelegate {
 
     /// We check references here because these popovers might be on other windows.
     func popoverDidClose(_ notification: Notification) {
+        guard view.window?.isVisible == true else { return }
         if let popover = popovers.downloadsPopover, notification.object as AnyObject? === popover {
             popovers.downloadsPopoverClosed()
-            updateDownloadsButton()
+            updateDownloadsButton(source: .popoverDidClose)
         } else if let popover = popovers.bookmarkListPopover, notification.object as AnyObject? === popover {
             popovers.bookmarkListPopoverClosed()
             updateBookmarksButton()

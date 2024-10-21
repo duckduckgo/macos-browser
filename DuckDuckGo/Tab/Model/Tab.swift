@@ -962,6 +962,7 @@ protocol NewWindowPolicyDecisionMaker {
     private func setupWebView(shouldLoadInBackground: Bool) {
         webView.navigationDelegate = navigationDelegate
         webView.uiDelegate = self
+        webView.inspectorDelegate = self
         webView.contextMenuDelegate = self.contextMenuManager
         webView.allowsBackForwardNavigationGestures = true
         webView.allowsMagnification = true
