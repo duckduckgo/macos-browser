@@ -40,7 +40,6 @@ extension HomePage.Views {
                         }
                     }
                     .toggleStyle(.switch)
-                    .visibility(continueSetUpModel.hasContent ? .visible : .gone)
                 }
 
                 if includeContinueSetUpCards {

@@ -54,7 +54,7 @@ final class BookmarkTableCellView: NSTableCellView {
     private var trackingArea: NSTrackingArea?
     private var mouseInside: Bool = false {
         didSet {
-            guard self.entity is Bookmark else {
+            guard self.entity != nil else {
                 menuButton.isHidden = true
                 return
             }
@@ -271,7 +271,7 @@ final class BookmarkTableCellView: NSTableCellView {
         } else if let folder = self.entity as? BookmarkFolder {
             update(from: folder)
         } else {
-            assertionFailure("\(#file): Failed to update cell from bookmark entity")
+            assertionFailure("\(#file): Failed to update cell from \(String(describing: entity))")
         }
     }
 
