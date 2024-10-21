@@ -36082,13 +36082,13 @@
       }
     },
     "newTab.menu.item.show.search.bar" : {
-      "comment" : "Title of the menu item in the home page to show/hide search bar section",
+      "comment" : "Title of the menu item in the home page to show/hide search box (search field)",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Show Search Field"
+            "value" : "Show Search Box"
           }
         }
       }
@@ -36154,13 +36154,13 @@
       }
     },
     "newTab.search.bar.section.title" : {
-      "comment" : "Title of the Search Field section in the home page",
+      "comment" : "Setting to show or hide the search box (search field) in the home page",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Search Field"
+            "value" : "Search Box"
           }
         }
       }
