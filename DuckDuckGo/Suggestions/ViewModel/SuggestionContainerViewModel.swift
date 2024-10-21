@@ -79,10 +79,12 @@ final class SuggestionContainerViewModel {
                     try validateShouldSelectTopSuggestion(from: result)
                 } catch {
                     Logger.general.debug("SuggestionContainerViewModel: ignoring top suggestion from \( result.map(String.init(describing:)) ?? "<nil>"): \(error)")
+                    print("SuggestionContainerViewModel: ignoring top suggestion from \( result.map(String.init(describing:)) ?? "<nil>"): \(error)")
                     return
                 }
                 print("🦋🍋 selecting at 0 for result for", self.suggestionContainer.latestQuery!)
-            self.select(at: 0)
+
+                self.select(at: 0)
         }
     }
 
