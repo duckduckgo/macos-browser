@@ -510,6 +510,10 @@ extension MainViewController {
         LocalPinningManager.shared.togglePinning(for: .networkProtection)
     }
 
+    @objc func toggleAIChatShortcut(_ sender: Any) {
+        LocalPinningManager.shared.togglePinning(for: .aiChat)
+    }
+
     // MARK: - History
 
     @objc func back(_ sender: Any?) {
