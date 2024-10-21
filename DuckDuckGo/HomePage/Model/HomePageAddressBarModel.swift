@@ -89,11 +89,7 @@ extension HomePage.Models {
 
         private var isExperimentActive: Bool = false {
             didSet {
-                if isExperimentActive {
-                    let ntpExperiment = NewTabPageSearchBoxExperiment()
-                    ntpExperiment.assignUserToCohort()
-                    shouldShowAddressBar = ntpExperiment.cohort?.isExperiment == true
-                }
+                setUpExperimentIfNeeded()
             }
         }
         private var privacyConfigCancellable: AnyCancellable?
@@ -101,15 +97,19 @@ extension HomePage.Models {
 
         init(tabCollectionViewModel: TabCollectionViewModel, privacyConfigurationManager: PrivacyConfigurationManaging) {
             self.tabCollectionViewModel = tabCollectionViewModel
-            self.isExperimentActive = privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .newTabSearchField)
-            if self.isExperimentActive {
-                let ntpExperiment = NewTabPageSearchBoxExperiment()
-                ntpExperiment.assignUserToCohort()
-                self.shouldShowAddressBar = ntpExperiment.cohort?.isExperiment == true
-            }
+            isExperimentActive = privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .newTabSearchField)
+            setUpExperimentIfNeeded()
 
             privacyConfigCancellable = privacyConfigurationManager.updatesPublisher.sink { [weak self, weak privacyConfigurationManager] in
                 self?.isExperimentActive = privacyConfigurationManager?.privacyConfig.isEnabled(featureKey: .newTabSearchField) == true
+            }
+        }
+
+        private func setUpExperimentIfNeeded() {
+            if isExperimentActive {
+                let ntpExperiment = NewTabPageSearchBoxExperiment()
+                ntpExperiment.assignUserToCohort()
+                shouldShowAddressBar = ntpExperiment.cohort?.isExperiment == true
             }
         }
 
