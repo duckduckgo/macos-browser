@@ -65,8 +65,9 @@ final class SuggestionContainerViewModel {
     }
 
     private func subscribeToSuggestionResult() {
-        suggestionResultCancellable = suggestionContainer.$result.sink { [weak self] _ in
-            guard let self, shouldSelectTopSuggestion else { return }
+        suggestionResultCancellable = suggestionContainer.$result.sink { [weak self] r in
+            print("🦋$result", r)
+            guard let self, shouldSelectTopSuggestion else { print("🦋!shouldSelectTopSuggestion"); return }
 
             self.select(at: 0)
         }
@@ -102,7 +103,7 @@ final class SuggestionContainerViewModel {
     }
 
     private func updateSelectedSuggestionViewModel() {
-        if let selectionIndex = selectionIndex {
+        if let selectionIndex {
             selectedSuggestionViewModel = suggestionViewModel(at: selectionIndex)
         } else {
             selectedSuggestionViewModel = nil
@@ -129,6 +130,8 @@ final class SuggestionContainerViewModel {
 
         if suggestionViewModel(at: index) != self.selectedSuggestionViewModel {
             selectionIndex = index
+        } else {
+            print("🦋selectionIndex == index", index)
         }
     }
 

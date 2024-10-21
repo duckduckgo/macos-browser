@@ -61,13 +61,13 @@ final class SuggestionContainer {
         loading.getSuggestions(query: query, usingDataSource: self) { [weak self] result, error in
             dispatchPrecondition(condition: .onQueue(.main))
 
-            guard self?.latestQuery == query else {
+            guard let self, self.latestQuery == query else {
                 print("🦋latestQuery `\(self?.latestQuery ?? "<nil>")` != `\(query)`")
                 return
             }
-            guard let result = result else {
+            guard let result else {
                 print("🦋result is nil")
-                self?.result = nil
+                self.result = nil
                 Logger.general.error("Suggestions: Failed to get suggestions - \(String(describing: error))")
                 PixelKit.fire(DebugEvent(GeneralPixel.suggestionsFetchFailed, error: error))
                 return
@@ -79,7 +79,7 @@ final class SuggestionContainer {
             }
 
             print("🦋assign \(result)")
-            self?.result = result
+            self.result = result
         }
     }
 
