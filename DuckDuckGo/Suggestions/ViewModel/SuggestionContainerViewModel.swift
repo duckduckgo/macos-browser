@@ -54,7 +54,7 @@ final class SuggestionContainerViewModel {
     private enum IgnoreTopSuggestionError: Error {
         case emptyResult
         case topSuggestionSelectionNotExpected
-        case cantBeAutocompleted(SuggestionResult, Bool, [Suggestion])
+        case cantBeAutocompleted(SuggestionResult, Bool, Bool, [Suggestion])
         case noUserStringValue
         case noSuggestionViewModel
         case notEqual(lhs: String, rhs: String)
@@ -63,7 +63,9 @@ final class SuggestionContainerViewModel {
         assert(suggestionContainer.result == result)
         guard let result, !result.isEmpty else { throw IgnoreTopSuggestionError.emptyResult }
         guard self.isTopSuggestionSelectionExpected else { throw IgnoreTopSuggestionError.topSuggestionSelectionNotExpected }
-        guard result.canBeAutocompleted else { throw IgnoreTopSuggestionError.cantBeAutocompleted(result, result.topHits.isEmpty, result.topHits) }
+        guard result.canBeAutocompleted else {
+            throw IgnoreTopSuggestionError.cantBeAutocompleted(result, result.canBeAutocompleted, result.topHits.isEmpty, result.topHits)
+        }
         guard let userStringValue else { throw IgnoreTopSuggestionError.noUserStringValue }
         guard let firstSuggestion = self.suggestionViewModel(at: 0) else { throw IgnoreTopSuggestionError.noSuggestionViewModel }
         guard firstSuggestion.autocompletionString.lowercased().hasPrefix(userStringValue.lowercased()) else {
