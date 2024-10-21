@@ -24,6 +24,7 @@ protocol ContextualOnboardingDialogTypeProviding {
 }
 
 protocol ContextualOnboardingStateUpdater {
+    var state: ContextualOnboardingState { get }
     func updateStateFor(tab: Tab)
     func gotItPressed()
     func fireButtonUsed()
@@ -133,7 +134,7 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
         }
     }
 
-    private var lastVisitTab: Tab?
+    private weak var lastVisitTab: Tab?
     private var lastVisitSite: URL?
     private var notBlockedTrackerSeen: Bool = false
 
