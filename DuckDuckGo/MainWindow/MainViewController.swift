@@ -346,9 +346,11 @@ final class MainViewController: NSViewController {
                     if browserTabViewController.homePageViewController?.addressBarModel.shouldShowAddressBar == true {
                         subscribeToNTPAddressBarVisibility(of: selectedTabViewModel)
                     } else {
+                        ntpAddressBarVisibilityCancellable?.cancel()
                         resizeNavigationBar(isHomePage: true, animated: lastTabContent != .newtab)
                     }
                 } else {
+                    ntpAddressBarVisibilityCancellable?.cancel()
                     resizeNavigationBar(isHomePage: false, animated: false)
                 }
                 adjustFirstResponder(selectedTabViewModel: selectedTabViewModel, tabContent: content)
