@@ -18,10 +18,15 @@
 
 import Cocoa
 
+protocol NavigationBarBadgeAnimatorDelegate: AnyObject {
+    func didFinishAnimating()
+}
+
 final class NavigationBarBadgeAnimator: NSObject {
     var queuedAnimation: QueueData?
     private var animationID: UUID?
     private(set) var isAnimating = false
+    weak var delegate: NavigationBarBadgeAnimatorDelegate?
 
     struct QueueData {
         var selectedTab: Tab?
@@ -55,6 +60,7 @@ final class NavigationBarBadgeAnimator: NSObject {
                                        buttonsContainer: buttonsContainer,
                                        notificationBadgeContainer: notificationBadgeContainer) {
                         self?.isAnimating = false
+                        self?.delegate?.didFinishAnimating()
                     }
                 }
             }

@@ -129,6 +129,7 @@ final class AddressBarButtonsViewController: NSViewController {
     var isTextFieldEditorFirstResponder = false {
         didSet {
             updateButtons()
+            stopHighlightingPrivacyShield()
         }
     }
     var textFieldValue: AddressBarTextField.Value? {
@@ -153,8 +154,15 @@ final class AddressBarButtonsViewController: NSViewController {
     private var trackerAnimationTriggerCancellable: AnyCancellable?
     private var privacyEntryPointIconUpdateCancellable: AnyCancellable?
     private var isMouseOverAnimationVisibleCancellable: AnyCancellable?
+    private var privacyEntryPointIsMouseOverCancellable: AnyCancellable?
 
-    private lazy var buttonsBadgeAnimator = NavigationBarBadgeAnimator()
+    private lazy var buttonsBadgeAnimator = {
+        let animator = NavigationBarBadgeAnimator()
+        animator.delegate = self
+        return animator
+    }()
+
+    private var hasPrivacyInfoPulseQueuedAnimation = false
 
     required init?(coder: NSCoder) {
         fatalError("AddressBarButtonsViewController: Bad initializer")
@@ -180,6 +188,7 @@ final class AddressBarButtonsViewController: NSViewController {
         subscribeToEffectiveAppearance()
         subscribeToIsMouseOverAnimationVisible()
         updateBookmarkButtonVisibility()
+        subscribeToPrivacyEntryPointIsMouseOver()
         bookmarkButton.sendAction(on: .leftMouseDown)
 
         privacyEntryPointButton.toolTip = UserText.privacyDashboardTooltip
@@ -209,6 +218,16 @@ final class AddressBarButtonsViewController: NSViewController {
                 } else {
                     self.buttonsBadgeAnimator.queuedAnimation = nil
                 }
+            }
+        }
+    }
+
+    private func playPrivacyInfoHighlightAnimationIfNecessary() {
+        if hasPrivacyInfoPulseQueuedAnimation {
+            hasPrivacyInfoPulseQueuedAnimation = false
+            // Give a bit of delay to have a better animation effect
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                ViewHighlighter.highlight(view: self.privacyEntryPointButton, inParent: self.view)
             }
         }
     }
@@ -592,7 +611,6 @@ final class AddressBarButtonsViewController: NSViewController {
             subscribeToUrl()
             subscribeToPermissions()
             subscribeToPrivacyEntryPointIconUpdateTrigger()
-            subscribeToTrackerAnimationTrigger()
 
             updatePrivacyEntryPointIcon()
         }
@@ -611,6 +629,7 @@ final class AddressBarButtonsViewController: NSViewController {
                 stopAnimations()
                 updateBookmarkButtonImage()
                 updateButtons()
+                subscribeToTrackerAnimationTrigger()
             }
     }
 
@@ -627,6 +646,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     private func subscribeToTrackerAnimationTrigger() {
         trackerAnimationTriggerCancellable = tabViewModel?.trackersAnimationTriggerPublisher
+            .first()
             .sink { [weak self] _ in
                 self?.animateTrackers()
             }
@@ -836,10 +856,15 @@ final class AddressBarButtonsViewController: NSViewController {
             self.updateZoomButtonVisibility(animation: true)
             trackerAnimationView?.play { [weak self] _ in
                 trackerAnimationView?.isHidden = true
-                self?.updatePrivacyEntryPointIcon()
-                self?.updatePermissionButtons()
-                self?.playBadgeAnimationIfNecessary()
-                self?.updateZoomButtonVisibility(animation: false)
+                guard let self else { return }
+                updatePrivacyEntryPointIcon()
+                updatePermissionButtons()
+                // If badge animation is not queueued check if we should animate the privacy shield
+                if buttonsBadgeAnimator.queuedAnimation == nil {
+                    playPrivacyInfoHighlightAnimationIfNecessary()
+                }
+                playBadgeAnimationIfNecessary()
+                updateZoomButtonVisibility(animation: false)
             }
         }
 
@@ -948,7 +973,46 @@ final class AddressBarButtonsViewController: NSViewController {
             }
     }
 
+    private func subscribeToPrivacyEntryPointIsMouseOver() {
+        privacyEntryPointIsMouseOverCancellable = privacyEntryPointButton.publisher(for: \.isMouseOver)
+            .first(where: { $0 }) // only interested when mouse is over
+            .sink(receiveValue: { [weak self] _ in
+                self?.stopHighlightingPrivacyShield()
+            })
+    }
+
 }
+
+// MARK: - Contextual Onboarding View Highlight
+
+extension AddressBarButtonsViewController {
+
+    func highlightPrivacyShield() {
+        if !isAnyShieldAnimationPlaying && buttonsBadgeAnimator.queuedAnimation == nil {
+            ViewHighlighter.highlight(view: privacyEntryPointButton, inParent: self.view)
+        } else {
+            hasPrivacyInfoPulseQueuedAnimation = true
+        }
+    }
+
+    func stopHighlightingPrivacyShield() {
+        hasPrivacyInfoPulseQueuedAnimation = false
+        ViewHighlighter.stopHighlighting(view: privacyEntryPointButton)
+    }
+
+}
+
+// MARK: - NavigationBarBadgeAnimatorDelegate
+
+extension AddressBarButtonsViewController: NavigationBarBadgeAnimatorDelegate {
+
+    func didFinishAnimating() {
+        playPrivacyInfoHighlightAnimationIfNecessary()
+    }
+
+}
+
+// MARK: - PermissionContextMenuDelegate
 
 extension AddressBarButtonsViewController: PermissionContextMenuDelegate {
 
@@ -976,6 +1040,8 @@ extension AddressBarButtonsViewController: PermissionContextMenuDelegate {
 
 }
 
+// MARK: - NSPopoverDelegate
+
 extension AddressBarButtonsViewController: NSPopoverDelegate {
 
     func popoverDidClose(_ notification: Notification) {
@@ -994,6 +1060,8 @@ extension AddressBarButtonsViewController: NSPopoverDelegate {
 
 }
 
+// MARK: - AnimationImageProvider
+
 final class TrackerAnimationImageProvider: AnimationImageProvider {
 
     var lastTrackerImages = [CGImage]()
@@ -1009,6 +1077,8 @@ final class TrackerAnimationImageProvider: AnimationImageProvider {
     }
 
 }
+
+// MARK: - URL Helpers
 
 extension URL {
     private static let localPatterns = [

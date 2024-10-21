@@ -181,7 +181,12 @@ final class WindowsManager {
         contentSize.height = min(NSScreen.main?.frame.size.height ?? 790, max(contentSize.height, 300))
         mainViewController.view.frame = NSRect(origin: .zero, size: contentSize)
 
-        return MainWindowController(mainViewController: mainViewController, popUp: popUp)
+        let fireWindowSession = if case .burner = burnerMode {
+            WindowControllersManager.shared.mainWindowControllers.first(where: {
+                $0.mainViewController.tabCollectionViewModel.burnerMode == burnerMode
+            })?.fireWindowSession ?? FireWindowSession()
+        } else { FireWindowSession?.none }
+        return MainWindowController(mainViewController: mainViewController, popUp: popUp, fireWindowSession: fireWindowSession)
     }
 
 }
