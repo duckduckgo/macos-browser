@@ -27,6 +27,7 @@ extension HomePage.Views {
         static let targetWidth: CGFloat = 508
         static let minWindowWidth: CGFloat = 660
         static let settingsPanelWidth: CGFloat = 236
+        static let customizeButtonPadding: CGFloat = 14
         let isBurner: Bool
 
         @EnvironmentObject var model: AppearancePreferences
@@ -114,7 +115,7 @@ extension HomePage.Views {
                             Spacer()
                             HStack {
                                 Spacer(minLength: Self.targetWidth + (geometry.size.width - Self.targetWidth)/2)
-                                SettingsButtonView(isSettingsVisible: $settingsVisibilityModel.isSettingsVisible)
+                                SettingsButtonView()
                                     .padding([.bottom, .trailing], 14)
                             }
                         }
@@ -236,25 +237,28 @@ extension HomePage.Views {
         }
 
         struct SettingsButtonView: View {
-            let defaultColor: Color = .homeFavoritesBackground
-            let onHoverColor: Color = .buttonMouseOver
-            let onSelectedColor: Color = .buttonMouseDown
-            let iconSize = 16.02
-            let targetSize = 28.0
-            let buttonWidthWithoutTitle = 52.0
+            static let defaultColor: Color = .homeFavoritesBackground
+            static let onHoverColor: Color = .buttonMouseOver
+            static let iconSize = 16.0
+            static let height = 28.0
+            static let buttonWidthWithoutTitle = 46.0
 
             @State var isHovering: Bool = false
-            @Binding var isSettingsVisible: Bool
 
-            @State private var textWidth: CGFloat = .infinity
+            @State private var textWidth: CGFloat = .infinity {
+                didSet {
+                    settingsModel.settingsButtonWidth = textWidth + Self.buttonWidthWithoutTitle
+                }
+            }
             @EnvironmentObject var settingsModel: HomePage.Models.SettingsModel
+            @EnvironmentObject var settingsVisibilityModel: HomePage.Models.SettingsVisibilityModel
 
             private var buttonBackgroundColor: Color {
-                isHovering ? onHoverColor : defaultColor
+                isHovering ? Self.onHoverColor : Self.defaultColor
             }
 
             private func isCompact(with geometry: GeometryProxy) -> Bool {
-                geometry.size.width < textWidth + buttonWidthWithoutTitle
+                geometry.size.width < settingsModel.settingsButtonWidth
             }
 
             var body: some View {
@@ -276,7 +280,7 @@ extension HomePage.Views {
                                 HStack(spacing: 6) {
                                     Image(.optionsMainView)
                                         .resizable()
-                                        .frame(width: iconSize, height: iconSize)
+                                        .frame(width: Self.iconSize, height: Self.iconSize)
                                         .scaledToFit()
                                     if !isCompact(with: geometry) {
                                         Text(UserText.homePageSettingsTitle)
@@ -284,13 +288,13 @@ extension HomePage.Views {
                                             .background(WidthGetter())
                                     }
                                 }
-                                .frame(height: targetSize)
+                                .frame(height: Self.height)
                                 .padding(.horizontal, isCompact(with: geometry) ? 6 : 12)
                             }
                             .fixedSize()
                             .link(onHoverChanged: nil) {
                                 withAnimation {
-                                    isSettingsVisible.toggle()
+                                    settingsVisibilityModel.isSettingsVisible.toggle()
                                 }
                             }
                             .onHover { isHovering in
