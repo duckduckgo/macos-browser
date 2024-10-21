@@ -21,9 +21,11 @@ import Onboarding
 import SwiftUIExtensions
 
 struct OnboardingDialogsContants {
-    static let titleFont = Font.system(size: 20, weight: .bold, design: .rounded)
+    static let titleFont = Font.system(size: Self.titleFontSize, weight: .bold, design: .rounded)
     static let messageFont = Font.system(size: Self.messageFontSize, weight: .regular, design: .rounded)
+    static let titleFontNotBold = Font.system(size: Self.titleFontSize, weight: .regular, design: .rounded)
     static let messageFontSize = 16.0
+    static let titleFontSize = 20.0
 }
 
 struct OnboardingTrySearchDialog: View {
@@ -131,20 +133,14 @@ struct OnboardingFirstSearchDoneDialog: View {
 }
 
 struct OnboardingFireButtonDialogContent: View {
-    private let attributedMessage: NSAttributedString = {
-        let firstString = UserText.ContextualOnboarding.onboardingTryFireButtonMessage
-        let boldString = "Fire Button"
-        let attributedString = NSMutableAttributedString(string: firstString)
-        let boldFontAttribute: [NSAttributedString.Key: Any] = [
-            .font: NSFont.systemFont(ofSize: OnboardingDialogsContants.messageFontSize, weight: .bold)
-        ]
-        if let boldRange = firstString.range(of: boldString) {
-            let nsBoldRange = NSRange(boldRange, in: firstString)
-            attributedString.addAttributes(boldFontAttribute, range: nsBoldRange)
-        }
-
-        return attributedString
-    }()
+    static let firstString = String(format: UserText.ContextualOnboarding.onboardingTryFireButtonTitle, UserText.ContextualOnboarding.onboardingTryFireButtonMessage)
+    private let attributedMessage = NSMutableAttributedString.attributedString(
+        from: Self.firstString,
+        defaultFontSize: OnboardingDialogsContants.titleFontSize,
+        boldFontSize: OnboardingDialogsContants.titleFontSize,
+        customPart: UserText.ContextualOnboarding.onboardingTryFireButtonMessage,
+        customFontSize: OnboardingDialogsContants.messageFontSize
+    )
 
     let viewModel: OnboardingFireButtonDialogViewModel
     @State private var showNextScreen: Bool = false
@@ -156,7 +152,7 @@ struct OnboardingFireButtonDialogContent: View {
             ContextualDaxDialogContent(
                 orientation: .horizontalStack(alignment: .center),
                 message: attributedMessage,
-                messageFont: OnboardingDialogsContants.messageFont,
+                messageFont: OnboardingDialogsContants.titleFontNotBold,
                 customActionView: AnyView(actionView))
         }
     }
@@ -164,7 +160,7 @@ struct OnboardingFireButtonDialogContent: View {
     @ViewBuilder
     private var actionView: some View {
         VStack {
-            OnboardingPrimaryCTAButton(title: "Try it", action: viewModel.tryFireButton)
+            OnboardingPrimaryCTAButton(title: UserText.ContextualOnboarding.onboardingTryFireButtonButton, action: viewModel.tryFireButton)
             OnboardingSecondaryCTAButton(title: UserText.skip, action: {
                 showNextScreen = true
                 viewModel.skip()
@@ -267,7 +263,7 @@ struct OnboardingPrimaryCTAButton: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .padding(.vertical, 3)
+                .padding(.vertical, 5)
                 .padding(.horizontal, 24)
         }
         .buttonStyle(DefaultActionButtonStyle(enabled: true))
@@ -278,6 +274,9 @@ struct OnboardingPrimaryCTAButton: View {
 
 struct OnboardingSecondaryCTAButton: View {
     @Environment(\.colorScheme) var colorScheme
+    private var strokeColor: Color {
+        return (colorScheme == .dark) ? Color.white.opacity(0.12) : Color.black.opacity(0.09)
+    }
 
     let title: String
     let action: () -> Void
@@ -285,10 +284,14 @@ struct OnboardingSecondaryCTAButton: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-            .padding(.vertical, 3)
-            .padding(.horizontal, 26)
+            .padding(.horizontal, 18)
         }
-        .buttonStyle(DismissActionButtonStyle())
+        .buttonStyle(OnboardingStyles.ListButtonStyle(maxWidth: nil))
+        .overlay(
+            RoundedRectangle(cornerRadius: 5)
+                .inset(by: 0.5)
+                .stroke(strokeColor, lineWidth: 1)
+        )
     }
 
 }
@@ -319,7 +322,7 @@ final class OnboardingPixelReporter: OnboardingSearchSuggestionsPixelReporting, 
 
 #Preview("Try Fire Button") {
     DaxDialogView(logoPosition: .left) {
-        OnboardingFireButtonDialogContent(viewModel: OnboardingFireButtonDialogViewModel(onDismiss: {}, onGotItPressed: {}))
+        OnboardingFireButtonDialogContent(viewModel: OnboardingFireButtonDialogViewModel(onDismiss: {}, onGotItPressed: {}, onFireButtonPressed: {}))
     }
     .padding()
 }
@@ -329,6 +332,6 @@ final class OnboardingPixelReporter: OnboardingSearchSuggestionsPixelReporting, 
         let firstString = UserText.ContextualOnboarding.onboardingTryFireButtonMessage
         return NSMutableAttributedString(string: firstString)
     }()
-    return OnboardingTrackersDoneDialog(shouldFollowUp: true, message: message, blockedTrackersCTAAction: {}, viewModel: OnboardingFireButtonDialogViewModel(onDismiss: {}, onGotItPressed: {}))
+    return OnboardingTrackersDoneDialog(shouldFollowUp: true, message: message, blockedTrackersCTAAction: {}, viewModel: OnboardingFireButtonDialogViewModel(onDismiss: {}, onGotItPressed: {}, onFireButtonPressed: {}))
         .padding()
 }
