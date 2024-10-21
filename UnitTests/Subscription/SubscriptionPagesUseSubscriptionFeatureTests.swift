@@ -1121,6 +1121,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
 
         mockFreemiumDBPUserStateManager.didPostFirstProfileSavedNotification = true
         feature.with(broker: broker)
+        let freeiumOrigin = PrivacyProSubscriptionAttributionPixelHandler.Consts.freemiumOrigin
 
         // When
         let subscriptionSelectedParams = ["id": "some-subscription-id"]
@@ -1128,7 +1129,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
 
         // Then
         XCTAssertNil(result)
-        XCTAssertEqual(subscriptionAttributionPixelHandler.origin, "funnel_pro_mac_freemium")
+        XCTAssertEqual(subscriptionAttributionPixelHandler.origin, freeiumOrigin)
     }
 
     func testFreemiumPixelOriginNotSetWhenSubscriptionSelectedSuccessNotFromFreemium() async throws {
@@ -1152,6 +1153,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
 
         mockFreemiumDBPUserStateManager.didPostFirstProfileSavedNotification = false
         feature.with(broker: broker)
+        let freeiumOrigin = PrivacyProSubscriptionAttributionPixelHandler.Consts.freemiumOrigin
 
         // When
         let subscriptionSelectedParams = ["id": "some-subscription-id"]
@@ -1159,7 +1161,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
 
         // Then
         XCTAssertNil(result)
-        XCTAssertNotEqual(subscriptionAttributionPixelHandler.origin, "funnel_pro_mac_freemium")
+        XCTAssertNotEqual(subscriptionAttributionPixelHandler.origin, freeiumOrigin)
     }
 }
 
