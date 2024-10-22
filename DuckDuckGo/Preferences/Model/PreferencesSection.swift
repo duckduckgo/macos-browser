@@ -42,9 +42,6 @@ struct PreferencesSection: Hashable, Identifiable {
                 panes.append(.duckPlayer)
             }
 
-#warning("TODO: use feature flag here, remove before merging")
-            panes.append(.aiChat)
-
             return panes
         }()
 
