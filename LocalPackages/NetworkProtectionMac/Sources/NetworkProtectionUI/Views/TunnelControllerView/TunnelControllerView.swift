@@ -45,6 +45,18 @@ public struct TunnelControllerView: View {
     @EnvironmentObject
     private var tipsModel: VPNTipsModel
 
+    private var tipGroup: TipGrouping = {
+        guard #available(macOS 15.0, *) else {
+            return EmptyTipGroup()
+        }
+
+        return TipGroup(.ordered) {
+            VPNGeoswitchingTip()
+            VPNDomainExclusionsTip()
+            VPNAutoconnectTip()
+        }
+    }()
+
     // MARK: - View Contents
 
     public var body: some View {
@@ -56,6 +68,7 @@ public struct TunnelControllerView: View {
 
             if #available(macOS 15.0, *) {
                 VPNAutoconnectTipView()
+                //TipView(tipGroup.currentTip as? VPNAutoconnectTip)
                     .padding(.horizontal, 9)
                     .padding(.vertical, 6)
             }
@@ -71,7 +84,9 @@ public struct TunnelControllerView: View {
                 if tipsModel.featureFlag {//,
                    //let tip = tipsModel.currentTip as? VPNDomainExclusionsTip {
 
-                    TipView(VPNDomainExclusionsTip())
+                    //TipView(VPNDomainExclusionsTip())
+                    //TipView(tipGroup.currentTip as? VPNDomainExclusionsTip)
+                    VPNDomainExclusionsTipView()
                         .padding(.horizontal, 9)
                         .padding(.vertical, 6)
                 }
@@ -199,7 +214,9 @@ public struct TunnelControllerView: View {
             }
 
             if #available(macOS 15.0, *) {
-                TipView(VPNGeoswitchingTip())
+                //TipView(VPNGeoswitchingTip())
+                VPNGeoswitchingTipView()
+                //TipView(tipGroup.currentTip as? VPNGeoswitchingTip)
                     .padding(.horizontal, 9)
                     .padding(.vertical, 6)
             }

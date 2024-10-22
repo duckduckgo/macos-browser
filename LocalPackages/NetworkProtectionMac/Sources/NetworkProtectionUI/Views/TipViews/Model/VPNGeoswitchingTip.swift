@@ -21,9 +21,10 @@ import TipKit
 
 /// A tip to suggest to the user to change their location using geo-switching
 ///
-@available(macOS 14.0, *)
-struct VPNGeoswitchingTip: Tip {
+struct VPNGeoswitchingTip {}
 
+@available(macOS 14.0, *)
+extension VPNGeoswitchingTip: Tip {
     static let vpnConnectedEvent = Tips.Event(id: "com.duckduckgo.vpn.tip.geoswitching.vpnConnectedEvent")
 
     var id: String {

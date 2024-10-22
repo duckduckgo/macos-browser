@@ -29,46 +29,32 @@ public final class VPNTipsModel: ObservableObject {
 
     @Published
     private(set) var activeSiteInfo: ActiveSiteInfo? {
-        willSet {
+        didSet {
             guard #available(macOS 14.0, *) else {
                 return
             }
 
-            VPNDomainExclusionsTip.hasActiveSite = (activeSiteInfo != nil)
+            print("🧉🧉 activeSiteInfo: \(String(describing: activeSiteInfo))")
+            handleActiveSiteInfoChanged(newValue: activeSiteInfo)
         }
     }
 
     @Published
     private(set) var connectionStatus: ConnectionStatus {
-        willSet {
+        didSet {
             guard #available(macOS 14.0, *) else {
                 return
             }
 
-            switch newValue {
-            case .connected:
-                if case connectionStatus = .connecting {
-                    Task {
-                        print("🧉💎 Geoswitching tip donated")
-                        await VPNGeoswitchingTip.vpnConnectedEvent.donate()
-                    }
-                }
-
-                VPNAutoconnectTip.vpnEnabled = true
-                VPNDomainExclusionsTip.vpnEnabled = true
-            default:
-                VPNAutoconnectTip.vpnEnabled = false
-                VPNDomainExclusionsTip.vpnEnabled = false
-            }
+            print("🧉🧉 activeSiteInfo: \(String(describing: connectionStatus))")
+            handleConnectionStatusChanged(oldValue: oldValue, newValue: connectionStatus)
         }
     }
 
     @Published
     private(set) var featureFlag: Bool
 
-    @Published
     private var tips: TipGrouping
-
     private let vpnSettings: VPNSettings
     private let logger: Logger
     private var cancellables = Set<AnyCancellable>()
@@ -77,7 +63,7 @@ public final class VPNTipsModel: ObservableObject {
 
         logger.debug("🧉🤌 makeTips")
 
-        guard #available(macOS 14.0, *) else {
+        guard #available(macOS 15.0, *) else {
             return EmptyTipGroup()
         }
 
@@ -107,12 +93,12 @@ public final class VPNTipsModel: ObservableObject {
         //     }
         // } else { ... what's below
         if isMenuApp {
-            return LegacyTipGroup(.ordered) {
+            return TipGroup(.ordered) {
                 VPNGeoswitchingTip()
                 VPNAutoconnectTip()
             }
         } else {
-            return LegacyTipGroup(.ordered) {
+            return TipGroup(.ordered) {
                 VPNGeoswitchingTip()
                 VPNDomainExclusionsTip()
                 VPNAutoconnectTip()
@@ -136,6 +122,9 @@ public final class VPNTipsModel: ObservableObject {
         self.vpnSettings = vpnSettings
 
         if #available(macOS 14.0, *) {
+            handleActiveSiteInfoChanged(newValue: activeSiteInfo)
+            handleConnectionStatusChanged(oldValue: connectionStatus, newValue: connectionStatus)
+
             subscribeToConnectionStatusChanges(statusObserver)
             subscribeToFeatureFlagChanges(featureFlagPublisher)
             subscribeToActiveSiteChanges(activeSitePublisher)
@@ -168,6 +157,32 @@ public final class VPNTipsModel: ObservableObject {
             .receive(on: DispatchQueue.main)
             .assign(to: \.activeSiteInfo, onWeaklyHeld: self)
             .store(in: &cancellables)
+    }
+
+    // MARK: - Handle Refreshing
+
+    @available(macOS 14.0, *)
+    private func handleActiveSiteInfoChanged(newValue: ActiveSiteInfo?) {
+        VPNDomainExclusionsTip.hasActiveSite = (activeSiteInfo != nil)
+    }
+
+    @available(macOS 14.0, *)
+    private func handleConnectionStatusChanged(oldValue: ConnectionStatus, newValue: ConnectionStatus) {
+        switch newValue {
+        case .connected:
+            if case oldValue = .connecting {
+                Task {
+                    print("🧉💎 Geoswitching tip donated")
+                    await VPNGeoswitchingTip.vpnConnectedEvent.donate()
+                }
+            }
+
+            VPNAutoconnectTip.vpnEnabled = true
+            VPNDomainExclusionsTip.vpnEnabled = true
+        default:
+            VPNAutoconnectTip.vpnEnabled = false
+            VPNDomainExclusionsTip.vpnEnabled = false
+        }
     }
 
     // MARK: - Tip Action handling

@@ -44,17 +44,14 @@ struct TipKitAppEventHandler: TipKitAppEventHandling {
 
             let appConfigurationGroupIdentifier = Bundle.main.appGroup(bundle: .appConfiguration)
 
-            /*
             guard let dataStoreLocation = try? DataStoreLocation.groupContainer(identifier: appConfigurationGroupIdentifier) else {
 
                 fatalError()
             }
-             */
-            let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appConfigurationGroupIdentifier)!
 
             controller.configureTipKit([
-                .displayFrequency(.immediate) //,
-                //.datastoreLocation(.url(url))
+                .displayFrequency(.immediate),
+                .datastoreLocation(dataStoreLocation)
             ])
         } else {
             logger.log("TipKit initialization skipped: iOS 17.0 or later is required.")
