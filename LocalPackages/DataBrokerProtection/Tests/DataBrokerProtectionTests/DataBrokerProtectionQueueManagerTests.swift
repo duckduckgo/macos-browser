@@ -64,6 +64,7 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         // When
         sut.startImmediateScanOperationsIfPermitted(showWebView: false,
                                                 operationDependencies: mockDependencies,
+                                                    errorHandler: nil,
                                                    completion: nil)
 
         // Then
@@ -81,6 +82,7 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         // When
         sut.startScheduledAllOperationsIfPermitted(showWebView: false,
                                                 operationDependencies: mockDependencies,
+                                                   errorHandler: nil,
                                                    completion: nil)
 
         // Then
@@ -98,6 +100,7 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         // When
         sut.startScheduledScanOperationsIfPermitted(showWebView: false,
                                                 operationDependencies: mockDependencies,
+                                                    errorHandler: nil,
                                                    completion: nil)
 
         // Then
@@ -114,14 +117,18 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         let mockOperation = MockDataBrokerOperation(id: 1, operationType: .manualScan, errorDelegate: sut)
         let mockOperationWithError = MockDataBrokerOperation(id: 2, operationType: .manualScan, errorDelegate: sut, shouldError: true)
         mockOperationsCreator.operationCollections = [mockOperation, mockOperationWithError]
-        let expectation = expectation(description: "Expected errors to be returned in completion")
+        let expectation = expectation(description: "Expected completion to be called")
         var errorCollection: DataBrokerProtectionAgentErrorCollection!
         let expectedConcurrentOperations = DataBrokerExecutionConfig().concurrentOperationsFor(.manualScan)
+        var errorHandlerCalled = false
 
         // When
         sut.startImmediateScanOperationsIfPermitted(showWebView: false,
                                                 operationDependencies: mockDependencies) { errors in
             errorCollection = errors
+            errorHandlerCalled = true
+        } completion: {
+            XCTAssertTrue(errorHandlerCalled)
             expectation.fulfill()
         }
 
@@ -134,7 +141,7 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         XCTAssertEqual(mockQueue.maxConcurrentOperationCount, expectedConcurrentOperations)
     }
 
-    func testWhenStartScheduledAllOperations_andOperationsCompleteWithErrors_thenCompletionIsCalledWithErrors() async throws {
+    func testWhenStartScheduledAllOperations_andOperationsCompleteWithErrors_thenErrorHandlerIsCalledWithErrors_followedByCompletionBlock() async throws {
         // Given
         sut = DefaultDataBrokerProtectionQueueManager(operationQueue: mockQueue,
                                                       operationsCreator: mockOperationsCreator,
@@ -144,14 +151,18 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         let mockOperation = MockDataBrokerOperation(id: 1, operationType: .all, errorDelegate: sut)
         let mockOperationWithError = MockDataBrokerOperation(id: 2, operationType: .all, errorDelegate: sut, shouldError: true)
         mockOperationsCreator.operationCollections = [mockOperation, mockOperationWithError]
-        let expectation = expectation(description: "Expected errors to be returned in completion")
+        let expectation = expectation(description: "Expected completion to be called")
         var errorCollection: DataBrokerProtectionAgentErrorCollection!
         let expectedConcurrentOperations = DataBrokerExecutionConfig().concurrentOperationsFor(.all)
+        var errorHandlerCalled = false
 
         // When
         sut.startScheduledAllOperationsIfPermitted(showWebView: false,
                                                 operationDependencies: mockDependencies) { errors in
             errorCollection = errors
+            errorHandlerCalled = true
+        } completion: {
+            XCTAssertTrue(errorHandlerCalled)
             expectation.fulfill()
         }
 
@@ -177,11 +188,15 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         let expectation = expectation(description: "Expected errors to be returned in completion")
         var errorCollection: DataBrokerProtectionAgentErrorCollection!
         let expectedConcurrentOperations = DataBrokerExecutionConfig().concurrentOperationsFor(.scheduledScan)
+        var errorHandlerCalled = false
 
         // When
         sut.startScheduledScanOperationsIfPermitted(showWebView: false,
                                                 operationDependencies: mockDependencies) { errors in
             errorCollection = errors
+            errorHandlerCalled = true
+        } completion: {
+            XCTAssertTrue(errorHandlerCalled)
             expectation.fulfill()
         }
 
@@ -209,6 +224,8 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         // When
         sut.startScheduledAllOperationsIfPermitted(showWebView: false, operationDependencies: mockDependencies) { errors in
             errorCollection = errors
+        } completion: {
+            // no-op
         }
 
         mockQueue.completeOperationsUpTo(index: 2)
@@ -221,7 +238,10 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         mockOperationsCreator.operationCollections = mockOperations
 
         // When
-        sut.startImmediateScanOperationsIfPermitted(showWebView: false, operationDependencies: mockDependencies) { _ in }
+        sut.startImmediateScanOperationsIfPermitted(showWebView: false, operationDependencies: mockDependencies) { _ in
+        } completion: {
+            // no-op
+        }
 
         // Then
         XCTAssert(errorCollection.operationErrors?.count == 2)
@@ -247,6 +267,8 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         // When
         sut.startImmediateScanOperationsIfPermitted(showWebView: false, operationDependencies: mockDependencies) { errors in
             errorCollection = errors
+        } completion: {
+            // no-op
         }
 
         mockQueue.completeOperationsUpTo(index: 2)
@@ -259,7 +281,10 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         mockOperationsCreator.operationCollections = mockOperations
 
         // When
-        sut.startImmediateScanOperationsIfPermitted(showWebView: false, operationDependencies: mockDependencies) { _ in }
+        sut.startImmediateScanOperationsIfPermitted(showWebView: false, operationDependencies: mockDependencies) { _ in
+        } completion: {
+            // no-op
+        }
 
         // Then
         XCTAssert(errorCollection.operationErrors?.count == 2)
@@ -285,6 +310,8 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         // When
         sut.startImmediateScanOperationsIfPermitted(showWebView: false, operationDependencies: mockDependencies) { errors in
             errorCollectionFirst = errors
+        } completion: {
+            // no-op
         }
 
         mockQueue.completeOperationsUpTo(index: 2)
@@ -301,6 +328,8 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         // When
         sut.startImmediateScanOperationsIfPermitted(showWebView: false, operationDependencies: mockDependencies) { errors in
             errorCollectionSecond = errors
+        } completion: {
+            // no-op
         }
 
         mockQueue.completeAllOperations()
@@ -327,7 +356,10 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         var errorCollection: DataBrokerProtectionAgentErrorCollection!
 
         // When
-        sut.startImmediateScanOperationsIfPermitted(showWebView: false, operationDependencies: mockDependencies) { _ in }
+        sut.startImmediateScanOperationsIfPermitted(showWebView: false, operationDependencies: mockDependencies) { _ in
+        } completion: {
+            // no-op
+        }
 
         // Then
         XCTAssert(mockQueue.operationCount == 10)
@@ -346,6 +378,8 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         sut.startScheduledAllOperationsIfPermitted(showWebView: false, operationDependencies: mockDependencies) { errors in
             errorCollection = errors
             completionCalled.toggle()
+        } completion: {
+            // no-op
         }
 
         // Then
@@ -372,7 +406,9 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         var errorCollection: DataBrokerProtectionAgentErrorCollection!
 
         // When
-        sut.startImmediateScanOperationsIfPermitted(showWebView: false, operationDependencies: mockDependencies) { _ in }
+        sut.startImmediateScanOperationsIfPermitted(showWebView: false, operationDependencies: mockDependencies) { _ in } completion: {
+            // no-op
+        }
 
         // Then
         XCTAssert(mockQueue.operationCount == 10)
@@ -390,6 +426,7 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         // When
         sut.startScheduledScanOperationsIfPermitted(showWebView: false, operationDependencies: mockDependencies) { errors in
             errorCollection = errors
+        } completion: {
             completionCalled.toggle()
         }
 
@@ -416,6 +453,7 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         sut.startImmediateScanOperationsIfPermitted(showWebView: false,
                                                 operationDependencies: mockDependencies) { errors in
             errorCollection = errors
+        } completion: {
             expectation.fulfill()
         }
 
@@ -437,6 +475,7 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         // When
         sut.execute(.startOptOutOperations(showWebView: false,
                                            operationDependencies: mockDependencies,
+                                           errorHandler: nil,
                                            completion: nil))
 
         // Then

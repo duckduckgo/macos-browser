@@ -182,7 +182,7 @@ public final class DataBrokerProtectionAgentManager {
             activityScheduler.startScheduler()
             didStartActivityScheduler = true
             fireMonitoringPixels()
-            startFreemiumOrSubscriptionScheduledOperations(showWebView: false, operationDependencies: operationDependencies, completion: nil)
+            startFreemiumOrSubscriptionScheduledOperations(showWebView: false, operationDependencies: operationDependencies, errorHandler: nil, completion: nil)
 
             /// Monitors entitlement changes every 60 minutes to optimize system performance and resource utilization by avoiding unnecessary operations when entitlement is invalid.
             /// While keeping the agent active with invalid entitlement has no significant risk, setting the monitoring interval at 60 minutes is a good balance to minimize backend checks.
@@ -235,11 +235,12 @@ private extension DataBrokerProtectionAgentManager {
     ///   - completion: Completion handler
     func startFreemiumOrSubscriptionScheduledOperations(showWebView: Bool,
                                                         operationDependencies: DataBrokerOperationDependencies,
-                                                        completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
+                                                        errorHandler: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?,
+                                                        completion: (() -> Void)?) {
         if authenticationManager.isUserAuthenticated {
-            queueManager.startScheduledAllOperationsIfPermitted(showWebView: showWebView, operationDependencies: operationDependencies, completion: completion)
+            queueManager.startScheduledAllOperationsIfPermitted(showWebView: showWebView, operationDependencies: operationDependencies, errorHandler: errorHandler, completion: completion)
         } else {
-            queueManager.startScheduledScanOperationsIfPermitted(showWebView: showWebView, operationDependencies: operationDependencies, completion: completion)
+            queueManager.startScheduledScanOperationsIfPermitted(showWebView: showWebView, operationDependencies: operationDependencies, errorHandler: errorHandler, completion: completion)
         }
     }
 }
@@ -247,15 +248,18 @@ private extension DataBrokerProtectionAgentManager {
 extension DataBrokerProtectionAgentManager: DataBrokerProtectionBackgroundActivitySchedulerDelegate {
 
     public func dataBrokerProtectionBackgroundActivitySchedulerDidTrigger(_ activityScheduler: DataBrokerProtection.DataBrokerProtectionBackgroundActivityScheduler, completion: (() -> Void)?) {
+        startScheduledOperations(completion: completion)
+    }
+
+    func startScheduledOperations(completion: (() -> Void)?) {
         fireMonitoringPixels()
-        startFreemiumOrSubscriptionScheduledOperations(showWebView: false, operationDependencies: operationDependencies) { _ in
+        startFreemiumOrSubscriptionScheduledOperations(showWebView: false, operationDependencies: operationDependencies, errorHandler: nil) {
             completion?()
         }
     }
 }
 
 extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentAppEvents {
-
     public func profileSaved() {
         let backgroundAgentInitialScanStartTime = Date()
 
@@ -285,13 +289,17 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentAppEvents {
                 self.pixelHandler.fire(.ipcServerImmediateScansFinishedWithoutError)
                 self.userNotificationService.sendFirstScanCompletedNotification()
             }
+        } completion: { [weak self] in
+            guard let self else { return }
 
             if let hasMatches = try? self.dataManager.hasMatches(),
-                hasMatches {
+               hasMatches {
                 self.userNotificationService.scheduleCheckInNotificationIfPossible()
             }
 
             fireImmediateScansCompletionPixel(startTime: backgroundAgentInitialScanStartTime)
+
+            self.startScheduledOperations(completion: nil)
         }
     }
 
@@ -299,7 +307,7 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentAppEvents {
         fireMonitoringPixels()
         startFreemiumOrSubscriptionScheduledOperations(showWebView: false,
                                                          operationDependencies:
-                                                            operationDependencies) { [weak self] errors in
+                                                        operationDependencies, errorHandler: { [weak self] errors in
             guard let self = self else { return }
 
             if let errors = errors {
@@ -325,7 +333,7 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentAppEvents {
             if errors?.oneTimeError == nil {
                 self.pixelHandler.fire(.ipcServerAppLaunchedScheduledScansFinishedWithoutError)
             }
-        }
+        }, completion: nil)
     }
 
     private func fireImmediateScansCompletionPixel(startTime: Date) {
@@ -350,18 +358,21 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentDebugComman
     public func startImmediateOperations(showWebView: Bool) {
         queueManager.startImmediateScanOperationsIfPermitted(showWebView: showWebView,
                                                          operationDependencies: operationDependencies,
+                                                         errorHandler: nil,
                                                          completion: nil)
     }
 
     public func startScheduledOperations(showWebView: Bool) {
         startFreemiumOrSubscriptionScheduledOperations(showWebView: showWebView,
                                                          operationDependencies: operationDependencies,
+                                                         errorHandler: nil,
                                                          completion: nil)
     }
 
     public func runAllOptOuts(showWebView: Bool) {
         queueManager.execute(.startOptOutOperations(showWebView: showWebView,
                                                     operationDependencies: operationDependencies,
+                                                    errorHandler: nil,
                                                     completion: nil))
     }
 

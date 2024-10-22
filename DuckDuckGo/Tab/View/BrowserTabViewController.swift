@@ -28,6 +28,12 @@ import os.log
 import Onboarding
 import Freemium
 
+protocol BrowserTabViewControllerDelegate: AnyObject {
+    func highlightFireButton()
+    func highlightPrivacyShield()
+    func dismissViewHighlight()
+}
+
 final class BrowserTabViewController: NSViewController {
 
     private lazy var browserTabView = BrowserTabView(frame: .zero, backgroundColor: .browserTabBackground)
@@ -39,12 +45,14 @@ final class BrowserTabViewController: NSViewController {
     private weak var webViewSnapshot: NSView?
     private var containerStackView: NSStackView
 
+    weak var delegate: BrowserTabViewControllerDelegate?
     var tabViewModel: TabViewModel?
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private let bookmarkManager: BookmarkManager
     private let dockCustomizer = DockCustomizer()
-    private let onboardingDialogTypeProvider: ContextualOnboardingDialogTypeProviding
+    private let onboardingDialogTypeProvider: ContextualOnboardingDialogTypeProviding & ContextualOnboardingStateUpdater
+
     private let onboardingDialogFactory: ContextualDaxDialogsFactory
     private let featureFlagger: FeatureFlagger
 
@@ -72,7 +80,7 @@ final class BrowserTabViewController: NSViewController {
 
     init(tabCollectionViewModel: TabCollectionViewModel,
          bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
-         onboardingDialogTypeProvider: ContextualOnboardingDialogTypeProviding = ContextualOnboardingDialogTypeProvider(),
+         onboardingDialogTypeProvider: ContextualOnboardingDialogTypeProviding & ContextualOnboardingStateUpdater = Application.appDelegate.onboardingStateMachine,
          onboardingDialogFactory: ContextualDaxDialogsFactory = DefaultContextualDaxDialogViewFactory(),
          featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger) {
         self.tabCollectionViewModel = tabCollectionViewModel
@@ -125,13 +133,26 @@ final class BrowserTabViewController: NSViewController {
         subscribeToTabs()
         subscribeToSelectedTabViewModel()
 
+        if let webViewContainer {
+            removeChild(in: self.containerStackView, webViewContainer: webViewContainer)
+        }
+
         view.registerForDraggedTypes([.URL, .fileURL])
+    }
+
+    @objc func windowDidBecomeActive(notification: Notification) {
+        presentContextualOnboarding()
     }
 
     override func viewWillAppear() {
         super.viewWillAppear()
 
         addMouseMonitors()
+
+        // Register for focus-related notifications
+        if let window = view.window {
+            NotificationCenter.default.addObserver(self, selector: #selector(windowDidBecomeActive), name: NSWindow.didBecomeKeyNotification, object: window)
+        }
     }
 
     override func viewWillDisappear() {
@@ -265,10 +286,9 @@ final class BrowserTabViewController: NSViewController {
                 self.subscribeToTabContent(of: selectedTabViewModel)
                 self.subscribeToHoveredLink(of: selectedTabViewModel)
                 self.subscribeToUserDialogs(of: selectedTabViewModel)
-                self.subscribeToDuckPlayerOnboardingPrompt(of: selectedTabViewModel)
 
                 self.adjustFirstResponder(force: true)
-                self.presentContextualOnboarding()
+                removeExistingDialog()
             }
             .store(in: &cancellables)
     }
@@ -385,7 +405,6 @@ final class BrowserTabViewController: NSViewController {
         let container = WebViewContainerView(tab: tab, webView: webView, frame: view.bounds)
         self.webViewContainer = container
         containerStackView.orientation = .vertical
-        containerStackView.distribution = .fill
         containerStackView.alignment = .leading
         containerStackView.distribution = .fillProportionally
 
@@ -403,17 +422,30 @@ final class BrowserTabViewController: NSViewController {
     }
     var daxContextualOnboardingController: NSViewController?
 
-    private func presentContextualOnboarding() {
-        // Before presenting a new dialog, remove any existing ones.
+    private func updateStateAndPresentContextualOnboarding() {
+        guard let tab = tabViewModel?.tab else { return }
+        onboardingDialogTypeProvider.updateStateFor(tab: tab)
+        presentContextualOnboarding()
+    }
+
+    private func removeExistingDialog() {
         containerStackView.arrangedSubviews.filter({ $0 != webViewContainer }).forEach {
             containerStackView.removeArrangedSubview($0)
             $0.removeFromSuperview()
         }
+    }
+
+    private func presentContextualOnboarding() {
+        // Before presenting a new dialog, remove any existing ones.
+        removeExistingDialog()
+        // Remove any existing higlights animation
+        delegate?.dismissViewHighlight()
 
         guard featureFlagger.isFeatureOn(.highlightsOnboarding) else { return }
 
-        guard let tab = tabViewModel?.tab,
-              let dialogType = onboardingDialogTypeProvider.dialogTypeForTab(tab) else {
+        guard let tab = tabViewModel?.tab else { return }
+        guard let dialogType = onboardingDialogTypeProvider.dialogTypeForTab(tab, privacyInfo: tab.privacyInfo) else {
+            delegate?.dismissViewHighlight()
             return
         }
 
@@ -424,7 +456,31 @@ final class BrowserTabViewController: NSViewController {
                 self.removeChild(in: self.containerStackView, webViewContainer: webViewContainer)
             }
         }
-        let daxView = onboardingDialogFactory.makeView(for: dialogType, delegate: tab, onDismiss: onDismissAction)
+
+        let onGotItPressed = { [weak self] in
+            guard let self else { return }
+
+            onboardingDialogTypeProvider.gotItPressed()
+
+            let currentState = onboardingDialogTypeProvider.state
+
+            // Reset highlight animations
+            delegate?.dismissViewHighlight()
+
+            // Process state
+            if case .showFireButton = currentState {
+                delegate?.highlightFireButton()
+            }
+        }
+
+        let daxView = onboardingDialogFactory.makeView(
+            for: dialogType,
+            delegate: tab,
+            onDismiss: onDismissAction,
+            onGotItPressed: onGotItPressed,
+            onFireButtonPressed: { [weak delegate] in
+                delegate?.dismissViewHighlight()
+            })
         let hostingController = NSHostingController(rootView: AnyView(daxView))
 
         daxContextualOnboardingController = hostingController
@@ -436,8 +492,15 @@ final class BrowserTabViewController: NSViewController {
             hostingController.view.trailingAnchor.constraint(equalTo: containerStackView.trailingAnchor)
         ])
 
-          containerStackView.layoutSubtreeIfNeeded()
-          webViewContainer?.layoutSubtreeIfNeeded()
+        containerStackView.layoutSubtreeIfNeeded()
+        webViewContainer?.layoutSubtreeIfNeeded()
+
+        let currentState = onboardingDialogTypeProvider.state
+        if currentState == .showFireButton {
+            delegate?.highlightFireButton()
+        } else if currentState == .showBlockedTrackers {
+            delegate?.highlightPrivacyShield()
+        }
     }
 
     private func changeWebView(tabViewModel: TabViewModel?) {
@@ -513,7 +576,7 @@ final class BrowserTabViewController: NSViewController {
             .store(in: &tabViewModelCancellables)
 
         tabViewModel?.tab.webViewDidFinishNavigationPublisher.sink { [weak self] in
-            self?.presentContextualOnboarding()
+            self?.updateStateAndPresentContextualOnboarding()
         }.store(in: &tabViewModelCancellables)
 
         tabViewModel?.tab.webViewDidStartNavigationPublisher.sink { [weak self] in
@@ -548,18 +611,6 @@ final class BrowserTabViewController: NSViewController {
             self.scheduleHoverLabelUpdatesForUrl(.duckDuckGo)
         }
 #endif
-    }
-
-    private func subscribeToDuckPlayerOnboardingPrompt(of tabViewModel: TabViewModel?) {
-        tabViewModel?.tab.duckPlayerOnboardingPublisher.sink { [weak self, weak tab = tabViewModel?.tab] onboardingState in
-
-            guard let self, tab != nil, let onboardingState = onboardingState, onboardingState.onboardingDecider.canDisplayOnboarding else  {
-                self?.duckPlayerOnboardingModalManager.close(animated: false, completion: nil)
-                return
-            }
-
-            self.duckPlayerOnboardingModalManager.show(on: self.view, animated: true)
-        }.store(in: &tabViewModelCancellables)
     }
 
     private func shouldMakeContentViewFirstResponder(for tabContent: Tab.TabContent) -> Bool {

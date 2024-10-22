@@ -26,7 +26,16 @@ import XCTest
 
 struct MockRemoteMessagingStoreProvider: RemoteMessagingStoreProviding {
     func makeRemoteMessagingStore(database: CoreDataDatabase, availabilityProvider: RemoteMessagingAvailabilityProviding) -> RemoteMessagingStoring {
-        RemoteMessagingStore(database: database, errorEvents: nil, remoteMessagingAvailabilityProvider: availabilityProvider)
+        MockRemoteMessagingStore()
+    }
+}
+
+final class MockRemoteMessagingConfigFetcher: RemoteMessagingConfigFetching {
+    func fetchRemoteMessagingConfig() async throws -> RemoteMessageResponse.JsonRemoteMessagingConfig {
+        let json = #"{ "version": 1, "messages": [], "rules": [] }"#
+        let jsonData = json.data(using: .utf8)!
+        let decoder = JSONDecoder()
+        return try decoder.decode(RemoteMessageResponse.JsonRemoteMessagingConfig.self, from: jsonData)
     }
 }
 
@@ -109,6 +118,7 @@ final class RemoteMessagingClientTests: XCTestCase {
     private func makeClient() {
         client = RemoteMessagingClient(
             database: remoteMessagingDatabase,
+            configFetcher: MockRemoteMessagingConfigFetcher(),
             configMatcherProvider: RemoteMessagingConfigMatcherProvider(
                 bookmarksDatabase: bookmarksDatabase,
                 appearancePreferences: AppearancePreferences(persistor: AppearancePreferencesPersistorMock()),
@@ -117,7 +127,6 @@ final class RemoteMessagingClientTests: XCTestCase {
                 statisticsStore: MockStatisticsStore(),
                 variantManager: MockVariantManager()
             ),
-            configurationStore: MockConfigurationStore(),
             remoteMessagingAvailabilityProvider: availabilityProvider
         )
     }

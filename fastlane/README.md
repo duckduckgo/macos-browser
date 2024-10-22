@@ -63,6 +63,14 @@ Makes App Store release build and uploads it to TestFlight
 
 Makes App Store release build and uploads it to TestFlight
 
+### mac promote_latest_testflight_to_appstore
+
+```sh
+[bundle exec] fastlane mac promote_latest_testflight_to_appstore
+```
+
+Promotes the latest testflight build to appstore without submitting for review
+
 ### mac release_appstore
 
 ```sh

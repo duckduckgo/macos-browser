@@ -70,6 +70,7 @@ final class MoreOptionsMenu: NSMenu {
 
     private let vpnFeatureGatekeeper: VPNFeatureGatekeeper
     private let subscriptionFeatureAvailability: SubscriptionFeatureAvailability
+    private let aiChatMenuConfiguration: AIChatMenuVisibilityConfigurable
 
     /// The `FreemiumDBPExperimentPixelHandler` instance used to fire pixels
     private let freemiumDBPExperimentPixelHandler: EventMapping<FreemiumDBPExperimentPixel>
@@ -92,7 +93,8 @@ final class MoreOptionsMenu: NSMenu {
          freemiumDBPPresenter: FreemiumDBPPresenter = DefaultFreemiumDBPPresenter(),
          appearancePreferences: AppearancePreferences = .shared,
          notificationCenter: NotificationCenter = .default,
-         freemiumDBPExperimentPixelHandler: EventMapping<FreemiumDBPExperimentPixel> = FreemiumDBPExperimentPixelHandler()) {
+         freemiumDBPExperimentPixelHandler: EventMapping<FreemiumDBPExperimentPixel> = FreemiumDBPExperimentPixelHandler(),
+         aiChatMenuConfiguration: AIChatMenuVisibilityConfigurable = AIChatMenuConfiguration()) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.emailManager = emailManager
@@ -107,6 +109,7 @@ final class MoreOptionsMenu: NSMenu {
         self.appearancePreferences = appearancePreferences
         self.notificationCenter = notificationCenter
         self.freemiumDBPExperimentPixelHandler = freemiumDBPExperimentPixelHandler
+        self.aiChatMenuConfiguration = aiChatMenuConfiguration
 
         super.init(title: "")
 
@@ -194,6 +197,11 @@ final class MoreOptionsMenu: NSMenu {
     @MainActor
     @objc func newBurnerWindow(_ sender: NSMenuItem) {
         WindowsManager.openNewWindow(burnerMode: BurnerMode(isBurner: true))
+    }
+
+    @MainActor
+    @objc func newAiChat(_ sender: NSMenuItem) {
+        AIChatTabOpener.openAIChatTab()
     }
 
     @MainActor
@@ -332,6 +340,17 @@ final class MoreOptionsMenu: NSMenu {
         burnerWindowItem.keyEquivalentModifierMask = [.command, .shift]
         burnerWindowItem.image = .newBurnerWindow
         addItem(burnerWindowItem)
+
+        // New AI Chat
+        if aiChatMenuConfiguration.shouldDisplayApplicationMenuShortcut {
+            let aiChatItem = NSMenuItem(title: UserText.newAIChatMenuItem,
+                                        action: #selector(newAiChat(_:)),
+                                        target: self)
+            aiChatItem.keyEquivalent = "n"
+            aiChatItem.keyEquivalentModifierMask = [.command, .option]
+            aiChatItem.image = .aiChat
+            addItem(aiChatItem)
+        }
 
         addItem(NSMenuItem.separator())
     }

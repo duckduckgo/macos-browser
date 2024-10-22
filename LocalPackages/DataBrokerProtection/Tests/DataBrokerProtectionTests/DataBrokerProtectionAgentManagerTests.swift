@@ -108,7 +108,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
 
         let scanCalledExpectation = XCTestExpectation(description: "Scan called")
         var startScheduledScansCalled = false
-        mockQueueManager.startScheduledAllOperationsIfPermittedCalledCompletion = { _ in
+        mockQueueManager.startScheduledAllOperationsIfPermittedCalledCompletion = {
             startScheduledScansCalled = true
             scanCalledExpectation.fulfill()
         }
@@ -150,7 +150,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
 
         let scanCalledExpectation = XCTestExpectation(description: "Scan called")
         var startScheduledScansCalled = false
-        mockQueueManager.startScheduledScanOperationsIfPermittedCalledCompletion = { _ in
+        mockQueueManager.startScheduledScanOperationsIfPermittedCalledCompletion = {
             startScheduledScansCalled = true
             scanCalledExpectation.fulfill()
         }
@@ -269,7 +269,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
         mockFreemiumDBPUserStateManager.didActivate = false
 
         var startScheduledScansCalled = false
-        mockQueueManager.startScheduledAllOperationsIfPermittedCalledCompletion = { _ in
+        mockQueueManager.startScheduledAllOperationsIfPermittedCalledCompletion = {
             startScheduledScansCalled = true
         }
 
@@ -300,7 +300,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
         mockFreemiumDBPUserStateManager.didActivate = true
 
         var startScheduledScansCalled = false
-        mockQueueManager.startScheduledScanOperationsIfPermittedCalledCompletion = { _ in
+        mockQueueManager.startScheduledScanOperationsIfPermittedCalledCompletion = {
             startScheduledScansCalled = true
         }
 
@@ -331,7 +331,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
         mockFreemiumDBPUserStateManager.didActivate = false
 
         var startImmediateScansCalled = false
-        mockQueueManager.startImmediateScanOperationsIfPermittedCalledCompletion = { _ in
+        mockQueueManager.startImmediateScanOperationsIfPermittedCalledCompletion = {
             startImmediateScansCalled = true
         }
 
@@ -362,7 +362,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
         mockFreemiumDBPUserStateManager.didActivate = true
 
         var startImmediateScansCalled = false
-        mockQueueManager.startImmediateScanOperationsIfPermittedCalledCompletion = { _ in
+        mockQueueManager.startImmediateScanOperationsIfPermittedCalledCompletion = {
             startImmediateScansCalled = true
         }
 
@@ -521,7 +521,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
         mockFreemiumDBPUserStateManager.didActivate = false
 
         var startScheduledScansCalled = false
-        mockQueueManager.startScheduledAllOperationsIfPermittedCalledCompletion = { _ in
+        mockQueueManager.startScheduledAllOperationsIfPermittedCalledCompletion = {
             startScheduledScansCalled = true
         }
 
@@ -551,7 +551,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
         mockFreemiumDBPUserStateManager.didActivate = true
 
         var startScheduledScansCalled = false
-        mockQueueManager.startScheduledScanOperationsIfPermittedCalledCompletion = { _ in
+        mockQueueManager.startScheduledScanOperationsIfPermittedCalledCompletion = {
             startScheduledScansCalled = true
         }
 

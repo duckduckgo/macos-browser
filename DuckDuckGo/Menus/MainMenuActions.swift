@@ -65,6 +65,12 @@ extension AppDelegate {
         }
     }
 
+    @objc func newAIChat(_ sender: Any?) {
+        DispatchQueue.main.async {
+            AIChatTabOpener.openAIChatTab()
+        }
+    }
+
     @objc func newTab(_ sender: Any?) {
         DispatchQueue.main.async {
             WindowsManager.openNewWindow()
@@ -329,7 +335,9 @@ extension AppDelegate {
     }
 
     @objc func resetRemoteMessages(_ sender: Any?) {
-        remoteMessagingClient.store?.resetRemoteMessages()
+        Task {
+            await remoteMessagingClient.store?.resetRemoteMessages()
+        }
     }
 
     @objc func resetNewTabPageCustomization(_ sender: Any?) {
@@ -804,8 +812,9 @@ extension MainViewController {
                                                           eventMapping: EventMapping<AutofillPixelEvent> { _, _, _, _ in },
                                                           installDate: nil)
         autofillPixelReporter.resetStoreDefaults()
-        AutofillLoginImportState().hasImportedLogins = false
-        AutofillLoginImportState().credentialsImportPromptPresentationCount = 0
+        var loginImportState = AutofillLoginImportState()
+        loginImportState.hasImportedLogins = false
+        loginImportState.isCredentialsImportPromptPermanantlyDismissed = false
     }
 
     @objc func resetBookmarks(_ sender: Any?) {
@@ -834,9 +843,12 @@ extension MainViewController {
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowEmailProtection.rawValue)
     }
 
-    @objc func resetDuckPlayerOnboarding(_ sender: Any?) {
-        DefaultDuckPlayerOnboardingDecider().reset()
-        DuckPlayerOnboardingExperiment().reset()
+    @objc func resetOnboarding(_ sender: Any?) {
+        UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.onboardingFinished.rawValue)
+    }
+
+    @objc func resetContextualOnboarding(_ sender: Any?) {
+        Application.appDelegate.onboardingStateMachine.state = .notStarted
     }
 
     @objc func resetDuckPlayerPreferences(_ sender: Any?) {

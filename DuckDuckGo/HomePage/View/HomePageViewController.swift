@@ -191,7 +191,7 @@ final class HomePageViewController: NSViewController {
             bookmark.isFavorite = !bookmark.isFavorite
             self?.bookmarkManager.update(bookmark: bookmark)
         }, deleteBookmark: { [weak self] bookmark in
-            self?.bookmarkManager.remove(bookmark: bookmark)
+            self?.bookmarkManager.remove(bookmark: bookmark, undoManager: self?.undoManager)
         }, add: { [weak self] in
             self?.showAddController()
         }, edit: { [weak self] bookmark in

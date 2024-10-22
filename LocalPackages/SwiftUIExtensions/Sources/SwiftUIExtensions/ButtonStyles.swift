@@ -49,23 +49,40 @@ public struct DefaultActionButtonStyle: ButtonStyle {
     }
 
     public func makeBody(configuration: Self.Configuration) -> some View {
+        ButtonContent(configuration: configuration, enabled: enabled)
+    }
 
-        let enabledBackgroundColor = configuration.isPressed ? Color(NSColor.controlAccentColor).opacity(0.5) : Color(NSColor.controlAccentColor)
-        let disabledBackgroundColor = Color.gray.opacity(0.1)
-        let labelColor = enabled ? Color.white : Color.primary.opacity(0.3)
+    struct ButtonContent: View {
+        let configuration: Configuration
+        let enabled: Bool
+        @State private var isHovered: Bool = false
 
-        configuration.label
-            .font(.system(size: 13))
-            .multilineTextAlignment(.center)
-            .fixedSize(horizontal: false, vertical: true)
-            .frame(minWidth: 44) // OK buttons will match the width of "Cancel" at least in English
-            .padding(.top, 2.5)
-            .padding(.bottom, 3)
-            .padding(.horizontal, 7.5)
-            .background(enabled ? enabledBackgroundColor : disabledBackgroundColor)
-            .foregroundColor(labelColor)
-            .cornerRadius(5)
+        var body: some View {
+            let enabledBackgroundColor = configuration.isPressed
+                ? Color("PrimaryButtonPressed")
+                : (isHovered
+                    ? Color("PrimaryButtonHover")
+                    : Color("PrimaryButtonRest"))
 
+            let disabledBackgroundColor = Color.gray.opacity(0.1)
+            let enabledLabelColor = configuration.isPressed ? Color.white.opacity(0.8) : Color.white
+            let disabledLabelColor = Color.primary.opacity(0.3)
+
+            configuration.label
+                .font(.system(size: 13))
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(minWidth: 44)
+                .padding(.top, 2.5)
+                .padding(.bottom, 3)
+                .padding(.horizontal, 7.5)
+                .background(enabled ? enabledBackgroundColor : disabledBackgroundColor)
+                .foregroundColor(enabled ? enabledLabelColor : disabledLabelColor)
+                .cornerRadius(5)
+                .onHover { hovering in
+                    isHovered = hovering
+                }
+        }
     }
 }
 
