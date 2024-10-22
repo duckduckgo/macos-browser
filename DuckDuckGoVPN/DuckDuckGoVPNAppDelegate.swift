@@ -75,7 +75,7 @@ final class DuckDuckGoVPNApplication: NSApplication {
 
 #if DEBUG
         if accountManager.accessToken != nil {
-            Logger.networkProtection.log("🟢 VPN Agent found token")
+            Logger.networkProtection.error("🟢 VPN Agent found token")
         } else {
             Logger.networkProtection.error("VPN Agent found no token")
         }

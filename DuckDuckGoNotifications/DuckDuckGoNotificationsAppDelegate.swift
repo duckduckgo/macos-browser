@@ -69,7 +69,7 @@ final class DuckDuckGoNotificationsAppDelegate: NSObject, NSApplicationDelegate 
     private var cancellables = Set<AnyCancellable>()
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        Logger.networkProtection.log("Login item finished launching")
+        Logger.networkProtection.info("Login item finished launching")
 
         startObservingVPNStatusChanges()
         Logger.networkProtection.log("Login item listening")
@@ -128,33 +128,33 @@ final class DuckDuckGoNotificationsAppDelegate: NSObject, NSApplicationDelegate 
     // MARK: - Showing Notifications
 
     func showConnectedNotification(serverLocation: String?) {
-        Logger.networkProtection.log("Presenting reconnected notification")
+        Logger.networkProtection.info("Presenting reconnected notification")
         notificationsPresenter.showConnectedNotification(serverLocation: serverLocation, snoozeEnded: false)
     }
 
     func showReconnectingNotification() {
-        Logger.networkProtection.log("Presenting reconnecting notification")
+        Logger.networkProtection.info("Presenting reconnecting notification")
         notificationsPresenter.showReconnectingNotification()
     }
 
     func showConnectionFailureNotification() {
-        Logger.networkProtection.log("Presenting failure notification")
+        Logger.networkProtection.info("Presenting failure notification")
         notificationsPresenter.showConnectionFailureNotification()
     }
 
     func showSupersededNotification() {
-        Logger.networkProtection.log("Presenting Superseded notification")
+        Logger.networkProtection.info("Presenting Superseded notification")
         notificationsPresenter.showSupersededNotification()
     }
 
     func showEntitlementNotification() {
-        Logger.networkProtection.log("Presenting Entitlements notification")
+        Logger.networkProtection.info("Presenting Entitlements notification")
 
         notificationsPresenter.showEntitlementNotification()
     }
 
     func showTestNotification() {
-        Logger.networkProtection.log("Presenting test notification")
+        Logger.networkProtection.info("Presenting test notification")
         notificationsPresenter.showTestNotification()
     }
 
