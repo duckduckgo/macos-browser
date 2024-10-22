@@ -391,6 +391,7 @@ final class BrowserTabViewController: NSViewController {
         containerStackView.orientation = .vertical
         containerStackView.alignment = .leading
         containerStackView.distribution = .fillProportionally
+        containerStackView.spacing = 0
 
         // Make sure link preview (tooltip shown in the bottom-left) is on top
         view.addSubview(containerStackView, positioned: .below, relativeTo: hoverLabelContainer)
@@ -460,20 +461,22 @@ final class BrowserTabViewController: NSViewController {
         let daxView = onboardingDialogFactory.makeView(
             for: dialogType,
             delegate: tab,
+            onboardingPixelReorter: OnboardingPixelReporter(),
             onDismiss: onDismissAction,
             onGotItPressed: onGotItPressed,
             onFireButtonPressed: { [weak delegate] in
                 delegate?.dismissViewHighlight()
             })
+        containerStackView.spacing = 0
         let hostingController = NSHostingController(rootView: AnyView(daxView))
-
         daxContextualOnboardingController = hostingController
         insertChild(daxContextualOnboardingController!, in: containerStackView, at: 0)
         hostingController.view.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
+            hostingController.view.topAnchor.constraint(equalTo: containerStackView.topAnchor),
             hostingController.view.widthAnchor.constraint(equalTo: containerStackView.widthAnchor),
             hostingController.view.leadingAnchor.constraint(equalTo: containerStackView.leadingAnchor),
-            hostingController.view.trailingAnchor.constraint(equalTo: containerStackView.trailingAnchor)
+            hostingController.view.trailingAnchor.constraint(equalTo: containerStackView.trailingAnchor),
         ])
 
         containerStackView.layoutSubtreeIfNeeded()

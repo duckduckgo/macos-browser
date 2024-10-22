@@ -111,6 +111,8 @@ final class AddressBarButtonsViewController: NSViewController {
 
     @Published private(set) var buttonsWidth: CGFloat = 0
 
+    private let onboardingPixelReporter: OnboardingAddressBarReporting
+
     private var tabCollectionViewModel: TabCollectionViewModel
     private var tabViewModel: TabViewModel? {
         didSet {
@@ -171,10 +173,12 @@ final class AddressBarButtonsViewController: NSViewController {
     init?(coder: NSCoder,
           tabCollectionViewModel: TabCollectionViewModel,
           accessibilityPreferences: AccessibilityPreferences = AccessibilityPreferences.shared,
-          popovers: NavigationBarPopovers) {
+          popovers: NavigationBarPopovers,
+          onboardingPixelReporter: OnboardingAddressBarReporting = OnboardingPixelReporter()) {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.accessibilityPreferences = accessibilityPreferences
         self.popovers = popovers
+        self.onboardingPixelReporter = onboardingPixelReporter
         super.init(coder: coder)
     }
 
@@ -266,6 +270,7 @@ final class AddressBarButtonsViewController: NSViewController {
         popupBlockedPopover?.close()
 
         popovers.togglePrivacyDashboardPopover(for: tabViewModel, from: privacyEntryPointButton)
+        onboardingPixelReporter.trackPrivacyDashboardOpened()
     }
 
     private func updateBookmarkButtonVisibility() {

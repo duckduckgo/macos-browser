@@ -104,6 +104,8 @@ public struct UserDefaultsWrapper<T> {
 
         case phishingDetectionEnabled = "preferences.security.phishing-detection-enabled"
 
+        case websiteVisited = "onboarding.website-visited"
+
         // ATB
         case installDate = "statistics.installdate.key"
         case atb = "statistics.atb.key"
