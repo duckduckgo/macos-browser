@@ -41,7 +41,7 @@ final class DuckDuckGoVPNApplication: NSApplication {
     private let _delegate: DuckDuckGoVPNAppDelegate
 
     override init() {
-        Logger.networkProtection.debug("🟢 Status Bar Agent starting\nPath: (\(Bundle.main.bundlePath, privacy: .public))\nVersion: \("\(Bundle.main.versionNumber!).\(Bundle.main.buildNumber)", privacy: .public)\nPID: \(NSRunningApplication.current.processIdentifier, privacy: .public)")
+        Logger.networkProtection.log("🟢 Status Bar Agent starting\nPath: (\(Bundle.main.bundlePath, privacy: .public))\nVersion: \("\(Bundle.main.versionNumber!).\(Bundle.main.buildNumber)", privacy: .public)\nPID: \(NSRunningApplication.current.processIdentifier, privacy: .public)")
 
         // prevent agent from running twice
         if let anotherInstance = NSRunningApplication.runningApplications(withBundleIdentifier: Bundle.main.bundleIdentifier!).first(where: { $0 != .current }) {
@@ -75,7 +75,7 @@ final class DuckDuckGoVPNApplication: NSApplication {
 
 #if DEBUG
         if accountManager.accessToken != nil {
-            Logger.networkProtection.debug("🟢 VPN Agent found token")
+            Logger.networkProtection.log("🟢 VPN Agent found token")
         } else {
             Logger.networkProtection.error("VPN Agent found no token")
         }
@@ -363,7 +363,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ aNotification: Notification) {
 
         APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
-        Logger.networkProtection.info("DuckDuckGoVPN started")
+        Logger.networkProtection.log("DuckDuckGoVPN started")
 
         // Setup Remote Configuration
         Configuration.setURLProvider(VPNAgentConfigurationURLProvider())

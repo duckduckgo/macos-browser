@@ -69,14 +69,14 @@ final class DuckDuckGoNotificationsAppDelegate: NSObject, NSApplicationDelegate 
     private var cancellables = Set<AnyCancellable>()
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        Logger.networkProtection.info("Login item finished launching")
+        Logger.networkProtection.log("Login item finished launching")
 
         startObservingVPNStatusChanges()
-        Logger.networkProtection.info("Login item listening")
+        Logger.networkProtection.log("Login item listening")
     }
 
     private func startObservingVPNStatusChanges() {
-        Logger.networkProtection.info("Register with sysex")
+        Logger.networkProtection.log("Register with sysex")
 
         distributedNotificationCenter.publisher(for: .showIssuesStartedNotification)
             .receive(on: DispatchQueue.main)
@@ -110,7 +110,7 @@ final class DuckDuckGoNotificationsAppDelegate: NSObject, NSApplicationDelegate 
             }.store(in: &cancellables)
 
         distributedNotificationCenter.publisher(for: .serverSelected).sink { [weak self] _ in
-            Logger.networkProtection.info("Got notification: listener started")
+            Logger.networkProtection.log("Got notification: listener started")
             self?.notificationsPresenter.requestAuthorization()
         }.store(in: &cancellables)
 
@@ -128,33 +128,33 @@ final class DuckDuckGoNotificationsAppDelegate: NSObject, NSApplicationDelegate 
     // MARK: - Showing Notifications
 
     func showConnectedNotification(serverLocation: String?) {
-        Logger.networkProtection.info("Presenting reconnected notification")
+        Logger.networkProtection.log("Presenting reconnected notification")
         notificationsPresenter.showConnectedNotification(serverLocation: serverLocation, snoozeEnded: false)
     }
 
     func showReconnectingNotification() {
-        Logger.networkProtection.info("Presenting reconnecting notification")
+        Logger.networkProtection.log("Presenting reconnecting notification")
         notificationsPresenter.showReconnectingNotification()
     }
 
     func showConnectionFailureNotification() {
-        Logger.networkProtection.info("Presenting failure notification")
+        Logger.networkProtection.log("Presenting failure notification")
         notificationsPresenter.showConnectionFailureNotification()
     }
 
     func showSupersededNotification() {
-        Logger.networkProtection.info("Presenting Superseded notification")
+        Logger.networkProtection.log("Presenting Superseded notification")
         notificationsPresenter.showSupersededNotification()
     }
 
     func showEntitlementNotification() {
-        Logger.networkProtection.info("Presenting Entitlements notification")
+        Logger.networkProtection.log("Presenting Entitlements notification")
 
         notificationsPresenter.showEntitlementNotification()
     }
 
     func showTestNotification() {
-        Logger.networkProtection.info("Presenting test notification")
+        Logger.networkProtection.log("Presenting test notification")
         notificationsPresenter.showTestNotification()
     }
 
