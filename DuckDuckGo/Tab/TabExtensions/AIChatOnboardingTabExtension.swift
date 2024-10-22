@@ -25,27 +25,31 @@ final class AIChatOnboardingTabExtension {
     private weak var webView: WKWebView?
     private var cancellables = Set<AnyCancellable>()
     private let notificationCenter: NotificationCenter
+    private let remoteSettings: AIChatRemoteSettings
 
     init(webViewPublisher: some Publisher<WKWebView, Never>,
-         notificationCenter: NotificationCenter = .default) {
+         notificationCenter: NotificationCenter = .default,
+         remoteSettings: AIChatRemoteSettings = AIChatRemoteSettings()) {
 
         self.notificationCenter = notificationCenter
-
+        self.remoteSettings = remoteSettings
+        
         webViewPublisher.sink { [weak self] webView in
             self?.webView = webView
         }.store(in: &cancellables)
     }
 
     private func validateAIChatCookie(webView: WKWebView) {
-        guard webView.url?.absoluteString == "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=2" else {
+        guard webView.url == remoteSettings.aiChatURL else {
             return
         }
 
         let cookieStore = webView.configuration.websiteDataStore.httpCookieStore
 
         cookieStore.getAllCookies { [weak self] cookies in
-            if cookies.contains(where: { $0.isAIChatCookie}) {
-                self?.notificationCenter.post(name: .AIChatOpenedForReturningUser, object: nil)
+            guard let self = self else { return }
+            if cookies.contains(where: { $0.isAIChatCookie(settings: self.remoteSettings) }) {
+                self.notificationCenter.post(name: .AIChatOpenedForReturningUser, object: nil)
             }
         }
     }
@@ -72,8 +76,8 @@ extension TabExtensions {
 }
 
 private extension HTTPCookie {
-    var isAIChatCookie: Bool {
-        name == "dcm" && domain == "duckduckgo.com"
+    func isAIChatCookie(settings: AIChatRemoteSettings) -> Bool {
+        name == settings.onboardingCookieName && domain == settings.onboardingCookieDomain
     }
 }
 

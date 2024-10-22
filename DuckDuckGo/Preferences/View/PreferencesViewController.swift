@@ -33,10 +33,13 @@ final class PreferencesViewController: NSViewController {
 
     private var bitwardenManager: BWManagement = BWManager.shared
 
-    init(syncService: DDGSyncing, duckPlayer: DuckPlayer = DuckPlayer.shared) {
+    init(syncService: DDGSyncing,
+         duckPlayer: DuckPlayer = DuckPlayer.shared,
+         aiChatRemoteSettings: AIChatRemoteSettings = AIChatRemoteSettings()) {
         model = PreferencesSidebarModel(syncService: syncService,
                                         vpnGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: Application.appDelegate.subscriptionManager),
-                                        includeDuckPlayer: duckPlayer.shouldDisplayPreferencesSideBar)
+                                        includeDuckPlayer: duckPlayer.shouldDisplayPreferencesSideBar,
+                                        includeAIChat: aiChatRemoteSettings.isAIChatEnabled)
         super.init(nibName: nil, bundle: nil)
     }
 

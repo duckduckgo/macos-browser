@@ -17,6 +17,7 @@
 //
 
 import Combine
+import BrowserServicesKit
 
 protocol AIChatMenuVisibilityConfigurable {
     var shouldDisplayApplicationMenuShortcut: Bool { get }
@@ -42,6 +43,7 @@ final class AIChatMenuConfiguration: AIChatMenuVisibilityConfigurable {
     private var cancellables = Set<AnyCancellable>()
     private var storage: AIChatPreferencesStorage
     private let notificationCenter: NotificationCenter
+    private let remoteSettings: AIChatRemoteSettings
 
     var valuesChangedPublisher = PassthroughSubject<Void, Never>()
     var shouldDisplayToolbarOnboardingPopover = PassthroughSubject<Void, Never>()
@@ -63,7 +65,7 @@ final class AIChatMenuConfiguration: AIChatMenuVisibilityConfigurable {
     }
 
     var shortcutURL: URL {
-        URL(string: "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=2")!
+        remoteSettings.aiChatURL
     }
 
     func markToolbarOnboardingPopoverAsShown() {
@@ -71,9 +73,12 @@ final class AIChatMenuConfiguration: AIChatMenuVisibilityConfigurable {
     }
 
     init(storage: AIChatPreferencesStorage = DefaultAIChatPreferencesStorage(),
-         notificationCenter: NotificationCenter = .default) {
+         notificationCenter: NotificationCenter = .default,
+         remoteSettings: AIChatRemoteSettings = AIChatRemoteSettings()) {
         self.storage = storage
         self.notificationCenter = notificationCenter
+        self.remoteSettings = remoteSettings
+
         self.subscribeToValuesChanged()
         self.subscribeToAIChatLoadedNotification()
     }
@@ -105,11 +110,9 @@ final class AIChatMenuConfiguration: AIChatMenuVisibilityConfigurable {
     private func isFeatureEnabledFor(shortcutType: ShortcutType) -> Bool {
         switch shortcutType {
         case .applicationMenu:
-            // Use privacy config here
-            return true
+            return remoteSettings.isApplicationMenuShortcutEnabled
         case .toolbar:
-            // Use privacy config here
-            return true
+            return remoteSettings.isToolbarShortcutEnabled
         }
     }
 }
