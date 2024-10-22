@@ -706,6 +706,8 @@ final class MainMenu: NSMenu {
                                   subscriptionManager: Application.appDelegate.subscriptionManager)
 
             NSMenuItem(title: "Logging").submenu(setupLoggingMenu())
+            NSMenuItem(title: "AI Chat").submenu(AIChatDebugMenu())
+
         }
         debugMenu.addItem(internalUserItem)
         debugMenu.autoenablesItems = false

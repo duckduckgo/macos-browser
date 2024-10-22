@@ -26,6 +26,7 @@ protocol AIChatPreferencesStorage {
     var showShortcutInApplicationMenuPublisher: AnyPublisher<Bool, Never> { get }
     var shouldDisplayToolbarShortcutPublisher: AnyPublisher<Bool, Never> { get }
 
+    func reset()
 }
 
 struct DefaultAIChatPreferencesStorage: AIChatPreferencesStorage {
@@ -80,6 +81,12 @@ struct DefaultAIChatPreferencesStorage: AIChatPreferencesStorage {
     var didDisplayAIChatToolbarOnboarding: Bool {
         get { userDefaults.didDisplayAIChatToolbarOnboarding }
         set { userDefaults.didDisplayAIChatToolbarOnboarding = newValue }
+    }
+
+    func reset() {
+        userDefaults.showAIChatShortcutInApplicationMenu = false
+        userDefaults.didDisplayAIChatToolbarOnboarding = false
+        pinningManager.unpin(.aiChat)
     }
 }
 

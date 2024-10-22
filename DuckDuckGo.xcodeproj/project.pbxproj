@@ -291,6 +291,8 @@
 		3199AF842C80736C003AEBDC /* DuckPlayerOnboardingLocationValidatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3199AF812C80736B003AEBDC /* DuckPlayerOnboardingLocationValidatorTests.swift */; };
 		319FCFF22CC81D54004F9288 /* AIChatRemoteSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 319FCFF12CC81D54004F9288 /* AIChatRemoteSettings.swift */; };
 		319FCFF32CC81D54004F9288 /* AIChatRemoteSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 319FCFF12CC81D54004F9288 /* AIChatRemoteSettings.swift */; };
+		319FCFF52CC83007004F9288 /* AIChatDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 319FCFF42CC83003004F9288 /* AIChatDebugMenu.swift */; };
+		319FCFF62CC83007004F9288 /* AIChatDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 319FCFF42CC83003004F9288 /* AIChatDebugMenu.swift */; };
 		31A2FD172BAB41C500D0E741 /* DataBrokerProtectionFeatureGatekeeperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31A2FD162BAB41C500D0E741 /* DataBrokerProtectionFeatureGatekeeperTests.swift */; };
 		31A2FD182BAB43BA00D0E741 /* DataBrokerProtectionFeatureGatekeeperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31A2FD162BAB41C500D0E741 /* DataBrokerProtectionFeatureGatekeeperTests.swift */; };
 		31A3A4E32B0C115F0021063C /* DataBrokerProtection in Frameworks */ = {isa = PBXBuildFile; productRef = 31A3A4E22B0C115F0021063C /* DataBrokerProtection */; };
@@ -3369,6 +3371,7 @@
 		3199C6F82AF94F5B002A7BA1 /* DataBrokerProtectionFeatureDisabler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionFeatureDisabler.swift; sourceTree = "<group>"; };
 		3199C6FC2AF97367002A7BA1 /* DataBrokerProtectionAppEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionAppEvents.swift; sourceTree = "<group>"; };
 		319FCFF12CC81D54004F9288 /* AIChatRemoteSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIChatRemoteSettings.swift; sourceTree = "<group>"; };
+		319FCFF42CC83003004F9288 /* AIChatDebugMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIChatDebugMenu.swift; sourceTree = "<group>"; };
 		31A2FD162BAB41C500D0E741 /* DataBrokerProtectionFeatureGatekeeperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionFeatureGatekeeperTests.swift; sourceTree = "<group>"; };
 		31A83FB42BE28D7D00F74E67 /* UserText+DBP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserText+DBP.swift"; sourceTree = "<group>"; };
 		31AA6B962B960B870025014E /* DataBrokerProtectionLoginItemPixels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionLoginItemPixels.swift; sourceTree = "<group>"; };
@@ -5238,6 +5241,7 @@
 		31521ABE2CC0139C00248E6F /* AIChat */ = {
 			isa = PBXGroup;
 			children = (
+				319FCFF42CC83003004F9288 /* AIChatDebugMenu.swift */,
 				314872762CC6898C00EEF89B /* OnboardingPopover */,
 				319FCFF12CC81D54004F9288 /* AIChatRemoteSettings.swift */,
 				316C48EE2CC2B231000B08C1 /* AIChatPreferencesStorage.swift */,
@@ -10926,6 +10930,7 @@
 				B6B71C592B23379600487131 /* NSLayoutConstraintExtension.swift in Sources */,
 				848648A22C76F4B20082282D /* BookmarksBarMenuViewController.swift in Sources */,
 				3706FB4A293F65D500E42796 /* PasswordManagementNoteModel.swift in Sources */,
+				319FCFF62CC83007004F9288 /* AIChatDebugMenu.swift in Sources */,
 				3706FB4B293F65D500E42796 /* CookieNotificationAnimationModel.swift in Sources */,
 				3706FB4C293F65D500E42796 /* SharingMenu.swift in Sources */,
 				3706FB4D293F65D500E42796 /* GrammarFeaturesManager.swift in Sources */,
@@ -12831,6 +12836,7 @@
 				D64A5FF82AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift in Sources */,
 				37A6A8F62AFCCA59008580A3 /* FaviconsFetcherOnboardingViewController.swift in Sources */,
 				5677A9372C9812E800DA7B0A /* TrackerMessageProvider.swift in Sources */,
+				319FCFF52CC83007004F9288 /* AIChatDebugMenu.swift in Sources */,
 				EE098E772C8EDE2C009EBA7F /* AutofillCredentialsImportManager.swift in Sources */,
 				3199AF6F2C80734A003AEBDC /* DuckPlayerOnboardingDecider.swift in Sources */,
 				AA3F895324C18AD500628DDE /* SuggestionViewModel.swift in Sources */,
