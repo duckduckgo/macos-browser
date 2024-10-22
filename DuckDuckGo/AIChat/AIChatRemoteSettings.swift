@@ -60,14 +60,14 @@ struct AIChatRemoteSettings {
     }
 
     var isAIChatEnabled: Bool {
-        privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .aiChat)
+        true
     }
 
     var isToolbarShortcutEnabled: Bool {
-        privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(AIChatSubfeature.toolbarShortcut)
+        true
     }
 
     var isApplicationMenuShortcutEnabled: Bool {
-        privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(AIChatSubfeature.applicationMenuShortcut)
+        true
     }
 }

@@ -103,11 +103,6 @@ final class AIChatMenuConfiguration: AIChatMenuVisibilityConfigurable {
     }
 
     private func isFeatureEnabledFor(shortcutType: ShortcutType) -> Bool {
-        switch shortcutType {
-        case .applicationMenu:
-            return remoteSettings.isApplicationMenuShortcutEnabled
-        case .toolbar:
-            return remoteSettings.isToolbarShortcutEnabled
-        }
+        return true
     }
 }
