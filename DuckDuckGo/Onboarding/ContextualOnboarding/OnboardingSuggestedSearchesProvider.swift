@@ -67,12 +67,7 @@ struct OnboardingSuggestedSearchesProvider: OnboardingSuggestionsItemsProviding 
     }
 
     private var surpriseMe: ContextualOnboardingListItem {
-        var search: String
-        if country == "US" {
-            search = UserText.ContextualOnboarding.tryASearchOptionSurpriseMeEnglish
-        } else {
-            search = UserText.ContextualOnboarding.tryASearchOptionSurpriseMeInternational
-        }
+        var search = UserText.ContextualOnboarding.tryASearchOptionSurpriseMe
         return ContextualOnboardingListItem.surprise(title: search, visibleTitle: UserText.ContextualOnboarding.tryASearchOptionSurpriseMeTitle)
     }
 
