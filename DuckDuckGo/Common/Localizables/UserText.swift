@@ -983,6 +983,9 @@ struct UserText {
     static let bitwardenCommunicationInfo = NSLocalizedString("bitwarden.connect.communication-info", value: "All communication between Bitwarden and DuckDuckGo is encrypted and the data never leaves your device.", comment: "Warns users that all communication between the DuckDuckGo browser and the password manager Bitwarden is encrypted and doesn't leave the user device")
     static let bitwardenHistoryInfo = NSLocalizedString("bitwarden.connect.history-info", value: "Bitwarden will have access to your browsing history.", comment: "Warn users that the password Manager Bitwarden will have access to their browsing history")
 
+    static let showAIChatShortcut = NSLocalizedString("pinning.show-aichat-shortcut", value: "Show AI Chat Shortcut", comment: "Menu item for showing the AI Chat shortcut")
+    static let hideAIChatShortcut = NSLocalizedString("pinning.hide-aichat-shortcut", value: "Hide AI Chat Shortcut", comment: "Menu item for hiding the AI Chat shortcut")
+
     static let showAutofillShortcut = NSLocalizedString("pinning.show-autofill-shortcut", value: "Show Passwords Shortcut", comment: "Menu item for showing the passwords shortcut")
     static let hideAutofillShortcut = NSLocalizedString("pinning.hide-autofill-shortcut", value: "Hide Passwords Shortcut", comment: "Menu item for hiding the passwords shortcut")
 

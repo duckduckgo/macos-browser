@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="o2v-eH-jTI">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="23094" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="o2v-eH-jTI">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22505"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23094"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -174,9 +174,9 @@
                             <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aWu-Jm-Oaz" userLabel="Menu Buttons">
                                 <rect key="frame" x="835" y="30" width="92" height="28"/>
                                 <subviews>
-                                    <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="G8p-di-fq4" userLabel="Downloads Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                    <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="G8p-di-fq4" userLabel="AI Chat Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="28" height="28"/>
-                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Downloads" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="GwE-DM-8UC">
+                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="AIChat" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="GwE-DM-8UC">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
@@ -197,7 +197,33 @@
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
                                         <connections>
-                                            <action selector="downloadsButtonAction:" target="o2v-eH-jTI" id="UIu-gq-V20"/>
+                                            <action selector="aiChatButtonAction:" target="o2v-eH-jTI" id="F42-cw-WpC"/>
+                                        </connections>
+                                    </button>
+                                    <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="l0L-Gq-8p3" userLabel="Downloads Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="28" height="28"/>
+                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Downloads" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="oqg-Yl-ZvV">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <color key="contentTintColor" name="ButtonColor"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="28" id="GB6-Ad-cop"/>
+                                            <constraint firstAttribute="width" constant="28" id="OQQ-cJ-hZg"/>
+                                        </constraints>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                                <color key="value" name="ButtonMouseOverColor"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                                <color key="value" name="ButtonMouseDownColor"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                <real key="value" value="4"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                        <connections>
+                                            <action selector="downloadsButtonAction:" target="o2v-eH-jTI" id="BBW-ii-lgU"/>
                                         </connections>
                                     </button>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="1nW-I1-nut" userLabel="Password Management Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
@@ -311,8 +337,10 @@
                                     <integer value="1000"/>
                                     <integer value="1000"/>
                                     <integer value="1000"/>
+                                    <integer value="1000"/>
                                 </visibilityPriorities>
                                 <customSpacing>
+                                    <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
@@ -353,10 +381,11 @@
                         <outlet property="addressBarProportionalWidthConstraint" destination="rqL-Vd-lnY" id="zxF-f6-8wE"/>
                         <outlet property="addressBarStack" destination="gIy-el-24l" id="vlT-AD-nDv"/>
                         <outlet property="addressBarTopConstraint" destination="km5-nE-hfK" id="dR8-qN-sMa"/>
+                        <outlet property="aiChatButton" destination="G8p-di-fq4" id="s1c-9f-UFg"/>
                         <outlet property="bookmarkListButton" destination="4sj-qN-UUY" id="Fjs-KE-Lfp"/>
                         <outlet property="buttonsTopConstraint" destination="qeF-30-DZN" id="WfB-NP-nV7"/>
                         <outlet property="daxLogo" destination="8Ha-or-PB2" id="Id4-3e-U4K"/>
-                        <outlet property="downloadsButton" destination="G8p-di-fq4" id="oxD-pc-8hn"/>
+                        <outlet property="downloadsButton" destination="l0L-Gq-8p3" id="ujH-qR-rUH"/>
                         <outlet property="goBackButton" destination="kky-0N-Cfd" id="RA9-yE-URS"/>
                         <outlet property="goForwardButton" destination="mdE-u0-Ei5" id="7wT-nX-Avr"/>
                         <outlet property="homeButton" destination="s7D-YB-p00" id="sjk-Af-Zl4"/>
@@ -899,6 +928,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="AIChat" width="16" height="16"/>
         <image name="Back" width="16" height="16"/>
         <image name="Bookmark" width="16" height="16"/>
         <image name="Bookmarks" width="16" height="16"/>
