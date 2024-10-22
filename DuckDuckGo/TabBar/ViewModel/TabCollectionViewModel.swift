@@ -731,6 +731,12 @@ final class TabCollectionViewModel: NSObject {
 
         if self.selectedTabViewModel !== selectedTabViewModel {
             selectedTabViewModel?.tab.lastSelectedAt = Date()
+
+            if selectedTabViewModel?.tab.url?.isErrorPage == true
+                && selectedTabViewModel?.tab.error?.code == WKError.Code.webContentProcessTerminated {
+                // TODO fire pixel
+            }
+
             self.selectedTabViewModel = selectedTabViewModel
         }
     }
