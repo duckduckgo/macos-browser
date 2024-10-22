@@ -277,8 +277,14 @@ class BookmarkSearchTests: XCTestCase {
 
     private func dragAndDropBookmark(_ thirdBookmarkCell: XCUIElement, mode: BookmarkMode) {
         let startCoordinate = thirdBookmarkCell.coordinate(withNormalizedOffset: .zero)
-        let targetCoordinate = (mode == .panel ? app.popovers.firstMatch.outlines.firstMatch : app.tables.firstMatch).coordinate(withNormalizedOffset: .zero)
-        startCoordinate.press(forDuration: 0.1, thenDragTo: targetCoordinate)
+
+        if mode == .panel {
+            let targetCoordinate = (app.popovers.firstMatch.outlines.firstMatch).coordinate(withNormalizedOffset: .zero)
+            startCoordinate.press(forDuration: 0.1, thenDragTo: targetCoordinate)
+        } else {
+            let secondBookmarkCell = app.tables.firstMatch.staticTexts["Bookmark #2"]
+            startCoordinate.press(forDuration: 0.1, thenDragTo: secondBookmarkCell.coordinate(withNormalizedOffset: .zero))
+        }
     }
 
     private func clearSearchInBookmarksManager() {
