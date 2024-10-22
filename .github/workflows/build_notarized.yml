@@ -71,7 +71,7 @@ jobs:
 
     name: Export Notarized App
 
-    runs-on: macos-14-xlarge
+    runs-on: macos-15-xlarge
 
     outputs:
       app-version: ${{ steps.set-outputs.outputs.app-version }}
@@ -230,7 +230,7 @@ jobs:
     needs: export-notarized-app
     if: ${{ github.event.inputs.create-dmg == true || inputs.create-dmg == true }}
 
-    runs-on: macos-14
+    runs-on: macos-15
 
     env:
       app-version: ${{ needs.export-notarized-app.outputs.app-version }}

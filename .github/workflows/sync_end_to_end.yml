@@ -34,12 +34,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runner: [macos-13-xlarge, macos-14-xlarge]
+        runner: [macos-13-xlarge, macos-14-xlarge, macos-15-xlarge]
         include:
           - xcode-version: "15.2"
             runner: macos-13-xlarge
           - xcode-version: "15.4"
             runner: macos-14-xlarge
+          - xcode-version: "16.0"
+            runner: macos-15-xlarge
 
     timeout-minutes: 60
 
@@ -99,6 +101,16 @@ jobs:
       id: sync-recovery-code
       with:
         debug: true
+
+    # This first bit is a hack to stop the app building package dependencies that isn't needed by the test runner
+    # Otherwise xcodebuild will attempt building BSK and linking GRDB framework that is incompatible with Xcode 15
+    - name: Build test runner
+      run: |
+        rm -rf LocalPackages
+        rm -rf DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+        git apply dependencies.patch
+        # sed -i '' '/\/\* Begin XCSwiftPackageProductDependency section \*\//,/\/\* End XCSwiftPackageProductDependency section \*\//d' DuckDuckGo.xcodeproj/project.pbxproj
+        # sed -i '' '/\/\* Begin XCRemoteSwiftPackageReference section \*\//,/\/\* End XCRemoteSwiftPackageReference section \*\//d' DuckDuckGo.xcodeproj/project.pbxproj
 
     - name: Build Sync e2e tests
       run: |
