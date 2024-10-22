@@ -27225,9 +27225,6 @@
         }
       }
     },
-    "Import complete!" : {
-      "comment" : "message about Passwords and or bookmarks Data Import completion"
-    },
     "Import Passwords" : {
       "comment" : "Title of dialog with instruction for the user to import passwords from another browser",
       "localizations" : {
@@ -27818,10 +27815,58 @@
       "comment" : "Import Browser Data dialog title",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Super, halten wir es unkompliziert!"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Great, let’s keep this simple!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Estupendo, hagámoslo de manera sencilla!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Super, restons simples !"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ottimo, semplifichiamo le cose!"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geweldig, laten we dit eenvoudig houden!"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Świetnie, to proste!"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ótimo, vamos manter isto simples!"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отлично! Зачем усложнять?"
           }
         }
       }
@@ -28072,8 +28117,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Importieren aus"
+            "state" : "translated",
+            "value" : "Woher möchtest du importieren?"
           }
         },
         "en" : {
@@ -28084,44 +28129,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Importar desde"
+            "state" : "translated",
+            "value" : "¿De dónde quieres importar?"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Importer depuis"
+            "state" : "translated",
+            "value" : "D'où voulez-vous importer ?"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Importa da"
+            "state" : "translated",
+            "value" : "Da dove vuoi importare?"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Importeren vanuit"
+            "state" : "translated",
+            "value" : "Vanwaar wil je importeren?"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Importuj z"
+            "state" : "translated",
+            "value" : "Skąd chcesz importować?"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Importar de"
+            "state" : "translated",
+            "value" : "De onde queres importar?"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Импорт из"
+            "state" : "translated",
+            "value" : "Откуда импортировать данные?"
           }
         }
       }
@@ -28130,10 +28175,58 @@
       "comment" : "message about Passwords and or bookmarks Data Import completion",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import abgeschlossen!"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Import complete!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Importación completada!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importation terminée !"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importazione completata!"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importeren voltooid!"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import zakończony!"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importação concluída!"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Импортирование завершено."
           }
         }
       }
@@ -61859,7 +61952,57 @@
       }
     },
     "What do you want to import?" : {
-      "comment" : "Data Import section title for checkboxes of data type to import: Passwords or Bookmarks."
+      "comment" : "Data Import section title for checkboxes of data type to import: Passwords or Bookmarks.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Was möchtest du importieren?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Qué quieres importar?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Que voulez-vous importer ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cosa vuoi importare?"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wat wil je importeren?"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Co chcesz importować?"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O que queres importar?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Что будем импортировать?"
+          }
+        }
+      }
     },
     "whats.new.menu.item" : {
       "comment" : "Title of the dialog menu item that opens the 'What's New' page",
