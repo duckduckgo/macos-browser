@@ -278,6 +278,9 @@ final class HomePageViewController: NSViewController {
     private func showSettingsOnboardingIfNeeded() {
         if !settingsVisibilityModel.didShowSettingsOnboarding {
             DispatchQueue.main.async {
+                guard let superview = self.view.superview else {
+                    return
+                }
                 let bounds = self.view.bounds
                 let settingsButtonWidth = Application.appDelegate.homePageSettingsModel.settingsButtonWidth
 
@@ -286,6 +289,18 @@ final class HomePageViewController: NSViewController {
                     y: bounds.maxY - HomePage.Views.RootView.customizeButtonPadding - HomePage.Views.RootView.SettingsButtonView.height,
                     width: settingsButtonWidth,
                     height: HomePage.Views.RootView.SettingsButtonView.height)
+
+                // Create a helper view as anchor for the popover and align it with the 'Customize' button.
+                // This is to ensure that popover updates its position correctly as the window is resized.
+                let popoverAnchorView = NSView(frame: rect)
+                superview.addSubview(popoverAnchorView, positioned: .below, relativeTo: self.view)
+                popoverAnchorView.translatesAutoresizingMaskIntoConstraints = false
+                NSLayoutConstraint.activate([
+                    popoverAnchorView.widthAnchor.constraint(equalToConstant: settingsButtonWidth),
+                    popoverAnchorView.heightAnchor.constraint(equalToConstant: HomePage.Views.RootView.SettingsButtonView.height),
+                    popoverAnchorView.trailingAnchor.constraint(equalTo: superview.trailingAnchor, constant: -HomePage.Views.RootView.customizeButtonPadding),
+                    popoverAnchorView.bottomAnchor.constraint(equalTo: superview.bottomAnchor, constant: -HomePage.Views.RootView.customizeButtonPadding)
+                ])
 
                 let viewController = PopoverMessageViewController(
                     title: UserText.homePageSettingsOnboardingTitle,
@@ -298,7 +313,7 @@ final class HomePageViewController: NSViewController {
                         self?.settingsVisibilityModel.isSettingsVisible = true
                     }
                 )
-                viewController.show(onParent: self, rect: rect, of: self.view, preferredEdge: .minY)
+                viewController.show(onParent: self, relativeTo: popoverAnchorView, preferredEdge: .maxY)
                 self.settingsVisibilityModel.didShowSettingsOnboarding = true
 
                 // Hide the popover as soon as settings is shown ('Customize' button is clicked).
@@ -307,6 +322,7 @@ final class HomePageViewController: NSViewController {
                     .prefix(1)
                     .sink { [weak viewController] _ in
                         viewController?.dismiss()
+                        popoverAnchorView.removeFromSuperview()
                     }
                     .store(in: &self.cancellables)
             }

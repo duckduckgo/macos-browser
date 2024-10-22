@@ -81,6 +81,8 @@ final class PopoverMessageViewController: NSHostingController<PopoverMessageView
     func show(onParent parent: NSViewController, rect: NSRect, of view: NSView, preferredEdge: NSRectEdge = .maxY) {
         // Set the content size to match the SwiftUI view's intrinsic size
         self.preferredContentSize = self.view.fittingSize
+        // For shorter strings, the positioning can be off unless the width is set a second time
+        self.preferredContentSize.width = self.view.fittingSize.width
 
         parent.present(self,
                        asPopoverRelativeTo: rect,
