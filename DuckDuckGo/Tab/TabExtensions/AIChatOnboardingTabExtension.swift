@@ -40,7 +40,9 @@ final class AIChatOnboardingTabExtension {
     }
 
     private func validateAIChatCookie(webView: WKWebView) {
-        guard webView.url == remoteSettings.aiChatURL else {
+        guard let url = webView.url,
+              url.isDuckDuckGo,
+              isQueryItemEqualToDuckDuckGoAIChat(url: url) else {
             return
         }
 
@@ -53,6 +55,17 @@ final class AIChatOnboardingTabExtension {
             }
         }
     }
+}
+
+private func isQueryItemEqualToDuckDuckGoAIChat(url: URL) -> Bool {
+    let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+    if let queryItems = components?.queryItems {
+        if let queryValue = queryItems.first(where: { $0.name == "q" })?.value {
+            return queryValue == "DuckDuckGo+AI+Chat"
+        }
+    }
+
+    return false
 }
 
 extension AIChatOnboardingTabExtension: NavigationResponder {
