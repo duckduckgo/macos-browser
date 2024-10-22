@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="cvc-K3-VCn">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="23094" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="cvc-K3-VCn">
     <dependencies>
-        <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23094"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="System colors introduced in macOS 10.14" minToolsVersion="10.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -109,13 +108,13 @@
                                                         </userDefinedRuntimeAttributes>
                                                     </customView>
                                                     <scrollView borderType="none" horizontalLineScroll="28" horizontalPageScroll="10" verticalLineScroll="28" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cx3-LG-ZUH">
-                                                        <rect key="frame" x="4" y="0.0" width="608" height="87"/>
+                                                        <rect key="frame" x="4" y="0.0" width="608" height="61"/>
                                                         <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="pb8-sX-fSc">
-                                                            <rect key="frame" x="0.0" y="0.0" width="608" height="87"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="608" height="61"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="28" viewBased="YES" id="4Z2-d8-NA2">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="608" height="74"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="608" height="102"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <color key="backgroundColor" name="ClearColor"/>
                                                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
@@ -141,23 +140,23 @@
                                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                                     <subviews>
                                                                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="vli-IP-Nr8">
-                                                                                            <rect key="frame" x="13" y="32" width="16" height="16"/>
+                                                                                            <rect key="frame" x="6" y="32" width="16" height="16"/>
                                                                                             <constraints>
                                                                                                 <constraint firstAttribute="width" constant="16" id="Q25-Gx-Xzg"/>
                                                                                                 <constraint firstAttribute="height" constant="16" id="go3-c4-c3W"/>
                                                                                             </constraints>
                                                                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="zsh-dc-Umh"/>
                                                                                         </imageView>
-                                                                                        <textField horizontalHuggingPriority="252" verticalHuggingPriority="750" horizontalCompressionResistancePriority="252" translatesAutoresizingMaskIntoConstraints="NO" id="bOr-Go-gyW">
-                                                                                            <rect key="frame" x="34" y="33" width="119" height="16"/>
+                                                                                        <textField focusRingType="none" horizontalHuggingPriority="252" verticalHuggingPriority="750" horizontalCompressionResistancePriority="252" translatesAutoresizingMaskIntoConstraints="NO" id="bOr-Go-gyW">
+                                                                                            <rect key="frame" x="27" y="33" width="119" height="16"/>
                                                                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Search Suggestion" id="7bg-HA-vCm">
                                                                                                 <font key="font" usesAppearanceFont="YES"/>
                                                                                                 <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                                             </textFieldCell>
                                                                                         </textField>
-                                                                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="252" translatesAutoresizingMaskIntoConstraints="NO" id="efo-Vy-aEh">
-                                                                                            <rect key="frame" x="149" y="33" width="429" height="15"/>
+                                                                                        <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="252" translatesAutoresizingMaskIntoConstraints="NO" id="efo-Vy-aEh">
+                                                                                            <rect key="frame" x="142" y="33" width="436" height="15"/>
                                                                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title=" – Search with DuckDuckGo" id="UZv-CE-fbV">
                                                                                                 <font key="font" metaFont="cellTitle"/>
                                                                                                 <color key="textColor" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
@@ -173,7 +172,7 @@
                                                                                         <constraint firstItem="efo-Vy-aEh" firstAttribute="firstBaseline" secondItem="bOr-Go-gyW" secondAttribute="firstBaseline" id="lQr-ay-EDp"/>
                                                                                         <constraint firstItem="bOr-Go-gyW" firstAttribute="centerY" secondItem="kX2-C1-38Y" secondAttribute="centerY" constant="-1" id="oAf-1Z-91H"/>
                                                                                         <constraint firstItem="efo-Vy-aEh" firstAttribute="width" secondItem="bOr-Go-gyW" secondAttribute="width" multiplier="0.55" priority="250" id="xOl-gW-elN"/>
-                                                                                        <constraint firstItem="vli-IP-Nr8" firstAttribute="leading" secondItem="kX2-C1-38Y" secondAttribute="leading" constant="13" id="zgq-le-RHJ"/>
+                                                                                        <constraint firstItem="vli-IP-Nr8" firstAttribute="leading" secondItem="kX2-C1-38Y" secondAttribute="leading" constant="6" id="zgq-le-RHJ"/>
                                                                                     </constraints>
                                                                                     <connections>
                                                                                         <outlet property="iconImageView" destination="vli-IP-Nr8" id="5lX-7Q-4Cw"/>
@@ -225,7 +224,7 @@
                                                 </userDefinedRuntimeAttributes>
                                             </customView>
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="ATb-xt-XAg" userLabel="Separator" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                <rect key="frame" x="1" y="100" width="614" height="1"/>
+                                                <rect key="frame" x="1" y="74" width="614" height="1"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="1" id="G3c-nz-oCJ"/>
                                                 </constraints>
