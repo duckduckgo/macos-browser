@@ -26,7 +26,6 @@ protocol AIChatMenuVisibilityConfigurable {
     var isFeatureEnabledForApplicationMenuShortcut: Bool { get }
     var isFeatureEnabledForToolbarShortcut: Bool { get }
 
-    var shortcutURL: URL { get }
     var valuesChangedPublisher: PassthroughSubject<Void, Never> { get }
 
     var shouldDisplayToolbarOnboardingPopover: PassthroughSubject<Void, Never> { get }
@@ -62,10 +61,6 @@ final class AIChatMenuConfiguration: AIChatMenuVisibilityConfigurable {
 
     var shouldDisplayApplicationMenuShortcut: Bool {
         return isFeatureEnabledForApplicationMenuShortcut && storage.showShortcutInApplicationMenu
-    }
-
-    var shortcutURL: URL {
-        remoteSettings.aiChatURL
     }
 
     func markToolbarOnboardingPopoverAsShown() {
