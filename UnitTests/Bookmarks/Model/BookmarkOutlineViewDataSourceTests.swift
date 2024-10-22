@@ -262,8 +262,8 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
     // MARK: - Private
 
     @MainActor
-    private func createTreeController(with bookmarks: [BaseBookmarkEntity]) -> BookmarkTreeController {
-        let bookmarkStoreMock = BookmarkStoreMock(bookmarks: bookmarks)
+    private func createTreeController(with bookmarks: [BaseBookmarkEntity], testId: String = #function) -> BookmarkTreeController {
+        let bookmarkStoreMock = BookmarkStoreMock(id: testId, bookmarks: bookmarks)
         let faviconManagerMock = FaviconManagerMock()
         let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
         bookmarkManager.loadBookmarks()

@@ -20,23 +20,22 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
-    private var bookmarkManager: LocalBookmarkManager!
-    private var bookmarkStoreMock: BookmarkStoreMock!
-
-    @MainActor
-    override func setUpWithError() throws {
-        try super.setUpWithError()
-        bookmarkStoreMock = BookmarkStoreMock(bookmarks: [BookmarkFolder.mock])
-        bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
+    private lazy var bookmarkStoreMock: BookmarkStoreMock! = BookmarkStoreMock(id: self.name, bookmarks: [BookmarkFolder.mock])
+    private lazy var bookmarkManager: LocalBookmarkManager! = {
+        let bookmarkManager = MainActor.assumeIsolated {
+            LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
+        }
         bookmarkManager.loadBookmarks()
-    }
+        return bookmarkManager
+    }()
 
-    override func tearDownWithError() throws {
+    override func tearDown() {
         bookmarkStoreMock = nil
         bookmarkManager = nil
-        try super.tearDownWithError()
     }
-
+    deinit {
+        print("a")
+    }
     // MARK: - Copy
 
     @MainActor

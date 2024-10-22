@@ -55,21 +55,27 @@ final class LocalBookmarkStore: BookmarkStore {
 
     // Directly used in tests
     init(
+        id: String = #function,
         contextProvider: @escaping () -> NSManagedObjectContext,
         appearancePreferences: AppearancePreferences = .shared,
         preFormFactorSpecificFavoritesOrder: [String]? = nil
     ) {
         self.contextProvider = contextProvider
         self.preFormFactorSpecificFavoritesOrder = preFormFactorSpecificFavoritesOrder
-
+        #if DEBUG
+        self.id = id
+        #endif
         favoritesDisplayMode = appearancePreferences.favoritesDisplayMode
         migrateToFormFactorSpecificFavoritesFolders()
         removeInvalidBookmarkEntities()
         cacheReadOnlyTopLevelBookmarksFolders()
     }
 
+#if DEBUG
+    let id: String
+#endif
+
     enum BookmarkStoreError: Error {
-        case storeDeallocated
         case noObjectId
         case badObjectId
         case asyncFetchFailed
@@ -312,9 +318,7 @@ final class LocalBookmarkStore: BookmarkStore {
     }
 
     func save(entitiesAtIndices: [BookmarkEntityAtIndex], completion: @escaping (Error?) -> Void) {
-        applyChangesAndSave(changes: { [weak self] context in
-            guard let self else { throw BookmarkStoreError.storeDeallocated }
-
+        applyChangesAndSave(changes: { [self] context in
             let (entitiesByUUID, objectsToInsertIntoParent) = try restoreBookmarksInParentEntity(entitiesAtIndices, in: context)
 
             for (parentEntity, (managedObjects, insertionIndices)) in objectsToInsertIntoParent {
@@ -322,8 +326,8 @@ final class LocalBookmarkStore: BookmarkStore {
             }
 
             try restoreFavorites(entitiesAtIndices, entitiesByUUID: entitiesByUUID, in: context)
-        }, onError: { [weak self] error in
-            self?.commonOnSaveErrorHandler(error)
+        }, onError: { [self] error in
+            self.commonOnSaveErrorHandler(error)
             DispatchQueue.main.async { completion(error) }
         }, onDidSave: {
             DispatchQueue.main.async { completion(nil) }
@@ -353,15 +357,15 @@ final class LocalBookmarkStore: BookmarkStore {
             let fetchRequest = BaseBookmarkEntity.entities(with: identifiers)
             let fetchResults = (try? context.fetch(fetchRequest)) ?? []
 
-            if fetchResults.count != identifiers.count {
-                assertionFailure("\(#file): Fetched bookmark entities didn't match the number of provided UUIDs")
-            }
+            #if DEBUG
+            assert(fetchResults.count == (identifiers).count, "\(self.id): Fetched bookmark entities: \(fetchResults) didn't match the number of provided UUIDs: \(identifiers)")
+            #endif
 
             for object in fetchResults {
                 object.markPendingDeletion()
             }
-        }, onError: { [weak self] error in
-            self?.commonOnSaveErrorHandler(error)
+        }, onError: { [self] error in
+            self.commonOnSaveErrorHandler(error)
             DispatchQueue.main.async { completion(error) }
         }, onDidSave: {
             DispatchQueue.main.async { completion(nil) }
@@ -417,10 +421,7 @@ final class LocalBookmarkStore: BookmarkStore {
 
     func update(folder: BookmarkFolder) {
         do {
-            _ = try applyChangesAndSave(changes: { [weak self] context in
-                guard let self = self else {
-                    throw BookmarkStoreError.storeDeallocated
-                }
+            _ = try applyChangesAndSave(changes: { [self] context in
                 try update(folder: folder, in: context)
             })
         } catch {
@@ -431,10 +432,7 @@ final class LocalBookmarkStore: BookmarkStore {
 
     func update(folder: BookmarkFolder, andMoveToParent parent: ParentFolderType) {
         do {
-            _ = try applyChangesAndSave(changes: { [weak self] context in
-                guard let self = self else {
-                    throw BookmarkStoreError.storeDeallocated
-                }
+            _ = try applyChangesAndSave(changes: { [self] context in
                 let folderEntity = try update(folder: folder, in: context)
                 try move(entities: [folderEntity], toIndex: nil, withinParentFolderType: parent, in: context)
             })
@@ -446,11 +444,7 @@ final class LocalBookmarkStore: BookmarkStore {
 
     func add(objectsWithUUIDs uuids: [String], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void) {
 
-        applyChangesAndSave(changes: { [weak self] context in
-            guard let self = self else {
-                throw BookmarkStoreError.storeDeallocated
-            }
-
+        applyChangesAndSave(changes: { [self] context in
             let bookmarksFetchRequest = BaseBookmarkEntity.entities(with: uuids)
             bookmarksFetchRequest.returnsObjectsAsFaults = false
             let bookmarksResults = try? context.fetch(bookmarksFetchRequest)
@@ -476,8 +470,8 @@ final class LocalBookmarkStore: BookmarkStore {
                     bookmarkManagedObject.parent = root
                 }
             }
-        }, onError: { [weak self] error in
-            self?.commonOnSaveErrorHandler(error)
+        }, onError: { [self] error in
+            self.commonOnSaveErrorHandler(error)
             DispatchQueue.main.async { completion(error) }
         }, onDidSave: {
             DispatchQueue.main.async { completion(nil) }
@@ -503,8 +497,8 @@ final class LocalBookmarkStore: BookmarkStore {
                     managedObject.update(with: entity, favoritesFoldersToAddFavorite: favoritesFolders, favoritesDisplayMode: favoritesDisplayMode)
                 }
             }
-        }, onError: { [weak self] error in
-            self?.commonOnSaveErrorHandler(error)
+        }, onError: { [self] error in
+            self.commonOnSaveErrorHandler(error)
             DispatchQueue.main.async { completion(error) }
         }, onDidSave: {
             DispatchQueue.main.async { completion(nil) }
@@ -523,12 +517,7 @@ final class LocalBookmarkStore: BookmarkStore {
         var canMoveObject = true
 
         let context = makeContext()
-        context.performAndWait { [weak self] in
-            guard self != nil else {
-                assertionFailure("Couldn't get strong self")
-                return
-            }
-
+        context.performAndWait {
             let folderToMoveFetchRequest = BaseBookmarkEntity.singleEntity(with: uuid)
             let folderToMoveFetchRequestResults = try? context.fetch(folderToMoveFetchRequest)
 
@@ -564,11 +553,7 @@ final class LocalBookmarkStore: BookmarkStore {
 
     func move(objectUUIDs: [String], toIndex index: Int?, withinParentFolder type: ParentFolderType, completion: @escaping (Error?) -> Void) {
 
-        applyChangesAndSave(changes: { [weak self] context in
-            guard let self = self else {
-                throw BookmarkStoreError.storeDeallocated
-            }
-
+        applyChangesAndSave(changes: { [self] context in
             // Guarantee that bookmarks are fetched in the same order as the UUIDs. In the future, this should fetch all objects at once with a
             // batch fetch request and have them sorted in the correct order.
             let bookmarkManagedObjects: [BookmarkEntity] = objectUUIDs.compactMap { uuid in
@@ -578,8 +563,8 @@ final class LocalBookmarkStore: BookmarkStore {
 
             try move(entities: bookmarkManagedObjects, toIndex: index, withinParentFolderType: type, in: context)
 
-        }, onError: { [weak self] error in
-            self?.commonOnSaveErrorHandler(error)
+        }, onError: { [self] error in
+            self.commonOnSaveErrorHandler(error)
             DispatchQueue.main.async { completion(error) }
         }, onDidSave: {
             DispatchQueue.main.async { completion(nil) }
@@ -682,8 +667,8 @@ final class LocalBookmarkStore: BookmarkStore {
                     bookmarkManagedObject.addToFavorites(folders: favoritesFolders)
                 }
             }
-        }, onError: { [weak self] error in
-            self?.commonOnSaveErrorHandler(error)
+        }, onError: { [self] error in
+            self.commonOnSaveErrorHandler(error)
             DispatchQueue.main.async { completion(error) }
         }, onDidSave: {
             DispatchQueue.main.async { completion(nil) }
@@ -869,8 +854,8 @@ final class LocalBookmarkStore: BookmarkStore {
             if deletedEntityCount > 0 {
                 PixelKit.fire(DebugEvent(GeneralPixel.removedInvalidBookmarkManagedObjects))
             }
-        } onError: { [weak self] error in
-            self?.commonOnSaveErrorHandler(error)
+        } onError: { [self] error in
+            self.commonOnSaveErrorHandler(error)
 
             Logger.bookmarks.error("Failed to remove invalid bookmark entities")
         } onDidSave: {}
@@ -1140,7 +1125,6 @@ extension LocalBookmarkStore.BookmarkStoreError: CustomNSError {
 
     var errorCode: Int {
         switch self {
-        case .storeDeallocated: return 1
         case .noObjectId: return 2
         case .badObjectId: return 3
         case .asyncFetchFailed: return 4

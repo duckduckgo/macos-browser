@@ -20,24 +20,20 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
-    private var bookmarkManager: LocalBookmarkManager!
-    private var bookmarkStoreMock: BookmarkStoreMock!
-    private var foldersStoreMock: BookmarkFolderStoreMock!
-
-    @MainActor
-    override func setUpWithError() throws {
-        try super.setUpWithError()
-        bookmarkStoreMock = BookmarkStoreMock(bookmarks: [BookmarkFolder.mock])
-        bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
+    private lazy var bookmarkStoreMock: BookmarkStoreMock! = BookmarkStoreMock(id: self.name, bookmarks: [BookmarkFolder.mock])
+    private lazy var bookmarkManager: LocalBookmarkManager! = {
+        let bookmarkManager = MainActor.assumeIsolated {
+            LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
+        }
         bookmarkManager.loadBookmarks()
-        foldersStoreMock = .init()
-    }
+        return bookmarkManager
+    }()
+    private lazy var foldersStoreMock: BookmarkFolderStoreMock! = BookmarkFolderStoreMock()
 
-    override func tearDownWithError() throws {
+    override func tearDown() {
         bookmarkStoreMock = nil
         bookmarkManager = nil
         foldersStoreMock = nil
-        try super.tearDownWithError()
     }
 
     // MARK: - Copy
