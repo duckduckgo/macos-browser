@@ -195,11 +195,15 @@ public final class TunnelControllerViewModel: ObservableObject {
         }
 
         refreshTimeLapsed()
-        let call = refreshTimeLapsed
 
-        let newTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+        let newTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+
+            guard let self else {
+                return
+            }
+
             Task { @MainActor in
-                call()
+                self.refreshTimeLapsed()
             }
         }
 
