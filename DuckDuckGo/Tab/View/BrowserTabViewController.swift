@@ -387,13 +387,6 @@ final class BrowserTabViewController: NSViewController {
 
     private func addWebViewToViewHierarchy(_ webView: WebView, tab: Tab) {
         let container = WebViewContainerView(tab: tab, webView: webView, frame: view.bounds)
-        webView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            webView.topAnchor.constraint(equalTo: container.topAnchor),
-            webView.bottomAnchor.constraint(equalTo: container.bottomAnchor),
-            webView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
-            webView.trailingAnchor.constraint(equalTo: container.trailingAnchor)
-            ])
         self.webViewContainer = container
         containerStackView.orientation = .vertical
         containerStackView.alignment = .leading
