@@ -1328,9 +1328,12 @@ extension Tab {
 
 extension Tab: OnboardingNavigationDelegate {
     func searchFor(_ query: String) {
-        guard let url = URL.makeSearchUrl(from: query) else { return }
-        let request = URLRequest(url: url)
-        self.webView.load(request)
+        if let url = URL(string: query), url.isDuckDuckGoSearch {
+            navigateTo(url: url)
+        } else {
+            guard let url = URL.makeSearchUrl(from: query) else { return }
+            navigateTo(url: url)
+        }
     }
 
     func navigateTo(url: URL) {
