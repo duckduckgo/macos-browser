@@ -24,7 +24,7 @@ import Foundation
 final class BookmarkStoreMock: BookmarkStore {
 
     private let store: LocalBookmarkStore?
-// 1
+// 2
     init(id: String = #function, contextProvider: (() -> NSManagedObjectContext)? = nil, loadAllCalled: Bool = false, bookmarks: [BaseBookmarkEntity]? = nil, loadError: Error? = nil, removeError: Error? = nil, updateBookmarkCalled: Bool = false, updateFolderCalled: Bool = false, addChildCalled: Bool = false, updateObjectsCalled: Bool = false, importBookmarksCalled: Bool = false, canMoveObjectWithUUIDCalled: Bool = false, moveObjectUUIDCalled: Bool = false, updateFavoriteIndexCalled: Bool = false) {
         self.loadAllCalled = loadAllCalled
         self.bookmarks = bookmarks
