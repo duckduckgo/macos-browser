@@ -686,7 +686,7 @@ private extension BookmarksAndFavoritesTests {
 
     /// Make sure that appearance tab has been used to set "show favorites" to true
     func toggleBookmarksBarShowFavoritesOn() {
-        app.typeKey(",", modifierFlags: [.command]) // Open settings
+        addressBarTextField.typeURL(URL(string: "duck://settings")!)
 
         XCTAssertTrue(
             settingsAppearanceButton.waitForExistence(timeout: UITests.Timeouts.elementExistence),
