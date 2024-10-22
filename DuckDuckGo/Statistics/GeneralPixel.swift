@@ -36,6 +36,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case dailyOsVersionCounter
 
     case dataImportFailed(source: DataImport.Source, sourceVersion: String?, error: any DataImportError)
+    case dataImportSucceeded(action: DataImportAction, source: DataImport.Source, sourceVersion: String?)
 
     case formAutofilled(kind: FormAutofillKind)
     case autofillItemSaved(kind: FormAutofillKind)
@@ -446,6 +447,9 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_favicon-import-failed_\(source)"
         case .dataImportFailed(source: let source, sourceVersion: _, error: let error):
             return "m_mac_data-import-failed_\(error.action)_\(source)"
+
+        case .dataImportSucceeded(action: let action, source: let source, sourceVersion: _):
+            return "m_mac_data-import-succeeded_\(action)_\(source)"
 
         case .formAutofilled(kind: let kind):
             return "m_mac_autofill_\(kind)"
@@ -1070,6 +1074,14 @@ enum GeneralPixel: PixelKitEventV2 {
 
         case .dataImportFailed(source: _, sourceVersion: let version, error: let error):
             var params = error.pixelParameters
+
+            if let version {
+                params[PixelKit.Parameters.sourceBrowserVersion] = version
+            }
+            return params
+
+        case .dataImportSucceeded(action: _, source: _, sourceVersion: let version):
+            var params = [String: String]()
 
             if let version {
                 params[PixelKit.Parameters.sourceBrowserVersion] = version
