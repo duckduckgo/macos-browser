@@ -63,8 +63,8 @@ final class PasswordManagementViewController: NSViewController {
     @IBOutlet var emptyState: NSView!
     @IBOutlet var emptyStateImageView: NSImageView!
     @IBOutlet var emptyStateTitle: NSTextField!
-    @IBOutlet var emptyStateMessage: NSTextView!
     @IBOutlet var emptyStateMessageHeight: NSLayoutConstraint!
+    @IBOutlet var emptyStateMessageContainer: NSView!
     @IBOutlet var emptyStateButton: NSButton!
     @IBOutlet weak var exportLoginItem: NSMenuItem!
     @IBOutlet var lockScreen: NSView!
@@ -173,9 +173,7 @@ final class PasswordManagementViewController: NSViewController {
 
         emptyStateTitle.attributedStringValue = NSAttributedString.make(emptyStateTitle.stringValue, lineHeight: 1.14, kern: -0.23)
 
-        emptyStateMessage.isSelectable = true
-        emptyStateMessage.delegate = self
-        setUpEmptyStateMessageAttributedText()
+        setUpEmptyStateMessageView()
 
         addVaultItemButton.toolTip = UserText.addItemTooltip
         moreButton.toolTip = UserText.moreOptionsTooltip
@@ -201,47 +199,20 @@ final class PasswordManagementViewController: NSViewController {
             .store(in: &cancellables)
     }
 
-    private func setUpEmptyStateMessageAttributedText() {
+    private func setUpEmptyStateMessageView() {
         guard let listModel else { return }
-        emptyStateMessage.delegate = self
 
-        let linkAttributes: [NSAttributedString.Key: Any] = [
-            .foregroundColor: NSColor.linkBlue,
-            .cursor: NSCursor.pointingHand
-        ]
+        let message = " \(listModel.emptyStateMessageDescription) [\(listModel.emptyStateMessageLinkText)](\(listModel.emptyStateMessageLinkURL))"
 
-        emptyStateMessage.linkTextAttributes = linkAttributes
-
-        let attachment = NSTextAttachment()
-        attachment.image = NSImage(resource: .lockSolid16).tinted(with: NSColor.blackWhite80)
-        attachment.bounds = CGRect(x: 0, y: -1, width: 12, height: 12)
-        let attributedTextImage = NSMutableAttributedString(attachment: attachment)
-
-        let string = NSMutableAttributedString(attributedString: attributedTextImage)
-
-        let messageString = NSMutableAttributedString(string: " " + listModel.emptyStateMessageDescription + " ")
-        string.append(messageString)
-
-        let linkString = NSMutableAttributedString(string: listModel.emptyStateMessageLinkText, attributes: [
-            .link: listModel.emptyStateMessageLinkURL
-        ])
-        string.append(linkString)
-
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.alignment = .center
-        string.addAttributes([
-            .cursor: NSCursor.arrow,
-            .paragraphStyle: paragraphStyle,
-            .font: NSFont.systemFont(ofSize: 13, weight: .regular),
-            .foregroundColor: NSColor.blackWhite80
-        ], range: NSRange(location: 0, length: string.length))
-
-        let maxSize = NSSize(width: 280, height: 20000)
-        let bounds = string.boundingRect(with: maxSize, options: .usesLineFragmentOrigin)
-
-        emptyStateMessageHeight.constant = bounds.height
-
-        emptyStateMessage.textStorage?.setAttributedString(string)
+        let hostingView = NSHostingView(rootView: PasswordManagementEmptyStateMessage(
+            message: message,
+            image: .lockSolid16
+        ))
+        hostingView.frame = emptyStateMessageContainer.bounds
+        hostingView.autoresizingMask = [.height, .width]
+        hostingView.translatesAutoresizingMaskIntoConstraints = true
+        emptyStateMessageContainer.addSubview(hostingView)
+        emptyStateMessageHeight.constant = listModel.emptyStateMessageViewHeight
     }
 
     private func setupStrings() {
@@ -252,7 +223,7 @@ final class PasswordManagementViewController: NSViewController {
         unlockYourAutofillLabel.title = UserText.passwordManagerUnlockAutofill
         autofillTitleLabel.stringValue = UserText.passwordManagementTitle
         emptyStateTitle.stringValue = UserText.pmEmptyStateDefaultTitle
-        setUpEmptyStateMessageAttributedText()
+        setUpEmptyStateMessageView()
         emptyStateButton.title = UserText.pmEmptyStateDefaultButtonTitle
     }
 
@@ -1079,10 +1050,10 @@ final class PasswordManagementViewController: NSViewController {
         emptyStateImageView.image = image
         emptyStateTitle.attributedStringValue = NSAttributedString.make(title, lineHeight: 1.14, kern: -0.23)
         if !hideMessage {
-            setUpEmptyStateMessageAttributedText()
+            setUpEmptyStateMessageView()
         }
-        emptyStateMessage.isHidden = hideMessage
         emptyStateButton.isHidden = hideButton
+        emptyStateMessageContainer.isHidden = hideMessage
     }
 
     private func requestSync() {
@@ -1157,5 +1128,19 @@ extension PasswordManagementViewController: NSMenuItemValidation {
         guard let vault = try? AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared) else { return false }
         let accounts = (try? vault.accounts()) ?? []
         return !accounts.isEmpty
+    }
+}
+
+struct PasswordManagementEmptyStateMessage: View {
+    let message: String
+    let image: ImageResource
+
+    var body: some View {
+        (
+            Text(Image(image)).baselineOffset(-1.0)
+            +
+            Text(.init(message))
+        )
+        .multilineTextAlignment(.center)
     }
 }
