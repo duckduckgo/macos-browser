@@ -30600,7 +30600,7 @@
     },
     "letsmove.alert.message" : {
       "comment" : "Message of the alert shown if the app is launched not from the /Applications folder – suggesting to move it there",
-      "extractionState" : "stale",
+      "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -30660,7 +30660,7 @@
     },
     "letsmove.alert.title" : {
       "comment" : "Title of the alert shown if the app is launched not from the /Applications folder – suggesting to move it there",
-      "extractionState" : "stale",
+      "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -30720,7 +30720,7 @@
     },
     "letsmove.could.not.move" : {
       "comment" : "Error message when moving the app to the /Applications folder failed",
-      "extractionState" : "stale",
+      "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -30780,7 +30780,7 @@
     },
     "letsmove.dont.move.button" : {
       "comment" : "Do Not Move to the /Applications folder button title",
-      "extractionState" : "stale",
+      "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -30840,7 +30840,7 @@
     },
     "letsmove.move.button" : {
       "comment" : "Move the /Applications folder button title",
-      "extractionState" : "stale",
+      "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {

@@ -181,11 +181,15 @@ public final class TunnelControllerViewModel: ObservableObject {
         }
 
         refreshTimeLapsed()
-        let call = refreshTimeLapsed
 
-        let newTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+        let newTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+
+            guard let self else {
+                return
+            }
+
             Task { @MainActor in
-                call()
+                self.refreshTimeLapsed()
             }
         }
 
@@ -503,10 +507,6 @@ public final class TunnelControllerViewModel: ObservableObject {
         }
 
         Task { @MainActor in
-            if #available(macOS 14.0, *) {
-                await VPNGeoswitchingTip.vpnConnectedEvent.donate()
-            }
-
             await tunnelController.start()
             refreshInternalIsRunning()
         }
@@ -541,7 +541,7 @@ public final class TunnelControllerViewModel: ObservableObject {
 
     func handleTunnelControllerShown() async {
         if #available(macOS 14.0, *) {
-            await VPNDomainExclusionsTip.viewOpenedWhehVPNAlreadyConnectedEvent.donate()
+            await VPNDomainExclusionsTip.viewOpenedWhenVPNAlreadyConnectedEvent.donate()
         }
     }
 }

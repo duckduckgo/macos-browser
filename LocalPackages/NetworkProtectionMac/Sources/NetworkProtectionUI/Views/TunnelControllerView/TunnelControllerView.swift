@@ -22,6 +22,7 @@ import Combine
 import NetworkProtection
 import Lottie
 import TipKit
+import TipKitUtils
 
 public struct TunnelControllerView: View {
 
@@ -40,6 +41,9 @@ public struct TunnelControllerView: View {
     public init(model: TunnelControllerViewModel) {
         self.model = model
     }
+
+    @EnvironmentObject
+    private var tipsModel: VPNTipsModel
 
     // MARK: - View Contents
 
@@ -60,9 +64,17 @@ public struct TunnelControllerView: View {
                 .padding(.top, 5)
 
             if #available(macOS 15.0, *) {
-                VPNDomainExclusionsTipView()
-                    .padding(.horizontal, 9)
-                    .padding(.vertical, 6)
+                //VPNDomainExclusionsTipView()
+                //.padding(.horizontal, 9)
+                //.padding(.vertical, 6)
+
+                if tipsModel.featureFlag {//,
+                   //let tip = tipsModel.currentTip as? VPNDomainExclusionsTip {
+
+                    TipView(VPNDomainExclusionsTip())
+                        .padding(.horizontal, 9)
+                        .padding(.vertical, 6)
+                }
             }
 
             Divider()
@@ -187,7 +199,7 @@ public struct TunnelControllerView: View {
             }
 
             if #available(macOS 15.0, *) {
-                VPNGeoswitchingTipView()
+                TipView(VPNGeoswitchingTip())
                     .padding(.horizontal, 9)
                     .padding(.vertical, 6)
             }

@@ -33,7 +33,7 @@ struct VPNGeoswitchingTipView: View {
     @ViewBuilder
     public var body: some View {
         if tipsModel.featureFlag,
-           let tip = tipsModel.tips.currentTip as? VPNGeoswitchingTip {
+           let tip = tipsModel.currentTip as? VPNGeoswitchingTip {
 
             TipView(tip)
         }

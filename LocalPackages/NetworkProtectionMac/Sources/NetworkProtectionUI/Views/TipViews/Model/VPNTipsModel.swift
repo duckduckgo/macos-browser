@@ -20,14 +20,16 @@ import AppKit
 import Combine
 import Common
 import NetworkProtection
+import os.log
 import TipKit
 import TipKitUtils
 
+@MainActor
 public final class VPNTipsModel: ObservableObject {
 
     @Published
     private(set) var activeSiteInfo: ActiveSiteInfo? {
-        didSet {
+        willSet {
             guard #available(macOS 14.0, *) else {
                 return
             }
@@ -38,13 +40,20 @@ public final class VPNTipsModel: ObservableObject {
 
     @Published
     private(set) var connectionStatus: ConnectionStatus {
-        didSet {
+        willSet {
             guard #available(macOS 14.0, *) else {
                 return
             }
 
-            switch connectionStatus {
+            switch newValue {
             case .connected:
+                if case connectionStatus = .connecting {
+                    Task {
+                        print("🧉💎 Geoswitching tip donated")
+                        await VPNGeoswitchingTip.vpnConnectedEvent.donate()
+                    }
+                }
+
                 VPNAutoconnectTip.vpnEnabled = true
                 VPNDomainExclusionsTip.vpnEnabled = true
             default:
@@ -56,44 +65,58 @@ public final class VPNTipsModel: ObservableObject {
 
     @Published
     private(set) var featureFlag: Bool
-    let tips: TipGrouping
+
+    @Published
+    private var tips: TipGrouping
 
     private let vpnSettings: VPNSettings
+    private let logger: Logger
     private var cancellables = Set<AnyCancellable>()
 
-    static func makeTips(forMenuApp isMenuApp: Bool) -> TipGrouping {
+    static func makeTips(forMenuApp isMenuApp: Bool, logger: Logger) -> TipGrouping {
+
+        logger.debug("🧉🤌 makeTips")
+
+        guard #available(macOS 14.0, *) else {
+            return EmptyTipGroup()
+        }
+
+        let domainExclusionsTip = VPNDomainExclusionsTip()
+        let geoswitchingTip = VPNGeoswitchingTip()
+
+        Task {
+            for await statusUpdate in geoswitchingTip.statusUpdates {
+                logger.debug("🧉 VPNGeoswitchingTip status updated: \(String(describing: statusUpdate), privacy: .public)")
+                logger.debug("🪙 VPNGeoswitchingTip summary:\nL shouldDisplay: \(String(describing: geoswitchingTip.shouldDisplay), privacy: .public)")
+            }
+        }
+
+        Task {
+            for await statusUpdate in domainExclusionsTip.statusUpdates {
+                logger.debug("🧉 VPNDomainExclusionsTip status updated: \(String(describing: statusUpdate), privacy: .public)")
+                logger.debug("🪙 VPNDomainExclusionsTip summary:\nL shouldDisplay: \(String(describing: domainExclusionsTip.shouldDisplay), privacy: .public)\nL hasActiveSite: \(String(describing: VPNDomainExclusionsTip.hasActiveSite), privacy: .public)\nL vpnEnabled: \(String(describing: VPNDomainExclusionsTip.vpnEnabled), privacy: .public)")
+            }
+        }
+
         // This is temporarily disabled until Xcode 16 is available.
         // Ref: https://app.asana.com/0/414235014887631/1208528787265444/f
         //
         // if #available(macOS 15.0, *) {
-        //     if isMenuApp {
-        //         return TipGroup(.ordered) {
-        //             VPNGeoswitchingTip()
-        //             VPNAutoconnectTip()
-        //         }
-        //     } else {
-        //         return TipGroup(.ordered) {
-        //             VPNGeoswitchingTip()
-        //             VPNDomainExclusionsTip()
-        //             VPNAutoconnectTip()
-        //         }
+        //     return TipGroup(.ordered) {
+        //         tips
         //     }
-        // }
-        if #available(macOS 14, *) {
-            if isMenuApp {
-                return LegacyTipGroup(.ordered) {
-                    VPNGeoswitchingTip()
-                    VPNAutoconnectTip()
-                }
-            } else {
-                return LegacyTipGroup(.ordered) {
-                    VPNGeoswitchingTip()
-                    VPNDomainExclusionsTip()
-                    VPNAutoconnectTip()
-                }
+        // } else { ... what's below
+        if isMenuApp {
+            return LegacyTipGroup(.ordered) {
+                VPNGeoswitchingTip()
+                VPNAutoconnectTip()
             }
         } else {
-            return EmptyTipGroup()
+            return LegacyTipGroup(.ordered) {
+                VPNGeoswitchingTip()
+                VPNDomainExclusionsTip()
+                VPNAutoconnectTip()
+            }
         }
     }
 
@@ -101,12 +124,15 @@ public final class VPNTipsModel: ObservableObject {
                 statusObserver: ConnectionStatusObserver,
                 activeSitePublisher: CurrentValuePublisher<ActiveSiteInfo?, Never>,
                 forMenuApp isMenuApp: Bool,
-                vpnSettings: VPNSettings) {
+                vpnSettings: VPNSettings,
+                logger: Logger) {
 
+        print("🧉🟢 New model instance")
         self.activeSiteInfo = activeSitePublisher.value
         self.connectionStatus = statusObserver.recentValue
         self.featureFlag = featureFlagPublisher.value
-        self.tips = Self.makeTips(forMenuApp: isMenuApp)
+        self.logger = logger
+        self.tips = Self.makeTips(forMenuApp: isMenuApp, logger: logger)
         self.vpnSettings = vpnSettings
 
         if #available(macOS 14.0, *) {
@@ -151,5 +177,10 @@ public final class VPNTipsModel: ObservableObject {
         if action.id == VPNAutoconnectTip.ActionIdentifiers.enable.rawValue {
             vpnSettings.connectOnLogin = true
         }
+    }
+
+    @available(macOS 14.0, *)
+    var currentTip: (any Tip)? {
+        tips.currentTip
     }
 }
