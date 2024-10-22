@@ -973,11 +973,13 @@ final class NavigationBarViewController: NSViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self]  in
                 guard let self = self else { return }
-                self.automaticallyShowAIChatOnboardingPopover()
+                self.automaticallyShowAIChatOnboardingPopoverIfPossible()
         }.store(in: &cancellables)
     }
 
-    private func automaticallyShowAIChatOnboardingPopover() {
+    private func automaticallyShowAIChatOnboardingPopoverIfPossible() {
+        guard WindowControllersManager.shared.lastKeyMainWindowController?.window === aiChatButton.window else { return }
+
         popovers.showAIChatOnboardingPopover(from: aiChatButton,
                                              withDelegate: self)
         aiChatMenuConfig.markToolbarOnboardingPopoverAsShown()
@@ -985,7 +987,6 @@ final class NavigationBarViewController: NSViewController {
 
     @IBAction func aiChatButtonAction(_ sender: NSButton) {
         AIChatTabOpener.openAIChatTab()
-        popovers.showAIChatOnboardingPopover(from: aiChatButton, withDelegate: self)
     }
 
     private func updateAIChatButton() {
@@ -1206,6 +1207,7 @@ extension NavigationBarViewController: NSPopoverDelegate {
             updatePasswordManagementButton()
         } else if let popover = popovers.aiChatOnboardingPopover, notification.object as AnyObject? === popover {
             popovers.aiChatOnboardingPopoverClosed()
+            updateAIChatButton()
         }
     }
 
