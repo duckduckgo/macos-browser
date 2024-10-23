@@ -23,21 +23,21 @@ import Subscription
 
 enum SubscriptionCookieManagerPixel: PixelKitEventV2 {
 
-    case errorHandlingAccountDidSignInTokenIsMissing
-    case errorHandlingAccountDidSignOutCookieIsMissing
-    case subscriptionCookieRefreshedWithUpdate
-    case subscriptionCookieRefreshedWithDelete
+    case missingTokenOnSignIn
+    case missingCookieOnSignOut
+    case cookieRefreshedWithUpdate
+    case cookieRefreshedWithDelete
     case failedToSetSubscriptionCookie
 
     var name: String {
         switch self {
-        case .errorHandlingAccountDidSignInTokenIsMissing:
+        case .missingTokenOnSignIn:
             return "m_mac_privacy-pro_subscription-cookie-missing_token_on_sign_in"
-        case .errorHandlingAccountDidSignOutCookieIsMissing:
+        case .missingCookieOnSignOut:
             return "m_mac_privacy-pro_subscription-cookie-missing_cookie_on_sign_out"
-        case .subscriptionCookieRefreshedWithUpdate:
+        case .cookieRefreshedWithUpdate:
             return "m_mac_privacy-pro_subscription-cookie-refreshed_with_update"
-        case .subscriptionCookieRefreshedWithDelete:
+        case .cookieRefreshedWithDelete:
             return "m_mac_privacy-pro_subscription-cookie-refreshed_with_delete"
         case .failedToSetSubscriptionCookie:
             return "m_mac_privacy-pro_subscription-cookie-failed_to_set_subscription_cookie"
@@ -59,14 +59,14 @@ public final class SubscriptionCookieManageEventPixelMapping: EventMapping<Subsc
         super.init { event, _, _, _ in
             let pixel: SubscriptionCookieManagerPixel = {
                 switch event {
-                case .errorHandlingAccountDidSignInTokenIsMissing: 
-                    return .errorHandlingAccountDidSignInTokenIsMissing
+                case .errorHandlingAccountDidSignInTokenIsMissing:
+                    return .missingTokenOnSignIn
                 case .errorHandlingAccountDidSignOutCookieIsMissing:
-                    return .errorHandlingAccountDidSignOutCookieIsMissing
+                    return .missingCookieOnSignOut
                 case .subscriptionCookieRefreshedWithUpdate:
-                    return .subscriptionCookieRefreshedWithUpdate
+                    return .cookieRefreshedWithUpdate
                 case .subscriptionCookieRefreshedWithDelete:
-                    return .subscriptionCookieRefreshedWithDelete
+                    return .cookieRefreshedWithDelete
                 case .failedToSetSubscriptionCookie:
                     return .failedToSetSubscriptionCookie
                 }
