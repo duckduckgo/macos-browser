@@ -127,12 +127,16 @@ final class HomePageViewController: NSViewController {
         super.viewDidAppear()
         refreshModels()
         addressBarModel.addressBarTextField?.makeMeFirstResponder()
+
+        showSettingsOnboardingIfNeeded()
     }
 
     override func viewWillDisappear() {
         super.viewWillDisappear()
 
         historyCancellable = nil
+
+        presentedViewControllers?.forEach { $0.dismiss() }
     }
 
     func refreshModelsOnAppBecomingActive() {
@@ -269,6 +273,61 @@ final class HomePageViewController: NSViewController {
     private func showEditController(for bookmark: Bookmark) {
         BookmarksDialogViewFactory.makeEditBookmarkView(bookmark: bookmark)
             .show(in: view.window)
+    }
+
+    private func showSettingsOnboardingIfNeeded() {
+        if !settingsVisibilityModel.didShowSettingsOnboarding {
+            // async dispatch in order to get the final value for self.view.bounds
+            DispatchQueue.main.async {
+                guard let superview = self.view.superview else {
+                    return
+                }
+                let bounds = self.view.bounds
+                let settingsButtonWidth = Application.appDelegate.homePageSettingsModel.settingsButtonWidth
+
+                let rect = NSRect(
+                    x: bounds.maxX - HomePage.Views.RootView.customizeButtonPadding - settingsButtonWidth,
+                    y: bounds.maxY - HomePage.Views.RootView.customizeButtonPadding - HomePage.Views.RootView.SettingsButtonView.height,
+                    width: settingsButtonWidth,
+                    height: HomePage.Views.RootView.SettingsButtonView.height)
+
+                // Create a helper view as anchor for the popover and align it with the 'Customize' button.
+                // This is to ensure that popover updates its position correctly as the window is resized.
+                let popoverAnchorView = NSView(frame: rect)
+                superview.addSubview(popoverAnchorView, positioned: .below, relativeTo: self.view)
+                popoverAnchorView.translatesAutoresizingMaskIntoConstraints = false
+                NSLayoutConstraint.activate([
+                    popoverAnchorView.widthAnchor.constraint(equalToConstant: settingsButtonWidth),
+                    popoverAnchorView.heightAnchor.constraint(equalToConstant: HomePage.Views.RootView.SettingsButtonView.height),
+                    popoverAnchorView.trailingAnchor.constraint(equalTo: superview.trailingAnchor, constant: -HomePage.Views.RootView.customizeButtonPadding),
+                    popoverAnchorView.bottomAnchor.constraint(equalTo: superview.bottomAnchor, constant: -HomePage.Views.RootView.customizeButtonPadding)
+                ])
+
+                let viewController = PopoverMessageViewController(
+                    title: UserText.homePageSettingsOnboardingTitle,
+                    message: UserText.homePageSettingsOnboardingMessage,
+                    image: .settingsOnboardingPopover,
+                    shouldShowCloseButton: true,
+                    presentMultiline: true,
+                    autoDismissDuration: nil,
+                    onClick: { [weak self] in
+                        self?.settingsVisibilityModel.isSettingsVisible = true
+                    }
+                )
+                viewController.show(onParent: self, relativeTo: popoverAnchorView, preferredEdge: .maxY)
+                self.settingsVisibilityModel.didShowSettingsOnboarding = true
+
+                // Hide the popover as soon as settings is shown ('Customize' button is clicked).
+                self.settingsVisibilityModel.$isSettingsVisible
+                    .filter { $0 }
+                    .prefix(1)
+                    .sink { [weak viewController] _ in
+                        viewController?.dismiss()
+                        popoverAnchorView.removeFromSuperview()
+                    }
+                    .store(in: &self.cancellables)
+            }
+        }
     }
 
     private var burningDataCancellable: AnyCancellable?
