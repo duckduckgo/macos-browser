@@ -322,6 +322,7 @@ final class LocalBookmarkStore: BookmarkStore {
             }
 
             try restoreFavorites(entitiesAtIndices, entitiesByUUID: entitiesByUUID, in: context)
+            try insertNewFavorites(entitiesAtIndices, entitiesByUUID: entitiesByUUID, in: context)
         }, onError: { [weak self] error in
             self?.commonOnSaveErrorHandler(error)
             DispatchQueue.main.async { completion(error) }
@@ -1003,6 +1004,26 @@ final class LocalBookmarkStore: BookmarkStore {
         }
     }
 
+    private func insertNewFavorites(_ entitiesAtIndices: [BookmarkEntityAtIndex],
+                                    entitiesByUUID: [String: BookmarkEntity],
+                                    in context: NSManagedObjectContext) throws {
+        let displayedFavoritesFolder = try fetchDisplayedFavoritesFolder(in: context)
+        let favoritesFoldersWithoutDisplayed = fetchOtherFavoritesFolders(in: context)
+
+        try entitiesAtIndices.forEach { (entity, _, indexInFavoritesArray) in
+            if let bookmark = entity as? Bookmark,
+               bookmark.isFavorite,
+               indexInFavoritesArray == nil {
+                try addEntityToFavorites(
+                    entity,
+                    at: nil,
+                    entitiesByUUID: entitiesByUUID,
+                    displayedFavoritesFolder: displayedFavoritesFolder,
+                    otherFavoritesFolders: favoritesFoldersWithoutDisplayed)
+            }
+        }
+    }
+
     private func fetchDisplayedFavoritesFolder(in context: NSManagedObjectContext) throws -> BookmarkEntity {
         let displayedFavoritesFolderUUID = favoritesDisplayMode.displayedFolder.rawValue
         guard let displayedFavoritesFolder = BookmarkUtils.fetchFavoritesFolder(withUUID: displayedFavoritesFolderUUID, in: context) else {
@@ -1034,7 +1055,7 @@ final class LocalBookmarkStore: BookmarkStore {
     }
 
     private func addEntityToFavorites(_ entity: BaseBookmarkEntity,
-                                      at index: Int,
+                                      at index: Int?,
                                       entitiesByUUID: [String: BookmarkEntity],
                                       displayedFavoritesFolder: BookmarkEntity,
                                       otherFavoritesFolders: [BookmarkEntity]) throws {
