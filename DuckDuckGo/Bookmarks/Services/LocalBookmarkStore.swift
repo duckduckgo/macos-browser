@@ -993,8 +993,6 @@ final class LocalBookmarkStore: BookmarkStore {
                                in: context)
     }
 
-    
-
     /// Restores favorite bookmark entities to their correct positions within the favorites list.
     ///
     /// - Parameters:
