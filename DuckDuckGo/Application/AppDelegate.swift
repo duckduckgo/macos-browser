@@ -96,6 +96,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     public let subscriptionManager: SubscriptionManager
     public let subscriptionUIHandler: SubscriptionUIHandling
+    public let subscriptionCookieManager: SubscriptionCookieManaging
 
     public let vpnSettings = VPNSettings(defaults: .netP)
 
@@ -264,6 +265,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         subscriptionManager = DefaultSubscriptionManager()
         subscriptionUIHandler = SubscriptionUIHandler(windowControllersManagerProvider: {
             return WindowControllersManager.shared
+        })
+
+        subscriptionCookieManager = SubscriptionCookieManager(subscriptionManager: subscriptionManager, currentCookieStore: {
+            WKWebsiteDataStore.default().httpCookieStore
         })
 
         // Update VPN environment and match the Subscription environment
@@ -445,6 +450,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         Task { @MainActor in
             await vpnRedditSessionWorkaround.installRedditSessionWorkaround()
+        }
+
+        Task { @MainActor in
+            await subscriptionCookieManager.refreshSubscriptionCookie()
         }
     }
 
