@@ -18019,7 +18019,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Möchtest du wirklich beenden?\n\nDuckDuckGo lädt derzeit „%@“%@ herunter. Wenn du jetzt aufhörst, wird DuckDuckGo den Download %@ nicht beenden."
+            "value" : "Möchtest du wirklich aufhören?\n\nDuckDuckGo lädt derzeit „%1$@“%2$@ herunter. Wenn du jetzt aufhörst, wird DuckDuckGo den Download %3$@ nicht beenden."
           }
         },
         "en" : {
@@ -18031,43 +18031,43 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¿Seguro que quieres salir?\n\nDuckDuckGo está descargando \"%@\"%@. Si sales ahora, DuckDuckGo no terminará de descargar %@."
+            "value" : "¿Seguro que quieres salir?\n\nDuckDuckGo se está descargando actualmente \"%1$@\"%2$@. Si sales ahora, DuckDuckGo no terminará de descargar %3$@."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Voulez-vous vraiment abandonner ?\n\nDuckDuckGo télécharge actuellement “%@”%@. Si vous abandonnez maintenant, DuckDuckGo ne terminera pas le téléchargement de %@."
+            "value" : "Voulez-vous vraiment abandonner ?DuckDuckGo télécharge actuellement « %1$@”%2$@ ». Si vous abandonnez maintenant, DuckDuckGo ne terminera pas le téléchargement de %3$@."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vuoi davvero uscire?\n\nDuckDuckGo sta attualmente scaricando “%@”%@. Se esci ora, DuckDuckGo non completerà il download di %@."
+            "value" : "Uscire?DuckDuckGo sta scaricando \"%1$@\"%2$@. Se esci ora, DuckDuckGo non completerà il download di %3$@."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Weet je zeker dat je wilt stoppen?\n\nDuckDuckGo downloadt op dit moment \"%@\"%@. Als je nu stopt, wordt het downloaden van %@ niet voltooid."
+            "value" : "Weet je zeker dat je wilt afsluiten?\n\nDuckDuckGo downloadt momenteel '%1$@'%2$@. Als je nu stopt, wordt %3$@ niet helemaal gedownload."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Czy na pewno chcesz zrezygnować?\n\nDuckDuckGo aktualnie pobiera „%@”%@. Jeśli teraz wyjdziesz, DuckDuckGo nie dokończy pobierania %@."
+            "value" : "Are you sure you want to quit?\n\nDuckDuckGo is currently downloading “%1$@”%2$@. If you quit now, DuckDuckGo won‘t finish downloading %3$@."
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tens a certeza de que pretendes sair?\n\nO DuckDuckGo está a transferir “%@”%@. Se saíres agora, o DuckDuckGo não vai transferir %@ até ao fim."
+            "value" : "Tens a certeza de que pretendes sair?\n\nO DuckDuckGo está a transferir \"%1$@”%2$@. Se saíres agora, o DuckDuckGo não vai transferir %3$@ até ao fim."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Действительно закрыть приложение?\n\nDuckDuckGo сейчас загружает «%@»%@. Если закрыть приложение, DuckDuckGo не загрузит %@."
+            "value" : "Are you sure you want to quit?\n\nDuckDuckGo is currently downloading “%1$@”%2$@. If you quit now, DuckDuckGo won‘t finish downloading %3$@."
           }
         }
       }
@@ -23007,7 +23007,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bist du sicher, dass du das Fire Window schließen willst?\n\nDuckDuckGo lädt gerade „%@“%@ herunter. Wenn du das Fire Window schließt, löscht DuckDuckGo %@."
+            "value" : "Möchtest du das Fire Window wirklich schließen?\n\nDuckDuckGo lädt derzeit „%1$@“%2$@ herunter. Wenn du das Fire Window schließt, löscht DuckDuckGo %3$@."
           }
         },
         "en" : {
@@ -23019,43 +23019,43 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¿Seguro que quieres cerrar la Fire Window?\n\nDuckDuckGo está descargando \"%@\"%@. Si cierras la Fire Window, DuckDuckGo eliminará %@."
+            "value" : "¿Seguro que quieres cerrar la Fire Window?\n\nDuckDuckGo se está descargando actualmente \"%1$@\"%2$@. Si cierras la Fire Window, DuckDuckGo eliminará %3$@."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Voulez-vous vraiment fermer la Fire Window ?\n\nDuckDuckGo télécharge actuellement “%@”%@. Si vous fermez la Fire Window, DuckDuckGo supprimera %@."
+            "value" : "Voulez-vous vraiment fermer la Fire Window ?\n\nDuckDuckGo télécharge actuellement « %1$@”%2$@ ». Si vous fermez la Fire Window, DuckDuckGo supprimera %3$@."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vuoi davvero chiudere la Fire Window?\n\nDuckDuckGo sta attualmente scaricando “%@”%@. Se la chiudi, DuckDuckGo eliminerà %@."
+            "value" : "Chiudere la Fire Window?\n\nDuckDuckGo sta scaricando \"%1$@\"%2$@. Se la chiudi, DuckDuckGo eliminerà %3$@."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Weet je zeker dat je het Fire Window wilt sluiten?\n\nDuckDuckGo downloadt op dit moment \"%@\"%@. Als je het Fire Window sluit, wordt %@ verwijderd."
+            "value" : "Weet je zeker dat je het Fire Window wilt sluiten?\n\nDuckDuckGo downloadt momenteel '%1$@'%2$@. Als je het Fire Window sluit, wordt %3$@ verwijderd."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Czy na pewno chcesz zamknąć okno Fire Window?\n\nDuckDuckGo aktualnie pobiera „%@”%@. Jeśli zamkniesz okno Fire Window, DuckDuckGo usunie %@."
+            "value" : "Are you sure you want to close the Fire Window?\n\nDuckDuckGo is currently downloading “%1$@”%2$@. If you close the Fire Window, DuckDuckGo will delete %3$@."
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tens a certeza de que pretendes fechar a Fire Window?\n\nO DuckDuckGo está a transferir “%@”%@. Se fechares a Fire Window, o DuckDuckGo vai eliminar %@."
+            "value" : "Tens a certeza de que pretendes fechar a Fire Window?\n\nO DuckDuckGo está a transferir \"%1$@”%2$@. Se fechares a Fire Window, o DuckDuckGo vai eliminar %3$@."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Действительно закрыть окно Fire Window?\n\nDuckDuckGo сейчас загружает «%@»%@. В случае закрытия DuckDuckGo удалит %@."
+            "value" : "Are you sure you want to close the Fire Window?\n\nDuckDuckGo is currently downloading “%1$@”%2$@. If you close the Fire Window, DuckDuckGo will delete %3$@."
           }
         }
       }
@@ -32458,7 +32458,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Закрыть DuckDuckGo"
+            "value" : "Завершить DuckDuckGo"
           }
         }
       }
