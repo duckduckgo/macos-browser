@@ -980,11 +980,18 @@ final class NavigationBarViewController: NSViewController {
     private func automaticallyShowAIChatOnboardingPopoverIfPossible() {
         guard WindowControllersManager.shared.lastKeyMainWindowController?.window === aiChatButton.window else { return }
 
-        popovers.showAIChatOnboardingPopover(from: aiChatButton, withDelegate: self)
+        showAIChatOnboardingConfirmationPopover()
 
-        // popovers.showAIChatOnboardingConfirmationPopover(from: aiChatButton, withDelegate: self)
+        //popovers.showAIChatOnboardingPopover(from: aiChatButton, withDelegate: self)
+        //aiChatMenuConfig.markToolbarOnboardingPopoverAsShown()
+    }
 
-        aiChatMenuConfig.markToolbarOnboardingPopoverAsShown()
+    private func showAIChatOnboardingConfirmationPopover() {
+        DispatchQueue.main.async {
+            let viewController = PopoverMessageViewController(message: "AI Chat Shortcut Added!",
+                                                              image: .successCheckmark)
+            viewController.show(onParent: self, relativeTo: self.aiChatButton)
+        }
     }
 
     @IBAction func aiChatButtonAction(_ sender: NSButton) {
@@ -1210,8 +1217,6 @@ extension NavigationBarViewController: NSPopoverDelegate {
         } else if let popover = popovers.aiChatOnboardingPopover, notification.object as AnyObject? === popover {
             popovers.aiChatOnboardingPopoverClosed()
             updateAIChatButton()
-        } else if let popover = popovers.aiChatOnboardingConfirmationPopover, notification.object as AnyObject? === popover {
-            popovers.aiChatOnboardingConfirmationPopoverClosed()
         }
     }
 

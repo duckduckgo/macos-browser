@@ -59,7 +59,6 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
     private(set) var autofillPopoverPresenter: AutofillPopoverPresenter
     private(set) var downloadsPopover: DownloadsPopover?
     private(set) var aiChatOnboardingPopover: AIChatOnboardingPopover?
-    private(set) var aiChatOnboardingConfirmationPopover: AIChatOnboardingConfirmationPopover?
 
     private var privacyDashboardPopover: PrivacyDashboardPopover?
     private var privacyInfoCancellable: AnyCancellable?
@@ -230,10 +229,6 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
             aiChatOnboardingPopover?.close()
         }
 
-        if aiChatOnboardingConfirmationPopover?.isShown ?? false {
-            aiChatOnboardingConfirmationPopover?.close()
-        }
-
         return true
     }
 
@@ -243,15 +238,6 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
 
         popover.delegate = delegate
         aiChatOnboardingPopover = popover
-        show(popover, positionedBelow: button)
-    }
-
-    func showAIChatOnboardingConfirmationPopover(from button: MouseOverButton, withDelegate delegate: NSPopoverDelegate) {
-        guard closeTransientPopovers() else { return }
-        let popover = aiChatOnboardingConfirmationPopover ?? AIChatOnboardingConfirmationPopover()
-
-        popover.delegate = delegate
-        aiChatOnboardingConfirmationPopover = popover
         show(popover, positionedBelow: button)
     }
 
@@ -407,10 +393,6 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
 
     func aiChatOnboardingPopoverClosed() {
         aiChatOnboardingPopover = nil
-    }
-
-    func aiChatOnboardingConfirmationPopoverClosed() {
-        aiChatOnboardingConfirmationPopover = nil
     }
 
     func saveIdentityPopoverClosed() {
