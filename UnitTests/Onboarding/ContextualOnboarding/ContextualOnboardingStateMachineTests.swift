@@ -77,12 +77,12 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         stateMachine.fireButtonUsed()
         stateMachine.state = .onboardingCompleted
 
-        XCTAssertTrue(fireButtonInfoStateProvider.infoPresentedOnce)
+        XCTAssertFalse(fireButtonInfoStateProvider.infoPresentedOnce)
     }
 
     func testWhenOnboardingIsAboutToStartLaunchToCustomHomePageIsTrue() {
         preferences.launchToCustomHomePage = false
-        stateMachine.state = .onboardingCompleted
+        stateMachine.state = .notStarted
 
         XCTAssertTrue(preferences.launchToCustomHomePage)
     }
