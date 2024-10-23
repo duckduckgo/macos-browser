@@ -1058,7 +1058,6 @@ final class LocalBookmarkStore: BookmarkStore {
     }
 
     private func parent(for entity: BaseBookmarkEntity, in context: NSManagedObjectContext) throws -> BookmarkEntity {
-        let parentEntity: BookmarkEntity
         if let parentId = entity.parentFolderUUID, parentId != PseudoFolder.bookmarks.id, parentId != "bookmarks_root",
            let parentFetchRequestResult = try? context.fetch(BaseBookmarkEntity.singleEntity(with: parentId)).first {
             return parentFetchRequestResult
