@@ -969,6 +969,7 @@ protocol NewWindowPolicyDecisionMaker {
     private func setupWebView(shouldLoadInBackground: Bool) {
         webView.navigationDelegate = navigationDelegate
         webView.uiDelegate = self
+        webView.inspectorDelegate = self
         webView.contextMenuDelegate = self.contextMenuManager
         webView.allowsBackForwardNavigationGestures = true
         webView.allowsMagnification = true
@@ -1334,9 +1335,15 @@ extension Tab {
 
 extension Tab: OnboardingNavigationDelegate {
     func searchFor(_ query: String) {
-        guard let url = URL.makeSearchUrl(from: query) else { return }
-        let request = URLRequest(url: url)
-        self.webView.load(request)
+        // We check if the provided string is already a search query.
+        // During onboarding, there's a specific case where we want to search for images,
+        // and this allows us to handle that scenario.
+        if let url = URL(string: query), url.isDuckDuckGoSearch {
+            navigateTo(url: url)
+        } else {
+            guard let url = URL.makeSearchUrl(from: query) else { return }
+            navigateTo(url: url)
+        }
     }
 
     func navigateTo(url: URL) {

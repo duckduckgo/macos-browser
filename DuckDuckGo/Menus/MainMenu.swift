@@ -85,6 +85,8 @@ final class MainMenu: NSMenu {
     var aiChatMenu = NSMenuItem(title: UserText.newAIChatMenuItem, action: #selector(AppDelegate.newAIChat), keyEquivalent: [.option, .command, "n"])
     let toggleNetworkProtectionShortcutMenuItem = NSMenuItem(title: UserText.showNetworkProtectionShortcut, action: #selector(MainViewController.toggleNetworkProtectionShortcut), keyEquivalent: "N")
 
+    let toggleAIChatShortcutMenuItem = NSMenuItem(title: UserText.showAIChatShortcut, action: #selector(MainViewController.toggleAIChatShortcut), keyEquivalent: "L")
+
     // MARK: Window
     let windowsMenu = NSMenu(title: UserText.mainMenuWindow)
 
@@ -275,6 +277,10 @@ final class MainMenu: NSMenu {
             toggleDownloadsShortcutMenuItem
 
             toggleNetworkProtectionShortcutMenuItem
+
+            if aiChatMenuConfig.shouldDisplayToolbarShortcut {
+                toggleAIChatShortcutMenuItem
+            }
 
             NSMenuItem.separator()
 
