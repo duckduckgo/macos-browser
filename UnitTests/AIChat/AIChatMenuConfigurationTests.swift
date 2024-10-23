@@ -23,11 +23,14 @@ import Combine
 class AIChatMenuConfigurationTests: XCTestCase {
     var configuration: AIChatMenuConfiguration!
     var mockStorage: MockAIChatPreferencesStorage!
+    var remoteSettings: MockRemoteAISettings!
 
     override func setUp() {
         super.setUp()
         mockStorage = MockAIChatPreferencesStorage()
-        configuration = AIChatMenuConfiguration(storage: mockStorage)
+        remoteSettings = MockRemoteAISettings()
+        configuration = AIChatMenuConfiguration(storage: mockStorage, remoteSettings: remoteSettings)
+
     }
 
     override func tearDown() {
@@ -51,7 +54,6 @@ class AIChatMenuConfigurationTests: XCTestCase {
     }
 
     func testToolbarValuesChangedPublisher() {
-        // Given
         let expectation = self.expectation(description: "Values changed publisher should emit a value.")
         var receivedValue: Void?
 
@@ -86,12 +88,43 @@ class AIChatMenuConfigurationTests: XCTestCase {
         }
         cancellable.cancel()
     }
+
+    func testShouldNotDisplayToolbarShortcutWhenDisabled() {
+        mockStorage.shouldDisplayToolbarShortcut = false
+        let result = configuration.shouldDisplayToolbarShortcut
+
+        XCTAssertFalse(result, "Toolbar shortcut should not be displayed when disabled.")
+    }
+
+    func testMarkToolbarOnboardingPopoverAsShown() {
+        mockStorage.didDisplayAIChatToolbarOnboarding = false
+
+        configuration.markToolbarOnboardingPopoverAsShown()
+
+        XCTAssertTrue(mockStorage.didDisplayAIChatToolbarOnboarding, "Toolbar onboarding popover should be marked as shown.")
+    }
+
+    func testReset() {
+        mockStorage.showShortcutInApplicationMenu = true
+        mockStorage.shouldDisplayToolbarShortcut = true
+        mockStorage.didDisplayAIChatToolbarOnboarding = true
+
+        mockStorage.reset()
+
+        XCTAssertFalse(mockStorage.showShortcutInApplicationMenu, "Application menu shortcut should be reset to false.")
+        XCTAssertFalse(mockStorage.shouldDisplayToolbarShortcut, "Toolbar shortcut should be reset to false.")
+        XCTAssertFalse(mockStorage.didDisplayAIChatToolbarOnboarding, "Toolbar onboarding popover should be reset to false.")
+    }
 }
 
 class MockAIChatPreferencesStorage: AIChatPreferencesStorage {
     var didDisplayAIChatToolbarOnboarding: Bool = false
 
-    func reset() { }
+    func reset() {
+        showShortcutInApplicationMenu = false
+        shouldDisplayToolbarShortcut = false
+        didDisplayAIChatToolbarOnboarding = false
+    }
 
     var showShortcutInApplicationMenu: Bool = false {
         didSet {
@@ -125,4 +158,33 @@ class MockAIChatPreferencesStorage: AIChatPreferencesStorage {
     }
 
     func markToolbarOnboardingPopoverAsShown() { }
+}
+
+struct MockRemoteAISettings: AIChatRemoteSettingsProvider {
+    var onboardingCookieName: String
+    var onboardingCookieDomain: String
+    var aiChatURLIdentifiableQuery: String
+    var aiChatURLIdentifiableQueryValue: String
+    var aiChatURL: URL
+    var isAIChatEnabled: Bool
+    var isToolbarShortcutEnabled: Bool
+    var isApplicationMenuShortcutEnabled: Bool
+
+    init(onboardingCookieName: String = "defaultCookie",
+         onboardingCookieDomain: String = "defaultdomain.com",
+         aiChatURLIdentifiableQuery: String = "defaultQuery",
+         aiChatURLIdentifiableQueryValue: String = "defaultValue",
+         aiChatURL: URL = URL(string: "https://duck.com/chat")!,
+         isAIChatEnabled: Bool = true,
+         isToolbarShortcutEnabled: Bool = true,
+         isApplicationMenuShortcutEnabled: Bool = true) {
+        self.onboardingCookieName = onboardingCookieName
+        self.onboardingCookieDomain = onboardingCookieDomain
+        self.aiChatURLIdentifiableQuery = aiChatURLIdentifiableQuery
+        self.aiChatURLIdentifiableQueryValue = aiChatURLIdentifiableQueryValue
+        self.aiChatURL = aiChatURL
+        self.isAIChatEnabled = isAIChatEnabled
+        self.isToolbarShortcutEnabled = isToolbarShortcutEnabled
+        self.isApplicationMenuShortcutEnabled = isApplicationMenuShortcutEnabled
+    }
 }

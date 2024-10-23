@@ -25,11 +25,11 @@ final class AIChatOnboardingTabExtension {
     private weak var webView: WKWebView?
     private var cancellables = Set<AnyCancellable>()
     private let notificationCenter: NotificationCenter
-    private let remoteSettings: AIChatRemoteSettings
+    private let remoteSettings: AIChatRemoteSettingsProvider
 
     init(webViewPublisher: some Publisher<WKWebView, Never>,
          notificationCenter: NotificationCenter = .default,
-         remoteSettings: AIChatRemoteSettings = AIChatRemoteSettings()) {
+         remoteSettings: AIChatRemoteSettingsProvider = AIChatRemoteSettings()) {
 
         self.notificationCenter = notificationCenter
         self.remoteSettings = remoteSettings
@@ -89,7 +89,7 @@ extension TabExtensions {
 }
 
 private extension HTTPCookie {
-    func isAIChatCookie(settings: AIChatRemoteSettings) -> Bool {
+    func isAIChatCookie(settings: AIChatRemoteSettingsProvider) -> Bool {
         name == settings.onboardingCookieName && domain == settings.onboardingCookieDomain
     }
 }

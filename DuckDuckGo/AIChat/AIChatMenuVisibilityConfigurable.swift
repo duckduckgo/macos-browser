@@ -42,7 +42,7 @@ final class AIChatMenuConfiguration: AIChatMenuVisibilityConfigurable {
     private var cancellables = Set<AnyCancellable>()
     private var storage: AIChatPreferencesStorage
     private let notificationCenter: NotificationCenter
-    private let remoteSettings: AIChatRemoteSettings
+    private let remoteSettings: AIChatRemoteSettingsProvider
 
     var valuesChangedPublisher = PassthroughSubject<Void, Never>()
     var shouldDisplayToolbarOnboardingPopover = PassthroughSubject<Void, Never>()
@@ -69,7 +69,7 @@ final class AIChatMenuConfiguration: AIChatMenuVisibilityConfigurable {
 
     init(storage: AIChatPreferencesStorage = DefaultAIChatPreferencesStorage(),
          notificationCenter: NotificationCenter = .default,
-         remoteSettings: AIChatRemoteSettings = AIChatRemoteSettings()) {
+         remoteSettings: AIChatRemoteSettingsProvider = AIChatRemoteSettings()) {
         self.storage = storage
         self.notificationCenter = notificationCenter
         self.remoteSettings = remoteSettings

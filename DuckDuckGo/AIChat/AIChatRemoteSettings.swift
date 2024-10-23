@@ -18,9 +18,20 @@
 
 import BrowserServicesKit
 
+protocol AIChatRemoteSettingsProvider {
+    var onboardingCookieName: String { get }
+    var onboardingCookieDomain: String { get }
+    var aiChatURLIdentifiableQuery: String { get }
+    var aiChatURLIdentifiableQueryValue: String { get }
+    var aiChatURL: URL { get }
+    var isAIChatEnabled: Bool { get }
+    var isToolbarShortcutEnabled: Bool { get }
+    var isApplicationMenuShortcutEnabled: Bool { get }
+}
+
 /// This struct serves as a wrapper for PrivacyConfigurationManaging, enabling the retrieval of data relevant to AIChat.
 /// It also fire pixels when necessary data is missing.
-struct AIChatRemoteSettings {
+struct AIChatRemoteSettings: AIChatRemoteSettingsProvider {
     enum SettingsValue: String {
         case cookieName = "onboardingCookieName"
         case cookieDomain = "onboardingCookieDomain"

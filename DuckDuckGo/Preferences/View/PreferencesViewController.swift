@@ -35,7 +35,7 @@ final class PreferencesViewController: NSViewController {
 
     init(syncService: DDGSyncing,
          duckPlayer: DuckPlayer = DuckPlayer.shared,
-         aiChatRemoteSettings: AIChatRemoteSettings = AIChatRemoteSettings()) {
+         aiChatRemoteSettings: AIChatRemoteSettingsProvider = AIChatRemoteSettings()) {
         model = PreferencesSidebarModel(syncService: syncService,
                                         vpnGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: Application.appDelegate.subscriptionManager),
                                         includeDuckPlayer: duckPlayer.shouldDisplayPreferencesSideBar,
