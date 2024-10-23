@@ -24,8 +24,8 @@ import Foundation
 final class BookmarkStoreMock: BookmarkStore {
 
     private let store: LocalBookmarkStore?
-
-    init(contextProvider: (() -> NSManagedObjectContext)? = nil, loadAllCalled: Bool = false, bookmarks: [BaseBookmarkEntity]? = nil, loadError: Error? = nil, removeError: Error? = nil, updateBookmarkCalled: Bool = false, updateFolderCalled: Bool = false, addChildCalled: Bool = false, updateObjectsCalled: Bool = false, importBookmarksCalled: Bool = false, canMoveObjectWithUUIDCalled: Bool = false, moveObjectUUIDCalled: Bool = false, updateFavoriteIndexCalled: Bool = false) {
+// 5
+    init(id: String = #function, contextProvider: (() -> NSManagedObjectContext)? = nil, loadAllCalled: Bool = false, bookmarks: [BaseBookmarkEntity]? = nil, loadError: Error? = nil, removeError: Error? = nil, updateBookmarkCalled: Bool = false, updateFolderCalled: Bool = false, addChildCalled: Bool = false, updateObjectsCalled: Bool = false, importBookmarksCalled: Bool = false, canMoveObjectWithUUIDCalled: Bool = false, moveObjectUUIDCalled: Bool = false, updateFavoriteIndexCalled: Bool = false) {
         self.loadAllCalled = loadAllCalled
         self.bookmarks = bookmarks
         self.loadError = loadError
@@ -39,7 +39,7 @@ final class BookmarkStoreMock: BookmarkStore {
         self.moveObjectUUIDCalled = moveObjectUUIDCalled
         self.updateFavoriteIndexCalled = updateFavoriteIndexCalled
 
-        self.store = contextProvider.map { LocalBookmarkStore(contextProvider: $0) }
+        self.store = contextProvider.map { LocalBookmarkStore(id: id, contextProvider: $0) }
         if let bookmarks, !bookmarks.isEmpty {
             var entities = [BaseBookmarkEntity]()
             var queue = bookmarks

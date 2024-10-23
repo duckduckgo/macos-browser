@@ -36,7 +36,20 @@ final class AddEditBookmarkDialogViewModelTests: XCTestCase {
         bookmarkManager = nil
         try super.tearDownWithError()
     }
-
+//
+//    private lazy var bookmarkStoreMock: BookmarkStoreMock! = BookmarkStoreMock(id: self.name, bookmarks: [BookmarkFolder.mock])
+//    private lazy var bookmarkManager: LocalBookmarkManager! = {
+//        let bookmarkManager = MainActor.assumeIsolated {
+//            LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
+//        }
+//        bookmarkManager.loadBookmarks()
+//        return bookmarkManager
+//    }()
+//
+//    override func tearDown() {
+//        bookmarkStoreMock = nil
+//        bookmarkManager = nil
+//    }
     // MARK: - Copy
 
     @MainActor

@@ -113,9 +113,9 @@ class BookmarksBarViewModelTests: XCTestCase {
     }
 
     @MainActor
-    private func createMockBookmarksManager(mockBookmarkStore: BookmarkStoreMock = BookmarkStoreMock()) -> BookmarkManager {
+    private func createMockBookmarksManager(testId: String = #function, mockBookmarkStore: BookmarkStoreMock? = nil) -> BookmarkManager {
         let mockFaviconManager = FaviconManagerMock()
-        return LocalBookmarkManager(bookmarkStore: mockBookmarkStore, faviconManagement: mockFaviconManager)
+        return LocalBookmarkManager(bookmarkStore: mockBookmarkStore ?? BookmarkStoreMock(id: testId), faviconManagement: mockFaviconManager)
     }
 
 }
