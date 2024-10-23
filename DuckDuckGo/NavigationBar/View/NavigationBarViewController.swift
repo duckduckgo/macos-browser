@@ -980,8 +980,10 @@ final class NavigationBarViewController: NSViewController {
     private func automaticallyShowAIChatOnboardingPopoverIfPossible() {
         guard WindowControllersManager.shared.lastKeyMainWindowController?.window === aiChatButton.window else { return }
 
-        popovers.showAIChatOnboardingPopover(from: aiChatButton,
-                                             withDelegate: self)
+        popovers.showAIChatOnboardingPopover(from: aiChatButton, withDelegate: self)
+
+        // popovers.showAIChatOnboardingConfirmationPopover(from: aiChatButton, withDelegate: self)
+
         aiChatMenuConfig.markToolbarOnboardingPopoverAsShown()
     }
 
@@ -1208,6 +1210,8 @@ extension NavigationBarViewController: NSPopoverDelegate {
         } else if let popover = popovers.aiChatOnboardingPopover, notification.object as AnyObject? === popover {
             popovers.aiChatOnboardingPopoverClosed()
             updateAIChatButton()
+        } else if let popover = popovers.aiChatOnboardingConfirmationPopover, notification.object as AnyObject? === popover {
+            popovers.aiChatOnboardingConfirmationPopoverClosed()
         }
     }
 
