@@ -22,22 +22,21 @@ import XCTest
 
 final class UserAgentTests: XCTestCase {
 
-    func test_default_user_agent_is_safari() {
-        XCTAssertEqual(UserAgent.safari, UserAgent.for(URL(string: "http://localhost")!))
-        XCTAssertEqual(UserAgent.safari, UserAgent.for(URL(string: "http://example.com")!))
+    func testThatDefaultUserAgentIsBranded() {
+        XCTAssertEqual(UserAgent.brandedDefault, UserAgent.for(URL(string: "http://localhost")!))
+        XCTAssertEqual(UserAgent.brandedDefault, UserAgent.for(URL(string: "http://example.com")!))
     }
 
-    func test_when_domain_is_google_docs_then_user_agent_is_chrome() {
-        XCTAssertEqual(UserAgent.safari, UserAgent.for(URL(string: "https://google.com")!))
-        XCTAssertEqual(UserAgent.safari, UserAgent.for(URL(string: "https://accounts.google.com")!))
-        XCTAssertEqual(UserAgent.safari, UserAgent.for(URL(string: "https://docs.google.com")!))
-        XCTAssertEqual(UserAgent.safari, UserAgent.for(URL(string: "https://docs.google.com/spreadsheets/a/document")!))
-        XCTAssertEqual(UserAgent.safari, UserAgent.for(URL(string: "https://a.docs.google.com")!))
+    func testWhenDomainIsGoogleDocsThenUserAgentIsBranded() {
+        XCTAssertEqual(UserAgent.brandedDefault, UserAgent.for(URL(string: "https://google.com")!))
+        XCTAssertEqual(UserAgent.brandedDefault, UserAgent.for(URL(string: "https://accounts.google.com")!))
+        XCTAssertEqual(UserAgent.brandedDefault, UserAgent.for(URL(string: "https://docs.google.com")!))
+        XCTAssertEqual(UserAgent.brandedDefault, UserAgent.for(URL(string: "https://docs.google.com/spreadsheets/a/document")!))
+        XCTAssertEqual(UserAgent.brandedDefault, UserAgent.for(URL(string: "https://a.docs.google.com")!))
     }
 
-    func testWhenDomainIsDuckDuckGo_ThenUserAgentDoesntIncludeChromeOrSafari() {
-        XCTAssert(!UserAgent.for(URL.duckDuckGo).contains("Safari"))
-        XCTAssert(!UserAgent.for(URL.duckDuckGo).contains("Chrome"))
+    func testWhenDomainIsDuckDuckGo_ThenUserAgentDoesNotIncludeSafari() {
+        XCTAssertFalse(UserAgent.for(URL.duckDuckGo).contains("Chrome"))
     }
 
     func testWhenUserAgentIsDuckDuckGo_ThenUserAgentContainsExpectedParameters() {
@@ -49,7 +48,30 @@ final class UserAgentTests: XCTestCase {
         XCTAssertEqual(userAgent, "ddg_mac/\(appVersion) (\(appID); macOS \(systemVersion))")
     }
 
-    func testWhenURLDomainIsOnWebViewDefaultListThenWebKitDefaultUserAgentIsUsed() {
+    func testWhenURLDomainIsOnDefaultSitesListThenUserAgentIsSafari() {
+        let config = MockPrivacyConfiguration()
+        config.featureSettings = [
+            "defaultSites": [
+                [
+                    "domain": "wikipedia.org",
+                    "reason": "reason"
+                ],
+                [
+                    "domain": "google.com",
+                    "reason": "reason"
+                ]
+            ]
+        ] as! [String: Any]
+
+        XCTAssertEqual(UserAgent.for("http://wikipedia.org".url, privacyConfig: config), UserAgent.safari)
+        XCTAssertEqual(UserAgent.for("https://wikipedia.org".url, privacyConfig: config), UserAgent.safari)
+        XCTAssertEqual(UserAgent.for("https://en.wikipedia.org/wiki/Duck".url, privacyConfig: config), UserAgent.safari)
+        XCTAssertEqual(UserAgent.for("https://google.com".url, privacyConfig: config), UserAgent.safari)
+        XCTAssertEqual(UserAgent.for("https://docs.google.com".url, privacyConfig: config), UserAgent.safari)
+        XCTAssertNotEqual(UserAgent.for("https://duckduckgo.com".url, privacyConfig: config), UserAgent.safari)
+    }
+
+    func testWhenURLDomainIsOnWebViewDefaultListThenUserAgentIsWebKitDefault() {
         let config = MockPrivacyConfiguration()
         config.featureSettings = [
             "webViewDefault": [
@@ -70,15 +92,6 @@ final class UserAgentTests: XCTestCase {
         XCTAssertEqual(UserAgent.for("https://google.com".url, privacyConfig: config), UserAgent.webViewDefault)
         XCTAssertEqual(UserAgent.for("https://docs.google.com".url, privacyConfig: config), UserAgent.webViewDefault)
         XCTAssertNotEqual(UserAgent.for("https://duckduckgo.com".url, privacyConfig: config), UserAgent.webViewDefault)
-    }
-
-    func testWhenDefaultPolicyIsBrandThenBrandedUserAgentIsUsed() {
-        let config = MockPrivacyConfiguration()
-        config.featureSettings = [
-            "defaultPolicy": "brand"
-        ] as! [String: Any]
-
-        XCTAssertEqual(UserAgent.for("http://wikipedia.org".url, privacyConfig: config), UserAgent.brandedDefault)
     }
 
     func testThatRemoteConfigurationTakesPrecedenceOverLocalConfiguration() {
