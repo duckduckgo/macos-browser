@@ -22,29 +22,19 @@ import BrowserServicesKit
 /// It also fire pixels when necessary data is missing.
 struct AIChatRemoteSettings {
     enum SettingsValue: String {
-        case cookieName
-        case cookieDomain
-        case aiChatURL
-        case aiChatURLIdentifiableQuery
-        case aiChatURLIdentifiableQueryValue
-
-        var settingsKey: String {
-            switch self {
-            case .cookieName: "onboardingCookieName"
-            case .cookieDomain: "onboardingCookieDomain"
-            case .aiChatURL: "aiChatURL"
-            case .aiChatURLIdentifiableQuery: "aiChatURLIdentifiableQuery"
-            case .aiChatURLIdentifiableQueryValue: "aiChatURLIdentifiableQueryValue"
-            }
-        }
+        case cookieName = "onboardingCookieName"
+        case cookieDomain = "onboardingCookieDomain"
+        case aiChatURL = "aiChatURL"
+        case aiChatURLIdentifiableQuery = "aiChatURLIdentifiableQuery"
+        case aiChatURLIdentifiableQueryValue = "aiChatURLIdentifiableQueryValue"
 
         var defaultValue: String {
             switch self {
-            case .cookieName: "dcm"
-            case .cookieDomain: "duckduckgo.com"
-            case .aiChatURL: "https://duck.ai"
-            case .aiChatURLIdentifiableQuery: "ia"
-            case .aiChatURLIdentifiableQueryValue: "chat"
+            case .cookieName: return "dcm"
+            case .cookieDomain: return "duckduckgo.com"
+            case .aiChatURL: return "https://duck.ai"
+            case .aiChatURLIdentifiableQuery: return "ia"
+            case .aiChatURLIdentifiableQueryValue: return "chat"
             }
         }
     }
@@ -58,38 +48,18 @@ struct AIChatRemoteSettings {
         self.privacyConfigurationManager = privacyConfigurationManager
     }
 
-    var onboardingCookieName: String {
-        getSettingsData(.cookieName)
-    }
+    // MARK: - Public
 
-    var onboardingCookieDomain: String {
-        getSettingsData(.cookieDomain)
-    }
-
-    var aiChatURLIdentifiableQuery: String {
-        getSettingsData(.aiChatURLIdentifiableQuery)
-    }
-
-    var aiChatURLIdentifiableQueryValue: String {
-        getSettingsData(.aiChatURLIdentifiableQueryValue)
-    }
+    var onboardingCookieName: String { getSettingsData(.cookieName) }
+    var onboardingCookieDomain: String { getSettingsData(.cookieDomain) }
+    var aiChatURLIdentifiableQuery: String { getSettingsData(.aiChatURLIdentifiableQuery) }
+    var aiChatURLIdentifiableQueryValue: String { getSettingsData(.aiChatURLIdentifiableQueryValue) }
 
     var aiChatURL: URL {
-        let urlString = getSettingsData(.aiChatURL)
-        if let url = URL(string: urlString) {
-            return url
-        } else {
+        guard let url = URL(string: getSettingsData(.aiChatURL)) else {
             return URL(string: SettingsValue.aiChatURL.defaultValue)!
         }
-    }
-
-    private func getSettingsData(_ value: SettingsValue) -> String {
-        if let value = settings[value.settingsKey] as? String {
-            return value
-        } else {
-            //fire pixel value.rawValue
-            return value.defaultValue
-        }
+        return url
     }
 
     var isAIChatEnabled: Bool {
@@ -102,5 +72,17 @@ struct AIChatRemoteSettings {
 
     var isApplicationMenuShortcutEnabled: Bool {
         privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(AIChatSubfeature.applicationMenuShortcut)
+    }
+
+    // MARK: - Private
+
+    private func getSettingsData(_ value: SettingsValue) -> String {
+        if let value = settings[value.rawValue] as? String {
+            return value
+        } else {
+            // Fire unique pixel for value.rawValue
+            print("FIRE \(value.rawValue)")
+            return value.defaultValue
+        }
     }
 }
