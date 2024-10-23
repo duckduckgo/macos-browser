@@ -269,7 +269,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         subscriptionCookieManager = SubscriptionCookieManager(subscriptionManager: subscriptionManager, currentCookieStore: {
             WKWebsiteDataStore.default().httpCookieStore
-        })
+        }, eventMapping: SubscriptionCookieManageEventPixelMapping())
 
         // Update VPN environment and match the Subscription environment
         vpnSettings.alignTo(subscriptionEnvironment: subscriptionManager.currentEnvironment)
