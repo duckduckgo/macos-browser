@@ -232,6 +232,7 @@ private extension DataBrokerProtectionAgentManager {
     /// - Parameters:
     ///   - showWebView: Whether to show the web view or not
     ///   - operationDependencies: Operation dependencies
+    ///   - errorHandler: Error handler
     ///   - completion: Completion handler
     func startFreemiumOrSubscriptionScheduledOperations(showWebView: Bool,
                                                         operationDependencies: DataBrokerOperationDependencies,
