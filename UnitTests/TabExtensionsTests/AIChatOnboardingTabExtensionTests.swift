@@ -1,5 +1,5 @@
 //
-//  HistoryTabExtensionTests 2.swift
+//  AIChatOnboardingTabExtensionTests 2.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //

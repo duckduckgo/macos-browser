@@ -27,11 +27,11 @@ final class AIChatDebugMenu: NSMenu {
             NSMenuItem(title: "Show toolbar onboarding", action: #selector(showToolbarOnboarding), target: self)
         }
     }
-    
+
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     @objc func resetToolbarOnboarding() {
         DefaultAIChatPreferencesStorage().reset()
     }
