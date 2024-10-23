@@ -391,6 +391,7 @@ final class BrowserTabViewController: NSViewController {
         containerStackView.orientation = .vertical
         containerStackView.alignment = .leading
         containerStackView.distribution = .fillProportionally
+        containerStackView.spacing = 0
 
         // Make sure link preview (tooltip shown in the bottom-left) is on top
         view.addSubview(containerStackView, positioned: .below, relativeTo: hoverLabelContainer)
@@ -472,6 +473,7 @@ final class BrowserTabViewController: NSViewController {
         hostingController.view.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             hostingController.view.widthAnchor.constraint(equalTo: containerStackView.widthAnchor),
+            hostingController.view.topAnchor.constraint(equalTo: containerStackView.topAnchor),
             hostingController.view.leadingAnchor.constraint(equalTo: containerStackView.leadingAnchor),
             hostingController.view.trailingAnchor.constraint(equalTo: containerStackView.trailingAnchor)
         ])
