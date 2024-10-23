@@ -100,12 +100,7 @@ struct DataImportView: ModalView {
             } else {
                 // If screen is not the first screen where the user choose the type of import they want to do show the generic title.
                 // Otherwise show the injected title.
-                let title = switch model.screen {
-                case .profileAndDataTypesPicker, .fileImport, .moreInfo:
-                    self.title
-                default:
-                    UserText.importDataTitle
-                }
+                let title = model.screen == .profileAndDataTypesPicker ? self.title : UserText.importDataTitle
 
                 Text(title)
                     .font(.title2.weight(.semibold))
