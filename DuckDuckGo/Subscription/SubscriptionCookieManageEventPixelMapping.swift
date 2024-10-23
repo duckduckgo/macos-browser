@@ -32,15 +32,15 @@ enum SubscriptionCookieManagerPixel: PixelKitEventV2 {
     var name: String {
         switch self {
         case .errorHandlingAccountDidSignInTokenIsMissing:
-            return "m_mac_privacy-pro_subscription_cookie_error_handling_accountdidsignin_token_is_missing"
+            return "m_mac_privacy-pro_subscription-cookie-missing_token_on_sign_in"
         case .errorHandlingAccountDidSignOutCookieIsMissing:
-            return "m_mac_privacy-pro_subscription_cookie_error_handling_accountdidsignout_cookie_is_missing"
+            return "m_mac_privacy-pro_subscription-cookie-missing_cookie_on_sign_out"
         case .subscriptionCookieRefreshedWithUpdate:
-            return "m_mac_privacy-pro_subscription_cookie_subscription_cookie_refreshed_with_update"
+            return "m_mac_privacy-pro_subscription-cookie-refreshed_with_update"
         case .subscriptionCookieRefreshedWithDelete:
-            return "m_mac_privacy-pro_subscription_cookie_subscription_cookie_refreshed_with_delete"
+            return "m_mac_privacy-pro_subscription-cookie-refreshed_with_delete"
         case .failedToSetSubscriptionCookie:
-            return "m_mac_privacy-pro_subscription_cookie_failed_to_set_subscription_cookie"
+            return "m_mac_privacy-pro_subscription-cookie-failed_to_set_subscription_cookie"
         }
     }
 
