@@ -55,18 +55,15 @@ final class PreferencesSidebarModel: ObservableObject {
         resetTabSelectionIfNeeded()
         refreshSections()
 
-        let duckPlayerFeatureFlagDidChange = privacyConfigurationManager.updatesPublisher
-            .map { [weak privacyConfigurationManager] in
-                privacyConfigurationManager?.privacyConfig.isEnabled(featureKey: .duckPlayer) == true
-            }
-            .removeDuplicates()
-            .asVoid()
+        let duckPlayerFeatureFlagDidChange = featureFlagDidChange(with: privacyConfigurationManager, on: .duckPlayer)
+        let aiChatFeatureFlagDidChange = featureFlagDidChange(with: privacyConfigurationManager, on: .aiChat)
 
         let syncFeatureFlagsDidChange = syncService.featureFlagsPublisher.map { $0.contains(.userInterface) }
             .removeDuplicates()
             .asVoid()
 
         Publishers.Merge(duckPlayerFeatureFlagDidChange, syncFeatureFlagsDidChange)
+            .merge(with: aiChatFeatureFlagDidChange)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in
                 self?.refreshSections()
@@ -83,6 +80,7 @@ final class PreferencesSidebarModel: ObservableObject {
         syncService: DDGSyncing,
         vpnGatekeeper: VPNFeatureGatekeeper,
         includeDuckPlayer: Bool,
+        includeAIChat: Bool,
         userDefaults: UserDefaults = .netP
     ) {
         let loadSections = {
@@ -91,7 +89,8 @@ final class PreferencesSidebarModel: ObservableObject {
             return PreferencesSection.defaultSections(
                 includingDuckPlayer: includeDuckPlayer,
                 includingSync: syncService.featureFlags.contains(.userInterface),
-                includingVPN: includingVPN
+                includingVPN: includingVPN,
+                includingAIChat: includeAIChat
             )
         }
 
@@ -138,6 +137,17 @@ final class PreferencesSidebarModel: ObservableObject {
     }
 
     // MARK: - Refreshing logic
+
+    private func featureFlagDidChange(with privacyConfigurationManager: PrivacyConfigurationManaging,
+                                      on featureKey: PrivacyFeature) -> AnyPublisher<Void, Never> {
+        return privacyConfigurationManager.updatesPublisher
+            .map { [weak privacyConfigurationManager] in
+                privacyConfigurationManager?.privacyConfig.isEnabled(featureKey: featureKey) == true
+            }
+            .removeDuplicates()
+            .asVoid()
+            .eraseToAnyPublisher()
+    }
 
     func refreshSections() {
         sections = loadSections()

@@ -202,6 +202,12 @@ extension TabExtensionsBuilder {
         }
 
         add {
+            AIChatOnboardingTabExtension(webViewPublisher: args.webViewFuture,
+                                         notificationCenter: .default,
+                                         remoteSettings: AIChatRemoteSettings())
+        }
+
+        add {
             SpecialErrorPageTabExtension(webViewPublisher: args.webViewFuture,
                                   scriptsPublisher: userScripts.compactMap { $0 },
                                   phishingDetector: dependencies.phishingDetector,

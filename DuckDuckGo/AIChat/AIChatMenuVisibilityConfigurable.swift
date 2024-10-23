@@ -17,6 +17,7 @@
 //
 
 import Combine
+import BrowserServicesKit
 
 protocol AIChatMenuVisibilityConfigurable {
     var shouldDisplayApplicationMenuShortcut: Bool { get }
@@ -25,8 +26,11 @@ protocol AIChatMenuVisibilityConfigurable {
     var isFeatureEnabledForApplicationMenuShortcut: Bool { get }
     var isFeatureEnabledForToolbarShortcut: Bool { get }
 
-    var shortcutURL: URL { get }
     var valuesChangedPublisher: PassthroughSubject<Void, Never> { get }
+
+    var shouldDisplayToolbarOnboardingPopover: PassthroughSubject<Void, Never> { get }
+
+    func markToolbarOnboardingPopoverAsShown()
 }
 
 final class AIChatMenuConfiguration: AIChatMenuVisibilityConfigurable {
@@ -37,8 +41,11 @@ final class AIChatMenuConfiguration: AIChatMenuVisibilityConfigurable {
 
     private var cancellables = Set<AnyCancellable>()
     private var storage: AIChatPreferencesStorage
+    private let notificationCenter: NotificationCenter
+    private let remoteSettings: AIChatRemoteSettingsProvider
 
     var valuesChangedPublisher = PassthroughSubject<Void, Never>()
+    var shouldDisplayToolbarOnboardingPopover = PassthroughSubject<Void, Never>()
 
     var isFeatureEnabledForApplicationMenuShortcut: Bool {
         isFeatureEnabledFor(shortcutType: .applicationMenu)
@@ -56,13 +63,29 @@ final class AIChatMenuConfiguration: AIChatMenuVisibilityConfigurable {
         return isFeatureEnabledForApplicationMenuShortcut && storage.showShortcutInApplicationMenu
     }
 
-    var shortcutURL: URL {
-        URL(string: "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=2")!
+    func markToolbarOnboardingPopoverAsShown() {
+        storage.didDisplayAIChatToolbarOnboarding = true
     }
 
-    init(storage: AIChatPreferencesStorage = DefaultAIChatPreferencesStorage()) {
+    init(storage: AIChatPreferencesStorage = DefaultAIChatPreferencesStorage(),
+         notificationCenter: NotificationCenter = .default,
+         remoteSettings: AIChatRemoteSettingsProvider = AIChatRemoteSettings()) {
         self.storage = storage
+        self.notificationCenter = notificationCenter
+        self.remoteSettings = remoteSettings
+
         self.subscribeToValuesChanged()
+        self.subscribeToAIChatLoadedNotification()
+    }
+
+    private func subscribeToAIChatLoadedNotification() {
+        notificationCenter.publisher(for: .AIChatOpenedForReturningUser)
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                if !self.storage.didDisplayAIChatToolbarOnboarding {
+                    self.shouldDisplayToolbarOnboardingPopover.send()
+                }
+            }.store(in: &cancellables)
     }
 
     private func subscribeToValuesChanged() {
@@ -82,11 +105,9 @@ final class AIChatMenuConfiguration: AIChatMenuVisibilityConfigurable {
     private func isFeatureEnabledFor(shortcutType: ShortcutType) -> Bool {
         switch shortcutType {
         case .applicationMenu:
-            // Use privacy config here
-            return true
+            return remoteSettings.isApplicationMenuShortcutEnabled
         case .toolbar:
-            // Use privacy config here
-            return true
+            return remoteSettings.isToolbarShortcutEnabled
         }
     }
 }
