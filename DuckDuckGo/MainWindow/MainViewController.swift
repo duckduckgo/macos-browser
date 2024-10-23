@@ -43,6 +43,7 @@ final class MainViewController: NSViewController {
     private var tabViewModelCancellables = Set<AnyCancellable>()
     private var bookmarksBarVisibilityChangedCancellable: AnyCancellable?
     private var eventMonitorCancellables = Set<AnyCancellable>()
+    private let aiChatMenuConfig: AIChatMenuVisibilityConfigurable
 
     private var bookmarksBarIsVisible: Bool {
         return bookmarksBarViewController.parent != nil
@@ -59,8 +60,10 @@ final class MainViewController: NSViewController {
     init(tabCollectionViewModel: TabCollectionViewModel? = nil,
          bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
          autofillPopoverPresenter: AutofillPopoverPresenter,
-         vpnXPCClient: VPNControllerXPCClient = .shared) {
+         vpnXPCClient: VPNControllerXPCClient = .shared,
+         aiChatMenuConfig: AIChatMenuVisibilityConfigurable = AIChatMenuConfiguration()) {
 
+        self.aiChatMenuConfig = aiChatMenuConfig
         let tabCollectionViewModel = tabCollectionViewModel ?? TabCollectionViewModel()
         self.tabCollectionViewModel = tabCollectionViewModel
         self.isBurner = tabCollectionViewModel.isBurner
@@ -108,7 +111,12 @@ final class MainViewController: NSViewController {
             )
         }()
 
-        navigationBarViewController = NavigationBarViewController.create(tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner, networkProtectionPopoverManager: networkProtectionPopoverManager, networkProtectionStatusReporter: networkProtectionStatusReporter, autofillPopoverPresenter: autofillPopoverPresenter)
+        navigationBarViewController = NavigationBarViewController.create(tabCollectionViewModel: tabCollectionViewModel,
+                                                                         isBurner: isBurner,
+                                                                         networkProtectionPopoverManager: networkProtectionPopoverManager,
+                                                                         networkProtectionStatusReporter: networkProtectionStatusReporter,
+                                                                         autofillPopoverPresenter: autofillPopoverPresenter,
+                                                                         aiChatMenuConfig: aiChatMenuConfig)
 
         browserTabViewController = BrowserTabViewController(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager)
         findInPageViewController = FindInPageViewController.create()
