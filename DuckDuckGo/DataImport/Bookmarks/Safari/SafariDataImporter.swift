@@ -114,7 +114,7 @@ final class SafariDataImporter: DataImporter {
             }
             await faviconManager.handleFaviconsByDocumentUrl(faviconsByDocument)
             PixelKit.fire(GeneralPixel.dataImportSucceeded(action: .favicons, source: source, sourceVersion: sourceVersion))
-            
+
         case .failure(let error):
             PixelKit.fire(GeneralPixel.dataImportFailed(source: source, sourceVersion: sourceVersion, error: error))
         }
