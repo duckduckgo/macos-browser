@@ -482,9 +482,9 @@ final class BrowserTabViewController: NSViewController {
         webViewContainer?.layoutSubtreeIfNeeded()
 
         let currentState = onboardingDialogTypeProvider.state
-        if currentState == .showFireButton {
+        if dialogType == .tryFireButton {
             delegate?.highlightFireButton()
-        } else if currentState == .showBlockedTrackers {
+        } else if case .trackers = dialogType {
             delegate?.highlightPrivacyShield()
         }
     }
@@ -563,11 +563,6 @@ final class BrowserTabViewController: NSViewController {
 
         tabViewModel?.tab.webViewDidFinishNavigationPublisher.sink { [weak self] in
             self?.updateStateAndPresentContextualOnboarding()
-        }.store(in: &tabViewModelCancellables)
-
-        tabViewModel?.tab.webViewDidStartNavigationPublisher.sink { [weak self] in
-            guard let self, let webViewContainer = self.webViewContainer else { return }
-            self.removeChild(in: self.containerStackView, webViewContainer: webViewContainer)
         }.store(in: &tabViewModelCancellables)
     }
 

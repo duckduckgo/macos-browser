@@ -1328,6 +1328,9 @@ extension Tab {
 
 extension Tab: OnboardingNavigationDelegate {
     func searchFor(_ query: String) {
+        // We check if the provided string is already a search query.
+        // During onboarding, there's a specific case where we want to search for images,
+        // and this allows us to handle that scenario.
         if let url = URL(string: query), url.isDuckDuckGoSearch {
             navigateTo(url: url)
         } else {
