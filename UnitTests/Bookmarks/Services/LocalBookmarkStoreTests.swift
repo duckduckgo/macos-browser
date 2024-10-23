@@ -23,8 +23,8 @@ import XCTest
 
 extension LocalBookmarkStore {
 
-    convenience init(context: NSManagedObjectContext) {
-        self.init {
+    convenience init(id: String = #function, context: NSManagedObjectContext) {
+        self.init(id: id) {
             context
         }
     }
@@ -1534,9 +1534,9 @@ final class LocalBookmarkStoreTests: XCTestCase {
     }
 
     @MainActor
-    private func validateInitialImport(for source: BookmarkImportSource) async throws {
+    private func validateInitialImport(for source: BookmarkImportSource, testId: String = #function) async throws {
         let context = container.viewContext
-        let bookmarkStore = LocalBookmarkStore(context: context)
+        let bookmarkStore = LocalBookmarkStore(id: testId, context: context)
         let importedBookmarks = createMockImportedBookmarks()
 
         let result = bookmarkStore.importBookmarks(importedBookmarks, source: source)

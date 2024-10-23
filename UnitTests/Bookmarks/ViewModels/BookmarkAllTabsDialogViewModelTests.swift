@@ -27,7 +27,7 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
     @MainActor
     override func setUpWithError() throws {
         try super.setUpWithError()
-        bookmarkStoreMock = BookmarkStoreMock(bookmarks: [BookmarkFolder.mock])
+        bookmarkStoreMock = BookmarkStoreMock(id: self.name, bookmarks: [BookmarkFolder.mock])
         bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
         bookmarkManager.loadBookmarks()
         foldersStoreMock = .init()
