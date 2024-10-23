@@ -41,19 +41,19 @@ struct AIChatToolBarPopUpOnboardingView: View {
 
             HStack {
                 createButton(title: UserText.aiChatOnboardingPopoverCTAReject,
-                             action: viewModel.rejectToolbarIcon,
-                             style: StandardButtonStyle())
+                             style: StandardButtonStyle(),
+                             action: viewModel.rejectToolbarIcon)
 
                 createButton(title: UserText.aiChatOnboardingPopoverCTAAccept,
-                             action: viewModel.acceptToolbarIcon,
-                             style: DefaultActionButtonStyle(enabled: true))
+                             style: DefaultActionButtonStyle(enabled: true),
+                             action: viewModel.acceptToolbarIcon)
             }
         }
         .padding()
         .frame(width: Constants.panelWidth, height: Constants.panelHeight)
     }
 
-    private func createButton(title: String, action: @escaping () -> Void, style: some ButtonStyle) -> some View {
+    private func createButton(title: String, style: some ButtonStyle, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Text(title)
                 .font(.system(size: 13))

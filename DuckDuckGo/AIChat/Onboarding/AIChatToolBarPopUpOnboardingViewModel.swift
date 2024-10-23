@@ -18,24 +18,21 @@
 
 final class AIChatToolBarPopUpOnboardingViewModel: ObservableObject {
     var aiChatStorage: AIChatPreferencesStorage
-    var rejectAction: (() -> Void)?
-    var acceptAction: (() -> Void)?
+    var ctaCallback: ((Bool) -> Void)?
 
     internal init(aiChatStorage: any AIChatPreferencesStorage = DefaultAIChatPreferencesStorage(),
-                  rejectAction: (() -> Void)? = nil,
-                  acceptAction: (() -> Void)? = nil) {
+                  ctaCallback: ((Bool) -> Void)? = nil) {
         self.aiChatStorage = aiChatStorage
-        self.rejectAction = rejectAction
-        self.acceptAction = acceptAction
+        self.ctaCallback = ctaCallback
     }
 
     func rejectToolbarIcon() {
         aiChatStorage.shouldDisplayToolbarShortcut = false
-        rejectAction?()
+        ctaCallback?(false)
     }
 
     func acceptToolbarIcon() {
         aiChatStorage.shouldDisplayToolbarShortcut = true
-        acceptAction?()
+        ctaCallback?(true)
     }
 }

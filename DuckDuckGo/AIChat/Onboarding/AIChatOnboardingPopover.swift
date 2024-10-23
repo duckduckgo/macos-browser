@@ -19,7 +19,11 @@
 import SwiftUI
 
 final class AIChatOnboardingPopover: NSPopover {
-    override init() {
+    let ctaCallback: (Bool) -> Void
+
+    init(ctaCallback: @escaping (Bool) -> Void) {
+        self.ctaCallback = ctaCallback
+
         super.init()
 
         self.animates = false
@@ -34,9 +38,7 @@ final class AIChatOnboardingPopover: NSPopover {
 
     private func setupContentController() {
         let controller = AIChatToolBarPopUpOnboardingViewController()
-        controller.didFinish = { [weak self] in
-            self?.close()
-        }
+        controller.ctaCallback = self.ctaCallback
         contentViewController = controller
     }
 }

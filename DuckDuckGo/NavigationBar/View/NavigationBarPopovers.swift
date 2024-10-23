@@ -232,9 +232,11 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
         return true
     }
 
-    func showAIChatOnboardingPopover(from button: MouseOverButton, withDelegate delegate: NSPopoverDelegate) {
+    func showAIChatOnboardingPopover(from button: MouseOverButton,
+                                     withDelegate delegate: NSPopoverDelegate,
+                                     ctaCallback: @escaping (Bool) -> Void) {
         guard closeTransientPopovers() else { return }
-        let popover = aiChatOnboardingPopover ?? AIChatOnboardingPopover()
+        let popover = aiChatOnboardingPopover ?? AIChatOnboardingPopover(ctaCallback: ctaCallback)
 
         popover.delegate = delegate
         aiChatOnboardingPopover = popover
@@ -284,6 +286,10 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
 
     func closeZoomPopover() {
         zoomPopover?.close()
+    }
+
+    func closeAIChatOnboardingPopover() {
+        aiChatOnboardingPopover?.close()
     }
 
     func openPrivacyDashboard(for tabViewModel: TabViewModel, from button: MouseOverButton) {

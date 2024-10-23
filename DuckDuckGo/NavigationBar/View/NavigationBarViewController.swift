@@ -980,10 +980,18 @@ final class NavigationBarViewController: NSViewController {
     private func automaticallyShowAIChatOnboardingPopoverIfPossible() {
         guard WindowControllersManager.shared.lastKeyMainWindowController?.window === aiChatButton.window else { return }
 
-        showAIChatOnboardingConfirmationPopover()
+        popovers.showAIChatOnboardingPopover(from: aiChatButton,
+                                             withDelegate: self,
+                                             ctaCallback: { [weak self] didAddShortcut in
+            guard let self = self else { return }
+            self.popovers.closeAIChatOnboardingPopover()
 
-        //popovers.showAIChatOnboardingPopover(from: aiChatButton, withDelegate: self)
-        //aiChatMenuConfig.markToolbarOnboardingPopoverAsShown()
+            if didAddShortcut {
+                self.showAIChatOnboardingConfirmationPopover()
+            }
+        })
+
+        aiChatMenuConfig.markToolbarOnboardingPopoverAsShown()
     }
 
     private func showAIChatOnboardingConfirmationPopover() {

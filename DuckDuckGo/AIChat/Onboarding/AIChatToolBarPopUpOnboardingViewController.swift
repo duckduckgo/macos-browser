@@ -19,7 +19,7 @@
 import SwiftUI
 
 final class AIChatToolBarPopUpOnboardingViewController: NSViewController {
-    var didFinish: (() -> Void)?
+    var ctaCallback: ((Bool) -> Void)?
 
     private let viewModel = AIChatToolBarPopUpOnboardingViewModel()
     private var hostingView: NSHostingView<AIChatToolBarPopUpOnboardingView>!
@@ -33,7 +33,6 @@ final class AIChatToolBarPopUpOnboardingViewController: NSViewController {
     }
 
     private func setupViewModelCallbacks() {
-        viewModel.rejectAction = didFinish
-        viewModel.acceptAction = didFinish
+        viewModel.ctaCallback = ctaCallback
     }
 }
