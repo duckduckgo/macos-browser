@@ -169,322 +169,22 @@
             </BuildableReference>
             <SkippedTests>
                <Test
-                  Identifier = "AddressBarTests">
-               </Test>
-               <Test
-                  Identifier = "AddressBarTests/testWhenActivatingWindowWithPinnedTabOpen_webViewBecomesFirstResponder()">
-               </Test>
-               <Test
-                  Identifier = "AddressBarTests/testWhenActivatingWindowWithPinnedTabWhenAddressBarIsActive_addressBarIsKeptActive()">
-               </Test>
-               <Test
-                  Identifier = "AddressBarTests/testWhenAddressSubmittedAndAddressBarIsReactivated_addressBarIsKeptActiveOnPageLoad()">
-               </Test>
-               <Test
-                  Identifier = "AddressBarTests/testWhenAddressSubmitted_addressBarIsDeactivated()">
-               </Test>
-               <Test
-                  Identifier = "AddressBarTests/testWhenDeactivatingAddressBar_webViewShouldBecomeFirstResponder()">
-               </Test>
-               <Test
-                  Identifier = "AddressBarTests/testWhenEditingSerpURL_serpIconIsDisplayed()">
-               </Test>
-               <Test
-                  Identifier = "AddressBarTests/testWhenGoingBackToNewtabPageFromBookmarks_addressBarIsActivated()">
-               </Test>
-               <Test
-                  Identifier = "AddressBarTests/testWhenGoingBackToNewtabPageFromSettings_addressBarIsActivated()">
-               </Test>
-               <Test
-                  Identifier = "AddressBarTests/testWhenGoingBackToNewtabPage_addressBarIsActivated()">
-               </Test>
-               <Test
-                  Identifier = "AddressBarTests/testWhenGoingBack_addressBarIsDeactivated()">
-               </Test>
-               <Test
-                  Identifier = "AddressBarTests/testWhenHomePageIsOpened_addressBarIsDeactivated()">
-               </Test>
-               <Test
-                  Identifier = "AddressBarTests/testWhenOpeningBookmark_addressBarIsDeactivated()">
-               </Test>
-               <Test
-                  Identifier = "AddressBarTests/testWhenOpeningHistoryEntry_addressBarIsDeactivated()">
-               </Test>
-               <Test
-                  Identifier = "AddressBarTests/testWhenOpeningNewTab_addressBarIsActivated()">
-               </Test>
-               <Test
-                  Identifier = "AddressBarTests/testWhenOpeningURLfromUI_addressBarIsDeactivated()">
-               </Test>
-               <Test
-                  Identifier = "AddressBarTests/testWhenPageRedirectedWhenAddressBarIsInactive_addressBarShouldReset()">
-               </Test>
-               <Test
-                  Identifier = "AddressBarTests/testWhenPageRedirected_addressBarStaysActivePreservingUserInput()">
-               </Test>
-               <Test
-                  Identifier = "AddressBarTests/testWhenReloadingFailingPage_addressBarIsDeactivated()">
-               </Test>
-               <Test
-                  Identifier = "AddressBarTests/testWhenRestoringToBookmarks_addressBarIsNotActive()">
-               </Test>
-               <Test
-                  Identifier = "AddressBarTests/testWhenRestoringToNewTab_addressBarIsActive()">
-               </Test>
-               <Test
-                  Identifier = "AddressBarTests/testWhenRestoringToOnboarding_addressBarIsNotActive()">
-               </Test>
-               <Test
-                  Identifier = "AddressBarTests/testWhenRestoringToSettings_addressBarIsNotActive()">
-               </Test>
-               <Test
-                  Identifier = "AddressBarTests/testWhenRestoringToURL_addressBarIsNotActive()">
-               </Test>
-               <Test
-                  Identifier = "AddressBarTests/testWhenSwitchingBetweenTabsWithTypedValue_typedValueIsPreserved()">
-               </Test>
-               <Test
-                  Identifier = "AddressBarTests/testWhenSwitchingBetweenTabs_addressBarFocusStateIsCorrect()">
-               </Test>
-               <Test
-                  Identifier = "AddressBarTests/testWhenSwitchingBetweenURLTabs_addressBarIsDeactivated()">
-               </Test>
-               <Test
-                  Identifier = "AddressBarTests/testWhenTabReloadedBySubmittingSameAddressAndAddressIsActivated_addressBarIsKeptActiveOnPageLoad()">
-               </Test>
-               <Test
-                  Identifier = "AddressBarTests/testWhenTabReloaded_addressBarIsDeactivated()">
-               </Test>
-               <Test
-                  Identifier = "AddressBarTests/testWhenUserStartsTypingOnNewTabPageLoad_userInputIsNotReset()">
-               </Test>
-               <Test
-                  Identifier = "AddressBarTests/test_WhenSiteCertificateInvalid_ThenAddressBarShowsDottedShieldIcon()">
-               </Test>
-               <Test
-                  Identifier = "AddressBarTests/test_WhenSiteCertificateNil_ThenAddressBarShowsStandardShieldIcon()">
-               </Test>
-               <Test
-                  Identifier = "AddressBarTests/test_WhenSiteCertificateValid_ThenAddressBarShowsStandardShieldIcon()">
-               </Test>
-               <Test
-                  Identifier = "AddressBarTests/test_ZoomLevelDefault_ThenZoomButtonIsNotVisible()">
-               </Test>
-               <Test
-                  Identifier = "AddressBarTests/test_ZoomLevelNonDefault_ThenZoomButtonIsVisible()">
-               </Test>
-               <Test
-                  Identifier = "AutoconsentIntegrationTests">
-               </Test>
-               <Test
-                  Identifier = "AutoconsentIntegrationTests/testCosmeticRule_whenFakeCookieBannerIsDisplayedAndScriptsAreReloaded_bannerIsHidden()">
-               </Test>
-               <Test
-                  Identifier = "AutoconsentIntegrationTests/testCosmeticRule_whenFakeCookieBannerIsDisplayed_bannerIsHidden()">
-               </Test>
-               <Test
                   Identifier = "AutoconsentIntegrationTests/testWhenAutoconsentDisabled_promptIsDisplayed()">
-               </Test>
-               <Test
-                  Identifier = "AutoconsentIntegrationTests/testWhenAutoconsentEnabled_cookieConsentManaged()">
-               </Test>
-               <Test
-                  Identifier = "CSVImporterIntegrationTests">
-               </Test>
-               <Test
-                  Identifier = "CoreDataEncryptionTests">
                </Test>
                <Test
                   Identifier = "CoreDataEncryptionTests/testSavingIncorrectValueTypes()">
                </Test>
                <Test
-                  Identifier = "DeallocationTests">
-               </Test>
-               <Test
-                  Identifier = "DeallocationTests/testWhenLastTabClosed_windowIsDeallocated()">
-               </Test>
-               <Test
-                  Identifier = "DeallocationTests/testWindowsDeallocation()">
-               </Test>
-               <Test
-                  Identifier = "DownloadsIntegrationTests">
-               </Test>
-               <Test
-                  Identifier = "DownloadsIntegrationTests/testWhenDownloadIsStartedAfterAppOpensURL_tabIsClosed()">
-               </Test>
-               <Test
-                  Identifier = "DownloadsIntegrationTests/testWhenDownloadIsStartedInNewTabAfterRedirect_tabIsClosed()">
-               </Test>
-               <Test
-                  Identifier = "DownloadsIntegrationTests/testWhenDownloadIsStartedInNewTab_tabIsClosed()">
-               </Test>
-               <Test
-                  Identifier = "DownloadsIntegrationTests/testWhenLocalFile_downloadStartsAlwaysDisplayingSavePanel()">
-               </Test>
-               <Test
-                  Identifier = "DownloadsIntegrationTests/testWhenLocalFolder_loadingFails()">
-               </Test>
-               <Test
-                  Identifier = "DownloadsIntegrationTests/testWhenLocalNonExistentFile_loadingFails()">
-               </Test>
-               <Test
-                  Identifier = "DownloadsIntegrationTests/testWhenNavigationActionIsBlob_downloadStarts()">
-               </Test>
-               <Test
-                  Identifier = "DownloadsIntegrationTests/testWhenNavigationActionIsData_downloadStarts()">
-               </Test>
-               <Test
-                  Identifier = "DownloadsIntegrationTests/testWhenSaveDialogOpenInBackgroundTabAndTabIsClosed_downloadIsCancelled()">
-               </Test>
-               <Test
-                  Identifier = "DownloadsIntegrationTests/testWhenSaveDialogOpenInBackgroundTabAndWindowIsClosed_downloadIsCancelled()">
-               </Test>
-               <Test
-                  Identifier = "DownloadsIntegrationTests/testWhenShouldDownloadResponse_downloadStarts()">
-               </Test>
-               <Test
-                  Identifier = "DownloadsIntegrationTests/testWhenUnsupportedMimeType_downloadStarts()">
-               </Test>
-               <Test
                   Identifier = "EncryptionKeyStoreTests">
-               </Test>
-               <Test
-                  Identifier = "ErrorPageTests">
-               </Test>
-               <Test
-                  Identifier = "ErrorPageTests/testPinnedTabDoesNotNavigateAway()">
-               </Test>
-               <Test
-                  Identifier = "ErrorPageTests/testWhenGoingBackToFailingPageAndItFailsAgain_errorPageIsUpdated()">
-               </Test>
-               <Test
-                  Identifier = "ErrorPageTests/testWhenGoingBackToFailingPage_reloadIsTriggered()">
-               </Test>
-               <Test
-                  Identifier = "ErrorPageTests/testWhenGoingToAnotherUrlFails_newBackForwardHistoryItemIsAdded()">
-               </Test>
-               <Test
-                  Identifier = "ErrorPageTests/testWhenGoingToAnotherUrlSucceeds_newBackForwardHistoryItemIsAdded()">
-               </Test>
-               <Test
-                  Identifier = "ErrorPageTests/testWhenLoadingFailsAfterSessionRestoration_navigationHistoryIsPreserved()">
-               </Test>
-               <Test
-                  Identifier = "ErrorPageTests/testWhenPageFailsToLoadAfterRedirect_errorPageShown()">
-               </Test>
-               <Test
-                  Identifier = "ErrorPageTests/testWhenPageFailsToLoad_errorPageShown()">
-               </Test>
-               <Test
-                  Identifier = "ErrorPageTests/testWhenPageLoadedAndFailsOnRefreshAndOnConsequentRefresh_errorPageIsUpdatedKeepingForwardHistory()">
-               </Test>
-               <Test
-                  Identifier = "ErrorPageTests/testWhenPageLoadedAndFailsOnRefreshAndSucceedsOnConsequentRefresh_forwardHistoryIsPreserved()">
-               </Test>
-               <Test
-                  Identifier = "ErrorPageTests/testWhenReloadingBySubmittingSameURL_errorPageRemainsSame()">
-               </Test>
-               <Test
-                  Identifier = "ErrorPageTests/testWhenTabWithConnectionLostErrorActivatedAndReloadFailsAgain_errorPageIsShownOnce()">
-               </Test>
-               <Test
-                  Identifier = "ErrorPageTests/testWhenTabWithNoConnectionErrorActivated_reloadTriggered()">
-               </Test>
-               <Test
-                  Identifier = "ErrorPageTests/testWhenTabWithOtherErrorActivated_reloadNotTriggered()">
                </Test>
                <Test
                   Identifier = "HTTPSUpgradeIntegrationTests">
                </Test>
                <Test
-                  Identifier = "HistoryIntegrationTests">
-               </Test>
-               <Test
-                  Identifier = "HistoryIntegrationTests/testWhenNavigatingBack_visitIsNotAdded()">
-               </Test>
-               <Test
-                  Identifier = "HistoryIntegrationTests/testWhenNavigatingToSamePage_visitIsAdded()">
-               </Test>
-               <Test
-                  Identifier = "HistoryIntegrationTests/testWhenPageTitleIsUpdated_historyEntryTitleUpdated()">
-               </Test>
-               <Test
-                  Identifier = "HistoryIntegrationTests/testWhenSameDocumentNavigation_historyEntryTitleUpdated()">
-               </Test>
-               <Test
-                  Identifier = "HistoryIntegrationTests/testWhenScriptTrackerLoaded_trackerAddedToHistory()">
-               </Test>
-               <Test
-                  Identifier = "HistoryIntegrationTests/testWhenSurrogateTrackerLoaded_trackerAddedToHistory()">
-               </Test>
-               <Test
-                  Identifier = "NavigationProtectionIntegrationTests">
-               </Test>
-               <Test
                   Identifier = "NavigationProtectionIntegrationTests/testAMPLinks()">
                </Test>
                <Test
-                  Identifier = "NavigationProtectionIntegrationTests/testGPC()">
-               </Test>
-               <Test
                   Identifier = "NavigationProtectionIntegrationTests/testReferrerTrimming()">
-               </Test>
-               <Test
-                  Identifier = "OnboardingPageTests">
-               </Test>
-               <Test
-                  Identifier = "OnboardingPageTests/testWhenNavigatingToOnboarding_OnboardingPageIsPresented()">
-               </Test>
-               <Test
-                  Identifier = "OnboardingPageTests/testWhenTabInitialisedSpeacialPagesHandlersAdded()">
-               </Test>
-               <Test
-                  Identifier = "PhishingDetectionIntegrationTests">
-               </Test>
-               <Test
-                  Identifier = "PhishingDetectionIntegrationTests/testFeatureDisabledAndPhishingDetection_tabIsNotMarkedPhishing()">
-               </Test>
-               <Test
-                  Identifier = "PhishingDetectionIntegrationTests/testPhishingDetectedThenDDGLoaded_tabIsNotMarkedPhishing()">
-               </Test>
-               <Test
-                  Identifier = "PhishingDetectionIntegrationTests/testPhishingDetectedThenNotDetected_tabIsNotMarkedPhishing()">
-               </Test>
-               <Test
-                  Identifier = "PhishingDetectionIntegrationTests/testPhishingDetectedViaHTTPRedirectChain_tabIsMarkedPhishing()">
-               </Test>
-               <Test
-                  Identifier = "PhishingDetectionIntegrationTests/testPhishingDetectedViaJSRedirectChain_tabIsMarkedPhishing()">
-               </Test>
-               <Test
-                  Identifier = "PhishingDetectionIntegrationTests/testPhishingDetected_tabIsMarkedPhishing()">
-               </Test>
-               <Test
-                  Identifier = "PhishingDetectionIntegrationTests/testPhishingNotDetected_tabIsNotMarkedPhishing()">
-               </Test>
-               <Test
-                  Identifier = "PrivacyDashboardIntegrationTests">
-               </Test>
-               <Test
-                  Identifier = "SearchNonexistentDomainTests">
-               </Test>
-               <Test
-                  Identifier = "SearchNonexistentDomainTests/testWhenNonexistentDomainNotEnteredByUser_notRedirectedToSERP()">
-               </Test>
-               <Test
-                  Identifier = "SearchNonexistentDomainTests/testWhenNonexistentDomainRequestedWithScheme_notRedirectedToSERP()">
-               </Test>
-               <Test
-                  Identifier = "SearchNonexistentDomainTests/testWhenNonexistentDomainRequestedWithValidTLD_notRedirectedToSERP()">
-               </Test>
-               <Test
-                  Identifier = "SearchNonexistentDomainTests/testWhenNonexistentDomainRequested_redirectedToSERP()">
-               </Test>
-               <Test
-                  Identifier = "SearchNonexistentDomainTests/testWhenNonexistentDomainSuggestionChosen_redirectedToSERP()">
-               </Test>
-               <Test
-                  Identifier = "TabContentTests">
                </Test>
                <Test
                   Identifier = "TabContentTests/testWhenPDFContextMenuPrintChosen_printDialogOpens()">
@@ -495,13 +195,10 @@
                <Test
                   Identifier = "TabContentTests/testWhenPDFMainMenuPrintChosen_printDialogOpens()">
                </Test>
-               <Test
-                  Identifier = "TabContentTests/testWhenPDFMainMenuSaveAsChosen_saveDialogOpens()">
-               </Test>
             </SkippedTests>
          </TestableReference>
          <TestableReference
-            skipped = "YES">
+            skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "SyncUITests"
@@ -511,7 +208,7 @@
             </BuildableReference>
          </TestableReference>
          <TestableReference
-            skipped = "YES">
+            skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "NetworkProtectionUITests"
@@ -521,7 +218,7 @@
             </BuildableReference>
          </TestableReference>
          <TestableReference
-            skipped = "YES">
+            skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "DataBrokerProtectionTests"
@@ -531,7 +228,7 @@
             </BuildableReference>
          </TestableReference>
          <TestableReference
-            skipped = "YES">
+            skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "UDSHelperTests"
@@ -541,7 +238,7 @@
             </BuildableReference>
          </TestableReference>
          <TestableReference
-            skipped = "YES">
+            skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "AppKitExtensionsTests"
