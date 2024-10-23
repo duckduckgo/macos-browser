@@ -320,7 +320,7 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         }
     }
 
-    func test_UpdateStateFor_OpensDuckDuckGoSearch_ShowsTryASearch() {
+    func test_OnUpdateStateFor_DuckDuckGoSite_WhenInNotStarted_ThenStateIsShowTryASearch() {
         // Given
         stateMachine.state = .notStarted
         tab.url = URL.duckDuckGo
@@ -332,7 +332,7 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         XCTAssertEqual(stateMachine.state, .showTryASearch)
     }
 
-    func test_UpdateStateFor_PerformsSearch_WhenInShowTryASearch_ShowsSearchDone() {
+    func test_OnUpdateStateFor_PerformsSearch_WhenInShowTryASearch_ThenStateIsShowsSearchDone() {
         // Given
         stateMachine.state = .showTryASearch
         tab.url = URL.makeSearchUrl(from: "test search")
@@ -344,7 +344,7 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         XCTAssertEqual(stateMachine.state, .showSearchDone)
     }
 
-    func test_UpdateStateFor_PerformsSearch_WhenInShowSearchDone_ShowsTryASite() {
+    func test_OnUpdateStateFor_PerformsSearch_WhenInShowSearchDone_ThenStateIsShowTryASite() {
         // Given
         stateMachine.state = .showSearchDone
         tab.url = URL.makeSearchUrl(from: "test search")
@@ -356,7 +356,7 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         XCTAssertEqual(stateMachine.state, .showTryASite)
     }
 
-    func test_UpdateStateFor_PerformsSearch_WhenInShowTryASite_ShowsTryASiteSeen() {
+    func test_OnUpdateStateFor_PerformsSearch_WhenInShowTryASite_ThenStateIsShowsTryASiteSeen() {
         // Given
         stateMachine.state = .showTryASite
         tab.url = URL.makeSearchUrl(from: "test search")
@@ -368,7 +368,7 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         XCTAssertEqual(stateMachine.state, .tryASiteSeen)
     }
 
-    func test_UpdateStateFor_PerformsSearch_WhenInShowBlockedTrackers_ShowsSearchDoneShowBlockedTrackers() {
+    func test_OnUpdateStateFor_PerformsSearch_WhenInShowBlockedTrackers_ThenStateIsShowsSearchDoneShowBlockedTrackers() {
         // Given
         stateMachine.state = .showBlockedTrackers
         tab.url = URL.makeSearchUrl(from: "test search")
@@ -380,7 +380,7 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         XCTAssertEqual(stateMachine.state, .searchDoneShowBlockedTrackers)
     }
 
-    func test_UpdateStateFor_PerformsSearch_WhenInShowMajorOrNoTracker_ShowsSearchDoneShowMajorOrNoTracker() {
+    func test_OnUpdateStateFor_PerformsSearch_WhenInShowMajorOrNoTracker_ThenStateIsShowsSearchDoneShowMajorOrNoTracker() {
         // Given
         stateMachine.state = .showMajorOrNoTracker
         tab.url = URL.makeSearchUrl(from: "test search")
@@ -392,7 +392,7 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         XCTAssertEqual(stateMachine.state, .searchDoneShowMajorOrNoTracker)
     }
 
-    func test_UpdateStateFor_PerformsSearch_WhenInSearchDoneShowBlockedTrackers_ShowsSearchDoneSeenShowBlockedTrackers() {
+    func test_OnUpdateStateFor_PerformsSearch_WhenInSearchDoneShowBlockedTrackers_ThenStateIsShowsSearchDoneSeenShowBlockedTrackers() {
         // Given
         stateMachine.state = .searchDoneShowBlockedTrackers
         tab.url = URL.makeSearchUrl(from: "test search")
@@ -404,7 +404,7 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         XCTAssertEqual(stateMachine.state, .searchDoneSeenShowBlockedTrackers)
     }
 
-    func test_UpdateStateFor_PerformsSearch_WhenInSearchDoneShowMajorOrNoTracker_ShowsSearchDoneSeenShowMajorOrNoTracker() {
+    func test_OnUpdateStateFor_PerformsSearch_WhenInSearchDoneShowMajorOrNoTracker_ThenStateIsShowsSearchDoneSeenShowMajorOrNoTracker() {
         // Given
         stateMachine.state = .searchDoneShowMajorOrNoTracker
         tab.url = URL.makeSearchUrl(from: "test search")
@@ -416,7 +416,7 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         XCTAssertEqual(stateMachine.state, .searchDoneSeenShowMajorOrNoTracker)
     }
 
-    func test_UpdateStateFor_PerformsSearch_WhenInSearchDoneSeenShowBlockedTrackers_ShowsShowFireButton() {
+    func test_OnUpdateStateFor_PerformsSearch_WhenInSearchDoneSeenShowBlockedTrackers_ThenStateIsShowsShowFireButton() {
         // Given
         stateMachine.state = .searchDoneSeenShowBlockedTrackers
         tab.url = URL.makeSearchUrl(from: "test search")
@@ -428,7 +428,7 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         XCTAssertEqual(stateMachine.state, .showFireButton)
     }
 
-    func test_UpdateStateFor_PerformsSearch_WhenInSearchDoneSeenShowMajorOrNoTracker_ShowsShowFireButton() {
+    func test_OnUpdateStateFor_PerformsSearch_WhenInSearchDoneSeenShowMajorOrNoTracker_ThenStateIsShowsShowFireButton() {
         // Given
         stateMachine.state = .searchDoneSeenShowMajorOrNoTracker
         tab.url = URL.makeSearchUrl(from: "test search")
@@ -440,7 +440,7 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         XCTAssertEqual(stateMachine.state, .showFireButton)
     }
 
-    func test_UpdateStateFor_PerformsSearch_WhenInFireUsedShowSearchDone_ShowsShowHighFive() {
+    func test_OnUpdateStateFor_PerformsSearch_WhenInFireUsedShowSearchDone_ThenStateIsShowsShowHighFive() {
         // Given
         stateMachine.state = .fireUsedShowSearchDone
         tab.url = URL.makeSearchUrl(from: "test search")
@@ -452,7 +452,7 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         XCTAssertEqual(stateMachine.state, .showHighFive)
     }
 
-    func test_UpdateStateFor_PerformsSearch_WhenInShowHighFive_ShowsOnboardingCompleted() {
+    func test_OnUpdateStateFor_PerformsSearch_WhenInShowHighFive_ThenStateIsShowsOnboardingCompleted() {
         // Given
         stateMachine.state = .showHighFive
         tab.url = URL.makeSearchUrl(from: "test search")
@@ -464,7 +464,7 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         XCTAssertEqual(stateMachine.state, .onboardingCompleted)
     }
 
-    func test_UpdateStateFor_PerformsSearch_WhenInOnboardingCompleted_DoesNotChangeState() {
+    func test_OnUpdateStateFor_PerformsSearch_WhenInOnboardingCompleted_ThenStateIsDoesNotChangeState() {
         // Given
         stateMachine.state = .onboardingCompleted
         tab.url = URL.makeSearchUrl(from: "test search")
@@ -473,10 +473,10 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         stateMachine.updateStateFor(tab: tab)
 
         // Then
-        XCTAssertEqual(stateMachine.state, .onboardingCompleted)  // State remains the same
+        XCTAssertEqual(stateMachine.state, .onboardingCompleted)
     }
 
-    func test_UpdateStateFor_VisitsSite_WhenInShowTryASearch_ShowsBlockedTrackers() {
+    func test_OnUpdateStateFor_VisitsSite_WhenInShowTryASearch_AndTrackersBlocked_ThenStateIsShowsBlockedTrackers() {
         // Given
         stateMachine.state = .showTryASearch
         tab.url = URL(string: "https://example.com")
@@ -489,7 +489,7 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         XCTAssertEqual(stateMachine.state, .showBlockedTrackers)
     }
 
-    func test_UpdateStateFor_VisitsSite_WhenTrackersBlocked_ShowsShowFireButton() {
+    func test_OnUpdateStateFor_VisitsSite_WhenOnsearchDoneSeenShowBlockedTrackers_AndTrackersBlocked_ThenStateIsShowFireButton() {
         // Given
         stateMachine.state = .searchDoneSeenShowBlockedTrackers
         tab.url = URL(string: "https://example.com")
@@ -502,7 +502,7 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         XCTAssertEqual(stateMachine.state, .showFireButton)
     }
 
-    func test_UpdateStateFor_VisitsSite_WhenNoTrackersBlocked_ShowsSearchDoneShowMajorOrNoTracker() {
+    func test_OnUpdateStateFor_VisitsSite_WhenOnShowSearchDone_AndNoTrackersBlocked_ThenStateIsShowsSearchDoneSeenShowMajorOrNoTracker() {
         // Given
         stateMachine.state = .showSearchDone
         tab.url = URL(string: "https://example.com")
@@ -515,7 +515,7 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         XCTAssertEqual(stateMachine.state, .searchDoneSeenShowMajorOrNoTracker)
     }
 
-    func test_UpdateStateFor_VisitsSiteAfterSearch_WithTrackers_MovesToSearchDoneShowBlockedTrackers() {
+    func test_OnUpdateStateFor_VisitsSite_WhenOnShowSearchDone_ThenStateIsSearchDoneSeenShowBlockedTrackers() {
         // Given
         stateMachine.state = .showSearchDone
         tab.url = URL(string: "https://example.com")
@@ -528,7 +528,7 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         XCTAssertEqual(stateMachine.state, .searchDoneSeenShowBlockedTrackers)
     }
 
-    func test_UpdateStateFor_VisitsSiteAfterSearch_WithBlockedTrackers_MovesToSearchDoneSeenShowBlockedTrackers() {
+    func test_OnUpdateStateFor_VisitsSite_WhenOnSearchDoneShowBlockedTrackers_AndBlockedTrackers_ThenStateIsShowFireButton() {
         // Given
         stateMachine.state = .searchDoneShowBlockedTrackers
         tab.url = URL(string: "https://example.com")
@@ -541,7 +541,7 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         XCTAssertEqual(stateMachine.state, .showFireButton)
     }
 
-    func test_UpdateStateFor_VisitsSiteAfterSearch_WithNoTrackers_MovesToSearchDoneSeenShowMajorOrNoTracker() {
+    func test_OnUpdateStateFor_VisitsSite_WhenOnsearchDoneShowMajorOrNoTracker_AndNoTrackers_ThenStateIsSearchDoneSeenShowMajorOrNoTracker() {
         // Given
         stateMachine.state = .searchDoneShowMajorOrNoTracker
         tab.url = URL(string: "https://example.com")
@@ -554,7 +554,7 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         XCTAssertEqual(stateMachine.state, .searchDoneShowMajorOrNoTracker)
     }
 
-    func test_UpdateStateFor_VisitsSite_TrackersSeen_TransitionsToShowFireButton() {
+    func test_OnUpdateStateFor_VisitsSite_WhenOnShowBlockedTrackers_ThenStateIsShowFireButton() {
         // Given
         stateMachine.state = .showBlockedTrackers
         tab.url = URL(string: "https://example.com")
@@ -567,7 +567,7 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         XCTAssertEqual(stateMachine.state, .showFireButton)
     }
 
-    func test_UpdateStateFor_VisitsSite_WithoutTrackers_DoesNotUpdateStateFromShowBlockedTrackers() {
+    func test_OnUpdateStateFor_VisitsSite_WhenOnShowBlockedTrackers_AndNoTrackers_stateIsShowFireButton() {
         // Given
         stateMachine.state = .showBlockedTrackers
         tab.url = URL(string: "https://example.com")
@@ -580,7 +580,7 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         XCTAssertEqual(stateMachine.state, .showFireButton)
     }
 
-    func test_UpdateStateFor_VisitsDuckDuckGoSearch_DoesNotChangeStateFromOnboardingCompleted() {
+    func test_OnUpdateStateFor_VisitsSite_WhenOnOnboardingComplete_ThenStateDoesNotChange() {
         // Given
         stateMachine.state = .onboardingCompleted
         tab.url = URL.duckDuckGo
@@ -592,7 +592,7 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         XCTAssertEqual(stateMachine.state, .onboardingCompleted)
     }
 
-    func test_UpdateStateFor_VisitsSite_NoTrackers_ShowsNoDialog() {
+    func test_OnUpdateStateFor_VisitsSite_WhenOnShowTryASearch_AndNoTrackers_ThenStateIsShowMajorOrNoTracker() {
         // Given
         stateMachine.state = .showTryASearch
         tab.url = URL(string: "https://example.com")
@@ -606,22 +606,23 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         XCTAssertEqual(stateMachine.state, .showMajorOrNoTracker)
     }
 
-    func test_UpdateStateFor_VisitsSite_TrackersSeen_ButNotBlocked_DoesNotUpdateState() {
+    func test_OnUpdateStateFor_VisitsSite_WhenOnShowTryASearchAndTrackersBlocked_AfterTrackersNotBlocked_ThenDoesNotUpdateState() {
         // Given
         stateMachine.state = .showTryASearch
         tab.url = URL(string: "https://example.com")
+        mockTrackerMessageProvider.trackerType = .majorTracker
+        stateMachine.updateStateFor(tab: tab)
+        tab.url = URL(string: "https://example2.com")
         mockTrackerMessageProvider.trackerType = .blockedTrackers(entityNames: ["Tracker1"])
-        stateMachine.notBlockedTrackerSeen = true
 
         // When
         stateMachine.updateStateFor(tab: tab)
 
         // Then
         XCTAssertEqual(stateMachine.state, .showBlockedTrackers)
-        XCTAssertTrue(stateMachine.notBlockedTrackerSeen)
     }
 
-    func test_UpdateStateFor_VisitsDuckDuckGoHome_DoesNotUpdateState() {
+    func test_OnUpdateStateFor_VisitsDuckDuckGo_WhenOnShowTryASearch_ThenStateIsShowBlockedTrackers() {
         // Given
         stateMachine.state = .showTryASearch
         tab.url = URL.duckDuckGo

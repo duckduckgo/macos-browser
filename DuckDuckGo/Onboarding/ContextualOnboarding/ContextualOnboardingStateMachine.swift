@@ -151,7 +151,7 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
 
     private weak var lastVisitTab: Tab?
     private var lastVisitSite: URL?
-    var notBlockedTrackerSeen: Bool = false
+    private var notBlockedTrackerSeen: Bool = false
 
     init(trackerMessageProvider: TrackerMessageProviding = TrackerMessageProvider(),
          startupPreferences: StartupPreferences = StartupPreferences.shared) {
