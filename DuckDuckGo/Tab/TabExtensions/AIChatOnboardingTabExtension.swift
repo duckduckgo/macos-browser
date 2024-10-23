@@ -33,7 +33,7 @@ final class AIChatOnboardingTabExtension {
 
         self.notificationCenter = notificationCenter
         self.remoteSettings = remoteSettings
-        
+
         webViewPublisher.sink { [weak self] webView in
             self?.webView = webView
         }.store(in: &cancellables)
@@ -55,17 +55,17 @@ final class AIChatOnboardingTabExtension {
             }
         }
     }
-}
 
-private func isQueryItemEqualToDuckDuckGoAIChat(url: URL) -> Bool {
-    let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
-    if let queryItems = components?.queryItems {
-        if let queryValue = queryItems.first(where: { $0.name == "q" })?.value {
-            return queryValue == "DuckDuckGo+AI+Chat"
+    private func isQueryItemEqualToDuckDuckGoAIChat(url: URL) -> Bool {
+        let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+        if let queryItems = components?.queryItems {
+            if let queryValue = queryItems.first(where: { $0.name == remoteSettings.aiChatURLIdentifiableQuery })?.value {
+                return queryValue == remoteSettings.aiChatURLIdentifiableQueryValue
+            }
         }
-    }
 
-    return false
+        return false
+    }
 }
 
 extension AIChatOnboardingTabExtension: NavigationResponder {

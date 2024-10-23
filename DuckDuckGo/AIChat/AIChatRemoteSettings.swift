@@ -21,6 +21,34 @@ import BrowserServicesKit
 /// This struct serves as a wrapper for PrivacyConfigurationManaging, enabling the retrieval of data relevant to AIChat.
 /// It also fire pixels when necessary data is missing.
 struct AIChatRemoteSettings {
+    enum SettingsValue: String {
+        case cookieName
+        case cookieDomain
+        case aiChatURL
+        case aiChatURLIdentifiableQuery
+        case aiChatURLIdentifiableQueryValue
+
+        var settingsKey: String {
+            switch self {
+            case .cookieName: "onboardingCookieName"
+            case .cookieDomain: "onboardingCookieDomain"
+            case .aiChatURL: "aiChatURL"
+            case .aiChatURLIdentifiableQuery: "aiChatURLIdentifiableQuery"
+            case .aiChatURLIdentifiableQueryValue: "aiChatURLIdentifiableQueryValue"
+            }
+        }
+
+        var defaultValue: String {
+            switch self {
+            case .cookieName: "dcm"
+            case .cookieDomain: "duckduckgo.com"
+            case .aiChatURL: "https://duck.ai"
+            case .aiChatURLIdentifiableQuery: "ia"
+            case .aiChatURLIdentifiableQueryValue: "chat"
+            }
+        }
+    }
+
     private let privacyConfigurationManager: PrivacyConfigurationManaging
     private var settings: PrivacyConfigurationData.PrivacyFeature.FeatureSettings {
         privacyConfigurationManager.privacyConfig.settings(for: .aiChat)
@@ -31,31 +59,36 @@ struct AIChatRemoteSettings {
     }
 
     var onboardingCookieName: String {
-        if let cookieName = settings["onboardingCookieName"] as? String {
-            return cookieName
-        } else {
-            // AICHAT-TODO: sendDebugPixel for no name in settings
-            return "dcm"
-        }
+        getSettingsData(.cookieName)
     }
 
     var onboardingCookieDomain: String {
-        if let cookieDomain = settings["onboardingCookieDomain"] as? String {
-            return cookieDomain
-        } else {
-            // AICHAT-TODO: sendDebugPixel for no domain in settings
-            return "duckduckgo.com"
-        }
+        getSettingsData(.cookieDomain)
+    }
+
+    var aiChatURLIdentifiableQuery: String {
+        getSettingsData(.aiChatURLIdentifiableQuery)
+    }
+
+    var aiChatURLIdentifiableQueryValue: String {
+        getSettingsData(.aiChatURLIdentifiableQueryValue)
     }
 
     var aiChatURL: URL {
-        if let aiChatURLString = settings["aiChatURL"] as? String,
-           let aiChatURL = URL(string: aiChatURLString) {
-            return aiChatURL
+        let urlString = getSettingsData(.aiChatURL)
+        if let url = URL(string: urlString) {
+            return url
         } else {
-            let defaultURL = URL(string: "https://duck.ai")!
-            // AICHAT-TODO: sendDebugPixel for no URL in settings
-            return defaultURL
+            return URL(string: SettingsValue.aiChatURL.defaultValue)!
+        }
+    }
+
+    private func getSettingsData(_ value: SettingsValue) -> String {
+        if let value = settings[value.settingsKey] as? String {
+            return value
+        } else {
+            //fire pixel value.rawValue
+            return value.defaultValue
         }
     }
 
