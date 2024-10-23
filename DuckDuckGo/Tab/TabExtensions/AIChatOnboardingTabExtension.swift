@@ -28,8 +28,8 @@ final class AIChatOnboardingTabExtension {
     private let remoteSettings: AIChatRemoteSettingsProvider
 
     init(webViewPublisher: some Publisher<WKWebView, Never>,
-         notificationCenter: NotificationCenter = .default,
-         remoteSettings: AIChatRemoteSettingsProvider = AIChatRemoteSettings()) {
+         notificationCenter: NotificationCenter,
+         remoteSettings: AIChatRemoteSettingsProvider) {
 
         self.notificationCenter = notificationCenter
         self.remoteSettings = remoteSettings

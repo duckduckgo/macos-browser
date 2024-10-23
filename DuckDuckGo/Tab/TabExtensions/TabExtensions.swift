@@ -202,7 +202,9 @@ extension TabExtensionsBuilder {
         }
 
         add {
-            AIChatOnboardingTabExtension(webViewPublisher: args.webViewFuture)
+            AIChatOnboardingTabExtension(webViewPublisher: args.webViewFuture,
+                                         notificationCenter: .default,
+                                         remoteSettings: AIChatRemoteSettings())
         }
 
         add {
