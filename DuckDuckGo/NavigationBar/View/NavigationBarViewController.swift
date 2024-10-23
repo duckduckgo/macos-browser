@@ -996,7 +996,7 @@ final class NavigationBarViewController: NSViewController {
 
     private func showAIChatOnboardingConfirmationPopover() {
         DispatchQueue.main.async {
-            let viewController = PopoverMessageViewController(message: "AI Chat Shortcut Added!",
+            let viewController = PopoverMessageViewController(message: UserText.aiChatOnboardingPopoverConfirmation,
                                                               image: .successCheckmark)
             viewController.show(onParent: self, relativeTo: self.aiChatButton)
         }
