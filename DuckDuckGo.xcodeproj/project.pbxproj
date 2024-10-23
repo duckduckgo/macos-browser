@@ -224,6 +224,8 @@
 		1EFA1A082C7C7F0F0099F508 /* PrivacyProPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F188267F2BBEB58100D9AC4F /* PrivacyProPixel.swift */; };
 		31031EB72CC94C6E00684340 /* AIChatRemoteSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31031EB62CC94C6C00684340 /* AIChatRemoteSettingsTests.swift */; };
 		31031EB82CC94C6E00684340 /* AIChatRemoteSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31031EB62CC94C6C00684340 /* AIChatRemoteSettingsTests.swift */; };
+		31031EBA2CC9736500684340 /* AIChatOnboardingTabExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31031EB92CC9736500684340 /* AIChatOnboardingTabExtensionTests.swift */; };
+		31031EBB2CC9736500684340 /* AIChatOnboardingTabExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31031EB92CC9736500684340 /* AIChatOnboardingTabExtensionTests.swift */; };
 		310E79BF294A19A8007C49E8 /* FireproofingReferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 310E79BE294A19A8007C49E8 /* FireproofingReferenceTests.swift */; };
 		311B262728E73E0A00FD181A /* TabShadowConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311B262628E73E0A00FD181A /* TabShadowConfig.swift */; };
 		31267C692B640C4200FEF811 /* DataBrokerProtectionFeatureGatekeeper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C5FFB82AF64D120008A79F /* DataBrokerProtectionFeatureGatekeeper.swift */; };
@@ -3335,6 +3337,7 @@
 		1ED910D42B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityTheftRestorationPagesUserScript.swift; sourceTree = "<group>"; };
 		1EEB2D792C986A40000D908B /* SubscriptionPagesUseSubscriptionFeatureTestsForStripe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionPagesUseSubscriptionFeatureTestsForStripe.swift; sourceTree = "<group>"; };
 		31031EB62CC94C6C00684340 /* AIChatRemoteSettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIChatRemoteSettingsTests.swift; sourceTree = "<group>"; };
+		31031EB92CC9736500684340 /* AIChatOnboardingTabExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIChatOnboardingTabExtensionTests.swift; sourceTree = "<group>"; };
 		310E79BE294A19A8007C49E8 /* FireproofingReferenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireproofingReferenceTests.swift; sourceTree = "<group>"; };
 		311B262628E73E0A00FD181A /* TabShadowConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabShadowConfig.swift; sourceTree = "<group>"; };
 		3139A1512AA4B3C000969C7D /* DataBrokerProtectionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionManager.swift; sourceTree = "<group>"; };
@@ -8952,6 +8955,7 @@
 		B6CA4822298CDC0B0067ECCE /* TabExtensionsTests */ = {
 			isa = PBXGroup;
 			children = (
+				31031EB92CC9736500684340 /* AIChatOnboardingTabExtensionTests.swift */,
 				B6CA4823298CDC2E0067ECCE /* AdClickAttributionTabExtensionTests.swift */,
 				B626A7632992506A00053070 /* SerpHeadersNavigationResponderTests.swift */,
 				1D1C36E529FB019C001FA40C /* HistoryTabExtensionTests.swift */,
@@ -11577,6 +11581,7 @@
 				3706FDF6293F661700E42796 /* DuckPlayerTests.swift in Sources */,
 				3706FDF7293F661700E42796 /* WebViewExtensionTests.swift in Sources */,
 				9FA5A0AA2BC900FC00153786 /* BookmarkAllTabsDialogViewModelTests.swift in Sources */,
+				31031EBB2CC9736500684340 /* AIChatOnboardingTabExtensionTests.swift in Sources */,
 				56534DEE29DF252C00121467 /* CapturingDefaultBrowserProvider.swift in Sources */,
 				561D29C32BDA745B007B91D0 /* MockSyncPausedStateManaging.swift in Sources */,
 				1EEB2D7B2C986A40000D908B /* SubscriptionPagesUseSubscriptionFeatureTestsForStripe.swift in Sources */,
@@ -13232,6 +13237,7 @@
 				B6106BA026A7BE0B0013B453 /* PermissionManagerTests.swift in Sources */,
 				4B59CC8C290083240058F2F6 /* ConnectBitwardenViewModelTests.swift in Sources */,
 				37DB56F52C3B3C420093D4DC /* MockRemoteMessagingStore.swift in Sources */,
+				31031EBA2CC9736500684340 /* AIChatOnboardingTabExtensionTests.swift in Sources */,
 				B68412202B6A30680092F66A /* StringExtensionTests.swift in Sources */,
 				B6106BB526A809E60013B453 /* GeolocationProviderTests.swift in Sources */,
 				BDA764912BC4E57200D0400C /* MockVPNLocationFormatter.swift in Sources */,
