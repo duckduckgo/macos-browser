@@ -81,7 +81,6 @@ struct AIChatRemoteSettings {
             return value
         } else {
             // Fire unique pixel for value.rawValue
-            print("FIRE \(value.rawValue)")
             return value.defaultValue
         }
     }

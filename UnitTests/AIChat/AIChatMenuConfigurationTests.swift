@@ -38,8 +38,6 @@ class AIChatMenuConfigurationTests: XCTestCase {
 
     func testShouldDisplayApplicationMenuShortcut() {
         mockStorage.showShortcutInApplicationMenu = true
-        let featureEnabled = true
-
         let result = configuration.shouldDisplayApplicationMenuShortcut
 
         XCTAssertTrue(result, "Application menu shortcut should be displayed when enabled.")
@@ -47,16 +45,9 @@ class AIChatMenuConfigurationTests: XCTestCase {
 
     func testShouldDisplayToolbarShortcut() {
         mockStorage.shouldDisplayToolbarShortcut = true
-        let featureEnabled = true
         let result = configuration.shouldDisplayToolbarShortcut
 
         XCTAssertTrue(result, "Toolbar shortcut should be displayed when enabled.")
-    }
-
-    func testShortcutURL() {
-        let url = configuration.shortcutURL
-
-        XCTAssertEqual(url.absoluteString, "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=2", "Shortcut URL should match the expected URL.")
     }
 
     func testToolbarValuesChangedPublisher() {
@@ -98,6 +89,10 @@ class AIChatMenuConfigurationTests: XCTestCase {
 }
 
 class MockAIChatPreferencesStorage: AIChatPreferencesStorage {
+    var didDisplayAIChatToolbarOnboarding: Bool = false
+
+    func reset() { }
+
     var showShortcutInApplicationMenu: Bool = false {
         didSet {
             showShortcutInApplicationMenuSubject.send(showShortcutInApplicationMenu)
@@ -128,4 +123,6 @@ class MockAIChatPreferencesStorage: AIChatPreferencesStorage {
     func updateToolbarShortcutDisplay(to value: Bool) {
         shouldDisplayToolbarShortcut = value
     }
+
+    func markToolbarOnboardingPopoverAsShown() { }
 }
