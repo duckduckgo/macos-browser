@@ -277,6 +277,7 @@ final class HomePageViewController: NSViewController {
 
     private func showSettingsOnboardingIfNeeded() {
         if !settingsVisibilityModel.didShowSettingsOnboarding {
+            // async dispatch in order to get the final value for self.view.bounds
             DispatchQueue.main.async {
                 guard let superview = self.view.superview else {
                     return
