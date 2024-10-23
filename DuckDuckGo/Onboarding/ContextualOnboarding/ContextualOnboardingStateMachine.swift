@@ -70,15 +70,30 @@ enum ContextualOnboardingState: String {
     // From this state, after a search, it will show nothing.
     case showTryASite
 
+    // State applied after the first search and the "Try A Site" dialog has been seen.
+    // From this state, after a website visit, it will show a "Tracker" dialog.
+    // From this state, after a search, it will show nothing.
+    case tryASiteSeen
+
     // State applied after the first time a site is visited where trackers were blocked, and a search occurred before.
     // From this state, after a website visit, it will show the "Try Fire Button" dialog.
-    // From this state, after a search, it will show nothing.
+    // From this state, after a search, it will show the "Search Done" dialog.
     case searchDoneShowBlockedTrackers
 
     // State applied after the first time a site is visited where no trackers were blocked, and a search occurred before.
     // From this state, after a website visit, it will show a "Tracker" dialog if a tracker is blocked; otherwise, nothing.
-    // From this state, after a search, it will show nothing.
+    // From this state, after a search, it will show the "Search Done" dialog.
     case searchDoneShowMajorOrNoTracker
+
+    // State applied after a searchDone dialog is seen and blocked tracker were previously seen.
+    // From this state, after a website visit, it will show the "Try Fire Button" dialog.
+    // From this state, after a search, it will show nothing.
+    case searchDoneSeenShowBlockedTrackers
+
+    // State applied after a searchDone dialog is seen and blocked tracker were previously seen.
+    // From this state, after a website visit, it will show the "Try Fire Button" dialog.
+    // From this state, after a search, it will show nothing.
+    case searchDoneSeenShowMajorOrNoTracker
 
     // State applied when, after the "Try a search" dialog is displayed, the fire button is used.
     // From this state, after a website visit, it will show a "Tracker" dialog.
@@ -188,12 +203,12 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
         switch state {
         case .showTryASearch:
             return .tryASearch
-        case .showMajorOrNoTracker, .searchDoneShowMajorOrNoTracker:
+        case .showMajorOrNoTracker, .searchDoneShowMajorOrNoTracker, .searchDoneSeenShowMajorOrNoTracker:
             if !notBlockedTrackerSeen {
                 return trackerDialog(for: privacyInfo)
             }
             return nil
-        case .showBlockedTrackers, .searchDoneShowBlockedTrackers, .fireUsedShowSearchDone:
+        case .showBlockedTrackers, .searchDoneShowBlockedTrackers, .searchDoneSeenShowBlockedTrackers, .fireUsedShowSearchDone:
             return trackerDialog(for: privacyInfo)
         case .showFireButton:
             return .tryFireButton
@@ -254,12 +269,18 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
             state = .showSearchDone
         case .showSearchDone:
             state = .showTryASite
+        case .showTryASite:
+            state = .tryASiteSeen
         case .showBlockedTrackers:
             state = .searchDoneShowBlockedTrackers
         case .showMajorOrNoTracker:
             state = .searchDoneShowMajorOrNoTracker
-        case .searchDoneShowBlockedTrackers, .searchDoneShowMajorOrNoTracker:
-            state = .showTryASite
+        case .searchDoneShowBlockedTrackers:
+            state = .searchDoneSeenShowBlockedTrackers
+        case .searchDoneShowMajorOrNoTracker:
+            state = .searchDoneSeenShowMajorOrNoTracker
+        case .searchDoneSeenShowBlockedTrackers, .searchDoneSeenShowMajorOrNoTracker:
+            state = .showFireButton
         case .showFireButton, .fireUsedShowSearchDone:
             state = .showHighFive
         case .showHighFive:
@@ -277,21 +298,21 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
         switch state {
         case .notStarted:
             state = .showTryASearch
-        case .showTryASearch, .showTryASite, .fireUsedTryASearchShown:
+        case .showTryASearch, .fireUsedTryASearchShown:
             if case .blockedTrackers = trackerType {
                 state = .showBlockedTrackers
             } else if trackerType != nil {
                 state = .showMajorOrNoTracker
             }
-        case .showSearchDone:
+        case .showSearchDone, .showTryASite, .tryASiteSeen:
             if case .blockedTrackers = trackerType {
-                state = .searchDoneShowBlockedTrackers
+                state = .searchDoneSeenShowBlockedTrackers
             } else if trackerType != nil {
-                state = .searchDoneShowMajorOrNoTracker
+                state = .searchDoneSeenShowMajorOrNoTracker
             }
-        case .showBlockedTrackers, .searchDoneShowBlockedTrackers:
+        case .showBlockedTrackers, .searchDoneShowBlockedTrackers, .searchDoneSeenShowBlockedTrackers:
             state = .showFireButton
-        case .showMajorOrNoTracker, .searchDoneShowMajorOrNoTracker:
+        case .showMajorOrNoTracker, .searchDoneShowMajorOrNoTracker, .searchDoneSeenShowMajorOrNoTracker:
             if case .blockedTrackers = trackerType {
                 state = .showBlockedTrackers
             } else {
@@ -312,7 +333,7 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
         switch state {
         case .showSearchDone, .fireUsedShowSearchDone:
             state = .showTryASite
-        case .showBlockedTrackers, .showMajorOrNoTracker, .searchDoneShowBlockedTrackers, .searchDoneShowMajorOrNoTracker:
+        case .showBlockedTrackers, .showMajorOrNoTracker, .searchDoneShowBlockedTrackers, .searchDoneShowMajorOrNoTracker, .searchDoneSeenShowBlockedTrackers, .searchDoneSeenShowMajorOrNoTracker:
             state = .showFireButton
         case .showFireButton:
             state = .showHighFive
@@ -329,7 +350,7 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
             state = .fireUsedTryASearchShown
         case .fireUsedShowSearchDone:
             state = .showHighFive
-        case .showBlockedTrackers, .showMajorOrNoTracker, .showTryASite, .searchDoneShowBlockedTrackers, .searchDoneShowMajorOrNoTracker, .showSearchDone:
+        case .showBlockedTrackers, .showMajorOrNoTracker, .showTryASite, .tryASiteSeen, .searchDoneShowBlockedTrackers, .searchDoneSeenShowBlockedTrackers, .searchDoneShowMajorOrNoTracker, .searchDoneSeenShowMajorOrNoTracker, .showSearchDone:
             state = .showFireButton
         case .showHighFive:
             state = .onboardingCompleted

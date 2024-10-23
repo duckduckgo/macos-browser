@@ -46,7 +46,7 @@ final class LoginItemsManager: LoginItemsManaging {
         for item in items {
             do {
                 try item.enable()
-                Logger.networkProtection.debug("🟢 Enabled successfully \(String(describing: item), privacy: .public)")
+                Logger.networkProtection.log("🟢 Enabled successfully \(String(describing: item), privacy: .public)")
             } catch let error as NSError {
                 handleError(for: item, action: .enable, error: error)
             }
@@ -59,7 +59,7 @@ final class LoginItemsManager: LoginItemsManaging {
         for item in items {
             do {
                 try item.enable()
-                Logger.networkProtection.debug("🟢 Enabled successfully \(String(describing: item), privacy: .public)")
+                Logger.networkProtection.log("🟢 Enabled successfully \(String(describing: item), privacy: .public)")
             } catch let error as NSError {
                 handleError(for: item, action: .enable, error: error)
                 throw error
@@ -71,7 +71,7 @@ final class LoginItemsManager: LoginItemsManaging {
         for item in items {
             do {
                 try item.restart()
-                Logger.networkProtection.debug("🟢 Restarted successfully \(String(describing: item), privacy: .public)")
+                Logger.networkProtection.log("🟢 Restarted successfully \(String(describing: item), privacy: .public)")
             } catch let error as NSError {
                 handleError(for: item, action: .restart, error: error)
             }
