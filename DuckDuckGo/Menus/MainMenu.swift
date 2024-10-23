@@ -82,8 +82,10 @@ final class MainMenu: NSMenu {
     let toggleAutofillShortcutMenuItem = NSMenuItem(title: UserText.mainMenuViewShowAutofillShortcut, action: #selector(MainViewController.toggleAutofillShortcut), keyEquivalent: "A")
     let toggleBookmarksShortcutMenuItem = NSMenuItem(title: UserText.mainMenuViewShowBookmarksShortcut, action: #selector(MainViewController.toggleBookmarksShortcut), keyEquivalent: "K")
     let toggleDownloadsShortcutMenuItem = NSMenuItem(title: UserText.mainMenuViewShowDownloadsShortcut, action: #selector(MainViewController.toggleDownloadsShortcut), keyEquivalent: "J")
-
+    var aiChatMenu = NSMenuItem(title: UserText.newAIChatMenuItem, action: #selector(AppDelegate.newAIChat), keyEquivalent: [.option, .command, "n"])
     let toggleNetworkProtectionShortcutMenuItem = NSMenuItem(title: UserText.showNetworkProtectionShortcut, action: #selector(MainViewController.toggleNetworkProtectionShortcut), keyEquivalent: "N")
+
+    let toggleAIChatShortcutMenuItem = NSMenuItem(title: UserText.showAIChatShortcut, action: #selector(MainViewController.toggleAIChatShortcut), keyEquivalent: "L")
 
     // MARK: Window
     let windowsMenu = NSMenu(title: UserText.mainMenuWindow)
@@ -102,12 +104,17 @@ final class MainMenu: NSMenu {
     let releaseNotesMenuItem = NSMenuItem(title: UserText.releaseNotesMenuItem, action: #selector(AppDelegate.showReleaseNotes))
     let whatIsNewMenuItem = NSMenuItem(title: UserText.whatsNewMenuItem, action: #selector(AppDelegate.showWhatIsNew))
     let sendFeedbackMenuItem = NSMenuItem(title: UserText.sendFeedback, action: #selector(AppDelegate.openFeedback))
+    private let aiChatMenuConfig: AIChatMenuVisibilityConfigurable
 
     // MARK: - Initialization
 
     @MainActor
-    init(featureFlagger: FeatureFlagger, bookmarkManager: BookmarkManager, faviconManager: FaviconManagement) {
+    init(featureFlagger: FeatureFlagger,
+         bookmarkManager: BookmarkManager,
+         faviconManager: FaviconManagement,
+         aiChatMenuConfig: AIChatMenuVisibilityConfigurable) {
 
+        self.aiChatMenuConfig = aiChatMenuConfig
         super.init(title: UserText.duckDuckGo)
 
         buildItems {
@@ -124,6 +131,9 @@ final class MainMenu: NSMenu {
 
         subscribeToBookmarkList(bookmarkManager: bookmarkManager)
         subscribeToFavicons(faviconManager: faviconManager)
+
+        setupAIChatMenu()
+        subscribeToAIChatPreferences(aiChatMenuConfig: aiChatMenuConfig)
     }
 
     func buildDuckDuckGoMenu() -> NSMenuItem {
@@ -157,6 +167,9 @@ final class MainMenu: NSMenu {
         NSMenuItem(title: UserText.mainMenuFile) {
             newWindowMenuItem
             NSMenuItem(title: UserText.newBurnerWindowMenuItem, action: #selector(AppDelegate.newBurnerWindow), keyEquivalent: "N")
+
+            aiChatMenu
+
             newTabMenuItem
             openLocationMenuItem
             NSMenuItem.separator()
@@ -264,6 +277,10 @@ final class MainMenu: NSMenu {
             toggleDownloadsShortcutMenuItem
 
             toggleNetworkProtectionShortcutMenuItem
+
+            if aiChatMenuConfig.shouldDisplayToolbarShortcut {
+                toggleAIChatShortcutMenuItem
+            }
 
             NSMenuItem.separator()
 
@@ -462,6 +479,15 @@ final class MainMenu: NSMenu {
             }
     }
 
+    var aiChatCancellable: AnyCancellable?
+    private func subscribeToAIChatPreferences(aiChatMenuConfig: AIChatMenuVisibilityConfigurable) {
+        aiChatCancellable = aiChatMenuConfig.valuesChangedPublisher
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] in
+                self?.setupAIChatMenu()
+            })
+    }
+
     // Nested recursing functions cause body length
     func updateBookmarksMenu(favoriteViewModels: [BookmarkViewModel], topLevelBookmarkViewModels: [BookmarkViewModel]) {
 
@@ -604,7 +630,7 @@ final class MainMenu: NSMenu {
                 NSMenuItem(title: "Reset Email Protection InContext Signup Prompt", action: #selector(MainViewController.resetEmailProtectionInContextPrompt))
                 NSMenuItem(title: "Reset Pixels Storage", action: #selector(MainViewController.resetDailyPixels))
                 NSMenuItem(title: "Reset Remote Messages", action: #selector(AppDelegate.resetRemoteMessages))
-                NSMenuItem(title: "Reset CPM Experiment Cohort (needs restart)", action: #selector(AppDelegate.resetCpmCohort))
+                NSMenuItem(title: "Reset CPM Experiment Cohort", action: #selector(AppDelegate.resetCpmCohort))
                 NSMenuItem(title: "Reset Duck Player Preferences", action: #selector(MainViewController.resetDuckPlayerPreferences))
                 NSMenuItem(title: "Reset Onboarding", action: #selector(MainViewController.resetOnboarding(_:)))
                 NSMenuItem(title: "Reset Contextual Onboarding", action: #selector(MainViewController.resetContextualOnboarding(_:)))
@@ -695,6 +721,10 @@ final class MainMenu: NSMenu {
 
         self.loggingMenu = menu
         return menu
+    }
+
+    private func setupAIChatMenu() {
+        aiChatMenu.isHidden = !aiChatMenuConfig.shouldDisplayApplicationMenuShortcut
     }
 
     private func updateInternalUserItem() {

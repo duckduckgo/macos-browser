@@ -19,7 +19,12 @@
 import Carbon
 import Combine
 import Foundation
+import History
+import OHHTTPStubs
+import OHHTTPStubsSwift
+import Suggestions
 import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
 @available(macOS 12.0, *)
@@ -101,6 +106,8 @@ class AddressBarTests: XCTestCase {
 
         NSError.disableSwizzledDescription = false
         StartupPreferences.shared.launchToCustomHomePage = false
+
+        HTTPStubs.removeAllStubs()
     }
 
     let asciiToCGEventMap: [String: UInt16] = [
@@ -188,6 +195,60 @@ class AddressBarTests: XCTestCase {
 
         XCTAssertEqual(addressBarValue, resultingString)
 
+    }
+
+    @MainActor
+    func testWhenAddressIsTyped_LoadedTopHitSuggestionIsCorrectlyAppendedAndSelected() {
+        // top hits should only work for visited urls
+        HistoryCoordinator.shared.addVisit(of: URL(string: "https://youtube.com")!)
+        let tab = Tab(content: .newtab)
+        window = WindowsManager.openNewWindow(with: tab)!
+
+        let json = """
+        [
+            { "phrase": "youtube.com", "isNav": true },
+            { "phrase": "ducks", "isNav": false },
+        ]
+        """
+        let address = "youtube.com"
+        stub {
+            $0.url!.absoluteString.hasPrefix("https://duckduckgo.com/ac/")
+        } response: { _ in
+            return HTTPStubsResponse(data: json.utf8data, statusCode: 200, headers: nil)
+        }
+
+        // This test reproduces a race condition where the $selectedSuggestionViewModel is published
+        // asynchronously on the main queue in response to user input. This can lead to a situation
+        // where the user-entered text in the suggestion model is one letter shorter than the actual
+        // user input in the address field.
+        // As a result, an extra letter may be selected and overtyped, causing a "skipped
+        // letter" effect or typographical errors. The goal of this test is to verify that the
+        // suggestion model correctly reflects the user's input without any discrepancies.
+        // https://app.asana.com/0/1207340338530322/1208166085652339/f
+        //
+        // Here we simulate receiving the keyboard event right after the suggestion view model received event.
+        var index = address.startIndex
+        let e = expectation(description: "typing done")
+        let c = addressBarTextField.suggestionContainerViewModel!.$selectedSuggestionViewModel
+            .receive(on: DispatchQueue.main)
+            .sink { [unowned self] suggestion in
+                guard suggestion != nil /* suggestion shown */
+                        || index == address.startIndex /* address is empty (first iteration) */ else {
+
+                    return
+                }
+                guard index < address.endIndex else {
+                    e.fulfill() // typing done
+                    return
+                }
+                type(String(address[index]))
+                index = address.index(after: index)
+            }
+
+        waitForExpectations(timeout: 5)
+        withExtendedLifetime(c) {}
+
+        XCTAssertEqual("youtube.com", addressBarValue.prefix("youtube.com".count))
     }
 
     @MainActor
@@ -896,6 +957,7 @@ class AddressBarTests: XCTestCase {
         let zoomButton = mainViewController.navigationBarViewController.addressBarViewController!.addressBarButtonsViewController!.zoomButton!
         XCTAssertTrue(zoomButton.isHidden)
     }
+
 }
 
 protocol MainActorPerformer {
