@@ -141,14 +141,19 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
     private var stateString: String {
         didSet {
             if stateString == ContextualOnboardingState.notStarted.rawValue {
+                // This makes the home page DuckDuckGo during the onboarding
                 startUpPreferences.launchToCustomHomePage = true
+                // This avoids the info sheet on the Fire button popover to be shown during the onboarding
                 fireButtonInfoStateProvider.infoPresentedOnce = true
                 resetData()
             }
             if stateString == ContextualOnboardingState.onboardingCompleted.rawValue {
+                // If the user has not used the fire button 
+                // it will present the info sheet on the Fire button popover when they click on it for the first time
                 if !fireButtonUsedOnce {
                     fireButtonInfoStateProvider.infoPresentedOnce = false
                 }
+                // This resets the home page to be the new tab page after the onboarding
                 startUpPreferences.launchToCustomHomePage = false
                 resetData()
             }
