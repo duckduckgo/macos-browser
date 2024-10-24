@@ -19,10 +19,11 @@
 import BrowserServicesKit
 import Combine
 import ContentBlocking
+import Navigation
+import os.log
 import TrackerRadarKit
 import WebKit
 import XCTest
-import Navigation
 
 @testable import DuckDuckGo_Privacy_Browser
 
@@ -103,8 +104,9 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         }}
 
         schemeHandler = TestSchemeHandler()
-        schemeHandler.middleware = [{ [data] _ in
-            .ok(.html(data.html.utf8String()!))
+        schemeHandler.middleware = [{ [data] in
+            Logger.tests.debug("schemeHandler.middleware \($0.url?.absoluteString ?? "<nil>", privacy: .public)")
+            return .ok(.html(data.html.utf8String()!))
         }]
 
         WKWebView.customHandlerSchemes = [.http, .https]
@@ -116,6 +118,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
 
     func makeContentBlockerRulesUserScript() {
         contentBlockerRulesScript = MockContentBlockerRulesUserScript()
+        Logger.tests.debug("➡️ contentBlockerRulesScriptSubj.send(MockContentBlockerRulesUserScript)")
         contentBlockerRulesScriptSubj.send(contentBlockerRulesScript)
     }
 
@@ -438,44 +441,53 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
             self.makeContentBlockerRulesUserScript()
         }
 
-        detection.onDidStart = { _ in }
-        detection.on2XXResponse = { _ in }
-        logic.onNavigation = { }
-        detection.onDidFinish = { _ in }
+        detection.onDidStart = { Logger.tests.log("detection.onDidStart \($0?.absoluteString ?? "<nil>", privacy: .public)") }
+        detection.on2XXResponse = { Logger.tests.log("detection.on2XXResponse \($0?.absoluteString ?? "<nil>", privacy: .public)") }
+        logic.onNavigation = { Logger.tests.log("logic.onNavigation") }
+        detection.onDidFinish = { Logger.tests.log("detection.onDidFinish \($0?.absoluteString ?? "<nil>", privacy: .public)") }
 
         var onDidFinish = expectation(description: "onDidFinish 1")
-        logic.onDidFinish = { _, _ in
+        logic.onDidFinish = { host, time in
+            Logger.tests.log("logic.onDidFinish \(host ?? "<nil>", privacy: .public) \("\(time)", privacy: .public)")
             onDidFinish.fulfill()
         }
         tab.setContent(.url(urls.url1, source: .link))
         waitForExpectations(timeout: 5)
+        Logger.tests.debug("➡️ setContent \(self.urls.url1.absoluteString, privacy: .public)")
+
         onDidFinish = expectation(description: "onDidFinish 2")
         tab.setContent(.url(urls.url2, source: .link))
         waitForExpectations(timeout: 5)
+        Logger.tests.debug("➡️ setContent \(self.urls.url2.absoluteString, privacy: .public)")
 
         detection.on2XXResponse = nil /*assert*/
         let onBackForward = expectation(description: "detection.onBackForward")
         logic.onBackForward = { [urls] url in
             XCTAssertEqual(url, urls.url1)
+            Logger.tests.log("logic.onBackForward \(url?.absoluteString ?? "<nil>", privacy: .public)")
             onBackForward.fulfill()
         }
         let onDetectionDidStart = expectation(description: "detection.onDidStart")
         detection.onDidStart = { [urls] url in
             XCTAssertEqual(url, urls.url1)
+            Logger.tests.log("detection.onDidStart \(url?.absoluteString ?? "<nil>", privacy: .public)")
             onDetectionDidStart.fulfill()
         }
 
         let onDetectionDidFinish = expectation(description: "detection.onDidFinish")
         let onLogicDidFinish = expectation(description: "logic.onDidFinish")
-        detection.onDidFinish = { _ in
+        detection.onDidFinish = {
+            Logger.tests.log("detection.onDidFinish \($0?.absoluteString ?? "<nil>", privacy: .public)")
             onDetectionDidFinish.fulfill()
         }
         logic.onDidFinish = { [now, urls] host, date in
+            Logger.tests.log("logic.onDidFinish \(host ?? "<nil>", privacy: .public) \("\(date)", privacy: .public)")
             XCTAssertEqual(host, urls.url1.host!)
             XCTAssertEqual(date, now)
             onLogicDidFinish.fulfill()
         }
 
+        Logger.tests.debug("➡️ goBack()")
         tab.goBack()
         waitForExpectations(timeout: 5)
     }
