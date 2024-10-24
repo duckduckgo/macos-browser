@@ -54,11 +54,11 @@ public final class VPNTipsModel: ObservableObject {
     @Published
     private(set) var featureFlag: Bool
 
-    private var tips: TipGrouping
+    //private var tips: TipGrouping
     private let vpnSettings: VPNSettings
     private let logger: Logger
     private var cancellables = Set<AnyCancellable>()
-
+/*
     static func makeTips(forMenuApp isMenuApp: Bool, logger: Logger) -> TipGrouping {
 
         logger.debug("🧉🤌 makeTips")
@@ -104,7 +104,7 @@ public final class VPNTipsModel: ObservableObject {
                 VPNAutoconnectTip()
             }
         }
-    }
+    }*/
 
     public init(featureFlagPublisher: CurrentValuePublisher<Bool, Never>,
                 statusObserver: ConnectionStatusObserver,
@@ -118,7 +118,7 @@ public final class VPNTipsModel: ObservableObject {
         self.connectionStatus = statusObserver.recentValue
         self.featureFlag = featureFlagPublisher.value
         self.logger = logger
-        self.tips = Self.makeTips(forMenuApp: isMenuApp, logger: logger)
+        //self.tips = Self.makeTips(forMenuApp: isMenuApp, logger: logger)
         self.vpnSettings = vpnSettings
 
         if #available(macOS 14.0, *) {
@@ -196,6 +196,7 @@ public final class VPNTipsModel: ObservableObject {
 
     @available(macOS 14.0, *)
     var currentTip: (any Tip)? {
-        tips.currentTip
+        //tips.currentTip
+        return nil
     }
 }
