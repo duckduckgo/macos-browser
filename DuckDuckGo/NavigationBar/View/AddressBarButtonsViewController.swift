@@ -271,7 +271,6 @@ final class AddressBarButtonsViewController: NSViewController {
 
         popovers?.togglePrivacyDashboardPopover(for: tabViewModel, from: privacyEntryPointButton)
         onboardingPixelReporter.trackPrivacyDashboardOpened()
-        popovers?.togglePrivacyDashboardPopover(for: tabViewModel, from: privacyEntryPointButton)
     }
 
     private func updateBookmarkButtonVisibility() {
