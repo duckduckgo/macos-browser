@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1728900024972,
+    "version": 1729758880206,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -59,6 +59,24 @@
                 "domainDetection": "enabled"
             },
             "hash": "b813ade8472a097ffbd43a3331116fe1"
+        },
+        "aiChat": {
+            "state": "disabled",
+            "exceptions": [],
+            "features": {
+                "toolbarShortcut": {
+                    "state": "disabled"
+                },
+                "applicationMenuShortcut": {
+                    "state": "disabled"
+                }
+            },
+            "settings": {
+                "aiChatURL": "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=2",
+                "onboardingCookieName": "dcm",
+                "onboardingCookieDomain": "duckduckgo.com"
+            },
+            "hash": "64a9f318c4cfd9fc702e641d2a69347b"
         },
         "ampLinks": {
             "exceptions": [
@@ -378,11 +396,11 @@
             },
             "state": "enabled",
             "features": {
-                "filterlistExperiment": {
+                "filterlistExperiment2": {
                     "state": "disabled"
                 }
             },
-            "hash": "69add087dec44523d540bf49f1ec1b0f"
+            "hash": "f1e901d6a8760c275cebbac1bf70529a"
         },
         "autofillBreakageReporter": {
             "state": "disabled",
@@ -3534,6 +3552,23 @@
                         ]
                     },
                     {
+                        "domain": "mantan-web.jp",
+                        "rules": [
+                            {
+                                "selector": "center > div",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".ad-rec",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".conteiner__head",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "marketwatch.com",
                         "rules": [
                             {
@@ -4382,6 +4417,10 @@
                             {
                                 "selector": "[data-aa-adunit]",
                                 "type": "hide"
+                            },
+                            {
+                                "selector": "[data-adpath]",
+                                "type": "hide-empty"
                             }
                         ]
                     },
@@ -4875,7 +4914,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "9cbafdd3b48aabf71f6cfb2f986a7181"
+            "hash": "f91fcec45cd63f074ee31f3e276cc6e9"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -5279,31 +5318,13 @@
             "state": "enabled",
             "exceptions": [
                 {
-                    "domain": "allegiantair.com"
-                },
-                {
                     "domain": "boston.com"
                 },
                 {
                     "domain": "costco.com"
                 },
                 {
-                    "domain": "crunchyroll.com"
-                },
-                {
                     "domain": "espn.com"
-                },
-                {
-                    "domain": "eventbrite.com"
-                },
-                {
-                    "domain": "duluthtrading.com"
-                },
-                {
-                    "domain": "web.whatsapp.com"
-                },
-                {
-                    "domain": "verizon.com"
                 },
                 {
                     "domain": "chime.com"
@@ -5312,25 +5333,19 @@
                     "domain": "tirerack.com"
                 },
                 {
-                    "domain": "milesplit.live"
-                },
-                {
                     "domain": "dollargeneral.com"
                 },
                 {
-                    "domain": "monstergear.monsterenergy.com"
+                    "domain": "milesplit.live"
+                },
+                {
+                    "domain": "monsterenergy.com"
                 },
                 {
                     "domain": "npr.org"
                 },
                 {
                     "domain": "norton.com"
-                },
-                {
-                    "domain": "jcrew.com"
-                },
-                {
-                    "domain": "pgealerts.alerts.pge.com"
                 },
                 {
                     "domain": "marvel.com"
@@ -5357,7 +5372,7 @@
                     "privacy-test-pages.site"
                 ]
             },
-            "hash": "4df9d206561ea1251d6348865362de63"
+            "hash": "501bbc6471eb079cb27fa8a2a47467a5"
         },
         "harmfulApis": {
             "settings": {
@@ -5645,9 +5660,9 @@
             "hash": "cbd62a1a63a829da0277ca045a311eb2"
         },
         "newTabSearchField": {
-            "state": "internal",
+            "state": "disabled",
             "exceptions": [],
-            "hash": "f1daaefe788583c2a00d7d19a23864a7"
+            "hash": "c292bb627849854515cebbded288ef5a"
         },
         "nonTracking3pCookies": {
             "settings": {
@@ -7467,6 +7482,7 @@
                                     "bodyelectricvitality.com.au",
                                     "cosmicbook.news",
                                     "eatroyo.com",
+                                    "experian.com",
                                     "thesimsresource.com",
                                     "tradersync.com",
                                     "vanguardplan.com"
@@ -9406,7 +9422,7 @@
                     "domain": "instructure.com"
                 }
             ],
-            "hash": "decc4b889c1d10bde764604562463b3c"
+            "hash": "2cc872ccc68d442e2266666f731709e2"
         },
         "trackingCookies1p": {
             "settings": {
@@ -9847,6 +9863,11 @@
             "exceptions": [],
             "state": "disabled",
             "hash": "728493ef7a1488e4781656d3f9db84aa"
+        },
+        "windowsNewTabPageExperiment": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
         },
         "windowsPermissionUsage": {
             "exceptions": [],

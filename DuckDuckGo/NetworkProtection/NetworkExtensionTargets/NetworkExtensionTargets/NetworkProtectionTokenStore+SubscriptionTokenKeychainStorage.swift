@@ -33,7 +33,7 @@ extension NetworkProtectionKeychainTokenStore: SubscriptionTokenStoring {
         if token.hasPrefix("ddg:") {
             token = token.replacingOccurrences(of: "ddg:", with: "")
         }
-        Logger.networkProtection.debug("🟢 Wrapper successfully fetched token \(token)")
+        Logger.networkProtection.log("🟢 Wrapper successfully fetched token \(token)")
         return token
     }
 
