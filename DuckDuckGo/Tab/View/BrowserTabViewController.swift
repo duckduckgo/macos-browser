@@ -461,7 +461,6 @@ final class BrowserTabViewController: NSViewController {
         let daxView = onboardingDialogFactory.makeView(
             for: dialogType,
             delegate: tab,
-            onboardingPixelReorter: OnboardingPixelReporter(),
             onDismiss: onDismissAction,
             onGotItPressed: onGotItPressed,
             onFireButtonPressed: { [weak delegate] in

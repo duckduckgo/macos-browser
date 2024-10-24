@@ -97,10 +97,10 @@ extension OnboardingPixelReporter: OnboardingFireReporting {
 
 extension OnboardingPixelReporter: OnboardingDialogsReporting {
     func trackLastDialogShown() {
-        PixelKit.fire(ContextualOnboardingPixel.onboardingFinished)
+        fire(ContextualOnboardingPixel.onboardingFinished, .unique)
     }
 
     func trackFireButtonSkipped() {
-        PixelKit.fire(ContextualOnboardingPixel.onboardingFireButtonPromptSkipPressed)
+        fire(ContextualOnboardingPixel.onboardingFireButtonPromptSkipPressed, .unique)
     }
 }

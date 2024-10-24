@@ -72,6 +72,12 @@ final class OnboardingPixelReporterTests: XCTestCase {
             }
         }
     }
+
+    func test_WhenTrackFireButtonSkipped_ThenOnboardingFireButtonPromptSkipPressedSent() {
+        reporter.trackFireButtonSkipped()
+        XCTAssertEqual(eventSent?.name, ContextualOnboardingPixel.onboardingFireButtonPromptSkipPressed.name)
+        XCTAssertEqual(frequency, .unique)
+    }
 }
 
 class MockContextualOnboardingState: ContextualOnboardingStateUpdater {
