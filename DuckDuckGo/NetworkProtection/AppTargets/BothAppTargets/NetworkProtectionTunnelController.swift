@@ -753,7 +753,42 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     /// extra Included Routes appended to 0.0.0.0, ::/0 (peers) and interface.addresses
     @MainActor
     private func includedRoutes() -> [NetworkProtection.IPAddressRange] {
-        []
+        [
+            IPAddressRange(stringLiteral: "0.0.0.0/0"),
+            IPAddressRange(stringLiteral: "1.0.0.0/8"),
+            IPAddressRange(stringLiteral: "2.0.0.0/8"),
+            IPAddressRange(stringLiteral: "3.0.0.0/8"),
+            IPAddressRange(stringLiteral: "4.0.0.0/6"),
+            IPAddressRange(stringLiteral: "8.0.0.0/7"),
+            IPAddressRange(stringLiteral: "11.0.0.0/8"),
+            IPAddressRange(stringLiteral: "12.0.0.0/6"),
+            IPAddressRange(stringLiteral: "16.0.0.0/4"),
+            IPAddressRange(stringLiteral: "32.0.0.0/3"),
+            IPAddressRange(stringLiteral: "64.0.0.0/2"),
+            IPAddressRange(stringLiteral: "128.0.0.0/3"),
+            IPAddressRange(stringLiteral: "160.0.0.0/5"),
+            IPAddressRange(stringLiteral: "168.0.0.0/6"),
+            IPAddressRange(stringLiteral: "172.0.0.0/12"),
+            IPAddressRange(stringLiteral: "172.32.0.0/11"),
+            IPAddressRange(stringLiteral: "172.64.0.0/10"),
+            IPAddressRange(stringLiteral: "172.128.0.0/9"),
+            IPAddressRange(stringLiteral: "173.0.0.0/8"),
+            IPAddressRange(stringLiteral: "174.0.0.0/7"),
+            IPAddressRange(stringLiteral: "176.0.0.0/4"),
+            IPAddressRange(stringLiteral: "192.0.0.0/9"),
+            IPAddressRange(stringLiteral: "192.128.0.0/11"),
+            IPAddressRange(stringLiteral: "192.160.0.0/13"),
+            IPAddressRange(stringLiteral: "192.169.0.0/16"),
+            IPAddressRange(stringLiteral: "192.170.0.0/15"),
+            IPAddressRange(stringLiteral: "192.172.0.0/14"),
+            IPAddressRange(stringLiteral: "192.176.0.0/12"),
+            IPAddressRange(stringLiteral: "192.192.0.0/10"),
+            IPAddressRange(stringLiteral: "193.0.0.0/8"),
+            IPAddressRange(stringLiteral: "194.0.0.0/7"),
+            IPAddressRange(stringLiteral: "196.0.0.0/6"),
+            IPAddressRange(stringLiteral: "200.0.0.0/5"),
+            IPAddressRange(stringLiteral: "208.0.0.0/4")
+         ]
     }
 
     /* Temporarily disabled - https://app.asana.com/0/0/1205766100762904/f
