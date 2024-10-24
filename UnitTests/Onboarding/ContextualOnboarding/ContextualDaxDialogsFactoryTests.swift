@@ -249,7 +249,7 @@ class CapturingOnboardingPixelReporter: OnboardingPixelReporting {
     func trackSearchSuggetionOptionTapped() {
     }
 
-    func trackSiteSuggestionOptionTapped() {
+    func trackSiteSuggetionOptionTapped() {
     }
 
     func trackFireButtonTryIt() {

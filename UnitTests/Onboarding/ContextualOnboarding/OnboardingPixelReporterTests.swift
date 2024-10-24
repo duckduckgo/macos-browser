@@ -47,7 +47,7 @@ final class OnboardingPixelReporterTests: XCTestCase {
     }
 
     func test_WhenTrackSiteSuggestionOptionTapped_ThenSiteSuggetionOptionTappedEventSent() throws {
-        reporter.trackSiteSuggestionOptionTapped()
+        reporter.trackSiteSuggetionOptionTapped()
         XCTAssertEqual(eventSent?.name, ContextualOnboardingPixel.siteSuggetionOptionTapped.name)
         XCTAssertEqual(frequency, .unique)
     }
