@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1729265730687,
+    "version": 1729758880206,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -61,17 +61,22 @@
             "hash": "b813ade8472a097ffbd43a3331116fe1"
         },
         "aiChat": {
-            "state": "enabled",
+            "state": "disabled",
             "exceptions": [],
             "features": {
                 "toolbarShortcut": {
-                    "state": "enabled"
+                    "state": "disabled"
                 },
                 "applicationMenuShortcut": {
-                    "state": "enabled"
+                    "state": "disabled"
                 }
             },
-            "hash": "d8a18aa2c020d7bdef900fc8c00f01b2"
+            "settings": {
+                "aiChatURL": "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=2",
+                "onboardingCookieName": "dcm",
+                "onboardingCookieDomain": "duckduckgo.com"
+            },
+            "hash": "64a9f318c4cfd9fc702e641d2a69347b"
         },
         "ampLinks": {
             "exceptions": [
@@ -5331,6 +5336,9 @@
                     "domain": "dollargeneral.com"
                 },
                 {
+                    "domain": "milesplit.live"
+                },
+                {
                     "domain": "monsterenergy.com"
                 },
                 {
@@ -5364,7 +5372,7 @@
                     "privacy-test-pages.site"
                 ]
             },
-            "hash": "64f354e852c4e0926e39fe59a72e4ac4"
+            "hash": "501bbc6471eb079cb27fa8a2a47467a5"
         },
         "harmfulApis": {
             "settings": {
@@ -5652,9 +5660,9 @@
             "hash": "cbd62a1a63a829da0277ca045a311eb2"
         },
         "newTabSearchField": {
-            "state": "internal",
+            "state": "disabled",
             "exceptions": [],
-            "hash": "f1daaefe788583c2a00d7d19a23864a7"
+            "hash": "c292bb627849854515cebbded288ef5a"
         },
         "nonTracking3pCookies": {
             "settings": {
@@ -9855,6 +9863,11 @@
             "exceptions": [],
             "state": "disabled",
             "hash": "728493ef7a1488e4781656d3f9db84aa"
+        },
+        "windowsNewTabPageExperiment": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
         },
         "windowsPermissionUsage": {
             "exceptions": [],
