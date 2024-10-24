@@ -29,7 +29,7 @@ enum ViewHighlighter {
 
         let animationView = LottieAnimationView.makePulseAnimationView()
         animationView.identifier = NSUserInterfaceItemIdentifier(identifier)
-        let multiplier = 2.0
+        let multiplier = 1.6
         parent.addSubview(animationView)
 
         NSLayoutConstraint.activate([
