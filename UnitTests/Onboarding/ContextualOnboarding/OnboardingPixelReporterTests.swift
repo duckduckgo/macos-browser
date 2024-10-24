@@ -84,6 +84,12 @@ final class OnboardingPixelReporterTests: XCTestCase {
         XCTAssertEqual(eventSent?.name, ContextualOnboardingPixel.onboardingFireButtonTryItPressed.name)
         XCTAssertEqual(frequency, .unique)
     }
+
+    func test_WhenTrackLastDialogShown_ThenOnboardingFinishedSent() {
+        reporter.trackLastDialogShown()
+        XCTAssertEqual(eventSent?.name, ContextualOnboardingPixel.onboardingFinished.name)
+        XCTAssertEqual(frequency, .unique)
+    }
 }
 
 class MockContextualOnboardingState: ContextualOnboardingStateUpdater {

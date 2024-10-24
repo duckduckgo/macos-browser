@@ -1551,6 +1551,8 @@
 		560C6ED72CCA5CE100D411E2 /* FindInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560C6ED52CCA5CE100D411E2 /* FindInView.swift */; };
 		560C6ED82CCA5CE700D411E2 /* FindInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560C6ED52CCA5CE100D411E2 /* FindInView.swift */; };
 		560C6ED92CCA5CE700D411E2 /* FindInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560C6ED52CCA5CE100D411E2 /* FindInView.swift */; };
+		560C6EDB2CCA6D5200D411E2 /* OnboardingFireButtonDialogViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560C6EDA2CCA6D5200D411E2 /* OnboardingFireButtonDialogViewModelTests.swift */; };
+		560C6EDC2CCA6D5200D411E2 /* OnboardingFireButtonDialogViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560C6EDA2CCA6D5200D411E2 /* OnboardingFireButtonDialogViewModelTests.swift */; };
 		560EB9322C78946F0080DBC8 /* ContextualOnboardingDialogs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560EB9312C78946F0080DBC8 /* ContextualOnboardingDialogs.swift */; };
 		560EB9332C78946F0080DBC8 /* ContextualOnboardingDialogs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560EB9312C78946F0080DBC8 /* ContextualOnboardingDialogs.swift */; };
 		560EB9352C7897370080DBC8 /* Onboarding in Frameworks */ = {isa = PBXBuildFile; productRef = 560EB9342C7897370080DBC8 /* Onboarding */; };
@@ -3778,6 +3780,7 @@
 		560C6ECC2CCA5BCB00D411E2 /* ContextualDaxDialogFactoryIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextualDaxDialogFactoryIntegrationTests.swift; sourceTree = "<group>"; };
 		560C6ECF2CCA5C6000D411E2 /* CapturingOnboardingNavigationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturingOnboardingNavigationDelegate.swift; sourceTree = "<group>"; };
 		560C6ED52CCA5CE100D411E2 /* FindInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindInView.swift; sourceTree = "<group>"; };
+		560C6EDA2CCA6D5200D411E2 /* OnboardingFireButtonDialogViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingFireButtonDialogViewModelTests.swift; sourceTree = "<group>"; };
 		560EB9312C78946F0080DBC8 /* ContextualOnboardingDialogs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextualOnboardingDialogs.swift; sourceTree = "<group>"; };
 		560EB9382C789A450080DBC8 /* OnboardingSuggestedSearchesProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingSuggestedSearchesProvider.swift; sourceTree = "<group>"; };
 		5614B3A02BBD639D009B5031 /* ZoomPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomPopover.swift; sourceTree = "<group>"; };
@@ -6642,6 +6645,7 @@
 				56A214AE2CB583BF00E5BC0E /* TrackerMessageProviderTests.swift */,
 				9FBB0C082CBD39B70006B6A6 /* ViewHighlighterTests.swift */,
 				560C6EC82CCA381A00D411E2 /* OnboardingPixelReporterTests.swift */,
+				560C6EDA2CCA6D5200D411E2 /* OnboardingFireButtonDialogViewModelTests.swift */,
 			);
 			path = ContextualOnboarding;
 			sourceTree = "<group>";
@@ -11560,6 +11564,7 @@
 				37DB56F62C3B3C420093D4DC /* MockRemoteMessagingStore.swift in Sources */,
 				9F872DA12B90644800138637 /* ContextualMenuTests.swift in Sources */,
 				3706FDFA293F661700E42796 /* DefaultBrowserPreferencesTests.swift in Sources */,
+				560C6EDC2CCA6D5200D411E2 /* OnboardingFireButtonDialogViewModelTests.swift in Sources */,
 				9FBD84782BB3E54200220859 /* InstallationAttributionPixelHandlerTests.swift in Sources */,
 				3706FDFB293F661700E42796 /* DispatchQueueExtensionsTests.swift in Sources */,
 				9F180D102B69C553000D695F /* Tab+WKUIDelegateTests.swift in Sources */,
@@ -13413,6 +13418,7 @@
 				1D3B1AC62937A478006F4388 /* BWRequestTests.swift in Sources */,
 				B630793A26731F2600DCEE41 /* FileDownloadManagerTests.swift in Sources */,
 				376731992C7F36B200EB097B /* UserBackgroundImageTests.swift in Sources */,
+				560C6EDB2CCA6D5200D411E2 /* OnboardingFireButtonDialogViewModelTests.swift in Sources */,
 				560C6EC92CCA381A00D411E2 /* OnboardingPixelReporterTests.swift in Sources */,
 				1E2BEAE42C8B00B5002741A3 /* SubscriptionPagesUseSubscriptionFeatureTests.swift in Sources */,
 			);

@@ -32,10 +32,6 @@ struct DefaultContextualDaxDialogViewFactory: ContextualDaxDialogsFactory {
     }
 
     func makeView(for type: ContextualDialogType, delegate: any OnboardingNavigationDelegate, onDismiss: @escaping () -> Void, onGotItPressed: @escaping () -> Void, onFireButtonPressed: @escaping () -> Void) -> AnyView {
-        let onFirePressed = {
-            onFireButtonPressed()
-            onboardingPixelReorter.trackFireButtonTryIt()
-        }
         let dialogView: AnyView
         switch type {
         case .tryASearch:
@@ -45,9 +41,9 @@ struct DefaultContextualDaxDialogViewFactory: ContextualDaxDialogsFactory {
         case .tryASite:
             dialogView = AnyView(tryASiteDialog(delegate: delegate))
         case .trackers(message: let message, shouldFollowUp: let shouldFollowUp):
-            dialogView = AnyView(trackersDialog(message: message, shouldFollowUp: shouldFollowUp, onDismiss: onDismiss, onGotItPressed: onGotItPressed, onFireButtonPressed: onFirePressed))
+            dialogView = AnyView(trackersDialog(message: message, shouldFollowUp: shouldFollowUp, onDismiss: onDismiss, onGotItPressed: onGotItPressed, onFireButtonPressed: onFireButtonPressed))
         case .tryFireButton:
-            dialogView = AnyView(tryFireButtonDialog(onDismiss: onDismiss, onGotItPressed: onGotItPressed, onFireButtonPressed: onFirePressed))
+            dialogView = AnyView(tryFireButtonDialog(onDismiss: onDismiss, onGotItPressed: onGotItPressed, onFireButtonPressed: onFireButtonPressed))
         case .highFive:
             dialogView = AnyView(highFiveDialog(onDismiss: onDismiss, onGotItPressed: onGotItPressed))
             onboardingPixelReorter.trackLastDialogShown()
@@ -90,20 +86,12 @@ struct DefaultContextualDaxDialogViewFactory: ContextualDaxDialogsFactory {
 
     private func trackersDialog(message: NSAttributedString, shouldFollowUp: Bool, onDismiss: @escaping () -> Void, onGotItPressed: @escaping () -> Void, onFireButtonPressed: @escaping () -> Void) -> some View {
         let gotIt = shouldFollowUp ? onGotItPressed : onDismiss
-        let onSkipPressed = {
-            onGotItPressed()
-            onboardingPixelReorter.trackFireButtonSkipped()
-        }
-        let viewModel = OnboardingFireButtonDialogViewModel(onDismiss: onDismiss, onGotItPressed: onSkipPressed, onFireButtonPressed: onFireButtonPressed)
+        let viewModel = OnboardingFireButtonDialogViewModel(onDismiss: onDismiss, onGotItPressed: onGotItPressed, onFireButtonPressed: onFireButtonPressed)
         return OnboardingTrackersDoneDialog(shouldFollowUp: true, message: message, blockedTrackersCTAAction: gotIt, viewModel: viewModel)
     }
 
     private func tryFireButtonDialog(onDismiss: @escaping () -> Void, onGotItPressed: @escaping () -> Void, onFireButtonPressed: @escaping () -> Void) -> some View {
-        let onSkipPressed = {
-            onGotItPressed()
-            onboardingPixelReorter.trackFireButtonSkipped()
-        }
-        let viewModel = OnboardingFireButtonDialogViewModel(onDismiss: onDismiss, onGotItPressed: onSkipPressed, onFireButtonPressed: onFireButtonPressed)
+        let viewModel = OnboardingFireButtonDialogViewModel(onDismiss: onDismiss, onGotItPressed: onGotItPressed, onFireButtonPressed: onFireButtonPressed)
         return OnboardingFireDialog(viewModel: viewModel)
     }
 
