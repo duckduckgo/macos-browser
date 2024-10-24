@@ -219,7 +219,7 @@ final class ContextualDaxDialogsFactoryTests: XCTestCase {
         XCTAssertTrue(onFireButtonRun)
     }
 
-    func testWhenMakeViewForTryFireButtonAndSkipButtonIsPressedThenOnFireButtonPressedActionIsCalled() throws {
+    func testWhenMakeViewForTryFireButtonAndSkipButtonIsPressedThenTrackFireButtonSkippedCalled() throws {
         // GIVEN
         let dialogType = ContextualDialogType.tryFireButton
         let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: {}, onGotItPressed: {}, onFireButtonPressed: {})
@@ -232,7 +232,7 @@ final class ContextualDaxDialogsFactoryTests: XCTestCase {
         XCTAssertTrue(reporter.trackFireButtonSkippedCalled)
     }
 
-    func testWhenMakeViewForTryFireButtonAndSkipButtonIsPressedThenOnFireButtonPressedActionIsCalled2() throws {
+    func testWhenMakeViewForTrackersAndSkipButtonIsPressedThenTrackFireButtonSkippedCalled() throws {
         // GIVEN
         let factory2 = DefaultContextualDaxDialogViewFactory(onboardingPixelReorter: reporter)
         let dialogType = ContextualDialogType.trackers(message: NSMutableAttributedString(string: "some trackers"), shouldFollowUp: true)
@@ -246,10 +246,40 @@ final class ContextualDaxDialogsFactoryTests: XCTestCase {
         XCTAssertTrue(reporter.trackFireButtonSkippedCalled)
     }
 
+    @MainActor
+    func testWhenMakeViewForTryFireButtonAndTryItButtonIsPressedThenTrackFireButtonSkippedCalledIsCalled() throws {
+        // GIVEN
+        let dialogType = ContextualDialogType.tryFireButton
+        let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: {}, onGotItPressed: {}, onFireButtonPressed: {})
+        let view = try XCTUnwrap(find(OnboardingFireDialog.self, in: result))
+
+        // WHEN
+        view.viewModel.tryFireButton()
+
+        // THEN
+        XCTAssertTrue(reporter.trackFireButtonTryItCalled)
+    }
+
+    @MainActor
+    func testWhenMakeViewForTrackersAndTryItButtonIsPressedThenTrackFireButtonSkippedCalledIsCalled() throws {
+        // GIVEN
+        let factory2 = DefaultContextualDaxDialogViewFactory(onboardingPixelReorter: reporter)
+        let dialogType = ContextualDialogType.trackers(message: NSMutableAttributedString(string: "some trackers"), shouldFollowUp: true)
+        let result = factory2.makeView(for: dialogType, delegate: delegate, onDismiss: {}, onGotItPressed: {}, onFireButtonPressed: {})
+        let view = try XCTUnwrap(find(OnboardingTrackersDoneDialog.self, in: result))
+
+        // WHEN
+        view.viewModel.tryFireButton()
+
+        // THEN
+        XCTAssertTrue(reporter.trackFireButtonTryItCalled)
+    }
+
 }
 
 class CapturingOnboardingPixelReporter: OnboardingPixelReporting {
     var trackFireButtonSkippedCalled = false
+    var trackFireButtonTryItCalled = false
 
     func trackFireButtonSkipped() {
         trackFireButtonSkippedCalled = true
@@ -262,5 +292,9 @@ class CapturingOnboardingPixelReporter: OnboardingPixelReporting {
     }
 
     func trackSiteSuggetionOptionTapped() {
+    }
+
+    func trackFireButtonTryIt() {
+        trackFireButtonTryItCalled = true
     }
 }

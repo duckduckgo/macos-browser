@@ -78,6 +78,12 @@ final class OnboardingPixelReporterTests: XCTestCase {
         XCTAssertEqual(eventSent?.name, ContextualOnboardingPixel.onboardingFireButtonPromptSkipPressed.name)
         XCTAssertEqual(frequency, .unique)
     }
+
+    func test_WhenTrackFireButtonTryIt_ThenOnboardingFireButtonTryItPressedSent() {
+        reporter.trackFireButtonTryIt()
+        XCTAssertEqual(eventSent?.name, ContextualOnboardingPixel.onboardingFireButtonTryItPressed.name)
+        XCTAssertEqual(frequency, .unique)
+    }
 }
 
 class MockContextualOnboardingState: ContextualOnboardingStateUpdater {

@@ -34,6 +34,7 @@ protocol OnboardingAddressBarReporting: AnyObject {
 protocol OnboardingDialogsReporting: AnyObject {
     func trackFireButtonSkipped()
     func trackLastDialogShown()
+    func trackFireButtonTryIt()
 }
 
 protocol OnboardingFireReporting: AnyObject {
@@ -102,5 +103,9 @@ extension OnboardingPixelReporter: OnboardingDialogsReporting {
 
     func trackFireButtonSkipped() {
         fire(ContextualOnboardingPixel.onboardingFireButtonPromptSkipPressed, .unique)
+    }
+
+    func trackFireButtonTryIt() {
+        fire(ContextualOnboardingPixel.onboardingFireButtonTryItPressed, .unique)
     }
 }

@@ -32,7 +32,10 @@ struct DefaultContextualDaxDialogViewFactory: ContextualDaxDialogsFactory {
     }
 
     func makeView(for type: ContextualDialogType, delegate: any OnboardingNavigationDelegate, onDismiss: @escaping () -> Void, onGotItPressed: @escaping () -> Void, onFireButtonPressed: @escaping () -> Void) -> AnyView {
-
+        let onFirePressed = {
+            onFireButtonPressed()
+            onboardingPixelReorter.trackFireButtonTryIt()
+        }
         let dialogView: AnyView
         switch type {
         case .tryASearch:
@@ -42,9 +45,9 @@ struct DefaultContextualDaxDialogViewFactory: ContextualDaxDialogsFactory {
         case .tryASite:
             dialogView = AnyView(tryASiteDialog(delegate: delegate))
         case .trackers(message: let message, shouldFollowUp: let shouldFollowUp):
-            dialogView = AnyView(trackersDialog(message: message, shouldFollowUp: shouldFollowUp, onDismiss: onDismiss, onGotItPressed: onGotItPressed, onFireButtonPressed: onFireButtonPressed))
+            dialogView = AnyView(trackersDialog(message: message, shouldFollowUp: shouldFollowUp, onDismiss: onDismiss, onGotItPressed: onGotItPressed, onFireButtonPressed: onFirePressed))
         case .tryFireButton:
-            dialogView = AnyView(tryFireButtonDialog(onDismiss: onDismiss, onGotItPressed: onGotItPressed, onFireButtonPressed: onFireButtonPressed))
+            dialogView = AnyView(tryFireButtonDialog(onDismiss: onDismiss, onGotItPressed: onGotItPressed, onFireButtonPressed: onFirePressed))
         case .highFive:
             dialogView = AnyView(highFiveDialog(onDismiss: onDismiss, onGotItPressed: onGotItPressed))
             onboardingPixelReorter.trackLastDialogShown()
