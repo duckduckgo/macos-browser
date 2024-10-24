@@ -43,6 +43,7 @@ protocol OnboardingFireReporting: AnyObject {
 }
 
 final class OnboardingPixelReporter: OnboardingSearchSuggestionsPixelReporting, OnboardingSiteSuggestionsPixelReporting {
+
     private let onboardingStateProvider: ContextualOnboardingStateUpdater
     private let fire: (PixelKitEventV2, PixelKit.Frequency) -> Void
     private let userDefaults: UserDefaults
@@ -55,7 +56,7 @@ final class OnboardingPixelReporter: OnboardingSearchSuggestionsPixelReporting, 
         self.userDefaults = userDefaults
     }
 
-    func trackSiteSuggestionOptionTapped() {
+    func trackSiteSuggetionOptionTapped() {
         fire(ContextualOnboardingPixel.siteSuggetionOptionTapped, .unique)
     }
 
