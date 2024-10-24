@@ -107,15 +107,17 @@ enum ContextualOnboardingPixel: PixelKitEventV2 {
      * Event Trigger: The privacy dashboard is opened from the Trackers dialog during the contextual onboarding
      *
      * Anomaly Investigation:
-
+     * It is triggered on privacyEntryPointButtonAction on AddressBarButtonViewController
+     * the OnboardingPixelProvider sends it only if the state non e' onboardingComleted
+     * Check code in that area  to check it behaves as expected
      */
     case onboardingPrivacyDashboardOpened
 
     /**
      * Event Trigger:
-     *
-     * Anomaly Investigation:
-
+     * It is triggered on didFinishLoading on Tab only if it's not a search
+     * the OnboardingPixelProvider sends it only the second time
+     * Check code in that area  to check it behaves as expected
      */
     case secondSiteVisited
 
