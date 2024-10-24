@@ -30,6 +30,15 @@ protocol ContextualOnboardingStateUpdater {
     func fireButtonUsed()
 }
 
+protocol FireButtonInfoStateProviding {
+    var infoPresentedOnce: Bool { get set }
+}
+
+final class FireButtonInfoStateProvider: FireButtonInfoStateProviding {
+    @UserDefaultsWrapper(key: .fireInfoPresentedOnce, defaultValue: false)
+     var infoPresentedOnce: Bool
+}
+
 enum ContextualDialogType: Equatable {
     case tryASearch
     case searchDone(shouldFollowUp: Bool)
@@ -125,15 +134,26 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
 
     private let trackerMessageProvider: TrackerMessageProviding
     private let startUpPreferences: StartupPreferences
+    private var fireButtonInfoStateProvider: FireButtonInfoStateProviding
+    private var fireButtonUsedOnce: Bool = false
 
     @UserDefaultsWrapper(key: .contextualOnboardingState, defaultValue: ContextualOnboardingState.onboardingCompleted.rawValue)
     private var stateString: String {
         didSet {
             if stateString == ContextualOnboardingState.notStarted.rawValue {
+                // This makes the home page DuckDuckGo during the onboarding
                 startUpPreferences.launchToCustomHomePage = true
+                // This avoids the info sheet on the Fire button popover to be shown during the onboarding
+                fireButtonInfoStateProvider.infoPresentedOnce = true
                 resetData()
             }
             if stateString == ContextualOnboardingState.onboardingCompleted.rawValue {
+                // If the user has not used the fire button 
+                // it will present the info sheet on the Fire button popover when they click on it for the first time
+                if !fireButtonUsedOnce {
+                    fireButtonInfoStateProvider.infoPresentedOnce = false
+                }
+                // This resets the home page to be the new tab page after the onboarding
                 startUpPreferences.launchToCustomHomePage = false
                 resetData()
             }
@@ -154,9 +174,11 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
     private var notBlockedTrackerSeen: Bool = false
 
     init(trackerMessageProvider: TrackerMessageProviding = TrackerMessageProvider(),
-         startupPreferences: StartupPreferences = StartupPreferences.shared) {
+         startupPreferences: StartupPreferences = StartupPreferences.shared,
+         fireButtonInfoStateProvider: FireButtonInfoStateProviding = FireButtonInfoStateProvider()) {
         self.trackerMessageProvider = trackerMessageProvider
         self.startUpPreferences = startupPreferences
+        self.fireButtonInfoStateProvider = fireButtonInfoStateProvider
     }
 
     func dialogTypeForTab(_ tab: Tab, privacyInfo: PrivacyInfo? = nil) -> ContextualDialogType? {
@@ -345,6 +367,7 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
     }
 
     func fireButtonUsed() {
+        fireButtonUsedOnce = true
         switch state {
         case .showTryASearch:
             state = .fireUsedTryASearchShown
