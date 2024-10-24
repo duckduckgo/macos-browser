@@ -53,7 +53,7 @@ struct OnboardingSuggestedSearchesProvider: OnboardingSuggestionsItemsProviding 
 
     private var option2: ContextualOnboardingListItem {
         var search: String
-        if country == "us" {
+        if country == "US" {
             search = UserText.ContextualOnboarding.tryASearchOption2English
         } else {
             search = UserText.ContextualOnboarding.tryASearchOption2International
@@ -67,13 +67,14 @@ struct OnboardingSuggestedSearchesProvider: OnboardingSuggestionsItemsProviding 
     }
 
     private var surpriseMe: ContextualOnboardingListItem {
-        var search: String
-        if country == "us" {
-            search = UserText.ContextualOnboarding.tryASearchOptionSurpriseMeEnglish
+        var search = UserText.ContextualOnboarding.tryASearchOptionSurpriseMe
+        if var url = URL.makeSearchUrl(from: search) {
+            url = url.appendingParameter(name: "ia", value: "images")
+            url = url.appendingParameter(name: "iax", value: "images")
+            return ContextualOnboardingListItem.surprise(title: url.absoluteString, visibleTitle: UserText.ContextualOnboarding.tryASearchOptionSurpriseMeTitle)
         } else {
-            search = UserText.ContextualOnboarding.tryASearchOptionSurpriseMeInternational
+            return ContextualOnboardingListItem.surprise(title: search, visibleTitle: UserText.ContextualOnboarding.tryASearchOptionSurpriseMeTitle)
         }
-        return ContextualOnboardingListItem.surprise(title: search, visibleTitle: UserText.ContextualOnboarding.tryASearchOptionSurpriseMeTitle)
     }
 
 }
