@@ -41,34 +41,40 @@ protocol OnboardingFireReporting: AnyObject {
 }
 
 final class OnboardingPixelReporter: OnboardingSearchSuggestionsPixelReporting, OnboardingSiteSuggestionsPixelReporting {
-   private  let onboardingStateProvider: ContextualOnboardingStateUpdater
+    private let onboardingStateProvider: ContextualOnboardingStateUpdater
+    private let fire: (PixelKitEventV2, PixelKit.Frequency) -> Void
 
     @UserDefaultsWrapper(key: .websiteVisited, defaultValue: false)
     private var siteVisited: Bool
 
-    init(onboardingStateProvider: ContextualOnboardingStateUpdater = Application.appDelegate.onboardingStateMachine) {
+    init(onboardingStateProvider: ContextualOnboardingStateUpdater = Application.appDelegate.onboardingStateMachine,
+         fireAction: @escaping (PixelKitEventV2, PixelKit.Frequency) -> Void = { event, frequency in PixelKit.fire(event, frequency: frequency) }) {
         self.onboardingStateProvider = onboardingStateProvider
+        self.fire = fireAction
     }
 
     func trackSiteSuggetionOptionTapped() {
+        fire(ContextualOnboardingPixel.siteSuggetionOptionTapped, .unique)
     }
+
     func trackSearchSuggetionOptionTapped() {
+        fire(ContextualOnboardingPixel.searchSuggetionOptionTapped, .unique)
     }
 }
 
 extension OnboardingPixelReporter: OnboardingAddressBarReporting {
     func trackPrivacyDashboardOpened() {
         if onboardingStateProvider.state != .onboardingCompleted {
-            PixelKit.fire(ContextualOnboardingPixel.onboardingPrivacyDashboardOpened)
+            fire(ContextualOnboardingPixel.onboardingPrivacyDashboardOpened, .unique)
         }
     }
 
     func trackAddressBarTypedIn() {
         if onboardingStateProvider.state == .showTryASearch {
-            PixelKit.fire(ContextualOnboardingPixel.onboardingSearchCustom)
+            PixelKit.fire(ContextualOnboardingPixel.onboardingSearchCustom, frequency: .unique)
         }
         if onboardingStateProvider.state == .showTryASite {
-            PixelKit.fire(ContextualOnboardingPixel.onboardingVisitSiteCustom)
+            PixelKit.fire(ContextualOnboardingPixel.onboardingVisitSiteCustom, frequency: .unique)
         }
     }
 
@@ -84,7 +90,7 @@ extension OnboardingPixelReporter: OnboardingAddressBarReporting {
 extension OnboardingPixelReporter: OnboardingFireReporting {
     func trackFireButtonPressed() {
         if onboardingStateProvider.state != .onboardingCompleted {
-            PixelKit.fire(ContextualOnboardingPixel.onboardingFireButtonPressed)
+            PixelKit.fire(ContextualOnboardingPixel.onboardingFireButtonPressed, frequency: .unique)
         }
     }
 }

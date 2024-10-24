@@ -270,7 +270,6 @@ class MockDialogsProvider: ContextualOnboardingDialogTypeProviding, ContextualOn
 }
 
 class CapturingDialogFactory: ContextualDaxDialogsFactory {
-
     let expectation: XCTestExpectation
     var capturedType: ContextualDialogType?
     var capturedDelegate: OnboardingNavigationDelegate?
@@ -282,7 +281,7 @@ class CapturingDialogFactory: ContextualDaxDialogsFactory {
         self.expectation = expectation
     }
 
-    func makeView(for type: ContextualDialogType, delegate: OnboardingNavigationDelegate, onDismiss: @escaping () -> Void, onGotItPressed: @escaping () -> Void, onFireButtonPressed: @escaping () -> Void) -> AnyView {
+    func makeView(for type: ContextualDialogType, delegate: OnboardingNavigationDelegate, onboardingPixelReorter: OnboardingPixelReporting, onDismiss: @escaping () -> Void, onGotItPressed: @escaping () -> Void, onFireButtonPressed: @escaping () -> Void) -> AnyView {
         capturedType = type
         capturedDelegate = delegate
         self.onGotItPressed = onGotItPressed

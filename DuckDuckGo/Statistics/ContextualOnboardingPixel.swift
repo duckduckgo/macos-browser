@@ -31,6 +31,24 @@ enum ContextualOnboardingPixel: PixelKitEventV2 {
      * Event Trigger: User types into the address bar when the search suggestions dialog is shown during the contextual onboarding
      *
      * Anomaly Investigation:
+     * It is triggered in  OnboardingSearchSuggestionsViewModel when one of the search suggestion button in the list is pressed (listItemPressed) in the contextual onboarding
+     * Check code in that area and in OnboardingPixelReporter to check it behaves as expected
+     */
+    case siteSuggetionOptionTapped
+
+    /**
+     * Event Trigger: User types into the address bar when the search suggestions dialog is shown during the contextual onboarding
+     *
+     * Anomaly Investigation:
+     * It is triggered in  OnboardingSiteSuggestionsViewModel when one of the site suggestion button in the list is pressed (listItemPressed) in the contextual onboarding
+     * Check code in that area and in OnboardingPixelReporter to check it behaves as expected
+     */
+    case searchSuggetionOptionTapped
+
+    /**
+     * Event Trigger: User types into the address bar when the search suggestions dialog is shown during the contextual onboarding
+     *
+     * Anomaly Investigation:
 
      */
     case onboardingSearchCustom
@@ -50,6 +68,14 @@ enum ContextualOnboardingPixel: PixelKitEventV2 {
 
      */
     case onboardingFireButtonPromptSkipPressed
+
+    /**
+     * Event Trigger: The “skip” button on the Fire Button dialog during the contextual onboarding
+     *
+     * Anomaly Investigation:
+
+     */
+    case onboardingFireButtonTryItPressed
 
     /**
      * Event Trigger: The final onboarding dialog is displayed during the contextual onboarding
@@ -86,19 +112,25 @@ enum ContextualOnboardingPixel: PixelKitEventV2 {
     var name: String {
         switch self {
         case .onboardingSearchCustom:
-            return "m_mac_onboarding_search_custom"
+            return "m_mac_onboarding_search_custom_u"
         case .onboardingVisitSiteCustom:
-            return "m_mac_onboarding_visit_site_custom"
+            return "m_mac_onboarding_visit_site_custom_u"
         case .onboardingFireButtonPromptSkipPressed:
-            return "m_mac_onboarding_fire_button_prompt_skip_pressed"
+            return "m_mac_onboarding_fire_button_prompt_skip_pressed_u"
         case .onboardingFinished:
-            return "m_mac_onboarding_finished"
+            return "m_mac_onboarding_finished_u"
         case .onboardingFireButtonPressed:
-            return "m_mac_onboarding_fire_button_pressed"
+            return "m_mac_onboarding_fire_button_pressed_u"
         case .onboardingPrivacyDashboardOpened:
-            return "m_mac_onboarding_privacy_dashboard_opened"
+            return "m_mac_onboarding_privacy_dashboard_opened_u"
         case .secondSiteVisited:
             return "m_mac_second_site_visit_u"
+        case .searchSuggetionOptionTapped:
+            return "m_mac_onboarding_search_option_tapped_u"
+        case .siteSuggetionOptionTapped:
+            return "m_mac_onboarding_visit_site_option_tapped_u"
+        case .onboardingFireButtonTryItPressed:
+            return "m_mac_onboarding_fire_button_try_it_pressed_u"
         }
     }
 
