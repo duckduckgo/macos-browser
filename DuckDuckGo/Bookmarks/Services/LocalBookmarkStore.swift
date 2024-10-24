@@ -55,18 +55,25 @@ final class LocalBookmarkStore: BookmarkStore {
 
     // Directly used in tests
     init(
+        id: String = #function,
         contextProvider: @escaping () -> NSManagedObjectContext,
         appearancePreferences: AppearancePreferences = .shared,
         preFormFactorSpecificFavoritesOrder: [String]? = nil
     ) {
         self.contextProvider = contextProvider
         self.preFormFactorSpecificFavoritesOrder = preFormFactorSpecificFavoritesOrder
-
+        #if DEBUG || CI
+        self.id = id
+        #endif
         favoritesDisplayMode = appearancePreferences.favoritesDisplayMode
         migrateToFormFactorSpecificFavoritesFolders()
         removeInvalidBookmarkEntities()
         cacheReadOnlyTopLevelBookmarksFolders()
     }
+
+#if DEBUG
+    let id: String
+#endif
 
     enum BookmarkStoreError: Error {
         case storeDeallocated
@@ -353,9 +360,11 @@ final class LocalBookmarkStore: BookmarkStore {
             let fetchRequest = BaseBookmarkEntity.entities(with: identifiers)
             let fetchResults = (try? context.fetch(fetchRequest)) ?? []
 
+#if DEBUG || CI
             if fetchResults.count != identifiers.count {
-                assertionFailure("\(#file): Fetched bookmark entities didn't match the number of provided UUIDs")
+                assertionFailure("\(self.id): Fetched bookmark entities: \(fetchResults) didn't match the number of provided UUIDs: \(identifiers)")
             }
+#endif
 
             for object in fetchResults {
                 object.markPendingDeletion()
@@ -1107,7 +1116,6 @@ final class LocalBookmarkStore: BookmarkStore {
     }
 
     private func parent(for entity: BaseBookmarkEntity, in context: NSManagedObjectContext) throws -> BookmarkEntity {
-        let parentEntity: BookmarkEntity
         if let parentId = entity.parentFolderUUID, parentId != PseudoFolder.bookmarks.id, parentId != "bookmarks_root",
            let parentFetchRequestResult = try? context.fetch(BaseBookmarkEntity.singleEntity(with: parentId)).first {
             return parentFetchRequestResult
