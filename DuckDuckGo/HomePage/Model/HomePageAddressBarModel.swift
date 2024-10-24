@@ -44,7 +44,20 @@ extension HomePage.Models {
                 }
             }
         }
-        @Published var value: AddressBarTextField.Value = .text("", userTyped: false)
+        @Published var value: AddressBarTextField.Value = .text("", userTyped: false) {
+            didSet {
+                if shouldDisplayInitialPlaceholder && !value.string.isEmpty {
+                    shouldDisplayInitialPlaceholder = false
+                }
+            }
+        }
+
+        /**
+         * This property is a workaround for placeholder not being displayed on the address bar in SwiftUI until focused.
+         *
+         * It's cleared after first edit on the field.
+         */
+        @Published var shouldDisplayInitialPlaceholder = true
 
         var addressBarTextField: AddressBarTextField? {
             guard shouldShowAddressBar else {
