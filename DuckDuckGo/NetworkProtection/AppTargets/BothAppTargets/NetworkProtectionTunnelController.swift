@@ -34,6 +34,7 @@ import SystemExtensions
 #endif
 
 import Subscription
+import BrowserServicesKit
 
 typealias NetworkProtectionStatusChangeHandler = (NetworkProtection.ConnectionStatus) -> Void
 typealias NetworkProtectionConfigChangeHandler = () -> Void
