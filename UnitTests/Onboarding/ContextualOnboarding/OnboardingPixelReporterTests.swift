@@ -54,6 +54,24 @@ final class OnboardingPixelReporterTests: XCTestCase {
         XCTAssertEqual(frequency, .unique)
     }
 
+    func test_WhenTrackAddressBarTypedIn_ThenDependingOnTheState_CorrectPixelsAreSent() throws {
+        for state in ContextualOnboardingState.allCases {
+            eventSent = nil
+            frequency = nil
+            onboardingState.state = state
+            reporter.trackAddressBarTypedIn()
+            if state == .showTryASearch {
+                XCTAssertEqual(eventSent?.name, ContextualOnboardingPixel.onboardingSearchCustom.name)
+                XCTAssertEqual(frequency, .unique)
+            } else if state == .showTryASite {
+                XCTAssertEqual(eventSent?.name, ContextualOnboardingPixel.onboardingVisitSiteCustom.name)
+                XCTAssertEqual(frequency, .unique)
+            } else {
+                XCTAssertNil(eventSent)
+                XCTAssertNil(frequency)
+            }
+        }
+    }
 }
 
 class MockContextualOnboardingState: ContextualOnboardingStateUpdater {

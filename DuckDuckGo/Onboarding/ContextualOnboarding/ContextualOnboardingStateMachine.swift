@@ -39,7 +39,7 @@ enum ContextualDialogType: Equatable {
     case highFive
 }
 
-enum ContextualOnboardingState: String {
+enum ContextualOnboardingState: String, CaseIterable {
 
     // The contextual onboarding has not started. This state should apply only during the linear onboarding.
     case notStarted

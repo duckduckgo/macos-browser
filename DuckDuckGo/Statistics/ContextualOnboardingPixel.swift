@@ -49,7 +49,9 @@ enum ContextualOnboardingPixel: PixelKitEventV2 {
      * Event Trigger: User types into the address bar when the search suggestions dialog is shown during the contextual onboarding
      *
      * Anomaly Investigation:
-
+     * It is triggered in  AddressBarTextField on  controlTextDidChange.
+     * The OnboardingPixelReporter then sends a pixel if this happens when try a search onboarding dialog is on
+     * Check code in that area and in OnboardingPixelReporter to check it behaves as expected
      */
     case onboardingSearchCustom
 
@@ -57,7 +59,9 @@ enum ContextualOnboardingPixel: PixelKitEventV2 {
      * Event Trigger: User types into the address bar when the site suggestions dialog  is shown during the contextual onboarding
      *
      * Anomaly Investigation:
-
+     * It is triggered in  AddressBarTextField on  controlTextDidChange.
+     * The OnboardingPixelReporter then sends a pixel if this happens when try a site onboarding dialog is on
+     * Check code in that area and in OnboardingPixelReporter to check it behaves as expected
      */
     case onboardingVisitSiteCustom
 

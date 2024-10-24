@@ -20,7 +20,7 @@ import Foundation
 import Onboarding
 import PixelKit
 
-typealias OnboardingPixelReporting = 
+typealias OnboardingPixelReporting =
 OnboardingSearchSuggestionsPixelReporting
 & OnboardingSiteSuggestionsPixelReporting
 & OnboardingDialogsReporting
@@ -71,10 +71,10 @@ extension OnboardingPixelReporter: OnboardingAddressBarReporting {
 
     func trackAddressBarTypedIn() {
         if onboardingStateProvider.state == .showTryASearch {
-            PixelKit.fire(ContextualOnboardingPixel.onboardingSearchCustom, frequency: .unique)
+            fire(ContextualOnboardingPixel.onboardingSearchCustom, .unique)
         }
         if onboardingStateProvider.state == .showTryASite {
-            PixelKit.fire(ContextualOnboardingPixel.onboardingVisitSiteCustom, frequency: .unique)
+            fire(ContextualOnboardingPixel.onboardingVisitSiteCustom, .unique)
         }
     }
 
