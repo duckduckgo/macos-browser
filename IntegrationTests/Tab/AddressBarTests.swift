@@ -958,6 +958,22 @@ class AddressBarTests: XCTestCase {
         XCTAssertTrue(zoomButton.isHidden)
     }
 
+    @MainActor
+    func test_WhenControlTextDidChange_ThenreporterTrackAddressBarTypedInCalled() async throws {
+        // GIVEN
+        let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [Tab(content: .newtab)]))
+        window = WindowsManager.openNewWindow(with: viewModel)!
+        let textField = mainViewController.navigationBarViewController.addressBarViewController?.addressBarTextField
+        XCTAssertNotNil(textField?.onboardingDelegate)
+        let reporter = CapturingOnboardingAddressBarReporting()
+        textField?.onboardingDelegate = reporter
+
+        // WHEN
+        textField?.controlTextDidChange(.init(name: .PasswordManagerChanged))
+
+        // THEN
+        XCTAssertTrue(reporter.trackAddressBarTypedInCalled)
+    }
 }
 
 protocol MainActorPerformer {
@@ -997,5 +1013,19 @@ class MockCertificateEvaluator: CertificateTrustEvaluating {
 
     func evaluateCertificateTrust(trust: SecTrust?) -> Bool? {
         return isValidCertificate
+    }
+}
+
+class CapturingOnboardingAddressBarReporting: OnboardingAddressBarReporting {
+    var trackAddressBarTypedInCalled = false
+
+    func trackAddressBarTypedIn() {
+        trackAddressBarTypedInCalled = true
+    }
+
+    func trackPrivacyDashboardOpened() {
+    }
+
+    func trackSiteVisited() {
     }
 }

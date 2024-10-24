@@ -270,7 +270,6 @@ class MockDialogsProvider: ContextualOnboardingDialogTypeProviding, ContextualOn
 }
 
 class CapturingDialogFactory: ContextualDaxDialogsFactory {
-
     let expectation: XCTestExpectation
     var capturedType: ContextualDialogType?
     var capturedDelegate: OnboardingNavigationDelegate?
