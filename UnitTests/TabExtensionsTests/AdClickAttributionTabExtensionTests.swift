@@ -255,30 +255,36 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
 
         let onDetectionDidStart = expectation(description: "detection.onDidStart")
         detection.onDidStart = { [urls] url in
+            Logger.tests.log("detection.onDidStart \(url?.absoluteString ?? "<nil>", privacy: .public)")
             XCTAssertEqual(url, urls.url2)
             onDetectionDidStart.fulfill()
         }
         let on2XXResponse = expectation(description: "on2XXResponse")
         detection.on2XXResponse = { [urls] url in
+            Logger.tests.log("detection.on2XXResponse \(url?.absoluteString ?? "<nil>", privacy: .public)")
             XCTAssertEqual(url, urls.url2)
             on2XXResponse.fulfill()
         }
         let onNavigation = expectation(description: "onNavigation")
         logic.onNavigation = {
+            Logger.tests.log("logic.onNavigation")
             onNavigation.fulfill()
         }
 
         let onDetectionDidFinish = expectation(description: "detection.onDidFinish")
         let onLogicDidFinish = expectation(description: "logic.onDidFinish")
-        detection.onDidFinish = { _ in
+        detection.onDidFinish = {
+            Logger.tests.log("detection.onDidFinish \($0?.absoluteString ?? "<nil>", privacy: .public)")
             onDetectionDidFinish.fulfill()
         }
         logic.onDidFinish = { [now, urls] host, date in
+            Logger.tests.log("logic.onDidFinish \(host ?? "<nil>", privacy: .public) \("\(date)", privacy: .public)")
             XCTAssertEqual(host, urls.url2.host!)
             XCTAssertEqual(date, now)
             onLogicDidFinish.fulfill()
         }
 
+        Logger.tests.debug("➡️ setContent \(self.urls.url2.absoluteString, privacy: .public)")
         tab.setContent(.url(urls.url2, source: .link))
         waitForExpectations(timeout: 5)
     }
@@ -296,44 +302,52 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
 
         schemeHandler.middleware = [{ [data] request in
             guard request.url!.path == "/" else { return nil}
+            Logger.tests.debug("schemeHandler.middleware #1 \(request.url?.absoluteString ?? "<nil>", privacy: .public)")
             return .ok(.html(data.metaRedirect.utf8String()!))
-        }, { [data] _ in
+        }, { [data] request in
+            Logger.tests.debug("schemeHandler.middleware #2 \(request.url?.absoluteString ?? "<nil>", privacy: .public)")
             return .ok(.html(data.html.utf8String()!))
         }]
 
         var onDetectionDidStart = expectation(description: "detection.onDidStart")
         let onDetectionDidStart2 = expectation(description: "detection.onDidStart 2")
-        detection.onDidStart = { _ in
+        detection.onDidStart = { url in
+            Logger.tests.log("detection.onDidStart \(url?.absoluteString ?? "<nil>", privacy: .public)")
             onDetectionDidStart.fulfill()
             onDetectionDidStart = onDetectionDidStart2
         }
         var on2XXResponse = expectation(description: "on2XXResponse")
         let on2XXResponse2 = expectation(description: "on2XXResponse 2")
-        detection.on2XXResponse = { _ in
+        detection.on2XXResponse = { url in
+            Logger.tests.log("detection.on2XXResponse \(url?.absoluteString ?? "<nil>", privacy: .public)")
             on2XXResponse.fulfill()
             on2XXResponse = on2XXResponse2
         }
         var onNavigation = expectation(description: "onNavigation")
         let onNavigation2 = expectation(description: "onNavigation 2")
         logic.onNavigation = {
+            Logger.tests.log("logic.onNavigation")
             onNavigation.fulfill()
             onNavigation = onNavigation2
         }
 
         let onDetectionDidFinish = expectation(description: "detection.onDidFinish")
         let onLogicDidFinish = expectation(description: "logic.onDidFinish")
-        detection.onDidFinish = { _ in
+        detection.onDidFinish = {
+            Logger.tests.log("detection.onDidFinish \($0?.absoluteString ?? "<nil>", privacy: .public)")
             onDetectionDidFinish.fulfill()
         }
         detection.onDidFail = {
             XCTFail("Not expected")
         }
         logic.onDidFinish = { [now, urls] host, date in
+            Logger.tests.log("logic.onDidFinish \(host ?? "<nil>", privacy: .public) \("\(date)", privacy: .public)")
             XCTAssertEqual(host, urls.url2.host!)
             XCTAssertEqual(date, now)
             onLogicDidFinish.fulfill()
         }
 
+        Logger.tests.debug("➡️ setContent \(self.urls.url1.absoluteString, privacy: .public)")
         tab.setContent(.url(urls.url1, source: .link))
         waitForExpectations(timeout: 5)
     }
@@ -352,50 +366,60 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         // For first load, redirect from url1 to url2
         schemeHandler.middleware = [{ request in
             guard request.url!.path == "/" else { return nil}
+            Logger.tests.debug("schemeHandler.middleware #1 \(request.url?.absoluteString ?? "<nil>", privacy: .public)")
             return .redirect(to: self.urls.url2)
-        }, { [data] _ in
+        }, { [data] request in
+            Logger.tests.debug("schemeHandler.middleware #1 \(request.url?.absoluteString ?? "<nil>", privacy: .public)")
             return .ok(.html(data.html.utf8String()!))
         }]
 
         // After redirect, issue developer redirect, that cancels url2 loading and navigates to url3
         decidePolicy = { navAction in
             if navAction.request.url == self.urls.url2 {
+                Logger.tests.debug("decidePolicy \(navAction.url.absoluteString , privacy: .public) -> redirect to \(self.urls.url3.absoluteString, privacy: .public)")
                 return .redirect(navAction.mainFrameTarget!, { navigator in
                     navigator.load(.init(url: self.urls.url3))
                 })
             } else {
+                Logger.tests.debug("decidePolicy \(navAction.url.absoluteString , privacy: .public) -> .next")
                 return .next
             }
         }
 
         let onDetectionDidStart = expectation(description: "detection.onDidStart")
         onDetectionDidStart.assertForOverFulfill = false
-        detection.onDidStart = { _ in
+        detection.onDidStart = { url in
+            Logger.tests.log("detection.onDidStart \(url?.absoluteString ?? "<nil>", privacy: .public)")
             onDetectionDidStart.fulfill()
         }
         let on2XXResponse = expectation(description: "on2XXResponse")
-        detection.on2XXResponse = { _ in
+        detection.on2XXResponse = { url in
+            Logger.tests.log("detection.on2XXResponse \(url?.absoluteString ?? "<nil>", privacy: .public)")
             on2XXResponse.fulfill()
         }
         let onNavigation = expectation(description: "onNavigation")
         logic.onNavigation = {
+            Logger.tests.log("logic.onNavigation")
             onNavigation.fulfill()
         }
 
         let onDetectionDidFinish = expectation(description: "detection.onDidFinish")
         let onLogicDidFinish = expectation(description: "logic.onDidFinish")
-        detection.onDidFinish = { _ in
+        detection.onDidFinish = {
+            Logger.tests.log("detection.onDidFinish \($0?.absoluteString ?? "<nil>", privacy: .public)")
             onDetectionDidFinish.fulfill()
         }
         detection.onDidFail = {
             XCTFail("Not expected")
         }
         logic.onDidFinish = { [now, urls] host, date in
+            Logger.tests.log("logic.onDidFinish \(host ?? "<nil>", privacy: .public) \("\(date)", privacy: .public)")
             XCTAssertEqual(host, urls.url3.host!)
             XCTAssertEqual(date, now)
             onLogicDidFinish.fulfill()
         }
 
+        Logger.tests.debug("➡️ setContent \(self.urls.url1.absoluteString, privacy: .public)")
         tab.setContent(.url(urls.url1, source: .link))
         waitForExpectations(timeout: 5)
     }
@@ -406,7 +430,8 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         privacyConfiguration.isFeatureKeyEnabled = { _, _ in
             return false
         }
-        schemeHandler.middleware = [{ _ in
+        schemeHandler.middleware = [{ request in
+            Logger.tests.debug("schemeHandler.middleware #err \(request.url?.absoluteString ?? "<nil>", privacy: .public)")
             return .failure(NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotFindHost))
         }]
         let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
@@ -416,16 +441,19 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
 
         let onDetectionDidStart = expectation(description: "detection.onDidStart")
         detection.onDidStart = { [urls] url in
+            Logger.tests.log("detection.onDidStart \(url?.absoluteString ?? "<nil>", privacy: .public)")
             XCTAssertEqual(url, urls.url2)
             onDetectionDidStart.fulfill()
         }
 
         let onDetectionDidFail = expectation(description: "detection.onDidFail")
         detection.onDidFail = {
+            Logger.tests.log("detection.onDidFail")
             onDetectionDidFail.fulfill()
         }
 
         // skipping server.start
+        Logger.tests.debug("➡️ setContent \(self.urls.url2.absoluteString, privacy: .public)")
         tab.setContent(.url(urls.url2, source: .link))
         waitForExpectations(timeout: 5)
     }
