@@ -376,12 +376,12 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         // After redirect, issue developer redirect, that cancels url2 loading and navigates to url3
         decidePolicy = { navAction in
             if navAction.request.url == self.urls.url2 {
-                Logger.tests.debug("decidePolicy \(navAction.url.absoluteString , privacy: .public) -> redirect to \(self.urls.url3.absoluteString, privacy: .public)")
+                Logger.tests.debug("decidePolicy \(navAction.url.absoluteString, privacy: .public) -> redirect to \(self.urls.url3.absoluteString, privacy: .public)")
                 return .redirect(navAction.mainFrameTarget!, { navigator in
                     navigator.load(.init(url: self.urls.url3))
                 })
             } else {
-                Logger.tests.debug("decidePolicy \(navAction.url.absoluteString , privacy: .public) -> .next")
+                Logger.tests.debug("decidePolicy \(navAction.url.absoluteString, privacy: .public) -> .next")
                 return .next
             }
         }
