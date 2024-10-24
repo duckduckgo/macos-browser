@@ -49,4 +49,5 @@ class MockAppearancePreferencesPersistor: AppearancePreferencesPersistor {
 
     var centerAlignedBookmarksBar: Bool = false
 
+    var didDismissHomePagePromotion = true
 }

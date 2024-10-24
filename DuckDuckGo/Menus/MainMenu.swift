@@ -663,6 +663,8 @@ final class MainMenu: NSMenu {
             NSMenuItem(title: "Personal Information Removal")
                 .submenu(DataBrokerProtectionDebugMenu())
 
+            FreemiumDebugMenu()
+
             if case .normal = NSApp.runType {
                 NSMenuItem(title: "VPN")
                     .submenu(NetworkProtectionDebugMenu())
