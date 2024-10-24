@@ -28,6 +28,29 @@ import os.log
 
 final class AddressBarTextField: NSTextField {
 
+    /**
+     * This property controls address bar mode and influences view styling.
+     *
+     * If set to `false` (default), the view is styled for displaying as the regular address bar
+     * in the navigation bar. If set to `true`, it's styled for displaying as a standalone view
+     * on the New Tab Page.
+     */
+    var isSearchBox: Bool = false
+
+    /**
+     * This property keeps the preferred appearance (color scheme) of the New Tab Page.
+     *
+     * It's non-nil when a custom NTP background is in use. Its value is used to properly
+     * style the suggestion window when it's shown.
+     */
+    var homePagePreferredAppearance: NSAppearance? {
+        didSet {
+            if suggestionWindowController != nil {
+                suggestionViewController.view.appearance = homePagePreferredAppearance
+            }
+        }
+    }
+
     var tabCollectionViewModel: TabCollectionViewModel! {
         didSet {
             subscribeToSelectedTabViewModel()
@@ -106,9 +129,8 @@ final class AddressBarTextField: NSTextField {
 
     private func subscribeToSelectedSuggestionViewModel() {
         selectedSuggestionViewModelCancellable = suggestionContainerViewModel?.$selectedSuggestionViewModel
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.displaySelectedSuggestionViewModel()
+            .sink { [weak self] selectedSuggestionViewModel in
+                self?.displaySelectedSuggestionViewModel(selectedSuggestionViewModel)
             }
     }
 
@@ -301,23 +323,48 @@ final class AddressBarTextField: NSTextField {
     }
 
     private func navigate(suggestion: Suggestion?) {
-        let pixel: GeneralPixel? = {
+        let ntpExperiment = NewTabPageSearchBoxExperiment()
+        let source: NewTabPageSearchBoxExperiment.SearchSource? = {
+            guard ntpExperiment.isActive else {
+                return nil
+            }
+            let isNewTab = tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab
+            guard isNewTab else {
+                return .addressBar
+            }
+            return isSearchBox ? .ntpSearchBox : .ntpAddressBar
+        }()
+
+        switch suggestion {
+        case .phrase, .none:
+            if let source {
+                ntpExperiment.recordSearch(from: source)
+            }
+        default:
+            break
+        }
+
+        let autocompletePixel: GeneralPixel? = {
             switch suggestion {
             case .phrase:
-                return .autocompleteClickPhrase
+                return .autocompleteClickPhrase(from: source, cohort: ntpExperiment.cohort, onboardingCohort: ntpExperiment.onboardingCohort)
             case .website:
-                return .autocompleteClickWebsite
+                return .autocompleteClickWebsite(from: source, cohort: ntpExperiment.cohort, onboardingCohort: ntpExperiment.onboardingCohort)
             case .bookmark(_, _, let isFavorite, _):
-                return isFavorite ? .autocompleteClickFavorite : .autocompleteClickBookmark
+                if isFavorite {
+                    return .autocompleteClickFavorite(from: source, cohort: ntpExperiment.cohort, onboardingCohort: ntpExperiment.onboardingCohort)
+                } else {
+                    return .autocompleteClickBookmark(from: source, cohort: ntpExperiment.cohort, onboardingCohort: ntpExperiment.onboardingCohort)
+                }
             case .historyEntry:
-                return .autocompleteClickHistory
+                return .autocompleteClickHistory(from: source, cohort: ntpExperiment.cohort, onboardingCohort: ntpExperiment.onboardingCohort)
             default:
                 return nil
             }
         }()
 
-        if let pixel {
-            PixelKit.fire(pixel)
+        if let autocompletePixel {
+            PixelKit.fire(autocompletePixel)
         }
 
         if NSApp.isCommandPressed {
@@ -500,14 +547,14 @@ final class AddressBarTextField: NSTextField {
 
     // MARK: - Suggestion window
 
-    private func displaySelectedSuggestionViewModel() {
+    private func displaySelectedSuggestionViewModel(_ selectedSuggestionViewModel: SuggestionViewModel?) {
         guard let suggestionWindow = suggestionWindowController?.window else {
             Logger.general.error("AddressBarTextField: Window not available")
             return
         }
         guard suggestionWindow.isVisible else { return }
 
-        guard let selectedSuggestionViewModel = suggestionContainerViewModel?.selectedSuggestionViewModel else {
+        guard let selectedSuggestionViewModel else {
             if let originalStringValue = suggestionContainerViewModel?.userStringValue {
                 self.value = Value(stringValue: originalStringValue, userTyped: true)
             } else {
@@ -581,6 +628,20 @@ final class AddressBarTextField: NSTextField {
             return
         }
 
+        if isSearchBox {
+            suggestionViewController.innerBorderViewTopConstraint.constant = 0
+            suggestionViewController.innerBorderViewBottomConstraint.constant = 0
+            suggestionViewController.innerBorderViewLeadingConstraint.constant = 0
+            suggestionViewController.innerBorderViewTrailingConstraint.constant = 0
+            suggestionViewController.backgroundView.borderWidth = 0
+
+            suggestionViewController.view.appearance = homePagePreferredAppearance
+            suggestionViewController.view.effectiveAppearance.performAsCurrentDrawingAppearance {
+                suggestionViewController.backgroundView.backgroundColor = .homePageAddressBarBackground
+                suggestionViewController.innerBorderView.borderColor = .homePageAddressBarBorder
+            }
+        }
+
         guard !suggestionWindow.isVisible, isFirstResponder else { return }
 
         window.addChildWindow(suggestionWindow, ordered: .above)
@@ -592,7 +653,7 @@ final class AddressBarTextField: NSTextField {
         NotificationCenter.default.post(name: .suggestionWindowOpen, object: nil)
     }
 
-    private func hideSuggestionWindow() {
+    func hideSuggestionWindow() {
         guard let window = window, let suggestionWindow = suggestionWindowController?.window else {
             return
         }
@@ -909,6 +970,13 @@ extension AddressBarTextField: NSTextFieldDelegate {
             self.currentTextDidChangeEvent = .none
         }
 
+        if stringValue.isEmpty {
+            suggestionContainerViewModel?.clearUserStringValue()
+            hideSuggestionWindow()
+        } else {
+            suggestionContainerViewModel?.setUserStringValue(stringValueWithoutSuffix, userAppendedStringToTheEnd: currentTextDidChangeEvent == .userAppendingTextToTheEnd)
+        }
+
         // if user continues typing letters from displayed Suggestion
         // don't blink and keep the Suggestion displayed
         if case .userAppendingTextToTheEnd = currentTextDidChangeEvent,
@@ -918,13 +986,6 @@ extension AddressBarTextField: NSTextFieldDelegate {
         } else {
             suggestionContainerViewModel?.clearSelection()
             self.value = Value(stringValue: stringValueWithoutSuffix, userTyped: true)
-        }
-
-        if stringValue.isEmpty {
-            suggestionContainerViewModel?.clearUserStringValue()
-            hideSuggestionWindow()
-        } else {
-            suggestionContainerViewModel?.setUserStringValue(stringValueWithoutSuffix, userAppendedStringToTheEnd: currentTextDidChangeEvent == .userAppendingTextToTheEnd)
         }
     }
 
