@@ -129,6 +129,7 @@ final class AddressBarTextField: NSTextField {
 
     private func subscribeToSelectedSuggestionViewModel() {
         selectedSuggestionViewModelCancellable = suggestionContainerViewModel?.$selectedSuggestionViewModel
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] selectedSuggestionViewModel in
                 self?.displaySelectedSuggestionViewModel(selectedSuggestionViewModel)
             }
