@@ -24,6 +24,7 @@ typealias OnboardingPixelReporting =
 OnboardingSearchSuggestionsPixelReporting
 & OnboardingSiteSuggestionsPixelReporting
 & OnboardingDialogsReporting
+& OnboardingAddressBarReporting
 
 protocol OnboardingAddressBarReporting: AnyObject {
     func trackAddressBarTypedIn()
@@ -44,14 +45,14 @@ protocol OnboardingFireReporting: AnyObject {
 final class OnboardingPixelReporter: OnboardingSearchSuggestionsPixelReporting, OnboardingSiteSuggestionsPixelReporting {
     private let onboardingStateProvider: ContextualOnboardingStateUpdater
     private let fire: (PixelKitEventV2, PixelKit.Frequency) -> Void
-
-    @UserDefaultsWrapper(key: .websiteVisited, defaultValue: false)
-    private var siteVisited: Bool
+    private let userDefaults: UserDefaults
 
     init(onboardingStateProvider: ContextualOnboardingStateUpdater = Application.appDelegate.onboardingStateMachine,
+         userDefaults: UserDefaults = UserDefaults.standard,
          fireAction: @escaping (PixelKitEventV2, PixelKit.Frequency) -> Void = { event, frequency in PixelKit.fire(event, frequency: frequency) }) {
         self.onboardingStateProvider = onboardingStateProvider
         self.fire = fireAction
+        self.userDefaults = userDefaults
     }
 
     func trackSiteSuggetionOptionTapped() {
@@ -80,10 +81,12 @@ extension OnboardingPixelReporter: OnboardingAddressBarReporting {
     }
 
     func trackSiteVisited() {
+        let key = "onboarding.website-visited"
+        let siteVisited = userDefaults.bool(forKey: key)
         if siteVisited {
-            PixelKit.fire(ContextualOnboardingPixel.secondSiteVisited, frequency: .unique)
+            fire(ContextualOnboardingPixel.secondSiteVisited, .unique)
         } else {
-            siteVisited = true
+            userDefaults.set(true, forKey: key)
         }
     }
 }

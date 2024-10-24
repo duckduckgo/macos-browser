@@ -97,7 +97,9 @@ enum ContextualOnboardingPixel: PixelKitEventV2 {
      * Event Trigger: The Fire button is clicked from the Fire Button dialog during the contextual onboarding
      *
      * Anomaly Investigation:
-
+     * It is triggered on fireButtonAction on MainMenuActions
+     * the OnboardingPixelProvider sends it only if the state non e' onboardingComleted
+     * Check code in that area  to check it behaves as expected
      */
     case onboardingFireButtonPressed
 

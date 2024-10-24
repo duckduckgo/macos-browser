@@ -236,6 +236,7 @@ class CapturingOnboardingPixelReporter: OnboardingPixelReporting {
     var trackFireButtonSkippedCalled = false
     var trackFireButtonTryItCalled = false
     var trackLastDialogShownCalled = false
+    var trackSiteVisitedCalled = false
 
     func trackFireButtonSkipped() {
         trackFireButtonSkippedCalled = true
@@ -253,5 +254,15 @@ class CapturingOnboardingPixelReporter: OnboardingPixelReporting {
 
     func trackFireButtonTryIt() {
         trackFireButtonTryItCalled = true
+    }
+
+    func trackAddressBarTypedIn() {
+    }
+
+    func trackPrivacyDashboardOpened() {
+    }
+
+    func trackSiteVisited() {
+        trackSiteVisitedCalled = true
     }
 }
