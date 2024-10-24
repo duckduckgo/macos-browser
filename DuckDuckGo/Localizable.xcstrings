@@ -15282,9 +15282,69 @@
         }
       }
     },
+    "contextual.onboarding.try-search.surprise-me" : {
+      "comment" : "Browser Search query for baby ducklings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entenküken"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "baby ducklings"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "patitos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "bébés canetons"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "anatroccoli"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "baby-eendjes"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "małe kaczuszki"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "patinhos bebés"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "утята"
+          }
+        }
+      }
+    },
     "contextual.onboarding.try-search.surprise-me-english" : {
       "comment" : "Browser Search query for chocolate chip cookie recipes",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -15344,7 +15404,7 @@
     },
     "contextual.onboarding.try-search.surprise-me-international" : {
       "comment" : "Browser Search query for dinner recipes",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -17959,7 +18019,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Möchtest du wirklich beenden?\n\nDuckDuckGo lädt derzeit „%@“%@ herunter. Wenn du jetzt aufhörst, wird DuckDuckGo den Download %@ nicht beenden."
+            "value" : "Möchtest du wirklich aufhören?\n\nDuckDuckGo lädt derzeit „%1$@“%2$@ herunter. Wenn du jetzt aufhörst, wird DuckDuckGo den Download %3$@ nicht beenden."
           }
         },
         "en" : {
@@ -17971,43 +18031,43 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¿Seguro que quieres salir?\n\nDuckDuckGo está descargando \"%@\"%@. Si sales ahora, DuckDuckGo no terminará de descargar %@."
+            "value" : "¿Seguro que quieres salir?\n\nDuckDuckGo se está descargando actualmente \"%1$@\"%2$@. Si sales ahora, DuckDuckGo no terminará de descargar %3$@."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Voulez-vous vraiment abandonner ?\n\nDuckDuckGo télécharge actuellement “%@”%@. Si vous abandonnez maintenant, DuckDuckGo ne terminera pas le téléchargement de %@."
+            "value" : "Voulez-vous vraiment abandonner ?DuckDuckGo télécharge actuellement « %1$@”%2$@ ». Si vous abandonnez maintenant, DuckDuckGo ne terminera pas le téléchargement de %3$@."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vuoi davvero uscire?\n\nDuckDuckGo sta attualmente scaricando “%@”%@. Se esci ora, DuckDuckGo non completerà il download di %@."
+            "value" : "Uscire?DuckDuckGo sta scaricando \"%1$@\"%2$@. Se esci ora, DuckDuckGo non completerà il download di %3$@."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Weet je zeker dat je wilt stoppen?\n\nDuckDuckGo downloadt op dit moment \"%@\"%@. Als je nu stopt, wordt het downloaden van %@ niet voltooid."
+            "value" : "Weet je zeker dat je wilt afsluiten?\n\nDuckDuckGo downloadt momenteel '%1$@'%2$@. Als je nu stopt, wordt %3$@ niet helemaal gedownload."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Czy na pewno chcesz zrezygnować?\n\nDuckDuckGo aktualnie pobiera „%@”%@. Jeśli teraz wyjdziesz, DuckDuckGo nie dokończy pobierania %@."
+            "value" : "Are you sure you want to quit?\n\nDuckDuckGo is currently downloading “%1$@”%2$@. If you quit now, DuckDuckGo won‘t finish downloading %3$@."
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tens a certeza de que pretendes sair?\n\nO DuckDuckGo está a transferir “%@”%@. Se saíres agora, o DuckDuckGo não vai transferir %@ até ao fim."
+            "value" : "Tens a certeza de que pretendes sair?\n\nO DuckDuckGo está a transferir \"%1$@”%2$@. Se saíres agora, o DuckDuckGo não vai transferir %3$@ até ao fim."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Действительно закрыть приложение?\n\nDuckDuckGo сейчас загружает «%@»%@. Если закрыть приложение, DuckDuckGo не загрузит %@."
+            "value" : "Are you sure you want to quit?\n\nDuckDuckGo is currently downloading “%1$@”%2$@. If you quit now, DuckDuckGo won‘t finish downloading %3$@."
           }
         }
       }
@@ -22947,7 +23007,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bist du sicher, dass du das Fire Window schließen willst?\n\nDuckDuckGo lädt gerade „%@“%@ herunter. Wenn du das Fire Window schließt, löscht DuckDuckGo %@."
+            "value" : "Möchtest du das Fire Window wirklich schließen?\n\nDuckDuckGo lädt derzeit „%1$@“%2$@ herunter. Wenn du das Fire Window schließt, löscht DuckDuckGo %3$@."
           }
         },
         "en" : {
@@ -22959,43 +23019,43 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¿Seguro que quieres cerrar la Fire Window?\n\nDuckDuckGo está descargando \"%@\"%@. Si cierras la Fire Window, DuckDuckGo eliminará %@."
+            "value" : "¿Seguro que quieres cerrar la Fire Window?\n\nDuckDuckGo se está descargando actualmente \"%1$@\"%2$@. Si cierras la Fire Window, DuckDuckGo eliminará %3$@."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Voulez-vous vraiment fermer la Fire Window ?\n\nDuckDuckGo télécharge actuellement “%@”%@. Si vous fermez la Fire Window, DuckDuckGo supprimera %@."
+            "value" : "Voulez-vous vraiment fermer la Fire Window ?\n\nDuckDuckGo télécharge actuellement « %1$@”%2$@ ». Si vous fermez la Fire Window, DuckDuckGo supprimera %3$@."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vuoi davvero chiudere la Fire Window?\n\nDuckDuckGo sta attualmente scaricando “%@”%@. Se la chiudi, DuckDuckGo eliminerà %@."
+            "value" : "Chiudere la Fire Window?\n\nDuckDuckGo sta scaricando \"%1$@\"%2$@. Se la chiudi, DuckDuckGo eliminerà %3$@."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Weet je zeker dat je het Fire Window wilt sluiten?\n\nDuckDuckGo downloadt op dit moment \"%@\"%@. Als je het Fire Window sluit, wordt %@ verwijderd."
+            "value" : "Weet je zeker dat je het Fire Window wilt sluiten?\n\nDuckDuckGo downloadt momenteel '%1$@'%2$@. Als je het Fire Window sluit, wordt %3$@ verwijderd."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Czy na pewno chcesz zamknąć okno Fire Window?\n\nDuckDuckGo aktualnie pobiera „%@”%@. Jeśli zamkniesz okno Fire Window, DuckDuckGo usunie %@."
+            "value" : "Are you sure you want to close the Fire Window?\n\nDuckDuckGo is currently downloading “%1$@”%2$@. If you close the Fire Window, DuckDuckGo will delete %3$@."
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tens a certeza de que pretendes fechar a Fire Window?\n\nO DuckDuckGo está a transferir “%@”%@. Se fechares a Fire Window, o DuckDuckGo vai eliminar %@."
+            "value" : "Tens a certeza de que pretendes fechar a Fire Window?\n\nO DuckDuckGo está a transferir \"%1$@”%2$@. Se fechares a Fire Window, o DuckDuckGo vai eliminar %3$@."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Действительно закрыть окно Fire Window?\n\nDuckDuckGo сейчас загружает «%@»%@. В случае закрытия DuckDuckGo удалит %@."
+            "value" : "Are you sure you want to close the Fire Window?\n\nDuckDuckGo is currently downloading “%1$@”%2$@. If you close the Fire Window, DuckDuckGo will delete %3$@."
           }
         }
       }
@@ -27288,6 +27348,126 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Изображения хранятся на вашем устройстве, поэтому у DuckDuckGo нет к ним доступа (даже для просмотра)."
+          }
+        }
+      }
+    },
+    "home.page.settings.onboarding.message" : {
+      "comment" : "Home Page Settings Onboarding message",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passe den Hintergrund, das Design und sogar die angezeigten Inhalte an. Versuch es doch mal!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Customize the background, theme, and even what content you see. Give it a try!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personaliza el fondo, el tema e incluso el contenido que ves. ¡Pruébalo!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personnalisez l'arrière-plan, le thème et même le contenu que vous voyez. Essayez par vous-même !"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personalizza lo sfondo, il tema e persino i contenuti che vedi. Prova!"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas de achtergrond, het thema en zelfs de inhoud aan die je ziet. Probeer het maar eens!"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dostosuj tło, motyw oraz wyświetlaną zawartość. Spróbuj!"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personaliza o fundo, o tema e até o conteúdo que vês. Experimenta!"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Можно настроить фон, тему и даже отображаемый контент. Давайте попробуем!"
+          }
+        }
+      }
+    },
+    "home.page.settings.onboarding.title" : {
+      "comment" : "Home Page Settings Onboarding message title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personalisiere deine neue Tab-Seite"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add extra personality to your new tab page"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade más personalidad a tu página de nueva pestaña"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajoutez une personnalité supplémentaire à votre nouvelle page à onglet"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi un tocco di personalità alla tua nuova scheda"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voeg extra persoonlijkheid toe aan je nieuwe tabbladpagina"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dostosuj stronę nowej zakładki do potrzeb"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adiciona personalidade extra à tua página do novo separador"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дополнительная персонализация новой вкладки"
           }
         }
       }
@@ -32278,7 +32458,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Закрыть DuckDuckGo"
+            "value" : "Завершить DuckDuckGo"
           }
         }
       }
@@ -36081,6 +36261,66 @@
         }
       }
     },
+    "newTab.menu.item.show.search.bar" : {
+      "comment" : "Title of the menu item in the home page to show/hide search box (search field)",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suchfeld anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show Search Box"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar el cuadro de búsqueda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher la boîte de recherche"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra la casella di ricerca"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoekvak weergeven"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokaż pole wyszukiwania"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar caixa de pesquisa"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать поле поиска"
+          }
+        }
+      }
+    },
     "newTab.recent.activity.section.title" : {
       "comment" : "Title of the RecentActivity section in the home page",
       "extractionState" : "extracted_with_value",
@@ -36137,6 +36377,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Недавняя активность"
+          }
+        }
+      }
+    },
+    "newTab.search.bar.section.title" : {
+      "comment" : "Setting to show or hide the search box (search field) in the home page",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suchfeld"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Search Box"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuadro de búsqueda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Champ de recherche"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Casella di ricerca"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoekveld"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pole wyszukiwania"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Caixa de pesquisa"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поле поиска"
           }
         }
       }
@@ -38368,55 +38668,55 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Du bist bereit! Du kannst mich jederzeit im Dock antreffen.\n\nMöchtest du sehen, wie ich dich beschütze? Versuche, eine deiner Lieblingsseiten aufzurufen 👆\n\nBehalte die Adressleiste im Auge. Ich werde Tracker blockieren und, wenn möglich, die Sicherheit deiner Verbindung verbessern 🔒"
+            "value" : "Du bist bereit! Du kannst mich jederzeit im Dock antreffen.\nMöchtest du sehen, wie ich dich beschütze? Versuche, eine deiner Lieblingsseiten zu besuchen 👆\n\nBehalte die Adressleiste im Auge. Ich werde Tracker blockieren und die Sicherheit deiner Verbindung verbessern, wenn möglichu{00A0}🔒"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "You’re all set! You can find me hanging out in the Dock anytime.\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possible 🔒"
+            "value" : "You’re all set! You can find me hanging out in the Dock anytime.\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possibleu{00A0}🔒"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¡Ya está todo listo! Puedes encontrarme en el Dock en cualquier momento.\n¿Quieres ver cómo te protejo? Prueba a visitar uno de tus sitios favoritos 👆\n\nNo pierdas de vista la barra de direcciones al navegar. Bloquearé los rastreadores y mejoraré la seguridad de tu conexión cuando sea posible 🔒"
+            "value" : "¡Ya está todo listo! Puedes encontrarme en el Dock en cualquier momento.\n¿Quieres ver cómo te protejo? Prueba a visitar uno de tus sitios favoritos 👆\n\nNo pierdas de vista la barra de direcciones al navegar. Bloquearé los rastreadores y mejoraré la seguridad de tu conexión cuando sea posible{00A0}🔒"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tout est prêt ! Vous pouvez me trouver sur le Dock à tout moment.\nVous voulez voir comment je vous protège ? Essayez de visiter l'un de vos sites préférés 👆\n\nContinuez à regarder la barre d'adresse au fur et à mesure. Je bloquerai les traqueurs et mettrai à niveau la sécurité de votre connexion si possible 🔒"
+            "value" : "Tout est prêt ! Vous pouvez me trouver sur le Dock à tout moment.\nVous voulez voir comment je vous protège ? Essayez de visiter l'un de vos sites préférés 👆\n\nContinuez à regarder la barre d'adresse au fur et à mesure. Je bloquerai les traqueurs et mettrai à niveau la sécurité de votre connexion si possible 🔒"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tutto pronto! Mi puoi trovare in qualsiasi momento sul Dock.\n\nVuoi vedere come ti proteggo? Prova a visitare uno dei tuoi siti preferiti 👆\n\nContinua a controllare la barra degli indirizzi mentre esplori. Bloccherò i sistemi di tracciamento e aggiornerò la sicurezza della tua connessione quando possibile 🔒"
+            "value" : "Tutto pronto! Puoi trovarmi nel dock in qualsiasi momento.\nVuoi vedere come ti proteggo? Prova a visitare uno dei tuoi siti preferiti 👆\n\nContinua a controllare la barra degli indirizzi mentre esplori. Bloccherò i sistemi di tracciamento e aggiornerò la sicurezza della tua connessione quando possibile{00A0} 🔒"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Je bent helemaal klaar! Je kunt me altijd vinden in de Dock.\n\nWil je zien hoe ik je bescherm? Ga eens naar een van je favoriete websites 👆\n\nKijk tijdens het surfen goed naar de adresbalk. Ik blokkeer trackers en werk de beveiliging van je verbinding bij wanneer mogelijk 🔒"
+            "value" : "Je bent helemaal klaar! Je kunt me altijd vinden in het Dock.\nWil je zien hoe ik je bescherm? Ga eens naar een van je favoriete websites 👆\n\nKijk tijdens het surfen goed naar de adresbalk. Ik blokkeer trackers en werk de beveiliging van je verbinding bij wanneer mogelijk 🔒"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wszystko gotowe! W każdej chwili możesz mnie znaleźć w Docku.\n\nChcesz zobaczyć, jak Cię chronię? Spróbuj odwiedzić jedną z ulubionych stron 👆\n\nW międzyczasie obserwuj pasek adresu. Będę blokować mechanizmy śledzące i w miarę możliwości poprawiać bezpieczeństwo połączenia 🔒"
+            "value" : "Wszystko gotowe! W każdej chwili możesz mnie znaleźć w Docku.\nChcesz zobaczyć, jak Cię chronię? Spróbuj odwiedzić jedną z ulubionych stron 👆\n\nW międzyczasie obserwuj pasek adresu. Będę blokować mechanizmy śledzące i w miarę możliwości poprawiać bezpieczeństwo połączenia 🔒"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Está tudo pronto! Podes encontrar-me na Dock em qualquer altura.\nQueres ver como te protejo? Experimenta visitar um dos teus sites favoritos 👆\n\nContinua a observar a barra de endereço à medida que vais avançando. Vou bloquear os rastreadores e melhorar a segurança da tua ligação sempre que possível 🔒"
+            "value" : "Está tudo pronto! Podes encontrar-me na Dock em qualquer altura.\nQueres ver como te protejo? Experimenta visitar um dos teus sites favoritos 👆\n\nContinua a observar a barra de endereço à medida que vais avançando. Vou bloquear os rastreadores e melhorar a segurança da tua ligação sempre que possível 🔒"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Готово! Теперь меня всегда можно найти на док-панели.\n\nХотите узнать, как я защищаю вашу конфиденциальность? Зайдите на свой любимый сайт...👆\n\nИ следите за адресной строкой. Я по возможности буду блокировать трекеры и обеспечивать вам более безопасное соединение 🔒"
+            "value" : "Готово! Теперь меня всегда можно найти на док-панели.\nВам интересно, как я защищаю вашу конфиденциальность? Зайдите на свой любимый сайт...👆\n\nИ следите за адресной строкой. По возможности я заблокирую все трекеры и сделаю соединение более безопасным {00A0}🔒"
           }
         }
       }
@@ -38428,55 +38728,55 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Du bist bereit!\n\nMöchtest du sehen, wie ich dich beschütze? Versuche, eine deiner Lieblingsseiten aufzurufen 👆\n\nBehalte die Adressleiste im Auge. Ich werde Tracker blockieren und, wenn möglich, die Sicherheit deiner Verbindung verbessern 🔒"
+            "value" : "Du bist bereit!\n\nMöchtest du sehen, wie ich dich beschütze? Versuche, eine deiner Lieblingsseiten zu besuchen 👆\n\nBehalte die Adressleiste im Auge. Ich werde Tracker blockieren und die Sicherheit deiner Verbindung verbessern, wenn möglich 🔒"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "You’re all set!\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possible 🔒"
+            "value" : "You’re all set!\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possibleu{00A0}🔒"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¡Ya está todo listo!\n\n¿Quieres ver cómo te protejo? Prueba a visitar uno de tus sitios favoritos 👆\n\nNo pierdas de vista la barra de direcciones al navegar. Bloquearé los rastreadores y mejoraré la seguridad de tu conexión cuando sea posible 🔒"
+            "value" : "¡Ya está todo listo!\n\n¿Quieres ver cómo te protejo? Prueba a visitar uno de tus sitios favoritos 👆\n\nSigue viendo la barra de direcciones sobre la marcha. Bloquearé los rastreadores y mejoraré la seguridad de tu conexión cuando sea posible 🔒"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tout est prêt !\n\nVous voulez voir comment je vous protège ? Essayez de visiter l'un de vos sites préférés 👆\n\nContinuez à regarder la barre d'adresse au fur et à mesure. Je bloquerai les traqueurs et mettrai à niveau la sécurité de votre connexion si possible 🔒"
+            "value" : "Tout est prêt !\n\nVous voulez voir comment je vous protège ? Essayez de visiter l'un de vos sites préférés 👆\n\n Continuez à regarder la barre d'adresse au fur et à mesure. Je bloquerai les traqueurs et mettrai à niveau la sécurité de votre connexion si possible 🔒"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tutto pronto!Vuoi vedere come ti proteggo? Prova a visitare uno dei tuoi siti preferiti 👆\n\nContinua a controllare la barra degli indirizzi mentre esplori. Bloccherò i sistemi di tracciamento e aggiornerò la sicurezza della tua connessione quando possibile 🔒"
+            "value" : "Tutto pronto.\n\nVuoi vedere come ti proteggo? Prova a visitare uno dei tuoi siti preferiti 👆Continua a controllare la barra degli indirizzi mentre esplori. Bloccherò i sistemi di tracciamento e aggiornerò la sicurezza della tua connessione quando possibile 🔒"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Je bent helemaal klaar!\n\nWil je zien hoe ik je bescherm? Ga eens naar een van je favoriete websites 👆\n\nKijk tijdens het surfen goed naar de adresbalk. Ik blokkeer trackers en werk de beveiliging van je verbinding bij wanneer mogelijk 🔒"
+            "value" : "Je bent helemaal klaar!\n\nWil je zien hoe ik je bescherm? Ga eens naar een van je favoriete websites 👆 \n\n Kijk tijdens het surfen goed naar de adresbalk. Ik blokkeer trackers en werk de beveiliging van je verbinding bij wanneer mogelijk 🔒"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wszystko gotowe!\n\nChcesz zobaczyć, jak Cię chronię? Spróbuj odwiedzić jedną z ulubionych stron 👆\n\nW międzyczasie obserwuj pasek adresu. Będę blokować mechanizmy śledzące i w miarę możliwości poprawiać bezpieczeństwo połączenia 🔒"
+            "value" : "Wszystko gotowe!\n\nChcesz zobaczyć, jak Cię chronię? Spróbuj odwiedzić jedną z ulubionych stron 👆\n\nW międzyczasie obserwuj pasek adresu. Będę blokować mechanizmy śledzące i w miarę możliwości poprawiać bezpieczeństwo połączenia 🔒"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Está tudo pronto!\n\nQueres ver como te protejo? Experimenta visitar um dos teus sites favoritos 👆\n\nContinua a observar a barra de endereço à medida que vais avançando. Vou bloquear os rastreadores e melhorar a segurança da tua ligação sempre que possível 🔒"
+            "value" : "Estás tudo pronto!\n\nQueres ver como te protejo? Experimenta visitar um dos teus sites favoritos 👆\n\nContinua a observar a barra de endereço à medida que vais avançando. Vou bloquear os rastreadores e melhorar a segurança da tua ligação sempre que possível 🔒"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Готово!\n\nХотите узнать, как я защищаю вашу конфиденциальность? Зайдите на свой любимый сайт...👆\n\nИ следите за адресной строкой. Я по возможности буду блокировать трекеры и обеспечивать вам более безопасное соединение 🔒"
+            "value" : "Все готово!\n\nХотите увидеть, как я вас защищаю? Зайдите на один из любимых сайтов 👆\n\nСледите за адресной строкой. Я по возможности буду блокировать трекеры и обеспечивать вам более безопасное соединение 🔒"
           }
         }
       }

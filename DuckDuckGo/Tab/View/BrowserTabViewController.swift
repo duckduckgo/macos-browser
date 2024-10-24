@@ -407,6 +407,7 @@ final class BrowserTabViewController: NSViewController {
         containerStackView.orientation = .vertical
         containerStackView.alignment = .leading
         containerStackView.distribution = .fillProportionally
+        containerStackView.spacing = 0
 
         // Make sure link preview (tooltip shown in the bottom-left) is on top
         view.addSubview(containerStackView, positioned: .below, relativeTo: hoverLabelContainer)
@@ -488,6 +489,7 @@ final class BrowserTabViewController: NSViewController {
         hostingController.view.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             hostingController.view.widthAnchor.constraint(equalTo: containerStackView.widthAnchor),
+            hostingController.view.topAnchor.constraint(equalTo: containerStackView.topAnchor),
             hostingController.view.leadingAnchor.constraint(equalTo: containerStackView.leadingAnchor),
             hostingController.view.trailingAnchor.constraint(equalTo: containerStackView.trailingAnchor)
         ])
@@ -496,9 +498,9 @@ final class BrowserTabViewController: NSViewController {
         webViewContainer?.layoutSubtreeIfNeeded()
 
         let currentState = onboardingDialogTypeProvider.state
-        if currentState == .showFireButton {
+        if dialogType == .tryFireButton {
             delegate?.highlightFireButton()
-        } else if currentState == .showBlockedTrackers {
+        } else if case .trackers = dialogType {
             delegate?.highlightPrivacyShield()
         }
     }
@@ -577,11 +579,6 @@ final class BrowserTabViewController: NSViewController {
 
         tabViewModel?.tab.webViewDidFinishNavigationPublisher.sink { [weak self] in
             self?.updateStateAndPresentContextualOnboarding()
-        }.store(in: &tabViewModelCancellables)
-
-        tabViewModel?.tab.webViewDidStartNavigationPublisher.sink { [weak self] in
-            guard let self, let webViewContainer = self.webViewContainer else { return }
-            self.removeChild(in: self.containerStackView, webViewContainer: webViewContainer)
         }.store(in: &tabViewModelCancellables)
     }
 
@@ -885,7 +882,7 @@ final class BrowserTabViewController: NSViewController {
             guard let syncService = NSApp.delegateTyped.syncService else {
                 fatalError("Sync service is nil")
             }
-            let preferencesViewController = PreferencesViewController(syncService: syncService)
+            let preferencesViewController = PreferencesViewController(syncService: syncService, tabCollectionViewModel: tabCollectionViewModel)
             preferencesViewController.delegate = self
             self.preferencesViewController = preferencesViewController
             return preferencesViewController

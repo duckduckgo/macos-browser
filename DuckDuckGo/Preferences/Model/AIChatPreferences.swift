@@ -18,72 +18,64 @@
 
 import Combine
 import Foundation
+import BrowserServicesKit
 
 final class AIChatPreferences: ObservableObject {
     static let shared = AIChatPreferences()
-
-    private var preferencesStorage: AIChatPreferencesStorage
+    private var storage: AIChatPreferencesStorage
+    private var cancellables = Set<AnyCancellable>()
+    private let configuration: AIChatMenuVisibilityConfigurable
     private let learnMoreURL = URL(string: "https://duckduckgo.com/duckduckgo-help-pages/aichat/")!
 
-    init(storage: AIChatPreferencesStorage = AIChatPreferencesUserDefaultsStorage()) {
-        self.preferencesStorage = storage
-        self.showShortcutInToolbar = storage.showShortcutInToolbar
-        self.showShortcutInApplicationMenu = storage.showShortcutInApplicationMenu
+    init(storage: AIChatPreferencesStorage = DefaultAIChatPreferencesStorage(),
+         configuration: AIChatMenuVisibilityConfigurable = AIChatMenuConfiguration()) {
+        self.storage = storage
+        self.configuration = configuration
+
+        showShortcutInToolbar = storage.shouldDisplayToolbarShortcut
+        showShortcutInApplicationMenu = storage.showShortcutInApplicationMenu
+
+        subscribeToShowInToolbarSettingsChanges()
+        subscribeToShowInApplicationMenuSettingsChanges()
+    }
+
+    func subscribeToShowInToolbarSettingsChanges() {
+        storage.shouldDisplayToolbarShortcutPublisher
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .assign(to: \.showShortcutInToolbar, onWeaklyHeld: self)
+            .store(in: &cancellables)
+    }
+
+    func subscribeToShowInApplicationMenuSettingsChanges() {
+        storage.showShortcutInApplicationMenuPublisher
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .assign(to: \.showShortcutInApplicationMenu, onWeaklyHeld: self)
+            .store(in: &cancellables)
+    }
+
+    var shouldShowToolBarShortcutOption: Bool {
+        self.configuration.isFeatureEnabledForToolbarShortcut
+    }
+
+    var shouldShowApplicationMenuShortcutOption: Bool {
+        self.configuration.isFeatureEnabledForApplicationMenuShortcut
     }
 
     @Published var showShortcutInToolbar: Bool {
         didSet {
-            preferencesStorage.showShortcutInToolbar = showShortcutInToolbar
+            storage.shouldDisplayToolbarShortcut = showShortcutInToolbar
         }
     }
 
     @Published var showShortcutInApplicationMenu: Bool {
         didSet {
-            preferencesStorage.showShortcutInApplicationMenu = showShortcutInApplicationMenu
+            storage.showShortcutInApplicationMenu = showShortcutInApplicationMenu
         }
     }
 
     @MainActor func openLearnMoreLink() {
         WindowControllersManager.shared.show(url: learnMoreURL, source: .ui, newTab: true)
-    }
-}
-
-protocol AIChatPreferencesStorage {
-    var showShortcutInToolbar: Bool { get set }
-    var showShortcutInApplicationMenu: Bool { get set }
-}
-
-struct AIChatPreferencesUserDefaultsStorage: AIChatPreferencesStorage {
-    private let userDefaults: UserDefaults
-
-    init(userDefaults: UserDefaults = .standard) {
-        self.userDefaults = userDefaults
-    }
-
-    var showShortcutInToolbar: Bool {
-        get { userDefaults.showAIChatShortcutInToolbar }
-        set { userDefaults.showAIChatShortcutInToolbar = newValue }
-    }
-
-    var showShortcutInApplicationMenu: Bool {
-        get { userDefaults.showAIChatShortcutInApplicationMenu }
-        set { userDefaults.showAIChatShortcutInApplicationMenu = newValue }
-    }
-}
-
-private extension UserDefaults {
-    enum Keys {
-        static let showAIChatShortcutInToolbar = "aichat.showAIChatShortcutInToolbar"
-        static let showAIChatShortcutInApplicationMenu = "aichat.showAIChatShortcutInApplicationMenu"
-    }
-
-    var showAIChatShortcutInApplicationMenu: Bool {
-        get { bool(forKey: Keys.showAIChatShortcutInApplicationMenu) }
-        set { set(newValue, forKey: Keys.showAIChatShortcutInApplicationMenu) }
-    }
-
-    var showAIChatShortcutInToolbar: Bool {
-        get { bool(forKey: Keys.showAIChatShortcutInToolbar) }
-        set { set(newValue, forKey: Keys.showAIChatShortcutInToolbar) }
     }
 }

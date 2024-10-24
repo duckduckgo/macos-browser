@@ -25,6 +25,7 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
     var isFavoriteVisible: Bool
     var isContinueSetUpVisible: Bool
     var isRecentActivityVisible: Bool
+    var isSearchBarVisible: Bool
     var showFullURL: Bool
     var currentThemeName: String
     var favoritesDisplayMode: String?
@@ -42,6 +43,7 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
         isContinueSetUpVisible: Bool = true,
         isFavoriteVisible: Bool = true,
         isRecentActivityVisible: Bool = true,
+        isSearchBarVisible: Bool = true,
         showBookmarksBar: Bool = true,
         bookmarksBarAppearance: BookmarksBarAppearance = .alwaysOn,
         homeButtonPosition: HomeButtonPosition = .right,
@@ -55,6 +57,7 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
         self.isContinueSetUpVisible = isContinueSetUpVisible
         self.isFavoriteVisible = isFavoriteVisible
         self.isRecentActivityVisible = isRecentActivityVisible
+        self.isSearchBarVisible = isSearchBarVisible
         self.showBookmarksBar = showBookmarksBar
         self.bookmarksBarAppearance = bookmarksBarAppearance
         self.homeButtonPosition = homeButtonPosition
@@ -87,6 +90,7 @@ final class AppearancePreferencesTests: XCTestCase {
         XCTAssertEqual(model.isFavoriteVisible, true)
         XCTAssertEqual(model.isContinueSetUpVisible, true)
         XCTAssertEqual(model.isRecentActivityVisible, true)
+        XCTAssertEqual(model.isSearchBarVisible, true)
         XCTAssertEqual(model.homeButtonPosition, .left)
         XCTAssertEqual(model.homePageCustomBackground, .gradient(.gradient01))
         XCTAssertTrue(model.centerAlignedBookmarksBarBool)
@@ -99,6 +103,7 @@ final class AppearancePreferencesTests: XCTestCase {
                 isContinueSetUpVisible: false,
                 isFavoriteVisible: false,
                 isRecentActivityVisible: false,
+                isSearchBarVisible: false,
                 homeButtonPosition: .left,
                 homePageCustomBackground: CustomBackground.gradient(.gradient05).description,
                 centerAlignedBookmarksBar: false
@@ -110,6 +115,7 @@ final class AppearancePreferencesTests: XCTestCase {
         XCTAssertEqual(model.isFavoriteVisible, false)
         XCTAssertEqual(model.isContinueSetUpVisible, false)
         XCTAssertEqual(model.isRecentActivityVisible, false)
+        XCTAssertEqual(model.isSearchBarVisible, false)
         XCTAssertEqual(model.homeButtonPosition, .left)
         XCTAssertEqual(model.homePageCustomBackground, .gradient(.gradient05))
         XCTAssertFalse(model.centerAlignedBookmarksBarBool)
@@ -156,6 +162,8 @@ final class AppearancePreferencesTests: XCTestCase {
         XCTAssertEqual(model.isFavoriteVisible, true)
         model.isContinueSetUpVisible = true
         XCTAssertEqual(model.isContinueSetUpVisible, true)
+        model.isSearchBarVisible = true
+        XCTAssertEqual(model.isSearchBarVisible, true)
 
         model.isRecentActivityVisible = false
         XCTAssertEqual(model.isRecentActivityVisible, false)
@@ -163,6 +171,8 @@ final class AppearancePreferencesTests: XCTestCase {
         XCTAssertEqual(model.isFavoriteVisible, false)
         model.isContinueSetUpVisible = false
         XCTAssertEqual(model.isContinueSetUpVisible, false)
+        model.isSearchBarVisible = false
+        XCTAssertEqual(model.isSearchBarVisible, false)
     }
 
     func testPersisterReturnsValuesFromDisk() {
@@ -176,9 +186,12 @@ final class AppearancePreferencesTests: XCTestCase {
         persister1.isRecentActivityVisible = true
         persister2.isContinueSetUpVisible = false
         persister1.isContinueSetUpVisible = true
+        persister2.isSearchBarVisible = false
+        persister1.isSearchBarVisible = true
 
         XCTAssertTrue(persister2.isFavoriteVisible)
         XCTAssertTrue(persister2.isRecentActivityVisible)
         XCTAssertTrue(persister2.isContinueSetUpVisible)
+        XCTAssertTrue(persister2.isSearchBarVisible)
     }
 }
