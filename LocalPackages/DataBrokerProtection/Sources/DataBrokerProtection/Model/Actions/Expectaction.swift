@@ -31,9 +31,65 @@ struct Item: Codable, Sendable {
     let parent: String?
 }
 
-internal struct ExpectationAction: Action {
+final class ExpectationAction: Action {
     let id: String
     let actionType: ActionType
     let expectations: [Item]
     let dataSource: DataSource?
+    let actions: [Action]?
+
+    enum CodingKeys: String, CodingKey {
+        case id, actionType, expectations, dataSource, actions
+    }
+
+    init(id: String, actionType: ActionType, expectations: [Item], dataSource: DataSource?, actions: [Action]?) {
+        self.id = id
+        self.actionType = actionType
+        self.expectations = expectations
+        self.dataSource = dataSource
+        self.actions = actions
+    }
+
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try container.decode(String.self, forKey: .id)
+        self.actionType = try container.decode(ActionType.self, forKey: .actionType)
+        self.expectations = try container.decode([Item].self, forKey: .expectations)
+        self.dataSource = try container.decodeIfPresent(DataSource.self, forKey: .dataSource)
+        let actionsList = try container.decodeIfPresent([[String: Any]].self, forKey: .actions)
+        if let actionsList = actionsList {
+            self.actions = try Step.parse(actionsList)
+        } else {
+            self.actions = nil
+        }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(actionType, forKey: .actionType)
+        try container.encode(expectations, forKey: .expectations)
+        try container.encode(dataSource, forKey: .dataSource)
+
+        var actionsContainer = container.nestedUnkeyedContainer(forKey: .actions)
+        for action in (actions ?? []) {
+            if let navigateAction = action as? NavigateAction {
+                try actionsContainer.encode(navigateAction)
+            } else if let extractAction = action as? ExtractAction {
+                try actionsContainer.encode(extractAction)
+            } else if let fillFormAction = action as? FillFormAction {
+                try actionsContainer.encode(fillFormAction)
+            } else if let getCaptchaInfoAction = action as? GetCaptchaInfoAction {
+                try actionsContainer.encode(getCaptchaInfoAction)
+            } else if let solveCaptchaInfoAction = action as? SolveCaptchaAction {
+                try actionsContainer.encode(solveCaptchaInfoAction)
+            } else if let emailConfirmationAction = action as? EmailConfirmationAction {
+                try actionsContainer.encode(emailConfirmationAction)
+            } else if let clickAction = action as? ClickAction {
+                try actionsContainer.encode(clickAction)
+            } else if let expectactionAction = action as? ExpectationAction {
+                try actionsContainer.encode(expectactionAction)
+            }
+        }
+    }
 }
