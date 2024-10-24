@@ -851,6 +851,10 @@ extension MainViewController {
         UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.onboardingFinished.rawValue)
     }
 
+    @objc func resetHomePageSettingsOnboarding(_ sender: Any?) {
+        UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Any>.Key.homePageDidShowSettingsOnboarding.rawValue)
+    }
+
     @objc func resetContextualOnboarding(_ sender: Any?) {
         Application.appDelegate.onboardingStateMachine.state = .notStarted
     }
