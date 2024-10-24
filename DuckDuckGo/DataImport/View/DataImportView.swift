@@ -24,7 +24,13 @@ struct DataImportView: ModalView {
 
     @Environment(\.dismiss) private var dismiss
 
-    @State var model = DataImportViewModel()
+    @State var model: DataImportViewModel
+    let title: String
+
+    init(model: DataImportViewModel = DataImportViewModel(), title: String = UserText.importDataTitle) {
+        self._model = State(initialValue: model)
+        self.title = title
+    }
 
     struct ProgressState {
         let text: String?
@@ -76,14 +82,27 @@ struct DataImportView: ModalView {
     }
 
     private func viewHeader() -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            if case .shortcuts = model.screen {
+        return VStack(alignment: .leading, spacing: 0) {
+            // If there are no errors show summary success header
+            if case .summary = model.screen, !model.hasAnySummaryError {
+                VStack(alignment: .leading) {
+                    Image(.success96)
+                    Text(UserText.importDataSuccessTitle)
+                        .foregroundColor(.primary)
+                        .font(.system(size: 17, weight: .bold))
+                }
+                .padding(.bottom, 16)
+            } else if case .shortcuts = model.screen {
                 Text(UserText.importDataShortcutsTitle)
                     .font(.title2.weight(.semibold))
                     .padding(.bottom, 24)
 
             } else {
-                Text(UserText.importDataTitle)
+                // If screen is not the first screen where the user choose the type of import they want to do show the generic title.
+                // Otherwise show the injected title.
+                let title = model.screen == .profileAndDataTypesPicker ? self.title : UserText.importDataTitle
+
+                Text(title)
                     .font(.title2.weight(.semibold))
                     .padding(.bottom, 24)
 

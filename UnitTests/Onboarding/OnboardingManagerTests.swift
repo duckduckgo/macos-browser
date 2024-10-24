@@ -62,7 +62,14 @@ class OnboardingManagerTests: XCTestCase {
         systemSettings = SystemSettings(rows: ["dock", "import", "default-browser"])
 #endif
         let stepDefinitions = StepDefinitions(systemSettings: systemSettings)
-        let expectedConfig = OnboardingConfiguration(stepDefinitions: stepDefinitions, env: "development", locale: "en")
+        let expectedConfig = OnboardingConfiguration(
+            stepDefinitions: stepDefinitions,
+            exclude: [],
+            order: "v3",
+            env: "development",
+            locale: "en",
+            platform: .init(name: "macos")
+        )
 
         // Then
         XCTAssertEqual(manager.configuration, expectedConfig)

@@ -91,10 +91,12 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
 
     let configuration: OnboardingConfiguration = {
         var systemSettings: SystemSettings
+        var order = "v3"
+        let platform = OnboardingPlatform(name: "macos")
 #if APPSTORE
-        systemSettings = SystemSettings(rows: ["import", "default-browser"])
+        systemSettings = SystemSettings(rows: ["import"])
 #else
-        systemSettings = SystemSettings(rows: ["dock", "import", "default-browser"])
+        systemSettings = SystemSettings(rows: ["dock", "import"])
 #endif
         let stepDefinitions = StepDefinitions(systemSettings: systemSettings)
         let preferredLocale = Bundle.main.preferredLocalizations.first ?? "en"
@@ -104,7 +106,8 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
 #else
         env = "production"
 #endif
-        return OnboardingConfiguration(stepDefinitions: stepDefinitions, env: env, locale: preferredLocale)
+
+        return OnboardingConfiguration(stepDefinitions: stepDefinitions, exclude: [], order: order, env: env, locale: preferredLocale, platform: platform)
     }()
 
     init(navigationDelegate: OnboardingNavigating, dockCustomization: DockCustomization, defaultBrowserProvider: DefaultBrowserProvider, appearancePreferences: AppearancePreferences, startupPreferences: StartupPreferences) {
