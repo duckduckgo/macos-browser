@@ -96,6 +96,7 @@ final class SafariDataImporter: DataImporter {
     private func importFavicons(from dataDirectoryURL: URL) async {
         let faviconsReader = SafariFaviconsReader(safariDataDirectoryURL: dataDirectoryURL)
         let faviconsResult = faviconsReader.readFavicons()
+        let sourceVersion = profile.installedAppsMajorVersionDescription()
 
         switch faviconsResult {
         case .success(let faviconsByURL):
@@ -112,9 +113,10 @@ final class SafariDataImporter: DataImporter {
                 result[pageURL] = favicons
             }
             await faviconManager.handleFaviconsByDocumentUrl(faviconsByDocument)
+            PixelKit.fire(GeneralPixel.dataImportSucceeded(action: .favicons, source: source, sourceVersion: sourceVersion))
 
         case .failure(let error):
-            PixelKit.fire(GeneralPixel.dataImportFailed(source: source, sourceVersion: profile.installedAppsMajorVersionDescription(), error: error))
+            PixelKit.fire(GeneralPixel.dataImportFailed(source: source, sourceVersion: sourceVersion, error: error))
         }
     }
 

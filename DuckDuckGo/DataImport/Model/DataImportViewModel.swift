@@ -245,12 +245,14 @@ struct DataImportViewModel {
         var nextScreen: Screen?
         // merge new import results into the model import summary keeping the original DataType sorting order
         for (dataType, result) in DataType.allCases.compactMap({ dataType in summary[dataType].map { (dataType, $0) } }) {
+            let sourceVersion = importSource.installedAppsMajorVersionDescription(selectedProfile: selectedProfile)
             switch result {
             case .success(let dataTypeSummary):
                 // if a data type can‘t be imported (Yandex/Passwords) - switch to its file import displaying successful import results
                 if dataTypeSummary.isEmpty, !(screen.isFileImport && screen.fileImportDataType == dataType), nextScreen == nil {
                     nextScreen = .fileImport(dataType: dataType, summary: Set(summary.filter({ $0.value.isSuccess }).keys))
                 }
+                PixelKit.fire(GeneralPixel.dataImportSucceeded(action: .generic, source: importSource, sourceVersion: sourceVersion))
             case .failure(let error):
                 // successful imports are appended above
                 self.summary.append( .init(dataType, result) )
@@ -260,7 +262,7 @@ struct DataImportViewModel {
                     // switch to file import of the failed data type displaying successful import results
                     nextScreen = .fileImport(dataType: dataType, summary: Set(summary.filter({ $0.value.isSuccess }).keys))
                 }
-                PixelKit.fire(GeneralPixel.dataImportFailed(source: importSource, sourceVersion: importSource.installedAppsMajorVersionDescription(selectedProfile: selectedProfile), error: error))
+                PixelKit.fire(GeneralPixel.dataImportFailed(source: importSource, sourceVersion: sourceVersion, error: error))
             }
         }
 
