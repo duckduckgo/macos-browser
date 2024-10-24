@@ -26,6 +26,7 @@ import XCTest
 final class LocalBookmarkManagerTests: XCTestCase {
 
     var container: NSPersistentContainer!
+    var context: NSManagedObjectContext!
 
     enum BookmarkManagerError: Error {
         case somethingReallyBad
@@ -33,11 +34,19 @@ final class LocalBookmarkManagerTests: XCTestCase {
 
     override func setUp() {
         container = CoreData.bookmarkContainer()
-        let context = container.newBackgroundContext()
+        context = container.newBackgroundContext()
         context.performAndWait {
             BookmarkUtils.prepareFoldersStructure(in: context)
         }
         LocalBookmarkManager.context = context
+    }
+
+    override func tearDown() {
+        // flush pending operations
+        context.performAndWait { }
+        LocalBookmarkManager.context = nil
+        context = nil
+        container = nil
     }
 
     @MainActor
@@ -807,7 +816,7 @@ fileprivate extension LocalBookmarkManager {
     }
 
     private static func makeManager(@BookmarksBuilder with bookmarks: () -> [BookmarksBuilderItem]) -> (LocalBookmarkManager, BookmarkStoreMock) {
-        let bookmarkStoreMock = BookmarkStoreMock(contextProvider: { Self.context }, bookmarks: bookmarks().build())
+        let bookmarkStoreMock = BookmarkStoreMock(contextProvider: Self.context.map { context in { context } }, bookmarks: bookmarks().build())
         let faviconManagerMock = MainActor.assumeIsolated { FaviconManagerMock() }
         let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
 

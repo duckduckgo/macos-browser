@@ -98,6 +98,7 @@ final class DownloadsViewController: NSViewController {
         scrollView.autohidesScrollers = true
         scrollView.borderType = .noBorder
         scrollView.hasHorizontalScroller = false
+        scrollView.hasVerticalScroller = true
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.usesPredominantAxisScrolling = false
         scrollView.automaticallyAdjustsContentInsets = false
