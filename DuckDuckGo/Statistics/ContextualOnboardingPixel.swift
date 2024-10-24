@@ -69,7 +69,7 @@ enum ContextualOnboardingPixel: PixelKitEventV2 {
      * Event Trigger: The “skip” button on the Fire Button dialog during the contextual onboarding
      *
      * Anomaly Investigation:
-     * It is triggered on skip in the OnboardingFireButtonDialogViewModel. The action is passed by the DefaultContextualDaxDialogViewFactory
+     * It is triggered on skip in the OnboardingFireButtonDialogViewModel.
      * Check code in that area  to check it behaves as expected
      */
     case onboardingFireButtonPromptSkipPressed
@@ -78,7 +78,7 @@ enum ContextualOnboardingPixel: PixelKitEventV2 {
      * Event Trigger: The “skip” button on the Fire Button dialog during the contextual onboarding
      *
      * Anomaly Investigation:
-     * It is triggered on tryFireButton in the OnboardingFireButtonDialogViewModel. The action is passed by the DefaultContextualDaxDialogViewFactory
+     * It is triggered on tryFireButton in the OnboardingFireButtonDialogViewModel.
      * Check code in that area  to check it behaves as expected
      */
     case onboardingFireButtonTryItPressed
@@ -87,7 +87,9 @@ enum ContextualOnboardingPixel: PixelKitEventV2 {
      * Event Trigger: The final onboarding dialog is displayed during the contextual onboarding
      *
      * Anomaly Investigation:
-
+     * It is triggered on when HighFive dialog is returned DefaultContextualDaxDialogViewFactory
+     * and on skip in the OnboardingFireButtonDialogViewModel.
+     * Check code in that area  to check it behaves as expected
      */
     case onboardingFinished
 

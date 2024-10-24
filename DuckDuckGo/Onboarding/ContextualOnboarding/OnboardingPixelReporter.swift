@@ -91,7 +91,7 @@ extension OnboardingPixelReporter: OnboardingAddressBarReporting {
 extension OnboardingPixelReporter: OnboardingFireReporting {
     func trackFireButtonPressed() {
         if onboardingStateProvider.state != .onboardingCompleted {
-            PixelKit.fire(ContextualOnboardingPixel.onboardingFireButtonPressed, frequency: .unique)
+            fire(ContextualOnboardingPixel.onboardingFireButtonPressed, .unique)
         }
     }
 }

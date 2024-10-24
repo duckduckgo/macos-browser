@@ -90,6 +90,21 @@ final class OnboardingPixelReporterTests: XCTestCase {
         XCTAssertEqual(eventSent?.name, ContextualOnboardingPixel.onboardingFinished.name)
         XCTAssertEqual(frequency, .unique)
     }
+
+    func test_WhenTrackFireButtonPressed_AndOnboardingNotCompleted_ThenOnboardingFireButtonPressedSent() {
+        onboardingState.state = .showFireButton
+        reporter.trackFireButtonPressed()
+        XCTAssertEqual(eventSent?.name, ContextualOnboardingPixel.onboardingFireButtonPressed.name)
+        XCTAssertEqual(frequency, .unique)
+    }
+
+    func test_WhenTrackFireButtonPressed_AndOnboardingCompleted_ThenNoPixelSent() {
+        onboardingState.state = .showFireButton
+        reporter.trackFireButtonPressed()
+        XCTAssertNil(eventSent)
+        XCTAssertNil(frequency)
+    }
+
 }
 
 class MockContextualOnboardingState: ContextualOnboardingStateUpdater {
