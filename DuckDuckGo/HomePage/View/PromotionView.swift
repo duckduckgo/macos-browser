@@ -29,12 +29,14 @@ extension HomePage.Views {
         var viewModel: PromotionViewModel
 
         @State var isHovering = false
+        @EnvironmentObject var settingsModel: HomePage.Models.SettingsModel
 
         var body: some View {
             ZStack {
                 RoundedRectangle(cornerRadius: 12)
-                    .foregroundColor(Color.blackWhite3)
-                    .cornerRadius(8)
+                    .stroke(Color.homeFavoritesGhost, style: StrokeStyle(lineWidth: 1.0))
+                    .homePageViewBackground(settingsModel.customBackground)
+                    .cornerRadius(12)
                 VStack(spacing: 12) {
                     HStack(spacing: 8) {
                         image
@@ -92,6 +94,7 @@ extension HomePage.Views {
                 Button(action: viewModel.proceedAction) {
                     Text(viewModel.proceedButtonText)
                 }
+                .controlSize(.large)
             }
         }
     }
