@@ -126,7 +126,6 @@ final class HomePageViewController: NSViewController {
     override func viewDidAppear() {
         super.viewDidAppear()
         refreshModels()
-        addressBarModel.addressBarTextField?.makeMeFirstResponder()
 
         showSettingsOnboardingIfNeeded()
     }
