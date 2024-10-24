@@ -47,7 +47,7 @@ protocol OptionsButtonMenuDelegate: AnyObject {
     func optionsButtonMenuRequestedIdentityTheftRestoration(_ menu: NSMenu)
 }
 
-final class MoreOptionsMenu: NSMenu {
+final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
 
     weak var actionDelegate: OptionsButtonMenuDelegate?
 
@@ -94,6 +94,8 @@ final class MoreOptionsMenu: NSMenu {
             self.sharingMenu = sharingMenu
         }
         self.emailManager.requestDelegate = self
+
+        delegate = self
 
         setupMenuItems()
     }
@@ -275,8 +277,10 @@ final class MoreOptionsMenu: NSMenu {
     private func addUpdateItem() {
 #if SPARKLE
         guard NSApp.runType != .uiTests,
-            let update = Application.appDelegate.updateController.latestUpdate,
-            !update.isInstalled
+              let updateController = Application.appDelegate.updateController,
+              let update = updateController.latestUpdate,
+              !update.isInstalled,
+              updateController.updateProgress.isDone
         else {
             return
         }
@@ -424,6 +428,14 @@ final class MoreOptionsMenu: NSMenu {
         return networkProtectionItem
     }
 
+    func menuWillOpen(_ menu: NSMenu) {
+#if SPARKLE
+        guard let updateController = Application.appDelegate.updateController else { return }
+        if updateController.hasPendingUpdate && updateController.needsNotificationDot {
+            updateController.needsNotificationDot = false
+        }
+#endif
+    }
 }
 
 final class EmailOptionsButtonSubMenu: NSMenu {
