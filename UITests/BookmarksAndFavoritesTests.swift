@@ -653,7 +653,7 @@ private extension BookmarksAndFavoritesTests {
 
     /// Make sure that we can reply on the bookmarks bar always appearing
     func toggleShowBookmarksBarAlwaysOn() {
-        app.typeKey(",", modifierFlags: [.command]) // Open settings
+        addressBarTextField.typeURL(URL("duck://settings")!) // Open settings
 
         XCTAssertTrue(
             settingsAppearanceButton.waitForExistence(timeout: UITests.Timeouts.elementExistence),

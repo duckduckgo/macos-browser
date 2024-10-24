@@ -58,7 +58,13 @@ enum UITests {
         let app = XCUIApplication()
         app.launch()
 
-        app.typeKey(",", modifierFlags: [.command]) // Open settings
+        let settings = app.menuItems["MainMenu.preferencesMenuItem"]
+        XCTAssertTrue(
+            settings.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "Reset bookmarks menu item didn't become available in a reasonable timeframe."
+        )
+
+        settings.click()
         let generalPreferencesButton = app.buttons["PreferencesSidebar.generalButton"]
         let autocompleteToggle = app.checkBoxes["PreferencesGeneralView.showAutocompleteSuggestions"]
         XCTAssertTrue(
