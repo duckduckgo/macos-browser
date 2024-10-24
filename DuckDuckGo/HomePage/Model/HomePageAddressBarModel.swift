@@ -110,12 +110,12 @@ extension HomePage.Models {
 
         init(tabCollectionViewModel: TabCollectionViewModel, privacyConfigurationManager: PrivacyConfigurationManaging) {
             self.tabCollectionViewModel = tabCollectionViewModel
-            isExperimentActive = privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .newTabSearchField)
+            isExperimentActive = true // privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .newTabSearchField)
             setUpExperimentIfNeeded()
 
-            privacyConfigCancellable = privacyConfigurationManager.updatesPublisher.sink { [weak self, weak privacyConfigurationManager] in
-                self?.isExperimentActive = privacyConfigurationManager?.privacyConfig.isEnabled(featureKey: .newTabSearchField) == true
-            }
+//            privacyConfigCancellable = privacyConfigurationManager.updatesPublisher.sink { [weak self, weak privacyConfigurationManager] in
+//                self?.isExperimentActive = privacyConfigurationManager?.privacyConfig.isEnabled(featureKey: .newTabSearchField) == true
+//            }
         }
 
         private func setUpExperimentIfNeeded() {

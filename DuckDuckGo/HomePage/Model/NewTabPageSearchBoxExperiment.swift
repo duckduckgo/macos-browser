@@ -76,6 +76,8 @@ protocol NewTabPageSearchBoxExperimentCohortDeciding {
 struct DefaultNewTabPageSearchBoxExperimentCohortDecider: NewTabPageSearchBoxExperimentCohortDeciding {
     var cohort: NewTabPageSearchBoxExperiment.Cohort? {
 
+        return .experiment
+
         // We enroll all new users
         if AppDelegate.isNewUser {
             return Bool.random() ? .experiment : .control
@@ -194,10 +196,10 @@ final class NewTabPageSearchBoxExperiment {
     }
 
     func assignUserToCohort() {
-        guard !dataStore.didRunEnrollment else {
-            Logger.newTabPageSearchBoxExperiment.debug("Cohort already assigned, skipping...")
-            return
-        }
+//        guard !dataStore.didRunEnrollment else {
+//            Logger.newTabPageSearchBoxExperiment.debug("Cohort already assigned, skipping...")
+//            return
+//        }
 
         guard let cohort = cohortDecider.cohort else {
             Logger.newTabPageSearchBoxExperiment.debug("User is not eligible for the experiment, skipping cohort assignment...")
