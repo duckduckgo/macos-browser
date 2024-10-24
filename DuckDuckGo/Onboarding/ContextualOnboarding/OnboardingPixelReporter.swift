@@ -55,7 +55,7 @@ final class OnboardingPixelReporter: OnboardingSearchSuggestionsPixelReporting, 
         self.userDefaults = userDefaults
     }
 
-    func trackSiteSuggetionOptionTapped() {
+    func trackSiteSuggestionOptionTapped() {
         fire(ContextualOnboardingPixel.siteSuggetionOptionTapped, .unique)
     }
 

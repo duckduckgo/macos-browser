@@ -28,7 +28,7 @@ final class ContextualDaxDialogsFactoryTests: XCTestCase {
     override func setUpWithError() throws {
         try super.setUpWithError()
         reporter = CapturingOnboardingPixelReporter()
-        factory = DefaultContextualDaxDialogViewFactory(onboardingPixelReorter: reporter)
+        factory = DefaultContextualDaxDialogViewFactory(onboardingPixelReporter: reporter)
         delegate = CapturingOnboardingNavigationDelegate()
     }
 
@@ -249,7 +249,7 @@ class CapturingOnboardingPixelReporter: OnboardingPixelReporting {
     func trackSearchSuggetionOptionTapped() {
     }
 
-    func trackSiteSuggetionOptionTapped() {
+    func trackSiteSuggestionOptionTapped() {
     }
 
     func trackFireButtonTryIt() {

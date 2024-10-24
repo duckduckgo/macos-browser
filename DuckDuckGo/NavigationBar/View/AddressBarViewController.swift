@@ -86,7 +86,7 @@ final class AddressBarViewController: NSViewController, ObservableObject {
         fatalError("AddressBarViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder, 
+    init?(coder: NSCoder,
           tabCollectionViewModel: TabCollectionViewModel,
           isBurner: Bool,
           popovers: NavigationBarPopovers?,

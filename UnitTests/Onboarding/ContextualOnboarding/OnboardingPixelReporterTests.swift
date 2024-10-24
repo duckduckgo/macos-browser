@@ -46,8 +46,8 @@ final class OnboardingPixelReporterTests: XCTestCase {
         userDefaults?.removePersistentDomain(forName: "OnboardingPixelReporterTests")
     }
 
-    func test_WhenTrackSiteSuggetionOptionTapped_ThenSiteSuggetionOptionTappedEventSent() throws {
-        reporter.trackSiteSuggetionOptionTapped()
+    func test_WhenTrackSiteSuggestionOptionTapped_ThenSiteSuggetionOptionTappedEventSent() throws {
+        reporter.trackSiteSuggestionOptionTapped()
         XCTAssertEqual(eventSent?.name, ContextualOnboardingPixel.siteSuggetionOptionTapped.name)
         XCTAssertEqual(frequency, .unique)
     }

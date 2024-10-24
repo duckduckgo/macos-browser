@@ -466,15 +466,12 @@ final class BrowserTabViewController: NSViewController {
             onFireButtonPressed: { [weak delegate] in
                 delegate?.dismissViewHighlight()
             })
-        containerStackView.spacing = 0
         let hostingController = NSHostingController(rootView: AnyView(daxView))
         daxContextualOnboardingController = hostingController
         insertChild(daxContextualOnboardingController!, in: containerStackView, at: 0)
         hostingController.view.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            hostingController.view.topAnchor.constraint(equalTo: containerStackView.topAnchor),
             hostingController.view.widthAnchor.constraint(equalTo: containerStackView.widthAnchor),
-            hostingController.view.topAnchor.constraint(equalTo: containerStackView.topAnchor),
             hostingController.view.leadingAnchor.constraint(equalTo: containerStackView.leadingAnchor),
             hostingController.view.trailingAnchor.constraint(equalTo: containerStackView.trailingAnchor),
         ])
@@ -482,7 +479,6 @@ final class BrowserTabViewController: NSViewController {
         containerStackView.layoutSubtreeIfNeeded()
         webViewContainer?.layoutSubtreeIfNeeded()
 
-        let currentState = onboardingDialogTypeProvider.state
         if dialogType == .tryFireButton {
             delegate?.highlightFireButton()
         } else if case .trackers = dialogType {

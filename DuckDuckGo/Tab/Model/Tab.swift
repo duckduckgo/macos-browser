@@ -164,7 +164,7 @@ protocol NewWindowPolicyDecisionMaker {
                   tunnelController: tunnelController,
                   phishingDetector: phishingDetector,
                   phishingState: phishingState,
-                  tabsPreferences: tabsPreferences, 
+                  tabsPreferences: tabsPreferences,
                   onboardingPixelReporter: onboardingPixelReporter)
     }
 

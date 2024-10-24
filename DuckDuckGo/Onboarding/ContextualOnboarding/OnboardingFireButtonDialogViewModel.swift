@@ -28,7 +28,8 @@ public class OnboardingFireButtonDialogViewModel: ObservableObject {
 
     init(onboardingPixelReporter: OnboardingDialogsReporting = OnboardingPixelReporter(),
          onDismiss: @escaping () -> Void,
-         onGotItPressed: @escaping () -> Void, onFireButtonPressed: @escaping () -> Void) {
+         onGotItPressed: @escaping () -> Void, 
+         onFireButtonPressed: @escaping () -> Void) {
         self.onDismiss = onDismiss
         self.onGotItPressed = onGotItPressed
         self.onFireButtonPressed = onFireButtonPressed

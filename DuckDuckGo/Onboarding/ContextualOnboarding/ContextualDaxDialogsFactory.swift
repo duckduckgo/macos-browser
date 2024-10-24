@@ -25,10 +25,10 @@ protocol ContextualDaxDialogsFactory {
 }
 
 struct DefaultContextualDaxDialogViewFactory: ContextualDaxDialogsFactory {
-    private let onboardingPixelReorter: OnboardingPixelReporting
+    private let onboardingPixelReporter: OnboardingPixelReporting
 
-    init(onboardingPixelReorter: OnboardingPixelReporting = OnboardingPixelReporter()) {
-        self.onboardingPixelReorter = onboardingPixelReorter
+    init(onboardingPixelReporter: OnboardingPixelReporting = OnboardingPixelReporter()) {
+        self.onboardingPixelReporter = onboardingPixelReporter
     }
 
     func makeView(for type: ContextualDialogType, delegate: any OnboardingNavigationDelegate, onDismiss: @escaping () -> Void, onGotItPressed: @escaping () -> Void, onFireButtonPressed: @escaping () -> Void) -> AnyView {
@@ -46,7 +46,7 @@ struct DefaultContextualDaxDialogViewFactory: ContextualDaxDialogsFactory {
             dialogView = AnyView(tryFireButtonDialog(onDismiss: onDismiss, onGotItPressed: onGotItPressed, onFireButtonPressed: onFireButtonPressed))
         case .highFive:
             dialogView = AnyView(highFiveDialog(onDismiss: onDismiss, onGotItPressed: onGotItPressed))
-            onboardingPixelReorter.trackLastDialogShown()
+            onboardingPixelReporter.trackLastDialogShown()
         }
         let adjustedView = {
             HStack {
@@ -64,14 +64,14 @@ struct DefaultContextualDaxDialogViewFactory: ContextualDaxDialogsFactory {
 
     private func tryASearchDialog(delegate: OnboardingNavigationDelegate) -> some View {
         let suggestedSearchedProvider = OnboardingSuggestedSearchesProvider()
-        let viewModel = OnboardingSearchSuggestionsViewModel(suggestedSearchesProvider: suggestedSearchedProvider, delegate: delegate, pixelReporter: onboardingPixelReorter)
+        let viewModel = OnboardingSearchSuggestionsViewModel(suggestedSearchesProvider: suggestedSearchedProvider, delegate: delegate, pixelReporter: onboardingPixelReporter)
 
         return OnboardingTrySearchDialog(viewModel: viewModel)
     }
 
     private func searchDoneDialog(shouldFollowUp: Bool, delegate: OnboardingNavigationDelegate, onDismiss: @escaping () -> Void, onGotItPressed: @escaping () -> Void) -> some View {
         let suggestedSitesProvider = OnboardingSuggestedSitesProvider(surpriseItemTitle: OnboardingSuggestedSitesProvider.surpriseItemTitle)
-        let viewModel = OnboardingSiteSuggestionsViewModel(title: "", suggestedSitesProvider: suggestedSitesProvider, delegate: delegate, pixelReporter: onboardingPixelReorter)
+        let viewModel = OnboardingSiteSuggestionsViewModel(title: "", suggestedSitesProvider: suggestedSitesProvider, delegate: delegate, pixelReporter: onboardingPixelReporter)
         let gotIt = shouldFollowUp ? onGotItPressed : onDismiss
 
         return OnboardingFirstSearchDoneDialog(shouldFollowUp: shouldFollowUp, viewModel: viewModel, gotItAction: gotIt)
@@ -79,7 +79,7 @@ struct DefaultContextualDaxDialogViewFactory: ContextualDaxDialogsFactory {
 
     private func tryASiteDialog(delegate: OnboardingNavigationDelegate) -> some View {
         let suggestedSitesProvider = OnboardingSuggestedSitesProvider(surpriseItemTitle: OnboardingSuggestedSitesProvider.surpriseItemTitle)
-        let viewModel = OnboardingSiteSuggestionsViewModel(title: "", suggestedSitesProvider: suggestedSitesProvider, delegate: delegate, pixelReporter: onboardingPixelReorter)
+        let viewModel = OnboardingSiteSuggestionsViewModel(title: "", suggestedSitesProvider: suggestedSitesProvider, delegate: delegate, pixelReporter: onboardingPixelReporter)
 
         return OnboardingTryVisitingASiteDialog(viewModel: viewModel)
     }
