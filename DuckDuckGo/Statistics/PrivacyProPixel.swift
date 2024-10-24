@@ -146,4 +146,3 @@ enum PrivacyProErrorPixel: PixelKitEventV2 {
     }
 
 }
-
