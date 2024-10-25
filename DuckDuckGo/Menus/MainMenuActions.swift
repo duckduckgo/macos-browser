@@ -510,6 +510,10 @@ extension MainViewController {
         LocalPinningManager.shared.togglePinning(for: .networkProtection)
     }
 
+    @objc func toggleAIChatShortcut(_ sender: Any) {
+        LocalPinningManager.shared.togglePinning(for: .aiChat)
+    }
+
     // MARK: - History
 
     @objc func back(_ sender: Any?) {
@@ -845,6 +849,10 @@ extension MainViewController {
 
     @objc func resetOnboarding(_ sender: Any?) {
         UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.onboardingFinished.rawValue)
+    }
+
+    @objc func resetHomePageSettingsOnboarding(_ sender: Any?) {
+        UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Any>.Key.homePageDidShowSettingsOnboarding.rawValue)
     }
 
     @objc func resetContextualOnboarding(_ sender: Any?) {
