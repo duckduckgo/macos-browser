@@ -321,7 +321,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 move(entities: managedObjects, to: insertionIndices, within: parentEntity)
             }
 
-            try handleFavorites(entitiesAtIndices, entitiesByUUID: entitiesByUUID, in: context)
+            try restoreFavorites(entitiesAtIndices, entitiesByUUID: entitiesByUUID, in: context)
         }, onError: { [weak self] error in
             self?.commonOnSaveErrorHandler(error)
             DispatchQueue.main.async { completion(error) }
@@ -974,41 +974,18 @@ final class LocalBookmarkStore: BookmarkStore {
         return (entitiesByUUID, objectsToInsertIntoParent)
     }
 
-    private func handleFavorites(_ entitiesAtIndices: [BookmarkEntityAtIndex],
-                                 entitiesByUUID: [String: BookmarkEntity],
-                                 in context: NSManagedObjectContext) throws {
+    /// Restores entities marked as favorites into the appropriate favorites folder.
+    /// - Parameters:
+    ///   - entitiesAtIndices: An array of `BookmarkEntityAtIndex`, containing entities with their target indices.
+    ///   - entitiesByUUID: A dictionary mapping UUID strings to corresponding `BookmarkEntity` objects.
+    ///   - context: The managed object context for interacting with Core Data.
+    /// - Throws: An error if the displayed favorites folder cannot be retrieved.
+    private func restoreFavorites(_ entitiesAtIndices: [BookmarkEntityAtIndex],
+                                  entitiesByUUID: [String: BookmarkEntity],
+                                  in context: NSManagedObjectContext) throws {
         let displayedFavoritesFolder = try fetchDisplayedFavoritesFolder(in: context)
         let favoritesFoldersWithoutDisplayed = fetchOtherFavoritesFolders(in: context)
 
-        try restoreFavorites(entitiesAtIndices,
-                             entitiesByUUID: entitiesByUUID,
-                             displayedFavoritesFolder: displayedFavoritesFolder,
-                             favoritesFoldersWithoutDisplayed: favoritesFoldersWithoutDisplayed,
-                             in: context)
-
-        try insertNewFavorites(entitiesAtIndices,
-                               entitiesByUUID: entitiesByUUID,
-                               displayedFavoritesFolder: displayedFavoritesFolder,
-                               favoritesFoldersWithoutDisplayed: favoritesFoldersWithoutDisplayed,
-                               in: context)
-    }
-
-    /// Restores favorite bookmark entities to their correct positions within the favorites list.
-    ///
-    /// - Parameters:
-    ///   - entitiesAtIndices: An array of `BookmarkEntityAtIndex` objects, containing bookmark entities along with their respective indices.
-    ///   - entitiesByUUID: A dictionary mapping UUID strings to `BookmarkEntity` objects, providing quick access to entities by their unique identifiers.
-    ///   - displayedFavoritesFolder: The `BookmarkEntity` representing the currently displayed folder of favorites.
-    ///   - favoritesFoldersWithoutDisplayed: An array of `BookmarkEntity` objects representing all other favorites folders, excluding the currently displayed folder.
-    ///   - context: The `NSManagedObjectContext` used to perform Core Data operations.
-    ///
-    /// - Throws: This function can throw errors if adding an entity to the favorites fails during Core Data operations.
-    ///
-    private func restoreFavorites(_ entitiesAtIndices: [BookmarkEntityAtIndex],
-                                  entitiesByUUID: [String: BookmarkEntity],
-                                  displayedFavoritesFolder: BookmarkEntity,
-                                  favoritesFoldersWithoutDisplayed: [BookmarkEntity],
-                                  in context: NSManagedObjectContext) throws {
         let sortedEntitiesByFavoritesIndex = sortEntitiesByFavoritesIndex(entitiesAtIndices)
         let adjustedIndices = calculateAdjustedIndices(for: sortedEntitiesByFavoritesIndex, in: displayedFavoritesFolder)
 
@@ -1023,41 +1000,6 @@ final class LocalBookmarkStore: BookmarkStore {
                 displayedFavoritesFolder: displayedFavoritesFolder,
                 otherFavoritesFolders: favoritesFoldersWithoutDisplayed
             )
-        }
-    }
-
-    /// Inserts new favorite bookmark entities into the favorites list if they meet certain conditions.
-    ///
-    /// - Parameters:
-    ///   - entitiesAtIndices: An array of `BookmarkEntityAtIndex` objects, which contain bookmark entities and their respective indices.
-    ///   - entitiesByUUID: A dictionary mapping UUID strings to `BookmarkEntity` objects, providing quick access to entities by their unique identifiers.
-    ///   - displayedFavoritesFolder: The `BookmarkEntity` representing the currently displayed folder of favorites.
-    ///   - favoritesFoldersWithoutDisplayed: An array of `BookmarkEntity` objects representing all other favorites folders, excluding the currently displayed folder.
-    ///   - context: The `NSManagedObjectContext` used to perform Core Data operations.
-    ///
-    /// - Throws: This function can throw errors if adding an entity to the favorites fails during the Core Data operations.
-    ///
-    /// - Discussion:
-    ///   This function iterates through the list of entities with their respective indices (`entitiesAtIndices`). For each entity:
-    ///   - If the entity is a `Bookmark`, is marked as a favorite (`isFavorite`), and does not have an index in the favorites array (`indexInFavoritesArray == nil`), it is considered new, so we need to insert it.
-    ///   - The `addEntityToFavorites` function is then called to add the bookmark to the list of favorites. The entity is added without specifying an index (`at: nil`), allowing it to be inserted at a default position (last position).
-    ///   - The function uses `entitiesByUUID` to resolve relationships between entities, as well as the `displayedFavoritesFolder` and `favoritesFoldersWithoutDisplayed` to ensure that the entity is added correctly to the appropriate folder structure.
-    private func insertNewFavorites(_ entitiesAtIndices: [BookmarkEntityAtIndex],
-                                    entitiesByUUID: [String: BookmarkEntity],
-                                    displayedFavoritesFolder: BookmarkEntity,
-                                    favoritesFoldersWithoutDisplayed: [BookmarkEntity],
-                                    in context: NSManagedObjectContext) throws {
-        try entitiesAtIndices.forEach { (entity, _, indexInFavoritesArray) in
-            if let bookmark = entity as? Bookmark,
-               bookmark.isFavorite,
-               indexInFavoritesArray == nil {
-                try addEntityToFavorites(
-                    entity,
-                    at: nil,
-                    entitiesByUUID: entitiesByUUID,
-                    displayedFavoritesFolder: displayedFavoritesFolder,
-                    otherFavoritesFolders: favoritesFoldersWithoutDisplayed)
-            }
         }
     }
 
@@ -1092,7 +1034,7 @@ final class LocalBookmarkStore: BookmarkStore {
     }
 
     private func addEntityToFavorites(_ entity: BaseBookmarkEntity,
-                                      at index: Int?,
+                                      at index: Int,
                                       entitiesByUUID: [String: BookmarkEntity],
                                       displayedFavoritesFolder: BookmarkEntity,
                                       otherFavoritesFolders: [BookmarkEntity]) throws {
@@ -1107,7 +1049,6 @@ final class LocalBookmarkStore: BookmarkStore {
     }
 
     private func parent(for entity: BaseBookmarkEntity, in context: NSManagedObjectContext) throws -> BookmarkEntity {
-        let parentEntity: BookmarkEntity
         if let parentId = entity.parentFolderUUID, parentId != PseudoFolder.bookmarks.id, parentId != "bookmarks_root",
            let parentFetchRequestResult = try? context.fetch(BaseBookmarkEntity.singleEntity(with: parentId)).first {
             return parentFetchRequestResult

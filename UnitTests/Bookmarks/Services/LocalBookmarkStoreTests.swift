@@ -60,7 +60,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
         let bookmark = Bookmark(id: UUID().uuidString, url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: true, parentFolderUUID: "bookmarks_root")
 
-        bookmarkStore.save(bookmark: bookmark, index: nil) { error in
+        bookmarkStore.save(bookmark: bookmark, index: nil, indexInFavoritesArray: 0) { error in
             XCTAssertNil(error)
 
             savingExpectation.fulfill()
@@ -953,9 +953,9 @@ final class LocalBookmarkStoreTests: XCTestCase {
         // Save the initial bookmarks state:
 
         _ = try await bookmarkStore.save(folder: folder)
-        _ = try await bookmarkStore.save(bookmark: bookmark1, index: nil)
-        _ = try await bookmarkStore.save(bookmark: bookmark2, index: nil)
-        _ = try await bookmarkStore.save(bookmark: bookmark3, index: nil)
+        _ = try await bookmarkStore.save(bookmark: bookmark1, index: nil, indexInFavoritesArray: 0)
+        _ = try await bookmarkStore.save(bookmark: bookmark2, index: nil, indexInFavoritesArray: 1)
+        _ = try await bookmarkStore.save(bookmark: bookmark3, index: nil, indexInFavoritesArray: 2)
 
         // Fetch persisted favorites back from the store:
 
@@ -1084,9 +1084,9 @@ final class LocalBookmarkStoreTests: XCTestCase {
         // Save the initial bookmarks state:
 
         _ = try await bookmarkStore.save(folder: initialParentFolder)
-        _ = try await bookmarkStore.save(bookmark: bookmark1, index: nil)
-        _ = try await bookmarkStore.save(bookmark: bookmark2, index: nil)
-        _ = try await bookmarkStore.save(bookmark: bookmark3, index: nil)
+        _ = try await bookmarkStore.save(bookmark: bookmark1, index: nil, indexInFavoritesArray: 0)
+        _ = try await bookmarkStore.save(bookmark: bookmark2, index: nil, indexInFavoritesArray: 1)
+        _ = try await bookmarkStore.save(bookmark: bookmark3, index: nil, indexInFavoritesArray: 2)
 
         // Fetch persisted favorites back from the store:
 
@@ -1127,9 +1127,9 @@ final class LocalBookmarkStoreTests: XCTestCase {
         // Save the initial bookmarks state:
 
         _ = try await bookmarkStore.save(folder: folder)
-        _ = try await bookmarkStore.save(bookmark: bookmark1, index: nil)
-        _ = try await bookmarkStore.save(bookmark: bookmark2, index: nil)
-        _ = try await bookmarkStore.save(bookmark: bookmark3, index: nil)
+        _ = try await bookmarkStore.save(bookmark: bookmark1, index: nil, indexInFavoritesArray: 0)
+        _ = try await bookmarkStore.save(bookmark: bookmark2, index: nil, indexInFavoritesArray: 1)
+        _ = try await bookmarkStore.save(bookmark: bookmark3, index: nil, indexInFavoritesArray: 2)
 
         // Fetch persisted favorites back from the store:
 
@@ -1213,7 +1213,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         bookmarkStore.applyFavoritesDisplayMode(.displayNative(.desktop))
 
         let bookmark = Bookmark(id: UUID().uuidString, url: "https://example1.com", title: "Example", isFavorite: true)
-        _ = try await bookmarkStore.save(bookmark: bookmark, index: nil)
+        _ = try await bookmarkStore.save(bookmark: bookmark, index: nil, indexInFavoritesArray: 0)
 
         context.performAndWait {
             let rootFolder = BookmarkUtils.fetchRootFolder(context)!
@@ -1315,7 +1315,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         bookmarkStore.applyFavoritesDisplayMode(.displayUnified(native: .desktop))
 
         let bookmark = Bookmark(id: UUID().uuidString, url: "https://example1.com", title: "Example", isFavorite: true)
-        _ = try await bookmarkStore.save(bookmark: bookmark, index: nil)
+        _ = try await bookmarkStore.save(bookmark: bookmark, index: nil, indexInFavoritesArray: 0)
 
         context.performAndWait {
             let rootFolder = BookmarkUtils.fetchRootFolder(context)!
