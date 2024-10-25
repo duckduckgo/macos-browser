@@ -88,6 +88,7 @@ extension HomePage.Views {
                                         scrollOffsetReader
                                     }
                                 }
+                                .animation(.none, value: recentlyVisitedModel.showRecentlyVisited)
                                 .coordinateSpace(name: Const.scrollViewCoordinateSpaceName)
                                 .onPreferenceChange(ScrollOffsetPreferenceKey.self, perform: hideSuggestionWindowIfScrolled)
                                 .if(addressBarModel.shouldShowAddressBar) { view in
