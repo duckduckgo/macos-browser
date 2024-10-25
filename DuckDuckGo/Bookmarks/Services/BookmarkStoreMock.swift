@@ -51,16 +51,7 @@ final class BookmarkStoreMock: BookmarkStore, CustomDebugStringConvertible {
                 }
             }
             var indexInFavoritesArray = 0
-            store?.save(
-                entitiesAtIndices: entities.map { entity in
-                    if let bookmark = entity as? Bookmark, bookmark.isFavorite {
-                        let result: (BaseBookmarkEntity, Int?, Int?) = (bookmark, nil, indexInFavoritesArray)
-                        indexInFavoritesArray += 1
-                        return result
-                    }
-
-                    return (entity, nil, nil)
-            }, completion: { _ in })
+            store?.save(entitiesAtIndices: entities.map { ($0, nil, nil) }, completion: { _ in })
         }
     }
 
