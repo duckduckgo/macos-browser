@@ -141,6 +141,10 @@ final class SuggestionViewController: NSViewController {
     }
 
     private func displayNewSuggestions() {
+        defer {
+            selectedRowCache = nil
+        }
+
         guard suggestionContainerViewModel.numberOfSuggestions > 0 else {
             closeWindow()
             tableView.reloadData()
@@ -151,6 +155,12 @@ final class SuggestionViewController: NSViewController {
         if suggestionContainerViewModel.suggestionContainer.result != nil {
             updateHeight()
             tableView.reloadData()
+
+            // Select at the same position where the suggestion was removed
+            if let selectedRowCache = selectedRowCache {
+                suggestionContainerViewModel.select(at: selectedRowCache)
+            }
+
             self.selectRow(at: self.suggestionContainerViewModel.selectionIndex)
         }
     }
@@ -209,6 +219,8 @@ final class SuggestionViewController: NSViewController {
         window.orderOut(nil)
     }
 
+    var selectedRowCache: Int?
+
     private func removeHistory(for suggestion: Suggestion) {
         assert(suggestion.isHistoryEntry)
 
@@ -217,12 +229,19 @@ final class SuggestionViewController: NSViewController {
             return
         }
 
+        selectedRowCache = tableView.selectedRow
+
         HistoryCoordinator.shared.removeUrlEntry(url) { [weak self] error in
-            guard error == nil else {
+            guard let self = self, error == nil else {
                 return
             }
 
-            self?.suggestionContainerViewModel.removeSuggestionFromResult(suggestion: suggestion)
+            if let userStringValue = suggestionContainerViewModel.userStringValue {
+                suggestionContainerViewModel.isTopSuggestionSelectionExpected = false
+                self.suggestionContainerViewModel.suggestionContainer.getSuggestions(for: userStringValue)
+            } else {
+                self.suggestionContainerViewModel.removeSuggestionFromResult(suggestion: suggestion)
+            }
         }
     }
 

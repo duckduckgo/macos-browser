@@ -49,7 +49,7 @@ final class SuggestionContainerViewModel {
 
     private(set) var userStringValue: String?
 
-    private var isTopSuggestionSelectionExpected = false
+    var isTopSuggestionSelectionExpected = false
 
     private var shouldSelectTopSuggestion: Bool {
         guard let result = suggestionContainer.result, !result.isEmpty else { return false }
