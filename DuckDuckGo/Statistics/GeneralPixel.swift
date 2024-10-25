@@ -920,7 +920,7 @@ enum GeneralPixel: PixelKitEventV2 {
             return "ad_attribution_logic_wrong_vendor_on_failed_compilation"
 
         case .webKitDidTerminate:
-            return "webkit_did_terminate"            
+            return "webkit_did_terminate"
         case .userViewedWebKitTerminationErrorPage:
             return "webkit-termination-error-page-viewed"
 
