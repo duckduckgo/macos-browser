@@ -72,6 +72,9 @@ struct BigSearchBox: View {
     let isCompact: Bool
     let supportsFixedColorScheme: Bool
 
+    @EnvironmentObject var addressBarModel: HomePage.Models.AddressBarModel
+    @Environment(\.colorScheme) private var colorScheme
+
     init(isCompact: Bool, supportsFixedColorScheme: Bool = true) {
         self.isCompact = isCompact
         self.supportsFixedColorScheme = supportsFixedColorScheme
@@ -106,9 +109,22 @@ struct BigSearchBox: View {
 
     @ViewBuilder
     func searchField() -> some View {
-        AddressBarTextFieldView(supportsFixedColorScheme: supportsFixedColorScheme)
-            .frame(height: Const.searchBoxHeight)
-            .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 3)
-            .shadow(color: .black.opacity(0.15), radius: 0, x: 0, y: 0)
+        ZStack {
+            AddressBarTextFieldView(supportsFixedColorScheme: supportsFixedColorScheme)
+                .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 3)
+                .shadow(color: .black.opacity(0.15), radius: 0, x: 0, y: 0)
+            if #available(macOS 12.0, *), addressBarModel.shouldDisplayInitialPlaceholder {
+                HStack {
+                    Text(UserText.addressBarPlaceholder)
+                        .foregroundColor(Color(nsColor: NSColor.placeholderTextColor))
+                        .background(Color.homePageAddressBarBackground)
+                        .font(.system(size: 15))
+                        .padding(.leading, 38)
+                        .animation(.none, value: colorScheme) // don't animate color scheme change because NSTextField doesn't
+                    Spacer()
+                }
+            }
+        }
+        .frame(height: Const.searchBoxHeight)
     }
 }
