@@ -18,7 +18,7 @@
 
 import XCTest
 
-class BookmarksBarTests: XCTestCase {
+class BookmarksBarTests: UITestCase {
     private var app: XCUIApplication!
     private var pageTitle: String!
     private var urlForBookmarksBar: URL!
@@ -35,6 +35,7 @@ class BookmarksBarTests: XCTestCase {
     private let titleStringLength = 12
 
     override class func setUp() {
+        super.setUp()
         UITests.firstRun()
     }
 

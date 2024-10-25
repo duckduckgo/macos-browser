@@ -18,7 +18,7 @@
 
 import XCTest
 
-class StateRestorationTests: XCTestCase {
+class StateRestorationTests: UITestCase {
     private var app: XCUIApplication!
     private var firstPageTitle: String!
     private var secondPageTitle: String!
@@ -31,6 +31,7 @@ class StateRestorationTests: XCTestCase {
     private var reopenAllWindowsFromLastSessionPreference: XCUIElement!
 
     override class func setUp() {
+        super.setUp()
         UITests.firstRun()
     }
 

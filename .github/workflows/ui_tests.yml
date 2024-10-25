@@ -132,6 +132,16 @@ jobs:
         | tee -a xcodebuild.log \
         | tee ui-tests.log
 
+    - name: Generate complete report
+      uses: kishikawakatsumi/xcresulttool@v1
+      if: success() || failure()
+      with:
+        path: |
+          xcodebuild.log
+          DerivedData/Logs/Test/*.xcresult
+          ~/Library/Logs/DiagnosticReports/*
+        retention-days: 7
+
     - name: Prepare test report
       if: always()
       run: |

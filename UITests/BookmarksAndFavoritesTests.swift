@@ -18,7 +18,7 @@
 
 import XCTest
 
-class BookmarksAndFavoritesTests: XCTestCase {
+class BookmarksAndFavoritesTests: UITestCase {
     private var app: XCUIApplication!
     private var pageTitle: String!
     private var urlForBookmarksBar: URL!
@@ -55,6 +55,7 @@ class BookmarksAndFavoritesTests: XCTestCase {
     private var showFavoritesPreferenceToggle: XCUIElement!
 
     override class func setUp() {
+        super.setUp()
         UITests.firstRun()
     }
 

@@ -108,3 +108,35 @@ enum UITests {
         app.terminate()
     }
 }
+
+class TestFailureObserver: NSObject, XCTestObservation {
+    func testCase(_ testCase: XCTestCase, didRecord issue: XCTIssue) {
+        print("Failed test with name: \(testCase.name)")
+        let screenshotName = "\(testCase.name)-failure"
+        testCase.takeScreenshot(screenshotName)
+    }
+}
+
+class UITestCase: XCTestCase {
+    private static let failureObserver = TestFailureObserver()
+
+    override class func setUp() {
+        super.setUp()
+        XCTestObservationCenter.shared.addTestObserver(failureObserver)
+    }
+
+    override class func tearDown() {
+        XCTestObservationCenter.shared.removeTestObserver(failureObserver)
+        super.tearDown()
+    }
+}
+
+extension XCTestCase {
+    func takeScreenshot(_ name: String) {
+        let fullScreenshot = XCUIScreen.main.screenshot()
+        let screenshot = XCTAttachment(screenshot: fullScreenshot)
+        screenshot.name = name
+        screenshot.lifetime = .keepAlways
+        add(screenshot)
+    }
+}

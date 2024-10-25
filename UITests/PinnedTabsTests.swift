@@ -18,7 +18,8 @@
 
 import XCTest
 
-class PinnedTabsTests: XCTestCase {
+class PinnedTabsTests: UITestCase {
+    private static let failureObserver = TestFailureObserver()
     private var app: XCUIApplication!
 
     override func setUpWithError() throws {
@@ -31,6 +32,7 @@ class PinnedTabsTests: XCTestCase {
     }
 
     override class func setUp() {
+        super.setUp()
         UITests.firstRun()
     }
 
