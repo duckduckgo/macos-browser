@@ -181,11 +181,21 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     private func showUpdateNotificationIfNeeded() {
         guard let latestUpdate, hasPendingUpdate, shouldShowUpdateNotification else { return }
 
+        let action = areAutomaticUpdatesEnabled ? UserText.autoUpdateAction : UserText.manualUpdateAction
+
         switch latestUpdate.type {
         case .critical:
-            notificationPresenter.showUpdateNotification(icon: NSImage.criticalUpdateNotificationInfo, text: UserText.criticalUpdateNotification, presentMultiline: true)
+            notificationPresenter.showUpdateNotification(
+                icon: NSImage.criticalUpdateNotificationInfo,
+                text: "\(UserText.criticalUpdateNotification) \(action)",
+                presentMultiline: true
+            )
         case .regular:
-            notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: UserText.updateAvailableNotification, presentMultiline: true)
+            notificationPresenter.showUpdateNotification(
+                icon: NSImage.updateNotificationInfo,
+                text: "\(UserText.updateAvailableNotification) \(action)",
+                presentMultiline: true
+            )
         }
 
         lastUpdateNotificationShownDate = Date()

@@ -37761,6 +37761,18 @@
         }
       }
     },
+    "notification.auto.update.action" : {
+      "comment" : "Action to take when an automatic update is available.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Restart to update."
+          }
+        }
+      }
+    },
     "notification.badge.cookiesmanaged" : {
       "comment" : "Notification that appears when browser automatically handle cookies",
       "extractionState" : "extracted_with_value",
@@ -38002,7 +38014,7 @@
       }
     },
     "notification.critical.update" : {
-      "comment" : "Notification informing user a critical update is required.",
+      "comment" : "Notification informing user a critical update is available.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -38014,7 +38026,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Critical update required. Restart to update."
+            "value" : "Critical update needed."
           }
         },
         "es" : {
@@ -38061,8 +38073,20 @@
         }
       }
     },
+    "notification.manual.update.action" : {
+      "comment" : "Action to take when a manual update is available.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Click here to update."
+          }
+        }
+      }
+    },
     "notification.update.available" : {
-      "comment" : "Notification informing user the a version of app is available",
+      "comment" : "Notification informing user the a version of app is available.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -38074,7 +38098,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "New version available. Click here to update."
+            "value" : "New version available."
           }
         },
         "es" : {
@@ -56759,7 +56783,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Critical update available"
+            "value" : "Critical update needed"
           }
         }
       }
