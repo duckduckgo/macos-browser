@@ -425,6 +425,10 @@ enum GeneralPixel: PixelKitEventV2 {
 
     case compilationFailed
 
+    // MARK: error page shown
+    case errorPageShownOther
+    case errorPageShownWebkitTermination
+
     var name: String {
         switch self {
 
@@ -1040,6 +1044,9 @@ enum GeneralPixel: PixelKitEventV2 {
         case .bookmarksSortByName: return "m_mac_sort_bookmarks_by_name"
         case .bookmarksSearchExecuted: return "m_mac_search_bookmarks_executed"
         case .bookmarksSearchResultClicked: return "m_mac_search_result_clicked"
+
+        case .errorPageShownOther: return "m_mac_errorpageshown_other"
+        case .errorPageShownWebkitTermination: return "m_mac_errorpageshown_webkittermination"
         }
     }
 
