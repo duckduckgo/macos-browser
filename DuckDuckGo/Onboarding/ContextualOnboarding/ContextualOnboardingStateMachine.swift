@@ -28,6 +28,7 @@ protocol ContextualOnboardingStateUpdater: AnyObject {
     func updateStateFor(tab: Tab)
     func gotItPressed()
     func fireButtonUsed()
+    func featureIsOff()
 }
 
 protocol FireButtonInfoStateProviding {
@@ -162,11 +163,7 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
 
     var state: ContextualOnboardingState {
         get {
-            if NSApp.delegateTyped.featureFlagger.isFeatureOn(.contextualOnboarding) {
-                return ContextualOnboardingState(rawValue: stateString) ?? .onboardingCompleted
-            } else {
-                return .onboardingCompleted
-            }
+            return ContextualOnboardingState(rawValue: stateString) ?? .onboardingCompleted
         }
         set {
             stateString = newValue.rawValue
@@ -384,5 +381,9 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
         default:
             break
         }
+    }
+
+    func featureIsOff() {
+        state = .onboardingCompleted
     }
 }

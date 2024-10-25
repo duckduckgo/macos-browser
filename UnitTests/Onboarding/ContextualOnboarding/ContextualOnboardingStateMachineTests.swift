@@ -673,6 +673,17 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         // Then
         XCTAssertEqual(stateMachine.state, .showBlockedTrackers)
     }
+
+    func test_OnFeatureIsOff_StateBecomesOnboardingCompleted() {
+        // Given
+        stateMachine.state = .showTryASearch
+
+        // When
+        stateMachine.featureIsOff()
+
+        // Then
+        XCTAssertEqual(stateMachine.state, .onboardingCompleted)
+    }
 }
 
 class MockTrackerMessageProvider: TrackerMessageProviding {
