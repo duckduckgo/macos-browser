@@ -269,7 +269,7 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
 }
 
 class MockDialogsProvider: ContextualOnboardingDialogTypeProviding, ContextualOnboardingStateUpdater {
-    
+
     var state: ContextualOnboardingState = .onboardingCompleted
     var featureIsOffCalled = false
 

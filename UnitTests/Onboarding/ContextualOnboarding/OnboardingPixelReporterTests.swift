@@ -149,7 +149,7 @@ final class OnboardingPixelReporterTests: XCTestCase {
 }
 
 class MockContextualOnboardingState: ContextualOnboardingStateUpdater {
-    
+
     var state: ContextualOnboardingState = .onboardingCompleted
 
     func updateStateFor(tab: Tab) {
