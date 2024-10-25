@@ -405,7 +405,6 @@ final class BrowserTabViewController: NSViewController {
         ])
         containerStackView.addArrangedSubview(container)
     }
-    var daxContextualOnboardingController: NSViewController?
 
     private func updateStateAndPresentContextualOnboarding() {
         guard let tab = tabViewModel?.tab else { return }
@@ -467,8 +466,7 @@ final class BrowserTabViewController: NSViewController {
                 delegate?.dismissViewHighlight()
             })
         let hostingController = NSHostingController(rootView: AnyView(daxView))
-        daxContextualOnboardingController = hostingController
-        insertChild(daxContextualOnboardingController!, in: containerStackView, at: 0)
+        insertChild(hostingController, in: containerStackView, at: 0)
         hostingController.view.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             hostingController.view.widthAnchor.constraint(equalTo: containerStackView.widthAnchor),
