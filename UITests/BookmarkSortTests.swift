@@ -61,6 +61,7 @@ class BookmarkSortTests: XCTestCase {
         app.dismissPopover(buttonIdentifier: "Hide")
         app.openBookmarksPanel()
         selectSortByName(mode: .panel)
+        app.openBookmarksPanel() // in reality, this closes the panel
         app.openBookmarksManager()
 
         app.buttons[AccessibilityIdentifiers.sortBookmarksButtonManager].tap()

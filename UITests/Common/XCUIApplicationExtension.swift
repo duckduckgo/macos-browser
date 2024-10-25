@@ -132,6 +132,7 @@ extension XCUIApplication {
         bookmarksPanelShortcutButton.tap()
     }
 
+
     func verifyBookmarkOrder(expectedOrder: [String], mode: BookmarkMode) {
         let rowCount = (mode == .panel ? popovers.firstMatch.outlines.firstMatch : tables.firstMatch).cells.count
         XCTAssertEqual(rowCount, expectedOrder.count, "Row count does not match expected count.")
