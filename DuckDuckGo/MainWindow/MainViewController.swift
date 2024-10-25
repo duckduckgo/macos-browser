@@ -476,14 +476,7 @@ final class MainViewController: NSViewController {
         let tabContent = tabContent ?? selectedTabViewModel.tab.content
 
         if case .newtab = tabContent {
-            let homeAddressBarTextField = browserTabViewController.homePageViewController?.addressBarModel?.addressBarTextField
-            let isHomeAddressBarVisible = browserTabViewController.homePageViewController?.appearancePreferences.isSearchBarVisible == true
-            if isHomeAddressBarVisible, let homeAddressBarTextField {
-                homeAddressBarTextField.makeMeFirstResponder()
-            } else {
-                navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
-            }
-
+            navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
         } else {
             // ignore published tab switch: BrowserTabViewController
             // adjusts first responder itself

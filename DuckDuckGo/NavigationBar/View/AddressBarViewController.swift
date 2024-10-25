@@ -42,6 +42,7 @@ final class AddressBarViewController: NSViewController, ObservableObject {
     private var tabViewModel: TabViewModel?
     private let suggestionContainerViewModel: SuggestionContainerViewModel
     private let isBurner: Bool
+    private let onboardingPixelReporter: OnboardingAddressBarReporting
     let isSearchBox: Bool
 
     enum Mode: Equatable {
@@ -85,7 +86,12 @@ final class AddressBarViewController: NSViewController, ObservableObject {
         fatalError("AddressBarViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, popovers: NavigationBarPopovers?, isSearchBox: Bool = false) {
+    init?(coder: NSCoder,
+          tabCollectionViewModel: TabCollectionViewModel,
+          isBurner: Bool,
+          popovers: NavigationBarPopovers?,
+          isSearchBox: Bool = false,
+          onboardingPixelReporter: OnboardingAddressBarReporting = OnboardingPixelReporter()) {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.popovers = popovers
         self.suggestionContainerViewModel = SuggestionContainerViewModel(
@@ -93,6 +99,7 @@ final class AddressBarViewController: NSViewController, ObservableObject {
             isBurner: isBurner,
             suggestionContainer: SuggestionContainer())
         self.isBurner = isBurner
+        self.onboardingPixelReporter = onboardingPixelReporter
         self.isSearchBox = isSearchBox
 
         super.init(coder: coder)
@@ -112,6 +119,7 @@ final class AddressBarViewController: NSViewController, ObservableObject {
         // only activate active text field leading constraint on its appearance to avoid constraint conflicts
         activeTextFieldMinXConstraint.isActive = false
         addressBarTextField.tabCollectionViewModel = tabCollectionViewModel
+        addressBarTextField.onboardingDelegate = onboardingPixelReporter
     }
 
     override func viewWillAppear() {

@@ -405,7 +405,6 @@ final class BrowserTabViewController: NSViewController {
         ])
         containerStackView.addArrangedSubview(container)
     }
-    var daxContextualOnboardingController: NSViewController?
 
     private func updateStateAndPresentContextualOnboarding() {
         guard let tab = tabViewModel?.tab else { return }
@@ -467,21 +466,17 @@ final class BrowserTabViewController: NSViewController {
                 delegate?.dismissViewHighlight()
             })
         let hostingController = NSHostingController(rootView: AnyView(daxView))
-
-        daxContextualOnboardingController = hostingController
-        insertChild(daxContextualOnboardingController!, in: containerStackView, at: 0)
+        insertChild(hostingController, in: containerStackView, at: 0)
         hostingController.view.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             hostingController.view.widthAnchor.constraint(equalTo: containerStackView.widthAnchor),
-            hostingController.view.topAnchor.constraint(equalTo: containerStackView.topAnchor),
             hostingController.view.leadingAnchor.constraint(equalTo: containerStackView.leadingAnchor),
-            hostingController.view.trailingAnchor.constraint(equalTo: containerStackView.trailingAnchor)
+            hostingController.view.trailingAnchor.constraint(equalTo: containerStackView.trailingAnchor),
         ])
 
         containerStackView.layoutSubtreeIfNeeded()
         webViewContainer?.layoutSubtreeIfNeeded()
 
-        let currentState = onboardingDialogTypeProvider.state
         if dialogType == .tryFireButton {
             delegate?.highlightFireButton()
         } else if case .trackers = dialogType {
