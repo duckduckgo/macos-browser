@@ -44,7 +44,7 @@ protocol OnboardingFireReporting: AnyObject {
 
 final class OnboardingPixelReporter: OnboardingSearchSuggestionsPixelReporting, OnboardingSiteSuggestionsPixelReporting {
 
-    private let onboardingStateProvider: ContextualOnboardingStateUpdater
+    private unowned let onboardingStateProvider: ContextualOnboardingStateUpdater
     private let fire: (PixelKitEventV2, PixelKit.Frequency) -> Void
     private let userDefaults: UserDefaults
 

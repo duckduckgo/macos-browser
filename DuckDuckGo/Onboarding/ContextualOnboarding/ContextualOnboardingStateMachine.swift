@@ -23,7 +23,7 @@ protocol ContextualOnboardingDialogTypeProviding {
     func dialogTypeForTab(_ tab: Tab, privacyInfo: PrivacyInfo?) -> ContextualDialogType?
 }
 
-protocol ContextualOnboardingStateUpdater {
+protocol ContextualOnboardingStateUpdater: AnyObject {
     var state: ContextualOnboardingState { get }
     func updateStateFor(tab: Tab)
     func gotItPressed()
