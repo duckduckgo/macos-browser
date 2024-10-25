@@ -35,11 +35,17 @@ final class SuggestionTableCellView: NSTableCellView {
     @IBOutlet weak var removeButton: NSButton!
     @IBOutlet weak var suffixTextField: NSTextField!
     @IBOutlet weak var suffixTrailingConstraint: NSLayoutConstraint!
-    
+
     var suggestion: Suggestion?
 
     override func awakeFromNib() {
         suffixTextField.textColor = Self.suffixColor
+    }
+
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+
+        updateDeleteImageViewVisibility()
     }
 
     var isSelected: Bool = false {
