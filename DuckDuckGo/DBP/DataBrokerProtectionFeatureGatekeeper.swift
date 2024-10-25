@@ -118,12 +118,10 @@ private extension DefaultDataBrokerProtectionFeatureGatekeeper {
 
     func firePrerequisitePixelsAndLogIfNecessary(hasEntitlements: Bool, isAuthenticatedResult: Bool) {
         if !hasEntitlements {
-            pixelHandler.fire(.gatekeeperEntitlementsInvalid)
             Logger.dataBrokerProtection.error("DBP feature Gatekeeper: Entitlement check failed")
         }
 
         if !isAuthenticatedResult {
-            pixelHandler.fire(.gatekeeperNotAuthenticated)
             Logger.dataBrokerProtection.error("DBP feature Gatekeeper: Authentication check failed")
         }
     }
