@@ -31,7 +31,7 @@ struct Item: Codable, Sendable {
     let parent: String?
 }
 
-final class ExpectationAction: Action {
+internal final class ExpectationAction: Action {
     let id: String
     let actionType: ActionType
     let expectations: [Item]
