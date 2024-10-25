@@ -120,7 +120,6 @@ jobs:
         defaults write com.duckduckgo.macos.browser.review moveToApplicationsFolderAlertSuppress 1
         set -o pipefail && xcodebuild test-without-building \
           -scheme "UI Tests CI" \
-          -resultBundlePath TestResults \
           -derivedDataPath DerivedData \
           -skipPackagePluginValidation \
           -skipMacroValidation \
@@ -128,15 +127,6 @@ jobs:
           -retry-tests-on-failure \
         | tee -a xcodebuild.log \
         | tee ui-tests.log
-
-    - name: Generate complete report
-      uses: gemmakbarlow/xcresulttool@main
-      if: success() || failure()
-      with:
-        path: | 
-          TestResults.xcresult
-        show-passed-tests: false
-        show-code-coverage: false
 
     - name: Prepare test report
       if: always()
