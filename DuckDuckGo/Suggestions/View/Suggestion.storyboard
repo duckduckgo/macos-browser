@@ -195,9 +195,10 @@
                                                                                         <constraint firstAttribute="trailing" secondItem="5Rx-2z-uI7" secondAttribute="trailing" id="Jod-KE-Yva"/>
                                                                                         <constraint firstItem="ofA-eI-PSe" firstAttribute="centerY" secondItem="kX2-C1-38Y" secondAttribute="centerY" id="Kph-ln-oM3"/>
                                                                                         <constraint firstItem="5Rx-2z-uI7" firstAttribute="leading" secondItem="kX2-C1-38Y" secondAttribute="leading" id="RIg-EO-t8H"/>
-                                                                                        <constraint firstAttribute="trailing" secondItem="ofA-eI-PSe" secondAttribute="trailing" constant="16" id="SJB-WB-Upi"/>
+                                                                                        <constraint firstAttribute="trailing" secondItem="ofA-eI-PSe" secondAttribute="trailing" constant="7" id="SJB-WB-Upi"/>
                                                                                         <constraint firstItem="5Rx-2z-uI7" firstAttribute="top" secondItem="kX2-C1-38Y" secondAttribute="top" id="W26-g1-Jzq"/>
-                                                                                        <constraint firstAttribute="trailing" secondItem="efo-Vy-aEh" secondAttribute="trailing" constant="8" id="XRI-uW-7gs"/>
+                                                                                        <constraint firstAttribute="trailing" secondItem="efo-Vy-aEh" secondAttribute="trailing" priority="250" constant="8" id="XRI-uW-7gs"/>
+                                                                                        <constraint firstItem="ofA-eI-PSe" firstAttribute="leading" secondItem="efo-Vy-aEh" secondAttribute="trailing" priority="750" constant="8" id="Z5N-iT-yxP"/>
                                                                                         <constraint firstAttribute="bottom" secondItem="5Rx-2z-uI7" secondAttribute="bottom" id="aae-AT-DGw"/>
                                                                                         <constraint firstItem="efo-Vy-aEh" firstAttribute="firstBaseline" secondItem="bOr-Go-gyW" secondAttribute="firstBaseline" id="lQr-ay-EDp"/>
                                                                                         <constraint firstItem="bOr-Go-gyW" firstAttribute="centerY" secondItem="kX2-C1-38Y" secondAttribute="centerY" constant="-1" id="oAf-1Z-91H"/>
@@ -208,6 +209,7 @@
                                                                                         <outlet property="iconImageView" destination="vli-IP-Nr8" id="5lX-7Q-4Cw"/>
                                                                                         <outlet property="removeButton" destination="ofA-eI-PSe" id="zJW-zP-qSs"/>
                                                                                         <outlet property="suffixTextField" destination="efo-Vy-aEh" id="vDH-Af-pkR"/>
+                                                                                        <outlet property="suffixTrailingConstraint" destination="XRI-uW-7gs" id="5KX-rj-2vE"/>
                                                                                         <outlet property="textField" destination="bOr-Go-gyW" id="wxi-1N-Bc4"/>
                                                                                     </connections>
                                                                                 </tableCellView>

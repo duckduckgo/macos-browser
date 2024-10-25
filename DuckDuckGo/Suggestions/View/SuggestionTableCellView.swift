@@ -34,7 +34,8 @@ final class SuggestionTableCellView: NSTableCellView {
     @IBOutlet weak var iconImageView: NSImageView!
     @IBOutlet weak var removeButton: NSButton!
     @IBOutlet weak var suffixTextField: NSTextField!
-
+    @IBOutlet weak var suffixTrailingConstraint: NSLayoutConstraint!
+    
     var suggestion: Suggestion?
 
     override func awakeFromNib() {
@@ -56,7 +57,7 @@ final class SuggestionTableCellView: NSTableCellView {
         attributedString = suggestionViewModel.tableCellViewAttributedString
         iconImageView.image = suggestionViewModel.icon
         suffixTextField.stringValue = suggestionViewModel.suffix
-        removeButton.isHidden = true
+        setRemoveButtonHidden(true)
 
         updateTextField()
     }
@@ -96,10 +97,15 @@ final class SuggestionTableCellView: NSTableCellView {
         // If the suggestion is based on history, if the mouse is inside the window's frame and
         // the suggestion is selected, show the delete button
         if let suggestion, suggestion.isHistoryEntry, windowFrameInScreen.contains(mouseLocation) {
-            removeButton.isHidden = !isSelected
+            setRemoveButtonHidden(!isSelected)
         } else {
-            removeButton.isHidden = true
+            setRemoveButtonHidden(true)
         }
+    }
+
+    private func setRemoveButtonHidden(_ hidden: Bool) {
+        removeButton.isHidden = hidden
+        suffixTrailingConstraint.priority = hidden ? .required : .defaultLow
     }
 
 }
