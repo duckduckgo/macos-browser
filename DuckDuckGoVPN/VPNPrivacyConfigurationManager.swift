@@ -81,7 +81,8 @@ public final class VPNPrivacyConfigurationManager: PrivacyConfigurationManaging 
         return privacyConfig
     }
 
-    public var internalUserDecider: InternalUserDecider = DefaultInternalUserDecider(store: InternalUserDeciderStoreMock())
+    public var internalUserDecider: InternalUserDecider = DefaultInternalUserDecider(
+        store: UserDefaults.appConfiguration)
 
     @discardableResult
     public func reload(etag: String?, data: Data?) -> PrivacyConfigurationManager.ReloadResult {

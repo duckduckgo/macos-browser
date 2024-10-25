@@ -220,10 +220,13 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         return controller
     }()
 
+    private let internalUserDecider = DefaultInternalUserDecider(store: UserDefaults.appConfiguration)
+
     @MainActor
     private lazy var tunnelController = NetworkProtectionTunnelController(
         networkExtensionBundleID: tunnelExtensionBundleID,
         networkExtensionController: networkExtensionController,
+        internalUserDecider: internalUserDecider,
         settings: tunnelSettings,
         defaults: userDefaults,
         accessTokenStorage: accessTokenStorage)

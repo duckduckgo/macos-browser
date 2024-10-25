@@ -41,12 +41,10 @@ typealias NetworkProtectionConfigChangeHandler = () -> Void
 
 final class NetworkProtectionTunnelController: TunnelController, TunnelSessionProvider {
 
-    // MARK: - Settings
+    // MARK: - Configuration
 
+    private let internalUserDecider: InternalUserDecider
     let settings: VPNSettings
-
-    // MARK: - Defaults
-
     let defaults: UserDefaults
 
     // MARK: - Combine Cancellables
@@ -155,11 +153,13 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     ///
     init(networkExtensionBundleID: String,
          networkExtensionController: NetworkExtensionController,
+         internalUserDecider: InternalUserDecider,
          settings: VPNSettings,
          defaults: UserDefaults,
          notificationCenter: NotificationCenter = .default,
          accessTokenStorage: SubscriptionTokenKeychainStorage) {
 
+        self.internalUserDecider = internalUserDecider
         self.networkExtensionBundleID = networkExtensionBundleID
         self.networkExtensionController = networkExtensionController
         self.notificationCenter = notificationCenter
@@ -350,14 +350,13 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             protocolConfiguration.providerBundleIdentifier = Bundle.tunnelExtensionBundleID
             protocolConfiguration.providerConfiguration = [
                 NetworkProtectionOptionKey.defaultPixelHeaders: APIRequest.Headers().httpHeaders,
-                NetworkProtectionOptionKey.includedRoutes: includedRoutes().map(\.stringRepresentation) as NSArray
             ]
 
             // always-on
             protocolConfiguration.disconnectOnSleep = false
 
             // kill switch
-            protocolConfiguration.enforceRoutes = settings.enforceRoutes
+            protocolConfiguration.enforceRoutes = enforceRoutes
 
             // this setting breaks Connection Tester
             protocolConfiguration.includeAllNetworks = settings.includeAllNetworks
@@ -733,6 +732,13 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         try await tunnelManager.saveToPreferences()
     }
 
+    // MARK: - Routing
+
+    private var enforceRoutes: Bool {
+        internalUserDecider.isInternalUser
+        && settings.enforceRoutes
+    }
+
     /* Temporarily disabled until we fix this menu: https://app.asana.com/0/0/1205766100762904/f
     @MainActor
     private func excludedRoutes() -> [NetworkProtection.IPAddressRange] {
@@ -754,8 +760,11 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     /// extra Included Routes appended to 0.0.0.0, ::/0 (peers) and interface.addresses
     @MainActor
     private func includedRoutes() -> [NetworkProtection.IPAddressRange] {
-        [
-            IPAddressRange(stringLiteral: "0.0.0.0/0"),
+        guard enforceRoutes else {
+            return []
+        }
+
+        return [
             IPAddressRange(stringLiteral: "1.0.0.0/8"),
             IPAddressRange(stringLiteral: "2.0.0.0/8"),
             IPAddressRange(stringLiteral: "3.0.0.0/8"),

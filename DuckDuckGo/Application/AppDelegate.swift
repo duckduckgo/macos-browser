@@ -75,6 +75,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private(set) var stateRestorationManager: AppStateRestorationManager!
     private var grammarFeaturesManager = GrammarFeaturesManager()
     let internalUserDecider: InternalUserDecider
+    private var isInternalUserSharingCancellable: AnyCancellable?
     let featureFlagger: FeatureFlagger
     private var appIconChanger: AppIconChanger!
     private var autoClearHandler: AutoClearHandler!
@@ -375,6 +376,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         subscribeToEmailProtectionStatusNotifications()
         subscribeToDataImportCompleteNotification()
+        subscribeToInternalUserChanges()
 
         fireFailedCompilationsPixelIfNeeded()
 
@@ -664,6 +666,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func subscribeToDataImportCompleteNotification() {
         NotificationCenter.default.addObserver(self, selector: #selector(dataImportCompleteNotification(_:)), name: .dataImportComplete, object: nil)
+    }
+
+    private func subscribeToInternalUserChanges() {
+        UserDefaults.appConfiguration.isInternalUser = internalUserDecider.isInternalUser
+
+        isInternalUserSharingCancellable = internalUserDecider.isInternalUserPublisher
+            .assign(to: \.isInternalUser, onWeaklyHeld: UserDefaults.appConfiguration)
     }
 
     private func emailDidSignInNotification(_ notification: Notification) {
