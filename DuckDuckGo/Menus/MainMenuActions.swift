@@ -818,7 +818,7 @@ extension MainViewController {
                                                           eventMapping: EventMapping<AutofillPixelEvent> { _, _, _, _ in },
                                                           installDate: nil)
         autofillPixelReporter.resetStoreDefaults()
-        var loginImportState = AutofillLoginImportState()
+        let loginImportState = AutofillLoginImportState()
         loginImportState.hasImportedLogins = false
         loginImportState.isCredentialsImportPromptPermanantlyDismissed = false
     }

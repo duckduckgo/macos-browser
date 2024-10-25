@@ -1854,6 +1854,8 @@
 		848648A22C76F4B20082282D /* BookmarksBarMenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 848648A02C76F4B20082282D /* BookmarksBarMenuViewController.swift */; };
 		84B49F0D2CB10F0900FF08BB /* OHHTTPStubs in Frameworks */ = {isa = PBXBuildFile; productRef = 84B49F0C2CB10F0900FF08BB /* OHHTTPStubs */; };
 		84B49F0F2CB10F0900FF08BB /* OHHTTPStubsSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 84B49F0E2CB10F0900FF08BB /* OHHTTPStubsSwift */; };
+		84B479082CCA7A3E00F40329 /* Logger+UnitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B479072CCA7A3900F40329 /* Logger+UnitTests.swift */; };
+		84B479092CCA7A3E00F40329 /* Logger+UnitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B479072CCA7A3900F40329 /* Logger+UnitTests.swift */; };
 		84DC715A2C1C1E9000033B8C /* UserDefaultsWrapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DC71582C1C1E8A00033B8C /* UserDefaultsWrapperTests.swift */; };
 		84DC715B2C1C1E9000033B8C /* UserDefaultsWrapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DC71582C1C1E8A00033B8C /* UserDefaultsWrapperTests.swift */; };
 		84DDB90A2C92B66E008C997B /* WKVisitedLinkStoreWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DDB9092C92B667008C997B /* WKVisitedLinkStoreWrapper.swift */; };
@@ -3957,6 +3959,7 @@
 		844D7DA32C9443E500BE61D4 /* NSPrintInfoExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSPrintInfoExtension.swift; sourceTree = "<group>"; };
 		84537A022C998C24008723BC /* FireWindowSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireWindowSession.swift; sourceTree = "<group>"; };
 		848648A02C76F4B20082282D /* BookmarksBarMenuViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarMenuViewController.swift; sourceTree = "<group>"; };
+		84B479072CCA7A3900F40329 /* Logger+UnitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Logger+UnitTests.swift"; sourceTree = "<group>"; };
 		84DC71582C1C1E8A00033B8C /* UserDefaultsWrapperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsWrapperTests.swift; sourceTree = "<group>"; };
 		84DDB9092C92B667008C997B /* WKVisitedLinkStoreWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKVisitedLinkStoreWrapper.swift; sourceTree = "<group>"; };
 		84F1C8CE2C7705B500716446 /* BookmarksBarMenuPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarMenuPopover.swift; sourceTree = "<group>"; };
@@ -8565,6 +8568,7 @@
 		AAEC74B92642E66600C2EFBC /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				84B479072CCA7A3900F40329 /* Logger+UnitTests.swift */,
 				4B4F72EB266B2ED300814C60 /* CollectionExtension.swift */,
 				1DFAB51F2A89830D00A0F7F6 /* SetExtensionTests.swift */,
 				B65349A9265CF45000DCC645 /* DispatchQueueExtensionsTests.swift */,
@@ -11749,6 +11753,7 @@
 				317295D32AF058D3002C3206 /* MockWaitlistTermsAndConditionsActionHandler.swift in Sources */,
 				9F0FFFB52BCCAE37007C87DD /* BookmarkAllTabsDialogCoordinatorViewModelTests.swift in Sources */,
 				3706FE34293F661700E42796 /* PermissionStoreTests.swift in Sources */,
+				84B479092CCA7A3E00F40329 /* Logger+UnitTests.swift in Sources */,
 				3706FE35293F661700E42796 /* ThirdPartyBrowserTests.swift in Sources */,
 				1DFAB5232A8983E100A0F7F6 /* SetExtensionTests.swift in Sources */,
 				56A054002C1AEFA1007D8FAB /* OnboardingManagerTests.swift in Sources */,
@@ -13156,6 +13161,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1DB9617A29F1D06D00CF5568 /* InternalUserDeciderMock.swift in Sources */,
+				84B479082CCA7A3E00F40329 /* Logger+UnitTests.swift in Sources */,
 				9833913327AAAEEE00DAF119 /* EmbeddedTrackerDataTests.swift in Sources */,
 				3776583127F8325B009A6B35 /* AutofillPreferencesTests.swift in Sources */,
 				373B2F852C387B830013A94B /* ActiveRemoteMessageModelTests.swift in Sources */,
