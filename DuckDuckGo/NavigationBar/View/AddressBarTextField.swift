@@ -656,14 +656,10 @@ final class AddressBarTextField: NSTextField {
     }
 
     func hideSuggestionWindow() {
-        guard let window = window, let suggestionWindow = suggestionWindowController?.window else {
-            return
-        }
+        guard let suggestionWindow = suggestionWindowController?.window, suggestionWindow.isVisible,
+              let parent = suggestionWindow.parent else { return }
 
-        if !suggestionWindow.isVisible { return }
-
-        window.removeChildWindow(suggestionWindow)
-        suggestionWindow.parent?.removeChildWindow(suggestionWindow)
+        parent.removeChildWindow(suggestionWindow)
         suggestionWindow.orderOut(nil)
     }
 
