@@ -26,6 +26,7 @@ import XCTest
 final class LocalBookmarkManagerTests: XCTestCase {
 
     var container: NSPersistentContainer!
+    var context: NSManagedObjectContext!
 
     enum BookmarkManagerError: Error {
         case somethingReallyBad
@@ -33,12 +34,22 @@ final class LocalBookmarkManagerTests: XCTestCase {
 
     override func setUp() {
         container = CoreData.bookmarkContainer()
-        let context = container.newBackgroundContext()
+        context = container.newBackgroundContext()
         context.performAndWait {
             BookmarkUtils.prepareFoldersStructure(in: context)
         }
         LocalBookmarkManager.context = context
     }
+
+    override func tearDown() {
+        // flush pending operations
+        context.performAndWait { }
+        LocalBookmarkManager.context = nil
+        context = nil
+        container = nil
+    }
+
+    // MARK: - Tests
 
     @MainActor
     func testWhenBookmarksAreNotLoadedYet_ThenManagerIgnoresBookmarkingRequests() {
@@ -760,7 +771,6 @@ final class LocalBookmarkManagerTests: XCTestCase {
     func testWhenNoVariantUrlIsBookmarked_ThenGetBookmarkForVariantReturnsNil() {
         let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
         let originalURL = URL(string: "http://example.com")!
-        let variantURL = URL(string: "https://example.com/")!
 
         bookmarkStoreMock.bookmarks = []
         bookmarkManager.loadBookmarks()
@@ -774,7 +784,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
         let originalURL = URL(string: "http://example.com")!
         let variantURL = URL(string: "https://example.com/")!
         let bookmark = Bookmark(id: UUID().uuidString, url: variantURL.absoluteString, title: "Title", isFavorite: false, parentFolderUUID: "bookmarks_root")
-        let (bookmarkManager, bookmarkStoreMock) = await LocalBookmarkManager.manager(with: {
+        let (bookmarkManager, _) = await LocalBookmarkManager.manager(with: {
             bookmark
         })
         bookmarkManager.loadBookmarks()
@@ -807,7 +817,7 @@ fileprivate extension LocalBookmarkManager {
     }
 
     private static func makeManager(@BookmarksBuilder with bookmarks: () -> [BookmarksBuilderItem]) -> (LocalBookmarkManager, BookmarkStoreMock) {
-        let bookmarkStoreMock = BookmarkStoreMock(contextProvider: { Self.context }, bookmarks: bookmarks().build())
+        let bookmarkStoreMock = BookmarkStoreMock(contextProvider: Self.context.map { context in { context } }, bookmarks: bookmarks().build())
         let faviconManagerMock = MainActor.assumeIsolated { FaviconManagerMock() }
         let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
 

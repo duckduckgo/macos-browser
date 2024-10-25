@@ -311,7 +311,7 @@ final class DuckPlayer {
         let userValues = encodeUserValues()
 
         /// If the user clicked on "Watch on Youtube" the next vide should open directly on youtube instead of displaying the overlay
-        var allowFirstVideo = shouldOpenNextVideoOnYoutube
+        let allowFirstVideo = shouldOpenNextVideoOnYoutube
 
         /// Reset the flag for subsequent videos
         shouldOpenNextVideoOnYoutube = false
