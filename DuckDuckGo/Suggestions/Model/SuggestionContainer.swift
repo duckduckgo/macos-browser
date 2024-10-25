@@ -34,6 +34,9 @@ final class SuggestionContainer {
     private let startupPreferences: StartupPreferences
     private let loading: SuggestionLoading
 
+    // Used for presenting the same suggestions after the removal of the local suggestion
+    private var suggestionDataCache: Data?
+
     private var latestQuery: Query?
 
     fileprivate let suggestionsURLSession = URLSession(configuration: .ephemeral)
@@ -55,8 +58,14 @@ final class SuggestionContainer {
                   bookmarkManager: LocalBookmarkManager.shared)
     }
 
-    func getSuggestions(for query: String) {
+    func getSuggestions(for query: String, useCachedData: Bool = false) {
         latestQuery = query
+
+        // Don't use cache by default
+        if !useCachedData {
+            suggestionDataCache = nil
+        }
+
         loading.getSuggestions(query: query, usingDataSource: self) { [weak self] result, error in
             dispatchPrecondition(condition: .onQueue(.main))
 
@@ -122,11 +131,17 @@ extension SuggestionContainer: SuggestionLoadingDataSource {
                            suggestionDataFromUrl url: URL,
                            withParameters parameters: [String: String],
                            completion: @escaping (Data?, Error?) -> Void) {
+        if let suggestionDataCache = suggestionDataCache {
+            completion(suggestionDataCache, nil)
+            return
+        }
+
         let url = url.appendingParameters(parameters)
         var request = URLRequest.defaultRequest(with: url)
         request.timeoutInterval = 1
 
         suggestionsURLSession.dataTask(with: request) { (data, _, error) in
+            self.suggestionDataCache = data
             completion(data, error)
         }.resume()
     }

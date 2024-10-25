@@ -238,7 +238,7 @@ final class SuggestionViewController: NSViewController {
 
             if let userStringValue = suggestionContainerViewModel.userStringValue {
                 suggestionContainerViewModel.isTopSuggestionSelectionExpected = false
-                self.suggestionContainerViewModel.suggestionContainer.getSuggestions(for: userStringValue)
+                self.suggestionContainerViewModel.suggestionContainer.getSuggestions(for: userStringValue, useCachedData: true)
             } else {
                 self.suggestionContainerViewModel.removeSuggestionFromResult(suggestion: suggestion)
             }
