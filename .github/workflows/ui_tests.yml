@@ -130,7 +130,7 @@ jobs:
         | tee ui-tests.log
 
     - name: Generate complete report
-      uses: kishikawakatsumi/xcresulttool@v1
+      uses: gemmakbarlow/xcresulttool@main
       if: success() || failure()
       with:
         path: | 
