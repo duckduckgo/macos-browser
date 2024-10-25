@@ -56752,6 +56752,18 @@
         }
       }
     },
+    "settings.newer.critical.update.available" : {
+      "comment" : "Label informing users the critical update of the app is available to install.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Critical update available"
+          }
+        }
+      }
+    },
     "settings.newer.version.available" : {
       "comment" : "Label informing users the newer version of the app is available to install.",
       "extractionState" : "extracted_with_value",
@@ -56837,7 +56849,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Restart to Update"
+            "value" : "Restart To Update"
           }
         },
         "es" : {
