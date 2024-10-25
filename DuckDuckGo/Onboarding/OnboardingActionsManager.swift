@@ -23,12 +23,11 @@ import Common
 import os.log
 
 enum OnboardingSteps: String, CaseIterable {
-    case summary
     case welcome
     case getStarted
-    case privateByDefault
-    case cleanerBrowsing
+    case makeDefaultSingle
     case systemSettings
+    case duckPlayerSingle
     case customize
 }
 
@@ -101,7 +100,7 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
         let stepDefinitions = StepDefinitions(systemSettings: systemSettings)
         let preferredLocale = Bundle.main.preferredLocalizations.first ?? "en"
         var env: String
-#if DEBUG
+#if DEBUG || REVIEW
         env = "development"
 #else
         env = "production"
@@ -124,6 +123,7 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
 
     @MainActor
     func goToAddressBar() {
+        PixelKit.fire(GeneralPixel.onboardingStepCompleteCustomize, frequency: .legacyDaily)
         onboardingHasFinished()
         let tab = Tab(content: .url(URL.duckDuckGo, source: .ui))
         navigation.replaceTabWith(tab)
@@ -181,18 +181,16 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
 
     func stepCompleted(step: OnboardingSteps) {
         switch step {
-        case .summary:
-            break
         case .welcome:
             PixelKit.fire(GeneralPixel.onboardingStepCompleteWelcome, frequency: .legacyDaily)
         case .getStarted:
             PixelKit.fire(GeneralPixel.onboardingStepCompleteGetStarted, frequency: .legacyDaily)
-        case .privateByDefault:
+        case .makeDefaultSingle:
             PixelKit.fire(GeneralPixel.onboardingStepCompletePrivateByDefault, frequency: .legacyDaily)
-        case .cleanerBrowsing:
-            PixelKit.fire(GeneralPixel.onboardingStepCompleteCleanerBrowsing, frequency: .legacyDaily)
         case .systemSettings:
             PixelKit.fire(GeneralPixel.onboardingStepCompleteSystemSettings, frequency: .legacyDaily)
+        case .duckPlayerSingle:
+            PixelKit.fire(GeneralPixel.onboardingStepCompleteCleanerBrowsing, frequency: .legacyDaily)
         case .customize:
             PixelKit.fire(GeneralPixel.onboardingStepCompleteCustomize, frequency: .legacyDaily)
         }

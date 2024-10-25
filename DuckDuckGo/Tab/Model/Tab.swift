@@ -780,12 +780,6 @@ protocol NewWindowPolicyDecisionMaker {
     func startOnboarding() {
         userInteractionDialog = nil
 
-        if NSApp.delegateTyped.featureFlagger.isFeatureOn(.highlightsOnboarding) {
-            Application.appDelegate.onboardingStateMachine.state = .notStarted
-            setContent(.onboarding)
-            return
-        }
-
 #if DEBUG || REVIEW
         if Application.runType == .uiTestsOnboarding {
             setContent(.onboarding)
@@ -794,6 +788,7 @@ protocol NewWindowPolicyDecisionMaker {
 #endif
 
         if PixelExperiment.cohort == .newOnboarding {
+            Application.appDelegate.onboardingStateMachine.state = .notStarted
             setContent(.onboarding)
         } else {
             setContent(.onboardingDeprecated)

@@ -407,6 +407,7 @@ final class BrowserTabViewController: NSViewController {
     }
 
     private func updateStateAndPresentContextualOnboarding() {
+        guard featureFlagger.isFeatureOn(.contextualOnboarding) else { return }
         guard let tab = tabViewModel?.tab else { return }
         onboardingDialogTypeProvider.updateStateFor(tab: tab)
         presentContextualOnboarding()
@@ -425,7 +426,7 @@ final class BrowserTabViewController: NSViewController {
         // Remove any existing higlights animation
         delegate?.dismissViewHighlight()
 
-        guard featureFlagger.isFeatureOn(.highlightsOnboarding) else { return }
+        guard featureFlagger.isFeatureOn(.contextualOnboarding) else { return }
 
         guard let tab = tabViewModel?.tab else { return }
         guard let dialogType = onboardingDialogTypeProvider.dialogTypeForTab(tab, privacyInfo: tab.privacyInfo) else {

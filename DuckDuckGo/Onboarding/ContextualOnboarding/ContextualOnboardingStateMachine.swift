@@ -162,7 +162,11 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
 
     var state: ContextualOnboardingState {
         get {
-            return ContextualOnboardingState(rawValue: stateString) ?? .onboardingCompleted
+            if NSApp.delegateTyped.featureFlagger.isFeatureOn(.contextualOnboarding) {
+                return ContextualOnboardingState(rawValue: stateString) ?? .onboardingCompleted
+            } else {
+                return .onboardingCompleted
+            }
         }
         set {
             stateString = newValue.rawValue
