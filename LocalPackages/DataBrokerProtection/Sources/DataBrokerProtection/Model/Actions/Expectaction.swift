@@ -29,6 +29,7 @@ struct Item: Codable, Sendable {
     let expect: String?
     let selector: String?
     let parent: String?
+    let failSilently: Bool?
 }
 
 internal final class ExpectationAction: Action {
