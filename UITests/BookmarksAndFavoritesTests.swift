@@ -627,7 +627,13 @@ class BookmarksAndFavoritesTests: XCTestCase {
             "The bookmarks bar bookmark icon failed to become available in a reasonable timeframe."
         )
         let bookmarkBarBookmarkIconCoordinate = bookmarkBarBookmarkIcon.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
-        let deleteContextMenuItemCoordinate = bookmarkBarBookmarkIcon.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 8.0))
+        var deleteContextMenuItemCoordinate: XCUICoordinate
+        if #available(macOS 15.0, *) {
+            deleteContextMenuItemCoordinate = bookmarkBarBookmarkIcon.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 8.0))
+        } else {
+            deleteContextMenuItemCoordinate = bookmarkBarBookmarkIcon.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 9.0))
+        }
+
         bookmarkBarBookmarkIconCoordinate.rightClick()
         deleteContextMenuItemCoordinate.click()
         app.typeKey("w", modifierFlags: [.command, .option, .shift])
