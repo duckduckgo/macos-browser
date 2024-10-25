@@ -58,6 +58,7 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
         viewController = nil
         cancellables = []
         expectation = nil
+        featureFlagger = nil
         try super.tearDownWithError()
     }
 

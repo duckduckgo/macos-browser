@@ -57,9 +57,9 @@ class OnboardingManagerTests: XCTestCase {
         // Given
         var systemSettings: SystemSettings
 #if APPSTORE
-        systemSettings = SystemSettings(rows: ["import", "default-browser"])
+        systemSettings = SystemSettings(rows: ["import"])
 #else
-        systemSettings = SystemSettings(rows: ["dock", "import", "default-browser"])
+        systemSettings = SystemSettings(rows: ["dock", "import"])
 #endif
         let stepDefinitions = StepDefinitions(systemSettings: systemSettings)
         let expectedConfig = OnboardingConfiguration(
