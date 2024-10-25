@@ -1,5 +1,4 @@
-.github/workflows/ui_tests.yml
-gname: UI Tests
+name: UI Tests
 
 on:
   workflow_dispatch:
