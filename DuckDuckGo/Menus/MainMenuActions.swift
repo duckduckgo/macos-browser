@@ -320,6 +320,8 @@ extension AppDelegate {
     @objc func fireButtonAction(_ sender: NSButton) {
         DispatchQueue.main.async {
             FireCoordinator.fireButtonAction()
+            let pixelReporter = OnboardingPixelReporter()
+            pixelReporter.trackFireButtonPressed()
         }
     }
 

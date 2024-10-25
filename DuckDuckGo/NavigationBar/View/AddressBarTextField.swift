@@ -80,6 +80,8 @@ final class AddressBarTextField: NSTextField {
     private var addressBarStringCancellable: AnyCancellable?
     private var contentTypeCancellable: AnyCancellable?
 
+    weak var onboardingDelegate: OnboardingAddressBarReporting?
+
     private let searchPreferences: SearchPreferences = SearchPreferences.shared
 
     private enum TextDidChangeEventType {
@@ -961,6 +963,7 @@ extension AddressBarTextField: NSTextFieldDelegate {
 
     func controlTextDidChange(_ obj: Notification) {
         handleTextDidChange()
+        onboardingDelegate?.trackAddressBarTypedIn()
     }
 
     private func handleTextDidChange() {
