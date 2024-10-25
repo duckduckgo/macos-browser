@@ -19,6 +19,7 @@
 import Bookmarks
 import Combine
 import Foundation
+import os.log
 
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
@@ -34,19 +35,24 @@ final class LocalBookmarkManagerTests: XCTestCase {
 
     override func setUp() {
         container = CoreData.bookmarkContainer()
-        context = container.newBackgroundContext()
+        let context = container.newBackgroundContext()
+        self.context = context
+        Logger.tests.debug("LocalBookmarkManagerTests.\(self.name).setUp with \(context.description, privacy: .public)")
+
         context.performAndWait {
             BookmarkUtils.prepareFoldersStructure(in: context)
         }
-        LocalBookmarkManager.context = context
+        LocalBookmarkManager.currentTest = self
     }
 
     override func tearDown() {
         // flush pending operations
+        Logger.tests.debug("LocalBookmarkManagerTests.\(self.name).tearDown: flush")
         context.performAndWait { }
-        LocalBookmarkManager.context = nil
+        LocalBookmarkManager.currentTest = nil
         context = nil
         container = nil
+        Logger.tests.debug("LocalBookmarkManagerTests.\(self.name).tearDown end")
     }
 
     // MARK: - Tests
@@ -810,16 +816,17 @@ final class LocalBookmarkManagerTests: XCTestCase {
 
 fileprivate extension LocalBookmarkManager {
 
-    static var context: NSManagedObjectContext!
+    static weak var currentTest: LocalBookmarkManagerTests!
 
     static var aManager: (LocalBookmarkManager, BookmarkStoreMock) {
         manager(with: {})
     }
 
     private static func makeManager(@BookmarksBuilder with bookmarks: () -> [BookmarksBuilderItem]) -> (LocalBookmarkManager, BookmarkStoreMock) {
-        let bookmarkStoreMock = BookmarkStoreMock(contextProvider: Self.context.map { context in { context } }, bookmarks: bookmarks().build())
+        let bookmarkStoreMock = BookmarkStoreMock(contextProvider: currentTest.context.map { context in { context } }, bookmarks: bookmarks().build())
         let faviconManagerMock = MainActor.assumeIsolated { FaviconManagerMock() }
         let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
+        Logger.tests.debug("LocalBookmarkManagerTests.\(currentTest!.name).makeManager \(String(describing: bookmarkManager)) with \(bookmarkStoreMock.debugDescription, privacy: .public)")
 
         return (bookmarkManager, bookmarkStoreMock)
     }
@@ -891,13 +898,9 @@ fileprivate extension BaseBookmarkEntity {
         }
     }
 
-    func matchesFolder(withTitle title: String, parent: String? = nil) -> Bool {
+    func matchesFolder(withTitle title: String, parent: String?) -> Bool {
         guard self.isFolder else { return false }
         return self.title == title && self.parentFolderUUID ?? "bookmarks_root" == parent ?? "bookmarks_root"
-    }
-
-    func matchesFolder(withTitle title: String, parent: BookmarkFolder? = nil) -> Bool {
-        matchesFolder(withTitle: title, parent: parent?.id)
     }
 
     func matches(_ folder: BookmarkFolder) -> Bool {

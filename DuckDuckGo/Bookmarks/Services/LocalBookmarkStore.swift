@@ -354,7 +354,7 @@ final class LocalBookmarkStore: BookmarkStore {
             let fetchResults = (try? context.fetch(fetchRequest)) ?? []
 
             if fetchResults.count != identifiers.count {
-                assertionFailure("\(#file): Fetched bookmark entities didn't match the number of provided UUIDs")
+                assertionFailure("\(self): Fetched bookmark entities \(fetchResults) didn't match the number of provided UUIDs \(identifiers)")
             }
 
             for object in fetchResults {
