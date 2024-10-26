@@ -310,14 +310,29 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     @objc func toggleEnforceRoutesAction(_ sender: Any?) {
         settings.enforceRoutes.toggle()
+
+        Task {
+            try await Task.sleep(interval: 0.1)
+            try await debugUtilities.restartAdapter()
+        }
     }
 
     @objc func toggleIncludeAllNetworks(_ sender: Any?) {
         settings.includeAllNetworks.toggle()
+
+        Task {
+            try await Task.sleep(interval: 0.1)
+            try await debugUtilities.restartAdapter()
+        }
     }
 
     @objc func toggleShouldExcludeLocalRoutes(_ sender: Any?) {
         settings.excludeLocalNetworks.toggle()
+
+        Task {
+            try await Task.sleep(interval: 0.1)
+            try await debugUtilities.restartAdapter()
+        }
     }
 
     @objc func openAppContainerInFinder(_ sender: Any?) {
