@@ -32,7 +32,6 @@ final class OnboardingUITests: UITestCase {
         app.launch()
         app.typeKey("w", modifierFlags: [.command, .option, .shift])
         app.typeKey("n", modifierFlags: .command)
-        app.dismissSystemNotificationIfPresent()
         let welcomeWindow = app.windows["Welcome"]
 
         let optionsButton = welcomeWindow.buttons["NavigationBarViewController.optionsButton"]

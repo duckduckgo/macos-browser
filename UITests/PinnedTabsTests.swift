@@ -29,7 +29,6 @@ class PinnedTabsTests: UITestCase {
         app.launch()
 
         app.typeKey("n", modifierFlags: .command)
-        app.dismissSystemNotificationIfPresent()
     }
 
     override class func setUp() {

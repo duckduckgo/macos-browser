@@ -55,7 +55,6 @@ class AutocompleteTests: UITestCase {
         app.launch()
         app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Enforce a single window
         app.typeKey("n", modifierFlags: .command)
-        app.dismissSystemNotificationIfPresent()
         try resetAndArrangeBookmarksAndHistory() // Manually reset to a clean state
     }
 

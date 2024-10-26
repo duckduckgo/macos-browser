@@ -44,7 +44,6 @@ class BrowsingHistoryTests: UITestCase {
         app.launch()
         app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Enforce a single window
         app.typeKey("n", modifierFlags: .command)
-        app.dismissSystemNotificationIfPresent()
 
         XCTAssertTrue(
             historyMenuBarItem.waitForExistence(timeout: UITests.Timeouts.elementExistence),

@@ -46,7 +46,6 @@ class FindInPageTests: UITestCase {
         app.launch()
         app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Let's enforce a single window
         app.typeKey("n", modifierFlags: .command)
-        app.dismissSystemNotificationIfPresent()
     }
 
     func test_findInPage_canBeOpenedWithKeyCommand() throws {

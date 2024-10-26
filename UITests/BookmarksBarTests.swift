@@ -59,7 +59,6 @@ class BookmarksBarTests: UITestCase {
         resetBookmarksAndAddOneBookmark()
         app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Close windows
         app.typeKey("n", modifierFlags: [.command])
-        app.dismissSystemNotificationIfPresent()
         openSettingsAndSetShowBookmarksBarToUnchecked()
         openSecondWindowAndVisitSite()
         siteWindow = app.windows.containing(.webView, identifier: pageTitle).firstMatch
