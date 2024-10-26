@@ -62,6 +62,7 @@ class PermissionsTests: UITestCase {
 
         app.launch()
         app.activate()
+        app.dismissSystemNotificationIfPresent()
         historyMenuBarItem.clickAfterExistenceTestSucceeds()
         clearAllHistoryMenuItem.clickAfterExistenceTestSucceeds()
         clearAllHistoryAlertClearButton.clickAfterExistenceTestSucceeds() // Manually remove the history

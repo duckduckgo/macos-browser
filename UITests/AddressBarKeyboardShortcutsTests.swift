@@ -35,6 +35,7 @@ class AddressBarKeyboardShortcutsTests: UITestCase {
         continueAfterFailure = false
         app = XCUIApplication()
         app.launchEnvironment["UITEST_MODE"] = "1"
+        app.dismissSystemNotificationIfPresent()
         urlStringForAddressBar = "https://duckduckgo.com/duckduckgo-help-pages/results/translation/"
         urlForAddressBar = URL(string: urlStringForAddressBar)
         addressBarTextField = app.windows.textFields["AddressBarViewController.addressBarTextField"]

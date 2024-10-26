@@ -48,6 +48,7 @@ class BookmarkSearchTests: UITestCase {
         app = XCUIApplication()
         app.launchEnvironment["UITEST_MODE"] = "1"
         app.launch()
+        app.dismissSystemNotificationIfPresent()
         app.resetBookmarks()
         enforceSingleWindow()
     }

@@ -145,4 +145,11 @@ extension XCUIApplication {
             XCTAssertTrue(cellLabel.exists, "Cell at index \(index) has unexpected label.")
         }
     }
+
+    func dismissSystemNotificationIfPresent() {
+        let notification = XCUIApplication().alerts["Background Items Added"]
+        if notification.exists {
+            notification.buttons["Close"].tap() // Adjust if the button has a different label
+        }
+    }
 }
