@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "sabrina/update-css-dependency",
-        "revision" : "f8df2c4cbb1352287ec22200d43994482af3c8bc"
+        "revision" : "44d747d56bc73cb74de0e9d7127314ea30eca371",
+        "version" : "200.3.0"
       }
     },
     {
