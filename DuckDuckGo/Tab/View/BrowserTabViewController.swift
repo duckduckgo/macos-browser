@@ -27,6 +27,12 @@ import PixelKit
 import os.log
 import Onboarding
 
+protocol BrowserTabViewControllerDelegate: AnyObject {
+    func highlightFireButton()
+    func highlightPrivacyShield()
+    func dismissViewHighlight()
+}
+
 final class BrowserTabViewController: NSViewController {
 
     private lazy var browserTabView = BrowserTabView(frame: .zero, backgroundColor: .browserTabBackground)
@@ -38,6 +44,7 @@ final class BrowserTabViewController: NSViewController {
     private weak var webViewSnapshot: NSView?
     private var containerStackView: NSStackView
 
+    weak var delegate: BrowserTabViewControllerDelegate?
     var tabViewModel: TabViewModel?
 
     private let tabCollectionViewModel: TabCollectionViewModel
@@ -382,9 +389,9 @@ final class BrowserTabViewController: NSViewController {
         let container = WebViewContainerView(tab: tab, webView: webView, frame: view.bounds)
         self.webViewContainer = container
         containerStackView.orientation = .vertical
-        containerStackView.distribution = .fill
         containerStackView.alignment = .leading
         containerStackView.distribution = .fillProportionally
+        containerStackView.spacing = 0
 
         // Make sure link preview (tooltip shown in the bottom-left) is on top
         view.addSubview(containerStackView, positioned: .below, relativeTo: hoverLabelContainer)
@@ -398,9 +405,12 @@ final class BrowserTabViewController: NSViewController {
         ])
         containerStackView.addArrangedSubview(container)
     }
-    var daxContextualOnboardingController: NSViewController?
 
     private func updateStateAndPresentContextualOnboarding() {
+        guard featureFlagger.isFeatureOn(.contextualOnboarding) else {
+            onboardingDialogTypeProvider.turnOffFeature()
+            return
+        }
         guard let tab = tabViewModel?.tab else { return }
         onboardingDialogTypeProvider.updateStateFor(tab: tab)
         presentContextualOnboarding()
@@ -416,10 +426,17 @@ final class BrowserTabViewController: NSViewController {
     private func presentContextualOnboarding() {
         // Before presenting a new dialog, remove any existing ones.
         removeExistingDialog()
-        guard featureFlagger.isFeatureOn(.highlightsOnboarding) else { return }
+        // Remove any existing higlights animation
+        delegate?.dismissViewHighlight()
+
+        guard featureFlagger.isFeatureOn(.contextualOnboarding) else {
+            onboardingDialogTypeProvider.turnOffFeature()
+            return
+        }
 
         guard let tab = tabViewModel?.tab else { return }
         guard let dialogType = onboardingDialogTypeProvider.dialogTypeForTab(tab, privacyInfo: tab.privacyInfo) else {
+            delegate?.dismissViewHighlight()
             return
         }
 
@@ -430,20 +447,48 @@ final class BrowserTabViewController: NSViewController {
                 self.removeChild(in: self.containerStackView, webViewContainer: webViewContainer)
             }
         }
-        let daxView = onboardingDialogFactory.makeView(for: dialogType, delegate: tab, onDismiss: onDismissAction, onGotItPressed: onboardingDialogTypeProvider.gotItPressed)
-        let hostingController = NSHostingController(rootView: AnyView(daxView))
 
-        daxContextualOnboardingController = hostingController
-        insertChild(daxContextualOnboardingController!, in: containerStackView, at: 0)
+        let onGotItPressed = { [weak self] in
+            guard let self else { return }
+
+            onboardingDialogTypeProvider.gotItPressed()
+
+            let currentState = onboardingDialogTypeProvider.state
+
+            // Reset highlight animations
+            delegate?.dismissViewHighlight()
+
+            // Process state
+            if case .showFireButton = currentState {
+                delegate?.highlightFireButton()
+            }
+        }
+
+        let daxView = onboardingDialogFactory.makeView(
+            for: dialogType,
+            delegate: tab,
+            onDismiss: onDismissAction,
+            onGotItPressed: onGotItPressed,
+            onFireButtonPressed: { [weak delegate] in
+                delegate?.dismissViewHighlight()
+            })
+        let hostingController = NSHostingController(rootView: AnyView(daxView))
+        insertChild(hostingController, in: containerStackView, at: 0)
         hostingController.view.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             hostingController.view.widthAnchor.constraint(equalTo: containerStackView.widthAnchor),
             hostingController.view.leadingAnchor.constraint(equalTo: containerStackView.leadingAnchor),
-            hostingController.view.trailingAnchor.constraint(equalTo: containerStackView.trailingAnchor)
+            hostingController.view.trailingAnchor.constraint(equalTo: containerStackView.trailingAnchor),
         ])
 
-          containerStackView.layoutSubtreeIfNeeded()
-          webViewContainer?.layoutSubtreeIfNeeded()
+        containerStackView.layoutSubtreeIfNeeded()
+        webViewContainer?.layoutSubtreeIfNeeded()
+
+        if dialogType == .tryFireButton {
+            delegate?.highlightFireButton()
+        } else if case .trackers = dialogType {
+            delegate?.highlightPrivacyShield()
+        }
     }
 
     private func changeWebView(tabViewModel: TabViewModel?) {
@@ -520,11 +565,6 @@ final class BrowserTabViewController: NSViewController {
 
         tabViewModel?.tab.webViewDidFinishNavigationPublisher.sink { [weak self] in
             self?.updateStateAndPresentContextualOnboarding()
-        }.store(in: &tabViewModelCancellables)
-
-        tabViewModel?.tab.webViewDidStartNavigationPublisher.sink { [weak self] in
-            guard let self, let webViewContainer = self.webViewContainer else { return }
-            self.removeChild(in: self.containerStackView, webViewContainer: webViewContainer)
         }.store(in: &tabViewModelCancellables)
     }
 
@@ -825,7 +865,7 @@ final class BrowserTabViewController: NSViewController {
             guard let syncService = NSApp.delegateTyped.syncService else {
                 fatalError("Sync service is nil")
             }
-            let preferencesViewController = PreferencesViewController(syncService: syncService)
+            let preferencesViewController = PreferencesViewController(syncService: syncService, tabCollectionViewModel: tabCollectionViewModel)
             preferencesViewController.delegate = self
             self.preferencesViewController = preferencesViewController
             return preferencesViewController

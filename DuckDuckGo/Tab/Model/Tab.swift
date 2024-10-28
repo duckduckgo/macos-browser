@@ -66,6 +66,7 @@ protocol NewWindowPolicyDecisionMaker {
     private var onNewWindow: ((WKNavigationAction?) -> NavigationDecision)?
 
     private let statisticsLoader: StatisticsLoader?
+    private let onboardingPixelReporter: OnboardingAddressBarReporting
     private let internalUserDecider: InternalUserDecider?
     let pinnedTabsManager: PinnedTabsManager
 
@@ -117,7 +118,8 @@ protocol NewWindowPolicyDecisionMaker {
                      tunnelController: NetworkProtectionIPCTunnelController? = TunnelControllerProvider.shared.tunnelController,
                      phishingDetector: PhishingSiteDetecting = PhishingDetection.shared,
                      phishingState: PhishingTabStateManaging = PhishingTabStateManager(),
-                     tabsPreferences: TabsPreferences = TabsPreferences.shared
+                     tabsPreferences: TabsPreferences = TabsPreferences.shared,
+                     onboardingPixelReporter: OnboardingAddressBarReporting = OnboardingPixelReporter()
     ) {
 
         let duckPlayer = duckPlayer
@@ -162,7 +164,8 @@ protocol NewWindowPolicyDecisionMaker {
                   tunnelController: tunnelController,
                   phishingDetector: phishingDetector,
                   phishingState: phishingState,
-                  tabsPreferences: tabsPreferences)
+                  tabsPreferences: tabsPreferences,
+                  onboardingPixelReporter: onboardingPixelReporter)
     }
 
     @MainActor
@@ -197,7 +200,8 @@ protocol NewWindowPolicyDecisionMaker {
          tunnelController: NetworkProtectionIPCTunnelController?,
          phishingDetector: PhishingSiteDetecting,
          phishingState: PhishingTabStateManaging,
-         tabsPreferences: TabsPreferences
+         tabsPreferences: TabsPreferences,
+         onboardingPixelReporter: OnboardingAddressBarReporting
     ) {
 
         self.content = content
@@ -229,6 +233,7 @@ protocol NewWindowPolicyDecisionMaker {
         let userContentController = configuration.userContentController as? UserContentController
         assert(userContentController != nil)
         self.userContentController = userContentController
+        self.onboardingPixelReporter = onboardingPixelReporter
 
         webView = WebView(frame: CGRect(origin: .zero, size: webViewSize), configuration: configuration)
         webView.allowsLinkPreview = false
@@ -771,6 +776,7 @@ protocol NewWindowPolicyDecisionMaker {
         }
     }
 
+    @MainActor
     func startOnboarding() {
         userInteractionDialog = nil
 
@@ -782,6 +788,7 @@ protocol NewWindowPolicyDecisionMaker {
 #endif
 
         if PixelExperiment.cohort == .newOnboarding {
+            Application.appDelegate.onboardingStateMachine.state = .notStarted
             setContent(.onboarding)
         } else {
             setContent(.onboardingDeprecated)
@@ -962,6 +969,7 @@ protocol NewWindowPolicyDecisionMaker {
     private func setupWebView(shouldLoadInBackground: Bool) {
         webView.navigationDelegate = navigationDelegate
         webView.uiDelegate = self
+        webView.inspectorDelegate = self
         webView.contextMenuDelegate = self.contextMenuManager
         webView.allowsBackForwardNavigationGestures = true
         webView.allowsMagnification = true
@@ -1218,6 +1226,9 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     func navigationDidFinish(_ navigation: Navigation) {
         invalidateInteractionStateData()
         statisticsLoader?.refreshRetentionAtb(isSearch: navigation.url.isDuckDuckGoSearch)
+        if !navigation.url.isDuckDuckGoSearch {
+            onboardingPixelReporter.trackSiteVisited()
+        }
         navigationDidEndPublisher.send(self)
     }
 
@@ -1250,6 +1261,8 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
     @MainActor
     func webContentProcessDidTerminate(with reason: WKProcessTerminationReason?) {
+        guard (error?.code.rawValue ?? WKError.Code.unknown.rawValue) != WKError.Code.webContentProcessTerminated.rawValue else { return }
+
         let error = WKError(.webContentProcessTerminated, userInfo: [
             WKProcessTerminationReason.userInfoKey: reason?.rawValue ?? -1,
             NSLocalizedDescriptionKey: UserText.webProcessCrashPageMessage
@@ -1327,9 +1340,15 @@ extension Tab {
 
 extension Tab: OnboardingNavigationDelegate {
     func searchFor(_ query: String) {
-        guard let url = URL.makeSearchUrl(from: query) else { return }
-        let request = URLRequest(url: url)
-        self.webView.load(request)
+        // We check if the provided string is already a search query.
+        // During onboarding, there's a specific case where we want to search for images,
+        // and this allows us to handle that scenario.
+        if let url = URL(string: query), url.isDuckDuckGoSearch {
+            navigateTo(url: url)
+        } else {
+            guard let url = URL.makeSearchUrl(from: query) else { return }
+            navigateTo(url: url)
+        }
     }
 
     func navigateTo(url: URL) {
