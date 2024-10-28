@@ -28,6 +28,7 @@ protocol ContextualOnboardingStateUpdater: AnyObject {
     func updateStateFor(tab: Tab)
     func gotItPressed()
     func fireButtonUsed()
+    func turnOffFeature()
 }
 
 protocol FireButtonInfoStateProviding {
@@ -380,5 +381,9 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
         default:
             break
         }
+    }
+
+    func turnOffFeature() {
+        state = .onboardingCompleted
     }
 }
