@@ -22,6 +22,7 @@ import Common
 import BrowserServicesKit
 import Configuration
 import PixelKit
+import AppKitExtensions
 import os.log
 
 // This is to avoid exposing all the dependancies outside of the DBP package
@@ -30,7 +31,7 @@ public class DataBrokerProtectionAgentManagerProvider {
     public static func agentManager(authenticationManager: DataBrokerProtectionAuthenticationManaging) -> DataBrokerProtectionAgentManager {
         let pixelHandler = DataBrokerProtectionPixelsHandler()
 
-        let executionConfig = DataBrokerExecutionConfig()
+        let executionConfig = DataBrokerExecutionConfig(mode: NSApp.runType == .integrationTests ? .fastForIntegrationTests : .normal)
         let activityScheduler = DefaultDataBrokerProtectionBackgroundActivityScheduler(config: executionConfig)
 
         let notificationService = DefaultDataBrokerProtectionUserNotificationService(pixelHandler: pixelHandler)
