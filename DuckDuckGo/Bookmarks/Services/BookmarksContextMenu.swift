@@ -308,13 +308,17 @@ extension BookmarksContextMenu: BookmarkMenuItemSelectors {
     }
 
     @objc func toggleBookmarkAsFavorite(_ sender: NSMenuItem) {
-        guard let bookmark = sender.representedObject as? Bookmark else {
+        if let bookmark = sender.representedObject as? Bookmark{
+            bookmark.isFavorite.toggle()
+            bookmarkManager.update(bookmark: bookmark)
+        } else if let bookmarks = sender.representedObject as? [Bookmark] {
+            bookmarks.forEach { bookmark in
+                bookmark.isFavorite.toggle()
+                bookmarkManager.update(bookmark: bookmark)
+            }
+        } else {
             assertionFailure("Failed to cast menu represented object to Bookmark")
-            return
         }
-
-        bookmark.isFavorite.toggle()
-        bookmarkManager.update(bookmark: bookmark)
     }
 
     @MainActor
