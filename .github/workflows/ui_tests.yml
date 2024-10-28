@@ -8,7 +8,8 @@ on:
     branches:
       - hotfix/*
       - release/*
-      
+  push:
+
 jobs:
   create-notarized-app:
     name: Build Notarized Review app
