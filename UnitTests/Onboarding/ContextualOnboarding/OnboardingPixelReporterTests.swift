@@ -161,6 +161,6 @@ class MockContextualOnboardingState: ContextualOnboardingStateUpdater {
     func fireButtonUsed() {
     }
 
-    func featureIsOff() {}
+    func turnOffFeature() {}
 
 }

@@ -83,6 +83,6 @@ class CapturingContextualOnboardingStateUpdater: ContextualOnboardingStateUpdate
         fireButtonUsedCalled = true
     }
 
-    func featureIsOff() {}
+    func turnOffFeature() {}
 
 }

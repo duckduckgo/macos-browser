@@ -674,12 +674,12 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         XCTAssertEqual(stateMachine.state, .showBlockedTrackers)
     }
 
-    func test_OnFeatureIsOff_StateBecomesOnboardingCompleted() {
+    func test_OnTurnOffFeature_StateBecomesOnboardingCompleted() {
         // Given
         stateMachine.state = .showTryASearch
 
         // When
-        stateMachine.featureIsOff()
+        stateMachine.turnOffFeature()
 
         // Then
         XCTAssertEqual(stateMachine.state, .onboardingCompleted)

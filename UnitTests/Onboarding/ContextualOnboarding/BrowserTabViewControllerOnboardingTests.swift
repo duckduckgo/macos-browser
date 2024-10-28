@@ -62,9 +62,9 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
         try super.tearDownWithError()
     }
 
-    func testWhenNavigationCompletedAndFeatureIsOffThenFeatureIsOff() throws {
+    func testWhenNavigationCompletedAndFeatureIsOffThenTurnOffFeature() throws {
         featureFlagger.isFeatureOn = false
-        let expectation = self.expectation(description: "Wait for featureIsOffCalled to be called")
+        let expectation = self.expectation(description: "Wait for turnOffFeatureCalled to be called")
         dialogProvider.dialogTypeForTabExpectation = expectation
 
         tab.navigateTo(url: URL(string: "some.url")!)
@@ -266,7 +266,7 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
 class MockDialogsProvider: ContextualOnboardingDialogTypeProviding, ContextualOnboardingStateUpdater {
 
     var state: ContextualOnboardingState = .onboardingCompleted
-    var featureIsOffCalledExpectation: XCTestExpectation?
+    var turnOffFeatureCalledExpectation: XCTestExpectation?
 
     func updateStateFor(tab: DuckDuckGo_Privacy_Browser.Tab) {}
 
@@ -283,8 +283,8 @@ class MockDialogsProvider: ContextualOnboardingDialogTypeProviding, ContextualOn
 
     func fireButtonUsed() {}
 
-    func featureIsOff() {
-        featureIsOffCalledExpectation?.fulfill()
+    func turnOffFeature() {
+        turnOffFeatureCalledExpectation?.fulfill()
     }
 }
 
