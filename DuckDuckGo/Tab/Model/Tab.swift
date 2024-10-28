@@ -1274,7 +1274,13 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             loadErrorHTML(error, header: UserText.webProcessCrashPageHeader, forUnreachableURL: url, alternate: true)
         }
 
-        PixelKit.fire(DebugEvent(GeneralPixel.webKitDidTerminate, error: error))
+#if APPSTORE
+        let additionalParameters = [String: String]()
+#else
+        let additionalParameters = SystemInfo.pixelParameters()
+#endif
+
+        PixelKit.fire(DebugEvent(GeneralPixel.webKitDidTerminate, error: error), withAdditionalParameters: additionalParameters)
     }
 
     @MainActor
@@ -1356,3 +1362,58 @@ extension Tab: OnboardingNavigationDelegate {
         self.webView.load(request)
     }
 }
+
+#if !APPSTORE
+
+final class SystemInfo {
+
+    static func pixelParameters() -> [String: String] {
+        let availableMemoryPercent = Self.getAvailableMemoryPercent()
+        let availableDiskSpacePercent = Self.getAvailableDiskSpacePercent()
+        return [
+           "available_memory": String(format: "%.2f", availableMemoryPercent),
+           "available_diskspace": String(format: "%.2f", availableDiskSpacePercent),
+        ]
+    }
+
+    static func getAvailableMemoryPercent() -> Int {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/memory_pressure")
+
+        let pipe = Pipe()
+        process.standardOutput = pipe
+
+        do {
+            try process.run()
+            process.waitUntilExit()
+
+            let data = pipe.fileHandleForReading.readDataToEndOfFile()
+            if let output = String(data: data, encoding: .utf8) {
+                // Should be the last line, but just in case search for it explicitly
+                let lines = output.split(separator: "\n")
+                if let memoryLine = lines.first(where: { $0.contains("System-wide memory free percentage") }),
+                   let range = memoryLine.range(of: "\\d+", options: .regularExpression),
+                   let percentage = Int(memoryLine[range]) {
+                    return percentage
+                }
+            }
+        } catch {
+            assertionFailure("Unable to run memory_pressure")
+        }
+
+        return -1
+    }
+
+    static func getAvailableDiskSpacePercent() -> Double {
+        guard let attributes = try? FileManager.default.attributesOfFileSystem(forPath: NSHomeDirectory()),
+              let totalSpace = attributes[.systemSize] as? UInt64,
+              let freeSpace = attributes[.systemFreeSize] as? UInt64 else {
+                return -1.0
+              }
+
+        return Double(freeSpace) / Double(totalSpace) * 100
+    }
+
+}
+
+#endif
