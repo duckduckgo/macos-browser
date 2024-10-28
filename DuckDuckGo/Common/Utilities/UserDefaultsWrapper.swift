@@ -140,6 +140,9 @@ public struct UserDefaultsWrapper<T> {
         case homePageCustomBackground = "home.page.custom.background"
         case homePageLastPickedCustomColor = "home.page.last.picked.custom.color"
 
+        case homePagePromotionVisible = "home.page.promotion.visible"
+        case homePagePromotionDidDismiss = "home.page.promotion.did.dismiss"
+
         case appIsRelaunchingAutomatically = "app-relaunching-automatically"
 
         case historyV5toV6Migration = "history.v5.to.v6.migration.2"

@@ -44,49 +44,9 @@ struct MapperToUI {
                                              totalScans: totalScans,
                                              scannedBrokers: partiallyScannedBrokers)
 
-        let matches = mapMatchesToUI(withoutDeprecated)
+        let matches = DBPUIDataBrokerProfileMatch.profileMatches(from: withoutDeprecated)
 
         return .init(resultsFound: matches, scanProgress: scanProgress)
-    }
-
-    private func mapMatchesToUI(_ brokerProfileQueryData: [BrokerProfileQueryData]) -> [DBPUIDataBrokerProfileMatch] {
-
-        // Used to find opt outs on the parent
-        let brokerURLsToQueryData =  Dictionary(grouping: brokerProfileQueryData, by: { $0.dataBroker.url })
-
-        return brokerProfileQueryData.flatMap {
-            var profiles = [DBPUIDataBrokerProfileMatch]()
-            for optOutJobData in $0.optOutJobData {
-                let dataBroker = $0.dataBroker
-
-                var parentBrokerOptOutJobData: [OptOutJobData]?
-                if let parent = dataBroker.parent,
-                   let parentsQueryData = brokerURLsToQueryData[parent] {
-                    parentBrokerOptOutJobData = parentsQueryData.flatMap { $0.optOutJobData }
-                }
-
-                profiles.append(DBPUIDataBrokerProfileMatch(optOutJobData: optOutJobData,
-                                                            dataBroker: dataBroker,
-                                                            parentBrokerOptOutJobData: parentBrokerOptOutJobData))
-
-                if !dataBroker.mirrorSites.isEmpty {
-                    let mirrorSitesMatches = dataBroker.mirrorSites.compactMap { mirrorSite in
-                        if mirrorSite.shouldWeIncludeMirrorSite() {
-                            return DBPUIDataBrokerProfileMatch(optOutJobData: optOutJobData,
-                                                               dataBrokerName: mirrorSite.name,
-                                                               dataBrokerURL: mirrorSite.url,
-                                                               dataBrokerParentURL: dataBroker.parent,
-                                                               parentBrokerOptOutJobData: parentBrokerOptOutJobData)
-                        }
-
-                        return nil
-                    }
-                    profiles.append(contentsOf: mirrorSitesMatches)
-                }
-            }
-
-            return profiles
-        }
     }
 
     func maintenanceScanState(_ brokerProfileQueryData: [BrokerProfileQueryData]) -> DBPUIScanAndOptOutMaintenanceState {
@@ -516,17 +476,6 @@ extension HistoryEvent {
         case .error(let error):
             return error.name
         default: return nil
-        }
-    }
-}
-
-fileprivate extension MirrorSite {
-
-    func shouldWeIncludeMirrorSite(for date: Date = Date()) -> Bool {
-        if let removedAt = self.removedAt {
-            return self.addedAt < date && date < removedAt
-        } else {
-            return self.addedAt < date
         }
     }
 }
