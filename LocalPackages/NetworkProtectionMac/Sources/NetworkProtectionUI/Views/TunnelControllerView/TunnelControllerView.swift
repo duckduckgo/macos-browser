@@ -53,7 +53,7 @@ public struct TunnelControllerView: View {
 
             featureToggleRow()
 
-            if #available(macOS 15.0, *) {
+            if #available(macOS 14.0, *) {
                 TipView(VPNAutoconnectTip())
                 //VPNAutoconnectTipView()
                 //TipView(tipGroup.currentTip as? VPNAutoconnectTip)
@@ -64,7 +64,7 @@ public struct TunnelControllerView: View {
             SiteTroubleshootingView()
                 .padding(.top, 5)
 
-            if #available(macOS 15.0, *) {
+            if #available(macOS 14.0, *) {
                 //VPNDomainExclusionsTipView()
                 //.padding(.horizontal, 9)
                 //.padding(.vertical, 6)
@@ -201,10 +201,8 @@ public struct TunnelControllerView: View {
                 }
             }
 
-            if #available(macOS 15.0, *) {
+            if #available(macOS 14.0, *) {
                 TipView(geoswitchingTip)
-                //VPNGeoswitchingTipView()
-                //TipView(tipGroup.currentTip as? VPNGeoswitchingTip)
                     .padding(.horizontal, 9)
                     .padding(.vertical, 6)
             }
@@ -237,46 +235,30 @@ public struct TunnelControllerView: View {
 
     // MARK: - Tips
 
-    let geoswitchingTip: VPNGeoswitchingTip = {
+    var geoswitchingTip: VPNGeoswitchingTip {
+
         let tip = VPNGeoswitchingTip()
 
         if #available(macOS 14.0, *) {
-            if tip.shouldDisplay {
-                Task {
-                    for await status in tip.statusUpdates {
-                        if case .invalidated = status {
-                            await VPNDomainExclusionsTip.geolocationTipDismissedEvent.donate()
-                            await VPNAutoconnectTip.geolocationTipDismissedEvent.donate()
-                        }
-                    }
-                }
-            }
+            tipsModel.subscribeToTipStatusChanges(tip)
         }
 
         return tip
-    }()
+    }
 
-    let snoozeTip: VPNDomainExclusionsTip = {
+    var snoozeTip: VPNDomainExclusionsTip {
         let tip = VPNDomainExclusionsTip()
 
         if #available(macOS 14.0, *) {
-            if tip.shouldDisplay {
-                Task {
-                    for await status in tip.statusUpdates {
-                        if case .invalidated = status {
-                            await VPNAutoconnectTip.domainExclusionsTipDismissedEvent.donate()
-                        }
-                    }
-                }
-            }
+            tipsModel.subscribeToTipStatusChanges(tip)
         }
 
         return tip
-    }()
+    }
 
-    let autoconnectTip: VPNAutoconnectTip = {
+    var autoconnectTip: VPNAutoconnectTip {
         VPNAutoconnectTip()
-    }()
+    }
 
     // MARK: - Rows
 
