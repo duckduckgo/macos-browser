@@ -95,7 +95,7 @@ final class SuggestionTableCellView: NSTableCellView {
         removeButton.contentTintColor = isSelected ? Self.selectedTintColor : Self.iconColor
     }
 
-    private func updateDeleteImageViewVisibility() {
+    func updateDeleteImageViewVisibility() {
         guard let window = window else { return }
         let mouseLocation = NSEvent.mouseLocation
         let windowFrameInScreen = window.frame

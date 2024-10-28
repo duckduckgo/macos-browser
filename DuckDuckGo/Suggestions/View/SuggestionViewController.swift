@@ -166,7 +166,13 @@ final class SuggestionViewController: NSViewController {
     }
 
     private func selectRow(at index: Int?) {
-        if tableView.selectedRow == index { return }
+        if tableView.selectedRow == index {
+            if let index, let cell = tableView.view(atColumn: 0, row: index, makeIfNecessary: false) as? SuggestionTableCellView {
+                // Show the delete button if necessary
+                cell.updateDeleteImageViewVisibility()
+            }
+            return
+        }
 
         guard let index = index,
               index >= 0,
