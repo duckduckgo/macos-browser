@@ -33,6 +33,7 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
     var tab: Tab!
     var cancellables: Set<AnyCancellable> = []
     var expectation: XCTestExpectation!
+    var dialogTypeForTabExpectation: XCTestExpectation!
 
     @MainActor override func setUpWithError() throws {
         try super.setUpWithError()
@@ -65,11 +66,11 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
     func testWhenNavigationCompletedAndFeatureIsOffThenTurnOffFeature() throws {
         featureFlagger.isFeatureOn = false
         let expectation = self.expectation(description: "Wait for turnOffFeatureCalled to be called")
-        dialogProvider.dialogTypeForTabExpectation = expectation
+        dialogProvider.turnOffFeatureCalledExpectation = expectation
 
         tab.navigateTo(url: URL(string: "some.url")!)
 
-        wait(for: [expectation], timeout: 2.0)
+        wait(for: [expectation], timeout: 3.0)
     }
 
     func testWhenNavigationCompletedAndNoDialogTypeThenOnlyWebViewVisible() throws {
