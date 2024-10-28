@@ -1,5 +1,5 @@
 //
-//  OnboardingConfiguration.swift
+//  CapturingOnboardingNavigationDelegate.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -17,26 +17,21 @@
 //
 
 import Foundation
+import Onboarding
 
-/// Configuration needed to set up the FE onboarding
-struct OnboardingConfiguration: Codable, Equatable {
-    var stepDefinitions: StepDefinitions
-    var exclude: [String]
-    var order: String
-    var env: String
-    var locale: String
-    var platform: OnboardingPlatform
-}
+class CapturingOnboardingNavigationDelegate: OnboardingNavigationDelegate {
+    var didCallSearchFor = false
+    var didNavigateToCalled = false
+    var capturedQuery = ""
+    var capturedUrlString = ""
 
-/// Defines the onboarding steps desired
-struct StepDefinitions: Codable, Equatable {
-    var systemSettings: SystemSettings
-}
+    func searchFor(_ query: String) {
+        didCallSearchFor = true
+        capturedQuery = query
+    }
 
-struct SystemSettings: Codable, Equatable {
-    var rows: [String]
-}
-
-struct OnboardingPlatform: Codable, Equatable {
-    var name: String
+    func navigateTo(url: URL) {
+        didNavigateToCalled = true
+        capturedUrlString = url.absoluteString
+    }
 }

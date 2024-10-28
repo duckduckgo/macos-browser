@@ -80,6 +80,8 @@ final class AddressBarTextField: NSTextField {
     private var addressBarStringCancellable: AnyCancellable?
     private var contentTypeCancellable: AnyCancellable?
 
+    weak var onboardingDelegate: OnboardingAddressBarReporting?
+
     private let searchPreferences: SearchPreferences = SearchPreferences.shared
 
     private enum TextDidChangeEventType {
@@ -654,14 +656,10 @@ final class AddressBarTextField: NSTextField {
     }
 
     func hideSuggestionWindow() {
-        guard let window = window, let suggestionWindow = suggestionWindowController?.window else {
-            return
-        }
+        guard let suggestionWindow = suggestionWindowController?.window, suggestionWindow.isVisible,
+              let parent = suggestionWindow.parent else { return }
 
-        if !suggestionWindow.isVisible { return }
-
-        window.removeChildWindow(suggestionWindow)
-        suggestionWindow.parent?.removeChildWindow(suggestionWindow)
+        parent.removeChildWindow(suggestionWindow)
         suggestionWindow.orderOut(nil)
     }
 
@@ -961,6 +959,7 @@ extension AddressBarTextField: NSTextFieldDelegate {
 
     func controlTextDidChange(_ obj: Notification) {
         handleTextDidChange()
+        onboardingDelegate?.trackAddressBarTypedIn()
     }
 
     private func handleTextDidChange() {

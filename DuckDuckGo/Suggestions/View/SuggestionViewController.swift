@@ -85,9 +85,7 @@ final class SuggestionViewController: NSViewController {
         tableView.rowHeight = suggestionContainerViewModel.isHomePage ? 34 : 28
     }
 
-    override func viewWillDisappear() {
-        super.viewWillDisappear()
-
+    override func viewDidDisappear() {
         eventMonitorCancellables.removeAll()
         clearSelection()
     }

@@ -1,5 +1,5 @@
 //
-//  OnboardingConfiguration.swift
+//  Logger+UnitTests.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -17,26 +17,10 @@
 //
 
 import Foundation
+import os.log
 
-/// Configuration needed to set up the FE onboarding
-struct OnboardingConfiguration: Codable, Equatable {
-    var stepDefinitions: StepDefinitions
-    var exclude: [String]
-    var order: String
-    var env: String
-    var locale: String
-    var platform: OnboardingPlatform
-}
+public extension Logger {
+    fileprivate static let subsystem = "com.duckduckgo.macos.browser.DuckDuckGoTests"
 
-/// Defines the onboarding steps desired
-struct StepDefinitions: Codable, Equatable {
-    var systemSettings: SystemSettings
-}
-
-struct SystemSettings: Codable, Equatable {
-    var rows: [String]
-}
-
-struct OnboardingPlatform: Codable, Equatable {
-    var name: String
+    static var tests = { Logger(subsystem: subsystem, category: "🧪") }()
 }

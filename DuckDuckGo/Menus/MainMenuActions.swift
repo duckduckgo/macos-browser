@@ -320,6 +320,8 @@ extension AppDelegate {
     @objc func fireButtonAction(_ sender: NSButton) {
         DispatchQueue.main.async {
             FireCoordinator.fireButtonAction()
+            let pixelReporter = OnboardingPixelReporter()
+            pixelReporter.trackFireButtonPressed()
         }
     }
 
@@ -816,7 +818,7 @@ extension MainViewController {
                                                           eventMapping: EventMapping<AutofillPixelEvent> { _, _, _, _ in },
                                                           installDate: nil)
         autofillPixelReporter.resetStoreDefaults()
-        var loginImportState = AutofillLoginImportState()
+        let loginImportState = AutofillLoginImportState()
         loginImportState.hasImportedLogins = false
         loginImportState.isCredentialsImportPromptPermanantlyDismissed = false
     }

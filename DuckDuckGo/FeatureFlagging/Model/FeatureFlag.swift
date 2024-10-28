@@ -32,7 +32,7 @@ public enum FeatureFlag: String {
     // https://app.asana.com/0/1206488453854252/1207136666798700/f
     case freemiumPIR
 
-    case highlightsOnboarding
+    case contextualOnboarding
 
     // https://app.asana.com/0/1201462886803403/1208030658792310/f
     case unknownUsernameCategorization
@@ -60,8 +60,8 @@ extension FeatureFlag: FeatureFlagSourceProviding {
             return .remoteReleasable(.subfeature(PhishingDetectionSubfeature.allowErrorPage))
         case .phishingDetectionPreferences:
             return .remoteReleasable(.subfeature(PhishingDetectionSubfeature.allowPreferencesToggle))
-        case .highlightsOnboarding:
-            return .internalOnly
+        case .contextualOnboarding:
+            return .remoteReleasable(.feature(.contextualOnboarding))
         case .credentialsImportPromotionForExistingUsers:
             return .remoteReleasable(.subfeature(AutofillSubfeature.credentialsImportPromotionForExistingUsers))
         case .networkProtectionUserTips:
