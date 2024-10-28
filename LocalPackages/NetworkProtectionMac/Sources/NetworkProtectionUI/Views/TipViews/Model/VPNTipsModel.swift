@@ -22,7 +22,6 @@ import Common
 import NetworkProtection
 import os.log
 import TipKit
-import TipKitUtils
 
 @MainActor
 public final class VPNTipsModel: ObservableObject {
@@ -58,57 +57,10 @@ public final class VPNTipsModel: ObservableObject {
     private let vpnSettings: VPNSettings
     private let logger: Logger
     private var cancellables = Set<AnyCancellable>()
-/*
-    static func makeTips(forMenuApp isMenuApp: Bool, logger: Logger) -> TipGrouping {
 
-        logger.debug("🧉🤌 makeTips")
-
-        guard #available(macOS 15.0, *) else {
-            return EmptyTipGroup()
-        }
-
-        let domainExclusionsTip = VPNDomainExclusionsTip()
-        let geoswitchingTip = VPNGeoswitchingTip()
-
-        Task {
-            for await statusUpdate in geoswitchingTip.statusUpdates {
-                logger.debug("🧉 VPNGeoswitchingTip status updated: \(String(describing: statusUpdate), privacy: .public)")
-                logger.debug("🪙 VPNGeoswitchingTip summary:\nL shouldDisplay: \(String(describing: geoswitchingTip.shouldDisplay), privacy: .public)")
-            }
-        }
-
-        Task {
-            for await statusUpdate in domainExclusionsTip.statusUpdates {
-                logger.debug("🧉 VPNDomainExclusionsTip status updated: \(String(describing: statusUpdate), privacy: .public)")
-                logger.debug("🪙 VPNDomainExclusionsTip summary:\nL shouldDisplay: \(String(describing: domainExclusionsTip.shouldDisplay), privacy: .public)\nL hasActiveSite: \(String(describing: VPNDomainExclusionsTip.hasActiveSite), privacy: .public)\nL vpnEnabled: \(String(describing: VPNDomainExclusionsTip.vpnEnabled), privacy: .public)")
-            }
-        }
-
-        // This is temporarily disabled until Xcode 16 is available.
-        // Ref: https://app.asana.com/0/414235014887631/1208528787265444/f
-        //
-        // if #available(macOS 15.0, *) {
-        //     return TipGroup(.ordered) {
-        //         tips
-        //     }
-        // } else { ... what's below
-        if isMenuApp {
-            return TipGroup(.ordered) {
-                VPNGeoswitchingTip()
-                VPNAutoconnectTip()
-            }
-        } else {
-            return TipGroup(.ordered) {
-                VPNGeoswitchingTip()
-                VPNDomainExclusionsTip()
-                VPNAutoconnectTip()
-            }
-        }
-    }*/
-
-    public init(featureFlagPublisher: CurrentValuePublisher<Bool, Never>,
+    public init(featureFlagPublisher: CurrentValueSubject<Bool, Never>,
                 statusObserver: ConnectionStatusObserver,
-                activeSitePublisher: CurrentValuePublisher<ActiveSiteInfo?, Never>,
+                activeSitePublisher: CurrentValueSubject<ActiveSiteInfo?, Never>,
                 forMenuApp isMenuApp: Bool,
                 vpnSettings: VPNSettings,
                 logger: Logger) {
@@ -118,7 +70,6 @@ public final class VPNTipsModel: ObservableObject {
         self.connectionStatus = statusObserver.recentValue
         self.featureFlag = featureFlagPublisher.value
         self.logger = logger
-        //self.tips = Self.makeTips(forMenuApp: isMenuApp, logger: logger)
         self.vpnSettings = vpnSettings
 
         if #available(macOS 14.0, *) {
@@ -132,7 +83,7 @@ public final class VPNTipsModel: ObservableObject {
     }
 
     @available(macOS 14.0, *)
-    private func subscribeToFeatureFlagChanges(_ publisher: CurrentValuePublisher<Bool, Never>) {
+    private func subscribeToFeatureFlagChanges(_ publisher: CurrentValueSubject<Bool, Never>) {
         publisher
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
@@ -150,7 +101,7 @@ public final class VPNTipsModel: ObservableObject {
     }
 
     @available(macOS 14.0, *)
-    private func subscribeToActiveSiteChanges(_ publisher: CurrentValuePublisher<ActiveSiteInfo?, Never>) {
+    private func subscribeToActiveSiteChanges(_ publisher: CurrentValueSubject<ActiveSiteInfo?, Never>) {
 
         publisher
             .removeDuplicates()

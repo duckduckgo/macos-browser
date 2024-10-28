@@ -21,14 +21,18 @@ import TipKit
 
 /// A tip to suggest using domain exclusions when a site doesn't work.
 ///
+struct VPNDomainExclusionsTip {}
+
 @available(macOS 14.0, *)
-struct VPNDomainExclusionsTip: Tip {
+extension VPNDomainExclusionsTip: Tip {
 
     @Parameter(.transient)
     static var vpnEnabled: Bool = false
 
     @Parameter(.transient)
     static var hasActiveSite: Bool = false
+
+    static let geolocationTipDismissedEvent = Tips.Event(id: "com.duckduckgo.vpn.tip.domainExclusions.geolocationTipDismissedEvent")
 
     /// The containing view was opened when the VPN was already connected.
     ///
@@ -59,6 +63,9 @@ struct VPNDomainExclusionsTip: Tip {
         }
         #Rule(Self.$vpnEnabled) {
             $0
+        }
+        #Rule(Self.geolocationTipDismissedEvent) {
+            $0.donations.count > 0
         }
         #Rule(Self.viewOpenedWhenVPNAlreadyConnectedEvent) {
             $0.donations.count > 0

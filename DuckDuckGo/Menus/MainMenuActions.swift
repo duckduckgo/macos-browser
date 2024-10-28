@@ -27,7 +27,6 @@ import Subscription
 import WebKit
 import os.log
 import SwiftUI
-import TipKitUtils
 
 // Actions are sent to objects of responder chain
 

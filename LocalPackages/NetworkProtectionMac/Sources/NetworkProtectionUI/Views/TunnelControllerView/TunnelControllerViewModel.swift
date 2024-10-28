@@ -20,7 +20,6 @@ import Combine
 import Foundation
 import NetworkProtection
 import SwiftUI
-import TipKitUtils
 import TipKit
 
 @MainActor

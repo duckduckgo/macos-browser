@@ -21,12 +21,18 @@ import TipKit
 
 /// A tip to suggest to the user to use the autoconnect option for the VPN.
 ///
+struct VPNAutoconnectTip {}
+
 @available(macOS 14.0, *)
-struct VPNAutoconnectTip: Tip {
+extension VPNAutoconnectTip: Tip {
 
     enum ActionIdentifiers: String {
         case enable = "com.duckduckgo.vpn.tip.autoconnect.action.enable"
     }
+
+    static let domainExclusionsTipDismissedEvent = Tips.Event(id: "com.duckduckgo.vpn.tip.autoconnect.domainExclusionsTipDismissedEvent")
+
+    static let geolocationTipDismissedEvent = Tips.Event(id: "com.duckduckgo.vpn.tip.autoconnect.geolocationTipDismissedEvent")
 
     @Parameter(.transient)
     static var vpnEnabled: Bool = false
@@ -57,6 +63,12 @@ struct VPNAutoconnectTip: Tip {
     var rules: [Rule] {
         #Rule(Self.$vpnEnabled) {
             $0 == true
+        }
+        #Rule(Self.domainExclusionsTipDismissedEvent) {
+            $0.donations.count > 0
+        }
+        #Rule(Self.geolocationTipDismissedEvent) {
+            $0.donations.count > 0
         }
     }
 }

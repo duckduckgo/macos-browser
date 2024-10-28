@@ -19,7 +19,6 @@
 
 import Foundation
 import os.log
-import TipKitUtils
 import TipKit
 
 protocol TipKitAppEventHandling {

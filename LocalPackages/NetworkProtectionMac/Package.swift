@@ -104,7 +104,6 @@ let package = Package(
                 "VPNPixels",
                 .product(name: "NetworkProtection", package: "BrowserServicesKit"),
                 .product(name: "PixelKit", package: "BrowserServicesKit"),
-                .product(name: "TipKitUtils", package: "BrowserServicesKit"),
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions"),
                 .product(name: "LoginItems", package: "LoginItems"),
                 .product(name: "Lottie", package: "lottie-spm")

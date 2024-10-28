@@ -109,7 +109,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
             let proxySettings = TransparentProxySettings(defaults: .netP)
             let uiActionHandler = VPNUIActionHandler(vpnURLEventHandler: vpnURLEventHandler, proxySettings: proxySettings)
 
-            let activeSitePublisher = CurrentValuePublisher(
+            let activeSitePublisher = CurrentValueSubject<ActiveSiteInfo?, Never>(
                 initialValue: nil,
                 publisher: $siteInfo.eraseToAnyPublisher())
 
@@ -162,7 +162,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
             })
 
             // TODO: replace with access to actual feature flag
-            let tipsFeatureFlagPublisher = CurrentValuePublisher(initialValue: true, publisher: Just(true).eraseToAnyPublisher())
+            let tipsFeatureFlagPublisher = CurrentValueSubject(initialValue: true, publisher: Just(true).eraseToAnyPublisher())
 
             let tipsModel = VPNTipsModel(featureFlagPublisher: tipsFeatureFlagPublisher,
                                          statusObserver: statusReporter.statusObserver,

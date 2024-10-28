@@ -24,7 +24,6 @@ import LoginItems
 import NetworkProtection
 import os.log
 import SwiftUI
-import TipKitUtils
 
 /// Abstraction of the the VPN status bar menu with a simple interface.
 ///
@@ -137,7 +136,7 @@ public final class StatusBarMenu: NSObject {
                 return
             }
 
-            let activeSitePublisher = CurrentValuePublisher(initialValue: nil, publisher: Just(ActiveSiteInfo?(nil)).eraseToAnyPublisher())
+            let activeSitePublisher = CurrentValueSubject<ActiveSiteInfo?, Never>(ActiveSiteInfo?(nil))
 
             let siteTroubleshootingViewModel = SiteTroubleshootingView.Model(
                 connectionStatusPublisher: Just(NetworkProtection.ConnectionStatus.disconnected).eraseToAnyPublisher(),
@@ -145,7 +144,7 @@ public final class StatusBarMenu: NSObject {
                 uiActionHandler: uiActionHandler)
 
             // TODO: replace with access to actual feature flag
-            let tipsFeatureFlagPublisher = CurrentValuePublisher(initialValue: true, publisher: Just(true).eraseToAnyPublisher())
+            let tipsFeatureFlagPublisher = CurrentValueSubject<Bool, Never>(true)
 
             let tipsModel = VPNTipsModel(featureFlagPublisher: tipsFeatureFlagPublisher,
                                          statusObserver: statusReporter.statusObserver,
