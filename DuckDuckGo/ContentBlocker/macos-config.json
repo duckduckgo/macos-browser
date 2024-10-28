@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1728900024972,
+    "version": 1730109523334,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -59,6 +59,26 @@
                 "domainDetection": "enabled"
             },
             "hash": "b813ade8472a097ffbd43a3331116fe1"
+        },
+        "aiChat": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "toolbarShortcut": {
+                    "state": "enabled"
+                },
+                "applicationMenuShortcut": {
+                    "state": "enabled"
+                }
+            },
+            "settings": {
+                "aiChatURL": "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=2",
+                "onboardingCookieName": "dcm",
+                "onboardingCookieDomain": "duckduckgo.com",
+                "aiChatURLIdentifiableQuery": "ia",
+                "aiChatURLIdentifiableQueryValue": "chat"
+            },
+            "hash": "e5711b3f4ceff89cd5c2d70b19a96875"
         },
         "ampLinks": {
             "exceptions": [
@@ -356,6 +376,9 @@
                     "domain": "speedweek.com"
                 },
                 {
+                    "domain": "la-becanerie.com"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -378,11 +401,11 @@
             },
             "state": "enabled",
             "features": {
-                "filterlistExperiment": {
-                    "state": "disabled"
+                "filterlistExperiment2": {
+                    "state": "enabled"
                 }
             },
-            "hash": "69add087dec44523d540bf49f1ec1b0f"
+            "hash": "419e42a27cc5daa895b567f1e3c1bd6b"
         },
         "autofillBreakageReporter": {
             "state": "disabled",
@@ -1268,6 +1291,11 @@
                 }
             ],
             "hash": "d02882dcee87a42b7d29bb6f2e21b4ca"
+        },
+        "contextualOnboarding": {
+            "exceptions": [],
+            "state": "enabled",
+            "hash": "52857469413a66e8b0c7b00de5589162"
         },
         "cookie": {
             "settings": {
@@ -3534,6 +3562,23 @@
                         ]
                     },
                     {
+                        "domain": "mantan-web.jp",
+                        "rules": [
+                            {
+                                "selector": "center > div",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".ad-rec",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".conteiner__head",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "marketwatch.com",
                         "rules": [
                             {
@@ -4382,6 +4427,10 @@
                             {
                                 "selector": "[data-aa-adunit]",
                                 "type": "hide"
+                            },
+                            {
+                                "selector": "[data-adpath]",
+                                "type": "hide-empty"
                             }
                         ]
                     },
@@ -4875,7 +4924,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "9cbafdd3b48aabf71f6cfb2f986a7181"
+            "hash": "f91fcec45cd63f074ee31f3e276cc6e9"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -5279,31 +5328,13 @@
             "state": "enabled",
             "exceptions": [
                 {
-                    "domain": "allegiantair.com"
-                },
-                {
                     "domain": "boston.com"
                 },
                 {
                     "domain": "costco.com"
                 },
                 {
-                    "domain": "crunchyroll.com"
-                },
-                {
                     "domain": "espn.com"
-                },
-                {
-                    "domain": "eventbrite.com"
-                },
-                {
-                    "domain": "duluthtrading.com"
-                },
-                {
-                    "domain": "web.whatsapp.com"
-                },
-                {
-                    "domain": "verizon.com"
                 },
                 {
                     "domain": "chime.com"
@@ -5312,25 +5343,19 @@
                     "domain": "tirerack.com"
                 },
                 {
-                    "domain": "milesplit.live"
-                },
-                {
                     "domain": "dollargeneral.com"
                 },
                 {
-                    "domain": "monstergear.monsterenergy.com"
+                    "domain": "milesplit.live"
+                },
+                {
+                    "domain": "monsterenergy.com"
                 },
                 {
                     "domain": "npr.org"
                 },
                 {
                     "domain": "norton.com"
-                },
-                {
-                    "domain": "jcrew.com"
-                },
-                {
-                    "domain": "pgealerts.alerts.pge.com"
                 },
                 {
                     "domain": "marvel.com"
@@ -5357,7 +5382,7 @@
                     "privacy-test-pages.site"
                 ]
             },
-            "hash": "4df9d206561ea1251d6348865362de63"
+            "hash": "501bbc6471eb079cb27fa8a2a47467a5"
         },
         "harmfulApis": {
             "settings": {
@@ -5645,9 +5670,9 @@
             "hash": "cbd62a1a63a829da0277ca045a311eb2"
         },
         "newTabSearchField": {
-            "state": "internal",
+            "state": "disabled",
             "exceptions": [],
-            "hash": "f1daaefe788583c2a00d7d19a23864a7"
+            "hash": "c292bb627849854515cebbded288ef5a"
         },
         "nonTracking3pCookies": {
             "settings": {
@@ -7467,6 +7492,7 @@
                                     "bodyelectricvitality.com.au",
                                     "cosmicbook.news",
                                     "eatroyo.com",
+                                    "experian.com",
                                     "thesimsresource.com",
                                     "tradersync.com",
                                     "vanguardplan.com"
@@ -8919,6 +8945,16 @@
                             }
                         ]
                     },
+                    "svonm.com": {
+                        "rules": [
+                            {
+                                "rule": "hgc-cf-cache-1.svonm.com",
+                                "domains": [
+                                    "t-online.de"
+                                ]
+                            }
+                        ]
+                    },
                     "taboola.com": {
                         "rules": [
                             {
@@ -9406,7 +9442,7 @@
                     "domain": "instructure.com"
                 }
             ],
-            "hash": "decc4b889c1d10bde764604562463b3c"
+            "hash": "4a71922e4eb31060dced0b091ad797e7"
         },
         "trackingCookies1p": {
             "settings": {
@@ -9847,6 +9883,11 @@
             "exceptions": [],
             "state": "disabled",
             "hash": "728493ef7a1488e4781656d3f9db84aa"
+        },
+        "windowsNewTabPageExperiment": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
         },
         "windowsPermissionUsage": {
             "exceptions": [],

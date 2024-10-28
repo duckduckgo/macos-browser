@@ -65,7 +65,7 @@ final class UserScripts: UserScriptsProvider {
         contentScopeUserScript = ContentScopeUserScript(sourceProvider.privacyConfigurationManager, properties: prefs)
         contentScopeUserScriptIsolated = ContentScopeUserScript(sourceProvider.privacyConfigurationManager, properties: prefs, isIsolated: true)
 
-        autofillScript = WebsiteAutofillUserScript(scriptSourceProvider: sourceProvider.autofillSourceProvider!, loginImportStateProvider: AutofillLoginImportState())
+        autofillScript = WebsiteAutofillUserScript(scriptSourceProvider: sourceProvider.autofillSourceProvider!)
 
         autoconsentUserScript = AutoconsentUserScript(scriptSource: sourceProvider, config: sourceProvider.privacyConfigurationManager.privacyConfig)
 
@@ -120,9 +120,11 @@ final class UserScripts: UserScriptsProvider {
             let stripePurchaseFlow = DefaultStripePurchaseFlow(subscriptionEndpointService: subscriptionManager.subscriptionEndpointService,
                                                                authEndpointService: subscriptionManager.authEndpointService,
                                                                accountManager: subscriptionManager.accountManager)
+            let freemiumDBPPixelExperimentManager = FreemiumDBPPixelExperimentManager(subscriptionManager: subscriptionManager)
             let delegate = SubscriptionPagesUseSubscriptionFeature(subscriptionManager: subscriptionManager,
                                                                    stripePurchaseFlow: stripePurchaseFlow,
-                                                                   uiHandler: Application.appDelegate.subscriptionUIHandler)
+                                                                   uiHandler: Application.appDelegate.subscriptionUIHandler,
+                                                                   freemiumDBPPixelExperimentManager: freemiumDBPPixelExperimentManager)
             subscriptionPagesUserScript.registerSubfeature(delegate: delegate)
             userScripts.append(subscriptionPagesUserScript)
 

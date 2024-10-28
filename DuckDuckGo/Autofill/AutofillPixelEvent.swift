@@ -25,12 +25,15 @@ enum AutofillPixelKitEvent: PixelKitEventV2 {
     case importCredentialsFlowHadCredentials
     case importCredentialsFlowEnded
 
+    case importCredentialsPromptNeverAgainClicked
+
     var name: String {
         switch self {
         case .importCredentialsFlowStarted: "autofill_import_credentials_flow_started"
         case .importCredentialsFlowCancelled: "autofill_import_credentials_flow_cancelled"
         case .importCredentialsFlowHadCredentials: "autofill_import_credentials_flow_had_credentials"
         case .importCredentialsFlowEnded: "autofill_import_credentials_flow_ended"
+        case .importCredentialsPromptNeverAgainClicked: "autofill_import_credentials_prompt_never_again_clicked"
         }
     }
 

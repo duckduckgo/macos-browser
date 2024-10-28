@@ -19,7 +19,12 @@
 import Carbon
 import Combine
 import Foundation
+import History
+import OHHTTPStubs
+import OHHTTPStubsSwift
+import Suggestions
 import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
 @available(macOS 12.0, *)
@@ -101,6 +106,8 @@ class AddressBarTests: XCTestCase {
 
         NSError.disableSwizzledDescription = false
         StartupPreferences.shared.launchToCustomHomePage = false
+
+        HTTPStubs.removeAllStubs()
     }
 
     let asciiToCGEventMap: [String: UInt16] = [
@@ -188,6 +195,60 @@ class AddressBarTests: XCTestCase {
 
         XCTAssertEqual(addressBarValue, resultingString)
 
+    }
+
+    @MainActor
+    func testWhenAddressIsTyped_LoadedTopHitSuggestionIsCorrectlyAppendedAndSelected() {
+        // top hits should only work for visited urls
+        HistoryCoordinator.shared.addVisit(of: URL(string: "https://youtube.com")!)
+        let tab = Tab(content: .newtab)
+        window = WindowsManager.openNewWindow(with: tab)!
+
+        let json = """
+        [
+            { "phrase": "youtube.com", "isNav": true },
+            { "phrase": "ducks", "isNav": false },
+        ]
+        """
+        let address = "youtube.com"
+        stub {
+            $0.url!.absoluteString.hasPrefix("https://duckduckgo.com/ac/")
+        } response: { _ in
+            return HTTPStubsResponse(data: json.utf8data, statusCode: 200, headers: nil)
+        }
+
+        // This test reproduces a race condition where the $selectedSuggestionViewModel is published
+        // asynchronously on the main queue in response to user input. This can lead to a situation
+        // where the user-entered text in the suggestion model is one letter shorter than the actual
+        // user input in the address field.
+        // As a result, an extra letter may be selected and overtyped, causing a "skipped
+        // letter" effect or typographical errors. The goal of this test is to verify that the
+        // suggestion model correctly reflects the user's input without any discrepancies.
+        // https://app.asana.com/0/1207340338530322/1208166085652339/f
+        //
+        // Here we simulate receiving the keyboard event right after the suggestion view model received event.
+        var index = address.startIndex
+        let e = expectation(description: "typing done")
+        let c = addressBarTextField.suggestionContainerViewModel!.$selectedSuggestionViewModel
+            .receive(on: DispatchQueue.main)
+            .sink { [unowned self] suggestion in
+                guard suggestion != nil /* suggestion shown */
+                        || index == address.startIndex /* address is empty (first iteration) */ else {
+
+                    return
+                }
+                guard index < address.endIndex else {
+                    e.fulfill() // typing done
+                    return
+                }
+                type(String(address[index]))
+                index = address.index(after: index)
+            }
+
+        waitForExpectations(timeout: 5)
+        withExtendedLifetime(c) {}
+
+        XCTAssertEqual("youtube.com", addressBarValue.prefix("youtube.com".count))
     }
 
     @MainActor
@@ -310,7 +371,10 @@ class AddressBarTests: XCTestCase {
          }
         for (idx, tab) in viewModel.tabs.enumerated() {
             viewModel.select(tab: tab)
-            try await Task.sleep(interval: 0.01)
+            for _ in 0..<10 {
+                guard addressBarValue != "tab-\(idx)" else { continue }
+                try await Task.sleep(interval: 0.01)
+            }
             XCTAssertEqual(addressBarValue, "tab-\(idx)")
             if tab.content == .newtab {
                 XCTAssertTrue(isAddressBarFirstResponder, "\(idx)")
@@ -811,7 +875,7 @@ class AddressBarTests: XCTestCase {
         // GIVEN
         let expectedImage = NSImage(named: "Shield")!
         let evaluator = MockCertificateEvaluator()
-        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")), certificateTrustEvaluator: evaluator)
+        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")), webViewConfiguration: webViewConfiguration, certificateTrustEvaluator: evaluator)
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         let tabLoadedPromise = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
 
@@ -830,7 +894,7 @@ class AddressBarTests: XCTestCase {
         let expectedImage = NSImage(named: "Shield")!
         let evaluator = MockCertificateEvaluator()
         evaluator.isValidCertificate = true
-        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")), certificateTrustEvaluator: evaluator)
+        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")), webViewConfiguration: webViewConfiguration, certificateTrustEvaluator: evaluator)
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         let tabLoadedPromise = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
 
@@ -849,7 +913,7 @@ class AddressBarTests: XCTestCase {
         let expectedImage = NSImage(named: "ShieldDot")!
         let evaluator = MockCertificateEvaluator()
         evaluator.isValidCertificate = false
-        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")), certificateTrustEvaluator: evaluator)
+        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")), webViewConfiguration: webViewConfiguration, certificateTrustEvaluator: evaluator)
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         let tabLoadedPromise = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
 
@@ -865,7 +929,7 @@ class AddressBarTests: XCTestCase {
     @MainActor
     func test_ZoomLevelNonDefault_ThenZoomButtonIsVisible() async throws {
         // GIVEN
-        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")))
+        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")), webViewConfiguration: webViewConfiguration)
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         viewModel.selectedTabViewModel?.zoomWasSet(to: .percent150)
         let tabLoadedPromise = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
@@ -882,7 +946,7 @@ class AddressBarTests: XCTestCase {
     @MainActor
     func test_ZoomLevelDefault_ThenZoomButtonIsNotVisible() async throws {
         // GIVEN
-        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")))
+        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")), webViewConfiguration: webViewConfiguration)
         tab.webView.zoomLevel = AccessibilityPreferences.shared.defaultPageZoom
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         viewModel.selectedTabViewModel?.zoomWasSet(to: .percent100)
@@ -895,6 +959,23 @@ class AddressBarTests: XCTestCase {
         // THEN
         let zoomButton = mainViewController.navigationBarViewController.addressBarViewController!.addressBarButtonsViewController!.zoomButton!
         XCTAssertTrue(zoomButton.isHidden)
+    }
+
+    @MainActor
+    func test_WhenControlTextDidChange_ThenreporterTrackAddressBarTypedInCalled() async throws {
+        // GIVEN
+        let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [Tab(content: .newtab)]))
+        window = WindowsManager.openNewWindow(with: viewModel)!
+        let textField = mainViewController.navigationBarViewController.addressBarViewController?.addressBarTextField
+        XCTAssertNotNil(textField?.onboardingDelegate)
+        let reporter = CapturingOnboardingAddressBarReporting()
+        textField?.onboardingDelegate = reporter
+
+        // WHEN
+        textField?.controlTextDidChange(.init(name: .PasswordManagerChanged))
+
+        // THEN
+        XCTAssertTrue(reporter.trackAddressBarTypedInCalled)
     }
 }
 
@@ -935,5 +1016,19 @@ class MockCertificateEvaluator: CertificateTrustEvaluating {
 
     func evaluateCertificateTrust(trust: SecTrust?) -> Bool? {
         return isValidCertificate
+    }
+}
+
+class CapturingOnboardingAddressBarReporting: OnboardingAddressBarReporting {
+    var trackAddressBarTypedInCalled = false
+
+    func trackAddressBarTypedIn() {
+        trackAddressBarTypedInCalled = true
+    }
+
+    func trackPrivacyDashboardOpened() {
+    }
+
+    func trackSiteVisited() {
     }
 }

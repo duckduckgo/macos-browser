@@ -569,7 +569,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         try super.loadVendorOptions(from: provider)
 
         guard let vendorOptions = provider?.providerConfiguration else {
-            Logger.networkProtection.debug("🔵 Provider is nil, or providerConfiguration is not set")
+            Logger.networkProtection.log("🔵 Provider is nil, or providerConfiguration is not set")
             throw ConfigurationError.missingProviderConfiguration
         }
 
@@ -578,7 +578,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     private func loadDefaultPixelHeaders(from options: [String: Any]) throws {
         guard let defaultPixelHeaders = options[NetworkProtectionOptionKey.defaultPixelHeaders] as? [String: String] else {
-            Logger.networkProtection.debug("🔵 Pixel options are not set")
+            Logger.networkProtection.log("🔵 Pixel options are not set")
             throw ConfigurationError.missingPixelHeaders
         }
 

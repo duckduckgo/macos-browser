@@ -16,12 +16,14 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Cocoa
 import Combine
 import SwiftUI
 import History
 import PixelKit
 import RemoteMessaging
+import Freemium
 
 @MainActor
 final class HomePageViewController: NSViewController {
@@ -31,6 +33,7 @@ final class HomePageViewController: NSViewController {
     private let historyCoordinating: HistoryCoordinating
     private let fireViewModel: FireViewModel
     private let onboardingViewModel: OnboardingViewModel
+    private let freemiumDBPPromotionViewCoordinator: FreemiumDBPPromotionViewCoordinator
 
     private(set) lazy var faviconsFetcherOnboarding: FaviconsFetcherOnboarding? = {
         guard let syncService = NSApp.delegateTyped.syncService, let syncBookmarksAdapter = NSApp.delegateTyped.syncDataProviders?.bookmarksAdapter else {
@@ -45,10 +48,14 @@ final class HomePageViewController: NSViewController {
     var recentlyVisitedModel: HomePage.Models.RecentlyVisitedModel!
     var featuresModel: HomePage.Models.ContinueSetUpModel!
     let settingsVisibilityModel = HomePage.Models.SettingsVisibilityModel()
+    private(set) var addressBarModel: HomePage.Models.AddressBarModel!
     let accessibilityPreferences: AccessibilityPreferences
     let appearancePreferences: AppearancePreferences
     let defaultBrowserPreferences: DefaultBrowserPreferences
+    let privacyConfigurationManager: PrivacyConfigurationManaging
     var cancellables = Set<AnyCancellable>()
+
+    private var isShowingSearchBar: Bool = false
 
     @UserDefaultsWrapper(key: .defaultBrowserDismissed, defaultValue: false)
     var defaultBrowserDismissed: Bool
@@ -64,7 +71,9 @@ final class HomePageViewController: NSViewController {
          onboardingViewModel: OnboardingViewModel = OnboardingViewModel(),
          accessibilityPreferences: AccessibilityPreferences = AccessibilityPreferences.shared,
          appearancePreferences: AppearancePreferences = AppearancePreferences.shared,
-         defaultBrowserPreferences: DefaultBrowserPreferences = DefaultBrowserPreferences.shared) {
+         defaultBrowserPreferences: DefaultBrowserPreferences = DefaultBrowserPreferences.shared,
+         freemiumDBPPromotionViewCoordinator: FreemiumDBPPromotionViewCoordinator,
+         privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.bookmarkManager = bookmarkManager
@@ -74,6 +83,8 @@ final class HomePageViewController: NSViewController {
         self.accessibilityPreferences = accessibilityPreferences
         self.appearancePreferences = appearancePreferences
         self.defaultBrowserPreferences = defaultBrowserPreferences
+        self.freemiumDBPPromotionViewCoordinator = freemiumDBPPromotionViewCoordinator
+        self.privacyConfigurationManager = privacyConfigurationManager
 
         super.init(nibName: nil, bundle: nil)
     }
@@ -83,10 +94,11 @@ final class HomePageViewController: NSViewController {
         defaultBrowserModel = createDefaultBrowserModel()
         recentlyVisitedModel = createRecentlyVisitedModel()
         featuresModel = createFeatureModel()
+        addressBarModel = createAddressBarModel()
 
         refreshModels()
 
-        let rootView = HomePage.Views.RootView(isBurner: tabCollectionViewModel.isBurner)
+        let rootView = HomePage.Views.RootView(isBurner: tabCollectionViewModel.isBurner, freemiumDBPPromotionViewCoordinator: freemiumDBPPromotionViewCoordinator)
             .environmentObject(favoritesModel)
             .environmentObject(defaultBrowserModel)
             .environmentObject(recentlyVisitedModel)
@@ -96,10 +108,7 @@ final class HomePageViewController: NSViewController {
             .environmentObject(appearancePreferences)
             .environmentObject(Application.appDelegate.activeRemoteMessageModel)
             .environmentObject(settingsVisibilityModel)
-            .onTapGesture { [weak self] in
-                // Remove focus from the address bar if interacting with this view.
-                self?.view.makeMeFirstResponder()
-            }
+            .environmentObject(addressBarModel)
 
         self.view = NSHostingView(rootView: rootView)
     }
@@ -121,12 +130,16 @@ final class HomePageViewController: NSViewController {
     override func viewDidAppear() {
         super.viewDidAppear()
         refreshModels()
+
+        showSettingsOnboardingIfNeeded()
     }
 
     override func viewWillDisappear() {
         super.viewWillDisappear()
 
         historyCancellable = nil
+
+        presentedViewControllers?.forEach { $0.dismiss() }
     }
 
     func refreshModelsOnAppBecomingActive() {
@@ -187,7 +200,7 @@ final class HomePageViewController: NSViewController {
             bookmark.isFavorite = !bookmark.isFavorite
             self?.bookmarkManager.update(bookmark: bookmark)
         }, deleteBookmark: { [weak self] bookmark in
-            self?.bookmarkManager.remove(bookmark: bookmark)
+            self?.bookmarkManager.remove(bookmark: bookmark, undoManager: self?.undoManager)
         }, add: { [weak self] in
             self?.showAddController()
         }, edit: { [weak self] bookmark in
@@ -197,6 +210,13 @@ final class HomePageViewController: NSViewController {
         }, onFaviconMissing: { [weak self] in
             self?.faviconsFetcherOnboarding?.presentOnboardingIfNeeded()
         })
+    }
+
+    func createAddressBarModel() -> HomePage.Models.AddressBarModel {
+        HomePage.Models.AddressBarModel(
+            tabCollectionViewModel: tabCollectionViewModel,
+            privacyConfigurationManager: privacyConfigurationManager
+        )
     }
 
     func refreshFavoritesModel() {
@@ -258,6 +278,61 @@ final class HomePageViewController: NSViewController {
             .show(in: view.window)
     }
 
+    private func showSettingsOnboardingIfNeeded() {
+        if addressBarModel.shouldShowAddressBar && !settingsVisibilityModel.didShowSettingsOnboarding {
+            // async dispatch in order to get the final value for self.view.bounds
+            DispatchQueue.main.async {
+                guard let superview = self.view.superview else {
+                    return
+                }
+                let bounds = self.view.bounds
+                let settingsButtonWidth = Application.appDelegate.homePageSettingsModel.settingsButtonWidth
+
+                let rect = NSRect(
+                    x: bounds.maxX - HomePage.Views.RootView.customizeButtonPadding - settingsButtonWidth,
+                    y: bounds.maxY - HomePage.Views.RootView.customizeButtonPadding - HomePage.Views.RootView.SettingsButtonView.height,
+                    width: settingsButtonWidth,
+                    height: HomePage.Views.RootView.SettingsButtonView.height)
+
+                // Create a helper view as anchor for the popover and align it with the 'Customize' button.
+                // This is to ensure that popover updates its position correctly as the window is resized.
+                let popoverAnchorView = NSView(frame: rect)
+                superview.addSubview(popoverAnchorView, positioned: .below, relativeTo: self.view)
+                popoverAnchorView.translatesAutoresizingMaskIntoConstraints = false
+                NSLayoutConstraint.activate([
+                    popoverAnchorView.widthAnchor.constraint(equalToConstant: settingsButtonWidth),
+                    popoverAnchorView.heightAnchor.constraint(equalToConstant: HomePage.Views.RootView.SettingsButtonView.height),
+                    popoverAnchorView.trailingAnchor.constraint(equalTo: superview.trailingAnchor, constant: -HomePage.Views.RootView.customizeButtonPadding),
+                    popoverAnchorView.bottomAnchor.constraint(equalTo: superview.bottomAnchor, constant: -HomePage.Views.RootView.customizeButtonPadding)
+                ])
+
+                let viewController = PopoverMessageViewController(
+                    title: UserText.homePageSettingsOnboardingTitle,
+                    message: UserText.homePageSettingsOnboardingMessage,
+                    image: .settingsOnboardingPopover,
+                    shouldShowCloseButton: true,
+                    presentMultiline: true,
+                    autoDismissDuration: nil,
+                    onClick: { [weak self] in
+                        self?.settingsVisibilityModel.isSettingsVisible = true
+                    }
+                )
+                viewController.show(onParent: self, relativeTo: popoverAnchorView, preferredEdge: .maxY)
+                self.settingsVisibilityModel.didShowSettingsOnboarding = true
+
+                // Hide the popover as soon as settings is shown ('Customize' button is clicked).
+                self.settingsVisibilityModel.$isSettingsVisible
+                    .filter { $0 }
+                    .prefix(1)
+                    .sink { [weak viewController] _ in
+                        viewController?.dismiss()
+                        popoverAnchorView.removeFromSuperview()
+                    }
+                    .store(in: &self.cancellables)
+            }
+        }
+    }
+
     private var burningDataCancellable: AnyCancellable?
     private func subscribeToBurningData() {
         burningDataCancellable = fireViewModel.fire.$burningData
@@ -277,5 +352,4 @@ final class HomePageViewController: NSViewController {
                 self?.refreshModels()
             }
     }
-
 }

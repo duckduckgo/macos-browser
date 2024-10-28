@@ -44,6 +44,7 @@ extension HomePage.Views {
                         .foregroundColor((.homePageMoreOrLessText))
                 }.frame(maxWidth: .infinity)
             }
+            .padding(.horizontal, 2)
             .padding(.top, 8)
             .font(.system(size: 11))
             .link {
