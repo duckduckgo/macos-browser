@@ -65,15 +65,24 @@ struct MapperToUI {
             for optOutJob in $0.optOutJobData {
                 let extractedProfile = optOutJob.extractedProfile
 
+                let optOutUrl = dataBroker.optOutUrl
+                var optOutBrokerName = dataBroker.name
+                let optOutUrlIsParent = dataBroker.optOutUrlIsParent
+
                 var parentBrokerOptOutJobData: [OptOutJobData]?
                 if let parent = $0.dataBroker.parent,
                    let parentsQueryData = brokerURLsToQueryData[parent] {
                     parentBrokerOptOutJobData = parentsQueryData.flatMap { $0.optOutJobData }
+                    if let parentDataBroker = parentsQueryData.first?.dataBroker, optOutUrlIsParent {
+                        optOutBrokerName = parentDataBroker.name
+                    }
                 }
 
                 let profileMatch = DBPUIDataBrokerProfileMatch(optOutJobData: optOutJob,
                                                                dataBroker: dataBroker,
-                                                               parentBrokerOptOutJobData: parentBrokerOptOutJobData)
+                                                               parentBrokerOptOutJobData: parentBrokerOptOutJobData,
+                                                               optOutUrl: optOutUrl,
+                                                               optOutBrokerName: optOutBrokerName)
 
                 if extractedProfile.removedDate == nil {
                     inProgressOptOuts.append(profileMatch)
@@ -87,7 +96,9 @@ struct MapperToUI {
                                                                           dataBrokerName: mirrorSite.name,
                                                                           dataBrokerURL: mirrorSite.url,
                                                                           dataBrokerParentURL: dataBroker.parent,
-                                                                          parentBrokerOptOutJobData: parentBrokerOptOutJobData)
+                                                                          parentBrokerOptOutJobData: parentBrokerOptOutJobData,
+                                                                          optOutUrl: optOutUrl,
+                                                                          optOutBrokerName: optOutBrokerName)
 
                         if let extractedProfileRemovedDate = extractedProfile.removedDate,
                            mirrorSite.shouldWeIncludeMirrorSite(for: extractedProfileRemovedDate) {
