@@ -22,7 +22,7 @@ import Foundation
 
 final class DataBrokerExecutionConfigTests: XCTestCase {
 
-    private let sut = DataBrokerExecutionConfig()
+    private let sut = DataBrokerExecutionConfig(mode: .normal)
 
     func testWhenOperationIsManualScans_thenConcurrentOperationsBetweenBrokersIsSix() {
         let value = sut.concurrentOperationsFor(.scan)
