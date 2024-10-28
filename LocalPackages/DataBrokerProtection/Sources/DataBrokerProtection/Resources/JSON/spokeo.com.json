@@ -1,32 +1,37 @@
 {
   "name": "Spokeo",
   "url": "spokeo.com",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "addedDatetime": 1692572400000,
+  "optOutUrl": "https://spokeo.com/optout",
   "mirrorSites": [
     {
       "name": "CallerSmart",
       "url": "callersmart.com",
       "addedAt": 1705599286529,
-      "removedAt": null
+      "removedAt": null,
+      "optOutUrl": "https://www.callersmart.com/opt-out"
     },
     {
       "name": "Selfie Network",
       "url": "selfie.network",
       "addedAt": 1705599286529,
-      "removedAt": null
+      "removedAt": null,
+      "optOutUrl": "https://spokeo.com/optout"
     },
     {
       "name": "Selfie Systems",
       "url": "selfie.systems",
       "addedAt": 1705599286529,
-      "removedAt": null
+      "removedAt": null,
+      "optOutUrl": "https://spokeo.com/optout"
     },
     {
       "name": "PeopleWin",
       "url": "peoplewin.com",
       "addedAt": 1705599286529,
-      "removedAt": null
+      "removedAt": null,
+      "optOutUrl": "https://www.spokeo.com/optout"
     }
   ],
   "steps": [
