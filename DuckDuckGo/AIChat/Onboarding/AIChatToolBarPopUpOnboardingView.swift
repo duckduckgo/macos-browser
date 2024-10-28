@@ -36,7 +36,7 @@ struct AIChatToolBarPopUpOnboardingView: View {
 
                 Text(UserText.aiChatOnboardingPopoverMessage1) +
                 Text(" ") +
-                Text(UserText.aiChatOnboardingPopoverMessage1).bold()
+                Text(UserText.aiChatOnboardingPopoverMessage2).bold()
             }
 
             HStack {
