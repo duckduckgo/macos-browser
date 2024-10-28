@@ -80,6 +80,10 @@ final class PIRScanIntegrationTests: XCTestCase {
      From there it performs a series of various introspections to check each step
      E.g. checking correct pixels are fired, checking operation statuses and events in the DB etc.
 
+     It checks more than just the headline (e.g. step 1 checks we save a profile but
+     also checks the broker profile queries are created correctly and that the login item
+     is running). This is mostly to make them easy to debug if they fail.
+
      The steps:
      1/ We save a profile
      2/ We scan brokers
@@ -108,11 +112,10 @@ final class PIRScanIntegrationTests: XCTestCase {
 
         let mockUserProfile = mockFakeBrokerUserProfile()
         let returnedUserProfile = await createProfileOnFakeBroker(mockUserProfile)
-        print(returnedUserProfile)
         XCTAssertEqual(mockUserProfile.firstName, returnedUserProfile.firstName)
 
+        // When
         /*
-         // When
          1/ We save a profile
          */
 
@@ -135,16 +138,20 @@ final class PIRScanIntegrationTests: XCTestCase {
                                whenCondition: {
             try! database.fetchAllBrokerProfileQueryData().count > 0
         })
-        print("Stage 1 passed: We save a profile")
 
+        // Also check that we made the broker profile queries correctly
         try await Task.sleep(nanoseconds: 3_000_000_000)
-        let queries9 = try! database.fetchAllBrokerProfileQueryData()
-        let initialBrokers = queries9.compactMap { $0.dataBroker }
+        let queries = try! database.fetchAllBrokerProfileQueryData()
+        let initialBrokers = queries.compactMap { $0.dataBroker }
         XCTAssertEqual(initialBrokers.count, 1)
         XCTAssertEqual(initialBrokers.first?.name, "DDG Fake Broker")
-        XCTAssertEqual(queries9.count, 1)
+        XCTAssertEqual(queries.count, 1)
+
+        // At this stage the login item should be running
         XCTAssertTrue(loginItemsManager.isAnyEnabled([.dbpBackgroundAgent]))
         XCTAssertTrue(LoginItem.dbpBackgroundAgent.isRunning)
+
+        print("Stage 1 passed: We save a profile")
 
         /*
         2/ We scan brokers
@@ -161,6 +168,7 @@ final class PIRScanIntegrationTests: XCTestCase {
 
         let metaData = await communicationDelegate.getBackgroundAgentMetadata()
         XCTAssertNotNil(metaData.lastStartedSchedulerOperationBrokerUrl)
+
         print("Stage 2 passed: We scan brokers")
 
         /*
@@ -177,10 +185,6 @@ final class PIRScanIntegrationTests: XCTestCase {
             return extractedProfiles.count > 0
         })
 
-        let queries3 = try! database.fetchAllBrokerProfileQueryData()
-        let brokerIDs = queries3.compactMap { $0.dataBroker.id }
-        let extractedProfiles = brokerIDs.flatMap { try! database.fetchExtractedProfiles(for: $0) }
-        //print(extractedProfiles)
         print("Stage 3 passed: We find and save extracted profiles")
 
         /*
@@ -196,10 +200,6 @@ final class PIRScanIntegrationTests: XCTestCase {
             return optOutJobs.count > 0
         })
 
-        let queries = try! database.fetchAllBrokerProfileQueryData()
-        let thing = queries.filter { $0.optOutJobData.count > 0 }
-        let name = thing.first?.dataBroker.name
-        print(name)
         print("Stage 4 passed: We create opt out jobs")
 
         /*
@@ -208,11 +208,6 @@ final class PIRScanIntegrationTests: XCTestCase {
          */
         let optOutJobsRunExpectation = expectation(description: "Opt out jobs run")
 
-        /* Currently hard coded the cadences to get this to run
-         need to in future change them for the tests
-         Also is a big inconsistent with current QoS
-         so possibly worth changing for tests
-         */
         await awaitFulfillment(of: optOutJobsRunExpectation,
                                withTimeout: 300,
                                whenCondition: {
@@ -232,7 +227,6 @@ final class PIRScanIntegrationTests: XCTestCase {
             let optOutsRequested = events.filter{ $0.type == .optOutRequested }
             return optOutsRequested.count > 0
         })
-
         print("Stage 5 passed: We finish running the opt out jobs")
 
         /*
