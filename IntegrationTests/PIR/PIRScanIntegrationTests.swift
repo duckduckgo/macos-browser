@@ -75,8 +75,24 @@ final class PIRScanIntegrationTests: XCTestCase {
     }
 
     /*
-     This test shows is where I'm developing everything
-     EVERYTHING
+     Tests the entire PIR process, broken down into 9 steps.
+     Kicks the process off by simulating a save profile message from the FE
+     From there it performs a series of various introspections to check each step
+     E.g. checking correct pixels are fired, checking operation statuses and events in the DB etc.
+
+     The steps:
+     1/ We save a profile
+     2/ We scan brokers
+     3/ We find and save extracted profiles
+     4/ We create opt out jobs
+     5/ We run those opt out jobs
+     6/ The BE service receives the email
+     7/ The app polls the backend service for the link
+     8/ We visit the confirmation link
+     9/ We confirm the opt out through a scan
+
+     Checking steps 6-8 are currently commented out since the fake broker doesn't
+     support sending emails at the moment
      */
     func testWhenProfileIsSaved_ThenEachStepHappensInSequence() async throws {
         // Given
