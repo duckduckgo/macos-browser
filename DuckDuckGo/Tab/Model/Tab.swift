@@ -1259,6 +1259,8 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
     @MainActor
     func webContentProcessDidTerminate(with reason: WKProcessTerminationReason?) {
+        guard (error?.code.rawValue ?? WKError.Code.unknown.rawValue) != WKError.Code.webContentProcessTerminated.rawValue else { return }
+
         let error = WKError(.webContentProcessTerminated, userInfo: [
             WKProcessTerminationReason.userInfoKey: reason?.rawValue ?? -1,
             NSLocalizedDescriptionKey: UserText.webProcessCrashPageMessage
