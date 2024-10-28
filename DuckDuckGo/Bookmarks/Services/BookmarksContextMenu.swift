@@ -424,16 +424,20 @@ extension BookmarksContextMenu: FolderMenuItemSelectors {
 
     @MainActor
     @objc func openInNewTabs(_ sender: NSMenuItem) {
-        guard let tabCollection = windowControllersManager.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel,
-              let folder = sender.representedObject as? BookmarkFolder
-        else {
+        guard let tabCollection = windowControllersManager.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel else {
             assertionFailure("Cannot open all in new tabs")
             return
         }
 
-        let tabs = Tab.withContentOfBookmark(folder: folder, burnerMode: tabCollection.burnerMode)
-        tabCollection.append(tabs: tabs)
-        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
+        if let folder = sender.representedObject as? BookmarkFolder {
+            let tabs = Tab.withContentOfBookmark(folder: folder, burnerMode: tabCollection.burnerMode)
+            tabCollection.append(tabs: tabs)
+            PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
+        } else if let bookmarks = sender.representedObject as? [Bookmark] {
+            let tabs = Tab.withContentOfBookmark(bookmarks: bookmarks, burnerMode: tabCollection.burnerMode)
+            tabCollection.append(tabs: tabs)
+            PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
+        }
     }
 
     @MainActor
