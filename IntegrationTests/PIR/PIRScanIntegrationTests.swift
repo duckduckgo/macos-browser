@@ -34,33 +34,6 @@ final class PIRScanIntegrationTests: XCTestCase {
     var viewModel: DBPUIViewModel!
     let testUserDefault = UserDefaults(suiteName: #function)!
 
-    private func fulfillExpecation(_ expectation: XCTestExpectation, whenCondition condition: () async -> Bool) async {
-        while await !condition() { }
-        expectation.fulfill()
-    }
-
-    private func awaitFulfillment(of expectation: XCTestExpectation, withTimeout timeout: TimeInterval, whenCondition condition: @escaping () async -> Bool) async {
-        let task = Task {
-            await fulfillExpecation(expectation, whenCondition: condition)
-        }
-
-        await fulfillment(of: [expectation], timeout: timeout)
-        task.cancel()
-    }
-
-    typealias PixelExpectation = (pixel: DataBrokerProtectionPixels, expectation: XCTestExpectation)
-
-    private func pixelKitToTest(_ pixelExpectations: [PixelExpectation]) -> PixelKit {
-        return PixelKit(dryRun: false,
-                        appVersion: "1.0.0",
-                        defaultHeaders: [:],
-                        defaults: testUserDefault) { pixelName, _, _, _, _, _ in
-            for pixelExpectation in pixelExpectations where pixelName.hasPrefix(pixelExpectation.pixel.name) {
-                pixelExpectation.expectation.fulfill()
-            }
-        }
-    }
-
     override func setUpWithError() throws {
         //continueAfterFailure = false
 
@@ -87,93 +60,6 @@ final class PIRScanIntegrationTests: XCTestCase {
         loginItemsManager.disableLoginItems([LoginItem.dbpBackgroundAgent])
     }
 
-
-    /*
-     interface UserProfile {
-       firstName: string
-       lastName: string
-       age: number
-       city: string
-       state: string
-     }
-
-     interface UserProfileWithId extends UserProfile {
-       id: number
-     }
-
-     POST URL/profiles
-
-     request payload:
-     UserProfile
-     */
-
-    struct UserProfile: Codable {
-        let firstName: String
-        let lastName: String
-        let age: Int
-        let city: String
-        let state: String
-    }
-
-    struct ReturnedUserProfile: Codable {
-        let id: Int
-        let profileUrl: String
-        let firstName: String
-        let lastName: String
-        let age: Int
-        let city: String
-        let state: String
-    }
-
-    func mockUserProfile() -> UserProfile {
-        return UserProfile(firstName: "John", lastName: "Smith", age: 63, city: "Dallas", state: "TX")
-    }
-
-    // A useful function for debugging responses from the fake broker
-    func prettyPrintJSONData(_ data: Data) {
-        if let json = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers),
-           let jsonData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted) {
-            print(String(decoding: jsonData, as: UTF8.self))
-        } else {
-            print("json data malformed")
-        }
-    }
-
-    func validateFakeBrokerResponse(responseData: Data, response: URLResponse) {
-        let httpResponse = response as! HTTPURLResponse
-        if httpResponse.statusCode != 200 {
-            prettyPrintJSONData(responseData)
-            XCTFail("Response code indidcates failure. Check the printed response data above (if expected json)")
-        }
-    }
-
-    let fakeBrokerAPIAddress = "http://localhost:3001/api/"
-
-    func deleteAllProfilesOnFakeBroker() async {
-        let deleteProfilesURL = URL(string: fakeBrokerAPIAddress + "profiles")!
-        var deleteRequest = URLRequest(url: deleteProfilesURL)
-        deleteRequest.httpMethod = "DELETE"
-
-        let (responseData, response) = try! await URLSession.shared.data(for: deleteRequest)
-        validateFakeBrokerResponse(responseData: responseData, response: response)
-    }
-
-    func createProfileOnFakeBroker(_ profile: UserProfile) async -> ReturnedUserProfile {
-        let url = URL(string: fakeBrokerAPIAddress + "profiles")!
-        var request = URLRequest(url: url)
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpMethod = "POST"
-        let encoder = JSONEncoder()
-        let data = try! encoder.encode(profile)
-        request.httpBody = data
-
-        let (responseData, response) = try! await URLSession.shared.data(for: request)
-        validateFakeBrokerResponse(responseData: responseData, response: response)
-
-        let decoder = JSONDecoder()
-        return try! decoder.decode(ReturnedUserProfile.self, from: responseData)
-    }
-
     /*
      Tests the login item starts
      */
@@ -192,7 +78,7 @@ final class PIRScanIntegrationTests: XCTestCase {
      This test shows is where I'm developing everything
      EVERYTHING
      */
-    func testWhenProfileIsSaved_ThenEVERYTHINGHAPPENS() async throws {
+    func testWhenProfileIsSaved_ThenEachStepHappensInSequence() async throws {
         // Given
         // Local state set up
         let dataManager = pirProtectionManager.dataManager
@@ -204,7 +90,7 @@ final class PIRScanIntegrationTests: XCTestCase {
         // Fake broker set up
         await deleteAllProfilesOnFakeBroker()
 
-        let mockUserProfile = mockUserProfile()
+        let mockUserProfile = mockFakeBrokerUserProfile()
         let returnedUserProfile = await createProfileOnFakeBroker(mockUserProfile)
         print(returnedUserProfile)
         XCTAssertEqual(mockUserProfile.firstName, returnedUserProfile.firstName)
@@ -390,7 +276,122 @@ final class PIRScanIntegrationTests: XCTestCase {
     }
 }
 
+// MARK: - Fake broker setup and config
+
+extension PIRScanIntegrationTests {
+
+    struct FakeBrokerUserProfile: Codable {
+        let firstName: String
+        let lastName: String
+        let age: Int
+        let city: String
+        let state: String
+    }
+
+    struct FakeBrokerReturnedUserProfile: Codable {
+        let id: Int
+        let profileUrl: String
+        let firstName: String
+        let lastName: String
+        let age: Int
+        let city: String
+        let state: String
+    }
+
+    func mockFakeBrokerUserProfile() -> FakeBrokerUserProfile {
+        return FakeBrokerUserProfile(firstName: "John", lastName: "Smith", age: 63, city: "Dallas", state: "TX")
+    }
+
+    var fakeBrokerAPIAddress: String {
+        "http://localhost:3001/api/"
+    }
+
+    func deleteAllProfilesOnFakeBroker() async {
+        let deleteProfilesURL = URL(string: fakeBrokerAPIAddress + "profiles")!
+        var deleteRequest = URLRequest(url: deleteProfilesURL)
+        deleteRequest.httpMethod = "DELETE"
+
+        let (responseData, response) = try! await URLSession.shared.data(for: deleteRequest)
+        validateFakeBrokerResponse(responseData: responseData, response: response)
+    }
+
+    func createProfileOnFakeBroker(_ profile: FakeBrokerUserProfile) async -> FakeBrokerReturnedUserProfile {
+        let url = URL(string: fakeBrokerAPIAddress + "profiles")!
+        var request = URLRequest(url: url)
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpMethod = "POST"
+        let encoder = JSONEncoder()
+        let data = try! encoder.encode(profile)
+        request.httpBody = data
+
+        let (responseData, response) = try! await URLSession.shared.data(for: request)
+        validateFakeBrokerResponse(responseData: responseData, response: response)
+
+        let decoder = JSONDecoder()
+        return try! decoder.decode(FakeBrokerReturnedUserProfile.self, from: responseData)
+    }
+}
+
+// MARK: - Testing helpers and utilities
+
 private extension PIRScanIntegrationTests {
+
+    /*
+     Used to check an Expectation continuously
+     i.e. for Expectations when we don't know exactly when they will complete
+     but don't want to have to wait unnecessarily since they may take some time
+     */
+    private func awaitFulfillment(of expectation: XCTestExpectation, withTimeout timeout: TimeInterval, whenCondition condition: @escaping () async -> Bool) async {
+        let task = Task {
+            await fulfillExpecation(expectation, whenCondition: condition)
+        }
+
+        await fulfillment(of: [expectation], timeout: timeout)
+        task.cancel()
+    }
+
+    // Helper function for the above
+    private func fulfillExpecation(_ expectation: XCTestExpectation, whenCondition condition: () async -> Bool) async {
+        while await !condition() { }
+        expectation.fulfill()
+    }
+
+    typealias PixelExpectation = (pixel: DataBrokerProtectionPixels, expectation: XCTestExpectation)
+
+    private func pixelKitToTest(_ pixelExpectations: [PixelExpectation]) -> PixelKit {
+        return PixelKit(dryRun: false,
+                        appVersion: "1.0.0",
+                        defaultHeaders: [:],
+                        defaults: testUserDefault) { pixelName, _, _, _, _, _ in
+            for pixelExpectation in pixelExpectations where pixelName.hasPrefix(pixelExpectation.pixel.name) {
+                pixelExpectation.expectation.fulfill()
+            }
+        }
+    }
+
+    func validateFakeBrokerResponse(responseData: Data, response: URLResponse) {
+        let httpResponse = response as! HTTPURLResponse
+        if httpResponse.statusCode != 200 {
+            prettyPrintJSONData(responseData)
+            XCTFail("Response code indidcates failure. Check the printed response data above (if expected json)")
+        }
+    }
+
+    // A useful function for debugging responses from the fake broker
+    func prettyPrintJSONData(_ data: Data) {
+        if let json = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers),
+           let jsonData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted) {
+            print(String(decoding: jsonData, as: UTF8.self))
+        } else {
+            print("json data malformed")
+        }
+    }
+}
+
+// MARK: - Mocks
+
+private extension PIRScanIntegrationTests {
+
     var mockProfile: DataBrokerProtectionProfile {
         // Use the current year to calculate age, since the fake broker is static (so will always list "63")
         let year = Calendar(identifier: .gregorian).component(.year, from: Date())
