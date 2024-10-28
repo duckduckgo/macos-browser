@@ -115,6 +115,7 @@ public struct DataBroker: Codable, Sendable {
     let schedulingConfig: DataBrokerScheduleConfig
     let parent: String?
     let mirrorSites: [MirrorSite]
+    let optOutUrl: String
 
     var isFakeBroker: Bool {
         name.contains("fake") // A future improvement will be to add a property in the JSON file.
@@ -128,6 +129,7 @@ public struct DataBroker: Codable, Sendable {
         case schedulingConfig
         case parent
         case mirrorSites
+        case optOutUrl
     }
 
     init(id: Int64? = nil,
@@ -137,7 +139,8 @@ public struct DataBroker: Codable, Sendable {
          version: String,
          schedulingConfig: DataBrokerScheduleConfig,
          parent: String? = nil,
-         mirrorSites: [MirrorSite] = [MirrorSite]()
+         mirrorSites: [MirrorSite] = [MirrorSite](),
+         optOutUrl: String
     ) {
         self.id = id
         self.name = name
@@ -153,6 +156,7 @@ public struct DataBroker: Codable, Sendable {
         self.schedulingConfig = schedulingConfig
         self.parent = parent
         self.mirrorSites = mirrorSites
+        self.optOutUrl = optOutUrl
     }
 
     public init(from decoder: Decoder) throws {
@@ -178,6 +182,8 @@ public struct DataBroker: Codable, Sendable {
         } catch {
             mirrorSites = [MirrorSite]()
         }
+
+        optOutUrl = (try? container.decode(String.self, forKey: .optOutUrl)) ?? ""
 
         id = nil
     }
@@ -234,5 +240,16 @@ extension DataBroker {
 
     var type: DataBrokerHierarchy {
         parent == nil ? .parent : .child
+    }
+
+    /// A computed property that determines if the `optOutUrl` belongs to the parent broker instead of this broker.
+    ///
+    /// This property returns `true` if the `optOutUrl` does not contain the main `url` of the broker,
+    /// indicating that the opt-out URL is associated with a parent broker. Conversely, it returns `false`
+    /// if the `optOutUrl` includes the broker's `url`, signifying that the opt-out URL belongs directly to this broker.
+    ///
+    /// - Returns: `true` if the `optOutUrl` is for a parent broker; `false` if it is for this broker.
+    var optOutUrlIsParent: Bool {
+        !optOutUrl.contains(url)
     }
 }
