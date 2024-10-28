@@ -100,6 +100,7 @@ final class PIRScanIntegrationTests: XCTestCase {
      */
     func testWhenProfileIsSaved_ThenEachStepHappensInSequence() async throws {
         // Given
+
         // Local state set up
         let dataManager = pirProtectionManager.dataManager
         let database = dataManager.database
@@ -118,7 +119,6 @@ final class PIRScanIntegrationTests: XCTestCase {
         /*
          1/ We save a profile
          */
-
         cache.profile = mockProfile
         Task { @MainActor in
             _ = try await communicationLayer.saveProfile(params: [], original: WKScriptMessage())
@@ -140,7 +140,6 @@ final class PIRScanIntegrationTests: XCTestCase {
         })
 
         // Also check that we made the broker profile queries correctly
-        try await Task.sleep(nanoseconds: 3_000_000_000)
         let queries = try! database.fetchAllBrokerProfileQueryData()
         let initialBrokers = queries.compactMap { $0.dataBroker }
         XCTAssertEqual(initialBrokers.count, 1)
@@ -156,7 +155,6 @@ final class PIRScanIntegrationTests: XCTestCase {
         /*
         2/ We scan brokers
         */
-
         let schedulerStartsExpectation = expectation(description: "Scheduler starts")
 
         await awaitFulfillment(of: schedulerStartsExpectation,
@@ -271,7 +269,6 @@ final class PIRScanIntegrationTests: XCTestCase {
         /*
         9/ We confirm the opt out through a scan
          */
-
         let optOutConfirmedExpectation = expectation(description: "Opt out confirmed")
         await awaitFulfillment(of: optOutConfirmedExpectation,
                                withTimeout: 300,
