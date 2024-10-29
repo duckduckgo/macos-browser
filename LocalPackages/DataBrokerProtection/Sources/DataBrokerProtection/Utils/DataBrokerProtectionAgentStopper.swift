@@ -58,8 +58,6 @@ struct DefaultDataBrokerProtectionAgentStopper: DataBrokerProtectionAgentStopper
     /// 1. The user is an active freemium user
     /// 2. The user has a subscription with valid entitlements
     public func validateRunPrerequisitesAndStopAgentIfNecessary() async {
-        return
-
         do {
             let hasProfile = try dataManager.fetchProfile() != nil
             let isAuthenticated = authenticationManager.isUserAuthenticated
