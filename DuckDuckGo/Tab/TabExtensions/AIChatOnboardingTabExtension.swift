@@ -73,6 +73,11 @@ extension AIChatOnboardingTabExtension: NavigationResponder {
         guard let webView = webView else { return }
         validateAIChatCookie(webView: webView)
     }
+
+    func navigation(_ navigation: Navigation, didSameDocumentNavigationOf navigationType: WKSameDocumentNavigationType) {
+        guard let webView = webView else { return }
+        validateAIChatCookie(webView: webView)
+    }
 }
 
 protocol AIChatOnboardingProtocol: AnyObject, NavigationResponder {
