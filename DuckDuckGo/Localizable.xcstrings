@@ -27358,55 +27358,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Passe den Hintergrund, das Design und sogar die angezeigten Inhalte an. Versuch es doch mal!"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Customize the background, theme, and even what content you see. Give it a try!"
+            "value" : "Add extra personality and pick what you want to see on your new tab page. Give it a try!"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Personaliza el fondo, el tema e incluso el contenido que ves. ¡Pruébalo!"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Personnalisez l'arrière-plan, le thème et même le contenu que vous voyez. Essayez par vous-même !"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Personalizza lo sfondo, il tema e persino i contenuti che vedi. Prova!"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Pas de achtergrond, het thema en zelfs de inhoud aan die je ziet. Probeer het maar eens!"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Dostosuj tło, motyw oraz wyświetlaną zawartość. Spróbuj!"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Personaliza o fundo, o tema e até o conteúdo que vês. Experimenta!"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Можно настроить фон, тему и даже отображаемый контент. Давайте попробуем!"
           }
         }
@@ -27418,55 +27418,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Personalisiere deine neue Tab-Seite"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Add extra personality to your new tab page"
+            "value" : "New search box, custom backgrounds & more!"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Añade más personalidad a tu página de nueva pestaña"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Ajoutez une personnalité supplémentaire à votre nouvelle page à onglet"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Aggiungi un tocco di personalità alla tua nuova scheda"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Voeg extra persoonlijkheid toe aan je nieuwe tabbladpagina"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Dostosuj stronę nowej zakładki do potrzeb"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Adiciona personalidade extra à tua página do novo separador"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Дополнительная персонализация новой вкладки"
           }
         }
