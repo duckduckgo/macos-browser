@@ -85,20 +85,6 @@ extension MirrorSite {
     func scannedBroker(withStatus status: ScannedBroker.Status) -> ScannedBroker {
         ScannedBroker(name: name, url: url, status: status)
     }
-
-    /// Determines whether a mirror site should be included in scan result calculations based on the provided date.
-    ///
-    /// - Parameter date: The date for which to check if the mirror site should be included. Defaults to the current date.
-    /// - Returns: A Boolean value indicating whether the mirror site should be included.
-    ///   - `true`: If the profile was added before the given date and has not been removed, or if it was removed but the provided date is between the `addedAt` and `removedAt` timestamps.
-    ///   - `false`: If the profile was either added after the given date or has been removed before the given date.
-    func shouldWeIncludeMirrorSite(for date: Date = Date()) -> Bool {
-        if let removedAt = self.removedAt {
-            return self.addedAt < date && date < removedAt
-        } else {
-            return self.addedAt < date
-        }
-    }
 }
 
 public enum DataBrokerHierarchy: Int {
@@ -106,7 +92,7 @@ public enum DataBrokerHierarchy: Int {
     case child = 0
 }
 
-public struct DataBroker: Codable, Sendable {
+struct DataBroker: Codable, Sendable {
     let id: Int64?
     let name: String
     let url: String
@@ -155,7 +141,7 @@ public struct DataBroker: Codable, Sendable {
         self.mirrorSites = mirrorSites
     }
 
-    public init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         name = try container.decode(String.self, forKey: .name)
 
@@ -221,11 +207,11 @@ public struct DataBroker: Codable, Sendable {
 
 extension DataBroker: Hashable {
 
-    public func hash(into hasher: inout Hasher) {
+    func hash(into hasher: inout Hasher) {
         hasher.combine(name)
     }
 
-    public static func == (lhs: DataBroker, rhs: DataBroker) -> Bool {
+    static func == (lhs: DataBroker, rhs: DataBroker) -> Bool {
         return lhs.name == rhs.name
     }
 }

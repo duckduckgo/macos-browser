@@ -1,9 +1,8 @@
 {
   "name": "Neighbor Report",
   "url": "neighbor.report",
-  "version": "0.4.0",
+  "version": "0.2.0",
   "addedDatetime": 1703570400000,
-  "optOutUrl": "https://neighbor.report/remove",
   "steps": [
     {
       "stepType": "scan",
@@ -64,8 +63,16 @@
           "selector": ".form-horizontal",
           "elements": [
             {
+              "type": "fullName",
+              "selector": ".//input[@name='inputName']"
+            },
+            {
               "type": "email",
               "selector": ".//input[@name='inputEmail']"
+            },
+            {
+              "type": "profileUrl",
+              "selector": ".//input[@name='inputURL']"
             }
           ]
         },
@@ -96,101 +103,9 @@
             {
               "type": "text",
               "selector": "body",
-              "expect": "How to remove"
+              "expect": "Remove persons"
             }
           ]
-        },
-        {
-          "actionType": "click",
-          "elements": [
-            {
-              "type": "button",
-              "selector": "//input[@name='locality']"
-            }
-          ],
-          "id": "0f1a545b-7dcf-4c66-b811-1d2c49d211ca"
-        },
-        {
-          "actionType": "fillForm",
-          "selector": "//form[@data-class='city-search']",
-          "elements": [
-            {
-              "type": "fullName",
-              "selector": ".//input[@name='name']"
-            }
-          ],
-          "id": "e9f9e323-3234-4e90-adec-cb503c7f0b43"
-        },
-        {
-          "actionType": "fillForm",
-          "selector": "//form[@data-class='city']",
-          "dataSource": "userProfile",
-          "elements": [
-            {
-              "type": "cityState",
-              "selector": ".//input[@name='q']"
-            }
-          ],
-          "id": "8184c48e-80c0-4259-8798-dc9721eaba52"
-        },
-        {
-          "actionType": "click",
-          "elements": [
-            {
-              "type": "button",
-              "selector": "//div[@class='deep-suggestion-block'][1]"
-            }
-          ],
-          "id": "0a28b6d1-4865-4183-97eb-561efce0ca0b"
-        },
-        {
-          "actionType": "click",
-          "elements": [
-            {
-              "type": "button",
-              "selector": "//button[@type='submit']"
-            }
-          ],
-          "id": "daad4b56-01e6-410d-9ee9-9c8490507ce1"
-        },
-        {
-          "actionType": "expectation",
-          "expectations": [
-            {
-              "type": "element",
-              "selector": ".//div[@class='results']//div"
-            }
-          ],
-          "id": "276f754b-9289-46f6-ae06-877b98af1cac"
-        },
-        {
-          "actionType": "click",
-          "elements": [
-            {
-              "selector": "a[class~='btn-success']",
-              "type": "button",
-              "parent": {
-                "profileMatch": {
-                  "selector": "//div[@class='results']/div",
-                  "profile": {
-                    "name": {
-                      "selector": ".//div[@class='h4']//strong",
-                      "beforeText": ","
-                    },
-                    "age": {
-                      "selector": ".//div[@class='h4']//strong//span",
-                      "afterText": ", ",
-                      "beforeText": "years"
-                    },
-                    "addressFull": {
-                      "selector": "./div/div[2]"
-                    }
-                  }
-                }
-              }
-            }
-          ],
-          "id": "b7a4e671-c78c-4047-b047-6d4b30479022"
         },
         {
           "actionType": "click",
@@ -198,8 +113,7 @@
           "elements": [
             {
               "type": "button",
-              "selector": ".btn-danger",
-              "multiple": true
+              "selector": ".btn-danger"
             },
             {
               "type": "button",

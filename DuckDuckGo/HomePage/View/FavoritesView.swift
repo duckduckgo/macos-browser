@@ -34,7 +34,7 @@ struct Favorites: View {
     var body: some View {
 
         if #available(macOS 12.0, *) {
-            LazyVStack(spacing: 0) {
+            LazyVStack(spacing: 4) {
                 FavoritesGrid(isHovering: $isHovering)
             }
             .frame(maxWidth: .infinity)
@@ -42,7 +42,7 @@ struct Favorites: View {
                 self.isHovering = isHovering
             }
         } else {
-            VStack(spacing: 0) {
+            VStack(spacing: 4) {
                 FavoritesGrid(isHovering: $isHovering)
             }
             .frame(maxWidth: .infinity)

@@ -65,7 +65,7 @@ struct AddressCityState: Codable, Hashable {
     }
 }
 
-public struct ExtractedProfile: Codable, Sendable {
+struct ExtractedProfile: Codable, Sendable {
     let id: Int64?
     let name: String?
     let alternativeNames: [String]?
@@ -127,7 +127,7 @@ public struct ExtractedProfile: Codable, Sendable {
         self.identifier = identifier
     }
 
-    public init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decodeIfPresent(Int64.self, forKey: .id)
         name = try container.decodeIfPresent(String.self, forKey: .name)
@@ -202,7 +202,7 @@ public struct ExtractedProfile: Codable, Sendable {
 }
 
 extension ExtractedProfile: Equatable {
-    public static func == (lhs: ExtractedProfile, rhs: ExtractedProfile) -> Bool {
+    static func == (lhs: ExtractedProfile, rhs: ExtractedProfile) -> Bool {
         lhs.name == rhs.name
     }
 }

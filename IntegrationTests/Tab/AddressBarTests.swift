@@ -371,10 +371,7 @@ class AddressBarTests: XCTestCase {
          }
         for (idx, tab) in viewModel.tabs.enumerated() {
             viewModel.select(tab: tab)
-            for _ in 0..<10 {
-                guard addressBarValue != "tab-\(idx)" else { continue }
-                try await Task.sleep(interval: 0.01)
-            }
+            try await Task.sleep(interval: 0.01)
             XCTAssertEqual(addressBarValue, "tab-\(idx)")
             if tab.content == .newtab {
                 XCTAssertTrue(isAddressBarFirstResponder, "\(idx)")
@@ -875,7 +872,7 @@ class AddressBarTests: XCTestCase {
         // GIVEN
         let expectedImage = NSImage(named: "Shield")!
         let evaluator = MockCertificateEvaluator()
-        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")), webViewConfiguration: webViewConfiguration, certificateTrustEvaluator: evaluator)
+        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")), certificateTrustEvaluator: evaluator)
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         let tabLoadedPromise = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
 
@@ -894,7 +891,7 @@ class AddressBarTests: XCTestCase {
         let expectedImage = NSImage(named: "Shield")!
         let evaluator = MockCertificateEvaluator()
         evaluator.isValidCertificate = true
-        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")), webViewConfiguration: webViewConfiguration, certificateTrustEvaluator: evaluator)
+        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")), certificateTrustEvaluator: evaluator)
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         let tabLoadedPromise = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
 
@@ -913,7 +910,7 @@ class AddressBarTests: XCTestCase {
         let expectedImage = NSImage(named: "ShieldDot")!
         let evaluator = MockCertificateEvaluator()
         evaluator.isValidCertificate = false
-        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")), webViewConfiguration: webViewConfiguration, certificateTrustEvaluator: evaluator)
+        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")), certificateTrustEvaluator: evaluator)
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         let tabLoadedPromise = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
 
@@ -929,7 +926,7 @@ class AddressBarTests: XCTestCase {
     @MainActor
     func test_ZoomLevelNonDefault_ThenZoomButtonIsVisible() async throws {
         // GIVEN
-        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")), webViewConfiguration: webViewConfiguration)
+        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")))
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         viewModel.selectedTabViewModel?.zoomWasSet(to: .percent150)
         let tabLoadedPromise = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
@@ -946,7 +943,7 @@ class AddressBarTests: XCTestCase {
     @MainActor
     func test_ZoomLevelDefault_ThenZoomButtonIsNotVisible() async throws {
         // GIVEN
-        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")), webViewConfiguration: webViewConfiguration)
+        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")))
         tab.webView.zoomLevel = AccessibilityPreferences.shared.defaultPageZoom
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         viewModel.selectedTabViewModel?.zoomWasSet(to: .percent100)
@@ -961,22 +958,6 @@ class AddressBarTests: XCTestCase {
         XCTAssertTrue(zoomButton.isHidden)
     }
 
-    @MainActor
-    func test_WhenControlTextDidChange_ThenreporterTrackAddressBarTypedInCalled() async throws {
-        // GIVEN
-        let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [Tab(content: .newtab)]))
-        window = WindowsManager.openNewWindow(with: viewModel)!
-        let textField = mainViewController.navigationBarViewController.addressBarViewController?.addressBarTextField
-        XCTAssertNotNil(textField?.onboardingDelegate)
-        let reporter = CapturingOnboardingAddressBarReporting()
-        textField?.onboardingDelegate = reporter
-
-        // WHEN
-        textField?.controlTextDidChange(.init(name: .PasswordManagerChanged))
-
-        // THEN
-        XCTAssertTrue(reporter.trackAddressBarTypedInCalled)
-    }
 }
 
 protocol MainActorPerformer {
@@ -1016,19 +997,5 @@ class MockCertificateEvaluator: CertificateTrustEvaluating {
 
     func evaluateCertificateTrust(trust: SecTrust?) -> Bool? {
         return isValidCertificate
-    }
-}
-
-class CapturingOnboardingAddressBarReporting: OnboardingAddressBarReporting {
-    var trackAddressBarTypedInCalled = false
-
-    func trackAddressBarTypedIn() {
-        trackAddressBarTypedInCalled = true
-    }
-
-    func trackPrivacyDashboardOpened() {
-    }
-
-    func trackSiteVisited() {
     }
 }

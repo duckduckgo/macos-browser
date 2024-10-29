@@ -43,18 +43,6 @@ struct DBPUIHandshake: Codable {
     let version: Int
 }
 
-/// User-related data intended to be returned as part of a hardshake response
-struct DBPUIHandshakeUserData: Codable, Equatable {
-    let isAuthenticatedUser: Bool
-}
-
-/// Data type returned in response to a handshake request
-struct DBPUIHandshakeResponse: Codable {
-    let version: Int
-    let success: Bool
-    let userdata: DBPUIHandshakeUserData
-}
-
 /// Standard response from the host to the UI. The response contains the
 /// current version of the host's communication protocol and a bool value
 /// indicating if the requested operation was successful.
@@ -223,57 +211,6 @@ extension DBPUIDataBrokerProfileMatch {
                   dataBrokerURL: dataBroker.url,
                   dataBrokerParentURL: dataBroker.parent,
                   parentBrokerOptOutJobData: parentBrokerOptOutJobData)
-    }
-
-    /// Generates an array of `DBPUIDataBrokerProfileMatch` objects from the provided query data.
-    ///
-    /// This method processes an array of `BrokerProfileQueryData` to create a list of profile matches for data brokers.
-    /// It takes into account the opt-out data associated with each data broker, as well as any parent data brokers and their opt-out data.
-    /// Additionally, it includes mirror sites for each data broker, if applicable, based on the conditions defined in `shouldWeIncludeMirrorSite()`.
-    ///
-    /// - Parameter queryData: An array of `BrokerProfileQueryData` objects, which contains data brokers and their respective opt-out data.
-    /// - Returns: An array of `DBPUIDataBrokerProfileMatch` objects representing matches for each data broker, including parent brokers and mirror sites.
-    static func profileMatches(from queryData: [BrokerProfileQueryData]) -> [DBPUIDataBrokerProfileMatch] {
-        // Group the query data by data broker URL to easily find parent data broker opt-outs later.
-        let brokerURLsToQueryData = Dictionary(grouping: queryData, by: { $0.dataBroker.url })
-
-        return queryData.flatMap {
-            var profiles = [DBPUIDataBrokerProfileMatch]()
-
-            for optOutJobData in $0.optOutJobData {
-                let dataBroker = $0.dataBroker
-
-                // Find opt-out job data for the parent broker, if applicable.
-                var parentBrokerOptOutJobData: [OptOutJobData]?
-                if let parent = dataBroker.parent,
-                   let parentsQueryData = brokerURLsToQueryData[parent] {
-                    parentBrokerOptOutJobData = parentsQueryData.flatMap { $0.optOutJobData }
-                }
-
-                // Create a profile match for the current data broker and append it to the list of profiles.
-                profiles.append(DBPUIDataBrokerProfileMatch(optOutJobData: optOutJobData,
-                                                            dataBroker: dataBroker,
-                                                            parentBrokerOptOutJobData: parentBrokerOptOutJobData))
-
-                // Handle mirror sites associated with the data broker.
-                if !dataBroker.mirrorSites.isEmpty {
-                    // Create profile matches for each mirror site if it meets the inclusion criteria.
-                    let mirrorSitesMatches = dataBroker.mirrorSites.compactMap { mirrorSite in
-                        if mirrorSite.shouldWeIncludeMirrorSite() {
-                            return DBPUIDataBrokerProfileMatch(optOutJobData: optOutJobData,
-                                                               dataBrokerName: mirrorSite.name,
-                                                               dataBrokerURL: mirrorSite.url,
-                                                               dataBrokerParentURL: dataBroker.parent,
-                                                               parentBrokerOptOutJobData: parentBrokerOptOutJobData)
-                        }
-                        return nil
-                    }
-                    profiles.append(contentsOf: mirrorSitesMatches)
-                }
-            }
-
-            return profiles
-        }
     }
 }
 

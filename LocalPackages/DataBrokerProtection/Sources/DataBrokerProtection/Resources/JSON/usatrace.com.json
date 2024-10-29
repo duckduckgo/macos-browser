@@ -1,10 +1,9 @@
 {
   "name": "USA Trace",
   "url": "usatrace.com",
-  "version": "0.3.0",
+  "version": "0.2.0",
   "parent": "peoplefinders.com",
   "addedDatetime": 1674540000000,
-  "optOutUrl": "https://www.usatrace.com/contact-us/",
   "steps": [
     {
       "stepType": "scan",

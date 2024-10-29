@@ -23,25 +23,12 @@ extension HomePage.Views {
     struct HomeContentSectionsView: View {
         let includeContinueSetUpCards: Bool
         @EnvironmentObject var model: AppearancePreferences
-        @EnvironmentObject var addressBarModel: HomePage.Models.AddressBarModel
         @EnvironmentObject var continueSetUpModel: HomePage.Models.ContinueSetUpModel
         @EnvironmentObject var favoritesModel: HomePage.Models.FavoritesModel
         let iconSize: CGFloat = 16
 
         var body: some View {
             VStack(alignment: .leading, spacing: 12) {
-                if addressBarModel.shouldShowAddressBar {
-                    Toggle(isOn: $model.isSearchBarVisible) {
-                        HStack {
-                            Image(.searchBookmarks)
-                                .frame(width: iconSize, height: iconSize)
-                            Text(UserText.newTabSearchBarSectionTitle)
-                            Spacer()
-                        }
-                    }
-                    .toggleStyle(.switch)
-                }
-
                 if includeContinueSetUpCards {
                     Toggle(isOn: $model.isContinueSetUpVisible) {
                         HStack {

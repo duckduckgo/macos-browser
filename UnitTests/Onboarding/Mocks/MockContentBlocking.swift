@@ -43,17 +43,9 @@ class MockEmbeddedDataProvider: EmbeddedDataProvider {
 class MockPrivacyConfigurationManaging: PrivacyConfigurationManaging {
     var currentConfig: Data = Data()
 
-    let updatesSubject = PassthroughSubject<Void, Never>()
-
-    var updatesPublisher: AnyPublisher<Void, Never> {
-        updatesSubject.eraseToAnyPublisher()
-    }
+    var updatesPublisher: AnyPublisher<Void, Never> = Empty<Void, Never>(completeImmediately: false).eraseToAnyPublisher()
 
     var privacyConfig: PrivacyConfiguration = MockPrivacyConfiguration()
-
-    var mockConfig: MockPrivacyConfiguration {
-        privacyConfig as! MockPrivacyConfiguration
-    }
 
     var internalUserDecider: InternalUserDecider = InternalUserDeciderMock()
 

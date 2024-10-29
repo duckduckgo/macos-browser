@@ -120,11 +120,9 @@ final class UserScripts: UserScriptsProvider {
             let stripePurchaseFlow = DefaultStripePurchaseFlow(subscriptionEndpointService: subscriptionManager.subscriptionEndpointService,
                                                                authEndpointService: subscriptionManager.authEndpointService,
                                                                accountManager: subscriptionManager.accountManager)
-            let freemiumDBPPixelExperimentManager = FreemiumDBPPixelExperimentManager(subscriptionManager: subscriptionManager)
             let delegate = SubscriptionPagesUseSubscriptionFeature(subscriptionManager: subscriptionManager,
                                                                    stripePurchaseFlow: stripePurchaseFlow,
-                                                                   uiHandler: Application.appDelegate.subscriptionUIHandler,
-                                                                   freemiumDBPPixelExperimentManager: freemiumDBPPixelExperimentManager)
+                                                                   uiHandler: Application.appDelegate.subscriptionUIHandler)
             subscriptionPagesUserScript.registerSubfeature(delegate: delegate)
             userScripts.append(subscriptionPagesUserScript)
 

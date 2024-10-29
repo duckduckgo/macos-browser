@@ -222,11 +222,11 @@ enum GeneralPixel: PixelKitEventV2 {
     case passwordImportKeychainPromptDenied
 
     // Autocomplete
-    case autocompleteClickPhrase(from: NewTabPageSearchBoxExperiment.SearchSource?, cohort: NewTabPageSearchBoxExperiment.Cohort?, onboardingCohort: PixelExperiment?)
-    case autocompleteClickWebsite(from: NewTabPageSearchBoxExperiment.SearchSource?, cohort: NewTabPageSearchBoxExperiment.Cohort?, onboardingCohort: PixelExperiment?)
-    case autocompleteClickBookmark(from: NewTabPageSearchBoxExperiment.SearchSource?, cohort: NewTabPageSearchBoxExperiment.Cohort?, onboardingCohort: PixelExperiment?)
-    case autocompleteClickFavorite(from: NewTabPageSearchBoxExperiment.SearchSource?, cohort: NewTabPageSearchBoxExperiment.Cohort?, onboardingCohort: PixelExperiment?)
-    case autocompleteClickHistory(from: NewTabPageSearchBoxExperiment.SearchSource?, cohort: NewTabPageSearchBoxExperiment.Cohort?, onboardingCohort: PixelExperiment?)
+    case autocompleteClickPhrase
+    case autocompleteClickWebsite
+    case autocompleteClickBookmark
+    case autocompleteClickFavorite
+    case autocompleteClickHistory
     case autocompleteToggledOff
     case autocompleteToggledOn
 
@@ -328,7 +328,6 @@ enum GeneralPixel: PixelKitEventV2 {
     case adAttributionLogicWrongVendorOnFailedCompilation
 
     case webKitDidTerminate
-    case userViewedWebKitTerminationErrorPage
 
     case removedInvalidBookmarkManagedObjects
 
@@ -424,10 +423,6 @@ enum GeneralPixel: PixelKitEventV2 {
     case secureVaultKeystoreEventL2KeyPasswordMigration
 
     case compilationFailed
-
-    // MARK: error page shown
-    case errorPageShownOther
-    case errorPageShownWebkitTermination
 
     var name: String {
         switch self {
@@ -921,8 +916,6 @@ enum GeneralPixel: PixelKitEventV2 {
 
         case .webKitDidTerminate:
             return "webkit_did_terminate"
-        case .userViewedWebKitTerminationErrorPage:
-            return "webkit-termination-error-page-viewed"
 
         case .removedInvalidBookmarkManagedObjects:
             return "removed_invalid_bookmark_managed_objects"
@@ -1044,9 +1037,6 @@ enum GeneralPixel: PixelKitEventV2 {
         case .bookmarksSortByName: return "m_mac_sort_bookmarks_by_name"
         case .bookmarksSearchExecuted: return "m_mac_search_bookmarks_executed"
         case .bookmarksSearchResultClicked: return "m_mac_search_result_clicked"
-
-        case .errorPageShownOther: return "m_mac_errorpageshown_other"
-        case .errorPageShownWebkitTermination: return "m_mac_errorpageshown_webkittermination"
         }
     }
 
@@ -1216,22 +1206,6 @@ enum GeneralPixel: PixelKitEventV2 {
                 .bookmarksSearchResultClicked(let origin):
             return ["origin": origin]
 
-        case .autocompleteClickPhrase(let from, let cohort, let onboardingCohort),
-                .autocompleteClickWebsite(let from, let cohort, let onboardingCohort),
-                .autocompleteClickBookmark(let from, let cohort, let onboardingCohort),
-                .autocompleteClickFavorite(let from, let cohort, let onboardingCohort),
-                .autocompleteClickHistory(let from, let cohort, let onboardingCohort):
-            var parameters: [String: String] = [:]
-            if let from {
-                parameters[NewTabSearchBoxExperimentPixel.Parameters.from] = from.rawValue
-            }
-            if let cohort {
-                parameters[NewTabSearchBoxExperimentPixel.Parameters.cohort] = cohort.rawValue
-            }
-            if let onboardingCohort {
-                parameters[NewTabSearchBoxExperimentPixel.Parameters.onboardingCohort] = onboardingCohort.rawValue
-            }
-            return parameters
         default: return nil
         }
     }

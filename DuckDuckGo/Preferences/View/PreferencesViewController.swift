@@ -17,7 +17,6 @@
 //
 
 import AppKit
-import BrowserServicesKit
 import SwiftUI
 import SwiftUIExtensions
 import Combine
@@ -29,23 +28,14 @@ final class PreferencesViewController: NSViewController {
     weak var delegate: BrowserTabSelectionDelegate?
 
     let model: PreferencesSidebarModel
-    let tabCollectionViewModel: TabCollectionViewModel
-    let privacyConfigurationManager: PrivacyConfigurationManaging
     private var selectedTabContentCancellable: AnyCancellable?
     private var selectedPreferencePaneCancellable: AnyCancellable?
 
     private var bitwardenManager: BWManagement = BWManager.shared
 
-    init(
-        syncService: DDGSyncing,
-        duckPlayer: DuckPlayer = DuckPlayer.shared,
-        tabCollectionViewModel: TabCollectionViewModel,
-        privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
-        aiChatRemoteSettings: AIChatRemoteSettingsProvider = AIChatRemoteSettings()
-    ) {
-        self.tabCollectionViewModel = tabCollectionViewModel
-        self.privacyConfigurationManager = privacyConfigurationManager
-
+    init(syncService: DDGSyncing,
+         duckPlayer: DuckPlayer = DuckPlayer.shared,
+         aiChatRemoteSettings: AIChatRemoteSettingsProvider = AIChatRemoteSettings()) {
         model = PreferencesSidebarModel(syncService: syncService,
                                         vpnGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: Application.appDelegate.subscriptionManager),
                                         includeDuckPlayer: duckPlayer.shouldDisplayPreferencesSideBar,
@@ -64,13 +54,7 @@ final class PreferencesViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let addressBarModel = HomePage.Models.AddressBarModel(
-            tabCollectionViewModel: tabCollectionViewModel,
-            privacyConfigurationManager: privacyConfigurationManager
-        )
-
         let prefRootView = Preferences.RootView(model: model,
-                                                addressBarModel: addressBarModel,
                                                 subscriptionManager: Application.appDelegate.subscriptionManager,
                                                 subscriptionUIHandler: Application.appDelegate.subscriptionUIHandler)
         let host = NSHostingView(rootView: prefRootView)

@@ -41,13 +41,10 @@ class MockAppearancePreferencesPersistor: AppearancePreferencesPersistor {
 
     var isRecentActivityVisible: Bool = true
 
-    var isSearchBarVisible: Bool = true
-
     var showBookmarksBar: Bool = false
 
     var bookmarksBarAppearance: BookmarksBarAppearance = .alwaysOn
 
     var centerAlignedBookmarksBar: Bool = false
 
-    var didDismissHomePagePromotion = true
 }

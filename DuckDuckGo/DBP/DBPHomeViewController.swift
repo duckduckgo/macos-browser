@@ -34,7 +34,6 @@ final class DBPHomeViewController: NSViewController {
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()
     private var currentChildViewController: NSViewController?
     private var observer: NSObjectProtocol?
-    private var freemiumDBPFeature: FreemiumDBPFeature
 
     private let prerequisiteVerifier: DataBrokerPrerequisitesStatusVerifier
     private lazy var errorViewController: DataBrokerProtectionErrorViewController = {
@@ -71,12 +70,9 @@ final class DBPHomeViewController: NSViewController {
             })
     }()
 
-    init(dataBrokerProtectionManager: DataBrokerProtectionManager,
-         prerequisiteVerifier: DataBrokerPrerequisitesStatusVerifier = DefaultDataBrokerPrerequisitesStatusVerifier(),
-         freemiumDBPFeature: FreemiumDBPFeature) {
+    init(dataBrokerProtectionManager: DataBrokerProtectionManager, prerequisiteVerifier: DataBrokerPrerequisitesStatusVerifier = DefaultDataBrokerPrerequisitesStatusVerifier()) {
         self.dataBrokerProtectionManager = dataBrokerProtectionManager
         self.prerequisiteVerifier = prerequisiteVerifier
-        self.freemiumDBPFeature = freemiumDBPFeature
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -98,7 +94,7 @@ final class DBPHomeViewController: NSViewController {
     override func viewDidAppear() {
         super.viewDidAppear()
 
-        if !dataBrokerProtectionManager.isUserAuthenticated() && !freemiumDBPFeature.isAvailable {
+        if !dataBrokerProtectionManager.isUserAuthenticated() {
             assertionFailure("This UI should never be presented if the user is not authenticated")
             closeUI()
         }

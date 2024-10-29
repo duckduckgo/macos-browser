@@ -58,7 +58,25 @@ struct Step: Codable, Sendable {
         try container.encode(optOutType, forKey: .optOutType)
 
         var actionsContainer = container.nestedUnkeyedContainer(forKey: .actions)
-        try actions.encode(to: &actionsContainer)
+        for action in actions {
+            if let navigateAction = action as? NavigateAction {
+                try actionsContainer.encode(navigateAction)
+            } else if let extractAction = action as? ExtractAction {
+                try actionsContainer.encode(extractAction)
+            } else if let fillFormAction = action as? FillFormAction {
+                try actionsContainer.encode(fillFormAction)
+            } else if let getCaptchaInfoAction = action as? GetCaptchaInfoAction {
+                try actionsContainer.encode(getCaptchaInfoAction)
+            } else if let solveCaptchaInfoAction = action as? SolveCaptchaAction {
+                try actionsContainer.encode(solveCaptchaInfoAction)
+            } else if let emailConfirmationAction = action as? EmailConfirmationAction {
+                try actionsContainer.encode(emailConfirmationAction)
+            } else if let clickAction = action as? ClickAction {
+                try actionsContainer.encode(clickAction)
+            } else if let expectactionAction = action as? ExpectationAction {
+                try actionsContainer.encode(expectactionAction)
+            }
+        }
     }
 
     static func parse(_ actions: [[String: Any]]) throws -> [Action] {
@@ -100,29 +118,5 @@ struct Step: Codable, Sendable {
         }
 
         return actionList
-    }
-}
-
-extension Array where Element == Action {
-    func encode(to container: inout any UnkeyedEncodingContainer) throws {
-        for action in self {
-            if let navigateAction = action as? NavigateAction {
-                try container.encode(navigateAction)
-            } else if let extractAction = action as? ExtractAction {
-                try container.encode(extractAction)
-            } else if let fillFormAction = action as? FillFormAction {
-                try container.encode(fillFormAction)
-            } else if let getCaptchaInfoAction = action as? GetCaptchaInfoAction {
-                try container.encode(getCaptchaInfoAction)
-            } else if let solveCaptchaInfoAction = action as? SolveCaptchaAction {
-                try container.encode(solveCaptchaInfoAction)
-            } else if let emailConfirmationAction = action as? EmailConfirmationAction {
-                try container.encode(emailConfirmationAction)
-            } else if let clickAction = action as? ClickAction {
-                try container.encode(clickAction)
-            } else if let expectactionAction = action as? ExpectationAction {
-                try container.encode(expectactionAction)
-            }
-        }
     }
 }

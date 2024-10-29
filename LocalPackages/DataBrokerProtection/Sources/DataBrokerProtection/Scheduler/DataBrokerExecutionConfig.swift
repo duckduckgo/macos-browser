@@ -26,9 +26,9 @@ public struct DataBrokerExecutionConfig {
     private let concurrentOperationsOnManualScans: Int = 6
     func concurrentOperationsFor(_ operation: OperationType) -> Int {
         switch operation {
-        case .all, .optOut, .scheduledScan:
+        case .all, .optOut:
             return concurrentOperationsDifferentBrokers
-        case .manualScan:
+        case .scan:
             return concurrentOperationsOnManualScans
         }
     }

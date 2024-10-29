@@ -103,46 +103,6 @@ final class DataImportViewModelTests: XCTestCase {
         await fulfillment(of: [e2, eDismissed], timeout: 0)
     }
 
-    func testWhenImportSummaryCompletesWithErrorsThenHasSummaryErrorsShouldReturnTrue() async throws {
-        // GIVEN
-        for source in Source.allCases where source.initialScreen == .profileAndDataTypesPicker {
-            // GIVEN
-            let browser = try XCTUnwrap(ThirdPartyBrowser.browser(for: source))
-            for dataType in DataType.allCases {
-                setupModel(with: source, profiles: [BrowserProfile.test])
-                try await initiateImport(of: source.supportedDataTypes, from: .test(for: browser), resultingWith: [
-                    dataType: .failure(Failure(.bookmarks, DataImport.ErrorType.dataCorrupted))
-                ])
-
-                // WHEN
-                let result = model.hasAnySummaryError
-
-                // THEN
-                XCTAssertTrue(result)
-            }
-        }
-    }
-
-    func testWhenImportSummaryCompletesWithoutErrorsThenHasSummaryErrorsShouldReturnFalse() async throws {
-        // GIVEN
-        for source in Source.allCases where source.initialScreen == .profileAndDataTypesPicker {
-            // GIVEN
-            let browser = try XCTUnwrap(ThirdPartyBrowser.browser(for: source))
-            for dataType in DataType.allCases {
-                setupModel(with: source, profiles: [BrowserProfile.test, BrowserProfile.default, BrowserProfile.test2])
-                try await initiateImport(of: source.supportedDataTypes, from: .test(for: browser), resultingWith: [
-                    dataType: .success(.init(successful: 10, duplicate: 0, failed: 1))
-                ])
-
-                // WHEN
-                let result = model.hasAnySummaryError
-
-                // THEN
-                XCTAssertFalse(result)
-            }
-        }
-    }
-
     // MARK: - Browser profiles
 
     func testWhenNoProfilesAreLoaded_selectedProfileIsNil() {

@@ -1,10 +1,9 @@
 {
   "name": "Veripages",
   "url": "veripages.com",
-  "version": "0.3.0",
+  "version": "0.2.0",
   "parent": "verecor.com",
   "addedDatetime": 1691989200000,
-  "optOutUrl": "https://veripages.com/inner/control/privacy",
   "steps": [
     {
       "stepType": "scan",

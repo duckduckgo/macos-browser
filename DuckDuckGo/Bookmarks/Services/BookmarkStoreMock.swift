@@ -21,7 +21,7 @@
 import Bookmarks
 import Foundation
 
-final class BookmarkStoreMock: BookmarkStore, CustomDebugStringConvertible {
+final class BookmarkStoreMock: BookmarkStore {
 
     private let store: LocalBookmarkStore?
 
@@ -265,10 +265,6 @@ final class BookmarkStoreMock: BookmarkStore, CustomDebugStringConvertible {
         var bookmarkEntityParent: (any BookmarkEntityProtocol)? {
             parent()
         }
-    }
-
-    var debugDescription: String {
-        return "<\(type(of: self)) \(Unmanaged.passUnretained(self).toOpaque()): \(store.map { "\($0)" } ?? "<nil>")>"
     }
 }
 

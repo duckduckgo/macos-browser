@@ -265,8 +265,6 @@ final class BookmarkListViewController: NSViewController {
         scrollView.drawsBackground = false
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.hasHorizontalScroller = false
-        scrollView.hasVerticalScroller = true
-        scrollView.scrollerStyle = .overlay
         scrollView.usesPredominantAxisScrolling = false
         scrollView.autohidesScrollers = true
         scrollView.automaticallyAdjustsContentInsets = false

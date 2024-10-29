@@ -59,16 +59,6 @@ extension KeyedDecodingContainer {
         return try decode(type, forKey: key)
     }
 
-    func decodeIfPresent(_ type: [[String: Any]].Type, forKey key: K) throws -> [[String: Any]]? {
-        guard contains(key) else {
-            return nil
-        }
-        guard try decodeNil(forKey: key) == false else {
-            return nil
-        }
-        return try decode(type, forKey: key)
-    }
-
     func decode(_ type: [Any].Type, forKey key: K) throws -> [Any] {
         var container = try self.nestedUnkeyedContainer(forKey: key)
         return try container.decode(type)

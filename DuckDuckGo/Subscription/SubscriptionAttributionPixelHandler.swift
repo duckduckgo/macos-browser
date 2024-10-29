@@ -27,11 +27,6 @@ protocol SubscriptionAttributionPixelHandler: AnyObject {
 // MARK: - SubscriptionAttributionPixelHandler
 
 final class PrivacyProSubscriptionAttributionPixelHandler: SubscriptionAttributionPixelHandler {
-
-    enum Consts {
-        static let freemiumOrigin = "funnel_pro_mac_freemium"
-    }
-
     var origin: String?
     private let decoratedAttributionPixelHandler: AttributionPixelHandler
 

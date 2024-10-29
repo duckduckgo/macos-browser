@@ -39,8 +39,7 @@ struct DefaultDataBrokerOperationDependencies: DataBrokerOperationDependencies {
 }
 
 enum OperationType {
-    case manualScan
-    case scheduledScan
+    case scan
     case optOut
     case all
 }
@@ -121,7 +120,7 @@ class DataBrokerOperation: Operation, @unchecked Sendable {
         switch operationType {
         case .optOut:
             operationsData = brokerProfileQueriesData.flatMap { $0.optOutJobData }
-        case .manualScan, .scheduledScan:
+        case .scan:
             operationsData = brokerProfileQueriesData.filter { $0.profileQuery.deprecated == false }.compactMap { $0.scanJobData }
         case .all:
             operationsData = brokerProfileQueriesData.flatMap { $0.operationsData }
@@ -181,7 +180,7 @@ class DataBrokerOperation: Operation, @unchecked Sendable {
                                                                                 runner: operationDependencies.runnerProvider.getJobRunner(),
                                                                                 pixelHandler: operationDependencies.pixelHandler,
                                                                                 showWebView: showWebView,
-                                                                                isImmediateOperation: operationType == .manualScan,
+                                                                                isImmediateOperation: operationType == .scan,
                                                                                 userNotificationService: operationDependencies.userNotificationService,
                                                                                 shouldRunNextStep: { [weak self] in
                     guard let self = self else { return false }

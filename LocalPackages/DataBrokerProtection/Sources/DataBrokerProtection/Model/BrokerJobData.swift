@@ -67,7 +67,7 @@ struct ScanJobData: BrokerJobData, Sendable {
     }
 }
 
-public struct OptOutJobData: BrokerJobData, Sendable {
+struct OptOutJobData: BrokerJobData, Sendable {
     let brokerId: Int64
     let profileQueryId: Int64
     let createdDate: Date

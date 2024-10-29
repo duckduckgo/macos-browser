@@ -20,30 +20,26 @@ import Cocoa
 import Combine
 import Lottie
 
-final class AddressBarViewController: NSViewController, ObservableObject {
+final class AddressBarViewController: NSViewController {
 
     @IBOutlet var addressBarTextField: AddressBarTextField!
     @IBOutlet var passiveTextField: NSTextField!
     @IBOutlet var inactiveBackgroundView: NSView!
     @IBOutlet var activeBackgroundView: ColorView!
-    @IBOutlet var activeOuterBorderView: ColorView!
-    @IBOutlet var activeBackgroundViewWithSuggestions: ColorView!
-    @IBOutlet var innerBorderView: ColorView!
+    @IBOutlet var activeOuterBorderView: NSView!
+    @IBOutlet var activeBackgroundViewWithSuggestions: NSView!
     @IBOutlet var progressIndicator: LoadingProgressView!
     @IBOutlet var passiveTextFieldMinXConstraint: NSLayoutConstraint!
     @IBOutlet var activeTextFieldMinXConstraint: NSLayoutConstraint!
-    @IBOutlet var buttonsContainerView: NSView!
     private static let defaultActiveTextFieldMinX: CGFloat = 40
 
-    private let popovers: NavigationBarPopovers?
-    var addressBarButtonsViewController: AddressBarButtonsViewController?
+    private let popovers: NavigationBarPopovers
+    private(set) var addressBarButtonsViewController: AddressBarButtonsViewController?
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private var tabViewModel: TabViewModel?
     private let suggestionContainerViewModel: SuggestionContainerViewModel
     private let isBurner: Bool
-    private let onboardingPixelReporter: OnboardingAddressBarReporting
-    let isSearchBox: Bool
 
     enum Mode: Equatable {
         case editing(isUrl: Bool)
@@ -86,12 +82,7 @@ final class AddressBarViewController: NSViewController, ObservableObject {
         fatalError("AddressBarViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder,
-          tabCollectionViewModel: TabCollectionViewModel,
-          isBurner: Bool,
-          popovers: NavigationBarPopovers?,
-          isSearchBox: Bool = false,
-          onboardingPixelReporter: OnboardingAddressBarReporting = OnboardingPixelReporter()) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, popovers: NavigationBarPopovers) {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.popovers = popovers
         self.suggestionContainerViewModel = SuggestionContainerViewModel(
@@ -99,8 +90,6 @@ final class AddressBarViewController: NSViewController, ObservableObject {
             isBurner: isBurner,
             suggestionContainer: SuggestionContainer())
         self.isBurner = isBurner
-        self.onboardingPixelReporter = onboardingPixelReporter
-        self.isSearchBox = isSearchBox
 
         super.init(coder: coder)
     }
@@ -111,7 +100,6 @@ final class AddressBarViewController: NSViewController, ObservableObject {
         view.wantsLayer = true
         view.layer?.masksToBounds = false
 
-        addressBarTextField.isSearchBox = isSearchBox
         addressBarTextField.placeholderString = UserText.addressBarPlaceholder
         addressBarTextField.setAccessibilityIdentifier("AddressBarViewController.addressBarTextField")
 
@@ -119,7 +107,6 @@ final class AddressBarViewController: NSViewController, ObservableObject {
         // only activate active text field leading constraint on its appearance to avoid constraint conflicts
         activeTextFieldMinXConstraint.isActive = false
         addressBarTextField.tabCollectionViewModel = tabCollectionViewModel
-        addressBarTextField.onboardingDelegate = onboardingPixelReporter
     }
 
     override func viewWillAppear() {
@@ -134,7 +121,6 @@ final class AddressBarViewController: NSViewController, ObservableObject {
             addressBarTextField.suggestionContainerViewModel = suggestionContainerViewModel
 
             registerForMouseEnteredAndExitedEvents()
-            refreshAddressBarAppearance(self)
 
             NotificationCenter.default.addObserver(self,
                                                    selector: #selector(refreshAddressBarAppearance(_:)),
@@ -158,8 +144,10 @@ final class AddressBarViewController: NSViewController, ObservableObject {
         }
         subscribeToSelectedTabViewModel()
         subscribeToAddressBarValue()
+        registerForMouseEnteredAndExitedEvents()
         subscribeToButtonsWidth()
         subscribeForShadowViewUpdates()
+
     }
 
     // swiftlint:disable notification_center_detachment
@@ -304,16 +292,10 @@ final class AddressBarViewController: NSViewController, ObservableObject {
             .store(in: &cancellables)
     }
 
-    @Published var isSuggestionsWindowVisible: Bool = false
-
     private func subscribeForShadowViewUpdates() {
         addressBarTextField.isSuggestionWindowVisiblePublisher
             .sink { [weak self] isSuggestionsWindowVisible in
-                self?.isSuggestionsWindowVisible = isSuggestionsWindowVisible
                 self?.updateShadowView(isSuggestionsWindowVisible)
-                if isSuggestionsWindowVisible {
-                    self?.layoutShadowView()
-                }
             }
             .store(in: &cancellables)
 
@@ -329,33 +311,19 @@ final class AddressBarViewController: NSViewController, ObservableObject {
     }
 
     private func updateView() {
-        let isFirstResponderOrBigSearchBox = isFirstResponder || isSearchBox
-
-        let isPassiveTextFieldHidden = isFirstResponderOrBigSearchBox || mode.isEditing
+        let isPassiveTextFieldHidden = isFirstResponder || mode.isEditing
         addressBarTextField.alphaValue = isPassiveTextFieldHidden ? 1 : 0
         passiveTextField.alphaValue = isPassiveTextFieldHidden ? 0 : 1
 
-        updateShadowViewPresence(isFirstResponderOrBigSearchBox)
-        inactiveBackgroundView.alphaValue = isFirstResponderOrBigSearchBox ? 0 : 1
-        activeBackgroundView.alphaValue = isFirstResponderOrBigSearchBox ? 1 : 0
+        updateShadowViewPresence(isFirstResponder)
+        inactiveBackgroundView.alphaValue = isFirstResponder ? 0 : 1
+        activeBackgroundView.alphaValue = isFirstResponder ? 1 : 0
 
-        let isKey = self.view.window?.isKeyWindow == true
+        let isKey = self.view.window?.isKeyWindow ?? false
+        activeOuterBorderView.alphaValue = isKey && isFirstResponder && isHomePage ? 1 : 0
 
-        if isSearchBox {
-            let appearance = addressBarTextField.homePagePreferredAppearance ?? NSApp.effectiveAppearance
-
-            appearance.performAsCurrentDrawingAppearance {
-                activeOuterBorderView.alphaValue = isKey && isFirstResponder ? 1 : 0
-                activeOuterBorderView.backgroundColor = accentColor.withAlphaComponent(0.2)
-                activeBackgroundView.borderWidth = 1.0
-                activeBackgroundView.borderColor = isKey && isFirstResponder ? accentColor.withAlphaComponent(0.8) : NSColor.homePageAddressBarBorder
-                activeBackgroundView.backgroundColor = NSColor.homePageAddressBarBackground
-            }
-        } else {
-            activeOuterBorderView.alphaValue = isKey && isFirstResponder && isHomePage ? 1 : 0
-            activeOuterBorderView.backgroundColor = accentColor.withAlphaComponent(0.2)
-            activeBackgroundView.borderColor = accentColor.withAlphaComponent(0.8)
-        }
+        activeOuterBorderView.layer?.backgroundColor = accentColor.withAlphaComponent(0.2).cgColor
+        activeBackgroundView.borderColor = accentColor.withAlphaComponent(0.8)
 
         addressBarTextField.placeholderString = tabViewModel?.tab.content == .newtab ? UserText.addressBarPlaceholder : ""
     }
@@ -380,9 +348,6 @@ final class AddressBarViewController: NSViewController, ObservableObject {
         activeOuterBorderView.isHidden = isSuggestionsWindowVisible
         activeBackgroundView.isHidden = isSuggestionsWindowVisible
         activeBackgroundViewWithSuggestions.isHidden = !isSuggestionsWindowVisible
-        if isSearchBox {
-            innerBorderView.isHidden = true
-        }
     }
 
     private func layoutShadowView() {
@@ -411,32 +376,19 @@ final class AddressBarViewController: NSViewController, ObservableObject {
 
         guard let window = view.window, NSApp.runType != .unitTests else { return }
 
-        if isSearchBox {
-            let appearance = addressBarTextField.homePagePreferredAppearance ?? NSApp.effectiveAppearance
+        NSAppearance.withAppAppearance {
+            if window.isKeyWindow {
+                activeBackgroundView.layer?.borderWidth = 2.0
+                activeBackgroundView.layer?.borderColor = accentColor.withAlphaComponent(0.6).cgColor
+                activeBackgroundView.layer?.backgroundColor = NSColor.addressBarBackground.cgColor
 
-            appearance.performAsCurrentDrawingAppearance {
-                activeBackgroundView.borderWidth = 1.0
-                activeBackgroundView.borderColor = NSColor.homePageAddressBarBorder
-                activeBackgroundView.backgroundColor = NSColor.homePageAddressBarBackground
-                activeBackgroundViewWithSuggestions.borderColor = NSColor.homePageAddressBarBorder
-                activeBackgroundViewWithSuggestions.backgroundColor = NSColor.homePageAddressBarBackground
-            }
+                activeOuterBorderView.isHidden = !isHomePage
+            } else {
+                activeBackgroundView.layer?.borderWidth = 0
+                activeBackgroundView.layer?.borderColor = nil
+                activeBackgroundView.layer?.backgroundColor = NSColor.inactiveSearchBarBackground.cgColor
 
-        } else {
-            NSAppearance.withAppAppearance {
-                if window.isKeyWindow {
-                    activeBackgroundView.borderWidth = 2.0
-                    activeBackgroundView.borderColor = accentColor.withAlphaComponent(0.6)
-                    activeBackgroundView.backgroundColor = NSColor.addressBarBackground
-
-                    activeOuterBorderView.isHidden = !isHomePage
-                } else {
-                    activeBackgroundView.borderWidth = 0
-                    activeBackgroundView.borderColor = nil
-                    activeBackgroundView.backgroundColor = NSColor.inactiveSearchBarBackground
-
-                    activeOuterBorderView.isHidden = true
-                }
+                activeOuterBorderView.isHidden = true
             }
         }
     }

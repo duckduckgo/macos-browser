@@ -299,17 +299,24 @@ struct OnboardingSecondaryCTAButton: View {
 // MARK: - Preview
 
 #Preview("Try Search") {
-    OnboardingTrySearchDialog(viewModel: OnboardingSearchSuggestionsViewModel(suggestedSearchesProvider: OnboardingSuggestedSearchesProvider(), pixelReporter: OnboardingPixelReporter(onboardingStateProvider: ContextualOnboardingStateMachine())))
+    OnboardingTrySearchDialog(viewModel: OnboardingSearchSuggestionsViewModel(suggestedSearchesProvider: OnboardingSuggestedSearchesProvider(), pixelReporter: OnboardingPixelReporter()))
         .padding()
 }
 
+final class OnboardingPixelReporter: OnboardingSearchSuggestionsPixelReporting, OnboardingSiteSuggestionsPixelReporting {
+    func trackSiteSuggetionOptionTapped() {
+    }
+    func trackSearchSuggetionOptionTapped() {
+    }
+}
+
 #Preview("Try Site") {
-    OnboardingTryVisitingSiteDialog(viewModel: OnboardingSiteSuggestionsViewModel(title: "", suggestedSitesProvider: OnboardingSuggestedSitesProvider(surpriseItemTitle: UserText.ContextualOnboarding.tryASearchOptionSurpriseMeTitle), pixelReporter: OnboardingPixelReporter(onboardingStateProvider: ContextualOnboardingStateMachine())))
+    OnboardingTryVisitingSiteDialog(viewModel: OnboardingSiteSuggestionsViewModel(title: "", suggestedSitesProvider: OnboardingSuggestedSitesProvider(surpriseItemTitle: UserText.ContextualOnboarding.tryASearchOptionSurpriseMeTitle), pixelReporter: OnboardingPixelReporter()))
         .padding()
 }
 
 #Preview("First Search Dialog") {
-    OnboardingFirstSearchDoneDialog(shouldFollowUp: true, viewModel: OnboardingSiteSuggestionsViewModel(title: UserText.ContextualOnboarding.onboardingTryASiteTitle, suggestedSitesProvider: OnboardingSuggestedSitesProvider(surpriseItemTitle: UserText.ContextualOnboarding.tryASearchOptionSurpriseMeTitle), pixelReporter: OnboardingPixelReporter(onboardingStateProvider: ContextualOnboardingStateMachine())), gotItAction: {})
+    OnboardingFirstSearchDoneDialog(shouldFollowUp: true, viewModel: OnboardingSiteSuggestionsViewModel(title: UserText.ContextualOnboarding.onboardingTryASiteTitle, suggestedSitesProvider: OnboardingSuggestedSitesProvider(surpriseItemTitle: UserText.ContextualOnboarding.tryASearchOptionSurpriseMeTitle), pixelReporter: OnboardingPixelReporter()), gotItAction: {})
         .padding()
 }
 

@@ -1,10 +1,9 @@
 {
   "name": "Virtory",
   "url": "virtory.com",
-  "version": "0.3.0",
+  "version": "0.2.0",
   "parent": "verecor.com",
   "addedDatetime": 1703052000000,
-  "optOutUrl": "https://virtory.com/prvt/control/privacy",
   "steps": [
     {
       "stepType": "scan",

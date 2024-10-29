@@ -21,14 +21,7 @@ import Foundation
 
 class CapturingOnboardingActionsManager: OnboardingActionsManaging {
 
-    var configuration: OnboardingConfiguration = OnboardingConfiguration(
-        stepDefinitions: StepDefinitions(systemSettings: SystemSettings(rows: [])),
-        exclude: [],
-        order: "",
-        env: "environment",
-        locale: "en",
-        platform: .init(name: "")
-    )
+    var configuration: OnboardingConfiguration = OnboardingConfiguration(stepDefinitions: StepDefinitions(systemSettings: SystemSettings(rows: [])), env: "environment", locale: "en")
 
     var goToAddressBarCalled = false
     var goToSettingsCalled = false

@@ -29,23 +29,21 @@ final class PopoverMessageViewController: NSHostingController<PopoverMessageView
 
     let viewModel: PopoverMessageViewModel
     let onDismiss: (() -> Void)?
-    let autoDismissDuration: TimeInterval?
+    let autoDismissDuration: TimeInterval
     let onClick: (() -> Void)?
     private var timer: Timer?
     private var trackingArea: NSTrackingArea?
 
-    init(title: String? = nil,
-         message: String,
+    init(message: String,
          image: NSImage? = nil,
          buttonText: String? = nil,
          buttonAction: (() -> Void)? = nil,
          shouldShowCloseButton: Bool = false,
          presentMultiline: Bool = false,
-         autoDismissDuration: TimeInterval? = Constants.autoDismissDuration,
+         autoDismissDuration: TimeInterval = Constants.autoDismissDuration,
          onDismiss: (() -> Void)? = nil,
          onClick: (() -> Void)? = nil) {
-        self.viewModel = PopoverMessageViewModel(title: title,
-                                                 message: message,
+        self.viewModel = PopoverMessageViewModel(message: message,
                                                  image: image,
                                                  buttonText: buttonText,
                                                  buttonAction: buttonAction,
@@ -78,20 +76,18 @@ final class PopoverMessageViewController: NSHostingController<PopoverMessageView
         scheduleAutoDismissTimer()
     }
 
-    func show(onParent parent: NSViewController, rect: NSRect, of view: NSView, preferredEdge: NSRectEdge = .maxY) {
+    func show(onParent parent: NSViewController, rect: NSRect, of view: NSView) {
         // Set the content size to match the SwiftUI view's intrinsic size
         self.preferredContentSize = self.view.fittingSize
-        // For shorter strings, the positioning can be off unless the width is set a second time
-        self.preferredContentSize.width = self.view.fittingSize.width
 
         parent.present(self,
                        asPopoverRelativeTo: rect,
                        of: view,
-                       preferredEdge: preferredEdge,
+                       preferredEdge: .maxY,
                        behavior: .applicationDefined)
     }
 
-    func show(onParent parent: NSViewController, relativeTo view: NSView, preferredEdge: NSRectEdge = .maxY) {
+    func show(onParent parent: NSViewController, relativeTo view: NSView) {
         // Set the content size to match the SwiftUI view's intrinsic size
         self.preferredContentSize = self.view.fittingSize
         // For shorter strings, the positioning can be off unless the width is set a second time
@@ -100,7 +96,7 @@ final class PopoverMessageViewController: NSHostingController<PopoverMessageView
         parent.present(self,
                        asPopoverRelativeTo: self.view.bounds,
                        of: view,
-                       preferredEdge: preferredEdge,
+                       preferredEdge: .maxY,
                        behavior: .applicationDefined)
     }
 
@@ -112,11 +108,9 @@ final class PopoverMessageViewController: NSHostingController<PopoverMessageView
 
     private func scheduleAutoDismissTimer() {
         cancelAutoDismissTimer()
-        if let autoDismissDuration {
-            timer = Timer.scheduledTimer(withTimeInterval: autoDismissDuration, repeats: false) { [weak self] _ in
-                guard let self = self else { return }
-                self.presentingViewController?.dismiss(self)
-            }
+        timer = Timer.scheduledTimer(withTimeInterval: autoDismissDuration, repeats: false) { [weak self] _ in
+            guard let self = self else { return }
+            self.presentingViewController?.dismiss(self)
         }
     }
 

@@ -21,7 +21,7 @@ import Common
 import SecureStorage
 import os.log
 
-public protocol DataBrokerProtectionRepository {
+protocol DataBrokerProtectionRepository {
     func save(_ profile: DataBrokerProtectionProfile) async throws
     func fetchProfile() throws -> DataBrokerProtectionProfile?
     func deleteProfileData() throws

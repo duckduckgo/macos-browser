@@ -28,7 +28,6 @@ import PixelKit
 
 public extension Notification.Name {
     static let subscriptionPageCloseAndOpenPreferences = Notification.Name("com.duckduckgo.subscriptionPage.CloseAndOpenPreferences")
-    static let subscriptionUpgradeFromFreemium = Notification.Name("com.duckduckgo.subscriptionPage.UpgradeFromFreemium")
 }
 
 /// The user script that will be the broker for all subscription features

@@ -354,7 +354,7 @@ final class LocalBookmarkStore: BookmarkStore {
             let fetchResults = (try? context.fetch(fetchRequest)) ?? []
 
             if fetchResults.count != identifiers.count {
-                assertionFailure("\(self): Fetched bookmark entities \(fetchResults) didn't match the number of provided UUIDs \(identifiers)")
+                assertionFailure("\(#file): Fetched bookmark entities didn't match the number of provided UUIDs")
             }
 
             for object in fetchResults {
@@ -1107,6 +1107,7 @@ final class LocalBookmarkStore: BookmarkStore {
     }
 
     private func parent(for entity: BaseBookmarkEntity, in context: NSManagedObjectContext) throws -> BookmarkEntity {
+        let parentEntity: BookmarkEntity
         if let parentId = entity.parentFolderUUID, parentId != PseudoFolder.bookmarks.id, parentId != "bookmarks_root",
            let parentFetchRequestResult = try? context.fetch(BaseBookmarkEntity.singleEntity(with: parentId)).first {
             return parentFetchRequestResult

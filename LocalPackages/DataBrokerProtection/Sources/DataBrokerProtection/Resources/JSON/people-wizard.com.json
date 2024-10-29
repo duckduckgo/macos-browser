@@ -1,10 +1,9 @@
 {
   "name": "People-Wizard.com",
   "url": "people-wizard.com",
-  "version": "0.3.0",
+  "version": "0.2.0",
   "parent": "peoplewhiz.com",
   "addedDatetime": 1709445600000,
-  "optOutUrl": "https://people-wizard.com/optout",
   "steps": [
     {
       "stepType": "scan",

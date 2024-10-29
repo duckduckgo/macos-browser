@@ -26,7 +26,6 @@ import Subscription
 import PixelKit
 import os.log
 import Onboarding
-import Freemium
 
 protocol BrowserTabViewControllerDelegate: AnyObject {
     func highlightFireButton()
@@ -164,7 +163,43 @@ final class BrowserTabViewController: NSViewController {
     override func viewDidAppear() {
         super.viewDidAppear()
 
-        subscribeToNotifications()
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(windowWillClose(_:)),
+                                               name: NSWindow.willCloseNotification,
+                                               object: self.view.window)
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onDuckDuckGoEmailIncontextSignup),
+                                               name: .emailDidIncontextSignup,
+                                               object: nil)
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onCloseDuckDuckGoEmailProtection),
+                                               name: .emailDidCloseEmailProtection,
+                                               object: nil)
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onPasswordImportFlowFinish),
+                                               name: .passwordImportDidCloseImportDialog,
+                                               object: nil)
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onDBPFeatureDisabled),
+                                               name: .dbpWasDisabled,
+                                               object: nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onCloseDataBrokerProtection),
+                                               name: .dbpDidClose,
+                                               object: nil)
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onCloseSubscriptionPage),
+                                               name: .subscriptionPageCloseAndOpenPreferences,
+                                               object: nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onSubscriptionAccountDidSignOut),
+                                               name: .accountDidSignOut,
+                                               object: nil)
     }
 
     @objc
@@ -266,13 +301,6 @@ final class BrowserTabViewController: NSViewController {
         }
     }
 
-    @objc
-    private func onSubscriptionUpgradeFromFreemium(_ notification: Notification) {
-        Task { @MainActor in
-            tabCollectionViewModel.removeAll(with: .dataBrokerProtection)
-        }
-    }
-
     private func subscribeToSelectedTabViewModel() {
         tabCollectionViewModel.$selectedTabViewModel
             .sink { [weak self] selectedTabViewModel in
@@ -306,50 +334,6 @@ final class BrowserTabViewController: NSViewController {
     private func subscribeToPinnedTabs() {
         pinnedTabsDelegatesCancellable = tabCollectionViewModel.pinnedTabsCollection?.$tabs
             .sink(receiveValue: setDelegate())
-    }
-
-    private func subscribeToNotifications() {
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(windowWillClose(_:)),
-                                               name: NSWindow.willCloseNotification,
-                                               object: self.view.window)
-
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(onDuckDuckGoEmailIncontextSignup),
-                                               name: .emailDidIncontextSignup,
-                                               object: nil)
-
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(onCloseDuckDuckGoEmailProtection),
-                                               name: .emailDidCloseEmailProtection,
-                                               object: nil)
-
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(onPasswordImportFlowFinish),
-                                               name: .passwordImportDidCloseImportDialog,
-                                               object: nil)
-
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(onDBPFeatureDisabled),
-                                               name: .dbpWasDisabled,
-                                               object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(onCloseDataBrokerProtection),
-                                               name: .dbpDidClose,
-                                               object: nil)
-
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(onCloseSubscriptionPage),
-                                               name: .subscriptionPageCloseAndOpenPreferences,
-                                               object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(onSubscriptionAccountDidSignOut),
-                                               name: .accountDidSignOut,
-                                               object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(onSubscriptionUpgradeFromFreemium),
-                                               name: .subscriptionUpgradeFromFreemium,
-                                               object: nil)
     }
 
     private func removeDataBrokerViewIfNecessary() -> ([Tab]) -> Void {
@@ -421,12 +405,9 @@ final class BrowserTabViewController: NSViewController {
         ])
         containerStackView.addArrangedSubview(container)
     }
+    var daxContextualOnboardingController: NSViewController?
 
     private func updateStateAndPresentContextualOnboarding() {
-        guard featureFlagger.isFeatureOn(.contextualOnboarding) else {
-            onboardingDialogTypeProvider.turnOffFeature()
-            return
-        }
         guard let tab = tabViewModel?.tab else { return }
         onboardingDialogTypeProvider.updateStateFor(tab: tab)
         presentContextualOnboarding()
@@ -445,10 +426,7 @@ final class BrowserTabViewController: NSViewController {
         // Remove any existing higlights animation
         delegate?.dismissViewHighlight()
 
-        guard featureFlagger.isFeatureOn(.contextualOnboarding) else {
-            onboardingDialogTypeProvider.turnOffFeature()
-            return
-        }
+        guard featureFlagger.isFeatureOn(.highlightsOnboarding) else { return }
 
         guard let tab = tabViewModel?.tab else { return }
         guard let dialogType = onboardingDialogTypeProvider.dialogTypeForTab(tab, privacyInfo: tab.privacyInfo) else {
@@ -489,17 +467,21 @@ final class BrowserTabViewController: NSViewController {
                 delegate?.dismissViewHighlight()
             })
         let hostingController = NSHostingController(rootView: AnyView(daxView))
-        insertChild(hostingController, in: containerStackView, at: 0)
+
+        daxContextualOnboardingController = hostingController
+        insertChild(daxContextualOnboardingController!, in: containerStackView, at: 0)
         hostingController.view.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             hostingController.view.widthAnchor.constraint(equalTo: containerStackView.widthAnchor),
+            hostingController.view.topAnchor.constraint(equalTo: containerStackView.topAnchor),
             hostingController.view.leadingAnchor.constraint(equalTo: containerStackView.leadingAnchor),
-            hostingController.view.trailingAnchor.constraint(equalTo: containerStackView.trailingAnchor),
+            hostingController.view.trailingAnchor.constraint(equalTo: containerStackView.trailingAnchor)
         ])
 
         containerStackView.layoutSubtreeIfNeeded()
         webViewContainer?.layoutSubtreeIfNeeded()
 
+        let currentState = onboardingDialogTypeProvider.state
         if dialogType == .tryFireButton {
             delegate?.highlightFireButton()
         } else if case .trackers = dialogType {
@@ -856,9 +838,7 @@ final class BrowserTabViewController: NSViewController {
     var homePageViewController: HomePageViewController?
     private func homePageViewControllerCreatingIfNeeded() -> HomePageViewController {
         return homePageViewController ?? {
-            let freemiumDBPPromotionViewCoordinator = Application.appDelegate.freemiumDBPPromotionViewCoordinator
-            let homePageViewController = HomePageViewController(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager,
-                                                                freemiumDBPPromotionViewCoordinator: freemiumDBPPromotionViewCoordinator)
+            let homePageViewController = HomePageViewController(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager)
             self.homePageViewController = homePageViewController
             return homePageViewController
         }()
@@ -869,8 +849,7 @@ final class BrowserTabViewController: NSViewController {
     var dataBrokerProtectionHomeViewController: DBPHomeViewController?
     private func dataBrokerProtectionHomeViewControllerCreatingIfNeeded() -> DBPHomeViewController {
         return dataBrokerProtectionHomeViewController ?? {
-            let freemiumDBPFeature = Application.appDelegate.freemiumDBPFeature
-            let dataBrokerProtectionHomeViewController = DBPHomeViewController(dataBrokerProtectionManager: DataBrokerProtectionManager.shared, freemiumDBPFeature: freemiumDBPFeature)
+            let dataBrokerProtectionHomeViewController = DBPHomeViewController(dataBrokerProtectionManager: DataBrokerProtectionManager.shared)
             self.dataBrokerProtectionHomeViewController = dataBrokerProtectionHomeViewController
             return dataBrokerProtectionHomeViewController
         }()
@@ -884,7 +863,7 @@ final class BrowserTabViewController: NSViewController {
             guard let syncService = NSApp.delegateTyped.syncService else {
                 fatalError("Sync service is nil")
             }
-            let preferencesViewController = PreferencesViewController(syncService: syncService, tabCollectionViewModel: tabCollectionViewModel)
+            let preferencesViewController = PreferencesViewController(syncService: syncService)
             preferencesViewController.delegate = self
             self.preferencesViewController = preferencesViewController
             return preferencesViewController

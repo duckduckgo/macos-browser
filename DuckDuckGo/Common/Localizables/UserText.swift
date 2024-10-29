@@ -480,12 +480,10 @@ struct UserText {
     static let importPasswords = NSLocalizedString("import.browser.data.passwords", value: "Import Passwords…", comment: "Opens Import Browser Data dialog")
 
     static let importDataTitle = NSLocalizedString("import.browser.data", value: "Import to DuckDuckGo", comment: "Import Browser Data dialog title")
-    static let importDataTitleOnboarding = NSLocalizedString("import.browser.data.onboarding", value: "Great, let’s keep this simple!", comment: "Import Browser Data dialog title")
     static let importDataShortcutsTitle = NSLocalizedString("import.browser.data.shortcuts", value: "Almost done!", comment: "Import Browser Data dialog title for final stage when choosing shortcuts to enable")
     static let importDataShortcutsSubtitle = NSLocalizedString("import.browser.data.shortcuts.subtitle", value: "You can always right-click on the browser toolbar to find more shortcuts like these.", comment: "Subtitle explaining how users can find toolbar shortcuts.")
-    static let importDataSourceTitle = NSLocalizedString("import.browser.data.source.title", value: "Where do you want to import from?", comment: "Import Browser Data title for option to choose source browser to import from")
+    static let importDataSourceTitle = NSLocalizedString("import.browser.data.source.title", value: "Import From", comment: "Import Browser Data title for option to choose source browser to import from")
     static let importDataSubtitle = NSLocalizedString("import.browser.data.source.subtitle", value: "Access and manage your passwords in DuckDuckGo Settings > Passwords & Autofill.", comment: "Subtitle explaining where users can find imported passwords.")
-    static let importDataSuccessTitle = NSLocalizedString("import.browser.data.success.title", value: "Import complete!", comment: "message about Passwords and or bookmarks Data Import completion")
 
     static let exportLogins = NSLocalizedString("export.logins.data", value: "Export Passwords…", comment: "Opens Export Logins Data dialog")
     static let exportBookmarks = NSLocalizedString("export.bookmarks.menu.item", value: "Export Bookmarks…", comment: "Export bookmarks menu item")
@@ -1131,13 +1129,9 @@ struct UserText {
     // MARK: New Tab
     // Context Menu
     static let newTabBottomPopoverTitle = NSLocalizedString("newTab.bottom.popover.title", value: "New Tab Page", comment: "Title of the popover that appears when pressing the bottom right button")
-    static let newTabMenuItemShowSearchBar = NSLocalizedString("newTab.menu.item.show.search.bar", value: "Show Search Box", comment: "Title of the menu item in the home page to show/hide search box (search field)")
     static let newTabMenuItemShowFavorite = NSLocalizedString("newTab.menu.item.show.favorite", value: "Show Favorites", comment: "Title of the menu item in the home page to show/hide favorite section")
     static let newTabMenuItemShowContinuteSetUp = NSLocalizedString("newTab.menu.item.show.continue.setup", value: "Show Next Steps", comment: "Title of the menu item in the home page to show/hide continue setup section")
     static let newTabMenuItemShowRecentActivity = NSLocalizedString("newTab.menu.item.show.recent.activity", value: "Show Recent Activity", comment: "Title of the menu item in the home page to show/hide recent activity section")
-
-    // Search Bar
-    static let newTabSearchBarSectionTitle = NSLocalizedString("newTab.search.bar.section.title", value: "Search Box", comment: "Setting to show or hide the search box (search field) in the home page")
 
     // Favorites
     static let newTabFavoriteSectionTitle = NSLocalizedString("newTab.favorites.section.title", value: "Favorites", comment: "Title of the Favorites section in the home page")
@@ -1190,8 +1184,6 @@ struct UserText {
     static let bookmarksBarPromptAccept = NSLocalizedString("bookmarks.bar.prompt.accept", value: "Show", comment: "Accept button label on bookmarks bar prompt")
 
     // MARK: Home Page Settings
-    static let homePageSettingsOnboardingTitle = NSLocalizedString("home.page.settings.onboarding.title", value: "Add extra personality to your new tab page", comment: "Home Page Settings Onboarding message title")
-    static let homePageSettingsOnboardingMessage = NSLocalizedString("home.page.settings.onboarding.message", value: "Customize the background, theme, and even what content you see. Give it a try!", comment: "Home Page Settings Onboarding message")
     static let homePageSettingsTitle = NSLocalizedString("home.page.settings.header", value: "Customize", comment: "Home Page Settings title")
     static let goToSettings = NSLocalizedString("home.page.settings.go.to.settings", value: "Go to Settings", comment: "Settings button caption")
     static let background = NSLocalizedString("home.page.settings.background", value: "Background", comment: "Section title in Home Page Settings to customization Home Page background")
@@ -1360,47 +1352,5 @@ struct UserText {
     static let syncPromoSidePanelTitle = NSLocalizedString("sync.promo.passwords.side.panel.title", value:"Setup", comment: "Title for the Sync Promotion in passwords side panel")
     static let syncPromoSidePanelSubtitle = NSLocalizedString("sync.promo.passwords.side.panel.subtitle", value:"Sync & Backup", comment: "Subtitle for the Sync Promotion in passwords side panel")
 
-    // Key: "freemium.pir.menu.item"
-    // Comment: "Title for Freemium Personal Information Removal (Scan-Only) item in the options menu"
-    static let freemiumDBPOptionsMenuItem = "Free Personal Information Scan"
 
-    // Key: "home.page.promotion.freemium.dbp.text"
-    // Comment: "Text for the Freemium DBP Home Page Promotion"
-    static let homePagePromotionFreemiumDBPText = "Find your personal info on sites that sell it."
-
-    // Key: "home.page.promotion.freemium.dbp.button.title"
-    // Comment: "Title for the Freemium DBP Home Page Promotion Button"
-    static let homePagePromotionFreemiumDBPButtonTitle = "Free Scan"
-
-    // Key: "home.page.promotion.freemium.dbp.post.scan.engagement.result.single.match.text"
-    // Comment: "Text for the Freemium DBP Home Page Post Scan Engagement Promotion When Only One Record is Found"
-    static let homePagePromotionFreemiumDBPPostScanEngagementResultSingleMatchText = "Your free personal info scan found 1 record about you on 1 site."
-
-    /// Generates Text for the Freemium DBP Home Page Post Scan Engagement Promotion when records are found on a single broker site.
-    /// Key: "home.page.promotion.freemium.dbp.post.scan.engagement.result.single.broker.text"
-    ///
-    /// - Parameter resultCount: The number of records found.
-    /// - Returns: A formatted string indicating the number of records found on 1 site.
-    static func homePagePromotionFreemiumDBPPostScanEngagementResultSingleBrokerText(resultCount: Int) -> String {
-        String(format: "Your free personal info scan found %d records about you on 1 site.", resultCount)
-    }
-
-    /// Generates Text for the Freemium DBP Home Page Post Scan Engagement Promotion when records are found on multiple broker sites.
-    /// Key: "home.page.promotion.freemium.dbp.post.scan.engagement.result.plural.text"
-    ///
-    /// - Parameters:
-    ///   - resultCount: The number of records found.
-    ///   - brokerCount: The number of broker sites where records were found.
-    /// - Returns: A formatted string indicating the number of records found on multiple sites.
-    static func homePagePromotionFreemiumDBPPostScanEngagementResultPluralText(resultCount: Int, brokerCount: Int) -> String {
-        String(format: "Your free personal info scan found %d records about you on %d different sites.", resultCount, brokerCount)
-    }
-
-    // Key: "home.page.promotion.freemium.dbp.post.scan.engagement.no.results.text"
-    // Comment: "Text for the Freemium DBP Home Page Post Scan Engagement Promotion When There Are No Results"
-    static let homePagePromotionFreemiumDBPPostScanEngagementNoResultsText = "Good news, your free personal info scan didn't find any records about you. We'll keep checking periodically."
-
-    // Key: "home.page.promotion.freemium.dbp.post.scan.engagement.button.title"
-    // Comment: "Title for the Freemium DBP Home Page Post Scan Engagement Promotion Button"
-    static let homePagePromotionFreemiumDBPPostScanEngagementButtonTitle = "View Results"
 }

@@ -29,10 +29,9 @@ let package = Package(
             targets: ["DataBrokerProtection"])
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "200.3.0"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "200.1.1"),
         .package(path: "../SwiftUIExtensions"),
         .package(path: "../XPCHelper"),
-        .package(path: "../Freemium"),
     ],
     targets: [
         .target(
@@ -44,7 +43,6 @@ let package = Package(
                 .product(name: "PixelKit", package: "BrowserServicesKit"),
                 .product(name: "Configuration", package: "BrowserServicesKit"),
                 .product(name: "Persistence", package: "BrowserServicesKit"),
-                .product(name: "Freemium", package: "Freemium"),
             ],
             resources: [.copy("Resources")],
             swiftSettings: [
@@ -56,7 +54,6 @@ let package = Package(
             dependencies: [
                 "DataBrokerProtection",
                 "BrowserServicesKit",
-                "Freemium",
             ],
             resources: [
                 .copy("Resources")

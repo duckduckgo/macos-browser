@@ -46,8 +46,6 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
     private var webView: WebView?
     private var window: NSWindow?
 
-    private var timer: Timer?
-
     init(privacyConfig: PrivacyConfigurationManaging, prefs: ContentScopeProperties, delegate: CCFCommunicationDelegate, isFakeBroker: Bool = false) {
         let configuration = WKWebViewConfiguration()
         configuration.applyDataBrokerConfiguration(privacyConfig: privacyConfig, prefs: prefs, delegate: delegate)
@@ -80,8 +78,6 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
             window?.makeKeyAndOrderFront(nil)
         }
 
-        installTimer()
-
         try? await load(url: URL(string: "\(WebViewSchemeHandler.dataBrokerProtectionScheme)://blank")!)
     }
 
@@ -104,8 +100,6 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
         WKWebsiteDataStore.default().removeData(ofTypes: [WKWebsiteDataTypeDiskCache, WKWebsiteDataTypeMemoryCache], modifiedSince: Date(timeIntervalSince1970: 0)) {
             Logger.action.debug("WKWebView data store deleted correctly")
         }
-
-        stopTimer()
 
         webViewConfiguration = nil
         userContentController = nil
@@ -199,24 +193,6 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
             print("Error png data was not respresented")
         }
     }
-
-    /// Workaround for stuck scans
-    /// https://app.asana.com/0/0/1208502720748038/1208596554608118/f
-
-    private func installTimer() {
-        stopTimer()
-        timer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { _ in
-            Task {
-                try await self.webView?.evaluateJavaScript("1+1") as Void?
-            }
-        }
-    }
-
-    private func stopTimer() {
-        timer?.invalidate()
-        timer = nil
-    }
-
 }
 
 extension DataBrokerProtectionWebViewHandler: WKNavigationDelegate {

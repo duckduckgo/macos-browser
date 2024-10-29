@@ -65,9 +65,6 @@ final class MainWindow: NSWindow {
         titleVisibility = .hidden
         titlebarAppearsTransparent = true
         collectionBehavior = .fullScreenPrimary
-
-        // Setting minimum width to fit the wide NTP search bar
-        minSize = .init(width: HomePage.Views.RootView.minWindowWidth, height: 0)
     }
 
     // MARK: - First Responder Notification

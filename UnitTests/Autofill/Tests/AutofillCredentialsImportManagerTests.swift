@@ -104,12 +104,14 @@ final class AutofillCredentialsImportManagerTests: XCTestCase {
     }
 
     func testOnAutofillUserScriptShouldDisplayOverlay_SerializedInputContextWithCredentialsImportFalse_returnsTrue() {
+        let serializedInputContext = "{\"inputType\":\"credentials.username\",\"credentialsImport\":false}"
         let result = manager.autofillUserScriptShouldDisplayOverlay("", for: "fill.dev")
 
         XCTAssertTrue(result)
     }
 
     func testOnAutofillUserScriptShouldDisplayOverlay_SerializedInputContextWithCredentialsImportTrue_PromptHasNOTBeenPermanantlyDismissed_returnsTrue() {
+        let serializedInputContext = "{\"inputType\":\"credentials.username\",\"credentialsImport\":false}"
         importState.isCredentialsImportPromptPermanantlyDismissed = false
         let result = manager.autofillUserScriptShouldDisplayOverlay("", for: "fill.dev")
 

@@ -1,10 +1,9 @@
 {
   "name": "backgroundcheck.run",
   "url": "backgroundcheck.run",
-  "version": "0.3.0",
+  "version": "0.2.0",
   "parent": "verecor.com",
   "addedDatetime": 1677736800000,
-  "optOutUrl": "https://backgroundcheck.run/ng/control/privacy",
   "steps": [
     {
       "stepType": "scan",

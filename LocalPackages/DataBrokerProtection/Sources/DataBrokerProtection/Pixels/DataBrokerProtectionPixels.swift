@@ -206,6 +206,10 @@ public enum DataBrokerProtectionPixels {
     case dataBrokerMetricsWeeklyStats(dataBrokerURL: String, profilesFound: Int, optOutsInProgress: Int, successfulOptOuts: Int, failedOptOuts: Int, durationOfFirstOptOut: Int, numberOfNewRecordsFound: Int, numberOfReappereances: Int)
     case dataBrokerMetricsMonthlyStats(dataBrokerURL: String, profilesFound: Int, optOutsInProgress: Int, successfulOptOuts: Int, failedOptOuts: Int, durationOfFirstOptOut: Int, numberOfNewRecordsFound: Int, numberOfReappereances: Int)
 
+    // Feature Gatekeeper
+    case gatekeeperNotAuthenticated
+    case gatekeeperEntitlementsInvalid
+
     // Custom stats
     case customDataBrokerStatsOptoutSubmit(dataBrokerName: String, optOutSubmitSuccessRate: Double)
     case customGlobalStatsOptoutSubmit(optOutSubmitSuccessRate: Double)
@@ -334,6 +338,10 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .dataBrokerMetricsWeeklyStats: return "m_mac_dbp_databroker_weekly_stats"
         case .dataBrokerMetricsMonthlyStats: return "m_mac_dbp_databroker_monthly_stats"
 
+            // Feature Gatekeeper
+        case .gatekeeperNotAuthenticated: return "m_mac_dbp_gatekeeper_not_authenticated"
+        case .gatekeeperEntitlementsInvalid: return "m_mac_dbp_gatekeeper_entitlements_invalid"
+
             // Configuration
         case .invalidPayload(let configuration): return "m_mac_dbp_\(configuration.rawValue)_invalid_payload".lowercased()
         case .errorLoadingCachedConfig: return "m_mac_dbp_configuration_error_loading_cached_config"
@@ -452,6 +460,8 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                 .secureVaultKeyStoreReadError,
                 .secureVaultKeyStoreUpdateError,
                 .secureVaultError,
+                .gatekeeperNotAuthenticated,
+                .gatekeeperEntitlementsInvalid,
                 .invalidPayload,
                 .pixelTest,
                 .failedToParsePrivacyConfig:
@@ -613,6 +623,8 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .globalMetricsMonthlyStats,
                     .dataBrokerMetricsWeeklyStats,
                     .dataBrokerMetricsMonthlyStats,
+                    .gatekeeperNotAuthenticated,
+                    .gatekeeperEntitlementsInvalid,
                     .invalidPayload,
                     .pixelTest,
                     .customDataBrokerStatsOptoutSubmit,

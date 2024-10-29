@@ -23,11 +23,12 @@ import Common
 import os.log
 
 enum OnboardingSteps: String, CaseIterable {
+    case summary
     case welcome
     case getStarted
-    case makeDefaultSingle
+    case privateByDefault
+    case cleanerBrowsing
     case systemSettings
-    case duckPlayerSingle
     case customize
 }
 
@@ -90,23 +91,20 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
 
     let configuration: OnboardingConfiguration = {
         var systemSettings: SystemSettings
-        var order = "v3"
-        let platform = OnboardingPlatform(name: "macos")
 #if APPSTORE
-        systemSettings = SystemSettings(rows: ["import"])
+        systemSettings = SystemSettings(rows: ["import", "default-browser"])
 #else
-        systemSettings = SystemSettings(rows: ["dock", "import"])
+        systemSettings = SystemSettings(rows: ["dock", "import", "default-browser"])
 #endif
         let stepDefinitions = StepDefinitions(systemSettings: systemSettings)
         let preferredLocale = Bundle.main.preferredLocalizations.first ?? "en"
         var env: String
-#if DEBUG || REVIEW
+#if DEBUG
         env = "development"
 #else
         env = "production"
 #endif
-
-        return OnboardingConfiguration(stepDefinitions: stepDefinitions, exclude: [], order: order, env: env, locale: preferredLocale, platform: platform)
+        return OnboardingConfiguration(stepDefinitions: stepDefinitions, env: env, locale: preferredLocale)
     }()
 
     init(navigationDelegate: OnboardingNavigating, dockCustomization: DockCustomization, defaultBrowserProvider: DefaultBrowserProvider, appearancePreferences: AppearancePreferences, startupPreferences: StartupPreferences) {
@@ -123,7 +121,6 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
 
     @MainActor
     func goToAddressBar() {
-        PixelKit.fire(GeneralPixel.onboardingStepCompleteCustomize, frequency: .legacyDaily)
         onboardingHasFinished()
         let tab = Tab(content: .url(URL.duckDuckGo, source: .ui))
         navigation.replaceTabWith(tab)
@@ -181,16 +178,18 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
 
     func stepCompleted(step: OnboardingSteps) {
         switch step {
+        case .summary:
+            break
         case .welcome:
             PixelKit.fire(GeneralPixel.onboardingStepCompleteWelcome, frequency: .legacyDaily)
         case .getStarted:
             PixelKit.fire(GeneralPixel.onboardingStepCompleteGetStarted, frequency: .legacyDaily)
-        case .makeDefaultSingle:
+        case .privateByDefault:
             PixelKit.fire(GeneralPixel.onboardingStepCompletePrivateByDefault, frequency: .legacyDaily)
+        case .cleanerBrowsing:
+            PixelKit.fire(GeneralPixel.onboardingStepCompleteCleanerBrowsing, frequency: .legacyDaily)
         case .systemSettings:
             PixelKit.fire(GeneralPixel.onboardingStepCompleteSystemSettings, frequency: .legacyDaily)
-        case .duckPlayerSingle:
-            PixelKit.fire(GeneralPixel.onboardingStepCompleteCleanerBrowsing, frequency: .legacyDaily)
         case .customize:
             PixelKit.fire(GeneralPixel.onboardingStepCompleteCustomize, frequency: .legacyDaily)
         }
