@@ -163,7 +163,6 @@ enum GeneralPixel: PixelKitEventV2 {
     case aichatToolbarOnboardingPopoverShown
     case aichatToolbarOnboardingPopoverAccept
 
-
     // Sync
     case syncSignupDirect
     case syncSignupConnect
