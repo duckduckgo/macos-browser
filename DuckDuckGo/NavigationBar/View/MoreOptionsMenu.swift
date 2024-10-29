@@ -168,7 +168,7 @@ final class MoreOptionsMenu: NSMenu {
 
     @MainActor
     @objc func newWindow(_ sender: NSMenuItem) {
-        WindowsManager.openNewWindow()
+        WindowsManager.openNewWindow(contentSize: .init(width: 768, height: 1024))
     }
 
     @MainActor
