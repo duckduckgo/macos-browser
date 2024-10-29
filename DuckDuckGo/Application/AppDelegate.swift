@@ -408,6 +408,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             PixelKit.fire(GeneralPixel.crashOnCrashHandlersSetUp)
             didCrashDuringCrashHandlersSetUp = false
         }
+
+//        if NSApp.runType == .uiTests {
+            if let window = WindowsManager.windows.first(where: { $0 is MainWindow }) {
+                window.setFrame(NSRect(x: 0, y: 0, width: 768, height: window.frame.height), display: true)
+            }
+//        }
     }
 
     private func fireFailedCompilationsPixelIfNeeded() {
