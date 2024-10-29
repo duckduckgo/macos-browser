@@ -301,6 +301,12 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="backgroundView" destination="j2X-bv-VAU" id="KIm-Kd-yvF"/>
+                        <outlet property="innerBorderView" destination="MtO-b9-tF8" id="amg-JW-wzl"/>
+                        <outlet property="innerBorderViewBottomConstraint" destination="jy6-YQ-i7d" id="dhy-ik-Oy1"/>
+                        <outlet property="innerBorderViewLeadingConstraint" destination="xur-aP-SHI" id="PUf-rj-N2J"/>
+                        <outlet property="innerBorderViewTopConstraint" destination="btM-7K-jHw" id="FCP-lk-Y1Q"/>
+                        <outlet property="innerBorderViewTrailingConstraint" destination="nOj-Ls-Ft4" id="VJn-yj-Ibg"/>
                         <outlet property="pixelPerfectConstraint" destination="j9h-Pb-BEa" id="qK5-gz-Sk1"/>
                         <outlet property="tableView" destination="4Z2-d8-NA2" id="xll-Sx-bit"/>
                         <outlet property="tableViewHeightConstraint" destination="aJH-FU-o7W" id="QpI-Vm-xUG"/>

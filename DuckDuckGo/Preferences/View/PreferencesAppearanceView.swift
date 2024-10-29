@@ -84,6 +84,7 @@ extension Preferences {
 
     struct AppearanceView: View {
         @ObservedObject var model: AppearancePreferences
+        @ObservedObject var addressBarModel: HomePage.Models.AddressBarModel
 
         var body: some View {
             PreferencePane(UserText.appearance) {
@@ -104,6 +105,9 @@ extension Preferences {
                 PreferencePaneSection(UserText.newTabBottomPopoverTitle) {
 
                     PreferencePaneSubSection {
+                        if addressBarModel.shouldShowAddressBar {
+                            ToggleMenuItem(UserText.newTabSearchBarSectionTitle, isOn: $model.isSearchBarVisible)
+                        }
                         if model.isContinueSetUpAvailable {
                             ToggleMenuItem(UserText.newTabSetUpSectionTitle, isOn: $model.isContinueSetUpVisible)
                         }

@@ -133,7 +133,8 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
             Logger.dataBrokerProtection.error("Error \(error.localizedDescription)")
             // Intentional no-op as there's no completion block
             // If you add a completion block, please remember to call it here too!
-        })    }
+        })
+    }
 
     public func runAllOptOuts(showWebView: Bool) {
         xpc.execute(call: { server in

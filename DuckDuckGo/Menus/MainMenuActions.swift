@@ -65,6 +65,12 @@ extension AppDelegate {
         }
     }
 
+    @objc func newAIChat(_ sender: Any?) {
+        DispatchQueue.main.async {
+            AIChatTabOpener.openAIChatTab()
+        }
+    }
+
     @objc func newTab(_ sender: Any?) {
         DispatchQueue.main.async {
             WindowsManager.openNewWindow()
@@ -314,6 +320,8 @@ extension AppDelegate {
     @objc func fireButtonAction(_ sender: NSButton) {
         DispatchQueue.main.async {
             FireCoordinator.fireButtonAction()
+            let pixelReporter = OnboardingPixelReporter()
+            pixelReporter.trackFireButtonPressed()
         }
     }
 
@@ -502,6 +510,10 @@ extension MainViewController {
 
     @objc func toggleNetworkProtectionShortcut(_ sender: Any) {
         LocalPinningManager.shared.togglePinning(for: .networkProtection)
+    }
+
+    @objc func toggleAIChatShortcut(_ sender: Any) {
+        LocalPinningManager.shared.togglePinning(for: .aiChat)
     }
 
     // MARK: - History
@@ -806,8 +818,9 @@ extension MainViewController {
                                                           eventMapping: EventMapping<AutofillPixelEvent> { _, _, _, _ in },
                                                           installDate: nil)
         autofillPixelReporter.resetStoreDefaults()
-        AutofillLoginImportState().hasImportedLogins = false
-        AutofillLoginImportState().credentialsImportPromptPresentationCount = 0
+        let loginImportState = AutofillLoginImportState()
+        loginImportState.hasImportedLogins = false
+        loginImportState.isCredentialsImportPromptPermanantlyDismissed = false
     }
 
     @objc func resetBookmarks(_ sender: Any?) {
@@ -838,6 +851,10 @@ extension MainViewController {
 
     @objc func resetOnboarding(_ sender: Any?) {
         UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.onboardingFinished.rawValue)
+    }
+
+    @objc func resetHomePageSettingsOnboarding(_ sender: Any?) {
+        UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Any>.Key.homePageDidShowSettingsOnboarding.rawValue)
     }
 
     @objc func resetContextualOnboarding(_ sender: Any?) {

@@ -299,30 +299,23 @@ struct OnboardingSecondaryCTAButton: View {
 // MARK: - Preview
 
 #Preview("Try Search") {
-    OnboardingTrySearchDialog(viewModel: OnboardingSearchSuggestionsViewModel(suggestedSearchesProvider: OnboardingSuggestedSearchesProvider(), pixelReporter: OnboardingPixelReporter()))
+    OnboardingTrySearchDialog(viewModel: OnboardingSearchSuggestionsViewModel(suggestedSearchesProvider: OnboardingSuggestedSearchesProvider(), pixelReporter: OnboardingPixelReporter(onboardingStateProvider: ContextualOnboardingStateMachine())))
         .padding()
 }
 
-final class OnboardingPixelReporter: OnboardingSearchSuggestionsPixelReporting, OnboardingSiteSuggestionsPixelReporting {
-    func trackSiteSuggetionOptionTapped() {
-    }
-    func trackSearchSuggetionOptionTapped() {
-    }
-}
-
 #Preview("Try Site") {
-    OnboardingTryVisitingSiteDialog(viewModel: OnboardingSiteSuggestionsViewModel(title: "", suggestedSitesProvider: OnboardingSuggestedSitesProvider(surpriseItemTitle: UserText.ContextualOnboarding.tryASearchOptionSurpriseMeTitle), pixelReporter: OnboardingPixelReporter()))
+    OnboardingTryVisitingSiteDialog(viewModel: OnboardingSiteSuggestionsViewModel(title: "", suggestedSitesProvider: OnboardingSuggestedSitesProvider(surpriseItemTitle: UserText.ContextualOnboarding.tryASearchOptionSurpriseMeTitle), pixelReporter: OnboardingPixelReporter(onboardingStateProvider: ContextualOnboardingStateMachine())))
         .padding()
 }
 
 #Preview("First Search Dialog") {
-    OnboardingFirstSearchDoneDialog(shouldFollowUp: true, viewModel: OnboardingSiteSuggestionsViewModel(title: UserText.ContextualOnboarding.onboardingTryASiteTitle, suggestedSitesProvider: OnboardingSuggestedSitesProvider(surpriseItemTitle: UserText.ContextualOnboarding.tryASearchOptionSurpriseMeTitle), pixelReporter: OnboardingPixelReporter()), gotItAction: {})
+    OnboardingFirstSearchDoneDialog(shouldFollowUp: true, viewModel: OnboardingSiteSuggestionsViewModel(title: UserText.ContextualOnboarding.onboardingTryASiteTitle, suggestedSitesProvider: OnboardingSuggestedSitesProvider(surpriseItemTitle: UserText.ContextualOnboarding.tryASearchOptionSurpriseMeTitle), pixelReporter: OnboardingPixelReporter(onboardingStateProvider: ContextualOnboardingStateMachine())), gotItAction: {})
         .padding()
 }
 
 #Preview("Try Fire Button") {
     DaxDialogView(logoPosition: .left) {
-        OnboardingFireButtonDialogContent(viewModel: OnboardingFireButtonDialogViewModel(onDismiss: {}, onGotItPressed: {}))
+        OnboardingFireButtonDialogContent(viewModel: OnboardingFireButtonDialogViewModel(onDismiss: {}, onGotItPressed: {}, onFireButtonPressed: {}))
     }
     .padding()
 }
@@ -332,6 +325,6 @@ final class OnboardingPixelReporter: OnboardingSearchSuggestionsPixelReporting, 
         let firstString = UserText.ContextualOnboarding.onboardingTryFireButtonMessage
         return NSMutableAttributedString(string: firstString)
     }()
-    return OnboardingTrackersDoneDialog(shouldFollowUp: true, message: message, blockedTrackersCTAAction: {}, viewModel: OnboardingFireButtonDialogViewModel(onDismiss: {}, onGotItPressed: {}))
+    return OnboardingTrackersDoneDialog(shouldFollowUp: true, message: message, blockedTrackersCTAAction: {}, viewModel: OnboardingFireButtonDialogViewModel(onDismiss: {}, onGotItPressed: {}, onFireButtonPressed: {}))
         .padding()
 }
