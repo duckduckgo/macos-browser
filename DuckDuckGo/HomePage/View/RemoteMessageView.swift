@@ -184,9 +184,12 @@ extension RemoteMessageButtonViewModel {
     )
 
     return RemoteMessageView(viewModel: .init(messageId: "1", modelType: small, onDidClose: { _ in }, onDidAppear: {}, onDidDisappear: {}, openURLHandler: { _ in }))
+        .environmentObject(HomePage.Models.SettingsModel())
+        .frame(height: 100)
 }
 
-#Preview("Medium") {
+@available(macOS 14.0, *)
+#Preview("Medium", traits: .fixedLayout(width: 600, height: 300)) {
     let medium = RemoteMessageModelType.medium(
         titleText: "Update Available!",
         descriptionText: "A new version of DuckDuckGo Browser is available. Update now to enjoy improved privacy features and enhanced performance.",
@@ -194,6 +197,8 @@ extension RemoteMessageButtonViewModel {
     )
 
     return RemoteMessageView(viewModel: .init(messageId: "1", modelType: medium, onDidClose: { _ in }, onDidAppear: {}, onDidDisappear: {}, openURLHandler: { _ in }))
+        .environmentObject(HomePage.Models.SettingsModel())
+        .frame(height: 100)
 }
 
 #Preview("Big Single Action") {
@@ -206,6 +211,8 @@ extension RemoteMessageButtonViewModel {
     )
 
     return RemoteMessageView(viewModel: .init(messageId: "1", modelType: bigSingleAction, onDidClose: { _ in }, onDidAppear: {}, onDidDisappear: {}, openURLHandler: { _ in }))
+        .environmentObject(HomePage.Models.SettingsModel())
+        .frame(height: 100)
 }
 
 #Preview("Big Single Action #2") {
@@ -218,6 +225,8 @@ extension RemoteMessageButtonViewModel {
     )
 
     return RemoteMessageView(viewModel: .init(messageId: "1", modelType: bigSingleAction, onDidClose: { _ in }, onDidAppear: {}, onDidDisappear: {}, openURLHandler: { _ in }))
+        .environmentObject(HomePage.Models.SettingsModel())
+        .frame(height: 100)
 }
 
 #Preview("Big Two Action") {
@@ -232,4 +241,6 @@ extension RemoteMessageButtonViewModel {
     )
 
     return RemoteMessageView(viewModel: .init(messageId: "1", modelType: bigTwoAction, onDidClose: { _ in }, onDidAppear: {}, onDidDisappear: {}, openURLHandler: { _ in }))
+        .environmentObject(HomePage.Models.SettingsModel())
+        .frame(height: 150)
 }

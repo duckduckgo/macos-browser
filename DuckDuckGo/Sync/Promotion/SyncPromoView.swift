@@ -224,6 +224,20 @@ struct SyncPromoView: View {
     }
 }
 
-#Preview {
-    SyncPromoView(viewModel: SyncPromoViewModel(touchpointType: .bookmarks, primaryButtonAction: {}, dismissButtonAction: {}))
+#Preview("Compact") {
+    SyncPromoView(viewModel: SyncPromoViewModel(touchpointType: .bookmarks, primaryButtonAction: {}, dismissButtonAction: {}),
+                  layout: .compact)
+        .frame(height: 115)
+}
+
+#Preview("Horizontal") {
+    SyncPromoView(viewModel: SyncPromoViewModel(touchpointType: .bookmarks, primaryButtonAction: {}, dismissButtonAction: {}),
+                  layout: .horizontal)
+        .frame(height: 80)
+}
+
+#Preview("Vertical") {
+    SyncPromoView(viewModel: SyncPromoViewModel(touchpointType: .bookmarks, primaryButtonAction: {}, dismissButtonAction: {}),
+                  layout: .vertical)
+        .frame(height: 300)
 }

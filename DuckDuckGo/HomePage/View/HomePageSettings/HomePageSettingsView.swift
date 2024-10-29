@@ -235,12 +235,12 @@ extension HomePage.Views.BackgroundCategoryView {
 #Preview {
     @State var isSettingsVisible: Bool = true
 
-    let model = HomePage.Models.SettingsModel()
-    model.customBackground = .solidColor(.color10)
+    let settingsModel = HomePage.Models.SettingsModel()
+    settingsModel.customBackground = .solidColor(.color10)
 
     return HomePage.Views.SettingsView(includingContinueSetUpCards: true, isSettingsVisible: $isSettingsVisible)
         .frame(width: 236, height: 600)
-        .environmentObject(model)
+        .environmentObject(settingsModel)
         .environmentObject(AppearancePreferences.shared)
         .environmentObject(HomePage.Models.ContinueSetUpModel(
             defaultBrowserProvider: SystemDefaultBrowserProvider(),
@@ -258,4 +258,5 @@ extension HomePage.Views.BackgroundCategoryView {
             moveFavorite: { _, _ in },
             onFaviconMissing: {}
         ))
+        .environmentObject(HomePage.Models.AddressBarModel(tabCollectionViewModel: TabCollectionViewModel(), privacyConfigurationManager: MockPrivacyConfigurationManager()))
 }
