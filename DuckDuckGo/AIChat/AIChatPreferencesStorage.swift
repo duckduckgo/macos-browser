@@ -84,8 +84,8 @@ struct DefaultAIChatPreferencesStorage: AIChatPreferencesStorage {
     }
 
     func reset() {
-        userDefaults.showAIChatShortcutInApplicationMenu = false
-        userDefaults.didDisplayAIChatToolbarOnboarding = false
+        userDefaults.showAIChatShortcutInApplicationMenu = UserDefaults.showAIChatShortcutInApplicationMenuDefaultValue
+        userDefaults.didDisplayAIChatToolbarOnboarding = UserDefaults.didDisplayAIChatToolbarOnboardingDefaultValue
         pinningManager.unpin(.aiChat)
     }
 }
@@ -96,7 +96,7 @@ private extension UserDefaults {
         static let didDisplayAIChatToolbarOnboardingKey = "aichat.didDisplayAIChatToolbarOnboarding"
     }
 
-    static let showAIChatShortcutInApplicationMenuDefaultValue = false
+    static let showAIChatShortcutInApplicationMenuDefaultValue = true
     static let didDisplayAIChatToolbarOnboardingDefaultValue = false
 
     @objc dynamic var showAIChatShortcutInApplicationMenu: Bool {
