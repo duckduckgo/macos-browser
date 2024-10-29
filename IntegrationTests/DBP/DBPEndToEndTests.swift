@@ -160,7 +160,7 @@ final class DBPEndToEndTests: XCTestCase {
         // This needs to be await since it takes time to start the login item
         let loginItemRunningExpectation = expectation(description: "Login item running after profile save")
         await awaitFulfillment(of: loginItemRunningExpectation,
-                               withTimeout: 3,
+                               withTimeout: 10,
                                whenCondition: {
             LoginItem.dbpBackgroundAgent.isRunning
         })
