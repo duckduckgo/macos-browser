@@ -87,8 +87,6 @@ extension HomePage.Views {
 
             @EnvironmentObject var model: HomePage.Models.ContinueSetUpModel
 
-            @State var isHovering = false
-
             private let featureType: HomePage.Models.FeatureType
 
             init?(featureType: HomePage.Models.FeatureType) {
@@ -113,14 +111,10 @@ extension HomePage.Views {
                             HomePage.Views.CloseButton(icon: .close, size: 16) {
                                 model.removeItem(for: featureType)
                             }
-                            .visibility(isHovering ? .visible : .gone)
                             Spacer()
                         }
                     }
                     .padding(6)
-                }
-                .onHover { isHovering in
-                    self.isHovering = isHovering
                 }
                 .onAppear {
                     if featureType == .dock {
