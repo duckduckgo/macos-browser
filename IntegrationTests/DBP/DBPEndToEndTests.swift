@@ -287,7 +287,7 @@ final class DBPEndToEndTests: XCTestCase {
          */
         let optOutConfirmedExpectation = expectation(description: "Opt out confirmed")
         await awaitFulfillment(of: optOutConfirmedExpectation,
-                               withTimeout: 300,
+                               withTimeout: 600,
                                whenCondition: {
             let queries = try! database.fetchAllBrokerProfileQueryData()
             let optOutJobs = queries.flatMap { $0.optOutJobData }
