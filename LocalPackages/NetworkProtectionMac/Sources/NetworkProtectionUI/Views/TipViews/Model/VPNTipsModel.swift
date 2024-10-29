@@ -33,7 +33,6 @@ public final class VPNTipsModel: ObservableObject {
                 return
             }
 
-            print("🧉🧉 activeSiteInfo: \(String(describing: activeSiteInfo))")
             handleActiveSiteInfoChanged(newValue: activeSiteInfo)
         }
     }
@@ -45,7 +44,6 @@ public final class VPNTipsModel: ObservableObject {
                 return
             }
 
-            print("🧉🧉 activeSiteInfo: \(String(describing: connectionStatus))")
             handleConnectionStatusChanged(oldValue: oldValue, newValue: connectionStatus)
         }
     }
@@ -53,7 +51,6 @@ public final class VPNTipsModel: ObservableObject {
     @Published
     private(set) var featureFlag: Bool
 
-    //private var tips: TipGrouping
     private let vpnSettings: VPNSettings
     private let logger: Logger
     private var cancellables = Set<AnyCancellable>()
@@ -65,7 +62,6 @@ public final class VPNTipsModel: ObservableObject {
                 vpnSettings: VPNSettings,
                 logger: Logger) {
 
-        print("🧉🟢 New model instance")
         self.activeSiteInfo = activeSitePublisher.value
         self.connectionStatus = statusObserver.recentValue
         self.featureFlag = featureFlagPublisher.value
@@ -73,6 +69,8 @@ public final class VPNTipsModel: ObservableObject {
         self.vpnSettings = vpnSettings
 
         if #available(macOS 14.0, *) {
+            VPNDomainExclusionsTip.canShow = !isMenuApp
+
             handleActiveSiteInfoChanged(newValue: activeSiteInfo)
             handleConnectionStatusChanged(oldValue: connectionStatus, newValue: connectionStatus)
 
@@ -123,7 +121,6 @@ public final class VPNTipsModel: ObservableObject {
         case .connected:
             if case oldValue = .connecting {
                 Task {
-                    print("🧉💎 Geoswitching tip donated")
                     await VPNGeoswitchingTip.vpnConnectedEvent.donate()
                 }
             }
@@ -145,7 +142,7 @@ public final class VPNTipsModel: ObservableObject {
         }
     }
 
-    @available(macOS 14.0, *)
+    /*@available(macOS 14.0, *)
     func subscribeToTipStatusChanges(_ tip: VPNGeoswitchingTip) {
         if tip.shouldDisplay {
             Task {
@@ -170,5 +167,5 @@ public final class VPNTipsModel: ObservableObject {
                 }
             }
         }
-    }
+    }*/
 }

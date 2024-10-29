@@ -240,7 +240,14 @@ public struct TunnelControllerView: View {
         let tip = VPNGeoswitchingTip()
 
         if #available(macOS 14.0, *) {
-            tipsModel.subscribeToTipStatusChanges(tip)
+            Task {
+                for await status in tip.statusUpdates {
+                    if case .invalidated = status {
+                        await VPNDomainExclusionsTip.geolocationTipDismissedEvent.donate()
+                        await VPNAutoconnectTip.geolocationTipDismissedEvent.donate()
+                    }
+                }
+            }
         }
 
         return tip
@@ -250,7 +257,15 @@ public struct TunnelControllerView: View {
         let tip = VPNDomainExclusionsTip()
 
         if #available(macOS 14.0, *) {
-            tipsModel.subscribeToTipStatusChanges(tip)
+            if tip.shouldDisplay {
+                Task {
+                    for await status in tip.statusUpdates {
+                        if case .invalidated = status {
+                            await VPNAutoconnectTip.domainExclusionsTipDismissedEvent.donate()
+                        }
+                    }
+                }
+            }
         }
 
         return tip
