@@ -285,7 +285,7 @@ final class DBPEndToEndTests: XCTestCase {
 
 // MARK: - Fake broker setup and config
 
-extension PIRScanIntegrationTests {
+extension DBPEndToEndTests {
 
     struct FakeBrokerUserProfile: Codable {
         let firstName: String
@@ -341,7 +341,7 @@ extension PIRScanIntegrationTests {
 
 // MARK: - Testing helpers and utilities
 
-private extension PIRScanIntegrationTests {
+private extension DBPEndToEndTests {
 
     /*
      Used to check an Expectation continuously
@@ -397,7 +397,7 @@ private extension PIRScanIntegrationTests {
 
 // MARK: - Mocks
 
-private extension PIRScanIntegrationTests {
+private extension DBPEndToEndTests {
 
     var mockProfile: DataBrokerProtectionProfile {
         // Use the current year to calculate age, since the fake broker is static (so will always list "63")
