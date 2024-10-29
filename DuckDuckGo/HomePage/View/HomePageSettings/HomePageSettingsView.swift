@@ -232,6 +232,7 @@ extension HomePage.Views.BackgroundCategoryView {
     fileprivate typealias BackgroundThumbnailView = HomePage.Views.BackgroundThumbnailView
 }
 
+#if DEBUG
 #Preview {
     @State var isSettingsVisible: Bool = true
 
@@ -260,3 +261,4 @@ extension HomePage.Views.BackgroundCategoryView {
         ))
         .environmentObject(HomePage.Models.AddressBarModel(tabCollectionViewModel: TabCollectionViewModel(), privacyConfigurationManager: MockPrivacyConfigurationManager()))
 }
+#endif
