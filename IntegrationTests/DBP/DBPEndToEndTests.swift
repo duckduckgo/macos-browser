@@ -128,9 +128,6 @@ final class DBPEndToEndTests: XCTestCase {
             _ = try await communicationLayer.saveProfile(params: [], original: WKScriptMessage())
         }
 
-        assertCondition(withExpectationDescription: "Test should pass", condition: { true })
-        assertCondition(withExpectationDescription: "Test should fail", condition: { false })
-
         // Then
         let profileSavedExpectation = expectation(description: "Profile saved in DB")
         let profileQueriesCreatedExpectation = expectation(description: "Profile queries created")
@@ -149,13 +146,24 @@ final class DBPEndToEndTests: XCTestCase {
         // Also check that we made the broker profile queries correctly
         let queries = try! database.fetchAllBrokerProfileQueryData()
         let initialBrokers = queries.compactMap { $0.dataBroker }
-        XCTAssertEqual(initialBrokers.count, 1)
-        XCTAssertEqual(initialBrokers.first?.name, "DDG Fake Broker")
-        XCTAssertEqual(queries.count, 1)
+        assertCondition(withExpectationDescription: "Correctly read and saved 1 broker after profile save",
+                        condition: { initialBrokers.count == 1 })
+        assertCondition(withExpectationDescription: "Saved correct broker after profile save",
+                        condition: { initialBrokers.first?.name == "DDG Fake Broker" })
+        assertCondition(withExpectationDescription: "Created 1 BrokerProfileQuery correctly after profile save",
+                        condition: { queries.count == 1 })
 
         // At this stage the login item should be running
-        XCTAssertTrue(loginItemsManager.isAnyEnabled([.dbpBackgroundAgent]))
-        XCTAssertTrue(LoginItem.dbpBackgroundAgent.isRunning)
+        assertCondition(withExpectationDescription: "Login item enabled after profile save",
+                        condition: { loginItemsManager.isAnyEnabled([.dbpBackgroundAgent]) })
+
+        // This needs to be await since it takes time to start the login item
+        let loginItemRunningExpectation = expectation(description: "Login item running after profile save")
+        await awaitFulfillment(of: loginItemRunningExpectation,
+                               withTimeout: 3,
+                               whenCondition: {
+            LoginItem.dbpBackgroundAgent.isRunning
+        })
 
         print("Stage 1 passed: We save a profile")
 
@@ -172,7 +180,8 @@ final class DBPEndToEndTests: XCTestCase {
         })
 
         let metaData = await communicationDelegate.getBackgroundAgentMetadata()
-        XCTAssertNotNil(metaData.lastStartedSchedulerOperationBrokerUrl)
+        assertCondition(withExpectationDescription: "Last operation broker URL is not nil",
+                        condition: { metaData.lastStartedSchedulerOperationBrokerUrl != nil })
 
         print("Stage 2 passed: We scan brokers")
 
