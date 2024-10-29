@@ -118,15 +118,15 @@ class TestFailureObserver: NSObject, XCTestObservation {
 }
 
 class UITestCase: XCTestCase {
-    private static let failureObserver = TestFailureObserver()
+//    private static let failureObserver = TestFailureObserver()
 
     override class func setUp() {
         super.setUp()
-        XCTestObservationCenter.shared.addTestObserver(failureObserver)
+//        XCTestObservationCenter.shared.addTestObserver(failureObserver)
     }
 
     override class func tearDown() {
-        XCTestObservationCenter.shared.removeTestObserver(failureObserver)
+//        XCTestObservationCenter.shared.removeTestObserver(failureObserver)
         super.tearDown()
     }
 }
