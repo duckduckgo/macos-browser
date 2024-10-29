@@ -39,6 +39,7 @@ public struct ReleaseNotesValues: Codable {
         case updateDownloading
         case updatePreparing
         case updateError
+        case criticalUpdateReady
     }
 
     let status: String
@@ -164,7 +165,11 @@ extension ReleaseNotesValues {
             status = .loaded
             downloadProgress = nil
         case .updateCycle(let progress):
-            status = updateController.hasPendingUpdate ? .updateReady : progress.toStatus
+            if updateController.hasPendingUpdate {
+                status = updateController.latestUpdate?.type == .critical ? .criticalUpdateReady : .updateReady
+            } else {
+                status = progress.toStatus
+            }
             downloadProgress = progress.toDownloadProgress
         }
 

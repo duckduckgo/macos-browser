@@ -148,6 +148,9 @@ extension Preferences {
         private var hasPendingUpdate: Bool {
             model.updateController?.hasPendingUpdate == true
         }
+        private var hasCriticalUpdate: Bool {
+            model.updateController?.latestUpdate?.type == .critical
+        }
 #endif
 
         @ViewBuilder
@@ -165,7 +168,11 @@ extension Preferences {
                     Text(" — " + UserText.upToDate)
                 case .updateCycle(let progress):
                     if hasPendingUpdate {
-                        Text(" — " + UserText.newerVersionAvailable)
+                        if hasCriticalUpdate {
+                            Text(" — " + UserText.newerCriticalUpdateAvailable)
+                        } else {
+                            Text(" — " + UserText.newerVersionAvailable)
+                        }
                     } else {
                         text(for: progress)
                     }
@@ -205,11 +212,19 @@ extension Preferences {
         private var statusIcon: some View {
             switch model.updateState {
             case .upToDate:
-                Image(systemName: "checkmark.circle.fill")
+                Image(nsImage: .check)
                     .foregroundColor(.green)
             case .updateCycle(let progress):
-                if hasPendingUpdate || progress.isFailed {
-                    Image(systemName: "exclamationmark.circle.fill")
+                if hasPendingUpdate {
+                    if hasCriticalUpdate {
+                        Image(nsImage: .criticalUpdateNotificationInfo)
+                            .foregroundColor(.red)
+                    } else {
+                        Image(nsImage: .updateNotificationInfo)
+                            .foregroundColor(.blue)
+                    }
+                } else if progress.isFailed {
+                    Image(nsImage: .criticalUpdateNotificationInfo)
                         .foregroundColor(.red)
                 } else {
                     ProgressView()
