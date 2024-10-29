@@ -121,8 +121,6 @@ struct SyncPromoView: View {
                 .padding(.trailing, 40)
             }
             .padding(.leading, 8)
-
-            closeButton
         }
     }
 
