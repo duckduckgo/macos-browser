@@ -783,6 +783,7 @@ protocol NewWindowPolicyDecisionMaker {
 #if DEBUG || REVIEW
         if Application.runType == .uiTests {
             Application.appDelegate.onboardingStateMachine.state = .onboardingCompleted
+            setContent(.onboardingDeprecated)
             return
         }
         if Application.runType == .uiTestsOnboarding {
