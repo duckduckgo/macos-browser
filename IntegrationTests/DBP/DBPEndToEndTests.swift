@@ -35,7 +35,7 @@ final class DBPEndToEndTests: XCTestCase {
     let testUserDefault = UserDefaults(suiteName: #function)!
 
     override func setUpWithError() throws {
-        //continueAfterFailure = false
+        continueAfterFailure = false
 
         loginItemsManager = LoginItemsManager()
         loginItemsManager.disableLoginItems([LoginItem.dbpBackgroundAgent])
@@ -97,6 +97,10 @@ final class DBPEndToEndTests: XCTestCase {
 
      Checking steps 6-8 are currently commented out since the fake broker doesn't
      support sending emails at the moment
+
+     It avoids using XCTAssert etc in place of expectations (with helper methods)
+     so when they fail there are more useful error messages in the log.
+     When we adopt Swift 6, this can likely be replaced with the new testing macros
      */
     func testWhenProfileIsSaved_ThenEachStepHappensInSequence() async throws {
         // Given
@@ -123,6 +127,9 @@ final class DBPEndToEndTests: XCTestCase {
         Task { @MainActor in
             _ = try await communicationLayer.saveProfile(params: [], original: WKScriptMessage())
         }
+
+        assertCondition(withExpectationDescription: "Test should pass", condition: { true })
+        assertCondition(withExpectationDescription: "Test should fail", condition: { false })
 
         // Then
         let profileSavedExpectation = expectation(description: "Profile saved in DB")
@@ -361,6 +368,19 @@ private extension DBPEndToEndTests {
     private func fulfillExpecation(_ expectation: XCTestExpectation, whenCondition condition: () async -> Bool) async {
         while await !condition() { }
         expectation.fulfill()
+    }
+
+    /*
+     Used instead of using assert etc directly so we get better error messages
+     in the log when they fail.
+     When we adopt Swift 6 can likely be replaced
+     */
+    private func assertCondition(withExpectationDescription description: String, condition: () -> Bool) {
+        let expectation = expectation(description: description)
+        if condition() {
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 0)
     }
 
     typealias PixelExpectation = (pixel: DataBrokerProtectionPixels, expectation: XCTestExpectation)
