@@ -1,5 +1,5 @@
 //
-//  PIRScanIntegrationTests.swift
+//  DBPEndToEndTests.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -25,7 +25,7 @@ import Combine
 @testable import DuckDuckGo_Privacy_Browser
 @testable import PixelKit
 
-final class PIRScanIntegrationTests: XCTestCase {
+final class DBPEndToEndTests: XCTestCase {
 
     var loginItemsManager: LoginItemsManager!
     var pirProtectionManager = DataBrokerProtectionManager.shared
