@@ -782,6 +782,7 @@ protocol NewWindowPolicyDecisionMaker {
 
 #if DEBUG || REVIEW
         if Application.runType == .uiTestsOnboarding {
+            Application.appDelegate.onboardingStateMachine.state = .notStarted
             setContent(.onboarding)
             return
         }
