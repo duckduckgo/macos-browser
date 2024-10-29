@@ -27358,8 +27358,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Passe den Hintergrund, das Design und sogar die angezeigten Inhalte an. Versuch es doch mal!"
+            "state" : "translated",
+            "value" : "Personalisiere deine neue Tab-Seite. Probier’s doch mal aus!"
           }
         },
         "en" : {
@@ -27370,44 +27370,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Personaliza el fondo, el tema e incluso el contenido que ves. ¡Pruébalo!"
+            "state" : "translated",
+            "value" : "Añade más personalidad y elige lo que quieres ver en tu nueva pestaña. ¡Pruébalo!"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Personnalisez l'arrière-plan, le thème et même le contenu que vous voyez. Essayez par vous-même !"
+            "state" : "translated",
+            "value" : "Ajoutez une personnalité supplémentaire et choisissez ce que vous voulez voir sur votre nouvelle page à onglet. Essayez par vous-même !"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Personalizza lo sfondo, il tema e persino i contenuti che vedi. Prova!"
+            "state" : "translated",
+            "value" : "Aggiungi un tocco di personalità e scegli cosa vuoi vedere nella tua nuova scheda. Prova!"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Pas de achtergrond, het thema en zelfs de inhoud aan die je ziet. Probeer het maar eens!"
+            "state" : "translated",
+            "value" : "Voeg extra persoonlijkheid toe en kies wat je op je nieuwe tabbladpagina wilt zien. Probeer het maar eens!"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Dostosuj tło, motyw oraz wyświetlaną zawartość. Spróbuj!"
+            "state" : "translated",
+            "value" : "Wybierz, co chcesz zobaczyć na stronie nowej karty, aby zyskała bardziej indywidualny charakter. Spróbuj!"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Personaliza o fundo, o tema e até o conteúdo que vês. Experimenta!"
+            "state" : "translated",
+            "value" : "Adiciona personalidade extra e escolhe o que queres ver na tua página do novo separador. Experimenta!"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Можно настроить фон, тему и даже отображаемый контент. Давайте попробуем!"
+            "state" : "translated",
+            "value" : "Добавьте дополнительную персонализацию и выберите, что должно присутствовать на странице новой вкладки. Попробуйте!"
           }
         }
       }
@@ -27418,8 +27418,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Personalisiere deine neue Tab-Seite"
+            "state" : "translated",
+            "value" : "Neues Suchfeld, benutzerdefinierte Hintergründe und mehr!"
           }
         },
         "en" : {
@@ -27430,44 +27430,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Añade más personalidad a tu página de nueva pestaña"
+            "state" : "translated",
+            "value" : "¡Nuevo cuadro de búsqueda, fondos personalizados y mucho más!"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Ajoutez une personnalité supplémentaire à votre nouvelle page à onglet"
+            "state" : "translated",
+            "value" : "Nouvelle boîte de recherche, arrière-plans personnalisés et plus encore !"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Aggiungi un tocco di personalità alla tua nuova scheda"
+            "state" : "translated",
+            "value" : "Nuova casella di ricerca, sfondi personalizzati e altro ancora!"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Voeg extra persoonlijkheid toe aan je nieuwe tabbladpagina"
+            "state" : "translated",
+            "value" : "Nieuw zoekvak, aangepaste achtergronden en meer!"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Dostosuj stronę nowej zakładki do potrzeb"
+            "state" : "translated",
+            "value" : "Nowe pole wyszukiwania, niestandardowe tła i nie tylko!"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Adiciona personalidade extra à tua página do novo separador"
+            "state" : "translated",
+            "value" : "Nova caixa de pesquisa, fundos personalizados e mais!"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Дополнительная персонализация новой вкладки"
+            "state" : "translated",
+            "value" : "Новая строка поиска, собственные фоны и многое другое"
           }
         }
       }
