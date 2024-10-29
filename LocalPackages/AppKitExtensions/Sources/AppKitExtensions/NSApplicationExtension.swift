@@ -25,7 +25,7 @@ public extension NSApplication {
         ProcessInfo.processInfo.environment["APP_SANDBOX_CONTAINER_ID"] != nil
     }
 
-    enum RunType {
+    enum RunType: String {
         case normal
         case unitTests
         case integrationTests

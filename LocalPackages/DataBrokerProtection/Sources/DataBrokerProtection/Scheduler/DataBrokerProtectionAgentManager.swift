@@ -35,7 +35,8 @@ public class DataBrokerProtectionAgentManagerProvider {
                                     accountManager: AccountManager) -> DataBrokerProtectionAgentManager {
         let pixelHandler = DataBrokerProtectionPixelsHandler()
 
-        let executionConfig = DataBrokerExecutionConfig(mode: NSApp.runType == .integrationTests ? .fastForIntegrationTests : .normal)
+        let dbpSettings = DataBrokerProtectionSettings()
+        let executionConfig = DataBrokerExecutionConfig(mode: dbpSettings.storedRunType == .integrationTests ? .fastForIntegrationTests : .normal)
         let activityScheduler = DefaultDataBrokerProtectionBackgroundActivityScheduler(config: executionConfig)
 
         let notificationService = DefaultDataBrokerProtectionUserNotificationService(pixelHandler: pixelHandler, userNotificationCenter: UNUserNotificationCenter.current(), authenticationManager: authenticationManager)
