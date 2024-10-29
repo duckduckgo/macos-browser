@@ -113,7 +113,7 @@ final class AIChatMenuConfiguration: AIChatMenuVisibilityConfigurable {
         notificationCenter.publisher(for: .AIChatOpenedForReturningUser)
             .sink { [weak self] _ in
                 guard let self = self else { return }
-                if !self.storage.didDisplayAIChatToolbarOnboarding {
+                if !self.storage.didDisplayAIChatToolbarOnboarding && !storage.shouldDisplayToolbarShortcut {
                     self.shouldDisplayToolbarOnboardingPopover.send()
                 }
             }.store(in: &cancellables)
