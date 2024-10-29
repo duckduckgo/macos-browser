@@ -115,6 +115,12 @@ jobs:
         cd DuckDuckGo-review-*.app && unzip DuckDuckGo-*.zip
         mv -f "DuckDuckGo Review.app" "../DerivedData/Build/Products/Review/DuckDuckGo Review.app"
 
+    - name: Increase screen resolution
+      run: |
+        system_profiler SPDisplaysDataType | grep Resolution
+        "/Library/Application Support/VMware Tools/vmware-resolutionSet" 2560 1440
+        system_profiler SPDisplaysDataType | grep Resolution
+
     - name: Run UI Tests
       run: |
         defaults write com.duckduckgo.macos.browser.review moveToApplicationsFolderAlertSuppress 1
