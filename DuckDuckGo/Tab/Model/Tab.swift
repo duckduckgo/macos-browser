@@ -781,13 +781,7 @@ protocol NewWindowPolicyDecisionMaker {
         userInteractionDialog = nil
 
 #if DEBUG || REVIEW
-        if Application.runType == .uiTests {
-            Application.appDelegate.onboardingStateMachine.state = .onboardingCompleted
-            setContent(.onboardingDeprecated)
-            return
-        }
         if Application.runType == .uiTestsOnboarding {
-            Application.appDelegate.onboardingStateMachine.state = .notStarted
             setContent(.onboarding)
             return
         }

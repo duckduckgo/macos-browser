@@ -100,44 +100,6 @@ final class OnboardingUITests: XCTestCase {
         let duckduckgoPage = app.windows["DuckDuckGo — Privacy, simplified."]
         XCTAssertTrue(duckduckgoPage.webViews["DuckDuckGo — Privacy, simplified."].waitForExistence(timeout: UITests.Timeouts.elementExistence))
         XCTAssertTrue(duckduckgoPage.buttons["NavigationBarViewController.optionsButton"].isEnabled)
-
-        // Contextual Onboarding
-//        XCTAssertTrue(duckduckgoPage.staticTexts["Try a search!"].waitForExistence(timeout: UITests.Timeouts.elementExistence))
-//
-//        let searchSuggestionButton = duckduckgoPage.buttons["how to say “duck” in spanish"]
-//        XCTAssertTrue(searchSuggestionButton.waitForExistence(timeout: UITests.Timeouts.siteLoad))
-//        searchSuggestionButton.click()
-//
-//        let suggestedSearchPage = app.windows["how to say duck in spanish at DuckDuckGo"]
-//        XCTAssertTrue(suggestedSearchPage.staticTexts["That’s DuckDuckGo Search!"].waitForExistence(timeout: UITests.Timeouts.elementExistence))
-//
-//        let searchGotIt = suggestedSearchPage.buttons["Got it"]
-//        XCTAssertTrue(searchGotIt.waitForExistence(timeout: UITests.Timeouts.elementExistence))
-//        searchGotIt.click()
-//
-//        XCTAssertTrue(suggestedSearchPage.staticTexts["Next, try visiting a site!"].waitForExistence(timeout: UITests.Timeouts.elementExistence))
-//
-//        let siteSuggestionButton = suggestedSearchPage.buttons["yahoo.com"]
-//        XCTAssertTrue(siteSuggestionButton.waitForExistence(timeout: UITests.Timeouts.elementExistence))
-//        siteSuggestionButton.click()
-//
-//        let siteSuggestedPage = app.windows["Yahoo | Mail, Weather, Search, Politics, News, Finance,…"]
-//        XCTAssertTrue(siteSuggestedPage.staticTexts["Taboola and Google Ads (Google) were trying to track you here. I blocked them!\n\n☝️ Tap the shield for more info."].waitForExistence(timeout: UITests.Timeouts.siteLoad))
-//
-//        let trackerGotIt = siteSuggestedPage.buttons["Got it"]
-//        XCTAssertTrue(trackerGotIt.waitForExistence(timeout: UITests.Timeouts.elementExistence))
-//        trackerGotIt.click()
-//
-//        XCTAssertTrue(siteSuggestedPage.staticTexts["Instantly clear your browsing activity with the Fire Button.\n\nGive it a try! 🔥"].waitForExistence(timeout: UITests.Timeouts.elementExistence))
-//
-//        let skipFire = siteSuggestedPage.buttons["Skip"]
-//        XCTAssertTrue(skipFire.waitForExistence(timeout: UITests.Timeouts.elementExistence))
-//        skipFire.click()
-//
-//        XCTAssertTrue(siteSuggestedPage.staticTexts["You’ve got this!"].waitForExistence(timeout: UITests.Timeouts.elementExistence))
-//        let highFive = siteSuggestedPage.buttons["High five!"]
-//        XCTAssertTrue(highFive.waitForExistence(timeout: UITests.Timeouts.elementExistence))
-//        highFive.click()
     }
 
     func resetApplicationData() throws {
