@@ -194,4 +194,51 @@ final class AppearancePreferencesTests: XCTestCase {
         XCTAssertTrue(persister2.isContinueSetUpVisible)
         XCTAssertTrue(persister2.isSearchBarVisible)
     }
+
+    func testContinueSetUpIsDismissedAfterWeek() {
+        // 1. app installed
+        var now = Date()
+        AppDelegate.firstLaunchDate = now
+
+        // listen to AppearancePreferences.objectWillChange
+        let model = AppearancePreferences(persistor: AppearancePreferencesPersistorMock(), dateTimeProvider: { now })
+        var eObjectWillChange: XCTestExpectation!
+        let c = model.objectWillChange.sink {
+            eObjectWillChange.fulfill()
+        }
+        func incrementDate() {
+            now = Calendar.current.date(byAdding: .day, value: 1, to: now)!
+        }
+
+        // check during 7 days
+        // eObjectWillChange shouldn‘t be called until 1 week
+        for i in 0..<7 {
+            XCTAssertTrue(model.isContinueSetUpVisible, "\(i)")
+            incrementDate()
+        }
+        // 1 week passed
+        // eObjectWillChange should be called once
+        eObjectWillChange = expectation(description: "AppearancePreferences.objectWillChange called")
+        incrementDate()
+        XCTAssertFalse(model.isContinueSetUpVisible, "7")
+        waitForExpectations(timeout: 0)
+
+        // shouldn‘t change after being set once
+        for i in 8..<20 {
+            XCTAssertFalse(model.isContinueSetUpVisible, "\(i)")
+            incrementDate()
+        }
+
+        withExtendedLifetime(c) {}
+    }
+
+    func testWhenLauchedAfterWeek_continueSetUpIsDismissed() {
+        let now = Date().addingTimeInterval(1)
+        let weekAgo = Date.weekAgo
+        AppDelegate.firstLaunchDate = weekAgo
+
+        let model = AppearancePreferences(persistor: AppearancePreferencesPersistorMock(), dateTimeProvider: { now })
+        XCTAssertFalse(model.isContinueSetUpVisible)
+    }
+
 }

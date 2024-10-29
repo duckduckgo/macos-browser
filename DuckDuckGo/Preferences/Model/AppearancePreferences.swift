@@ -178,6 +178,7 @@ final class AppearancePreferences: ObservableObject {
 
     struct Constants {
         static let bookmarksBarAlignmentChangedIsCenterAlignedParameter = "isCenterAligned"
+        static let dismissNextStepsCardsAfterDays = 7
     }
 
     static let shared = AppearancePreferences()
@@ -211,13 +212,22 @@ final class AppearancePreferences: ObservableObject {
         }
     }
 
-    @Published var isContinueSetUpVisible: Bool {
-        didSet {
-            persistor.isContinueSetUpVisible = isContinueSetUpVisible
+    var isContinueSetUpVisible: Bool {
+        get {
+            guard persistor.isContinueSetUpVisible else { return false }
+            if AppDelegate.firstLaunchDate < Calendar.current.date(byAdding: .day, value: -Constants.dismissNextStepsCardsAfterDays, to: dateTimeProvider())! {
+                self.isContinueSetUpVisible = false
+                return false
+            }
+            return true
+        }
+        set {
+            persistor.isContinueSetUpVisible = newValue
             // Temporary Pixel
             if !isContinueSetUpVisible {
                 PixelKit.fire(GeneralPixel.continueSetUpSectionHidden)
             }
+            self.objectWillChange.send()
         }
     }
 
@@ -291,16 +301,17 @@ final class AppearancePreferences: ObservableObject {
 
     init(
         persistor: AppearancePreferencesPersistor = AppearancePreferencesUserDefaultsPersistor(),
-        homePageNavigator: HomePageNavigator = DefaultHomePageNavigator()
+        homePageNavigator: HomePageNavigator = DefaultHomePageNavigator(),
+        dateTimeProvider: @escaping () -> Date = Date.init
     ) {
         self.persistor = persistor
         self.homePageNavigator = homePageNavigator
+        self.dateTimeProvider = dateTimeProvider
         currentThemeName = .init(rawValue: persistor.currentThemeName) ?? .systemDefault
         showFullURL = persistor.showFullURL
         favoritesDisplayMode = persistor.favoritesDisplayMode.flatMap(FavoritesDisplayMode.init) ?? .default
         isFavoriteVisible = persistor.isFavoriteVisible
         isRecentActivityVisible = persistor.isRecentActivityVisible
-        isContinueSetUpVisible = persistor.isContinueSetUpVisible
         isSearchBarVisible = persistor.isSearchBarVisible
         showBookmarksBar = persistor.showBookmarksBar
         bookmarksBarAppearance = persistor.bookmarksBarAppearance
@@ -311,12 +322,11 @@ final class AppearancePreferences: ObservableObject {
 
     private var persistor: AppearancePreferencesPersistor
     private var homePageNavigator: HomePageNavigator
+    private let dateTimeProvider: () -> Date
 
     private func requestSync() {
         Task { @MainActor in
-            guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService else {
-                return
-            }
+            guard let syncService = NSApp.delegateTyped.syncService else { return }
             Logger.sync.debug("Requesting sync if enabled")
             syncService.scheduler.notifyDataChanged()
         }
