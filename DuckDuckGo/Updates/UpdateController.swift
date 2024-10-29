@@ -97,7 +97,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     @UserDefaultsWrapper(key: .automaticUpdates, defaultValue: true)
     var areAutomaticUpdatesEnabled: Bool {
         didSet {
-            Logger.updates.debug("areAutomaticUpdatesEnabled: \(self.areAutomaticUpdatesEnabled)")
+            Logger.updates.log("areAutomaticUpdatesEnabled: \(self.areAutomaticUpdatesEnabled)")
             if oldValue != areAutomaticUpdatesEnabled {
                 userDriver?.cancelAndDismissCurrentUpdate()
                 try? configureUpdater()
@@ -145,7 +145,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     func checkForUpdateIfNeeded() {
         guard let updater, !updater.sessionInProgress else { return }
 
-        Logger.updates.debug("Checking for updates")
+        Logger.updates.log("Checking for updates")
 
         updater.checkForUpdates()
     }
@@ -242,7 +242,7 @@ extension UpdateController: SPUUpdaterDelegate {
     }
 
     func updater(_ updater: SPUUpdater, didFindValidUpdate item: SUAppcastItem) {
-        Logger.updates.debug("Updater did find valid update: \(item.displayVersionString)(\(item.versionString))")
+        Logger.updates.log("Updater did find valid update: \(item.displayVersionString)(\(item.versionString))")
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidFindUpdate))
         cachedUpdateResult = UpdateCheckResult(item: item, isInstalled: false)
     }
@@ -251,31 +251,31 @@ extension UpdateController: SPUUpdaterDelegate {
         let nsError = error as NSError
         guard let item = nsError.userInfo["SULatestAppcastItemFound"] as? SUAppcastItem else { return }
 
-        Logger.updates.debug("Updater did not find update: \(String(describing: item.displayVersionString))(\(String(describing: item.versionString)))")
+        Logger.updates.log("Updater did not find update: \(String(describing: item.displayVersionString))(\(String(describing: item.versionString)))")
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidNotFindUpdate, error: error))
 
         cachedUpdateResult = UpdateCheckResult(item: item, isInstalled: true)
     }
 
     func updater(_ updater: SPUUpdater, didDownloadUpdate item: SUAppcastItem) {
-        Logger.updates.debug("Updater did download update: \(item.displayVersionString)(\(item.versionString))")
+        Logger.updates.log("Updater did download update: \(item.displayVersionString)(\(item.versionString))")
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidDownloadUpdate))
     }
 
     func updater(_ updater: SPUUpdater, didExtractUpdate item: SUAppcastItem) {
-        Logger.updates.debug("Updater did extract update: \(item.displayVersionString)(\(item.versionString))")
+        Logger.updates.log("Updater did extract update: \(item.displayVersionString)(\(item.versionString))")
     }
 
     func updater(_ updater: SPUUpdater, willInstallUpdate item: SUAppcastItem) {
-        Logger.updates.debug("Updater will install update: \(item.displayVersionString)(\(item.versionString))")
+        Logger.updates.log("Updater will install update: \(item.displayVersionString)(\(item.versionString))")
     }
 
     func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {
         if error == nil {
-            Logger.updates.debug("Updater did finish update cycle")
+            Logger.updates.log("Updater did finish update cycle")
             updateProgress = .updateCycleDone
         } else {
-            Logger.updates.debug("Updater did finish update cycle with error")
+            Logger.updates.log("Updater did finish update cycle with error")
         }
     }
 

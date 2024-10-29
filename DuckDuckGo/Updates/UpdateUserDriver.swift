@@ -119,7 +119,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     }
 
     func showUserInitiatedUpdateCheck(cancellation: @escaping () -> Void) {
-        Logger.updates.debug("Updater started performing the update check. (isInternalUser: \(self.internalUserDecider.isInternalUser)")
+        Logger.updates.log("Updater started performing the update check. (isInternalUser: \(self.internalUserDecider.isInternalUser)")
         updateProgress = .updateCycleDidStart
     }
 
