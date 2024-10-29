@@ -1352,5 +1352,47 @@ struct UserText {
     static let syncPromoSidePanelTitle = NSLocalizedString("sync.promo.passwords.side.panel.title", value:"Setup", comment: "Title for the Sync Promotion in passwords side panel")
     static let syncPromoSidePanelSubtitle = NSLocalizedString("sync.promo.passwords.side.panel.subtitle", value:"Sync & Backup", comment: "Subtitle for the Sync Promotion in passwords side panel")
 
+    // Key: "freemium.pir.menu.item"
+    // Comment: "Title for Freemium Personal Information Removal (Scan-Only) item in the options menu"
+    static let freemiumDBPOptionsMenuItem = "Free Personal Information Scan"
 
+    // Key: "home.page.promotion.freemium.dbp.text"
+    // Comment: "Text for the Freemium DBP Home Page Promotion"
+    static let homePagePromotionFreemiumDBPText = "Find your personal info on sites that sell it."
+
+    // Key: "home.page.promotion.freemium.dbp.button.title"
+    // Comment: "Title for the Freemium DBP Home Page Promotion Button"
+    static let homePagePromotionFreemiumDBPButtonTitle = "Free Scan"
+
+    // Key: "home.page.promotion.freemium.dbp.post.scan.engagement.result.single.match.text"
+    // Comment: "Text for the Freemium DBP Home Page Post Scan Engagement Promotion When Only One Record is Found"
+    static let homePagePromotionFreemiumDBPPostScanEngagementResultSingleMatchText = "Your free personal info scan found 1 record about you on 1 site."
+
+    /// Generates Text for the Freemium DBP Home Page Post Scan Engagement Promotion when records are found on a single broker site.
+    /// Key: "home.page.promotion.freemium.dbp.post.scan.engagement.result.single.broker.text"
+    ///
+    /// - Parameter resultCount: The number of records found.
+    /// - Returns: A formatted string indicating the number of records found on 1 site.
+    static func homePagePromotionFreemiumDBPPostScanEngagementResultSingleBrokerText(resultCount: Int) -> String {
+        String(format: "Your free personal info scan found %d records about you on 1 site.", resultCount)
+    }
+
+    /// Generates Text for the Freemium DBP Home Page Post Scan Engagement Promotion when records are found on multiple broker sites.
+    /// Key: "home.page.promotion.freemium.dbp.post.scan.engagement.result.plural.text"
+    ///
+    /// - Parameters:
+    ///   - resultCount: The number of records found.
+    ///   - brokerCount: The number of broker sites where records were found.
+    /// - Returns: A formatted string indicating the number of records found on multiple sites.
+    static func homePagePromotionFreemiumDBPPostScanEngagementResultPluralText(resultCount: Int, brokerCount: Int) -> String {
+        String(format: "Your free personal info scan found %d records about you on %d different sites.", resultCount, brokerCount)
+    }
+
+    // Key: "home.page.promotion.freemium.dbp.post.scan.engagement.no.results.text"
+    // Comment: "Text for the Freemium DBP Home Page Post Scan Engagement Promotion When There Are No Results"
+    static let homePagePromotionFreemiumDBPPostScanEngagementNoResultsText = "Good news, your free personal info scan didn't find any records about you. We'll keep checking periodically."
+
+    // Key: "home.page.promotion.freemium.dbp.post.scan.engagement.button.title"
+    // Comment: "Title for the Freemium DBP Home Page Post Scan Engagement Promotion Button"
+    static let homePagePromotionFreemiumDBPPostScanEngagementButtonTitle = "View Results"
 }
