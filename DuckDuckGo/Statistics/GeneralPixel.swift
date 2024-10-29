@@ -156,6 +156,14 @@ enum GeneralPixel: PixelKitEventV2 {
     case networkProtectionGeoswitchingSetCustom
     case networkProtectionGeoswitchingNoLocations
 
+    // AI Chat
+    case aichatToolbarClicked
+    case aichatApplicationMenuAppClicked
+    case aichatApplicationMenuFileClicked
+    case aichatToolbarOnboardingPopoverShown
+    case aichatToolbarOnboardingPopoverAccept
+
+
     // Sync
     case syncSignupDirect
     case syncSignupConnect
@@ -661,6 +669,18 @@ enum GeneralPixel: PixelKitEventV2 {
 
         case .networkProtectionEnabledOnSearch:
             return "m_mac_netp_ev_enabled_on_search"
+
+            // AI Chat
+        case .aichatToolbarClicked:
+            return "m_mac_aichat_toolbar-clicked"
+        case .aichatApplicationMenuAppClicked:
+            return "m_mac_aichat_application-menu-app-clicked"
+        case .aichatApplicationMenuFileClicked:
+            return "m_mac_aichat_application-menu-file-clicked"
+        case .aichatToolbarOnboardingPopoverShown:
+            return "m_mac_aichat_toolbar-onboarding-popover-shown"
+        case .aichatToolbarOnboardingPopoverAccept:
+            return "m_mac_aichat_toolbar-onboarding-popover-accept"
 
             // Sync
         case .syncSignupDirect:

@@ -179,6 +179,7 @@ final class MoreOptionsMenu: NSMenu {
     @MainActor
     @objc func newAiChat(_ sender: NSMenuItem) {
         AIChatTabOpener.openAIChatTab()
+        PixelKit.fire(GeneralPixel.aichatApplicationMenuAppClicked, includeAppVersionParameter: true)
     }
 
     @MainActor

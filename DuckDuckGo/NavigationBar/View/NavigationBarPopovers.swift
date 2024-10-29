@@ -238,6 +238,8 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
         guard closeTransientPopovers() else { return }
         let popover = aiChatOnboardingPopover ?? AIChatOnboardingPopover(ctaCallback: ctaCallback)
 
+        PixelKit.fire(GeneralPixel.aichatToolbarOnboardingPopoverShown,
+                      includeAppVersionParameter: true)
         popover.delegate = delegate
         aiChatOnboardingPopover = popover
         show(popover, positionedBelow: button)

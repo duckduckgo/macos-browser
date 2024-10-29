@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+import PixelKit
+
 final class AIChatToolBarPopUpOnboardingViewModel: ObservableObject {
     var aiChatStorage: AIChatPreferencesStorage
     var ctaCallback: ((Bool) -> Void)?
@@ -32,6 +34,8 @@ final class AIChatToolBarPopUpOnboardingViewModel: ObservableObject {
     }
 
     func acceptToolbarIcon() {
+        PixelKit.fire(GeneralPixel.aichatToolbarOnboardingPopoverAccept,
+                      includeAppVersionParameter: true)
         aiChatStorage.shouldDisplayToolbarShortcut = true
         ctaCallback?(true)
     }

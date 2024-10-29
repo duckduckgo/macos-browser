@@ -1006,6 +1006,7 @@ final class NavigationBarViewController: NSViewController {
 
     @IBAction func aiChatButtonAction(_ sender: NSButton) {
         AIChatTabOpener.openAIChatTab()
+        PixelKit.fire(GeneralPixel.aichatToolbarClicked, includeAppVersionParameter: true)
     }
 
     private func updateAIChatButton() {
