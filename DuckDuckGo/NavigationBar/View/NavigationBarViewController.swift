@@ -27,6 +27,7 @@ import NetworkProtectionIPC
 import NetworkProtectionUI
 import Subscription
 import SubscriptionUI
+import Freemium
 
 final class NavigationBarViewController: NSViewController {
 
@@ -223,10 +224,12 @@ final class NavigationBarViewController: NSViewController {
     }
 
     @IBSegueAction func createAddressBarViewController(_ coder: NSCoder) -> AddressBarViewController? {
+        let onboardingPixelReporter = OnboardingPixelReporter()
         guard let addressBarViewController = AddressBarViewController(coder: coder,
                                                                       tabCollectionViewModel: tabCollectionViewModel,
                                                                       isBurner: isBurner,
-                                                                      popovers: popovers) else {
+                                                                      popovers: popovers,
+                                                                      onboardingPixelReporter: onboardingPixelReporter) else {
             fatalError("NavigationBarViewController: Failed to init AddressBarViewController")
         }
 
@@ -295,11 +298,14 @@ final class NavigationBarViewController: NSViewController {
 
     @IBAction func optionsButtonAction(_ sender: NSButton) {
         let internalUserDecider = NSApp.delegateTyped.internalUserDecider
+        let freemiumDBPFeature = Application.appDelegate.freemiumDBPFeature
         let menu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                    passwordManagerCoordinator: PasswordManagerCoordinator.shared,
                                    vpnFeatureGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: subscriptionManager),
                                    internalUserDecider: internalUserDecider,
-                                   subscriptionManager: subscriptionManager)
+                                   subscriptionManager: subscriptionManager,
+                                   freemiumDBPFeature: freemiumDBPFeature)
+
         menu.actionDelegate = self
         let location = NSPoint(x: -menu.size.width + sender.bounds.width, y: sender.bounds.height + 4)
         menu.popUp(positioning: nil, at: location, in: sender)

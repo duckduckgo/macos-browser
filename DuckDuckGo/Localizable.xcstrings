@@ -27352,6 +27352,126 @@
         }
       }
     },
+    "home.page.settings.onboarding.message" : {
+      "comment" : "Home Page Settings Onboarding message",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passe den Hintergrund, das Design und sogar die angezeigten Inhalte an. Versuch es doch mal!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Customize the background, theme, and even what content you see. Give it a try!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personaliza el fondo, el tema e incluso el contenido que ves. ¡Pruébalo!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personnalisez l'arrière-plan, le thème et même le contenu que vous voyez. Essayez par vous-même !"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personalizza lo sfondo, il tema e persino i contenuti che vedi. Prova!"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas de achtergrond, het thema en zelfs de inhoud aan die je ziet. Probeer het maar eens!"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dostosuj tło, motyw oraz wyświetlaną zawartość. Spróbuj!"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personaliza o fundo, o tema e até o conteúdo que vês. Experimenta!"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Можно настроить фон, тему и даже отображаемый контент. Давайте попробуем!"
+          }
+        }
+      }
+    },
+    "home.page.settings.onboarding.title" : {
+      "comment" : "Home Page Settings Onboarding message title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personalisiere deine neue Tab-Seite"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add extra personality to your new tab page"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade más personalidad a tu página de nueva pestaña"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajoutez une personnalité supplémentaire à votre nouvelle page à onglet"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi un tocco di personalità alla tua nuova scheda"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voeg extra persoonlijkheid toe aan je nieuwe tabbladpagina"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dostosuj stronę nowej zakładki do potrzeb"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adiciona personalidade extra à tua página do novo separador"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дополнительная персонализация новой вкладки"
+          }
+        }
+      }
+    },
     "home.page.settings.sections" : {
       "comment" : "Section title in Home Page Settings to adjust Home Page sections visibility",
       "extractionState" : "extracted_with_value",
@@ -28111,6 +28231,66 @@
         }
       }
     },
+    "import.browser.data.onboarding" : {
+      "comment" : "Import Browser Data dialog title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Super, halten wir es unkompliziert!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Great, let’s keep this simple!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Estupendo, hagámoslo de manera sencilla!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Super, restons simples !"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ottimo, semplifichiamo le cose!"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geweldig, laten we dit eenvoudig houden!"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Świetnie, to proste!"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ótimo, vamos manter isto simples!"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отлично! Зачем усложнять?"
+          }
+        }
+      }
+    },
     "import.browser.data.passwords" : {
       "comment" : "Opens Import Browser Data dialog",
       "extractionState" : "extracted_with_value",
@@ -28358,55 +28538,115 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Importieren aus"
+            "value" : "Woher möchtest du importieren?"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Import From"
+            "value" : "Where do you want to import from?"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Importar desde"
+            "value" : "¿De dónde quieres importar?"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Importer depuis"
+            "value" : "D'où voulez-vous importer ?"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Importa da"
+            "value" : "Da dove vuoi importare?"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Importeren vanuit"
+            "value" : "Vanwaar wil je importeren?"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Importuj z"
+            "value" : "Skąd chcesz importować?"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Importar de"
+            "value" : "De onde queres importar?"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Импорт из"
+            "value" : "Откуда импортировать данные?"
+          }
+        }
+      }
+    },
+    "import.browser.data.success.title" : {
+      "comment" : "message about Passwords and or bookmarks Data Import completion",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import abgeschlossen!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Import complete!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Importación completada!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importation terminée !"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importazione completata!"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importeren voltooid!"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import zakończony!"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importação concluída!"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Импортирование завершено."
           }
         }
       }
@@ -36141,6 +36381,66 @@
         }
       }
     },
+    "newTab.menu.item.show.search.bar" : {
+      "comment" : "Title of the menu item in the home page to show/hide search box (search field)",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suchfeld anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show Search Box"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar el cuadro de búsqueda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher la boîte de recherche"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra la casella di ricerca"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoekvak weergeven"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokaż pole wyszukiwania"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar caixa de pesquisa"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать поле поиска"
+          }
+        }
+      }
+    },
     "newTab.recent.activity.section.title" : {
       "comment" : "Title of the RecentActivity section in the home page",
       "extractionState" : "extracted_with_value",
@@ -36197,6 +36497,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Недавняя активность"
+          }
+        }
+      }
+    },
+    "newTab.search.bar.section.title" : {
+      "comment" : "Setting to show or hide the search box (search field) in the home page",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suchfeld"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Search Box"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuadro de búsqueda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Champ de recherche"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Casella di ricerca"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoekveld"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pole wyszukiwania"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Caixa de pesquisa"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поле поиска"
           }
         }
       }
@@ -55323,6 +55683,7 @@
     },
     "Select Data to Import:" : {
       "comment" : "Data Import section title for checkboxes of data type to import: Passwords or Bookmarks.",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -62126,6 +62487,59 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Защита от отслеживания онлайн"
+          }
+        }
+      }
+    },
+    "What do you want to import?" : {
+      "comment" : "Data Import section title for checkboxes of data type to import: Passwords or Bookmarks.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Was möchtest du importieren?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Qué quieres importar?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Que voulez-vous importer ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cosa vuoi importare?"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wat wil je importeren?"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Co chcesz importować?"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O que queres importar?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Что будем импортировать?"
           }
         }
       }

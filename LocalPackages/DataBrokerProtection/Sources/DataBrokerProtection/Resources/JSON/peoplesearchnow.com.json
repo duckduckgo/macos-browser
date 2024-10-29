@@ -1,9 +1,10 @@
 {
   "name": "People Search Now",
   "url": "peoplesearchnow.com",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "parent": "peoplefinders.com",
   "addedDatetime": 1705989600000,
+  "optOutUrl": "https://www.peoplesearchnow.com/opt-out",
   "steps": [
     {
       "stepType": "scan",

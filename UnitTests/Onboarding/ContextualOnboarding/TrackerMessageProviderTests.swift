@@ -114,9 +114,8 @@ final class TrackerMessageProviderTests: XCTestCase {
 
     func testTrackerType_When1Tracker_ReturnsExpectedMessage() {
         let expectedMessage: String = "Tracker1 was trying to track you here. I blocked them!\n\n☝️ Tap the shield for more info."
-        let serverTrust = MockSecurityTrust()
         let protectionStatus = ProtectionStatus(unprotectedTemporary: false, enabledFeatures: [], allowlisted: false, denylisted: false)
-        var privacyInfo = PrivacyInfo(url: URL(string: "https://site-with-tracker.com")!,
+        let privacyInfo = PrivacyInfo(url: URL(string: "https://site-with-tracker.com")!,
                                       parentEntity: nil,
                                       protectionStatus: protectionStatus)
         let detectedTracker = DetectedRequest(url: "https://site-with-tracker.com", eTLDplus1: "https://site-with-tracker.com", knownTracker: nil, entity: trackerEntity1, state: .blocked, pageUrl: "https://site-with-tracker.com")
@@ -131,9 +130,8 @@ final class TrackerMessageProviderTests: XCTestCase {
 
     func testTrackerType_When2Trackers_ReturnsExpectedMessage() throws {
         let expectedMessage: String = "were trying to track you here. I blocked them!"
-        let serverTrust = MockSecurityTrust()
         let protectionStatus = ProtectionStatus(unprotectedTemporary: false, enabledFeatures: [], allowlisted: false, denylisted: false)
-        var privacyInfo = PrivacyInfo(url: URL(string: "https://site-with-tracker.com")!,
+        let privacyInfo = PrivacyInfo(url: URL(string: "https://site-with-tracker.com")!,
                                       parentEntity: nil,
                                       protectionStatus: protectionStatus)
         let detectedTracker = DetectedRequest(url: "https://site-with-tracker.com", eTLDplus1: "https://site-with-tracker.com", knownTracker: nil, entity: trackerEntity1, state: .blocked, pageUrl: "https://site-with-tracker.com")
