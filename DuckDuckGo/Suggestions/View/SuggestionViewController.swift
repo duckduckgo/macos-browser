@@ -91,6 +91,15 @@ final class SuggestionViewController: NSViewController {
         clearSelection()
     }
 
+    override func viewDidLayout() {
+        super.viewDidLayout()
+
+        // Make sure the table view width equals the encapsulating scroll view
+        tableView.sizeToFit()
+        let column = tableView.tableColumns.first
+        column?.width = tableView.frame.width
+    }
+
     private func setupTableView() {
         tableView.style = .plain
         tableView.setAccessibilityIdentifier("SuggestionViewController.tableView")
