@@ -480,10 +480,12 @@ struct UserText {
     static let importPasswords = NSLocalizedString("import.browser.data.passwords", value: "Import Passwords…", comment: "Opens Import Browser Data dialog")
 
     static let importDataTitle = NSLocalizedString("import.browser.data", value: "Import to DuckDuckGo", comment: "Import Browser Data dialog title")
+    static let importDataTitleOnboarding = NSLocalizedString("import.browser.data.onboarding", value: "Great, let’s keep this simple!", comment: "Import Browser Data dialog title")
     static let importDataShortcutsTitle = NSLocalizedString("import.browser.data.shortcuts", value: "Almost done!", comment: "Import Browser Data dialog title for final stage when choosing shortcuts to enable")
     static let importDataShortcutsSubtitle = NSLocalizedString("import.browser.data.shortcuts.subtitle", value: "You can always right-click on the browser toolbar to find more shortcuts like these.", comment: "Subtitle explaining how users can find toolbar shortcuts.")
-    static let importDataSourceTitle = NSLocalizedString("import.browser.data.source.title", value: "Import From", comment: "Import Browser Data title for option to choose source browser to import from")
+    static let importDataSourceTitle = NSLocalizedString("import.browser.data.source.title", value: "Where do you want to import from?", comment: "Import Browser Data title for option to choose source browser to import from")
     static let importDataSubtitle = NSLocalizedString("import.browser.data.source.subtitle", value: "Access and manage your passwords in DuckDuckGo Settings > Passwords & Autofill.", comment: "Subtitle explaining where users can find imported passwords.")
+    static let importDataSuccessTitle = NSLocalizedString("import.browser.data.success.title", value: "Import complete!", comment: "message about Passwords and or bookmarks Data Import completion")
 
     static let exportLogins = NSLocalizedString("export.logins.data", value: "Export Passwords…", comment: "Opens Export Logins Data dialog")
     static let exportBookmarks = NSLocalizedString("export.bookmarks.menu.item", value: "Export Bookmarks…", comment: "Export bookmarks menu item")
@@ -1129,9 +1131,13 @@ struct UserText {
     // MARK: New Tab
     // Context Menu
     static let newTabBottomPopoverTitle = NSLocalizedString("newTab.bottom.popover.title", value: "New Tab Page", comment: "Title of the popover that appears when pressing the bottom right button")
+    static let newTabMenuItemShowSearchBar = NSLocalizedString("newTab.menu.item.show.search.bar", value: "Show Search Box", comment: "Title of the menu item in the home page to show/hide search box (search field)")
     static let newTabMenuItemShowFavorite = NSLocalizedString("newTab.menu.item.show.favorite", value: "Show Favorites", comment: "Title of the menu item in the home page to show/hide favorite section")
     static let newTabMenuItemShowContinuteSetUp = NSLocalizedString("newTab.menu.item.show.continue.setup", value: "Show Next Steps", comment: "Title of the menu item in the home page to show/hide continue setup section")
     static let newTabMenuItemShowRecentActivity = NSLocalizedString("newTab.menu.item.show.recent.activity", value: "Show Recent Activity", comment: "Title of the menu item in the home page to show/hide recent activity section")
+
+    // Search Bar
+    static let newTabSearchBarSectionTitle = NSLocalizedString("newTab.search.bar.section.title", value: "Search Box", comment: "Setting to show or hide the search box (search field) in the home page")
 
     // Favorites
     static let newTabFavoriteSectionTitle = NSLocalizedString("newTab.favorites.section.title", value: "Favorites", comment: "Title of the Favorites section in the home page")
@@ -1184,6 +1190,8 @@ struct UserText {
     static let bookmarksBarPromptAccept = NSLocalizedString("bookmarks.bar.prompt.accept", value: "Show", comment: "Accept button label on bookmarks bar prompt")
 
     // MARK: Home Page Settings
+    static let homePageSettingsOnboardingTitle = NSLocalizedString("home.page.settings.onboarding.title", value: "New search box, custom backgrounds & more!", comment: "Home Page Settings Onboarding message title")
+    static let homePageSettingsOnboardingMessage = NSLocalizedString("home.page.settings.onboarding.message", value: "Add extra personality and pick what you want to see on your new tab page. Give it a try!", comment: "Home Page Settings Onboarding message")
     static let homePageSettingsTitle = NSLocalizedString("home.page.settings.header", value: "Customize", comment: "Home Page Settings title")
     static let goToSettings = NSLocalizedString("home.page.settings.go.to.settings", value: "Go to Settings", comment: "Settings button caption")
     static let background = NSLocalizedString("home.page.settings.background", value: "Background", comment: "Section title in Home Page Settings to customization Home Page background")

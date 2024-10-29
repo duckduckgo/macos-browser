@@ -191,6 +191,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.usesPredominantAxisScrolling = false
         scrollView.automaticallyAdjustsContentInsets = false
+        scrollView.scrollerInsets = NSEdgeInsets(top: -22, left: 0, bottom: -22, right: 0)
         scrollView.contentInsets = NSEdgeInsets(top: 22, left: 0, bottom: 22, right: 0)
 
         let clipView = NSClipView()
@@ -240,7 +241,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     private func setupLayout() {
         NSLayoutConstraint.activate([
             toolbarButtonsStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 48),
-            view.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: 48),
+            view.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: 58),
             separator.topAnchor.constraint(equalTo: toolbarButtonsStackView.bottomAnchor, constant: 24),
             emptyState.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 20),
             scrollView.topAnchor.constraint(equalTo: separator.bottomAnchor),
@@ -249,16 +250,15 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
             searchBar.leadingAnchor.constraint(greaterThanOrEqualTo: toolbarButtonsStackView.trailingAnchor, constant: 8),
             searchBar.widthAnchor.constraint(equalToConstant: 256),
             searchBar.centerYAnchor.constraint(equalTo: toolbarButtonsStackView.centerYAnchor),
-            searchBar.trailingAnchor.constraint(equalTo: separator.trailingAnchor),
+            view.trailingAnchor.constraint(equalTo: searchBar.trailingAnchor, constant: 58),
             view.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             view.trailingAnchor.constraint(greaterThanOrEqualTo: searchBar.trailingAnchor, constant: 20),
             view.trailingAnchor.constraint(equalTo: separator.trailingAnchor, constant: 58),
             emptyState.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            separator.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 58),
+            separator.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 48),
             toolbarButtonsStackView.topAnchor.constraint(equalTo: view.topAnchor, constant: 32),
             emptyState.topAnchor.constraint(greaterThanOrEqualTo: separator.bottomAnchor, constant: 8),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 48),
-            emptyState.centerXAnchor.constraint(equalTo: separator.centerXAnchor),
 
             newBookmarkButton.heightAnchor.constraint(equalToConstant: 24),
             newFolderButton.heightAnchor.constraint(equalToConstant: 24),
@@ -794,23 +794,23 @@ extension BookmarkManagementDetailViewController {
 
     private func setupSyncPromoLayout() {
          NSLayoutConstraint.activate([
-                                        documentView.topAnchor.constraint(equalTo: scrollView.contentView.topAnchor),
-                                        documentView.leadingAnchor.constraint(equalTo: scrollView.contentView.leadingAnchor),
-                                        documentView.trailingAnchor.constraint(lessThanOrEqualTo: scrollView.contentView.trailingAnchor),
-                                        documentView.widthAnchor.constraint(equalTo: scrollView.contentView.widthAnchor, constant: -12),
-                                        scrollView.widthAnchor.constraint(greaterThanOrEqualToConstant: 400),
-                                        scrollView.heightAnchor.constraint(greaterThanOrEqualToConstant: 220)
-                                    ])
+            documentView.topAnchor.constraint(equalTo: scrollView.contentView.topAnchor),
+            documentView.leadingAnchor.constraint(equalTo: scrollView.contentView.leadingAnchor),
+            documentView.trailingAnchor.constraint(lessThanOrEqualTo: scrollView.contentView.trailingAnchor),
+            documentView.widthAnchor.constraint(equalTo: scrollView.contentView.widthAnchor, constant: 0),
+            scrollView.widthAnchor.constraint(greaterThanOrEqualToConstant: 400),
+            scrollView.heightAnchor.constraint(greaterThanOrEqualToConstant: 220)
+        ])
 
         NSLayoutConstraint.activate([
-                                        syncPromoViewHostingView.topAnchor.constraint(equalTo: documentView.topAnchor, constant: 0),
-                                        syncPromoViewHostingView.leadingAnchor.constraint(equalTo: documentView.leadingAnchor, constant: 2),
-                                        syncPromoViewHostingView.trailingAnchor.constraint(equalTo: documentView.trailingAnchor, constant: -2),
+            syncPromoViewHostingView.topAnchor.constraint(equalTo: documentView.topAnchor, constant: 0),
+            syncPromoViewHostingView.leadingAnchor.constraint(equalTo: documentView.leadingAnchor, constant: 2),
+            syncPromoViewHostingView.trailingAnchor.constraint(equalTo: documentView.trailingAnchor, constant: -2),
 
-                                        tableView.leadingAnchor.constraint(equalTo: documentView.leadingAnchor),
-                                        tableView.trailingAnchor.constraint(equalTo: documentView.trailingAnchor),
-                                        tableView.bottomAnchor.constraint(greaterThanOrEqualTo: documentView.bottomAnchor),
-                                    ])
+            tableView.leadingAnchor.constraint(equalTo: documentView.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: documentView.trailingAnchor),
+            tableView.bottomAnchor.constraint(greaterThanOrEqualTo: documentView.bottomAnchor),
+        ])
 
         tableViewTopToDocumentTopConstraint = tableView.topAnchor.constraint(equalTo: documentView.topAnchor)
         tableViewTopToDocumentTopConstraint?.isActive = false

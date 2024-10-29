@@ -25,7 +25,7 @@ final class OnboardingUserScript: NSObject, Subfeature {
     let onboardingActionsManager: OnboardingActionsManaging
     var messageOriginPolicy: MessageOriginPolicy = .only(rules: [.exact(hostname: "onboarding")])
     let featureName: String = "onboarding"
-    var broker: UserScriptMessageBroker?
+    weak var broker: UserScriptMessageBroker?
 
     // MARK: - MessageNames
     enum MessageNames: String, CaseIterable {

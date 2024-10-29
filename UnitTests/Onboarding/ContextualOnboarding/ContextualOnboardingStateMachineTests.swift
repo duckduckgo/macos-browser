@@ -25,6 +25,8 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
 
     var stateMachine: ContextualOnboardingStateMachine!
     var mockTrackerMessageProvider: MockTrackerMessageProvider!
+    var preferences: StartupPreferences!
+    var fireButtonInfoStateProvider: MockFireButtonInfoStateProvider!
     var tab: Tab!
     let expectation = XCTestExpectation()
 
@@ -32,7 +34,9 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         super.setUp()
         UserDefaultsWrapper<Any>.clearAll()
         mockTrackerMessageProvider = MockTrackerMessageProvider(expectation: expectation)
-        stateMachine = ContextualOnboardingStateMachine(trackerMessageProvider: mockTrackerMessageProvider)
+        fireButtonInfoStateProvider = MockFireButtonInfoStateProvider()
+        preferences = StartupPreferences(persistor: MockStartUpPreferencesPersistor())
+        stateMachine = ContextualOnboardingStateMachine(trackerMessageProvider: mockTrackerMessageProvider, startupPreferences: preferences, fireButtonInfoStateProvider: fireButtonInfoStateProvider)
         tab = Tab(url: URL.duckDuckGo)
     }
 
@@ -45,6 +49,42 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
 
     func testDefaultStateIsOnboardingCompleted() {
         XCTAssertEqual(stateMachine.state, .onboardingCompleted)
+    }
+
+    func testWhenOnboardingCompletedThenLaunchToCustomHomePageIsFalse() {
+        preferences.launchToCustomHomePage = true
+        stateMachine.state = .onboardingCompleted
+
+        XCTAssertFalse(preferences.launchToCustomHomePage)
+    }
+
+    func testWhenOnboardingIsAboutToStartThenFireButtonInfoStateIsTrue() {
+        fireButtonInfoStateProvider.infoPresentedOnce = false
+        stateMachine.state = .notStarted
+
+        XCTAssertTrue(fireButtonInfoStateProvider.infoPresentedOnce)
+    }
+
+    func testWhenOnboardingFinishedAndFireButtonNotUsedThenFireButtonInfoStateIsFalse() {
+        fireButtonInfoStateProvider.infoPresentedOnce = true
+        stateMachine.state = .onboardingCompleted
+
+        XCTAssertFalse(fireButtonInfoStateProvider.infoPresentedOnce)
+    }
+
+    func testWhenOnboardingFinishedAndFireButtonUsedThenFireButtonInfoStateIsFalse() {
+        fireButtonInfoStateProvider.infoPresentedOnce = false
+        stateMachine.fireButtonUsed()
+        stateMachine.state = .onboardingCompleted
+
+        XCTAssertFalse(fireButtonInfoStateProvider.infoPresentedOnce)
+    }
+
+    func testWhenOnboardingIsAboutToStartLaunchToCustomHomePageIsTrue() {
+        preferences.launchToCustomHomePage = false
+        stateMachine.state = .notStarted
+
+        XCTAssertTrue(preferences.launchToCustomHomePage)
     }
 
     func test_OnSearch_WhenStateIsShowSearchDoneOrFireUsedShowSearchDone_returnsSearchDoneShouldFollowUp() {
@@ -633,6 +673,17 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         // Then
         XCTAssertEqual(stateMachine.state, .showBlockedTrackers)
     }
+
+    func test_OnTurnOffFeature_StateBecomesOnboardingCompleted() {
+        // Given
+        stateMachine.state = .showTryASearch
+
+        // When
+        stateMachine.turnOffFeature()
+
+        // Then
+        XCTAssertEqual(stateMachine.state, .onboardingCompleted)
+    }
 }
 
 class MockTrackerMessageProvider: TrackerMessageProviding {
@@ -657,4 +708,16 @@ class MockTrackerMessageProvider: TrackerMessageProviding {
         // Simulate fetching the tracker type
         return trackerType
     }
+}
+
+class MockStartUpPreferencesPersistor: StartupPreferencesPersistor {
+    var restorePreviousSession: Bool = false
+
+    var launchToCustomHomePage: Bool = false
+
+    var customHomePageURL: String = ""
+}
+
+class MockFireButtonInfoStateProvider: FireButtonInfoStateProviding {
+    var infoPresentedOnce: Bool = false
 }
