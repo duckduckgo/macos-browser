@@ -20,6 +20,10 @@ import XCTest
 
 final class OnboardingUITests: XCTestCase {
 
+    override func tearDownWithError() throws {
+        try resetApplicationData()
+    }
+
     func testOnboardingToBrowsing() throws {
         try resetApplicationData()
         continueAfterFailure = false
