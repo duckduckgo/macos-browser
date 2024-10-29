@@ -187,7 +187,7 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         mockOperationsCreator.operationCollections = [mockOperation, mockOperationWithError]
         let expectation = expectation(description: "Expected errors to be returned in completion")
         var errorCollection: DataBrokerProtectionAgentErrorCollection!
-        let expectedConcurrentOperations = DataBrokerExecutionConfig().concurrentOperationsFor(.scheduledScan)
+        let expectedConcurrentOperations = DataBrokerExecutionConfig(mode: .normal).concurrentOperationsFor(.scheduledScan)
         var errorHandlerCalled = false
 
         // When
