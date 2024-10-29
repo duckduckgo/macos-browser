@@ -32,8 +32,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "e5946eee6af859690cc1cc5e51daef3c8368981b",
-        "version" : "201.0.0"
+        "revision" : "8f0f19bcaccf60a7bbc4166f363b4ddca6aa10b7"
       }
     },
     {
@@ -41,8 +40,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "b74549bd869fdecc16fad851f2f608b1724764df",
-        "version" : "6.25.0"
+        "revision" : "f4b1e50b4719de107dfd7dd6c46899f7f11d659a"
       }
     },
     {
