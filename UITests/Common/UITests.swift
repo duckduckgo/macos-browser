@@ -27,8 +27,6 @@ enum UITests {
         static let elementExistence: Double = 5.0
         /// The fire animation time has environmental dependencies, so we want to wait for completion so we don't try to type into it
         static let fireAnimation: Double = 30.0
-        /// To wait for element existence after a navigation, for CI resilience
-        static let siteLoad: Double = 10.0
     }
 
     /// A page simple enough to test favorite, bookmark, and history storage
