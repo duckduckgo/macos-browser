@@ -376,6 +376,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
                 let registeredDevices = try await syncService.fetchDevices()
                 mapDevices(registeredDevices)
             } catch {
+                PixelKit.fire(DebugEvent(GeneralPixel.syncRefreshDevicesError(error: error)))
                 Logger.sync.debug("Failed to refresh devices: \(error)")
             }
         }
