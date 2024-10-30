@@ -96,7 +96,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     public let subscriptionManager: SubscriptionManager
     public let subscriptionUIHandler: SubscriptionUIHandling
-    public let subscriptionCookieManager: SubscriptionCookieManaging
+    // Temporary disable, see: https://app.asana.com/0/0/1208249142369975/1208659372053914/f
+//    public let subscriptionCookieManager: SubscriptionCookieManaging 
 
     public let vpnSettings = VPNSettings(defaults: .netP)
 
@@ -267,9 +268,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             return WindowControllersManager.shared
         })
 
-        subscriptionCookieManager = SubscriptionCookieManager(subscriptionManager: subscriptionManager, currentCookieStore: {
-            WKWebsiteDataStore.default().httpCookieStore
-        }, eventMapping: SubscriptionCookieManageEventPixelMapping())
+        // Temporary disable, see: https://app.asana.com/0/0/1208249142369975/1208659372053914/f
+//        subscriptionCookieManager = SubscriptionCookieManager(subscriptionManager: subscriptionManager, currentCookieStore: {
+//            WKWebsiteDataStore.default().httpCookieStore
+//        }, eventMapping: SubscriptionCookieManageEventPixelMapping())
 
         // Update VPN environment and match the Subscription environment
         vpnSettings.alignTo(subscriptionEnvironment: subscriptionManager.currentEnvironment)
@@ -452,9 +454,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             await vpnRedditSessionWorkaround.installRedditSessionWorkaround()
         }
 
-        Task { @MainActor in
-            await subscriptionCookieManager.refreshSubscriptionCookie()
-        }
+        // Temporary disable, see: https://app.asana.com/0/0/1208249142369975/1208659372053914/f
+//        Task { @MainActor in
+//            await subscriptionCookieManager.refreshSubscriptionCookie()
+//        }
     }
 
     func applicationDidResignActive(_ notification: Notification) {
