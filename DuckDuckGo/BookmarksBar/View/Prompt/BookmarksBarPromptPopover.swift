@@ -84,14 +84,18 @@ struct BookmarksBarPromptView: View {
                 .font(.system(size: 15).weight(.semibold))
                 .padding(.bottom, 16)
 
-            Group {
-                Text(UserText.bookmarksBarPromptMessage1)
-                    .font(.system(size: 13)) +
-                Text(" ") +
-                Text(UserText.bookmarksBarPromptMessage2)
-                    .font(.system(size: 13, weight: .bold))
+            if #available(macOS 12, *) {
+                // Use Markdown for macOS 12 and newer
+                // .init is required for markdown to be correctly parsed from NSLocalizedString
+                Text(.init(UserText.bookmarksBarPromptMessageMarkdown))
+                    .font(.system(size: 13))
+                    .padding(.bottom, 20)
+            } else {
+                // Fallback for earlier macOS versions
+                Text(UserText.bookmarksBarPromptMessageFallback)
+                    .font(.system(size: 13))
+                    .padding(.bottom, 20)
             }
-                .padding(.bottom, 20)
 
             HStack {
                 Button {

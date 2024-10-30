@@ -34,9 +34,14 @@ struct AIChatToolBarPopUpOnboardingView: View {
                 Text(UserText.aiChatOnboardingPopoverTitle)
                     .font(.headline)
 
-                Text(UserText.aiChatOnboardingPopoverMessage1) +
-                Text(" ") +
-                Text(UserText.aiChatOnboardingPopoverMessage2).bold()
+                if #available(macOS 12, *) {
+                    // Use Markdown for macOS 12 and newer
+                    // .init is required for markdown to be correctly parsed from NSLocalizedString
+                    Text(.init(UserText.aiChatOnboardingPopoverMessageMarkdown))
+                } else {
+                    // Fallback for earlier macOS versions
+                    Text(UserText.aiChatOnboardingPopoverMessageFallback)
+                }
             }
 
             HStack {
