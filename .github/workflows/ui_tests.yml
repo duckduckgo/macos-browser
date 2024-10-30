@@ -23,7 +23,7 @@ jobs:
 
       - name: change screen resolution
         run: |
-          "/Library/Application Support/VMware Tools/vmware-resolutionSet" 1080 2160
+          "/Library/Application\ Support/VMware\ Tools/vmware-resolutionSet" 1080 2160
           
       - name: new screen resolution
         run: system_profiler SPDisplaysDataType | grep Resolution
