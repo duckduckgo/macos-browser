@@ -1395,4 +1395,6 @@ struct UserText {
     // Key: "home.page.promotion.freemium.dbp.post.scan.engagement.button.title"
     // Comment: "Title for the Freemium DBP Home Page Post Scan Engagement Promotion Button"
     static let homePagePromotionFreemiumDBPPostScanEngagementButtonTitle = "View Results"
+
+    static let removeSuggestionTooltip = NSLocalizedString("remove.suggestion.tooltip", value: "Remove from browsing history", comment: "Tooltip for the button which removes the history entry from the history")
 }

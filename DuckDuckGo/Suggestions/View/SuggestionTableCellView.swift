@@ -40,7 +40,7 @@ final class SuggestionTableCellView: NSTableCellView {
 
     override func awakeFromNib() {
         suffixTextField.textColor = Self.suffixColor
-        removeButton.toolTip = "Clear this URL from browsing history"
+        removeButton.toolTip = UserText.removeSuggestionTooltip
     }
 
     override func viewDidMoveToWindow() {
