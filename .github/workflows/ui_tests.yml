@@ -18,24 +18,12 @@ jobs:
             runner: macos-15-xlarge
     
     steps:
-      - name: Get Display Information with Diagnostics
+      - name: Install screenresolution
+        run: brew install screenresolution
+
+      - name: Get Screen Resolution
         run: |
-          echo "Retrieving display information with diagnostics..."
-          
-          # Run the command, capturing output and exit code
-          DISPLAY_INFO=$(system_profiler SPDisplaysDataType 2>&1 | tee display_info.txt)
-          EXIT_CODE=$?
-          
-          # Log the output and exit code
-          echo "Display Information Output:"
-          echo "$DISPLAY_INFO"
-          echo "Exit Code: $EXIT_CODE"
-          
-          # Check if the command failed and provide an alternative message
-          if [ "$EXIT_CODE" -ne 0 ]; then
-            echo "system_profiler command failed or returned no data."
-          fi
-        continue-on-error: true
+          screenresolution get || echo "Screen resolution data not available"
 
       - name: Upload Display Information (Artifact)
         uses: actions/upload-artifact@v3
