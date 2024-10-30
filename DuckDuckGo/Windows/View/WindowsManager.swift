@@ -68,26 +68,17 @@ final class WindowsManager {
                                                  burnerMode: burnerMode,
                                                  autofillPopoverPresenter: autofillPopoverPresenter)
 
-//        if let contentSize {
-//            mainWindowController.window?.setContentSize(contentSize)
-//        }
+        if let contentSize {
+            mainWindowController.window?.setContentSize(contentSize)
+        }
 
         mainWindowController.window?.setIsMiniaturized(isMiniaturized)
 
-//        if let droppingPoint {
-//            mainWindowController.window?.setFrameOrigin(droppingPoint: droppingPoint)
-//        } else if let sourceWindow = self.findPositioningSourceWindow(for: tabCollectionViewModel?.tabs.first) {
-//            mainWindowController.window?.setFrameOrigin(cascadedFrom: sourceWindow)
-//        }
-
-        if let window = mainWindowController.window {
-            mainWindowController.window?.setContentSize(NSSize(width: window.frame.width, height: 600))
-        } else {
-            mainWindowController.window?.setContentSize(NSSize(width: 600, height: 600))
+        if let droppingPoint {
+            mainWindowController.window?.setFrameOrigin(droppingPoint: droppingPoint)
+        } else if let sourceWindow = self.findPositioningSourceWindow(for: tabCollectionViewModel?.tabs.first) {
+            mainWindowController.window?.setFrameOrigin(cascadedFrom: sourceWindow)
         }
-
-        mainWindowController.window?.setFrameOrigin(NSPoint(x: 0, y: 0))
-
 
         if showWindow {
             mainWindowController.showWindow(self)

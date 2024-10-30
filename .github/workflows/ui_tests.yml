@@ -50,6 +50,16 @@ jobs:
     timeout-minutes: 120
 
     steps:
+    - name: default screen resolution
+      run: system_profiler SPDisplaysDataType | grep Resolution
+
+    - name: change screen resolution
+      run: |
+        "/Library/Application Support/VMware Tools/vmware-resolutionSet" 2560 1600
+
+    - name: new screen resolution
+      run: system_profiler SPDisplaysDataType | grep Resolution
+
     - name: Register SSH key for certificates repository access
       uses: webfactory/ssh-agent@v0.7.0
       with:
