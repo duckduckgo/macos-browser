@@ -251,8 +251,8 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
     }
 
     func showAutofillOnboardingPopover(from button: MouseOverButton,
-                                     withDelegate delegate: NSPopoverDelegate,
-                                     ctaCallback: @escaping (Bool) -> Void) {
+                                       withDelegate delegate: NSPopoverDelegate,
+                                       ctaCallback: @escaping (Bool) -> Void) {
         guard closeTransientPopovers() else { return }
         let popover = autofillOnboardingPopover ?? AutofillToolbarOnboardingPopover(ctaCallback: ctaCallback)
 
