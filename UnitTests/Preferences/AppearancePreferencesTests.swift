@@ -69,6 +69,10 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
 
 final class AppearancePreferencesTests: XCTestCase {
 
+    override func setUp() {
+        AppDelegate.firstLaunchDate = Date()
+    }
+
     func testWhenInitializedThenItLoadsPersistedValues() throws {
         var model = AppearancePreferences(
             persistor: AppearancePreferencesPersistorMock(
@@ -154,6 +158,7 @@ final class AppearancePreferencesTests: XCTestCase {
     }
 
     func testWhenNewTabPreferencesAreUpdatedThenPersistedValuesAreUpdated() throws {
+
         let model = AppearancePreferences(persistor: AppearancePreferencesPersistorMock())
 
         model.isRecentActivityVisible = true
@@ -196,9 +201,8 @@ final class AppearancePreferencesTests: XCTestCase {
     }
 
     func testContinueSetUpIsDismissedAfterWeek() {
-        // 1. app installed
+        // 1. app installed and launched
         var now = Date()
-        AppDelegate.firstLaunchDate = now
 
         // listen to AppearancePreferences.objectWillChange
         let model = AppearancePreferences(persistor: AppearancePreferencesPersistorMock(), dateTimeProvider: { now })
@@ -233,9 +237,7 @@ final class AppearancePreferencesTests: XCTestCase {
     }
 
     func testWhenLauchedAfterWeek_continueSetUpIsDismissed() {
-        let now = Date().addingTimeInterval(1)
-        let weekAgo = Date.weekAgo
-        AppDelegate.firstLaunchDate = weekAgo
+        let now = Date().addingTimeInterval(7 * 24 * 60 * 60)
 
         let model = AppearancePreferences(persistor: AppearancePreferencesPersistorMock(), dateTimeProvider: { now })
         XCTAssertFalse(model.isContinueSetUpVisible)
