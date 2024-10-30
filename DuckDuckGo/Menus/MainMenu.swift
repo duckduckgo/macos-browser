@@ -85,6 +85,8 @@ final class MainMenu: NSMenu {
     var aiChatMenu = NSMenuItem(title: UserText.newAIChatMenuItem, action: #selector(AppDelegate.newAIChat), keyEquivalent: [.option, .command, "n"])
     let toggleNetworkProtectionShortcutMenuItem = NSMenuItem(title: UserText.showNetworkProtectionShortcut, action: #selector(MainViewController.toggleNetworkProtectionShortcut), keyEquivalent: "N")
 
+    let toggleAIChatShortcutMenuItem = NSMenuItem(title: UserText.showAIChatShortcut, action: #selector(MainViewController.toggleAIChatShortcut), keyEquivalent: "L")
+
     // MARK: Window
     let windowsMenu = NSMenu(title: UserText.mainMenuWindow)
 
@@ -275,6 +277,10 @@ final class MainMenu: NSMenu {
             toggleDownloadsShortcutMenuItem
 
             toggleNetworkProtectionShortcutMenuItem
+
+            if aiChatMenuConfig.shouldDisplayToolbarShortcut {
+                toggleAIChatShortcutMenuItem
+            }
 
             NSMenuItem.separator()
 
@@ -605,6 +611,7 @@ final class MainMenu: NSMenu {
                     NSMenuItem(title: "150 Tabs", action: #selector(MainViewController.addDebugTabs(_:)), representedObject: 150)
                 }
             }
+            NSMenuItem(title: "Skip Onboarding", action: #selector(MainViewController.skipOnboarding))
             NSMenuItem(title: "Reset Data") {
                 NSMenuItem(title: "Reset Default Browser Prompt", action: #selector(MainViewController.resetDefaultBrowserPrompt))
                 NSMenuItem(title: "Reset Default Grammar Checks", action: #selector(MainViewController.resetDefaultGrammarChecks))
@@ -627,6 +634,7 @@ final class MainMenu: NSMenu {
                 NSMenuItem(title: "Reset CPM Experiment Cohort", action: #selector(AppDelegate.resetCpmCohort))
                 NSMenuItem(title: "Reset Duck Player Preferences", action: #selector(MainViewController.resetDuckPlayerPreferences))
                 NSMenuItem(title: "Reset Onboarding", action: #selector(MainViewController.resetOnboarding(_:)))
+                NSMenuItem(title: "Reset Home Page Settings Onboarding", action: #selector(MainViewController.resetHomePageSettingsOnboarding(_:)))
                 NSMenuItem(title: "Reset Contextual Onboarding", action: #selector(MainViewController.resetContextualOnboarding(_:)))
                 NSMenuItem(title: "Reset Sync Promo prompts", action: #selector(MainViewController.resetSyncPromoPrompts))
 
@@ -655,6 +663,8 @@ final class MainMenu: NSMenu {
 
             NSMenuItem(title: "Personal Information Removal")
                 .submenu(DataBrokerProtectionDebugMenu())
+
+            FreemiumDebugMenu()
 
             if case .normal = NSApp.runType {
                 NSMenuItem(title: "VPN")

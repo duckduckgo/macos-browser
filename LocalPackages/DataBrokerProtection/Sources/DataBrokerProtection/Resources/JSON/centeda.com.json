@@ -1,9 +1,10 @@
 {
   "name": "Centeda",
   "url": "centeda.com",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "parent": "verecor.com",
   "addedDatetime": 1677736800000,
+  "optOutUrl": "https://centeda.com/ng/control/privacy",
   "steps": [
     {
       "stepType": "scan",
