@@ -40,7 +40,7 @@ final class BookmarksBarPromptPopover: NSPopover {
     private func setupContentController() {
         let controller = BookmarksBarPromptViewController.create()
         contentViewController = controller
-        contentViewController?.preferredContentSize = NSSize(width: 356, height: 272)
+        contentViewController?.preferredContentSize = NSSize(width: 356, height: 292)
     }
 
 }
@@ -84,8 +84,13 @@ struct BookmarksBarPromptView: View {
                 .font(.system(size: 15).weight(.semibold))
                 .padding(.bottom, 16)
 
-            Text(UserText.bookmarksBarPromptMessage)
-                .font(.system(size: 13))
+            Group {
+                Text(UserText.bookmarksBarPromptMessage1)
+                    .font(.system(size: 13)) +
+                Text(" ") +
+                Text(UserText.bookmarksBarPromptMessage2)
+                    .font(.system(size: 13, weight: .bold))
+            }
                 .padding(.bottom, 20)
 
             HStack {

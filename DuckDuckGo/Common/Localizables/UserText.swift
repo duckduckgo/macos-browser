@@ -1184,7 +1184,9 @@ struct UserText {
 
     // Bookmarks bar prompt
     static let bookmarksBarPromptTitle = NSLocalizedString("bookmarks.bar.prompt.title", value: "Show Bookmarks Bar?", comment: "Title for bookmarks bar prompt")
-    static let bookmarksBarPromptMessage = NSLocalizedString("bookmarks.bar.prompt.message", value: "Show the Bookmarks Bar for quick access to your new bookmarks.", comment: "Message show for bookmarks bar prompt")
+    static let bookmarksBarPromptMessage1 = NSLocalizedString("bookmarks.bar.prompt.message1", value: "Show the Bookmarks Bar for quick access to your favorite bookmarks. You can adjust this later in", comment: "First part for message show for bookmarks bar prompt")
+    static let bookmarksBarPromptMessage2 = NSLocalizedString("bookmarks.bar.prompt.message2", value: "Settings > Appearance.", comment: "Second part for message show for bookmarks bar prompt")
+
     static let bookmarksBarPromptDismiss = NSLocalizedString("bookmarks.bar.prompt.dismiss", value: "Hide", comment: "Dismiss button label on bookmarks bar prompt")
     static let bookmarksBarPromptAccept = NSLocalizedString("bookmarks.bar.prompt.accept", value: "Show", comment: "Accept button label on bookmarks bar prompt")
 
