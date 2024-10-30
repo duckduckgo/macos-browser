@@ -34,6 +34,7 @@ final class MoreOptionsMenuTests: XCTestCase {
     var networkProtectionVisibilityMock: NetworkProtectionVisibilityMock!
     var capturingActionDelegate: CapturingOptionsButtonMenuDelegate!
     var internalUserDecider: InternalUserDeciderMock!
+    var defaultBrowserProvider: DefaultBrowserProviderMock!
 
     var storePurchaseManager: StorePurchaseManager!
 
@@ -55,6 +56,8 @@ final class MoreOptionsMenuTests: XCTestCase {
         networkProtectionVisibilityMock = NetworkProtectionVisibilityMock(isInstalled: false, visible: false)
         capturingActionDelegate = CapturingOptionsButtonMenuDelegate()
         internalUserDecider = InternalUserDeciderMock()
+        defaultBrowserProvider = DefaultBrowserProviderMock()
+        defaultBrowserProvider.isDefault = true
 
         storePurchaseManager = StorePurchaseManagerMock()
 
@@ -97,6 +100,7 @@ final class MoreOptionsMenuTests: XCTestCase {
                                           freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager,
                                           freemiumDBPFeature: mockFreemiumDBPFeature,
                                           freemiumDBPPresenter: mockFreemiumDBPPresenter,
+                                          defaultBrowserPreferences: .init(defaultBrowserProvider: defaultBrowserProvider),
                                           notificationCenter: mockNotificationCenter,
                                           freemiumDBPExperimentPixelHandler: mockPixelHandler)
 
@@ -155,24 +159,25 @@ final class MoreOptionsMenuTests: XCTestCase {
         XCTAssertTrue(subscriptionManager.canPurchase)
 
         XCTAssertEqual(moreOptionsMenu.items[0].title, UserText.sendFeedback)
-        XCTAssertTrue(moreOptionsMenu.items[1].isSeparatorItem)
-        XCTAssertEqual(moreOptionsMenu.items[2].title, UserText.plusButtonNewTabMenuItem)
-        XCTAssertEqual(moreOptionsMenu.items[3].title, UserText.newWindowMenuItem)
-        XCTAssertEqual(moreOptionsMenu.items[4].title, UserText.newBurnerWindowMenuItem)
-        XCTAssertTrue(moreOptionsMenu.items[5].isSeparatorItem)
-        XCTAssertEqual(moreOptionsMenu.items[6].title, UserText.zoom)
-        XCTAssertTrue(moreOptionsMenu.items[7].isSeparatorItem)
-        XCTAssertEqual(moreOptionsMenu.items[8].title, UserText.bookmarks)
-        XCTAssertEqual(moreOptionsMenu.items[9].title, UserText.downloads)
-        XCTAssertEqual(moreOptionsMenu.items[10].title, UserText.passwordManagementTitle)
-        XCTAssertTrue(moreOptionsMenu.items[11].isSeparatorItem)
-        XCTAssertEqual(moreOptionsMenu.items[12].title, UserText.emailOptionsMenuItem)
-        XCTAssertTrue(moreOptionsMenu.items[13].isSeparatorItem)
-        XCTAssertEqual(moreOptionsMenu.items[14].title, UserText.subscriptionOptionsMenuItem)
-        XCTAssertFalse(moreOptionsMenu.items[14].hasSubmenu)
-        XCTAssertTrue(moreOptionsMenu.items[15].isSeparatorItem)
-        XCTAssertEqual(moreOptionsMenu.items[16].title, UserText.mainMenuHelp)
-        XCTAssertEqual(moreOptionsMenu.items[17].title, UserText.settings)
+        XCTAssertEqual(moreOptionsMenu.items[1].title, UserText.setAsDefaultBrowser)
+        XCTAssertTrue(moreOptionsMenu.items[2].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[3].title, UserText.plusButtonNewTabMenuItem)
+        XCTAssertEqual(moreOptionsMenu.items[4].title, UserText.newWindowMenuItem)
+        XCTAssertEqual(moreOptionsMenu.items[5].title, UserText.newBurnerWindowMenuItem)
+        XCTAssertTrue(moreOptionsMenu.items[6].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[7].title, UserText.zoom)
+        XCTAssertTrue(moreOptionsMenu.items[8].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[9].title, UserText.bookmarks)
+        XCTAssertEqual(moreOptionsMenu.items[10].title, UserText.downloads)
+        XCTAssertEqual(moreOptionsMenu.items[11].title, UserText.passwordManagementTitle)
+        XCTAssertTrue(moreOptionsMenu.items[12].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[13].title, UserText.emailOptionsMenuItem)
+        XCTAssertTrue(moreOptionsMenu.items[14].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[15].title, UserText.subscriptionOptionsMenuItem)
+        XCTAssertFalse(moreOptionsMenu.items[15].hasSubmenu)
+        XCTAssertTrue(moreOptionsMenu.items[16].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[17].title, UserText.mainMenuHelp)
+        XCTAssertEqual(moreOptionsMenu.items[18].title, UserText.settings)
     }
 
     @MainActor
@@ -187,25 +192,26 @@ final class MoreOptionsMenuTests: XCTestCase {
         XCTAssertTrue(subscriptionManager.canPurchase)
 
         XCTAssertEqual(moreOptionsMenu.items[0].title, UserText.sendFeedback)
-        XCTAssertTrue(moreOptionsMenu.items[1].isSeparatorItem)
-        XCTAssertEqual(moreOptionsMenu.items[2].title, UserText.plusButtonNewTabMenuItem)
-        XCTAssertEqual(moreOptionsMenu.items[3].title, UserText.newWindowMenuItem)
-        XCTAssertEqual(moreOptionsMenu.items[4].title, UserText.newBurnerWindowMenuItem)
-        XCTAssertTrue(moreOptionsMenu.items[5].isSeparatorItem)
-        XCTAssertEqual(moreOptionsMenu.items[6].title, UserText.zoom)
-        XCTAssertTrue(moreOptionsMenu.items[7].isSeparatorItem)
-        XCTAssertEqual(moreOptionsMenu.items[8].title, UserText.bookmarks)
-        XCTAssertEqual(moreOptionsMenu.items[9].title, UserText.downloads)
-        XCTAssertEqual(moreOptionsMenu.items[10].title, UserText.passwordManagementTitle)
-        XCTAssertTrue(moreOptionsMenu.items[11].isSeparatorItem)
-        XCTAssertEqual(moreOptionsMenu.items[12].title, UserText.emailOptionsMenuItem)
-        XCTAssertTrue(moreOptionsMenu.items[13].isSeparatorItem)
-        XCTAssertEqual(moreOptionsMenu.items[14].title, UserText.subscriptionOptionsMenuItem)
-        XCTAssertFalse(moreOptionsMenu.items[14].hasSubmenu)
-        XCTAssertEqual(moreOptionsMenu.items[15].title, UserText.freemiumDBPOptionsMenuItem)
-        XCTAssertTrue(moreOptionsMenu.items[16].isSeparatorItem)
-        XCTAssertEqual(moreOptionsMenu.items[17].title, UserText.mainMenuHelp)
-        XCTAssertEqual(moreOptionsMenu.items[18].title, UserText.settings)
+        XCTAssertEqual(moreOptionsMenu.items[1].title, UserText.setAsDefaultBrowser)
+        XCTAssertTrue(moreOptionsMenu.items[2].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[3].title, UserText.plusButtonNewTabMenuItem)
+        XCTAssertEqual(moreOptionsMenu.items[4].title, UserText.newWindowMenuItem)
+        XCTAssertEqual(moreOptionsMenu.items[5].title, UserText.newBurnerWindowMenuItem)
+        XCTAssertTrue(moreOptionsMenu.items[6].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[7].title, UserText.zoom)
+        XCTAssertTrue(moreOptionsMenu.items[8].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[9].title, UserText.bookmarks)
+        XCTAssertEqual(moreOptionsMenu.items[10].title, UserText.downloads)
+        XCTAssertEqual(moreOptionsMenu.items[11].title, UserText.passwordManagementTitle)
+        XCTAssertTrue(moreOptionsMenu.items[12].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[13].title, UserText.emailOptionsMenuItem)
+        XCTAssertTrue(moreOptionsMenu.items[14].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[15].title, UserText.subscriptionOptionsMenuItem)
+        XCTAssertFalse(moreOptionsMenu.items[15].hasSubmenu)
+        XCTAssertEqual(moreOptionsMenu.items[16].title, UserText.freemiumDBPOptionsMenuItem)
+        XCTAssertTrue(moreOptionsMenu.items[17].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[18].title, UserText.mainMenuHelp)
+        XCTAssertEqual(moreOptionsMenu.items[19].title, UserText.settings)
     }
 
     @MainActor
@@ -282,7 +288,7 @@ final class MoreOptionsMenuTests: XCTestCase {
         setupMoreOptionsMenu()
 
         // GIVEN
-        let bookmarksMenu = try XCTUnwrap(moreOptionsMenu.item(at: 8)?.submenu)
+        let bookmarksMenu = try XCTUnwrap(moreOptionsMenu.item(at: 9)?.submenu)
         let bookmarkAllTabsIndex = try XCTUnwrap(bookmarksMenu.indexOfItem(withTitle: UserText.bookmarkAllTabs))
         let bookmarkAllTabsMenuItem = try XCTUnwrap(bookmarksMenu.items[bookmarkAllTabsIndex])
         bookmarkAllTabsMenuItem.isEnabled = true
@@ -294,6 +300,29 @@ final class MoreOptionsMenuTests: XCTestCase {
         XCTAssertTrue(capturingActionDelegate.optionsButtonMenuRequestedBookmarkAllOpenTabsCalled)
     }
 
+    // MARK: - Default Browser Action
+
+    @MainActor
+    func testWhenBrowserIsDefaultThenSetAsDefaultBrowserMenuItemIsHidden() {
+        defaultBrowserProvider.isDefault = true
+
+        setupMoreOptionsMenu()
+        moreOptionsMenu.update()
+
+        XCTAssertEqual(moreOptionsMenu.items[1].title, UserText.setAsDefaultBrowser)
+        XCTAssertTrue(moreOptionsMenu.items[1].isHidden)
+    }
+
+    @MainActor
+    func testWhenBrowserIsNotDefaultThenSetAsDefaultBrowserMenuItemIsShown() {
+        defaultBrowserProvider.isDefault = false
+
+        setupMoreOptionsMenu()
+        moreOptionsMenu.update()
+
+        XCTAssertEqual(moreOptionsMenu.items[1].title, UserText.setAsDefaultBrowser)
+        XCTAssertFalse(moreOptionsMenu.items[1].isHidden)
+    }
 }
 
 final class NetworkProtectionVisibilityMock: VPNFeatureGatekeeper {
