@@ -218,6 +218,7 @@ final class AppearancePreferencesTests: XCTestCase {
         // eObjectWillChange shouldn‘t be called until 1 week
         for i in 0..<7 {
             XCTAssertTrue(model.isContinueSetUpVisible, "\(i)")
+            XCTAssertFalse(model.isContinueSetUpCardsViewOutdated, "\(i)")
             incrementDate()
         }
         // 1 week passed
@@ -225,11 +226,12 @@ final class AppearancePreferencesTests: XCTestCase {
         eObjectWillChange = expectation(description: "AppearancePreferences.objectWillChange called")
         incrementDate()
         XCTAssertFalse(model.isContinueSetUpVisible, "7")
-        waitForExpectations(timeout: 0)
+        waitForExpectations(timeout: 1)
 
         // shouldn‘t change after being set once
         for i in 8..<20 {
             XCTAssertFalse(model.isContinueSetUpVisible, "\(i)")
+            XCTAssertTrue(model.isContinueSetUpCardsViewOutdated, "\(i)")
             incrementDate()
         }
 
