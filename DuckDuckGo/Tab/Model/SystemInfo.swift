@@ -23,11 +23,11 @@ import Common
 
 final class SystemInfo {
 
-    static func pixelParameters(appVersion: AppVersion = AppVersion.shared) -> [String: String] {
+    static func pixelParameters(appVersion: AppVersion = AppVersion.shared) async -> [String: String] {
         let availableMemoryPercent = Self.getAvailableMemoryPercent()
         let availableDiskSpacePercent = Self.getAvailableDiskSpacePercent()
         return [
-           "available_memory": String(format: "%.2f", availableMemoryPercent),
+           "available_memory": String(availableMemoryPercent),
            "available_diskspace": String(format: "%.2f", availableDiskSpacePercent),
            "os_version": appVersion.osVersion,
         ]
