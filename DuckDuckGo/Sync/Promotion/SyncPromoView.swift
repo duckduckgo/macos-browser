@@ -56,7 +56,6 @@ struct SyncPromoView: View {
                 HomePage.Views.CloseButton(icon: .close, size: 16) {
                     dismissAction()
                 }
-                .visibility(isHovering ? .visible : .invisible)
                 .padding(6)
 
                 Spacer()

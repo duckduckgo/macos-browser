@@ -24,7 +24,6 @@ struct RemoteMessageView: View {
 
     let viewModel: RemoteMessageViewModel
 
-    @State var isHovering = false
     @EnvironmentObject var settingsModel: HomePage.Models.SettingsModel
 
     var body: some View {
@@ -77,9 +76,6 @@ struct RemoteMessageView: View {
             }
         }
         .padding(.horizontal, 2)
-        .onHover { isHovering in
-            self.isHovering = isHovering
-        }
         .onAppear(perform: viewModel.onDidAppear)
         .onDisappear(perform: viewModel.onDidDisappear)
     }
@@ -90,7 +86,6 @@ struct RemoteMessageView: View {
                 await viewModel.onDidClose(.close)
             }
         }
-        .visibility(isHovering ? .visible : .invisible)
         .padding(6)
     }
 
