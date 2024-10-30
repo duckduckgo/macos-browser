@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1730109523334,
+    "version": 1730236228271,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -379,6 +379,15 @@
                     "domain": "la-becanerie.com"
                 },
                 {
+                    "domain": "thrifty.com"
+                },
+                {
+                    "domain": "dollar.com"
+                },
+                {
+                    "domain": "ethicalconsumer.org"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -405,7 +414,7 @@
                     "state": "enabled"
                 }
             },
-            "hash": "419e42a27cc5daa895b567f1e3c1bd6b"
+            "hash": "027678ee84a319cc8ba7a58b0df58dd1"
         },
         "autofillBreakageReporter": {
             "state": "disabled",
@@ -1291,14 +1300,11 @@
                 }
             ],
             "hash": "d02882dcee87a42b7d29bb6f2e21b4ca"
-<<<<<<< HEAD
-=======
         },
         "contextualOnboarding": {
             "exceptions": [],
             "state": "enabled",
             "hash": "52857469413a66e8b0c7b00de5589162"
->>>>>>> main
         },
         "cookie": {
             "settings": {
@@ -1427,13 +1433,17 @@
                     {
                         "domain": "adobe.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2289"
-                    }
-                ],
-                "webViewDefault": [
+                    },
                     {
                         "domain": "accounts.google.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1295"
                     },
+                    {
+                        "domain": "mail.google.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1295"
+                    }
+                ],
+                "webViewDefault": [
                     {
                         "domain": "flysas.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1347"
@@ -1454,7 +1464,7 @@
             },
             "exceptions": [],
             "state": "enabled",
-            "hash": "6e1e9af5fb146e16b5f9f3090b41ca89"
+            "hash": "748cc5de2bc4b6b5e77c9c80b91efc2c"
         },
         "dbp": {
             "state": "enabled",
@@ -5673,15 +5683,9 @@
             "hash": "cbd62a1a63a829da0277ca045a311eb2"
         },
         "newTabSearchField": {
-<<<<<<< HEAD
-            "state": "internal",
-            "exceptions": [],
-            "hash": "f1daaefe788583c2a00d7d19a23864a7"
-=======
             "state": "disabled",
             "exceptions": [],
             "hash": "c292bb627849854515cebbded288ef5a"
->>>>>>> main
         },
         "nonTracking3pCookies": {
             "settings": {
@@ -6869,6 +6873,13 @@
                                 ]
                             },
                             {
+                                "rule": "doubleclick.net/ondemand/dash/content/",
+                                "domains": [
+                                    "cbs.com",
+                                    "paramountplus.com"
+                                ]
+                            },
+                            {
                                 "rule": "securepubads.g.doubleclick.net/gampad/ads",
                                 "domains": [
                                     "ah.nl",
@@ -7504,7 +7515,8 @@
                                     "experian.com",
                                     "thesimsresource.com",
                                     "tradersync.com",
-                                    "vanguardplan.com"
+                                    "vanguardplan.com",
+                                    "xpn.org"
                                 ]
                             }
                         ]
@@ -9451,11 +9463,7 @@
                     "domain": "instructure.com"
                 }
             ],
-<<<<<<< HEAD
-            "hash": "1cf339c9f618be0304f90f0f48a7b6cf"
-=======
-            "hash": "4a71922e4eb31060dced0b091ad797e7"
->>>>>>> main
+            "hash": "7d4f56d34c41ddfde274e4aa23a8b74b"
         },
         "trackingCookies1p": {
             "settings": {
@@ -9897,14 +9905,11 @@
             "state": "disabled",
             "hash": "728493ef7a1488e4781656d3f9db84aa"
         },
-<<<<<<< HEAD
-=======
         "windowsNewTabPageExperiment": {
             "state": "disabled",
             "exceptions": [],
             "hash": "c292bb627849854515cebbded288ef5a"
         },
->>>>>>> main
         "windowsPermissionUsage": {
             "exceptions": [],
             "state": "disabled",
