@@ -433,8 +433,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         guard didFinishLaunching else { return }
 
         PixelExperiment.fireOnboardingTestPixels()
-        syncService?.initializeIfNeeded()
-        syncService?.scheduler.notifyAppLifecycleEvent()
+        initializeSync()
 
         NetworkProtectionAppEvents(featureGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: subscriptionManager)).applicationDidBecomeActive()
 
@@ -455,6 +454,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         Task { @MainActor in
             await subscriptionCookieManager.refreshSubscriptionCookie()
         }
+    }
+
+    private func initializeSync() {
+        guard let syncService else { return }
+        syncService.initializeIfNeeded()
+        syncService.scheduler.notifyAppLifecycleEvent()
+        SyncDiagnosisHelper(syncService: syncService).diagnoseAccountStatus()
     }
 
     func applicationDidResignActive(_ notification: Notification) {
