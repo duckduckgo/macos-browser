@@ -275,6 +275,14 @@
 		317295D32AF058D3002C3206 /* MockWaitlistTermsAndConditionsActionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 317295D02AF058D3002C3206 /* MockWaitlistTermsAndConditionsActionHandler.swift */; };
 		317295D42AF058D3002C3206 /* MockWaitlistFeatureSetupHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 317295D12AF058D3002C3206 /* MockWaitlistFeatureSetupHandler.swift */; };
 		317295D52AF058D3002C3206 /* MockWaitlistFeatureSetupHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 317295D12AF058D3002C3206 /* MockWaitlistFeatureSetupHandler.swift */; };
+		317307262CD248DB00C492AB /* AutofillToolbarOnboardingPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 317307252CD248DA00C492AB /* AutofillToolbarOnboardingPopover.swift */; };
+		317307272CD248DB00C492AB /* AutofillToolbarOnboardingPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 317307252CD248DA00C492AB /* AutofillToolbarOnboardingPopover.swift */; };
+		317307292CD248EA00C492AB /* AutofillToolbarOnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 317307282CD248EA00C492AB /* AutofillToolbarOnboardingViewController.swift */; };
+		3173072A2CD248EA00C492AB /* AutofillToolbarOnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 317307282CD248EA00C492AB /* AutofillToolbarOnboardingViewController.swift */; };
+		3173072C2CD2490700C492AB /* AutofillToolbarOnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3173072B2CD2490300C492AB /* AutofillToolbarOnboardingView.swift */; };
+		3173072D2CD2490700C492AB /* AutofillToolbarOnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3173072B2CD2490300C492AB /* AutofillToolbarOnboardingView.swift */; };
+		3173072F2CD2493900C492AB /* AutofillToolbarOnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3173072E2CD2493700C492AB /* AutofillToolbarOnboardingViewModel.swift */; };
+		317307302CD2493900C492AB /* AutofillToolbarOnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3173072E2CD2493700C492AB /* AutofillToolbarOnboardingViewModel.swift */; };
 		3184AC6D288F29D800C35E4B /* BadgeNotificationAnimationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3184AC6C288F29D800C35E4B /* BadgeNotificationAnimationModel.swift */; };
 		3184AC6F288F2A1100C35E4B /* CookieNotificationAnimationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3184AC6E288F2A1100C35E4B /* CookieNotificationAnimationModel.swift */; };
 		3199AF6F2C80734A003AEBDC /* DuckPlayerOnboardingDecider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3199AF632C80734A003AEBDC /* DuckPlayerOnboardingDecider.swift */; };
@@ -3398,6 +3406,10 @@
 		3171D6DA2889B64D0068632A /* CookieManagedNotificationContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieManagedNotificationContainerView.swift; sourceTree = "<group>"; };
 		317295D02AF058D3002C3206 /* MockWaitlistTermsAndConditionsActionHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockWaitlistTermsAndConditionsActionHandler.swift; sourceTree = "<group>"; };
 		317295D12AF058D3002C3206 /* MockWaitlistFeatureSetupHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockWaitlistFeatureSetupHandler.swift; sourceTree = "<group>"; };
+		317307252CD248DA00C492AB /* AutofillToolbarOnboardingPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillToolbarOnboardingPopover.swift; sourceTree = "<group>"; };
+		317307282CD248EA00C492AB /* AutofillToolbarOnboardingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillToolbarOnboardingViewController.swift; sourceTree = "<group>"; };
+		3173072B2CD2490300C492AB /* AutofillToolbarOnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillToolbarOnboardingView.swift; sourceTree = "<group>"; };
+		3173072E2CD2493700C492AB /* AutofillToolbarOnboardingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillToolbarOnboardingViewModel.swift; sourceTree = "<group>"; };
 		3184AC6C288F29D800C35E4B /* BadgeNotificationAnimationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeNotificationAnimationModel.swift; sourceTree = "<group>"; };
 		3184AC6E288F2A1100C35E4B /* CookieNotificationAnimationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieNotificationAnimationModel.swift; sourceTree = "<group>"; };
 		3192A2702A4C4E330084EA89 /* DataBrokerProtection */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = DataBrokerProtection; sourceTree = "<group>"; };
@@ -5327,6 +5339,17 @@
 			path = CookieManaged;
 			sourceTree = "<group>";
 		};
+		317307242CD2489900C492AB /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				3173072E2CD2493700C492AB /* AutofillToolbarOnboardingViewModel.swift */,
+				3173072B2CD2490300C492AB /* AutofillToolbarOnboardingView.swift */,
+				317307282CD248EA00C492AB /* AutofillToolbarOnboardingViewController.swift */,
+				317307252CD248DA00C492AB /* AutofillToolbarOnboardingPopover.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
 		3184AC6B288F29C600C35E4B /* BadgeAnimationContainer */ = {
 			isa = PBXGroup;
 			children = (
@@ -6768,6 +6791,7 @@
 		7B1E819A27C8874900FF0E60 /* Autofill */ = {
 			isa = PBXGroup;
 			children = (
+				317307242CD2489900C492AB /* Onboarding */,
 				C10529482C9F45720041E502 /* Debug */,
 				7B1E819B27C8874900FF0E60 /* ContentOverlayPopover.swift */,
 				7B1E819C27C8874900FF0E60 /* ContentOverlay.storyboard */,
@@ -11303,6 +11327,7 @@
 				3706FBE1293F65D500E42796 /* AppStateRestorationManager.swift in Sources */,
 				9FA173EC2B7B232200EE4E6E /* AddEditBookmarkDialogView.swift in Sources */,
 				3706FBE2293F65D500E42796 /* ClickToLoadUserScript.swift in Sources */,
+				3173072C2CD2490700C492AB /* AutofillToolbarOnboardingView.swift in Sources */,
 				EED4D3E02C8A298D00C79EEA /* AutofillPixelEvent.swift in Sources */,
 				3706FBE3293F65D500E42796 /* WindowControllersManager.swift in Sources */,
 				37197EAA2942443D00394917 /* ModalSheetCancellable.swift in Sources */,
@@ -11313,6 +11338,7 @@
 				3706FBE7293F65D500E42796 /* PasswordManagementItemListModel.swift in Sources */,
 				3706FBE8293F65D500E42796 /* SuggestionTableCellView.swift in Sources */,
 				3706FBE9293F65D500E42796 /* FireViewModel.swift in Sources */,
+				317307292CD248EA00C492AB /* AutofillToolbarOnboardingViewController.swift in Sources */,
 				B68D21D02ACBC9FD002DA3C2 /* ContentBlockerRulesManagerMock.swift in Sources */,
 				BD7090D02C5182FB009EED82 /* UnifiedFeedbackFormView.swift in Sources */,
 				3199AF742C80734A003AEBDC /* DuckPlayerOnboardingModalManager.swift in Sources */,
@@ -11434,6 +11460,7 @@
 				B6F1B02F2BCE6B47005E863C /* TunnelControllerProvider.swift in Sources */,
 				31A83FB62BE28D7D00F74E67 /* UserText+DBP.swift in Sources */,
 				3706FC31293F65D500E42796 /* PermissionButton.swift in Sources */,
+				317307262CD248DB00C492AB /* AutofillToolbarOnboardingPopover.swift in Sources */,
 				9F6434622BEC82B700D2D8A0 /* AttributionPixelHandler.swift in Sources */,
 				3706FC32293F65D500E42796 /* MoreOptionsMenu.swift in Sources */,
 				3706FC34293F65D500E42796 /* PermissionAuthorizationViewController.swift in Sources */,
@@ -11547,6 +11574,7 @@
 				9FDA6C222B79A59D00E099A9 /* BookmarkFavoriteView.swift in Sources */,
 				C1372EF52BBC5BAD003F8793 /* SecureTextField.swift in Sources */,
 				316913242BD2B6250051B46D /* DataBrokerProtectionPixelsHandler.swift in Sources */,
+				317307302CD2493900C492AB /* AutofillToolbarOnboardingViewModel.swift in Sources */,
 				843D73BC2C786E5400E4F9DC /* BookmarkListPopover.swift in Sources */,
 				3706FC77293F65D500E42796 /* PageObserverUserScript.swift in Sources */,
 				4BF0E5132AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift in Sources */,
@@ -12496,6 +12524,7 @@
 				9826B0A02747DF3D0092F683 /* ContentBlocking.swift in Sources */,
 				4B379C2227BDBA29008A968E /* LocalAuthenticationService.swift in Sources */,
 				37CEFCA92A6737A2001EF741 /* CredentialsCleanupErrorHandling.swift in Sources */,
+				317307272CD248DB00C492AB /* AutofillToolbarOnboardingPopover.swift in Sources */,
 				4BB99D0326FE191E001E4761 /* SafariBookmarksReader.swift in Sources */,
 				316913292BD2C7570051B46D /* DataBrokerProtectionErrorViewController.swift in Sources */,
 				1DA6D0FD2A1FF9A100540406 /* HTTPCookie.swift in Sources */,
@@ -12572,6 +12601,7 @@
 				B6F1C80B2761C45400334924 /* LocalUnprotectedDomains.swift in Sources */,
 				1E25A4FE2CC937120080EFD4 /* SubscriptionCookieManageEventPixelMapping.swift in Sources */,
 				B69A14FA2B4D705D00B9417D /* BookmarkFolderPicker.swift in Sources */,
+				3173072F2CD2493900C492AB /* AutofillToolbarOnboardingViewModel.swift in Sources */,
 				1D36E658298AA3BA00AA485D /* InternalUserDeciderStore.swift in Sources */,
 				B634DBE5293C944700C3C99E /* NewWindowPolicy.swift in Sources */,
 				31CF3432288B0B1B0087244B /* NavigationBarBadgeAnimator.swift in Sources */,
@@ -12690,6 +12720,7 @@
 				AA5FA69D275F945C00DCE9C9 /* FaviconStore.swift in Sources */,
 				4B9DB0352A983B24000927DB /* WaitlistTermsAndConditionsView.swift in Sources */,
 				AAB8203C26B2DE0D00788AC3 /* SuggestionListCharacteristics.swift in Sources */,
+				3173072A2CD248EA00C492AB /* AutofillToolbarOnboardingViewController.swift in Sources */,
 				4B6785472AA8DE68008A5004 /* VPNUninstaller.swift in Sources */,
 				4B9292D42667123700AD2C21 /* BookmarkListViewController.swift in Sources */,
 				BD88A83E2C4F3E4300460A26 /* FeedbackCategoryProviding.swift in Sources */,
@@ -13203,6 +13234,7 @@
 				4B4D60D32A0C84F700BCD287 /* UserText+NetworkProtection.swift in Sources */,
 				843D73BB2C786E5400E4F9DC /* BookmarkListPopover.swift in Sources */,
 				B6B2400E28083B49001B8F3A /* WebViewContainerView.swift in Sources */,
+				3173072D2CD2490700C492AB /* AutofillToolbarOnboardingView.swift in Sources */,
 				AAC5E4D925D6A711007F5990 /* BookmarkStore.swift in Sources */,
 				B6FA893F269C424500588ECD /* PrivacyDashboardViewController.swift in Sources */,
 				37D2771527E870D4003365FD /* PreferencesAppearanceView.swift in Sources */,

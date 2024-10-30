@@ -405,6 +405,11 @@ struct UserText {
     static let gpcExplanation = NSLocalizedString("gpc.explanation", value: "Tells participating websites not to sell or share your data.", comment: "GPC explanation in settings")
     static let learnMore = NSLocalizedString("learnmore.link", value: "Learn More", comment: "Learn More link")
 
+    static let autofillOnboardingPopoverCTAReject = NSLocalizedString("autofill.onboarding.popover.reject", value: "No Thanks", comment: "Autofill onboarding CTA for rejection")
+    static let autofillOnboardingPopoverCTAAccept = NSLocalizedString("autofill.onboarding.popover.accept", value: "Add Shortcut", comment: "Autofill onboarding CTA for approval")
+    static let autofillOnboardingPopoverTitle = NSLocalizedString("autofill.onboarding.popover.title", value: "Add passwords shortcut?", comment: "Autofill onboarding popover title")
+    static let autofillOnboardingPopoverMessage = NSLocalizedString("autofill.onboarding.popover.message1", value: "You can manage your toolbar shortcuts at any time by right-clicking on the toolbar.", comment: "Autofill onboarding popover message")
+
     static let autofillPasswordManager = NSLocalizedString("autofill.password-manager", value: "Password Manager", comment: "Autofill settings section title")
     static let autofillPasswordManagerDuckDuckGo = NSLocalizedString("autofill.password-manager.duckduckgo", value: "DuckDuckGo built-in password manager", comment: "Autofill password manager row title")
     static let autofillPasswordManagerBitwarden = NSLocalizedString("autofill.password-manager.bitwarden", value: "Bitwarden", comment: "Autofill password manager row title")

@@ -59,6 +59,7 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
     private(set) var autofillPopoverPresenter: AutofillPopoverPresenter
     private(set) var downloadsPopover: DownloadsPopover?
     private(set) var aiChatOnboardingPopover: AIChatOnboardingPopover?
+    private(set) var autofillOnboardingPopover: AutofillToolbarOnboardingPopover?
 
     private var privacyDashboardPopover: PrivacyDashboardPopover?
     private var privacyInfoCancellable: AnyCancellable?
@@ -229,6 +230,10 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
             aiChatOnboardingPopover?.close()
         }
 
+        if autofillOnboardingPopover?.isShown ?? false {
+            autofillOnboardingPopover?.close()
+        }
+
         return true
     }
 
@@ -242,6 +247,17 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
                       includeAppVersionParameter: true)
         popover.delegate = delegate
         aiChatOnboardingPopover = popover
+        show(popover, positionedBelow: button)
+    }
+
+    func showAutofillOnboardingPopover(from button: MouseOverButton,
+                                     withDelegate delegate: NSPopoverDelegate,
+                                     ctaCallback: @escaping (Bool) -> Void) {
+        guard closeTransientPopovers() else { return }
+        let popover = autofillOnboardingPopover ?? AutofillToolbarOnboardingPopover(ctaCallback: ctaCallback)
+
+        popover.delegate = delegate
+        autofillOnboardingPopover = popover
         show(popover, positionedBelow: button)
     }
 
@@ -292,6 +308,10 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
 
     func closeAIChatOnboardingPopover() {
         aiChatOnboardingPopover?.close()
+    }
+
+    func closeAutofillOnboardingPopover() {
+        autofillOnboardingPopover?.close()
     }
 
     func openPrivacyDashboard(for tabViewModel: TabViewModel, from button: MouseOverButton) {
@@ -401,6 +421,10 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
 
     func aiChatOnboardingPopoverClosed() {
         aiChatOnboardingPopover = nil
+    }
+
+    func autofillOnboardingPopoverClosed() {
+        autofillOnboardingPopover = nil
     }
 
     func saveIdentityPopoverClosed() {
