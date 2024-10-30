@@ -26,7 +26,7 @@ jobs:
           screenresolution list
 
       - name: change screen resolution
-        run: screenresolution set 2560x1600x32
+        run: screenresolution set 1920x1080x32@60
           
       - name: Get New Screen Resolution
         run: |
