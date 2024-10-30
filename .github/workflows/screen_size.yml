@@ -1,0 +1,29 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Screen Size Tests
+
+# Controls when the action will run. 
+on:
+  workflow_dispatch:
+jobs:
+  screentest:
+    name: UI tests
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [macos-15-xlarge]
+        include:
+          - xcode-version: "16.0"
+            runner: macos-15-xlarge
+    
+    steps:
+      - name: default screen resolution
+        run: system_profiler SPDisplaysDataType | grep Resolution
+
+      - name: change screen resolution
+        run: |
+          "/Library/Application Support/VMware Tools/vmware-resolutionSet" 1080 2160
+          
+      - name: new screen resolution
+        run: system_profiler SPDisplaysDataType | grep Resolution
