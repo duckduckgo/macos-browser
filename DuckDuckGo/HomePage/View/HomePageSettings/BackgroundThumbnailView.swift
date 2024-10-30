@@ -77,6 +77,7 @@ extension HomePage.Views {
         let customBackground: CustomBackground?
         @ViewBuilder let content: () -> Content
 
+        @State var isHovering = false
         @EnvironmentObject var model: HomePage.Models.SettingsModel
 
         init(
@@ -113,6 +114,7 @@ extension HomePage.Views {
                                 model.customImagesManager?.deleteImage(image)
                             }
                             .colorScheme(image.colorScheme)
+                            .visibility(isHovering ? .visible : .gone)
                             Spacer()
                         }
                     }
@@ -120,6 +122,9 @@ extension HomePage.Views {
                 }
             }
             .contentShape(Rectangle())
+            .onHover { isHovering in
+                self.isHovering = isHovering
+            }
         }
 
         @ViewBuilder
