@@ -458,6 +458,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 try await syncService.deleteAccount()
                 managementDialogModel.endFlow()
                 syncPausedStateManager.syncDidTurnOff()
+                SyncDiagnosisHelper(syncService: syncService).didManuallyDisableSync()
             } catch {
                 managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToDeleteData, description: error.localizedDescription)
                 PixelKit.fire(DebugEvent(GeneralPixel.syncDeleteAccountError(error: error)))
