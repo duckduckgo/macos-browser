@@ -20,14 +20,15 @@ import Foundation
 import DDGSync
 import PixelKit
 
-final class SyncDiagnosisHelper {
-    private struct Consts {
-        static let syncManuallyDisabledKey = "com.duckduckgo.app.key.debug.SyncManuallyDisabled"
-        static let syncWasDisabledUnexpectedlyPixelFired = "com.duckduckgo.app.key.debug.SyncWasDisabledUnexpectedlyPixelFired"
-    }
-
+struct SyncDiagnosisHelper {
     private let userDefaults = UserDefaults.standard
     private let syncService: DDGSyncing
+
+    @UserDefaultsWrapper(key: .syncManuallyDisabledKey)
+    private var syncManuallyDisabled: Bool?
+
+    @UserDefaultsWrapper(key: .syncWasDisabledUnexpectedlyPixelFiredKey, defaultValue: false)
+    private var syncWasDisabledUnexpectedlyPixelFired: Bool
 
     init(syncService: DDGSyncing) {
         self.syncService = syncService
@@ -37,22 +38,26 @@ final class SyncDiagnosisHelper {
 // For events to help understand the impact of https://app.asana.com/0/1201493110486074/1208538487332133/f
 
     func didManuallyDisableSync() {
-        userDefaults.set(true, forKey: Consts.syncManuallyDisabledKey)
+        syncManuallyDisabled = true
     }
 
     func diagnoseAccountStatus() {
         if syncService.account == nil {
             // Nil value means sync was never on in the first place. So don't fire in this case.
-            let syncWasManuallyDisabled = userDefaults.value(forKey: Consts.syncManuallyDisabledKey) as? Bool
-            if syncWasManuallyDisabled == false,
-               !userDefaults.bool(forKey: Consts.syncWasDisabledUnexpectedlyPixelFired) {
+            if syncManuallyDisabled == false,
+               !syncWasDisabledUnexpectedlyPixelFired {
                 PixelKit.fire(DebugEvent(GeneralPixel.syncDebugWasDisabledUnexpectedly), frequency: .dailyAndCount)
-                userDefaults.set(true, forKey: Consts.syncWasDisabledUnexpectedlyPixelFired)
+                syncWasDisabledUnexpectedlyPixelFired = true
             }
         } else {
-            userDefaults.set(false, forKey: Consts.syncManuallyDisabledKey)
-            userDefaults.set(false, forKey: Consts.syncWasDisabledUnexpectedlyPixelFired)
+            syncManuallyDisabled = false
+            syncWasDisabledUnexpectedlyPixelFired = false
         }
     }
 
+}
+
+extension UserDefaultsWrapper.DefaultsKey {
+    static let syncManuallyDisabledKey = Self(rawValue: "com.duckduckgo.app.key.debug.SyncManuallyDisabled")
+    static let syncWasDisabledUnexpectedlyPixelFiredKey = Self(rawValue: "com.duckduckgo.app.key.debug.SyncWasDisabledUnexpectedlyPixelFired")
 }
