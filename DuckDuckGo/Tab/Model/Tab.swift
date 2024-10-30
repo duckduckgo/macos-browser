@@ -1373,6 +1373,7 @@ final class SystemInfo {
         return [
            "available_memory": String(format: "%.2f", availableMemoryPercent),
            "available_diskspace": String(format: "%.2f", availableDiskSpacePercent),
+           "os_version": AppVersion.shared.osVersion,
         ]
     }
 
