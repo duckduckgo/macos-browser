@@ -12,14 +12,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runner: [macos-13-xlarge]
+        runner: [macos-15-xlarge]
         include:
           - xcode-version: "16.0"
-            runner: macos-13-xlarge
+            runner: macos-15-xlarge
     
     steps:
       - name: default screen resolution
-        run: system_profiler SPDisplaysDataType | grep Resolution
+        run: set -x DISPLAY_INFO=$(system_profiler SPDisplaysDataType || echo "Resolution data not available") echo "$DISPLAY_INFO"
 
       - name: change screen resolution
         run: |
