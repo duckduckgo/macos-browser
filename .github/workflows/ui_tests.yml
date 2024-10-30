@@ -19,7 +19,9 @@ jobs:
     
     steps:
       - name: default screen resolution
-        run: set -x DISPLAY_INFO=$(system_profiler SPDisplaysDataType || echo "Resolution data not available") echo "$DISPLAY_INFO"
+        run: echo "Retrieving display information..."
+          DISPLAY_INFO=$(system_profiler SPDisplaysDataType || echo "Resolution data not available")
+          echo "$DISPLAY_INFO"
 
       - name: change screen resolution
         run: |
