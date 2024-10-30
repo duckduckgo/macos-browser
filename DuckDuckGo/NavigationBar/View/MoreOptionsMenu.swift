@@ -200,6 +200,7 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
 
     @MainActor
     @objc func setAsDefault(_ sender: NSMenuItem) {
+        PixelKit.fire(GeneralPixel.defaultRequestedFromMoreOptionsMenu)
         defaultBrowserPreferences.becomeDefault()
     }
 

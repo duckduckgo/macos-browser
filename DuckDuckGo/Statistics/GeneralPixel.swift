@@ -212,6 +212,8 @@ enum GeneralPixel: PixelKitEventV2 {
     case defaultRequestedFromHomepageSetupView
     case defaultRequestedFromSettings
     case defaultRequestedFromOnboarding
+    case defaultRequestedFromMainMenu
+    case defaultRequestedFromMoreOptionsMenu
 
     // Adding to the Dock
     case addToDockOnboardingStepPresented
@@ -754,6 +756,8 @@ enum GeneralPixel: PixelKitEventV2 {
         case .defaultRequestedFromHomepageSetupView: return "m_mac_default_requested_from_homepage_setup_view"
         case .defaultRequestedFromSettings: return "m_mac_default_requested_from_settings"
         case .defaultRequestedFromOnboarding: return "m_mac_default_requested_from_onboarding"
+        case .defaultRequestedFromMainMenu: return "m_mac_default_requested_from_main_menu"
+        case .defaultRequestedFromMoreOptionsMenu: return "m_mac_default_requested_from_more_options_menu"
 
         case .addToDockOnboardingStepPresented: return "m_mac_add_to_dock_onboarding_step_presented"
         case .userAddedToDockDuringOnboarding: return "m_mac_user_added_to_dock_during_onboarding"
