@@ -21,9 +21,9 @@ jobs:
       - name: Install screenresolution
         run: brew install screenresolution
 
-      - name: Get Screen Resolution
+      - name: List available resolution
         run: |
-          screenresolution get || echo "Screen resolution data not available"
+          screenresolution list
 
       - name: change screen resolution
         run: screenresolution set 2560x1600x32
