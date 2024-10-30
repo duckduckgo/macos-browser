@@ -411,7 +411,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 //        if NSApp.runType == .uiTests {
             if let window = WindowsManager.windows.first(where: { $0 is MainWindow }) {
-                window.setFrame(NSRect(x: 0, y: 0, width: 400, height: window.frame.height), display: true)
+                window.setFrame(NSRect(x: 0, y: 0, width: window.frame.width, height: 600), display: true)
             }
 //        }
     }
