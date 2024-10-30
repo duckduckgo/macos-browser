@@ -212,11 +212,17 @@ final class AppearancePreferences: ObservableObject {
         }
     }
 
+    var isContinueSetUpCardsViewOutdated: Bool {
+        AppDelegate.firstLaunchDate < Calendar.current.date(byAdding: .day, value: -Constants.dismissNextStepsCardsAfterDays, to: dateTimeProvider())!
+    }
+
     var isContinueSetUpVisible: Bool {
         get {
             guard persistor.isContinueSetUpVisible else { return false }
-            if AppDelegate.firstLaunchDate < Calendar.current.date(byAdding: .day, value: -Constants.dismissNextStepsCardsAfterDays, to: dateTimeProvider())! {
-                self.isContinueSetUpVisible = false
+            if isContinueSetUpCardsViewOutdated {
+                DispatchQueue.main.async {
+                    self.isContinueSetUpVisible = false
+                }
                 return false
             }
             return true

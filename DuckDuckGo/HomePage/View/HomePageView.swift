@@ -104,7 +104,8 @@ extension HomePage.Views {
                         .contextMenu(menuItems: sectionsVisibilityContextMenuItems)
 
                         if settingsVisibilityModel.isSettingsVisible {
-                            SettingsView(includingContinueSetUpCards: model.isContinueSetUpAvailable, isSettingsVisible: $settingsVisibilityModel.isSettingsVisible)
+                            SettingsView(includingContinueSetUpCards: model.isContinueSetUpAvailable && !model.isContinueSetUpCardsViewOutdated,
+                                         isSettingsVisible: $settingsVisibilityModel.isSettingsVisible)
                                 .frame(width: Self.settingsPanelWidth)
                                 .transition(.move(edge: .trailing))
                                 .layoutPriority(1)
