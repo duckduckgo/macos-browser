@@ -12,18 +12,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runner: [macos-15-xlarge]
+        runner: [macos-14-xlarge]
         include:
           - xcode-version: "16.0"
-            runner: macos-15-xlarge
+            runner: macos-14-xlarge
     
     steps:
       - name: default screen resolution
-        run: set -x system_profiler SPDisplaysDataType | grep Resolution 2>&1 | tee output.log || true
+        run: system_profiler SPDisplaysDataType | grep Resolution
 
       - name: change screen resolution
         run: |
-          "/Library/Application\ Support/VMware\ Tools/vmware-resolutionSet" 1080 2160
+          "/Library/Application Support/VMware Tools/vmware-resolutionSet" 1080 2160
           
       - name: new screen resolution
         run: system_profiler SPDisplaysDataType | grep Resolution
