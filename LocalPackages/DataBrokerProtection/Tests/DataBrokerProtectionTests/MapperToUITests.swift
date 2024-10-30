@@ -423,12 +423,10 @@ final class MapperToUITests: XCTestCase {
         XCTAssertEqual(state.completedOptOuts.count, 0)
 
         let childProfile = state.inProgressOptOuts.first { $0.dataBroker.name == "ChildBrokerWithOwnOptOut" }
-        XCTAssertEqual(childProfile?.optOutBrokerName, "ChildBrokerWithOwnOptOut")
-        XCTAssertEqual(childProfile?.optOutUrl, "child.com/optout")
+        XCTAssertEqual(childProfile?.dataBroker.optOutUrl, "child.com/optout")
 
         let parentProfile = state.inProgressOptOuts.first { $0.dataBroker.name == "ParentBroker" }
-        XCTAssertEqual(parentProfile?.optOutBrokerName, "ParentBroker")
-        XCTAssertEqual(parentProfile?.optOutUrl, "parent.com/optout")
+        XCTAssertEqual(parentProfile?.dataBroker.optOutUrl, "parent.com/optout")
     }
 
     func testMaintenanceScanState_childBrokerWithParentOptOutUrl() {
@@ -458,12 +456,10 @@ final class MapperToUITests: XCTestCase {
         XCTAssertEqual(state.completedOptOuts.count, 0)
 
         let childProfile = state.inProgressOptOuts.first { $0.dataBroker.name == "ChildBroker" }
-        XCTAssertEqual(childProfile?.optOutBrokerName, "ParentBroker")
-        XCTAssertEqual(childProfile?.optOutUrl, "parent.com/optout")
+        XCTAssertEqual(childProfile?.dataBroker.optOutUrl, "parent.com/optout")
 
         let parentProfile = state.inProgressOptOuts.first { $0.dataBroker.name == "ParentBroker" }
-        XCTAssertEqual(parentProfile?.optOutBrokerName, "ParentBroker")
-        XCTAssertEqual(parentProfile?.optOutUrl, "parent.com/optout")
+        XCTAssertEqual(childProfile?.dataBroker.optOutUrl, "parent.com/optout")
     }
 }
 

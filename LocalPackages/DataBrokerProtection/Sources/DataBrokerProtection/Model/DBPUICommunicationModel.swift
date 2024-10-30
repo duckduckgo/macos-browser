@@ -127,12 +127,14 @@ struct DBPUIDataBroker: Codable, Hashable {
     let url: String
     let date: Double?
     let parentURL: String?
+    let optOutUrl: String
 
-    init(name: String, url: String, date: Double? = nil, parentURL: String?) {
+    init(name: String, url: String, date: Double? = nil, parentURL: String?, optOutUrl: String) {
         self.name = name
         self.url = url
         self.date = date
         self.parentURL = parentURL
+        self.optOutUrl = optOutUrl
     }
 
     func hash(into hasher: inout Hasher) {
@@ -163,8 +165,6 @@ struct DBPUIDataBrokerProfileMatch: Codable {
     let estimatedRemovalDate: Double?
     let removedDate: Double?
     let hasMatchingRecordOnParentBroker: Bool
-    let optOutUrl: String
-    let optOutBrokerName: String
 }
 
 extension DBPUIDataBrokerProfileMatch {
@@ -173,8 +173,7 @@ extension DBPUIDataBrokerProfileMatch {
          dataBrokerURL: String,
          dataBrokerParentURL: String?,
          parentBrokerOptOutJobData: [OptOutJobData]?,
-         optOutUrl: String,
-         optOutBrokerName: String) {
+         optOutUrl: String) {
         let extractedProfile = optOutJobData.extractedProfile
 
         /*
@@ -209,7 +208,7 @@ extension DBPUIDataBrokerProfileMatch {
             extractedProfile.doesMatchExtractedProfile(parentOptOut.extractedProfile)
         } ?? false
 
-        self.init(dataBroker: DBPUIDataBroker(name: dataBrokerName, url: dataBrokerURL, parentURL: dataBrokerParentURL),
+        self.init(dataBroker: DBPUIDataBroker(name: dataBrokerName, url: dataBrokerURL, parentURL: dataBrokerParentURL, optOutUrl: optOutUrl),
                   name: extractedProfile.fullName ?? "No name",
                   addresses: extractedProfile.addresses?.map {DBPUIUserProfileAddress(addressCityState: $0) } ?? [],
                   alternativeNames: extractedProfile.alternativeNames ?? [String](),
@@ -218,19 +217,16 @@ extension DBPUIDataBrokerProfileMatch {
                   optOutSubmittedDate: optOutSubmittedDate?.timeIntervalSince1970,
                   estimatedRemovalDate: estimatedRemovalDate?.timeIntervalSince1970,
                   removedDate: extractedProfile.removedDate?.timeIntervalSince1970,
-                  hasMatchingRecordOnParentBroker: hasFoundParentMatch,
-                  optOutUrl: optOutUrl,
-                  optOutBrokerName: optOutBrokerName)
+                  hasMatchingRecordOnParentBroker: hasFoundParentMatch)
     }
 
-    init(optOutJobData: OptOutJobData, dataBroker: DataBroker, parentBrokerOptOutJobData: [OptOutJobData]?, optOutUrl: String, optOutBrokerName: String) {
+    init(optOutJobData: OptOutJobData, dataBroker: DataBroker, parentBrokerOptOutJobData: [OptOutJobData]?, optOutUrl: String) {
         self.init(optOutJobData: optOutJobData,
                   dataBrokerName: dataBroker.name,
                   dataBrokerURL: dataBroker.url,
                   dataBrokerParentURL: dataBroker.parent,
                   parentBrokerOptOutJobData: parentBrokerOptOutJobData,
-                  optOutUrl: optOutUrl,
-                  optOutBrokerName: optOutBrokerName)
+                  optOutUrl: optOutUrl)
     }
 
     /// Generates an array of `DBPUIDataBrokerProfileMatch` objects from the provided query data.
@@ -251,26 +247,18 @@ extension DBPUIDataBrokerProfileMatch {
             for optOutJobData in $0.optOutJobData {
                 let dataBroker = $0.dataBroker
 
-                let optOutUrl = dataBroker.optOutUrl
-                var optOutBrokerName = dataBroker.name
-                let optOutUrlIsParent = dataBroker.optOutUrlIsParent
-
                 // Find opt-out job data for the parent broker, if applicable.
                 var parentBrokerOptOutJobData: [OptOutJobData]?
                 if let parent = dataBroker.parent,
                    let parentsQueryData = brokerURLsToQueryData[parent] {
                     parentBrokerOptOutJobData = parentsQueryData.flatMap { $0.optOutJobData }
-                    if let parentDataBroker = parentsQueryData.first?.dataBroker, optOutUrlIsParent {
-                        optOutBrokerName = parentDataBroker.name
-                    }
                 }
 
                 // Create a profile match for the current data broker and append it to the list of profiles.
                 profiles.append(DBPUIDataBrokerProfileMatch(optOutJobData: optOutJobData,
                                                             dataBroker: dataBroker,
                                                             parentBrokerOptOutJobData: parentBrokerOptOutJobData,
-                                                            optOutUrl: optOutUrl,
-                                                            optOutBrokerName: optOutBrokerName))
+                                                            optOutUrl: dataBroker.optOutUrl))
 
                 // Handle mirror sites associated with the data broker.
                 if !dataBroker.mirrorSites.isEmpty {
@@ -282,8 +270,7 @@ extension DBPUIDataBrokerProfileMatch {
                                                                dataBrokerURL: mirrorSite.url,
                                                                dataBrokerParentURL: dataBroker.parent,
                                                                parentBrokerOptOutJobData: parentBrokerOptOutJobData,
-                                                               optOutUrl: optOutUrl,
-                                                               optOutBrokerName: optOutBrokerName)
+                                                               optOutUrl: dataBroker.optOutUrl)
                         }
                         return nil
                     }

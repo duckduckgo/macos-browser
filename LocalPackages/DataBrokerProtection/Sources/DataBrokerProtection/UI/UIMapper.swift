@@ -65,24 +65,16 @@ struct MapperToUI {
             for optOutJob in $0.optOutJobData {
                 let extractedProfile = optOutJob.extractedProfile
 
-                let optOutUrl = dataBroker.optOutUrl
-                var optOutBrokerName = dataBroker.name
-                let optOutUrlIsParent = dataBroker.optOutUrlIsParent
-
                 var parentBrokerOptOutJobData: [OptOutJobData]?
                 if let parent = $0.dataBroker.parent,
                    let parentsQueryData = brokerURLsToQueryData[parent] {
                     parentBrokerOptOutJobData = parentsQueryData.flatMap { $0.optOutJobData }
-                    if let parentDataBroker = parentsQueryData.first?.dataBroker, optOutUrlIsParent {
-                        optOutBrokerName = parentDataBroker.name
-                    }
                 }
 
                 let profileMatch = DBPUIDataBrokerProfileMatch(optOutJobData: optOutJob,
                                                                dataBroker: dataBroker,
                                                                parentBrokerOptOutJobData: parentBrokerOptOutJobData,
-                                                               optOutUrl: optOutUrl,
-                                                               optOutBrokerName: optOutBrokerName)
+                                                               optOutUrl: dataBroker.optOutUrl)
 
                 if extractedProfile.removedDate == nil {
                     inProgressOptOuts.append(profileMatch)
@@ -97,8 +89,7 @@ struct MapperToUI {
                                                                           dataBrokerURL: mirrorSite.url,
                                                                           dataBrokerParentURL: dataBroker.parent,
                                                                           parentBrokerOptOutJobData: parentBrokerOptOutJobData,
-                                                                          optOutUrl: optOutUrl,
-                                                                          optOutBrokerName: optOutBrokerName)
+                                                                          optOutUrl: dataBroker.optOutUrl)
 
                         if let extractedProfileRemovedDate = extractedProfile.removedDate,
                            mirrorSite.shouldWeIncludeMirrorSite(for: extractedProfileRemovedDate) {
@@ -146,13 +137,15 @@ struct MapperToUI {
                 brokers.append(DBPUIDataBroker(name: $0.dataBroker.name,
                                                url: $0.dataBroker.url,
                                                date: $0.scanJobData.lastRunDate!.timeIntervalSince1970,
-                                               parentURL: $0.dataBroker.parent))
+                                               parentURL: $0.dataBroker.parent,
+                                               optOutUrl: $0.dataBroker.optOutUrl))
 
                 for mirrorSite in $0.dataBroker.mirrorSites where mirrorSite.addedAt < $0.scanJobData.lastRunDate! {
                     brokers.append(DBPUIDataBroker(name: mirrorSite.name,
                                                    url: mirrorSite.url,
                                                    date: $0.scanJobData.lastRunDate!.timeIntervalSince1970,
-                                                   parentURL: $0.dataBroker.parent))
+                                                   parentURL: $0.dataBroker.parent,
+                                                   optOutUrl: $0.dataBroker.optOutUrl))
                 }
 
                 return brokers
@@ -182,7 +175,8 @@ struct MapperToUI {
                 brokers.append(DBPUIDataBroker(name: $0.dataBroker.name,
                                                url: $0.dataBroker.url,
                                                date: $0.scanJobData.preferredRunDate!.timeIntervalSince1970,
-                                               parentURL: $0.dataBroker.parent))
+                                               parentURL: $0.dataBroker.parent,
+                                               optOutUrl: $0.dataBroker.optOutUrl))
 
                 for mirrorSite in $0.dataBroker.mirrorSites {
                     if let removedDate = mirrorSite.removedAt {
@@ -190,13 +184,15 @@ struct MapperToUI {
                             brokers.append(DBPUIDataBroker(name: mirrorSite.name,
                                                            url: mirrorSite.url,
                                                            date: $0.scanJobData.preferredRunDate!.timeIntervalSince1970,
-                                                           parentURL: $0.dataBroker.parent))
+                                                           parentURL: $0.dataBroker.parent,
+                                                           optOutUrl: $0.dataBroker.optOutUrl))
                         }
                     } else {
                         brokers.append(DBPUIDataBroker(name: mirrorSite.name,
                                                        url: mirrorSite.url,
                                                        date: $0.scanJobData.preferredRunDate!.timeIntervalSince1970,
-                                                       parentURL: $0.dataBroker.parent))
+                                                       parentURL: $0.dataBroker.parent,
+                                                       optOutUrl: $0.dataBroker.optOutUrl))
                     }
                 }
 
