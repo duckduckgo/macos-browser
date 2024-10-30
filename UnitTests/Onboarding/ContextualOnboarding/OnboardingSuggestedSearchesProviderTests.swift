@@ -27,39 +27,39 @@ class OnboardingSuggestedSearchesProviderTests: XCTestCase {
     let userText = UserText.ContextualOnboarding.self
 
     func testSearchesListForEnglishLanguageAndUsRegion() {
-        let mockProvider = MockOnboardingRegionAndLanguageProvider(regionCode: "us", languageCode: "en")
+        let mockProvider = MockOnboardingRegionAndLanguageProvider(regionCode: "US", languageCode: "en")
         let provider = OnboardingSuggestedSearchesProvider(countryAndLanguageProvider: mockProvider)
 
         let expectedSearches = [
             ContextualOnboardingListItem.search(title: userText.tryASearchOption1English),
             ContextualOnboardingListItem.search(title: userText.tryASearchOption2English),
-            ContextualOnboardingListItem.surprise(title: userText.tryASearchOptionSurpriseMeEnglish, visibleTitle: UserText.ContextualOnboarding.tryASearchOptionSurpriseMeTitle)
+            ContextualOnboardingListItem.surprise(title: "https://duckduckgo.com/?q=baby%20ducklings&ia=images&iax=images", visibleTitle: UserText.ContextualOnboarding.tryASearchOptionSurpriseMeTitle)
         ]
 
         XCTAssertEqual(provider.list, expectedSearches)
     }
 
     func testSearchesListForNonEnglishLanguageAndNonUSRegion() {
-        let mockProvider = MockOnboardingRegionAndLanguageProvider(regionCode: "fr", languageCode: "fr")
+        let mockProvider = MockOnboardingRegionAndLanguageProvider(regionCode: "FR", languageCode: "fr")
         let provider = OnboardingSuggestedSearchesProvider(countryAndLanguageProvider: mockProvider)
 
         let expectedSearches = [
             ContextualOnboardingListItem.search(title: userText.tryASearchOption1International),
             ContextualOnboardingListItem.search(title: userText.tryASearchOption2International),
-            ContextualOnboardingListItem.surprise(title: userText.tryASearchOptionSurpriseMeInternational, visibleTitle: UserText.ContextualOnboarding.tryASearchOptionSurpriseMeTitle)
+            ContextualOnboardingListItem.surprise(title: "https://duckduckgo.com/?q=baby%20ducklings&ia=images&iax=images", visibleTitle: UserText.ContextualOnboarding.tryASearchOptionSurpriseMeTitle)
         ]
 
         XCTAssertEqual(provider.list, expectedSearches)
     }
 
     func testSearchesListForUSRegionAndNonEnglishLanguage() {
-        let mockProvider = MockOnboardingRegionAndLanguageProvider(regionCode: "us", languageCode: "es")
+        let mockProvider = MockOnboardingRegionAndLanguageProvider(regionCode: "US", languageCode: "es")
         let provider = OnboardingSuggestedSearchesProvider(countryAndLanguageProvider: mockProvider)
 
         let expectedSearches = [
             ContextualOnboardingListItem.search(title: userText.tryASearchOption1International),
             ContextualOnboardingListItem.search(title: userText.tryASearchOption2English),
-            ContextualOnboardingListItem.surprise(title: userText.tryASearchOptionSurpriseMeEnglish, visibleTitle: UserText.ContextualOnboarding.tryASearchOptionSurpriseMeTitle)
+            ContextualOnboardingListItem.surprise(title: "https://duckduckgo.com/?q=baby%20ducklings&ia=images&iax=images", visibleTitle: UserText.ContextualOnboarding.tryASearchOptionSurpriseMeTitle)
         ]
 
         XCTAssertEqual(provider.list, expectedSearches)

@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1727797589369,
+    "version": 1730109523334,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -59,6 +59,26 @@
                 "domainDetection": "enabled"
             },
             "hash": "b813ade8472a097ffbd43a3331116fe1"
+        },
+        "aiChat": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "toolbarShortcut": {
+                    "state": "enabled"
+                },
+                "applicationMenuShortcut": {
+                    "state": "enabled"
+                }
+            },
+            "settings": {
+                "aiChatURL": "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=2",
+                "onboardingCookieName": "dcm",
+                "onboardingCookieDomain": "duckduckgo.com",
+                "aiChatURLIdentifiableQuery": "ia",
+                "aiChatURLIdentifiableQueryValue": "chat"
+            },
+            "hash": "e5711b3f4ceff89cd5c2d70b19a96875"
         },
         "ampLinks": {
             "exceptions": [
@@ -356,6 +376,9 @@
                     "domain": "speedweek.com"
                 },
                 {
+                    "domain": "la-becanerie.com"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -373,19 +396,16 @@
             ],
             "settings": {
                 "disabledCMPs": [
-                    "generic-cosmetic",
-                    "termsfeed3",
-                    "healthline-media",
-                    "ketch"
+                    "healthline-media"
                 ]
             },
             "state": "enabled",
             "features": {
-                "filterlistExperiment": {
-                    "state": "disabled"
+                "filterlistExperiment2": {
+                    "state": "enabled"
                 }
             },
-            "hash": "a24d4efe9deb2a73284d7beab93c0d32"
+            "hash": "419e42a27cc5daa895b567f1e3c1bd6b"
         },
         "autofillBreakageReporter": {
             "state": "disabled",
@@ -417,9 +437,12 @@
                 },
                 "credentialsImportPromotion": {
                     "state": "enabled"
+                },
+                "credentialsImportPromotionForExistingUsers": {
+                    "state": "enabled"
                 }
             },
-            "hash": "81031a6b86bd68eec102c2ed67f48c1b"
+            "hash": "22709d939c21d127514fd009c54ee987"
         },
         "backgroundAgentPixelTest": {
             "state": "enabled",
@@ -1268,6 +1291,14 @@
                 }
             ],
             "hash": "d02882dcee87a42b7d29bb6f2e21b4ca"
+<<<<<<< HEAD
+=======
+        },
+        "contextualOnboarding": {
+            "exceptions": [],
+            "state": "enabled",
+            "hash": "52857469413a66e8b0c7b00de5589162"
+>>>>>>> main
         },
         "cookie": {
             "settings": {
@@ -1501,7 +1532,8 @@
                                 ".ytd-video-preview",
                                 "#thumbnail-container",
                                 "#video-title-link",
-                                "#video-title"
+                                "#video-title",
+                                "video.video-stream.html5-main-video"
                             ]
                         },
                         "thumbnailOverlays": {
@@ -1552,7 +1584,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "a22c997161337594616c850542cee336"
+            "hash": "6d2484ffb4609f98336632cdd1487f34"
         },
         "elementHiding": {
             "exceptions": [
@@ -3450,6 +3482,15 @@
                         ]
                     },
                     {
+                        "domain": "livebeaches.com",
+                        "rules": [
+                            {
+                                "selector": "[class*='random-ad']",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "livemint.com",
                         "rules": [
                             {
@@ -3520,6 +3561,23 @@
                             {
                                 "selector": ".primis",
                                 "type": "closest-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "mantan-web.jp",
+                        "rules": [
+                            {
+                                "selector": "center > div",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".ad-rec",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".conteiner__head",
+                                "type": "hide-empty"
                             }
                         ]
                     },
@@ -4372,6 +4430,10 @@
                             {
                                 "selector": "[data-aa-adunit]",
                                 "type": "hide"
+                            },
+                            {
+                                "selector": "[data-adpath]",
+                                "type": "hide-empty"
                             }
                         ]
                     },
@@ -4865,7 +4927,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "81b9ba9f3245da9eb799ec916e6b916b"
+            "hash": "f91fcec45cd63f074ee31f3e276cc6e9"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -5269,31 +5331,13 @@
             "state": "enabled",
             "exceptions": [
                 {
-                    "domain": "allegiantair.com"
-                },
-                {
                     "domain": "boston.com"
                 },
                 {
                     "domain": "costco.com"
                 },
                 {
-                    "domain": "crunchyroll.com"
-                },
-                {
                     "domain": "espn.com"
-                },
-                {
-                    "domain": "eventbrite.com"
-                },
-                {
-                    "domain": "duluthtrading.com"
-                },
-                {
-                    "domain": "web.whatsapp.com"
-                },
-                {
-                    "domain": "verizon.com"
                 },
                 {
                     "domain": "chime.com"
@@ -5302,22 +5346,19 @@
                     "domain": "tirerack.com"
                 },
                 {
-                    "domain": "milesplit.live"
-                },
-                {
                     "domain": "dollargeneral.com"
                 },
                 {
-                    "domain": "monstergear.monsterenergy.com"
+                    "domain": "milesplit.live"
+                },
+                {
+                    "domain": "monsterenergy.com"
                 },
                 {
                     "domain": "npr.org"
                 },
                 {
                     "domain": "norton.com"
-                },
-                {
-                    "domain": "jcrew.com"
                 },
                 {
                     "domain": "marvel.com"
@@ -5344,7 +5385,7 @@
                     "privacy-test-pages.site"
                 ]
             },
-            "hash": "70264848cdb2f1e2ac1e21429405319d"
+            "hash": "501bbc6471eb079cb27fa8a2a47467a5"
         },
         "harmfulApis": {
             "settings": {
@@ -5632,9 +5673,15 @@
             "hash": "cbd62a1a63a829da0277ca045a311eb2"
         },
         "newTabSearchField": {
+<<<<<<< HEAD
             "state": "internal",
             "exceptions": [],
             "hash": "f1daaefe788583c2a00d7d19a23864a7"
+=======
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
+>>>>>>> main
         },
         "nonTracking3pCookies": {
             "settings": {
@@ -7454,6 +7501,7 @@
                                     "bodyelectricvitality.com.au",
                                     "cosmicbook.news",
                                     "eatroyo.com",
+                                    "experian.com",
                                     "thesimsresource.com",
                                     "tradersync.com",
                                     "vanguardplan.com"
@@ -7555,6 +7603,7 @@
                                     "local12.com",
                                     "local21news.com",
                                     "midmichigannow.com",
+                                    "mlb.com",
                                     "my15wtcn.com",
                                     "my24milwaukee.com",
                                     "my48.tv",
@@ -8148,7 +8197,7 @@
                     "nosto.com": {
                         "rules": [
                             {
-                                "rule": "connect.nosto.com/script/shopify/nosto.js",
+                                "rule": "connect.nosto.com",
                                 "domains": [
                                     "<all>"
                                 ]
@@ -8534,6 +8583,7 @@
                                 "rule": "a.pub.network/core/prebid-universal-creative.js",
                                 "domains": [
                                     "signupgenius.com",
+                                    "smithsonianmag.com",
                                     "titantv.com"
                                 ]
                             },
@@ -8678,6 +8728,16 @@
                             }
                         ]
                     },
+                    "sascdn.com": {
+                        "rules": [
+                            {
+                                "rule": "sascdn.com/tag/",
+                                "domains": [
+                                    "filmweb.pl"
+                                ]
+                            }
+                        ]
+                    },
                     "scene7.com": {
                         "rules": [
                             {
@@ -8802,6 +8862,16 @@
                             }
                         ]
                     },
+                    "smartadserver.com": {
+                        "rules": [
+                            {
+                                "rule": "smartadserver.com/genericpost",
+                                "domains": [
+                                    "filmweb.pl"
+                                ]
+                            }
+                        ]
+                    },
                     "snapkit.com": {
                         "rules": [
                             {
@@ -8880,6 +8950,16 @@
                                     "bankofamerica.com",
                                     "idnotify.com",
                                     "united.com"
+                                ]
+                            }
+                        ]
+                    },
+                    "svonm.com": {
+                        "rules": [
+                            {
+                                "rule": "hgc-cf-cache-1.svonm.com",
+                                "domains": [
+                                    "t-online.de"
                                 ]
                             }
                         ]
@@ -9332,6 +9412,16 @@
                             }
                         ]
                     },
+                    "eltiempo.co": {
+                        "rules": [
+                            {
+                                "rule": "ads.eltiempo.co/genericpost",
+                                "domains": [
+                                    "filmweb.pl"
+                                ]
+                            }
+                        ]
+                    },
                     "yandex.tm": {
                         "rules": [
                             {
@@ -9361,7 +9451,11 @@
                     "domain": "instructure.com"
                 }
             ],
+<<<<<<< HEAD
             "hash": "1cf339c9f618be0304f90f0f48a7b6cf"
+=======
+            "hash": "4a71922e4eb31060dced0b091ad797e7"
+>>>>>>> main
         },
         "trackingCookies1p": {
             "settings": {
@@ -9803,6 +9897,14 @@
             "state": "disabled",
             "hash": "728493ef7a1488e4781656d3f9db84aa"
         },
+<<<<<<< HEAD
+=======
+        "windowsNewTabPageExperiment": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
+        },
+>>>>>>> main
         "windowsPermissionUsage": {
             "exceptions": [],
             "state": "disabled",

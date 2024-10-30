@@ -42,6 +42,7 @@ final class DeviceAuthenticator: UserAuthenticating {
         case exportLogins
         case syncSettings
         case deleteAllPasswords
+        case viewAllCredentials
 
         var localizedDescription: String {
             switch self {
@@ -51,6 +52,7 @@ final class DeviceAuthenticator: UserAuthenticating {
             case .exportLogins: return UserText.pmAutoLockPromptExportLogins
             case .syncSettings: return UserText.syncAutoLockPrompt
             case .deleteAllPasswords: return UserText.deleteAllPasswordsPermissionText
+            case .viewAllCredentials: return UserText.pmAutoLockPromptUnlockLogins
             }
         }
     }
@@ -163,7 +165,9 @@ final class DeviceAuthenticator: UserAuthenticating {
         let needsAuthenticationForCreditCardsAutofill = reason == .autofillCreditCards && isCreditCardTimeIntervalExpired()
         let needsAuthenticationForSyncSettings = reason == .syncSettings && isSyncSettingsTimeIntervalExpired()
         let needsAuthenticationForDeleteAllPasswords = reason == .deleteAllPasswords
-        guard needsAuthenticationForCreditCardsAutofill || needsAuthenticationForSyncSettings || needsAuthenticationForDeleteAllPasswords || requiresAuthentication else {
+        let needsAuthenticationForViewAllCredentials = reason == .viewAllCredentials
+        guard needsAuthenticationForCreditCardsAutofill || needsAuthenticationForSyncSettings || needsAuthenticationForDeleteAllPasswords || needsAuthenticationForViewAllCredentials ||
+                requiresAuthentication else {
             result(.success)
             return
         }

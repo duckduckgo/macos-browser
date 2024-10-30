@@ -21,6 +21,7 @@ import Foundation
 import SwiftUI
 
 public final class PopoverMessageViewModel: ObservableObject {
+    @Published var title: String?
     @Published var message: String
     @Published var image: NSImage?
     @Published var buttonText: String?
@@ -28,12 +29,14 @@ public final class PopoverMessageViewModel: ObservableObject {
     var shouldShowCloseButton: Bool
     var shouldPresentMultiline: Bool
 
-    public init(message: String,
+    public init(title: String?,
+                message: String,
                 image: NSImage? = nil,
                 buttonText: String? = nil,
                 buttonAction: (() -> Void)? = nil,
                 shouldShowCloseButton: Bool = false,
                 shouldPresentMultiline: Bool = true) {
+        self.title = title
         self.message = message
         self.image = image
         self.buttonText = buttonText
@@ -60,40 +63,91 @@ public struct PopoverMessageView: View {
         ZStack {
             ClickableViewRepresentable(onClick: onClick)
                 .background(Color.clear)
-            HStack(alignment: .top) {
-                if let image = viewModel.image {
-                    Image(nsImage: image)
-                        .padding(.top, 3)
+            if let title = viewModel.title {
+                messageWithTitleBody(title)
+            } else {
+                messageBody
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var messageBody: some View {
+        HStack(alignment: .top) {
+            if let image = viewModel.image {
+                Image(nsImage: image)
+                    .padding(.top, 3)
+            }
+
+            Text(viewModel.message)
+                .font(.body)
+                .fontWeight(.bold)
+                .padding(.leading, 2)
+                .frame(minHeight: 22)
+                .lineLimit(nil)
+                .if(viewModel.shouldPresentMultiline) { view in
+                    view.frame(width: 150, alignment: .leading)
                 }
 
-                if viewModel.shouldPresentMultiline {
-                    Text(viewModel.message)
-                        .font(.body)
-                        .fontWeight(.bold)
-                        .padding(.leading, 2)
-                        .frame(width: 150, alignment: .leading)
-                        .frame(minHeight: 22)
-                        .lineLimit(nil)
-                } else {
-                    Text(viewModel.message)
-                        .font(.body)
-                        .fontWeight(.bold)
-                        .padding(.leading, 2)
-                        .frame(minHeight: 22)
-                        .lineLimit(nil)
-                }
+            if let text = viewModel.buttonText,
+               let action = viewModel.buttonAction {
+                Button(text, action: {
+                    action()
+                    onClose?()
+                })
+                .padding(.top, 2)
+                .padding(.leading, 4)
+            }
 
-                if let text = viewModel.buttonText,
-                   let action = viewModel.buttonAction {
-                    Button(text, action: {
-                        action()
-                        onClose?()
-                    })
-                    .padding(.top, 2)
-                    .padding(.leading, 4)
+            if viewModel.shouldShowCloseButton {
+                Button(action: {
+                    onClose?()
+                }) {
+                    Image(.updateNotificationClose)
+                        .frame(width: 16, height: 16)
                 }
+                .buttonStyle(PlainButtonStyle())
+                .padding(.top, viewModel.buttonText != nil ? 4 : 0)
+            }
+        }
+        .padding()
+    }
 
-                if viewModel.shouldShowCloseButton {
+    @ViewBuilder
+    private func messageWithTitleBody(_ title: String) -> some View {
+        HStack(spacing: 12) {
+            if let image = viewModel.image {
+                Image(nsImage: image)
+            }
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.body)
+                    .fontWeight(.bold)
+                    .frame(minHeight: 22)
+                    .lineLimit(nil)
+                Text(viewModel.message)
+                    .font(.body)
+                    .frame(minHeight: 22)
+                    .lineLimit(nil)
+            }
+            .padding(.leading, 8)
+            .if(viewModel.shouldPresentMultiline) { view in
+                view.frame(width: 300, alignment: .leading)
+            }
+
+            if let text = viewModel.buttonText,
+               let action = viewModel.buttonAction {
+                Button(text, action: {
+                    action()
+                    onClose?()
+                })
+                .padding(.top, 2)
+                .padding(.leading, 4)
+            }
+
+            if viewModel.shouldShowCloseButton {
+                VStack(spacing: 0) {
                     Button(action: {
                         onClose?()
                     }) {
@@ -101,11 +155,15 @@ public struct PopoverMessageView: View {
                             .frame(width: 16, height: 16)
                     }
                     .buttonStyle(PlainButtonStyle())
-                    .padding(.top, viewModel.buttonText != nil ? 4 : 0)
+                    .padding(.top, -4)
+                    .padding(.trailing, -8)
+
+                    Spacer()
                 }
             }
-            .padding()
         }
+        .padding(.horizontal)
+        .padding(.vertical, 12)
     }
 }
 

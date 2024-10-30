@@ -22,14 +22,67 @@ import XCTest
 final class FirePopoverViewModelTests: XCTestCase {
 
     @MainActor
-    private func makeViewModel(with tabCollectionViewModel: TabCollectionViewModel) -> FirePopoverViewModel {
-        FirePopoverViewModel(
-            fireViewModel: .init(),
+    private func makeViewModel(with tabCollectionViewModel: TabCollectionViewModel, contextualOnboardingStateMachine: ContextualOnboardingStateUpdater = ContextualOnboardingStateMachine()) -> FirePopoverViewModel {
+        let manager = WebCacheManagerMock()
+        let historyCoordinator = HistoryCoordinatingMock()
+        let permissionManager = PermissionManagerMock()
+        let faviconManager = FaviconManagerMock()
+        let fire = Fire(cacheManager: manager,
+                        historyCoordinating: historyCoordinator,
+                        permissionManager: permissionManager,
+                        windowControllerManager: WindowControllersManager.shared,
+                        faviconManagement: faviconManager,
+                        tld: ContentBlocking.shared.tld)
+        return FirePopoverViewModel(
+            fireViewModel: .init(fire: fire),
             tabCollectionViewModel: tabCollectionViewModel,
             historyCoordinating: HistoryCoordinatingMock(),
             fireproofDomains: FireproofDomains(store: FireproofDomainsStoreMock()),
             faviconManagement: FaviconManagerMock(),
-            tld: ContentBlocking.shared.tld
+            tld: ContentBlocking.shared.tld,
+            contextualOnboardingStateMachine: contextualOnboardingStateMachine
         )
     }
+
+    @MainActor func testOnBurn_OnboardingStateMachineFireButtonUsedCalled() {
+        // Given
+        let tabCollectionVM = TabCollectionViewModel()
+        let stateMachine = CapturingContextualOnboardingStateUpdater()
+        let vm = makeViewModel(with: tabCollectionVM, contextualOnboardingStateMachine: stateMachine)
+        XCTAssertNil(stateMachine.updatedForTab)
+        XCTAssertFalse(stateMachine.gotItPressedCalled)
+        XCTAssertFalse(stateMachine.fireButtonUsedCalled)
+
+        // When
+        vm.burn()
+
+        // Then
+        XCTAssertNil(stateMachine.updatedForTab)
+        XCTAssertFalse(stateMachine.gotItPressedCalled)
+        XCTAssertTrue(stateMachine.fireButtonUsedCalled)
+    }
+}
+
+class CapturingContextualOnboardingStateUpdater: ContextualOnboardingStateUpdater {
+
+    var state: ContextualOnboardingState = .onboardingCompleted
+
+    var updatedForTab: Tab?
+    var gotItPressedCalled = false
+    var fireButtonUsedCalled = false
+
+    func updateStateFor(tab: Tab) {
+        updatedForTab = tab
+    }
+
+    func gotItPressed() {
+        gotItPressedCalled = true
+    }
+
+    func fireButtonUsed() {
+        fireButtonUsedCalled = true
+    }
+
+    func turnOffFeature() {}
+
 }

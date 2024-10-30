@@ -540,6 +540,10 @@ extension DataImportViewModel {
         return DataImportViewSummarizedError(errors: errors)
     }
 
+    var hasAnySummaryError: Bool {
+        !summary.allSatisfy { $0.result.isSuccess }
+    }
+
     private static func requestPrimaryPasswordCallback(_ source: DataImport.Source) -> String? {
         let alert = NSAlert.passwordRequiredAlert(source: source)
         let response = alert.runModal()

@@ -42,14 +42,13 @@ final class DownloadsViewController: NSViewController {
     private let viewModel: DownloadListViewModel
     private var downloadsCancellable: AnyCancellable?
 
-    init(viewModel: DownloadListViewModel? = nil) {
-        self.viewModel = viewModel ?? DownloadListViewModel()
+    init(viewModel: DownloadListViewModel) {
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
 
     required init?(coder: NSCoder) {
-        self.viewModel = DownloadListViewModel()
-        super.init(coder: coder)
+        fatalError("\(Self.self): Bad initializer")
     }
 
     override func loadView() {
@@ -99,6 +98,7 @@ final class DownloadsViewController: NSViewController {
         scrollView.autohidesScrollers = true
         scrollView.borderType = .noBorder
         scrollView.hasHorizontalScroller = false
+        scrollView.hasVerticalScroller = true
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.usesPredominantAxisScrolling = false
         scrollView.automaticallyAdjustsContentInsets = false
@@ -487,7 +487,7 @@ extension DownloadsViewController: NSTableViewDataSource, NSTableViewDelegate {
     store.fetchBlock = { completion in
         completion(.success(previewDownloadListItems))
     }
-    let viewModel = DownloadListViewModel(coordinator: DownloadListCoordinator(store: store))
+    let viewModel = DownloadListViewModel(fireWindowSession: nil, coordinator: DownloadListCoordinator(store: store))
     return DownloadsViewController(viewModel: viewModel)
 }() }
 #endif

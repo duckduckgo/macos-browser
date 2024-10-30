@@ -22,6 +22,7 @@ import Combine
 @objc protocol MouseOverViewDelegate: AnyObject {
 
     @objc @MainActor optional func mouseOverView(_ mouseOverView: MouseOverView, isMouseOver: Bool)
+    @objc @MainActor optional func mouseOverView(_ mouseOverView: MouseOverView, mouseMovedWith: NSEvent)
 
     @objc @MainActor optional func mouseClickView(_ mouseClickView: MouseClickView, mouseDownEvent: NSEvent)
     @objc @MainActor optional func mouseClickView(_ mouseClickView: MouseClickView, mouseUpEvent: NSEvent)
@@ -148,6 +149,12 @@ internal class MouseOverView: NSControl, Hoverable {
         if eventTypeMask.contains(.init(type: event.type)), let action {
             NSApp.sendAction(action, to: target, from: self)
         }
+    }
+
+    override func mouseMoved(with event: NSEvent) {
+        super.mouseMoved(with: event)
+
+        delegate?.mouseOverView?(self, mouseMovedWith: event)
     }
 
     override func mouseDown(with event: NSEvent) {

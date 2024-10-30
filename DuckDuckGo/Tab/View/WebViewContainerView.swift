@@ -53,6 +53,11 @@ final class WebViewContainerView: NSView {
     private var blurViewIsHiddenCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
 
+    override func layout() {
+        super.layout()
+        webView.tabContentView.frame = bounds
+    }
+
     override func didAddSubview(_ subview: NSView) {
         // if fullscreen placeholder is shown
         guard self.webView.tabContentView !== self.webView else {

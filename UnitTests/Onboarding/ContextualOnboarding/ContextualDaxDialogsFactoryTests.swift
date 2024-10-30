@@ -23,16 +23,19 @@ import Onboarding
 final class ContextualDaxDialogsFactoryTests: XCTestCase {
     private var factory: ContextualDaxDialogsFactory!
     private var delegate: CapturingOnboardingNavigationDelegate!
+    private var reporter: CapturingOnboardingPixelReporter!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
-        factory = DefaultContextualDaxDialogViewFactory()
+        reporter = CapturingOnboardingPixelReporter()
+        factory = DefaultContextualDaxDialogViewFactory(onboardingPixelReporter: reporter)
         delegate = CapturingOnboardingNavigationDelegate()
     }
 
     @MainActor override func tearDownWithError() throws {
         factory = nil
         delegate = nil
+        reporter = nil
         try super.tearDownWithError()
     }
 
@@ -41,7 +44,7 @@ final class ContextualDaxDialogsFactoryTests: XCTestCase {
         let dialogType = ContextualDialogType.tryASearch
 
         // WHEN
-        let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: {})
+        let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: {}, onGotItPressed: {}, onFireButtonPressed: {})
 
         // THEN
         let view = try XCTUnwrap(find(OnboardingTrySearchDialog.self, in: result))
@@ -59,11 +62,13 @@ final class ContextualDaxDialogsFactoryTests: XCTestCase {
     func testWhenMakeViewForSearchDoneWithShouldFollowUpThenOnboardingsearchDoneViewCreatedAndOnActionNothingOccurs() throws {
         // GIVEN
         var onDismissRun = false
+        var onGotItPressedRun = false
         let dialogType = ContextualDialogType.searchDone(shouldFollowUp: true)
         let onDismiss = { onDismissRun = true }
+        let onGotItPressed = { onGotItPressedRun = true }
 
         // WHEN
-        let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: onDismiss)
+        let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: onDismiss, onGotItPressed: onGotItPressed, onFireButtonPressed: {})
 
         // THEN
         let view = try XCTUnwrap(find(OnboardingFirstSearchDoneDialog.self, in: result))
@@ -75,16 +80,19 @@ final class ContextualDaxDialogsFactoryTests: XCTestCase {
 
         // THEN
         XCTAssertFalse(onDismissRun)
+        XCTAssertTrue(onGotItPressedRun)
     }
 
     func testWhenMakeViewForSearchDoneWithoutShouldFollowUpThenOnboardingsearchDoneViewCreatedAndOnActionOccurs() throws {
         // GIVEN
         var onDismissRun = false
+        var onGotItPressedRun = false
         let dialogType = ContextualDialogType.searchDone(shouldFollowUp: false)
         let onDismiss = { onDismissRun = true }
+        let onGotItPressed = { onGotItPressedRun = true }
 
         // WHEN
-        let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: onDismiss)
+        let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: onDismiss, onGotItPressed: onGotItPressed, onFireButtonPressed: {})
 
         // THEN
         let view = try XCTUnwrap(find(OnboardingFirstSearchDoneDialog.self, in: result))
@@ -96,6 +104,7 @@ final class ContextualDaxDialogsFactoryTests: XCTestCase {
 
         // THEN
         XCTAssertTrue(onDismissRun)
+        XCTAssertFalse(onGotItPressedRun)
     }
 
     func testWhenMakeViewForTryASiteThenOnboardingTrySiteDialogViewCreatedAndOnActionExpectedSearchOccurs() throws {
@@ -103,7 +112,7 @@ final class ContextualDaxDialogsFactoryTests: XCTestCase {
         let dialogType = ContextualDialogType.tryASite
 
         // WHEN
-        let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: {})
+        let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: {}, onGotItPressed: {}, onFireButtonPressed: {})
 
         // THEN
         let view = try XCTUnwrap(find(OnboardingTryVisitingASiteDialog.self, in: result))
@@ -121,12 +130,14 @@ final class ContextualDaxDialogsFactoryTests: XCTestCase {
     func testWhenMakeViewForTryASiteWithShouldFollowUpThenTrySiteDialogViewCreatedAndOnActionNothingOccurs() throws {
         // GIVEN
         var onDismissRun = false
+        var onGotItPressedRun = false
         let trackerMessage = NSMutableAttributedString(string: "some trackers")
         let dialogType = ContextualDialogType.trackers(message: trackerMessage, shouldFollowUp: true)
         let onDismiss = { onDismissRun = true }
+        let onGotItPressed = { onGotItPressedRun = true }
 
         // WHEN
-        let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: onDismiss)
+        let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: onDismiss, onGotItPressed: onGotItPressed, onFireButtonPressed: {})
 
         // THEN
         let view = try XCTUnwrap(find(OnboardingTrackersDoneDialog.self, in: result))
@@ -138,17 +149,20 @@ final class ContextualDaxDialogsFactoryTests: XCTestCase {
 
         // THEN
         XCTAssertFalse(onDismissRun)
+        XCTAssertTrue(onGotItPressedRun)
     }
 
     func testWhenMakeViewForTryASiteWithoutShouldFollowUpThenTryASiteDialogViewCreatedAndOnActionOccurs() throws {
         // GIVEN
         var onDismissRun = false
+        var onGotItPressedRun = false
         let trackerMessage = NSMutableAttributedString(string: "some trackers")
         let dialogType = ContextualDialogType.trackers(message: trackerMessage, shouldFollowUp: false)
         let onDismiss = { onDismissRun = true }
+        let onGotItPressed = { onGotItPressedRun = true }
 
         // WHEN
-        let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: onDismiss)
+        let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: onDismiss, onGotItPressed: onGotItPressed, onFireButtonPressed: {})
 
         // THEN
         let view = try XCTUnwrap(find(OnboardingTrackersDoneDialog.self, in: result))
@@ -160,40 +174,19 @@ final class ContextualDaxDialogsFactoryTests: XCTestCase {
 
         // THEN
         XCTAssertTrue(onDismissRun)
-    }
-
-    @MainActor func testWhenMakeViewForTryFireButtonThenOnboardingTryFireButtonDialogViewCreatedAndOnActionExpectedActionOccurs() throws {
-        // GIVEN
-        var onDismissRun = false
-        let dialogType = ContextualDialogType.tryFireButton
-        let onDismiss = { onDismissRun = true }
-
-        // WHEN
-        let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: onDismiss)
-
-        // THEN
-        let view = try XCTUnwrap(find(OnboardingFireDialog.self, in: result))
-
-        // WHEN
-        view.viewModel.skip()
-        view.viewModel.tryFireButton()
-
-        // THEN
-        XCTAssertTrue(onDismissRun)
-        let expectation = self.expectation(description: "Wait for FirePopover to appear")
-        self.waitForPopoverToAppear(expectation: expectation)
-        wait(for: [expectation], timeout: 3.0)
-        WindowControllersManager.shared.lastKeyMainWindowController?.window?.close()
+        XCTAssertFalse(onGotItPressedRun)
     }
 
     func testWhenMakeViewForHighFivThenFilalDialogViewCreatedAndOnActionExpectedSearchOccurs() throws {
         // GIVEN
         var onDismissRun = false
+        var onGotItPressedRun = false
         let dialogType = ContextualDialogType.highFive
         let onDismiss = { onDismissRun = true }
+        let onGotItPressed = { onGotItPressedRun = true }
 
         // WHEN
-        let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: onDismiss)
+        let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: onDismiss, onGotItPressed: onGotItPressed, onFireButtonPressed: {})
 
         // THEN
         let view = try XCTUnwrap(find(OnboardingFinalDialog.self, in: result))
@@ -203,56 +196,73 @@ final class ContextualDaxDialogsFactoryTests: XCTestCase {
 
         // THEN
         XCTAssertTrue(onDismissRun)
+        XCTAssertTrue(onGotItPressedRun)
     }
 
-    @MainActor private func waitForPopoverToAppear(expectation: XCTestExpectation) {
-        if let popover = FireCoordinator.firePopover, popover.isShown {
-            // Fulfill the expectation if the popover is shown
-            expectation.fulfill()
-        } else {
-            // If not shown yet, check again after a delay
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                self.waitForPopoverToAppear(expectation: expectation)
-            }
-        }
+    @MainActor
+    func testWhenMakeViewForTryFireButtonAndFireButtonIsPressedThenOnFireButtonPressedActionIsCalled() throws {
+        // GIVEN
+        var onFireButtonRun = false
+        let dialogType = ContextualDialogType.tryFireButton
+        let onFireButtonPressed = { onFireButtonRun = true }
+
+        // WHEN
+        let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: {}, onGotItPressed: {}, onFireButtonPressed: onFireButtonPressed)
+
+        // THEN
+        let view = try XCTUnwrap(find(OnboardingFireDialog.self, in: result))
+
+        // WHEN
+        view.viewModel.tryFireButton()
+
+        // THEN
+        XCTAssertTrue(onFireButtonRun)
+    }
+
+    func testWhenMakeViewForTryFireButtonAndSkipButtonIsPressedThenTrackFireButtonSkippedCalled() throws {
+        // GIVEN
+        let dialogType = ContextualDialogType.highFive
+
+        // WHEN
+        let result = factory.makeView(for: dialogType, delegate: delegate, onDismiss: {}, onGotItPressed: {}, onFireButtonPressed: {})
+
+        // THEN
+        XCTAssertTrue(reporter.trackLastDialogShownCalled)
     }
 
 }
 
-class CapturingOnboardingNavigationDelegate: OnboardingNavigationDelegate {
-    var didCallSearchFor = false
-    var didNavigateToCalled = false
-    var capturedQuery = ""
-    var capturedUrlString = ""
+class CapturingOnboardingPixelReporter: OnboardingPixelReporting {
+    var trackFireButtonSkippedCalled = false
+    var trackFireButtonTryItCalled = false
+    var trackLastDialogShownCalled = false
+    var trackSiteVisitedCalled = false
 
-    func searchFor(_ query: String) {
-        didCallSearchFor = true
-        capturedQuery = query
+    func trackFireButtonSkipped() {
+        trackFireButtonSkippedCalled = true
     }
 
-    func navigateTo(url: URL) {
-        didNavigateToCalled = true
-        capturedUrlString = url.absoluteString
+    func trackLastDialogShown() {
+        trackLastDialogShownCalled = true
     }
-}
 
-import SwiftUI
-
-/// Recursively searches for a SwiftUI view of type `T` within the given root object.
-///
-/// - Parameters:
-///   - type: The type of view to search for.
-///   - root: The root object to start searching from.
-/// - Returns: An optional view of type `T`, or `nil` if no such view is found.
-func find<T: View>(_ type: T.Type, in root: Any) -> T? {
-    let mirror = Mirror(reflecting: root)
-    for child in mirror.children {
-        if let view = child.value as? T {
-            return view
-        }
-        if let found = find(type, in: child.value) {
-            return found
-        }
+    func trackSearchSuggetionOptionTapped() {
     }
-    return nil
+
+    func trackSiteSuggetionOptionTapped() {
+    }
+
+    func trackFireButtonTryIt() {
+        trackFireButtonTryItCalled = true
+    }
+
+    func trackAddressBarTypedIn() {
+    }
+
+    func trackPrivacyDashboardOpened() {
+    }
+
+    func trackSiteVisited() {
+        trackSiteVisitedCalled = true
+    }
 }

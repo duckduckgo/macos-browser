@@ -17,16 +17,40 @@
 //
 
 import Foundation
+import Combine
 
-public struct OnboardingFireButtonDialogViewModel {
-    let onDismiss: () -> Void
+public class OnboardingFireButtonDialogViewModel: ObservableObject {
+
+    private var onDismiss: () -> Void
+    private var onGotItPressed: () -> Void
+    private var onFireButtonPressed: () -> Void
+    private let onboardingPixelReporter: OnboardingDialogsReporting
+
+    init(onboardingPixelReporter: OnboardingDialogsReporting = OnboardingPixelReporter(),
+         onDismiss: @escaping () -> Void,
+         onGotItPressed: @escaping () -> Void,
+         onFireButtonPressed: @escaping () -> Void) {
+        self.onDismiss = onDismiss
+        self.onGotItPressed = onGotItPressed
+        self.onFireButtonPressed = onFireButtonPressed
+        self.onboardingPixelReporter = onboardingPixelReporter
+    }
+
+    func highFive() {
+        onGotItPressed()
+        onDismiss()
+    }
 
     func skip() {
-        onDismiss()
+        onGotItPressed()
+        onboardingPixelReporter.trackFireButtonSkipped()
+        onboardingPixelReporter.trackLastDialogShown()
     }
 
     @MainActor
     func tryFireButton() {
+        onFireButtonPressed()
+        onboardingPixelReporter.trackFireButtonTryIt()
         FireCoordinator.fireButtonAction()
     }
 }

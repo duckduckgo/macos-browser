@@ -86,7 +86,9 @@ struct RemoteMessageView: View {
 
     private var closeButton: some View {
         HomePage.Views.CloseButton(icon: .close, size: 16) {
-            viewModel.onDidClose(.close)
+            Task {
+                await viewModel.onDidClose(.close)
+            }
         }
         .visibility(isHovering ? .visible : .invisible)
         .padding(6)
@@ -106,14 +108,20 @@ struct RemoteMessageView: View {
     private var title: some View {
         Text(viewModel.title)
             .font(.system(size: 13).bold())
+            .multilineTextAlignment(.leading)
+            .fixMultilineScrollableText()
    }
 
     @ViewBuilder
     private var subtitle: some View {
         if #available(macOS 12.0, *), let attributed = try? AttributedString(markdown: viewModel.subtitle) {
             Text(attributed)
+                .multilineTextAlignment(.leading)
+                .fixMultilineScrollableText()
         } else {
             Text(viewModel.subtitle)
+                .multilineTextAlignment(.leading)
+                .fixMultilineScrollableText()
         }
     }
 
@@ -159,7 +167,11 @@ extension RemoteMessageButtonViewModel {
     }
 
     var standardButton: some View {
-        Button(action: action) {
+        Button {
+            Task { @MainActor in
+                await action()
+            }
+        } label: {
             Text(title)
         }
     }

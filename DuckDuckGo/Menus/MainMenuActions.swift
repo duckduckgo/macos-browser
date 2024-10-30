@@ -26,6 +26,7 @@ import PixelKit
 import Subscription
 import WebKit
 import os.log
+import SwiftUI
 
 // Actions are sent to objects of responder chain
 
@@ -61,6 +62,12 @@ extension AppDelegate {
     @objc func newBurnerWindow(_ sender: Any?) {
         DispatchQueue.main.async {
             WindowsManager.openNewWindow(burnerMode: BurnerMode(isBurner: true))
+        }
+    }
+
+    @objc func newAIChat(_ sender: Any?) {
+        DispatchQueue.main.async {
+            AIChatTabOpener.openAIChatTab()
         }
     }
 
@@ -313,6 +320,8 @@ extension AppDelegate {
     @objc func fireButtonAction(_ sender: NSButton) {
         DispatchQueue.main.async {
             FireCoordinator.fireButtonAction()
+            let pixelReporter = OnboardingPixelReporter()
+            pixelReporter.trackFireButtonPressed()
         }
     }
 
@@ -328,7 +337,9 @@ extension AppDelegate {
     }
 
     @objc func resetRemoteMessages(_ sender: Any?) {
-        remoteMessagingClient.store?.resetRemoteMessages()
+        Task {
+            await remoteMessagingClient.store?.resetRemoteMessages()
+        }
     }
 
     @objc func resetNewTabPageCustomization(_ sender: Any?) {
@@ -499,6 +510,10 @@ extension MainViewController {
 
     @objc func toggleNetworkProtectionShortcut(_ sender: Any) {
         LocalPinningManager.shared.togglePinning(for: .networkProtection)
+    }
+
+    @objc func toggleAIChatShortcut(_ sender: Any) {
+        LocalPinningManager.shared.togglePinning(for: .aiChat)
     }
 
     // MARK: - History
@@ -803,8 +818,9 @@ extension MainViewController {
                                                           eventMapping: EventMapping<AutofillPixelEvent> { _, _, _, _ in },
                                                           installDate: nil)
         autofillPixelReporter.resetStoreDefaults()
-        AutofillLoginImportState().hasImportedLogins = false
-        AutofillLoginImportState().credentialsImportPromptPresentationCount = 0
+        let loginImportState = AutofillLoginImportState()
+        loginImportState.hasImportedLogins = false
+        loginImportState.isCredentialsImportPromptPermanantlyDismissed = false
     }
 
     @objc func resetBookmarks(_ sender: Any?) {
@@ -833,9 +849,23 @@ extension MainViewController {
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowEmailProtection.rawValue)
     }
 
-    @objc func resetDuckPlayerOnboarding(_ sender: Any?) {
-        DefaultDuckPlayerOnboardingDecider().reset()
-        DuckPlayerOnboardingExperiment().reset()
+    @objc func skipOnboarding(_ sender: Any?) {
+        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.onboardingFinished.rawValue)
+        Application.appDelegate.onboardingStateMachine.state = .onboardingCompleted
+        WindowControllersManager.shared.updatePreventUserInteraction(prevent: false)
+        WindowControllersManager.shared.replaceTabWith(Tab(content: .newtab))
+    }
+
+    @objc func resetOnboarding(_ sender: Any?) {
+        UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.onboardingFinished.rawValue)
+    }
+
+    @objc func resetHomePageSettingsOnboarding(_ sender: Any?) {
+        UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Any>.Key.homePageDidShowSettingsOnboarding.rawValue)
+    }
+
+    @objc func resetContextualOnboarding(_ sender: Any?) {
+        Application.appDelegate.onboardingStateMachine.state = .notStarted
     }
 
     @objc func resetDuckPlayerPreferences(_ sender: Any?) {
@@ -962,6 +992,24 @@ extension MainViewController {
 
     @objc func resetConfigurationToDefault(_ sender: Any?) {
         setConfigurationUrl(nil)
+    }
+
+    @available(macOS 13.5, *)
+    @objc func showAllCredentials(_ sender: Any?) {
+        let hostingView = NSHostingView(rootView: AutofillCredentialsDebugView())
+        hostingView.translatesAutoresizingMaskIntoConstraints = false
+        hostingView.frame.size = hostingView.intrinsicContentSize
+
+        let window = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 1400, height: 700),
+                styleMask: [.titled, .closable, .resizable],
+                backing: .buffered, defer: false)
+
+        window.center()
+        window.title = "Credentials"
+        window.contentView = hostingView
+        window.isReleasedWhenClosed = false
+        window.makeKeyAndOrderFront(nil)
     }
 
     // MARK: - Developer Tools

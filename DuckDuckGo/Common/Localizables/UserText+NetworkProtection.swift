@@ -133,15 +133,15 @@ extension UserText {
     static let itrFeedbackFormCategorySomethingElse = "Something else"
 
     // "ppro.feedback-form.text-1" - Text for the body of the PPro feedback form
-    static let pproFeedbackFormText1 = "Found an issue not cover in our [help center](duck://)? We definitely want to know about it.\n\nTell us what's going on:"
+    static let pproFeedbackFormText1 = "Found an issue not covered in our [help center](duck://)? We definitely want to know about it.\n\nTell us what's going on:"
     // "ppro.feedback-form.text-2" - Text for the body of the PPro feedback form
-    static let pproFeedbackFormText2 = "In addition to the details entered above, we send some anonymized info with your feedback:"
+    static let pproFeedbackFormText2 = "In addition to the details entered into this form, your app issue report will contain:"
     // "ppro.feedback-form.text-3" - Bullet text for the body of the PPro feedback form
-    static let pproFeedbackFormText3 = "• Whether specific browser features are active"
+    static let pproFeedbackFormText3 = "• Whether specific DuckDuckGo features are enabled"
     // "ppro.feedback-form.text-4" - Bullet text for the body of the PPro feedback form
-    static let pproFeedbackFormText4 = "• Aggregate app diagnostics (e.g., error codes)"
+    static let pproFeedbackFormText4 = "• Aggregate DuckDuckGo app diagnostics"
     // "ppro.feedback-form.text-5" - Text for the body of the PPro feedback form
-    static let pproFeedbackFormText5 = "By clicking \"Submit\" you agree that DuckDuckGo may use information submitted to improve the app."
+    static let pproFeedbackFormText5 = "By clicking \"Submit\" I agree that DuckDuckGo may use the information in this report for purposes of improving the app's features."
     // "ppro.feedback-form.disclaimer" - Text for the disclaimer of the PPro feedback form
     static let pproFeedbackFormDisclaimer = "Reports are anonymous and sent to DuckDuckGo to help improve our service"
 
