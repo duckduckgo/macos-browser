@@ -58,7 +58,6 @@ final class OnboardingUITests: XCTestCase {
         // Let’s get you set up
         XCTAssertTrue(welcomeWindow.webViews["Welcome"].staticTexts["Let’s get you set up!"].waitForExistence(timeout: UITests.Timeouts.elementExistence))
 
-        // Import Now
         XCTAssertTrue(skipButton.waitForExistence(timeout: UITests.Timeouts.elementExistence))
         skipButton.click()
 
@@ -70,15 +69,16 @@ final class OnboardingUITests: XCTestCase {
         XCTAssertTrue(cancelButton.waitForExistence(timeout: UITests.Timeouts.elementExistence))
         cancelButton.click()
 
-        let nextButton = welcomeWindow.webViews["Welcome"].buttons["Next"]
-        XCTAssertTrue(nextButton.waitForExistence(timeout: UITests.Timeouts.elementExistence))
-        nextButton.click()
+        let nextButtonSetUp = welcomeWindow.webViews["Welcome"].buttons["Next"]
+        XCTAssertTrue(nextButtonSetUp.waitForExistence(timeout: UITests.Timeouts.elementExistence))
+        nextButtonSetUp.click()
 
         // Duck Player
         XCTAssertTrue(welcomeWindow.webViews["Welcome"].staticTexts["Drowning in ads on YouTube? Not with Duck Player!"].waitForExistence(timeout: UITests.Timeouts.elementExistence))
 
-        XCTAssertTrue(nextButton.waitForExistence(timeout: UITests.Timeouts.elementExistence))
-        nextButton.click()
+        let nextButtonDuckPlayer = welcomeWindow.webViews["Welcome"].buttons["Next"]
+        XCTAssertTrue(nextButtonDuckPlayer.waitForExistence(timeout: UITests.Timeouts.elementExistence))
+        nextButtonDuckPlayer.click()
 
         // Customize Experience
         XCTAssertTrue(welcomeWindow.webViews["Welcome"].staticTexts["Let’s customize a few things…"].waitForExistence(timeout: UITests.Timeouts.elementExistence))
