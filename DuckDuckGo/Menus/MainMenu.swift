@@ -165,12 +165,13 @@ final class MainMenu: NSMenu {
 
     func buildFileMenu() -> NSMenuItem {
         NSMenuItem(title: UserText.mainMenuFile) {
+            newTabMenuItem
+
             newWindowMenuItem
             NSMenuItem(title: UserText.newBurnerWindowMenuItem, action: #selector(AppDelegate.newBurnerWindow), keyEquivalent: "N")
 
             aiChatMenu
 
-            newTabMenuItem
             openLocationMenuItem
             NSMenuItem.separator()
 

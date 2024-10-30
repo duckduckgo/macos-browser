@@ -19,6 +19,8 @@
 import AppKit
 
 final class AIChatDebugMenu: NSMenu {
+    private var storage = DefaultAIChatPreferencesStorage()
+
     init() {
         super.init(title: "")
 
@@ -33,11 +35,10 @@ final class AIChatDebugMenu: NSMenu {
     }
 
     @objc func resetToolbarOnboarding() {
-        DefaultAIChatPreferencesStorage().reset()
+        storage.reset()
     }
 
     @objc func showToolbarOnboarding() {
-        var storage = DefaultAIChatPreferencesStorage()
         storage.didDisplayAIChatToolbarOnboarding = false
         NotificationCenter.default.post(name: .AIChatOpenedForReturningUser, object: nil)
     }
