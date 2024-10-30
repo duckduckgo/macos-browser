@@ -25,15 +25,9 @@ jobs:
         run: |
           screenresolution get || echo "Screen resolution data not available"
 
-      - name: Upload Display Information (Artifact)
-        uses: actions/upload-artifact@v3
-        with:
-          name: display_info
-          path: display_info.txt
-
       - name: change screen resolution
-        run: |
-          "/Library/Application Support/VMware Tools/vmware-resolutionSet" 1080 2160
+        run: screenresolution set 2560x1600
           
-      - name: new screen resolution
-        run: system_profiler SPDisplaysDataType | grep Resolution
+      - name: Get New Screen Resolution
+        run: |
+          screenresolution get || echo "Screen resolution data not available"
