@@ -35,7 +35,7 @@ final class SuggestionContainer {
     private let loading: SuggestionLoading
 
     // Used for presenting the same suggestions after the removal of the local suggestion
-    private var suggestionDataCache: Data?
+    private(set) var suggestionDataCache: Data?
 
     private var latestQuery: Query?
 
