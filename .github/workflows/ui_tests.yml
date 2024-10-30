@@ -26,7 +26,7 @@ jobs:
           screenresolution get || echo "Screen resolution data not available"
 
       - name: change screen resolution
-        run: screenresolution set 2560x1600
+        run: screenresolution set 2560x1600x32
           
       - name: Get New Screen Resolution
         run: |
