@@ -50978,6 +50978,66 @@
         }
       }
     },
+    "preferences.about.duckduckgo-tagline" : {
+      "comment" : "About screen",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dein Schutz, unsere Priorität."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your protection, our priority."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu protección, nuestra prioridad."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre protection, notre priorité."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La tua protezione, la nostra priorità."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jouw bescherming, onze prioriteit."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Twoje bezpieczeństwo jest naszym priorytetem."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A tua proteção, a nossa prioridade."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ваша защита — наш приоритет."
+          }
+        }
+      }
+    },
     "preferences.about.more-at" : {
       "comment" : "Link to the about page",
       "extractionState" : "extracted_with_value",
@@ -51100,7 +51160,7 @@
     },
     "preferences.about.privacy-simplified" : {
       "comment" : "About screen",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
