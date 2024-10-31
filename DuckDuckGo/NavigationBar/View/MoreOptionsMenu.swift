@@ -128,6 +128,7 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
 
     let zoomMenuItem = NSMenuItem(title: UserText.zoom, action: nil, keyEquivalent: "").withImage(.optionsButtonMenuZoom)
     private(set) lazy var setAsDefaultMenuItem = NSMenuItem(title: UserText.setAsDefaultBrowser, action: #selector(setAsDefault(_:)), target: self)
+        .withImage(.defaultBrowserMenuItem)
 
     @MainActor
     private func setupMenuItems() {

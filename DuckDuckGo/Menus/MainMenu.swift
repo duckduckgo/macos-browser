@@ -101,7 +101,7 @@ final class MainMenu: NSMenu {
 
     let helpMenu = NSMenu(title: UserText.mainMenuHelp)
     let aboutMenuItem = NSMenuItem(title: UserText.about, action: #selector(AppDelegate.showAbout))
-    let setAsDefaultMenuItem = NSMenuItem(title: UserText.setAsDefaultBrowser, action: #selector(AppDelegate.setAsDefault), keyEquivalent: "♡")
+    let setAsDefaultMenuItem = NSMenuItem(title: UserText.setAsDefaultBrowser + "...", action: #selector(AppDelegate.setAsDefault), keyEquivalent: "♡")
     let releaseNotesMenuItem = NSMenuItem(title: UserText.releaseNotesMenuItem, action: #selector(AppDelegate.showReleaseNotes))
     let whatIsNewMenuItem = NSMenuItem(title: UserText.whatsNewMenuItem, action: #selector(AppDelegate.showWhatIsNew))
     let sendFeedbackMenuItem = NSMenuItem(title: UserText.sendFeedback, action: #selector(AppDelegate.openFeedback))

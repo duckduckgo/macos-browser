@@ -53582,6 +53582,18 @@
         }
       }
     },
+    "preferences.set-as-default" : {
+      "comment" : "Menu option to set the browser as default",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Make DuckDuckGo Your Default"
+          }
+        }
+      }
+    },
     "preferences.shortcuts" : {
       "comment" : "Name of the preferences section related to shortcuts",
       "extractionState" : "extracted_with_value",
