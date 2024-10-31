@@ -34,20 +34,13 @@ final class BookmarkHTMLReader {
             case proceedToTopLevelFolder = 4
             case readFolder = 5
             case unknown = 7
-            case noRoot = 8
-            case noChildren = 9
         }
 
         var action: DataImportAction { .bookmarks }
         let type: OperationType
         let underlyingError: Error?
 
-        var errorType: DataImport.ErrorType {
-            switch type {
-            case .noChildren: .noData
-            default: .dataCorrupted
-            }
-        }
+        var errorType: DataImport.ErrorType { .dataCorrupted }
     }
 
     private var currentOperationType: ImportError.OperationType = .parseXml
@@ -147,11 +140,10 @@ final class BookmarkHTMLReader {
     }
 
     private func validateHTMLBookmarksDocument(_ document: XMLDocument) throws -> XMLNode? {
-        guard let root = document.rootElement() else { throw ImportError(type: .noRoot, underlyingError: nil) }
-        guard root.childCount > 0 else { throw ImportError(type: .noChildren, underlyingError: nil) }
-        guard let body = root.child(at: 1) else { throw ImportError(type: .validationBody, underlyingError: nil) }
+        let root = document.rootElement()
+        guard let body = root?.childIfExists(at: 1) else { throw ImportError(type: .validationBody, underlyingError: nil) }
         // get /html/body/*[0]
-        let cursor = body.child(at: 0)
+        let cursor = body.childIfExists(at: 0)
 
         return cursor
     }
@@ -163,12 +155,12 @@ final class BookmarkHTMLReader {
             switch cursor?.htmlTag {
             case .dl:
                 let originalCursorValue = cursor
-                cursor = cursor?.child(at: 0)
+                cursor = cursor?.childIfExists(at: 0)
                 dlLoop: while cursor != nil {
                     switch cursor?.htmlTag {
                     case .dd:
-                        if cursor?.child(at: 0)?.htmlTag == .h3 {
-                            cursor = cursor?.child(at: 0)
+                        if cursor?.childIfExists(at: 0)?.htmlTag == .h3 {
+                            cursor = cursor?.childIfExists(at: 0)
                             break dlLoop
                         }
                         cursor = cursor?.nextSibling
@@ -203,7 +195,7 @@ final class BookmarkHTMLReader {
             itemType = cursor?.itemType(inSafariFormat: false)
             switch itemType {
             case .some:
-                cursor = cursor?.child(at: 0)
+                cursor = cursor?.childIfExists(at: 0)
             case .none:
                 cursor = cursor?.nextSibling
             }
@@ -251,12 +243,12 @@ final class BookmarkHTMLReader {
 
     private func readFolderContents(_ node: XMLNode?) throws -> [ImportedBookmarks.BookmarkOrFolder] {
         var cursor = node
-        cursor = cursor?.child(at: 0)
+        cursor = cursor?.childIfExists(at: 0)
 
         var children = [ImportedBookmarks.BookmarkOrFolder]()
 
         while cursor != nil {
-            let firstChild = cursor?.child(at: 0)
+            let firstChild = cursor?.childIfExists(at: 0)
             switch (cursor?.htmlTag, firstChild?.htmlTag) {
             case (.dd, .h3):
                 children.append(try readFolder(firstChild))
@@ -362,13 +354,13 @@ private extension XMLNode {
                 return .folder
             case .dt:
                 return .bookmark
-            case .dl where child(at: 0)?.child(at: 0)?.htmlTag == .a:
+            case .dl where childIfExists(at: 0)?.childIfExists(at: 0)?.htmlTag == .a:
                 return .safariTopLevelBookmarks
             default:
                 return nil
             }
         } else {
-            switch (htmlTag, child(at: 0)?.htmlTag) {
+            switch (htmlTag, childIfExists(at: 0)?.htmlTag) {
             case (.dd, .h3):
                 return .folder
             case (.dt, .a):
