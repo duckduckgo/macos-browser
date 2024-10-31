@@ -1844,6 +1844,8 @@
 		843965132C6F2FFE004C8899 /* NSDragOperationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843965112C6F2FFE004C8899 /* NSDragOperationExtension.swift */; };
 		843965152C737022004C8899 /* NSPasteboardExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843965142C737022004C8899 /* NSPasteboardExtension.swift */; };
 		843965162C737022004C8899 /* NSPasteboardExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843965142C737022004C8899 /* NSPasteboardExtension.swift */; };
+		843AD3DC2CD389CC00163067 /* XMLNodeExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843AD3DB2CD389C500163067 /* XMLNodeExtension.swift */; };
+		843AD3DD2CD389CC00163067 /* XMLNodeExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843AD3DB2CD389C500163067 /* XMLNodeExtension.swift */; };
 		843D73BB2C786E5400E4F9DC /* BookmarkListPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84F1C8DA2C774CA900716446 /* BookmarkListPopover.swift */; };
 		843D73BC2C786E5400E4F9DC /* BookmarkListPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84F1C8DA2C774CA900716446 /* BookmarkListPopover.swift */; };
 		844D7DA42C9443EA00BE61D4 /* NSPrintInfoExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844D7DA32C9443E500BE61D4 /* NSPrintInfoExtension.swift */; };
@@ -3999,6 +4001,7 @@
 		8426108C2C9811EC0070D5F9 /* KeyEquivalentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyEquivalentView.swift; sourceTree = "<group>"; };
 		843965112C6F2FFE004C8899 /* NSDragOperationExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSDragOperationExtension.swift; sourceTree = "<group>"; };
 		843965142C737022004C8899 /* NSPasteboardExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSPasteboardExtension.swift; sourceTree = "<group>"; };
+		843AD3DB2CD389C500163067 /* XMLNodeExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XMLNodeExtension.swift; sourceTree = "<group>"; };
 		844D7DA32C9443E500BE61D4 /* NSPrintInfoExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSPrintInfoExtension.swift; sourceTree = "<group>"; };
 		84537A022C998C24008723BC /* FireWindowSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireWindowSession.swift; sourceTree = "<group>"; };
 		848648A02C76F4B20082282D /* BookmarksBarMenuViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarMenuViewController.swift; sourceTree = "<group>"; };
@@ -8509,6 +8512,7 @@
 				AA6FFB4324DC33320028F4D0 /* NSViewExtension.swift */,
 				AA9E9A5525A3AE8400D1959D /* NSWindowExtension.swift */,
 				B643BF1327ABF772000BACEC /* NSWorkspaceExtension.swift */,
+				843AD3DB2CD389C500163067 /* XMLNodeExtension.swift */,
 				B6A9E46A2614618A0067D1B9 /* OperatingSystemVersionExtension.swift */,
 				EEE50C282C38249C003DD7FF /* OptionalExtension.swift */,
 				B637273C26CCF0C200C8CB02 /* OptionalExtension.swift */,
@@ -11540,6 +11544,7 @@
 				C18194602C7CDD0E00381092 /* PromotionViewModel.swift in Sources */,
 				3706FC31293F65D500E42796 /* PermissionButton.swift in Sources */,
 				9F6434622BEC82B700D2D8A0 /* AttributionPixelHandler.swift in Sources */,
+				843AD3DC2CD389CC00163067 /* XMLNodeExtension.swift in Sources */,
 				3706FC32293F65D500E42796 /* MoreOptionsMenu.swift in Sources */,
 				3706FC34293F65D500E42796 /* PermissionAuthorizationViewController.swift in Sources */,
 				3706FC35293F65D500E42796 /* BookmarkNode.swift in Sources */,
@@ -12785,6 +12790,7 @@
 				3797C7A02C61806500DA77FB /* HomePageSettingsView.swift in Sources */,
 				B6F41031264D2B23003DA42C /* ProgressExtension.swift in Sources */,
 				4B723E0F26B0006500E14D75 /* CSVParser.swift in Sources */,
+				843AD3DD2CD389CC00163067 /* XMLNodeExtension.swift in Sources */,
 				B63BDF7E27FDAA640072D75B /* PrivacyDashboardWebView.swift in Sources */,
 				37CD54CF27F2FDD100F1F7B9 /* AppearancePreferences.swift in Sources */,
 				3199AF7B2C80734A003AEBDC /* DuckPlayerOnboardingLocationValidator.swift in Sources */,
