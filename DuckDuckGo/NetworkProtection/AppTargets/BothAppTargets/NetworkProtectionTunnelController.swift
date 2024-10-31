@@ -296,8 +296,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     }
 
     private func handleSetExcludeLocalNetworks(_ excludeLocalNetworks: Bool) async throws {
-        guard let tunnelManager = await manager,
-              tunnelManager.protocolConfiguration?.excludeLocalNetworks == !excludeLocalNetworks else {
+        guard let tunnelManager = await manager else {
             return
         }
 
@@ -361,10 +360,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             // this setting breaks Connection Tester
             protocolConfiguration.includeAllNetworks = settings.includeAllNetworks
 
-            // This is intentionally not used but left here for documentation purposes.
-            // The reason for this is that we want to have full control of the routes that
-            // are excluded, so instead of using this setting we're just configuring the
-            // excluded routes through our VPNSettings class, which our extension reads directly.
+            // This messes up the routing, so please keep it always disabled
             protocolConfiguration.excludeLocalNetworks = false
 
             return protocolConfiguration
