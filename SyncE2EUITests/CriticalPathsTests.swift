@@ -374,7 +374,7 @@ final class CriticalPathsTests: XCTestCase {
         }
         let duckduckgoBookmark =  bookmarksWindow.staticTexts["www.duckduckgo.com"]
         let stackOverflow =  bookmarksWindow.staticTexts["Stack Overflow - Where Developers Learn, Share, & Build Careers"]
-        let privacySimplified = bookmarksWindow.staticTexts["DuckDuckGo — Your protection, our priority."]
+        let privacySimplified = bookmarksWindow.staticTexts["DuckDuckGo — Privacy, simplified."]
         let wolfram = bookmarksWindow.staticTexts["Wolfram|Alpha: Computational Intelligence"]
         let news = bookmarksWindow.staticTexts["news"]
         let codes = bookmarksWindow.staticTexts["code"]
