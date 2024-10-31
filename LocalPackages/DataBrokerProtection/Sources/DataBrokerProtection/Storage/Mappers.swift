@@ -176,7 +176,8 @@ struct MapperToModel {
             version: decodedBroker.version,
             schedulingConfig: decodedBroker.schedulingConfig,
             parent: decodedBroker.parent,
-            mirrorSites: decodedBroker.mirrorSites
+            mirrorSites: decodedBroker.mirrorSites,
+            optOutUrl: decodedBroker.optOutUrl
         )
     }
 
