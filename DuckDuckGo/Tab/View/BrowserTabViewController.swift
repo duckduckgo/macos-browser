@@ -777,8 +777,12 @@ final class BrowserTabViewController: NSViewController {
             updateTabIfNeeded(tabViewModel: tabViewModel)
 
         case .newtab:
-            removeAllTabContent()
-            addAndLayoutChild(homePageViewControllerCreatingIfNeeded())
+            if NSApp.delegateTyped.experimentalFeatures.isHTMLNewTabPageEnabled {
+                updateTabIfNeeded(tabViewModel: tabViewModel)
+            } else {
+                removeAllTabContent()
+                addAndLayoutChild(homePageViewControllerCreatingIfNeeded())
+            }
 
         case .dataBrokerProtection:
             removeAllTabContent()
@@ -788,6 +792,11 @@ final class BrowserTabViewController: NSViewController {
         default:
             removeAllTabContent()
         }
+    }
+
+    func refreshTab() {
+        guard let tabViewModel else { return }
+        showTabContent(of: tabViewModel)
     }
 
     func updateTabIfNeeded(tabViewModel: TabViewModel?) {
@@ -835,7 +844,9 @@ final class BrowserTabViewController: NSViewController {
         switch tabViewModel.tab.content {
         case .onboarding:
             return
-        case .newtab, .settings:
+        case .newtab:
+            containsHostingView = !NSApp.delegateTyped.experimentalFeatures.isHTMLNewTabPageEnabled
+        case .settings:
             containsHostingView = true
         default:
             containsHostingView = false

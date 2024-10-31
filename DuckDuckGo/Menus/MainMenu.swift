@@ -91,6 +91,7 @@ final class MainMenu: NSMenu {
     let windowsMenu = NSMenu(title: UserText.mainMenuWindow)
 
     // MARK: Debug
+    private var experimentalFeaturesMenu: NSMenu?
 
     private var loggingMenu: NSMenu?
     let customConfigurationUrlMenuItem = NSMenuItem(title: "Last Update Time", action: nil)
@@ -446,6 +447,11 @@ final class MainMenu: NSMenu {
         updateInternalUserItem()
         updateRemoteConfigurationInfo()
         updateAutofillDebugScriptMenuItem()
+        updateExperimentalFeatures()
+    }
+
+    private func updateExperimentalFeatures() {
+        experimentalFeaturesMenu?.items[0].state = NSApp.delegateTyped.experimentalFeatures.isHTMLNewTabPageEnabled ? .on : .off
     }
 
     // MARK: - Bookmarks
@@ -617,7 +623,14 @@ final class MainMenu: NSMenu {
 
     @MainActor
     private func setupDebugMenu() -> NSMenu {
+        let experimentalFeaturesMenu = NSMenu() {
+            NSMenuItem(title: "HTML New Tab Page", action: #selector(AppDelegate.toggleHTMLNTP(_:)), representedObject: 10)
+        }
+        self.experimentalFeaturesMenu = experimentalFeaturesMenu
         let debugMenu = NSMenu(title: "Debug") {
+            NSMenuItem(title: "Experimental features")
+                .submenu(experimentalFeaturesMenu)
+            NSMenuItem.separator()
             NSMenuItem(title: "Open Vanilla Browser", action: #selector(MainViewController.openVanillaBrowser)).withAccessibilityIdentifier("MainMenu.openVanillaBrowser")
             NSMenuItem.separator()
             NSMenuItem(title: "Tab") {
