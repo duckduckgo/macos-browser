@@ -38,8 +38,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runner: [macos-15-xlarge]
+        runner: [macos-13-xlarge, macos-14-xlarge, macos-15-xlarge]
         include:
+          - xcode-version: "15.2"
+            runner: macos-13-xlarge
+          - xcode-version: "15.4"
+            runner: macos-14-xlarge
           - xcode-version: "16"
             runner: macos-15-xlarge
 
