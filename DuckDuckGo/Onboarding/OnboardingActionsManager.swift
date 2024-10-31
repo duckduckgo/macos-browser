@@ -48,7 +48,7 @@ protocol OnboardingActionsManaging {
     func addToDock()
 
     /// At user imput shows the import data flow
-    func importData()
+    func importData() async -> Bool
 
     /// At user imput shows the system prompt to change default browser
     func setAsDefault()
@@ -83,6 +83,7 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
     private let defaultBrowserProvider: DefaultBrowserProvider
     private let appearancePreferences: AppearancePreferences
     private let startupPreferences: StartupPreferences
+    private let dataImportProvider: DataImportStatusProviding
     private var cancellables = Set<AnyCancellable>()
 
     @UserDefaultsWrapper(key: .onboardingFinished, defaultValue: false)
@@ -109,12 +110,18 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
         return OnboardingConfiguration(stepDefinitions: stepDefinitions, exclude: [], order: order, env: env, locale: preferredLocale, platform: platform)
     }()
 
-    init(navigationDelegate: OnboardingNavigating, dockCustomization: DockCustomization, defaultBrowserProvider: DefaultBrowserProvider, appearancePreferences: AppearancePreferences, startupPreferences: StartupPreferences) {
+    init(navigationDelegate: OnboardingNavigating, 
+         dockCustomization: DockCustomization,
+         defaultBrowserProvider: DefaultBrowserProvider,
+         appearancePreferences: AppearancePreferences,
+         startupPreferences: StartupPreferences,
+         dataImportProvider: DataImportStatusProviding = BookmarksAndPasswordsImportStatusProvider()) {
         self.navigation = navigationDelegate
         self.dockCustomization = dockCustomization
         self.defaultBrowserProvider = defaultBrowserProvider
         self.appearancePreferences = appearancePreferences
         self.startupPreferences = startupPreferences
+        self.dataImportProvider = dataImportProvider
     }
 
     func onboardingStarted() {
@@ -148,8 +155,16 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
     }
 
     @MainActor
-    func importData() {
-        navigation.showImportDataView()
+    func importData() async -> Bool {
+        return await withCheckedContinuation { continuation in
+            dataImportProvider.showImportWindow(customTitle: UserText.importDataTitleOnboarding, completion: { [weak self] in
+                guard let self else {
+                    continuation.resume(returning: false)
+                    return
+                }
+                continuation.resume(returning: self.dataImportProvider.didImport)
+            })
+        }
     }
 
     func setAsDefault() {
