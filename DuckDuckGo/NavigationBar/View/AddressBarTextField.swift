@@ -26,6 +26,10 @@ import Suggestions
 import Subscription
 import os.log
 
+protocol AddressBarTextFieldEventDelegate: AnyObject {
+    func didChangeControlText()
+}
+
 final class AddressBarTextField: NSTextField {
 
     /**
@@ -80,7 +84,7 @@ final class AddressBarTextField: NSTextField {
     private var addressBarStringCancellable: AnyCancellable?
     private var contentTypeCancellable: AnyCancellable?
 
-    weak var onboardingDelegate: OnboardingAddressBarReporting?
+    weak var textFieldEventDelegate: AddressBarTextFieldEventDelegate?
 
     private let searchPreferences: SearchPreferences = SearchPreferences.shared
 
@@ -959,7 +963,7 @@ extension AddressBarTextField: NSTextFieldDelegate {
 
     func controlTextDidChange(_ obj: Notification) {
         handleTextDidChange()
-        onboardingDelegate?.trackAddressBarTypedIn()
+        textFieldEventDelegate?.didChangeControlText()
     }
 
     private func handleTextDidChange() {

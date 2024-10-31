@@ -966,16 +966,17 @@ class AddressBarTests: XCTestCase {
         // GIVEN
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [Tab(content: .newtab)]))
         window = WindowsManager.openNewWindow(with: viewModel)!
-        let textField = mainViewController.navigationBarViewController.addressBarViewController?.addressBarTextField
-        XCTAssertNotNil(textField?.onboardingDelegate)
-        let reporter = CapturingOnboardingAddressBarReporting()
-        textField?.onboardingDelegate = reporter
+        let addressBarViewController = try XCTUnwrap(mainViewController.navigationBarViewController.addressBarViewController)
+        let textField = addressBarViewController.addressBarTextField
+        XCTAssertNotNil(textField?.textFieldEventDelegate)
+        let delegate = CapturingTextFieldEventDelegate()
+        textField?.textFieldEventDelegate = delegate
 
         // WHEN
         textField?.controlTextDidChange(.init(name: .PasswordManagerChanged))
 
         // THEN
-        XCTAssertTrue(reporter.trackAddressBarTypedInCalled)
+        XCTAssertTrue(delegate.didChangeControlTextCalled)
     }
 }
 
@@ -1019,16 +1020,10 @@ class MockCertificateEvaluator: CertificateTrustEvaluating {
     }
 }
 
-class CapturingOnboardingAddressBarReporting: OnboardingAddressBarReporting {
-    var trackAddressBarTypedInCalled = false
+class CapturingTextFieldEventDelegate: AddressBarTextFieldEventDelegate {
+    var didChangeControlTextCalled = false
 
-    func trackAddressBarTypedIn() {
-        trackAddressBarTypedInCalled = true
-    }
-
-    func trackPrivacyDashboardOpened() {
-    }
-
-    func trackSiteVisited() {
+    func didChangeControlText() {
+        didChangeControlTextCalled = true
     }
 }

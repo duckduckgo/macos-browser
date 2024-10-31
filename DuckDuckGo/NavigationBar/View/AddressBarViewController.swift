@@ -119,7 +119,7 @@ final class AddressBarViewController: NSViewController, ObservableObject {
         // only activate active text field leading constraint on its appearance to avoid constraint conflicts
         activeTextFieldMinXConstraint.isActive = false
         addressBarTextField.tabCollectionViewModel = tabCollectionViewModel
-        addressBarTextField.onboardingDelegate = onboardingPixelReporter
+        addressBarTextField.textFieldEventDelegate = self
     }
 
     override func viewWillAppear() {
@@ -584,6 +584,12 @@ extension AddressBarViewController: AddressBarButtonsViewControllerDelegate {
         addressBarTextField.clearValue()
     }
 
+}
+
+extension AddressBarViewController: AddressBarTextFieldEventDelegate {
+    func didChangeControlText() {
+        onboardingPixelReporter.trackAddressBarTypedIn()
+    }
 }
 
 fileprivate extension NSView {

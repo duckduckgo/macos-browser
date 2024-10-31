@@ -684,6 +684,22 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
         // Then
         XCTAssertEqual(stateMachine.state, .onboardingCompleted)
     }
+
+    @MainActor
+    func test_lastVisitTabDoesNotCreateRetainCycle() {
+        // Given
+        var tab: Tab? = Tab(content: .url(URL.duckDuckGo, credential: nil, source: .appOpenUrl))
+        stateMachine.updateStateFor(tab: tab!)
+        let mirror = Mirror(reflecting: stateMachine!)
+
+        // When
+        tab = nil
+        RunLoop.main.run(until: Date().addingTimeInterval(0.1))
+
+        // Then
+        let lastVisitTabAfterDeallocation = mirror.descendant("lastVisitTab") as? Tab
+        XCTAssertNil(lastVisitTabAfterDeallocation)
+    }
 }
 
 class MockTrackerMessageProvider: TrackerMessageProviding {
