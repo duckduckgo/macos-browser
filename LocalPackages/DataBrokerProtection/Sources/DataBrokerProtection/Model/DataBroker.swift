@@ -241,15 +241,4 @@ extension DataBroker {
     var type: DataBrokerHierarchy {
         parent == nil ? .parent : .child
     }
-
-    /// A computed property that determines if the `optOutUrl` belongs to the parent broker instead of this broker.
-    ///
-    /// This property returns `true` if the `optOutUrl` does not contain the main `url` of the broker,
-    /// indicating that the opt-out URL is associated with a parent broker. Conversely, it returns `false`
-    /// if the `optOutUrl` includes the broker's `url`, signifying that the opt-out URL belongs directly to this broker.
-    ///
-    /// - Returns: `true` if the `optOutUrl` is for a parent broker; `false` if it is for this broker.
-    var optOutUrlIsParent: Bool {
-        !optOutUrl.contains(url)
-    }
 }
