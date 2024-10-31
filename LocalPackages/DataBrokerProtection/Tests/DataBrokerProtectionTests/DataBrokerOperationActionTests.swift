@@ -331,7 +331,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
     }
 
     func testWhenRunningActionWithoutExtractedProfile_thenExecuteIsCalledWithProfileData() async {
-        let expectationAction = ExpectationAction(id: "1", actionType: .expectation, expectations: [Item](), dataSource: nil)
+        let expectationAction = ExpectationAction(id: "1", actionType: .expectation, expectations: [Item](), dataSource: nil, actions: nil)
         let sut = OptOutJob(
             privacyConfig: PrivacyConfigurationManagingMock(),
             prefs: ContentScopeProperties.mock,
@@ -415,7 +415,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
 
     func testWhenExpectationActionRuns_thenStageIsSetToSubmit() async {
         let mockStageCalculator = MockStageDurationCalculator()
-        let expectationAction = ExpectationAction(id: "1", actionType: .expectation, expectations: [Item](), dataSource: nil)
+        let expectationAction = ExpectationAction(id: "1", actionType: .expectation, expectations: [Item](), dataSource: nil, actions: nil)
         let sut = OptOutJob(
             privacyConfig: PrivacyConfigurationManagingMock(),
             prefs: ContentScopeProperties.mock,

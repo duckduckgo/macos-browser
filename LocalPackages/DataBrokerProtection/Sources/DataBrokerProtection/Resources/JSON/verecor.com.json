@@ -1,8 +1,9 @@
 {
   "name": "Verecor",
   "url": "verecor.com",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "addedDatetime": 1677132000000,
+  "optOutUrl": "https://verecor.com/ng/control/privacy",
   "steps": [
     {
       "stepType": "scan",

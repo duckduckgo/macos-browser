@@ -39,6 +39,8 @@ extension HomePage.Views {
         @EnvironmentObject var addressBarModel: HomePage.Models.AddressBarModel
         @EnvironmentObject var recentlyVisitedModel: HomePage.Models.RecentlyVisitedModel
 
+        @ObservedObject var freemiumDBPPromotionViewCoordinator: FreemiumDBPPromotionViewCoordinator
+
         var body: some View {
             if isBurner {
                 BurnerHomePageView()
@@ -88,6 +90,7 @@ extension HomePage.Views {
                                         scrollOffsetReader
                                     }
                                 }
+                                .animation(.none, value: recentlyVisitedModel.showRecentlyVisited)
                                 .coordinateSpace(name: Const.scrollViewCoordinateSpaceName)
                                 .onPreferenceChange(ScrollOffsetPreferenceKey.self, perform: hideSuggestionWindowIfScrolled)
                                 .if(addressBarModel.shouldShowAddressBar) { view in
@@ -147,6 +150,8 @@ extension HomePage.Views {
                         .if(addressBarModel.shouldShowAddressBar) { view in
                             view.padding(.top, Const.remoteMessageTopPaddingWithSearchBar)
                         }
+
+                    freemiumPromotionView()
 
                     if addressBarModel.shouldShowAddressBar {
                         BigSearchBox(isCompact: isCompactLogo(with: geometry))
@@ -217,6 +222,12 @@ extension HomePage.Views {
             case .none:
                 Color.newTabPageBackground
             }
+        }
+
+        func freemiumPromotionView() -> some View {
+            PromotionView(viewModel: freemiumDBPPromotionViewCoordinator.viewModel)
+                .padding(.bottom, 16)
+                .visibility(freemiumDBPPromotionViewCoordinator.isHomePagePromotionVisible ? .visible : .gone)
         }
 
         @ViewBuilder

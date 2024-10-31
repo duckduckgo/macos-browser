@@ -27358,8 +27358,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Passe den Hintergrund, das Design und sogar die angezeigten Inhalte an. Versuch es doch mal!"
+            "state" : "translated",
+            "value" : "Personalisiere deine neue Tab-Seite. Probier’s doch mal aus!"
           }
         },
         "en" : {
@@ -27370,44 +27370,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Personaliza el fondo, el tema e incluso el contenido que ves. ¡Pruébalo!"
+            "state" : "translated",
+            "value" : "Añade más personalidad y elige lo que quieres ver en tu nueva pestaña. ¡Pruébalo!"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Personnalisez l'arrière-plan, le thème et même le contenu que vous voyez. Essayez par vous-même !"
+            "state" : "translated",
+            "value" : "Ajoutez une personnalité supplémentaire et choisissez ce que vous voulez voir sur votre nouvelle page à onglet. Essayez par vous-même !"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Personalizza lo sfondo, il tema e persino i contenuti che vedi. Prova!"
+            "state" : "translated",
+            "value" : "Aggiungi un tocco di personalità e scegli cosa vuoi vedere nella tua nuova scheda. Prova!"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Pas de achtergrond, het thema en zelfs de inhoud aan die je ziet. Probeer het maar eens!"
+            "state" : "translated",
+            "value" : "Voeg extra persoonlijkheid toe en kies wat je op je nieuwe tabbladpagina wilt zien. Probeer het maar eens!"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Dostosuj tło, motyw oraz wyświetlaną zawartość. Spróbuj!"
+            "state" : "translated",
+            "value" : "Wybierz, co chcesz zobaczyć na stronie nowej karty, aby zyskała bardziej indywidualny charakter. Spróbuj!"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Personaliza o fundo, o tema e até o conteúdo que vês. Experimenta!"
+            "state" : "translated",
+            "value" : "Adiciona personalidade extra e escolhe o que queres ver na tua página do novo separador. Experimenta!"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Можно настроить фон, тему и даже отображаемый контент. Давайте попробуем!"
+            "state" : "translated",
+            "value" : "Добавьте дополнительную персонализацию и выберите, что должно присутствовать на странице новой вкладки. Попробуйте!"
           }
         }
       }
@@ -27418,8 +27418,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Personalisiere deine neue Tab-Seite"
+            "state" : "translated",
+            "value" : "Neues Suchfeld, benutzerdefinierte Hintergründe und mehr!"
           }
         },
         "en" : {
@@ -27430,44 +27430,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Añade más personalidad a tu página de nueva pestaña"
+            "state" : "translated",
+            "value" : "¡Nuevo cuadro de búsqueda, fondos personalizados y mucho más!"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Ajoutez une personnalité supplémentaire à votre nouvelle page à onglet"
+            "state" : "translated",
+            "value" : "Nouvelle boîte de recherche, arrière-plans personnalisés et plus encore !"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Aggiungi un tocco di personalità alla tua nuova scheda"
+            "state" : "translated",
+            "value" : "Nuova casella di ricerca, sfondi personalizzati e altro ancora!"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Voeg extra persoonlijkheid toe aan je nieuwe tabbladpagina"
+            "state" : "translated",
+            "value" : "Nieuw zoekvak, aangepaste achtergronden en meer!"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Dostosuj stronę nowej zakładki do potrzeb"
+            "state" : "translated",
+            "value" : "Nowe pole wyszukiwania, niestandardowe tła i nie tylko!"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Adiciona personalidade extra à tua página do novo separador"
+            "state" : "translated",
+            "value" : "Nova caixa de pesquisa, fundos personalizados e mais!"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Дополнительная персонализация новой вкладки"
+            "state" : "translated",
+            "value" : "Новая строка поиска, собственные фоны и многое другое"
           }
         }
       }
@@ -28231,6 +28231,66 @@
         }
       }
     },
+    "import.browser.data.onboarding" : {
+      "comment" : "Import Browser Data dialog title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Super, halten wir es unkompliziert!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Great, let’s keep this simple!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Estupendo, hagámoslo de manera sencilla!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Super, restons simples !"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ottimo, semplifichiamo le cose!"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geweldig, laten we dit eenvoudig houden!"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Świetnie, to proste!"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ótimo, vamos manter isto simples!"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отлично! Зачем усложнять?"
+          }
+        }
+      }
+    },
     "import.browser.data.passwords" : {
       "comment" : "Opens Import Browser Data dialog",
       "extractionState" : "extracted_with_value",
@@ -28478,55 +28538,115 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Importieren aus"
+            "value" : "Woher möchtest du importieren?"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Import From"
+            "value" : "Where do you want to import from?"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Importar desde"
+            "value" : "¿De dónde quieres importar?"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Importer depuis"
+            "value" : "D'où voulez-vous importer ?"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Importa da"
+            "value" : "Da dove vuoi importare?"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Importeren vanuit"
+            "value" : "Vanwaar wil je importeren?"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Importuj z"
+            "value" : "Skąd chcesz importować?"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Importar de"
+            "value" : "De onde queres importar?"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Импорт из"
+            "value" : "Откуда импортировать данные?"
+          }
+        }
+      }
+    },
+    "import.browser.data.success.title" : {
+      "comment" : "message about Passwords and or bookmarks Data Import completion",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import abgeschlossen!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Import complete!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Importación completada!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importation terminée !"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importazione completata!"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importeren voltooid!"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import zakończony!"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importação concluída!"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Импортирование завершено."
           }
         }
       }
@@ -50738,6 +50858,66 @@
         }
       }
     },
+    "preferences.about.duckduckgo-tagline" : {
+      "comment" : "About screen",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dein Schutz, unsere Priorität."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your protection, our priority."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu protección, nuestra prioridad."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre protection, notre priorité."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La tua protezione, la nostra priorità."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jouw bescherming, onze prioriteit."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Twoje bezpieczeństwo jest naszym priorytetem."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A tua proteção, a nossa prioridade."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ваша защита — наш приоритет."
+          }
+        }
+      }
+    },
     "preferences.about.more-at" : {
       "comment" : "Link to the about page",
       "extractionState" : "extracted_with_value",
@@ -50860,7 +51040,7 @@
     },
     "preferences.about.privacy-simplified" : {
       "comment" : "About screen",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -55563,6 +55743,7 @@
     },
     "Select Data to Import:" : {
       "comment" : "Data Import section title for checkboxes of data type to import: Passwords or Bookmarks.",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -62366,6 +62547,59 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Защита от отслеживания онлайн"
+          }
+        }
+      }
+    },
+    "What do you want to import?" : {
+      "comment" : "Data Import section title for checkboxes of data type to import: Passwords or Bookmarks.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Was möchtest du importieren?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Qué quieres importar?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Que voulez-vous importer ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cosa vuoi importare?"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wat wil je importeren?"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Co chcesz importować?"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O que queres importar?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Что будем импортировать?"
           }
         }
       }
