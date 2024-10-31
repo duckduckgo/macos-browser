@@ -28,6 +28,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case crashOnCrashHandlersSetUp
     case compileRulesWait(onboardingShown: OnboardingShown, waitTime: CompileRulesWaitTime, result: WaitResult)
     case launchInitial(cohort: String)
+    case launch(isDefault: Bool)
 
     case serp(cohort: String?)
     case serpInitial(cohort: String)
@@ -451,6 +452,9 @@ enum GeneralPixel: PixelKitEventV2 {
 
         case .compileRulesWait(onboardingShown: let onboardingShown, waitTime: let waitTime, result: let result):
             return "m_mac_cbr-wait_\(onboardingShown)_\(waitTime)_\(result)"
+
+        case .launch(let isDefault):
+            return isDefault ? "ml_mac_app-launch_as-default" : "ml_mac_app-launch_as-nondefault"
 
         case .serp:
             return "m_mac_navigation_search"
