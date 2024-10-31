@@ -115,6 +115,60 @@ class AIChatMenuConfigurationTests: XCTestCase {
         XCTAssertFalse(mockStorage.shouldDisplayToolbarShortcut, "Toolbar shortcut should be reset to false.")
         XCTAssertFalse(mockStorage.didDisplayAIChatToolbarOnboarding, "Toolbar onboarding popover should be reset to false.")
     }
+
+    func testShouldNotDisplayToolbarShortcutWhenRemoteFlagIsTrueAndStorageIsFalse() {
+        remoteSettings.isToolbarShortcutEnabled = true
+        mockStorage.shouldDisplayToolbarShortcut = false
+
+        let result = configuration.shouldDisplayToolbarShortcut
+
+        XCTAssertFalse(result, "Toolbar shortcut should not be displayed when remote flag is true and storage is false.")
+    }
+
+    func testShouldNotDisplayToolbarShortcutWhenRemoteFlagIsFalseAndStorageIsTrue() {
+        remoteSettings.isToolbarShortcutEnabled = false
+        mockStorage.shouldDisplayToolbarShortcut = true
+
+        let result = configuration.shouldDisplayToolbarShortcut
+
+        XCTAssertFalse(result, "Toolbar shortcut should not be displayed when remote flag is false, even if storage is true.")
+    }
+
+    func testShouldNotDisplayApplicationMenuShortcutWhenRemoteFlagIsTrueAndStorageIsFalse() {
+        remoteSettings.isApplicationMenuShortcutEnabled = true
+        mockStorage.showShortcutInApplicationMenu = false
+
+        let result = configuration.shouldDisplayApplicationMenuShortcut
+
+        XCTAssertFalse(result, "Application menu shortcut should not be displayed when remote flag is true and storage is false.")
+    }
+
+    func testShouldNotDisplayApplicationMenuShortcutWhenRemoteFlagIsFalseAndStorageIsTrue() {
+        remoteSettings.isApplicationMenuShortcutEnabled = false
+        mockStorage.showShortcutInApplicationMenu = true
+
+        let result = configuration.shouldDisplayApplicationMenuShortcut
+
+        XCTAssertFalse(result, "Application menu shortcut should not be displayed when remote flag is false, even if storage is true.")
+    }
+
+    func testShouldDisplayToolbarShortcutWhenRemoteFlagAndStorageAreTrue() {
+        remoteSettings.isToolbarShortcutEnabled = true
+        mockStorage.shouldDisplayToolbarShortcut = true
+
+        let result = configuration.shouldDisplayToolbarShortcut
+
+        XCTAssertTrue(result, "Toolbar shortcut should be displayed when both remote flag and storage are true.")
+    }
+
+    func testShouldDisplayApplicationMenuShortcutWhenRemoteFlagAndStorageAreTrue() {
+        remoteSettings.isApplicationMenuShortcutEnabled = true
+        mockStorage.showShortcutInApplicationMenu = true
+
+        let result = configuration.shouldDisplayApplicationMenuShortcut
+
+        XCTAssertTrue(result, "Application menu shortcut should be displayed when both remote flag and storage are true.")
+    }
 }
 
 class MockAIChatPreferencesStorage: AIChatPreferencesStorage {
@@ -160,7 +214,7 @@ class MockAIChatPreferencesStorage: AIChatPreferencesStorage {
     func markToolbarOnboardingPopoverAsShown() { }
 }
 
-struct MockRemoteAISettings: AIChatRemoteSettingsProvider {
+final class MockRemoteAISettings: AIChatRemoteSettingsProvider {
     var onboardingCookieName: String
     var onboardingCookieDomain: String
     var aiChatURLIdentifiableQuery: String
