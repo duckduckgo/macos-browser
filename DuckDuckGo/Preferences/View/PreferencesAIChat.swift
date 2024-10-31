@@ -44,7 +44,7 @@ extension Preferences {
                                 .foregroundColor(Color(.greyText))
                         } else {
                             // Fallback for earlier macOS versions
-                            TextMenuItemCaption(UserText.bookmarksBarPromptMessageFallback)
+                            TextMenuItemCaption(UserText.aiChatPreferencesCaptionWithLinkFallback)
                         }
 
                         TextButton(UserText.aiChatPreferencesLearnMoreButton) {
