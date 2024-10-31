@@ -34,13 +34,20 @@ final class BookmarkHTMLReader {
             case proceedToTopLevelFolder = 4
             case readFolder = 5
             case unknown = 7
+            case noRoot = 8
+            case noChildren = 9
         }
 
         var action: DataImportAction { .bookmarks }
         let type: OperationType
         let underlyingError: Error?
 
-        var errorType: DataImport.ErrorType { .dataCorrupted }
+        var errorType: DataImport.ErrorType {
+            switch type {
+            case .noChildren: .noData
+            default: .dataCorrupted
+            }
+        }
     }
 
     private var currentOperationType: ImportError.OperationType = .parseXml
@@ -140,8 +147,9 @@ final class BookmarkHTMLReader {
     }
 
     private func validateHTMLBookmarksDocument(_ document: XMLDocument) throws -> XMLNode? {
-        let root = document.rootElement()
-        guard let body = root?.child(at: 1) else { throw ImportError(type: .validationBody, underlyingError: nil) }
+        guard let root = document.rootElement() else { throw ImportError(type: .noRoot, underlyingError: nil) }
+        guard root.childCount > 0 else { throw ImportError(type: .noChildren, underlyingError: nil) }
+        guard let body = root.child(at: 1) else { throw ImportError(type: .validationBody, underlyingError: nil) }
         // get /html/body/*[0]
         let cursor = body.child(at: 0)
 
