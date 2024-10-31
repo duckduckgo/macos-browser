@@ -51,6 +51,11 @@ extension Preferences {
                     }
                 }
             }
+            .onAppear {
+#if SPARKLE && !DEBUG
+                model.checkForUpdate()
+#endif
+            }
         }
     }
 
@@ -139,6 +144,15 @@ extension Preferences {
             }
         }
 
+#if SPARKLE
+        private var hasPendingUpdate: Bool {
+            model.updateController?.hasPendingUpdate == true
+        }
+        private var hasCriticalUpdate: Bool {
+            model.updateController?.latestUpdate?.type == .critical
+        }
+#endif
+
         @ViewBuilder
         private var versionText: some View {
             HStack(spacing: 0) {
@@ -150,35 +164,77 @@ extension Preferences {
                     }))
 #if SPARKLE
                 switch model.updateState {
-                case .loading:
-                    Text(" — " + UserText.checkingForUpdate)
                 case .upToDate:
                     Text(" — " + UserText.upToDate)
-                case .newVersionAvailable:
-                    Text(" — " + UserText.newerVersionAvailable)
+                case .updateCycle(let progress):
+                    if hasPendingUpdate {
+                        if hasCriticalUpdate {
+                            Text(" — " + UserText.newerCriticalUpdateAvailable)
+                        } else {
+                            Text(" — " + UserText.newerVersionAvailable)
+                        }
+                    } else {
+                        text(for: progress)
+                    }
                 }
 #endif
             }
         }
 
 #if SPARKLE
+        private var formatter: NumberFormatter {
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .percent
+            formatter.maximumFractionDigits = 0
+            return formatter
+        }
+
+        @ViewBuilder
+        private func text(for progress: UpdateCycleProgress) -> some View {
+            switch progress {
+            case .updateCycleDidStart:
+                Text(" — " + UserText.checkingForUpdate)
+            case .downloadDidStart:
+                Text(" — " + String(format: UserText.downloadingUpdate, ""))
+            case .downloading(let percentage):
+                Text(" — " + String(format: UserText.downloadingUpdate,
+                                    formatter.string(from: NSNumber(value: percentage)) ?? ""))
+            case .extractionDidStart, .extracting, .readyToInstallAndRelaunch, .installationDidStart, .installing:
+                Text(" — " + UserText.preparingUpdate)
+            case .updaterError:
+                Text(" — " + UserText.updateFailed)
+            case .updateCycleNotStarted, .updateCycleDone:
+                EmptyView()
+            }
+        }
+
         @ViewBuilder
         private var statusIcon: some View {
             switch model.updateState {
-            case .loading:
-                ProgressView()
-                    .scaleEffect(0.6)
             case .upToDate:
-                Image(systemName: "checkmark.circle.fill")
+                Image(nsImage: .check)
                     .foregroundColor(.green)
-            case .newVersionAvailable:
-                Image(systemName: "exclamationmark.circle.fill")
-                    .foregroundColor(.red)
+            case .updateCycle(let progress):
+                if hasPendingUpdate {
+                    if hasCriticalUpdate {
+                        Image(nsImage: .criticalUpdateNotificationInfo)
+                            .foregroundColor(.red)
+                    } else {
+                        Image(nsImage: .updateNotificationInfo)
+                            .foregroundColor(.blue)
+                    }
+                } else if progress.isFailed {
+                    Image(nsImage: .criticalUpdateNotificationInfo)
+                        .foregroundColor(.red)
+                } else {
+                    ProgressView()
+                        .scaleEffect(0.6)
+                }
             }
         }
 
         private var lastCheckedText: some View {
-            let lastChecked = model.updateState != .loading ? "\(lastCheckedFormattedDate(model.lastUpdateCheckDate))" : "-"
+            let lastChecked = model.updateController?.updateProgress.isIdle == true ? lastCheckedFormattedDate(model.lastUpdateCheckDate) : "-"
             return Text("\(UserText.lastChecked): \(lastChecked)")
                 .foregroundColor(.secondary)
         }
@@ -200,22 +256,29 @@ extension Preferences {
         @ViewBuilder
         private var updateButton: some View {
             switch model.updateState {
-            case .loading:
-                Button(UserText.checkForUpdate) {
-                    model.checkForUpdate()
-                }
-                .buttonStyle(UpdateButtonStyle(enabled: false))
-                .disabled(true)
             case .upToDate:
                 Button(UserText.checkForUpdate) {
                     model.checkForUpdate()
                 }
                 .buttonStyle(UpdateButtonStyle(enabled: true))
-            case .newVersionAvailable:
-                Button(UserText.restartToUpdate) {
-                    model.restartToUpdate()
+            case .updateCycle(let progress):
+                if hasPendingUpdate {
+                    Button(model.areAutomaticUpdatesEnabled ? UserText.restartToUpdate : UserText.runUpdate) {
+                        model.runUpdate()
+                    }
+                    .buttonStyle(UpdateButtonStyle(enabled: true))
+                } else if progress.isFailed {
+                    Button(UserText.retryUpdate) {
+                        model.checkForUpdate()
+                    }
+                    .buttonStyle(UpdateButtonStyle(enabled: true))
+                } else {
+                    Button(UserText.checkForUpdate) {
+                        model.checkForUpdate()
+                    }
+                    .buttonStyle(UpdateButtonStyle(enabled: false))
+                    .disabled(true)
                 }
-                .buttonStyle(UpdateButtonStyle(enabled: true))
             }
         }
 #endif

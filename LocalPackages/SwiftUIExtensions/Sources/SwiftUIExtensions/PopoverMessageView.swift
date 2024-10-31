@@ -86,7 +86,7 @@ public struct PopoverMessageView: View {
                 .frame(minHeight: 22)
                 .lineLimit(nil)
                 .if(viewModel.shouldPresentMultiline) { view in
-                    view.frame(width: 150, alignment: .leading)
+                    view.frame(width: 160, alignment: .leading)
                 }
 
             if let text = viewModel.buttonText,
