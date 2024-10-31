@@ -365,7 +365,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             // The reason for this is that we want to have full control of the routes that
             // are excluded, so instead of using this setting we're just configuring the
             // excluded routes through our VPNSettings class, which our extension reads directly.
-            // protocolConfiguration.excludeLocalNetworks = settings.excludeLocalNetworks
+            protocolConfiguration.excludeLocalNetworks = false
 
             return protocolConfiguration
         }()
@@ -617,6 +617,8 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         options[NetworkProtectionOptionKey.authToken] = authToken
         options[NetworkProtectionOptionKey.selectedEnvironment] = settings.selectedEnvironment.rawValue as NSString
         options[NetworkProtectionOptionKey.selectedServer] = settings.selectedServer.stringValue as? NSString
+
+        options[NetworkProtectionOptionKey.excludeLocalNetworks] = NSNumber(value: settings.excludeLocalNetworks)
 
 #if NETP_SYSTEM_EXTENSION
         if let data = try? JSONEncoder().encode(settings.selectedLocation) {

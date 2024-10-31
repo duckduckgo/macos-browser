@@ -39,9 +39,9 @@ final class VPNPreferencesModel: ObservableObject {
     @Published var excludeLocalNetworks: Bool {
         didSet {
             settings.excludeLocalNetworks = excludeLocalNetworks
-            Task {
+            /*Task {
                 try await vpnXPCClient.command(.restartAdapter)
-            }
+            }*/
         }
     }
 
