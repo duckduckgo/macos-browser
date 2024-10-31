@@ -224,6 +224,10 @@ public struct UserDefaultsWrapper<T> {
         // Subscription
 
         case subscriptionEnvironment = "subscription.environment"
+
+        // Experimental Feature Flags
+
+        case htmlNewTabPage = "experimental.html-new-tab-page"
     }
 
     enum RemovedKeys: String, CaseIterable {

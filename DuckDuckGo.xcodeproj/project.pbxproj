@@ -1194,6 +1194,8 @@
 		37A6A8F22AFCC988008580A3 /* FaviconsFetcherOnboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A6A8F02AFCC988008580A3 /* FaviconsFetcherOnboarding.swift */; };
 		37A6A8F62AFCCA59008580A3 /* FaviconsFetcherOnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A6A8F52AFCCA59008580A3 /* FaviconsFetcherOnboardingViewController.swift */; };
 		37A6A8F72AFCCA59008580A3 /* FaviconsFetcherOnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A6A8F52AFCCA59008580A3 /* FaviconsFetcherOnboardingViewController.swift */; };
+		37A746A62CDA4C6600C438AB /* ExperimentalFeatures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A746A52CDA4C6200C438AB /* ExperimentalFeatures.swift */; };
+		37A746A72CDA4C6600C438AB /* ExperimentalFeatures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A746A52CDA4C6200C438AB /* ExperimentalFeatures.swift */; };
 		37A803DB27FD69D300052F4C /* DataImportResources in Resources */ = {isa = PBXBuildFile; fileRef = 37A803DA27FD69D300052F4C /* DataImportResources */; };
 		37AAA41C2C9CB9C0002A5377 /* AddressBarTextFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AAA41B2C9CB9C0002A5377 /* AddressBarTextFieldView.swift */; };
 		37AAA41D2C9CB9C0002A5377 /* AddressBarTextFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AAA41B2C9CB9C0002A5377 /* AddressBarTextFieldView.swift */; };
@@ -3586,6 +3588,7 @@
 		37A4CEB9282E992F00D75B89 /* StartupPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StartupPreferences.swift; sourceTree = "<group>"; };
 		37A6A8F02AFCC988008580A3 /* FaviconsFetcherOnboarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconsFetcherOnboarding.swift; sourceTree = "<group>"; };
 		37A6A8F52AFCCA59008580A3 /* FaviconsFetcherOnboardingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconsFetcherOnboardingViewController.swift; sourceTree = "<group>"; };
+		37A746A52CDA4C6200C438AB /* ExperimentalFeatures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExperimentalFeatures.swift; sourceTree = "<group>"; };
 		37A803DA27FD69D300052F4C /* DataImportResources */ = {isa = PBXFileReference; lastKnownFileType = folder; path = DataImportResources; sourceTree = "<group>"; };
 		37AAA41B2C9CB9C0002A5377 /* AddressBarTextFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBarTextFieldView.swift; sourceTree = "<group>"; };
 		37AFCE8027DA2CA600471A10 /* PreferencesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesViewController.swift; sourceTree = "<group>"; };
@@ -7566,6 +7569,7 @@
 		AA4D700525545EDE00C3411E /* Application */ = {
 			isa = PBXGroup;
 			children = (
+				37A746A52CDA4C6200C438AB /* ExperimentalFeatures.swift */,
 				4B4D60E12A0C883A00BCD287 /* AppMain.swift */,
 				B62B48382ADE46FC000DECE5 /* Application.swift */,
 				AA585D81248FD31100E9A3E2 /* AppDelegate.swift */,
@@ -10927,6 +10931,7 @@
 				3706FA9F293F65D500E42796 /* FeedbackPresenter.swift in Sources */,
 				CD2AB5C42C8222F70019EB49 /* PhishingDetectionStateManager.swift in Sources */,
 				37A6A8F22AFCC988008580A3 /* FaviconsFetcherOnboarding.swift in Sources */,
+				37A746A72CDA4C6600C438AB /* ExperimentalFeatures.swift in Sources */,
 				859F30652A72A9FA00C20372 /* BookmarksBarPromptPopover.swift in Sources */,
 				37197EA22942441900394917 /* Tab+Dialogs.swift in Sources */,
 				3706FAA0293F65D500E42796 /* UserAgent.swift in Sources */,
@@ -13069,6 +13074,7 @@
 				B6A5A27125B9377300AA7ADA /* StatePersistenceService.swift in Sources */,
 				B68458B025C7E76A00DC17B6 /* WindowManager+StateRestoration.swift in Sources */,
 				B68458C525C7EA0C00DC17B6 /* TabCollection+NSSecureCoding.swift in Sources */,
+				37A746A62CDA4C6600C438AB /* ExperimentalFeatures.swift in Sources */,
 				C13909EF2B85FD4E001626ED /* AutofillActionExecutor.swift in Sources */,
 				370C23072C76A36500A80A3E /* BackgroundPickerView.swift in Sources */,
 				4BB88B5B25B7BA50006F6B06 /* Instruments.swift in Sources */,

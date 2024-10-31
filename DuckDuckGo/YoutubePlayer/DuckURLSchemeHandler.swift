@@ -30,7 +30,7 @@ final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
         }
 
         switch requestURL.type {
-        case .onboarding, .releaseNotes:
+        case .onboarding, .releaseNotes, .newTab:
             handleSpecialPages(urlSchemeTask: urlSchemeTask)
         case .duckPlayer:
             handleDuckPlayer(requestURL: requestURL, urlSchemeTask: urlSchemeTask, webView: webView)
@@ -127,6 +127,8 @@ private extension DuckURLSchemeHandler {
             directoryURL = URL(fileURLWithPath: "/pages/onboarding")
         } else if url.isReleaseNotesScheme {
             directoryURL = URL(fileURLWithPath: "/pages/release-notes")
+        } else if url.isNewTab {
+            directoryURL = URL(fileURLWithPath: "/pages/new-tab")
         } else {
             assertionFailure("Unknown scheme")
             return nil
@@ -205,6 +207,7 @@ private extension DuckURLSchemeHandler {
 
 extension URL {
     enum URLType {
+        case newTab
         case onboarding
         case duckPlayer
         case releaseNotes
@@ -220,6 +223,8 @@ extension URL {
             return .phishingErrorPage
         } else if self.isReleaseNotesScheme {
             return .releaseNotes
+        } else if self.isNewTab {
+            return .newTab
         } else {
             return nil
         }
@@ -227,6 +232,10 @@ extension URL {
 
     var isOnboarding: Bool {
         return isDuckURLScheme && host == "onboarding"
+    }
+
+    var isNewTab: Bool {
+        return isDuckURLScheme && host == "newtab"
     }
 
     var isDuckURLScheme: Bool {

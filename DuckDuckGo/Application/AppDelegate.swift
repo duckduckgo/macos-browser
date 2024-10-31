@@ -44,6 +44,11 @@ import Freemium
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
 
+    let experimentalFeatures = ExperimentalFeatures()
+    @objc func toggleHTMLNTP(_ sender: NSMenuItem) {
+        experimentalFeatures.isHTMLNewTabPageEnabled.toggle()
+    }
+
 #if DEBUG
     let disableCVDisplayLinkLogs: Void = {
         // Disable CVDisplayLink logs
