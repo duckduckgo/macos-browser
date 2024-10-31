@@ -44,7 +44,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
             let extractedProfileId: Int64 = 1
             let currentPreferredRunDate = Date()
 
-            let mockDataBroker = DataBroker(name: "databroker", url: "databroker.com", steps: [Step](), version: "1.0", schedulingConfig: config)
+            let mockDataBroker = DataBroker(name: "databroker", url: "databroker.com", steps: [Step](), version: "1.0", schedulingConfig: config, optOutUrl: "")
             let mockProfileQuery = ProfileQuery(id: profileQueryId, firstName: "a", lastName: "b", city: "c", state: "d", birthYear: 1222)
 
             let historyEvents = [HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested)]
@@ -92,7 +92,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
             let extractedProfileId: Int64 = 1
             let currentPreferredRunDate = Date()
 
-            let mockDataBroker = DataBroker(name: "databroker", url: "databroker.com", steps: [Step](), version: "1.0", schedulingConfig: config)
+            let mockDataBroker = DataBroker(name: "databroker", url: "databroker.com", steps: [Step](), version: "1.0", schedulingConfig: config, optOutUrl: "")
             let mockProfileQuery = ProfileQuery(id: profileQueryId, firstName: "a", lastName: "b", city: "c", state: "d", birthYear: 1222)
 
             let historyEvents = [HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested)]
@@ -143,7 +143,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
             let extractedProfileId: Int64 = 1
             let currentPreferredRunDate = Date()
 
-            let mockDataBroker = DataBroker(name: "databroker", url: "databroker.com", steps: [Step](), version: "1.0", schedulingConfig: config)
+            let mockDataBroker = DataBroker(name: "databroker", url: "databroker.com", steps: [Step](), version: "1.0", schedulingConfig: config, optOutUrl: "")
             let mockProfileQuery = ProfileQuery(id: profileQueryId, firstName: "a", lastName: "b", city: "c", state: "d", birthYear: 1222)
 
             let historyEvents = [HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested)]
@@ -888,7 +888,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
         let extractedProfileId: Int64 = 1
         let currentPreferredRunDate = Date()
 
-        let mockDataBroker = DataBroker(name: "databroker", url: "databroker.com", steps: [Step](), version: "1.0", schedulingConfig: config)
+        let mockDataBroker = DataBroker(name: "databroker", url: "databroker.com", steps: [Step](), version: "1.0", schedulingConfig: config, optOutUrl: "")
         let mockProfileQuery = ProfileQuery(id: profileQueryId, firstName: "a", lastName: "b", city: "c", state: "d", birthYear: 1222)
 
         let historyEvents = [HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested)]
@@ -913,7 +913,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
         let currentPreferredRunDate = Date()
         let expectedPreferredRunDate = Date().addingTimeInterval(config.confirmOptOutScan.hoursToSeconds)
 
-        let mockDataBroker = DataBroker(name: "databroker", url: "databroker.com", steps: [Step](), version: "1.0", schedulingConfig: config)
+        let mockDataBroker = DataBroker(name: "databroker", url: "databroker.com", steps: [Step](), version: "1.0", schedulingConfig: config, optOutUrl: "")
         let mockProfileQuery = ProfileQuery(id: profileQueryId, firstName: "a", lastName: "b", city: "c", state: "d", birthYear: 1222)
 
         let historyEvents = [HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested)]
@@ -987,7 +987,8 @@ extension DataBroker {
                 retryError: 0,
                 confirmOptOutScan: 0,
                 maintenanceScan: 0
-            )
+            ),
+            optOutUrl: ""
         )
     }
 
@@ -1006,7 +1007,8 @@ extension DataBroker {
                 confirmOptOutScan: 0,
                 maintenanceScan: 0
             ),
-            parent: "some"
+            parent: "some",
+            optOutUrl: ""
         )
     }
 
@@ -1020,7 +1022,8 @@ extension DataBroker {
                 retryError: 0,
                 confirmOptOutScan: 0,
                 maintenanceScan: 0
-            )
+            ),
+            optOutUrl: ""
         )
     }
 
@@ -1033,7 +1036,8 @@ extension DataBroker {
                 retryError: 0,
                 confirmOptOutScan: 0,
                 maintenanceScan: 0
-            )
+              ),
+              optOutUrl: ""
         )
     }
 
@@ -1052,7 +1056,8 @@ extension DataBroker {
                 confirmOptOutScan: 0,
                 maintenanceScan: 0
             ),
-            mirrorSites: mirroSites
+            mirrorSites: mirroSites,
+            optOutUrl: ""
         )
     }
 }
