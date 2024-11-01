@@ -105,8 +105,6 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .globalMetricsMonthlyStats,
                     .dataBrokerMetricsWeeklyStats,
                     .dataBrokerMetricsMonthlyStats,
-                    .gatekeeperNotAuthenticated,
-                    .gatekeeperEntitlementsInvalid,
                     .invalidPayload,
                     .pixelTest,
                     .customDataBrokerStatsOptoutSubmit,

@@ -21,7 +21,7 @@
 import Bookmarks
 import Foundation
 
-final class BookmarkStoreMock: BookmarkStore {
+final class BookmarkStoreMock: BookmarkStore, CustomDebugStringConvertible {
 
     private let store: LocalBookmarkStore?
 
@@ -51,16 +51,7 @@ final class BookmarkStoreMock: BookmarkStore {
                 }
             }
             var indexInFavoritesArray = 0
-            store?.save(
-                entitiesAtIndices: entities.map { entity in
-                    if let bookmark = entity as? Bookmark, bookmark.isFavorite {
-                        let result: (BaseBookmarkEntity, Int?, Int?) = (bookmark, nil, indexInFavoritesArray)
-                        indexInFavoritesArray += 1
-                        return result
-                    }
-
-                    return (entity, nil, nil)
-            }, completion: { _ in })
+            store?.save(entitiesAtIndices: entities.map { ($0, nil, nil) }, completion: { _ in })
         }
     }
 
@@ -274,6 +265,10 @@ final class BookmarkStoreMock: BookmarkStore {
         var bookmarkEntityParent: (any BookmarkEntityProtocol)? {
             parent()
         }
+    }
+
+    var debugDescription: String {
+        return "<\(type(of: self)) \(Unmanaged.passUnretained(self).toOpaque()): \(store.map { "\($0)" } ?? "<nil>")>"
     }
 }
 

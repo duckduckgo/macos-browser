@@ -155,7 +155,8 @@ extension BrokerProfileQueryData {
                 url: "parent.com",
                 steps: [Step](),
                 version: "1.0.0",
-                schedulingConfig: DataBrokerScheduleConfig.mock
+                schedulingConfig: DataBrokerScheduleConfig.mock,
+                optOutUrl: ""
             ),
             profileQuery: ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", birthYear: 50),
             scanJobData: ScanJobData(brokerId: 1, profileQueryId: 1, historyEvents: historyEvents)
@@ -170,7 +171,8 @@ extension BrokerProfileQueryData {
                 steps: [Step](),
                 version: "1.0.0",
                 schedulingConfig: DataBrokerScheduleConfig.mock,
-                parent: "parent.com"
+                parent: "parent.com",
+                optOutUrl: ""
             ),
             profileQuery: ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", birthYear: 50),
             scanJobData: ScanJobData(brokerId: 2, profileQueryId: 1, historyEvents: historyEvents)

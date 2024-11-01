@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1729265730687,
+    "version": 1730109523334,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -71,7 +71,14 @@
                     "state": "enabled"
                 }
             },
-            "hash": "d8a18aa2c020d7bdef900fc8c00f01b2"
+            "settings": {
+                "aiChatURL": "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=2",
+                "onboardingCookieName": "dcm",
+                "onboardingCookieDomain": "duckduckgo.com",
+                "aiChatURLIdentifiableQuery": "ia",
+                "aiChatURLIdentifiableQueryValue": "chat"
+            },
+            "hash": "e5711b3f4ceff89cd5c2d70b19a96875"
         },
         "ampLinks": {
             "exceptions": [
@@ -369,6 +376,9 @@
                     "domain": "speedweek.com"
                 },
                 {
+                    "domain": "la-becanerie.com"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -392,10 +402,10 @@
             "state": "enabled",
             "features": {
                 "filterlistExperiment2": {
-                    "state": "disabled"
+                    "state": "enabled"
                 }
             },
-            "hash": "f1e901d6a8760c275cebbac1bf70529a"
+            "hash": "419e42a27cc5daa895b567f1e3c1bd6b"
         },
         "autofillBreakageReporter": {
             "state": "disabled",
@@ -1281,6 +1291,11 @@
                 }
             ],
             "hash": "d02882dcee87a42b7d29bb6f2e21b4ca"
+        },
+        "contextualOnboarding": {
+            "exceptions": [],
+            "state": "enabled",
+            "hash": "52857469413a66e8b0c7b00de5589162"
         },
         "cookie": {
             "settings": {
@@ -5331,6 +5346,9 @@
                     "domain": "dollargeneral.com"
                 },
                 {
+                    "domain": "milesplit.live"
+                },
+                {
                     "domain": "monsterenergy.com"
                 },
                 {
@@ -5364,7 +5382,7 @@
                     "privacy-test-pages.site"
                 ]
             },
-            "hash": "64f354e852c4e0926e39fe59a72e4ac4"
+            "hash": "501bbc6471eb079cb27fa8a2a47467a5"
         },
         "harmfulApis": {
             "settings": {
@@ -5652,9 +5670,9 @@
             "hash": "cbd62a1a63a829da0277ca045a311eb2"
         },
         "newTabSearchField": {
-            "state": "internal",
+            "state": "disabled",
             "exceptions": [],
-            "hash": "f1daaefe788583c2a00d7d19a23864a7"
+            "hash": "c292bb627849854515cebbded288ef5a"
         },
         "nonTracking3pCookies": {
             "settings": {
@@ -8927,6 +8945,16 @@
                             }
                         ]
                     },
+                    "svonm.com": {
+                        "rules": [
+                            {
+                                "rule": "hgc-cf-cache-1.svonm.com",
+                                "domains": [
+                                    "t-online.de"
+                                ]
+                            }
+                        ]
+                    },
                     "taboola.com": {
                         "rules": [
                             {
@@ -9414,7 +9442,7 @@
                     "domain": "instructure.com"
                 }
             ],
-            "hash": "2cc872ccc68d442e2266666f731709e2"
+            "hash": "4a71922e4eb31060dced0b091ad797e7"
         },
         "trackingCookies1p": {
             "settings": {
@@ -9855,6 +9883,11 @@
             "exceptions": [],
             "state": "disabled",
             "hash": "728493ef7a1488e4781656d3f9db84aa"
+        },
+        "windowsNewTabPageExperiment": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
         },
         "windowsPermissionUsage": {
             "exceptions": [],

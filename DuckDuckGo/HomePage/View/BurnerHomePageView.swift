@@ -25,7 +25,24 @@ extension HomePage.Views {
 
         static let height: CGFloat = 273
 
+        enum Const {
+            static let verticalPadding = 40.0
+            static let searchBoxVerticalSpacing = 24.0
+        }
+
+        var totalHeight: CGFloat {
+
+            var totalHeight = Self.height + 2 * Const.verticalPadding
+
+            if addressBarModel.shouldShowAddressBar && model.isSearchBarVisible {
+                totalHeight += Const.searchBoxVerticalSpacing + BigSearchBox.Const.totalHeight
+            }
+            return totalHeight
+        }
+
         @Environment(\.colorScheme) var colorScheme
+        @EnvironmentObject var model: AppearancePreferences
+        @EnvironmentObject var addressBarModel: HomePage.Models.AddressBarModel
 
         let backgroundColor = Color(.newTabPageBackground)
         private var infoBackgroundColor: Color {
@@ -45,36 +62,55 @@ extension HomePage.Views {
         }
 
         var body: some View {
-            ZStack {
-                backgroundColor.edgesIgnoringSafeArea(.all)
+            GeometryReader { geometry in
+                ZStack {
+                    ScrollView {
+                        VStack(spacing: Const.searchBoxVerticalSpacing) {
+                            Spacer(minLength: Const.verticalPadding)
 
-                VStack(alignment: .leading, spacing: 16) {
-                    HStack {
-                        Image(.burnerWindowHomepage)
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 64, height: 48)
-                            .padding(.leading, -15)
-                            .padding(.top, -5)
+                            Group {
+                                if addressBarModel.shouldShowAddressBar {
+                                    BigSearchBox(isCompact: false, supportsFixedColorScheme: false)
+                                        .visibility(model.isSearchBarVisible ? .visible : .gone)
+                                }
 
-                        Text(UserText.burnerWindowHeader)
-                            .font(.system(size: 22, weight: .bold))
-                            .foregroundColor(Color.primary)
-                            .padding(.leading, -10)
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color.homeFavoritesGhost, style: StrokeStyle(lineWidth: 1.0))
+                                        .homePageViewBackground(nil)
+                                        .cornerRadius(12)
+
+                                    VStack(alignment: .leading, spacing: 16) {
+                                        HStack {
+                                            Image(.burnerWindowHomepage)
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fit)
+                                                .frame(width: 64, height: 48)
+                                                .padding(.leading, -15)
+                                                .padding(.top, -5)
+
+                                            Text(UserText.burnerWindowHeader)
+                                                .font(.system(size: 22, weight: .bold))
+                                                .foregroundColor(Color.primary)
+                                                .padding(.leading, -10)
+                                        }
+
+                                        FeaturesBox()
+                                            .padding(.top, 10)
+                                    }
+                                    .padding(.horizontal, 40)
+                                }
+                                .frame(height: Self.height)
+                            }
+                            .frame(width: HomePage.Views.RootView.targetWidth)
+
+                            Spacer(minLength: Const.verticalPadding)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .frame(height: max(geometry.size.height, totalHeight))
                     }
-
-                    FeaturesBox()
-                        .padding(.top, 10)
                 }
-                .frame(width: HomePage.Views.RootView.targetWidth,
-                       height: Self.height,
-                       alignment: .leading)
-                .padding(.horizontal, 40)
-                .padding(.vertical, 20)
-                .background(RoundedRectangle(cornerRadius: 8).fill(infoBackgroundColor))
-                .overlay(RoundedRectangle(cornerRadius: 8).stroke(infoStrokeColor2, lineWidth: 1))
-                .overlay(RoundedRectangle(cornerRadius: 8).stroke(infoStrokeColor1, lineWidth: 1).padding(1)) // Add this line
-                .shadow(color: infoShadowColor, radius: 2, x: 0, y: 2)
+                .background(backgroundColor)
             }
         }
     }

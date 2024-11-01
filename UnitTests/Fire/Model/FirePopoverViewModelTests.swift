@@ -64,6 +64,7 @@ final class FirePopoverViewModelTests: XCTestCase {
 }
 
 class CapturingContextualOnboardingStateUpdater: ContextualOnboardingStateUpdater {
+
     var state: ContextualOnboardingState = .onboardingCompleted
 
     var updatedForTab: Tab?
@@ -81,5 +82,7 @@ class CapturingContextualOnboardingStateUpdater: ContextualOnboardingStateUpdate
     func fireButtonUsed() {
         fireButtonUsedCalled = true
     }
+
+    func turnOffFeature() {}
 
 }

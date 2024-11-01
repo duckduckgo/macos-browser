@@ -224,8 +224,7 @@ final class StatisticsLoader {
 
         DispatchQueue.global().asyncAfter(deadline: .now() + randomDelay) {
             PixelKit.fire(GeneralPixel.dailyOsVersionCounter,
-                          frequency: .legacyDaily,
-                          includeAppVersionParameter: false)
+                          frequency: .legacyDaily)
         }
     }
 
