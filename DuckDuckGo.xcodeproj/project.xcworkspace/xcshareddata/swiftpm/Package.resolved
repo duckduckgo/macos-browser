@@ -32,7 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "748463efbe18152dfcacba297b5b8735f37bdfc2"
+        "branch" : "dominik/xcode-16",
+        "revision" : "8fb01fbcaf16035d41f543e74c34c3df011847eb"
       }
     },
     {

@@ -24,10 +24,6 @@ final class OnboardingUITests: UITestCase {
         try resetApplicationData()
     }
 
-    override func tearDownWithError() throws {
-        try resetApplicationData()
-    }
-
     func testOnboardingToBrowsing() throws {
         try resetApplicationData()
         continueAfterFailure = false
