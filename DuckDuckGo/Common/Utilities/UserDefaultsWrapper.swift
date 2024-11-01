@@ -133,10 +133,15 @@ public struct UserDefaultsWrapper<T> {
         case homePageIsFavoriteVisible = "home.page.is.favorite.visible"
         case homePageIsContinueSetupVisible = "home.page.is.continue.setup.visible"
         case homePageIsRecentActivityVisible = "home.page.is.recent.activity.visible"
+        case homePageIsSearchBarVisible = "home.page.is.search.bar.visible"
         case homePageIsFirstSession = "home.page.is.first.session"
+        case homePageDidShowSettingsOnboarding = "home.page.did.show.settings.onboarding"
         case homePageUserBackgroundImages = "home.page.user.background.images"
         case homePageCustomBackground = "home.page.custom.background"
         case homePageLastPickedCustomColor = "home.page.last.picked.custom.color"
+
+        case homePagePromotionVisible = "home.page.promotion.visible"
+        case homePagePromotionDidDismiss = "home.page.promotion.did.dismiss"
 
         case appIsRelaunchingAutomatically = "app-relaunching-automatically"
 
@@ -179,6 +184,7 @@ public struct UserDefaultsWrapper<T> {
 
         // Updates
         case automaticUpdates = "updates.automatic"
+        case pendingUpdateShown = "pending.update.shown"
 
         // Experiments
         case pixelExperimentInstalled = "pixel.experiment.installed"

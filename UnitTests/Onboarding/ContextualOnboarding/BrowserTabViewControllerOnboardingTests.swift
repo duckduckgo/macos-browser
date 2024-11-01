@@ -29,20 +29,23 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
     var viewController: BrowserTabViewController!
     var dialogProvider: MockDialogsProvider!
     var factory: CapturingDialogFactory!
+    var featureFlagger: MockFeatureFlagger!
     var tab: Tab!
     var cancellables: Set<AnyCancellable> = []
     var expectation: XCTestExpectation!
+    var dialogTypeForTabExpectation: XCTestExpectation!
 
     @MainActor override func setUpWithError() throws {
         try super.setUpWithError()
         let tabCollectionViewModel = TabCollectionViewModel()
+        featureFlagger = MockFeatureFlagger()
         dialogProvider = MockDialogsProvider()
         expectation = .init()
         factory = CapturingDialogFactory(expectation: expectation)
         tab = Tab()
         tab.setContent(.url(URL.duckDuckGo, credential: nil, source: .appOpenUrl))
         let tabViewModel = TabViewModel(tab: tab)
-        viewController = BrowserTabViewController(tabCollectionViewModel: tabCollectionViewModel, onboardingDialogTypeProvider: dialogProvider, onboardingDialogFactory: factory, featureFlagger: MockFeatureFlagger())
+        viewController = BrowserTabViewController(tabCollectionViewModel: tabCollectionViewModel, onboardingDialogTypeProvider: dialogProvider, onboardingDialogFactory: factory, featureFlagger: featureFlagger)
         viewController.tabViewModel = tabViewModel
         let window = NSWindow()
         window.contentViewController = viewController
@@ -56,7 +59,18 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
         viewController = nil
         cancellables = []
         expectation = nil
+        featureFlagger = nil
         try super.tearDownWithError()
+    }
+
+    func testWhenNavigationCompletedAndFeatureIsOffThenTurnOffFeature() throws {
+        featureFlagger.isFeatureOn = false
+        let expectation = self.expectation(description: "Wait for turnOffFeatureCalled to be called")
+        dialogProvider.turnOffFeatureCalledExpectation = expectation
+
+        tab.navigateTo(url: URL(string: "some.url")!)
+
+        wait(for: [expectation], timeout: 3.0)
     }
 
     func testWhenNavigationCompletedAndNoDialogTypeThenOnlyWebViewVisible() throws {
@@ -251,7 +265,9 @@ final class BrowserTabViewControllerOnboardingTests: XCTestCase {
 }
 
 class MockDialogsProvider: ContextualOnboardingDialogTypeProviding, ContextualOnboardingStateUpdater {
+
     var state: ContextualOnboardingState = .onboardingCompleted
+    var turnOffFeatureCalledExpectation: XCTestExpectation?
 
     func updateStateFor(tab: DuckDuckGo_Privacy_Browser.Tab) {}
 
@@ -267,10 +283,13 @@ class MockDialogsProvider: ContextualOnboardingDialogTypeProviding, ContextualOn
     func gotItPressed() {}
 
     func fireButtonUsed() {}
+
+    func turnOffFeature() {
+        turnOffFeatureCalledExpectation?.fulfill()
+    }
 }
 
 class CapturingDialogFactory: ContextualDaxDialogsFactory {
-
     let expectation: XCTestExpectation
     var capturedType: ContextualDialogType?
     var capturedDelegate: OnboardingNavigationDelegate?

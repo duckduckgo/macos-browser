@@ -174,6 +174,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case syncBookmarksValidationErrorDaily
     case syncCredentialsValidationErrorDaily
     case syncSettingsValidationErrorDaily
+    case syncDebugWasDisabledUnexpectedly
 
     // Remote Messaging Framework
     case remoteMessageShown
@@ -222,11 +223,11 @@ enum GeneralPixel: PixelKitEventV2 {
     case passwordImportKeychainPromptDenied
 
     // Autocomplete
-    case autocompleteClickPhrase
-    case autocompleteClickWebsite
-    case autocompleteClickBookmark
-    case autocompleteClickFavorite
-    case autocompleteClickHistory
+    case autocompleteClickPhrase(from: NewTabPageSearchBoxExperiment.SearchSource?, cohort: NewTabPageSearchBoxExperiment.Cohort?, onboardingCohort: PixelExperiment?)
+    case autocompleteClickWebsite(from: NewTabPageSearchBoxExperiment.SearchSource?, cohort: NewTabPageSearchBoxExperiment.Cohort?, onboardingCohort: PixelExperiment?)
+    case autocompleteClickBookmark(from: NewTabPageSearchBoxExperiment.SearchSource?, cohort: NewTabPageSearchBoxExperiment.Cohort?, onboardingCohort: PixelExperiment?)
+    case autocompleteClickFavorite(from: NewTabPageSearchBoxExperiment.SearchSource?, cohort: NewTabPageSearchBoxExperiment.Cohort?, onboardingCohort: PixelExperiment?)
+    case autocompleteClickHistory(from: NewTabPageSearchBoxExperiment.SearchSource?, cohort: NewTabPageSearchBoxExperiment.Cohort?, onboardingCohort: PixelExperiment?)
     case autocompleteToggledOff
     case autocompleteToggledOn
 
@@ -328,6 +329,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case adAttributionLogicWrongVendorOnFailedCompilation
 
     case webKitDidTerminate
+    case userViewedWebKitTerminationErrorPage
 
     case removedInvalidBookmarkManagedObjects
 
@@ -396,6 +398,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case syncLogoutError(error: Error)
     case syncUpdateDeviceError(error: Error)
     case syncRemoveDeviceError(error: Error)
+    case syncRefreshDevicesError(error: Error)
     case syncDeleteAccountError(error: Error)
     case syncLoginExistingAccountError(error: Error)
     case syncCannotCreateRecoveryPDF
@@ -423,6 +426,10 @@ enum GeneralPixel: PixelKitEventV2 {
     case secureVaultKeystoreEventL2KeyPasswordMigration
 
     case compilationFailed
+
+    // MARK: error page shown
+    case errorPageShownOther
+    case errorPageShownWebkitTermination
 
     var name: String {
         switch self {
@@ -682,6 +689,7 @@ enum GeneralPixel: PixelKitEventV2 {
         case .syncBookmarksValidationErrorDaily: return "m_mac_sync_bookmarks_validation_error_daily"
         case .syncCredentialsValidationErrorDaily: return "m_mac_sync_credentials_validation_error_daily"
         case .syncSettingsValidationErrorDaily: return "m_mac_sync_settings_validation_error_daily"
+        case .syncDebugWasDisabledUnexpectedly: return "m_mac_sync_was_disabled_unexpectedly"
 
         case .remoteMessageShown: return "m_mac_remote_message_shown"
         case .remoteMessageShownUnique: return "m_mac_remote_message_shown_unique"
@@ -916,6 +924,8 @@ enum GeneralPixel: PixelKitEventV2 {
 
         case .webKitDidTerminate:
             return "webkit_did_terminate"
+        case .userViewedWebKitTerminationErrorPage:
+            return "webkit-termination-error-page-viewed"
 
         case .removedInvalidBookmarkManagedObjects:
             return "removed_invalid_bookmark_managed_objects"
@@ -1003,6 +1013,7 @@ enum GeneralPixel: PixelKitEventV2 {
         case .syncLogoutError: return "sync_logout_error"
         case .syncUpdateDeviceError: return "sync_update_device_error"
         case .syncRemoveDeviceError: return "sync_remove_device_error"
+        case .syncRefreshDevicesError: return "sync_refresh_devices_error"
         case .syncDeleteAccountError: return "sync_delete_account_error"
         case .syncLoginExistingAccountError: return "sync_login_existing_account_error"
         case .syncCannotCreateRecoveryPDF: return "sync_cannot_create_recovery_pdf"
@@ -1037,6 +1048,9 @@ enum GeneralPixel: PixelKitEventV2 {
         case .bookmarksSortByName: return "m_mac_sort_bookmarks_by_name"
         case .bookmarksSearchExecuted: return "m_mac_search_bookmarks_executed"
         case .bookmarksSearchResultClicked: return "m_mac_search_result_clicked"
+
+        case .errorPageShownOther: return "m_mac_errorpageshown_other"
+        case .errorPageShownWebkitTermination: return "m_mac_errorpageshown_webkittermination"
         }
     }
 
@@ -1055,6 +1069,7 @@ enum GeneralPixel: PixelKitEventV2 {
                 .syncLogoutError(let error),
                 .syncUpdateDeviceError(let error),
                 .syncRemoveDeviceError(let error),
+                .syncRefreshDevicesError(let error),
                 .syncDeleteAccountError(let error),
                 .syncLoginExistingAccountError(let error),
                 .bookmarksCouldNotLoadDatabase(let error?):
@@ -1206,6 +1221,22 @@ enum GeneralPixel: PixelKitEventV2 {
                 .bookmarksSearchResultClicked(let origin):
             return ["origin": origin]
 
+        case .autocompleteClickPhrase(let from, let cohort, let onboardingCohort),
+                .autocompleteClickWebsite(let from, let cohort, let onboardingCohort),
+                .autocompleteClickBookmark(let from, let cohort, let onboardingCohort),
+                .autocompleteClickFavorite(let from, let cohort, let onboardingCohort),
+                .autocompleteClickHistory(let from, let cohort, let onboardingCohort):
+            var parameters: [String: String] = [:]
+            if let from {
+                parameters[NewTabSearchBoxExperimentPixel.Parameters.from] = from.rawValue
+            }
+            if let cohort {
+                parameters[NewTabSearchBoxExperimentPixel.Parameters.cohort] = cohort.rawValue
+            }
+            if let onboardingCohort {
+                parameters[NewTabSearchBoxExperimentPixel.Parameters.onboardingCohort] = onboardingCohort.rawValue
+            }
+            return parameters
         default: return nil
         }
     }

@@ -22,11 +22,10 @@ import Common
 import DataBrokerProtection
 import Subscription
 import os.log
+import Freemium
 
 protocol DataBrokerProtectionFeatureGatekeeper {
-    func isFeatureVisible() -> Bool
     func disableAndDeleteForAllUsers()
-    func isPrivacyProEnabled() -> Bool
     func arePrerequisitesSatisfied() async -> Bool
 }
 
@@ -37,19 +36,22 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
     private let userDefaults: UserDefaults
     private let subscriptionAvailability: SubscriptionFeatureAvailability
     private let accountManager: AccountManager
+    private let freemiumDBPUserStateManager: FreemiumDBPUserStateManager
 
     init(privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
          featureDisabler: DataBrokerProtectionFeatureDisabling = DataBrokerProtectionFeatureDisabler(),
          pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler(),
          userDefaults: UserDefaults = .standard,
          subscriptionAvailability: SubscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability(),
-         accountManager: AccountManager) {
+         accountManager: AccountManager,
+         freemiumDBPUserStateManager: FreemiumDBPUserStateManager) {
         self.privacyConfigurationManager = privacyConfigurationManager
         self.featureDisabler = featureDisabler
         self.pixelHandler = pixelHandler
         self.userDefaults = userDefaults
         self.subscriptionAvailability = subscriptionAvailability
         self.accountManager = accountManager
+        self.freemiumDBPUserStateManager = freemiumDBPUserStateManager
     }
 
     var isUserLocaleAllowed: Bool {
@@ -70,28 +72,24 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
         return (regionCode ?? "US") == "US"
     }
 
-    func isPrivacyProEnabled() -> Bool {
-        return subscriptionAvailability.isFeatureAvailable
-    }
-
     func disableAndDeleteForAllUsers() {
         featureDisabler.disableAndDelete()
 
         Logger.dataBrokerProtection.debug("Disabling and removing DBP for all users")
     }
 
-    /// If we want to prevent new users from joining the waitlist while still allowing waitlist users to continue using it,
-    /// we should set isWaitlistEnabled to false and isWaitlistBetaActive to true.
-    /// To remove it from everyone, isWaitlistBetaActive should be set to false
-    func isFeatureVisible() -> Bool {
-        // only US locale should be available
-        guard isUserLocaleAllowed else { return false }
-
-        // US internal users should have it available by default
-        return isInternalUser
-    }
-
+    /// Checks DBP prerequisites
+    ///
+    /// Prerequisites are satisified if either:
+    /// 1. The user is an active freemium user (e.g has activated freemium and is not authenticated)
+    /// 2. The user has a subscription with valid entitlements
+    ///
+    /// - Returns: Bool indicating prerequisites are satisfied
     func arePrerequisitesSatisfied() async -> Bool {
+
+        let isAuthenticated = accountManager.isUserAuthenticated
+        if !isAuthenticated && freemiumDBPUserStateManager.didActivate { return true }
+
         let entitlements = await accountManager.hasEntitlement(forProductName: .dataBrokerProtection,
                                                                cachePolicy: .reloadIgnoringLocalCacheData)
         var hasEntitlements: Bool
@@ -101,8 +99,6 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
         case .failure:
             hasEntitlements = false
         }
-
-        let isAuthenticated = accountManager.accessToken != nil
 
         firePrerequisitePixelsAndLogIfNecessary(hasEntitlements: hasEntitlements, isAuthenticatedResult: isAuthenticated)
 
@@ -118,12 +114,10 @@ private extension DefaultDataBrokerProtectionFeatureGatekeeper {
 
     func firePrerequisitePixelsAndLogIfNecessary(hasEntitlements: Bool, isAuthenticatedResult: Bool) {
         if !hasEntitlements {
-            pixelHandler.fire(.gatekeeperEntitlementsInvalid)
             Logger.dataBrokerProtection.error("DBP feature Gatekeeper: Entitlement check failed")
         }
 
         if !isAuthenticatedResult {
-            pixelHandler.fire(.gatekeeperNotAuthenticated)
             Logger.dataBrokerProtection.error("DBP feature Gatekeeper: Authentication check failed")
         }
     }
