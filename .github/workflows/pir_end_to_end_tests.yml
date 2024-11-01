@@ -63,7 +63,7 @@ jobs:
         path: main
 
     - name: Set up fastlane
-      run: 
+      run: |
         cd main
         bundle install
   
