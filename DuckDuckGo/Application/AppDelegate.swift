@@ -303,6 +303,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                                                                                               vpnUninstaller: vpnUninstaller)
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     func applicationDidFinishLaunching(_ notification: Notification) {
         guard NSApp.runType.requiresEnvironment else { return }
         defer {
@@ -479,8 +480,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         Task { @MainActor in
             await subscriptionCookieManager.refreshSubscriptionCookie()
         }
-
-
     }
 
     private func initializeSync() {
