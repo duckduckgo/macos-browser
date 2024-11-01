@@ -19,6 +19,7 @@
 import Foundation
 import Subscription
 import Common
+import AppKitExtensions
 
 public protocol DataBrokerProtectionSubscriptionManaging {
     var isUserAuthenticated: Bool { get }
@@ -31,12 +32,16 @@ public final class DataBrokerProtectionSubscriptionManager: DataBrokerProtection
     let subscriptionManager: SubscriptionManager
 
     public var isUserAuthenticated: Bool {
-        return true
-        subscriptionManager.accountManager.accessToken != nil
+        accessToken != nil
     }
 
     public var accessToken: String? {
-        subscriptionManager.accountManager.accessToken
+        // We use a staging token for privacy pro supplied through a github secret/action
+        // for PIR end to end tests
+        if NSApplication.runType == .integrationTests, let token = ProcessInfo.processInfo.environment["PRIVACYPRO_STAGING_TOKEN"] {
+            return token
+        }
+        return subscriptionManager.accountManager.accessToken
     }
 
     public init(subscriptionManager: SubscriptionManager) {
@@ -44,7 +49,6 @@ public final class DataBrokerProtectionSubscriptionManager: DataBrokerProtection
     }
 
     public func hasValidEntitlement() async throws -> Bool {
-        return true
         switch await subscriptionManager.accountManager.hasEntitlement(forProductName: .dataBrokerProtection,
                                                                        cachePolicy: .reloadIgnoringLocalCacheData) {
         case let .success(result):
