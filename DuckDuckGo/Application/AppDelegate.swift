@@ -96,7 +96,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     public let subscriptionManager: SubscriptionManager
     public let subscriptionUIHandler: SubscriptionUIHandling
-    public let subscriptionCookieManager: SubscriptionCookieManaging
+    private let subscriptionCookieManager: SubscriptionCookieManaging
+    private var subscriptionCookieManagerFeatureFlagCancellable: AnyCancellable?
 
     public let vpnSettings = VPNSettings(defaults: .netP)
 
@@ -302,6 +303,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                                                                                               vpnUninstaller: vpnUninstaller)
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     func applicationDidFinishLaunching(_ notification: Notification) {
         guard NSApp.runType.requiresEnvironment else { return }
         defer {
@@ -343,6 +345,30 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         startupSync()
 
         subscriptionManager.loadInitialData()
+
+        let privacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager
+
+        // Enable subscriptionCookieManager if feature flag is present
+        if privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(PrivacyProSubfeature.setAccessTokenCookieForSubscriptionDomains) {
+            subscriptionCookieManager.enableSettingSubscriptionCookie()
+        }
+
+        // Keep track of feature flag changes
+        subscriptionCookieManagerFeatureFlagCancellable = privacyConfigurationManager.updatesPublisher
+            .sink { [weak self, weak privacyConfigurationManager] in
+                guard let self, let privacyConfigurationManager else { return }
+
+                let isEnabled = privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(PrivacyProSubfeature.setAccessTokenCookieForSubscriptionDomains)
+
+                Task { [weak self] in
+                    if isEnabled {
+                        self?.subscriptionCookieManager.enableSettingSubscriptionCookie()
+                        await self?.subscriptionCookieManager.refreshSubscriptionCookie()
+                    } else {
+                        await self?.subscriptionCookieManager.disableSettingSubscriptionCookie()
+                    }
+                }
+            }
 
         if [.normal, .uiTests].contains(NSApp.runType) {
             stateRestorationManager.applicationDidFinishLaunching()
