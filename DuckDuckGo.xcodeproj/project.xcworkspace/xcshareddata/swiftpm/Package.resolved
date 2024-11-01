@@ -33,7 +33,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "sam/validate-errors-before-throwing-them-to-the-os",
-        "revision" : "aff5f0ca16cc9861157014c96752ec366d4f2c15"
+        "revision" : "a853f3ac5450bd515c4974808c7d91949f0ee6f5"
       }
     },
     {
