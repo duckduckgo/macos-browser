@@ -104,7 +104,7 @@ jobs:
       run: |
         # Override .xcode_version because 15.4 is not available on macos 13
         echo "${{ matrix.xcode-version }}" > .xcode-version
-        cd main && sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
+        sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
     - name: Run PIR e2e Tests
       run: |
