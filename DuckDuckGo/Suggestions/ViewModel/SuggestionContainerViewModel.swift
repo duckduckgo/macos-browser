@@ -182,12 +182,18 @@ final class SuggestionContainerViewModel {
     }
 
     func removeSuggestionFromResult(suggestion: Suggestion) {
-        suggestionContainer.result?.topHits = suggestionContainer.result?.topHits.filter({
+        let topHits = suggestionContainer.result?.topHits.filter({
             !($0 == suggestion && $0.isHistoryEntry)
         }) ?? []
-        suggestionContainer.result?.localSuggestions = suggestionContainer.result?.localSuggestions.filter({
+        let duckduckgoSuggestions = suggestionContainer.result?.duckduckgoSuggestions ?? []
+        let localSuggestions = suggestionContainer.result?.localSuggestions.filter({
             !($0 == suggestion && $0.isHistoryEntry)
         }) ?? []
+        let result = SuggestionResult(topHits: topHits,
+                                      duckduckgoSuggestions: duckduckgoSuggestions,
+                                      localSuggestions: localSuggestions)
+
+        suggestionContainer.result = result
     }
 
 }
