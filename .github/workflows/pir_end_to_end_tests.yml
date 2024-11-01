@@ -14,7 +14,6 @@ on:
 jobs:
   pir-e2e-tests:
     name: PIR e2e tests
-    needs: create-notarized-app
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
