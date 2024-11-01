@@ -119,6 +119,8 @@ jobs:
           -retry-tests-on-failure \
           | tee xcodebuild.log \
           | tee pir-e2e-tests.log
+      env:
+          PRIVACYPRO_STAGING_TOKEN: ${{ secrets.PRIVACYPRO_STAGING_TOKEN }}
 
     - name: Prepare test report
       if: always()
