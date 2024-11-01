@@ -60,9 +60,12 @@ jobs:
       uses: actions/checkout@v4
       with:
         submodules: recursive
+        path: main
 
     - name: Set up fastlane
-      run: bundle install
+      run: 
+        cd main
+        bundle install
   
     - name: Sync code signing assets
       env:
@@ -72,6 +75,7 @@ jobs:
         MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
         SSH_PRIVATE_KEY_FASTLANE_MATCH: ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
       run: |
+        cd main
         bundle exec fastlane sync_signing_ci
 
     - name: Download and unzip artifact
@@ -79,6 +83,7 @@ jobs:
 
     - name: Set cache key hash
       run: |
+        cd main
         has_only_tags=$(jq '[ .pins[].state | has("version") ] | all' DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved)
         if [[ "$has_only_tags" == "true" ]]; then
           echo "cache_key_hash=${{ hashFiles('DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}" >> $GITHUB_ENV
@@ -90,7 +95,7 @@ jobs:
       if: env.cache_key_hash
       uses: actions/cache@v4
       with:
-        path: DerivedData/SourcePackages
+        path: main/DerivedData/SourcePackages
         key: ${{ runner.os }}-spm-${{ env.cache_key_hash }}
         restore-keys: |
           ${{ runner.os }}-spm-
@@ -99,7 +104,7 @@ jobs:
       run: |
         # Override .xcode_version because 15.4 is not available on macos 13
         echo "${{ matrix.xcode-version }}" > .xcode-version
-        sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
+        cd main && sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
     - name: Run PIR e2e Tests
       run: |
