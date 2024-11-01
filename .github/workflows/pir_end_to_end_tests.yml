@@ -115,7 +115,7 @@ jobs:
           -configuration "CI" \
           -skipPackagePluginValidation -skipMacroValidation \
           ENABLE_TESTABILITY=true \
-          "-only-testing:DBPE2ETests \
+          "-only-testing:DBPE2ETests" \
           -retry-tests-on-failure \
           | tee xcodebuild.log \
           | tee pir-e2e-tests.log
