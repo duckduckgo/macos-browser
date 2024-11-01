@@ -32,6 +32,7 @@ extension MainViewController: BareBonesBrowserUIDelegate {
         let configuration = WKWebViewConfiguration()
         configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
         configuration.processPool = WKProcessPool()
+        configuration.mediaTypesRequiringUserActionForPlayback = []
         return configuration
     }()
 
