@@ -17,6 +17,7 @@
 //
 
 import BrowserServicesKit
+import PixelKit
 
 protocol AIChatRemoteSettingsProvider {
     var onboardingCookieName: String { get }
@@ -91,7 +92,7 @@ struct AIChatRemoteSettings: AIChatRemoteSettingsProvider {
         if let value = settings[value.rawValue] as? String {
             return value
         } else {
-            // Fire unique pixel for value.rawValue
+            PixelKit.fire(GeneralPixel.aichatNoRemoteSettingsFound(value), includeAppVersionParameter: true)
             return value.defaultValue
         }
     }
