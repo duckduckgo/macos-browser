@@ -25,6 +25,8 @@ import Combine
 @testable import DuckDuckGo_Privacy_Browser
 @testable import PixelKit
 
+// swiftlint:disable force_try
+
 final class DBPEndToEndTests: XCTestCase {
 
     var loginItemsManager: LoginItemsManager!
@@ -406,6 +408,7 @@ private extension DBPEndToEndTests {
     }
 
     func validateFakeBrokerResponse(responseData: Data, response: URLResponse) {
+        // swiftlint:disable:next force_cast
         let httpResponse = response as! HTTPURLResponse
         if httpResponse.statusCode != 200 {
             prettyPrintJSONData(responseData)
@@ -520,3 +523,5 @@ private extension DBPEndToEndTests {
         }
     }
 }
+
+// swiftlint:enable force_try
