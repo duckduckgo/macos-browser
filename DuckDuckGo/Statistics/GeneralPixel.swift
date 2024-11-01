@@ -681,7 +681,7 @@ enum GeneralPixel: PixelKitEventV2 {
         case .aichatToolbarOnboardingPopoverAccept:
             return "m_mac_aichat_toolbar-onboarding-popover-accept"
         case .aichatNoRemoteSettingsFound(let settings):
-            return "m_mac_aichat_no_remote_settings_found-\(settings.rawValue)"
+            return "m_mac_aichat_no_remote_settings_found-\(settings.rawValue.lowercased())"
 
             // Sync
         case .syncSignupDirect:
