@@ -24,21 +24,18 @@ import Subscription
 enum SubscriptionCookieManagerPixel: PixelKitEventV2 {
 
     case missingTokenOnSignIn
-    case missingCookieOnSignOut
-    case cookieRefreshedWithUpdate
-    case cookieRefreshedWithDelete
+    case cookieRefreshedWithAccessToken
+    case cookieRefreshedWithEmptyValue
     case failedToSetSubscriptionCookie
 
     var name: String {
         switch self {
         case .missingTokenOnSignIn:
             return "m_mac_privacy-pro_subscription-cookie-missing_token_on_sign_in"
-        case .missingCookieOnSignOut:
-            return "m_mac_privacy-pro_subscription-cookie-missing_cookie_on_sign_out"
-        case .cookieRefreshedWithUpdate:
-            return "m_mac_privacy-pro_subscription-cookie-refreshed_with_update"
-        case .cookieRefreshedWithDelete:
-            return "m_mac_privacy-pro_subscription-cookie-refreshed_with_delete"
+        case .cookieRefreshedWithAccessToken:
+            return "m_mac_privacy-pro_subscription-cookie-refreshed_with_access_token"
+        case .cookieRefreshedWithEmptyValue:
+            return "m_mac_privacy-pro_subscription-cookie-refreshed_with_empty_value"
         case .failedToSetSubscriptionCookie:
             return "m_mac_privacy-pro_subscription-cookie-failed_to_set_subscription_cookie"
         }
@@ -61,12 +58,10 @@ public final class SubscriptionCookieManageEventPixelMapping: EventMapping<Subsc
                 switch event {
                 case .errorHandlingAccountDidSignInTokenIsMissing:
                     return .missingTokenOnSignIn
-                case .errorHandlingAccountDidSignOutCookieIsMissing:
-                    return .missingCookieOnSignOut
-                case .subscriptionCookieRefreshedWithUpdate:
-                    return .cookieRefreshedWithUpdate
-                case .subscriptionCookieRefreshedWithDelete:
-                    return .cookieRefreshedWithDelete
+                case .subscriptionCookieRefreshedWithAccessToken:
+                    return .cookieRefreshedWithAccessToken
+                case .subscriptionCookieRefreshedWithEmptyValue:
+                    return .cookieRefreshedWithEmptyValue
                 case .failedToSetSubscriptionCookie:
                     return .failedToSetSubscriptionCookie
                 }

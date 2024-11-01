@@ -61,7 +61,7 @@ final class AddressBarButtonsViewController: NSViewController {
     @IBOutlet weak var imageButtonWrapper: NSView!
     @IBOutlet weak var imageButton: NSButton!
     @IBOutlet weak var clearButton: NSButton!
-    @IBOutlet weak var buttonsContainer: NSStackView!
+    @IBOutlet private weak var buttonsContainer: NSStackView!
 
     @IBOutlet weak var animationWrapperView: NSView!
     var trackerAnimationView1: LottieAnimationView!
@@ -72,7 +72,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     @IBOutlet weak var notificationAnimationView: NavigationBarBadgeAnimationView!
 
-    @IBOutlet weak var permissionButtons: NSView!
+    @IBOutlet private weak var permissionButtons: NSView!
     @IBOutlet weak var cameraButton: PermissionButton! {
         didSet {
             cameraButton.isHidden = true
@@ -368,7 +368,7 @@ final class AddressBarButtonsViewController: NSViewController {
                 return
             }
         }
-        guard button.isShown, permissionButtons.isShown else { return }
+        guard button.isVisible else { return }
 
         (popover.contentViewController as? PermissionAuthorizationViewController)?.query = query
         popover.show(relativeTo: button.bounds, of: button, preferredEdge: .maxY)
