@@ -53,7 +53,7 @@ jobs:
 
     timeout-minutes: 120
 
-   steps:
+    steps:
     - name: Register SSH keys for certificates repository and PIR fake broker repository access
       uses: webfactory/ssh-agent@v0.7.0
       with:
