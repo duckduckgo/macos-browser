@@ -42,7 +42,7 @@ final class LocalBitwardenInstallationService: BWInstallationService {
     static var bundlePath = "/Applications/Bitwarden.app"
     private lazy var bundleUrl = URL(fileURLWithPath: Self.bundlePath)
     static var minimumVersion = "2022.10.1"
-    static var incompatibleVersions = ["2024.3.0", "2024.3.2", "2024.4.0", "2024.4.1"]
+    static var incompatibleVersions = ["2024.3.0", "2024.3.2", "2024.4.0", "2024.4.1", "2024.10.0", "2024.10.1", "2024.10.2"]
 
     private lazy var manifestPath: String = {
 #if DEBUG
