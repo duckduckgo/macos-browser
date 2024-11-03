@@ -33,6 +33,7 @@ extension BrokerProfileQueryData {
                      dataBrokerName: String = "test",
                      url: String = "test.com",
                      parentURL: String? = nil,
+                     optOutUrl: String? = nil,
                      lastRunDate: Date? = nil,
                      preferredRunDate: Date? = nil,
                      extractedProfile: ExtractedProfile? = nil,
@@ -48,7 +49,8 @@ extension BrokerProfileQueryData {
                 version: "1.0.0",
                 schedulingConfig: DataBrokerScheduleConfig.mock,
                 parent: parentURL,
-                mirrorSites: mirrorSites
+                mirrorSites: mirrorSites,
+                optOutUrl: optOutUrl ?? ""
             ),
             profileQuery: ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", birthYear: 50, deprecated: deprecated),
             scanJobData: ScanJobData(brokerId: 1,
@@ -623,9 +625,9 @@ final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault
 
     func fetchBroker(with name: String) throws -> DataBroker? {
         if shouldReturnOldVersionBroker {
-            return .init(id: 1, name: "Broker", url: "broker.com", steps: [Step](), version: "1.0.0", schedulingConfig: .mock)
+            return .init(id: 1, name: "Broker", url: "broker.com", steps: [Step](), version: "1.0.0", schedulingConfig: .mock, optOutUrl: "")
         } else if shouldReturnNewVersionBroker {
-            return .init(id: 1, name: "Broker", url: "broker.com", steps: [Step](), version: "1.0.1", schedulingConfig: .mock)
+            return .init(id: 1, name: "Broker", url: "broker.com", steps: [Step](), version: "1.0.1", schedulingConfig: .mock, optOutUrl: "")
         }
 
         return nil
@@ -1231,7 +1233,8 @@ extension DataBroker {
                 retryError: 0,
                 confirmOptOutScan: 0,
                 maintenanceScan: 0
-            )
+            ),
+            optOutUrl: ""
         )
     }
 }

@@ -26,11 +26,17 @@ final class UpdateNotificationPresenter {
     static let presentationTimeInterval: TimeInterval = 10
 
     func showUpdateNotification(icon: NSImage, text: String, buttonText: String? = nil, presentMultiline: Bool = false) {
-        Logger.updates.debug("Notification presented: \(text)")
+        Logger.updates.log("Notification presented: \(text)")
 
         DispatchQueue.main.async {
             guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController ?? WindowControllersManager.shared.mainWindowControllers.last,
                   let button = windowController.mainViewController.navigationBarViewController.optionsButton else {
+                return
+            }
+
+            let parentViewController = windowController.mainViewController
+
+            guard parentViewController.view.window?.isKeyWindow == true, (parentViewController.presentedViewControllers ?? []).isEmpty else {
                 return
             }
 
@@ -49,8 +55,7 @@ final class UpdateNotificationPresenter {
                 self?.openUpdatesPage()
             })
 
-            viewController.show(onParent: windowController.mainViewController,
-                                relativeTo: button)
+            viewController.show(onParent: parentViewController, relativeTo: button)
         }
     }
 

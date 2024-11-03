@@ -32,6 +32,15 @@ protocol ReleaseNotesUserScriptProvider {
 extension UserScripts: ReleaseNotesUserScriptProvider {}
 
 public struct ReleaseNotesValues: Codable {
+    enum Status: String {
+        case loaded
+        case loading
+        case updateReady
+        case updateDownloading
+        case updatePreparing
+        case updateError
+        case criticalUpdateReady
+    }
 
     let status: String
     let currentVersion: String
@@ -40,7 +49,8 @@ public struct ReleaseNotesValues: Codable {
     let releaseTitle: String?
     let releaseNotes: [String]?
     let releaseNotesPrivacyPro: [String]?
-
+    let downloadProgress: Double?
+    let automaticUpdate: Bool?
 }
 
 final class ReleaseNotesTabExtension: NavigationResponder {
@@ -84,7 +94,7 @@ final class ReleaseNotesTabExtension: NavigationResponder {
             return
         }
         let updateController = Application.appDelegate.updateController!
-        Publishers.CombineLatest(updateController.isUpdateBeingLoadedPublisher, updateController.latestUpdatePublisher)
+        Publishers.CombineLatest(updateController.updateProgressPublisher, updateController.latestUpdatePublisher)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 guard let self else { return }
@@ -93,6 +103,14 @@ final class ReleaseNotesTabExtension: NavigationResponder {
             .store(in: &cancellables)
     }
 
+    @MainActor
+    func navigationDidFinish(_ navigation: Navigation) {
+#if !DEBUG
+        guard NSApp.runType != .uiTests, navigation.url.isReleaseNotesScheme else { return }
+        let updateController = Application.appDelegate.updateController!
+        updateController.checkForUpdateIfNeeded()
+#endif
+    }
 }
 
 protocol ReleaseNotesTabExtensionProtocol: AnyObject, NavigationResponder {}
@@ -107,49 +125,87 @@ extension TabExtensions {
 
 extension ReleaseNotesValues {
 
-    init(status: String,
+    init(status: Status,
          currentVersion: String,
-         lastUpdate: UInt) {
-        self.init(status: status,
-                  currentVersion: currentVersion,
-                  latestVersion: nil,
-                  lastUpdate: lastUpdate,
-                  releaseTitle: nil,
-                  releaseNotes: nil,
-                  releaseNotesPrivacyPro: nil)
+         latestVersion: String? = nil,
+         lastUpdate: UInt,
+         releaseTitle: String? = nil,
+         releaseNotes: [String]? = nil,
+         releaseNotesPrivacyPro: [String]? = nil,
+         downloadProgress: Double? = nil,
+         automaticUpdate: Bool? = nil) {
+        self.status = status.rawValue
+        self.currentVersion = currentVersion
+        self.latestVersion = latestVersion
+        self.lastUpdate = lastUpdate
+        self.releaseTitle = releaseTitle
+        self.releaseNotes = releaseNotes
+        self.releaseNotesPrivacyPro = releaseNotesPrivacyPro
+        self.downloadProgress = downloadProgress
+        self.automaticUpdate = automaticUpdate
     }
 
     init(from updateController: UpdateController?) {
         let currentVersion = "\(AppVersion().versionNumber) (\(AppVersion().buildNumber))"
         let lastUpdate = UInt((updateController?.lastUpdateCheckDate ?? Date()).timeIntervalSince1970)
-        let status: String
-        let latestVersion: String
 
-        guard let updateController, !updateController.isUpdateBeingLoaded else {
-            self.init(status: "loading",
+        guard let updateController, let latestUpdate = updateController.latestUpdate else {
+            self.init(status: updateController?.updateProgress.toStatus ?? .loaded,
                       currentVersion: currentVersion,
                       lastUpdate: lastUpdate)
             return
         }
 
-        if let latestUpdate = updateController.latestUpdate {
-            status = latestUpdate.isInstalled ? "loaded" : "updateReady"
-            latestVersion = "\(latestUpdate.version) (\(latestUpdate.build))"
-            self.init(status: status,
-                      currentVersion: currentVersion,
-                      latestVersion: latestVersion,
-                      lastUpdate: lastUpdate,
-                      releaseTitle: latestUpdate.title,
-                      releaseNotes: latestUpdate.releaseNotes,
-                      releaseNotesPrivacyPro: latestUpdate.releaseNotesPrivacyPro)
-            return
-        } else {
-            self.init(status: "loaded",
-                      currentVersion: currentVersion,
-                      lastUpdate: lastUpdate)
+        let updateState = UpdateState(from: updateController.latestUpdate, progress: updateController.updateProgress)
+
+        let status: Status
+        let downloadProgress: Double?
+        switch updateState {
+        case .upToDate:
+            status = .loaded
+            downloadProgress = nil
+        case .updateCycle(let progress):
+            if updateController.hasPendingUpdate {
+                status = updateController.latestUpdate?.type == .critical ? .criticalUpdateReady : .updateReady
+            } else {
+                status = progress.toStatus
+            }
+            downloadProgress = progress.toDownloadProgress
+        }
+
+        self.init(status: status,
+                  currentVersion: currentVersion,
+                  latestVersion: latestUpdate.versionString,
+                  lastUpdate: lastUpdate,
+                  releaseTitle: latestUpdate.title,
+                  releaseNotes: latestUpdate.releaseNotes,
+                  releaseNotesPrivacyPro: latestUpdate.releaseNotesPrivacyPro,
+                  downloadProgress: downloadProgress,
+                  automaticUpdate: updateController.areAutomaticUpdatesEnabled)
+    }
+}
+
+private extension Update {
+    var versionString: String? {
+        "\(version) \(build)"
+    }
+}
+
+private extension UpdateCycleProgress {
+    var toStatus: ReleaseNotesValues.Status {
+        switch self {
+        case .updateCycleDidStart: return .loading
+        case .downloadDidStart, .downloading: return .updateDownloading
+        case .extractionDidStart, .extracting, .readyToInstallAndRelaunch, .installationDidStart, .installing: return .updatePreparing
+        case .updaterError: return .updateError
+        case .updateCycleNotStarted, .updateCycleDone: return .updateReady
         }
     }
 
+    var toDownloadProgress: Double? {
+        guard case .downloading(let percentage) = self else { return nil }
+        return percentage
+    }
 }
 
 #else
