@@ -8,3 +8,4 @@ on:
 jobs:
   call-sub-workflow:
     uses: ./.github/workflows/pir_end_to_end_tests.yml
+    secrets: inherit
