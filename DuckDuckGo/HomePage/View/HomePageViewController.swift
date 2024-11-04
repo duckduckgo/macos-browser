@@ -23,6 +23,7 @@ import SwiftUI
 import History
 import PixelKit
 import RemoteMessaging
+import Freemium
 
 @MainActor
 final class HomePageViewController: NSViewController {
@@ -32,6 +33,7 @@ final class HomePageViewController: NSViewController {
     private let historyCoordinating: HistoryCoordinating
     private let fireViewModel: FireViewModel
     private let onboardingViewModel: OnboardingViewModel
+    private let freemiumDBPPromotionViewCoordinator: FreemiumDBPPromotionViewCoordinator
 
     private(set) lazy var faviconsFetcherOnboarding: FaviconsFetcherOnboarding? = {
         guard let syncService = NSApp.delegateTyped.syncService, let syncBookmarksAdapter = NSApp.delegateTyped.syncDataProviders?.bookmarksAdapter else {
@@ -70,6 +72,7 @@ final class HomePageViewController: NSViewController {
          accessibilityPreferences: AccessibilityPreferences = AccessibilityPreferences.shared,
          appearancePreferences: AppearancePreferences = AppearancePreferences.shared,
          defaultBrowserPreferences: DefaultBrowserPreferences = DefaultBrowserPreferences.shared,
+         freemiumDBPPromotionViewCoordinator: FreemiumDBPPromotionViewCoordinator,
          privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
@@ -80,6 +83,7 @@ final class HomePageViewController: NSViewController {
         self.accessibilityPreferences = accessibilityPreferences
         self.appearancePreferences = appearancePreferences
         self.defaultBrowserPreferences = defaultBrowserPreferences
+        self.freemiumDBPPromotionViewCoordinator = freemiumDBPPromotionViewCoordinator
         self.privacyConfigurationManager = privacyConfigurationManager
 
         super.init(nibName: nil, bundle: nil)
@@ -94,7 +98,7 @@ final class HomePageViewController: NSViewController {
 
         refreshModels()
 
-        let rootView = HomePage.Views.RootView(isBurner: tabCollectionViewModel.isBurner)
+        let rootView = HomePage.Views.RootView(isBurner: tabCollectionViewModel.isBurner, freemiumDBPPromotionViewCoordinator: freemiumDBPPromotionViewCoordinator)
             .environmentObject(favoritesModel)
             .environmentObject(defaultBrowserModel)
             .environmentObject(recentlyVisitedModel)
@@ -126,7 +130,6 @@ final class HomePageViewController: NSViewController {
     override func viewDidAppear() {
         super.viewDidAppear()
         refreshModels()
-        addressBarModel.addressBarTextField?.makeMeFirstResponder()
 
         showSettingsOnboardingIfNeeded()
     }
@@ -276,7 +279,7 @@ final class HomePageViewController: NSViewController {
     }
 
     private func showSettingsOnboardingIfNeeded() {
-        if !settingsVisibilityModel.didShowSettingsOnboarding {
+        if addressBarModel.shouldShowAddressBar && !settingsVisibilityModel.didShowSettingsOnboarding {
             // async dispatch in order to get the final value for self.view.bounds
             DispatchQueue.main.async {
                 guard let superview = self.view.superview else {
@@ -349,5 +352,4 @@ final class HomePageViewController: NSViewController {
                 self?.refreshModels()
             }
     }
-
 }

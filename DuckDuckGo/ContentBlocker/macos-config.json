@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1729758880206,
+    "version": 1730109523334,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -61,22 +61,24 @@
             "hash": "b813ade8472a097ffbd43a3331116fe1"
         },
         "aiChat": {
-            "state": "disabled",
+            "state": "enabled",
             "exceptions": [],
             "features": {
                 "toolbarShortcut": {
-                    "state": "disabled"
+                    "state": "enabled"
                 },
                 "applicationMenuShortcut": {
-                    "state": "disabled"
+                    "state": "enabled"
                 }
             },
             "settings": {
                 "aiChatURL": "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=2",
                 "onboardingCookieName": "dcm",
-                "onboardingCookieDomain": "duckduckgo.com"
+                "onboardingCookieDomain": "duckduckgo.com",
+                "aiChatURLIdentifiableQuery": "ia",
+                "aiChatURLIdentifiableQueryValue": "chat"
             },
-            "hash": "64a9f318c4cfd9fc702e641d2a69347b"
+            "hash": "e5711b3f4ceff89cd5c2d70b19a96875"
         },
         "ampLinks": {
             "exceptions": [
@@ -374,6 +376,9 @@
                     "domain": "speedweek.com"
                 },
                 {
+                    "domain": "la-becanerie.com"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -397,10 +402,10 @@
             "state": "enabled",
             "features": {
                 "filterlistExperiment2": {
-                    "state": "disabled"
+                    "state": "enabled"
                 }
             },
-            "hash": "f1e901d6a8760c275cebbac1bf70529a"
+            "hash": "419e42a27cc5daa895b567f1e3c1bd6b"
         },
         "autofillBreakageReporter": {
             "state": "disabled",
@@ -1286,6 +1291,11 @@
                 }
             ],
             "hash": "d02882dcee87a42b7d29bb6f2e21b4ca"
+        },
+        "contextualOnboarding": {
+            "exceptions": [],
+            "state": "enabled",
+            "hash": "52857469413a66e8b0c7b00de5589162"
         },
         "cookie": {
             "settings": {
@@ -8935,6 +8945,16 @@
                             }
                         ]
                     },
+                    "svonm.com": {
+                        "rules": [
+                            {
+                                "rule": "hgc-cf-cache-1.svonm.com",
+                                "domains": [
+                                    "t-online.de"
+                                ]
+                            }
+                        ]
+                    },
                     "taboola.com": {
                         "rules": [
                             {
@@ -9422,7 +9442,7 @@
                     "domain": "instructure.com"
                 }
             ],
-            "hash": "2cc872ccc68d442e2266666f731709e2"
+            "hash": "4a71922e4eb31060dced0b091ad797e7"
         },
         "trackingCookies1p": {
             "settings": {

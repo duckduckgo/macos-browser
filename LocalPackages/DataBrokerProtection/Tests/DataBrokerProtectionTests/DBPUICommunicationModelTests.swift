@@ -46,7 +46,8 @@ final class DBPUICommunicationModelTests: XCTestCase {
                                                        dataBrokerName: "doesn't matter for the test",
                                                        dataBrokerURL: "see above",
                                                        dataBrokerParentURL: "whatever",
-                                                       parentBrokerOptOutJobData: nil)
+                                                       parentBrokerOptOutJobData: nil,
+                                                       optOutUrl: "broker.com")
 
         // Then
         XCTAssertEqual(profileMatch.foundDate, createdDate.timeIntervalSince1970)
@@ -77,7 +78,8 @@ final class DBPUICommunicationModelTests: XCTestCase {
                                                        dataBrokerName: "doesn't matter for the test",
                                                        dataBrokerURL: "see above",
                                                        dataBrokerParentURL: "whatever",
-                                                       parentBrokerOptOutJobData: nil)
+                                                       parentBrokerOptOutJobData: nil,
+                                                       optOutUrl: "broker.com")
 
         // Then
         XCTAssertEqual(profileMatch.foundDate, foundEventDate.timeIntervalSince1970)
@@ -116,7 +118,8 @@ final class DBPUICommunicationModelTests: XCTestCase {
                                                        dataBrokerName: "doesn't matter for the test",
                                                        dataBrokerURL: "see above",
                                                        dataBrokerParentURL: "whatever",
-                                                       parentBrokerOptOutJobData: nil)
+                                                       parentBrokerOptOutJobData: nil,
+                                                       optOutUrl: "broker.com")
 
         // Then
         XCTAssertEqual(profileMatch.foundDate, foundEventDate2.timeIntervalSince1970)
@@ -147,7 +150,8 @@ final class DBPUICommunicationModelTests: XCTestCase {
                                                        dataBrokerName: "doesn't matter for the test",
                                                        dataBrokerURL: "see above",
                                                        dataBrokerParentURL: "whatever",
-                                                       parentBrokerOptOutJobData: [parentOptOut])
+                                                       parentBrokerOptOutJobData: [parentOptOut],
+                                                       optOutUrl: "broker.com")
 
         // Then
         XCTAssertTrue(profileMatch.hasMatchingRecordOnParentBroker)
@@ -177,7 +181,8 @@ final class DBPUICommunicationModelTests: XCTestCase {
                                                        dataBrokerParentURL: "whatever",
                                                        parentBrokerOptOutJobData: [parentOptOutNonmatching1,
                                                                                    parentOptOutMatching,
-                                                                                   parentOptOutNonmatching2])
+                                                                                   parentOptOutNonmatching2],
+                                                       optOutUrl: "broker.com")
 
         // Then
         XCTAssertTrue(profileMatch.hasMatchingRecordOnParentBroker)
@@ -203,7 +208,8 @@ final class DBPUICommunicationModelTests: XCTestCase {
                                                        dataBrokerURL: "see above",
                                                        dataBrokerParentURL: "whatever",
                                                        parentBrokerOptOutJobData: [parentOptOutNonmatching1,
-                                                                                   parentOptOutNonmatching2])
+                                                                                   parentOptOutNonmatching2],
+                                                       optOutUrl: "broker.com")
 
         // Then
         XCTAssertFalse(profileMatch.hasMatchingRecordOnParentBroker)
@@ -225,9 +231,70 @@ final class DBPUICommunicationModelTests: XCTestCase {
                                                        dataBrokerName: "doesn't matter for the test",
                                                        dataBrokerURL: "see above",
                                                        dataBrokerParentURL: "whatever",
-                                                       parentBrokerOptOutJobData: [parentOptOut])
+                                                       parentBrokerOptOutJobData: [parentOptOut],
+                                                       optOutUrl: "broker.com")
 
         // Then
         XCTAssertTrue(profileMatch.hasMatchingRecordOnParentBroker)
+    }
+
+    // MARK: - `profileMatches` Broker OptOut URL & Name tests
+
+    func testProfileMatches_optOutUrlAndBrokerNameForChildBroker() {
+        // Given
+        let extractedProfile = ExtractedProfile(id: 1, name: "Sample Name", profileUrl: "profile.com")
+
+        let childBroker = BrokerProfileQueryData.mock(
+            dataBrokerName: "ChildBroker",
+            url: "child.com",
+            parentURL: "parent.com",
+            optOutUrl: "child.com/optout",
+            extractedProfile: extractedProfile
+        )
+
+        let parentBroker = BrokerProfileQueryData.mock(
+            dataBrokerName: "ParentBroker",
+            url: "parent.com",
+            optOutUrl: "parent.com/optout",
+            extractedProfile: extractedProfile
+        )
+
+        // When
+        let results = DBPUIDataBrokerProfileMatch.profileMatches(from: [childBroker, parentBroker])
+
+        // Then
+        XCTAssertEqual(results.count, 2)
+
+        let childProfile = results.first { $0.dataBroker.name == "ChildBroker" }
+        XCTAssertEqual(childProfile?.dataBroker.optOutUrl, "child.com/optout")
+    }
+
+    func testProfileMatches_optOutUrlAndBrokerNameForParentBroker() {
+        // Given
+        let extractedProfile = ExtractedProfile(id: 1, name: "Sample Name", profileUrl: "profile.com")
+
+        let childBroker = BrokerProfileQueryData.mock(
+            dataBrokerName: "ChildBroker",
+            url: "child.com",
+            parentURL: "parent.com",
+            optOutUrl: "parent.com/optout",
+            extractedProfile: extractedProfile
+        )
+
+        let parentBroker = BrokerProfileQueryData.mock(
+            dataBrokerName: "ParentBroker",
+            url: "parent.com",
+            optOutUrl: "parent.com/optout",
+            extractedProfile: extractedProfile
+        )
+
+        // When
+        let results = DBPUIDataBrokerProfileMatch.profileMatches(from: [childBroker, parentBroker])
+
+        // Then
+        XCTAssertEqual(results.count, 2)
+
+        let childProfile = results.first { $0.dataBroker.name == "ChildBroker" }
+        XCTAssertEqual(childProfile?.dataBroker.optOutUrl, "parent.com/optout")
     }
 }

@@ -23,11 +23,12 @@ protocol ContextualOnboardingDialogTypeProviding {
     func dialogTypeForTab(_ tab: Tab, privacyInfo: PrivacyInfo?) -> ContextualDialogType?
 }
 
-protocol ContextualOnboardingStateUpdater {
+protocol ContextualOnboardingStateUpdater: AnyObject {
     var state: ContextualOnboardingState { get }
     func updateStateFor(tab: Tab)
     func gotItPressed()
     func fireButtonUsed()
+    func turnOffFeature()
 }
 
 protocol FireButtonInfoStateProviding {
@@ -48,7 +49,7 @@ enum ContextualDialogType: Equatable {
     case highFive
 }
 
-enum ContextualOnboardingState: String {
+enum ContextualOnboardingState: String, CaseIterable {
 
     // The contextual onboarding has not started. This state should apply only during the linear onboarding.
     case notStarted
@@ -380,5 +381,9 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
         default:
             break
         }
+    }
+
+    func turnOffFeature() {
+        state = .onboardingCompleted
     }
 }

@@ -24,6 +24,8 @@ import PixelKit
 import NetworkProtection
 import Subscription
 import os.log
+import Freemium
+import DataBrokerProtection
 
 protocol OptionsButtonMenuDelegate: AnyObject {
 
@@ -47,7 +49,7 @@ protocol OptionsButtonMenuDelegate: AnyObject {
     func optionsButtonMenuRequestedIdentityTheftRestoration(_ menu: NSMenu)
 }
 
-final class MoreOptionsMenu: NSMenu {
+final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
 
     weak var actionDelegate: OptionsButtonMenuDelegate?
 
@@ -59,10 +61,19 @@ final class MoreOptionsMenu: NSMenu {
     private lazy var sharingMenu: NSMenu = SharingMenu(title: UserText.shareMenuItem)
     private var accountManager: AccountManager { subscriptionManager.accountManager }
     private let subscriptionManager: SubscriptionManager
+    private let freemiumDBPUserStateManager: FreemiumDBPUserStateManager
+    private let freemiumDBPFeature: FreemiumDBPFeature
+    private let freemiumDBPPresenter: FreemiumDBPPresenter
+    private let appearancePreferences: AppearancePreferences
+
+    private let notificationCenter: NotificationCenter
 
     private let vpnFeatureGatekeeper: VPNFeatureGatekeeper
     private let subscriptionFeatureAvailability: SubscriptionFeatureAvailability
     private let aiChatMenuConfiguration: AIChatMenuVisibilityConfigurable
+
+    /// The `FreemiumDBPExperimentPixelHandler` instance used to fire pixels
+    private let freemiumDBPExperimentPixelHandler: EventMapping<FreemiumDBPExperimentPixel>
 
     required init(coder: NSCoder) {
         fatalError("MoreOptionsMenu: Bad initializer")
@@ -77,6 +88,12 @@ final class MoreOptionsMenu: NSMenu {
          sharingMenu: NSMenu? = nil,
          internalUserDecider: InternalUserDecider,
          subscriptionManager: SubscriptionManager,
+         freemiumDBPUserStateManager: FreemiumDBPUserStateManager = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp),
+         freemiumDBPFeature: FreemiumDBPFeature,
+         freemiumDBPPresenter: FreemiumDBPPresenter = DefaultFreemiumDBPPresenter(),
+         appearancePreferences: AppearancePreferences = .shared,
+         notificationCenter: NotificationCenter = .default,
+         freemiumDBPExperimentPixelHandler: EventMapping<FreemiumDBPExperimentPixel> = FreemiumDBPExperimentPixelHandler(),
          aiChatMenuConfiguration: AIChatMenuVisibilityConfigurable = AIChatMenuConfiguration()) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
@@ -86,6 +103,12 @@ final class MoreOptionsMenu: NSMenu {
         self.subscriptionFeatureAvailability = subscriptionFeatureAvailability
         self.internalUserDecider = internalUserDecider
         self.subscriptionManager = subscriptionManager
+        self.freemiumDBPUserStateManager = freemiumDBPUserStateManager
+        self.freemiumDBPFeature = freemiumDBPFeature
+        self.freemiumDBPPresenter = freemiumDBPPresenter
+        self.appearancePreferences = appearancePreferences
+        self.notificationCenter = notificationCenter
+        self.freemiumDBPExperimentPixelHandler = freemiumDBPExperimentPixelHandler
         self.aiChatMenuConfiguration = aiChatMenuConfiguration
 
         super.init(title: "")
@@ -94,6 +117,8 @@ final class MoreOptionsMenu: NSMenu {
             self.sharingMenu = sharingMenu
         }
         self.emailManager.requestDelegate = self
+
+        delegate = self
 
         setupMenuItems()
     }
@@ -139,7 +164,7 @@ final class MoreOptionsMenu: NSMenu {
 
         addItem(NSMenuItem.separator())
 
-        addSubscriptionItems()
+        addSubscriptionAndFreemiumDBPItems()
 
         addPageItems()
 
@@ -264,6 +289,19 @@ final class MoreOptionsMenu: NSMenu {
     }
 
     @MainActor
+    @objc func openFreemiumDBP(_ sender: NSMenuItem) {
+
+        if freemiumDBPUserStateManager.didPostFirstProfileSavedNotification {
+            freemiumDBPExperimentPixelHandler.fire(FreemiumDBPExperimentPixel.overFlowResults)
+        } else {
+            freemiumDBPExperimentPixelHandler.fire(FreemiumDBPExperimentPixel.overFlowScan)
+        }
+
+        freemiumDBPPresenter.showFreemiumDBPAndSetActivated(windowControllerManager: WindowControllersManager.shared)
+        notificationCenter.post(name: .freemiumDBPEntryPointActivated, object: nil)
+    }
+
+    @MainActor
     @objc func findInPage(_ sender: NSMenuItem) {
         tabCollectionViewModel.selectedTabViewModel?.showFindInPage()
     }
@@ -275,8 +313,10 @@ final class MoreOptionsMenu: NSMenu {
     private func addUpdateItem() {
 #if SPARKLE
         guard NSApp.runType != .uiTests,
-            let update = Application.appDelegate.updateController.latestUpdate,
-            !update.isInstalled
+              let updateController = Application.appDelegate.updateController,
+              let update = updateController.latestUpdate,
+              !update.isInstalled,
+              updateController.updateProgress.isDone
         else {
             return
         }
@@ -345,6 +385,14 @@ final class MoreOptionsMenu: NSMenu {
     }
 
     @MainActor
+    private func addSubscriptionAndFreemiumDBPItems() {
+        addSubscriptionItems()
+        addFreemiumDBPItem()
+
+        addItem(NSMenuItem.separator())
+    }
+
+    @MainActor
     private func addSubscriptionItems() {
         guard subscriptionFeatureAvailability.isFeatureAvailable else { return }
 
@@ -362,15 +410,25 @@ final class MoreOptionsMenu: NSMenu {
             // Do not add for App Store when purchase not available in the region
             if !shouldHideDueToNoProduct() {
                 addItem(privacyProItem)
-                addItem(NSMenuItem.separator())
             }
         } else {
             privacyProItem.submenu = SubscriptionSubMenu(targeting: self,
                                                          subscriptionFeatureAvailability: DefaultSubscriptionFeatureAvailability(),
                                                          accountManager: accountManager)
             addItem(privacyProItem)
-            addItem(NSMenuItem.separator())
         }
+    }
+
+    @MainActor
+    private func addFreemiumDBPItem() {
+        guard freemiumDBPFeature.isAvailable else { return }
+
+        let freemiumDBPItem = NSMenuItem(title: UserText.freemiumDBPOptionsMenuItem).withImage(.dbpIcon)
+
+        freemiumDBPItem.target = self
+        freemiumDBPItem.action = #selector(openFreemiumDBP(_:))
+
+        addItem(freemiumDBPItem)
     }
 
     @MainActor
@@ -424,6 +482,14 @@ final class MoreOptionsMenu: NSMenu {
         return networkProtectionItem
     }
 
+    func menuWillOpen(_ menu: NSMenu) {
+#if SPARKLE
+        guard let updateController = Application.appDelegate.updateController else { return }
+        if updateController.hasPendingUpdate && updateController.needsNotificationDot {
+            updateController.needsNotificationDot = false
+        }
+#endif
+    }
 }
 
 final class EmailOptionsButtonSubMenu: NSMenu {

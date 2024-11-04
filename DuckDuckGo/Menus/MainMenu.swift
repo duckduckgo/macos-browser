@@ -611,6 +611,7 @@ final class MainMenu: NSMenu {
                     NSMenuItem(title: "150 Tabs", action: #selector(MainViewController.addDebugTabs(_:)), representedObject: 150)
                 }
             }
+            NSMenuItem(title: "Skip Onboarding", action: #selector(MainViewController.skipOnboarding))
             NSMenuItem(title: "Reset Data") {
                 NSMenuItem(title: "Reset Default Browser Prompt", action: #selector(MainViewController.resetDefaultBrowserPrompt))
                 NSMenuItem(title: "Reset Default Grammar Checks", action: #selector(MainViewController.resetDefaultGrammarChecks))
@@ -662,6 +663,8 @@ final class MainMenu: NSMenu {
 
             NSMenuItem(title: "Personal Information Removal")
                 .submenu(DataBrokerProtectionDebugMenu())
+
+            FreemiumDebugMenu()
 
             if case .normal = NSApp.runType {
                 NSMenuItem(title: "VPN")

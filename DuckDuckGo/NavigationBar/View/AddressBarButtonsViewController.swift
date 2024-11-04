@@ -61,7 +61,7 @@ final class AddressBarButtonsViewController: NSViewController {
     @IBOutlet weak var imageButtonWrapper: NSView!
     @IBOutlet weak var imageButton: NSButton!
     @IBOutlet weak var clearButton: NSButton!
-    @IBOutlet weak var buttonsContainer: NSStackView!
+    @IBOutlet private weak var buttonsContainer: NSStackView!
 
     @IBOutlet weak var animationWrapperView: NSView!
     var trackerAnimationView1: LottieAnimationView!
@@ -72,7 +72,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     @IBOutlet weak var notificationAnimationView: NavigationBarBadgeAnimationView!
 
-    @IBOutlet weak var permissionButtons: NSView!
+    @IBOutlet private weak var permissionButtons: NSView!
     @IBOutlet weak var cameraButton: PermissionButton! {
         didSet {
             cameraButton.isHidden = true
@@ -110,6 +110,8 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     @Published private(set) var buttonsWidth: CGFloat = 0
+
+    private let onboardingPixelReporter: OnboardingAddressBarReporting
 
     private var tabCollectionViewModel: TabCollectionViewModel
     private var tabViewModel: TabViewModel? {
@@ -171,10 +173,12 @@ final class AddressBarButtonsViewController: NSViewController {
     init?(coder: NSCoder,
           tabCollectionViewModel: TabCollectionViewModel,
           accessibilityPreferences: AccessibilityPreferences = AccessibilityPreferences.shared,
-          popovers: NavigationBarPopovers?) {
+          popovers: NavigationBarPopovers?,
+          onboardingPixelReporter: OnboardingAddressBarReporting = OnboardingPixelReporter()) {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.accessibilityPreferences = accessibilityPreferences
         self.popovers = popovers
+        self.onboardingPixelReporter = onboardingPixelReporter
         super.init(coder: coder)
     }
 
@@ -266,6 +270,7 @@ final class AddressBarButtonsViewController: NSViewController {
         popupBlockedPopover?.close()
 
         popovers?.togglePrivacyDashboardPopover(for: tabViewModel, from: privacyEntryPointButton)
+        onboardingPixelReporter.trackPrivacyDashboardOpened()
     }
 
     private func updateBookmarkButtonVisibility() {
@@ -363,7 +368,7 @@ final class AddressBarButtonsViewController: NSViewController {
                 return
             }
         }
-        guard button.isShown, permissionButtons.isShown else { return }
+        guard button.isVisible else { return }
 
         (popover.contentViewController as? PermissionAuthorizationViewController)?.query = query
         popover.show(relativeTo: button.bounds, of: button, preferredEdge: .maxY)
