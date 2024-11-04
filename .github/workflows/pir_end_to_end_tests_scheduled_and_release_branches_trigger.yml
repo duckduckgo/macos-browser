@@ -1,6 +1,6 @@
 name: PIR E2E Tests Scheduled and release branches trigger
 
-workflow_dispatch:
+on:
   schedule:
      - cron: '0 3 * * 1-5' # 3AM UTC offsetted to legacy to avoid action-junit-report@v4 bug
   pull_request:
