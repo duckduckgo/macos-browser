@@ -19,8 +19,6 @@ jobs:
             runner: macos-14-xlarge
 
     if: |
-    #  startsWith(github.base_ref, 'release/') ||
-    #  startsWith(github.base_ref, 'hotfix/') ||
       contains(github.ref_name, 'loremattei/') ||
     #  contains(toJson(github.event.pull_request.files.*.filename), 'DBPE2ETests/') ||
     #  contains(toJson(github.event.pull_request.files.*.filename), 'LocalPackages/DataBrokerProtection/') ||
