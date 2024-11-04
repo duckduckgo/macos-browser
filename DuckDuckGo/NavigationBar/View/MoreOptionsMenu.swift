@@ -127,8 +127,6 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
     }
 
     let zoomMenuItem = NSMenuItem(title: UserText.zoom, action: nil, keyEquivalent: "").withImage(.optionsButtonMenuZoom)
-    private(set) lazy var setAsDefaultMenuItem = NSMenuItem(title: UserText.setAsDefaultBrowser, action: #selector(setAsDefault(_:)), target: self)
-        .withImage(.defaultBrowserMenuItem)
 
     @MainActor
     private func setupMenuItems() {
@@ -152,7 +150,12 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
 
 #endif // FEEDBACK
 
-        addItem(setAsDefaultMenuItem)
+        if !defaultBrowserPreferences.isDefault {
+            let setAsDefaultMenuItem = NSMenuItem(title: UserText.setAsDefaultBrowser, action: #selector(setAsDefault(_:)))
+                .targetting(self)
+                .withImage(.defaultBrowserMenuItem)
+            addItem(setAsDefaultMenuItem)
+        }
 
         addItem(NSMenuItem.separator())
 
@@ -183,12 +186,6 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
             .targetting(self)
             .withImage(.preferences)
         addItem(preferencesItem)
-    }
-
-    override func update() {
-        super.update()
-
-        setAsDefaultMenuItem.isHidden = defaultBrowserPreferences.isDefault
     }
 
     @objc func openDataBrokerProtection(_ sender: NSMenuItem) {
