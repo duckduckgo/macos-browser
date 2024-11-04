@@ -21,11 +21,11 @@ import PackagePlugin
 import XcodeProjectPlugin
 
 let nonSandboxedExtraInputFiles: Set<InputFile> = [
-    .init("BinaryOwnershipChecker.swift", .source),
     .init("BWEncryption.m", .source),
     .init("BWEncryptionOutput.m", .source),
     .init("BWManager.swift", .source),
     .init("UpdateController.swift", .source),
+    .init("UpdateUserDriver.swift", .source),
     .init("PFMoveApplication.m", .source),
     .init("DuckDuckGo VPN.app", .unknown),
     .init("DuckDuckGo Notifications.app", .unknown),
@@ -50,7 +50,6 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
     "DuckDuckGo Privacy Pro": nonSandboxedExtraInputFiles,
 
     "Unit Tests": [
-        .init("BinaryOwnershipCheckerTests.swift", .source),
         .init("BWEncryptionTests.swift", .source),
         .init("WKWebViewPrivateMethodsAvailabilityTests.swift", .source)
     ],

@@ -40,6 +40,9 @@ final class MoreOptionsMenuButton: MouseOverButton {
     var isNotificationVisible: Bool = false {
         didSet {
             updateNotificationVisibility()
+#if SPARKLE
+            needsDisplay = isNotificationVisible != oldValue
+#endif
         }
     }
 
@@ -50,8 +53,8 @@ final class MoreOptionsMenuButton: MouseOverButton {
         if NSApp.runType != .uiTests {
             updateController = Application.appDelegate.updateController
         }
-#endif
         subscribeToUpdateInfo()
+#endif
     }
 
     override func updateLayer() {
@@ -61,10 +64,11 @@ final class MoreOptionsMenuButton: MouseOverButton {
 
     private func subscribeToUpdateInfo() {
 #if SPARKLE
-        cancellable = updateController?.isUpdateAvailableToInstallPublisher
+        guard let updateController else { return }
+        cancellable = Publishers.CombineLatest(updateController.hasPendingUpdatePublisher, updateController.notificationDotPublisher)
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] isAvailable in
-                self?.isNotificationVisible = isAvailable
+            .sink { [weak self] hasPendingUpdate, needsNotificationDot in
+                self?.isNotificationVisible = hasPendingUpdate && needsNotificationDot
             }
 #endif
     }

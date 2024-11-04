@@ -56,6 +56,7 @@ enum UITests {
     /// - Parameter requestedToggleState: How the autocomplete checkbox state should be set
     static func setAutocompleteToggleBeforeTestcaseRuns(_ requestedToggleState: Bool) {
         let app = XCUIApplication()
+        app.launchEnvironment["UITEST_MODE"] = "1"
         app.launch()
 
         app.typeKey(",", modifierFlags: [.command]) // Open settings
@@ -96,6 +97,7 @@ enum UITests {
             notificationCenter.typeKey(.escape, modifierFlags: [])
         }
         let app = XCUIApplication()
+        app.launchEnvironment["UITEST_MODE"] = "1"
         app.launch()
         app.typeKey("n", modifierFlags: .command)
         app.typeKey("w", modifierFlags: [.command, .option])
