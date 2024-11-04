@@ -43,6 +43,7 @@ final class ReleaseNotesUserScript: NSObject, Subfeature {
         case reportPageException
         case reportInitException
         case browserRestart
+        case retryUpdate
     }
 
     override init() {
@@ -57,7 +58,8 @@ final class ReleaseNotesUserScript: NSObject, Subfeature {
         .initialSetup: initialSetup,
         .reportPageException: reportPageException,
         .reportInitException: reportInitException,
-        .browserRestart: browserRestart
+        .browserRestart: browserRestart,
+        .retryUpdate: retryUpdate,
     ]
 
     @MainActor
@@ -106,6 +108,14 @@ extension ReleaseNotesUserScript {
 #endif
 
         return InitialSetupResult(env: env, locale: Locale.current.identifier)
+    }
+
+    @MainActor
+    private func retryUpdate(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        DispatchQueue.main.async { [weak self] in
+            self?.updateController.checkForUpdateIfNeeded()
+        }
+        return nil
     }
 
     struct InitialSetupResult: Encodable {

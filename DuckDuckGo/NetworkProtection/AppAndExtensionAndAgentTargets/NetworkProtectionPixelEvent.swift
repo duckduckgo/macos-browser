@@ -118,6 +118,8 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
     case networkProtectionConfigurationPixelTest
     case networkProtectionConfigurationFailedToParse(_ error: Error)
 
+    case networkProtectionMalformedErrorDetected(_ error: Error)
+
     case networkProtectionUnhandledError(function: String, line: Int, error: Error)
 
     /// Name of the pixel event
@@ -348,6 +350,9 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
         case .networkProtectionConfigurationFailedToParse:
             return "netp_ev_configuration_failed_to_parse"
 
+        case .networkProtectionMalformedErrorDetected:
+            return "netp_malformed_error_detected"
+
         case .networkProtectionUnhandledError:
             return "netp_unhandled_error"
         }
@@ -466,7 +471,8 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionDNSUpdateCustom,
                 .networkProtectionDNSUpdateDefault,
                 .networkProtectionConfigurationInvalidPayload,
-                .networkProtectionConfigurationPixelTest:
+                .networkProtectionConfigurationPixelTest,
+                .networkProtectionMalformedErrorDetected:
             return nil
         }
     }
@@ -495,7 +501,8 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionSystemExtensionActivationFailure(let error),
                 .networkProtectionServerMigrationFailure(let error),
                 .networkProtectionConfigurationErrorLoadingCachedConfig(let error),
-                .networkProtectionConfigurationFailedToParse(let error):
+                .networkProtectionConfigurationFailedToParse(let error),
+                .networkProtectionMalformedErrorDetected(let error):
             return error
         case .networkProtectionActiveUser,
                 .networkProtectionNewUser,

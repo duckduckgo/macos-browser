@@ -25,25 +25,6 @@ final class AboutPreferences: ObservableObject, PreferencesTabOpening {
     static let shared = AboutPreferences()
 
 #if SPARKLE
-    enum UpdateState {
-
-        case loading
-        case upToDate
-        case newVersionAvailable
-
-        init(from update: Update?, isLoading: Bool) {
-            if isLoading {
-                self = .loading
-            } else {
-                if let update, !update.isInstalled {
-                    self = .newVersionAvailable
-                } else {
-                    self = .upToDate
-                }
-            }
-        }
-    }
-
     @Published var updateState = UpdateState.upToDate
 
     var updateController: UpdateControllerProtocol? {
@@ -90,10 +71,10 @@ final class AboutPreferences: ObservableObject, PreferencesTabOpening {
 
 #if SPARKLE
     func checkForUpdate() {
-        updateController?.checkForUpdateInBackground()
+        updateController?.checkForUpdateIfNeeded()
     }
 
-    func restartToUpdate() {
+    func runUpdate() {
         updateController?.runUpdate()
     }
 
@@ -101,7 +82,7 @@ final class AboutPreferences: ObservableObject, PreferencesTabOpening {
         guard let updateController, !subscribed else { return }
 
         cancellable = updateController.latestUpdatePublisher
-            .combineLatest(updateController.isUpdateBeingLoadedPublisher)
+            .combineLatest(updateController.updateProgressPublisher)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.refreshUpdateState()
@@ -114,7 +95,7 @@ final class AboutPreferences: ObservableObject, PreferencesTabOpening {
 
     private func refreshUpdateState() {
         guard let updateController else { return }
-        updateState = UpdateState(from: updateController.latestUpdate, isLoading: updateController.isUpdateBeingLoaded)
+        updateState = UpdateState(from: updateController.latestUpdate, progress: updateController.updateProgress)
     }
 #endif
 
