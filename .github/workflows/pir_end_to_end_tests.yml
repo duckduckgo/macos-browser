@@ -18,7 +18,8 @@ jobs:
           - xcode-version: "15.4"
             runner: macos-14-xlarge
 
-    #if: |
+    if: |
+      true
     #  startsWith(github.base_ref, 'release/') ||
     #  startsWith(github.base_ref, 'hotfix/') ||
     #  github.base_ref == 'loremattei/pir-integration-tests-for-ci/' ||
