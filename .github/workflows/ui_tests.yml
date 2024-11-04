@@ -55,18 +55,12 @@ jobs:
 
     steps:
     - name: Install screenresolution
+      if: matrix.runner == 'macos-15-xlarge'
       run: brew install screenresolution
 
-    - name: List available resolution
-      run: |
-        screenresolution list
-
-    - name: change screen resolution
+    - name: Change screen resolution
+      if: matrix.runner == 'macos-15-xlarge'
       run: screenresolution set 1920x1080x32@60
-          
-    - name: Get New Screen Resolution
-      run: |
-        screenresolution get || echo "Screen resolution data not available"
 
     - name: Register SSH key for certificates repository access
       uses: webfactory/ssh-agent@v0.7.0
