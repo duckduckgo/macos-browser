@@ -161,9 +161,13 @@ private class DummyAIChatConfig: AIChatMenuVisibilityConfigurable {
     var isFeatureEnabledForApplicationMenuShortcut = false
     var isFeatureEnabledForToolbarShortcut = false
 
-    var shortcutURL: URL { URL(string: "https://example.com")! }
-
     var valuesChangedPublisher: PassthroughSubject<Void, Never> {
         return PassthroughSubject<Void, Never>()
     }
+
+    var shouldDisplayToolbarOnboardingPopover: PassthroughSubject<Void, Never> {
+        return PassthroughSubject<Void, Never>()
+    }
+
+    func markToolbarOnboardingPopoverAsShown() { }
 }
