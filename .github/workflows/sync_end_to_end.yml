@@ -46,6 +46,14 @@ jobs:
     timeout-minutes: 60
 
     steps:
+    - name: Install screenresolution
+      if: matrix.runner == 'macos-15-xlarge'
+      run: brew install screenresolution
+
+    - name: Change screen resolution
+      if: matrix.runner == 'macos-15-xlarge'
+      run: screenresolution set 1920x1080x32@60
+
     - name: Register SSH key for certificates repository access
       uses: webfactory/ssh-agent@v0.7.0
       with:
@@ -101,16 +109,6 @@ jobs:
       id: sync-recovery-code
       with:
         debug: true
-
-    # This first bit is a hack to stop the app building package dependencies that isn't needed by the test runner
-    # Otherwise xcodebuild will attempt building BSK and linking GRDB framework that is incompatible with Xcode 15
-    - name: Build test runner
-      run: |
-        rm -rf LocalPackages
-        rm -rf DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
-        git apply dependencies.patch
-        # sed -i '' '/\/\* Begin XCSwiftPackageProductDependency section \*\//,/\/\* End XCSwiftPackageProductDependency section \*\//d' DuckDuckGo.xcodeproj/project.pbxproj
-        # sed -i '' '/\/\* Begin XCRemoteSwiftPackageReference section \*\//,/\/\* End XCRemoteSwiftPackageReference section \*\//d' DuckDuckGo.xcodeproj/project.pbxproj
 
     - name: Build Sync e2e tests
       run: |
