@@ -14370,12 +14370,12 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58C8295CF9A7002C0CC0 /* IntegrationTests.xcconfig */;
 			buildSettings = {
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = HKE973VLUW;
 				INFOPLIST_FILE = DBPE2ETests/Info.plist;
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.DBPE2ETests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "com.duckduckgo.DBPE2ETests macos";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "match Direct com.duckduckgo.DBPE2ETests macos";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/DBPE2ETests/DBPE2ETestsBridging.h";
 			};
 			name = CI;
