@@ -69,18 +69,23 @@ final class NetworkProtectionDebugMenu: NSMenu {
                 NSMenuItem(title: "Reset All State", action: #selector(NetworkProtectionDebugMenu.resetAllState))
                     .targetting(self)
 
-                NSMenuItem(title: "Reset Site Issue Alert", action: #selector(NetworkProtectionDebugMenu.resetSiteIssuesAlert(_:)))
-                    .targetting(self)
-
-                resetToDefaults
-                    .targetting(self)
-
-                NSMenuItem.separator()
+                NSMenuItem.separator() // Resetting single components should go below this point
 
                 NSMenuItem(title: "Remove Network Extension and Login Items", action: #selector(NetworkProtectionDebugMenu.removeSystemExtensionAndAgents))
                     .targetting(self)
 
                 NSMenuItem(title: "Remove VPN configuration", action: #selector(NetworkProtectionDebugMenu.removeVPNConfiguration(_:)))
+                    .targetting(self)
+
+                resetToDefaults
+                    .targetting(self)
+
+                NSMenuItem.separator() // Resetting VPN subfeatures should go below this point
+
+                NSMenuItem(title: "Reset Enforce Routes force-enabled flag", action: #selector(NetworkProtectionDebugMenu.resetEnforceRoutesForceEnabledFlag(_:)))
+                    .targetting(self)
+
+                NSMenuItem(title: "Reset Site Issue Alert", action: #selector(NetworkProtectionDebugMenu.resetSiteIssuesAlert(_:)))
                     .targetting(self)
             }
 
@@ -183,6 +188,10 @@ final class NetworkProtectionDebugMenu: NSMenu {
                 Logger.networkProtection.error("Error in resetAllState: \(error.localizedDescription, privacy: .public)")
             }
         }
+    }
+
+    @objc func resetEnforceRoutesForceEnabledFlag(_ sender: Any?) {
+        settings.enforceRoutesForceEnabledOnce = false
     }
 
     @objc func resetSiteIssuesAlert(_ sender: Any?) {
