@@ -41,8 +41,7 @@ extension HomePage.Views {
                     HStack(spacing: 8) {
                         image
 
-                        text
-                        .padding(.leading, 0)
+                        textContent
 
                         Spacer(minLength: 4)
 
@@ -85,8 +84,26 @@ extension HomePage.Views {
             }
         }
 
-        private var text: some View {
-            Text(viewModel.text)
+        private var textContent: some View {
+            VStack(alignment: .leading, spacing: viewModel.title == nil ? 0 : 8) {
+                title
+                description
+            }
+        }
+
+        private var title: some View {
+            Group {
+                if let title = viewModel.title {
+                    Text(title)
+                        .font(.system(size: 13).bold())
+                } else {
+                    EmptyView()
+                }
+            }
+       }
+
+        private var description: some View {
+            Text(viewModel.description)
         }
 
         private var button: some View {

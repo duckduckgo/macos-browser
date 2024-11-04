@@ -22,11 +22,13 @@ extension PromotionViewModel {
     static func freemiumDBPPromotion(proceedAction: @escaping () -> Void,
                                      closeAction: @escaping () -> Void) -> PromotionViewModel {
 
-        let text = UserText.homePagePromotionFreemiumDBPText
+        let title = UserText.homePagePromotionFreemiumDBPTitle
+        let description = UserText.homePagePromotionFreemiumDBPDescription
         let actionButtonText = UserText.homePagePromotionFreemiumDBPButtonTitle
 
-        return PromotionViewModel(image: .radarCheck,
-                                  text: text,
+        return PromotionViewModel(image: .informationRemover128,
+                                  title: title,
+                                  description: description,
                                   proceedButtonText: actionButtonText,
                                   proceedAction: proceedAction,
                                   closeAction: closeAction)
@@ -37,22 +39,22 @@ extension PromotionViewModel {
                                                           proceedAction: @escaping () -> Void,
                                                           closeAction: @escaping () -> Void) -> PromotionViewModel {
 
-        var text = ""
+        var description = ""
 
         switch (resultCount, brokerCount) {
         case (1, _):
-            text = UserText.homePagePromotionFreemiumDBPPostScanEngagementResultSingleMatchText
+            description = UserText.homePagePromotionFreemiumDBPPostScanEngagementResultSingleMatchDescription
         case (let resultCount, 1):
-            text = UserText.homePagePromotionFreemiumDBPPostScanEngagementResultSingleBrokerText(resultCount: resultCount)
+            description = UserText.homePagePromotionFreemiumDBPPostScanEngagementResultSingleBrokerDescription(resultCount: resultCount)
         default:
-            text = UserText.homePagePromotionFreemiumDBPPostScanEngagementResultPluralText(resultCount: resultCount,
+            description = UserText.homePagePromotionFreemiumDBPPostScanEngagementResultPluralDescription(resultCount: resultCount,
                                                                                                    brokerCount: brokerCount)
         }
 
         let actionButtonText = UserText.homePagePromotionFreemiumDBPPostScanEngagementButtonTitle
 
-        return PromotionViewModel(image: .radarCheck,
-                                  text: text,
+        return PromotionViewModel(image: .informationRemover128,
+                                  description: description,
                                   proceedButtonText: actionButtonText,
                                   proceedAction: proceedAction,
                                   closeAction: closeAction)
@@ -61,11 +63,11 @@ extension PromotionViewModel {
     static func freemiumDBPPromotionScanEngagementNoResults(proceedAction: @escaping () -> Void,
                                                             closeAction: @escaping () -> Void) -> PromotionViewModel {
 
-        let text = UserText.homePagePromotionFreemiumDBPPostScanEngagementNoResultsText
+        let description = UserText.homePagePromotionFreemiumDBPPostScanEngagementNoResultsDescription
         let actionButtonText = UserText.homePagePromotionFreemiumDBPPostScanEngagementButtonTitle
 
-        return PromotionViewModel(image: .radarCheck,
-                                  text: text,
+        return PromotionViewModel(image: .informationRemover128,
+                                  description: description,
                                   proceedButtonText: actionButtonText,
                                   proceedAction: proceedAction,
                                   closeAction: closeAction)
