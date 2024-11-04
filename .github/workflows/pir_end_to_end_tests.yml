@@ -19,8 +19,7 @@ jobs:
             runner: macos-14-xlarge
 
     if: |
-       github.ref_name != null
-    #  contains(github.ref_name, 'i')
+      contains(github.event.pull_request.head.ref, 'i')
     #  contains(toJson(github.event.pull_request.files.*.filename), 'DBPE2ETests/') ||
     #  contains(toJson(github.event.pull_request.files.*.filename), 'LocalPackages/DataBrokerProtection/') ||
     #  contains(toJson(github.event.pull_request.files.*.filename), 'LocalPackages/DataBrokerProtection/') ||
