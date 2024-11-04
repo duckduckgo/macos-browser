@@ -23,12 +23,14 @@ extension PromotionViewModel {
                                      closeAction: @escaping () -> Void) -> PromotionViewModel {
 
         let title = UserText.homePagePromotionFreemiumDBPTitle
-        let description = UserText.homePagePromotionFreemiumDBPDescription
+        let description = UserText.homePagePromotionFreemiumDBPDescriptionPartOne
+        let additionalBoldedDescription = UserText.homePagePromotionFreemiumDBPDescriptionPartTwo
         let actionButtonText = UserText.homePagePromotionFreemiumDBPButtonTitle
 
         return PromotionViewModel(image: .informationRemover128,
                                   title: title,
                                   description: description,
+                                  additionalBoldedDescription: additionalBoldedDescription,
                                   proceedButtonText: actionButtonText,
                                   proceedAction: proceedAction,
                                   closeAction: closeAction)

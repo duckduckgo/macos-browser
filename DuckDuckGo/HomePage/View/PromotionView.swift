@@ -87,7 +87,7 @@ extension HomePage.Views {
         private var textContent: some View {
             VStack(alignment: .leading, spacing: viewModel.title == nil ? 0 : 8) {
                 title
-                description
+                description.foregroundColor(Color(.greyText))
             }
         }
 
@@ -103,7 +103,11 @@ extension HomePage.Views {
        }
 
         private var description: some View {
-            Text(viewModel.description)
+            if let additionalBoldedDescription = viewModel.additionalBoldedDescription {
+                return Text(viewModel.description) + Text(additionalBoldedDescription).bold()
+            } else {
+                return Text(viewModel.description)
+            }
         }
 
         private var button: some View {
