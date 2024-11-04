@@ -1,0 +1,13 @@
+name: PIR E2E Tests files changed trigger
+
+on:
+  pull_request:
+    branches-ignore: # skip running on these branches since they are trigged by a different workflow
+      - hotfix/*
+      - release/*
+    paths: ['DBPE2ETests/**', 'LocalPackages/DataBrokerProtection/**', 'DuckDuckGoDBPBackgroundAgent/**', 'DuckDuckGo.xcodeproj/project.pbxproj']
+
+jobs:
+  call-sub-workflow:
+    uses: ./.github/workflows/pir_end_to_end_tests.yml
+    secrets: inherit
