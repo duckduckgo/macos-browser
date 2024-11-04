@@ -733,8 +733,20 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     // MARK: - Routing
 
     private var enforceRoutes: Bool {
-        internalUserDecider.isInternalUser
-        && settings.enforceRoutes
+
+        guard internalUserDecider.isInternalUser else {
+            return false
+        }
+
+        /// Even though there's a remote feature flag, we still want to allow internal users to disable enforceRoutes
+        /// manually in case they have trouble.  To achieve this we force the setting to ON once, but otherwise
+        /// allow the internal user to disable it again.
+        if !settings.enforceRoutesForceEnabledOnce {
+            settings.enforceRoutesForceEnabledOnce = true
+            settings.enforceRoutes = true
+        }
+
+        return settings.enforceRoutes
     }
 
     struct TunnelFailureError: LocalizedError {
