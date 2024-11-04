@@ -42,7 +42,8 @@ final class OperationPreferredDateUpdaterTests: XCTestCase {
                 retryError: 1,
                 confirmOptOutScan: confirmOptOutScanHours,
                 maintenanceScan: 1
-            )
+            ),
+            optOutUrl: ""
         )
         databaseMock.childBrokers = [childBroker]
 
