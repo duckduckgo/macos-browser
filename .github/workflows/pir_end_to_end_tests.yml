@@ -125,6 +125,7 @@ jobs:
     - name: Prepare test report
       if: always()
       run: |
+        cd main
         xcbeautify --report junit --report-path . --junit-report-filename pir-e2e-tests.xml < pir-e2e-tests.log
 
     - name: Publish tests report
