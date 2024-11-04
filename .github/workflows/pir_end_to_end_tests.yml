@@ -1,4 +1,4 @@
-name: UI Tests
+name: PIR E2E Tests
 
 on:
   workflow_dispatch:
