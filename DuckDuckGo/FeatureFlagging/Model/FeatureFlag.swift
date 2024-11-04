@@ -30,7 +30,7 @@ public enum FeatureFlag: String {
     case appendAtbToSerpQueries
 
     // https://app.asana.com/0/1206488453854252/1207136666798700/f
-    case freemiumPIR
+    case freemiumDBP
 
     case contextualOnboarding
 
@@ -54,8 +54,8 @@ extension FeatureFlag: FeatureFlagSourceProviding {
             return .remoteReleasable(.subfeature(SslCertificatesSubfeature.allowBypass))
         case .unknownUsernameCategorization:
             return .remoteReleasable(.subfeature(AutofillSubfeature.unknownUsernameCategorization))
-        case .freemiumPIR:
-            return .remoteDevelopment(.subfeature(DBPSubfeature.freemium))
+        case .freemiumDBP:
+            return .remoteReleasable(.subfeature(DBPSubfeature.freemium))
         case .phishingDetectionErrorPage:
             return .remoteReleasable(.subfeature(PhishingDetectionSubfeature.allowErrorPage))
         case .phishingDetectionPreferences:

@@ -46,6 +46,7 @@ protocol WindowControllersManagerProtocol {
                        popUp: Bool,
                        lazyLoadTabs: Bool,
                        isMiniaturized: Bool) -> MainWindow?
+    func showTab(with content: Tab.TabContent)
 }
 extension WindowControllersManagerProtocol {
     @discardableResult

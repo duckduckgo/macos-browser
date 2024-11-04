@@ -31,17 +31,18 @@ protocol UpdateControllerProtocol: AnyObject {
     var latestUpdate: Update? { get }
     var latestUpdatePublisher: Published<Update?>.Publisher { get }
 
-    var isUpdateAvailableToInstall: Bool { get }
-    var isUpdateAvailableToInstallPublisher: Published<Bool>.Publisher { get }
+    var hasPendingUpdate: Bool { get }
+    var hasPendingUpdatePublisher: Published<Bool>.Publisher { get }
 
-    var isUpdateBeingLoaded: Bool { get }
-    var isUpdateBeingLoadedPublisher: Published<Bool>.Publisher { get }
+    var needsNotificationDot: Bool { get set }
+    var notificationDotPublisher: AnyPublisher<Bool, Never> { get }
+
+    var updateProgress: UpdateCycleProgress { get }
+    var updateProgressPublisher: Published<UpdateCycleProgress>.Publisher { get }
 
     var lastUpdateCheckDate: Date? { get }
 
-    func checkForUpdate()
-    func checkForUpdateInBackground()
-
+    func checkForUpdateIfNeeded()
     func runUpdate()
 
     var areAutomaticUpdatesEnabled: Bool { get set }
@@ -59,85 +60,75 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     lazy var notificationPresenter = UpdateNotificationPresenter()
     let willRelaunchAppPublisher: AnyPublisher<Void, Never>
 
-    @Published private(set) var isUpdateBeingLoaded = false
-    var isUpdateBeingLoadedPublisher: Published<Bool>.Publisher { $isUpdateBeingLoaded }
-
     // Struct used to cache data until the updater finishes checking for updates
     struct UpdateCheckResult {
         let item: SUAppcastItem
         let isInstalled: Bool
     }
-    private var updateCheckResult: UpdateCheckResult?
+    private var cachedUpdateResult: UpdateCheckResult?
 
-    @Published private(set) var latestUpdate: Update? {
+    @Published private(set) var updateProgress = UpdateCycleProgress.default {
         didSet {
-            if let latestUpdate, !latestUpdate.isInstalled {
-                if !shouldShowManualUpdateDialog {
-                    switch latestUpdate.type {
-                    case .critical:
-                        notificationPresenter.showUpdateNotification(icon: NSImage.criticalUpdateNotificationInfo, text: UserText.criticalUpdateNotification, presentMultiline: true)
-                    case .regular:
-                        notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: UserText.updateAvailableNotification, presentMultiline: true)
-                    }
-                }
-                isUpdateAvailableToInstall = !latestUpdate.isInstalled
-            } else {
-                isUpdateAvailableToInstall = false
+            if let cachedUpdateResult {
+                latestUpdate = Update(appcastItem: cachedUpdateResult.item, isInstalled: cachedUpdateResult.isInstalled)
+                hasPendingUpdate = latestUpdate?.isInstalled == false && updateProgress.isIdle
+                needsNotificationDot = hasPendingUpdate
             }
+            showUpdateNotificationIfNeeded()
         }
     }
 
+    var updateProgressPublisher: Published<UpdateCycleProgress>.Publisher { $updateProgress }
+
+    @Published private(set) var latestUpdate: Update?
+
     var latestUpdatePublisher: Published<Update?>.Publisher { $latestUpdate }
 
-    @Published private(set) var isUpdateAvailableToInstall = false
-    var isUpdateAvailableToInstallPublisher: Published<Bool>.Publisher { $isUpdateAvailableToInstall }
+    @Published private(set) var hasPendingUpdate = false
+    var hasPendingUpdatePublisher: Published<Bool>.Publisher { $hasPendingUpdate }
 
-    var lastUpdateCheckDate: Date? {
-        updater.updater.lastUpdateCheckDate
+    var lastUpdateCheckDate: Date? { updater?.lastUpdateCheckDate }
+    var lastUpdateNotificationShownDate: Date = .distantPast
+
+    private var shouldShowUpdateNotification: Bool {
+        Date().timeIntervalSince(lastUpdateNotificationShownDate) > .days(7)
     }
 
     @UserDefaultsWrapper(key: .automaticUpdates, defaultValue: true)
     var areAutomaticUpdatesEnabled: Bool {
         didSet {
-            Logger.updates.debug("areAutomaticUpdatesEnabled: \(self.areAutomaticUpdatesEnabled)")
-            if updater.updater.automaticallyDownloadsUpdates != areAutomaticUpdatesEnabled {
-                updater.updater.automaticallyDownloadsUpdates = areAutomaticUpdatesEnabled
-
-                // Reinitialize in order to reset the current loaded state
-                if !areAutomaticUpdatesEnabled {
-                    configureUpdater()
-                    latestUpdate = nil
-                }
+            Logger.updates.log("areAutomaticUpdatesEnabled: \(self.areAutomaticUpdatesEnabled)")
+            if oldValue != areAutomaticUpdatesEnabled {
+                userDriver?.cancelAndDismissCurrentUpdate()
+                try? configureUpdater()
             }
         }
     }
 
-    var automaticUpdateFlow: Bool {
-        // In case the current user is not the owner of the binary, we have to switch
-        // to manual update flow because the authentication is required.
-        return areAutomaticUpdatesEnabled && binaryOwnershipChecker.isCurrentUserOwner()
+    @UserDefaultsWrapper(key: .pendingUpdateShown, defaultValue: false)
+    var needsNotificationDot: Bool {
+        didSet {
+            notificationDotSubject.send(needsNotificationDot)
+        }
     }
 
-    var shouldShowManualUpdateDialog = false
+    private let notificationDotSubject = CurrentValueSubject<Bool, Never>(false)
+    lazy var notificationDotPublisher = notificationDotSubject.eraseToAnyPublisher()
 
-    private(set) var updater: SPUStandardUpdaterController!
-    private var appRestarter: AppRestarting
+    private(set) var updater: SPUUpdater?
+    private(set) var userDriver: UpdateUserDriver?
     private let willRelaunchAppSubject = PassthroughSubject<Void, Never>()
     private var internalUserDecider: InternalUserDecider
-    private let binaryOwnershipChecker: BinaryOwnershipChecking
+    private var updateProcessCancellable: AnyCancellable!
 
     // MARK: - Public
 
-    init(internalUserDecider: InternalUserDecider,
-         appRestarter: AppRestarting = AppRestarter(),
-         binaryOwnershipChecker: BinaryOwnershipChecking = BinaryOwnershipChecker()) {
+    init(internalUserDecider: InternalUserDecider) {
         willRelaunchAppPublisher = willRelaunchAppSubject.eraseToAnyPublisher()
         self.internalUserDecider = internalUserDecider
-        self.appRestarter = appRestarter
-        self.binaryOwnershipChecker = binaryOwnershipChecker
         super.init()
 
-        configureUpdater()
+        try? configureUpdater()
     }
 
     func checkNewApplicationVersion() {
@@ -151,79 +142,79 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         }
     }
 
-    func checkForUpdate() {
-        Logger.updates.debug("Checking for updates")
+    func checkForUpdateIfNeeded() {
+        guard let updater, !updater.sessionInProgress else { return }
 
-        updater.updater.checkForUpdates()
-    }
+        Logger.updates.log("Checking for updates")
 
-    func checkForUpdateInBackground() {
-        Logger.updates.debug("Checking for updates in background")
-
-        updater.updater.checkForUpdatesInBackground()
-    }
-
-    @objc func runUpdate() {
-        PixelKit.fire(DebugEvent(GeneralPixel.updaterDidRunUpdate))
-
-        if automaticUpdateFlow {
-            appRestarter.restart()
-        } else {
-            updater.userDriver.activeUpdateAlert?.hideUnnecessaryUpdateButtons()
-            shouldShowManualUpdateDialog = true
-            checkForUpdate()
-        }
+        updater.checkForUpdates()
     }
 
     // MARK: - Private
 
-    private func configureUpdater() {
-        // The default configuration of Sparkle updates is in Info.plist
-        updater = SPUStandardUpdaterController(updaterDelegate: self, userDriverDelegate: self)
-        shouldShowManualUpdateDialog = false
+    private func configureUpdater() throws {
+        // Workaround to reset the updater state
+        cachedUpdateResult = nil
+        latestUpdate = nil
 
-        if updater.updater.automaticallyDownloadsUpdates != automaticUpdateFlow {
-            updater.updater.automaticallyDownloadsUpdates = automaticUpdateFlow
-        }
+        // The default configuration of Sparkle updates is in Info.plist
+        userDriver = UpdateUserDriver(internalUserDecider: internalUserDecider,
+                                      areAutomaticUpdatesEnabled: areAutomaticUpdatesEnabled)
+        guard let userDriver else { return }
+
+        updater = SPUUpdater(hostBundle: Bundle.main, applicationBundle: Bundle.main, userDriver: userDriver, delegate: self)
+
+        updateProcessCancellable = userDriver.updateProgressPublisher
+            .assign(to: \.updateProgress, onWeaklyHeld: self)
+
+        try updater?.start()
 
 #if DEBUG
-        updater.updater.automaticallyChecksForUpdates = false
-        updater.updater.automaticallyDownloadsUpdates = false
-        updater.updater.updateCheckInterval = 0
+        updater?.automaticallyChecksForUpdates = false
+        updater?.automaticallyDownloadsUpdates = false
+        updater?.updateCheckInterval = 0
 #else
-        // Load the appcast to retrieve information about the latest update (required for displaying Release Notes)
-        checkForUpdateInBackground()
+        checkForUpdateIfNeeded()
 #endif
     }
 
-    @objc private func openUpdatesPage() {
+    private func showUpdateNotificationIfNeeded() {
+        guard let latestUpdate, hasPendingUpdate, shouldShowUpdateNotification else { return }
+
+        let action = areAutomaticUpdatesEnabled ? UserText.autoUpdateAction : UserText.manualUpdateAction
+
+        switch latestUpdate.type {
+        case .critical:
+            notificationPresenter.showUpdateNotification(
+                icon: NSImage.criticalUpdateNotificationInfo,
+                text: "\(UserText.criticalUpdateNotification) \(action)",
+                presentMultiline: true
+            )
+        case .regular:
+            notificationPresenter.showUpdateNotification(
+                icon: NSImage.updateNotificationInfo,
+                text: "\(UserText.updateAvailableNotification) \(action)",
+                presentMultiline: true
+            )
+        }
+
+        lastUpdateNotificationShownDate = Date()
+    }
+
+    @objc func openUpdatesPage() {
         notificationPresenter.openUpdatesPage()
     }
 
-}
-
-extension UpdateController: SPUStandardUserDriverDelegate {
-
-    func standardUserDriverShouldHandleShowingScheduledUpdate(_ update: SUAppcastItem, andInImmediateFocus immediateFocus: Bool) -> Bool {
-        return shouldShowManualUpdateDialog
+    @objc func runUpdate() {
+        if let userDriver {
+            PixelKit.fire(DebugEvent(GeneralPixel.updaterDidRunUpdate))
+            userDriver.resume()
+        }
     }
-
-    func standardUserDriverWillHandleShowingUpdate(_ handleShowingUpdate: Bool, forUpdate update: SUAppcastItem, state: SPUUserUpdateState) {}
 
 }
 
 extension UpdateController: SPUUpdaterDelegate {
-
-    func updater(_ updater: SPUUpdater, mayPerform updateCheck: SPUUpdateCheck) throws {
-        Logger.updates.debug("Updater started performing the update check. (isInternalUser: \(self.internalUserDecider.isInternalUser)")
-
-        onUpdateCheckStart()
-    }
-
-    private func onUpdateCheckStart() {
-        updateCheckResult = nil
-        isUpdateBeingLoaded = true
-    }
 
     func allowedChannels(for updater: SPUUpdater) -> Set<String> {
         if internalUserDecider.isInternalUser {
@@ -251,63 +242,41 @@ extension UpdateController: SPUUpdaterDelegate {
     }
 
     func updater(_ updater: SPUUpdater, didFindValidUpdate item: SUAppcastItem) {
-        Logger.updates.debug("Updater did find valid update: \(item.displayVersionString)(\(item.versionString))")
-
+        Logger.updates.log("Updater did find valid update: \(item.displayVersionString)(\(item.versionString))")
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidFindUpdate))
-
-        if !automaticUpdateFlow {
-            // For manual updates, we can present the available update without waiting for the update cycle to finish. The Sparkle flow downloads the update later
-            updateCheckResult = UpdateCheckResult(item: item, isInstalled: false)
-            onUpdateCheckEnd()
-        }
+        cachedUpdateResult = UpdateCheckResult(item: item, isInstalled: false)
     }
 
     func updaterDidNotFindUpdate(_ updater: SPUUpdater, error: any Error) {
-        let item = (error as NSError).userInfo["SULatestAppcastItemFound"] as? SUAppcastItem
-        Logger.updates.debug("Updater did not find update: \(String(describing: item?.displayVersionString))(\(String(describing: item?.versionString)))")
-        if let item {
-            // User is running the latest version
-            updateCheckResult = UpdateCheckResult(item: item, isInstalled: true)
-        }
+        let nsError = error as NSError
+        guard let item = nsError.userInfo["SULatestAppcastItemFound"] as? SUAppcastItem else { return }
 
+        Logger.updates.log("Updater did not find update: \(String(describing: item.displayVersionString))(\(String(describing: item.versionString)))")
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidNotFindUpdate, error: error))
+
+        cachedUpdateResult = UpdateCheckResult(item: item, isInstalled: true)
     }
 
     func updater(_ updater: SPUUpdater, didDownloadUpdate item: SUAppcastItem) {
-        Logger.updates.debug("Updater did download update: \(item.displayVersionString)(\(item.versionString))")
-
-        if automaticUpdateFlow {
-            // For automatic updates, the available item has to be downloaded
-            updateCheckResult = UpdateCheckResult(item: item, isInstalled: false)
-            return
-        }
-
+        Logger.updates.log("Updater did download update: \(item.displayVersionString)(\(item.versionString))")
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidDownloadUpdate))
     }
 
-    func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {
-        Logger.updates.debug("Updater did finish update cycle")
-
-        onUpdateCheckEnd()
+    func updater(_ updater: SPUUpdater, didExtractUpdate item: SUAppcastItem) {
+        Logger.updates.log("Updater did extract update: \(item.displayVersionString)(\(item.versionString))")
     }
 
-    private func onUpdateCheckEnd() {
-        guard isUpdateBeingLoaded else {
-            // The update check end is already handled
-            return
-        }
+    func updater(_ updater: SPUUpdater, willInstallUpdate item: SUAppcastItem) {
+        Logger.updates.log("Updater will install update: \(item.displayVersionString)(\(item.versionString))")
+    }
 
-        // If the update is available, present it
-        if let updateCheckResult = updateCheckResult {
-            latestUpdate = Update(appcastItem: updateCheckResult.item,
-                                  isInstalled: updateCheckResult.isInstalled)
+    func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {
+        if error == nil {
+            Logger.updates.log("Updater did finish update cycle")
+            updateProgress = .updateCycleDone
         } else {
-            latestUpdate = nil
+            Logger.updates.log("Updater did finish update cycle with error")
         }
-
-        // Clear cache
-        isUpdateBeingLoaded = false
-        updateCheckResult = nil
     }
 
 }

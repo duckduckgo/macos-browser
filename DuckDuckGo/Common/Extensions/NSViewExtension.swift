@@ -85,6 +85,12 @@ extension NSView {
         set { isHidden = !newValue }
     }
 
+    var isVisible: Bool {
+        guard !isHiddenOrHasHiddenAncestor,
+              let window, window.isVisible else { return false }
+        return true
+    }
+
     func makeMeFirstResponder() {
         guard let window = window else {
             Logger.general.error("\(self.className): Window not available")

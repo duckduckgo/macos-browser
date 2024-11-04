@@ -1274,7 +1274,15 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             loadErrorHTML(error, header: UserText.webProcessCrashPageHeader, forUnreachableURL: url, alternate: true)
         }
 
-        PixelKit.fire(DebugEvent(GeneralPixel.webKitDidTerminate, error: error))
+        Task {
+#if APPSTORE
+            let additionalParameters = [String: String]()
+#else
+            let additionalParameters = await SystemInfo.pixelParameters()
+#endif
+
+            PixelKit.fire(DebugEvent(GeneralPixel.webKitDidTerminate, error: error), withAdditionalParameters: additionalParameters)
+        }
     }
 
     @MainActor

@@ -18,7 +18,7 @@
 
 import Foundation
 
-struct AttemptInformation {
+public struct AttemptInformation {
     let extractedProfileId: Int64
     let dataBroker: String
     let attemptId: String

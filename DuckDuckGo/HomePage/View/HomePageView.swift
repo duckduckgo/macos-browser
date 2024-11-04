@@ -39,6 +39,8 @@ extension HomePage.Views {
         @EnvironmentObject var addressBarModel: HomePage.Models.AddressBarModel
         @EnvironmentObject var recentlyVisitedModel: HomePage.Models.RecentlyVisitedModel
 
+        @ObservedObject var freemiumDBPPromotionViewCoordinator: FreemiumDBPPromotionViewCoordinator
+
         var body: some View {
             if isBurner {
                 BurnerHomePageView()
@@ -149,6 +151,8 @@ extension HomePage.Views {
                             view.padding(.top, Const.remoteMessageTopPaddingWithSearchBar)
                         }
 
+                    freemiumPromotionView()
+
                     if addressBarModel.shouldShowAddressBar {
                         BigSearchBox(isCompact: isCompactLogo(with: geometry))
                             .id(Const.searchBarIdentifier)
@@ -218,6 +222,12 @@ extension HomePage.Views {
             case .none:
                 Color.newTabPageBackground
             }
+        }
+
+        func freemiumPromotionView() -> some View {
+            PromotionView(viewModel: freemiumDBPPromotionViewCoordinator.viewModel)
+                .padding(.bottom, 16)
+                .visibility(freemiumDBPPromotionViewCoordinator.isHomePagePromotionVisible ? .visible : .gone)
         }
 
         @ViewBuilder
