@@ -2,7 +2,7 @@ name: PIR E2E Tests files changed trigger
 
 on:
   pull_request:
-    paths: ['DBPE2ETests/**', 'LocalPackages/DataBrokerProtection/**', 'DuckDuckGoDBPBackgroundAgent/**', 'DuckDuckGo.xcodeproj/project.pbxproj']
+    paths: ['LocalPackages/DataBrokerProtection/**']
 
 jobs:
   call-sub-workflow:
