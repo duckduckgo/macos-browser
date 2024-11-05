@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "graeme/send-pixel-on-sync-secure-storage-failure",
-        "revision" : "ad32885472e561de7748b0a5ec16fd3fb3723101"
+        "revision" : "56dbee74e34d37b6e699921a0b9bce2b8f22711d",
+        "version" : "203.2.0"
       }
     },
     {
