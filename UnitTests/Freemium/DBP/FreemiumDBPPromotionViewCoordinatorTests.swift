@@ -197,8 +197,7 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         let viewModel = sut.viewModel
 
         // Then
-        XCTAssertEqual(viewModel.description, UserText.homePagePromotionFreemiumDBPDescriptionPartOne)
-        XCTAssertEqual(viewModel.additionalBoldedDescription, UserText.homePagePromotionFreemiumDBPDescriptionPartTwo)
+        XCTAssertEqual(viewModel.description, UserText.homePagePromotionFreemiumDBPDescription)
     }
 
     func testNotificationObservation_updatesPromotionVisibility() {

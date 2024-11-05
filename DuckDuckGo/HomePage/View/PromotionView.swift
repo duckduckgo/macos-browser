@@ -94,7 +94,7 @@ extension HomePage.Views {
         private var title: some View {
             Group {
                 if let title = viewModel.title {
-                    Text(title)
+                    Text(verbatim: title)
                         .font(.system(size: 13).bold())
                 } else {
                     EmptyView()
@@ -102,18 +102,19 @@ extension HomePage.Views {
             }
        }
 
+        @ViewBuilder
         private var description: some View {
-            if let additionalBoldedDescription = viewModel.additionalBoldedDescription {
-                return Text(viewModel.description) + Text(additionalBoldedDescription).bold()
+            if #available(macOS 12.0, *), let attributed = try? AttributedString(markdown: viewModel.description) {
+                Text(attributed)
             } else {
-                return Text(viewModel.description)
+                Text(verbatim: viewModel.description)
             }
         }
 
         private var button: some View {
             Group {
                 Button(action: viewModel.proceedAction) {
-                    Text(viewModel.proceedButtonText)
+                    Text(verbatim: viewModel.proceedButtonText)
                 }
                 .controlSize(.large)
             }

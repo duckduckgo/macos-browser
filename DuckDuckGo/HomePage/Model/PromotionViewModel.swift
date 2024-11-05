@@ -26,16 +26,14 @@ extension HomePage.Models {
         let image: ImageResource
         let title: String?
         let description: String
-        let additionalBoldedDescription: String?
         let proceedButtonText: String
         let proceedAction: () -> Void
         let closeAction: () -> Void
 
-        init(image: ImageResource, title: String? = nil, description: String, additionalBoldedDescription: String? = nil, proceedButtonText: String, proceedAction: @escaping () -> Void, closeAction: @escaping () -> Void) {
+        init(image: ImageResource, title: String? = nil, description: String, proceedButtonText: String, proceedAction: @escaping () -> Void, closeAction: @escaping () -> Void) {
             self.image = image
             self.title = title
             self.description = description
-            self.additionalBoldedDescription = additionalBoldedDescription
             self.proceedButtonText = proceedButtonText
             self.proceedAction = proceedAction
             self.closeAction = closeAction
