@@ -29,7 +29,7 @@ extension Tab {
     }
 
     @MainActor
-    static func withContentOfBookmark(bookmarks: [Bookmark], burnerMode: BurnerMode) -> [Tab] {
+    static func with(contentsOf bookmarks: [Bookmark], burnerMode: BurnerMode) -> [Tab] {
         bookmarks.compactMap { bookmark -> Tab? in
             guard let url = bookmark.urlObject else { return nil }
             return Tab(content: .url(url, source: .bookmark), shouldLoadInBackground: true, burnerMode: burnerMode)

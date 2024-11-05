@@ -438,7 +438,7 @@ extension BookmarksContextMenu: FolderMenuItemSelectors {
             tabCollection.append(tabs: tabs)
             PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
         } else if let bookmarks = sender.representedObject as? [Bookmark] {
-            let tabs = Tab.withContentOfBookmark(bookmarks: bookmarks, burnerMode: tabCollection.burnerMode)
+            let tabs = Tab.with(contentsOf: bookmarks, burnerMode: tabCollection.burnerMode)
             tabCollection.append(tabs: tabs)
             PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
         }
