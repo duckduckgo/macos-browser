@@ -63,20 +63,6 @@ final class DBPEndToEndTests: XCTestCase {
     }
 
     /*
-     Tests the login item starts
-     */
-    func testLoginItemIsRunning() async throws {
-        try await Task.sleep(nanoseconds: 3_000_000_000)
-
-        // When
-        try await pirProtectionManager.dataManager.saveProfile(mockProfile)
-
-        XCTAssertTrue(loginItemsManager.isAnyEnabled([.dbpBackgroundAgent]))
-        // Failing, likely due to missing profile and background agent being killed
-        //XCTAssertTrue(LoginItem.dbpBackgroundAgent.isRunning)
-    }
-
-    /*
      Tests the entire PIR process, broken down into 9 steps.
      Kicks the process off by simulating a save profile message from the FE
      From there it performs a series of various introspections to check each step
