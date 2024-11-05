@@ -264,6 +264,10 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     @IBAction func privacyEntryPointButtonAction(_ sender: Any) {
+        openPrivacyDashboardPopover()
+    }
+
+    func openPrivacyDashboardPopover() {
         if let permissionAuthorizationPopover, permissionAuthorizationPopover.isShown {
             permissionAuthorizationPopover.close()
         }

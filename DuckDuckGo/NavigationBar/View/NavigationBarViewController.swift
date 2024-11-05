@@ -516,7 +516,7 @@ final class NavigationBarViewController: NSViewController {
     @objc private func showPasswordsAutoPinnedFeedback(_ sender: Notification) {
         DispatchQueue.main.async {
             let popoverMessage = PopoverMessageViewController(message: UserText.passwordManagerAutoPinnedPopoverText)
-            popoverMessage.show(onParent: self, relativeTo: self.addressBarViewController!.addressBarButtonsViewController!.privacyEntryPointButton)
+            popoverMessage.show(onParent: self, relativeTo: self.passwordManagementButton)
         }
     }
 
@@ -556,7 +556,7 @@ final class NavigationBarViewController: NSViewController {
                                                                        store: BrokenSitePromptLimiterStore())
 
     @objc private func attemptToShowBrokenSitePrompt(_ sender: Notification) {
-        guard brokenSitePromptLimiter.shouldShowToast(),
+        guard /*brokenSitePromptLimiter.shouldShowToast(),*/ // TODO: Uncomment
               let event = sender.userInfo?[PageRefreshEvent.key] as? PageRefreshEvent,
               let url = tabCollectionViewModel.selectedTabViewModel?.tab.url, !url.isDuckDuckGo,
               OnboardingActionsManager.isOnboardingFinished,
@@ -568,17 +568,22 @@ final class NavigationBarViewController: NSViewController {
     private func showBrokenSitePrompt(after: PageRefreshEvent) {
         guard view.window?.isKeyWindow == true,
               let privacyButton = addressBarViewController?.addressBarButtonsViewController?.privacyEntryPointButton else { return }
-//        brokenSitePromptLimiter.didShowToast() // uncomment
-        let popoverMessage = PopoverMessageViewController(message: "Site not working?",
-                                                          buttonText: "Let Us Know",
-                                                          buttonAction: {},
+        brokenSitePromptLimiter.didShowToast()
+        PixelKit.fire(GeneralPixel.siteNotWorkingShown)
+        let popoverMessage = PopoverMessageViewController(message: UserText.BrokenSitePrompt.title,
+                                                          buttonText: UserText.BrokenSitePrompt.buttonTitle,
+                                                          buttonAction: {
+            self.brokenSitePromptLimiter.didOpenReport()
+            self.addressBarViewController?.addressBarButtonsViewController?.openPrivacyDashboardPopover()
+            PixelKit.fire(GeneralPixel.siteNotWorkingWebsiteIsBroken)
+        },
                                                           shouldShowCloseButton: true,
                                                           autoDismissDuration: nil,
                                                           onDismiss: {
-// how to handle dismiss while tapping elsewhere?
+            self.brokenSitePromptLimiter.didDismissToast()
         }
                                                           )
-        popoverMessage.show(onParent: self, relativeTo: privacyButton)
+        popoverMessage.show(onParent: self, relativeTo: privacyButton, behavior: .semitransient)
     }
 
     func toggleDownloadsPopover(keepButtonVisible: Bool) {

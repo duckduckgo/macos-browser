@@ -20,7 +20,6 @@ import Common
 import PageRefreshMonitor
 import PixelKit
 
-
 enum PageRefreshPixel: PixelKitEventV2 {
 
     case twiceWithin12Seconds
