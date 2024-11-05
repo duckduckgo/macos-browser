@@ -28,6 +28,8 @@ import NetworkProtectionUI
 import Subscription
 import SubscriptionUI
 import Freemium
+import BrokenSitePrompt
+import PageRefreshMonitor
 
 final class NavigationBarViewController: NSViewController {
 
@@ -221,6 +223,12 @@ final class NavigationBarViewController: NSViewController {
                 .leading: .leading(multiplier: 1.0, const: 72)
             ]))
         }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: {
+            NotificationCenter.default.post(name: .pageRefreshDidMatchBrokenSiteCriteria,
+                                            object: self,
+                                            userInfo: [PageRefreshEvent.key: PageRefreshEvent.twiceWithin12Seconds])
+        })
     }
 
     @IBSegueAction func createAddressBarViewController(_ coder: NSCoder) -> AddressBarViewController? {
@@ -423,6 +431,11 @@ final class NavigationBarViewController: NSViewController {
                                                name: AutoconsentUserScript.newSitePopupHiddenNotification,
                                                object: nil)
 
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(attemptToShowBrokenSitePrompt(_:)),
+                                               name: .pageRefreshDidMatchBrokenSiteCriteria,
+                                               object: nil)
+
         UserDefaults.netP
             .publisher(for: \.networkProtectionShouldShowVPNUninstalledMessage)
             .receive(on: DispatchQueue.main)
@@ -503,7 +516,7 @@ final class NavigationBarViewController: NSViewController {
     @objc private func showPasswordsAutoPinnedFeedback(_ sender: Notification) {
         DispatchQueue.main.async {
             let popoverMessage = PopoverMessageViewController(message: UserText.passwordManagerAutoPinnedPopoverText)
-            popoverMessage.show(onParent: self, relativeTo: self.passwordManagementButton)
+            popoverMessage.show(onParent: self, relativeTo: self.addressBarViewController!.addressBarButtonsViewController!.privacyEntryPointButton)
         }
     }
 
@@ -536,6 +549,36 @@ final class NavigationBarViewController: NSViewController {
             let animationType: NavigationBarBadgeAnimationView.AnimationType = isCosmetic ? .cookiePopupHidden : .cookiePopupManaged
             self.addressBarViewController?.addressBarButtonsViewController?.showBadgeNotification(animationType)
         }
+    }
+
+    // TODO: DI
+    lazy private var brokenSitePromptLimiter = BrokenSitePromptLimiter(privacyConfigManager: ContentBlocking.shared.privacyConfigurationManager,
+                                                                       store: BrokenSitePromptLimiterStore())
+
+    @objc private func attemptToShowBrokenSitePrompt(_ sender: Notification) {
+        guard brokenSitePromptLimiter.shouldShowToast(),
+              let event = sender.userInfo?[PageRefreshEvent.key] as? PageRefreshEvent,
+              let url = tabCollectionViewModel.selectedTabViewModel?.tab.url, !url.isDuckDuckGo,
+              OnboardingActionsManager.isOnboardingFinished,
+              Application.appDelegate.onboardingStateMachine.state == .onboardingCompleted
+        else { return }
+        showBrokenSitePrompt(after: event)
+    }
+
+    private func showBrokenSitePrompt(after: PageRefreshEvent) {
+        guard view.window?.isKeyWindow == true,
+              let privacyButton = addressBarViewController?.addressBarButtonsViewController?.privacyEntryPointButton else { return }
+//        brokenSitePromptLimiter.didShowToast() // uncomment
+        let popoverMessage = PopoverMessageViewController(message: "Site not working?",
+                                                          buttonText: "Let Us Know",
+                                                          buttonAction: {},
+                                                          shouldShowCloseButton: true,
+                                                          autoDismissDuration: nil,
+                                                          onDismiss: {
+// how to handle dismiss while tapping elsewhere?
+        }
+                                                          )
+        popoverMessage.show(onParent: self, relativeTo: privacyButton)
     }
 
     func toggleDownloadsPopover(keepButtonVisible: Bool) {

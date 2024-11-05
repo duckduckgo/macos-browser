@@ -224,6 +224,18 @@ public struct UserDefaultsWrapper<T> {
         // Subscription
 
         case subscriptionEnvironment = "subscription.environment"
+
+        // PageRefreshMonitor
+
+        case didRefreshTimestamp = "pageRefreshMonitor.did-refresh-timestamp"
+        case didDoubleRefreshTimestamp = "pageRefreshMonitor.did-double-refresh-timestamp"
+        case didRefreshCounter = "pageRefreshMonitor.did-refresh-counter"
+
+        // BrokenSitePrompt
+
+        case lastBrokenSiteToastShownDate = "brokenSitePrompt.lastBrokenSiteToastShownDate"
+        case toastDismissStreakCounter = "brokenSitePrompt.toastDismissStreakCounter"
+
     }
 
     enum RemovedKeys: String, CaseIterable {
