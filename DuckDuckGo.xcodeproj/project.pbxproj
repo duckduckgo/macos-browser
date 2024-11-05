@@ -4142,6 +4142,7 @@
 		987799FF29999B64005D8EB6 /* Bookmark 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Bookmark 3.xcdatamodel"; sourceTree = "<group>"; };
 		98A95D87299A2DF900B9B81A /* BookmarkMigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkMigrationTests.swift; sourceTree = "<group>"; };
 		98EB5D0F27516A4800681FE6 /* AppPrivacyConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPrivacyConfigurationTests.swift; sourceTree = "<group>"; };
+		9D02C9012CDA4A9E001A6E78 /* PIRE2ETests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = PIRE2ETests.xcconfig; sourceTree = "<group>"; };
 		9D0668CD2CD4F1C800D6C9EA /* DBPE2ETestsBridging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DBPE2ETestsBridging.h; sourceTree = "<group>"; };
 		9D84E3F32CD4E6660046CD8B /* DBPEndToEndTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DBPEndToEndTests.swift; sourceTree = "<group>"; };
 		9D84E3F42CD4E6660046CD8B /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -5702,6 +5703,7 @@
 				373A26962964CF0B0043FC57 /* TestsTargetsBase.xcconfig */,
 				378B588D295CF447002C0CC0 /* UnitTests.xcconfig */,
 				378B58C8295CF9A7002C0CC0 /* IntegrationTests.xcconfig */,
+				9D02C9012CDA4A9E001A6E78 /* PIRE2ETests.xcconfig */,
 				37E75733296F4F0500E1C162 /* UnitTestsAppStore.xcconfig */,
 				37E75734296F4F0500E1C162 /* IntegrationTestsAppStore.xcconfig */,
 				B6EC37FA29B6447F001ACE79 /* TestsServer.xcconfig */,
@@ -14357,48 +14359,29 @@
 		};
 		9D84E4382CD4E66F0046CD8B /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 378B58C8295CF9A7002C0CC0 /* IntegrationTests.xcconfig */;
+			baseConfigurationReference = 9D02C9012CDA4A9E001A6E78 /* PIRE2ETests.xcconfig */;
 			buildSettings = {
-				INFOPLIST_FILE = DBPE2ETests/Info.plist;
-				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.DBPE2ETests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/DBPE2ETests/DBPE2ETestsBridging.h";
 			};
 			name = Debug;
 		};
 		9D84E4392CD4E66F0046CD8B /* CI */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 378B58C8295CF9A7002C0CC0 /* IntegrationTests.xcconfig */;
+			baseConfigurationReference = 9D02C9012CDA4A9E001A6E78 /* PIRE2ETests.xcconfig */;
 			buildSettings = {
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
-				"DEVELOPMENT_TEAM[sdk=macosx*]" = HKE973VLUW;
-				INFOPLIST_FILE = DBPE2ETests/Info.plist;
-				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.DBPE2ETests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "match Direct com.duckduckgo.DBPE2ETests macos";
-				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/DBPE2ETests/DBPE2ETestsBridging.h";
 			};
 			name = CI;
 		};
 		9D84E43A2CD4E66F0046CD8B /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 378B58C8295CF9A7002C0CC0 /* IntegrationTests.xcconfig */;
+			baseConfigurationReference = 9D02C9012CDA4A9E001A6E78 /* PIRE2ETests.xcconfig */;
 			buildSettings = {
-				INFOPLIST_FILE = DBPE2ETests/Info.plist;
-				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.DBPE2ETests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/DBPE2ETests/DBPE2ETestsBridging.h";
 			};
 			name = Release;
 		};
 		9D84E43B2CD4E66F0046CD8B /* Review */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 378B58C8295CF9A7002C0CC0 /* IntegrationTests.xcconfig */;
+			baseConfigurationReference = 9D02C9012CDA4A9E001A6E78 /* PIRE2ETests.xcconfig */;
 			buildSettings = {
-				INFOPLIST_FILE = DBPE2ETests/Info.plist;
-				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.DBPE2ETests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/DBPE2ETests/DBPE2ETestsBridging.h";
 			};
 			name = Review;
 		};
