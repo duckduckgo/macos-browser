@@ -521,19 +521,19 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Allows you to upload photographs and videos</string>
+	<string>Lets websites ask permission to use your camera for video calls, recording videos, or taking and uploading photos and videos. Your camera remains private to DuckDuckGo. Photos and video are not stored by or shared with DuckDuckGo.</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2024 DuckDuckGo. All rights reserved.</string>
 	<key>NSLocationUsageDescription</key>
-	<string>Lets websites ask permission to use your location to improve search results, provide directions, and show nearby map locations. Your location remains private to DuckDuckGo.</string>
+	<string>Lets websites ask permission to use your location to improve search results, provide weather and directions, and show nearby map locations. Your location will remain private to DuckDuckGo.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Allows you to share recordings</string>
+	<string>Lets websites ask permission to use your microphone for audio/video calls, and for recording audio on websites that support it. Audio is never stored by or shared with DuckDuckGo.</string>
 	<key>NSDownloadsFolderUsageDescription</key>
-	<string>Lets the browser save files you download to this folder.</string>
+	<string>Lets you save files to the Downloads folder on your computer.</string>
 	<key>NSDesktopFolderUsageDescription</key>
-	<string>Lets the browser save files you download to this folder.</string>
+	<string>Lets you save files to the Desktop folder on your computer.</string>
 	<key>NSDocumentsFolderUsageDescription</key>
-	<string>Lets the browser save files you download to this folder.</string>
+	<string>Lets you save files to the Documents folder on your computer.</string>
 	<key>NSPrincipalClass</key>
 	<string>$(INFOPLIST_KEY_NSPrincipalClass)</string>
 	<key>NSSupportsAutomaticTermination</key>
