@@ -5,7 +5,7 @@ CC:
 **Description**:
 
 **Optional E2E tests**:
-- [] Run PIR E2E tests
+- [ ] Run PIR E2E tests
 	Check this to run the Personal Information Removal end to end tests. If updating CCF, or any PIR related code, tick this.
 
 **Steps to test this PR**:
