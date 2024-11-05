@@ -2,7 +2,8 @@ name: PIR E2E Tests files changed trigger
 
 on:
   pull_request:
-    paths: ['LocalPackages/DataBrokerProtection/**']
+    paths:
+      - 'LocalPackages/DataBrokerProtection/**'
 
 jobs:
   call-sub-workflow:
