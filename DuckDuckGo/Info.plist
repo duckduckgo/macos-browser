@@ -521,13 +521,13 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Lets websites ask permission to use your camera for video calls, recording videos, or taking and uploading photos and videos. Your camera remains private to DuckDuckGo. Photos and video are not stored by or shared with DuckDuckGo.</string>
+	<string>Lets websites ask permission to use your camera for video calls, recording and uploading videos, or taking and uploading photos.</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2024 DuckDuckGo. All rights reserved.</string>
 	<key>NSLocationUsageDescription</key>
-	<string>Lets websites ask permission to use your location to improve search results, provide weather and directions, and show nearby map locations. Your location will remain private to DuckDuckGo.</string>
+	<string>Lets websites ask permission to use your location to improve search results, provide weather and directions, or show nearby map locations.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Lets websites ask permission to use your microphone for audio/video calls, and for recording audio on websites that support it. Audio is never stored by or shared with DuckDuckGo.</string>
+	<string>Lets websites ask permission to use your microphone for audio and video calls or for recording and uploading audio.</string>
 	<key>NSDownloadsFolderUsageDescription</key>
 	<string>Lets you save files to the Downloads folder on your computer.</string>
 	<key>NSDesktopFolderUsageDescription</key>
