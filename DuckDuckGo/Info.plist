@@ -525,17 +525,15 @@
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2024 DuckDuckGo. All rights reserved.</string>
 	<key>NSLocationUsageDescription</key>
-	<string>Allows you to share your geolocation</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Allows you to share your location</string>
+	<string>Lets websites ask permission to use your location to improve search results, provide directions, and show nearby map locations. Your location remains private to DuckDuckGo.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Allows you to share recordings</string>
 	<key>NSDownloadsFolderUsageDescription</key>
-	<string>Allows you to save downloaded files to this folder.</string>
+	<string>Lets the browser save files you download to this folder.</string>
 	<key>NSDesktopFolderUsageDescription</key>
-	<string>Allows you to save downloaded files to this folder.</string>
+	<string>Lets the browser save files you download to this folder.</string>
 	<key>NSDocumentsFolderUsageDescription</key>
-	<string>Allows you to save downloaded files to this folder.</string>
+	<string>Lets the browser save files you download to this folder.</string>
 	<key>NSPrincipalClass</key>
 	<string>$(INFOPLIST_KEY_NSPrincipalClass)</string>
 	<key>NSSupportsAutomaticTermination</key>
