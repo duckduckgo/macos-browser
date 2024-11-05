@@ -40,11 +40,11 @@ public final class DBPUIViewModel {
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()
 
     public init(dataManager: DataBrokerProtectionDataManaging,
-         agentInterface: DataBrokerProtectionAppToAgentInterface,
-         webUISettings: DataBrokerProtectionWebUIURLSettingsRepresentable,
-         privacyConfig: PrivacyConfigurationManaging? = nil,
-         prefs: ContentScopeProperties? = nil,
-         webView: WKWebView? = nil) {
+                agentInterface: DataBrokerProtectionAppToAgentInterface,
+                webUISettings: DataBrokerProtectionWebUIURLSettingsRepresentable,
+                privacyConfig: PrivacyConfigurationManaging? = nil,
+                prefs: ContentScopeProperties? = nil,
+                webView: WKWebView? = nil) {
         self.dataManager = dataManager
         self.agentInterface = agentInterface
         self.webUISettings = webUISettings
