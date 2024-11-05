@@ -358,9 +358,20 @@ struct UserText {
     // Misc
 
     // AI Chat
+    static let aiChatOnboardingPopoverTitle = NSLocalizedString("ai-chat.onboarding.popover.title", value: "Launch AI Chat directly from your toolbar", comment: "AI Chat onboarding popover title")
+    static let aiChatOnboardingPopoverMessageMarkdown = NSLocalizedString("ai-chat.onboarding.popover.message-markdown", value: "You can adjust this and other AI Chat features in **Settings** > **AI Chat**.", comment: "AI Chat onboarding popover message, make sure to keep Settings and AI Chat inside ** **")
+    static let aiChatOnboardingPopoverMessageFallback = NSLocalizedString("ai-chat.onboarding.popover.message-fallback", value: "You can adjust this and other AI Chat features in Settings > AI Chat", comment: "AI Chat onboarding popover message continuation")
+    static let aiChatOnboardingPopoverCTAReject = NSLocalizedString("ai-chat.onboarding.popover.reject", value: "No Thanks", comment: "AI Chat onboarding CTA for rejection")
+    static let aiChatOnboardingPopoverCTAAccept = NSLocalizedString("ai-chat.onboarding.popover.accept", value: "Add Shortcut", comment: "AI Chat onboarding CTA for approval")
+    static let aiChatOnboardingPopoverConfirmation = NSLocalizedString("ai-chat.onboarding.popover.confirmation", value: "AI Chat shortcut added!", comment: "Confirmation for accepting the AI Chat onboarding popover")
+
     static let aiChatShowInToolbarToggle = NSLocalizedString("ai-chat.show-in-toolbar.toggle", value: "Show AI Chat shortcut in browser toolbar", comment: "Show AI Chat in toolbar")
 
     static let aiChatShowInApplicationMenuToggle = NSLocalizedString("ai-chat.show-in-application-menu.toggle", value: "Show “New AI Chat” in File and application menus", comment: "Show AI Chat in application menus")
+
+    static let aiChatPreferencesCaptionWithLinkMarkdown = NSLocalizedString("ai-chat.preferences.caption.link.markdown", value: "AI Chat is an optional feature available at [duck.ai](https://duck.ai) that lets you have private conversations with popular 3rd-party AI chat models. Your chats are not used to train chat models.", comment: "Ai Chat preferences explanation with a markdown link. Do not translate what's inside [] and ()")
+
+    static let aiChatPreferencesCaptionWithLinkFallback = NSLocalizedString("ai-chat.preferences.caption.link.fallback", value: "AI Chat is an optional feature available at duck.ai that lets you have private conversations with popular 3rd-party AI chat models. Your chats are not used to train chat models.", comment: "Ai Chat preferences explanation")
 
     static let aiChatPreferencesCaption = NSLocalizedString("ai-chat.preferences.caption", value: "Launch AI Chat faster by adding shortcuts to your browser toolbar or menu", comment: "Ai Chat preferences explanation")
     static let aiChatPreferencesLearnMoreButton = NSLocalizedString("ai-chat.preferences.learn-more", value: "Learn More", comment: "AI Chat preferences button to learn more about it")
@@ -397,6 +408,11 @@ struct UserText {
     static let gpcCheckboxTitle = NSLocalizedString("gpc.checkbox.title", value: "Enable Global Privacy Control", comment: "GPC settings checkbox title")
     static let gpcExplanation = NSLocalizedString("gpc.explanation", value: "Tells participating websites not to sell or share your data.", comment: "GPC explanation in settings")
     static let learnMore = NSLocalizedString("learnmore.link", value: "Learn More", comment: "Learn More link")
+
+    static let autofillOnboardingPopoverCTAReject = NSLocalizedString("autofill.onboarding.popover.reject", value: "No Thanks", comment: "Autofill onboarding CTA for rejection")
+    static let autofillOnboardingPopoverCTAAccept = NSLocalizedString("autofill.onboarding.popover.accept", value: "Add Shortcut", comment: "Autofill onboarding CTA for approval")
+    static let autofillOnboardingPopoverTitle = NSLocalizedString("autofill.onboarding.popover.title", value: "Add passwords shortcut?", comment: "Autofill onboarding popover title")
+    static let autofillOnboardingPopoverMessage = NSLocalizedString("autofill.onboarding.popover.message1", value: "You can manage your toolbar shortcuts at any time by right-clicking on the toolbar.", comment: "Autofill onboarding popover message")
 
     static let autofillPasswordManager = NSLocalizedString("autofill.password-manager", value: "Password Manager", comment: "Autofill settings section title")
     static let autofillPasswordManagerDuckDuckGo = NSLocalizedString("autofill.password-manager.duckduckgo", value: "DuckDuckGo built-in password manager", comment: "Autofill password manager row title")
@@ -693,7 +709,7 @@ struct UserText {
     static let autofill = NSLocalizedString("preferences.autofill", value: "Passwords", comment: "Show Autofill preferences")
 
     static let aboutDuckDuckGo = NSLocalizedString("preferences.about.about-duckduckgo", value: "About DuckDuckGo", comment: "About screen")
-    static let privacySimplified = NSLocalizedString("preferences.about.privacy-simplified", value: "Privacy, simplified.", comment: "About screen")
+    static let duckduckgoTagline = NSLocalizedString("preferences.about.duckduckgo-tagline", value: "Your protection, our priority.", comment: "About screen")
     static let aboutUnsupportedDeviceInfo1 = NSLocalizedString("preferences.about.unsupported-device-info1", value: "DuckDuckGo is no longer providing browser updates for your version of macOS.", comment: "This string represents a message informing the user that DuckDuckGo is no longer providing browser updates for their version of macOS")
     static func aboutUnsupportedDeviceInfo2(version: String) -> String {
         let localized = NSLocalizedString("preferences.about.unsupported-device-info2", value: "Please update to macOS %@ or later to use the most recent version of DuckDuckGo. You can also keep using your current version of the browser, but it will not receive further updates.", comment: "Copy in section that tells the user to update their macOS version since their current version is unsupported")
@@ -949,8 +965,8 @@ struct UserText {
     static let bitwardenError = NSLocalizedString("bitwarden.error", value: "Unable to find or connect to Bitwarden", comment: "This message appears when the application is unable to find or connect to Bitwarden, indicating a connection issue.")
     static let bitwardenNotInstalled = NSLocalizedString("bitwarden.not.installed", value: "Bitwarden app is not installed", comment: "")
     static let bitwardenOldVersion = NSLocalizedString("bitwarden.old.version", value: "Please update Bitwarden to the latest version", comment: "Message that warns user they need to update their password manager Bitwarden app vesion")
-    static let bitwardenIncompatible = NSLocalizedString("bitwarden.incompatible", value: "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:", comment: "Message that warns user that specific Bitwarden app vesions are not compatible with this app")
-    static let bitwardenIncompatibleStep1 = NSLocalizedString("bitwarden.incompatible.step.1", value: "Download v2024.4.3", comment: "First step to downgrade Bitwarden")
+    static let bitwardenIncompatible = NSLocalizedString("bitwarden.incompatible", value: "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.10.0, v2024.10.1, v2024.10.2. Please downgrade to an older version by following these steps:", comment: "Message that warns user that specific Bitwarden app vesions are not compatible with this app")
+    static let bitwardenIncompatibleStep1 = NSLocalizedString("bitwarden.incompatible.step.1", value: "Download v2024.9.0", comment: "First step to downgrade Bitwarden")
     static let bitwardenIncompatibleStep2 = NSLocalizedString("bitwarden.incompatible.step.2", value: "2. Open the downloaded DMG file and drag the Bitwarden application to\nthe /Applications folder.", comment: "Second step to downgrade Bitwarden")
     static let bitwardenIntegrationNotApproved = NSLocalizedString("bitwarden.integration.not.approved", value: "Integration with DuckDuckGo is not approved in Bitwarden app", comment: "While the user tries to connect the DuckDuckGo Browser to password manager Bitwarden This message indicates that the integration with DuckDuckGo has not been approved in the Bitwarden app.")
     static let bitwardenMissingHandshake = NSLocalizedString("bitwarden.missing.handshake", value: "Missing handshake", comment: "While the user tries to connect the DuckDuckGo Browser to password manager Bitwarden This message indicates a missing handshake (a way for two devices or systems to say hello to each other and agree to communicate or exchange information).")
@@ -1177,7 +1193,9 @@ struct UserText {
 
     // Bookmarks bar prompt
     static let bookmarksBarPromptTitle = NSLocalizedString("bookmarks.bar.prompt.title", value: "Show Bookmarks Bar?", comment: "Title for bookmarks bar prompt")
-    static let bookmarksBarPromptMessage = NSLocalizedString("bookmarks.bar.prompt.message", value: "Show the Bookmarks Bar for quick access to your new bookmarks.", comment: "Message show for bookmarks bar prompt")
+    static let bookmarksBarPromptMessageMarkdown = NSLocalizedString("bookmarks.bar.prompt.message1", value: "Show the Bookmarks Bar for quick access to your favorite bookmarks. You can adjust this later in **Settings** > **Appearance**.", comment: " message with markdown show for bookmarks bar prompt, make sure to keep the ** ** for the translated words Settings and Appearance")
+    static let bookmarksBarPromptMessageFallback = NSLocalizedString("bookmarks.bar.prompt.message1", value: "Show the Bookmarks Bar for quick access to your favorite bookmarks. You can adjust this later in Settings > Appearance.", comment: " message show for bookmarks bar prompt")
+
     static let bookmarksBarPromptDismiss = NSLocalizedString("bookmarks.bar.prompt.dismiss", value: "Hide", comment: "Dismiss button label on bookmarks bar prompt")
     static let bookmarksBarPromptAccept = NSLocalizedString("bookmarks.bar.prompt.accept", value: "Show", comment: "Accept button label on bookmarks bar prompt")
 
@@ -1237,21 +1255,29 @@ struct UserText {
     static let downloadsOpenDownloadsFolder = NSLocalizedString("downloads.open-downloads-folder", value: "Open Downloads Folder", comment: "Button in the downloads manager that allows the user to open the downloads folder")
 
     // MARK: Updates
-    static let updateAvailableMenuItem = NSLocalizedString("update.available.menu.item", value: "Update Available - Restart Now", comment: "Title of the menu item that informs user that a new update is available. Clicking on the menu item restarts the app and installs the update")
+    static let updateAvailableMenuItem = NSLocalizedString("update.available.menu.item", value: "Update Available - Install Now", comment: "Title of the menu item that informs user that a new update is available. Clicking on the menu item installs the update")
     static let releaseNotesMenuItem = NSLocalizedString("release.notes.menu.item", value: "Release Notes", comment: "Title of the dialog menu item that opens release notes")
     static let whatsNewMenuItem = NSLocalizedString("whats.new.menu.item", value: "What's New", comment: "Title of the dialog menu item that opens the 'What's New' page")
     static let browserUpdatesTitle = NSLocalizedString("settings.browser.updates.title", value: "Browser Updates", comment: "Title of the section in Settings where people set up automatic vs manual updates")
     static let automaticUpdates = NSLocalizedString("settings.automatic.updates", value: "Automatically install updates (recommended)", comment: "Title of the checkbox item to set up automatic updates of the browser")
     static let manualUpdates = NSLocalizedString("settings.manual.updates", value: "Check for updates but let you choose to install them", comment: "Title of the checkbox item to set up manual updates of the browser")
     static let checkingForUpdate = NSLocalizedString("settings.checking.for.update", value: "Checking for update", comment: "Label informing users the app is currently checking for new update")
+    static let downloadingUpdate = NSLocalizedString("settings.downloading.update", value: "Downloading update %@", comment: "Label informing users the app is currently downloading the update. This will contain a percentage")
+    static let preparingUpdate = NSLocalizedString("settings.preparing.update", value: "Preparing update", comment: "Label informing users the app is preparing to update.")
+    static let updateFailed = NSLocalizedString("settings.update.failed", value: "Update failed", comment: "Label informing users the app is unable to update.")
     static let upToDate = NSLocalizedString("settings.up.to.date", value: "DuckDuckGo is up to date", comment: "Label informing users the app is currently up to date and no update is required.")
     static let newerVersionAvailable = NSLocalizedString("settings.newer.version.available", value: "Newer version available", comment: "Label informing users the newer version of the app is available to install.")
+    static let newerCriticalUpdateAvailable = NSLocalizedString("settings.newer.critical.update.available", value: "Critical update needed", comment: "Label informing users the critical update of the app is available to install.")
     static let lastChecked = NSLocalizedString("settings.last.checked", value: "Last checked", comment: "Label informing users what is the last time the app checked for the update.")
-    static let restartToUpdate = NSLocalizedString("settings.restart.to.update", value: "Restart to Update", comment: "Button label trigering restart and update of the application.")
+    static let restartToUpdate = NSLocalizedString("settings.restart.to.update", value: "Restart To Update", comment: "Button label triggering restart and update of the application.")
+    static let runUpdate = NSLocalizedString("settings.run.update", value: "Update DuckDuckGo", comment: "Button label triggering update of the application.")
+    static let retryUpdate = NSLocalizedString("settings.retry.update", value: "Retry Update", comment: "Button label triggering a retry of the update.")
     static let browserUpdatedNotification = NSLocalizedString("notification.browser.updated", value: "Browser Updated", comment: "Notification informing user the app has been updated")
     static let browserDowngradedNotification = NSLocalizedString("notification.browser.downgraded", value: "Browser Downgraded", comment: "Notification informing user the app has been downgraded")
-    static let criticalUpdateNotification = NSLocalizedString("notification.critical.update", value: "Critical update required. Restart to update.", comment: "Notification informing user a critical update is required.")
-    static let updateAvailableNotification = NSLocalizedString("notification.update.available", value: "New version available. Restart to update.", comment: "Notification informing user the a version of app is available")
+    static let criticalUpdateNotification = NSLocalizedString("notification.critical.update", value: "Critical update needed.", comment: "Notification informing user a critical update is available.")
+    static let updateAvailableNotification = NSLocalizedString("notification.update.available", value: "New version available.", comment: "Notification informing user the a version of app is available.")
+    static let autoUpdateAction = NSLocalizedString("notification.auto.update.action", value: "Restart to update.", comment: "Action to take when an automatic update is available.")
+    static let manualUpdateAction = NSLocalizedString("notification.manual.update.action", value: "Click here to update.", comment: "Action to take when a manual update is available.")
     static let viewDetails = NSLocalizedString("view.details.button", value: "View Details", comment: "Button title to open more details about the update")
 
     enum Bookmarks {
@@ -1395,4 +1421,6 @@ struct UserText {
     // Key: "home.page.promotion.freemium.dbp.post.scan.engagement.button.title"
     // Comment: "Title for the Freemium DBP Home Page Post Scan Engagement Promotion Button"
     static let homePagePromotionFreemiumDBPPostScanEngagementButtonTitle = "View Results"
+
+    static let removeSuggestionTooltip = NSLocalizedString("remove.suggestion.tooltip", value: "Remove from browsing history", comment: "Tooltip for the button which removes the history entry from the history")
 }

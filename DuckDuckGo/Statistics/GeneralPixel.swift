@@ -156,6 +156,13 @@ enum GeneralPixel: PixelKitEventV2 {
     case networkProtectionGeoswitchingSetCustom
     case networkProtectionGeoswitchingNoLocations
 
+    // AI Chat
+    case aichatToolbarClicked
+    case aichatApplicationMenuAppClicked
+    case aichatApplicationMenuFileClicked
+    case aichatToolbarOnboardingPopoverShown
+    case aichatToolbarOnboardingPopoverAccept
+    case aichatNoRemoteSettingsFound(AIChatRemoteSettings.SettingsValue)
     // Sync
     case syncSignupDirect
     case syncSignupConnect
@@ -174,6 +181,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case syncBookmarksValidationErrorDaily
     case syncCredentialsValidationErrorDaily
     case syncSettingsValidationErrorDaily
+    case syncDebugWasDisabledUnexpectedly
 
     // Remote Messaging Framework
     case remoteMessageShown
@@ -397,6 +405,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case syncLogoutError(error: Error)
     case syncUpdateDeviceError(error: Error)
     case syncRemoveDeviceError(error: Error)
+    case syncRefreshDevicesError(error: Error)
     case syncDeleteAccountError(error: Error)
     case syncLoginExistingAccountError(error: Error)
     case syncCannotCreateRecoveryPDF
@@ -662,6 +671,20 @@ enum GeneralPixel: PixelKitEventV2 {
         case .networkProtectionEnabledOnSearch:
             return "m_mac_netp_ev_enabled_on_search"
 
+            // AI Chat
+        case .aichatToolbarClicked:
+            return "m_mac_aichat_toolbar-clicked"
+        case .aichatApplicationMenuAppClicked:
+            return "m_mac_aichat_application-menu-app-clicked"
+        case .aichatApplicationMenuFileClicked:
+            return "m_mac_aichat_application-menu-file-clicked"
+        case .aichatToolbarOnboardingPopoverShown:
+            return "m_mac_aichat_toolbar-onboarding-popover-shown"
+        case .aichatToolbarOnboardingPopoverAccept:
+            return "m_mac_aichat_toolbar-onboarding-popover-accept"
+        case .aichatNoRemoteSettingsFound(let settings):
+            return "m_mac_aichat_no_remote_settings_found-\(settings.rawValue.lowercased())"
+
             // Sync
         case .syncSignupDirect:
             return "m_mac_sync_signup_direct"
@@ -687,6 +710,7 @@ enum GeneralPixel: PixelKitEventV2 {
         case .syncBookmarksValidationErrorDaily: return "m_mac_sync_bookmarks_validation_error_daily"
         case .syncCredentialsValidationErrorDaily: return "m_mac_sync_credentials_validation_error_daily"
         case .syncSettingsValidationErrorDaily: return "m_mac_sync_settings_validation_error_daily"
+        case .syncDebugWasDisabledUnexpectedly: return "m_mac_sync_was_disabled_unexpectedly"
 
         case .remoteMessageShown: return "m_mac_remote_message_shown"
         case .remoteMessageShownUnique: return "m_mac_remote_message_shown_unique"
@@ -1010,6 +1034,7 @@ enum GeneralPixel: PixelKitEventV2 {
         case .syncLogoutError: return "sync_logout_error"
         case .syncUpdateDeviceError: return "sync_update_device_error"
         case .syncRemoveDeviceError: return "sync_remove_device_error"
+        case .syncRefreshDevicesError: return "sync_refresh_devices_error"
         case .syncDeleteAccountError: return "sync_delete_account_error"
         case .syncLoginExistingAccountError: return "sync_login_existing_account_error"
         case .syncCannotCreateRecoveryPDF: return "sync_cannot_create_recovery_pdf"
@@ -1065,6 +1090,7 @@ enum GeneralPixel: PixelKitEventV2 {
                 .syncLogoutError(let error),
                 .syncUpdateDeviceError(let error),
                 .syncRemoveDeviceError(let error),
+                .syncRefreshDevicesError(let error),
                 .syncDeleteAccountError(let error),
                 .syncLoginExistingAccountError(let error),
                 .bookmarksCouldNotLoadDatabase(let error?):

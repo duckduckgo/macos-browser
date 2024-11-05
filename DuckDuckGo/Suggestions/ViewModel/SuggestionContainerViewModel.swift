@@ -49,7 +49,7 @@ final class SuggestionContainerViewModel {
 
     private(set) var userStringValue: String?
 
-    private var isTopSuggestionSelectionExpected = false
+    var isTopSuggestionSelectionExpected = false
 
     private enum IgnoreTopSuggestionError: Error {
         case emptyResult
@@ -179,6 +179,21 @@ final class SuggestionContainerViewModel {
 
         let newIndex = max(0, selectionIndex - 1)
         select(at: newIndex)
+    }
+
+    func removeSuggestionFromResult(suggestion: Suggestion) {
+        let topHits = suggestionContainer.result?.topHits.filter({
+            !($0 == suggestion && $0.isHistoryEntry)
+        }) ?? []
+        let duckduckgoSuggestions = suggestionContainer.result?.duckduckgoSuggestions ?? []
+        let localSuggestions = suggestionContainer.result?.localSuggestions.filter({
+            !($0 == suggestion && $0.isHistoryEntry)
+        }) ?? []
+        let result = SuggestionResult(topHits: topHits,
+                                      duckduckgoSuggestions: duckduckgoSuggestions,
+                                      localSuggestions: localSuggestions)
+
+        suggestionContainer.result = result
     }
 
 }

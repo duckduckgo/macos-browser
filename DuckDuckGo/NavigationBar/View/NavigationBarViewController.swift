@@ -184,6 +184,8 @@ final class NavigationBarViewController: NSViewController {
 #if DEBUG || REVIEW
         addDebugNotificationListeners()
 #endif
+
+        subscribeToAIChatOnboarding()
     }
 
     override func viewWillAppear() {
@@ -332,10 +334,6 @@ final class NavigationBarViewController: NSViewController {
 
     @IBAction func downloadsButtonAction(_ sender: NSButton) {
         toggleDownloadsPopover(keepButtonVisible: false)
-    }
-
-    @IBAction func aiChatButtonAction(_ sender: NSButton) {
-        AIChatTabOpener.openAIChatTab()
     }
 
     override func mouseDown(with event: NSEvent) {
@@ -513,20 +511,15 @@ final class NavigationBarViewController: NSViewController {
         guard view.window?.isKeyWindow == true else { return }
 
         DispatchQueue.main.async {
-            let popoverMessage = PopoverMessageViewController(message: UserText.passwordManagerPinnedPromptPopoverText,
-                                                              buttonText: UserText.passwordManagerPinnedPromptPopoverButtonText,
-                                                              buttonAction: {},
-                                                              onDismiss: {
-                self.passwordManagementButton.isHidden = !LocalPinningManager.shared.isPinned(.autofill)
-            })
+            self.popovers.showAutofillOnboardingPopover(from: self.passwordManagementButton,
+                                                   withDelegate: self) { [weak self] didAddShortcut in
+                guard let self = self else { return }
+                self.popovers.closeAutofillOnboardingPopover()
 
-            popoverMessage.viewModel.buttonAction = { [weak popoverMessage] in
-                LocalPinningManager.shared.pin(.autofill)
-                popoverMessage?.dismiss()
+                if didAddShortcut {
+                    LocalPinningManager.shared.pin(.autofill)
+                }
             }
-
-            self.passwordManagementButton.isHidden = false
-            popoverMessage.show(onParent: self, relativeTo: self.passwordManagementButton)
         }
     }
 
@@ -909,18 +902,6 @@ final class NavigationBarViewController: NSViewController {
         }
     }
 
-    private func updateAIChatButton() {
-
-        let menu = NSMenu()
-        let title = LocalPinningManager.shared.shortcutTitle(for: .aiChat)
-        menu.addItem(withTitle: title, action: #selector(toggleAIChatPanelPinning(_:)), keyEquivalent: "")
-
-        aiChatButton.menu = menu
-        aiChatButton.toolTip = UserText.aiChat
-
-        aiChatButton.isHidden = !(LocalPinningManager.shared.isPinned(.aiChat) && aiChatMenuConfig.isFeatureEnabledForToolbarShortcut)
-    }
-
     private func subscribeToCredentialsToSave() {
         credentialsToSaveCancellable = tabCollectionViewModel.selectedTabViewModel?.tab.autofillDataToSavePublisher
             .receive(on: DispatchQueue.main)
@@ -984,6 +965,58 @@ final class NavigationBarViewController: NSViewController {
                 refreshOrStopButton?.toolTip = isLoading ? UserText.stopLoadingTooltip : UserText.refreshPageTooltip
             }
             .store(in: &navigationButtonsCancellables)
+    }
+
+    // MARK: - AI Chat
+
+    private func subscribeToAIChatOnboarding() {
+        aiChatMenuConfig.shouldDisplayToolbarOnboardingPopover
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self]  in
+                guard let self = self else { return }
+                self.automaticallyShowAIChatOnboardingPopoverIfPossible()
+        }.store(in: &cancellables)
+    }
+
+    private func automaticallyShowAIChatOnboardingPopoverIfPossible() {
+        guard WindowControllersManager.shared.lastKeyMainWindowController?.window === aiChatButton.window else { return }
+
+        popovers.showAIChatOnboardingPopover(from: aiChatButton,
+                                             withDelegate: self,
+                                             ctaCallback: { [weak self] didAddShortcut in
+            guard let self = self else { return }
+            self.popovers.closeAIChatOnboardingPopover()
+
+            if didAddShortcut {
+                self.showAIChatOnboardingConfirmationPopover()
+            }
+        })
+
+        aiChatMenuConfig.markToolbarOnboardingPopoverAsShown()
+    }
+
+    private func showAIChatOnboardingConfirmationPopover() {
+        DispatchQueue.main.async {
+            let viewController = PopoverMessageViewController(message: UserText.aiChatOnboardingPopoverConfirmation,
+                                                              image: .successCheckmark)
+            viewController.show(onParent: self, relativeTo: self.aiChatButton)
+        }
+    }
+
+    @IBAction func aiChatButtonAction(_ sender: NSButton) {
+        AIChatTabOpener.openAIChatTab()
+        PixelKit.fire(GeneralPixel.aichatToolbarClicked, includeAppVersionParameter: true)
+    }
+
+    private func updateAIChatButton() {
+        let menu = NSMenu()
+        let title = LocalPinningManager.shared.shortcutTitle(for: .aiChat)
+        menu.addItem(withTitle: title, action: #selector(toggleAIChatPanelPinning(_:)), keyEquivalent: "")
+
+        aiChatButton.menu = menu
+        aiChatButton.toolTip = UserText.aiChat
+
+        aiChatButton.isHidden = !(LocalPinningManager.shared.isPinned(.aiChat) && aiChatMenuConfig.isFeatureEnabledForToolbarShortcut)
     }
 }
 
@@ -1191,9 +1224,14 @@ extension NavigationBarViewController: NSPopoverDelegate {
         } else if let popover = popovers.savePaymentMethodPopover, notification.object as AnyObject? === popover {
             popovers.savePaymentMethodPopoverClosed()
             updatePasswordManagementButton()
+        } else if let popover = popovers.aiChatOnboardingPopover, notification.object as AnyObject? === popover {
+            popovers.aiChatOnboardingPopoverClosed()
+            updateAIChatButton()
+        } else if let popover = popovers.autofillOnboardingPopover, notification.object as AnyObject? === popover {
+            popovers.autofillOnboardingPopoverClosed()
+            updatePasswordManagementButton()
         }
     }
-
 }
 
 extension NavigationBarViewController: DownloadsViewControllerDelegate {

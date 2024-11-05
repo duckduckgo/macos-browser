@@ -165,12 +165,13 @@ final class MainMenu: NSMenu {
 
     func buildFileMenu() -> NSMenuItem {
         NSMenuItem(title: UserText.mainMenuFile) {
+            newTabMenuItem
+
             newWindowMenuItem
             NSMenuItem(title: UserText.newBurnerWindowMenuItem, action: #selector(AppDelegate.newBurnerWindow), keyEquivalent: "N")
 
             aiChatMenu
 
-            newTabMenuItem
             openLocationMenuItem
             NSMenuItem.separator()
 
@@ -278,9 +279,7 @@ final class MainMenu: NSMenu {
 
             toggleNetworkProtectionShortcutMenuItem
 
-            if aiChatMenuConfig.shouldDisplayToolbarShortcut {
-                toggleAIChatShortcutMenuItem
-            }
+            toggleAIChatShortcutMenuItem
 
             NSMenuItem.separator()
 
@@ -429,6 +428,7 @@ final class MainMenu: NSMenu {
 
         // To be safe, hide the NetP shortcut menu item by default.
         toggleNetworkProtectionShortcutMenuItem.isHidden = true
+        toggleAIChatShortcutMenuItem.isHidden = true
 
         updateHomeButtonMenuItem()
         updateBookmarksBarMenuItem()
@@ -585,6 +585,13 @@ final class MainMenu: NSMenu {
             toggleBookmarksShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .bookmarks)
             toggleDownloadsShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .downloads)
 
+            if AIChatRemoteSettings().isApplicationMenuShortcutEnabled {
+                toggleAIChatShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .aiChat)
+                toggleAIChatShortcutMenuItem.isHidden = false
+            } else {
+                toggleAIChatShortcutMenuItem.isHidden = true
+            }
+
             if DefaultVPNFeatureGatekeeper(subscriptionManager: Application.appDelegate.subscriptionManager).isVPNVisible() {
                 toggleNetworkProtectionShortcutMenuItem.isHidden = false
                 toggleNetworkProtectionShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .networkProtection)
@@ -704,6 +711,8 @@ final class MainMenu: NSMenu {
                                   subscriptionManager: Application.appDelegate.subscriptionManager)
 
             NSMenuItem(title: "Logging").submenu(setupLoggingMenu())
+            NSMenuItem(title: "AI Chat").submenu(AIChatDebugMenu())
+
         }
         debugMenu.addItem(internalUserItem)
         debugMenu.autoenablesItems = false
