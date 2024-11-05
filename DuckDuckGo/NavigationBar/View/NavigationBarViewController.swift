@@ -113,6 +113,7 @@ final class NavigationBarViewController: NSViewController {
     private var downloadsCancellables = Set<AnyCancellable>()
     private var cancellables = Set<AnyCancellable>()
     private let aiChatMenuConfig: AIChatMenuVisibilityConfigurable
+    private let brokenSitePromptLimiter: BrokenSitePromptLimiter
 
     @UserDefaultsWrapper(key: .homeButtonPosition, defaultValue: .right)
     static private var homeButtonPosition: HomeButtonPosition
@@ -122,21 +123,23 @@ final class NavigationBarViewController: NSViewController {
     private let networkProtectionButtonModel: NetworkProtectionNavBarButtonModel
     private let networkProtectionFeatureActivation: NetworkProtectionFeatureActivation
 
-    static func create(tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool,
+    static func create(tabCollectionViewModel: TabCollectionViewModel,
+                       isBurner: Bool,
                        networkProtectionFeatureActivation: NetworkProtectionFeatureActivation = NetworkProtectionKeychainTokenStore(),
                        downloadListCoordinator: DownloadListCoordinator = .shared,
                        dragDropManager: BookmarkDragDropManager = .shared,
                        networkProtectionPopoverManager: NetPPopoverManager,
                        networkProtectionStatusReporter: NetworkProtectionStatusReporter,
                        autofillPopoverPresenter: AutofillPopoverPresenter,
-                       aiChatMenuConfig: AIChatMenuVisibilityConfigurable) -> NavigationBarViewController {
+                       aiChatMenuConfig: AIChatMenuVisibilityConfigurable,
+                       brokenSitePromptLimiter: BrokenSitePromptLimiter) -> NavigationBarViewController {
         NSStoryboard(name: "NavigationBar", bundle: nil).instantiateInitialController { coder in
-            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner, networkProtectionFeatureActivation: networkProtectionFeatureActivation, downloadListCoordinator: downloadListCoordinator, dragDropManager: dragDropManager, networkProtectionPopoverManager: networkProtectionPopoverManager, networkProtectionStatusReporter: networkProtectionStatusReporter, autofillPopoverPresenter: autofillPopoverPresenter, aiChatMenuConfig: aiChatMenuConfig)
+            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner, networkProtectionFeatureActivation: networkProtectionFeatureActivation, downloadListCoordinator: downloadListCoordinator, dragDropManager: dragDropManager, networkProtectionPopoverManager: networkProtectionPopoverManager, networkProtectionStatusReporter: networkProtectionStatusReporter, autofillPopoverPresenter: autofillPopoverPresenter, aiChatMenuConfig: aiChatMenuConfig, brokenSitePromptLimiter: brokenSitePromptLimiter)
         }!
     }
 
     init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, networkProtectionFeatureActivation: NetworkProtectionFeatureActivation, downloadListCoordinator: DownloadListCoordinator, dragDropManager: BookmarkDragDropManager, networkProtectionPopoverManager: NetPPopoverManager, networkProtectionStatusReporter: NetworkProtectionStatusReporter, autofillPopoverPresenter: AutofillPopoverPresenter,
-          aiChatMenuConfig: AIChatMenuVisibilityConfigurable) {
+          aiChatMenuConfig: AIChatMenuVisibilityConfigurable, brokenSitePromptLimiter: BrokenSitePromptLimiter) {
 
         self.popovers = NavigationBarPopovers(networkProtectionPopoverManager: networkProtectionPopoverManager, autofillPopoverPresenter: autofillPopoverPresenter, isBurner: isBurner)
         self.tabCollectionViewModel = tabCollectionViewModel
@@ -146,6 +149,7 @@ final class NavigationBarViewController: NSViewController {
         self.downloadListCoordinator = downloadListCoordinator
         self.dragDropManager = dragDropManager
         self.aiChatMenuConfig = aiChatMenuConfig
+        self.brokenSitePromptLimiter = brokenSitePromptLimiter
         goBackButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .back, tabCollectionViewModel: tabCollectionViewModel)
         goForwardButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .forward, tabCollectionViewModel: tabCollectionViewModel)
         super.init(coder: coder)
@@ -545,10 +549,6 @@ final class NavigationBarViewController: NSViewController {
         }
     }
 
-    // TODO: DI
-    lazy private var brokenSitePromptLimiter = BrokenSitePromptLimiter(privacyConfigManager: ContentBlocking.shared.privacyConfigurationManager,
-                                                                       store: BrokenSitePromptLimiterStore())
-
     @objc private func attemptToShowBrokenSitePrompt(_ sender: Notification) {
         guard brokenSitePromptLimiter.shouldShowToast(),
               let event = sender.userInfo?[PageRefreshEvent.key] as? PageRefreshEvent,
@@ -576,7 +576,7 @@ final class NavigationBarViewController: NSViewController {
                                                           onDismiss: {
             self.brokenSitePromptLimiter.didDismissToast()
         }
-                                                          )
+        )
         popoverMessage.show(onParent: self, relativeTo: privacyButton, behavior: .semitransient)
     }
 

@@ -2927,6 +2927,8 @@
 		CBECDB812CD9829A005B8B87 /* PageRefreshStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBECDB7F2CD98296005B8B87 /* PageRefreshStore.swift */; };
 		CBECDB842CDA813C005B8B87 /* BrokenSitePromptLimiterStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBECDB832CDA8137005B8B87 /* BrokenSitePromptLimiterStore.swift */; };
 		CBECDB852CDA813C005B8B87 /* BrokenSitePromptLimiterStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBECDB832CDA8137005B8B87 /* BrokenSitePromptLimiterStore.swift */; };
+		CBECDB872CDACE29005B8B87 /* BrokenSitePromptLimiter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBECDB862CDACE29005B8B87 /* BrokenSitePromptLimiter.swift */; };
+		CBECDB882CDACE29005B8B87 /* BrokenSitePromptLimiter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBECDB862CDACE29005B8B87 /* BrokenSitePromptLimiter.swift */; };
 		CD2AB5BF2C8222F20019EB49 /* PhishingDetection.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE248A42C821FFE00F9399D /* PhishingDetection.swift */; };
 		CD2AB5C02C8222F20019EB49 /* PhishingDetection.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE248A42C821FFE00F9399D /* PhishingDetection.swift */; };
 		CD2AB5C12C8222F40019EB49 /* PhishingDetectionPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE248A52C821FFE00F9399D /* PhishingDetectionPreferences.swift */; };
@@ -4770,6 +4772,7 @@
 		CBECDB7C2CD9826E005B8B87 /* PageRefreshEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageRefreshEvent.swift; sourceTree = "<group>"; };
 		CBECDB7F2CD98296005B8B87 /* PageRefreshStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageRefreshStore.swift; sourceTree = "<group>"; };
 		CBECDB832CDA8137005B8B87 /* BrokenSitePromptLimiterStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrokenSitePromptLimiterStore.swift; sourceTree = "<group>"; };
+		CBECDB862CDACE29005B8B87 /* BrokenSitePromptLimiter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrokenSitePromptLimiter.swift; sourceTree = "<group>"; };
 		CD2AB5C92C8225E70019EB49 /* URLTokenValidator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLTokenValidator.swift; sourceTree = "<group>"; };
 		CD3301282C887B1C009AA127 /* URLTokenValidatorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLTokenValidatorTests.swift; sourceTree = "<group>"; };
 		CD33012B2C89B588009AA127 /* ErrorPageHTMLFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorPageHTMLFactory.swift; sourceTree = "<group>"; };
@@ -9466,6 +9469,7 @@
 			isa = PBXGroup;
 			children = (
 				CBECDB832CDA8137005B8B87 /* BrokenSitePromptLimiterStore.swift */,
+				CBECDB862CDACE29005B8B87 /* BrokenSitePromptLimiter.swift */,
 			);
 			path = BrokenSitePrompt;
 			sourceTree = "<group>";
@@ -11707,6 +11711,7 @@
 				3706FC50293F65D500E42796 /* FeedbackWindow.swift in Sources */,
 				3706FC51293F65D500E42796 /* RecentlyVisitedView.swift in Sources */,
 				B6E3E5552BBFCEE300A41922 /* NoDownloadsCellView.swift in Sources */,
+				CBECDB882CDACE29005B8B87 /* BrokenSitePromptLimiter.swift in Sources */,
 				B645D8F729FA95440024461F /* WKProcessPoolExtension.swift in Sources */,
 				9F9C49FE2BC7E9830099738D /* BookmarkAllTabsDialogViewModel.swift in Sources */,
 				9F514F922B7D88AD001832A9 /* AddEditBookmarkFolderDialogView.swift in Sources */,
@@ -12787,6 +12792,7 @@
 				4B0AACAC28BC63ED001038AC /* ChromiumFaviconsReader.swift in Sources */,
 				AABEE6AB24ACA0F90043105B /* SuggestionTableRowView.swift in Sources */,
 				37CD54CB27F2FDD100F1F7B9 /* DownloadsPreferences.swift in Sources */,
+				CBECDB872CDACE29005B8B87 /* BrokenSitePromptLimiter.swift in Sources */,
 				4B1E6EF227AB5E5D00F51793 /* PasswordManagementItemList.swift in Sources */,
 				AAC5E4D025D6A709007F5990 /* Bookmark.swift in Sources */,
 				4B0EF7262B578095009D6481 /* AppVersionExtension.swift in Sources */,
