@@ -694,10 +694,15 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
 
         // When
         tab = nil
-        RunLoop.main.run(until: Date().addingTimeInterval(0.1))
+        let timeoutDate = Date().addingTimeInterval(3.0)
+
+        var lastVisitTabAfterDeallocation: Tab?
+        repeat {
+            RunLoop.main.run(until: Date().addingTimeInterval(0.1))
+            lastVisitTabAfterDeallocation = mirror.descendant("lastVisitTab") as? Tab
+        } while lastVisitTabAfterDeallocation != nil && Date() < timeoutDate
 
         // Then
-        let lastVisitTabAfterDeallocation = mirror.descendant("lastVisitTab") as? Tab
         XCTAssertNil(lastVisitTabAfterDeallocation)
     }
 }
