@@ -86,7 +86,6 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
     ///
     /// - Returns: Bool indicating prerequisites are satisfied
     func arePrerequisitesSatisfied() async -> Bool {
-        return true
 
         let isAuthenticated = accountManager.isUserAuthenticated
         if !isAuthenticated && freemiumDBPUserStateManager.didActivate { return true }
