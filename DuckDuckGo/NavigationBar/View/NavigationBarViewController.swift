@@ -223,12 +223,6 @@ final class NavigationBarViewController: NSViewController {
                 .leading: .leading(multiplier: 1.0, const: 72)
             ]))
         }
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: {
-            NotificationCenter.default.post(name: .pageRefreshDidMatchBrokenSiteCriteria,
-                                            object: self,
-                                            userInfo: [PageRefreshEvent.key: PageRefreshEvent.twiceWithin12Seconds])
-        })
     }
 
     @IBSegueAction func createAddressBarViewController(_ coder: NSCoder) -> AddressBarViewController? {
@@ -556,7 +550,7 @@ final class NavigationBarViewController: NSViewController {
                                                                        store: BrokenSitePromptLimiterStore())
 
     @objc private func attemptToShowBrokenSitePrompt(_ sender: Notification) {
-        guard /*brokenSitePromptLimiter.shouldShowToast(),*/ // TODO: Uncomment
+        guard brokenSitePromptLimiter.shouldShowToast(),
               let event = sender.userInfo?[PageRefreshEvent.key] as? PageRefreshEvent,
               let url = tabCollectionViewModel.selectedTabViewModel?.tab.url, !url.isDuckDuckGo,
               OnboardingActionsManager.isOnboardingFinished,

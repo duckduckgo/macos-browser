@@ -58497,6 +58497,30 @@
         }
       }
     },
+    "site.not.working.button.title" : {
+      "comment" : "Button title that appears on a dialog asking users about possible breakage of a site",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Let Us Know"
+          }
+        }
+      }
+    },
+    "site.not.working.title" : {
+      "comment" : "Title that appears on a dialog asking users about possible breakage of a site",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Site not working?"
+          }
+        }
+      }
+    },
     "Smart Copy/Paste" : {
       "comment" : "Main Menu Edit-Substitutions item",
       "localizations" : {
