@@ -14833,8 +14833,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BareBonesBrowser.git";
 			requirement = {
-				kind = exactVersion;
-				version = 0.1.0;
+				branch = "sam/migrate-daily-and-count-type-to-legacy-status";
+				kind = branch;
 			};
 		};
 		FAE06B199CA1F209B55B34E9 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */ = {
