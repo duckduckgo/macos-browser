@@ -1,5 +1,5 @@
 //
-//  AIChatTabOpener.swift
+//  AutofillToolbarOnboardingViewModel.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -16,8 +16,18 @@
 //  limitations under the License.
 //
 
-struct AIChatTabOpener {
-    @MainActor static func openAIChatTab() {
-        WindowControllersManager.shared.showTab(with: .url(AIChatRemoteSettings().aiChatURL, credential: nil, source: .ui))
+final class AutofillToolbarOnboardingViewModel: ObservableObject {
+    var ctaCallback: ((Bool) -> Void)?
+
+    internal init(ctaCallback: ((Bool) -> Void)? = nil) {
+        self.ctaCallback = ctaCallback
+    }
+
+    func rejectToolbarIcon() {
+        ctaCallback?(false)
+    }
+
+    func acceptToolbarIcon() {
+        ctaCallback?(true)
     }
 }

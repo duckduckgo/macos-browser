@@ -30,7 +30,23 @@ extension Preferences {
                 TextMenuTitle(UserText.aiChat)
                 PreferencePaneSubSection {
                     VStack(alignment: .leading, spacing: 1) {
-                        TextMenuItemCaption(UserText.aiChatPreferencesCaption)
+                        if #available(macOS 12, *) {
+                            // Use Markdown for macOS 12 and newer
+                            // .init is required for markdown to be correctly parsed from NSLocalizedString
+                            Text(.init(UserText.aiChatPreferencesCaptionWithLinkMarkdown))
+                                .environment(\.openURL, OpenURLAction { _ in
+                                    model.openAIChatLink()
+                                    return .handled
+                                })
+                                .tint(Color(.linkBlue))
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .fixMultilineScrollableText()
+                                .foregroundColor(Color(.greyText))
+                        } else {
+                            // Fallback for earlier macOS versions
+                            TextMenuItemCaption(UserText.aiChatPreferencesCaptionWithLinkFallback)
+                        }
+
                         TextButton(UserText.aiChatPreferencesLearnMoreButton) {
                             model.openLearnMoreLink()
                         }
