@@ -39,7 +39,9 @@ public final class DataBrokerProtectionSubscriptionManager: DataBrokerProtection
         // We use a staging token for privacy pro supplied through a github secret/action
         // for PIR end to end tests. This is also stored in bitwarden if you want to run
         // the tests locally 
-        if NSApplication.runType == .integrationTests, let token = ProcessInfo.processInfo.environment["PRIVACYPRO_STAGING_TOKEN"] {
+        let dbpSettings = DataBrokerProtectionSettings()
+        if dbpSettings.storedRunType == .integrationTests,
+           let token = ProcessInfo.processInfo.environment["PRIVACYPRO_STAGING_TOKEN"] {
             return token
         }
         return subscriptionManager.accountManager.accessToken
