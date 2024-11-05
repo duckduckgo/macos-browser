@@ -44206,6 +44206,18 @@
         }
       }
     },
+    "pinning.hide-aichat-shortcut" : {
+      "comment" : "Menu item for hiding the AI Chat shortcut",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Hide AI Chat Shortcut"
+          }
+        }
+      }
+    },
     "pinning.hide-autofill-shortcut" : {
       "comment" : "Menu item for hiding the passwords shortcut",
       "extractionState" : "extracted_with_value",
@@ -44442,6 +44454,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Скрыть ярлык для VPN"
+          }
+        }
+      }
+    },
+    "pinning.show-aichat-shortcut" : {
+      "comment" : "Menu item for showing the AI Chat shortcut",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show AI Chat Shortcut"
           }
         }
       }
