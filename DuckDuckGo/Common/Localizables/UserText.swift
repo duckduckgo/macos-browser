@@ -1368,9 +1368,13 @@ struct UserText {
     // Comment: "Title for the Freemium DBP Home Page Promotion"
     static let homePagePromotionFreemiumDBPTitle = "Personal Information Removal"
 
+    // Key: "home.page.promotion.freemium.dbp.description.markdown"
+    // Comment: "Markdown Description for the Freemium DBP Home Page Promotion"
+    static let homePagePromotionFreemiumDBPDescriptionMarkdown = "Find out which sites are selling **your info.**"
+
     // Key: "home.page.promotion.freemium.dbp.description"
     // Comment: "Description for the Freemium DBP Home Page Promotion"
-    static let homePagePromotionFreemiumDBPDescription = "Find out which sites are selling **your info.**"
+    static let homePagePromotionFreemiumDBPDescription = "Find out which sites are selling your info."
 
     // Key: "home.page.promotion.freemium.dbp.button.title"
     // Comment: "Title for the Freemium DBP Home Page Promotion Button"
