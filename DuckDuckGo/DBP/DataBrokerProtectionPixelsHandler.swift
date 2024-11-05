@@ -106,7 +106,6 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .dataBrokerMetricsWeeklyStats,
                     .dataBrokerMetricsMonthlyStats,
                     .invalidPayload,
-                    .pixelTest,
                     .customDataBrokerStatsOptoutSubmit,
                     .customGlobalStatsOptoutSubmit,
                     .weeklyChildBrokerOrphanedOptOuts:
