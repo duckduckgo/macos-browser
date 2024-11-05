@@ -89,7 +89,6 @@ class MainMenuTests: XCTestCase {
         XCTAssertEqual(manager.reopenLastClosedMenuItem?.keyEquivalentModifierMask, ReopenMenuItemKeyEquivalentManager.Const.modifierMask)
     }
 
-
     // MARK: - Default Browser Action
 
     @MainActor
