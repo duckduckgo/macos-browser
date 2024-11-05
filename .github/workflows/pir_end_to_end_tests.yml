@@ -21,11 +21,7 @@ jobs:
     if: |
       startsWith(github.event.pull_request.base.ref, 'release/') ||
       startsWith(github.event.pull_request.base.ref, 'hotfix/') ||
-      contains(toJson(github.event.pull_request.files.*.filename), 'DBPE2ETests/') ||
-      contains(toJson(github.event.pull_request.files.*.filename), 'LocalPackages/DataBrokerProtection/') ||
-      contains(toJson(github.event.pull_request.files.*.filename), 'LocalPackages/DataBrokerProtection/') ||
-      contains(toJson(github.event.pull_request.files.*.filename), 'DuckDuckGoDBPBackgroundAgent/') ||
-      contains(toJson(github.event.pull_request.files.*.filename), 'DuckDuckGo.xcodeproj/project.pbxproj') ||
+      (contains(github.event.pull_request.body, '- [x] Run PIR E2E tests') && (github.event.action != 'edited' || !contains(github.event.changes.body.from, '- [x] Run PIR E2E tests'))) ||
       github.event_name == 'schedule'
 
     concurrency:
