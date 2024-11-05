@@ -73,7 +73,11 @@ final class TabPreviewWindowController: NSWindowController {
     }
 
     func show(parentWindow: NSWindow, topLeftPointInWindow: CGPoint) {
+        Logger.tabPreview.log("TabPreviewWindowController showing tab preview")
+
         func presentPreview(tabPreviewWindow: NSWindow) {
+            Logger.tabPreview.log("TabPreviewWindowController presenting tab preview")
+
             parentWindow.addChildWindow(tabPreviewWindow, ordered: .above)
             self.layout(topLeftPoint: parentWindow.convertPoint(toScreen: topLeftPointInWindow))
         }
@@ -107,7 +111,11 @@ final class TabPreviewWindowController: NSWindowController {
     }
 
     func hide(allowQuickRedisplay: Bool = false, withDelay delay: Bool = false) {
+        Logger.tabPreview.log("TabPreviewWindowController hiding tab preview allowQuickRedisplay:\(allowQuickRedisplay) delay:\(delay)")
+
         func removePreview(allowQuickRedisplay: Bool) {
+            Logger.tabPreview.log("TabPreviewWindowController removing tab preview allowQuickRedisplay:\(allowQuickRedisplay)")
+
             guard let window = window else {
                 lastHideTime = nil
                 return
@@ -117,11 +125,12 @@ final class TabPreviewWindowController: NSWindowController {
                 if !allowQuickRedisplay {
                     lastHideTime = nil
                 }
+                window.orderOut(nil)
                 return
             }
 
             parentWindow.removeChildWindow(window)
-            (window).orderOut(nil)
+            window.orderOut(nil)
 
             // Record the hide time
             lastHideTime = allowQuickRedisplay ? Date() : nil
