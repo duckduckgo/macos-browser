@@ -70,8 +70,7 @@ struct EmailService: EmailServiceProtocol {
 
         /* Ideally we would use staging to get a real email from the endpoint
          but there's a problem with the token */
-        let dbpSettings = DataBrokerProtectionSettings()
-        if dbpSettings.storedRunType == .integrationTests {
+        if settings.storedRunType == .integrationTests {
             return EmailData(pattern: nil, emailAddress: "test@duck.com")
         }
 
