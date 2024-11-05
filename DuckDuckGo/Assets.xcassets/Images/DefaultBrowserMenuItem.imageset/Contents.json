@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "Icon 2.svg",
+      "filename" : "Set-as-Default-16D.svg",
       "idiom" : "universal"
     }
   ],
@@ -10,6 +10,7 @@
     "version" : 1
   },
   "properties" : {
-    "preserves-vector-representation" : true
+    "preserves-vector-representation" : true,
+    "template-rendering-intent" : "template"
   }
 }
