@@ -14777,8 +14777,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 203.1.0;
+				branch = "sam/migrate-daily-and-count-type-to-legacy-status";
+				kind = branch;
 			};
 		};
 		9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
@@ -14833,8 +14833,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BareBonesBrowser.git";
 			requirement = {
-				branch = "sam/migrate-daily-and-count-type-to-legacy-status";
-				kind = branch;
+				kind = exactVersion;
+				version = 0.1.0;
 			};
 		};
 		FAE06B199CA1F209B55B34E9 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */ = {
