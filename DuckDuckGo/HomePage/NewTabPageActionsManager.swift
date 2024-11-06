@@ -22,11 +22,14 @@ import PixelKit
 import Common
 import os.log
 
-protocol NewTabPageActionsManaging {
+protocol NewTabPageActionsManaging: AnyObject {
     var configuration: NewTabPageConfiguration { get }
+    var userScript: NewTabPageUserScript? { get set }
 
     /// It is called in case of error loading the pages
-    func reportException(with param: [String: String])
+    func reportException(with params: [String: String])
+    func showContextMenu(with params: [String: Any])
+    func updateWidgetConfigs(with params: [[String: String]])
 }
 
 struct NewTabPageConfiguration: Encodable {
@@ -44,6 +47,10 @@ struct NewTabPageConfiguration: Encodable {
 
         enum WidgetVisibility: String, Encodable {
             case visible, hidden
+
+            var isVisible: Bool {
+                self == .visible
+            }
         }
 
         init(id: String, isVisible: Bool) {
@@ -64,9 +71,31 @@ final class NewTabPageActionsManager: NewTabPageActionsManaging {
 
     private let appearancePreferences: AppearancePreferences
     private var cancellables = Set<AnyCancellable>()
+    weak var userScript: NewTabPageUserScript?
 
     init(appearancePreferences: AppearancePreferences) {
         self.appearancePreferences = appearancePreferences
+
+        appearancePreferences.$isFavoriteVisible.dropFirst().removeDuplicates().asVoid()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in
+                self?.notifyWidgetConfigsDidChange()
+            }
+            .store(in: &cancellables)
+
+        appearancePreferences.$isRecentActivityVisible.dropFirst().removeDuplicates().asVoid()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in
+                self?.notifyWidgetConfigsDidChange()
+            }
+            .store(in: &cancellables)
+    }
+
+    private func notifyWidgetConfigsDidChange() {
+        userScript?.widgetConfigsUpdated(widgetConfigs: [
+            .init(id: "favorites", isVisible: appearancePreferences.isFavoriteVisible),
+            .init(id: "privacyStats", isVisible: appearancePreferences.isRecentActivityVisible)
+        ])
     }
 
     var configuration: NewTabPageConfiguration {
@@ -91,9 +120,68 @@ final class NewTabPageActionsManager: NewTabPageActionsManaging {
         )
     }
 
-    func reportException(with param: [String: String]) {
-        let message = param["message"] ?? ""
-        let id = param["id"] ?? ""
+    func showContextMenu(with params: [String: Any]) {
+        guard let menuItems = params["visibilityMenuItems"] as? [[String: String]] else {
+            return
+        }
+        let menu = NSMenu()
+
+        for menuItem in menuItems {
+            guard let title = menuItem["title"], let id = menuItem["id"] else {
+                continue
+            }
+            switch id {
+            case "favorites":
+                let item = NSMenuItem(title: title, action: #selector(toggleVisibility(_:)), representedObject: id)
+                    .targetting(self)
+                item.state = appearancePreferences.isFavoriteVisible ? .on : .off
+                menu.addItem(item)
+            case "privacyStats":
+                let item = NSMenuItem(title: title, action: #selector(toggleVisibility(_:)), representedObject: id)
+                    .targetting(self)
+                item.state = appearancePreferences.isRecentActivityVisible ? .on : .off
+                menu.addItem(item)
+            default:
+                break
+            }
+        }
+
+        if !menu.items.isEmpty {
+            menu.popUp(positioning: nil, at: NSEvent.mouseLocation, in: nil)
+        }
+    }
+
+    @objc private func toggleVisibility(_ sender: NSMenuItem) {
+        switch sender.representedObject as? String {
+        case "favorites":
+            appearancePreferences.isFavoriteVisible.toggle()
+        case "privacyStats":
+            appearancePreferences.isRecentActivityVisible.toggle()
+        default:
+            break
+        }
+    }
+
+    func updateWidgetConfigs(with params: [[String: String]]) {
+        for param in params {
+            guard let id = param["id"], let visibility = param["visibility"] else {
+                continue
+            }
+            let isVisible = NewTabPageConfiguration.WidgetConfig.WidgetVisibility(rawValue: visibility)?.isVisible == true
+            switch id {
+            case "favorites":
+                appearancePreferences.isFavoriteVisible = isVisible
+            case "privacyStats":
+                appearancePreferences.isRecentActivityVisible = isVisible
+            default:
+                break
+            }
+        }
+    }
+
+    func reportException(with params: [String: String]) {
+        let message = params["message"] ?? ""
+        let id = params["id"] ?? ""
         Logger.general.error("New Tab Page error: \("\(id): \(message)", privacy: .public)")
     }
 }

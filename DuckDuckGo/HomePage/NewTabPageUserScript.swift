@@ -26,15 +26,21 @@ final class NewTabPageUserScript: NSObject, @preconcurrency Subfeature {
     var messageOriginPolicy: MessageOriginPolicy = .only(rules: [.exact(hostname: "newtab")])
     let featureName: String = "newTabPage"
     weak var broker: UserScriptMessageBroker?
+    var webViews: NSHashTable<WKWebView> = .weakObjects()
 
     // MARK: - MessageNames
     enum MessageNames: String, CaseIterable {
+        case contextMenu
         case initialSetup
         case reportInitException
+        case reportPageException
+        case widgetsSetConfig = "widgets_setConfig"
     }
 
     init(actionsManager: NewTabPageActionsManaging) {
         self.actionsManager = actionsManager
+        super.init()
+        actionsManager.userScript = self
     }
 
     public func with(broker: UserScriptMessageBroker) {
@@ -42,8 +48,11 @@ final class NewTabPageUserScript: NSObject, @preconcurrency Subfeature {
     }
 
     private lazy var methodHandlers: [MessageNames: Handler] = [
-            .initialSetup: initialSetup,
-            .reportInitException: reportException
+        .contextMenu: { [weak self] in try await self?.showContextMenu(params: $0, original: $1) },
+        .initialSetup: { [weak self] in try await self?.initialSetup(params: $0, original: $1) },
+        .reportInitException: { [weak self] in try await self?.reportException(params: $0, original: $1) },
+        .reportPageException: { [weak self] in try await self?.reportException(params: $0, original: $1) },
+        .widgetsSetConfig: { [weak self] in try await self?.widgetsSetConfig(params: $0, original: $1) }
     ]
 
     @MainActor
@@ -52,12 +61,11 @@ final class NewTabPageUserScript: NSObject, @preconcurrency Subfeature {
         return methodHandlers[messageName]
     }
 
-    // MARK: - UserValuesNotification
-
-    struct UserValuesNotification: Encodable {
-        let userValuesNotification: UserValues
+    func widgetConfigsUpdated(widgetConfigs: [NewTabPageConfiguration.WidgetConfig]) {
+        for webView in webViews.allObjects {
+            broker?.push(method: "widgets_onConfigUpdated", params: widgetConfigs, for: self, into: webView)
+        }
     }
-
 }
 
 extension NewTabPageUserScript {
@@ -65,61 +73,21 @@ extension NewTabPageUserScript {
     private func initialSetup(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         return actionsManager.configuration
     }
-//
-//    @MainActor
-//    private func dismissToAddressBar(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-//        onboardingActionsManager.goToAddressBar()
-//        return nil
-//    }
-//
-//    @MainActor
-//    private func dismissToSettings(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-//        onboardingActionsManager.goToSettings()
-//        return nil
-//    }
-//
-//    private func requestDockOptIn(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-//        onboardingActionsManager.addToDock()
-//        return Result()
-//    }
-//
-//    @MainActor
-//    private func requestImport(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-//        onboardingActionsManager.importData()
-//        return Result()
-//    }
-//
-//    private func requestSetAsDefault(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-//        onboardingActionsManager.setAsDefault()
-//        return Result()
-//    }
-//
-//    @MainActor
-//    private func setBookmarksBar(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-//        guard let params = params as? [String: Bool], let enabled = params["enabled"] else { return nil }
-//        onboardingActionsManager.setBookmarkBar(enabled: enabled)
-//        return nil
-//    }
-//
-//    private func setSessionRestore(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-//        guard let params = params as? [String: Bool], let enabled = params["enabled"] else { return nil }
-//        onboardingActionsManager.setSessionRestore(enabled: enabled)
-//        return nil
-//    }
-//
-//    private func setShowHome(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-//        guard let params = params as? [String: Bool], let enabled = params["enabled"] else { return nil }
-//        onboardingActionsManager.setHomeButtonPosition(enabled: enabled)
-//        return nil
-//    }
-//
-//    private func stepCompleted(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-//        if let params = params as? [String: String], let stepString = params["id"], let step = OnboardingSteps(rawValue: stepString) {
-//            onboardingActionsManager.stepCompleted(step: step)
-//        }
-//        return nil
-//    }
-//
+
+    @MainActor
+    private func widgetsSetConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        guard let params = params as? [[String: String]] else { return nil }
+        actionsManager.updateWidgetConfigs(with: params)
+        return nil
+    }
+
+    @MainActor
+    private func showContextMenu(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        guard let params = params as? [String: Any] else { return nil }
+        actionsManager.showContextMenu(with: params)
+        return nil
+    }
+
     private func reportException(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let params = params as? [String: String] else { return nil }
         actionsManager.reportException(with: params)

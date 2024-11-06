@@ -30,9 +30,7 @@ extension SpecialPagesUserScript {
 
     @MainActor
     func withNewTabPage() {
-        let actionsManager = buildNewTabPageActionsManager()
-        let userScript = NewTabPageUserScript(actionsManager: actionsManager)
-        self.registerSubfeature(delegate: userScript)
+        self.registerSubfeature(delegate: NSApp.delegateTyped.newTabPageUserScript)
     }
 
     func withDuckPlayerIfAvailable() {

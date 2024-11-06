@@ -44,6 +44,9 @@ import Freemium
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
 
+    let newTabPageActionsManager = NewTabPageActionsManager(appearancePreferences: .shared)
+    private(set) lazy var newTabPageUserScript = NewTabPageUserScript(actionsManager: newTabPageActionsManager)
+
     let experimentalFeatures = ExperimentalFeatures()
     @objc func toggleHTMLNTP(_ sender: NSMenuItem) {
         experimentalFeatures.isHTMLNewTabPageEnabled.toggle()

@@ -31,7 +31,6 @@ protocol ScriptSourceProviding {
     var autofillSourceProvider: AutofillUserScriptSourceProvider? { get }
     var sessionKey: String? { get }
     var onboardingActionsManager: OnboardingActionsManaging? { get }
-    var newTabPageActionsManager: NewTabPageActionsManaging? { get }
     func buildAutofillSource() -> AutofillUserScriptSourceProvider
 
 }
@@ -46,7 +45,6 @@ struct ScriptSourceProvider: ScriptSourceProviding {
     private(set) var contentBlockerRulesConfig: ContentBlockerUserScriptConfig?
     private(set) var surrogatesConfig: SurrogatesUserScriptConfig?
     private(set) var onboardingActionsManager: OnboardingActionsManaging?
-    private(set) var newTabPageActionsManager: NewTabPageActionsManaging?
     private(set) var autofillSourceProvider: AutofillUserScriptSourceProvider?
     private(set) var sessionKey: String?
 
@@ -77,7 +75,6 @@ struct ScriptSourceProvider: ScriptSourceProviding {
         self.sessionKey = generateSessionKey()
         self.autofillSourceProvider = buildAutofillSource()
         self.onboardingActionsManager = buildOnboardingActionsManager()
-        self.newTabPageActionsManager = buildNewTabPageActionsManager()
     }
 
     private func generateSessionKey() -> String {
@@ -139,11 +136,6 @@ struct ScriptSourceProvider: ScriptSourceProviding {
             defaultBrowserProvider: SystemDefaultBrowserProvider(),
             appearancePreferences: AppearancePreferences.shared,
             startupPreferences: StartupPreferences.shared)
-    }
-
-    @MainActor
-    private func buildNewTabPageActionsManager() -> NewTabPageActionsManaging {
-        NewTabPageActionsManager(appearancePreferences: .shared)
     }
 
     private func loadTextFile(_ fileName: String, _ fileExt: String) -> String? {

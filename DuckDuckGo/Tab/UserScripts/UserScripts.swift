@@ -75,7 +75,7 @@ final class UserScripts: UserScriptsProvider {
                                                                     languageCode: lenguageCode)
 
         onboardingUserScript = OnboardingUserScript(onboardingActionsManager: sourceProvider.onboardingActionsManager!)
-        newTabPageUserScript = NewTabPageUserScript(actionsManager: sourceProvider.newTabPageActionsManager!)
+        newTabPageUserScript = NSApp.delegateTyped.newTabPageUserScript
 
         specialPages = SpecialPagesUserScript()
 
