@@ -108,7 +108,7 @@ class MainMenuTests: XCTestCase {
 
         let duckDuckGoMenu = try XCTUnwrap(sut.items.first?.submenu)
 
-        XCTAssertEqual(duckDuckGoMenu.items[3].title, UserText.setAsDefaultBrowser + "...")
+        XCTAssertEqual(duckDuckGoMenu.items[3].title, UserText.setAsDefaultBrowser + "…")
         XCTAssertTrue(duckDuckGoMenu.items[3].isHidden)
     }
 
@@ -129,7 +129,7 @@ class MainMenuTests: XCTestCase {
 
         let duckDuckGoMenu = try XCTUnwrap(sut.items.first?.submenu)
 
-        XCTAssertEqual(duckDuckGoMenu.items[3].title, UserText.setAsDefaultBrowser + "...")
+        XCTAssertEqual(duckDuckGoMenu.items[3].title, UserText.setAsDefaultBrowser + "…")
         XCTAssertFalse(duckDuckGoMenu.items[3].isHidden)
     }
 
