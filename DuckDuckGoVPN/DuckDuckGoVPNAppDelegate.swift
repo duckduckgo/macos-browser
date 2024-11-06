@@ -454,6 +454,6 @@ extension DuckDuckGoVPNAppDelegate: AccountManagerKeychainAccessDelegate {
 
     public func accountManagerKeychainAccessFailed(accessType: AccountKeychainAccessType, error: AccountKeychainAccessError) {
         PixelKit.fire(PrivacyProErrorPixel.privacyProKeychainAccessError(accessType: accessType, accessError: error),
-                      frequency: .dailyAndCount)
+                      frequency: .legacyDailyAndCount)
     }
 }

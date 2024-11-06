@@ -40,7 +40,7 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .ipcServerImmediateScansFinishedWithError(error: let error),
                     .ipcServerAppLaunchedXPCError(error: let error),
                     .ipcServerAppLaunchedScheduledScansFinishedWithError(error: let error):
-                PixelKit.fire(DebugEvent(event, error: error), frequency: .dailyAndCount, includeAppVersionParameter: true)
+                PixelKit.fire(DebugEvent(event, error: error), frequency: .legacyDailyAndCount, includeAppVersionParameter: true)
             case .ipcServerProfileSavedCalledByApp,
                     .ipcServerProfileSavedReceivedByAgent,
                     .ipcServerImmediateScansInterrupted,
@@ -50,7 +50,7 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .ipcServerAppLaunchedScheduledScansBlocked,
                     .ipcServerAppLaunchedScheduledScansInterrupted,
                     .ipcServerAppLaunchedScheduledScansFinishedWithoutError:
-                PixelKit.fire(event, frequency: .dailyAndCount, includeAppVersionParameter: true)
+                PixelKit.fire(event, frequency: .legacyDailyAndCount, includeAppVersionParameter: true)
             case .parentChildMatches,
                     .optOutStart,
                     .optOutEmailGenerate,
@@ -121,7 +121,7 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .entitlementCheckValid,
                     .entitlementCheckInvalid,
                     .entitlementCheckError:
-                PixelKit.fire(event, frequency: .dailyAndCount)
+                PixelKit.fire(event, frequency: .legacyDailyAndCount)
             }
         }
     }

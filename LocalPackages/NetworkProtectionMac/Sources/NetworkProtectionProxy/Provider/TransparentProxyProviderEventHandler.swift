@@ -39,7 +39,7 @@ public final class TransparentProxyProviderEventHandler: TransparentProxyProvide
         // Start and stop
 
         case .startAttempt(let step):
-            pixelKit?.fire(step, frequency: .dailyAndCount)
+            pixelKit?.fire(step, frequency: .legacyDailyAndCount)
 
             switch step {
             case .begin:
