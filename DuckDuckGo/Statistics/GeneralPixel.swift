@@ -409,6 +409,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case syncDeleteAccountError(error: Error)
     case syncLoginExistingAccountError(error: Error)
     case syncCannotCreateRecoveryPDF
+    case syncSecureStorageReadError(error: Error)
 
     case bookmarksCleanupFailed
     case bookmarksCleanupAttemptedWhileSyncWasEnabled
@@ -1038,6 +1039,7 @@ enum GeneralPixel: PixelKitEventV2 {
         case .syncDeleteAccountError: return "sync_delete_account_error"
         case .syncLoginExistingAccountError: return "sync_login_existing_account_error"
         case .syncCannotCreateRecoveryPDF: return "sync_cannot_create_recovery_pdf"
+        case .syncSecureStorageReadError: return "sync_secure_storage_read_error"
 
         case .bookmarksCleanupFailed: return "bookmarks_cleanup_failed"
         case .bookmarksCleanupAttemptedWhileSyncWasEnabled: return "bookmarks_cleanup_attempted_while_sync_was_enabled"
@@ -1093,6 +1095,7 @@ enum GeneralPixel: PixelKitEventV2 {
                 .syncRefreshDevicesError(let error),
                 .syncDeleteAccountError(let error),
                 .syncLoginExistingAccountError(let error),
+                .syncSecureStorageReadError(let error),
                 .bookmarksCouldNotLoadDatabase(let error?):
             return error
         default: return nil
