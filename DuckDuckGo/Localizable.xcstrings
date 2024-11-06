@@ -44026,6 +44026,9 @@
         }
       }
     },
+    "Personal Information Removal" : {
+
+    },
     "phishing-detection.enabled.checkbox" : {
       "comment" : "Checkbox that enables or disables the phishing detection feature in the browser",
       "extractionState" : "extracted_with_value",
