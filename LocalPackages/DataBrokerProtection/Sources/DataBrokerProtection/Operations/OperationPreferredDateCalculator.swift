@@ -61,7 +61,7 @@ struct OperationPreferredDateCalculator {
                                 historyEvents: [HistoryEvent],
                                 extractedProfileID: Int64?,
                                 schedulingConfig: DataBrokerScheduleConfig,
-                                attemptCount: Int?,
+                                attemptCount: Int64?,
                                 date: DateProtocol = SystemDate()) throws -> Date? {
         guard let lastEvent = historyEvents.last else {
             throw DataBrokerProtectionError.cantCalculatePreferredRunDate
@@ -92,7 +92,7 @@ struct OperationPreferredDateCalculator {
     private func shouldScheduleNewOptOut(events: [HistoryEvent],
                                          extractedProfileId: Int64,
                                          schedulingConfig: DataBrokerScheduleConfig,
-                                         attemptCount: Int?) -> Bool {
+                                         attemptCount: Int64?) -> Bool {
         guard let lastRemovalEvent = events.last(where: { $0.type == .optOutRequested && $0.extractedProfileId == extractedProfileId }) else {
             return false
         }

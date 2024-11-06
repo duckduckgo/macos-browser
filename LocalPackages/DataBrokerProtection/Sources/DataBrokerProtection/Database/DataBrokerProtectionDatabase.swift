@@ -38,7 +38,7 @@ public protocol DataBrokerProtectionRepository {
     func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64) throws
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
-    func updateAttemptCount(_ count: Int, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
+    func updateAttemptCount(_ count: Int64, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func increaseAttemptCount(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func updateSubmittedSuccessfullyDate(_ date: Date?,
                                          forBrokerId brokerId: Int64,
@@ -240,7 +240,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
         }
     }
 
-    func updateAttemptCount(_ count: Int, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+    func updateAttemptCount(_ count: Int64, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
         do {
             let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
             try vault.updateAttemptCount(

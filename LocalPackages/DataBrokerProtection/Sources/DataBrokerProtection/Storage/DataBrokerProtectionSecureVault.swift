@@ -65,14 +65,14 @@ protocol DataBrokerProtectionSecureVault: SecureVault {
               createdDate: Date,
               lastRunDate: Date?,
               preferredRunDate: Date?,
-              attemptCount: Int,
+              attemptCount: Int64,
               submittedSuccessfullyDate: Date?,
               sevenDaysConfirmationPixelFired: Bool,
               fourteenDaysConfirmationPixelFired: Bool,
               twentyOneDaysConfirmationPixelFired: Bool) throws
     func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
-    func updateAttemptCount(_ count: Int, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
+    func updateAttemptCount(_ count: Int64, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func increaseAttemptCount(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func updateSubmittedSuccessfullyDate(_ date: Date?,
                                          forBrokerId brokerId: Int64,
@@ -264,7 +264,7 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
               createdDate: Date,
               lastRunDate: Date?,
               preferredRunDate: Date?,
-              attemptCount: Int,
+              attemptCount: Int64,
               submittedSuccessfullyDate: Date?,
               sevenDaysConfirmationPixelFired: Bool,
               fourteenDaysConfirmationPixelFired: Bool,
@@ -294,7 +294,7 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
         try self.providers.database.updateLastRunDate(date, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
     }
 
-    func updateAttemptCount(_ count: Int, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+    func updateAttemptCount(_ count: Int64, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
         try self.providers.database.updateAttemptCount(count, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
     }
 

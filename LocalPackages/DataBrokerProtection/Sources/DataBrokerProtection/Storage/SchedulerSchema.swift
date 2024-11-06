@@ -204,7 +204,7 @@ struct OptOutDB: Codable {
     var lastRunDate: Date?
     var preferredRunDate: Date?
 
-    var attemptCount: Int
+    var attemptCount: Int64
 
     // This was added in a later migration (V4), so will be nil for older entries submitted before the migration
     var submittedSuccessfullyDate: Date?
