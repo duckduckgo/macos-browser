@@ -7612,55 +7612,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
+            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.10.0, v2024.10.1, v2024.10.2. Please downgrade to an older version by following these steps:"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
           }
         }
@@ -7672,55 +7672,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Download v2024.4.3"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Download v2024.4.3"
+            "value" : "Download v2024.9.0"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Download v2024.4.3"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Download v2024.4.3"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Download v2024.4.3"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Download v2024.4.3"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Download v2024.4.3"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Download v2024.4.3"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Download v2024.4.3"
           }
         }
@@ -27359,55 +27359,55 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Passe den Hintergrund, das Design und sogar die angezeigten Inhalte an. Versuch es doch mal!"
+            "value" : "Personalisiere deine neue Tab-Seite. Probier’s doch mal aus!"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Customize the background, theme, and even what content you see. Give it a try!"
+            "value" : "Add extra personality and pick what you want to see on your new tab page. Give it a try!"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Personaliza el fondo, el tema e incluso el contenido que ves. ¡Pruébalo!"
+            "value" : "Añade más personalidad y elige lo que quieres ver en tu nueva pestaña. ¡Pruébalo!"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Personnalisez l'arrière-plan, le thème et même le contenu que vous voyez. Essayez par vous-même !"
+            "value" : "Ajoutez une personnalité supplémentaire et choisissez ce que vous voulez voir sur votre nouvelle page à onglet. Essayez par vous-même !"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Personalizza lo sfondo, il tema e persino i contenuti che vedi. Prova!"
+            "value" : "Aggiungi un tocco di personalità e scegli cosa vuoi vedere nella tua nuova scheda. Prova!"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pas de achtergrond, het thema en zelfs de inhoud aan die je ziet. Probeer het maar eens!"
+            "value" : "Voeg extra persoonlijkheid toe en kies wat je op je nieuwe tabbladpagina wilt zien. Probeer het maar eens!"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dostosuj tło, motyw oraz wyświetlaną zawartość. Spróbuj!"
+            "value" : "Wybierz, co chcesz zobaczyć na stronie nowej karty, aby zyskała bardziej indywidualny charakter. Spróbuj!"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Personaliza o fundo, o tema e até o conteúdo que vês. Experimenta!"
+            "value" : "Adiciona personalidade extra e escolhe o que queres ver na tua página do novo separador. Experimenta!"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Можно настроить фон, тему и даже отображаемый контент. Давайте попробуем!"
+            "value" : "Добавьте дополнительную персонализацию и выберите, что должно присутствовать на странице новой вкладки. Попробуйте!"
           }
         }
       }
@@ -27419,55 +27419,55 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Personalisiere deine neue Tab-Seite"
+            "value" : "Neues Suchfeld, benutzerdefinierte Hintergründe und mehr!"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Add extra personality to your new tab page"
+            "value" : "New search box, custom backgrounds & more!"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Añade más personalidad a tu página de nueva pestaña"
+            "value" : "¡Nuevo cuadro de búsqueda, fondos personalizados y mucho más!"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ajoutez une personnalité supplémentaire à votre nouvelle page à onglet"
+            "value" : "Nouvelle boîte de recherche, arrière-plans personnalisés et plus encore !"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aggiungi un tocco di personalità alla tua nuova scheda"
+            "value" : "Nuova casella di ricerca, sfondi personalizzati e altro ancora!"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Voeg extra persoonlijkheid toe aan je nieuwe tabbladpagina"
+            "value" : "Nieuw zoekvak, aangepaste achtergronden en meer!"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dostosuj stronę nowej zakładki do potrzeb"
+            "value" : "Nowe pole wyszukiwania, niestandardowe tła i nie tylko!"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Adiciona personalidade extra à tua página do novo separador"
+            "value" : "Nova caixa de pesquisa, fundos personalizados e mais!"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Дополнительная персонализация новой вкладки"
+            "value" : "Новая строка поиска, собственные фоны и многое другое"
           }
         }
       }
@@ -36203,7 +36203,7 @@
     },
     "newTab.menu.item.show.continue.setup" : {
       "comment" : "Title of the menu item in the home page to show/hide continue setup section",
-      "extractionState" : "stale",
+      "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -37881,6 +37881,66 @@
         }
       }
     },
+    "notification.auto.update.action" : {
+      "comment" : "Action to take when an automatic update is available.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zum Aktualisieren neu starten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Restart to update."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reinicia para actualizar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Redémarrer pour mettre à jour."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riavvia per aggiornare."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start opnieuw om bij te werken."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uruchom ponownie, aby zaktualizować."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reiniciar para atualizar."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перезапустите приложение."
+          }
+        }
+      }
+    },
     "notification.badge.cookiesmanaged" : {
       "comment" : "Notification that appears when browser automatically handle cookies",
       "extractionState" : "extracted_with_value",
@@ -38122,121 +38182,181 @@
       }
     },
     "notification.critical.update" : {
-      "comment" : "Notification informing user a critical update is required.",
+      "comment" : "Notification informing user a critical update is available.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kritisches Update erforderlich. Zum Aktualisieren neu starten."
+            "value" : "Kritisches Update erforderlich."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Critical update required. Restart to update."
+            "value" : "Critical update needed."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Se requiere una actualización crítica. Reinicia para actualizar."
+            "value" : "Se necesita una actualización crítica."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Une mise à jour critique est requise. Redémarrer pour mettre à jour."
+            "value" : "Une mise à jour critique est nécessaire."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aggiornamento critico obbligatorio. Riavvia per aggiornare."
+            "value" : "Aggiornamento critico necessario."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kritieke update vereist. Start opnieuw om bij te werken."
+            "value" : "Kritieke update nodig."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wymagana krytyczna aktualizacja. Uruchom ponownie, aby zaktualizować."
+            "value" : "Wymagana krytyczna aktualizacja."
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Atualização crítica obrigatória. Reiniciar para atualizar."
+            "value" : "Atualização crítica necessária."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Требуется критическое обновление. Перезапустите приложение."
+            "value" : "Требуется критическое обновление."
+          }
+        }
+      }
+    },
+    "notification.manual.update.action" : {
+      "comment" : "Action to take when a manual update is available.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klicke hier, um zu aktualisieren."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Click here to update."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haz clic aquí para actualizar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cliquez ici pour mettre à jour."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fai clic qui per aggiornare."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klik hier om te updaten."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kliknij tutaj, aby zaktualizować."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clica aqui para atualizar."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нажмите здесь, чтобы обновить."
           }
         }
       }
     },
     "notification.update.available" : {
-      "comment" : "Notification informing user the a version of app is available",
+      "comment" : "Notification informing user the a version of app is available.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Neue Version verfügbar. Zum Aktualisieren neu starten."
+            "value" : "Neue Version verfügbar."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "New version available. Restart to update."
+            "value" : "New version available."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nueva versión disponible. Reinicia para actualizar."
+            "value" : "Nueva versión disponible."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Une nouvelle version est disponible. Redémarrer pour mettre à jour."
+            "value" : "Une nouvelle version est disponible."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nuova versione disponibile. Riavvia per aggiornare."
+            "value" : "Nuova versione disponibile."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nieuwe versie beschikbaar. Start opnieuw om bij te werken."
+            "value" : "Nieuwe versie beschikbaar."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dostępna nowa wersja. Uruchom ponownie, aby zaktualizować."
+            "value" : "Dostępna nowa wersja."
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nova versão disponível. Reiniciar para atualizar."
+            "value" : "Nova versão disponível."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Доступна новая версия. Перезапустите приложение."
+            "value" : "Доступна новая версия."
           }
         }
       }
@@ -50882,6 +51002,66 @@
         }
       }
     },
+    "preferences.about.duckduckgo-tagline" : {
+      "comment" : "About screen",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dein Schutz, unsere Priorität."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your protection, our priority."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu protección, nuestra prioridad."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre protection, notre priorité."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La tua protezione, la nostra priorità."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jouw bescherming, onze prioriteit."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Twoje bezpieczeństwo jest naszym priorytetem."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A tua proteção, a nossa prioridade."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ваша защита — наш приоритет."
+          }
+        }
+      }
+    },
     "preferences.about.more-at" : {
       "comment" : "Link to the about page",
       "extractionState" : "extracted_with_value",
@@ -51004,7 +51184,7 @@
     },
     "preferences.about.privacy-simplified" : {
       "comment" : "About screen",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -56765,6 +56945,66 @@
         }
       }
     },
+    "settings.downloading.update" : {
+      "comment" : "Label informing users the app is currently downloading the update. This will contain a percentage",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update wird heruntergeladen %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Downloading update %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descargando actualización %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Téléchargement de la mise à jour %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download dell'aggiornamento %@"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update %@ downloaden"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pobieranie aktualizacji %@"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A transferir a atualização %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Загрузка обновления %@"
+          }
+        }
+      }
+    },
     "settings.last.checked" : {
       "comment" : "Label informing users what is the last time the app checked for the update.",
       "extractionState" : "extracted_with_value",
@@ -56885,6 +57125,66 @@
         }
       }
     },
+    "settings.newer.critical.update.available" : {
+      "comment" : "Label informing users the critical update of the app is available to install.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kritisches Update erforderlich"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Critical update needed"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se necesita una actualización crítica"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une mise à jour critique est nécessaire"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiornamento critico necessario"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kritieke update nodig"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wymagana krytyczna aktualizacja"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atualização crítica necessária"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Требуется критическое обновление"
+          }
+        }
+      }
+    },
     "settings.newer.version.available" : {
       "comment" : "Label informing users the newer version of the app is available to install.",
       "extractionState" : "extracted_with_value",
@@ -56945,8 +57245,68 @@
         }
       }
     },
+    "settings.preparing.update" : {
+      "comment" : "Label informing users the app is preparing to update.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update vorbereiten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Preparing update"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparando la actualización"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Préparation de la mise à jour"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparazione dell'aggiornamento"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update voorbereiden"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przygotowanie aktualizacji"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A preparar a atualização"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подготовка обновления"
+          }
+        }
+      }
+    },
     "settings.restart.to.update" : {
-      "comment" : "Button label trigering restart and update of the application.",
+      "comment" : "Button label triggering restart and update of the application.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -56958,7 +57318,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Restart to Update"
+            "value" : "Restart To Update"
           }
         },
         "es" : {
@@ -57001,6 +57361,126 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Перезапустите для обновления"
+          }
+        }
+      }
+    },
+    "settings.retry.update" : {
+      "comment" : "Button label triggering a retry of the update.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update nochmal versuchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Retry Update"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reintentar actualización"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réessayer la mise à jour"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riprova l'aggiornamento"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update opnieuw proberen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ponów próbę aktualizacji"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Repetir atualização"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Повторить попытку обновления"
+          }
+        }
+      }
+    },
+    "settings.run.update" : {
+      "comment" : "Button label triggering update of the application.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo aktualisieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Update DuckDuckGo"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualizar DuckDuckGo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mettre à jour DuckDuckGo"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiorna DuckDuckGo"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo bijwerken"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zaktualizuj DuckDuckGo"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atualizar o DuckDuckGo"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обновить DuckDuckGo"
           }
         }
       }
@@ -57061,6 +57541,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "DuckDuckGo обновлен"
+          }
+        }
+      }
+    },
+    "settings.update.failed" : {
+      "comment" : "Label informing users the app is unable to update.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update fehlgeschlagen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Update failed"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualización fallida"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Échec de la mise à jour"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiornamento non riuscito"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update mislukt"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niepowodzenie aktualizacji"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A atualização falhou"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось обновить"
           }
         }
       }
@@ -61659,61 +62199,61 @@
       }
     },
     "update.available.menu.item" : {
-      "comment" : "Title of the menu item that informs user that a new update is available. Clicking on the menu item restarts the app and installs the update",
+      "comment" : "Title of the menu item that informs user that a new update is available. Clicking on the menu item installs the update",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Update verfügbar – Jetzt neu starten"
+            "value" : "Update verfügbar – jetzt installieren"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Update Available - Restart Now"
+            "value" : "Update Available - Install Now"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Actualización disponible - Reiniciar ahora"
+            "value" : "Actualización disponible - Instalar ahora"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mise à jour disponible : redémarrer"
+            "value" : "Mise à jour disponible : installer"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aggiornamento disponibile - Riavvia ora"
+            "value" : "Aggiornamento disponibile - Installa ora"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Update beschikbaar - nu opnieuw opstarten"
+            "value" : "Update beschikbaar - nu installeren"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dostępna aktualizacja — uruchom ponownie teraz"
+            "value" : "Dostępna aktualizacja — zainstaluj teraz"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Atualização disponível – Reiniciar agora"
+            "value" : "Atualização disponível – Instalar agora"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Доступно обновление: перезапустить"
+            "value" : "Доступно обновление – установить сейчас"
           }
         }
       }
