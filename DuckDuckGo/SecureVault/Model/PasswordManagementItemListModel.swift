@@ -303,10 +303,6 @@ final class PasswordManagementItemListModel: ObservableObject {
         autofillPreferences.isAutoLockEnabled ? UserText.pmEmptyStateDefaultDescription : UserText.pmEmptyStateDefaultDescriptionAutolockOff
     }
 
-    var emptyStateMessageViewHeight: CGFloat {
-        autofillPreferences.isAutoLockEnabled ? 32 : 16
-    }
-
     var emptyStateMessageLinkText: String {
         UserText.learnMore
     }

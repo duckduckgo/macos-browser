@@ -207,12 +207,11 @@ final class PasswordManagementViewController: NSViewController {
         let hostingView = NSHostingView(rootView: PasswordManagementEmptyStateMessage(
             message: message,
             image: .lockSolid16
-        ))
-        hostingView.frame = emptyStateMessageContainer.bounds
-        hostingView.autoresizingMask = [.height, .width]
-        hostingView.translatesAutoresizingMaskIntoConstraints = true
+        ).fixedSize())
+
+        hostingView.frame = CGRect(origin: .zero, size: hostingView.intrinsicContentSize)
         emptyStateMessageContainer.addSubview(hostingView)
-        emptyStateMessageHeight.constant = listModel.emptyStateMessageViewHeight
+        emptyStateMessageHeight.constant = hostingView.intrinsicContentSize.height
     }
 
     private func setupStrings() {
@@ -1142,5 +1141,6 @@ struct PasswordManagementEmptyStateMessage: View {
             Text(.init(message))
         )
         .multilineTextAlignment(.center)
+        .frame(width: 280)
     }
 }
