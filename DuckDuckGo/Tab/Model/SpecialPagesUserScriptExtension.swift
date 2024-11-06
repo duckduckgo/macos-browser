@@ -28,6 +28,13 @@ extension SpecialPagesUserScript {
         self.registerSubfeature(delegate: onboardingScript)
     }
 
+    @MainActor
+    func withNewTabPage() {
+        let actionsManager = buildNewTabPageActionsManager()
+        let userScript = NewTabPageUserScript(actionsManager: actionsManager)
+        self.registerSubfeature(delegate: userScript)
+    }
+
     func withDuckPlayerIfAvailable() {
         var youtubePlayerUserScript: YoutubePlayerUserScript?
         if DuckPlayer.shared.isAvailable {
@@ -48,6 +55,7 @@ extension SpecialPagesUserScript {
     @MainActor
     func withAllSubfeatures() {
         withOnboarding()
+        withNewTabPage()
         withErrorPages()
         withDuckPlayerIfAvailable()
     }
@@ -60,5 +68,10 @@ extension SpecialPagesUserScript {
             defaultBrowserProvider: SystemDefaultBrowserProvider(),
             appearancePreferences: AppearancePreferences.shared,
             startupPreferences: StartupPreferences.shared)
+    }
+
+    @MainActor
+    private func buildNewTabPageActionsManager() -> NewTabPageActionsManaging {
+        NewTabPageActionsManager(appearancePreferences: .shared)
     }
 }
