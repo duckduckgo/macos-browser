@@ -2917,10 +2917,6 @@
 		CBC83E3629B63D380008E19C /* Configuration in Frameworks */ = {isa = PBXBuildFile; productRef = CBC83E3529B63D380008E19C /* Configuration */; };
 		CBDD5DE329A67F2700832877 /* MockConfigurationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBDD5DE229A67F2700832877 /* MockConfigurationStore.swift */; };
 		CBDD5DE429A6800300832877 /* MockConfigurationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBDD5DE229A67F2700832877 /* MockConfigurationStore.swift */; };
-		CBECDB722CD9814F005B8B87 /* PageRefreshMonitor in Frameworks */ = {isa = PBXBuildFile; productRef = CBECDB712CD9814F005B8B87 /* PageRefreshMonitor */; };
-		CBECDB742CD98159005B8B87 /* BrokenSitePrompt in Frameworks */ = {isa = PBXBuildFile; productRef = CBECDB732CD98159005B8B87 /* BrokenSitePrompt */; };
-		CBECDB762CD98161005B8B87 /* BrokenSitePrompt in Frameworks */ = {isa = PBXBuildFile; productRef = CBECDB752CD98161005B8B87 /* BrokenSitePrompt */; };
-		CBECDB782CD98166005B8B87 /* PageRefreshMonitor in Frameworks */ = {isa = PBXBuildFile; productRef = CBECDB772CD98166005B8B87 /* PageRefreshMonitor */; };
 		CBECDB7D2CD98274005B8B87 /* PageRefreshEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBECDB7C2CD9826E005B8B87 /* PageRefreshEvent.swift */; };
 		CBECDB7E2CD98274005B8B87 /* PageRefreshEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBECDB7C2CD9826E005B8B87 /* PageRefreshEvent.swift */; };
 		CBECDB802CD9829A005B8B87 /* PageRefreshStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBECDB7F2CD98296005B8B87 /* PageRefreshStore.swift */; };
@@ -2929,6 +2925,10 @@
 		CBECDB852CDA813C005B8B87 /* BrokenSitePromptLimiterStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBECDB832CDA8137005B8B87 /* BrokenSitePromptLimiterStore.swift */; };
 		CBECDB872CDACE29005B8B87 /* BrokenSitePromptLimiter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBECDB862CDACE29005B8B87 /* BrokenSitePromptLimiter.swift */; };
 		CBECDB882CDACE29005B8B87 /* BrokenSitePromptLimiter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBECDB862CDACE29005B8B87 /* BrokenSitePromptLimiter.swift */; };
+		CBECDB8A2CDBD616005B8B87 /* PageRefreshMonitor in Frameworks */ = {isa = PBXBuildFile; productRef = CBECDB892CDBD616005B8B87 /* PageRefreshMonitor */; };
+		CBECDB8C2CDBD61C005B8B87 /* BrokenSitePrompt in Frameworks */ = {isa = PBXBuildFile; productRef = CBECDB8B2CDBD61C005B8B87 /* BrokenSitePrompt */; };
+		CBECDB8E2CDBD62C005B8B87 /* PageRefreshMonitor in Frameworks */ = {isa = PBXBuildFile; productRef = CBECDB8D2CDBD62C005B8B87 /* PageRefreshMonitor */; };
+		CBECDB902CDBD631005B8B87 /* BrokenSitePrompt in Frameworks */ = {isa = PBXBuildFile; productRef = CBECDB8F2CDBD631005B8B87 /* BrokenSitePrompt */; };
 		CD2AB5BF2C8222F20019EB49 /* PhishingDetection.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE248A42C821FFE00F9399D /* PhishingDetection.swift */; };
 		CD2AB5C02C8222F20019EB49 /* PhishingDetection.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE248A42C821FFE00F9399D /* PhishingDetection.swift */; };
 		CD2AB5C12C8222F40019EB49 /* PhishingDetectionPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE248A52C821FFE00F9399D /* PhishingDetectionPreferences.swift */; };
@@ -4768,7 +4768,6 @@
 		CB24F70B29A3D9CB006DCC58 /* AppConfigurationURLProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfigurationURLProvider.swift; sourceTree = "<group>"; };
 		CB6BCDF827C6BEFF00CC76DC /* PrivacyFeatures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyFeatures.swift; sourceTree = "<group>"; };
 		CBDD5DE229A67F2700832877 /* MockConfigurationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockConfigurationStore.swift; sourceTree = "<group>"; };
-		CBECDB702CD98132005B8B87 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = SOURCE_ROOT; };
 		CBECDB7C2CD9826E005B8B87 /* PageRefreshEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageRefreshEvent.swift; sourceTree = "<group>"; };
 		CBECDB7F2CD98296005B8B87 /* PageRefreshStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageRefreshStore.swift; sourceTree = "<group>"; };
 		CBECDB832CDA8137005B8B87 /* BrokenSitePromptLimiterStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrokenSitePromptLimiterStore.swift; sourceTree = "<group>"; };
@@ -4871,10 +4870,11 @@
 				4BF97AD32B43C43F00EB4240 /* NetworkProtectionUI in Frameworks */,
 				7B1459572B7D43E500047F2C /* NetworkProtectionProxy in Frameworks */,
 				B6F7128229F6820A00594A45 /* QuickLookUI.framework in Frameworks */,
+				CBECDB902CDBD631005B8B87 /* BrokenSitePrompt in Frameworks */,
 				9FF521482BAA909C00B9819B /* Lottie in Frameworks */,
+				CBECDB8E2CDBD62C005B8B87 /* PageRefreshMonitor in Frameworks */,
 				984FD3BF299ACF35007334DD /* Bookmarks in Frameworks */,
 				37A5E2F0298AA1B20047046B /* Persistence in Frameworks */,
-				CBECDB782CD98166005B8B87 /* PageRefreshMonitor in Frameworks */,
 				9DC70B1A2AA1FA5B005A844B /* LoginItems in Frameworks */,
 				37269EFD2B332FAC005E8E46 /* Common in Frameworks */,
 				F198C7142BD18A30000BF24D /* PixelKit in Frameworks */,
@@ -4891,7 +4891,6 @@
 				37F44A5F298C17830025E7FE /* Navigation in Frameworks */,
 				7B2366862C09FACD002D393F /* VPNAppLauncher in Frameworks */,
 				371209252C232E6C003ADF3D /* RemoteMessaging in Frameworks */,
-				CBECDB762CD98161005B8B87 /* BrokenSitePrompt in Frameworks */,
 				4BCBE45A2BA7E17800FC75A1 /* Subscription in Frameworks */,
 				B6EC37FF29B8D915001ACE79 /* Configuration in Frameworks */,
 				567A23C52C7F75BB0010F66C /* SpecialErrorPages in Frameworks */,
@@ -5142,10 +5141,10 @@
 				9D9DE5732C63AA0700D20B15 /* AppKitExtensions in Frameworks */,
 				F1DF95E72BD188B60045E591 /* LoginItems in Frameworks */,
 				372217802B3337FE00B8E9C2 /* TestUtils in Frameworks */,
-				CBECDB722CD9814F005B8B87 /* PageRefreshMonitor in Frameworks */,
+				CBECDB8A2CDBD616005B8B87 /* PageRefreshMonitor in Frameworks */,
 				7BA076BB2B65D61400D7FB72 /* NetworkProtectionProxy in Frameworks */,
 				4B4D60B12A0C83B900BCD287 /* NetworkProtectionUI in Frameworks */,
-				CBECDB742CD98159005B8B87 /* BrokenSitePrompt in Frameworks */,
+				CBECDB8C2CDBD61C005B8B87 /* BrokenSitePrompt in Frameworks */,
 				98A50964294B691800D10880 /* Persistence in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -7612,7 +7611,6 @@
 		AA585D75248FD31100E9A3E2 = {
 			isa = PBXGroup;
 			children = (
-				CBECDB702CD98132005B8B87 /* BrowserServicesKit */,
 				378B5886295CF2A4002C0CC0 /* Configuration */,
 				378E279C2970217400FCADA2 /* LocalPackages */,
 				7BB108552A43375D000AB95F /* LocalThirdParty */,
@@ -9699,8 +9697,8 @@
 				C18BF9CD2C73678C00ED6B8A /* Freemium */,
 				567A23C42C7F75BB0010F66C /* SpecialErrorPages */,
 				CD34F0C32C8869FF006826BE /* PhishingDetection */,
-				CBECDB752CD98161005B8B87 /* BrokenSitePrompt */,
-				CBECDB772CD98166005B8B87 /* PageRefreshMonitor */,
+				CBECDB8D2CDBD62C005B8B87 /* PageRefreshMonitor */,
+				CBECDB8F2CDBD631005B8B87 /* BrokenSitePrompt */,
 			);
 			productName = DuckDuckGo;
 			productReference = 3706FD05293F65D500E42796 /* DuckDuckGo App Store.app */;
@@ -10139,8 +10137,8 @@
 				C18BF9CB2C73678500ED6B8A /* Freemium */,
 				567A23C02C7F71570010F66C /* SpecialErrorPages */,
 				CD34F0BB2C885D65006826BE /* PhishingDetection */,
-				CBECDB712CD9814F005B8B87 /* PageRefreshMonitor */,
-				CBECDB732CD98159005B8B87 /* BrokenSitePrompt */,
+				CBECDB892CDBD616005B8B87 /* PageRefreshMonitor */,
+				CBECDB8B2CDBD61C005B8B87 /* BrokenSitePrompt */,
 			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo.app */;
@@ -14831,8 +14829,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 203.1.0;
+				branch = "jacek/behavioral-toast-udpates";
+				kind = branch;
 			};
 		};
 		9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
@@ -15596,21 +15594,25 @@
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = Configuration;
 		};
-		CBECDB712CD9814F005B8B87 /* PageRefreshMonitor */ = {
+		CBECDB892CDBD616005B8B87 /* PageRefreshMonitor */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = PageRefreshMonitor;
 		};
-		CBECDB732CD98159005B8B87 /* BrokenSitePrompt */ = {
+		CBECDB8B2CDBD61C005B8B87 /* BrokenSitePrompt */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = BrokenSitePrompt;
 		};
-		CBECDB752CD98161005B8B87 /* BrokenSitePrompt */ = {
+		CBECDB8D2CDBD62C005B8B87 /* PageRefreshMonitor */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = BrokenSitePrompt;
-		};
-		CBECDB772CD98166005B8B87 /* PageRefreshMonitor */ = {
-			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = PageRefreshMonitor;
+		};
+		CBECDB8F2CDBD631005B8B87 /* BrokenSitePrompt */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = BrokenSitePrompt;
 		};
 		CD34F0BB2C885D65006826BE /* PhishingDetection */ = {
 			isa = XCSwiftPackageProductDependency;
