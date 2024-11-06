@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "sam/migrate-daily-and-count-type-to-legacy-status",
-        "revision" : "1915671f92f95f7e06870852787d96da9809a93c"
+        "revision" : "64a5d8d1e19951fe397305a14e521713fb0eaa49",
+        "version" : "203.3.0"
       }
     },
     {
@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "48fee2508995d4ac02d18b3d55424adedcb4ce4f",
-        "version" : "6.28.0"
+        "revision" : "6cab7bdb584653a5dc007cc1ae827ec41c5a91bc",
+        "version" : "6.29.0"
       }
     },
     {
