@@ -75,10 +75,6 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
 
 final class AppearancePreferencesTests: XCTestCase {
 
-    override func setUp() {
-        AppDelegate.firstLaunchDate = Date()
-    }
-
     func testWhenInitializedThenItLoadsPersistedValues() throws {
         var model = AppearancePreferences(
             persistor: AppearancePreferencesPersistorMock(
@@ -164,7 +160,6 @@ final class AppearancePreferencesTests: XCTestCase {
     }
 
     func testWhenNewTabPreferencesAreUpdatedThenPersistedValuesAreUpdated() throws {
-
         let model = AppearancePreferences(persistor: AppearancePreferencesPersistorMock())
 
         model.isRecentActivityVisible = true
