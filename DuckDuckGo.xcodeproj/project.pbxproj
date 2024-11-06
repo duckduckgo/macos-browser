@@ -2797,6 +2797,7 @@
 		BB470EBC2C5A66D6002EE91D /* BookmarkManagementDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB470EBA2C5A66D6002EE91D /* BookmarkManagementDetailViewModel.swift */; };
 		BB5789722B2CA70F0009DFE2 /* DataBrokerProtectionSubscriptionEventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB5789712B2CA70F0009DFE2 /* DataBrokerProtectionSubscriptionEventHandler.swift */; };
 		BB5F46A32C8751F6005F72DF /* BookmarkSortTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB5F46A22C8751F6005F72DF /* BookmarkSortTests.swift */; };
+		BB731F312CDBA6360023D2E4 /* FireWindowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB731F302CDBA6320023D2E4 /* FireWindowTests.swift */; };
 		BB7B5F982C4ED73800BA4AF8 /* BookmarksSearchAndSortMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB7B5F972C4ED73800BA4AF8 /* BookmarksSearchAndSortMetrics.swift */; };
 		BB7B5F992C4ED73800BA4AF8 /* BookmarksSearchAndSortMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB7B5F972C4ED73800BA4AF8 /* BookmarksSearchAndSortMetrics.swift */; };
 		BBB881882C4029BA001247C6 /* BookmarkListTreeControllerSearchDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB881872C4029BA001247C6 /* BookmarkListTreeControllerSearchDataSource.swift */; };
@@ -4747,6 +4748,7 @@
 		BB470EBA2C5A66D6002EE91D /* BookmarkManagementDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkManagementDetailViewModel.swift; sourceTree = "<group>"; };
 		BB5789712B2CA70F0009DFE2 /* DataBrokerProtectionSubscriptionEventHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionSubscriptionEventHandler.swift; sourceTree = "<group>"; };
 		BB5F46A22C8751F6005F72DF /* BookmarkSortTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkSortTests.swift; sourceTree = "<group>"; };
+		BB731F302CDBA6320023D2E4 /* FireWindowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireWindowTests.swift; sourceTree = "<group>"; };
 		BB7B5F972C4ED73800BA4AF8 /* BookmarksSearchAndSortMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksSearchAndSortMetrics.swift; sourceTree = "<group>"; };
 		BBB881872C4029BA001247C6 /* BookmarkListTreeControllerSearchDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkListTreeControllerSearchDataSource.swift; sourceTree = "<group>"; };
 		BBBB653F2C77BB9400E69AC6 /* BookmarkSearchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkSearchTests.swift; sourceTree = "<group>"; };
@@ -6953,6 +6955,7 @@
 		7B4CE8DB26F02108009134B1 /* UITests */ = {
 			isa = PBXGroup;
 			children = (
+				BB731F302CDBA6320023D2E4 /* FireWindowTests.swift */,
 				376E708D2BD686260082B7EB /* UI Tests.xctestplan */,
 				EEBCE6802BA444FA00B9DF00 /* Common */,
 				EEC7BE2D2BC6C09400F86835 /* AddressBarKeyboardShortcutsTests.swift */,
@@ -12604,6 +12607,7 @@
 				EEC7BE2E2BC6C09500F86835 /* AddressBarKeyboardShortcutsTests.swift in Sources */,
 				EE54F7B32BBFEA49006218DB /* BookmarksAndFavoritesTests.swift in Sources */,
 				EE02D4222BB4611A00DBE6B3 /* TestsURLExtension.swift in Sources */,
+				BB731F312CDBA6360023D2E4 /* FireWindowTests.swift in Sources */,
 				EE42CBCC2BC8004700AD411C /* PermissionsTests.swift in Sources */,
 				7B4CE8E726F02135009134B1 /* TabBarTests.swift in Sources */,
 				EEBCE6832BA463DD00B9DF00 /* NSImageExtensions.swift in Sources */,
