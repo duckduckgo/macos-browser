@@ -65,12 +65,14 @@ protocol DataBrokerProtectionSecureVault: SecureVault {
               createdDate: Date,
               lastRunDate: Date?,
               preferredRunDate: Date?,
+              attemptCount: Int,
               submittedSuccessfullyDate: Date?,
               sevenDaysConfirmationPixelFired: Bool,
               fourteenDaysConfirmationPixelFired: Bool,
               twentyOneDaysConfirmationPixelFired: Bool) throws
     func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
+    func updateAttemptCount(_ count: Int, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func updateSubmittedSuccessfullyDate(_ date: Date?,
                                          forBrokerId brokerId: Int64,
                                          profileQueryId: Int64,
@@ -89,6 +91,7 @@ protocol DataBrokerProtectionSecureVault: SecureVault {
                                                    extractedProfileId: Int64) throws
     func fetchOptOut(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> OptOutJobData?
     func fetchOptOuts(brokerId: Int64, profileQueryId: Int64) throws -> [OptOutJobData]
+    func fetchOptOuts(brokerId: Int64) throws -> [OptOutJobData]
     func fetchAllOptOuts() throws -> [OptOutJobData]
 
     func save(historyEvent: HistoryEvent, brokerId: Int64, profileQueryId: Int64) throws
@@ -260,6 +263,7 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
               createdDate: Date,
               lastRunDate: Date?,
               preferredRunDate: Date?,
+              attemptCount: Int,
               submittedSuccessfullyDate: Date?,
               sevenDaysConfirmationPixelFired: Bool,
               fourteenDaysConfirmationPixelFired: Bool,
@@ -273,6 +277,7 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
             createdDate: createdDate,
             lastRunDate: lastRunDate,
             preferredRunDate: preferredRunDate,
+            attemptCount: attemptCount,
             submittedSuccessfullyDate: submittedSuccessfullyDate,
             sevenDaysConfirmationPixelFired: sevenDaysConfirmationPixelFired,
             fourteenDaysConfirmationPixelFired: fourteenDaysConfirmationPixelFired,
@@ -286,6 +291,10 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
 
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
         try self.providers.database.updateLastRunDate(date, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
+    }
+
+    func updateAttemptCount(_ count: Int, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+        try self.providers.database.updateAttemptCount(count, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
     }
 
     func updateSubmittedSuccessfullyDate(_ date: Date?,
@@ -342,6 +351,19 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
             let optOutEvents = try self.providers.database.fetchOptOutEvents(
                 brokerId: brokerId,
                 profileQueryId: profileQueryId,
+                extractedProfileId: $0.optOutDB.extractedProfileId
+            )
+            return try mapper.mapToModel($0.optOutDB, extractedProfileDB: $0.extractedProfileDB, events: optOutEvents)
+        }
+    }
+
+    func fetchOptOuts(brokerId: Int64) throws -> [OptOutJobData] {
+        let mapper = MapperToModel(mechanism: l2Decrypt(data:))
+
+        return try self.providers.database.fetchOptOuts(brokerId: brokerId).map {
+            let optOutEvents = try self.providers.database.fetchOptOutEvents(
+                brokerId: brokerId,
+                profileQueryId: $0.optOutDB.profileQueryId,
                 extractedProfileId: $0.optOutDB.extractedProfileId
             )
             return try mapper.mapToModel($0.optOutDB, extractedProfileDB: $0.extractedProfileDB, events: optOutEvents)

@@ -189,6 +189,18 @@ public struct DefaultDataBrokerProtectionBrokerUpdater: DataBrokerProtectionBrok
             guard let savedBrokerId = savedBroker.id else { return }
 
             try vault.update(broker, with: savedBrokerId)
+            try updateAttemptCount(broker)
+        }
+    }
+
+    private func updateAttemptCount(_ broker: DataBroker) throws {
+        guard broker.type == .parent, let brokerId = broker.id else { return }
+
+        let optOutJobs = try vault.fetchOptOuts(brokerId: brokerId)
+        for optOutJob in optOutJobs {
+            if let extractedProfileId = optOutJob.extractedProfile.id {
+                try vault.updateAttemptCount(0, brokerId: brokerId, profileQueryId: optOutJob.profileQueryId, extractedProfileId: extractedProfileId)
+            }
         }
     }
 

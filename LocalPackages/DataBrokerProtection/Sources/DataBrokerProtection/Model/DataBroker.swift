@@ -24,6 +24,7 @@ struct DataBrokerScheduleConfig: Codable {
     let retryError: Int
     let confirmOptOutScan: Int
     let maintenanceScan: Int
+    let maxAttempts: Int
 }
 
 extension Int {

@@ -74,6 +74,7 @@ public struct OptOutJobData: BrokerJobData, Sendable {
     let preferredRunDate: Date?
     let historyEvents: [HistoryEvent]
     let lastRunDate: Date?
+    let attemptCount: Int
 
     // This was added in a later DB migration (V4), so will be nil for older entries submitted before the migration
     let submittedSuccessfullyDate: Date?
@@ -89,6 +90,7 @@ public struct OptOutJobData: BrokerJobData, Sendable {
          preferredRunDate: Date? = nil,
          historyEvents: [HistoryEvent],
          lastRunDate: Date? = nil,
+         attemptCount: Int = 0,
          submittedSuccessfullyDate: Date? = nil,
          extractedProfile: ExtractedProfile,
          sevenDaysConfirmationPixelFired: Bool = false,
@@ -100,6 +102,7 @@ public struct OptOutJobData: BrokerJobData, Sendable {
         self.preferredRunDate = preferredRunDate
         self.historyEvents = historyEvents
         self.lastRunDate = lastRunDate
+        self.attemptCount = attemptCount
         self.submittedSuccessfullyDate = submittedSuccessfullyDate
         self.extractedProfile = extractedProfile
         self.sevenDaysConfirmationPixelFired = sevenDaysConfirmationPixelFired

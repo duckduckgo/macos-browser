@@ -168,7 +168,8 @@ final class BrokerJSONCodableTests: XCTestCase {
                  "schedulingConfig": {
                    "retryError": 48,
                    "confirmOptOutScan": 72,
-                   "maintenanceScan": 240
+                   "maintenanceScan": 240,
+                   "maxAttempts": -1
                  }
                }
 
@@ -316,7 +317,8 @@ final class BrokerJSONCodableTests: XCTestCase {
                  "schedulingConfig": {
                    "retryError": 48,
                    "confirmOptOutScan": 72,
-                   "maintenanceScan": 240
+                   "maintenanceScan": 240,
+                   "maxAttempts": -1
                  }
                }
 
@@ -421,7 +423,8 @@ final class BrokerJSONCodableTests: XCTestCase {
               "schedulingConfig": {
                 "retryError": 48,
                 "confirmOptOutScan": 72,
-                "maintenanceScan": 240
+                "maintenanceScan": 240,
+                "maxAttempts": -1
               }
             }
             """

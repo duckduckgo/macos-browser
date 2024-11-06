@@ -38,6 +38,7 @@ public protocol DataBrokerProtectionRepository {
     func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64) throws
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
+    func updateAttemptCount(_ count: Int, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func updateSubmittedSuccessfullyDate(_ date: Date?,
                                          forBrokerId brokerId: Int64,
                                          profileQueryId: Int64,
@@ -238,6 +239,22 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
         }
     }
 
+    func updateAttemptCount(_ count: Int, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
+            try vault.updateAttemptCount(
+                count,
+                brokerId: brokerId,
+                profileQueryId: profileQueryId,
+                extractedProfileId: extractedProfileId
+            )
+        } catch {
+            Logger.dataBrokerProtection.error("Database error: updateAttemptCount, error: \(error.localizedDescription, privacy: .public)")
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.updateAttemptCount"))
+            throw error
+        }
+    }
+
     func updateSubmittedSuccessfullyDate(_ date: Date?,
                                          forBrokerId brokerId: Int64,
                                          profileQueryId: Int64,
@@ -388,6 +405,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
                            createdDate: optOut.createdDate,
                            lastRunDate: optOut.lastRunDate,
                            preferredRunDate: optOut.preferredRunDate,
+                           attemptCount: optOut.attemptCount,
                            submittedSuccessfullyDate: optOut.submittedSuccessfullyDate,
                            sevenDaysConfirmationPixelFired: optOut.sevenDaysConfirmationPixelFired,
                            fourteenDaysConfirmationPixelFired: optOut.fourteenDaysConfirmationPixelFired,

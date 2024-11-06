@@ -204,6 +204,8 @@ struct OptOutDB: Codable {
     var lastRunDate: Date?
     var preferredRunDate: Date?
 
+    var attemptCount: Int
+
     // This was added in a later migration (V4), so will be nil for older entries submitted before the migration
     var submittedSuccessfullyDate: Date?
 
@@ -230,6 +232,7 @@ extension OptOutDB: PersistableRecord, FetchableRecord {
         case createdDate
         case lastRunDate
         case preferredRunDate
+        case attemptCount
         case submittedSuccessfullyDate
         case sevenDaysConfirmationPixelFired
         case fourteenDaysConfirmationPixelFired
@@ -243,6 +246,7 @@ extension OptOutDB: PersistableRecord, FetchableRecord {
         createdDate = row[Columns.createdDate]
         lastRunDate = row[Columns.lastRunDate]
         preferredRunDate = row[Columns.preferredRunDate]
+        attemptCount = row[Columns.attemptCount]
         submittedSuccessfullyDate = row[Columns.submittedSuccessfullyDate]
         sevenDaysConfirmationPixelFired = row[Columns.sevenDaysConfirmationPixelFired]
         fourteenDaysConfirmationPixelFired = row[Columns.fourteenDaysConfirmationPixelFired]
@@ -256,6 +260,7 @@ extension OptOutDB: PersistableRecord, FetchableRecord {
         container[Columns.createdDate] = createdDate
         container[Columns.lastRunDate] = lastRunDate
         container[Columns.preferredRunDate] = preferredRunDate
+        container[Columns.attemptCount] = attemptCount
         container[Columns.submittedSuccessfullyDate] = submittedSuccessfullyDate
         container[Columns.sevenDaysConfirmationPixelFired] = sevenDaysConfirmationPixelFired
         container[Columns.fourteenDaysConfirmationPixelFired] = fourteenDaysConfirmationPixelFired
