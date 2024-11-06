@@ -111,7 +111,6 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
 
     case networkProtectionConfigurationInvalidPayload(configuration: Configuration)
     case networkProtectionConfigurationErrorLoadingCachedConfig(_ error: Error)
-    case networkProtectionConfigurationPixelTest
     case networkProtectionConfigurationFailedToParse(_ error: Error)
 
     case networkProtectionMalformedErrorDetected(_ error: Error)
@@ -328,9 +327,6 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
         case .networkProtectionConfigurationErrorLoadingCachedConfig:
             return "netp_ev_configuration_error_loading_cached_config"
 
-        case .networkProtectionConfigurationPixelTest:
-            return "netp_ev_configuration_pixel_test"
-
         case .networkProtectionConfigurationFailedToParse:
             return "netp_ev_configuration_failed_to_parse"
 
@@ -450,7 +446,6 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionDNSUpdateCustom,
                 .networkProtectionDNSUpdateDefault,
                 .networkProtectionConfigurationInvalidPayload,
-                .networkProtectionConfigurationPixelTest,
                 .networkProtectionMalformedErrorDetected:
             return nil
         }
@@ -530,8 +525,7 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionServerMigrationSuccess,
                 .networkProtectionDNSUpdateCustom,
                 .networkProtectionDNSUpdateDefault,
-                .networkProtectionConfigurationInvalidPayload,
-                .networkProtectionConfigurationPixelTest:
+                .networkProtectionConfigurationInvalidPayload:
             return nil
         }
     }
