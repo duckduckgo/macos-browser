@@ -22,6 +22,7 @@ protocol BookmarksContextMenuDelegate: NSMenuDelegate, BookmarkSearchMenuItemSel
     var isSearching: Bool { get }
     var parentFolder: BookmarkFolder? { get }
     var shouldIncludeManageBookmarksItem: Bool { get }
+    var undoManager: UndoManager? { get }
 
     func selectedItems() -> [Any]
     func showDialog(_ dialog: any ModalView)
@@ -307,13 +308,17 @@ extension BookmarksContextMenu: BookmarkMenuItemSelectors {
     }
 
     @objc func toggleBookmarkAsFavorite(_ sender: NSMenuItem) {
-        guard let bookmark = sender.representedObject as? Bookmark else {
+        if let bookmark = sender.representedObject as? Bookmark{
+            bookmark.isFavorite.toggle()
+            bookmarkManager.update(bookmark: bookmark)
+        } else if let bookmarks = sender.representedObject as? [Bookmark] {
+            bookmarks.forEach { bookmark in
+                bookmark.isFavorite.toggle()
+                bookmarkManager.update(bookmark: bookmark)
+            }
+        } else {
             assertionFailure("Failed to cast menu represented object to Bookmark")
-            return
         }
-
-        bookmark.isFavorite.toggle()
-        bookmarkManager.update(bookmark: bookmark)
     }
 
     @MainActor
@@ -342,7 +347,7 @@ extension BookmarksContextMenu: BookmarkMenuItemSelectors {
             return
         }
 
-        bookmarkManager.remove(bookmark: bookmark)
+        bookmarkManager.remove(bookmark: bookmark, undoManager: bookmarksContextMenuDelegate?.undoManager)
     }
 
     @objc func deleteEntities(_ sender: NSMenuItem) {
@@ -351,7 +356,7 @@ extension BookmarksContextMenu: BookmarkMenuItemSelectors {
             return
         }
 
-        bookmarkManager.remove(objectsWithUUIDs: uuids)
+        bookmarkManager.remove(objectsWithUUIDs: uuids, undoManager: bookmarksContextMenuDelegate?.undoManager)
     }
 
     @MainActor
@@ -418,21 +423,25 @@ extension BookmarksContextMenu: FolderMenuItemSelectors {
             return
         }
 
-        bookmarkManager.remove(folder: folder)
+        bookmarkManager.remove(folder: folder, undoManager: bookmarksContextMenuDelegate?.undoManager)
     }
 
     @MainActor
     @objc func openInNewTabs(_ sender: NSMenuItem) {
-        guard let tabCollection = windowControllersManager.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel,
-              let folder = sender.representedObject as? BookmarkFolder
-        else {
+        guard let tabCollection = windowControllersManager.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel else {
             assertionFailure("Cannot open all in new tabs")
             return
         }
 
-        let tabs = Tab.withContentOfBookmark(folder: folder, burnerMode: tabCollection.burnerMode)
-        tabCollection.append(tabs: tabs)
-        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
+        if let folder = sender.representedObject as? BookmarkFolder {
+            let tabs = Tab.withContentOfBookmark(folder: folder, burnerMode: tabCollection.burnerMode)
+            tabCollection.append(tabs: tabs)
+            PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
+        } else if let bookmarks = sender.representedObject as? [Bookmark] {
+            let tabs = Tab.with(contentsOf: bookmarks, burnerMode: tabCollection.burnerMode)
+            tabCollection.append(tabs: tabs)
+            PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
+        }
     }
 
     @MainActor

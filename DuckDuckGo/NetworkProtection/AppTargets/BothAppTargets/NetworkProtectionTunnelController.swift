@@ -537,7 +537,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     func start() async {
         VPNOperationErrorRecorder().beginRecordingControllerStart()
         PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionControllerStartAttempt,
-                      frequency: .dailyAndCount)
+                      frequency: .legacyDailyAndCount)
         controllerErrorStore.lastErrorMessage = nil
 
         do {
@@ -580,7 +580,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
                 // in the packet tunnel provider side that can be used to debug additional logic.
                 //
                 PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionControllerStartSuccess,
-                              frequency: .dailyAndCount)
+                              frequency: .legacyDailyAndCount)
             }
         } catch {
             VPNOperationErrorRecorder().recordControllerStartFailure(error)
@@ -588,11 +588,11 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
             if case StartError.cancelled = error {
                 PixelKit.fire(
-                    NetworkProtectionPixelEvent.networkProtectionControllerStartCancelled, frequency: .dailyAndCount, includeAppVersionParameter: true
+                    NetworkProtectionPixelEvent.networkProtectionControllerStartCancelled, frequency: .legacyDailyAndCount, includeAppVersionParameter: true
                 )
             } else {
                 PixelKit.fire(
-                    NetworkProtectionPixelEvent.networkProtectionControllerStartFailure(error), frequency: .dailyAndCount, includeAppVersionParameter: true
+                    NetworkProtectionPixelEvent.networkProtectionControllerStartFailure(error), frequency: .legacyDailyAndCount, includeAppVersionParameter: true
                 )
             }
 
@@ -830,7 +830,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
     private func fetchAuthToken() throws -> NSString? {
         if let accessToken = try? accessTokenStorage.getAccessToken() {
-            Logger.networkProtection.debug("🟢 TunnelController found token")
+            Logger.networkProtection.log("🟢 TunnelController found token")
             return Self.adaptAccessTokenForVPN(accessToken) as NSString?
         } else {
             Logger.networkProtection.error("TunnelController found no token")

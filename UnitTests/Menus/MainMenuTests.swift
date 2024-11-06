@@ -89,12 +89,56 @@ class MainMenuTests: XCTestCase {
         XCTAssertEqual(manager.reopenLastClosedMenuItem?.keyEquivalentModifierMask, ReopenMenuItemKeyEquivalentManager.Const.modifierMask)
     }
 
+    // MARK: - Default Browser Action
+
+    @MainActor
+    func testWhenBrowserIsDefaultThenSetAsDefaultBrowserMenuItemIsHidden() throws {
+        let defaultBrowserProvider = DefaultBrowserProviderMock()
+        defaultBrowserProvider.isDefault = true
+
+        let sut = MainMenu(
+            featureFlagger: DummyFeatureFlagger(),
+            bookmarkManager: MockBookmarkManager(),
+            faviconManager: FaviconManagerMock(),
+            defaultBrowserPreferences: .init(defaultBrowserProvider: defaultBrowserProvider),
+            aiChatMenuConfig: DummyAIChatConfig()
+        )
+
+        sut.update()
+
+        let duckDuckGoMenu = try XCTUnwrap(sut.items.first?.submenu)
+
+        XCTAssertEqual(duckDuckGoMenu.items[3].title, UserText.setAsDefaultBrowser + "…")
+        XCTAssertTrue(duckDuckGoMenu.items[3].isHidden)
+    }
+
+    @MainActor
+    func testWhenBrowserIsNotDefaultThenSetAsDefaultBrowserMenuItemIsShown() throws {
+        let defaultBrowserProvider = DefaultBrowserProviderMock()
+        defaultBrowserProvider.isDefault = false
+
+        let sut = MainMenu(
+            featureFlagger: DummyFeatureFlagger(),
+            bookmarkManager: MockBookmarkManager(),
+            faviconManager: FaviconManagerMock(),
+            defaultBrowserPreferences: .init(defaultBrowserProvider: defaultBrowserProvider),
+            aiChatMenuConfig: DummyAIChatConfig()
+        )
+
+        sut.update()
+
+        let duckDuckGoMenu = try XCTUnwrap(sut.items.first?.submenu)
+
+        XCTAssertEqual(duckDuckGoMenu.items[3].title, UserText.setAsDefaultBrowser + "…")
+        XCTAssertFalse(duckDuckGoMenu.items[3].isHidden)
+    }
+
     // MARK: - Bookmarks
 
     @MainActor
     func testWhenBookmarksMenuIsInitialized_ThenSecondItemIsBookmarkAllTabs() throws {
         // GIVEN
-        let sut = MainMenu(featureFlagger: DummyFeatureFlagger(), bookmarkManager: MockBookmarkManager(), faviconManager: FaviconManagerMock())
+        let sut = MainMenu(featureFlagger: DummyFeatureFlagger(), bookmarkManager: MockBookmarkManager(), faviconManager: FaviconManagerMock(), aiChatMenuConfig: DummyAIChatConfig())
         let bookmarksMenu = try XCTUnwrap(sut.item(withTitle: UserText.bookmarks))
 
         // WHEN
@@ -104,10 +148,70 @@ class MainMenuTests: XCTestCase {
         XCTAssertEqual(result.keyEquivalent, "d")
         XCTAssertEqual(result.keyEquivalentModifierMask, [.command, .shift])
     }
+
+    // MARK: - AI Chat
+
+    @MainActor
+    func testMainMenuInitializedWithFalseAiChatFlag_ThenAiChatIsNotVisible() throws {
+        // GIVEN
+        let aiChatConfig = DummyAIChatConfig()
+        let sut = MainMenu(featureFlagger: DummyFeatureFlagger(),
+                           bookmarkManager: MockBookmarkManager(),
+                           faviconManager: FaviconManagerMock(),
+                           aiChatMenuConfig: aiChatConfig)
+
+        let fileMenu = try XCTUnwrap(sut.item(withTitle: UserText.mainMenuFile))
+
+        // WHEN
+        let aiChatMenu = fileMenu.submenu?.item(withTitle: UserText.newAIChatMenuItem)
+
+        // THEN
+        XCTAssertNotNil(aiChatMenu, "AI Chat menu item should exist in the file menu.")
+        XCTAssertTrue(aiChatMenu?.isHidden == true, "AI Chat menu item should be hidden when the AI chat flag is false.")
+    }
+
+    @MainActor
+    func testMainMenuInitializedWithTrueAiChatFlag_ThenAiChatIsVisible() throws {
+        // GIVEN
+        let aiChatConfig = DummyAIChatConfig()
+        aiChatConfig.shouldDisplayApplicationMenuShortcut = true
+        aiChatConfig.isFeatureEnabledForApplicationMenuShortcut = true
+
+        let sut = MainMenu(featureFlagger: DummyFeatureFlagger(),
+                           bookmarkManager: MockBookmarkManager(),
+                           faviconManager: FaviconManagerMock(),
+                           aiChatMenuConfig: aiChatConfig)
+
+        let fileMenu = try XCTUnwrap(sut.item(withTitle: UserText.mainMenuFile))
+
+        // WHEN
+        let aiChatMenu = fileMenu.submenu?.item(withTitle: UserText.newAIChatMenuItem)
+
+        // THEN
+        XCTAssertNotNil(aiChatMenu, "AI Chat menu item should exist in the file menu.")
+        XCTAssertFalse(aiChatMenu?.isHidden ?? true, "AI Chat menu item should be visible when the AI chat flag is true.")
+    }
 }
 
 private class DummyFeatureFlagger: FeatureFlagger {
     func isFeatureOn<F: BrowserServicesKit.FeatureFlagSourceProviding>(forProvider: F) -> Bool {
         false
     }
+}
+
+private class DummyAIChatConfig: AIChatMenuVisibilityConfigurable {
+    var shouldDisplayApplicationMenuShortcut = false
+    var shouldDisplayToolbarShortcut = false
+    var isFeatureEnabledForApplicationMenuShortcut = false
+    var isFeatureEnabledForToolbarShortcut = false
+
+    var valuesChangedPublisher: PassthroughSubject<Void, Never> {
+        return PassthroughSubject<Void, Never>()
+    }
+
+    var shouldDisplayToolbarOnboardingPopover: PassthroughSubject<Void, Never> {
+        return PassthroughSubject<Void, Never>()
+    }
+
+    func markToolbarOnboardingPopoverAsShown() { }
 }

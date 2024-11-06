@@ -46,6 +46,7 @@ protocol WindowControllersManagerProtocol {
                        popUp: Bool,
                        lazyLoadTabs: Bool,
                        isMiniaturized: Bool) -> MainWindow?
+    func showTab(with content: Tab.TabContent)
 }
 extension WindowControllersManagerProtocol {
     @discardableResult
@@ -354,7 +355,7 @@ extension WindowControllersManager: OnboardingNavigating {
 
     @MainActor
     func showImportDataView() {
-        DataImportView().show()
+        DataImportView(title: UserText.importDataTitleOnboarding).show()
     }
 
     @MainActor

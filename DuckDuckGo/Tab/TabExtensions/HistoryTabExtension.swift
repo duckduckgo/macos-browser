@@ -193,6 +193,7 @@ extension HistoryTabExtension: NavigationResponder {
     func didCommit(_ navigation: Navigation) {
         guard navigation.url == self.url,
               navigation.url.isHypertextURL,
+              navigation.navigationAction.navigationType != .alternateHtmlLoad, // should not be loading error page
               case .expected = visitState else { return }
 
         guard !navigation.navigationAction.navigationType.isBackForward else {

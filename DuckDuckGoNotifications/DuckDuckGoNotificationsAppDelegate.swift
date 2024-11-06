@@ -72,11 +72,11 @@ final class DuckDuckGoNotificationsAppDelegate: NSObject, NSApplicationDelegate 
         Logger.networkProtection.info("Login item finished launching")
 
         startObservingVPNStatusChanges()
-        Logger.networkProtection.info("Login item listening")
+        Logger.networkProtection.log("Login item listening")
     }
 
     private func startObservingVPNStatusChanges() {
-        Logger.networkProtection.info("Register with sysex")
+        Logger.networkProtection.log("Register with sysex")
 
         distributedNotificationCenter.publisher(for: .showIssuesStartedNotification)
             .receive(on: DispatchQueue.main)
@@ -110,7 +110,7 @@ final class DuckDuckGoNotificationsAppDelegate: NSObject, NSApplicationDelegate 
             }.store(in: &cancellables)
 
         distributedNotificationCenter.publisher(for: .serverSelected).sink { [weak self] _ in
-            Logger.networkProtection.info("Got notification: listener started")
+            Logger.networkProtection.log("Got notification: listener started")
             self?.notificationsPresenter.requestAuthorization()
         }.store(in: &cancellables)
 

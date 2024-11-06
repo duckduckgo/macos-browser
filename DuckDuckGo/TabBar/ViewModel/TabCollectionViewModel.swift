@@ -130,6 +130,7 @@ final class TabCollectionViewModel: NSObject {
 
         subscribeToTabs()
         subscribeToPinnedTabsManager()
+        subscribeToSelectedTab()
 
         if tabCollection.tabs.isEmpty {
             appendNewTab(with: homePage)
@@ -151,6 +152,32 @@ final class TabCollectionViewModel: NSObject {
         self.init(tabCollection: tabCollection,
                   pinnedTabsManager: WindowControllersManager.shared.pinnedTabsManager,
                   burnerMode: burnerMode)
+    }
+
+    var selectedTabCancellable: AnyCancellable?
+    private func subscribeToSelectedTab() {
+        selectedTabCancellable = $selectedTabViewModel
+            .compactMap { $0 }
+            .sink { [weak self] model in
+                self?.subscribeToTabError(model)
+            }
+    }
+
+    var selectedTabErrorCancellable: AnyCancellable?
+    private func subscribeToTabError(_ model: TabViewModel) {
+        selectedTabErrorCancellable = model.tab.$error
+            .compactMap { $0 }
+            .sink { [weak self] error in
+                self?.fireErrorPageShownPixel(error)
+        }
+    }
+
+    private func fireErrorPageShownPixel(_ error: WKError) {
+        if error.code == WKError.Code.webContentProcessTerminated {
+            PixelKit.fire(GeneralPixel.errorPageShownWebkitTermination)
+        } else {
+            PixelKit.fire(GeneralPixel.errorPageShownOther)
+        }
     }
 
     func setUpLazyLoadingIfNeeded() {

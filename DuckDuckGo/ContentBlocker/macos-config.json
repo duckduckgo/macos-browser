@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1728900024972,
+    "version": 1730728849681,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -59,6 +59,26 @@
                 "domainDetection": "enabled"
             },
             "hash": "b813ade8472a097ffbd43a3331116fe1"
+        },
+        "aiChat": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "toolbarShortcut": {
+                    "state": "enabled"
+                },
+                "applicationMenuShortcut": {
+                    "state": "enabled"
+                }
+            },
+            "settings": {
+                "aiChatURL": "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=2",
+                "onboardingCookieName": "dcm",
+                "onboardingCookieDomain": "duckduckgo.com",
+                "aiChatURLIdentifiableQuery": "ia",
+                "aiChatURLIdentifiableQueryValue": "chat"
+            },
+            "hash": "e5711b3f4ceff89cd5c2d70b19a96875"
         },
         "ampLinks": {
             "exceptions": [
@@ -356,6 +376,39 @@
                     "domain": "speedweek.com"
                 },
                 {
+                    "domain": "la-becanerie.com"
+                },
+                {
+                    "domain": "thrifty.com"
+                },
+                {
+                    "domain": "dollar.com"
+                },
+                {
+                    "domain": "ethicalconsumer.org"
+                },
+                {
+                    "domain": "diroots.com"
+                },
+                {
+                    "domain": "arbeitsagentur.de"
+                },
+                {
+                    "domain": "melawear.de"
+                },
+                {
+                    "domain": "dnb.com"
+                },
+                {
+                    "domain": "bookings.ltmuseum.co.uk"
+                },
+                {
+                    "domain": "famillemary.fr"
+                },
+                {
+                    "domain": "manoloblahnik.com"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -378,11 +431,11 @@
             },
             "state": "enabled",
             "features": {
-                "filterlistExperiment": {
-                    "state": "disabled"
+                "filterlistExperiment2": {
+                    "state": "enabled"
                 }
             },
-            "hash": "69add087dec44523d540bf49f1ec1b0f"
+            "hash": "7a4965df30b37cc6667c92a477757058"
         },
         "autofillBreakageReporter": {
             "state": "disabled",
@@ -431,12 +484,15 @@
                         "steps": [
                             {
                                 "percent": 10
+                            },
+                            {
+                                "percent": 50
                             }
                         ]
                     }
                 }
             },
-            "hash": "75ff21cf9a4181783c06965edd6fe746"
+            "hash": "9de8e4b066aa23f7c20ca638ee0d9f1a"
         },
         "bookmarks": {
             "state": "enabled",
@@ -1269,6 +1325,11 @@
             ],
             "hash": "d02882dcee87a42b7d29bb6f2e21b4ca"
         },
+        "contextualOnboarding": {
+            "exceptions": [],
+            "state": "enabled",
+            "hash": "52857469413a66e8b0c7b00de5589162"
+        },
         "cookie": {
             "settings": {
                 "trackerCookie": "enabled",
@@ -1285,6 +1346,10 @@
                     {
                         "domain": "payments.google.com",
                         "reason": "After sign-in for Google Pay flows (after flickering is resolved), blocking this causes the loading spinner to spin indefinitely, and the payment flow cannot proceed."
+                    },
+                    {
+                        "domain": "docs.google.com",
+                        "reason": "Embedded Google docs get into redirect loop if signed into a Google account"
                     }
                 ],
                 "firstPartyTrackerCookiePolicy": {
@@ -1335,7 +1400,7 @@
                 }
             ],
             "state": "disabled",
-            "hash": "6b4d2cef180104c5c84f5687479b8492"
+            "hash": "fce0a9ccd7ae060d25e7debe4d8905fb"
         },
         "customUserAgent": {
             "settings": {
@@ -1396,13 +1461,17 @@
                     {
                         "domain": "adobe.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2289"
-                    }
-                ],
-                "webViewDefault": [
+                    },
                     {
                         "domain": "accounts.google.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1295"
                     },
+                    {
+                        "domain": "mail.google.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1295"
+                    }
+                ],
+                "webViewDefault": [
                     {
                         "domain": "flysas.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1347"
@@ -1423,7 +1492,7 @@
             },
             "exceptions": [],
             "state": "enabled",
-            "hash": "6e1e9af5fb146e16b5f9f3090b41ca89"
+            "hash": "748cc5de2bc4b6b5e77c9c80b91efc2c"
         },
         "dbp": {
             "state": "enabled",
@@ -3534,6 +3603,23 @@
                         ]
                     },
                     {
+                        "domain": "mantan-web.jp",
+                        "rules": [
+                            {
+                                "selector": "center > div",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".ad-rec",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".conteiner__head",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "marketwatch.com",
                         "rules": [
                             {
@@ -4110,6 +4196,15 @@
                         ]
                     },
                     {
+                        "domain": "salon.com",
+                        "rules": [
+                            {
+                                "selector": ".fc-ab-root",
+                                "type": "hide"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "scmp.com",
                         "rules": [
                             {
@@ -4382,6 +4477,10 @@
                             {
                                 "selector": "[data-aa-adunit]",
                                 "type": "hide"
+                            },
+                            {
+                                "selector": "[data-adpath]",
+                                "type": "hide-empty"
                             }
                         ]
                     },
@@ -4875,7 +4974,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "9cbafdd3b48aabf71f6cfb2f986a7181"
+            "hash": "485beac7762b316d685395a55537e0b7"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -5279,31 +5378,13 @@
             "state": "enabled",
             "exceptions": [
                 {
-                    "domain": "allegiantair.com"
-                },
-                {
                     "domain": "boston.com"
                 },
                 {
                     "domain": "costco.com"
                 },
                 {
-                    "domain": "crunchyroll.com"
-                },
-                {
                     "domain": "espn.com"
-                },
-                {
-                    "domain": "eventbrite.com"
-                },
-                {
-                    "domain": "duluthtrading.com"
-                },
-                {
-                    "domain": "web.whatsapp.com"
-                },
-                {
-                    "domain": "verizon.com"
                 },
                 {
                     "domain": "chime.com"
@@ -5312,25 +5393,19 @@
                     "domain": "tirerack.com"
                 },
                 {
-                    "domain": "milesplit.live"
-                },
-                {
                     "domain": "dollargeneral.com"
                 },
                 {
-                    "domain": "monstergear.monsterenergy.com"
+                    "domain": "milesplit.live"
+                },
+                {
+                    "domain": "monsterenergy.com"
                 },
                 {
                     "domain": "npr.org"
                 },
                 {
                     "domain": "norton.com"
-                },
-                {
-                    "domain": "jcrew.com"
-                },
-                {
-                    "domain": "pgealerts.alerts.pge.com"
                 },
                 {
                     "domain": "marvel.com"
@@ -5357,7 +5432,7 @@
                     "privacy-test-pages.site"
                 ]
             },
-            "hash": "4df9d206561ea1251d6348865362de63"
+            "hash": "501bbc6471eb079cb27fa8a2a47467a5"
         },
         "harmfulApis": {
             "settings": {
@@ -5645,9 +5720,9 @@
             "hash": "cbd62a1a63a829da0277ca045a311eb2"
         },
         "newTabSearchField": {
-            "state": "internal",
+            "state": "disabled",
             "exceptions": [],
-            "hash": "f1daaefe788583c2a00d7d19a23864a7"
+            "hash": "c292bb627849854515cebbded288ef5a"
         },
         "nonTracking3pCookies": {
             "settings": {
@@ -5985,6 +6060,11 @@
             "exceptions": [],
             "minSupportedVersion": "1.70.0",
             "hash": "0a35f748d63fc61a777ea5e712728fa3"
+        },
+        "textZoom": {
+            "exceptions": [],
+            "state": "disabled",
+            "hash": "728493ef7a1488e4781656d3f9db84aa"
         },
         "toggleReports": {
             "state": "enabled",
@@ -6835,6 +6915,13 @@
                                 ]
                             },
                             {
+                                "rule": "doubleclick.net/ondemand/dash/content/",
+                                "domains": [
+                                    "cbs.com",
+                                    "paramountplus.com"
+                                ]
+                            },
+                            {
                                 "rule": "securepubads.g.doubleclick.net/gampad/ads",
                                 "domains": [
                                     "ah.nl",
@@ -7467,9 +7554,11 @@
                                     "bodyelectricvitality.com.au",
                                     "cosmicbook.news",
                                     "eatroyo.com",
+                                    "experian.com",
                                     "thesimsresource.com",
                                     "tradersync.com",
-                                    "vanguardplan.com"
+                                    "vanguardplan.com",
+                                    "xpn.org"
                                 ]
                             }
                         ]
@@ -8919,6 +9008,16 @@
                             }
                         ]
                     },
+                    "svonm.com": {
+                        "rules": [
+                            {
+                                "rule": "hgc-cf-cache-1.svonm.com",
+                                "domains": [
+                                    "t-online.de"
+                                ]
+                            }
+                        ]
+                    },
                     "taboola.com": {
                         "rules": [
                             {
@@ -9406,7 +9505,7 @@
                     "domain": "instructure.com"
                 }
             ],
-            "hash": "decc4b889c1d10bde764604562463b3c"
+            "hash": "7d4f56d34c41ddfde274e4aa23a8b74b"
         },
         "trackingCookies1p": {
             "settings": {
@@ -9847,6 +9946,11 @@
             "exceptions": [],
             "state": "disabled",
             "hash": "728493ef7a1488e4781656d3f9db84aa"
+        },
+        "windowsNewTabPageExperiment": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
         },
         "windowsPermissionUsage": {
             "exceptions": [],
