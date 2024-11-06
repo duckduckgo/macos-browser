@@ -72,12 +72,12 @@ struct DefaultSubscriptionAppStoreRestorer: SubscriptionAppStoreRestorer {
         await uiHandler.dismissProgressViewController()
         switch result {
         case .success:
-            PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreSuccess, frequency: .dailyAndCount)
+            PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreSuccess, frequency: .legacyDailyAndCount)
         case .failure(let error):
             switch error {
             case .missingAccountOrTransactions: break
             default:
-                PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreFailureOther, frequency: .dailyAndCount)
+                PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreFailureOther, frequency: .legacyDailyAndCount)
             }
             switch error {
             case .missingAccountOrTransactions:
@@ -96,7 +96,7 @@ struct DefaultSubscriptionAppStoreRestorer: SubscriptionAppStoreRestorer {
     // MARK: - UI interactions
 
     private func showSomethingWentWrongAlert() async {
-        PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailure, frequency: .dailyAndCount)
+        PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailure, frequency: .legacyDailyAndCount)
         await uiHandler.show(alertType: .somethingWentWrong)
     }
 
