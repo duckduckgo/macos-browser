@@ -68,13 +68,6 @@ struct EmailService: EmailServiceProtocol {
 
     func getEmail(dataBrokerURL: String, attemptId: UUID) async throws -> EmailData {
 
-        /* Ideally we would use staging to get a real email from the endpoint
-         but there's a problem with the token */
-        let dbpSettings = DataBrokerProtectionSettings()
-        if dbpSettings.storedRunType == .integrationTests {
-            return EmailData(pattern: nil, emailAddress: "test@duck.com")
-        }
-
         var urlComponents = URLComponents(url: settings.selectedEnvironment.endpointURL, resolvingAgainstBaseURL: true)
         urlComponents?.path = "\(Constants.endpointSubPath)/generate"
         urlComponents?.queryItems = [
