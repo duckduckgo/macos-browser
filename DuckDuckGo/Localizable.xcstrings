@@ -36201,66 +36201,6 @@
         }
       }
     },
-    "newTab.menu.item.show.continue.setup" : {
-      "comment" : "Title of the menu item in the home page to show/hide continue setup section",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nächste Schritte anzeigen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Show Next Steps"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mostrar pasos siguientes"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Afficher les étapes suivantes"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mostra i passaggi successivi"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Volgende stappen weergeven"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pokaż dalsze kroki"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mostrar passos seguintes"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Показать дальнейшие шаги"
-          }
-        }
-      }
-    },
     "newTab.menu.item.show.favorite" : {
       "comment" : "Title of the menu item in the home page to show/hide favorite section",
       "extractionState" : "extracted_with_value",
