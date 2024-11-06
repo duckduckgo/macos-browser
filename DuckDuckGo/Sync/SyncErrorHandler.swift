@@ -91,7 +91,12 @@ public class SyncErrorHandler: EventMapping<SyncError>, ObservableObject {
     public init(alertPresenter: SyncAlertsPresenting = SyncAlertsPresenter()) {
         self.alertPresenter = alertPresenter
         super.init { event, _, _, _ in
-            PixelKit.fire(DebugEvent(GeneralPixel.syncSentUnauthenticatedRequest, error: event))
+            switch event {
+            case .failedToReadSecureStore(let status):
+                PixelKit.fire(DebugEvent(GeneralPixel.syncSecureStorageReadError(error: event), error: event))
+            default:
+                PixelKit.fire(DebugEvent(GeneralPixel.syncSentUnauthenticatedRequest, error: event))
+            }
         }
     }
 

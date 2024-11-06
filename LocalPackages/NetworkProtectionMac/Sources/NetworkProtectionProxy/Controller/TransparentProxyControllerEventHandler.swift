@@ -36,7 +36,7 @@ public final class TransparentProxyControllerEventHandler: TransparentProxyContr
     public func handle(event: TransparentProxyController.Event) {
         switch event {
         case .startAttempt(let step):
-            pixelKit?.fire(step, frequency: .dailyAndCount)
+            pixelKit?.fire(step, frequency: .legacyDailyAndCount)
 
             switch step {
             case .prevented(let error):

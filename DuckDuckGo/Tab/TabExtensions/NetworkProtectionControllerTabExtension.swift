@@ -32,7 +32,7 @@ final class NetworkProtectionControllerTabExtension {
 extension NetworkProtectionControllerTabExtension: NavigationResponder {
     func navigationDidFinish(_ navigation: Navigation) {
         if navigation.url.isDuckDuckGoSearch, tunnelController.isConnected == true {
-            PixelKit.fire(GeneralPixel.networkProtectionEnabledOnSearch, frequency: .dailyAndCount)
+            PixelKit.fire(GeneralPixel.networkProtectionEnabledOnSearch, frequency: .legacyDailyAndCount)
         }
     }
 }
