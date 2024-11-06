@@ -23,6 +23,7 @@ import Combine
 import Common
 import Lottie
 import os.log
+import PrivacyDashboard
 
 protocol AddressBarButtonsViewControllerDelegate: AnyObject {
 
@@ -267,13 +268,13 @@ final class AddressBarButtonsViewController: NSViewController {
         openPrivacyDashboardPopover()
     }
 
-    func openPrivacyDashboardPopover() {
+    func openPrivacyDashboardPopover(entryPoint: PrivacyDashboardEntryPoint = .dashboard) {
         if let permissionAuthorizationPopover, permissionAuthorizationPopover.isShown {
             permissionAuthorizationPopover.close()
         }
         popupBlockedPopover?.close()
 
-        popovers?.togglePrivacyDashboardPopover(for: tabViewModel, from: privacyEntryPointButton)
+        popovers?.togglePrivacyDashboardPopover(for: tabViewModel, from: privacyEntryPointButton, entryPoint: entryPoint)
         onboardingPixelReporter.trackPrivacyDashboardOpened()
     }
 
@@ -385,7 +386,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     func openPrivacyDashboard() {
         guard let tabViewModel else { return }
-        popovers?.openPrivacyDashboard(for: tabViewModel, from: privacyEntryPointButton)
+        popovers?.openPrivacyDashboard(for: tabViewModel, from: privacyEntryPointButton, entryPoint: .dashboard)
     }
 
     func updateButtons() {

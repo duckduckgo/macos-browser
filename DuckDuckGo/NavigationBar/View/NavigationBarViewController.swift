@@ -553,13 +553,16 @@ final class NavigationBarViewController: NSViewController {
         guard brokenSitePromptLimiter.shouldShowToast(),
               let event = sender.userInfo?[PageRefreshEvent.key] as? PageRefreshEvent,
               let url = tabCollectionViewModel.selectedTabViewModel?.tab.url, !url.isDuckDuckGo,
-              OnboardingActionsManager.isOnboardingFinished,
-              Application.appDelegate.onboardingStateMachine.state == .onboardingCompleted
+              isOnboardingFinished
         else { return }
         showBrokenSitePrompt(after: event)
     }
 
-    private func showBrokenSitePrompt(after: PageRefreshEvent) {
+    private var isOnboardingFinished: Bool {
+        OnboardingActionsManager.isOnboardingFinished && Application.appDelegate.onboardingStateMachine.state == .onboardingCompleted
+    }
+
+    private func showBrokenSitePrompt(after event: PageRefreshEvent) {
         guard view.window?.isKeyWindow == true,
               let privacyButton = addressBarViewController?.addressBarButtonsViewController?.privacyEntryPointButton else { return }
         brokenSitePromptLimiter.didShowToast()
@@ -568,7 +571,7 @@ final class NavigationBarViewController: NSViewController {
                                                           buttonText: UserText.BrokenSitePrompt.buttonTitle,
                                                           buttonAction: {
             self.brokenSitePromptLimiter.didOpenReport()
-            self.addressBarViewController?.addressBarButtonsViewController?.openPrivacyDashboardPopover()
+            self.addressBarViewController?.addressBarButtonsViewController?.openPrivacyDashboardPopover(entryPoint: .prompt(event.rawValue))
             PixelKit.fire(GeneralPixel.siteNotWorkingWebsiteIsBroken)
         },
                                                           shouldShowCloseButton: true,
