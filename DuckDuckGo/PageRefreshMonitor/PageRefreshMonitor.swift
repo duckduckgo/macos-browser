@@ -1,5 +1,5 @@
 //
-//  PageRefreshStore.swift
+//  AppPageRefreshMonitor.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -17,10 +17,12 @@
 //
 
 import PageRefreshMonitor
+import PixelKit
 
-final class PageRefreshStore: PageRefreshStoring {
+extension PageRefreshMonitor {
 
-    @UserDefaultsWrapper(key: .refreshTimestamps, defaultValue: [])
-    var refreshTimestamps: [Date]
+    static let onDidDetectRefreshPattern: () -> Void = {
+        PixelKit.fire(GeneralPixel.pageRefreshThreeTimesWithin20Seconds)
+    }
 
 }

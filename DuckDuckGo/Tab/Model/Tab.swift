@@ -122,7 +122,7 @@ protocol NewWindowPolicyDecisionMaker {
                      phishingState: PhishingTabStateManaging = PhishingTabStateManager(),
                      tabsPreferences: TabsPreferences = TabsPreferences.shared,
                      onboardingPixelReporter: OnboardingAddressBarReporting = OnboardingPixelReporter(),
-                     pageRefreshMonitor: PageRefreshMonitoring = PageRefreshMonitor(eventMapping: PageRefreshEventPixelMapping(),
+                     pageRefreshMonitor: PageRefreshMonitoring = PageRefreshMonitor(onDidDetectRefreshPattern: PageRefreshMonitor.onDidDetectRefreshPattern,
                                                                                     store: PageRefreshStore())
     ) {
 

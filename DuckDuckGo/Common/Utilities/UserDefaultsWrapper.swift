@@ -227,9 +227,7 @@ public struct UserDefaultsWrapper<T> {
 
         // PageRefreshMonitor
 
-        case didRefreshTimestamp = "pageRefreshMonitor.did-refresh-timestamp"
-        case didDoubleRefreshTimestamp = "pageRefreshMonitor.did-double-refresh-timestamp"
-        case didRefreshCounter = "pageRefreshMonitor.did-refresh-counter"
+        case refreshTimestamps = "pageRefreshMonitor.refresh-timestamps"
 
         // BrokenSitePrompt
 
