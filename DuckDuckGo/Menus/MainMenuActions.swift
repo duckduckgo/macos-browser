@@ -68,6 +68,7 @@ extension AppDelegate {
     @objc func newAIChat(_ sender: Any?) {
         DispatchQueue.main.async {
             AIChatTabOpener.openAIChatTab()
+            PixelKit.fire(GeneralPixel.aichatApplicationMenuFileClicked, includeAppVersionParameter: true)
         }
     }
 
@@ -156,6 +157,12 @@ extension AppDelegate {
     @MainActor
     @objc func showAbout(_ sender: Any?) {
         WindowControllersManager.shared.showTab(with: .settings(pane: .about))
+    }
+
+    @MainActor
+    @objc func setAsDefault(_ sender: Any?) {
+        PixelKit.fire(GeneralPixel.defaultRequestedFromMainMenu)
+        DefaultBrowserPreferences.shared.becomeDefault()
     }
 
     @MainActor

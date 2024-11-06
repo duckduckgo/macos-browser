@@ -473,6 +473,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         freemiumDBPScanResultPolling = DefaultFreemiumDBPScanResultPolling(dataManager: DataBrokerProtectionManager.shared.dataManager, freemiumDBPUserStateManager: freemiumDBPUserStateManager)
         freemiumDBPScanResultPolling?.startPollingOrObserving()
+
+        PixelKit.fire(NonStandardEvent(GeneralPixel.launch(isDefault: DefaultBrowserPreferences().isDefault)))
     }
 
     private func fireFailedCompilationsPixelIfNeeded() {

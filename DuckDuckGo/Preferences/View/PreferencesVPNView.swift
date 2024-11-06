@@ -139,7 +139,7 @@ extension Preferences {
                                 showsCustomDNSServerPageSheet.toggle()
                             } else {
                                 model.resetDNSSettings()
-                                PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDNSUpdateDefault, frequency: .dailyAndCount)
+                                PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDNSUpdateDefault, frequency: .legacyDailyAndCount)
                             }
                         }
                         .onChange(of: showsCustomDNSServerPageSheet) { showsCustomDNSServerPageSheet in
@@ -242,9 +242,9 @@ struct CustomDNSServerPageSheet: View {
         /// Updating `dnsSettings` does an IPv4 conversion before actually commiting the change,
         /// so we do a final check to see which outcome the user ends up with
         if settings.dnsSettings.usesCustomDNS {
-            PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDNSUpdateCustom, frequency: .dailyAndCount)
+            PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDNSUpdateCustom, frequency: .legacyDailyAndCount)
         } else {
-            PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDNSUpdateDefault, frequency: .dailyAndCount)
+            PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDNSUpdateDefault, frequency: .legacyDailyAndCount)
         }
     }
 

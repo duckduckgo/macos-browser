@@ -40,13 +40,15 @@ final class PreferencesViewController: NSViewController {
         syncService: DDGSyncing,
         duckPlayer: DuckPlayer = DuckPlayer.shared,
         tabCollectionViewModel: TabCollectionViewModel,
-        privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager
+        privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
+        aiChatRemoteSettings: AIChatRemoteSettingsProvider = AIChatRemoteSettings()
     ) {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.privacyConfigurationManager = privacyConfigurationManager
         model = PreferencesSidebarModel(syncService: syncService,
                                         vpnGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: Application.appDelegate.subscriptionManager),
-                                        includeDuckPlayer: duckPlayer.shouldDisplayPreferencesSideBar)
+                                        includeDuckPlayer: duckPlayer.shouldDisplayPreferencesSideBar,
+                                        includeAIChat: aiChatRemoteSettings.isAIChatEnabled)
         super.init(nibName: nil, bundle: nil)
     }
 
