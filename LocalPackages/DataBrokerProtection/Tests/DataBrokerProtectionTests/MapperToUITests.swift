@@ -394,6 +394,73 @@ final class MapperToUITests: XCTestCase {
         XCTAssertEqual(result.scanProgress.scannedBrokers, expected)
     }
 
+    // MARK: - `maintenanceScanState` Broker OptOut URL & Name tests
+
+    func testMaintenanceScanState_childBrokerWithOwnOptOutUrl() {
+        // Given
+        let extractedProfile = ExtractedProfile(id: 2, name: "Another Sample", profileUrl: "anotherprofile.com", removedDate: nil)
+
+        let childBroker = BrokerProfileQueryData.mock(
+            dataBrokerName: "ChildBrokerWithOwnOptOut",
+            url: "child.com",
+            parentURL: "parent.com",
+            optOutUrl: "child.com/optout",
+            extractedProfile: extractedProfile
+        )
+
+        let parentBroker = BrokerProfileQueryData.mock(
+            dataBrokerName: "ParentBroker",
+            url: "parent.com",
+            optOutUrl: "parent.com/optout",
+            extractedProfile: extractedProfile
+        )
+
+        // When
+        let state = sut.maintenanceScanState([childBroker, parentBroker])
+
+        // Then
+        XCTAssertEqual(state.inProgressOptOuts.count, 2)
+        XCTAssertEqual(state.completedOptOuts.count, 0)
+
+        let childProfile = state.inProgressOptOuts.first { $0.dataBroker.name == "ChildBrokerWithOwnOptOut" }
+        XCTAssertEqual(childProfile?.dataBroker.optOutUrl, "child.com/optout")
+
+        let parentProfile = state.inProgressOptOuts.first { $0.dataBroker.name == "ParentBroker" }
+        XCTAssertEqual(parentProfile?.dataBroker.optOutUrl, "parent.com/optout")
+    }
+
+    func testMaintenanceScanState_childBrokerWithParentOptOutUrl() {
+        // Given
+        let extractedProfile = ExtractedProfile(id: 1, name: "Sample Name", profileUrl: "profile.com", removedDate: nil)
+
+        let childBroker = BrokerProfileQueryData.mock(
+            dataBrokerName: "ChildBroker",
+            url: "child.com",
+            parentURL: "parent.com",
+            optOutUrl: "parent.com/optout",
+            extractedProfile: extractedProfile
+        )
+
+        let parentBroker = BrokerProfileQueryData.mock(
+            dataBrokerName: "ParentBroker",
+            url: "parent.com",
+            optOutUrl: "parent.com/optout",
+            extractedProfile: extractedProfile
+        )
+
+        // When
+        let state = sut.maintenanceScanState([childBroker, parentBroker])
+
+        // Then
+        XCTAssertEqual(state.inProgressOptOuts.count, 2)
+        XCTAssertEqual(state.completedOptOuts.count, 0)
+
+        let childProfile = state.inProgressOptOuts.first { $0.dataBroker.name == "ChildBroker" }
+        XCTAssertEqual(childProfile?.dataBroker.optOutUrl, "parent.com/optout")
+
+        let parentProfile = state.inProgressOptOuts.first { $0.dataBroker.name == "ParentBroker" }
+        XCTAssertEqual(childProfile?.dataBroker.optOutUrl, "parent.com/optout")
+    }
 }
 
 extension DBPUIScanProgress.ScannedBroker {

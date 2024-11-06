@@ -28,6 +28,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case crashOnCrashHandlersSetUp
     case compileRulesWait(onboardingShown: OnboardingShown, waitTime: CompileRulesWaitTime, result: WaitResult)
     case launchInitial(cohort: String)
+    case launch(isDefault: Bool)
 
     case serp(cohort: String?)
     case serpInitial(cohort: String)
@@ -156,6 +157,13 @@ enum GeneralPixel: PixelKitEventV2 {
     case networkProtectionGeoswitchingSetCustom
     case networkProtectionGeoswitchingNoLocations
 
+    // AI Chat
+    case aichatToolbarClicked
+    case aichatApplicationMenuAppClicked
+    case aichatApplicationMenuFileClicked
+    case aichatToolbarOnboardingPopoverShown
+    case aichatToolbarOnboardingPopoverAccept
+    case aichatNoRemoteSettingsFound(AIChatRemoteSettings.SettingsValue)
     // Sync
     case syncSignupDirect
     case syncSignupConnect
@@ -174,6 +182,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case syncBookmarksValidationErrorDaily
     case syncCredentialsValidationErrorDaily
     case syncSettingsValidationErrorDaily
+    case syncDebugWasDisabledUnexpectedly
 
     // Remote Messaging Framework
     case remoteMessageShown
@@ -204,6 +213,8 @@ enum GeneralPixel: PixelKitEventV2 {
     case defaultRequestedFromHomepageSetupView
     case defaultRequestedFromSettings
     case defaultRequestedFromOnboarding
+    case defaultRequestedFromMainMenu
+    case defaultRequestedFromMoreOptionsMenu
 
     // Adding to the Dock
     case addToDockOnboardingStepPresented
@@ -397,9 +408,11 @@ enum GeneralPixel: PixelKitEventV2 {
     case syncLogoutError(error: Error)
     case syncUpdateDeviceError(error: Error)
     case syncRemoveDeviceError(error: Error)
+    case syncRefreshDevicesError(error: Error)
     case syncDeleteAccountError(error: Error)
     case syncLoginExistingAccountError(error: Error)
     case syncCannotCreateRecoveryPDF
+    case syncSecureStorageReadError(error: Error)
 
     case bookmarksCleanupFailed
     case bookmarksCleanupAttemptedWhileSyncWasEnabled
@@ -440,6 +453,9 @@ enum GeneralPixel: PixelKitEventV2 {
 
         case .compileRulesWait(onboardingShown: let onboardingShown, waitTime: let waitTime, result: let result):
             return "m_mac_cbr-wait_\(onboardingShown)_\(waitTime)_\(result)"
+
+        case .launch(let isDefault):
+            return isDefault ? "ml_mac_app-launch_as-default" : "ml_mac_app-launch_as-nondefault"
 
         case .serp:
             return "m_mac_navigation_search"
@@ -662,6 +678,20 @@ enum GeneralPixel: PixelKitEventV2 {
         case .networkProtectionEnabledOnSearch:
             return "m_mac_netp_ev_enabled_on_search"
 
+            // AI Chat
+        case .aichatToolbarClicked:
+            return "m_mac_aichat_toolbar-clicked"
+        case .aichatApplicationMenuAppClicked:
+            return "m_mac_aichat_application-menu-app-clicked"
+        case .aichatApplicationMenuFileClicked:
+            return "m_mac_aichat_application-menu-file-clicked"
+        case .aichatToolbarOnboardingPopoverShown:
+            return "m_mac_aichat_toolbar-onboarding-popover-shown"
+        case .aichatToolbarOnboardingPopoverAccept:
+            return "m_mac_aichat_toolbar-onboarding-popover-accept"
+        case .aichatNoRemoteSettingsFound(let settings):
+            return "m_mac_aichat_no_remote_settings_found-\(settings.rawValue.lowercased())"
+
             // Sync
         case .syncSignupDirect:
             return "m_mac_sync_signup_direct"
@@ -687,6 +717,7 @@ enum GeneralPixel: PixelKitEventV2 {
         case .syncBookmarksValidationErrorDaily: return "m_mac_sync_bookmarks_validation_error_daily"
         case .syncCredentialsValidationErrorDaily: return "m_mac_sync_credentials_validation_error_daily"
         case .syncSettingsValidationErrorDaily: return "m_mac_sync_settings_validation_error_daily"
+        case .syncDebugWasDisabledUnexpectedly: return "m_mac_sync_was_disabled_unexpectedly"
 
         case .remoteMessageShown: return "m_mac_remote_message_shown"
         case .remoteMessageShownUnique: return "m_mac_remote_message_shown_unique"
@@ -730,6 +761,8 @@ enum GeneralPixel: PixelKitEventV2 {
         case .defaultRequestedFromHomepageSetupView: return "m_mac_default_requested_from_homepage_setup_view"
         case .defaultRequestedFromSettings: return "m_mac_default_requested_from_settings"
         case .defaultRequestedFromOnboarding: return "m_mac_default_requested_from_onboarding"
+        case .defaultRequestedFromMainMenu: return "m_mac_default_requested_from_main_menu"
+        case .defaultRequestedFromMoreOptionsMenu: return "m_mac_default_requested_from_more_options_menu"
 
         case .addToDockOnboardingStepPresented: return "m_mac_add_to_dock_onboarding_step_presented"
         case .userAddedToDockDuringOnboarding: return "m_mac_user_added_to_dock_during_onboarding"
@@ -1010,9 +1043,11 @@ enum GeneralPixel: PixelKitEventV2 {
         case .syncLogoutError: return "sync_logout_error"
         case .syncUpdateDeviceError: return "sync_update_device_error"
         case .syncRemoveDeviceError: return "sync_remove_device_error"
+        case .syncRefreshDevicesError: return "sync_refresh_devices_error"
         case .syncDeleteAccountError: return "sync_delete_account_error"
         case .syncLoginExistingAccountError: return "sync_login_existing_account_error"
         case .syncCannotCreateRecoveryPDF: return "sync_cannot_create_recovery_pdf"
+        case .syncSecureStorageReadError: return "sync_secure_storage_read_error"
 
         case .bookmarksCleanupFailed: return "bookmarks_cleanup_failed"
         case .bookmarksCleanupAttemptedWhileSyncWasEnabled: return "bookmarks_cleanup_attempted_while_sync_was_enabled"
@@ -1065,8 +1100,10 @@ enum GeneralPixel: PixelKitEventV2 {
                 .syncLogoutError(let error),
                 .syncUpdateDeviceError(let error),
                 .syncRemoveDeviceError(let error),
+                .syncRefreshDevicesError(let error),
                 .syncDeleteAccountError(let error),
                 .syncLoginExistingAccountError(let error),
+                .syncSecureStorageReadError(let error),
                 .bookmarksCouldNotLoadDatabase(let error?):
             return error
         default: return nil

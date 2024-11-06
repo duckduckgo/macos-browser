@@ -97,7 +97,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     public let subscriptionManager: SubscriptionManager
     public let subscriptionUIHandler: SubscriptionUIHandling
-    public let subscriptionCookieManager: SubscriptionCookieManaging
+    private let subscriptionCookieManager: SubscriptionCookieManaging
+    private var subscriptionCookieManagerFeatureFlagCancellable: AnyCancellable?
 
     // MARK: - Freemium DBP
     public let freemiumDBPFeature: FreemiumDBPFeature
@@ -325,6 +326,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         freemiumDBPFeature.subscribeToDependencyUpdates()
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     func applicationDidFinishLaunching(_ notification: Notification) {
         guard NSApp.runType.requiresEnvironment else { return }
         defer {
@@ -366,6 +368,30 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         startupSync()
 
         subscriptionManager.loadInitialData()
+
+        let privacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager
+
+        // Enable subscriptionCookieManager if feature flag is present
+        if privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(PrivacyProSubfeature.setAccessTokenCookieForSubscriptionDomains) {
+            subscriptionCookieManager.enableSettingSubscriptionCookie()
+        }
+
+        // Keep track of feature flag changes
+        subscriptionCookieManagerFeatureFlagCancellable = privacyConfigurationManager.updatesPublisher
+            .sink { [weak self, weak privacyConfigurationManager] in
+                guard let self, let privacyConfigurationManager else { return }
+
+                let isEnabled = privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(PrivacyProSubfeature.setAccessTokenCookieForSubscriptionDomains)
+
+                Task { [weak self] in
+                    if isEnabled {
+                        self?.subscriptionCookieManager.enableSettingSubscriptionCookie()
+                        await self?.subscriptionCookieManager.refreshSubscriptionCookie()
+                    } else {
+                        await self?.subscriptionCookieManager.disableSettingSubscriptionCookie()
+                    }
+                }
+            }
 
         if [.normal, .uiTests].contains(NSApp.runType) {
             stateRestorationManager.applicationDidFinishLaunching()
@@ -445,6 +471,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         freemiumDBPScanResultPolling = DefaultFreemiumDBPScanResultPolling(dataManager: DataBrokerProtectionManager.shared.dataManager, freemiumDBPUserStateManager: freemiumDBPUserStateManager)
         freemiumDBPScanResultPolling?.startPollingOrObserving()
+
+        PixelKit.fire(NonStandardEvent(GeneralPixel.launch(isDefault: DefaultBrowserPreferences().isDefault)))
     }
 
     private func fireFailedCompilationsPixelIfNeeded() {
@@ -465,8 +493,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         guard didFinishLaunching else { return }
 
         PixelExperiment.fireOnboardingTestPixels()
-        syncService?.initializeIfNeeded()
-        syncService?.scheduler.notifyAppLifecycleEvent()
+        initializeSync()
 
         NetworkProtectionAppEvents(featureGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: subscriptionManager)).applicationDidBecomeActive()
 
@@ -490,6 +517,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         Task { @MainActor in
             await subscriptionCookieManager.refreshSubscriptionCookie()
         }
+    }
+
+    private func initializeSync() {
+        guard let syncService else { return }
+        syncService.initializeIfNeeded()
+        syncService.scheduler.notifyAppLifecycleEvent()
+        SyncDiagnosisHelper(syncService: syncService).diagnoseAccountStatus()
     }
 
     func applicationDidResignActive(_ notification: Notification) {

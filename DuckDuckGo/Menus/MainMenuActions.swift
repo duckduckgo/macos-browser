@@ -68,6 +68,7 @@ extension AppDelegate {
     @objc func newAIChat(_ sender: Any?) {
         DispatchQueue.main.async {
             AIChatTabOpener.openAIChatTab()
+            PixelKit.fire(GeneralPixel.aichatApplicationMenuFileClicked, includeAppVersionParameter: true)
         }
     }
 
@@ -156,6 +157,12 @@ extension AppDelegate {
     @MainActor
     @objc func showAbout(_ sender: Any?) {
         WindowControllersManager.shared.showTab(with: .settings(pane: .about))
+    }
+
+    @MainActor
+    @objc func setAsDefault(_ sender: Any?) {
+        PixelKit.fire(GeneralPixel.defaultRequestedFromMainMenu)
+        DefaultBrowserPreferences.shared.becomeDefault()
     }
 
     @MainActor
@@ -847,6 +854,13 @@ extension MainViewController {
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowImport.rawValue)
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowDuckPlayer.rawValue)
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowEmailProtection.rawValue)
+    }
+
+    @objc func skipOnboarding(_ sender: Any?) {
+        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.onboardingFinished.rawValue)
+        Application.appDelegate.onboardingStateMachine.state = .onboardingCompleted
+        WindowControllersManager.shared.updatePreventUserInteraction(prevent: false)
+        WindowControllersManager.shared.replaceTabWith(Tab(content: .newtab))
     }
 
     @objc func resetOnboarding(_ sender: Any?) {

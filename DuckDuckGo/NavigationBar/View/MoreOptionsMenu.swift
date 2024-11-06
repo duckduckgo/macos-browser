@@ -49,7 +49,7 @@ protocol OptionsButtonMenuDelegate: AnyObject {
     func optionsButtonMenuRequestedIdentityTheftRestoration(_ menu: NSMenu)
 }
 
-final class MoreOptionsMenu: NSMenu {
+final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
 
     weak var actionDelegate: OptionsButtonMenuDelegate?
 
@@ -65,6 +65,7 @@ final class MoreOptionsMenu: NSMenu {
     private let freemiumDBPFeature: FreemiumDBPFeature
     private let freemiumDBPPresenter: FreemiumDBPPresenter
     private let appearancePreferences: AppearancePreferences
+    private let defaultBrowserPreferences: DefaultBrowserPreferences
 
     private let notificationCenter: NotificationCenter
 
@@ -92,6 +93,7 @@ final class MoreOptionsMenu: NSMenu {
          freemiumDBPFeature: FreemiumDBPFeature,
          freemiumDBPPresenter: FreemiumDBPPresenter = DefaultFreemiumDBPPresenter(),
          appearancePreferences: AppearancePreferences = .shared,
+         defaultBrowserPreferences: DefaultBrowserPreferences = .shared,
          notificationCenter: NotificationCenter = .default,
          freemiumDBPExperimentPixelHandler: EventMapping<FreemiumDBPExperimentPixel> = FreemiumDBPExperimentPixelHandler(),
          aiChatMenuConfiguration: AIChatMenuVisibilityConfigurable = AIChatMenuConfiguration()) {
@@ -107,6 +109,7 @@ final class MoreOptionsMenu: NSMenu {
         self.freemiumDBPFeature = freemiumDBPFeature
         self.freemiumDBPPresenter = freemiumDBPPresenter
         self.appearancePreferences = appearancePreferences
+        self.defaultBrowserPreferences = defaultBrowserPreferences
         self.notificationCenter = notificationCenter
         self.freemiumDBPExperimentPixelHandler = freemiumDBPExperimentPixelHandler
         self.aiChatMenuConfiguration = aiChatMenuConfiguration
@@ -117,6 +120,8 @@ final class MoreOptionsMenu: NSMenu {
             self.sharingMenu = sharingMenu
         }
         self.emailManager.requestDelegate = self
+
+        delegate = self
 
         setupMenuItems()
     }
@@ -143,9 +148,16 @@ final class MoreOptionsMenu: NSMenu {
                                                    accountManager: accountManager)
         addItem(feedbackMenuItem)
 
-        addItem(NSMenuItem.separator())
-
 #endif // FEEDBACK
+
+        if !defaultBrowserPreferences.isDefault {
+            let setAsDefaultMenuItem = NSMenuItem(title: UserText.setAsDefaultBrowser, action: #selector(setAsDefault(_:)))
+                .targetting(self)
+                .withImage(.defaultBrowserMenuItem)
+            addItem(setAsDefaultMenuItem)
+        }
+
+        addItem(NSMenuItem.separator())
 
         addWindowItems()
 
@@ -185,6 +197,12 @@ final class MoreOptionsMenu: NSMenu {
     }
 
     @MainActor
+    @objc func setAsDefault(_ sender: NSMenuItem) {
+        PixelKit.fire(GeneralPixel.defaultRequestedFromMoreOptionsMenu)
+        defaultBrowserPreferences.becomeDefault()
+    }
+
+    @MainActor
     @objc func newTab(_ sender: NSMenuItem) {
         tabCollectionViewModel.appendNewTab()
     }
@@ -202,6 +220,7 @@ final class MoreOptionsMenu: NSMenu {
     @MainActor
     @objc func newAiChat(_ sender: NSMenuItem) {
         AIChatTabOpener.openAIChatTab()
+        PixelKit.fire(GeneralPixel.aichatApplicationMenuAppClicked, includeAppVersionParameter: true)
     }
 
     @MainActor
@@ -311,8 +330,10 @@ final class MoreOptionsMenu: NSMenu {
     private func addUpdateItem() {
 #if SPARKLE
         guard NSApp.runType != .uiTests,
-            let update = Application.appDelegate.updateController.latestUpdate,
-            !update.isInstalled
+              let updateController = Application.appDelegate.updateController,
+              let update = updateController.latestUpdate,
+              !update.isInstalled,
+              updateController.updateProgress.isDone
         else {
             return
         }
@@ -478,6 +499,14 @@ final class MoreOptionsMenu: NSMenu {
         return networkProtectionItem
     }
 
+    func menuWillOpen(_ menu: NSMenu) {
+#if SPARKLE
+        guard let updateController = Application.appDelegate.updateController else { return }
+        if updateController.hasPendingUpdate && updateController.needsNotificationDot {
+            updateController.needsNotificationDot = false
+        }
+#endif
+    }
 }
 
 final class EmailOptionsButtonSubMenu: NSMenu {

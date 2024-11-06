@@ -17,16 +17,51 @@
 //
 
 import Combine
+import BrowserServicesKit
 
 protocol AIChatMenuVisibilityConfigurable {
+
+    /// This property validates remote feature flags and user settings to determine if the shortcut
+    /// should be presented to the user.
+    ///
+    /// - Returns: `true` if the application menu shortcut should be displayed; otherwise, `false`.
     var shouldDisplayApplicationMenuShortcut: Bool { get }
+
+    /// This property checks the relevant settings to decide if the toolbar shortcut is to be shown.
+    ///
+    /// - Returns: `true` if the toolbar shortcut should be displayed; otherwise, `false`.
     var shouldDisplayToolbarShortcut: Bool { get }
 
+    /// This property reflects the current state of the feature flag for the application menu shortcut.
+    ///
+    /// - Returns: `true` if the remote feature for the application menu shortcut is enabled; otherwise, `false`.
     var isFeatureEnabledForApplicationMenuShortcut: Bool { get }
+
+    /// This property reflects the current state of the feature flag for the toolbar shortcut.
+    ///
+    /// - Returns: `true` if the remote feature for the toolbar shortcut is enabled; otherwise, `false`.
     var isFeatureEnabledForToolbarShortcut: Bool { get }
 
-    var shortcutURL: URL { get }
+    /// A publisher that emits a value when either the `shouldDisplayApplicationMenuShortcut` or
+    /// `shouldDisplayToolbarShortcut` settings, backed by storage, are changed.
+    ///
+    /// This allows subscribers to react to changes in the visibility settings of the application menu
+    /// and toolbar shortcuts.
+    ///
+    /// - Returns: A `PassthroughSubject` that emits `Void` when the values change.
     var valuesChangedPublisher: PassthroughSubject<Void, Never> { get }
+
+    /// A publisher that is triggered when it is validated that the onboarding should be displayed.
+    ///
+    /// This property listens to `AIChatOnboardingTabExtension` and triggers the publisher when a
+    /// notification `AIChatOpenedForReturningUser`  is posted.
+    ///
+    /// - Returns: A `PassthroughSubject` that emits `Void` when the onboarding popover should be displayed.
+    var shouldDisplayToolbarOnboardingPopover: PassthroughSubject<Void, Never> { get }
+
+    /// Marks the toolbar onboarding popover as shown, preventing it from being displayed more than once.
+    /// This method should be called after the onboarding popover has been presented to the user.
+    func markToolbarOnboardingPopoverAsShown()
 }
 
 final class AIChatMenuConfiguration: AIChatMenuVisibilityConfigurable {
@@ -37,8 +72,11 @@ final class AIChatMenuConfiguration: AIChatMenuVisibilityConfigurable {
 
     private var cancellables = Set<AnyCancellable>()
     private var storage: AIChatPreferencesStorage
+    private let notificationCenter: NotificationCenter
+    private let remoteSettings: AIChatRemoteSettingsProvider
 
     var valuesChangedPublisher = PassthroughSubject<Void, Never>()
+    var shouldDisplayToolbarOnboardingPopover = PassthroughSubject<Void, Never>()
 
     var isFeatureEnabledForApplicationMenuShortcut: Bool {
         isFeatureEnabledFor(shortcutType: .applicationMenu)
@@ -56,13 +94,29 @@ final class AIChatMenuConfiguration: AIChatMenuVisibilityConfigurable {
         return isFeatureEnabledForApplicationMenuShortcut && storage.showShortcutInApplicationMenu
     }
 
-    var shortcutURL: URL {
-        URL(string: "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=2")!
+    func markToolbarOnboardingPopoverAsShown() {
+        storage.didDisplayAIChatToolbarOnboarding = true
     }
 
-    init(storage: AIChatPreferencesStorage = DefaultAIChatPreferencesStorage()) {
+    init(storage: AIChatPreferencesStorage = DefaultAIChatPreferencesStorage(),
+         notificationCenter: NotificationCenter = .default,
+         remoteSettings: AIChatRemoteSettingsProvider = AIChatRemoteSettings()) {
         self.storage = storage
+        self.notificationCenter = notificationCenter
+        self.remoteSettings = remoteSettings
+
         self.subscribeToValuesChanged()
+        self.subscribeToAIChatLoadedNotification()
+    }
+
+    private func subscribeToAIChatLoadedNotification() {
+        notificationCenter.publisher(for: .AIChatOpenedForReturningUser)
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                if !self.storage.didDisplayAIChatToolbarOnboarding && !storage.shouldDisplayToolbarShortcut {
+                    self.shouldDisplayToolbarOnboardingPopover.send()
+                }
+            }.store(in: &cancellables)
     }
 
     private func subscribeToValuesChanged() {
@@ -82,11 +136,9 @@ final class AIChatMenuConfiguration: AIChatMenuVisibilityConfigurable {
     private func isFeatureEnabledFor(shortcutType: ShortcutType) -> Bool {
         switch shortcutType {
         case .applicationMenu:
-            // Use privacy config here
-            return true
+            return remoteSettings.isApplicationMenuShortcutEnabled
         case .toolbar:
-            // Use privacy config here
-            return true
+            return remoteSettings.isToolbarShortcutEnabled
         }
     }
 }
