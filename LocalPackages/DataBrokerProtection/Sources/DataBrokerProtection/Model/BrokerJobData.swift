@@ -90,7 +90,7 @@ public struct OptOutJobData: BrokerJobData, Sendable {
          preferredRunDate: Date? = nil,
          historyEvents: [HistoryEvent],
          lastRunDate: Date? = nil,
-         attemptCount: Int64 = 0,
+         attemptCount: Int64,
          submittedSuccessfullyDate: Date? = nil,
          extractedProfile: ExtractedProfile,
          sevenDaysConfirmationPixelFired: Bool = false,
