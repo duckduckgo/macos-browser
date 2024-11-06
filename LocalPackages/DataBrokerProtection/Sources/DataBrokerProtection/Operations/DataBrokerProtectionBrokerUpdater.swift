@@ -40,6 +40,14 @@ final class FileResources: ResourcesRepository {
     }
 
     func fetchBrokerFromResourceFiles() throws -> [DataBroker]? {
+        guard NSApplication.runType != .unitTests && NSApplication.runType != .uiTests else {
+            /*
+             There's a bug with the bundle resources in tests:
+             https://forums.swift.org/t/swift-5-3-swiftpm-resources-in-tests-uses-wrong-bundle-path/37051/49
+             */
+            return []
+        }
+
         guard let resourceURL = Bundle.module.resourceURL else {
             Logger.dataBrokerProtection.fault("DataBrokerProtectionUpdater: error FileResources fetchBrokerFromResourceFiles, error: Bundle.module.resourceURL is nil")
             assertionFailure()
