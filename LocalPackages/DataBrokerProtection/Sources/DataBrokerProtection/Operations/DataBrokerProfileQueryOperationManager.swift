@@ -319,6 +319,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                     schedulingConfig: brokerProfileQueryData.dataBroker.schedulingConfig,
                     database: database
                 )
+                try database.increaseAttemptCount(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
             } catch {
                 handleOperationError(
                     origin: .optOut,

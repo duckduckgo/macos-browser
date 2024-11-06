@@ -64,6 +64,7 @@ protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
     func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func updateAttemptCount(_ count: Int, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
+    func increaseAttemptCount(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func updateSubmittedSuccessfullyDate(_ date: Date?,
                                          forBrokerId brokerId: Int64,
                                          profileQueryId: Int64,
@@ -418,6 +419,20 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
                               forBrokerId: brokerId,
                               profileQueryId: profileQueryId,
                               extractedProfileId: extractedProfileId)
+    }
+
+    func increaseAttemptCount(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+        try db.write { db in
+            if var optOut = try OptOutDB.fetchOne(db, key: [
+                OptOutDB.Columns.brokerId.name: brokerId,
+                OptOutDB.Columns.profileQueryId.name: profileQueryId,
+                OptOutDB.Columns.extractedProfileId.name: extractedProfileId]) {
+                optOut.attemptCount += 1
+                try optOut.update(db)
+            } else {
+                throw DataBrokerProtectionDatabaseErrors.elementNotFound
+            }
+        }
     }
 
     func updateSubmittedSuccessfullyDate(_ date: Date?,
