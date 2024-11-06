@@ -87,9 +87,14 @@ public class SyncErrorHandler: EventMapping<SyncError>, ObservableObject {
     var isSyncPausedChangedPublisher = PassthroughSubject<Void, Never>()
 
     let alertPresenter: SyncAlertsPresenting
+    private let firePixel: SyncFirePixelClosure
 
-    public init(alertPresenter: SyncAlertsPresenting = SyncAlertsPresenter()) {
+    public init(alertPresenter: SyncAlertsPresenting = SyncAlertsPresenter(),
+                firePixel: @escaping SyncFirePixelClosure = { eventData in
+                        PixelKit.fire(eventData.event, frequency: eventData.frequency, withAdditionalParameters: eventData.additionalParameters)
+                    }) {
         self.alertPresenter = alertPresenter
+        self.firePixel = firePixel
         super.init { event, _, _, _ in
             PixelKit.fire(DebugEvent(GeneralPixel.syncSentUnauthenticatedRequest, error: event))
         }
@@ -236,21 +241,25 @@ extension SyncErrorHandler: SyncErrorHandling {
     private func handleError(_ error: Error, modelType: ModelType) {
         switch error {
         case SyncError.patchPayloadCompressionFailed(let errorCode):
-            PixelKit.fire(DebugEvent(modelType.patchPayloadCompressionFailedPixel), withAdditionalParameters: ["error": "\(errorCode)"])
+            let eventData = SyncPixelEventData(event: DebugEvent(modelType.patchPayloadCompressionFailedPixel), additionalParameters: ["error": "\(errorCode)"])
+            firePixel(eventData)
         case let syncError as SyncError:
             handleSyncError(syncError, modelType: modelType)
-            PixelKit.fire(DebugEvent(modelType.syncFailedPixel, error: syncError))
+            let eventData = SyncPixelEventData(event: DebugEvent(modelType.syncFailedPixel, error: syncError), additionalParameters: syncError.errorParameters)
+            firePixel(eventData)
         case let settingsMetadataError as SettingsSyncMetadataSaveError:
             let underlyingError = settingsMetadataError.underlyingError
             let processedErrors = CoreDataErrorsParser.parse(error: underlyingError as NSError)
             let params = processedErrors.errorPixelParameters
-            PixelKit.fire(DebugEvent(GeneralPixel.syncSettingsMetadataUpdateFailed, error: underlyingError), withAdditionalParameters: params)
+            let eventData = SyncPixelEventData(event: DebugEvent(GeneralPixel.syncSettingsMetadataUpdateFailed, error: underlyingError), additionalParameters: params)
+            firePixel(eventData)
         default:
             let nsError = error as NSError
             if nsError.domain != NSURLErrorDomain {
                 let processedErrors = CoreDataErrorsParser.parse(error: error as NSError)
                 let params = processedErrors.errorPixelParameters
-                PixelKit.fire(DebugEvent(modelType.syncFailedPixel, error: error), withAdditionalParameters: params)
+                let eventData = SyncPixelEventData(event: DebugEvent(modelType.syncFailedPixel, error: error), additionalParameters: params)
+                firePixel(eventData)
             }
             let modelTypeString = modelType.rawValue.capitalized
             Logger.sync.error("\(modelTypeString, privacy: .public) Sync error: \(String(reflecting: error), privacy: .public)")
@@ -286,12 +295,14 @@ extension SyncErrorHandler: SyncErrorHandling {
             case .settings:
                 break
             }
-            PixelKit.fire(modelType.badRequestPixel, frequency: .legacyDaily)
+            let eventData = SyncPixelEventData(event: modelType.badRequestPixel, frequency: .legacyDaily)
+            firePixel(eventData)
         case .unexpectedStatusCode(401):
             syncIsPaused(errorType: .invalidLoginCredentials)
         case .unexpectedStatusCode(418), .unexpectedStatusCode(429):
             syncIsPaused(errorType: .tooManyRequests)
-            PixelKit.fire(modelType.tooManyRequestsPixel, frequency: .legacyDaily)
+            let eventData = SyncPixelEventData(event: modelType.tooManyRequestsPixel, frequency: .legacyDaily)
+            firePixel(eventData)
         default:
             break
         }
@@ -303,19 +314,23 @@ extension SyncErrorHandler: SyncErrorHandling {
         case .bookmarksCountLimitExceeded:
             currentSyncBookmarksPausedError = errorType.rawValue
             self.isSyncBookmarksPaused = true
-            PixelKit.fire(GeneralPixel.syncBookmarksObjectLimitExceededDaily, frequency: .legacyDaily)
+            let eventData = SyncPixelEventData(event: GeneralPixel.syncBookmarksObjectLimitExceededDaily, frequency: .legacyDaily)
+            firePixel(eventData)
         case .credentialsCountLimitExceeded:
             currentSyncCredentialsPausedError = errorType.rawValue
             self.isSyncCredentialsPaused = true
-            PixelKit.fire(GeneralPixel.syncCredentialsObjectLimitExceededDaily, frequency: .legacyDaily)
+            let eventData = SyncPixelEventData(event: GeneralPixel.syncCredentialsObjectLimitExceededDaily, frequency: .legacyDaily)
+            firePixel(eventData)
         case .bookmarksRequestSizeLimitExceeded:
             currentSyncBookmarksPausedError = errorType.rawValue
             self.isSyncBookmarksPaused = true
-            PixelKit.fire(GeneralPixel.syncBookmarksRequestSizeLimitExceededDaily, frequency: .legacyDaily)
+            let eventData = SyncPixelEventData(event: GeneralPixel.syncBookmarksRequestSizeLimitExceededDaily, frequency: .legacyDaily)
+            firePixel(eventData)
         case .credentialsRequestSizeLimitExceeded:
             currentSyncCredentialsPausedError = errorType.rawValue
             self.isSyncCredentialsPaused = true
-            PixelKit.fire(GeneralPixel.syncCredentialsRequestSizeLimitExceededDaily, frequency: .legacyDaily)
+            let eventData = SyncPixelEventData(event: GeneralPixel.syncCredentialsRequestSizeLimitExceededDaily, frequency: .legacyDaily)
+            firePixel(eventData)
         case .badRequestBookmarks:
             currentSyncBookmarksPausedError = errorType.rawValue
             self.isSyncBookmarksPaused = true
@@ -473,3 +488,11 @@ extension SyncErrorHandler: SyncPausedStateManaging {
         resetCredentialsErrors()
     }
 }
+
+public struct SyncPixelEventData {
+    public let event: PixelKitEvent
+    public var frequency: PixelKit.Frequency = .standard
+    public var additionalParameters: [String: String] = [:]
+}
+
+public typealias SyncFirePixelClosure = (SyncPixelEventData) -> Void
