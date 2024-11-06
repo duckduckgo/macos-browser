@@ -28,6 +28,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case crashOnCrashHandlersSetUp
     case compileRulesWait(onboardingShown: OnboardingShown, waitTime: CompileRulesWaitTime, result: WaitResult)
     case launchInitial(cohort: String)
+    case launch(isDefault: Bool)
 
     case serp(cohort: String?)
     case serpInitial(cohort: String)
@@ -212,6 +213,8 @@ enum GeneralPixel: PixelKitEventV2 {
     case defaultRequestedFromHomepageSetupView
     case defaultRequestedFromSettings
     case defaultRequestedFromOnboarding
+    case defaultRequestedFromMainMenu
+    case defaultRequestedFromMoreOptionsMenu
 
     // Adding to the Dock
     case addToDockOnboardingStepPresented
@@ -450,6 +453,9 @@ enum GeneralPixel: PixelKitEventV2 {
 
         case .compileRulesWait(onboardingShown: let onboardingShown, waitTime: let waitTime, result: let result):
             return "m_mac_cbr-wait_\(onboardingShown)_\(waitTime)_\(result)"
+
+        case .launch(let isDefault):
+            return isDefault ? "ml_mac_app-launch_as-default" : "ml_mac_app-launch_as-nondefault"
 
         case .serp:
             return "m_mac_navigation_search"
@@ -755,6 +761,8 @@ enum GeneralPixel: PixelKitEventV2 {
         case .defaultRequestedFromHomepageSetupView: return "m_mac_default_requested_from_homepage_setup_view"
         case .defaultRequestedFromSettings: return "m_mac_default_requested_from_settings"
         case .defaultRequestedFromOnboarding: return "m_mac_default_requested_from_onboarding"
+        case .defaultRequestedFromMainMenu: return "m_mac_default_requested_from_main_menu"
+        case .defaultRequestedFromMoreOptionsMenu: return "m_mac_default_requested_from_more_options_menu"
 
         case .addToDockOnboardingStepPresented: return "m_mac_add_to_dock_onboarding_step_presented"
         case .userAddedToDockDuringOnboarding: return "m_mac_user_added_to_dock_during_onboarding"
