@@ -132,6 +132,8 @@ public struct UserDefaultsWrapper<T> {
         case homePageContinueSetUpImport = "home.page.continue.set.up.import"
         case homePageIsFavoriteVisible = "home.page.is.favorite.visible"
         case homePageIsContinueSetupVisible = "home.page.is.continue.setup.visible"
+        case continueSetUpCardsLastDemonstrated = "home.page.contiune.setup.last.demonstrated"
+        case continueSetUpCardsNumberOfDaysDemonstrated = "home.page.contiune.setup.demo.days"
         case homePageIsRecentActivityVisible = "home.page.is.recent.activity.visible"
         case homePageIsSearchBarVisible = "home.page.is.search.bar.visible"
         case homePageIsFirstSession = "home.page.is.first.session"

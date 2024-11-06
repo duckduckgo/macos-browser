@@ -108,9 +108,6 @@ extension Preferences {
                         if addressBarModel.shouldShowAddressBar {
                             ToggleMenuItem(UserText.newTabSearchBarSectionTitle, isOn: $model.isSearchBarVisible)
                         }
-                        if model.isContinueSetUpAvailable {
-                            ToggleMenuItem(UserText.newTabSetUpSectionTitle, isOn: $model.isContinueSetUpVisible)
-                        }
                         ToggleMenuItem(UserText.newTabFavoriteSectionTitle, isOn: $model.isFavoriteVisible).accessibilityIdentifier("Preferences.AppearanceView.showFavoritesToggle")
                         ToggleMenuItem(UserText.newTabRecentActivitySectionTitle, isOn: $model.isRecentActivityVisible)
                     }

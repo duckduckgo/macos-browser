@@ -29,6 +29,8 @@ protocol AppearancePreferencesPersistor {
     var favoritesDisplayMode: String? { get set }
     var isFavoriteVisible: Bool { get set }
     var isContinueSetUpVisible: Bool { get set }
+    var continueSetUpCardsLastDemonstrated: Date? { get set }
+    var continueSetUpCardsNumberOfDaysDemonstrated: Int { get set }
     var isRecentActivityVisible: Bool { get set }
     var isSearchBarVisible: Bool { get set }
     var showBookmarksBar: Bool { get set }
@@ -53,6 +55,12 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
 
     @UserDefaultsWrapper(key: .homePageIsContinueSetupVisible, defaultValue: true)
     var isContinueSetUpVisible: Bool
+
+    @UserDefaultsWrapper(key: .continueSetUpCardsLastDemonstrated)
+    var continueSetUpCardsLastDemonstrated: Date?
+
+    @UserDefaultsWrapper(key: .continueSetUpCardsNumberOfDaysDemonstrated, defaultValue: 0)
+    var continueSetUpCardsNumberOfDaysDemonstrated: Int
 
     @UserDefaultsWrapper(key: .homePageIsRecentActivityVisible, defaultValue: true)
     var isRecentActivityVisible: Bool
@@ -178,7 +186,7 @@ final class AppearancePreferences: ObservableObject {
 
     struct Constants {
         static let bookmarksBarAlignmentChangedIsCenterAlignedParameter = "isCenterAligned"
-        static let dismissNextStepsCardsAfterDays = 7
+        static let dismissNextStepsCardsAfterDays = 9
     }
 
     static let shared = AppearancePreferences()
@@ -212,20 +220,11 @@ final class AppearancePreferences: ObservableObject {
         }
     }
 
-    var isContinueSetUpCardsViewOutdated: Bool {
-        AppDelegate.firstLaunchDate < Calendar.current.date(byAdding: .day, value: -Constants.dismissNextStepsCardsAfterDays, to: dateTimeProvider())!
-    }
+    @Published var isContinueSetUpCardsViewOutdated: Bool
 
     var isContinueSetUpVisible: Bool {
         get {
-            guard persistor.isContinueSetUpVisible else { return false }
-            if isContinueSetUpCardsViewOutdated {
-                DispatchQueue.main.async {
-                    self.isContinueSetUpVisible = false
-                }
-                return false
-            }
-            return true
+            return persistor.isContinueSetUpVisible && !isContinueSetUpCardsViewOutdated
         }
         set {
             persistor.isContinueSetUpVisible = newValue
@@ -234,6 +233,26 @@ final class AppearancePreferences: ObservableObject {
                 PixelKit.fire(GeneralPixel.continueSetUpSectionHidden)
             }
             self.objectWillChange.send()
+        }
+    }
+
+    func continueSetUpCardsViewDidAppear() {
+        guard isContinueSetUpVisible, !isContinueSetUpCardsViewOutdated else { return }
+
+        if let continueSetUpCardsLastDemonstrated = persistor.continueSetUpCardsLastDemonstrated {
+            // how many days has passed since last Continue Setup demonstration
+            let daysSinceLastDemonstration = Calendar.current.dateComponents([.day], from: continueSetUpCardsLastDemonstrated, to: dateTimeProvider()).day!
+            if daysSinceLastDemonstration > 0 {
+                persistor.continueSetUpCardsLastDemonstrated = Date()
+                persistor.continueSetUpCardsNumberOfDaysDemonstrated += 1
+
+                if persistor.continueSetUpCardsNumberOfDaysDemonstrated >= Constants.dismissNextStepsCardsAfterDays {
+                    self.isContinueSetUpCardsViewOutdated = true
+                }
+            }
+
+        } else if persistor.continueSetUpCardsLastDemonstrated == nil {
+            persistor.continueSetUpCardsLastDemonstrated = Date()
         }
     }
 
@@ -313,6 +332,7 @@ final class AppearancePreferences: ObservableObject {
         self.persistor = persistor
         self.homePageNavigator = homePageNavigator
         self.dateTimeProvider = dateTimeProvider
+        self.isContinueSetUpCardsViewOutdated = persistor.continueSetUpCardsNumberOfDaysDemonstrated >= Constants.dismissNextStepsCardsAfterDays
         currentThemeName = .init(rawValue: persistor.currentThemeName) ?? .systemDefault
         showFullURL = persistor.showFullURL
         favoritesDisplayMode = persistor.favoritesDisplayMode.flatMap(FavoritesDisplayMode.init) ?? .default
