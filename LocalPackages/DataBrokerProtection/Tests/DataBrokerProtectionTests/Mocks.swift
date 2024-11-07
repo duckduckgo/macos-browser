@@ -148,7 +148,7 @@ extension BrokerProfileQueryData {
 
 extension DataBrokerScheduleConfig {
     static var mock: DataBrokerScheduleConfig {
-        DataBrokerScheduleConfig(retryError: 1, confirmOptOutScan: 2, maintenanceScan: 3)
+        DataBrokerScheduleConfig(retryError: 1, confirmOptOutScan: 2, maintenanceScan: 3, maxAttempts: -1)
     }
 }
 
@@ -1232,7 +1232,8 @@ extension DataBroker {
             schedulingConfig: DataBrokerScheduleConfig(
                 retryError: 0,
                 confirmOptOutScan: 0,
-                maintenanceScan: 0
+                maintenanceScan: 0,
+                maxAttempts: -1
             ),
             optOutUrl: ""
         )

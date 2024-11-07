@@ -38,7 +38,7 @@ final class MapperToModelTests: XCTestCase {
             url: "https://example.com",
             steps: [],
             version: "1.0",
-            schedulingConfig: DataBrokerScheduleConfig(retryError: 1, confirmOptOutScan: 2, maintenanceScan: 3),
+            schedulingConfig: DataBrokerScheduleConfig(retryError: 1, confirmOptOutScan: 2, maintenanceScan: 3, maxAttempts: -1),
             parent: "ParentBroker",
             mirrorSites: [],
             optOutUrl: "https://example.com/opt-out"

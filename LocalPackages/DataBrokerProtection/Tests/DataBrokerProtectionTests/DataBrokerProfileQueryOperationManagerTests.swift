@@ -37,7 +37,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
 
     func testWhenOnlyOneProfileIsFoundAndRemoved_thenAllInfoRemovedNotificationIsSent() async {
         do {
-            let config = DataBrokerScheduleConfig(retryError: 1000, confirmOptOutScan: 1000, maintenanceScan: 1000)
+            let config = DataBrokerScheduleConfig(retryError: 1000, confirmOptOutScan: 1000, maintenanceScan: 1000, maxAttempts: -1)
 
             let brokerId: Int64 = 1
             let profileQueryId: Int64 = 1
@@ -85,7 +85,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
     func testWhenManyProfilesAreFoundAndOnlyOneRemoved_thenFirstRemovedNotificationIsSent() async {
         do {
 
-            let config = DataBrokerScheduleConfig(retryError: 1000, confirmOptOutScan: 1000, maintenanceScan: 1000)
+            let config = DataBrokerScheduleConfig(retryError: 1000, confirmOptOutScan: 1000, maintenanceScan: 1000, maxAttempts: -1)
 
             let brokerId: Int64 = 1
             let profileQueryId: Int64 = 1
@@ -136,7 +136,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
     func testWhenNoProfilesAreRemoved_thenNoNotificationsAreSent() async {
         do {
 
-            let config = DataBrokerScheduleConfig(retryError: 1000, confirmOptOutScan: 1000, maintenanceScan: 1000)
+            let config = DataBrokerScheduleConfig(retryError: 1000, confirmOptOutScan: 1000, maintenanceScan: 1000, maxAttempts: -1)
 
             let brokerId: Int64 = 1
             let profileQueryId: Int64 = 1
@@ -791,7 +791,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
         let profileQueryId: Int64 = 1
         let extractedProfileId: Int64 = 1
         mockDatabase.lastHistoryEventToReturn = HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .error(error: .unknown("Test error")))
-        let schedulingConfig = DataBrokerScheduleConfig(retryError: 1, confirmOptOutScan: 0, maintenanceScan: 0)
+        let schedulingConfig = DataBrokerScheduleConfig(retryError: 1, confirmOptOutScan: 0, maintenanceScan: 0, maxAttempts: -1)
 
         try sut.updateOperationDataDates(origin: .scan, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId, schedulingConfig: schedulingConfig, database: mockDatabase)
 
@@ -803,7 +803,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
         let brokerId: Int64 = 1
         let profileQueryId: Int64 = 1
         mockDatabase.lastHistoryEventToReturn = HistoryEvent(extractedProfileId: nil, brokerId: brokerId, profileQueryId: profileQueryId, type: .error(error: .unknown("Test error")))
-        let schedulingConfig = DataBrokerScheduleConfig(retryError: 1, confirmOptOutScan: 0, maintenanceScan: 0)
+        let schedulingConfig = DataBrokerScheduleConfig(retryError: 1, confirmOptOutScan: 0, maintenanceScan: 0, maxAttempts: -1)
 
         try sut.updateOperationDataDates(origin: .scan, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: nil, schedulingConfig: schedulingConfig, database: mockDatabase)
 
@@ -816,7 +816,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
         let profileQueryId: Int64 = 1
         let extractedProfileId: Int64 = 1
         mockDatabase.lastHistoryEventToReturn = HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested)
-        let schedulingConfig = DataBrokerScheduleConfig(retryError: 0, confirmOptOutScan: 1, maintenanceScan: 0)
+        let schedulingConfig = DataBrokerScheduleConfig(retryError: 0, confirmOptOutScan: 1, maintenanceScan: 0, maxAttempts: -1)
 
         try sut.updateOperationDataDates(origin: .scan, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId, schedulingConfig: schedulingConfig, database: mockDatabase)
 
@@ -829,7 +829,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
         let profileQueryId: Int64 = 1
         let extractedProfileId: Int64 = 1
         mockDatabase.lastHistoryEventToReturn = HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested)
-        let schedulingConfig = DataBrokerScheduleConfig(retryError: 0, confirmOptOutScan: 1, maintenanceScan: 0)
+        let schedulingConfig = DataBrokerScheduleConfig(retryError: 0, confirmOptOutScan: 1, maintenanceScan: 0, maxAttempts: -1)
 
         try sut.updateOperationDataDates(origin: .scan, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId, schedulingConfig: schedulingConfig, database: mockDatabase)
 
@@ -842,7 +842,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
         let profileQueryId: Int64 = 1
         let extractedProfileId: Int64 = 1
         mockDatabase.lastHistoryEventToReturn = HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .matchesFound(count: 0))
-        let schedulingConfig = DataBrokerScheduleConfig(retryError: 0, confirmOptOutScan: 0, maintenanceScan: 1)
+        let schedulingConfig = DataBrokerScheduleConfig(retryError: 0, confirmOptOutScan: 0, maintenanceScan: 1, maxAttempts: -1)
 
         try sut.updateOperationDataDates(origin: .scan, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId, schedulingConfig: schedulingConfig, database: mockDatabase)
 
@@ -855,7 +855,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
         let profileQueryId: Int64 = 1
         let extractedProfileId: Int64 = 1
         mockDatabase.lastHistoryEventToReturn = HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutStarted)
-        let schedulingConfig = DataBrokerScheduleConfig(retryError: 0, confirmOptOutScan: 0, maintenanceScan: 1)
+        let schedulingConfig = DataBrokerScheduleConfig(retryError: 0, confirmOptOutScan: 0, maintenanceScan: 1, maxAttempts: -1)
 
         try sut.updateOperationDataDates(origin: .scan, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId, schedulingConfig: schedulingConfig, database: mockDatabase)
 
@@ -870,7 +870,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
         let profileQueryId: Int64 = 1
         let extractedProfileId: Int64 = 1
         mockDatabase.lastHistoryEventToReturn = HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .scanStarted)
-        let schedulingConfig = DataBrokerScheduleConfig(retryError: 0, confirmOptOutScan: 0, maintenanceScan: 1)
+        let schedulingConfig = DataBrokerScheduleConfig(retryError: 0, confirmOptOutScan: 0, maintenanceScan: 1, maxAttempts: -1)
 
         try sut.updateOperationDataDates(origin: .scan, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId, schedulingConfig: schedulingConfig, database: mockDatabase)
 
@@ -881,7 +881,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
     }
 
     func testUpdatingScanDateFromOptOut_thenScanRespectMostRecentDate() throws {
-        let config = DataBrokerScheduleConfig(retryError: 1000, confirmOptOutScan: 1000, maintenanceScan: 1000)
+        let config = DataBrokerScheduleConfig(retryError: 1000, confirmOptOutScan: 1000, maintenanceScan: 1000, maxAttempts: -1)
 
         let brokerId: Int64 = 1
         let profileQueryId: Int64 = 1
@@ -905,7 +905,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
     }
 
     func testUpdatingScanDateFromScan_thenScanDoesNotRespectMostRecentDate() throws {
-        let config = DataBrokerScheduleConfig(retryError: 1000, confirmOptOutScan: 1000, maintenanceScan: 1000)
+        let config = DataBrokerScheduleConfig(retryError: 1000, confirmOptOutScan: 1000, maintenanceScan: 1000, maxAttempts: -1)
 
         let brokerId: Int64 = 1
         let profileQueryId: Int64 = 1
@@ -986,7 +986,8 @@ extension DataBroker {
             schedulingConfig: DataBrokerScheduleConfig(
                 retryError: 0,
                 confirmOptOutScan: 0,
-                maintenanceScan: 0
+                maintenanceScan: 0,
+                maxAttempts: -1
             ),
             optOutUrl: ""
         )
@@ -1005,7 +1006,8 @@ extension DataBroker {
             schedulingConfig: DataBrokerScheduleConfig(
                 retryError: 0,
                 confirmOptOutScan: 0,
-                maintenanceScan: 0
+                maintenanceScan: 0,
+                maxAttempts: -1
             ),
             parent: "some",
             optOutUrl: ""
@@ -1021,7 +1023,8 @@ extension DataBroker {
             schedulingConfig: DataBrokerScheduleConfig(
                 retryError: 0,
                 confirmOptOutScan: 0,
-                maintenanceScan: 0
+                maintenanceScan: 0,
+                maxAttempts: -1
             ),
             optOutUrl: ""
         )
@@ -1035,7 +1038,8 @@ extension DataBroker {
               schedulingConfig: DataBrokerScheduleConfig(
                 retryError: 0,
                 confirmOptOutScan: 0,
-                maintenanceScan: 0
+                maintenanceScan: 0,
+                maxAttempts: -1
               ),
               optOutUrl: ""
         )
@@ -1054,7 +1058,8 @@ extension DataBroker {
             schedulingConfig: DataBrokerScheduleConfig(
                 retryError: 0,
                 confirmOptOutScan: 0,
-                maintenanceScan: 0
+                maintenanceScan: 0,
+                maxAttempts: -1
             ),
             mirrorSites: mirroSites,
             optOutUrl: ""

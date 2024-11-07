@@ -41,7 +41,8 @@ final class OperationPreferredDateUpdaterTests: XCTestCase {
             schedulingConfig: DataBrokerScheduleConfig(
                 retryError: 1,
                 confirmOptOutScan: confirmOptOutScanHours,
-                maintenanceScan: 1
+                maintenanceScan: 1,
+                maxAttempts: -1
             ),
             optOutUrl: ""
         )

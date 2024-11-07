@@ -25,7 +25,8 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
     private let schedulingConfig = DataBrokerScheduleConfig(
         retryError: 48,
         confirmOptOutScan: 2000,
-        maintenanceScan: 3000
+        maintenanceScan: 3000,
+        maxAttempts: -1
     )
 
     // SCANS
