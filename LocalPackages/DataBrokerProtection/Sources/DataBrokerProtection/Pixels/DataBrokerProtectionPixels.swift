@@ -196,7 +196,6 @@ public enum DataBrokerProtectionPixels {
     // Configuration
     case invalidPayload(Configuration)
     case errorLoadingCachedConfig(Error)
-    case pixelTest
     case failedToParsePrivacyConfig(Error)
 
     // Measure success/failure rate of Personal Information Removal Pixels
@@ -337,7 +336,6 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             // Configuration
         case .invalidPayload(let configuration): return "m_mac_dbp_\(configuration.rawValue)_invalid_payload".lowercased()
         case .errorLoadingCachedConfig: return "m_mac_dbp_configuration_error_loading_cached_config"
-        case .pixelTest: return "m_mac_dbp_configuration_pixel_test"
         case .failedToParsePrivacyConfig: return "m_mac_dbp_configuration_failed_to_parse"
 
             // Various monitoring pixels
@@ -453,7 +451,6 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                 .secureVaultKeyStoreUpdateError,
                 .secureVaultError,
                 .invalidPayload,
-                .pixelTest,
                 .failedToParsePrivacyConfig:
             return [:]
         case .ipcServerProfileSavedCalledByApp,
@@ -550,7 +547,7 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .ipcServerImmediateScansFinishedWithError(error: let error),
                     .ipcServerAppLaunchedXPCError(error: let error),
                     .ipcServerAppLaunchedScheduledScansFinishedWithError(error: let error):
-                PixelKit.fire(DebugEvent(event, error: error), frequency: .dailyAndCount, includeAppVersionParameter: true)
+                PixelKit.fire(DebugEvent(event, error: error), frequency: .legacyDailyAndCount, includeAppVersionParameter: true)
             case .ipcServerProfileSavedCalledByApp,
                     .ipcServerProfileSavedReceivedByAgent,
                     .ipcServerImmediateScansInterrupted,
@@ -560,7 +557,7 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .ipcServerAppLaunchedScheduledScansBlocked,
                     .ipcServerAppLaunchedScheduledScansInterrupted,
                     .ipcServerAppLaunchedScheduledScansFinishedWithoutError:
-                PixelKit.fire(event, frequency: .dailyAndCount, includeAppVersionParameter: true)
+                PixelKit.fire(event, frequency: .legacyDailyAndCount, includeAppVersionParameter: true)
             case .parentChildMatches,
                     .optOutStart,
                     .optOutEmailGenerate,
@@ -614,7 +611,6 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .dataBrokerMetricsWeeklyStats,
                     .dataBrokerMetricsMonthlyStats,
                     .invalidPayload,
-                    .pixelTest,
                     .customDataBrokerStatsOptoutSubmit,
                     .customGlobalStatsOptoutSubmit,
                     .weeklyChildBrokerOrphanedOptOuts:
@@ -629,7 +625,7 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .entitlementCheckValid,
                     .entitlementCheckInvalid,
                     .entitlementCheckError:
-                PixelKit.fire(event, frequency: .dailyAndCount)
+                PixelKit.fire(event, frequency: .legacyDailyAndCount)
 
             }
         }

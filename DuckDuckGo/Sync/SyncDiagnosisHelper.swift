@@ -46,7 +46,7 @@ struct SyncDiagnosisHelper {
             // Nil value means sync was never on in the first place. So don't fire in this case.
             if syncManuallyDisabled == false,
                !syncWasDisabledUnexpectedlyPixelFired {
-                PixelKit.fire(DebugEvent(GeneralPixel.syncDebugWasDisabledUnexpectedly), frequency: .dailyAndCount)
+                PixelKit.fire(DebugEvent(GeneralPixel.syncDebugWasDisabledUnexpectedly), frequency: .legacyDailyAndCount)
                 syncWasDisabledUnexpectedlyPixelFired = true
             }
         } else {

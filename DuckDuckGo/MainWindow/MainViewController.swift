@@ -218,6 +218,7 @@ final class MainViewController: NSViewController {
 
     func windowDidResignKey() {
         browserTabViewController.windowDidResignKey()
+        tabBarViewController.hideTabPreview()
     }
 
     func showBookmarkPromptIfNeeded() {

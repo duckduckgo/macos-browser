@@ -95,7 +95,7 @@ final class LoginItemsManager: LoginItemsManaging {
                                                       action: "enable",
                                                       buildType: AppVersion.shared.buildType,
                                                       osVersion: AppVersion.shared.osVersion)
-        PixelKit.fire(DebugEvent(event, error: error), frequency: .dailyAndCount)
+        PixelKit.fire(DebugEvent(event, error: error), frequency: .legacyDailyAndCount)
         Logger.networkProtection.error("Could not enable \(item.debugDescription, privacy: .public): \(error.debugDescription, privacy: .public)")
     }
 
