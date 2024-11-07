@@ -27,11 +27,21 @@ import PixelKit
 import os.log
 import Onboarding
 import Freemium
+import UserScript
 
 protocol BrowserTabViewControllerDelegate: AnyObject {
     func highlightFireButton()
     func highlightPrivacyShield()
     func dismissViewHighlight()
+}
+
+extension BrowserTabViewController: UserContentControllerDelegate {
+    func userContentController(
+        _ userContentController: UserContentController,
+        didInstallContentRuleLists contentRuleLists: [String: WKContentRuleList],
+        userScripts: any UserScriptsProvider,
+        updateEvent: ContentBlockerRulesManager.UpdateEvent
+    ) {}
 }
 
 final class BrowserTabViewController: NSViewController {
@@ -40,6 +50,17 @@ final class BrowserTabViewController: NSViewController {
     private lazy var hoverLabel = NSTextField(string: URL.duckDuckGo.absoluteString)
     private lazy var hoverLabelContainer = ColorView(frame: .zero, backgroundColor: .browserTabBackground, borderWidth: 0)
 
+    private lazy var newTabPageWebView: WebView = {
+        let configuration = WKWebViewConfiguration()
+        configuration.applyStandardConfiguration(contentBlocking: PrivacyFeatures.contentBlocking,
+                                                 burnerMode: tabCollectionViewModel.burnerMode,
+                                                 earlyAccessHandlers: [])
+        let userContentController = configuration.userContentController as? UserContentController
+        userContentController?.delegate = self
+
+
+        return WebView(frame: .zero, configuration: configuration)
+    }()
     private weak var webView: WebView?
     private weak var webViewContainer: NSView?
     private weak var webViewSnapshot: NSView?
@@ -138,6 +159,7 @@ final class BrowserTabViewController: NSViewController {
         }
 
         view.registerForDraggedTypes([.URL, .fileURL])
+        newTabPageWebView.load(URLRequest(url: URL.newtab))
     }
 
     @objc func windowDidBecomeActive(notification: Notification) {
@@ -516,7 +538,7 @@ final class BrowserTabViewController: NSViewController {
         }
 
         func displayWebView(of tabViewModel: TabViewModel) {
-            let newWebView = tabViewModel.tab.webView
+            let newWebView = tabViewModel.tab.content.urlForWebView?.isNewTab == true ? newTabPageWebView : tabViewModel.tab.webView
             cleanUpRemoteWebViewIfNeeded(newWebView)
             webView = newWebView
 
@@ -824,11 +846,13 @@ final class BrowserTabViewController: NSViewController {
             return false
         }
 
+        let newWebView = tabViewModel.tab.content.urlForWebView?.isNewTab == true ? newTabPageWebView : tabViewModel.tab.webView
+
         let isPinnedTab = tabCollectionViewModel.pinnedTabsCollection?.tabs.contains(tabViewModel.tab) == true
         let isKeyWindow = view.window?.isKeyWindow == true
 
         let tabIsNotOnScreen = webView?.tabContentView.superview == nil
-        let isDifferentTabDisplayed = webView !== tabViewModel.tab.webView
+        let isDifferentTabDisplayed = webView !== newWebView
 
         return isDifferentTabDisplayed
         || tabIsNotOnScreen
@@ -1434,7 +1458,7 @@ extension BrowserTabViewController {
                 guard let self,
                       self.tabViewModel === tabViewModel else { return }
 
-                // only make web view first responder after replacing the 
+                // only make web view first responder after replacing the
                 // snapshot if the address bar is not the first responder
                 if view.window?.firstResponder === view.window {
                     viewToMakeFirstResponderAfterAdding = { [weak self] in
