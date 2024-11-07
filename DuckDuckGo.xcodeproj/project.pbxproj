@@ -1100,6 +1100,8 @@
 		372A0FED2B2379310033BF7F /* SyncMetricsEventsHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372A0FEB2B2379310033BF7F /* SyncMetricsEventsHandler.swift */; };
 		372BC2A12A4AFA47001D8FD5 /* SyncCredentialsAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372BC2A02A4AFA47001D8FD5 /* SyncCredentialsAdapter.swift */; };
 		372BC2A22A4AFA47001D8FD5 /* SyncCredentialsAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372BC2A02A4AFA47001D8FD5 /* SyncCredentialsAdapter.swift */; };
+		372ED7C22CDD481B002287EC /* NewTabPageUserContentController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372ED7C12CDD4815002287EC /* NewTabPageUserContentController.swift */; };
+		372ED7C32CDD481B002287EC /* NewTabPageUserContentController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372ED7C12CDD4815002287EC /* NewTabPageUserContentController.swift */; };
 		3739326529AE4B39009346AE /* DDGSync in Frameworks */ = {isa = PBXBuildFile; productRef = 3739326429AE4B39009346AE /* DDGSync */; };
 		3739326729AE4B42009346AE /* DDGSync in Frameworks */ = {isa = PBXBuildFile; productRef = 3739326629AE4B42009346AE /* DDGSync */; };
 		373A1AA8283ED1B900586521 /* BookmarkHTMLReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373A1AA7283ED1B900586521 /* BookmarkHTMLReader.swift */; };
@@ -1267,8 +1269,6 @@
 		37FB430F2CDB84A500479A1E /* NewTabPageUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FB430D2CDB84A200479A1E /* NewTabPageUserScript.swift */; };
 		37FB43112CDB883B00479A1E /* NewTabPageActionsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FB43102CDB883700479A1E /* NewTabPageActionsManager.swift */; };
 		37FB43122CDB883B00479A1E /* NewTabPageActionsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FB43102CDB883700479A1E /* NewTabPageActionsManager.swift */; };
-		37FB43142CDBA20900479A1E /* NewTabPageTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FB43132CDBA20500479A1E /* NewTabPageTabExtension.swift */; };
-		37FB43152CDBA20900479A1E /* NewTabPageTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FB43132CDBA20500479A1E /* NewTabPageTabExtension.swift */; };
 		37FD78112A29EBD100B36DB1 /* SyncErrorHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FD78102A29EBD100B36DB1 /* SyncErrorHandler.swift */; };
 		37FD78122A29EBD100B36DB1 /* SyncErrorHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FD78102A29EBD100B36DB1 /* SyncErrorHandler.swift */; };
 		4B0135CE2729F1AA00D54834 /* NSPasteboardExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0135CD2729F1AA00D54834 /* NSPasteboardExtension.swift */; };
@@ -3524,6 +3524,7 @@
 		37219B3C2CC27DB300C9D7A8 /* NewTabPageSearchBoxExperimentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageSearchBoxExperimentTests.swift; sourceTree = "<group>"; };
 		372A0FEB2B2379310033BF7F /* SyncMetricsEventsHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncMetricsEventsHandler.swift; sourceTree = "<group>"; };
 		372BC2A02A4AFA47001D8FD5 /* SyncCredentialsAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncCredentialsAdapter.swift; sourceTree = "<group>"; };
+		372ED7C12CDD4815002287EC /* NewTabPageUserContentController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageUserContentController.swift; sourceTree = "<group>"; };
 		373A1AA7283ED1B900586521 /* BookmarkHTMLReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkHTMLReader.swift; sourceTree = "<group>"; };
 		373A1AA9283ED86C00586521 /* BookmarksHTMLReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksHTMLReaderTests.swift; sourceTree = "<group>"; };
 		373A1AAF2842C4EA00586521 /* BookmarkHTMLImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkHTMLImporter.swift; sourceTree = "<group>"; };
@@ -3651,7 +3652,6 @@
 		37F19A6928E2F2D000740DC6 /* DuckPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckPlayer.swift; sourceTree = "<group>"; };
 		37FB430D2CDB84A200479A1E /* NewTabPageUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageUserScript.swift; sourceTree = "<group>"; };
 		37FB43102CDB883700479A1E /* NewTabPageActionsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageActionsManager.swift; sourceTree = "<group>"; };
-		37FB43132CDBA20500479A1E /* NewTabPageTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageTabExtension.swift; sourceTree = "<group>"; };
 		37FD78102A29EBD100B36DB1 /* SyncErrorHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncErrorHandler.swift; sourceTree = "<group>"; };
 		4B0135CD2729F1AA00D54834 /* NSPasteboardExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSPasteboardExtension.swift; sourceTree = "<group>"; };
 		4B02197F25E05FAC00ED7DEA /* FireproofingURLExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FireproofingURLExtensions.swift; sourceTree = "<group>"; };
@@ -8626,8 +8626,8 @@
 		AAE71DB225F66A0900D74437 /* HomePage */ = {
 			isa = PBXGroup;
 			children = (
-				37FB43132CDBA20500479A1E /* NewTabPageTabExtension.swift */,
 				37FB43102CDB883700479A1E /* NewTabPageActionsManager.swift */,
+				372ED7C12CDD4815002287EC /* NewTabPageUserContentController.swift */,
 				37FB430D2CDB84A200479A1E /* NewTabPageUserScript.swift */,
 				85589E8527BBB8DD0038AD11 /* Model */,
 				AAE71DB325F66A3F00D74437 /* View */,
@@ -11187,6 +11187,7 @@
 				4B9DB0362A983B24000927DB /* WaitlistTermsAndConditionsView.swift in Sources */,
 				37197EA82942443D00394917 /* BrowserTabViewController.swift in Sources */,
 				3706FB39293F65D500E42796 /* PrivacyDashboardPopover.swift in Sources */,
+				372ED7C32CDD481B002287EC /* NewTabPageUserContentController.swift in Sources */,
 				3706FB3B293F65D500E42796 /* RootView.swift in Sources */,
 				3706FB3C293F65D500E42796 /* AddressBarTextField.swift in Sources */,
 				3706FB3D293F65D500E42796 /* FocusRingView.swift in Sources */,
@@ -11814,7 +11815,6 @@
 				3706FCA0293F65D500E42796 /* ContiguousBytesExtension.swift in Sources */,
 				B602E8172A1E2570006D261F /* URL+NetworkProtection.swift in Sources */,
 				3706FCA1293F65D500E42796 /* AdjacentItemEnumerator.swift in Sources */,
-				37FB43142CDBA20900479A1E /* NewTabPageTabExtension.swift in Sources */,
 				9F9C49FA2BC7BC970099738D /* BookmarkAllTabsDialogView.swift in Sources */,
 				31ECDA122BED339600AE679F /* DataBrokerAuthenticationManagerBuilder.swift in Sources */,
 				3706FCA2293F65D500E42796 /* ChromiumKeychainPrompt.swift in Sources */,
@@ -12966,6 +12966,7 @@
 				56D6A3D629DB2BAB0055215A /* ContinueSetUpView.swift in Sources */,
 				B6B5F5842B03580A008DB58A /* RequestFilePermissionView.swift in Sources */,
 				4B1E6EEE27AB5E5100F51793 /* PasswordManagementListSection.swift in Sources */,
+				372ED7C22CDD481B002287EC /* NewTabPageUserContentController.swift in Sources */,
 				31C9ADE52AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift in Sources */,
 				AA222CB92760F74E00321475 /* FaviconReferenceCache.swift in Sources */,
 				4B9292A126670D2A00AD2C21 /* BookmarkTreeController.swift in Sources */,
@@ -13138,7 +13139,6 @@
 				4BE65479271FCD41008D1D63 /* EditableTextView.swift in Sources */,
 				AA9FF95D24A1FA1C0039E328 /* TabCollection.swift in Sources */,
 				1DA84D322C119AE70011C80F /* UpdateMenuItemFactory.swift in Sources */,
-				37FB43152CDBA20900479A1E /* NewTabPageTabExtension.swift in Sources */,
 				B6B4D1CF2B0E0DD000C26286 /* DataImportNoDataView.swift in Sources */,
 				B688B4DA273E6D3B0087BEAF /* MainView.swift in Sources */,
 				B61E2CD5294346C000773D8A /* Tab+Navigation.swift in Sources */,

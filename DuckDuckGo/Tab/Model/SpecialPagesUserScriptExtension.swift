@@ -53,7 +53,6 @@ extension SpecialPagesUserScript {
     @MainActor
     func withAllSubfeatures() {
         withOnboarding()
-        withNewTabPage()
         withErrorPages()
         withDuckPlayerIfAvailable()
     }

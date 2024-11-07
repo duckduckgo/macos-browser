@@ -227,10 +227,6 @@ extension TabExtensionsBuilder {
             OnboardingTabExtension()
         }
 
-        add {
-            NewTabPageTabExtension(scriptsPublisher: userScripts.compactMap { $0 }, webViewPublisher: args.webViewFuture)
-        }
-
         if let tunnelController = dependencies.tunnelController {
             add {
                 NetworkProtectionControllerTabExtension(tunnelController: tunnelController)

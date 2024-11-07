@@ -47,7 +47,6 @@ final class UserScripts: UserScriptsProvider {
     let youtubePlayerUserScript: YoutubePlayerUserScript?
     let specialErrorPageUserScript: SpecialErrorPageUserScript?
     let onboardingUserScript: OnboardingUserScript?
-    let newTabPageUserScript: NewTabPageUserScript?
 #if SPARKLE
     let releaseNotesUserScript: ReleaseNotesUserScript?
 #endif
@@ -75,7 +74,6 @@ final class UserScripts: UserScriptsProvider {
                                                                     languageCode: lenguageCode)
 
         onboardingUserScript = OnboardingUserScript(onboardingActionsManager: sourceProvider.onboardingActionsManager!)
-        newTabPageUserScript = NSApp.delegateTyped.newTabPageUserScript
 
         specialPages = SpecialPagesUserScript()
 
@@ -115,9 +113,6 @@ final class UserScripts: UserScriptsProvider {
                 specialPages.registerSubfeature(delegate: onboardingUserScript)
             }
 
-            if let newTabPageUserScript {
-                specialPages.registerSubfeature(delegate: newTabPageUserScript)
-            }
             userScripts.append(specialPages)
         }
 

@@ -35,15 +35,6 @@ protocol BrowserTabViewControllerDelegate: AnyObject {
     func dismissViewHighlight()
 }
 
-extension BrowserTabViewController: UserContentControllerDelegate {
-    func userContentController(
-        _ userContentController: UserContentController,
-        didInstallContentRuleLists contentRuleLists: [String: WKContentRuleList],
-        userScripts: any UserScriptsProvider,
-        updateEvent: ContentBlockerRulesManager.UpdateEvent
-    ) {}
-}
-
 final class BrowserTabViewController: NSViewController {
 
     private lazy var browserTabView = BrowserTabView(frame: .zero, backgroundColor: .browserTabBackground)
@@ -52,14 +43,13 @@ final class BrowserTabViewController: NSViewController {
 
     private lazy var newTabPageWebView: WebView = {
         let configuration = WKWebViewConfiguration()
-        configuration.applyStandardConfiguration(contentBlocking: PrivacyFeatures.contentBlocking,
-                                                 burnerMode: tabCollectionViewModel.burnerMode,
-                                                 earlyAccessHandlers: [])
-        let userContentController = configuration.userContentController as? UserContentController
-        userContentController?.delegate = self
+        configuration.applyNTPConfiguration()
 
+        let webView = WebView(frame: .zero, configuration: configuration)
 
-        return WebView(frame: .zero, configuration: configuration)
+        NSApp.delegateTyped.newTabPageUserScript.webViews.add(webView)
+
+        return webView
     }()
     private weak var webView: WebView?
     private weak var webViewContainer: NSView?
@@ -538,7 +528,7 @@ final class BrowserTabViewController: NSViewController {
         }
 
         func displayWebView(of tabViewModel: TabViewModel) {
-            let newWebView = tabViewModel.tab.content.urlForWebView?.isNewTab == true ? newTabPageWebView : tabViewModel.tab.webView
+            let newWebView = tabViewModel.tab.content.urlForWebView?.isNewTabPage == true ? newTabPageWebView : tabViewModel.tab.webView
             cleanUpRemoteWebViewIfNeeded(newWebView)
             webView = newWebView
 
@@ -846,7 +836,7 @@ final class BrowserTabViewController: NSViewController {
             return false
         }
 
-        let newWebView = tabViewModel.tab.content.urlForWebView?.isNewTab == true ? newTabPageWebView : tabViewModel.tab.webView
+        let newWebView = tabViewModel.tab.content.urlForWebView?.isNewTabPage == true ? newTabPageWebView : tabViewModel.tab.webView
 
         let isPinnedTab = tabCollectionViewModel.pinnedTabsCollection?.tabs.contains(tabViewModel.tab) == true
         let isKeyWindow = view.window?.isKeyWindow == true
