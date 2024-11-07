@@ -231,8 +231,8 @@ public struct UserDefaultsWrapper<T> {
 
         // BrokenSitePrompt
 
-        case lastBrokenSiteToastShownDate = "brokenSitePrompt.lastBrokenSiteToastShownDate"
-        case toastDismissStreakCounter = "brokenSitePrompt.toastDismissStreakCounter"
+        case lastBrokenSiteToastShownDate = "brokenSitePrompt.last-broken-site-toast-shown-date"
+        case toastDismissStreakCounter = "brokenSitePrompt.toast-dismiss-streak-counter"
 
     }
 
