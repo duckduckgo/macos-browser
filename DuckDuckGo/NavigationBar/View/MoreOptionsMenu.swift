@@ -65,6 +65,7 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
     private let freemiumDBPFeature: FreemiumDBPFeature
     private let freemiumDBPPresenter: FreemiumDBPPresenter
     private let appearancePreferences: AppearancePreferences
+    private let defaultBrowserPreferences: DefaultBrowserPreferences
 
     private let notificationCenter: NotificationCenter
 
@@ -92,6 +93,7 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
          freemiumDBPFeature: FreemiumDBPFeature,
          freemiumDBPPresenter: FreemiumDBPPresenter = DefaultFreemiumDBPPresenter(),
          appearancePreferences: AppearancePreferences = .shared,
+         defaultBrowserPreferences: DefaultBrowserPreferences = .shared,
          notificationCenter: NotificationCenter = .default,
          freemiumDBPExperimentPixelHandler: EventMapping<FreemiumDBPExperimentPixel> = FreemiumDBPExperimentPixelHandler(),
          aiChatMenuConfiguration: AIChatMenuVisibilityConfigurable = AIChatMenuConfiguration()) {
@@ -107,6 +109,7 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
         self.freemiumDBPFeature = freemiumDBPFeature
         self.freemiumDBPPresenter = freemiumDBPPresenter
         self.appearancePreferences = appearancePreferences
+        self.defaultBrowserPreferences = defaultBrowserPreferences
         self.notificationCenter = notificationCenter
         self.freemiumDBPExperimentPixelHandler = freemiumDBPExperimentPixelHandler
         self.aiChatMenuConfiguration = aiChatMenuConfiguration
@@ -145,9 +148,16 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
                                                    accountManager: accountManager)
         addItem(feedbackMenuItem)
 
-        addItem(NSMenuItem.separator())
-
 #endif // FEEDBACK
+
+        if !defaultBrowserPreferences.isDefault {
+            let setAsDefaultMenuItem = NSMenuItem(title: UserText.setAsDefaultBrowser, action: #selector(setAsDefault(_:)))
+                .targetting(self)
+                .withImage(.defaultBrowserMenuItem)
+            addItem(setAsDefaultMenuItem)
+        }
+
+        addItem(NSMenuItem.separator())
 
         addWindowItems()
 
@@ -184,6 +194,12 @@ final class MoreOptionsMenu: NSMenu, NSMenuDelegate {
 
     @objc func showNetworkProtectionStatus(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedNetworkProtectionPopover(self)
+    }
+
+    @MainActor
+    @objc func setAsDefault(_ sender: NSMenuItem) {
+        PixelKit.fire(GeneralPixel.defaultRequestedFromMoreOptionsMenu)
+        defaultBrowserPreferences.becomeDefault()
     }
 
     @MainActor

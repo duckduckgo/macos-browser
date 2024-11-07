@@ -41,8 +41,7 @@ extension HomePage.Views {
                     HStack(spacing: 8) {
                         image
 
-                        text
-                        .padding(.leading, 0)
+                        textContent
 
                         Spacer(minLength: 4)
 
@@ -85,14 +84,37 @@ extension HomePage.Views {
             }
         }
 
-        private var text: some View {
-            Text(viewModel.text)
+        private var textContent: some View {
+            VStack(alignment: .leading, spacing: viewModel.title == nil ? 0 : 8) {
+                title
+                description.foregroundColor(Color(.greyText))
+            }
+        }
+
+        private var title: some View {
+            Group {
+                if let title = viewModel.title {
+                    Text(verbatim: title)
+                        .font(.system(size: 13).bold())
+                } else {
+                    EmptyView()
+                }
+            }
+       }
+
+        @ViewBuilder
+        private var description: some View {
+            if #available(macOS 12.0, *), let attributed = try? AttributedString(markdown: viewModel.description) {
+                Text(attributed)
+            } else {
+                Text(verbatim: viewModel.description)
+            }
         }
 
         private var button: some View {
             Group {
                 Button(action: viewModel.proceedAction) {
-                    Text(viewModel.proceedButtonText)
+                    Text(verbatim: viewModel.proceedButtonText)
                 }
                 .controlSize(.large)
             }

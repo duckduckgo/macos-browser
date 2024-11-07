@@ -136,7 +136,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
     func setSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
 
-        PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseEmailSuccess, frequency: .dailyAndCount)
+        PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseEmailSuccess, frequency: .legacyDailyAndCount)
 
         guard let subscriptionValues: SubscriptionValues = DecodableHelper.decode(from: params) else {
             assertionFailure("SubscriptionPagesUserScript: expected JSON representation of SubscriptionValues")
@@ -189,7 +189,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func subscriptionSelected(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        PixelKit.fire(PrivacyProPixel.privacyProPurchaseAttempt, frequency: .dailyAndCount)
+        PixelKit.fire(PrivacyProPixel.privacyProPurchaseAttempt, frequency: .legacyDailyAndCount)
         struct SubscriptionSelection: Decodable {
             let id: String
         }
@@ -273,7 +273,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                 switch completePurchaseResult {
                 case .success(let purchaseUpdate):
                     Logger.subscription.info("[Purchase] Purchase complete")
-                    PixelKit.fire(PrivacyProPixel.privacyProPurchaseSuccess, frequency: .dailyAndCount)
+                    PixelKit.fire(PrivacyProPixel.privacyProPurchaseSuccess, frequency: .legacyDailyAndCount)
                     sendFreemiumSubscriptionPixelIfFreemiumActivated()
                     saveSubscriptionUpgradeTimestampIfFreemiumActivated()
                     PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActivated, frequency: .unique)
@@ -385,7 +385,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         await stripePurchaseFlow.completeSubscriptionPurchase()
         await uiHandler.dismissProgressViewController()
 
-        PixelKit.fire(PrivacyProPixel.privacyProPurchaseStripeSuccess, frequency: .dailyAndCount)
+        PixelKit.fire(PrivacyProPixel.privacyProPurchaseStripeSuccess, frequency: .legacyDailyAndCount)
         sendFreemiumSubscriptionPixelIfFreemiumActivated()
         saveSubscriptionUpgradeTimestampIfFreemiumActivated()
         subscriptionSuccessPixelHandler.fireSuccessfulSubscriptionAttributionPixel()
@@ -457,7 +457,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     // MARK: - UI interactions
 
     func showSomethingWentWrongAlert() async {
-        PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailure, frequency: .dailyAndCount)
+        PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailure, frequency: .legacyDailyAndCount)
         switch await uiHandler.dismissProgressViewAndShow(alertType: .somethingWentWrong, text: nil) {
         case .alertFirstButtonReturn:
             let url = subscriptionManager.url(for: .purchase)
@@ -478,7 +478,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                                                                      authEndpointService: subscriptionManager.authEndpointService)
                 let result = await appStoreRestoreFlow.restoreAccountFromPastPurchase()
                 switch result {
-                case .success: PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreSuccess, frequency: .dailyAndCount)
+                case .success: PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreSuccess, frequency: .legacyDailyAndCount)
                 case .failure: break
                 }
                 Task { @MainActor in
@@ -529,7 +529,7 @@ extension SubscriptionPagesUseSubscriptionFeature: SubscriptionAccessActionHandl
     func subscriptionAccessActionHandleAction(event: SubscriptionAccessActionHandlingEvent) {
         switch event {
         case .activateAddEmailClick:
-            PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseEmailStart, frequency: .dailyAndCount)
+            PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseEmailStart, frequency: .legacyDailyAndCount)
         default: break
         }
     }
