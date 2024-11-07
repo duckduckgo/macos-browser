@@ -1522,78 +1522,6 @@
         }
       }
     },
-    "ai-chat.onboarding.popover.accept" : {
-      "comment" : "AI Chat onboarding CTA for approval",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Add Shortcut"
-          }
-        }
-      }
-    },
-    "ai-chat.onboarding.popover.confirmation" : {
-      "comment" : "Confirmation for accepting the AI Chat onboarding popover",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "AI Chat shortcut added!"
-          }
-        }
-      }
-    },
-    "ai-chat.onboarding.popover.message-fallback" : {
-      "comment" : "AI Chat onboarding popover message continuation",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "You can adjust this and other AI Chat features in Settings > AI Chat"
-          }
-        }
-      }
-    },
-    "ai-chat.onboarding.popover.message-markdown" : {
-      "comment" : "AI Chat onboarding popover message, make sure to keep Settings and AI Chat inside ** **",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "You can adjust this and other AI Chat features in **Settings** > **AI Chat**."
-          }
-        }
-      }
-    },
-    "ai-chat.onboarding.popover.reject" : {
-      "comment" : "AI Chat onboarding CTA for rejection",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "No Thanks"
-          }
-        }
-      }
-    },
-    "ai-chat.onboarding.popover.title" : {
-      "comment" : "AI Chat onboarding popover title",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Launch AI Chat directly from your toolbar"
-          }
-        }
-      }
-    },
     "ai-chat.preferences.caption" : {
       "comment" : "Ai Chat preferences explanation",
       "extractionState" : "extracted_with_value",
@@ -1650,30 +1578,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Чтобы быстрее запускать функцию AI Chat, добавьте ее ярлык на панель инструментов или в меню браузера."
-          }
-        }
-      }
-    },
-    "ai-chat.preferences.caption.link.fallback" : {
-      "comment" : "Ai Chat preferences explanation",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "AI Chat is an optional feature available at duck.ai that lets you have private conversations with popular 3rd-party AI chat models. Your chats are not used to train chat models."
-          }
-        }
-      }
-    },
-    "ai-chat.preferences.caption.link.markdown" : {
-      "comment" : "Ai Chat preferences explanation with a markdown link. Do not translate what's inside [] and ()",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "AI Chat is an optional feature available at [duck.ai](https://duck.ai) that lets you have private conversations with popular 3rd-party AI chat models. Your chats are not used to train chat models."
           }
         }
       }
@@ -5726,54 +5630,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "В отсутствие блокировки любой, у кого появится доступ к устройству, сможет использовать или изменить ваши автозаполняемые данные. Из соображений безопасности при заполнении платежных данных в формах всегда требуется аутентификация."
-          }
-        }
-      }
-    },
-    "autofill.onboarding.popover.accept" : {
-      "comment" : "Autofill onboarding CTA for approval",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Add Shortcut"
-          }
-        }
-      }
-    },
-    "autofill.onboarding.popover.message1" : {
-      "comment" : "Autofill onboarding popover message",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "You can manage your toolbar shortcuts at any time by right-clicking on the toolbar."
-          }
-        }
-      }
-    },
-    "autofill.onboarding.popover.reject" : {
-      "comment" : "Autofill onboarding CTA for rejection",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "No Thanks"
-          }
-        }
-      }
-    },
-    "autofill.onboarding.popover.title" : {
-      "comment" : "Autofill onboarding popover title",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Add passwords shortcut?"
           }
         }
       }
@@ -10003,7 +9859,7 @@
     },
     "bookmarks.bar.prompt.message" : {
       "comment" : "Message show for bookmarks bar prompt",
-      "extractionState" : "stale",
+      "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -10057,18 +9913,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Показывает панель для быстрого доступа к новым закладкам."
-          }
-        }
-      }
-    },
-    "bookmarks.bar.prompt.message1" : {
-      "comment" : " message show for bookmarks bar prompt\n    message with markdown show for bookmarks bar prompt, make sure to keep the ** ** for the translated words Settings and Appearance",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Show the Bookmarks Bar for quick access to your favorite bookmarks. You can adjust this later in **Settings** > **Appearance**."
           }
         }
       }
@@ -39070,7 +38914,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "You’re all set! You can find me hanging out in the Dock anytime.\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possibleu{00A0}🔒"
+            "value" : "You’re all set! You can find me hanging out in the Dock anytime.\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possible 🔒"
           }
         },
         "es" : {
@@ -39130,7 +38974,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "You’re all set!\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possibleu{00A0}🔒"
+            "value" : "You’re all set!\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possible 🔒"
           }
         },
         "es" : {
@@ -55395,18 +55239,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Удалить из избранного"
-          }
-        }
-      }
-    },
-    "remove.suggestion.tooltip" : {
-      "comment" : "Tooltip for the button which removes the history entry from the history",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Remove from browsing history"
           }
         }
       }
