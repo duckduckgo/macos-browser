@@ -34,6 +34,7 @@ final class MoreOptionsMenuTests: XCTestCase {
     var networkProtectionVisibilityMock: NetworkProtectionVisibilityMock!
     var capturingActionDelegate: CapturingOptionsButtonMenuDelegate!
     var internalUserDecider: InternalUserDeciderMock!
+    var defaultBrowserProvider: DefaultBrowserProviderMock!
 
     var storePurchaseManager: StorePurchaseManager!
 
@@ -55,6 +56,8 @@ final class MoreOptionsMenuTests: XCTestCase {
         networkProtectionVisibilityMock = NetworkProtectionVisibilityMock(isInstalled: false, visible: false)
         capturingActionDelegate = CapturingOptionsButtonMenuDelegate()
         internalUserDecider = InternalUserDeciderMock()
+        defaultBrowserProvider = DefaultBrowserProviderMock()
+        defaultBrowserProvider.isDefault = true
 
         storePurchaseManager = StorePurchaseManagerMock()
 
@@ -97,6 +100,7 @@ final class MoreOptionsMenuTests: XCTestCase {
                                           freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager,
                                           freemiumDBPFeature: mockFreemiumDBPFeature,
                                           freemiumDBPPresenter: mockFreemiumDBPPresenter,
+                                          defaultBrowserPreferences: .init(defaultBrowserProvider: defaultBrowserProvider),
                                           notificationCenter: mockNotificationCenter,
                                           freemiumDBPExperimentPixelHandler: mockPixelHandler)
 
@@ -294,6 +298,27 @@ final class MoreOptionsMenuTests: XCTestCase {
         XCTAssertTrue(capturingActionDelegate.optionsButtonMenuRequestedBookmarkAllOpenTabsCalled)
     }
 
+    // MARK: - Default Browser Action
+
+    @MainActor
+    func testWhenBrowserIsDefaultThenSetAsDefaultBrowserMenuItemIsHidden() {
+        defaultBrowserProvider.isDefault = true
+
+        setupMoreOptionsMenu()
+        moreOptionsMenu.update()
+
+        XCTAssertNotEqual(moreOptionsMenu.items[1].title, UserText.setAsDefaultBrowser)
+    }
+
+    @MainActor
+    func testWhenBrowserIsNotDefaultThenSetAsDefaultBrowserMenuItemIsShown() {
+        defaultBrowserProvider.isDefault = false
+
+        setupMoreOptionsMenu()
+        moreOptionsMenu.update()
+
+        XCTAssertEqual(moreOptionsMenu.items[1].title, UserText.setAsDefaultBrowser)
+    }
 }
 
 final class NetworkProtectionVisibilityMock: VPNFeatureGatekeeper {

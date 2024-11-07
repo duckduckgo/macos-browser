@@ -134,7 +134,6 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private let configurationStore = ConfigurationStore()
     private let configurationManager: ConfigurationManager
     private let privacyConfigurationManager = VPNPrivacyConfigurationManager()
-    private var configurationSubscription: AnyCancellable?
 
     public init(accountManager: AccountManager,
                 accessTokenStorage: SubscriptionTokenKeychainStorage,
@@ -386,11 +385,6 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
             setUpSubscriptionMonitoring()
 
-            configurationSubscription = privacyConfigurationManager.updatesPublisher
-                .sink { [weak self] in
-                    self?.firePrivacyConfigTestPixelIfNecessary()
-                }
-
             if launchedOnStartup {
                 Task {
                     let isConnected = await tunnelController.isConnected
@@ -427,8 +421,6 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private func setUpSubscriptionMonitoring() {
         guard accountManager.isUserAuthenticated else { return }
 
-        self.firePrivacyConfigTestPixelIfNecessary()
-
         let entitlementsCheck = {
             await self.accountManager.hasEntitlement(forProductName: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
         }
@@ -453,12 +445,6 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
                     break
                 }
             }
-        }
-    }
-
-    private func firePrivacyConfigTestPixelIfNecessary() {
-        if privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(BackgroundAgentPixelTestSubfeature.pixelTest) {
-            PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionConfigurationPixelTest, frequency: .daily)
         }
     }
 

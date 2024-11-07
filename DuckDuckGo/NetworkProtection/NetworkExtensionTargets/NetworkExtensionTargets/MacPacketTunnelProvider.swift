@@ -82,14 +82,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 domainEvent = .networkProtectionClientFailedToFetchRegisteredServers(eventError)
             case .failedToParseRegisteredServersResponse:
                 domainEvent = .networkProtectionClientFailedToParseRegisteredServersResponse
-            case .failedToEncodeRedeemRequest:
-                domainEvent = .networkProtectionClientFailedToEncodeRedeemRequest
-            case .invalidInviteCode:
-                domainEvent = .networkProtectionClientInvalidInviteCode
-            case .failedToRedeemInviteCode(let error):
-                domainEvent = .networkProtectionClientFailedToRedeemInviteCode(error)
-            case .failedToParseRedeemResponse(let error):
-                domainEvent = .networkProtectionClientFailedToParseRedeemResponse(error)
             case .invalidAuthToken:
                 domainEvent = .networkProtectionClientInvalidAuthToken
             case .serverListInconsistency:
@@ -124,8 +116,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 domainEvent = .networkProtectionClientFailedToParseServerStatusResponse(error)
             case .unhandledError(function: let function, line: let line, error: let error):
                 domainEvent = .networkProtectionUnhandledError(function: function, line: line, error: error)
-            case .failedToRetrieveAuthToken,
-                    .failedToFetchLocationList,
+            case .failedToFetchLocationList,
                     .failedToParseLocationListResponse:
                 // Needs Privacy triage for macOS Geoswitching pixels
                 return
