@@ -18,6 +18,8 @@
 
 import Foundation
 import Common
+import AppKitExtensions
+import Cocoa
 import SecureStorage
 import os.log
 
@@ -38,12 +40,21 @@ final class FileResources: ResourcesRepository {
     }
 
     func fetchBrokerFromResourceFiles() throws -> [DataBroker]? {
+        guard NSApplication.runType != .unitTests && NSApplication.runType != .uiTests else {
+            /*
+             There's a bug with the bundle resources in tests:
+             https://forums.swift.org/t/swift-5-3-swiftpm-resources-in-tests-uses-wrong-bundle-path/37051/49
+             */
+            return []
+        }
+
         guard let resourceURL = Bundle.module.resourceURL else {
             Logger.dataBrokerProtection.fault("DataBrokerProtectionUpdater: error FileResources fetchBrokerFromResourceFiles, error: Bundle.module.resourceURL is nil")
             assertionFailure()
             throw FileResourcesError.bundleResourceURLNil
         }
 
+        let shouldUseFakeBrokers = (NSApp.runType == .integrationTests)
         let brokersURL = resourceURL.appendingPathComponent("Resources").appendingPathComponent("JSON")
         do {
             let fileURLs = try fileManager.contentsOfDirectory(
@@ -53,7 +64,9 @@ final class FileResources: ResourcesRepository {
             )
 
             let brokerJSONFiles = fileURLs.filter {
-                $0.isJSON && !$0.hasFakePrefix
+                $0.isJSON && (
+                (shouldUseFakeBrokers && $0.hasFakePrefix) ||
+                (!shouldUseFakeBrokers && !$0.hasFakePrefix))
             }
 
             return try brokerJSONFiles.map(DataBroker.initFromResource(_:))
