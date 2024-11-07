@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Foundation
 
 protocol ExperimentalFeaturesPersistor {
@@ -45,13 +46,16 @@ struct ExperimentalFeaturesDefaultHandler: ExperimentalFeaturesHandler {
 
 final class ExperimentalFeatures {
 
+    let internalUserDecider: InternalUserDecider
     private var persistor: ExperimentalFeaturesPersistor
     private var actionHandler: ExperimentalFeaturesHandler
 
     init(
+        internalUserDecider: InternalUserDecider,
         persistor: ExperimentalFeaturesPersistor = ExperimentalFeaturesUserDefaultsPersistor(),
         actionHandler: ExperimentalFeaturesHandler = ExperimentalFeaturesDefaultHandler()
     ) {
+        self.internalUserDecider = internalUserDecider
         self.persistor = persistor
         self.actionHandler = actionHandler
     }
