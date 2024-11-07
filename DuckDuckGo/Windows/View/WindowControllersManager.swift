@@ -235,7 +235,7 @@ extension WindowControllersManager {
 
         let viewController = windowController.mainViewController
         let tabCollectionViewModel = viewController.tabCollectionViewModel
-        tabCollectionViewModel.appendNewTab(with: content)
+        tabCollectionViewModel.insertOrAppendNewTab(content)
         windowController.window?.orderFront(nil)
     }
 
