@@ -320,7 +320,12 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                     schedulingConfig: brokerProfileQueryData.dataBroker.schedulingConfig,
                     database: database
                 )
-                try database.increaseAttemptCount(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
+                try increaseAttemptCountIfNeeded(
+                    database: database,
+                    brokerId: brokerId,
+                    profileQueryId: profileQueryId,
+                    extractedProfileId: extractedProfileId
+                )
             } catch {
                 handleOperationError(
                     origin: .optOut,
@@ -390,6 +395,18 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                                      extractedProfileId: extractedProfileId,
                                                      schedulingConfig: schedulingConfig)
         }
+
+    internal func increaseAttemptCountIfNeeded(database: DataBrokerProtectionRepository,
+                                              brokerId: Int64,
+                                              profileQueryId: Int64,
+                                              extractedProfileId: Int64) throws {
+        guard let events = try? database.fetchOptOutHistoryEvents(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId),
+              events.last?.type == .optOutRequested else {
+            return
+        }
+
+        try database.increaseAttemptCount(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
+    }
 
     private func handleOperationError(origin: OperationPreferredDateUpdaterOrigin,
                                       brokerId: Int64,
