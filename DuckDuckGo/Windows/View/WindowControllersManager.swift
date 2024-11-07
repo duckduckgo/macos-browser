@@ -221,7 +221,7 @@ extension WindowControllersManager {
         } else {
             let newTab = Tab(content: url.map { .url($0, source: source) } ?? .newtab, shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
             newTab.setContent(url.map { .contentFromURL($0, source: source) } ?? .newtab)
-            tabCollectionViewModel.append(tab: newTab)
+            tabCollectionViewModel.insertOrAppend(tab: newTab, selected: true)
         }
     }
 
@@ -235,7 +235,7 @@ extension WindowControllersManager {
 
         let viewController = windowController.mainViewController
         let tabCollectionViewModel = viewController.tabCollectionViewModel
-        tabCollectionViewModel.appendNewTab(with: content)
+        tabCollectionViewModel.insertOrAppendNewTab(content)
         windowController.window?.orderFront(nil)
     }
 
