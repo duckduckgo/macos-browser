@@ -91,6 +91,14 @@ final class FeatureFlagOverrides {
         guard internalUserDecider.isInternalUser else {
             return
         }
+
+        switch featureFlag {
+        case .htmlNewTabPage:
+            break
+        default:
+            return
+        }
+
         let currentValue = persistor.value(for: featureFlag) ?? false
         let newValue = !currentValue
         persistor.set(!currentValue, for: featureFlag)
