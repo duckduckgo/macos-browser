@@ -44,7 +44,7 @@ jobs:
             runner: macos-13-xlarge
           - xcode-version: "15.4"
             runner: macos-14-xlarge
-          - xcode-version: "16"
+          - xcode-version: "16.1"
             runner: macos-15-xlarge
 
     concurrency:
