@@ -3870,6 +3870,7 @@
 		4BA1A6F5258C4F9600F6F690 /* EncryptionMocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptionMocks.swift; sourceTree = "<group>"; };
 		4BA1A6FD258C5C1300F6F690 /* EncryptedValueTransformerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptedValueTransformerTests.swift; sourceTree = "<group>"; };
 		4BA71ED92B4B81E80002EBCE /* AppVersionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersionExtension.swift; sourceTree = "<group>"; };
+		4BA808FF2CDE78F600338EE4 /* DuckDuckGoAppStoreReview.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DuckDuckGoAppStoreReview.entitlements; sourceTree = "<group>"; };
 		4BB6CE5E26B77ED000EC5860 /* Cryptography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cryptography.swift; sourceTree = "<group>"; };
 		4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugUserScript.swift; sourceTree = "<group>"; };
 		4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequenceExtensions.swift; sourceTree = "<group>"; };
@@ -7742,6 +7743,7 @@
 				37D9BBA329376EE8000B99F9 /* DuckDuckGoAppStore.entitlements */,
 				377E54382937B7C400780A0A /* DuckDuckGoAppStoreCI.entitlements */,
 				37E1116C2C578F1B00583C19 /* DuckDuckGoAppStoreDebug.entitlements */,
+				4BA808FF2CDE78F600338EE4 /* DuckDuckGoAppStoreReview.entitlements */,
 				4B5F15032A1570F10060320F /* DuckDuckGoDebug.entitlements */,
 				4B65143C26392483005B46EB /* Email */,
 				B68412192B6A16030092F66A /* ErrorPage */,
