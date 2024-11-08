@@ -108,6 +108,7 @@ jobs:
     - name: Run PIR e2e Tests
       run: |
         cd main
+        launchctl setenv PRIVACYPRO_STAGING_TOKEN '${{ secrets.PRIVACYPRO_STAGING_TOKEN }}'
         set -o pipefail && xcodebuild test \
           -scheme "DBPE2ETests" \
           -derivedDataPath "DerivedData" \
