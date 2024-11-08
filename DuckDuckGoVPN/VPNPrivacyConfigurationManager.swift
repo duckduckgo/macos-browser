@@ -24,7 +24,12 @@ import PixelKit
 
 public final class VPNPrivacyConfigurationManager: PrivacyConfigurationManaging {
 
+    public let internalUserDecider: InternalUserDecider
     private let lock = NSLock()
+
+    init(internalUserDecider: InternalUserDecider) {
+        self.internalUserDecider = internalUserDecider
+    }
 
     var embeddedConfigData: Data {
         let configString = """
@@ -80,9 +85,6 @@ public final class VPNPrivacyConfigurationManager: PrivacyConfigurationManaging 
                                                  internalUserDecider: internalUserDecider)
         return privacyConfig
     }
-
-    public var internalUserDecider: InternalUserDecider = DefaultInternalUserDecider(
-        store: UserDefaults.appConfiguration)
 
     @discardableResult
     public func reload(etag: String?, data: Data?) -> PrivacyConfigurationManager.ReloadResult {

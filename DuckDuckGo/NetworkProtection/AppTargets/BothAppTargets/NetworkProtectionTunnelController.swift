@@ -20,6 +20,7 @@ import Foundation
 import Combine
 import SwiftUI
 import Common
+import FeatureFlags
 import NetworkExtension
 import NetworkProtection
 import NetworkProtectionProxy
@@ -43,7 +44,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
     // MARK: - Configuration
 
-    private let internalUserDecider: InternalUserDecider
+    private let featureFlagger: FeatureFlagger
     let settings: VPNSettings
     let defaults: UserDefaults
 
@@ -153,13 +154,13 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     ///
     init(networkExtensionBundleID: String,
          networkExtensionController: NetworkExtensionController,
-         internalUserDecider: InternalUserDecider,
+         featureFlagger: FeatureFlagger,
          settings: VPNSettings,
          defaults: UserDefaults,
          notificationCenter: NotificationCenter = .default,
          accessTokenStorage: SubscriptionTokenKeychainStorage) {
 
-        self.internalUserDecider = internalUserDecider
+        self.featureFlagger = featureFlagger
         self.networkExtensionBundleID = networkExtensionBundleID
         self.networkExtensionController = networkExtensionController
         self.notificationCenter = notificationCenter
@@ -733,21 +734,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     // MARK: - Routing
 
     private var enforceRoutes: Bool {
-
-        guard internalUserDecider.isInternalUser else {
-            return false
-        }
-
-        /// Even though there's a remote feature flag, we still want to allow internal users to disable enforceRoutes
-        /// manually in case they have trouble.  To achieve this we force the setting to ON once, but otherwise
-        /// allow the internal user to disable it again.
-        if !settings.enforceRoutesForceEnabledOnce {
-            settings.enforceRoutesForceEnabledOnce = true
-            settings.excludeLocalNetworks = true
-            settings.enforceRoutes = true
-        }
-
-        return settings.enforceRoutes
+        featureFlagger.isFeatureOn(.networkProtectionEnforceRoutes)
     }
 
     struct TunnelFailureError: LocalizedError {

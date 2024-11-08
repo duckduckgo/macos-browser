@@ -133,8 +133,12 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
     private let configurationStore = ConfigurationStore()
     private let configurationManager: ConfigurationManager
-    private let privacyConfigurationManager = VPNPrivacyConfigurationManager()
     private var configurationSubscription: AnyCancellable?
+
+    private let privacyConfigurationManager = VPNPrivacyConfigurationManager(internalUserDecider: DefaultInternalUserDecider(store: UserDefaults.appConfiguration))
+    private lazy var featureFlagger = DefaultFeatureFlagger(
+        internalUserDecider: privacyConfigurationManager.internalUserDecider,
+        privacyConfigManager: privacyConfigurationManager)
 
     public init(accountManager: AccountManager,
                 accessTokenStorage: SubscriptionTokenKeychainStorage,
@@ -220,13 +224,11 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         return controller
     }()
 
-    private let internalUserDecider = DefaultInternalUserDecider(store: UserDefaults.appConfiguration)
-
     @MainActor
     private lazy var tunnelController = NetworkProtectionTunnelController(
         networkExtensionBundleID: tunnelExtensionBundleID,
         networkExtensionController: networkExtensionController,
-        internalUserDecider: internalUserDecider,
+        featureFlagger: featureFlagger,
         settings: tunnelSettings,
         defaults: userDefaults,
         accessTokenStorage: accessTokenStorage)
