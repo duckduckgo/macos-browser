@@ -53,7 +53,7 @@ struct SyncDiagnosisHelper {
                 PixelKit.fire(
                     DebugEvent(GeneralPixel.syncDebugWasDisabledUnexpectedly),
                     frequency: .dailyAndCount,
-                    withAdditionalParameters: [Const.authStatePixelParamKey : syncService.authState.rawValue]
+                    withAdditionalParameters: [Const.authStatePixelParamKey: syncService.authState.rawValue]
                 )
                 syncWasDisabledUnexpectedlyPixelFired = true
             }
