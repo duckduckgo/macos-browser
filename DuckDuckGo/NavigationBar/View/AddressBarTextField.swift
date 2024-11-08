@@ -555,6 +555,8 @@ final class AddressBarTextField: NSTextField {
             return
         }
 
+        if !suggestionWindow.isVisible && selectedSuggestionViewModel == nil { return }
+
         guard let selectedSuggestionViewModel else {
             if let originalStringValue = suggestionContainerViewModel?.userStringValue {
                 self.value = Value(stringValue: originalStringValue, userTyped: true)
