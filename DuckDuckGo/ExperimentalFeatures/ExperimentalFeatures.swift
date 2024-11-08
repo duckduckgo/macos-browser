@@ -18,22 +18,46 @@
 
 import BrowserServicesKit
 import Foundation
+import Persistence
 
 protocol ExperimentalFeaturesPersistor {
-    var isHTMLNewTabPageEnabled: Bool { get set }
+    func value(for flag: FeatureFlag) -> Bool?
+    func set(_ value: Bool?, for flag: FeatureFlag)
 }
 
 struct ExperimentalFeaturesUserDefaultsPersistor: ExperimentalFeaturesPersistor {
-    @UserDefaultsWrapper(key: .htmlNewTabPage, defaultValue: false)
-    var isHTMLNewTabPageEnabled: Bool
+    let keyValueStore: KeyValueStoring
+
+    func value(for flag: FeatureFlag) -> Bool? {
+        let key = key(for: flag)
+        return keyValueStore.object(forKey: key) as? Bool
+    }
+
+    func set(_ value: Bool?, for flag: FeatureFlag) {
+        let key = key(for: flag)
+        keyValueStore.set(value, forKey: key)
+    }
+
+    private func key(for flag: FeatureFlag) -> String {
+        return "local-override.\(flag.rawValue)"
+    }
 }
 
 protocol ExperimentalFeaturesHandler {
-    func isHTMLNewTabPageEnabledDidChange(_ isEnabled: Bool)
+    func flagDidChange(_ featureFlag: FeatureFlag, isEnabled: Bool)
 }
 
 struct ExperimentalFeaturesDefaultHandler: ExperimentalFeaturesHandler {
-    func isHTMLNewTabPageEnabledDidChange(_ isEnabled: Bool) {
+    func flagDidChange(_ featureFlag: FeatureFlag, isEnabled: Bool) {
+        switch featureFlag {
+        case .htmlNewTabPage:
+            isHTMLNewTabPageEnabledDidChange(isEnabled)
+        default:
+            break
+        }
+    }
+
+    private func isHTMLNewTabPageEnabledDidChange(_ isEnabled: Bool) {
         Task { @MainActor in
             WindowControllersManager.shared.mainWindowControllers.forEach { mainWindowController in
                 if mainWindowController.mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab {
@@ -47,27 +71,53 @@ struct ExperimentalFeaturesDefaultHandler: ExperimentalFeaturesHandler {
 final class ExperimentalFeatures {
 
     let internalUserDecider: InternalUserDecider
+    let featureFlagger: FeatureFlagger
     private var persistor: ExperimentalFeaturesPersistor
     private var actionHandler: ExperimentalFeaturesHandler
 
     init(
         internalUserDecider: InternalUserDecider,
-        persistor: ExperimentalFeaturesPersistor = ExperimentalFeaturesUserDefaultsPersistor(),
+        featureFlagger: FeatureFlagger,
+        persistor: ExperimentalFeaturesPersistor = ExperimentalFeaturesUserDefaultsPersistor(keyValueStore: UserDefaults.appConfiguration),
         actionHandler: ExperimentalFeaturesHandler = ExperimentalFeaturesDefaultHandler()
     ) {
         self.internalUserDecider = internalUserDecider
+        self.featureFlagger = featureFlagger
         self.persistor = persistor
         self.actionHandler = actionHandler
     }
 
-    var isHTMLNewTabPageEnabled: Bool {
-        get {
-            persistor.isHTMLNewTabPageEnabled
+    func toggleOverride(for featureFlag: FeatureFlag) {
+        guard internalUserDecider.isInternalUser else {
+            return
         }
-        set {
-            if newValue != persistor.isHTMLNewTabPageEnabled {
-                persistor.isHTMLNewTabPageEnabled = newValue
-                actionHandler.isHTMLNewTabPageEnabledDidChange(newValue)
+        let currentValue = persistor.value(for: featureFlag) ?? false
+        let newValue = !currentValue
+        persistor.set(!currentValue, for: featureFlag)
+        actionHandler.flagDidChange(featureFlag, isEnabled: newValue)
+    }
+
+    func override(for featureFlag: FeatureFlag) -> Bool? {
+        guard internalUserDecider.isInternalUser else {
+            return nil
+        }
+        switch featureFlag {
+        case .htmlNewTabPage:
+            return persistor.value(for: featureFlag)
+        default:
+            return nil
+        }
+    }
+
+    func clearAllOverrides() {
+        FeatureFlag.allCases.forEach { flag in
+            guard let override = override(for: flag) else {
+                return
+            }
+            persistor.set(nil, for: flag)
+            let defaultValue = featureFlagger.isFeatureOn(flag)
+            if defaultValue != override {
+                actionHandler.flagDidChange(flag, isEnabled: defaultValue)
             }
         }
     }

@@ -30,6 +30,8 @@ final class ExperimentalFeaturesMenu: NSMenu {
 
         buildItems {
             htmlNewTabPageMenuItem
+            NSMenuItem.separator()
+            NSMenuItem(title: "Reset All Overrides", action: #selector(resetAllOverrides(_:))).targetting(self)
         }
     }
 
@@ -39,10 +41,18 @@ final class ExperimentalFeaturesMenu: NSMenu {
 
     override func update() {
         super.update()
-        htmlNewTabPageMenuItem.state = NSApp.delegateTyped.experimentalFeatures.isHTMLNewTabPageEnabled ? .on : .off
+        let featureFlagger = experimentalFeatures.featureFlagger
+
+        let isHTMLNTPOn = featureFlagger.isFeatureOn(.htmlNewTabPage, allowOverride: false)
+        htmlNewTabPageMenuItem.title = "HTML New Tab Page (default: \(isHTMLNTPOn ? "on" : "off"))"
+        htmlNewTabPageMenuItem.state = featureFlagger.isFeatureOn(.htmlNewTabPage) ? .on : .off
     }
 
     @objc func toggleHTMLNewTabPage(_ sender: NSMenuItem) {
-        experimentalFeatures.isHTMLNewTabPageEnabled.toggle()
+        experimentalFeatures.toggleOverride(for: .htmlNewTabPage)
+    }
+
+    @objc func resetAllOverrides(_ sender: NSMenuItem) {
+        experimentalFeatures.clearAllOverrides()
     }
 }

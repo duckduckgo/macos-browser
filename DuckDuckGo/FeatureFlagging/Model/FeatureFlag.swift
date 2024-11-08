@@ -19,7 +19,7 @@
 import Foundation
 import BrowserServicesKit
 
-public enum FeatureFlag: String {
+public enum FeatureFlag: String, CaseIterable {
     case debugMenu
     case sslCertificatesBypass
     case phishingDetectionErrorPage
@@ -41,6 +41,8 @@ public enum FeatureFlag: String {
 
     /// https://app.asana.com/0/72649045549333/1208231259093710/f
     case networkProtectionUserTips
+
+    case htmlNewTabPage
 }
 
 extension FeatureFlag: FeatureFlagSourceProviding {
@@ -66,12 +68,32 @@ extension FeatureFlag: FeatureFlagSourceProviding {
             return .remoteReleasable(.subfeature(AutofillSubfeature.credentialsImportPromotionForExistingUsers))
         case .networkProtectionUserTips:
             return .remoteDevelopment(.subfeature(NetworkProtectionSubfeature.userTips))
+        case .htmlNewTabPage:
+            return .disabled
         }
     }
 }
 
+protocol LocalFeatureFlagOverriding {
+    func localOverride(for featureFlag: FeatureFlag) -> Bool?
+}
+
+extension FeatureFlag: LocalFeatureFlagOverriding {
+    func localOverride(for featureFlag: FeatureFlag) -> Bool? {
+        NSApp.delegateTyped.experimentalFeatures.override(for: featureFlag)
+    }
+
+    var localOverride: Bool? {
+        localOverride(for: self)
+    }
+}
+
 extension FeatureFlagger {
-    public func isFeatureOn(_ featureFlag: FeatureFlag) -> Bool {
-        isFeatureOn(forProvider: featureFlag)
+
+    public func isFeatureOn(_ featureFlag: FeatureFlag, allowOverride: Bool = true) -> Bool {
+        if allowOverride, let localOverride = featureFlag.localOverride {
+            return localOverride
+        }
+        return isFeatureOn(forProvider: featureFlag)
     }
 }

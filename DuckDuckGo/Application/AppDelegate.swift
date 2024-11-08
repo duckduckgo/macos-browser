@@ -302,7 +302,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                                                        freemiumDBPUserStateManager: freemiumDBPUserStateManager)
         freemiumDBPPromotionViewCoordinator = FreemiumDBPPromotionViewCoordinator(freemiumDBPUserStateManager: freemiumDBPUserStateManager,
                                                                                   freemiumDBPFeature: freemiumDBPFeature)
-        experimentalFeatures = ExperimentalFeatures(internalUserDecider: internalUserDecider)
+        experimentalFeatures = ExperimentalFeatures(internalUserDecider: internalUserDecider, featureFlagger: featureFlagger)
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {
