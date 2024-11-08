@@ -684,6 +684,10 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         }
     }
 
+    func command(_ command: VPNCommand) async throws {
+        try await sendProviderMessageToActiveSession(.request(.command(command)))
+    }
+
     /// Restarts the tunnel.
     ///
     @MainActor
@@ -769,6 +773,11 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             Self.simulationOptions.setEnabled(true, option: .connectionInterruption)
             try await sendProviderMessageToActiveSession(.simulateConnectionInterruption)
         }
+    }
+
+    @MainActor
+    private func sendProviderRequestToActiveSession(_ request: ExtensionRequest) async throws {
+        try await sendProviderMessageToActiveSession(.request(request))
     }
 
     @MainActor
