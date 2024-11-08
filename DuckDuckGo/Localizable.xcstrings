@@ -55243,18 +55243,6 @@
         }
       }
     },
-    "remove.suggestion.tooltip" : {
-      "comment" : "Tooltip for the button which removes the history entry from the history",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Remove from browsing history"
-          }
-        }
-      }
-    },
     "Reopen All Windows from Last Session" : {
       "comment" : "Main Menu History item",
       "localizations" : {
