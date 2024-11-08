@@ -90,7 +90,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let bookmarksManager = LocalBookmarkManager.shared
     var privacyDashboardWindow: NSWindow?
 
-    let experimentalFeatures: ExperimentalFeatures
+    let featureFlagOverrides: FeatureFlagOverrides
     let activeRemoteMessageModel: ActiveRemoteMessageModel
     let homePageSettingsModel = HomePage.Models.SettingsModel()
     let remoteMessagingClient: RemoteMessagingClient!
@@ -302,7 +302,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                                                        freemiumDBPUserStateManager: freemiumDBPUserStateManager)
         freemiumDBPPromotionViewCoordinator = FreemiumDBPPromotionViewCoordinator(freemiumDBPUserStateManager: freemiumDBPUserStateManager,
                                                                                   freemiumDBPFeature: freemiumDBPFeature)
-        experimentalFeatures = ExperimentalFeatures(internalUserDecider: internalUserDecider, featureFlagger: featureFlagger)
+        featureFlagOverrides = FeatureFlagOverrides(internalUserDecider: internalUserDecider, featureFlagger: featureFlagger)
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {

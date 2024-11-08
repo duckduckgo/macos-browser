@@ -18,14 +18,14 @@
 
 import AppKit
 
-final class ExperimentalFeaturesMenu: NSMenu {
+final class FeatureFlagOverridesMenu: NSMenu {
 
-    let experimentalFeatures: ExperimentalFeatures
+    let featureFlagOverrides: FeatureFlagOverrides
 
     private(set) lazy var htmlNewTabPageMenuItem = NSMenuItem(title: "HTML New Tab Page", action: #selector(toggleHTMLNewTabPage(_:))).targetting(self)
 
-    init(experimentalFeatures: ExperimentalFeatures) {
-        self.experimentalFeatures = experimentalFeatures
+    init(featureFlagOverrides: FeatureFlagOverrides) {
+        self.featureFlagOverrides = featureFlagOverrides
         super.init(title: "")
 
         buildItems {
@@ -41,7 +41,7 @@ final class ExperimentalFeaturesMenu: NSMenu {
 
     override func update() {
         super.update()
-        let featureFlagger = experimentalFeatures.featureFlagger
+        let featureFlagger = featureFlagOverrides.featureFlagger
 
         let isHTMLNTPOn = featureFlagger.isFeatureOn(.htmlNewTabPage, allowOverride: false)
         htmlNewTabPageMenuItem.title = "HTML New Tab Page (default: \(isHTMLNTPOn ? "on" : "off"))"
@@ -49,10 +49,10 @@ final class ExperimentalFeaturesMenu: NSMenu {
     }
 
     @objc func toggleHTMLNewTabPage(_ sender: NSMenuItem) {
-        experimentalFeatures.toggleOverride(for: .htmlNewTabPage)
+        featureFlagOverrides.toggleOverride(for: .htmlNewTabPage)
     }
 
     @objc func resetAllOverrides(_ sender: NSMenuItem) {
-        experimentalFeatures.clearAllOverrides()
+        featureFlagOverrides.clearAllOverrides()
     }
 }

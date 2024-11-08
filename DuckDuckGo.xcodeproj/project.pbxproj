@@ -1058,10 +1058,10 @@
 		370C230F2C76A3D600A80A3E /* SettingsGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370C23042C76A31F00A80A3E /* SettingsGrid.swift */; };
 		370C23112C7747E200A80A3E /* ImageProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370C23102C7747E200A80A3E /* ImageProcessor.swift */; };
 		370C23122C7747E200A80A3E /* ImageProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370C23102C7747E200A80A3E /* ImageProcessor.swift */; };
-		37115A0F2CDCE63800F2FF5C /* ExperimentalFeaturesMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37115A0E2CDCE63300F2FF5C /* ExperimentalFeaturesMenu.swift */; };
-		37115A102CDCE63800F2FF5C /* ExperimentalFeaturesMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37115A0E2CDCE63300F2FF5C /* ExperimentalFeaturesMenu.swift */; };
-		37115A142CDCE65D00F2FF5C /* ExperimentalFeatures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37115A122CDCE65D00F2FF5C /* ExperimentalFeatures.swift */; };
-		37115A152CDCE65D00F2FF5C /* ExperimentalFeatures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37115A122CDCE65D00F2FF5C /* ExperimentalFeatures.swift */; };
+		37115A0F2CDCE63800F2FF5C /* FeatureFlagOverridesMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37115A0E2CDCE63300F2FF5C /* FeatureFlagOverridesMenu.swift */; };
+		37115A102CDCE63800F2FF5C /* FeatureFlagOverridesMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37115A0E2CDCE63300F2FF5C /* FeatureFlagOverridesMenu.swift */; };
+		37115A142CDCE65D00F2FF5C /* FeatureFlagOverrides.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37115A122CDCE65D00F2FF5C /* FeatureFlagOverrides.swift */; };
+		37115A152CDCE65D00F2FF5C /* FeatureFlagOverrides.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37115A122CDCE65D00F2FF5C /* FeatureFlagOverrides.swift */; };
 		371209212C232E3F003ADF3D /* RemoteMessagingClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371209202C232E3F003ADF3D /* RemoteMessagingClient.swift */; };
 		371209232C232E66003ADF3D /* RemoteMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 371209222C232E66003ADF3D /* RemoteMessaging */; };
 		371209252C232E6C003ADF3D /* RemoteMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 371209242C232E6C003ADF3D /* RemoteMessaging */; };
@@ -3551,8 +3551,8 @@
 		370C23082C76A39900A80A3E /* BackgroundCategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundCategoryView.swift; sourceTree = "<group>"; };
 		370C230A2C76A3BC00A80A3E /* BackgroundThumbnailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundThumbnailView.swift; sourceTree = "<group>"; };
 		370C23102C7747E200A80A3E /* ImageProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageProcessor.swift; sourceTree = "<group>"; };
-		37115A0E2CDCE63300F2FF5C /* ExperimentalFeaturesMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExperimentalFeaturesMenu.swift; sourceTree = "<group>"; };
-		37115A122CDCE65D00F2FF5C /* ExperimentalFeatures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExperimentalFeatures.swift; sourceTree = "<group>"; };
+		37115A0E2CDCE63300F2FF5C /* FeatureFlagOverridesMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureFlagOverridesMenu.swift; sourceTree = "<group>"; };
+		37115A122CDCE65D00F2FF5C /* FeatureFlagOverrides.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureFlagOverrides.swift; sourceTree = "<group>"; };
 		371209202C232E3F003ADF3D /* RemoteMessagingClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMessagingClient.swift; sourceTree = "<group>"; };
 		371209292C2333A0003ADF3D /* RemoteMessagingDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMessagingDatabase.swift; sourceTree = "<group>"; };
 		3712092B2C23383C003ADF3D /* RemoteMessagingStoreErrorHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMessagingStoreErrorHandling.swift; sourceTree = "<group>"; };
@@ -5276,6 +5276,8 @@
 			isa = PBXGroup;
 			children = (
 				EECE10E429DD77E60044D027 /* FeatureFlag.swift */,
+				37115A122CDCE65D00F2FF5C /* FeatureFlagOverrides.swift */,
+				37115A0E2CDCE63300F2FF5C /* FeatureFlagOverridesMenu.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -5628,15 +5630,6 @@
 				37E2608E2C8A3ABE006EE07F /* HomePageSettingsModelNavigator.swift */,
 			);
 			path = HomePageSettings;
-			sourceTree = "<group>";
-		};
-		37115A132CDCE65D00F2FF5C /* ExperimentalFeatures */ = {
-			isa = PBXGroup;
-			children = (
-				37115A122CDCE65D00F2FF5C /* ExperimentalFeatures.swift */,
-				37115A0E2CDCE63300F2FF5C /* ExperimentalFeaturesMenu.swift */,
-			);
-			path = ExperimentalFeatures;
 			sourceTree = "<group>";
 		};
 		3712091F2C232E2B003ADF3D /* RemoteMessaging */ = {
@@ -7763,7 +7756,6 @@
 				4B5F15032A1570F10060320F /* DuckDuckGoDebug.entitlements */,
 				4B65143C26392483005B46EB /* Email */,
 				B68412192B6A16030092F66A /* ErrorPage */,
-				37115A132CDCE65D00F2FF5C /* ExperimentalFeatures */,
 				AA5FA695275F823900DCE9C9 /* Favicons */,
 				1D36E651298A84F600AA485D /* FeatureFlagging */,
 				AA3863C227A1E1C000749AB5 /* Feedback */,
@@ -11246,7 +11238,7 @@
 				3706FB13293F65D500E42796 /* Bookmark.swift in Sources */,
 				3706FB14293F65D500E42796 /* ConnectBitwardenViewModel.swift in Sources */,
 				3706FB15293F65D500E42796 /* NSNotificationName+DataImport.swift in Sources */,
-				37115A152CDCE65D00F2FF5C /* ExperimentalFeatures.swift in Sources */,
+				37115A152CDCE65D00F2FF5C /* FeatureFlagOverrides.swift in Sources */,
 				EE6666702B56EDE4001D898D /* VPNLocationsHostingViewController.swift in Sources */,
 				3706FB16293F65D500E42796 /* StoredPermission.swift in Sources */,
 				3706FB17293F65D500E42796 /* FirePopoverCollectionViewHeader.swift in Sources */,
@@ -11416,7 +11408,7 @@
 				567A23D82C8871290010F66C /* OnboardingFireButtonDialogViewModel.swift in Sources */,
 				37FD78122A29EBD100B36DB1 /* SyncErrorHandler.swift in Sources */,
 				1D4B03D62CA4432000224E99 /* BookmarkUrlExtension.swift in Sources */,
-				37115A102CDCE63800F2FF5C /* ExperimentalFeaturesMenu.swift in Sources */,
+				37115A102CDCE63800F2FF5C /* FeatureFlagOverridesMenu.swift in Sources */,
 				987799F42999993C005D8EB6 /* LegacyBookmarksStoreMigration.swift in Sources */,
 				3706FB7A293F65D500E42796 /* FileDownloadManager.swift in Sources */,
 				3706FB7B293F65D500E42796 /* BookmarkImport.swift in Sources */,
@@ -12890,7 +12882,7 @@
 				1D6A492029CF7A490011DF74 /* NSPopoverExtension.swift in Sources */,
 				37CC53F427E8D4620028713D /* NSPathControlView.swift in Sources */,
 				B6BF5D8929470BC4006742B1 /* HTTPSUpgradeTabExtension.swift in Sources */,
-				37115A142CDCE65D00F2FF5C /* ExperimentalFeatures.swift in Sources */,
+				37115A142CDCE65D00F2FF5C /* FeatureFlagOverrides.swift in Sources */,
 				1D36E65B298ACD2900AA485D /* AppIconChanger.swift in Sources */,
 				4B4D60E22A0C883A00BCD287 /* AppMain.swift in Sources */,
 				7BCB90C22C18626E008E3543 /* VPNControllerXPCClient+ConvenienceInitializers.swift in Sources */,
@@ -12916,7 +12908,7 @@
 				AAE246F8270A406200BEEAEE /* FirePopoverCollectionViewHeader.swift in Sources */,
 				314872742CC653D500EEF89B /* AIChatOnboardingPopover.swift in Sources */,
 				AAB7320926DD0CD9002FACF9 /* FireViewController.swift in Sources */,
-				37115A0F2CDCE63800F2FF5C /* ExperimentalFeaturesMenu.swift in Sources */,
+				37115A0F2CDCE63800F2FF5C /* FeatureFlagOverridesMenu.swift in Sources */,
 				31C26A0D2CBE9DFE00FFF462 /* AIChatPreferences.swift in Sources */,
 				4B92928C26670D1700AD2C21 /* OutlineSeparatorViewCell.swift in Sources */,
 				8426108D2C9811F30070D5F9 /* KeyEquivalentView.swift in Sources */,

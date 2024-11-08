@@ -619,8 +619,8 @@ final class MainMenu: NSMenu {
     @MainActor
     private func setupDebugMenu() -> NSMenu {
         let debugMenu = NSMenu(title: "Debug") {
-            NSMenuItem(title: "Experimental features")
-                .submenu(ExperimentalFeaturesMenu(experimentalFeatures: NSApp.delegateTyped.experimentalFeatures))
+            NSMenuItem(title: "Feature Flag Overrides")
+                .submenu(FeatureFlagOverridesMenu(featureFlagOverrides: NSApp.delegateTyped.featureFlagOverrides))
             NSMenuItem.separator()
             NSMenuItem(title: "Open Vanilla Browser", action: #selector(MainViewController.openVanillaBrowser)).withAccessibilityIdentifier("MainMenu.openVanillaBrowser")
             NSMenuItem.separator()

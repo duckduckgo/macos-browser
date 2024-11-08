@@ -80,7 +80,7 @@ protocol LocalFeatureFlagOverriding {
 
 extension FeatureFlag: LocalFeatureFlagOverriding {
     func localOverride(for featureFlag: FeatureFlag) -> Bool? {
-        NSApp.delegateTyped.experimentalFeatures.override(for: featureFlag)
+        NSApp.delegateTyped.featureFlagOverrides.override(for: featureFlag)
     }
 
     var localOverride: Bool? {

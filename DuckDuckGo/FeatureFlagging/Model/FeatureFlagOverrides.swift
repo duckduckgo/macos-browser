@@ -20,12 +20,12 @@ import BrowserServicesKit
 import Foundation
 import Persistence
 
-protocol ExperimentalFeaturesPersistor {
+protocol FeatureFlagOverridesPersistor {
     func value(for flag: FeatureFlag) -> Bool?
     func set(_ value: Bool?, for flag: FeatureFlag)
 }
 
-struct ExperimentalFeaturesUserDefaultsPersistor: ExperimentalFeaturesPersistor {
+struct FeatureFlagOverridesUserDefaultsPersistor: FeatureFlagOverridesPersistor {
     let keyValueStore: KeyValueStoring
 
     func value(for flag: FeatureFlag) -> Bool? {
@@ -43,11 +43,11 @@ struct ExperimentalFeaturesUserDefaultsPersistor: ExperimentalFeaturesPersistor 
     }
 }
 
-protocol ExperimentalFeaturesHandler {
+protocol FeatureFlagOverridesHandler {
     func flagDidChange(_ featureFlag: FeatureFlag, isEnabled: Bool)
 }
 
-struct ExperimentalFeaturesDefaultHandler: ExperimentalFeaturesHandler {
+struct FeatureFlagOverridesDefaultHandler: FeatureFlagOverridesHandler {
     func flagDidChange(_ featureFlag: FeatureFlag, isEnabled: Bool) {
         switch featureFlag {
         case .htmlNewTabPage:
@@ -68,18 +68,18 @@ struct ExperimentalFeaturesDefaultHandler: ExperimentalFeaturesHandler {
     }
 }
 
-final class ExperimentalFeatures {
+final class FeatureFlagOverrides {
 
     let internalUserDecider: InternalUserDecider
     let featureFlagger: FeatureFlagger
-    private var persistor: ExperimentalFeaturesPersistor
-    private var actionHandler: ExperimentalFeaturesHandler
+    private var persistor: FeatureFlagOverridesPersistor
+    private var actionHandler: FeatureFlagOverridesHandler
 
     init(
         internalUserDecider: InternalUserDecider,
         featureFlagger: FeatureFlagger,
-        persistor: ExperimentalFeaturesPersistor = ExperimentalFeaturesUserDefaultsPersistor(keyValueStore: UserDefaults.appConfiguration),
-        actionHandler: ExperimentalFeaturesHandler = ExperimentalFeaturesDefaultHandler()
+        persistor: FeatureFlagOverridesPersistor = FeatureFlagOverridesUserDefaultsPersistor(keyValueStore: UserDefaults.appConfiguration),
+        actionHandler: FeatureFlagOverridesHandler = FeatureFlagOverridesDefaultHandler()
     ) {
         self.internalUserDecider = internalUserDecider
         self.featureFlagger = featureFlagger
