@@ -54,6 +54,9 @@ extension Tab: NavigationResponder {
             // Duck Player overlay navigations handling
             .weak(nullable: self.duckPlayer),
 
+            // AI Chat onboarding navigations handling
+            .weak(nullable: self.aiChatOnboarding),
+
             // open external scheme link in another app
             .weak(nullable: self.externalAppSchemeHandler),
 

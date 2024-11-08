@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "sabrina/onboarding-import-state",
-        "revision" : "3aa45c028914206c3ecc24fcd51d365af32ca8fa"
+        "revision" : "26cc3c597990db8a0f8aa4be743b25ce65076c95",
+        "version" : "207.1.0"
       }
     },
     {
@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "branch" : "pr-releases/pr-1180",
-        "revision" : "82be5d3ada8ff7743b08e5139c9e9ba83d66841c"
+        "revision" : "1733ee59f06f6e725a98cf6cd8322159f59d664b",
+        "version" : "6.31.0"
       }
     },
     {

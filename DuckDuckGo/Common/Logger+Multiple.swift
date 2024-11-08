@@ -28,4 +28,5 @@ extension Logger {
     static var tabSnapshots = { Logger(subsystem: "Tab Snapshots", category: "") }()
     static var tabLazyLoading = { Logger(subsystem: "Lazy Loading", category: "") }()
     static var updates = { Logger(subsystem: "Updates", category: "") }()
+    static var tabPreview = { Logger(subsystem: "Tab Preview", category: "") }()
 }
