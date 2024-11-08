@@ -14971,8 +14971,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 207.0.0;
+				branch = "sabrina/add-experiment-manager";
+				kind = branch;
 			};
 		};
 		9D84E4002CD4E66F0046CD8B /* XCRemoteSwiftPackageReference "OHHTTPStubs" */ = {
