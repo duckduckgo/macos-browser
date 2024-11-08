@@ -37,7 +37,7 @@ final class DBPEndToEndTests: XCTestCase {
     let testUserDefault = UserDefaults(suiteName: #function)!
 
     override func setUpWithError() throws {
-        continueAfterFailure = true
+        continueAfterFailure = false
 
         loginItemsManager = LoginItemsManager()
         loginItemsManager.disableLoginItems([LoginItem.dbpBackgroundAgent])
