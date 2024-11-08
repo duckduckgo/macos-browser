@@ -110,7 +110,7 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
         return OnboardingConfiguration(stepDefinitions: stepDefinitions, exclude: [], order: order, env: env, locale: preferredLocale, platform: platform)
     }()
 
-    init(navigationDelegate: OnboardingNavigating, 
+    init(navigationDelegate: OnboardingNavigating,
          dockCustomization: DockCustomization,
          defaultBrowserProvider: DefaultBrowserProvider,
          appearancePreferences: AppearancePreferences,
