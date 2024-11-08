@@ -1,5 +1,5 @@
 //
-//  ExperimentalFeatures.swift
+//  FeatureFlagOverrides.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
