@@ -23,7 +23,7 @@ import PixelKit
 
 protocol DataImportStatusProviding {
     var didImport: Bool { get }
-    func showImportWindow(completion: (() -> Void)?)
+    func showImportWindow(customTitle: String?, completion: (() -> Void)?)
 }
 
 final class BookmarksAndPasswordsImportStatusProvider: DataImportStatusProviding {
@@ -50,8 +50,8 @@ final class BookmarksAndPasswordsImportStatusProvider: DataImportStatusProviding
     }
 
     @MainActor
-    func showImportWindow(completion: (() -> Void)?) {
-        DataImportView().show(completion: completion)
+    func showImportWindow(customTitle: String?, completion: (() -> Void)?) {
+        DataImportView(title: customTitle ?? UserText.importDataTitle).show(completion: completion)
     }
 
     // It only cover the case in which the user has imported bookmar AFTER already having some bookmarks
