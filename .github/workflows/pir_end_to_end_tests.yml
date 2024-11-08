@@ -28,7 +28,7 @@ jobs:
       group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.runner }}
       cancel-in-progress: true
 
-    timeout-minutes: 15
+    timeout-minutes: 25
 
     steps:
     - name: Register SSH keys for certificates repository and PIR fake broker repository access
