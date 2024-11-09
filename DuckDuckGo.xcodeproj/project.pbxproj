@@ -10749,7 +10749,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [ \"$CONFIGURATION\" != \"Debug\" ] || [ \"$ENABLE_PREVIEWS\" = \"YES\" ]; then exit 0; fi\n#${BUILT_PRODUCTS_DIR}/SwiftLintTool\n";
+			shellScript = "if [ \"$CONFIGURATION\" != \"Debug\" ] || [ \"$ENABLE_PREVIEWS\" = \"YES\" ]; then exit 0; fi\n${BUILT_PRODUCTS_DIR}/SwiftLintTool\n";
 		};
 		3121F62B2B64266A002F706A /* Copy Swift Package resources */ = {
 			isa = PBXShellScriptBuildPhase;
