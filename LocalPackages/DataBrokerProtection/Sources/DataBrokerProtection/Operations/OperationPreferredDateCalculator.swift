@@ -44,10 +44,10 @@ struct OperationPreferredDateCalculator {
             if isDeprecated {
                 return nil
             } else {
-                return Date().addingTimeInterval(schedulingConfig.maintenanceScan.hoursToSeconds)
+                return Date().addingTimeInterval(schedulingConfig.maintenanceScan.just30Minutes)
             }
         case .noMatchFound, .matchesFound, .reAppearence:
-            return Date().addingTimeInterval(schedulingConfig.maintenanceScan.hoursToSeconds)
+            return Date().addingTimeInterval(schedulingConfig.maintenanceScan.just30Minutes)
         case .error:
             return Date().addingTimeInterval(schedulingConfig.retryError.hoursToSeconds)
         case .optOutStarted, .scanStarted:
@@ -102,7 +102,7 @@ struct OperationPreferredDateCalculator {
             return false
         }
 
-        let lastRemovalEventDate = lastRemovalEvent.date.addingTimeInterval(schedulingConfig.maintenanceScan.hoursToSeconds)
+        let lastRemovalEventDate = lastRemovalEvent.date.addingTimeInterval(schedulingConfig.maintenanceScan.just30Minutes)
         return lastRemovalEventDate < Date()
     }
 

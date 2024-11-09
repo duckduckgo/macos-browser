@@ -31,6 +31,10 @@ extension Int {
     var hoursToSeconds: TimeInterval {
         return TimeInterval(self * 3600)
     }
+
+    var just30Minutes: TimeInterval {
+        TimeInterval(60*30)
+    }
 }
 
 struct MirrorSite: Codable, Sendable {

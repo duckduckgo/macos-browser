@@ -52,7 +52,7 @@ final class ScanJob: DataBrokerJob {
          emailService: EmailServiceProtocol,
          captchaService: CaptchaServiceProtocol,
          cookieHandler: CookieHandler = BrokerCookieHandler(),
-         operationAwaitTime: TimeInterval = 3,
+         operationAwaitTime: TimeInterval = 1,
          clickAwaitTime: TimeInterval = 0,
          stageDurationCalculator: StageDurationCalculator,
          pixelHandler: EventMapping<DataBrokerProtectionPixels>,

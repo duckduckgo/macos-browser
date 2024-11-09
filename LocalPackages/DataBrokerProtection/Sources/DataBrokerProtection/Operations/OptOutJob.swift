@@ -58,7 +58,7 @@ final class OptOutJob: DataBrokerJob {
          emailService: EmailServiceProtocol,
          captchaService: CaptchaServiceProtocol,
          cookieHandler: CookieHandler = BrokerCookieHandler(),
-         operationAwaitTime: TimeInterval = 3,
+         operationAwaitTime: TimeInterval = 1,
          clickAwaitTime: TimeInterval = 40,
          stageCalculator: StageDurationCalculator,
          pixelHandler: EventMapping<DataBrokerProtectionPixels>,
