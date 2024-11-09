@@ -15023,8 +15023,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = "jacek/behavioral-toast-udpates";
-				kind = branch;
+				kind = exactVersion;
+				version = 208.0.0;
 			};
 		};
 		9D84E4002CD4E66F0046CD8B /* XCRemoteSwiftPackageReference "OHHTTPStubs" */ = {
