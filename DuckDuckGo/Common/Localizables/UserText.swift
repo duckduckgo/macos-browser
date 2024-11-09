@@ -1346,6 +1346,11 @@ struct UserText {
         static let daxDialogTapTheShield = NSLocalizedString("contextual.onboarding.browsing.trackers.tap.shield", value: "☝️ Tap the shield for more info.", comment: "Suggests to tap to a shield shaped icon that is above the copy")
     }
 
+    enum BrokenSitePrompt {
+        static let title = NSLocalizedString("site.not.working.title", value: "Site not working?", comment: "Title that appears on a dialog asking users about possible breakage of a site")
+        static let buttonTitle = NSLocalizedString("site.not.working.button.title", value: "Let Us Know", comment: "Button title that appears on a dialog asking users about possible breakage of a site")
+    }
+
     // Key: "subscription.menu.item"
     // Comment: "Title for Subscription item in the options menu"
     static let subscriptionOptionsMenuItem = "Privacy Pro"

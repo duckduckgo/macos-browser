@@ -24,6 +24,7 @@ import NetworkProtection
 import NetworkProtectionUI
 import NetworkProtectionIPC
 import PixelKit
+import PrivacyDashboard
 
 protocol PopoverPresenter {
     func show(_ popover: NSPopover, positionedBelow view: NSView)
@@ -162,11 +163,11 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
         show(popover, positionedBelow: button)
     }
 
-    func togglePrivacyDashboardPopover(for tabViewModel: TabViewModel?, from button: MouseOverButton) {
+    func togglePrivacyDashboardPopover(for tabViewModel: TabViewModel?, from button: MouseOverButton, entryPoint: PrivacyDashboardEntryPoint) {
         if privacyDashboardPopover?.isShown == true {
             closePrivacyDashboard()
         } else if let tabViewModel {
-            openPrivacyDashboard(for: tabViewModel, from: button)
+            openPrivacyDashboard(for: tabViewModel, from: button, entryPoint: entryPoint)
         }
     }
 
@@ -314,10 +315,10 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
         autofillOnboardingPopover?.close()
     }
 
-    func openPrivacyDashboard(for tabViewModel: TabViewModel, from button: MouseOverButton) {
+    func openPrivacyDashboard(for tabViewModel: TabViewModel, from button: MouseOverButton, entryPoint: PrivacyDashboardEntryPoint) {
         guard closeTransientPopovers() else { return }
 
-        let popover = PrivacyDashboardPopover()
+        let popover = PrivacyDashboardPopover(entryPoint: entryPoint)
         popover.delegate = self
         self.privacyDashboardPopover = popover
         self.subscribePrivacyDashboardPendingUpdates(for: popover)
