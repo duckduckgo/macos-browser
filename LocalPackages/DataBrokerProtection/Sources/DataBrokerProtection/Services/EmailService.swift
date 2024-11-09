@@ -67,6 +67,7 @@ struct EmailService: EmailServiceProtocol {
     }
 
     func getEmail(dataBrokerURL: String, attemptId: UUID) async throws -> EmailData {
+
         var urlComponents = URLComponents(url: settings.selectedEnvironment.endpointURL, resolvingAgainstBaseURL: true)
         urlComponents?.path = "\(Constants.endpointSubPath)/generate"
         urlComponents?.queryItems = [

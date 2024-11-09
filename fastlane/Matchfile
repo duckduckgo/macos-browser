@@ -60,7 +60,8 @@ for_lane :sync_signing_ci do
         "com.duckduckgo.macos.vpn.debug",
         "com.duckduckgo.mobile.ios.vpn.agent.debug",
         "com.duckduckgo.macos.DBP.backgroundAgent.debug",
-        "com.duckduckgo.mobile.ios.DBP.backgroundAgent.debug"
+        "com.duckduckgo.mobile.ios.DBP.backgroundAgent.debug",
+        "com.duckduckgo.DBPE2ETests"
     ]
     additional_cert_types []
 end

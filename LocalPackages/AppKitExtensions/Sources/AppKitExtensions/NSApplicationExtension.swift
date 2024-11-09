@@ -25,7 +25,7 @@ public extension NSApplication {
         ProcessInfo.processInfo.environment["APP_SANDBOX_CONTAINER_ID"] != nil
     }
 
-    enum RunType {
+    enum RunType: String {
         case normal
         case unitTests
         case integrationTests
@@ -50,7 +50,7 @@ public extension NSApplication {
         if let testBundlePath = ProcessInfo().environment["XCTestBundlePath"] {
             if testBundlePath.contains("Unit") {
                 return .unitTests
-            } else if testBundlePath.contains("Integration") {
+            } else if testBundlePath.contains("Integration") || testBundlePath.contains("DBPE2ETests") {
                 return .integrationTests
             } else {
                 return .uiTests

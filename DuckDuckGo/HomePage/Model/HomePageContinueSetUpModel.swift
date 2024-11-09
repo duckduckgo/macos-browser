@@ -145,7 +145,7 @@ extension HomePage.Models {
         }
 
         private func performImportBookmarksAndPasswordsAction() {
-            dataImportProvider.showImportWindow(completion: { self.refreshFeaturesMatrix() })
+            dataImportProvider.showImportWindow(customTitle: nil, completion: { self.refreshFeaturesMatrix() })
         }
 
         @MainActor
