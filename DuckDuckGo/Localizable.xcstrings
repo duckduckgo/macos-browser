@@ -43547,7 +43547,7 @@
       }
     },
     "permission.authorization.format" : {
-      "comment" : "Popover asking for domain %@ to use camera/mic/location (%@)",
+      "comment" : "Popover asking for domain %@ to use camera/mic (%@)",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -43602,6 +43602,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Открыть сайту %1$@ доступ (%2$@)?"
+          }
+        }
+      }
+    },
+    "permission.authorization.location" : {
+      "comment" : "Popover asking for domain %@ to use location",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "“%@“ website would like to use your current location."
           }
         }
       }

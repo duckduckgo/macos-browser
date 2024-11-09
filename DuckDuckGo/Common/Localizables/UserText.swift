@@ -546,9 +546,12 @@ struct UserText {
     static let failedToOpenExternally = NSLocalizedString("open.externally.failed", value: "The app required to open that link can’t be found", comment: "’Link’ is link on a website, it couldn't be opened due to the required app not being found")
 
     // MARK: Permission
+    static let locationPermissionAuthorizationFormat = NSLocalizedString("permission.authorization.location",
+                                                                         value: "“%@“ website would like to use your current location.",
+                                                                         comment: "Popover asking for domain %@ to use location")
     static let devicePermissionAuthorizationFormat = NSLocalizedString("permission.authorization.format",
                                                                        value: "Allow “%@“ to use your %@?",
-                                                                       comment: "Popover asking for domain %@ to use camera/mic/location (%@)")
+                                                                       comment: "Popover asking for domain %@ to use camera/mic (%@)")
     static let popupWindowsPermissionAuthorizationFormat = NSLocalizedString("permission.authorization.popups.format",
                                                                              value: "Allow “%@“ to open PopUp Window?",
                                                                              comment: "Popover asking for domain %@ to open Popup Window")

@@ -25,6 +25,7 @@ import Navigation
 import PrivacyDashboard
 import TrackerRadarKit
 import WebKit
+import os.log
 
 protocol AdClickAttributionDependencies {
 
@@ -60,6 +61,8 @@ extension AdClickAttributionDetection: AdClickAttributionDetecting {}
 protocol AdClickLogicProtocol: AnyObject {
     var state: AdClickAttributionLogic.State { get }
     var delegate: AdClickAttributionLogicDelegate? { get set }
+
+    var debugID: String { get }
 
     func applyInheritedAttribution(state: AdClickAttributionLogic.State?)
     func onRulesChanged(latestRules: [ContentBlockerRulesManager.Rules])
@@ -131,6 +134,8 @@ final class AdClickAttributionTabExtension: TabExtension {
         self.dependencies = dependencies
         self.dateTimeProvider = dateTimeProvider
         (self.logic, self.detection) = logicsProvider(dependencies)
+
+        Logger.contentBlocking.debug("<\(self.logic.debugID)> AttributionLogic created in Tab Extension")
         self.logic.delegate = self
 
         // delay firing up until UserContentController is published
@@ -143,6 +148,8 @@ final class AdClickAttributionTabExtension: TabExtension {
     }
 
     private func delayedInitialization(with userContentController: UserContentControllerProtocol, inheritedAttribution: AdClickAttributionLogic.State?, contentBlockerRulesScriptPublisher: some Publisher<(any ContentBlockerScriptProtocol)?, Never>, trackerInfoPublisher: some Publisher<DetectedRequest, Never>) {
+
+        Logger.contentBlocking.debug("<\(self.logic.debugID)> Performing delayed initialization")
 
         cancellables.removeAll()
         self.userContentController = userContentController
@@ -179,6 +186,8 @@ extension AdClickAttributionTabExtension: AdClickAttributionLogicDelegate {
             assertionFailure("UserContentController not set")
             return
         }
+
+        Logger.contentBlocking.debug("<\(self.logic.debugID)> Attribution requesting Rule application for \(vendor ?? "<none>")")
 
         let attributedTempListName = AdClickAttributionRulesProvider.Constants.attributedTempRuleListName
 
