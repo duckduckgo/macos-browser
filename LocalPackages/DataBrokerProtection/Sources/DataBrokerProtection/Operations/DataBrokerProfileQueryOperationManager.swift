@@ -320,12 +320,6 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                     schedulingConfig: brokerProfileQueryData.dataBroker.schedulingConfig,
                     database: database
                 )
-                try increaseAttemptCountIfNeeded(
-                    database: database,
-                    brokerId: brokerId,
-                    profileQueryId: profileQueryId,
-                    extractedProfileId: extractedProfileId
-                )
             } catch {
                 handleOperationError(
                     origin: .optOut,
@@ -364,6 +358,12 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                 lastStageDate: stageDurationCalculator.lastStateTime,
                                 startTime: stageDurationCalculator.startTime)
             try database.add(.init(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested))
+            try increaseAttemptCountIfNeeded(
+                database: database,
+                brokerId: brokerId,
+                profileQueryId: profileQueryId,
+                extractedProfileId: extractedProfileId
+            )
         } catch {
             let tries = try? retriesCalculatorUseCase.calculateForOptOut(database: database, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
             stageDurationCalculator.fireOptOutFailure(tries: tries ?? -1)
@@ -397,11 +397,11 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         }
 
     internal func increaseAttemptCountIfNeeded(database: DataBrokerProtectionRepository,
-                                              brokerId: Int64,
-                                              profileQueryId: Int64,
-                                              extractedProfileId: Int64) throws {
+                                               brokerId: Int64,
+                                               profileQueryId: Int64,
+                                               extractedProfileId: Int64) throws {
         guard let events = try? database.fetchOptOutHistoryEvents(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId),
-              events.last?.type == .optOutRequested else {
+              events.sorted(by: { $0.date > $1.date }).first?.type == .optOutRequested else {
             return
         }
 
