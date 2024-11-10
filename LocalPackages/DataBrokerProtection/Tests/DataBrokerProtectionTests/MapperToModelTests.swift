@@ -68,7 +68,7 @@ final class MapperToModelTests: XCTestCase {
                 "url": "https://example.com",
                 "steps": [],
                 "version": "1.0",
-                "schedulingConfig": {"retryError": 1, "confirmOptOutScan": 2, "maintenanceScan": 3}
+                "schedulingConfig": {"retryError": 1, "confirmOptOutScan": 2, "maintenanceScan": 3, "maxAttempts": -1}
             }
             """.data(using: .utf8)!
         let brokerDB = BrokerDB(id: 1, name: "TestBroker", json: brokerData, version: "1.0", url: "https://example.com")
@@ -104,7 +104,7 @@ final class MapperToModelTests: XCTestCase {
                 "name": "TestBroker",
                 "steps": [],
                 "version": "1.0",
-                "schedulingConfig": {"retryError": 1, "confirmOptOutScan": 2, "maintenanceScan": 3}
+                "schedulingConfig": {"retryError": 1, "confirmOptOutScan": 2, "maintenanceScan": 3, "maxAttempts": -1}
             }
             """.data(using: .utf8)!
         let brokerDB = BrokerDB(id: 1, name: "TestBroker", json: brokerData, version: "1.0", url: "")
