@@ -252,7 +252,7 @@ struct DataImportViewModel {
                 if dataTypeSummary.isEmpty, !(screen.isFileImport && screen.fileImportDataType == dataType), nextScreen == nil {
                     nextScreen = .fileImport(dataType: dataType, summary: Set(summary.filter({ $0.value.isSuccess }).keys))
                 }
-                PixelKit.fire(GeneralPixel.dataImportSucceeded(action: .generic, source: importSource, sourceVersion: sourceVersion))
+                PixelKit.fire(GeneralPixel.dataImportSucceeded(action: .init(dataType), source: importSource, sourceVersion: sourceVersion))
             case .failure(let error):
                 // successful imports are appended above
                 self.summary.append( .init(dataType, result) )
