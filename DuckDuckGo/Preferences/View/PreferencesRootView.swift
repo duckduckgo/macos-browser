@@ -46,12 +46,19 @@ enum Preferences {
 
         @ObservedObject var model: PreferencesSidebarModel
 
+        let addressBarModel: HomePage.Models.AddressBarModel
         var subscriptionModel: PreferencesSubscriptionModel?
         let subscriptionManager: SubscriptionManager
         let subscriptionUIHandler: SubscriptionUIHandling
 
-        init(model: PreferencesSidebarModel, subscriptionManager: SubscriptionManager, subscriptionUIHandler: SubscriptionUIHandling) {
+        init(
+            model: PreferencesSidebarModel,
+            addressBarModel: HomePage.Models.AddressBarModel,
+            subscriptionManager: SubscriptionManager,
+            subscriptionUIHandler: SubscriptionUIHandling
+        ) {
             self.model = model
+            self.addressBarModel = addressBarModel
             self.subscriptionManager = subscriptionManager
             self.subscriptionUIHandler = subscriptionUIHandler
             self.subscriptionModel = makeSubscriptionViewModel()
@@ -99,7 +106,7 @@ enum Preferences {
                 case .sync:
                     SyncView()
                 case .appearance:
-                    AppearanceView(model: .shared)
+                    AppearanceView(model: .shared, addressBarModel: addressBarModel)
                 case .dataClearing:
                     DataClearingView(model: DataClearingPreferences.shared)
                 case .vpn:
@@ -154,11 +161,11 @@ enum Preferences {
                     case .iHaveASubscriptionClick:
                         PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseClick)
                     case .activateAddEmailClick:
-                        PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseEmailStart, frequency: .dailyAndCount)
+                        PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseEmailStart, frequency: .legacyDailyAndCount)
                     case .postSubscriptionAddEmailClick:
                         PixelKit.fire(PrivacyProPixel.privacyProWelcomeAddDevice, frequency: .unique)
                     case .restorePurchaseStoreClick:
-                        PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreStart, frequency: .dailyAndCount)
+                        PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreStart, frequency: .legacyDailyAndCount)
                     case .addDeviceEnterEmail:
                         PixelKit.fire(PrivacyProPixel.privacyProAddDeviceEnterEmail)
                     case .activeSubscriptionSettingsClick:

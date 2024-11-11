@@ -134,7 +134,6 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private let configurationStore = ConfigurationStore()
     private let configurationManager: ConfigurationManager
     private let privacyConfigurationManager = VPNPrivacyConfigurationManager()
-    private var configurationSubscription: AnyCancellable?
 
     public init(accountManager: AccountManager,
                 accessTokenStorage: SubscriptionTokenKeychainStorage,
@@ -386,13 +385,6 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
             setUpSubscriptionMonitoring()
 
-            configurationSubscription = privacyConfigurationManager.updatesPublisher
-                .sink { [weak self] in
-                    if self?.privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(BackgroundAgentPixelTestSubfeature.pixelTest) ?? false {
-                        PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionConfigurationPixelTest, frequency: .daily)
-                    }
-                }
-
             if launchedOnStartup {
                 Task {
                     let isConnected = await tunnelController.isConnected
@@ -428,6 +420,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
     private func setUpSubscriptionMonitoring() {
         guard accountManager.isUserAuthenticated else { return }
+
         let entitlementsCheck = {
             await self.accountManager.hasEntitlement(forProductName: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
         }
@@ -454,12 +447,13 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             }
         }
     }
+
 }
 
 extension DuckDuckGoVPNAppDelegate: AccountManagerKeychainAccessDelegate {
 
     public func accountManagerKeychainAccessFailed(accessType: AccountKeychainAccessType, error: AccountKeychainAccessError) {
         PixelKit.fire(PrivacyProErrorPixel.privacyProKeychainAccessError(accessType: accessType, accessError: error),
-                      frequency: .dailyAndCount)
+                      frequency: .legacyDailyAndCount)
     }
 }

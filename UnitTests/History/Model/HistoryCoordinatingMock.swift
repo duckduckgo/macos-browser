@@ -95,4 +95,10 @@ final class HistoryCoordinatingMock: HistoryCoordinating {
         trackerFoundCalled = true
     }
 
+    var removeUrlEntryCalled = false
+    func removeUrlEntry(_ url: URL, completion: (((any Error)?) -> Void)?) {
+        removeUrlEntryCalled = true
+        completion?(nil)
+    }
+
 }

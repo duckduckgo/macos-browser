@@ -1522,6 +1522,366 @@
         }
       }
     },
+    "ai-chat.onboarding.popover.accept" : {
+      "comment" : "AI Chat onboarding CTA for approval",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shortcut hinzufügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add Shortcut"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir acceso directo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter un raccourci"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi scorciatoia"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sneltoets toevoegen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodaj skrót"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicionar atalho"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить ярлык"
+          }
+        }
+      }
+    },
+    "ai-chat.onboarding.popover.confirmation" : {
+      "comment" : "Confirmation for accepting the AI Chat onboarding popover",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI-Chat-Shortcut hinzugefügt!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "AI Chat shortcut added!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Se ha añadido un acceso directo a AI Chat!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Raccourci AI Chat ajouté !"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scorciatoia per AI Chat aggiunta!"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Snelkoppeling naar AI Chat toegevoegd!"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodano skrót do AI Chat!"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atalho do AI Chat adicionado!"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ярлык AI Chat добавлен!"
+          }
+        }
+      }
+    },
+    "ai-chat.onboarding.popover.message-fallback" : {
+      "comment" : "AI Chat onboarding popover message continuation",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du kannst diese und andere AI Chat-Funktionen unter Einstellungen > AI Chat anpassen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You can adjust this and other AI Chat features in Settings > AI Chat"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puedes ajustar esta y otras funciones de AI Chat en Ajustes > AI Chat"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous pouvez ajuster cela et d'autres fonctionnalités d'AI Chat dans Réglages > AI Chat"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puoi regolare questa e altre funzionalità di AI Chat in Impostazioni > AI Chat"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je kunt deze en andere AI Chat-functies aanpassen in Instellingen > AI Chat"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Możesz dostosować tę i inne funkcje AI Chat, wybierając kolejno Ustawienia > AI Chat"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Podes ajustar esta e outras funcionalidades do AI Chat em Definições > AI Chat"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Эту и другие функции AI Chat можно отрегулировать в разделе «Настройки > AI Chat»."
+          }
+        }
+      }
+    },
+    "ai-chat.onboarding.popover.message-markdown" : {
+      "comment" : "AI Chat onboarding popover message, make sure to keep Settings and AI Chat inside ** **",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du kannst diese und andere AI Chat-Funktionen in **Einstellungen** > **AI Chat** anpassen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You can adjust this and other AI Chat features in **Settings** > **AI Chat**."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puedes ajustar esta y otras funciones de AI Chat en **Ajustes** > **AI Chat**."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous pouvez ajuster cela et d'autres fonctionnalités d'AI Chat dans **Réglages** > **AI Chat**."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puoi regolare questa e altre funzionalità di AI Chat in **Impostazioni** > **AI Chat**."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je kunt deze en andere AI Chat-functies aanpassen in **Instellingen** > **AI Chat**."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Możesz dostosować tę i inne funkcje AI Chat, wybierając kolejno **Ustawienia** > **AI Chat**."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Podes ajustar esta e outras funcionalidades do AI Chat em **Definições** > **AI Chat**."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Эту и другие функции AI Chat можно отрегулировать в разделе **Настройки > AI Chat**."
+          }
+        }
+      }
+    },
+    "ai-chat.onboarding.popover.reject" : {
+      "comment" : "AI Chat onboarding CTA for rejection",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nein, danke"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No Thanks"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No, gracias"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non merci"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No, grazie"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nee, bedankt"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie, dziękuję"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não, obrigado"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет, спасибо"
+          }
+        }
+      }
+    },
+    "ai-chat.onboarding.popover.title" : {
+      "comment" : "AI Chat onboarding popover title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Starte AI Chat direkt von deiner Symbolleiste"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Launch AI Chat directly from your toolbar"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inicia AI Chat directamente desde la barra de herramientas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lancez AI Chat directement depuis votre barre d'outils"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avvia AI Chat direttamente dalla barra degli strumenti"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start AI Chat rechtstreeks vanuit je werkbalk"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uruchom AI Chat bezpośrednio z paska narzędzi"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inicia o AI Chat diretamente a partir da tua barra de ferramentas"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Запуск AI Chat прямо с панели инструментов"
+          }
+        }
+      }
+    },
     "ai-chat.preferences.caption" : {
       "comment" : "Ai Chat preferences explanation",
       "extractionState" : "extracted_with_value",
@@ -1578,6 +1938,126 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Чтобы быстрее запускать функцию AI Chat, добавьте ее ярлык на панель инструментов или в меню браузера."
+          }
+        }
+      }
+    },
+    "ai-chat.preferences.caption.link.fallback" : {
+      "comment" : "Ai Chat preferences explanation",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI Chat ist eine optionale Funktion, die unter duck.ai verfügbar ist und es dir ermöglicht, private Unterhaltungen mit beliebten KI-Chatmodellen von Drittanbietern zu führen. Deine Chats werden nicht zum Trainieren von Chatmodellen verwendet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "AI Chat is an optional feature available at duck.ai that lets you have private conversations with popular 3rd-party AI chat models. Your chats are not used to train chat models."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI Chat es una función opcional disponible en duck.ai que te permite tener conversaciones privadas con populares modelos de chat de IA de terceros. Tus chats no se utilizan para entrenar modelos de chat."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI Chat est une fonctionnalité optionnelle disponible sur duck.ai qui vous permet d'avoir des conversations privées avec des modèles de chat IA tiers populaires. Vos discussions ne servent pas à entraîner des modèles de discussion."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI Chat è una funzionalità opzionale disponibile su duck.ai che consente di intrattenere conversazioni private con i più diffusi modelli di chat AI di terze parti. Le tue chat non vengono usate per addestrare modelli di chat."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI Chat is een optionele functie die beschikbaar is op duck.ai en waarmee je privégesprekken kunt voeren met populaire AI-chatmodellen van derden. Je chats worden niet gebruikt om chatmodellen te trainen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI Chat to opcjonalna funkcja dostępna pod adresem duck.ai, która umożliwia prowadzenie prywatnych rozmów z popularnymi modelami czatu AI innych firm. Twoje czaty nie są używane do trenowania modeli czatu."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O AI Chat é uma funcionalidade opcional disponível no duck.ai que te permite ter conversas privadas com modelos de AI chat populares de terceiros. As tuas conversas não são utilizadas para treinar modelos de chat."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI Chat — это дополнительная функция duck.ai, которая позволяет вести приватные беседы с популярными сторонними чат-моделями на базе ИИ. Содержимое чатов не применяется для обучения чат-ботов."
+          }
+        }
+      }
+    },
+    "ai-chat.preferences.caption.link.markdown" : {
+      "comment" : "Ai Chat preferences explanation with a markdown link. Do not translate what's inside [] and ()",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI Chat ist eine optionale Funktion, die unter [duck.ai](https://duck.ai) verfügbar ist und es dir ermöglicht, private Unterhaltungen mit beliebten KI-Chatmodellen von Drittanbietern zu führen. Deine Chats werden nicht zum Trainieren von Chatmodellen verwendet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "AI Chat is an optional feature available at [duck.ai](https://duck.ai) that lets you have private conversations with popular 3rd-party AI chat models. Your chats are not used to train chat models."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI Chat es una función opcional disponible en [duck.ai](https://duck.ai) que te permite mantener conversaciones privadas con modelos populares de chat de IA de terceros. Tus chats no se utilizan para entrenar modelos de chat."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI Chat est une fonctionnalité optionnelle disponible sur [duck.ai](https://duck.ai) qui vous permet d'avoir des conversations privées avec des modèles de chat IA tiers populaires. Vos discussions ne servent pas à entraîner des modèles de discussion."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI Chat è una funzionalità opzionale disponibile su [duck.ai](https://duck.ai) che consente di intrattenere conversazioni private con i più comuni modelli di chat AI di terze parti. Le tue chat non vengono usate per addestrare modelli di chat."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI Chat is een optionele functie die beschikbaar is op [duck.ai](https://duck.ai) waarmee je privégesprekken kunt voeren met populaire AI-chatmodellen van derden. Je chats worden niet gebruikt om chatmodellen te trainen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI Chat to opcjonalna funkcja dostępna pod adresem [duck.ai] (https://duck.ai), która umożliwia prowadzenie prywatnych rozmów z popularnymi modelami czatu AI innych firm. Twoje czaty nie są używane do trenowania modeli czatu."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O AI Chat é uma funcionalidade opcional disponível no [duck.ai](https://duck.ai) que te permite ter conversas privadas com modelos de AI chat populares de terceiros. As tuas conversas não são utilizadas para treinar modelos de chat."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI Chat — это дополнительная функция [duck.ai](https://duck.ai), которая позволяет вести приватные беседы с популярными сторонними чат-моделями на базе искусственного интеллекта. Содержимое чатов не применяется для обучения чат-ботов."
           }
         }
       }
@@ -5634,6 +6114,246 @@
         }
       }
     },
+    "autofill.onboarding.popover.accept" : {
+      "comment" : "Autofill onboarding CTA for approval",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shortcut hinzufügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add Shortcut"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir acceso directo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter un raccourci"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi scorciatoia"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sneltoets toevoegen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodaj skrót"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicionar atalho"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить ярлык"
+          }
+        }
+      }
+    },
+    "autofill.onboarding.popover.message1" : {
+      "comment" : "Autofill onboarding popover message",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du kannst deine Symbolleisten-Shortcuts jederzeit verwalten, indem du mit der rechten Maustaste auf die Symbolleiste klickst."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You can manage your toolbar shortcuts at any time by right-clicking on the toolbar."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puedes gestionar tus accesos directos de la barra de herramientas en cualquier momento haciendo clic con el botón derecho en la barra de herramientas."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous pouvez gérer les raccourcis de votre barre d'outils à tout moment en cliquant dessus avec le bouton droit de la souris."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puoi gestire le scorciatoie della barra degli strumenti in qualsiasi momento facendo clic con il tasto destro del mouse sulla barra degli strumenti."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je kunt je snelkoppelingen op de werkbalk op elk moment beheren door met de rechtermuisknop op de werkbalk te klikken."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Możesz zarządzać skrótami paska narzędzi w dowolnym momencie, klikając prawym przyciskiem myszy na pasku narzędzi."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Podes gerir os atalhos da barra de ferramentas em qualquer altura ao clicar com o botão direito do rato na barra de ferramentas."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ярлыки на панели инструментов можно настроить в любой момент путем нажатия на панель правой кнопкой мышки."
+          }
+        }
+      }
+    },
+    "autofill.onboarding.popover.reject" : {
+      "comment" : "Autofill onboarding CTA for rejection",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nein, danke"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No Thanks"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No, gracias"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non merci"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No, grazie"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nee, bedankt"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie, dziękuję"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não, obrigado"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет, спасибо"
+          }
+        }
+      }
+    },
+    "autofill.onboarding.popover.title" : {
+      "comment" : "Autofill onboarding popover title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwort-Shortcut hinzufügen?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add passwords shortcut?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Añadir acceso directo a contraseñas?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter un raccourci pour les mots de passe ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungere una scorciatoia per le password?"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wachtwoordsnelkoppeling toevoegen?"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodać skrót do haseł?"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicionar atalho de palavras-passe?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить ярлык для менеджера паролей?"
+          }
+        }
+      }
+    },
     "autofill.password-manager" : {
       "comment" : "Autofill settings section title",
       "extractionState" : "extracted_with_value",
@@ -7612,55 +8332,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
+            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.10.0, v2024.10.1, v2024.10.2. Please downgrade to an older version by following these steps:"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
           }
         }
@@ -7672,55 +8392,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Download v2024.4.3"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Download v2024.4.3"
+            "value" : "Download v2024.9.0"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Download v2024.4.3"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Download v2024.4.3"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Download v2024.4.3"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Download v2024.4.3"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Download v2024.4.3"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Download v2024.4.3"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Download v2024.4.3"
           }
         }
@@ -9859,7 +10579,7 @@
     },
     "bookmarks.bar.prompt.message" : {
       "comment" : "Message show for bookmarks bar prompt",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -9913,6 +10633,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Показывает панель для быстрого доступа к новым закладкам."
+          }
+        }
+      }
+    },
+    "bookmarks.bar.prompt.message1" : {
+      "comment" : " message show for bookmarks bar prompt\n message with markdown show for bookmarks bar prompt, make sure to keep the ** ** for the translated words Settings and Appearance",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeige die Lesezeichenleiste an, um schnell auf deine bevorzugten Lesezeichen zuzugreifen. Du kannst das später unter **Einstellungen** > **Erscheinungsbild** anpassen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show the Bookmarks Bar for quick access to your favorite bookmarks. You can adjust this later in **Settings** > **Appearance**."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muestra la barra de marcadores para acceder rápidamente a tus marcadores favoritos. Puedes ajustar esto más tarde en **Configuración** > **Apariencia**."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Affichez la barre des signets pour accéder rapidement à vos favoris. Vous pourrez modifier cela plus tard dans **Réglages** > **Apparence**."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra la barra dei segnalibri per accedere rapidamente ai tuoi segnalibri preferiti. Puoi modificarla in seguito in **Impostazioni** > **Aspetto**."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laat de bladwijzerbalk zien voor snelle toegang tot je favoriete bladwijzers. Je kunt dit later aanpassen in **Instellingen** > **Uiterlijk**."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokaż pasek zakładek, aby mieć szybki dostęp do ulubionych zakładek. Możesz to później zmienić, wybierając kolejno **Ustawienia** > **Wygląd**."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra a barra de marcadores para teres acesso rápido aos teus marcadores favoritos. Podes ajustar isto mais tarde em **Definições** > **Aparência**."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отображать панель для быстрого доступа к закладкам в Избранном. Эту настройку можно изменить позже в разделе **Настройки** > **Внешний вид**."
           }
         }
       }
@@ -15282,9 +16062,69 @@
         }
       }
     },
+    "contextual.onboarding.try-search.surprise-me" : {
+      "comment" : "Browser Search query for baby ducklings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entenküken"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "baby ducklings"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "patitos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "bébés canetons"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "anatroccoli"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "baby-eendjes"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "małe kaczuszki"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "patinhos bebés"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "утята"
+          }
+        }
+      }
+    },
     "contextual.onboarding.try-search.surprise-me-english" : {
       "comment" : "Browser Search query for chocolate chip cookie recipes",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -15344,7 +16184,7 @@
     },
     "contextual.onboarding.try-search.surprise-me-international" : {
       "comment" : "Browser Search query for dinner recipes",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -17959,7 +18799,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Möchtest du wirklich beenden?\n\nDuckDuckGo lädt derzeit „%@“%@ herunter. Wenn du jetzt aufhörst, wird DuckDuckGo den Download %@ nicht beenden."
+            "value" : "Möchtest du wirklich aufhören?\n\nDuckDuckGo lädt derzeit „%1$@“%2$@ herunter. Wenn du jetzt aufhörst, wird DuckDuckGo den Download %3$@ nicht beenden."
           }
         },
         "en" : {
@@ -17971,43 +18811,43 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¿Seguro que quieres salir?\n\nDuckDuckGo está descargando \"%@\"%@. Si sales ahora, DuckDuckGo no terminará de descargar %@."
+            "value" : "¿Seguro que quieres salir?\n\nDuckDuckGo se está descargando actualmente \"%1$@\"%2$@. Si sales ahora, DuckDuckGo no terminará de descargar %3$@."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Voulez-vous vraiment abandonner ?\n\nDuckDuckGo télécharge actuellement “%@”%@. Si vous abandonnez maintenant, DuckDuckGo ne terminera pas le téléchargement de %@."
+            "value" : "Voulez-vous vraiment abandonner ?DuckDuckGo télécharge actuellement « %1$@”%2$@ ». Si vous abandonnez maintenant, DuckDuckGo ne terminera pas le téléchargement de %3$@."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vuoi davvero uscire?\n\nDuckDuckGo sta attualmente scaricando “%@”%@. Se esci ora, DuckDuckGo non completerà il download di %@."
+            "value" : "Uscire?DuckDuckGo sta scaricando \"%1$@\"%2$@. Se esci ora, DuckDuckGo non completerà il download di %3$@."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Weet je zeker dat je wilt stoppen?\n\nDuckDuckGo downloadt op dit moment \"%@\"%@. Als je nu stopt, wordt het downloaden van %@ niet voltooid."
+            "value" : "Weet je zeker dat je wilt afsluiten?\n\nDuckDuckGo downloadt momenteel '%1$@'%2$@. Als je nu stopt, wordt %3$@ niet helemaal gedownload."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Czy na pewno chcesz zrezygnować?\n\nDuckDuckGo aktualnie pobiera „%@”%@. Jeśli teraz wyjdziesz, DuckDuckGo nie dokończy pobierania %@."
+            "value" : "Czy na pewno chcesz wyjść?\n\nDuckDuckGo aktualnie pobiera „%1$@”%2$@. Jeśli teraz wyjdziesz, DuckDuckGo nie dokończy pobierania %3$@."
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tens a certeza de que pretendes sair?\n\nO DuckDuckGo está a transferir “%@”%@. Se saíres agora, o DuckDuckGo não vai transferir %@ até ao fim."
+            "value" : "Tens a certeza de que pretendes sair?\n\nO DuckDuckGo está a transferir \"%1$@”%2$@. Se saíres agora, o DuckDuckGo não vai transferir %3$@ até ao fim."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Действительно закрыть приложение?\n\nDuckDuckGo сейчас загружает «%@»%@. Если закрыть приложение, DuckDuckGo не загрузит %@."
+            "value" : "Вы точно хотите закрыть приложение?\n\nDuckDuckGo загружает «%1$@»%2$@. Если прервать этот процесс, DuckDuckGo не загрузит %3$@."
           }
         }
       }
@@ -22947,7 +23787,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bist du sicher, dass du das Fire Window schließen willst?\n\nDuckDuckGo lädt gerade „%@“%@ herunter. Wenn du das Fire Window schließt, löscht DuckDuckGo %@."
+            "value" : "Möchtest du das Fire Window wirklich schließen?\n\nDuckDuckGo lädt derzeit „%1$@“%2$@ herunter. Wenn du das Fire Window schließt, löscht DuckDuckGo %3$@."
           }
         },
         "en" : {
@@ -22959,43 +23799,43 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¿Seguro que quieres cerrar la Fire Window?\n\nDuckDuckGo está descargando \"%@\"%@. Si cierras la Fire Window, DuckDuckGo eliminará %@."
+            "value" : "¿Seguro que quieres cerrar la Fire Window?\n\nDuckDuckGo se está descargando actualmente \"%1$@\"%2$@. Si cierras la Fire Window, DuckDuckGo eliminará %3$@."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Voulez-vous vraiment fermer la Fire Window ?\n\nDuckDuckGo télécharge actuellement “%@”%@. Si vous fermez la Fire Window, DuckDuckGo supprimera %@."
+            "value" : "Voulez-vous vraiment fermer la Fire Window ?\n\nDuckDuckGo télécharge actuellement « %1$@”%2$@ ». Si vous fermez la Fire Window, DuckDuckGo supprimera %3$@."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vuoi davvero chiudere la Fire Window?\n\nDuckDuckGo sta attualmente scaricando “%@”%@. Se la chiudi, DuckDuckGo eliminerà %@."
+            "value" : "Chiudere la Fire Window?\n\nDuckDuckGo sta scaricando \"%1$@\"%2$@. Se la chiudi, DuckDuckGo eliminerà %3$@."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Weet je zeker dat je het Fire Window wilt sluiten?\n\nDuckDuckGo downloadt op dit moment \"%@\"%@. Als je het Fire Window sluit, wordt %@ verwijderd."
+            "value" : "Weet je zeker dat je het Fire Window wilt sluiten?\n\nDuckDuckGo downloadt momenteel '%1$@'%2$@. Als je het Fire Window sluit, wordt %3$@ verwijderd."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Czy na pewno chcesz zamknąć okno Fire Window?\n\nDuckDuckGo aktualnie pobiera „%@”%@. Jeśli zamkniesz okno Fire Window, DuckDuckGo usunie %@."
+            "value" : "Czy na pewno chcesz zamknąć okno Fire Window?\n\nDuckDuckGo aktualnie pobiera „%1$@”%2$@. Jeśli zamkniesz okno Fire Window, DuckDuckGo usunie %3$@."
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tens a certeza de que pretendes fechar a Fire Window?\n\nO DuckDuckGo está a transferir “%@”%@. Se fechares a Fire Window, o DuckDuckGo vai eliminar %@."
+            "value" : "Tens a certeza de que pretendes fechar a Fire Window?\n\nO DuckDuckGo está a transferir \"%1$@”%2$@. Se fechares a Fire Window, o DuckDuckGo vai eliminar %3$@."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Действительно закрыть окно Fire Window?\n\nDuckDuckGo сейчас загружает «%@»%@. В случае закрытия DuckDuckGo удалит %@."
+            "value" : "Вы точно хотите закрыть окно Fire Window?\n\nDuckDuckGo загружает «%1$@»%2$@. В случае закрытия DuckDuckGo удалит %3$@."
           }
         }
       }
@@ -27292,6 +28132,126 @@
         }
       }
     },
+    "home.page.settings.onboarding.message" : {
+      "comment" : "Home Page Settings Onboarding message",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personalisiere deine neue Tab-Seite. Probier’s doch mal aus!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add extra personality and pick what you want to see on your new tab page. Give it a try!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade más personalidad y elige lo que quieres ver en tu nueva pestaña. ¡Pruébalo!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajoutez une personnalité supplémentaire et choisissez ce que vous voulez voir sur votre nouvelle page à onglet. Essayez par vous-même !"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi un tocco di personalità e scegli cosa vuoi vedere nella tua nuova scheda. Prova!"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voeg extra persoonlijkheid toe en kies wat je op je nieuwe tabbladpagina wilt zien. Probeer het maar eens!"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wybierz, co chcesz zobaczyć na stronie nowej karty, aby zyskała bardziej indywidualny charakter. Spróbuj!"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adiciona personalidade extra e escolhe o que queres ver na tua página do novo separador. Experimenta!"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавьте дополнительную персонализацию и выберите, что должно присутствовать на странице новой вкладки. Попробуйте!"
+          }
+        }
+      }
+    },
+    "home.page.settings.onboarding.title" : {
+      "comment" : "Home Page Settings Onboarding message title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neues Suchfeld, benutzerdefinierte Hintergründe und mehr!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "New search box, custom backgrounds & more!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Nuevo cuadro de búsqueda, fondos personalizados y mucho más!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nouvelle boîte de recherche, arrière-plans personnalisés et plus encore !"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuova casella di ricerca, sfondi personalizzati e altro ancora!"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nieuw zoekvak, aangepaste achtergronden en meer!"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nowe pole wyszukiwania, niestandardowe tła i nie tylko!"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nova caixa de pesquisa, fundos personalizados e mais!"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Новая строка поиска, собственные фоны и многое другое"
+          }
+        }
+      }
+    },
     "home.page.settings.sections" : {
       "comment" : "Section title in Home Page Settings to adjust Home Page sections visibility",
       "extractionState" : "extracted_with_value",
@@ -28051,6 +29011,66 @@
         }
       }
     },
+    "import.browser.data.onboarding" : {
+      "comment" : "Import Browser Data dialog title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Super, halten wir es unkompliziert!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Great, let’s keep this simple!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Estupendo, hagámoslo de manera sencilla!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Super, restons simples !"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ottimo, semplifichiamo le cose!"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geweldig, laten we dit eenvoudig houden!"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Świetnie, to proste!"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ótimo, vamos manter isto simples!"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отлично! Зачем усложнять?"
+          }
+        }
+      }
+    },
     "import.browser.data.passwords" : {
       "comment" : "Opens Import Browser Data dialog",
       "extractionState" : "extracted_with_value",
@@ -28298,55 +29318,115 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Importieren aus"
+            "value" : "Woher möchtest du importieren?"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Import From"
+            "value" : "Where do you want to import from?"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Importar desde"
+            "value" : "¿De dónde quieres importar?"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Importer depuis"
+            "value" : "D'où voulez-vous importer ?"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Importa da"
+            "value" : "Da dove vuoi importare?"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Importeren vanuit"
+            "value" : "Vanwaar wil je importeren?"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Importuj z"
+            "value" : "Skąd chcesz importować?"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Importar de"
+            "value" : "De onde queres importar?"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Импорт из"
+            "value" : "Откуда импортировать данные?"
+          }
+        }
+      }
+    },
+    "import.browser.data.success.title" : {
+      "comment" : "message about Passwords and or bookmarks Data Import completion",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import abgeschlossen!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Import complete!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Importación completada!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importation terminée !"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importazione completata!"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importeren voltooid!"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import zakończony!"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importação concluída!"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Импортирование завершено."
           }
         }
       }
@@ -32278,7 +33358,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Закрыть DuckDuckGo"
+            "value" : "Завершить DuckDuckGo"
           }
         }
       }
@@ -36081,6 +37161,66 @@
         }
       }
     },
+    "newTab.menu.item.show.search.bar" : {
+      "comment" : "Title of the menu item in the home page to show/hide search box (search field)",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suchfeld anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show Search Box"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar el cuadro de búsqueda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher la boîte de recherche"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra la casella di ricerca"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoekvak weergeven"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokaż pole wyszukiwania"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar caixa de pesquisa"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать поле поиска"
+          }
+        }
+      }
+    },
     "newTab.recent.activity.section.title" : {
       "comment" : "Title of the RecentActivity section in the home page",
       "extractionState" : "extracted_with_value",
@@ -36137,6 +37277,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Недавняя активность"
+          }
+        }
+      }
+    },
+    "newTab.search.bar.section.title" : {
+      "comment" : "Setting to show or hide the search box (search field) in the home page",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suchfeld"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Search Box"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuadro de búsqueda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Champ de recherche"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Casella di ricerca"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoekveld"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pole wyszukiwania"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Caixa de pesquisa"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поле поиска"
           }
         }
       }
@@ -37461,6 +38661,66 @@
         }
       }
     },
+    "notification.auto.update.action" : {
+      "comment" : "Action to take when an automatic update is available.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zum Aktualisieren neu starten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Restart to update."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reinicia para actualizar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Redémarrer pour mettre à jour."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riavvia per aggiornare."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start opnieuw om bij te werken."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uruchom ponownie, aby zaktualizować."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reiniciar para atualizar."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перезапустите приложение."
+          }
+        }
+      }
+    },
     "notification.badge.cookiesmanaged" : {
       "comment" : "Notification that appears when browser automatically handle cookies",
       "extractionState" : "extracted_with_value",
@@ -37702,121 +38962,181 @@
       }
     },
     "notification.critical.update" : {
-      "comment" : "Notification informing user a critical update is required.",
+      "comment" : "Notification informing user a critical update is available.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kritisches Update erforderlich. Zum Aktualisieren neu starten."
+            "value" : "Kritisches Update erforderlich."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Critical update required. Restart to update."
+            "value" : "Critical update needed."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Se requiere una actualización crítica. Reinicia para actualizar."
+            "value" : "Se necesita una actualización crítica."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Une mise à jour critique est requise. Redémarrer pour mettre à jour."
+            "value" : "Une mise à jour critique est nécessaire."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aggiornamento critico obbligatorio. Riavvia per aggiornare."
+            "value" : "Aggiornamento critico necessario."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kritieke update vereist. Start opnieuw om bij te werken."
+            "value" : "Kritieke update nodig."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wymagana krytyczna aktualizacja. Uruchom ponownie, aby zaktualizować."
+            "value" : "Wymagana krytyczna aktualizacja."
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Atualização crítica obrigatória. Reiniciar para atualizar."
+            "value" : "Atualização crítica necessária."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Требуется критическое обновление. Перезапустите приложение."
+            "value" : "Требуется критическое обновление."
+          }
+        }
+      }
+    },
+    "notification.manual.update.action" : {
+      "comment" : "Action to take when a manual update is available.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klicke hier, um zu aktualisieren."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Click here to update."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haz clic aquí para actualizar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cliquez ici pour mettre à jour."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fai clic qui per aggiornare."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klik hier om te updaten."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kliknij tutaj, aby zaktualizować."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clica aqui para atualizar."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нажмите здесь, чтобы обновить."
           }
         }
       }
     },
     "notification.update.available" : {
-      "comment" : "Notification informing user the a version of app is available",
+      "comment" : "Notification informing user the a version of app is available.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Neue Version verfügbar. Zum Aktualisieren neu starten."
+            "value" : "Neue Version verfügbar."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "New version available. Restart to update."
+            "value" : "New version available."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nueva versión disponible. Reinicia para actualizar."
+            "value" : "Nueva versión disponible."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Une nouvelle version est disponible. Redémarrer pour mettre à jour."
+            "value" : "Une nouvelle version est disponible."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nuova versione disponibile. Riavvia per aggiornare."
+            "value" : "Nuova versione disponibile."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nieuwe versie beschikbaar. Start opnieuw om bij te werken."
+            "value" : "Nieuwe versie beschikbaar."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dostępna nowa wersja. Uruchom ponownie, aby zaktualizować."
+            "value" : "Dostępna nowa wersja."
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nova versão disponível. Reiniciar para atualizar."
+            "value" : "Nova versão disponível."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Доступна новая версия. Перезапустите приложение."
+            "value" : "Доступна новая версия."
           }
         }
       }
@@ -42227,7 +43547,7 @@
       }
     },
     "permission.authorization.format" : {
-      "comment" : "Popover asking for domain %@ to use camera/mic/location (%@)",
+      "comment" : "Popover asking for domain %@ to use camera/mic (%@)",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -42282,6 +43602,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Открыть сайту %1$@ доступ (%2$@)?"
+          }
+        }
+      }
+    },
+    "permission.authorization.location" : {
+      "comment" : "Popover asking for domain %@ to use location",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "“%@“ website would like to use your current location."
           }
         }
       }
@@ -43786,6 +45118,66 @@
         }
       }
     },
+    "pinning.hide-aichat-shortcut" : {
+      "comment" : "Menu item for hiding the AI Chat shortcut",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI-Chat-Verknüpfung ausblenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Hide AI Chat Shortcut"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultar acceso directo a AI Chat"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masquer le raccourci de chat IA"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nascondi scorciatoia AI Chat"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Snelkoppeling voor AI-chat verbergen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ukryj skrót do AI Chat"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultar atalho do AI Chat"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скрыть ярлык AI Chat"
+          }
+        }
+      }
+    },
     "pinning.hide-autofill-shortcut" : {
       "comment" : "Menu item for hiding the passwords shortcut",
       "extractionState" : "extracted_with_value",
@@ -44022,6 +45414,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Скрыть ярлык для VPN"
+          }
+        }
+      }
+    },
+    "pinning.show-aichat-shortcut" : {
+      "comment" : "Menu item for showing the AI Chat shortcut",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI-Chat-Verknüpfung anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show AI Chat Shortcut"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar acceso directo a AI Chat"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher le raccourci AI Chat"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra scorciatoia AI Chat"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Snelkoppeling voor AI Chat weergeven"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokaż skrót do AI Chat"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar atalho do AI Chat"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать ярлык AI Chat"
           }
         }
       }
@@ -50438,6 +51890,66 @@
         }
       }
     },
+    "preferences.about.duckduckgo-tagline" : {
+      "comment" : "About screen",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dein Schutz, unsere Priorität."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your protection, our priority."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu protección, nuestra prioridad."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre protection, notre priorité."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La tua protezione, la nostra priorità."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jouw bescherming, onze prioriteit."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Twoje bezpieczeństwo jest naszym priorytetem."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A tua proteção, a nossa prioridade."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ваша защита — наш приоритет."
+          }
+        }
+      }
+    },
     "preferences.about.more-at" : {
       "comment" : "Link to the about page",
       "extractionState" : "extracted_with_value",
@@ -50560,7 +52072,7 @@
     },
     "preferences.about.privacy-simplified" : {
       "comment" : "About screen",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -52958,6 +54470,66 @@
         }
       }
     },
+    "preferences.set-as-default" : {
+      "comment" : "Menu option to set the browser as default",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo als Standard-Browser festlegen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Set DuckDuckGo As Default Browser"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Establece DuckDuckGo como tu navegador predeterminado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Définir DuckDuckGo comme navigateur par défaut"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imposta DuckDuckGo come browser predefinito"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo instellen als standaardbrowser"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ustaw DuckDuckGo jako domyślną przeglądarkę"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Definir o DuckDuckGo como navegador predefinido"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сделать DuckDuckGo браузером по умолчанию"
+          }
+        }
+      }
+    },
     "preferences.shortcuts" : {
       "comment" : "Name of the preferences section related to shortcuts",
       "extractionState" : "extracted_with_value",
@@ -54556,6 +56128,18 @@
         }
       }
     },
+    "remove.suggestion.tooltip" : {
+      "comment" : "Tooltip for the button which removes the history entry from the history",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Remove from browsing history"
+          }
+        }
+      }
+    },
     "Reopen All Windows from Last Session" : {
       "comment" : "Main Menu History item",
       "localizations" : {
@@ -55263,6 +56847,7 @@
     },
     "Select Data to Import:" : {
       "comment" : "Data Import section title for checkboxes of data type to import: Passwords or Bookmarks.",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -56320,6 +57905,66 @@
         }
       }
     },
+    "settings.downloading.update" : {
+      "comment" : "Label informing users the app is currently downloading the update. This will contain a percentage",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update wird heruntergeladen %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Downloading update %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descargando actualización %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Téléchargement de la mise à jour %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download dell'aggiornamento %@"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update %@ downloaden"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pobieranie aktualizacji %@"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A transferir a atualização %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Загрузка обновления %@"
+          }
+        }
+      }
+    },
     "settings.last.checked" : {
       "comment" : "Label informing users what is the last time the app checked for the update.",
       "extractionState" : "extracted_with_value",
@@ -56440,6 +58085,66 @@
         }
       }
     },
+    "settings.newer.critical.update.available" : {
+      "comment" : "Label informing users the critical update of the app is available to install.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kritisches Update erforderlich"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Critical update needed"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se necesita una actualización crítica"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une mise à jour critique est nécessaire"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiornamento critico necessario"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kritieke update nodig"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wymagana krytyczna aktualizacja"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atualização crítica necessária"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Требуется критическое обновление"
+          }
+        }
+      }
+    },
     "settings.newer.version.available" : {
       "comment" : "Label informing users the newer version of the app is available to install.",
       "extractionState" : "extracted_with_value",
@@ -56500,8 +58205,68 @@
         }
       }
     },
+    "settings.preparing.update" : {
+      "comment" : "Label informing users the app is preparing to update.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update vorbereiten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Preparing update"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparando la actualización"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Préparation de la mise à jour"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparazione dell'aggiornamento"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update voorbereiden"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przygotowanie aktualizacji"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A preparar a atualização"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подготовка обновления"
+          }
+        }
+      }
+    },
     "settings.restart.to.update" : {
-      "comment" : "Button label trigering restart and update of the application.",
+      "comment" : "Button label triggering restart and update of the application.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -56513,7 +58278,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Restart to Update"
+            "value" : "Restart To Update"
           }
         },
         "es" : {
@@ -56556,6 +58321,126 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Перезапустите для обновления"
+          }
+        }
+      }
+    },
+    "settings.retry.update" : {
+      "comment" : "Button label triggering a retry of the update.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update nochmal versuchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Retry Update"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reintentar actualización"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réessayer la mise à jour"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riprova l'aggiornamento"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update opnieuw proberen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ponów próbę aktualizacji"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Repetir atualização"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Повторить попытку обновления"
+          }
+        }
+      }
+    },
+    "settings.run.update" : {
+      "comment" : "Button label triggering update of the application.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo aktualisieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Update DuckDuckGo"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualizar DuckDuckGo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mettre à jour DuckDuckGo"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiorna DuckDuckGo"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo bijwerken"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zaktualizuj DuckDuckGo"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atualizar o DuckDuckGo"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обновить DuckDuckGo"
           }
         }
       }
@@ -56616,6 +58501,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "DuckDuckGo обновлен"
+          }
+        }
+      }
+    },
+    "settings.update.failed" : {
+      "comment" : "Label informing users the app is unable to update.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update fehlgeschlagen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Update failed"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualización fallida"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Échec de la mise à jour"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiornamento non riuscito"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update mislukt"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niepowodzenie aktualizacji"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A atualização falhou"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось обновить"
           }
         }
       }
@@ -57340,6 +59285,126 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Показать содержимое папки"
+          }
+        }
+      }
+    },
+    "site.not.working.button.title" : {
+      "comment" : "Button title that appears on a dialog asking users about possible breakage of a site",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lass es uns wissen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Let Us Know"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Háznoslo saber"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faites-le nous savoir"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faccelo sapere"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laat het ons weten"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daj nam znać"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contacte-nos"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сообщить"
+          }
+        }
+      }
+    },
+    "site.not.working.title" : {
+      "comment" : "Title that appears on a dialog asking users about possible breakage of a site",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Webseite funktioniert nicht?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Site not working?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿El sitio no funciona?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le site ne fonctionne pas ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il sito non funziona?"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Werkt de site niet?"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Witryna nie działa?"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O site não funciona?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сайт не работает?"
           }
         }
       }
@@ -61214,61 +63279,61 @@
       }
     },
     "update.available.menu.item" : {
-      "comment" : "Title of the menu item that informs user that a new update is available. Clicking on the menu item restarts the app and installs the update",
+      "comment" : "Title of the menu item that informs user that a new update is available. Clicking on the menu item installs the update",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Update verfügbar – Jetzt neu starten"
+            "value" : "Update verfügbar – jetzt installieren"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Update Available - Restart Now"
+            "value" : "Update Available - Install Now"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Actualización disponible - Reiniciar ahora"
+            "value" : "Actualización disponible - Instalar ahora"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mise à jour disponible : redémarrer"
+            "value" : "Mise à jour disponible : installer"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aggiornamento disponibile - Riavvia ora"
+            "value" : "Aggiornamento disponibile - Installa ora"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Update beschikbaar - nu opnieuw opstarten"
+            "value" : "Update beschikbaar - nu installeren"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dostępna aktualizacja — uruchom ponownie teraz"
+            "value" : "Dostępna aktualizacja — zainstaluj teraz"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Atualização disponível – Reiniciar agora"
+            "value" : "Atualização disponível – Instalar agora"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Доступно обновление: перезапустить"
+            "value" : "Доступно обновление – установить сейчас"
           }
         }
       }
@@ -62066,6 +64131,59 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Защита от отслеживания онлайн"
+          }
+        }
+      }
+    },
+    "What do you want to import?" : {
+      "comment" : "Data Import section title for checkboxes of data type to import: Passwords or Bookmarks.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Was möchtest du importieren?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Qué quieres importar?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Que voulez-vous importer ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cosa vuoi importare?"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wat wil je importeren?"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Co chcesz importować?"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O que queres importar?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Что будем импортировать?"
           }
         }
       }

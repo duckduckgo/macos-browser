@@ -23,6 +23,7 @@ import Common
 import NetworkProtection
 import NetworkProtectionIPC
 import os.log
+import BrokenSitePrompt
 
 final class MainViewController: NSViewController {
     private lazy var mainView = MainView(frame: NSRect(x: 0, y: 0, width: 600, height: 660))
@@ -61,7 +62,8 @@ final class MainViewController: NSViewController {
          bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
          autofillPopoverPresenter: AutofillPopoverPresenter,
          vpnXPCClient: VPNControllerXPCClient = .shared,
-         aiChatMenuConfig: AIChatMenuVisibilityConfigurable = AIChatMenuConfiguration()) {
+         aiChatMenuConfig: AIChatMenuVisibilityConfigurable = AIChatMenuConfiguration(),
+         brokenSitePromptLimiter: BrokenSitePromptLimiter = .shared) {
 
         self.aiChatMenuConfig = aiChatMenuConfig
         let tabCollectionViewModel = tabCollectionViewModel ?? TabCollectionViewModel()
@@ -116,7 +118,8 @@ final class MainViewController: NSViewController {
                                                                          networkProtectionPopoverManager: networkProtectionPopoverManager,
                                                                          networkProtectionStatusReporter: networkProtectionStatusReporter,
                                                                          autofillPopoverPresenter: autofillPopoverPresenter,
-                                                                         aiChatMenuConfig: aiChatMenuConfig)
+                                                                         aiChatMenuConfig: aiChatMenuConfig,
+                                                                         brokenSitePromptLimiter: brokenSitePromptLimiter)
 
         browserTabViewController = BrowserTabViewController(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager)
         findInPageViewController = FindInPageViewController.create()
@@ -190,8 +193,12 @@ final class MainViewController: NSViewController {
             mainView.navigationBarContainerView.wantsLayer = true
             mainView.navigationBarContainerView.layer?.masksToBounds = false
 
-            resizeNavigationBar(isHomePage: tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab,
-                                animated: false)
+            if tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab,
+               browserTabViewController.homePageViewController?.addressBarModel.shouldShowAddressBar == false {
+                resizeNavigationBar(isHomePage: true, animated: lastTabContent != .newtab)
+            } else {
+                resizeNavigationBar(isHomePage: false, animated: false)
+            }
         }
 
         updateDividerColor(isShowingHomePage: tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab)
@@ -211,6 +218,7 @@ final class MainViewController: NSViewController {
 
     func windowDidResignKey() {
         browserTabViewController.windowDidResignKey()
+        tabBarViewController.hideTabPreview()
     }
 
     func showBookmarkPromptIfNeeded() {
@@ -346,10 +354,32 @@ final class MainViewController: NSViewController {
                 guard let self, let selectedTabViewModel else { return }
                 defer { lastTabContent = content }
 
-                resizeNavigationBar(isHomePage: content == .newtab, animated: content == .newtab && lastTabContent != .newtab)
+                if content == .newtab {
+                    if browserTabViewController.homePageViewController?.addressBarModel.shouldShowAddressBar == true {
+                        subscribeToNTPAddressBarVisibility(of: selectedTabViewModel)
+                    } else {
+                        ntpAddressBarVisibilityCancellable?.cancel()
+                        resizeNavigationBar(isHomePage: true, animated: lastTabContent != .newtab)
+                    }
+                } else {
+                    ntpAddressBarVisibilityCancellable?.cancel()
+                    resizeNavigationBar(isHomePage: false, animated: false)
+                }
                 adjustFirstResponder(selectedTabViewModel: selectedTabViewModel, tabContent: content)
             }
             .store(in: &self.tabViewModelCancellables)
+    }
+
+    private var ntpAddressBarVisibilityCancellable: AnyCancellable?
+
+    private func subscribeToNTPAddressBarVisibility(of selectedTabViewModel: TabViewModel) {
+        ntpAddressBarVisibilityCancellable = browserTabViewController.homePageViewController?.appearancePreferences.$isSearchBarVisible
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isAddressBarVisible in
+                guard let self else { return }
+                resizeNavigationBar(isHomePage: !isAddressBarVisible, animated: true)
+                adjustFirstResponder(selectedTabViewModel: selectedTabViewModel, tabContent: .newtab)
+            }
     }
 
     private func subscribeToFirstResponder() {
@@ -451,7 +481,6 @@ final class MainViewController: NSViewController {
 
         if case .newtab = tabContent {
             navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
-
         } else {
             // ignore published tab switch: BrowserTabViewController
             // adjusts first responder itself
@@ -522,6 +551,9 @@ extension MainViewController {
             }
             if let addressBarVC = navigationBarViewController.addressBarViewController {
                 isHandled = isHandled || addressBarVC.escapeKeyDown()
+            }
+            if let homePageAddressBarModel = browserTabViewController.homePageViewController?.addressBarModel {
+                isHandled = isHandled || homePageAddressBarModel.escapeKeyDown()
             }
             return isHandled
 

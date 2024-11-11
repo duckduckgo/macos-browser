@@ -25,7 +25,7 @@ final class DataBrokerOperationsCreatorTests: XCTestCase {
 
     // Dependencies
     private var mockDatabase: MockDatabase!
-    private var mockSchedulerConfig = DataBrokerExecutionConfig()
+    private var mockSchedulerConfig = DataBrokerExecutionConfig(mode: .normal)
     private var mockRunnerProvider: MockRunnerProvider!
     private var mockPixelHandler: MockPixelHandler!
     private var mockUserNotificationService: MockUserNotificationService!
@@ -70,7 +70,7 @@ final class DataBrokerOperationsCreatorTests: XCTestCase {
         mockDatabase.brokerProfileQueryDataToReturn = dataBrokerProfileQueries
 
         // When
-        let result = try! sut.operations(forOperationType: .scan,
+        let result = try! sut.operations(forOperationType: .manualScan,
                                          withPriorityDate: Date(),
                                          showWebView: false,
                                          errorDelegate: MockDataBrokerOperationErrorDelegate(),

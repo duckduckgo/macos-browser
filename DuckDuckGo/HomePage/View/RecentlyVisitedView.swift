@@ -61,6 +61,7 @@ struct RecentlyVisited: View {
             }
             .padding(.vertical, 24)
         }
+        .padding(.horizontal, 2)
         .padding(.bottom, 24)
 
     }

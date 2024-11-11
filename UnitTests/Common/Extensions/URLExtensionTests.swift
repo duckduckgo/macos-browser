@@ -58,7 +58,14 @@ final class URLExtensionTests: XCTestCase {
             ("http:// 💩.la:8080 ", "https://duckduckgo.com/?q=http%3A%2F%2F%20%F0%9F%92%A9.la%3A8080"),
             ("https://xn--ls8h.la/path/to/resource", "https://xn--ls8h.la/path/to/resource"),
             ("1.4/3.4", "https://duckduckgo.com/?q=1.4%2F3.4"),
-            ("16385-12228.72", "https://duckduckgo.com/?q=16385-12228.72")
+            ("16385-12228.72", "https://duckduckgo.com/?q=16385-12228.72"),
+            ("user@localhost", "https://duckduckgo.com/?q=user%40localhost"),
+            ("user@domain.com", "https://duckduckgo.com/?q=user%40domain.com"),
+            ("http://user@domain.com", "http://user@domain.com"),
+            ("http://user:@domain.com", "http://user:@domain.com"),
+            ("http://user: @domain.com", "https://duckduckgo.com/?q=http%3A%2F%2Fuser%3A%20%40domain.com"),
+            ("http://user:,,@domain.com", "http://user:,,@domain.com"),
+            ("http://user:pass@domain.com", "http://user:pass@domain.com")
         ]
 
         for (string, expected) in data {

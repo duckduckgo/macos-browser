@@ -176,15 +176,15 @@ final class VPNUninstaller: VPNUninstalling {
             return
         }
 
-        pixelKit?.fire(IPCUninstallAttempt.begin, frequency: .dailyAndCount)
+        pixelKit?.fire(IPCUninstallAttempt.begin, frequency: .legacyDailyAndCount)
 
         do {
             try await executeUninstallSequence(removeSystemExtension: removeSystemExtension)
-            pixelKit?.fire(IPCUninstallAttempt.success, frequency: .dailyAndCount)
+            pixelKit?.fire(IPCUninstallAttempt.success, frequency: .legacyDailyAndCount)
         } catch UninstallError.cancelled(let reason) {
-            pixelKit?.fire(IPCUninstallAttempt.cancelled(reason), frequency: .dailyAndCount)
+            pixelKit?.fire(IPCUninstallAttempt.cancelled(reason), frequency: .legacyDailyAndCount)
         } catch {
-            pixelKit?.fire(IPCUninstallAttempt.failure(error), frequency: .dailyAndCount)
+            pixelKit?.fire(IPCUninstallAttempt.failure(error), frequency: .legacyDailyAndCount)
         }
     }
 

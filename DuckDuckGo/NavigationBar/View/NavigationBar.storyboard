@@ -406,7 +406,7 @@
         <!--Address Bar View Controller-->
         <scene sceneID="gzs-lg-gqU">
             <objects>
-                <viewController id="H4f-bE-T92" customClass="AddressBarViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="AddressBarViewController" id="H4f-bE-T92" customClass="AddressBarViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" wantsLayer="YES" id="wj6-L2-5rJ">
                         <rect key="frame" x="0.0" y="0.0" width="726" height="32"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -522,7 +522,7 @@
                             <containerView translatesAutoresizingMaskIntoConstraints="NO" id="bOl-8Z-hTh">
                                 <rect key="frame" x="2" y="3" width="722" height="26"/>
                                 <connections>
-                                    <segue destination="mcr-nj-GmC" kind="embed" destinationCreationSelector="createAddressBarButtonsViewController:" id="zZO-zH-MBi"/>
+                                    <segue destination="mcr-nj-GmC" kind="embed" identifier="" destinationCreationSelector="createAddressBarButtonsViewController:" id="zZO-zH-MBi"/>
                                 </connections>
                             </containerView>
                             <customView id="ktI-g4-Uk6" customClass="ShadowView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
@@ -584,7 +584,9 @@
                         <outlet property="activeOuterBorderView" destination="Zjk-bE-Xft" id="u6o-fc-V76"/>
                         <outlet property="activeTextFieldMinXConstraint" destination="bY3-LA-cuF" id="Sln-8O-mrq"/>
                         <outlet property="addressBarTextField" destination="zaX-wZ-E3D" id="pfO-d4-i46"/>
+                        <outlet property="buttonsContainerView" destination="bOl-8Z-hTh" id="UHc-27-JaK"/>
                         <outlet property="inactiveBackgroundView" destination="ENV-0H-Fcc" id="OV5-2s-Ggq"/>
+                        <outlet property="innerBorderView" destination="INL-zs-eEh" id="7aF-qt-wCX"/>
                         <outlet property="passiveTextField" destination="le0-Hn-ZAC" id="npL-R1-gmH"/>
                         <outlet property="passiveTextFieldMinXConstraint" destination="eJI-rp-ptx" id="HNu-7v-JQy"/>
                         <outlet property="progressIndicator" destination="4x6-Xn-fNv" id="Ydu-ob-RJz"/>
@@ -599,7 +601,7 @@
         <!--Address Bar Buttons View Controller-->
         <scene sceneID="gr3-5z-X3m">
             <objects>
-                <viewController id="mcr-nj-GmC" customClass="AddressBarButtonsViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="AddressBarButtonsViewController" id="mcr-nj-GmC" customClass="AddressBarButtonsViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="Bhg-sv-n5J">
                         <rect key="frame" x="0.0" y="0.0" width="578" height="34"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -619,7 +621,7 @@
                                 </constraints>
                             </customView>
                             <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="taC-vG-1fV" customClass="AddressBarButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="545" y="1" width="32" height="32"/>
+                                <rect key="frame" x="540" y="1" width="32" height="32"/>
                                 <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Bookmark" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="H3Y-Sk-Xp8">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -645,7 +647,7 @@
                                 </connections>
                             </button>
                             <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kRc-0m-oqe" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="546" y="4" width="26" height="26"/>
+                                <rect key="frame" x="542" y="4" width="26" height="26"/>
                                 <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Clear" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="Qnf-P6-S6w">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -892,13 +894,13 @@
                             </stackView>
                         </subviews>
                         <constraints>
-                            <constraint firstAttribute="trailing" secondItem="taC-vG-1fV" secondAttribute="trailing" constant="1" id="26X-xU-JjT"/>
+                            <constraint firstAttribute="trailing" secondItem="taC-vG-1fV" secondAttribute="trailing" constant="6" id="26X-xU-JjT"/>
                             <constraint firstItem="HEu-ro-RSA" firstAttribute="centerY" secondItem="Bhg-sv-n5J" secondAttribute="centerY" id="BRs-q1-MOh"/>
                             <constraint firstItem="1qw-sL-vFK" firstAttribute="centerY" secondItem="Bhg-sv-n5J" secondAttribute="centerY" id="Cl5-vM-wFc"/>
                             <constraint firstItem="1qw-sL-vFK" firstAttribute="leading" secondItem="Bhg-sv-n5J" secondAttribute="leading" constant="2" id="IGR-F0-d7K"/>
                             <constraint firstItem="HEu-ro-RSA" firstAttribute="leading" secondItem="Bhg-sv-n5J" secondAttribute="leading" id="JJu-Ej-iFq"/>
                             <constraint firstItem="kRc-0m-oqe" firstAttribute="centerY" secondItem="Bhg-sv-n5J" secondAttribute="centerY" id="T0S-fo-y1J"/>
-                            <constraint firstAttribute="trailing" secondItem="kRc-0m-oqe" secondAttribute="trailing" constant="6" id="WeU-Fb-omO"/>
+                            <constraint firstAttribute="trailing" secondItem="kRc-0m-oqe" secondAttribute="trailing" constant="10" id="WeU-Fb-omO"/>
                             <constraint firstItem="taC-vG-1fV" firstAttribute="centerY" secondItem="Bhg-sv-n5J" secondAttribute="centerY" id="j0x-vX-dys"/>
                             <constraint firstItem="hdY-An-3W8" firstAttribute="centerY" secondItem="Bhg-sv-n5J" secondAttribute="centerY" id="rBY-us-BMz"/>
                             <constraint firstItem="hdY-An-3W8" firstAttribute="leading" secondItem="Bhg-sv-n5J" secondAttribute="leading" id="xv6-0t-7td"/>

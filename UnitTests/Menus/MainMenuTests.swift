@@ -89,6 +89,50 @@ class MainMenuTests: XCTestCase {
         XCTAssertEqual(manager.reopenLastClosedMenuItem?.keyEquivalentModifierMask, ReopenMenuItemKeyEquivalentManager.Const.modifierMask)
     }
 
+    // MARK: - Default Browser Action
+
+    @MainActor
+    func testWhenBrowserIsDefaultThenSetAsDefaultBrowserMenuItemIsHidden() throws {
+        let defaultBrowserProvider = DefaultBrowserProviderMock()
+        defaultBrowserProvider.isDefault = true
+
+        let sut = MainMenu(
+            featureFlagger: DummyFeatureFlagger(),
+            bookmarkManager: MockBookmarkManager(),
+            faviconManager: FaviconManagerMock(),
+            defaultBrowserPreferences: .init(defaultBrowserProvider: defaultBrowserProvider),
+            aiChatMenuConfig: DummyAIChatConfig()
+        )
+
+        sut.update()
+
+        let duckDuckGoMenu = try XCTUnwrap(sut.items.first?.submenu)
+
+        XCTAssertEqual(duckDuckGoMenu.items[3].title, UserText.setAsDefaultBrowser + "…")
+        XCTAssertTrue(duckDuckGoMenu.items[3].isHidden)
+    }
+
+    @MainActor
+    func testWhenBrowserIsNotDefaultThenSetAsDefaultBrowserMenuItemIsShown() throws {
+        let defaultBrowserProvider = DefaultBrowserProviderMock()
+        defaultBrowserProvider.isDefault = false
+
+        let sut = MainMenu(
+            featureFlagger: DummyFeatureFlagger(),
+            bookmarkManager: MockBookmarkManager(),
+            faviconManager: FaviconManagerMock(),
+            defaultBrowserPreferences: .init(defaultBrowserProvider: defaultBrowserProvider),
+            aiChatMenuConfig: DummyAIChatConfig()
+        )
+
+        sut.update()
+
+        let duckDuckGoMenu = try XCTUnwrap(sut.items.first?.submenu)
+
+        XCTAssertEqual(duckDuckGoMenu.items[3].title, UserText.setAsDefaultBrowser + "…")
+        XCTAssertFalse(duckDuckGoMenu.items[3].isHidden)
+    }
+
     // MARK: - Bookmarks
 
     @MainActor
@@ -161,9 +205,13 @@ private class DummyAIChatConfig: AIChatMenuVisibilityConfigurable {
     var isFeatureEnabledForApplicationMenuShortcut = false
     var isFeatureEnabledForToolbarShortcut = false
 
-    var shortcutURL: URL { URL(string: "https://example.com")! }
-
     var valuesChangedPublisher: PassthroughSubject<Void, Never> {
         return PassthroughSubject<Void, Never>()
     }
+
+    var shouldDisplayToolbarOnboardingPopover: PassthroughSubject<Void, Never> {
+        return PassthroughSubject<Void, Never>()
+    }
+
+    func markToolbarOnboardingPopoverAsShown() { }
 }

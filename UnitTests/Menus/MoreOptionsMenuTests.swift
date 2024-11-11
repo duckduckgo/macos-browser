@@ -23,6 +23,7 @@ import XCTest
 import Subscription
 import SubscriptionTestingUtilities
 import BrowserServicesKit
+import DataBrokerProtection
 
 @testable import DuckDuckGo_Privacy_Browser
 
@@ -33,10 +34,17 @@ final class MoreOptionsMenuTests: XCTestCase {
     var networkProtectionVisibilityMock: NetworkProtectionVisibilityMock!
     var capturingActionDelegate: CapturingOptionsButtonMenuDelegate!
     var internalUserDecider: InternalUserDeciderMock!
+    var defaultBrowserProvider: DefaultBrowserProviderMock!
 
     var storePurchaseManager: StorePurchaseManager!
 
     var subscriptionManager: SubscriptionManagerMock!
+
+    private var mockFreemiumDBPPresenter = MockFreemiumDBPPresenter()
+    private var mockFreemiumDBPFeature: MockFreemiumDBPFeature!
+    private var mockNotificationCenter: MockNotificationCenter!
+    private var mockPixelHandler: MockFreemiumDBPExperimentPixelHandler!
+    private var mockFreemiumDBPUserStateManager: MockFreemiumDBPUserStateManager!
 
     var moreOptionsMenu: MoreOptionsMenu!
 
@@ -48,6 +56,8 @@ final class MoreOptionsMenuTests: XCTestCase {
         networkProtectionVisibilityMock = NetworkProtectionVisibilityMock(isInstalled: false, visible: false)
         capturingActionDelegate = CapturingOptionsButtonMenuDelegate()
         internalUserDecider = InternalUserDeciderMock()
+        defaultBrowserProvider = DefaultBrowserProviderMock()
+        defaultBrowserProvider.isDefault = true
 
         storePurchaseManager = StorePurchaseManagerMock()
 
@@ -59,6 +69,11 @@ final class MoreOptionsMenuTests: XCTestCase {
                                                                                                   purchasePlatform: .appStore),
                                                       canPurchase: false)
 
+        mockFreemiumDBPFeature = MockFreemiumDBPFeature()
+
+        mockNotificationCenter = MockNotificationCenter()
+        mockPixelHandler = MockFreemiumDBPExperimentPixelHandler()
+        mockFreemiumDBPUserStateManager = MockFreemiumDBPUserStateManager()
     }
 
     @MainActor
@@ -81,10 +96,18 @@ final class MoreOptionsMenuTests: XCTestCase {
                                                                                                                usesUnifiedFeedbackForm: false),
                                           sharingMenu: NSMenu(),
                                           internalUserDecider: internalUserDecider,
-                                          subscriptionManager: subscriptionManager)
+                                          subscriptionManager: subscriptionManager,
+                                          freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager,
+                                          freemiumDBPFeature: mockFreemiumDBPFeature,
+                                          freemiumDBPPresenter: mockFreemiumDBPPresenter,
+                                          defaultBrowserPreferences: .init(defaultBrowserProvider: defaultBrowserProvider),
+                                          notificationCenter: mockNotificationCenter,
+                                          freemiumDBPExperimentPixelHandler: mockPixelHandler)
 
         moreOptionsMenu.actionDelegate = capturingActionDelegate
     }
+
+    // MARK: - Subscription & Freemium
 
     private func mockAuthentication() {
         subscriptionManager.accountManager.storeAuthToken(token: "")
@@ -125,9 +148,10 @@ final class MoreOptionsMenuTests: XCTestCase {
     }
 
     @MainActor
-    func testThatMoreOptionMenuHasTheExpectedItemsWhenUnauthenticatedAndCanPurchaseSubscription() {
+    func testThatMoreOptionMenuHasTheExpectedItemsWhenFreemiumFeatureUnavailable() {
         subscriptionManager.canPurchase = true
         subscriptionManager.currentEnvironment = SubscriptionEnvironment(serviceEnvironment: .production, purchasePlatform: .stripe)
+        mockFreemiumDBPFeature.featureAvailable = false
 
         setupMoreOptionsMenu()
 
@@ -156,12 +180,15 @@ final class MoreOptionsMenuTests: XCTestCase {
     }
 
     @MainActor
-    func testThatMoreOptionMenuHasTheExpectedItemsWhenSubscriptionIsActive() {
-        mockAuthentication()
+    func testThatMoreOptionMenuHasTheExpectedItemsWhenFreemiumFeatureAvailable() {
+        subscriptionManager.canPurchase = true
+        subscriptionManager.currentEnvironment = SubscriptionEnvironment(serviceEnvironment: .production, purchasePlatform: .stripe)
+        mockFreemiumDBPFeature.featureAvailable = true
 
         setupMoreOptionsMenu()
 
-        XCTAssertTrue(subscriptionManager.accountManager.isUserAuthenticated)
+        XCTAssertFalse(subscriptionManager.accountManager.isUserAuthenticated)
+        XCTAssertTrue(subscriptionManager.canPurchase)
 
         XCTAssertEqual(moreOptionsMenu.items[0].title, UserText.sendFeedback)
         XCTAssertTrue(moreOptionsMenu.items[1].isSeparatorItem)
@@ -177,18 +204,53 @@ final class MoreOptionsMenuTests: XCTestCase {
         XCTAssertTrue(moreOptionsMenu.items[11].isSeparatorItem)
         XCTAssertEqual(moreOptionsMenu.items[12].title, UserText.emailOptionsMenuItem)
         XCTAssertTrue(moreOptionsMenu.items[13].isSeparatorItem)
-
         XCTAssertEqual(moreOptionsMenu.items[14].title, UserText.subscriptionOptionsMenuItem)
-        XCTAssertTrue(moreOptionsMenu.items[14].hasSubmenu)
-        XCTAssertEqual(moreOptionsMenu.items[14].submenu?.items[0].title, UserText.networkProtection)
-        XCTAssertEqual(moreOptionsMenu.items[14].submenu?.items[1].title, UserText.dataBrokerProtectionOptionsMenuItem)
-        XCTAssertEqual(moreOptionsMenu.items[14].submenu?.items[2].title, UserText.identityTheftRestorationOptionsMenuItem)
-        XCTAssertTrue(moreOptionsMenu.items[14].submenu!.items[3].isSeparatorItem)
-        XCTAssertEqual(moreOptionsMenu.items[14].submenu?.items[4].title, UserText.subscriptionSettingsOptionsMenuItem)
+        XCTAssertFalse(moreOptionsMenu.items[14].hasSubmenu)
+        XCTAssertEqual(moreOptionsMenu.items[15].title, UserText.freemiumDBPOptionsMenuItem)
+        XCTAssertTrue(moreOptionsMenu.items[16].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[17].title, UserText.mainMenuHelp)
+        XCTAssertEqual(moreOptionsMenu.items[18].title, UserText.settings)
+    }
 
-        XCTAssertTrue(moreOptionsMenu.items[15].isSeparatorItem)
-        XCTAssertEqual(moreOptionsMenu.items[16].title, UserText.mainMenuHelp)
-        XCTAssertEqual(moreOptionsMenu.items[17].title, UserText.settings)
+    @MainActor
+    func testWhenClickingFreemiumDBPOptionThenFreemiumPresenterIsCalledAndNotificationIsPostedAndPixelFired() throws {
+        // Given
+        subscriptionManager.canPurchase = true
+        subscriptionManager.currentEnvironment = SubscriptionEnvironment(serviceEnvironment: .production, purchasePlatform: .stripe)
+        mockFreemiumDBPFeature.featureAvailable = true
+        setupMoreOptionsMenu()
+
+        let freemiumItemIndex = try XCTUnwrap(moreOptionsMenu.indexOfItem(withTitle: UserText.freemiumDBPOptionsMenuItem))
+
+        // When
+        moreOptionsMenu.performActionForItem(at: freemiumItemIndex)
+
+        // Then
+        XCTAssertTrue(mockFreemiumDBPPresenter.didCallShowFreemium)
+        XCTAssertTrue(mockNotificationCenter.didCallPostNotification)
+        XCTAssertEqual(mockNotificationCenter.lastPostedNotification, .freemiumDBPEntryPointActivated)
+        XCTAssertEqual(mockPixelHandler.lastFiredEvent, FreemiumDBPExperimentPixel.overFlowScan)
+    }
+
+    @MainActor
+    func testWhenClickingFreemiumDBPOptionAndFreemiumActivatedThenFreemiumPresenterIsCalledAndNotificationIsPostedAndPixelFired() throws {
+        // Given
+        mockFreemiumDBPUserStateManager.didPostFirstProfileSavedNotification = true
+        subscriptionManager.canPurchase = true
+        subscriptionManager.currentEnvironment = SubscriptionEnvironment(serviceEnvironment: .production, purchasePlatform: .stripe)
+        mockFreemiumDBPFeature.featureAvailable = true
+        setupMoreOptionsMenu()
+
+        let freemiumItemIndex = try XCTUnwrap(moreOptionsMenu.indexOfItem(withTitle: UserText.freemiumDBPOptionsMenuItem))
+
+        // When
+        moreOptionsMenu.performActionForItem(at: freemiumItemIndex)
+
+        // Then
+        XCTAssertTrue(mockFreemiumDBPPresenter.didCallShowFreemium)
+        XCTAssertTrue(mockNotificationCenter.didCallPostNotification)
+        XCTAssertEqual(mockNotificationCenter.lastPostedNotification, .freemiumDBPEntryPointActivated)
+        XCTAssertEqual(mockPixelHandler.lastFiredEvent, FreemiumDBPExperimentPixel.overFlowResults)
     }
 
     // MARK: Zoom
@@ -236,6 +298,27 @@ final class MoreOptionsMenuTests: XCTestCase {
         XCTAssertTrue(capturingActionDelegate.optionsButtonMenuRequestedBookmarkAllOpenTabsCalled)
     }
 
+    // MARK: - Default Browser Action
+
+    @MainActor
+    func testWhenBrowserIsDefaultThenSetAsDefaultBrowserMenuItemIsHidden() {
+        defaultBrowserProvider.isDefault = true
+
+        setupMoreOptionsMenu()
+        moreOptionsMenu.update()
+
+        XCTAssertNotEqual(moreOptionsMenu.items[1].title, UserText.setAsDefaultBrowser)
+    }
+
+    @MainActor
+    func testWhenBrowserIsNotDefaultThenSetAsDefaultBrowserMenuItemIsShown() {
+        defaultBrowserProvider.isDefault = false
+
+        setupMoreOptionsMenu()
+        moreOptionsMenu.update()
+
+        XCTAssertEqual(moreOptionsMenu.items[1].title, UserText.setAsDefaultBrowser)
+    }
 }
 
 final class NetworkProtectionVisibilityMock: VPNFeatureGatekeeper {
@@ -270,5 +353,28 @@ final class NetworkProtectionVisibilityMock: VPNFeatureGatekeeper {
 
     func disableIfUserHasNoAccess() async {
         // Intentional no-op
+    }
+}
+
+final class MockFreemiumDBPFeature: FreemiumDBPFeature {
+    var featureAvailable = false
+    var isAvailableSubject = PassthroughSubject<Bool, Never>()
+
+    var isAvailable: Bool {
+        featureAvailable
+    }
+
+    var isAvailablePublisher: AnyPublisher<Bool, Never> {
+        return isAvailableSubject.eraseToAnyPublisher()
+    }
+
+    func subscribeToDependencyUpdates() {}
+}
+
+final class MockFreemiumDBPPresenter: FreemiumDBPPresenter {
+    var didCallShowFreemium = false
+
+    func showFreemiumDBPAndSetActivated(windowControllerManager: WindowControllersManagerProtocol? = nil) {
+        didCallShowFreemium = true
     }
 }

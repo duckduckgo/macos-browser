@@ -79,10 +79,6 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
     case networkProtectionClientFailedToEncodeRegisterKeyRequest
     case networkProtectionClientFailedToFetchRegisteredServers(_ error: Error?)
     case networkProtectionClientFailedToParseRegisteredServersResponse
-    case networkProtectionClientFailedToEncodeRedeemRequest
-    case networkProtectionClientInvalidInviteCode
-    case networkProtectionClientFailedToRedeemInviteCode(_ error: Error?)
-    case networkProtectionClientFailedToParseRedeemResponse(_ error: Error)
     case networkProtectionClientFailedToFetchLocations(_ error: Error?)
     case networkProtectionClientFailedToParseLocationsResponse(_ error: Error?)
     case networkProtectionClientFailedToFetchServerStatus(_ error: Error?)
@@ -115,8 +111,9 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
 
     case networkProtectionConfigurationInvalidPayload(configuration: Configuration)
     case networkProtectionConfigurationErrorLoadingCachedConfig(_ error: Error)
-    case networkProtectionConfigurationPixelTest
     case networkProtectionConfigurationFailedToParse(_ error: Error)
+
+    case networkProtectionMalformedErrorDetected(_ error: Error)
 
     case networkProtectionUnhandledError(function: String, line: Int, error: Error)
 
@@ -246,18 +243,6 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
         case .networkProtectionClientFailedToParseRegisteredServersResponse:
             return "netp_backend_api_error_parsing_device_registration_response_failed"
 
-        case .networkProtectionClientFailedToEncodeRedeemRequest:
-            return "netp_backend_api_error_encoding_redeem_request_body_failed"
-
-        case .networkProtectionClientInvalidInviteCode:
-            return "netp_backend_api_error_invalid_invite_code"
-
-        case .networkProtectionClientFailedToRedeemInviteCode:
-            return "netp_backend_api_error_failed_to_redeem_invite_code"
-
-        case .networkProtectionClientFailedToParseRedeemResponse:
-            return "netp_backend_api_error_parsing_redeem_response_failed"
-
         case .networkProtectionClientFailedToFetchLocations:
             return "netp_backend_api_error_failed_to_fetch_location_list"
 
@@ -342,11 +327,11 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
         case .networkProtectionConfigurationErrorLoadingCachedConfig:
             return "netp_ev_configuration_error_loading_cached_config"
 
-        case .networkProtectionConfigurationPixelTest:
-            return "netp_ev_configuration_pixel_test"
-
         case .networkProtectionConfigurationFailedToParse:
             return "netp_ev_configuration_failed_to_parse"
+
+        case .networkProtectionMalformedErrorDetected:
+            return "netp_malformed_error_detected"
 
         case .networkProtectionUnhandledError:
             return "netp_unhandled_error"
@@ -386,8 +371,6 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
         case .networkProtectionClientFailedToFetchServerList(let error):
             return error?.pixelParameters
         case .networkProtectionClientFailedToFetchRegisteredServers(let error):
-            return error?.pixelParameters
-        case .networkProtectionClientFailedToRedeemInviteCode(let error):
             return error?.pixelParameters
         case .networkProtectionClientFailedToFetchLocations(let error):
             return error?.pixelParameters
@@ -450,9 +433,6 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionClientFailedToParseServerListResponse,
                 .networkProtectionClientFailedToEncodeRegisterKeyRequest,
                 .networkProtectionClientFailedToParseRegisteredServersResponse,
-                .networkProtectionClientFailedToEncodeRedeemRequest,
-                .networkProtectionClientInvalidInviteCode,
-                .networkProtectionClientFailedToParseRedeemResponse,
                 .networkProtectionClientInvalidAuthToken,
                 .networkProtectionWireguardErrorCannotLocateTunnelFileDescriptor,
                 .networkProtectionWireguardErrorFailedDNSResolution,
@@ -466,15 +446,14 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionDNSUpdateCustom,
                 .networkProtectionDNSUpdateDefault,
                 .networkProtectionConfigurationInvalidPayload,
-                .networkProtectionConfigurationPixelTest:
+                .networkProtectionMalformedErrorDetected:
             return nil
         }
     }
 
     var error: (any Error)? {
         switch self {
-        case .networkProtectionClientFailedToRedeemInviteCode(let error),
-                .networkProtectionClientFailedToFetchLocations(let error),
+        case .networkProtectionClientFailedToFetchLocations(let error),
                 .networkProtectionClientFailedToParseLocationsResponse(let error),
                 .networkProtectionClientFailedToFetchServerList(let error),
                 .networkProtectionClientFailedToFetchRegisteredServers(let error),
@@ -486,7 +465,6 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionTunnelStopFailure(let error),
                 .networkProtectionTunnelUpdateFailure(let error),
                 .networkProtectionTunnelWakeFailure(let error),
-                .networkProtectionClientFailedToParseRedeemResponse(let error),
                 .networkProtectionWireguardErrorCannotSetNetworkSettings(let error),
                 .networkProtectionWireguardErrorCannotStartWireguardBackend(let error),
                 .networkProtectionWireguardErrorCannotSetWireguardConfig(let error),
@@ -495,7 +473,8 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionSystemExtensionActivationFailure(let error),
                 .networkProtectionServerMigrationFailure(let error),
                 .networkProtectionConfigurationErrorLoadingCachedConfig(let error),
-                .networkProtectionConfigurationFailedToParse(let error):
+                .networkProtectionConfigurationFailedToParse(let error),
+                .networkProtectionMalformedErrorDetected(let error):
             return error
         case .networkProtectionActiveUser,
                 .networkProtectionNewUser,
@@ -530,8 +509,6 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionClientFailedToParseServerListResponse,
                 .networkProtectionClientFailedToEncodeRegisterKeyRequest,
                 .networkProtectionClientFailedToParseRegisteredServersResponse,
-                .networkProtectionClientFailedToEncodeRedeemRequest,
-                .networkProtectionClientInvalidInviteCode,
                 .networkProtectionClientInvalidAuthToken,
                 .networkProtectionKeychainErrorFailedToCastKeychainValueToData,
                 .networkProtectionKeychainReadError,
@@ -548,8 +525,7 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionServerMigrationSuccess,
                 .networkProtectionDNSUpdateCustom,
                 .networkProtectionDNSUpdateDefault,
-                .networkProtectionConfigurationInvalidPayload,
-                .networkProtectionConfigurationPixelTest:
+                .networkProtectionConfigurationInvalidPayload:
             return nil
         }
     }

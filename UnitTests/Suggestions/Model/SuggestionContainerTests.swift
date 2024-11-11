@@ -62,4 +62,34 @@ final class SuggestionContainerTests: XCTestCase {
         XCTAssertNil(suggestionContainer.result)
     }
 
+    func testSuggestionLoadingCacheClearing() {
+        let suggestionLoadingMock = SuggestionLoadingMock()
+        let historyCoordinatingMock = HistoryCoordinatingMock()
+        let suggestionContainer = SuggestionContainer(suggestionLoading: suggestionLoadingMock,
+                                                      historyCoordinating: historyCoordinatingMock,
+                                                      bookmarkManager: LocalBookmarkManager.shared)
+
+        XCTAssertNil(suggestionContainer.suggestionDataCache)
+        let e = expectation(description: "Suggestions updated")
+        suggestionContainer.suggestionLoading(suggestionLoadingMock, suggestionDataFromUrl: URL.testsServer, withParameters: [:]) { data, error in
+            XCTAssertNotNil(suggestionContainer.suggestionDataCache)
+            e.fulfill()
+
+            // Test the cache is not cleared if useCachedData is true
+            XCTAssertFalse(suggestionLoadingMock.getSuggestionsCalled)
+            suggestionContainer.getSuggestions(for: "test", useCachedData: true)
+            XCTAssertNotNil(suggestionContainer.suggestionDataCache)
+            XCTAssert(suggestionLoadingMock.getSuggestionsCalled)
+
+            suggestionLoadingMock.getSuggestionsCalled = false
+
+            // Test the cache is cleared if useCachedData is false
+            XCTAssertFalse(suggestionLoadingMock.getSuggestionsCalled)
+            suggestionContainer.getSuggestions(for: "test", useCachedData: false)
+            XCTAssertNil(suggestionContainer.suggestionDataCache)
+            XCTAssert(suggestionLoadingMock.getSuggestionsCalled)
+        }
+
+        waitForExpectations(timeout: 1)
+    }
 }
