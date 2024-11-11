@@ -700,7 +700,7 @@ final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault
     func updateAttemptCount(_ count: Int64, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
     }
 
-    func increaseAttemptCount(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+    func incrementAttemptCount(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
     }
 
     func fetchOptOut(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> OptOutJobData? {
@@ -923,7 +923,7 @@ final class MockDatabase: DataBrokerProtectionRepository {
         attemptCount = count
     }
 
-    func increaseAttemptCount(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+    func incrementAttemptCount(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
         attemptCount += 1
     }
 

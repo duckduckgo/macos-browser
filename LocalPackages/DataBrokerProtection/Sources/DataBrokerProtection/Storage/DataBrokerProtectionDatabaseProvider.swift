@@ -64,7 +64,7 @@ protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
     func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func updateAttemptCount(_ count: Int64, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
-    func increaseAttemptCount(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
+    func incrementAttemptCount(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func updateSubmittedSuccessfullyDate(_ date: Date?,
                                          forBrokerId brokerId: Int64,
                                          profileQueryId: Int64,
@@ -421,7 +421,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
                               extractedProfileId: extractedProfileId)
     }
 
-    func increaseAttemptCount(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+    func incrementAttemptCount(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
         try updateOptOutField({ optOut, _ in optOut.attemptCount += 1 },
                               value: -1,
                               forBrokerId: brokerId,

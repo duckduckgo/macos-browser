@@ -93,12 +93,12 @@ struct OperationPreferredDateCalculator {
                                          extractedProfileId: Int64,
                                          schedulingConfig: DataBrokerScheduleConfig,
                                          attemptCount: Int64?) -> Bool {
-        guard let lastRemovalEvent = events.last(where: { $0.type == .optOutRequested && $0.extractedProfileId == extractedProfileId }) else {
+        let currentAttempt = attemptCount ?? 0
+        if schedulingConfig.maxAttempts != -1, currentAttempt >= schedulingConfig.maxAttempts {
             return false
         }
 
-        let currentAttempt = attemptCount ?? 0
-        if schedulingConfig.maxAttempts != -1, currentAttempt >= schedulingConfig.maxAttempts {
+        guard let lastRemovalEvent = events.last(where: { $0.type == .optOutRequested && $0.extractedProfileId == extractedProfileId }) else {
             return false
         }
 

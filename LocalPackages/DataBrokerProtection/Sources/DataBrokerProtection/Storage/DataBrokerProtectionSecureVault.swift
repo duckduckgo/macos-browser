@@ -73,7 +73,7 @@ protocol DataBrokerProtectionSecureVault: SecureVault {
     func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func updateAttemptCount(_ count: Int64, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
-    func increaseAttemptCount(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
+    func incrementAttemptCount(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func updateSubmittedSuccessfullyDate(_ date: Date?,
                                          forBrokerId brokerId: Int64,
                                          profileQueryId: Int64,
@@ -298,8 +298,8 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
         try self.providers.database.updateAttemptCount(count, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
     }
 
-    func increaseAttemptCount(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
-        try self.providers.database.increaseAttemptCount(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
+    func incrementAttemptCount(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+        try self.providers.database.incrementAttemptCount(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
     }
 
     func updateSubmittedSuccessfullyDate(_ date: Date?,

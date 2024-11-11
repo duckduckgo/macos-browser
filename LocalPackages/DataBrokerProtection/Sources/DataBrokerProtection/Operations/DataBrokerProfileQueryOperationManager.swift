@@ -358,7 +358,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                 lastStageDate: stageDurationCalculator.lastStateTime,
                                 startTime: stageDurationCalculator.startTime)
             try database.add(.init(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested))
-            try increaseAttemptCountIfNeeded(
+            try incrementAttemptCountIfNeeded(
                 database: database,
                 brokerId: brokerId,
                 profileQueryId: profileQueryId,
@@ -396,16 +396,16 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                                      schedulingConfig: schedulingConfig)
         }
 
-    internal func increaseAttemptCountIfNeeded(database: DataBrokerProtectionRepository,
+    private func incrementAttemptCountIfNeeded(database: DataBrokerProtectionRepository,
                                                brokerId: Int64,
                                                profileQueryId: Int64,
                                                extractedProfileId: Int64) throws {
         guard let events = try? database.fetchOptOutHistoryEvents(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId),
-              events.sorted(by: { $0.date > $1.date }).first?.type == .optOutRequested else {
+              events.max(by: { $0.date < $1.date })?.type == .optOutRequested else {
             return
         }
 
-        try database.increaseAttemptCount(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
+        try database.incrementAttemptCount(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
     }
 
     private func handleOperationError(origin: OperationPreferredDateUpdaterOrigin,
