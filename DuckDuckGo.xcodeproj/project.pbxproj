@@ -15024,31 +15024,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = exactVersion;
-				version = 208.0.0;
-			};
-		};
-		9D84E4002CD4E66F0046CD8B /* XCRemoteSwiftPackageReference "OHHTTPStubs" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/AliSoftware/OHHTTPStubs.git";
-			requirement = {
-				kind = exactVersion;
-				version = 9.1.0;
-			};
-		};
-		9D84E4032CD4E66F0046CD8B /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/pointfreeco/swift-snapshot-testing";
-			requirement = {
-				kind = exactVersion;
-				version = 1.15.4;
-			};
-		};
-		9D84E4052CD4E66F0046CD8B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
-			requirement = {
-				kind = exactVersion;
-				version = 200.3.0;
+				version = 208.1.0;
 			};
 		};
 		9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
@@ -15650,22 +15626,18 @@
 		};
 		9D84E3FF2CD4E66F0046CD8B /* OHHTTPStubs */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 9D84E4002CD4E66F0046CD8B /* XCRemoteSwiftPackageReference "OHHTTPStubs" */;
 			productName = OHHTTPStubs;
 		};
 		9D84E4012CD4E66F0046CD8B /* OHHTTPStubsSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 9D84E4002CD4E66F0046CD8B /* XCRemoteSwiftPackageReference "OHHTTPStubs" */;
 			productName = OHHTTPStubsSwift;
 		};
 		9D84E4022CD4E66F0046CD8B /* SnapshotTesting */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 9D84E4032CD4E66F0046CD8B /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
 			productName = SnapshotTesting;
 		};
 		9D84E4042CD4E66F0046CD8B /* PixelKitTestingUtilities */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 9D84E4052CD4E66F0046CD8B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = PixelKitTestingUtilities;
 		};
 		9D84E4062CD4E66F0046CD8B /* AppKitExtensions */ = {
@@ -15674,7 +15646,6 @@
 		};
 		9D84E4072CD4E66F0046CD8B /* Common */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 9D84E4052CD4E66F0046CD8B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = Common;
 		};
 		9D9AE8F82AAA3AD00026E7DC /* DataBrokerProtection */ = {
