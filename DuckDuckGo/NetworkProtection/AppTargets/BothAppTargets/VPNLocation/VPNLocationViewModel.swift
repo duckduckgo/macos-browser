@@ -74,13 +74,13 @@ final class VPNLocationViewModel: ObservableObject {
     }
 
     func onNearestItemSelection() async {
-        PixelKit.fire(GeneralPixel.networkProtectionGeoswitchingSetNearest, frequency: .dailyAndCount)
+        PixelKit.fire(GeneralPixel.networkProtectionGeoswitchingSetNearest, frequency: .legacyDailyAndCount)
         selectedLocation = .nearest
         await reloadList()
     }
 
     func onCountryItemSelection(id: String, cityId: String? = nil) async {
-        PixelKit.fire(GeneralPixel.networkProtectionGeoswitchingSetCustom, frequency: .dailyAndCount)
+        PixelKit.fire(GeneralPixel.networkProtectionGeoswitchingSetCustom, frequency: .legacyDailyAndCount)
         let city = cityId == VPNCityItemModel.nearest.id ? nil : cityId
         let location = NetworkProtectionSelectedLocation(country: id, city: city)
         selectedLocation = .location(location)
@@ -95,7 +95,7 @@ final class VPNLocationViewModel: ObservableObject {
     private func reloadList() async {
         guard let locations = try? await locationListRepository.fetchLocationList().sortedByName() else { return }
         if locations.isEmpty {
-            PixelKit.fire(GeneralPixel.networkProtectionGeoswitchingNoLocations, frequency: .dailyAndCount)
+            PixelKit.fire(GeneralPixel.networkProtectionGeoswitchingNoLocations, frequency: .legacyDailyAndCount)
         }
         let isNearestSelected = selectedLocation == .nearest
         self.isNearestSelected = isNearestSelected

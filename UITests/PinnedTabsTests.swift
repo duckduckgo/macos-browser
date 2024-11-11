@@ -157,8 +157,8 @@ class PinnedTabsTests: XCTestCase {
     private func assertPinnedTabsRestoredState() {
         let newApp = XCUIApplication()
         newApp.launch()
-
-        sleep(2)
+        newApp.typeKey("n", modifierFlags: .command)
+        sleep(10) // This was increased from two to ten, because slower VMs needed more time to re-launch the app.
 
         /// Goes to Page #2 to check the state
         newApp.typeKey("[", modifierFlags: [.command, .shift])

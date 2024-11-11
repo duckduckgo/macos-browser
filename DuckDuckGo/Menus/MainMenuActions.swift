@@ -160,6 +160,12 @@ extension AppDelegate {
     }
 
     @MainActor
+    @objc func setAsDefault(_ sender: Any?) {
+        PixelKit.fire(GeneralPixel.defaultRequestedFromMainMenu)
+        DefaultBrowserPreferences.shared.becomeDefault()
+    }
+
+    @MainActor
     @objc func showReleaseNotes(_ sender: Any?) {
         WindowControllersManager.shared.showTab(with: .releaseNotes)
     }

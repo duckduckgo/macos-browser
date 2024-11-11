@@ -705,6 +705,8 @@ class MockAdClickLogic: AdClickLogicProtocol {
         self.delegate!.attributionLogic(castedLogic, didRequestRuleApplication: .init(name: "rulesList", rulesList: ruleList, trackerData: .mock, encodedTrackerData: "etd", etag: "etag", identifier: .mock), forVendor: "vnd")
     }
 
+    var debugID = "test"
+
     var onRulesChanged: (([ContentBlockerRulesManager.Rules]) -> Void)?
     func onRulesChanged(latestRules: [ContentBlockerRulesManager.Rules]) {
         onRulesChanged?(latestRules)
@@ -802,8 +804,8 @@ extension AdClickAttributionLogic.State: Equatable {
         case .noAttribution: if case .noAttribution = rhs { return true }
         case .activeAttribution(vendor: let vendor, session: let session, rules: let rules):
             if case .activeAttribution(vendor: vendor, session: session, rules: rules) = rhs { return true }
-        case .preparingAttribution(vendor: let vendor, session: let session, completionBlocks: _):
-            if case .preparingAttribution(vendor: vendor, session: session, completionBlocks: _) = rhs { return true }
+        case .preparingAttribution(vendor: let vendor, session: let session, let id, completionBlocks: _):
+            if case .preparingAttribution(vendor: vendor, session: session, requestID: id, completionBlocks: _) = rhs { return true }
         }
         return false
     }

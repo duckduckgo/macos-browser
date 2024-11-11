@@ -19,6 +19,7 @@
 import Foundation
 import Subscription
 import Common
+import AppKitExtensions
 
 public protocol DataBrokerProtectionSubscriptionManaging {
     var isUserAuthenticated: Bool { get }
@@ -31,11 +32,19 @@ public final class DataBrokerProtectionSubscriptionManager: DataBrokerProtection
     let subscriptionManager: SubscriptionManager
 
     public var isUserAuthenticated: Bool {
-        subscriptionManager.accountManager.accessToken != nil
+        accessToken != nil
     }
 
     public var accessToken: String? {
-        subscriptionManager.accountManager.accessToken
+        // We use a staging token for privacy pro supplied through a github secret/action
+        // for PIR end to end tests. This is also stored in bitwarden if you want to run
+        // the tests locally 
+        let dbpSettings = DataBrokerProtectionSettings()
+        if dbpSettings.storedRunType == .integrationTests,
+           let token = ProcessInfo.processInfo.environment["PRIVACYPRO_STAGING_TOKEN"] {
+            return token
+        }
+        return subscriptionManager.accountManager.accessToken
     }
 
     public init(subscriptionManager: SubscriptionManager) {
