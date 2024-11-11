@@ -22,6 +22,7 @@ import Common
 import BrowserServicesKit
 import Configuration
 import PixelKit
+import AppKitExtensions
 import os.log
 import Freemium
 import Subscription
@@ -34,7 +35,8 @@ public class DataBrokerProtectionAgentManagerProvider {
                                     accountManager: AccountManager) -> DataBrokerProtectionAgentManager {
         let pixelHandler = DataBrokerProtectionPixelsHandler()
 
-        let executionConfig = DataBrokerExecutionConfig()
+        let dbpSettings = DataBrokerProtectionSettings()
+        let executionConfig = DataBrokerExecutionConfig(mode: dbpSettings.storedRunType == .integrationTests ? .fastForIntegrationTests : .normal)
         let activityScheduler = DefaultDataBrokerProtectionBackgroundActivityScheduler(config: executionConfig)
 
         let notificationService = DefaultDataBrokerProtectionUserNotificationService(pixelHandler: pixelHandler, userNotificationCenter: UNUserNotificationCenter.current(), authenticationManager: authenticationManager)
@@ -138,8 +140,6 @@ public final class DataBrokerProtectionAgentManager {
 
     private var didStartActivityScheduler = false
 
-    private var configurationSubscription: AnyCancellable?
-
     init(userNotificationService: DataBrokerProtectionUserNotificationService,
          activityScheduler: DataBrokerProtectionBackgroundActivityScheduler,
          ipcServer: DataBrokerProtectionIPCServer,
@@ -187,13 +187,6 @@ public final class DataBrokerProtectionAgentManager {
             /// Monitors entitlement changes every 60 minutes to optimize system performance and resource utilization by avoiding unnecessary operations when entitlement is invalid.
             /// While keeping the agent active with invalid entitlement has no significant risk, setting the monitoring interval at 60 minutes is a good balance to minimize backend checks.
             agentStopper.monitorEntitlementAndStopAgentIfEntitlementIsInvalidAndUserIsNotFreemium(interval: .minutes(60))
-
-            configurationSubscription = privacyConfigurationManager.updatesPublisher
-                .sink { [weak self] _ in
-                    if self?.privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(BackgroundAgentPixelTestSubfeature.pixelTest) ?? false {
-                        PixelKit.fire(DataBrokerProtectionPixels.pixelTest, frequency: .daily)
-                    }
-                }
         }
     }
 }

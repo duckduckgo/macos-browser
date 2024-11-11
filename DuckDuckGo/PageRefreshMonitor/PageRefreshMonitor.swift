@@ -1,7 +1,7 @@
 //
-//  CapturingDataImportProvider.swift
+//  PageRefreshMonitor.swift
 //
-//  Copyright © 2023 DuckDuckGo. All rights reserved.
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,16 +16,13 @@
 //  limitations under the License.
 //
 
-import Foundation
-@testable import DuckDuckGo_Privacy_Browser
+import PageRefreshMonitor
+import PixelKit
 
-class CapturingDataImportProvider: DataImportStatusProviding {
+extension PageRefreshMonitor {
 
-    var showImportWindowCalled = false
-    var didImport = false
-
-    func showImportWindow(customTitle: String?, completion: (() -> Void)?) {
-        showImportWindowCalled = true
-        completion?()
+    static let onDidDetectRefreshPattern: () -> Void = {
+        PixelKit.fire(GeneralPixel.pageRefreshThreeTimesWithin20Seconds)
     }
+
 }

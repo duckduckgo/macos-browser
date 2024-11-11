@@ -17,6 +17,7 @@
 //
 
 import Cocoa
+import PrivacyDashboard
 
 final class PrivacyDashboardPopover: NSPopover {
 
@@ -35,22 +36,22 @@ final class PrivacyDashboardPopover: NSPopover {
         (contentViewController as? PrivacyDashboardViewController)!
     }
 
-    override init() {
+    init(entryPoint: PrivacyDashboardEntryPoint = .dashboard) {
         super.init()
 #if DEBUG
         self.behavior = .semitransient
 #else
         self.behavior = .transient
 #endif
-        setupContentController()
+        setupContentController(entryPoint: entryPoint)
     }
 
     required init?(coder: NSCoder) {
         fatalError("\(Self.self): Bad initializer")
     }
 
-    private func setupContentController() {
-        let controller = PrivacyDashboardViewController()
+    private func setupContentController(entryPoint: PrivacyDashboardEntryPoint) {
+        let controller = PrivacyDashboardViewController(entryPoint: entryPoint)
         controller.sizeDelegate = self
         contentViewController = controller
     }

@@ -62,8 +62,9 @@ class CapturingOnboardingActionsManager: OnboardingActionsManaging {
         addToDockCalled = true
     }
 
-    func importData() {
+    func importData() async -> Bool {
         importDataCalled = true
+        return true
     }
 
     func setAsDefault() {

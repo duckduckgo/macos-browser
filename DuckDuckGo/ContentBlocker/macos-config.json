@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1730728849681,
+    "version": 1731320660413,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -487,12 +487,15 @@
                             },
                             {
                                 "percent": 50
+                            },
+                            {
+                                "percent": 100
                             }
                         ]
                     }
                 }
             },
-            "hash": "9de8e4b066aa23f7c20ca638ee0d9f1a"
+            "hash": "91e54b0d57fbf1cf8668c9a929631432"
         },
         "bookmarks": {
             "state": "enabled",
@@ -521,14 +524,14 @@
             "hash": "37e0cf88badfc8b01b6394f0884502f6"
         },
         "brokenSitePrompt": {
-            "state": "disabled",
+            "state": "enabled",
             "exceptions": [],
             "settings": {
                 "maxDismissStreak": 3,
                 "dismissStreakResetDays": 30,
                 "coolDownDays": 7
             },
-            "hash": "f93d54aff00a2110443fffcd8b3f26c9"
+            "hash": "7ff56afca8279353caaa7da24ab31e28"
         },
         "brokenSiteReportExperiment": {
             "exceptions": [],
@@ -1384,6 +1387,12 @@
                     "domain": "instructure.com"
                 },
                 {
+                    "domain": "humana.com"
+                },
+                {
+                    "domain": "centerwellpharmacy.com"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -1400,7 +1409,7 @@
                 }
             ],
             "state": "disabled",
-            "hash": "fce0a9ccd7ae060d25e7debe4d8905fb"
+            "hash": "33c2d56a2a9dd43c88a353d8a57dfa72"
         },
         "customUserAgent": {
             "settings": {
@@ -1812,6 +1821,10 @@
                         "type": "hide-empty"
                     },
                     {
+                        "selector": "#top-ad",
+                        "type": "hide"
+                    },
+                    {
                         "selector": "#topAd",
                         "type": "hide-empty"
                     },
@@ -1861,6 +1874,10 @@
                     },
                     {
                         "selector": "#google-one-tap-popup-container",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": ".google-one-tap__module",
                         "type": "hide"
                     },
                     {
@@ -2174,6 +2191,7 @@
                     "content continues below",
                     "x",
                     "_",
+                    "sponsor message",
                     "sponsored",
                     "sponsorisé",
                     "story continues below advertisement",
@@ -3235,6 +3253,10 @@
                             },
                             {
                                 "selector": "[aria-labelledby='promo-header']",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": "div[role='banner']:has(div > a[href='https://support.google.com/a/answer/33864'])",
                                 "type": "hide"
                             }
                         ]
@@ -4974,7 +4996,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "485beac7762b316d685395a55537e0b7"
+            "hash": "a67f228d780dfbd95210e12b90da8df2"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -5695,11 +5717,14 @@
                 },
                 "userTips": {
                     "state": "enabled"
+                },
+                "enforceRoutes": {
+                    "state": "enabled"
                 }
             },
             "exceptions": [],
             "minSupportedVersion": "1.57.1",
-            "hash": "8e20176b0569977f35a9897a40882627"
+            "hash": "ea1fe9850a4436bd65e4d2c80732da80"
         },
         "newTabContinueSetUp": {
             "exceptions": [],
@@ -5720,9 +5745,9 @@
             "hash": "cbd62a1a63a829da0277ca045a311eb2"
         },
         "newTabSearchField": {
-            "state": "disabled",
+            "state": "enabled",
             "exceptions": [],
-            "hash": "c292bb627849854515cebbded288ef5a"
+            "hash": "697382e31649d84b01166f1dc6f790d6"
         },
         "nonTracking3pCookies": {
             "settings": {
@@ -6018,6 +6043,27 @@
             "state": "disabled",
             "hash": "be6751fe0307a7e1b9476f4d8b8d0aaf"
         },
+        "showOnAppLaunch": {
+            "exceptions": [
+                {
+                    "domain": "marvel.com"
+                },
+                {
+                    "domain": "sundancecatalog.com"
+                },
+                {
+                    "domain": "noaprints.com"
+                },
+                {
+                    "domain": "flexmls.com"
+                },
+                {
+                    "domain": "instructure.com"
+                }
+            ],
+            "state": "disabled",
+            "hash": "be6751fe0307a7e1b9476f4d8b8d0aaf"
+        },
         "sslCertificates": {
             "state": "enabled",
             "exceptions": [],
@@ -6027,6 +6073,27 @@
                 }
             },
             "hash": "abe9584048f7f8157f71a14e7914cb1c"
+        },
+        "swipingTabs": {
+            "exceptions": [
+                {
+                    "domain": "marvel.com"
+                },
+                {
+                    "domain": "sundancecatalog.com"
+                },
+                {
+                    "domain": "noaprints.com"
+                },
+                {
+                    "domain": "flexmls.com"
+                },
+                {
+                    "domain": "instructure.com"
+                }
+            ],
+            "state": "disabled",
+            "hash": "be6751fe0307a7e1b9476f4d8b8d0aaf"
         },
         "syncPromotion": {
             "state": "enabled",
@@ -6892,6 +6959,12 @@
                                     "homedepot.com",
                                     "sbs.com.au"
                                 ]
+                            },
+                            {
+                                "rule": "sbs.demdex.net",
+                                "domains": [
+                                    "sbs.com.au"
+                                ]
                             }
                         ]
                     },
@@ -6988,6 +7061,12 @@
                                     "rocketnews24.com",
                                     "weather.com",
                                     "wunderground.com"
+                                ]
+                            },
+                            {
+                                "rule": "securepubads.g.doubleclick.net/pagead/ima_ppub_config",
+                                "domains": [
+                                    "sbs.com.au"
                                 ]
                             },
                             {
@@ -9103,6 +9182,13 @@
                                 ]
                             },
                             {
+                                "rule": "tags.tiqcdn.com/utag/cbsi/",
+                                "domains": [
+                                    "cbs.com",
+                                    "paramountplus.com"
+                                ]
+                            },
+                            {
                                 "rule": "tags.tiqcdn.com/utag/",
                                 "domains": [
                                     "<all>"
@@ -9505,7 +9591,7 @@
                     "domain": "instructure.com"
                 }
             ],
-            "hash": "7d4f56d34c41ddfde274e4aa23a8b74b"
+            "hash": "ee6f955a89fa4d85e792ef4ebdb81920"
         },
         "trackingCookies1p": {
             "settings": {
