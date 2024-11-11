@@ -75,6 +75,9 @@ protocol NewTabPageSearchBoxExperimentCohortDeciding {
 
 struct DefaultNewTabPageSearchBoxExperimentCohortDecider: NewTabPageSearchBoxExperimentCohortDeciding {
     var cohort: NewTabPageSearchBoxExperiment.Cohort? {
+        if NSApp.runType == .uiTests {
+            return nil
+        }
 
         // We enroll all new users
         if AppDelegate.isNewUser {
