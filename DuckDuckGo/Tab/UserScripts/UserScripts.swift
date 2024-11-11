@@ -95,14 +95,15 @@ final class UserScripts: UserScriptsProvider {
 
         contentScopeUserScriptIsolated.registerSubfeature(delegate: clickToLoadScript)
 
+        if let aiChatUserScript {
+            contentScopeUserScriptIsolated.registerSubfeature(delegate: aiChatUserScript)
+        }
+
         if let youtubeOverlayScript {
             contentScopeUserScriptIsolated.registerSubfeature(delegate: youtubeOverlayScript)
         }
 
         if let specialPages = specialPages {
-            if let aiChatUserScript {
-                specialPages.registerSubfeature(delegate: aiChatUserScript)
-            }
 
             if let specialErrorPageUserScript {
                 specialPages.registerSubfeature(delegate: specialErrorPageUserScript)
