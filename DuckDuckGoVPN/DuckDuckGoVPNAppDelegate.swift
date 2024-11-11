@@ -134,8 +134,6 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private let configurationStore = ConfigurationStore()
     private let configurationManager: ConfigurationManager
     private var configurationSubscription: AnyCancellable?
-    private let privacyConfigurationManager = VPNPrivacyConfigurationManager()
-
     private let privacyConfigurationManager = VPNPrivacyConfigurationManager(internalUserDecider: DefaultInternalUserDecider(store: UserDefaults.appConfiguration))
     private lazy var featureFlagger = DefaultFeatureFlagger(
         internalUserDecider: privacyConfigurationManager.internalUserDecider,
