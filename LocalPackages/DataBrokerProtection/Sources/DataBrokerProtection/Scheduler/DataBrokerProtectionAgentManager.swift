@@ -22,6 +22,7 @@ import Common
 import BrowserServicesKit
 import Configuration
 import PixelKit
+import AppKitExtensions
 import os.log
 import Freemium
 import Subscription
@@ -34,7 +35,8 @@ public class DataBrokerProtectionAgentManagerProvider {
                                     accountManager: AccountManager) -> DataBrokerProtectionAgentManager {
         let pixelHandler = DataBrokerProtectionPixelsHandler()
 
-        let executionConfig = DataBrokerExecutionConfig()
+        let dbpSettings = DataBrokerProtectionSettings()
+        let executionConfig = DataBrokerExecutionConfig(mode: dbpSettings.storedRunType == .integrationTests ? .fastForIntegrationTests : .normal)
         let activityScheduler = DefaultDataBrokerProtectionBackgroundActivityScheduler(config: executionConfig)
 
         let notificationService = DefaultDataBrokerProtectionUserNotificationService(pixelHandler: pixelHandler, userNotificationCenter: UNUserNotificationCenter.current(), authenticationManager: authenticationManager)

@@ -21,6 +21,10 @@ import DDGSync
 import PixelKit
 
 struct SyncDiagnosisHelper {
+    private enum Const {
+        static let authStatePixelParamKey = "authState"
+    }
+
     private let userDefaults = UserDefaults.standard
     private let syncService: DDGSyncing
 
@@ -46,7 +50,11 @@ struct SyncDiagnosisHelper {
             // Nil value means sync was never on in the first place. So don't fire in this case.
             if syncManuallyDisabled == false,
                !syncWasDisabledUnexpectedlyPixelFired {
-                PixelKit.fire(DebugEvent(GeneralPixel.syncDebugWasDisabledUnexpectedly), frequency: .legacyDailyAndCount)
+                PixelKit.fire(
+                    DebugEvent(GeneralPixel.syncDebugWasDisabledUnexpectedly),
+                    frequency: .dailyAndCount,
+                    withAdditionalParameters: [Const.authStatePixelParamKey: syncService.authState.rawValue]
+                )
                 syncWasDisabledUnexpectedlyPixelFired = true
             }
         } else {

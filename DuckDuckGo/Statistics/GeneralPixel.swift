@@ -444,6 +444,12 @@ enum GeneralPixel: PixelKitEventV2 {
     case errorPageShownOther
     case errorPageShownWebkitTermination
 
+    // Broken site prompt
+
+    case pageRefreshThreeTimesWithin20Seconds
+    case siteNotWorkingShown
+    case siteNotWorkingWebsiteIsBroken
+
     var name: String {
         switch self {
 
@@ -1086,6 +1092,11 @@ enum GeneralPixel: PixelKitEventV2 {
 
         case .errorPageShownOther: return "m_mac_errorpageshown_other"
         case .errorPageShownWebkitTermination: return "m_mac_errorpageshown_webkittermination"
+
+            // Broken site prompt
+        case .pageRefreshThreeTimesWithin20Seconds: return "m_mac_reload-three-times-within-20-seconds"
+        case .siteNotWorkingShown: return "m_mac_site-not-working_shown"
+        case .siteNotWorkingWebsiteIsBroken: return "m_mac_site-not-working_website-is-broken"
         }
     }
 

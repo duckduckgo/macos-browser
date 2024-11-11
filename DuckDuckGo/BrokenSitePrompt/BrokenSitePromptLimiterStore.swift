@@ -1,7 +1,7 @@
 //
-//  CapturingDataImportProvider.swift
+//  BrokenSitePromptLimiterStore.swift
 //
-//  Copyright © 2023 DuckDuckGo. All rights reserved.
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -17,15 +17,14 @@
 //
 
 import Foundation
-@testable import DuckDuckGo_Privacy_Browser
+import BrokenSitePrompt
 
-class CapturingDataImportProvider: DataImportStatusProviding {
+final class BrokenSitePromptLimiterStore: BrokenSitePromptLimiterStoring {
 
-    var showImportWindowCalled = false
-    var didImport = false
+    @UserDefaultsWrapper(key: .lastBrokenSiteToastShownDate, defaultValue: .distantPast)
+    var lastToastShownDate: Date
 
-    func showImportWindow(customTitle: String?, completion: (() -> Void)?) {
-        showImportWindowCalled = true
-        completion?()
-    }
+    @UserDefaultsWrapper(key: .toastDismissStreakCounter, defaultValue: 0)
+    var toastDismissStreakCounter: Int
+
 }
