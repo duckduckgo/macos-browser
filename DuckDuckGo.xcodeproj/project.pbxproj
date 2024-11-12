@@ -329,6 +329,8 @@
 		31E163BA293A56F400963C10 /* BrokenSiteReportingReferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31E163B9293A56F400963C10 /* BrokenSiteReportingReferenceTests.swift */; };
 		31E163BD293A579E00963C10 /* PrivacyReferenceTestHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31E163BC293A579E00963C10 /* PrivacyReferenceTestHelper.swift */; };
 		31E163C0293A581900963C10 /* privacy-reference-tests in Resources */ = {isa = PBXBuildFile; fileRef = 31E163BF293A581900963C10 /* privacy-reference-tests */; };
+		31E3FD722CE39C4600A392C8 /* AIChatDebugURLSettingsRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31E3FD702CE39C4600A392C8 /* AIChatDebugURLSettingsRepresentable.swift */; };
+		31E3FD732CE39C4600A392C8 /* AIChatDebugURLSettingsRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31E3FD702CE39C4600A392C8 /* AIChatDebugURLSettingsRepresentable.swift */; };
 		31ECDA0E2BED317300AE679F /* BundleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106B9D26A565DA0013B453 /* BundleExtension.swift */; };
 		31ECDA0F2BED317300AE679F /* BundleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106B9D26A565DA0013B453 /* BundleExtension.swift */; };
 		31ECDA112BED339600AE679F /* DataBrokerAuthenticationManagerBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31ECDA102BED339600AE679F /* DataBrokerAuthenticationManagerBuilder.swift */; };
@@ -3542,6 +3544,7 @@
 		31E163B9293A56F400963C10 /* BrokenSiteReportingReferenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrokenSiteReportingReferenceTests.swift; sourceTree = "<group>"; };
 		31E163BC293A579E00963C10 /* PrivacyReferenceTestHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyReferenceTestHelper.swift; sourceTree = "<group>"; };
 		31E163BF293A581900963C10 /* privacy-reference-tests */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "privacy-reference-tests"; path = "Submodules/privacy-reference-tests"; sourceTree = SOURCE_ROOT; };
+		31E3FD702CE39C4600A392C8 /* AIChatDebugURLSettingsRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIChatDebugURLSettingsRepresentable.swift; sourceTree = "<group>"; };
 		31ECDA102BED339600AE679F /* DataBrokerAuthenticationManagerBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerAuthenticationManagerBuilder.swift; sourceTree = "<group>"; };
 		31F25EFE2CC3CA00002F9084 /* AIChatMenuConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIChatMenuConfigurationTests.swift; sourceTree = "<group>"; };
 		31F28C4C28C8EEC500119F70 /* YoutubePlayerUserScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YoutubePlayerUserScript.swift; sourceTree = "<group>"; };
@@ -5452,6 +5455,7 @@
 		31521ABE2CC0139C00248E6F /* AIChat */ = {
 			isa = PBXGroup;
 			children = (
+				31E3FD712CE39C4600A392C8 /* Debug */,
 				31CF74542CDC1771004ACCE5 /* UserScript */,
 				31031EAC2CC8FFCB00684340 /* Onboarding */,
 				319FCFF42CC83003004F9288 /* AIChatDebugMenu.swift */,
@@ -5586,6 +5590,14 @@
 				31E163BF293A581900963C10 /* privacy-reference-tests */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		31E3FD712CE39C4600A392C8 /* Debug */ = {
+			isa = PBXGroup;
+			children = (
+				31E3FD702CE39C4600A392C8 /* AIChatDebugURLSettingsRepresentable.swift */,
+			);
+			path = Debug;
 			sourceTree = "<group>";
 		};
 		31F25EFD2CC3C9F9002F9084 /* AIChat */ = {
@@ -11633,6 +11645,7 @@
 				569277C229DDCBB500B633EF /* HomePageContinueSetUpModel.swift in Sources */,
 				3767318F2C7F32E900EB097B /* SolidColorBackground.swift in Sources */,
 				3706FBD7293F65D500E42796 /* ContentBlockerRulesLists.swift in Sources */,
+				31E3FD732CE39C4600A392C8 /* AIChatDebugURLSettingsRepresentable.swift in Sources */,
 				3706FBD8293F65D500E42796 /* NSViewControllerExtension.swift in Sources */,
 				3706FBD9293F65D500E42796 /* NSAppearanceExtension.swift in Sources */,
 				3706FBDA293F65D500E42796 /* PermissionManager.swift in Sources */,
@@ -12775,6 +12788,7 @@
 				4BF0E5122AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift in Sources */,
 				AA6EF9AD25066F42004754E6 /* WindowsManager.swift in Sources */,
 				1D43EB3A292B63B00065E5D6 /* BWRequest.swift in Sources */,
+				31E3FD722CE39C4600A392C8 /* AIChatDebugURLSettingsRepresentable.swift in Sources */,
 				C172E7372C93968E00521D9A /* SyncPromoPixelKitEvent.swift in Sources */,
 				B684121C2B6A1D880092F66A /* ErrorPageHTMLTemplate.swift in Sources */,
 				B65C7DFB2B886CF0001E2D5C /* WKPDFHUDViewWrapper.swift in Sources */,
