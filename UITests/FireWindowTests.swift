@@ -115,19 +115,28 @@ class FireWindowTests: XCTestCase {
     // MARK: - Utilities
 
     private func signInUsingAutoFill() {
-        let webViewFire = app.webViews.firstMatch
-        let webViewCoordinate = webViewFire.coordinate(withNormalizedOffset: CGVector(dx: 5, dy: 5))
-        webViewCoordinate.tap()
-        app.typeKey("\t", modifierFlags: [])
-//        let emailTextFieldFire = webViewFire.textFields["Email"].firstMatch
-//        emailTextFieldFire.click()
+        if #available(macOS 13.0, *) {
+            let webViewFire = app.webViews.firstMatch
+            let webViewCoordinate = webViewFire.coordinate(withNormalizedOffset: CGVector(dx: 5, dy: 5))
+            webViewCoordinate.tap()
+            app.typeKey("\t", modifierFlags: [])
+            let autoFillPopup = webViewFire.buttons["test@duck.com privacy-test-pages.site"]
+            let coordinate = autoFillPopup.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+            coordinate.tap()
 
-        let autoFillPopup = webViewFire.buttons["test@duck.com privacy-test-pages.site"]
-        let coordinate = autoFillPopup.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
-        coordinate.tap()
+            // TODO: How can I check the value?
+            XCTAssertEqual(app.textFields["Email"].value as? String, "test@duck.com")
+        } else {
+            let webViewFire = app.webViews.firstMatch
+            webViewFire.tap()
+            let emailTextFieldFire = webViewFire.textFields["Email"].firstMatch
+            emailTextFieldFire.click()
+            let autoFillPopup = webViewFire.buttons["test@duck.com privacy-test-pages.site"]
+            let coordinate = autoFillPopup.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+            coordinate.tap()
 
-        let emailTextFieldFire = webViewFire.textFields["Email"].firstMatch
-        XCTAssertEqual(emailTextFieldFire.value as? String, "test@duck.com")
+            XCTAssertEqual(emailTextFieldFire.value as? String, "test@duck.com")
+        }
     }
 
     private func saveCredentials() {
@@ -136,16 +145,23 @@ class FireWindowTests: XCTestCase {
     }
 
     private func signIn() {
-        let webView = app.webViews.firstMatch
-        let webViewCoordinate = webView.coordinate(withNormalizedOffset: CGVector(dx: 5, dy: 5))
-        webViewCoordinate.tap()
-//        let emailTextField = webView.textFields["Email"].firstMatch
-//        emailTextField.click()
-//        emailTextField.typeText("test@duck.com")
-        app.typeKey("\t", modifierFlags: [])
-        app.typeText("test@duck.com")
-        app.typeKey("\t", modifierFlags: [])
-        app.typeText("pa$$word")
+        if #available(macOS 13.0, *) {
+            let webView = app.webViews.firstMatch
+            let webViewCoordinate = webView.coordinate(withNormalizedOffset: CGVector(dx: 5, dy: 5))
+            webViewCoordinate.tap()
+            app.typeKey("\t", modifierFlags: [])
+            app.typeText("test@duck.com")
+            app.typeKey("\t", modifierFlags: [])
+            app.typeText("pa$$word")
+        } else {
+            let webView = app.webViews.firstMatch
+            webView.tap()
+            let emailTextField = webView.textFields["Email"].firstMatch
+            emailTextField.click()
+            emailTextField.typeText("test@duck.com")
+            app.typeKey("\t", modifierFlags: [])
+            app.typeText("pa$$word")
+        }
 
         let signInButton = app.webViews.firstMatch.buttons["Sign in"].firstMatch
         signInButton.click()
@@ -175,22 +191,30 @@ class FireWindowTests: XCTestCase {
     }
 
     private func fillCredentials() {
-        let webView = app.webViews.firstMatch
-        let webViewCoordinate = webView.coordinate(withNormalizedOffset: CGVector(dx: 5, dy: 5))
-        webViewCoordinate.tap()
-//        webView.tap()
-//        let emailTextField = webView.textFields["Email"].firstMatch
-//        emailTextField.click()
-//        emailTextField.typeText("test@duck.com")
-        app.typeKey("\t", modifierFlags: [])
-        app.typeText("test@duck.com")
-        app.typeKey("\t", modifierFlags: [])
-        app.typeText("pa$$word")
-//        let password = webView.secureTextFields["Password"].firstMatch
-//        password.click()
-//        password.typeText("pa$$word")
-        app.typeKey("\t", modifierFlags: [])
-        app.typeText("pa$$word")
+        if #available(macOS 13.0, *) {
+            /// On macOS 13 we tap in the webview coordinate and we use tabs to make it work given that it doesn't find web view elements
+            let webView = app.webViews.firstMatch
+            let webViewCoordinate = webView.coordinate(withNormalizedOffset: CGVector(dx: 5, dy: 5))
+            webViewCoordinate.tap()
+            app.typeKey("\t", modifierFlags: [])
+            app.typeText("test@duck.com")
+            app.typeKey("\t", modifierFlags: [])
+            app.typeText("pa$$word")
+            app.typeKey("\t", modifierFlags: [])
+            app.typeText("pa$$word")
+        } else {
+            let webView = app.webViews.firstMatch
+            webView.tap()
+            let emailTextField = webView.textFields["Email"].firstMatch
+            emailTextField.click()
+            emailTextField.typeText("test@duck.com")
+
+            let password = webView.secureTextFields["Password"].firstMatch
+            password.click()
+            password.typeText("pa$$word")
+            app.typeKey("\t", modifierFlags: [])
+            app.typeText("pa$$word")
+        }
     }
 
     private func openSignUpSite() {
