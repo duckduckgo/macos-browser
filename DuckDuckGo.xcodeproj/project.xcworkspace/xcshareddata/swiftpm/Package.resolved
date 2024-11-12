@@ -33,7 +33,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "dominik/feature-flag-overrides",
-        "revision" : "1e11729a35087cb83a6dfe5d026294760073c28e"
+        "revision" : "cfbf585bdf15436697af25420aeb39ebd07242b6"
       }
     },
     {

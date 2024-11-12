@@ -58,9 +58,17 @@ final class FeatureFlagOverridesMenu: NSMenu {
                     target: self,
                     representedObject: flag
                 )
+                .submenu(NSMenu(items: [
+                    NSMenuItem(
+                        title: "Remove Override",
+                        action: #selector(resetOverride(_:)),
+                        target: self,
+                        representedObject: flag
+                    )
+                ]))
             }
             NSMenuItem.separator()
-            NSMenuItem(title: "Reset All Overrides", action: #selector(resetAllOverrides(_:))).targetting(self)
+            NSMenuItem(title: "Remove All Overrides", action: #selector(resetAllOverrides(_:))).targetting(self)
         }
     }
 
@@ -94,6 +102,11 @@ final class FeatureFlagOverridesMenu: NSMenu {
     @objc func toggleFeatureFlag(_ sender: NSMenuItem) {
         guard let featureFlag = sender.representedObject as? FeatureFlag else { return }
         featureFlagger.localOverrides?.toggleOverride(for: featureFlag)
+    }
+
+    @objc func resetOverride(_ sender: NSMenuItem) {
+        guard let featureFlag = sender.representedObject as? FeatureFlag else { return }
+        featureFlagger.localOverrides?.clearOverride(for: featureFlag)
     }
 
     @objc func resetAllOverrides(_ sender: NSMenuItem) {
