@@ -225,6 +225,15 @@ public struct UserDefaultsWrapper<T> {
 
         case subscriptionEnvironment = "subscription.environment"
 
+        // PageRefreshMonitor
+
+        case refreshTimestamps = "pageRefreshMonitor.refresh-timestamps"
+
+        // BrokenSitePrompt
+
+        case lastBrokenSiteToastShownDate = "brokenSitePrompt.last-broken-site-toast-shown-date"
+        case toastDismissStreakCounter = "brokenSitePrompt.toast-dismiss-streak-counter"
+
         // Experimental Feature Flags
 
         case htmlNewTabPage = "experimental.html-new-tab-page"

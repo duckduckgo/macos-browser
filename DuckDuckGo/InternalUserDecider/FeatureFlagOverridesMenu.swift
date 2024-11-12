@@ -17,15 +17,38 @@
 //
 
 import AppKit
+import FeatureFlags
+
+struct FeatureFlagOverridesDefaultHandler: FeatureFlagOverridesHandler {
+    func flagDidChange(_ featureFlag: FeatureFlag, isEnabled: Bool) {
+        switch featureFlag {
+        case .htmlNewTabPage:
+            isHTMLNewTabPageEnabledDidChange(isEnabled)
+        default:
+            break
+        }
+    }
+
+    private func isHTMLNewTabPageEnabledDidChange(_ isEnabled: Bool) {
+        Task { @MainActor in
+            WindowControllersManager.shared.mainWindowControllers.forEach { mainWindowController in
+                if mainWindowController.mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab {
+                    mainWindowController.mainViewController.browserTabViewController.refreshTab()
+                }
+            }
+        }
+    }
+}
+
 
 final class FeatureFlagOverridesMenu: NSMenu {
 
-    let featureFlagOverrides: FeatureFlagOverrides
+    let featureFlagger: OverridableFeatureFlagger
 
     private(set) lazy var htmlNewTabPageMenuItem = NSMenuItem(title: "HTML New Tab Page", action: #selector(toggleHTMLNewTabPage(_:))).targetting(self)
 
-    init(featureFlagOverrides: FeatureFlagOverrides) {
-        self.featureFlagOverrides = featureFlagOverrides
+    init(featureFlagOverrides: OverridableFeatureFlagger) {
+        self.featureFlagger = featureFlagOverrides
         super.init(title: "")
 
         buildItems {
@@ -41,7 +64,7 @@ final class FeatureFlagOverridesMenu: NSMenu {
 
     override func update() {
         super.update()
-        let featureFlagger = featureFlagOverrides.featureFlagger
+        let featureFlagger = featureFlagger
 
         let isHTMLNTPOn = featureFlagger.isFeatureOn(.htmlNewTabPage, allowOverride: false)
         htmlNewTabPageMenuItem.title = "HTML New Tab Page (default: \(isHTMLNTPOn ? "on" : "off"))"
@@ -49,10 +72,10 @@ final class FeatureFlagOverridesMenu: NSMenu {
     }
 
     @objc func toggleHTMLNewTabPage(_ sender: NSMenuItem) {
-        featureFlagOverrides.toggleOverride(for: .htmlNewTabPage)
+        featureFlagger.overrides.toggleOverride(for: .htmlNewTabPage)
     }
 
     @objc func resetAllOverrides(_ sender: NSMenuItem) {
-        featureFlagOverrides.clearAllOverrides()
+        featureFlagger.overrides.clearAllOverrides()
     }
 }

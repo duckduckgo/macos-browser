@@ -20,6 +20,7 @@ import BrowserServicesKit
 import Cocoa
 import Common
 import Combine
+import FeatureFlags
 import OSLog
 import SwiftUI
 import WebKit
@@ -620,7 +621,7 @@ final class MainMenu: NSMenu {
     private func setupDebugMenu() -> NSMenu {
         let debugMenu = NSMenu(title: "Debug") {
             NSMenuItem(title: "Feature Flag Overrides")
-                .submenu(FeatureFlagOverridesMenu(featureFlagOverrides: NSApp.delegateTyped.featureFlagOverrides))
+                .submenu(FeatureFlagOverridesMenu(featureFlagOverrides: NSApp.delegateTyped.featureFlagger))
             NSMenuItem.separator()
             NSMenuItem(title: "Open Vanilla Browser", action: #selector(MainViewController.openVanillaBrowser)).withAccessibilityIdentifier("MainMenu.openVanillaBrowser")
             NSMenuItem.separator()

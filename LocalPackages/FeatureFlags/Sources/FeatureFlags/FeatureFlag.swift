@@ -42,6 +42,9 @@ public enum FeatureFlag: String, CaseIterable {
     /// https://app.asana.com/0/72649045549333/1208231259093710/f
     case networkProtectionUserTips
 
+    /// https://app.asana.com/0/72649045549333/1208617860225199/f
+    case networkProtectionEnforceRoutes
+
     case htmlNewTabPage
 }
 
@@ -68,32 +71,10 @@ extension FeatureFlag: FeatureFlagSourceProviding {
             return .remoteReleasable(.subfeature(AutofillSubfeature.credentialsImportPromotionForExistingUsers))
         case .networkProtectionUserTips:
             return .remoteDevelopment(.subfeature(NetworkProtectionSubfeature.userTips))
+        case .networkProtectionEnforceRoutes:
+            return .remoteDevelopment(.subfeature(NetworkProtectionSubfeature.enforceRoutes))
         case .htmlNewTabPage:
             return .disabled
         }
-    }
-}
-
-protocol LocalFeatureFlagOverriding {
-    func localOverride(for featureFlag: FeatureFlag) -> Bool?
-}
-
-extension FeatureFlag: LocalFeatureFlagOverriding {
-    func localOverride(for featureFlag: FeatureFlag) -> Bool? {
-        NSApp.delegateTyped.featureFlagOverrides.override(for: featureFlag)
-    }
-
-    var localOverride: Bool? {
-        localOverride(for: self)
-    }
-}
-
-extension FeatureFlagger {
-
-    public func isFeatureOn(_ featureFlag: FeatureFlag, allowOverride: Bool = true) -> Bool {
-        if allowOverride, let localOverride = featureFlag.localOverride {
-            return localOverride
-        }
-        return isFeatureOn(forProvider: featureFlag)
     }
 }

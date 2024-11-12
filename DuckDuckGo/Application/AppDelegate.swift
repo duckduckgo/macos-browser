@@ -25,6 +25,7 @@ import Configuration
 import CoreData
 import Crashes
 import DDGSync
+import FeatureFlags
 import History
 import MetricKit
 import Networking
@@ -76,7 +77,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private(set) var stateRestorationManager: AppStateRestorationManager!
     private var grammarFeaturesManager = GrammarFeaturesManager()
     let internalUserDecider: InternalUserDecider
-    let featureFlagger: FeatureFlagger
+    private var isInternalUserSharingCancellable: AnyCancellable?
+    let featureFlagger: OverridableFeatureFlagger
     private var appIconChanger: AppIconChanger!
     private var autoClearHandler: AutoClearHandler!
     private(set) var autofillPixelReporter: AutofillPixelReporter?
@@ -90,7 +92,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let bookmarksManager = LocalBookmarkManager.shared
     var privacyDashboardWindow: NSWindow?
 
-    let featureFlagOverrides: FeatureFlagOverrides
     let activeRemoteMessageModel: ActiveRemoteMessageModel
     let homePageSettingsModel = HomePage.Models.SettingsModel()
     let remoteMessagingClient: RemoteMessagingClient!
@@ -262,9 +263,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             activeRemoteMessageModel = ActiveRemoteMessageModel(remoteMessagingStore: nil, remoteMessagingAvailabilityProvider: nil)
         }
 
-        featureFlagger = DefaultFeatureFlagger(
-            internalUserDecider: internalUserDecider,
-            privacyConfigManager: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
+        featureFlagger = OverridableFeatureFlagger(
+            defaultFlagger: DefaultFeatureFlagger(
+                internalUserDecider: internalUserDecider,
+                privacyConfigManager: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
+            ), overrides: FeatureFlagOverrides(
+                keyValueStore: UserDefaults.appConfiguration,
+                actionHandler: FeatureFlagOverridesDefaultHandler()
+            )
         )
 
         onboardingStateMachine = ContextualOnboardingStateMachine()
@@ -302,7 +308,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                                                        freemiumDBPUserStateManager: freemiumDBPUserStateManager)
         freemiumDBPPromotionViewCoordinator = FreemiumDBPPromotionViewCoordinator(freemiumDBPUserStateManager: freemiumDBPUserStateManager,
                                                                                   freemiumDBPFeature: freemiumDBPFeature)
-        featureFlagOverrides = FeatureFlagOverrides(internalUserDecider: internalUserDecider, featureFlagger: featureFlagger)
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {
@@ -435,6 +440,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         subscribeToEmailProtectionStatusNotifications()
         subscribeToDataImportCompleteNotification()
+        subscribeToInternalUserChanges()
 
         fireFailedCompilationsPixelIfNeeded()
 
@@ -748,6 +754,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func subscribeToDataImportCompleteNotification() {
         NotificationCenter.default.addObserver(self, selector: #selector(dataImportCompleteNotification(_:)), name: .dataImportComplete, object: nil)
+    }
+
+    private func subscribeToInternalUserChanges() {
+        UserDefaults.appConfiguration.isInternalUser = internalUserDecider.isInternalUser
+
+        isInternalUserSharingCancellable = internalUserDecider.isInternalUserPublisher
+            .assign(to: \.isInternalUser, onWeaklyHeld: UserDefaults.appConfiguration)
     }
 
     private func emailDidSignInNotification(_ notification: Notification) {

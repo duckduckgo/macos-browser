@@ -554,7 +554,8 @@ final class AddressBarTextField: NSTextField {
             Logger.general.error("AddressBarTextField: Window not available")
             return
         }
-        guard suggestionWindow.isVisible else { return }
+
+        if !suggestionWindow.isVisible && selectedSuggestionViewModel == nil { return }
 
         guard let selectedSuggestionViewModel else {
             if let originalStringValue = suggestionContainerViewModel?.userStringValue {
