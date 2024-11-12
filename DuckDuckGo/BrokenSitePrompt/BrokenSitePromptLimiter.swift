@@ -1,7 +1,7 @@
 //
-//  CapturingDataImportProvider.swift
+//  BrokenSitePromptLimiter.swift
 //
-//  Copyright © 2023 DuckDuckGo. All rights reserved.
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -17,15 +17,11 @@
 //
 
 import Foundation
-@testable import DuckDuckGo_Privacy_Browser
+import BrokenSitePrompt
 
-class CapturingDataImportProvider: DataImportStatusProviding {
+extension BrokenSitePromptLimiter {
 
-    var showImportWindowCalled = false
-    var didImport = false
+    static let shared: BrokenSitePromptLimiter = BrokenSitePromptLimiter(privacyConfigManager: ContentBlocking.shared.privacyConfigurationManager,
+                                                                         store: BrokenSitePromptLimiterStore())
 
-    func showImportWindow(customTitle: String?, completion: (() -> Void)?) {
-        showImportWindowCalled = true
-        completion?()
-    }
 }

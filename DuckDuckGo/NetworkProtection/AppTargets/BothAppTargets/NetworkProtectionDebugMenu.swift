@@ -69,18 +69,20 @@ final class NetworkProtectionDebugMenu: NSMenu {
                 NSMenuItem(title: "Reset All State", action: #selector(NetworkProtectionDebugMenu.resetAllState))
                     .targetting(self)
 
-                NSMenuItem(title: "Reset Site Issue Alert", action: #selector(NetworkProtectionDebugMenu.resetSiteIssuesAlert(_:)))
-                    .targetting(self)
-
-                resetToDefaults
-                    .targetting(self)
-
-                NSMenuItem.separator()
+                NSMenuItem.separator() // Resetting single components should go below this point
 
                 NSMenuItem(title: "Remove Network Extension and Login Items", action: #selector(NetworkProtectionDebugMenu.removeSystemExtensionAndAgents))
                     .targetting(self)
 
                 NSMenuItem(title: "Remove VPN configuration", action: #selector(NetworkProtectionDebugMenu.removeVPNConfiguration(_:)))
+                    .targetting(self)
+
+                resetToDefaults
+                    .targetting(self)
+
+                NSMenuItem.separator() // Resetting VPN subfeatures should go below this point
+
+                NSMenuItem(title: "Reset Site Issue Alert", action: #selector(NetworkProtectionDebugMenu.resetSiteIssuesAlert(_:)))
                     .targetting(self)
             }
 
@@ -310,14 +312,29 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     @objc func toggleEnforceRoutesAction(_ sender: Any?) {
         settings.enforceRoutes.toggle()
+
+        Task {
+            try await Task.sleep(interval: 0.1)
+            try await debugUtilities.restartAdapter()
+        }
     }
 
     @objc func toggleIncludeAllNetworks(_ sender: Any?) {
         settings.includeAllNetworks.toggle()
+
+        Task {
+            try await Task.sleep(interval: 0.1)
+            try await debugUtilities.restartAdapter()
+        }
     }
 
     @objc func toggleShouldExcludeLocalRoutes(_ sender: Any?) {
         settings.excludeLocalNetworks.toggle()
+
+        Task {
+            try await Task.sleep(interval: 0.1)
+            try await debugUtilities.restartAdapter()
+        }
     }
 
     @objc func openAppContainerInFinder(_ sender: Any?) {

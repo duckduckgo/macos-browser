@@ -93,7 +93,7 @@ final class PermissionAuthorizationViewController: NSViewController {
         else { return }
 
         switch query.permissions[0] {
-        case .camera, .microphone, .geolocation:
+        case .camera, .microphone:
             descriptionLabel.stringValue = String(format: UserText.devicePermissionAuthorizationFormat,
                                                   query.domain,
                                                   query.permissions.localizedDescription.lowercased())
@@ -108,6 +108,8 @@ final class PermissionAuthorizationViewController: NSViewController {
             descriptionLabel.stringValue = String(format: UserText.externalSchemePermissionAuthorizationFormat,
                                                   query.domain,
                                                   query.permissions.localizedDescription)
+        case .geolocation:
+            descriptionLabel.stringValue = String(format: UserText.locationPermissionAuthorizationFormat, query.domain)
         }
         alwaysAllowCheckbox.title = UserText.permissionAlwaysAllowOnDomainCheckbox
         domainNameLabel.stringValue = query.domain.isEmpty ? "" : "“" + query.domain + "”"
