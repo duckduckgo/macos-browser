@@ -72,7 +72,7 @@ final class MockAIChatUserScriptHandler: AIChatUserScriptHandling {
 }
 
 private final class AIChatMockDebugSettings: AIChatDebugURLSettingsRepresentable {
-    var customURLHostname: String? = nil
-    var customURL: String? = nil
+    var customURLHostname: String?
+    var customURL: String?
     func reset() { }
 }
