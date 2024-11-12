@@ -341,6 +341,17 @@ platform :mac do
     )
   end
 
+  desc 'Creates a new Kechain to use on UI tests'
+  lane :create_keychain do |options|
+    create_keychain(
+      name: "DefaultKeychain",
+      default_keychain: true,
+      unlock: true,
+      timeout: 54000,
+      lock_when_sleeps: false
+    )
+  end
+
   #################################################
   # Helper functions
   #################################################
