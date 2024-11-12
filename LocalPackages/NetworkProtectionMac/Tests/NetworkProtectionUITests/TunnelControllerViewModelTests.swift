@@ -102,6 +102,10 @@ final class TunnelControllerViewModelTests: XCTestCase {
         func stop() async {
             stopCallback?()
         }
+
+        func command(_ command: VPNCommand) async throws {
+            // no-op
+        }
     }
 
     // MARK: - Tests
