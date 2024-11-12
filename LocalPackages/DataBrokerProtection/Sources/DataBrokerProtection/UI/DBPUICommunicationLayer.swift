@@ -79,7 +79,7 @@ struct DBPUICommunicationLayer: Subfeature {
     weak var delegate: DBPUICommunicationDelegate?
 
     private enum Constants {
-        static let version = 8
+        static let version = 9
     }
 
     internal init(webURLSettings: DataBrokerProtectionWebUIURLSettingsRepresentable,
