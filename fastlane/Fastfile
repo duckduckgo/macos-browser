@@ -345,6 +345,7 @@ platform :mac do
   lane :create_keychain_ui_tests do |options|
     create_keychain(
       name: "DefaultKeychain",
+      password: "default",
       default_keychain: true,
       unlock: true,
       timeout: 54000,
