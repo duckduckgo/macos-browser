@@ -87,6 +87,18 @@ final class NewTabPageSearchBoxExperimentTests: XCTestCase {
         super.tearDown()
     }
 
+    func testThatLegacyAndCurrentExperimentCohortsAreCorrectlyIdentified() {
+        XCTAssertTrue(NewTabPageSearchBoxExperiment.Cohort.experiment.isExperiment)
+        XCTAssertTrue(NewTabPageSearchBoxExperiment.Cohort.experimentExistingUser.isExperiment)
+        XCTAssertTrue(NewTabPageSearchBoxExperiment.Cohort.legacyExperiment.isExperiment)
+        XCTAssertTrue(NewTabPageSearchBoxExperiment.Cohort.legacyExperimentExistingUser.isExperiment)
+
+        XCTAssertFalse(NewTabPageSearchBoxExperiment.Cohort.control.isExperiment)
+        XCTAssertFalse(NewTabPageSearchBoxExperiment.Cohort.controlExistingUser.isExperiment)
+        XCTAssertFalse(NewTabPageSearchBoxExperiment.Cohort.legacyControl.isExperiment)
+        XCTAssertFalse(NewTabPageSearchBoxExperiment.Cohort.legacyControlExistingUser.isExperiment)
+    }
+
     func testWhenUserIsNotEnrolledAndIsEligibleForExperimentThenCohortIsSet() throws {
         cohortDecider.cohort = .experimentExistingUser
         let date = Date()

@@ -169,14 +169,20 @@ final class NewTabPageSearchBoxExperiment {
         case experiment = "ntp_search_box_v2"
         case controlExistingUser = "control_existing_user_v2"
         case experimentExistingUser = "ntp_search_box_existing_user_v2"
+        case legacyControl = "control"
+        case legacyExperiment = "ntp_search_box"
+        case legacyControlExistingUser = "control_existing_user"
+        case legacyExperimentExistingUser = "ntp_search_box_existing_user"
+
+        static let allExperimentCohortValues: Set<Cohort> = [
+            .legacyExperiment,
+            .legacyExperimentExistingUser,
+            .experiment,
+            .experimentExistingUser
+        ]
 
         var isExperiment: Bool {
-            switch self {
-            case .experiment, .experimentExistingUser:
-                return true
-            default:
-                return false
-            }
+            return Self.allExperimentCohortValues.contains(self)
         }
     }
 
