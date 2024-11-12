@@ -183,7 +183,7 @@ class FireWindowTests: XCTestCase {
     }
 
     private func openSignUpSite() {
-        let addressBarTextField = app.windows.firstMatch.textFields["AddressBarViewController.addressBarTextField"].firstMatch
+        let addressBarTextField = app.windows.firstMatch.textFields["AddressBarViewController.addressBarTextField"].firstMatch  
         XCTAssertTrue(
             addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The address bar text field didn't become available in a reasonable timeframe."
