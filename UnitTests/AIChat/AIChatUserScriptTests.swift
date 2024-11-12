@@ -28,7 +28,7 @@ final class AIChatUserScriptTests: XCTestCase {
     override func setUp() {
         super.setUp()
         mockHandler = MockAIChatUserScriptHandler()
-        userScript = AIChatUserScript(handler: mockHandler)
+        userScript = AIChatUserScript(handler: mockHandler, urlSettings: AIChatMockDebugSettings())
     }
 
     override func tearDown() {
@@ -69,4 +69,10 @@ final class MockAIChatUserScriptHandler: AIChatUserScriptHandling {
     func handleGetUserValues(params: Any, message: UserScriptMessage) -> Encodable? {
         return AIChatUserScriptHandler.UserValues(isToolbarShortcutEnabled: true, platform: "macOS")
     }
+}
+
+private final class AIChatMockDebugSettings: AIChatDebugURLSettingsRepresentable {
+    var customURLHostname: String? = nil
+    var customURL: String? = nil
+    func reset() { }
 }

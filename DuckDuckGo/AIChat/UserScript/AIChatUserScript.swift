@@ -29,10 +29,21 @@ final class AIChatUserScript: NSObject, Subfeature {
     private let handler: AIChatUserScriptHandling
     public let featureName: String = "aiChat"
     var broker: UserScriptMessageBroker?
-    public let messageOriginPolicy: MessageOriginPolicy = .only(rules: [.exact(hostname: URL.duckDuckGo.absoluteString)])
+    private(set) var messageOriginPolicy: MessageOriginPolicy
 
-    init(handler: AIChatUserScriptHandling) {
+    init(handler: AIChatUserScriptHandling, urlSettings: AIChatDebugURLSettingsRepresentable) {
         self.handler = handler
+        var rules = [HostnameMatchingRule]()
+
+        /// Default rule for DuckDuckGo AI Chat
+        rules.append(.exact(hostname: URL.duckDuckGo.absoluteString))
+
+        /// Check if a custom hostname is provided in the URL settings
+        /// Custom hostnames are used for debugging purposes
+        if let customURLHostname = urlSettings.customURLHostname {
+            rules.append(.exact(hostname: customURLHostname))
+        }
+        self.messageOriginPolicy = .only(rules: rules)
     }
 
     func handler(forMethodNamed methodName: String) -> Subfeature.Handler? {
