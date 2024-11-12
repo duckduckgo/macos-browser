@@ -38,14 +38,14 @@ final class AIChatUserScriptTests: XCTestCase {
     }
 
     func testOpenSettingsMessageTriggersOpenSettingsMethod() async throws {
-        let handler = try XCTUnwrap(userScript.handler(forMethodNamed: "openSettings"))
+        let handler = try XCTUnwrap(userScript.handler(forMethodNamed: AIChatUserScript.MessageNames.openSettings.rawValue))
         _ = try await handler([""], WKScriptMessage())
 
         XCTAssertTrue(mockHandler.didOpenSettings, "openSettings should be called")
     }
 
     func testGetUserValuesMessageReturnsCorrectUserValues() async throws {
-        let handler = try XCTUnwrap(userScript.handler(forMethodNamed: "getUserValues"))
+        let handler = try XCTUnwrap(userScript.handler(forMethodNamed: AIChatUserScript.MessageNames.getUserValues.rawValue))
 
         let result = try await handler([""], WKScriptMessage())
 
