@@ -1,0 +1,3 @@
+#import "_WKWebExtensionPermission.h"
+
+WK_EXTERN _WKWebExtensionPermission const _WKWebExtensionPermissionNotifications;
