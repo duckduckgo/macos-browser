@@ -135,7 +135,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case duckPlayerNewTabSettingsOff
     case duckPlayerContingencySettingsDisplayed
     case duckPlayerContingencyLearnMoreClicked
-    
+
     // Temporary Overlay Pixels
     case duckPlayerYouTubeOverlayNavigationBack
     case duckPlayerYouTubeOverlayNavigationRefresh
@@ -143,7 +143,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case duckPlayerYouTubeOverlayNavigationOutsideYoutube
     case duckPlayerYouTubeOverlayNavigationClosed
     case duckPlayerYouTubeNavigationIdle30
-    
+
     // Dashboard
     case dashboardProtectionAllowlistAdd(triggerOrigin: String?)
     case dashboardProtectionAllowlistRemove(triggerOrigin: String?)
@@ -1124,7 +1124,7 @@ enum GeneralPixel: PixelKitEventV2 {
         case .pageRefreshThreeTimesWithin20Seconds: return "m_mac_reload-three-times-within-20-seconds"
         case .siteNotWorkingShown: return "m_mac_site-not-working_shown"
         case .siteNotWorkingWebsiteIsBroken: return "m_mac_site-not-working_website-is-broken"
-            
+
         }
     }
 

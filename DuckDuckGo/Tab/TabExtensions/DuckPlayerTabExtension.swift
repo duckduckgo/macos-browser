@@ -208,14 +208,14 @@ extension DuckPlayerTabExtension: NavigationResponder {
                 navigator.load(URLRequest(url: .duckPlayer(videoID, timestamp: timestamp)))
             }
         }
-        
+
         // Fire DuckPlayer Temporary Pixels on Reload
         if case .reload = navigationAction.navigationType {
             if let url = navigationAction.request.url {
                 duckPlayerOverlayUsagePixels.handleNavigationAndFirePixels(url: url, duckPlayerMode: duckPlayer.mode)
             }
         }
-        
+
         // when in Private Player, don't directly reload current URL when it‘s a Private Player target URL
         if case .reload = navigationAction.navigationType,
            navigationAction.url.isDuckPlayer {
@@ -281,7 +281,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
             webView.goBack()
             webView.load(URLRequest(url: .duckPlayer(videoID, timestamp: timestamp)))
         }
-        
+
         // Fire DuckPlayer Overlay Temporary Pixels
         if let url = navigation.request.url {
             duckPlayerOverlayUsagePixels.handleNavigationAndFirePixels(url: url, duckPlayerMode: duckPlayer.mode)
