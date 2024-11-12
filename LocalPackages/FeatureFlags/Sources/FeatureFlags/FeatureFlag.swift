@@ -48,7 +48,16 @@ public enum FeatureFlag: String, CaseIterable {
     case htmlNewTabPage
 }
 
-extension FeatureFlag: FeatureFlagSourceProviding {
+extension FeatureFlag: FeatureFlagProtocol {
+    public var supportsLocalOverriding: Bool {
+        switch self {
+        case .htmlNewTabPage:
+            return true
+        default:
+            return false
+        }
+    }
+
     public var source: FeatureFlagSource {
         switch self {
         case .debugMenu:
@@ -76,5 +85,15 @@ extension FeatureFlag: FeatureFlagSourceProviding {
         case .htmlNewTabPage:
             return .disabled
         }
+    }
+}
+
+public extension FeatureFlagger {
+
+    func isFeatureOn(_ featureFlag: FeatureFlag, allowOverride: Bool = true) -> Bool {
+        if internalUserDecider.isInternalUser, allowOverride, let localOverride = localOverrides?.override(for: featureFlag) {
+            return localOverride
+        }
+        return isFeatureOn(forProvider: featureFlag)
     }
 }

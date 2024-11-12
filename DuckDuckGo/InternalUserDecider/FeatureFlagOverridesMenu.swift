@@ -1,5 +1,5 @@
 //
-//  ExperimentalFeaturesMenu.swift
+//  FeatureFlagOverridesMenu.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -17,11 +17,13 @@
 //
 
 import AppKit
+import BrowserServicesKit
 import FeatureFlags
 
 struct FeatureFlagOverridesDefaultHandler: FeatureFlagOverridesHandler {
-    func flagDidChange(_ featureFlag: FeatureFlag, isEnabled: Bool) {
-        switch featureFlag {
+    func flagDidChange<Flag: FeatureFlagProtocol>(_ featureFlag: Flag, isEnabled: Bool) {
+        guard let flag = featureFlag as? FeatureFlag else { return }
+        switch flag {
         case .htmlNewTabPage:
             isHTMLNewTabPageEnabledDidChange(isEnabled)
         default:
@@ -40,19 +42,23 @@ struct FeatureFlagOverridesDefaultHandler: FeatureFlagOverridesHandler {
     }
 }
 
-
 final class FeatureFlagOverridesMenu: NSMenu {
 
-    let featureFlagger: OverridableFeatureFlagger
+    let featureFlagger: FeatureFlagger
 
-    private(set) lazy var htmlNewTabPageMenuItem = NSMenuItem(title: "HTML New Tab Page", action: #selector(toggleHTMLNewTabPage(_:))).targetting(self)
-
-    init(featureFlagOverrides: OverridableFeatureFlagger) {
+    init(featureFlagOverrides: FeatureFlagger) {
         self.featureFlagger = featureFlagOverrides
         super.init(title: "")
 
         buildItems {
-            htmlNewTabPageMenuItem
+            FeatureFlag.allCases.filter(\.supportsLocalOverriding).map { flag in
+                NSMenuItem(
+                    title: "\(flag.rawValue) (default: \(featureFlagger.isFeatureOn(flag, allowOverride: false) ? "on" : "off"))",
+                    action: #selector(toggleFeatureFlag(_:)),
+                    target: self,
+                    representedObject: flag
+                )
+            }
             NSMenuItem.separator()
             NSMenuItem(title: "Reset All Overrides", action: #selector(resetAllOverrides(_:))).targetting(self)
         }
@@ -64,18 +70,33 @@ final class FeatureFlagOverridesMenu: NSMenu {
 
     override func update() {
         super.update()
-        let featureFlagger = featureFlagger
 
-        let isHTMLNTPOn = featureFlagger.isFeatureOn(.htmlNewTabPage, allowOverride: false)
-        htmlNewTabPageMenuItem.title = "HTML New Tab Page (default: \(isHTMLNTPOn ? "on" : "off"))"
-        htmlNewTabPageMenuItem.state = featureFlagger.isFeatureOn(.htmlNewTabPage) ? .on : .off
+        items.forEach { item in
+            guard let flag = item.representedObject as? FeatureFlag else {
+                return
+            }
+            item.title = "\(flag.rawValue) (default: \(defaultValue(for: flag)), override: \(overrideValue(for: flag)))"
+            item.state = featureFlagger.localOverrides?.override(for: flag) == true ? .on : .off
+        }
     }
 
-    @objc func toggleHTMLNewTabPage(_ sender: NSMenuItem) {
-        featureFlagger.overrides.toggleOverride(for: .htmlNewTabPage)
+    private func defaultValue(for flag: FeatureFlag) -> String {
+        featureFlagger.isFeatureOn(flag, allowOverride: false) ? "on" : "off"
+    }
+
+    private func overrideValue(for flag: FeatureFlag) -> String {
+        guard let override = featureFlagger.localOverrides?.override(for: flag) else {
+            return "none"
+        }
+        return override ? "on" : "off"
+    }
+
+    @objc func toggleFeatureFlag(_ sender: NSMenuItem) {
+        guard let featureFlag = sender.representedObject as? FeatureFlag else { return }
+        featureFlagger.localOverrides?.toggleOverride(for: featureFlag)
     }
 
     @objc func resetAllOverrides(_ sender: NSMenuItem) {
-        featureFlagger.overrides.clearAllOverrides()
+        featureFlagger.localOverrides?.clearAllOverrides(for: FeatureFlag.self)
     }
 }

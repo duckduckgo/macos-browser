@@ -3699,7 +3699,6 @@
 		37F19A6428E1B3FB00740DC6 /* PreferencesDuckPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesDuckPlayerView.swift; sourceTree = "<group>"; };
 		37F19A6628E1B43200740DC6 /* DuckPlayerPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckPlayerPreferences.swift; sourceTree = "<group>"; };
 		37F19A6928E2F2D000740DC6 /* DuckPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckPlayer.swift; sourceTree = "<group>"; };
-		37F8ABCC2CDE100300CB0294 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = SOURCE_ROOT; };
 		37F8ABD22CE3EE5B00CB0294 /* FeatureFlagOverridesMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureFlagOverridesMenu.swift; sourceTree = "<group>"; };
 		37FD78102A29EBD100B36DB1 /* SyncErrorHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncErrorHandler.swift; sourceTree = "<group>"; };
 		4B0135CD2729F1AA00D54834 /* NSPasteboardExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSPasteboardExtension.swift; sourceTree = "<group>"; };
@@ -7684,7 +7683,6 @@
 		AA585D75248FD31100E9A3E2 = {
 			isa = PBXGroup;
 			children = (
-				37F8ABCC2CDE100300CB0294 /* BrowserServicesKit */,
 				378B5886295CF2A4002C0CC0 /* Configuration */,
 				378E279C2970217400FCADA2 /* LocalPackages */,
 				7BB108552A43375D000AB95F /* LocalThirdParty */,
@@ -15023,8 +15021,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 209.0.0;
+				branch = "dominik/feature-flag-overrides";
+				kind = branch;
 			};
 		};
 		9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */ = {

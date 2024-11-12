@@ -78,7 +78,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var grammarFeaturesManager = GrammarFeaturesManager()
     let internalUserDecider: InternalUserDecider
     private var isInternalUserSharingCancellable: AnyCancellable?
-    let featureFlagger: OverridableFeatureFlagger
+    let featureFlagger: FeatureFlagger
     private var appIconChanger: AppIconChanger!
     private var autoClearHandler: AutoClearHandler!
     private(set) var autofillPixelReporter: AutofillPixelReporter?
@@ -263,11 +263,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             activeRemoteMessageModel = ActiveRemoteMessageModel(remoteMessagingStore: nil, remoteMessagingAvailabilityProvider: nil)
         }
 
-        featureFlagger = OverridableFeatureFlagger(
-            defaultFlagger: DefaultFeatureFlagger(
-                internalUserDecider: internalUserDecider,
-                privacyConfigManager: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
-            ), overrides: FeatureFlagOverrides(
+        featureFlagger = DefaultFeatureFlagger(
+            internalUserDecider: internalUserDecider,
+            privacyConfigManager: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
+            localOverrides: FeatureFlagOverrides(
                 keyValueStore: UserDefaults.appConfiguration,
                 actionHandler: FeatureFlagOverridesDefaultHandler()
             )
