@@ -116,14 +116,17 @@ class FireWindowTests: XCTestCase {
 
     private func signInUsingAutoFill() {
         let webViewFire = app.webViews.firstMatch
-        webViewFire.tap()
-        let emailTextFieldFire = webViewFire.textFields["Email"].firstMatch
-        emailTextFieldFire.click()
+        let webViewCoordinate = webViewFire.coordinate(withNormalizedOffset: CGVector(dx: 5, dy: 5))
+        webViewCoordinate.tap()
+        app.typeKey("\t", modifierFlags: [])
+//        let emailTextFieldFire = webViewFire.textFields["Email"].firstMatch
+//        emailTextFieldFire.click()
 
         let autoFillPopup = webViewFire.buttons["test@duck.com privacy-test-pages.site"]
         let coordinate = autoFillPopup.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
         coordinate.tap()
 
+        let emailTextFieldFire = webViewFire.textFields["Email"].firstMatch
         XCTAssertEqual(emailTextFieldFire.value as? String, "test@duck.com")
     }
 
@@ -134,10 +137,13 @@ class FireWindowTests: XCTestCase {
 
     private func signIn() {
         let webView = app.webViews.firstMatch
-        webView.tap()
-        let emailTextField = webView.textFields["Email"].firstMatch
-        emailTextField.click()
-        emailTextField.typeText("test@duck.com")
+        let webViewCoordinate = webView.coordinate(withNormalizedOffset: CGVector(dx: 5, dy: 5))
+        webViewCoordinate.tap()
+//        let emailTextField = webView.textFields["Email"].firstMatch
+//        emailTextField.click()
+//        emailTextField.typeText("test@duck.com")
+        app.typeKey("\t", modifierFlags: [])
+        app.typeText("test@duck.com")
         app.typeKey("\t", modifierFlags: [])
         app.typeText("pa$$word")
 
@@ -170,14 +176,19 @@ class FireWindowTests: XCTestCase {
 
     private func fillCredentials() {
         let webView = app.webViews.firstMatch
-        webView.tap()
-        let emailTextField = webView.textFields["Email"].firstMatch
-        emailTextField.click()
-        emailTextField.typeText("test@duck.com")
-
-        let password = webView.secureTextFields["Password"].firstMatch
-        password.click()
-        password.typeText("pa$$word")
+        let webViewCoordinate = webView.coordinate(withNormalizedOffset: CGVector(dx: 5, dy: 5))
+        webViewCoordinate.tap()
+//        webView.tap()
+//        let emailTextField = webView.textFields["Email"].firstMatch
+//        emailTextField.click()
+//        emailTextField.typeText("test@duck.com")
+        app.typeKey("\t", modifierFlags: [])
+        app.typeText("test@duck.com")
+        app.typeKey("\t", modifierFlags: [])
+        app.typeText("pa$$word")
+//        let password = webView.secureTextFields["Password"].firstMatch
+//        password.click()
+//        password.typeText("pa$$word")
         app.typeKey("\t", modifierFlags: [])
         app.typeText("pa$$word")
     }
