@@ -37,8 +37,9 @@ final class AIChatUserScriptTests: XCTestCase {
         super.tearDown()
     }
 
-    func testOpenSettingsMessageTriggersOpenSettingsMethod() {
-        _ = userScript.handler(forMethodNamed: "openSettings")
+    func testOpenSettingsMessageTriggersOpenSettingsMethod() async throws {
+        let handler = try XCTUnwrap(userScript.handler(forMethodNamed: "openSettings"))
+        _ = try await handler([""], WKScriptMessage())
 
         XCTAssertTrue(mockHandler.didOpenSettings, "openSettings should be called")
     }
@@ -60,11 +61,12 @@ final class AIChatUserScriptTests: XCTestCase {
 final class MockAIChatUserScriptHandler: AIChatUserScriptHandling {
     var didOpenSettings = false
 
-    func handleGetUserValues(params: Any, message: UserScriptMessage) -> Encodable? {
-        return AIChatUserScriptHandler.UserValues(isToolbarShortcutEnabled: true, platform: "macOS")
+    func openSettings(params: Any, message: UserScriptMessage) -> Encodable? {
+        didOpenSettings = true
+        return nil
     }
 
-    func openSettings() {
-        didOpenSettings = true
+    func handleGetUserValues(params: Any, message: UserScriptMessage) -> Encodable? {
+        return AIChatUserScriptHandler.UserValues(isToolbarShortcutEnabled: true, platform: "macOS")
     }
 }

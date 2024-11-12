@@ -40,8 +40,7 @@ final class AIChatUserScript: NSObject, Subfeature {
         case .getUserValues:
             return handler.handleGetUserValues
         case .openSettings:
-            handler.openSettings()
-            return nil
+            return handler.openSettings
         default:
             return nil
         }
