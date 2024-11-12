@@ -94,6 +94,7 @@ class FireWindowTests: XCTestCase {
 
     func testFireWindowsSignInDoesNotShowCredentialsPopup() {
         openFireWindow()
+        app.openNewTab()
         openSignUpSite()
         fillCredentials()
         finishSignUp()
@@ -102,12 +103,14 @@ class FireWindowTests: XCTestCase {
 
     func testCrendentialsAreAutoFilledInFireWindows() {
         openNormalWindow()
+        app.openNewTab()
         openLoginSite()
         signIn()
         saveCredentials()
 
         /// Here we start the same flow but in the fire window, but we use the autofill credentials saved in the step before.
         openFireWindow()
+        app.openNewTab()
         openLoginSite()
         signInUsingAutoFill()
     }
@@ -115,17 +118,18 @@ class FireWindowTests: XCTestCase {
     // MARK: - Utilities
 
     private func signInUsingAutoFill() {
-        if #available(macOS 13.0, *) {
+        if ProcessInfo.processInfo.operatingSystemVersion.majorVersion == 13 {
             let webViewFire = app.webViews.firstMatch
             let webViewCoordinate = webViewFire.coordinate(withNormalizedOffset: CGVector(dx: 5, dy: 5))
             webViewCoordinate.tap()
             app.typeKey("\t", modifierFlags: [])
+            sleep(1)
             let autoFillPopup = webViewFire.buttons["test@duck.com privacy-test-pages.site"]
             let coordinate = autoFillPopup.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
             coordinate.tap()
 
             // TODO: How can I check the value?
-            XCTAssertEqual(app.textFields["Email"].value as? String, "test@duck.com")
+            XCTAssertTrue(webViewFire.staticTexts["test@duck.com"].exists)
         } else {
             let webViewFire = app.webViews.firstMatch
             webViewFire.tap()
@@ -145,7 +149,7 @@ class FireWindowTests: XCTestCase {
     }
 
     private func signIn() {
-        if #available(macOS 13.0, *) {
+        if ProcessInfo.processInfo.operatingSystemVersion.majorVersion == 13 {
             let webView = app.webViews.firstMatch
             let webViewCoordinate = webView.coordinate(withNormalizedOffset: CGVector(dx: 5, dy: 5))
             webViewCoordinate.tap()
@@ -191,7 +195,7 @@ class FireWindowTests: XCTestCase {
     }
 
     private func fillCredentials() {
-        if #available(macOS 13.0, *) {
+        if ProcessInfo.processInfo.operatingSystemVersion.majorVersion == 13 {
             /// On macOS 13 we tap in the webview coordinate and we use tabs to make it work given that it doesn't find web view elements
             let webView = app.webViews.firstMatch
             let webViewCoordinate = webView.coordinate(withNormalizedOffset: CGVector(dx: 5, dy: 5))
