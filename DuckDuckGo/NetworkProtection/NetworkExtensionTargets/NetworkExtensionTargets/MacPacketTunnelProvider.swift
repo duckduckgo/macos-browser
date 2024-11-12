@@ -556,6 +556,25 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     // MARK: - NEPacketTunnelProvider
 
+    public override func load(options: StartupOptions) throws {
+        try super.load(options: options)
+
+#if NETP_SYSTEM_EXTENSION
+        loadExcludeLocalNetworks(from: options)
+#endif
+    }
+
+    private func loadExcludeLocalNetworks(from options: StartupOptions) {
+        switch options.excludeLocalNetworks {
+        case .set(let exclude):
+            settings.excludeLocalNetworks = exclude
+        case .useExisting:
+            break
+        case .reset:
+            settings.excludeLocalNetworks = true
+        }
+    }
+
     enum ConfigurationError: Error {
         case missingProviderConfiguration
         case missingPixelHeaders

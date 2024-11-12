@@ -37,6 +37,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case dailyOsVersionCounter
 
     case dataImportFailed(source: DataImport.Source, sourceVersion: String?, error: any DataImportError)
+    case dataImportSucceeded(action: DataImportAction, source: DataImport.Source, sourceVersion: String?)
 
     case formAutofilled(kind: FormAutofillKind)
     case autofillItemSaved(kind: FormAutofillKind)
@@ -413,6 +414,8 @@ enum GeneralPixel: PixelKitEventV2 {
     case syncLoginExistingAccountError(error: Error)
     case syncCannotCreateRecoveryPDF
     case syncSecureStorageReadError(error: Error)
+    case syncSecureStorageDecodingError(error: Error)
+    case syncAccountRemoved(reason: String)
 
     case bookmarksCleanupFailed
     case bookmarksCleanupAttemptedWhileSyncWasEnabled
@@ -473,6 +476,9 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_favicon-import-failed_\(source)"
         case .dataImportFailed(source: let source, sourceVersion: _, error: let error):
             return "m_mac_data-import-failed_\(error.action)_\(source)"
+
+        case .dataImportSucceeded(action: let action, source: let source, sourceVersion: _):
+            return "m_mac_data-import-succeeded_\(action)_\(source)"
 
         case .formAutofilled(kind: let kind):
             return "m_mac_autofill_\(kind)"
@@ -1054,6 +1060,8 @@ enum GeneralPixel: PixelKitEventV2 {
         case .syncLoginExistingAccountError: return "sync_login_existing_account_error"
         case .syncCannotCreateRecoveryPDF: return "sync_cannot_create_recovery_pdf"
         case .syncSecureStorageReadError: return "sync_secure_storage_read_error"
+        case .syncSecureStorageDecodingError: return "sync_secure_storage_decoding_error"
+        case .syncAccountRemoved(let reason): return "sync_account_removed_reason_\(reason)"
 
         case .bookmarksCleanupFailed: return "bookmarks_cleanup_failed"
         case .bookmarksCleanupAttemptedWhileSyncWasEnabled: return "bookmarks_cleanup_attempted_while_sync_was_enabled"
@@ -1115,6 +1123,7 @@ enum GeneralPixel: PixelKitEventV2 {
                 .syncDeleteAccountError(let error),
                 .syncLoginExistingAccountError(let error),
                 .syncSecureStorageReadError(let error),
+                .syncSecureStorageDecodingError(let error),
                 .bookmarksCouldNotLoadDatabase(let error?):
             return error
         default: return nil
@@ -1128,6 +1137,14 @@ enum GeneralPixel: PixelKitEventV2 {
 
         case .dataImportFailed(source: _, sourceVersion: let version, error: let error):
             var params = error.pixelParameters
+
+            if let version {
+                params[PixelKit.Parameters.sourceBrowserVersion] = version
+            }
+            return params
+
+        case .dataImportSucceeded(action: _, source: _, sourceVersion: let version):
+            var params = [String: String]()
 
             if let version {
                 params[PixelKit.Parameters.sourceBrowserVersion] = version
