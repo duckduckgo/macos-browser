@@ -55,17 +55,20 @@ final class DuckPlayerTabExtension {
     private weak var youtubePlayerScript: YoutubePlayerUserScript?
     private let onboardingDecider: DuckPlayerOnboardingDecider
     private var shouldSelectNextNewTab: Bool?
+    private var duckPlayerOverlayUsagePixels: DuckPlayerOverlayPixelFiring
 
     init(duckPlayer: DuckPlayer,
          isBurner: Bool,
          scriptsPublisher: some Publisher<some YoutubeScriptsProvider, Never>,
          webViewPublisher: some Publisher<WKWebView, Never>,
          preferences: DuckPlayerPreferences = .shared,
-         onboardingDecider: DuckPlayerOnboardingDecider) {
+         onboardingDecider: DuckPlayerOnboardingDecider,
+         duckPlayerOverlayPixels: DuckPlayerOverlayPixelFiring = DuckPlayerOverlayUsagePixels()) {
         self.duckPlayer = duckPlayer
         self.isBurner = isBurner
         self.preferences = preferences
         self.onboardingDecider = onboardingDecider
+        self.duckPlayerOverlayUsagePixels = duckPlayerOverlayPixels
         webViewPublisher.sink { [weak self] webView in
             self?.webView = webView
         }.store(in: &cancellables)
@@ -205,7 +208,14 @@ extension DuckPlayerTabExtension: NavigationResponder {
                 navigator.load(URLRequest(url: .duckPlayer(videoID, timestamp: timestamp)))
             }
         }
-
+        
+        // Fire DuckPlayer Temporary Pixels on Reload
+        if case .reload = navigationAction.navigationType {
+            if let url = navigationAction.request.url {
+                duckPlayerOverlayUsagePixels.handleNavigationAndFirePixels(url: url, duckPlayerMode: duckPlayer.mode)
+            }
+        }
+        
         // when in Private Player, don't directly reload current URL when it‘s a Private Player target URL
         if case .reload = navigationAction.navigationType,
            navigationAction.url.isDuckPlayer {
@@ -270,6 +280,11 @@ extension DuckPlayerTabExtension: NavigationResponder {
 
             webView.goBack()
             webView.load(URLRequest(url: .duckPlayer(videoID, timestamp: timestamp)))
+        }
+        
+        // Fire DuckPlayer Overlay Temporary Pixels
+        if let url = navigation.request.url {
+            duckPlayerOverlayUsagePixels.handleNavigationAndFirePixels(url: url, duckPlayerMode: duckPlayer.mode)
         }
     }
 

@@ -135,7 +135,15 @@ enum GeneralPixel: PixelKitEventV2 {
     case duckPlayerNewTabSettingsOff
     case duckPlayerContingencySettingsDisplayed
     case duckPlayerContingencyLearnMoreClicked
-
+    
+    // Temporary Overlay Pixels
+    case duckPlayerYouTubeOverlayNavigationBack
+    case duckPlayerYouTubeOverlayNavigationRefresh
+    case duckPlayerYouTubeNavigationWithinYouTube
+    case duckPlayerYouTubeOverlayNavigationOutsideYoutube
+    case duckPlayerYouTubeOverlayNavigationClosed
+    case duckPlayerYouTubeNavigationIdle30
+    
     // Dashboard
     case dashboardProtectionAllowlistAdd(triggerOrigin: String?)
     case dashboardProtectionAllowlistRemove(triggerOrigin: String?)
@@ -659,6 +667,21 @@ enum GeneralPixel: PixelKitEventV2 {
             return "duckplayer_mac_contingency_settings-displayed"
         case .duckPlayerContingencyLearnMoreClicked:
             return "duckplayer_mac_contingency_learn-more-clicked"
+
+        // Duck Player Temporary Overlay Pixels
+        case .duckPlayerYouTubeOverlayNavigationBack:
+            return "duckplayer_youtube_overlay_navigation_back"
+        case .duckPlayerYouTubeOverlayNavigationRefresh:
+            return "duckplayer_youtube_overlay_navigation_refresh"
+        case .duckPlayerYouTubeNavigationWithinYouTube:
+            return "duckplayer_youtube_overlay_navigation_within-youtube"
+        case .duckPlayerYouTubeOverlayNavigationOutsideYoutube:
+            return "duckplayer_youtube_overlay_navigation_outside-youtube"
+        case .duckPlayerYouTubeOverlayNavigationClosed:
+            return "duckplayer_youtube_overlay_navigation_closed"
+        case .duckPlayerYouTubeNavigationIdle30:
+            return "duckplayer_youtube_overlay_idle-30"
+
         case .dashboardProtectionAllowlistAdd:
             return "mp_wla"
         case .dashboardProtectionAllowlistRemove:
@@ -1101,6 +1124,7 @@ enum GeneralPixel: PixelKitEventV2 {
         case .pageRefreshThreeTimesWithin20Seconds: return "m_mac_reload-three-times-within-20-seconds"
         case .siteNotWorkingShown: return "m_mac_site-not-working_shown"
         case .siteNotWorkingWebsiteIsBroken: return "m_mac_site-not-working_website-is-broken"
+            
         }
     }
 
