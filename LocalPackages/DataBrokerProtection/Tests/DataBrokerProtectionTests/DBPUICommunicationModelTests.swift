@@ -22,39 +22,110 @@ import Foundation
 
 final class DBPUICommunicationModelTests: XCTestCase {
 
-    func testProfileMatchInit_whenCreatedDateIsNotDefault_thenResultingProfileMatchDatesAreBothBasedOnOptOutJobDataDates() {
-
+    func testProfileMatch_whenInitWithEmptyHistoryEventsAndNoRemovedDate_thenTimelineEventsAreAlsoEmpty() {
         // Given
-        let extractedProfile = ExtractedProfile.mockWithRemovedDate
+        let historyEvents = [HistoryEvent]()
 
-        let foundEventDate = Calendar.current.date(byAdding: .day, value: -20, to: Date.now)!
-        let submittedEventDate = Calendar.current.date(byAdding: .day, value: -18, to: Date.now)!
-        let historyEvents = [
-            HistoryEvent(extractedProfileId: 0, brokerId: 0, profileQueryId: 0, type: .matchesFound(count: 1), date: foundEventDate),
-            HistoryEvent(extractedProfileId: 0, brokerId: 0, profileQueryId: 0, type: .optOutRequested, date: submittedEventDate)
-        ]
-
-        let createdDate = Calendar.current.date(byAdding: .day, value: -14, to: Date.now)!
-        let submittedDate = Calendar.current.date(byAdding: .day, value: -7, to: Date.now)!
-        let optOut = OptOutJobData.mock(with: extractedProfile,
-                                        historyEvents: historyEvents,
-                                        createdDate: createdDate,
-                                        submittedSuccessfullyDate: submittedDate)
+        let mockDataBroker = DBPUIDataBroker(name: "some broker", url: "broker.com", parentURL: nil, optOutUrl: "some url")
 
         // When
-        let profileMatch = DBPUIDataBrokerProfileMatch(optOutJobData: optOut,
-                                                       dataBrokerName: "doesn't matter for the test",
-                                                       dataBrokerURL: "see above",
-                                                       dataBrokerParentURL: "whatever",
-                                                       parentBrokerOptOutJobData: nil,
-                                                       optOutUrl: "broker.com")
+        let timelineEvents = DBPUITimelineEvent.from(historyEvents: historyEvents, removedDate: nil)
+        let profileMatch = DBPUIDataBrokerProfileMatch(dataBroker: mockDataBroker,
+                                                       name: "some profile",
+                                                       addresses: [],
+                                                       alternativeNames: [],
+                                                       relatives: [],
+                                                       timelineEvents: timelineEvents,
+                                                       hasMatchingRecordOnParentBroker: true)
 
         // Then
-        XCTAssertEqual(profileMatch.foundDate, createdDate.timeIntervalSince1970)
-        XCTAssertEqual(profileMatch.optOutSubmittedDate, submittedDate.timeIntervalSince1970)
+        XCTAssertEqual(profileMatch.timelineEvents, [])
     }
 
-    func testProfileMatchInit_whenCreatedDateIsDefault_thenResultingProfileMatchDatesAreBothBasedOnEventDates() {
+    func testProfileMatch_whenInit_thenTimelineEventsAreFilteredAndSortedChronologically() {
+        // Given
+        let historyEvents = [
+            HistoryEvent(extractedProfileId: 0, brokerId: 0, profileQueryId: 0, type: .scanStarted, date: Date(timeIntervalSince1970: 0)),
+            HistoryEvent(extractedProfileId: 0, brokerId: 0, profileQueryId: 0, type: .noMatchFound, date: Date(timeIntervalSince1970: 50)),
+            HistoryEvent(extractedProfileId: 0, brokerId: 0, profileQueryId: 0, type: .matchesFound(count: 2), date: Date(timeIntervalSince1970: 100)),
+            HistoryEvent(extractedProfileId: 0, brokerId: 0, profileQueryId: 2, type: .reAppearence, date: Date(timeIntervalSince1970: 2500)),
+            HistoryEvent(extractedProfileId: 0, brokerId: 0, profileQueryId: 2, type: .optOutStarted, date: Date(timeIntervalSince1970: 2000)),
+            HistoryEvent(extractedProfileId: 0, brokerId: 0, profileQueryId: 2, type: .optOutRequested, date: Date(timeIntervalSince1970: 2000)),
+            HistoryEvent(extractedProfileId: 0, brokerId: 0, profileQueryId: 1, type: .optOutStarted, date: Date(timeIntervalSince1970: 1000)),
+            HistoryEvent(extractedProfileId: 0, brokerId: 0, profileQueryId: 1, type: .optOutRequested, date: Date(timeIntervalSince1970: 1000)),
+            HistoryEvent(extractedProfileId: 0, brokerId: 0, profileQueryId: 1, type: .reAppearence, date: Date(timeIntervalSince1970: 1500)),
+        ]
+
+        let expectedTimelineEvents = [
+            DBPUITimelineEvent(foundDate: Date(timeIntervalSince1970: 100)),
+            DBPUITimelineEvent(optOutSubmittedDate: Date(timeIntervalSince1970: 1000)),
+            DBPUITimelineEvent(reappearedDate: Date(timeIntervalSince1970: 1500)),
+            DBPUITimelineEvent(optOutSubmittedDate: Date(timeIntervalSince1970: 2000)),
+            DBPUITimelineEvent(reappearedDate: Date(timeIntervalSince1970: 2500)),
+            DBPUITimelineEvent(removedDate: Date(timeIntervalSince1970: 5000)),
+            DBPUITimelineEvent(estimatedRemovalDate: Calendar.current.date(byAdding: .day, value: 14, to: Date(timeIntervalSince1970: 2000))),
+        ]
+
+        let mockDataBroker = DBPUIDataBroker(name: "some broker", url: "broker.com", parentURL: nil, optOutUrl: "some url")
+
+        // When
+        let timelineEvents = DBPUITimelineEvent.from(historyEvents: historyEvents, removedDate: Date(timeIntervalSince1970: 5000))
+        let profileMatch = DBPUIDataBrokerProfileMatch(dataBroker: mockDataBroker,
+                                                       name: "some profile",
+                                                       addresses: [],
+                                                       alternativeNames: [],
+                                                       relatives: [],
+                                                       timelineEvents: timelineEvents,
+                                                       hasMatchingRecordOnParentBroker: true)
+
+        // Then
+        XCTAssertEqual(profileMatch.timelineEvents, expectedTimelineEvents)
+    }
+
+    func testOptOutMatchInitializer() {
+        // Given
+        let historyEvents = [
+            HistoryEvent(extractedProfileId: 0, brokerId: 0, profileQueryId: 0, type: .scanStarted, date: Date(timeIntervalSince1970: 0)),
+            HistoryEvent(extractedProfileId: 0, brokerId: 0, profileQueryId: 0, type: .noMatchFound, date: Date(timeIntervalSince1970: 50)),
+            HistoryEvent(extractedProfileId: 0, brokerId: 0, profileQueryId: 0, type: .matchesFound(count: 2), date: Date(timeIntervalSince1970: 100)),
+            HistoryEvent(extractedProfileId: 0, brokerId: 0, profileQueryId: 2, type: .reAppearence, date: Date(timeIntervalSince1970: 2500)),
+            HistoryEvent(extractedProfileId: 0, brokerId: 0, profileQueryId: 2, type: .optOutStarted, date: Date(timeIntervalSince1970: 2000)),
+            HistoryEvent(extractedProfileId: 0, brokerId: 0, profileQueryId: 2, type: .optOutRequested, date: Date(timeIntervalSince1970: 2000)),
+            HistoryEvent(extractedProfileId: 0, brokerId: 0, profileQueryId: 1, type: .optOutStarted, date: Date(timeIntervalSince1970: 1000)),
+            HistoryEvent(extractedProfileId: 0, brokerId: 0, profileQueryId: 1, type: .optOutRequested, date: Date(timeIntervalSince1970: 1000)),
+            HistoryEvent(extractedProfileId: 0, brokerId: 0, profileQueryId: 1, type: .reAppearence, date: Date(timeIntervalSince1970: 1500)),
+        ]
+
+        let expectedTimelineEvents = [
+            DBPUITimelineEvent(foundDate: Date(timeIntervalSince1970: 100)),
+            DBPUITimelineEvent(optOutSubmittedDate: Date(timeIntervalSince1970: 1000)),
+            DBPUITimelineEvent(reappearedDate: Date(timeIntervalSince1970: 1500)),
+            DBPUITimelineEvent(optOutSubmittedDate: Date(timeIntervalSince1970: 2000)),
+            DBPUITimelineEvent(reappearedDate: Date(timeIntervalSince1970: 2500)),
+            DBPUITimelineEvent(removedDate: Date(timeIntervalSince1970: 5000)),
+            DBPUITimelineEvent(estimatedRemovalDate: Calendar.current.date(byAdding: .day, value: 14, to: Date(timeIntervalSince1970: 2000))),
+        ]
+
+        let mockDataBroker = DBPUIDataBroker(name: "some broker", url: "broker.com", parentURL: nil, optOutUrl: "some url")
+
+        // When
+        let timelineEvents = DBPUITimelineEvent.from(historyEvents: historyEvents, removedDate: Date(timeIntervalSince1970: 5000))
+        let profileMatch = DBPUIDataBrokerProfileMatch(dataBroker: mockDataBroker,
+                                                       name: "some profile",
+                                                       addresses: [],
+                                                       alternativeNames: [],
+                                                       relatives: [],
+                                                       timelineEvents: timelineEvents,
+                                                       hasMatchingRecordOnParentBroker: true)
+
+        let optOutMatch = DBPUIOptOutMatch(profileMatch: profileMatch, matches: 1)
+
+        // Then
+        XCTAssertEqual(optOutMatch?.timelineEvents, expectedTimelineEvents)
+        XCTAssertEqual(optOutMatch?.date, 5000)
+    }
+
+    func testProfileMatch_whenInit_thenResultingProfileMatchDatesAreBothBasedOnEventDates() {
 
         // Given
         let extractedProfile = ExtractedProfile.mockWithRemovedDate
@@ -86,7 +157,7 @@ final class DBPUICommunicationModelTests: XCTestCase {
         XCTAssertEqual(profileMatch.optOutSubmittedDate, submittedEventDate.timeIntervalSince1970)
     }
 
-    func testProfileMatchInit_whenCreatedDateIsDefaultAndThereAreMultipleEventsOfTheSameType_thenResultingProfileMatchDatesAreBothBasedOnFirstEventDates() {
+    func testProfileMatch_whenInit_thenResultingProfileMatchDatesAreBothBasedOnFirstEventDates() {
 
         // Given
         let extractedProfile = ExtractedProfile.mockWithRemovedDate
@@ -296,5 +367,15 @@ final class DBPUICommunicationModelTests: XCTestCase {
 
         let childProfile = results.first { $0.dataBroker.name == "ChildBroker" }
         XCTAssertEqual(childProfile?.dataBroker.optOutUrl, "parent.com/optout")
+    }
+}
+
+extension DBPUIDataBrokerProfileMatch {
+    var foundDate: Double? {
+        timelineEvents.first(where: { $0.type == .recordFound })?.date
+    }
+
+    var optOutSubmittedDate: Double? {
+        timelineEvents.first(where: { $0.type == .optOutSubmitted })?.date
     }
 }

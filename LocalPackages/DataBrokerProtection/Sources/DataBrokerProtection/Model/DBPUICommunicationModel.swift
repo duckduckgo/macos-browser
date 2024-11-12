@@ -197,8 +197,8 @@ extension DBPUITimelineEvent {
         self.init(type: .removed, date: removedDate)
     }
 
-    static func from(historyEvents: [HistoryEvent]) -> [DBPUITimelineEvent] {
-        historyEvents.compactMap { event in
+    static func from(historyEvents: [HistoryEvent], removedDate: Date?) -> [DBPUITimelineEvent] {
+        var timelineEvents = historyEvents.compactMap { event in
             switch event.type {
             case .matchesFound:
                 return DBPUITimelineEvent(foundDate: event.date)
@@ -210,6 +210,20 @@ extension DBPUITimelineEvent {
                 return nil
             }
         }
+
+        let mostRecentFoundEvent = timelineEvents.filter({ $0.type == .recordFound || $0.type == .recordReappeared }).max(by: <)
+        let mostRecentOptOutSubmittedEvent = timelineEvents.filter({ $0.type == .optOutSubmitted }).max(by: <)
+
+        if let optOutSubmittedDate = (mostRecentOptOutSubmittedEvent ?? mostRecentFoundEvent)?.eventDate,
+           let estimatedRemovalEvent = DBPUITimelineEvent(estimatedRemovalDate: Calendar.current.date(byAdding: .day, value: 14, to: optOutSubmittedDate)) {
+            timelineEvents.append(estimatedRemovalEvent)
+        }
+
+        if let removedEvent = DBPUITimelineEvent(removedDate: removedDate) {
+            timelineEvents.append(removedEvent)
+        }
+
+        return timelineEvents
     }
 }
 
@@ -230,6 +244,22 @@ struct DBPUIDataBrokerProfileMatch: Codable {
     let relatives: [String]
     let timelineEvents: [DBPUITimelineEvent]
     let hasMatchingRecordOnParentBroker: Bool
+
+    init(dataBroker: DBPUIDataBroker,
+         name: String,
+         addresses: [DBPUIUserProfileAddress],
+         alternativeNames: [String],
+         relatives: [String],
+         timelineEvents: [DBPUITimelineEvent],
+         hasMatchingRecordOnParentBroker: Bool) {
+        self.dataBroker = dataBroker
+        self.name = name
+        self.addresses = addresses
+        self.alternativeNames = alternativeNames
+        self.relatives = relatives
+        self.timelineEvents = timelineEvents.sorted(by: <)
+        self.hasMatchingRecordOnParentBroker = hasMatchingRecordOnParentBroker
+    }
 }
 
 extension DBPUIDataBrokerProfileMatch {
@@ -240,19 +270,7 @@ extension DBPUIDataBrokerProfileMatch {
          parentBrokerOptOutJobData: [OptOutJobData]?,
          optOutUrl: String) {
         let extractedProfile = optOutJobData.extractedProfile
-
-        var timelineEvents = DBPUITimelineEvent.from(historyEvents: optOutJobData.historyEvents).sorted(by: <)
-        let mostRecentFoundDate = timelineEvents.filter({ $0.type == .recordFound || $0.type == .recordReappeared }).last?.eventDate
-        let mostRecentOptOutSubmittedDate = timelineEvents.filter({ $0.type == .optOutSubmitted }).last?.eventDate
-        let estimatedRemovalDate = Calendar.current.date(byAdding: .day,
-                                                         value: 14,
-                                                         to: (mostRecentOptOutSubmittedDate ?? mostRecentFoundDate ?? Date(timeIntervalSince1970: 0)))
-        if let estimatedRemovalEvent = DBPUITimelineEvent(estimatedRemovalDate: estimatedRemovalDate) {
-            timelineEvents.append(estimatedRemovalEvent)
-        }
-        if let removedEvent = DBPUITimelineEvent(removedDate: extractedProfile.removedDate) {
-            timelineEvents.append(removedEvent)
-        }
+        let timelineEvents = DBPUITimelineEvent.from(historyEvents: optOutJobData.historyEvents, removedDate: extractedProfile.removedDate)
 
         // Check for any matching records on the parent broker
         let hasFoundParentMatch = parentBrokerOptOutJobData?.contains { parentOptOut in
@@ -354,8 +372,7 @@ struct DBPUIOptOutMatch: DBPUISendableMessage {
 
 extension DBPUIOptOutMatch {
     init?(profileMatch: DBPUIDataBrokerProfileMatch, matches: Int) {
-        let removedEvents = profileMatch.timelineEvents.filter({ $0.type == .removed })
-        guard let removedDate = removedEvents.max()?.date else { return nil }
+        guard let removedDate = profileMatch.timelineEvents.filter({ $0.type == .removed }).first?.date else { return nil }
         let dataBroker = profileMatch.dataBroker
         self.init(dataBroker: dataBroker,
                   matches: matches,
