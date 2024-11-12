@@ -76,6 +76,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private(set) var stateRestorationManager: AppStateRestorationManager!
     private var grammarFeaturesManager = GrammarFeaturesManager()
     let internalUserDecider: InternalUserDecider
+    private var isInternalUserSharingCancellable: AnyCancellable?
     let featureFlagger: FeatureFlagger
     private var appIconChanger: AppIconChanger!
     private var autoClearHandler: AutoClearHandler!
@@ -282,7 +283,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         vpnSettings.alignTo(subscriptionEnvironment: subscriptionManager.currentEnvironment)
 
         // Update DBP environment and match the Subscription environment
+        let dbpSettings = DataBrokerProtectionSettings()
         DataBrokerProtectionSettings().alignTo(subscriptionEnvironment: subscriptionManager.currentEnvironment)
+
+        // Also update the stored run type so the login item knows if tests are running
+        dbpSettings.updateStoredRunType()
 
         // Freemium DBP
         let freemiumDBPUserStateManager = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp)
@@ -429,6 +434,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         subscribeToEmailProtectionStatusNotifications()
         subscribeToDataImportCompleteNotification()
+        subscribeToInternalUserChanges()
 
         fireFailedCompilationsPixelIfNeeded()
 
@@ -742,6 +748,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func subscribeToDataImportCompleteNotification() {
         NotificationCenter.default.addObserver(self, selector: #selector(dataImportCompleteNotification(_:)), name: .dataImportComplete, object: nil)
+    }
+
+    private func subscribeToInternalUserChanges() {
+        UserDefaults.appConfiguration.isInternalUser = internalUserDecider.isInternalUser
+
+        isInternalUserSharingCancellable = internalUserDecider.isInternalUserPublisher
+            .assign(to: \.isInternalUser, onWeaklyHeld: UserDefaults.appConfiguration)
     }
 
     private func emailDidSignInNotification(_ notification: Notification) {
