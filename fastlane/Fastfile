@@ -342,7 +342,7 @@ platform :mac do
   end
 
   desc 'Creates a new Kechain to use on UI tests'
-  lane :create_keychain do |options|
+  lane :create_keychain_ui_tests do |options|
     create_keychain(
       name: "DefaultKeychain",
       default_keychain: true,
