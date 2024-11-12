@@ -86,15 +86,18 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     private var internalUserDecider: InternalUserDecider
 
     private var checkpoint: Checkpoint
-    private var onResuming: () -> Void = {}
-
+    private var onResuming: (() -> Void)?
     private var onSkipping: () -> Void = {}
+
+    var isResumable: Bool {
+        onResuming != nil
+    }
 
     private var bytesToDownload: UInt64 = 0
     private var bytesDownloaded: UInt64 = 0
 
     @Published var updateProgress = UpdateCycleProgress.default
-    public var updateProgressPublisher: Published<UpdateCycleProgress>.Publisher { $updateProgress }
+    var updateProgressPublisher: Published<UpdateCycleProgress>.Publisher { $updateProgress }
 
     init(internalUserDecider: InternalUserDecider,
          areAutomaticUpdatesEnabled: Bool) {
@@ -103,7 +106,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     }
 
     func resume() {
-        onResuming()
+        onResuming?()
     }
 
     func cancelAndDismissCurrentUpdate() {
