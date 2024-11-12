@@ -248,7 +248,7 @@ extension AutoconsentUserScript {
                 "enableCosmeticRules": true,
                 "detectRetries": 20,
                 "isMainWorld": false,
-                "enableFilterList": enableFilterList
+                "enableFilterList": true
             ] as [String: Any?]
         ] as [String: Any?], nil)
     }
