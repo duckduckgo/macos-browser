@@ -33,7 +33,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "max/remove-cpm-experiment",
-        "revision" : "142bc52210634458e02fe435cf7ca4ca16ef30d0"
+        "revision" : "15906ec304cb73ab3a87a4c54796973c6442af0d"
       }
     },
     {
