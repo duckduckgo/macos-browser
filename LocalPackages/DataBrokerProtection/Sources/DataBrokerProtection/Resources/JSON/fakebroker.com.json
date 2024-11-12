@@ -89,7 +89,7 @@
   "schedulingConfig": {
     "retryError": 48,
     "confirmOptOutScan": 0,
-    "maintenanceScan": 240
+    "maintenanceScan": 120
   },
   "addedDatetime": 1725632531153,
   "version": "0.0.1"
