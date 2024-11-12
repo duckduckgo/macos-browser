@@ -38,6 +38,12 @@ class CapturingNewTabPageSearchBoxExperimentPixelReporter: NewTabPageSearchBoxEx
     }
     var calls: [PixelArguments] = []
 
+    var cohortAssignmentCalls: [NewTabPageSearchBoxExperiment.Cohort] = []
+
+    func fireNTPSearchBoxExperimentCohortAssignmentPixel(cohort: NewTabPageSearchBoxExperiment.Cohort, onboardingCohort: PixelExperiment?) {
+        cohortAssignmentCalls.append(cohort)
+    }
+
     func fireNTPSearchBoxExperimentPixel(
         day: Int,
         count: Int,
@@ -90,6 +96,7 @@ final class NewTabPageSearchBoxExperimentTests: XCTestCase {
         XCTAssertTrue(experiment.isActive)
         XCTAssertGreaterThan(try XCTUnwrap(dataStore.enrollmentDate), date)
         XCTAssertEqual(experiment.cohort, cohortDecider.cohort)
+        XCTAssertEqual(pixelReporter.cohortAssignmentCalls, [cohortDecider.cohort])
     }
 
     func testWhenUserIsNotEnrolledAndIsNotEligibleForExperimentThenCohortIsNil() {
@@ -101,6 +108,7 @@ final class NewTabPageSearchBoxExperimentTests: XCTestCase {
         XCTAssertTrue(dataStore.didRunEnrollment)
         XCTAssertFalse(experiment.isActive)
         XCTAssertNil(experiment.cohort)
+        XCTAssertTrue(pixelReporter.cohortAssignmentCalls.isEmpty)
     }
 
     func testWhenUserIsEnrolledThenSubsequentCohortAssignmentsHaveNoEffect() {
@@ -114,6 +122,7 @@ final class NewTabPageSearchBoxExperimentTests: XCTestCase {
         XCTAssertTrue(dataStore.didRunEnrollment)
         XCTAssertEqual(experiment.cohort, .control)
         XCTAssertEqual(dataStore.enrollmentDate, date)
+        XCTAssertTrue(pixelReporter.cohortAssignmentCalls.isEmpty)
     }
 
     func testWhenUserIsEnrolledThenIsActiveReturnsFalseWhenExperimentExpires() {

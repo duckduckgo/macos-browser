@@ -96,6 +96,11 @@ struct DefaultNewTabPageSearchBoxExperimentCohortDecider: NewTabPageSearchBoxExp
 }
 
 protocol NewTabPageSearchBoxExperimentPixelReporting {
+    func fireNTPSearchBoxExperimentCohortAssignmentPixel(
+        cohort: NewTabPageSearchBoxExperiment.Cohort,
+        onboardingCohort: PixelExperiment?
+    )
+
     func fireNTPSearchBoxExperimentPixel(
         day: Int,
         count: Int,
@@ -106,6 +111,11 @@ protocol NewTabPageSearchBoxExperimentPixelReporting {
 }
 
 struct DefaultNewTabPageSearchBoxExperimentPixelReporter: NewTabPageSearchBoxExperimentPixelReporting {
+
+    func fireNTPSearchBoxExperimentCohortAssignmentPixel(cohort: NewTabPageSearchBoxExperiment.Cohort, onboardingCohort: PixelExperiment?) {
+        PixelKit.fire(NewTabSearchBoxExperimentPixel.cohortAssigned(cohort: cohort, onboardingCohort: onboardingCohort))
+    }
+
     func fireNTPSearchBoxExperimentPixel(
         day: Int,
         count: Int,
@@ -155,10 +165,10 @@ final class NewTabPageSearchBoxExperiment {
     }
 
     enum Cohort: String {
-        case control
-        case experiment = "ntp_search_box"
-        case controlExistingUser = "control_existing_user"
-        case experimentExistingUser = "ntp_search_box_existing_user"
+        case control = "control_v2"
+        case experiment = "ntp_search_box_v2"
+        case controlExistingUser = "control_existing_user_v2"
+        case experimentExistingUser = "ntp_search_box_existing_user_v2"
 
         var isExperiment: Bool {
             switch self {
@@ -211,6 +221,7 @@ final class NewTabPageSearchBoxExperiment {
         dataStore.didRunEnrollment = true
 
         Logger.newTabPageSearchBoxExperiment.debug("User assigned to cohort \(cohort.rawValue)")
+        pixelReporter.fireNTPSearchBoxExperimentCohortAssignmentPixel(cohort: cohort, onboardingCohort: onboardingExperimentCohortProvider.onboardingExperimentCohort)
     }
 
     func recordSearch(from source: SearchSource) {
