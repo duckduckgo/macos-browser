@@ -356,14 +356,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         }
 
         switch subscriptionFeatureName {
-        case .privateBrowsing:
-            notificationCenter.post(name: .openPrivateBrowsing, object: self, userInfo: nil)
-        case .privateSearch:
-            notificationCenter.post(name: .openPrivateSearch, object: self, userInfo: nil)
-        case .emailProtection:
-            notificationCenter.post(name: .openEmailProtection, object: self, userInfo: nil)
-        case .appTrackingProtection:
-            notificationCenter.post(name: .openAppTrackingProtection, object: self, userInfo: nil)
         case .vpn:
             PixelKit.fire(PrivacyProPixel.privacyProWelcomeVPN, frequency: .unique)
             notificationCenter.post(name: .ToggleNetworkProtectionInMainWindow, object: self, userInfo: nil)
