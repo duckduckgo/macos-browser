@@ -40,6 +40,11 @@ on:
         description: "Branch name"
         required: false
         type: string
+      skip-notify:
+        description: "Skip Mattermost notification"
+        required: false
+        default: false
+        type: boolean
     secrets:
       APPLE_API_KEY_BASE64:
         required: true
@@ -360,7 +365,7 @@ jobs:
     name: Send Mattermost message
 
     needs: [export-notarized-app, create-dmg]
-    if: always()
+    if: ${{ always() && inputs.skip-notify == false }}
 
     runs-on: ubuntu-latest
 
