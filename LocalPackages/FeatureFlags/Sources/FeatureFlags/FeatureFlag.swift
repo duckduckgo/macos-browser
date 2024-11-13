@@ -91,6 +91,6 @@ extension FeatureFlag: FeatureFlagProtocol {
 public extension FeatureFlagger {
 
     func isFeatureOn(_ featureFlag: FeatureFlag) -> Bool {
-        isFeatureOn<FeatureFlag>(featureFlag)
+        isFeatureOn(for: featureFlag)
     }
 }

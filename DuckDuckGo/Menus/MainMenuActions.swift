@@ -352,10 +352,6 @@ extension AppDelegate {
     @objc func resetNewTabPageCustomization(_ sender: Any?) {
         homePageSettingsModel.resetAllCustomizations()
     }
-
-    @objc func resetCpmCohort(_ sender: Any?) {
-        UserDefaultsWrapper.clear(.autoconsentFilterlistExperimentCohort)
-    }
 }
 
 extension MainViewController {
