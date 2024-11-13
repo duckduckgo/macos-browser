@@ -19,7 +19,6 @@
 import Foundation
 import Combine
 import PixelKit
-import RemoteMessaging
 import Common
 import os.log
 
@@ -31,7 +30,6 @@ protocol NewTabPageActionsManaging: AnyObject {
     func reportException(with params: [String: String])
     func showContextMenu(with params: [String: Any])
     func updateWidgetConfigs(with params: [[String: String]])
-    func getRemoteMessage() -> NTP.RMFMessage?
 }
 
 struct NewTabPageConfiguration: Encodable {
@@ -72,14 +70,11 @@ struct NewTabPageConfiguration: Encodable {
 final class NewTabPageActionsManager: NewTabPageActionsManaging {
 
     private let appearancePreferences: AppearancePreferences
-    private let activeRemoteMessageModel: ActiveRemoteMessageModel
-
     private var cancellables = Set<AnyCancellable>()
     weak var userScript: NewTabPageUserScript?
 
-    init(appearancePreferences: AppearancePreferences, activeRemoteMessageModel: ActiveRemoteMessageModel) {
+    init(appearancePreferences: AppearancePreferences) {
         self.appearancePreferences = appearancePreferences
-        self.activeRemoteMessageModel = activeRemoteMessageModel
 
         appearancePreferences.$isFavoriteVisible.dropFirst().removeDuplicates().asVoid()
             .receive(on: DispatchQueue.main)
@@ -94,23 +89,13 @@ final class NewTabPageActionsManager: NewTabPageActionsManaging {
                 self?.notifyWidgetConfigsDidChange()
             }
             .store(in: &cancellables)
-
-        activeRemoteMessageModel.$remoteMessage.dropFirst()
-            .sink { [weak self] remoteMessage in
-                self?.notifyRemoteMessageDidChange(remoteMessage)
-            }
-            .store(in: &cancellables)
     }
 
     private func notifyWidgetConfigsDidChange() {
-        userScript?.notifyWidgetConfigsDidChange(widgetConfigs: [
+        userScript?.widgetConfigsUpdated(widgetConfigs: [
             .init(id: "favorites", isVisible: appearancePreferences.isFavoriteVisible),
             .init(id: "privacyStats", isVisible: appearancePreferences.isRecentActivityVisible)
         ])
-    }
-
-    private func notifyRemoteMessageDidChange(_ remoteMessage: RemoteMessageModel?) {
-        userScript?.notifyRemoteMessageDidChange(.small(.init(descriptionText: "Hello, this is a description", id: "hejka", titleText: "Hello I'm a title")))
     }
 
     var configuration: NewTabPageConfiguration {
@@ -192,10 +177,6 @@ final class NewTabPageActionsManager: NewTabPageActionsManaging {
                 break
             }
         }
-    }
-
-    func getRemoteMessage() -> NTP.RMFMessage? {
-        .small(.init(descriptionText: "Hello, this is a description", id: "hejka", titleText: "Hello I'm a title"))
     }
 
     func reportException(with params: [String: String]) {

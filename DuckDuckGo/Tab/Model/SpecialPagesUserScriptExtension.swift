@@ -66,4 +66,9 @@ extension SpecialPagesUserScript {
             appearancePreferences: AppearancePreferences.shared,
             startupPreferences: StartupPreferences.shared)
     }
+
+    @MainActor
+    private func buildNewTabPageActionsManager() -> NewTabPageActionsManaging {
+        NewTabPageActionsManager(appearancePreferences: .shared)
+    }
 }

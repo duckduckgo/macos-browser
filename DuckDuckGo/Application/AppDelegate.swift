@@ -44,6 +44,8 @@ import Freemium
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
 
+    let newTabPageActionsManager = NewTabPageActionsManager(appearancePreferences: .shared)
+    private(set) lazy var newTabPageUserScript = NewTabPageUserScript(actionsManager: newTabPageActionsManager)
 
     let experimentalFeatures = ExperimentalFeatures()
     @objc func toggleHTMLNTP(_ sender: NSMenuItem) {
@@ -96,8 +98,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let bookmarksManager = LocalBookmarkManager.shared
     var privacyDashboardWindow: NSWindow?
 
-    let newTabPageActionsManager: NewTabPageActionsManaging
-    let newTabPageUserScript: NewTabPageUserScript
     let activeRemoteMessageModel: ActiveRemoteMessageModel
     let homePageSettingsModel = HomePage.Models.SettingsModel()
     let remoteMessagingClient: RemoteMessagingClient!
@@ -305,9 +305,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                                                        freemiumDBPUserStateManager: freemiumDBPUserStateManager)
         freemiumDBPPromotionViewCoordinator = FreemiumDBPPromotionViewCoordinator(freemiumDBPUserStateManager: freemiumDBPUserStateManager,
                                                                                   freemiumDBPFeature: freemiumDBPFeature)
-
-        newTabPageActionsManager = NewTabPageActionsManager(appearancePreferences: .shared, activeRemoteMessageModel: activeRemoteMessageModel)
-        newTabPageUserScript = NewTabPageUserScript(actionsManager: newTabPageActionsManager)
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {
