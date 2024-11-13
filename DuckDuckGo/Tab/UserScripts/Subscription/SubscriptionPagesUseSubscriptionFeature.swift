@@ -33,7 +33,8 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     var featureName = "useSubscription"
     var messageOriginPolicy: MessageOriginPolicy = .only(rules: [
         .exact(hostname: "duckduckgo.com"),
-        .exact(hostname: "abrown.duckduckgo.com")
+        .exact(hostname: "abrown.duckduckgo.com"),
+        .exact(hostname: "devtesting17.duckduckgo.com")
     ])
     let subscriptionManager: SubscriptionManager
     var accountManager: AccountManager { subscriptionManager.accountManager }
@@ -130,8 +131,12 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func getSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        Logger.config.info("START getSubscription")
+        let timestamp = NSDate().timeIntervalSince1970
         let authToken = accountManager.authToken ?? ""
-        return Subscription(token: authToken)
+        let foo = Subscription(token: authToken)
+        Logger.config.info("END getSubscription \(NSDate().timeIntervalSince1970 - timestamp)")
+        return foo
     }
 
     func setSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
@@ -167,18 +172,22 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func getSubscriptionOptions(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        Logger.config.info("START getSubscriptionOptions")
+        let timestamp = NSDate().timeIntervalSince1970
         guard subscriptionFeatureAvailability.isSubscriptionPurchaseAllowed else { return SubscriptionOptions.empty }
 
         switch subscriptionPlatform {
         case .appStore:
             if #available(macOS 12.0, *) {
                 if let subscriptionOptions = await subscriptionManager.storePurchaseManager().subscriptionOptions() {
+                    Logger.config.info("END getSubscriptionOptions (appStore) \(NSDate().timeIntervalSince1970 - timestamp)")
                     return subscriptionOptions
                 }
             }
         case .stripe:
             switch await stripePurchaseFlow.subscriptionOptions() {
             case .success(let subscriptionOptions):
+                Logger.config.info("END getSubscriptionOptions (stripe) \(NSDate().timeIntervalSince1970 - timestamp)")
                 return subscriptionOptions
             case .failure:
                 break

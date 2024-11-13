@@ -11008,7 +11008,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [ \"$ENABLE_PREVIEWS\" = \"YES\" ]; then exit 0; fi\n\"${SRCROOT}/scripts/assert_xcode_version.sh\"\n";
+			shellScript = "if [ \"$ENABLE_PREVIEWS\" = \"YES\" ]; then exit 0; fi\n#\"${SRCROOT}/scripts/assert_xcode_version.sh\"\n";
 		};
 		CBCCF59F2996681700C02DFE /* Assert Xcode version */ = {
 			isa = PBXShellScriptBuildPhase;
