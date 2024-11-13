@@ -26,6 +26,8 @@ protocol NewTabPageActionsManaging: AnyObject {
     var configuration: NewTabPageConfiguration { get }
     var userScript: NewTabPageUserScript? { get set }
 
+    func getFavorites() -> NewTabPageUserScript.FavoritesData
+    func getFavoritesConfig() -> NewTabPageUserScript.FavoritesConfig
     /// It is called in case of error loading the pages
     func reportException(with params: [String: String])
     func showContextMenu(with params: [String: Any])
@@ -118,6 +120,16 @@ final class NewTabPageActionsManager: NewTabPageActionsManaging {
             locale: Bundle.main.preferredLocalizations.first ?? "en",
             platform: .init(name: "macos")
         )
+    }
+
+    func getFavorites() -> NewTabPageUserScript.FavoritesData {
+        // implementation TBD
+        .init(favorites: [])
+    }
+
+    func getFavoritesConfig() -> NewTabPageUserScript.FavoritesConfig {
+        // implementation TBD
+        .init(animation: .auto, expansion: .collapsed)
     }
 
     func showContextMenu(with params: [String: Any]) {

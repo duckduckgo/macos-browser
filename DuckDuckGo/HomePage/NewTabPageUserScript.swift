@@ -31,6 +31,8 @@ final class NewTabPageUserScript: NSObject, @preconcurrency Subfeature {
     // MARK: - MessageNames
     enum MessageNames: String, CaseIterable {
         case contextMenu
+        case favoritesGetConfig = "favorites_getConfig"
+        case favoritesGetData = "favorites_getData"
         case initialSetup
         case reportInitException
         case reportPageException
@@ -49,6 +51,8 @@ final class NewTabPageUserScript: NSObject, @preconcurrency Subfeature {
 
     private lazy var methodHandlers: [MessageNames: Handler] = [
         .contextMenu: { [weak self] in try await self?.showContextMenu(params: $0, original: $1) },
+        .favoritesGetConfig: { [weak self] in try await self?.favoritesGetConfig(params: $0, original: $1) },
+        .favoritesGetData: { [weak self] in try await self?.favoritesGetData(params: $0, original: $1) },
         .initialSetup: { [weak self] in try await self?.initialSetup(params: $0, original: $1) },
         .reportInitException: { [weak self] in try await self?.reportException(params: $0, original: $1) },
         .reportPageException: { [weak self] in try await self?.reportException(params: $0, original: $1) },
@@ -70,6 +74,23 @@ final class NewTabPageUserScript: NSObject, @preconcurrency Subfeature {
 
 extension NewTabPageUserScript {
     @MainActor
+    private func showContextMenu(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        guard let params = params as? [String: Any] else { return nil }
+        actionsManager.showContextMenu(with: params)
+        return nil
+    }
+
+    @MainActor
+    private func favoritesGetConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        actionsManager.getFavoritesConfig()
+    }
+
+    @MainActor
+    private func favoritesGetData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        actionsManager.getFavorites()
+    }
+
+    @MainActor
     private func initialSetup(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         actionsManager.configuration
     }
@@ -81,17 +102,51 @@ extension NewTabPageUserScript {
         return nil
     }
 
-    @MainActor
-    private func showContextMenu(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let params = params as? [String: Any] else { return nil }
-        actionsManager.showContextMenu(with: params)
-        return nil
-    }
-
     private func reportException(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let params = params as? [String: String] else { return nil }
         actionsManager.reportException(with: params)
         return nil
     }
+}
 
+extension NewTabPageUserScript {
+
+    struct FavoritesConfig: Encodable {
+        let animation: Animation?
+        let expansion: Expansion
+    }
+
+    enum Expansion: String, Encodable {
+        case collapsed, expanded
+    }
+
+    struct Animation: Encodable {
+        let kind: AnimationKind
+
+        static let none = Animation(kind: .none)
+        static let viewTransitions = Animation(kind: .viewTransitions)
+        static let auto = Animation(kind: .auto)
+
+        enum AnimationKind: String, Encodable {
+            case none
+            case viewTransitions = "view-transitions"
+            case auto = "auto-animate"
+        }
+    }
+
+    struct FavoritesData: Encodable {
+        var favorites: [Favorite]
+    }
+
+    struct Favorite: Encodable {
+        let favicon: FavoriteFavicon?
+        let id: String
+        let title: String
+        let url: String
+    }
+
+    struct FavoriteFavicon: Encodable {
+        var maxAvailableSize: Int
+        var src: String
+    }
 }
