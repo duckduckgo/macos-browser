@@ -26,7 +26,7 @@ import Combine
 final class ReleaseNotesUserScript: NSObject, Subfeature {
 
     lazy var updateController: UpdateControllerProtocol = Application.appDelegate.updateController
-    var messageOriginPolicy: MessageOriginPolicy = .only(rules: [.exact(hostname: "release-notes"), .exact(hostname: "newtab")])
+    var messageOriginPolicy: MessageOriginPolicy = .only(rules: [.exact(hostname: "release-notes")])
     let featureName: String = "release-notes"
     weak var broker: UserScriptMessageBroker?
     weak var webView: WKWebView? {
