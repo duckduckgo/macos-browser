@@ -365,7 +365,7 @@ jobs:
     name: Send Mattermost message
 
     needs: [export-notarized-app, create-dmg]
-    if: ${{ always() && inputs.skip-notify != false }}
+    if: ${{ always() && inputs.skip-notify == false }}
 
     runs-on: ubuntu-latest
 
