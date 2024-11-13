@@ -28,7 +28,7 @@ final class AIChatUserScript: NSObject, Subfeature {
 
     private let handler: AIChatUserScriptHandling
     public let featureName: String = "aiChat"
-    var broker: UserScriptMessageBroker?
+    weak var broker: UserScriptMessageBroker?
     private(set) var messageOriginPolicy: MessageOriginPolicy
 
     init(handler: AIChatUserScriptHandling, urlSettings: AIChatDebugURLSettingsRepresentable) {

@@ -20,7 +20,7 @@ import UserScript
 
 protocol AIChatUserScriptHandling {
     func handleGetUserValues(params: Any, message: UserScriptMessage) -> Encodable?
-    func openSettings(params: Any, message: UserScriptMessage) -> Encodable?
+    func openSettings(params: Any, message: UserScriptMessage) async -> Encodable?
 }
 
 struct AIChatUserScriptHandler: AIChatUserScriptHandling {
@@ -36,10 +36,8 @@ struct AIChatUserScriptHandler: AIChatUserScriptHandling {
         self.storage = storage
     }
 
-    public func openSettings(params: Any, message: UserScriptMessage) -> Encodable? {
-        Task { @MainActor in
-            WindowControllersManager.shared.showTab(with: .settings(pane: .aiChat))
-        }
+    @MainActor public func openSettings(params: Any, message: UserScriptMessage) -> Encodable? {
+        WindowControllersManager.shared.showTab(with: .settings(pane: .aiChat))
         return nil
     }
 
