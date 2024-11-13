@@ -23,15 +23,15 @@ import UserScript
 
 final class NewTabPageUserContentController: WKUserContentController {
 
-    let ntpUserScripts: NTPUserScript
+    let newTabPageUserScriptProvider: NewTabPageUserScriptProvider
 
     @MainActor
     override init() {
-        ntpUserScripts = NTPUserScript()
+        newTabPageUserScriptProvider = NewTabPageUserScriptProvider()
 
         super.init()
 
-        ntpUserScripts.userScripts.forEach {
+        newTabPageUserScriptProvider.userScripts.forEach {
             let userScript = $0.makeWKUserScriptSync()
             self.installUserScripts([userScript], handlers: [$0])
         }
@@ -49,14 +49,14 @@ final class NewTabPageUserContentController: WKUserContentController {
 }
 
 @MainActor
-final class NTPUserScript: UserScriptsProvider {
-    lazy var userScripts: [UserScript] = [specialPagesUserScriptIsolated]
+final class NewTabPageUserScriptProvider: UserScriptsProvider {
+    lazy var userScripts: [UserScript] = [specialPagesUserScript]
 
-    let specialPagesUserScriptIsolated: SpecialPagesUserScript
+    let specialPagesUserScript: SpecialPagesUserScript
 
     init() {
-        specialPagesUserScriptIsolated = SpecialPagesUserScript()
-        specialPagesUserScriptIsolated.withNewTabPage()
+        specialPagesUserScript = SpecialPagesUserScript()
+        specialPagesUserScript.withNewTabPage()
     }
 
     @MainActor
@@ -80,11 +80,10 @@ final class NTPUserScript: UserScriptsProvider {
 extension WKWebViewConfiguration {
 
     @MainActor
-    func applyNTPConfiguration() {
-        preferences.isFraudulentWebsiteWarningEnabled = false
+    func applyNewTabPageWebViewConfiguration(with featureFlagger: FeatureFlagger) {
         if urlSchemeHandler(forURLScheme: URL.NavigationalScheme.duck.rawValue) == nil {
             setURLSchemeHandler(
-                DuckURLSchemeHandler(featureFlagger: NSApp.delegateTyped.featureFlagger),
+                DuckURLSchemeHandler(featureFlagger: featureFlagger),
                 forURLScheme: URL.NavigationalScheme.duck.rawValue
             )
         }

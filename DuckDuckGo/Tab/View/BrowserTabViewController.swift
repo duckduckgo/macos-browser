@@ -44,7 +44,7 @@ final class BrowserTabViewController: NSViewController {
     private let newTabPageUserScript: NewTabPageUserScript
     private lazy var newTabPageWebView: WebView = {
         let configuration = WKWebViewConfiguration()
-        configuration.applyNTPConfiguration()
+        configuration.applyNewTabPageWebViewConfiguration(with: featureFlagger)
 
         let webView = WebView(frame: .zero, configuration: configuration)
 
