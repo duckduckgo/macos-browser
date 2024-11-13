@@ -21,6 +21,7 @@ import Cocoa
 import Common
 import Configuration
 import Crashes
+import FeatureFlags
 import History
 import PixelKit
 import Subscription
@@ -1018,7 +1019,9 @@ extension MainViewController {
     // MARK: - Developer Tools
 
     @objc func toggleDeveloperTools(_ sender: Any?) {
-        guard let webView = getActiveTabAndIndex()?.tab.webView else { return }
+        guard let webView = browserTabViewController.webView else {
+            return
+        }
 
         if webView.isInspectorShown == true {
             webView.closeDeveloperTools()
@@ -1028,15 +1031,15 @@ extension MainViewController {
     }
 
     @objc func openJavaScriptConsole(_ sender: Any?) {
-        getActiveTabAndIndex()?.tab.webView.openJavaScriptConsole()
+        browserTabViewController.webView?.openJavaScriptConsole()
     }
 
     @objc func showPageSource(_ sender: Any?) {
-        getActiveTabAndIndex()?.tab.webView.showPageSource()
+        browserTabViewController.webView?.showPageSource()
     }
 
     @objc func showPageResources(_ sender: Any?) {
-        getActiveTabAndIndex()?.tab.webView.showPageSource()
+        browserTabViewController.webView?.showPageSource()
     }
 }
 
@@ -1133,7 +1136,7 @@ extension MainViewController: NSMenuItemValidation {
         case #selector(MainViewController.openJavaScriptConsole(_:)),
              #selector(MainViewController.showPageSource(_:)),
              #selector(MainViewController.showPageResources(_:)):
-            return activeTabViewModel?.canReload == true || (activeTabViewModel?.tab.url?.isNewTabPage == true && NSApp.delegateTyped.featureFlagger.isFeatureOn(.htmlNewTabPage))
+            return activeTabViewModel?.canReload == true || (activeTabViewModel?.tab.url?.isNewTabPage == true && featureFlagger.isFeatureOn(.htmlNewTabPage))
 
         case #selector(MainViewController.toggleDownloads(_:)):
             let isDownloadsPopoverShown = self.navigationBarViewController.isDownloadsPopoverShown

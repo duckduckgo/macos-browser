@@ -42,7 +42,7 @@ final class BrowserTabViewController: NSViewController {
     private lazy var hoverLabelContainer = ColorView(frame: .zero, backgroundColor: .browserTabBackground, borderWidth: 0)
 
     private let newTabPageUserScript: NewTabPageUserScript
-    private lazy var newTabPageWebView: WebView = {
+    private(set) lazy var newTabPageWebView: WebView = {
         let configuration = WKWebViewConfiguration()
         configuration.applyNewTabPageWebViewConfiguration(with: featureFlagger)
 
@@ -53,7 +53,7 @@ final class BrowserTabViewController: NSViewController {
 
         return webView
     }()
-    private weak var webView: WebView?
+    private(set) weak var webView: WebView?
     private weak var webViewContainer: NSView?
     private weak var webViewSnapshot: NSView?
     private var containerStackView: NSStackView
@@ -537,7 +537,6 @@ final class BrowserTabViewController: NSViewController {
             webView = newWebView
 
             addWebViewToViewHierarchy(newWebView, tab: tabViewModel.tab)
-
         }
 
         guard let tabViewModel = tabViewModel else {

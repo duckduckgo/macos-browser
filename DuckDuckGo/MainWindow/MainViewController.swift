@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Cocoa
 import Carbon.HIToolbox
 import Combine
@@ -34,6 +35,7 @@ final class MainViewController: NSViewController {
     let findInPageViewController: FindInPageViewController
     let fireViewController: FireViewController
     let bookmarksBarViewController: BookmarksBarViewController
+    let featureFlagger: FeatureFlagger
     private let bookmarksBarVisibilityManager: BookmarksBarVisibilityManager
 
     let tabCollectionViewModel: TabCollectionViewModel
@@ -63,12 +65,15 @@ final class MainViewController: NSViewController {
          autofillPopoverPresenter: AutofillPopoverPresenter,
          vpnXPCClient: VPNControllerXPCClient = .shared,
          aiChatMenuConfig: AIChatMenuVisibilityConfigurable = AIChatMenuConfiguration(),
-         brokenSitePromptLimiter: BrokenSitePromptLimiter = .shared) {
+         brokenSitePromptLimiter: BrokenSitePromptLimiter = .shared,
+         featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger
+    ) {
 
         self.aiChatMenuConfig = aiChatMenuConfig
         let tabCollectionViewModel = tabCollectionViewModel ?? TabCollectionViewModel()
         self.tabCollectionViewModel = tabCollectionViewModel
         self.isBurner = tabCollectionViewModel.isBurner
+        self.featureFlagger = featureFlagger
 
         tabBarViewController = TabBarViewController.create(tabCollectionViewModel: tabCollectionViewModel)
         bookmarksBarVisibilityManager = BookmarksBarVisibilityManager(selectedTabPublisher: tabCollectionViewModel.$selectedTabViewModel.eraseToAnyPublisher())

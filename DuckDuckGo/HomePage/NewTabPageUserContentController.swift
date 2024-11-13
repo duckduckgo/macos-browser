@@ -87,6 +87,7 @@ extension WKWebViewConfiguration {
                 forURLScheme: URL.NavigationalScheme.duck.rawValue
             )
         }
+        preferences[.developerExtrasEnabled] = true
         self.userContentController = NewTabPageUserContentController()
      }
 }
