@@ -90,10 +90,7 @@ extension FeatureFlag: FeatureFlagProtocol {
 
 public extension FeatureFlagger {
 
-    func isFeatureOn(_ featureFlag: FeatureFlag, allowOverride: Bool = true) -> Bool {
-        if internalUserDecider.isInternalUser, allowOverride, let localOverride = localOverrides?.override(for: featureFlag) {
-            return localOverride
-        }
-        return isFeatureOn(forProvider: featureFlag)
+    func isFeatureOn(_ featureFlag: FeatureFlag) -> Bool {
+        isFeatureOn<FeatureFlag>(featureFlag)
     }
 }

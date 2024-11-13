@@ -266,10 +266,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         featureFlagger = DefaultFeatureFlagger(
             internalUserDecider: internalUserDecider,
             privacyConfigManager: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
-            localOverrides: FeatureFlagOverrides(
+            localOverrides: FeatureFlagLocalOverrides(
                 keyValueStore: UserDefaults.appConfiguration,
                 actionHandler: FeatureFlagOverridesDefaultHandler()
-            )
+            ),
+            for: FeatureFlag.self
         )
 
         onboardingStateMachine = ContextualOnboardingStateMachine()

@@ -20,7 +20,7 @@ import AppKit
 import BrowserServicesKit
 import FeatureFlags
 
-struct FeatureFlagOverridesDefaultHandler: FeatureFlagOverridesHandler {
+struct FeatureFlagOverridesDefaultHandler: FeatureFlagLocalOverridesHandler {
     func flagDidChange<Flag: FeatureFlagProtocol>(_ featureFlag: Flag, isEnabled: Bool) {
         guard let flag = featureFlag as? FeatureFlag else { return }
         switch flag {
