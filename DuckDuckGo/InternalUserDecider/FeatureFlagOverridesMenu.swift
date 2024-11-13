@@ -46,27 +46,29 @@ final class FeatureFlagOverridesMenu: NSMenu {
 
     let featureFlagger: FeatureFlagger
 
+    let setInternalUserStateItem: NSMenuItem = {
+        let item = NSMenuItem(title: "Set Internal User State First")
+        item.isEnabled = false
+        return item
+    }()
+
     init(featureFlagOverrides: FeatureFlagger) {
         self.featureFlagger = featureFlagOverrides
         super.init(title: "")
 
         buildItems {
+            setInternalUserStateItem
+            NSMenuItem.separator()
+
             FeatureFlag.allCases.filter(\.supportsLocalOverriding).map { flag in
                 NSMenuItem(
-                    title: "\(flag.rawValue) (default: \(featureFlagger.isFeatureOn(flag, allowOverride: false) ? "on" : "off"))",
+                    title: "\(flag.rawValue) (default: \(featureFlagger.isFeatureOn(for: flag, allowOverride: false) ? "on" : "off"))",
                     action: #selector(toggleFeatureFlag(_:)),
                     target: self,
                     representedObject: flag
                 )
-                .submenu(NSMenu(items: [
-                    NSMenuItem(
-                        title: "Remove Override",
-                        action: #selector(resetOverride(_:)),
-                        target: self,
-                        representedObject: flag
-                    )
-                ]))
             }
+
             NSMenuItem.separator()
             NSMenuItem(title: "Remove All Overrides", action: #selector(resetAllOverrides(_:))).targetting(self)
         }
@@ -83,13 +85,30 @@ final class FeatureFlagOverridesMenu: NSMenu {
             guard let flag = item.representedObject as? FeatureFlag else {
                 return
             }
+            item.isHidden = !featureFlagger.internalUserDecider.isInternalUser
             item.title = "\(flag.rawValue) (default: \(defaultValue(for: flag)), override: \(overrideValue(for: flag)))"
-            item.state = featureFlagger.localOverrides?.override(for: flag) == true ? .on : .off
+            let override = featureFlagger.localOverrides?.override(for: flag)
+            item.state = override == true ? .on : .off
+
+            if override != nil {
+                item.submenu = NSMenu(items: [
+                    NSMenuItem(
+                        title: "Remove Override",
+                        action: #selector(resetOverride(_:)),
+                        target: self,
+                        representedObject: flag
+                    )
+                ])
+            } else {
+                item.submenu = nil
+            }
         }
+
+        setInternalUserStateItem.isHidden = featureFlagger.internalUserDecider.isInternalUser
     }
 
     private func defaultValue(for flag: FeatureFlag) -> String {
-        featureFlagger.isFeatureOn(flag, allowOverride: false) ? "on" : "off"
+        featureFlagger.isFeatureOn(for: flag, allowOverride: false) ? "on" : "off"
     }
 
     private func overrideValue(for flag: FeatureFlag) -> String {
