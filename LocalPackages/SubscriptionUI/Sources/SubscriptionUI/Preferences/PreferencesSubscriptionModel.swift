@@ -338,12 +338,24 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             hasAccessToDBP = false
         }
 
+        // TODO: Refine support for both IDTR variants
+        var hasITR = false
         switch await self.accountManager.hasEntitlement(forProductName: .identityTheftRestoration, cachePolicy: .returnCacheDataDontLoad) {
         case let .success(result):
-            hasAccessToITR = result
+            hasITR = result
         case .failure:
-            hasAccessToITR = false
+            hasITR = false
         }
+
+        var hasITRGlobal = false
+        switch await self.accountManager.hasEntitlement(forProductName: .identityTheftRestoration, cachePolicy: .returnCacheDataDontLoad) {
+        case let .success(result):
+            hasITRGlobal = result
+        case .failure:
+            hasITRGlobal = false
+        }
+
+        hasAccessToITR = hasITR || hasITRGlobal
     }
 
     @MainActor func fetchEmailAndRemoteEntitlements() async {
@@ -358,7 +370,8 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             let entitlements = response.account.entitlements.compactMap { $0.product }
             hasAccessToVPN = entitlements.contains(.networkProtection)
             hasAccessToDBP = entitlements.contains(.dataBrokerProtection)
-            hasAccessToITR = entitlements.contains(.identityTheftRestoration)
+            // TODO: Refine support for both IDTR variants
+            hasAccessToITR = entitlements.contains(.identityTheftRestoration) || entitlements.contains(.identityTheftRestorationGlobal)
             accountManager.updateCache(with: response.account.entitlements)
         }
     }
