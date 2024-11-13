@@ -215,6 +215,12 @@ final class NewTabPageSearchBoxExperiment {
             return
         }
 
+        let isOnboardingFinished = UserDefaultsWrapper<Bool>(key: .onboardingFinished, defaultValue: false).wrappedValue
+        guard isOnboardingFinished else {
+            Logger.newTabPageSearchBoxExperiment.debug("Skipping cohort assignment until onboarding is finished...")
+            return
+        }
+
         guard let cohort = cohortDecider.cohort else {
             Logger.newTabPageSearchBoxExperiment.debug("User is not eligible for the experiment, skipping cohort assignment...")
             dataStore.experimentCohort = nil
