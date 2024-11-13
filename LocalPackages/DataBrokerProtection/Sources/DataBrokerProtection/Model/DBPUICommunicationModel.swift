@@ -372,7 +372,7 @@ struct DBPUIOptOutMatch: DBPUISendableMessage {
 
 extension DBPUIOptOutMatch {
     init?(profileMatch: DBPUIDataBrokerProfileMatch, matches: Int) {
-        guard let removedDate = profileMatch.timelineEvents.filter({ $0.type == .removed }).first?.date else { return nil }
+        guard let removedDate = profileMatch.timelineEvents.first(where: { $0.type == .removed })?.date else { return nil }
         let dataBroker = profileMatch.dataBroker
         self.init(dataBroker: dataBroker,
                   matches: matches,
