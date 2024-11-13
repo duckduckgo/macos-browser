@@ -231,7 +231,7 @@ class FireWindowTests: XCTestCase {
     }
 
     private func openSignUpSite() {
-        let addressBarTextField = app.windows.firstMatch.textFields["AddressBarViewController.addressBarTextField"].firstMatch  
+        let addressBarTextField = app.windows.firstMatch.textFields["AddressBarViewController.addressBarTextField"].firstMatch
         XCTAssertTrue(
             addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The address bar text field didn't become available in a reasonable timeframe."
@@ -260,11 +260,9 @@ class FireWindowTests: XCTestCase {
         XCTAssertEqual(result, .completed, "No static texts were found in the app")
 
         // After confirming static texts are available, iterate through them
-        for staticText in app.staticTexts.allElementsBoundByIndex {
-            if staticText.exists {
-                XCTAssertFalse(staticText.label.contains("Page #1"), "Unwanted string found in static text: \(staticText.label)")
-                XCTAssertFalse(staticText.label.contains("Page #2"), "Unwanted string found in static text: \(staticText.label)")
-            }
+        for staticText in app.staticTexts.allElementsBoundByIndex where staticText.exists {
+            XCTAssertFalse(staticText.label.contains("Page #1"), "Unwanted string found in static text: \(staticText.label)")
+            XCTAssertFalse(staticText.label.contains("Page #2"), "Unwanted string found in static text: \(staticText.label)")
         }
     }
 
@@ -285,12 +283,10 @@ class FireWindowTests: XCTestCase {
         XCTAssertEqual(result, .completed, "No static texts were found in the app")
 
         // After confirming static texts are available, iterate through them
-        for staticText in app.staticTexts.allElementsBoundByIndex {
-            if staticText.exists {
-                XCTAssertFalse(staticText.label.contains("Page #4"), "Unwanted string found in static text: \(staticText.label)")
-                XCTAssertFalse(staticText.label.contains("Page #5"), "Unwanted string found in static text: \(staticText.label)")
-                XCTAssertFalse(staticText.label.contains("Page #6"), "Unwanted string found in static text: \(staticText.label)")
-            }
+        for staticText in app.staticTexts.allElementsBoundByIndex where staticText.exists {
+            XCTAssertFalse(staticText.label.contains("Page #4"), "Unwanted string found in static text: \(staticText.label)")
+            XCTAssertFalse(staticText.label.contains("Page #5"), "Unwanted string found in static text: \(staticText.label)")
+            XCTAssertFalse(staticText.label.contains("Page #6"), "Unwanted string found in static text: \(staticText.label)")
         }
     }
 
