@@ -136,10 +136,15 @@ struct DefaultNewTabPageSearchBoxExperimentPixelReporter: NewTabPageSearchBoxExp
 }
 
 protocol OnboardingExperimentCohortProviding {
+    var isOnboardingFinished: Bool { get }
     var onboardingExperimentCohort: PixelExperiment? { get }
 }
 
 struct DefaultOnboardingExperimentCohortProvider: OnboardingExperimentCohortProviding {
+    var isOnboardingFinished: Bool {
+        UserDefaultsWrapper<Bool>(key: .onboardingFinished, defaultValue: false).wrappedValue
+    }
+
     var onboardingExperimentCohort: PixelExperiment? {
         PixelExperiment.logic.cohort
     }
@@ -215,8 +220,7 @@ final class NewTabPageSearchBoxExperiment {
             return
         }
 
-        let isOnboardingFinished = UserDefaultsWrapper<Bool>(key: .onboardingFinished, defaultValue: false).wrappedValue
-        guard isOnboardingFinished else {
+        guard onboardingExperimentCohortProvider.isOnboardingFinished else {
             Logger.newTabPageSearchBoxExperiment.debug("Skipping cohort assignment until onboarding is finished...")
             return
         }

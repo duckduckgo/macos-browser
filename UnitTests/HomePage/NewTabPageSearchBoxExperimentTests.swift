@@ -25,6 +25,7 @@ class MockNewTabPageSearchBoxExperimentCohortDecider: NewTabPageSearchBoxExperim
 }
 
 class MockOnboardingExperimentCohortProvider: OnboardingExperimentCohortProviding {
+    var isOnboardingFinished: Bool = true
     var onboardingExperimentCohort: PixelExperiment?
 }
 
@@ -97,6 +98,19 @@ final class NewTabPageSearchBoxExperimentTests: XCTestCase {
         XCTAssertFalse(NewTabPageSearchBoxExperiment.Cohort.controlExistingUser.isExperiment)
         XCTAssertFalse(NewTabPageSearchBoxExperiment.Cohort.legacyControl.isExperiment)
         XCTAssertFalse(NewTabPageSearchBoxExperiment.Cohort.legacyControlExistingUser.isExperiment)
+    }
+
+    func testWhenUserIsNotEnrolledAndOnboardingIsNotFinishedThenCohortIsNotSet() {
+        onboardingExperimentCohortProvider.isOnboardingFinished = false
+        cohortDecider.cohort = .experimentExistingUser
+        let date = Date()
+        experiment.assignUserToCohort()
+
+        XCTAssertFalse(dataStore.didRunEnrollment)
+        XCTAssertFalse(experiment.isActive)
+        XCTAssertNil(dataStore.enrollmentDate)
+        XCTAssertNil(experiment.cohort)
+        XCTAssertTrue(pixelReporter.cohortAssignmentCalls.isEmpty)
     }
 
     func testWhenUserIsNotEnrolledAndIsEligibleForExperimentThenCohortIsSet() throws {
