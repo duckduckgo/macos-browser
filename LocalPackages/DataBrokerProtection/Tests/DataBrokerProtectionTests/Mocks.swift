@@ -769,6 +769,10 @@ final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault
         return 1
     }
 
+    func fetchAllAttempts() throws -> [AttemptInformation] {
+        []
+    }
+
     func fetchAttemptInformation(for extractedProfileId: Int64) throws -> AttemptInformation? {
         return nil
     }
@@ -988,6 +992,10 @@ final class MockDatabase: DataBrokerProtectionRepository {
 
     func fetchExtractedProfiles(for brokerId: Int64) -> [ExtractedProfile] {
         return extractedProfilesFromBroker
+    }
+
+    func fetchAllAttempts() throws -> [AttemptInformation] {
+        [attemptInformation].compactMap { $0 }
     }
 
     func fetchAttemptInformation(for extractedProfileId: Int64) -> AttemptInformation? {

@@ -64,6 +64,7 @@ public protocol DataBrokerProtectionRepository {
     func fetchOptOutHistoryEvents(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> [HistoryEvent]
     func hasMatches() throws -> Bool
 
+    func fetchAllAttempts() throws -> [AttemptInformation]
     func fetchAttemptInformation(for extractedProfileId: Int64) throws -> AttemptInformation?
     func addAttempt(extractedProfileId: Int64, attemptUUID: UUID, dataBroker: String, lastStageDate: Date, startTime: Date) throws
 }
@@ -483,6 +484,17 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
         } catch {
             Logger.dataBrokerProtection.error("Database error: fetchHistoryEvents, error: \(error.localizedDescription, privacy: .public)")
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.fetchOptOutHistoryEvents brokerId profileQueryId extractedProfileId"))
+            throw error
+        }
+    }
+
+    func fetchAllAttempts() throws -> [AttemptInformation] {
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
+            return try vault.fetchAllAttempts()
+        } catch {
+            Logger.dataBrokerProtection.error("Database error: fetchAllAttempts, error: \(error.localizedDescription, privacy: .public)")
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.fetchAllAttempts"))
             throw error
         }
     }
