@@ -125,6 +125,7 @@ final class HomePageViewController: NSViewController {
             PixelKit.fire(GeneralPixel.newTabInitial, frequency: .legacyInitial)
         }
         subscribeToHistory()
+        addressBarModel.setUpExperimentIfNeeded()
     }
 
     override func viewDidAppear() {
