@@ -61,7 +61,7 @@ final class NewTabPageUserScript: NSObject, @preconcurrency Subfeature {
         return methodHandlers[messageName]
     }
 
-    func widgetConfigsUpdated(widgetConfigs: [NewTabPageConfiguration.WidgetConfig]) {
+    func notifyWidgetConfigsDidChange(widgetConfigs: [NewTabPageConfiguration.WidgetConfig]) {
         for webView in webViews.allObjects {
             broker?.push(method: "widgets_onConfigUpdated", params: widgetConfigs, for: self, into: webView)
         }
@@ -71,7 +71,7 @@ final class NewTabPageUserScript: NSObject, @preconcurrency Subfeature {
 extension NewTabPageUserScript {
     @MainActor
     private func initialSetup(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        return actionsManager.configuration
+        actionsManager.configuration
     }
 
     @MainActor
@@ -93,7 +93,5 @@ extension NewTabPageUserScript {
         actionsManager.reportException(with: params)
         return nil
     }
-
-    struct Result: Encodable {}
 
 }

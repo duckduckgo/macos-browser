@@ -48,6 +48,7 @@ final class BrowserTabViewController: NSViewController {
         let webView = WebView(frame: .zero, configuration: configuration)
 
         NSApp.delegateTyped.newTabPageUserScript.webViews.add(webView)
+        webView.load(URLRequest(url: URL.newtab))
 
         return webView
     }()
@@ -149,7 +150,6 @@ final class BrowserTabViewController: NSViewController {
         }
 
         view.registerForDraggedTypes([.URL, .fileURL])
-        newTabPageWebView.load(URLRequest(url: URL.newtab))
     }
 
     @objc func windowDidBecomeActive(notification: Notification) {

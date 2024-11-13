@@ -92,7 +92,7 @@ final class NewTabPageActionsManager: NewTabPageActionsManaging {
     }
 
     private func notifyWidgetConfigsDidChange() {
-        userScript?.widgetConfigsUpdated(widgetConfigs: [
+        userScript?.notifyWidgetConfigsDidChange(widgetConfigs: [
             .init(id: "favorites", isVisible: appearancePreferences.isFavoriteVisible),
             .init(id: "privacyStats", isVisible: appearancePreferences.isRecentActivityVisible)
         ])
