@@ -124,7 +124,7 @@ class FireWindowTests: XCTestCase {
     }
 
     private func signInUsingAutoFill() {
-        if ProcessInfo.processInfo.operatingSystemVersion.majorVersion == 13 {
+        if areTestsRunningOnMacos13() {
             let webViewFire = app.webViews.firstMatch
             let webViewCoordinate = webViewFire.coordinate(withNormalizedOffset: CGVector(dx: 5, dy: 5))
             webViewCoordinate.tap()
@@ -158,7 +158,7 @@ class FireWindowTests: XCTestCase {
     }
 
     private func signIn() {
-        if ProcessInfo.processInfo.operatingSystemVersion.majorVersion == 13 {
+        if areTestsRunningOnMacos13() {
             let webView = app.webViews.firstMatch
             let webViewCoordinate = webView.coordinate(withNormalizedOffset: CGVector(dx: 5, dy: 5))
             webViewCoordinate.tap()
@@ -204,7 +204,7 @@ class FireWindowTests: XCTestCase {
     }
 
     private func fillCredentials() {
-        if ProcessInfo.processInfo.operatingSystemVersion.majorVersion == 13 {
+        if areTestsRunningOnMacos13() {
             /// On macOS 13 we tap in the webview coordinate and we use tabs to make it work given that it doesn't find web view elements
             let webView = app.webViews.firstMatch
             let webViewCoordinate = webView.coordinate(withNormalizedOffset: CGVector(dx: 5, dy: 5))
@@ -311,13 +311,6 @@ class FireWindowTests: XCTestCase {
         openSite(pageTitle: "Page #6")
     }
 
-    private func cleanAllHistory() {
-        app.typeKey(.delete, modifierFlags: [.command, .shift])
-        let clearButton = app.buttons["Clear"].firstMatch
-        XCTAssertTrue(clearButton.exists, "Clear button should exist")
-        clearButton.tap()
-    }
-
     private func assertSiteIsNotShowingInNormalWindowHistory() {
         let siteMenuItemInHistory = app.menuItems["Some site"]
         XCTAssertFalse(siteMenuItemInHistory.exists, "Menu item should not exist because it was not stored in history.")
@@ -343,5 +336,9 @@ class FireWindowTests: XCTestCase {
             app.windows.firstMatch.webViews[pageTitle].waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Visited site didn't load with the expected title in a reasonable timeframe."
         )
+    }
+
+    private func areTestsRunningOnMacos13() -> Bool {
+        return ProcessInfo.processInfo.operatingSystemVersion.majorVersion == 13
     }
 }
