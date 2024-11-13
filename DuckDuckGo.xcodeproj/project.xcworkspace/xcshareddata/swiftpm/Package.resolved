@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "max/remove-cpm-experiment",
-        "revision" : "15906ec304cb73ab3a87a4c54796973c6442af0d"
+        "revision" : "948420e704ea4d9412a4fc3e2c2ab0d5ea5fe5d7",
+        "version" : "209.1.0"
       }
     },
     {
