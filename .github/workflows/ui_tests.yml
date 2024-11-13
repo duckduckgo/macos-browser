@@ -144,6 +144,7 @@ jobs:
       with:
         check_name: "Test Report ${{ matrix.runner }}"
         report_paths: ui-tests.xml
+        check_retries: true
 
     - name: Upload logs when workflow failed
       uses: actions/upload-artifact@v4
