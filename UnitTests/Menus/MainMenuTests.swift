@@ -194,7 +194,10 @@ class MainMenuTests: XCTestCase {
 }
 
 private class DummyFeatureFlagger: FeatureFlagger {
-    func isFeatureOn<F: BrowserServicesKit.FeatureFlagSourceProviding>(forProvider: F) -> Bool {
+    var internalUserDecider: InternalUserDecider = DefaultInternalUserDecider(store: MockInternalUserStoring())
+    var localOverrides: FeatureFlagLocalOverriding?
+
+    func isFeatureOn<Flag: FeatureFlagProtocol>(for: Flag, allowOverride: Bool) -> Bool {
         false
     }
 }

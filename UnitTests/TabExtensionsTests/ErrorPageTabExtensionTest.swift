@@ -480,8 +480,11 @@ class ChallangeSender: URLAuthenticationChallengeSender {
 }
 
 class MockFeatureFlagger: FeatureFlagger {
+    var internalUserDecider: InternalUserDecider = DefaultInternalUserDecider(store: MockInternalUserStoring())
+    var localOverrides: FeatureFlagLocalOverriding?
+
     var isFeatureOn = true
-    func isFeatureOn<F>(forProvider: F) -> Bool where F: BrowserServicesKit.FeatureFlagSourceProviding {
+    func isFeatureOn<Flag: FeatureFlagProtocol>(for featureFlag: Flag, allowOverride: Bool) -> Bool {
         return isFeatureOn
     }
 }
