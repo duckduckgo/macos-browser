@@ -83,7 +83,10 @@ extension WKWebViewConfiguration {
     func applyNTPConfiguration() {
         preferences.isFraudulentWebsiteWarningEnabled = false
         if urlSchemeHandler(forURLScheme: URL.NavigationalScheme.duck.rawValue) == nil {
-            setURLSchemeHandler(DuckURLSchemeHandler(), forURLScheme: URL.NavigationalScheme.duck.rawValue)
+            setURLSchemeHandler(
+                DuckURLSchemeHandler(featureFlagger: NSApp.delegateTyped.featureFlagger),
+                forURLScheme: URL.NavigationalScheme.duck.rawValue
+            )
         }
         self.userContentController = NewTabPageUserContentController()
      }

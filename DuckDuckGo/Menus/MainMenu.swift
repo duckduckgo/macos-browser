@@ -20,6 +20,7 @@ import BrowserServicesKit
 import Cocoa
 import Common
 import Combine
+import FeatureFlags
 import OSLog
 import SwiftUI
 import WebKit
@@ -91,7 +92,6 @@ final class MainMenu: NSMenu {
     let windowsMenu = NSMenu(title: UserText.mainMenuWindow)
 
     // MARK: Debug
-    private var experimentalFeaturesMenu: NSMenu?
 
     private var loggingMenu: NSMenu?
     let customConfigurationUrlMenuItem = NSMenuItem(title: "Last Update Time", action: nil)
@@ -447,11 +447,6 @@ final class MainMenu: NSMenu {
         updateInternalUserItem()
         updateRemoteConfigurationInfo()
         updateAutofillDebugScriptMenuItem()
-        updateExperimentalFeatures()
-    }
-
-    private func updateExperimentalFeatures() {
-        experimentalFeaturesMenu?.items[0].state = NSApp.delegateTyped.experimentalFeatures.isHTMLNewTabPageEnabled ? .on : .off
     }
 
     // MARK: - Bookmarks
@@ -623,13 +618,9 @@ final class MainMenu: NSMenu {
 
     @MainActor
     private func setupDebugMenu() -> NSMenu {
-        let experimentalFeaturesMenu = NSMenu() {
-            NSMenuItem(title: "HTML New Tab Page", action: #selector(AppDelegate.toggleHTMLNTP(_:)), representedObject: 10)
-        }
-        self.experimentalFeaturesMenu = experimentalFeaturesMenu
         let debugMenu = NSMenu(title: "Debug") {
-            NSMenuItem(title: "Experimental features")
-                .submenu(experimentalFeaturesMenu)
+            NSMenuItem(title: "Feature Flag Overrides")
+                .submenu(FeatureFlagOverridesMenu(featureFlagOverrides: NSApp.delegateTyped.featureFlagger))
             NSMenuItem.separator()
             NSMenuItem(title: "Open Vanilla Browser", action: #selector(MainViewController.openVanillaBrowser)).withAccessibilityIdentifier("MainMenu.openVanillaBrowser")
             NSMenuItem.separator()
@@ -661,7 +652,6 @@ final class MainMenu: NSMenu {
                 NSMenuItem(title: "Reset Email Protection InContext Signup Prompt", action: #selector(MainViewController.resetEmailProtectionInContextPrompt))
                 NSMenuItem(title: "Reset Pixels Storage", action: #selector(MainViewController.resetDailyPixels))
                 NSMenuItem(title: "Reset Remote Messages", action: #selector(AppDelegate.resetRemoteMessages))
-                NSMenuItem(title: "Reset CPM Experiment Cohort", action: #selector(AppDelegate.resetCpmCohort))
                 NSMenuItem(title: "Reset Duck Player Preferences", action: #selector(MainViewController.resetDuckPlayerPreferences))
                 NSMenuItem(title: "Reset Onboarding", action: #selector(MainViewController.resetOnboarding(_:)))
                 NSMenuItem(title: "Reset Home Page Settings Onboarding", action: #selector(MainViewController.resetHomePageSettingsOnboarding(_:)))

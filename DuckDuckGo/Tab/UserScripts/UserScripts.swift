@@ -50,11 +50,14 @@ final class UserScripts: UserScriptsProvider {
 #if SPARKLE
     let releaseNotesUserScript: ReleaseNotesUserScript?
 #endif
+    let aiChatUserScript: AIChatUserScript?
 
     init(with sourceProvider: ScriptSourceProviding) {
         clickToLoadScript = ClickToLoadUserScript()
         contentBlockerRulesScript = ContentBlockerRulesUserScript(configuration: sourceProvider.contentBlockerRulesConfig!)
         surrogatesScript = SurrogatesUserScript(configuration: sourceProvider.surrogatesConfig!)
+        aiChatUserScript = AIChatUserScript(handler: AIChatUserScriptHandler(storage: DefaultAIChatPreferencesStorage()),
+                                            urlSettings: AIChatDebugURLSettings())
 
         let isGPCEnabled = WebTrackingProtectionPreferences.shared.isGPCEnabled
         let privacyConfig = sourceProvider.privacyConfigurationManager.privacyConfig
@@ -93,11 +96,16 @@ final class UserScripts: UserScriptsProvider {
 
         contentScopeUserScriptIsolated.registerSubfeature(delegate: clickToLoadScript)
 
+        if let aiChatUserScript {
+            contentScopeUserScriptIsolated.registerSubfeature(delegate: aiChatUserScript)
+        }
+
         if let youtubeOverlayScript {
             contentScopeUserScriptIsolated.registerSubfeature(delegate: youtubeOverlayScript)
         }
 
         if let specialPages = specialPages {
+
             if let specialErrorPageUserScript {
                 specialPages.registerSubfeature(delegate: specialErrorPageUserScript)
             }

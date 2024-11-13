@@ -211,30 +211,6 @@ final class NetworkProtectionPixelEventTests: XCTestCase {
              and: .expect(pixelName: "m_mac_netp_backend_api_error_parsing_device_registration_response_failed"),
              file: #filePath,
              line: #line)
-        fire(NetworkProtectionPixelEvent.networkProtectionClientFailedToEncodeRedeemRequest,
-             frequency: .legacyDailyAndCount,
-             and: .expect(pixelName: "m_mac_netp_backend_api_error_encoding_redeem_request_body_failed"),
-             file: #filePath,
-             line: #line)
-        fire(NetworkProtectionPixelEvent.networkProtectionClientInvalidInviteCode,
-             frequency: .legacyDailyAndCount,
-             and: .expect(pixelName: "m_mac_netp_backend_api_error_invalid_invite_code"),
-             file: #filePath,
-             line: #line)
-        fire(NetworkProtectionPixelEvent.networkProtectionClientFailedToRedeemInviteCode(TestError.testError),
-             frequency: .legacyDailyAndCount,
-             and: .expect(pixelName: "m_mac_netp_backend_api_error_failed_to_redeem_invite_code",
-                          error: TestError.testError,
-                          underlyingErrors: [TestError.underlyingError]),
-             file: #filePath,
-             line: #line)
-        fire(NetworkProtectionPixelEvent.networkProtectionClientFailedToParseRedeemResponse(TestError.testError),
-             frequency: .legacyDailyAndCount,
-             and: .expect(pixelName: "m_mac_netp_backend_api_error_parsing_redeem_response_failed",
-                          error: TestError.testError,
-                          underlyingErrors: [TestError.underlyingError]),
-             file: #filePath,
-             line: #line)
         fire(NetworkProtectionPixelEvent.networkProtectionClientFailedToFetchLocations(TestError.testError),
              frequency: .legacyDailyAndCount,
              and: .expect(pixelName: "m_mac_netp_backend_api_error_failed_to_fetch_location_list",

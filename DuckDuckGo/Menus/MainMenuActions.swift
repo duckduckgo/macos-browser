@@ -352,10 +352,6 @@ extension AppDelegate {
     @objc func resetNewTabPageCustomization(_ sender: Any?) {
         homePageSettingsModel.resetAllCustomizations()
     }
-
-    @objc func resetCpmCohort(_ sender: Any?) {
-        UserDefaultsWrapper.clear(.autoconsentFilterlistExperimentCohort)
-    }
 }
 
 extension MainViewController {
@@ -1137,7 +1133,7 @@ extension MainViewController: NSMenuItemValidation {
         case #selector(MainViewController.openJavaScriptConsole(_:)),
              #selector(MainViewController.showPageSource(_:)),
              #selector(MainViewController.showPageResources(_:)):
-            return activeTabViewModel?.canReload == true || (activeTabViewModel?.tab.url?.isNewTabPage == true && NSApp.delegateTyped.experimentalFeatures.isHTMLNewTabPageEnabled)
+            return activeTabViewModel?.canReload == true || (activeTabViewModel?.tab.url?.isNewTabPage == true && NSApp.delegateTyped.featureFlagger.isFeatureOn(.htmlNewTabPage))
 
         case #selector(MainViewController.toggleDownloads(_:)):
             let isDownloadsPopoverShown = self.navigationBarViewController.isDownloadsPopoverShown

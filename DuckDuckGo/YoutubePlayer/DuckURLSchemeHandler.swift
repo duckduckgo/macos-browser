@@ -16,12 +16,20 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
+import FeatureFlags
 import Foundation
 import WebKit
 import ContentScopeScripts
 import PhishingDetection
 
 final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
+
+    let featureFlagger: FeatureFlagger
+
+    init(featureFlagger: FeatureFlagger) {
+        self.featureFlagger = featureFlagger
+    }
 
     func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
         guard let requestURL = webView.url ?? urlSchemeTask.request.url else {
@@ -30,12 +38,18 @@ final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
         }
 
         switch requestURL.type {
-        case .onboarding, .releaseNotes, .newTab:
+        case .onboarding, .releaseNotes:
             handleSpecialPages(urlSchemeTask: urlSchemeTask)
         case .duckPlayer:
             handleDuckPlayer(requestURL: requestURL, urlSchemeTask: urlSchemeTask, webView: webView)
         case .phishingErrorPage:
             handleErrorPage(urlSchemeTask: urlSchemeTask)
+        case .newTab:
+            if featureFlagger.isFeatureOn(.htmlNewTabPage) {
+                handleSpecialPages(urlSchemeTask: urlSchemeTask)
+            } else {
+                handleNativeUIPages(requestURL: requestURL, urlSchemeTask: urlSchemeTask)
+            }
         default:
             handleNativeUIPages(requestURL: requestURL, urlSchemeTask: urlSchemeTask)
         }

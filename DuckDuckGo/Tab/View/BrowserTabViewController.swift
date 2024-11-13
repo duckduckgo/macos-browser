@@ -789,7 +789,7 @@ final class BrowserTabViewController: NSViewController {
             updateTabIfNeeded(tabViewModel: tabViewModel)
 
         case .newtab:
-            if NSApp.delegateTyped.experimentalFeatures.isHTMLNewTabPageEnabled {
+            if NSApp.delegateTyped.featureFlagger.isFeatureOn(.htmlNewTabPage) {
                 updateTabIfNeeded(tabViewModel: tabViewModel)
             } else {
                 removeAllTabContent()
@@ -859,7 +859,7 @@ final class BrowserTabViewController: NSViewController {
         case .onboarding:
             return
         case .newtab:
-            containsHostingView = !NSApp.delegateTyped.experimentalFeatures.isHTMLNewTabPageEnabled
+            containsHostingView = !NSApp.delegateTyped.featureFlagger.isFeatureOn(.htmlNewTabPage)
         case .settings:
             containsHostingView = true
         default:

@@ -28,6 +28,8 @@ import NetworkProtectionUI
 import Subscription
 import SubscriptionUI
 import Freemium
+import BrokenSitePrompt
+import PageRefreshMonitor
 
 final class NavigationBarViewController: NSViewController {
 
@@ -111,6 +113,7 @@ final class NavigationBarViewController: NSViewController {
     private var downloadsCancellables = Set<AnyCancellable>()
     private var cancellables = Set<AnyCancellable>()
     private let aiChatMenuConfig: AIChatMenuVisibilityConfigurable
+    private let brokenSitePromptLimiter: BrokenSitePromptLimiter
 
     @UserDefaultsWrapper(key: .homeButtonPosition, defaultValue: .right)
     static private var homeButtonPosition: HomeButtonPosition
@@ -120,21 +123,23 @@ final class NavigationBarViewController: NSViewController {
     private let networkProtectionButtonModel: NetworkProtectionNavBarButtonModel
     private let networkProtectionFeatureActivation: NetworkProtectionFeatureActivation
 
-    static func create(tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool,
+    static func create(tabCollectionViewModel: TabCollectionViewModel,
+                       isBurner: Bool,
                        networkProtectionFeatureActivation: NetworkProtectionFeatureActivation = NetworkProtectionKeychainTokenStore(),
                        downloadListCoordinator: DownloadListCoordinator = .shared,
                        dragDropManager: BookmarkDragDropManager = .shared,
                        networkProtectionPopoverManager: NetPPopoverManager,
                        networkProtectionStatusReporter: NetworkProtectionStatusReporter,
                        autofillPopoverPresenter: AutofillPopoverPresenter,
-                       aiChatMenuConfig: AIChatMenuVisibilityConfigurable) -> NavigationBarViewController {
+                       aiChatMenuConfig: AIChatMenuVisibilityConfigurable,
+                       brokenSitePromptLimiter: BrokenSitePromptLimiter) -> NavigationBarViewController {
         NSStoryboard(name: "NavigationBar", bundle: nil).instantiateInitialController { coder in
-            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner, networkProtectionFeatureActivation: networkProtectionFeatureActivation, downloadListCoordinator: downloadListCoordinator, dragDropManager: dragDropManager, networkProtectionPopoverManager: networkProtectionPopoverManager, networkProtectionStatusReporter: networkProtectionStatusReporter, autofillPopoverPresenter: autofillPopoverPresenter, aiChatMenuConfig: aiChatMenuConfig)
+            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner, networkProtectionFeatureActivation: networkProtectionFeatureActivation, downloadListCoordinator: downloadListCoordinator, dragDropManager: dragDropManager, networkProtectionPopoverManager: networkProtectionPopoverManager, networkProtectionStatusReporter: networkProtectionStatusReporter, autofillPopoverPresenter: autofillPopoverPresenter, aiChatMenuConfig: aiChatMenuConfig, brokenSitePromptLimiter: brokenSitePromptLimiter)
         }!
     }
 
     init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, networkProtectionFeatureActivation: NetworkProtectionFeatureActivation, downloadListCoordinator: DownloadListCoordinator, dragDropManager: BookmarkDragDropManager, networkProtectionPopoverManager: NetPPopoverManager, networkProtectionStatusReporter: NetworkProtectionStatusReporter, autofillPopoverPresenter: AutofillPopoverPresenter,
-          aiChatMenuConfig: AIChatMenuVisibilityConfigurable) {
+          aiChatMenuConfig: AIChatMenuVisibilityConfigurable, brokenSitePromptLimiter: BrokenSitePromptLimiter) {
 
         self.popovers = NavigationBarPopovers(networkProtectionPopoverManager: networkProtectionPopoverManager, autofillPopoverPresenter: autofillPopoverPresenter, isBurner: isBurner)
         self.tabCollectionViewModel = tabCollectionViewModel
@@ -144,6 +149,7 @@ final class NavigationBarViewController: NSViewController {
         self.downloadListCoordinator = downloadListCoordinator
         self.dragDropManager = dragDropManager
         self.aiChatMenuConfig = aiChatMenuConfig
+        self.brokenSitePromptLimiter = brokenSitePromptLimiter
         goBackButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .back, tabCollectionViewModel: tabCollectionViewModel)
         goForwardButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .forward, tabCollectionViewModel: tabCollectionViewModel)
         super.init(coder: coder)
@@ -423,6 +429,11 @@ final class NavigationBarViewController: NSViewController {
                                                name: AutoconsentUserScript.newSitePopupHiddenNotification,
                                                object: nil)
 
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(attemptToShowBrokenSitePrompt(_:)),
+                                               name: .pageRefreshMonitorDidDetectRefreshPattern,
+                                               object: nil)
+
         UserDefaults.netP
             .publisher(for: \.networkProtectionShouldShowVPNUninstalledMessage)
             .receive(on: DispatchQueue.main)
@@ -536,6 +547,39 @@ final class NavigationBarViewController: NSViewController {
             let animationType: NavigationBarBadgeAnimationView.AnimationType = isCosmetic ? .cookiePopupHidden : .cookiePopupManaged
             self.addressBarViewController?.addressBarButtonsViewController?.showBadgeNotification(animationType)
         }
+    }
+
+    @objc private func attemptToShowBrokenSitePrompt(_ sender: Notification) {
+        guard brokenSitePromptLimiter.shouldShowToast(),
+              let url = tabCollectionViewModel.selectedTabViewModel?.tab.url, !url.isDuckDuckGo,
+              isOnboardingFinished
+        else { return }
+        showBrokenSitePrompt()
+    }
+
+    private var isOnboardingFinished: Bool {
+        OnboardingActionsManager.isOnboardingFinished && Application.appDelegate.onboardingStateMachine.state == .onboardingCompleted
+    }
+
+    private func showBrokenSitePrompt() {
+        guard view.window?.isKeyWindow == true,
+              let privacyButton = addressBarViewController?.addressBarButtonsViewController?.privacyEntryPointButton else { return }
+        brokenSitePromptLimiter.didShowToast()
+        PixelKit.fire(GeneralPixel.siteNotWorkingShown)
+        let popoverMessage = PopoverMessageViewController(message: UserText.BrokenSitePrompt.title,
+                                                          buttonText: UserText.BrokenSitePrompt.buttonTitle,
+                                                          buttonAction: {
+            self.brokenSitePromptLimiter.didOpenReport()
+            self.addressBarViewController?.addressBarButtonsViewController?.openPrivacyDashboardPopover(entryPoint: .prompt)
+            PixelKit.fire(GeneralPixel.siteNotWorkingWebsiteIsBroken)
+        },
+                                                          shouldShowCloseButton: true,
+                                                          autoDismissDuration: nil,
+                                                          onDismiss: {
+            self.brokenSitePromptLimiter.didDismissToast()
+        }
+        )
+        popoverMessage.show(onParent: self, relativeTo: privacyButton, behavior: .semitransient)
     }
 
     func toggleDownloadsPopover(keepButtonVisible: Bool) {

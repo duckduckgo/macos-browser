@@ -398,6 +398,9 @@ final class TabCollectionViewModel: NSObject {
     }
 
     func insertOrAppendNewTab(_ content: Tab.TabContent = .newtab, selected: Bool = true) {
+        if selectDisplayableTabIfPresent(content) {
+            return
+        }
         insertOrAppend(tab: Tab(content: content, shouldLoadInBackground: true, burnerMode: burnerMode), selected: selected)
     }
 
