@@ -21,7 +21,7 @@ import BrowserServicesKit
 import FeatureFlags
 
 struct FeatureFlagOverridesDefaultHandler: FeatureFlagLocalOverridesHandler {
-    func flagDidChange<Flag: FeatureFlagProtocol>(_ featureFlag: Flag, isEnabled: Bool) {
+    func flagDidChange<Flag: FeatureFlagDescribing>(_ featureFlag: Flag, isEnabled: Bool) {
         guard let flag = featureFlag as? FeatureFlag else { return }
         switch flag {
         case .htmlNewTabPage:

@@ -197,7 +197,7 @@ private class DummyFeatureFlagger: FeatureFlagger {
     var internalUserDecider: InternalUserDecider = DefaultInternalUserDecider(store: MockInternalUserStoring())
     var localOverrides: FeatureFlagLocalOverriding?
 
-    func isFeatureOn<Flag: FeatureFlagProtocol>(for: Flag, allowOverride: Bool) -> Bool {
+    func isFeatureOn<Flag: FeatureFlagDescribing>(for: Flag, allowOverride: Bool) -> Bool {
         false
     }
 }

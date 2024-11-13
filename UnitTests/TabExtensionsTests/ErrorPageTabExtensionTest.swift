@@ -484,7 +484,7 @@ class MockFeatureFlagger: FeatureFlagger {
     var localOverrides: FeatureFlagLocalOverriding?
 
     var isFeatureOn = true
-    func isFeatureOn<Flag: FeatureFlagProtocol>(for featureFlag: Flag, allowOverride: Bool) -> Bool {
+    func isFeatureOn<Flag: FeatureFlagDescribing>(for featureFlag: Flag, allowOverride: Bool) -> Bool {
         return isFeatureOn
     }
 }

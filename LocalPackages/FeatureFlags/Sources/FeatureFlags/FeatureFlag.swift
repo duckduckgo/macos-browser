@@ -48,7 +48,7 @@ public enum FeatureFlag: String, CaseIterable {
     case htmlNewTabPage
 }
 
-extension FeatureFlag: FeatureFlagProtocol {
+extension FeatureFlag: FeatureFlagDescribing {
     public var supportsLocalOverriding: Bool {
         switch self {
         case .htmlNewTabPage:
