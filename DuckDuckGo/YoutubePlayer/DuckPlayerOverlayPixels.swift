@@ -20,7 +20,7 @@ import PixelKit
 protocol DuckPlayerOverlayPixelFiring {
 
     var pixelFiring: PixelFiring? { get set }
-    var navigationHistory: [URL] { get set }
+    var navigationHistory: [URL] { get set }    
 
     func handleNavigationAndFirePixels(url: URL?, duckPlayerMode: DuckPlayerMode)
 }
@@ -38,12 +38,6 @@ final class DuckPlayerOverlayUsagePixels: DuckPlayerOverlayPixelFiring {
          timeoutInterval: TimeInterval = 30.0) {
         self.pixelFiring = pixelFiring
         self.idleTimeInterval = timeoutInterval
-    }
-
-    // Method to reset the idle timer
-    private func resetIdleTimer() {
-        idleTimer?.invalidate()
-        idleTimer = nil
     }
 
     func handleNavigationAndFirePixels(url: URL?, duckPlayerMode: DuckPlayerMode) {
@@ -85,16 +79,22 @@ final class DuckPlayerOverlayUsagePixels: DuckPlayerOverlayPixelFiring {
             } else if previousURL.isYoutubeWatch && !currentURL.isYoutube && !currentURL.isDuckPlayer {
                 // Navigation outside YouTube
                 pixelFiring?.fire(GeneralPixel.duckPlayerYouTubeOverlayNavigationOutsideYoutube)
+                navigationHistory.removeAll()
             }
         }
 
         // Truncation logic: Remove all URLs up to the last occurrence of the current URL in normalized form
-        if let lastOccurrenceIndex = (0..<navigationHistory.count - 1).last(where: { navigationHistory[$0].forComparison() == comparisonURL }) {
-            navigationHistory = Array(navigationHistory.prefix(upTo: lastOccurrenceIndex + 1))
+        if navigationHistory.count > 0 {
+            if let lastOccurrenceIndex = (0..<navigationHistory.count - 1).last(where: { navigationHistory[$0].forComparison() == comparisonURL }) {
+                navigationHistory = Array(navigationHistory.prefix(upTo: lastOccurrenceIndex + 1))
+            }
         }
-
-        // Cancel and reset the idle timer whenever a new navigation occurs
-        resetIdleTimer()
+        
     }
+    
+    private func firePixel(_ pixel: PixelKitEventV2) {
+        pixelFiring?.fire(pixel)
+    }
+    
 
 }

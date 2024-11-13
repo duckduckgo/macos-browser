@@ -215,6 +215,11 @@ extension DuckPlayerTabExtension: NavigationResponder {
                 duckPlayerOverlayUsagePixels.handleNavigationAndFirePixels(url: url, duckPlayerMode: duckPlayer.mode)
             }
         }
+        
+        // Fire DuckPlayer temporary pixels on navigating outside Youtube
+        if let url = navigationAction.request.url, !url.isYoutube {
+            duckPlayerOverlayUsagePixels.handleNavigationAndFirePixels(url: url, duckPlayerMode: duckPlayer.mode)
+        }
 
         // when in Private Player, don't directly reload current URL when it‘s a Private Player target URL
         if case .reload = navigationAction.navigationType,
@@ -396,6 +401,8 @@ extension DuckPlayerTabExtension: NavigationResponder {
     @MainActor
     func navigationDidFinish(_ navigation: Navigation) {
         setUpYoutubeScriptsIfNeeded(for: navigation.url)
+        
+        
     }
 
 }
