@@ -41,13 +41,14 @@ final class BrowserTabViewController: NSViewController {
     private lazy var hoverLabel = NSTextField(string: URL.duckDuckGo.absoluteString)
     private lazy var hoverLabelContainer = ColorView(frame: .zero, backgroundColor: .browserTabBackground, borderWidth: 0)
 
+    private let newTabPageUserScript: NewTabPageUserScript
     private lazy var newTabPageWebView: WebView = {
         let configuration = WKWebViewConfiguration()
         configuration.applyNTPConfiguration()
 
         let webView = WebView(frame: .zero, configuration: configuration)
 
-        NSApp.delegateTyped.newTabPageUserScript.webViews.add(webView)
+        newTabPageUserScript.webViews.add(webView)
         webView.load(URLRequest(url: URL.newtab))
 
         return webView
@@ -94,12 +95,15 @@ final class BrowserTabViewController: NSViewController {
          bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
          onboardingDialogTypeProvider: ContextualOnboardingDialogTypeProviding & ContextualOnboardingStateUpdater = Application.appDelegate.onboardingStateMachine,
          onboardingDialogFactory: ContextualDaxDialogsFactory = DefaultContextualDaxDialogViewFactory(),
-         featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger) {
+         featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger,
+         newTabPageUserScript: NewTabPageUserScript = NSApp.delegateTyped.newTabPageUserScript
+    ) {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.bookmarkManager = bookmarkManager
         self.onboardingDialogTypeProvider = onboardingDialogTypeProvider
         self.onboardingDialogFactory = onboardingDialogFactory
         self.featureFlagger = featureFlagger
+        self.newTabPageUserScript = newTabPageUserScript
         containerStackView = NSStackView()
 
         super.init(nibName: nil, bundle: nil)
@@ -789,7 +793,7 @@ final class BrowserTabViewController: NSViewController {
             updateTabIfNeeded(tabViewModel: tabViewModel)
 
         case .newtab:
-            if NSApp.delegateTyped.featureFlagger.isFeatureOn(.htmlNewTabPage) {
+            if featureFlagger.isFeatureOn(.htmlNewTabPage) {
                 updateTabIfNeeded(tabViewModel: tabViewModel)
             } else {
                 removeAllTabContent()
@@ -859,7 +863,7 @@ final class BrowserTabViewController: NSViewController {
         case .onboarding:
             return
         case .newtab:
-            containsHostingView = !NSApp.delegateTyped.featureFlagger.isFeatureOn(.htmlNewTabPage)
+            containsHostingView = !featureFlagger.isFeatureOn(.htmlNewTabPage)
         case .settings:
             containsHostingView = true
         default:
