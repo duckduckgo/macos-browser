@@ -134,7 +134,7 @@ class FireWindowTests: XCTestCase {
             let coordinate = autoFillPopup.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
             coordinate.tap()
 
-            /// On macOS there are some issues when accessing web view elements so we do not check the value of the email text field.
+            /// On macOS 13 there are some issues when accessing web view elements so we do not check the value of the email text field.
             /// If we can access the `test@duck.com privacy-test-pages.site` button means that auto fill is working correctly in the fire window.
             /// Checking that the email is being filled correctly is more an autofill test that fire window, so we are okay to skip it.
             ///
