@@ -224,10 +224,15 @@ extension HomePage.Views {
             }
         }
 
+        @ViewBuilder
         func freemiumPromotionView() -> some View {
-            PromotionView(viewModel: freemiumDBPPromotionViewCoordinator.viewModel)
-                .padding(.bottom, 16)
-                .visibility(freemiumDBPPromotionViewCoordinator.isHomePagePromotionVisible ? .visible : .gone)
+            if let viewModel = freemiumDBPPromotionViewCoordinator.viewModel {
+                PromotionView(viewModel: viewModel)
+                    .padding(.bottom, 16)
+                    .visibility(freemiumDBPPromotionViewCoordinator.isHomePagePromotionVisible ? .visible : .gone)
+            } else {
+                EmptyView()
+            }
         }
 
         @ViewBuilder
