@@ -201,7 +201,7 @@ final class WebCacheManagerTests: XCTestCase {
             removeDataCalledCount += 1
 
             self.records = self.records.filter { record in
-                !recordsToRemove.contains(where: { $0 == record })
+                !recordsToRemove.contains(where: { $0 == record && $0.dataTypes.isSubset(of: dataTypes)})
             }
         }
 
