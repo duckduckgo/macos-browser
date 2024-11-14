@@ -31,9 +31,10 @@ final class FreemiumDBPPromotionViewCoordinator: ObservableObject {
     /// Published property that determines whether the promotion is visible on the home page.
     @Published var isHomePagePromotionVisible: Bool = false
 
-    /// The view model representing the promotion, which updates based on the user's state.
-    var viewModel: PromotionViewModel {
-        createViewModel()
+    /// The view model representing the promotion, which updates based on the user's state. Returns `nil` if the feature is not enabled
+    var viewModel: PromotionViewModel? {
+        guard freemiumDBPFeature.isAvailable else { return nil }
+        return createViewModel()
     }
 
     /// Stores whether the user has dismissed the home page promotion.

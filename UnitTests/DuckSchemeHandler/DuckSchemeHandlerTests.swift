@@ -25,10 +25,20 @@ import PhishingDetection
 
 final class DuckSchemeHandlerTests: XCTestCase {
 
+    var featureFlagger: MockFeatureFlagger!
+    var handler: DuckURLSchemeHandler!
+
+    override func setUp() {
+        super.setUp()
+        featureFlagger = MockFeatureFlagger()
+        featureFlagger.isFeatureOn = false
+
+        handler = DuckURLSchemeHandler(featureFlagger: featureFlagger)
+    }
+
     func testWebViewFromOnboardingHandlerReturnsResponseAndData() throws {
         // Given
         let onboardingURL = URL(string: "duck://onboarding")!
-        let handler = DuckURLSchemeHandler()
         let webView = WKWebView()
         let schemeTask = MockSchemeTask(request: URLRequest(url: onboardingURL))
 
@@ -47,7 +57,6 @@ final class DuckSchemeHandlerTests: XCTestCase {
     func testWebViewFromReleaseNoteHandlerReturnsResponseAndData() throws {
         // Given
         let releaseNotesURL = URL(string: "duck://release-notes")!
-        let handler = DuckURLSchemeHandler()
         let webView = WKWebView()
         let schemeTask = MockSchemeTask(request: URLRequest(url: releaseNotesURL))
 
@@ -67,7 +76,6 @@ final class DuckSchemeHandlerTests: XCTestCase {
     func testWebViewFromDuckPlayerHandlerReturnsResponseAndData() throws {
         // Given
         let duckPlayerURL = URL(string: "duck://player")!
-        let handler = DuckURLSchemeHandler()
         let webView = WKWebView()
         let schemeTask = MockSchemeTask(request: URLRequest(url: duckPlayerURL))
 
@@ -84,7 +92,6 @@ final class DuckSchemeHandlerTests: XCTestCase {
     func testWebViewFromNativeUIHandlerReturnsResponseAndData() throws {
         // Given
         let nativeURL = URL(string: "duck://newtab")!
-        let handler = DuckURLSchemeHandler()
         let webView = WKWebView()
         let schemeTask = MockSchemeTask(request: URLRequest(url: nativeURL))
 
@@ -123,7 +130,6 @@ final class DuckSchemeHandlerTests: XCTestCase {
         let token = URLTokenValidator.shared.generateToken(for: phishingUrl)
         let errorURLString = "duck://error?reason=phishing&url=\(encodedURL)&token=\(token)"
         let errorURL = URL(string: errorURLString)!
-        let handler = DuckURLSchemeHandler()
         let webView = WKWebView()
         let schemeTask = MockSchemeTask(request: URLRequest(url: errorURL))
 
@@ -148,7 +154,6 @@ final class DuckSchemeHandlerTests: XCTestCase {
         let token = "ababababababababababab"
         let errorURLString = "duck://error?reason=phishing&url=\(encodedURL)&token=\(token)"
         let errorURL = URL(string: errorURLString)!
-        let handler = DuckURLSchemeHandler()
         let webView = WKWebView()
         let schemeTask = MockSchemeTask(request: URLRequest(url: errorURL))
 

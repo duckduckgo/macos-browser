@@ -48,6 +48,7 @@ final class BookmarkOutlineViewDataSource: NSObject, BookmarksOutlineViewDataSou
     private var outlineView: BookmarksOutlineView?
 
     private let contentMode: ContentMode
+    private var sortMode: BookmarksSortMode
     private(set) var expandedNodesIDs = Set<String>()
     @Published private(set) var isSearching = false
 
@@ -95,6 +96,7 @@ final class BookmarkOutlineViewDataSource: NSObject, BookmarksOutlineViewDataSou
         self.dragDropManager = dragDropManager
         self.treeController = treeController
         self.presentFaviconsFetcherOnboarding = presentFaviconsFetcherOnboarding
+        self.sortMode = sortMode
 
         super.init()
     }
@@ -102,11 +104,13 @@ final class BookmarkOutlineViewDataSource: NSObject, BookmarksOutlineViewDataSou
     func reloadData(with sortMode: BookmarksSortMode, withRootFolder rootFolder: BookmarkFolder? = nil) {
         isSearching = false
         dragDestinationFolder = nil
+        self.sortMode = sortMode
         treeController.rebuild(for: sortMode, withRootFolder: rootFolder)
     }
 
     func reloadData(forSearchQuery searchQuery: String, sortMode: BookmarksSortMode) {
         isSearching = true
+        self.sortMode = sortMode
         treeController.rebuild(forSearchQuery: searchQuery, sortMode: sortMode)
     }
 
@@ -260,6 +264,8 @@ final class BookmarkOutlineViewDataSource: NSObject, BookmarksOutlineViewDataSou
     }
 
     func outlineView(_ outlineView: NSOutlineView, validateDrop info: NSDraggingInfo, proposedItem item: Any?, proposedChildIndex index: Int) -> NSDragOperation {
+        if !sortMode.isReorderingEnabled { return .none }
+
         let destinationNode = nodeForItem(item)
 
         if contentMode == .foldersOnly, destinationNode.isRoot {

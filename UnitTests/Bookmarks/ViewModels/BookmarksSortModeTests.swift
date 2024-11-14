@@ -100,4 +100,10 @@ class BookmarksSortModeTests: XCTestCase {
         XCTAssertEqual(descendingMenu.items[4].title, UserText.bookmarksSortByNameDescending)
         XCTAssertEqual(descendingMenu.items[4].state, .on)
     }
+
+    func testReorderingValueIsCorrect() {
+        XCTAssertTrue(BookmarksSortMode.manual.isReorderingEnabled)
+        XCTAssertFalse(BookmarksSortMode.nameAscending.isReorderingEnabled)
+        XCTAssertFalse(BookmarksSortMode.nameDescending.isReorderingEnabled)
+    }
 }

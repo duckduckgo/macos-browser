@@ -13,6 +13,7 @@ jobs:
       release-type: review
       create-dmg: false
       branch: ${{ github.sha }}
+      skip-notify: true
     secrets:
       APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
       APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
@@ -163,6 +164,7 @@ jobs:
       with:
         check_name: "Test Report ${{ matrix.runner }}"
         report_paths: ui-tests.xml
+        check_retries: true
 
     - name: Upload logs when workflow failed
       uses: actions/upload-artifact@v4
