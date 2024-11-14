@@ -20,28 +20,6 @@ import AppKit
 import BrowserServicesKit
 import FeatureFlags
 
-struct FeatureFlagOverridesDefaultHandler: FeatureFlagLocalOverridesHandler {
-    func flagDidChange<Flag: FeatureFlagDescribing>(_ featureFlag: Flag, isEnabled: Bool) {
-        guard let flag = featureFlag as? FeatureFlag else { return }
-        switch flag {
-        case .htmlNewTabPage:
-            isHTMLNewTabPageEnabledDidChange(isEnabled)
-        default:
-            break
-        }
-    }
-
-    private func isHTMLNewTabPageEnabledDidChange(_ isEnabled: Bool) {
-        Task { @MainActor in
-            WindowControllersManager.shared.mainWindowControllers.forEach { mainWindowController in
-                if mainWindowController.mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab {
-                    mainWindowController.mainViewController.browserTabViewController.refreshTab()
-                }
-            }
-        }
-    }
-}
-
 final class FeatureFlagOverridesMenu: NSMenu {
 
     let featureFlagger: FeatureFlagger

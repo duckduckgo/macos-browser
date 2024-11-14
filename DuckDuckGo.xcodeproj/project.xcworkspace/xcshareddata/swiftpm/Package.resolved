@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "dominik/feature-flag-overrides",
-        "revision" : "5be16267af6b40dca2f8aa2ff4559957f4368c77"
+        "revision" : "cfb178099738bc6cd0c3a3d73df717420ef4a59f",
+        "version" : "210.0.0"
       }
     },
     {

@@ -28,10 +28,13 @@ import PixelKit
  */
 enum NewTabSearchBoxExperimentPixel: PixelKitEventV2 {
 
+    case cohortAssigned(cohort: NewTabPageSearchBoxExperiment.Cohort, onboardingCohort: PixelExperiment?)
     case initialSearch(day: Int, count: Int, from: NewTabPageSearchBoxExperiment.SearchSource, cohort: NewTabPageSearchBoxExperiment.Cohort, onboardingCohort: PixelExperiment?)
 
     var name: String {
         switch self {
+        case .cohortAssigned:
+            return "m_mac_initial-search-day-1"
         case .initialSearch(let day, _, _, _, _):
             return "m_mac_initial-search-day-\(day)"
         }
@@ -39,6 +42,16 @@ enum NewTabSearchBoxExperimentPixel: PixelKitEventV2 {
 
     var parameters: [String: String]? {
         switch self {
+        case let .cohortAssigned(cohort, onboardingCohort):
+            var parameters = [
+                Parameters.count: "0",
+                Parameters.cohort: cohort.rawValue
+            ]
+            if let onboardingCohort {
+                parameters[Parameters.onboardingCohort] = onboardingCohort.rawValue
+            }
+            return parameters
+
         case let .initialSearch(_, count, from, cohort, onboardingCohort):
             var parameters = [
                 Parameters.count: String(count),

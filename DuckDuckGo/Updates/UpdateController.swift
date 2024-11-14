@@ -71,7 +71,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         didSet {
             if let cachedUpdateResult {
                 latestUpdate = Update(appcastItem: cachedUpdateResult.item, isInstalled: cachedUpdateResult.isInstalled)
-                hasPendingUpdate = latestUpdate?.isInstalled == false && updateProgress.isIdle
+                hasPendingUpdate = latestUpdate?.isInstalled == false && updateProgress.isDone && userDriver?.isResumable == true
                 needsNotificationDot = hasPendingUpdate
             }
             showUpdateNotificationIfNeeded()
