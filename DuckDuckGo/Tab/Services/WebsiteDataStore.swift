@@ -133,12 +133,7 @@ internal class WebCacheManager {
         let removableRecords = allRecords.filter { record in
             // For Local Storage, only remove records that *exactly match* the display name.
             // Subdomains or root domains should be excluded.
-
-            // First, check if the record's display name matches the URL's for DuckDuckGo cookie domain.
-            guard record.displayName != URL.cookieDomain else { return false }
-
-            // Then, check if the display name is in the list of fireproof domains.
-            return !fireproofDomains.fireproofDomains.contains(record.displayName)
+            !URL.duckduckgoDomain.contains(record.displayName) && !fireproofDomains.fireproofDomains.contains(record.displayName)
         }
 
         await websiteDataStore.removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypesExceptCookies, for: removableRecords)
@@ -160,7 +155,7 @@ internal class WebCacheManager {
 
         // Don't clear fireproof domains
         let cookiesToRemove = cookies.filter { cookie in
-            !self.fireproofDomains.isFireproof(cookieDomain: cookie.domain) && ![URL.cookieDomain, SubscriptionCookieManager.cookieDomain].contains(cookie.domain)
+            !self.fireproofDomains.isFireproof(cookieDomain: cookie.domain) && ![URL.duckduckgoDomain, SubscriptionCookieManager.cookieDomain].contains(cookie.domain)
         }
 
         for cookie in cookiesToRemove {
