@@ -92,7 +92,6 @@ final class MainMenu: NSMenu {
     let windowsMenu = NSMenu(title: UserText.mainMenuWindow)
 
     // MARK: Debug
-    private var experimentalFeaturesMenu: NSMenu?
 
     private var loggingMenu: NSMenu?
     let customConfigurationUrlMenuItem = NSMenuItem(title: "Last Update Time", action: nil)
