@@ -268,7 +268,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             privacyConfigManager: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
             localOverrides: FeatureFlagLocalOverrides(
                 keyValueStore: UserDefaults.appConfiguration,
-                actionHandler: FeatureFlagOverridesDefaultHandler()
+                actionHandler: FeatureFlagOverridesPublishingHandler<FeatureFlag>()
             ),
             for: FeatureFlag.self
         )
