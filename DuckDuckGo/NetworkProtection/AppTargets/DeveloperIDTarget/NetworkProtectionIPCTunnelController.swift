@@ -144,6 +144,10 @@ extension NetworkProtectionIPCTunnelController: TunnelController {
         }
     }
 
+    func command(_ command: VPNCommand) async throws {
+        try await ipcClient.command(command)
+    }
+
     /// Queries VPN to know if it's connected.
     ///
     /// - Returns: `true` if the VPN is connected, connecting or reasserting, and `false` otherwise.

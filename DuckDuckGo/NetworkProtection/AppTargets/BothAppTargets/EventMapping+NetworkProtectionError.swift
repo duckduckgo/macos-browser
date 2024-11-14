@@ -27,18 +27,6 @@ extension EventMapping where Event == NetworkProtectionError {
         let frequency: PixelKit.Frequency
 
         switch event {
-        case .failedToEncodeRedeemRequest:
-            domainEvent = .networkProtectionClientFailedToEncodeRedeemRequest
-            frequency = .standard
-        case .invalidInviteCode:
-            domainEvent = .networkProtectionClientInvalidInviteCode
-            frequency = .standard
-        case .failedToRedeemInviteCode(let error):
-            domainEvent = .networkProtectionClientFailedToRedeemInviteCode(error)
-            frequency = .standard
-        case .failedToParseRedeemResponse(let error):
-            domainEvent = .networkProtectionClientFailedToParseRedeemResponse(error)
-            frequency = .standard
         case .invalidAuthToken:
             domainEvent = .networkProtectionClientInvalidAuthToken
             frequency = .standard
@@ -83,7 +71,6 @@ extension EventMapping where Event == NetworkProtectionError {
                 .wireGuardSetNetworkSettings,
                 .startWireGuardBackend,
                 .setWireguardConfig,
-                .failedToRetrieveAuthToken,
                 .failedToFetchServerStatus,
                 .failedToParseServerStatusResponse:
             domainEvent = .networkProtectionUnhandledError(function: #function, line: #line, error: event)

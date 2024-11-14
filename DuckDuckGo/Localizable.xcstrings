@@ -1522,6 +1522,366 @@
         }
       }
     },
+    "ai-chat.onboarding.popover.accept" : {
+      "comment" : "AI Chat onboarding CTA for approval",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shortcut hinzufügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add Shortcut"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir acceso directo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter un raccourci"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi scorciatoia"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sneltoets toevoegen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodaj skrót"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicionar atalho"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить ярлык"
+          }
+        }
+      }
+    },
+    "ai-chat.onboarding.popover.confirmation" : {
+      "comment" : "Confirmation for accepting the AI Chat onboarding popover",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI-Chat-Shortcut hinzugefügt!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "AI Chat shortcut added!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Se ha añadido un acceso directo a AI Chat!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Raccourci AI Chat ajouté !"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scorciatoia per AI Chat aggiunta!"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Snelkoppeling naar AI Chat toegevoegd!"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodano skrót do AI Chat!"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atalho do AI Chat adicionado!"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ярлык AI Chat добавлен!"
+          }
+        }
+      }
+    },
+    "ai-chat.onboarding.popover.message-fallback" : {
+      "comment" : "AI Chat onboarding popover message continuation",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du kannst diese und andere AI Chat-Funktionen unter Einstellungen > AI Chat anpassen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You can adjust this and other AI Chat features in Settings > AI Chat"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puedes ajustar esta y otras funciones de AI Chat en Ajustes > AI Chat"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous pouvez ajuster cela et d'autres fonctionnalités d'AI Chat dans Réglages > AI Chat"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puoi regolare questa e altre funzionalità di AI Chat in Impostazioni > AI Chat"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je kunt deze en andere AI Chat-functies aanpassen in Instellingen > AI Chat"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Możesz dostosować tę i inne funkcje AI Chat, wybierając kolejno Ustawienia > AI Chat"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Podes ajustar esta e outras funcionalidades do AI Chat em Definições > AI Chat"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Эту и другие функции AI Chat можно отрегулировать в разделе «Настройки > AI Chat»."
+          }
+        }
+      }
+    },
+    "ai-chat.onboarding.popover.message-markdown" : {
+      "comment" : "AI Chat onboarding popover message, make sure to keep Settings and AI Chat inside ** **",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du kannst diese und andere AI Chat-Funktionen in **Einstellungen** > **AI Chat** anpassen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You can adjust this and other AI Chat features in **Settings** > **AI Chat**."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puedes ajustar esta y otras funciones de AI Chat en **Ajustes** > **AI Chat**."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous pouvez ajuster cela et d'autres fonctionnalités d'AI Chat dans **Réglages** > **AI Chat**."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puoi regolare questa e altre funzionalità di AI Chat in **Impostazioni** > **AI Chat**."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je kunt deze en andere AI Chat-functies aanpassen in **Instellingen** > **AI Chat**."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Możesz dostosować tę i inne funkcje AI Chat, wybierając kolejno **Ustawienia** > **AI Chat**."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Podes ajustar esta e outras funcionalidades do AI Chat em **Definições** > **AI Chat**."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Эту и другие функции AI Chat можно отрегулировать в разделе **Настройки > AI Chat**."
+          }
+        }
+      }
+    },
+    "ai-chat.onboarding.popover.reject" : {
+      "comment" : "AI Chat onboarding CTA for rejection",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nein, danke"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No Thanks"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No, gracias"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non merci"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No, grazie"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nee, bedankt"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie, dziękuję"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não, obrigado"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет, спасибо"
+          }
+        }
+      }
+    },
+    "ai-chat.onboarding.popover.title" : {
+      "comment" : "AI Chat onboarding popover title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Starte AI Chat direkt von deiner Symbolleiste"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Launch AI Chat directly from your toolbar"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inicia AI Chat directamente desde la barra de herramientas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lancez AI Chat directement depuis votre barre d'outils"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avvia AI Chat direttamente dalla barra degli strumenti"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start AI Chat rechtstreeks vanuit je werkbalk"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uruchom AI Chat bezpośrednio z paska narzędzi"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inicia o AI Chat diretamente a partir da tua barra de ferramentas"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Запуск AI Chat прямо с панели инструментов"
+          }
+        }
+      }
+    },
     "ai-chat.preferences.caption" : {
       "comment" : "Ai Chat preferences explanation",
       "extractionState" : "extracted_with_value",
@@ -1578,6 +1938,126 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Чтобы быстрее запускать функцию AI Chat, добавьте ее ярлык на панель инструментов или в меню браузера."
+          }
+        }
+      }
+    },
+    "ai-chat.preferences.caption.link.fallback" : {
+      "comment" : "Ai Chat preferences explanation",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI Chat ist eine optionale Funktion, die unter duck.ai verfügbar ist und es dir ermöglicht, private Unterhaltungen mit beliebten KI-Chatmodellen von Drittanbietern zu führen. Deine Chats werden nicht zum Trainieren von Chatmodellen verwendet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "AI Chat is an optional feature available at duck.ai that lets you have private conversations with popular 3rd-party AI chat models. Your chats are not used to train chat models."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI Chat es una función opcional disponible en duck.ai que te permite tener conversaciones privadas con populares modelos de chat de IA de terceros. Tus chats no se utilizan para entrenar modelos de chat."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI Chat est une fonctionnalité optionnelle disponible sur duck.ai qui vous permet d'avoir des conversations privées avec des modèles de chat IA tiers populaires. Vos discussions ne servent pas à entraîner des modèles de discussion."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI Chat è una funzionalità opzionale disponibile su duck.ai che consente di intrattenere conversazioni private con i più diffusi modelli di chat AI di terze parti. Le tue chat non vengono usate per addestrare modelli di chat."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI Chat is een optionele functie die beschikbaar is op duck.ai en waarmee je privégesprekken kunt voeren met populaire AI-chatmodellen van derden. Je chats worden niet gebruikt om chatmodellen te trainen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI Chat to opcjonalna funkcja dostępna pod adresem duck.ai, która umożliwia prowadzenie prywatnych rozmów z popularnymi modelami czatu AI innych firm. Twoje czaty nie są używane do trenowania modeli czatu."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O AI Chat é uma funcionalidade opcional disponível no duck.ai que te permite ter conversas privadas com modelos de AI chat populares de terceiros. As tuas conversas não são utilizadas para treinar modelos de chat."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI Chat — это дополнительная функция duck.ai, которая позволяет вести приватные беседы с популярными сторонними чат-моделями на базе ИИ. Содержимое чатов не применяется для обучения чат-ботов."
+          }
+        }
+      }
+    },
+    "ai-chat.preferences.caption.link.markdown" : {
+      "comment" : "Ai Chat preferences explanation with a markdown link. Do not translate what's inside [] and ()",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI Chat ist eine optionale Funktion, die unter [duck.ai](https://duck.ai) verfügbar ist und es dir ermöglicht, private Unterhaltungen mit beliebten KI-Chatmodellen von Drittanbietern zu führen. Deine Chats werden nicht zum Trainieren von Chatmodellen verwendet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "AI Chat is an optional feature available at [duck.ai](https://duck.ai) that lets you have private conversations with popular 3rd-party AI chat models. Your chats are not used to train chat models."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI Chat es una función opcional disponible en [duck.ai](https://duck.ai) que te permite mantener conversaciones privadas con modelos populares de chat de IA de terceros. Tus chats no se utilizan para entrenar modelos de chat."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI Chat est une fonctionnalité optionnelle disponible sur [duck.ai](https://duck.ai) qui vous permet d'avoir des conversations privées avec des modèles de chat IA tiers populaires. Vos discussions ne servent pas à entraîner des modèles de discussion."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI Chat è una funzionalità opzionale disponibile su [duck.ai](https://duck.ai) che consente di intrattenere conversazioni private con i più comuni modelli di chat AI di terze parti. Le tue chat non vengono usate per addestrare modelli di chat."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI Chat is een optionele functie die beschikbaar is op [duck.ai](https://duck.ai) waarmee je privégesprekken kunt voeren met populaire AI-chatmodellen van derden. Je chats worden niet gebruikt om chatmodellen te trainen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI Chat to opcjonalna funkcja dostępna pod adresem [duck.ai] (https://duck.ai), która umożliwia prowadzenie prywatnych rozmów z popularnymi modelami czatu AI innych firm. Twoje czaty nie są używane do trenowania modeli czatu."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O AI Chat é uma funcionalidade opcional disponível no [duck.ai](https://duck.ai) que te permite ter conversas privadas com modelos de AI chat populares de terceiros. As tuas conversas não são utilizadas para treinar modelos de chat."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI Chat — это дополнительная функция [duck.ai](https://duck.ai), которая позволяет вести приватные беседы с популярными сторонними чат-моделями на базе искусственного интеллекта. Содержимое чатов не применяется для обучения чат-ботов."
           }
         }
       }
@@ -5630,6 +6110,246 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "В отсутствие блокировки любой, у кого появится доступ к устройству, сможет использовать или изменить ваши автозаполняемые данные. Из соображений безопасности при заполнении платежных данных в формах всегда требуется аутентификация."
+          }
+        }
+      }
+    },
+    "autofill.onboarding.popover.accept" : {
+      "comment" : "Autofill onboarding CTA for approval",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shortcut hinzufügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add Shortcut"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir acceso directo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter un raccourci"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi scorciatoia"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sneltoets toevoegen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodaj skrót"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicionar atalho"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить ярлык"
+          }
+        }
+      }
+    },
+    "autofill.onboarding.popover.message1" : {
+      "comment" : "Autofill onboarding popover message",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du kannst deine Symbolleisten-Shortcuts jederzeit verwalten, indem du mit der rechten Maustaste auf die Symbolleiste klickst."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You can manage your toolbar shortcuts at any time by right-clicking on the toolbar."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puedes gestionar tus accesos directos de la barra de herramientas en cualquier momento haciendo clic con el botón derecho en la barra de herramientas."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous pouvez gérer les raccourcis de votre barre d'outils à tout moment en cliquant dessus avec le bouton droit de la souris."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puoi gestire le scorciatoie della barra degli strumenti in qualsiasi momento facendo clic con il tasto destro del mouse sulla barra degli strumenti."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je kunt je snelkoppelingen op de werkbalk op elk moment beheren door met de rechtermuisknop op de werkbalk te klikken."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Możesz zarządzać skrótami paska narzędzi w dowolnym momencie, klikając prawym przyciskiem myszy na pasku narzędzi."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Podes gerir os atalhos da barra de ferramentas em qualquer altura ao clicar com o botão direito do rato na barra de ferramentas."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ярлыки на панели инструментов можно настроить в любой момент путем нажатия на панель правой кнопкой мышки."
+          }
+        }
+      }
+    },
+    "autofill.onboarding.popover.reject" : {
+      "comment" : "Autofill onboarding CTA for rejection",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nein, danke"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No Thanks"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No, gracias"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non merci"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No, grazie"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nee, bedankt"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie, dziękuję"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não, obrigado"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет, спасибо"
+          }
+        }
+      }
+    },
+    "autofill.onboarding.popover.title" : {
+      "comment" : "Autofill onboarding popover title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwort-Shortcut hinzufügen?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add passwords shortcut?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Añadir acceso directo a contraseñas?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter un raccourci pour les mots de passe ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungere una scorciatoia per le password?"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wachtwoordsnelkoppeling toevoegen?"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodać skrót do haseł?"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicionar atalho de palavras-passe?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить ярлык для менеджера паролей?"
           }
         }
       }
@@ -9859,7 +10579,7 @@
     },
     "bookmarks.bar.prompt.message" : {
       "comment" : "Message show for bookmarks bar prompt",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -9913,6 +10633,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Показывает панель для быстрого доступа к новым закладкам."
+          }
+        }
+      }
+    },
+    "bookmarks.bar.prompt.message1" : {
+      "comment" : " message show for bookmarks bar prompt\n message with markdown show for bookmarks bar prompt, make sure to keep the ** ** for the translated words Settings and Appearance",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeige die Lesezeichenleiste an, um schnell auf deine bevorzugten Lesezeichen zuzugreifen. Du kannst das später unter **Einstellungen** > **Erscheinungsbild** anpassen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show the Bookmarks Bar for quick access to your favorite bookmarks. You can adjust this later in **Settings** > **Appearance**."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muestra la barra de marcadores para acceder rápidamente a tus marcadores favoritos. Puedes ajustar esto más tarde en **Configuración** > **Apariencia**."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Affichez la barre des signets pour accéder rapidement à vos favoris. Vous pourrez modifier cela plus tard dans **Réglages** > **Apparence**."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra la barra dei segnalibri per accedere rapidamente ai tuoi segnalibri preferiti. Puoi modificarla in seguito in **Impostazioni** > **Aspetto**."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laat de bladwijzerbalk zien voor snelle toegang tot je favoriete bladwijzers. Je kunt dit later aanpassen in **Instellingen** > **Uiterlijk**."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokaż pasek zakładek, aby mieć szybki dostęp do ulubionych zakładek. Możesz to później zmienić, wybierając kolejno **Ustawienia** > **Wygląd**."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra a barra de marcadores para teres acesso rápido aos teus marcadores favoritos. Podes ajustar isto mais tarde em **Definições** > **Aparência**."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отображать панель для быстрого доступа к закладкам в Избранном. Эту настройку можно изменить позже в разделе **Настройки** > **Внешний вид**."
           }
         }
       }
@@ -18055,7 +18835,7 @@
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Are you sure you want to quit?\n\nDuckDuckGo is currently downloading “%1$@”%2$@. If you quit now, DuckDuckGo won‘t finish downloading %3$@."
+            "value" : "Czy na pewno chcesz wyjść?\n\nDuckDuckGo aktualnie pobiera „%1$@”%2$@. Jeśli teraz wyjdziesz, DuckDuckGo nie dokończy pobierania %3$@."
           }
         },
         "pt" : {
@@ -18067,7 +18847,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Are you sure you want to quit?\n\nDuckDuckGo is currently downloading “%1$@”%2$@. If you quit now, DuckDuckGo won‘t finish downloading %3$@."
+            "value" : "Вы точно хотите закрыть приложение?\n\nDuckDuckGo загружает «%1$@»%2$@. Если прервать этот процесс, DuckDuckGo не загрузит %3$@."
           }
         }
       }
@@ -23043,7 +23823,7 @@
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Are you sure you want to close the Fire Window?\n\nDuckDuckGo is currently downloading “%1$@”%2$@. If you close the Fire Window, DuckDuckGo will delete %3$@."
+            "value" : "Czy na pewno chcesz zamknąć okno Fire Window?\n\nDuckDuckGo aktualnie pobiera „%1$@”%2$@. Jeśli zamkniesz okno Fire Window, DuckDuckGo usunie %3$@."
           }
         },
         "pt" : {
@@ -23055,7 +23835,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Are you sure you want to close the Fire Window?\n\nDuckDuckGo is currently downloading “%1$@”%2$@. If you close the Fire Window, DuckDuckGo will delete %3$@."
+            "value" : "Вы точно хотите закрыть окно Fire Window?\n\nDuckDuckGo загружает «%1$@»%2$@. В случае закрытия DuckDuckGo удалит %3$@."
           }
         }
       }
@@ -38847,8 +39627,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Du bist bereit! Du kannst mich jederzeit im Dock antreffen.\nMöchtest du sehen, wie ich dich beschütze? Versuche, eine deiner Lieblingsseiten zu besuchen 👆\n\nBehalte die Adressleiste im Auge. Ich werde Tracker blockieren und die Sicherheit deiner Verbindung verbessern, wenn möglichu{00A0}🔒"
+            "state" : "translated",
+            "value" : "Du bist bereit! Du kannst mich jederzeit im Dock antreffen.\n\nMöchtest du sehen, wie ich dich beschütze? Versuche, eine deiner Lieblingsseiten aufzurufen 👆\n\nBehalte die Adressleiste im Auge. Ich werde Tracker blockieren und, wenn möglich, die Sicherheit deiner Verbindung verbessern 🔒"
           }
         },
         "en" : {
@@ -38859,44 +39639,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "¡Ya está todo listo! Puedes encontrarme en el Dock en cualquier momento.\n¿Quieres ver cómo te protejo? Prueba a visitar uno de tus sitios favoritos 👆\n\nNo pierdas de vista la barra de direcciones al navegar. Bloquearé los rastreadores y mejoraré la seguridad de tu conexión cuando sea posible{00A0}🔒"
+            "state" : "translated",
+            "value" : "¡Ya está todo listo! Puedes encontrarme en el Dock en cualquier momento.\n¿Quieres ver cómo te protejo? Prueba a visitar uno de tus sitios favoritos 👆\n\nNo pierdas de vista la barra de direcciones al navegar. Bloquearé los rastreadores y mejoraré la seguridad de tu conexión cuando sea posible 🔒"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Tout est prêt ! Vous pouvez me trouver sur le Dock à tout moment.\nVous voulez voir comment je vous protège ? Essayez de visiter l'un de vos sites préférés 👆\n\nContinuez à regarder la barre d'adresse au fur et à mesure. Je bloquerai les traqueurs et mettrai à niveau la sécurité de votre connexion si possible 🔒"
+            "state" : "translated",
+            "value" : "Tout est prêt ! Vous pouvez me trouver sur le Dock à tout moment.\nVous voulez voir comment je vous protège ? Essayez de visiter l'un de vos sites préférés 👆\n\nContinuez à regarder la barre d'adresse au fur et à mesure. Je bloquerai les traqueurs et mettrai à niveau la sécurité de votre connexion si possible 🔒"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Tutto pronto! Puoi trovarmi nel dock in qualsiasi momento.\nVuoi vedere come ti proteggo? Prova a visitare uno dei tuoi siti preferiti 👆\n\nContinua a controllare la barra degli indirizzi mentre esplori. Bloccherò i sistemi di tracciamento e aggiornerò la sicurezza della tua connessione quando possibile{00A0} 🔒"
+            "state" : "translated",
+            "value" : "Tutto pronto! Mi puoi trovare in qualsiasi momento sul Dock.\n\nVuoi vedere come ti proteggo? Prova a visitare uno dei tuoi siti preferiti 👆\n\nContinua a controllare la barra degli indirizzi mentre esplori. Bloccherò i sistemi di tracciamento e aggiornerò la sicurezza della tua connessione quando possibile 🔒"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Je bent helemaal klaar! Je kunt me altijd vinden in het Dock.\nWil je zien hoe ik je bescherm? Ga eens naar een van je favoriete websites 👆\n\nKijk tijdens het surfen goed naar de adresbalk. Ik blokkeer trackers en werk de beveiliging van je verbinding bij wanneer mogelijk 🔒"
+            "state" : "translated",
+            "value" : "Je bent helemaal klaar! Je kunt me altijd vinden in de Dock.\n\nWil je zien hoe ik je bescherm? Ga eens naar een van je favoriete websites 👆\n\nKijk tijdens het surfen goed naar de adresbalk. Ik blokkeer trackers en werk de beveiliging van je verbinding bij wanneer mogelijk 🔒"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Wszystko gotowe! W każdej chwili możesz mnie znaleźć w Docku.\nChcesz zobaczyć, jak Cię chronię? Spróbuj odwiedzić jedną z ulubionych stron 👆\n\nW międzyczasie obserwuj pasek adresu. Będę blokować mechanizmy śledzące i w miarę możliwości poprawiać bezpieczeństwo połączenia 🔒"
+            "state" : "translated",
+            "value" : "Wszystko gotowe! W każdej chwili możesz mnie znaleźć w Docku.\n\nChcesz zobaczyć, jak Cię chronię? Spróbuj odwiedzić jedną z ulubionych stron 👆\n\nW międzyczasie obserwuj pasek adresu. Będę blokować mechanizmy śledzące i w miarę możliwości poprawiać bezpieczeństwo połączenia 🔒"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Está tudo pronto! Podes encontrar-me na Dock em qualquer altura.\nQueres ver como te protejo? Experimenta visitar um dos teus sites favoritos 👆\n\nContinua a observar a barra de endereço à medida que vais avançando. Vou bloquear os rastreadores e melhorar a segurança da tua ligação sempre que possível 🔒"
+            "state" : "translated",
+            "value" : "Está tudo pronto! Podes encontrar-me na Dock em qualquer altura.\nQueres ver como te protejo? Experimenta visitar um dos teus sites favoritos 👆\n\nContinua a observar a barra de endereço à medida que vais avançando. Vou bloquear os rastreadores e melhorar a segurança da tua ligação sempre que possível 🔒"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Готово! Теперь меня всегда можно найти на док-панели.\nВам интересно, как я защищаю вашу конфиденциальность? Зайдите на свой любимый сайт...👆\n\nИ следите за адресной строкой. По возможности я заблокирую все трекеры и сделаю соединение более безопасным {00A0}🔒"
+            "state" : "translated",
+            "value" : "Готово! Теперь меня всегда можно найти на док-панели.\n\nХотите узнать, как я защищаю вашу конфиденциальность? Зайдите на свой любимый сайт...👆\n\nИ следите за адресной строкой. Я по возможности буду блокировать трекеры и обеспечивать вам более безопасное соединение 🔒"
           }
         }
       }
@@ -38907,8 +39687,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Du bist bereit!\n\nMöchtest du sehen, wie ich dich beschütze? Versuche, eine deiner Lieblingsseiten zu besuchen 👆\n\nBehalte die Adressleiste im Auge. Ich werde Tracker blockieren und die Sicherheit deiner Verbindung verbessern, wenn möglich 🔒"
+            "state" : "translated",
+            "value" : "Du bist bereit!\n\nMöchtest du sehen, wie ich dich beschütze? Versuche, eine deiner Lieblingsseiten aufzurufen 👆\n\nBehalte die Adressleiste im Auge. Ich werde Tracker blockieren und, wenn möglich, die Sicherheit deiner Verbindung verbessern 🔒"
           }
         },
         "en" : {
@@ -38919,44 +39699,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "¡Ya está todo listo!\n\n¿Quieres ver cómo te protejo? Prueba a visitar uno de tus sitios favoritos 👆\n\nSigue viendo la barra de direcciones sobre la marcha. Bloquearé los rastreadores y mejoraré la seguridad de tu conexión cuando sea posible 🔒"
+            "state" : "translated",
+            "value" : "¡Ya está todo listo!\n\n¿Quieres ver cómo te protejo? Prueba a visitar uno de tus sitios favoritos 👆\n\nNo pierdas de vista la barra de direcciones al navegar. Bloquearé los rastreadores y mejoraré la seguridad de tu conexión cuando sea posible 🔒"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Tout est prêt !\n\nVous voulez voir comment je vous protège ? Essayez de visiter l'un de vos sites préférés 👆\n\n Continuez à regarder la barre d'adresse au fur et à mesure. Je bloquerai les traqueurs et mettrai à niveau la sécurité de votre connexion si possible 🔒"
+            "state" : "translated",
+            "value" : "Tout est prêt !\n\nVous voulez voir comment je vous protège ? Essayez de visiter l'un de vos sites préférés 👆\n\nContinuez à regarder la barre d'adresse au fur et à mesure. Je bloquerai les traqueurs et mettrai à niveau la sécurité de votre connexion si possible 🔒"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Tutto pronto.\n\nVuoi vedere come ti proteggo? Prova a visitare uno dei tuoi siti preferiti 👆Continua a controllare la barra degli indirizzi mentre esplori. Bloccherò i sistemi di tracciamento e aggiornerò la sicurezza della tua connessione quando possibile 🔒"
+            "state" : "translated",
+            "value" : "Tutto pronto!Vuoi vedere come ti proteggo? Prova a visitare uno dei tuoi siti preferiti 👆\n\nContinua a controllare la barra degli indirizzi mentre esplori. Bloccherò i sistemi di tracciamento e aggiornerò la sicurezza della tua connessione quando possibile 🔒"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Je bent helemaal klaar!\n\nWil je zien hoe ik je bescherm? Ga eens naar een van je favoriete websites 👆 \n\n Kijk tijdens het surfen goed naar de adresbalk. Ik blokkeer trackers en werk de beveiliging van je verbinding bij wanneer mogelijk 🔒"
+            "state" : "translated",
+            "value" : "Je bent helemaal klaar!\n\nWil je zien hoe ik je bescherm? Ga eens naar een van je favoriete websites 👆\n\nKijk tijdens het surfen goed naar de adresbalk. Ik blokkeer trackers en werk de beveiliging van je verbinding bij wanneer mogelijk 🔒"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Wszystko gotowe!\n\nChcesz zobaczyć, jak Cię chronię? Spróbuj odwiedzić jedną z ulubionych stron 👆\n\nW międzyczasie obserwuj pasek adresu. Będę blokować mechanizmy śledzące i w miarę możliwości poprawiać bezpieczeństwo połączenia 🔒"
+            "state" : "translated",
+            "value" : "Wszystko gotowe!\n\nChcesz zobaczyć, jak Cię chronię? Spróbuj odwiedzić jedną z ulubionych stron 👆\n\nW międzyczasie obserwuj pasek adresu. Będę blokować mechanizmy śledzące i w miarę możliwości poprawiać bezpieczeństwo połączenia 🔒"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Estás tudo pronto!\n\nQueres ver como te protejo? Experimenta visitar um dos teus sites favoritos 👆\n\nContinua a observar a barra de endereço à medida que vais avançando. Vou bloquear os rastreadores e melhorar a segurança da tua ligação sempre que possível 🔒"
+            "state" : "translated",
+            "value" : "Está tudo pronto!\n\nQueres ver como te protejo? Experimenta visitar um dos teus sites favoritos 👆\n\nContinua a observar a barra de endereço à medida que vais avançando. Vou bloquear os rastreadores e melhorar a segurança da tua ligação sempre que possível 🔒"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Все готово!\n\nХотите увидеть, как я вас защищаю? Зайдите на один из любимых сайтов 👆\n\nСледите за адресной строкой. Я по возможности буду блокировать трекеры и обеспечивать вам более безопасное соединение 🔒"
+            "state" : "translated",
+            "value" : "Готово!\n\nХотите узнать, как я защищаю вашу конфиденциальность? Зайдите на свой любимый сайт...👆\n\nИ следите за адресной строкой. Я по возможности буду блокировать трекеры и обеспечивать вам более безопасное соединение 🔒"
           }
         }
       }
@@ -42707,7 +43487,7 @@
       }
     },
     "permission.authorization.format" : {
-      "comment" : "Popover asking for domain %@ to use camera/mic/location (%@)",
+      "comment" : "Popover asking for domain %@ to use camera/mic (%@)",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -42762,6 +43542,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Открыть сайту %1$@ доступ (%2$@)?"
+          }
+        }
+      }
+    },
+    "permission.authorization.location" : {
+      "comment" : "Popover asking for domain %@ to use location",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "“%@“ website would like to use your current location."
           }
         }
       }
@@ -43966,9 +44758,6 @@
         }
       }
     },
-    "Personal Information Removal" : {
-
-    },
     "phishing-detection.enabled.checkbox" : {
       "comment" : "Checkbox that enables or disables the phishing detection feature in the browser",
       "extractionState" : "extracted_with_value",
@@ -44273,10 +45062,58 @@
       "comment" : "Menu item for hiding the AI Chat shortcut",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI-Chat-Verknüpfung ausblenden"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Hide AI Chat Shortcut"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultar acceso directo a AI Chat"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masquer le raccourci de chat IA"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nascondi scorciatoia AI Chat"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Snelkoppeling voor AI-chat verbergen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ukryj skrót do AI Chat"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultar atalho do AI Chat"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скрыть ярлык AI Chat"
           }
         }
       }
@@ -44525,10 +45362,58 @@
       "comment" : "Menu item for showing the AI Chat shortcut",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI-Chat-Verknüpfung anzeigen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Show AI Chat Shortcut"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar acceso directo a AI Chat"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher le raccourci AI Chat"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra scorciatoia AI Chat"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Snelkoppeling voor AI Chat weergeven"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokaż skrót do AI Chat"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar atalho do AI Chat"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать ярлык AI Chat"
           }
         }
       }
@@ -55183,6 +56068,18 @@
         }
       }
     },
+    "remove.suggestion.tooltip" : {
+      "comment" : "Tooltip for the button which removes the history entry from the history",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Remove from browsing history"
+          }
+        }
+      }
+    },
     "Reopen All Windows from Last Session" : {
       "comment" : "Main Menu History item",
       "localizations" : {
@@ -58328,6 +59225,126 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Показать содержимое папки"
+          }
+        }
+      }
+    },
+    "site.not.working.button.title" : {
+      "comment" : "Button title that appears on a dialog asking users about possible breakage of a site",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lass es uns wissen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Let Us Know"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Háznoslo saber"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faites-le nous savoir"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faccelo sapere"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laat het ons weten"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daj nam znać"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contacte-nos"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сообщить"
+          }
+        }
+      }
+    },
+    "site.not.working.title" : {
+      "comment" : "Title that appears on a dialog asking users about possible breakage of a site",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Webseite funktioniert nicht?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Site not working?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿El sitio no funciona?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le site ne fonctionne pas ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il sito non funziona?"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Werkt de site niet?"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Witryna nie działa?"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O site não funciona?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сайт не работает?"
           }
         }
       }

@@ -101,9 +101,10 @@ final class OnboardingUITests: XCTestCase {
         startBrowsingButton.click()
 
         // AfterOnboarding
-        let duckduckgoPrivacySimplifiedWindow = app.windows["DuckDuckGo — Your protection, our priority."]
-        XCTAssertTrue(duckduckgoPrivacySimplifiedWindow.webViews["DuckDuckGo — Your protection, our priority."].waitForExistence(timeout: UITests.Timeouts.elementExistence))
-        XCTAssertTrue(duckduckgoPrivacySimplifiedWindow.buttons["NavigationBarViewController.optionsButton"].isEnabled)
+        let ddgLogo = app.windows.webViews.groups.containing(.image, identifier: "DuckDuckGo Logo").element
+        XCTAssertTrue(ddgLogo.waitForExistence(timeout: UITests.Timeouts.elementExistence))
+        let homePageSubTitle = app.windows.webViews.groups.containing(.staticText, identifier: "Your protection, our priority.").element
+        XCTAssertTrue(homePageSubTitle.waitForExistence(timeout: UITests.Timeouts.elementExistence))
     }
 
     func resetApplicationData() throws {

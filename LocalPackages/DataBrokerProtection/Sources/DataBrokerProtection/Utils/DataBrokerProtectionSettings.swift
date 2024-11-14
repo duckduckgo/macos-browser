@@ -18,9 +18,14 @@
 
 import Foundation
 import Combine
+import AppKitExtensions
 
 public final class DataBrokerProtectionSettings {
     private let defaults: UserDefaults
+
+    private enum Keys {
+        static let runType = "dbp.environment.run-type"
+    }
 
     public enum SelectedEnvironment: String, Codable {
         case production
@@ -55,6 +60,22 @@ public final class DataBrokerProtectionSettings {
 
         set {
             defaults.dataBrokerProtectionSelectedEnvironment = newValue
+        }
+    }
+
+    public func updateStoredRunType() {
+        storedRunType = NSApplication.runType
+    }
+
+    public private(set) var storedRunType: NSApplication.RunType? {
+        get {
+            guard let runType = UserDefaults.dbp.string(forKey: Keys.runType) else {
+                return nil
+            }
+            return NSApplication.RunType(rawValue: runType)
+        }
+        set(runType) {
+            UserDefaults.dbp.set(runType?.rawValue, forKey: Keys.runType)
         }
     }
 

@@ -546,9 +546,12 @@ struct UserText {
     static let failedToOpenExternally = NSLocalizedString("open.externally.failed", value: "The app required to open that link can’t be found", comment: "’Link’ is link on a website, it couldn't be opened due to the required app not being found")
 
     // MARK: Permission
+    static let locationPermissionAuthorizationFormat = NSLocalizedString("permission.authorization.location",
+                                                                         value: "“%@“ website would like to use your current location.",
+                                                                         comment: "Popover asking for domain %@ to use location")
     static let devicePermissionAuthorizationFormat = NSLocalizedString("permission.authorization.format",
                                                                        value: "Allow “%@“ to use your %@?",
-                                                                       comment: "Popover asking for domain %@ to use camera/mic/location (%@)")
+                                                                       comment: "Popover asking for domain %@ to use camera/mic (%@)")
     static let popupWindowsPermissionAuthorizationFormat = NSLocalizedString("permission.authorization.popups.format",
                                                                              value: "Allow “%@“ to open PopUp Window?",
                                                                              comment: "Popover asking for domain %@ to open Popup Window")
@@ -1340,6 +1343,11 @@ struct UserText {
         static let daxDialogBrowsingWithMultipleTrackers = NSLocalizedString("contextual.onboarding.browsing.multiple.trackers", value: "*%2$@, %3$@* and others (%d) were trying to track you here. I blocked them!\n\n%4$@", comment: "First parameter is a count of additional trackers, second and third are names of the tracker networks (strings) the last is a string (Do not remove \n\n%4$@)")
         public static let daxDialogBrowsingWithoutTrackers = NSLocalizedString("dax.onboarding.browsing.without.trackers", value: "As you tap and scroll, I’ll block pesky trackers.\n\nGo ahead - keep browsing!", comment: "")
         static let daxDialogTapTheShield = NSLocalizedString("contextual.onboarding.browsing.trackers.tap.shield", value: "☝️ Tap the shield for more info.", comment: "Suggests to tap to a shield shaped icon that is above the copy")
+    }
+
+    enum BrokenSitePrompt {
+        static let title = NSLocalizedString("site.not.working.title", value: "Site not working?", comment: "Title that appears on a dialog asking users about possible breakage of a site")
+        static let buttonTitle = NSLocalizedString("site.not.working.button.title", value: "Let Us Know", comment: "Button title that appears on a dialog asking users about possible breakage of a site")
     }
 
     // Key: "subscription.menu.item"
