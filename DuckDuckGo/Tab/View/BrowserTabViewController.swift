@@ -44,14 +44,8 @@ final class BrowserTabViewController: NSViewController {
 
     private let newTabPageUserScript: NewTabPageUserScript
     private(set) lazy var newTabPageWebView: WebView = {
-        let configuration = WKWebViewConfiguration()
-        configuration.applyNewTabPageWebViewConfiguration(with: featureFlagger)
-
-        let webView = WebView(frame: .zero, configuration: configuration)
-
+        let webView = NewTabPageWebView(featureFlagger: featureFlagger)
         newTabPageUserScript.webViews.add(webView)
-        webView.load(URLRequest(url: URL.newtab))
-
         return webView
     }()
     private(set) weak var webView: WebView?
