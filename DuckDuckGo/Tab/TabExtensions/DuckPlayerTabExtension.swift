@@ -128,6 +128,14 @@ final class DuckPlayerTabExtension {
         }
     }
 
+    private func fireOverlayShownPixelIfNeeded(url: URL) {
+        guard duckPlayer.isAvailable,
+                duckPlayer.mode == .alwaysAsk,
+                url.isYoutubeWatch else {
+            return
+        }
+        PixelKit.fire(GeneralPixel.duckPlayerOverlayYoutubeImpressions)
+    }
 }
 
 extension DuckPlayerTabExtension: YoutubeOverlayUserScriptDelegate {
@@ -190,6 +198,9 @@ extension DuckPlayerTabExtension: NavigationResponder {
         guard duckPlayer.isAvailable, duckPlayer.mode != .disabled else {
             return decidePolicyWithDisabledDuckPlayer(for: navigationAction)
         }
+        
+        // Fires the Overlay Shown Pixel
+        fireOverlayShownPixelIfNeeded(url: navigationAction.url)
 
         // session restoration will try to load real www.youtube-nocookie.com url
         // we need to redirect it to custom duck:// scheme handler which will load
@@ -287,7 +298,10 @@ extension DuckPlayerTabExtension: NavigationResponder {
             webView.goBack()
             webView.load(URLRequest(url: .duckPlayer(videoID, timestamp: timestamp)))
         }
-
+        
+        // Fire Overlay Shown Pixels
+        fireOverlayShownPixelIfNeeded(url: navigation.url)
+        
         // Fire DuckPlayer Overlay Temporary Pixels
         if let url = navigation.request.url {
             duckPlayerOverlayUsagePixels.handleNavigationAndFirePixels(url: url, duckPlayerMode: duckPlayer.mode)
