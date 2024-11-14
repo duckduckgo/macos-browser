@@ -45,6 +45,7 @@ public enum FeatureFlag: String, CaseIterable {
     /// https://app.asana.com/0/72649045549333/1208617860225199/f
     case networkProtectionEnforceRoutes
 
+    /// https://app.asana.com/0/72649045549333/1208241266421040/f
     case htmlNewTabPage
 }
 
