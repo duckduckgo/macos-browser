@@ -242,7 +242,7 @@ final class AppearancePreferences: ObservableObject {
         if let continueSetUpCardsLastDemonstrated = persistor.continueSetUpCardsLastDemonstrated {
             // how many days has passed since last Continue Setup demonstration
             let daysSinceLastDemonstration = Calendar.current.dateComponents([.day], from: continueSetUpCardsLastDemonstrated, to: dateTimeProvider()).day!
-            if daysSinceLastDemonstration > 0 {
+            if daysSinceLastDemonstration > 0 || true {
                 persistor.continueSetUpCardsLastDemonstrated = Date()
                 persistor.continueSetUpCardsNumberOfDaysDemonstrated += 1
 

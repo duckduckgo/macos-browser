@@ -104,7 +104,8 @@ extension HomePage.Views {
                         .contextMenu(menuItems: sectionsVisibilityContextMenuItems)
 
                         if settingsVisibilityModel.isSettingsVisible {
-                            SettingsView(isSettingsVisible: $settingsVisibilityModel.isSettingsVisible)
+                            SettingsView(includingContinueSetUpCards: model.isContinueSetUpAvailable && !model.isContinueSetUpCardsViewOutdated,
+                                         isSettingsVisible: $settingsVisibilityModel.isSettingsVisible)
                                 .frame(width: Self.settingsPanelWidth)
                                 .transition(.move(edge: .trailing))
                                 .layoutPriority(1)
@@ -238,6 +239,11 @@ extension HomePage.Views {
             if addressBarModel.shouldShowAddressBar {
                 Toggle(UserText.newTabMenuItemShowSearchBar, isOn: $model.isSearchBarVisible)
                     .toggleStyle(.checkbox)
+            }
+            if model.isContinueSetUpAvailable && !model.isContinueSetUpCardsViewOutdated {
+                Toggle(UserText.newTabMenuItemShowContinuteSetUp, isOn: $model.isContinueSetUpVisible)
+                    .toggleStyle(.checkbox)
+                    .visibility(continueSetUpModel.hasContent ? .visible : .gone)
             }
             Toggle(UserText.newTabMenuItemShowFavorite, isOn: $model.isFavoriteVisible)
                 .toggleStyle(.checkbox)

@@ -21,6 +21,7 @@ import SwiftUIExtensions
 extension HomePage.Views {
 
     struct HomeContentSectionsView: View {
+        let includeContinueSetUpCards: Bool
         @EnvironmentObject var model: AppearancePreferences
         @EnvironmentObject var addressBarModel: HomePage.Models.AddressBarModel
         @EnvironmentObject var continueSetUpModel: HomePage.Models.ContinueSetUpModel
@@ -39,6 +40,19 @@ extension HomePage.Views {
                         }
                     }
                     .toggleStyle(.switch)
+                }
+
+                if includeContinueSetUpCards {
+                    Toggle(isOn: $model.isContinueSetUpVisible) {
+                        HStack {
+                            Image(.rocketGrayscale)
+                                .frame(width: iconSize, height: iconSize)
+                            Text(UserText.newTabSetUpSectionTitle)
+                            Spacer()
+                        }
+                    }
+                    .toggleStyle(.switch)
+                    .visibility(continueSetUpModel.hasContent ? .visible : .gone)
                 }
 
                 Toggle(isOn: $model.isFavoriteVisible) {

@@ -32,6 +32,7 @@ extension HomePage.Views {
             static let sectionSpacing = 36.0
         }
 
+        let includingContinueSetUpCards: Bool
         @EnvironmentObject var model: HomePage.Models.SettingsModel
         @EnvironmentObject var appearancePreferences: AppearancePreferences
         @EnvironmentObject var continueSetUpModel: HomePage.Models.ContinueSetUpModel
@@ -174,7 +175,7 @@ extension HomePage.Views {
                 ThemePicker()
             }
             SettingsSection(title: UserText.homePageSections) {
-                HomeContentSectionsView()
+                HomeContentSectionsView(includeContinueSetUpCards: includingContinueSetUpCards)
             }
             rootViewFooter
         }
@@ -232,13 +233,42 @@ extension HomePage.Views.BackgroundCategoryView {
 }
 
 #if DEBUG
-#Preview {
+#Preview("including continue set up cards") {
     @State var isSettingsVisible: Bool = true
 
     let settingsModel = HomePage.Models.SettingsModel()
     settingsModel.customBackground = .solidColor(.color10)
 
-    return HomePage.Views.SettingsView( isSettingsVisible: $isSettingsVisible)
+    return HomePage.Views.SettingsView(includingContinueSetUpCards: true, isSettingsVisible: $isSettingsVisible)
+        .frame(width: 236, height: 600)
+        .environmentObject(settingsModel)
+        .environmentObject(AppearancePreferences.shared)
+        .environmentObject(HomePage.Models.ContinueSetUpModel(
+            defaultBrowserProvider: SystemDefaultBrowserProvider(),
+            dockCustomizer: DockCustomizer(),
+            dataImportProvider: BookmarksAndPasswordsImportStatusProvider(),
+            tabCollectionViewModel: TabCollectionViewModel(),
+            duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor()
+        ))
+        .environmentObject(HomePage.Models.FavoritesModel(
+            open: { _, _ in },
+            removeFavorite: { _ in },
+            deleteBookmark: { _ in },
+            add: {},
+            edit: { _ in },
+            moveFavorite: { _, _ in },
+            onFaviconMissing: {}
+        ))
+        .environmentObject(HomePage.Models.AddressBarModel(tabCollectionViewModel: TabCollectionViewModel(), privacyConfigurationManager: MockPrivacyConfigurationManager()))
+}
+
+#Preview("no continue set up cards") {
+    @State var isSettingsVisible: Bool = true
+
+    let settingsModel = HomePage.Models.SettingsModel()
+    settingsModel.customBackground = .solidColor(.color10)
+
+    return HomePage.Views.SettingsView(includingContinueSetUpCards: false, isSettingsVisible: $isSettingsVisible)
         .frame(width: 236, height: 600)
         .environmentObject(settingsModel)
         .environmentObject(AppearancePreferences.shared)

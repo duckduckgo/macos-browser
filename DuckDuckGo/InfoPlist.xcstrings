@@ -67,55 +67,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Lade Fotos und Videos hoch"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Allows you to upload photographs and videos"
+            "value" : "Lets websites ask permission to use your camera for video calls, recording and uploading videos, or taking and uploading photos."
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Te permite subir fotos y vídeos"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Vous permet de télécharger des photos et des vidéos"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Consente il caricamento di foto e video"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Hiermee kun je foto's en video's uploaden"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Umożliwia przesyłanie zdjęć i filmów"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Permite-lhe carregar fotografias e vídeos"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Позволяет загружать фото и видео"
           }
         }
@@ -127,55 +127,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Speichere heruntergeladene Dateien in diesem Ordner."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Allows you to save downloaded files to this folder."
+            "value" : "Lets you save files to the Desktop folder on your computer."
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Te permite guardar los archivos descargados en esta carpeta."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Permet d'enregistrer les fichiers téléchargés dans ce dossier."
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Consente di salvare in questa cartella i file scaricati."
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Hiermee kun je gedownloade bestanden opslaan in deze map."
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Umożliwia zapisywanie pobranych plików w tym folderze."
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Permite guardar ficheiros transferidos nesta pasta."
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Позволяет сохранять загруженные файлы в эту папку."
           }
         }
@@ -187,55 +187,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Speichere heruntergeladene Dateien in diesem Ordner."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Allows you to save downloaded files to this folder."
+            "value" : "Lets you save files to the Documents folder on your computer."
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Te permite guardar los archivos descargados en esta carpeta."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Permet d'enregistrer les fichiers téléchargés dans ce dossier."
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Consente di salvare in questa cartella i file scaricati."
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Hiermee kun je gedownloade bestanden opslaan in deze map."
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Umożliwia zapisywanie pobranych plików w tym folderze."
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Permite guardar ficheiros transferidos nesta pasta."
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Позволяет сохранять загруженные файлы в эту папку."
           }
         }
@@ -247,55 +247,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Speichere heruntergeladene Dateien in diesem Ordner."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Allows you to save downloaded files to this folder."
+            "value" : "Lets you save files to the Downloads folder on your computer."
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Te permite guardar los archivos descargados en esta carpeta."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Permet d'enregistrer les fichiers téléchargés dans ce dossier."
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Consente di salvare in questa cartella i file scaricati."
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Hiermee kun je gedownloade bestanden opslaan in deze map."
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Umożliwia zapisywanie pobranych plików w tym folderze."
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Permite guardar ficheiros transferidos nesta pasta."
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Позволяет сохранять загруженные файлы в эту папку."
           }
         }
@@ -367,55 +367,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Teile deinen Standort"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Allows you to share your geolocation"
+            "value" : "Lets websites ask permission to use your location to improve search results, provide weather and directions, or show nearby map locations."
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Te permite compartir tu ubicación"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Vous permet de partager votre géolocalisation"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Consente la condivisione della tua geolocalizzazione"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Hiermee kun je je geolocatie delen"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Umożliwia udostępnianie geolokalizacji"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Permite-te partilhar a tua localização geográfica"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Позволяет делиться геопозицией"
           }
         }
@@ -423,7 +423,7 @@
     },
     "NSLocationWhenInUseUsageDescription" : {
       "comment" : "Privacy - Location When In Use Usage Description",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -487,55 +487,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Teile deine Aufzeichnungen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Allows you to share recordings"
+            "value" : "Lets websites ask permission to use your microphone for audio and video calls or for recording and uploading audio."
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Te permite compartir grabaciones"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Vous permet de partager des enregistrements"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Consente la condivisione delle registrazioni"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Hiermee kun je opnames delen"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Umożliwia udostępnianie nagrań"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Permite-lhe partilhar gravações"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Позволяет делиться аудиозаписями"
           }
         }
