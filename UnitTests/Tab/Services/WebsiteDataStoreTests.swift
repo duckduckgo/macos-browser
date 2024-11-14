@@ -20,6 +20,18 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class WebCacheManagerTests: XCTestCase {
+    /// The webView is necessary to manage the shared state of WKWebsiteDataRecord
+    var webView: WKWebView?
+
+    override func setUp() {
+        super.setUp()
+        webView = WKWebView()
+    }
+
+    override func tearDown() {
+        webView = nil
+        super.tearDown()
+    }
 
     func testWhenCookiesHaveSubDomainsOnSubDomainsAndWildcardsThenAllCookiesRetained() {
         let logins = MockPreservedLogins(domains: [
