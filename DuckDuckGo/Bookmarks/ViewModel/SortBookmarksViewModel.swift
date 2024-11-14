@@ -55,6 +55,10 @@ enum BookmarksSortMode: Codable {
         return self == .nameAscending || self == .nameDescending
     }
 
+    var isReorderingEnabled: Bool{
+        return self == .manual
+    }
+
     func menu(target: AnyObject) -> NSMenu {
         switch self {
         case .manual:
