@@ -232,10 +232,6 @@ public struct UserDefaultsWrapper<T> {
 
         case lastBrokenSiteToastShownDate = "brokenSitePrompt.last-broken-site-toast-shown-date"
         case toastDismissStreakCounter = "brokenSitePrompt.toast-dismiss-streak-counter"
-
-        // Experimental Feature Flags
-
-        case htmlNewTabPage = "experimental.html-new-tab-page"
     }
 
     enum RemovedKeys: String, CaseIterable {
