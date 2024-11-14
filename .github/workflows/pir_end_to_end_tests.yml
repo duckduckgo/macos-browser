@@ -43,7 +43,7 @@ jobs:
       with:
         repository: DuckDuckGo/pir-fake-broker
         ssh-key: ${{ secrets.SSH_PRIVATE_KEY_PIR_FAKE_BROKER }}
-        ref: loremattei/ci-integration
+        ref: main
         path: pir-fake-broker
 
     - name: Start PIR Fake Broker
