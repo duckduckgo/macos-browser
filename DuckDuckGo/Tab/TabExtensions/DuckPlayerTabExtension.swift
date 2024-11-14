@@ -129,11 +129,27 @@ final class DuckPlayerTabExtension {
     }
 
     private func fireOverlayShownPixelIfNeeded(url: URL) {
+
         guard duckPlayer.isAvailable,
-                duckPlayer.mode == .alwaysAsk,
-                url.isYoutubeWatch else {
+              duckPlayer.mode == .alwaysAsk,
+              url.isYoutubeWatch else {
             return
         }
+
+        // Static variable for debounce logic
+        let debounceInterval: TimeInterval = 1.0
+        let now = Date()
+
+        struct Debounce {
+            static var lastFireTime: Date?
+        }
+
+        // Check debounce condition and update timestamp if firing
+        guard Debounce.lastFireTime == nil || now.timeIntervalSince(Debounce.lastFireTime!) >= debounceInterval else {
+            return
+        }
+
+        Debounce.lastFireTime = now
         PixelKit.fire(GeneralPixel.duckPlayerOverlayYoutubeImpressions)
     }
 }
