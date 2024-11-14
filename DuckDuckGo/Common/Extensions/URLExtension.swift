@@ -94,12 +94,7 @@ extension URL {
             return nil
         }
 
-        let privacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager
-        let isFilterListExperimentEnabled = privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(AutoconsentSubfeature.filterlistExperiment2)
         var url = Self.duckDuckGo.appendingParameter(name: DuckDuckGoParameters.search.rawValue, value: trimmedQuery)
-        if isFilterListExperimentEnabled {
-            url = url.appendingParameter(name: "cpme", value: AutoconsentFilterlistExperiment.cohort == AutoconsentFilterlistExperiment.test ? "1" : "0")
-        }
 
         // Add experimental atb parameter to SERP queries for internal users to display Privacy Reminder
         // https://app.asana.com/0/1199230911884351/1205979030848528/f
