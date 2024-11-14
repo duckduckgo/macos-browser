@@ -182,7 +182,7 @@ extension DuckPlayerTabExtension: NewWindowPolicyDecisionMaker {
 }
 
 extension DuckPlayerTabExtension: NavigationResponder {
-    // swiftlint:disable:next cyclomatic_complexity
+    // swiftlint:disable cyclomatic_complexity
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         // only proceed when Private Player is enabled
@@ -258,6 +258,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
         // Navigating to a Youtube URL
         return handleYoutubeNavigation(for: navigationAction)
     }
+    // swiftlint:enable cyclomatic_complexity
 
     @MainActor
     private func handleYoutubeNavigation(for navigationAction: NavigationAction) -> NavigationActionPolicy? {
