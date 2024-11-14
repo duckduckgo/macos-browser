@@ -401,7 +401,6 @@ extension DuckPlayerTabExtension: NavigationResponder {
     @MainActor
     func navigationDidFinish(_ navigation: Navigation) {
         setUpYoutubeScriptsIfNeeded(for: navigation.url)
-
     }
 
 }

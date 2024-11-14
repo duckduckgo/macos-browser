@@ -20,7 +20,7 @@ import PixelKit
 protocol DuckPlayerOverlayPixelFiring {
 
     var pixelFiring: PixelFiring? { get set }
-    var navigationHistory: [URL] { get set }    
+    var navigationHistory: [URL] { get set }
 
     func handleNavigationAndFirePixels(url: URL?, duckPlayerMode: DuckPlayerMode)
 }
@@ -89,12 +89,11 @@ final class DuckPlayerOverlayUsagePixels: DuckPlayerOverlayPixelFiring {
                 navigationHistory = Array(navigationHistory.prefix(upTo: lastOccurrenceIndex + 1))
             }
         }
-        
+
     }
-    
+
     private func firePixel(_ pixel: PixelKitEventV2) {
         pixelFiring?.fire(pixel)
     }
-    
 
 }
