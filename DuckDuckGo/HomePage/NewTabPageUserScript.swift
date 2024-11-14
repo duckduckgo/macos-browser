@@ -36,6 +36,8 @@ final class NewTabPageUserScript: NSObject, @preconcurrency Subfeature {
         case initialSetup
         case reportInitException
         case reportPageException
+        case statsGetConfig = "stats_getConfig"
+        case statsGetData = "stats_getData"
         case widgetsSetConfig = "widgets_setConfig"
     }
 
@@ -56,6 +58,8 @@ final class NewTabPageUserScript: NSObject, @preconcurrency Subfeature {
         .initialSetup: { [weak self] in try await self?.initialSetup(params: $0, original: $1) },
         .reportInitException: { [weak self] in try await self?.reportException(params: $0, original: $1) },
         .reportPageException: { [weak self] in try await self?.reportException(params: $0, original: $1) },
+        .statsGetConfig: { [weak self] in try await self?.statsGetConfig(params: $0, original: $1) },
+        .statsGetData: { [weak self] in try await self?.statsGetData(params: $0, original: $1) },
         .widgetsSetConfig: { [weak self] in try await self?.widgetsSetConfig(params: $0, original: $1) }
     ]
 
@@ -96,6 +100,16 @@ extension NewTabPageUserScript {
     }
 
     @MainActor
+    private func statsGetConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        actionsManager.getPrivacyStatsConfig()
+    }
+
+    @MainActor
+    private func statsGetData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        actionsManager.getPrivacyStats()
+    }
+
+    @MainActor
     private func widgetsSetConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let params = params as? [[String: String]] else { return nil }
         actionsManager.updateWidgetConfigs(with: params)
@@ -111,7 +125,7 @@ extension NewTabPageUserScript {
 
 extension NewTabPageUserScript {
 
-    struct FavoritesConfig: Encodable {
+    struct WidgetConfig: Encodable {
         let animation: Animation?
         let expansion: Expansion
     }
@@ -135,7 +149,7 @@ extension NewTabPageUserScript {
     }
 
     struct FavoritesData: Encodable {
-        var favorites: [Favorite]
+        let favorites: [Favorite]
     }
 
     struct Favorite: Encodable {
@@ -146,7 +160,17 @@ extension NewTabPageUserScript {
     }
 
     struct FavoriteFavicon: Encodable {
-        var maxAvailableSize: Int
-        var src: String
+        let maxAvailableSize: Int
+        let src: String
+    }
+
+    struct PrivacyStatsData: Encodable {
+        let totalCount: Int
+        let trackerCompanies: [TrackerCompany]
+    }
+
+    struct TrackerCompany: Encodable {
+        let count: Int
+        let displayName: String
     }
 }

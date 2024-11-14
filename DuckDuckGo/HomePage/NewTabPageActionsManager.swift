@@ -27,7 +27,11 @@ protocol NewTabPageActionsManaging: AnyObject {
     var userScript: NewTabPageUserScript? { get set }
 
     func getFavorites() -> NewTabPageUserScript.FavoritesData
-    func getFavoritesConfig() -> NewTabPageUserScript.FavoritesConfig
+    func getFavoritesConfig() -> NewTabPageUserScript.WidgetConfig
+
+    func getPrivacyStats() -> NewTabPageUserScript.PrivacyStatsData
+    func getPrivacyStatsConfig() -> NewTabPageUserScript.WidgetConfig
+
     /// It is called in case of error loading the pages
     func reportException(with params: [String: String])
     func showContextMenu(with params: [String: Any])
@@ -127,7 +131,17 @@ final class NewTabPageActionsManager: NewTabPageActionsManaging {
         .init(favorites: [])
     }
 
-    func getFavoritesConfig() -> NewTabPageUserScript.FavoritesConfig {
+    func getFavoritesConfig() -> NewTabPageUserScript.WidgetConfig {
+        // implementation TBD
+        .init(animation: .auto, expansion: .collapsed)
+    }
+
+    func getPrivacyStats() -> NewTabPageUserScript.PrivacyStatsData {
+        // implementation TBD
+        .init(totalCount: 0, trackerCompanies: [])
+    }
+
+    func getPrivacyStatsConfig() -> NewTabPageUserScript.WidgetConfig {
         // implementation TBD
         .init(animation: .auto, expansion: .collapsed)
     }
