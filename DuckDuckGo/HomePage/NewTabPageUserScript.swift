@@ -20,7 +20,7 @@ import Foundation
 import UserScript
 import WebKit
 
-final class NewTabPageUserScript: NSObject, @preconcurrency Subfeature {
+final class NewTabPageUserScript: NSObject, Subfeature {
 
     let actionsManager: NewTabPageActionsManaging
     var messageOriginPolicy: MessageOriginPolicy = .only(rules: [.exact(hostname: "newtab")])
