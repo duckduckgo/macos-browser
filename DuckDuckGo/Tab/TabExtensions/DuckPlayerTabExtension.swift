@@ -214,7 +214,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
         guard duckPlayer.isAvailable, duckPlayer.mode != .disabled else {
             return decidePolicyWithDisabledDuckPlayer(for: navigationAction)
         }
- 
+
         // Fires the Overlay Shown Pixel if not coming from DuckPlayer's Watch in Youtube
         if !navigationAction.sourceFrame.url.isDuckPlayer {
             fireOverlayShownPixelIfNeeded(url: navigationAction.url)
@@ -316,10 +316,10 @@ extension DuckPlayerTabExtension: NavigationResponder {
             webView.goBack()
             webView.load(URLRequest(url: .duckPlayer(videoID, timestamp: timestamp)))
         }
-        
+
         // Fire Overlay Shown Pixels
         fireOverlayShownPixelIfNeeded(url: navigation.url)
-        
+
         // Fire DuckPlayer Overlay Temporary Pixels
         if let url = navigation.request.url {
             duckPlayerOverlayUsagePixels.handleNavigationAndFirePixels(url: url, duckPlayerMode: duckPlayer.mode)
