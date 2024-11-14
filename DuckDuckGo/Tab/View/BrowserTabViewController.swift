@@ -553,7 +553,7 @@ final class BrowserTabViewController: NSViewController {
         }
 
         func displayWebView(of tabViewModel: TabViewModel) {
-            let newWebView = tabViewModel.tab.content.urlForWebView?.isNewTabPage == true ? newTabPageWebView : tabViewModel.tab.webView
+            let newWebView = tabViewModel.tab.content == .newtab ? newTabPageWebView : tabViewModel.tab.webView
             cleanUpRemoteWebViewIfNeeded(newWebView)
             webView = newWebView
 
@@ -830,11 +830,6 @@ final class BrowserTabViewController: NSViewController {
         }
     }
 
-    func refreshTab() {
-        guard let tabViewModel else { return }
-        showTabContent(of: tabViewModel)
-    }
-
     func updateTabIfNeeded(tabViewModel: TabViewModel?) {
         if shouldReplaceWebView(for: tabViewModel) {
             removeAllTabContent(includingWebView: true)
@@ -860,7 +855,7 @@ final class BrowserTabViewController: NSViewController {
             return false
         }
 
-        let newWebView = tabViewModel.tab.content.urlForWebView?.isNewTabPage == true ? newTabPageWebView : tabViewModel.tab.webView
+        let newWebView = tabViewModel.tab.content == .newtab ? newTabPageWebView : tabViewModel.tab.webView
 
         let isPinnedTab = tabCollectionViewModel.pinnedTabsCollection?.tabs.contains(tabViewModel.tab) == true
         let isKeyWindow = view.window?.isKeyWindow == true

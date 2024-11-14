@@ -120,7 +120,6 @@ final class UserScripts: UserScriptsProvider {
             if let onboardingUserScript {
                 specialPages.registerSubfeature(delegate: onboardingUserScript)
             }
-
             userScripts.append(specialPages)
         }
 
