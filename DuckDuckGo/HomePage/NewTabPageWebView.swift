@@ -21,15 +21,16 @@ import WebKit
 
 final class NewTabPageWebView: WebView {
 
-    init(featureFlagger: FeatureFlagger) {
+    init(featureFlagger: FeatureFlagger, newTabPageUserScript: NewTabPageUserScript) {
         let configuration = WKWebViewConfiguration()
-        configuration.applyNewTabPageWebViewConfiguration(with: featureFlagger)
+        configuration.applyNewTabPageWebViewConfiguration(with: featureFlagger, newTabPageUserScript: newTabPageUserScript)
 
         super.init(frame: .zero, configuration: configuration)
+        newTabPageUserScript.webView = self
         navigationDelegate = self
         load(URLRequest(url: URL.newtab))
     }
-    
+
     @MainActor required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

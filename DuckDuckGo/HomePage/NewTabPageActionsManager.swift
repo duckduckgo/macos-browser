@@ -23,8 +23,9 @@ import Common
 import os.log
 
 protocol NewTabPageActionsManaging: AnyObject {
-    var configuration: NewTabPageConfiguration { get }
-    var userScript: NewTabPageUserScript? { get set }
+    var configuration: NewTabPageUserScript.NewTabPageConfiguration { get }
+
+    func registerUserScript(_ userScript: NewTabPageUserScript)
 
     func getFavorites() -> NewTabPageUserScript.FavoritesData
     func getFavoritesConfig() -> NewTabPageUserScript.WidgetConfig
@@ -38,46 +39,11 @@ protocol NewTabPageActionsManaging: AnyObject {
     func updateWidgetConfigs(with params: [[String: String]])
 }
 
-struct NewTabPageConfiguration: Encodable {
-    var widgets: [Widget]
-    var widgetConfigs: [WidgetConfig]
-    var env: String
-    var locale: String
-    var platform: Platform
-
-    struct Widget: Encodable {
-        var id: String
-    }
-
-    struct WidgetConfig: Encodable {
-
-        enum WidgetVisibility: String, Encodable {
-            case visible, hidden
-
-            var isVisible: Bool {
-                self == .visible
-            }
-        }
-
-        init(id: String, isVisible: Bool) {
-            self.id = id
-            self.visibility = isVisible ? .visible : .hidden
-        }
-
-        var id: String
-        var visibility: WidgetVisibility
-    }
-
-    struct Platform: Encodable {
-        var name: String
-    }
-}
-
 final class NewTabPageActionsManager: NewTabPageActionsManaging {
 
     private let appearancePreferences: AppearancePreferences
     private var cancellables = Set<AnyCancellable>()
-    weak var userScript: NewTabPageUserScript?
+    private var userScripts = NSHashTable<NewTabPageUserScript>.weakObjects()
 
     init(appearancePreferences: AppearancePreferences) {
         self.appearancePreferences = appearancePreferences
@@ -97,14 +63,20 @@ final class NewTabPageActionsManager: NewTabPageActionsManaging {
             .store(in: &cancellables)
     }
 
-    private func notifyWidgetConfigsDidChange() {
-        userScript?.notifyWidgetConfigsDidChange(widgetConfigs: [
-            .init(id: "favorites", isVisible: appearancePreferences.isFavoriteVisible),
-            .init(id: "privacyStats", isVisible: appearancePreferences.isRecentActivityVisible)
-        ])
+    func registerUserScript(_ userScript: NewTabPageUserScript) {
+        userScripts.add(userScript)
     }
 
-    var configuration: NewTabPageConfiguration {
+    private func notifyWidgetConfigsDidChange() {
+        userScripts.allObjects.forEach { userScript in
+            userScript.notifyWidgetConfigsDidChange(widgetConfigs: [
+                .init(id: "favorites", isVisible: appearancePreferences.isFavoriteVisible),
+                .init(id: "privacyStats", isVisible: appearancePreferences.isRecentActivityVisible)
+            ])
+        }
+    }
+
+    var configuration: NewTabPageUserScript.NewTabPageConfiguration {
 #if DEBUG || REVIEW
         let env = "development"
 #else
@@ -193,7 +165,7 @@ final class NewTabPageActionsManager: NewTabPageActionsManaging {
             guard let id = param["id"], let visibility = param["visibility"] else {
                 continue
             }
-            let isVisible = NewTabPageConfiguration.WidgetConfig.WidgetVisibility(rawValue: visibility)?.isVisible == true
+            let isVisible = NewTabPageUserScript.NewTabPageConfiguration.WidgetConfig.WidgetVisibility(rawValue: visibility)?.isVisible == true
             switch id {
             case "favorites":
                 appearancePreferences.isFavoriteVisible = isVisible

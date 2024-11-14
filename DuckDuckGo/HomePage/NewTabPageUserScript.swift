@@ -26,7 +26,7 @@ final class NewTabPageUserScript: NSObject, Subfeature {
     var messageOriginPolicy: MessageOriginPolicy = .only(rules: [.exact(hostname: "newtab")])
     let featureName: String = "newTabPage"
     weak var broker: UserScriptMessageBroker?
-    var webViews: NSHashTable<WKWebView> = .weakObjects()
+    weak var webView: WKWebView?
 
     // MARK: - MessageNames
     enum MessageNames: String, CaseIterable {
@@ -44,7 +44,7 @@ final class NewTabPageUserScript: NSObject, Subfeature {
     init(actionsManager: NewTabPageActionsManaging) {
         self.actionsManager = actionsManager
         super.init()
-        actionsManager.userScript = self
+        actionsManager.registerUserScript(self)
     }
 
     public func with(broker: UserScriptMessageBroker) {
@@ -70,9 +70,10 @@ final class NewTabPageUserScript: NSObject, Subfeature {
     }
 
     func notifyWidgetConfigsDidChange(widgetConfigs: [NewTabPageConfiguration.WidgetConfig]) {
-        for webView in webViews.allObjects {
-            broker?.push(method: "widgets_onConfigUpdated", params: widgetConfigs, for: self, into: webView)
+        guard let webView else {
+            return
         }
+        broker?.push(method: "widgets_onConfigUpdated", params: widgetConfigs, for: self, into: webView)
     }
 }
 
@@ -124,6 +125,41 @@ extension NewTabPageUserScript {
 }
 
 extension NewTabPageUserScript {
+
+    struct NewTabPageConfiguration: Encodable {
+        var widgets: [Widget]
+        var widgetConfigs: [WidgetConfig]
+        var env: String
+        var locale: String
+        var platform: Platform
+
+        struct Widget: Encodable {
+            var id: String
+        }
+
+        struct WidgetConfig: Encodable {
+
+            enum WidgetVisibility: String, Encodable {
+                case visible, hidden
+
+                var isVisible: Bool {
+                    self == .visible
+                }
+            }
+
+            init(id: String, isVisible: Bool) {
+                self.id = id
+                self.visibility = isVisible ? .visible : .hidden
+            }
+
+            var id: String
+            var visibility: WidgetVisibility
+        }
+
+        struct Platform: Encodable {
+            var name: String
+        }
+    }
 
     struct WidgetConfig: Encodable {
         let animation: Animation?

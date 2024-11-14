@@ -42,12 +42,9 @@ final class BrowserTabViewController: NSViewController {
     private lazy var hoverLabel = NSTextField(string: URL.duckDuckGo.absoluteString)
     private lazy var hoverLabelContainer = ColorView(frame: .zero, backgroundColor: .browserTabBackground, borderWidth: 0)
 
-    private let newTabPageUserScript: NewTabPageUserScript
-    private(set) lazy var newTabPageWebView: WebView = {
-        let webView = NewTabPageWebView(featureFlagger: featureFlagger)
-        newTabPageUserScript.webViews.add(webView)
-        return webView
-    }()
+    private let newTabPageActionsManager: NewTabPageActionsManaging
+    private lazy var newTabPageUserScript: NewTabPageUserScript = NewTabPageUserScript(actionsManager: newTabPageActionsManager)
+    private lazy var newTabPageWebView: WebView = NewTabPageWebView(featureFlagger: featureFlagger, newTabPageUserScript: newTabPageUserScript)
     private(set) weak var webView: WebView?
     private weak var webViewContainer: NSView?
     private weak var webViewSnapshot: NSView?
@@ -91,14 +88,14 @@ final class BrowserTabViewController: NSViewController {
          onboardingDialogTypeProvider: ContextualOnboardingDialogTypeProviding & ContextualOnboardingStateUpdater = Application.appDelegate.onboardingStateMachine,
          onboardingDialogFactory: ContextualDaxDialogsFactory = DefaultContextualDaxDialogViewFactory(),
          featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger,
-         newTabPageUserScript: NewTabPageUserScript = NSApp.delegateTyped.newTabPageUserScript
+         newTabPageActionsManager: NewTabPageActionsManaging = NSApp.delegateTyped.newTabPageActionsManager
     ) {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.bookmarkManager = bookmarkManager
         self.onboardingDialogTypeProvider = onboardingDialogTypeProvider
         self.onboardingDialogFactory = onboardingDialogFactory
         self.featureFlagger = featureFlagger
-        self.newTabPageUserScript = newTabPageUserScript
+        self.newTabPageActionsManager = newTabPageActionsManager
         containerStackView = NSStackView()
 
         super.init(nibName: nil, bundle: nil)

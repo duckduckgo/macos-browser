@@ -28,11 +28,6 @@ extension SpecialPagesUserScript {
         self.registerSubfeature(delegate: onboardingScript)
     }
 
-    @MainActor
-    func withNewTabPage() {
-        self.registerSubfeature(delegate: NSApp.delegateTyped.newTabPageUserScript)
-    }
-
     func withDuckPlayerIfAvailable() {
         var youtubePlayerUserScript: YoutubePlayerUserScript?
         if DuckPlayer.shared.isAvailable {

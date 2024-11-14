@@ -93,7 +93,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var privacyDashboardWindow: NSWindow?
 
     let newTabPageActionsManager: NewTabPageActionsManaging
-    let newTabPageUserScript: NewTabPageUserScript
     let activeRemoteMessageModel: ActiveRemoteMessageModel
     let homePageSettingsModel = HomePage.Models.SettingsModel()
     let remoteMessagingClient: RemoteMessagingClient!
@@ -312,7 +311,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                                                                                   freemiumDBPFeature: freemiumDBPFeature)
 
         newTabPageActionsManager = NewTabPageActionsManager(appearancePreferences: .shared)
-        newTabPageUserScript = NewTabPageUserScript(actionsManager: newTabPageActionsManager)
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {

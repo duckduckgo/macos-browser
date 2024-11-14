@@ -26,8 +26,8 @@ final class NewTabPageUserContentController: WKUserContentController {
     let newTabPageUserScriptProvider: NewTabPageUserScriptProvider
 
     @MainActor
-    override init() {
-        newTabPageUserScriptProvider = NewTabPageUserScriptProvider()
+    init(newTabPageUserScript: NewTabPageUserScript) {
+        newTabPageUserScriptProvider = NewTabPageUserScriptProvider(newTabPageUserScript: newTabPageUserScript)
 
         super.init()
 
@@ -54,9 +54,9 @@ final class NewTabPageUserScriptProvider: UserScriptsProvider {
 
     let specialPagesUserScript: SpecialPagesUserScript
 
-    init() {
+    init(newTabPageUserScript: NewTabPageUserScript) {
         specialPagesUserScript = SpecialPagesUserScript()
-        specialPagesUserScript.withNewTabPage()
+        specialPagesUserScript.registerSubfeature(delegate: newTabPageUserScript)
     }
 
     @MainActor
@@ -80,7 +80,7 @@ final class NewTabPageUserScriptProvider: UserScriptsProvider {
 extension WKWebViewConfiguration {
 
     @MainActor
-    func applyNewTabPageWebViewConfiguration(with featureFlagger: FeatureFlagger) {
+    func applyNewTabPageWebViewConfiguration(with featureFlagger: FeatureFlagger, newTabPageUserScript: NewTabPageUserScript) {
         if urlSchemeHandler(forURLScheme: URL.NavigationalScheme.duck.rawValue) == nil {
             setURLSchemeHandler(
                 DuckURLSchemeHandler(featureFlagger: featureFlagger),
@@ -88,6 +88,6 @@ extension WKWebViewConfiguration {
             )
         }
         preferences[.developerExtrasEnabled] = true
-        self.userContentController = NewTabPageUserContentController()
+        self.userContentController = NewTabPageUserContentController(newTabPageUserScript: newTabPageUserScript)
      }
 }
