@@ -182,7 +182,7 @@ extension DuckPlayerTabExtension: NewWindowPolicyDecisionMaker {
 }
 
 extension DuckPlayerTabExtension: NavigationResponder {
-
+    // swiftlint:disable:next cyclomatic_complexity
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         // only proceed when Private Player is enabled
@@ -215,7 +215,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
                 duckPlayerOverlayUsagePixels.handleNavigationAndFirePixels(url: url, duckPlayerMode: duckPlayer.mode)
             }
         }
-        
+
         // Fire DuckPlayer temporary pixels on navigating outside Youtube
         if let url = navigationAction.request.url, !url.isYoutube {
             duckPlayerOverlayUsagePixels.handleNavigationAndFirePixels(url: url, duckPlayerMode: duckPlayer.mode)
@@ -401,8 +401,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
     @MainActor
     func navigationDidFinish(_ navigation: Navigation) {
         setUpYoutubeScriptsIfNeeded(for: navigation.url)
-        
-        
+
     }
 
 }
