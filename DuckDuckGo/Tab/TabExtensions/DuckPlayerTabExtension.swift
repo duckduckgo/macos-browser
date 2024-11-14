@@ -128,6 +128,30 @@ final class DuckPlayerTabExtension {
         }
     }
 
+    private func fireOverlayShownPixelIfNeeded(url: URL) {
+
+        guard duckPlayer.isAvailable,
+              duckPlayer.mode == .alwaysAsk,
+              url.isYoutubeWatch else {
+            return
+        }
+
+        // Static variable for debounce logic
+        let debounceInterval: TimeInterval = 1.0
+        let now = Date()
+
+        struct Debounce {
+            static var lastFireTime: Date?
+        }
+
+        // Check debounce condition and update timestamp if firing
+        guard Debounce.lastFireTime == nil || now.timeIntervalSince(Debounce.lastFireTime!) >= debounceInterval else {
+            return
+        }
+
+        Debounce.lastFireTime = now
+        PixelKit.fire(GeneralPixel.duckPlayerOverlayYoutubeImpressions)
+    }
 }
 
 extension DuckPlayerTabExtension: YoutubeOverlayUserScriptDelegate {
@@ -189,6 +213,11 @@ extension DuckPlayerTabExtension: NavigationResponder {
 
         guard duckPlayer.isAvailable, duckPlayer.mode != .disabled else {
             return decidePolicyWithDisabledDuckPlayer(for: navigationAction)
+        }
+
+        // Fires the Overlay Shown Pixel if not coming from DuckPlayer's Watch in Youtube
+        if !navigationAction.sourceFrame.url.isDuckPlayer {
+            fireOverlayShownPixelIfNeeded(url: navigationAction.url)
         }
 
         // session restoration will try to load real www.youtube-nocookie.com url
@@ -287,6 +316,9 @@ extension DuckPlayerTabExtension: NavigationResponder {
             webView.goBack()
             webView.load(URLRequest(url: .duckPlayer(videoID, timestamp: timestamp)))
         }
+
+        // Fire Overlay Shown Pixels
+        fireOverlayShownPixelIfNeeded(url: navigation.url)
 
         // Fire DuckPlayer Overlay Temporary Pixels
         if let url = navigation.request.url {
