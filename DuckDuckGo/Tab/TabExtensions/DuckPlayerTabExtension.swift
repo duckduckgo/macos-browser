@@ -214,9 +214,11 @@ extension DuckPlayerTabExtension: NavigationResponder {
         guard duckPlayer.isAvailable, duckPlayer.mode != .disabled else {
             return decidePolicyWithDisabledDuckPlayer(for: navigationAction)
         }
-        
-        // Fires the Overlay Shown Pixel
-        fireOverlayShownPixelIfNeeded(url: navigationAction.url)
+ 
+        // Fires the Overlay Shown Pixel if not coming from DuckPlayer's Watch in Youtube
+        if !navigationAction.sourceFrame.url.isDuckPlayer {
+            fireOverlayShownPixelIfNeeded(url: navigationAction.url)
+        }
 
         // session restoration will try to load real www.youtube-nocookie.com url
         // we need to redirect it to custom duck:// scheme handler which will load
