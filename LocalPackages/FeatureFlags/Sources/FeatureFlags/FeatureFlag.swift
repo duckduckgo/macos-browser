@@ -19,7 +19,7 @@
 import Foundation
 import BrowserServicesKit
 
-public enum FeatureFlag: String {
+public enum FeatureFlag: String, CaseIterable {
     case debugMenu
     case sslCertificatesBypass
     case phishingDetectionErrorPage
@@ -44,9 +44,21 @@ public enum FeatureFlag: String {
 
     /// https://app.asana.com/0/72649045549333/1208617860225199/f
     case networkProtectionEnforceRoutes
+
+    /// https://app.asana.com/0/72649045549333/1208241266421040/f
+    case htmlNewTabPage
 }
 
-extension FeatureFlag: FeatureFlagSourceProviding {
+extension FeatureFlag: FeatureFlagDescribing {
+    public var supportsLocalOverriding: Bool {
+        switch self {
+        case .htmlNewTabPage:
+            return true
+        default:
+            return false
+        }
+    }
+
     public var source: FeatureFlagSource {
         switch self {
         case .debugMenu:
@@ -71,12 +83,15 @@ extension FeatureFlag: FeatureFlagSourceProviding {
             return .remoteDevelopment(.subfeature(NetworkProtectionSubfeature.userTips))
         case .networkProtectionEnforceRoutes:
             return .remoteDevelopment(.subfeature(NetworkProtectionSubfeature.enforceRoutes))
+        case .htmlNewTabPage:
+            return .disabled
         }
     }
 }
 
-extension FeatureFlagger {
-    public func isFeatureOn(_ featureFlag: FeatureFlag) -> Bool {
-        isFeatureOn(forProvider: featureFlag)
+public extension FeatureFlagger {
+
+    func isFeatureOn(_ featureFlag: FeatureFlag) -> Bool {
+        isFeatureOn(for: featureFlag)
     }
 }

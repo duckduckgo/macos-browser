@@ -25,6 +25,7 @@ import Configuration
 import CoreData
 import Crashes
 import DDGSync
+import FeatureFlags
 import History
 import MetricKit
 import Networking
@@ -264,7 +265,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         featureFlagger = DefaultFeatureFlagger(
             internalUserDecider: internalUserDecider,
-            privacyConfigManager: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
+            privacyConfigManager: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
+            localOverrides: FeatureFlagLocalOverrides(
+                keyValueStore: UserDefaults.appConfiguration,
+                actionHandler: FeatureFlagOverridesPublishingHandler<FeatureFlag>()
+            ),
+            for: FeatureFlag.self
         )
 
         onboardingStateMachine = ContextualOnboardingStateMachine()
