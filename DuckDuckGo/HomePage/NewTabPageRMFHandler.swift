@@ -52,21 +52,71 @@ final class NewTabPageRMFHandler: NewTabPageScriptClient {
 
     enum MessageNames: String, CaseIterable {
         case rmfGetData = "rmf_getData"
+        case rmfOnDataUpdate = "rmf_onDataUpdate"
+        case rmfDismiss = "rmf_dismiss"
+        case rmfPrimaryAction = "rmf_primaryAction"
+        case rmfSecondaryAction = "rmf_secondaryAction"
     }
 
     func registerMessageHandlers(for userScript: any SubfeatureWithExternalMessageHandling) {
         userScript.registerMessageHandlers([
-            MessageNames.rmfGetData.rawValue: { [weak self] in try await self?.rmfGetData(params: $0, original: $1) }
+            MessageNames.rmfGetData.rawValue: { [weak self] in try await self?.getData(params: $0, original: $1) },
+            MessageNames.rmfOnDataUpdate.rawValue: { [weak self] in try await self?.getData(params: $0, original: $1) },
+            MessageNames.rmfDismiss.rawValue: { [weak self] in try await self?.dismiss(params: $0, original: $1) },
+            MessageNames.rmfPrimaryAction.rawValue: { [weak self] in try await self?.primaryAction(params: $0, original: $1) },
+            MessageNames.rmfSecondaryAction.rawValue: { [weak self] in try await self?.secondaryAction(params: $0, original: $1) }
         ])
     }
 
     @MainActor
-    private func rmfGetData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+    private func getData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let remoteMessage = activeRemoteMessageModel.remoteMessage else {
             return NewTabPageUserScript.RMFData(content: nil)
         }
 
         return NewTabPageUserScript.RMFData(content: .init(remoteMessage))
+    }
+
+    private func dismiss(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        guard let paramsDict = params as? [String: Any], let id = paramsDict["id"] as? String else {
+            return nil
+        }
+        assert(id == activeRemoteMessageModel.remoteMessage?.id)
+        await activeRemoteMessageModel.dismissRemoteMessage(with: .close)
+        return nil
+    }
+
+    private func primaryAction(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        guard let paramsDict = params as? [String: Any], let id = paramsDict["id"] as? String else {
+            return nil
+        }
+        assert(id == activeRemoteMessageModel.remoteMessage?.id)
+        switch activeRemoteMessageModel.remoteMessage?.content {
+        case let .bigSingleAction(_, _, _, _, primaryAction):
+            print(primaryAction)
+            await activeRemoteMessageModel.dismissRemoteMessage(with: .action)
+        case let .bigTwoAction(_, _, _, _, primaryAction, _, _):
+            print(primaryAction)
+            await activeRemoteMessageModel.dismissRemoteMessage(with: .primaryAction)
+        default:
+            break
+        }
+        return nil
+    }
+
+    private func secondaryAction(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        guard let paramsDict = params as? [String: Any], let id = paramsDict["id"] as? String else {
+            return nil
+        }
+        assert(id == activeRemoteMessageModel.remoteMessage?.id)
+        switch activeRemoteMessageModel.remoteMessage?.content {
+        case let .bigTwoAction(_, _, _, _, _, secondaryAction, _):
+            print(secondaryAction)
+        default:
+            break
+        }
+        await activeRemoteMessageModel.dismissRemoteMessage(with: .secondaryAction)
+        return nil
     }
 
     private func notifyRemoteMessageDidChange(_ remoteMessage: RemoteMessageModel?) {
@@ -78,7 +128,7 @@ final class NewTabPageRMFHandler: NewTabPageScriptClient {
         }()
 
         userScriptsSource?.userScripts.forEach { userScript in
-            pushMessage(named: MessageNames.rmfGetData.rawValue, params: data, for: userScript)
+            pushMessage(named: MessageNames.rmfOnDataUpdate.rawValue, params: data, for: userScript)
         }
     }
 }
@@ -96,10 +146,10 @@ extension NewTabPageUserScript.RMFMessage {
         case let .medium(titleText, descriptionText, placeholder):
             self = .medium(.init(id: remoteMessageModel.id, titleText: titleText, descriptionText: descriptionText, icon: .init(placeholder)))
 
-        case let .bigSingleAction(titleText, descriptionText, placeholder, primaryActionText, primaryAction):
+        case let .bigSingleAction(titleText, descriptionText, placeholder, primaryActionText, _):
             self = .bigSingleAction(.init(id: remoteMessageModel.id, titleText: titleText, descriptionText: descriptionText, icon: .init(placeholder), primaryActionText: primaryActionText))
 
-        case let .bigTwoAction(titleText, descriptionText, placeholder, primaryActionText, primaryAction, secondaryActionText, secondaryAction):
+        case let .bigTwoAction(titleText, descriptionText, placeholder, primaryActionText, _, secondaryActionText, _):
             self = .bigTwoAction(.init(id: remoteMessageModel.id, titleText: titleText, descriptionText: descriptionText, icon: .init(placeholder), primaryActionText: primaryActionText, secondaryActionText: secondaryActionText))
 
         default:
@@ -174,7 +224,11 @@ extension NewTabPageUserScript {
     }
 
     enum RMFIcon: String, Encodable {
-        case announce, ddgAnnounce, criticalUpdate, appUpdate, privacyPro
+        case announce = "Announce"
+        case ddgAnnounce = "DDGAnnounce"
+        case criticalUpdate = "CriticalUpdate"
+        case appUpdate = "AppUpdate"
+        case privacyPro = "PrivacyPro"
 
         init(_ placeholder: RemotePlaceholder) {
             switch placeholder {
