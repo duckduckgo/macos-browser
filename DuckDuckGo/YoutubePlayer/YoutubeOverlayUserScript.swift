@@ -161,8 +161,11 @@ extension YoutubeOverlayUserScript {
         case "play.do_not_use":
             duckPlayerPreferences.youtubeOverlayAnyButtonPressed = true
             PixelKit.fire(GeneralPixel.duckPlayerOverlayYoutubeWatchHere)
-        case "overlay":
-            PixelKit.fire(GeneralPixel.duckPlayerOverlayYoutubeImpressions)
+
+        // Moved to DuckPlayerTabExtension
+        // See :https://app.asana.com/0/1203249713006009/1208754606104659/f
+            // case "overlay":
+            // PixelKit.fire(GeneralPixel.duckPlayerOverlayYoutubeImpressions)
         default:
             break
         }

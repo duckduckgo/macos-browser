@@ -555,6 +555,7 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
                    validateDrop info: NSDraggingInfo,
                    proposedRow row: Int,
                    proposedDropOperation dropOperation: NSTableView.DropOperation) -> NSDragOperation {
+        if !sortBookmarksViewModel.selectedSortMode.isReorderingEnabled { return .none }
         let destination = destination(for: dropOperation, at: row)
 
         guard !isSearching || destination is BookmarkFolder else { return .none }

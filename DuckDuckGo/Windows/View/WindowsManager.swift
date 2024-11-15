@@ -76,7 +76,6 @@ final class WindowsManager {
 
         if let droppingPoint {
             mainWindowController.window?.setFrameOrigin(droppingPoint: droppingPoint)
-
         } else if let sourceWindow = self.findPositioningSourceWindow(for: tabCollectionViewModel?.tabs.first) {
             mainWindowController.window?.setFrameOrigin(cascadedFrom: sourceWindow)
         }

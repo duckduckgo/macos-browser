@@ -136,6 +136,14 @@ enum GeneralPixel: PixelKitEventV2 {
     case duckPlayerContingencySettingsDisplayed
     case duckPlayerContingencyLearnMoreClicked
 
+    // Temporary Overlay Pixels
+    case duckPlayerYouTubeOverlayNavigationBack
+    case duckPlayerYouTubeOverlayNavigationRefresh
+    case duckPlayerYouTubeNavigationWithinYouTube
+    case duckPlayerYouTubeOverlayNavigationOutsideYoutube
+    case duckPlayerYouTubeOverlayNavigationClosed
+    case duckPlayerYouTubeNavigationIdle30
+
     // Dashboard
     case dashboardProtectionAllowlistAdd(triggerOrigin: String?)
     case dashboardProtectionAllowlistRemove(triggerOrigin: String?)
@@ -414,6 +422,8 @@ enum GeneralPixel: PixelKitEventV2 {
     case syncLoginExistingAccountError(error: Error)
     case syncCannotCreateRecoveryPDF
     case syncSecureStorageReadError(error: Error)
+    case syncSecureStorageDecodingError(error: Error)
+    case syncAccountRemoved(reason: String)
 
     case bookmarksCleanupFailed
     case bookmarksCleanupAttemptedWhileSyncWasEnabled
@@ -657,6 +667,21 @@ enum GeneralPixel: PixelKitEventV2 {
             return "duckplayer_mac_contingency_settings-displayed"
         case .duckPlayerContingencyLearnMoreClicked:
             return "duckplayer_mac_contingency_learn-more-clicked"
+
+        // Duck Player Temporary Overlay Pixels
+        case .duckPlayerYouTubeOverlayNavigationBack:
+            return "duckplayer_youtube_overlay_navigation_back"
+        case .duckPlayerYouTubeOverlayNavigationRefresh:
+            return "duckplayer_youtube_overlay_navigation_refresh"
+        case .duckPlayerYouTubeNavigationWithinYouTube:
+            return "duckplayer_youtube_overlay_navigation_within-youtube"
+        case .duckPlayerYouTubeOverlayNavigationOutsideYoutube:
+            return "duckplayer_youtube_overlay_navigation_outside-youtube"
+        case .duckPlayerYouTubeOverlayNavigationClosed:
+            return "duckplayer_youtube_overlay_navigation_closed"
+        case .duckPlayerYouTubeNavigationIdle30:
+            return "duckplayer_youtube_overlay_idle-30"
+
         case .dashboardProtectionAllowlistAdd:
             return "mp_wla"
         case .dashboardProtectionAllowlistRemove:
@@ -1058,6 +1083,8 @@ enum GeneralPixel: PixelKitEventV2 {
         case .syncLoginExistingAccountError: return "sync_login_existing_account_error"
         case .syncCannotCreateRecoveryPDF: return "sync_cannot_create_recovery_pdf"
         case .syncSecureStorageReadError: return "sync_secure_storage_read_error"
+        case .syncSecureStorageDecodingError: return "sync_secure_storage_decoding_error"
+        case .syncAccountRemoved(let reason): return "sync_account_removed_reason_\(reason)"
 
         case .bookmarksCleanupFailed: return "bookmarks_cleanup_failed"
         case .bookmarksCleanupAttemptedWhileSyncWasEnabled: return "bookmarks_cleanup_attempted_while_sync_was_enabled"
@@ -1097,6 +1124,7 @@ enum GeneralPixel: PixelKitEventV2 {
         case .pageRefreshThreeTimesWithin20Seconds: return "m_mac_reload-three-times-within-20-seconds"
         case .siteNotWorkingShown: return "m_mac_site-not-working_shown"
         case .siteNotWorkingWebsiteIsBroken: return "m_mac_site-not-working_website-is-broken"
+
         }
     }
 
@@ -1119,6 +1147,7 @@ enum GeneralPixel: PixelKitEventV2 {
                 .syncDeleteAccountError(let error),
                 .syncLoginExistingAccountError(let error),
                 .syncSecureStorageReadError(let error),
+                .syncSecureStorageDecodingError(let error),
                 .bookmarksCouldNotLoadDatabase(let error?):
             return error
         default: return nil

@@ -235,8 +235,7 @@ extension AutoconsentUserScript {
         }
         let remoteConfig = self.config.settings(for: .autoconsent)
         let disabledCMPs = remoteConfig["disabledCMPs"] as? [String] ?? []
-        let isFilterListExperimentEnabled = config.isSubfeatureEnabled(AutoconsentSubfeature.filterlistExperiment2)
-        let enableFilterList = isFilterListExperimentEnabled && AutoconsentFilterlistExperiment.cohort == AutoconsentFilterlistExperiment.test
+        let enableFilterList = config.isSubfeatureEnabled(AutoconsentSubfeature.filterlist)
 
         replyHandler([
             "type": "initResp",

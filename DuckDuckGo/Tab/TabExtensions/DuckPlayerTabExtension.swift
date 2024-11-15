@@ -55,17 +55,20 @@ final class DuckPlayerTabExtension {
     private weak var youtubePlayerScript: YoutubePlayerUserScript?
     private let onboardingDecider: DuckPlayerOnboardingDecider
     private var shouldSelectNextNewTab: Bool?
+    private var duckPlayerOverlayUsagePixels: DuckPlayerOverlayPixelFiring
 
     init(duckPlayer: DuckPlayer,
          isBurner: Bool,
          scriptsPublisher: some Publisher<some YoutubeScriptsProvider, Never>,
          webViewPublisher: some Publisher<WKWebView, Never>,
          preferences: DuckPlayerPreferences = .shared,
-         onboardingDecider: DuckPlayerOnboardingDecider) {
+         onboardingDecider: DuckPlayerOnboardingDecider,
+         duckPlayerOverlayPixels: DuckPlayerOverlayPixelFiring = DuckPlayerOverlayUsagePixels()) {
         self.duckPlayer = duckPlayer
         self.isBurner = isBurner
         self.preferences = preferences
         self.onboardingDecider = onboardingDecider
+        self.duckPlayerOverlayUsagePixels = duckPlayerOverlayPixels
         webViewPublisher.sink { [weak self] webView in
             self?.webView = webView
         }.store(in: &cancellables)
@@ -125,6 +128,30 @@ final class DuckPlayerTabExtension {
         }
     }
 
+    private func fireOverlayShownPixelIfNeeded(url: URL) {
+
+        guard duckPlayer.isAvailable,
+              duckPlayer.mode == .alwaysAsk,
+              url.isYoutubeWatch else {
+            return
+        }
+
+        // Static variable for debounce logic
+        let debounceInterval: TimeInterval = 1.0
+        let now = Date()
+
+        struct Debounce {
+            static var lastFireTime: Date?
+        }
+
+        // Check debounce condition and update timestamp if firing
+        guard Debounce.lastFireTime == nil || now.timeIntervalSince(Debounce.lastFireTime!) >= debounceInterval else {
+            return
+        }
+
+        Debounce.lastFireTime = now
+        PixelKit.fire(GeneralPixel.duckPlayerOverlayYoutubeImpressions)
+    }
 }
 
 extension DuckPlayerTabExtension: YoutubeOverlayUserScriptDelegate {
@@ -179,13 +206,18 @@ extension DuckPlayerTabExtension: NewWindowPolicyDecisionMaker {
 }
 
 extension DuckPlayerTabExtension: NavigationResponder {
-
+    // swiftlint:disable cyclomatic_complexity
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         // only proceed when Private Player is enabled
 
         guard duckPlayer.isAvailable, duckPlayer.mode != .disabled else {
             return decidePolicyWithDisabledDuckPlayer(for: navigationAction)
+        }
+
+        // Fires the Overlay Shown Pixel if not coming from DuckPlayer's Watch in Youtube
+        if !navigationAction.sourceFrame.url.isDuckPlayer {
+            fireOverlayShownPixelIfNeeded(url: navigationAction.url)
         }
 
         // session restoration will try to load real www.youtube-nocookie.com url
@@ -204,6 +236,18 @@ extension DuckPlayerTabExtension: NavigationResponder {
                 navigator.goBack()?.overrideResponders { _, _ in .cancel }
                 navigator.load(URLRequest(url: .duckPlayer(videoID, timestamp: timestamp)))
             }
+        }
+
+        // Fire DuckPlayer Temporary Pixels on Reload
+        if case .reload = navigationAction.navigationType {
+            if let url = navigationAction.request.url {
+                duckPlayerOverlayUsagePixels.handleNavigationAndFirePixels(url: url, duckPlayerMode: duckPlayer.mode)
+            }
+        }
+
+        // Fire DuckPlayer temporary pixels on navigating outside Youtube
+        if let url = navigationAction.request.url, !url.isYoutube {
+            duckPlayerOverlayUsagePixels.handleNavigationAndFirePixels(url: url, duckPlayerMode: duckPlayer.mode)
         }
 
         // when in Private Player, don't directly reload current URL when it‘s a Private Player target URL
@@ -243,6 +287,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
         // Navigating to a Youtube URL
         return handleYoutubeNavigation(for: navigationAction)
     }
+    // swiftlint:enable cyclomatic_complexity
 
     @MainActor
     private func handleYoutubeNavigation(for navigationAction: NavigationAction) -> NavigationActionPolicy? {
@@ -270,6 +315,14 @@ extension DuckPlayerTabExtension: NavigationResponder {
 
             webView.goBack()
             webView.load(URLRequest(url: .duckPlayer(videoID, timestamp: timestamp)))
+        }
+
+        // Fire Overlay Shown Pixels
+        fireOverlayShownPixelIfNeeded(url: navigation.url)
+
+        // Fire DuckPlayer Overlay Temporary Pixels
+        if let url = navigation.request.url {
+            duckPlayerOverlayUsagePixels.handleNavigationAndFirePixels(url: url, duckPlayerMode: duckPlayer.mode)
         }
     }
 

@@ -40,6 +40,11 @@ on:
         description: "Branch name"
         required: false
         type: string
+      skip-notify:
+        description: "Skip Mattermost notification"
+        required: false
+        default: false
+        type: boolean
     secrets:
       APPLE_API_KEY_BASE64:
         required: true
@@ -71,7 +76,7 @@ jobs:
 
     name: Export Notarized App
 
-    runs-on: macos-14-xlarge
+    runs-on: macos-15-xlarge
 
     outputs:
       app-version: ${{ steps.set-outputs.outputs.app-version }}
@@ -230,7 +235,7 @@ jobs:
     needs: export-notarized-app
     if: ${{ github.event.inputs.create-dmg == true || inputs.create-dmg == true }}
 
-    runs-on: macos-14
+    runs-on: macos-15
 
     env:
       app-version: ${{ needs.export-notarized-app.outputs.app-version }}
@@ -360,7 +365,7 @@ jobs:
     name: Send Mattermost message
 
     needs: [export-notarized-app, create-dmg]
-    if: always()
+    if: ${{ always() && inputs.skip-notify == false }}
 
     runs-on: ubuntu-latest
 

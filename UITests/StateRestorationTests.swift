@@ -18,7 +18,7 @@
 
 import XCTest
 
-class StateRestorationTests: XCTestCase {
+class StateRestorationTests: UITestCase {
     private var app: XCUIApplication!
     private var firstPageTitle: String!
     private var secondPageTitle: String!
@@ -31,6 +31,7 @@ class StateRestorationTests: XCTestCase {
     private var reopenAllWindowsFromLastSessionPreference: XCUIElement!
 
     override class func setUp() {
+        super.setUp()
         UITests.firstRun()
     }
 
@@ -57,7 +58,7 @@ class StateRestorationTests: XCTestCase {
     }
 
     func test_tabStateAtRelaunch_shouldContainTwoSitesVisitedInPreviousSession_whenReopenAllWindowsFromLastSessionIsSet() {
-        app.typeKey(",", modifierFlags: [.command]) // Open settings
+        addressBarTextField.typeURL(URL(string: "duck://settings")!) // Open settings
         settingsGeneralButton.click(forDuration: 0.5, thenDragTo: settingsGeneralButton)
         reopenAllWindowsFromLastSessionPreference.clickAfterExistenceTestSucceeds()
         app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Close windows
@@ -93,7 +94,7 @@ class StateRestorationTests: XCTestCase {
     }
 
     func test_tabStateAtRelaunch_shouldContainNoSitesVisitedInPreviousSession_whenReopenAllWindowsFromLastSessionIsUnset() {
-        app.typeKey(",", modifierFlags: [.command]) // Open settings
+        addressBarTextField.typeURL(URL(string: "duck://settings")!) // Open settings
         settingsGeneralButton.click(forDuration: 0.5, thenDragTo: settingsGeneralButton)
         openANewWindowPreference.clickAfterExistenceTestSucceeds()
         app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Close windows

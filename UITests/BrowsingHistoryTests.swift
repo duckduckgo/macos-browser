@@ -18,7 +18,7 @@
 
 import XCTest
 
-class BrowsingHistoryTests: XCTestCase {
+class BrowsingHistoryTests: UITestCase {
     private var app: XCUIApplication!
     private var historyMenuBarItem: XCUIElement!
     private var clearAllHistoryMenuItem: XCUIElement!
@@ -28,6 +28,7 @@ class BrowsingHistoryTests: XCTestCase {
     private let lengthForRandomPageTitle = 8
 
     override class func setUp() {
+        super.setUp()
         UITests.firstRun()
     }
 
