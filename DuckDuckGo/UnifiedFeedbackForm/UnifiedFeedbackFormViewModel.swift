@@ -121,7 +121,11 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
         }
     }
 
-    @Published var userEmail = ""
+    @Published var userEmail = "" {
+        didSet {
+            updateSubmitButtonStatus()
+        }
+    }
 
     private var selectedSubcategoryPrompt: String {
         switch UnifiedFeedbackCategory(rawValue: selectedCategory) {
@@ -286,7 +290,7 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
     }
 
     private func updateSubmitButtonStatus() {
-        self.submitButtonEnabled = viewState.canSubmit && !feedbackFormText.isEmpty
+        self.submitButtonEnabled = viewState.canSubmit && !feedbackFormText.isEmpty && (userEmail.isEmpty || userEmail.isValidEmail)
     }
 
     private func updateSubmitShowStatus() {
@@ -300,5 +304,12 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
                 return selectedCategory != UnifiedFeedbackCategory.prompt.rawValue && selectedSubcategory != selectedSubcategoryPrompt
             }
         }()
+    }
+}
+
+private extension String {
+    var isValidEmail: Bool {
+        guard let regex = try? NSRegularExpression(pattern: #"[^\s]+@[^\s]+\.[^\s]+"#) else { return false }
+        return matches(regex)
     }
 }
