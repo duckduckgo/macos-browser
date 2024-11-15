@@ -29,7 +29,7 @@ import XCTest
 /// the best way, in the event that a future macOS version stops supporting this approach, but also solves the bug with `addUIInterruptionMonitor`,
 /// and you want to branch the implementations per macOS version:
 /// https://stackoverflow.com/questions/56559269/adduiinterruptionmonitor-is-not-getting-called-on-macos
-class PermissionsTests: XCTestCase {
+class PermissionsTests: UITestCase {
     private var app: XCUIApplication!
     private var notificationCenter: XCUIApplication!
     private var addressBarTextField: XCUIElement!
@@ -38,7 +38,9 @@ class PermissionsTests: XCTestCase {
     private var clearAllHistoryMenuItem: XCUIElement!
     private var clearAllHistoryAlertClearButton: XCUIElement!
     private var fakeFireButton: XCUIElement!
+
     override class func setUp() {
+        super.setUp()
         UITests.firstRun()
     }
 

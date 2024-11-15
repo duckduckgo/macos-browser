@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>com.apple.developer.networking.networkextension</key>
+	<array>
+		<string>packet-tunnel-provider</string>
+		<string>app-proxy-provider</string>
+	</array>
+	<key>com.apple.security.app-sandbox</key>
+	<true/>
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>$(IPC_APP_GROUP)</string>
+		<string>$(DBP_APP_GROUP)</string>
+		<string>$(NETP_APP_GROUP)</string>
+		<string>$(SUBSCRIPTION_APP_GROUP)</string>
+		<string>$(APP_CONFIGURATION_APP_GROUP)</string>
+	</array>
+	<key>com.apple.security.device.audio-input</key>
+	<true/>
+	<key>com.apple.security.device.camera</key>
+	<true/>
+	<key>com.apple.security.files.downloads.read-write</key>
+	<true/>
+	<key>com.apple.security.files.user-selected.read-write</key>
+	<true/>
+	<key>com.apple.security.network.client</key>
+	<true/>
+	<key>com.apple.security.personal-information.location</key>
+	<true/>
+	<key>com.apple.security.print</key>
+	<true/>
+	<key>com.apple.security.temporary-exception.files.home-relative-path.read-only</key>
+	<array>
+		<string>/Library/Application Support/Google/Chrome/</string>
+		<string>/Library/Application Support/BraveSoftware/Brave-Browser/</string>
+		<string>/Library/Application Support/Firefox/</string>
+		<string>/Library/Application Support/Microsoft Edge/</string>
+		<string>/Library/Application Support/Vivaldi/</string>
+		<string>/Library/Application Support/com.operasoftware.Opera/</string>
+		<string>/Library/Application Support/com.operasoftware.OperaGX/</string>
+		<string>/Library/Application Support/Yandex/YandexBrowser/</string>
+		<string>/Library/Application Support/Chromium/</string>
+		<string>/Library/Application Support/Coccoc/</string>
+		<string>/Library/Application Support/TorBrowser-Data/Browser/</string>
+		<string>/Library/Application Support/Arc/User Data/</string>
+	</array>
+	<key>com.apple.security.temporary-exception.mach-lookup.global-name</key>
+	<array>
+		<string>$(DBP_BACKGROUND_AGENT_BUNDLE_ID)</string>
+		<string>$(AGENT_BUNDLE_ID)</string>
+	</array>
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(DBP_APP_GROUP)</string>
+		<string>$(AppIdentifierPrefix)com.duckduckgo.mobile.ios</string>
+		<string>$(NETP_APP_GROUP)</string>
+		<string>$(SUBSCRIPTION_APP_GROUP)</string>
+	</array>
+</dict>
+</plist>
