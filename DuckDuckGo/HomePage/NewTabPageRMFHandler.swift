@@ -20,7 +20,8 @@ import Combine
 import RemoteMessaging
 import UserScript
 
-protocol NewTabPageScriptClient {
+protocol NewTabPageScriptClient: AnyObject {
+    var userScriptsSource: NewTabPageUserScriptsSource? { get set }
     func registerMessageHandlers(for userScript: SubfeatureWithExternalMessageHandling)
 }
 
@@ -38,10 +39,12 @@ final class NewTabPageRMFHandler: NewTabPageScriptClient {
     let activeRemoteMessageModel: ActiveRemoteMessageModel
     weak var userScriptsSource: NewTabPageUserScriptsSource?
 
+    private let openURLHandler: (URL) -> Void
     private var cancellables = Set<AnyCancellable>()
 
-    init(activeRemoteMessageModel: ActiveRemoteMessageModel) {
+    init(activeRemoteMessageModel: ActiveRemoteMessageModel, openURLHandler: @escaping (URL) -> Void) {
         self.activeRemoteMessageModel = activeRemoteMessageModel
+        self.openURLHandler = openURLHandler
 
         activeRemoteMessageModel.$remoteMessage.dropFirst()
             .sink { [weak self] remoteMessage in
@@ -93,10 +96,10 @@ final class NewTabPageRMFHandler: NewTabPageScriptClient {
         assert(id == activeRemoteMessageModel.remoteMessage?.id)
         switch activeRemoteMessageModel.remoteMessage?.content {
         case let .bigSingleAction(_, _, _, _, primaryAction):
-            print(primaryAction)
+            handleAction(remoteAction: primaryAction)
             await activeRemoteMessageModel.dismissRemoteMessage(with: .action)
         case let .bigTwoAction(_, _, _, _, primaryAction, _, _):
-            print(primaryAction)
+            handleAction(remoteAction: primaryAction)
             await activeRemoteMessageModel.dismissRemoteMessage(with: .primaryAction)
         default:
             break
@@ -110,13 +113,26 @@ final class NewTabPageRMFHandler: NewTabPageScriptClient {
         }
         assert(id == activeRemoteMessageModel.remoteMessage?.id)
         switch activeRemoteMessageModel.remoteMessage?.content {
-        case let .bigTwoAction(_, _, _, _, _, secondaryAction, _):
-            print(secondaryAction)
+        case let .bigTwoAction(_, _, _, _, _, _, secondaryAction):
+            handleAction(remoteAction: secondaryAction)
         default:
             break
         }
         await activeRemoteMessageModel.dismissRemoteMessage(with: .secondaryAction)
         return nil
+    }
+
+    private func handleAction(remoteAction: RemoteAction) {
+        switch remoteAction {
+        case .url(let value), .share(let value, _), .survey(let value):
+            if let url = URL.makeURL(from: value) {
+                openURLHandler(url)
+            }
+        case .appStore:
+            openURLHandler(.appStore)
+        default:
+            break
+        }
     }
 
     private func notifyRemoteMessageDidChange(_ remoteMessage: RemoteMessageModel?) {

@@ -47,7 +47,7 @@ protocol NewTabPageUserScriptsSource: AnyObject {
 final class NewTabPageActionsManager: NewTabPageActionsManaging, NewTabPageUserScriptsSource {
 
     private let appearancePreferences: AppearancePreferences
-    private let rmfHandler: NewTabPageRMFHandler
+    private let newTabPageScriptClients: [NewTabPageScriptClient]
 
     private var cancellables = Set<AnyCancellable>()
     private var userScriptsHandles = NSHashTable<NewTabPageUserScript>.weakObjects()
@@ -56,10 +56,17 @@ final class NewTabPageActionsManager: NewTabPageActionsManaging, NewTabPageUserS
         userScriptsHandles.allObjects
     }
 
-    init(appearancePreferences: AppearancePreferences, activeRemoteMessageModel: ActiveRemoteMessageModel) {
+    init(
+        appearancePreferences: AppearancePreferences,
+        activeRemoteMessageModel: ActiveRemoteMessageModel,
+        openURLHandler: @escaping (URL) -> Void
+    ) {
         self.appearancePreferences = appearancePreferences
-        self.rmfHandler = NewTabPageRMFHandler(activeRemoteMessageModel: activeRemoteMessageModel)
-        rmfHandler.userScriptsSource = self
+
+        newTabPageScriptClients = [
+            NewTabPageRMFHandler(activeRemoteMessageModel: activeRemoteMessageModel, openURLHandler: openURLHandler)
+        ]
+        newTabPageScriptClients.forEach { $0.userScriptsSource = self }
 
         appearancePreferences.$isFavoriteVisible.dropFirst().removeDuplicates().asVoid()
             .receive(on: DispatchQueue.main)
@@ -78,7 +85,7 @@ final class NewTabPageActionsManager: NewTabPageActionsManaging, NewTabPageUserS
 
     func registerUserScript(_ userScript: NewTabPageUserScript) {
         userScriptsHandles.add(userScript)
-        rmfHandler.registerMessageHandlers(for: userScript)
+        newTabPageScriptClients.forEach { $0.registerMessageHandlers(for: userScript) }
     }
 
     private func notifyWidgetConfigsDidChange() {

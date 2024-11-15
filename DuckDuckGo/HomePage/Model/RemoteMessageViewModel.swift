@@ -88,8 +88,7 @@ struct RemoteMessageViewModel {
             }
         case .appStore:
             return { @MainActor in
-                let url = URL(string: "https://apps.apple.com/app/duckduckgo-privacy-browser/id663592361")!
-                openURLHandler(url)
+                openURLHandler(.appStore)
                 await onDidClose(buttonAction)
             }
         case .dismiss:
