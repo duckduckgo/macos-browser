@@ -17,6 +17,7 @@
 //
 
 import BrowserServicesKit
+import Combine
 import WebKit
 
 final class NewTabPageWebView: WebView {
@@ -29,11 +30,17 @@ final class NewTabPageWebView: WebView {
         newTabPageUserScript.webView = self
         navigationDelegate = self
         load(URLRequest(url: URL.newtab))
+
+        windowCancellable = publisher(for: \.window)
+            .map { $0 != nil }
+            .assign(to: \.isViewOnScreen, on: NSApp.delegateTyped.activeRemoteMessageModel)
     }
 
     @MainActor required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+
+    private var windowCancellable: AnyCancellable?
 }
 
 extension NewTabPageWebView: WKNavigationDelegate {
