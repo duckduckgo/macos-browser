@@ -35,16 +35,26 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runner: [macos-13-xlarge, macos-14-xlarge]
+        runner: [macos-13-xlarge, macos-14-xlarge, macos-15-xlarge]
         include:
           - xcode-version: "15.2"
             runner: macos-13-xlarge
           - xcode-version: "15.4"
             runner: macos-14-xlarge
+          - xcode-version: "16.1"
+            runner: macos-15-xlarge
 
     timeout-minutes: 60
 
     steps:
+    - name: Install screenresolution
+      if: matrix.runner == 'macos-15-xlarge'
+      run: brew install screenresolution
+
+    - name: Change screen resolution
+      if: matrix.runner == 'macos-15-xlarge'
+      run: screenresolution set 1920x1080x32@60
+
     - name: Register SSH key for certificates repository access
       uses: webfactory/ssh-agent@v0.7.0
       with:
