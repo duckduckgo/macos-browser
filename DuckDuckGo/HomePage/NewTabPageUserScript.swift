@@ -20,7 +20,12 @@ import Foundation
 import UserScript
 import WebKit
 
-final class NewTabPageUserScript: NSObject, Subfeature {
+protocol SubfeatureWithExternalMessageHandling: AnyObject, Subfeature {
+    var webView: WKWebView? { get }
+    func registerMessageHandlers(_ handlers: [String: Subfeature.Handler])
+}
+
+final class NewTabPageUserScript: NSObject, SubfeatureWithExternalMessageHandling {
 
     let actionsManager: NewTabPageActionsManaging
     var messageOriginPolicy: MessageOriginPolicy = .only(rules: [.exact(hostname: "newtab")])
@@ -29,18 +34,8 @@ final class NewTabPageUserScript: NSObject, Subfeature {
     weak var webView: WKWebView?
 
     // MARK: - MessageNames
-    enum MessageNames: String, CaseIterable {
-        case contextMenu
-        case favoritesGetConfig = "favorites_getConfig"
-        case favoritesGetData = "favorites_getData"
-        case initialSetup
-        case reportInitException
-        case reportPageException
-        case rmfGetData = "rmf_getData"
-        case statsGetConfig = "stats_getConfig"
-        case statsGetData = "stats_getData"
-        case widgetsSetConfig = "widgets_setConfig"
-    }
+
+    typealias MessageName = String
 
     init(actionsManager: NewTabPageActionsManaging) {
         self.actionsManager = actionsManager
@@ -52,23 +47,27 @@ final class NewTabPageUserScript: NSObject, Subfeature {
         self.broker = broker
     }
 
-    private lazy var methodHandlers: [MessageNames: Handler] = [
-        .contextMenu: { [weak self] in try await self?.showContextMenu(params: $0, original: $1) },
-        .favoritesGetConfig: { [weak self] in try await self?.favoritesGetConfig(params: $0, original: $1) },
-        .favoritesGetData: { [weak self] in try await self?.favoritesGetData(params: $0, original: $1) },
-        .initialSetup: { [weak self] in try await self?.initialSetup(params: $0, original: $1) },
-        .reportInitException: { [weak self] in try await self?.reportException(params: $0, original: $1) },
-        .reportPageException: { [weak self] in try await self?.reportException(params: $0, original: $1) },
-        .rmfGetData: { [weak self] in try await self?.rmfGetData(params: $0, original: $1) },
-        .statsGetConfig: { [weak self] in try await self?.statsGetConfig(params: $0, original: $1) },
-        .statsGetData: { [weak self] in try await self?.statsGetData(params: $0, original: $1) },
-        .widgetsSetConfig: { [weak self] in try await self?.widgetsSetConfig(params: $0, original: $1) }
+    private lazy var methodHandlers: [MessageName: Handler] = [
+        "contextMenu": { [weak self] in try await self?.showContextMenu(params: $0, original: $1) },
+        "favorites_getConfig": { [weak self] in try await self?.favoritesGetConfig(params: $0, original: $1) },
+        "favorites_getData": { [weak self] in try await self?.favoritesGetData(params: $0, original: $1) },
+        "initialSetup": { [weak self] in try await self?.initialSetup(params: $0, original: $1) },
+        "reportInitException": { [weak self] in try await self?.reportException(params: $0, original: $1) },
+        "reportPageException": { [weak self] in try await self?.reportException(params: $0, original: $1) },
+        "stats_getConfig": { [weak self] in try await self?.statsGetConfig(params: $0, original: $1) },
+        "stats_getData": { [weak self] in try await self?.statsGetData(params: $0, original: $1) },
+        "widgets_setConfig": { [weak self] in try await self?.widgetsSetConfig(params: $0, original: $1) }
     ]
 
+    func registerMessageHandlers(_ handlers: [MessageName: Subfeature.Handler]) {
+        for (messageName, handler) in handlers {
+            methodHandlers[messageName] = handler
+        }
+    }
+
     @MainActor
-    func handler(forMethodNamed methodName: String) -> Handler? {
-        guard let messageName = MessageNames(rawValue: methodName) else { return nil }
-        return methodHandlers[messageName]
+    func handler(forMethodNamed methodName: MessageName) -> Handler? {
+        methodHandlers[methodName]
     }
 
     func notifyWidgetConfigsDidChange(widgetConfigs: [NewTabPageConfiguration.WidgetConfig]) {
@@ -84,6 +83,13 @@ final class NewTabPageUserScript: NSObject, Subfeature {
         }
 
         broker?.push(method: "rmf_onDataUpdate", params: remoteMessageData, for: self, into: webView)
+    }
+
+    func pushMessage(named method: String, params: Encodable?, using script: NewTabPageUserScript) {
+        guard let webView = script.webView else {
+            return
+        }
+        script.broker?.push(method: method, params: params, for: script, into: webView)
     }
 }
 
@@ -125,12 +131,6 @@ extension NewTabPageUserScript {
         guard let params = params as? [String: Any] else { return nil }
         actionsManager.showContextMenu(with: params)
         return nil
-    }
-
-    @MainActor
-    private func rmfGetData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        let data = NewTabPageUserScript.RMFData(content: actionsManager.getRemoteMessage())
-        return data
     }
 
     private func reportException(params: Any, original: WKScriptMessage) async throws -> Encodable? {

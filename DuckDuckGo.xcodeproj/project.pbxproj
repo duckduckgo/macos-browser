@@ -1099,6 +1099,8 @@
 		37219B3E2CC27DB700C9D7A8 /* NewTabPageSearchBoxExperimentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37219B3C2CC27DB300C9D7A8 /* NewTabPageSearchBoxExperimentTests.swift */; };
 		372217802B3337FE00B8E9C2 /* TestUtils in Frameworks */ = {isa = PBXBuildFile; productRef = 3722177F2B3337FE00B8E9C2 /* TestUtils */; };
 		372217822B33380700B8E9C2 /* TestUtils in Frameworks */ = {isa = PBXBuildFile; productRef = 372217812B33380700B8E9C2 /* TestUtils */; };
+		3723A94F2CE7400D00A0C59A /* NewTabPageRMFHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3723A94E2CE73FDD00A0C59A /* NewTabPageRMFHandler.swift */; };
+		3723A9502CE7400D00A0C59A /* NewTabPageRMFHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3723A94E2CE73FDD00A0C59A /* NewTabPageRMFHandler.swift */; };
 		37269EFB2B332F9E005E8E46 /* Common in Frameworks */ = {isa = PBXBuildFile; productRef = 37269EFA2B332F9E005E8E46 /* Common */; };
 		37269EFD2B332FAC005E8E46 /* Common in Frameworks */ = {isa = PBXBuildFile; productRef = 37269EFC2B332FAC005E8E46 /* Common */; };
 		37269EFF2B332FBB005E8E46 /* Common in Frameworks */ = {isa = PBXBuildFile; productRef = 37269EFE2B332FBB005E8E46 /* Common */; };
@@ -3596,6 +3598,7 @@
 		37219B362CBFBC8200C9D7A8 /* NewTabSearchBoxExperimentPixel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabSearchBoxExperimentPixel.swift; sourceTree = "<group>"; };
 		37219B392CBFD4F300C9D7A8 /* NewTabPageSearchBoxExperiment+Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NewTabPageSearchBoxExperiment+Logger.swift"; sourceTree = "<group>"; };
 		37219B3C2CC27DB300C9D7A8 /* NewTabPageSearchBoxExperimentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageSearchBoxExperimentTests.swift; sourceTree = "<group>"; };
+		3723A94E2CE73FDD00A0C59A /* NewTabPageRMFHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageRMFHandler.swift; sourceTree = "<group>"; };
 		372A0FEB2B2379310033BF7F /* SyncMetricsEventsHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncMetricsEventsHandler.swift; sourceTree = "<group>"; };
 		372BC2A02A4AFA47001D8FD5 /* SyncCredentialsAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncCredentialsAdapter.swift; sourceTree = "<group>"; };
 		372ED7C12CDD4815002287EC /* NewTabPageUserContentController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageUserContentController.swift; sourceTree = "<group>"; };
@@ -8764,6 +8767,7 @@
 		AAE71DB225F66A0900D74437 /* HomePage */ = {
 			isa = PBXGroup;
 			children = (
+				3723A94E2CE73FDD00A0C59A /* NewTabPageRMFHandler.swift */,
 				37FB43102CDB883700479A1E /* NewTabPageActionsManager.swift */,
 				372ED7C12CDD4815002287EC /* NewTabPageUserContentController.swift */,
 				37FB430D2CDB84A200479A1E /* NewTabPageUserScript.swift */,
@@ -11453,6 +11457,7 @@
 				37E2608D2C8A1F6D006EE07F /* UserColorProviding.swift in Sources */,
 				BDBA85A02C5D25B700BC54F5 /* VPNMetadataCollector.swift in Sources */,
 				3706FB60293F65D500E42796 /* PasswordManagementIdentityItemView.swift in Sources */,
+				3723A94F2CE7400D00A0C59A /* NewTabPageRMFHandler.swift in Sources */,
 				3706FB61293F65D500E42796 /* ProgressExtension.swift in Sources */,
 				3706FB62293F65D500E42796 /* CSVParser.swift in Sources */,
 				31C26A0E2CBE9DFE00FFF462 /* AIChatPreferences.swift in Sources */,
@@ -13056,6 +13061,7 @@
 				1DDF076328F815AD00EDFBE3 /* BWCommunicator.swift in Sources */,
 				9FEE98652B846870002E44E8 /* AddEditBookmarkView.swift in Sources */,
 				85589E9127BFB9810038AD11 /* HomePageRecentlyVisitedModel.swift in Sources */,
+				3723A9502CE7400D00A0C59A /* NewTabPageRMFHandler.swift in Sources */,
 				85012B0229133F9F003D0DCC /* NavigationBarPopovers.swift in Sources */,
 				B626A7602992407D00053070 /* CancellableExtension.swift in Sources */,
 				37D23785287F4E6500BCE03B /* PinnedTabsHostingView.swift in Sources */,

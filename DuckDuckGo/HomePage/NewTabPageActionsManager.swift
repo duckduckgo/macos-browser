@@ -38,20 +38,28 @@ protocol NewTabPageActionsManaging: AnyObject {
     func reportException(with params: [String: String])
     func showContextMenu(with params: [String: Any])
     func updateWidgetConfigs(with params: [[String: String]])
-    func getRemoteMessage() -> NewTabPageUserScript.RMFMessage?
 }
 
-final class NewTabPageActionsManager: NewTabPageActionsManaging {
+protocol NewTabPageUserScriptsSource: AnyObject {
+    var userScripts: [SubfeatureWithExternalMessageHandling] { get }
+}
+
+final class NewTabPageActionsManager: NewTabPageActionsManaging, NewTabPageUserScriptsSource {
 
     private let appearancePreferences: AppearancePreferences
-    private let activeRemoteMessageModel: ActiveRemoteMessageModel
+    private let rmfHandler: NewTabPageRMFHandler
 
     private var cancellables = Set<AnyCancellable>()
-    private var userScripts = NSHashTable<NewTabPageUserScript>.weakObjects()
+    private var userScriptsHandles = NSHashTable<NewTabPageUserScript>.weakObjects()
+
+    var userScripts: [any SubfeatureWithExternalMessageHandling] {
+        userScriptsHandles.allObjects
+    }
 
     init(appearancePreferences: AppearancePreferences, activeRemoteMessageModel: ActiveRemoteMessageModel) {
         self.appearancePreferences = appearancePreferences
-        self.activeRemoteMessageModel = activeRemoteMessageModel
+        self.rmfHandler = NewTabPageRMFHandler(activeRemoteMessageModel: activeRemoteMessageModel)
+        rmfHandler.userScriptsSource = self
 
         appearancePreferences.$isFavoriteVisible.dropFirst().removeDuplicates().asVoid()
             .receive(on: DispatchQueue.main)
@@ -66,32 +74,19 @@ final class NewTabPageActionsManager: NewTabPageActionsManaging {
                 self?.notifyWidgetConfigsDidChange()
             }
             .store(in: &cancellables)
-
-        activeRemoteMessageModel.$remoteMessage.dropFirst()
-            .sink { [weak self] remoteMessage in
-                self?.notifyRemoteMessageDidChange(remoteMessage)
-            }
-            .store(in: &cancellables)
     }
 
     func registerUserScript(_ userScript: NewTabPageUserScript) {
-        userScripts.add(userScript)
+        userScriptsHandles.add(userScript)
+        rmfHandler.registerMessageHandlers(for: userScript)
     }
 
     private func notifyWidgetConfigsDidChange() {
-        userScripts.allObjects.forEach { userScript in
+        userScriptsHandles.allObjects.forEach { userScript in
             userScript.notifyWidgetConfigsDidChange(widgetConfigs: [
                 .init(id: "favorites", isVisible: appearancePreferences.isFavoriteVisible),
                 .init(id: "privacyStats", isVisible: appearancePreferences.isRecentActivityVisible)
             ])
-        }
-    }
-
-    private func notifyRemoteMessageDidChange(_ remoteMessage: RemoteMessageModel?) {
-        let data = NewTabPageUserScript.RMFData(content: .small(.init(descriptionText: "Hello, this is a description", id: "hejka", titleText: "Hello I'm a title")))
-
-        userScripts.allObjects.forEach { userScript in
-            userScript.notifyRemoteMessageDidChange(data)
         }
     }
 
@@ -194,10 +189,6 @@ final class NewTabPageActionsManager: NewTabPageActionsManaging {
                 break
             }
         }
-    }
-
-    func getRemoteMessage() -> NewTabPageUserScript.RMFMessage? {
-        .small(.init(descriptionText: "Hello, this is a description", id: "hejka", titleText: "Hello I'm a title"))
     }
 
     func reportException(with params: [String: String]) {
