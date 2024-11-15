@@ -25,3 +25,4 @@
 #import "_WKWebExtensionTabCreationOptions.h"
 #import "_WKWebExtensionWindow.h"
 #import "_WKWebExtensionWindowCreationOptions.h"
+#import "WKWebViewConfigurationPrivate.h"

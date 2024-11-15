@@ -59,6 +59,10 @@ final class MainWindowController: NSWindowController {
         subscribeToTrafficLightsAlpha()
         subscribeToBurningData()
         subscribeToResolutionChange()
+
+        if #available(macOS 14.4, *) {
+            WebExtensionManager.shared.didOpenWindow(self)
+        }
     }
 
     required init?(coder: NSCoder) {
@@ -67,6 +71,10 @@ final class MainWindowController: NSWindowController {
 
     deinit {
         NotificationCenter.default.removeObserver(self)
+
+        if #available(macOS 14.4, *) {
+            WebExtensionManager.shared.didCloseWindow(self)
+        }
     }
 
     private var shouldShowOnboarding: Bool {
@@ -217,6 +225,10 @@ extension MainWindowController: NSWindowDelegate {
 
         if (notification.object as? NSWindow)?.isPopUpWindow == false {
             WindowControllersManager.shared.lastKeyMainWindowController = self
+        }
+
+        if #available(macOS 14.4, *) {
+            WebExtensionManager.shared.didFocusWindow(self)
         }
     }
 

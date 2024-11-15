@@ -1,0 +1,180 @@
+//
+//  WKWebExtensionTab.swift
+//
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+
+@available(macOS 14.4, *)
+extension Tab: @preconcurrency _WKWebExtensionTab {
+
+    func window(for context: _WKWebExtensionContext) -> (any _WKWebExtensionWindow)? {
+        return webView.window?.windowController as? MainWindowController
+    }
+
+    @MainActor
+    func indexInWindow(for context: _WKWebExtensionContext) -> UInt {
+        let mainWindowController = webView.window?.windowController as? MainWindowController
+        let mainViewController = mainWindowController?.mainViewController
+        let tabCollectionViewModel = mainViewController?.tabCollectionViewModel
+        let tabCollection = tabCollectionViewModel?.tabCollection
+        return UInt(tabCollection?.tabs.firstIndex(of: self) ?? 0)
+    }
+
+    func parentTab(for context: _WKWebExtensionContext) -> (any _WKWebExtensionTab)? {
+        return parentTab
+    }
+
+    func setParent(_ parentTab: (any _WKWebExtensionTab)?, for context: _WKWebExtensionContext) async throws {
+        assertionFailure("not supported yet")
+    }
+
+    func mainWebView(for context: _WKWebExtensionContext) -> WKWebView? {
+        return webView
+    }
+
+    func tabTitle(for context: _WKWebExtensionContext) -> String? {
+        return title
+    }
+
+    func isPinned(for context: _WKWebExtensionContext) -> Bool {
+        return isPinned
+    }
+
+    func pin(for context: _WKWebExtensionContext) async throws {
+        assertionFailure("not supported yet")
+    }
+
+    func unpin(for context: _WKWebExtensionContext) async throws {
+        assertionFailure("not supported yet")
+    }
+
+    func isReaderModeAvailable(for context: _WKWebExtensionContext) -> Bool {
+        return false
+    }
+
+    func isShowingReaderMode(for context: _WKWebExtensionContext) -> Bool {
+        return false
+    }
+
+    func toggleReaderMode(for context: _WKWebExtensionContext) async throws {
+        assertionFailure("not supported yet")
+    }
+
+    func isAudible(for context: _WKWebExtensionContext) -> Bool {
+        return false
+    }
+
+    func isMuted(for context: _WKWebExtensionContext) -> Bool {
+        return false
+    }
+
+    func mute(for context: _WKWebExtensionContext) async throws {
+        assertionFailure("not supported yet")
+    }
+
+    func unmute(for context: _WKWebExtensionContext) async throws {
+        assertionFailure("not supported yet")
+    }
+
+    func size(for context: _WKWebExtensionContext) -> CGSize {
+        webView.frame.size
+    }
+
+    func zoomFactor(for context: _WKWebExtensionContext) -> Double {
+        return webView.pageZoom
+    }
+
+    func setZoomFactor(_ zoomFactor: Double, for context: _WKWebExtensionContext) async throws {
+        assertionFailure("not supported yet")
+    }
+
+    func url(for context: _WKWebExtensionContext) -> URL? {
+        return content.urlForWebView
+    }
+
+    func pendingURL(for context: _WKWebExtensionContext) -> URL? {
+        return isLoading ? content.urlForWebView : nil
+    }
+
+    func isLoadingComplete(for context: _WKWebExtensionContext) -> Bool {
+        return !isLoading
+    }
+
+    func detectWebpageLocale(for context: _WKWebExtensionContext) async throws -> Locale? {
+        return Locale.current
+    }
+
+    func captureVisibleWebpage(for context: _WKWebExtensionContext) async throws -> NSImage? {
+        assertionFailure("not supported yet")
+        return nil
+    }
+
+    func load(_ url: URL, for context: _WKWebExtensionContext) async throws {
+        setContent(.url(url, credential: nil, source: .ui))
+    }
+
+    func reload(for context: _WKWebExtensionContext) async throws {
+        await reload()
+    }
+
+    func reloadFromOrigin(for context: _WKWebExtensionContext) async throws {
+        await reload()
+    }
+
+    func goBack(for context: _WKWebExtensionContext) async throws {
+        await goBack()
+    }
+
+    func goForward(for context: _WKWebExtensionContext) async throws {
+        await goForward()
+    }
+
+    func activate(for context: _WKWebExtensionContext) async throws {
+        assertionFailure("not supported yet")
+    }
+
+    @MainActor
+    func isSelected(for context: _WKWebExtensionContext) -> Bool {
+        let mainWindowController = webView.window?.windowController as? MainWindowController
+        let mainViewController = mainWindowController?.mainViewController
+        let tabCollectionViewModel = mainViewController?.tabCollectionViewModel
+        return tabCollectionViewModel?.selectedTab == self
+    }
+
+    func select(for context: _WKWebExtensionContext) async throws {
+        let mainWindowController = await webView.window?.windowController as? MainWindowController
+        let mainViewController = await mainWindowController?.mainViewController
+        let tabCollectionViewModel = mainViewController?.tabCollectionViewModel
+        await tabCollectionViewModel?.select(tab: self)
+    }
+
+    func deselect(for context: _WKWebExtensionContext) async throws {
+        assertionFailure("not supported yet")
+    }
+
+    func duplicate(for context: _WKWebExtensionContext, with options: _WKWebExtensionTabCreationOptions) async throws -> (any _WKWebExtensionTab)? {
+        assertionFailure("not supported yet")
+        return nil
+    }
+
+    func close(for context: _WKWebExtensionContext) async throws {
+        assertionFailure("not supported yet")
+    }
+
+    func shouldGrantTabPermissionsOnUserGesture(for context: _WKWebExtensionContext) -> Bool {
+        return true
+    }
+
+}
