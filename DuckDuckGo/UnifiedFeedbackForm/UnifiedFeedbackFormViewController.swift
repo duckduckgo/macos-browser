@@ -21,6 +21,8 @@ import AppKit
 import SwiftUI
 import Combine
 import PixelKit
+import Subscription
+import Networking
 
 final class UnifiedFeedbackFormViewController: NSViewController {
     // Using a dynamic height in the form was causing layout problems and couldn't be completed in time for the release that needed this form.
@@ -29,9 +31,9 @@ final class UnifiedFeedbackFormViewController: NSViewController {
     enum Constants {
         static let landingPageHeight = 260.0
         static let feedbackFormCompactHeight = 430.0
-        static let feedbackFormHeight = 650.0
+        static let feedbackFormHeight = 740.0
         static let feedbackSentHeight = 350.0
-        static let feedbackErrorHeight = 560.0
+        static let feedbackErrorHeight = 760.0
     }
 
     private let defaultSize = CGSize(width: 480, height: Constants.landingPageHeight)
@@ -46,6 +48,8 @@ final class UnifiedFeedbackFormViewController: NSViewController {
          source: UnifiedFeedbackSource = .default) {
         self.feedbackSender = feedbackSender
         self.viewModel = UnifiedFeedbackFormViewModel(
+            accountManager: DefaultSubscriptionManager().accountManager,
+            apiService: DefaultAPIService(),
             vpnMetadataCollector: DefaultVPNMetadataCollector(accountManager: Application.appDelegate.subscriptionManager.accountManager),
             feedbackSender: feedbackSender,
             source: source

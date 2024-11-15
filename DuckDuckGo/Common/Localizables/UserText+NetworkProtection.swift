@@ -145,6 +145,11 @@ extension UserText {
     // "ppro.feedback-form.disclaimer" - Text for the disclaimer of the PPro feedback form
     static let pproFeedbackFormDisclaimer = "Reports are anonymous and sent to DuckDuckGo to help improve our service"
 
+    // "ppro.feedback-form.email.label" - Label for the email field of the PPro feedback form
+    static let pproFeedbackFormEmailLabel = "Provide an email if you’d like us to contact you about this issue (we may not be able to respond to all issues):"
+    // "ppro.feedback-form.email.placeholder" - Placeholder for the email field of the PPro feedback form
+    static let pproFeedbackFormEmailPlaceholder = "Email (optional)"
+
     // "ppro.feedback-form.sending-confirmation.title" - Title for the feedback sent view title of the feedback form
     static let pproFeedbackFormSendingConfirmationTitle = "Thank you!"
     // "ppro.feedback-form.sending-confirmation.description" - Title for the feedback sent view description of the feedback form

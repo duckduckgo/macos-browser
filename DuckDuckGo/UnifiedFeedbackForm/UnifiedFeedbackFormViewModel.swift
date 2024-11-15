@@ -20,12 +20,17 @@ import Foundation
 import Combine
 import SwiftUI
 import PixelKit
+import Networking
+import Subscription
 
 protocol UnifiedFeedbackFormViewModelDelegate: AnyObject {
     func feedbackViewModelDismissedView(_ viewModel: UnifiedFeedbackFormViewModel)
 }
 
 final class UnifiedFeedbackFormViewModel: ObservableObject {
+    private static let feedbackEndpoint = URL(string: "https://subscriptions.duckduckgo.com/api/feedback")!
+    private static let platform = "macos"
+
     enum ViewState {
         case feedbackPending
         case feedbackSending
@@ -42,6 +47,12 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
         }
     }
 
+    enum Error: String, Swift.Error {
+        case missingAccessToken
+        case invalidRequest
+        case invalidResponse
+    }
+
     enum ViewAction {
         case cancel
         case submit
@@ -49,6 +60,26 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
         case reportShow
         case reportSubmitShow
         case reportFAQClick
+    }
+
+    struct Payload: Codable {
+        let userEmail: String
+        let feedbackSource: String
+        let platform: String
+        let problemCategory: String
+
+        let feedbackText: String
+        let problemSubCategory: String
+        let customMetadata: String
+
+        func toData() -> Data? {
+            try? JSONEncoder().encode(self)
+        }
+    }
+
+    struct Response: Decodable {
+        let message: String?
+        let error: String?
     }
 
     @Published var viewState: ViewState {
@@ -90,6 +121,8 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
         }
     }
 
+    @Published var userEmail = ""
+
     private var selectedSubcategoryPrompt: String {
         switch UnifiedFeedbackCategory(rawValue: selectedCategory) {
         case .selectFeature, nil: return ""
@@ -113,18 +146,24 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
 
     weak var delegate: UnifiedFeedbackFormViewModelDelegate?
 
+    private let accountManager: any AccountManager
+    private let apiService: any Networking.APIService
     private let vpnMetadataCollector: any UnifiedMetadataCollector
     private let defaultMetadataCollector: any UnifiedMetadataCollector
     private let feedbackSender: any UnifiedFeedbackSender
 
     let source: UnifiedFeedbackSource
 
-    init(vpnMetadataCollector: any UnifiedMetadataCollector,
+    init(accountManager: any AccountManager,
+         apiService: any Networking.APIService,
+         vpnMetadataCollector: any UnifiedMetadataCollector,
          defaultMetadataCollector: any UnifiedMetadataCollector = EmptyMetadataCollector(),
          feedbackSender: any UnifiedFeedbackSender = DefaultFeedbackSender(),
          source: UnifiedFeedbackSource = .default) {
         self.viewState = .feedbackPending
 
+        self.accountManager = accountManager
+        self.apiService = apiService
         self.vpnMetadataCollector = vpnMetadataCollector
         self.defaultMetadataCollector = defaultMetadataCollector
         self.feedbackSender = feedbackSender
@@ -204,6 +243,7 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
         switch UnifiedFeedbackCategory(rawValue: selectedCategory) {
         case .vpn:
             let metadata = await vpnMetadataCollector.collectMetadata()
+            try await submitIssue(metadata: metadata)
             try await feedbackSender.sendReportIssuePixel(source: source,
                                                           category: selectedCategory,
                                                           subcategory: selectedSubcategory,
@@ -211,11 +251,37 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
                                                           metadata: metadata as? VPNMetadata)
         default:
             let metadata = await defaultMetadataCollector.collectMetadata()
+            try await submitIssue(metadata: metadata)
             try await feedbackSender.sendReportIssuePixel(source: source,
                                                           category: selectedCategory,
                                                           subcategory: selectedSubcategory,
                                                           description: feedbackFormText,
                                                           metadata: metadata as? EmptyFeedbackMetadata)
+        }
+    }
+
+    private func submitIssue(metadata: UnifiedFeedbackMetadata?) async throws {
+        guard !userEmail.isEmpty else { return }
+
+        guard let accessToken = accountManager.accessToken else {
+            throw Error.missingAccessToken
+        }
+
+        let payload = Payload(userEmail: userEmail,
+                              feedbackSource: source.rawValue,
+                              platform: Self.platform,
+                              problemCategory: selectedCategory,
+                              feedbackText: feedbackFormText,
+                              problemSubCategory: selectedSubcategory,
+                              customMetadata: metadata?.toString() ?? "")
+        let headers = APIRequestV2.HeadersV2(additionalHeaders: [HTTPHeaderKey.authorization: "Bearer \(accessToken)"])
+        guard let request = APIRequestV2(url: Self.feedbackEndpoint, method: .post, headers: headers, body: payload.toData()) else {
+            throw Error.invalidRequest
+        }
+
+        let response: Response = try await apiService.fetch(request: request).decodeBody()
+        if let error = response.error, !error.isEmpty {
+            throw Error.invalidResponse
         }
     }
 
