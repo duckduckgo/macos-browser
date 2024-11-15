@@ -767,6 +767,24 @@ extension MainViewController {
         }
     }
 
+    @objc func debugResetContinueSetup(_ sender: Any?) {
+        AppearancePreferencesUserDefaultsPersistor().continueSetUpCardsLastDemonstrated = nil
+        AppearancePreferencesUserDefaultsPersistor().continueSetUpCardsNumberOfDaysDemonstrated = 0
+        AppearancePreferences.shared.isContinueSetUpCardsViewOutdated = false
+        AppearancePreferences.shared.isContinueSetUpVisible = true
+    }
+
+    @objc func debugShiftNewTabOpeningDate(_ sender: Any?) {
+        AppearancePreferencesUserDefaultsPersistor().continueSetUpCardsLastDemonstrated = (AppearancePreferencesUserDefaultsPersistor().continueSetUpCardsLastDemonstrated ?? Date()).addingTimeInterval(-.day)
+        AppearancePreferences.shared.continueSetUpCardsViewDidAppear()
+    }
+
+    @objc func debugShiftNewTabOpeningDateNtimes(_ sender: Any?) {
+        for _ in 0..<AppearancePreferences.Constants.dismissNextStepsCardsAfterDays {
+            debugShiftNewTabOpeningDate(sender)
+        }
+    }
+
     @objc func resetDefaultBrowserPrompt(_ sender: Any?) {
         UserDefaultsWrapper.clear(.defaultBrowserDismissed)
     }
