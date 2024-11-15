@@ -310,7 +310,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         freemiumDBPPromotionViewCoordinator = FreemiumDBPPromotionViewCoordinator(freemiumDBPUserStateManager: freemiumDBPUserStateManager,
                                                                                   freemiumDBPFeature: freemiumDBPFeature)
 
-        newTabPageActionsManager = NewTabPageActionsManager(appearancePreferences: .shared)
+        newTabPageActionsManager = NewTabPageActionsManager(appearancePreferences: .shared, activeRemoteMessageModel: activeRemoteMessageModel)
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {

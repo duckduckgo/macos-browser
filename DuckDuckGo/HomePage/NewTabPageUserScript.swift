@@ -36,6 +36,7 @@ final class NewTabPageUserScript: NSObject, Subfeature {
         case initialSetup
         case reportInitException
         case reportPageException
+        case rmfGetData = "rmf_getData"
         case statsGetConfig = "stats_getConfig"
         case statsGetData = "stats_getData"
         case widgetsSetConfig = "widgets_setConfig"
@@ -58,6 +59,7 @@ final class NewTabPageUserScript: NSObject, Subfeature {
         .initialSetup: { [weak self] in try await self?.initialSetup(params: $0, original: $1) },
         .reportInitException: { [weak self] in try await self?.reportException(params: $0, original: $1) },
         .reportPageException: { [weak self] in try await self?.reportException(params: $0, original: $1) },
+        .rmfGetData: { [weak self] in try await self?.rmfGetData(params: $0, original: $1) },
         .statsGetConfig: { [weak self] in try await self?.statsGetConfig(params: $0, original: $1) },
         .statsGetData: { [weak self] in try await self?.statsGetData(params: $0, original: $1) },
         .widgetsSetConfig: { [weak self] in try await self?.widgetsSetConfig(params: $0, original: $1) }
@@ -75,16 +77,17 @@ final class NewTabPageUserScript: NSObject, Subfeature {
         }
         broker?.push(method: "widgets_onConfigUpdated", params: widgetConfigs, for: self, into: webView)
     }
+
+    func notifyRemoteMessageDidChange(_ remoteMessageData: NewTabPageUserScript.RMFData?) {
+        guard let webView else {
+            return
+        }
+
+        broker?.push(method: "rmf_onDataUpdate", params: remoteMessageData, for: self, into: webView)
+    }
 }
 
 extension NewTabPageUserScript {
-    @MainActor
-    private func showContextMenu(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let params = params as? [String: Any] else { return nil }
-        actionsManager.showContextMenu(with: params)
-        return nil
-    }
-
     @MainActor
     private func favoritesGetConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         actionsManager.getFavoritesConfig()
@@ -115,6 +118,19 @@ extension NewTabPageUserScript {
         guard let params = params as? [[String: String]] else { return nil }
         actionsManager.updateWidgetConfigs(with: params)
         return nil
+    }
+
+    @MainActor
+    private func showContextMenu(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        guard let params = params as? [String: Any] else { return nil }
+        actionsManager.showContextMenu(with: params)
+        return nil
+    }
+
+    @MainActor
+    private func rmfGetData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        let data = NewTabPageUserScript.RMFData(content: actionsManager.getRemoteMessage())
+        return data
     }
 
     private func reportException(params: Any, original: WKScriptMessage) async throws -> Encodable? {
@@ -208,5 +224,72 @@ extension NewTabPageUserScript {
     struct TrackerCompany: Encodable {
         let count: Int
         let displayName: String
+    }
+
+    struct RMFData: Encodable {
+        var content: RMFMessage?
+    }
+
+    enum RMFMessage: Encodable {
+        case small(SmallMessage), medium(MediumMessage), bigSingleAction(BigSingleActionMessage), bigTwoAction(BigTwoActionMessage)
+
+        func encode(to encoder: any Encoder) throws {
+            try message.encode(to: encoder)
+        }
+
+        var message: Encodable {
+            switch self {
+            case .small(let message):
+                return message
+            case .medium(let message):
+                return message
+            case .bigSingleAction(let message):
+                return message
+            case .bigTwoAction(let message):
+                return message
+            }
+        }
+    }
+
+    struct SmallMessage: Encodable {
+        let messageType = "small"
+
+        var descriptionText: String
+        var id: String
+        var titleText: String
+    }
+
+    struct MediumMessage: Encodable {
+        let messageType = "medium"
+
+        var descriptionText: String
+        var icon: RMFIcon
+        var id: String
+        var titleText: String
+    }
+
+    struct BigSingleActionMessage: Encodable {
+        let messageType = "big_single_action"
+
+        var descriptionText: String
+        var icon: RMFIcon
+        var id: String
+        var primaryActionText: String
+        var titleText: String
+    }
+
+    struct BigTwoActionMessage: Encodable {
+        let messageType = "big_two_action"
+
+        var descriptionText: String
+        var icon: RMFIcon
+        var id: String
+        var primaryActionText: String
+        var secondaryActionText: String
+        var titleText: String
+    }
+
+    enum RMFIcon: String, Encodable {
+        case announce, ddgAnnounce, criticalUpdate, appUpdate, privacyPro
     }
 }

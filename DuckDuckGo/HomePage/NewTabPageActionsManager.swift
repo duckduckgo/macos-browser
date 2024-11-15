@@ -19,6 +19,7 @@
 import Foundation
 import Combine
 import PixelKit
+import RemoteMessaging
 import Common
 import os.log
 
@@ -37,16 +38,20 @@ protocol NewTabPageActionsManaging: AnyObject {
     func reportException(with params: [String: String])
     func showContextMenu(with params: [String: Any])
     func updateWidgetConfigs(with params: [[String: String]])
+    func getRemoteMessage() -> NewTabPageUserScript.RMFMessage?
 }
 
 final class NewTabPageActionsManager: NewTabPageActionsManaging {
 
     private let appearancePreferences: AppearancePreferences
+    private let activeRemoteMessageModel: ActiveRemoteMessageModel
+
     private var cancellables = Set<AnyCancellable>()
     private var userScripts = NSHashTable<NewTabPageUserScript>.weakObjects()
 
-    init(appearancePreferences: AppearancePreferences) {
+    init(appearancePreferences: AppearancePreferences, activeRemoteMessageModel: ActiveRemoteMessageModel) {
         self.appearancePreferences = appearancePreferences
+        self.activeRemoteMessageModel = activeRemoteMessageModel
 
         appearancePreferences.$isFavoriteVisible.dropFirst().removeDuplicates().asVoid()
             .receive(on: DispatchQueue.main)
@@ -61,6 +66,12 @@ final class NewTabPageActionsManager: NewTabPageActionsManaging {
                 self?.notifyWidgetConfigsDidChange()
             }
             .store(in: &cancellables)
+
+        activeRemoteMessageModel.$remoteMessage.dropFirst()
+            .sink { [weak self] remoteMessage in
+                self?.notifyRemoteMessageDidChange(remoteMessage)
+            }
+            .store(in: &cancellables)
     }
 
     func registerUserScript(_ userScript: NewTabPageUserScript) {
@@ -73,6 +84,14 @@ final class NewTabPageActionsManager: NewTabPageActionsManaging {
                 .init(id: "favorites", isVisible: appearancePreferences.isFavoriteVisible),
                 .init(id: "privacyStats", isVisible: appearancePreferences.isRecentActivityVisible)
             ])
+        }
+    }
+
+    private func notifyRemoteMessageDidChange(_ remoteMessage: RemoteMessageModel?) {
+        let data = NewTabPageUserScript.RMFData(content: .small(.init(descriptionText: "Hello, this is a description", id: "hejka", titleText: "Hello I'm a title")))
+
+        userScripts.allObjects.forEach { userScript in
+            userScript.notifyRemoteMessageDidChange(data)
         }
     }
 
@@ -175,6 +194,10 @@ final class NewTabPageActionsManager: NewTabPageActionsManaging {
                 break
             }
         }
+    }
+
+    func getRemoteMessage() -> NewTabPageUserScript.RMFMessage? {
+        .small(.init(descriptionText: "Hello, this is a description", id: "hejka", titleText: "Hello I'm a title"))
     }
 
     func reportException(with params: [String: String]) {
