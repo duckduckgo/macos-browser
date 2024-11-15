@@ -18,6 +18,7 @@
 
 import AppKit
 import Combine
+import FeatureFlags
 import PreferencesViews
 import SwiftUI
 import SwiftUIExtensions

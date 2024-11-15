@@ -26,7 +26,7 @@ jobs:
 
     # This doesn't need Xcode, so could technically run on Ubuntu, but find_asana_release_task.sh
     # uses BSD-specific `date` syntax, that doesn't work with GNU `date` (available on Linux).
-    runs-on: macos-14
+    runs-on: macos-15
     timeout-minutes: 10
 
     outputs:
@@ -89,7 +89,7 @@ jobs:
 
     # needs: [ validate_input_conditions, run_tests ]
     needs: validate_input_conditions
-    runs-on: macos-14
+    runs-on: macos-15-xlarge
     timeout-minutes: 10
 
     steps:

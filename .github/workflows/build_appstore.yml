@@ -111,9 +111,17 @@ jobs:
         APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
         MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
       run: |
+        if [ "${{ env.destination }}" == "testflight_review" ]; then
+          app_bundle_name="DuckDuckGo App Store Review"
+          app_dsym_name="DuckDuckGo-AppStore-Review"
+        else
+          app_bundle_name="DuckDuckGo App Store"
+          app_dsym_name="DuckDuckGo-AppStore"
+        fi
+
         bundle exec fastlane release_${{ env.destination }}
-        dsym_path="${{ github.workspace }}/DuckDuckGo-AppStore.app.dSYM.zip"
-        mv -f "${{ github.workspace }}/DuckDuckGo App Store.app.dSYM.zip" "${dsym_path}"
+        dsym_path="${{ github.workspace }}/${app_dsym_name}.app.dSYM.zip"
+        mv -f "${{ github.workspace }}/${app_bundle_name}.app.dSYM.zip" "${dsym_path}"
         version="$(cut -d ' ' -f 3 < Configuration/Version.xcconfig)"
         build_number="$(cut -d ' ' -f 3 < Configuration/BuildNumber.xcconfig)"
         echo "dsym-path=${dsym_path}" >> $GITHUB_ENV

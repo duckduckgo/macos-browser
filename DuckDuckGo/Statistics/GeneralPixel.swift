@@ -28,6 +28,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case crashOnCrashHandlersSetUp
     case compileRulesWait(onboardingShown: OnboardingShown, waitTime: CompileRulesWaitTime, result: WaitResult)
     case launchInitial(cohort: String)
+    case launch(isDefault: Bool)
 
     case serp(cohort: String?)
     case serpInitial(cohort: String)
@@ -36,6 +37,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case dailyOsVersionCounter
 
     case dataImportFailed(source: DataImport.Source, sourceVersion: String?, error: any DataImportError)
+    case dataImportSucceeded(action: DataImportAction, source: DataImport.Source, sourceVersion: String?)
 
     case formAutofilled(kind: FormAutofillKind)
     case autofillItemSaved(kind: FormAutofillKind)
@@ -134,6 +136,14 @@ enum GeneralPixel: PixelKitEventV2 {
     case duckPlayerContingencySettingsDisplayed
     case duckPlayerContingencyLearnMoreClicked
 
+    // Temporary Overlay Pixels
+    case duckPlayerYouTubeOverlayNavigationBack
+    case duckPlayerYouTubeOverlayNavigationRefresh
+    case duckPlayerYouTubeNavigationWithinYouTube
+    case duckPlayerYouTubeOverlayNavigationOutsideYoutube
+    case duckPlayerYouTubeOverlayNavigationClosed
+    case duckPlayerYouTubeNavigationIdle30
+
     // Dashboard
     case dashboardProtectionAllowlistAdd(triggerOrigin: String?)
     case dashboardProtectionAllowlistRemove(triggerOrigin: String?)
@@ -156,6 +166,13 @@ enum GeneralPixel: PixelKitEventV2 {
     case networkProtectionGeoswitchingSetCustom
     case networkProtectionGeoswitchingNoLocations
 
+    // AI Chat
+    case aichatToolbarClicked
+    case aichatApplicationMenuAppClicked
+    case aichatApplicationMenuFileClicked
+    case aichatToolbarOnboardingPopoverShown
+    case aichatToolbarOnboardingPopoverAccept
+    case aichatNoRemoteSettingsFound(AIChatRemoteSettings.SettingsValue)
     // Sync
     case syncSignupDirect
     case syncSignupConnect
@@ -174,6 +191,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case syncBookmarksValidationErrorDaily
     case syncCredentialsValidationErrorDaily
     case syncSettingsValidationErrorDaily
+    case syncDebugWasDisabledUnexpectedly
 
     // Remote Messaging Framework
     case remoteMessageShown
@@ -204,6 +222,8 @@ enum GeneralPixel: PixelKitEventV2 {
     case defaultRequestedFromHomepageSetupView
     case defaultRequestedFromSettings
     case defaultRequestedFromOnboarding
+    case defaultRequestedFromMainMenu
+    case defaultRequestedFromMoreOptionsMenu
 
     // Adding to the Dock
     case addToDockOnboardingStepPresented
@@ -397,9 +417,13 @@ enum GeneralPixel: PixelKitEventV2 {
     case syncLogoutError(error: Error)
     case syncUpdateDeviceError(error: Error)
     case syncRemoveDeviceError(error: Error)
+    case syncRefreshDevicesError(error: Error)
     case syncDeleteAccountError(error: Error)
     case syncLoginExistingAccountError(error: Error)
     case syncCannotCreateRecoveryPDF
+    case syncSecureStorageReadError(error: Error)
+    case syncSecureStorageDecodingError(error: Error)
+    case syncAccountRemoved(reason: String)
 
     case bookmarksCleanupFailed
     case bookmarksCleanupAttemptedWhileSyncWasEnabled
@@ -429,6 +453,12 @@ enum GeneralPixel: PixelKitEventV2 {
     case errorPageShownOther
     case errorPageShownWebkitTermination
 
+    // Broken site prompt
+
+    case pageRefreshThreeTimesWithin20Seconds
+    case siteNotWorkingShown
+    case siteNotWorkingWebsiteIsBroken
+
     var name: String {
         switch self {
 
@@ -441,6 +471,9 @@ enum GeneralPixel: PixelKitEventV2 {
         case .compileRulesWait(onboardingShown: let onboardingShown, waitTime: let waitTime, result: let result):
             return "m_mac_cbr-wait_\(onboardingShown)_\(waitTime)_\(result)"
 
+        case .launch(let isDefault):
+            return isDefault ? "ml_mac_app-launch_as-default" : "ml_mac_app-launch_as-nondefault"
+
         case .serp:
             return "m_mac_navigation_search"
 
@@ -451,6 +484,9 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_favicon-import-failed_\(source)"
         case .dataImportFailed(source: let source, sourceVersion: _, error: let error):
             return "m_mac_data-import-failed_\(error.action)_\(source)"
+
+        case .dataImportSucceeded(action: let action, source: let source, sourceVersion: _):
+            return "m_mac_data-import-succeeded_\(action)_\(source)"
 
         case .formAutofilled(kind: let kind):
             return "m_mac_autofill_\(kind)"
@@ -631,6 +667,21 @@ enum GeneralPixel: PixelKitEventV2 {
             return "duckplayer_mac_contingency_settings-displayed"
         case .duckPlayerContingencyLearnMoreClicked:
             return "duckplayer_mac_contingency_learn-more-clicked"
+
+        // Duck Player Temporary Overlay Pixels
+        case .duckPlayerYouTubeOverlayNavigationBack:
+            return "duckplayer_youtube_overlay_navigation_back"
+        case .duckPlayerYouTubeOverlayNavigationRefresh:
+            return "duckplayer_youtube_overlay_navigation_refresh"
+        case .duckPlayerYouTubeNavigationWithinYouTube:
+            return "duckplayer_youtube_overlay_navigation_within-youtube"
+        case .duckPlayerYouTubeOverlayNavigationOutsideYoutube:
+            return "duckplayer_youtube_overlay_navigation_outside-youtube"
+        case .duckPlayerYouTubeOverlayNavigationClosed:
+            return "duckplayer_youtube_overlay_navigation_closed"
+        case .duckPlayerYouTubeNavigationIdle30:
+            return "duckplayer_youtube_overlay_idle-30"
+
         case .dashboardProtectionAllowlistAdd:
             return "mp_wla"
         case .dashboardProtectionAllowlistRemove:
@@ -662,6 +713,20 @@ enum GeneralPixel: PixelKitEventV2 {
         case .networkProtectionEnabledOnSearch:
             return "m_mac_netp_ev_enabled_on_search"
 
+            // AI Chat
+        case .aichatToolbarClicked:
+            return "m_mac_aichat_toolbar-clicked"
+        case .aichatApplicationMenuAppClicked:
+            return "m_mac_aichat_application-menu-app-clicked"
+        case .aichatApplicationMenuFileClicked:
+            return "m_mac_aichat_application-menu-file-clicked"
+        case .aichatToolbarOnboardingPopoverShown:
+            return "m_mac_aichat_toolbar-onboarding-popover-shown"
+        case .aichatToolbarOnboardingPopoverAccept:
+            return "m_mac_aichat_toolbar-onboarding-popover-accept"
+        case .aichatNoRemoteSettingsFound(let settings):
+            return "m_mac_aichat_no_remote_settings_found-\(settings.rawValue.lowercased())"
+
             // Sync
         case .syncSignupDirect:
             return "m_mac_sync_signup_direct"
@@ -687,6 +752,7 @@ enum GeneralPixel: PixelKitEventV2 {
         case .syncBookmarksValidationErrorDaily: return "m_mac_sync_bookmarks_validation_error_daily"
         case .syncCredentialsValidationErrorDaily: return "m_mac_sync_credentials_validation_error_daily"
         case .syncSettingsValidationErrorDaily: return "m_mac_sync_settings_validation_error_daily"
+        case .syncDebugWasDisabledUnexpectedly: return "m_mac_sync_was_disabled_unexpectedly"
 
         case .remoteMessageShown: return "m_mac_remote_message_shown"
         case .remoteMessageShownUnique: return "m_mac_remote_message_shown_unique"
@@ -730,6 +796,8 @@ enum GeneralPixel: PixelKitEventV2 {
         case .defaultRequestedFromHomepageSetupView: return "m_mac_default_requested_from_homepage_setup_view"
         case .defaultRequestedFromSettings: return "m_mac_default_requested_from_settings"
         case .defaultRequestedFromOnboarding: return "m_mac_default_requested_from_onboarding"
+        case .defaultRequestedFromMainMenu: return "m_mac_default_requested_from_main_menu"
+        case .defaultRequestedFromMoreOptionsMenu: return "m_mac_default_requested_from_more_options_menu"
 
         case .addToDockOnboardingStepPresented: return "m_mac_add_to_dock_onboarding_step_presented"
         case .userAddedToDockDuringOnboarding: return "m_mac_user_added_to_dock_during_onboarding"
@@ -1010,9 +1078,13 @@ enum GeneralPixel: PixelKitEventV2 {
         case .syncLogoutError: return "sync_logout_error"
         case .syncUpdateDeviceError: return "sync_update_device_error"
         case .syncRemoveDeviceError: return "sync_remove_device_error"
+        case .syncRefreshDevicesError: return "sync_refresh_devices_error"
         case .syncDeleteAccountError: return "sync_delete_account_error"
         case .syncLoginExistingAccountError: return "sync_login_existing_account_error"
         case .syncCannotCreateRecoveryPDF: return "sync_cannot_create_recovery_pdf"
+        case .syncSecureStorageReadError: return "sync_secure_storage_read_error"
+        case .syncSecureStorageDecodingError: return "sync_secure_storage_decoding_error"
+        case .syncAccountRemoved(let reason): return "sync_account_removed_reason_\(reason)"
 
         case .bookmarksCleanupFailed: return "bookmarks_cleanup_failed"
         case .bookmarksCleanupAttemptedWhileSyncWasEnabled: return "bookmarks_cleanup_attempted_while_sync_was_enabled"
@@ -1047,6 +1119,12 @@ enum GeneralPixel: PixelKitEventV2 {
 
         case .errorPageShownOther: return "m_mac_errorpageshown_other"
         case .errorPageShownWebkitTermination: return "m_mac_errorpageshown_webkittermination"
+
+            // Broken site prompt
+        case .pageRefreshThreeTimesWithin20Seconds: return "m_mac_reload-three-times-within-20-seconds"
+        case .siteNotWorkingShown: return "m_mac_site-not-working_shown"
+        case .siteNotWorkingWebsiteIsBroken: return "m_mac_site-not-working_website-is-broken"
+
         }
     }
 
@@ -1065,8 +1143,11 @@ enum GeneralPixel: PixelKitEventV2 {
                 .syncLogoutError(let error),
                 .syncUpdateDeviceError(let error),
                 .syncRemoveDeviceError(let error),
+                .syncRefreshDevicesError(let error),
                 .syncDeleteAccountError(let error),
                 .syncLoginExistingAccountError(let error),
+                .syncSecureStorageReadError(let error),
+                .syncSecureStorageDecodingError(let error),
                 .bookmarksCouldNotLoadDatabase(let error?):
             return error
         default: return nil
@@ -1080,6 +1161,14 @@ enum GeneralPixel: PixelKitEventV2 {
 
         case .dataImportFailed(source: _, sourceVersion: let version, error: let error):
             var params = error.pixelParameters
+
+            if let version {
+                params[PixelKit.Parameters.sourceBrowserVersion] = version
+            }
+            return params
+
+        case .dataImportSucceeded(action: _, source: _, sourceVersion: let version):
+            var params = [String: String]()
 
             if let version {
                 params[PixelKit.Parameters.sourceBrowserVersion] = version

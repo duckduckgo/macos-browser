@@ -18,6 +18,6 @@
 
 struct AIChatTabOpener {
     @MainActor static func openAIChatTab() {
-        WindowControllersManager.shared.showTab(with: .url(AIChatMenuConfiguration().shortcutURL, credential: nil, source: .ui))
+        WindowControllersManager.shared.showTab(with: .url(AIChatRemoteSettings().aiChatURL, credential: nil, source: .ui))
     }
 }

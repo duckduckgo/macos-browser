@@ -19,6 +19,7 @@
 import Common
 import WebKit
 import GRDB
+import Subscription
 import os.log
 
 public protocol HTTPCookieStore {
@@ -154,7 +155,7 @@ internal class WebCacheManager {
 
         // Don't clear fireproof domains
         let cookiesToRemove = cookies.filter { cookie in
-            !self.fireproofDomains.isFireproof(cookieDomain: cookie.domain) && cookie.domain != URL.cookieDomain
+            !self.fireproofDomains.isFireproof(cookieDomain: cookie.domain) && ![URL.cookieDomain, SubscriptionCookieManager.cookieDomain].contains(cookie.domain)
         }
 
         for cookie in cookiesToRemove {

@@ -161,11 +161,11 @@ enum Preferences {
                     case .iHaveASubscriptionClick:
                         PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseClick)
                     case .activateAddEmailClick:
-                        PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseEmailStart, frequency: .dailyAndCount)
+                        PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseEmailStart, frequency: .legacyDailyAndCount)
                     case .postSubscriptionAddEmailClick:
                         PixelKit.fire(PrivacyProPixel.privacyProWelcomeAddDevice, frequency: .unique)
                     case .restorePurchaseStoreClick:
-                        PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreStart, frequency: .dailyAndCount)
+                        PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreStart, frequency: .legacyDailyAndCount)
                     case .addDeviceEnterEmail:
                         PixelKit.fire(PrivacyProPixel.privacyProAddDeviceEnterEmail)
                     case .activeSubscriptionSettingsClick:

@@ -26,7 +26,10 @@ struct PreferencesSection: Hashable, Identifiable {
     let panes: [PreferencePaneIdentifier]
 
     @MainActor
-    static func defaultSections(includingDuckPlayer: Bool, includingSync: Bool, includingVPN: Bool) -> [PreferencesSection] {
+    static func defaultSections(includingDuckPlayer: Bool,
+                                includingSync: Bool,
+                                includingVPN: Bool,
+                                includingAIChat: Bool) -> [PreferencesSection] {
         let privacyPanes: [PreferencePaneIdentifier] = [
             .defaultBrowser, .privateSearch, .webTrackingProtection, .cookiePopupProtection, .emailProtection
         ]
@@ -40,6 +43,10 @@ struct PreferencesSection: Hashable, Identifiable {
 
             if includingDuckPlayer {
                 panes.append(.duckPlayer)
+            }
+
+            if includingAIChat {
+                panes.append(.aiChat)
             }
 
             return panes

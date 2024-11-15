@@ -621,7 +621,7 @@
                                 </constraints>
                             </customView>
                             <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="taC-vG-1fV" customClass="AddressBarButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="545" y="1" width="32" height="32"/>
+                                <rect key="frame" x="540" y="1" width="32" height="32"/>
                                 <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Bookmark" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="H3Y-Sk-Xp8">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -647,7 +647,7 @@
                                 </connections>
                             </button>
                             <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kRc-0m-oqe" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="546" y="4" width="26" height="26"/>
+                                <rect key="frame" x="542" y="4" width="26" height="26"/>
                                 <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Clear" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="Qnf-P6-S6w">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -894,13 +894,13 @@
                             </stackView>
                         </subviews>
                         <constraints>
-                            <constraint firstAttribute="trailing" secondItem="taC-vG-1fV" secondAttribute="trailing" constant="1" id="26X-xU-JjT"/>
+                            <constraint firstAttribute="trailing" secondItem="taC-vG-1fV" secondAttribute="trailing" constant="6" id="26X-xU-JjT"/>
                             <constraint firstItem="HEu-ro-RSA" firstAttribute="centerY" secondItem="Bhg-sv-n5J" secondAttribute="centerY" id="BRs-q1-MOh"/>
                             <constraint firstItem="1qw-sL-vFK" firstAttribute="centerY" secondItem="Bhg-sv-n5J" secondAttribute="centerY" id="Cl5-vM-wFc"/>
                             <constraint firstItem="1qw-sL-vFK" firstAttribute="leading" secondItem="Bhg-sv-n5J" secondAttribute="leading" constant="2" id="IGR-F0-d7K"/>
                             <constraint firstItem="HEu-ro-RSA" firstAttribute="leading" secondItem="Bhg-sv-n5J" secondAttribute="leading" id="JJu-Ej-iFq"/>
                             <constraint firstItem="kRc-0m-oqe" firstAttribute="centerY" secondItem="Bhg-sv-n5J" secondAttribute="centerY" id="T0S-fo-y1J"/>
-                            <constraint firstAttribute="trailing" secondItem="kRc-0m-oqe" secondAttribute="trailing" constant="6" id="WeU-Fb-omO"/>
+                            <constraint firstAttribute="trailing" secondItem="kRc-0m-oqe" secondAttribute="trailing" constant="10" id="WeU-Fb-omO"/>
                             <constraint firstItem="taC-vG-1fV" firstAttribute="centerY" secondItem="Bhg-sv-n5J" secondAttribute="centerY" id="j0x-vX-dys"/>
                             <constraint firstItem="hdY-An-3W8" firstAttribute="centerY" secondItem="Bhg-sv-n5J" secondAttribute="centerY" id="rBY-us-BMz"/>
                             <constraint firstItem="hdY-An-3W8" firstAttribute="leading" secondItem="Bhg-sv-n5J" secondAttribute="leading" id="xv6-0t-7td"/>

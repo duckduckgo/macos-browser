@@ -25,6 +25,7 @@ import Configuration
 import CoreData
 import Crashes
 import DDGSync
+import FeatureFlags
 import History
 import MetricKit
 import Networking
@@ -76,6 +77,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private(set) var stateRestorationManager: AppStateRestorationManager!
     private var grammarFeaturesManager = GrammarFeaturesManager()
     let internalUserDecider: InternalUserDecider
+    private var isInternalUserSharingCancellable: AnyCancellable?
     let featureFlagger: FeatureFlagger
     private var appIconChanger: AppIconChanger!
     private var autoClearHandler: AutoClearHandler!
@@ -97,7 +99,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     public let subscriptionManager: SubscriptionManager
     public let subscriptionUIHandler: SubscriptionUIHandling
-    public let subscriptionCookieManager: SubscriptionCookieManaging
+    private let subscriptionCookieManager: SubscriptionCookieManaging
+    private var subscriptionCookieManagerFeatureFlagCancellable: AnyCancellable?
 
     // MARK: - Freemium DBP
     public let freemiumDBPFeature: FreemiumDBPFeature
@@ -262,7 +265,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         featureFlagger = DefaultFeatureFlagger(
             internalUserDecider: internalUserDecider,
-            privacyConfigManager: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
+            privacyConfigManager: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
+            localOverrides: FeatureFlagLocalOverrides(
+                keyValueStore: UserDefaults.appConfiguration,
+                actionHandler: FeatureFlagOverridesPublishingHandler<FeatureFlag>()
+            ),
+            for: FeatureFlag.self
         )
 
         onboardingStateMachine = ContextualOnboardingStateMachine()
@@ -281,7 +289,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         vpnSettings.alignTo(subscriptionEnvironment: subscriptionManager.currentEnvironment)
 
         // Update DBP environment and match the Subscription environment
+        let dbpSettings = DataBrokerProtectionSettings()
         DataBrokerProtectionSettings().alignTo(subscriptionEnvironment: subscriptionManager.currentEnvironment)
+
+        // Also update the stored run type so the login item knows if tests are running
+        dbpSettings.updateStoredRunType()
 
         // Freemium DBP
         let freemiumDBPUserStateManager = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp)
@@ -325,6 +337,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         freemiumDBPFeature.subscribeToDependencyUpdates()
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     func applicationDidFinishLaunching(_ notification: Notification) {
         guard NSApp.runType.requiresEnvironment else { return }
         defer {
@@ -367,6 +380,30 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         subscriptionManager.loadInitialData()
 
+        let privacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager
+
+        // Enable subscriptionCookieManager if feature flag is present
+        if privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(PrivacyProSubfeature.setAccessTokenCookieForSubscriptionDomains) {
+            subscriptionCookieManager.enableSettingSubscriptionCookie()
+        }
+
+        // Keep track of feature flag changes
+        subscriptionCookieManagerFeatureFlagCancellable = privacyConfigurationManager.updatesPublisher
+            .sink { [weak self, weak privacyConfigurationManager] in
+                guard let self, let privacyConfigurationManager else { return }
+
+                let isEnabled = privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(PrivacyProSubfeature.setAccessTokenCookieForSubscriptionDomains)
+
+                Task { [weak self] in
+                    if isEnabled {
+                        self?.subscriptionCookieManager.enableSettingSubscriptionCookie()
+                        await self?.subscriptionCookieManager.refreshSubscriptionCookie()
+                    } else {
+                        await self?.subscriptionCookieManager.disableSettingSubscriptionCookie()
+                    }
+                }
+            }
+
         if [.normal, .uiTests].contains(NSApp.runType) {
             stateRestorationManager.applicationDidFinishLaunching()
         }
@@ -403,6 +440,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         subscribeToEmailProtectionStatusNotifications()
         subscribeToDataImportCompleteNotification()
+        subscribeToInternalUserChanges()
 
         fireFailedCompilationsPixelIfNeeded()
 
@@ -445,6 +483,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         freemiumDBPScanResultPolling = DefaultFreemiumDBPScanResultPolling(dataManager: DataBrokerProtectionManager.shared.dataManager, freemiumDBPUserStateManager: freemiumDBPUserStateManager)
         freemiumDBPScanResultPolling?.startPollingOrObserving()
+
+        PixelKit.fire(NonStandardEvent(GeneralPixel.launch(isDefault: DefaultBrowserPreferences().isDefault)))
     }
 
     private func fireFailedCompilationsPixelIfNeeded() {
@@ -465,8 +505,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         guard didFinishLaunching else { return }
 
         PixelExperiment.fireOnboardingTestPixels()
-        syncService?.initializeIfNeeded()
-        syncService?.scheduler.notifyAppLifecycleEvent()
+        initializeSync()
 
         NetworkProtectionAppEvents(featureGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: subscriptionManager)).applicationDidBecomeActive()
 
@@ -490,6 +529,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         Task { @MainActor in
             await subscriptionCookieManager.refreshSubscriptionCookie()
         }
+    }
+
+    private func initializeSync() {
+        guard let syncService else { return }
+        syncService.initializeIfNeeded()
+        syncService.scheduler.notifyAppLifecycleEvent()
+        SyncDiagnosisHelper(syncService: syncService).diagnoseAccountStatus()
     }
 
     func applicationDidResignActive(_ notification: Notification) {
@@ -708,6 +754,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func subscribeToDataImportCompleteNotification() {
         NotificationCenter.default.addObserver(self, selector: #selector(dataImportCompleteNotification(_:)), name: .dataImportComplete, object: nil)
+    }
+
+    private func subscribeToInternalUserChanges() {
+        UserDefaults.appConfiguration.isInternalUser = internalUserDecider.isInternalUser
+
+        isInternalUserSharingCancellable = internalUserDecider.isInternalUserPublisher
+            .assign(to: \.isInternalUser, onWeaklyHeld: UserDefaults.appConfiguration)
     }
 
     private func emailDidSignInNotification(_ notification: Notification) {

@@ -293,19 +293,6 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         presentDialog(for: .removeDevice(device))
     }
 
-    func turnOffSync() {
-        Task { @MainActor in
-            do {
-                try await syncService.disconnect()
-                managementDialogModel.endFlow()
-                syncPausedStateManager.syncDidTurnOff()
-            } catch {
-                managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToTurnSyncOff, description: error.localizedDescription)
-                PixelKit.fire(DebugEvent(GeneralPixel.syncLogoutError(error: error)))
-            }
-        }
-    }
-
     @MainActor
     func manageBookmarks() {
         guard let mainVC = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController else { return }
@@ -389,6 +376,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
                 let registeredDevices = try await syncService.fetchDevices()
                 mapDevices(registeredDevices)
             } catch {
+                PixelKit.fire(DebugEvent(GeneralPixel.syncRefreshDevicesError(error: error), error: error))
                 Logger.sync.debug("Failed to refresh devices: \(error)")
             }
         }
@@ -450,12 +438,27 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
 extension SyncPreferences: ManagementDialogModelDelegate {
 
+    func turnOffSync() {
+        Task { @MainActor in
+            do {
+                try await syncService.disconnect()
+                managementDialogModel.endFlow()
+                syncPausedStateManager.syncDidTurnOff()
+                SyncDiagnosisHelper(syncService: syncService).didManuallyDisableSync()
+            } catch {
+                managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToTurnSyncOff, description: error.localizedDescription)
+                PixelKit.fire(DebugEvent(GeneralPixel.syncLogoutError(error: error)))
+            }
+        }
+    }
+
     func deleteAccount() {
         Task { @MainActor in
             do {
                 try await syncService.deleteAccount()
                 managementDialogModel.endFlow()
                 syncPausedStateManager.syncDidTurnOff()
+                SyncDiagnosisHelper(syncService: syncService).didManuallyDisableSync()
             } catch {
                 managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToDeleteData, description: error.localizedDescription)
                 PixelKit.fire(DebugEvent(GeneralPixel.syncDeleteAccountError(error: error)))

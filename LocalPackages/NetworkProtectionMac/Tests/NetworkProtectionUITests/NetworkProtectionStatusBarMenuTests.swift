@@ -35,6 +35,10 @@ final class StatusBarMenuTests: XCTestCase {
             // no-op
         }
 
+        func command(_ command: VPNCommand) async throws {
+            // no-op
+        }
+
         var isConnected: Bool {
             true
         }

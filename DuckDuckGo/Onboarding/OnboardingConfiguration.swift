@@ -40,3 +40,7 @@ struct SystemSettings: Codable, Equatable {
 struct OnboardingPlatform: Codable, Equatable {
     var name: String
 }
+
+struct OnboardingImportResponse: Codable, Equatable {
+    var enabled: Bool
+}

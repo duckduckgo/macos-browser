@@ -48,7 +48,7 @@ final class VPNUninstaller: VPNUninstalling {
     }
 
     func uninstall(includingSystemExtension: Bool) async throws {
-        pixelKit?.fire(VPNUninstallAttempt.begin, frequency: .dailyAndCount)
+        pixelKit?.fire(VPNUninstallAttempt.begin, frequency: .legacyDailyAndCount)
 
         do {
             try await removeSystemExtension()
@@ -59,15 +59,15 @@ final class VPNUninstaller: VPNUninstalling {
             }
 
             defaults.networkProtectionShouldShowVPNUninstalledMessage = true
-            pixelKit?.fire(VPNUninstallAttempt.success, frequency: .dailyAndCount)
+            pixelKit?.fire(VPNUninstallAttempt.success, frequency: .legacyDailyAndCount)
         } catch {
             switch error {
             case OSSystemExtensionError.requestCanceled:
-                pixelKit?.fire(VPNUninstallAttempt.cancelled(.sysexInstallationCancelled), frequency: .dailyAndCount)
+                pixelKit?.fire(VPNUninstallAttempt.cancelled(.sysexInstallationCancelled), frequency: .legacyDailyAndCount)
             case OSSystemExtensionError.authorizationRequired:
-                pixelKit?.fire(VPNUninstallAttempt.cancelled(.sysexInstallationRequiresAuthorization), frequency: .dailyAndCount)
+                pixelKit?.fire(VPNUninstallAttempt.cancelled(.sysexInstallationRequiresAuthorization), frequency: .legacyDailyAndCount)
             default:
-                pixelKit?.fire(VPNUninstallAttempt.failure(error), frequency: .dailyAndCount)
+                pixelKit?.fire(VPNUninstallAttempt.failure(error), frequency: .legacyDailyAndCount)
             }
 
             throw error

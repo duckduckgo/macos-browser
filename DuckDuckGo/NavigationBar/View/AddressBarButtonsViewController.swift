@@ -23,6 +23,7 @@ import Combine
 import Common
 import Lottie
 import os.log
+import PrivacyDashboard
 
 protocol AddressBarButtonsViewControllerDelegate: AnyObject {
 
@@ -61,7 +62,7 @@ final class AddressBarButtonsViewController: NSViewController {
     @IBOutlet weak var imageButtonWrapper: NSView!
     @IBOutlet weak var imageButton: NSButton!
     @IBOutlet weak var clearButton: NSButton!
-    @IBOutlet weak var buttonsContainer: NSStackView!
+    @IBOutlet private weak var buttonsContainer: NSStackView!
 
     @IBOutlet weak var animationWrapperView: NSView!
     var trackerAnimationView1: LottieAnimationView!
@@ -72,7 +73,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     @IBOutlet weak var notificationAnimationView: NavigationBarBadgeAnimationView!
 
-    @IBOutlet weak var permissionButtons: NSView!
+    @IBOutlet private weak var permissionButtons: NSView!
     @IBOutlet weak var cameraButton: PermissionButton! {
         didSet {
             cameraButton.isHidden = true
@@ -264,12 +265,16 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     @IBAction func privacyEntryPointButtonAction(_ sender: Any) {
+        openPrivacyDashboardPopover()
+    }
+
+    func openPrivacyDashboardPopover(entryPoint: PrivacyDashboardEntryPoint = .dashboard) {
         if let permissionAuthorizationPopover, permissionAuthorizationPopover.isShown {
             permissionAuthorizationPopover.close()
         }
         popupBlockedPopover?.close()
 
-        popovers?.togglePrivacyDashboardPopover(for: tabViewModel, from: privacyEntryPointButton)
+        popovers?.togglePrivacyDashboardPopover(for: tabViewModel, from: privacyEntryPointButton, entryPoint: entryPoint)
         onboardingPixelReporter.trackPrivacyDashboardOpened()
     }
 
@@ -368,7 +373,7 @@ final class AddressBarButtonsViewController: NSViewController {
                 return
             }
         }
-        guard button.isShown, permissionButtons.isShown else { return }
+        guard button.isVisible else { return }
 
         (popover.contentViewController as? PermissionAuthorizationViewController)?.query = query
         popover.show(relativeTo: button.bounds, of: button, preferredEdge: .maxY)
@@ -381,7 +386,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     func openPrivacyDashboard() {
         guard let tabViewModel else { return }
-        popovers?.openPrivacyDashboard(for: tabViewModel, from: privacyEntryPointButton)
+        popovers?.openPrivacyDashboard(for: tabViewModel, from: privacyEntryPointButton, entryPoint: .dashboard)
     }
 
     func updateButtons() {

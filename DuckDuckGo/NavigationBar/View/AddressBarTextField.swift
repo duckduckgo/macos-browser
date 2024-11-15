@@ -554,7 +554,8 @@ final class AddressBarTextField: NSTextField {
             Logger.general.error("AddressBarTextField: Window not available")
             return
         }
-        guard suggestionWindow.isVisible else { return }
+
+        if !suggestionWindow.isVisible && selectedSuggestionViewModel == nil { return }
 
         guard let selectedSuggestionViewModel else {
             if let originalStringValue = suggestionContainerViewModel?.userStringValue {
@@ -1232,11 +1233,6 @@ extension AddressBarTextField: SuggestionViewControllerDelegate {
     func suggestionViewControllerDidConfirmSelection(_ suggestionViewController: SuggestionViewController) {
         let suggestion = suggestionContainerViewModel?.selectedSuggestionViewModel?.suggestion
         navigate(suggestion: suggestion)
-    }
-
-    func shouldCloseSuggestionWindow(forMouseEvent event: NSEvent) -> Bool {
-        // don't hide suggestions if clicking somewhere inside the Address Bar view
-        return superview?.isMouseLocationInsideBounds(event.locationInWindow) != true
     }
 
 }

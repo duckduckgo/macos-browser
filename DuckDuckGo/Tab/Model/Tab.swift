@@ -29,6 +29,7 @@ import PhishingDetection
 import SpecialErrorPages
 import os.log
 import Onboarding
+import PageRefreshMonitor
 
 protocol TabDelegate: ContentOverlayUserScriptDelegate {
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool)
@@ -68,6 +69,7 @@ protocol NewWindowPolicyDecisionMaker {
     private let statisticsLoader: StatisticsLoader?
     private let onboardingPixelReporter: OnboardingAddressBarReporting
     private let internalUserDecider: InternalUserDecider?
+    private let pageRefreshMonitor: PageRefreshMonitoring
     let pinnedTabsManager: PinnedTabsManager
 
     private let webViewConfiguration: WKWebViewConfiguration
@@ -119,7 +121,9 @@ protocol NewWindowPolicyDecisionMaker {
                      phishingDetector: PhishingSiteDetecting = PhishingDetection.shared,
                      phishingState: PhishingTabStateManaging = PhishingTabStateManager(),
                      tabsPreferences: TabsPreferences = TabsPreferences.shared,
-                     onboardingPixelReporter: OnboardingAddressBarReporting = OnboardingPixelReporter()
+                     onboardingPixelReporter: OnboardingAddressBarReporting = OnboardingPixelReporter(),
+                     pageRefreshMonitor: PageRefreshMonitoring = PageRefreshMonitor(onDidDetectRefreshPattern: PageRefreshMonitor.onDidDetectRefreshPattern,
+                                                                                    store: PageRefreshStore())
     ) {
 
         let duckPlayer = duckPlayer
@@ -165,7 +169,8 @@ protocol NewWindowPolicyDecisionMaker {
                   phishingDetector: phishingDetector,
                   phishingState: phishingState,
                   tabsPreferences: tabsPreferences,
-                  onboardingPixelReporter: onboardingPixelReporter)
+                  onboardingPixelReporter: onboardingPixelReporter,
+                  pageRefreshMonitor: pageRefreshMonitor)
     }
 
     @MainActor
@@ -201,7 +206,8 @@ protocol NewWindowPolicyDecisionMaker {
          phishingDetector: PhishingSiteDetecting,
          phishingState: PhishingTabStateManaging,
          tabsPreferences: TabsPreferences,
-         onboardingPixelReporter: OnboardingAddressBarReporting
+         onboardingPixelReporter: OnboardingAddressBarReporting,
+         pageRefreshMonitor: PageRefreshMonitoring
     ) {
 
         self.content = content
@@ -234,6 +240,7 @@ protocol NewWindowPolicyDecisionMaker {
         assert(userContentController != nil)
         self.userContentController = userContentController
         self.onboardingPixelReporter = onboardingPixelReporter
+        self.pageRefreshMonitor = pageRefreshMonitor
 
         webView = WebView(frame: CGRect(origin: .zero, size: webViewSize), configuration: configuration)
         webView.allowsLinkPreview = false
@@ -801,6 +808,9 @@ protocol NewWindowPolicyDecisionMaker {
         userInteractionDialog = nil
 
         self.brokenSiteInfo?.tabReloadRequested()
+        if let url = webView.url {
+            pageRefreshMonitor.register(for: url)
+        }
 
         // In the case of an error only reload web URLs to prevent uxss attacks via redirecting to javascript://
         if let error = error,
@@ -1274,7 +1284,15 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             loadErrorHTML(error, header: UserText.webProcessCrashPageHeader, forUnreachableURL: url, alternate: true)
         }
 
-        PixelKit.fire(DebugEvent(GeneralPixel.webKitDidTerminate, error: error))
+        Task {
+#if APPSTORE
+            let additionalParameters = [String: String]()
+#else
+            let additionalParameters = await SystemInfo.pixelParameters()
+#endif
+
+            PixelKit.fire(DebugEvent(GeneralPixel.webKitDidTerminate, error: error), withAdditionalParameters: additionalParameters)
+        }
     }
 
     @MainActor

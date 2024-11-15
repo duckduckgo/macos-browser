@@ -37,6 +37,7 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
     override func setUpWithError() throws {
         mockUserStateManager = MockFreemiumDBPUserStateManager()
         mockFeature = MockFreemiumDBPFeature()
+        mockFeature.featureAvailable = true
         mockPresenter = MockFreemiumDBPPresenter()
         mockPixelHandler = MockFreemiumDBPExperimentPixelHandler()
 
@@ -97,7 +98,7 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
 
         // When
         let viewModel = sut.viewModel
-        viewModel.proceedAction()
+        viewModel!.proceedAction()
 
         // Then
         XCTAssertTrue(mockUserStateManager.didDismissHomePagePromotion)
@@ -109,7 +110,7 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
     func testCloseAction_dismissesPromotion_andFiresPixel() {
         // When
         let viewModel = sut.viewModel
-        viewModel.closeAction()
+        viewModel!.closeAction()
 
         // Then
         XCTAssertTrue(mockUserStateManager.didDismissHomePagePromotion)
@@ -124,7 +125,7 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
 
         // When
         let viewModel = sut.viewModel
-        viewModel.proceedAction()
+        viewModel!.proceedAction()
 
         // Then
         XCTAssertTrue(mockUserStateManager.didDismissHomePagePromotion)
@@ -139,7 +140,7 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
 
         // When
         let viewModel = sut.viewModel
-        viewModel.closeAction()
+        viewModel!.closeAction()
 
         // Then
         XCTAssertTrue(mockUserStateManager.didDismissHomePagePromotion)
@@ -154,7 +155,7 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
 
         // When
         let viewModel = sut.viewModel
-        viewModel.proceedAction()
+        viewModel!.proceedAction()
 
         // Then
         XCTAssertTrue(mockUserStateManager.didDismissHomePagePromotion)
@@ -169,7 +170,7 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
 
         // When
         let viewModel = sut.viewModel
-        viewModel.closeAction()
+        viewModel!.closeAction()
 
         // Then
         XCTAssertTrue(mockUserStateManager.didDismissHomePagePromotion)
@@ -185,7 +186,7 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         let viewModel = sut.viewModel
 
         // Then
-        XCTAssertEqual(viewModel.text, UserText.homePagePromotionFreemiumDBPPostScanEngagementResultPluralText(resultCount: 5, brokerCount: 2))
+        XCTAssertEqual(viewModel!.description, UserText.homePagePromotionFreemiumDBPPostScanEngagementResultPluralDescription(resultCount: 5, brokerCount: 2))
     }
 
     @MainActor
@@ -197,7 +198,19 @@ final class FreemiumDBPPromotionViewCoordinatorTests: XCTestCase {
         let viewModel = sut.viewModel
 
         // Then
-        XCTAssertEqual(viewModel.text, UserText.homePagePromotionFreemiumDBPText)
+        XCTAssertEqual(viewModel!.description, UserText.homePagePromotionFreemiumDBPDescriptionMarkdown)
+    }
+
+    @MainActor
+    func testViewModel_whenFeatureNotEnabled() {
+        // Given
+        mockFeature.featureAvailable = false
+
+        // When
+        let viewModel = sut.viewModel
+
+        // Then
+        XCTAssertNil(viewModel)
     }
 
     func testNotificationObservation_updatesPromotionVisibility() {

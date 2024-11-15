@@ -96,7 +96,7 @@ extension NetworkProtectionIPCTunnelController: TunnelController {
             knownFailureStore.lastKnownFailure = KnownFailure(error)
             errorRecorder.recordIPCStartFailure(error)
             log(error)
-            pixelKit?.fire(StartAttempt.failure(error), frequency: .dailyAndCount)
+            pixelKit?.fire(StartAttempt.failure(error), frequency: .legacyDailyAndCount)
         }
 
         do {
@@ -112,7 +112,7 @@ extension NetworkProtectionIPCTunnelController: TunnelController {
                 if let error {
                     handleFailure(error)
                 } else {
-                    pixelKit?.fire(StartAttempt.success, frequency: .dailyAndCount)
+                    pixelKit?.fire(StartAttempt.success, frequency: .legacyDailyAndCount)
                 }
             }
         } catch {
@@ -126,7 +126,7 @@ extension NetworkProtectionIPCTunnelController: TunnelController {
 
         func handleFailure(_ error: Error) {
             log(error)
-            pixelKit?.fire(StopAttempt.failure(error), frequency: .dailyAndCount)
+            pixelKit?.fire(StopAttempt.failure(error), frequency: .legacyDailyAndCount)
         }
 
         do {
@@ -136,12 +136,16 @@ extension NetworkProtectionIPCTunnelController: TunnelController {
                 if let error {
                     handleFailure(error)
                 } else {
-                    pixelKit?.fire(StopAttempt.success, frequency: .dailyAndCount)
+                    pixelKit?.fire(StopAttempt.success, frequency: .legacyDailyAndCount)
                 }
             }
         } catch {
             handleFailure(error)
         }
+    }
+
+    func command(_ command: VPNCommand) async throws {
+        try await ipcClient.command(command)
     }
 
     /// Queries VPN to know if it's connected.

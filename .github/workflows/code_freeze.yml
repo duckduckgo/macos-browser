@@ -14,7 +14,7 @@ jobs:
 
     name: Create Release Branch
 
-    runs-on: macos-14-xlarge
+    runs-on: macos-15-xlarge
     timeout-minutes: 10
 
     outputs:
@@ -73,7 +73,7 @@ jobs:
 
     # needs: [ create_release_branch, run_tests ]
     needs: create_release_branch
-    runs-on: macos-14
+    runs-on: macos-15-xlarge
     timeout-minutes: 10
 
     steps:

@@ -63,7 +63,6 @@ public struct UserDefaultsWrapper<T> {
         case alwaysRequestDownloadLocationKey = "preferences.download-location.always-request"
         case openDownloadsPopupOnCompletionKey = "preferences.downloads.open.on.completion"
         case autoconsentEnabled = "preferences.autoconsent-enabled"
-        case autoconsentFilterlistExperimentCohort = "preferences.autoconsent.filterListExperimentCohort"
         case duckPlayerMode = "preferences.duck-player"
         case youtubeOverlayInteracted = "preferences.youtube-overlay-interacted"
         case youtubeOverlayButtonsUsed = "preferences.youtube-overlay-user-used-buttons"
@@ -184,6 +183,7 @@ public struct UserDefaultsWrapper<T> {
 
         // Updates
         case automaticUpdates = "updates.automatic"
+        case pendingUpdateShown = "pending.update.shown"
 
         // Experiments
         case pixelExperimentInstalled = "pixel.experiment.installed"
@@ -223,6 +223,15 @@ public struct UserDefaultsWrapper<T> {
         // Subscription
 
         case subscriptionEnvironment = "subscription.environment"
+
+        // PageRefreshMonitor
+
+        case refreshTimestamps = "pageRefreshMonitor.refresh-timestamps"
+
+        // BrokenSitePrompt
+
+        case lastBrokenSiteToastShownDate = "brokenSitePrompt.last-broken-site-toast-shown-date"
+        case toastDismissStreakCounter = "brokenSitePrompt.toast-dismiss-streak-counter"
     }
 
     enum RemovedKeys: String, CaseIterable {

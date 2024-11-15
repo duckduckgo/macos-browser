@@ -98,6 +98,14 @@ extension HomePage.Models {
             return addressBarViewController.view
         }
 
+        func setUpExperimentIfNeeded() {
+            if isExperimentActive {
+                let ntpExperiment = NewTabPageSearchBoxExperiment()
+                ntpExperiment.assignUserToCohort()
+                shouldShowAddressBar = ntpExperiment.cohort?.isExperiment == true
+            }
+        }
+
         let tabCollectionViewModel: TabCollectionViewModel
 
         private var isExperimentActive: Bool = false {
@@ -115,14 +123,6 @@ extension HomePage.Models {
 
             privacyConfigCancellable = privacyConfigurationManager.updatesPublisher.sink { [weak self, weak privacyConfigurationManager] in
                 self?.isExperimentActive = privacyConfigurationManager?.privacyConfig.isEnabled(featureKey: .newTabSearchField) == true
-            }
-        }
-
-        private func setUpExperimentIfNeeded() {
-            if isExperimentActive {
-                let ntpExperiment = NewTabPageSearchBoxExperiment()
-                ntpExperiment.assignUserToCohort()
-                shouldShowAddressBar = ntpExperiment.cohort?.isExperiment == true
             }
         }
 
