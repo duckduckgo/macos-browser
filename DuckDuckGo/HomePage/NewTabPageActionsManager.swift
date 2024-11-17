@@ -23,9 +23,21 @@ import RemoteMessaging
 import Common
 import os.log
 
-protocol NewTabPageActionsManaging: AnyObject {
-    var configuration: NewTabPageUserScript.NewTabPageConfiguration { get }
+protocol NewTabPageScriptClient: AnyObject {
+    var userScriptsSource: NewTabPageUserScriptsSource? { get set }
+    func registerMessageHandlers(for userScript: SubfeatureWithExternalMessageHandling)
+}
 
+extension NewTabPageScriptClient {
+    func pushMessage(named method: String, params: Encodable?, for userScript: SubfeatureWithExternalMessageHandling) {
+        guard let webView = userScript.webView else {
+            return
+        }
+        userScript.broker?.push(method: method, params: params, for: userScript, into: webView)
+    }
+}
+
+protocol NewTabPageActionsManaging: AnyObject {
     func registerUserScript(_ userScript: NewTabPageUserScript)
 
     func getFavorites() -> NewTabPageUserScript.FavoritesData
@@ -36,8 +48,6 @@ protocol NewTabPageActionsManaging: AnyObject {
 
     /// It is called in case of error loading the pages
     func reportException(with params: [String: String])
-    func showContextMenu(with params: [String: Any])
-    func updateWidgetConfigs(with params: [[String: String]])
 }
 
 protocol NewTabPageUserScriptsSource: AnyObject {
@@ -46,7 +56,6 @@ protocol NewTabPageUserScriptsSource: AnyObject {
 
 final class NewTabPageActionsManager: NewTabPageActionsManaging, NewTabPageUserScriptsSource {
 
-    private let appearancePreferences: AppearancePreferences
     private let newTabPageScriptClients: [NewTabPageScriptClient]
 
     private var cancellables = Set<AnyCancellable>()
@@ -61,62 +70,16 @@ final class NewTabPageActionsManager: NewTabPageActionsManaging, NewTabPageUserS
         activeRemoteMessageModel: ActiveRemoteMessageModel,
         openURLHandler: @escaping (URL) -> Void
     ) {
-        self.appearancePreferences = appearancePreferences
-
         newTabPageScriptClients = [
-            NewTabPageRMFHandler(activeRemoteMessageModel: activeRemoteMessageModel, openURLHandler: openURLHandler)
+            NewTabPageConfigurationClient(appearancePreferences: appearancePreferences),
+            NewTabPageRMFClient(activeRemoteMessageModel: activeRemoteMessageModel, openURLHandler: openURLHandler)
         ]
         newTabPageScriptClients.forEach { $0.userScriptsSource = self }
-
-        appearancePreferences.$isFavoriteVisible.dropFirst().removeDuplicates().asVoid()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] in
-                self?.notifyWidgetConfigsDidChange()
-            }
-            .store(in: &cancellables)
-
-        appearancePreferences.$isRecentActivityVisible.dropFirst().removeDuplicates().asVoid()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] in
-                self?.notifyWidgetConfigsDidChange()
-            }
-            .store(in: &cancellables)
     }
 
     func registerUserScript(_ userScript: NewTabPageUserScript) {
         userScriptsHandles.add(userScript)
         newTabPageScriptClients.forEach { $0.registerMessageHandlers(for: userScript) }
-    }
-
-    private func notifyWidgetConfigsDidChange() {
-        userScriptsHandles.allObjects.forEach { userScript in
-            userScript.notifyWidgetConfigsDidChange(widgetConfigs: [
-                .init(id: "favorites", isVisible: appearancePreferences.isFavoriteVisible),
-                .init(id: "privacyStats", isVisible: appearancePreferences.isRecentActivityVisible)
-            ])
-        }
-    }
-
-    var configuration: NewTabPageUserScript.NewTabPageConfiguration {
-#if DEBUG || REVIEW
-        let env = "development"
-#else
-        let env = "production"
-#endif
-        return .init(
-            widgets: [
-                .init(id: "rmf"),
-                .init(id: "favorites"),
-                .init(id: "privacyStats")
-            ],
-            widgetConfigs: [
-                .init(id: "favorites", isVisible: appearancePreferences.isFavoriteVisible),
-                .init(id: "privacyStats", isVisible: appearancePreferences.isRecentActivityVisible)
-            ],
-            env: env,
-            locale: Bundle.main.preferredLocalizations.first ?? "en",
-            platform: .init(name: "macos")
-        )
     }
 
     func getFavorites() -> NewTabPageUserScript.FavoritesData {
@@ -137,65 +100,6 @@ final class NewTabPageActionsManager: NewTabPageActionsManaging, NewTabPageUserS
     func getPrivacyStatsConfig() -> NewTabPageUserScript.WidgetConfig {
         // implementation TBD
         .init(animation: .auto, expansion: .collapsed)
-    }
-
-    func showContextMenu(with params: [String: Any]) {
-        guard let menuItems = params["visibilityMenuItems"] as? [[String: String]] else {
-            return
-        }
-        let menu = NSMenu()
-
-        for menuItem in menuItems {
-            guard let title = menuItem["title"], let id = menuItem["id"] else {
-                continue
-            }
-            switch id {
-            case "favorites":
-                let item = NSMenuItem(title: title, action: #selector(toggleVisibility(_:)), representedObject: id)
-                    .targetting(self)
-                item.state = appearancePreferences.isFavoriteVisible ? .on : .off
-                menu.addItem(item)
-            case "privacyStats":
-                let item = NSMenuItem(title: title, action: #selector(toggleVisibility(_:)), representedObject: id)
-                    .targetting(self)
-                item.state = appearancePreferences.isRecentActivityVisible ? .on : .off
-                menu.addItem(item)
-            default:
-                break
-            }
-        }
-
-        if !menu.items.isEmpty {
-            menu.popUp(positioning: nil, at: NSEvent.mouseLocation, in: nil)
-        }
-    }
-
-    @objc private func toggleVisibility(_ sender: NSMenuItem) {
-        switch sender.representedObject as? String {
-        case "favorites":
-            appearancePreferences.isFavoriteVisible.toggle()
-        case "privacyStats":
-            appearancePreferences.isRecentActivityVisible.toggle()
-        default:
-            break
-        }
-    }
-
-    func updateWidgetConfigs(with params: [[String: String]]) {
-        for param in params {
-            guard let id = param["id"], let visibility = param["visibility"] else {
-                continue
-            }
-            let isVisible = NewTabPageUserScript.NewTabPageConfiguration.WidgetConfig.WidgetVisibility(rawValue: visibility)?.isVisible == true
-            switch id {
-            case "favorites":
-                appearancePreferences.isFavoriteVisible = isVisible
-            case "privacyStats":
-                appearancePreferences.isRecentActivityVisible = isVisible
-            default:
-                break
-            }
-        }
     }
 
     func reportException(with params: [String: String]) {

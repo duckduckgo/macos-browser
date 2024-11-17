@@ -1,5 +1,5 @@
 //
-//  NewTabPageRMFHandler.swift
+//  NewTabPageRMFClient.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -20,21 +20,7 @@ import Combine
 import RemoteMessaging
 import UserScript
 
-protocol NewTabPageScriptClient: AnyObject {
-    var userScriptsSource: NewTabPageUserScriptsSource? { get set }
-    func registerMessageHandlers(for userScript: SubfeatureWithExternalMessageHandling)
-}
-
-extension NewTabPageScriptClient {
-    func pushMessage(named method: String, params: Encodable?, for userScript: SubfeatureWithExternalMessageHandling) {
-        guard let webView = userScript.webView else {
-            return
-        }
-        userScript.broker?.push(method: method, params: params, for: userScript, into: webView)
-    }
-}
-
-final class NewTabPageRMFHandler: NewTabPageScriptClient {
+final class NewTabPageRMFClient: NewTabPageScriptClient {
 
     let activeRemoteMessageModel: ActiveRemoteMessageModel
     weak var userScriptsSource: NewTabPageUserScriptsSource?
@@ -64,7 +50,6 @@ final class NewTabPageRMFHandler: NewTabPageScriptClient {
     func registerMessageHandlers(for userScript: any SubfeatureWithExternalMessageHandling) {
         userScript.registerMessageHandlers([
             MessageNames.rmfGetData.rawValue: { [weak self] in try await self?.getData(params: $0, original: $1) },
-            MessageNames.rmfOnDataUpdate.rawValue: { [weak self] in try await self?.getData(params: $0, original: $1) },
             MessageNames.rmfDismiss.rawValue: { [weak self] in try await self?.dismiss(params: $0, original: $1) },
             MessageNames.rmfPrimaryAction.rawValue: { [weak self] in try await self?.primaryAction(params: $0, original: $1) },
             MessageNames.rmfSecondaryAction.rawValue: { [weak self] in try await self?.secondaryAction(params: $0, original: $1) }
@@ -149,31 +134,6 @@ final class NewTabPageRMFHandler: NewTabPageScriptClient {
     }
 }
 
-extension NewTabPageUserScript.RMFMessage {
-    init?(_ remoteMessageModel: RemoteMessageModel) {
-        guard let modelType = remoteMessageModel.content, modelType.isSupported else {
-            return nil
-        }
-
-        switch modelType {
-        case let .small(titleText, descriptionText):
-            self = .small(.init(id: remoteMessageModel.id, titleText: titleText, descriptionText: descriptionText))
-
-        case let .medium(titleText, descriptionText, placeholder):
-            self = .medium(.init(id: remoteMessageModel.id, titleText: titleText, descriptionText: descriptionText, icon: .init(placeholder)))
-
-        case let .bigSingleAction(titleText, descriptionText, placeholder, primaryActionText, _):
-            self = .bigSingleAction(.init(id: remoteMessageModel.id, titleText: titleText, descriptionText: descriptionText, icon: .init(placeholder), primaryActionText: primaryActionText))
-
-        case let .bigTwoAction(titleText, descriptionText, placeholder, primaryActionText, _, secondaryActionText, _):
-            self = .bigTwoAction(.init(id: remoteMessageModel.id, titleText: titleText, descriptionText: descriptionText, icon: .init(placeholder), primaryActionText: primaryActionText, secondaryActionText: secondaryActionText))
-
-        default:
-            return nil
-        }
-    }
-}
-
 extension NewTabPageUserScript {
 
     struct RMFData: Encodable {
@@ -197,6 +157,29 @@ extension NewTabPageUserScript {
                 return message
             case .bigTwoAction(let message):
                 return message
+            }
+        }
+
+        init?(_ remoteMessageModel: RemoteMessageModel) {
+            guard let modelType = remoteMessageModel.content, modelType.isSupported else {
+                return nil
+            }
+
+            switch modelType {
+            case let .small(titleText, descriptionText):
+                self = .small(.init(id: remoteMessageModel.id, titleText: titleText, descriptionText: descriptionText))
+
+            case let .medium(titleText, descriptionText, placeholder):
+                self = .medium(.init(id: remoteMessageModel.id, titleText: titleText, descriptionText: descriptionText, icon: .init(placeholder)))
+
+            case let .bigSingleAction(titleText, descriptionText, placeholder, primaryActionText, _):
+                self = .bigSingleAction(.init(id: remoteMessageModel.id, titleText: titleText, descriptionText: descriptionText, icon: .init(placeholder), primaryActionText: primaryActionText))
+
+            case let .bigTwoAction(titleText, descriptionText, placeholder, primaryActionText, _, secondaryActionText, _):
+                self = .bigTwoAction(.init(id: remoteMessageModel.id, titleText: titleText, descriptionText: descriptionText, icon: .init(placeholder), primaryActionText: primaryActionText, secondaryActionText: secondaryActionText))
+
+            default:
+                return nil
             }
         }
     }

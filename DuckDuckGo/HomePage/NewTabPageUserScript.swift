@@ -48,15 +48,12 @@ final class NewTabPageUserScript: NSObject, SubfeatureWithExternalMessageHandlin
     }
 
     private lazy var methodHandlers: [MessageName: Handler] = [
-        "contextMenu": { [weak self] in try await self?.showContextMenu(params: $0, original: $1) },
         "favorites_getConfig": { [weak self] in try await self?.favoritesGetConfig(params: $0, original: $1) },
         "favorites_getData": { [weak self] in try await self?.favoritesGetData(params: $0, original: $1) },
-        "initialSetup": { [weak self] in try await self?.initialSetup(params: $0, original: $1) },
         "reportInitException": { [weak self] in try await self?.reportException(params: $0, original: $1) },
         "reportPageException": { [weak self] in try await self?.reportException(params: $0, original: $1) },
         "stats_getConfig": { [weak self] in try await self?.statsGetConfig(params: $0, original: $1) },
         "stats_getData": { [weak self] in try await self?.statsGetData(params: $0, original: $1) },
-        "widgets_setConfig": { [weak self] in try await self?.widgetsSetConfig(params: $0, original: $1) }
     ]
 
     func registerMessageHandlers(_ handlers: [MessageName: Subfeature.Handler]) {
@@ -68,13 +65,6 @@ final class NewTabPageUserScript: NSObject, SubfeatureWithExternalMessageHandlin
     @MainActor
     func handler(forMethodNamed methodName: MessageName) -> Handler? {
         methodHandlers[methodName]
-    }
-
-    func notifyWidgetConfigsDidChange(widgetConfigs: [NewTabPageConfiguration.WidgetConfig]) {
-        guard let webView else {
-            return
-        }
-        broker?.push(method: "widgets_onConfigUpdated", params: widgetConfigs, for: self, into: webView)
     }
 
     func notifyRemoteMessageDidChange(_ remoteMessageData: NewTabPageUserScript.RMFData?) {
@@ -105,11 +95,6 @@ extension NewTabPageUserScript {
     }
 
     @MainActor
-    private func initialSetup(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        actionsManager.configuration
-    }
-
-    @MainActor
     private func statsGetConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         actionsManager.getPrivacyStatsConfig()
     }
@@ -117,20 +102,6 @@ extension NewTabPageUserScript {
     @MainActor
     private func statsGetData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         actionsManager.getPrivacyStats()
-    }
-
-    @MainActor
-    private func widgetsSetConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let params = params as? [[String: String]] else { return nil }
-        actionsManager.updateWidgetConfigs(with: params)
-        return nil
-    }
-
-    @MainActor
-    private func showContextMenu(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let params = params as? [String: Any] else { return nil }
-        actionsManager.showContextMenu(with: params)
-        return nil
     }
 
     private func reportException(params: Any, original: WKScriptMessage) async throws -> Encodable? {
