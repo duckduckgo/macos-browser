@@ -40,9 +40,6 @@ extension NewTabPageScriptClient {
 protocol NewTabPageActionsManaging: AnyObject {
     func registerUserScript(_ userScript: NewTabPageUserScript)
 
-    func getFavorites() -> NewTabPageUserScript.FavoritesData
-    func getFavoritesConfig() -> NewTabPageUserScript.WidgetConfig
-
     func getPrivacyStats() -> NewTabPageUserScript.PrivacyStatsData
     func getPrivacyStatsConfig() -> NewTabPageUserScript.WidgetConfig
 
@@ -72,7 +69,8 @@ final class NewTabPageActionsManager: NewTabPageActionsManaging, NewTabPageUserS
     ) {
         newTabPageScriptClients = [
             NewTabPageConfigurationClient(appearancePreferences: appearancePreferences),
-            NewTabPageRMFClient(activeRemoteMessageModel: activeRemoteMessageModel, openURLHandler: openURLHandler)
+            NewTabPageRMFClient(activeRemoteMessageModel: activeRemoteMessageModel, openURLHandler: openURLHandler),
+            NewTabPageFavoritesClient()
         ]
         newTabPageScriptClients.forEach { $0.userScriptsSource = self }
     }
@@ -80,16 +78,6 @@ final class NewTabPageActionsManager: NewTabPageActionsManaging, NewTabPageUserS
     func registerUserScript(_ userScript: NewTabPageUserScript) {
         userScriptsHandles.add(userScript)
         newTabPageScriptClients.forEach { $0.registerMessageHandlers(for: userScript) }
-    }
-
-    func getFavorites() -> NewTabPageUserScript.FavoritesData {
-        // implementation TBD
-        .init(favorites: [])
-    }
-
-    func getFavoritesConfig() -> NewTabPageUserScript.WidgetConfig {
-        // implementation TBD
-        .init(animation: .auto, expansion: .collapsed)
     }
 
     func getPrivacyStats() -> NewTabPageUserScript.PrivacyStatsData {

@@ -160,5 +160,42 @@ final class NewTabPageConfigurationClient: NewTabPageScriptClient {
         }
         return nil
     }
+}
 
+extension NewTabPageUserScript {
+
+    struct NewTabPageConfiguration: Encodable {
+        var widgets: [Widget]
+        var widgetConfigs: [WidgetConfig]
+        var env: String
+        var locale: String
+        var platform: Platform
+
+        struct Widget: Encodable {
+            var id: String
+        }
+
+        struct WidgetConfig: Encodable {
+
+            enum WidgetVisibility: String, Encodable {
+                case visible, hidden
+
+                var isVisible: Bool {
+                    self == .visible
+                }
+            }
+
+            init(id: String, isVisible: Bool) {
+                self.id = id
+                self.visibility = isVisible ? .visible : .hidden
+            }
+
+            var id: String
+            var visibility: WidgetVisibility
+        }
+
+        struct Platform: Encodable {
+            var name: String
+        }
+    }
 }

@@ -48,8 +48,6 @@ final class NewTabPageUserScript: NSObject, SubfeatureWithExternalMessageHandlin
     }
 
     private lazy var methodHandlers: [MessageName: Handler] = [
-        "favorites_getConfig": { [weak self] in try await self?.favoritesGetConfig(params: $0, original: $1) },
-        "favorites_getData": { [weak self] in try await self?.favoritesGetData(params: $0, original: $1) },
         "reportInitException": { [weak self] in try await self?.reportException(params: $0, original: $1) },
         "reportPageException": { [weak self] in try await self?.reportException(params: $0, original: $1) },
         "stats_getConfig": { [weak self] in try await self?.statsGetConfig(params: $0, original: $1) },
@@ -84,15 +82,6 @@ final class NewTabPageUserScript: NSObject, SubfeatureWithExternalMessageHandlin
 }
 
 extension NewTabPageUserScript {
-    @MainActor
-    private func favoritesGetConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        actionsManager.getFavoritesConfig()
-    }
-
-    @MainActor
-    private func favoritesGetData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        actionsManager.getFavorites()
-    }
 
     @MainActor
     private func statsGetConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
@@ -112,41 +101,6 @@ extension NewTabPageUserScript {
 }
 
 extension NewTabPageUserScript {
-
-    struct NewTabPageConfiguration: Encodable {
-        var widgets: [Widget]
-        var widgetConfigs: [WidgetConfig]
-        var env: String
-        var locale: String
-        var platform: Platform
-
-        struct Widget: Encodable {
-            var id: String
-        }
-
-        struct WidgetConfig: Encodable {
-
-            enum WidgetVisibility: String, Encodable {
-                case visible, hidden
-
-                var isVisible: Bool {
-                    self == .visible
-                }
-            }
-
-            init(id: String, isVisible: Bool) {
-                self.id = id
-                self.visibility = isVisible ? .visible : .hidden
-            }
-
-            var id: String
-            var visibility: WidgetVisibility
-        }
-
-        struct Platform: Encodable {
-            var name: String
-        }
-    }
 
     struct WidgetConfig: Encodable {
         let animation: Animation?
@@ -170,22 +124,9 @@ extension NewTabPageUserScript {
             case auto = "auto-animate"
         }
     }
+}
 
-    struct FavoritesData: Encodable {
-        let favorites: [Favorite]
-    }
-
-    struct Favorite: Encodable {
-        let favicon: FavoriteFavicon?
-        let id: String
-        let title: String
-        let url: String
-    }
-
-    struct FavoriteFavicon: Encodable {
-        let maxAvailableSize: Int
-        let src: String
-    }
+extension NewTabPageUserScript {
 
     struct PrivacyStatsData: Encodable {
         let totalCount: Int

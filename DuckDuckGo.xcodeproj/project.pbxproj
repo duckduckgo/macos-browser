@@ -1199,6 +1199,8 @@
 		3797C7A42C62C38800DA77FB /* HomePageSettingsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3797C7A22C62C38800DA77FB /* HomePageSettingsModel.swift */; };
 		379B5AEC2CEA26DA00B9F5D7 /* NewTabPageConfigurationClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379B5AEB2CEA26C600B9F5D7 /* NewTabPageConfigurationClient.swift */; };
 		379B5AED2CEA26DA00B9F5D7 /* NewTabPageConfigurationClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379B5AEB2CEA26C600B9F5D7 /* NewTabPageConfigurationClient.swift */; };
+		379B5AEF2CEA30F100B9F5D7 /* NewTabPageFavoritesClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379B5AEE2CEA30EA00B9F5D7 /* NewTabPageFavoritesClient.swift */; };
+		379B5AF02CEA30F100B9F5D7 /* NewTabPageFavoritesClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379B5AEE2CEA30EA00B9F5D7 /* NewTabPageFavoritesClient.swift */; };
 		379DE4BD27EA31AC002CC3DE /* PreferencesAutofillView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379DE4BC27EA31AC002CC3DE /* PreferencesAutofillView.swift */; };
 		379E877629E98729001C8BB0 /* BookmarksCleanupErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379E877529E98729001C8BB0 /* BookmarksCleanupErrorHandling.swift */; };
 		379E877729E98729001C8BB0 /* BookmarksCleanupErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379E877529E98729001C8BB0 /* BookmarksCleanupErrorHandling.swift */; };
@@ -3670,6 +3672,7 @@
 		3797C79F2C61806500DA77FB /* HomePageSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePageSettingsView.swift; sourceTree = "<group>"; };
 		3797C7A22C62C38800DA77FB /* HomePageSettingsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePageSettingsModel.swift; sourceTree = "<group>"; };
 		379B5AEB2CEA26C600B9F5D7 /* NewTabPageConfigurationClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageConfigurationClient.swift; sourceTree = "<group>"; };
+		379B5AEE2CEA30EA00B9F5D7 /* NewTabPageFavoritesClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageFavoritesClient.swift; sourceTree = "<group>"; };
 		379DE4BC27EA31AC002CC3DE /* PreferencesAutofillView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesAutofillView.swift; sourceTree = "<group>"; };
 		379E877529E98729001C8BB0 /* BookmarksCleanupErrorHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksCleanupErrorHandling.swift; sourceTree = "<group>"; };
 		37A089FA2C510FE0003BB417 /* RemoteMessagingDebugMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMessagingDebugMenu.swift; sourceTree = "<group>"; };
@@ -8771,6 +8774,7 @@
 			isa = PBXGroup;
 			children = (
 				3723A94E2CE73FDD00A0C59A /* NewTabPageRMFClient.swift */,
+				379B5AEE2CEA30EA00B9F5D7 /* NewTabPageFavoritesClient.swift */,
 				379B5AEB2CEA26C600B9F5D7 /* NewTabPageConfigurationClient.swift */,
 				37FB43102CDB883700479A1E /* NewTabPageActionsManager.swift */,
 				372ED7C12CDD4815002287EC /* NewTabPageUserContentController.swift */,
@@ -11721,6 +11725,7 @@
 				3706FBE3293F65D500E42796 /* WindowControllersManager.swift in Sources */,
 				37197EAA2942443D00394917 /* ModalSheetCancellable.swift in Sources */,
 				31267C6B2B640C5200FEF811 /* DataBrokerProtectionAppEvents.swift in Sources */,
+				379B5AF02CEA30F100B9F5D7 /* NewTabPageFavoritesClient.swift in Sources */,
 				3706FBE4293F65D500E42796 /* FireAnimationView.swift in Sources */,
 				3706FBE5293F65D500E42796 /* FaviconUrlReference.swift in Sources */,
 				3199AF802C80734A003AEBDC /* TabModalManageable.swift in Sources */,
@@ -13385,6 +13390,7 @@
 				AAA892EA250A4CEF005B37B2 /* WindowControllersManager.swift in Sources */,
 				85C5991B27D10CF000E605B2 /* FireAnimationView.swift in Sources */,
 				B6B4D1CA2B0C8C9200C26286 /* FirefoxCompatibilityPreferences.swift in Sources */,
+				379B5AEF2CEA30F100B9F5D7 /* NewTabPageFavoritesClient.swift in Sources */,
 				AA6197C4276B314D008396F0 /* FaviconUrlReference.swift in Sources */,
 				B696AFFB2AC5924800C93203 /* FileLineError.swift in Sources */,
 				1D39E57A2C2C0F3700757339 /* ReleaseNotesUserScript.swift in Sources */,
