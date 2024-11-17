@@ -869,7 +869,10 @@ final class BrowserTabViewController: NSViewController {
         case .onboarding:
             return
         case .newtab:
-            containsHostingView = !featureFlagger.isFeatureOn(.htmlNewTabPage)
+            guard !featureFlagger.isFeatureOn(.htmlNewTabPage) else {
+                return
+            }
+            containsHostingView = false
         case .settings:
             containsHostingView = true
         default:
