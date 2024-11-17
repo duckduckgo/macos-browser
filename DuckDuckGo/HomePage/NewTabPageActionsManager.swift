@@ -40,9 +40,6 @@ extension NewTabPageScriptClient {
 protocol NewTabPageActionsManaging: AnyObject {
     func registerUserScript(_ userScript: NewTabPageUserScript)
 
-    func getPrivacyStats() -> NewTabPageUserScript.PrivacyStatsData
-    func getPrivacyStatsConfig() -> NewTabPageUserScript.WidgetConfig
-
     /// It is called in case of error loading the pages
     func reportException(with params: [String: String])
 }
@@ -70,7 +67,8 @@ final class NewTabPageActionsManager: NewTabPageActionsManaging, NewTabPageUserS
         newTabPageScriptClients = [
             NewTabPageConfigurationClient(appearancePreferences: appearancePreferences),
             NewTabPageRMFClient(activeRemoteMessageModel: activeRemoteMessageModel, openURLHandler: openURLHandler),
-            NewTabPageFavoritesClient()
+            NewTabPageFavoritesClient(),
+            NewTabPagePrivacyStatsClient()
         ]
         newTabPageScriptClients.forEach { $0.userScriptsSource = self }
     }
@@ -78,16 +76,6 @@ final class NewTabPageActionsManager: NewTabPageActionsManaging, NewTabPageUserS
     func registerUserScript(_ userScript: NewTabPageUserScript) {
         userScriptsHandles.add(userScript)
         newTabPageScriptClients.forEach { $0.registerMessageHandlers(for: userScript) }
-    }
-
-    func getPrivacyStats() -> NewTabPageUserScript.PrivacyStatsData {
-        // implementation TBD
-        .init(totalCount: 0, trackerCompanies: [])
-    }
-
-    func getPrivacyStatsConfig() -> NewTabPageUserScript.WidgetConfig {
-        // implementation TBD
-        .init(animation: .auto, expansion: .collapsed)
     }
 
     func reportException(with params: [String: String]) {

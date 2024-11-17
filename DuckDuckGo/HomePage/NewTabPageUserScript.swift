@@ -49,9 +49,7 @@ final class NewTabPageUserScript: NSObject, SubfeatureWithExternalMessageHandlin
 
     private lazy var methodHandlers: [MessageName: Handler] = [
         "reportInitException": { [weak self] in try await self?.reportException(params: $0, original: $1) },
-        "reportPageException": { [weak self] in try await self?.reportException(params: $0, original: $1) },
-        "stats_getConfig": { [weak self] in try await self?.statsGetConfig(params: $0, original: $1) },
-        "stats_getData": { [weak self] in try await self?.statsGetData(params: $0, original: $1) },
+        "reportPageException": { [weak self] in try await self?.reportException(params: $0, original: $1) }
     ]
 
     func registerMessageHandlers(_ handlers: [MessageName: Subfeature.Handler]) {
@@ -65,14 +63,6 @@ final class NewTabPageUserScript: NSObject, SubfeatureWithExternalMessageHandlin
         methodHandlers[methodName]
     }
 
-    func notifyRemoteMessageDidChange(_ remoteMessageData: NewTabPageUserScript.RMFData?) {
-        guard let webView else {
-            return
-        }
-
-        broker?.push(method: "rmf_onDataUpdate", params: remoteMessageData, for: self, into: webView)
-    }
-
     func pushMessage(named method: String, params: Encodable?, using script: NewTabPageUserScript) {
         guard let webView = script.webView else {
             return
@@ -82,16 +72,6 @@ final class NewTabPageUserScript: NSObject, SubfeatureWithExternalMessageHandlin
 }
 
 extension NewTabPageUserScript {
-
-    @MainActor
-    private func statsGetConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        actionsManager.getPrivacyStatsConfig()
-    }
-
-    @MainActor
-    private func statsGetData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        actionsManager.getPrivacyStats()
-    }
 
     private func reportException(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let params = params as? [String: String] else { return nil }
@@ -123,18 +103,5 @@ extension NewTabPageUserScript {
             case viewTransitions = "view-transitions"
             case auto = "auto-animate"
         }
-    }
-}
-
-extension NewTabPageUserScript {
-
-    struct PrivacyStatsData: Encodable {
-        let totalCount: Int
-        let trackerCompanies: [TrackerCompany]
-    }
-
-    struct TrackerCompany: Encodable {
-        let count: Int
-        let displayName: String
     }
 }
