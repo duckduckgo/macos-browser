@@ -18,6 +18,7 @@
 
 import AppKit
 import Combine
+import os.log
 import UserScript
 
 final class NewTabPageConfigurationClient: NewTabPageScriptClient {
@@ -48,6 +49,8 @@ final class NewTabPageConfigurationClient: NewTabPageScriptClient {
     enum MessageNames: String, CaseIterable {
         case contextMenu
         case initialSetup
+        case reportInitException
+        case reportPageException
         case widgetsSetConfig = "widgets_setConfig"
         case widgetsOnConfigUpdated = "widgets_onConfigUpdated"
     }
@@ -56,6 +59,8 @@ final class NewTabPageConfigurationClient: NewTabPageScriptClient {
         userScript.registerMessageHandlers([
             MessageNames.contextMenu.rawValue: { [weak self] in try await self?.showContextMenu(params: $0, original: $1) },
             MessageNames.initialSetup.rawValue: { [weak self] in try await self?.initialSetup(params: $0, original: $1) },
+            MessageNames.reportInitException.rawValue: { [weak self] in try await self?.reportException(params: $0, original: $1) },
+            MessageNames.reportPageException.rawValue: { [weak self] in try await self?.reportException(params: $0, original: $1) },
             MessageNames.widgetsSetConfig.rawValue: { [weak self] in try await self?.widgetsSetConfig(params: $0, original: $1) }
         ])
     }
@@ -158,6 +163,14 @@ final class NewTabPageConfigurationClient: NewTabPageScriptClient {
                 break
             }
         }
+        return nil
+    }
+
+    func reportException(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        guard let params = params as? [String: String] else { return nil }
+        let message = params["message"] ?? ""
+        let id = params["id"] ?? ""
+        Logger.general.error("New Tab Page error: \("\(id): \(message)", privacy: .public)")
         return nil
     }
 }

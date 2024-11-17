@@ -32,6 +32,7 @@ final class NewTabPageUserScript: NSObject, SubfeatureWithExternalMessageHandlin
     let featureName: String = "newTabPage"
     weak var broker: UserScriptMessageBroker?
     weak var webView: WKWebView?
+    private var methodHandlers: [MessageName: Handler] = [:]
 
     // MARK: - MessageNames
 
@@ -47,18 +48,12 @@ final class NewTabPageUserScript: NSObject, SubfeatureWithExternalMessageHandlin
         self.broker = broker
     }
 
-    private lazy var methodHandlers: [MessageName: Handler] = [
-        "reportInitException": { [weak self] in try await self?.reportException(params: $0, original: $1) },
-        "reportPageException": { [weak self] in try await self?.reportException(params: $0, original: $1) }
-    ]
-
     func registerMessageHandlers(_ handlers: [MessageName: Subfeature.Handler]) {
         for (messageName, handler) in handlers {
             methodHandlers[messageName] = handler
         }
     }
 
-    @MainActor
     func handler(forMethodNamed methodName: MessageName) -> Handler? {
         methodHandlers[methodName]
     }
@@ -68,15 +63,6 @@ final class NewTabPageUserScript: NSObject, SubfeatureWithExternalMessageHandlin
             return
         }
         script.broker?.push(method: method, params: params, for: script, into: webView)
-    }
-}
-
-extension NewTabPageUserScript {
-
-    private func reportException(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let params = params as? [String: String] else { return nil }
-        actionsManager.reportException(with: params)
-        return nil
     }
 }
 

@@ -39,9 +39,6 @@ extension NewTabPageScriptClient {
 
 protocol NewTabPageActionsManaging: AnyObject {
     func registerUserScript(_ userScript: NewTabPageUserScript)
-
-    /// It is called in case of error loading the pages
-    func reportException(with params: [String: String])
 }
 
 protocol NewTabPageUserScriptsSource: AnyObject {
@@ -76,11 +73,5 @@ final class NewTabPageActionsManager: NewTabPageActionsManaging, NewTabPageUserS
     func registerUserScript(_ userScript: NewTabPageUserScript) {
         userScriptsHandles.add(userScript)
         newTabPageScriptClients.forEach { $0.registerMessageHandlers(for: userScript) }
-    }
-
-    func reportException(with params: [String: String]) {
-        let message = params["message"] ?? ""
-        let id = params["id"] ?? ""
-        Logger.general.error("New Tab Page error: \("\(id): \(message)", privacy: .public)")
     }
 }
