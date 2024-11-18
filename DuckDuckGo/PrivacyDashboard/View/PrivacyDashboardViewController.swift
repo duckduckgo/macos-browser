@@ -34,7 +34,7 @@ final class PrivacyDashboardViewController: NSViewController {
 
     struct Constants {
         static let initialContentHeight: CGFloat = 489.0
-        static let reportBrokenSiteInitialContentHeight = 587.0 + 28.0
+        static let reportBrokenSiteInitialContentHeight = 587c.0 + 28.0
         static let initialContentWidth: CGFloat = 360.0
     }
 
@@ -81,7 +81,6 @@ final class PrivacyDashboardViewController: NSViewController {
         let toggleReportingManager = ToggleReportingManager(feature: toggleReportingFeature)
         self.privacyDashboardController = PrivacyDashboardController(privacyInfo: privacyInfo,
                                                                      entryPoint: entryPoint,
-                                                                     variant: .control,
                                                                      toggleReportingManager: toggleReportingManager,
                                                                      eventMapping: eventMapping)
         super.init(nibName: nil, bundle: nil)
