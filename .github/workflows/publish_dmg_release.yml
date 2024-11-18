@@ -255,23 +255,21 @@ jobs:
           ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
           BRANCH: ${{ github.ref_name }}
         run: |
-          version="$(cut -d '/' -f 2 <<< "$BRANCH")"
-          ./scripts/update_asana_for_release.sh public \
-            ${{ steps.task-id.outputs.asana_task_id }} \
-            ${{ vars.MACOS_APP_BOARD_DONE_SECTION_ID }} \
-            "${version}" \
-            announcement-task-contents.txt
-          echo "announcement-task-contents=$(sed 's/"/\\"/g' < announcement-task-contents.txt)" >> $GITHUB_OUTPUT
+          bundle exec fastlane run update_asana_for_release \
+            platform:macos \
+            release_type:public \
+            github_handle:"${{ github.actor }}" \
+            is_scheduled_release:"${{ github.event_name == 'schedule' }}" \
+            release_task_id:"${{ steps.task-id.outputs.asana_task_id }}" \
+            target_section_id:"${{ vars.MACOS_APP_BOARD_DONE_SECTION_ID }}"
 
       - name: Get tasks since last internal release
         id: get-tasks-since-last-internal-release
         if: contains(github.event.inputs.release-type, '') || github.event.inputs.release-type == 'internal'
         env:
-          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
-          tasks="$(./scripts/update_asana_for_release.sh list-tasks-in-last-internal-release)"
-          echo "tasks=$tasks" >> $GITHUB_OUTPUT
+            bundle exec fastlane run get_tasks_in_last_internal_release platform:macos
 
       - name: Set common environment variables
         if: always()
@@ -336,19 +334,6 @@ jobs:
             github_handle:"${{ github.actor }}" \
             is_scheduled_release:"${{ github.event_name == 'schedule' }}"
 
-      - name: Create Asana task to announce the release
-        id: create-announcement-task
-        if: ${{ env.RELEASE_TYPE != 'internal' }}
-        env:
-          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
-        run: |
-          bundle exec fastlane run asana_create_action_item \
-            task_url:"${{ env.asana-task-url }}" \
-            task_name:"Announce the release to the company" \
-            html_notes:"${{ steps.update-asana.outputs.announcement-task-contents }}" \
-            github_handle:"${{ github.actor }}" \
-            is_scheduled_release:"${{ github.event_name == 'schedule' }}"
-
       - name: Upload patch to the Asana task
         id: upload-patch
         if: success()
@@ -382,7 +367,7 @@ jobs:
       - name: Report status
         if: always()
         env:
-          ANNOUNCEMENT_TASK_ID: ${{ steps.create-announcement-task.outputs.asana_new_task_id }}
+          ANNOUNCEMENT_TASK_ID: ${{ steps.update-asana.outputs.asana_new_task_id }}
           ASSIGNEE_ID: ${{ steps.create-task.outputs.asana_assignee_id }}
           TASK_ID: ${{ steps.create-task.outputs.asana_new_task_id }}
           ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
