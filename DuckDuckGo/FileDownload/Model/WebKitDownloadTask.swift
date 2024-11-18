@@ -333,9 +333,10 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
             Logger.fileDownload.error("🛑 file presenters failure: \(self): \(error)")
 
             self.download.cancel()
+
             self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error, resumeData: nil, isRetryable: false)))
 
-            PixelKit.fire(DebugEvent(GeneralPixel.fileDownloadCreatePresentersFailed, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.fileDownloadCreatePresentersFailed(osVersion: "\(ProcessInfo.processInfo.operatingSystemVersion)"), error: error))
         }
     }
 
