@@ -77,7 +77,7 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
         }
     }
 
-    struct Response: Decodable {
+    struct Response: Codable {
         let message: String?
         let error: String?
     }
