@@ -90,3 +90,4 @@ jobs:
           bundle exec fastlane run asana_add_comment \
             task_url:"${{ steps.create_release_task.outputs.asana_task_url }}" \
             template_name:"hotfix-branch-ready"
+            
