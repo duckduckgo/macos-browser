@@ -2,8 +2,6 @@
 
 We are excited to engage the community in development!
 
-Test change to verify failures.
-
 ## We are hiring!
 DuckDuckGo is growing fast and we continue to expand our fully distributed team. We embrace diverse perspectives, and seek out passionate, self-motivated people, committed to our shared vision of raising the standard of trust online. If you are a senior software engineer, visit our [careers](https://duckduckgo.com/hiring/#open) page to find out more about our openings!
 
