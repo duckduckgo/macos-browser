@@ -75,14 +75,15 @@ jobs:
       - name: Update Asana tasks for the release
         env:
           ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
           BRANCH: ${{ github.ref_name }}
         run: |
-          version="$(cut -d '/' -f 2 <<< "$BRANCH")"
-          # 'internal', because we start with making a build that still needs to be tested before being published
-          # and we want Asana tasks to be moved to "Validation" and not already to "Done"
-          ./scripts/update_asana_for_release.sh internal ${{ steps.task-id.outputs.asana_task_id }} ${{ vars.MACOS_APP_BOARD_VALIDATION_SECTION_ID }} "${version}"
-
+          bundle exec fastlane run update_asana_for_release \
+            platform:macos \
+            release_type:internal \
+            release_task_id:"${{ steps.task-id.outputs.asana_task_id }}" \
+            target_section_id:"${{ vars.MACOS_APP_BOARD_VALIDATION_SECTION_ID }}"
+          
   prepare_release:
     name: Prepare Release
     needs: run_tests

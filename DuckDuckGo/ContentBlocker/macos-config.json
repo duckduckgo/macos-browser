@@ -1,12 +1,7 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1731616743726,
+    "version": 1731320660413,
     "features": {
-        "adAttributionReporting": {
-            "state": "disabled",
-            "exceptions": [],
-            "hash": "c292bb627849854515cebbded288ef5a"
-        },
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
             "state": "enabled",
@@ -183,9 +178,6 @@
                     "domain": "eurostar.com"
                 },
                 {
-                    "domain": "geo.fr"
-                },
-                {
                     "domain": "ksta.de"
                 },
                 {
@@ -286,6 +278,9 @@
                 },
                 {
                     "domain": "motorsport.com"
+                },
+                {
+                    "domain": "paypal.com"
                 },
                 {
                     "domain": "elmundotoday.com"
@@ -436,11 +431,11 @@
             },
             "state": "enabled",
             "features": {
-                "filterlist": {
+                "filterlistExperiment2": {
                     "state": "enabled"
                 }
             },
-            "hash": "c2e778616a7691e4b8e1668b52142880"
+            "hash": "7a4965df30b37cc6667c92a477757058"
         },
         "autofillBreakageReporter": {
             "state": "disabled",
@@ -2336,15 +2331,6 @@
                         ]
                     },
                     {
-                        "domain": "androidauthority.com",
-                        "rules": [
-                            {
-                                "selector": "div[data-ad-type]",
-                                "type": "closest-empty"
-                            }
-                        ]
-                    },
-                    {
                         "domain": "androidpolice.com",
                         "rules": [
                             {
@@ -2939,14 +2925,6 @@
                             {
                                 "selector": ".viafoura-standalone-mpu",
                                 "type": "hide"
-                            }
-                        ]
-                    },
-                    {
-                        "domain": "expressnews.com",
-                        "rules": [
-                            {
-                                "type": "disable-default"
                             }
                         ]
                     },
@@ -3746,10 +3724,6 @@
                             {
                                 "selector": "[class^='ads__right-rail']",
                                 "type": "hide-empty"
-                            },
-                            {
-                                "selector": ".atf_mobile-scroll-ad",
-                                "type": "hide"
                             }
                         ]
                     },
@@ -5022,7 +4996,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "8fcbd7aec79d8215b881832a951704da"
+            "hash": "a67f228d780dfbd95210e12b90da8df2"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -5943,13 +5917,9 @@
                 },
                 "allowPurchaseStripe": {
                     "state": "enabled"
-                },
-                "useUnifiedFeedback": {
-                    "state": "enabled",
-                    "minSupportedVersion": "1.113.0"
                 }
             },
-            "hash": "85c4759ce6c0b809c071998403e864ba"
+            "hash": "1a10a68ea8885db0d1d9bab371c0f738"
         },
         "privacyProtectionsPopup": {
             "state": "disabled",
@@ -7800,7 +7770,6 @@
                                     "siouxlandnews.com",
                                     "southernoregoncw.com",
                                     "star64.tv",
-                                    "stockcharts.com",
                                     "thecw38.com",
                                     "thecw46.com",
                                     "thecwtc.com",
@@ -8748,7 +8717,6 @@
                                 "domains": [
                                     "signupgenius.com",
                                     "smithsonianmag.com",
-                                    "stockcharts.com",
                                     "titantv.com"
                                 ]
                             },
@@ -9623,7 +9591,7 @@
                     "domain": "instructure.com"
                 }
             ],
-            "hash": "a2dedea9ec77d234d33aeaa2d4ea88b2"
+            "hash": "ee6f955a89fa4d85e792ef4ebdb81920"
         },
         "trackingCookies1p": {
             "settings": {
@@ -9682,9 +9650,6 @@
                     "domain": "axs.com"
                 },
                 {
-                    "domain": "urldefense.com"
-                },
-                {
                     "domain": "marvel.com"
                 },
                 {
@@ -9731,7 +9696,7 @@
             },
             "state": "enabled",
             "minSupportedVersion": "0.22.3",
-            "hash": "460ab4e48211b13dc1891bef8922392e"
+            "hash": "d4fd05626079512387bd1fc0de585cb9"
         },
         "userAgentRotation": {
             "settings": {
