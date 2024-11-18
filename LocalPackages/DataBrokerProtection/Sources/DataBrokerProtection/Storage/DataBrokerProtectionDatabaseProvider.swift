@@ -100,6 +100,7 @@ protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
 
     func hasMatches() throws -> Bool
 
+    func fetchAllAttempts() throws -> [OptOutAttemptDB]
     func fetchAttemptInformation(for extractedProfileId: Int64) throws -> OptOutAttemptDB?
     func save(_ optOutAttemptDB: OptOutAttemptDB) throws
  }
@@ -616,6 +617,12 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
     func hasMatches() throws -> Bool {
         try db.read { db in
             return try OptOutDB.fetchCount(db) > 0
+        }
+    }
+
+    func fetchAllAttempts() throws -> [OptOutAttemptDB] {
+        try db.read { db in
+            return try OptOutAttemptDB.fetchAll(db)
         }
     }
 
