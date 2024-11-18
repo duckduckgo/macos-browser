@@ -92,6 +92,24 @@ jobs:
     - name: Download and unzip artifact
       uses: actions/download-artifact@v4
 
+    - name: Set cache key hash
+      run: |
+        has_only_tags=$(jq '[ .pins[].state | has("version") ] | all' DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved)
+        if [[ "$has_only_tags" == "true" ]]; then
+          echo "cache_key_hash=${{ hashFiles('DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}" >> $GITHUB_ENV
+        else
+          echo "Package.resolved contains dependencies specified by branch or commit, skipping cache."
+        fi
+
+    - name: Cache SPM
+      if: env.cache_key_hash
+      uses: actions/cache@v4
+      with:
+        path: DerivedData/SourcePackages
+        key: ${{ runner.os }}-spm-${{ env.cache_key_hash }}
+        restore-keys: |
+          ${{ runner.os }}-spm-
+
     - name: Select Xcode
       run: |
         # Override .xcode_version because 15.4 is not available on macos 13
