@@ -71,7 +71,7 @@ jobs:
 
     needs: validate_input_conditions
 
-    if: needs.validate_input_conditions.outputs.skip-release == 'false'
+    if: needs.validate_input_conditions.outputs.skip-release != 'true'
     uses: ./.github/workflows/pr.yml
     with:
       branch: ${{ needs.validate_input_conditions.outputs.release-branch }}
