@@ -769,6 +769,10 @@ final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault
         return 1
     }
 
+    func fetchAllAttempts() throws -> [AttemptInformation] {
+        []
+    }
+
     func fetchAttemptInformation(for extractedProfileId: Int64) throws -> AttemptInformation? {
         return nil
     }
@@ -990,6 +994,10 @@ final class MockDatabase: DataBrokerProtectionRepository {
         return extractedProfilesFromBroker
     }
 
+    func fetchAllAttempts() throws -> [AttemptInformation] {
+        [attemptInformation].compactMap { $0 }
+    }
+
     func fetchAttemptInformation(for extractedProfileId: Int64) -> AttemptInformation? {
         return attemptInformation
     }
@@ -1203,8 +1211,9 @@ extension ScanJobData {
 
 extension OptOutJobData {
     static func mock(with extractedProfile: ExtractedProfile,
+                     preferredRunDate: Date? = nil,
                      historyEvents: [HistoryEvent] = [HistoryEvent]()) -> OptOutJobData {
-        .init(brokerId: 1, profileQueryId: 1, createdDate: Date(), historyEvents: historyEvents, attemptCount: 0, extractedProfile: extractedProfile)
+        .init(brokerId: 1, profileQueryId: 1, createdDate: Date(), preferredRunDate: preferredRunDate, historyEvents: historyEvents, attemptCount: 0, extractedProfile: extractedProfile)
     }
 
     static func mock(with createdDate: Date) -> OptOutJobData {

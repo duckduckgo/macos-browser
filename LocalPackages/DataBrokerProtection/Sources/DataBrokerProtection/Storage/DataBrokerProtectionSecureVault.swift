@@ -107,6 +107,7 @@ protocol DataBrokerProtectionSecureVault: SecureVault {
 
     func hasMatches() throws -> Bool
 
+    func fetchAllAttempts() throws -> [AttemptInformation]
     func fetchAttemptInformation(for extractedProfileId: Int64) throws -> AttemptInformation?
     func save(extractedProfileId: Int64, attemptUUID: UUID, dataBroker: String, lastStageDate: Date, startTime: Date) throws
 }
@@ -443,6 +444,11 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
 
     func hasMatches() throws -> Bool {
         try self.providers.database.hasMatches()
+    }
+
+    func fetchAllAttempts() throws -> [AttemptInformation] {
+        let mapper = MapperToModel(mechanism: l2Decrypt(data:))
+        return try self.providers.database.fetchAllAttempts().map(mapper.mapToModel(_:))
     }
 
     func fetchAttemptInformation(for extractedProfileId: Int64) throws -> AttemptInformation? {

@@ -100,6 +100,7 @@ protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
 
     func hasMatches() throws -> Bool
 
+    func fetchAllAttempts() throws -> [OptOutAttemptDB]
     func fetchAttemptInformation(for extractedProfileId: Int64) throws -> OptOutAttemptDB?
     func save(_ optOutAttemptDB: OptOutAttemptDB) throws
  }
@@ -619,6 +620,12 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         }
     }
 
+    func fetchAllAttempts() throws -> [OptOutAttemptDB] {
+        try db.read { db in
+            return try OptOutAttemptDB.fetchAll(db)
+        }
+    }
+
     func fetchAttemptInformation(for extractedProfileId: Int64) throws -> OptOutAttemptDB? {
         try db.read { db in
             return try OptOutAttemptDB.fetchOne(db, key: extractedProfileId)
@@ -627,7 +634,14 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
 
     func save(_ optOutAttemptDB: OptOutAttemptDB) throws {
         try db.write { db in
-            try optOutAttemptDB.insert(db)
+            // We originally intended for ExtractedProfileDB to have a one-to-many relationship with OptOutAttemptDB,
+            // but it somehow ended up as a one-to-one relationship instead.
+            //
+            // This serves as a temporary workaround to keep the opt-out retry mechanism functioning.
+            // We'll need to address this issue properly in the future.
+            //
+            // https://app.asana.com/0/1205591970852438/1208761697124514/f
+            try optOutAttemptDB.upsert(db)
         }
     }
 }

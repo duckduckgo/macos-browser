@@ -371,15 +371,22 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
 
     func testWhenRemovedProfileIsFound_thenOptOutConfirmedIsAddedRemoveDateIsUpdatedAndPreferredRunDateIsSetToNil() async {
         do {
+            let extractedProfileId: Int64 = 1
+            let brokerId: Int64 = 1
+            let profileQueryId: Int64 = 1
+            let mockHistoryEvent = HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested)
+            let mockBrokerProfileQuery = BrokerProfileQueryData(
+                dataBroker: .mock,
+                profileQuery: .mock,
+                scanJobData: .mock,
+                optOutJobData: [.mock(with: .mockWithoutRemovedDate, preferredRunDate: Date(), historyEvents: [mockHistoryEvent])]
+            )
+
             mockWebOperationRunner.scanResults = [.mockWithoutId]
+            mockDatabase.brokerProfileQueryDataToReturn = [mockBrokerProfileQuery]
             _ = try await sut.runScanOperation(
                 on: mockWebOperationRunner,
-                brokerProfileQueryData: .init(
-                    dataBroker: .mock,
-                    profileQuery: .mock,
-                    scanJobData: .mock,
-                    optOutJobData: [OptOutJobData.mock(with: .mockWithoutRemovedDate)]
-                ),
+                brokerProfileQueryData: mockBrokerProfileQuery,
                 database: mockDatabase,
                 notificationCenter: .default,
                 pixelHandler: MockDataBrokerProtectionPixelsHandler(),
@@ -389,6 +396,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
             XCTAssertTrue(mockDatabase.optOutEvents.contains(where: { $0.type == .optOutConfirmed }))
             XCTAssertTrue(mockDatabase.wasUpdateRemoveDateCalled)
             XCTAssertNotNil(mockDatabase.extractedProfileRemovedDate)
+            XCTAssertTrue(mockDatabase.wasUpdatedPreferredRunDateForOptOutCalled)
+            XCTAssertNil(mockDatabase.lastPreferredRunDateOnOptOut)
         } catch {
             XCTFail("Should not throw")
         }
