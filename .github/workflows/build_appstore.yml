@@ -163,7 +163,7 @@ jobs:
       env:
         WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         DESTINATION: ${{ env.destination }}
-        PLATFORM: macos
+        PLATFORM: macOS
       run: |
         bundle exec fastlane run mattermost_send_message \
           mattermost_webhook_url:${{ secrets.MM_WEBHOOK_URL }} \
