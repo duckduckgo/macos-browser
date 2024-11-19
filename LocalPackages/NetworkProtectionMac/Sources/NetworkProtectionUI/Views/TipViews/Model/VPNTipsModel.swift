@@ -49,8 +49,9 @@ public final class VPNTipsModel: ObservableObject {
     }
 
     @Published
-    private(set) var featureFlag: Bool
+    private var featureFlag: Bool
 
+    private let isMenuApp: Bool
     private let vpnSettings: VPNSettings
     private let logger: Logger
     private var cancellables = Set<AnyCancellable>()
@@ -65,12 +66,11 @@ public final class VPNTipsModel: ObservableObject {
         self.activeSiteInfo = activeSitePublisher.value
         self.connectionStatus = statusObserver.recentValue
         self.featureFlag = featureFlagPublisher.value
+        self.isMenuApp = isMenuApp
         self.logger = logger
         self.vpnSettings = vpnSettings
 
         if #available(macOS 14.0, *) {
-            VPNDomainExclusionsTip.canShow = !isMenuApp
-
             handleActiveSiteInfoChanged(newValue: activeSiteInfo)
             handleConnectionStatusChanged(oldValue: connectionStatus, newValue: connectionStatus)
 
@@ -78,6 +78,10 @@ public final class VPNTipsModel: ObservableObject {
             subscribeToFeatureFlagChanges(featureFlagPublisher)
             subscribeToActiveSiteChanges(activeSitePublisher)
         }
+    }
+
+    var canShowTips: Bool {
+        !isMenuApp && featureFlag
     }
 
     @available(macOS 14.0, *)
@@ -112,7 +116,8 @@ public final class VPNTipsModel: ObservableObject {
 
     @available(macOS 14.0, *)
     private func handleActiveSiteInfoChanged(newValue: ActiveSiteInfo?) {
-        VPNDomainExclusionsTip.hasActiveSite = (activeSiteInfo != nil)
+        Logger.networkProtection.debug("🧉 Active site info changed: \(String(describing: newValue))")
+        return VPNDomainExclusionsTip.hasActiveSite = (activeSiteInfo != nil)
     }
 
     @available(macOS 14.0, *)
@@ -139,6 +144,26 @@ public final class VPNTipsModel: ObservableObject {
             vpnSettings.connectOnLogin = true
         }
     }
+
+    // MARK: - Tips
+
+    let autoconnectTip = VPNAutoconnectTip()
+
+    let domainExclusionsTip: VPNDomainExclusionsTip = {
+        let tip = VPNDomainExclusionsTip()
+
+        if #available(macOS 14.0, *) {
+            Task {
+                for await status in tip.statusUpdates {
+                    if case .invalidated = status {
+                        await VPNAutoconnectTip.domainExclusionsTipDismissedEvent.donate()
+                    }
+                }
+            }
+        }
+
+        return tip
+    }()
 
     let geoswitchingTip: VPNGeoswitchingTip = {
 

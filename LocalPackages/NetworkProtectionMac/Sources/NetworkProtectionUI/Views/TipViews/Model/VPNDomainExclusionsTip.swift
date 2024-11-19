@@ -32,13 +32,6 @@ extension VPNDomainExclusionsTip: Tip {
     @Parameter(.transient)
     static var hasActiveSite: Bool = false
 
-    /// Whether the tip can be shown.
-    ///
-    /// This tip is not shown for the VPN menu app.
-    ///
-    @Parameter(.transient)
-    static var canShow: Bool = false
-
     static let geolocationTipDismissedEvent = Tips.Event(id: "com.duckduckgo.vpn.tip.domainExclusions.geolocationTipDismissedEvent")
 
     /// The containing view was opened when the VPN was already connected.
@@ -69,9 +62,6 @@ extension VPNDomainExclusionsTip: Tip {
             $0
         }
         #Rule(Self.$vpnEnabled) {
-            $0
-        }
-        #Rule(Self.$canShow) {
             $0
         }
         #Rule(Self.geolocationTipDismissedEvent) {

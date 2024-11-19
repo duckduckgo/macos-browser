@@ -54,10 +54,10 @@ public struct TunnelControllerView: View {
 
             featureToggleRow()
 
-            if #available(macOS 14.0, *) {
-                TipView(autoconnectTip)
-                //VPNAutoconnectTipView()
-                //TipView(tipGroup.currentTip as? VPNAutoconnectTip)
+            if #available(macOS 14.0, *),
+               tipsModel.canShowTips {
+
+                TipView(tipsModel.autoconnectTip)
                     .padding(.horizontal, 9)
                     .padding(.vertical, 6)
             }
@@ -65,20 +65,12 @@ public struct TunnelControllerView: View {
             SiteTroubleshootingView()
                 .padding(.top, 5)
 
-            if #available(macOS 14.0, *) {
-                //VPNDomainExclusionsTipView()
-                //.padding(.horizontal, 9)
-                //.padding(.vertical, 6)
+            if #available(macOS 14.0, *),
+               tipsModel.canShowTips {
 
-                if tipsModel.featureFlag {//,
-                   //let tip = tipsModel.currentTip as? VPNDomainExclusionsTip {
-
-                    TipView(domainExclusionsTip)
-                    //TipView(tipGroup.currentTip as? VPNDomainExclusionsTip)
-                    //VPNDomainExclusionsTipView()
-                        .padding(.horizontal, 9)
-                        .padding(.vertical, 6)
-                }
+                TipView(tipsModel.domainExclusionsTip)
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 6)
             }
 
             Divider()
@@ -202,7 +194,9 @@ public struct TunnelControllerView: View {
                 }
             }
 
-            if #available(macOS 14.0, *) {
+            if #available(macOS 14.0, *),
+               tipsModel.canShowTips {
+
                 TipView(tipsModel.geoswitchingTip)
                     .padding(.horizontal, 9)
                     .padding(.vertical, 6)
@@ -253,7 +247,7 @@ public struct TunnelControllerView: View {
 
         return tip
     }()*/
-
+/*
     let domainExclusionsTip: VPNDomainExclusionsTip = {
         let tip = VPNDomainExclusionsTip()
 
@@ -270,9 +264,9 @@ public struct TunnelControllerView: View {
         }
 
         return tip
-    }()
+    }()*/
 
-    let autoconnectTip = VPNAutoconnectTip()
+    //let autoconnectTip = VPNAutoconnectTip()
 
     // MARK: - Rows
 
