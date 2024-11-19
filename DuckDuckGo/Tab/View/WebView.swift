@@ -39,7 +39,7 @@ protocol WebViewZoomLevelDelegate: AnyObject {
 }
 
 @objc(DuckDuckGo_WebView)
-open class WebView: WKWebView {
+final class WebView: WKWebView {
 
     weak var contextMenuDelegate: WebViewContextMenuDelegate?
     weak var interactionEventsDelegate: WebViewInteractionEventsDelegate?
@@ -53,7 +53,7 @@ open class WebView: WKWebView {
         isInspectorShown && window != nil
     }
 
-    open override func addTrackingArea(_ trackingArea: NSTrackingArea) {
+    override func addTrackingArea(_ trackingArea: NSTrackingArea) {
         /// disable mouseEntered/mouseMoved/mouseExited events passing to Web View while it‘s loading
         /// see https://app.asana.com/0/1177771139624306/1206990108527681/f
         if trackingArea.owner?.className == "WKMouseTrackingObserver" {
@@ -75,7 +75,7 @@ open class WebView: WKWebView {
         super.addTrackingArea(trackingArea)
     }
 
-    open override var isInFullScreenMode: Bool {
+    override var isInFullScreenMode: Bool {
         if #available(macOS 13.0, *) {
             return self.fullscreenState != .notInFullscreen
         } else {
@@ -160,29 +160,29 @@ open class WebView: WKWebView {
 
     // MARK: - Menu
 
-    open override func willOpenMenu(_ menu: NSMenu, with event: NSEvent) {
+    override func willOpenMenu(_ menu: NSMenu, with event: NSEvent) {
         super.willOpenMenu(menu, with: event)
         contextMenuDelegate?.webView(self, willOpenContextMenu: menu, with: event)
     }
 
-    open override func didCloseMenu(_ menu: NSMenu, with event: NSEvent?) {
+    override func didCloseMenu(_ menu: NSMenu, with event: NSEvent?) {
         super.didCloseMenu(menu, with: event)
         contextMenuDelegate?.webView(self, didCloseContextMenu: menu, with: event)
     }
 
     // MARK: - Events
 
-    open override func mouseDown(with event: NSEvent) {
+    override func mouseDown(with event: NSEvent) {
         super.mouseDown(with: event)
         interactionEventsDelegate?.webView(self, mouseDown: event)
     }
 
-    open override func keyDown(with event: NSEvent) {
+    override func keyDown(with event: NSEvent) {
         super.keyDown(with: event)
         interactionEventsDelegate?.webView(self, keyDown: event)
     }
 
-    open override func scrollWheel(with event: NSEvent) {
+    override func scrollWheel(with event: NSEvent) {
         super.scrollWheel(with: event)
         interactionEventsDelegate?.webView(self, scrollWheel: event)
     }
@@ -198,7 +198,7 @@ open class WebView: WKWebView {
         }
     }
 
-    open override func viewDidMoveToWindow() {
+    override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
         if shouldShowWebInspector {
             openDeveloperTools()
@@ -268,7 +268,7 @@ open class WebView: WKWebView {
 
     // MARK: - NSDraggingDestination
 
-    open override func draggingUpdated(_ draggingInfo: NSDraggingInfo) -> NSDragOperation {
+    override func draggingUpdated(_ draggingInfo: NSDraggingInfo) -> NSDragOperation {
         if draggingInfo.draggingSource is WebView {
             return super.draggingUpdated(draggingInfo)
         }
@@ -285,7 +285,7 @@ open class WebView: WKWebView {
         return superview.draggingUpdated(draggingInfo)
     }
 
-    open override func performDragOperation(_ draggingInfo: NSDraggingInfo) -> Bool {
+    override func performDragOperation(_ draggingInfo: NSDraggingInfo) -> Bool {
         if draggingInfo.draggingSource is WebView {
             return super.performDragOperation(draggingInfo)
         }

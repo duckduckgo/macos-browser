@@ -43,8 +43,7 @@ final class BrowserTabViewController: NSViewController {
     private lazy var hoverLabelContainer = ColorView(frame: .zero, backgroundColor: .browserTabBackground, borderWidth: 0)
 
     private let newTabPageActionsManager: NewTabPageActionsManaging
-    private lazy var newTabPageUserScript: NewTabPageUserScript = NewTabPageUserScript(actionsManager: newTabPageActionsManager)
-    private lazy var newTabPageWebView: WebView = NewTabPageWebView(featureFlagger: featureFlagger, newTabPageUserScript: newTabPageUserScript)
+    private(set) lazy var newTabPageWebViewModel: NewTabPageWebViewModel = NewTabPageWebViewModel(featureFlagger: featureFlagger, actionsManager: newTabPageActionsManager)
     private(set) weak var webView: WebView?
     private weak var webViewContainer: NSView?
     private weak var webViewSnapshot: NSView?
@@ -544,7 +543,7 @@ final class BrowserTabViewController: NSViewController {
         }
 
         func displayWebView(of tabViewModel: TabViewModel) {
-            let newWebView = tabViewModel.tab.content == .newtab ? newTabPageWebView : tabViewModel.tab.webView
+            let newWebView = tabViewModel.tab.content == .newtab ? newTabPageWebViewModel.webView : tabViewModel.tab.webView
             cleanUpRemoteWebViewIfNeeded(newWebView)
             webView = newWebView
 
@@ -846,7 +845,7 @@ final class BrowserTabViewController: NSViewController {
             return false
         }
 
-        let newWebView = tabViewModel.tab.content == .newtab ? newTabPageWebView : tabViewModel.tab.webView
+        let newWebView = tabViewModel.tab.content == .newtab ? newTabPageWebViewModel.webView : tabViewModel.tab.webView
 
         let isPinnedTab = tabCollectionViewModel.pinnedTabsCollection?.tabs.contains(tabViewModel.tab) == true
         let isKeyWindow = view.window?.isKeyWindow == true

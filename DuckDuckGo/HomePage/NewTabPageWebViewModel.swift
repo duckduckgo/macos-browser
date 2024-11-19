@@ -1,5 +1,5 @@
 //
-//  NewTabPageWebView.swift
+//  NewTabPageWebViewModel.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -19,24 +19,30 @@
 import BrowserServicesKit
 import WebKit
 
-final class NewTabPageWebView: WebView {
+/**
+ * This class manages
+ */
+@MainActor
+final class NewTabPageWebViewModel: NSObject {
+    let newTabPageUserScript: NewTabPageUserScript
+    let webView: WebView
 
-    init(featureFlagger: FeatureFlagger, newTabPageUserScript: NewTabPageUserScript) {
+    init(featureFlagger: FeatureFlagger, actionsManager: NewTabPageActionsManaging) {
+        newTabPageUserScript = NewTabPageUserScript(actionsManager: actionsManager)
+
         let configuration = WKWebViewConfiguration()
         configuration.applyNewTabPageWebViewConfiguration(with: featureFlagger, newTabPageUserScript: newTabPageUserScript)
+        webView = WebView(frame: .zero, configuration: configuration)
 
-        super.init(frame: .zero, configuration: configuration)
-        newTabPageUserScript.webView = self
-        navigationDelegate = self
-        load(URLRequest(url: URL.newtab))
-    }
+        super.init()
 
-    @MainActor required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        webView.navigationDelegate = self
+        webView.load(URLRequest(url: URL.newtab))
+        newTabPageUserScript.webView = webView
     }
 }
 
-extension NewTabPageWebView: WKNavigationDelegate {
+extension NewTabPageWebViewModel: WKNavigationDelegate {
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
         navigationAction.request.url == .newtab ? .allow : .cancel
     }
