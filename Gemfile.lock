@@ -1,9 +1,9 @@
 GIT
   remote: https://github.com/duckduckgo/fastlane-plugin-ddg_apple_automation
-  revision: 466fef65f4e8e8a6a215cba72edabf48fb9e6a33
-  tag: 0.11.6
+  revision: fdf84367c1e824248a30a620c45bf5db68de880e
+  branch: kieran/-mm-handle-empty-asana-url
   specs:
-    fastlane-plugin-ddg_apple_automation (0.11.6)
+    fastlane-plugin-ddg_apple_automation (0.11.7)
       asana
       climate_control
       httpparty
@@ -33,10 +33,10 @@ GEM
       aws-partitions (~> 1, >= 1.992.0)
       aws-sigv4 (~> 1.9)
       jmespath (~> 1, >= 1.6.1)
-    aws-sdk-kms (1.95.0)
+    aws-sdk-kms (1.96.0)
       aws-sdk-core (~> 3, >= 3.210.0)
       aws-sigv4 (~> 1.5)
-    aws-sdk-s3 (1.171.0)
+    aws-sdk-s3 (1.172.0)
       aws-sdk-core (~> 3, >= 3.210.0)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.5)
