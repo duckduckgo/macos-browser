@@ -128,9 +128,7 @@ final class NewTabPageRMFClient: NewTabPageScriptClient {
             return .init(content: NewTabPageUserScript.RMFMessage(remoteMessage))
         }()
 
-        userScriptsSource?.userScripts.forEach { userScript in
-            pushMessage(named: MessageNames.rmfOnDataUpdate.rawValue, params: data, for: userScript)
-        }
+        pushMessage(named: MessageNames.rmfOnDataUpdate.rawValue, params: data)
     }
 }
 

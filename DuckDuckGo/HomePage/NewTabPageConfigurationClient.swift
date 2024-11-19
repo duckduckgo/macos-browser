@@ -71,9 +71,7 @@ final class NewTabPageConfigurationClient: NewTabPageScriptClient {
             .init(id: "privacyStats", isVisible: appearancePreferences.isRecentActivityVisible)
         ]
 
-        userScriptsSource?.userScripts.forEach { userScript in
-            pushMessage(named: MessageNames.widgetsOnConfigUpdated.rawValue, params: widgetConfigs, for: userScript)
-        }
+        pushMessage(named: MessageNames.widgetsOnConfigUpdated.rawValue, params: widgetConfigs)
     }
 
     @MainActor

@@ -46,12 +46,19 @@ protocol NewTabPageScriptClient: AnyObject {
 }
 
 extension NewTabPageScriptClient {
-    func pushMessage(named method: String, params: Encodable?, for userScript: SubfeatureWithExternalMessageHandling) {
-        guard let webView = userScript.webView else {
-            return
+    /**
+     * Convenience method to push a message with specific parameters to all user scripts
+     * currently registered with `userScriptsSource`.
+     */
+    func pushMessage(named method: String, params: Encodable?) {
+        userScriptsSource?.userScripts.forEach { userScript in
+            guard let webView = userScript.webView else {
+                return
+            }
+            userScript.broker?.push(method: method, params: params, for: userScript, into: webView)
         }
-        userScript.broker?.push(method: method, params: params, for: userScript, into: webView)
     }
+
 }
 
 protocol NewTabPageActionsManaging: AnyObject {
