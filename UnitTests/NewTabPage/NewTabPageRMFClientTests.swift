@@ -21,62 +21,6 @@ import RemoteMessaging
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-extension RemoteMessageModel {
-    static func mockSmall(id: String) -> RemoteMessageModel {
-        .init(
-            id: id,
-            content: .small(titleText: "title", descriptionText: "description"),
-            matchingRules: [],
-            exclusionRules: [],
-            isMetricsEnabled: true
-        )
-    }
-
-    static func mockMedium(id: String) -> RemoteMessageModel {
-        .init(
-            id: "sample_message",
-            content: .medium(titleText: "title", descriptionText: "description", placeholder: .criticalUpdate),
-            matchingRules: [],
-            exclusionRules: [],
-            isMetricsEnabled: true
-        )
-    }
-
-    static func mockBigSingleAction(id: String, action: RemoteAction) -> RemoteMessageModel {
-        .init(
-            id: "sample_message",
-            content: .bigSingleAction(
-                titleText: "title",
-                descriptionText: "description",
-                placeholder: .ddgAnnounce,
-                primaryActionText: "primary_action",
-                primaryAction: action
-            ),
-            matchingRules: [],
-            exclusionRules: [],
-            isMetricsEnabled: true
-        )
-    }
-
-    static func mockBigTwoAction(id: String, primaryAction: RemoteAction, secondaryAction: RemoteAction) -> RemoteMessageModel {
-        .init(
-            id: "sample_message",
-            content: .bigTwoAction(
-                titleText: "title",
-                descriptionText: "description",
-                placeholder: .ddgAnnounce,
-                primaryActionText: "primary_action",
-                primaryAction: primaryAction,
-                secondaryActionText: "secondary_action",
-                secondaryAction: secondaryAction
-            ),
-            matchingRules: [],
-            exclusionRules: [],
-            isMetricsEnabled: true
-        )
-    }
-}
-
 final class CapturingNewTabPageActiveRemoteMessageProvider: NewTabPageActiveRemoteMessageProviding {
     @Published var remoteMessage: RemoteMessageModel?
 
@@ -204,42 +148,90 @@ final class NewTabPageRMFClientTests: XCTestCase {
         remoteMessageProvider.remoteMessage = .mockSmall(id: "sample_message")
 
         try await sendMessageExpectingNilResponse(named: .rmfPrimaryAction, parameters: ["id": "different_sample_message"])
-        XCTAssertTrue(remoteMessageProvider.dismissCalls.isEmpty)
+        XCTAssertEqual(remoteMessageProvider.dismissCalls, [])
     }
 
-    func testWhenSingleActionMessageThenAppStoreActionOpensAppStoreURL() async throws {
+    func testWhenSingleActionMessageThenPrimaryActionWithAppStoreOpensAppStoreURL() async throws {
         remoteMessageProvider.remoteMessage = .mockBigSingleAction(id: "sample_message", action: .appStore)
         try await sendMessageExpectingNilResponse(named: .rmfPrimaryAction, parameters: ["id": "sample_message"])
         XCTAssertEqual(openURLCalls, [.appStore])
     }
 
-    func testWhenSingleActionMessageThenURLActionOpensURL() async throws {
+    func testWhenSingleActionMessageThenPrimaryActionWithURLOpensURL() async throws {
         remoteMessageProvider.remoteMessage = .mockBigSingleAction(id: "sample_message", action: .url(value: "http://example.com"))
         try await sendMessageExpectingNilResponse(named: .rmfPrimaryAction, parameters: ["id": "sample_message"])
         XCTAssertEqual(openURLCalls, ["http://example.com".url!])
     }
 
-    func testWhenSingleActionMessageThenSurveyActionOpensSurveyURL() async throws {
+    func testWhenSingleActionMessageThenPrimaryActionWithSurveyOpensSurveyURL() async throws {
         remoteMessageProvider.remoteMessage = .mockBigSingleAction(id: "sample_message", action: .survey(value: "http://example.com"))
         try await sendMessageExpectingNilResponse(named: .rmfPrimaryAction, parameters: ["id": "sample_message"])
         XCTAssertEqual(openURLCalls, ["http://example.com".url!])
     }
 
-    func testWhenTwoActionMessageThenAppStoreActionOpensAppStoreURL() async throws {
+    func testWhenTwoActionMessageThenPrimaryActionWithAppStoreOpensAppStoreURL() async throws {
         remoteMessageProvider.remoteMessage = .mockBigTwoAction(id: "sample_message", primaryAction: .appStore, secondaryAction: .dismiss)
         try await sendMessageExpectingNilResponse(named: .rmfPrimaryAction, parameters: ["id": "sample_message"])
         XCTAssertEqual(openURLCalls, [.appStore])
     }
 
-    func testWhenTwoActionMessageThenURLActionOpensURL() async throws {
+    func testWhenTwoActionMessageThenPrimaryActionWithURLOpensURL() async throws {
         remoteMessageProvider.remoteMessage = .mockBigTwoAction(id: "sample_message", primaryAction: .url(value: "http://example.com"), secondaryAction: .dismiss)
         try await sendMessageExpectingNilResponse(named: .rmfPrimaryAction, parameters: ["id": "sample_message"])
         XCTAssertEqual(openURLCalls, ["http://example.com".url!])
     }
 
-    func testWhenTwoActionMessageThenSurveyActionOpensSurveyURL() async throws {
+    func testWhenTwoActionMessageThenPrimaryActionWithSurveyOpensSurveyURL() async throws {
         remoteMessageProvider.remoteMessage = .mockBigTwoAction(id: "sample_message", primaryAction: .survey(value: "http://example.com"), secondaryAction: .dismiss)
         try await sendMessageExpectingNilResponse(named: .rmfPrimaryAction, parameters: ["id": "sample_message"])
+        XCTAssertEqual(openURLCalls, ["http://example.com".url!])
+    }
+
+    // MARK: - secondaryAction
+
+    func testWhenTwoActionMessageThenSecondaryActionSendsSecondaryActionToProvider() async throws {
+        remoteMessageProvider.remoteMessage = .mockBigTwoAction(id: "sample_message", primaryAction: .dismiss, secondaryAction: .appStore)
+
+        try await sendMessageExpectingNilResponse(named: .rmfSecondaryAction, parameters: ["id": "sample_message"])
+        XCTAssertEqual(remoteMessageProvider.dismissCalls, [.secondaryAction])
+    }
+
+    func testWhenSingleActionMessageThenSecondaryActionHasNoEffect() async throws {
+        remoteMessageProvider.remoteMessage = .mockBigSingleAction(id: "sample_message", action: .appStore)
+
+        try await sendMessageExpectingNilResponse(named: .rmfSecondaryAction, parameters: ["id": "sample_message"])
+        XCTAssertEqual(remoteMessageProvider.dismissCalls, [])
+    }
+
+    func testWhenMessageHasNoButtonThenSecondaryActionHasNoEffect() async throws {
+        remoteMessageProvider.remoteMessage = .mockSmall(id: "sample_message")
+
+        try await sendMessageExpectingNilResponse(named: .rmfSecondaryAction, parameters: ["id": "sample_message"])
+        XCTAssertEqual(remoteMessageProvider.dismissCalls, [])
+    }
+
+    func testWhenMessageIdDoesNotMatchThenSecondaryActionHasNoEffect() async throws {
+        remoteMessageProvider.remoteMessage = .mockSmall(id: "sample_message")
+
+        try await sendMessageExpectingNilResponse(named: .rmfSecondaryAction, parameters: ["id": "different_sample_message"])
+        XCTAssertTrue(remoteMessageProvider.dismissCalls.isEmpty)
+    }
+
+    func testWhenTwoActionMessageThenSecondaryActionWithAppStoreOpensAppStoreURL() async throws {
+        remoteMessageProvider.remoteMessage = .mockBigTwoAction(id: "sample_message", primaryAction: .dismiss, secondaryAction: .appStore)
+        try await sendMessageExpectingNilResponse(named: .rmfSecondaryAction, parameters: ["id": "sample_message"])
+        XCTAssertEqual(openURLCalls, [.appStore])
+    }
+
+    func testWhenTwoActionMessageThenSecondaryActionWithURLOpensURL() async throws {
+        remoteMessageProvider.remoteMessage = .mockBigTwoAction(id: "sample_message", primaryAction: .appStore, secondaryAction: .url(value: "http://example.com"))
+        try await sendMessageExpectingNilResponse(named: .rmfSecondaryAction, parameters: ["id": "sample_message"])
+        XCTAssertEqual(openURLCalls, ["http://example.com".url!])
+    }
+
+    func testWhenTwoActionMessageThenSecondaryActionWithSurveyOpensSurveyURL() async throws {
+        remoteMessageProvider.remoteMessage = .mockBigTwoAction(id: "sample_message", primaryAction: .appStore, secondaryAction: .survey(value: "http://example.com"))
+        try await sendMessageExpectingNilResponse(named: .rmfSecondaryAction, parameters: ["id": "sample_message"])
         XCTAssertEqual(openURLCalls, ["http://example.com".url!])
     }
 
@@ -255,5 +247,61 @@ final class NewTabPageRMFClientTests: XCTestCase {
         let handler = try XCTUnwrap(userScript.handler(forMethodNamed: methodName.rawValue), file: file, line: line)
         let response = try await handler(parameters, .init())
         XCTAssertNil(response, file: file, line: line)
+    }
+}
+
+fileprivate extension RemoteMessageModel {
+    static func mockSmall(id: String) -> RemoteMessageModel {
+        .init(
+            id: id,
+            content: .small(titleText: "title", descriptionText: "description"),
+            matchingRules: [],
+            exclusionRules: [],
+            isMetricsEnabled: true
+        )
+    }
+
+    static func mockMedium(id: String) -> RemoteMessageModel {
+        .init(
+            id: "sample_message",
+            content: .medium(titleText: "title", descriptionText: "description", placeholder: .criticalUpdate),
+            matchingRules: [],
+            exclusionRules: [],
+            isMetricsEnabled: true
+        )
+    }
+
+    static func mockBigSingleAction(id: String, action: RemoteAction) -> RemoteMessageModel {
+        .init(
+            id: "sample_message",
+            content: .bigSingleAction(
+                titleText: "title",
+                descriptionText: "description",
+                placeholder: .ddgAnnounce,
+                primaryActionText: "primary_action",
+                primaryAction: action
+            ),
+            matchingRules: [],
+            exclusionRules: [],
+            isMetricsEnabled: true
+        )
+    }
+
+    static func mockBigTwoAction(id: String, primaryAction: RemoteAction, secondaryAction: RemoteAction) -> RemoteMessageModel {
+        .init(
+            id: "sample_message",
+            content: .bigTwoAction(
+                titleText: "title",
+                descriptionText: "description",
+                placeholder: .ddgAnnounce,
+                primaryActionText: "primary_action",
+                primaryAction: primaryAction,
+                secondaryActionText: "secondary_action",
+                secondaryAction: secondaryAction
+            ),
+            matchingRules: [],
+            exclusionRules: [],
+            isMetricsEnabled: true
+        )
     }
 }

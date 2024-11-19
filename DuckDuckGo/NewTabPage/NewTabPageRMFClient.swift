@@ -122,10 +122,10 @@ final class NewTabPageRMFClient: NewTabPageScriptClient {
         switch remoteMessageProvider.remoteMessage?.content {
         case let .bigTwoAction(_, _, _, _, _, _, secondaryAction):
             handleAction(remoteAction: secondaryAction)
+            await remoteMessageProvider.dismissRemoteMessage(with: .secondaryAction)
         default:
             break
         }
-        await remoteMessageProvider.dismissRemoteMessage(with: .secondaryAction)
         return nil
     }
 
