@@ -17,6 +17,7 @@
 //
 
 import Combine
+import Common
 import RemoteMessaging
 import UserScript
 
@@ -79,9 +80,8 @@ final class NewTabPageRMFClient: NewTabPageScriptClient {
     }
 
     private func dismiss(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let paramsDict = params as? [String: Any],
-              let id = paramsDict["id"] as? String,
-              id == remoteMessageProvider.remoteMessage?.id
+        guard let remoteMessageParams: NewTabPageUserScript.RemoteMessageParams = DecodableHelper.decode(from: params),
+              remoteMessageParams.id == remoteMessageProvider.remoteMessage?.id
         else {
             return nil
         }
@@ -91,9 +91,8 @@ final class NewTabPageRMFClient: NewTabPageScriptClient {
     }
 
     private func primaryAction(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let paramsDict = params as? [String: Any],
-              let id = paramsDict["id"] as? String,
-              id == remoteMessageProvider.remoteMessage?.id
+        guard let remoteMessageParams: NewTabPageUserScript.RemoteMessageParams = DecodableHelper.decode(from: params),
+              remoteMessageParams.id == remoteMessageProvider.remoteMessage?.id
         else {
             return nil
         }
@@ -112,9 +111,8 @@ final class NewTabPageRMFClient: NewTabPageScriptClient {
     }
 
     private func secondaryAction(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let paramsDict = params as? [String: Any],
-              let id = paramsDict["id"] as? String,
-              id == remoteMessageProvider.remoteMessage?.id
+        guard let remoteMessageParams: NewTabPageUserScript.RemoteMessageParams = DecodableHelper.decode(from: params),
+              remoteMessageParams.id == remoteMessageProvider.remoteMessage?.id
         else {
             return nil
         }
@@ -156,8 +154,12 @@ final class NewTabPageRMFClient: NewTabPageScriptClient {
 
 extension NewTabPageUserScript {
 
+    struct RemoteMessageParams: Codable {
+        let id: String
+    }
+
     struct RMFData: Encodable {
-        var content: RMFMessage?
+        let content: RMFMessage?
     }
 
     enum RMFMessage: Encodable, Equatable {
@@ -207,39 +209,39 @@ extension NewTabPageUserScript {
     struct SmallMessage: Encodable, Equatable {
         let messageType = "small"
 
-        var id: String
-        var titleText: String
-        var descriptionText: String
+        let id: String
+        let titleText: String
+        let descriptionText: String
     }
 
     struct MediumMessage: Encodable, Equatable {
         let messageType = "medium"
 
-        var id: String
-        var titleText: String
-        var descriptionText: String
-        var icon: RMFIcon
+        let id: String
+        let titleText: String
+        let descriptionText: String
+        let icon: RMFIcon
     }
 
     struct BigSingleActionMessage: Encodable, Equatable {
         let messageType = "big_single_action"
 
-        var id: String
-        var titleText: String
-        var descriptionText: String
-        var icon: RMFIcon
-        var primaryActionText: String
+        let id: String
+        let titleText: String
+        let descriptionText: String
+        let icon: RMFIcon
+        let primaryActionText: String
     }
 
     struct BigTwoActionMessage: Encodable, Equatable {
         let messageType = "big_two_action"
 
-        var id: String
-        var titleText: String
-        var descriptionText: String
-        var icon: RMFIcon
-        var primaryActionText: String
-        var secondaryActionText: String
+        let id: String
+        let titleText: String
+        let descriptionText: String
+        let icon: RMFIcon
+        let primaryActionText: String
+        let secondaryActionText: String
     }
 
     enum RMFIcon: String, Encodable {

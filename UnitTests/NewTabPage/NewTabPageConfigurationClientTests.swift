@@ -125,25 +125,13 @@ final class NewTabPageConfigurationClientTests: XCTestCase {
 
     func sendMessage<Response: Encodable>(named methodName: NewTabPageConfigurationClient.MessageName, parameters: Any = [], file: StaticString = #file, line: UInt = #line) async throws -> Response {
         let handler = try XCTUnwrap(userScript.handler(forMethodNamed: methodName.rawValue), file: file, line: line)
-        let response = try await handler(asJSON(parameters), .init())
+        let response = try await handler(NewTabPageTestsHelper.asJSON(parameters), .init())
         return try XCTUnwrap(response as? Response, file: file, line: line)
     }
 
     func sendMessageExpectingNilResponse(named methodName: NewTabPageConfigurationClient.MessageName, parameters: Any = [], file: StaticString = #file, line: UInt = #line) async throws {
         let handler = try XCTUnwrap(userScript.handler(forMethodNamed: methodName.rawValue), file: file, line: line)
-        let response = try await handler(asJSON(parameters), .init())
+        let response = try await handler(NewTabPageTestsHelper.asJSON(parameters), .init())
         XCTAssertNil(response, file: file, line: line)
-    }
-
-    func asJSON(_ value: Any, file: StaticString = #file, line: UInt = #line) throws -> Any {
-        if JSONSerialization.isValidJSONObject(value) {
-            return value
-        }
-        if let encodableValue = value as? Encodable {
-            let jsonData = try JSONEncoder().encode(encodableValue)
-            return try JSONSerialization.jsonObject(with: jsonData)
-        }
-        XCTFail("invalid JSON value", file: file, line: line)
-        return []
     }
 }
