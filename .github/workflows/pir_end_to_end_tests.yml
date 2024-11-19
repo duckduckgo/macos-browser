@@ -13,10 +13,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runner: [macos-14-xlarge]
+        runner: [macos-15-xlarge]
         include:
-          - xcode-version: "15.4"
-            runner: macos-14-xlarge
+          - xcode-version: "16.1"
+            runner: macos-15-xlarge
 
     if: |
       startsWith(github.event.pull_request.base.ref, 'release/') ||
