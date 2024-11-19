@@ -51,8 +51,10 @@ public final class DataBrokerProtectionBackgroundManager {
                                                   thirdPartyCredentialsProvider: false)
 
         let sessionKey = UUID().uuidString
+        let messageSecret = UUID().uuidString
         let prefs = ContentScopeProperties(gpcEnabled: false,
                                                 sessionKey: sessionKey,
+                                                messageSecret: messageSecret,
                                                 featureToggles: features)
 
         let pixelHandler = DataBrokerProtectionPixelsHandler()

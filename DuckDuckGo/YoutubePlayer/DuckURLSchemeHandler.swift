@@ -141,7 +141,7 @@ private extension DuckURLSchemeHandler {
             directoryURL = URL(fileURLWithPath: "/pages/onboarding")
         } else if url.isReleaseNotesScheme {
             directoryURL = URL(fileURLWithPath: "/pages/release-notes")
-        } else if url.isNewTab {
+        } else if url.isNewTabPage {
             directoryURL = URL(fileURLWithPath: "/pages/new-tab")
         } else {
             assertionFailure("Unknown scheme")
@@ -237,7 +237,7 @@ extension URL {
             return .phishingErrorPage
         } else if self.isReleaseNotesScheme {
             return .releaseNotes
-        } else if self.isNewTab {
+        } else if self.isNewTabPage {
             return .newTab
         } else {
             return nil
@@ -248,7 +248,7 @@ extension URL {
         return isDuckURLScheme && host == "onboarding"
     }
 
-    var isNewTab: Bool {
+    var isNewTabPage: Bool {
         return isDuckURLScheme && host == "newtab"
     }
 
