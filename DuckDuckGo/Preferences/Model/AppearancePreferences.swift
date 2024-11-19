@@ -31,6 +31,7 @@ protocol AppearancePreferencesPersistor {
     var isContinueSetUpVisible: Bool { get set }
     var continueSetUpCardsLastDemonstrated: Date? { get set }
     var continueSetUpCardsNumberOfDaysDemonstrated: Int { get set }
+    var continueSetUpCardsClosed: Bool { get set }
     var isRecentActivityVisible: Bool { get set }
     var isSearchBarVisible: Bool { get set }
     var showBookmarksBar: Bool { get set }
@@ -61,6 +62,9 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
 
     @UserDefaultsWrapper(key: .continueSetUpCardsNumberOfDaysDemonstrated, defaultValue: 0)
     var continueSetUpCardsNumberOfDaysDemonstrated: Int
+
+    @UserDefaultsWrapper(key: .continueSetUpCardsClosed, defaultValue: false)
+    var continueSetUpCardsClosed: Bool
 
     @UserDefaultsWrapper(key: .homePageIsRecentActivityVisible, defaultValue: true)
     var isRecentActivityVisible: Bool
@@ -222,9 +226,15 @@ final class AppearancePreferences: ObservableObject {
 
     @Published var isContinueSetUpCardsViewOutdated: Bool
 
+    @Published var continueSetUpCardsClosed: Bool {
+        didSet {
+            persistor.continueSetUpCardsClosed = continueSetUpCardsClosed
+        }
+    }
+
     var isContinueSetUpVisible: Bool {
         get {
-            return persistor.isContinueSetUpVisible && !isContinueSetUpCardsViewOutdated
+            return persistor.isContinueSetUpVisible && !persistor.continueSetUpCardsClosed && !isContinueSetUpCardsViewOutdated
         }
         set {
             persistor.isContinueSetUpVisible = newValue
@@ -333,6 +343,7 @@ final class AppearancePreferences: ObservableObject {
         self.homePageNavigator = homePageNavigator
         self.dateTimeProvider = dateTimeProvider
         self.isContinueSetUpCardsViewOutdated = persistor.continueSetUpCardsNumberOfDaysDemonstrated >= Constants.dismissNextStepsCardsAfterDays
+        self.continueSetUpCardsClosed = persistor.continueSetUpCardsClosed
         currentThemeName = .init(rawValue: persistor.currentThemeName) ?? .systemDefault
         showFullURL = persistor.showFullURL
         favoritesDisplayMode = persistor.favoritesDisplayMode.flatMap(FavoritesDisplayMode.init) ?? .default

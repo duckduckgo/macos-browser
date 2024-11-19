@@ -104,7 +104,7 @@ extension HomePage.Views {
                         .contextMenu(menuItems: sectionsVisibilityContextMenuItems)
 
                         if settingsVisibilityModel.isSettingsVisible {
-                            SettingsView(includingContinueSetUpCards: model.isContinueSetUpAvailable && !model.isContinueSetUpCardsViewOutdated,
+                            SettingsView(includingContinueSetUpCards: model.isContinueSetUpAvailable && !model.isContinueSetUpCardsViewOutdated && !model.continueSetUpCardsClosed,
                                          isSettingsVisible: $settingsVisibilityModel.isSettingsVisible)
                                 .frame(width: Self.settingsPanelWidth)
                                 .transition(.move(edge: .trailing))
@@ -240,7 +240,7 @@ extension HomePage.Views {
                 Toggle(UserText.newTabMenuItemShowSearchBar, isOn: $model.isSearchBarVisible)
                     .toggleStyle(.checkbox)
             }
-            if model.isContinueSetUpAvailable && !model.isContinueSetUpCardsViewOutdated {
+            if model.isContinueSetUpAvailable && !model.isContinueSetUpCardsViewOutdated && !model.continueSetUpCardsClosed {
                 Toggle(UserText.newTabMenuItemShowContinuteSetUp, isOn: $model.isContinueSetUpVisible)
                     .toggleStyle(.checkbox)
                     .visibility(continueSetUpModel.hasContent ? .visible : .gone)

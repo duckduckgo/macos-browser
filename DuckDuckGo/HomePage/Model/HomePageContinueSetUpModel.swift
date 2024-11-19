@@ -61,23 +61,36 @@ extension HomePage.Models {
             }
         }
 
-        @UserDefaultsWrapper(key: .homePageShowMakeDefault, defaultValue: true)
-        private var shouldShowMakeDefaultSetting: Bool
+        struct Settings {
+            @UserDefaultsWrapper(key: .homePageShowMakeDefault, defaultValue: true)
+            var shouldShowMakeDefaultSetting: Bool
 
-        @UserDefaultsWrapper(key: .homePageShowAddToDock, defaultValue: true)
-        private var shouldShowAddToDockSetting: Bool
+            @UserDefaultsWrapper(key: .homePageShowAddToDock, defaultValue: true)
+            var shouldShowAddToDockSetting: Bool
 
-        @UserDefaultsWrapper(key: .homePageShowImport, defaultValue: true)
-        private var shouldShowImportSetting: Bool
+            @UserDefaultsWrapper(key: .homePageShowImport, defaultValue: true)
+            var shouldShowImportSetting: Bool
 
-        @UserDefaultsWrapper(key: .homePageShowDuckPlayer, defaultValue: true)
-        private var shouldShowDuckPlayerSetting: Bool
+            @UserDefaultsWrapper(key: .homePageShowDuckPlayer, defaultValue: true)
+            var shouldShowDuckPlayerSetting: Bool
 
-        @UserDefaultsWrapper(key: .homePageShowEmailProtection, defaultValue: true)
-        private var shouldShowEmailProtectionSetting: Bool
+            @UserDefaultsWrapper(key: .homePageShowEmailProtection, defaultValue: true)
+            var shouldShowEmailProtectionSetting: Bool
 
-        @UserDefaultsWrapper(key: .homePageIsFirstSession, defaultValue: true)
-        private var isFirstSession: Bool
+            @UserDefaultsWrapper(key: .homePageIsFirstSession, defaultValue: true)
+            var isFirstSession: Bool
+
+            func clear() {
+                _shouldShowMakeDefaultSetting.clear()
+                _shouldShowAddToDockSetting.clear()
+                _shouldShowImportSetting.clear()
+                _shouldShowDuckPlayerSetting.clear()
+                _shouldShowEmailProtectionSetting.clear()
+                _isFirstSession.clear()
+            }
+        }
+
+        private let settings: Settings
 
         var isMoreOrLessButtonNeeded: Bool {
             return featuresMatrix.count > itemsRowCountWhenCollapsed
@@ -87,7 +100,7 @@ extension HomePage.Models {
             return !featuresMatrix.isEmpty
         }
 
-        lazy var listOfFeatures = isFirstSession ? firstRunFeatures : randomisedFeatures
+        lazy var listOfFeatures = settings.isFirstSession ? firstRunFeatures : randomisedFeatures
 
         private var featuresMatrix: [[FeatureType]] = [[]] {
             didSet {
@@ -113,6 +126,7 @@ extension HomePage.Models {
             self.duckPlayerPreferences = duckPlayerPreferences
             self.privacyConfigurationManager = privacyConfigurationManager
             self.subscriptionManager = subscriptionManager
+            self.settings = .init()
 
             refreshFeaturesMatrix()
 
@@ -171,15 +185,15 @@ extension HomePage.Models {
         func removeItem(for featureType: FeatureType) {
             switch featureType {
             case .defaultBrowser:
-                shouldShowMakeDefaultSetting = false
+                settings.shouldShowMakeDefaultSetting = false
             case .dock:
-                shouldShowAddToDockSetting = false
+                settings.shouldShowAddToDockSetting = false
             case .importBookmarksAndPasswords:
-                shouldShowImportSetting = false
+                settings.shouldShowImportSetting = false
             case .duckplayer:
-                shouldShowDuckPlayerSetting = false
+                settings.shouldShowDuckPlayerSetting = false
             case .emailProtection:
-                shouldShowEmailProtectionSetting = false
+                settings.shouldShowEmailProtectionSetting = false
             }
             refreshFeaturesMatrix()
         }
@@ -187,6 +201,9 @@ extension HomePage.Models {
         func refreshFeaturesMatrix() {
             var features: [FeatureType] = []
             appendFeatureCards(&features)
+            if features.isEmpty {
+                AppearancePreferences.shared.continueSetUpCardsClosed = true
+            }
             featuresMatrix = features.chunked(into: itemsPerRow)
         }
 
@@ -214,14 +231,14 @@ extension HomePage.Models {
         // Helper Functions
         @MainActor
         @objc private func newTabOpenNotification(_ notification: Notification) {
-            if !isFirstSession {
+            if !settings.isFirstSession {
                 listOfFeatures = randomisedFeatures
             }
 #if DEBUG
-            isFirstSession = false
+            settings.isFirstSession = false
 #endif
             if OnboardingViewModel.isOnboardingFinished {
-                isFirstSession = false
+                settings.isFirstSession = false
             }
         }
 
@@ -252,33 +269,27 @@ extension HomePage.Models {
         }
 
         private var shouldMakeDefaultCardBeVisible: Bool {
-            shouldShowMakeDefaultSetting &&
-            !defaultBrowserProvider.isDefault
+            settings.shouldShowMakeDefaultSetting && !defaultBrowserProvider.isDefault
         }
 
         private var shouldDockCardBeVisible: Bool {
 #if !APPSTORE
-            shouldShowAddToDockSetting &&
-            !dockCustomizer.isAddedToDock
+            settings.shouldShowAddToDockSetting && !dockCustomizer.isAddedToDock
 #else
             return false
 #endif
         }
 
         private var shouldImportCardBeVisible: Bool {
-            shouldShowImportSetting &&
-            !dataImportProvider.didImport
+            settings.shouldShowImportSetting && !dataImportProvider.didImport
         }
 
         private var shouldDuckPlayerCardBeVisible: Bool {
-            shouldShowDuckPlayerSetting &&
-            duckPlayerPreferences.duckPlayerModeBool == nil &&
-            !duckPlayerPreferences.youtubeOverlayAnyButtonPressed
+            settings.shouldShowDuckPlayerSetting && duckPlayerPreferences.duckPlayerModeBool == nil && !duckPlayerPreferences.youtubeOverlayAnyButtonPressed
         }
 
         private var shouldEmailProtectionCardBeVisible: Bool {
-            shouldShowEmailProtectionSetting &&
-            !emailManager.isSignedIn
+            settings.shouldShowEmailProtectionSetting && !emailManager.isSignedIn
         }
 
     }
