@@ -98,6 +98,29 @@ final class NewTabPageConfigurationClientTests: XCTestCase {
         XCTAssertEqual(configuration.platform, .init(name: "macos"))
     }
 
+    // MARK: - widgetsSetConfig
+
+    func testWhenWidgetsSetConfigIsReceivedThenWidgetConfigsAreUpdated() async throws {
+        let configs: [NewTabPageUserScript.NewTabPageConfiguration.WidgetConfig] = [
+            .init(id: .favorites, isVisible: false),
+            .init(id: .privacyStats, isVisible: true)
+        ]
+        try await sendMessageExpectingNilResponse(named: .widgetsSetConfig, parameters: configs)
+        XCTAssertEqual(appearancePreferences.isFavoriteVisible, false)
+        XCTAssertEqual(appearancePreferences.isRecentActivityVisible, true)
+    }
+
+    func testWhenWidgetsSetConfigIsReceivedWithPartialConfigThenOnlyIncludedWidgetsConfigsAreUpdated() async throws {
+        let initialIsFavoritesVisible = appearancePreferences.isFavoriteVisible
+
+        let configs: [NewTabPageUserScript.NewTabPageConfiguration.WidgetConfig] = [
+            .init(id: .privacyStats, isVisible: false)
+        ]
+        try await sendMessageExpectingNilResponse(named: .widgetsSetConfig, parameters: configs)
+        XCTAssertEqual(appearancePreferences.isFavoriteVisible, initialIsFavoritesVisible)
+        XCTAssertEqual(appearancePreferences.isRecentActivityVisible, false)
+    }
+
     // MARK: - Helper functions
 
     func sendMessage<Response: Encodable>(named methodName: NewTabPageConfigurationClient.MessageName, parameters: Any = [], file: StaticString = #file, line: UInt = #line) async throws -> Response {
