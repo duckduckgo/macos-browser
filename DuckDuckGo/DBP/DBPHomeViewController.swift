@@ -56,8 +56,10 @@ final class DBPHomeViewController: NSViewController {
 
         let isGPCEnabled = WebTrackingProtectionPreferences.shared.isGPCEnabled
         let sessionKey = UUID().uuidString
+        let messageSecret = UUID().uuidString
         let prefs = ContentScopeProperties(gpcEnabled: isGPCEnabled,
                                            sessionKey: sessionKey,
+                                           messageSecret: messageSecret,
                                            featureToggles: features)
 
         return DataBrokerProtectionViewController(
