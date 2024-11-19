@@ -367,7 +367,7 @@ jobs:
     #needs: [export-notarized-app, create-dmg]
     if: ${{ always() && inputs.skip-notify == false }}
 
-    runs-on: ubuntu-latest
+    runs-on: macos-15
 
     # env:
     #   success: ${{ (needs.export-notarized-app.result == 'success') && (needs.create-dmg.result == 'success' || needs.create-dmg.result == 'skipped') }}
