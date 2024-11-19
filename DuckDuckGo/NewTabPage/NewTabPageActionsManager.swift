@@ -107,8 +107,8 @@ final class NewTabPageActionsManager: NewTabPageActionsManaging, NewTabPageUserS
         newTabPageScriptClients.forEach { $0.registerMessageHandlers(for: userScript) }
     }
 
-    init(_ clients: [NewTabPageScriptClient]) {
-        newTabPageScriptClients = clients
+    init(scriptClients: [NewTabPageScriptClient]) {
+        newTabPageScriptClients = scriptClients
         newTabPageScriptClients.forEach { $0.userScriptsSource = self }
     }
 }
@@ -120,7 +120,7 @@ extension NewTabPageActionsManager {
         activeRemoteMessageModel: ActiveRemoteMessageModel,
         openURLHandler: @escaping (URL) -> Void
     ) {
-        self.init([
+        self.init(scriptClients: [
             NewTabPageConfigurationClient(appearancePreferences: appearancePreferences),
             NewTabPageRMFClient(activeRemoteMessageModel: activeRemoteMessageModel, openURLHandler: openURLHandler),
             NewTabPageFavoritesClient(),
