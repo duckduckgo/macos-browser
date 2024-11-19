@@ -18,18 +18,36 @@
 
 import AppKit
 import Combine
+import Common
 import os.log
 import UserScript
 
+protocol NewTabPageContextMenuPresenting {
+    func showContextMenu(_ menu: NSMenu)
+}
+
+struct DefaultNewTabPageContextMenuPresenter: NewTabPageContextMenuPresenting {
+    func showContextMenu(_ menu: NSMenu) {
+        if !menu.items.isEmpty {
+            menu.popUp(positioning: nil, at: NSEvent.mouseLocation, in: nil)
+        }
+    }
+}
+
 final class NewTabPageConfigurationClient: NewTabPageScriptClient {
 
-    let appearancePreferences: AppearancePreferences
     weak var userScriptsSource: NewTabPageUserScriptsSource?
 
     private var cancellables = Set<AnyCancellable>()
+    private let appearancePreferences: AppearancePreferences
+    private let contextMenuPresenter: NewTabPageContextMenuPresenting
 
-    init(appearancePreferences: AppearancePreferences) {
+    init(
+        appearancePreferences: AppearancePreferences,
+        contextMenuPresenter: NewTabPageContextMenuPresenting = DefaultNewTabPageContextMenuPresenter()
+    ) {
         self.appearancePreferences = appearancePreferences
+        self.contextMenuPresenter = contextMenuPresenter
 
         appearancePreferences.$isFavoriteVisible.dropFirst().removeDuplicates().asVoid()
             .receive(on: DispatchQueue.main)
@@ -46,7 +64,7 @@ final class NewTabPageConfigurationClient: NewTabPageScriptClient {
             .store(in: &cancellables)
     }
 
-    enum MessageNames: String, CaseIterable {
+    enum MessageName: String, CaseIterable {
         case contextMenu
         case initialSetup
         case reportInitException
@@ -57,44 +75,38 @@ final class NewTabPageConfigurationClient: NewTabPageScriptClient {
 
     func registerMessageHandlers(for userScript: any SubfeatureWithExternalMessageHandling) {
         userScript.registerMessageHandlers([
-            MessageNames.contextMenu.rawValue: { [weak self] in try await self?.showContextMenu(params: $0, original: $1) },
-            MessageNames.initialSetup.rawValue: { [weak self] in try await self?.initialSetup(params: $0, original: $1) },
-            MessageNames.reportInitException.rawValue: { [weak self] in try await self?.reportException(params: $0, original: $1) },
-            MessageNames.reportPageException.rawValue: { [weak self] in try await self?.reportException(params: $0, original: $1) },
-            MessageNames.widgetsSetConfig.rawValue: { [weak self] in try await self?.widgetsSetConfig(params: $0, original: $1) }
+            MessageName.contextMenu.rawValue: { [weak self] in try await self?.showContextMenu(params: $0, original: $1) },
+            MessageName.initialSetup.rawValue: { [weak self] in try await self?.initialSetup(params: $0, original: $1) },
+            MessageName.reportInitException.rawValue: { [weak self] in try await self?.reportException(params: $0, original: $1) },
+            MessageName.reportPageException.rawValue: { [weak self] in try await self?.reportException(params: $0, original: $1) },
+            MessageName.widgetsSetConfig.rawValue: { [weak self] in try await self?.widgetsSetConfig(params: $0, original: $1) }
         ])
     }
 
     private func notifyWidgetConfigsDidChange() {
         let widgetConfigs: [NewTabPageUserScript.NewTabPageConfiguration.WidgetConfig] = [
-            .init(id: "favorites", isVisible: appearancePreferences.isFavoriteVisible),
-            .init(id: "privacyStats", isVisible: appearancePreferences.isRecentActivityVisible)
+            .init(id: .favorites, isVisible: appearancePreferences.isFavoriteVisible),
+            .init(id: .privacyStats, isVisible: appearancePreferences.isRecentActivityVisible)
         ]
 
-        pushMessage(named: MessageNames.widgetsOnConfigUpdated.rawValue, params: widgetConfigs)
+        pushMessage(named: MessageName.widgetsOnConfigUpdated.rawValue, params: widgetConfigs)
     }
 
     @MainActor
     private func showContextMenu(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let params = params as? [String: Any] else { return nil }
+        guard let params: NewTabPageUserScript.ContextMenuParams = DecodableHelper.decode(from: params) else { return nil }
 
-        guard let menuItems = params["visibilityMenuItems"] as? [[String: String]] else {
-            return nil
-        }
         let menu = NSMenu()
 
-        for menuItem in menuItems {
-            guard let title = menuItem["title"], let id = menuItem["id"] else {
-                continue
-            }
-            switch id {
-            case "favorites":
-                let item = NSMenuItem(title: title, action: #selector(toggleVisibility(_:)), representedObject: id)
+        for menuItem in params.visibilityMenuItems {
+            switch menuItem.id {
+            case .favorites:
+                let item = NSMenuItem(title: menuItem.title, action: #selector(toggleVisibility(_:)), representedObject: menuItem.id)
                     .targetting(self)
                 item.state = appearancePreferences.isFavoriteVisible ? .on : .off
                 menu.addItem(item)
-            case "privacyStats":
-                let item = NSMenuItem(title: title, action: #selector(toggleVisibility(_:)), representedObject: id)
+            case .privacyStats:
+                let item = NSMenuItem(title: menuItem.title, action: #selector(toggleVisibility(_:)), representedObject: menuItem.id)
                     .targetting(self)
                 item.state = appearancePreferences.isRecentActivityVisible ? .on : .off
                 menu.addItem(item)
@@ -104,17 +116,17 @@ final class NewTabPageConfigurationClient: NewTabPageScriptClient {
         }
 
         if !menu.items.isEmpty {
-            menu.popUp(positioning: nil, at: NSEvent.mouseLocation, in: nil)
+            contextMenuPresenter.showContextMenu(menu)
         }
 
         return nil
     }
 
     @objc private func toggleVisibility(_ sender: NSMenuItem) {
-        switch sender.representedObject as? String {
-        case "favorites":
+        switch sender.representedObject as? NewTabPageUserScript.WidgetId {
+        case .favorites:
             appearancePreferences.isFavoriteVisible.toggle()
-        case "privacyStats":
+        case .privacyStats:
             appearancePreferences.isRecentActivityVisible.toggle()
         default:
             break
@@ -130,13 +142,13 @@ final class NewTabPageConfigurationClient: NewTabPageScriptClient {
 #endif
         return NewTabPageUserScript.NewTabPageConfiguration(
             widgets: [
-                .init(id: "rmf"),
-                .init(id: "favorites"),
-                .init(id: "privacyStats")
+                .init(id: .rmf),
+                .init(id: .favorites),
+                .init(id: .privacyStats)
             ],
             widgetConfigs: [
-                .init(id: "favorites", isVisible: appearancePreferences.isFavoriteVisible),
-                .init(id: "privacyStats", isVisible: appearancePreferences.isRecentActivityVisible)
+                .init(id: .favorites, isVisible: appearancePreferences.isFavoriteVisible),
+                .init(id: .privacyStats, isVisible: appearancePreferences.isRecentActivityVisible)
             ],
             env: env,
             locale: Bundle.main.preferredLocalizations.first ?? "en",
@@ -146,17 +158,15 @@ final class NewTabPageConfigurationClient: NewTabPageScriptClient {
 
     @MainActor
     private func widgetsSetConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let params = params as? [[String: String]] else { return nil }
-        for param in params {
-            guard let id = param["id"], let visibility = param["visibility"] else {
-                continue
-            }
-            let isVisible = NewTabPageUserScript.NewTabPageConfiguration.WidgetConfig.WidgetVisibility(rawValue: visibility)?.isVisible == true
-            switch id {
-            case "favorites":
-                appearancePreferences.isFavoriteVisible = isVisible
-            case "privacyStats":
-                appearancePreferences.isRecentActivityVisible = isVisible
+        guard let widgetConfigs: [NewTabPageUserScript.NewTabPageConfiguration.WidgetConfig] = DecodableHelper.decode(from: params) else {
+            return nil
+        }
+        for widgetConfig in widgetConfigs {
+            switch widgetConfig.id {
+            case .favorites:
+                appearancePreferences.isFavoriteVisible = widgetConfig.visibility.isVisible
+            case .privacyStats:
+                appearancePreferences.isRecentActivityVisible = widgetConfig.visibility.isVisible
             default:
                 break
             }
@@ -175,6 +185,19 @@ final class NewTabPageConfigurationClient: NewTabPageScriptClient {
 
 extension NewTabPageUserScript {
 
+    enum WidgetId: String, Codable {
+        case rmf, favorites, privacyStats
+    }
+
+    struct ContextMenuParams: Codable {
+        let visibilityMenuItems: [ContextMenuItem]
+
+        struct ContextMenuItem: Codable {
+            let id: WidgetId
+            let title: String
+        }
+    }
+
     struct NewTabPageConfiguration: Encodable {
         var widgets: [Widget]
         var widgetConfigs: [WidgetConfig]
@@ -183,12 +206,12 @@ extension NewTabPageUserScript {
         var platform: Platform
 
         struct Widget: Encodable {
-            var id: String
+            var id: WidgetId
         }
 
-        struct WidgetConfig: Encodable {
+        struct WidgetConfig: Codable {
 
-            enum WidgetVisibility: String, Encodable {
+            enum WidgetVisibility: String, Codable {
                 case visible, hidden
 
                 var isVisible: Bool {
@@ -196,12 +219,12 @@ extension NewTabPageUserScript {
                 }
             }
 
-            init(id: String, isVisible: Bool) {
+            init(id: WidgetId, isVisible: Bool) {
                 self.id = id
                 self.visibility = isVisible ? .visible : .hidden
             }
 
-            var id: String
+            var id: WidgetId
             var visibility: WidgetVisibility
         }
 

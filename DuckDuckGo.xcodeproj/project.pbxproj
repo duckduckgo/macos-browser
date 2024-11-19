@@ -1163,6 +1163,8 @@
 		376788102CECD5A800F59D83 /* NewTabPageUserScriptTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3767880E2CECD5A200F59D83 /* NewTabPageUserScriptTests.swift */; };
 		376788122CECF03200F59D83 /* NewTabPageRMFClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376788112CECF03000F59D83 /* NewTabPageRMFClientTests.swift */; };
 		376788132CECF03200F59D83 /* NewTabPageRMFClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376788112CECF03000F59D83 /* NewTabPageRMFClientTests.swift */; };
+		376788152CED308200F59D83 /* NewTabPageConfigurationClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376788142CED308000F59D83 /* NewTabPageConfigurationClientTests.swift */; };
+		376788162CED308200F59D83 /* NewTabPageConfigurationClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376788142CED308000F59D83 /* NewTabPageConfigurationClientTests.swift */; };
 		3768D8382C24BFF5004120AE /* RemoteMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3768D8372C24BFF5004120AE /* RemoteMessageView.swift */; };
 		3768D8392C24BFF5004120AE /* RemoteMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3768D8372C24BFF5004120AE /* RemoteMessageView.swift */; };
 		3768D83B2C24C0A8004120AE /* RemoteMessageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3768D83A2C24C0A8004120AE /* RemoteMessageViewModel.swift */; };
@@ -3645,6 +3647,7 @@
 		3767880B2CECCB6C00F59D83 /* NewTabPageActionsManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageActionsManagerTests.swift; sourceTree = "<group>"; };
 		3767880E2CECD5A200F59D83 /* NewTabPageUserScriptTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageUserScriptTests.swift; sourceTree = "<group>"; };
 		376788112CECF03000F59D83 /* NewTabPageRMFClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageRMFClientTests.swift; sourceTree = "<group>"; };
+		376788142CED308000F59D83 /* NewTabPageConfigurationClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageConfigurationClientTests.swift; sourceTree = "<group>"; };
 		3768D8372C24BFF5004120AE /* RemoteMessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMessageView.swift; sourceTree = "<group>"; };
 		3768D83A2C24C0A8004120AE /* RemoteMessageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMessageViewModel.swift; sourceTree = "<group>"; };
 		3768D83F2C29C1F1004120AE /* ActiveRemoteMessageModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveRemoteMessageModel.swift; sourceTree = "<group>"; };
@@ -5794,6 +5797,7 @@
 				3767880E2CECD5A200F59D83 /* NewTabPageUserScriptTests.swift */,
 				3767880B2CECCB6C00F59D83 /* NewTabPageActionsManagerTests.swift */,
 				376788112CECF03000F59D83 /* NewTabPageRMFClientTests.swift */,
+				376788142CED308000F59D83 /* NewTabPageConfigurationClientTests.swift */,
 			);
 			path = NewTabPage;
 			sourceTree = "<group>";
@@ -12263,6 +12267,7 @@
 				3706FE2D293F661700E42796 /* ChromiumFaviconsReaderTests.swift in Sources */,
 				3706FE2E293F661700E42796 /* LocalBookmarkManagerTests.swift in Sources */,
 				9F180D132B69C665000D695F /* DownloadsTabExtensionMock.swift in Sources */,
+				376788162CED308200F59D83 /* NewTabPageConfigurationClientTests.swift in Sources */,
 				3706FE2F293F661700E42796 /* WebViewMock.swift in Sources */,
 				3706FE30293F661700E42796 /* CollectionExtension.swift in Sources */,
 				B630E80129C887ED00363609 /* NSErrorAdditionalInfo.swift in Sources */,
@@ -13987,6 +13992,7 @@
 				562532A02BC069180034D316 /* ZoomPopoverViewModelTests.swift in Sources */,
 				4B9292C02667103100AD2C21 /* BookmarkManagedObjectTests.swift in Sources */,
 				373A1AB228451ED400586521 /* BookmarksHTMLImporterTests.swift in Sources */,
+				376788152CED308200F59D83 /* NewTabPageConfigurationClientTests.swift in Sources */,
 				4B723E0626B0003E00E14D75 /* CSVParserTests.swift in Sources */,
 				561D29C62BDA74ED007B91D0 /* MockDDGSyncing.swift in Sources */,
 				B60C6F8429B1BAD3007BFAA8 /* FileManagerTempDirReplacement.swift in Sources */,
