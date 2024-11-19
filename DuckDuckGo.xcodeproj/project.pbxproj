@@ -5764,6 +5764,21 @@
 			path = CustomBackgrounds;
 			sourceTree = "<group>";
 		};
+		376788092CECCAD900F59D83 /* NewTabPage */ = {
+			isa = PBXGroup;
+			children = (
+				3723A94E2CE73FDD00A0C59A /* NewTabPageRMFClient.swift */,
+				379B5AEE2CEA30EA00B9F5D7 /* NewTabPageFavoritesClient.swift */,
+				379B5AF12CEA32FF00B9F5D7 /* NewTabPagePrivacyStatsClient.swift */,
+				379B5AEB2CEA26C600B9F5D7 /* NewTabPageConfigurationClient.swift */,
+				37FB43102CDB883700479A1E /* NewTabPageActionsManager.swift */,
+				372ED7C12CDD4815002287EC /* NewTabPageUserContentController.swift */,
+				37FB430D2CDB84A200479A1E /* NewTabPageUserScript.swift */,
+				3758CBAA2CE63D510089FC2D /* NewTabPageWebViewModel.swift */,
+			);
+			path = NewTabPage;
+			sourceTree = "<group>";
+		};
 		3775913429AB99DA00E26367 /* Sync */ = {
 			isa = PBXGroup;
 			children = (
@@ -7850,6 +7865,7 @@
 				4B4D60542A0B29FA00BCD287 /* NetworkProtection */,
 				4B2D06642A132F3A00DE1F49 /* NetworkProtectionAppExtension.entitlements */,
 				4B5F14C42A145D6A0060320F /* NetworkProtectionVPNController.entitlements */,
+				376788092CECCAD900F59D83 /* NewTabPage */,
 				85B7184727677A7D00B4277F /* Onboarding */,
 				CBECDB7B2CD9824B005B8B87 /* PageRefreshMonitor */,
 				1D074B252909A371006E4AC3 /* PasswordManager */,
@@ -8774,14 +8790,6 @@
 		AAE71DB225F66A0900D74437 /* HomePage */ = {
 			isa = PBXGroup;
 			children = (
-				3723A94E2CE73FDD00A0C59A /* NewTabPageRMFClient.swift */,
-				379B5AEE2CEA30EA00B9F5D7 /* NewTabPageFavoritesClient.swift */,
-				379B5AF12CEA32FF00B9F5D7 /* NewTabPagePrivacyStatsClient.swift */,
-				379B5AEB2CEA26C600B9F5D7 /* NewTabPageConfigurationClient.swift */,
-				37FB43102CDB883700479A1E /* NewTabPageActionsManager.swift */,
-				372ED7C12CDD4815002287EC /* NewTabPageUserContentController.swift */,
-				37FB430D2CDB84A200479A1E /* NewTabPageUserScript.swift */,
-				3758CBAA2CE63D510089FC2D /* NewTabPageWebViewModel.swift */,
 				85589E8527BBB8DD0038AD11 /* Model */,
 				AAE71DB325F66A3F00D74437 /* View */,
 				85AC7ADA27BD628400FFB69B /* HomePage.swift */,
