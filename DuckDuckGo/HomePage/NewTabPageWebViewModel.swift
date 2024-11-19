@@ -21,7 +21,14 @@ import Combine
 import WebKit
 
 /**
- * This class manages
+ * This class manages a dedicated web view for displaying New Tab Page.
+ *
+ * It initializes NTP user script, the NTP-specific web view configuration
+ * and then sets up a new web view with that configuration. It also serves
+ * as a navigation delegate for the web view, blocking all navigations other than
+ * to the New Tab Page.
+ *
+ * This class is inspired by `DBPUIViewModel`.
  */
 @MainActor
 final class NewTabPageWebViewModel: NSObject {
