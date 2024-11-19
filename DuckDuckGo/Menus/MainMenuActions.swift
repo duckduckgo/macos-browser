@@ -21,6 +21,7 @@ import Cocoa
 import Common
 import Configuration
 import Crashes
+import FeatureFlags
 import History
 import PixelKit
 import Subscription
@@ -62,6 +63,13 @@ extension AppDelegate {
     @objc func newBurnerWindow(_ sender: Any?) {
         DispatchQueue.main.async {
             WindowsManager.openNewWindow(burnerMode: BurnerMode(isBurner: true))
+        }
+    }
+
+    @objc func newAIChat(_ sender: Any?) {
+        DispatchQueue.main.async {
+            AIChatTabOpener.openAIChatTab()
+            PixelKit.fire(GeneralPixel.aichatApplicationMenuFileClicked, includeAppVersionParameter: true)
         }
     }
 
@@ -150,6 +158,12 @@ extension AppDelegate {
     @MainActor
     @objc func showAbout(_ sender: Any?) {
         WindowControllersManager.shared.showTab(with: .settings(pane: .about))
+    }
+
+    @MainActor
+    @objc func setAsDefault(_ sender: Any?) {
+        PixelKit.fire(GeneralPixel.defaultRequestedFromMainMenu)
+        DefaultBrowserPreferences.shared.becomeDefault()
     }
 
     @MainActor
@@ -314,6 +328,8 @@ extension AppDelegate {
     @objc func fireButtonAction(_ sender: NSButton) {
         DispatchQueue.main.async {
             FireCoordinator.fireButtonAction()
+            let pixelReporter = OnboardingPixelReporter()
+            pixelReporter.trackFireButtonPressed()
         }
     }
 
@@ -336,10 +352,6 @@ extension AppDelegate {
 
     @objc func resetNewTabPageCustomization(_ sender: Any?) {
         homePageSettingsModel.resetAllCustomizations()
-    }
-
-    @objc func resetCpmCohort(_ sender: Any?) {
-        UserDefaultsWrapper.clear(.autoconsentFilterlistExperimentCohort)
     }
 }
 
@@ -502,6 +514,10 @@ extension MainViewController {
 
     @objc func toggleNetworkProtectionShortcut(_ sender: Any) {
         LocalPinningManager.shared.togglePinning(for: .networkProtection)
+    }
+
+    @objc func toggleAIChatShortcut(_ sender: Any) {
+        LocalPinningManager.shared.togglePinning(for: .aiChat)
     }
 
     // MARK: - History
@@ -806,8 +822,9 @@ extension MainViewController {
                                                           eventMapping: EventMapping<AutofillPixelEvent> { _, _, _, _ in },
                                                           installDate: nil)
         autofillPixelReporter.resetStoreDefaults()
-        AutofillLoginImportState().hasImportedLogins = false
-        AutofillLoginImportState().credentialsImportPromptPresentationCount = 0
+        let loginImportState = AutofillLoginImportState()
+        loginImportState.hasImportedLogins = false
+        loginImportState.isCredentialsImportPromptPermanantlyDismissed = false
     }
 
     @objc func resetBookmarks(_ sender: Any?) {
@@ -836,8 +853,19 @@ extension MainViewController {
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowEmailProtection.rawValue)
     }
 
+    @objc func skipOnboarding(_ sender: Any?) {
+        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.onboardingFinished.rawValue)
+        Application.appDelegate.onboardingStateMachine.state = .onboardingCompleted
+        WindowControllersManager.shared.updatePreventUserInteraction(prevent: false)
+        WindowControllersManager.shared.replaceTabWith(Tab(content: .newtab))
+    }
+
     @objc func resetOnboarding(_ sender: Any?) {
         UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.onboardingFinished.rawValue)
+    }
+
+    @objc func resetHomePageSettingsOnboarding(_ sender: Any?) {
+        UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Any>.Key.homePageDidShowSettingsOnboarding.rawValue)
     }
 
     @objc func resetContextualOnboarding(_ sender: Any?) {
@@ -995,7 +1023,9 @@ extension MainViewController {
     // MARK: - Developer Tools
 
     @objc func toggleDeveloperTools(_ sender: Any?) {
-        guard let webView = getActiveTabAndIndex()?.tab.webView else { return }
+        guard let webView = browserTabViewController.webView else {
+            return
+        }
 
         if webView.isInspectorShown == true {
             webView.closeDeveloperTools()
@@ -1005,15 +1035,15 @@ extension MainViewController {
     }
 
     @objc func openJavaScriptConsole(_ sender: Any?) {
-        getActiveTabAndIndex()?.tab.webView.openJavaScriptConsole()
+        browserTabViewController.webView?.openJavaScriptConsole()
     }
 
     @objc func showPageSource(_ sender: Any?) {
-        getActiveTabAndIndex()?.tab.webView.showPageSource()
+        browserTabViewController.webView?.showPageSource()
     }
 
     @objc func showPageResources(_ sender: Any?) {
-        getActiveTabAndIndex()?.tab.webView.showPageSource()
+        browserTabViewController.webView?.showPageSource()
     }
 }
 
@@ -1110,7 +1140,7 @@ extension MainViewController: NSMenuItemValidation {
         case #selector(MainViewController.openJavaScriptConsole(_:)),
              #selector(MainViewController.showPageSource(_:)),
              #selector(MainViewController.showPageResources(_:)):
-            return activeTabViewModel?.canReload == true
+            return activeTabViewModel?.canReload == true || (featureFlagger.isFeatureOn(.htmlNewTabPage) && activeTabViewModel?.tab.content == .newtab)
 
         case #selector(MainViewController.toggleDownloads(_:)):
             let isDownloadsPopoverShown = self.navigationBarViewController.isDownloadsPopoverShown

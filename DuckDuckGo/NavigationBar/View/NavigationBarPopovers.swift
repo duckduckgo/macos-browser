@@ -24,6 +24,7 @@ import NetworkProtection
 import NetworkProtectionUI
 import NetworkProtectionIPC
 import PixelKit
+import PrivacyDashboard
 
 protocol PopoverPresenter {
     func show(_ popover: NSPopover, positionedBelow view: NSView)
@@ -58,6 +59,8 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
     private(set) var savePaymentMethodPopover: SavePaymentMethodPopover?
     private(set) var autofillPopoverPresenter: AutofillPopoverPresenter
     private(set) var downloadsPopover: DownloadsPopover?
+    private(set) var aiChatOnboardingPopover: AIChatOnboardingPopover?
+    private(set) var autofillOnboardingPopover: AutofillToolbarOnboardingPopover?
 
     private var privacyDashboardPopover: PrivacyDashboardPopover?
     private var privacyInfoCancellable: AnyCancellable?
@@ -70,12 +73,14 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
     private weak var zoomPopoverDelegate: NSPopoverDelegate?
 
     private let networkProtectionPopoverManager: NetPPopoverManager
+    private let isBurner: Bool
 
     private var popoverIsShownCancellables = Set<AnyCancellable>()
 
-    init(networkProtectionPopoverManager: NetPPopoverManager, autofillPopoverPresenter: AutofillPopoverPresenter) {
+    init(networkProtectionPopoverManager: NetPPopoverManager, autofillPopoverPresenter: AutofillPopoverPresenter, isBurner: Bool) {
         self.networkProtectionPopoverManager = networkProtectionPopoverManager
         self.autofillPopoverPresenter = autofillPopoverPresenter
+        self.isBurner = isBurner
     }
 
     var passwordManagementDomain: String? {
@@ -141,6 +146,7 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
         }
     }
 
+    @MainActor
     func toggleDownloadsPopover(from button: MouseOverButton, popoverDelegate: NSPopoverDelegate, downloadsDelegate: DownloadsViewControllerDelegate) {
         if downloadsPopover?.isShown ?? false {
             downloadsPopover?.close()
@@ -149,7 +155,7 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
         guard closeTransientPopovers(),
               button.window != nil else { return }
 
-        let popover = DownloadsPopover()
+        let popover = DownloadsPopover(fireWindowSession: FireWindowSessionRef(window: button.window))
         popover.delegate = popoverDelegate
         popover.viewController.delegate = downloadsDelegate
         downloadsPopover = popover
@@ -157,15 +163,16 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
         show(popover, positionedBelow: button)
     }
 
-    func togglePrivacyDashboardPopover(for tabViewModel: TabViewModel?, from button: MouseOverButton) {
+    func togglePrivacyDashboardPopover(for tabViewModel: TabViewModel?, from button: MouseOverButton, entryPoint: PrivacyDashboardEntryPoint) {
         if privacyDashboardPopover?.isShown == true {
             closePrivacyDashboard()
         } else if let tabViewModel {
-            openPrivacyDashboard(for: tabViewModel, from: button)
+            openPrivacyDashboard(for: tabViewModel, from: button, entryPoint: entryPoint)
         }
     }
 
     private var downloadsPopoverTimer: Timer?
+    @MainActor
     func showDownloadsPopoverAndAutoHide(from button: MouseOverButton, popoverDelegate: NSPopoverDelegate, downloadsDelegate: DownloadsViewControllerDelegate) {
         let timerBlock: (Timer) -> Void = { [weak self] _ in
             self?.downloadsPopoverTimer?.invalidate()
@@ -220,7 +227,39 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
             privacyDashboardPopover?.close()
         }
 
+        if aiChatOnboardingPopover?.isShown ?? false {
+            aiChatOnboardingPopover?.close()
+        }
+
+        if autofillOnboardingPopover?.isShown ?? false {
+            autofillOnboardingPopover?.close()
+        }
+
         return true
+    }
+
+    func showAIChatOnboardingPopover(from button: MouseOverButton,
+                                     withDelegate delegate: NSPopoverDelegate,
+                                     ctaCallback: @escaping (Bool) -> Void) {
+        guard closeTransientPopovers() else { return }
+        let popover = aiChatOnboardingPopover ?? AIChatOnboardingPopover(ctaCallback: ctaCallback)
+
+        PixelKit.fire(GeneralPixel.aichatToolbarOnboardingPopoverShown,
+                      includeAppVersionParameter: true)
+        popover.delegate = delegate
+        aiChatOnboardingPopover = popover
+        show(popover, positionedBelow: button)
+    }
+
+    func showAutofillOnboardingPopover(from button: MouseOverButton,
+                                       withDelegate delegate: NSPopoverDelegate,
+                                       ctaCallback: @escaping (Bool) -> Void) {
+        guard closeTransientPopovers() else { return }
+        let popover = autofillOnboardingPopover ?? AutofillToolbarOnboardingPopover(ctaCallback: ctaCallback)
+
+        popover.delegate = delegate
+        autofillOnboardingPopover = popover
+        show(popover, positionedBelow: button)
     }
 
     func showBookmarkListPopover(from button: MouseOverButton, withDelegate delegate: NSPopoverDelegate, forTab tab: Tab?) {
@@ -268,10 +307,18 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
         zoomPopover?.close()
     }
 
-    func openPrivacyDashboard(for tabViewModel: TabViewModel, from button: MouseOverButton) {
+    func closeAIChatOnboardingPopover() {
+        aiChatOnboardingPopover?.close()
+    }
+
+    func closeAutofillOnboardingPopover() {
+        autofillOnboardingPopover?.close()
+    }
+
+    func openPrivacyDashboard(for tabViewModel: TabViewModel, from button: MouseOverButton, entryPoint: PrivacyDashboardEntryPoint) {
         guard closeTransientPopovers() else { return }
 
-        let popover = PrivacyDashboardPopover()
+        let popover = PrivacyDashboardPopover(entryPoint: entryPoint)
         popover.delegate = self
         self.privacyDashboardPopover = popover
         self.subscribePrivacyDashboardPendingUpdates(for: popover)
@@ -371,6 +418,14 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
 
     func bookmarkListPopoverClosed() {
         bookmarkListPopover = nil
+    }
+
+    func aiChatOnboardingPopoverClosed() {
+        aiChatOnboardingPopover = nil
+    }
+
+    func autofillOnboardingPopoverClosed() {
+        autofillOnboardingPopover = nil
     }
 
     func saveIdentityPopoverClosed() {

@@ -503,8 +503,6 @@
 	<string>$(DISTRIBUTED_NOTIFICATIONS_PREFIX)</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
-	<key>LSMultipleInstancesProhibited</key>
-	<true/>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.productivity</string>
 	<key>LSMinimumSystemVersion</key>
@@ -523,21 +521,19 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Allows you to upload photographs and videos</string>
+	<string>Lets websites ask permission to use your camera for video calls, recording and uploading videos, or taking and uploading photos.</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2024 DuckDuckGo. All rights reserved.</string>
 	<key>NSLocationUsageDescription</key>
-	<string>Allows you to share your geolocation</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Allows you to share your location</string>
+	<string>Lets websites ask permission to use your location to improve search results, provide weather and directions, or show nearby map locations.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Allows you to share recordings</string>
+	<string>Lets websites ask permission to use your microphone for audio and video calls or for recording and uploading audio.</string>
 	<key>NSDownloadsFolderUsageDescription</key>
-	<string>Allows you to save downloaded files to this folder.</string>
+	<string>Lets you save files to the Downloads folder on your computer.</string>
 	<key>NSDesktopFolderUsageDescription</key>
-	<string>Allows you to save downloaded files to this folder.</string>
+	<string>Lets you save files to the Desktop folder on your computer.</string>
 	<key>NSDocumentsFolderUsageDescription</key>
-	<string>Allows you to save downloaded files to this folder.</string>
+	<string>Lets you save files to the Documents folder on your computer.</string>
 	<key>NSPrincipalClass</key>
 	<string>$(INFOPLIST_KEY_NSPrincipalClass)</string>
 	<key>NSSupportsAutomaticTermination</key>

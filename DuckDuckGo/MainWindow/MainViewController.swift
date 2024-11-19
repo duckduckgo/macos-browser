@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Cocoa
 import Carbon.HIToolbox
 import Combine
@@ -23,6 +24,7 @@ import Common
 import NetworkProtection
 import NetworkProtectionIPC
 import os.log
+import BrokenSitePrompt
 
 final class MainViewController: NSViewController {
     private lazy var mainView = MainView(frame: NSRect(x: 0, y: 0, width: 600, height: 660))
@@ -33,6 +35,7 @@ final class MainViewController: NSViewController {
     let findInPageViewController: FindInPageViewController
     let fireViewController: FireViewController
     let bookmarksBarViewController: BookmarksBarViewController
+    let featureFlagger: FeatureFlagger
     private let bookmarksBarVisibilityManager: BookmarksBarVisibilityManager
 
     let tabCollectionViewModel: TabCollectionViewModel
@@ -43,6 +46,7 @@ final class MainViewController: NSViewController {
     private var tabViewModelCancellables = Set<AnyCancellable>()
     private var bookmarksBarVisibilityChangedCancellable: AnyCancellable?
     private var eventMonitorCancellables = Set<AnyCancellable>()
+    private let aiChatMenuConfig: AIChatMenuVisibilityConfigurable
 
     private var bookmarksBarIsVisible: Bool {
         return bookmarksBarViewController.parent != nil
@@ -59,11 +63,17 @@ final class MainViewController: NSViewController {
     init(tabCollectionViewModel: TabCollectionViewModel? = nil,
          bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
          autofillPopoverPresenter: AutofillPopoverPresenter,
-         vpnXPCClient: VPNControllerXPCClient = .shared) {
+         vpnXPCClient: VPNControllerXPCClient = .shared,
+         aiChatMenuConfig: AIChatMenuVisibilityConfigurable = AIChatMenuConfiguration(),
+         brokenSitePromptLimiter: BrokenSitePromptLimiter = .shared,
+         featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger
+    ) {
 
+        self.aiChatMenuConfig = aiChatMenuConfig
         let tabCollectionViewModel = tabCollectionViewModel ?? TabCollectionViewModel()
         self.tabCollectionViewModel = tabCollectionViewModel
         self.isBurner = tabCollectionViewModel.isBurner
+        self.featureFlagger = featureFlagger
 
         tabBarViewController = TabBarViewController.create(tabCollectionViewModel: tabCollectionViewModel)
         bookmarksBarVisibilityManager = BookmarksBarVisibilityManager(selectedTabPublisher: tabCollectionViewModel.$selectedTabViewModel.eraseToAnyPublisher())
@@ -108,7 +118,13 @@ final class MainViewController: NSViewController {
             )
         }()
 
-        navigationBarViewController = NavigationBarViewController.create(tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner, networkProtectionPopoverManager: networkProtectionPopoverManager, networkProtectionStatusReporter: networkProtectionStatusReporter, autofillPopoverPresenter: autofillPopoverPresenter)
+        navigationBarViewController = NavigationBarViewController.create(tabCollectionViewModel: tabCollectionViewModel,
+                                                                         isBurner: isBurner,
+                                                                         networkProtectionPopoverManager: networkProtectionPopoverManager,
+                                                                         networkProtectionStatusReporter: networkProtectionStatusReporter,
+                                                                         autofillPopoverPresenter: autofillPopoverPresenter,
+                                                                         aiChatMenuConfig: aiChatMenuConfig,
+                                                                         brokenSitePromptLimiter: brokenSitePromptLimiter)
 
         browserTabViewController = BrowserTabViewController(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager)
         findInPageViewController = FindInPageViewController.create()
@@ -116,7 +132,7 @@ final class MainViewController: NSViewController {
         bookmarksBarViewController = BookmarksBarViewController.create(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager)
 
         super.init(nibName: nil, bundle: nil)
-
+        browserTabViewController.delegate = self
         findInPageViewController.delegate = self
     }
 
@@ -182,8 +198,12 @@ final class MainViewController: NSViewController {
             mainView.navigationBarContainerView.wantsLayer = true
             mainView.navigationBarContainerView.layer?.masksToBounds = false
 
-            resizeNavigationBar(isHomePage: tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab,
-                                animated: false)
+            if tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab,
+               browserTabViewController.homePageViewController?.addressBarModel.shouldShowAddressBar == false {
+                resizeNavigationBar(isHomePage: true, animated: lastTabContent != .newtab)
+            } else {
+                resizeNavigationBar(isHomePage: false, animated: false)
+            }
         }
 
         updateDividerColor(isShowingHomePage: tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab)
@@ -203,6 +223,7 @@ final class MainViewController: NSViewController {
 
     func windowDidResignKey() {
         browserTabViewController.windowDidResignKey()
+        tabBarViewController.hideTabPreview()
     }
 
     func showBookmarkPromptIfNeeded() {
@@ -319,7 +340,6 @@ final class MainViewController: NSViewController {
     private func subscribeToBookmarkBarVisibility() {
         bookmarksBarVisibilityChangedCancellable = bookmarksBarVisibilityManager
             .$isBookmarksBarVisible
-            .removeDuplicates()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] isBookmarksBarVisible in
                 self?.updateBookmarksBarViewVisibility(visible: isBookmarksBarVisible)
@@ -338,10 +358,32 @@ final class MainViewController: NSViewController {
                 guard let self, let selectedTabViewModel else { return }
                 defer { lastTabContent = content }
 
-                resizeNavigationBar(isHomePage: content == .newtab, animated: content == .newtab && lastTabContent != .newtab)
+                if content == .newtab {
+                    if browserTabViewController.homePageViewController?.addressBarModel.shouldShowAddressBar == true {
+                        subscribeToNTPAddressBarVisibility(of: selectedTabViewModel)
+                    } else {
+                        ntpAddressBarVisibilityCancellable?.cancel()
+                        resizeNavigationBar(isHomePage: true, animated: lastTabContent != .newtab)
+                    }
+                } else {
+                    ntpAddressBarVisibilityCancellable?.cancel()
+                    resizeNavigationBar(isHomePage: false, animated: false)
+                }
                 adjustFirstResponder(selectedTabViewModel: selectedTabViewModel, tabContent: content)
             }
             .store(in: &self.tabViewModelCancellables)
+    }
+
+    private var ntpAddressBarVisibilityCancellable: AnyCancellable?
+
+    private func subscribeToNTPAddressBarVisibility(of selectedTabViewModel: TabViewModel) {
+        ntpAddressBarVisibilityCancellable = browserTabViewController.homePageViewController?.appearancePreferences.$isSearchBarVisible
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isAddressBarVisible in
+                guard let self else { return }
+                resizeNavigationBar(isHomePage: !isAddressBarVisible, animated: true)
+                adjustFirstResponder(selectedTabViewModel: selectedTabViewModel, tabContent: .newtab)
+            }
     }
 
     private func subscribeToFirstResponder() {
@@ -443,7 +485,6 @@ final class MainViewController: NSViewController {
 
         if case .newtab = tabContent {
             navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
-
         } else {
             // ignore published tab switch: BrowserTabViewController
             // adjusts first responder itself
@@ -515,6 +556,9 @@ extension MainViewController {
             if let addressBarVC = navigationBarViewController.addressBarViewController {
                 isHandled = isHandled || addressBarVC.escapeKeyDown()
             }
+            if let homePageAddressBarModel = browserTabViewController.homePageViewController?.addressBarModel {
+                isHandled = isHandled || homePageAddressBarModel.escapeKeyDown()
+            }
             return isHandled
 
         // Handle critical Main Menu actions before WebView
@@ -562,6 +606,25 @@ extension MainViewController {
         return event
 
     }
+}
+
+// MARK: - BrowserTabViewControllerDelegate
+
+extension MainViewController: BrowserTabViewControllerDelegate {
+
+    func highlightFireButton() {
+        tabBarViewController.startFireButtonPulseAnimation()
+    }
+
+    func dismissViewHighlight() {
+        tabBarViewController.stopFireButtonPulseAnimation()
+        navigationBarViewController.addressBarViewController?.addressBarButtonsViewController?.stopHighlightingPrivacyShield()
+    }
+
+    func highlightPrivacyShield() {
+        navigationBarViewController.addressBarViewController?.addressBarButtonsViewController?.highlightPrivacyShield()
+    }
+
 }
 
 #if DEBUG

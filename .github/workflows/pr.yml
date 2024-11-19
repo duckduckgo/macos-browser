@@ -68,7 +68,7 @@ jobs:
 
     name: Test Shell Scripts
 
-    runs-on: macos-14
+    runs-on: macos-15
 
     steps:
     - name: Check out the code
@@ -119,7 +119,7 @@ jobs:
           - cache-key: sandbox-
             flavor: Sandbox
 
-    runs-on: macos-14-xlarge
+    runs-on: macos-15-xlarge
     timeout-minutes: 30
 
     outputs:
@@ -317,7 +317,7 @@ jobs:
     # workflow_call is used by bump_internal_release and is followed by a proper release job
     if: github.actor != 'dependabot[bot]' && (github.event_name == 'push' || github.event_name == 'pull_request')
 
-    runs-on: macos-14-xlarge
+    runs-on: macos-15-xlarge
     timeout-minutes: 30
 
     steps:
@@ -386,11 +386,20 @@ jobs:
   verify-autoconsent-bundle:
     name: 'Verify autoconsent bundle'
     runs-on: ubuntu-latest
-
     steps:
-      - name: Skip
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+      - name: Build bundle
         run: |
-          echo "Skipping autoconsent bundle verification during an experiment"
+          npm ci
+          npm run rebuild-autoconsent
+      - name: Verify clean tree
+        run: |
+          git update-index --refresh
+          git diff-index --quiet HEAD --
 
   create-asana-task:
     name: Create Asana Task

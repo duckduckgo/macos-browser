@@ -100,8 +100,8 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
         }
     }
 
-    /// downloads initiated from a Burner Window won‘t stay in the Downloads panel after completion
-    let isBurner: Bool
+    /// downloads initiated from a Burner Window will be kept in the window
+    let fireWindowSession: FireWindowSessionRef?
 
     private weak var delegate: WebKitDownloadTaskDelegate?
 
@@ -131,12 +131,12 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
     }
 
     @MainActor(unsafe)
-    init(download: WebKitDownload, destination: DownloadDestination, isBurner: Bool) {
+    init(download: WebKitDownload, destination: DownloadDestination, fireWindowSession: FireWindowSessionRef?) {
         self.download = download
         self.progress = DownloadProgress(download: download)
         self.fileProgressPresenter = FileProgressPresenter(progress: progress)
         self.state = .initial(destination)
-        self.isBurner = isBurner
+        self.fireWindowSession = fireWindowSession
         super.init()
 
         progress.cancellationHandler = { [weak self, taskDescr=self.debugDescription] in
@@ -333,9 +333,10 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
             Logger.fileDownload.error("🛑 file presenters failure: \(self): \(error)")
 
             self.download.cancel()
+
             self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error, resumeData: nil, isRetryable: false)))
 
-            PixelKit.fire(DebugEvent(GeneralPixel.fileDownloadCreatePresentersFailed, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.fileDownloadCreatePresentersFailed(osVersion: "\(ProcessInfo.processInfo.operatingSystemVersion)"), error: error))
         }
     }
 
@@ -512,12 +513,15 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
             return
         }
 
-        let tempURL = tempFile.url
-        // disable retrying download for user-removed/trashed files
-        let isRetryable = if tempURL == nil || tempURL.map({ !FileManager.default.fileExists(atPath: $0.path) || FileManager.default.isInTrash($0) }) == true {
-            false
+        // disable retrying download for user-removed/trashed files or fire windows downloads
+        let isRetryable: Bool
+        if let url = tempFile.url {
+            let fileExists = FileManager.default.fileExists(atPath: url.path)
+            let isInTrash = FileManager.default.isInTrash(url)
+            let isFromFireWindow = fireWindowSession != nil
+            isRetryable = fileExists && !isInTrash && !isFromFireWindow
         } else {
-            true
+            isRetryable = false
         }
 
         Logger.fileDownload.debug("❗️ downloadDidFail \(self): \(error), retryable: \(isRetryable)")

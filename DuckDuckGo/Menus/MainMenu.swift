@@ -20,6 +20,7 @@ import BrowserServicesKit
 import Cocoa
 import Common
 import Combine
+import FeatureFlags
 import OSLog
 import SwiftUI
 import WebKit
@@ -82,8 +83,10 @@ final class MainMenu: NSMenu {
     let toggleAutofillShortcutMenuItem = NSMenuItem(title: UserText.mainMenuViewShowAutofillShortcut, action: #selector(MainViewController.toggleAutofillShortcut), keyEquivalent: "A")
     let toggleBookmarksShortcutMenuItem = NSMenuItem(title: UserText.mainMenuViewShowBookmarksShortcut, action: #selector(MainViewController.toggleBookmarksShortcut), keyEquivalent: "K")
     let toggleDownloadsShortcutMenuItem = NSMenuItem(title: UserText.mainMenuViewShowDownloadsShortcut, action: #selector(MainViewController.toggleDownloadsShortcut), keyEquivalent: "J")
-
+    var aiChatMenu = NSMenuItem(title: UserText.newAIChatMenuItem, action: #selector(AppDelegate.newAIChat), keyEquivalent: [.option, .command, "n"])
     let toggleNetworkProtectionShortcutMenuItem = NSMenuItem(title: UserText.showNetworkProtectionShortcut, action: #selector(MainViewController.toggleNetworkProtectionShortcut), keyEquivalent: "N")
+
+    let toggleAIChatShortcutMenuItem = NSMenuItem(title: UserText.showAIChatShortcut, action: #selector(MainViewController.toggleAIChatShortcut), keyEquivalent: "L")
 
     // MARK: Window
     let windowsMenu = NSMenu(title: UserText.mainMenuWindow)
@@ -99,15 +102,25 @@ final class MainMenu: NSMenu {
 
     let helpMenu = NSMenu(title: UserText.mainMenuHelp)
     let aboutMenuItem = NSMenuItem(title: UserText.about, action: #selector(AppDelegate.showAbout))
+    let setAsDefaultMenuItem = NSMenuItem(title: UserText.setAsDefaultBrowser + "…", action: #selector(AppDelegate.setAsDefault))
     let releaseNotesMenuItem = NSMenuItem(title: UserText.releaseNotesMenuItem, action: #selector(AppDelegate.showReleaseNotes))
     let whatIsNewMenuItem = NSMenuItem(title: UserText.whatsNewMenuItem, action: #selector(AppDelegate.showWhatIsNew))
     let sendFeedbackMenuItem = NSMenuItem(title: UserText.sendFeedback, action: #selector(AppDelegate.openFeedback))
 
+    private let defaultBrowserPreferences: DefaultBrowserPreferences
+    private let aiChatMenuConfig: AIChatMenuVisibilityConfigurable
+
     // MARK: - Initialization
 
     @MainActor
-    init(featureFlagger: FeatureFlagger, bookmarkManager: BookmarkManager, faviconManager: FaviconManagement) {
+    init(featureFlagger: FeatureFlagger,
+         bookmarkManager: BookmarkManager,
+         faviconManager: FaviconManagement,
+         defaultBrowserPreferences: DefaultBrowserPreferences = .shared,
+         aiChatMenuConfig: AIChatMenuVisibilityConfigurable) {
 
+        self.defaultBrowserPreferences = defaultBrowserPreferences
+        self.aiChatMenuConfig = aiChatMenuConfig
         super.init(title: UserText.duckDuckGo)
 
         buildItems {
@@ -124,6 +137,9 @@ final class MainMenu: NSMenu {
 
         subscribeToBookmarkList(bookmarkManager: bookmarkManager)
         subscribeToFavicons(faviconManager: faviconManager)
+
+        setupAIChatMenu()
+        subscribeToAIChatPreferences(aiChatMenuConfig: aiChatMenuConfig)
     }
 
     func buildDuckDuckGoMenu() -> NSMenuItem {
@@ -132,6 +148,7 @@ final class MainMenu: NSMenu {
             NSMenuItem.separator()
 
             preferencesMenuItem
+            setAsDefaultMenuItem
 
             NSMenuItem.separator()
 
@@ -153,11 +170,16 @@ final class MainMenu: NSMenu {
         }
     }
 
+    @MainActor
     func buildFileMenu() -> NSMenuItem {
         NSMenuItem(title: UserText.mainMenuFile) {
+            newTabMenuItem
+
             newWindowMenuItem
             NSMenuItem(title: UserText.newBurnerWindowMenuItem, action: #selector(AppDelegate.newBurnerWindow), keyEquivalent: "N")
-            newTabMenuItem
+
+            aiChatMenu
+
             openLocationMenuItem
             NSMenuItem.separator()
 
@@ -265,6 +287,8 @@ final class MainMenu: NSMenu {
 
             toggleNetworkProtectionShortcutMenuItem
 
+            toggleAIChatShortcutMenuItem
+
             NSMenuItem.separator()
 
             toggleFullscreenMenuItem
@@ -284,6 +308,7 @@ final class MainMenu: NSMenu {
         }
     }
 
+    @MainActor
     func buildHistoryMenu() -> NSMenuItem {
         NSMenuItem(title: UserText.mainMenuHistory)
             .submenu(historyMenu)
@@ -410,8 +435,11 @@ final class MainMenu: NSMenu {
     override func update() {
         super.update()
 
+        setAsDefaultMenuItem.isHidden = defaultBrowserPreferences.isDefault
+
         // To be safe, hide the NetP shortcut menu item by default.
         toggleNetworkProtectionShortcutMenuItem.isHidden = true
+        toggleAIChatShortcutMenuItem.isHidden = true
 
         updateHomeButtonMenuItem()
         updateBookmarksBarMenuItem()
@@ -460,6 +488,15 @@ final class MainMenu: NSMenu {
             .sink { [weak self] favorites, topLevel in
                 self?.updateBookmarksMenu(favoriteViewModels: favorites, topLevelBookmarkViewModels: topLevel)
             }
+    }
+
+    var aiChatCancellable: AnyCancellable?
+    private func subscribeToAIChatPreferences(aiChatMenuConfig: AIChatMenuVisibilityConfigurable) {
+        aiChatCancellable = aiChatMenuConfig.valuesChangedPublisher
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] in
+                self?.setupAIChatMenu()
+            })
     }
 
     // Nested recursing functions cause body length
@@ -559,6 +596,13 @@ final class MainMenu: NSMenu {
             toggleBookmarksShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .bookmarks)
             toggleDownloadsShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .downloads)
 
+            if AIChatRemoteSettings().isApplicationMenuShortcutEnabled {
+                toggleAIChatShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .aiChat)
+                toggleAIChatShortcutMenuItem.isHidden = false
+            } else {
+                toggleAIChatShortcutMenuItem.isHidden = true
+            }
+
             if DefaultVPNFeatureGatekeeper(subscriptionManager: Application.appDelegate.subscriptionManager).isVPNVisible() {
                 toggleNetworkProtectionShortcutMenuItem.isHidden = false
                 toggleNetworkProtectionShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .networkProtection)
@@ -575,6 +619,9 @@ final class MainMenu: NSMenu {
     @MainActor
     private func setupDebugMenu() -> NSMenu {
         let debugMenu = NSMenu(title: "Debug") {
+            NSMenuItem(title: "Feature Flag Overrides")
+                .submenu(FeatureFlagOverridesMenu(featureFlagOverrides: NSApp.delegateTyped.featureFlagger))
+            NSMenuItem.separator()
             NSMenuItem(title: "Open Vanilla Browser", action: #selector(MainViewController.openVanillaBrowser)).withAccessibilityIdentifier("MainMenu.openVanillaBrowser")
             NSMenuItem.separator()
             NSMenuItem(title: "Tab") {
@@ -585,6 +632,7 @@ final class MainMenu: NSMenu {
                     NSMenuItem(title: "150 Tabs", action: #selector(MainViewController.addDebugTabs(_:)), representedObject: 150)
                 }
             }
+            NSMenuItem(title: "Skip Onboarding", action: #selector(MainViewController.skipOnboarding))
             NSMenuItem(title: "Reset Data") {
                 NSMenuItem(title: "Reset Default Browser Prompt", action: #selector(MainViewController.resetDefaultBrowserPrompt))
                 NSMenuItem(title: "Reset Default Grammar Checks", action: #selector(MainViewController.resetDefaultGrammarChecks))
@@ -604,9 +652,9 @@ final class MainMenu: NSMenu {
                 NSMenuItem(title: "Reset Email Protection InContext Signup Prompt", action: #selector(MainViewController.resetEmailProtectionInContextPrompt))
                 NSMenuItem(title: "Reset Pixels Storage", action: #selector(MainViewController.resetDailyPixels))
                 NSMenuItem(title: "Reset Remote Messages", action: #selector(AppDelegate.resetRemoteMessages))
-                NSMenuItem(title: "Reset CPM Experiment Cohort (needs restart)", action: #selector(AppDelegate.resetCpmCohort))
                 NSMenuItem(title: "Reset Duck Player Preferences", action: #selector(MainViewController.resetDuckPlayerPreferences))
                 NSMenuItem(title: "Reset Onboarding", action: #selector(MainViewController.resetOnboarding(_:)))
+                NSMenuItem(title: "Reset Home Page Settings Onboarding", action: #selector(MainViewController.resetHomePageSettingsOnboarding(_:)))
                 NSMenuItem(title: "Reset Contextual Onboarding", action: #selector(MainViewController.resetContextualOnboarding(_:)))
                 NSMenuItem(title: "Reset Sync Promo prompts", action: #selector(MainViewController.resetSyncPromoPrompts))
 
@@ -635,6 +683,8 @@ final class MainMenu: NSMenu {
 
             NSMenuItem(title: "Personal Information Removal")
                 .submenu(DataBrokerProtectionDebugMenu())
+
+            FreemiumDebugMenu()
 
             if case .normal = NSApp.runType {
                 NSMenuItem(title: "VPN")
@@ -679,6 +729,8 @@ final class MainMenu: NSMenu {
             }
 
             NSMenuItem(title: "Logging").submenu(setupLoggingMenu())
+            NSMenuItem(title: "AI Chat").submenu(AIChatDebugMenu())
+
         }
         debugMenu.addItem(internalUserItem)
         debugMenu.autoenablesItems = false
@@ -700,6 +752,10 @@ final class MainMenu: NSMenu {
 
         self.loggingMenu = menu
         return menu
+    }
+
+    private func setupAIChatMenu() {
+        aiChatMenu.isHidden = !aiChatMenuConfig.shouldDisplayApplicationMenuShortcut
     }
 
     private func updateInternalUserItem() {

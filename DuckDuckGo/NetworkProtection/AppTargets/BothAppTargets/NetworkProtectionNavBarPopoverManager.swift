@@ -39,6 +39,7 @@ protocol NetworkProtectionIPCClient {
 
     func start(completion: @escaping (Error?) -> Void)
     func stop(completion: @escaping (Error?) -> Void)
+    func command(_ command: VPNCommand) async throws
 }
 
 extension VPNControllerXPCClient: NetworkProtectionIPCClient {

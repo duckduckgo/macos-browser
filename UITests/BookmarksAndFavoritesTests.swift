@@ -18,7 +18,7 @@
 
 import XCTest
 
-class BookmarksAndFavoritesTests: XCTestCase {
+class BookmarksAndFavoritesTests: UITestCase {
     private var app: XCUIApplication!
     private var pageTitle: String!
     private var urlForBookmarksBar: URL!
@@ -55,6 +55,7 @@ class BookmarksAndFavoritesTests: XCTestCase {
     private var showFavoritesPreferenceToggle: XCUIElement!
 
     override class func setUp() {
+        super.setUp()
         UITests.firstRun()
     }
 
@@ -627,7 +628,13 @@ class BookmarksAndFavoritesTests: XCTestCase {
             "The bookmarks bar bookmark icon failed to become available in a reasonable timeframe."
         )
         let bookmarkBarBookmarkIconCoordinate = bookmarkBarBookmarkIcon.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
-        let deleteContextMenuItemCoordinate = bookmarkBarBookmarkIcon.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 9.0))
+        var deleteContextMenuItemCoordinate: XCUICoordinate
+        if #available(macOS 15.0, *) {
+            deleteContextMenuItemCoordinate = bookmarkBarBookmarkIcon.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 8.0))
+        } else {
+            deleteContextMenuItemCoordinate = bookmarkBarBookmarkIcon.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 9.0))
+        }
+
         bookmarkBarBookmarkIconCoordinate.rightClick()
         deleteContextMenuItemCoordinate.click()
         app.typeKey("w", modifierFlags: [.command, .option, .shift])
@@ -653,7 +660,13 @@ private extension BookmarksAndFavoritesTests {
 
     /// Make sure that we can reply on the bookmarks bar always appearing
     func toggleShowBookmarksBarAlwaysOn() {
-        app.typeKey(",", modifierFlags: [.command]) // Open settings
+        let settings = app.menuItems["MainMenu.preferencesMenuItem"]
+        XCTAssertTrue(
+            settings.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "Reset bookmarks menu item didn't become available in a reasonable timeframe."
+        )
+
+        settings.click()
 
         XCTAssertTrue(
             settingsAppearanceButton.waitForExistence(timeout: UITests.Timeouts.elementExistence),
@@ -686,7 +699,8 @@ private extension BookmarksAndFavoritesTests {
 
     /// Make sure that appearance tab has been used to set "show favorites" to true
     func toggleBookmarksBarShowFavoritesOn() {
-        app.typeKey(",", modifierFlags: [.command]) // Open settings
+        app.openNewTab()
+        addressBarTextField.typeURL(URL(string: "duck://settings")!)
 
         XCTAssertTrue(
             settingsAppearanceButton.waitForExistence(timeout: UITests.Timeouts.elementExistence),

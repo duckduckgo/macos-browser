@@ -56,9 +56,16 @@ enum UITests {
     /// - Parameter requestedToggleState: How the autocomplete checkbox state should be set
     static func setAutocompleteToggleBeforeTestcaseRuns(_ requestedToggleState: Bool) {
         let app = XCUIApplication()
+        app.launchEnvironment["UITEST_MODE"] = "1"
         app.launch()
 
-        app.typeKey(",", modifierFlags: [.command]) // Open settings
+        let settings = app.menuItems["MainMenu.preferencesMenuItem"]
+        XCTAssertTrue(
+            settings.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "Reset bookmarks menu item didn't become available in a reasonable timeframe."
+        )
+
+        settings.click()
         let generalPreferencesButton = app.buttons["PreferencesSidebar.generalButton"]
         let autocompleteToggle = app.checkBoxes["PreferencesGeneralView.showAutocompleteSuggestions"]
         XCTAssertTrue(
@@ -96,9 +103,42 @@ enum UITests {
             notificationCenter.typeKey(.escape, modifierFlags: [])
         }
         let app = XCUIApplication()
+        app.launchEnvironment["UITEST_MODE"] = "1"
         app.launch()
         app.typeKey("n", modifierFlags: .command)
         app.typeKey("w", modifierFlags: [.command, .option])
         app.terminate()
+    }
+}
+
+class TestFailureObserver: NSObject, XCTestObservation {
+    func testCase(_ testCase: XCTestCase, didRecord issue: XCTIssue) {
+        print("Failed test with name: \(testCase.name)")
+        let screenshotName = "\(testCase.name)-failure"
+        testCase.takeScreenshot(screenshotName)
+    }
+}
+
+class UITestCase: XCTestCase {
+    private static let failureObserver = TestFailureObserver()
+
+    override class func setUp() {
+        super.setUp()
+        XCTestObservationCenter.shared.addTestObserver(failureObserver)
+    }
+
+    override class func tearDown() {
+        XCTestObservationCenter.shared.removeTestObserver(failureObserver)
+        super.tearDown()
+    }
+}
+
+extension XCTestCase {
+    func takeScreenshot(_ name: String) {
+        let fullScreenshot = XCUIScreen.main.screenshot()
+        let screenshot = XCTAttachment(screenshot: fullScreenshot)
+        screenshot.name = name
+        screenshot.lifetime = .keepAlways
+        add(screenshot)
     }
 }

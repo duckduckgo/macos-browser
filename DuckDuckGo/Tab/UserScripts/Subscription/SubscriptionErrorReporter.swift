@@ -65,7 +65,7 @@ struct DefaultSubscriptionErrorReporter: SubscriptionErrorReporter {
         case .failedToRestorePastPurchase:
             isStoreError = true
         case .subscriptionNotFound:
-            PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreFailureNotFound, frequency: .dailyAndCount)
+            PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreFailureNotFound, frequency: .legacyDailyAndCount)
             isStoreError = true
         case .subscriptionExpired:
             isStoreError = true
@@ -74,17 +74,17 @@ struct DefaultSubscriptionErrorReporter: SubscriptionErrorReporter {
             isBackendError = true
         case .cancelledByUser: break
         case .accountCreationFailed:
-            PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailureAccountNotCreated, frequency: .dailyAndCount)
+            PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailureAccountNotCreated, frequency: .legacyDailyAndCount)
         case .activeSubscriptionAlreadyPresent: break
         case .generalError: break
         }
 
         if isStoreError {
-            PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailureStoreError, frequency: .dailyAndCount)
+            PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailureStoreError, frequency: .legacyDailyAndCount)
         }
 
         if isBackendError {
-            PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailureBackendError, frequency: .dailyAndCount)
+            PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailureBackendError, frequency: .legacyDailyAndCount)
         }
     }
 }

@@ -46,6 +46,7 @@ protocol WindowControllersManagerProtocol {
                        popUp: Bool,
                        lazyLoadTabs: Bool,
                        isMiniaturized: Bool) -> MainWindow?
+    func showTab(with content: Tab.TabContent)
 }
 extension WindowControllersManagerProtocol {
     @discardableResult
@@ -220,7 +221,7 @@ extension WindowControllersManager {
         } else {
             let newTab = Tab(content: url.map { .url($0, source: source) } ?? .newtab, shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
             newTab.setContent(url.map { .contentFromURL($0, source: source) } ?? .newtab)
-            tabCollectionViewModel.append(tab: newTab)
+            tabCollectionViewModel.insertOrAppend(tab: newTab, selected: true)
         }
     }
 
@@ -234,7 +235,7 @@ extension WindowControllersManager {
 
         let viewController = windowController.mainViewController
         let tabCollectionViewModel = viewController.tabCollectionViewModel
-        tabCollectionViewModel.appendNewTab(with: content)
+        tabCollectionViewModel.insertOrAppendNewTab(content)
         windowController.window?.orderFront(nil)
     }
 
@@ -354,7 +355,7 @@ extension WindowControllersManager: OnboardingNavigating {
 
     @MainActor
     func showImportDataView() {
-        DataImportView().show()
+        DataImportView(title: UserText.importDataTitleOnboarding).show()
     }
 
     @MainActor

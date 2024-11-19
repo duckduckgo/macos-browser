@@ -17,6 +17,7 @@ jobs:
       release-type: review
       create-dmg: false
       branch: ${{ github.sha }}
+      skip-notify: true
     secrets:
       APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
       APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
@@ -38,12 +39,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runner: [macos-13-xlarge, macos-14-xlarge]
+        runner: [macos-13-xlarge, macos-14-xlarge, macos-15-xlarge]
         include:
           - xcode-version: "15.2"
             runner: macos-13-xlarge
           - xcode-version: "15.4"
             runner: macos-14-xlarge
+          - xcode-version: "16.1"
+            runner: macos-15-xlarge
 
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.runner }}
@@ -52,6 +55,14 @@ jobs:
     timeout-minutes: 120
 
     steps:
+    - name: Install screenresolution
+      if: matrix.runner == 'macos-15-xlarge'
+      run: brew install screenresolution
+
+    - name: Change screen resolution
+      if: matrix.runner == 'macos-15-xlarge'
+      run: screenresolution set 1920x1080x32@60
+
     - name: Register SSH key for certificates repository access
       uses: webfactory/ssh-agent@v0.7.0
       with:
@@ -64,6 +75,9 @@ jobs:
 
     - name: Set up fastlane
       run: bundle install
+
+    - name: Create Default Keychain
+      run: bundle exec fastlane create_keychain_ui_tests
   
     - name: Sync code signing assets
       env:
@@ -141,6 +155,7 @@ jobs:
       with:
         check_name: "Test Report ${{ matrix.runner }}"
         report_paths: ui-tests.xml
+        check_retries: true
 
     - name: Upload logs when workflow failed
       uses: actions/upload-artifact@v4

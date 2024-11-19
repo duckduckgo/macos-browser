@@ -23,10 +23,21 @@ protocol ContextualOnboardingDialogTypeProviding {
     func dialogTypeForTab(_ tab: Tab, privacyInfo: PrivacyInfo?) -> ContextualDialogType?
 }
 
-protocol ContextualOnboardingStateUpdater {
+protocol ContextualOnboardingStateUpdater: AnyObject {
+    var state: ContextualOnboardingState { get }
     func updateStateFor(tab: Tab)
     func gotItPressed()
     func fireButtonUsed()
+    func turnOffFeature()
+}
+
+protocol FireButtonInfoStateProviding {
+    var infoPresentedOnce: Bool { get set }
+}
+
+final class FireButtonInfoStateProvider: FireButtonInfoStateProviding {
+    @UserDefaultsWrapper(key: .fireInfoPresentedOnce, defaultValue: false)
+     var infoPresentedOnce: Bool
 }
 
 enum ContextualDialogType: Equatable {
@@ -38,7 +49,7 @@ enum ContextualDialogType: Equatable {
     case highFive
 }
 
-enum ContextualOnboardingState: String {
+enum ContextualOnboardingState: String, CaseIterable {
 
     // The contextual onboarding has not started. This state should apply only during the linear onboarding.
     case notStarted
@@ -69,15 +80,30 @@ enum ContextualOnboardingState: String {
     // From this state, after a search, it will show nothing.
     case showTryASite
 
+    // State applied after the first search and the "Try A Site" dialog has been seen.
+    // From this state, after a website visit, it will show a "Tracker" dialog.
+    // From this state, after a search, it will show nothing.
+    case tryASiteSeen
+
     // State applied after the first time a site is visited where trackers were blocked, and a search occurred before.
     // From this state, after a website visit, it will show the "Try Fire Button" dialog.
-    // From this state, after a search, it will show nothing.
+    // From this state, after a search, it will show the "Search Done" dialog.
     case searchDoneShowBlockedTrackers
 
     // State applied after the first time a site is visited where no trackers were blocked, and a search occurred before.
     // From this state, after a website visit, it will show a "Tracker" dialog if a tracker is blocked; otherwise, nothing.
-    // From this state, after a search, it will show nothing.
+    // From this state, after a search, it will show the "Search Done" dialog.
     case searchDoneShowMajorOrNoTracker
+
+    // State applied after a searchDone dialog is seen and blocked tracker were previously seen.
+    // From this state, after a website visit, it will show the "Try Fire Button" dialog.
+    // From this state, after a search, it will show nothing.
+    case searchDoneSeenShowBlockedTrackers
+
+    // State applied after a searchDone dialog is seen and blocked tracker were previously seen.
+    // From this state, after a website visit, it will show the "Try Fire Button" dialog.
+    // From this state, after a search, it will show nothing.
+    case searchDoneSeenShowMajorOrNoTracker
 
     // State applied when, after the "Try a search" dialog is displayed, the fire button is used.
     // From this state, after a website visit, it will show a "Tracker" dialog.
@@ -109,15 +135,26 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
 
     private let trackerMessageProvider: TrackerMessageProviding
     private let startUpPreferences: StartupPreferences
+    private var fireButtonInfoStateProvider: FireButtonInfoStateProviding
+    private var fireButtonUsedOnce: Bool = false
 
     @UserDefaultsWrapper(key: .contextualOnboardingState, defaultValue: ContextualOnboardingState.onboardingCompleted.rawValue)
     private var stateString: String {
         didSet {
             if stateString == ContextualOnboardingState.notStarted.rawValue {
+                // This makes the home page DuckDuckGo during the onboarding
                 startUpPreferences.launchToCustomHomePage = true
+                // This avoids the info sheet on the Fire button popover to be shown during the onboarding
+                fireButtonInfoStateProvider.infoPresentedOnce = true
                 resetData()
             }
             if stateString == ContextualOnboardingState.onboardingCompleted.rawValue {
+                // If the user has not used the fire button 
+                // it will present the info sheet on the Fire button popover when they click on it for the first time
+                if !fireButtonUsedOnce {
+                    fireButtonInfoStateProvider.infoPresentedOnce = false
+                }
+                // This resets the home page to be the new tab page after the onboarding
                 startUpPreferences.launchToCustomHomePage = false
                 resetData()
             }
@@ -138,9 +175,11 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
     private var notBlockedTrackerSeen: Bool = false
 
     init(trackerMessageProvider: TrackerMessageProviding = TrackerMessageProvider(),
-         startupPreferences: StartupPreferences = StartupPreferences.shared) {
+         startupPreferences: StartupPreferences = StartupPreferences.shared,
+         fireButtonInfoStateProvider: FireButtonInfoStateProviding = FireButtonInfoStateProvider()) {
         self.trackerMessageProvider = trackerMessageProvider
         self.startUpPreferences = startupPreferences
+        self.fireButtonInfoStateProvider = fireButtonInfoStateProvider
     }
 
     func dialogTypeForTab(_ tab: Tab, privacyInfo: PrivacyInfo? = nil) -> ContextualDialogType? {
@@ -187,12 +226,12 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
         switch state {
         case .showTryASearch:
             return .tryASearch
-        case .showMajorOrNoTracker, .searchDoneShowMajorOrNoTracker:
+        case .showMajorOrNoTracker, .searchDoneShowMajorOrNoTracker, .searchDoneSeenShowMajorOrNoTracker:
             if !notBlockedTrackerSeen {
                 return trackerDialog(for: privacyInfo)
             }
             return nil
-        case .showBlockedTrackers, .searchDoneShowBlockedTrackers, .fireUsedShowSearchDone:
+        case .showBlockedTrackers, .searchDoneShowBlockedTrackers, .searchDoneSeenShowBlockedTrackers, .fireUsedShowSearchDone:
             return trackerDialog(for: privacyInfo)
         case .showFireButton:
             return .tryFireButton
@@ -253,12 +292,18 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
             state = .showSearchDone
         case .showSearchDone:
             state = .showTryASite
+        case .showTryASite:
+            state = .tryASiteSeen
         case .showBlockedTrackers:
             state = .searchDoneShowBlockedTrackers
         case .showMajorOrNoTracker:
             state = .searchDoneShowMajorOrNoTracker
-        case .searchDoneShowBlockedTrackers, .searchDoneShowMajorOrNoTracker:
-            state = .showTryASite
+        case .searchDoneShowBlockedTrackers:
+            state = .searchDoneSeenShowBlockedTrackers
+        case .searchDoneShowMajorOrNoTracker:
+            state = .searchDoneSeenShowMajorOrNoTracker
+        case .searchDoneSeenShowBlockedTrackers, .searchDoneSeenShowMajorOrNoTracker:
+            state = .showFireButton
         case .showFireButton, .fireUsedShowSearchDone:
             state = .showHighFive
         case .showHighFive:
@@ -276,21 +321,21 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
         switch state {
         case .notStarted:
             state = .showTryASearch
-        case .showTryASearch, .showTryASite, .fireUsedTryASearchShown:
+        case .showTryASearch, .fireUsedTryASearchShown:
             if case .blockedTrackers = trackerType {
                 state = .showBlockedTrackers
             } else if trackerType != nil {
                 state = .showMajorOrNoTracker
             }
-        case .showSearchDone:
+        case .showSearchDone, .showTryASite, .tryASiteSeen:
             if case .blockedTrackers = trackerType {
-                state = .searchDoneShowBlockedTrackers
+                state = .searchDoneSeenShowBlockedTrackers
             } else if trackerType != nil {
-                state = .searchDoneShowMajorOrNoTracker
+                state = .searchDoneSeenShowMajorOrNoTracker
             }
-        case .showBlockedTrackers, .searchDoneShowBlockedTrackers:
+        case .showBlockedTrackers, .searchDoneShowBlockedTrackers, .searchDoneSeenShowBlockedTrackers:
             state = .showFireButton
-        case .showMajorOrNoTracker, .searchDoneShowMajorOrNoTracker:
+        case .showMajorOrNoTracker, .searchDoneShowMajorOrNoTracker, .searchDoneSeenShowMajorOrNoTracker:
             if case .blockedTrackers = trackerType {
                 state = .showBlockedTrackers
             } else {
@@ -311,7 +356,7 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
         switch state {
         case .showSearchDone, .fireUsedShowSearchDone:
             state = .showTryASite
-        case .showBlockedTrackers, .showMajorOrNoTracker, .searchDoneShowBlockedTrackers, .searchDoneShowMajorOrNoTracker:
+        case .showBlockedTrackers, .showMajorOrNoTracker, .searchDoneShowBlockedTrackers, .searchDoneShowMajorOrNoTracker, .searchDoneSeenShowBlockedTrackers, .searchDoneSeenShowMajorOrNoTracker:
             state = .showFireButton
         case .showFireButton:
             state = .showHighFive
@@ -323,17 +368,22 @@ final class ContextualOnboardingStateMachine: ContextualOnboardingDialogTypeProv
     }
 
     func fireButtonUsed() {
+        fireButtonUsedOnce = true
         switch state {
         case .showTryASearch:
             state = .fireUsedTryASearchShown
         case .fireUsedShowSearchDone:
             state = .showHighFive
-        case .showBlockedTrackers, .showMajorOrNoTracker, .showTryASite, .searchDoneShowBlockedTrackers, .searchDoneShowMajorOrNoTracker, .showSearchDone:
+        case .showBlockedTrackers, .showMajorOrNoTracker, .showTryASite, .tryASiteSeen, .searchDoneShowBlockedTrackers, .searchDoneSeenShowBlockedTrackers, .searchDoneShowMajorOrNoTracker, .searchDoneSeenShowMajorOrNoTracker, .showSearchDone:
             state = .showFireButton
         case .showHighFive:
             state = .onboardingCompleted
         default:
             break
         }
+    }
+
+    func turnOffFeature() {
+        state = .onboardingCompleted
     }
 }

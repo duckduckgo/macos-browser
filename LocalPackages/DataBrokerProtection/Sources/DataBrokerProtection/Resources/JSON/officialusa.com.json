@@ -1,9 +1,10 @@
 {
   "name": "OfficialUSA",
   "url": "officialusa.com",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "parent": "neighbor.report",
   "addedDatetime": 1692594000000,
+  "optOutUrl": "https://www.officialusa.com/opt-out/",
   "steps": [
     {
       "stepType": "scan",

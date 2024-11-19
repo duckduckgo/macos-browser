@@ -20,10 +20,11 @@ import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
 class CapturingDataImportProvider: DataImportStatusProviding {
+
     var showImportWindowCalled = false
     var didImport = false
 
-    func showImportWindow(completion: (() -> Void)?) {
+    func showImportWindow(customTitle: String?, completion: (() -> Void)?) {
         showImportWindowCalled = true
         completion?()
     }

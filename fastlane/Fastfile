@@ -106,6 +106,21 @@ platform :mac do
     )
   end
 
+  desc 'Promotes the latest TestFlight build to App Store without submitting for review'
+  lane :promote_latest_testflight_to_appstore do |options|
+
+    latest_build_info = fetch_testflight_build_number(options)
+    latest_build_number = lane_context[SharedValues::LATEST_TESTFLIGHT_BUILD_NUMBER]   
+    latest_build_version = lane_context[SharedValues::LATEST_TESTFLIGHT_VERSION]
+
+    UI.message("The latest build number #{latest_build_number} of the latest version: #{latest_build_version}")
+
+    upload_metadata(options.merge({
+      build_number: latest_build_number.to_s,
+      app_version: latest_build_version.to_s,
+    }))
+
+  end
   # Makes App Store release build, uploads it to TestFlight, and prepares App Store listing for submission.
   #
   # - it first uploads just the build, and only then attempts uploading metadata.
@@ -145,7 +160,8 @@ platform :mac do
   lane :upload_metadata do |options|
     deliver(common_deliver_arguments(options).merge({
       skip_binary_upload: true,
-      skip_metadata: false
+      skip_metadata: false,
+      version_check_wait_retry_limit: 1
     }))
   end
 
@@ -322,6 +338,18 @@ platform :mac do
     macos_update_version_and_build_number_config(
       version: new_version,
       build_number: build_number
+    )
+  end
+
+  desc 'Creates a new Kechain to use on UI tests'
+  lane :create_keychain_ui_tests do |options|
+    create_keychain(
+      name: "DefaultKeychain",
+      password: "default",
+      default_keychain: true,
+      unlock: true,
+      timeout: 54000,
+      lock_when_sleeps: false
     )
   end
 

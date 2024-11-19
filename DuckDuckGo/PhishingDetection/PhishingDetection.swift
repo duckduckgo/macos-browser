@@ -47,11 +47,11 @@ public class PhishingDetection: PhishingSiteDetecting {
     private let hashPrefixDataSHA: String
 
     private init(
-        revision: Int = 1653367,
+        revision: Int = 1686837,
         filterSetURL: URL = Bundle.main.url(forResource: "filterSet", withExtension: "json")!,
-        filterSetDataSHA: String = "edd913cb0a579c2b163a01347531ed78976bfaf1d14b96a658c4a39d34a70ffc",
+        filterSetDataSHA: String = "517e610cd7c304f91ff5aaee91d570f7b6e678dbe9744e00cdb0a3126068432f",
         hashPrefixURL: URL = Bundle.main.url(forResource: "hashPrefixes", withExtension: "json")!,
-        hashPrefixDataSHA: String = "c61349d196c46db9155ca654a0d33368ee0f33766fcd63e5a20f1d5c92026dc5",
+        hashPrefixDataSHA: String = "05075ab14302a9e0329fbc0ba7e4e3118d7fa37846ec087c3942cfb1be92ffe0",
         detectionClient: PhishingDetectionAPIClient = PhishingDetectionAPIClient(),
         dataProvider: PhishingDetectionDataProvider? = nil,
         dataStore: PhishingDetectionDataSaving? = nil,
@@ -156,6 +156,8 @@ public class PhishingDetection: PhishingSiteDetecting {
                 PixelKit.fire(PhishingDetectionEvents.visitSite)
             case .updateTaskFailed48h(error: let error):
                 PixelKit.fire(PhishingDetectionEvents.updateTaskFailed48h(error: error))
+            case .settingToggled(to: let settingState):
+                PixelKit.fire(PhishingDetectionEvents.settingToggled(to: settingState))
             }
         })
         let resolvedUpdateManager = updateManager ?? PhishingDetectionUpdateManager(client: detectionClient, dataStore: resolvedDataStore)

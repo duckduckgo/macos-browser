@@ -40,7 +40,7 @@ final class BookmarksBarPromptPopover: NSPopover {
     private func setupContentController() {
         let controller = BookmarksBarPromptViewController.create()
         contentViewController = controller
-        contentViewController?.preferredContentSize = NSSize(width: 356, height: 272)
+        contentViewController?.preferredContentSize = NSSize(width: 356, height: 292)
     }
 
 }
@@ -84,9 +84,18 @@ struct BookmarksBarPromptView: View {
                 .font(.system(size: 15).weight(.semibold))
                 .padding(.bottom, 16)
 
-            Text(UserText.bookmarksBarPromptMessage)
-                .font(.system(size: 13))
-                .padding(.bottom, 20)
+            if #available(macOS 12, *) {
+                // Use Markdown for macOS 12 and newer
+                // .init is required for markdown to be correctly parsed from NSLocalizedString
+                Text(.init(UserText.bookmarksBarPromptMessageMarkdown))
+                    .font(.system(size: 13))
+                    .padding(.bottom, 20)
+            } else {
+                // Fallback for earlier macOS versions
+                Text(UserText.bookmarksBarPromptMessageFallback)
+                    .font(.system(size: 13))
+                    .padding(.bottom, 20)
+            }
 
             HStack {
                 Button {

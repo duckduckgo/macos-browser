@@ -111,7 +111,7 @@ struct DefaultFeedbackSender: UnifiedFeedbackSender {
     }
 
     func sendFormShowPixel() {
-        PixelKit.fire(GeneralPixel.pproFeedbackFormShow, frequency: .dailyAndCount)
+        PixelKit.fire(GeneralPixel.pproFeedbackFormShow, frequency: .legacyDailyAndCount)
     }
 
     func sendSubmitScreenShowPixel(source: UnifiedFeedbackSource, reportType: String, category: String, subcategory: String) {
@@ -119,7 +119,7 @@ struct DefaultFeedbackSender: UnifiedFeedbackSender {
                                                                 reportType: ReportType.from(reportType),
                                                                 category: Category.from(category),
                                                                 subcategory: Subcategory.from(subcategory)),
-                      frequency: .dailyAndCount)
+                      frequency: .legacyDailyAndCount)
     }
 
     func sendSubmitScreenFAQClickPixel(source: UnifiedFeedbackSource, reportType: String, category: String, subcategory: String) {
@@ -127,6 +127,6 @@ struct DefaultFeedbackSender: UnifiedFeedbackSender {
                                                                     reportType: ReportType.from(reportType),
                                                                     category: Category.from(category),
                                                                     subcategory: Subcategory.from(subcategory)),
-                      frequency: .dailyAndCount)
+                      frequency: .legacyDailyAndCount)
     }
 }

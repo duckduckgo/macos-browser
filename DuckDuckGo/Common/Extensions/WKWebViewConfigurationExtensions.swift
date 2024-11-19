@@ -60,7 +60,10 @@ extension WKWebViewConfiguration {
 
         if SupportedOSChecker.isCurrentOSReceivingUpdates {
             if urlSchemeHandler(forURLScheme: URL.NavigationalScheme.duck.rawValue) == nil {
-                setURLSchemeHandler(DuckURLSchemeHandler(), forURLScheme: URL.NavigationalScheme.duck.rawValue)
+                setURLSchemeHandler(
+                    DuckURLSchemeHandler(featureFlagger: NSApp.delegateTyped.featureFlagger),
+                    forURLScheme: URL.NavigationalScheme.duck.rawValue
+                )
             }
         }
 
@@ -119,7 +122,7 @@ extension NSPopover {
     // https://app.asana.com/0/1201037661562251/1206407295280737/f
     @objc(swizzled_showRelativeToRect:ofView:preferredEdge:)
     private dynamic func swizzled_show(relativeTo positioningRect: NSRect, of positioningView: NSView, preferredEdge: NSRectEdge) {
-        if positioningView.superview == nil {
+        if positioningView.window == nil {
             var observer: Cancellable?
             observer = positioningView.observe(\.window) { positioningView, _ in
                 if positioningView.window != nil {

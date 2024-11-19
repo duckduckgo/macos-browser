@@ -18,7 +18,7 @@
 
 import XCTest
 
-class BookmarkSortTests: XCTestCase {
+class BookmarkSortTests: UITestCase {
     private var app: XCUIApplication!
 
     private enum AccessibilityIdentifiers {
@@ -29,6 +29,7 @@ class BookmarkSortTests: XCTestCase {
     }
 
     override class func setUp() {
+        super.setUp()
         UITests.firstRun()
     }
 
@@ -61,6 +62,7 @@ class BookmarkSortTests: XCTestCase {
         app.dismissPopover(buttonIdentifier: "Hide")
         app.openBookmarksPanel()
         selectSortByName(mode: .panel)
+        app.openBookmarksPanel() // Here we do not open the panel, we close it by tapping the shortcut button again.
         app.openBookmarksManager()
 
         app.buttons[AccessibilityIdentifiers.sortBookmarksButtonManager].tap()

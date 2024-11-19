@@ -18,7 +18,7 @@
 
 import XCTest
 
-class FindInPageTests: XCTestCase {
+class FindInPageTests: UITestCase {
     private var app: XCUIApplication!
     private var addressBarTextField: XCUIElement!
     private var loremIpsumWebView: XCUIElement!
@@ -26,11 +26,13 @@ class FindInPageTests: XCTestCase {
     private let minimumExpectedMatchingPixelsInFindHighlight = 150
 
     override class func setUp() {
+        super.setUp()
         UITests.firstRun()
         saveLocalHTML()
     }
 
     override class func tearDown() {
+        super.tearDown()
         removeLocalHTML()
     }
 

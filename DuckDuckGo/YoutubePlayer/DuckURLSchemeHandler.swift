@@ -16,12 +16,20 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
+import FeatureFlags
 import Foundation
 import WebKit
 import ContentScopeScripts
 import PhishingDetection
 
 final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
+
+    let featureFlagger: FeatureFlagger
+
+    init(featureFlagger: FeatureFlagger) {
+        self.featureFlagger = featureFlagger
+    }
 
     func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
         guard let requestURL = webView.url ?? urlSchemeTask.request.url else {
@@ -36,6 +44,12 @@ final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
             handleDuckPlayer(requestURL: requestURL, urlSchemeTask: urlSchemeTask, webView: webView)
         case .phishingErrorPage:
             handleErrorPage(urlSchemeTask: urlSchemeTask)
+        case .newTab:
+            if featureFlagger.isFeatureOn(.htmlNewTabPage) {
+                handleSpecialPages(urlSchemeTask: urlSchemeTask)
+            } else {
+                handleNativeUIPages(requestURL: requestURL, urlSchemeTask: urlSchemeTask)
+            }
         default:
             handleNativeUIPages(requestURL: requestURL, urlSchemeTask: urlSchemeTask)
         }
@@ -127,6 +141,8 @@ private extension DuckURLSchemeHandler {
             directoryURL = URL(fileURLWithPath: "/pages/onboarding")
         } else if url.isReleaseNotesScheme {
             directoryURL = URL(fileURLWithPath: "/pages/release-notes")
+        } else if url.isNewTabPage {
+            directoryURL = URL(fileURLWithPath: "/pages/new-tab")
         } else {
             assertionFailure("Unknown scheme")
             return nil
@@ -205,6 +221,7 @@ private extension DuckURLSchemeHandler {
 
 extension URL {
     enum URLType {
+        case newTab
         case onboarding
         case duckPlayer
         case releaseNotes
@@ -220,6 +237,8 @@ extension URL {
             return .phishingErrorPage
         } else if self.isReleaseNotesScheme {
             return .releaseNotes
+        } else if self.isNewTabPage {
+            return .newTab
         } else {
             return nil
         }
@@ -227,6 +246,10 @@ extension URL {
 
     var isOnboarding: Bool {
         return isDuckURLScheme && host == "onboarding"
+    }
+
+    var isNewTabPage: Bool {
+        return isDuckURLScheme && host == "newtab"
     }
 
     var isDuckURLScheme: Bool {

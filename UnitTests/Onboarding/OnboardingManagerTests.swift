@@ -30,6 +30,7 @@ class OnboardingManagerTests: XCTestCase {
     var startupPreferences: StartupPreferences!
     var appearancePersistor: MockAppearancePreferencesPersistor!
     var startupPersistor: StartupPreferencesUserDefaultsPersistor!
+    var importProvider: CapturingDataImportProvider!
 
     @MainActor override func setUp() {
         super.setUp()
@@ -40,7 +41,8 @@ class OnboardingManagerTests: XCTestCase {
         appearancePreferences = AppearancePreferences(persistor: appearancePersistor)
         startupPersistor = StartupPreferencesUserDefaultsPersistor()
         startupPreferences = StartupPreferences(appearancePreferences: appearancePreferences, persistor: startupPersistor)
-        manager = OnboardingActionsManager(navigationDelegate: navigationDelegate, dockCustomization: dockCustomization, defaultBrowserProvider: defaultBrowserProvider, appearancePreferences: appearancePreferences, startupPreferences: startupPreferences)
+        importProvider = CapturingDataImportProvider()
+        manager = OnboardingActionsManager(navigationDelegate: navigationDelegate, dockCustomization: dockCustomization, defaultBrowserProvider: defaultBrowserProvider, appearancePreferences: appearancePreferences, startupPreferences: startupPreferences, dataImportProvider: importProvider)
     }
 
     override func tearDown() {
@@ -57,12 +59,19 @@ class OnboardingManagerTests: XCTestCase {
         // Given
         var systemSettings: SystemSettings
 #if APPSTORE
-        systemSettings = SystemSettings(rows: ["import", "default-browser"])
+        systemSettings = SystemSettings(rows: ["import"])
 #else
-        systemSettings = SystemSettings(rows: ["dock", "import", "default-browser"])
+        systemSettings = SystemSettings(rows: ["dock", "import"])
 #endif
         let stepDefinitions = StepDefinitions(systemSettings: systemSettings)
-        let expectedConfig = OnboardingConfiguration(stepDefinitions: stepDefinitions, env: "development", locale: "en")
+        let expectedConfig = OnboardingConfiguration(
+            stepDefinitions: stepDefinitions,
+            exclude: [],
+            order: "v3",
+            env: "development",
+            locale: "en",
+            platform: .init(name: "macos")
+        )
 
         // Then
         XCTAssertEqual(manager.configuration, expectedConfig)
@@ -144,12 +153,16 @@ class OnboardingManagerTests: XCTestCase {
     }
 
     @MainActor
-    func testOnImportData_DataImportViewShown() {
+    func testOnImportData_DataImportViewShown() async {
+        // Given
+        importProvider.didImport = true
+
         // When
-        manager.importData()
+        let didImport = await manager.importData()
 
         // Then
-        XCTAssertTrue(navigationDelegate.showImportDataViewCalled)
+        XCTAssertTrue(importProvider.showImportWindowCalled)
+        XCTAssertTrue(didImport)
     }
 
     func testOnAddToDock_IsAddedToDock() {

@@ -22,18 +22,24 @@ import Common
 import BrowserServicesKit
 import Configuration
 import PixelKit
+import AppKitExtensions
 import os.log
+import Freemium
+import Subscription
+import UserNotifications
 
 // This is to avoid exposing all the dependancies outside of the DBP package
 public class DataBrokerProtectionAgentManagerProvider {
 
-    public static func agentManager(authenticationManager: DataBrokerProtectionAuthenticationManaging) -> DataBrokerProtectionAgentManager {
+    public static func agentManager(authenticationManager: DataBrokerProtectionAuthenticationManaging,
+                                    accountManager: AccountManager) -> DataBrokerProtectionAgentManager {
         let pixelHandler = DataBrokerProtectionPixelsHandler()
 
-        let executionConfig = DataBrokerExecutionConfig()
+        let dbpSettings = DataBrokerProtectionSettings()
+        let executionConfig = DataBrokerExecutionConfig(mode: dbpSettings.storedRunType == .integrationTests ? .fastForIntegrationTests : .normal)
         let activityScheduler = DefaultDataBrokerProtectionBackgroundActivityScheduler(config: executionConfig)
 
-        let notificationService = DefaultDataBrokerProtectionUserNotificationService(pixelHandler: pixelHandler)
+        let notificationService = DefaultDataBrokerProtectionUserNotificationService(pixelHandler: pixelHandler, userNotificationCenter: UNUserNotificationCenter.current(), authenticationManager: authenticationManager)
         Configuration.setURLProvider(DBPAgentConfigurationURLProvider())
         let configStore = ConfigurationStore()
         let privacyConfigurationManager = DBPPrivacyConfigurationManager()
@@ -82,10 +88,13 @@ public class DataBrokerProtectionAgentManagerProvider {
                                                          emailService: emailService,
                                                          captchaService: captchaService)
 
+        let freemiumDBPUserStateManager = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp)
+
         let agentstopper = DefaultDataBrokerProtectionAgentStopper(dataManager: dataManager,
                                                                    entitlementMonitor: DataBrokerProtectionEntitlementMonitor(),
                                                                    authenticationManager: authenticationManager,
-                                                                   pixelHandler: pixelHandler)
+                                                                   pixelHandler: pixelHandler,
+                                                                   freemiumDBPUserStateManager: freemiumDBPUserStateManager)
 
         let operationDependencies = DefaultDataBrokerOperationDependencies(
             database: dataManager.database,
@@ -105,7 +114,9 @@ public class DataBrokerProtectionAgentManagerProvider {
             pixelHandler: pixelHandler,
             agentStopper: agentstopper,
             configurationManager: configurationManager,
-            privacyConfigurationManager: privacyConfigurationManager)
+            privacyConfigurationManager: privacyConfigurationManager,
+            authenticationManager: authenticationManager,
+            freemiumDBPUserStateManager: freemiumDBPUserStateManager)
     }
 }
 
@@ -121,13 +132,13 @@ public final class DataBrokerProtectionAgentManager {
     private let agentStopper: DataBrokerProtectionAgentStopper
     private let configurationManger: DefaultConfigurationManager
     private let privacyConfigurationManager: DBPPrivacyConfigurationManager
+    private let authenticationManager: DataBrokerProtectionAuthenticationManaging
+    private let freemiumDBPUserStateManager: FreemiumDBPUserStateManager
 
     // Used for debug functions only, so not injected
     private lazy var browserWindowManager = BrowserWindowManager()
 
     private var didStartActivityScheduler = false
-
-    private var configurationSubscription: AnyCancellable?
 
     init(userNotificationService: DataBrokerProtectionUserNotificationService,
          activityScheduler: DataBrokerProtectionBackgroundActivityScheduler,
@@ -138,7 +149,9 @@ public final class DataBrokerProtectionAgentManager {
          pixelHandler: EventMapping<DataBrokerProtectionPixels>,
          agentStopper: DataBrokerProtectionAgentStopper,
          configurationManager: DefaultConfigurationManager,
-         privacyConfigurationManager: DBPPrivacyConfigurationManager
+         privacyConfigurationManager: DBPPrivacyConfigurationManager,
+         authenticationManager: DataBrokerProtectionAuthenticationManaging,
+         freemiumDBPUserStateManager: FreemiumDBPUserStateManager
     ) {
         self.userNotificationService = userNotificationService
         self.activityScheduler = activityScheduler
@@ -150,6 +163,8 @@ public final class DataBrokerProtectionAgentManager {
         self.agentStopper = agentStopper
         self.configurationManger = configurationManager
         self.privacyConfigurationManager = privacyConfigurationManager
+        self.authenticationManager = authenticationManager
+        self.freemiumDBPUserStateManager = freemiumDBPUserStateManager
 
         self.activityScheduler.delegate = self
         self.ipcServer.serverDelegate = self
@@ -167,18 +182,11 @@ public final class DataBrokerProtectionAgentManager {
             activityScheduler.startScheduler()
             didStartActivityScheduler = true
             fireMonitoringPixels()
-            queueManager.startScheduledOperationsIfPermitted(showWebView: false, operationDependencies: operationDependencies, errorHandler: nil, completion: nil)
+            startFreemiumOrSubscriptionScheduledOperations(showWebView: false, operationDependencies: operationDependencies, errorHandler: nil, completion: nil)
 
             /// Monitors entitlement changes every 60 minutes to optimize system performance and resource utilization by avoiding unnecessary operations when entitlement is invalid.
             /// While keeping the agent active with invalid entitlement has no significant risk, setting the monitoring interval at 60 minutes is a good balance to minimize backend checks.
-            agentStopper.monitorEntitlementAndStopAgentIfEntitlementIsInvalid(interval: .minutes(60))
-
-            configurationSubscription = privacyConfigurationManager.updatesPublisher
-                .sink { [weak self] _ in
-                    if self?.privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(BackgroundAgentPixelTestSubfeature.pixelTest) ?? false {
-                        PixelKit.fire(DataBrokerProtectionPixels.pixelTest, frequency: .daily)
-                    }
-                }
+            agentStopper.monitorEntitlementAndStopAgentIfEntitlementIsInvalidAndUserIsNotFreemium(interval: .minutes(60))
         }
     }
 }
@@ -187,6 +195,9 @@ public final class DataBrokerProtectionAgentManager {
 
 extension DataBrokerProtectionAgentManager {
     func fireMonitoringPixels() {
+        // Only send pixels for authenticated users
+        guard authenticationManager.isUserAuthenticated else { return }
+
         let database = operationDependencies.database
 
         let engagementPixels = DataBrokerProtectionEngagementPixels(database: database, handler: pixelHandler)
@@ -199,8 +210,32 @@ extension DataBrokerProtectionAgentManager {
         eventPixels.tryToFireWeeklyPixels()
         // This will try to fire the stats pixels
         statsPixels.tryToFireStatsPixels()
+
+        // If a user upgraded from Freemium, don't send 24-hour opt-out submit pixels
+        guard !freemiumDBPUserStateManager.didActivate else { return }
+
         // Fire custom stats pixels if needed
         statsPixels.fireCustomStatsPixelsIfNeeded()
+    }
+}
+
+private extension DataBrokerProtectionAgentManager {
+
+    /// Starts either Subscription (scan and opt-out) or Freemium (scan-only) scheduled operations
+    /// - Parameters:
+    ///   - showWebView: Whether to show the web view or not
+    ///   - operationDependencies: Operation dependencies
+    ///   - errorHandler: Error handler
+    ///   - completion: Completion handler
+    func startFreemiumOrSubscriptionScheduledOperations(showWebView: Bool,
+                                                        operationDependencies: DataBrokerOperationDependencies,
+                                                        errorHandler: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?,
+                                                        completion: (() -> Void)?) {
+        if authenticationManager.isUserAuthenticated {
+            queueManager.startScheduledAllOperationsIfPermitted(showWebView: showWebView, operationDependencies: operationDependencies, errorHandler: errorHandler, completion: completion)
+        } else {
+            queueManager.startScheduledScanOperationsIfPermitted(showWebView: showWebView, operationDependencies: operationDependencies, errorHandler: errorHandler, completion: completion)
+        }
     }
 }
 
@@ -212,10 +247,9 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionBackgroundActivi
 
     func startScheduledOperations(completion: (() -> Void)?) {
         fireMonitoringPixels()
-        queueManager.startScheduledOperationsIfPermitted(showWebView: false,
-                                                         operationDependencies: operationDependencies,
-                                                         errorHandler: nil,
-                                                         completion: completion)
+        startFreemiumOrSubscriptionScheduledOperations(showWebView: false, operationDependencies: operationDependencies, errorHandler: nil) {
+            completion?()
+        }
     }
 }
 
@@ -225,7 +259,7 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentAppEvents {
 
         userNotificationService.requestNotificationPermission()
         fireMonitoringPixels()
-        queueManager.startImmediateOperationsIfPermitted(showWebView: false, operationDependencies: operationDependencies) { [weak self] errors in
+        queueManager.startImmediateScanOperationsIfPermitted(showWebView: false, operationDependencies: operationDependencies) { [weak self] errors in
             guard let self = self else { return }
 
             if let errors = errors {
@@ -265,9 +299,9 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentAppEvents {
 
     public func appLaunched() {
         fireMonitoringPixels()
-        queueManager.startScheduledOperationsIfPermitted(showWebView: false,
-                                                         operationDependencies: operationDependencies,
-                                                         errorHandler: { [weak self] errors in
+        startFreemiumOrSubscriptionScheduledOperations(showWebView: false,
+                                                         operationDependencies:
+                                                        operationDependencies, errorHandler: { [weak self] errors in
             guard let self = self else { return }
 
             if let errors = errors {
@@ -316,14 +350,14 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentDebugComman
     }
 
     public func startImmediateOperations(showWebView: Bool) {
-        queueManager.startImmediateOperationsIfPermitted(showWebView: showWebView,
+        queueManager.startImmediateScanOperationsIfPermitted(showWebView: showWebView,
                                                          operationDependencies: operationDependencies,
                                                          errorHandler: nil,
                                                          completion: nil)
     }
 
     public func startScheduledOperations(showWebView: Bool) {
-        queueManager.startScheduledOperationsIfPermitted(showWebView: showWebView,
+        startFreemiumOrSubscriptionScheduledOperations(showWebView: showWebView,
                                                          operationDependencies: operationDependencies,
                                                          errorHandler: nil,
                                                          completion: nil)

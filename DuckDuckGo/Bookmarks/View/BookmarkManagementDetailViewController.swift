@@ -17,6 +17,7 @@
 //
 
 import AppKit
+import Carbon
 import Combine
 import SwiftUI
 
@@ -144,10 +145,10 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         toolbarButtonsStackView.translatesAutoresizingMaskIntoConstraints = false
         toolbarButtonsStackView.distribution = .fill
 
-        configureToolbar(button: newBookmarkButton, image: .addBookmark, isHidden: false)
-        configureToolbar(button: newFolderButton, image: .addFolder, isHidden: false)
-        configureToolbar(button: deleteItemsButton, image: .trash, isHidden: true)
-        configureToolbar(button: sortItemsButton, image: .sortAscending, isHidden: false)
+        configureToolbarButton(newBookmarkButton, image: .addBookmark, isHidden: false)
+        configureToolbarButton(newFolderButton, image: .addFolder, isHidden: false)
+        configureToolbarButton(deleteItemsButton, image: .trash, isHidden: false)
+        configureToolbarButton(sortItemsButton, image: .sortAscending, isHidden: false)
 
         emptyState.addSubview(emptyStateImageView)
         emptyState.addSubview(emptyStateTitle)
@@ -190,6 +191,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.usesPredominantAxisScrolling = false
         scrollView.automaticallyAdjustsContentInsets = false
+        scrollView.scrollerInsets = NSEdgeInsets(top: -22, left: 0, bottom: -22, right: 0)
         scrollView.contentInsets = NSEdgeInsets(top: 22, left: 0, bottom: 22, right: 0)
 
         let clipView = NSClipView()
@@ -239,7 +241,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     private func setupLayout() {
         NSLayoutConstraint.activate([
             toolbarButtonsStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 48),
-            view.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: 48),
+            view.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: 58),
             separator.topAnchor.constraint(equalTo: toolbarButtonsStackView.bottomAnchor, constant: 24),
             emptyState.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 20),
             scrollView.topAnchor.constraint(equalTo: separator.bottomAnchor),
@@ -248,16 +250,15 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
             searchBar.leadingAnchor.constraint(greaterThanOrEqualTo: toolbarButtonsStackView.trailingAnchor, constant: 8),
             searchBar.widthAnchor.constraint(equalToConstant: 256),
             searchBar.centerYAnchor.constraint(equalTo: toolbarButtonsStackView.centerYAnchor),
-            searchBar.trailingAnchor.constraint(equalTo: separator.trailingAnchor),
+            view.trailingAnchor.constraint(equalTo: searchBar.trailingAnchor, constant: 58),
             view.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             view.trailingAnchor.constraint(greaterThanOrEqualTo: searchBar.trailingAnchor, constant: 20),
             view.trailingAnchor.constraint(equalTo: separator.trailingAnchor, constant: 58),
             emptyState.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            separator.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 58),
+            separator.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 48),
             toolbarButtonsStackView.topAnchor.constraint(equalTo: view.topAnchor, constant: 32),
             emptyState.topAnchor.constraint(greaterThanOrEqualTo: separator.bottomAnchor, constant: 8),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 48),
-            emptyState.centerXAnchor.constraint(equalTo: separator.centerXAnchor),
 
             newBookmarkButton.heightAnchor.constraint(equalToConstant: 24),
             newFolderButton.heightAnchor.constraint(equalToConstant: 24),
@@ -314,14 +315,22 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         }.store(in: &cancellables)
     }
 
-    override func viewDidDisappear() {
-        super.viewDidDisappear()
+    override func viewWillAppear() {
+        NotificationCenter.default.addObserver(self, selector: #selector(firstReponderDidChange), name: .firstResponder, object: nil)
+
         reloadData()
     }
 
+    override func viewDidDisappear() {
+        NotificationCenter.default.removeObserver(self, name: .firstResponder, object: nil)
+    }
+
     override func keyDown(with event: NSEvent) {
-        if event.charactersIgnoringModifiers == String(UnicodeScalar(NSDeleteCharacter)!) {
+        switch Int(event.keyCode) {
+        case kVK_Delete, kVK_ForwardDelete:
             deleteSelectedItems()
+        default:
+            super.keyDown(with: event)
         }
     }
 
@@ -409,7 +418,23 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
             .show(in: view.window)
     }
 
+    @objc func firstReponderDidChange(notification: Notification) {
+        // clear delete undo history when activating the Address Bar
+        if notification.object is AddressBarTextEditor {
+            undoManager?.removeAllActions(withTarget: bookmarkManager)
+        }
+    }
+
     @objc func delete(_ sender: AnyObject) {
+        if tableView.selectedRowIndexes.isEmpty {
+            guard let folder = selectionState.folder else {
+                assertionFailure("Cannot delete root folder")
+                return
+            }
+            bookmarkManager.remove(folder: folder, undoManager: undoManager)
+            return
+        }
+
         deleteSelectedItems()
     }
 
@@ -420,11 +445,12 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     }
 
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
-        if menuItem.action == #selector(BookmarkManagementDetailViewController.delete(_:)) {
+        switch menuItem.action {
+        case #selector(BookmarkManagementDetailViewController.delete(_:)):
             return !tableView.selectedRowIndexes.isEmpty
+        default:
+            return true
         }
-
-        return true
     }
 
     private func setupSort(mode: BookmarksSortMode) {
@@ -444,10 +470,13 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     }
 
     private func deleteSelectedItems() {
+        guard !tableView.selectedRowIndexes.isEmpty else {
+            return
+        }
         let entities = tableView.selectedRowIndexes.compactMap { fetchEntity(at: $0) }
         let entityUUIDs = entities.map(\.id)
 
-        bookmarkManager.remove(objectsWithUUIDs: entityUUIDs)
+        bookmarkManager.remove(objectsWithUUIDs: entityUUIDs, undoManager: undoManager)
     }
 
     private(set) lazy var faviconsFetcherOnboarding: FaviconsFetcherOnboarding? = {
@@ -526,6 +555,7 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
                    validateDrop info: NSDraggingInfo,
                    proposedRow row: Int,
                    proposedDropOperation dropOperation: NSTableView.DropOperation) -> NSDragOperation {
+        if !sortBookmarksViewModel.selectedSortMode.isReorderingEnabled { return .none }
         let destination = destination(for: dropOperation, at: row)
 
         guard !isSearching || destination is BookmarkFolder else { return .none }
@@ -580,12 +610,22 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
     private func updateToolbarButtons() {
         newFolderButton.cell?.representedObject = selectionState.folder
 
-        let shouldShowDeleteButton = tableView.selectedRowIndexes.count > 1
+        let selectedRowsCount = tableView.selectedRowIndexes.count
+        let canDeleteFolder = selectionState.folder != nil
         NSAnimationContext.runAnimationGroup { context in
             context.duration = 0.25
-            deleteItemsButton.animator().isHidden = !shouldShowDeleteButton
-            newBookmarkButton.animator().isHidden = shouldShowDeleteButton
-            newFolderButton.animator().isHidden = shouldShowDeleteButton
+            if selectedRowsCount > 0 {
+                deleteItemsButton.animator().title = UserText.delete
+                deleteItemsButton.animator().isEnabled = true
+            } else if canDeleteFolder {
+                deleteItemsButton.animator().title = UserText.deleteFolder
+                deleteItemsButton.animator().isEnabled = true
+            } else {
+                deleteItemsButton.animator().title = UserText.delete
+                deleteItemsButton.animator().isEnabled = false
+            }
+            newBookmarkButton.animator().isHidden = selectedRowsCount > 1
+            newFolderButton.animator().isHidden = selectedRowsCount > 1
         }
     }
 
@@ -609,7 +649,7 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
 
 private extension BookmarkManagementDetailViewController {
 
-    func configureToolbar(button: MouseOverButton, image: NSImage, isHidden: Bool) {
+    func configureToolbarButton(_ button: MouseOverButton, image: NSImage, isHidden: Bool) {
         button.bezelStyle = .shadowlessSquare
         button.cornerRadius = 4
         button.normalTintColor = .button
@@ -755,23 +795,23 @@ extension BookmarkManagementDetailViewController {
 
     private func setupSyncPromoLayout() {
          NSLayoutConstraint.activate([
-                                        documentView.topAnchor.constraint(equalTo: scrollView.contentView.topAnchor),
-                                        documentView.leadingAnchor.constraint(equalTo: scrollView.contentView.leadingAnchor),
-                                        documentView.trailingAnchor.constraint(lessThanOrEqualTo: scrollView.contentView.trailingAnchor),
-                                        documentView.widthAnchor.constraint(equalTo: scrollView.contentView.widthAnchor, constant: -12),
-                                        scrollView.widthAnchor.constraint(greaterThanOrEqualToConstant: 400),
-                                        scrollView.heightAnchor.constraint(greaterThanOrEqualToConstant: 220)
-                                    ])
+            documentView.topAnchor.constraint(equalTo: scrollView.contentView.topAnchor),
+            documentView.leadingAnchor.constraint(equalTo: scrollView.contentView.leadingAnchor),
+            documentView.trailingAnchor.constraint(lessThanOrEqualTo: scrollView.contentView.trailingAnchor),
+            documentView.widthAnchor.constraint(equalTo: scrollView.contentView.widthAnchor, constant: 0),
+            scrollView.widthAnchor.constraint(greaterThanOrEqualToConstant: 400),
+            scrollView.heightAnchor.constraint(greaterThanOrEqualToConstant: 220)
+        ])
 
         NSLayoutConstraint.activate([
-                                        syncPromoViewHostingView.topAnchor.constraint(equalTo: documentView.topAnchor, constant: 0),
-                                        syncPromoViewHostingView.leadingAnchor.constraint(equalTo: documentView.leadingAnchor, constant: 2),
-                                        syncPromoViewHostingView.trailingAnchor.constraint(equalTo: documentView.trailingAnchor, constant: -2),
+            syncPromoViewHostingView.topAnchor.constraint(equalTo: documentView.topAnchor, constant: 0),
+            syncPromoViewHostingView.leadingAnchor.constraint(equalTo: documentView.leadingAnchor, constant: 2),
+            syncPromoViewHostingView.trailingAnchor.constraint(equalTo: documentView.trailingAnchor, constant: -2),
 
-                                        tableView.leadingAnchor.constraint(equalTo: documentView.leadingAnchor),
-                                        tableView.trailingAnchor.constraint(equalTo: documentView.trailingAnchor),
-                                        tableView.bottomAnchor.constraint(greaterThanOrEqualTo: documentView.bottomAnchor),
-                                    ])
+            tableView.leadingAnchor.constraint(equalTo: documentView.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: documentView.trailingAnchor),
+            tableView.bottomAnchor.constraint(greaterThanOrEqualTo: documentView.bottomAnchor),
+        ])
 
         tableViewTopToDocumentTopConstraint = tableView.topAnchor.constraint(equalTo: documentView.topAnchor)
         tableViewTopToDocumentTopConstraint?.isActive = false

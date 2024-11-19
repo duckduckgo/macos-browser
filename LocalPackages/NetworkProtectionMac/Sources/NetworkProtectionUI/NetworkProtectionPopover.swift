@@ -101,6 +101,10 @@ public final class NetworkProtectionPopover: NSPopover {
     }
 
     override public func show(relativeTo positioningRect: NSRect, of positioningView: NSView, preferredEdge: NSRectEdge) {
+
+        // Starting on macOS sequoia this is necessary to make sure the popover has focus
+        NSRunningApplication.current.activate(options: .activateIgnoringOtherApps)
+
         statusReporter.forceRefresh()
         statusViewModel.refreshLoginItemStatus()
         super.show(relativeTo: positioningRect, of: positioningView, preferredEdge: preferredEdge)

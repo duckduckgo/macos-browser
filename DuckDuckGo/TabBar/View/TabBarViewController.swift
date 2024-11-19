@@ -49,6 +49,8 @@ final class TabBarViewController: NSViewController {
 
     @IBOutlet weak var addTabButton: MouseOverButton!
 
+    private var fireButtonMouseOverCancellable: AnyCancellable?
+
     private var addNewTabButtonFooter: TabBarFooter? {
         guard let indexPath = collectionView.indexPathsForVisibleSupplementaryElements(ofKind: NSCollectionView.elementKindSectionFooter).first,
               let footerView = collectionView.supplementaryView(forElementKind: NSCollectionView.elementKindSectionFooter, at: indexPath) else { return nil }
@@ -178,6 +180,11 @@ final class TabBarViewController: NSViewController {
         fireButton.toolTip = UserText.clearBrowsingHistoryTooltip
         fireButton.animationNames = MouseOverAnimationButton.AnimationNames(aqua: "flame-mouse-over", dark: "dark-flame-mouse-over")
         fireButton.sendAction(on: .leftMouseDown)
+        fireButtonMouseOverCancellable = fireButton.publisher(for: \.isMouseOver)
+            .first(where: { $0 }) // only interested when mouse is over
+            .sink(receiveValue: { [weak self] _ in
+                self?.stopFireButtonPulseAnimation()
+            })
     }
 
     private func setupAsBurnerWindowIfNeeded() {
@@ -824,7 +831,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
             Logger.general.error("TabBarViewController: Failed to fetch bookmark for url \(url)")
             return
         }
-        bookmarkManager.remove(bookmark: bookmark)
+        bookmarkManager.remove(bookmark: bookmark, undoManager: nil)
     }
 
     private func fireproof(_ tab: Tab) {
@@ -1258,6 +1265,18 @@ extension TabBarViewController: TabBarViewItemDelegate {
         }
         return .init(hasItemsToTheLeft: indexPath.item > 0,
                      hasItemsToTheRight: indexPath.item + 1 < tabCollectionViewModel.tabCollection.tabs.count)
+    }
+
+}
+
+extension TabBarViewController {
+
+    func startFireButtonPulseAnimation() {
+        ViewHighlighter.highlight(view: fireButton, inParent: view)
+    }
+
+    func stopFireButtonPulseAnimation() {
+        ViewHighlighter.stopHighlighting(view: fireButton)
     }
 
 }
