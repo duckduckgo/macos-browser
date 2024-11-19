@@ -82,7 +82,7 @@ extension UserText {
     // "general.feedback-form.category.vpn" - Description for the feedback form when the issue is related to VPN
     static let generalFeedbackFormCategoryVPN = "VPN"
     // "general.feedback-form.category.pir" - Description for the feedback form when the issue is related to Personal Info Removal (PIR)
-    static let generalFeedbackFormCategoryPIR = "Personal Info Removal"
+    static let generalFeedbackFormCategoryPIR = "Personal Information Removal"
     // "general.feedback-form.category.itr" - Description for the feedback form when the issue is related to Identity Theft Restoration (ITR)
     static let generalFeedbackFormCategoryITR = "Identity Theft Restoration"
     // "ppro.feedback-form.category.select-category" - Title for the category selection state of the feedback form
