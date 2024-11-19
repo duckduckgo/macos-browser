@@ -23,8 +23,25 @@ import RemoteMessaging
 import Common
 import os.log
 
+/**
+ * This protocol describes a feature or set of features that use HTML New Tab Page.
+ *
+ * A class implementing this protocol can register handlers for a subset of
+ * `NewTabPageUserScript`'s messages, allowing for better separation of concerns
+ * by having e.g. a class responsible for handling Favorites messages, a class responsible
+ * for handling RMF messages, etc.
+ *
+ * Objects implementing this protocol are added to `NewTabPageActionsManager`.
+ */
 protocol NewTabPageScriptClient: AnyObject {
+    /**
+     * Handle to the object that returns the list of all living `NewTabPageUserScript` instances.
+     */
     var userScriptsSource: NewTabPageUserScriptsSource? { get set }
+
+    /**
+     * This function should be implemented to add all message handlers to the provided `userScript`.
+     */
     func registerMessageHandlers(for userScript: SubfeatureWithExternalMessageHandling)
 }
 
@@ -56,17 +73,21 @@ final class NewTabPageActionsManager: NewTabPageActionsManaging, NewTabPageUserS
         userScriptsHandles.allObjects
     }
 
-    init(
+    convenience init(
         appearancePreferences: AppearancePreferences,
         activeRemoteMessageModel: ActiveRemoteMessageModel,
         openURLHandler: @escaping (URL) -> Void
     ) {
-        newTabPageScriptClients = [
+        self.init([
             NewTabPageConfigurationClient(appearancePreferences: appearancePreferences),
             NewTabPageRMFClient(activeRemoteMessageModel: activeRemoteMessageModel, openURLHandler: openURLHandler),
             NewTabPageFavoritesClient(),
             NewTabPagePrivacyStatsClient()
-        ]
+        ])
+    }
+
+    init(_ clients: [NewTabPageScriptClient]) {
+        newTabPageScriptClients = clients
         newTabPageScriptClients.forEach { $0.userScriptsSource = self }
     }
 

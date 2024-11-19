@@ -20,6 +20,16 @@ import Foundation
 import UserScript
 import WebKit
 
+/**
+ * This protocol extends `Subfeature` and allows to register message handlers from an external source.
+ *
+ * `NewTabPageUserScript` manages many different features that only share the same view
+ * (HTML New Tab Page) and are otherwise independent of each other.
+ *
+ * Implementing this protocol in `NewTabPageUserScript` allows for having multiple objects
+ * registered as handlers to handle feature-specific messages, e.g. a separate object
+ * responsible for RMF, favorites, privacy stats, etc.
+ */
 protocol SubfeatureWithExternalMessageHandling: AnyObject, Subfeature {
     var webView: WKWebView? { get }
     func registerMessageHandlers(_ handlers: [String: Subfeature.Handler])
@@ -27,19 +37,11 @@ protocol SubfeatureWithExternalMessageHandling: AnyObject, Subfeature {
 
 final class NewTabPageUserScript: NSObject, SubfeatureWithExternalMessageHandling {
 
-    let actionsManager: NewTabPageActionsManaging
     var messageOriginPolicy: MessageOriginPolicy = .only(rules: [.exact(hostname: "newtab")])
     let featureName: String = "newTabPage"
     weak var broker: UserScriptMessageBroker?
-    weak var webView: WKWebView?
-    private var methodHandlers: [MessageName: Handler] = [:]
-
-    // MARK: - MessageNames
-
-    typealias MessageName = String
 
     init(actionsManager: NewTabPageActionsManaging) {
-        self.actionsManager = actionsManager
         super.init()
         actionsManager.registerUserScript(self)
     }
@@ -48,14 +50,21 @@ final class NewTabPageUserScript: NSObject, SubfeatureWithExternalMessageHandlin
         self.broker = broker
     }
 
+    // MARK: - Message Handling
+
+    typealias MessageName = String
+
+    weak var webView: WKWebView?
+    private var messageHandlers: [MessageName: Handler] = [:]
+
     func registerMessageHandlers(_ handlers: [MessageName: Subfeature.Handler]) {
         for (messageName, handler) in handlers {
-            methodHandlers[messageName] = handler
+            messageHandlers[messageName] = handler
         }
     }
 
     func handler(forMethodNamed methodName: MessageName) -> Handler? {
-        methodHandlers[methodName]
+        messageHandlers[methodName]
     }
 
     func pushMessage(named method: String, params: Encodable?, using script: NewTabPageUserScript) {
