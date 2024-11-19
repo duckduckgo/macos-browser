@@ -394,7 +394,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TYPE: ${{ github.event.inputs.release-type || inputs.release-type }}
           WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          success: true
+          success: false
         run: |
           template_name=$([[ "${{ env.success }}" == "true" ]] && echo "notarized-build-complete" || echo "notarized-build-failed")
           bundle exec fastlane run mattermost_send_message \
