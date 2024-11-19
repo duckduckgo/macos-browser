@@ -60,12 +60,20 @@ extension NewTabPageScriptClient {
     }
 }
 
-protocol NewTabPageActionsManaging: AnyObject {
-    func registerUserScript(_ userScript: NewTabPageUserScript)
-}
-
+/**
+ * This protocol describes type that can provide a list of user scripts.
+ *
+ * It's conformed to by `NewTabPageActionsManager` (via `NewTabPageActionsManaging`).
+ */
 protocol NewTabPageUserScriptsSource: AnyObject {
     var userScripts: [NewTabPageUserScript] { get }
+}
+
+/**
+ * This protocol describes the API of `NewTabPageActionsManager`.
+ */
+protocol NewTabPageActionsManaging: AnyObject, NewTabPageUserScriptsSource {
+    func registerUserScript(_ userScript: NewTabPageUserScript)
 }
 
 /**
