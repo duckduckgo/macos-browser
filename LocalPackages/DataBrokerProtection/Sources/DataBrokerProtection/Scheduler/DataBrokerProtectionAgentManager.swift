@@ -61,6 +61,7 @@ public class DataBrokerProtectionAgentManagerProvider {
                                                   unknownUsernameCategorization: false)
         let contentScopeProperties = ContentScopeProperties(gpcEnabled: false,
                                                             sessionKey: UUID().uuidString,
+                                                            messageSecret: UUID().uuidString,
                                                             featureToggles: features)
 
         let fakeBroker = DataBrokerDebugFlagFakeBroker()
