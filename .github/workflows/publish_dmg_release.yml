@@ -267,9 +267,11 @@ jobs:
         id: get-tasks-since-last-internal-release
         if: contains(github.event.inputs.release-type, '') || github.event.inputs.release-type == 'internal'
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         run: |
-            bundle exec fastlane run get_tasks_in_last_internal_release platform:macos
+          tasks="$(./scripts/update_asana_for_release.sh list-tasks-in-last-internal-release)"
+          echo "tasks=$tasks" >> $GITHUB_OUTPUT
 
       - name: Set common environment variables
         if: always()
