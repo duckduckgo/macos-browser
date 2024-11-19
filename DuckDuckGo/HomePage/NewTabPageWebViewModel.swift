@@ -37,7 +37,8 @@ final class NewTabPageWebViewModel: NSObject {
     private var windowCancellable: AnyCancellable?
 
     init(featureFlagger: FeatureFlagger, actionsManager: NewTabPageActionsManaging) {
-        newTabPageUserScript = NewTabPageUserScript(actionsManager: actionsManager)
+        newTabPageUserScript = NewTabPageUserScript()
+        actionsManager.registerUserScript(newTabPageUserScript)
 
         let configuration = WKWebViewConfiguration()
         configuration.applyNewTabPageWebViewConfiguration(with: featureFlagger, newTabPageUserScript: newTabPageUserScript)

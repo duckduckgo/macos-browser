@@ -58,7 +58,6 @@ extension NewTabPageScriptClient {
             userScript.broker?.push(method: method, params: params, for: userScript, into: webView)
         }
     }
-
 }
 
 protocol NewTabPageActionsManaging: AnyObject {
@@ -66,19 +65,47 @@ protocol NewTabPageActionsManaging: AnyObject {
 }
 
 protocol NewTabPageUserScriptsSource: AnyObject {
-    var userScripts: [SubfeatureWithExternalMessageHandling] { get }
+    var userScripts: [NewTabPageUserScript] { get }
 }
 
+/**
+ * This class serves as an aggregator of feature-specific `NewTabPageUserScriptClient`s.
+ *
+ * The browser uses 1 New Tab Page (and 1 NTP User Script) per window. In order to
+ * broadcast updates to all windows that show New Tab Page, and to not duplicate the logic
+ * of NTP data sources, this class keeps track of all living NTP user scripts and makes sure
+ * script clients' message handlers are registered with all user scripts.
+ */
 final class NewTabPageActionsManager: NewTabPageActionsManaging, NewTabPageUserScriptsSource {
 
     private let newTabPageScriptClients: [NewTabPageScriptClient]
 
-    private var cancellables = Set<AnyCancellable>()
-    private var userScriptsHandles = NSHashTable<NewTabPageUserScript>.weakObjects()
+    /**
+     * This hash table holds weak references to user scripts,
+     * ensuring that no user script belonging to a closed window is ever contained within.
+     */
+    private let userScriptsHandles = NSHashTable<NewTabPageUserScript>.weakObjects()
 
-    var userScripts: [any SubfeatureWithExternalMessageHandling] {
+    var userScripts: [NewTabPageUserScript] {
         userScriptsHandles.allObjects
     }
+
+    /**
+     * Records user script reference internally and register all clients' message handlers
+     * with the user script.
+     */
+    func registerUserScript(_ userScript: NewTabPageUserScript) {
+        userScriptsHandles.add(userScript)
+        newTabPageScriptClients.forEach { $0.registerMessageHandlers(for: userScript) }
+    }
+
+    init(_ clients: [NewTabPageScriptClient]) {
+        newTabPageScriptClients = clients
+        newTabPageScriptClients.forEach { $0.userScriptsSource = self }
+    }
+}
+
+extension NewTabPageActionsManager {
 
     convenience init(
         appearancePreferences: AppearancePreferences,
@@ -91,15 +118,5 @@ final class NewTabPageActionsManager: NewTabPageActionsManaging, NewTabPageUserS
             NewTabPageFavoritesClient(),
             NewTabPagePrivacyStatsClient()
         ])
-    }
-
-    init(_ clients: [NewTabPageScriptClient]) {
-        newTabPageScriptClients = clients
-        newTabPageScriptClients.forEach { $0.userScriptsSource = self }
-    }
-
-    func registerUserScript(_ userScript: NewTabPageUserScript) {
-        userScriptsHandles.add(userScript)
-        newTabPageScriptClients.forEach { $0.registerMessageHandlers(for: userScript) }
     }
 }

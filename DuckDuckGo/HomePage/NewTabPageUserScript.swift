@@ -41,11 +41,6 @@ final class NewTabPageUserScript: NSObject, SubfeatureWithExternalMessageHandlin
     let featureName: String = "newTabPage"
     weak var broker: UserScriptMessageBroker?
 
-    init(actionsManager: NewTabPageActionsManaging) {
-        super.init()
-        actionsManager.registerUserScript(self)
-    }
-
     public func with(broker: UserScriptMessageBroker) {
         self.broker = broker
     }
