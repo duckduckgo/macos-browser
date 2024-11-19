@@ -205,11 +205,11 @@ extension NewTabPageUserScript {
         var locale: String
         var platform: Platform
 
-        struct Widget: Encodable {
+        struct Widget: Encodable, Equatable {
             var id: WidgetId
         }
 
-        struct WidgetConfig: Codable {
+        struct WidgetConfig: Codable, Equatable {
 
             enum WidgetVisibility: String, Codable {
                 case visible, hidden
@@ -228,7 +228,7 @@ extension NewTabPageUserScript {
             var visibility: WidgetVisibility
         }
 
-        struct Platform: Encodable {
+        struct Platform: Encodable, Equatable {
             var name: String
         }
     }

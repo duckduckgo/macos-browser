@@ -82,6 +82,22 @@ final class NewTabPageConfigurationClientTests: XCTestCase {
         XCTAssertEqual(contextMenuPresenter.showContextMenuCalls.count, 0)
     }
 
+    // MARK: - initialSetup
+
+    func testThatInitialSetupReturnsConfiguration() async throws {
+        let configuration: NewTabPageUserScript.NewTabPageConfiguration = try await sendMessage(named: .initialSetup)
+        XCTAssertEqual(configuration.widgets, [
+            .init(id: .rmf),
+            .init(id: .favorites),
+            .init(id: .privacyStats)
+        ])
+        XCTAssertEqual(configuration.widgetConfigs, [
+            .init(id: .favorites, isVisible: appearancePreferences.isFavoriteVisible),
+            .init(id: .privacyStats, isVisible: appearancePreferences.isRecentActivityVisible)
+        ])
+        XCTAssertEqual(configuration.platform, .init(name: "macos"))
+    }
+
     // MARK: - Helper functions
 
     func sendMessage<Response: Encodable>(named methodName: NewTabPageConfigurationClient.MessageName, parameters: Any = [], file: StaticString = #file, line: UInt = #line) async throws -> Response {
