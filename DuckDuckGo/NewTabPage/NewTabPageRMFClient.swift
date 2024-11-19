@@ -79,19 +79,25 @@ final class NewTabPageRMFClient: NewTabPageScriptClient {
     }
 
     private func dismiss(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let paramsDict = params as? [String: Any], let id = paramsDict["id"] as? String else {
+        guard let paramsDict = params as? [String: Any],
+              let id = paramsDict["id"] as? String,
+              id == remoteMessageProvider.remoteMessage?.id
+        else {
             return nil
         }
-        assert(id == remoteMessageProvider.remoteMessage?.id)
+
         await remoteMessageProvider.dismissRemoteMessage(with: .close)
         return nil
     }
 
     private func primaryAction(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let paramsDict = params as? [String: Any], let id = paramsDict["id"] as? String else {
+        guard let paramsDict = params as? [String: Any],
+              let id = paramsDict["id"] as? String,
+              id == remoteMessageProvider.remoteMessage?.id
+        else {
             return nil
         }
-        assert(id == remoteMessageProvider.remoteMessage?.id)
+
         switch remoteMessageProvider.remoteMessage?.content {
         case let .bigSingleAction(_, _, _, _, primaryAction):
             handleAction(remoteAction: primaryAction)
@@ -106,10 +112,13 @@ final class NewTabPageRMFClient: NewTabPageScriptClient {
     }
 
     private func secondaryAction(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let paramsDict = params as? [String: Any], let id = paramsDict["id"] as? String else {
+        guard let paramsDict = params as? [String: Any],
+              let id = paramsDict["id"] as? String,
+              id == remoteMessageProvider.remoteMessage?.id
+        else {
             return nil
         }
-        assert(id == remoteMessageProvider.remoteMessage?.id)
+
         switch remoteMessageProvider.remoteMessage?.content {
         case let .bigTwoAction(_, _, _, _, _, _, secondaryAction):
             handleAction(remoteAction: secondaryAction)

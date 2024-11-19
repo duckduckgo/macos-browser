@@ -21,6 +21,62 @@ import RemoteMessaging
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
+extension RemoteMessageModel {
+    static func mockSmall(id: String) -> RemoteMessageModel {
+        .init(
+            id: id,
+            content: .small(titleText: "title", descriptionText: "description"),
+            matchingRules: [],
+            exclusionRules: [],
+            isMetricsEnabled: true
+        )
+    }
+
+    static func mockMedium(id: String) -> RemoteMessageModel {
+        .init(
+            id: "sample_message",
+            content: .medium(titleText: "title", descriptionText: "description", placeholder: .criticalUpdate),
+            matchingRules: [],
+            exclusionRules: [],
+            isMetricsEnabled: true
+        )
+    }
+
+    static func mockBigSingleAction(id: String, action: RemoteAction) -> RemoteMessageModel {
+        .init(
+            id: "sample_message",
+            content: .bigSingleAction(
+                titleText: "title",
+                descriptionText: "description",
+                placeholder: .ddgAnnounce,
+                primaryActionText: "primary_action",
+                primaryAction: action
+            ),
+            matchingRules: [],
+            exclusionRules: [],
+            isMetricsEnabled: true
+        )
+    }
+
+    static func mockBigTwoAction(id: String, primaryAction: RemoteAction, secondaryAction: RemoteAction) -> RemoteMessageModel {
+        .init(
+            id: "sample_message",
+            content: .bigTwoAction(
+                titleText: "title",
+                descriptionText: "description",
+                placeholder: .ddgAnnounce,
+                primaryActionText: "primary_action",
+                primaryAction: .appStore,
+                secondaryActionText: "secondary_action",
+                secondaryAction: .dismiss
+            ),
+            matchingRules: [],
+            exclusionRules: [],
+            isMetricsEnabled: true
+        )
+    }
+}
+
 final class CapturingNewTabPageActiveRemoteMessageProvider: NewTabPageActiveRemoteMessageProviding {
     @Published var remoteMessage: RemoteMessageModel?
 
@@ -58,46 +114,24 @@ final class NewTabPageRMFClientTests: XCTestCase {
         XCTAssertNil(rmfData.content)
     }
 
+    // MARK: - getData
+
     func testThatGetDataReturnsSmallMessageIfPresent() async throws {
-        remoteMessageProvider.remoteMessage = RemoteMessageModel(
-            id: "sample_message",
-            content: .small(titleText: "title", descriptionText: "description"),
-            matchingRules: [],
-            exclusionRules: [],
-            isMetricsEnabled: true
-        )
+        remoteMessageProvider.remoteMessage = .mockSmall(id: "sample_message")
         let rmfData: NewTabPageUserScript.RMFData = try await sendMessage(named: .rmfGetData)
         let message = try XCTUnwrap(rmfData.content)
         XCTAssertEqual(message, .small(.init(id: "sample_message", titleText: "title", descriptionText: "description")))
     }
 
     func testThatGetDataReturnsMediumMessageIfPresent() async throws {
-        remoteMessageProvider.remoteMessage = RemoteMessageModel(
-            id: "sample_message",
-            content: .medium(titleText: "title", descriptionText: "description", placeholder: .criticalUpdate),
-            matchingRules: [],
-            exclusionRules: [],
-            isMetricsEnabled: true
-        )
+        remoteMessageProvider.remoteMessage = .mockMedium(id: "sample_message")
         let rmfData: NewTabPageUserScript.RMFData = try await sendMessage(named: .rmfGetData)
         let message = try XCTUnwrap(rmfData.content)
         XCTAssertEqual(message, .medium(.init(id: "sample_message", titleText: "title", descriptionText: "description", icon: .criticalUpdate)))
     }
 
     func testThatGetDataReturnsBigSingleActionMessageIfPresent() async throws {
-        remoteMessageProvider.remoteMessage = RemoteMessageModel(
-            id: "sample_message",
-            content: .bigSingleAction(
-                titleText: "title",
-                descriptionText: "description",
-                placeholder: .ddgAnnounce,
-                primaryActionText: "primary_action",
-                primaryAction: .appStore
-            ),
-            matchingRules: [],
-            exclusionRules: [],
-            isMetricsEnabled: true
-        )
+        remoteMessageProvider.remoteMessage = .mockBigSingleAction(id: "sample_message", action: .appStore)
         let rmfData: NewTabPageUserScript.RMFData = try await sendMessage(named: .rmfGetData)
         let message = try XCTUnwrap(rmfData.content)
         XCTAssertEqual(message, .bigSingleAction(
@@ -112,21 +146,7 @@ final class NewTabPageRMFClientTests: XCTestCase {
     }
 
     func testThatGetDataReturnsBigTwoActionMessageIfPresent() async throws {
-        remoteMessageProvider.remoteMessage = RemoteMessageModel(
-            id: "sample_message",
-            content: .bigTwoAction(
-                titleText: "title",
-                descriptionText: "description",
-                placeholder: .ddgAnnounce,
-                primaryActionText: "primary_action",
-                primaryAction: .appStore,
-                secondaryActionText: "secondary_action",
-                secondaryAction: .dismiss
-            ),
-            matchingRules: [],
-            exclusionRules: [],
-            isMetricsEnabled: true
-        )
+        remoteMessageProvider.remoteMessage = .mockBigTwoAction(id: "sample_message", primaryAction: .appStore, secondaryAction: .dismiss)
         let rmfData: NewTabPageUserScript.RMFData = try await sendMessage(named: .rmfGetData)
         let message = try XCTUnwrap(rmfData.content)
         XCTAssertEqual(message, .bigTwoAction(
@@ -141,17 +161,63 @@ final class NewTabPageRMFClientTests: XCTestCase {
         ))
     }
 
+    // MARK: - dismiss
+
+    func testThatDismissSendsDismissActionToProvider() async throws {
+        remoteMessageProvider.remoteMessage = .mockSmall(id: "sample_message")
+
+        try await sendMessageExpectingNilResponse(named: .rmfDismiss, parameters: ["id": "sample_message"])
+        XCTAssertEqual(remoteMessageProvider.dismissCalls, [.close])
+    }
+
+    func testWhenMessageIdDoesNotMatchThenDismissHasNoEffect() async throws {
+        remoteMessageProvider.remoteMessage = .mockSmall(id: "sample_message")
+
+        try await sendMessageExpectingNilResponse(named: .rmfDismiss, parameters: ["id": "different_sample_message"])
+        XCTAssertTrue(remoteMessageProvider.dismissCalls.isEmpty)
+    }
+
+    // MARK: - primaryAction
+
+    func testWhenSingleActionMessageThenPrimaryActionSendsActionToProvider() async throws {
+        remoteMessageProvider.remoteMessage = .mockBigSingleAction(id: "sample_message", action: .appStore)
+
+        try await sendMessageExpectingNilResponse(named: .rmfPrimaryAction, parameters: ["id": "sample_message"])
+        XCTAssertEqual(remoteMessageProvider.dismissCalls, [.action])
+    }
+
+    func testWhenTwoActionMessageThenPrimaryActionSendsPrimaryActionToProvider() async throws {
+        remoteMessageProvider.remoteMessage = .mockBigTwoAction(id: "sample_message", primaryAction: .appStore, secondaryAction: .dismiss)
+
+        try await sendMessageExpectingNilResponse(named: .rmfPrimaryAction, parameters: ["id": "sample_message"])
+        XCTAssertEqual(remoteMessageProvider.dismissCalls, [.primaryAction])
+    }
+
+    func testWhenMessageHasNoButtonThenPrimaryActionHasNoEffect() async throws {
+        remoteMessageProvider.remoteMessage = .mockSmall(id: "sample_message")
+
+        try await sendMessageExpectingNilResponse(named: .rmfPrimaryAction, parameters: ["id": "sample_message"])
+        XCTAssertEqual(remoteMessageProvider.dismissCalls, [])
+    }
+
+    func testWhenMessageIdDoesNotMatchThenPrimaryActionHasNoEffect() async throws {
+        remoteMessageProvider.remoteMessage = .mockSmall(id: "sample_message")
+
+        try await sendMessageExpectingNilResponse(named: .rmfPrimaryAction, parameters: ["id": "different_sample_message"])
+        XCTAssertTrue(remoteMessageProvider.dismissCalls.isEmpty)
+    }
+
     // MARK: - Helper functions
 
-    func sendMessage<Response: Encodable>(named methodName: NewTabPageRMFClient.MessageName, file: StaticString = #file, line: UInt = #line) async throws -> Response {
+    func sendMessage<Response: Encodable>(named methodName: NewTabPageRMFClient.MessageName, parameters: Any = [], file: StaticString = #file, line: UInt = #line) async throws -> Response {
         let handler = try XCTUnwrap(userScript.handler(forMethodNamed: methodName.rawValue), file: file, line: line)
-        let response = try await handler([], .init())
+        let response = try await handler(parameters, .init())
         return try XCTUnwrap(response as? Response, file: file, line: line)
     }
 
-    func sendMessageExpectingNilResponse(named methodName: NewTabPageRMFClient.MessageName, file: StaticString = #file, line: UInt = #line) async throws {
+    func sendMessageExpectingNilResponse(named methodName: NewTabPageRMFClient.MessageName, parameters: Any = [], file: StaticString = #file, line: UInt = #line) async throws {
         let handler = try XCTUnwrap(userScript.handler(forMethodNamed: methodName.rawValue), file: file, line: line)
-        let response = try await handler([], .init())
+        let response = try await handler(parameters, .init())
         XCTAssertNil(response, file: file, line: line)
     }
 }
