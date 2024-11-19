@@ -18,6 +18,7 @@
 //
 
 import Foundation
+import BrowserServicesKit
 import os.log
 import TipKit
 
@@ -28,16 +29,24 @@ protocol TipKitAppEventHandling {
 struct TipKitAppEventHandler: TipKitAppEventHandling {
 
     private let controller: TipKitController
+    private let featureFlagger: FeatureFlagger
     private let logger: Logger
 
     init(controller: TipKitController = .make(),
+         featureFlagger: FeatureFlagger,
          logger: Logger = .tipKit) {
 
         self.controller = controller
+        self.featureFlagger = featureFlagger
         self.logger = logger
     }
 
     func appDidFinishLaunching() {
+        guard featureFlagger.isFeatureOn(.networkProtectionUserTips) else {
+            logger.log("TipKit disabled by remote feature flag.")
+            return
+        }
+
         if #available(macOS 14.0, *) {
             typealias DataStoreLocation = Tips.ConfigurationOption.DatastoreLocation
 
@@ -50,7 +59,7 @@ struct TipKitAppEventHandler: TipKitAppEventHandling {
 
             controller.configureTipKit([
                 .displayFrequency(.immediate),
-                .datastoreLocation(dataStoreLocation)
+                .datastoreLocation(.applicationDefault)
             ])
         } else {
             logger.log("TipKit initialization skipped: iOS 17.0 or later is required.")

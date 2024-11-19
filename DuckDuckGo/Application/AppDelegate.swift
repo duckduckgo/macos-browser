@@ -388,7 +388,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         dataBrokerProtectionSubscriptionEventHandler.registerForSubscriptionAccountManagerEvents()
         DataBrokerProtectionAppEvents(featureGatekeeper: DefaultDataBrokerProtectionFeatureGatekeeper(accountManager: subscriptionManager.accountManager)).applicationDidFinishLaunching()
 
-        TipKitAppEventHandler().appDidFinishLaunching()
+        TipKitAppEventHandler(featureFlagger: featureFlagger).appDidFinishLaunching()
 
         setUpAutoClearHandler()
 
