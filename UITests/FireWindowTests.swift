@@ -148,7 +148,15 @@ class FireWindowTests: XCTestCase {
             let coordinate = autoFillPopup.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
             coordinate.tap()
 
-            XCTAssertEqual(emailTextFieldFire.value as? String, "test@duck.com")
+            // Use an expectation to wait for the value to update
+            let expectedValue = "test@duck.com"
+            let valuePredicate = NSPredicate(format: "value == %@", expectedValue)
+
+            let expectation = XCTNSPredicateExpectation(predicate: valuePredicate, object: emailTextFieldFire)
+
+            let result = XCTWaiter().wait(for: [expectation], timeout: UITests.Timeouts.elementExistence)
+            XCTAssertEqual(result, .completed, "The email text field value did not update as expected.")
+            XCTAssertEqual(emailTextFieldFire.value as? String, expectedValue)
         }
     }
 
