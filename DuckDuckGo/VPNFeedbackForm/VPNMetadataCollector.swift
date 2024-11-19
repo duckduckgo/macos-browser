@@ -123,16 +123,16 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
     private let statusReporter: NetworkProtectionStatusReporter
     private let ipcClient: VPNControllerXPCClient
     private let defaults: UserDefaults
-    private let accountManager: AccountManager
+    private let subscriptionManager: any SubscriptionManager
     private let settings: VPNSettings
 
     init(defaults: UserDefaults = .netP,
-         accountManager: AccountManager) {
+         subscriptionManager: any SubscriptionManager) {
 
         let ipcClient = VPNControllerXPCClient.shared
         ipcClient.register { _ in }
 
-        self.accountManager = accountManager
+        self.subscriptionManager = subscriptionManager
         self.ipcClient = ipcClient
         self.defaults = defaults
 
@@ -321,10 +321,9 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
     }
 
     func collectPrivacyProInfo() async -> VPNMetadata.PrivacyProInfo {
-        let hasVPNEntitlement = (try? await accountManager.hasEntitlement(forProductName: .networkProtection).get()) ?? false
         return .init(
-            hasPrivacyProAccount: accountManager.isUserAuthenticated,
-            hasVPNEntitlement: hasVPNEntitlement
+            hasPrivacyProAccount: subscriptionManager.isUserAuthenticated,
+            hasVPNEntitlement: subscriptionManager.isEntitlementActive(.networkProtection)
         )
     }
 

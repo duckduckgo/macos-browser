@@ -141,7 +141,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         )
 
         return VPNRedditSessionWorkaround(
-            accountManager: subscriptionManager.accountManager,
+            subscriptionManager: subscriptionManager,
             ipcClient: ipcClient,
             statusReporter: statusReporter
         )
@@ -269,7 +269,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         onboardingStateMachine = ContextualOnboardingStateMachine()
 
-        // Configure Subscription
+        // MARK: - Subscription configuration
+
         subscriptionManager = DefaultSubscriptionManager()
         subscriptionUIHandler = SubscriptionUIHandler(windowControllersManagerProvider: {
             return WindowControllersManager.shared
@@ -278,6 +279,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         subscriptionCookieManager = SubscriptionCookieManager(subscriptionManager: subscriptionManager, currentCookieStore: {
             WKWebsiteDataStore.default().httpCookieStore
         }, eventMapping: SubscriptionCookieManageEventPixelMapping())
+
+        // MARK: -
 
         // Update VPN environment and match the Subscription environment
         vpnSettings.alignTo(subscriptionEnvironment: subscriptionManager.currentEnvironment)
@@ -298,7 +301,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         freemiumDBPFeature = DefaultFreemiumDBPFeature(privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager,
                                                        experimentManager: experimentManager,
                                                        subscriptionManager: subscriptionManager,
-                                                       accountManager: subscriptionManager.accountManager,
                                                        freemiumDBPUserStateManager: freemiumDBPUserStateManager)
         freemiumDBPPromotionViewCoordinator = FreemiumDBPPromotionViewCoordinator(freemiumDBPUserStateManager: freemiumDBPUserStateManager,
                                                                                   freemiumDBPFeature: freemiumDBPFeature)
@@ -448,8 +450,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         dataBrokerProtectionSubscriptionEventHandler.registerForSubscriptionAccountManagerEvents()
 
         let freemiumDBPUserStateManager = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp)
-        let pirGatekeeper = DefaultDataBrokerProtectionFeatureGatekeeper(accountManager:
-                                                                            subscriptionManager.accountManager,
+        let pirGatekeeper = DefaultDataBrokerProtectionFeatureGatekeeper(subscriptionManager: subscriptionManager,
                                                                          freemiumDBPUserStateManager: freemiumDBPUserStateManager)
 
         DataBrokerProtectionAppEvents(featureGatekeeper: pirGatekeeper).applicationDidFinishLaunching()
@@ -504,14 +505,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NetworkProtectionAppEvents(featureGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: subscriptionManager)).applicationDidBecomeActive()
 
         let freemiumDBPUserStateManager = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp)
-        let pirGatekeeper = DefaultDataBrokerProtectionFeatureGatekeeper(accountManager:
-                                                                            subscriptionManager.accountManager,
+        let pirGatekeeper = DefaultDataBrokerProtectionFeatureGatekeeper(subscriptionManager: subscriptionManager,
                                                                          freemiumDBPUserStateManager: freemiumDBPUserStateManager)
 
         DataBrokerProtectionAppEvents(featureGatekeeper: pirGatekeeper).applicationDidBecomeActive()
 
-        subscriptionManager.refreshCachedSubscriptionAndEntitlements { isSubscriptionActive in
-            if isSubscriptionActive {
+        Task {
+            guard let subscription = try? await subscriptionManager.currentSubscription(refresh: true) else {
+                return
+            }
+
+            if subscription.isActive {
                 PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActive, frequency: .daily)
             }
         }

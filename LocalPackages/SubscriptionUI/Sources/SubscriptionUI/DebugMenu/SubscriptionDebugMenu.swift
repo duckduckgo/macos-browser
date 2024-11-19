@@ -30,9 +30,6 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     var currentViewController: () -> NSViewController?
     let subscriptionManager: SubscriptionManager
-    var accountManager: AccountManager {
-        subscriptionManager.accountManager
-    }
 
     private var _purchaseManager: Any?
     @available(macOS 12.0, *)
@@ -166,26 +163,29 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     @objc
     func signOut() {
-        accountManager.signOut()
+        Task {
+            await subscriptionManager.signOut()
+        }
     }
 
     @objc
     func showAccountDetails() {
-        let title = accountManager.isUserAuthenticated ? "Authenticated" : "Not Authenticated"
-        let message = accountManager.isUserAuthenticated ? ["AuthToken: \(accountManager.authToken ?? "")",
-                                                                                "AccessToken: \(accountManager.accessToken ?? "")",
-                                                                                "Email: \(accountManager.email ?? "")"].joined(separator: "\n") : nil
-        showAlert(title: title, message: message)
+        Task {
+            let title = subscriptionManager.isUserAuthenticated ? "Authenticated" : "Not Authenticated"
+            let token = try? await subscriptionManager.getTokenContainer(policy: .local).accessToken
+            let message = subscriptionManager.isUserAuthenticated ? ["AccessToken: \(token ?? "")",
+                                                                     "Email: \(subscriptionManager.userEmail ?? "")"].joined(separator: "\n") : nil
+            showAlert(title: title, message: message)
+        }
     }
 
     @objc
     func validateToken() {
         Task {
-            guard let token = accountManager.accessToken else { return }
-            switch await subscriptionManager.authEndpointService.validateToken(accessToken: token) {
-            case .success(let response):
-                showAlert(title: "Validate token", message: "\(response)")
-            case .failure(let error):
+            do {
+                let tokenContainer = try await subscriptionManager.getTokenContainer(policy: .local)
+                showAlert(title: "Valid token", message: tokenContainer.debugDescription)
+            } catch {
                 showAlert(title: "Validate token", message: "\(error)")
             }
         }
@@ -193,30 +193,18 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     @objc
     func checkEntitlements() {
-        Task {
-            var results: [String] = []
-
-            let entitlements: [Entitlement.ProductName] = [.networkProtection, .dataBrokerProtection, .identityTheftRestoration]
-            for entitlement in entitlements {
-                if case let .success(result) = await accountManager.hasEntitlement(forProductName: entitlement, cachePolicy: .reloadIgnoringLocalCacheData) {
-                    let resultSummary = "Entitlement check for \(entitlement.rawValue): \(result)"
-                    results.append(resultSummary)
-                    print(resultSummary)
-                }
-            }
-
-            showAlert(title: "Check Entitlements", message: results.joined(separator: "\n"))
-        }
+        let entitlements = subscriptionManager.entitlements
+        let descriptions = entitlements.map({ entitlement in entitlement.rawValue })
+        showAlert(title: "Check Entitlements", message: descriptions.joined(separator: "\n"))
     }
 
     @objc
     func getSubscriptionDetails() {
         Task {
-            guard let token = accountManager.accessToken else { return }
-            switch await subscriptionManager.subscriptionEndpointService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData) {
-            case .success(let response):
-                showAlert(title: "Subscription info", message: "\(response)")
-            case .failure(let error):
+            do {
+                let subscription = try await subscriptionManager.getSubscription(cachePolicy: .reloadIgnoringLocalCacheData)
+                showAlert(title: "Subscription info", message: subscription.debugDescription)
+            } catch {
                 showAlert(title: "Subscription info", message: "\(error)")
             }
         }
@@ -232,17 +220,14 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     @IBAction func showPurchaseView(_ sender: Any?) {
         if #available(macOS 12.0, *) {
-            let storePurchaseManager = DefaultStorePurchaseManager()
-            let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(accountManager: subscriptionManager.accountManager,
-                                                                 storePurchaseManager: subscriptionManager.storePurchaseManager(),
-                                                                 subscriptionEndpointService: subscriptionManager.subscriptionEndpointService,
-                                                                 authEndpointService: subscriptionManager.authEndpointService)
-            let appStorePurchaseFlow = DefaultAppStorePurchaseFlow(subscriptionEndpointService: subscriptionManager.subscriptionEndpointService,
+            let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(subscriptionManager: subscriptionManager,
+                                                                 storePurchaseManager: subscriptionManager.storePurchaseManager())
+            let appStorePurchaseFlow = DefaultAppStorePurchaseFlow(subscriptionManager: subscriptionManager,
                                                                    storePurchaseManager: subscriptionManager.storePurchaseManager(),
-                                                                   accountManager: subscriptionManager.accountManager,
-                                                                   appStoreRestoreFlow: appStoreRestoreFlow,
-                                                                   authEndpointService: subscriptionManager.authEndpointService)
-            let vc = DebugPurchaseViewController(storePurchaseManager: storePurchaseManager, appStorePurchaseFlow: appStorePurchaseFlow)
+                                                                   appStoreRestoreFlow: appStoreRestoreFlow)
+
+            let vc = DebugPurchaseViewController(storePurchaseManager: DefaultStorePurchaseManager(),
+                                                 appStorePurchaseFlow: appStorePurchaseFlow)
             currentViewController()?.presentAsSheet(vc)
         }
     }
@@ -278,7 +263,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     }
 
     private func askAndUpdateServiceEnvironment(to newServiceEnvironment: SubscriptionEnvironment.ServiceEnvironment) {
-        let alert = makeAlert(title: "Are you sure you want to change the environment to \(newServiceEnvironment.description.capitalized)",
+        let alert = makeAlert(title: "Are you sure you want to change the environment to \(newServiceEnvironment.rawValue.capitalized)",
                               message: """
                               Please make sure you have manually removed your current active Subscription and reset all related features.
                               You may also need to change environment of related features.
@@ -301,10 +286,8 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     func restorePurchases(_ sender: Any?) {
         if #available(macOS 12.0, *) {
             Task {
-                let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(accountManager: subscriptionManager.accountManager,
-                                                                     storePurchaseManager: subscriptionManager.storePurchaseManager(),
-                                                                     subscriptionEndpointService: subscriptionManager.subscriptionEndpointService,
-                                                                     authEndpointService: subscriptionManager.authEndpointService)
+                let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(subscriptionManager: subscriptionManager,
+                                                                     storePurchaseManager: subscriptionManager.storePurchaseManager())
                 await appStoreRestoreFlow.restoreAccountFromPastPurchase()
             }
         }

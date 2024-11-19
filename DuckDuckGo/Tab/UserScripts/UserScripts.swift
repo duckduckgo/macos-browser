@@ -125,9 +125,7 @@ final class UserScripts: UserScriptsProvider {
 
         if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
             let subscriptionManager = Application.appDelegate.subscriptionManager
-            let stripePurchaseFlow = DefaultStripePurchaseFlow(subscriptionEndpointService: subscriptionManager.subscriptionEndpointService,
-                                                               authEndpointService: subscriptionManager.authEndpointService,
-                                                               accountManager: subscriptionManager.accountManager)
+            let stripePurchaseFlow = DefaultStripePurchaseFlow(subscriptionManager: subscriptionManager)
             let freemiumDBPPixelExperimentManager = FreemiumDBPPixelExperimentManager(subscriptionManager: subscriptionManager)
             let delegate = SubscriptionPagesUseSubscriptionFeature(subscriptionManager: subscriptionManager,
                                                                    stripePurchaseFlow: stripePurchaseFlow,
@@ -136,7 +134,8 @@ final class UserScripts: UserScriptsProvider {
             subscriptionPagesUserScript.registerSubfeature(delegate: delegate)
             userScripts.append(subscriptionPagesUserScript)
 
-            identityTheftRestorationPagesUserScript.registerSubfeature(delegate: IdentityTheftRestorationPagesFeature())
+            let identityTheftRestorationPagesFeature = IdentityTheftRestorationPagesFeature(subscriptionManager: subscriptionManager)
+            identityTheftRestorationPagesUserScript.registerSubfeature(delegate: identityTheftRestorationPagesFeature)
             userScripts.append(identityTheftRestorationPagesUserScript)
         }
     }

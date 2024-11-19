@@ -200,7 +200,7 @@ final class DuckPlayer {
             guard let self else {
                 return nil
             }
-            guard let userValues: UserValues = DecodableHelper.decode(from: params) else {
+            guard let userValues: UserValues = CodableHelper.decode(from: params) else {
                 assertionFailure("YoutubeOverlayUserScript: expected JSON representation of UserValues")
                 return nil
             }

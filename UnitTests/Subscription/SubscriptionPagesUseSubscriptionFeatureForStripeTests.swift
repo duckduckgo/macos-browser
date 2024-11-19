@@ -1,5 +1,5 @@
 //
-//  SubscriptionPagesUseSubscriptionFeatureTestsForStripe.swift
+//  SubscriptionPagesUseSubscriptionFeatureForStripeTests.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -26,9 +26,10 @@ import UserScript
 @testable import PixelKit
 import PixelKitTestingUtilities
 import os.log
+import Networking
 
 @available(macOS 12.0, *)
-final class SubscriptionPagesUseSubscriptionFeatureTestsForStripe: XCTestCase {
+final class SubscriptionPagesUseSubscriptionFeatureForStripeTests: XCTestCase {
 
     private struct Constants {
         static let userDefaultsSuiteName = "SubscriptionPagesUseSubscriptionFeatureTests"
@@ -39,9 +40,9 @@ final class SubscriptionPagesUseSubscriptionFeatureTestsForStripe: XCTestCase {
 
         static let email = "dax@duck.com"
 
-        static let entitlements = [Entitlement(product: .dataBrokerProtection),
-                                   Entitlement(product: .identityTheftRestoration),
-                                   Entitlement(product: .networkProtection)]
+        static let entitlements: [SubscriptionEntitlement] = [.dataBrokerProtection,
+                                                              .identityTheftRestoration,
+                                                              .networkProtection]
 
         static let mostRecentTransactionJWS = "dGhpcyBpcyBub3QgYSByZWFsIEFw(...)cCBTdG9yZSB0cmFuc2FjdGlvbiBKV1M="
 
@@ -69,14 +70,14 @@ final class SubscriptionPagesUseSubscriptionFeatureTestsForStripe: XCTestCase {
                                                                 SubscriptionFeature(name: "identity-theft-restoration")
                                                              ])
 
-        static let validateTokenResponse = ValidateTokenResponse(account: ValidateTokenResponse.Account(email: Constants.email,
-                                                                                                        entitlements: Constants.entitlements,
-                                                                                                        externalID: Constants.externalID))
+//        static let validateTokenResponse = ValidateTokenResponse(account: ValidateTokenResponse.Account(email: Constants.email,
+//                                                                                                        entitlements: Constants.entitlements,
+//                                                                                                        externalID: Constants.externalID))
 
         static let mockParams: [String: String] = [:]
         @MainActor static let mockScriptMessage = MockWKScriptMessage(name: "", body: "", webView: WKWebView() )
 
-        static let invalidTokenError = APIServiceError.serverError(statusCode: 401, error: "invalid_token")
+//        static let invalidTokenError = APIServiceError.serverError(statusCode: 401, error: "invalid_token")
     }
 
     var userDefaults: UserDefaults!
@@ -86,22 +87,22 @@ final class SubscriptionPagesUseSubscriptionFeatureTestsForStripe: XCTestCase {
 
     var accountStorage: AccountKeychainStorageMock!
     var accessTokenStorage: SubscriptionTokenKeychainStorageMock!
-    var entitlementsCache: UserDefaultsCache<[Entitlement]>!
+//    var entitlementsCache: UserDefaultsCache<[Entitlement]>!
 
     var subscriptionService: SubscriptionEndpointServiceMock!
-    var authService: AuthEndpointServiceMock!
+//    var authService: AuthEndpointServiceMock!
 
     var storePurchaseManager: StorePurchaseManagerMock!
     var subscriptionEnvironment: SubscriptionEnvironment!
 
     var appStorePurchaseFlow: AppStorePurchaseFlow!
     var appStoreRestoreFlow: AppStoreRestoreFlow!
-    var appStoreAccountManagementFlow: AppStoreAccountManagementFlow!
+//    var appStoreAccountManagementFlow: AppStoreAccountManagementFlow!
     var stripePurchaseFlow: StripePurchaseFlow!
 
     var subscriptionFeatureAvailability: SubscriptionFeatureAvailabilityMock!
 
-    var accountManager: AccountManager!
+//    var accountManager: AccountManager!
     var subscriptionManager: SubscriptionManager!
     var mockFreemiumDBPExperimentManager: MockFreemiumDBPExperimentManager!
 
@@ -363,7 +364,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTestsForStripe: XCTestCase {
 }
 
 @available(macOS 12.0, *)
-extension SubscriptionPagesUseSubscriptionFeatureTestsForStripe {
+extension SubscriptionPagesUseSubscriptionFeatureForStripeTests {
 
     func ensureUserAuthenticatedState() {
         accountStorage.authToken = Constants.authToken

@@ -108,8 +108,27 @@ private extension FreemiumDBPPixelExperimentManager {
 
     /// Determines if the user is eligible for the experiment based on subscription status and locale.
     var userIsEligible: Bool {
-        subscriptionManager.isPotentialPrivacyProSubscriber
+        isPotentialPrivacyProSubscriber
         && locale.isUSRegion
+    }
+
+    /// Returns true if a user is a "potential" Privacy Pro subscriber. This means:
+    ///
+    /// 1. Is eligible to purchase
+    /// 2. Is not a current subscriber
+    var isPotentialPrivacyProSubscriber: Bool {
+        isPrivacyProPurchaseAvailable
+        && !subscriptionManager.isUserAuthenticated
+    }
+
+    private var isPrivacyProPurchaseAvailable: Bool {
+        let platform = subscriptionManager.currentEnvironment.purchasePlatform
+        switch platform {
+        case .appStore:
+            return subscriptionManager.canPurchase
+        case .stripe:
+            return true
+        }
     }
 
     /// Checks if the user is not already enrolled in the experiment.

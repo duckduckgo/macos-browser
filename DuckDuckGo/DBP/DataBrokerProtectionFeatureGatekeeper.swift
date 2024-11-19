@@ -35,7 +35,7 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let userDefaults: UserDefaults
     private let subscriptionAvailability: SubscriptionFeatureAvailability
-    private let accountManager: AccountManager
+    private let subscriptionManager: any SubscriptionManager
     private let freemiumDBPUserStateManager: FreemiumDBPUserStateManager
 
     init(privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
@@ -43,14 +43,14 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
          pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler(),
          userDefaults: UserDefaults = .standard,
          subscriptionAvailability: SubscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability(),
-         accountManager: AccountManager,
+         subscriptionManager: any SubscriptionManager,
          freemiumDBPUserStateManager: FreemiumDBPUserStateManager) {
         self.privacyConfigurationManager = privacyConfigurationManager
         self.featureDisabler = featureDisabler
         self.pixelHandler = pixelHandler
         self.userDefaults = userDefaults
         self.subscriptionAvailability = subscriptionAvailability
-        self.accountManager = accountManager
+        self.subscriptionManager = subscriptionManager
         self.freemiumDBPUserStateManager = freemiumDBPUserStateManager
     }
 
@@ -87,21 +87,10 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
     /// - Returns: Bool indicating prerequisites are satisfied
     func arePrerequisitesSatisfied() async -> Bool {
 
-        let isAuthenticated = accountManager.isUserAuthenticated
+        let isAuthenticated = subscriptionManager.isUserAuthenticated
         if !isAuthenticated && freemiumDBPUserStateManager.didActivate { return true }
-
-        let entitlements = await accountManager.hasEntitlement(forProductName: .dataBrokerProtection,
-                                                               cachePolicy: .reloadIgnoringLocalCacheData)
-        var hasEntitlements: Bool
-        switch entitlements {
-        case .success(let value):
-            hasEntitlements = value
-        case .failure:
-            hasEntitlements = false
-        }
-
+        var hasEntitlements = subscriptionManager.isEntitlementActive(.dataBrokerProtection)
         firePrerequisitePixelsAndLogIfNecessary(hasEntitlements: hasEntitlements, isAuthenticatedResult: isAuthenticated)
-
         return hasEntitlements && isAuthenticated
     }
 }

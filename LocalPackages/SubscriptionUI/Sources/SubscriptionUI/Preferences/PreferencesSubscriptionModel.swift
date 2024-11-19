@@ -20,12 +20,13 @@ import AppKit
 import Subscription
 import struct Combine.AnyPublisher
 import enum Combine.Publishers
+import Networking
 
 public final class PreferencesSubscriptionModel: ObservableObject {
 
     @Published var isUserAuthenticated: Bool = false
     @Published var subscriptionDetails: String?
-    @Published var subscriptionStatus: Subscription.Status?
+    @Published var subscriptionStatus: PrivacyProSubscription.Status?
 
     @Published var hasAccessToVPN: Bool = false
     @Published var hasAccessToDBP: Bool = false
@@ -34,20 +35,17 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     @Published var email: String?
     var hasEmail: Bool { !(email?.isEmpty ?? true) }
 
-    private var subscriptionPlatform: Subscription.Platform?
+    private var subscriptionPlatform: PrivacyProSubscription.Platform?
 
     lazy var sheetModel = SubscriptionAccessViewModel(actionHandlers: sheetActionHandler,
                                                       purchasePlatform: subscriptionManager.currentEnvironment.purchasePlatform)
 
     private let subscriptionManager: SubscriptionManager
-    private var accountManager: AccountManager {
-        subscriptionManager.accountManager
-    }
     private let openURLHandler: (URL) -> Void
     public let userEventHandler: (UserEvent) -> Void
     private let sheetActionHandler: SubscriptionAccessActionHandlers
 
-    private var fetchSubscriptionDetailsTask: Task<(), Never>?
+//    private var fetchSubscriptionDetailsTask: Task<(), Never>?
 
     private var signInObserver: Any?
     private var signOutObserver: Any?
@@ -101,15 +99,15 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         self.userEventHandler = userEventHandler
         self.sheetActionHandler = sheetActionHandler
 
-        self.isUserAuthenticated = accountManager.isUserAuthenticated
+        self.isUserAuthenticated = subscriptionManager.isUserAuthenticated
 
-        if accountManager.isUserAuthenticated {
+        if subscriptionManager.isUserAuthenticated {
             Task {
                 await self.updateSubscription(cachePolicy: .returnCacheDataElseLoad)
-                await self.loadCachedEntitlements()
+                await self.loadEntitlements(policy: .local)
             }
 
-            self.email = accountManager.email
+            self.email = subscriptionManager.userEmail
         }
 
         signInObserver = NotificationCenter.default.addObserver(forName: .accountDidSignIn, object: nil, queue: .main) { [weak self] _ in
@@ -143,7 +141,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     private func updateUserAuthenticatedState(_ isUserAuthenticated: Bool) {
         self.isUserAuthenticated = isUserAuthenticated
-        self.email = accountManager.email
+        self.email = subscriptionManager.userEmail
     }
 
     @MainActor
@@ -161,13 +159,13 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
         switch subscriptionPlatform {
         case .apple:
-            if await confirmIfSignedInToSameAccount() {
+//            if await confirmIfSignedInToSameAccount() { // TODO: what is this for?
                 return .navigateToManageSubscription { [weak self] in
                     self?.changePlanOrBilling(for: .appStore)
                 }
-            } else {
-                return .presentSheet(.apple)
-            }
+//            } else {
+//                return .presentSheet(.apple)
+//            }
         case .google:
             return .presentSheet(.google)
         case .stripe:
@@ -186,28 +184,27 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             NSWorkspace.shared.open(subscriptionManager.url(for: .manageSubscriptionsInAppStore))
         case .stripe:
             Task {
-                guard let accessToken = accountManager.accessToken, let externalID = accountManager.externalID,
-                      case let .success(response) = await subscriptionManager.subscriptionEndpointService.getCustomerPortalURL(accessToken: accessToken, externalID: externalID) else { return }
-                guard let customerPortalURL = URL(string: response.customerPortalUrl) else { return }
-
+                guard let customerPortalURL = try? await subscriptionManager.getCustomerPortalURL() else {
+                    return
+                }
                 openURLHandler(customerPortalURL)
             }
         }
     }
 
-    private func confirmIfSignedInToSameAccount() async -> Bool {
-        if #available(macOS 12.0, *) {
-            guard let lastTransactionJWSRepresentation = await subscriptionManager.storePurchaseManager().mostRecentTransaction() else { return false }
-            switch await subscriptionManager.authEndpointService.storeLogin(signature: lastTransactionJWSRepresentation) {
-            case .success(let response):
-                return response.externalID == accountManager.externalID
-            case .failure:
-                return false
-            }
-        }
-
-        return false
-    }
+//    private func confirmIfSignedInToSameAccount() async -> Bool {
+//        if #available(macOS 12.0, *) {
+//            guard let lastTransactionJWSRepresentation = await subscriptionManager.storePurchaseManager().mostRecentTransaction() else { return false }
+//            switch await subscriptionManager.authEndpointService.storeLogin(signature: lastTransactionJWSRepresentation) {
+//            case .success(let response):
+//                return response.externalID == accountManager.externalID
+//            case .failure:
+//                return false
+//            }
+//        }
+//
+//        return false
+//    }
 
     @MainActor
     func openVPN() {
@@ -256,14 +253,14 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         }
 
         Task {
-            if subscriptionManager.currentEnvironment.purchasePlatform == .appStore {
-                if #available(macOS 12.0, iOS 15.0, *) {
-                    let appStoreAccountManagementFlow = DefaultAppStoreAccountManagementFlow(authEndpointService: subscriptionManager.authEndpointService,
-                                                                                             storePurchaseManager: subscriptionManager.storePurchaseManager(),
-                                                                                             accountManager: subscriptionManager.accountManager)
-                    await appStoreAccountManagementFlow.refreshAuthTokenIfNeeded()
-                }
-            }
+//            if subscriptionManager.currentEnvironment.purchasePlatform == .appStore {
+//                if #available(macOS 12.0, iOS 15.0, *) {
+//                    let appStoreAccountManagementFlow = DefaultAppStoreAccountManagementFlow(authEndpointService: subscriptionManager.authEndpointService,
+//                                                                                             storePurchaseManager: subscriptionManager.storePurchaseManager(),
+//                                                                                             accountManager: subscriptionManager.accountManager)
+//                    await appStoreAccountManagementFlow.refreshAuthTokenIfNeeded()
+//                }
+//            } // TODO: Double check but I don't think this makes sense in this context
 
             Task { @MainActor in
                 userEventHandler(eventType)
@@ -275,7 +272,9 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     @MainActor
     func removeFromThisDeviceAction() {
         userEventHandler(.removeSubscriptionClick)
-        accountManager.signOut()
+        Task {
+            await subscriptionManager.signOut()
+        }
     }
 
     @MainActor
@@ -293,10 +292,8 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         if subscriptionManager.currentEnvironment.purchasePlatform == .appStore {
             if #available(macOS 12.0, *) {
                 Task {
-                    let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(accountManager: subscriptionManager.accountManager,
-                                                                         storePurchaseManager: subscriptionManager.storePurchaseManager(),
-                                                                         subscriptionEndpointService: subscriptionManager.subscriptionEndpointService,
-                                                                         authEndpointService: subscriptionManager.authEndpointService)
+                    let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(subscriptionManager: subscriptionManager,
+                                                                         storePurchaseManager: DefaultStorePurchaseManager())
                     await appStoreRestoreFlow.restoreAccountFromPastPurchase()
                     fetchAndUpdateSubscriptionDetails()
                 }
@@ -308,80 +305,71 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func fetchAndUpdateSubscriptionDetails() {
-        self.isUserAuthenticated = accountManager.isUserAuthenticated
-
-        guard fetchSubscriptionDetailsTask == nil else { return }
-
-        fetchSubscriptionDetailsTask = Task { [weak self] in
-            defer {
-                self?.fetchSubscriptionDetailsTask = nil
-            }
-
+        self.isUserAuthenticated = subscriptionManager.isUserAuthenticated
+        Task { [weak self] in
             await self?.fetchEmailAndRemoteEntitlements()
             await self?.updateSubscription(cachePolicy: .reloadIgnoringLocalCacheData)
         }
+
+//        guard fetchSubscriptionDetailsTask == nil else { return }
+//
+//        fetchSubscriptionDetailsTask = Task { [weak self] in
+//            defer {
+//                self?.fetchSubscriptionDetailsTask = nil
+//            }
+//
+//            await self?.fetchEmailAndRemoteEntitlements()
+//            await self?.updateSubscription(cachePolicy: .reloadIgnoringLocalCacheData)
+//        }
     }
 
     @MainActor
-    private func loadCachedEntitlements() async {
-        switch await self.accountManager.hasEntitlement(forProductName: .networkProtection, cachePolicy: .returnCacheDataDontLoad) {
-        case let .success(result):
-            hasAccessToVPN = result
-        case .failure:
+    private func loadEntitlements(policy: TokensCachePolicy) async {
+        guard let tokenContainer = try? await subscriptionManager.getTokenContainer(policy: policy) else {
             hasAccessToVPN = false
-        }
-
-        switch await self.accountManager.hasEntitlement(forProductName: .dataBrokerProtection, cachePolicy: .returnCacheDataDontLoad) {
-        case let .success(result):
-            hasAccessToDBP = result
-        case .failure:
             hasAccessToDBP = false
-        }
-
-        switch await self.accountManager.hasEntitlement(forProductName: .identityTheftRestoration, cachePolicy: .returnCacheDataDontLoad) {
-        case let .success(result):
-            hasAccessToITR = result
-        case .failure:
             hasAccessToITR = false
-        }
-    }
-
-    @MainActor func fetchEmailAndRemoteEntitlements() async {
-        guard let accessToken = accountManager.accessToken else { return }
-
-        if case let .success(response) = await subscriptionManager.authEndpointService.validateToken(accessToken: accessToken) {
-            if accountManager.email != response.account.email {
-                email = response.account.email
-                accountManager.storeAccount(token: accessToken, email: response.account.email, externalID: response.account.externalID)
-            }
-
-            let entitlements = response.account.entitlements.compactMap { $0.product }
-            hasAccessToVPN = entitlements.contains(.networkProtection)
-            hasAccessToDBP = entitlements.contains(.dataBrokerProtection)
-            hasAccessToITR = entitlements.contains(.identityTheftRestoration)
-            accountManager.updateCache(with: response.account.entitlements)
-        }
-    }
-
-    @MainActor
-    private func updateSubscription(cachePolicy: APICachePolicy) async {
-        guard let token = accountManager.accessToken else {
-            subscriptionManager.subscriptionEndpointService.signOut()
             return
         }
 
-        switch await subscriptionManager.subscriptionEndpointService.getSubscription(accessToken: token, cachePolicy: cachePolicy) {
-        case .success(let subscription):
-            updateDescription(for: subscription.expiresOrRenewsAt, status: subscription.status, period: subscription.billingPeriod)
-            subscriptionPlatform = subscription.platform
-            subscriptionStatus = subscription.status
-        case .failure:
-            break
-        }
+        hasAccessToVPN = tokenContainer.decodedAccessToken.hasEntitlement(.networkProtection)
+        hasAccessToDBP = tokenContainer.decodedAccessToken.hasEntitlement(.dataBrokerProtection)
+        hasAccessToITR = tokenContainer.decodedAccessToken.hasEntitlement(.identityTheftRestoration)
+    }
+
+    @MainActor func fetchEmailAndRemoteEntitlements() async {
+        await loadEntitlements(policy: .localForceRefresh)
+        guard let tokenContainer = try? await subscriptionManager.getTokenContainer(policy: .local) else { return }
+        email = tokenContainer.decodedAccessToken.email
+
+//        guard let accessToken = accountManager.accessToken else { return }
+//
+//        if case let .success(response) = await subscriptionManager.authEndpointService.validateToken(accessToken: accessToken) {
+//            if accountManager.email != response.account.email {
+//                email = response.account.email
+//                accountManager.storeAccount(token: accessToken, email: response.account.email, externalID: response.account.externalID)
+//            }
+//
+//            let entitlements = response.account.entitlements.compactMap { $0.product }
+//            hasAccessToVPN = entitlements.contains(.networkProtection)
+//            hasAccessToDBP = entitlements.contains(.dataBrokerProtection)
+//            hasAccessToITR = entitlements.contains(.identityTheftRestoration)
+//            accountManager.updateCache(with: response.account.entitlements)
+//        }
     }
 
     @MainActor
-    func updateDescription(for date: Date, status: Subscription.Status, period: Subscription.BillingPeriod) {
+    private func updateSubscription(cachePolicy: SubscriptionCachePolicy) async {
+        guard let subscription = try? await subscriptionManager.getSubscription(cachePolicy: cachePolicy) else {
+            return
+        }
+        updateDescription(for: subscription.expiresOrRenewsAt, status: subscription.status, period: subscription.billingPeriod)
+        subscriptionPlatform = subscription.platform
+        subscriptionStatus = subscription.status
+    }
+
+    @MainActor
+    func updateDescription(for date: Date, status: PrivacyProSubscription.Status, period: PrivacyProSubscription.BillingPeriod) {
 
         let formattedDate = dateFormatter.string(from: date)
 
