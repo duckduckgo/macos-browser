@@ -28,6 +28,7 @@ import PixelKit
 import os.log
 import Onboarding
 import Freemium
+import UserScript
 
 protocol BrowserTabViewControllerDelegate: AnyObject {
     func highlightFireButton()
@@ -41,7 +42,9 @@ final class BrowserTabViewController: NSViewController {
     private lazy var hoverLabel = NSTextField(string: URL.duckDuckGo.absoluteString)
     private lazy var hoverLabelContainer = ColorView(frame: .zero, backgroundColor: .browserTabBackground, borderWidth: 0)
 
-    private weak var webView: WebView?
+    private let newTabPageActionsManager: NewTabPageActionsManaging
+    private(set) lazy var newTabPageWebViewModel: NewTabPageWebViewModel = NewTabPageWebViewModel(featureFlagger: featureFlagger, actionsManager: newTabPageActionsManager)
+    private(set) weak var webView: WebView?
     private weak var webViewContainer: NSView?
     private weak var webViewSnapshot: NSView?
     private var containerStackView: NSStackView
@@ -83,12 +86,15 @@ final class BrowserTabViewController: NSViewController {
          bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
          onboardingDialogTypeProvider: ContextualOnboardingDialogTypeProviding & ContextualOnboardingStateUpdater = Application.appDelegate.onboardingStateMachine,
          onboardingDialogFactory: ContextualDaxDialogsFactory = DefaultContextualDaxDialogViewFactory(),
-         featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger) {
+         featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger,
+         newTabPageActionsManager: NewTabPageActionsManaging = NSApp.delegateTyped.newTabPageActionsManager
+    ) {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.bookmarkManager = bookmarkManager
         self.onboardingDialogTypeProvider = onboardingDialogTypeProvider
         self.onboardingDialogFactory = onboardingDialogFactory
         self.featureFlagger = featureFlagger
+        self.newTabPageActionsManager = newTabPageActionsManager
         containerStackView = NSStackView()
 
         super.init(nibName: nil, bundle: nil)
@@ -537,12 +543,11 @@ final class BrowserTabViewController: NSViewController {
         }
 
         func displayWebView(of tabViewModel: TabViewModel) {
-            let newWebView = tabViewModel.tab.webView
+            let newWebView = tabViewModel.tab.content == .newtab ? newTabPageWebViewModel.webView : tabViewModel.tab.webView
             cleanUpRemoteWebViewIfNeeded(newWebView)
             webView = newWebView
 
             addWebViewToViewHierarchy(newWebView, tab: tabViewModel.tab)
-
         }
 
         guard let tabViewModel = tabViewModel else {
@@ -798,7 +803,7 @@ final class BrowserTabViewController: NSViewController {
             updateTabIfNeeded(tabViewModel: tabViewModel)
 
         case .newtab:
-            if NSApp.delegateTyped.featureFlagger.isFeatureOn(.htmlNewTabPage) {
+            if featureFlagger.isFeatureOn(.htmlNewTabPage) {
                 updateTabIfNeeded(tabViewModel: tabViewModel)
             } else {
                 removeAllTabContent()
@@ -840,11 +845,13 @@ final class BrowserTabViewController: NSViewController {
             return false
         }
 
+        let newWebView = tabViewModel.tab.content == .newtab ? newTabPageWebViewModel.webView : tabViewModel.tab.webView
+
         let isPinnedTab = tabCollectionViewModel.pinnedTabsCollection?.tabs.contains(tabViewModel.tab) == true
         let isKeyWindow = view.window?.isKeyWindow == true
 
         let tabIsNotOnScreen = webView?.tabContentView.superview == nil
-        let isDifferentTabDisplayed = webView !== tabViewModel.tab.webView
+        let isDifferentTabDisplayed = webView !== newWebView
 
         return isDifferentTabDisplayed
         || tabIsNotOnScreen
@@ -861,7 +868,7 @@ final class BrowserTabViewController: NSViewController {
         case .onboarding:
             return
         case .newtab:
-            containsHostingView = !NSApp.delegateTyped.featureFlagger.isFeatureOn(.htmlNewTabPage)
+            containsHostingView = !featureFlagger.isFeatureOn(.htmlNewTabPage)
         case .settings:
             containsHostingView = true
         default:
@@ -1450,7 +1457,7 @@ extension BrowserTabViewController {
                 guard let self,
                       self.tabViewModel === tabViewModel else { return }
 
-                // only make web view first responder after replacing the 
+                // only make web view first responder after replacing the
                 // snapshot if the address bar is not the first responder
                 if view.window?.firstResponder === view.window {
                     viewToMakeFirstResponderAfterAdding = { [weak self] in
