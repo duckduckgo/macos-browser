@@ -1,7 +1,12 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1731320660413,
+    "version": 1731929493732,
     "features": {
+        "adAttributionReporting": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
+        },
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
             "state": "enabled",
@@ -178,6 +183,9 @@
                     "domain": "eurostar.com"
                 },
                 {
+                    "domain": "geo.fr"
+                },
+                {
                     "domain": "ksta.de"
                 },
                 {
@@ -278,9 +286,6 @@
                 },
                 {
                     "domain": "motorsport.com"
-                },
-                {
-                    "domain": "paypal.com"
                 },
                 {
                     "domain": "elmundotoday.com"
@@ -426,16 +431,17 @@
             ],
             "settings": {
                 "disabledCMPs": [
-                    "healthline-media"
+                    "healthline-media",
+                    "bing.com"
                 ]
             },
             "state": "enabled",
             "features": {
-                "filterlistExperiment2": {
+                "filterlist": {
                     "state": "enabled"
                 }
             },
-            "hash": "7a4965df30b37cc6667c92a477757058"
+            "hash": "0c92a80a2234de9193e5e8f34ed50ee8"
         },
         "autofillBreakageReporter": {
             "state": "disabled",
@@ -1387,12 +1393,6 @@
                     "domain": "instructure.com"
                 },
                 {
-                    "domain": "humana.com"
-                },
-                {
-                    "domain": "centerwellpharmacy.com"
-                },
-                {
                     "domain": "marvel.com"
                 },
                 {
@@ -1409,7 +1409,7 @@
                 }
             ],
             "state": "disabled",
-            "hash": "33c2d56a2a9dd43c88a353d8a57dfa72"
+            "hash": "fce0a9ccd7ae060d25e7debe4d8905fb"
         },
         "customUserAgent": {
             "settings": {
@@ -1523,12 +1523,13 @@
                     }
                 },
                 "freemium": {
-                    "state": "internal"
+                    "state": "enabled",
+                    "minSupportedVersion": "1.113.0"
                 }
             },
             "exceptions": [],
             "minSupportedVersion": "1.70.0",
-            "hash": "3effc07d3c8c4a94732a1d14006e8d22"
+            "hash": "6fcc6976fc1e865a6bca7b5deb101da7"
         },
         "duckPlayer": {
             "exceptions": [],
@@ -2331,6 +2332,15 @@
                         ]
                     },
                     {
+                        "domain": "androidauthority.com",
+                        "rules": [
+                            {
+                                "selector": "div[data-ad-type]",
+                                "type": "closest-empty"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "androidpolice.com",
                         "rules": [
                             {
@@ -2925,6 +2935,14 @@
                             {
                                 "selector": ".viafoura-standalone-mpu",
                                 "type": "hide"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "expressnews.com",
+                        "rules": [
+                            {
+                                "type": "disable-default"
                             }
                         ]
                     },
@@ -3724,6 +3742,10 @@
                             {
                                 "selector": "[class^='ads__right-rail']",
                                 "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".atf_mobile-scroll-ad",
+                                "type": "hide"
                             }
                         ]
                     },
@@ -4996,7 +5018,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "a67f228d780dfbd95210e12b90da8df2"
+            "hash": "8fcbd7aec79d8215b881832a951704da"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -5237,6 +5259,15 @@
                     "domain": "xfinity.com"
                 },
                 {
+                    "domain": "centerwellpharmacy.com"
+                },
+                {
+                    "domain": "go365.com"
+                },
+                {
+                    "domain": "humana.com"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -5286,7 +5317,7 @@
                 }
             ],
             "state": "enabled",
-            "hash": "97e86f6982f80cebfd56915be1457595"
+            "hash": "04e4f97a4ad60cd13663ac5d486d3ac4"
         },
         "fingerprintingScreenSize": {
             "settings": {
@@ -5653,6 +5684,15 @@
             "state": "disabled",
             "hash": "728493ef7a1488e4781656d3f9db84aa"
         },
+        "messageBridge": {
+            "exceptions": [],
+            "settings": {
+                "aiChat": "disabled",
+                "domains": []
+            },
+            "state": "disabled",
+            "hash": "cec85d8cf7db4b2abcbc450c66dd63fc"
+        },
         "navigatorInterface": {
             "exceptions": [
                 {
@@ -5917,9 +5957,13 @@
                 },
                 "allowPurchaseStripe": {
                     "state": "enabled"
+                },
+                "useUnifiedFeedback": {
+                    "state": "enabled",
+                    "minSupportedVersion": "1.113.0"
                 }
             },
-            "hash": "1a10a68ea8885db0d1d9bab371c0f738"
+            "hash": "85c4759ce6c0b809c071998403e864ba"
         },
         "privacyProtectionsPopup": {
             "state": "disabled",
@@ -7031,6 +7075,7 @@
                                     "ah.nl",
                                     "applesfera.com",
                                     "goplay.be",
+                                    "itsthevibe.com",
                                     "nytimes.com",
                                     "realmadrid.com",
                                     "rocketnews24.com",
@@ -7073,6 +7118,7 @@
                                 "rule": "securepubads.g.doubleclick.net/pagead/managed/js/gpt",
                                 "domains": [
                                     "applesfera.com",
+                                    "itsthevibe.com",
                                     "triblive.com"
                                 ]
                             },
@@ -7770,6 +7816,7 @@
                                     "siouxlandnews.com",
                                     "southernoregoncw.com",
                                     "star64.tv",
+                                    "stockcharts.com",
                                     "thecw38.com",
                                     "thecw46.com",
                                     "thecwtc.com",
@@ -8717,6 +8764,7 @@
                                 "domains": [
                                     "signupgenius.com",
                                     "smithsonianmag.com",
+                                    "stockcharts.com",
                                     "titantv.com"
                                 ]
                             },
@@ -9419,6 +9467,12 @@
                                 ]
                             },
                             {
+                                "rule": "runtime.strm.yandex.ru/player/video/",
+                                "domains": [
+                                    "yandex.cloud"
+                                ]
+                            },
+                            {
                                 "rule": "strm.yandex.ru/vh-special-converted/vod-content/",
                                 "domains": [
                                     "<all>"
@@ -9591,7 +9645,7 @@
                     "domain": "instructure.com"
                 }
             ],
-            "hash": "ee6f955a89fa4d85e792ef4ebdb81920"
+            "hash": "95c71de2b9a692da11d288ce7535cffa"
         },
         "trackingCookies1p": {
             "settings": {
@@ -9650,6 +9704,18 @@
                     "domain": "axs.com"
                 },
                 {
+                    "domain": "urldefense.com"
+                },
+                {
+                    "domain": "centerwellpharmacy.com"
+                },
+                {
+                    "domain": "go365.com"
+                },
+                {
+                    "domain": "humana.com"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -9696,7 +9762,7 @@
             },
             "state": "enabled",
             "minSupportedVersion": "0.22.3",
-            "hash": "d4fd05626079512387bd1fc0de585cb9"
+            "hash": "009e36025b3a532522f65bf0c19fa0d8"
         },
         "userAgentRotation": {
             "settings": {

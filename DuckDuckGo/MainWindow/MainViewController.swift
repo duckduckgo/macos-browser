@@ -340,7 +340,6 @@ final class MainViewController: NSViewController {
     private func subscribeToBookmarkBarVisibility() {
         bookmarksBarVisibilityChangedCancellable = bookmarksBarVisibilityManager
             .$isBookmarksBarVisible
-            .removeDuplicates()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] isBookmarksBarVisible in
                 self?.updateBookmarksBarViewVisibility(visible: isBookmarksBarVisible)
