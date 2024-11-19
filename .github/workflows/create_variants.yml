@@ -94,7 +94,7 @@ jobs:
     
     name: Send Mattermost message
     needs: create-variants
-    runs-on: ubuntu-latest
+    runs-on: macos-15
     
     env:
       success: ${{ needs.create-variants.result == 'success' }}
@@ -107,21 +107,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          curl -fLSs $(gh api https://api.github.com/repos/${{ github.repository }}/contents/scripts/assets/variants-release-mm-template.json --jq .download_url) \
-              --output message-template.json
-    
-          export MM_USER_HANDLE=$(base64 -d <<< ${{ secrets.MM_HANDLES_BASE64 }} | jq ".${{ github.actor }}" | tr -d '"')
-    
-          if [[ -z "${MM_USER_HANDLE}" ]]; then
-              echo "Mattermost user handle not known for ${{ github.actor }}, skipping sending message"
-          else
-    
-              if [[ "${{ env.success }}" == "true" ]]; then
-                  status="success"
-              else
-                  status="failure"
-              fi
-              curl -s -H 'Content-type: application/json' \
-                  -d "$(envsubst < message-template.json | jq ".${status}")" \
-                  ${{ secrets.MM_WEBHOOK_URL }}
-          fi
+          bundle exec fastlane run mattermost_send_message \
+            mattermost_webhook_url:${{ secrets.MM_WEBHOOK_URL }} \
+            github_handle:${{ github.actor }} \
+            template_name:$([[ "${{ env.success }}" == "true" ]] && echo "variants-release-published" || echo "variants-release-failed")
