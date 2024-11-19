@@ -1159,6 +1159,8 @@
 		376731A22C7F50D200EB097B /* Logger+HomePageSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376731A02C7F50D200EB097B /* Logger+HomePageSettings.swift */; };
 		3767880C2CECCB7200F59D83 /* NewTabPageActionsManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3767880B2CECCB6C00F59D83 /* NewTabPageActionsManagerTests.swift */; };
 		3767880D2CECCB7200F59D83 /* NewTabPageActionsManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3767880B2CECCB6C00F59D83 /* NewTabPageActionsManagerTests.swift */; };
+		3767880F2CECD5A800F59D83 /* NewTabPageUserScriptTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3767880E2CECD5A200F59D83 /* NewTabPageUserScriptTests.swift */; };
+		376788102CECD5A800F59D83 /* NewTabPageUserScriptTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3767880E2CECD5A200F59D83 /* NewTabPageUserScriptTests.swift */; };
 		3768D8382C24BFF5004120AE /* RemoteMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3768D8372C24BFF5004120AE /* RemoteMessageView.swift */; };
 		3768D8392C24BFF5004120AE /* RemoteMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3768D8372C24BFF5004120AE /* RemoteMessageView.swift */; };
 		3768D83B2C24C0A8004120AE /* RemoteMessageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3768D83A2C24C0A8004120AE /* RemoteMessageViewModel.swift */; };
@@ -3639,6 +3641,7 @@
 		3767319B2C7F415200EB097B /* CustomBackgroundTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomBackgroundTests.swift; sourceTree = "<group>"; };
 		376731A02C7F50D200EB097B /* Logger+HomePageSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Logger+HomePageSettings.swift"; sourceTree = "<group>"; };
 		3767880B2CECCB6C00F59D83 /* NewTabPageActionsManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageActionsManagerTests.swift; sourceTree = "<group>"; };
+		3767880E2CECD5A200F59D83 /* NewTabPageUserScriptTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageUserScriptTests.swift; sourceTree = "<group>"; };
 		3768D8372C24BFF5004120AE /* RemoteMessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMessageView.swift; sourceTree = "<group>"; };
 		3768D83A2C24C0A8004120AE /* RemoteMessageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMessageViewModel.swift; sourceTree = "<group>"; };
 		3768D83F2C29C1F1004120AE /* ActiveRemoteMessageModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveRemoteMessageModel.swift; sourceTree = "<group>"; };
@@ -5785,6 +5788,7 @@
 		3767880A2CECCB6000F59D83 /* NewTabPage */ = {
 			isa = PBXGroup;
 			children = (
+				3767880E2CECD5A200F59D83 /* NewTabPageUserScriptTests.swift */,
 				3767880B2CECCB6C00F59D83 /* NewTabPageActionsManagerTests.swift */,
 			);
 			path = NewTabPage;
@@ -12245,6 +12249,7 @@
 				37DB56F02C3B31CD0093D4DC /* MockRemoteMessagingAvailabilityProvider.swift in Sources */,
 				567A23E22C89B1EE0010F66C /* BrowserTabViewControllerOnboardingTests.swift in Sources */,
 				1D8C2FEB2B70F5A7005E4BBD /* MockWebViewSnapshotRenderer.swift in Sources */,
+				3767880F2CECD5A800F59D83 /* NewTabPageUserScriptTests.swift in Sources */,
 				56A0540E2C1C375E007D8FAB /* MockWindow.swift in Sources */,
 				3706FE2A293F661700E42796 /* SafariVersionReaderTests.swift in Sources */,
 				31031EB82CC94C6E00684340 /* AIChatRemoteSettingsTests.swift in Sources */,
@@ -13937,6 +13942,7 @@
 				9FBD84772BB3E54200220859 /* InstallationAttributionPixelHandlerTests.swift in Sources */,
 				AA9C363025518CA9004B1BA3 /* FireTests.swift in Sources */,
 				B6106BB126A7D8720013B453 /* PermissionStoreTests.swift in Sources */,
+				376788102CECD5A800F59D83 /* NewTabPageUserScriptTests.swift in Sources */,
 				4BF4951826C08395000547B8 /* ThirdPartyBrowserTests.swift in Sources */,
 				4B98D27C28D960DD003C2B6F /* FirefoxFaviconsReaderTests.swift in Sources */,
 				9F0FFFBE2BCCAF1F007C87DD /* BookmarkAllTabsDialogViewModelMock.swift in Sources */,

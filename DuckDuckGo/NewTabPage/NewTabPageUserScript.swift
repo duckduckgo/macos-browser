@@ -53,9 +53,7 @@ final class NewTabPageUserScript: NSObject, SubfeatureWithExternalMessageHandlin
     private var messageHandlers: [MessageName: Handler] = [:]
 
     func registerMessageHandlers(_ handlers: [MessageName: Subfeature.Handler]) {
-        for (messageName, handler) in handlers {
-            messageHandlers[messageName] = handler
-        }
+        messageHandlers.merge(handlers, uniquingKeysWith: { $1 })
     }
 
     func handler(forMethodNamed methodName: MessageName) -> Handler? {

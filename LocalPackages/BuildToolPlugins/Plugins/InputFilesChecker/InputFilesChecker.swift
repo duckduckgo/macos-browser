@@ -163,7 +163,7 @@ struct TargetSourcesChecker: BuildToolPlugin, XcodeBuildToolPlugin {
     }
 }
 
-extension File: Equatable, Hashable {
+extension File: @retroactive Equatable, @retroactive Hashable {
     public static func == (lhs: File, rhs: File) -> Bool {
         lhs.path == rhs.path && lhs.type == rhs.type
     }
