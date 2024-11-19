@@ -77,12 +77,17 @@ public final class VPNTipsModel: ObservableObject {
             subscribeToConnectionStatusChanges(statusObserver)
             subscribeToFeatureFlagChanges(featureFlagPublisher)
             subscribeToActiveSiteChanges(activeSitePublisher)
+
+            subscribeToStatusChanges(for: domainExclusionsTip)
+            subscribeToStatusChanges(for: geoswitchingTip)
         }
     }
 
     var canShowTips: Bool {
         !isMenuApp && featureFlag
     }
+
+    // MARK - Subscriptions
 
     @available(macOS 14.0, *)
     private func subscribeToFeatureFlagChanges(_ publisher: CurrentValuePublisher<Bool, Never>) {
@@ -112,6 +117,46 @@ public final class VPNTipsModel: ObservableObject {
             .store(in: &cancellables)
     }
 
+    // MARK: - Tips
+
+    let autoconnectTip = VPNAutoconnectTip()
+    let domainExclusionsTip = VPNDomainExclusionsTip()
+    let geoswitchingTip = VPNGeoswitchingTip()
+
+    // MARK: - Tip Action handling
+
+    @available(macOS 14.0, *)
+    func autoconnectTipActionHandler(_ action: Tip.Action) {
+        if action.id == VPNAutoconnectTip.ActionIdentifiers.enable.rawValue {
+            vpnSettings.connectOnLogin = true
+        }
+    }
+
+    // MARK: - Subscriptions: Tips
+
+    @available(macOS 14.0, *)
+    func subscribeToStatusChanges(for tip: VPNGeoswitchingTip) {
+        Task {
+            for await status in tip.statusUpdates {
+                if case .invalidated = status {
+                    await VPNDomainExclusionsTip.geolocationTipDismissedEvent.donate()
+                    await VPNAutoconnectTip.geolocationTipDismissedEvent.donate()
+                }
+            }
+        }
+    }
+
+    @available(macOS 14.0, *)
+    func subscribeToStatusChanges(for tip: VPNDomainExclusionsTip) {
+        Task {
+            for await status in tip.statusUpdates {
+                if case .invalidated = status {
+                    await VPNAutoconnectTip.domainExclusionsTipDismissedEvent.donate()
+                }
+            }
+        }
+    }
+
     // MARK: - Handle Refreshing
 
     @available(macOS 14.0, *)
@@ -136,77 +181,13 @@ public final class VPNTipsModel: ObservableObject {
         }
     }
 
-    // MARK: - Tip Action handling
+    // MARK: - UI Events
 
-    @available(macOS 14.0, *)
-    func autoconnectTipActionHandler(_ action: Tip.Action) {
-        if action.id == VPNAutoconnectTip.ActionIdentifiers.enable.rawValue {
-            vpnSettings.connectOnLogin = true
+    func handleTunnelControllerShown() async {
+        if #available(macOS 14.0, *),
+           case .invalidated = VPNGeoswitchingTip().status {
+
+            await VPNDomainExclusionsTip.viewOpenedWhenVPNAlreadyConnectedEvent.donate()
         }
     }
-
-    // MARK: - Tips
-
-    let autoconnectTip = VPNAutoconnectTip()
-
-    let domainExclusionsTip: VPNDomainExclusionsTip = {
-        let tip = VPNDomainExclusionsTip()
-
-        if #available(macOS 14.0, *) {
-            Task {
-                for await status in tip.statusUpdates {
-                    if case .invalidated = status {
-                        await VPNAutoconnectTip.domainExclusionsTipDismissedEvent.donate()
-                    }
-                }
-            }
-        }
-
-        return tip
-    }()
-
-    let geoswitchingTip: VPNGeoswitchingTip = {
-
-        let tip = VPNGeoswitchingTip()
-
-        if #available(macOS 14.0, *) {
-            Task {
-                for await status in tip.statusUpdates {
-                    if case .invalidated = status {
-                        await VPNDomainExclusionsTip.geolocationTipDismissedEvent.donate()
-                        await VPNAutoconnectTip.geolocationTipDismissedEvent.donate()
-                    }
-                }
-            }
-        }
-
-        return tip
-    }()
-
-    /*@available(macOS 14.0, *)
-    func subscribeToTipStatusChanges(_ tip: VPNGeoswitchingTip) {
-        if tip.shouldDisplay {
-            Task {
-                for await status in tip.statusUpdates {
-                    if case .invalidated = status {
-                        await VPNDomainExclusionsTip.geolocationTipDismissedEvent.donate()
-                        await VPNAutoconnectTip.geolocationTipDismissedEvent.donate()
-                    }
-                }
-            }
-        }
-    }
-
-    @available(macOS 14.0, *)
-    func subscribeToTipStatusChanges(_ tip: VPNDomainExclusionsTip) {
-        if tip.shouldDisplay {
-            Task {
-                for await status in tip.statusUpdates {
-                    if case .invalidated = status {
-                        await VPNAutoconnectTip.domainExclusionsTipDismissedEvent.donate()
-                    }
-                }
-            }
-        }
-    }*/
 }

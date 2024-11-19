@@ -535,14 +535,6 @@ public final class TunnelControllerViewModel: ObservableObject {
         }
     }
 #endif
-
-    // MARK: - UI Events
-
-    func handleTunnelControllerShown() async {
-        if #available(macOS 14.0, *) {
-            await VPNDomainExclusionsTip.viewOpenedWhenVPNAlreadyConnectedEvent.donate()
-        }
-    }
 }
 
 extension DataVolume {

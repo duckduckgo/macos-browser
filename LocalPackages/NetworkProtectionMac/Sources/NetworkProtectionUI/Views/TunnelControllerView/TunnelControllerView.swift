@@ -85,7 +85,7 @@ public struct TunnelControllerView: View {
         }
         .onAppear {
             Task {
-                await model.handleTunnelControllerShown()
+                await tipsModel.handleTunnelControllerShown()
             }
         }
     }
@@ -227,46 +227,6 @@ public struct TunnelControllerView: View {
             dividerRow()
         }
     }
-
-    // MARK: - Tips
-
-    /*let geoswitchingTip: VPNGeoswitchingTip = {
-
-        let tip = VPNGeoswitchingTip()
-
-        if #available(macOS 14.0, *) {
-            Task {
-                for await status in tip.statusUpdates {
-                    if case .invalidated = status {
-                        await VPNDomainExclusionsTip.geolocationTipDismissedEvent.donate()
-                        await VPNAutoconnectTip.geolocationTipDismissedEvent.donate()
-                    }
-                }
-            }
-        }
-
-        return tip
-    }()*/
-/*
-    let domainExclusionsTip: VPNDomainExclusionsTip = {
-        let tip = VPNDomainExclusionsTip()
-
-        if #available(macOS 14.0, *) {
-            Task {
-                for await status in tip.statusUpdates {
-                    Logger.networkProtection.debug("🧉 DomainExclusionsTip status: \(String(describing: status), privacy: .public)")
-
-                    if case .invalidated = status {
-                        await VPNAutoconnectTip.domainExclusionsTipDismissedEvent.donate()
-                    }
-                }
-            }
-        }
-
-        return tip
-    }()*/
-
-    //let autoconnectTip = VPNAutoconnectTip()
 
     // MARK: - Rows
 
