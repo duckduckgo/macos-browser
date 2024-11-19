@@ -1440,7 +1440,7 @@ final class MockDataBrokerProtectionOperationQueue: DataBrokerProtectionOperatio
         self.operations.append(op)
     }
 
-    func addBarrierBlock(_ barrier: @escaping @Sendable () -> Void) {
+    func addBarrierBlock1(_ barrier: @escaping @Sendable () -> Void) {
         didCallAddBarrierBlockCount += 1
         self.barrierBlock = barrier
     }

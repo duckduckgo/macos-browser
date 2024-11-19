@@ -17,7 +17,6 @@
 //
 
 import Foundation
-import Common
 
 // Integration Tests helpers
 extension URL {
@@ -61,5 +60,85 @@ extension URL {
         }
         return url
     }
+
+    private func appendingParameters<QueryParams: Collection>(_ parameters: QueryParams, allowedReservedCharacters: CharacterSet? = nil) -> URL
+    where QueryParams.Element == (key: String, value: String) {
+
+        return parameters.reduce(self) { partialResult, parameter in
+            partialResult.appendingParameter(
+                name: parameter.key,
+                value: parameter.value,
+                allowedReservedCharacters: allowedReservedCharacters
+            )
+        }
+    }
+
+    private func appendingParameter(name: String, value: String, allowedReservedCharacters: CharacterSet? = nil) -> URL {
+        let queryItem = URLQueryItem(percentEncodingName: name,
+                                     value: value,
+                                     withAllowedCharacters: allowedReservedCharacters)
+        return self.appending(percentEncodedQueryItem: queryItem)
+    }
+
+    private func appending(percentEncodedQueryItem: URLQueryItem) -> URL {
+        appending(percentEncodedQueryItems: [percentEncodedQueryItem])
+    }
+
+    private func appending(percentEncodedQueryItems: [URLQueryItem]) -> URL {
+        guard var components = URLComponents(url: self, resolvingAgainstBaseURL: true) else { return self }
+
+        var existingPercentEncodedQueryItems = components.percentEncodedQueryItems ?? [URLQueryItem]()
+        existingPercentEncodedQueryItems.append(contentsOf: percentEncodedQueryItems)
+        components.percentEncodedQueryItems = existingPercentEncodedQueryItems
+
+        return components.url ?? self
+    }
+}
+
+fileprivate extension URLQueryItem {
+
+    init(percentEncodingName name: String, value: String, withAllowedCharacters allowedReservedCharacters: CharacterSet? = nil) {
+        let allowedCharacters: CharacterSet = {
+            if let allowedReservedCharacters = allowedReservedCharacters {
+                return .urlQueryParameterAllowed.union(allowedReservedCharacters)
+            }
+            return .urlQueryParameterAllowed
+        }()
+
+        let percentEncodedName = name.percentEncoded(withAllowedCharacters: allowedCharacters)
+        let percentEncodedValue = value.percentEncoded(withAllowedCharacters: allowedCharacters)
+
+        self.init(name: percentEncodedName, value: percentEncodedValue)
+    }
+
+}
+
+extension StringProtocol {
+
+    fileprivate func percentEncoded(withAllowedCharacters allowedCharacters: CharacterSet) -> String {
+        if let percentEncoded = self.addingPercentEncoding(withAllowedCharacters: allowedCharacters) {
+            return percentEncoded
+        }
+        assertionFailure("Unexpected failure")
+        return components(separatedBy: allowedCharacters.inverted).joined()
+    }
+
+    var utf8data: Data {
+        data(using: .utf8)!
+    }
+}
+
+public extension CharacterSet {
+
+    /**
+     * As per [RFC 3986](https://www.rfc-editor.org/rfc/rfc3986#section-2.2).
+     *
+     * This set contains all reserved characters that are otherwise
+     * included in `CharacterSet.urlQueryAllowed` but still need to be percent-escaped.
+     */
+    static let urlQueryReserved = CharacterSet(charactersIn: ":/?#[]@!$&'()*+,;=")
+
+    static let urlQueryParameterAllowed = CharacterSet.urlQueryAllowed.subtracting(Self.urlQueryReserved)
+    static let urlQueryStringAllowed = CharacterSet(charactersIn: "%+?").union(.urlQueryParameterAllowed)
 
 }

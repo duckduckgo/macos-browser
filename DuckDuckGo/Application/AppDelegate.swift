@@ -25,6 +25,7 @@ import Configuration
 import CoreData
 import Crashes
 import DDGSync
+import FeatureFlags
 import History
 import MetricKit
 import Networking
@@ -91,6 +92,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let bookmarksManager = LocalBookmarkManager.shared
     var privacyDashboardWindow: NSWindow?
 
+    let newTabPageActionsManager: NewTabPageActionsManaging
     let activeRemoteMessageModel: ActiveRemoteMessageModel
     let homePageSettingsModel = HomePage.Models.SettingsModel()
     let remoteMessagingClient: RemoteMessagingClient!
@@ -264,7 +266,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         featureFlagger = DefaultFeatureFlagger(
             internalUserDecider: internalUserDecider,
-            privacyConfigManager: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
+            privacyConfigManager: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
+            localOverrides: FeatureFlagLocalOverrides(
+                keyValueStore: UserDefaults.appConfiguration,
+                actionHandler: FeatureFlagOverridesPublishingHandler<FeatureFlag>()
+            ),
+            for: FeatureFlag.self
         )
 
         onboardingStateMachine = ContextualOnboardingStateMachine()
@@ -304,6 +311,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                                                        freemiumDBPUserStateManager: freemiumDBPUserStateManager)
         freemiumDBPPromotionViewCoordinator = FreemiumDBPPromotionViewCoordinator(freemiumDBPUserStateManager: freemiumDBPUserStateManager,
                                                                                   freemiumDBPFeature: freemiumDBPFeature)
+
+        newTabPageActionsManager = NewTabPageActionsManager(appearancePreferences: .shared)
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {

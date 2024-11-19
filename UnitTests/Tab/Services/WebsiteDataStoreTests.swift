@@ -20,6 +20,18 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class WebCacheManagerTests: XCTestCase {
+    /// The webView is necessary to manage the shared state of WKWebsiteDataRecord
+    var webView: WKWebView?
+
+    override func setUp() {
+        super.setUp()
+        webView = WKWebView()
+    }
+
+    override func tearDown() {
+        webView = nil
+        super.tearDown()
+    }
 
     func testWhenCookiesHaveSubDomainsOnSubDomainsAndWildcardsThenAllCookiesRetained() {
         let logins = MockPreservedLogins(domains: [
@@ -89,7 +101,7 @@ final class WebCacheManagerTests: XCTestCase {
 
     }
 
-    func testWhenClearedThenDDGCookiesAreRetained() {
+    @MainActor func testWhenClearedThenDDGCookiesAndStorageAreRetained() async {
         let logins = MockPreservedLogins(domains: [
             "example.com"
         ])
@@ -104,16 +116,17 @@ final class WebCacheManagerTests: XCTestCase {
             MockDataRecord(recordName: "duckduckgo.com")
         ]
 
-        let expect = expectation(description: #function)
         let webCacheManager = WebCacheManager(fireproofDomains: logins, websiteDataStore: dataStore)
-        Task {
-            await webCacheManager.clear()
-            expect.fulfill()
-        }
-        wait(for: [expect], timeout: 30.0)
 
+        // Await the clear function directly
+        await webCacheManager.clear()
+
+        // Assertions after the async operation
         XCTAssertEqual(cookieStore.cookies.count, 1)
         XCTAssertEqual(cookieStore.cookies[0].domain, "duckduckgo.com")
+
+        XCTAssertEqual(dataStore.records.count, 1)
+        XCTAssertEqual(dataStore.records.first?.displayName, "duckduckgo.com")
     }
 
     func testWhenClearedThenCookiesForLoginsAreRetained() {
@@ -184,15 +197,11 @@ final class WebCacheManagerTests: XCTestCase {
             }
         }
 
-        func removeData(ofTypes dataTypes: Set<String>, for records: [WKWebsiteDataRecord]) async {
+        func removeData(ofTypes dataTypes: Set<String>, for recordsToRemove: [WKWebsiteDataRecord]) async {
             removeDataCalledCount += 1
 
-            // In the real implementation, records will be selectively removed or edited based on their Fireproof status. For simplicity in this test,
-            // only remove records if all data types are removed, so that we can tell whether records for given domains still exist in some form.
-            if dataTypes == WKWebsiteDataStore.allWebsiteDataTypes() {
-                self.records = records.filter {
-                    dataTypes == $0.dataTypes
-                }
+            self.records = self.records.filter { record in
+                !recordsToRemove.contains(where: { $0 == record && $0.dataTypes.isSubset(of: dataTypes)})
             }
         }
 

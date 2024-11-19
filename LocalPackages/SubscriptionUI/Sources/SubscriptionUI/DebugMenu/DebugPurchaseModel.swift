@@ -41,7 +41,7 @@ public final class DebugPurchaseModel: ObservableObject {
         print("Attempting purchase: \(product.displayName)")
 
         Task {
-            await appStorePurchaseFlow.purchaseSubscription(with: product.id, emailAccessToken: nil)
+            await appStorePurchaseFlow.purchaseSubscription(with: product.id)
         }
     }
 }
