@@ -302,7 +302,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case fileMoveToDownloadsFailed
     case fileAccessRelatedItemFailed
     case fileGetDownloadLocationFailed
-    case fileDownloadCreatePresentersFailed
+    case fileDownloadCreatePresentersFailed(osVersion: String)
     case downloadResumeDataCodingFailed
 
     case suggestionsFetchFailed
@@ -1321,6 +1321,8 @@ enum GeneralPixel: PixelKitEventV2 {
                 parameters[NewTabSearchBoxExperimentPixel.Parameters.onboardingCohort] = onboardingCohort.rawValue
             }
             return parameters
+        case .fileDownloadCreatePresentersFailed(let osVersion):
+            return ["osVersion": osVersion]
         default: return nil
         }
     }

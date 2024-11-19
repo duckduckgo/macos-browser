@@ -16,10 +16,9 @@
 //  limitations under the License.
 //
 
-import Common
 import XCTest
 
-class BookmarksBarTests: XCTestCase {
+class BookmarksBarTests: UITestCase {
     private var app: XCUIApplication!
     private var pageTitle: String!
     private var urlForBookmarksBar: URL!
@@ -36,6 +35,7 @@ class BookmarksBarTests: XCTestCase {
     private let titleStringLength = 12
 
     override class func setUp() {
+        super.setUp()
         UITests.firstRun()
     }
 
@@ -58,6 +58,7 @@ class BookmarksBarTests: XCTestCase {
         app.typeKey("n", modifierFlags: [.command]) // Guarantee a single window
         resetBookmarksAndAddOneBookmark()
         app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Close windows
+        app.typeKey("n", modifierFlags: [.command])
         openSettingsAndSetShowBookmarksBarToUnchecked()
         openSecondWindowAndVisitSite()
         siteWindow = app.windows.containing(.webView, identifier: pageTitle).firstMatch
@@ -164,7 +165,7 @@ class BookmarksBarTests: XCTestCase {
 
 private extension BookmarksBarTests {
     func openSettingsAndSetShowBookmarksBarToUnchecked() {
-        app.typeKey(",", modifierFlags: [.command])
+        addressBarTextField.typeURL(URL(string: "duck://settings")!)
 
         let settingsAppearanceButton = app.buttons["PreferencesSidebar.appearanceButton"]
         XCTAssertTrue(
