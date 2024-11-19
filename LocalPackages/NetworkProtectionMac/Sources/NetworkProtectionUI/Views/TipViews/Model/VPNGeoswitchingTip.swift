@@ -25,7 +25,9 @@ struct VPNGeoswitchingTip {}
 
 @available(macOS 14.0, *)
 extension VPNGeoswitchingTip: Tip {
-    static let vpnConnectedEvent = Tips.Event(id: "com.duckduckgo.vpn.tip.geoswitching.vpnConnectedEvent")
+
+    @Parameter
+    static var vpnEnabledAtLeastOnce: Bool = false
 
     var id: String {
         "com.duckduckgo.vpn.tip.geoswitching"
@@ -44,8 +46,8 @@ extension VPNGeoswitchingTip: Tip {
     }
 
     var rules: [Rule] {
-        #Rule(Self.vpnConnectedEvent) {
-            $0.donations.donatedWithin(.week).count > 0
+        #Rule(Self.$vpnEnabledAtLeastOnce) {
+            $0
         }
     }
 }

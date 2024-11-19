@@ -21,6 +21,7 @@ import SwiftUIExtensions
 import Combine
 import NetworkProtection
 import Lottie
+import os.log
 import TipKit
 
 public struct TunnelControllerView: View {
@@ -54,7 +55,7 @@ public struct TunnelControllerView: View {
             featureToggleRow()
 
             if #available(macOS 14.0, *) {
-                TipView(VPNAutoconnectTip())
+                TipView(autoconnectTip)
                 //VPNAutoconnectTipView()
                 //TipView(tipGroup.currentTip as? VPNAutoconnectTip)
                     .padding(.horizontal, 9)
@@ -72,7 +73,7 @@ public struct TunnelControllerView: View {
                 if tipsModel.featureFlag {//,
                    //let tip = tipsModel.currentTip as? VPNDomainExclusionsTip {
 
-                    TipView(VPNDomainExclusionsTip())
+                    TipView(domainExclusionsTip)
                     //TipView(tipGroup.currentTip as? VPNDomainExclusionsTip)
                     //VPNDomainExclusionsTipView()
                         .padding(.horizontal, 9)
@@ -202,7 +203,7 @@ public struct TunnelControllerView: View {
             }
 
             if #available(macOS 14.0, *) {
-                TipView(geoswitchingTip)
+                TipView(tipsModel.geoswitchingTip)
                     .padding(.horizontal, 9)
                     .padding(.vertical, 6)
             }
@@ -235,7 +236,7 @@ public struct TunnelControllerView: View {
 
     // MARK: - Tips
 
-    var geoswitchingTip: VPNGeoswitchingTip {
+    /*let geoswitchingTip: VPNGeoswitchingTip = {
 
         let tip = VPNGeoswitchingTip()
 
@@ -251,29 +252,27 @@ public struct TunnelControllerView: View {
         }
 
         return tip
-    }
+    }()*/
 
-    var snoozeTip: VPNDomainExclusionsTip {
+    let domainExclusionsTip: VPNDomainExclusionsTip = {
         let tip = VPNDomainExclusionsTip()
 
         if #available(macOS 14.0, *) {
-            if tip.shouldDisplay {
-                Task {
-                    for await status in tip.statusUpdates {
-                        if case .invalidated = status {
-                            await VPNAutoconnectTip.domainExclusionsTipDismissedEvent.donate()
-                        }
+            Task {
+                for await status in tip.statusUpdates {
+                    Logger.networkProtection.debug("🧉 DomainExclusionsTip status: \(String(describing: status), privacy: .public)")
+
+                    if case .invalidated = status {
+                        await VPNAutoconnectTip.domainExclusionsTipDismissedEvent.donate()
                     }
                 }
             }
         }
 
         return tip
-    }
+    }()
 
-    var autoconnectTip: VPNAutoconnectTip {
-        VPNAutoconnectTip()
-    }
+    let autoconnectTip = VPNAutoconnectTip()
 
     // MARK: - Rows
 

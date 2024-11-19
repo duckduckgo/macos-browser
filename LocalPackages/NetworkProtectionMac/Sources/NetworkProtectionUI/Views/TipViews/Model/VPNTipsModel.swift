@@ -120,9 +120,7 @@ public final class VPNTipsModel: ObservableObject {
         switch newValue {
         case .connected:
             if case oldValue = .connecting {
-                Task {
-                    await VPNGeoswitchingTip.vpnConnectedEvent.donate()
-                }
+                VPNGeoswitchingTip.vpnEnabledAtLeastOnce = true
             }
 
             VPNAutoconnectTip.vpnEnabled = true
@@ -141,6 +139,24 @@ public final class VPNTipsModel: ObservableObject {
             vpnSettings.connectOnLogin = true
         }
     }
+
+    let geoswitchingTip: VPNGeoswitchingTip = {
+
+        let tip = VPNGeoswitchingTip()
+
+        if #available(macOS 14.0, *) {
+            Task {
+                for await status in tip.statusUpdates {
+                    if case .invalidated = status {
+                        await VPNDomainExclusionsTip.geolocationTipDismissedEvent.donate()
+                        await VPNAutoconnectTip.geolocationTipDismissedEvent.donate()
+                    }
+                }
+            }
+        }
+
+        return tip
+    }()
 
     /*@available(macOS 14.0, *)
     func subscribeToTipStatusChanges(_ tip: VPNGeoswitchingTip) {
