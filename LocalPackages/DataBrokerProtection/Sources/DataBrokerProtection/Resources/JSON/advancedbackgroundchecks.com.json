@@ -1,7 +1,7 @@
 {
   "name": "AdvancedBackgroundChecks",
   "url": "advancedbackgroundchecks.com",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "parent": "peoplefinders.com",
   "addedDatetime": 1678060800000,
   "optOutUrl": "https://www.advancedbackgroundchecks.com/removal",

@@ -1,7 +1,7 @@
 {
   "name": "PeopleWhized.com",
   "url": "peoplewhized.com",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "parent": "peoplewhiz.com",
   "addedDatetime": 1709424000000,
   "optOutUrl": "https://peoplewhized.com/optout",

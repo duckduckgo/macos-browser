@@ -1,7 +1,7 @@
 {
   "name": "Dataveria",
   "url": "dataveria.com",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "parent": "verecor.com",
   "addedDatetime": 1677736800000,
   "optOutUrl": "https://dataveria.com/ng/control/privacy",

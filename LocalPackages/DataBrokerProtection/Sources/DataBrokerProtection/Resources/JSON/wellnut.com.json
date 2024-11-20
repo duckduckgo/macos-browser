@@ -1,7 +1,7 @@
 {
   "name": "Wellnut",
   "url": "wellnut.com",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "parent": "verecor.com",
   "addedDatetime": 1703052000000,
   "optOutUrl": "https://wellnut.com/noi/control/privacy",

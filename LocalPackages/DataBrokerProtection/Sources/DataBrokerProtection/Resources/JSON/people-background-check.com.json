@@ -1,7 +1,7 @@
 {
   "name": "People Background Check",
   "url": "people-background-check.com",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "parent": "verecor.com",
   "addedDatetime": 1702965600000,
   "optOutUrl": "https://people-background-check.com/ng/control/privacy",

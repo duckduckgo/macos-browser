@@ -1,7 +1,7 @@
 {
   "name": "CurAdvisor",
   "url": "curadvisor.com",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "parent": "verecor.com",
   "addedDatetime": 1703052000000,
   "optOutUrl": "https://curadvisor.com/nada/control/privacy",
