@@ -20,17 +20,36 @@ import UserScript
 
 final class NewTabPageFavoritesClient: NewTabPageScriptClient {
 
+    let bookmarkManager: BookmarkManager
+    let faviconManager: FaviconManagement
+    let favoritesModel: HomePage.Models.FavoritesModel
     weak var userScriptsSource: NewTabPageUserScriptsSource?
 
-    enum MessageNames: String, CaseIterable {
+    init(
+        favoritesModel: HomePage.Models.FavoritesModel,
+        bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
+        faviconManager: FaviconManagement = FaviconManager.shared
+    ) {
+        self.favoritesModel = favoritesModel
+        self.bookmarkManager = bookmarkManager
+        self.faviconManager = faviconManager
+    }
+
+    enum MessageName: String, CaseIterable {
         case getConfig = "favorites_getConfig"
         case getData = "favorites_getData"
+        case move = "favorites_move"
+        case onConfigUpdate = "favorites_onConfigUpdate"
+        case onDataUpdate = "favorites_onDataUpdate"
+        case open = "favorites_open"
+        case openContextMenu = "favorites_openContextMenu"
+        case setConfig = "favorites_setConfig"
     }
 
     func registerMessageHandlers(for userScript: any SubfeatureWithExternalMessageHandling) {
         userScript.registerMessageHandlers([
-            MessageNames.getConfig.rawValue: { [weak self] in try await self?.getConfig(params: $0, original: $1) },
-            MessageNames.getData.rawValue: { [weak self] in try await self?.getData(params: $0, original: $1) },
+            MessageName.getConfig.rawValue: { [weak self] in try await self?.getConfig(params: $0, original: $1) },
+            MessageName.getData.rawValue: { [weak self] in try await self?.getData(params: $0, original: $1) },
         ])
     }
 
@@ -39,9 +58,13 @@ final class NewTabPageFavoritesClient: NewTabPageScriptClient {
         NewTabPageUserScript.WidgetConfig(animation: .auto, expansion: .collapsed)
     }
 
+    @MainActor
     func getData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        // implementation TBD
-        NewTabPageUserScript.FavoritesData(favorites: [])
+        favoritesModel.favorites = bookmarkManager.list?.favoriteBookmarks ?? []
+        let favorites = favoritesModel.favorites.map {
+            NewTabPageUserScript.Favorite($0, faviconManager: faviconManager, favoritesModel: favoritesModel)
+        }
+        return NewTabPageUserScript.FavoritesData(favorites: favorites)
     }
 }
 
@@ -56,6 +79,24 @@ extension NewTabPageUserScript {
         let id: String
         let title: String
         let url: String
+
+        @MainActor
+        init(_ bookmark: Bookmark, faviconManager: FaviconManagement, favoritesModel: HomePage.Models.FavoritesModel) {
+            id = bookmark.id
+            title = bookmark.title
+            url = bookmark.url
+
+            guard let url = bookmark.url.url,
+                  faviconManager.areFaviconsLoaded,
+                  let faviconURL = faviconManager.getCachedFaviconURL(for: url, sizeCategory: .medium),
+                  let duckFaviconURL = URL.duckFavicon(for: faviconURL)
+            else {
+                favoritesModel.onFaviconMissing()
+                favicon = nil
+                return
+            }
+            favicon = FavoriteFavicon(maxAvailableSize: Int(Favicon.SizeCategory.medium.rawValue), src: duckFaviconURL.absoluteString)
+        }
     }
 
     struct FavoriteFavicon: Encodable {
