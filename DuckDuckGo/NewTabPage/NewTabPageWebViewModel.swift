@@ -36,7 +36,7 @@ final class NewTabPageWebViewModel: NSObject {
     let webView: WebView
     private var windowCancellable: AnyCancellable?
 
-    init(featureFlagger: FeatureFlagger, actionsManager: NewTabPageActionsManaging) {
+    init(featureFlagger: FeatureFlagger, actionsManager: NewTabPageActionsManaging, activeRemoteMessageModel: ActiveRemoteMessageModel) {
         newTabPageUserScript = NewTabPageUserScript()
         actionsManager.registerUserScript(newTabPageUserScript)
 
@@ -52,7 +52,7 @@ final class NewTabPageWebViewModel: NSObject {
 
         windowCancellable = webView.publisher(for: \.window)
             .map { $0 != nil }
-            .assign(to: \.isViewOnScreen, on: NSApp.delegateTyped.activeRemoteMessageModel)
+            .assign(to: \.isViewOnScreen, on: activeRemoteMessageModel)
     }
 }
 
