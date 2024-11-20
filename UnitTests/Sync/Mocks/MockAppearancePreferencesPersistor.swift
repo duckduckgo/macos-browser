@@ -43,6 +43,8 @@ class MockAppearancePreferencesPersistor: AppearancePreferencesPersistor {
 
     var continueSetUpCardsNumberOfDaysDemonstrated: Int = 0
 
+    var continueSetUpCardsClosed: Bool = false
+
     var isRecentActivityVisible: Bool = true
 
     var isSearchBarVisible: Bool = true
