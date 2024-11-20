@@ -36,22 +36,27 @@ extension DefaultSubscriptionManager {
         let accessTokenStorage = SubscriptionTokenKeychainStorage(keychainType: .dataProtection(.named(subscriptionAppGroup)))
         let subscriptionEndpointService = DefaultSubscriptionEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
         let authEndpointService = DefaultAuthEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
+        let subscriptionFeatureMappingCache = DefaultSubscriptionFeatureMappingCache(subscriptionEndpointService: subscriptionEndpointService,
+                                                                                     userDefaults: subscriptionUserDefaults)
+
         let accountManager = DefaultAccountManager(accessTokenStorage: accessTokenStorage,
                                                    entitlementsCache: entitlementsCache,
                                                    subscriptionEndpointService: subscriptionEndpointService,
                                                    authEndpointService: authEndpointService)
 
         if #available(macOS 12.0, *) {
-            let storePurchaseManager = DefaultStorePurchaseManager()
+            let storePurchaseManager = DefaultStorePurchaseManager(subscriptionFeatureMappingCache: subscriptionFeatureMappingCache)
             self.init(storePurchaseManager: storePurchaseManager,
                       accountManager: accountManager,
                       subscriptionEndpointService: subscriptionEndpointService,
                       authEndpointService: authEndpointService,
+                      subscriptionFeatureMappingCache: subscriptionFeatureMappingCache,
                       subscriptionEnvironment: subscriptionEnvironment)
         } else {
             self.init(accountManager: accountManager,
                       subscriptionEndpointService: subscriptionEndpointService,
                       authEndpointService: authEndpointService,
+                      subscriptionFeatureMappingCache: subscriptionFeatureMappingCache,
                       subscriptionEnvironment: subscriptionEnvironment)
         }
 

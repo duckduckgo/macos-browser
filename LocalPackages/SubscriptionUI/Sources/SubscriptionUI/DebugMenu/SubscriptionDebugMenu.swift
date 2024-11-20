@@ -38,7 +38,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     @available(macOS 12.0, *)
     fileprivate var purchaseManager: DefaultStorePurchaseManager {
         if _purchaseManager == nil {
-            _purchaseManager = DefaultStorePurchaseManager()
+            _purchaseManager = DefaultStorePurchaseManager(subscriptionFeatureMappingCache: subscriptionManager.subscriptionFeatureMappingCache)
         }
         // swiftlint:disable:next force_cast
         return _purchaseManager as! DefaultStorePurchaseManager
@@ -232,7 +232,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     @IBAction func showPurchaseView(_ sender: Any?) {
         if #available(macOS 12.0, *) {
-            let storePurchaseManager = DefaultStorePurchaseManager()
+            let storePurchaseManager = DefaultStorePurchaseManager(subscriptionFeatureMappingCache: subscriptionManager.subscriptionFeatureMappingCache)
             let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(accountManager: subscriptionManager.accountManager,
                                                                  storePurchaseManager: subscriptionManager.storePurchaseManager(),
                                                                  subscriptionEndpointService: subscriptionManager.subscriptionEndpointService,
