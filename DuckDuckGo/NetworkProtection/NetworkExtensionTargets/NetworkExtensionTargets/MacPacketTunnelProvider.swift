@@ -430,9 +430,9 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                                                                            useAccessTokenProvider: false,
                                                                            accessTokenProvider: { nil }
         )
-        let entitlementsCache = UserDefaultsCache<[Entitlement]>(userDefaults: subscriptionUserDefaults,
-                                                                 key: UserDefaultsCacheKey.subscriptionEntitlements,
-                                                                 settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(20)))
+//        let entitlementsCache = UserDefaultsCache<[Entitlement]>(userDefaults: subscriptionUserDefaults,
+//                                                                 key: UserDefaultsCacheKey.subscriptionEntitlements,
+//                                                                 settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(20)))
         // Align Subscription environment to the VPN environment
         var subscriptionEnvironment = SubscriptionEnvironment.default
         switch settings.selectedEnvironment {
@@ -442,15 +442,41 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             subscriptionEnvironment.serviceEnvironment = .staging
         }
 
-        let subscriptionEndpointService = DefaultSubscriptionEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
-        let authEndpointService = DefaultAuthEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
-        let accountManager = DefaultAccountManager(accessTokenStorage: tokenStore,
-                                                   entitlementsCache: entitlementsCache,
-                                                   subscriptionEndpointService: subscriptionEndpointService,
-                                                   authEndpointService: authEndpointService)
+//        let subscriptionEndpointService = DefaultSubscriptionEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
+//        let authEndpointService = DefaultAuthEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
+//        let accountManager = DefaultAccountManager(accessTokenStorage: tokenStore,
+//                                                   entitlementsCache: entitlementsCache,
+//                                                   subscriptionEndpointService: subscriptionEndpointService,
+//                                                   authEndpointService: authEndpointService)
 
-        let entitlementsCheck = {
-            await accountManager.hasEntitlement(forProductName: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
+        let configuration = URLSessionConfiguration.default
+        configuration.httpCookieStorage = nil
+        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        let urlSession = URLSession(configuration: configuration,
+                                    delegate: SessionDelegate(),
+                                    delegateQueue: nil)
+        let apiService = DefaultAPIService(urlSession: urlSession)
+        let authEnvironment: OAuthEnvironment = subscriptionEnvironment.serviceEnvironment == .production ? .production : .staging
+        let authService = DefaultOAuthService(baseURL: authEnvironment.url, apiService: apiService)
+
+        // keychain storage
+        let subscriptionAppGroup = MacPacketTunnelProvider.subscriptionsAppGroup!
+        let tokenStorage = SubscriptionTokenKeychainStorageV2(keychainType: .dataProtection(.named(subscriptionAppGroup)))
+        let legacyAccountStorage = SubscriptionTokenKeychainStorage(keychainType: .dataProtection(.named(subscriptionAppGroup)))
+
+        let authClient = DefaultOAuthClient(tokensStorage: tokenStorage,
+                                            legacyTokenStorage: legacyAccountStorage,
+                                            authService: authService)
+        let entitlementsCheck: (() async -> Result<Bool, Error>) = {
+//            await accountManager.hasEntitlement(forProductName: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
+            do {
+                let tokenContainer = try await authClient.getTokens(policy: .localForceRefresh)
+                let entitlements = tokenContainer.decodedAccessToken.subscriptionEntitlements
+                return .success(entitlements.contains(.networkProtection))
+            } catch {
+                Logger.networkProtection.error("Failed to get token: \(error)")
+                return .failure(error)
+            }
         }
 
         let tunnelHealthStore = NetworkProtectionTunnelHealthStore(notificationCenter: notificationCenter)
@@ -470,7 +496,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                    entitlementCheck: entitlementsCheck)
 
         setupPixels()
-        accountManager.delegate = self
         observeServerChanges()
         observeStatusUpdateRequests()
     }
@@ -676,10 +701,10 @@ final class DefaultWireGuardInterface: WireGuardInterface {
     }
 }
 
-extension MacPacketTunnelProvider: AccountManagerKeychainAccessDelegate {
-
-    public func accountManagerKeychainAccessFailed(accessType: AccountKeychainAccessType, error: AccountKeychainAccessError) {
-        PixelKit.fire(PrivacyProErrorPixel.privacyProKeychainAccessError(accessType: accessType, accessError: error),
-                      frequency: .legacyDailyAndCount)
-    }
-}
+//extension MacPacketTunnelProvider: AccountManagerKeychainAccessDelegate {
+//
+//    public func accountManagerKeychainAccessFailed(accessType: AccountKeychainAccessType, error: AccountKeychainAccessError) {
+//        PixelKit.fire(PrivacyProErrorPixel.privacyProKeychainAccessError(accessType: accessType, accessError: error),
+//                      frequency: .legacyDailyAndCount)
+//    }
+//}

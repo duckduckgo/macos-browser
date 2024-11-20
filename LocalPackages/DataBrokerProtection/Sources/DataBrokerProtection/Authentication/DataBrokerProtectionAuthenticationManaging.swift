@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import Subscription
 
 public protocol DataBrokerProtectionAuthenticationManaging {
     var isUserAuthenticated: Bool { get }
@@ -29,24 +30,24 @@ public protocol DataBrokerProtectionAuthenticationManaging {
 
 public final class DataBrokerProtectionAuthenticationManager: DataBrokerProtectionAuthenticationManaging {
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
-    private let subscriptionManager: DataBrokerProtectionSubscriptionManaging
+    private let subscriptionManager: any SubscriptionManager
 
     public var isUserAuthenticated: Bool {
         subscriptionManager.isUserAuthenticated
     }
 
     public var accessToken: String? {
-        subscriptionManager.accessToken
+        subscriptionManager.getTokenContainerSynchronously(policy: .localValid)?.accessToken
     }
 
     public init(redeemUseCase: any DataBrokerProtectionRedeemUseCase,
-                subscriptionManager: any DataBrokerProtectionSubscriptionManaging) {
+                subscriptionManager: any SubscriptionManager) {
         self.redeemUseCase = redeemUseCase
         self.subscriptionManager = subscriptionManager
     }
 
-    public func hasValidEntitlement() async throws -> Bool {
-        try await subscriptionManager.hasValidEntitlement()
+    public func hasValidEntitlement() -> Bool {
+        subscriptionManager.isEntitlementActive(.dataBrokerProtection)
     }
 
     public func getAuthHeader() -> String? {

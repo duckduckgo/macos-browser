@@ -343,7 +343,7 @@ final class NetworkProtectionVisibilityMock: VPNFeatureGatekeeper {
         return !visible
     }
 
-    func canStartVPN() async throws -> Bool {
+    func canStartVPN() -> Bool {
         return false
     }
 

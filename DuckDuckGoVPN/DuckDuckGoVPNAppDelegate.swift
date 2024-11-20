@@ -37,7 +37,7 @@ import os.log
 @objc(Application)
 final class DuckDuckGoVPNApplication: NSApplication {
 
-    public var accountManager: AccountManager
+    public var subscriptionManager: any SubscriptionManager
     private let _delegate: DuckDuckGoVPNAppDelegate
 
     override init() {
@@ -50,36 +50,42 @@ final class DuckDuckGoVPNApplication: NSApplication {
         }
 
         // MARK: - Configure Subscription
-        let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
-        let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
-        let subscriptionEnvironment = DefaultSubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
-        let subscriptionEndpointService = DefaultSubscriptionEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
-        let authEndpointService = DefaultAuthEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
-        let entitlementsCache = UserDefaultsCache<[Entitlement]>(userDefaults: subscriptionUserDefaults,
-                                                                 key: UserDefaultsCacheKey.subscriptionEntitlements,
-                                                                 settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(20)))
-        let accessTokenStorage = SubscriptionTokenKeychainStorage(keychainType: .dataProtection(.named(subscriptionAppGroup)))
-        accountManager = DefaultAccountManager(accessTokenStorage: accessTokenStorage,
-                                               entitlementsCache: entitlementsCache,
-                                               subscriptionEndpointService: subscriptionEndpointService,
-                                               authEndpointService: authEndpointService)
+        self.subscriptionManager = DefaultSubscriptionManager()
 
-        _delegate = DuckDuckGoVPNAppDelegate(accountManager: accountManager,
-                                             accessTokenStorage: accessTokenStorage,
-                                             subscriptionEnvironment: subscriptionEnvironment)
+//        let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
+//        let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
+//        let subscriptionEnvironment = DefaultSubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
+//        let subscriptionEndpointService = DefaultSubscriptionEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
+//        let authEndpointService = DefaultAuthEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
+//        let entitlementsCache = UserDefaultsCache<[Entitlement]>(userDefaults: subscriptionUserDefaults,
+//                                                                 key: UserDefaultsCacheKey.subscriptionEntitlements,
+//                                                                 settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(20)))
+//        let accessTokenStorage = SubscriptionTokenKeychainStorage(keychainType: .dataProtection(.named(subscriptionAppGroup)))
+//        accountManager = DefaultAccountManager(accessTokenStorage: accessTokenStorage,
+//                                               entitlementsCache: entitlementsCache,
+//                                               subscriptionEndpointService: subscriptionEndpointService,
+//                                               authEndpointService: authEndpointService)
+
+        _delegate = DuckDuckGoVPNAppDelegate(subscriptionManager: subscriptionManager)
         super.init()
 
         setupPixelKit()
         self.delegate = _delegate
-        accountManager.delegate = _delegate
 
 #if DEBUG
-        if accountManager.accessToken != nil {
-            Logger.networkProtection.error("🟢 VPN Agent found token")
-        } else {
-            Logger.networkProtection.error("VPN Agent found no token")
-        }
+        checkTokenPresence()
 #endif
+    }
+
+    func checkTokenPresence() {
+        Task {
+            do {
+                let tokenContainer = try await subscriptionManager.getTokenContainer(policy: .local)
+                Logger.networkProtection.error("🟢 VPN Agent found token")
+            } catch {
+                Logger.networkProtection.error("VPN Agent found no token \(error.localizedDescription)")
+            }
+        }
     }
 
     required init?(coder: NSCoder) {
@@ -128,8 +134,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private static let recentThreshold: TimeInterval = 5.0
 
     private let appLauncher = AppLauncher()
-    private let accountManager: AccountManager
-    private let accessTokenStorage: SubscriptionTokenKeychainStorage
+    private let subscriptionManager: any SubscriptionManager
 
     private let configurationStore = ConfigurationStore()
     private let configurationManager: ConfigurationManager
@@ -139,14 +144,10 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         internalUserDecider: privacyConfigurationManager.internalUserDecider,
         privacyConfigManager: privacyConfigurationManager)
 
-    public init(accountManager: AccountManager,
-                accessTokenStorage: SubscriptionTokenKeychainStorage,
-                subscriptionEnvironment: SubscriptionEnvironment) {
-
-        self.accountManager = accountManager
-        self.accessTokenStorage = accessTokenStorage
+    public init(subscriptionManager: any SubscriptionManager) {
+        self.subscriptionManager = subscriptionManager
         self.tunnelSettings = VPNSettings(defaults: .netP)
-        self.tunnelSettings.alignTo(subscriptionEnvironment: subscriptionEnvironment)
+        self.tunnelSettings.alignTo(subscriptionEnvironment: subscriptionManager.currentEnvironment)
         self.configurationManager = ConfigurationManager(privacyConfigManager: privacyConfigurationManager, store: configurationStore)
     }
 
@@ -230,7 +231,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         featureFlagger: featureFlagger,
         settings: tunnelSettings,
         defaults: userDefaults,
-        accessTokenStorage: accessTokenStorage)
+        subscriptionManager: subscriptionManager)
 
     /// An IPC server that provides access to the tunnel controller.
     ///
@@ -424,10 +425,18 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private lazy var entitlementMonitor = NetworkProtectionEntitlementMonitor()
 
     private func setUpSubscriptionMonitoring() {
-        guard accountManager.isUserAuthenticated else { return }
+        guard subscriptionManager.isUserAuthenticated else { return }
 
-        let entitlementsCheck = {
-            await self.accountManager.hasEntitlement(forProductName: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
+        let entitlementsCheck: (() async -> Result<Bool, Error>) = {
+            //await self.accountManager.hasEntitlement(forProductName: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
+            do {
+                let tokenContainer = try await self.subscriptionManager.getTokenContainer(policy: .localForceRefresh)
+                let entitlements = tokenContainer.decodedAccessToken.subscriptionEntitlements
+                return .success(entitlements.contains(.networkProtection))
+            } catch {
+                Logger.networkProtection.error("Failed to get token: \(error)")
+                return .failure(error)
+            }
         }
 
         Task {
@@ -455,10 +464,10 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
 }
 
-extension DuckDuckGoVPNAppDelegate: AccountManagerKeychainAccessDelegate {
-
-    public func accountManagerKeychainAccessFailed(accessType: AccountKeychainAccessType, error: AccountKeychainAccessError) {
-        PixelKit.fire(PrivacyProErrorPixel.privacyProKeychainAccessError(accessType: accessType, accessError: error),
-                      frequency: .legacyDailyAndCount)
-    }
-}
+//extension DuckDuckGoVPNAppDelegate: AccountManagerKeychainAccessDelegate {
+//
+//    public func accountManagerKeychainAccessFailed(accessType: AccountKeychainAccessType, error: AccountKeychainAccessError) {
+//        PixelKit.fire(PrivacyProErrorPixel.privacyProKeychainAccessError(accessType: accessType, accessError: error),
+//                      frequency: .legacyDailyAndCount)
+//    }
+//}

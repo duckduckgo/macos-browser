@@ -70,7 +70,7 @@ final class RemoteMessagingConfigMatcherProvider: RemoteMessagingConfigMatcherPr
 
         let subscriptionManager = await Application.appDelegate.subscriptionManager
 
-        let isPrivacyProSubscriber = subscriptionManager.accountManager.isUserAuthenticated
+        let isPrivacyProSubscriber = subscriptionManager.isUserAuthenticated
         let isPrivacyProEligibleUser = subscriptionManager.canPurchase
 
         let activationDateStore = DefaultWaitlistActivationDateStore(source: .netP)
@@ -84,10 +84,8 @@ final class RemoteMessagingConfigMatcherProvider: RemoteMessagingConfigMatcherPr
         var privacyProPurchasePlatform: String?
         let surveyActionMapper: RemoteMessagingSurveyActionMapping
 
-        if let accessToken = subscriptionManager.accountManager.accessToken {
-            let subscriptionResult = await subscriptionManager.subscriptionEndpointService.getSubscription(accessToken: accessToken)
-
-            if case let .success(subscription) = subscriptionResult {
+        if isPrivacyProSubscriber {
+            if let subscription = try? await subscriptionManager.getSubscription(cachePolicy: .returnCacheDataElseLoad) {
                 privacyProDaysSinceSubscribed = Calendar.current.numberOfDaysBetween(subscription.startedAt, and: Date()) ?? -1
                 privacyProDaysUntilExpiry = Calendar.current.numberOfDaysBetween(Date(), and: subscription.expiresOrRenewsAt) ?? -1
                 privacyProPurchasePlatform = subscription.platform.rawValue
@@ -138,7 +136,7 @@ final class RemoteMessagingConfigMatcherProvider: RemoteMessagingConfigMatcherPr
         let deprecatedRemoteMessageStorage = DefaultSurveyRemoteMessagingStorage.surveys()
 
         let freemiumDBPUserStateManager = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp)
-        let isCurrentFreemiumDBPUser = !subscriptionManager.accountManager.isUserAuthenticated && freemiumDBPUserStateManager.didActivate
+        let isCurrentFreemiumDBPUser = !isPrivacyProSubscriber && freemiumDBPUserStateManager.didActivate
 
         return RemoteMessagingConfigMatcher(
             appAttributeMatcher: AppAttributeMatcher(statisticsStore: statisticsStore,

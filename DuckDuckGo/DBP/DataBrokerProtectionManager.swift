@@ -33,10 +33,8 @@ public final class DataBrokerProtectionManager {
 
     private lazy var freemiumDBPFirstProfileSavedNotifier: FreemiumDBPFirstProfileSavedNotifier = {
         let freemiumDBPUserStateManager = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp)
-        let accountManager = Application.appDelegate.subscriptionManager.accountManager
-        let freemiumDBPFirstProfileSavedNotifier = FreemiumDBPFirstProfileSavedNotifier(freemiumDBPUserStateManager: freemiumDBPUserStateManager,
-                                                                                        accountManager: accountManager)
-        return freemiumDBPFirstProfileSavedNotifier
+        return FreemiumDBPFirstProfileSavedNotifier(freemiumDBPUserStateManager: freemiumDBPUserStateManager,
+                                                    subscriptionManager: Application.appDelegate.subscriptionManager)
     }()
 
     lazy var dataManager: DataBrokerProtectionDataManager = {

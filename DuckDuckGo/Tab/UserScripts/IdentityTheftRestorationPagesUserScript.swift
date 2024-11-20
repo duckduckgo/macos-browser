@@ -23,6 +23,7 @@ import Foundation
 import WebKit
 import Subscription
 import UserScript
+import os.log
 
 ///
 /// The user script that will be the broker for all subscription features

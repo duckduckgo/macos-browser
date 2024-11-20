@@ -29,7 +29,7 @@ import Subscription
 protocol VPNFeatureGatekeeper {
     var isInstalled: Bool { get }
 
-    func canStartVPN() async throws -> Bool
+    func canStartVPN() -> Bool
     func isVPNVisible() -> Bool
     func shouldUninstallAutomatically() -> Bool
     func disableIfUserHasNoAccess() async
@@ -64,17 +64,11 @@ struct DefaultVPNFeatureGatekeeper: VPNFeatureGatekeeper {
     /// For beta users this means they have an auth token.
     /// For subscription users this means they have entitlements.
     ///
-    func canStartVPN() async throws -> Bool {
+    func canStartVPN() -> Bool {
         guard subscriptionFeatureAvailability.isFeatureAvailable else {
             return false
         }
-
-        switch await subscriptionManager.accountManager.hasEntitlement(forProductName: .networkProtection) {
-        case .success(let hasEntitlement):
-            return hasEntitlement
-        case .failure(let error):
-            throw error
-        }
+        return subscriptionManager.isEntitlementActive(.networkProtection)
     }
 
     /// Whether the user can see the VPN entry points in the UI.
@@ -86,7 +80,7 @@ struct DefaultVPNFeatureGatekeeper: VPNFeatureGatekeeper {
         guard subscriptionFeatureAvailability.isFeatureAvailable else {
             return false
         }
-        return subscriptionManager.accountManager.isUserAuthenticated
+        return subscriptionManager.isUserAuthenticated
     }
 
     /// We've had to add this method because accessing the singleton in app delegate is crashing the integration tests.
@@ -98,7 +92,9 @@ struct DefaultVPNFeatureGatekeeper: VPNFeatureGatekeeper {
     /// Returns whether the VPN should be uninstalled automatically.
     /// This is only true when the user is not an Easter Egg user, the waitlist test has ended, and the user is onboarded.
     func shouldUninstallAutomatically() -> Bool {
-        return subscriptionFeatureAvailability.isFeatureAvailable && !subscriptionManager.accountManager.isUserAuthenticated && LoginItem.vpnMenu.status.isInstalled
+        return subscriptionFeatureAvailability.isFeatureAvailable
+        && !subscriptionManager.isUserAuthenticated
+        && LoginItem.vpnMenu.status.isInstalled
     }
 
     /// Whether the user is fully onboarded

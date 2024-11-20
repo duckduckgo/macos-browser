@@ -68,7 +68,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
     // MARK: - Subscriptions
 
-    private let accessTokenStorage: SubscriptionTokenKeychainStorage
+    private let subscriptionManager: any SubscriptionManager
 
     // MARK: - Debug Options Support
 
@@ -158,7 +158,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
          settings: VPNSettings,
          defaults: UserDefaults,
          notificationCenter: NotificationCenter = .default,
-         accessTokenStorage: SubscriptionTokenKeychainStorage) {
+         subscriptionManager: any SubscriptionManager) {
 
         self.featureFlagger = featureFlagger
         self.networkExtensionBundleID = networkExtensionBundleID
@@ -166,7 +166,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         self.notificationCenter = notificationCenter
         self.settings = settings
         self.defaults = defaults
-        self.accessTokenStorage = accessTokenStorage
+        self.subscriptionManager = subscriptionManager
 
         subscribeToSettingsChanges()
         subscribeToStatusChanges()
@@ -608,9 +608,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         var options = [String: NSObject]()
 
         options[NetworkProtectionOptionKey.activationAttemptId] = UUID().uuidString as NSString
-        guard let authToken = try fetchAuthToken() else {
-            throw StartError.noAuthToken
-        }
+        let authToken = try await fetchAuthToken()
         options[NetworkProtectionOptionKey.authToken] = authToken
         options[NetworkProtectionOptionKey.selectedEnvironment] = settings.selectedEnvironment.rawValue as NSString
         options[NetworkProtectionOptionKey.selectedServer] = settings.selectedServer.stringValue as? NSString
@@ -793,17 +791,14 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         }
     }
 
-    private func fetchAuthToken() throws -> NSString? {
-        if let accessToken = try? accessTokenStorage.getAccessToken() {
+    private func fetchAuthToken() async throws -> NSString {
+        do {
+            let tokenContainer = try await subscriptionManager.getTokenContainer(policy: .localValid)
             Logger.networkProtection.log("🟢 TunnelController found token")
-            return Self.adaptAccessTokenForVPN(accessToken) as NSString?
-        } else {
+            return "ddg:\(tokenContainer.accessToken)" as NSString
+        } catch {
             Logger.networkProtection.error("TunnelController found no token")
-            return nil
+            throw StartError.noAuthToken
         }
-    }
-
-    private static func adaptAccessTokenForVPN(_ token: String) -> String {
-        "ddg:\(token)"
     }
 }

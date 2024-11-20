@@ -132,7 +132,6 @@ extension DefaultSubscriptionManager {
             }
         }
 
-        let accessTokenStorage = SubscriptionTokenKeychainStorage(keychainType: .dataProtection(.named(subscriptionAppGroup)))
         let subscriptionEndpointService = DefaultSubscriptionEndpointService(apiService: apiService,
                                                                              baseURL: subscriptionEnvironment.serviceEnvironment.url)
 

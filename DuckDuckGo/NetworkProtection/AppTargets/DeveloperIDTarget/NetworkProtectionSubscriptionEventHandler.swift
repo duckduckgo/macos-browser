@@ -22,6 +22,7 @@ import Foundation
 import Subscription
 import NetworkProtection
 import NetworkProtectionUI
+import Networking
 
 final class NetworkProtectionSubscriptionEventHandler {
 
@@ -48,33 +49,19 @@ final class NetworkProtectionSubscriptionEventHandler {
 
     private func subscribeToEntitlementChanges() {
         Task {
-            switch await subscriptionManager.accountManager.hasEntitlement(forProductName: .networkProtection) {
-            case .success(let hasEntitlements):
-                Task {
-                    await handleEntitlementsChange(hasEntitlements: hasEntitlements)
-                }
-            case .failure:
-                break
-            }
+            await handleEntitlementsChange(hasEntitlements: subscriptionManager.isEntitlementActive(.networkProtection))
 
             NotificationCenter.default
                 .publisher(for: .entitlementsDidChange)
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] notification in
-                    guard let self else {
-                        return
-                    }
-
-                    guard let entitlements = notification.userInfo?[UserDefaultsCacheKey.subscriptionEntitlements] as? [Entitlement] else {
-
+                    guard let self else { return }
+                    guard let entitlements = notification.userInfo?[UserDefaultsCacheKey.subscriptionEntitlements] as? [SubscriptionEntitlement] else {
                         assertionFailure("Missing entitlements are truly unexpected")
                         return
                     }
 
-                    let hasEntitlements = entitlements.contains { entitlement in
-                        entitlement.product == .networkProtection
-                    }
-
+                    let hasEntitlements = entitlements.contains(.networkProtection)
                     Task {
                         await self.handleEntitlementsChange(hasEntitlements: hasEntitlements)
                     }
@@ -98,10 +85,6 @@ final class NetworkProtectionSubscriptionEventHandler {
     }
 
     @objc private func handleAccountDidSignIn() {
-        guard subscriptionManager.accountManager.accessToken != nil else {
-            assertionFailure("[NetP Subscription] AccountManager signed in but token could not be retrieved")
-            return
-        }
         userDefaults.networkProtectionEntitlementsExpired = false
     }
 
