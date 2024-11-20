@@ -40,6 +40,15 @@ final class NewTabPageFavoritesClient: NewTabPageScriptClient {
                 }
             }
             .store(in: &cancellables)
+
+        favoritesModel.$showAllFavorites.dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] showAllFavorites in
+                Task { @MainActor in
+                    self?.notifyConfigUpdated(showAllFavorites)
+                }
+            }
+            .store(in: &cancellables)
     }
 
     enum MessageName: String, CaseIterable {
@@ -92,6 +101,13 @@ final class NewTabPageFavoritesClient: NewTabPageScriptClient {
             NewTabPageFavoritesClient.Favorite($0, faviconManager: faviconManager, favoritesModel: favoritesModel)
         }
         pushMessage(named: MessageName.onDataUpdate.rawValue, params: NewTabPageFavoritesClient.FavoritesData(favorites: favorites))
+    }
+
+    @MainActor
+    private func notifyConfigUpdated(_ showAllFavorites: Bool) {
+        let expansion: NewTabPageUserScript.WidgetConfig.Expansion = favoritesModel.showAllFavorites ? .expanded : .collapsed
+        let config = NewTabPageUserScript.WidgetConfig(animation: .auto, expansion: expansion)
+        pushMessage(named: MessageName.onConfigUpdate.rawValue, params: config)
     }
 
     @MainActor
