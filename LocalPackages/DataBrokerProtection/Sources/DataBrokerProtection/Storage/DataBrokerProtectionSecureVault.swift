@@ -65,12 +65,15 @@ protocol DataBrokerProtectionSecureVault: SecureVault {
               createdDate: Date,
               lastRunDate: Date?,
               preferredRunDate: Date?,
+              attemptCount: Int64,
               submittedSuccessfullyDate: Date?,
               sevenDaysConfirmationPixelFired: Bool,
               fourteenDaysConfirmationPixelFired: Bool,
               twentyOneDaysConfirmationPixelFired: Bool) throws
     func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
+    func updateAttemptCount(_ count: Int64, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
+    func incrementAttemptCount(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func updateSubmittedSuccessfullyDate(_ date: Date?,
                                          forBrokerId brokerId: Int64,
                                          profileQueryId: Int64,
@@ -89,6 +92,7 @@ protocol DataBrokerProtectionSecureVault: SecureVault {
                                                    extractedProfileId: Int64) throws
     func fetchOptOut(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> OptOutJobData?
     func fetchOptOuts(brokerId: Int64, profileQueryId: Int64) throws -> [OptOutJobData]
+    func fetchOptOuts(brokerId: Int64) throws -> [OptOutJobData]
     func fetchAllOptOuts() throws -> [OptOutJobData]
 
     func save(historyEvent: HistoryEvent, brokerId: Int64, profileQueryId: Int64) throws
@@ -103,6 +107,7 @@ protocol DataBrokerProtectionSecureVault: SecureVault {
 
     func hasMatches() throws -> Bool
 
+    func fetchAllAttempts() throws -> [AttemptInformation]
     func fetchAttemptInformation(for extractedProfileId: Int64) throws -> AttemptInformation?
     func save(extractedProfileId: Int64, attemptUUID: UUID, dataBroker: String, lastStageDate: Date, startTime: Date) throws
 }
@@ -260,6 +265,7 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
               createdDate: Date,
               lastRunDate: Date?,
               preferredRunDate: Date?,
+              attemptCount: Int64,
               submittedSuccessfullyDate: Date?,
               sevenDaysConfirmationPixelFired: Bool,
               fourteenDaysConfirmationPixelFired: Bool,
@@ -273,6 +279,7 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
             createdDate: createdDate,
             lastRunDate: lastRunDate,
             preferredRunDate: preferredRunDate,
+            attemptCount: attemptCount,
             submittedSuccessfullyDate: submittedSuccessfullyDate,
             sevenDaysConfirmationPixelFired: sevenDaysConfirmationPixelFired,
             fourteenDaysConfirmationPixelFired: fourteenDaysConfirmationPixelFired,
@@ -286,6 +293,14 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
 
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
         try self.providers.database.updateLastRunDate(date, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
+    }
+
+    func updateAttemptCount(_ count: Int64, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+        try self.providers.database.updateAttemptCount(count, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
+    }
+
+    func incrementAttemptCount(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+        try self.providers.database.incrementAttemptCount(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
     }
 
     func updateSubmittedSuccessfullyDate(_ date: Date?,
@@ -342,6 +357,19 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
             let optOutEvents = try self.providers.database.fetchOptOutEvents(
                 brokerId: brokerId,
                 profileQueryId: profileQueryId,
+                extractedProfileId: $0.optOutDB.extractedProfileId
+            )
+            return try mapper.mapToModel($0.optOutDB, extractedProfileDB: $0.extractedProfileDB, events: optOutEvents)
+        }
+    }
+
+    func fetchOptOuts(brokerId: Int64) throws -> [OptOutJobData] {
+        let mapper = MapperToModel(mechanism: l2Decrypt(data:))
+
+        return try self.providers.database.fetchOptOuts(brokerId: brokerId).map {
+            let optOutEvents = try self.providers.database.fetchOptOutEvents(
+                brokerId: brokerId,
+                profileQueryId: $0.optOutDB.profileQueryId,
                 extractedProfileId: $0.optOutDB.extractedProfileId
             )
             return try mapper.mapToModel($0.optOutDB, extractedProfileDB: $0.extractedProfileDB, events: optOutEvents)
@@ -416,6 +444,11 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
 
     func hasMatches() throws -> Bool {
         try self.providers.database.hasMatches()
+    }
+
+    func fetchAllAttempts() throws -> [AttemptInformation] {
+        let mapper = MapperToModel(mechanism: l2Decrypt(data:))
+        return try self.providers.database.fetchAllAttempts().map(mapper.mapToModel(_:))
     }
 
     func fetchAttemptInformation(for extractedProfileId: Int64) throws -> AttemptInformation? {

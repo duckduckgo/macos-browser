@@ -56,12 +56,15 @@ protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
               createdDate: Date,
               lastRunDate: Date?,
               preferredRunDate: Date?,
+              attemptCount: Int64,
               submittedSuccessfullyDate: Date?,
               sevenDaysConfirmationPixelFired: Bool,
               fourteenDaysConfirmationPixelFired: Bool,
               twentyOneDaysConfirmationPixelFired: Bool) throws
     func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
+    func updateAttemptCount(_ count: Int64, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
+    func incrementAttemptCount(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func updateSubmittedSuccessfullyDate(_ date: Date?,
                                          forBrokerId brokerId: Int64,
                                          profileQueryId: Int64,
@@ -80,6 +83,7 @@ protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
                                                    extractedProfileId: Int64) throws
     func fetchOptOut(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> (optOutDB: OptOutDB, extractedProfileDB: ExtractedProfileDB)?
     func fetchOptOuts(brokerId: Int64, profileQueryId: Int64) throws -> [(optOutDB: OptOutDB, extractedProfileDB: ExtractedProfileDB)]
+    func fetchOptOuts(brokerId: Int64) throws -> [(optOutDB: OptOutDB, extractedProfileDB: ExtractedProfileDB)]
     func fetchAllOptOuts() throws -> [(optOutDB: OptOutDB, extractedProfileDB: ExtractedProfileDB)]
 
     func save(_ scanEvent: ScanHistoryEventDB) throws
@@ -96,6 +100,7 @@ protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
 
     func hasMatches() throws -> Bool
 
+    func fetchAllAttempts() throws -> [OptOutAttemptDB]
     func fetchAttemptInformation(for extractedProfileId: Int64) throws -> OptOutAttemptDB?
     func save(_ optOutAttemptDB: OptOutAttemptDB) throws
  }
@@ -118,7 +123,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
     public static func create<T: MigrationsProvider>(file: URL = DefaultDataBrokerProtectionDatabaseProvider.defaultDatabaseURL(),
                                                      key: Data,
                                                      migrationProvider: T.Type = DefaultDataBrokerProtectionDatabaseMigrationsProvider.self) throws -> DefaultDataBrokerProtectionDatabaseProvider {
-            try DefaultDataBrokerProtectionDatabaseProvider(file: file, key: key, registerMigrationsHandler: migrationProvider.v4Migrations)
+        try DefaultDataBrokerProtectionDatabaseProvider(file: file, key: key, registerMigrationsHandler: migrationProvider.v5Migrations)
     }
 
     public init(file: URL = DefaultDataBrokerProtectionDatabaseProvider.defaultDatabaseURL(),
@@ -352,6 +357,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
               createdDate: Date,
               lastRunDate: Date?,
               preferredRunDate: Date?,
+              attemptCount: Int64,
               submittedSuccessfullyDate: Date?,
               sevenDaysConfirmationPixelFired: Bool,
               fourteenDaysConfirmationPixelFired: Bool,
@@ -366,6 +372,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
                 createdDate: createdDate,
                 lastRunDate: lastRunDate,
                 preferredRunDate: preferredRunDate,
+                attemptCount: attemptCount,
                 submittedSuccessfullyDate: submittedSuccessfullyDate,
                 sevenDaysConfirmationPixelFired: sevenDaysConfirmationPixelFired,
                 fourteenDaysConfirmationPixelFired: fourteenDaysConfirmationPixelFired,
@@ -402,6 +409,22 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
         try updateOptOutField({ $0.lastRunDate = $1 },
                               value: date,
+                              forBrokerId: brokerId,
+                              profileQueryId: profileQueryId,
+                              extractedProfileId: extractedProfileId)
+    }
+
+    func updateAttemptCount(_ count: Int64, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+        try updateOptOutField({ $0.attemptCount = $1 },
+                              value: count,
+                              forBrokerId: brokerId,
+                              profileQueryId: profileQueryId,
+                              extractedProfileId: extractedProfileId)
+    }
+
+    func incrementAttemptCount(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+        try updateOptOutField({ optOut, _ in optOut.attemptCount += 1 },
+                              value: -1,
                               forBrokerId: brokerId,
                               profileQueryId: profileQueryId,
                               extractedProfileId: extractedProfileId)
@@ -466,6 +489,23 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
             var optOutsWithExtractedProfiles = [(optOutDB: OptOutDB, extractedProfileDB: ExtractedProfileDB)]()
             let optOuts = try OptOutDB
                 .filter(Column(OptOutDB.Columns.brokerId.name) == brokerId && Column(OptOutDB.Columns.profileQueryId.name) == profileQueryId)
+                .fetchAll(db)
+
+            for optOut in optOuts {
+                if let extractedProfile = try optOut.extractedProfile.fetchOne(db) {
+                    optOutsWithExtractedProfiles.append((optOutDB: optOut, extractedProfileDB: extractedProfile))
+                }
+            }
+
+            return optOutsWithExtractedProfiles
+        }
+    }
+
+    func fetchOptOuts(brokerId: Int64) throws -> [(optOutDB: OptOutDB, extractedProfileDB: ExtractedProfileDB)] {
+        try db.read { db in
+            var optOutsWithExtractedProfiles = [(optOutDB: OptOutDB, extractedProfileDB: ExtractedProfileDB)]()
+            let optOuts = try OptOutDB
+                .filter(Column(OptOutDB.Columns.brokerId.name) == brokerId)
                 .fetchAll(db)
 
             for optOut in optOuts {
@@ -580,6 +620,12 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         }
     }
 
+    func fetchAllAttempts() throws -> [OptOutAttemptDB] {
+        try db.read { db in
+            return try OptOutAttemptDB.fetchAll(db)
+        }
+    }
+
     func fetchAttemptInformation(for extractedProfileId: Int64) throws -> OptOutAttemptDB? {
         try db.read { db in
             return try OptOutAttemptDB.fetchOne(db, key: extractedProfileId)
@@ -588,7 +634,14 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
 
     func save(_ optOutAttemptDB: OptOutAttemptDB) throws {
         try db.write { db in
-            try optOutAttemptDB.insert(db)
+            // We originally intended for ExtractedProfileDB to have a one-to-many relationship with OptOutAttemptDB,
+            // but it somehow ended up as a one-to-one relationship instead.
+            //
+            // This serves as a temporary workaround to keep the opt-out retry mechanism functioning.
+            // We'll need to address this issue properly in the future.
+            //
+            // https://app.asana.com/0/1205591970852438/1208761697124514/f
+            try optOutAttemptDB.upsert(db)
         }
     }
 }
