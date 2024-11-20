@@ -18,13 +18,15 @@
 
 import XCTest
 
-class AddressBarKeyboardShortcutsTests: XCTestCase {
+class AddressBarKeyboardShortcutsTests: UITestCase {
     private var app: XCUIApplication!
     private var urlStringForAddressBar: String!
     private var urlForAddressBar: URL!
 
     private var addressBarTextField: XCUIElement!
+
     override class func setUp() {
+        super.setUp()
         UITests.firstRun()
         UITests.setAutocompleteToggleBeforeTestcaseRuns(false) // We don't want changes in the address bar that we don't create
     }

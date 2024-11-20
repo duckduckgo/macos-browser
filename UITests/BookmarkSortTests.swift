@@ -18,7 +18,7 @@
 
 import XCTest
 
-class BookmarkSortTests: XCTestCase {
+class BookmarkSortTests: UITestCase {
     private var app: XCUIApplication!
 
     private enum AccessibilityIdentifiers {
@@ -29,6 +29,7 @@ class BookmarkSortTests: XCTestCase {
     }
 
     override class func setUp() {
+        super.setUp()
         UITests.firstRun()
     }
 

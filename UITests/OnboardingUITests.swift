@@ -18,7 +18,7 @@
 
 import XCTest
 
-final class OnboardingUITests: XCTestCase {
+final class OnboardingUITests: UITestCase {
 
     override func tearDownWithError() throws {
         try resetApplicationData()

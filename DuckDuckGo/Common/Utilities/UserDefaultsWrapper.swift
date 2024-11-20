@@ -235,7 +235,6 @@ public struct UserDefaultsWrapper<T> {
 
         case lastBrokenSiteToastShownDate = "brokenSitePrompt.last-broken-site-toast-shown-date"
         case toastDismissStreakCounter = "brokenSitePrompt.toast-dismiss-streak-counter"
-
     }
 
     enum RemovedKeys: String, CaseIterable {

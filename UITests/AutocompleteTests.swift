@@ -18,7 +18,7 @@
 
 import XCTest
 
-class AutocompleteTests: XCTestCase {
+class AutocompleteTests: UITestCase {
     private var app: XCUIApplication!
     private var addBookmarkButton: XCUIElement!
     private var resetBookMarksMenuItem: XCUIElement!
@@ -32,6 +32,7 @@ class AutocompleteTests: XCTestCase {
     private var siteTitleForHistorySite: String!
 
     override class func setUp() {
+        super.setUp()
         UITests.firstRun()
         UITests.setAutocompleteToggleBeforeTestcaseRuns(true) // These tests require autocomplete to be on
     }
