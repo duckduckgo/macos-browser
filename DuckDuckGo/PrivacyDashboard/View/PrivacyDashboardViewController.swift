@@ -250,7 +250,10 @@ extension PrivacyDashboardViewController: PrivacyDashboardControllerDelegate {
     }
 
     func privacyDashboardControllerDidRequestShowGeneralFeedback(_ privacyDashboardController: PrivacyDashboardController) {
-        // Not used in macOS
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+            FeedbackPresenter.presentFeedbackForm()
+        }
+        dismiss()
     }
 
     func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController,
