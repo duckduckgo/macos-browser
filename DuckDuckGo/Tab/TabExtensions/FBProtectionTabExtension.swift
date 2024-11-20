@@ -71,7 +71,7 @@ extension FBProtectionTabExtension {
         }
         guard self.fbBlockingEnabled != enable else { return false }
         guard let userContentController else {
-            assertionFailure("Missing UserContentController")
+//            assertionFailure("Missing UserContentController")
             return false
         }
         if enable {

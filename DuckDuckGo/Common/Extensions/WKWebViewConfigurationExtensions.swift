@@ -67,11 +67,12 @@ extension WKWebViewConfiguration {
             }
         }
 
-        let userContentController = UserContentController(assetsPublisher: contentBlocking.contentBlockingAssetsPublisher,
-                                                          privacyConfigurationManager: contentBlocking.privacyConfigurationManager,
-                                                          earlyAccessHandlers: earlyAccessHandlers)
+//TODO: Resolve conflict with user content controller
+//        let userContentController = UserContentController(assetsPublisher: contentBlocking.contentBlockingAssetsPublisher,
+//                                                          privacyConfigurationManager: contentBlocking.privacyConfigurationManager,
+//                                                          earlyAccessHandlers: earlyAccessHandlers)
 
-        self.userContentController = userContentController
+//        self.userContentController = userContentController
         self.processPool.geolocationProvider = GeolocationProvider(processPool: self.processPool)
 
         _=NSPopover.swizzleShowRelativeToRectOnce

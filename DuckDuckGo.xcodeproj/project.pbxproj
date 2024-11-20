@@ -5344,6 +5344,53 @@
 			path = FeatureFlagging;
 			sourceTree = "<group>";
 		};
+		1D2DB9A22CE26B7A00F73E96 /* WebExtensions */ = {
+			isa = PBXGroup;
+			children = (
+				1D2DB9CA2CE26B9D00F73E96 /* Headers */,
+				1DF78E0A2CE5F58400AB898E /* WebExtensionManager.swift */,
+				1DF78E0E2CE6197200AB898E /* WKWebExtensionTab.swift */,
+				1DF78E112CE61DB000AB898E /* WKWebExtensionWindow.swift */,
+			);
+			path = WebExtensions;
+			sourceTree = "<group>";
+		};
+		1D2DB9CA2CE26B9D00F73E96 /* Headers */ = {
+			isa = PBXGroup;
+			children = (
+				1D2DB9CF2CE3345A00F73E96 /* WebExtensions.h */,
+				1D2DB9A32CE26B8F00F73E96 /* _WKWebExtension.h */,
+				1D2DB9A42CE26B8F00F73E96 /* _WKWebExtensionAction.h */,
+				1D2DB9A62CE26B8F00F73E96 /* _WKWebExtensionActionPrivate.h */,
+				1D2DB9A72CE26B8F00F73E96 /* _WKWebExtensionCommand.h */,
+				1D2DB9A92CE26B8F00F73E96 /* _WKWebExtensionCommandPrivate.h */,
+				1D2DB9AA2CE26B8F00F73E96 /* _WKWebExtensionContext.h */,
+				1D2DB9AC2CE26B8F00F73E96 /* _WKWebExtensionContextPrivate.h */,
+				1D2DB9AD2CE26B8F00F73E96 /* _WKWebExtensionController.h */,
+				1D2DB9AE2CE26B8F00F73E96 /* _WKWebExtensionControllerConfiguration.h */,
+				1D2DB9B02CE26B8F00F73E96 /* _WKWebExtensionControllerConfigurationPrivate.h */,
+				1D2DB9B12CE26B8F00F73E96 /* _WKWebExtensionControllerDelegate.h */,
+				1D2DB9B22CE26B8F00F73E96 /* _WKWebExtensionControllerDelegatePrivate.h */,
+				1D2DB9B42CE26B8F00F73E96 /* _WKWebExtensionControllerPrivate.h */,
+				1D2DB9B52CE26B8F00F73E96 /* _WKWebExtensionDataRecord.h */,
+				1D2DB9B72CE26B8F00F73E96 /* _WKWebExtensionDataRecordPrivate.h */,
+				1D2DB9B82CE26B8F00F73E96 /* _WKWebExtensionDataType.h */,
+				1D2DB9BB2CE26B8F00F73E96 /* _WKWebExtensionMatchPattern.h */,
+				1D2DB9BD2CE26B8F00F73E96 /* _WKWebExtensionMatchPatternPrivate.h */,
+				1D2DB9BE2CE26B8F00F73E96 /* _WKWebExtensionMessagePort.h */,
+				1D2DB9C02CE26B8F00F73E96 /* _WKWebExtensionMessagePortPrivate.h */,
+				1D2DB9C12CE26B8F00F73E96 /* _WKWebExtensionPermission.h */,
+				1D2DB9C22CE26B8F00F73E96 /* _WKWebExtensionPermissionPrivate.h */,
+				1D2DB9C32CE26B8F00F73E96 /* _WKWebExtensionPrivate.h */,
+				1D2DB9C42CE26B8F00F73E96 /* _WKWebExtensionTab.h */,
+				1D2DB9C52CE26B8F00F73E96 /* _WKWebExtensionTabCreationOptions.h */,
+				1D2DB9C72CE26B8F00F73E96 /* _WKWebExtensionWindow.h */,
+				1D2DB9C82CE26B8F00F73E96 /* _WKWebExtensionWindowCreationOptions.h */,
+				1DF78E0D2CE5F76E00AB898E /* WKWebViewConfigurationPrivate.h */,
+			);
+			path = Headers;
+			sourceTree = "<group>";
+		};
 		1D36E651298A84F600AA485D /* InternalUserDecider */ = {
 			isa = PBXGroup;
 			children = (
@@ -5353,53 +5400,6 @@
 			path = InternalUserDecider;
 			sourceTree = "<group>";
 		};
-        1D2DB9A22CE26B7A00F73E96 /* WebExtensions */ = {
-            isa = PBXGroup;
-            children = (
-                1D2DB9CA2CE26B9D00F73E96 /* Headers */,
-                1DF78E0A2CE5F58400AB898E /* WebExtensionManager.swift */,
-                1DF78E0E2CE6197200AB898E /* WKWebExtensionTab.swift */,
-                1DF78E112CE61DB000AB898E /* WKWebExtensionWindow.swift */,
-            );
-            path = WebExtensions;
-            sourceTree = "<group>";
-        };
-        1D2DB9CA2CE26B9D00F73E96 /* Headers */ = {
-            isa = PBXGroup;
-            children = (
-                1D2DB9CF2CE3345A00F73E96 /* WebExtensions.h */,
-                1D2DB9A32CE26B8F00F73E96 /* _WKWebExtension.h */,
-                1D2DB9A42CE26B8F00F73E96 /* _WKWebExtensionAction.h */,
-                1D2DB9A62CE26B8F00F73E96 /* _WKWebExtensionActionPrivate.h */,
-                1D2DB9A72CE26B8F00F73E96 /* _WKWebExtensionCommand.h */,
-                1D2DB9A92CE26B8F00F73E96 /* _WKWebExtensionCommandPrivate.h */,
-                1D2DB9AA2CE26B8F00F73E96 /* _WKWebExtensionContext.h */,
-                1D2DB9AC2CE26B8F00F73E96 /* _WKWebExtensionContextPrivate.h */,
-                1D2DB9AD2CE26B8F00F73E96 /* _WKWebExtensionController.h */,
-                1D2DB9AE2CE26B8F00F73E96 /* _WKWebExtensionControllerConfiguration.h */,
-                1D2DB9B02CE26B8F00F73E96 /* _WKWebExtensionControllerConfigurationPrivate.h */,
-                1D2DB9B12CE26B8F00F73E96 /* _WKWebExtensionControllerDelegate.h */,
-                1D2DB9B22CE26B8F00F73E96 /* _WKWebExtensionControllerDelegatePrivate.h */,
-                1D2DB9B42CE26B8F00F73E96 /* _WKWebExtensionControllerPrivate.h */,
-                1D2DB9B52CE26B8F00F73E96 /* _WKWebExtensionDataRecord.h */,
-                1D2DB9B72CE26B8F00F73E96 /* _WKWebExtensionDataRecordPrivate.h */,
-                1D2DB9B82CE26B8F00F73E96 /* _WKWebExtensionDataType.h */,
-                1D2DB9BB2CE26B8F00F73E96 /* _WKWebExtensionMatchPattern.h */,
-                1D2DB9BD2CE26B8F00F73E96 /* _WKWebExtensionMatchPatternPrivate.h */,
-                1D2DB9BE2CE26B8F00F73E96 /* _WKWebExtensionMessagePort.h */,
-                1D2DB9C02CE26B8F00F73E96 /* _WKWebExtensionMessagePortPrivate.h */,
-                1D2DB9C12CE26B8F00F73E96 /* _WKWebExtensionPermission.h */,
-                1D2DB9C22CE26B8F00F73E96 /* _WKWebExtensionPermissionPrivate.h */,
-                1D2DB9C32CE26B8F00F73E96 /* _WKWebExtensionPrivate.h */,
-                1D2DB9C42CE26B8F00F73E96 /* _WKWebExtensionTab.h */,
-                1D2DB9C52CE26B8F00F73E96 /* _WKWebExtensionTabCreationOptions.h */,
-                1D2DB9C72CE26B8F00F73E96 /* _WKWebExtensionWindow.h */,
-                1D2DB9C82CE26B8F00F73E96 /* _WKWebExtensionWindowCreationOptions.h */,
-                1DF78E0D2CE5F76E00AB898E /* WKWebViewConfigurationPrivate.h */,
-            );
-            path = Headers;
-            sourceTree = "<group>";
-        };
 		1D3B1AB7293405F5006F4388 /* PasswordManagers */ = {
 			isa = PBXGroup;
 			children = (

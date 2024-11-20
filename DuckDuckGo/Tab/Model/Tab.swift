@@ -231,17 +231,15 @@ protocol NewWindowPolicyDecisionMaker {
         specialPagesUserScript?
             .withAllSubfeatures()
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
-        // This must be done before initializing WKWebView with the configuration
         if #available(macOS 14.4, *) {
             WebExtensionManager.shared.setUpWebExtensionController(for: configuration)
         }
         configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking,
                                                  burnerMode: burnerMode,
                                                  earlyAccessHandlers: specialPagesUserScript.map { [$0] } ?? [])
-
         self.webViewConfiguration = configuration
         let userContentController = configuration.userContentController as? UserContentController
-        assert(userContentController != nil)
+//        assert(userContentController != nil)
         self.userContentController = userContentController
         self.onboardingPixelReporter = onboardingPixelReporter
         self.pageRefreshMonitor = pageRefreshMonitor
