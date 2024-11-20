@@ -24,6 +24,9 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
 
     var isFavoriteVisible: Bool
     var isContinueSetUpVisible: Bool
+    var continueSetUpCardsLastDemonstrated: Date?
+    var continueSetUpCardsNumberOfDaysDemonstrated: Int
+    var continueSetUpCardsClosed: Bool
     var isRecentActivityVisible: Bool
     var isSearchBarVisible: Bool
     var showFullURL: Bool
@@ -41,6 +44,9 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
         currentThemeName: String = ThemeName.systemDefault.rawValue,
         favoritesDisplayMode: String? = FavoritesDisplayMode.displayNative(.desktop).description,
         isContinueSetUpVisible: Bool = true,
+        continueSetUpCardsLastDemonstrated: Date? = nil,
+        continueSetUpCardsNumberOfDaysDemonstrated: Int = 0,
+        continueSetUpCardsClosed: Bool = false,
         isFavoriteVisible: Bool = true,
         isRecentActivityVisible: Bool = true,
         isSearchBarVisible: Bool = true,
@@ -55,6 +61,9 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
         self.currentThemeName = currentThemeName
         self.favoritesDisplayMode = favoritesDisplayMode
         self.isContinueSetUpVisible = isContinueSetUpVisible
+        self.continueSetUpCardsLastDemonstrated = continueSetUpCardsLastDemonstrated
+        self.continueSetUpCardsNumberOfDaysDemonstrated = continueSetUpCardsNumberOfDaysDemonstrated
+        self.continueSetUpCardsClosed = continueSetUpCardsClosed
         self.isFavoriteVisible = isFavoriteVisible
         self.isRecentActivityVisible = isRecentActivityVisible
         self.isSearchBarVisible = isSearchBarVisible
@@ -194,4 +203,70 @@ final class AppearancePreferencesTests: XCTestCase {
         XCTAssertTrue(persister2.isContinueSetUpVisible)
         XCTAssertTrue(persister2.isSearchBarVisible)
     }
+
+    func testContinueSetUpIsNotDismissedAfterSeveralDemonstrationsWithinSeveralDays() {
+        // 1. app installed and launched
+        var now = Date()
+
+        // listen to AppearancePreferences.objectWillChange
+        let model = AppearancePreferences(persistor: AppearancePreferencesPersistorMock(), dateTimeProvider: { now })
+        let c = model.objectWillChange.sink {
+            XCTFail("Unexpected model.objectWillChange")
+        }
+        func incrementDate() {
+            now = Calendar.current.date(byAdding: .hour, value: 1, to: now)!
+        }
+
+        // check during N hours
+        // eObjectWillChange shouldn‘t be called until N days
+        for i in 0..<max(AppearancePreferences.Constants.dismissNextStepsCardsAfterDays, 48) {
+            XCTAssertTrue(model.isContinueSetUpVisible, "\(i)")
+            XCTAssertFalse(model.isContinueSetUpCardsViewOutdated, "\(i)")
+            incrementDate()
+        }
+
+        withExtendedLifetime(c) {}
+    }
+
+    func testContinueSetUpIsDismissedAfterNDays() {
+        // 1. app installed and launched
+        var now = Date()
+
+        // listen to AppearancePreferences.objectWillChange
+        let model = AppearancePreferences(persistor: AppearancePreferencesPersistorMock(), dateTimeProvider: { now })
+        var eObjectWillChange: XCTestExpectation!
+        let c = model.objectWillChange.sink {
+            eObjectWillChange.fulfill()
+        }
+        func incrementDate() {
+            now = Calendar.current.date(byAdding: .day, value: 5, to: now)!
+        }
+
+        // check during N days
+        // eObjectWillChange shouldn‘t be called until N days
+        for i in 0..<AppearancePreferences.Constants.dismissNextStepsCardsAfterDays {
+            XCTAssertTrue(model.isContinueSetUpVisible, "\(i)")
+            XCTAssertFalse(model.isContinueSetUpCardsViewOutdated, "\(i)")
+            model.continueSetUpCardsViewDidAppear()
+            incrementDate()
+        }
+        // N days passed
+        // eObjectWillChange should be called once
+        eObjectWillChange = expectation(description: "AppearancePreferences.objectWillChange called")
+        incrementDate()
+        model.continueSetUpCardsViewDidAppear()
+        XCTAssertFalse(model.isContinueSetUpVisible, "dismissNextStepsCardsAfterDays")
+        waitForExpectations(timeout: 1)
+
+        // shouldn‘t change after being set once
+        for i in (AppearancePreferences.Constants.dismissNextStepsCardsAfterDays + 1)..<(AppearancePreferences.Constants.dismissNextStepsCardsAfterDays + 20) {
+            XCTAssertFalse(model.isContinueSetUpVisible, "\(i)")
+            XCTAssertTrue(model.isContinueSetUpCardsViewOutdated, "\(i)")
+            incrementDate()
+            model.continueSetUpCardsViewDidAppear()
+        }
+
+        withExtendedLifetime(c) {}
+    }
+
 }

@@ -242,6 +242,7 @@ extension ContentScopeProperties {
         ContentScopeProperties(
             gpcEnabled: false,
             sessionKey: "sessionKey",
+            messageSecret: "messageSecret",
             featureToggles: ContentScopeFeatureToggles.mock
         )
     }
