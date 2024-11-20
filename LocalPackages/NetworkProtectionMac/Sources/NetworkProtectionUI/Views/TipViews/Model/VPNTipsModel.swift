@@ -87,7 +87,7 @@ public final class VPNTipsModel: ObservableObject {
         !isMenuApp && featureFlag
     }
 
-    // MARK - Subscriptions
+    // MARK: - Subscriptions
 
     @available(macOS 14.0, *)
     private func subscribeToFeatureFlagChanges(_ publisher: CurrentValuePublisher<Bool, Never>) {

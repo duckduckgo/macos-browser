@@ -145,17 +145,17 @@ public final class StatusBarMenu: NSObject {
                 activeSitePublisher: activeSitePublisher.eraseToAnyPublisher(),
                 uiActionHandler: uiActionHandler)
 
-            // TODO: replace with access to actual feature flag
+            // We don't use tips in the status menu app.
             let tipsFeatureFlagPublisher = CurrentValuePublisher<Bool, Never>(
-                initialValue: true,
-                publisher: Just(true).eraseToAnyPublisher())
+                initialValue: false,
+                publisher: Just(false).eraseToAnyPublisher())
 
             let tipsModel = VPNTipsModel(featureFlagPublisher: tipsFeatureFlagPublisher,
                                          statusObserver: statusReporter.statusObserver,
                                          activeSitePublisher: activeSitePublisher,
                                          forMenuApp: true,
                                          vpnSettings: VPNSettings(defaults: userDefaults),
-                                         logger: Logger.init(subsystem: "DuckDuckGo", category: "TipKit"))
+                                         logger: Logger(subsystem: "DuckDuckGo", category: "TipKit"))
 
             let debugInformationViewModel = DebugInformationViewModel(showDebugInformation: isOptionKeyPressed)
 
