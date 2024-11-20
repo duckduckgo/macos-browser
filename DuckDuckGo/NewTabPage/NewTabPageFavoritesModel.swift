@@ -166,8 +166,9 @@ final class NewTabPageFavoritesModel: NSObject {
     }
 
     @MainActor
-    func open(_ bookmark: Bookmark) {
-        actionsHandler.open(bookmark, target: .current)
+    func openFavorite(withID bookmarkID: String) {
+        guard let favorite = favorites.first(where: { $0.id == bookmarkID}) else { return }
+        actionsHandler.open(favorite, target: .current)
     }
 
     @MainActor

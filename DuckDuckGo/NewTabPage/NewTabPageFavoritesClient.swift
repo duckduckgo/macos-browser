@@ -18,6 +18,7 @@
 
 import Bookmarks
 import Common
+import Combine
 import UserScript
 
 final class NewTabPageFavoritesClient: NewTabPageScriptClient {
@@ -25,10 +26,20 @@ final class NewTabPageFavoritesClient: NewTabPageScriptClient {
     let faviconManager: FaviconManagement
     let favoritesModel: NewTabPageFavoritesModel
     weak var userScriptsSource: NewTabPageUserScriptsSource?
+    private var cancellables: Set<AnyCancellable> = []
 
     init(favoritesModel: NewTabPageFavoritesModel, faviconManager: FaviconManagement = FaviconManager.shared) {
         self.favoritesModel = favoritesModel
         self.faviconManager = faviconManager
+
+        favoritesModel.$favorites.dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] favorites in
+                Task { @MainActor in
+                    self?.notifyDataUpdated(favorites)
+                }
+            }
+            .store(in: &cancellables)
     }
 
     enum MessageName: String, CaseIterable {
@@ -65,15 +76,19 @@ final class NewTabPageFavoritesClient: NewTabPageScriptClient {
     }
 
     @MainActor
+    private func notifyDataUpdated(_ favorites: [Bookmark]) {
+        let favorites = favoritesModel.favorites.map {
+            NewTabPageFavoritesClient.Favorite($0, faviconManager: faviconManager, favoritesModel: favoritesModel)
+        }
+        pushMessage(named: MessageName.onDataUpdate.rawValue, params: favorites)
+    }
+
+    @MainActor
     func open(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let openAction: NewTabPageFavoritesClient.FavoritesOpenAction = DecodableHelper.decode(from: params) else {
             return nil
         }
-        guard let favorite = favoritesModel.favorites.first(where: { $0.id == openAction.id }) else {
-            return nil
-        }
-        favoritesModel.open(favorite)
-
+        favoritesModel.openFavorite(withID: openAction.id)
         return nil
     }
 
