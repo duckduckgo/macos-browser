@@ -59,13 +59,23 @@ final class NewTabPageFavoritesClient: NewTabPageScriptClient {
             MessageName.getData.rawValue: { [weak self] in try await self?.getData(params: $0, original: $1) },
             MessageName.move.rawValue: { [weak self] in try await self?.move(params: $0, original: $1) },
             MessageName.open.rawValue: { [weak self] in try await self?.open(params: $0, original: $1) },
-            MessageName.openContextMenu.rawValue: { [weak self] in try await self?.openContextMenu(params: $0, original: $1) }
+            MessageName.openContextMenu.rawValue: { [weak self] in try await self?.openContextMenu(params: $0, original: $1) },
+            MessageName.setConfig.rawValue: { [weak self] in try await self?.setConfig(params: $0, original: $1) }
         ])
     }
 
     func getConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        // implementation TBD
-        NewTabPageUserScript.WidgetConfig(animation: .auto, expansion: .collapsed)
+        let expansion: NewTabPageUserScript.WidgetConfig.Expansion = favoritesModel.showAllFavorites ? .expanded : .collapsed
+        return NewTabPageUserScript.WidgetConfig(animation: .auto, expansion: expansion)
+    }
+
+    @MainActor
+    func setConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        guard let action: NewTabPageUserScript.WidgetConfig = DecodableHelper.decode(from: params) else {
+            return nil
+        }
+        favoritesModel.showAllFavorites = action.expansion == .expanded
+        return nil
     }
 
     @MainActor
@@ -121,6 +131,14 @@ extension NewTabPageFavoritesClient {
     struct FavoritesMoveAction: Codable {
         let id: String
         let targetIndex: Int
+    }
+
+    struct FavoritesConfig: Codable {
+        let expansion: Expansion
+
+        enum Expansion: String, Codable {
+            case expanded, collapsed
+        }
     }
 
     struct FavoritesData: Encodable {
