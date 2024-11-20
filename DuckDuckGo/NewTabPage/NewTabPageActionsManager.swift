@@ -139,7 +139,11 @@ extension NewTabPageActionsManager {
         self.init(scriptClients: [
             NewTabPageConfigurationClient(appearancePreferences: appearancePreferences),
             NewTabPageRMFClient(remoteMessageProvider: activeRemoteMessageModel, openURLHandler: openURLHandler),
-            NewTabPageFavoritesClient(favoritesModel: favoritesModel),
+            NewTabPageFavoritesClient(favoritesModel: favoritesModel, openFavorite: { bookmark in
+                Task { @MainActor in
+                    WindowControllersManager.shared.open(bookmark: bookmark)
+                }
+            }),
             NewTabPagePrivacyStatsClient()
         ])
     }

@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+import Bookmarks
+import Common
 import UserScript
 
 final class NewTabPageFavoritesClient: NewTabPageScriptClient {
@@ -23,16 +25,19 @@ final class NewTabPageFavoritesClient: NewTabPageScriptClient {
     let bookmarkManager: BookmarkManager
     let faviconManager: FaviconManagement
     let favoritesModel: HomePage.Models.FavoritesModel
+    let openFavorite: (Bookmark) -> Void
     weak var userScriptsSource: NewTabPageUserScriptsSource?
 
     init(
         favoritesModel: HomePage.Models.FavoritesModel,
         bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
-        faviconManager: FaviconManagement = FaviconManager.shared
+        faviconManager: FaviconManagement = FaviconManager.shared,
+        openFavorite: @escaping (Bookmark) -> Void
     ) {
         self.favoritesModel = favoritesModel
         self.bookmarkManager = bookmarkManager
         self.faviconManager = faviconManager
+        self.openFavorite = openFavorite
     }
 
     enum MessageName: String, CaseIterable {
@@ -50,6 +55,7 @@ final class NewTabPageFavoritesClient: NewTabPageScriptClient {
         userScript.registerMessageHandlers([
             MessageName.getConfig.rawValue: { [weak self] in try await self?.getConfig(params: $0, original: $1) },
             MessageName.getData.rawValue: { [weak self] in try await self?.getData(params: $0, original: $1) },
+            MessageName.open.rawValue: { [weak self] in try await self?.open(params: $0, original: $1) }
         ])
     }
 
@@ -66,9 +72,26 @@ final class NewTabPageFavoritesClient: NewTabPageScriptClient {
         }
         return NewTabPageUserScript.FavoritesData(favorites: favorites)
     }
+
+    @MainActor
+    func open(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        guard let openAction: NewTabPageUserScript.FavoritesOpenAction = DecodableHelper.decode(from: params) else {
+            return nil
+        }
+        guard let favorite = favoritesModel.favorites.first(where: { $0.id == openAction.id }) else {
+            return nil
+        }
+        openFavorite(favorite)
+
+        return nil
+    }
 }
 
 extension NewTabPageUserScript {
+
+    struct FavoritesOpenAction: Codable {
+        let id: String
+    }
 
     struct FavoritesData: Encodable {
         let favorites: [Favorite]
