@@ -27,7 +27,7 @@ protocol FavoritesActionsHandling {
 
     func removeFavorite(_ bookmark: Bookmark)
     func deleteBookmark(_ bookmark: Bookmark)
-    func moveFavorite(_ bookmark: Bookmark, toIndex: Int)
+    func move(_ bookmarkID: String, toIndex: Int)
 }
 
 final class DefaultFavoritesActionsHandler: FavoritesActionsHandling {
@@ -105,8 +105,8 @@ final class DefaultFavoritesActionsHandler: FavoritesActionsHandling {
         BookmarksDialogViewFactory.makeEditBookmarkView(bookmark: bookmark).show(in: window)
     }
 
-    func moveFavorite(_ bookmark: Bookmark, toIndex index: Int) {
-        bookmarkManager.moveFavorites(with: [bookmark.id], toIndex: index) { _ in }
+    func move(_ bookmarkID: String, toIndex index: Int) {
+        bookmarkManager.moveFavorites(with: [bookmarkID], toIndex: index) { _ in }
     }
 
     @MainActor
@@ -169,6 +169,10 @@ final class NewTabPageFavoritesModel: NSObject {
     func openFavorite(withID bookmarkID: String) {
         guard let favorite = favorites.first(where: { $0.id == bookmarkID}) else { return }
         actionsHandler.open(favorite, target: .current)
+    }
+
+    func moveFavorite(withID bookmarkID: String, toIndex index: Int) {
+        actionsHandler.move(bookmarkID, toIndex: index)
     }
 
     @MainActor

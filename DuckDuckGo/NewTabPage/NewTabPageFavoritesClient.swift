@@ -57,6 +57,7 @@ final class NewTabPageFavoritesClient: NewTabPageScriptClient {
         userScript.registerMessageHandlers([
             MessageName.getConfig.rawValue: { [weak self] in try await self?.getConfig(params: $0, original: $1) },
             MessageName.getData.rawValue: { [weak self] in try await self?.getData(params: $0, original: $1) },
+            MessageName.move.rawValue: { [weak self] in try await self?.move(params: $0, original: $1) },
             MessageName.open.rawValue: { [weak self] in try await self?.open(params: $0, original: $1) },
             MessageName.openContextMenu.rawValue: { [weak self] in try await self?.openContextMenu(params: $0, original: $1) }
         ])
@@ -84,11 +85,20 @@ final class NewTabPageFavoritesClient: NewTabPageScriptClient {
     }
 
     @MainActor
-    func open(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let openAction: NewTabPageFavoritesClient.FavoritesOpenAction = DecodableHelper.decode(from: params) else {
+    func move(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        guard let action: NewTabPageFavoritesClient.FavoritesMoveAction = DecodableHelper.decode(from: params) else {
             return nil
         }
-        favoritesModel.openFavorite(withID: openAction.id)
+        favoritesModel.moveFavorite(withID: action.id, toIndex: action.targetIndex)
+        return nil
+    }
+
+    @MainActor
+    func open(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        guard let action: NewTabPageFavoritesClient.FavoritesOpenAction = DecodableHelper.decode(from: params) else {
+            return nil
+        }
+        favoritesModel.openFavorite(withID: action.id)
         return nil
     }
 
@@ -106,6 +116,11 @@ extension NewTabPageFavoritesClient {
 
     struct FavoritesOpenAction: Codable {
         let id: String
+    }
+
+    struct FavoritesMoveAction: Codable {
+        let id: String
+        let targetIndex: Int
     }
 
     struct FavoritesData: Encodable {
