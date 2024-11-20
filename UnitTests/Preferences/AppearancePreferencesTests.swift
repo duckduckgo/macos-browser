@@ -26,6 +26,7 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
     var isContinueSetUpVisible: Bool
     var continueSetUpCardsLastDemonstrated: Date?
     var continueSetUpCardsNumberOfDaysDemonstrated: Int
+    var continueSetUpCardsClosed: Bool
     var isRecentActivityVisible: Bool
     var isSearchBarVisible: Bool
     var showFullURL: Bool
@@ -45,6 +46,7 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
         isContinueSetUpVisible: Bool = true,
         continueSetUpCardsLastDemonstrated: Date? = nil,
         continueSetUpCardsNumberOfDaysDemonstrated: Int = 0,
+        continueSetUpCardsClosed: Bool = false,
         isFavoriteVisible: Bool = true,
         isRecentActivityVisible: Bool = true,
         isSearchBarVisible: Bool = true,
@@ -61,6 +63,7 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
         self.isContinueSetUpVisible = isContinueSetUpVisible
         self.continueSetUpCardsLastDemonstrated = continueSetUpCardsLastDemonstrated
         self.continueSetUpCardsNumberOfDaysDemonstrated = continueSetUpCardsNumberOfDaysDemonstrated
+        self.continueSetUpCardsClosed = continueSetUpCardsClosed
         self.isFavoriteVisible = isFavoriteVisible
         self.isRecentActivityVisible = isRecentActivityVisible
         self.isSearchBarVisible = isSearchBarVisible
