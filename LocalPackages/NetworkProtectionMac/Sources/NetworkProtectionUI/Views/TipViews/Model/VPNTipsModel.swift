@@ -129,6 +129,8 @@ public final class VPNTipsModel: ObservableObject {
     func autoconnectTipActionHandler(_ action: Tip.Action) {
         if action.id == VPNAutoconnectTip.ActionIdentifiers.enable.rawValue {
             vpnSettings.connectOnLogin = true
+
+            autoconnectTip.invalidate(reason: .actionPerformed)
         }
     }
 
@@ -183,11 +185,20 @@ public final class VPNTipsModel: ObservableObject {
 
     // MARK: - UI Events
 
-    func handleTunnelControllerShown() async {
-        if #available(macOS 14.0, *),
-           case .invalidated = VPNGeoswitchingTip().status {
+    @available(macOS 14.0, *)
+    func handleLocationsShown() {
+        geoswitchingTip.invalidate(reason: .actionPerformed)
+    }
 
-            await VPNDomainExclusionsTip.viewOpenedWhenVPNAlreadyConnectedEvent.donate()
+    @available(macOS 14.0, *)
+    func handleSiteExcluded() {
+        geoswitchingTip.invalidate(reason: .actionPerformed)
+    }
+
+    @available(macOS 14.0, *)
+    func handleTunnelControllerShown() {
+        if case .connected = connectionStatus {
+            VPNDomainExclusionsTip.statusViewOpenedWhenVPNIsOn = true
         }
     }
 }

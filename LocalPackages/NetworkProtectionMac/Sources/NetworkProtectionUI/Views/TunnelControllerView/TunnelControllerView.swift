@@ -34,7 +34,8 @@ public struct TunnelControllerView: View {
 
     /// The view model that this instance will use.
     ///
-    @ObservedObject var model: TunnelControllerViewModel
+    @ObservedObject
+    var model: TunnelControllerViewModel
 
     // MARK: - Initializers
 
@@ -57,7 +58,7 @@ public struct TunnelControllerView: View {
             if #available(macOS 14.0, *),
                tipsModel.canShowTips {
 
-                TipView(tipsModel.autoconnectTip)
+                TipView(tipsModel.autoconnectTip, action: tipsModel.autoconnectTipActionHandler)
                     .padding(.horizontal, 9)
                     .padding(.vertical, 6)
             }
@@ -84,8 +85,8 @@ public struct TunnelControllerView: View {
             }
         }
         .onAppear {
-            Task {
-                await tipsModel.handleTunnelControllerShown()
+            if #available(macOS 14.0, *) {
+                tipsModel.handleTunnelControllerShown()
             }
         }
     }
@@ -150,6 +151,10 @@ public struct TunnelControllerView: View {
                 .padding(EdgeInsets(top: 6, leading: 9, bottom: 6, trailing: 9))
 
             MenuItemCustomButton {
+                if #available(macOS 14.0, *) {
+                    tipsModel.handleLocationsShown()
+                }
+
                 model.showLocationSettings()
                 dismiss()
             } label: { isHovered in

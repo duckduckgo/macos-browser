@@ -55,7 +55,6 @@ extension VPNAutoconnectTip: Tip {
     var actions: [Action] {
         [Action(id: ActionIdentifiers.enable.rawValue) {
             Text("Enable")
-                .foregroundStyle(Color(.linkColor))
         }]
     }
 

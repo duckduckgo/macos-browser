@@ -27,6 +27,9 @@ public struct SiteTroubleshootingView: View {
     @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var model: Model
 
+    @EnvironmentObject
+    private var tipsModel: VPNTipsModel
+
     // MARK: - View Contents
 
     public var body: some View {
@@ -51,6 +54,10 @@ public struct SiteTroubleshootingView: View {
             Toggle(isOn: Binding(get: {
                 siteInfo.excluded
             }, set: { value in
+                if #available(macOS 14.0, *) {
+                    tipsModel.handleSiteExcluded()
+                }
+
                 model.setExclusion(value, forDomain: siteInfo.domain)
             })) {
                 HStack(spacing: 5) {

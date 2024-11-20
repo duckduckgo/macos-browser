@@ -31,14 +31,14 @@ extension VPNDomainExclusionsTip: Tip {
     @Parameter(.transient)
     static var hasActiveSite: Bool = false
 
-    static let geolocationTipDismissedEvent = Tips.Event(id: "com.duckduckgo.vpn.tip.domainExclusions.geolocationTipDismissedEvent")
+    /// This flag attempt to capture the user's intent to disable the VPN, which is the right time to show this tip.
+    ///
+    /// If the VPN is ON when the status view is opened, there's a reasonable expectation the user might want to disable the VPN.
+    ///
+    @Parameter
+    static var statusViewOpenedWhenVPNIsOn: Bool = false
 
-    /// The containing view was opened when the VPN was already connected.
-    ///
-    /// This condition may be indicative that the user is struggling, so they might want
-    /// to exclude a site.
-    ///
-    static let viewOpenedWhenVPNAlreadyConnectedEvent = Tips.Event(id: "com.duckduckgo.vpn.tip.domainExclusions.popoverOpenedWhileAlreadyConnected")
+    static let geolocationTipDismissedEvent = Tips.Event(id: "com.duckduckgo.vpn.tip.domainExclusions.geolocationTipDismissedEvent")
 
     var id: String {
         "com.duckduckgo.vpn.tip.domainExclusions"
@@ -63,10 +63,10 @@ extension VPNDomainExclusionsTip: Tip {
         #Rule(Self.$vpnEnabled) {
             $0
         }
-        #Rule(Self.geolocationTipDismissedEvent) {
-            $0.donations.count > 0
+        #Rule(Self.$statusViewOpenedWhenVPNIsOn) {
+            $0
         }
-        #Rule(Self.viewOpenedWhenVPNAlreadyConnectedEvent) {
+        #Rule(Self.geolocationTipDismissedEvent) {
             $0.donations.count > 0
         }
     }
