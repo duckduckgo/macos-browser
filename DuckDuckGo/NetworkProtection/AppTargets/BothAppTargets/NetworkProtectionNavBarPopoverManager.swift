@@ -30,6 +30,8 @@ import os.log
 import Subscription
 import SwiftUI
 import VPNAppLauncher
+import BrowserServicesKit
+import FeatureFlags
 
 protocol NetworkProtectionIPCClient {
     var ipcStatusObserver: ConnectionStatusObserver { get }
@@ -162,8 +164,23 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
                 _ = try? await self?.vpnUninstaller.uninstall(removeSystemExtension: true)
             })
 
-            // TODO: replace with access to actual feature flag
-            let tipsFeatureFlagPublisher = CurrentValuePublisher(initialValue: true, publisher: Just(true).eraseToAnyPublisher())
+            let featureFlagger = NSApp.delegateTyped.featureFlagger
+            let tipsFeatureFlagInitialValue = featureFlagger.isFeatureOn(.networkProtectionUserTips)
+            let tipsFeatureFlagPublisher: CurrentValuePublisher<Bool, Never>
+
+            if let overridesHandler = featureFlagger.localOverrides?.actionHandler as? FeatureFlagOverridesPublishingHandler<FeatureFlag> {
+
+                let featureFlagPublisher = overridesHandler.flagDidChangePublisher
+                    .filter { $0.0 == .networkProtectionUserTips }
+
+                tipsFeatureFlagPublisher = CurrentValuePublisher(
+                    initialValue: tipsFeatureFlagInitialValue,
+                    publisher: Just(tipsFeatureFlagInitialValue).eraseToAnyPublisher())
+            } else {
+                tipsFeatureFlagPublisher = CurrentValuePublisher(
+                    initialValue: tipsFeatureFlagInitialValue,
+                    publisher: Just(tipsFeatureFlagInitialValue).eraseToAnyPublisher())
+            }
 
             let tipsModel = VPNTipsModel(featureFlagPublisher: tipsFeatureFlagPublisher,
                                          statusObserver: statusReporter.statusObserver,
