@@ -172,7 +172,11 @@ final class NewTabPageFavoritesModel: NSObject {
     }
 
     func moveFavorite(withID bookmarkID: String, toIndex index: Int) {
-        actionsHandler.move(bookmarkID, toIndex: index)
+        guard let currentIndex = favorites.firstIndex(where: { $0.id == bookmarkID }) else {
+            return
+        }
+        let targetIndex = index > currentIndex ? index + 1 : index
+        actionsHandler.move(bookmarkID, toIndex: targetIndex)
     }
 
     @MainActor

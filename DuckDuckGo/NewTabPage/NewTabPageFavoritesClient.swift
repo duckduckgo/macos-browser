@@ -81,7 +81,7 @@ final class NewTabPageFavoritesClient: NewTabPageScriptClient {
         let favorites = favoritesModel.favorites.map {
             NewTabPageFavoritesClient.Favorite($0, faviconManager: faviconManager, favoritesModel: favoritesModel)
         }
-        pushMessage(named: MessageName.onDataUpdate.rawValue, params: favorites)
+        pushMessage(named: MessageName.onDataUpdate.rawValue, params: NewTabPageFavoritesClient.FavoritesData(favorites: favorites))
     }
 
     @MainActor
