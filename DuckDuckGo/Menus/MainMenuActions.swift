@@ -768,6 +768,27 @@ extension MainViewController {
         }
     }
 
+    @objc func debugResetContinueSetup(_ sender: Any?) {
+        AppearancePreferencesUserDefaultsPersistor().continueSetUpCardsLastDemonstrated = nil
+        AppearancePreferencesUserDefaultsPersistor().continueSetUpCardsNumberOfDaysDemonstrated = 0
+        AppearancePreferences.shared.isContinueSetUpCardsViewOutdated = false
+        AppearancePreferences.shared.continueSetUpCardsClosed = false
+        AppearancePreferences.shared.isContinueSetUpVisible = true
+        HomePage.Models.ContinueSetUpModel.Settings().clear()
+        NotificationCenter.default.post(name: NSApplication.didBecomeActiveNotification, object: NSApp)
+    }
+
+    @objc func debugShiftNewTabOpeningDate(_ sender: Any?) {
+        AppearancePreferencesUserDefaultsPersistor().continueSetUpCardsLastDemonstrated = (AppearancePreferencesUserDefaultsPersistor().continueSetUpCardsLastDemonstrated ?? Date()).addingTimeInterval(-.day)
+        AppearancePreferences.shared.continueSetUpCardsViewDidAppear()
+    }
+
+    @objc func debugShiftNewTabOpeningDateNtimes(_ sender: Any?) {
+        for _ in 0..<AppearancePreferences.Constants.dismissNextStepsCardsAfterDays {
+            debugShiftNewTabOpeningDate(sender)
+        }
+    }
+
     @objc func resetDefaultBrowserPrompt(_ sender: Any?) {
         UserDefaultsWrapper.clear(.defaultBrowserDismissed)
     }
