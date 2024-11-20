@@ -22,18 +22,6 @@ import Common
 import os.log
 import UserScript
 
-protocol NewTabPageContextMenuPresenting {
-    func showContextMenu(_ menu: NSMenu)
-}
-
-struct DefaultNewTabPageContextMenuPresenter: NewTabPageContextMenuPresenting {
-    func showContextMenu(_ menu: NSMenu) {
-        if !menu.items.isEmpty {
-            menu.popUp(positioning: nil, at: NSEvent.mouseLocation, in: nil)
-        }
-    }
-}
-
 final class NewTabPageConfigurationClient: NewTabPageScriptClient {
 
     weak var userScriptsSource: NewTabPageUserScriptsSource?

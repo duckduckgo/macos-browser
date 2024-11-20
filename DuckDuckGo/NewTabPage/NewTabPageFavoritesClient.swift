@@ -22,22 +22,13 @@ import UserScript
 
 final class NewTabPageFavoritesClient: NewTabPageScriptClient {
 
-    let bookmarkManager: BookmarkManager
     let faviconManager: FaviconManagement
-    let favoritesModel: HomePage.Models.FavoritesModel
-    let openFavorite: (Bookmark) -> Void
+    let favoritesModel: NewTabPageFavoritesModel
     weak var userScriptsSource: NewTabPageUserScriptsSource?
 
-    init(
-        favoritesModel: HomePage.Models.FavoritesModel,
-        bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
-        faviconManager: FaviconManagement = FaviconManager.shared,
-        openFavorite: @escaping (Bookmark) -> Void
-    ) {
+    init(favoritesModel: NewTabPageFavoritesModel, faviconManager: FaviconManagement = FaviconManager.shared) {
         self.favoritesModel = favoritesModel
-        self.bookmarkManager = bookmarkManager
         self.faviconManager = faviconManager
-        self.openFavorite = openFavorite
     }
 
     enum MessageName: String, CaseIterable {
@@ -55,7 +46,8 @@ final class NewTabPageFavoritesClient: NewTabPageScriptClient {
         userScript.registerMessageHandlers([
             MessageName.getConfig.rawValue: { [weak self] in try await self?.getConfig(params: $0, original: $1) },
             MessageName.getData.rawValue: { [weak self] in try await self?.getData(params: $0, original: $1) },
-            MessageName.open.rawValue: { [weak self] in try await self?.open(params: $0, original: $1) }
+            MessageName.open.rawValue: { [weak self] in try await self?.open(params: $0, original: $1) },
+            MessageName.openContextMenu.rawValue: { [weak self] in try await self?.openContextMenu(params: $0, original: $1) }
         ])
     }
 
@@ -66,28 +58,36 @@ final class NewTabPageFavoritesClient: NewTabPageScriptClient {
 
     @MainActor
     func getData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        favoritesModel.favorites = bookmarkManager.list?.favoriteBookmarks ?? []
         let favorites = favoritesModel.favorites.map {
-            NewTabPageUserScript.Favorite($0, faviconManager: faviconManager, favoritesModel: favoritesModel)
+            NewTabPageFavoritesClient.Favorite($0, faviconManager: faviconManager, favoritesModel: favoritesModel)
         }
-        return NewTabPageUserScript.FavoritesData(favorites: favorites)
+        return NewTabPageFavoritesClient.FavoritesData(favorites: favorites)
     }
 
     @MainActor
     func open(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let openAction: NewTabPageUserScript.FavoritesOpenAction = DecodableHelper.decode(from: params) else {
+        guard let openAction: NewTabPageFavoritesClient.FavoritesOpenAction = DecodableHelper.decode(from: params) else {
             return nil
         }
         guard let favorite = favoritesModel.favorites.first(where: { $0.id == openAction.id }) else {
             return nil
         }
-        openFavorite(favorite)
+        favoritesModel.open(favorite)
 
+        return nil
+    }
+
+    @MainActor
+    func openContextMenu(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        guard let openAction: NewTabPageFavoritesClient.FavoritesOpenAction = DecodableHelper.decode(from: params) else {
+            return nil
+        }
+        favoritesModel.showContextMenu(for: openAction.id)
         return nil
     }
 }
 
-extension NewTabPageUserScript {
+extension NewTabPageFavoritesClient {
 
     struct FavoritesOpenAction: Codable {
         let id: String
@@ -104,7 +104,7 @@ extension NewTabPageUserScript {
         let url: String
 
         @MainActor
-        init(_ bookmark: Bookmark, faviconManager: FaviconManagement, favoritesModel: HomePage.Models.FavoritesModel) {
+        init(_ bookmark: Bookmark, faviconManager: FaviconManagement, favoritesModel: NewTabPageFavoritesModel) {
             id = bookmark.id
             title = bookmark.title
             url = bookmark.url

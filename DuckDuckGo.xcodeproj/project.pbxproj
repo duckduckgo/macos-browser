@@ -1293,6 +1293,10 @@
 		37F44A5F298C17830025E7FE /* Navigation in Frameworks */ = {isa = PBXBuildFile; productRef = 37F44A5E298C17830025E7FE /* Navigation */; };
 		37F8ABD32CE3EE5B00CB0294 /* FeatureFlagOverridesMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F8ABD22CE3EE5B00CB0294 /* FeatureFlagOverridesMenu.swift */; };
 		37F8ABD42CE3EE5B00CB0294 /* FeatureFlagOverridesMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F8ABD22CE3EE5B00CB0294 /* FeatureFlagOverridesMenu.swift */; };
+		37F8E2332CEE3646002F0141 /* NewTabPageContextMenuPresenting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F8E2322CEE363D002F0141 /* NewTabPageContextMenuPresenting.swift */; };
+		37F8E2342CEE3646002F0141 /* NewTabPageContextMenuPresenting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F8E2322CEE363D002F0141 /* NewTabPageContextMenuPresenting.swift */; };
+		37F8E2362CEE3C01002F0141 /* NewTabPageFavoritesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F8E2352CEE3BF5002F0141 /* NewTabPageFavoritesModel.swift */; };
+		37F8E2372CEE3C01002F0141 /* NewTabPageFavoritesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F8E2352CEE3BF5002F0141 /* NewTabPageFavoritesModel.swift */; };
 		37FB430E2CDB84A500479A1E /* NewTabPageUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FB430D2CDB84A200479A1E /* NewTabPageUserScript.swift */; };
 		37FB430F2CDB84A500479A1E /* NewTabPageUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FB430D2CDB84A200479A1E /* NewTabPageUserScript.swift */; };
 		37FB43112CDB883B00479A1E /* NewTabPageActionsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FB43102CDB883700479A1E /* NewTabPageActionsManager.swift */; };
@@ -3751,6 +3755,8 @@
 		37F19A6628E1B43200740DC6 /* DuckPlayerPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckPlayerPreferences.swift; sourceTree = "<group>"; };
 		37F19A6928E2F2D000740DC6 /* DuckPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckPlayer.swift; sourceTree = "<group>"; };
 		37F8ABD22CE3EE5B00CB0294 /* FeatureFlagOverridesMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureFlagOverridesMenu.swift; sourceTree = "<group>"; };
+		37F8E2322CEE363D002F0141 /* NewTabPageContextMenuPresenting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageContextMenuPresenting.swift; sourceTree = "<group>"; };
+		37F8E2352CEE3BF5002F0141 /* NewTabPageFavoritesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageFavoritesModel.swift; sourceTree = "<group>"; };
 		37FB430D2CDB84A200479A1E /* NewTabPageUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageUserScript.swift; sourceTree = "<group>"; };
 		37FB43102CDB883700479A1E /* NewTabPageActionsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageActionsManager.swift; sourceTree = "<group>"; };
 		37FD78102A29EBD100B36DB1 /* SyncErrorHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncErrorHandler.swift; sourceTree = "<group>"; };
@@ -5782,8 +5788,10 @@
 		376788092CECCAD900F59D83 /* NewTabPage */ = {
 			isa = PBXGroup;
 			children = (
+				37F8E2322CEE363D002F0141 /* NewTabPageContextMenuPresenting.swift */,
 				3723A94E2CE73FDD00A0C59A /* NewTabPageRMFClient.swift */,
 				379B5AEE2CEA30EA00B9F5D7 /* NewTabPageFavoritesClient.swift */,
+				37F8E2352CEE3BF5002F0141 /* NewTabPageFavoritesModel.swift */,
 				379B5AF12CEA32FF00B9F5D7 /* NewTabPagePrivacyStatsClient.swift */,
 				379B5AEB2CEA26C600B9F5D7 /* NewTabPageConfigurationClient.swift */,
 				37FB43102CDB883700479A1E /* NewTabPageActionsManager.swift */,
@@ -11355,6 +11363,7 @@
 				3706FB00293F65D500E42796 /* PasswordManagementCreditCardModel.swift in Sources */,
 				3706FB01293F65D500E42796 /* NSEventExtension.swift in Sources */,
 				3706FB02293F65D500E42796 /* Onboarding.swift in Sources */,
+				37F8E2342CEE3646002F0141 /* NewTabPageContextMenuPresenting.swift in Sources */,
 				3706FEB8293F6EFB00E42796 /* ConnectBitwardenView.swift in Sources */,
 				1DFAB51E2A8982A600A0F7F6 /* SetExtension.swift in Sources */,
 				B60C6F8E29B200AB007BFAA8 /* SavePanelAccessoryView.swift in Sources */,
@@ -11381,6 +11390,7 @@
 				3706FB15293F65D500E42796 /* NSNotificationName+DataImport.swift in Sources */,
 				37F8ABD42CE3EE5B00CB0294 /* FeatureFlagOverridesMenu.swift in Sources */,
 				EE6666702B56EDE4001D898D /* VPNLocationsHostingViewController.swift in Sources */,
+				37F8E2372CEE3C01002F0141 /* NewTabPageFavoritesModel.swift in Sources */,
 				3706FB16293F65D500E42796 /* StoredPermission.swift in Sources */,
 				3706FB17293F65D500E42796 /* FirePopoverCollectionViewHeader.swift in Sources */,
 				85774B042A71CDD000DE0561 /* BlockMenuItem.swift in Sources */,
@@ -13420,6 +13430,7 @@
 				377D8D642C105B8B001F5F6B /* NSAccessibilityProtocolExtension.swift in Sources */,
 				31CF74572CDC177D004ACCE5 /* AIChatUserScript.swift in Sources */,
 				1DB9618329F67F6200CF5568 /* FaviconNullStore.swift in Sources */,
+				37F8E2332CEE3646002F0141 /* NewTabPageContextMenuPresenting.swift in Sources */,
 				8400DC4E2C6E2770006509D2 /* SteppedScrollView.swift in Sources */,
 				BB5789722B2CA70F0009DFE2 /* DataBrokerProtectionSubscriptionEventHandler.swift in Sources */,
 				B693954F26F04BEB0015B914 /* PaddedImageButton.swift in Sources */,
@@ -13467,6 +13478,7 @@
 				AAE7527A263B046100B973F8 /* History.xcdatamodeld in Sources */,
 				B64C853D26944B940048FEBE /* PermissionStore.swift in Sources */,
 				AA75A0AE26F3500C0086B667 /* PrivacyIconViewModel.swift in Sources */,
+				37F8E2362CEE3C01002F0141 /* NewTabPageFavoritesModel.swift in Sources */,
 				4BB99D0126FE191E001E4761 /* ChromiumBookmarksReader.swift in Sources */,
 				B6C0B23426E71BCD0031CB7F /* Downloads.xcdatamodeld in Sources */,
 				9FBD84732BB3E15D00220859 /* InstallationAttributionPixelHandler.swift in Sources */,

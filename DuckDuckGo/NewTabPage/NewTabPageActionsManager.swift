@@ -120,30 +120,10 @@ extension NewTabPageActionsManager {
         activeRemoteMessageModel: ActiveRemoteMessageModel,
         openURLHandler: @escaping (URL) -> Void
     ) {
-        let favoritesModel = HomePage.Models.FavoritesModel { bookmark, openTarget in
-            print("open favorite: \(bookmark), target: \(openTarget)")
-        } removeFavorite: { bookmark in
-            print("remove favorite: \(bookmark)")
-        } deleteBookmark: { delete in
-            print("delete bookmark: \(delete)")
-        } add: {
-            print("add favorite")
-        } edit: { bookmark in
-            print("edit bookmark \(bookmark)")
-        } moveFavorite: { bookmark, index in
-            print("move favorite \(bookmark) to \(index)")
-        } onFaviconMissing: {
-            print("favicon missing")
-        }
-
         self.init(scriptClients: [
             NewTabPageConfigurationClient(appearancePreferences: appearancePreferences),
             NewTabPageRMFClient(remoteMessageProvider: activeRemoteMessageModel, openURLHandler: openURLHandler),
-            NewTabPageFavoritesClient(favoritesModel: favoritesModel, openFavorite: { bookmark in
-                Task { @MainActor in
-                    WindowControllersManager.shared.open(bookmark: bookmark)
-                }
-            }),
+            NewTabPageFavoritesClient(favoritesModel: NewTabPageFavoritesModel()),
             NewTabPagePrivacyStatsClient()
         ])
     }
