@@ -1290,6 +1290,8 @@
 		37F19A6528E1B3FB00740DC6 /* PreferencesDuckPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F19A6428E1B3FB00740DC6 /* PreferencesDuckPlayerView.swift */; };
 		37F19A6728E1B43200740DC6 /* DuckPlayerPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F19A6628E1B43200740DC6 /* DuckPlayerPreferences.swift */; };
 		37F19A6A28E2F2D000740DC6 /* DuckPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F19A6928E2F2D000740DC6 /* DuckPlayer.swift */; };
+		37F1E32B2CEF2DA800130142 /* NewTabPageFavoritesActionsHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F1E32A2CEF2DA200130142 /* NewTabPageFavoritesActionsHandler.swift */; };
+		37F1E32C2CEF2DA800130142 /* NewTabPageFavoritesActionsHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F1E32A2CEF2DA200130142 /* NewTabPageFavoritesActionsHandler.swift */; };
 		37F44A5F298C17830025E7FE /* Navigation in Frameworks */ = {isa = PBXBuildFile; productRef = 37F44A5E298C17830025E7FE /* Navigation */; };
 		37F8ABD32CE3EE5B00CB0294 /* FeatureFlagOverridesMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F8ABD22CE3EE5B00CB0294 /* FeatureFlagOverridesMenu.swift */; };
 		37F8ABD42CE3EE5B00CB0294 /* FeatureFlagOverridesMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F8ABD22CE3EE5B00CB0294 /* FeatureFlagOverridesMenu.swift */; };
@@ -3754,6 +3756,7 @@
 		37F19A6428E1B3FB00740DC6 /* PreferencesDuckPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesDuckPlayerView.swift; sourceTree = "<group>"; };
 		37F19A6628E1B43200740DC6 /* DuckPlayerPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckPlayerPreferences.swift; sourceTree = "<group>"; };
 		37F19A6928E2F2D000740DC6 /* DuckPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckPlayer.swift; sourceTree = "<group>"; };
+		37F1E32A2CEF2DA200130142 /* NewTabPageFavoritesActionsHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageFavoritesActionsHandler.swift; sourceTree = "<group>"; };
 		37F8ABD22CE3EE5B00CB0294 /* FeatureFlagOverridesMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureFlagOverridesMenu.swift; sourceTree = "<group>"; };
 		37F8E2322CEE363D002F0141 /* NewTabPageContextMenuPresenting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageContextMenuPresenting.swift; sourceTree = "<group>"; };
 		37F8E2352CEE3BF5002F0141 /* NewTabPageFavoritesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageFavoritesModel.swift; sourceTree = "<group>"; };
@@ -5790,8 +5793,7 @@
 			children = (
 				37F8E2322CEE363D002F0141 /* NewTabPageContextMenuPresenting.swift */,
 				3723A94E2CE73FDD00A0C59A /* NewTabPageRMFClient.swift */,
-				379B5AEE2CEA30EA00B9F5D7 /* NewTabPageFavoritesClient.swift */,
-				37F8E2352CEE3BF5002F0141 /* NewTabPageFavoritesModel.swift */,
+				37F1E32D2CEF2DDD00130142 /* Favorites */,
 				379B5AF12CEA32FF00B9F5D7 /* NewTabPagePrivacyStatsClient.swift */,
 				379B5AEB2CEA26C600B9F5D7 /* NewTabPageConfigurationClient.swift */,
 				37FB43102CDB883700479A1E /* NewTabPageActionsManager.swift */,
@@ -6003,6 +6005,16 @@
 				37D23786287F5C2900BCE03B /* PinnedTabsViewModelTests.swift */,
 			);
 			path = PinnedTabs;
+			sourceTree = "<group>";
+		};
+		37F1E32D2CEF2DDD00130142 /* Favorites */ = {
+			isa = PBXGroup;
+			children = (
+				379B5AEE2CEA30EA00B9F5D7 /* NewTabPageFavoritesClient.swift */,
+				37F8E2352CEE3BF5002F0141 /* NewTabPageFavoritesModel.swift */,
+				37F1E32A2CEF2DA200130142 /* NewTabPageFavoritesActionsHandler.swift */,
+			);
+			path = Favorites;
 			sourceTree = "<group>";
 		};
 		4B02197B25E05FAC00ED7DEA /* Fireproofing */ = {
@@ -11555,6 +11567,7 @@
 				37CBCA9B2A8966E60050218F /* SyncSettingsAdapter.swift in Sources */,
 				370C230C2C76A3D600A80A3E /* BackgroundCategoryView.swift in Sources */,
 				370C230D2C76A3D600A80A3E /* BackgroundThumbnailView.swift in Sources */,
+				37F1E32B2CEF2DA800130142 /* NewTabPageFavoritesActionsHandler.swift in Sources */,
 				370C230E2C76A3D600A80A3E /* BackgroundPickerView.swift in Sources */,
 				370C230F2C76A3D600A80A3E /* SettingsGrid.swift in Sources */,
 				3707C72A294B5D2900682A9F /* URLExtension.swift in Sources */,
@@ -13579,6 +13592,7 @@
 				B693955726F04BEC0015B914 /* MouseOverButton.swift in Sources */,
 				AA61C0D02722159B00E6B681 /* FireInfoViewController.swift in Sources */,
 				C1C405872C7F80E50089DE8A /* PromotionView+FreemiumDBP.swift in Sources */,
+				37F1E32C2CEF2DA800130142 /* NewTabPageFavoritesActionsHandler.swift in Sources */,
 				9D9AE8692AA76CDC0026E7DC /* LoginItem+NetworkProtection.swift in Sources */,
 				9F9C49F92BC7BC970099738D /* BookmarkAllTabsDialogView.swift in Sources */,
 				B64C85422694590B0048FEBE /* PermissionButton.swift in Sources */,
