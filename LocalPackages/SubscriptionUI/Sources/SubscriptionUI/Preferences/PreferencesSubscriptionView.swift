@@ -175,53 +175,65 @@ public struct PreferencesSubscriptionView: View {
 
     @ViewBuilder
     private var featureRowsForNoSubscriptionView: some View {
-        SectionView(iconName: "VPN-Icon",
-                    title: UserText.vpnServiceTitle,
-                    description: UserText.vpnServiceDescription)
+        if model.shouldShowVPN {
+            SectionView(iconName: "VPN-Icon",
+                        title: UserText.vpnServiceTitle,
+                        description: UserText.vpnServiceDescription)
 
-        Divider()
-            .foregroundColor(Color.secondary)
+            Divider()
+                .foregroundColor(Color.secondary)
+        }
 
-        SectionView(iconName: "PIR-Icon",
-                    title: UserText.personalInformationRemovalServiceTitle,
-                    description: UserText.personalInformationRemovalServiceDescription)
+        if model.shouldShowDBP {
+            SectionView(iconName: "PIR-Icon",
+                        title: UserText.personalInformationRemovalServiceTitle,
+                        description: UserText.personalInformationRemovalServiceDescription)
 
-        Divider()
-            .foregroundColor(Color.secondary)
+            Divider()
+                .foregroundColor(Color.secondary)
+        }
 
-        SectionView(iconName: "ITR-Icon",
-                    title: UserText.identityTheftRestorationServiceTitle,
-                    description: UserText.identityTheftRestorationServiceDescription)
+        if model.shouldShowITR {
+            SectionView(iconName: "ITR-Icon",
+                        title: UserText.identityTheftRestorationServiceTitle,
+                        description: UserText.identityTheftRestorationServiceDescription)
+        }
     }
 
     @ViewBuilder
     private var featureRowsForActiveSubscription: some View {
-        SectionView(iconName: "VPN-Icon",
-                    title: UserText.vpnServiceTitle,
-                    description: UserText.vpnServiceDescription,
-                    buttonName: UserText.vpnServiceButtonTitle,
-                    buttonAction: { model.openVPN() },
-                    enabled: model.hasAccessToVPN)
+        if model.shouldShowVPN {
+            SectionView(iconName: "VPN-Icon",
+                        title: UserText.vpnServiceTitle,
+                        description: UserText.vpnServiceDescription,
+                        buttonName: UserText.vpnServiceButtonTitle,
+                        buttonAction: { model.openVPN() },
+                        enabled: model.hasAccessToVPN)
 
-        Divider()
-            .foregroundColor(Color.secondary)
+            Divider()
+                .foregroundColor(Color.secondary)
+        }
 
-        SectionView(iconName: "PIR-Icon",
-                    title: UserText.personalInformationRemovalServiceTitle,
-                    description: UserText.personalInformationRemovalServiceDescription,
-                    buttonName: UserText.personalInformationRemovalServiceButtonTitle,
-                    buttonAction: { model.openPersonalInformationRemoval() },
-                    enabled: model.hasAccessToDBP)
+        if model.shouldShowDBP {
+            SectionView(iconName: "PIR-Icon",
+                        title: UserText.personalInformationRemovalServiceTitle,
+                        description: UserText.personalInformationRemovalServiceDescription,
+                        buttonName: UserText.personalInformationRemovalServiceButtonTitle,
+                        buttonAction: { model.openPersonalInformationRemoval() },
+                        enabled: model.hasAccessToDBP)
 
-        Divider()
-            .foregroundColor(Color.secondary)
+            Divider()
+                .foregroundColor(Color.secondary)
+        }
 
-        SectionView(iconName: "ITR-Icon",
-                    title: UserText.identityTheftRestorationServiceTitle,
-                    description: UserText.identityTheftRestorationServiceDescription,
-                    buttonName: UserText.identityTheftRestorationServiceButtonTitle,
-                    buttonAction: { model.openIdentityTheftRestoration() },
-                    enabled: model.hasAccessToITR)
+        if model.shouldShowITR {
+            SectionView(iconName: "ITR-Icon",
+                        title: UserText.identityTheftRestorationServiceTitle,
+                        description: UserText.identityTheftRestorationServiceDescription,
+                        buttonName: UserText.identityTheftRestorationServiceButtonTitle,
+                        buttonAction: { model.openIdentityTheftRestoration() },
+                        enabled: model.hasAccessToITR)
+        }
     }
 
     @ViewBuilder

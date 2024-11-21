@@ -27,6 +27,10 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     @Published var subscriptionDetails: String?
     @Published var subscriptionStatus: Subscription.Status?
 
+    @Published var shouldShowVPN: Bool = false
+    @Published var shouldShowDBP: Bool = false
+    @Published var shouldShowITR: Bool = false
+
     @Published var hasAccessToVPN: Bool = false
     @Published var hasAccessToDBP: Bool = false
     @Published var hasAccessToITR: Bool = false
@@ -37,7 +41,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     private var subscriptionPlatform: Subscription.Platform?
 
     lazy var sheetModel = SubscriptionAccessViewModel(actionHandlers: sheetActionHandler,
-                                                      purchasePlatform: subscriptionManager.currentEnvironment.purchasePlatform)
+        purchasePlatform: subscriptionManager.currentEnvironment.purchasePlatform)
 
     private let subscriptionManager: SubscriptionManager
     private var accountManager: AccountManager {
@@ -106,6 +110,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         if accountManager.isUserAuthenticated {
             Task {
                 await self.updateSubscription(cachePolicy: .returnCacheDataElseLoad)
+                await self.updateAvailableSubscriptionFeatures()
                 await self.loadCachedEntitlements()
             }
 
@@ -323,6 +328,25 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     }
 
     @MainActor
+    private func updateAvailableSubscriptionFeatures() async {
+        let features = await currentSubscriptionFeatures()
+
+        shouldShowVPN = features.contains(.networkProtection)
+        shouldShowDBP = features.contains(.dataBrokerProtection)
+        shouldShowITR = features.contains(.identityTheftRestoration) || features.contains(.identityTheftRestorationGlobal)
+    }
+
+    private func currentSubscriptionFeatures() async -> [Entitlement.ProductName] {
+        switch (subscriptionManager.accountManager.isUserAuthenticated, subscriptionManager.currentEnvironment.purchasePlatform) {
+        case (true, _),
+             (false, .appStore):
+            return await subscriptionManager.currentSubscriptionFeatures()
+        case (false, .stripe):
+            return [.networkProtection, .dataBrokerProtection, .identityTheftRestoration]
+        }
+    }
+
+    @MainActor
     private func loadCachedEntitlements() async {
         switch await self.accountManager.hasEntitlement(forProductName: .networkProtection, cachePolicy: .returnCacheDataDontLoad) {
         case let .success(result):
@@ -348,7 +372,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         }
 
         var hasITRGlobal = false
-        switch await self.accountManager.hasEntitlement(forProductName: .identityTheftRestoration, cachePolicy: .returnCacheDataDontLoad) {
+        switch await self.accountManager.hasEntitlement(forProductName: .identityTheftRestorationGlobal, cachePolicy: .returnCacheDataDontLoad) {
         case let .success(result):
             hasITRGlobal = result
         case .failure:
