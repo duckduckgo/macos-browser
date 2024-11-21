@@ -141,7 +141,7 @@ public final class VPNTipsModel: ObservableObject {
         Task {
             for await status in tip.statusUpdates {
                 if case .invalidated = status {
-                    await VPNDomainExclusionsTip.geolocationTipDismissedEvent.donate()
+                    VPNDomainExclusionsTip.geolocationTipDismissed = true
                     await VPNAutoconnectTip.geolocationTipDismissedEvent.donate()
                 }
             }

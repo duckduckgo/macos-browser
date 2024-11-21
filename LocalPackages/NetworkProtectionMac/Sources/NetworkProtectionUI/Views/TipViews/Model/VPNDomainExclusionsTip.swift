@@ -38,7 +38,8 @@ extension VPNDomainExclusionsTip: Tip {
     @Parameter
     static var statusViewOpenedWhenVPNIsOn: Bool = false
 
-    static let geolocationTipDismissedEvent = Tips.Event(id: "com.duckduckgo.vpn.tip.domainExclusions.geolocationTipDismissedEvent")
+    @Parameter
+    static var geolocationTipDismissed: Bool = false
 
     var id: String {
         "com.duckduckgo.vpn.tip.domainExclusions"
@@ -66,8 +67,8 @@ extension VPNDomainExclusionsTip: Tip {
         #Rule(Self.$statusViewOpenedWhenVPNIsOn) {
             $0
         }
-        #Rule(Self.geolocationTipDismissedEvent) {
-            $0.donations.count > 0
+        #Rule(Self.$geolocationTipDismissed) {
+            $0
         }
     }
 }

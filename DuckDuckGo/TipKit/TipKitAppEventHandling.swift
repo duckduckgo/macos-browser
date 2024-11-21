@@ -47,22 +47,9 @@ struct TipKitAppEventHandler: TipKitAppEventHandling {
         }
 
         if #available(macOS 14.0, *) {
-            typealias DataStoreLocation = Tips.ConfigurationOption.DatastoreLocation
-
-            /// A this time TipKit does not seem to handle synchronization of state between multiple apps very well.
-            /// That said, we still use the app configuration group for the data store in hopes this will soon change.
-            /// As long as we don't use TipKit for the same views from multiple Apps we'll be fine, but we can test
-            /// whether it's still broken rather easily if we keep the state in a shared app group, and we avoid having
-            /// to migrate the store in the future.
-            let appConfigurationGroupIdentifier = Bundle.main.appGroup(bundle: .appConfiguration)
-
-            guard let dataStoreLocation = try? DataStoreLocation.groupContainer(identifier: appConfigurationGroupIdentifier) else {
-                fatalError()
-            }
-
             controller.configureTipKit([
                 .displayFrequency(.immediate),
-                .datastoreLocation(dataStoreLocation)
+                .datastoreLocation(.applicationDefault)
             ])
         } else {
             logger.log("TipKit initialization skipped: iOS 17.0 or later is required.")
