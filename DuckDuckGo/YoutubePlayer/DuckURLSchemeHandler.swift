@@ -129,26 +129,40 @@ private extension DuckURLSchemeHandler {
 // MARK: - Favicons
 
 private extension DuckURLSchemeHandler {
+    /**
+     * This handler supports special Duck favicon URLs and uses `FaviconManager`
+     * to return a favicon in response, based on the actual favicon URL that's
+     * encoded in the URL path.
+     *
+     * If favicon is not found, an `HTTP 404` response is returned.
+     */
     func handleFavicon(urlSchemeTask: WKURLSchemeTask) {
         guard let requestURL = urlSchemeTask.request.url else {
             assertionFailure("No URL for Favicon scheme handler")
             return
         }
 
+        /**
+         * Favicon URL has the format of `duck://favicon/<url_percent_encoded_favicon_url>`.
+         * Calling `requestURL.path` drops leading `duck://favicon` and automatically
+         * handles percent-encoding. We only need to drop the leading forward slash to get the favicon URL.
+         */
         guard let faviconURL = requestURL.path.dropping(prefix: "/").url else {
             assertionFailure("Favicon URL malformed \(requestURL.path.dropping(prefix: "/"))")
             return
         }
 
-        let (response, data) = response(for: requestURL, withFaviconURL: faviconURL)
+        guard let (response, data) = response(for: requestURL, withFaviconURL: faviconURL) else { return }
         urlSchemeTask.didReceive(response)
         urlSchemeTask.didReceive(data)
         urlSchemeTask.didFinish()
     }
 
-    func response(for requestURL: URL, withFaviconURL faviconURL: URL) -> (URLResponse, Data) {
+    func response(for requestURL: URL, withFaviconURL faviconURL: URL) -> (URLResponse, Data)? {
         guard let favicon = faviconManager.getCachedFavicon(for: faviconURL, sizeCategory: .medium), let imagePNGData = favicon.image?.pngData else {
-            let response = HTTPURLResponse(url: requestURL, statusCode: 404, httpVersion: "HTTP/1.1", headerFields: nil)!
+            guard let response = HTTPURLResponse(url: requestURL, statusCode: 404, httpVersion: "HTTP/1.1", headerFields: nil) else {
+                return nil
+            }
             return (response, Data())
         }
         let response = URLResponse(url: requestURL, mimeType: "image/png", expectedContentLength: imagePNGData.count, textEncodingName: nil)
