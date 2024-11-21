@@ -137,7 +137,8 @@ final class DownloadsViewController: NSViewController {
         separator.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(separator)
 
-        let swiftUIView = DownloadsErrorBannerView(errorType: NSApp.isSandboxed ? .openHelpURL : .openSystemSettings)
+        let swiftUIView = DownloadsErrorBannerView(dismiss: { self.dismiss() },
+                                                   errorType: NSApp.isSandboxed ? .openHelpURL : .openSystemSettings)
         let hostingView = NSHostingView(rootView: swiftUIView)
         hostingView.translatesAutoresizingMaskIntoConstraints = false
         hostingView.isHidden = true
@@ -149,6 +150,7 @@ final class DownloadsViewController: NSViewController {
 
     private func setupLayout(separator: NSBox, hostingView: NSHostingView<DownloadsErrorBannerView>) {
         tableViewHeightConstraint = scrollView.heightAnchor.constraint(equalToConstant: 440)
+        errorBannerTopAnchorConstraint = scrollView.topAnchor.constraint(equalTo: separator.bottomAnchor, constant: 12)
 
         hostingViewConstraints = [
             hostingView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12),
@@ -156,8 +158,6 @@ final class DownloadsViewController: NSViewController {
             hostingView.topAnchor.constraint(equalTo: separator.bottomAnchor, constant: 12),
             scrollView.topAnchor.constraint(equalTo: hostingView.bottomAnchor, constant: 12)
         ]
-
-        errorBannerTopAnchorConstraint = scrollView.topAnchor.constraint(equalTo: separator.bottomAnchor, constant: 12)
 
         NSLayoutConstraint.activate([
             titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12),
@@ -196,8 +196,8 @@ final class DownloadsViewController: NSViewController {
 
     private func hideErrorBanner() {
         errorBannerHostingView?.isHidden = true
-        NSLayoutConstraint.activate([errorBannerTopAnchorConstraint])
         NSLayoutConstraint.deactivate(hostingViewConstraints)
+        NSLayoutConstraint.activate([errorBannerTopAnchorConstraint])
         view.layoutSubtreeIfNeeded()
     }
 
@@ -554,6 +554,7 @@ enum DownloadsErrorViewType {
 }
 
 struct DownloadsErrorBannerView: View {
+    var dismiss: () -> Void
     let errorType: DownloadsErrorViewType
 
     var body: some View {
@@ -563,12 +564,14 @@ struct DownloadsErrorBannerView: View {
                 .font(.body)
             Button(errorType.title) {
                 errorType.onAction()
+                dismiss()
             }
         }
         .padding()
         .background(Color.gray.opacity(0.1))
         .cornerRadius(8)
         .frame(width: 420)
+        .frame(minHeight: 84.0)
     }
 }
 

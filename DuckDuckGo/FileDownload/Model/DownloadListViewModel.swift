@@ -72,7 +72,7 @@ final class DownloadListViewModel {
                 Publishers.MergeMany(items.map { $0.$state })
             }.map { state in
                 if case .failed(let error) = state {
-                    if error.isNSFileReadUnknownError && self.isSpecificMacOSVersion() {
+                    if error.isNSFileReadUnknownError && self.isAffectedMacOSVersion() {
                         return true
                     }
                 }
@@ -87,7 +87,9 @@ final class DownloadListViewModel {
             .store(in: &cancellables)
     }
 
-    private func isSpecificMacOSVersion() -> Bool {
+    /// macOS 15.0.1 and 14.7.1 have a bug that affects downloads. Apple fixed the issue on macOS 15.1
+    /// For more information: https://app.asana.com/0/1204006570077678/1208522448255790/f
+    private func isAffectedMacOSVersion() -> Bool {
         let currentVersion = AppVersion.shared.osVersion
         let targetVersions = ["15.0.1", "14.7.1"]
 
