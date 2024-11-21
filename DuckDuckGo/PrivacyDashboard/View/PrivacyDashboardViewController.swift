@@ -187,15 +187,6 @@ final class PrivacyDashboardViewController: NSViewController {
 extension PrivacyDashboardViewController: PrivacyDashboardControllerDelegate {
 
     func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController,
-                                    didSelectBreakageCategory category: String) {
-        // Not used in macOS
-    }
-
-    func privacyDashboardControllerDidRequestShowReportBrokenSite(_ privacyDashboardController: PrivacyDashboardController) {
-        // Not used in macOS: PixelKit.fire(GeneralPixel.privacyDashboardReportBrokenSite)
-    }
-
-    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController,
                                     didChangeProtectionSwitch protectionState: ProtectionState,
                                     didSendReport: Bool) {
         privacyDashboardProtectionSwitchChangeHandler(state: protectionState)
@@ -245,14 +236,10 @@ extension PrivacyDashboardViewController: PrivacyDashboardControllerDelegate {
         dismiss()
     }
 
-    func privacyDashboardControllerDidRequestShowAlertForMissingDescription(_ privacyDashboardController: PrivacyDashboardController) {
-        // Not used in macOS
-    }
-
     func privacyDashboardControllerDidRequestShowGeneralFeedback(_ privacyDashboardController: PrivacyDashboardController) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-            FeedbackPresenter.presentFeedbackForm()
-        }
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+//            FeedbackPresenter.presentFeedbackForm()
+//        }
         dismiss()
     }
 
