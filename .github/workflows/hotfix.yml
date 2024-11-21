@@ -52,6 +52,9 @@ jobs:
             github_handle:"${{ github.actor }}" \
             is_hotfix:"true"
 
+      - name: Reinstall fastlane
+        run: bundle install
+
       - name: Report success
         env:
           ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
