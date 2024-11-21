@@ -82,7 +82,6 @@ final class CapturingNewTabPageFavoritesActionsHandler: FavoritesActionsHandling
 
 final class NewTabPageFavoritesClientTests: XCTestCase {
     var client: NewTabPageFavoritesClient!
-    var faviconManager: FaviconManagerMock!
     var contextMenuPresenter: CapturingNewTabPageContextMenuPresenter!
     var actionsHandler: CapturingNewTabPageFavoritesActionsHandler!
     var favoritesModel: NewTabPageFavoritesModel!
@@ -92,7 +91,6 @@ final class NewTabPageFavoritesClientTests: XCTestCase {
     override func setUpWithError() throws {
         try super.setUpWithError()
         contextMenuPresenter = CapturingNewTabPageContextMenuPresenter()
-        faviconManager = FaviconManagerMock()
         actionsHandler = CapturingNewTabPageFavoritesActionsHandler()
         favoritesModel = NewTabPageFavoritesModel(
             actionsHandler: actionsHandler,
@@ -100,7 +98,7 @@ final class NewTabPageFavoritesClientTests: XCTestCase {
             settingsPersistor: UserDefaultsNewTabPageFavoritesSettingsPersistor(MockKeyValueStore())
         )
 
-        client = NewTabPageFavoritesClient(favoritesModel: favoritesModel, faviconManager: faviconManager)
+        client = NewTabPageFavoritesClient(favoritesModel: favoritesModel)
 
         userScript = NewTabPageUserScript()
         client.registerMessageHandlers(for: userScript)
