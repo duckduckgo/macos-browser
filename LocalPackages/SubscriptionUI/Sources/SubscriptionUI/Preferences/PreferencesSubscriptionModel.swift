@@ -131,6 +131,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         subscriptionChangeObserver = NotificationCenter.default.addObserver(forName: .subscriptionDidChange, object: nil, queue: .main) { _ in
             Task { [weak self] in
                 await self?.updateSubscription(cachePolicy: .returnCacheDataDontLoad)
+                await self?.updateAvailableSubscriptionFeatures()
             }
         }
     }
@@ -340,7 +341,6 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         }
     }
 
-
     private func currentStorefrontRegion() -> SubscriptionRegion {
         var region: SubscriptionRegion?
 
@@ -366,11 +366,10 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     }
 
     private func currentSubscriptionFeatures() async -> [Entitlement.ProductName] {
-        switch (subscriptionManager.accountManager.isUserAuthenticated, subscriptionManager.currentEnvironment.purchasePlatform) {
-        case (true, _),
-             (false, .appStore):
+        // TODO: Guard behind feature flag
+        if subscriptionManager.currentEnvironment.purchasePlatform == .appStore {
             return await subscriptionManager.currentSubscriptionFeatures()
-        case (false, .stripe):
+        } else {
             return [.networkProtection, .dataBrokerProtection, .identityTheftRestoration]
         }
     }

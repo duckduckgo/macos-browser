@@ -126,7 +126,12 @@ public struct PreferencesSubscriptionView: View {
                 .cornerRadius(4)
         } content: {
             TextMenuItemHeader(UserText.preferencesSubscriptionInactiveHeader)
-            TextMenuItemCaption(UserText.preferencesSubscriptionInactiveCaption)
+            switch model.subscriptionStorefrontRegion {
+            case .usa:
+                TextMenuItemCaption(UserText.preferencesSubscriptionInactiveUSCaption)
+            case .restOfWorld:
+                TextMenuItemCaption(UserText.preferencesSubscriptionInactiveROWCaption)
+            }
         } buttons: {
             Button(UserText.purchaseButton) { model.purchaseAction() }
                 .buttonStyle(DefaultActionButtonStyle(enabled: true))
@@ -299,7 +304,9 @@ public struct PreferencesSubscriptionView: View {
         PreferencePaneSection {
             TextMenuItemHeader(UserText.preferencesSubscriptionFooterTitle, bottomPadding: 0)
             HStack(alignment: .top, spacing: 6) {
-                TextMenuItemCaption(UserText.preferencesSubscriptionFooterCaption)
+                // TODO: we need to switch based on feature flag
+//                TextMenuItemCaption(UserText.preferencesSubscriptionFooterCaption)
+                TextMenuItemCaption(UserText.preferencesSubscriptionHelpFooterCaption)
                 Button(UserText.viewFaqsButton) { model.openFAQ() }
             }
         }
