@@ -215,7 +215,7 @@ final class DBPEndToEndTests: XCTestCase {
                                whenCondition: {
             let queries = try! database.fetchAllBrokerProfileQueryData()
             let optOutJobs = queries.flatMap { $0.optOutJobData }
-            return optOutJobs[0].lastRunDate != nil
+            return optOutJobs.first?.lastRunDate != nil
         })
         print("Stage 5.1 passed: We start running the opt out jobs")
 

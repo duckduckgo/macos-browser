@@ -77,7 +77,7 @@ extension HomePage.Views {
                     }
                 }
 
-                MoreOrLess(isExpanded: $model.shouldShowAllFeatures)
+                HomePage.Views.MoreOrLess(isExpanded: $model.shouldShowAllFeatures)
                     .padding(.top, -3)
                     .visibility(model.isMoreOrLessButtonNeeded ? .visible : .gone)
             }
@@ -86,8 +86,6 @@ extension HomePage.Views {
         struct FeatureCard: View {
 
             @EnvironmentObject var model: HomePage.Models.ContinueSetUpModel
-
-            @State var isHovering = false
 
             private let featureType: HomePage.Models.FeatureType
 
@@ -101,7 +99,7 @@ extension HomePage.Views {
                         .frame(width: 24, height: 24)
                 }
                 ZStack {
-                    CardTemplate(title: featureType.title, summary: featureType.summary, actionText: featureType.action, confirmationText: featureType.confirmation, icon: icon, width: model.itemWidth, height: model.itemHeight, action: { model.performAction(for: featureType) })
+                    HomePage.Views.ContinueSetUpView.CardTemplate(title: featureType.title, summary: featureType.summary, actionText: featureType.action, confirmationText: featureType.confirmation, icon: icon, width: model.itemWidth, height: model.itemHeight, action: { model.performAction(for: featureType) })
                         .contextMenu(ContextMenu(menuItems: {
                             Button(featureType.action, action: { model.performAction(for: featureType) })
                             Divider()
@@ -110,17 +108,13 @@ extension HomePage.Views {
                     HStack {
                         Spacer()
                         VStack {
-                            CloseButton(icon: .close, size: 16) {
+                            HomePage.Views.CloseButton(icon: .close, size: 16) {
                                 model.removeItem(for: featureType)
                             }
-                            .visibility(isHovering ? .visible : .gone)
                             Spacer()
                         }
                     }
                     .padding(6)
-                }
-                .onHover { isHovering in
-                    self.isHovering = isHovering
                 }
                 .onAppear {
                     if featureType == .dock {
@@ -290,6 +284,15 @@ extension HomePage.Views {
     }
 }
 
-#Preview {
+@available(macOS 14.0, *)
+#Preview(traits: .fixedLayout(width: 600, height: 700)) {
     HomePage.Views.ContinueSetUpView()
+        .environmentObject(HomePage.Models.SettingsModel())
+        .environmentObject(HomePage.Models.ContinueSetUpModel(
+            defaultBrowserProvider: SystemDefaultBrowserProvider(),
+            dockCustomizer: DockCustomizer(),
+            dataImportProvider: BookmarksAndPasswordsImportStatusProvider(),
+            tabCollectionViewModel: TabCollectionViewModel(),
+            duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor()
+        ))
 }

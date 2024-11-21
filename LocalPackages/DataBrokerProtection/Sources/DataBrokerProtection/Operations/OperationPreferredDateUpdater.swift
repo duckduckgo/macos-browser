@@ -128,7 +128,8 @@ struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
         var newOptOutPreferredDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: currentOptOutPreferredRunDate,
                                                                            historyEvents: brokerProfileQuery.events,
                                                                            extractedProfileID: extractedProfileId,
-                                                                           schedulingConfig: schedulingConfig)
+                                                                           schedulingConfig: schedulingConfig,
+                                                                           attemptCount: optOutJob?.attemptCount)
 
         if let newDate = newOptOutPreferredDate, origin == .scan {
             newOptOutPreferredDate = returnMostRecentDate(currentOptOutPreferredRunDate, newDate)

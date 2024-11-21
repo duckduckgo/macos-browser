@@ -43610,10 +43610,58 @@
       "comment" : "Popover asking for domain %@ to use location",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Website „%@“ möchte deinen aktuellen Standort verwenden."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "“%@“ website would like to use your current location."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El sitio web “%@” desea usar tu ubicación actual."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le site « %@ » souhaiterait utiliser votre position actuelle."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il sito web “%@“ vorrebbe utilizzare la tua posizione attuale."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De website \"%@\" wil graag je huidige locatie gebruiken."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Witryna „%@” chce korzystać z Twojej aktualnej lokalizacji."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O site \"%@\" gostaria de utilizar a tua localização atual."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сайт %@ запрашивает доступ к вашей текущей геопозиции."
           }
         }
       }

@@ -21,6 +21,7 @@ import Cocoa
 import Common
 import Configuration
 import Crashes
+import FeatureFlags
 import History
 import PixelKit
 import Subscription
@@ -767,6 +768,27 @@ extension MainViewController {
         }
     }
 
+    @objc func debugResetContinueSetup(_ sender: Any?) {
+        AppearancePreferencesUserDefaultsPersistor().continueSetUpCardsLastDemonstrated = nil
+        AppearancePreferencesUserDefaultsPersistor().continueSetUpCardsNumberOfDaysDemonstrated = 0
+        AppearancePreferences.shared.isContinueSetUpCardsViewOutdated = false
+        AppearancePreferences.shared.continueSetUpCardsClosed = false
+        AppearancePreferences.shared.isContinueSetUpVisible = true
+        HomePage.Models.ContinueSetUpModel.Settings().clear()
+        NotificationCenter.default.post(name: NSApplication.didBecomeActiveNotification, object: NSApp)
+    }
+
+    @objc func debugShiftNewTabOpeningDate(_ sender: Any?) {
+        AppearancePreferencesUserDefaultsPersistor().continueSetUpCardsLastDemonstrated = (AppearancePreferencesUserDefaultsPersistor().continueSetUpCardsLastDemonstrated ?? Date()).addingTimeInterval(-.day)
+        AppearancePreferences.shared.continueSetUpCardsViewDidAppear()
+    }
+
+    @objc func debugShiftNewTabOpeningDateNtimes(_ sender: Any?) {
+        for _ in 0..<AppearancePreferences.Constants.dismissNextStepsCardsAfterDays {
+            debugShiftNewTabOpeningDate(sender)
+        }
+    }
+
     @objc func resetDefaultBrowserPrompt(_ sender: Any?) {
         UserDefaultsWrapper.clear(.defaultBrowserDismissed)
     }
@@ -1018,7 +1040,9 @@ extension MainViewController {
     // MARK: - Developer Tools
 
     @objc func toggleDeveloperTools(_ sender: Any?) {
-        guard let webView = getActiveTabAndIndex()?.tab.webView else { return }
+        guard let webView = browserTabViewController.webView else {
+            return
+        }
 
         if webView.isInspectorShown == true {
             webView.closeDeveloperTools()
@@ -1028,15 +1052,15 @@ extension MainViewController {
     }
 
     @objc func openJavaScriptConsole(_ sender: Any?) {
-        getActiveTabAndIndex()?.tab.webView.openJavaScriptConsole()
+        browserTabViewController.webView?.openJavaScriptConsole()
     }
 
     @objc func showPageSource(_ sender: Any?) {
-        getActiveTabAndIndex()?.tab.webView.showPageSource()
+        browserTabViewController.webView?.showPageSource()
     }
 
     @objc func showPageResources(_ sender: Any?) {
-        getActiveTabAndIndex()?.tab.webView.showPageSource()
+        browserTabViewController.webView?.showPageSource()
     }
 }
 
@@ -1133,7 +1157,7 @@ extension MainViewController: NSMenuItemValidation {
         case #selector(MainViewController.openJavaScriptConsole(_:)),
              #selector(MainViewController.showPageSource(_:)),
              #selector(MainViewController.showPageResources(_:)):
-            return activeTabViewModel?.canReload == true
+            return activeTabViewModel?.canReload == true || (featureFlagger.isFeatureOn(.htmlNewTabPage) && activeTabViewModel?.tab.content == .newtab)
 
         case #selector(MainViewController.toggleDownloads(_:)):
             let isDownloadsPopoverShown = self.navigationBarViewController.isDownloadsPopoverShown

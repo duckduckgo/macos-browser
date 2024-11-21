@@ -1,7 +1,7 @@
 {
   "name": "PublicReports",
   "url": "publicreports.com",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "parent": "verecor.com",
   "addedDatetime": 1703052000000,
   "optOutUrl": "https://persontrust.com/ng/control/privacy",
@@ -69,6 +69,7 @@
   "schedulingConfig": {
     "retryError": 48,
     "confirmOptOutScan": 72,
-    "maintenanceScan": 240
+    "maintenanceScan": 120,
+    "maxAttempts": -1
   }
 }
