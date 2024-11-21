@@ -1,7 +1,7 @@
 {
   "name": "Quick People Trace",
   "url": "quickpeopletrace.com",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "parent": "peoplefinders.com",
   "addedDatetime": 1674540000000,
   "optOutUrl": "https://www.quickpeopletrace.com/contact-us/",
@@ -52,6 +52,7 @@
   "schedulingConfig": {
     "retryError": 48,
     "confirmOptOutScan": 72,
-    "maintenanceScan": 240
+    "maintenanceScan": 120,
+    "maxAttempts": -1
   }
 }
