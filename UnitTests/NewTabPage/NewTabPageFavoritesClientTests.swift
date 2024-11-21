@@ -85,7 +85,6 @@ final class NewTabPageFavoritesClientTests: XCTestCase {
     var faviconManager: FaviconManagerMock!
     var contextMenuPresenter: CapturingNewTabPageContextMenuPresenter!
     var actionsHandler: CapturingNewTabPageFavoritesActionsHandler!
-    var settingsPersistor: UserDefaultsNewTabPageFavoritesSettingsPersistor!
     var favoritesModel: NewTabPageFavoritesModel!
     var userScript: NewTabPageUserScript!
 
@@ -95,11 +94,10 @@ final class NewTabPageFavoritesClientTests: XCTestCase {
         contextMenuPresenter = CapturingNewTabPageContextMenuPresenter()
         faviconManager = FaviconManagerMock()
         actionsHandler = CapturingNewTabPageFavoritesActionsHandler()
-        settingsPersistor = UserDefaultsNewTabPageFavoritesSettingsPersistor(MockKeyValueStore())
         favoritesModel = NewTabPageFavoritesModel(
             actionsHandler: actionsHandler,
             contextMenuPresenter: contextMenuPresenter,
-            settingsPersistor: settingsPersistor
+            settingsPersistor: UserDefaultsNewTabPageFavoritesSettingsPersistor(MockKeyValueStore())
         )
 
         client = NewTabPageFavoritesClient(favoritesModel: favoritesModel, faviconManager: faviconManager)

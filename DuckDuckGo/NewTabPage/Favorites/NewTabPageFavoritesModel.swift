@@ -64,8 +64,16 @@ final class NewTabPageFavoritesModel: NSObject {
         isViewExpanded = settingsPersistor.isViewExpanded
     }
 
-    convenience init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
-        self.init(actionsHandler: DefaultFavoritesActionsHandler(bookmarkManager: bookmarkManager))
+    convenience init(
+        bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
+        contextMenuPresenter: NewTabPageContextMenuPresenting = DefaultNewTabPageContextMenuPresenter(),
+        settingsPersistor: NewTabPageFavoritesSettingsPersistor = UserDefaultsNewTabPageFavoritesSettingsPersistor()
+    ) {
+        self.init(
+            actionsHandler: DefaultFavoritesActionsHandler(bookmarkManager: bookmarkManager),
+            contextMenuPresenter: contextMenuPresenter,
+            settingsPersistor: settingsPersistor
+        )
 
         bookmarkManager.listPublisher
             .receive(on: DispatchQueue.main)
@@ -77,7 +85,7 @@ final class NewTabPageFavoritesModel: NSObject {
 
     @Published var isViewExpanded: Bool {
         didSet {
-            settingsPersistor.isViewExpanded = isViewExpanded
+            settingsPersistor.isViewExpanded = self.isViewExpanded
         }
     }
 

@@ -1197,6 +1197,8 @@
 		3783F92329432E1800BCA897 /* WebViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3783F92229432E1800BCA897 /* WebViewTests.swift */; };
 		37878E552CA3330300CC9EB5 /* HomePageAddressBarModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37878E542CA332F800CC9EB5 /* HomePageAddressBarModel.swift */; };
 		37878E562CA3330300CC9EB5 /* HomePageAddressBarModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37878E542CA332F800CC9EB5 /* HomePageAddressBarModel.swift */; };
+		378D62572CEF80200056BBD8 /* NewTabPageFavoritesModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378D62562CEF801A0056BBD8 /* NewTabPageFavoritesModelTests.swift */; };
+		378D62582CEF80200056BBD8 /* NewTabPageFavoritesModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378D62562CEF801A0056BBD8 /* NewTabPageFavoritesModelTests.swift */; };
 		378F44E429B4BDE900899924 /* SwiftUIExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 378F44E329B4BDE900899924 /* SwiftUIExtensions */; };
 		378F44E629B4BDEE00899924 /* SwiftUIExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 378F44E529B4BDEE00899924 /* SwiftUIExtensions */; };
 		378F44EB29B4C73E00899924 /* ViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378F44EA29B4C73E00899924 /* ViewExtension.swift */; };
@@ -3688,6 +3690,7 @@
 		378B588D295CF447002C0CC0 /* UnitTests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = UnitTests.xcconfig; sourceTree = "<group>"; };
 		378B58C8295CF9A7002C0CC0 /* IntegrationTests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = IntegrationTests.xcconfig; sourceTree = "<group>"; };
 		378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGo.xcconfig; sourceTree = "<group>"; };
+		378D62562CEF801A0056BBD8 /* NewTabPageFavoritesModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageFavoritesModelTests.swift; sourceTree = "<group>"; };
 		378E2799296F6FDE00FCADA2 /* ManualAppStoreRelease.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ManualAppStoreRelease.xcconfig; sourceTree = "<group>"; };
 		378E279D2970217400FCADA2 /* BuildToolPlugins */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = BuildToolPlugins; sourceTree = "<group>"; };
 		378F44E229B4B7B600899924 /* SwiftUIExtensions */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = SwiftUIExtensions; sourceTree = "<group>"; };
@@ -5815,6 +5818,7 @@
 				3767880B2CECCB6C00F59D83 /* NewTabPageActionsManagerTests.swift */,
 				376788112CECF03000F59D83 /* NewTabPageRMFClientTests.swift */,
 				37F1E32E2CEF4A2C00130142 /* NewTabPageFavoritesClientTests.swift */,
+				378D62562CEF801A0056BBD8 /* NewTabPageFavoritesModelTests.swift */,
 				376788142CED308000F59D83 /* NewTabPageConfigurationClientTests.swift */,
 			);
 			path = NewTabPage;
@@ -12289,6 +12293,7 @@
 				37DB56F02C3B31CD0093D4DC /* MockRemoteMessagingAvailabilityProvider.swift in Sources */,
 				567A23E22C89B1EE0010F66C /* BrowserTabViewControllerOnboardingTests.swift in Sources */,
 				1D8C2FEB2B70F5A7005E4BBD /* MockWebViewSnapshotRenderer.swift in Sources */,
+				378D62572CEF80200056BBD8 /* NewTabPageFavoritesModelTests.swift in Sources */,
 				3767880F2CECD5A800F59D83 /* NewTabPageUserScriptTests.swift in Sources */,
 				56A0540E2C1C375E007D8FAB /* MockWindow.swift in Sources */,
 				3706FE2A293F661700E42796 /* SafariVersionReaderTests.swift in Sources */,
@@ -13832,6 +13837,7 @@
 				4BF6961D28BE911100D402D4 /* RecentlyVisitedSiteModelTests.swift in Sources */,
 				9FA5A0A92BC900FC00153786 /* BookmarkAllTabsDialogViewModelTests.swift in Sources */,
 				B6619F062B17138D00CD9186 /* DataImportSourceViewModelTests.swift in Sources */,
+				378D62582CEF80200056BBD8 /* NewTabPageFavoritesModelTests.swift in Sources */,
 				4BBF0917282DD6EF00EE1418 /* TemporaryFileHandlerTests.swift in Sources */,
 				EE66F10C2C3431030071856E /* WebsiteAccount_isDuplicateTests.swift in Sources */,
 				B6A5A27925B93FFF00AA7ADA /* StateRestorationManagerTests.swift in Sources */,
