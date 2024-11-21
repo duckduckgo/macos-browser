@@ -171,8 +171,7 @@ extension AutoconsentUserScript {
         case MessageName.eval:
             handleEval(message: message, replyHandler: replyHandler)
         case MessageName.popupFound:
-            Logger.autoconsent.debug("Autoconsent popup found")
-            replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
+            handlePopupFound(message: message, replyHandler: replyHandler)
         case MessageName.optOutResult:
             handleOptOutResult(message: message, replyHandler: replyHandler)
         case MessageName.optInResult:
@@ -292,6 +291,37 @@ extension AutoconsentUserScript {
     }
 
     @MainActor
+    func handlePopupFound(message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
+        guard let messageData: PopupFoundMessage = decodeMessageBody(from: message.body) else {
+            replyHandler(nil, "cannot decode message")
+            return
+        }
+        Logger.autoconsent.debug("Cookie popup found: \(String(describing: messageData))")
+        guard let url = URL(string: messageData.url),
+              let host = url.host else {
+            replyHandler(nil, "cannot decode message")
+            return
+        }
+
+        if messageData.cmp == "filterList" {
+            refreshDashboardState(consentManaged: true, cosmetic: true, optoutFailed: false, selftestFailed: nil)
+            // trigger animation, but do not cache it because it can still be overridden
+            if !management.sitesNotifiedCache.contains(host) {
+                Logger.autoconsent.debug("bragging that we hid a popup")
+                // post popover notification on main thread
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: Self.newSitePopupHiddenNotification, object: self, userInfo: [
+                        "topUrl": self.topUrl ?? url,
+                        "isCosmetic": true
+                    ])
+                }
+            }
+        }
+
+        replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
+    }
+
+    @MainActor
     func handleOptOutResult(message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
         guard let messageData: OptOutResultMessage = decodeMessageBody(from: message.body) else {
             replyHandler(nil, "cannot decode message")
@@ -329,14 +359,16 @@ extension AutoconsentUserScript {
 
         // trigger popup once per domain
         if !management.sitesNotifiedCache.contains(host) {
-            Logger.autoconsent.debug("bragging that we closed a popup")
             management.sitesNotifiedCache.insert(host)
-            // post popover notification on main thread
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(name: Self.newSitePopupHiddenNotification, object: self, userInfo: [
-                    "topUrl": self.topUrl ?? url,
-                    "isCosmetic": messageData.isCosmetic
-                ])
+            if messageData.cmp != "filterList" { // filterlist animation should have been triggered already (see handlePopupFound)
+                Logger.autoconsent.debug("bragging that we closed a popup")
+                // post popover notification on main thread
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: Self.newSitePopupHiddenNotification, object: self, userInfo: [
+                        "topUrl": self.topUrl ?? url,
+                        "isCosmetic": messageData.isCosmetic
+                    ])
+                }
             }
         }
 
