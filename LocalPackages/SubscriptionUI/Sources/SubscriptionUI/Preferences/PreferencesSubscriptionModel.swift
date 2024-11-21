@@ -27,6 +27,8 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     @Published var subscriptionDetails: String?
     @Published var subscriptionStatus: Subscription.Status?
 
+    @Published var subscriptionStorefrontRegion: SubscriptionRegion = .usa
+
     @Published var shouldShowVPN: Bool = false
     @Published var shouldShowDBP: Bool = false
     @Published var shouldShowITR: Bool = false
@@ -104,6 +106,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         self.openURLHandler = openURLHandler
         self.userEventHandler = userEventHandler
         self.sheetActionHandler = sheetActionHandler
+        self.subscriptionStorefrontRegion = currentStorefrontRegion()
 
         self.isUserAuthenticated = accountManager.isUserAuthenticated
 
@@ -143,6 +146,16 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
         if let subscriptionChangeObserver {
             NotificationCenter.default.removeObserver(subscriptionChangeObserver)
+        }
+    }
+
+    @MainActor
+    func didAppear() {
+        if isUserAuthenticated {
+            userEventHandler(.activeSubscriptionSettingsClick)
+            fetchAndUpdateSubscriptionDetails()
+        } else {
+            self.subscriptionStorefrontRegion = currentStorefrontRegion()
         }
     }
 
@@ -312,7 +325,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     }
 
     @MainActor
-    func fetchAndUpdateSubscriptionDetails() {
+    private func fetchAndUpdateSubscriptionDetails() {
         self.isUserAuthenticated = accountManager.isUserAuthenticated
 
         guard fetchSubscriptionDetailsTask == nil else { return }
@@ -325,6 +338,22 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             await self?.fetchEmailAndRemoteEntitlements()
             await self?.updateSubscription(cachePolicy: .reloadIgnoringLocalCacheData)
         }
+    }
+
+
+    private func currentStorefrontRegion() -> SubscriptionRegion {
+        var region: SubscriptionRegion?
+
+        switch subscriptionManager.currentEnvironment.purchasePlatform {
+        case .appStore:
+            if #available(macOS 12.0, *) {
+                region = subscriptionManager.storePurchaseManager().currentStorefrontRegion
+            }
+        case .stripe:
+            region = .usa
+        }
+
+        return region ?? .usa
     }
 
     @MainActor
