@@ -40,7 +40,7 @@ final class NewTabPageFavoritesClient: NewTabPageScriptClient {
             }
             .store(in: &cancellables)
 
-        favoritesModel.$showAllFavorites.dropFirst()
+        favoritesModel.$isViewExpanded.dropFirst()
             .sink { [weak self] showAllFavorites in
                 Task { @MainActor in
                     self?.notifyConfigUpdated(showAllFavorites)
@@ -79,16 +79,16 @@ final class NewTabPageFavoritesClient: NewTabPageScriptClient {
     }
 
     func getConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        let expansion: NewTabPageUserScript.WidgetConfig.Expansion = favoritesModel.showAllFavorites ? .expanded : .collapsed
+        let expansion: NewTabPageUserScript.WidgetConfig.Expansion = favoritesModel.isViewExpanded ? .expanded : .collapsed
         return NewTabPageUserScript.WidgetConfig(animation: .auto, expansion: expansion)
     }
 
     @MainActor
     func setConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let action: NewTabPageUserScript.WidgetConfig = DecodableHelper.decode(from: params) else {
+        guard let config: NewTabPageUserScript.WidgetConfig = DecodableHelper.decode(from: params) else {
             return nil
         }
-        favoritesModel.showAllFavorites = action.expansion == .expanded
+        favoritesModel.isViewExpanded = config.expansion == .expanded
         return nil
     }
 
@@ -110,7 +110,7 @@ final class NewTabPageFavoritesClient: NewTabPageScriptClient {
 
     @MainActor
     private func notifyConfigUpdated(_ showAllFavorites: Bool) {
-        let expansion: NewTabPageUserScript.WidgetConfig.Expansion = favoritesModel.showAllFavorites ? .expanded : .collapsed
+        let expansion: NewTabPageUserScript.WidgetConfig.Expansion = favoritesModel.isViewExpanded ? .expanded : .collapsed
         let config = NewTabPageUserScript.WidgetConfig(animation: .auto, expansion: expansion)
         pushMessage(named: MessageName.onConfigUpdate.rawValue, params: config)
     }
@@ -172,7 +172,7 @@ extension NewTabPageFavoritesClient {
         let favorites: [Favorite]
     }
 
-    struct Favorite: Encodable {
+    struct Favorite: Encodable, Equatable {
         let favicon: FavoriteFavicon?
         let id: String
         let title: String
@@ -195,9 +195,16 @@ extension NewTabPageFavoritesClient {
             }
             favicon = FavoriteFavicon(maxAvailableSize: Int(Favicon.SizeCategory.medium.rawValue), src: duckFaviconURL.absoluteString)
         }
+
+        init(id: String, title: String, url: String, favicon: NewTabPageFavoritesClient.FavoriteFavicon? = nil) {
+            self.id = id
+            self.title = title
+            self.url = url
+            self.favicon = favicon
+        }
     }
 
-    struct FavoriteFavicon: Encodable {
+    struct FavoriteFavicon: Encodable, Equatable {
         let maxAvailableSize: Int
         let src: String
     }

@@ -78,7 +78,7 @@ extension NewTabPageUserScript {
             case collapsed, expanded
         }
 
-        struct Animation: Codable {
+        struct Animation: Codable, Equatable {
             let kind: AnimationKind
 
             static let none = Animation(kind: .none)

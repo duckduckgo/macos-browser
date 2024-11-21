@@ -18,6 +18,28 @@
 
 import Combine
 import Foundation
+import Persistence
+
+protocol NewTabPageFavoritesSettingsPersistor: AnyObject {
+    var isViewExpanded: Bool { get set }
+}
+
+final class UserDefaultsNewTabPageFavoritesSettingsPersistor: NewTabPageFavoritesSettingsPersistor {
+    enum Keys {
+        static let isViewExpanded = "new-tab-page.favorites.is-view-expanded"
+    }
+
+    private let keyValueStore: KeyValueStoring
+
+    init(_ keyValueStore: KeyValueStoring = UserDefaults.standard) {
+        self.keyValueStore = keyValueStore
+    }
+
+    var isViewExpanded: Bool {
+        get { return keyValueStore.object(forKey: Keys.isViewExpanded) as? Bool ?? false }
+        set { keyValueStore.set(newValue, forKey: Keys.isViewExpanded) }
+    }
+}
 
 final class NewTabPageFavoritesModel: NSObject {
 
@@ -27,12 +49,19 @@ final class NewTabPageFavoritesModel: NSObject {
 
     private let actionsHandler: FavoritesActionsHandling
     private let contextMenuPresenter: NewTabPageContextMenuPresenting
+    private let settingsPersistor: NewTabPageFavoritesSettingsPersistor
     private var cancellables: Set<AnyCancellable> = []
 
-    init(actionsHandler: FavoritesActionsHandling, contextMenuPresenter: NewTabPageContextMenuPresenting = DefaultNewTabPageContextMenuPresenter()) {
+    init(
+        actionsHandler: FavoritesActionsHandling,
+        contextMenuPresenter: NewTabPageContextMenuPresenting = DefaultNewTabPageContextMenuPresenter(),
+        settingsPersistor: NewTabPageFavoritesSettingsPersistor = UserDefaultsNewTabPageFavoritesSettingsPersistor()
+    ) {
         self.actionsHandler = actionsHandler
         self.contextMenuPresenter = contextMenuPresenter
-        self.showAllFavorites = Self.showAllFavoritesSetting
+        self.settingsPersistor = settingsPersistor
+
+        isViewExpanded = settingsPersistor.isViewExpanded
     }
 
     convenience init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
@@ -46,16 +75,15 @@ final class NewTabPageFavoritesModel: NSObject {
             .store(in: &cancellables)
     }
 
-    @UserDefaultsWrapper(key: .homePageShowAllFavorites, defaultValue: true)
-    private static var showAllFavoritesSetting: Bool
-
-    @Published var showAllFavorites: Bool {
+    @Published var isViewExpanded: Bool {
         didSet {
-            Self.showAllFavoritesSetting = showAllFavorites
+            settingsPersistor.isViewExpanded = isViewExpanded
         }
     }
 
     @Published var favorites: [Bookmark] = []
+
+    // MARK: - Actions
 
     @MainActor
     func openFavorite(withURL url: String) {
@@ -96,7 +124,7 @@ final class NewTabPageFavoritesModel: NSObject {
             NSMenuItem(title: UserText.edit, action: #selector(editBookmark(_:)), target: self, representedObject: favorite)
                 .withAccessibilityIdentifier("HomePage.Views.editBookmark")
             NSMenuItem(title: UserText.removeFavorite, action: #selector(removeFavorite(_:)), target: self, representedObject: favorite)
-                .withAccessibilityIdentifier("HomePage.Views.editBookmark")
+                .withAccessibilityIdentifier("HomePage.Views.removeFavorite")
             NSMenuItem(title: UserText.deleteBookmark, action: #selector(deleteBookmark(_:)), target: self, representedObject: favorite)
                 .withAccessibilityIdentifier("HomePage.Views.deleteBookmark")
         }
