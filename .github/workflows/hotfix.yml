@@ -18,12 +18,12 @@ jobs:
 
     steps:
 
-      # - name: Assert main branch
-      #   run: |
-      #     if [ "${{ github.ref_name }}" != "main" ]; then
-      #       echo "👎 Not the main branch"
-      #       exit 1
-      #     fi
+      - name: Assert main branch
+        run: |
+          if [ "${{ github.ref_name }}" != "main" ]; then
+            echo "👎 Not the main branch"
+            exit 1
+          fi
 
       - name: Check out the code
         uses: actions/checkout@v4
@@ -52,6 +52,7 @@ jobs:
             github_handle:"${{ github.actor }}" \
             is_hotfix:"true"
 
+      # Necessary as make_release_branch will checkout a hotfix branch and the plugins may be differnet
       - name: Reinstall fastlane
         run: bundle install
 
