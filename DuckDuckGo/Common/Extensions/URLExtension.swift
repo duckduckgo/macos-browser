@@ -593,4 +593,10 @@ extension URL {
         }
     }
 
+    // MARK: - Other
+
+    static var appStore: URL {
+        URL(string: "https://apps.apple.com/app/duckduckgo-privacy-browser/id663592361")!
+    }
+
 }

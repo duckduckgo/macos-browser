@@ -310,7 +310,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         freemiumDBPPromotionViewCoordinator = FreemiumDBPPromotionViewCoordinator(freemiumDBPUserStateManager: freemiumDBPUserStateManager,
                                                                                   freemiumDBPFeature: freemiumDBPFeature)
 
-        newTabPageActionsManager = NewTabPageActionsManager(appearancePreferences: .shared)
+        newTabPageActionsManager = NewTabPageActionsManager(
+            appearancePreferences: .shared,
+            activeRemoteMessageModel: activeRemoteMessageModel,
+            openURLHandler: { url in
+                Task { @MainActor in
+                    WindowControllersManager.shared.showTab(with: .contentFromURL(url, source: .appOpenUrl))
+                }
+            }
+        )
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {
