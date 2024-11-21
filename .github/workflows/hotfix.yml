@@ -41,7 +41,7 @@ jobs:
           APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
           APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
           # Elevated permissions token is needed here to use GH git/refs API (used by fastlane)
-          GH_TOKEN: ${{ secrets.GHA_ELEVATED_PERMISSIONS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GHA_ELEVATED_PERMISSIONS_TOKEN }}
           ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
         run: |
           last_release="$(gh api repos/${{ github.repository }}/releases/latest | jq -r .tag_name)"
