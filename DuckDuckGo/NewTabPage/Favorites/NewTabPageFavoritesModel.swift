@@ -69,8 +69,8 @@ final class NewTabPageFavoritesModel: NSObject {
 
         bookmarkManager.listPublisher
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.favorites = bookmarkManager.list?.favoriteBookmarks ?? []
+            .sink { [weak self] list in
+                self?.favorites = list?.favoriteBookmarks ?? []
             }
             .store(in: &cancellables)
     }
