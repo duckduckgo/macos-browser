@@ -19452,6 +19452,42 @@
         }
       }
     },
+    "downloads.error.cta.non-sandbox" : {
+      "comment" : "Call to action for the OS specific downloads issue",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open Settings"
+          }
+        }
+      }
+    },
+    "downloads.error.cta.sandbox" : {
+      "comment" : "Call to action for the OS specific downloads issue",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "How To Update"
+          }
+        }
+      }
+    },
+    "downloads.error.message.for.specific.os" : {
+      "comment" : "This error message will appear in an error banner when users cannot download files on macOS 14.7.1 or 15.0.1",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The download failed because of a known issue on macOS 14.7.1 and 15.0.1. Update to macOS 15.1 and try downloading again."
+          }
+        }
+      }
+    },
     "downloads.error.move.failed" : {
       "comment" : "Short error description when could not move downloaded file to the Downloads folder",
       "extractionState" : "extracted_with_value",
