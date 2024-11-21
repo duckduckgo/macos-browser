@@ -32,23 +32,6 @@ protocol FavoritesActionsHandling {
 
 final class DefaultFavoritesActionsHandler: FavoritesActionsHandling {
     let bookmarkManager: BookmarkManager
-    private(set) lazy var faviconsFetcherOnboarding: FaviconsFetcherOnboarding? = {
-        guard let syncService = NSApp.delegateTyped.syncService, let syncBookmarksAdapter = NSApp.delegateTyped.syncDataProviders?.bookmarksAdapter else {
-            assertionFailure("SyncService and/or SyncBookmarksAdapter is nil")
-            return nil
-        }
-        return .init(syncService: syncService, syncBookmarksAdapter: syncBookmarksAdapter)
-    }()
-
-    @MainActor
-    private var window: NSWindow? {
-        WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.view.window
-    }
-
-    @MainActor
-    private var tabCollectionViewModel: TabCollectionViewModel? {
-        WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel
-    }
 
     init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
         self.bookmarkManager = bookmarkManager
@@ -72,12 +55,12 @@ final class DefaultFavoritesActionsHandler: FavoritesActionsHandling {
         }
 
         if target == .newTab || NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
-            tabCollectionViewModel.appendNewTab(with: .contentFromURL(url, source: .bookmark), selected: true)
+            tabCollectionViewModel.insertOrAppendNewTab(.contentFromURL(url, source: .bookmark), selected: true)
             return
         }
 
         if NSApplication.shared.isCommandPressed {
-            tabCollectionViewModel.appendNewTab(with: .contentFromURL(url, source: .bookmark), selected: false)
+            tabCollectionViewModel.insertOrAppendNewTab(.contentFromURL(url, source: .bookmark), selected: false)
             return
         }
 
@@ -113,6 +96,24 @@ final class DefaultFavoritesActionsHandler: FavoritesActionsHandling {
     func onFaviconMissing() {
         faviconsFetcherOnboarding?.presentOnboardingIfNeeded()
     }
+
+    @MainActor
+    private var window: NSWindow? {
+        WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.view.window
+    }
+
+    @MainActor
+    private var tabCollectionViewModel: TabCollectionViewModel? {
+        WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel
+    }
+
+    private lazy var faviconsFetcherOnboarding: FaviconsFetcherOnboarding? = {
+        guard let syncService = NSApp.delegateTyped.syncService, let syncBookmarksAdapter = NSApp.delegateTyped.syncDataProviders?.bookmarksAdapter else {
+            assertionFailure("SyncService and/or SyncBookmarksAdapter is nil")
+            return nil
+        }
+        return .init(syncService: syncService, syncBookmarksAdapter: syncBookmarksAdapter)
+    }()
 }
 
 final class NewTabPageFavoritesModel: NSObject {
