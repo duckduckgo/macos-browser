@@ -155,11 +155,11 @@ final class NewTabPageFavoritesClientTests: XCTestCase {
         ]
         let data: NewTabPageFavoritesClient.FavoritesData = try await handleMessage(named: .getData)
         XCTAssertEqual(data.favorites, [
-            .init(id: "1", title: "A", url: "https://a.com"),
-            .init(id: "10", title: "B", url: "https://b.com"),
-            .init(id: "5", title: "C", url: "https://c.com"),
-            .init(id: "2", title: "D", url: "https://d.com"),
-            .init(id: "3", title: "E", url: "https://e.com")
+            .init(id: "1", title: "A", url: "https://a.com", favicon: .init(maxAvailableSize: 132, src: "duck://favicon/https%3A//a.com")),
+            .init(id: "10", title: "B", url: "https://b.com", favicon: .init(maxAvailableSize: 132, src: "duck://favicon/https%3A//b.com")),
+            .init(id: "5", title: "C", url: "https://c.com", favicon: .init(maxAvailableSize: 132, src: "duck://favicon/https%3A//c.com")),
+            .init(id: "2", title: "D", url: "https://d.com", favicon: .init(maxAvailableSize: 132, src: "duck://favicon/https%3A//d.com")),
+            .init(id: "3", title: "E", url: "https://e.com", favicon: .init(maxAvailableSize: 132, src: "duck://favicon/https%3A//e.com"))
         ])
     }
 
@@ -213,6 +213,7 @@ final class NewTabPageFavoritesClientTests: XCTestCase {
         XCTAssertEqual(contextMenuPresenter.showContextMenuCalls.count, 0)
     }
 
+    @MainActor
     func testThatContextMenuActionsAreForwardedToTheHandler() async throws {
         favoritesModel.favorites = [.init(id: "abcd", url: "https://example.com", title: "A", isFavorite: true)]
         let action = NewTabPageFavoritesClient.FavoritesContextMenuAction(id: "abcd")
@@ -221,11 +222,6 @@ final class NewTabPageFavoritesClientTests: XCTestCase {
 
         let menu = try XCTUnwrap(contextMenuPresenter.showContextMenuCalls.first)
         XCTAssertEqual(menu.items.count, 6)
-        let openInNewTab = menu.items[0]
-        let openInNewWindow = menu.items[1]
-        let edit = menu.items[3]
-        let removeFavorite = menu.items[4]
-        let deleteBookmark = menu.items[5]
 
         menu.performActionForItem(at: 0)
         XCTAssertEqual(actionsHandler.openCalls.last, CapturingNewTabPageFavoritesActionsHandler.OpenCall("https://example.com".url!, .newTab))
