@@ -50,7 +50,6 @@ jobs:
             platform:"macos" \
             version:"$last_release" \
             github_handle:"${{ github.actor }}" \
-            target_section_id:"1206716192269178" \
             is_hotfix:"true"
 
       - name: Report success
