@@ -109,6 +109,8 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
         return controller
     }()
 
+    var messagePort: _WKWebExtension.MessagePort?
+
     func setUpWebExtensionController(for configuration: WKWebViewConfiguration) {
         configuration._webExtensionController = extensionController
     }
@@ -243,6 +245,7 @@ extension WebExtensionManager: @preconcurrency _WKWebExtensionControllerDelegate
     }
 
     func webExtensionController(_ controller: _WKWebExtensionController, openOptionsPageFor extensionContext: _WKWebExtensionContext) async throws {
+
     }
 
     func webExtensionController(_ controller: _WKWebExtensionController, promptForPermissions permissions: Set<_WKWebExtension.Permission>, in tab: (any _WKWebExtensionTab)?, for extensionContext: _WKWebExtensionContext) async -> (Set<_WKWebExtension.Permission>, Date?) {
@@ -275,10 +278,11 @@ extension WebExtensionManager: @preconcurrency _WKWebExtensionControllerDelegate
     }
 
     func webExtensionController(_ controller: _WKWebExtensionController, sendMessage message: Any, to applicationIdentifier: String?, for extensionContext: _WKWebExtensionContext) async throws -> Any? {
-        return nil
+        try await messagePort?.sendMessage(message)
     }
 
     func webExtensionController(_ controller: _WKWebExtensionController, connectUsingMessagePort port: _WKWebExtension.MessagePort, for extensionContext: _WKWebExtensionContext) async throws {
+        messagePort = port
     }
 
 }
