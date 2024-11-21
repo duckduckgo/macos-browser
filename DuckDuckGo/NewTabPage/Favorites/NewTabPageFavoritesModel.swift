@@ -33,11 +33,20 @@ final class UserDefaultsNewTabPageFavoritesSettingsPersistor: NewTabPageFavorite
 
     init(_ keyValueStore: KeyValueStoring = UserDefaults.standard) {
         self.keyValueStore = keyValueStore
+        migrateFromNativeHomePageSettings()
     }
 
     var isViewExpanded: Bool {
         get { return keyValueStore.object(forKey: Keys.isViewExpanded) as? Bool ?? false }
         set { keyValueStore.set(newValue, forKey: Keys.isViewExpanded) }
+    }
+
+    private func migrateFromNativeHomePageSettings() {
+        guard keyValueStore.object(forKey: Keys.isViewExpanded) == nil else {
+            return
+        }
+        let legacyKey = UserDefaultsWrapper<Any>.Key.homePageShowAllFavorites.rawValue
+        isViewExpanded = keyValueStore.object(forKey: legacyKey) as? Bool ?? false
     }
 }
 
@@ -118,7 +127,14 @@ final class NewTabPageFavoritesModel: NSObject {
 
     @MainActor
     func showContextMenu(for bookmarkID: String) {
+        /**
+         * This isn't very effective (may need to traverse up to entire array)
+         * but it's only ever needed for context menus. I decided to skip
+         * optimizing it because it's fast enough and we shouldn't have too big arrays
+         * of favorites, and indexing favorites by UUID on each refresh could be too much.
+         */
         guard let favorite = favorites.first(where: { $0.id == bookmarkID}) else { return }
+
         let menu = NSMenu()
 
         menu.buildItems {
