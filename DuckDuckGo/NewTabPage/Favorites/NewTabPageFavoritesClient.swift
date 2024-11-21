@@ -120,7 +120,7 @@ final class NewTabPageFavoritesClient: NewTabPageScriptClient {
         guard let action: NewTabPageFavoritesClient.FavoritesMoveAction = DecodableHelper.decode(from: params) else {
             return nil
         }
-        favoritesModel.moveFavorite(withID: action.id, toIndex: action.targetIndex)
+        favoritesModel.moveFavorite(withID: action.id, fromIndex: action.fromIndex, toIndex: action.targetIndex)
         return nil
     }
 
@@ -129,28 +129,34 @@ final class NewTabPageFavoritesClient: NewTabPageScriptClient {
         guard let action: NewTabPageFavoritesClient.FavoritesOpenAction = DecodableHelper.decode(from: params) else {
             return nil
         }
-        favoritesModel.openFavorite(withID: action.id)
+        favoritesModel.openFavorite(withURL: action.url)
         return nil
     }
 
     @MainActor
     func openContextMenu(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let openAction: NewTabPageFavoritesClient.FavoritesOpenAction = DecodableHelper.decode(from: params) else {
+        guard let contextMenuAction: NewTabPageFavoritesClient.FavoritesContextMenuAction = DecodableHelper.decode(from: params) else {
             return nil
         }
-        favoritesModel.showContextMenu(for: openAction.id)
+        favoritesModel.showContextMenu(for: contextMenuAction.id)
         return nil
     }
 }
 
 extension NewTabPageFavoritesClient {
 
+    struct FavoritesContextMenuAction: Codable {
+        let id: String
+    }
+
     struct FavoritesOpenAction: Codable {
         let id: String
+        let url: String
     }
 
     struct FavoritesMoveAction: Codable {
         let id: String
+        let fromIndex: Int
         let targetIndex: Int
     }
 

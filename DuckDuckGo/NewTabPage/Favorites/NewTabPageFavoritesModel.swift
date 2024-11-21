@@ -58,16 +58,13 @@ final class NewTabPageFavoritesModel: NSObject {
     @Published var favorites: [Bookmark] = []
 
     @MainActor
-    func openFavorite(withID bookmarkID: String) {
-        guard let favorite = favorites.first(where: { $0.id == bookmarkID}), let url = favorite.urlObject else { return }
+    func openFavorite(withURL url: String) {
+        guard let url = url.url else { return }
         actionsHandler.open(url, target: .current)
     }
 
-    func moveFavorite(withID bookmarkID: String, toIndex index: Int) {
-        guard let currentIndex = favorites.firstIndex(where: { $0.id == bookmarkID }) else {
-            return
-        }
-        let targetIndex = index > currentIndex ? index + 1 : index
+    func moveFavorite(withID bookmarkID: String, fromIndex: Int, toIndex index: Int) {
+        let targetIndex = index > fromIndex ? index + 1 : index
         actionsHandler.move(bookmarkID, toIndex: targetIndex)
     }
 
