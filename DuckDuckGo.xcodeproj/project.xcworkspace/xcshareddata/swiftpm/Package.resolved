@@ -32,8 +32,8 @@
         "package": "BrowserServicesKit",
         "repositoryURL": "https://github.com/duckduckgo/BrowserServicesKit",
         "state": {
-          "branch": "mgurgel/new-breakage-form",
-          "revision": "bb0d926828f6978b3ff717ded8db34947efcd5a7",
+          "branch": "jacek/new-breakage-form",
+          "revision": "d015603f35a80acf247ebc28e0161e23ccd3067d",
           "version": null
         }
       },
@@ -42,8 +42,8 @@
         "repositoryURL": "https://github.com/duckduckgo/content-scope-scripts",
         "state": {
           "branch": null,
-          "revision": "32c3e2bce3cc20a079d96b3ee23a9cde5d2337c3",
-          "version": "6.35.0"
+          "revision": "6cab7bdb584653a5dc007cc1ae827ec41c5a91bc",
+          "version": "6.29.0"
         }
       },
       {
@@ -60,8 +60,8 @@
         "repositoryURL": "https://github.com/duckduckgo/GRDB.swift.git",
         "state": {
           "branch": null,
-          "revision": "5b2f6a81099d26ae0f9e38788f51490cd6a4b202",
-          "version": "2.4.2"
+          "revision": "4225b85c9a0c50544e413a1ea1e502c802b44b35",
+          "version": "2.4.0"
         }
       },
       {
