@@ -78,7 +78,6 @@ public final class VPNTipsModel: ObservableObject {
             subscribeToFeatureFlagChanges(featureFlagPublisher)
             subscribeToActiveSiteChanges(activeSitePublisher)
 
-            subscribeToStatusChanges(for: domainExclusionsTip)
             subscribeToStatusChanges(for: geoswitchingTip)
         }
     }
@@ -148,17 +147,6 @@ public final class VPNTipsModel: ObservableObject {
         }
     }
 
-    @available(macOS 14.0, *)
-    func subscribeToStatusChanges(for tip: VPNDomainExclusionsTip) {
-        Task {
-            for await status in tip.statusUpdates {
-                if case .invalidated = status {
-                    await VPNAutoconnectTip.domainExclusionsTipDismissedEvent.donate()
-                }
-            }
-        }
-    }
-
     // MARK: - Handle Refreshing
 
     @available(macOS 14.0, *)
@@ -173,6 +161,10 @@ public final class VPNTipsModel: ObservableObject {
         case .connected:
             if case oldValue = .connecting {
                 VPNGeoswitchingTip.vpnEnabledAtLeastOnce = true
+
+                if case .invalidated = domainExclusionsTip.status {
+                    VPNAutoconnectTip.vpnEnabledWhenDomainExclusionsAlreadyDismissed = true
+                }
             }
 
             VPNAutoconnectTip.vpnEnabled = true

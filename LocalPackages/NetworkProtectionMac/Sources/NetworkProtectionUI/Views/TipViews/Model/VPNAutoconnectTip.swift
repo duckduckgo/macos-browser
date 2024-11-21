@@ -29,12 +29,13 @@ extension VPNAutoconnectTip: Tip {
         case enable = "com.duckduckgo.vpn.tip.autoconnect.action.enable"
     }
 
-    static let domainExclusionsTipDismissedEvent = Tips.Event(id: "com.duckduckgo.vpn.tip.autoconnect.domainExclusionsTipDismissedEvent")
-
     static let geolocationTipDismissedEvent = Tips.Event(id: "com.duckduckgo.vpn.tip.autoconnect.geolocationTipDismissedEvent")
 
     @Parameter(.transient)
     static var vpnEnabled: Bool = false
+
+    @Parameter
+    static var vpnEnabledWhenDomainExclusionsAlreadyDismissed: Bool = false
 
     var id: String {
         "com.duckduckgo.vpn.tip.autoconnect"
@@ -62,8 +63,8 @@ extension VPNAutoconnectTip: Tip {
         #Rule(Self.$vpnEnabled) {
             $0 == true
         }
-        #Rule(Self.domainExclusionsTipDismissedEvent) {
-            $0.donations.count > 0
+        #Rule(Self.$vpnEnabledWhenDomainExclusionsAlreadyDismissed) {
+            $0
         }
         #Rule(Self.geolocationTipDismissedEvent) {
             $0.donations.count > 0
