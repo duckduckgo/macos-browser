@@ -53,7 +53,7 @@ jobs:
     steps:
 
     - name: Register SSH key for certificates repository access
-      uses: webfactory/ssh-agent@v0.7.0
+      uses: webfactory/ssh-agent@v0.9.0
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
 
