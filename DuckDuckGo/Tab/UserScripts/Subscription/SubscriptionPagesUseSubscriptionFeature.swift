@@ -344,7 +344,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
     func featureSelected(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         struct FeatureSelection: Codable {
-            let feature: String
+            let productFeature: Entitlement.ProductName
         }
 
         guard let featureSelection: FeatureSelection = DecodableHelper.decode(from: params) else {
@@ -352,23 +352,20 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             return nil
         }
 
-        guard let subscriptionFeatureName = SubscriptionFeatureName(rawValue: featureSelection.feature) else {
-            assertionFailure("SubscriptionPagesUserScript: feature name does not matches mapping")
-            return nil
-        }
-
-        switch subscriptionFeatureName {
-        case .vpn:
+        switch featureSelection.productFeature {
+        case .networkProtection:
             PixelKit.fire(PrivacyProPixel.privacyProWelcomeVPN, frequency: .unique)
             notificationCenter.post(name: .ToggleNetworkProtectionInMainWindow, object: self, userInfo: nil)
-        case .personalInformationRemoval:
+        case .dataBrokerProtection:
             PixelKit.fire(PrivacyProPixel.privacyProWelcomePersonalInformationRemoval, frequency: .unique)
             notificationCenter.post(name: .openPersonalInformationRemoval, object: self, userInfo: nil)
             await uiHandler.showTab(with: .dataBrokerProtection)
-        case .identityTheftRestoration:
+        case .identityTheftRestoration, .identityTheftRestorationGlobal:
             PixelKit.fire(PrivacyProPixel.privacyProWelcomeIdentityRestoration, frequency: .unique)
             let url = subscriptionManager.url(for: .identityTheftRestoration)
             await uiHandler.showTab(with: .identityTheftRestoration(url))
+        case .unknown:
+            break
         }
 
         return nil
