@@ -61,11 +61,9 @@ extension UserAgent {
 
     static func `for`(_ url: URL?,
                       privacyConfig: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig) -> String {
-        guard let absoluteString = url?.absoluteString else {
+        guard let url, privacyConfig.isEnabled(featureKey: .customUserAgent) else {
             return Self.default
         }
-
-        guard privacyConfig.isEnabled(featureKey: .customUserAgent) else { return Self.default }
 
         if isURLPartOfWebviewDefaultList(url: url, privacyConfig: privacyConfig) {
             return Self.webViewDefault
@@ -83,25 +81,25 @@ extension UserAgent {
     static let webviewDefaultKey = "webViewDefault"
     static let domainKey = "domain"
 
-    private static func isURLPartOfWebviewDefaultList(url: URL?,
+    private static func isURLPartOfWebviewDefaultList(url: URL,
                                                       privacyConfig: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig) -> Bool {
         let settings = privacyConfig.settings(for: .customUserAgent)
         let webViewDefaultList = settings[webviewDefaultKey] as? [[String: String]] ?? []
         let domains = webViewDefaultList.map { $0[domainKey] ?? "" }
 
         return domains.contains(where: { domain in
-            url?.isPart(ofDomain: domain) ?? false
+            url.isPart(ofDomain: domain)
         })
     }
 
-    private static func isURLPartOfDefaultSitesList(url: URL?, privacyConfig: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig) -> Bool {
+    private static func isURLPartOfDefaultSitesList(url: URL, privacyConfig: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig) -> Bool {
 
         let uaSettings = privacyConfig.settings(for: .customUserAgent)
         let defaultSitesObjs = uaSettings[defaultSitesKey] as? [[String: String]] ?? []
         let domains = defaultSitesObjs.map { $0[domainKey] ?? "" }
 
         return domains.contains(where: { domain in
-            url?.isPart(ofDomain: domain) ?? false
+            url.isPart(ofDomain: domain)
         })
     }
 }
