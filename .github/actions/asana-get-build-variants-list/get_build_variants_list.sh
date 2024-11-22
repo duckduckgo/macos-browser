@@ -56,7 +56,7 @@ _fetch_origin_tasks() {
 		fi
 	done
 
-	echo "${origin_variants}"
+	echo "${origin_variants[*]}" | tr ' ' ','
 }
 
 # Create a JSON string from the list of ATB items passed.
@@ -92,14 +92,16 @@ _fetch_atb_variants() {
 
 	variants_list=("$(_create_atb_variant_pairs "$atb_variants")")
 
-	echo "${variants_list}"
+	echo "${variants_list[*]}" | tr ' ' ','
 }
 
 main() {
+	local atb_variants
+	local origin_variants
 	# fetch ATB variants
-	local atb_variants=$(_fetch_atb_variants)
+	atb_variants="$(_fetch_atb_variants)"
 	# fetch Origin variants
-	local origin_variants=$(_fetch_origin_tasks)
+	origin_variants="$(_fetch_origin_tasks)"
 	# merges the two list together. Use `include` keyword for later usage in matrix. 
 	# for more info see https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs#example-adding-configurations.
 	local merged_variants="{\"include\": [${atb_variants},${origin_variants}]}"
