@@ -26,6 +26,8 @@ import TipKit
 @MainActor
 public final class VPNTipsModel: ObservableObject {
 
+    static let imageSize = CGSize(width: 32, height: 32)
+
     @Published
     private(set) var activeSiteInfo: ActiveSiteInfo? {
         didSet {
@@ -141,7 +143,7 @@ public final class VPNTipsModel: ObservableObject {
             for await status in tip.statusUpdates {
                 if case .invalidated = status {
                     VPNDomainExclusionsTip.geolocationTipDismissed = true
-                    await VPNAutoconnectTip.geolocationTipDismissedEvent.donate()
+                    VPNAutoconnectTip.geolocationTipDismissed = true
                 }
             }
         }

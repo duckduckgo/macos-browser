@@ -136,13 +136,17 @@ public final class StatusBarMenu: NSObject {
                 return
             }
 
+            let connectionStatusPublisher = CurrentValuePublisher(
+                initialValue: .disconnected,
+                publisher: Just(NetworkProtection.ConnectionStatus.disconnected).eraseToAnyPublisher())
+
             let activeSitePublisher = CurrentValuePublisher(
                 initialValue: ActiveSiteInfo?(nil),
                 publisher: Just(nil).eraseToAnyPublisher())
 
             let siteTroubleshootingViewModel = SiteTroubleshootingView.Model(
-                connectionStatusPublisher: Just(NetworkProtection.ConnectionStatus.disconnected).eraseToAnyPublisher(),
-                activeSitePublisher: activeSitePublisher.eraseToAnyPublisher(),
+                connectionStatusPublisher: connectionStatusPublisher,
+                activeSitePublisher: activeSitePublisher,
                 uiActionHandler: uiActionHandler)
 
             // We don't use tips in the status menu app.

@@ -59,6 +59,7 @@ public struct TunnelControllerView: View {
                tipsModel.canShowTips {
 
                 TipView(tipsModel.autoconnectTip, action: tipsModel.autoconnectTipActionHandler)
+                    .tipImageSize(VPNTipsModel.imageSize)
                     .padding(.horizontal, 9)
                     .padding(.vertical, 6)
             }
@@ -70,6 +71,7 @@ public struct TunnelControllerView: View {
                tipsModel.canShowTips {
 
                 TipView(tipsModel.domainExclusionsTip)
+                    .tipImageSize(VPNTipsModel.imageSize)
                     .padding(.horizontal, 9)
                     .padding(.vertical, 6)
             }
@@ -203,6 +205,7 @@ public struct TunnelControllerView: View {
                tipsModel.canShowTips {
 
                 TipView(tipsModel.geoswitchingTip)
+                    .tipImageSize(VPNTipsModel.imageSize)
                     .padding(.horizontal, 9)
                     .padding(.vertical, 6)
             }
