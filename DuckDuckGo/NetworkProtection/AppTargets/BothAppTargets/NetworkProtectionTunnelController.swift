@@ -605,8 +605,10 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     }
 
     private func start(_ tunnelManager: NETunnelProviderManager) async throws {
-        var options = [String: NSObject]()
 
+        Logger.networkProtection.debug("Starting NetworkProtectionTunnelController")
+
+        var options = [String: NSObject]()
         options[NetworkProtectionOptionKey.activationAttemptId] = UUID().uuidString as NSString
         options[NetworkProtectionOptionKey.tokenContainer] = try await fetchAuthToken()
         options[NetworkProtectionOptionKey.selectedEnvironment] = settings.selectedEnvironment.rawValue as NSString
