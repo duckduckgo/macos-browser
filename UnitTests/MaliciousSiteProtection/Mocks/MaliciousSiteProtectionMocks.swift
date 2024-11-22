@@ -84,7 +84,6 @@ final class MockMaliciousSiteDetector: MaliciousSiteProtection.MaliciousSiteDete
         }
     }
 
-
     func evaluate(_ url: URL) async -> MaliciousSiteProtection.ThreatKind? {
         return isMalicious(url)
     }
