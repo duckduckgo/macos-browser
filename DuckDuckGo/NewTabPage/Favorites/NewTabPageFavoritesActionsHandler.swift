@@ -56,7 +56,7 @@ final class DefaultFavoritesActionsHandler: FavoritesActionsHandling {
     }
 
     func removeFavorite(_ bookmark: Bookmark) {
-        bookmark.isFavorite = !bookmark.isFavorite
+        bookmark.isFavorite = false
         bookmarkManager.update(bookmark: bookmark)
     }
 
