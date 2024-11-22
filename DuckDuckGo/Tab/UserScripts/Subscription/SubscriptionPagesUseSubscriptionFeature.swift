@@ -167,25 +167,27 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func getSubscriptionOptions(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard subscriptionFeatureAvailability.isSubscriptionPurchaseAllowed else { return SubscriptionOptions.empty }
+        var subscriptionOptions = SubscriptionOptions.empty
 
         switch subscriptionPlatform {
         case .appStore:
             if #available(macOS 12.0, *) {
-                if let subscriptionOptions = await subscriptionManager.storePurchaseManager().subscriptionOptions() {
-                    return subscriptionOptions
+                if let appStoreSubscriptionOptions = await subscriptionManager.storePurchaseManager().subscriptionOptions() {
+                    subscriptionOptions = appStoreSubscriptionOptions
                 }
             }
         case .stripe:
             switch await stripePurchaseFlow.subscriptionOptions() {
-            case .success(let subscriptionOptions):
-                return subscriptionOptions
+            case .success(let stripeSubscriptionOptions):
+                subscriptionOptions = stripeSubscriptionOptions
             case .failure:
                 break
             }
         }
 
-        return SubscriptionOptions.empty
+        guard subscriptionFeatureAvailability.isSubscriptionPurchaseAllowed else { return subscriptionOptions.withoutPurchaseOptions() }
+
+        return subscriptionOptions
     }
 
     func subscriptionSelected(params: Any, original: WKScriptMessage) async throws -> Encodable? {
