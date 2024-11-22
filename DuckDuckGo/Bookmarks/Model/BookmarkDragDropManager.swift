@@ -196,11 +196,6 @@ final class BookmarkDragDropManager {
                 continue
             }
 
-            // Skip adding bookmark if the URL is already bookmarked
-            if bookmarkManager.getBookmark(for: url) != nil {
-                continue
-            }
-
             self.bookmarkManager.makeBookmark(for: url, title: title, isFavorite: isFavorite, index: currentIndex, parent: parent)
             currentIndex += 1
         }
