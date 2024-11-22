@@ -36,7 +36,8 @@ jobs:
     timeout-minutes: 15
 
     outputs:
-      build-variants: ${{ steps.get-build-variants.outputs.build-variants }}
+      build-variants-1: ${{ steps.get-build-variants.outputs.build-variants-1 }}
+      build-variants-2: ${{ steps.get-build-variants.outputs.build-variants-2 }}
 
     steps:
       - name: Check out repository
@@ -69,14 +70,35 @@ jobs:
           path: ${{ github.workspace }}/duckduckgo.dmg
           retention-days: 1
 
-  create-variants:
+  create-variants-1:
 
     name: Create Variant
     needs: [set-up-variants, download-dmg-and-upload-artifact]
 
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.set-up-variants.outputs.build-variants) }}
+      matrix: ${{ fromJSON(needs.set-up-variants.outputs.build-variants-1) }}
+    uses: ./.github/workflows/create_variant.yml
+    with:
+      atb-variant: ${{ matrix.variant }}
+      origin-variant: ${{ matrix.origin }}
+    secrets:
+      APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
+      APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+      APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
+      AWS_ACCESS_KEY_ID_RELEASE_S3: ${{ secrets.AWS_ACCESS_KEY_ID_RELEASE_S3 }}
+      AWS_SECRET_ACCESS_KEY_RELEASE_S3: ${{ secrets.AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
+      MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+      SSH_PRIVATE_KEY_FASTLANE_MATCH: ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
+
+  create-variants-2:
+
+    name: Create Variant
+    needs: [set-up-variants, download-dmg-and-upload-artifact, create-variants-1]
+
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.set-up-variants.outputs.build-variants-2) }}
     uses: ./.github/workflows/create_variant.yml
     with:
       atb-variant: ${{ matrix.variant }}
@@ -93,12 +115,12 @@ jobs:
   mattermost:
     
     name: Send Mattermost message
-    needs: create-variants
+    needs: [create-variants-2]
     runs-on: macos-15
     
     env:
-      success: ${{ needs.create-variants.result == 'success' }}
-      failure: ${{ needs.create-variants.result == 'failure' }}
+      success: ${{ needs.create-variants-2.result == 'success' }}
+      failure: ${{ needs.create-variants-2.result == 'failure' }}
     
     steps:
       - name: Send Mattermost message
