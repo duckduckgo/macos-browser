@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Combine
 import TestUtils
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
@@ -39,26 +40,27 @@ final class NewTabPageFavoritesModelTests: XCTestCase {
         let favorite1 = Bookmark(id: "1", url: "https://example.com/1", title: "1", isFavorite: true)
         let favorite2 = Bookmark(id: "2", url: "https://example.com/2", title: "2", isFavorite: true)
 
-        let expectation = expectation(description: "subscription")
-        expectation.expectedFulfillmentCount = 3
-
         var favoritesUpdateEvents = [[Bookmark]]()
-        let cancellable = model.$favorites.dropFirst().removeDuplicates()
-            .sink {
-                favoritesUpdateEvents.append($0)
-                expectation.fulfill()
-            }
+        var cancellable: AnyCancellable?
 
-        bookmarkManager.list = BookmarkList()
-        bookmarkManager.list = BookmarkList(entities: [favorite1], topLevelEntities: [favorite1], favorites: [favorite1])
-        bookmarkManager.list = BookmarkList(
-            entities: [favorite1, favorite2],
-            topLevelEntities: [favorite1, favorite2],
-            favorites: [favorite1, favorite2]
-        )
+        await withCheckedContinuation { continuation in
+            cancellable = model.$favorites.dropFirst().removeDuplicates().prefix(3)
+                .sink(receiveCompletion: { _ in
+                    continuation.resume()
+                }, receiveValue: {
+                    favoritesUpdateEvents.append($0)
+                })
 
-        await fulfillment(of: [expectation], timeout: 1)
-        cancellable.cancel()
+            bookmarkManager.list = BookmarkList()
+            bookmarkManager.list = BookmarkList(entities: [favorite1], topLevelEntities: [favorite1], favorites: [favorite1])
+            bookmarkManager.list = BookmarkList(
+                entities: [favorite1, favorite2],
+                topLevelEntities: [favorite1, favorite2],
+                favorites: [favorite1, favorite2]
+            )
+        }
+
+        cancellable?.cancel()
 
         XCTAssertEqual(favoritesUpdateEvents, [
             [],
