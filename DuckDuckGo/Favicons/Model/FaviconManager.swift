@@ -35,6 +35,8 @@ protocol FaviconManagement: AnyObject {
 
     func handleFaviconsByDocumentUrl(_ faviconsByDocumentUrl: [URL: [Favicon]])
 
+    func getCachedFaviconURL(for documentUrl: URL, sizeCategory: Favicon.SizeCategory) -> URL?
+
     func getCachedFavicon(for documentUrl: URL, sizeCategory: Favicon.SizeCategory) -> Favicon?
 
     func getCachedFavicon(for host: String, sizeCategory: Favicon.SizeCategory) -> Favicon?
@@ -193,6 +195,10 @@ final class FaviconManager: FaviconManagement {
 
             return cachedFavicon
         }
+    }
+
+    func getCachedFaviconURL(for documentUrl: URL, sizeCategory: Favicon.SizeCategory) -> URL? {
+        referenceCache.getFaviconUrl(for: documentUrl, sizeCategory: sizeCategory)
     }
 
     func getCachedFavicon(for documentUrl: URL, sizeCategory: Favicon.SizeCategory) -> Favicon? {

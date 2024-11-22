@@ -70,26 +70,26 @@ final class NewTabPageUserScript: NSObject, SubfeatureWithExternalMessageHandlin
 
 extension NewTabPageUserScript {
 
-    struct WidgetConfig: Encodable {
+    struct WidgetConfig: Codable {
         let animation: Animation?
         let expansion: Expansion
-    }
 
-    enum Expansion: String, Encodable {
-        case collapsed, expanded
-    }
+        enum Expansion: String, Codable {
+            case collapsed, expanded
+        }
 
-    struct Animation: Encodable {
-        let kind: AnimationKind
+        struct Animation: Codable, Equatable {
+            let kind: AnimationKind
 
-        static let none = Animation(kind: .none)
-        static let viewTransitions = Animation(kind: .viewTransitions)
-        static let auto = Animation(kind: .auto)
+            static let none = Animation(kind: .none)
+            static let viewTransitions = Animation(kind: .viewTransitions)
+            static let auto = Animation(kind: .auto)
 
-        enum AnimationKind: String, Encodable {
-            case none
-            case viewTransitions = "view-transitions"
-            case auto = "auto-animate"
+            enum AnimationKind: String, Codable {
+                case none
+                case viewTransitions = "view-transitions"
+                case auto = "auto-animate"
+            }
         }
     }
 }

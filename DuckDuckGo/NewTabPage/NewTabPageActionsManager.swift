@@ -123,7 +123,7 @@ extension NewTabPageActionsManager {
         self.init(scriptClients: [
             NewTabPageConfigurationClient(appearancePreferences: appearancePreferences),
             NewTabPageRMFClient(remoteMessageProvider: activeRemoteMessageModel, openURLHandler: openURLHandler),
-            NewTabPageFavoritesClient(),
+            NewTabPageFavoritesClient(favoritesModel: NewTabPageFavoritesModel()),
             NewTabPagePrivacyStatsClient()
         ])
     }
