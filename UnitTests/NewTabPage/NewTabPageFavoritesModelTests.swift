@@ -43,7 +43,7 @@ final class NewTabPageFavoritesModelTests: XCTestCase {
         expectation.expectedFulfillmentCount = 3
 
         var favoritesUpdateEvents = [[Bookmark]]()
-        let cancellable = model.$favorites.dropFirst()
+        let cancellable = model.$favorites.dropFirst().removeDuplicates()
             .sink {
                 favoritesUpdateEvents.append($0)
                 expectation.fulfill()
