@@ -60,6 +60,7 @@ public struct TunnelControllerView: View {
 
                 TipView(tipsModel.autoconnectTip, action: tipsModel.autoconnectTipActionHandler)
                     .tipImageSize(VPNTipsModel.imageSize)
+                    .tipBackground(Color(.onboardingStepBackground))
                     .padding(.horizontal, 9)
                     .padding(.vertical, 6)
             }
@@ -72,6 +73,7 @@ public struct TunnelControllerView: View {
 
                 TipView(tipsModel.domainExclusionsTip)
                     .tipImageSize(VPNTipsModel.imageSize)
+                    .tipBackground(Color(.onboardingStepBackground))
                     .padding(.horizontal, 9)
                     .padding(.vertical, 6)
             }
@@ -206,6 +208,7 @@ public struct TunnelControllerView: View {
 
                 TipView(tipsModel.geoswitchingTip)
                     .tipImageSize(VPNTipsModel.imageSize)
+                    .tipBackground(Color(.onboardingStepBackground))
                     .padding(.horizontal, 9)
                     .padding(.vertical, 6)
             }
