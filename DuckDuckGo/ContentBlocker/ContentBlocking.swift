@@ -148,7 +148,6 @@ final class AppContentBlocking {
 
         case .contentBlockingLRCMissing:
                     domainEvent = .contentBlockingLRCMissing
-            
         case .contentBlockingCompilationTime:
             // Temporarily avoid firing this pixel. This can be re-enabled if it's determined to be necessary later.
             // domainEvent = .contentBlockingCompilationTime
