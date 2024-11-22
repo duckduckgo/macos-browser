@@ -532,6 +532,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     /// Starts the VPN connection
     ///
     func start() async {
+        Logger.networkProtection.log("Start VPN")
         VPNOperationErrorRecorder().beginRecordingControllerStart()
         PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionControllerStartAttempt,
                       frequency: .legacyDailyAndCount)
@@ -580,6 +581,8 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
                               frequency: .legacyDailyAndCount)
             }
         } catch {
+            Logger.networkProtection.error("Starting tunnel error: \(error, privacy: .public)")
+
             VPNOperationErrorRecorder().recordControllerStartFailure(error)
             knownFailureStore.lastKnownFailure = KnownFailure(error)
 
@@ -610,7 +613,10 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
         var options = [String: NSObject]()
         options[NetworkProtectionOptionKey.activationAttemptId] = UUID().uuidString as NSString
-        options[NetworkProtectionOptionKey.tokenContainer] = try await fetchAuthToken()
+
+        let tokenContainer = try await fetchTokenContainer()
+        options[NetworkProtectionOptionKey.tokenContainer] = tokenContainer.data
+
         options[NetworkProtectionOptionKey.selectedEnvironment] = settings.selectedEnvironment.rawValue as NSString
         options[NetworkProtectionOptionKey.selectedServer] = settings.selectedServer.stringValue as? NSString
 
@@ -792,13 +798,13 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         }
     }
 
-    private func fetchAuthToken() async throws -> NSString {
+    private func fetchTokenContainer() async throws -> TokenContainer {
         do {
             let tokenContainer = try await subscriptionManager.getTokenContainer(policy: .localValid)
-            Logger.networkProtection.log("🟢 TunnelController found token")
-            return "ddg:\(tokenContainer.accessToken)" as NSString
+            Logger.networkProtection.log("🟢 TunnelController found token container")
+            return tokenContainer
         } catch {
-            Logger.networkProtection.error("TunnelController found no token")
+            Logger.networkProtection.error("TunnelController found no token container")
             throw StartError.noAuthToken
         }
     }
