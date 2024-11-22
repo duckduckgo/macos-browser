@@ -23,13 +23,13 @@ import ContentBlocking
 import Foundation
 import Navigation
 import PrivacyDashboard
-import PhishingDetection
+import MaliciousSiteProtection
 
 final class PrivacyDashboardTabExtension {
 
     private let contentBlocking: any ContentBlockingProtocol
     private let certificateTrustEvaluator: CertificateTrustEvaluating
-    private var phishingStateManager: PhishingTabStateManaging
+    private var maliciousSiteProtectionStateProvider: MaliciousSiteProtectionStateProvider
 
     @Published private(set) var privacyInfo: PrivacyInfo?
 
@@ -45,11 +45,11 @@ final class PrivacyDashboardTabExtension {
          didUpgradeToHttpsPublisher: some Publisher<URL, Never>,
          trackersPublisher: some Publisher<DetectedTracker, Never>,
          webViewPublisher: some Publisher<WKWebView, Never>,
-         phishingStateManager: PhishingTabStateManaging) {
+         maliciousSiteProtectionStateProvider: @escaping  MaliciousSiteProtectionStateProvider) {
 
         self.contentBlocking = contentBlocking
         self.certificateTrustEvaluator = certificateTrustEvaluator
-        self.phishingStateManager = phishingStateManager
+        self.maliciousSiteProtectionStateProvider = maliciousSiteProtectionStateProvider
 
         autoconsentUserScriptPublisher.sink { [weak self] autoconsentUserScript in
             autoconsentUserScript?.delegate = self
@@ -97,14 +97,11 @@ final class PrivacyDashboardTabExtension {
         }
     }
 
-    private func updatePrivacyInfo(with url: URL?) async {
-        guard let url = url else { return }
-        guard url.isValid else { return }
-        guard !(url.isDuckURLScheme || url.isDuckDuckGo) else { return }
-        let malicious = phishingStateManager.didBypassError
-        await MainActor.run {
-            self.privacyInfo?.isPhishing = malicious
-        }
+    @MainActor
+    private func updateMaliciousSiteInfo(for url: URL?) {
+        guard let url, url.isValid, // TODO: is it correctly updated when no malicious site info?
+              !(url.isDuckURLScheme || url.isDuckDuckGo) else { return }
+        self.privacyInfo?.malicousSiteThreatKind = maliciousSiteProtectionStateProvider().bypassedMaliciousSiteThreatKind
     }
 
 }
@@ -132,7 +129,7 @@ extension PrivacyDashboardTabExtension {
         privacyInfo = PrivacyInfo(url: url,
                                   parentEntity: entity,
                                   protectionStatus: makeProtectionStatus(for: host),
-                                  isPhishing: self.phishingStateManager.didBypassError)
+                                  malicousSiteThreatKind: maliciousSiteProtectionStateProvider().bypassedMaliciousSiteThreatKind)
 
         previousPrivacyInfosByURL[url.absoluteString] = privacyInfo
 
@@ -176,8 +173,7 @@ extension PrivacyDashboardTabExtension: NavigationResponder {
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         resetConnectionUpgradedTo(navigationAction: navigationAction)
-        let url = navigationAction.url
-        await updatePrivacyInfo(with: url)
+        updateMaliciousSiteInfo(for: navigationAction.url) // TODO: what happens on .. cancellad nav?
         return .next
     }
 

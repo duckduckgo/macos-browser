@@ -1,5 +1,5 @@
 //
-//  PhishingDetectionStateManager.swift
+//  MaliciousSiteProtectionState.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -17,15 +17,11 @@
 //
 
 import Foundation
+import MaliciousSiteProtection
 
-public protocol PhishingTabStateManaging {
-    var didBypassError: Bool { get set }
-    var isShowingPhishingError: Bool { get set }
+struct MaliciousSiteProtectionState {
+    var currentMalicousSiteThreatKind: MaliciousSiteProtection.ThreatKind?
+    var bypassedMaliciousSiteThreatKind: MaliciousSiteProtection.ThreatKind?
 }
 
-public class PhishingTabStateManager: PhishingTabStateManaging {
-    public var didBypassError: Bool = false
-    public var isShowingPhishingError: Bool = false
-
-    public init(){}
-}
+typealias MaliciousSiteProtectionStateProvider = () -> MaliciousSiteProtectionState

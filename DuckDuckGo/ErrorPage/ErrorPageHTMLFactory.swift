@@ -17,7 +17,7 @@
 //
 
 import Foundation
-import PhishingDetection
+import MaliciousSiteProtection
 import SpecialErrorPages
 
 protocol ErrorPageHTMLTemplating {
@@ -25,16 +25,17 @@ protocol ErrorPageHTMLTemplating {
     func makeHTMLFromTemplate() -> String
 }
 
-final class ErrorPageHTMLFactory {
-    static func html(for error: Error, url: URL, errorCode: Int? = nil, header: String? = nil) -> String {
-        let defaultHeader = UserText.errorPageHeader
-        let nsError = error as NSError
-        let wkError = WKError(_nsError: nsError)
-        switch wkError.code {
-        case WKError.Code(rawValue: PhishingDetectionError.detected.rawValue):
-            return SpecialErrorPageHTMLTemplate.htmlFromTemplate
+enum ErrorPageHTMLFactory {
+    static func html(for error: Error, errorCode: Int? = nil, header: String? = nil) -> String {
+        switch error as NSError {
+        case let error as MaliciousSiteError:
+            switch error.code {
+            case .phishing, .malware:
+                return SpecialErrorPageHTMLTemplate.htmlFromTemplate
+            }
         default:
-            return ErrorPageHTMLTemplate(error: wkError, header: header ?? defaultHeader).makeHTMLFromTemplate()
+            return ErrorPageHTMLTemplate(error: WKError(_nsError: error as NSError),
+                                         header: header ?? UserText.errorPageHeader).makeHTMLFromTemplate()
         }
     }
 }

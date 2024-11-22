@@ -62,11 +62,11 @@ updateRevision() {
 }
 
 performUpdate hashPrefix \
-		"${PWD}/DuckDuckGo/PhishingDetection/PhishingDetection.swift" \
-		"${PWD}/DuckDuckGo/PhishingDetection/hashPrefixes.json"
+		"${PWD}/DuckDuckGo/PhishingDetection/MaliciousSiteProtection.swift" \
+		"${PWD}/DuckDuckGo/PhishingDetection/phishingHashPrefixes.json"
 
 performUpdate filterSet \
-		"${PWD}/DuckDuckGo/PhishingDetection/PhishingDetection.swift" \
-		"${PWD}/DuckDuckGo/PhishingDetection/filterSet.json"
+		"${PWD}/DuckDuckGo/PhishingDetection/MaliciousSiteProtection.swift" \
+        "${PWD}/DuckDuckGo/PhishingDetection/phishingFilterSet.json"
 
-updateRevision "$new_revision" "${PWD}/DuckDuckGo/PhishingDetection/PhishingDetection.swift" 
+updateRevision "$new_revision" "${PWD}/DuckDuckGo/PhishingDetection/MaliciousSiteProtection.swift"

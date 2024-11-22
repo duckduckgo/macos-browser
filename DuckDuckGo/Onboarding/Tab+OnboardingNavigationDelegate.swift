@@ -1,5 +1,5 @@
 //
-//  CapturingOnboardingNavigationDelegate.swift
+//  Tab+.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -19,20 +19,22 @@
 import Foundation
 import Onboarding
 
-class CapturingOnboardingNavigationDelegate: OnboardingNavigationDelegate {
-
-    var didCallSearchFor = false
-    var didNavigateToCalled = false
-    var capturedQuery = ""
-    var capturedUrlString = ""
+extension Tab: OnboardingNavigationDelegate {
 
     func searchFromOnboarding(for query: String) {
-        didCallSearchFor = true
-        capturedQuery = query
+        // We check if the provided string is already a search query.
+        // During onboarding, there's a specific case where we want to search for images,
+        // and this allows us to handle that scenario.
+        let url = if let url = URL(string: query), url.isDuckDuckGoSearch {
+            url
+        } else {
+            URL.makeSearchUrl(from: query)
+        }
+        setUrl(url, source: .userEntered(query, downloadRequested: false))
     }
 
     func navigateFromOnboarding(to url: URL) {
-        didNavigateToCalled = true
-        capturedUrlString = url.absoluteString
+        setUrl(url, source: .ui)
     }
+
 }

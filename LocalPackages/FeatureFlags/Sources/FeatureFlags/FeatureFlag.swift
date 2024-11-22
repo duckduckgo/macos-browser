@@ -22,8 +22,8 @@ import BrowserServicesKit
 public enum FeatureFlag: String, CaseIterable {
     case debugMenu
     case sslCertificatesBypass
-    case phishingDetectionErrorPage
-    case phishingDetectionPreferences
+    case maliciousSiteProtectionErrorPage
+    case maliciousSiteProtectionPreferences
 
     /// Add experimental atb parameter to SERP queries for internal users to display Privacy Reminder
     /// https://app.asana.com/0/1199230911884351/1205979030848528/f
@@ -54,7 +54,18 @@ extension FeatureFlag: FeatureFlagDescribing {
         switch self {
         case .htmlNewTabPage:
             return true
-        default:
+        case .maliciousSiteProtectionErrorPage,
+             .maliciousSiteProtectionPreferences:
+            return true
+        case .debugMenu,
+             .sslCertificatesBypass,
+             .appendAtbToSerpQueries,
+             .freemiumDBP,
+             .contextualOnboarding,
+             .unknownUsernameCategorization,
+             .credentialsImportPromotionForExistingUsers,
+             .networkProtectionUserTips,
+             .networkProtectionEnforceRoutes:
             return false
         }
     }
@@ -71,10 +82,10 @@ extension FeatureFlag: FeatureFlagDescribing {
             return .remoteReleasable(.subfeature(AutofillSubfeature.unknownUsernameCategorization))
         case .freemiumDBP:
             return .remoteReleasable(.subfeature(DBPSubfeature.freemium))
-        case .phishingDetectionErrorPage:
-            return .remoteReleasable(.subfeature(PhishingDetectionSubfeature.allowErrorPage))
-        case .phishingDetectionPreferences:
-            return .remoteReleasable(.subfeature(PhishingDetectionSubfeature.allowPreferencesToggle))
+        case .maliciousSiteProtectionErrorPage:
+            return .remoteReleasable(.subfeature(MaliciousSiteProtectionSubfeature.allowErrorPage))
+        case .maliciousSiteProtectionPreferences:
+            return .remoteReleasable(.subfeature(MaliciousSiteProtectionSubfeature.allowPreferencesToggle))
         case .contextualOnboarding:
             return .remoteReleasable(.feature(.contextualOnboarding))
         case .credentialsImportPromotionForExistingUsers:

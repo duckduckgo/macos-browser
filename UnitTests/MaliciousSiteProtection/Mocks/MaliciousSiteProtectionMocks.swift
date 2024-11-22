@@ -1,5 +1,5 @@
 //
-//  PhishingDetectionMocks.swift
+//  MaliciousSiteProtectionMocks.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -16,13 +16,14 @@
 //  limitations under the License.
 //
 
-import Foundation
-import XCTest
 import Combine
-import PhishingDetection
+import Foundation
+import MaliciousSiteProtection
+import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
-class MockDataProvider: PhishingDetectionDataProviding {
+class MockMaliciousSiteDataProvider: MaliciousSiteProtection.EmbeddedDataProviding {
     var embeddedFilterSet: Set<Filter> = []
     var embeddedHashPrefixes: Set<String> = []
     var embeddedRevision: Int = 0
@@ -40,7 +41,7 @@ class MockDataProvider: PhishingDetectionDataProviding {
     }
 }
 
-class MockFileStorageManager: FileStorageManager {
+class MockMaliciousSiteFileStore: MaliciousSiteProtection.FileStoring {
     private var storage: [String: Data] = [:]
     var didWriteToDisk: Bool = false
     var didReadFromDisk: Bool = false
@@ -71,20 +72,20 @@ final class MockPhishingDataActivitites: PhishingDetectionDataActivityHandling {
     }
 }
 
-final class MockPhishingDetection: PhishingDetecting {
-    func isMalicious(url: URL) async -> Bool {
-        return url.absoluteString.contains("malicious")
-    }
-}
+final class MockMaliciousSiteDetector: MaliciousSiteProtection.MaliciousSiteDetecting {
 
-final class MockPhishingSiteDetector: PhishingSiteDetecting {
-    var isMalicious: Bool = false
-
-    init(isMalicious: Bool) {
-        self.isMalicious = isMalicious
+    var isMalicious: (URL) -> MaliciousSiteProtection.ThreatKind? = { url in
+        url.absoluteString.contains("malicious") ? .phishing : nil
     }
 
-    func checkIsMaliciousIfEnabled(url: URL) async -> Bool {
-        return isMalicious
+    init(isMalicious: ((URL) -> MaliciousSiteProtection.ThreatKind?)? = nil) {
+        if let isMalicious {
+            self.isMalicious = isMalicious
+        }
+    }
+
+
+    func evaluate(_ url: URL) async -> MaliciousSiteProtection.ThreatKind? {
+        return isMalicious(url)
     }
 }

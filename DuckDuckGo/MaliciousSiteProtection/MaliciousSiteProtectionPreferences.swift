@@ -1,5 +1,5 @@
 //
-//  PhishingDetectionPreferences.swift
+//  MaliciousSiteProtectionPreferences.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -19,19 +19,19 @@
 import Foundation
 import Combine
 
-protocol PhishingDetectionPreferencesPersistor {
+protocol MaliciousSiteProtectionPreferencesPersistor {
     var isEnabled: Bool { get set }
 }
 
-struct PhishingDetectionPreferencesUserDefaultsPersistor: PhishingDetectionPreferencesPersistor {
+struct MaliciousSiteProtectionPreferencesUserDefaultsPersistor: MaliciousSiteProtectionPreferencesPersistor {
 
     @UserDefaultsWrapper(key: .phishingDetectionEnabled, defaultValue: true)
     var isEnabled: Bool
 }
 
-final class PhishingDetectionPreferences: ObservableObject {
+final class MaliciousSiteProtectionPreferences: ObservableObject {
 
-    static let shared = PhishingDetectionPreferences()
+    static let shared = MaliciousSiteProtectionPreferences()
 
     @Published
     var isEnabled: Bool {
@@ -40,10 +40,10 @@ final class PhishingDetectionPreferences: ObservableObject {
         }
     }
 
-    init(persistor: PhishingDetectionPreferencesPersistor = PhishingDetectionPreferencesUserDefaultsPersistor()) {
+    init(persistor: MaliciousSiteProtectionPreferencesPersistor = MaliciousSiteProtectionPreferencesUserDefaultsPersistor()) {
         self.persistor = persistor
         self.isEnabled = persistor.isEnabled
     }
 
-    private var persistor: PhishingDetectionPreferencesPersistor
+    private var persistor: MaliciousSiteProtectionPreferencesPersistor
 }

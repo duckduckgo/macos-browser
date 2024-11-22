@@ -104,13 +104,17 @@ struct WKURLSchemeTaskHandler {
     }
 
     static func redirect(to url: URL) -> WKURLSchemeTaskHandler {
+        redirect(to: url.absoluteString)
+    }
+
+    static func redirect(to location: String) -> WKURLSchemeTaskHandler {
         .init { task in
             let response = MockHTTPURLResponse(url: task.request.url!,
                                                statusCode: 301,
                                                mime: nil,
-                                               headerFields: ["Location": url.absoluteString])!
+                                               headerFields: ["Location": location])!
 
-            task._didPerformRedirection(response, newRequest: URLRequest(url: url))
+            task._didPerformRedirection(response, newRequest: URLRequest(url: URL(string: location, relativeTo: task.request.url)!))
             task.didReceive(response)
             task.didFinish()
         }

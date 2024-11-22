@@ -31,8 +31,7 @@ final class ErrorPageTabExtensionTest: XCTestCase {
     var scriptPublisher: PassthroughSubject<MockSpecialErrorPageScriptProvider, Never>!
     var errorPageExtention: SpecialErrorPageTabExtension!
     var credentialCreator: MockCredentialCreator!
-    var phishingDetection: MockPhishingSiteDetector!
-    var phishingStateManager: PhishingTabStateManager!
+    var detector: MockMaliciousSiteDetector!
     let errorURLString = "com.example.error"
     let phishingURLString = "https://privacy-test-pages.site/security/phishing.html"
 
@@ -41,10 +40,8 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         scriptPublisher = PassthroughSubject<MockSpecialErrorPageScriptProvider, Never>()
         let featureFlagger = MockFeatureFlagger()
         credentialCreator = MockCredentialCreator()
-        phishingStateManager = PhishingTabStateManager()
-        phishingDetection = MockPhishingSiteDetector(isMalicious: true)
-        errorPageExtention = SpecialErrorPageTabExtension(webViewPublisher: mockWebViewPublisher, scriptsPublisher: scriptPublisher, urlCredentialCreator: credentialCreator, featureFlagger: featureFlagger, phishingDetector: phishingDetection,
-                                                          phishingStateManager: phishingStateManager)
+        detector = MockMaliciousSiteDetector { _ in .phishing }
+        errorPageExtention = SpecialErrorPageTabExtension(webViewPublisher: mockWebViewPublisher, scriptsPublisher: scriptPublisher, urlCredentialCreator: credentialCreator, featureFlagger: featureFlagger, maliciousSiteDetector: detector)
     }
 
     override func tearDownWithError() throws {
@@ -338,7 +335,8 @@ final class ErrorPageTabExtensionTest: XCTestCase {
 
         // THEN
         XCTAssertEqual(policy.debugDescription, "redirect")
-        XCTAssertTrue(phishingStateManager.isShowingPhishingError)
+        XCTAssertEqual(errorPageExtention.state.currentMalicousSiteThreatKind, .phishing)
+        XCTAssertNil(errorPageExtention.state.bypassedMaliciousSiteThreatKind)
     }
 
     @MainActor func testWhenPhishingDetected_AndVisitSiteClicked_ThenNavigationProceeds() async {
@@ -360,13 +358,13 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         XCTAssertEqual(policy.debugDescription, "next")
         XCTAssertTrue(mockWebView.reloadCalled)
         XCTAssertTrue(mockWebView.canGoBack)
-        XCTAssertFalse(phishingStateManager.isShowingPhishingError)
-        XCTAssertTrue(phishingStateManager.didBypassError)
+        XCTAssertNil(errorPageExtention.state.currentMalicousSiteThreatKind)
+        XCTAssertEqual(errorPageExtention.state.bypassedMaliciousSiteThreatKind, .phishing)
     }
 
     @MainActor func testWhenPhishingNotDetected_ThenNavigationProceeds() async {
          // GIVEN
-        phishingDetection.isMalicious = false
+        detector.isMalicious = { _ in .none }
          let mockWebView = MockWKWebView(url: URL(string: phishingURLString)!)
         let mainFrameNavigation = Navigation(identity: NavigationIdentity(nil), responders: ResponderChain(), state: .started, isCurrent: true)
         let urlRequest = URLRequest(url: URL(string: phishingURLString)!)
@@ -381,7 +379,8 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         // THEN
         XCTAssertEqual(policy.debugDescription, "next")
         XCTAssertFalse(mockWebView.reloadCalled)
-        XCTAssertFalse(phishingStateManager.isShowingPhishingError)
+        XCTAssertNil(errorPageExtention.state.currentMalicousSiteThreatKind)
+        XCTAssertNil(errorPageExtention.state.bypassedMaliciousSiteThreatKind)
      }
 }
 

@@ -16,12 +16,13 @@
 //  limitations under the License.
 //
 
-import XCTest
-@testable import DuckDuckGo_Privacy_Browser
-import Common
 import BrowserServicesKit
 import Combine
-import PhishingDetection
+import Common
+import MaliciousSiteProtection
+import XCTest
+
+@testable import DuckDuckGo_Privacy_Browser
 
 final class DuckSchemeHandlerTests: XCTestCase {
 
@@ -137,13 +138,8 @@ final class DuckSchemeHandlerTests: XCTestCase {
         handler.webView(webView, start: schemeTask)
 
         // Then
-        let error = PhishingDetectionError.detected
-        let expectedError = NSError(domain: PhishingDetectionError.errorDomain, code: error.errorCode, userInfo: [
-            NSURLErrorFailingURLErrorKey: phishingUrl,
-            NSLocalizedDescriptionKey: error.errorUserInfo[NSLocalizedDescriptionKey] ?? "Phishing detected"
-        ])
-        XCTAssertNotNil(schemeTask.error)
-        XCTAssertEqual(schemeTask.error! as NSError, expectedError)
+        let expectedError = MaliciousSiteError(code: .phishing, failingUrl: phishingUrl)
+        XCTAssertEqual(schemeTask.error as NSError?, expectedError as NSError)
     }
 
     @MainActor
