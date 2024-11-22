@@ -50,22 +50,12 @@ final class DuckDuckGoVPNApplication: NSApplication {
         }
 
         // MARK: - Configure Subscription
-        self.subscriptionManager = DefaultSubscriptionManager()
-
-//        let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
-//        let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
-//        let subscriptionEnvironment = DefaultSubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
-//        let subscriptionEndpointService = DefaultSubscriptionEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
-//        let authEndpointService = DefaultAuthEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
-//        let entitlementsCache = UserDefaultsCache<[Entitlement]>(userDefaults: subscriptionUserDefaults,
-//                                                                 key: UserDefaultsCacheKey.subscriptionEntitlements,
-//                                                                 settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(20)))
-//        let accessTokenStorage = SubscriptionTokenKeychainStorage(keychainType: .dataProtection(.named(subscriptionAppGroup)))
-//        accountManager = DefaultAccountManager(accessTokenStorage: accessTokenStorage,
-//                                               entitlementsCache: entitlementsCache,
-//                                               subscriptionEndpointService: subscriptionEndpointService,
-//                                               authEndpointService: authEndpointService)
-
+        let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
+        let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
+        let subscriptionEnvironment = DefaultSubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
+        self.subscriptionManager = DefaultSubscriptionManager(appGroup: subscriptionAppGroup,
+                                                              userDefault: subscriptionUserDefaults,
+                                                              environment: subscriptionEnvironment)
         _delegate = DuckDuckGoVPNAppDelegate(subscriptionManager: subscriptionManager)
         super.init()
 
@@ -80,8 +70,8 @@ final class DuckDuckGoVPNApplication: NSApplication {
     func checkTokenPresence() {
         Task {
             do {
-                let tokenContainer = try await subscriptionManager.getTokenContainer(policy: .local)
-                Logger.networkProtection.error("🟢 VPN Agent found token")
+                _ = try await subscriptionManager.getTokenContainer(policy: .local)
+                Logger.networkProtection.log("🟢 VPN Agent found token")
             } catch {
                 Logger.networkProtection.error("VPN Agent found no token \(error.localizedDescription)")
             }
@@ -428,10 +418,8 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         guard subscriptionManager.isUserAuthenticated else { return }
 
         let entitlementsCheck: (() async -> Result<Bool, Error>) = {
-            //await self.accountManager.hasEntitlement(forProductName: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
             do {
-                let tokenContainer = try await self.subscriptionManager.getTokenContainer(policy: .localForceRefresh)
-                let entitlements = tokenContainer.decodedAccessToken.subscriptionEntitlements
+                let entitlements = try await self.subscriptionManager.getEntitlements(forceRefresh: true)
                 return .success(entitlements.contains(.networkProtection))
             } catch {
                 Logger.networkProtection.error("Failed to get token: \(error)")

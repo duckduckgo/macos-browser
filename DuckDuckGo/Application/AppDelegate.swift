@@ -277,8 +277,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         onboardingStateMachine = ContextualOnboardingStateMachine()
 
         // MARK: - Subscription configuration
-
-        subscriptionManager = DefaultSubscriptionManager()
+        let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
+        let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
+        let subscriptionEnvironment = DefaultSubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
+        subscriptionManager = DefaultSubscriptionManager(appGroup: subscriptionAppGroup,
+                                                         userDefault: subscriptionUserDefaults,
+                                                         environment: subscriptionEnvironment)
         subscriptionUIHandler = SubscriptionUIHandler(windowControllersManagerProvider: {
             return WindowControllersManager.shared
         })

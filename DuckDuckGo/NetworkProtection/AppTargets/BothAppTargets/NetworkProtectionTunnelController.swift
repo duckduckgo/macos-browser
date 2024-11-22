@@ -608,8 +608,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         var options = [String: NSObject]()
 
         options[NetworkProtectionOptionKey.activationAttemptId] = UUID().uuidString as NSString
-        let authToken = try await fetchAuthToken()
-        options[NetworkProtectionOptionKey.authToken] = authToken
+        options[NetworkProtectionOptionKey.tokenContainer] = try await fetchAuthToken()
         options[NetworkProtectionOptionKey.selectedEnvironment] = settings.selectedEnvironment.rawValue as NSString
         options[NetworkProtectionOptionKey.selectedServer] = settings.selectedServer.stringValue as? NSString
 

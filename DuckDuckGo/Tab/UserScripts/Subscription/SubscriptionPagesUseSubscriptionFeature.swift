@@ -95,6 +95,8 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func handler(forMethodNamed methodName: String) -> Subfeature.Handler? {
+        Logger.subscription.debug("WebView handler: \(methodName)")
+
         switch methodName {
         case Handlers.getSubscription: return getSubscription
         case Handlers.setSubscription: return setSubscription
@@ -129,8 +131,8 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func getSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-//        let authToken = accountManager.authToken ?? ""
-//        return Subscription(token: authToken)
+        guard subscriptionManager.isUserAuthenticated else { return Subscription(token: "") }
+
         do {
             let accessToken = try await subscriptionManager.getTokenContainer(policy: .localValid).accessToken
             return Subscription(token: accessToken)
@@ -140,26 +142,10 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         }
     }
 
-//    func setSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-//
-//        PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseEmailSuccess, frequency: .legacyDailyAndCount)
-//
-//        guard let subscriptionValues: SubscriptionValues = DecodableHelper.decode(from: params) else {
-//            assertionFailure("SubscriptionPagesUserScript: expected JSON representation of SubscriptionValues")
-//            return nil
-//        }
-//
-//        let authToken = subscriptionValues.token
-//        if case let .success(accessToken) = await accountManager.exchangeAuthTokenToAccessToken(authToken),
-//           case let .success(accountDetails) = await accountManager.fetchAccountDetails(with: accessToken) {
-//            accountManager.storeAuthToken(token: authToken)
-//            accountManager.storeAccount(token: accessToken, email: accountDetails.email, externalID: accountDetails.externalID)
-//        }
-//
-//        return nil
-//    }
     func setSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         // Note: This is called by the web FE when a subscription is retrieved, `params` contains an auth token V1 that will need to be exchanged for a V2. This is a temporary workaround until the FE fully supports v2 auth.
+
+        PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseEmailSuccess, frequency: .legacyDailyAndCount)
 
         guard let subscriptionValues: SubscriptionValues = CodableHelper.decode(from: params) else {
             Logger.subscription.fault("SubscriptionPagesUserScript: expected JSON representation of SubscriptionValues")
@@ -181,10 +167,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func backToSettings(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-//        if let accessToken = accountManager.accessToken,
-//           case let .success(accountDetails) = await accountManager.fetchAccountDetails(with: accessToken) {
-//            accountManager.storeAccount(token: accessToken, email: accountDetails.email, externalID: accountDetails.externalID)
-//        }
         try await subscriptionManager.getTokenContainer(policy: .localForceRefresh)
         DispatchQueue.main.async { [weak self] in
             self?.notificationCenter.post(name: .subscriptionPageCloseAndOpenPreferences, object: self)

@@ -26,77 +26,7 @@ import os.log
 extension DefaultSubscriptionManager {
 
     // Init the SubscriptionManager using the standard dependencies and configuration, to be used only in the dependencies tree root
-    public convenience init() {
-//
-//
-//        //        let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
-//        let subscriptionEnvironment = DefaultSubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
-//        vpnSettings.alignTo(subscriptionEnvironment: subscriptionEnvironment)
-//
-//        let configuration = URLSessionConfiguration.default
-//        configuration.httpCookieStorage = nil
-//        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
-//        let urlSession = URLSession(configuration: configuration,
-//                                    delegate: SessionDelegate(),
-//                                    delegateQueue: nil)
-//        let apiService = DefaultAPIService(urlSession: urlSession)
-//        let authEnvironment: OAuthEnvironment = subscriptionEnvironment.serviceEnvironment == .production ? .production : .staging
-//
-//        let authService = DefaultOAuthService(baseURL: authEnvironment.url, apiService: apiService)
-//
-//        // keychain storage
-//        let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
-//        let tokenStorage = SubscriptionTokenKeychainStorageV2(keychainType: .dataProtection(.named(subscriptionAppGroup)))
-//        let legacyAccountStorage = SubscriptionTokenKeychainStorage(keychainType: .dataProtection(.named(subscriptionAppGroup)))
-//
-//        let authClient = DefaultOAuthClient(tokensStorage: tokenStorage,
-//                                            legacyTokenStorage: legacyAccountStorage,
-//                                            authService: authService)
-//
-//
-//        apiService.authorizationRefresherCallback = { _ in
-//            guard let tokenContainer = tokenStorage.tokenContainer else {
-//                throw OAuthClientError.internalError("Missing refresh token")
-//            }
-//
-//            if tokenContainer.decodedAccessToken.isExpired() {
-//                Logger.OAuth.debug("Refreshing tokens")
-//                let tokens = try await authClient.getTokens(policy: .localForceRefresh)
-//                return tokens.accessToken
-//            } else {
-//                Logger.general.debug("Trying to refresh valid token, using the old one")
-//                return tokenContainer.accessToken
-//            }
-//        }
-//
-//        let subscriptionEndpointService = DefaultSubscriptionEndpointService(apiService: apiService,
-//                                                                             baseURL: subscriptionEnvironment.serviceEnvironment.url)
-//        let pixelHandler: SubscriptionManager.PixelHandler = { type in
-//            switch type {
-//            case .deadToken:
-//                // TODO: add pixel
-//                //                Pixel.fire(pixel: .privacyProDeadTokenDetected)
-//                break
-//            }
-//        }
-//
-//        if #available(macOS 12.0, *) {
-//            let storePurchaseManager = DefaultStorePurchaseManager()
-//            subscriptionManager = DefaultSubscriptionManager(storePurchaseManager: storePurchaseManager,
-//                                                             oAuthClient: authClient,
-//                                                             subscriptionEndpointService: subscriptionEndpointService,
-//                                                             subscriptionEnvironment: subscriptionEnvironment,
-//                                                             pixelHandler: pixelHandler)
-//        } else {
-//            subscriptionManager = DefaultSubscriptionManager(oAuthClient: authClient,
-//                                                             subscriptionEndpointService: subscriptionEndpointService,
-//                                                             subscriptionEnvironment: subscriptionEnvironment,
-//                                                             pixelHandler: pixelHandler)
-//        }
-
-        let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
-        let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
-        let subscriptionEnvironment = DefaultSubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
+    public convenience init(appGroup: String, userDefault: UserDefaults, environment: SubscriptionEnvironment) {
 
         let configuration = URLSessionConfiguration.default
         configuration.httpCookieStorage = nil
@@ -105,13 +35,13 @@ extension DefaultSubscriptionManager {
                                     delegate: SessionDelegate(),
                                     delegateQueue: nil)
         let apiService = DefaultAPIService(urlSession: urlSession)
-        let authEnvironment: OAuthEnvironment = subscriptionEnvironment.serviceEnvironment == .production ? .production : .staging
+        let authEnvironment: OAuthEnvironment = environment.serviceEnvironment == .production ? .production : .staging
 
         let authService = DefaultOAuthService(baseURL: authEnvironment.url, apiService: apiService)
 
         // keychain storage
-        let tokenStorage = SubscriptionTokenKeychainStorageV2(keychainType: .dataProtection(.named(subscriptionAppGroup)))
-        let legacyAccountStorage = SubscriptionTokenKeychainStorage(keychainType: .dataProtection(.named(subscriptionAppGroup)))
+        let tokenStorage = SubscriptionTokenKeychainStorageV2(keychainType: .dataProtection(.named(appGroup)))
+        let legacyAccountStorage = SubscriptionTokenKeychainStorage(keychainType: .dataProtection(.named(appGroup)))
 
         let authClient = DefaultOAuthClient(tokensStorage: tokenStorage,
                                             legacyTokenStorage: legacyAccountStorage,
@@ -133,8 +63,7 @@ extension DefaultSubscriptionManager {
         }
 
         let subscriptionEndpointService = DefaultSubscriptionEndpointService(apiService: apiService,
-                                                                             baseURL: subscriptionEnvironment.serviceEnvironment.url)
-
+                                                                             baseURL: environment.serviceEnvironment.url)
         let pixelHandler: SubscriptionManager.PixelHandler = { type in
             switch type {
             case .deadToken:
@@ -148,12 +77,12 @@ extension DefaultSubscriptionManager {
             self.init(storePurchaseManager: DefaultStorePurchaseManager(),
                       oAuthClient: authClient,
                       subscriptionEndpointService: subscriptionEndpointService,
-                      subscriptionEnvironment: subscriptionEnvironment,
+                      subscriptionEnvironment: environment,
                       pixelHandler: pixelHandler)
         } else {
             self.init(oAuthClient: authClient,
                       subscriptionEndpointService: subscriptionEndpointService,
-                      subscriptionEnvironment: subscriptionEnvironment,
+                      subscriptionEnvironment: environment,
                       pixelHandler: pixelHandler)
         }
     }

@@ -18,6 +18,7 @@
 
 import Foundation
 import NetworkProtection
+import Subscription
 
 enum PinnableView: String {
     case autofill
@@ -40,7 +41,7 @@ protocol PinningManager {
 
 final class LocalPinningManager: PinningManager {
 
-    static let shared = LocalPinningManager(networkProtectionFeatureActivation: NetworkProtectionKeychainTokenStore())
+    static let shared = LocalPinningManager()
 
     static let pinnedViewChangedNotificationViewTypeKey = "pinning.pinnedViewChanged.viewType"
 
@@ -49,12 +50,6 @@ final class LocalPinningManager: PinningManager {
 
     @UserDefaultsWrapper(key: .manuallyToggledPinnedViews, defaultValue: [])
     private var manuallyToggledPinnedViewsStrings: [String]
-
-    private let networkProtectionFeatureActivation: NetworkProtectionFeatureActivation
-
-    init(networkProtectionFeatureActivation: NetworkProtectionFeatureActivation) {
-        self.networkProtectionFeatureActivation = networkProtectionFeatureActivation
-    }
 
     func togglePinning(for view: PinnableView) {
         flagAsManuallyToggled(view)
@@ -72,7 +67,6 @@ final class LocalPinningManager: PinningManager {
 
     /// Do not call this for user-initiated toggling.  This is only meant to be used for scenarios in which certain conditions
     /// may require a view to be pinned.
-    ///
     func pin(_ view: PinnableView) {
         guard !isPinned(view) else {
             return

@@ -193,7 +193,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     @objc
     func checkEntitlements() {
-        let entitlements = subscriptionManager.entitlements
+        let entitlements = subscriptionManager.currentEntitlements
         let descriptions = entitlements.map({ entitlement in entitlement.rawValue })
         showAlert(title: "Check Entitlements", message: descriptions.joined(separator: "\n"))
     }

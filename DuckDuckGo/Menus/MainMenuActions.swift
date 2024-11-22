@@ -897,8 +897,10 @@ extension MainViewController {
     /// Clears the PrivacyPro state to make testing easier.
     ///
     private func clearPrivacyProState() {
-        Application.appDelegate.subscriptionManager.accountManager.signOut()
-        UserDefaults.netP.networkProtectionEntitlementsExpired = false
+        Task {
+            await Application.appDelegate.subscriptionManager.signOut()
+            UserDefaults.netP.networkProtectionEntitlementsExpired = false
+        }
     }
 
     @objc func resetDailyPixels(_ sender: Any?) {

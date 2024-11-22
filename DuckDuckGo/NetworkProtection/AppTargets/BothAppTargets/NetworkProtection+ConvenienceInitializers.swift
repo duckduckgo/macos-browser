@@ -29,27 +29,10 @@ extension NetworkProtectionDeviceManager {
     static func create() -> NetworkProtectionDeviceManager {
         let settings = Application.appDelegate.vpnSettings
         let keyStore = NetworkProtectionKeychainKeyStore()
-        let tokenStore = NetworkProtectionKeychainTokenStore()
         return NetworkProtectionDeviceManager(environment: settings.selectedEnvironment,
-                                              tokenStore: tokenStore,
+                                              tokenProvider: Application.appDelegate.subscriptionManager,
                                               keyStore: keyStore,
                                               errorEvents: .networkProtectionAppDebugEvents)
-    }
-}
-
-extension NetworkProtectionKeychainTokenStore {
-    convenience init() {
-        self.init(useAccessTokenProvider: true)
-    }
-
-    convenience init(useAccessTokenProvider: Bool) {
-        let accessTokenProvider: AccessTokenProvider = {
-            return try? await Application.appDelegate.subscriptionManager.getTokenContainer(policy: .localValid).accessToken
-        }
-        self.init(keychainType: .default,
-                  errorEvents: .networkProtectionAppDebugEvents,
-                  useAccessTokenProvider: useAccessTokenProvider,
-                  accessTokenProvider: accessTokenProvider)
     }
 }
 
@@ -65,7 +48,7 @@ extension NetworkProtectionLocationListCompositeRepository {
         let settings = Application.appDelegate.vpnSettings
         self.init(
             environment: settings.selectedEnvironment,
-            tokenStore: NetworkProtectionKeychainTokenStore(),
+            tokenProvider: Application.appDelegate.subscriptionManager,
             errorEvents: .networkProtectionAppDebugEvents
         )
     }

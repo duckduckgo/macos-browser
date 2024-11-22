@@ -3031,8 +3031,6 @@
 		EE3424612BA0853900173B1B /* VPNUninstaller.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE34245D2BA0853900173B1B /* VPNUninstaller.swift */; };
 		EE42CBCC2BC8004700AD411C /* PermissionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE42CBCB2BC8004700AD411C /* PermissionsTests.swift */; };
 		EE54F7B32BBFEA49006218DB /* BookmarksAndFavoritesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE54F7B22BBFEA48006218DB /* BookmarksAndFavoritesTests.swift */; };
-		EE66418C2B9B1981005BCD17 /* NetworkProtectionTokenStore+SubscriptionTokenKeychainStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE66418B2B9B1981005BCD17 /* NetworkProtectionTokenStore+SubscriptionTokenKeychainStorage.swift */; };
-		EE66418D2B9B1981005BCD17 /* NetworkProtectionTokenStore+SubscriptionTokenKeychainStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE66418B2B9B1981005BCD17 /* NetworkProtectionTokenStore+SubscriptionTokenKeychainStorage.swift */; };
 		EE66666F2B56EDE4001D898D /* VPNLocationsHostingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE66666E2B56EDE4001D898D /* VPNLocationsHostingViewController.swift */; };
 		EE6666702B56EDE4001D898D /* VPNLocationsHostingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE66666E2B56EDE4001D898D /* VPNLocationsHostingViewController.swift */; };
 		EE66F10C2C3431030071856E /* WebsiteAccount_isDuplicateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE66F10B2C3431030071856E /* WebsiteAccount_isDuplicateTests.swift */; };
@@ -4881,7 +4879,6 @@
 		EE34245D2BA0853900173B1B /* VPNUninstaller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNUninstaller.swift; sourceTree = "<group>"; };
 		EE42CBCB2BC8004700AD411C /* PermissionsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PermissionsTests.swift; sourceTree = "<group>"; };
 		EE54F7B22BBFEA48006218DB /* BookmarksAndFavoritesTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarksAndFavoritesTests.swift; sourceTree = "<group>"; };
-		EE66418B2B9B1981005BCD17 /* NetworkProtectionTokenStore+SubscriptionTokenKeychainStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NetworkProtectionTokenStore+SubscriptionTokenKeychainStorage.swift"; sourceTree = "<group>"; };
 		EE66666E2B56EDE4001D898D /* VPNLocationsHostingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNLocationsHostingViewController.swift; sourceTree = "<group>"; };
 		EE66F10B2C3431030071856E /* WebsiteAccount_isDuplicateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsiteAccount_isDuplicateTests.swift; sourceTree = "<group>"; };
 		EE7F74902BB5D76600CD9456 /* BookmarksBarTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarksBarTests.swift; sourceTree = "<group>"; };
@@ -6286,7 +6283,6 @@
 				4B41ED9F2B15437A001EEDF4 /* NetworkProtectionNotificationsPresenterFactory.swift */,
 				EEF12E6D2A2111880023E6BF /* MacPacketTunnelProvider.swift */,
 				7B0099802B65C6B300FE7C31 /* MacTransparentProxyProvider.swift */,
-				EE66418B2B9B1981005BCD17 /* NetworkProtectionTokenStore+SubscriptionTokenKeychainStorage.swift */,
 			);
 			path = NetworkExtensionTargets;
 			sourceTree = "<group>";
@@ -12494,7 +12490,6 @@
 				4B25377A2A11C01700610219 /* UserText+NetworkProtectionExtensions.swift in Sources */,
 				B65DA5F42A77D3FA00CBEE8D /* BundleExtension.swift in Sources */,
 				4B52354D2C854CB600AFAF64 /* DuckDuckGoUserAgent.swift in Sources */,
-				EE66418D2B9B1981005BCD17 /* NetworkProtectionTokenStore+SubscriptionTokenKeychainStorage.swift in Sources */,
 				EEBCA0C72BD7CE2C004DF19C /* VPNFailureRecoveryPixel.swift in Sources */,
 				F1DA51932BF6081D00CF29FA /* AttributionPixelHandler.swift in Sources */,
 				7B2E52252A5FEC09000C6D39 /* NetworkProtectionAgentNotificationsPresenter.swift in Sources */,
@@ -12622,7 +12617,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B41EDA02B15437A001EEDF4 /* NetworkProtectionNotificationsPresenterFactory.swift in Sources */,
-				EE66418C2B9B1981005BCD17 /* NetworkProtectionTokenStore+SubscriptionTokenKeychainStorage.swift in Sources */,
 				7B7DFB202B7E736B009EA1A3 /* MacPacketTunnelProvider.swift in Sources */,
 				F1DA51962BF6083700CF29FA /* PrivacyProPixel.swift in Sources */,
 				EEBCA0C62BD7CE2C004DF19C /* VPNFailureRecoveryPixel.swift in Sources */,

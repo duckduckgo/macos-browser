@@ -70,7 +70,7 @@ struct PreferencesSection: Hashable, Identifiable {
             let platform = subscriptionManager.currentEnvironment.purchasePlatform
             var shouldHidePrivacyProDueToNoProducts = platform == .appStore && subscriptionManager.canPurchase == false
 
-            if subscriptionManager.accountManager.isUserAuthenticated {
+            if subscriptionManager.isUserAuthenticated {
                 shouldHidePrivacyProDueToNoProducts = false
             }
 

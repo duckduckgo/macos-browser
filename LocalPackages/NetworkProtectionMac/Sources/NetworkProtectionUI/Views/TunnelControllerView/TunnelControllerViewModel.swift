@@ -325,7 +325,6 @@ public final class TunnelControllerViewModel: ObservableObject {
 
     // MARK: - Connection Status: Toggle State
 
-    @frozen
     enum ToggleTransition: Equatable {
         case idle
         case switchingOn(locallyInitiated: Bool)
