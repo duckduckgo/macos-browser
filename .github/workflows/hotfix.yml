@@ -44,17 +44,25 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GHA_ELEVATED_PERMISSIONS_TOKEN }}
           ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
         run: |
-          last_release="$(gh api repos/${{ github.repository }}/releases/latest | jq -r .tag_name)"
-          echo "last_release=$last_release" >> $GITHUB_OUTPUT
           bundle exec fastlane run start_new_release \
             platform:"macos" \
-            version:"$last_release" \
             github_handle:"${{ github.actor }}" \
             is_hotfix:"true"
 
       # Necessary as make_release_branch will checkout a hotfix branch and the plugins may be differnet TODO: KS
       # - name: Reinstall fastlane
       #   run: bundle install
+
+      - name: Print environment variables #KS Temp testing
+        env:
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          BRANCH: ${{ steps.make_release_branch.outputs.release_branch_name }}
+          RELEASE_TAG: ${{ steps.make_release_branch.outputs.last_release }}
+          WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          echo "BRANCH: $BRANCH"
+          echo "RELEASE_TAG: $RELEASE_TAG"
+          echo "WORKFLOW_URL: $WORKFLOW_URL"
 
       # - name: Report success
       #   env:
