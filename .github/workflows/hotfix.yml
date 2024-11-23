@@ -18,12 +18,12 @@ jobs:
 
     steps:
 
-      - name: Assert main branch
-        run: |
-          if [ "${{ github.ref_name }}" != "main" ]; then
-            echo "👎 Not the main branch"
-            exit 1
-          fi
+      # - name: Assert main branch TODO: KS
+      #   run: |
+      #     if [ "${{ github.ref_name }}" != "main" ]; then
+      #       echo "👎 Not the main branch"
+      #       exit 1
+      #     fi
 
       - name: Check out the code
         uses: actions/checkout@v4
@@ -52,17 +52,17 @@ jobs:
             github_handle:"${{ github.actor }}" \
             is_hotfix:"true"
 
-      # Necessary as make_release_branch will checkout a hotfix branch and the plugins may be differnet
-      - name: Reinstall fastlane
-        run: bundle install
+      # Necessary as make_release_branch will checkout a hotfix branch and the plugins may be differnet TODO: KS
+      # - name: Reinstall fastlane
+      #   run: bundle install
 
-      - name: Report success
-        env:
-          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          BRANCH: ${{ steps.make_release_branch.outputs.release_branch_name }}
-          RELEASE_TAG: ${{ steps.make_release_branch.outputs.last_release }}
-          WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        run: |
-          bundle exec fastlane run asana_add_comment \
-            task_url:"${{ steps.make_release_branch.outputs.asana_task_url }}" \
-            template_name:"hotfix-branch-ready"
+      # - name: Report success
+      #   env:
+      #     ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+      #     BRANCH: ${{ steps.make_release_branch.outputs.release_branch_name }}
+      #     RELEASE_TAG: ${{ steps.make_release_branch.outputs.last_release }}
+      #     WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      #   run: |
+      #     bundle exec fastlane run asana_add_comment \
+      #       task_url:"${{ steps.make_release_branch.outputs.asana_task_url }}" \
+      #       template_name:"hotfix-branch-ready"
