@@ -1291,6 +1291,8 @@
 		37DF37072CF38B9F005ED34B /* PrivacyStats in Frameworks */ = {isa = PBXBuildFile; productRef = 37DF37062CF38B9F005ED34B /* PrivacyStats */; };
 		37DF37092CF38CD7005ED34B /* PrivacyStatsDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DF37082CF38CD3005ED34B /* PrivacyStatsDatabase.swift */; };
 		37DF370A2CF38CD7005ED34B /* PrivacyStatsDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DF37082CF38CD3005ED34B /* PrivacyStatsDatabase.swift */; };
+		37DF370D2CF3CF03005ED34B /* NewTabPagePrivacyStatsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DF370C2CF3CEFD005ED34B /* NewTabPagePrivacyStatsModel.swift */; };
+		37DF370E2CF3CF03005ED34B /* NewTabPagePrivacyStatsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DF370C2CF3CEFD005ED34B /* NewTabPagePrivacyStatsModel.swift */; };
 		37E2608C2C8A1F6D006EE07F /* UserColorProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E2608B2C8A1F6D006EE07F /* UserColorProviding.swift */; };
 		37E2608D2C8A1F6D006EE07F /* UserColorProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E2608B2C8A1F6D006EE07F /* UserColorProviding.swift */; };
 		37E2608F2C8A3ABE006EE07F /* HomePageSettingsModelNavigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E2608E2C8A3ABE006EE07F /* HomePageSettingsModelNavigator.swift */; };
@@ -3764,6 +3766,7 @@
 		37DD516C296EAEDC00837F27 /* DuckDuckGoAppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGoAppStore.xcconfig; sourceTree = "<group>"; };
 		37DF37032CF386DB005ED34B /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = SOURCE_ROOT; };
 		37DF37082CF38CD3005ED34B /* PrivacyStatsDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyStatsDatabase.swift; sourceTree = "<group>"; };
+		37DF370C2CF3CEFD005ED34B /* NewTabPagePrivacyStatsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPagePrivacyStatsModel.swift; sourceTree = "<group>"; };
 		37E1116C2C578F1B00583C19 /* DuckDuckGoAppStoreDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DuckDuckGoAppStoreDebug.entitlements; sourceTree = "<group>"; };
 		37E2608B2C8A1F6D006EE07F /* UserColorProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserColorProviding.swift; sourceTree = "<group>"; };
 		37E2608E2C8A3ABE006EE07F /* HomePageSettingsModelNavigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePageSettingsModelNavigator.swift; sourceTree = "<group>"; };
@@ -5814,7 +5817,7 @@
 				37F8E2322CEE363D002F0141 /* NewTabPageContextMenuPresenting.swift */,
 				3723A94E2CE73FDD00A0C59A /* NewTabPageRMFClient.swift */,
 				37F1E32D2CEF2DDD00130142 /* Favorites */,
-				379B5AF12CEA32FF00B9F5D7 /* NewTabPagePrivacyStatsClient.swift */,
+				37DF370B2CF3CEF5005ED34B /* PrivacyStats */,
 				379B5AEB2CEA26C600B9F5D7 /* NewTabPageConfigurationClient.swift */,
 				37FB43102CDB883700479A1E /* NewTabPageActionsManager.swift */,
 				372ED7C12CDD4815002287EC /* NewTabPageUserContentController.swift */,
@@ -6036,6 +6039,15 @@
 				37D23786287F5C2900BCE03B /* PinnedTabsViewModelTests.swift */,
 			);
 			path = PinnedTabs;
+			sourceTree = "<group>";
+		};
+		37DF370B2CF3CEF5005ED34B /* PrivacyStats */ = {
+			isa = PBXGroup;
+			children = (
+				379B5AF12CEA32FF00B9F5D7 /* NewTabPagePrivacyStatsClient.swift */,
+				37DF370C2CF3CEFD005ED34B /* NewTabPagePrivacyStatsModel.swift */,
+			);
+			path = PrivacyStats;
 			sourceTree = "<group>";
 		};
 		37F1E32D2CEF2DDD00130142 /* Favorites */ = {
@@ -11750,6 +11762,7 @@
 				B6B4D1CB2B0C8C9200C26286 /* FirefoxCompatibilityPreferences.swift in Sources */,
 				F188268E2BBF01C400D9AC4F /* PixelDataModel.xcdatamodeld in Sources */,
 				3706FBC0293F65D500E42796 /* CSVImporter.swift in Sources */,
+				37DF370D2CF3CF03005ED34B /* NewTabPagePrivacyStatsModel.swift in Sources */,
 				3706FBC1293F65D500E42796 /* StartupPreferences.swift in Sources */,
 				3706FBC2293F65D500E42796 /* MainMenu.swift in Sources */,
 				3706FBC5293F65D500E42796 /* CallToAction.swift in Sources */,
@@ -13613,6 +13626,7 @@
 				7B4D8A212BDA857300852966 /* VPNOperationErrorRecorder.swift in Sources */,
 				F17E7DDE2C7C83E500907A84 /* Logger+FileDownload.swift in Sources */,
 				859F30642A72A7BB00C20372 /* BookmarksBarPromptPopover.swift in Sources */,
+				37DF370E2CF3CF03005ED34B /* NewTabPagePrivacyStatsModel.swift in Sources */,
 				7B6545ED2C0778BB00115BEA /* VPNControllerUDSClient+ConvenienceInitializers.swift in Sources */,
 				BDBA85902C5D252A00BC54F5 /* VPNFeedbackSender.swift in Sources */,
 				B693955426F04BEC0015B914 /* ColorView.swift in Sources */,

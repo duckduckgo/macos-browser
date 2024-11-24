@@ -96,6 +96,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private(set) lazy var newTabPageActionsManager: NewTabPageActionsManaging = NewTabPageActionsManager(
         appearancePreferences: .shared,
         activeRemoteMessageModel: activeRemoteMessageModel,
+        privacyStats: privacyStats,
         openURLHandler: { url in
             Task { @MainActor in
                 WindowControllersManager.shared.showTab(with: .contentFromURL(url, source: .appOpenUrl))
