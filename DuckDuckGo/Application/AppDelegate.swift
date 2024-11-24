@@ -36,6 +36,7 @@ import SyncDataProviders
 import UserNotifications
 import Lottie
 import NetworkProtection
+import PrivacyStats
 import Subscription
 import NetworkProtectionIPC
 import DataBrokerProtection
@@ -101,6 +102,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
         }
     )
+    let privacyStats: PrivacyStats
     let activeRemoteMessageModel: ActiveRemoteMessageModel
     let homePageSettingsModel = HomePage.Models.SettingsModel()
     let remoteMessagingClient: RemoteMessagingClient!
@@ -317,6 +319,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                                                        freemiumDBPUserStateManager: freemiumDBPUserStateManager)
         freemiumDBPPromotionViewCoordinator = FreemiumDBPPromotionViewCoordinator(freemiumDBPUserStateManager: freemiumDBPUserStateManager,
                                                                                   freemiumDBPFeature: freemiumDBPFeature)
+
+        privacyStats = PrivacyStats(
+            databaseProvider: PrivacyStatsDatabase(),
+            // swiftlint:disable:next force_cast
+            trackerDataProvider: (ContentBlocking.shared as! AppContentBlocking)
+        )
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {
