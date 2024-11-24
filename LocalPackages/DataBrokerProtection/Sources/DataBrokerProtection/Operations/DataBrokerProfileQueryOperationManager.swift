@@ -353,10 +353,10 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                                         profileQueryId: profileQueryId)
 
             try database.addAttempt(extractedProfileId: extractedProfileId,
-                                attemptUUID: stageDurationCalculator.attemptId,
-                                dataBroker: stageDurationCalculator.dataBroker,
-                                lastStageDate: stageDurationCalculator.lastStateTime,
-                                startTime: stageDurationCalculator.startTime)
+                                    attemptUUID: stageDurationCalculator.attemptId,
+                                    dataBroker: stageDurationCalculator.dataBroker,
+                                    lastStageDate: stageDurationCalculator.lastStateTime,
+                                    startTime: stageDurationCalculator.startTime)
             try database.add(.init(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested))
             try incrementAttemptCountIfNeeded(
                 database: database,
