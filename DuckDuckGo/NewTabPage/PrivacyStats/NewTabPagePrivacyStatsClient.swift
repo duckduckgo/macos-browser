@@ -48,7 +48,7 @@ final class NewTabPagePrivacyStatsClient: NewTabPageScriptClient {
         model.statsUpdatePublisher
             .sink { [weak self] in
                 Task { @MainActor in
-                    self?.notifyDataUpdated()
+                    await self?.notifyDataUpdated()
                 }
             }
             .store(in: &cancellables)
@@ -83,29 +83,36 @@ final class NewTabPagePrivacyStatsClient: NewTabPageScriptClient {
         return nil
     }
 
-    private func calculatePrivacyStats() -> NewTabPageUserScript.PrivacyStatsData {
-        let stats = model.privacyStats.fetchPrivacyStats()
-        let total = stats.values.reduce(0, +)
-        let top10Stats = stats.sorted { $0.value > $1.value }.prefix(10)
-        var companies = top10Stats
-            .map { key, value in
-                NewTabPageUserScript.TrackerCompany(count: value, displayName: key)
+    private func calculatePrivacyStats() async -> NewTabPageUserScript.PrivacyStatsData {
+        let stats = await model.privacyStats.fetchPrivacyStats()
+        let topCompanies = model.privacyStats.topCompanies
+
+        var totalCount: Int = 0
+        var otherCount: Int = 0
+
+        var companiesStats: [NewTabPageUserScript.TrackerCompany] = stats.compactMap { key, value in
+            totalCount += value
+            guard topCompanies.contains(key) else {
+                otherCount += value
+                return nil
             }
-        let otherCount = total - top10Stats.reduce(0, { $0 + $1.value })
-        if otherCount > 0 {
-            companies.append(.init(count: otherCount, displayName: "__other__"))
+            return NewTabPageUserScript.TrackerCompany(count: value, displayName: key)
         }
-        return NewTabPageUserScript.PrivacyStatsData(totalCount: total, trackerCompanies: companies)
+
+        if otherCount > 0 {
+            companiesStats.append(.init(count: otherCount, displayName: "__other__"))
+        }
+        return NewTabPageUserScript.PrivacyStatsData(totalCount: totalCount, trackerCompanies: companiesStats)
     }
 
     @MainActor
-    private func notifyDataUpdated() {
-        pushMessage(named: MessageName.onDataUpdate.rawValue, params: calculatePrivacyStats())
+    private func notifyDataUpdated() async {
+        pushMessage(named: MessageName.onDataUpdate.rawValue, params: await calculatePrivacyStats())
     }
 
     @MainActor
     func getData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        return calculatePrivacyStats()
+        return await calculatePrivacyStats()
     }
 }
 

@@ -45,7 +45,9 @@ final class PrivacyStatsTabExtension: NSObject {
         }
         switch tracker.type {
         case .tracker, .trackerWithSurrogate:
-            privacyStats.recordBlockedTracker(entityName)
+            Task {
+                await privacyStats.recordBlockedTracker(entityName)
+            }
         case .thirdPartyRequest:
             break
         }
