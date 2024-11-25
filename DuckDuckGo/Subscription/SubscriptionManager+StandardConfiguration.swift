@@ -26,7 +26,10 @@ import os.log
 extension DefaultSubscriptionManager {
 
     // Init the SubscriptionManager using the standard dependencies and configuration, to be used only in the dependencies tree root
-    public convenience init(appGroup: String?, userDefault: UserDefaults, environment: SubscriptionEnvironment) {
+    public convenience init(appGroup: String?,
+                            keychainType: KeychainType,
+                            userDefault: UserDefaults,
+                            environment: SubscriptionEnvironment) {
 
         let configuration = URLSessionConfiguration.default
         configuration.httpCookieStorage = nil
@@ -38,19 +41,11 @@ extension DefaultSubscriptionManager {
         let authEnvironment: OAuthEnvironment = environment.serviceEnvironment == .production ? .production : .staging
 
         let authService = DefaultOAuthService(baseURL: authEnvironment.url, apiService: apiService)
-
-        // keychain storage
-        let accessGroup: KeychainType.AccessGroup
-        if let appGroup = appGroup {
-            accessGroup = .named(appGroup)
-        } else {
-            accessGroup = .unspecified
-        }
-        let tokenStorage = SubscriptionTokenKeychainStorageV2(keychainType: .dataProtection(accessGroup))
-//        let legacyAccountStorage = SubscriptionTokenKeychainStorage(keychainType: .dataProtection(accessGroup)) // TODO: re-enable
+        let tokenStorage = SubscriptionTokenKeychainStorageV2(keychainType: keychainType)
+        let legacyAccountStorage = SubscriptionTokenKeychainStorage(keychainType: keychainType)
 
         let authClient = DefaultOAuthClient(tokensStorage: tokenStorage,
-                                            legacyTokenStorage: nil, // legacyAccountStorage,
+                                            legacyTokenStorage: legacyAccountStorage,
                                             authService: authService)
 
         apiService.authorizationRefresherCallback = { _ in

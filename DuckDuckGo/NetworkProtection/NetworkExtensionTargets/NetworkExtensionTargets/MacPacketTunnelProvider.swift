@@ -429,7 +429,9 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         }
 
         Logger.networkProtection.log("Subscription environment: \(subscriptionEnvironment.description, privacy: .public)")
+
         let subscriptionManager = DefaultSubscriptionManager(appGroup: appGroup,
+                                                             keychainType: Bundle.keychainType,
                                                              userDefault: subscriptionUserDefaults,
                                                              environment: subscriptionEnvironment)
 

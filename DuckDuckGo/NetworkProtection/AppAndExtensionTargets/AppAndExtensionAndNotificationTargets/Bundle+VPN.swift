@@ -18,6 +18,7 @@
 
 import Foundation
 import NetworkProtection
+import Common
 
 extension Bundle {
 
