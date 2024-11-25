@@ -443,7 +443,10 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
     @MainActor
     func pushPurchaseUpdate(originalMessage: WKScriptMessage, purchaseUpdate: PurchaseUpdate) {
-        pushAction(method: .onPurchaseUpdate, webView: originalMessage.webView!, params: purchaseUpdate)
+        guard let webView = originalMessage.webView else {
+            return
+        }
+        pushAction(method: .onPurchaseUpdate, webView: webView, params: purchaseUpdate)
     }
 
     func pushAction(method: SubscribeActionName, webView: WKWebView, params: Encodable) {

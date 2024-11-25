@@ -29,7 +29,7 @@ import WireGuard
 
 final class MacPacketTunnelProvider: PacketTunnelProvider {
 
-    static var isAppex: Bool {
+    static var isAppex: Bool { // IS APP STORE VERSION
 #if NETP_SYSTEM_EXTENSION
         false
 #else
@@ -37,7 +37,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 #endif
     }
 
-    static var subscriptionsAppGroup: String? {
+    fileprivate static var subscriptionsAppGroup: String? {
         isAppex ? Bundle.main.appGroup(bundle: .subs) : nil
     }
 
@@ -401,6 +401,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
     // MARK: - Initialization
 
     @MainActor @objc public init() {
+        Logger.networkProtection.log("Initializing MacPacketTunnelProvider")
 #if NETP_SYSTEM_EXTENSION
         let defaults = UserDefaults.standard
 #else
@@ -412,7 +413,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         let settings = VPNSettings(defaults: defaults)
 
         // MARK: - Configure Subscription
-        let subscriptionUserDefaults = UserDefaults(suiteName: MacPacketTunnelProvider.subscriptionsAppGroup)!
+        let appGroup = MacPacketTunnelProvider.subscriptionsAppGroup
+        let subscriptionUserDefaults = UserDefaults(suiteName: appGroup)!
         let notificationCenter: NetworkProtectionNotificationCenter = DistributedNotificationCenter.default()
         let controllerErrorStore = NetworkProtectionTunnelErrorStore(notificationCenter: notificationCenter)
         let debugEvents = Self.networkProtectionDebugEvents(controllerErrorStore: controllerErrorStore)
@@ -427,7 +429,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         }
 
         Logger.networkProtection.log("Subscription environment: \(subscriptionEnvironment.description, privacy: .public)")
-        let subscriptionManager = DefaultSubscriptionManager(appGroup: MacPacketTunnelProvider.subscriptionsAppGroup,
+        let subscriptionManager = DefaultSubscriptionManager(appGroup: appGroup,
                                                              userDefault: subscriptionUserDefaults,
                                                              environment: subscriptionEnvironment)
 

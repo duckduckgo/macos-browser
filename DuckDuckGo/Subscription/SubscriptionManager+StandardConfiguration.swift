@@ -47,10 +47,10 @@ extension DefaultSubscriptionManager {
             accessGroup = .unspecified
         }
         let tokenStorage = SubscriptionTokenKeychainStorageV2(keychainType: .dataProtection(accessGroup))
-        let legacyAccountStorage = SubscriptionTokenKeychainStorage(keychainType: .dataProtection(accessGroup))
+//        let legacyAccountStorage = SubscriptionTokenKeychainStorage(keychainType: .dataProtection(accessGroup)) // TODO: re-enable
 
         let authClient = DefaultOAuthClient(tokensStorage: tokenStorage,
-                                            legacyTokenStorage: legacyAccountStorage,
+                                            legacyTokenStorage: nil, // legacyAccountStorage,
                                             authService: authService)
 
         apiService.authorizationRefresherCallback = { _ in
