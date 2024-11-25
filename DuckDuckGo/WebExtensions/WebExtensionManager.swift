@@ -51,7 +51,9 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
 
     static private func makeContext(for webExtension: _WKWebExtension) -> _WKWebExtensionContext {
         let context = _WKWebExtensionContext(for: webExtension)
-        context.uniqueIdentifier = UUID().uuidString
+
+        // TODO: Temporary fix to have the same state on multiple browser sessions
+        context.uniqueIdentifier = UUID(uuidString: "36dbd1f8-27c7-43fd-a206-726958a1018d")!.uuidString
 
         // TODO: We should consult what the extension requests to decide what to grant.
         let matchPatterns = context.webExtension.allRequestedMatchPatterns
