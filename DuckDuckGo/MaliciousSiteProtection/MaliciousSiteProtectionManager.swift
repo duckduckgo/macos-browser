@@ -49,7 +49,7 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
         filterSetDataSHA: String = "517e610cd7c304f91ff5aaee91d570f7b6e678dbe9744e00cdb0a3126068432f",
         hashPrefixURL: URL = Bundle.main.url(forResource: "phishingHashPrefixes", withExtension: "json")!,
         hashPrefixDataSHA: String = "05075ab14302a9e0329fbc0ba7e4e3118d7fa37846ec087c3942cfb1be92ffe0",
-        apiClient: MaliciousSiteProtection.APIClientProtocol? = nil,
+        apiClient: MaliciousSiteProtection.APIClientProtocol = .production,
         embeddedDataProvider: MaliciousSiteProtection.EmbeddedDataProviding? = nil,
         dataManager: MaliciousSiteProtection.DataManaging? = nil,
         detector: MaliciousSiteProtection.MaliciousSiteDetecting? = nil,
@@ -76,7 +76,6 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
             hashPrefixDataSHA: hashPrefixDataSHA
         )
 
-        let apiClient = apiClient ?? MaliciousSiteProtection.APIClient(environment: .production)
         let dataManager = dataManager ?? MaliciousSiteProtection.DataManager(embeddedDataProvider: embeddedDataProvider)
 
         self.detector = detector ?? MaliciousSiteDetector(apiClient: apiClient, dataManager: dataManager, eventMapping: Self.debugEvents)
