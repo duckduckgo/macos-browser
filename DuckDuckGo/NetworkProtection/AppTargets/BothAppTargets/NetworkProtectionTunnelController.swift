@@ -608,9 +608,6 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     }
 
     private func start(_ tunnelManager: NETunnelProviderManager) async throws {
-
-        Logger.networkProtection.debug("Starting NetworkProtectionTunnelController")
-
         var options = [String: NSObject]()
         options[NetworkProtectionOptionKey.activationAttemptId] = UUID().uuidString as NSString
 
@@ -652,8 +649,10 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         }
 
         do {
+            Logger.networkProtection.debug("Starting NetworkProtectionTunnelController, options: \(options, privacy: .public)")
             try tunnelManager.connection.startVPNTunnel(options: options)
         } catch {
+            Logger.networkProtection.fault("Failed to start VPN tunnel: \(error, privacy: .public)")
             throw StartError.startTunnelFailure(error)
         }
 

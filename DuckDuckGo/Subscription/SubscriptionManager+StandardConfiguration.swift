@@ -26,7 +26,7 @@ import os.log
 extension DefaultSubscriptionManager {
 
     // Init the SubscriptionManager using the standard dependencies and configuration, to be used only in the dependencies tree root
-    public convenience init(appGroup: String, userDefault: UserDefaults, environment: SubscriptionEnvironment) {
+    public convenience init(appGroup: String?, userDefault: UserDefaults, environment: SubscriptionEnvironment) {
 
         let configuration = URLSessionConfiguration.default
         configuration.httpCookieStorage = nil
@@ -40,8 +40,14 @@ extension DefaultSubscriptionManager {
         let authService = DefaultOAuthService(baseURL: authEnvironment.url, apiService: apiService)
 
         // keychain storage
-        let tokenStorage = SubscriptionTokenKeychainStorageV2(keychainType: .dataProtection(.named(appGroup)))
-        let legacyAccountStorage = SubscriptionTokenKeychainStorage(keychainType: .dataProtection(.named(appGroup)))
+        let accessGroup: KeychainType.AccessGroup
+        if let appGroup = appGroup {
+            accessGroup = .named(appGroup)
+        } else {
+            accessGroup = .unspecified
+        }
+        let tokenStorage = SubscriptionTokenKeychainStorageV2(keychainType: .dataProtection(accessGroup))
+        let legacyAccountStorage = SubscriptionTokenKeychainStorage(keychainType: .dataProtection(accessGroup))
 
         let authClient = DefaultOAuthClient(tokensStorage: tokenStorage,
                                             legacyTokenStorage: legacyAccountStorage,
