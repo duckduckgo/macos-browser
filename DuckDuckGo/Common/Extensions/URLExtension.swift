@@ -342,6 +342,10 @@ extension URL {
         return ![.https, .http, .about, .file, .blob, .data, .ftp, .javascript, .duck].contains(navigationalScheme)
     }
 
+    var isWebExtensionUrl: Bool {
+        return scheme == "webkit-extension"
+    }
+
     // MARK: - DuckDuckGo
 
     static var onboarding: URL {
