@@ -99,7 +99,7 @@ final class PrivacyDashboardTabExtension {
 
     @MainActor
     private func updateMaliciousSiteInfo(for url: URL?) {
-        guard let url, url.isValid, // TODO: is it correctly updated when no malicious site info?
+        guard let url, url.isValid,
               !(url.isDuckURLScheme || url.isDuckDuckGo) else { return }
         self.privacyInfo?.malicousSiteThreatKind = maliciousSiteProtectionStateProvider().bypassedMaliciousSiteThreatKind
     }
@@ -173,7 +173,7 @@ extension PrivacyDashboardTabExtension: NavigationResponder {
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         resetConnectionUpgradedTo(navigationAction: navigationAction)
-        updateMaliciousSiteInfo(for: navigationAction.url) // TODO: what happens on .. cancellad nav?
+        updateMaliciousSiteInfo(for: navigationAction.url)
         return .next
     }
 

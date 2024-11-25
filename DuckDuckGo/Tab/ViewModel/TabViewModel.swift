@@ -405,7 +405,7 @@ final class TabViewModel {
                 case .phishing:
                     title = UserText.phishingErrorPageTabTitle
                 case .malware:
-                    title = UserText.phishingErrorPageTabTitle // TODO: Malware title
+                    title = UserText.malwareErrorPageTabTitle
                 }
             default:
                 title = UserText.tabErrorTitle

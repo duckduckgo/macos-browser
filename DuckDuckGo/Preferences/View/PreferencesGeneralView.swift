@@ -197,15 +197,15 @@ extension Preferences {
 
                 // SECTION 7: Phishing Detection
                 if featureFlagger.isFeatureOn(.maliciousSiteProtectionPreferences) {
-                    PreferencePaneSection(UserText.phishingDetectionHeader) {
+                    PreferencePaneSection(UserText.maliciousSiteDetectionHeader) {
                         PreferencePaneSubSection {
-                            ToggleMenuItem(UserText.phishingDetectionIsEnabled,
+                            ToggleMenuItem(UserText.maliciousSiteDetectionIsEnabled,
                                            isOn: $phishingDetectionModel.isEnabled)
                                 .onChange(of: phishingDetectionModel.isEnabled) { newValue in
                                     PixelKit.fire(MaliciousSiteProtection.Event.settingToggled(to: newValue))
                                 }
                         }.padding(.bottom, 5)
-                        Text(UserText.phishingDetectionEnabledWarning)
+                        Text(UserText.maliciousDetectionEnabledWarning)
                             .font(.footnote)
                             .foregroundColor(.red)
                             .padding(.top, 5)
