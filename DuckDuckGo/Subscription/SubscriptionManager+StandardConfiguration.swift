@@ -20,11 +20,13 @@ import Foundation
 import Subscription
 import Common
 import PixelKit
+import BrowserServicesKit
+import FeatureFlags
 
 extension DefaultSubscriptionManager {
 
     // Init the SubscriptionManager using the standard dependencies and configuration, to be used only in the dependencies tree root
-    public convenience init() {
+    public convenience init(featureFlagger: FeatureFlagger? = nil) {
         // MARK: - Configure Subscription
         let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
         let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
@@ -44,6 +46,20 @@ extension DefaultSubscriptionManager {
                                                    subscriptionEndpointService: subscriptionEndpointService,
                                                    authEndpointService: authEndpointService)
 
+        let subscriptionFeatureFlagger: FeatureFlaggerMapping<SubscriptionFeatureFlags> = FeatureFlaggerMapping { feature in
+            guard let featureFlagger else {
+                // With no featureFlagger provided there is no gating of features
+                return true
+            }
+
+            switch feature {
+            case .isLaunchedROW:
+                return featureFlagger.isFeatureOn(.isPrivacyProLaunchedROW)
+            case .isLaunchedROWOverride:
+                return featureFlagger.isFeatureOn(.isPrivacyProLaunchedROWOverride)
+            }
+        }
+
         if #available(macOS 12.0, *) {
             let storePurchaseManager = DefaultStorePurchaseManager(subscriptionFeatureMappingCache: subscriptionFeatureMappingCache)
             self.init(storePurchaseManager: storePurchaseManager,
@@ -51,13 +67,15 @@ extension DefaultSubscriptionManager {
                       subscriptionEndpointService: subscriptionEndpointService,
                       authEndpointService: authEndpointService,
                       subscriptionFeatureMappingCache: subscriptionFeatureMappingCache,
-                      subscriptionEnvironment: subscriptionEnvironment)
+                      subscriptionEnvironment: subscriptionEnvironment,
+                      subscriptionFeatureFlagger: subscriptionFeatureFlagger)
         } else {
             self.init(accountManager: accountManager,
                       subscriptionEndpointService: subscriptionEndpointService,
                       authEndpointService: authEndpointService,
                       subscriptionFeatureMappingCache: subscriptionFeatureMappingCache,
-                      subscriptionEnvironment: subscriptionEnvironment)
+                      subscriptionEnvironment: subscriptionEnvironment,
+                      subscriptionFeatureFlagger: subscriptionFeatureFlagger)
         }
 
         accountManager.delegate = self

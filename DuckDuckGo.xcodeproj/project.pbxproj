@@ -205,6 +205,10 @@
 		1E2BEAE52C8B00B5002741A3 /* SubscriptionPagesUseSubscriptionFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E2BEAE32C8B00B5002741A3 /* SubscriptionPagesUseSubscriptionFeatureTests.swift */; };
 		1E559BB12BBCA9F1002B4AF6 /* RedirectNavigationResponder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E559BB02BBCA9F1002B4AF6 /* RedirectNavigationResponder.swift */; };
 		1E559BB22BBCA9F1002B4AF6 /* RedirectNavigationResponder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E559BB02BBCA9F1002B4AF6 /* RedirectNavigationResponder.swift */; };
+		1E5921BF2CF479E600E15CCA /* FeatureFlags in Frameworks */ = {isa = PBXBuildFile; productRef = 1E5921BE2CF479E600E15CCA /* FeatureFlags */; };
+		1E5921C12CF479EE00E15CCA /* FeatureFlags in Frameworks */ = {isa = PBXBuildFile; productRef = 1E5921C02CF479EE00E15CCA /* FeatureFlags */; };
+		1E5921C32CF47A0700E15CCA /* FeatureFlags in Frameworks */ = {isa = PBXBuildFile; productRef = 1E5921C22CF47A0700E15CCA /* FeatureFlags */; };
+		1E5921C52CF47A0F00E15CCA /* FeatureFlags in Frameworks */ = {isa = PBXBuildFile; productRef = 1E5921C42CF47A0F00E15CCA /* FeatureFlags */; };
 		1E7E2E9029029A2A00C01B54 /* ContentBlockingRulesUpdateObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7E2E8F29029A2A00C01B54 /* ContentBlockingRulesUpdateObserver.swift */; };
 		1E7E2E942902AC0E00C01B54 /* PrivacyDashboardPermissionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7E2E932902AC0E00C01B54 /* PrivacyDashboardPermissionHandler.swift */; };
 		1E950E3F2912A10D0051A99B /* ContentBlocking in Frameworks */ = {isa = PBXBuildFile; productRef = 1E950E3E2912A10D0051A99B /* ContentBlocking */; };
@@ -5044,6 +5048,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B5235452C7BB14D00AFAF64 /* WireGuard in Frameworks */,
+				1E5921C12CF479EE00E15CCA /* FeatureFlags in Frameworks */,
 				37269F012B332FC8005E8E46 /* Common in Frameworks */,
 				9D9DE57B2C63AA1F00D20B15 /* AppKitExtensions in Frameworks */,
 				EE7295E92A545BC4008C0991 /* NetworkProtection in Frameworks */,
@@ -5119,6 +5124,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1E5921BF2CF479E600E15CCA /* FeatureFlags in Frameworks */,
 				02589D9F2C88E8270093940D /* Persistence in Frameworks */,
 				F1DF95E52BD1807C0045E591 /* Subscription in Frameworks */,
 				4B5235472C7BB15700AFAF64 /* WireGuard in Frameworks */,
@@ -5184,6 +5190,7 @@
 				9DC5FAC52C6B8A010011F068 /* AppKitExtensions in Frameworks */,
 				020807B22C6CFF95006F94C4 /* Configuration in Frameworks */,
 				F1D0428E2BFB9F9C00A31506 /* Subscription in Frameworks */,
+				1E5921C32CF47A0700E15CCA /* FeatureFlags in Frameworks */,
 				C18BF9D02C736C9100ED6B8A /* Freemium in Frameworks */,
 				9D9AE8F92AAA3AD00026E7DC /* DataBrokerProtection in Frameworks */,
 			);
@@ -5198,6 +5205,7 @@
 				315A023F2B6421AE00BFA577 /* Networking in Frameworks */,
 				9DC5FAC72C6B8A080011F068 /* AppKitExtensions in Frameworks */,
 				F1D042902BFB9FA300A31506 /* Subscription in Frameworks */,
+				1E5921C52CF47A0F00E15CCA /* FeatureFlags in Frameworks */,
 				C18BF9D22C736C9700ED6B8A /* Freemium in Frameworks */,
 				9D9AE8FB2AAA3AD90026E7DC /* DataBrokerProtection in Frameworks */,
 			);
@@ -9961,6 +9969,7 @@
 				4B5235442C7BB14D00AFAF64 /* WireGuard */,
 				02589DA02C88EB570093940D /* Configuration */,
 				02589DA22C88EB5D0093940D /* Persistence */,
+				1E5921C02CF479EE00E15CCA /* FeatureFlags */,
 			);
 			productName = NetworkProtectionSystemExtension;
 			productReference = 4B25375A2A11BE7300610219 /* com.duckduckgo.macos.vpn.network-extension.debug.systemextension */;
@@ -10094,6 +10103,7 @@
 				4B5235462C7BB15700AFAF64 /* WireGuard */,
 				02589D9C2C88E8210093940D /* Configuration */,
 				02589D9E2C88E8270093940D /* Persistence */,
+				1E5921BE2CF479E600E15CCA /* FeatureFlags */,
 			);
 			productName = NetworkProtectionAppExtension;
 			productReference = 4B4D603D2A0B290200BCD287 /* NetworkProtectionAppExtension.appex */;
@@ -10210,6 +10220,7 @@
 				020807B12C6CFF95006F94C4 /* Configuration */,
 				C18BF9CF2C736C9100ED6B8A /* Freemium */,
 				02A15D8F2C88D773001A4237 /* Persistence */,
+				1E5921C22CF47A0700E15CCA /* FeatureFlags */,
 			);
 			productName = DuckDuckGoAgent;
 			productReference = 9D9AE8D12AAA39A70026E7DC /* DuckDuckGo Personal Information Removal.app */;
@@ -10237,6 +10248,7 @@
 				C18BF9D12C736C9700ED6B8A /* Freemium */,
 				02A15D8B2C88D763001A4237 /* Configuration */,
 				02A15D8D2C88D76A001A4237 /* Persistence */,
+				1E5921C42CF47A0F00E15CCA /* FeatureFlags */,
 			);
 			productName = DuckDuckGoAgent;
 			productReference = 9D9AE8F22AAA39D30026E7DC /* DuckDuckGo Personal Information Removal App Store.app */;
@@ -15253,6 +15265,22 @@
 			isa = XCSwiftPackageProductDependency;
 			package = FAE06B199CA1F209B55B34E9 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = Crashes;
+		};
+		1E5921BE2CF479E600E15CCA /* FeatureFlags */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FeatureFlags;
+		};
+		1E5921C02CF479EE00E15CCA /* FeatureFlags */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FeatureFlags;
+		};
+		1E5921C22CF47A0700E15CCA /* FeatureFlags */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FeatureFlags;
+		};
+		1E5921C42CF47A0F00E15CCA /* FeatureFlags */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FeatureFlags;
 		};
 		1E950E3E2912A10D0051A99B /* ContentBlocking */ = {
 			isa = XCSwiftPackageProductDependency;
