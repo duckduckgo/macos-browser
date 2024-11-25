@@ -20,6 +20,8 @@ import AppKit
 import Subscription
 import struct Combine.AnyPublisher
 import enum Combine.Publishers
+import FeatureFlags
+import BrowserServicesKit
 
 public final class PreferencesSubscriptionModel: ObservableObject {
 
@@ -39,6 +41,9 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @Published var email: String?
     var hasEmail: Bool { !(email?.isEmpty ?? true) }
+
+    let featureFlagger: FeatureFlagger
+    var isROWLaunched: Bool = false
 
     private var subscriptionPlatform: Subscription.Platform?
 
@@ -101,11 +106,13 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     public init(openURLHandler: @escaping (URL) -> Void,
                 userEventHandler: @escaping (UserEvent) -> Void,
                 sheetActionHandler: SubscriptionAccessActionHandlers,
-                subscriptionManager: SubscriptionManager) {
+                subscriptionManager: SubscriptionManager,
+                featureFlagger: FeatureFlagger) {
         self.subscriptionManager = subscriptionManager
         self.openURLHandler = openURLHandler
         self.userEventHandler = userEventHandler
         self.sheetActionHandler = sheetActionHandler
+        self.featureFlagger = featureFlagger
         self.subscriptionStorefrontRegion = currentStorefrontRegion()
 
         self.isUserAuthenticated = accountManager.isUserAuthenticated
@@ -158,6 +165,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         } else {
             self.subscriptionStorefrontRegion = currentStorefrontRegion()
         }
+        isROWLaunched = featureFlagger.isFeatureOn(.isPrivacyProLaunchedROW) || featureFlagger.isFeatureOn(.isPrivacyProLaunchedROWOverride)
     }
 
     private func updateUserAuthenticatedState(_ isUserAuthenticated: Bool) {
@@ -366,9 +374,12 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     }
 
     private func currentSubscriptionFeatures() async -> [Entitlement.ProductName] {
-        // TODO: Guard behind feature flag
         if subscriptionManager.currentEnvironment.purchasePlatform == .appStore {
-            return await subscriptionManager.currentSubscriptionFeatures()
+            if !isROWLaunched {
+                return [.networkProtection, .dataBrokerProtection, .identityTheftRestoration]
+            } else {
+                return await subscriptionManager.currentSubscriptionFeatures()
+            }
         } else {
             return [.networkProtection, .dataBrokerProtection, .identityTheftRestoration]
         }
@@ -390,7 +401,6 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             hasAccessToDBP = false
         }
 
-        // TODO: Refine support for both IDTR variants
         var hasITR = false
         switch await self.accountManager.hasEntitlement(forProductName: .identityTheftRestoration, cachePolicy: .returnCacheDataDontLoad) {
         case let .success(result):
@@ -422,7 +432,6 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             let entitlements = response.account.entitlements.compactMap { $0.product }
             hasAccessToVPN = entitlements.contains(.networkProtection)
             hasAccessToDBP = entitlements.contains(.dataBrokerProtection)
-            // TODO: Refine support for both IDTR variants
             hasAccessToITR = entitlements.contains(.identityTheftRestoration) || entitlements.contains(.identityTheftRestorationGlobal)
             accountManager.updateCache(with: response.account.entitlements)
         }

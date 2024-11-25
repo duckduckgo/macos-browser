@@ -304,9 +304,11 @@ public struct PreferencesSubscriptionView: View {
         PreferencePaneSection {
             TextMenuItemHeader(UserText.preferencesSubscriptionFooterTitle, bottomPadding: 0)
             HStack(alignment: .top, spacing: 6) {
-                // TODO: we need to switch based on feature flag
-//                TextMenuItemCaption(UserText.preferencesSubscriptionFooterCaption)
-                TextMenuItemCaption(UserText.preferencesSubscriptionHelpFooterCaption)
+                if !model.isROWLaunched {
+                    TextMenuItemCaption(UserText.preferencesSubscriptionFooterCaption)
+                } else {
+                    TextMenuItemCaption(UserText.preferencesSubscriptionHelpFooterCaption)
+                }
                 Button(UserText.viewFaqsButton) { model.openFAQ() }
             }
         }

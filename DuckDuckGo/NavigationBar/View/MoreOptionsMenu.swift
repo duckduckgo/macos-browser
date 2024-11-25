@@ -975,7 +975,6 @@ final class SubscriptionSubMenu: NSMenu, NSMenuDelegate {
             let isNetworkProtectionItemEnabled = await hasEntitlement(for: .networkProtection)
             let isDataBrokerProtectionItemEnabled = await hasEntitlement(for: .dataBrokerProtection)
 
-            // TODO: Refine support for both IDTR variants
             let hasIdentityTheftRestoration = await hasEntitlement(for: .identityTheftRestoration)
             let hasIdentityTheftRestorationGlobal = await hasEntitlement(for: .identityTheftRestorationGlobal)
             let isIdentityTheftRestorationItemEnabled = hasIdentityTheftRestoration || hasIdentityTheftRestorationGlobal
