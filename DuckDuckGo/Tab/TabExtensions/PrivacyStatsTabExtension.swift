@@ -50,15 +50,6 @@ final class PrivacyStatsTabExtension: NSObject {
             break
         }
     }
-
-    private func commitBeforeClosing() {
-        privacyStats.commitChanges()
-    }
-
-
-    deinit {
-        commitBeforeClosing()
-    }
 }
 
 protocol PrivacyStatsExtensionProtocol: AnyObject, NavigationResponder {
