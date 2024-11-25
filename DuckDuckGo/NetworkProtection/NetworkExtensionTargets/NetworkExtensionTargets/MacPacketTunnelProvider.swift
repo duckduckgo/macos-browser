@@ -413,8 +413,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         let settings = VPNSettings(defaults: defaults)
 
         // MARK: - Configure Subscription
-        let appGroup = MacPacketTunnelProvider.subscriptionsAppGroup
-        let subscriptionUserDefaults = UserDefaults(suiteName: appGroup)!
+        let subscriptionUserDefaults = UserDefaults(suiteName: MacPacketTunnelProvider.subscriptionsAppGroup)!
         let notificationCenter: NetworkProtectionNotificationCenter = DistributedNotificationCenter.default()
         let controllerErrorStore = NetworkProtectionTunnelErrorStore(notificationCenter: notificationCenter)
         let debugEvents = Self.networkProtectionDebugEvents(controllerErrorStore: controllerErrorStore)
@@ -430,8 +429,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
         Logger.networkProtection.log("Subscription environment: \(subscriptionEnvironment.description, privacy: .public)")
 
-        let subscriptionManager = DefaultSubscriptionManager(appGroup: appGroup,
-                                                             keychainType: Bundle.keychainType,
+        let subscriptionManager = DefaultSubscriptionManager(keychainType: Bundle.keychainType, // note: the old public static let tokenStoreService = "com.duckduckgo.networkprotection.authToken" was used as kSecAttrService in NetworkProtectionKeychainStore, now is different. the old token recovery will not work in the extension, yes in main app
                                                              userDefault: subscriptionUserDefaults,
                                                              environment: subscriptionEnvironment)
 

@@ -26,8 +26,7 @@ import os.log
 extension DefaultSubscriptionManager {
 
     // Init the SubscriptionManager using the standard dependencies and configuration, to be used only in the dependencies tree root
-    public convenience init(appGroup: String?,
-                            keychainType: KeychainType,
+    public convenience init(keychainType: KeychainType,
                             userDefault: UserDefaults,
                             environment: SubscriptionEnvironment) {
 

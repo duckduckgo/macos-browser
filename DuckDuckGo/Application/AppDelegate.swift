@@ -280,7 +280,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
         let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
         let subscriptionEnvironment = DefaultSubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
-        subscriptionManager = DefaultSubscriptionManager(appGroup: subscriptionAppGroup,
+        subscriptionManager = DefaultSubscriptionManager(keychainType: .dataProtection(.named(subscriptionAppGroup)),
                                                          userDefault: subscriptionUserDefaults,
                                                          environment: subscriptionEnvironment)
         subscriptionUIHandler = SubscriptionUIHandler(windowControllersManagerProvider: {
