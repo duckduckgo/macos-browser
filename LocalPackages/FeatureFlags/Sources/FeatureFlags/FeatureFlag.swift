@@ -56,7 +56,7 @@ extension FeatureFlag: FeatureFlagDescribing {
     public var supportsLocalOverriding: Bool {
         switch self {
         case .htmlNewTabPage,
-             .isPrivacyProLaunchedROW:
+             .isPrivacyProLaunchedROWOverride:
             return true
         default:
             return false
