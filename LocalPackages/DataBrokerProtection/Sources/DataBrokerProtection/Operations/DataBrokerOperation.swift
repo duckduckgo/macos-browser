@@ -131,7 +131,7 @@ class DataBrokerOperation: Operation, @unchecked Sendable {
 
         if let priorityDate = priorityDate {
             filteredAndSortedOperationsData = operationsData
-                .filter { $0.preferredRunDate != nil && $0.preferredRunDate! <= priorityDate }
+                .filtered(by: priorityDate)
                 .sorted { $0.preferredRunDate! < $1.preferredRunDate! }
         } else {
             filteredAndSortedOperationsData = operationsData
@@ -215,3 +215,16 @@ class DataBrokerOperation: Operation, @unchecked Sendable {
     }
 }
 // swiftlint:enable explicit_non_final_class
+
+extension Array where Element == BrokerJobData {
+    /// Filters jobs based on their preferred run date:
+    /// - Jobs with no preferred run date are included.
+    /// - Jobs with a preferred run date on or before the priority date are included.
+    ///
+    /// Note: Jobs without a preferred run date may be:
+    /// 1. From child brokers (skipped during runOptOutOperation)
+    /// 2. From former child brokers now acting as parent brokers (processed if extractedProfile hasn't been removed)
+    func filtered(by priorityDate: Date) -> [BrokerJobData] {
+        filter { $0.preferredRunDate == nil || $0.preferredRunDate! <= priorityDate }
+    }
+}
