@@ -134,7 +134,7 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
         context.performAction(for: nil)
 
         // Uncomment the line below to enable debugging of the background script
-//        showBackgroundConsole(context: context)
+        showBackgroundConsole(context: context)
     }
 
     @MainActor
@@ -159,6 +159,9 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
             return
         }
         backgroundWebView.configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
+
+        //TODO: Remove this line, it's just a test of setting user agent
+        backgroundWebView.customUserAgent = UserAgent.safari
 
         guard backgroundWebView.responds(to: NSSelectorFromString("_inspector")),
               let inspector = backgroundWebView.value(forKey: "_inspector") as? NSObject,
