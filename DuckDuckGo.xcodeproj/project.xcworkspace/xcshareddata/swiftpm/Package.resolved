@@ -28,6 +28,15 @@
       }
     },
     {
+      "identity" : "browserserviceskit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/duckduckgo/BrowserServicesKit",
+      "state" : {
+        "branch" : "graeme/partial-form-save",
+        "revision" : "655ef65c3873621e1f2e41fcceca0b260fd987e7"
+      }
+    },
+    {
       "identity" : "content-scope-scripts",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
@@ -42,7 +51,7 @@
       "location" : "https://github.com/duckduckgo/duckduckgo-autofill.git",
       "state" : {
         "branch" : "dbajpeyi/feature/partial-form-save",
-        "revision" : "e1030b4292f39b18f1e0f0701a6e8d1a68cfa8cd"
+        "revision" : "fe030fb580ae2e6ea26e810ac22cf9771ef9f48c"
       }
     },
     {
