@@ -160,7 +160,7 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
         }
         backgroundWebView.configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
 
-        //TODO: Remove this line, it's just a test of setting user agent
+        //TODO: Remove this line, or find a better place. This is just a test of setting user agent
         backgroundWebView.customUserAgent = UserAgent.safari
 
         guard backgroundWebView.responds(to: NSSelectorFromString("_inspector")),
@@ -278,6 +278,7 @@ extension WebExtensionManager: @preconcurrency _WKWebExtensionControllerDelegate
         }
 
         popupWebView.configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
+        popupWebView.customUserAgent = UserAgent.safari
 
         popupPopover.show(relativeTo: button.bounds, of: button, preferredEdge: .maxY)
     }
