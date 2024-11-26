@@ -242,8 +242,13 @@ extension WebExtensionManager: @preconcurrency _WKWebExtensionControllerDelegate
 
     func webExtensionController(_ controller: _WKWebExtensionController, openNewTabWith options: _WKWebExtensionTabCreationOptions, for extensionContext: _WKWebExtensionContext) async throws -> (any _WKWebExtensionTab)? {
 
-        if let url = options.desiredURL {
-            let tab = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.browserTabViewController.openNewTab(with: .url(url, source: .ui))
+        if let tabCollectionViewModel = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel,
+           let url = options.desiredURL {
+            let configuration = extensionContext.webViewConfiguration
+            let tab = Tab(content: .url(url, source: .ui),
+                          webViewConfiguration: configuration,
+                          burnerMode: tabCollectionViewModel.burnerMode)
+            tabCollectionViewModel.append(tab: tab)
             return tab
         }
 
