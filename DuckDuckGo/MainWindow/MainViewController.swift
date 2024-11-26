@@ -27,7 +27,7 @@ import os.log
 import BrokenSitePrompt
 
 final class MainViewController: NSViewController {
-    private lazy var mainView = MainView(frame: NSRect(x: 0, y: 0, width: 600, height: 660))
+    private(set) lazy var mainView = MainView(frame: NSRect(x: 0, y: 0, width: 600, height: 660))
 
     let tabBarViewController: TabBarViewController
     let navigationBarViewController: NavigationBarViewController

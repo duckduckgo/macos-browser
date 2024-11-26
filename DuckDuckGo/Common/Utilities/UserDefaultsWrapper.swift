@@ -155,6 +155,8 @@ public struct UserDefaultsWrapper<T> {
         case centerAlignedBookmarksBar = "bookmarks.bar.center.aligned"
         case lastBookmarksBarUsagePixelSendDate = "bookmarks.bar.last-usage-pixel-send-date"
 
+        case hideToolbarsOnFullScreen = "hide.toolbars.on.fullscren"
+
         case pinnedViews = "pinning.pinned-views"
         case manuallyToggledPinnedViews = "pinning.manually-toggled-pinned-views"
 

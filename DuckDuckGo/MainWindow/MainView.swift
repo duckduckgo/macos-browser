@@ -31,6 +31,9 @@ final class MainView: NSView {
 
     private(set) var navigationBarTopConstraint: NSLayoutConstraint!
     private(set) var bookmarksBarHeightConstraint: NSLayoutConstraint!
+    private(set) var webContainerTopConstraint: NSLayoutConstraint!
+    private(set) var webContainerTopConstraintToNavigation: NSLayoutConstraint!
+    private(set) var tabBarHeightConstraint: NSLayoutConstraint!
 
     @Published var isMouseAboveWebView: Bool = false
 
@@ -59,14 +62,19 @@ final class MainView: NSView {
 
     private func addConstraints() {
         bookmarksBarHeightConstraint = bookmarksBarContainerView.heightAnchor.constraint(equalToConstant: 34)
-
+        tabBarHeightConstraint = tabBarContainerView.heightAnchor.constraint(equalToConstant: 38)
         navigationBarTopConstraint = navigationBarContainerView.topAnchor.constraint(equalTo: topAnchor, constant: 38)
+        webContainerTopConstraint = webContainerView.topAnchor.constraint(equalTo: bookmarksBarContainerView.bottomAnchor)
+        webContainerTopConstraintToNavigation = webContainerView.topAnchor.constraint(equalTo: navigationBarContainerView.bottomAnchor)
+
+        webContainerTopConstraint.priority = .defaultHigh
+        webContainerTopConstraintToNavigation.priority = .defaultLow
 
         NSLayoutConstraint.activate([
             tabBarContainerView.topAnchor.constraint(equalTo: topAnchor),
             tabBarContainerView.leadingAnchor.constraint(equalTo: leadingAnchor),
             tabBarContainerView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            tabBarContainerView.heightAnchor.constraint(equalToConstant: 38),
+            tabBarHeightConstraint,
 
             divider.topAnchor.constraint(equalTo: navigationBarContainerView.bottomAnchor),
             divider.leadingAnchor.constraint(equalTo: leadingAnchor),
@@ -82,7 +90,8 @@ final class MainView: NSView {
             navigationBarContainerView.leadingAnchor.constraint(equalTo: leadingAnchor),
             navigationBarContainerView.trailingAnchor.constraint(equalTo: trailingAnchor),
 
-            webContainerView.topAnchor.constraint(equalTo: bookmarksBarContainerView.bottomAnchor),
+            webContainerTopConstraint,
+            webContainerTopConstraintToNavigation,
             webContainerView.bottomAnchor.constraint(equalTo: bottomAnchor),
             webContainerView.leadingAnchor.constraint(equalTo: leadingAnchor),
             webContainerView.trailingAnchor.constraint(equalTo: trailingAnchor),
