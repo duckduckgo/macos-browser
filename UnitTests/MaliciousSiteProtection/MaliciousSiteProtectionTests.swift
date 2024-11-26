@@ -35,7 +35,7 @@ final class MaliciousSiteProtectionTests: XCTestCase {
         let mockFileStore = MockMaliciousSiteFileStore()
         mockDataProvider = MockMaliciousSiteDataProvider()
 
-        let dataManager = MaliciousSiteProtection.DataManager(embeddedDataProvider: mockDataProvider, fileStore: mockFileStore)
+        let dataManager = MaliciousSiteProtection.DataManager(fileStore: mockFileStore, embeddedDataProvider: mockDataProvider, fileNameProvider: { _ in "file.json" })
         phishingDetection = MaliciousSiteProtectionManager(dataManager: dataManager, detector: MockMaliciousSiteDetector(), dataActivities: mockDataActivities, featureFlagger: MockFeatureFlagger())
         super.setUp()
     }

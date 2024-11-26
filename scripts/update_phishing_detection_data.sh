@@ -5,68 +5,63 @@
 ## Danger checks that the URLs match on every PR. If the code changes, the regex that Danger uses may need an update.
 API_URL="https://duckduckgo.com/api/protection"
 
+work_dir="${PWD}/DuckDuckGo/MaliciousSiteProtection"
+def_filename="${work_dir}/MaliciousSiteProtectionManager.swift"
+
+old_revision="$(grep "static let embeddedDataRevision =" "${def_filename}" | awk -F '[=,]' '{print $2}' | xargs)"
+if [ -z "$old_revision" ]; then
+    echo "Error: Could not read embeddedDataRevision"
+    exit 1
+fi
+
 temp_filename="phishing_data_new_file"
 new_revision=$(curl -s "${API_URL}/revision" | jq -r '.revision')
 
+printf "Embedded revision: %s, actual revision: %s\n" "${old_revision}" "${new_revision}"
 rm -f "$temp_filename"
 
 performUpdate() {
-	local data_type=$1
-	local provider_path=$2
+    local threat_type=$1
+	local data_type=$2
 	local data_path=$3
-	printf "Processing: %s\n" "${data_type}"
+    capitalized_data_type="$(echo "${data_type}" | awk '{print toupper(substr($0, 1, 1)) substr($0, 2)}')"
+	printf "Processing %s\n" "${threat_type}${capitalized_data_type}"
 
-	if test ! -f "$data_path"; then
-		printf "Error: %s does not exist\n" "${data_path}"
-		exit 1
-	fi
+	old_sha="$(grep "static let ${threat_type}Embedded${capitalized_data_type}DataSHA =" "${def_filename}" | awk -F '"' '{print $2}')"
+    if [ -z "$old_sha" ]; then
+        echo "Error: Could not read ${threat_type}Embedded${capitalized_data_type}DataSHA"
+        exit 1
+    fi
 
-	if test ! -f "$provider_path"; then
-		printf "Error: %s does not exist\n" "${provider_path}"
-		exit 1
-	fi
-	old_sha="$(grep "${data_type}DataSHA: String =" "${provider_path}" | awk -F '"' '{print $2}')"
+	printf "Embedded SHA256: %s\n" "${old_sha}"
 
-	old_revision=$(grep 'revision: Int' "${provider_path}" | awk -F '[=,]' '{print $2}' | xargs)
+    curl -o "$temp_filename" -s "${API_URL}/${data_type}"
+    jq -rc '.insert' "$temp_filename" > "$data_path"
 
-	printf "Existing SHA256: %s\n" "${old_sha}"
-	printf "Existing revision: %s, new revision: %s\n" "${old_revision}" "${new_revision}"
+    new_sha="$(shasum -a 256 "$data_path" | awk -F ' ' '{print $1}')"
 
-	if [ "$old_revision" -lt "$new_revision" ]; then
-        curl -o "$temp_filename" -s "${API_URL}/${data_type}"
-		jq -rc '.insert' "$temp_filename" > "$data_path"
+    printf "New SHA256: %s\n" "$new_sha"
 
-		new_sha="$(shasum -a 256 "$data_path" | awk -F ' ' '{print $1}')"
+    sed -i '' -e "s/$old_sha/$new_sha/g" "${def_filename}"
+    sed -i '' -e "s/${threat_type}EmbeddedDataRevision =.*/${threat_type}EmbeddedDataRevision = $new_revision/" "${def_filename}"
 
-		printf "New SHA256: %s\n" "$new_sha"
-
-        sed -i '' -e "s/$old_sha/$new_sha/g" "${provider_path}"
-
-		printf 'Files updated\n\n'
-	else
-		printf 'Nothing to update\n\n'
-	fi
-
+    printf "${threat_type}Embedded${capitalized_data_type}DataSHA updated\n\n"
 	rm -f "$temp_filename"
 }
 
 updateRevision() {
-    local new_revision=$1
-	local provider_path=$2
-	old_revision=$(grep 'revision: Int' "${provider_path}" | awk -F '[=,]' '{print $2}' | xargs)
-
-	if [ "$old_revision" -lt "$new_revision" ]; then
-		sed -i '' -e "s/revision: Int =.*/revision: Int = $new_revision,/" "${provider_path}"
-		printf "Updated revision from %s to %s\n" "$old_revision" "$new_revision"
-	fi
+    sed -i '' -e "s/revision = $old_revision/revision = $new_revision/" "${def_filename}"
+    printf "Updated revision from %s to %s\n" "$old_revision" "$new_revision"
 }
 
-performUpdate hashPrefix \
-		"${PWD}/DuckDuckGo/PhishingDetection/MaliciousSiteProtection.swift" \
-		"${PWD}/DuckDuckGo/PhishingDetection/phishingHashPrefixes.json"
+if [ "$old_revision" -lt "$new_revision" ]; then
+    performUpdate phishing hashPrefix "${work_dir}/phishingHashPrefixes.json"
+    performUpdate phishing filterSet "${work_dir}/phishingFilterSet.json"
 
-performUpdate filterSet \
-		"${PWD}/DuckDuckGo/PhishingDetection/MaliciousSiteProtection.swift" \
-        "${PWD}/DuckDuckGo/PhishingDetection/phishingFilterSet.json"
+    performUpdate malware hashPrefix "${work_dir}/malwareHashPrefixes.json"
+    performUpdate malware filterSet "${work_dir}/malwareFilterSet.json"
 
-updateRevision "$new_revision" "${PWD}/DuckDuckGo/PhishingDetection/MaliciousSiteProtection.swift"
+    updateRevision
+else
+    printf 'Nothing to update\n\n'
+fi

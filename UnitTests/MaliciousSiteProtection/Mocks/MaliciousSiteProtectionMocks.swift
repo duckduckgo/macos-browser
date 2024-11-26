@@ -24,20 +24,34 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 class MockMaliciousSiteDataProvider: MaliciousSiteProtection.EmbeddedDataProviding {
+
     var embeddedFilterSet: Set<Filter> = []
     var embeddedHashPrefixes: Set<String> = []
     var embeddedRevision: Int = 0
     var didLoadFilterSet: Bool = false
     var didLoadHashPrefixes: Bool = false
 
-    func loadEmbeddedFilterSet() -> Set<Filter> {
-        didLoadFilterSet = true
-        return embeddedFilterSet
+    public func revision(for detectionKind: MaliciousSiteProtection.DataManager.StoredDataType) -> Int {
+        embeddedRevision
     }
 
-    func loadEmbeddedHashPrefixes() -> Set<String> {
-        didLoadHashPrefixes = true
-        return embeddedHashPrefixes
+    public func url(for detectionKind: MaliciousSiteProtection.DataManager.StoredDataType) -> URL {
+        URL.empty
+    }
+
+    public func hash(for detectionKind: MaliciousSiteProtection.DataManager.StoredDataType) -> String {
+        ""
+    }
+
+    public func loadDataSet<DataKey>(for key: DataKey) -> DataKey.EmbeddedDataSetType where DataKey: MaliciousSiteDataKeyProtocol {
+        switch key.dataType {
+        case .filterSet:
+            self.didLoadFilterSet = true
+            return Array(embeddedFilterSet) as! DataKey.EmbeddedDataSetType
+        case .hashPrefixSet:
+            self.didLoadHashPrefixes = true
+            return Array(embeddedHashPrefixes) as! DataKey.EmbeddedDataSetType
+        }
     }
 }
 
@@ -46,9 +60,10 @@ class MockMaliciousSiteFileStore: MaliciousSiteProtection.FileStoring {
     var didWriteToDisk: Bool = false
     var didReadFromDisk: Bool = false
 
-    func write(data: Data, to filename: String) {
+    func write(data: Data, to filename: String) -> Bool {
         didWriteToDisk = true
         storage[filename] = data
+        return true
     }
 
     func read(from filename: String) -> Data? {
