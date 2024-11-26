@@ -420,12 +420,13 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
         // Align Subscription environment to the VPN environment
         var subscriptionEnvironment = SubscriptionEnvironment.default
-        switch settings.selectedEnvironment { // we don't care about the purchasePlatform
+        switch settings.selectedEnvironment {
         case .production:
             subscriptionEnvironment.serviceEnvironment = .production
         case .staging:
             subscriptionEnvironment.serviceEnvironment = .staging
         }
+        subscriptionEnvironment.purchasePlatform = .stripe // we don't care about the purchasePlatform
 
         Logger.networkProtection.debug("Subscription ServiceEnvironment: \(subscriptionEnvironment.serviceEnvironment.rawValue, privacy: .public)")
 
