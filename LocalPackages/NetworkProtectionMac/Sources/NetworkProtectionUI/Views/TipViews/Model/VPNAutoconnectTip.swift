@@ -29,14 +29,17 @@ extension VPNAutoconnectTip: Tip {
         case enable = "com.duckduckgo.vpn.tip.autoconnect.action.enable"
     }
 
-    @Parameter
-    static var geolocationTipDismissed: Bool = false
-
     @Parameter(.transient)
     static var vpnEnabled: Bool = false
 
+    /// This condition tries to verify that this tip is distanced from the previous tip..
+    ///
+    /// The conditions that will trigger this are:
+    ///     - The status view was opened when previous tip's status is invalidated.
+    ///     - The VPN is enabled when previous tip's status is invalidated.
+    ///
     @Parameter
-    static var vpnEnabledWhenDomainExclusionsAlreadyDismissed: Bool = false
+    static var isDistancedFromPreviousTip: Bool = false
 
     var id: String {
         "com.duckduckgo.vpn.tip.autoconnect"
@@ -64,10 +67,7 @@ extension VPNAutoconnectTip: Tip {
         #Rule(Self.$vpnEnabled) {
             $0 == true
         }
-        #Rule(Self.$vpnEnabledWhenDomainExclusionsAlreadyDismissed) {
-            $0
-        }
-        #Rule(Self.$geolocationTipDismissed) {
+        #Rule(Self.$isDistancedFromPreviousTip) {
             $0
         }
     }

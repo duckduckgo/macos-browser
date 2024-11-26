@@ -72,6 +72,10 @@ public final class VPNTipsModel: ObservableObject {
         self.logger = logger
         self.vpnSettings = vpnSettings
 
+        guard !isMenuApp else {
+            return
+        }
+
         if #available(macOS 14.0, *) {
             handleActiveSiteInfoChanged(newValue: activeSiteInfo)
             handleConnectionStatusChanged(oldValue: connectionStatus, newValue: connectionStatus)
@@ -79,9 +83,12 @@ public final class VPNTipsModel: ObservableObject {
             subscribeToConnectionStatusChanges(statusObserver)
             subscribeToFeatureFlagChanges(featureFlagPublisher)
             subscribeToActiveSiteChanges(activeSitePublisher)
-
-            subscribeToStatusChanges(for: geoswitchingTip)
         }
+    }
+
+    deinit {
+        geoswitchingStatusUpdateTask?.cancel()
+        geoswitchingStatusUpdateTask = nil
     }
 
     var canShowTips: Bool {
@@ -124,6 +131,8 @@ public final class VPNTipsModel: ObservableObject {
     let domainExclusionsTip = VPNDomainExclusionsTip()
     let geoswitchingTip = VPNGeoswitchingTip()
 
+    var geoswitchingStatusUpdateTask: Task<Void, Never>?
+
     // MARK: - Tip Action handling
 
     @available(macOS 14.0, *)
@@ -135,40 +144,24 @@ public final class VPNTipsModel: ObservableObject {
         }
     }
 
-    // MARK: - Subscriptions: Tips
-
-    @available(macOS 14.0, *)
-    func subscribeToStatusChanges(for tip: VPNGeoswitchingTip) {
-        Task {
-            for await status in tip.statusUpdates {
-                if case .invalidated = status {
-                    VPNDomainExclusionsTip.geolocationTipDismissed = true
-                    VPNAutoconnectTip.geolocationTipDismissed = true
-                }
-            }
-        }
-    }
-
     // MARK: - Handle Refreshing
 
     @available(macOS 14.0, *)
     private func handleActiveSiteInfoChanged(newValue: ActiveSiteInfo?) {
-        Logger.networkProtection.debug("🧉 Active site info changed: \(String(describing: newValue))")
+        guard !isMenuApp else { return }
         return VPNDomainExclusionsTip.hasActiveSite = (activeSiteInfo != nil)
     }
 
     @available(macOS 14.0, *)
     private func handleConnectionStatusChanged(oldValue: ConnectionStatus, newValue: ConnectionStatus) {
+        guard !isMenuApp else { return }
         switch newValue {
         case .connected:
             if case oldValue = .connecting {
-                VPNGeoswitchingTip.vpnEnabledAtLeastOnce = true
-
-                if case .invalidated = domainExclusionsTip.status {
-                    VPNAutoconnectTip.vpnEnabledWhenDomainExclusionsAlreadyDismissed = true
-                }
+                handleTipDistanceConditionsCheckpoint()
             }
 
+            VPNGeoswitchingTip.vpnEnabledOnce = true
             VPNAutoconnectTip.vpnEnabled = true
             VPNDomainExclusionsTip.vpnEnabled = true
         default:
@@ -177,22 +170,46 @@ public final class VPNTipsModel: ObservableObject {
         }
     }
 
+    @available(macOS 14.0, *)
+    private func handleTipDistanceConditionsCheckpoint() {
+        if case .invalidated = geoswitchingTip.status {
+            VPNDomainExclusionsTip.isDistancedFromPreviousTip = true
+        }
+
+        if case .invalidated = domainExclusionsTip.status {
+            VPNAutoconnectTip.isDistancedFromPreviousTip = true
+        }
+    }
+
     // MARK: - UI Events
 
     @available(macOS 14.0, *)
+    func handleGeoswitchingTipInvalidated(_ reason: Tip.InvalidationReason) {
+        switch reason {
+        case .actionPerformed:
+            Logger.networkProtection.log("🧉 Geo-switching tip actioned")
+            break
+        default:
+            Logger.networkProtection.log("🧉 Geo-switching tip dismissed")
+        }
+    }
+
+    @available(macOS 14.0, *)
     func handleLocationsShown() {
+        guard !isMenuApp else { return }
         geoswitchingTip.invalidate(reason: .actionPerformed)
     }
 
     @available(macOS 14.0, *)
     func handleSiteExcluded() {
-        geoswitchingTip.invalidate(reason: .actionPerformed)
+        guard !isMenuApp else { return }
+        domainExclusionsTip.invalidate(reason: .actionPerformed)
     }
 
     @available(macOS 14.0, *)
     func handleTunnelControllerShown() {
-        if case .connected = connectionStatus {
-            VPNDomainExclusionsTip.statusViewOpenedWhenVPNIsOn = true
-        }
+        guard !isMenuApp else { return }
+
+        handleTipDistanceConditionsCheckpoint()
     }
 }

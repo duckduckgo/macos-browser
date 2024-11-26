@@ -31,15 +31,14 @@ extension VPNDomainExclusionsTip: Tip {
     @Parameter(.transient)
     static var hasActiveSite: Bool = false
 
-    /// This flag attempt to capture the user's intent to disable the VPN, which is the right time to show this tip.
+    /// This condition tries to verify that this tip is distanced from the previous tip and doesn't show right after.
     ///
-    /// If the VPN is ON when the status view is opened, there's a reasonable expectation the user might want to disable the VPN.
+    /// The conditions that will trigger this are:
+    ///     - The status view was opened when previous tip's status is invalidated.
+    ///     - The VPN is enabled when previous tip's status is invalidated.
     ///
     @Parameter
-    static var statusViewOpenedWhenVPNIsOn: Bool = false
-
-    @Parameter
-    static var geolocationTipDismissed: Bool = false
+    static var isDistancedFromPreviousTip: Bool = false
 
     var id: String {
         "com.duckduckgo.vpn.tip.domainExclusions"
@@ -64,10 +63,7 @@ extension VPNDomainExclusionsTip: Tip {
         #Rule(Self.$vpnEnabled) {
             $0
         }
-        #Rule(Self.$statusViewOpenedWhenVPNIsOn) {
-            $0
-        }
-        #Rule(Self.$geolocationTipDismissed) {
+        #Rule(Self.$isDistancedFromPreviousTip) {
             $0
         }
     }

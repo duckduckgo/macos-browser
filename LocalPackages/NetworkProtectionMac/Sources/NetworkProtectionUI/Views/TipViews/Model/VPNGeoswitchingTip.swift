@@ -25,8 +25,12 @@ struct VPNGeoswitchingTip {}
 @available(macOS 14.0, *)
 extension VPNGeoswitchingTip: Tip {
 
+    /// Where the VPN was ever enabled.
+    ///
+    /// Once set this is never unset.  The tip doesn't need to be hidden when the user is disconnected.
+    ///
     @Parameter
-    static var vpnEnabledAtLeastOnce: Bool = false
+    static var vpnEnabledOnce: Bool = false
 
     var id: String {
         "com.duckduckgo.vpn.tip.geoswitching"
@@ -45,7 +49,7 @@ extension VPNGeoswitchingTip: Tip {
     }
 
     var rules: [Rule] {
-        #Rule(Self.$vpnEnabledAtLeastOnce) {
+        #Rule(Self.$vpnEnabledOnce) {
             $0
         }
     }

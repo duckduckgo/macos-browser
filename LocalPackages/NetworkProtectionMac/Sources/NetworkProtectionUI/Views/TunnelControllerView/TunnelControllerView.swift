@@ -56,7 +56,8 @@ public struct TunnelControllerView: View {
             featureToggleRow()
 
             if #available(macOS 14.0, *),
-               tipsModel.canShowTips {
+               tipsModel.canShowTips,
+               case .invalidated = tipsModel.domainExclusionsTip.status {
 
                 TipView(tipsModel.autoconnectTip, action: tipsModel.autoconnectTipActionHandler)
                     .tipImageSize(VPNTipsModel.imageSize)
@@ -69,13 +70,27 @@ public struct TunnelControllerView: View {
                 .padding(.top, 5)
 
             if #available(macOS 14.0, *),
-               tipsModel.canShowTips {
+               tipsModel.canShowTips,
+               case .invalidated = tipsModel.geoswitchingTip.status {
 
                 TipView(tipsModel.domainExclusionsTip)
                     .tipImageSize(VPNTipsModel.imageSize)
                     .tipBackground(Color(.tipBackground))
                     .padding(.horizontal, 9)
                     .padding(.vertical, 6)
+                    .task {
+                        var previousStatus = tipsModel.domainExclusionsTip.status
+
+                        for await status in tipsModel.domainExclusionsTip.statusUpdates {
+                            if case .invalidated = status {
+                                if case .available = previousStatus {
+                                    Logger.networkProtection.log("🧉 Domain exclusions tip dismissed")
+                                }
+
+                                previousStatus = status
+                            }
+                        }
+                    }
             }
 
             Divider()
@@ -211,6 +226,19 @@ public struct TunnelControllerView: View {
                     .tipBackground(Color(.tipBackground))
                     .padding(.horizontal, 9)
                     .padding(.vertical, 6)
+                    .task {
+                        var previousStatus = tipsModel.geoswitchingTip.status
+
+                        for await status in tipsModel.geoswitchingTip.statusUpdates {
+                            if case .invalidated(let reason) = status {
+                                if case .available = previousStatus {
+                                    tipsModel.handleGeoswitchingTipInvalidated(reason)
+                                }
+                            }
+
+                            previousStatus = status
+                        }
+                    }
             }
 
             dividerRow()
