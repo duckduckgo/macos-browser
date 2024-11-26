@@ -56498,6 +56498,18 @@
         }
       }
     },
+    "preferences.appearance.hide-toolbars-on-full-screen" : {
+      "comment" : "Option to hide tabs and bookmarks bar toolbars on full screen",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Remove Tabs and Bookmarks Bar toolbars on Full Screen"
+          }
+        }
+      }
+    },
     "preferences.appearance.show-autocomplete-suggestions" : {
       "comment" : "Option to show autocomplete suggestions in the address bar",
       "extractionState" : "extracted_with_value",

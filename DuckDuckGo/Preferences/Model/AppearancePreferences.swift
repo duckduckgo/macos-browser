@@ -41,6 +41,7 @@ protocol AppearancePreferencesPersistor {
     var homeButtonPosition: HomeButtonPosition { get set }
     var homePageCustomBackground: String? { get set }
     var centerAlignedBookmarksBar: Bool { get set }
+    var hideToolbarsOnFullScreen: Bool { get set }
 }
 
 struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersistor {
@@ -103,6 +104,9 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
 
     @UserDefaultsWrapper(key: .centerAlignedBookmarksBar, defaultValue: true)
     var centerAlignedBookmarksBar: Bool
+
+    @UserDefaultsWrapper(key: .hideToolbarsOnFullScreen, defaultValue: false)
+    var hideToolbarsOnFullScreen: Bool
 }
 
 protocol HomePageNavigator {
@@ -212,6 +216,12 @@ final class AppearancePreferences: ObservableObject {
     @Published var showFullURL: Bool {
         didSet {
             persistor.showFullURL = showFullURL
+        }
+    }
+
+    @Published var hideToolbarsOnFullScreen: Bool {
+        didSet {
+            persistor.hideToolbarsOnFullScreen = hideToolbarsOnFullScreen
         }
     }
 
@@ -369,6 +379,7 @@ final class AppearancePreferences: ObservableObject {
         homeButtonPosition = persistor.homeButtonPosition
         homePageCustomBackground = persistor.homePageCustomBackground.flatMap(CustomBackground.init)
         centerAlignedBookmarksBarBool = persistor.centerAlignedBookmarksBar
+        hideToolbarsOnFullScreen = persistor.hideToolbarsOnFullScreen
     }
 
     private var persistor: AppearancePreferencesPersistor
