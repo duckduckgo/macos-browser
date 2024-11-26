@@ -64,6 +64,22 @@ public struct TunnelControllerView: View {
                     .tipBackground(Color(.tipBackground))
                     .padding(.horizontal, 9)
                     .padding(.vertical, 6)
+                    .onAppear {
+                        tipsModel.handleAutoconnectionTipShown()
+                    }
+                    .task {
+                        var previousStatus = tipsModel.autoconnectTip.status
+
+                        for await status in tipsModel.autoconnectTip.statusUpdates {
+                            if case .invalidated(let reason) = status {
+                                if case .available = previousStatus {
+                                    tipsModel.handleAutoconnectTipInvalidated(reason)
+                                }
+                            }
+
+                            previousStatus = status
+                        }
+                    }
             }
 
             SiteTroubleshootingView()
@@ -78,17 +94,20 @@ public struct TunnelControllerView: View {
                     .tipBackground(Color(.tipBackground))
                     .padding(.horizontal, 9)
                     .padding(.vertical, 6)
+                    .onAppear {
+                        tipsModel.handleDomainExclusionsTipShown()
+                    }
                     .task {
                         var previousStatus = tipsModel.domainExclusionsTip.status
 
                         for await status in tipsModel.domainExclusionsTip.statusUpdates {
-                            if case .invalidated = status {
+                            if case .invalidated(let reason) = status {
                                 if case .available = previousStatus {
-                                    Logger.networkProtection.log("🧉 Domain exclusions tip dismissed")
+                                    tipsModel.handleDomainExclusionTipInvalidated(reason)
                                 }
-
-                                previousStatus = status
                             }
+
+                            previousStatus = status
                         }
                     }
             }
@@ -105,7 +124,12 @@ public struct TunnelControllerView: View {
         }
         .onAppear {
             if #available(macOS 14.0, *) {
-                tipsModel.handleTunnelControllerShown()
+                tipsModel.handleTunnelControllerAppear()
+            }
+        }
+        .onDisappear {
+            if #available(macOS 14.0, *) {
+                tipsModel.handleTunnelControllerDisappear()
             }
         }
     }
@@ -226,6 +250,9 @@ public struct TunnelControllerView: View {
                     .tipBackground(Color(.tipBackground))
                     .padding(.horizontal, 9)
                     .padding(.vertical, 6)
+                    .onAppear {
+                        tipsModel.handleGeoswitchingTipShown()
+                    }
                     .task {
                         var previousStatus = tipsModel.geoswitchingTip.status
 

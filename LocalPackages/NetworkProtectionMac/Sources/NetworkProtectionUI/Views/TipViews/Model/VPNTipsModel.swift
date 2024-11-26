@@ -22,6 +22,8 @@ import Common
 import NetworkProtection
 import os.log
 import TipKit
+import PixelKit
+import VPNPixels
 
 @MainActor
 public final class VPNTipsModel: ObservableObject {
@@ -184,13 +186,32 @@ public final class VPNTipsModel: ObservableObject {
     // MARK: - UI Events
 
     @available(macOS 14.0, *)
+    func handleAutoconnectTipInvalidated(_ reason: Tip.InvalidationReason) {
+        switch reason {
+        case .actionPerformed:
+            PixelKit.fire(VPNTipPixel.autoconnectTip(step: .actioned))
+        default:
+            PixelKit.fire(VPNTipPixel.autoconnectTip(step: .dismissed))
+        }
+    }
+
+    @available(macOS 14.0, *)
+    func handleDomainExclusionTipInvalidated(_ reason: Tip.InvalidationReason) {
+        switch reason {
+        case .actionPerformed:
+            PixelKit.fire(VPNTipPixel.domainExclusionsTip(step: .actioned))
+        default:
+            PixelKit.fire(VPNTipPixel.domainExclusionsTip(step: .dismissed))
+        }
+    }
+
+    @available(macOS 14.0, *)
     func handleGeoswitchingTipInvalidated(_ reason: Tip.InvalidationReason) {
         switch reason {
         case .actionPerformed:
-            Logger.networkProtection.log("🧉 Geo-switching tip actioned")
-            break
+            PixelKit.fire(VPNTipPixel.geoswitchingTip(step: .actioned))
         default:
-            Logger.networkProtection.log("🧉 Geo-switching tip dismissed")
+            PixelKit.fire(VPNTipPixel.geoswitchingTip(step: .dismissed))
         }
     }
 
@@ -207,9 +228,47 @@ public final class VPNTipsModel: ObservableObject {
     }
 
     @available(macOS 14.0, *)
-    func handleTunnelControllerShown() {
+    func handleTunnelControllerAppear() {
         guard !isMenuApp else { return }
 
         handleTipDistanceConditionsCheckpoint()
+    }
+
+    @available(macOS 14.0, *)
+    func handleTunnelControllerDisappear() {
+        guard !isMenuApp else { return }
+
+        if case .available = autoconnectTip.status {
+            PixelKit.fire(VPNTipPixel.autoconnectTip(step: .ignored))
+        }
+
+        if case .available = domainExclusionsTip.status {
+            PixelKit.fire(VPNTipPixel.domainExclusionsTip(step: .ignored))
+        }
+
+        if case .available = geoswitchingTip.status {
+            PixelKit.fire(VPNTipPixel.geoswitchingTip(step: .ignored))
+        }
+    }
+
+    @available(macOS 14.0, *)
+    func handleAutoconnectionTipShown() {
+        guard !isMenuApp else { return }
+
+        PixelKit.fire(VPNTipPixel.autoconnectTip(step: .shown))
+    }
+
+    @available(macOS 14.0, *)
+    func handleDomainExclusionsTipShown() {
+        guard !isMenuApp else { return }
+
+        PixelKit.fire(VPNTipPixel.domainExclusionsTip(step: .shown))
+    }
+
+    @available(macOS 14.0, *)
+    func handleGeoswitchingTipShown() {
+        guard !isMenuApp else { return }
+
+        PixelKit.fire(VPNTipPixel.geoswitchingTip(step: .shown))
     }
 }
