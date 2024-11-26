@@ -80,7 +80,7 @@ final class NewTabPageRMFClient: NewTabPageScriptClient {
     }
 
     private func dismiss(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let remoteMessageParams: NewTabPageUserScript.RemoteMessageParams = DecodableHelper.decode(from: params),
+        guard let remoteMessageParams: NewTabPageUserScript.RemoteMessageParams = CodableHelper.decode(from: params),
               remoteMessageParams.id == remoteMessageProvider.remoteMessage?.id
         else {
             return nil
@@ -91,7 +91,7 @@ final class NewTabPageRMFClient: NewTabPageScriptClient {
     }
 
     private func primaryAction(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let remoteMessageParams: NewTabPageUserScript.RemoteMessageParams = DecodableHelper.decode(from: params),
+        guard let remoteMessageParams: NewTabPageUserScript.RemoteMessageParams = CodableHelper.decode(from: params),
               remoteMessageParams.id == remoteMessageProvider.remoteMessage?.id
         else {
             return nil
@@ -111,7 +111,7 @@ final class NewTabPageRMFClient: NewTabPageScriptClient {
     }
 
     private func secondaryAction(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let remoteMessageParams: NewTabPageUserScript.RemoteMessageParams = DecodableHelper.decode(from: params),
+        guard let remoteMessageParams: NewTabPageUserScript.RemoteMessageParams = CodableHelper.decode(from: params),
               remoteMessageParams.id == remoteMessageProvider.remoteMessage?.id
         else {
             return nil

@@ -83,7 +83,7 @@ final class NewTabPageFavoritesClient: NewTabPageScriptClient {
 
     @MainActor
     func setConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let config: NewTabPageUserScript.WidgetConfig = DecodableHelper.decode(from: params) else {
+        guard let config: NewTabPageUserScript.WidgetConfig = CodableHelper.decode(from: params) else {
             return nil
         }
         favoritesModel.isViewExpanded = config.expansion == .expanded
@@ -115,7 +115,7 @@ final class NewTabPageFavoritesClient: NewTabPageScriptClient {
 
     @MainActor
     func move(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let action: NewTabPageFavoritesClient.FavoritesMoveAction = DecodableHelper.decode(from: params) else {
+        guard let action: NewTabPageFavoritesClient.FavoritesMoveAction = CodableHelper.decode(from: params) else {
             return nil
         }
         favoritesModel.moveFavorite(withID: action.id, fromIndex: action.fromIndex, toIndex: action.targetIndex)
@@ -124,7 +124,7 @@ final class NewTabPageFavoritesClient: NewTabPageScriptClient {
 
     @MainActor
     func open(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let action: NewTabPageFavoritesClient.FavoritesOpenAction = DecodableHelper.decode(from: params) else {
+        guard let action: NewTabPageFavoritesClient.FavoritesOpenAction = CodableHelper.decode(from: params) else {
             return nil
         }
         favoritesModel.openFavorite(withURL: action.url)
@@ -133,7 +133,7 @@ final class NewTabPageFavoritesClient: NewTabPageScriptClient {
 
     @MainActor
     func openContextMenu(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let contextMenuAction: NewTabPageFavoritesClient.FavoritesContextMenuAction = DecodableHelper.decode(from: params) else {
+        guard let contextMenuAction: NewTabPageFavoritesClient.FavoritesContextMenuAction = CodableHelper.decode(from: params) else {
             return nil
         }
         favoritesModel.showContextMenu(for: contextMenuAction.id)

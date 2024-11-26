@@ -82,7 +82,7 @@ final class NewTabPageConfigurationClient: NewTabPageScriptClient {
 
     @MainActor
     private func showContextMenu(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let params: NewTabPageUserScript.ContextMenuParams = DecodableHelper.decode(from: params) else { return nil }
+        guard let params: NewTabPageUserScript.ContextMenuParams = CodableHelper.decode(from: params) else { return nil }
 
         let menu = NSMenu()
 
@@ -146,7 +146,7 @@ final class NewTabPageConfigurationClient: NewTabPageScriptClient {
 
     @MainActor
     private func widgetsSetConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let widgetConfigs: [NewTabPageUserScript.NewTabPageConfiguration.WidgetConfig] = DecodableHelper.decode(from: params) else {
+        guard let widgetConfigs: [NewTabPageUserScript.NewTabPageConfiguration.WidgetConfig] = CodableHelper.decode(from: params) else {
             return nil
         }
         for widgetConfig in widgetConfigs {
