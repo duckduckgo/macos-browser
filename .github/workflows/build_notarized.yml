@@ -93,7 +93,7 @@ jobs:
 
     steps:
     - name: Register SSH key for certificates repository access
-      uses: webfactory/ssh-agent@v0.7.0
+      uses: webfactory/ssh-agent@v0.9.0
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
 
@@ -367,13 +367,26 @@ jobs:
     needs: [export-notarized-app, create-dmg]
     if: ${{ always() && inputs.skip-notify == false }}
 
-    runs-on: ubuntu-latest
+    runs-on: macos-15
 
     env:
       success: ${{ (needs.export-notarized-app.result == 'success') && (needs.create-dmg.result == 'success' || needs.create-dmg.result == 'skipped') }}
       failure: ${{ (needs.export-notarized-app.result == 'failure') || (needs.create-dmg.result == 'failure') }}
 
     steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch || github.ref_name }}
+          sparse-checkout: |
+            .github
+            Gemfile
+            Gemfile.lock
+            fastlane
+          
+      - name: Set up fastlane
+        run: bundle install
+
       - name: Send Mattermost message
         if: ${{ env.success || env.failure }} # Don't execute when cancelled
         env:
@@ -382,25 +395,7 @@ jobs:
           RELEASE_TYPE: ${{ github.event.inputs.release-type || inputs.release-type }}
           WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          curl -fLSs $(gh api https://api.github.com/repos/${{ github.repository }}/contents/scripts/assets/release-mm-template.json?ref=${{ github.ref }} --jq .download_url) \
-              --output message-template.json
-
-          export MM_USER_HANDLE=$(base64 -d <<< ${{ secrets.MM_HANDLES_BASE64 }} | jq ".${{ github.actor }}" | tr -d '"')
-
-          if [[ -z "${MM_USER_HANDLE}" ]]; then
-              echo "Mattermost user handle not known for ${{ github.actor }}, skipping sending message"
-          else
-
-              if [[ -n "${ASANA_TASK_URL}" ]]; then
-                  export ASANA_LINK=" | [:asana: Asana task](${ASANA_TASK_URL})"
-              fi
-
-              if [[ "${{ env.success }}" == "true" ]]; then
-                  status="success"
-              else
-                  status="failure"
-              fi
-              curl -s -H 'Content-type: application/json' \
-                  -d "$(envsubst < message-template.json | jq ".${status}")" \
-                  ${{ secrets.MM_WEBHOOK_URL }}
-          fi
+          bundle exec fastlane run mattermost_send_message \
+            mattermost_webhook_url:${{ secrets.MM_WEBHOOK_URL }} \
+            github_handle:${{ github.actor }} \
+            template_name:$([[ "${{ env.success }}" == "true" ]] && echo "notarized-build-complete" || echo "notarized-build-failed")

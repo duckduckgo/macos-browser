@@ -17,6 +17,7 @@
 //
 
 import BrowserServicesKit
+import Combine
 import WebKit
 
 /**
@@ -33,9 +34,11 @@ import WebKit
 final class NewTabPageWebViewModel: NSObject {
     let newTabPageUserScript: NewTabPageUserScript
     let webView: WebView
+    private var windowCancellable: AnyCancellable?
 
-    init(featureFlagger: FeatureFlagger, actionsManager: NewTabPageActionsManaging) {
-        newTabPageUserScript = NewTabPageUserScript(actionsManager: actionsManager)
+    init(featureFlagger: FeatureFlagger, actionsManager: NewTabPageActionsManaging, activeRemoteMessageModel: ActiveRemoteMessageModel) {
+        newTabPageUserScript = NewTabPageUserScript()
+        actionsManager.registerUserScript(newTabPageUserScript)
 
         let configuration = WKWebViewConfiguration()
         configuration.applyNewTabPageWebViewConfiguration(with: featureFlagger, newTabPageUserScript: newTabPageUserScript)
@@ -46,6 +49,10 @@ final class NewTabPageWebViewModel: NSObject {
         webView.navigationDelegate = self
         webView.load(URLRequest(url: URL.newtab))
         newTabPageUserScript.webView = webView
+
+        windowCancellable = webView.publisher(for: \.window)
+            .map { $0 != nil }
+            .assign(to: \.isViewOnScreen, on: activeRemoteMessageModel)
     }
 }
 

@@ -41,7 +41,8 @@ final class OperationPreferredDateUpdaterTests: XCTestCase {
             schedulingConfig: DataBrokerScheduleConfig(
                 retryError: 1,
                 confirmOptOutScan: confirmOptOutScanHours,
-                maintenanceScan: 1
+                maintenanceScan: 1,
+                maxAttempts: -1
             ),
             optOutUrl: ""
         )
@@ -75,7 +76,7 @@ final class OperationPreferredDateUpdaterTests: XCTestCase {
         databaseMock.lastHistoryEventToReturn = lastHistoryEventToReturn
 
         let scanJobData = ScanJobData(brokerId: brokerId, profileQueryId: profileQueryId, historyEvents: [lastHistoryEventToReturn])
-        let optOutJobData = OptOutJobData(brokerId: brokerId, profileQueryId: profileQueryId, createdDate: createdDate, historyEvents: [lastHistoryEventToReturn], extractedProfile: .mockWithoutRemovedDate)
+        let optOutJobData = OptOutJobData(brokerId: brokerId, profileQueryId: profileQueryId, createdDate: createdDate, historyEvents: [lastHistoryEventToReturn], attemptCount: 0, extractedProfile: .mockWithoutRemovedDate)
         databaseMock.brokerProfileQueryDataToReturn = [
             BrokerProfileQueryData(dataBroker: .mock, profileQuery: .mock, scanJobData: scanJobData, optOutJobData: [optOutJobData])
         ]
@@ -102,7 +103,7 @@ final class OperationPreferredDateUpdaterTests: XCTestCase {
         databaseMock.lastHistoryEventToReturn = lastHistoryEventToReturn
 
         let scanJobData = ScanJobData(brokerId: brokerId, profileQueryId: profileQueryId, historyEvents: [lastHistoryEventToReturn])
-        let optOutJobData = OptOutJobData(brokerId: brokerId, profileQueryId: profileQueryId, createdDate: createdDate, historyEvents: [lastHistoryEventToReturn], submittedSuccessfullyDate: submittedDate, extractedProfile: .mockWithoutRemovedDate)
+        let optOutJobData = OptOutJobData(brokerId: brokerId, profileQueryId: profileQueryId, createdDate: createdDate, historyEvents: [lastHistoryEventToReturn], attemptCount: 0, submittedSuccessfullyDate: submittedDate, extractedProfile: .mockWithoutRemovedDate)
         databaseMock.brokerProfileQueryDataToReturn = [
             BrokerProfileQueryData(dataBroker: .mock, profileQuery: .mock, scanJobData: scanJobData, optOutJobData: [optOutJobData])
         ]

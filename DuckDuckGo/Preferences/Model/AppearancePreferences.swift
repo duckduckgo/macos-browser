@@ -29,6 +29,9 @@ protocol AppearancePreferencesPersistor {
     var favoritesDisplayMode: String? { get set }
     var isFavoriteVisible: Bool { get set }
     var isContinueSetUpVisible: Bool { get set }
+    var continueSetUpCardsLastDemonstrated: Date? { get set }
+    var continueSetUpCardsNumberOfDaysDemonstrated: Int { get set }
+    var continueSetUpCardsClosed: Bool { get set }
     var isRecentActivityVisible: Bool { get set }
     var isSearchBarVisible: Bool { get set }
     var showBookmarksBar: Bool { get set }
@@ -53,6 +56,15 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
 
     @UserDefaultsWrapper(key: .homePageIsContinueSetupVisible, defaultValue: true)
     var isContinueSetUpVisible: Bool
+
+    @UserDefaultsWrapper(key: .continueSetUpCardsLastDemonstrated)
+    var continueSetUpCardsLastDemonstrated: Date?
+
+    @UserDefaultsWrapper(key: .continueSetUpCardsNumberOfDaysDemonstrated, defaultValue: 0)
+    var continueSetUpCardsNumberOfDaysDemonstrated: Int
+
+    @UserDefaultsWrapper(key: .continueSetUpCardsClosed, defaultValue: false)
+    var continueSetUpCardsClosed: Bool
 
     @UserDefaultsWrapper(key: .homePageIsRecentActivityVisible, defaultValue: true)
     var isRecentActivityVisible: Bool
@@ -178,6 +190,7 @@ final class AppearancePreferences: ObservableObject {
 
     struct Constants {
         static let bookmarksBarAlignmentChangedIsCenterAlignedParameter = "isCenterAligned"
+        static let dismissNextStepsCardsAfterDays = 9
     }
 
     static let shared = AppearancePreferences()
@@ -211,13 +224,45 @@ final class AppearancePreferences: ObservableObject {
         }
     }
 
-    @Published var isContinueSetUpVisible: Bool {
+    @Published var isContinueSetUpCardsViewOutdated: Bool
+
+    @Published var continueSetUpCardsClosed: Bool {
         didSet {
-            persistor.isContinueSetUpVisible = isContinueSetUpVisible
+            persistor.continueSetUpCardsClosed = continueSetUpCardsClosed
+        }
+    }
+
+    var isContinueSetUpVisible: Bool {
+        get {
+            return persistor.isContinueSetUpVisible && !persistor.continueSetUpCardsClosed && !isContinueSetUpCardsViewOutdated
+        }
+        set {
+            persistor.isContinueSetUpVisible = newValue
             // Temporary Pixel
             if !isContinueSetUpVisible {
                 PixelKit.fire(GeneralPixel.continueSetUpSectionHidden)
             }
+            self.objectWillChange.send()
+        }
+    }
+
+    func continueSetUpCardsViewDidAppear() {
+        guard isContinueSetUpVisible, !isContinueSetUpCardsViewOutdated else { return }
+
+        if let continueSetUpCardsLastDemonstrated = persistor.continueSetUpCardsLastDemonstrated {
+            // how many days has passed since last Continue Setup demonstration
+            let daysSinceLastDemonstration = Calendar.current.dateComponents([.day], from: continueSetUpCardsLastDemonstrated, to: dateTimeProvider()).day!
+            if daysSinceLastDemonstration > 0 {
+                persistor.continueSetUpCardsLastDemonstrated = Date()
+                persistor.continueSetUpCardsNumberOfDaysDemonstrated += 1
+
+                if persistor.continueSetUpCardsNumberOfDaysDemonstrated >= Constants.dismissNextStepsCardsAfterDays {
+                    self.isContinueSetUpCardsViewOutdated = true
+                }
+            }
+
+        } else if persistor.continueSetUpCardsLastDemonstrated == nil {
+            persistor.continueSetUpCardsLastDemonstrated = Date()
         }
     }
 
@@ -291,16 +336,19 @@ final class AppearancePreferences: ObservableObject {
 
     init(
         persistor: AppearancePreferencesPersistor = AppearancePreferencesUserDefaultsPersistor(),
-        homePageNavigator: HomePageNavigator = DefaultHomePageNavigator()
+        homePageNavigator: HomePageNavigator = DefaultHomePageNavigator(),
+        dateTimeProvider: @escaping () -> Date = Date.init
     ) {
         self.persistor = persistor
         self.homePageNavigator = homePageNavigator
+        self.dateTimeProvider = dateTimeProvider
+        self.isContinueSetUpCardsViewOutdated = persistor.continueSetUpCardsNumberOfDaysDemonstrated >= Constants.dismissNextStepsCardsAfterDays
+        self.continueSetUpCardsClosed = persistor.continueSetUpCardsClosed
         currentThemeName = .init(rawValue: persistor.currentThemeName) ?? .systemDefault
         showFullURL = persistor.showFullURL
         favoritesDisplayMode = persistor.favoritesDisplayMode.flatMap(FavoritesDisplayMode.init) ?? .default
         isFavoriteVisible = persistor.isFavoriteVisible
         isRecentActivityVisible = persistor.isRecentActivityVisible
-        isContinueSetUpVisible = persistor.isContinueSetUpVisible
         isSearchBarVisible = persistor.isSearchBarVisible
         showBookmarksBar = persistor.showBookmarksBar
         bookmarksBarAppearance = persistor.bookmarksBarAppearance
@@ -311,12 +359,11 @@ final class AppearancePreferences: ObservableObject {
 
     private var persistor: AppearancePreferencesPersistor
     private var homePageNavigator: HomePageNavigator
+    private let dateTimeProvider: () -> Date
 
     private func requestSync() {
         Task { @MainActor in
-            guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService else {
-                return
-            }
+            guard let syncService = NSApp.delegateTyped.syncService else { return }
             Logger.sync.debug("Requesting sync if enabled")
             syncService.scheduler.notifyDataChanged()
         }

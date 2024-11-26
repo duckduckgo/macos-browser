@@ -19,9 +19,12 @@ inputs:
     required: true
     type: string
 outputs:
-  build-variants:
-    description: "The list of build variants to create"
-    value: ${{ steps.get-build-variants-task.outputs.build-variants }}
+  build-variants-1:
+    description: "The list of build variants to create (batch 1)"
+    value: ${{ steps.get-build-variants-task.outputs.build-variants-1 }}
+  build-variants-2:
+    description: "The list of build variants to create (batch 2)"
+    value: ${{ steps.get-build-variants-task.outputs.build-variants-2 }}
 runs:
   using: "composite"
   steps:

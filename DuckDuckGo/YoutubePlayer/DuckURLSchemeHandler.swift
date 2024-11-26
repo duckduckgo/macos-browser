@@ -26,9 +26,11 @@ import PhishingDetection
 final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
 
     let featureFlagger: FeatureFlagger
+    let faviconManager: FaviconManagement
 
-    init(featureFlagger: FeatureFlagger) {
+    init(featureFlagger: FeatureFlagger, faviconManager: FaviconManagement = FaviconManager.shared) {
         self.featureFlagger = featureFlagger
+        self.faviconManager = faviconManager
     }
 
     func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
@@ -46,7 +48,11 @@ final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
             handleErrorPage(urlSchemeTask: urlSchemeTask)
         case .newTab:
             if featureFlagger.isFeatureOn(.htmlNewTabPage) {
-                handleSpecialPages(urlSchemeTask: urlSchemeTask)
+                if urlSchemeTask.request.url?.type == .favicon {
+                    handleFavicon(urlSchemeTask: urlSchemeTask)
+                } else {
+                    handleSpecialPages(urlSchemeTask: urlSchemeTask)
+                }
             } else {
                 handleNativeUIPages(requestURL: requestURL, urlSchemeTask: urlSchemeTask)
             }
@@ -120,6 +126,53 @@ private extension DuckURLSchemeHandler {
     }
 }
 
+// MARK: - Favicons
+
+private extension DuckURLSchemeHandler {
+    /**
+     * This handler supports special Duck favicon URLs and uses `FaviconManager`
+     * to return a favicon in response, based on the actual favicon URL that's
+     * encoded in the URL path.
+     *
+     * If favicon is not found, an `HTTP 404` response is returned.
+     */
+    func handleFavicon(urlSchemeTask: WKURLSchemeTask) {
+        guard let requestURL = urlSchemeTask.request.url else {
+            assertionFailure("No URL for Favicon scheme handler")
+            return
+        }
+
+        /**
+         * Favicon URL has the format of `duck://favicon/<url_percent_encoded_favicon_url>`.
+         * Calling `requestURL.path` drops leading `duck://favicon` and automatically
+         * handles percent-encoding. We only need to drop the leading forward slash to get the favicon URL.
+         */
+        guard let faviconURL = requestURL.path.dropping(prefix: "/").url else {
+            assertionFailure("Favicon URL malformed \(requestURL.path.dropping(prefix: "/"))")
+            return
+        }
+
+        guard let (response, data) = response(for: requestURL, withFaviconURL: faviconURL) else { return }
+        urlSchemeTask.didReceive(response)
+        urlSchemeTask.didReceive(data)
+        urlSchemeTask.didFinish()
+    }
+
+    func response(for requestURL: URL, withFaviconURL faviconURL: URL) -> (URLResponse, Data)? {
+        guard faviconManager.areFaviconsLoaded,
+              let favicon = faviconManager.getCachedFavicon(for: faviconURL, sizeCategory: .medium),
+              let imagePNGData = favicon.image?.pngData
+        else {
+            guard let response = HTTPURLResponse(url: requestURL, statusCode: 404, httpVersion: "HTTP/1.1", headerFields: nil) else {
+                return nil
+            }
+            return (response, Data())
+        }
+        let response = URLResponse(url: requestURL, mimeType: "image/png", expectedContentLength: imagePNGData.count, textEncodingName: nil)
+        return (response, imagePNGData)
+    }
+}
+
 // MARK: - Onboarding & Release Notes
 private extension DuckURLSchemeHandler {
     func handleSpecialPages(urlSchemeTask: WKURLSchemeTask) {
@@ -157,8 +210,8 @@ private extension DuckURLSchemeHandler {
         }
 
         guard let file = ContentScopeScripts.Bundle.path(forResource: fileName, ofType: fileExtension, inDirectory: directoryURL.path) else {
-            assertionFailure("\(fileExtension) template not found")
-            return nil
+            let response = HTTPURLResponse(url: url, statusCode: 404, httpVersion: "HTTP/1.1", headerFields: nil)!
+            return (response, Data())
         }
 
         guard let data = try? Data(contentsOf: URL(fileURLWithPath: file)) else {
@@ -222,6 +275,7 @@ private extension DuckURLSchemeHandler {
 extension URL {
     enum URLType {
         case newTab
+        case favicon
         case onboarding
         case duckPlayer
         case releaseNotes
@@ -239,6 +293,8 @@ extension URL {
             return .releaseNotes
         } else if self.isNewTabPage {
             return .newTab
+        } else if self.isFavicon {
+            return .favicon
         } else {
             return nil
         }
@@ -250,6 +306,10 @@ extension URL {
 
     var isNewTabPage: Bool {
         return isDuckURLScheme && host == "newtab"
+    }
+
+    var isFavicon: Bool {
+        return isDuckURLScheme && host == "favicon"
     }
 
     var isDuckURLScheme: Bool {

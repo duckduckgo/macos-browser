@@ -21,6 +21,18 @@ import Foundation
 enum FileDownloadError: Error {
     case failedToMoveFileToDownloads
     case failedToCompleteDownloadTask(underlyingError: Error?, resumeData: Data?, isRetryable: Bool)
+
+    var isNSFileReadUnknownError: Bool {
+        switch self {
+        case .failedToMoveFileToDownloads:
+            return false
+        case .failedToCompleteDownloadTask(let underlyingError, _, _):
+            guard let underlyingError else { return false }
+
+            let nsError = underlyingError as NSError
+            return nsError.domain == NSCocoaErrorDomain && nsError.code == NSFileReadUnknownError
+        }
+    }
 }
 
 extension FileDownloadError: LocalizedError {

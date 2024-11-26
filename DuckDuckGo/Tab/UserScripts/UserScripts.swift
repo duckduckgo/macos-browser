@@ -62,8 +62,10 @@ final class UserScripts: UserScriptsProvider {
         let isGPCEnabled = WebTrackingProtectionPreferences.shared.isGPCEnabled
         let privacyConfig = sourceProvider.privacyConfigurationManager.privacyConfig
         let sessionKey = sourceProvider.sessionKey ?? ""
+        let messageSecret = sourceProvider.messageSecret ?? ""
         let prefs = ContentScopeProperties(gpcEnabled: isGPCEnabled,
                                                 sessionKey: sessionKey,
+                                                messageSecret: messageSecret,
                                                 featureToggles: ContentScopeFeatureToggles.supportedFeaturesOnMacOS(privacyConfig))
         contentScopeUserScript = ContentScopeUserScript(sourceProvider.privacyConfigurationManager, properties: prefs)
         contentScopeUserScriptIsolated = ContentScopeUserScript(sourceProvider.privacyConfigurationManager, properties: prefs, isIsolated: true)
