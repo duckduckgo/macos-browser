@@ -73,20 +73,21 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
     }
 
     lazy var extensions: [_WKWebExtension] = {
-        guard let dashlane = WebExtensionManager.loadWebExtension(path: "/Applications/Dashlane.app/Contents/PlugIns/SafariWebExtension (macOS).appex/Contents/Resources/") else {
+        guard let nordpass = WebExtensionManager.loadWebExtension(path: "/Applications/NordPass® Password Manager & Digital Vault.app/Contents/PlugIns/NordPass® Password Manager & Digital Vault Extension.appex/Contents/Resources/") else {
             return []
         }
 
 //        let bitwarden = WebExtensionManager.loadWebExtension(path: "/Applications/Bitwarden.app/Contents/PlugIns/safari.appex/Contents/Resources/")
 //        let lastpass = WebExtensionManager.loadWebExtension(path: "/Applications/LastPass.app/Contents/PlugIns/safariext.appex/Contents/Resources/")
+//        let lastpassForSafari = WebExtensionManager.loadWebExtension(path: "/Applications/LastPass for Safari.app/Contents/PlugIns/LastPass for Safari Extension.appex/Contents/Resources/")
 //        let dashlane = WebExtensionManager.loadWebExtension(path: "/Applications/Dashlane.app/Contents/PlugIns/SafariWebExtension (macOS).appex/Contents/Resources/")
 //        let nordpass = WebExtensionManager.loadWebExtension(path: "/Applications/NordPass® Password Manager & Digital Vault.app/Contents/PlugIns/NordPass® Password Manager & Digital Vault Extension.appex/Contents/Resources/")
-//        let onePassword = WebExtensionManager.loadWebExtension(path: "/Applications/1Password\ for\ Safari.app/Contents/PlugIns/1Password.appex/Contents/Resources/")
-//        let okta = WebExtensionManager.loadWebExtension(path: "/Applications/Okta\ Extension\ App.app/Contents/PlugIns/WebExtension.appex/Contents/Resources")
+//        let onePassword = WebExtensionManager.loadWebExtension(path: "/Applications/1Password for Safari.app/Contents/PlugIns/1Password.appex/Contents/Resources/")
+//        let okta = WebExtensionManager.loadWebExtension(path: "/Applications/Okta Extension App.app/Contents/PlugIns/WebExtension.appex/Contents/Resources")
 //        let adBlock = WebExtensionManager.loadWebExtension(path: "/Applications/NordPass® Password Manager & Digital Vault.app/Contents/PlugIns/NordPass® Password Manager & Digital Vault Extension.appex/Contents/Resources/")
 //        let nightEye = WebExtensionManager.loadWebExtension(path: "/Applications/Night Eye.app/Contents/PlugIns/Night Eye Extension.appex/Contents/Resources/")
 
-        return [dashlane]
+        return [nordpass]
     }()
 
     // Context manages the extension's permissions and allows it to inject content, run background logic, show popovers, and display other web-based UI to the user.
