@@ -27,7 +27,6 @@ extension DefaultSubscriptionManager {
 
     // Init the SubscriptionManager using the standard dependencies and configuration, to be used only in the dependencies tree root
     public convenience init(keychainType: KeychainType,
-                            userDefault: UserDefaults,
                             environment: SubscriptionEnvironment) {
 
         let configuration = URLSessionConfiguration.default
@@ -41,10 +40,10 @@ extension DefaultSubscriptionManager {
 
         let authService = DefaultOAuthService(baseURL: authEnvironment.url, apiService: apiService)
         let tokenStorage = SubscriptionTokenKeychainStorageV2(keychainType: keychainType)
-        let legacyAccountStorage = SubscriptionTokenKeychainStorage(keychainType: keychainType)
+//        let legacyAccountStorage = SubscriptionTokenKeychainStorage(keychainType: keychainType)
 
         let authClient = DefaultOAuthClient(tokensStorage: tokenStorage,
-                                            legacyTokenStorage: legacyAccountStorage,
+//                                            legacyTokenStorage: legacyAccountStorage,
                                             authService: authService)
 
         apiService.authorizationRefresherCallback = { _ in

@@ -412,25 +412,24 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         NetworkProtectionLastVersionRunStore(userDefaults: defaults).lastExtensionVersionRun = AppVersion.shared.versionAndBuildNumber
         let settings = VPNSettings(defaults: defaults)
 
-        // MARK: - Configure Subscription
-        let subscriptionUserDefaults = UserDefaults(suiteName: MacPacketTunnelProvider.subscriptionsAppGroup)!
         let notificationCenter: NetworkProtectionNotificationCenter = DistributedNotificationCenter.default()
         let controllerErrorStore = NetworkProtectionTunnelErrorStore(notificationCenter: notificationCenter)
         let debugEvents = Self.networkProtectionDebugEvents(controllerErrorStore: controllerErrorStore)
 
+        // MARK: - Configure Subscription
+
         // Align Subscription environment to the VPN environment
         var subscriptionEnvironment = SubscriptionEnvironment.default
-        switch settings.selectedEnvironment {
+        switch settings.selectedEnvironment { // we don't care about the purchasePlatform
         case .production:
             subscriptionEnvironment.serviceEnvironment = .production
         case .staging:
             subscriptionEnvironment.serviceEnvironment = .staging
         }
 
-        Logger.networkProtection.log("Subscription environment: \(subscriptionEnvironment.description, privacy: .public)")
+        Logger.networkProtection.debug("Subscription ServiceEnvironment: \(subscriptionEnvironment.serviceEnvironment.rawValue, privacy: .public)")
 
         let subscriptionManager = DefaultSubscriptionManager(keychainType: Bundle.keychainType, // note: the old public static let tokenStoreService = "com.duckduckgo.networkprotection.authToken" was used as kSecAttrService in NetworkProtectionKeychainStore, now is different. the old token recovery will not work in the extension, yes in main app
-                                                             userDefault: subscriptionUserDefaults,
                                                              environment: subscriptionEnvironment)
 
         let entitlementsCheck: (() async -> Result<Bool, Error>) = {
