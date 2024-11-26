@@ -33,6 +33,10 @@ protocol UserScriptWithAutoconsent: UserScript {
 
 final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, UserScriptWithAutoconsent {
 
+    private struct Constants {
+        static let filterListCmpName = "filterList" // special CMP name used for reports from the cosmetic filterlist
+    }
+
     static let newSitePopupHiddenNotification = Notification.Name("newSitePopupHidden")
 
     var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
@@ -111,13 +115,13 @@ extension AutoconsentUserScript {
 
     struct PopupFoundMessage: Codable {
         let type: String
-        let cmp: String
+        let cmp: String // name of the Autoconsent rule that matched
         let url: String
     }
 
     struct OptOutResultMessage: Codable {
         let type: String
-        let cmp: String
+        let cmp: String // name of the Autoconsent rule that matched
         let result: Bool
         let scheduleSelfTest: Bool
         let url: String
@@ -125,7 +129,7 @@ extension AutoconsentUserScript {
 
     struct OptInResultMessage: Codable {
         let type: String
-        let cmp: String
+        let cmp: String // name of the Autoconsent rule that matched
         let result: Bool
         let scheduleSelfTest: Bool
         let url: String
@@ -133,14 +137,14 @@ extension AutoconsentUserScript {
 
     struct SelfTestResultMessage: Codable {
         let type: String
-        let cmp: String
+        let cmp: String // name of the Autoconsent rule that matched
         let result: Bool
         let url: String
     }
 
     struct AutoconsentDoneMessage: Codable {
         let type: String
-        let cmp: String
+        let cmp: String // name of the Autoconsent rule that matched
         let url: String
         let isCosmetic: Bool
     }
@@ -292,29 +296,26 @@ extension AutoconsentUserScript {
 
     @MainActor
     func handlePopupFound(message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
-        guard let messageData: PopupFoundMessage = decodeMessageBody(from: message.body) else {
-            replyHandler(nil, "cannot decode message")
-            return
-        }
-        Logger.autoconsent.info("Cookie popup found: \(String(describing: messageData))")
-        guard let url = URL(string: messageData.url),
+        guard let messageData: PopupFoundMessage = decodeMessageBody(from: message.body),
+              let url = URL(string: messageData.url),
               let host = url.host else {
             replyHandler(nil, "cannot decode message")
             return
         }
+        Logger.autoconsent.info("Cookie popup found: \(String(describing: messageData))")
 
-        if messageData.cmp == "filterList" {
+        // if popupFound is sent with "filterList", it indicates that cosmetic filterlist matched in the prehide stage,
+        // but a real opt-out may still follow. See https://github.com/duckduckgo/autoconsent/blob/main/api.md#messaging-api
+        if messageData.cmp == Constants.filterListCmpName {
             refreshDashboardState(consentManaged: true, cosmetic: true, optoutFailed: false, selftestFailed: nil)
             // trigger animation, but do not cache it because it can still be overridden
             if !management.sitesNotifiedCache.contains(host) {
                 Logger.autoconsent.info("Starting animation for cosmetic filters")
-                // post popover notification on main thread
-                DispatchQueue.main.async {
-                    NotificationCenter.default.post(name: Self.newSitePopupHiddenNotification, object: self, userInfo: [
-                        "topUrl": self.topUrl ?? url,
-                        "isCosmetic": true
-                    ])
-                }
+                // post popover notification
+                NotificationCenter.default.post(name: Self.newSitePopupHiddenNotification, object: self, userInfo: [
+                    "topUrl": self.topUrl ?? url,
+                    "isCosmetic": true
+                ])
             }
         }
 
@@ -360,15 +361,13 @@ extension AutoconsentUserScript {
         // trigger popup once per domain
         if !management.sitesNotifiedCache.contains(host) {
             management.sitesNotifiedCache.insert(host)
-            if messageData.cmp != "filterList" { // filterlist animation should have been triggered already (see handlePopupFound)
+            if messageData.cmp != Constants.filterListCmpName { // filterlist animation should have been triggered already (see handlePopupFound)
                 Logger.autoconsent.info("Starting animation for the handled cookie popup")
-                // post popover notification on main thread
-                DispatchQueue.main.async {
-                    NotificationCenter.default.post(name: Self.newSitePopupHiddenNotification, object: self, userInfo: [
-                        "topUrl": self.topUrl ?? url,
-                        "isCosmetic": messageData.isCosmetic
-                    ])
-                }
+                // post popover notification
+                NotificationCenter.default.post(name: Self.newSitePopupHiddenNotification, object: self, userInfo: [
+                    "topUrl": self.topUrl ?? url,
+                    "isCosmetic": messageData.isCosmetic
+                ])
             }
         }
 
