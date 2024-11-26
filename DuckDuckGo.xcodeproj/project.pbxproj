@@ -7842,7 +7842,6 @@
 				565E46DE2B2725DD0013AC2A /* SyncE2EUITests */,
 				AA585D7F248FD31100E9A3E2 /* Products */,
 				85AE2FF024A33A2D002D507F /* Frameworks */,
-				8443DC702CF60383000B8829 /* BrowserServicesKit */,
 			);
 			sourceTree = "<group>";
 		};
@@ -15212,7 +15211,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = revision;
-				revision = 1509f0cf7c48800bf79bc5f6a5dfa3f7f3f7b696;
+				revision = c19e6f6d75508fabc849db7cc3f737adc243a15c;
 			};
 		};
 		9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
