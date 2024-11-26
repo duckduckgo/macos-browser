@@ -244,7 +244,7 @@ extension WebExtensionManager: @preconcurrency _WKWebExtensionControllerDelegate
 
         if let tabCollectionViewModel = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel,
            let url = options.desiredURL {
-            let configuration = extensionContext.webViewConfiguration
+            let configuration = url.isWebExtensionUrl ? extensionContext.webViewConfiguration : nil
             let tab = Tab(content: .url(url, source: .ui),
                           webViewConfiguration: configuration,
                           burnerMode: tabCollectionViewModel.burnerMode)
