@@ -24,17 +24,26 @@ extension HomePage.Views {
     struct CloseButton: View {
         let icon: NSImage
         let size: CGFloat
+        let backgroundColor: Color
+        let backgroundColorOnHover: Color
         let action: () -> Void
-        let foregroundColor: Color = .homeFavoritesBackground
-        let foregroundColorOnHover: Color = .homeFavoritesHover
 
         @State var isHovering = false
+
+        init(icon: NSImage, size: CGFloat, backgroundColor: Color = .clear, backgroundColorOnHover: Color = .homeFavoritesHover, action: @escaping () -> Void) {
+            self.icon = icon
+            self.size = size
+            self.backgroundColor = backgroundColor
+            self.backgroundColorOnHover = backgroundColorOnHover
+            self.action = action
+            self.isHovering = isHovering
+        }
 
         var body: some View {
             Button(action: action) {
                 ZStack {
                     Circle()
-                        .fill(isHovering ? foregroundColorOnHover : foregroundColor)
+                        .fill(isHovering ? backgroundColorOnHover : backgroundColor)
                         .frame(width: size, height: size)
                     Image(nsImage: icon)
                         .foregroundColor(.blackWhite80)
@@ -43,6 +52,11 @@ extension HomePage.Views {
             .buttonStyle(.plain)
             .onHover { isHovering in
                 self.isHovering = isHovering
+                if isHovering {
+                    NSCursor.pointingHand.push()
+                } else {
+                    NSCursor.pointingHand.pop()
+                }
             }
         }
     }

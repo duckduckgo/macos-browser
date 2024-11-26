@@ -825,6 +825,9 @@ struct UserText {
     static let downloadFailed = NSLocalizedString("downloads.error.other", value: "Error", comment: "Short error description when Download failed")
     static let downloadBytesLoadedFormat = NSLocalizedString("downloads.bytes.format", value: "%@ of %@", comment: "Number of bytes out of total bytes downloaded (1Mb of 2Mb)")
     static let downloadSpeedFormat = NSLocalizedString("downloads.speed.format", value: "%@/s", comment: "Download speed format (1Mb/sec)")
+    static let downloadsErrorMessage = NSLocalizedString("downloads.error.message.for.specific.os", value: "The download failed because of a known issue on macOS 14.7.1 and 15.0.1. Update to macOS 15.1 and try downloading again.", comment: "This error message will appear in an error banner when users cannot download files on macOS 14.7.1 or 15.0.1")
+    static let downloadsErrorSandboxCallToAction = NSLocalizedString("downloads.error.cta.sandbox", value: "How To Update", comment: "Call to action for the OS specific downloads issue")
+    static let downloadsErrorNonSandboxCallToAction = NSLocalizedString("downloads.error.cta.non-sandbox", value: "Open Settings", comment: "Call to action for the OS specific downloads issue")
 
     static let cancelDownloadToolTip = NSLocalizedString("downloads.tooltip.cancel", value: "Cancel Download", comment: "Mouse-over tooltip for Cancel Download button")
     static let restartDownloadToolTip = NSLocalizedString("downloads.tooltip.restart", value: "Restart Download", comment: "Mouse-over tooltip for Restart Download button")

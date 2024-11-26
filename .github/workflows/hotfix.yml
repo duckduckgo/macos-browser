@@ -28,6 +28,7 @@ jobs:
       - name: Check out the code
         uses: actions/checkout@v4
         with:
+          token: ${{ secrets.GHA_ELEVATED_PERMISSIONS_TOKEN }}
           submodules: recursive
           fetch-depth: 0 # Fetch all history and tags in order to extract Asana task URLs from git log
 
@@ -41,44 +42,17 @@ jobs:
           APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
           APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
           # Elevated permissions token is needed here to use GH git/refs API (used by fastlane)
-          GH_TOKEN: ${{ secrets.GHA_ELEVATED_PERMISSIONS_TOKEN }}
-        run: |
-          git config --global user.name "Dax the Duck"
-          git config --global user.email "dax@duckduckgo.com"
-          last_release="$(gh api repos/${{ github.repository }}/releases/latest | jq -r .tag_name)"
-          echo "last_release=$last_release" >> $GITHUB_OUTPUT
-          bundle exec fastlane prepare_hotfix version:"$last_release"
-
-      - name: Create release task
-        id: create_release_task
-        env:
+          GITHUB_TOKEN: ${{ secrets.GHA_ELEVATED_PERMISSIONS_TOKEN }}
           ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
         run: |
-          version="$(echo ${{ steps.make_release_branch.outputs.release_branch_name }} | cut -d '/' -f 2)"
-          task_name="macOS App Hotfix Release $version"
-          asana_task_id="$(curl -fLSs -X POST "https://app.asana.com/api/1.0/task_templates/${{ vars.MACOS_HOTFIX_TASK_TEMPLATE_ID }}/instantiateTask" \
-            -H "Authorization: Bearer ${{ env.ASANA_ACCESS_TOKEN }}" \
-            -H "Content-Type: application/json" \
-            -d "{ \"data\": { \"name\": \"$task_name\" }}" \
-            | jq -r .data.new_task.gid)"
-          echo "marketing_version=${version}" >> $GITHUB_OUTPUT
-          echo "asana_task_id=${asana_task_id}" >> $GITHUB_OUTPUT
-          echo "asana_task_url=https://app.asana.com/0/0/${asana_task_id}/f" >> $GITHUB_OUTPUT
+          bundle exec fastlane run start_new_release \
+            platform:"macos" \
+            github_handle:"${{ github.actor }}" \
+            is_hotfix:"true"
 
-          curl -fLSs -X POST "https://app.asana.com/api/1.0/sections/${{ vars.MACOS_APP_DEVELOPMENT_RELEASE_SECTION_ID }}/addTask" \
-            -H "Authorization: Bearer ${{ env.ASANA_ACCESS_TOKEN }}" \
-            -H "Content-Type: application/json" \
-            --output /dev/null \
-            -d "{\"data\": {\"task\": \"${asana_task_id}\"}}"
-
-          assignee_id="$(curl -fLSs https://raw.githubusercontent.com/duckduckgo/BrowserServicesKit/main/.github/actions/asana-failed-pr-checks/user_ids.json \
-            | jq -r .${{ github.actor }})"
-
-          curl -fLSs -X PUT "https://app.asana.com/api/1.0/tasks/${asana_task_id}" \
-            -H "Authorization: Bearer ${{ env.ASANA_ACCESS_TOKEN }}" \
-            -H "Content-Type: application/json" \
-            --output /dev/null \
-            -d "{ \"data\": { \"assignee\": \"$assignee_id\" }}"
+      # Necessary as make_release_branch will checkout a hotfix branch and the plugins may be differnet
+      - name: Reinstall fastlane
+        run: bundle install
 
       - name: Report success
         env:
@@ -88,5 +62,5 @@ jobs:
           WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           bundle exec fastlane run asana_add_comment \
-            task_url:"${{ steps.create_release_task.outputs.asana_task_url }}" \
+            task_url:"${{ steps.make_release_branch.outputs.asana_task_url }}" \
             template_name:"hotfix-branch-ready"

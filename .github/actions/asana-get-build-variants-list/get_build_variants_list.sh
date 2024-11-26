@@ -22,9 +22,7 @@ _create_origins_and_variants() {
 	jq -c '.data[]
 		| select(.custom_fields[] | select(.name == "'"${origin_field}"'").text_value != null)
 		| {origin: (.custom_fields[] | select(.name == "'"${origin_field}"'") | .text_value), variant: (.custom_fields[] | select(.name == "'"${atb_field}"'") | .text_value)}
-		| if .variant != null then {origin}, {origin, variant} else {origin} end' <<< "$response" \
-		| tr '\n' ',' \
-		| sed 's/,$//'
+		| if .variant != null then {origin}, {origin, variant} else {origin} end' <<< "$response"
 }
 
 # Fetch all the Asana tasks in the section specified by ORIGIN_ASANA_SECTION_ID for a project.
@@ -56,7 +54,7 @@ _fetch_origin_tasks() {
 		fi
 	done
 
-	echo "${origin_variants}"
+	printf "%s\n" "${origin_variants[@]}"
 }
 
 # Create a JSON string from the list of ATB items passed.
@@ -70,9 +68,7 @@ _create_atb_variant_pairs() {
 	# remove the trailing comma at the end of the line.
 	jq -R -c 'split(",") 
 		| map({variant: .}) 
-		| .[]' <<< "$response" \
-		| tr '\n' ',' \
-		| sed 's/,$//'
+		| .[]' <<< "$response"
 }
 
 # Fetches all the ATB variants defined in the ATB_ASANA_TASK_ID at the Variants list (comma separated) section.
@@ -92,19 +88,53 @@ _fetch_atb_variants() {
 
 	variants_list=("$(_create_atb_variant_pairs "$atb_variants")")
 
-	echo "${variants_list}"
+	printf "%s\n" "${variants_list[@]}"
+}
+
+split_array_into_chunks() {
+    local array=("$@")
+    local chunk_size=256
+    local total_elements=${#array[@]}
+    local chunks=()
+	local items
+
+    for ((i = 0; i < total_elements; i += chunk_size)); do
+		# Format the list of variants in a JSON object suitable for being consumed by GitHub Actions matrix.
+		# For more info see https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs#example-adding-configurations.
+		items="$(echo "${array[@]:i:chunk_size}" |  tr ' ' ',')"
+		chunks+=("{\"include\": [${items}]}")
+    done
+
+	printf "%s\n" "${chunks[@]}"
 }
 
 main() {
+	local variants=()
+	local items=()
+
 	# fetch ATB variants
-	local atb_variants=$(_fetch_atb_variants)
+	variants+=("$(_fetch_atb_variants)")
 	# fetch Origin variants
-	local origin_variants=$(_fetch_origin_tasks)
-	# merges the two list together. Use `include` keyword for later usage in matrix. 
-	# for more info see https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs#example-adding-configurations.
-	local merged_variants="{\"include\": [${atb_variants},${origin_variants}]}"
-	# write in GitHub output
-	echo "build-variants=${merged_variants}" >> "$GITHUB_OUTPUT"
+	variants+=("$(_fetch_origin_tasks "$origin_batch")")
+
+	while read -r variant; do
+		items+=("$variant")
+	done <<< "$(printf "%s\n" "${variants[@]}")"
+
+	echo "Found ${#items[@]} variants"
+
+	local chunks=()
+	while read -r chunk; do
+		chunks+=("$chunk")
+	done <<< "$(split_array_into_chunks "${items[@]}")"
+
+	local i=1
+    for chunk in "${chunks[@]}"; do
+		# Save to GitHub output
+		echo "Storing chunk #${i}"
+		echo "build-variants-${i}=${chunk}" >> "$GITHUB_OUTPUT"
+		i=$((i + 1))
+    done
 }
 
-main 
+main "$@"

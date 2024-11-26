@@ -104,7 +104,8 @@ extension HomePage.Views {
                         .contextMenu(menuItems: sectionsVisibilityContextMenuItems)
 
                         if settingsVisibilityModel.isSettingsVisible {
-                            SettingsView(includingContinueSetUpCards: model.isContinueSetUpAvailable, isSettingsVisible: $settingsVisibilityModel.isSettingsVisible)
+                            SettingsView(includingContinueSetUpCards: model.isContinueSetUpAvailable && !model.isContinueSetUpCardsViewOutdated && !model.continueSetUpCardsClosed,
+                                         isSettingsVisible: $settingsVisibilityModel.isSettingsVisible)
                                 .frame(width: Self.settingsPanelWidth)
                                 .transition(.move(edge: .trailing))
                                 .layoutPriority(1)
@@ -163,6 +164,9 @@ extension HomePage.Views {
                         ContinueSetUpView()
                             .visibility(model.isContinueSetUpVisible ? .visible : .gone)
                             .padding(.top, continueSetUpCardsTopPadding)
+                            .onAppear {
+                                model.continueSetUpCardsViewDidAppear()
+                            }
                     }
 
                     Favorites()
@@ -241,7 +245,7 @@ extension HomePage.Views {
                 Toggle(UserText.newTabMenuItemShowSearchBar, isOn: $model.isSearchBarVisible)
                     .toggleStyle(.checkbox)
             }
-            if model.isContinueSetUpAvailable {
+            if model.isContinueSetUpAvailable && !model.isContinueSetUpCardsViewOutdated && !model.continueSetUpCardsClosed {
                 Toggle(UserText.newTabMenuItemShowContinuteSetUp, isOn: $model.isContinueSetUpVisible)
                     .toggleStyle(.checkbox)
                     .visibility(continueSetUpModel.hasContent ? .visible : .gone)

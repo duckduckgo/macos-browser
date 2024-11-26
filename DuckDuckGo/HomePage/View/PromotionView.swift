@@ -28,7 +28,6 @@ extension HomePage.Views {
 
         var viewModel: PromotionViewModel
 
-        @State var isHovering = false
         @EnvironmentObject var settingsModel: HomePage.Models.SettingsModel
 
         var body: some View {
@@ -63,16 +62,12 @@ extension HomePage.Views {
                 }
             }
             .padding(.horizontal, 2)
-            .onHover { isHovering in
-                self.isHovering = isHovering
-            }
         }
 
         private var closeButton: some View {
             HomePage.Views.CloseButton(icon: .close, size: 16) {
                 viewModel.closeAction()
             }
-            .visibility(isHovering ? .visible : .invisible)
             .padding(6)
         }
 
@@ -124,4 +119,7 @@ extension HomePage.Views {
 
 #Preview {
     return HomePage.Views.PromotionView(viewModel: PromotionViewModel.freemiumDBPPromotion(proceedAction: {}, closeAction: {}))
+        .frame(height: 85)
+        .environmentObject(HomePage.Models.SettingsModel())
+
 }

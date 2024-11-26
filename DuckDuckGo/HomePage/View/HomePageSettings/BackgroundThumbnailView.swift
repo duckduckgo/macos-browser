@@ -110,7 +110,7 @@ extension HomePage.Views {
                     HStack {
                         Spacer()
                         VStack {
-                            CloseButton(icon: .close, size: 16) {
+                            CloseButton(icon: .close, size: 16, backgroundColor: .homeFavoritesBackground) {
                                 model.customImagesManager?.deleteImage(image)
                             }
                             .colorScheme(image.colorScheme)
