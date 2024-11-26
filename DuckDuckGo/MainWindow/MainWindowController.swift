@@ -26,6 +26,7 @@ final class MainWindowController: NSWindowController {
     private var fireViewModel: FireViewModel
     private static var knownFullScreenMouseDetectionWindows = Set<NSValue>()
     let fireWindowSession: FireWindowSession?
+    private let appearancePreferences: AppearancePreferencesUserDefaultsPersistor
 
     var mainViewController: MainViewController {
         // swiftlint:disable force_cast
@@ -51,6 +52,7 @@ final class MainWindowController: NSWindowController {
         assert(!mainViewController.isBurner || fireWindowSession != nil)
         self.fireWindowSession = fireWindowSession
         fireWindowSession?.addWindow(window)
+        appearancePreferences = AppearancePreferencesUserDefaultsPersistor()
 
         super.init(window: window)
 
@@ -227,6 +229,42 @@ extension MainWindowController: NSWindowDelegate {
     func windowWillEnterFullScreen(_ notification: Notification) {
         mainViewController.tabBarViewController.draggingSpace.isHidden = true
         mainViewController.windowWillEnterFullScreen()
+
+        if appearancePreferences.hideToolbarsOnFullScreen {
+            onEnterFullScreenWhenFullScreenModeIsEnabled()
+        }
+    }
+
+    func windowWillExitFullScreen(_ notification: Notification) {
+        mainViewController.tabBarViewController.draggingSpace.isHidden = false
+
+        if appearancePreferences.hideToolbarsOnFullScreen {
+            onExitFullScreenWhenFullScreenModeIsEnabled()
+        }
+    }
+
+    private func onEnterFullScreenWhenFullScreenModeIsEnabled() {
+        guard let toolbar = window?.toolbar else { return }
+        toolbar.isVisible = false
+
+        mainViewController.mainView.navigationBarTopConstraint.animator().constant = 0
+        mainViewController.mainView.tabBarHeightConstraint.animator().constant = 0
+        mainViewController.mainView.webContainerTopConstraintToNavigation.animator().priority = .defaultHigh
+        mainViewController.mainView.webContainerTopConstraint.animator().priority = .defaultLow
+        moveTabBarView(toTitlebarView: false)
+    }
+
+    private func onExitFullScreenWhenFullScreenModeIsEnabled() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak self] in
+            guard let toolbar = self?.window?.toolbar else { return }
+            toolbar.isVisible = true
+
+            self?.mainViewController.mainView.tabBarHeightConstraint.animator().constant = 38
+            self?.mainViewController.mainView.navigationBarTopConstraint.animator().constant = 38
+            self?.mainViewController.mainView.webContainerTopConstraintToNavigation.animator().priority = .defaultLow
+            self?.mainViewController.mainView.webContainerTopConstraint.animator().priority = .defaultHigh
+            self?.moveTabBarView(toTitlebarView: true)
+        }
     }
 
     func windowWillMiniaturize(_ notification: Notification) {
@@ -274,10 +312,6 @@ extension MainWindowController: NSWindowDelegate {
 
             break
         }
-    }
-
-    func windowWillExitFullScreen(_ notification: Notification) {
-        mainViewController.tabBarViewController.draggingSpace.isHidden = false
     }
 
     func windowWillClose(_ notification: Notification) {

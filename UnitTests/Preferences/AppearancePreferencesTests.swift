@@ -38,6 +38,7 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
     var homePageCustomBackground: String?
     var centerAlignedBookmarksBar: Bool
     var didDismissHomePagePromotion: Bool
+    var hideToolbarsOnFullScreen: Bool
 
     init(
         showFullURL: Bool = false,
@@ -55,7 +56,8 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
         homeButtonPosition: HomeButtonPosition = .right,
         homePageCustomBackground: String? = nil,
         centerAlignedBookmarksBar: Bool = true,
-        didDismissHomePagePromotion: Bool = true
+        didDismissHomePagePromotion: Bool = true,
+        hideToolbarsOnFullScreen: Bool = false
     ) {
         self.showFullURL = showFullURL
         self.currentThemeName = currentThemeName
@@ -73,6 +75,7 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
         self.homePageCustomBackground = homePageCustomBackground
         self.centerAlignedBookmarksBar = centerAlignedBookmarksBar
         self.didDismissHomePagePromotion = didDismissHomePagePromotion
+        self.hideToolbarsOnFullScreen = hideToolbarsOnFullScreen
     }
 }
 
@@ -103,6 +106,7 @@ final class AppearancePreferencesTests: XCTestCase {
         XCTAssertEqual(model.homeButtonPosition, .left)
         XCTAssertEqual(model.homePageCustomBackground, .gradient(.gradient01))
         XCTAssertTrue(model.centerAlignedBookmarksBarBool)
+        XCTAssertFalse(model.hideToolbarsOnFullScreen)
 
         model = AppearancePreferences(
             persistor: AppearancePreferencesPersistorMock(
@@ -115,7 +119,8 @@ final class AppearancePreferencesTests: XCTestCase {
                 isSearchBarVisible: false,
                 homeButtonPosition: .left,
                 homePageCustomBackground: CustomBackground.gradient(.gradient05).description,
-                centerAlignedBookmarksBar: false
+                centerAlignedBookmarksBar: false,
+                hideToolbarsOnFullScreen: true
             )
         )
         XCTAssertEqual(model.showFullURL, true)
@@ -128,6 +133,7 @@ final class AppearancePreferencesTests: XCTestCase {
         XCTAssertEqual(model.homeButtonPosition, .left)
         XCTAssertEqual(model.homePageCustomBackground, .gradient(.gradient05))
         XCTAssertFalse(model.centerAlignedBookmarksBarBool)
+        XCTAssertTrue(model.hideToolbarsOnFullScreen)
     }
 
     func testWhenInitializedWithGarbageThenThemeIsSetToSystemDefault() throws {
