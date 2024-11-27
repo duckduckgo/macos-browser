@@ -228,14 +228,17 @@ extension Array where Element == BrokerJobData {
         filter { $0.preferredRunDate == nil || $0.preferredRunDate! <= priorityDate }
     }
 
+    /// Sorts BrokerJobData array based on their preferred run dates.
+    /// - Jobs with non-nil preferred run dates are sorted in ascending order (earliest date first).
+    /// - Jobs with nil preferred run dates come last, maintaining their original relative order.
     func sortedByPreferredRunDate() -> [BrokerJobData] {
         sorted { lhs, rhs in
             switch (lhs.preferredRunDate, rhs.preferredRunDate) {
             case (nil, nil):
                 return false
-            case (nil, _):
-                return true
             case (_, nil):
+                return true
+            case (nil, _):
                 return false
             case (let lhsRunDate?, let rhsRunDate?):
                 return lhsRunDate < rhsRunDate
