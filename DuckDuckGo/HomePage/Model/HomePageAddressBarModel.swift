@@ -101,6 +101,7 @@ extension HomePage.Models {
         func setUpExperimentIfNeeded() {
             if isExperimentActive {
                 let ntpExperiment = NewTabPageSearchBoxExperiment()
+                ntpExperiment.assignUserToCohort()
                 shouldShowAddressBar = ntpExperiment.cohort?.isExperiment == true
             }
         }
