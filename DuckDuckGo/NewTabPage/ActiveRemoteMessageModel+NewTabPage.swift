@@ -22,7 +22,10 @@ import RemoteMessaging
 
 extension ActiveRemoteMessageModel: NewTabPageActiveRemoteMessageProviding {
     var remoteMessagePublisher: AnyPublisher<RemoteMessageModel?, Never> {
-        $remoteMessage.dropFirst().eraseToAnyPublisher()
+        $remoteMessage
+            .dropFirst()
+            .filter { $0?.isForTabBar == true }
+            .eraseToAnyPublisher()
     }
 
     func isMessageSupported(_ message: RemoteMessageModel) -> Bool {

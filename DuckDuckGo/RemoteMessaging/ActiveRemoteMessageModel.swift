@@ -185,3 +185,10 @@ extension RemoteMessageModelType {
         }
     }
 }
+
+extension RemoteMessageModel {
+
+    var isForTabBar: Bool {
+        return id == TabBarRemoteMessage.tabBarPermanentSurveyRemoteMessageId
+    }
+}

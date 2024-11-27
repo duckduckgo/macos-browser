@@ -23,6 +23,7 @@ import Lottie
 import SwiftUI
 import WebKit
 import os.log
+import RemoteMessaging
 
 final class TabBarViewController: NSViewController {
 
@@ -70,6 +71,9 @@ final class TabBarViewController: NSViewController {
     private let pinnedTabsViewModel: PinnedTabsViewModel?
     private let pinnedTabsView: PinnedTabsView?
     private let pinnedTabsHostingView: PinnedTabsHostingView?
+    private let tabBarRemoteMessageViewModel: TabBarRemoteMessageViewModel
+    private let feedbackPopoverViewController: PopoverMessageViewController
+    private var feedbackBarButtonHostingController: NSHostingController<TabBarRemoteMessageView>?
 
     private var selectionIndexCancellable: AnyCancellable?
     private var mouseDownCancellable: AnyCancellable?
@@ -86,9 +90,9 @@ final class TabBarViewController: NSViewController {
         }
     }
 
-    static func create(tabCollectionViewModel: TabCollectionViewModel) -> TabBarViewController {
+    static func create(tabCollectionViewModel: TabCollectionViewModel, activeRemoteMessageModel: ActiveRemoteMessageModel) -> TabBarViewController {
         NSStoryboard(name: "TabBar", bundle: nil).instantiateInitialController { coder in
-            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel)
+            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel, activeRemoteMessageModel: activeRemoteMessageModel)
         }!
     }
 
@@ -96,8 +100,9 @@ final class TabBarViewController: NSViewController {
         fatalError("TabBarViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, activeRemoteMessageModel: ActiveRemoteMessageModel) {
         self.tabCollectionViewModel = tabCollectionViewModel
+        self.tabBarRemoteMessageViewModel = TabBarRemoteMessageViewModel(activeRemoteMessageModel: activeRemoteMessageModel)
         if !tabCollectionViewModel.isBurner, let pinnedTabCollection = tabCollectionViewModel.pinnedTabsManager?.tabCollection {
             let pinnedTabsViewModel = PinnedTabsViewModel(collection: pinnedTabCollection)
             let pinnedTabsView = PinnedTabsView(model: pinnedTabsViewModel)
@@ -109,6 +114,15 @@ final class TabBarViewController: NSViewController {
             self.pinnedTabsView = nil
             self.pinnedTabsHostingView = nil
         }
+
+        feedbackPopoverViewController = PopoverMessageViewController(
+            title: "Tell Us What You Think",
+            message: "Take our short survey and help us build the best browser.",
+            image: .daxResponse,
+            shouldShowCloseButton: false,
+            presentMultiline: true,
+            autoDismissDuration: nil
+        )
 
         super.init(coder: coder)
     }
@@ -124,6 +138,7 @@ final class TabBarViewController: NSViewController {
         subscribeToTabModeChanges()
         setupAddTabButton()
         setupAsBurnerWindowIfNeeded()
+        addTabBarRemoteMessageListener()
     }
 
     override func viewWillAppear() {
@@ -198,6 +213,61 @@ final class TabBarViewController: NSViewController {
             fireButton.mouseDownTintColor = NSColor.white
             fireButton.mouseOverTintColor = NSColor.white
         }
+    }
+
+    private func addTabBarRemoteMessageListener() {
+        tabBarRemoteMessageViewModel.$remoteMessage.sink(receiveValue: { tabBarRemoteMessage in
+            if let tabBarRemoteMessage = tabBarRemoteMessage {
+                if self.feedbackBarButtonHostingController == nil {
+                    self.showTabBarRemoteMessage(tabBarRemoteMessage)
+                }
+            } else {
+                if self.feedbackBarButtonHostingController != nil {
+                    self.removeFeedbackButton()
+                }
+            }
+        })
+        .store(in: &cancellables)
+    }
+
+    private func showTabBarRemoteMessage(_ tabBarRemotMessage: TabBarRemoteMessage) {
+        let feedbackButtonView = TabBarRemoteMessageView(
+            model: tabBarRemotMessage,
+            onClose: {
+                self.tabBarRemoteMessageViewModel.onDismiss()
+                self.removeFeedbackButton()
+            },
+            onTap: { surveyURL in
+                WindowControllersManager.shared.showTab(with: .contentFromURL(surveyURL, source: .appOpenUrl))
+                self.tabBarRemoteMessageViewModel.onOpenSurvey()
+                self.removeFeedbackButton()
+            },
+            onHover: {
+                self.tabBarRemoteMessageViewModel.onUserHovered()
+            }
+        )
+        feedbackBarButtonHostingController = NSHostingController(rootView: feedbackButtonView)
+        guard let feedbackBarButtonHostingController else { return }
+
+        feedbackBarButtonHostingController.view.translatesAutoresizingMaskIntoConstraints = false
+
+        // Insert the hosting controller's view into the stack view just before the fire button
+        let index = max(0, rightSideStackView.arrangedSubviews.count - 1)
+        rightSideStackView.insertArrangedSubview(feedbackBarButtonHostingController.view, at: index)
+
+        NSLayoutConstraint.activate([
+            feedbackBarButtonHostingController.view.heightAnchor.constraint(equalToConstant: 24),
+            feedbackBarButtonHostingController.view.centerYAnchor.constraint(equalTo: rightSideStackView.centerYAnchor)
+        ])
+    }
+
+    private func removeFeedbackButton() {
+        guard let hostingController = feedbackBarButtonHostingController else { return }
+
+        rightSideStackView.removeArrangedSubview(hostingController.view)
+        hostingController.view.removeFromSuperview()
+        hostingController.removeFromParent()
+        feedbackBarButtonHostingController = nil
     }
 
     private func setupPinnedTabsView() {
