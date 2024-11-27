@@ -70,7 +70,7 @@ final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, Us
         let consentStatus = CookieConsentInfo(
             consentManaged: consentManaged, cosmetic: cosmetic, optoutFailed: optoutFailed, selftestFailed: selftestFailed
         )
-        Logger.autoconsent.info("Refreshing dashboard state: \(String(describing: consentStatus))")
+        Logger.autoconsent.debug("Refreshing dashboard state: \(String(describing: consentStatus))")
         self.delegate?.autoconsentUserScript(consentStatus: consentStatus)
     }
 
@@ -180,7 +180,7 @@ extension AutoconsentUserScript {
             handleOptOutResult(message: message, replyHandler: replyHandler)
         case MessageName.optInResult:
             // this is not supported in browser
-            Logger.autoconsent.info("ignoring optInResult: \(String(describing: message.body))")
+            Logger.autoconsent.debug("ignoring optInResult: \(String(describing: message.body))")
             replyHandler(nil, "opt-in is not supported")
         case MessageName.cmpDetected:
             // no need to do anything here
@@ -208,7 +208,7 @@ extension AutoconsentUserScript {
 
         guard url.navigationalScheme?.isHypertextScheme == true else {
             // ignore special schemes
-            Logger.autoconsent.info("Ignoring special URL scheme: \(messageData.url)")
+            Logger.autoconsent.debug("Ignoring special URL scheme: \(messageData.url)")
             replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
             return
         }
@@ -302,7 +302,7 @@ extension AutoconsentUserScript {
             replyHandler(nil, "cannot decode message")
             return
         }
-        Logger.autoconsent.info("Cookie popup found: \(String(describing: messageData))")
+        Logger.autoconsent.debug("Cookie popup found: \(String(describing: messageData))")
 
         // if popupFound is sent with "filterList", it indicates that cosmetic filterlist matched in the prehide stage,
         // but a real opt-out may still follow. See https://github.com/duckduckgo/autoconsent/blob/main/api.md#messaging-api
@@ -310,7 +310,7 @@ extension AutoconsentUserScript {
             refreshDashboardState(consentManaged: true, cosmetic: true, optoutFailed: false, selftestFailed: nil)
             // trigger animation, but do not cache it because it can still be overridden
             if !management.sitesNotifiedCache.contains(host) {
-                Logger.autoconsent.info("Starting animation for cosmetic filters")
+                Logger.autoconsent.debug("Starting animation for cosmetic filters")
                 // post popover notification
                 NotificationCenter.default.post(name: Self.newSitePopupHiddenNotification, object: self, userInfo: [
                     "topUrl": self.topUrl ?? url,
@@ -328,7 +328,7 @@ extension AutoconsentUserScript {
             replyHandler(nil, "cannot decode message")
             return
         }
-        Logger.autoconsent.info("opt-out result: \(String(describing: messageData))")
+        Logger.autoconsent.debug("opt-out result: \(String(describing: messageData))")
 
         if !messageData.result {
             refreshDashboardState(consentManaged: true, cosmetic: nil, optoutFailed: true, selftestFailed: nil)
@@ -348,7 +348,7 @@ extension AutoconsentUserScript {
             replyHandler(nil, "cannot decode message")
             return
         }
-        Logger.autoconsent.info("opt-out successful: \(String(describing: messageData))")
+        Logger.autoconsent.debug("opt-out successful: \(String(describing: messageData))")
 
         guard let url = URL(string: messageData.url),
               let host = url.host else {
@@ -362,7 +362,7 @@ extension AutoconsentUserScript {
         if !management.sitesNotifiedCache.contains(host) {
             management.sitesNotifiedCache.insert(host)
             if messageData.cmp != Constants.filterListCmpName { // filterlist animation should have been triggered already (see handlePopupFound)
-                Logger.autoconsent.info("Starting animation for the handled cookie popup")
+                Logger.autoconsent.debug("Starting animation for the handled cookie popup")
                 // post popover notification
                 NotificationCenter.default.post(name: Self.newSitePopupHiddenNotification, object: self, userInfo: [
                     "topUrl": self.topUrl ?? url,
@@ -375,7 +375,7 @@ extension AutoconsentUserScript {
 
         if let selfTestWebView = selfTestWebView,
            let selfTestFrameInfo = selfTestFrameInfo {
-            Logger.autoconsent.info("requesting self-test in: \(messageData.url)")
+            Logger.autoconsent.debug("requesting self-test in: \(messageData.url)")
             selfTestWebView.evaluateJavaScript(
                 "window.autoconsentMessageCallback({ type: 'selfTest' })",
                 in: selfTestFrameInfo,
@@ -385,7 +385,7 @@ extension AutoconsentUserScript {
                     case.failure(let error):
                         Logger.autoconsent.error("Error running self-test: \(error.localizedDescription, privacy: .public)")
                     case.success:
-                        Logger.autoconsent.info("self-test requested")
+                        Logger.autoconsent.debug("self-test requested")
                     }
                 }
             )
@@ -403,7 +403,7 @@ extension AutoconsentUserScript {
             return
         }
         // store self-test result
-        Logger.autoconsent.info("self-test result: \(String(describing: messageData))")
+        Logger.autoconsent.debug("self-test result: \(String(describing: messageData))")
         refreshDashboardState(consentManaged: true, cosmetic: nil, optoutFailed: false, selftestFailed: messageData.result)
         replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
     }
