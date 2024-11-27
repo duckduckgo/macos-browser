@@ -128,6 +128,13 @@ private struct FeedbackFormBodyView: View {
                         await viewModel.process(action: .faqClick)
                     }
                 }
+        } content: {
+            Text(UserText.pproFeedbackFormEmailLabel)
+                .multilineTextAlignment(.leading)
+                .lineLimit(nil)
+                .fixedSize(horizontal: false, vertical: true)
+            TextField(UserText.pproFeedbackFormEmailPlaceholder, text: $viewModel.userEmail)
+                .textFieldStyle(.roundedBorder)
         } footer: {
             Text(UserText.pproFeedbackFormText2)
             VStack(alignment: .leading) {
