@@ -33,7 +33,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "smodi/content_blocking_lookup_time_tracking",
-        "revision" : "9d09c7b0c7f2826c8397783727ef53d9d40ef439"
+        "revision" : "0f82487050cddbe2ec38594f504fdab5d2b99ba5"
       }
     },
     {
