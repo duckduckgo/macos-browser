@@ -21,6 +21,8 @@ import AppKit
 import SwiftUI
 import Combine
 import PixelKit
+import Subscription
+import Networking
 
 final class UnifiedFeedbackFormViewController: NSViewController {
     // Using a dynamic height in the form was causing layout problems and couldn't be completed in time for the release that needed this form.
@@ -28,10 +30,10 @@ final class UnifiedFeedbackFormViewController: NSViewController {
     // This should be cleaned up later, and eventually use the `sizingOptions` property of NSHostingController.
     enum Constants {
         static let landingPageHeight = 260.0
+        static let feedbackFormMiniHeight = 350.0
         static let feedbackFormCompactHeight = 430.0
-        static let feedbackFormHeight = 650.0
+        static let feedbackFormHeight = 740.0
         static let feedbackSentHeight = 350.0
-        static let feedbackErrorHeight = 560.0
     }
 
     private let defaultSize = CGSize(width: 480, height: Constants.landingPageHeight)
@@ -90,13 +92,17 @@ final class UnifiedFeedbackFormViewController: NSViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.updateViewHeight()
-        }
-        .store(in: &cancellables)
+            }
+            .store(in: &cancellables)
 
-        viewModel.$selectedReportType
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.updateViewHeight()
+        Publishers.MergeMany(
+            viewModel.$selectedReportType,
+            viewModel.$selectedCategory,
+            viewModel.$selectedSubcategory
+        )
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] _ in
+            self?.updateViewHeight()
         }
         .store(in: &cancellables)
     }
@@ -106,6 +112,10 @@ final class UnifiedFeedbackFormViewController: NSViewController {
         case .feedbackPending:
             if UnifiedFeedbackReportType(rawValue: viewModel.selectedReportType) == .prompt {
                 heightConstraint?.constant = Constants.landingPageHeight
+            } else if UnifiedFeedbackReportType(rawValue: viewModel.selectedReportType) == .reportIssue,
+                      UnifiedFeedbackCategory(rawValue: viewModel.selectedCategory) == .prompt ||
+                      viewModel.selectedSubcategory == PrivacyProFeedbackSubcategory.prompt.rawValue {
+                heightConstraint?.constant = Constants.feedbackFormMiniHeight
             } else {
                 heightConstraint?.constant = viewModel.usesCompactForm ? Constants.feedbackFormCompactHeight : Constants.feedbackFormHeight
             }
@@ -114,7 +124,7 @@ final class UnifiedFeedbackFormViewController: NSViewController {
         case .feedbackSent:
             heightConstraint?.constant = Constants.feedbackSentHeight
         case .feedbackSendingFailed:
-            heightConstraint?.constant = Constants.feedbackErrorHeight
+            heightConstraint?.constant = (viewModel.usesCompactForm ? Constants.feedbackFormCompactHeight : Constants.feedbackFormHeight) + 20.0
         }
     }
 

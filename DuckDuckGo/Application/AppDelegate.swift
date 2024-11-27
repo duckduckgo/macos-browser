@@ -295,7 +295,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         })
 
         subscriptionCookieManager = SubscriptionCookieManager(subscriptionManager: subscriptionManager, currentCookieStore: {
-            WKWebsiteDataStore.default().httpCookieStore
+            WKHTTPCookieStoreWrapper(store: WKWebsiteDataStore.default().httpCookieStore)
         }, eventMapping: SubscriptionCookieManageEventPixelMapping())
 
         // MARK: -
