@@ -84,38 +84,14 @@ final class NewTabPagePrivacyStatsClient: NewTabPageScriptClient {
         return nil
     }
 
-    private func calculatePrivacyStats() async -> NewTabPageUserScript.PrivacyStatsData {
-        let date = Date()
-        let stats = await model.privacyStats.fetchPrivacyStats()
-        let topCompanies = model.privacyStats.topCompanies
-
-        var totalCount: Int64 = 0
-        var otherCount: Int64 = 0
-
-        var companiesStats: [NewTabPageUserScript.TrackerCompany] = stats.compactMap { key, value in
-            totalCount += value
-            guard topCompanies.contains(key) else {
-                otherCount += value
-                return nil
-            }
-            return NewTabPageUserScript.TrackerCompany(count: value, displayName: key)
-        }
-
-        if otherCount > 0 {
-            companiesStats.append(.init(count: otherCount, displayName: "__other__"))
-        }
-        Logger.privacyStats.debug("Reloading privacy stats took \(Date().timeIntervalSince(date)) s")
-        return NewTabPageUserScript.PrivacyStatsData(totalCount: totalCount, trackerCompanies: companiesStats)
-    }
-
     @MainActor
     private func notifyDataUpdated() async {
-        pushMessage(named: MessageName.onDataUpdate.rawValue, params: await calculatePrivacyStats())
+        pushMessage(named: MessageName.onDataUpdate.rawValue, params: await model.calculatePrivacyStats())
     }
 
     @MainActor
     func getData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        return await calculatePrivacyStats()
+        return await model.calculatePrivacyStats()
     }
 }
 

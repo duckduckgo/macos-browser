@@ -122,11 +122,17 @@ extension NewTabPageActionsManager {
         privacyStats: PrivacyStatsCollecting,
         openURLHandler: @escaping (URL) -> Void
     ) {
+        let privacyStatsModel = NewTabPagePrivacyStatsModel(
+            privacyStats: privacyStats,
+            // swiftlint:disable:next force_cast
+            trackerDataProvider: (ContentBlocking.shared as! AppContentBlocking)
+        )
+
         self.init(scriptClients: [
             NewTabPageConfigurationClient(appearancePreferences: appearancePreferences),
             NewTabPageRMFClient(remoteMessageProvider: activeRemoteMessageModel, openURLHandler: openURLHandler),
             NewTabPageFavoritesClient(favoritesModel: NewTabPageFavoritesModel()),
-            NewTabPagePrivacyStatsClient(model: NewTabPagePrivacyStatsModel(privacyStats: privacyStats))
+            NewTabPagePrivacyStatsClient(model: privacyStatsModel)
         ])
     }
 }

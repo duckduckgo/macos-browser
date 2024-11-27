@@ -1,5 +1,5 @@
 //
-//  PrivacyStats.swift
+//  PrivacyStatsTrackerDataProviding.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -17,11 +17,14 @@
 //
 
 import Combine
-import Foundation
-import PrivacyStats
 import TrackerRadarKit
 
-extension AppContentBlocking: TrackerDataProviding {
+public protocol PrivacyStatsTrackerDataProviding {
+    var trackerData: TrackerData { get }
+    var trackerDataUpdatesPublisher: AnyPublisher<Void, Never> { get }
+}
+
+extension AppContentBlocking: PrivacyStatsTrackerDataProviding {
     var trackerData: TrackerData {
         trackerDataManager.trackerData
     }

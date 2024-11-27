@@ -321,11 +321,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         freemiumDBPPromotionViewCoordinator = FreemiumDBPPromotionViewCoordinator(freemiumDBPUserStateManager: freemiumDBPUserStateManager,
                                                                                   freemiumDBPFeature: freemiumDBPFeature)
 
-        privacyStats = PrivacyStats(
-            databaseProvider: PrivacyStatsDatabase(),
-            // swiftlint:disable:next force_cast
-            trackerDataProvider: (ContentBlocking.shared as! AppContentBlocking)
-        )
+        privacyStats = PrivacyStats(databaseProvider: PrivacyStatsDatabase())
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {

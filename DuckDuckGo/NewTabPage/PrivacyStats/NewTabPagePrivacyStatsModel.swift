@@ -17,6 +17,7 @@
 //
 
 import Combine
+import os.log
 import Persistence
 import PrivacyStats
 
@@ -63,24 +64,79 @@ final class NewTabPagePrivacyStatsModel {
     }
 
     private let settingsPersistor: NewTabPagePrivacyStatsSettingsPersistor
+    private var topCompanies: Set<String> = []
+    private let trackerDataProvider: PrivacyStatsTrackerDataProviding
 
     private let statsUpdateSubject = PassthroughSubject<Void, Never>()
-    private var statsUpdateCancellable: AnyCancellable?
+    private var cancellables: Set<AnyCancellable> = []
 
     init(
         privacyStats: PrivacyStatsCollecting,
+        trackerDataProvider: PrivacyStatsTrackerDataProviding,
         settingsPersistor: NewTabPagePrivacyStatsSettingsPersistor = UserDefaultsNewTabPagePrivacyStatsSettingsPersistor()
     ) {
         self.privacyStats = privacyStats
+        self.trackerDataProvider = trackerDataProvider
         self.settingsPersistor = settingsPersistor
 
         isViewExpanded = settingsPersistor.isViewExpanded
         statsUpdatePublisher = statsUpdateSubject.eraseToAnyPublisher()
 
-        statsUpdateCancellable = privacyStats.statsUpdatePublisher
+        privacyStats.statsUpdatePublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.statsUpdateSubject.send()
             }
+            .store(in: &cancellables)
+
+        trackerDataProvider.trackerDataUpdatesPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in
+                self?.refreshTopCompanies()
+            }
+            .store(in: &cancellables)
+
+        refreshTopCompanies()
+    }
+
+    func calculatePrivacyStats() async -> NewTabPageUserScript.PrivacyStatsData {
+        let date = Date()
+        let stats = await privacyStats.fetchPrivacyStats()
+
+        var totalCount: Int64 = 0
+        var otherCount: Int64 = 0
+
+        var companiesStats: [NewTabPageUserScript.TrackerCompany] = stats.compactMap { key, value in
+            totalCount += value
+            guard topCompanies.contains(key) else {
+                otherCount += value
+                return nil
+            }
+            return NewTabPageUserScript.TrackerCompany(count: value, displayName: key)
+        }
+
+        if otherCount > 0 {
+            companiesStats.append(.init(count: otherCount, displayName: "__other__"))
+        }
+        Logger.privacyStats.debug("Reloading privacy stats took \(Date().timeIntervalSince(date)) s")
+        return NewTabPageUserScript.PrivacyStatsData(totalCount: totalCount, trackerCompanies: companiesStats)
+    }
+
+    private func refreshTopCompanies() {
+        struct TrackerWithPrevalence {
+            let name: String
+            let prevalence: Double
+        }
+
+        let trackers: [TrackerWithPrevalence] = trackerDataProvider.trackerData.entities.values.compactMap { entity in
+            guard let displayName = entity.displayName, let prevalence = entity.prevalence else {
+                return nil
+            }
+            return TrackerWithPrevalence(name: displayName, prevalence: prevalence)
+        }
+
+        let topTrackersArray = trackers.sorted(by: { $0.prevalence > $1.prevalence }).prefix(100).map(\.name)
+        Logger.privacyStats.debug("top tracker companies: \(topTrackersArray)")
+        topCompanies = Set(topTrackersArray)
     }
 }

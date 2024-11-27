@@ -355,6 +355,8 @@
 		31FBF2322CDD130900626C17 /* AIChatUserScriptTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31FBF2302CDD12FE00626C17 /* AIChatUserScriptTests.swift */; };
 		3701C9CE29BD040C00305B15 /* FirefoxBerkeleyDatabaseReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3701C9CD29BD040900305B15 /* FirefoxBerkeleyDatabaseReader.swift */; };
 		3701C9CF29BD040C00305B15 /* FirefoxBerkeleyDatabaseReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3701C9CD29BD040900305B15 /* FirefoxBerkeleyDatabaseReader.swift */; };
+		370245FD2CF7C65400CD79A3 /* PrivacyStatsTrackerDataProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370245FC2CF7C64B00CD79A3 /* PrivacyStatsTrackerDataProviding.swift */; };
+		370245FE2CF7C65400CD79A3 /* PrivacyStatsTrackerDataProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370245FC2CF7C64B00CD79A3 /* PrivacyStatsTrackerDataProviding.swift */; };
 		370270BC2C78AC6F002E44E4 /* NewTabBackgroundPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370270BB2C78AC6F002E44E4 /* NewTabBackgroundPixel.swift */; };
 		370270BD2C78B6D3002E44E4 /* NewTabBackgroundPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370270BB2C78AC6F002E44E4 /* NewTabBackgroundPixel.swift */; };
 		370270C02C78EB13002E44E4 /* HomePageSettingsModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370270BF2C78EB13002E44E4 /* HomePageSettingsModelTests.swift */; };
@@ -1242,8 +1244,6 @@
 		37BF3F22286F0A7A00BD9014 /* PinnedTabsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BF3F1F286F0A7A00BD9014 /* PinnedTabsView.swift */; };
 		37C9F78C2CF1C776004D73A1 /* PrivacyStatsTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C9F78B2CF1C770004D73A1 /* PrivacyStatsTabExtension.swift */; };
 		37C9F78D2CF1C776004D73A1 /* PrivacyStatsTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C9F78B2CF1C770004D73A1 /* PrivacyStatsTabExtension.swift */; };
-		37C9F7902CF1C86C004D73A1 /* PrivacyStatsExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C9F78F2CF1C862004D73A1 /* PrivacyStatsExtension.swift */; };
-		37C9F7912CF1C86C004D73A1 /* PrivacyStatsExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C9F78F2CF1C862004D73A1 /* PrivacyStatsExtension.swift */; };
 		37CBCA9A2A8966E60050218F /* SyncSettingsAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CBCA992A8966E60050218F /* SyncSettingsAdapter.swift */; };
 		37CBCA9B2A8966E60050218F /* SyncSettingsAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CBCA992A8966E60050218F /* SyncSettingsAdapter.swift */; };
 		37CC53EC27E8A4D10028713D /* PreferencesDataClearingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CC53EB27E8A4D10028713D /* PreferencesDataClearingView.swift */; };
@@ -3606,6 +3606,7 @@
 		31FBF2302CDD12FE00626C17 /* AIChatUserScriptTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIChatUserScriptTests.swift; sourceTree = "<group>"; };
 		336B39E22726B4B700C417D3 /* LocalUnprotectedDomains.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalUnprotectedDomains.swift; sourceTree = "<group>"; };
 		3701C9CD29BD040900305B15 /* FirefoxBerkeleyDatabaseReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxBerkeleyDatabaseReader.swift; sourceTree = "<group>"; };
+		370245FC2CF7C64B00CD79A3 /* PrivacyStatsTrackerDataProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyStatsTrackerDataProviding.swift; sourceTree = "<group>"; };
 		370270BB2C78AC6F002E44E4 /* NewTabBackgroundPixel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabBackgroundPixel.swift; sourceTree = "<group>"; };
 		370270BF2C78EB13002E44E4 /* HomePageSettingsModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePageSettingsModelTests.swift; sourceTree = "<group>"; };
 		37054FC82873301700033B6F /* PinnedTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedTabView.swift; sourceTree = "<group>"; };
@@ -3730,7 +3731,6 @@
 		37BF3F1E286F0A7A00BD9014 /* PinnedTabsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinnedTabsViewModel.swift; sourceTree = "<group>"; };
 		37BF3F1F286F0A7A00BD9014 /* PinnedTabsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinnedTabsView.swift; sourceTree = "<group>"; };
 		37C9F78B2CF1C770004D73A1 /* PrivacyStatsTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyStatsTabExtension.swift; sourceTree = "<group>"; };
-		37C9F78F2CF1C862004D73A1 /* PrivacyStatsExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyStatsExtension.swift; sourceTree = "<group>"; };
 		37CBCA992A8966E60050218F /* SyncSettingsAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncSettingsAdapter.swift; sourceTree = "<group>"; };
 		37CC53EB27E8A4D10028713D /* PreferencesDataClearingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesDataClearingView.swift; sourceTree = "<group>"; };
 		37CC53F327E8D4620028713D /* NSPathControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSPathControlView.swift; sourceTree = "<group>"; };
@@ -5988,8 +5988,8 @@
 		37C9F78E2CF1C855004D73A1 /* PrivacyStats */ = {
 			isa = PBXGroup;
 			children = (
+				370245FC2CF7C64B00CD79A3 /* PrivacyStatsTrackerDataProviding.swift */,
 				37DF37082CF38CD3005ED34B /* PrivacyStatsDatabase.swift */,
-				37C9F78F2CF1C862004D73A1 /* PrivacyStatsExtension.swift */,
 			);
 			path = PrivacyStats;
 			sourceTree = "<group>";
@@ -11511,7 +11511,6 @@
 				BD7090D32C52ECFE009EED82 /* UnifiedMetadataCollector.swift in Sources */,
 				4B9DB0362A983B24000927DB /* WaitlistTermsAndConditionsView.swift in Sources */,
 				37197EA82942443D00394917 /* BrowserTabViewController.swift in Sources */,
-				37C9F7902CF1C86C004D73A1 /* PrivacyStatsExtension.swift in Sources */,
 				3706FB39293F65D500E42796 /* PrivacyDashboardPopover.swift in Sources */,
 				372ED7C32CDD481B002287EC /* NewTabPageUserContentController.swift in Sources */,
 				3706FB3B293F65D500E42796 /* RootView.swift in Sources */,
@@ -12125,6 +12124,7 @@
 				B6BCC53C2AFD15DF002C5499 /* DataImportProfilePicker.swift in Sources */,
 				3706FC8A293F65D500E42796 /* AutoconsentUserScript.swift in Sources */,
 				3706FC8B293F65D500E42796 /* BookmarksExporter.swift in Sources */,
+				370245FE2CF7C65400CD79A3 /* PrivacyStatsTrackerDataProviding.swift in Sources */,
 				3706FC8C293F65D500E42796 /* FirefoxDataImporter.swift in Sources */,
 				3706FC8D293F65D500E42796 /* PreferencesGeneralView.swift in Sources */,
 				37197EA92942443D00394917 /* WebView.swift in Sources */,
@@ -13138,7 +13138,6 @@
 				CBECDB872CDACE29005B8B87 /* BrokenSitePromptLimiter.swift in Sources */,
 				4B1E6EF227AB5E5D00F51793 /* PasswordManagementItemList.swift in Sources */,
 				AAC5E4D025D6A709007F5990 /* Bookmark.swift in Sources */,
-				37C9F7912CF1C86C004D73A1 /* PrivacyStatsExtension.swift in Sources */,
 				4B0EF7262B578095009D6481 /* AppVersionExtension.swift in Sources */,
 				4BBDEE9328FC14760092FAA6 /* ConnectBitwardenViewModel.swift in Sources */,
 				4B5A4F4C27F3A5AA008FBD88 /* NSNotificationName+DataImport.swift in Sources */,
@@ -13486,6 +13485,7 @@
 				F44C130225C2DA0400426E3E /* NSAppearanceExtension.swift in Sources */,
 				CBECDB802CD9829A005B8B87 /* PageRefreshStore.swift in Sources */,
 				4B3B8490297A0E1000A384BD /* EmailManagerExtension.swift in Sources */,
+				370245FD2CF7C65400CD79A3 /* PrivacyStatsTrackerDataProviding.swift in Sources */,
 				B64C84F1269310120048FEBE /* PermissionManager.swift in Sources */,
 				37CD54D027F2FDD100F1F7B9 /* DefaultBrowserPreferences.swift in Sources */,
 				B64C853026943BC10048FEBE /* Permissions.xcdatamodeld in Sources */,
