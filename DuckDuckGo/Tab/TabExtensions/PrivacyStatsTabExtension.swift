@@ -40,7 +40,7 @@ final class PrivacyStatsTabExtension: NSObject {
     }
 
     private func recordDetectedTracker(_ tracker: DetectedTracker) {
-        guard let entityName = tracker.request.entityName else {
+        guard tracker.request.isBlocked, let entityName = tracker.request.entityName else {
             return
         }
         switch tracker.type {

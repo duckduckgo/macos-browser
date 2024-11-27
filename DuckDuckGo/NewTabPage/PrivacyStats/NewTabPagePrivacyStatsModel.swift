@@ -77,8 +77,8 @@ final class NewTabPagePrivacyStatsModel {
         isViewExpanded = settingsPersistor.isViewExpanded
         statsUpdatePublisher = statsUpdateSubject.eraseToAnyPublisher()
 
-        statsUpdateCancellable = privacyStats.currentStatsUpdatePublisher
-            .debounce(for: 1, scheduler: DispatchQueue.main)
+        statsUpdateCancellable = privacyStats.statsUpdatePublisher
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.statsUpdateSubject.send()
             }

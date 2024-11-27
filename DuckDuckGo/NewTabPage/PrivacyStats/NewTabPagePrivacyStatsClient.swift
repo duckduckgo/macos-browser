@@ -18,6 +18,7 @@
 
 import Combine
 import Common
+import os.log
 import UserScript
 
 final class NewTabPagePrivacyStatsClient: NewTabPageScriptClient {
@@ -84,11 +85,12 @@ final class NewTabPagePrivacyStatsClient: NewTabPageScriptClient {
     }
 
     private func calculatePrivacyStats() async -> NewTabPageUserScript.PrivacyStatsData {
+        let date = Date()
         let stats = await model.privacyStats.fetchPrivacyStats()
         let topCompanies = model.privacyStats.topCompanies
 
-        var totalCount: Int = 0
-        var otherCount: Int = 0
+        var totalCount: Int64 = 0
+        var otherCount: Int64 = 0
 
         var companiesStats: [NewTabPageUserScript.TrackerCompany] = stats.compactMap { key, value in
             totalCount += value
@@ -102,6 +104,7 @@ final class NewTabPagePrivacyStatsClient: NewTabPageScriptClient {
         if otherCount > 0 {
             companiesStats.append(.init(count: otherCount, displayName: "__other__"))
         }
+        Logger.privacyStats.debug("Reloading privacy stats took \(Date().timeIntervalSince(date)) s")
         return NewTabPageUserScript.PrivacyStatsData(totalCount: totalCount, trackerCompanies: companiesStats)
     }
 
@@ -119,12 +122,12 @@ final class NewTabPagePrivacyStatsClient: NewTabPageScriptClient {
 extension NewTabPageUserScript {
 
     struct PrivacyStatsData: Encodable {
-        let totalCount: Int
+        let totalCount: Int64
         let trackerCompanies: [TrackerCompany]
     }
 
     struct TrackerCompany: Encodable {
-        let count: Int
+        let count: Int64
         let displayName: String
     }
 }
