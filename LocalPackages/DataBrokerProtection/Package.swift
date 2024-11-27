@@ -59,6 +59,8 @@ let package = Package(
                 "DataBrokerProtection",
                 "BrowserServicesKit",
                 "Freemium",
+                .product(name: "TestUtils", package: "BrowserServicesKit"),
+                .product(name: "SubscriptionTestingUtilities", package: "BrowserServicesKit"),
             ],
             resources: [
                 .copy("Resources")

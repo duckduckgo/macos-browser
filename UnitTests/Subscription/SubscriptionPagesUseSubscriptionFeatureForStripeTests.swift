@@ -85,29 +85,16 @@ final class SubscriptionPagesUseSubscriptionFeatureForStripeTests: XCTestCase {
     var uiHandler: SubscriptionUIHandlerMock!
     var pixelKit: PixelKit!
 
-    var accountStorage: AccountKeychainStorageMock!
-    var accessTokenStorage: SubscriptionTokenKeychainStorageMock!
-//    var entitlementsCache: UserDefaultsCache<[Entitlement]>!
-
-    var subscriptionService: SubscriptionEndpointServiceMock!
-//    var authService: AuthEndpointServiceMock!
+    var subscriptionManager: SubscriptionManagerMock!
 
     var storePurchaseManager: StorePurchaseManagerMock!
     var subscriptionEnvironment: SubscriptionEnvironment!
-
     var appStorePurchaseFlow: AppStorePurchaseFlow!
     var appStoreRestoreFlow: AppStoreRestoreFlow!
-//    var appStoreAccountManagementFlow: AppStoreAccountManagementFlow!
     var stripePurchaseFlow: StripePurchaseFlow!
-
     var subscriptionFeatureAvailability: SubscriptionFeatureAvailabilityMock!
-
-//    var accountManager: AccountManager!
-    var subscriptionManager: SubscriptionManager!
     var mockFreemiumDBPExperimentManager: MockFreemiumDBPExperimentManager!
-
     var feature: SubscriptionPagesUseSubscriptionFeature!
-
     var pixelsFired: [String] = []
     var uiEventsHappened: [SubscriptionUIHandlerMock.UIHandlerMockPerformedAction] = []
 
@@ -129,57 +116,22 @@ final class SubscriptionPagesUseSubscriptionFeatureForStripeTests: XCTestCase {
             self.uiEventsHappened.append(action)
         }
 
-        subscriptionService = SubscriptionEndpointServiceMock()
-        authService = AuthEndpointServiceMock()
-
         storePurchaseManager = StorePurchaseManagerMock()
         subscriptionEnvironment = SubscriptionEnvironment(serviceEnvironment: .production,
                                                           purchasePlatform: .stripe)
-        accountStorage = AccountKeychainStorageMock()
-        accessTokenStorage = SubscriptionTokenKeychainStorageMock()
 
-        entitlementsCache = UserDefaultsCache<[Entitlement]>(userDefaults: userDefaults,
-                                                             key: UserDefaultsCacheKey.subscriptionEntitlements,
-                                                             settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(20)))
+        subscriptionManager = SubscriptionManagerMock()
 
-        // Real AccountManager
-        accountManager = DefaultAccountManager(storage: accountStorage,
-                                               accessTokenStorage: accessTokenStorage,
-                                               entitlementsCache: entitlementsCache,
-                                               subscriptionEndpointService: subscriptionService,
-                                               authEndpointService: authService)
+        appStoreRestoreFlow = DefaultAppStoreRestoreFlow(subscriptionManager: subscriptionManager,
+                                                         storePurchaseManager: storePurchaseManager)
 
-        // Real Flows
-        appStoreRestoreFlow = DefaultAppStoreRestoreFlow(accountManager: accountManager,
-                                                         storePurchaseManager: storePurchaseManager,
-                                                         subscriptionEndpointService: subscriptionService,
-                                                         authEndpointService: authService)
-
-        appStorePurchaseFlow = DefaultAppStorePurchaseFlow(subscriptionEndpointService: subscriptionService,
+        appStorePurchaseFlow = DefaultAppStorePurchaseFlow(subscriptionManager: subscriptionManager,
                                                            storePurchaseManager: storePurchaseManager,
-                                                           accountManager: accountManager,
-                                                           appStoreRestoreFlow: appStoreRestoreFlow,
-                                                           authEndpointService: authService)
-
-        appStoreAccountManagementFlow = DefaultAppStoreAccountManagementFlow(authEndpointService: authService,
-                                                                             storePurchaseManager: storePurchaseManager,
-                                                                             accountManager: accountManager)
-
-        stripePurchaseFlow = DefaultStripePurchaseFlow(subscriptionEndpointService: subscriptionService,
-                                                       authEndpointService: authService,
-                                                       accountManager: accountManager)
-
+                                                           appStoreRestoreFlow: appStoreRestoreFlow)
+        stripePurchaseFlow = DefaultStripePurchaseFlow(subscriptionManager: subscriptionManager)
         subscriptionFeatureAvailability = SubscriptionFeatureAvailabilityMock(isFeatureAvailable: true,
                                                                               isSubscriptionPurchaseAllowed: true,
                                                                               usesUnifiedFeedbackForm: false)
-
-        // Real SubscriptionManager
-        subscriptionManager = DefaultSubscriptionManager(storePurchaseManager: storePurchaseManager,
-                                                         accountManager: accountManager,
-                                                         subscriptionEndpointService: subscriptionService,
-                                                         authEndpointService: authService,
-                                                         subscriptionEnvironment: subscriptionEnvironment)
-
         mockFreemiumDBPExperimentManager = MockFreemiumDBPExperimentManager()
 
         feature = SubscriptionPagesUseSubscriptionFeature(subscriptionManager: subscriptionManager,
@@ -194,30 +146,13 @@ final class SubscriptionPagesUseSubscriptionFeatureForStripeTests: XCTestCase {
         userDefaults = nil
         pixelsFired.removeAll()
         uiEventsHappened.removeAll()
-
-        subscriptionService = nil
-        authService = nil
         storePurchaseManager = nil
         subscriptionEnvironment = nil
-
-        accountStorage = nil
-        accessTokenStorage = nil
-
-        entitlementsCache.reset()
-        entitlementsCache = nil
-
-        accountManager = nil
-
-        // Real Flows
         appStorePurchaseFlow = nil
         appStoreRestoreFlow = nil
-        appStoreAccountManagementFlow = nil
         stripePurchaseFlow = nil
-
         subscriptionFeatureAvailability = nil
-
         subscriptionManager = nil
-
         feature = nil
     }
 
@@ -226,7 +161,7 @@ final class SubscriptionPagesUseSubscriptionFeatureForStripeTests: XCTestCase {
     func testGetSubscriptionOptionsSuccess() async throws {
         // Given
         XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .stripe)
-        subscriptionService.getProductsResult = .success(Constants.productItems)
+        subscriptionManager.productsResponse = .success(Constants.productItems)
 
         // When
         let result = try await feature.getSubscriptionOptions(params: Constants.mockParams, original: Constants.mockScriptMessage)
@@ -241,7 +176,7 @@ final class SubscriptionPagesUseSubscriptionFeatureForStripeTests: XCTestCase {
     func testGetSubscriptionOptionsReturnsEmptyOptionsWhenNoSubscriptionOptions() async throws {
         // Given
         XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .stripe)
-        subscriptionService.getProductsResult = .success([])
+        subscriptionManager.productsResponse = .success([])
         storePurchaseManager.subscriptionOptionsResult = nil
 
         // When
@@ -256,7 +191,7 @@ final class SubscriptionPagesUseSubscriptionFeatureForStripeTests: XCTestCase {
     func testGetSubscriptionOptionsReturnsEmptyOptionsWhenSubscriptionOptionsDidNotFetch() async throws {
         // Given
         XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .stripe)
-        subscriptionService.getProductsResult = .failure(Constants.invalidTokenError)
+        subscriptionManager.productsResponse = .failure(Constants.invalidTokenError)
         storePurchaseManager.subscriptionOptionsResult = nil
 
         // When

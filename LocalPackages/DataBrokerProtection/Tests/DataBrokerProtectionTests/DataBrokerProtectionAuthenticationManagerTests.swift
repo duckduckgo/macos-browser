@@ -18,15 +18,19 @@
 
 import XCTest
 @testable import DataBrokerProtection
+import Subscription
+import SubscriptionTestingUtilities
+import Networking
+import TestUtils
 
 class DataBrokerProtectionAuthenticationManagerTests: XCTestCase {
     var authenticationManager: DataBrokerProtectionAuthenticationManager!
     var redeemUseCase: DataBrokerProtectionRedeemUseCase!
-    var subscriptionManager: MockDataBrokerProtectionSubscriptionManaging!
+    var subscriptionManager: SubscriptionManagerMock! //MockDataBrokerProtectionSubscriptionManaging!
 
     override func setUp() async throws {
         redeemUseCase = MockRedeemUseCase()
-        subscriptionManager = MockDataBrokerProtectionSubscriptionManaging()
+        subscriptionManager = SubscriptionManagerMock()
     }
 
     override func tearDown() async throws {
@@ -36,7 +40,7 @@ class DataBrokerProtectionAuthenticationManagerTests: XCTestCase {
     }
 
     func testUserNotAuthenticatedWhenSubscriptionManagerReturnsFalse() {
-        subscriptionManager.userAuthenticatedValue = false
+        subscriptionManager.isUserAuthenticated = false
 
         authenticationManager = DataBrokerProtectionAuthenticationManager(redeemUseCase: redeemUseCase,
                                                                           subscriptionManager: subscriptionManager)
@@ -45,7 +49,7 @@ class DataBrokerProtectionAuthenticationManagerTests: XCTestCase {
     }
 
     func testEmptyAccessTokenResultsInNilAuthHeader() {
-        subscriptionManager.accessTokenValue = nil
+        subscriptionManager.resultTokenContainer = OAuthTokensFactory.makeValidTokenContainer()
 
         authenticationManager = DataBrokerProtectionAuthenticationManager(redeemUseCase: redeemUseCase,
                                                                           subscriptionManager: subscriptionManager)
@@ -54,7 +58,7 @@ class DataBrokerProtectionAuthenticationManagerTests: XCTestCase {
     }
 
     func testUserAuthenticatedWhenSubscriptionManagerReturnsTrue() {
-        subscriptionManager.userAuthenticatedValue = true
+        subscriptionManager.isUserAuthenticated = true
 
         authenticationManager = DataBrokerProtectionAuthenticationManager(redeemUseCase: redeemUseCase,
                                                                           subscriptionManager: subscriptionManager)
@@ -63,8 +67,7 @@ class DataBrokerProtectionAuthenticationManagerTests: XCTestCase {
     }
 
     func testNonEmptyAccessTokenResultsInValidAuthHeader() {
-        let accessToken = "validAccessToken"
-        subscriptionManager.accessTokenValue = accessToken
+        subscriptionManager.resultTokenContainer = OAuthTokensFactory.makeValidTokenContainer()
 
         authenticationManager = DataBrokerProtectionAuthenticationManager(redeemUseCase: redeemUseCase,
                                                                           subscriptionManager: subscriptionManager)
@@ -73,69 +76,19 @@ class DataBrokerProtectionAuthenticationManagerTests: XCTestCase {
     }
 
     func testValidEntitlementCheckWithSuccess() async {
-        subscriptionManager.entitlementResultValue = true
-
+        subscriptionManager.resultTokenContainer = OAuthTokensFactory.makeValidTokenContainerWithEntitlements()
         authenticationManager = DataBrokerProtectionAuthenticationManager(redeemUseCase: redeemUseCase,
                                                                           subscriptionManager: subscriptionManager)
-        do {
-            let result = try await authenticationManager.hasValidEntitlement()
-            XCTAssertTrue(result, "Entitlement check should return true for valid entitlement")
-        } catch {
-            XCTFail("Entitlement check should not fail: \(error)")
-        }
+        let result = authenticationManager.hasValidEntitlement()
+        XCTAssertTrue(result, "Entitlement check should return true for valid entitlement")
     }
 
     func testValidEntitlementCheckWithSuccessFalse() async {
-        subscriptionManager.entitlementResultValue = false
-
+        subscriptionManager.resultTokenContainer = OAuthTokensFactory.makeValidTokenContainer()
         authenticationManager = DataBrokerProtectionAuthenticationManager(redeemUseCase: redeemUseCase,
                                                                           subscriptionManager: subscriptionManager)
 
-        do {
-            let result = try await authenticationManager.hasValidEntitlement()
-            XCTAssertFalse(result, "Entitlement check should return false for valid entitlement")
-        } catch {
-            XCTFail("Entitlement check should not fail: \(error)")
-        }
-    }
-
-    func testValidEntitlementCheckWithFailure() async {
-        let mockError = NSError(domain: "TestErrorDomain", code: 123, userInfo: nil)
-        subscriptionManager.entitlementError = mockError
-
-        authenticationManager = DataBrokerProtectionAuthenticationManager(redeemUseCase: redeemUseCase,
-                                                                          subscriptionManager: subscriptionManager)
-
-        do {
-            _ = try await authenticationManager.hasValidEntitlement()
-            XCTFail("Entitlement check should fail")
-        } catch let error as NSError {
-            XCTAssertEqual(mockError.domain, error.domain)
-            XCTAssertEqual(mockError.code, error.code)
-        }
-    }
-}
-
-final class MockDataBrokerProtectionSubscriptionManaging: DataBrokerProtectionSubscriptionManaging {
-    typealias EntitlementResult = Result<Bool, Error>
-
-    var userAuthenticatedValue = false
-    var accessTokenValue: String?
-    var entitlementResultValue = false
-    var entitlementError: Error?
-
-    var isUserAuthenticated: Bool {
-        userAuthenticatedValue
-    }
-
-    var accessToken: String? {
-        accessTokenValue
-    }
-
-    func hasValidEntitlement() async throws -> Bool {
-        if let error = entitlementError {
-            throw error
-        }
-        return entitlementResultValue
+        let result = authenticationManager.hasValidEntitlement()
+        XCTAssertFalse(result, "Entitlement check should return false for valid entitlement")
     }
 }

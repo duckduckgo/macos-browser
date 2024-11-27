@@ -167,11 +167,10 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func backToSettings(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        try await subscriptionManager.getTokenContainer(policy: .localForceRefresh)
+        _ = try? await subscriptionManager.getTokenContainer(policy: .localForceRefresh)
         DispatchQueue.main.async { [weak self] in
             self?.notificationCenter.post(name: .subscriptionPageCloseAndOpenPreferences, object: self)
         }
-
         return nil
     }
 
@@ -230,7 +229,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                     return nil
                 }
 
-                let emailAccessToken = try? EmailManager().getToken()
                 let purchaseTransactionJWS: String
                 let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(subscriptionManager: subscriptionManager,
                                                                      storePurchaseManager: subscriptionManager.storePurchaseManager())
