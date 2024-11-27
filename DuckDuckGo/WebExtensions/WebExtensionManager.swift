@@ -229,7 +229,13 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
 extension WebExtensionManager: @preconcurrency _WKWebExtensionControllerDelegate {
 
     func webExtensionController(_ controller: _WKWebExtensionController, openWindowsFor extensionContext: _WKWebExtensionContext) -> [any _WKWebExtensionWindow] {
-        return []
+        var windows = WindowControllersManager.shared.mainWindowControllers
+        if let focusedWindow = WindowControllersManager.shared.lastKeyMainWindowController {
+            // Ensure focusedWindow is the first item
+            windows.removeAll { $0 === focusedWindow }
+            windows.insert(focusedWindow, at: 0)
+        }
+        return windows
     }
 
     func webExtensionController(_ controller: _WKWebExtensionController, focusedWindowFor extensionContext: _WKWebExtensionContext) -> (any _WKWebExtensionWindow)? {
