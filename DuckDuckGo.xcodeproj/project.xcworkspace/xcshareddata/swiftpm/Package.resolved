@@ -33,7 +33,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "dominik/privacy-stats",
-        "revision" : "0006a084034f7c54b31f6cc7b5cc6813bedf613b"
+        "revision" : "98a751107a557220077fd2fe8ba9d624edcc1e58"
       }
     },
     {
@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "dfef00ef77f5181d1d8a4f7cc88f7b7c0514dd34",
-        "version" : "6.39.0"
+        "revision" : "e51efbca45d2178c43dd3b0fe4d18d19b34c54e3",
+        "version" : "6.40.0"
       }
     },
     {
