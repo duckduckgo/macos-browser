@@ -253,7 +253,7 @@ private extension DuckURLSchemeHandler {
             return
         }
         let threatKind: MaliciousSiteProtection.ThreatKind = switch reason {
-        // case .malware: .malware
+        case .malware: .malware
         case .phishing: .phishing
         case .ssl: {
             assertionFailure("SSL error page is handled with NSURLError: NSURLErrorServerCertificateUntrusted error")

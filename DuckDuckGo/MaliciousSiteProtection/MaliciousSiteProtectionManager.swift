@@ -30,8 +30,8 @@ extension MaliciousSiteProtectionManager {
         switch (dataType, dataType.threatKind) {
         case (.hashPrefixSet, .phishing): "phishingHashPrefixes.json"
         case (.filterSet, .phishing): "phishingFilterSet.json"
-//            case (.hashPrefixes, .malware): "malwareHashPrefixes.json"
-//            case (.filters, .malware): "malwareFilterSet.json"
+        case (.hashPrefixSet, .malware): "malwareHashPrefixes.json"
+        case (.filterSet, .malware): "malwareFilterSet.json"
         }
     }
 
@@ -48,8 +48,8 @@ extension MaliciousSiteProtectionManager {
             static let embeddedDataRevision = 1692083
             static let phishingEmbeddedHashPrefixDataSHA = "b423fa3cf21d82a8f537ae3c817c7aa5338603401c77a6ed7094f0b20af30055"
             static let phishingEmbeddedFilterSetDataSHA = "6633f7a2e521071485128c6bf3b84ce2a2dc7bd09750fed7b0300913ed8bfa96"
-//            static let malwareEmbeddedHashPrefixDataSHA = "b423fa3cf21d82a8f537ae3c817c7aa5338603401c77a6ed7094f0b20af30055"
-//            static let malwareEmbeddedFilterSetDataSHA = "6633f7a2e521071485128c6bf3b84ce2a2dc7bd09750fed7b0300913ed8bfa96"
+            static let malwareEmbeddedHashPrefixDataSHA = "b423fa3cf21d82a8f537ae3c817c7aa5338603401c77a6ed7094f0b20af30055"
+            static let malwareEmbeddedFilterSetDataSHA = "6633f7a2e521071485128c6bf3b84ce2a2dc7bd09750fed7b0300913ed8bfa96"
         }
 
         func revision(for dataType: MaliciousSiteProtection.DataManager.StoredDataType) -> Int {
@@ -68,8 +68,8 @@ extension MaliciousSiteProtectionManager {
             switch (dataType, dataType.threatKind) {
             case (.hashPrefixSet, .phishing): Constants.phishingEmbeddedHashPrefixDataSHA
             case (.filterSet, .phishing): Constants.phishingEmbeddedFilterSetDataSHA
-//            case (.hashPrefixes, .malware): Constants.malwareEmbeddedHashPrefixDataSHA
-//            case (.filters, .malware): Constants.malwareEmbeddedFilterSetDataSHA
+            case (.hashPrefixSet, .malware): Constants.malwareEmbeddedHashPrefixDataSHA
+            case (.filterSet, .malware): Constants.malwareEmbeddedFilterSetDataSHA
             }
         }
 
@@ -92,7 +92,7 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
 
     init(
         fileStoreUrl: URL? = nil,
-        apiClient: MaliciousSiteProtection.APIClientProtocol = .production,
+        apiClient: MaliciousSiteProtection.APIClientProtocol = MaliciousSiteProtection.APIClient(environment: .dev),
         embeddedDataProvider: MaliciousSiteProtection.EmbeddedDataProviding? = nil,
         dataManager: MaliciousSiteProtection.DataManaging? = nil,
         detector: MaliciousSiteProtection.MaliciousSiteDetecting? = nil,
