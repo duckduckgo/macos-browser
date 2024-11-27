@@ -69,6 +69,7 @@ protocol NewWindowPolicyDecisionMaker {
     private let onboardingPixelReporter: OnboardingAddressBarReporting
     private let internalUserDecider: InternalUserDecider?
     private let pageRefreshMonitor: PageRefreshMonitoring
+    private let featureFlagger: FeatureFlagger
     let pinnedTabsManager: PinnedTabsManager
 
     private let webViewConfiguration: WKWebViewConfiguration
@@ -103,6 +104,7 @@ protocol NewWindowPolicyDecisionMaker {
                      cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? = ContentBlockingAssetsCompilationTimeReporter.shared,
                      statisticsLoader: StatisticsLoader? = nil,
                      extensionsBuilder: TabExtensionsBuilderProtocol = TabExtensionsBuilder.default,
+                     featureFlagger: FeatureFlagger? = nil,
                      title: String? = nil,
                      favicon: NSImage? = nil,
                      interactionStateData: Data? = nil,
@@ -147,6 +149,7 @@ protocol NewWindowPolicyDecisionMaker {
                   permissionManager: permissionManager,
                   geolocationService: geolocationService,
                   extensionsBuilder: extensionsBuilder,
+                  featureFlagger: featureFlagger ?? NSApp.delegateTyped.featureFlagger,
                   cbaTimeReporter: cbaTimeReporter,
                   statisticsLoader: statisticsLoader,
                   internalUserDecider: internalUserDecider,
@@ -183,6 +186,7 @@ protocol NewWindowPolicyDecisionMaker {
          permissionManager: PermissionManagerProtocol,
          geolocationService: GeolocationServiceProtocol,
          extensionsBuilder: TabExtensionsBuilderProtocol,
+         featureFlagger: FeatureFlagger,
          cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?,
          statisticsLoader: StatisticsLoader?,
          internalUserDecider: InternalUserDecider?,
@@ -208,6 +212,7 @@ protocol NewWindowPolicyDecisionMaker {
         self.content = content
         self.faviconManagement = faviconManagement
         self.pinnedTabsManager = pinnedTabsManager
+        self.featureFlagger = featureFlagger
         self.statisticsLoader = statisticsLoader
         self.internalUserDecider = internalUserDecider
         self.title = title
@@ -1253,12 +1258,13 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
         // don‘t show an error page if the error was already handled
         // (by SearchNonexistentDomainNavigationResponder) or another navigation was triggered by `setContent`
-        guard self.content.urlForWebView == url || self.content == .none /* when navigation fails instantly we may have no content set yet */
-                || (error as NSError as? MaliciousSiteError) != nil else { return }
+        guard self.content.urlForWebView == url
+                || self.content == .none /* when navigation fails instantly we may have no content set yet */
+                // navigation failure with MaliciousSiteError is achieved by redirecting to a special token-protected
+                // duck://error?.. URL performed in SpecialErrorPageTabExtension.swift
+                || error as NSError is MaliciousSiteError else { return }
 
         self.error = error
-
-        guard !error.isServerCertificateUntrusted else { return }
 
         // when already displaying the error page and reload navigation fails again: don‘t navigate, just update page HTML
         let shouldPerformAlternateNavigation = navigation.url != webView.url || navigation.navigationAction.targetFrame?.url != .error
@@ -1293,7 +1299,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
     @MainActor
     private func loadErrorHTML(_ error: WKError, header: String, forUnreachableURL url: URL, alternate: Bool) {
-        let html = ErrorPageHTMLFactory.html(for: error, header: header)
+        let html = ErrorPageHTMLFactory.html(for: error, featureFlagger: featureFlagger, header: header)
         if alternate {
             webView.loadAlternateHTML(html, baseURL: .error, forUnreachableURL: url)
         } else {

@@ -57,7 +57,11 @@ extension MaliciousSiteProtectionManager {
         }
 
         func url(for dataType: MaliciousSiteProtection.DataManager.StoredDataType) -> URL {
-            return Bundle.main.url(forResource: fileName(for: dataType), withExtension: nil)!
+            let fileName = fileName(for: dataType)
+            guard let url = Bundle.main.url(forResource: fileName, withExtension: nil) else {
+                fatalError("Could not find embedded data file \"\(fileName)\"")
+            }
+            return url
         }
 
         func hash(for dataType: MaliciousSiteProtection.DataManager.StoredDataType) -> String {
@@ -84,7 +88,7 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
 
     private var featureFlagsCancellable: AnyCancellable?
     private var detectionPreferencesEnabledCancellable: AnyCancellable?
-    private var updateTask: Task<Void, Error>?
+    private(set) var updateTask: Task<Void, Error>?
 
     init(
         fileStoreUrl: URL? = nil,

@@ -19,7 +19,7 @@
 import Foundation
 import BrowserServicesKit
 
-final class AppTrackerDataSetProvider: EmbeddedDataProvider {
+struct AppTrackerDataSetProvider: EmbeddedDataProvider {
 
     public struct Constants {
         public static let embeddedDataETag = "\"d2b2d827e636087583eb5aec0deed5f8\""

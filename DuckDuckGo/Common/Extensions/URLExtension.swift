@@ -17,11 +17,12 @@
 //
 
 import AppKit
+import AppKitExtensions
 import BrowserServicesKit
 import Common
 import Foundation
-import AppKitExtensions
 import os.log
+import SpecialErrorPages
 
 extension URL.NavigationalScheme {
 
@@ -94,7 +95,7 @@ extension URL {
             return nil
         }
 
-        var url = Self.duckDuckGo.appendingParameter(name: DuckDuckGoParameters.search.rawValue, value: trimmedQuery)
+        var url = Self.duckDuckGo.appendingParameter(name: DuckDuckGoParameters.search, value: trimmedQuery)
 
         // Add experimental atb parameter to SERP queries for internal users to display Privacy Reminder
         // https://app.asana.com/0/1199230911884351/1205979030848528/f
@@ -158,6 +159,36 @@ extension URL {
 
     var isSettingsURL: Bool {
         isChild(of: .settings) && (pathComponents.isEmpty || PreferencePaneIdentifier(url: self) != nil)
+    }
+
+    var specialErrorPageParameters: (failingUrl: URL, reason: SpecialErrorKind, token: String)? {
+        guard isErrorURL,
+              let reason = getParameter(named: Parameter.reason).flatMap(SpecialErrorKind.init(rawValue:)),
+              let failingUrl = getParameter(named: Parameter.failingUrl).flatMap(URL.init(base64UrlString:)),
+              let token = getParameter(named: Parameter.token) else { return nil }
+
+        return (failingUrl: failingUrl, reason: reason, token: token)
+    }
+
+    static func specialErrorPage(failingUrl: URL, kind: SpecialErrorKind) -> URL {
+        let encodedUrl = URLTokenValidator.base64URLEncode(failingUrl)
+        let token = URLTokenValidator.shared.generateToken(for: failingUrl)
+        return .error.appendingParameters([
+            Parameter.failingUrl: encodedUrl,
+            Parameter.reason: kind.rawValue,
+            Parameter.token: token
+        ])
+    }
+
+    init?(base64UrlString: String) {
+        guard let decodedData = URLTokenValidator.base64URLDecode(base64UrlString),
+              let decodedString = String(data: decodedData, encoding: .utf8),
+              let url = URL(string: decodedString) else { return nil }
+        self = url
+    }
+
+    var isErrorURL: Bool {
+        return navigationalScheme == .duck && host == URL.error.host
     }
 #endif
 
@@ -422,7 +453,7 @@ extension URL {
     }
 
     var isDuckDuckGoSearch: Bool {
-        if isDuckDuckGo, path.isEmpty || path == "/", getParameter(named: DuckDuckGoParameters.search.rawValue) != nil {
+        if isDuckDuckGo, path.isEmpty || path == "/", getParameter(named: DuckDuckGoParameters.search) != nil {
             return true
         }
 
@@ -433,10 +464,10 @@ extension URL {
         self.isChild(of: .duckDuckGoEmailLogin) || self == .duckDuckGoEmail
     }
 
-    enum DuckDuckGoParameters: String {
-        case search = "q"
-        case ia
-        case iax
+    enum DuckDuckGoParameters {
+        static let search = "q"
+        static let ia = "ia"
+        static let iax = "iax"
 
         enum ATB {
             static let atb = "atb"
@@ -447,12 +478,17 @@ extension URL {
             static let appUsageValue = "app_use"
         }
     }
+    enum Parameter {
+        static let reason = "reason"
+        static let failingUrl = "url"
+        static let token = "token"
+    }
 
     // MARK: - Search
 
     var searchQuery: String? {
         guard isDuckDuckGoSearch else { return nil }
-        return getParameter(named: DuckDuckGoParameters.search.rawValue)
+        return getParameter(named: DuckDuckGoParameters.search)
     }
 
     // MARK: - Punycode

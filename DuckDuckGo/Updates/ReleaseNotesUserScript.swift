@@ -73,7 +73,7 @@ final class ReleaseNotesUserScript: NSObject, Subfeature {
             return
         }
 
-        guard webView.url?.isReleaseNotesScheme ?? false else {
+        guard webView.url == .releaseNotes else {
             return
         }
 

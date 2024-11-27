@@ -72,21 +72,6 @@ class MockMaliciousSiteFileStore: MaliciousSiteProtection.FileStoring {
     }
 }
 
-final class MockPhishingDataActivitites: PhishingDetectionDataActivityHandling {
-    var started: Bool = false
-    var stopped: Bool = true
-
-    func start() {
-        started = true
-        stopped = false
-    }
-
-    func stop() {
-        stopped = true
-        started = false
-    }
-}
-
 final class MockMaliciousSiteDetector: MaliciousSiteProtection.MaliciousSiteDetecting {
 
     var isMalicious: (URL) -> MaliciousSiteProtection.ThreatKind? = { url in

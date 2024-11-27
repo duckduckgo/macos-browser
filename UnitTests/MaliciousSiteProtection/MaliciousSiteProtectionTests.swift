@@ -25,32 +25,29 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class MaliciousSiteProtectionTests: XCTestCase {
-    var phishingDetection: MaliciousSiteDetecting!
-    var mockDataActivities: MockPhishingDataActivitites!
+    var phishingDetection: MaliciousSiteProtectionManager!
     var mockDetector: MockMaliciousSiteDetector!
     var mockDataProvider: MockMaliciousSiteDataProvider!
 
     override func setUp() {
-        mockDataActivities = MockPhishingDataActivitites()
         let mockFileStore = MockMaliciousSiteFileStore()
         mockDataProvider = MockMaliciousSiteDataProvider()
 
         let dataManager = MaliciousSiteProtection.DataManager(fileStore: mockFileStore, embeddedDataProvider: mockDataProvider, fileNameProvider: { _ in "file.json" })
-        phishingDetection = MaliciousSiteProtectionManager(dataManager: dataManager, detector: MockMaliciousSiteDetector(), dataActivities: mockDataActivities, featureFlagger: MockFeatureFlagger())
+        phishingDetection = MaliciousSiteProtectionManager(dataManager: dataManager, detector: MockMaliciousSiteDetector(), featureFlagger: MockFeatureFlagger())
         super.setUp()
     }
 
     override func tearDown() {
         phishingDetection = nil
         mockDataProvider = nil
-        mockDataActivities = nil
         mockDetector = nil
         super.tearDown()
     }
 
     func testDidLoadAndStartDataActivities() async {
         MaliciousSiteProtectionPreferences.shared.isEnabled = true
-        XCTAssertTrue(mockDataActivities.started)
+        XCTAssertNotNil(phishingDetection.updateTask)
     }
 
     func testDisableFeature() async {
@@ -63,8 +60,7 @@ final class MaliciousSiteProtectionTests: XCTestCase {
         MaliciousSiteProtectionPreferences.shared.isEnabled = false
         XCTAssertFalse(mockDataProvider.didLoadHashPrefixes)
         XCTAssertFalse(mockDataProvider.didLoadFilterSet)
-        XCTAssertFalse(mockDataActivities.started)
-        XCTAssertTrue(mockDataActivities.stopped)
+        XCTAssertNil(phishingDetection.updateTask)
     }
 
     func testIsMalicious() async {

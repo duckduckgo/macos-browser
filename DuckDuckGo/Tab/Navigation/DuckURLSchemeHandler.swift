@@ -190,14 +190,15 @@ private extension DuckURLSchemeHandler {
         var fileName = "index"
         var fileExtension = "html"
         var directoryURL: URL
-        if url.isOnboarding {
+        switch url.type {
+        case .onboarding:
             directoryURL = URL(fileURLWithPath: "/pages/onboarding")
-        } else if url.isReleaseNotesScheme {
+        case .releaseNotes:
             directoryURL = URL(fileURLWithPath: "/pages/release-notes")
-        } else if url.isNewTabPage {
+        case .newTab:
             directoryURL = URL(fileURLWithPath: "/pages/new-tab")
-        } else {
-            assertionFailure("Unknown scheme")
+        default:
+            assertionFailure("Unsupported URL")
             return nil
         }
         directoryURL.appendPathComponent(url.path)
@@ -246,20 +247,21 @@ private extension DuckURLSchemeHandler {
             return
         }
 
-        guard requestURL.isErrorPage,
-              let threat = requestURL.getParameter(named: "reason").flatMap(MaliciousSiteProtection.ThreatKind.init),
-              let base64urlString = requestURL.getParameter(named: "url"),
-              let decodedData = URLTokenValidator.base64URLDecode(base64URLString: base64urlString),
-              let decodedString = String(data: decodedData, encoding: .utf8),
-              let url = URL(string: decodedString),
-              let token = requestURL.getParameter(named: "token"),
-              URLTokenValidator.shared.validateToken(token, for: url) else {
-
+        guard let (failingUrl: failingUrl, reason: reason, token: token) = requestURL.specialErrorPageParameters,
+              URLTokenValidator.shared.validateToken(token, for: failingUrl) else {
             urlSchemeTask.didFailWithError(URLError(.badURL, userInfo: [NSURLErrorFailingURLErrorKey: requestURL]))
             return
         }
+        let threatKind: MaliciousSiteProtection.ThreatKind = switch reason {
+        // case .malware: .malware
+        case .phishing: .phishing
+        case .ssl: {
+            assertionFailure("SSL error page is handled with NSURLError: NSURLErrorServerCertificateUntrusted error")
+            return .phishing
+        }()
+        }
 
-        let error = MaliciousSiteError(threat: threat, failingUrl: url)
+        let error = MaliciousSiteError(threat: threatKind, failingUrl: failingUrl)
         urlSchemeTask.didFailWithError(error)
     }
 }
@@ -275,45 +277,29 @@ extension URL {
     }
 
     var type: URLType? {
+        guard case .duck = navigationalScheme else { return nil }
         if self.isDuckPlayer {
             return .duckPlayer
-        } else if self.isOnboarding {
-            return .onboarding
-        } else if self.isErrorPage {
+        } else if self.isErrorURL {
             return .error
-        } else if self.isReleaseNotesScheme {
-            return .releaseNotes
-        } else if self.isNewTabPage {
-            return .newTab
         } else if self.isFavicon {
             return .favicon
-        } else {
+        }
+
+        switch self {
+        case .onboarding:
+            return .onboarding
+        case .releaseNotes:
+            return .releaseNotes
+        case .newtab:
+            return .newTab
+        default:
             return nil
         }
     }
 
-    var isOnboarding: Bool {
-        return isDuckURLScheme && host == "onboarding"
-    }
-
-    var isNewTabPage: Bool {
-        return isDuckURLScheme && host == "newtab"
-    }
-
     var isFavicon: Bool {
         return isDuckURLScheme && host == "favicon"
-    }
-
-    var isDuckURLScheme: Bool {
-        navigationalScheme == .duck
-    }
-
-    var isReleaseNotesScheme: Bool {
-        return isDuckURLScheme && host == "release-notes"
-    }
-
-    var isErrorPage: Bool {
-        isDuckURLScheme && self.host == "error"
     }
 
 }

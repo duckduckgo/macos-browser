@@ -22,18 +22,18 @@ import Navigation
 
 final class OnboardingTabExtensionTests: XCTestCase {
 
-    var onboardingTabExtension: OnboardingTabExtension!
+    var onboardingNavigationResponder: OnboardingNavigationResponder!
     var navigationPreferences: NavigationPreferences!
 
     override func setUp() {
         super.setUp()
-        onboardingTabExtension = OnboardingTabExtension()
+        onboardingNavigationResponder = OnboardingNavigationResponder()
         navigationPreferences = NavigationPreferences(userAgent: nil, contentMode: .desktop, javaScriptEnabled: true)
     }
 
     override func tearDown() {
         navigationPreferences = nil
-        onboardingTabExtension = nil
+        onboardingNavigationResponder = nil
         super.tearDown()
     }
 
@@ -43,10 +43,10 @@ final class OnboardingTabExtensionTests: XCTestCase {
         let navigationAction = NavigationAction(request: URLRequest(url: URL(string: "duck://onboarding://")!), navigationType: .custom(.ui), currentHistoryItemIdentity: nil, redirectHistory: nil, isUserInitiated: false, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: nil, shouldDownload: false, mainFrameNavigation: nil)
 
         // When
-        let navigationPolicy = await onboardingTabExtension.decidePolicy(for: navigationAction, preferences: &navigationPreferences)
+        let navigationPolicy = await onboardingNavigationResponder.decidePolicy(for: navigationAction, preferences: &navigationPreferences)
 
         // Then
-        XCTAssertEqual(navigationPolicy, .allow)
+        XCTAssert({ if case .allow = navigationPolicy { true } else { false } }(), String(describing: navigationPolicy))
     }
 
     @MainActor
@@ -55,10 +55,10 @@ final class OnboardingTabExtensionTests: XCTestCase {
         let navigationAction = NavigationAction(request: URLRequest(url: URL(string: "someUrl://")!), navigationType: .custom(.ui), currentHistoryItemIdentity: nil, redirectHistory: nil, isUserInitiated: false, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: nil, shouldDownload: false, mainFrameNavigation: nil)
 
         // When
-        let navigationPolicy = await onboardingTabExtension.decidePolicy(for: navigationAction, preferences: &navigationPreferences)
+        let navigationPolicy = await onboardingNavigationResponder.decidePolicy(for: navigationAction, preferences: &navigationPreferences)
 
         // Then
-        XCTAssertEqual(navigationPolicy, .next)
+        XCTAssertNil(navigationPolicy /* == .next */)
     }
 }
 

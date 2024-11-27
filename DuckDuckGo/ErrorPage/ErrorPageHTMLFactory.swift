@@ -16,26 +16,33 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
+import ContentScopeScripts
 import Foundation
 import MaliciousSiteProtection
+import Navigation
 import SpecialErrorPages
 
-protocol ErrorPageHTMLTemplating {
-    static var htmlTemplatePath: String { get }
-    func makeHTMLFromTemplate() -> String
-}
-
 enum ErrorPageHTMLFactory {
-    static func html(for error: Error, errorCode: Int? = nil, header: String? = nil) -> String {
+
+    static func html(for error: WKError, featureFlagger: FeatureFlagger, header: String? = nil) -> String {
         switch error as NSError {
-        case let error as MaliciousSiteError:
-            switch error.code {
-            case .phishing, .malware:
-                return SpecialErrorPageHTMLTemplate.htmlFromTemplate
-            }
+        case is MaliciousSiteError where featureFlagger.isFeatureOn(.maliciousSiteProtectionErrorPage):
+            return specialErrorPageTemplateHtml
+
+        case is URLError where error.isServerCertificateUntrusted && featureFlagger.isFeatureOn(.sslCertificatesBypass):
+            return specialErrorPageTemplateHtml
+
         default:
             return ErrorPageHTMLTemplate(error: WKError(_nsError: error as NSError),
                                          header: header ?? UserText.errorPageHeader).makeHTMLFromTemplate()
         }
     }
+
+    public static let specialErrorPageTemplateHtml: String = {
+        guard let file = ContentScopeScripts.Bundle.path(forResource: "index", ofType: "html", inDirectory: "pages/special-error") else { fatalError("HTML template not found") }
+        guard let html = try? String(contentsOfFile: file) else { fatalError("Should be able to load template") }
+        return html
+    }()
+
 }
