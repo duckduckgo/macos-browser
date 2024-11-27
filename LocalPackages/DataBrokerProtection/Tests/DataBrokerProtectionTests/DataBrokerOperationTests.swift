@@ -23,7 +23,7 @@ final class DataBrokerOperationTests: XCTestCase {
     lazy var mockOptOutQueryData: [BrokerProfileQueryData] = {
         let brokerId: Int64 = 1
 
-        let mockChildBrokerQueryData = Array(1...10).map {
+        let mockNilPreferredRunDateQueryData = Array(1...10).map {
             BrokerProfileQueryData.mock(preferredRunDate: nil, optOutJobData: [BrokerProfileQueryData.createOptOutJobData(extractedProfileId: Int64($0), brokerId: brokerId, profileQueryId: Int64($0), preferredRunDate: nil)])
         }
         let mockPastQueryData = Array(1...10).map {
@@ -33,7 +33,7 @@ final class DataBrokerOperationTests: XCTestCase {
             BrokerProfileQueryData.mock(preferredRunDate: .nowPlus(hours: $0), optOutJobData: [BrokerProfileQueryData.createOptOutJobData(extractedProfileId: Int64($0), brokerId: brokerId, profileQueryId: Int64($0), preferredRunDate: .nowPlus(hours: $0))])
         }
 
-        return mockChildBrokerQueryData + mockPastQueryData + mockFutureQueryData
+        return mockNilPreferredRunDateQueryData + mockPastQueryData + mockFutureQueryData
     }()
 
     lazy var mockScanQueryData: [BrokerProfileQueryData] = {
@@ -57,8 +57,8 @@ final class DataBrokerOperationTests: XCTestCase {
         let operationData4 = MockDataBrokerOperation.filterAndSortOperationsData(brokerProfileQueriesData: mockOptOutQueryData, operationType: .optOut, priorityDate: .distantFuture)
 
         XCTAssertEqual(operationData1.count, 30) // all jobs
-        XCTAssertEqual(operationData2.count, 20) // child broker + past jobs
-        XCTAssertEqual(operationData3.count, 10) // child broker jobs
+        XCTAssertEqual(operationData2.count, 20) // nil preferred run date + past jobs
+        XCTAssertEqual(operationData3.count, 10) // nil preferred run date jobs
         XCTAssertEqual(operationData4.count, 30) // all jobs
     }
 
@@ -85,11 +85,11 @@ final class DataBrokerOperationTests: XCTestCase {
         XCTAssertEqual(operationData1.count, 30+30)
 
         XCTAssertEqual(operationData2.filter { $0 is ScanJobData }.count, 10) // past jobs
-        XCTAssertEqual(operationData2.filter { $0 is OptOutJobData }.count, 20) // child broker + past jobs
+        XCTAssertEqual(operationData2.filter { $0 is OptOutJobData }.count, 20) // nil preferred run date + past jobs
         XCTAssertEqual(operationData2.count, 10+20)
 
         XCTAssertEqual(operationData3.filter { $0 is ScanJobData }.count, 0) // no jobs
-        XCTAssertEqual(operationData3.filter { $0 is OptOutJobData }.count, 10) // child broker jobs
+        XCTAssertEqual(operationData3.filter { $0 is OptOutJobData }.count, 10) // nil preferred run date jobs
         XCTAssertEqual(operationData3.count, 0+10)
 
         XCTAssertEqual(operationData4.filter { $0 is ScanJobData }.count, 20) // past + future jobs
