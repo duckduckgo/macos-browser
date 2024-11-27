@@ -21,7 +21,7 @@
 extension Tab: @preconcurrency _WKWebExtensionTab {
 
     private var tabCollectionViewModel: TabCollectionViewModel? {
-        let mainWindowController = webView.window?.windowController as? MainWindowController
+        let mainWindowController = WindowControllersManager.shared.windowController(for: self)
         let mainViewController = mainWindowController?.mainViewController
         return mainViewController?.tabCollectionViewModel
     }
@@ -32,9 +32,6 @@ extension Tab: @preconcurrency _WKWebExtensionTab {
 
     @MainActor
     func indexInWindow(for context: _WKWebExtensionContext) -> UInt {
-        let mainWindowController = webView.window?.windowController as? MainWindowController
-        let mainViewController = mainWindowController?.mainViewController
-        let tabCollectionViewModel = mainViewController?.tabCollectionViewModel
         let tabCollection = tabCollectionViewModel?.tabCollection
         return UInt(tabCollection?.tabs.firstIndex(of: self) ?? 0)
     }

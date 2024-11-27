@@ -345,6 +345,12 @@ extension WindowControllersManager {
         })
     }
 
+    func windowController(for tab: Tab) -> MainWindowController? {
+        return mainWindowControllers.first(where: {
+            $0.mainViewController.tabCollectionViewModel.tabCollection.tabs.contains(tab)
+        })
+    }
+
 }
 
 extension WindowControllersManager: OnboardingNavigating {
