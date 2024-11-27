@@ -17,7 +17,14 @@
 //
 
 @available(macOS 14.4, *)
+@MainActor
 extension Tab: @preconcurrency _WKWebExtensionTab {
+
+    private var tabCollectionViewModel: TabCollectionViewModel? {
+        let mainWindowController = webView.window?.windowController as? MainWindowController
+        let mainViewController = mainWindowController?.mainViewController
+        return mainViewController?.tabCollectionViewModel
+    }
 
     func window(for context: _WKWebExtensionContext) -> (any _WKWebExtensionWindow)? {
         return webView.window?.windowController as? MainWindowController
@@ -126,38 +133,32 @@ extension Tab: @preconcurrency _WKWebExtensionTab {
     }
 
     func reload(for context: _WKWebExtensionContext) async throws {
-        await reload()
+        reload()
     }
 
     func reloadFromOrigin(for context: _WKWebExtensionContext) async throws {
-        await reload()
+        reload()
     }
 
     func goBack(for context: _WKWebExtensionContext) async throws {
-        await goBack()
+        goBack()
     }
 
     func goForward(for context: _WKWebExtensionContext) async throws {
-        await goForward()
+        goForward()
     }
 
     func activate(for context: _WKWebExtensionContext) async throws {
-        assertionFailure("not supported yet")
+        tabCollectionViewModel?.select(tab: self)
     }
 
     @MainActor
     func isSelected(for context: _WKWebExtensionContext) -> Bool {
-        let mainWindowController = webView.window?.windowController as? MainWindowController
-        let mainViewController = mainWindowController?.mainViewController
-        let tabCollectionViewModel = mainViewController?.tabCollectionViewModel
         return tabCollectionViewModel?.selectedTab == self
     }
 
     func select(for context: _WKWebExtensionContext) async throws {
-        let mainWindowController = await webView.window?.windowController as? MainWindowController
-        let mainViewController = await mainWindowController?.mainViewController
-        let tabCollectionViewModel = mainViewController?.tabCollectionViewModel
-        await tabCollectionViewModel?.select(tab: self)
+        tabCollectionViewModel?.select(tab: self)
     }
 
     func deselect(for context: _WKWebExtensionContext) async throws {
@@ -170,7 +171,11 @@ extension Tab: @preconcurrency _WKWebExtensionTab {
     }
 
     func close(for context: _WKWebExtensionContext) async throws {
-        assertionFailure("not supported yet")
+        if let index = tabCollectionViewModel?.indexInAllTabs(of: self) {
+            tabCollectionViewModel?.remove(at: index)
+        } else {
+            assertionFailure("Tab not found")
+        }
     }
 
     func shouldGrantTabPermissionsOnUserGesture(for context: _WKWebExtensionContext) -> Bool {

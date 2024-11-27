@@ -17,6 +17,7 @@
 //
 
 @available(macOS 14.4, *)
+@MainActor
 extension MainWindowController: @preconcurrency _WKWebExtensionWindow {
 
     func tabs(for context: _WKWebExtensionContext) -> [any _WKWebExtensionTab] {
