@@ -95,7 +95,7 @@ final class NewTabPagePrivacyStatsClient: NewTabPageScriptClient {
     }
 }
 
-extension NewTabPageUserScript {
+extension NewTabPagePrivacyStatsClient {
 
     struct PrivacyStatsData: Encodable, Equatable {
         let totalCount: Int64
