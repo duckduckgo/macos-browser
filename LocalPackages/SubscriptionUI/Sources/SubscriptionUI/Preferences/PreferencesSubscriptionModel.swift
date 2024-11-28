@@ -375,11 +375,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     private func currentSubscriptionFeatures() async -> [Entitlement.ProductName] {
         if subscriptionManager.currentEnvironment.purchasePlatform == .appStore {
-            if !isROWLaunched {
-                return [.networkProtection, .dataBrokerProtection, .identityTheftRestoration]
-            } else {
-                return await subscriptionManager.currentSubscriptionFeatures()
-            }
+            return await subscriptionManager.currentSubscriptionFeatures()
         } else {
             return [.networkProtection, .dataBrokerProtection, .identityTheftRestoration]
         }
