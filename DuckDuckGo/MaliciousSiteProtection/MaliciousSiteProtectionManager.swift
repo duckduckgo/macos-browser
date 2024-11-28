@@ -45,11 +45,11 @@ extension MaliciousSiteProtectionManager {
     struct EmbeddedDataProvider: MaliciousSiteProtection.EmbeddedDataProviding {
 
         private enum Constants {
-            static let embeddedDataRevision = 1693963
+            static let embeddedDataRevision = 1693964 // TODO: Rollback the revision and hashes when malware is deployed on the server
             static let phishingEmbeddedHashPrefixDataSHA = "86e9b69a6224e22755408f8ec1d13354ca8d59048f11d0728d9c664602500e8e"
             static let phishingEmbeddedFilterSetDataSHA = "6c29956071ef76d83a65c6c34646f361e9d6b5007b7251f0c5473428486aa9ee"
             static let malwareEmbeddedHashPrefixDataSHA = "07c4f1bd44881974f53e07f67090bac60770378fb8f68d45bbf8451f6545b423"
-            static let malwareEmbeddedFilterSetDataSHA = "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+            static let malwareEmbeddedFilterSetDataSHA = "9060c9e106444d578fc41df7b961343fc057e95adc88a3c0249504d477d7c4e0"
         }
 
         func revision(for dataType: MaliciousSiteProtection.DataManager.StoredDataType) -> Int {
