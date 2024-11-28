@@ -100,7 +100,6 @@ final class NewTabPagePrivacyStatsModel {
     }
 
     func calculatePrivacyStats() async -> NewTabPageUserScript.PrivacyStatsData {
-        let date = Date()
         let stats = await privacyStats.fetchPrivacyStats()
 
         var totalCount: Int64 = 0
@@ -116,9 +115,8 @@ final class NewTabPagePrivacyStatsModel {
         }
 
         if otherCount > 0 {
-            companiesStats.append(.init(count: otherCount, displayName: "__other__"))
+            companiesStats.append(.otherCompanies(count: otherCount))
         }
-        Logger.privacyStats.debug("Reloading privacy stats took \(Date().timeIntervalSince(date)) s")
         return NewTabPageUserScript.PrivacyStatsData(totalCount: totalCount, trackerCompanies: companiesStats)
     }
 
@@ -135,8 +133,12 @@ final class NewTabPagePrivacyStatsModel {
             return TrackerWithPrevalence(name: displayName, prevalence: prevalence)
         }
 
-        let topTrackersArray = trackers.sorted(by: { $0.prevalence > $1.prevalence }).prefix(100).map(\.name)
+        let topTrackersArray = trackers.sorted(by: { $0.prevalence > $1.prevalence }).prefix(Const.maxTopCompaniesCount).map(\.name)
         Logger.privacyStats.debug("top tracker companies: \(topTrackersArray)")
         topCompanies = Set(topTrackersArray)
+    }
+
+    private enum Const {
+        static let maxTopCompaniesCount: Int = 100
     }
 }

@@ -97,13 +97,21 @@ final class NewTabPagePrivacyStatsClient: NewTabPageScriptClient {
 
 extension NewTabPageUserScript {
 
-    struct PrivacyStatsData: Encodable {
+    struct PrivacyStatsData: Encodable, Equatable {
         let totalCount: Int64
         let trackerCompanies: [TrackerCompany]
+
+        static func == (lhs: PrivacyStatsData, rhs: PrivacyStatsData) -> Bool {
+            lhs.totalCount == rhs.totalCount && Set(lhs.trackerCompanies) == Set(rhs.trackerCompanies)
+        }
     }
 
-    struct TrackerCompany: Encodable {
+    struct TrackerCompany: Encodable, Equatable, Hashable {
         let count: Int64
         let displayName: String
+
+        static func otherCompanies(count: Int64) -> TrackerCompany {
+            TrackerCompany(count: count, displayName: "__other__")
+        }
     }
 }

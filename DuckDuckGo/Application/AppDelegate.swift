@@ -103,7 +103,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
         }
     )
-    let privacyStats: PrivacyStats
+    let privacyStats: PrivacyStats!
     let activeRemoteMessageModel: ActiveRemoteMessageModel
     let homePageSettingsModel = HomePage.Models.SettingsModel()
     let remoteMessagingClient: RemoteMessagingClient!
@@ -321,7 +321,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         freemiumDBPPromotionViewCoordinator = FreemiumDBPPromotionViewCoordinator(freemiumDBPUserStateManager: freemiumDBPUserStateManager,
                                                                                   freemiumDBPFeature: freemiumDBPFeature)
 
-        privacyStats = PrivacyStats(databaseProvider: PrivacyStatsDatabase())
+        if NSApplication.runType.requiresEnvironment {
+            privacyStats = PrivacyStats(databaseProvider: PrivacyStatsDatabase())
+        } else {
+            // As long as privacyStats is only used by NewTabPageActionsManager,
+            // it's safe to not initialize the client for unit tests to avoid side effects.
+            privacyStats = nil
+        }
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {
