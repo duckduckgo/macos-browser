@@ -46,7 +46,7 @@ performUpdate() {
         echo "❌ Revision mismatch! Expected $new_revision but got $revision."
         exit 1
     fi
-    printf "writing to ${data_path}\n"
+    printf "writing to %s\n" "${data_path}"
     jq -rc '.insert' "$temp_filename" > "$data_path"
 
     new_sha="$(shasum -a 256 "$data_path" | awk -F ' ' '{print $1}')"
@@ -63,7 +63,7 @@ performUpdate() {
     if [ "$new_sha" == "$old_sha" ]; then
         printf "\n"
     else
-        printf "✅ ${threat_type}Embedded${capitalized_data_type}DataSHA updated\n\n"
+        printf "✅ %sEmbedded%sDataSHA updated\n\n" "${threat_type}" "${capitalized_data_type}"
     fi
 	rm -f "$temp_filename"
 }
