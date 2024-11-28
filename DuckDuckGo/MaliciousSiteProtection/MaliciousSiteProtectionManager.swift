@@ -70,7 +70,7 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
     static let shared = MaliciousSiteProtectionManager()
 
     private let detector: MaliciousSiteDetecting
-    private let updateManager: MaliciousSiteProtection.UpdateManaging
+    private let updateManager: MaliciousSiteProtection.UpdateManager
     private let dataActivities: PhishingDetectionDataActivityHandling
     private let detectionPreferences: MaliciousSiteProtectionPreferences
     private let featureFlagger: FeatureFlagger
@@ -80,12 +80,10 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
     private var detectionPreferencesEnabledCancellable: AnyCancellable?
 
     init(
-        fileStoreUrl: URL? = nil,
-        apiClient: MaliciousSiteProtection.APIClientProtocol = .production,
+        apiEnvironment: MaliciousSiteDetector.APIEnvironment = .production,
         embeddedDataProvider: MaliciousSiteProtection.EmbeddedDataProviding? = nil,
-        dataManager: MaliciousSiteProtection.DataManaging? = nil,
+        dataManager: MaliciousSiteProtection.DataManager? = nil,
         detector: MaliciousSiteProtection.MaliciousSiteDetecting? = nil,
-        updateManager: MaliciousSiteProtection.UpdateManaging? = nil,
         dataActivities: PhishingDetectionDataActivityHandling? = nil,
         detectionPreferences: MaliciousSiteProtectionPreferences = MaliciousSiteProtectionPreferences.shared,
         featureFlagger: FeatureFlagger? = nil,
@@ -95,12 +93,14 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
         self.configManager = configManager ?? AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
 
         let embeddedDataProvider = embeddedDataProvider ?? EmbeddedDataProvider()
-        let configurationUrl = fileStoreUrl ?? FileManager.default.configurationDirectory()
-        let fileStore = MaliciousSiteProtection.FileStore(dataStoreURL: configurationUrl)
-        let dataManager = dataManager ?? MaliciousSiteProtection.DataManager(fileStore: fileStore, embeddedDataProvider: embeddedDataProvider, fileNameProvider: Self.fileName(for:))
+        let dataManager = dataManager ?? {
+            let configurationUrl = FileManager.default.configurationDirectory()
+            let fileStore = MaliciousSiteProtection.FileStore(dataStoreURL: configurationUrl)
+            return MaliciousSiteProtection.DataManager(fileStore: fileStore, embeddedDataProvider: embeddedDataProvider, fileNameProvider: Self.fileName(for:))
+        }()
 
-        self.detector = detector ?? MaliciousSiteDetector(apiClient: apiClient, dataManager: dataManager, eventMapping: Self.debugEvents)
-        self.updateManager = updateManager ?? MaliciousSiteProtection.UpdateManager(apiClient: apiClient, dataManager: dataManager)
+        self.detector = detector ?? MaliciousSiteDetector(apiEnvironment: apiEnvironment, dataManager: dataManager, eventMapping: Self.debugEvents)
+        self.updateManager = MaliciousSiteProtection.UpdateManager(apiEnvironment: apiEnvironment, dataManager: dataManager)
         self.detectionPreferences = detectionPreferences
         self.dataActivities = dataActivities ?? PhishingDetectionDataActivities(updateManager: self.updateManager)
 

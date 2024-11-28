@@ -43,14 +43,13 @@ class MockMaliciousSiteDataProvider: MaliciousSiteProtection.EmbeddedDataProvidi
         ""
     }
 
-    public func loadDataSet<DataKey>(for key: DataKey) -> DataKey.EmbeddedDataSetType where DataKey: MaliciousSiteDataKeyProtocol {
-        switch key.dataType {
-        case .filterSet:
+    func data(withContentsOf url: URL) throws -> Data {
+        if url.lastPathComponent.lowercased().contains("filter") {
             self.didLoadFilterSet = true
-            return Array(embeddedFilterSet) as! DataKey.EmbeddedDataSetType
-        case .hashPrefixSet:
+            return try JSONEncoder().encode(embeddedFilterSet)
+        } else {
             self.didLoadHashPrefixes = true
-            return Array(embeddedHashPrefixes) as! DataKey.EmbeddedDataSetType
+            return try JSONEncoder().encode(embeddedHashPrefixes)
         }
     }
 }
