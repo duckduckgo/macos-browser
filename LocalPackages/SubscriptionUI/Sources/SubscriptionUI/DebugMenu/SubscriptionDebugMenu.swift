@@ -36,17 +36,6 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         subscriptionManager.accountManager
     }
 
-    private var _purchaseManager: Any?
-    @available(macOS 12.0, *)
-    fileprivate var purchaseManager: DefaultStorePurchaseManager {
-        if _purchaseManager == nil {
-            _purchaseManager = DefaultStorePurchaseManager(subscriptionFeatureMappingCache: subscriptionManager.subscriptionFeatureMappingCache,
-                                                           subscriptionFeatureFlagger: nil)
-        }
-        // swiftlint:disable:next force_cast
-        return _purchaseManager as! DefaultStorePurchaseManager
-    }
-
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -266,14 +255,12 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     @objc
     func syncAppleIDAccount() {
         Task { @MainActor in
-            try? await purchaseManager.syncAppleIDAccount()
+            try? await subscriptionManager.storePurchaseManager().syncAppleIDAccount()
         }
     }
 
     @IBAction func showPurchaseView(_ sender: Any?) {
         if #available(macOS 12.0, *) {
-            let storePurchaseManager = DefaultStorePurchaseManager(subscriptionFeatureMappingCache: subscriptionManager.subscriptionFeatureMappingCache,
-                                                                   subscriptionFeatureFlagger: nil)
             let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(accountManager: subscriptionManager.accountManager,
                                                                  storePurchaseManager: subscriptionManager.storePurchaseManager(),
                                                                  subscriptionEndpointService: subscriptionManager.subscriptionEndpointService,
@@ -283,7 +270,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
                                                                    accountManager: subscriptionManager.accountManager,
                                                                    appStoreRestoreFlow: appStoreRestoreFlow,
                                                                    authEndpointService: subscriptionManager.authEndpointService)
-            let vc = DebugPurchaseViewController(storePurchaseManager: storePurchaseManager, appStorePurchaseFlow: appStorePurchaseFlow)
+            let vc = DebugPurchaseViewController(storePurchaseManager: subscriptionManager.storePurchaseManager() as! DefaultStorePurchaseManager, appStorePurchaseFlow: appStorePurchaseFlow)
             currentViewController()?.presentAsSheet(vc)
         }
     }
