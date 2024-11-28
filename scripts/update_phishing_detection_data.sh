@@ -10,7 +10,7 @@ def_filename="${work_dir}/MaliciousSiteProtectionManager.swift"
 
 old_revision="$(grep "static let embeddedDataRevision =" "${def_filename}" | awk -F '[=,]' '{print $2}' | xargs)"
 if [ -z "$old_revision" ]; then
-    echo "Error: Could not read embeddedDataRevision"
+    echo "❌ Could not read embeddedDataRevision"
     exit 1
 fi
 
@@ -29,7 +29,7 @@ performUpdate() {
 
 	old_sha="$(grep "static let ${threat_type}Embedded${capitalized_data_type}DataSHA =" "${def_filename}" | awk -F '"' '{print $2}')"
     if [ -z "$old_sha" ]; then
-        echo "Error: Could not read ${threat_type}Embedded${capitalized_data_type}DataSHA"
+        echo "❌ Could not read ${threat_type}Embedded${capitalized_data_type}DataSHA"
         exit 1
     fi
 
@@ -37,7 +37,16 @@ performUpdate() {
 
     url="${API_URL}/${data_type}?category=${threat_type}"
     printf "Fetching %s\n" "${url}"
-    curl -o "$temp_filename" -s "${url}"
+    curl -o "$temp_filename" -H "Cache-Control: no-cache" -s "${url}"
+    # Extract the revision from the fetched JSON
+    revision=$(jq -r '.revision' "$temp_filename")
+
+    # Compare the fetched revision with the local new_revision variable
+    if [ "$revision" != "$new_revision" ]; then
+        echo "❌ Revision mismatch! Expected $new_revision but got $revision."
+        exit 1
+    fi
+    printf "writing to ${data_path}\n"
     jq -rc '.insert' "$temp_filename" > "$data_path"
 
     new_sha="$(shasum -a 256 "$data_path" | awk -F ' ' '{print $1}')"
@@ -60,7 +69,7 @@ performUpdate() {
 }
 
 updateRevision() {
-    sed -i '' -e "s/revision = $old_revision/revision = $new_revision/" "${def_filename}"
+    sed -i '' -e "s/embeddedDataRevision = $old_revision/embeddedDataRevision = $new_revision/" "${def_filename}"
     printf "Updated revision from %s to %s\n" "$old_revision" "$new_revision"
 }
 
