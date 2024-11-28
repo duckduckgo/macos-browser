@@ -258,7 +258,7 @@ extension ErrorPageTabExtensionNavigationDelegate {
     func reloadPage() -> WKNavigation? {
         guard let wevView = self as? WKWebView else { return nil }
         if let item = wevView.backForwardList.currentItem {
-            return wevView.go(to: item) // TODO: Doesn‘t work for phishing
+            return wevView.go(to: item)
         }
         return nil
     }

@@ -17,7 +17,7 @@ fi
 temp_filename="phishing_data_new_file"
 new_revision=$(curl -s "${API_URL}/revision" | jq -r '.revision')
 
-printf "Embedded revision: %s, actual revision: %s\n" "${old_revision}" "${new_revision}"
+printf "Embedded revision: %s, actual revision: %s\n\n" "${old_revision}" "${new_revision}"
 rm -f "$temp_filename"
 
 performUpdate() {
@@ -35,17 +35,27 @@ performUpdate() {
 
 	printf "Embedded SHA256: %s\n" "${old_sha}"
 
-    curl -o "$temp_filename" -s "${API_URL}/${data_type}"
+    url="${API_URL}/${data_type}?category=${threat_type}"
+    printf "Fetching %s\n" "${url}"
+    curl -o "$temp_filename" -s "${url}"
     jq -rc '.insert' "$temp_filename" > "$data_path"
 
     new_sha="$(shasum -a 256 "$data_path" | awk -F ' ' '{print $1}')"
 
-    printf "New SHA256: %s\n" "$new_sha"
+    if [ "$new_sha" == "$old_sha" ]; then
+        printf "🆗 Data not modified.\n"
+    else
+        printf "New SHA256: %s ✨\n" "$new_sha"
+    fi
 
     sed -i '' -e "s/$old_sha/$new_sha/g" "${def_filename}"
     sed -i '' -e "s/${threat_type}EmbeddedDataRevision =.*/${threat_type}EmbeddedDataRevision = $new_revision/" "${def_filename}"
 
-    printf "${threat_type}Embedded${capitalized_data_type}DataSHA updated\n\n"
+    if [ "$new_sha" == "$old_sha" ]; then
+        printf "\n"
+    else
+        printf "✅ ${threat_type}Embedded${capitalized_data_type}DataSHA updated\n\n"
+    fi
 	rm -f "$temp_filename"
 }
 
