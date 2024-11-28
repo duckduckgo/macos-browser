@@ -665,7 +665,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     ///
     @MainActor
     func stop() async {
-        await stop(disableOnDemand: false)
+        await stop(disableOnDemand: true)
     }
 
     @MainActor
