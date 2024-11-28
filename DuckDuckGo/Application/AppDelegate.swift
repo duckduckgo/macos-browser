@@ -294,7 +294,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         })
 
         subscriptionCookieManager = SubscriptionCookieManager(subscriptionManager: subscriptionManager, currentCookieStore: {
-            WKWebsiteDataStore.default().httpCookieStore
+            WKHTTPCookieStoreWrapper(store: WKWebsiteDataStore.default().httpCookieStore)
         }, eventMapping: SubscriptionCookieManageEventPixelMapping())
 
         // Update VPN environment and match the Subscription environment
@@ -408,10 +408,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
                 let isEnabled = privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(PrivacyProSubfeature.setAccessTokenCookieForSubscriptionDomains)
 
-                Task { [weak self] in
+                Task { @MainActor [weak self] in
                     if isEnabled {
                         self?.subscriptionCookieManager.enableSettingSubscriptionCookie()
-                        await self?.subscriptionCookieManager.refreshSubscriptionCookie()
                     } else {
                         await self?.subscriptionCookieManager.disableSettingSubscriptionCookie()
                     }

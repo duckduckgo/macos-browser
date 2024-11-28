@@ -254,6 +254,7 @@ jobs:
         env:
           ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
           BRANCH: ${{ github.ref_name }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           bundle exec fastlane run update_asana_for_release \
             platform:macos \
