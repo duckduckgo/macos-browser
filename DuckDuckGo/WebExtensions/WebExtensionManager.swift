@@ -243,7 +243,49 @@ extension WebExtensionManager: @preconcurrency _WKWebExtensionControllerDelegate
     }
 
     func webExtensionController(_ controller: _WKWebExtensionController, openNewWindowWith options: _WKWebExtensionWindowCreationOptions, for extensionContext: _WKWebExtensionContext) async throws -> (any _WKWebExtensionWindow)? {
-        return nil
+        // Extract options
+        let tabs = options.desiredURLs.map { Tab(content: .contentFromURL($0, source: .ui)) }
+        let burnerMode = BurnerMode(isBurner: options.shouldUsePrivateBrowsing)
+        let tabCollectionViewModel = TabCollectionViewModel(
+            tabCollection: TabCollection(tabs: tabs),
+            burnerMode: burnerMode
+        )
+
+        // Create new window
+        let mainWindow = WindowControllersManager.shared.openNewWindow(
+            with: tabCollectionViewModel,
+            burnerMode: burnerMode,
+            droppingPoint: options.desiredFrame.origin,
+            contentSize: options.desiredFrame.size,
+            showWindow: options.shouldFocus,
+            popUp: options.desiredWindowType == .popup,
+            isMiniaturized: options.desiredWindowState == .minimized,
+            isMaximized: options.desiredWindowState == .maximized,
+            isFullscreen: options.desiredWindowState == .fullscreen
+        )
+
+        // Move existing tabs if necessary
+        try moveExistingTabs(options.desiredTabs, to: tabCollectionViewModel)
+
+        return mainWindow?.windowController as? MainWindowController
+    }
+
+    private func moveExistingTabs(_ existingTabs: [any _WKWebExtensionTab], to targetViewModel: TabCollectionViewModel) throws {
+        guard !existingTabs.isEmpty else { return }
+
+        for existingTab in existingTabs {
+            guard
+                let tab = existingTab as? Tab,
+                let sourceViewModel = WindowControllersManager.shared.windowController(for: tab)?
+                    .mainViewController.tabCollectionViewModel,
+                let currentIndex = sourceViewModel.tabCollection.tabs.firstIndex(of: tab)
+            else {
+                assertionFailure("Failed to find tab collection view model for \(existingTab)")
+                continue
+            }
+
+            sourceViewModel.moveTab(at: currentIndex, to: targetViewModel, at: targetViewModel.tabs.count)
+        }
     }
 
     func webExtensionController(_ controller: _WKWebExtensionController, openNewTabWith options: _WKWebExtensionTabCreationOptions, for extensionContext: _WKWebExtensionContext) async throws -> (any _WKWebExtensionTab)? {
@@ -262,7 +304,7 @@ extension WebExtensionManager: @preconcurrency _WKWebExtensionControllerDelegate
     }
 
     func webExtensionController(_ controller: _WKWebExtensionController, openOptionsPageFor extensionContext: _WKWebExtensionContext) async throws {
-
+        assertionFailure("not supported yet")
     }
 
     func webExtensionController(_ controller: _WKWebExtensionController, promptForPermissions permissions: Set<_WKWebExtension.Permission>, in tab: (any _WKWebExtensionTab)?, for extensionContext: _WKWebExtensionContext) async -> (Set<_WKWebExtension.Permission>, Date?) {
