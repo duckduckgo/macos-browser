@@ -82,7 +82,7 @@ struct OperationPreferredDateCalculator {
         case .optOutStarted, .scanStarted, .noMatchFound:
             return currentPreferredRunDate
         case .optOutConfirmed, .optOutRequested:
-            return nil
+            return Date.distantFuture
         }
     }
 
