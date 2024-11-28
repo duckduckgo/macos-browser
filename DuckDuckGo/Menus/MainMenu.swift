@@ -726,7 +726,8 @@ final class MainMenu: NSMenu {
                                   updatePurchasingPlatform: updatePurchasingPlatform,
                                   currentViewController: { WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController },
                                   openSubscriptionTab: { WindowControllersManager.shared.showTab(with: .subscription($0)) },
-                                  subscriptionManager: Application.appDelegate.subscriptionManager)
+                                  subscriptionManager: Application.appDelegate.subscriptionManager,
+                                  subscriptionUserDefaults: subscriptionUserDefaults)
 
             NSMenuItem(title: "Logging").submenu(setupLoggingMenu())
             NSMenuItem(title: "AI Chat").submenu(AIChatDebugMenu())

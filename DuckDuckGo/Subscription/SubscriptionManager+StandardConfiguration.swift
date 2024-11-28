@@ -49,7 +49,7 @@ extension DefaultSubscriptionManager {
         let subscriptionFeatureFlagger: FeatureFlaggerMapping<SubscriptionFeatureFlags> = FeatureFlaggerMapping { feature in
             guard let featureFlagger else {
                 // With no featureFlagger provided there is no gating of features
-                return true
+                return feature.defaultState
             }
 
             switch feature {
@@ -57,11 +57,20 @@ extension DefaultSubscriptionManager {
                 return featureFlagger.isFeatureOn(.isPrivacyProLaunchedROW)
             case .isLaunchedROWOverride:
                 return featureFlagger.isFeatureOn(.isPrivacyProLaunchedROWOverride)
+            case .usePrivacyProUSARegionOverride:
+                return (featureFlagger.internalUserDecider.isInternalUser &&
+                        subscriptionEnvironment.serviceEnvironment == .staging &&
+                        subscriptionUserDefaults.storefrontRegionOverride == .usa)
+            case .usePrivacyProROWRegionOverride:
+                return (featureFlagger.internalUserDecider.isInternalUser &&
+                        subscriptionEnvironment.serviceEnvironment == .staging &&
+                        subscriptionUserDefaults.storefrontRegionOverride == .restOfWorld)
             }
         }
 
         if #available(macOS 12.0, *) {
-            let storePurchaseManager = DefaultStorePurchaseManager(subscriptionFeatureMappingCache: subscriptionFeatureMappingCache)
+            let storePurchaseManager = DefaultStorePurchaseManager(subscriptionFeatureMappingCache: subscriptionFeatureMappingCache,
+                                                                   subscriptionFeatureFlagger: subscriptionFeatureFlagger)
             self.init(storePurchaseManager: storePurchaseManager,
                       accountManager: accountManager,
                       subscriptionEndpointService: subscriptionEndpointService,
