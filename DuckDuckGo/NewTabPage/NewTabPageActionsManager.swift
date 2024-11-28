@@ -124,8 +124,7 @@ extension NewTabPageActionsManager {
     ) {
         let privacyStatsModel = NewTabPagePrivacyStatsModel(
             privacyStats: privacyStats,
-            // swiftlint:disable:next force_cast
-            trackerDataProvider: (ContentBlocking.shared as! AppContentBlocking)
+            trackerDataProvider: PrivacyStatsTrackerDataProvider(contentBlocking: ContentBlocking.shared)
         )
 
         self.init(scriptClients: [

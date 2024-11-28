@@ -1,5 +1,5 @@
 //
-//  PrivacyStatsTrackerDataProviding.swift
+//  PrivacyStatsTrackerDataProvider.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Combine
 import TrackerRadarKit
 
@@ -24,11 +25,28 @@ public protocol PrivacyStatsTrackerDataProviding {
     var trackerDataUpdatesPublisher: AnyPublisher<Void, Never> { get }
 }
 
-extension AppContentBlocking: PrivacyStatsTrackerDataProviding {
+final class PrivacyStatsTrackerDataProvider: PrivacyStatsTrackerDataProviding {
     var trackerData: TrackerData {
         trackerDataManager.trackerData
     }
+    let trackerDataUpdatesPublisher: AnyPublisher<Void, Never>
+
+    init(contentBlocking: ContentBlockingProtocol) {
+        trackerDataManager = contentBlocking.trackerDataManager
+        trackerDataUpdatesPublisher = contentBlocking.contentBlockingAssetsPublisher.asVoid().eraseToAnyPublisher()
+    }
+
+    private let trackerDataManager: TrackerDataManager
+}
+
+#if DEBUG
+extension ContentBlockingMock: PrivacyStatsTrackerDataProviding {
+    var trackerData: TrackerData {
+        trackerDataManager.trackerData
+    }
+
     var trackerDataUpdatesPublisher: AnyPublisher<Void, Never> {
         contentBlockingAssetsPublisher.asVoid().eraseToAnyPublisher()
     }
 }
+#endif
