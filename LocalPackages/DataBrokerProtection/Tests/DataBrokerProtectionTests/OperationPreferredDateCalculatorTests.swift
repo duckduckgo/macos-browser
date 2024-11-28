@@ -785,7 +785,6 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
                                                                        schedulingConfig: schedulingConfig,
                                                                        attemptCount: 0)
 
-
         XCTAssertTrue(proposedOptOutDate!.isInDistantFuture())
     }
 
