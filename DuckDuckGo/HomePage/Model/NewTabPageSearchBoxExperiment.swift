@@ -210,7 +210,7 @@ final class NewTabPageSearchBoxExperiment {
     }
 
     var cohort: Cohort? {
-        isActive ? dataStore.experimentCohort : nil
+        dataStore.experimentCohort
     }
 
     var onboardingCohort: PixelExperiment? {

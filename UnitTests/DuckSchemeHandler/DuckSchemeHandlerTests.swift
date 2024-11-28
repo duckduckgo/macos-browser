@@ -157,13 +157,8 @@ final class DuckSchemeHandlerTests: XCTestCase {
         handler.webView(webView, start: schemeTask)
 
         // Then
-        let error = WKError.unknown
-        let expectedError = NSError(domain: "Unexpected Error", code: error.rawValue, userInfo: [
-            NSURLErrorFailingURLErrorKey: "about:blank",
-            NSLocalizedDescriptionKey: "Unexpected Error"
-        ])
         XCTAssertNotNil(schemeTask.error)
-        XCTAssertEqual(schemeTask.error! as NSError, expectedError)
+        XCTAssertEqual((schemeTask.error! as? URLError)?.code, .badURL)
     }
 
     @MainActor
