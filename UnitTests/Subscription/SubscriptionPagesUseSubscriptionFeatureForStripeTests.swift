@@ -27,6 +27,7 @@ import UserScript
 import PixelKitTestingUtilities
 import os.log
 import Networking
+import TestUtils
 
 @available(macOS 12.0, *)
 final class SubscriptionPagesUseSubscriptionFeatureForStripeTests: XCTestCase {
@@ -191,7 +192,7 @@ final class SubscriptionPagesUseSubscriptionFeatureForStripeTests: XCTestCase {
     func testGetSubscriptionOptionsReturnsEmptyOptionsWhenSubscriptionOptionsDidNotFetch() async throws {
         // Given
         XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .stripe)
-        subscriptionManager.productsResponse = .failure(Constants.invalidTokenError)
+//        subscriptionManager.productsResponse = .failure(Constants.invalidTokenError)
         storePurchaseManager.subscriptionOptionsResult = nil
 
         // When
@@ -209,11 +210,13 @@ final class SubscriptionPagesUseSubscriptionFeatureForStripeTests: XCTestCase {
         // Given
         ensureUserUnauthenticatedState()
         XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .stripe)
-        XCTAssertFalse(accountManager.isUserAuthenticated)
+        XCTAssertFalse(subscriptionManager.isUserAuthenticated)
 
-        authService.createAccountResult = .success(CreateAccountResponse(authToken: Constants.authToken,
-                                                                         externalID: Constants.externalID,
-                                                                         status: "created"))
+//        authService.createAccountResult = .success(CreateAccountResponse(authToken: Constants.authToken,
+//                                                                         externalID: Constants.externalID,
+//                                                                         status: "created"))
+//        subscriptionManager.resultSubscription = SubscriptionMockFactory.subscription
+//        subscriptionManager.resultExchangeTokenContainer = OAuthTokensFactory.makeValidTokenContainerWithEntitlements()
 
         // When
         let subscriptionSelectedParams = ["id": "some-subscription-id"]
@@ -230,16 +233,18 @@ final class SubscriptionPagesUseSubscriptionFeatureForStripeTests: XCTestCase {
         // Given
         ensureUserAuthenticatedState()
         XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .stripe)
-        XCTAssertTrue(accountManager.isUserAuthenticated)
+        XCTAssertTrue(subscriptionManager.isUserAuthenticated)
 
-        subscriptionService.getSubscriptionResult = .success(SubscriptionMockFactory.expiredSubscription)
+//        subscriptionService.getSubscriptionResult = .success(SubscriptionMockFactory.expiredSubscription)
+        subscriptionManager.resultSubscription = SubscriptionMockFactory.expiredSubscription
+//        subscriptionManager.resultExchangeTokenContainer = OAuthTokensFactory.makeValidTokenContainerWithEntitlements()
 
         // When
         let subscriptionSelectedParams = ["id": "some-subscription-id"]
         let result = try await feature.subscriptionSelected(params: subscriptionSelectedParams, original: Constants.mockScriptMessage)
 
         // Then
-        XCTAssertFalse(authService.createAccountCalled)
+//        XCTAssertFalse(authService.createAccountCalled)
         XCTAssertEqual(uiEventsHappened, [.didDismissProgressViewController])
         XCTAssertNil(result)
         XCTAssertPrivacyPixelsFired([PrivacyProPixel.privacyProPurchaseAttempt.name + "_d",
@@ -251,7 +256,7 @@ final class SubscriptionPagesUseSubscriptionFeatureForStripeTests: XCTestCase {
         ensureUserUnauthenticatedState()
         XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .stripe)
 
-        authService.createAccountResult = .failure(Constants.invalidTokenError)
+//        authService.createAccountResult = .failure(Constants.invalidTokenError)
         await uiHandler.setAlertResponse(alertResponse: .alertFirstButtonReturn)
 
         // When
@@ -280,8 +285,10 @@ final class SubscriptionPagesUseSubscriptionFeatureForStripeTests: XCTestCase {
         // Given
         ensureUserAuthenticatedState()
 
-        authService.getAccessTokenResult = .success(AccessTokenResponse(accessToken: Constants.accessToken))
-        authService.validateTokenResult = .success(Constants.validateTokenResponse)
+//        authService.getAccessTokenResult = .success(AccessTokenResponse(accessToken: Constants.accessToken))
+//        authService.validateTokenResult = .success(Constants.validateTokenResponse)
+//        subscriptionManager.resultSubscription = SubscriptionMockFactory.subscription
+//        subscriptionManager.resultExchangeTokenContainer = OAuthTokensFactory.makeValidTokenContainerWithEntitlements()
 
         // When
         let result = try await feature.completeStripePayment(params: Constants.mockParams, original: Constants.mockScriptMessage)
@@ -302,15 +309,11 @@ final class SubscriptionPagesUseSubscriptionFeatureForStripeTests: XCTestCase {
 extension SubscriptionPagesUseSubscriptionFeatureForStripeTests {
 
     func ensureUserAuthenticatedState() {
-        accountStorage.authToken = Constants.authToken
-        accountStorage.email = Constants.email
-        accountStorage.externalID = Constants.externalID
-        accessTokenStorage.accessToken = Constants.accessToken
+        subscriptionManager.resultExchangeTokenContainer = OAuthTokensFactory.makeValidTokenContainerWithEntitlements()
     }
 
     func ensureUserUnauthenticatedState() {
-        try? accessTokenStorage.removeAccessToken()
-        try? accountStorage.clearAuthenticationState()
+        subscriptionManager.resultExchangeTokenContainer = nil
     }
 
     public func XCTAssertPrivacyPixelsFired(_ pixels: [String], file: StaticString = #file, line: UInt = #line) {

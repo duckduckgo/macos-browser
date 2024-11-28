@@ -58,19 +58,9 @@ final class MoreOptionsMenuTests: XCTestCase {
         internalUserDecider = InternalUserDeciderMock()
         defaultBrowserProvider = DefaultBrowserProviderMock()
         defaultBrowserProvider.isDefault = true
-
         storePurchaseManager = StorePurchaseManagerMock()
-
-        subscriptionManager = SubscriptionManagerMock(accountManager: AccountManagerMock(),
-                                                      subscriptionEndpointService: SubscriptionEndpointServiceMock(),
-                                                      authEndpointService: AuthEndpointServiceMock(),
-                                                      storePurchaseManager: storePurchaseManager,
-                                                      currentEnvironment: SubscriptionEnvironment(serviceEnvironment: .production,
-                                                                                                  purchasePlatform: .appStore),
-                                                      canPurchase: false)
-
+        subscriptionManager = SubscriptionManagerMock()
         mockFreemiumDBPFeature = MockFreemiumDBPFeature()
-
         mockNotificationCenter = MockNotificationCenter()
         mockPixelHandler = MockFreemiumDBPExperimentPixelHandler()
         mockFreemiumDBPUserStateManager = MockFreemiumDBPUserStateManager()
@@ -109,11 +99,6 @@ final class MoreOptionsMenuTests: XCTestCase {
 
     // MARK: - Subscription & Freemium
 
-    private func mockAuthentication() {
-        subscriptionManager.accountManager.storeAuthToken(token: "")
-        subscriptionManager.accountManager.storeAccount(token: "", email: "", externalID: "")
-    }
-
     @MainActor
     func testThatPrivacyProIsNotPresentWhenUnauthenticatedAndPurchaseNotAllowedOnAppStore () {
         subscriptionManager.canPurchase = false
@@ -121,7 +106,7 @@ final class MoreOptionsMenuTests: XCTestCase {
 
         setupMoreOptionsMenu()
 
-        XCTAssertFalse(subscriptionManager.accountManager.isUserAuthenticated)
+        XCTAssertFalse(subscriptionManager.isUserAuthenticated)
         XCTAssertFalse(moreOptionsMenu.items.map { $0.title }.contains(UserText.subscriptionOptionsMenuItem))
     }
 
@@ -132,7 +117,7 @@ final class MoreOptionsMenuTests: XCTestCase {
 
         setupMoreOptionsMenu()
 
-        XCTAssertFalse(subscriptionManager.accountManager.isUserAuthenticated)
+        XCTAssertFalse(subscriptionManager.isUserAuthenticated)
         XCTAssertTrue(moreOptionsMenu.items.map { $0.title }.contains(UserText.subscriptionOptionsMenuItem))
     }
 
@@ -143,7 +128,7 @@ final class MoreOptionsMenuTests: XCTestCase {
 
         setupMoreOptionsMenu()
 
-        XCTAssertFalse(subscriptionManager.accountManager.isUserAuthenticated)
+        XCTAssertFalse(subscriptionManager.isUserAuthenticated)
         XCTAssertTrue(moreOptionsMenu.items.map { $0.title }.contains(UserText.subscriptionOptionsMenuItem))
     }
 
@@ -155,7 +140,7 @@ final class MoreOptionsMenuTests: XCTestCase {
 
         setupMoreOptionsMenu()
 
-        XCTAssertFalse(subscriptionManager.accountManager.isUserAuthenticated)
+        XCTAssertFalse(subscriptionManager.isUserAuthenticated)
         XCTAssertTrue(subscriptionManager.canPurchase)
 
         XCTAssertEqual(moreOptionsMenu.items[0].title, UserText.sendFeedback)
@@ -187,7 +172,7 @@ final class MoreOptionsMenuTests: XCTestCase {
 
         setupMoreOptionsMenu()
 
-        XCTAssertFalse(subscriptionManager.accountManager.isUserAuthenticated)
+        XCTAssertFalse(subscriptionManager.isUserAuthenticated)
         XCTAssertTrue(subscriptionManager.canPurchase)
 
         XCTAssertEqual(moreOptionsMenu.items[0].title, UserText.sendFeedback)

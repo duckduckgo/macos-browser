@@ -18,26 +18,26 @@
 
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
+import TestUtils
+import SubscriptionTestingUtilities
 
 final class FreemiumDBPFirstProfileSavedNotifierTests: XCTestCase {
 
     private var mockFreemiumDBPUserStateManager: MockFreemiumDBPUserStateManager!
-    private var mockAccountManager: MockAccountManager!
     private var mockNotificationCenter: MockNotificationCenter!
+    private var mockSubscriptionManager: SubscriptionManagerMock!
     private var sut: FreemiumDBPFirstProfileSavedNotifier!
 
     override func setUpWithError() throws {
         mockFreemiumDBPUserStateManager = MockFreemiumDBPUserStateManager()
-        mockAccountManager = MockAccountManager()
         mockNotificationCenter = MockNotificationCenter()
         sut = FreemiumDBPFirstProfileSavedNotifier(freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager,
-                                                   accountManager: mockAccountManager,
+                                                   subscriptionManager: mockSubscriptionManager,
                                                    notificationCenter: mockNotificationCenter)
     }
 
     func testWhenAllCriteriaSatisfied_thenNotificationShouldBePosted() {
         // Given
-        mockAccountManager.accessToken = nil
         mockFreemiumDBPUserStateManager.didActivate = true
         mockFreemiumDBPUserStateManager.didPostFirstProfileSavedNotification = false
 
@@ -52,7 +52,7 @@ final class FreemiumDBPFirstProfileSavedNotifierTests: XCTestCase {
 
     func testWhenUserIsAuthenticated_thenNotificationShouldNotBePosted() {
         // Given
-        mockAccountManager.accessToken = "some_token"
+        mockSubscriptionManager.resultTokenContainer = OAuthTokensFactory.makeValidTokenContainerWithEntitlements()
         mockFreemiumDBPUserStateManager.didActivate = true
         mockFreemiumDBPUserStateManager.didPostFirstProfileSavedNotification = false
 
@@ -65,7 +65,6 @@ final class FreemiumDBPFirstProfileSavedNotifierTests: XCTestCase {
 
     func testWhenUserHasNotActivated_thenNotificationShouldNotBePosted() {
         // Given
-        mockAccountManager.accessToken = nil
         mockFreemiumDBPUserStateManager.didActivate = false
         mockFreemiumDBPUserStateManager.didPostFirstProfileSavedNotification = false
 
@@ -78,7 +77,6 @@ final class FreemiumDBPFirstProfileSavedNotifierTests: XCTestCase {
 
     func testWhenNotificationAlreadyPosted_thenShouldNotPostAgain() {
         // Given
-        mockAccountManager.accessToken = nil
         mockFreemiumDBPUserStateManager.didActivate = true
         mockFreemiumDBPUserStateManager.didPostFirstProfileSavedNotification = true
 
@@ -91,7 +89,6 @@ final class FreemiumDBPFirstProfileSavedNotifierTests: XCTestCase {
 
     func testWhenNotificationIsPosted_thenStateShouldBeUpdated() {
         // Given
-        mockAccountManager.accessToken = nil
         mockFreemiumDBPUserStateManager.didActivate = true
         mockFreemiumDBPUserStateManager.didPostFirstProfileSavedNotification = false
 

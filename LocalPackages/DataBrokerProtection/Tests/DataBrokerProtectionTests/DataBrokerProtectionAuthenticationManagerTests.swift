@@ -40,7 +40,7 @@ class DataBrokerProtectionAuthenticationManagerTests: XCTestCase {
     }
 
     func testUserNotAuthenticatedWhenSubscriptionManagerReturnsFalse() {
-        subscriptionManager.isUserAuthenticated = false
+        subscriptionManager.resultTokenContainer = OAuthTokensFactory.makeValidTokenContainer()
 
         authenticationManager = DataBrokerProtectionAuthenticationManager(redeemUseCase: redeemUseCase,
                                                                           subscriptionManager: subscriptionManager)
@@ -58,7 +58,7 @@ class DataBrokerProtectionAuthenticationManagerTests: XCTestCase {
     }
 
     func testUserAuthenticatedWhenSubscriptionManagerReturnsTrue() {
-        subscriptionManager.isUserAuthenticated = true
+        subscriptionManager.resultTokenContainer = OAuthTokensFactory.makeValidTokenContainer()
 
         authenticationManager = DataBrokerProtectionAuthenticationManager(redeemUseCase: redeemUseCase,
                                                                           subscriptionManager: subscriptionManager)

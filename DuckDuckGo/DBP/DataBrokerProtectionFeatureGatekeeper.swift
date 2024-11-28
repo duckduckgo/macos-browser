@@ -80,7 +80,7 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
 
     /// Checks DBP prerequisites
     ///
-    /// Prerequisites are satisified if either:
+    /// Prerequisites are satisfied if either:
     /// 1. The user is an active freemium user (e.g has activated freemium and is not authenticated)
     /// 2. The user has a subscription with valid entitlements
     ///

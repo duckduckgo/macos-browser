@@ -40,10 +40,6 @@ final class SubscriptionAppStoreRestorerTests: XCTestCase {
     var userDefaults: UserDefaults!
     var pixelKit: PixelKit!
     var uiHandler: SubscriptionUIHandlerMock!
-
-    var accountManager: AccountManagerMock!
-    var subscriptionService: SubscriptionEndpointServiceMock!
-    var authService: AuthEndpointServiceMock!
     var storePurchaseManager: StorePurchaseManagerMock!
     var subscriptionEnvironment: SubscriptionEnvironment!
 
@@ -71,19 +67,11 @@ final class SubscriptionAppStoreRestorerTests: XCTestCase {
             self.uiEventsHappened.append(action)
         })
 
-        accountManager = AccountManagerMock()
-        subscriptionService = SubscriptionEndpointServiceMock()
-        authService = AuthEndpointServiceMock()
         storePurchaseManager = StorePurchaseManagerMock()
         subscriptionEnvironment = SubscriptionEnvironment(serviceEnvironment: .production,
                                                            purchasePlatform: .appStore)
 
-        subscriptionManager = SubscriptionManagerMock(accountManager: accountManager,
-                                                      subscriptionEndpointService: subscriptionService,
-                                                      authEndpointService: authService,
-                                                      storePurchaseManager: storePurchaseManager,
-                                                      currentEnvironment: subscriptionEnvironment,
-                                                      canPurchase: true)
+        subscriptionManager = SubscriptionManagerMock()
         appStoreRestoreFlow = AppStoreRestoreFlowMock()
 
         subscriptionAppStoreRestorer = DefaultSubscriptionAppStoreRestorer(subscriptionManager: subscriptionManager,
@@ -93,23 +81,15 @@ final class SubscriptionAppStoreRestorerTests: XCTestCase {
 
     override func tearDown() async throws {
         userDefaults = nil
-
         PixelKit.tearDown()
         pixelKit.clearFrequencyHistoryForAllPixels()
-
         pixelsFired.removeAll()
         uiEventsHappened.removeAll()
-
-        accountManager = nil
-        subscriptionService = nil
-        authService = nil
         storePurchaseManager = nil
         subscriptionEnvironment = nil
-
         subscriptionManager = nil
         appStoreRestoreFlow = nil
         uiHandler = nil
-
         subscriptionAppStoreRestorer = nil
     }
 
@@ -117,7 +97,7 @@ final class SubscriptionAppStoreRestorerTests: XCTestCase {
 
     func testRestoreAppStoreSubscriptionSuccess() async throws {
         // Given
-        appStoreRestoreFlow.restoreAccountFromPastPurchaseResult = .success(())
+        appStoreRestoreFlow.restoreAccountFromPastPurchaseResult = .success("")
 
         // When
         await subscriptionAppStoreRestorer.restoreAppStoreSubscription()
@@ -151,7 +131,7 @@ final class SubscriptionAppStoreRestorerTests: XCTestCase {
         // Given
         storePurchaseManager.syncAppleIDAccountResultError = StoreKitError.unknown
         await uiHandler.setAlertResponse(alertResponse: .alertFirstButtonReturn)
-        appStoreRestoreFlow.restoreAccountFromPastPurchaseResult = .success(())
+        appStoreRestoreFlow.restoreAccountFromPastPurchaseResult = .success("")
 
         // When
         await subscriptionAppStoreRestorer.restoreAppStoreSubscription()
@@ -286,10 +266,7 @@ final class SubscriptionAppStoreRestorerTests: XCTestCase {
 
     func testRestoreAppStoreSubscriptionWhenRestoreFailsDueToSubscriptionBeingExpired() async throws {
         // Given
-        appStoreRestoreFlow.restoreAccountFromPastPurchaseResult = .failure(.subscriptionExpired(accountDetails: .init(authToken: Constants.authToken,
-                                                                                                                       accessToken: Constants.accessToken,
-                                                                                                                       externalID: Constants.externalID,
-                                                                                                                       email: Constants.email)) )
+        appStoreRestoreFlow.restoreAccountFromPastPurchaseResult = .failure(AppStoreRestoreFlowError.subscriptionExpired)
         await uiHandler.setAlertResponse(alertResponse: .alertFirstButtonReturn)
 
         // When

@@ -2980,8 +2980,6 @@
 		C1CE846A2C887CF60068913B /* FreemiumDBPScanResultPolling.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1CE84682C887CF60068913B /* FreemiumDBPScanResultPolling.swift */; };
 		C1CE846C2C88868D0068913B /* FreemiumDBPScanResultPollingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1CE846B2C88868D0068913B /* FreemiumDBPScanResultPollingTests.swift */; };
 		C1CE846D2C88868D0068913B /* FreemiumDBPScanResultPollingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1CE846B2C88868D0068913B /* FreemiumDBPScanResultPollingTests.swift */; };
-		C1D8BE452C1739E70057E426 /* DataBrokerProtectionMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1D8BE442C1739E70057E426 /* DataBrokerProtectionMocks.swift */; };
-		C1D8BE462C1739EC0057E426 /* DataBrokerProtectionMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1D8BE442C1739E70057E426 /* DataBrokerProtectionMocks.swift */; };
 		C1DAF3B52B9A44860059244F /* AutofillPopoverPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1DAF3B42B9A44860059244F /* AutofillPopoverPresenter.swift */; };
 		C1DAF3B62B9A44860059244F /* AutofillPopoverPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1DAF3B42B9A44860059244F /* AutofillPopoverPresenter.swift */; };
 		C1E961EB2B879E79001760E1 /* MockAutofillActionPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1E961E72B879E4D001760E1 /* MockAutofillActionPresenter.swift */; };
@@ -4882,7 +4880,6 @@
 		C1C405862C7F80E50089DE8A /* PromotionView+FreemiumDBP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PromotionView+FreemiumDBP.swift"; sourceTree = "<group>"; };
 		C1CE84682C887CF60068913B /* FreemiumDBPScanResultPolling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreemiumDBPScanResultPolling.swift; sourceTree = "<group>"; };
 		C1CE846B2C88868D0068913B /* FreemiumDBPScanResultPollingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreemiumDBPScanResultPollingTests.swift; sourceTree = "<group>"; };
-		C1D8BE442C1739E70057E426 /* DataBrokerProtectionMocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionMocks.swift; sourceTree = "<group>"; };
 		C1DAF3B42B9A44860059244F /* AutofillPopoverPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillPopoverPresenter.swift; sourceTree = "<group>"; };
 		C1E961E72B879E4D001760E1 /* MockAutofillActionPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAutofillActionPresenter.swift; sourceTree = "<group>"; };
 		C1E961EC2B879ED9001760E1 /* MockAutofillActionExecutor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAutofillActionExecutor.swift; sourceTree = "<group>"; };
@@ -5620,7 +5617,6 @@
 			isa = PBXGroup;
 			children = (
 				C1D8BE432C1739BF0057E426 /* Tests */,
-				C1D8BE422C1739BA0057E426 /* Mocks */,
 			);
 			path = DBP;
 			sourceTree = "<group>";
@@ -9627,14 +9623,6 @@
 			path = Promotion;
 			sourceTree = "<group>";
 		};
-		C1D8BE422C1739BA0057E426 /* Mocks */ = {
-			isa = PBXGroup;
-			children = (
-				C1D8BE442C1739E70057E426 /* DataBrokerProtectionMocks.swift */,
-			);
-			path = Mocks;
-			sourceTree = "<group>";
-		};
 		C1D8BE432C1739BF0057E426 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
@@ -12313,7 +12301,6 @@
 				B60C6F8229B1B4AD007BFAA8 /* TestRunHelper.swift in Sources */,
 				567DA94029E8045D008AC5EE /* MockEmailStorage.swift in Sources */,
 				9FBB0C0A2CBD3B800006B6A6 /* ViewHighlighterTests.swift in Sources */,
-				C1D8BE462C1739EC0057E426 /* DataBrokerProtectionMocks.swift in Sources */,
 				317295D32AF058D3002C3206 /* MockWaitlistTermsAndConditionsActionHandler.swift in Sources */,
 				9F0FFFB52BCCAE37007C87DD /* BookmarkAllTabsDialogCoordinatorViewModelTests.swift in Sources */,
 				3706FE34293F661700E42796 /* PermissionStoreTests.swift in Sources */,
@@ -14038,7 +14025,6 @@
 				BDA7648D2BC4E4EF00D0400C /* DefaultVPNLocationFormatterTests.swift in Sources */,
 				85F487B5276A8F2E003CE668 /* OnboardingTests.swift in Sources */,
 				B626A7642992506A00053070 /* SerpHeadersNavigationResponderTests.swift in Sources */,
-				C1D8BE452C1739E70057E426 /* DataBrokerProtectionMocks.swift in Sources */,
 				5677A93D2C98414900DA7B0A /* ContextualOnboardingStateMachineTests.swift in Sources */,
 				AA652CCE25DD9071009059CC /* BookmarkListTests.swift in Sources */,
 				859E7D6D274548F2009C2B69 /* BookmarksExporterTests.swift in Sources */,
