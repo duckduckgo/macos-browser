@@ -29,7 +29,7 @@ let package = Package(
             targets: ["DataBrokerProtection"])
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", branch: "bunn/aichat-flags"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "212.1.0"),
         .package(path: "../SwiftUIExtensions"),
         .package(path: "../AppKitExtensions"),
         .package(path: "../XPCHelper"),
