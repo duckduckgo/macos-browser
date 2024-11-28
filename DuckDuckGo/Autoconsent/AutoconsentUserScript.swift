@@ -33,6 +33,10 @@ protocol UserScriptWithAutoconsent: UserScript {
 
 final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, UserScriptWithAutoconsent {
 
+    private struct Constants {
+        static let filterListCmpName = "filterList" // special CMP name used for reports from the cosmetic filterlist
+    }
+
     static let newSitePopupHiddenNotification = Notification.Name("newSitePopupHidden")
 
     var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
@@ -111,13 +115,13 @@ extension AutoconsentUserScript {
 
     struct PopupFoundMessage: Codable {
         let type: String
-        let cmp: String
+        let cmp: String // name of the Autoconsent rule that matched
         let url: String
     }
 
     struct OptOutResultMessage: Codable {
         let type: String
-        let cmp: String
+        let cmp: String // name of the Autoconsent rule that matched
         let result: Bool
         let scheduleSelfTest: Bool
         let url: String
@@ -125,7 +129,7 @@ extension AutoconsentUserScript {
 
     struct OptInResultMessage: Codable {
         let type: String
-        let cmp: String
+        let cmp: String // name of the Autoconsent rule that matched
         let result: Bool
         let scheduleSelfTest: Bool
         let url: String
@@ -133,14 +137,14 @@ extension AutoconsentUserScript {
 
     struct SelfTestResultMessage: Codable {
         let type: String
-        let cmp: String
+        let cmp: String // name of the Autoconsent rule that matched
         let result: Bool
         let url: String
     }
 
     struct AutoconsentDoneMessage: Codable {
         let type: String
-        let cmp: String
+        let cmp: String // name of the Autoconsent rule that matched
         let url: String
         let isCosmetic: Bool
     }
@@ -171,8 +175,7 @@ extension AutoconsentUserScript {
         case MessageName.eval:
             handleEval(message: message, replyHandler: replyHandler)
         case MessageName.popupFound:
-            Logger.autoconsent.debug("Autoconsent popup found")
-            replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
+            handlePopupFound(message: message, replyHandler: replyHandler)
         case MessageName.optOutResult:
             handleOptOutResult(message: message, replyHandler: replyHandler)
         case MessageName.optInResult:
@@ -187,19 +190,17 @@ extension AutoconsentUserScript {
         case MessageName.autoconsentDone:
             handleAutoconsentDone(message: message, replyHandler: replyHandler)
         case MessageName.autoconsentError:
-            Logger.autoconsent.debug("Autoconsent error: \(String(describing: message.body))")
+            Logger.autoconsent.error("Autoconsent error: \(String(describing: message.body))")
             replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
         }
     }
 
     @MainActor
     func handleInit(message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
-        guard let messageData: InitMessage = decodeMessageBody(from: message.body) else {
+        guard let messageData: InitMessage = decodeMessageBody(from: message.body),
+              let url = URL(string: messageData.url) else {
+            assertionFailure("Received a malformed message from autoconsent")
             replyHandler(nil, "cannot decode message")
-            return
-        }
-        guard let url = URL(string: messageData.url) else {
-            replyHandler(nil, "cannot decode init request")
             return
         }
 
@@ -256,6 +257,7 @@ extension AutoconsentUserScript {
     @MainActor
     func handleEval(message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
         guard let messageData: EvalMessage = decodeMessageBody(from: message.body) else {
+            assertionFailure("Received a malformed message from autoconsent")
             replyHandler(nil, "cannot decode message")
             return
         }
@@ -292,8 +294,38 @@ extension AutoconsentUserScript {
     }
 
     @MainActor
+    func handlePopupFound(message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
+        guard let messageData: PopupFoundMessage = decodeMessageBody(from: message.body),
+              let url = URL(string: messageData.url),
+              let host = url.host else {
+            assertionFailure("Received a malformed message from autoconsent")
+            replyHandler(nil, "cannot decode message")
+            return
+        }
+        Logger.autoconsent.debug("Cookie popup found: \(String(describing: messageData))")
+
+        // if popupFound is sent with "filterList", it indicates that cosmetic filterlist matched in the prehide stage,
+        // but a real opt-out may still follow. See https://github.com/duckduckgo/autoconsent/blob/main/api.md#messaging-api
+        if messageData.cmp == Constants.filterListCmpName {
+            refreshDashboardState(consentManaged: true, cosmetic: true, optoutFailed: false, selftestFailed: nil)
+            // trigger animation, but do not cache it because it can still be overridden
+            if !management.sitesNotifiedCache.contains(host) {
+                Logger.autoconsent.debug("Starting animation for cosmetic filters")
+                // post popover notification
+                NotificationCenter.default.post(name: Self.newSitePopupHiddenNotification, object: self, userInfo: [
+                    "topUrl": self.topUrl ?? url,
+                    "isCosmetic": true
+                ])
+            }
+        }
+
+        replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
+    }
+
+    @MainActor
     func handleOptOutResult(message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
         guard let messageData: OptOutResultMessage = decodeMessageBody(from: message.body) else {
+            assertionFailure("Received a malformed message from autoconsent")
             replyHandler(nil, "cannot decode message")
             return
         }
@@ -313,26 +345,24 @@ extension AutoconsentUserScript {
     @MainActor
     func handleAutoconsentDone(message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
         // report a managed popup
-        guard let messageData: AutoconsentDoneMessage = decodeMessageBody(from: message.body) else {
-            replyHandler(nil, "cannot decode message")
-            return
-        }
-        Logger.autoconsent.debug("opt-out successful: \(String(describing: messageData))")
-
-        guard let url = URL(string: messageData.url),
+        guard let messageData: AutoconsentDoneMessage = decodeMessageBody(from: message.body),
+              let url = URL(string: messageData.url),
               let host = url.host else {
+            assertionFailure("Received a malformed message from autoconsent")
             replyHandler(nil, "cannot decode message")
             return
         }
+
+        Logger.autoconsent.debug("opt-out successful: \(String(describing: messageData))")
 
         refreshDashboardState(consentManaged: true, cosmetic: messageData.isCosmetic, optoutFailed: false, selftestFailed: nil)
 
         // trigger popup once per domain
         if !management.sitesNotifiedCache.contains(host) {
-            Logger.autoconsent.debug("bragging that we closed a popup")
             management.sitesNotifiedCache.insert(host)
-            // post popover notification on main thread
-            DispatchQueue.main.async {
+            if messageData.cmp != Constants.filterListCmpName { // filterlist animation should have been triggered already (see handlePopupFound)
+                Logger.autoconsent.debug("Starting animation for the handled cookie popup")
+                // post popover notification
                 NotificationCenter.default.post(name: Self.newSitePopupHiddenNotification, object: self, userInfo: [
                     "topUrl": self.topUrl ?? url,
                     "isCosmetic": messageData.isCosmetic
@@ -359,7 +389,7 @@ extension AutoconsentUserScript {
                 }
             )
         } else {
-            Logger.autoconsent.debug("no self-test scheduled in this tab")
+            Logger.autoconsent.error("no self-test scheduled in this tab")
         }
         selfTestWebView = nil
         selfTestFrameInfo = nil
@@ -367,7 +397,9 @@ extension AutoconsentUserScript {
 
     @MainActor
     func handleSelfTestResult(message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
-        guard let messageData: SelfTestResultMessage = decodeMessageBody(from: message.body) else {
+        guard let messageData: SelfTestResultMessage = decodeMessageBody(from: message.body),
+              let url = URL(string: messageData.url) else {
+            assertionFailure("Received a malformed message from autoconsent")
             replyHandler(nil, "cannot decode message")
             return
         }
