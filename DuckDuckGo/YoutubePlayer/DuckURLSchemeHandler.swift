@@ -255,7 +255,10 @@ private extension DuckURLSchemeHandler {
               let token = requestURL.getParameter(named: "token"),
               URLTokenValidator.shared.validateToken(token, for: url) else {
 
-            urlSchemeTask.didFailWithError(URLError(.badURL, userInfo: [NSURLErrorFailingURLErrorKey: requestURL]))
+            urlSchemeTask.didFailWithError(URLError(.badURL, userInfo: [
+                NSURLErrorFailingURLErrorKey: requestURL,
+                NSLocalizedDescriptionKey: Bundle(for: URLSession.self).localizedString(forKey: "Err-1000", value: "bad URL", table: "Localizable")
+            ]))
             return
         }
 

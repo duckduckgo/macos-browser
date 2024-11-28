@@ -56,7 +56,7 @@ jobs:
       run: screenresolution set 1920x1080x32@60
 
     - name: Register SSH key for certificates repository access
-      uses: webfactory/ssh-agent@v0.7.0
+      uses: webfactory/ssh-agent@v0.9.0
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
 
