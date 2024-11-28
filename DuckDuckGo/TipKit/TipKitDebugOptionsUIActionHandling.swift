@@ -40,7 +40,7 @@ struct TipKitDebugOptionsUIActionHandler: TipKitDebugOptionsUIActionHandling {
         if #available(macOS 14.0, *) {
             controller.resetTipKitOnNextAppLaunch()
         } else {
-            logger.log("TipKit initialization skipped: iOS 17.0 or later is required.")
+            logger.log("TipKit initialization skipped: macOS 14.0 or later is required.")
         }
     }
 }

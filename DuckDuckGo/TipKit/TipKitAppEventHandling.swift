@@ -52,7 +52,7 @@ struct TipKitAppEventHandler: TipKitAppEventHandling {
                 .datastoreLocation(.applicationDefault)
             ])
         } else {
-            logger.log("TipKit initialization skipped: iOS 17.0 or later is required.")
+            logger.log("TipKit initialization skipped: macOS 14.0 or later is required.")
         }
     }
 }
