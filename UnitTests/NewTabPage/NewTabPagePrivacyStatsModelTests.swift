@@ -35,7 +35,7 @@ final class CapturingPrivacyStats: PrivacyStatsCollecting {
         recordBlockedTrackerCalls.append(name)
     }
 
-    func fetchPrivacyStats() async -> [String : Int64] {
+    func fetchPrivacyStats() async -> [String: Int64] {
         fetchPrivacyStatsCallCount += 1
         return privacyStats
     }
@@ -156,4 +156,3 @@ final class NewTabPagePrivacyStatsModelTests: XCTestCase {
         XCTAssertTrue(settingsPersistor.isViewExpanded)
     }
 }
-
