@@ -35,21 +35,32 @@ class MockMaliciousSiteDataProvider: MaliciousSiteProtection.EmbeddedDataProvidi
         embeddedRevision
     }
 
-    public func url(for detectionKind: MaliciousSiteProtection.DataManager.StoredDataType) -> URL {
-        URL.empty
+    func url(for dataType: MaliciousSiteProtection.DataManager.StoredDataType) -> URL {
+        switch dataType {
+        case .filterSet:
+            return URL(string: "filterSet")!
+        case .hashPrefixSet:
+            return URL(string: "hashPrefixSet")!
+        }
     }
 
-    public func hash(for detectionKind: MaliciousSiteProtection.DataManager.StoredDataType) -> String {
-        ""
+    func hash(for dataType: MaliciousSiteProtection.DataManager.StoredDataType) -> String {
+        let url = url(for: dataType)
+        let data = try! data(withContentsOf: url)
+        let sha = data.sha256
+        return sha
     }
 
     func data(withContentsOf url: URL) throws -> Data {
-        if url.lastPathComponent.lowercased().contains("filter") {
+        switch url.absoluteString {
+        case "filterSet":
             self.didLoadFilterSet = true
-            return try JSONEncoder().encode(embeddedFilterSet)
-        } else {
+            return "[]".utf8data
+        case "hashPrefixSet":
             self.didLoadHashPrefixes = true
-            return try JSONEncoder().encode(embeddedHashPrefixes)
+            return "[]".utf8data
+        default:
+            fatalError("Unexpected url \(url.absoluteString)")
         }
     }
 }
@@ -68,21 +79,6 @@ class MockMaliciousSiteFileStore: MaliciousSiteProtection.FileStoring {
     func read(from filename: String) -> Data? {
         didReadFromDisk = true
         return storage[filename]
-    }
-}
-
-final class MockPhishingDataActivitites: PhishingDetectionDataActivityHandling {
-    var started: Bool = false
-    var stopped: Bool = true
-
-    func start() {
-        started = true
-        stopped = false
-    }
-
-    func stop() {
-        stopped = true
-        started = false
     }
 }
 

@@ -35,6 +35,13 @@ extension MaliciousSiteProtectionManager {
         }
     }
 
+    static func updateInterval(for dataKind: MaliciousSiteProtection.DataManager.StoredDataType) -> TimeInterval? {
+        switch dataKind {
+        case .hashPrefixSet: .minutes(20)
+        case .filterSet: .hours(12)
+        }
+    }
+
     struct EmbeddedDataProvider: MaliciousSiteProtection.EmbeddedDataProviding {
 
         private enum Constants {
@@ -71,20 +78,20 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
 
     private let detector: MaliciousSiteDetecting
     private let updateManager: MaliciousSiteProtection.UpdateManager
-    private let dataActivities: PhishingDetectionDataActivityHandling
     private let detectionPreferences: MaliciousSiteProtectionPreferences
     private let featureFlagger: FeatureFlagger
     private let configManager: PrivacyConfigurationManaging
 
     private var featureFlagsCancellable: AnyCancellable?
     private var detectionPreferencesEnabledCancellable: AnyCancellable?
+    private var updateTask: Task<Void, Error>?
+    var backgroundUpdatesEnabled: Bool { updateTask != nil }
 
     init(
         apiEnvironment: MaliciousSiteDetector.APIEnvironment = .production,
         embeddedDataProvider: MaliciousSiteProtection.EmbeddedDataProviding? = nil,
         dataManager: MaliciousSiteProtection.DataManager? = nil,
         detector: MaliciousSiteProtection.MaliciousSiteDetecting? = nil,
-        dataActivities: PhishingDetectionDataActivityHandling? = nil,
         detectionPreferences: MaliciousSiteProtectionPreferences = MaliciousSiteProtectionPreferences.shared,
         featureFlagger: FeatureFlagger? = nil,
         configManager: PrivacyConfigurationManaging? = nil
@@ -100,9 +107,8 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
         }()
 
         self.detector = detector ?? MaliciousSiteDetector(apiEnvironment: apiEnvironment, dataManager: dataManager, eventMapping: Self.debugEvents)
-        self.updateManager = MaliciousSiteProtection.UpdateManager(apiEnvironment: apiEnvironment, dataManager: dataManager)
+        self.updateManager = MaliciousSiteProtection.UpdateManager(apiEnvironment: apiEnvironment, dataManager: dataManager, updateIntervalProvider: Self.updateInterval)
         self.detectionPreferences = detectionPreferences
-        self.dataActivities = dataActivities ?? PhishingDetectionDataActivities(updateManager: self.updateManager)
 
         self.setupBindings()
     }
@@ -147,11 +153,12 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
     }
 
     private func startUpdateTasks() {
-        dataActivities.start()
+        self.updateTask = updateManager.startPeriodicUpdates()
     }
 
     private func stopUpdateTasks() {
-        dataActivities.stop()
+        updateTask?.cancel()
+        updateTask = nil
     }
 
     // MARK: - Public

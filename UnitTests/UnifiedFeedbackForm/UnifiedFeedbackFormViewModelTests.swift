@@ -268,3 +268,9 @@ private class MockVPNFeedbackFormViewModelDelegate: UnifiedFeedbackFormViewModel
     }
 
 }
+
+extension MockAPIService {
+    convenience init(apiResponse: Result<APIResponseV2, Error>) {
+        self.init { _ in apiResponse }
+    }
+}
