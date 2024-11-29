@@ -22,6 +22,7 @@ import Common
 import FeatureFlags
 import Foundation
 import MaliciousSiteProtection
+import Networking
 import PixelKit
 
 extension MaliciousSiteProtectionManager {
@@ -93,6 +94,7 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
 
     init(
         apiEnvironment: MaliciousSiteDetector.APIEnvironment = .production,
+        apiService: APIService = DefaultAPIService(urlSession: .shared),
         embeddedDataProvider: MaliciousSiteProtection.EmbeddedDataProviding? = nil,
         dataManager: MaliciousSiteProtection.DataManager? = nil,
         detector: MaliciousSiteProtection.MaliciousSiteDetecting? = nil,
@@ -111,8 +113,8 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
             return MaliciousSiteProtection.DataManager(fileStore: fileStore, embeddedDataProvider: embeddedDataProvider, fileNameProvider: Self.fileName(for:))
         }()
 
-        self.detector = detector ?? MaliciousSiteDetector(apiEnvironment: apiEnvironment, dataManager: dataManager, eventMapping: Self.debugEvents)
-        self.updateManager = MaliciousSiteProtection.UpdateManager(apiEnvironment: apiEnvironment, dataManager: dataManager, updateIntervalProvider: updateIntervalProvider ?? Self.updateInterval)
+        self.detector = detector ?? MaliciousSiteDetector(apiEnvironment: apiEnvironment, service: apiService, dataManager: dataManager, eventMapping: Self.debugEvents)
+        self.updateManager = MaliciousSiteProtection.UpdateManager(apiEnvironment: apiEnvironment, service: apiService, dataManager: dataManager, updateIntervalProvider: updateIntervalProvider ?? Self.updateInterval)
         self.detectionPreferences = detectionPreferences
 
         self.setupBindings()
