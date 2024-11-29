@@ -44,9 +44,14 @@ final class CapturingPrivacyStats: PrivacyStatsCollecting {
         clearPrivacyStatsCallCount += 1
     }
 
+    func handleAppTermination() async {
+        handleAppTerminationCallCount += 1
+    }
+
     var recordBlockedTrackerCalls: [String] = []
     var clearPrivacyStatsCallCount: Int = 0
     var fetchPrivacyStatsCallCount: Int = 0
+    var handleAppTerminationCallCount: Int = 0
     var privacyStats: [String: Int64] = [:]
 }
 
