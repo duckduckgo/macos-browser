@@ -274,7 +274,9 @@ private class MockVPNFeedbackFormViewModelDelegate: UnifiedFeedbackFormViewModel
 extension SubscriptionManagerMock {
 
     convenience init() {
-        self.init(accountManager: AccountManagerMock(),
+        let accountManager = AccountManagerMock()
+        accountManager.accessToken = "token"
+        self.init(accountManager: accountManager,
                   subscriptionEndpointService: SubscriptionEndpointServiceMock(),
                   authEndpointService: AuthEndpointServiceMock(),
                   storePurchaseManager: StorePurchaseManagerMock(),
