@@ -63,7 +63,7 @@ performUpdate() {
     if [ "$new_sha" == "$old_sha" ]; then
         printf "\n"
     else
-        printf "✅ %sEmbedded%sDataSHA updated\n\n" "${threat_type}" "${capitalized_data_type}"
+        printf "✅ %s updated\n\n" "${threat_type}Embedded${capitalized_data_type}DataSHA"
     fi
 	rm -f "$temp_filename"
 }

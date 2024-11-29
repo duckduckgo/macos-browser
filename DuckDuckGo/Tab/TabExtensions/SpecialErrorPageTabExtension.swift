@@ -91,7 +91,7 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
         // There may be cases where this is a bad idea, for example a malicious site that redirects to a socialnetwork.com -
         // but if a flagged site sends you somewhere, you should still be cautious of that site so we want it to remain flagged.
         // swiftlint:disable:next todo
-        if let threatKind = state.bypassedMaliciousSiteThreatKind, navigationAction.navigationType == .other { // TODO: Validate this .other handler works for actual .redirect-s
+        if let threatKind = state.bypassedMaliciousSiteThreatKind, navigationAction.navigationType == .other {
             exemptions[url] = threatKind
         }
         state.bypassedMaliciousSiteThreatKind = exemptions[url]
