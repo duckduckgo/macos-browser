@@ -6026,7 +6026,7 @@
             ],
             "hash": "6792064606a5a72c5cd44addb4d40bda"
         },
-        "maliciousSiteProtection": {
+        "phishingDetection": {
             "state": "internal",
             "exceptions": [
                 {

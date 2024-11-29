@@ -190,15 +190,14 @@ private extension DuckURLSchemeHandler {
         var fileName = "index"
         var fileExtension = "html"
         var directoryURL: URL
-        switch url.type {
-        case .onboarding:
+        if url.isOnboarding {
             directoryURL = URL(fileURLWithPath: "/pages/onboarding")
-        case .releaseNotes:
+        } else if url.isReleaseNotes {
             directoryURL = URL(fileURLWithPath: "/pages/release-notes")
-        case .newTab:
+        } else if url.isNewTabPage {
             directoryURL = URL(fileURLWithPath: "/pages/new-tab")
-        default:
-            assertionFailure("Unsupported URL")
+        } else {
+            assertionFailure("Unknown scheme")
             return nil
         }
         directoryURL.appendPathComponent(url.path)
@@ -269,7 +268,7 @@ private extension DuckURLSchemeHandler {
     }
 }
 
-extension URL {
+private extension URL {
     enum URLType {
         case newTab
         case favicon
@@ -299,6 +298,18 @@ extension URL {
         default:
             return nil
         }
+    }
+
+    var isOnboarding: Bool {
+        return isDuckURLScheme && host == "onboarding"
+    }
+
+    var isNewTabPage: Bool {
+        return isDuckURLScheme && host == "newtab"
+    }
+
+    var isReleaseNotes: Bool {
+        return isDuckURLScheme && host == "release-notes"
     }
 
     var isFavicon: Bool {
