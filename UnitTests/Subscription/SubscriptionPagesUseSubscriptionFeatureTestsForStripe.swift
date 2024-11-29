@@ -56,7 +56,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTestsForStripe: XCTestCase {
                                                    price: "99",
                                                    currency: "USD")]
 
-        static let subscriptionOptions = SubscriptionOptions(platform: SubscriptionPlatformName.stripe.rawValue,
+        static let subscriptionOptions = SubscriptionOptions(platform: SubscriptionPlatformName.stripe,
                                                              options: [
                                                                 SubscriptionOption(id: "1",
                                                                                    cost: SubscriptionOptionCost(displayPrice: "$9.00", recurrence: "monthly")),
@@ -64,9 +64,9 @@ final class SubscriptionPagesUseSubscriptionFeatureTestsForStripe: XCTestCase {
                                                                                    cost: SubscriptionOptionCost(displayPrice: "$99.00", recurrence: "yearly"))
                                                              ],
                                                              features: [
-                                                                SubscriptionFeature(name: "vpn"),
-                                                                SubscriptionFeature(name: "personal-information-removal"),
-                                                                SubscriptionFeature(name: "identity-theft-restoration")
+                                                                SubscriptionFeature(name: .networkProtection),
+                                                                SubscriptionFeature(name: .dataBrokerProtection),
+                                                                SubscriptionFeature(name: .identityTheftRestoration)
                                                              ])
 
         static let validateTokenResponse = ValidateTokenResponse(account: ValidateTokenResponse.Account(email: Constants.email,
@@ -93,6 +93,9 @@ final class SubscriptionPagesUseSubscriptionFeatureTestsForStripe: XCTestCase {
 
     var storePurchaseManager: StorePurchaseManagerMock!
     var subscriptionEnvironment: SubscriptionEnvironment!
+
+    var subscriptionFeatureMappingCache: SubscriptionFeatureMappingCacheMock!
+    var subscriptionFeatureFlagger: FeatureFlaggerMapping<SubscriptionFeatureFlags>!
 
     var appStorePurchaseFlow: AppStorePurchaseFlow!
     var appStoreRestoreFlow: AppStoreRestoreFlow!
@@ -141,6 +144,9 @@ final class SubscriptionPagesUseSubscriptionFeatureTestsForStripe: XCTestCase {
                                                              key: UserDefaultsCacheKey.subscriptionEntitlements,
                                                              settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(20)))
 
+        subscriptionFeatureMappingCache = SubscriptionFeatureMappingCacheMock()
+        subscriptionFeatureFlagger = FeatureFlaggerMapping<SubscriptionFeatureFlags>(mapping: { $0.defaultState })
+
         // Real AccountManager
         accountManager = DefaultAccountManager(storage: accountStorage,
                                                accessTokenStorage: accessTokenStorage,
@@ -177,7 +183,9 @@ final class SubscriptionPagesUseSubscriptionFeatureTestsForStripe: XCTestCase {
                                                          accountManager: accountManager,
                                                          subscriptionEndpointService: subscriptionService,
                                                          authEndpointService: authService,
-                                                         subscriptionEnvironment: subscriptionEnvironment)
+                                                         subscriptionFeatureMappingCache: subscriptionFeatureMappingCache,
+                                                         subscriptionEnvironment: subscriptionEnvironment,
+                                                         subscriptionFeatureFlagger: subscriptionFeatureFlagger)
 
         mockFreemiumDBPExperimentManager = MockFreemiumDBPExperimentManager()
 
