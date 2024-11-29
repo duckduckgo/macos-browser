@@ -205,7 +205,7 @@ private class DummyFeatureFlagger: FeatureFlagger {
         return nil
     }
 
-    func getCohortIfEnabled<Flag>(for featureFlag: Flag) -> (any CohortEnum)? where Flag: FeatureFlagExperimentDescribing {
+    func getCohortIfEnabled<Flag>(for featureFlag: Flag) -> (any FlagCohort)? where Flag: FeatureFlagExperimentDescribing {
         return nil
     }
 
