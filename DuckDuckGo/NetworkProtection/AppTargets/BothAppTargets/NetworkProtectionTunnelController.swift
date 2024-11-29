@@ -665,16 +665,23 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     ///
     @MainActor
     func stop() async {
+        await stop(disableOnDemand: true)
+    }
+
+    @MainActor
+    func stop(disableOnDemand: Bool) async {
         guard let manager = await manager else {
             return
         }
 
-        await stop(tunnelManager: manager)
+        await stop(tunnelManager: manager, disableOnDemand: disableOnDemand)
     }
 
     @MainActor
-    private func stop(tunnelManager: NETunnelProviderManager) async {
-        try? await self.disableOnDemand(tunnelManager: tunnelManager)
+    private func stop(tunnelManager: NETunnelProviderManager, disableOnDemand: Bool) async {
+        if disableOnDemand {
+            try? await self.disableOnDemand(tunnelManager: tunnelManager)
+        }
 
         switch tunnelManager.connection.status {
         case .connected, .connecting, .reasserting:
@@ -692,15 +699,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     ///
     @MainActor
     func restart() async {
-        guard let manager = await manager else {
-            return
-        }
-
-        await stop(tunnelManager: manager)
-        await start()
-
-        // When restarting the tunnel we enable on-demand optimistically
-        try? await enableOnDemand(tunnelManager: manager)
+        await stop(disableOnDemand: false)
     }
 
     // MARK: - On Demand & Kill Switch
