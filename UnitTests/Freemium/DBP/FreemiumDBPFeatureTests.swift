@@ -44,6 +44,7 @@ final class FreemiumDBPFeatureTests: XCTestCase {
         let mockSubscriptionService = SubscriptionEndpointServiceMock()
         let mockAuthService = AuthEndpointServiceMock()
         let mockStorePurchaseManager = StorePurchaseManagerMock()
+        let mockSubscriptionFeatureMappingCache = SubscriptionFeatureMappingCacheMock()
 
         let currentEnvironment = SubscriptionEnvironment(serviceEnvironment: .production,
                                                          purchasePlatform: .appStore)
@@ -53,7 +54,8 @@ final class FreemiumDBPFeatureTests: XCTestCase {
                                                           authEndpointService: mockAuthService,
                                                           storePurchaseManager: mockStorePurchaseManager,
                                                           currentEnvironment: currentEnvironment,
-                                                          canPurchase: false)
+                                                          canPurchase: false,
+                                                          subscriptionFeatureMappingCache: mockSubscriptionFeatureMappingCache)
 
         mockFreemiumDBPUserStateManagerManager = MockFreemiumDBPUserStateManager()
         mockFeatureDisabler = MockFeatureDisabler()

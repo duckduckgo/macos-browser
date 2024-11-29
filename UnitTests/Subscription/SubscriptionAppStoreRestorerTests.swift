@@ -45,6 +45,7 @@ final class SubscriptionAppStoreRestorerTests: XCTestCase {
     var subscriptionService: SubscriptionEndpointServiceMock!
     var authService: AuthEndpointServiceMock!
     var storePurchaseManager: StorePurchaseManagerMock!
+    var subscriptionFeatureMappingCache: SubscriptionFeatureMappingCacheMock!
     var subscriptionEnvironment: SubscriptionEnvironment!
 
     var subscriptionManager: SubscriptionManagerMock!
@@ -75,6 +76,8 @@ final class SubscriptionAppStoreRestorerTests: XCTestCase {
         subscriptionService = SubscriptionEndpointServiceMock()
         authService = AuthEndpointServiceMock()
         storePurchaseManager = StorePurchaseManagerMock()
+        subscriptionFeatureMappingCache = SubscriptionFeatureMappingCacheMock()
+
         subscriptionEnvironment = SubscriptionEnvironment(serviceEnvironment: .production,
                                                            purchasePlatform: .appStore)
 
@@ -83,7 +86,8 @@ final class SubscriptionAppStoreRestorerTests: XCTestCase {
                                                       authEndpointService: authService,
                                                       storePurchaseManager: storePurchaseManager,
                                                       currentEnvironment: subscriptionEnvironment,
-                                                      canPurchase: true)
+                                                      canPurchase: true,
+                                                      subscriptionFeatureMappingCache: subscriptionFeatureMappingCache)
         appStoreRestoreFlow = AppStoreRestoreFlowMock()
 
         subscriptionAppStoreRestorer = DefaultSubscriptionAppStoreRestorer(subscriptionManager: subscriptionManager,

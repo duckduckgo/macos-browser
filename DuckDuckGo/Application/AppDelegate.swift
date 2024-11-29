@@ -282,13 +282,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 keyValueStore: UserDefaults.appConfiguration,
                 actionHandler: FeatureFlagOverridesPublishingHandler<FeatureFlag>()
             ),
+            experimentManager: ExperimentCohortsManager(store: ExperimentsDataStore()),
             for: FeatureFlag.self
         )
 
         onboardingStateMachine = ContextualOnboardingStateMachine()
 
         // Configure Subscription
-        subscriptionManager = DefaultSubscriptionManager()
+        subscriptionManager = DefaultSubscriptionManager(featureFlagger: featureFlagger)
         subscriptionUIHandler = SubscriptionUIHandler(windowControllersManagerProvider: {
             return WindowControllersManager.shared
         })
@@ -325,8 +326,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if NSApplication.runType.requiresEnvironment {
             privacyStats = PrivacyStats(databaseProvider: PrivacyStatsDatabase())
         } else {
-            // As long as privacyStats is only used by NewTabPageActionsManager,
-            // it's safe to not initialize the client for unit tests to avoid side effects.
             privacyStats = MockPrivacyStats()
         }
 #else

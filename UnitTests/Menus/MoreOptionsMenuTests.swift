@@ -67,7 +67,8 @@ final class MoreOptionsMenuTests: XCTestCase {
                                                       storePurchaseManager: storePurchaseManager,
                                                       currentEnvironment: SubscriptionEnvironment(serviceEnvironment: .production,
                                                                                                   purchasePlatform: .appStore),
-                                                      canPurchase: false)
+                                                      canPurchase: false,
+                                                      subscriptionFeatureMappingCache: SubscriptionFeatureMappingCacheMock())
 
         mockFreemiumDBPFeature = MockFreemiumDBPFeature()
 
