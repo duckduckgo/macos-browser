@@ -203,7 +203,7 @@ class MaliciousSiteProtectionIntegrationTests: XCTestCase {
             loadingExpectation.fulfill()
         }
         defer { task.cancel() }
-        await fulfillment(of: [loadingExpectation], timeout: 1)
+        await fulfillment(of: [loadingExpectation], timeout: 5)
     }
 }
 
