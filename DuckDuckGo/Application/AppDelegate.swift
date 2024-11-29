@@ -285,7 +285,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         onboardingStateMachine = ContextualOnboardingStateMachine()
 
         // Configure Subscription
-        subscriptionManager = DefaultSubscriptionManager()
+        subscriptionManager = DefaultSubscriptionManager(featureFlagger: featureFlagger)
         subscriptionUIHandler = SubscriptionUIHandler(windowControllersManagerProvider: {
             return WindowControllersManager.shared
         })

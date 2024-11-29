@@ -20,6 +20,7 @@ import Foundation
 import Combine
 import SwiftUI
 import PixelKit
+import Subscription
 
 protocol UnifiedFeedbackFormViewModelDelegate: AnyObject {
     func feedbackViewModelDismissedView(_ viewModel: UnifiedFeedbackFormViewModel)
@@ -118,17 +119,33 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
     private let feedbackSender: any UnifiedFeedbackSender
 
     let source: UnifiedFeedbackSource
+    private(set) var availableCategories: [UnifiedFeedbackCategory] = [.selectFeature, .subscription]
 
     init(vpnMetadataCollector: any UnifiedMetadataCollector,
          defaultMetadataCollector: any UnifiedMetadataCollector = EmptyMetadataCollector(),
          feedbackSender: any UnifiedFeedbackSender = DefaultFeedbackSender(),
-         source: UnifiedFeedbackSource = .default) {
+         source: UnifiedFeedbackSource = .default,
+         subscriptionManager: any SubscriptionManager) {
         self.viewState = .feedbackPending
 
         self.vpnMetadataCollector = vpnMetadataCollector
         self.defaultMetadataCollector = defaultMetadataCollector
         self.feedbackSender = feedbackSender
         self.source = source
+
+        Task {
+            let features = await subscriptionManager.currentSubscriptionFeatures()
+
+            if features.contains(.networkProtection) {
+                availableCategories.append(.vpn)
+            }
+            if features.contains(.dataBrokerProtection) {
+                availableCategories.append(.pir)
+            }
+            if features.contains(.identityTheftRestoration) || features.contains(.identityTheftRestorationGlobal) {
+                availableCategories.append(.itr)
+            }
+        }
     }
 
     @MainActor
