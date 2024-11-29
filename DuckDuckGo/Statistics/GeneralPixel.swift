@@ -314,6 +314,10 @@ enum GeneralPixel: PixelKitEventV2 {
     case contentBlockingCompilationFailed(listType: CompileRulesListType, component: ContentBlockerDebugEvents.Component)
 
     case contentBlockingCompilationTime
+    case contentBlockingLookupRulesSucceeded
+    case contentBlockingFetchLRCSucceeded
+    case contentBlockingNoMatchInLRC
+    case contentBlockingLRCMissing
 
     case secureVaultInitError(error: Error)
     case secureVaultError(error: Error)
@@ -929,6 +933,15 @@ enum GeneralPixel: PixelKitEventV2 {
 
         case .contentBlockingCompilationTime:
             return "content_blocking_compilation_time"
+
+        case .contentBlockingLookupRulesSucceeded:
+            return "content_blocking_lookup_rules_succeeded"
+        case .contentBlockingFetchLRCSucceeded:
+            return "content_blocking_fetch_lrc_succeeded"
+        case .contentBlockingNoMatchInLRC:
+            return "content_blocking_no_match_in_lrc"
+        case .contentBlockingLRCMissing:
+            return "content_blocking_lrc_missing"
 
         case .secureVaultInitError:
             return "secure_vault_init_error"

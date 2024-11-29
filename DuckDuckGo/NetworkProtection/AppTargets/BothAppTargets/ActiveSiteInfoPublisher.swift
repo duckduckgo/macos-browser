@@ -1,5 +1,5 @@
 //
-//  SiteTroubleshootingInfoPublisher.swift
+//  ActiveSiteInfoPublisher.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -22,15 +22,15 @@ import NetworkProtectionProxy
 import NetworkProtectionUI
 
 @MainActor
-final class SiteTroubleshootingInfoPublisher {
+final class ActiveSiteInfoPublisher {
 
     private var activeDomain: String? {
         didSet {
-            refreshSiteTroubleshootingInfo()
+            refreshActiveSiteInfo()
         }
     }
 
-    private let subject: CurrentValueSubject<SiteTroubleshootingInfo?, Never>
+    private let subject: CurrentValueSubject<ActiveSiteInfo?, Never>
 
     private let activeDomainPublisher: AnyPublisher<String?, Never>
     private let proxySettings: TransparentProxySettings
@@ -39,7 +39,7 @@ final class SiteTroubleshootingInfoPublisher {
     init(activeDomainPublisher: AnyPublisher<String?, Never>,
          proxySettings: TransparentProxySettings) {
 
-        subject = CurrentValueSubject<SiteTroubleshootingInfo?, Never>(nil)
+        subject = CurrentValueSubject<ActiveSiteInfo?, Never>(nil)
         self.activeDomainPublisher = activeDomainPublisher
         self.proxySettings = proxySettings
 
@@ -59,7 +59,7 @@ final class SiteTroubleshootingInfoPublisher {
 
             switch change {
             case .excludedDomains:
-                refreshSiteTroubleshootingInfo()
+                refreshActiveSiteInfo()
             default:
                 break
             }
@@ -68,15 +68,15 @@ final class SiteTroubleshootingInfoPublisher {
 
     // MARK: - Refreshing
 
-    func refreshSiteTroubleshootingInfo() {
-        if activeSiteTroubleshootingInfo != subject.value {
-            subject.send(activeSiteTroubleshootingInfo)
+    func refreshActiveSiteInfo() {
+        if activeActiveSiteInfo != subject.value {
+            subject.send(activeActiveSiteInfo)
         }
     }
 
     // MARK: - Active Site Troubleshooting Info
 
-    var activeSiteTroubleshootingInfo: SiteTroubleshootingInfo? {
+    var activeActiveSiteInfo: ActiveSiteInfo? {
         guard let activeDomain else {
             return nil
         }
@@ -84,13 +84,13 @@ final class SiteTroubleshootingInfoPublisher {
         return site(forDomain: activeDomain.droppingWwwPrefix())
     }
 
-    private func site(forDomain domain: String) -> SiteTroubleshootingInfo? {
+    private func site(forDomain domain: String) -> ActiveSiteInfo? {
         let icon: NSImage?
-        let currentSite: NetworkProtectionUI.SiteTroubleshootingInfo?
+        let currentSite: NetworkProtectionUI.ActiveSiteInfo?
 
         icon = FaviconManager.shared.getCachedFavicon(forDomainOrAnySubdomain: domain, sizeCategory: .small)?.image
         let proxySettings = TransparentProxySettings(defaults: .netP)
-        currentSite = NetworkProtectionUI.SiteTroubleshootingInfo(
+        currentSite = NetworkProtectionUI.ActiveSiteInfo(
             icon: icon,
             domain: domain,
             excluded: proxySettings.isExcluding(domain: domain))
@@ -99,12 +99,12 @@ final class SiteTroubleshootingInfoPublisher {
     }
 }
 
-extension SiteTroubleshootingInfoPublisher: Publisher {
-    typealias Output = SiteTroubleshootingInfo?
+extension ActiveSiteInfoPublisher: Publisher {
+    typealias Output = ActiveSiteInfo?
     typealias Failure = Never
 
     nonisolated
-    func receive<S>(subscriber: S) where S: Subscriber, Never == S.Failure, NetworkProtectionUI.SiteTroubleshootingInfo? == S.Input {
+    func receive<S>(subscriber: S) where S: Subscriber, Never == S.Failure, NetworkProtectionUI.ActiveSiteInfo? == S.Input {
 
         subject.receive(subscriber: subscriber)
     }

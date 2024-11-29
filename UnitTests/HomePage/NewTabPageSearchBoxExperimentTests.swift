@@ -162,12 +162,12 @@ final class NewTabPageSearchBoxExperimentTests: XCTestCase {
         XCTAssertFalse(experiment.isActive)
     }
 
-    func testWhenExperimentIsInactiveThenCohortIsNil() {
+    func testWhenExperimentIsInactiveThenCohortStays() {
         dataStore.didRunEnrollment = true
         dataStore.experimentCohort = .experiment
         dataStore.enrollmentDate = Date.daysAgo(NewTabPageSearchBoxExperiment.Const.experimentDurationInDays)
 
-        XCTAssertNil(experiment.cohort)
+        XCTAssertEqual(experiment.cohort, .experiment)
     }
 
     func testWhenExperimentIsInactiveThenOnboardingExperimentCohortIsNil() {
