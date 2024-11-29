@@ -62,9 +62,9 @@ extension FeatureFlag: FeatureFlagDescribing {
     public var source: FeatureFlagSource {
         switch self {
         case .debugMenu:
-            return .internalOnly
+            return .internalOnly()
         case .appendAtbToSerpQueries:
-            return .internalOnly
+            return .internalOnly()
         case .sslCertificatesBypass:
             return .remoteReleasable(.subfeature(SslCertificatesSubfeature.allowBypass))
         case .unknownUsernameCategorization:
