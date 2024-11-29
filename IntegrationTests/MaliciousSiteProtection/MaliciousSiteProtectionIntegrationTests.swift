@@ -30,6 +30,11 @@ class MaliciousSiteProtectionIntegrationTests: XCTestCase {
     var window: NSWindow!
     var cancellables: Set<AnyCancellable>!
     var detector: MaliciousSiteDetecting!
+    var contentBlockingMock: ContentBlockingMock!
+    var privacyFeaturesMock: AnyPrivacyFeatures!
+    var privacyConfiguration: MockPrivacyConfiguration {
+        contentBlockingMock.privacyConfigurationManager.privacyConfig as! MockPrivacyConfiguration
+    }
     var tab: Tab!
     var tabViewModel: TabViewModel!
     var schemeHandler: TestSchemeHandler!
@@ -54,7 +59,14 @@ class MaliciousSiteProtectionIntegrationTests: XCTestCase {
         webViewConfiguration.setURLSchemeHandler(schemeHandler, forURLScheme: URL.NavigationalScheme.http.rawValue)
         webViewConfiguration.setURLSchemeHandler(schemeHandler, forURLScheme: URL.NavigationalScheme.https.rawValue)
 
-        tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, maliciousSiteDetector: detector)
+        contentBlockingMock = ContentBlockingMock()
+        privacyFeaturesMock = AppPrivacyFeatures(contentBlocking: contentBlockingMock, httpsUpgradeStore: HTTPSUpgradeStoreMock())
+        // disable waiting for CBR compilation on navigation
+        privacyConfiguration.isFeatureKeyEnabled = { feature, _ in
+            if case .maliciousSiteProtection = feature { true } else { false }
+        }
+
+        tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock, maliciousSiteDetector: detector)
         tabViewModel = TabViewModel(tab: tab)
         window = WindowsManager.openNewWindow(with: tab)!
         cancellables = Set<AnyCancellable>()
