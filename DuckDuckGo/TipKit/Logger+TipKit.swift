@@ -1,5 +1,5 @@
 //
-//  SiteTroubleshootingInfo.swift
+//  Logger+TipKit.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -16,21 +16,12 @@
 //  limitations under the License.
 //
 
-import AppKit
 import Foundation
+import os.log
 
-public struct SiteTroubleshootingInfo {
-    public let icon: NSImage?
-    public let domain: String
-    public let excluded: Bool
+extension Logger {
 
-    public init(icon: NSImage?, domain: String, excluded: Bool) {
-        self.icon = icon
-        self.domain = domain
-        self.excluded = excluded
-    }
-}
-
-extension SiteTroubleshootingInfo: Equatable {
-
+    static var tipKit: Logger = {
+        Logger(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "TipKit")
+    }()
 }

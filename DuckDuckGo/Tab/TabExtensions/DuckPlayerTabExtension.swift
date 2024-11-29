@@ -246,7 +246,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
         }
 
         // Fire DuckPlayer temporary pixels on navigating outside Youtube
-        if let url = navigationAction.request.url, !url.isYoutube {
+        if let url = navigationAction.request.url, !url.isYoutube, navigationAction.isForMainFrame {
             duckPlayerOverlayUsagePixels.handleNavigationAndFirePixels(url: url, duckPlayerMode: duckPlayer.mode)
         }
 

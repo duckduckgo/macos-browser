@@ -28,14 +28,14 @@ extension LottieView where Placeholder: View {
         let loopEndFrame: AnimationFrameTime
     }
 
-    public func playing(withIntro timing: LoopWithIntroTiming, isAnimating: Binding<Bool> = .constant(true)) -> Lottie.LottieView<Placeholder> {
+    public func playing(withIntro timing: LoopWithIntroTiming, isAnimating: Bool = true) -> Lottie.LottieView<Placeholder> {
         configure { uiView in
-            if uiView.isAnimationPlaying, !isAnimating.wrappedValue {
+            if uiView.isAnimationPlaying, !isAnimating {
                 uiView.stop()
                 return
             }
 
-            guard isAnimating.wrappedValue, !uiView.isAnimationPlaying else { return }
+            guard isAnimating, !uiView.isAnimationPlaying else { return }
 
             if uiView.loopMode == .playOnce, uiView.currentProgress == 1 { return }
 

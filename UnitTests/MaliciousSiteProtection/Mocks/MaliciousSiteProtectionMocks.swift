@@ -35,22 +35,32 @@ class MockMaliciousSiteDataProvider: MaliciousSiteProtection.EmbeddedDataProvidi
         embeddedRevision
     }
 
-    public func url(for detectionKind: MaliciousSiteProtection.DataManager.StoredDataType) -> URL {
-        URL.empty
-    }
-
-    public func hash(for detectionKind: MaliciousSiteProtection.DataManager.StoredDataType) -> String {
-        ""
-    }
-
-    public func loadDataSet<DataKey>(for key: DataKey) -> DataKey.EmbeddedDataSetType where DataKey: MaliciousSiteDataKeyProtocol {
-        switch key.dataType {
+    func url(for dataType: MaliciousSiteProtection.DataManager.StoredDataType) -> URL {
+        switch dataType {
         case .filterSet:
-            self.didLoadFilterSet = true
-            return Array(embeddedFilterSet) as! DataKey.EmbeddedDataSetType
+            return URL(string: "filterSet")!
         case .hashPrefixSet:
+            return URL(string: "hashPrefixSet")!
+        }
+    }
+
+    func hash(for dataType: MaliciousSiteProtection.DataManager.StoredDataType) -> String {
+        let url = url(for: dataType)
+        let data = try! data(withContentsOf: url)
+        let sha = data.sha256
+        return sha
+    }
+
+    func data(withContentsOf url: URL) throws -> Data {
+        switch url.absoluteString {
+        case "filterSet":
+            self.didLoadFilterSet = true
+            return "[]".utf8data
+        case "hashPrefixSet":
             self.didLoadHashPrefixes = true
-            return Array(embeddedHashPrefixes) as! DataKey.EmbeddedDataSetType
+            return "[]".utf8data
+        default:
+            fatalError("Unexpected url \(url.absoluteString)")
         }
     }
 }

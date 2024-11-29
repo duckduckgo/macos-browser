@@ -25,29 +25,29 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class MaliciousSiteProtectionTests: XCTestCase {
-    var phishingDetection: MaliciousSiteProtectionManager!
+    lazy var phishingDetection: MaliciousSiteProtectionManager! = {
+        MaliciousSiteProtectionManager(dataManager: dataManager, detector: MockMaliciousSiteDetector(), featureFlagger: MockFeatureFlagger())
+    }()
     var mockDetector: MockMaliciousSiteDetector!
     var mockDataProvider: MockMaliciousSiteDataProvider!
+    var dataManager: MaliciousSiteProtection.DataManager!
 
-    override func setUp() {
+    override func setUp() async throws {
         let mockFileStore = MockMaliciousSiteFileStore()
         mockDataProvider = MockMaliciousSiteDataProvider()
-
-        let dataManager = MaliciousSiteProtection.DataManager(fileStore: mockFileStore, embeddedDataProvider: mockDataProvider, fileNameProvider: { _ in "file.json" })
-        phishingDetection = MaliciousSiteProtectionManager(dataManager: dataManager, detector: MockMaliciousSiteDetector(), featureFlagger: MockFeatureFlagger())
-        super.setUp()
+        dataManager = MaliciousSiteProtection.DataManager(fileStore: mockFileStore, embeddedDataProvider: mockDataProvider, fileNameProvider: { _ in "file.json" })
     }
 
-    override func tearDown() {
+    override func tearDown() async throws {
         phishingDetection = nil
         mockDataProvider = nil
         mockDetector = nil
-        super.tearDown()
+        dataManager = nil
     }
 
     func testDidLoadAndStartDataActivities() async {
         MaliciousSiteProtectionPreferences.shared.isEnabled = true
-        XCTAssertNotNil(phishingDetection.updateTask)
+        XCTAssertTrue(phishingDetection.backgroundUpdatesEnabled)
     }
 
     func testDisableFeature() async {
@@ -58,9 +58,11 @@ final class MaliciousSiteProtectionTests: XCTestCase {
 
     func testDidNotLoadAndStartDataActivities_IfFeatureDisabled() async {
         MaliciousSiteProtectionPreferences.shared.isEnabled = false
+        _=phishingDetection
+        for _ in 0..<100 { await Task.yield() }
         XCTAssertFalse(mockDataProvider.didLoadHashPrefixes)
         XCTAssertFalse(mockDataProvider.didLoadFilterSet)
-        XCTAssertNil(phishingDetection.updateTask)
+        XCTAssertFalse(phishingDetection.backgroundUpdatesEnabled)
     }
 
     func testIsMalicious() async {
