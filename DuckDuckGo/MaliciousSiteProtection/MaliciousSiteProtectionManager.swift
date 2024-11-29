@@ -35,13 +35,6 @@ extension MaliciousSiteProtectionManager {
         }
     }
 
-    static func updateInterval(for dataKind: MaliciousSiteProtection.DataManager.StoredDataType) -> TimeInterval? {
-        switch dataKind {
-        case .hashPrefixSet: .minutes(20)
-        case .filterSet: .hours(12)
-        }
-    }
-
     struct EmbeddedDataProvider: MaliciousSiteProtection.EmbeddedDataProviding {
 
         private enum Constants {
@@ -97,7 +90,8 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
         configManager: PrivacyConfigurationManaging? = nil
     ) {
         self.featureFlagger = featureFlagger ?? NSApp.delegateTyped.featureFlagger
-        self.configManager = configManager ?? AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
+        let configManager = configManager ?? AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
+        self.configManager = configManager
 
         let embeddedDataProvider = embeddedDataProvider ?? EmbeddedDataProvider()
         let dataManager = dataManager ?? {
@@ -107,7 +101,16 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
         }()
 
         self.detector = detector ?? MaliciousSiteDetector(apiEnvironment: apiEnvironment, dataManager: dataManager, eventMapping: Self.debugEvents)
-        self.updateManager = MaliciousSiteProtection.UpdateManager(apiEnvironment: apiEnvironment, dataManager: dataManager, updateIntervalProvider: Self.updateInterval)
+
+        let updateIntervalProvider = { (dataType: MaliciousSiteProtection.DataManager.StoredDataType) -> TimeInterval? in
+            let settings = MaliciousSiteProtectionRemoteSettings(privacyConfigurationManager: configManager)
+            switch dataType {
+            case .hashPrefixSet: return settings[.hashPrefixUpdateFrequencyMinutes] * 60
+            case .filterSet: return settings[.filterSetUpdateFrequencyMinutes] * 60
+            }
+        }
+
+        self.updateManager = MaliciousSiteProtection.UpdateManager(apiEnvironment: apiEnvironment, dataManager: dataManager, updateIntervalProvider: updateIntervalProvider)
         self.detectionPreferences = detectionPreferences
 
         self.setupBindings()

@@ -1954,6 +1954,10 @@
 		84B479092CCA7A3E00F40329 /* Logger+UnitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B479072CCA7A3900F40329 /* Logger+UnitTests.swift */; };
 		84B49F0D2CB10F0900FF08BB /* OHHTTPStubs in Frameworks */ = {isa = PBXBuildFile; productRef = 84B49F0C2CB10F0900FF08BB /* OHHTTPStubs */; };
 		84B49F0F2CB10F0900FF08BB /* OHHTTPStubsSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 84B49F0E2CB10F0900FF08BB /* OHHTTPStubsSwift */; };
+		84C96E3F2CF994D800A80A01 /* MaliciousSiteProtectionRemoteSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C96E3E2CF994D400A80A01 /* MaliciousSiteProtectionRemoteSettings.swift */; };
+		84C96E402CF994D800A80A01 /* MaliciousSiteProtectionRemoteSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C96E3E2CF994D400A80A01 /* MaliciousSiteProtectionRemoteSettings.swift */; };
+		84C96E422CF9995300A80A01 /* MaliciousSiteProtectionSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C96E412CF9995100A80A01 /* MaliciousSiteProtectionSettingsTests.swift */; };
+		84C96E432CF9995300A80A01 /* MaliciousSiteProtectionSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C96E412CF9995100A80A01 /* MaliciousSiteProtectionSettingsTests.swift */; };
 		84DC715A2C1C1E9000033B8C /* UserDefaultsWrapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DC71582C1C1E8A00033B8C /* UserDefaultsWrapperTests.swift */; };
 		84DC715B2C1C1E9000033B8C /* UserDefaultsWrapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DC71582C1C1E8A00033B8C /* UserDefaultsWrapperTests.swift */; };
 		84DDB90A2C92B66E008C997B /* WKVisitedLinkStoreWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DDB9092C92B667008C997B /* WKVisitedLinkStoreWrapper.swift */; };
@@ -4197,6 +4201,8 @@
 		84537A022C998C24008723BC /* FireWindowSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireWindowSession.swift; sourceTree = "<group>"; };
 		848648A02C76F4B20082282D /* BookmarksBarMenuViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarMenuViewController.swift; sourceTree = "<group>"; };
 		84B479072CCA7A3900F40329 /* Logger+UnitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Logger+UnitTests.swift"; sourceTree = "<group>"; };
+		84C96E3E2CF994D400A80A01 /* MaliciousSiteProtectionRemoteSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaliciousSiteProtectionRemoteSettings.swift; sourceTree = "<group>"; };
+		84C96E412CF9995100A80A01 /* MaliciousSiteProtectionSettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaliciousSiteProtectionSettingsTests.swift; sourceTree = "<group>"; };
 		84DC71582C1C1E8A00033B8C /* UserDefaultsWrapperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsWrapperTests.swift; sourceTree = "<group>"; };
 		84DDB9092C92B667008C997B /* WKVisitedLinkStoreWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKVisitedLinkStoreWrapper.swift; sourceTree = "<group>"; };
 		84F1C8CE2C7705B500716446 /* BookmarksBarMenuPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarMenuPopover.swift; sourceTree = "<group>"; };
@@ -9736,8 +9742,9 @@
 		CD34F0BE2C886462006826BE /* MaliciousSiteProtection */ = {
 			isa = PBXGroup;
 			children = (
-				CD34F0C02C886482006826BE /* Mocks */,
+				84C96E412CF9995100A80A01 /* MaliciousSiteProtectionSettingsTests.swift */,
 				CD89DD5D2C89E08D0080F9AF /* MaliciousSiteProtectionTests.swift */,
+				CD34F0C02C886482006826BE /* Mocks */,
 			);
 			path = MaliciousSiteProtection;
 			sourceTree = "<group>";
@@ -9761,6 +9768,7 @@
 		CDE248A22C821FD500F9399D /* MaliciousSiteProtection */ = {
 			isa = PBXGroup;
 			children = (
+				84C96E3E2CF994D400A80A01 /* MaliciousSiteProtectionRemoteSettings.swift */,
 				CDE248A62C821FFE00F9399D /* phishingFilterSet.json */,
 				CDE248A32C821FFE00F9399D /* phishingHashPrefixes.json */,
 				CDE248A42C821FFE00F9399D /* MaliciousSiteProtectionManager.swift */,
@@ -11906,6 +11914,7 @@
 				3706FC09293F65D500E42796 /* SuggestionViewModel.swift in Sources */,
 				3706FC0A293F65D500E42796 /* BookmarkManagedObject.swift in Sources */,
 				B6ABC5972B4861D4008343B9 /* FocusableTextField.swift in Sources */,
+				84C96E3F2CF994D800A80A01 /* MaliciousSiteProtectionRemoteSettings.swift in Sources */,
 				3706FC0B293F65D500E42796 /* CSVLoginExporter.swift in Sources */,
 				37197EAC294244D600394917 /* FutureExtension.swift in Sources */,
 				4B9DB0452A983B24000927DB /* WaitlistModalViewController.swift in Sources */,
@@ -12425,6 +12434,7 @@
 				3706FE50293F661700E42796 /* WindowManagerStateRestorationTests.swift in Sources */,
 				3706FE51293F661700E42796 /* SafariBookmarksReaderTests.swift in Sources */,
 				3706FE52293F661700E42796 /* FileSystemDSLTests.swift in Sources */,
+				84C96E422CF9995300A80A01 /* MaliciousSiteProtectionSettingsTests.swift in Sources */,
 				3706FE53293F661700E42796 /* CoreDataEncryptionTests.swift in Sources */,
 				3706FE54293F661700E42796 /* PasteboardBookmarkTests.swift in Sources */,
 				3706FE55293F661700E42796 /* CBRCompileTimeReporterTests.swift in Sources */,
@@ -13449,6 +13459,7 @@
 				BD7090CF2C5182FB009EED82 /* UnifiedFeedbackFormView.swift in Sources */,
 				1D9A4E5A2B43213B00F449E2 /* TabSnapshotExtension.swift in Sources */,
 				316913262BD2B76F0051B46D /* DataBrokerPrerequisitesStatusVerifier.swift in Sources */,
+				84C96E402CF994D800A80A01 /* MaliciousSiteProtectionRemoteSettings.swift in Sources */,
 				4B7A57CF279A4EF300B1C70E /* ChromiumPreferences.swift in Sources */,
 				AA6AD95B2704B6DB00159F8A /* FirePopoverViewController.swift in Sources */,
 				56A054042C1AFA86007D8FAB /* OnboardingConfiguration.swift in Sources */,
@@ -13884,6 +13895,7 @@
 				1D838A332C44F0310078373F /* ReleaseNotesParserTests.swift in Sources */,
 				56A0542D2C201DA8007D8FAB /* MockContentBlocking.swift in Sources */,
 				56A054442C2252CE007D8FAB /* OnboardingUserScriptTests.swift in Sources */,
+				84C96E432CF9995300A80A01 /* MaliciousSiteProtectionSettingsTests.swift in Sources */,
 				9FAD623A2BCFDB32007F3A65 /* WebsiteInfoHelpers.swift in Sources */,
 				56A054282C201D04007D8FAB /* MockSchemeTask.swift in Sources */,
 				56A054472C22536A007D8FAB /* CapturingOnboardingActionsManager.swift in Sources */,
