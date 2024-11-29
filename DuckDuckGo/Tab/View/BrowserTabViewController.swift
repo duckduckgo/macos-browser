@@ -42,8 +42,13 @@ final class BrowserTabViewController: NSViewController {
     private lazy var hoverLabel = NSTextField(string: URL.duckDuckGo.absoluteString)
     private lazy var hoverLabelContainer = ColorView(frame: .zero, backgroundColor: .browserTabBackground, borderWidth: 0)
 
+    private let activeRemoteMessageModel: ActiveRemoteMessageModel
     private let newTabPageActionsManager: NewTabPageActionsManaging
-    private(set) lazy var newTabPageWebViewModel: NewTabPageWebViewModel = NewTabPageWebViewModel(featureFlagger: featureFlagger, actionsManager: newTabPageActionsManager)
+    private(set) lazy var newTabPageWebViewModel: NewTabPageWebViewModel = NewTabPageWebViewModel(
+        featureFlagger: featureFlagger,
+        actionsManager: newTabPageActionsManager,
+        activeRemoteMessageModel: activeRemoteMessageModel
+    )
     private(set) weak var webView: WebView?
     private weak var webViewContainer: NSView?
     private weak var webViewSnapshot: NSView?
@@ -87,7 +92,8 @@ final class BrowserTabViewController: NSViewController {
          onboardingDialogTypeProvider: ContextualOnboardingDialogTypeProviding & ContextualOnboardingStateUpdater = Application.appDelegate.onboardingStateMachine,
          onboardingDialogFactory: ContextualDaxDialogsFactory = DefaultContextualDaxDialogViewFactory(),
          featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger,
-         newTabPageActionsManager: NewTabPageActionsManaging = NSApp.delegateTyped.newTabPageActionsManager
+         newTabPageActionsManager: NewTabPageActionsManaging = NSApp.delegateTyped.newTabPageActionsManager,
+         activeRemoteMessageModel: ActiveRemoteMessageModel = NSApp.delegateTyped.activeRemoteMessageModel
     ) {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.bookmarkManager = bookmarkManager
@@ -95,6 +101,7 @@ final class BrowserTabViewController: NSViewController {
         self.onboardingDialogFactory = onboardingDialogFactory
         self.featureFlagger = featureFlagger
         self.newTabPageActionsManager = newTabPageActionsManager
+        self.activeRemoteMessageModel = activeRemoteMessageModel
         containerStackView = NSStackView()
 
         super.init(nibName: nil, bundle: nil)
@@ -868,7 +875,10 @@ final class BrowserTabViewController: NSViewController {
         case .onboarding:
             return
         case .newtab:
-            containsHostingView = !featureFlagger.isFeatureOn(.htmlNewTabPage)
+            guard !featureFlagger.isFeatureOn(.htmlNewTabPage) else {
+                return
+            }
+            containsHostingView = false
         case .settings:
             containsHostingView = true
         default:

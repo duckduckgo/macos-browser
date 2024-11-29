@@ -20,6 +20,15 @@ import AppKit
 
 extension NSImage {
 
+    public var pngData: Data? {
+        guard let tiffRepresentation = self.tiffRepresentation,
+              let bitmapImage = NSBitmapImageRep(data: tiffRepresentation) else {
+            return nil
+        }
+
+        return bitmapImage.representation(using: .png, properties: [:])
+    }
+
     /**
      * This function calculates image brightness using relative luminance formula.
      *

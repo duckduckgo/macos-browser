@@ -92,7 +92,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let bookmarksManager = LocalBookmarkManager.shared
     var privacyDashboardWindow: NSWindow?
 
-    let newTabPageActionsManager: NewTabPageActionsManaging
+    private(set) lazy var newTabPageActionsManager: NewTabPageActionsManaging = NewTabPageActionsManager(
+        appearancePreferences: .shared,
+        activeRemoteMessageModel: activeRemoteMessageModel,
+        openURLHandler: { url in
+            Task { @MainActor in
+                WindowControllersManager.shared.showTab(with: .contentFromURL(url, source: .appOpenUrl))
+            }
+        }
+    )
     let activeRemoteMessageModel: ActiveRemoteMessageModel
     let homePageSettingsModel = HomePage.Models.SettingsModel()
     let remoteMessagingClient: RemoteMessagingClient!
@@ -283,7 +291,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         })
 
         subscriptionCookieManager = SubscriptionCookieManager(subscriptionManager: subscriptionManager, currentCookieStore: {
-            WKWebsiteDataStore.default().httpCookieStore
+            WKHTTPCookieStoreWrapper(store: WKWebsiteDataStore.default().httpCookieStore)
         }, eventMapping: SubscriptionCookieManageEventPixelMapping())
 
         // Update VPN environment and match the Subscription environment
@@ -309,8 +317,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                                                        freemiumDBPUserStateManager: freemiumDBPUserStateManager)
         freemiumDBPPromotionViewCoordinator = FreemiumDBPPromotionViewCoordinator(freemiumDBPUserStateManager: freemiumDBPUserStateManager,
                                                                                   freemiumDBPFeature: freemiumDBPFeature)
-
-        newTabPageActionsManager = NewTabPageActionsManager(appearancePreferences: .shared)
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {
@@ -397,10 +403,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
                 let isEnabled = privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(PrivacyProSubfeature.setAccessTokenCookieForSubscriptionDomains)
 
-                Task { [weak self] in
+                Task { @MainActor [weak self] in
                     if isEnabled {
                         self?.subscriptionCookieManager.enableSettingSubscriptionCookie()
-                        await self?.subscriptionCookieManager.refreshSubscriptionCookie()
                     } else {
                         await self?.subscriptionCookieManager.disableSettingSubscriptionCookie()
                     }

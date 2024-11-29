@@ -144,6 +144,11 @@ extension URL {
     // base url for Error Page Alternate HTML loaded into Web View
     static let error = URL(string: "duck://error")!
 
+    static func duckFavicon(for faviconURL: URL) -> URL? {
+        let encodedURL = faviconURL.absoluteString.percentEncoded(withAllowedCharacters: .urlPathAllowed)
+        return URL(string: "duck://favicon/\(encodedURL)")
+    }
+
     static let dataBrokerProtection = URL(string: "duck://personal-information-removal")!
 
 #if !SANDBOX_TEST_TOOL
@@ -591,6 +596,12 @@ extension URL {
         } else {
             return false
         }
+    }
+
+    // MARK: - Other
+
+    static var appStore: URL {
+        URL(string: "https://apps.apple.com/app/duckduckgo-privacy-browser/id663592361")!
     }
 
 }
