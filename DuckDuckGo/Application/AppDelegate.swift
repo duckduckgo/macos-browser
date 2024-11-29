@@ -595,7 +595,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             return terminationReply
         }
 
+        tearDownPrivacyStats()
+
         return .terminateNow
+    }
+
+    func tearDownPrivacyStats() {
+        let condition = RunLoop.ResumeCondition()
+        Task {
+            await privacyStats.handleAppTermination()
+            condition.resolve()
+        }
+        RunLoop.current.run(until: condition)
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
