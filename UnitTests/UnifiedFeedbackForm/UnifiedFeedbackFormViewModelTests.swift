@@ -17,6 +17,8 @@
 //
 
 import XCTest
+import Subscription
+import SubscriptionTestingUtilities
 @testable import DuckDuckGo_Privacy_Browser
 
 final class UnifiedFeedbackFormViewModelTests: XCTestCase {
@@ -24,7 +26,8 @@ final class UnifiedFeedbackFormViewModelTests: XCTestCase {
     func testWhenCreatingViewModel_ThenInitialStateIsFeedbackPending() throws {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
-        let viewModel = UnifiedFeedbackFormViewModel(vpnMetadataCollector: collector, feedbackSender: sender)
+        let subscriptionManager = SubscriptionManagerMock()
+        let viewModel = UnifiedFeedbackFormViewModel(vpnMetadataCollector: collector, feedbackSender: sender, subscriptionManager: subscriptionManager)
 
         XCTAssertEqual(viewModel.viewState, .feedbackPending)
     }
@@ -32,7 +35,8 @@ final class UnifiedFeedbackFormViewModelTests: XCTestCase {
     func testWhenSendingFeedbackSucceeds_ThenFeedbackIsSent() async throws {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
-        let viewModel = UnifiedFeedbackFormViewModel(vpnMetadataCollector: collector, feedbackSender: sender)
+        let subscriptionManager = SubscriptionManagerMock()
+        let viewModel = UnifiedFeedbackFormViewModel(vpnMetadataCollector: collector, feedbackSender: sender, subscriptionManager: subscriptionManager)
         viewModel.selectedReportType = UnifiedFeedbackReportType.reportIssue.rawValue
         let text = "Some feedback report text"
         viewModel.feedbackFormText = text
@@ -46,7 +50,8 @@ final class UnifiedFeedbackFormViewModelTests: XCTestCase {
     func testWhenSendingFeedbackFails_ThenFeedbackIsNotSent() async throws {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
-        let viewModel = UnifiedFeedbackFormViewModel(vpnMetadataCollector: collector, feedbackSender: sender)
+        let subscriptionManager = SubscriptionManagerMock()
+        let viewModel = UnifiedFeedbackFormViewModel(vpnMetadataCollector: collector, feedbackSender: sender, subscriptionManager: subscriptionManager)
         viewModel.selectedReportType = UnifiedFeedbackReportType.reportIssue.rawValue
         let text = "Some feedback report text"
         viewModel.feedbackFormText = text
@@ -62,7 +67,8 @@ final class UnifiedFeedbackFormViewModelTests: XCTestCase {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
         let delegate = MockVPNFeedbackFormViewModelDelegate()
-        let viewModel = UnifiedFeedbackFormViewModel(vpnMetadataCollector: collector, feedbackSender: sender)
+        let subscriptionManager = SubscriptionManagerMock()
+        let viewModel = UnifiedFeedbackFormViewModel(vpnMetadataCollector: collector, feedbackSender: sender, subscriptionManager: subscriptionManager)
         viewModel.delegate = delegate
 
         XCTAssertFalse(delegate.receivedDismissedViewCallback)
@@ -192,4 +198,18 @@ private class MockVPNFeedbackFormViewModelDelegate: UnifiedFeedbackFormViewModel
         receivedDismissedViewCallback = true
     }
 
+}
+
+extension SubscriptionManagerMock {
+
+    convenience init() {
+        self.init(accountManager: AccountManagerMock(),
+                  subscriptionEndpointService: SubscriptionEndpointServiceMock(),
+                  authEndpointService: AuthEndpointServiceMock(),
+                  storePurchaseManager: StorePurchaseManagerMock(),
+                  currentEnvironment: SubscriptionEnvironment(serviceEnvironment: .production,
+                                                              purchasePlatform: .appStore),
+                  canPurchase: false,
+                  subscriptionFeatureMappingCache: SubscriptionFeatureMappingCacheMock())
+    }
 }
