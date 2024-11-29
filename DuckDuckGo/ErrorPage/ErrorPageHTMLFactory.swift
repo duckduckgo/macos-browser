@@ -27,7 +27,7 @@ enum ErrorPageHTMLFactory {
 
     static func html(for error: WKError, featureFlagger: FeatureFlagger, header: String? = nil) -> String {
         switch error as NSError {
-        case is MaliciousSiteError where featureFlagger.isFeatureOn(.maliciousSiteProtectionErrorPage):
+        case is MaliciousSiteError:
             return SpecialErrorPageHTMLTemplate.htmlFromTemplate
 
         case is URLError where error.isServerCertificateUntrusted && featureFlagger.isFeatureOn(.sslCertificatesBypass):

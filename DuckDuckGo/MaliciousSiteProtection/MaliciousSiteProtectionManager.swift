@@ -169,7 +169,7 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
 
     public func evaluate(_ url: URL) async -> ThreatKind? {
         guard configManager.privacyConfig.isFeature(.maliciousSiteProtection, enabledForDomain: url.host) || featureFlagger.localOverrides?.override(for: FeatureFlag.maliciousSiteProtectionErrorPage) == true,
-              detectionPreferences.isEnabled || !(featureFlagger.isFeatureOn(.maliciousSiteProtectionPreferences) || featureFlagger.localOverrides?.override(for: FeatureFlag.maliciousSiteProtectionPreferences) == true) else { return .none }
+              detectionPreferences.isEnabled else { return .none }
 
         return await detector.evaluate(url)
     }
