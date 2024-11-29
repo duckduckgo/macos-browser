@@ -1724,8 +1724,8 @@
 		56A054142C1C3796007D8FAB /* CapturingDockCustomizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A054122C1C3796007D8FAB /* CapturingDockCustomizer.swift */; };
 		56A054162C1C37B0007D8FAB /* CapturingOnboardingNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A054152C1C37B0007D8FAB /* CapturingOnboardingNavigation.swift */; };
 		56A054172C1C37B0007D8FAB /* CapturingOnboardingNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A054152C1C37B0007D8FAB /* CapturingOnboardingNavigation.swift */; };
-		56A0541F2C1CA1F5007D8FAB /* OnboardingTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A0541E2C1CA1F5007D8FAB /* OnboardingTabExtension.swift */; };
-		56A054202C1CA1F5007D8FAB /* OnboardingTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A0541E2C1CA1F5007D8FAB /* OnboardingTabExtension.swift */; };
+		56A0541F2C1CA1F5007D8FAB /* OnboardingNavigationResponder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A0541E2C1CA1F5007D8FAB /* OnboardingNavigationResponder.swift */; };
+		56A054202C1CA1F5007D8FAB /* OnboardingNavigationResponder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A0541E2C1CA1F5007D8FAB /* OnboardingNavigationResponder.swift */; };
 		56A054282C201D04007D8FAB /* MockSchemeTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A054252C201D00007D8FAB /* MockSchemeTask.swift */; };
 		56A054292C201D05007D8FAB /* MockSchemeTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A054252C201D00007D8FAB /* MockSchemeTask.swift */; };
 		56A0542D2C201DA8007D8FAB /* MockContentBlocking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A0542A2C201D64007D8FAB /* MockContentBlocking.swift */; };
@@ -4087,7 +4087,7 @@
 		56A054072C1C3730007D8FAB /* MockWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockWindow.swift; sourceTree = "<group>"; };
 		56A054122C1C3796007D8FAB /* CapturingDockCustomizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturingDockCustomizer.swift; sourceTree = "<group>"; };
 		56A054152C1C37B0007D8FAB /* CapturingOnboardingNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturingOnboardingNavigation.swift; sourceTree = "<group>"; };
-		56A0541E2C1CA1F5007D8FAB /* OnboardingTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingTabExtension.swift; sourceTree = "<group>"; };
+		56A0541E2C1CA1F5007D8FAB /* OnboardingNavigationResponder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingNavigationResponder.swift; sourceTree = "<group>"; };
 		56A054252C201D00007D8FAB /* MockSchemeTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSchemeTask.swift; sourceTree = "<group>"; };
 		56A0542A2C201D64007D8FAB /* MockContentBlocking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockContentBlocking.swift; sourceTree = "<group>"; };
 		56A0542F2C2043C8007D8FAB /* OnboardingTabExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingTabExtensionTests.swift; sourceTree = "<group>"; };
@@ -5713,7 +5713,6 @@
 				3199AF6B2C80734A003AEBDC /* Onboarding */,
 				3199AF6E2C80734A003AEBDC /* TabModal */,
 				37F19A6928E2F2D000740DC6 /* DuckPlayer.swift */,
-				31F28C5228C8EECA00119F70 /* DuckURLSchemeHandler.swift */,
 				315AA06F28CA5CC800200030 /* YoutubePlayerNavigationHandler.swift */,
 				31F28C4C28C8EEC500119F70 /* YoutubePlayerUserScript.swift */,
 				31F28C4E28C8EEC500119F70 /* YoutubeOverlayUserScript.swift */,
@@ -7468,7 +7467,7 @@
 				85B7184827677A9200B4277F /* View */,
 				56A053FB2C19E8F7007D8FAB /* OnboardingActionsManager.swift */,
 				56A054012C1AFA5D007D8FAB /* OnboardingConfiguration.swift */,
-				56A0541E2C1CA1F5007D8FAB /* OnboardingTabExtension.swift */,
+				56A0541E2C1CA1F5007D8FAB /* OnboardingNavigationResponder.swift */,
 				56A0543D2C215FB3007D8FAB /* OnboardingUserScript.swift */,
 				8443DC6C2CF0C777000B8829 /* Tab+OnboardingNavigationDelegate.swift */,
 			);
@@ -8399,13 +8398,13 @@
 		AA86491C24D83868001BABEE /* View */ = {
 			isa = PBXGroup;
 			children = (
+				B637273A26CBC8AF00C8CB02 /* AuthenticationAlert.swift */,
 				B6C0BB6929AF1C7000AE8E3C /* BrowserTabView.swift */,
 				AA585D83248FD31100E9A3E2 /* BrowserTabViewController.swift */,
+				B6BE9FA9293F7955006363C6 /* ModalSheetCancellable.swift */,
 				AA6FFB4524DC3B5A0028F4D0 /* WebView.swift */,
 				B6B2400D28083B49001B8F3A /* WebViewContainerView.swift */,
 				37054FCD2876472D00033B6F /* WebViewSnapshotView.swift */,
-				B637273A26CBC8AF00C8CB02 /* AuthenticationAlert.swift */,
-				B6BE9FA9293F7955006363C6 /* ModalSheetCancellable.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -8421,20 +8420,19 @@
 		AA86491E24D83A66001BABEE /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				1D1A33482A6FEB170080ACED /* BurnerMode.swift */,
 				F4A6198B283CFFBB007F2080 /* ContentScopeFeatureFlagging.swift */,
 				B626A75929921FAA00053070 /* NavigationActionPolicyExtension.swift */,
 				B634DBE4293C944700C3C99E /* NewWindowPolicy.swift */,
+				85B49AF92CD1B7C5007FAA2A /* SystemInfo.swift */,
 				AA9FF95824A1ECF20039E328 /* Tab.swift */,
-				B6F1B0252BCE5A50005E863C /* TabContent.swift */,
 				B634DBE0293C8FD500C3C99E /* Tab+Dialogs.swift */,
 				B61E2CD4294346C000773D8A /* Tab+Navigation.swift */,
 				B634DBDE293C8F7F00C3C99E /* Tab+UIDelegate.swift */,
+				B6F1B0252BCE5A50005E863C /* TabContent.swift */,
 				B6C00ED6292FB4B4009C73A6 /* TabExtensionsBuilder.swift */,
 				983DFB2428B67036006B7E34 /* UserContentUpdating.swift */,
 				B634DBE2293C8FFF00C3C99E /* UserDialogRequest.swift */,
-				1D1A33482A6FEB170080ACED /* BurnerMode.swift */,
-				56406D4A2C636A8900BF8FA2 /* SpecialPagesUserScriptExtension.swift */,
-				85B49AF92CD1B7C5007FAA2A /* SystemInfo.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -9126,8 +9124,8 @@
 		B647EFB32922539400BA628D /* TabExtensions */ = {
 			isa = PBXGroup;
 			children = (
-				3148727D2CC68F6200EEF89B /* AIChatOnboardingTabExtension.swift */,
 				B647EFBA2922584B00BA628D /* AdClickAttributionTabExtension.swift */,
+				3148727D2CC68F6200EEF89B /* AIChatOnboardingTabExtension.swift */,
 				B6C00ECA292F839D009C73A6 /* AutofillTabExtension.swift */,
 				B6F1B0212BCE5658005E863C /* BrokenSiteInfoTabExtension.swift */,
 				B6D574B12947224C008ED1B6 /* ContentBlockingTabExtension.swift */,
@@ -9147,7 +9145,6 @@
 				B6BDDA002942389000F68088 /* TabExtensions.swift */,
 				1D9A4E592B43213B00F449E2 /* TabSnapshotExtension.swift */,
 				B626A76C29928B1600053070 /* TestsClosureNavigationResponder.swift */,
-				567A23BD2C7F539C0010F66C /* SpecialErrorPageUserScriptExtension.swift */,
 			);
 			path = TabExtensions;
 			sourceTree = "<group>";
@@ -9373,9 +9370,11 @@
 				85D438B5256E7C9E00F3BAF8 /* ContextMenuUserScript.swift */,
 				4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */,
 				856CADEF271710F400E79BB0 /* HoverUserScript.swift */,
-				4B2E7D6226FF9D6500D2DB17 /* PrintingUserScript.swift */,
-				F1B33DF92BAD9C83001128B3 /* Subscription */,
 				1ED910D42B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift */,
+				4B2E7D6226FF9D6500D2DB17 /* PrintingUserScript.swift */,
+				567A23BD2C7F539C0010F66C /* SpecialErrorPageUserScriptExtension.swift */,
+				56406D4A2C636A8900BF8FA2 /* SpecialPagesUserScriptExtension.swift */,
+				F1B33DF92BAD9C83001128B3 /* Subscription */,
 				85AC3AEE25D5CE9800C7D2AA /* UserScripts.swift */,
 			);
 			path = UserScripts;
@@ -9384,10 +9383,11 @@
 		B6BF5D912947198E006742B1 /* Navigation */ = {
 			isa = PBXGroup;
 			children = (
-				B6BF5D922947199A006742B1 /* SerpHeadersNavigationResponder.swift */,
+				B687B7CB2947A1E9001DEA6F /* ExternalAppSchemeHandler.swift */,
 				1E559BB02BBCA9F1002B4AF6 /* RedirectNavigationResponder.swift */,
 				B60C6F7629B0E286007BFAA8 /* SearchNonexistentDomainNavigationResponder.swift */,
-				B687B7CB2947A1E9001DEA6F /* ExternalAppSchemeHandler.swift */,
+				B6BF5D922947199A006742B1 /* SerpHeadersNavigationResponder.swift */,
+				31F28C5228C8EECA00119F70 /* DuckURLSchemeHandler.swift */,
 			);
 			path = Navigation;
 			sourceTree = "<group>";
@@ -11319,7 +11319,7 @@
 				3768D8412C29C1F1004120AE /* ActiveRemoteMessageModel.swift in Sources */,
 				3706FAB8293F65D500E42796 /* FaviconImageCache.swift in Sources */,
 				3706FAB9293F65D500E42796 /* TabBarViewController.swift in Sources */,
-				56A054202C1CA1F5007D8FAB /* OnboardingTabExtension.swift in Sources */,
+				56A054202C1CA1F5007D8FAB /* OnboardingNavigationResponder.swift in Sources */,
 				3706FABA293F65D500E42796 /* BookmarkOutlineViewDataSource.swift in Sources */,
 				560EB9332C78946F0080DBC8 /* ContextualOnboardingDialogs.swift in Sources */,
 				37878E552CA3330300CC9EB5 /* HomePageAddressBarModel.swift in Sources */,
@@ -13434,7 +13434,7 @@
 				AA6EF9B525081B4C004754E6 /* MainMenuActions.swift in Sources */,
 				EEDFA38A2CD148DE00D1C558 /* SyncDiagnosisHelper.swift in Sources */,
 				EED4D3D82C874AE200C79EEA /* PopoverInfoViewController.swift in Sources */,
-				56A0541F2C1CA1F5007D8FAB /* OnboardingTabExtension.swift in Sources */,
+				56A0541F2C1CA1F5007D8FAB /* OnboardingNavigationResponder.swift in Sources */,
 				B63D466925BEB6C200874977 /* WKWebView+SessionState.swift in Sources */,
 				B6F1B0222BCE5658005E863C /* BrokenSiteInfoTabExtension.swift in Sources */,
 				3199AF7F2C80734A003AEBDC /* TabModalManageable.swift in Sources */,
@@ -15281,7 +15281,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = revision;
-				revision = ba5ac555da0fcaa5bf8de69490a5dc65770e9178;
+				revision = dfaf4beeb8b996b65797ae4fc8869cd584935592;
 			};
 		};
 		9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */ = {

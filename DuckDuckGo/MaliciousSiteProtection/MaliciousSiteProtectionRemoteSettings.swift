@@ -71,11 +71,53 @@ struct MaliciousSiteProtectionRemoteSettings: MaliciousSiteProtectionRemoteSetti
         guard let value = settings[key.rawValue] else {
             return key.defaultValue
         }
-        guard let typedValue = value as? T.Value else {
+
+        // perform number conversion if needed
+        guard let typedValue: T.Value = ((T.Value.self as? SettingValueConvertible.Type)?.init(anyValue: value) ?? value) as? T.Value else {
             assertionFailure("Unexpected type of value for \(key.rawValue): \(type(of: value)) (\(value))")
             return key.defaultValue
         }
         return typedValue
     }
 
+}
+
+private protocol SettingValueConvertible {
+    init?(anyValue: Any)
+}
+extension Double: SettingValueConvertible {
+    public init?(anyValue: Any) {
+        switch anyValue {
+        case let int as Int:
+            self = Self(int)
+        case let double as Double:
+            self = double
+        default:
+            return nil
+        }
+    }
+}
+extension Int: SettingValueConvertible {
+    public init?(anyValue: Any) {
+        switch anyValue {
+        case let int as Int:
+            self = int
+        case let double as Double:
+            self = Int(double)
+        default:
+            return nil
+        }
+    }
+}
+extension Bool: SettingValueConvertible {
+    public init?(anyValue: Any) {
+        switch anyValue {
+        case let int as Int:
+            self = (int != 0)
+        case let double as Double:
+            self = (double != 0)
+        default:
+            return nil
+        }
+    }
 }

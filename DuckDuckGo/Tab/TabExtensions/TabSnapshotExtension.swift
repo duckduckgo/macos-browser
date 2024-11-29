@@ -154,7 +154,7 @@ final class TabSnapshotExtension {
     func renderWebViewSnapshot() async {
         guard let webView, let tabContent,
               let url = tabContent.userEditableUrl,
-              !(url.isDuckURLScheme && !url.isReleaseNotesScheme) else {
+              url.navigationalScheme != .duck else {
             // Previews of native views are rendered in renderNativePreview()
             return
         }

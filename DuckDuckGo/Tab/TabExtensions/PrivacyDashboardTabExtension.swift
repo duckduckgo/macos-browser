@@ -85,16 +85,14 @@ final class PrivacyDashboardTabExtension {
         .store(in: &cancellables)
     }
 
+    @MainActor
     private func updatePrivacyInfo(with trust: SecTrust?) async {
-        let isValid = await self.certificateTrustEvaluator.evaluateCertificateTrust(trust: trust)
-        await MainActor.run {
-            self.isCertificateValid = isValid
-            if isValid ?? false {
-                self.privacyInfo?.serverTrust = trust
-            } else {
-                self.privacyInfo?.serverTrust = nil
-            }
-        }
+        let isValid = await Task<Bool?, Never>.detached {
+            await self.certificateTrustEvaluator.evaluateCertificateTrust(trust: trust)
+        }.value
+
+        self.isCertificateValid = isValid
+        self.privacyInfo?.serverTrust = (isValid == true) ? trust : nil
     }
 
     @MainActor
@@ -104,10 +102,7 @@ final class PrivacyDashboardTabExtension {
         self.privacyInfo?.malicousSiteThreatKind = maliciousSiteProtectionStateProvider().bypassedMaliciousSiteThreatKind
     }
 
-}
-
-extension PrivacyDashboardTabExtension {
-
+    @MainActor
     private func resetDashboardInfo(for url: URL, didGoBackForward: Bool) {
         guard url.isHypertextURL else {
             privacyInfo = nil
@@ -121,6 +116,7 @@ extension PrivacyDashboardTabExtension {
         }
     }
 
+    @MainActor
     private func makePrivacyInfo(url: URL) -> PrivacyInfo? {
         guard let host = url.host else { return nil }
 

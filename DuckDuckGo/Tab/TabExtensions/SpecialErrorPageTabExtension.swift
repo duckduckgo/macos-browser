@@ -35,61 +35,66 @@ protocol SpecialErrorPageScriptProvider {
 extension UserScripts: SpecialErrorPageScriptProvider {}
 
 final class SpecialErrorPageTabExtension {
-    weak var webView: ErrorPageTabExtensionNavigationDelegate?
-    private weak var specialErrorPageUserScript: SpecialErrorPageUserScript?
-    private var shouldBypassSSLError = false
-    private var urlCredentialCreator: URLCredentialCreating
-    private var featureFlagger: FeatureFlagger
-    private var detector: MaliciousSiteDetecting
-    private(set) var state = MaliciousSiteProtectionState()
-    private var errorPageType: SpecialErrorKind?
-    private var exemptions: [URL: MaliciousSiteProtection.ThreatKind] = [:]
+
+    private let urlCredentialCreator: URLCredentialCreating
+    private let featureFlagger: FeatureFlagger
+    private let detector: MaliciousSiteDetecting
     private let tld = TLD()
+
+    @MainActor private weak var webView: ErrorPageTabExtensionNavigationDelegate?
+    @MainActor private weak var specialErrorPageUserScript: SpecialErrorPageUserScript?
+
+    @MainActor private var exemptions: [URL: MaliciousSiteProtection.ThreatKind] = [:]
+    @MainActor private var shouldBypassSSLError = false
+    @MainActor private(set) var state = MaliciousSiteProtectionState()
+    @MainActor private(set) var errorData: SpecialErrorData?
 
     private var cancellables = Set<AnyCancellable>()
 
-    var errorData: SpecialErrorData?
-    var failingURL: URL?
+    init(webViewPublisher: some Publisher<some ErrorPageTabExtensionNavigationDelegate, Never>,
+         scriptsPublisher: some Publisher<some SpecialErrorPageScriptProvider, Never>,
+         urlCredentialCreator: URLCredentialCreating = URLCredentialCreator(),
+         featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger,
+         maliciousSiteDetector: some MaliciousSiteDetecting) {
 
-    init(
-        webViewPublisher: some Publisher<WKWebView, Never>,
-        scriptsPublisher: some Publisher<some SpecialErrorPageScriptProvider, Never>,
-        urlCredentialCreator: URLCredentialCreating = URLCredentialCreator(),
-        featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger,
-        maliciousSiteDetector: some MaliciousSiteDetecting) {
-            self.featureFlagger = featureFlagger
-            self.urlCredentialCreator = urlCredentialCreator
-            self.detector = maliciousSiteDetector
-            webViewPublisher.sink { [weak self] webView in
+        self.featureFlagger = featureFlagger
+        self.urlCredentialCreator = urlCredentialCreator
+        self.detector = maliciousSiteDetector
+
+        webViewPublisher.sink { [weak self] webView in
+            MainActor.assumeIsolated {
                 self?.webView = webView
-            }.store(in: &cancellables)
-            scriptsPublisher.sink { [weak self] scripts in
+            }
+        }.store(in: &cancellables)
+        scriptsPublisher.sink { [weak self] scripts in
+            MainActor.assumeIsolated {
                 self?.specialErrorPageUserScript = scripts.specialErrorPageUserScript
                 self?.specialErrorPageUserScript?.delegate = self
-            }.store(in: &cancellables)
-        }
-
-    @MainActor private func loadSSLErrorHTML(url: URL, alternate: Bool) {
-        let html = SpecialErrorPageHTMLTemplate.htmlFromTemplate
-        loadHTML(html: html, url: url, alternate: alternate)
+            }
+        }.store(in: &cancellables)
     }
 
-    @MainActor
-    private func loadHTML(html: String, url: URL, alternate: Bool) {
-        if alternate {
-            webView?.loadAlternateHTML(html, baseURL: .error, forUnreachableURL: url)
-        } else {
-            webView?.setDocumentHtml(html)
-        }
-    }
 }
 
 extension SpecialErrorPageTabExtension: NavigationResponder {
+
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
-        handleExemptions(for: navigationAction)
-
         let url = navigationAction.url
+
+        // An edge case for if a site gets flagged as malicious, the user clicks through the warning,
+        // and then the malicious page redirects to a site that isn't flagged.
+        //
+        // We want to ensure the new site is still marked as dangerous in the privacy dashboard.
+        // So we basically flag all URLs in the redirect chain as malicious (and exempted) too.
+        //
+        // There may be cases where this is a bad idea, for example a malicious site that redirects to a socialnetwork.com -
+        // but if a flagged site sends you somewhere, you should still be cautious of that site so we want it to remain flagged.
+        if let threatKind = state.bypassedMaliciousSiteThreatKind, navigationAction.navigationType == .other {
+            exemptions[url] = threatKind
+        }
+        state.bypassedMaliciousSiteThreatKind = exemptions[url]
+
         if state.bypassedMaliciousSiteThreatKind != .none || url.isDuckDuckGo || url.isDuckURLScheme {
             state.currentMalicousSiteThreatKind = .none
             return .next
@@ -102,83 +107,79 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
 
         state.currentMalicousSiteThreatKind = threatKind
 
-        return redirect(navigationAction, with: threatKind)
-    }
-
-    private func handleExemptions(for navigationAction: NavigationAction) {
-        let url = navigationAction.url
-        // An edge case for if a site gets flagged as malicious, the user clicks through the warning,
-        // and then the malicious page redirects to a site that isn't flagged.
-        //
-        // We want to ensure the new site is still marked as dangerous in the privacy dashboard.
-        // So we basically flag all URLs in the redirect chain as malicious (and exempted) too.
-        //
-        // There may be cases where this is a bad idea, for example a malicious site that redirects to a socialnetwork.com -
-        // but if a flagged site sends you somewhere, you should still be cautious of that site so we want it to remain flagged.
-        // swiftlint:disable:next todo
-        if let threatKind = state.bypassedMaliciousSiteThreatKind, navigationAction.navigationType == .other { // TODO: Validate this .other handler works for actual .redirect-s
-            exemptions[url] = threatKind
-        }
-        state.bypassedMaliciousSiteThreatKind = exemptions[url]
+        return redirectMaliciousNavigationAction(navigationAction, with: threatKind)
     }
 
     @MainActor
-    private func redirect(_ navigationAction: NavigationAction, with threatKind: MaliciousSiteProtection.ThreatKind) -> NavigationActionPolicy? {
-        let domain: String
-        let errorPageType = threatKind.errorPageType
-        self.errorPageType = errorPageType
+    private func redirectMaliciousNavigationAction(_ navigationAction: NavigationAction, with threatKind: MaliciousSiteProtection.ThreatKind) -> NavigationActionPolicy? {
+        // Check if the main frame target is available; if not, handle as an iframe navigation
         guard let mainFrame = navigationAction.mainFrameTarget else {
-            return redirectMaliciousIframe(navigationAction, with: threatKind)
+            return redirectMaliciousIframeNavigationAction(navigationAction, with: threatKind)
         }
 
         let url = navigationAction.url
-        failingURL = url
-        domain = url.host ?? url.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true)
-        errorData = SpecialErrorData(kind: errorPageType, domain: domain, eTldPlus1: tld.eTLDplus1(failingURL?.host))
-        let errorUrl = URL.errorUrl(with: threatKind, failingUrl: url)
+
+        // Generate a custom duck://error page URL that will be handled by DuckURLSchemeHandler
+        // DuckURLSchemeHandler will decode the error and fail the custom URL scheme navigation task with the error,
+        // which will then navigate to a special error page (`Tab.swift: navigation(_:didFailWith:)`)
+        let errorUrl = URL.specialErrorPage(failingUrl: url, kind: threatKind.errorPageKind)
+
         return .redirect(mainFrame) { navigator in
             navigator.load(URLRequest(url: errorUrl))
         }
     }
 
     @MainActor
-    private func redirectMaliciousIframe(_ navigationAction: NavigationAction, with threatKind: MaliciousSiteProtection.ThreatKind) -> NavigationActionPolicy? {
+    private func redirectMaliciousIframeNavigationAction(_ navigationAction: NavigationAction, with threatKind: MaliciousSiteProtection.ThreatKind) -> NavigationActionPolicy? {
         PixelKit.fire(MaliciousSiteProtection.Event.iframeLoaded)
 
+        // Extract the URL of the source frame (the iframe) that initiated the navigation action
         let iframeTopUrl = navigationAction.sourceFrame.url
-        failingURL = iframeTopUrl
-        let domain = iframeTopUrl.host ?? iframeTopUrl.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true)
-        errorData = SpecialErrorData(kind: threatKind.errorPageType, domain: domain, eTldPlus1: tld.eTLDplus1(failingURL?.host))
 
-        let errorUrl = URL.errorUrl(with: threatKind, failingUrl: iframeTopUrl)
+        // Generate a custom duck://error page URL that will be handled by DuckURLSchemeHandler
+        // DuckURLSchemeHandler will decode the error and fail the custom URL scheme navigation task with the error,
+        // which will then navigate to a special error page (`Tab.swift: navigation(_:didFailWith:)`)
+        let errorUrl = URL.specialErrorPage(failingUrl: iframeTopUrl, kind: threatKind.errorPageKind)
+
+        // Load the error URL in the web view main frame to display the custom error page instead of currently loaded website
         _ = webView?.load(URLRequest(url: errorUrl))
-        return .none
+
+        return .cancel
     }
 
-    @MainActor
-    func navigation(_ navigation: Navigation, didFailWith error: WKError) {
-        let url = error.failingUrl ?? navigation.url
-        guard navigation.isCurrent else { return }
-        guard error.errorCode != NSURLErrorCannotFindHost else { return }
+    func willStart(_ navigation: Navigation) {
+        errorData = nil
+    }
 
-        if !error.isFrameLoadInterrupted, !error.isNavigationCancelled {
-            guard let webView else { return }
-            let shouldPerformAlternateNavigation = navigation.url != webView.url || navigation.navigationAction.targetFrame?.url != .error
-            if featureFlagger.isFeatureOn(.sslCertificatesBypass),
-               error.errorCode == NSURLErrorServerCertificateUntrusted,
-               let errorCode = error.userInfo["_kCFStreamErrorCodeKey"] as? Int {
-                errorPageType = .ssl
-                failingURL = url
-                let domain: String = url.host ?? url.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true)
-                errorData = SpecialErrorData(kind: .ssl, errorType: SSLErrorType.forErrorCode(errorCode).rawValue, domain: domain, eTldPlus1: tld.eTLDplus1(failingURL?.host))
-                loadSSLErrorHTML(url: url, alternate: shouldPerformAlternateNavigation)
+    func navigation(_ navigation: Navigation, didFailWith error: WKError) {
+        guard navigation.isCurrent, let url = error.failingUrl else {
+            self.errorData = nil
+            return
+        }
+
+        switch error as NSError {
+        case let error as MaliciousSiteError:
+            // Set the error data that will be sent to the error page on load (`SpecialErrorPageUserScript.swift: initialSetup`)
+            errorData = .maliciousSite(kind: error.threatKind, url: url)
+
+        case is URLError where error.isServerCertificateUntrusted:
+            guard let errorType = error.sslErrorType else {
+                assertionFailure("Missing SSL error type")
+                errorData = nil
+                return
             }
+
+            let domain: String = url.host ?? url.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true)
+            errorData = .ssl(type: errorType, domain: domain, eTldPlus1: tld.eTLDplus1(domain))
+
+        default:
+            errorData = nil
         }
     }
 
     @MainActor
     func navigationDidFinish(_ navigation: Navigation) {
-        specialErrorPageUserScript?.isEnabled = navigation.url == failingURL
+        specialErrorPageUserScript?.isEnabled = (errorData != nil && navigation.navigationAction.navigationType == .alternateHtmlLoad)
     }
 
     @MainActor
@@ -193,21 +194,11 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
     }
 
 }
-private extension URL {
-
-    @MainActor
-    static func errorUrl(with threatKind: MaliciousSiteProtection.ThreatKind, failingUrl: URL) -> URL {
-        let urlString = failingUrl.absoluteString.utf8data
-        let encodedURL = URLTokenValidator.base64URLEncode(data: urlString)
-        let token = URLTokenValidator.shared.generateToken(for: failingUrl)
-        let errorURLString = "duck://error?reason=phishing&url=\(encodedURL)&token=\(token)"
-        return URL(string: errorURLString)!
-    }
-
-}
 
 extension SpecialErrorPageTabExtension: SpecialErrorPageUserScriptDelegate {
-    func leaveSite() {
+
+    // Special error page "Leave site" button action
+    func leaveSiteAction() {
         guard webView?.canGoBack == true else {
             webView?.close()
             return
@@ -215,31 +206,29 @@ extension SpecialErrorPageTabExtension: SpecialErrorPageUserScriptDelegate {
         _ = webView?.goBack()
     }
 
-    func visitSite() {
+    // Special error page "Visit site" button action
+    func visitSiteAction() {
         defer {
             webView?.reloadPage()
         }
-        guard let webView, let url = webView.url, let errorPageType else { return }
-        let threatKind: MaliciousSiteProtection.ThreatKind
-        switch errorPageType {
-        case .phishing:
-            threatKind = .phishing
-        // case .malware:
-        //     threatKind = .malware
+        guard let errorData, let webView, let url = webView.url else { return }
+        switch errorData {
+        case .maliciousSite(kind: let threatKind, url: _):
+            PixelKit.fire(MaliciousSiteProtection.Event.visitSite)
+
+            exemptions[url] = threatKind
+            state.bypassedMaliciousSiteThreatKind = threatKind
+            state.currentMalicousSiteThreatKind = .none
+
         case .ssl:
             shouldBypassSSLError = true
-            return
         }
-
-        PixelKit.fire(MaliciousSiteProtection.Event.visitSite)
-
-        exemptions[url] = threatKind
-        state.bypassedMaliciousSiteThreatKind = threatKind
-        state.currentMalicousSiteThreatKind = .none
     }
 
+    // Special error page "More info" expanded
     func advancedInfoPresented() {}
 }
+
 protocol SpecialErrorPageTabExtensionProtocol: AnyObject, NavigationResponder {
     var state: MaliciousSiteProtectionState { get }
 }
@@ -250,7 +239,7 @@ extension SpecialErrorPageTabExtension: TabExtension, SpecialErrorPageTabExtensi
 }
 
 extension TabExtensions {
-    var errorPage: SpecialErrorPageTabExtensionProtocol? {
+    var specialErrorPage: SpecialErrorPageTabExtensionProtocol? {
         resolve(SpecialErrorPageTabExtension.self)
     }
 }
@@ -258,13 +247,10 @@ extension TabExtensions {
 protocol ErrorPageTabExtensionNavigationDelegate: AnyObject {
     var url: URL? { get }
     var canGoBack: Bool { get }
-    func loadAlternateHTML(_ html: String, baseURL: URL, forUnreachableURL failingURL: URL)
-    func setDocumentHtml(_ html: String)
     func load(_ request: URLRequest) -> WKNavigation?
     func goBack() -> WKNavigation?
     func close()
-    @discardableResult
-    func reloadPage() -> WKNavigation?
+    @discardableResult func reloadPage() -> WKNavigation?
 }
 
 extension ErrorPageTabExtensionNavigationDelegate {

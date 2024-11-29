@@ -38,11 +38,11 @@ extension MaliciousSiteProtectionManager {
     struct EmbeddedDataProvider: MaliciousSiteProtection.EmbeddedDataProviding {
 
         private enum Constants {
-            static let embeddedDataRevision = 1692083
-            static let phishingEmbeddedHashPrefixDataSHA = "b423fa3cf21d82a8f537ae3c817c7aa5338603401c77a6ed7094f0b20af30055"
-            static let phishingEmbeddedFilterSetDataSHA = "6633f7a2e521071485128c6bf3b84ce2a2dc7bd09750fed7b0300913ed8bfa96"
-//            static let malwareEmbeddedHashPrefixDataSHA = "b423fa3cf21d82a8f537ae3c817c7aa5338603401c77a6ed7094f0b20af30055"
-//            static let malwareEmbeddedFilterSetDataSHA = "6633f7a2e521071485128c6bf3b84ce2a2dc7bd09750fed7b0300913ed8bfa96"
+            static let embeddedDataRevision = 1694418
+            static let phishingEmbeddedHashPrefixDataSHA = "d9eccd24d05ce16d4ab877574df728f69be6c7840aea00e1be11aeafffb0b1dc"
+            static let phishingEmbeddedFilterSetDataSHA = "5452a5a36651c3edb5f87716042175b5a3074acb5cc62a279dbca75479fc1eda"
+//            static let malwareEmbeddedHashPrefixDataSHA = "be5a2320307ed0dd8b8b2f2702dbade752dfb886aae24f212b0c3009524636aa"
+//            static let malwareEmbeddedFilterSetDataSHA = "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
         }
 
         func revision(for dataType: MaliciousSiteProtection.DataManager.StoredDataType) -> Int {
@@ -50,7 +50,11 @@ extension MaliciousSiteProtectionManager {
         }
 
         func url(for dataType: MaliciousSiteProtection.DataManager.StoredDataType) -> URL {
-            return Bundle.main.url(forResource: fileName(for: dataType), withExtension: nil)!
+            let fileName = fileName(for: dataType)
+            guard let url = Bundle.main.url(forResource: fileName, withExtension: nil) else {
+                fatalError("Could not find embedded data file \"\(fileName)\"")
+            }
+            return url
         }
 
         func hash(for dataType: MaliciousSiteProtection.DataManager.StoredDataType) -> String {
@@ -104,10 +108,13 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
 
         let updateIntervalProvider = { (dataType: MaliciousSiteProtection.DataManager.StoredDataType) -> TimeInterval? in
             let settings = MaliciousSiteProtectionRemoteSettings(privacyConfigurationManager: configManager)
+            let minutes: TimeInterval
             switch dataType {
-            case .hashPrefixSet: return settings[.hashPrefixUpdateFrequencyMinutes] * 60
-            case .filterSet: return settings[.filterSetUpdateFrequencyMinutes] * 60
+            case .hashPrefixSet: minutes = settings[.hashPrefixUpdateFrequencyMinutes]
+            case .filterSet: minutes = settings[.filterSetUpdateFrequencyMinutes]
             }
+            guard minutes > 0 else { return nil }
+            return minutes * 60
         }
 
         self.updateManager = MaliciousSiteProtection.UpdateManager(apiEnvironment: apiEnvironment, dataManager: dataManager, updateIntervalProvider: updateIntervalProvider)
@@ -168,7 +175,7 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
 
     public func evaluate(_ url: URL) async -> ThreatKind? {
         guard configManager.privacyConfig.isFeature(.maliciousSiteProtection, enabledForDomain: url.host) || featureFlagger.localOverrides?.override(for: FeatureFlag.maliciousSiteProtectionErrorPage) == true,
-              detectionPreferences.isEnabled || !(featureFlagger.isFeatureOn(.maliciousSiteProtectionPreferences) || featureFlagger.localOverrides?.override(for: FeatureFlag.maliciousSiteProtectionPreferences) == true) else { return .none }
+              detectionPreferences.isEnabled else { return .none }
 
         return await detector.evaluate(url)
     }

@@ -42,7 +42,7 @@ extension Tab: NavigationResponder {
     func setupNavigationDelegate() {
         navigationDelegate.setResponders(
             .weak(nullable: self.navigationHotkeyHandler),
-            .weak(nullable: self.onboarding),
+            .struct(OnboardingNavigationResponder()),
             .weak(nullable: self.brokenSiteInfo),
 
             // redirect to SERP for non-valid domains entered by user
@@ -63,8 +63,6 @@ extension Tab: NavigationResponder {
             // tracking link rewrite, referrer trimming, global privacy control
             .weak(nullable: self.navigationProtection),
 
-            .weak(nullable: self.downloads),
-
             .weak(nullable: self.adClickAttribution),
 
             // update blocked trackers info
@@ -81,6 +79,12 @@ extension Tab: NavigationResponder {
             .weak(nullable: self.contentBlockingAndSurrogates),
             // update click-to-load state
             .weak(nullable: self.fbProtection),
+
+            // Special Error Page script handler and Malicious Site detection
+            .weak(nullable: self.specialErrorPage),
+
+            .weak(nullable: self.downloads),
+
             // browsing history
             .weak(nullable: self.history),
 
@@ -90,16 +94,14 @@ extension Tab: NavigationResponder {
             // Tab Snapshots
             .weak(nullable: self.tabSnapshots),
 
-            // Error Page
-            .weak(nullable: self.errorPage),
-
             // Release Notes
             .weak(nullable: self.releaseNotes),
 
-            // should be the last, for Unit Tests navigation events tracking
-            .struct(nullable: testsClosureNavigationResponder),
+            .weak(nullable: self.networkProtection),
 
-            .weak(nullable: self.networkProtection)
+            // should be the last, for Unit Tests navigation events tracking
+            .struct(nullable: testsClosureNavigationResponder)
+            // !! don‘t add Tab Extensions here !!
         )
 
         newWindowPolicyDecisionMakers = [NewWindowPolicyDecisionMaker?](arrayLiteral:

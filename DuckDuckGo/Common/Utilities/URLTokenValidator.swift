@@ -60,10 +60,10 @@ public class URLTokenValidator {
         let urlString = url.absoluteString
         let timestamp = String(Int(Date().timeIntervalSince1970))
         let dataToSign = urlString + timestamp
-        let data = dataToSign.data(using: .utf8)!
+        let data = dataToSign.utf8data
 
         let hmacData = hmacSHA256(data: data, key: secretKey)
-        let signature = URLTokenValidator.base64URLEncode(data: hmacData)
+        let signature = URLTokenValidator.base64URLEncode(hmacData)
         return "\(signature):\(timestamp)"
     }
 
@@ -95,7 +95,7 @@ public class URLTokenValidator {
         let data = dataToSign.data(using: .utf8)!
 
         let expectedHmacData = hmacSHA256(data: data, key: secretKey)
-        let expectedSignature = URLTokenValidator.base64URLEncode(data: expectedHmacData)
+        let expectedSignature = URLTokenValidator.base64URLEncode(expectedHmacData)
 
         return expectedSignature == signature
     }
@@ -124,7 +124,7 @@ public class URLTokenValidator {
      - Parameter data: The data to be encoded.
      - Returns: A URL-safe base64-encoded string.
      */
-    public static func base64URLEncode(data: Data) -> String {
+    public static func base64URLEncode(_ data: Data) -> String {
         let base64String = data.base64EncodedString()
         let base64URLString = base64String
             .replacingOccurrences(of: "+", with: "-")
@@ -133,13 +133,18 @@ public class URLTokenValidator {
         return base64URLString
     }
 
+    public static func base64URLEncode(_ url: URL) -> String {
+        let data = url.absoluteString.utf8data
+        return base64URLEncode(data)
+    }
+
     /**
      Decodes a URL-safe base64-encoded string to data.
 
      - Parameter base64URLString: The URL-safe base64-encoded string to be decoded.
      - Returns: The decoded data, or nil if the string is not a valid base64-encoded string.
      */
-    public static func base64URLDecode(base64URLString: String) -> Data? {
+    public static func base64URLDecode(_ base64URLString: String) -> Data? {
         // Convert Base64URL string to Base64 string
         var base64String = base64URLString
             .replacingOccurrences(of: "-", with: "+")

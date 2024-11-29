@@ -1,5 +1,5 @@
 //
-//  OnboardingTabExtension.swift
+//  OnboardingNavigationResponder.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -19,22 +19,11 @@
 import Foundation
 import Navigation
 
-final class OnboardingTabExtension: NavigationResponder {
-    @MainActor
+struct OnboardingNavigationResponder: NavigationResponder {
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
-        if navigationAction.url.isOnboarding {
+        if navigationAction.url == .onboarding {
             return .allow
         }
         return .next
     }
-}
-
-protocol OnboardingTabExtensionProtocol: AnyObject, NavigationResponder {}
-
-extension OnboardingTabExtension: OnboardingTabExtensionProtocol, TabExtension {
-    func getPublicProtocol() -> OnboardingTabExtensionProtocol { self }
-}
-
-extension TabExtensions {
-    var onboarding: OnboardingTabExtensionProtocol? { resolve(OnboardingTabExtension.self) }
 }

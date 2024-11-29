@@ -34,29 +34,25 @@ final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
     }
 
     func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
-        guard let requestURL = webView.url ?? urlSchemeTask.request.url else {
+        guard let requestURL = urlSchemeTask.request.url else {
             assertionFailure("No URL for Duck scheme handler")
             return
         }
+        let webViewURL = webView.url ?? requestURL
 
-        switch requestURL.type {
-        case .onboarding, .releaseNotes:
+        if webViewURL.isOnboarding || webViewURL.isReleaseNotes {
             handleSpecialPages(urlSchemeTask: urlSchemeTask)
-        case .duckPlayer:
+        } else if webViewURL.isDuckPlayer {
             handleDuckPlayer(requestURL: requestURL, urlSchemeTask: urlSchemeTask, webView: webView)
-        case .error:
+        } else if webViewURL.isErrorURL {
             handleErrorPage(urlSchemeTask: urlSchemeTask)
-        case .newTab:
-            if featureFlagger.isFeatureOn(.htmlNewTabPage) {
-                if urlSchemeTask.request.url?.type == .favicon {
-                    handleFavicon(urlSchemeTask: urlSchemeTask)
-                } else {
-                    handleSpecialPages(urlSchemeTask: urlSchemeTask)
-                }
+        } else if webViewURL.isNewTabPage && featureFlagger.isFeatureOn(.htmlNewTabPage) {
+            if requestURL.isFavicon {
+                handleFavicon(urlSchemeTask: urlSchemeTask)
             } else {
-                handleNativeUIPages(requestURL: requestURL, urlSchemeTask: urlSchemeTask)
+                handleSpecialPages(urlSchemeTask: urlSchemeTask)
             }
-        default:
+        } else {
             handleNativeUIPages(requestURL: requestURL, urlSchemeTask: urlSchemeTask)
         }
     }
@@ -192,7 +188,7 @@ private extension DuckURLSchemeHandler {
         var directoryURL: URL
         if url.isOnboarding {
             directoryURL = URL(fileURLWithPath: "/pages/onboarding")
-        } else if url.isReleaseNotesScheme {
+        } else if url.isReleaseNotes {
             directoryURL = URL(fileURLWithPath: "/pages/release-notes")
         } else if url.isNewTabPage {
             directoryURL = URL(fileURLWithPath: "/pages/new-tab")
@@ -246,54 +242,29 @@ private extension DuckURLSchemeHandler {
             return
         }
 
-        guard requestURL.isErrorPage,
-              let threat = requestURL.getParameter(named: "reason").flatMap(MaliciousSiteProtection.ThreatKind.init),
-              let base64urlString = requestURL.getParameter(named: "url"),
-              let decodedData = URLTokenValidator.base64URLDecode(base64URLString: base64urlString),
-              let decodedString = String(data: decodedData, encoding: .utf8),
-              let url = URL(string: decodedString),
-              let token = requestURL.getParameter(named: "token"),
-              URLTokenValidator.shared.validateToken(token, for: url) else {
-
+        guard let (failingUrl: failingUrl, reason: reason, token: token) = requestURL.specialErrorPageParameters,
+              URLTokenValidator.shared.validateToken(token, for: failingUrl) else {
             urlSchemeTask.didFailWithError(URLError(.badURL, userInfo: [
                 NSURLErrorFailingURLErrorKey: requestURL,
                 NSLocalizedDescriptionKey: Bundle(for: URLSession.self).localizedString(forKey: "Err-1000", value: "bad URL", table: "Localizable")
             ]))
             return
         }
+        let threatKind: MaliciousSiteProtection.ThreatKind = switch reason {
+        // case .malware: .malware
+        case .phishing: .phishing
+        case .ssl: {
+            assertionFailure("SSL error page is handled with NSURLError: NSURLErrorServerCertificateUntrusted error")
+            return .phishing
+        }()
+        }
 
-        let error = MaliciousSiteError(threat: threat, failingUrl: url)
+        let error = MaliciousSiteError(threat: threatKind, failingUrl: failingUrl)
         urlSchemeTask.didFailWithError(error)
     }
 }
 
-extension URL {
-    enum URLType {
-        case newTab
-        case favicon
-        case onboarding
-        case duckPlayer
-        case releaseNotes
-        case error
-    }
-
-    var type: URLType? {
-        if self.isDuckPlayer {
-            return .duckPlayer
-        } else if self.isOnboarding {
-            return .onboarding
-        } else if self.isErrorPage {
-            return .error
-        } else if self.isReleaseNotesScheme {
-            return .releaseNotes
-        } else if self.isNewTabPage {
-            return .newTab
-        } else if self.isFavicon {
-            return .favicon
-        } else {
-            return nil
-        }
-    }
+private extension URL {
 
     var isOnboarding: Bool {
         return isDuckURLScheme && host == "onboarding"
@@ -303,20 +274,12 @@ extension URL {
         return isDuckURLScheme && host == "newtab"
     }
 
-    var isFavicon: Bool {
-        return isDuckURLScheme && host == "favicon"
-    }
-
-    var isDuckURLScheme: Bool {
-        navigationalScheme == .duck
-    }
-
-    var isReleaseNotesScheme: Bool {
+    var isReleaseNotes: Bool {
         return isDuckURLScheme && host == "release-notes"
     }
 
-    var isErrorPage: Bool {
-        isDuckURLScheme && self.host == "error"
+    var isFavicon: Bool {
+        return isDuckURLScheme && host == "favicon"
     }
 
 }
