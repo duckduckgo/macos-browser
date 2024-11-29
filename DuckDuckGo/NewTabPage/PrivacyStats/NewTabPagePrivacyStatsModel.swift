@@ -139,6 +139,11 @@ final class NewTabPagePrivacyStatsModel {
     }
 
     private enum Const {
+        /**
+         * This number is arbitrary, we decided to only show up to 100 most popular companies
+         * while putting all others into "Other companies" bucket. FWIW, at the time of writing
+         * this there are 831 companies in total in the Tracker Data Set.
+         */
         static let maxTopCompaniesCount: Int = 100
     }
 }
