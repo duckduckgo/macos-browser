@@ -901,6 +901,10 @@ extension MainViewController {
         SyncPromoManager().resetPromos()
     }
 
+    @objc func resetTipKit(_ sender: Any?) {
+        TipKitDebugOptionsUIActionHandler().resetTipKitTapped()
+    }
+
     @objc func internalUserState(_ sender: Any?) {
         guard let internalUserDecider = NSApp.delegateTyped.internalUserDecider as? DefaultInternalUserDecider else { return }
         let state = internalUserDecider.isInternalUser

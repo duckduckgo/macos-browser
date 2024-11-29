@@ -472,6 +472,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         DataBrokerProtectionAppEvents(featureGatekeeper: pirGatekeeper).applicationDidFinishLaunching()
 
+        TipKitAppEventHandler(featureFlagger: featureFlagger).appDidFinishLaunching()
+
         setUpAutoClearHandler()
 
         setUpAutofillPixelReporter()
