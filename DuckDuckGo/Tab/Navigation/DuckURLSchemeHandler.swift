@@ -34,29 +34,25 @@ final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
     }
 
     func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
-        guard let requestURL = webView.url ?? urlSchemeTask.request.url else {
+        guard let requestURL = urlSchemeTask.request.url else {
             assertionFailure("No URL for Duck scheme handler")
             return
         }
+        let webViewURL = webView.url ?? requestURL
 
-        switch requestURL.type {
-        case .onboarding, .releaseNotes:
+        if webViewURL.isOnboarding || webViewURL.isReleaseNotes {
             handleSpecialPages(urlSchemeTask: urlSchemeTask)
-        case .duckPlayer:
+        } else if webViewURL.isDuckPlayer {
             handleDuckPlayer(requestURL: requestURL, urlSchemeTask: urlSchemeTask, webView: webView)
-        case .error:
+        } else if webViewURL.isErrorURL {
             handleErrorPage(urlSchemeTask: urlSchemeTask)
-        case .newTab:
-            if featureFlagger.isFeatureOn(.htmlNewTabPage) {
-                if urlSchemeTask.request.url?.type == .favicon {
-                    handleFavicon(urlSchemeTask: urlSchemeTask)
-                } else {
-                    handleSpecialPages(urlSchemeTask: urlSchemeTask)
-                }
+        } else if webViewURL.isNewTabPage && featureFlagger.isFeatureOn(.htmlNewTabPage) {
+            if requestURL.isFavicon {
+                handleFavicon(urlSchemeTask: urlSchemeTask)
             } else {
-                handleNativeUIPages(requestURL: requestURL, urlSchemeTask: urlSchemeTask)
+                handleSpecialPages(urlSchemeTask: urlSchemeTask)
             }
-        default:
+        } else {
             handleNativeUIPages(requestURL: requestURL, urlSchemeTask: urlSchemeTask)
         }
     }
@@ -269,36 +265,6 @@ private extension DuckURLSchemeHandler {
 }
 
 private extension URL {
-    enum URLType {
-        case newTab
-        case favicon
-        case onboarding
-        case duckPlayer
-        case releaseNotes
-        case error
-    }
-
-    var type: URLType? {
-        guard case .duck = navigationalScheme else { return nil }
-        if self.isDuckPlayer {
-            return .duckPlayer
-        } else if self.isErrorURL {
-            return .error
-        } else if self.isFavicon {
-            return .favicon
-        }
-
-        switch self {
-        case .onboarding:
-            return .onboarding
-        case .releaseNotes:
-            return .releaseNotes
-        case .newtab:
-            return .newTab
-        default:
-            return nil
-        }
-    }
 
     var isOnboarding: Bool {
         return isDuckURLScheme && host == "onboarding"
