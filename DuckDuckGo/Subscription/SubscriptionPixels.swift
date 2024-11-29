@@ -32,5 +32,5 @@ enum SubscriptionPixels: PixelKitEventV2 {
         }
     }
 
-    var parameters: [String : String]? { nil }
+    var parameters: [String: String]? { nil }
 }

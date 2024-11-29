@@ -159,13 +159,9 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
         switch subscriptionPlatform {
         case .apple:
-//            if await confirmIfSignedInToSameAccount() { // TODO: what is this for?
-                return .navigateToManageSubscription { [weak self] in
-                    self?.changePlanOrBilling(for: .appStore)
-                }
-//            } else {
-//                return .presentSheet(.apple)
-//            }
+            return .navigateToManageSubscription { [weak self] in
+                self?.changePlanOrBilling(for: .appStore)
+            }
         case .google:
             return .presentSheet(.google)
         case .stripe:
@@ -191,20 +187,6 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             }
         }
     }
-
-//    private func confirmIfSignedInToSameAccount() async -> Bool {
-//        if #available(macOS 12.0, *) {
-//            guard let lastTransactionJWSRepresentation = await subscriptionManager.storePurchaseManager().mostRecentTransaction() else { return false }
-//            switch await subscriptionManager.authEndpointService.storeLogin(signature: lastTransactionJWSRepresentation) {
-//            case .success(let response):
-//                return response.externalID == accountManager.externalID
-//            case .failure:
-//                return false
-//            }
-//        }
-//
-//        return false
-//    }
 
     @MainActor
     func openVPN() {
@@ -253,15 +235,11 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         }
 
         Task {
-//            if subscriptionManager.currentEnvironment.purchasePlatform == .appStore {
-//                if #available(macOS 12.0, iOS 15.0, *) {
-//                    let appStoreAccountManagementFlow = DefaultAppStoreAccountManagementFlow(authEndpointService: subscriptionManager.authEndpointService,
-//                                                                                             storePurchaseManager: subscriptionManager.storePurchaseManager(),
-//                                                                                             accountManager: subscriptionManager.accountManager)
-//                    await appStoreAccountManagementFlow.refreshAuthTokenIfNeeded()
-//                }
-//            } // TODO: Double check but I don't think this makes sense in this context
-            try await subscriptionManager.getTokenContainer(policy: .localForceRefresh)
+            if subscriptionManager.currentEnvironment.purchasePlatform == .appStore {
+                if #available(macOS 12.0, iOS 15.0, *) {
+                    try await subscriptionManager.getTokenContainer(policy: .localForceRefresh)
+                }
+            }
 
             Task { @MainActor in
                 userEventHandler(eventType)
