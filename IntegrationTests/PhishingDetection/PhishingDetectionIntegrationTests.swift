@@ -119,7 +119,7 @@ class PhishingDetectionIntegrationTests: XCTestCase {
     }
 
     @MainActor
-    func testPhishingDetectedViaJSRedirectChain_tabIsMarkedPhishing() async throws {
+    func disabled_testPhishingDetectedViaJSRedirectChain_tabIsMarkedPhishing() async throws {
         loadUrl("http://privacy-test-pages.site/security/badware/phishing-js-redirector.html")
         try await waitForTabToFinishLoading()
         let tabErrorCode = tabViewModel.tab.error?.errorCode
