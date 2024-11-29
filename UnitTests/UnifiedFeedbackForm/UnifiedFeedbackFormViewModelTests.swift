@@ -61,7 +61,7 @@ final class UnifiedFeedbackFormViewModelTests: XCTestCase {
         let sender = MockVPNFeedbackSender()
         let payload = UnifiedFeedbackFormViewModel.Response(message: "something", error: nil)
         let response = APIResponseV2(data: try! JSONEncoder().encode(payload), httpResponse: HTTPURLResponse())
-        let viewModel = UnifiedFeedbackFormViewModel(accountManager: MockAccountManager(),
+        let viewModel = UnifiedFeedbackFormViewModel(subscriptionManager: SubscriptionManagerMock(),
                                                      apiService: MockAPIService(apiResponse: .success(response)),
                                                      vpnMetadataCollector: collector,
                                                      feedbackSender: sender)

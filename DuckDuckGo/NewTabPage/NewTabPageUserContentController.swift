@@ -83,7 +83,7 @@ extension WKWebViewConfiguration {
     func applyNewTabPageWebViewConfiguration(with featureFlagger: FeatureFlagger, newTabPageUserScript: NewTabPageUserScript) {
         if urlSchemeHandler(forURLScheme: URL.NavigationalScheme.duck.rawValue) == nil {
             setURLSchemeHandler(
-                DuckURLSchemeHandler(featureFlagger: featureFlagger),
+                DuckURLSchemeHandler(featureFlagger: featureFlagger, isNTPSpecialPageSupported: true),
                 forURLScheme: URL.NavigationalScheme.duck.rawValue
             )
         }

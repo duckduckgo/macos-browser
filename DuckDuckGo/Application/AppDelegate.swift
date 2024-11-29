@@ -36,6 +36,7 @@ import SyncDataProviders
 import UserNotifications
 import Lottie
 import NetworkProtection
+import PrivacyStats
 import Subscription
 import NetworkProtectionIPC
 import DataBrokerProtection
@@ -95,12 +96,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private(set) lazy var newTabPageActionsManager: NewTabPageActionsManaging = NewTabPageActionsManager(
         appearancePreferences: .shared,
         activeRemoteMessageModel: activeRemoteMessageModel,
+        privacyStats: privacyStats,
         openURLHandler: { url in
             Task { @MainActor in
                 WindowControllersManager.shared.showTab(with: .contentFromURL(url, source: .appOpenUrl))
             }
         }
     )
+    let privacyStats: PrivacyStatsCollecting
     let activeRemoteMessageModel: ActiveRemoteMessageModel
     let homePageSettingsModel = HomePage.Models.SettingsModel()
     let remoteMessagingClient: RemoteMessagingClient!
@@ -318,6 +321,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                                                        freemiumDBPUserStateManager: freemiumDBPUserStateManager)
         freemiumDBPPromotionViewCoordinator = FreemiumDBPPromotionViewCoordinator(freemiumDBPUserStateManager: freemiumDBPUserStateManager,
                                                                                   freemiumDBPFeature: freemiumDBPFeature)
+
+#if DEBUG
+        if NSApplication.runType.requiresEnvironment {
+            privacyStats = PrivacyStats(databaseProvider: PrivacyStatsDatabase())
+        } else {
+            privacyStats = MockPrivacyStats()
+        }
+#else
+        privacyStats = PrivacyStats(databaseProvider: PrivacyStatsDatabase())
+#endif
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {
@@ -581,7 +594,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             return terminationReply
         }
 
+        tearDownPrivacyStats()
+
         return .terminateNow
+    }
+
+    func tearDownPrivacyStats() {
+        let condition = RunLoop.ResumeCondition()
+        Task {
+            await privacyStats.handleAppTermination()
+            condition.resolve()
+        }
+        RunLoop.current.run(until: condition)
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
