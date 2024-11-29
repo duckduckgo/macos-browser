@@ -23,7 +23,6 @@ public enum FeatureFlag: String, CaseIterable {
     case debugMenu
     case sslCertificatesBypass
     case maliciousSiteProtectionErrorPage
-    case maliciousSiteProtectionPreferences
 
     /// Add experimental atb parameter to SERP queries for internal users to display Privacy Reminder
     /// https://app.asana.com/0/1199230911884351/1205979030848528/f
@@ -54,8 +53,7 @@ extension FeatureFlag: FeatureFlagDescribing {
         switch self {
         case .htmlNewTabPage:
             return true
-        case .maliciousSiteProtectionErrorPage,
-             .maliciousSiteProtectionPreferences:
+        case .maliciousSiteProtectionErrorPage:
             return true
         case .debugMenu,
              .sslCertificatesBypass,
@@ -84,8 +82,6 @@ extension FeatureFlag: FeatureFlagDescribing {
             return .remoteReleasable(.subfeature(DBPSubfeature.freemium))
         case .maliciousSiteProtectionErrorPage:
             return .remoteReleasable(.subfeature(MaliciousSiteProtectionSubfeature.allowErrorPage))
-        case .maliciousSiteProtectionPreferences:
-            return .remoteReleasable(.subfeature(MaliciousSiteProtectionSubfeature.allowPreferencesToggle))
         case .contextualOnboarding:
             return .remoteReleasable(.feature(.contextualOnboarding))
         case .credentialsImportPromotionForExistingUsers:
