@@ -40,19 +40,20 @@ final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
         }
         let webViewURL = webView.url ?? requestURL
 
-        if webViewURL.isOnboarding || webViewURL.isReleaseNotes {
+        switch webViewURL.type {
+        case .onboarding, .releaseNotes:
             handleSpecialPages(urlSchemeTask: urlSchemeTask)
-        } else if webViewURL.isDuckPlayer {
+        case .duckPlayer:
             handleDuckPlayer(requestURL: requestURL, urlSchemeTask: urlSchemeTask, webView: webView)
-        } else if webViewURL.isErrorURL {
+        case .error:
             handleErrorPage(urlSchemeTask: urlSchemeTask)
-        } else if webViewURL.isNewTabPage && featureFlagger.isFeatureOn(.htmlNewTabPage) {
-            if requestURL.isFavicon {
+        case .newTab where featureFlagger.isFeatureOn(.htmlNewTabPage):
+            if requestURL.type == .favicon {
                 handleFavicon(urlSchemeTask: urlSchemeTask)
             } else {
                 handleSpecialPages(urlSchemeTask: urlSchemeTask)
             }
-        } else {
+        default:
             handleNativeUIPages(requestURL: requestURL, urlSchemeTask: urlSchemeTask)
         }
     }
@@ -265,6 +266,33 @@ private extension DuckURLSchemeHandler {
 }
 
 private extension URL {
+
+    enum URLType {
+        case newTab
+        case favicon
+        case onboarding
+        case duckPlayer
+        case releaseNotes
+        case error
+    }
+
+    var type: URLType? {
+        if self.isDuckPlayer {
+            return .duckPlayer
+        } else if self.isOnboarding {
+            return .onboarding
+        } else if self.isErrorURL {
+            return .error
+        } else if self.isReleaseNotes {
+            return .releaseNotes
+        } else if self.isNewTabPage {
+            return .newTab
+        } else if self.isFavicon {
+            return .favicon
+        } else {
+            return nil
+        }
+    }
 
     var isOnboarding: Bool {
         return isDuckURLScheme && host == "onboarding"
