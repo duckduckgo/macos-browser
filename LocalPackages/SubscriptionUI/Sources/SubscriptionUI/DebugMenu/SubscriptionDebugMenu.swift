@@ -18,6 +18,7 @@
 
 import AppKit
 import Subscription
+import StoreKit
 
 public final class SubscriptionDebugMenu: NSMenuItem {
 
@@ -91,6 +92,12 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         let environmentItem = NSMenuItem(title: "Environment", action: nil, target: nil)
         environmentItem.submenu = makeEnvironmentSubmenu()
         menu.addItem(environmentItem)
+
+        menu.addItem(.separator())
+        let storefrontID = SKPaymentQueue.default().storefront?.identifier ?? "nil"
+        menu.addItem(NSMenuItem(title: "Storefront ID: \(storefrontID)", action: nil, target: nil))
+        let storefrontCountryCode = SKPaymentQueue.default().storefront?.countryCode ?? "nil"
+        menu.addItem(NSMenuItem(title: "Storefront Country Code: \(storefrontCountryCode)", action: nil, target: nil))
 
         menu.delegate = self
 
