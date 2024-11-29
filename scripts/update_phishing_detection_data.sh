@@ -45,12 +45,12 @@ performUpdate() {
     sed -i '' -e "s/$old_sha/$new_sha/g" "${def_filename}"
     sed -i '' -e "s/${threat_type}EmbeddedDataRevision =.*/${threat_type}EmbeddedDataRevision = $new_revision/" "${def_filename}"
 
-    printf "${threat_type}Embedded${capitalized_data_type}DataSHA updated\n\n"
+    printf "%s updated\n\n" "${threat_type}Embedded${capitalized_data_type}DataSHA"
 	rm -f "$temp_filename"
 }
 
 updateRevision() {
-    sed -i '' -e "s/revision = $old_revision/revision = $new_revision/" "${def_filename}"
+    sed -i '' -e "s/embeddedDataRevision = $old_revision/embeddedDataRevision = $new_revision/" "${def_filename}"
     printf "Updated revision from %s to %s\n" "$old_revision" "$new_revision"
 }
 

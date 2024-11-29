@@ -1942,10 +1942,6 @@
 		843D73BC2C786E5400E4F9DC /* BookmarkListPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84F1C8DA2C774CA900716446 /* BookmarkListPopover.swift */; };
 		8443DC6D2CF0C777000B8829 /* Tab+OnboardingNavigationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8443DC6C2CF0C777000B8829 /* Tab+OnboardingNavigationDelegate.swift */; };
 		8443DC6E2CF0C777000B8829 /* Tab+OnboardingNavigationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8443DC6C2CF0C777000B8829 /* Tab+OnboardingNavigationDelegate.swift */; };
-		8443DC742CF7021F000B8829 /* malwareHashPrefixes.json in Resources */ = {isa = PBXBuildFile; fileRef = 8443DC732CF7021F000B8829 /* malwareHashPrefixes.json */; };
-		8443DC752CF7021F000B8829 /* malwareFilterSet.json in Resources */ = {isa = PBXBuildFile; fileRef = 8443DC722CF7021F000B8829 /* malwareFilterSet.json */; };
-		8443DC762CF7021F000B8829 /* malwareHashPrefixes.json in Resources */ = {isa = PBXBuildFile; fileRef = 8443DC732CF7021F000B8829 /* malwareHashPrefixes.json */; };
-		8443DC772CF7021F000B8829 /* malwareFilterSet.json in Resources */ = {isa = PBXBuildFile; fileRef = 8443DC722CF7021F000B8829 /* malwareFilterSet.json */; };
 		844D7DA42C9443EA00BE61D4 /* NSPrintInfoExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844D7DA32C9443E500BE61D4 /* NSPrintInfoExtension.swift */; };
 		844D7DA52C9443EA00BE61D4 /* NSPrintInfoExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844D7DA32C9443E500BE61D4 /* NSPrintInfoExtension.swift */; };
 		84537A032C998C28008723BC /* FireWindowSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84537A022C998C24008723BC /* FireWindowSession.swift */; };
@@ -4197,8 +4193,6 @@
 		843965142C737022004C8899 /* NSPasteboardExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSPasteboardExtension.swift; sourceTree = "<group>"; };
 		843AD3DB2CD389C500163067 /* XMLNodeExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XMLNodeExtension.swift; sourceTree = "<group>"; };
 		8443DC6C2CF0C777000B8829 /* Tab+OnboardingNavigationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Tab+OnboardingNavigationDelegate.swift"; sourceTree = "<group>"; };
-		8443DC722CF7021F000B8829 /* malwareFilterSet.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = malwareFilterSet.json; sourceTree = "<group>"; };
-		8443DC732CF7021F000B8829 /* malwareHashPrefixes.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = malwareHashPrefixes.json; sourceTree = "<group>"; };
 		844D7DA32C9443E500BE61D4 /* NSPrintInfoExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSPrintInfoExtension.swift; sourceTree = "<group>"; };
 		84537A022C998C24008723BC /* FireWindowSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireWindowSession.swift; sourceTree = "<group>"; };
 		848648A02C76F4B20082282D /* BookmarksBarMenuViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarMenuViewController.swift; sourceTree = "<group>"; };
@@ -9769,8 +9763,6 @@
 			children = (
 				CDE248A62C821FFE00F9399D /* phishingFilterSet.json */,
 				CDE248A32C821FFE00F9399D /* phishingHashPrefixes.json */,
-				8443DC722CF7021F000B8829 /* malwareFilterSet.json */,
-				8443DC732CF7021F000B8829 /* malwareHashPrefixes.json */,
 				CDE248A42C821FFE00F9399D /* MaliciousSiteProtectionManager.swift */,
 				CDE248A52C821FFE00F9399D /* MaliciousSiteProtectionPreferences.swift */,
 				CDE248A72C821FFE00F9399D /* MaliciousSiteProtectionState.swift */,
@@ -10659,8 +10651,6 @@
 				3706FCC8293F65D500E42796 /* Assets.xcassets in Resources */,
 				3706FCC9293F65D500E42796 /* NavigationBar.storyboard in Resources */,
 				3706FCCA293F65D500E42796 /* FirePopoverCollectionViewHeader.xib in Resources */,
-				8443DC742CF7021F000B8829 /* malwareHashPrefixes.json in Resources */,
-				8443DC752CF7021F000B8829 /* malwareFilterSet.json in Resources */,
 				9FBB0C012CB94FC10006B6A6 /* view_highlight.json in Resources */,
 				3706FCCC293F65D500E42796 /* TabBar.storyboard in Resources */,
 				3706FCCD293F65D500E42796 /* shield-dot.json in Resources */,
@@ -10863,8 +10853,6 @@
 				AA585D86248FD31400E9A3E2 /* Assets.xcassets in Resources */,
 				85589E8D27BBBB870038AD11 /* NavigationBar.storyboard in Resources */,
 				AAE246F6270A3D3000BEEAEE /* FirePopoverCollectionViewHeader.xib in Resources */,
-				8443DC762CF7021F000B8829 /* malwareHashPrefixes.json in Resources */,
-				8443DC772CF7021F000B8829 /* malwareFilterSet.json in Resources */,
 				9FBB0C002CB94FC10006B6A6 /* view_highlight.json in Resources */,
 				AA80EC79256C46AA007083E7 /* TabBar.storyboard in Resources */,
 				AA34396D2754D4E300B241FA /* shield-dot.json in Resources */,
