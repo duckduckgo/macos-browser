@@ -24,8 +24,6 @@ import SubscriptionTestingUtilities
 import Freemium
 import Combine
 import TestUtils
-import SubscriptionTestingUtilities
-
 final class FreemiumDBPFeatureTests: XCTestCase {
 
     private var sut: FreemiumDBPFeature!
@@ -48,6 +46,7 @@ final class FreemiumDBPFeatureTests: XCTestCase {
                                                          purchasePlatform: .appStore)
 
         mockSubscriptionManager = SubscriptionManagerMock()
+        mockSubscriptionManager.currentEnvironment = currentEnvironment
 
         mockFreemiumDBPUserStateManagerManager = MockFreemiumDBPUserStateManager()
         mockFeatureDisabler = MockFeatureDisabler()

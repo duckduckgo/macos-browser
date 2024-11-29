@@ -28,7 +28,7 @@ protocol UnifiedFeedbackFormViewModelDelegate: AnyObject {
 }
 
 final class UnifiedFeedbackFormViewModel: ObservableObject {
-    private static let feedbackEndpoint = URL(string: "https://subscriptions.duckduckgo.com/api/feedback")!
+    static let feedbackEndpoint = URL(string: "https://subscriptions.duckduckgo.com/api/feedback")!
     private static let platform = "macos"
 
     enum ViewState {

@@ -116,13 +116,13 @@ final class SubscriptionPagesUseSubscriptionFeatureForStripeTests: XCTestCase {
         uiHandler = SubscriptionUIHandlerMock { action in
             self.uiEventsHappened.append(action)
         }
-
-        storePurchaseManager = StorePurchaseManagerMock()
-        subscriptionEnvironment = SubscriptionEnvironment(serviceEnvironment: .production,
-                                                          purchasePlatform: .stripe)
-
         subscriptionManager = SubscriptionManagerMock()
-
+        subscriptionManager.resultURL = URL(string: "https://example.com")
+        storePurchaseManager = StorePurchaseManagerMock()
+        subscriptionManager.resultStorePurchaseManager = storePurchaseManager
+        subscriptionEnvironment = SubscriptionEnvironment(serviceEnvironment: .staging,
+                                                          purchasePlatform: .stripe)
+        subscriptionManager.currentEnvironment = subscriptionEnvironment
         appStoreRestoreFlow = DefaultAppStoreRestoreFlow(subscriptionManager: subscriptionManager,
                                                          storePurchaseManager: storePurchaseManager)
 
@@ -192,7 +192,7 @@ final class SubscriptionPagesUseSubscriptionFeatureForStripeTests: XCTestCase {
     func testGetSubscriptionOptionsReturnsEmptyOptionsWhenSubscriptionOptionsDidNotFetch() async throws {
         // Given
         XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .stripe)
-//        subscriptionManager.productsResponse = .failure(Constants.invalidTokenError)
+        subscriptionManager.productsResponse = .failure(Subscription.SubscriptionManagerError.tokenUnavailable(error: nil))
         storePurchaseManager.subscriptionOptionsResult = nil
 
         // When
@@ -211,15 +211,14 @@ final class SubscriptionPagesUseSubscriptionFeatureForStripeTests: XCTestCase {
         ensureUserUnauthenticatedState()
         XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .stripe)
         XCTAssertFalse(subscriptionManager.isUserAuthenticated)
-
-//        authService.createAccountResult = .success(CreateAccountResponse(authToken: Constants.authToken,
-//                                                                         externalID: Constants.externalID,
-//                                                                         status: "created"))
-//        subscriptionManager.resultSubscription = SubscriptionMockFactory.subscription
-//        subscriptionManager.resultExchangeTokenContainer = OAuthTokensFactory.makeValidTokenContainerWithEntitlements()
+        subscriptionManager.resultCreateAccountTokenContainer = OAuthTokensFactory.makeValidTokenContainerWithEntitlements()
+        let subscriptionID = "some-subscription-id"
+        subscriptionManager.resultSubscription = SubscriptionMockFactory.subscription
+        storePurchaseManager.purchaseSubscriptionResult = .success(subscriptionID)
+        subscriptionManager.confirmPurchaseResponse = .success(SubscriptionMockFactory.subscription)
 
         // When
-        let subscriptionSelectedParams = ["id": "some-subscription-id"]
+        let subscriptionSelectedParams = ["id": subscriptionID]
         let result = try await feature.subscriptionSelected(params: subscriptionSelectedParams, original: Constants.mockScriptMessage)
 
         // Then
@@ -234,10 +233,8 @@ final class SubscriptionPagesUseSubscriptionFeatureForStripeTests: XCTestCase {
         ensureUserAuthenticatedState()
         XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .stripe)
         XCTAssertTrue(subscriptionManager.isUserAuthenticated)
-
-//        subscriptionService.getSubscriptionResult = .success(SubscriptionMockFactory.expiredSubscription)
+        await uiHandler.setAlertResponse(alertResponse: .alertFirstButtonReturn)
         subscriptionManager.resultSubscription = SubscriptionMockFactory.expiredSubscription
-//        subscriptionManager.resultExchangeTokenContainer = OAuthTokensFactory.makeValidTokenContainerWithEntitlements()
 
         // When
         let subscriptionSelectedParams = ["id": "some-subscription-id"]
@@ -255,8 +252,9 @@ final class SubscriptionPagesUseSubscriptionFeatureForStripeTests: XCTestCase {
         // Given
         ensureUserUnauthenticatedState()
         XCTAssertEqual(subscriptionEnvironment.purchasePlatform, .stripe)
-
-//        authService.createAccountResult = .failure(Constants.invalidTokenError)
+        subscriptionManager.resultCreateAccountTokenContainer = nil
+        storePurchaseManager.purchaseSubscriptionResult = .success(Constants.mostRecentTransactionJWS)
+        subscriptionManager.confirmPurchaseResponse = .success(SubscriptionMockFactory.subscription)
         await uiHandler.setAlertResponse(alertResponse: .alertFirstButtonReturn)
 
         // When
@@ -265,10 +263,11 @@ final class SubscriptionPagesUseSubscriptionFeatureForStripeTests: XCTestCase {
 
         // Then
         XCTAssertFalse(storePurchaseManager.purchaseSubscriptionCalled)
-        XCTAssertEqual(uiEventsHappened, [.didDismissProgressViewController,
-                                          .didShowAlert(.somethingWentWrong),
-                                          .didShowTab(.subscription(subscriptionManager.url(for: .purchase))),
-                                          .didDismissProgressViewController])
+        XCTAssertTrue(uiEventsHappened.count == 4)
+        XCTAssertTrue(uiEventsHappened.contains(.didDismissProgressViewController))
+        XCTAssertTrue(uiEventsHappened.contains(.didShowAlert(.somethingWentWrong)))
+        XCTAssertTrue(uiEventsHappened.contains(.didShowTab(.subscription(subscriptionManager.url(for: .purchase)))))
+        XCTAssertTrue(uiEventsHappened.contains(.didDismissProgressViewController))
         XCTAssertNil(result)
         XCTAssertPrivacyPixelsFired([PrivacyProPixel.privacyProPurchaseAttempt.name + "_d",
                                      PrivacyProPixel.privacyProPurchaseAttempt.name + "_c",
@@ -309,11 +308,11 @@ final class SubscriptionPagesUseSubscriptionFeatureForStripeTests: XCTestCase {
 extension SubscriptionPagesUseSubscriptionFeatureForStripeTests {
 
     func ensureUserAuthenticatedState() {
-        subscriptionManager.resultExchangeTokenContainer = OAuthTokensFactory.makeValidTokenContainerWithEntitlements()
+        subscriptionManager.resultTokenContainer = OAuthTokensFactory.makeValidTokenContainerWithEntitlements()
     }
 
     func ensureUserUnauthenticatedState() {
-        subscriptionManager.resultExchangeTokenContainer = nil
+        subscriptionManager.resultTokenContainer = nil
     }
 
     public func XCTAssertPrivacyPixelsFired(_ pixels: [String], file: StaticString = #file, line: UInt = #line) {

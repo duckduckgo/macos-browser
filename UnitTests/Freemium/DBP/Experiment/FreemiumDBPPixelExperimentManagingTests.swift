@@ -21,8 +21,6 @@ import SubscriptionTestingUtilities
 import Subscription
 @testable import DuckDuckGo_Privacy_Browser
 import TestUtils
-import SubscriptionTestingUtilities
-
 final class FreemiumDBPPixelExperimentManagingTests: XCTestCase {
 
     private var sut: FreemiumDBPPixelExperimentManaging!
@@ -35,7 +33,7 @@ final class FreemiumDBPPixelExperimentManagingTests: XCTestCase {
         let mockStorePurchaseManager = StorePurchaseManagerMock()
         let currentEnvironment = SubscriptionEnvironment(serviceEnvironment: .production,
                                                          purchasePlatform: .appStore)
-
+        mockSubscriptionManager.currentEnvironment = currentEnvironment
         mockSubscriptionManager = SubscriptionManagerMock()
         mockUserDefaults = MockUserDefaults()
         let testLocale = Locale(identifier: "en_US")

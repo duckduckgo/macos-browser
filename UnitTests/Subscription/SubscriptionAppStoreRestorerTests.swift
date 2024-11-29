@@ -68,10 +68,13 @@ final class SubscriptionAppStoreRestorerTests: XCTestCase {
         })
 
         storePurchaseManager = StorePurchaseManagerMock()
+
         subscriptionEnvironment = SubscriptionEnvironment(serviceEnvironment: .production,
                                                            purchasePlatform: .appStore)
 
         subscriptionManager = SubscriptionManagerMock()
+        subscriptionManager.currentEnvironment = subscriptionEnvironment
+        subscriptionManager.resultStorePurchaseManager = storePurchaseManager
         appStoreRestoreFlow = AppStoreRestoreFlowMock()
 
         subscriptionAppStoreRestorer = DefaultSubscriptionAppStoreRestorer(subscriptionManager: subscriptionManager,
@@ -156,6 +159,7 @@ final class SubscriptionAppStoreRestorerTests: XCTestCase {
         // Given
         appStoreRestoreFlow.restoreAccountFromPastPurchaseResult = .failure(.missingAccountOrTransactions)
         await uiHandler.setAlertResponse(alertResponse: .alertFirstButtonReturn)
+        subscriptionManager.resultURL = URL(string: "https://www.duckduckgo.com")
 
         // When
         await subscriptionAppStoreRestorer.restoreAppStoreSubscription()
@@ -268,6 +272,7 @@ final class SubscriptionAppStoreRestorerTests: XCTestCase {
         // Given
         appStoreRestoreFlow.restoreAccountFromPastPurchaseResult = .failure(AppStoreRestoreFlowError.subscriptionExpired)
         await uiHandler.setAlertResponse(alertResponse: .alertFirstButtonReturn)
+        subscriptionManager.resultURL = URL(string: "https://www.duckduckgo.com")
 
         // When
         await subscriptionAppStoreRestorer.restoreAppStoreSubscription()

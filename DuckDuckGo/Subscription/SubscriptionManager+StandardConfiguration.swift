@@ -66,9 +66,7 @@ extension DefaultSubscriptionManager {
         let pixelHandler: SubscriptionManager.PixelHandler = { type in
             switch type {
             case .deadToken:
-                // TODO: add pixel
-                //                Pixel.fire(pixel: .privacyProDeadTokenDetected)
-                break
+                PixelKit.fire(SubscriptionPixels.privacyProDeadTokenDetected)
             }
         }
 
@@ -86,11 +84,3 @@ extension DefaultSubscriptionManager {
         }
     }
 }
-
-//extension DefaultSubscriptionManager: AccountManagerKeychainAccessDelegate {
-//
-//    public func accountManagerKeychainAccessFailed(accessType: AccountKeychainAccessType, error: AccountKeychainAccessError) {
-//        PixelKit.fire(PrivacyProErrorPixel.privacyProKeychainAccessError(accessType: accessType, accessError: error),
-//                      frequency: .legacyDailyAndCount)
-//    }
-//}

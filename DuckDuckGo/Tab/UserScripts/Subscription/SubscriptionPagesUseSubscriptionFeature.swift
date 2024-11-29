@@ -156,9 +156,13 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         // Clear subscription Cache
         await subscriptionManager.signOut()
 
-        let authToken = subscriptionValues.token
+        guard !subscriptionValues.token.isEmpty else {
+            Logger.subscription.fault("Empty token provided, Failed to exchange v1 token for v2")
+            return nil
+        }
+
         do {
-            _ = try await subscriptionManager.exchange(tokenV1: authToken)
+            _ = try await subscriptionManager.exchange(tokenV1: subscriptionValues.token)
             Logger.subscription.log("v1 token exchanged for v2")
         } catch {
             Logger.subscription.error("Failed to exchange v1 token for v2")

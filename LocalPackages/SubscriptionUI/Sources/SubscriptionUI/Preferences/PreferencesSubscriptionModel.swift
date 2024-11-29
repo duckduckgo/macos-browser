@@ -261,6 +261,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 //                    await appStoreAccountManagementFlow.refreshAuthTokenIfNeeded()
 //                }
 //            } // TODO: Double check but I don't think this makes sense in this context
+            try await subscriptionManager.getTokenContainer(policy: .localForceRefresh)
 
             Task { @MainActor in
                 userEventHandler(eventType)

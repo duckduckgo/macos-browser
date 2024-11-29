@@ -25,7 +25,7 @@ import Common
 import os.log
 
 final class VPNRedditSessionWorkaround {
-    
+
     private let subscriptionManager: any SubscriptionManager
     private let ipcClient: VPNControllerXPCClient
     private let statusReporter: NetworkProtectionStatusReporter

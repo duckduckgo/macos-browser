@@ -31,6 +31,7 @@ final class FreemiumDBPFirstProfileSavedNotifierTests: XCTestCase {
     override func setUpWithError() throws {
         mockFreemiumDBPUserStateManager = MockFreemiumDBPUserStateManager()
         mockNotificationCenter = MockNotificationCenter()
+        mockSubscriptionManager = SubscriptionManagerMock()
         sut = FreemiumDBPFirstProfileSavedNotifier(freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager,
                                                    subscriptionManager: mockSubscriptionManager,
                                                    notificationCenter: mockNotificationCenter)

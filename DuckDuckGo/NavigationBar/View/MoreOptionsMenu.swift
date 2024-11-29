@@ -948,7 +948,7 @@ final class SubscriptionSubMenu: NSMenu, NSMenuDelegate {
 
     private func refreshAvailabilityBasedOnEntitlements() {
         guard subscriptionFeatureAvailability.isFeatureAvailable, subscriptionManager.isUserAuthenticated else { return }
-        
+
         Task.detached(priority: .background) { [weak self] in
             guard let self else { return }
 

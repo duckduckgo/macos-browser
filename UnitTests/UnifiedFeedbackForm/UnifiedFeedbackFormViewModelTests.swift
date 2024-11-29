@@ -44,7 +44,6 @@ final class UnifiedFeedbackFormViewModelTests: XCTestCase {
     func testWhenCreatingViewModel_ThenInitialStateIsFeedbackPending() throws {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
-        //        apiService.set(response: .failure(Error.generic), forRequest: <#T##APIRequestV2#>)
         let viewModel = UnifiedFeedbackFormViewModel(subscriptionTokenProvider: subscriptionTokenProvider,
                                                      apiService: apiService,
                                                      vpnMetadataCollector: collector,
@@ -56,7 +55,6 @@ final class UnifiedFeedbackFormViewModelTests: XCTestCase {
     func testGivenNoEmail_WhenSendingFeedbackSucceeds_ThenFeedbackIsSent() async throws {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
-        //        apiService.set(response: .failure(Error.generic), forRequest: <#T##APIRequestV2#>)
         let viewModel = UnifiedFeedbackFormViewModel(subscriptionTokenProvider: subscriptionTokenProvider,
                                                      apiService: apiService,
                                                      vpnMetadataCollector: collector,
@@ -74,9 +72,13 @@ final class UnifiedFeedbackFormViewModelTests: XCTestCase {
     func testGivenEmail_WhenSendingFeedbackSucceeds_ThenFeedbackIsSent() async throws {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
+
+        // API request to mock
         let payload = UnifiedFeedbackFormViewModel.Response(message: "something", error: nil)
         let response = APIResponseV2(data: try! JSONEncoder().encode(payload), httpResponse: HTTPURLResponse())
-        //        apiService.set(response: , forRequest: <#T##APIRequestV2#>)
+        apiService.set(response: response, forRequestURL: UnifiedFeedbackFormViewModel.feedbackEndpoint)
+
+        subscriptionTokenProvider.resultTokenContainer = OAuthTokensFactory.makeValidTokenContainerWithEntitlements()
         let viewModel = UnifiedFeedbackFormViewModel(subscriptionTokenProvider: subscriptionTokenProvider,
                                                      apiService: apiService,
                                                      vpnMetadataCollector: collector,
@@ -95,7 +97,6 @@ final class UnifiedFeedbackFormViewModelTests: XCTestCase {
     func testWhenSendingFeedbackFails_ThenFeedbackIsNotSent() async throws {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
-        //        apiService.set(response: , forRequest: <#T##APIRequestV2#>) // error
         let viewModel = UnifiedFeedbackFormViewModel(subscriptionTokenProvider: subscriptionTokenProvider,
                                                      apiService: apiService,
                                                      vpnMetadataCollector: collector,
@@ -114,7 +115,6 @@ final class UnifiedFeedbackFormViewModelTests: XCTestCase {
     func testGivenInvalidEmail_WhenSendingFeedbackFails_ThenFeedbackIsNotSent() async throws {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
-        //        apiService.set(response: , forRequest: <#T##APIRequestV2#>) // error
         let viewModel = UnifiedFeedbackFormViewModel(subscriptionTokenProvider: subscriptionTokenProvider,
                                                      apiService: apiService,
 
@@ -135,7 +135,6 @@ final class UnifiedFeedbackFormViewModelTests: XCTestCase {
     func testGivenValidEmail_WhenSendingFeedbackFails_ThenFeedbackIsNotSent() async throws {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
-        //        apiService.set(response: , forRequest: <#T##APIRequestV2#>) // error
         let viewModel = UnifiedFeedbackFormViewModel(subscriptionTokenProvider: subscriptionTokenProvider,
                                                      apiService: apiService,
                                                      vpnMetadataCollector: collector,
@@ -156,7 +155,6 @@ final class UnifiedFeedbackFormViewModelTests: XCTestCase {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
         let delegate = MockVPNFeedbackFormViewModelDelegate()
-        //        apiService.set(response: , forRequest: <#T##APIRequestV2#>) // error
         let viewModel = UnifiedFeedbackFormViewModel(subscriptionTokenProvider: subscriptionTokenProvider,
                                                      apiService: apiService,
 

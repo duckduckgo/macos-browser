@@ -26,7 +26,7 @@ import TestUtils
 class DataBrokerProtectionAuthenticationManagerTests: XCTestCase {
     var authenticationManager: DataBrokerProtectionAuthenticationManager!
     var redeemUseCase: DataBrokerProtectionRedeemUseCase!
-    var subscriptionManager: SubscriptionManagerMock! //MockDataBrokerProtectionSubscriptionManaging!
+    var subscriptionManager: SubscriptionManagerMock!
 
     override func setUp() async throws {
         redeemUseCase = MockRedeemUseCase()
@@ -40,26 +40,19 @@ class DataBrokerProtectionAuthenticationManagerTests: XCTestCase {
     }
 
     func testUserNotAuthenticatedWhenSubscriptionManagerReturnsFalse() {
-        subscriptionManager.resultTokenContainer = OAuthTokensFactory.makeValidTokenContainer()
-
         authenticationManager = DataBrokerProtectionAuthenticationManager(redeemUseCase: redeemUseCase,
                                                                           subscriptionManager: subscriptionManager)
-
         XCTAssertEqual(authenticationManager.isUserAuthenticated, false)
     }
 
     func testEmptyAccessTokenResultsInNilAuthHeader() {
-        subscriptionManager.resultTokenContainer = OAuthTokensFactory.makeValidTokenContainer()
-
         authenticationManager = DataBrokerProtectionAuthenticationManager(redeemUseCase: redeemUseCase,
                                                                           subscriptionManager: subscriptionManager)
-
         XCTAssertNil(authenticationManager.getAuthHeader())
     }
 
     func testUserAuthenticatedWhenSubscriptionManagerReturnsTrue() {
         subscriptionManager.resultTokenContainer = OAuthTokensFactory.makeValidTokenContainer()
-
         authenticationManager = DataBrokerProtectionAuthenticationManager(redeemUseCase: redeemUseCase,
                                                                           subscriptionManager: subscriptionManager)
 
