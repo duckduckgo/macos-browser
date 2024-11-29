@@ -21,6 +21,8 @@ import SwiftUIExtensions
 import Combine
 import NetworkProtection
 import Lottie
+import os.log
+import TipKit
 
 public struct TunnelControllerView: View {
 
@@ -32,13 +34,17 @@ public struct TunnelControllerView: View {
 
     /// The view model that this instance will use.
     ///
-    @ObservedObject var model: TunnelControllerViewModel
+    @ObservedObject
+    var model: TunnelControllerViewModel
 
     // MARK: - Initializers
 
     public init(model: TunnelControllerViewModel) {
         self.model = model
     }
+
+    @EnvironmentObject
+    private var tipsModel: VPNTipsModel
 
     // MARK: - View Contents
 
@@ -49,8 +55,62 @@ public struct TunnelControllerView: View {
 
             featureToggleRow()
 
+            if #available(macOS 14.0, *),
+               tipsModel.canShowTips,
+               case .invalidated = tipsModel.domainExclusionsTip.status {
+
+                TipView(tipsModel.autoconnectTip, action: tipsModel.autoconnectTipActionHandler)
+                    .tipImageSize(VPNTipsModel.imageSize)
+                    .tipBackground(Color(.tipBackground))
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 6)
+                    .onAppear {
+                        tipsModel.handleAutoconnectionTipShown()
+                    }
+                    .task {
+                        var previousStatus = tipsModel.autoconnectTip.status
+
+                        for await status in tipsModel.autoconnectTip.statusUpdates {
+                            if case .invalidated(let reason) = status {
+                                if case .available = previousStatus {
+                                    tipsModel.handleAutoconnectTipInvalidated(reason)
+                                }
+                            }
+
+                            previousStatus = status
+                        }
+                    }
+            }
+
             SiteTroubleshootingView()
                 .padding(.top, 5)
+
+            if #available(macOS 14.0, *),
+               tipsModel.canShowTips,
+               case .invalidated = tipsModel.geoswitchingTip.status {
+
+                TipView(tipsModel.domainExclusionsTip)
+                    .tipImageSize(VPNTipsModel.imageSize)
+                    .tipBackground(Color(.tipBackground))
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 6)
+                    .onAppear {
+                        tipsModel.handleDomainExclusionsTipShown()
+                    }
+                    .task {
+                        var previousStatus = tipsModel.domainExclusionsTip.status
+
+                        for await status in tipsModel.domainExclusionsTip.statusUpdates {
+                            if case .invalidated(let reason) = status {
+                                if case .available = previousStatus {
+                                    tipsModel.handleDomainExclusionTipInvalidated(reason)
+                                }
+                            }
+
+                            previousStatus = status
+                        }
+                    }
+            }
 
             Divider()
                 .padding(EdgeInsets(top: 5, leading: 9, bottom: 5, trailing: 9))
@@ -60,6 +120,16 @@ public struct TunnelControllerView: View {
             if model.showServerDetails {
                 connectionStatusView()
                     .disabled(on: !isEnabled)
+            }
+        }
+        .onAppear {
+            if #available(macOS 14.0, *) {
+                tipsModel.handleTunnelControllerAppear()
+            }
+        }
+        .onDisappear {
+            if #available(macOS 14.0, *) {
+                tipsModel.handleTunnelControllerDisappear()
             }
         }
     }
@@ -105,7 +175,7 @@ public struct TunnelControllerView: View {
                     introEndFrame: 100,
                     loopStartFrame: 130,
                     loopEndFrame: 370
-                ), isAnimating: $model.isVPNEnabled)
+                ), isAnimating: model.isVPNEnabled)
     }
 
     @ViewBuilder
@@ -124,6 +194,10 @@ public struct TunnelControllerView: View {
                 .padding(EdgeInsets(top: 6, leading: 9, bottom: 6, trailing: 9))
 
             MenuItemCustomButton {
+                if #available(macOS 14.0, *) {
+                    tipsModel.handleLocationsShown()
+                }
+
                 model.showLocationSettings()
                 dismiss()
             } label: { isHovered in
@@ -166,6 +240,32 @@ public struct TunnelControllerView: View {
                             .foregroundColor(isHovered ? .white: Color(.defaultText))
                     }
                 }
+            }
+
+            if #available(macOS 14.0, *),
+               tipsModel.canShowTips {
+
+                TipView(tipsModel.geoswitchingTip)
+                    .tipImageSize(VPNTipsModel.imageSize)
+                    .tipBackground(Color(.tipBackground))
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 6)
+                    .onAppear {
+                        tipsModel.handleGeoswitchingTipShown()
+                    }
+                    .task {
+                        var previousStatus = tipsModel.geoswitchingTip.status
+
+                        for await status in tipsModel.geoswitchingTip.statusUpdates {
+                            if case .invalidated(let reason) = status {
+                                if case .available = previousStatus {
+                                    tipsModel.handleGeoswitchingTipInvalidated(reason)
+                                }
+                            }
+
+                            previousStatus = status
+                        }
+                    }
             }
 
             dividerRow()

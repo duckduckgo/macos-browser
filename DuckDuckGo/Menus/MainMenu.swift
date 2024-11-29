@@ -728,6 +728,11 @@ final class MainMenu: NSMenu {
                                   openSubscriptionTab: { WindowControllersManager.shared.showTab(with: .subscription($0)) },
                                   subscriptionManager: Application.appDelegate.subscriptionManager)
 
+            NSMenuItem(title: "TipKit") {
+                NSMenuItem(title: "Reset", action: #selector(MainViewController.resetTipKit))
+                NSMenuItem(title: "⚠️ App restart required.", action: nil, target: nil)
+            }
+
             NSMenuItem(title: "Logging").submenu(setupLoggingMenu())
             NSMenuItem(title: "AI Chat").submenu(AIChatDebugMenu())
 

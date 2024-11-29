@@ -326,6 +326,7 @@ final class AddressBarTextField: NSTextField {
 
     private func navigate(suggestion: Suggestion?) {
         let ntpExperiment = NewTabPageSearchBoxExperiment()
+        let ntpExperimentCohort: NewTabPageSearchBoxExperiment.Cohort? = ntpExperiment.isActive ? ntpExperiment.cohort : nil
         let source: NewTabPageSearchBoxExperiment.SearchSource? = {
             guard ntpExperiment.isActive else {
                 return nil
@@ -349,17 +350,17 @@ final class AddressBarTextField: NSTextField {
         let autocompletePixel: GeneralPixel? = {
             switch suggestion {
             case .phrase:
-                return .autocompleteClickPhrase(from: source, cohort: ntpExperiment.cohort, onboardingCohort: ntpExperiment.onboardingCohort)
+                return .autocompleteClickPhrase(from: source, cohort: ntpExperimentCohort, onboardingCohort: ntpExperiment.onboardingCohort)
             case .website:
-                return .autocompleteClickWebsite(from: source, cohort: ntpExperiment.cohort, onboardingCohort: ntpExperiment.onboardingCohort)
+                return .autocompleteClickWebsite(from: source, cohort: ntpExperimentCohort, onboardingCohort: ntpExperiment.onboardingCohort)
             case .bookmark(_, _, let isFavorite, _):
                 if isFavorite {
-                    return .autocompleteClickFavorite(from: source, cohort: ntpExperiment.cohort, onboardingCohort: ntpExperiment.onboardingCohort)
+                    return .autocompleteClickFavorite(from: source, cohort: ntpExperimentCohort, onboardingCohort: ntpExperiment.onboardingCohort)
                 } else {
-                    return .autocompleteClickBookmark(from: source, cohort: ntpExperiment.cohort, onboardingCohort: ntpExperiment.onboardingCohort)
+                    return .autocompleteClickBookmark(from: source, cohort: ntpExperimentCohort, onboardingCohort: ntpExperiment.onboardingCohort)
                 }
             case .historyEntry:
-                return .autocompleteClickHistory(from: source, cohort: ntpExperiment.cohort, onboardingCohort: ntpExperiment.onboardingCohort)
+                return .autocompleteClickHistory(from: source, cohort: ntpExperimentCohort, onboardingCohort: ntpExperiment.onboardingCohort)
             default:
                 return nil
             }

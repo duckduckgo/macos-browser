@@ -119,7 +119,7 @@ class AutoconsentMessageProtocolTests: XCTestCase {
         let message = MockWKScriptMessage(name: "popupFound", body: [
             "type": "popupFound",
             "cmp": "some cmp",
-            "url": "some url"
+            "url": "https://example.com"
         ])
         userScript.handleMessage(
             replyHandler: {(msg: Any?, _: String?) in

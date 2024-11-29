@@ -249,7 +249,10 @@ private extension DuckURLSchemeHandler {
 
         guard let (failingUrl: failingUrl, reason: reason, token: token) = requestURL.specialErrorPageParameters,
               URLTokenValidator.shared.validateToken(token, for: failingUrl) else {
-            urlSchemeTask.didFailWithError(URLError(.badURL, userInfo: [NSURLErrorFailingURLErrorKey: requestURL]))
+            urlSchemeTask.didFailWithError(URLError(.badURL, userInfo: [
+                NSURLErrorFailingURLErrorKey: requestURL,
+                NSLocalizedDescriptionKey: Bundle(for: URLSession.self).localizedString(forKey: "Err-1000", value: "bad URL", table: "Localizable")
+            ]))
             return
         }
         let threatKind: MaliciousSiteProtection.ThreatKind = switch reason {
