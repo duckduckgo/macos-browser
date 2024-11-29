@@ -50,9 +50,14 @@ final class MaliciousSiteProtectionTests: XCTestCase {
         XCTAssertTrue(phishingDetection.backgroundUpdatesEnabled)
     }
 
-    func testDisableFeature() async {
+    func testWhenFeatureDisabled_phishingIsNotDetected() async {
         MaliciousSiteProtectionPreferences.shared.isEnabled = false
-        let isMalicious = await phishingDetection.evaluate(URL(string: "https://malicious.com")!)
+        let isMalicious = await phishingDetection.evaluate(URL(string: "https://phishing.com")!)
+        XCTAssertNil(isMalicious)
+    }
+    func testWhenFeatureDisabled_malwareIsNotDetected() async {
+        MaliciousSiteProtectionPreferences.shared.isEnabled = false
+        let isMalicious = await phishingDetection.evaluate(URL(string: "https://malware.com")!)
         XCTAssertNil(isMalicious)
     }
 
@@ -65,10 +70,16 @@ final class MaliciousSiteProtectionTests: XCTestCase {
         XCTAssertFalse(phishingDetection.backgroundUpdatesEnabled)
     }
 
-    func testIsMalicious() async {
+    func testWhenPhishingDetected_phishingThreatReturned() async {
         MaliciousSiteProtectionPreferences.shared.isEnabled = true
-        let isMalicious = await phishingDetection.evaluate(URL(string: "https://malicious.com")!)
+        let isMalicious = await phishingDetection.evaluate(URL(string: "https://phishing.com")!)
         XCTAssertEqual(isMalicious, .phishing)
+    }
+
+    func testWhenMalwareDetected_malwareThreatReturned() async {
+        MaliciousSiteProtectionPreferences.shared.isEnabled = true
+        let isMalicious = await phishingDetection.evaluate(URL(string: "https://malware.com")!)
+        XCTAssertEqual(isMalicious, .malware)
     }
 
     func testIsNotMalicious() async {
