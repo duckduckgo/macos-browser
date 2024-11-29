@@ -19,6 +19,7 @@
 import Foundation
 import AppKit
 import Bookmarks
+import Combine
 import Common
 import PixelKit
 import os.log
@@ -242,9 +243,13 @@ final class AppearancePreferences: ObservableObject {
             if !isContinueSetUpVisible {
                 PixelKit.fire(GeneralPixel.continueSetUpSectionHidden)
             }
+            isContinueSetUpVisibleSubject.send(newValue)
             self.objectWillChange.send()
         }
     }
+
+    let isContinueSetUpVisiblePublisher: AnyPublisher<Bool, Never>
+    private var isContinueSetUpVisibleSubject = PassthroughSubject<Bool, Never>()
 
     func continueSetUpCardsViewDidAppear() {
         guard isContinueSetUpVisible, !isContinueSetUpCardsViewOutdated else { return }
@@ -344,6 +349,7 @@ final class AppearancePreferences: ObservableObject {
         self.dateTimeProvider = dateTimeProvider
         self.isContinueSetUpCardsViewOutdated = persistor.continueSetUpCardsNumberOfDaysDemonstrated >= Constants.dismissNextStepsCardsAfterDays
         self.continueSetUpCardsClosed = persistor.continueSetUpCardsClosed
+        self.isContinueSetUpVisiblePublisher = isContinueSetUpVisibleSubject.eraseToAnyPublisher()
         currentThemeName = .init(rawValue: persistor.currentThemeName) ?? .systemDefault
         showFullURL = persistor.showFullURL
         favoritesDisplayMode = persistor.favoritesDisplayMode.flatMap(FavoritesDisplayMode.init) ?? .default

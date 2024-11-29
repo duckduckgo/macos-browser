@@ -26,6 +26,20 @@ import Subscription
 import NetworkProtection
 import NetworkProtectionUI
 
+protocol ContinueSetUpModelTabOpening {
+    @MainActor
+    func openTab(_ tab: Tab)
+}
+
+struct TabCollectionViewModelTabOpener: ContinueSetUpModelTabOpening {
+    let tabCollectionViewModel: TabCollectionViewModel
+
+    @MainActor
+    func openTab(_ tab: Tab) {
+        tabCollectionViewModel.insertOrAppend(tab: tab, selected: true)
+    }
+}
+
 extension HomePage.Models {
 
     static let newHomePageTabOpen = Notification.Name("newHomePageAppOpen")
@@ -49,14 +63,16 @@ extension HomePage.Models {
         private let defaultBrowserProvider: DefaultBrowserProvider
         private let dockCustomizer: DockCustomization
         private let dataImportProvider: DataImportStatusProviding
-        private let tabCollectionViewModel: TabCollectionViewModel
+        private let tabOpener: ContinueSetUpModelTabOpening
         private let emailManager: EmailManager
         private let duckPlayerPreferences: DuckPlayerPreferencesPersistor
         private let subscriptionManager: SubscriptionManager
 
-        @UserDefaultsWrapper(key: .homePageShowAllFeatures, defaultValue: false)
-        var shouldShowAllFeatures: Bool {
+        @Published
+        var shouldShowAllFeatures: Bool = UserDefaultsWrapper(key: .homePageShowAllFeatures, defaultValue: false).wrappedValue {
             didSet {
+                let udWrapper = UserDefaultsWrapper(key: .homePageShowAllFeatures, defaultValue: false)
+                udWrapper.wrappedValue = shouldShowAllFeatures
                 updateVisibleMatrix()
             }
         }
@@ -102,7 +118,7 @@ extension HomePage.Models {
 
         lazy var listOfFeatures = settings.isFirstSession ? firstRunFeatures : randomisedFeatures
 
-        private var featuresMatrix: [[FeatureType]] = [[]] {
+        @Published var featuresMatrix: [[FeatureType]] = [[]] {
             didSet {
                 updateVisibleMatrix()
             }
@@ -110,18 +126,19 @@ extension HomePage.Models {
 
         @Published var visibleFeaturesMatrix: [[FeatureType]] = [[]]
 
-        init(defaultBrowserProvider: DefaultBrowserProvider,
-             dockCustomizer: DockCustomization,
-             dataImportProvider: DataImportStatusProviding,
-             tabCollectionViewModel: TabCollectionViewModel,
+        init(defaultBrowserProvider: DefaultBrowserProvider = SystemDefaultBrowserProvider(),
+             dockCustomizer: DockCustomization = DockCustomizer(),
+             dataImportProvider: DataImportStatusProviding = BookmarksAndPasswordsImportStatusProvider(),
+             tabOpener: ContinueSetUpModelTabOpening,
              emailManager: EmailManager = EmailManager(),
-             duckPlayerPreferences: DuckPlayerPreferencesPersistor,
+             duckPlayerPreferences: DuckPlayerPreferencesPersistor = DuckPlayerPreferencesUserDefaultsPersistor(),
              privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
              subscriptionManager: SubscriptionManager = Application.appDelegate.subscriptionManager) {
+
             self.defaultBrowserProvider = defaultBrowserProvider
             self.dockCustomizer = dockCustomizer
             self.dataImportProvider = dataImportProvider
-            self.tabCollectionViewModel = tabCollectionViewModel
+            self.tabOpener = tabOpener
             self.emailManager = emailManager
             self.duckPlayerPreferences = duckPlayerPreferences
             self.privacyConfigurationManager = privacyConfigurationManager
@@ -166,14 +183,14 @@ extension HomePage.Models {
         private func performDuckPlayerAction() {
             if let videoUrl = URL(string: duckPlayerURL) {
                 let tab = Tab(content: .url(videoUrl, source: .link), shouldLoadInBackground: true)
-                tabCollectionViewModel.append(tab: tab)
+                tabOpener.openTab(tab)
             }
         }
 
         @MainActor
         private func performEmailProtectionAction() {
             let tab = Tab(content: .url(EmailUrls().emailProtectionLink, source: .ui), shouldLoadInBackground: true)
-            tabCollectionViewModel.append(tab: tab)
+            tabOpener.openTab(tab)
         }
 
         func performDockAction() {
