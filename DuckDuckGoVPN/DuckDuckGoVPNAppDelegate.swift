@@ -132,7 +132,8 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private let privacyConfigurationManager = VPNPrivacyConfigurationManager(internalUserDecider: DefaultInternalUserDecider(store: UserDefaults.appConfiguration))
     private lazy var featureFlagger = DefaultFeatureFlagger(
         internalUserDecider: privacyConfigurationManager.internalUserDecider,
-        privacyConfigManager: privacyConfigurationManager)
+        privacyConfigManager: privacyConfigurationManager,
+        experimentManager: nil)
 
     public init(subscriptionManager: any SubscriptionManager) {
         self.subscriptionManager = subscriptionManager

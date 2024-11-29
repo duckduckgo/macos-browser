@@ -279,6 +279,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 keyValueStore: UserDefaults.appConfiguration,
                 actionHandler: FeatureFlagOverridesPublishingHandler<FeatureFlag>()
             ),
+            experimentManager: ExperimentCohortsManager(store: ExperimentsDataStore()),
             for: FeatureFlag.self
         )
 
