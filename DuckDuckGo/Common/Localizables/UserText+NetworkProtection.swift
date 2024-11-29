@@ -82,7 +82,7 @@ extension UserText {
     // "general.feedback-form.category.vpn" - Description for the feedback form when the issue is related to VPN
     static let generalFeedbackFormCategoryVPN = "VPN"
     // "general.feedback-form.category.pir" - Description for the feedback form when the issue is related to Personal Info Removal (PIR)
-    static let generalFeedbackFormCategoryPIR = "Personal Info Removal"
+    static let generalFeedbackFormCategoryPIR = "Personal Information Removal"
     // "general.feedback-form.category.itr" - Description for the feedback form when the issue is related to Identity Theft Restoration (ITR)
     static let generalFeedbackFormCategoryITR = "Identity Theft Restoration"
     // "ppro.feedback-form.category.select-category" - Title for the category selection state of the feedback form
@@ -144,6 +144,11 @@ extension UserText {
     static let pproFeedbackFormText5 = "By clicking \"Submit\" I agree that DuckDuckGo may use the information in this report for purposes of improving the app's features."
     // "ppro.feedback-form.disclaimer" - Text for the disclaimer of the PPro feedback form
     static let pproFeedbackFormDisclaimer = "Reports are anonymous and sent to DuckDuckGo to help improve our service"
+
+    // "ppro.feedback-form.email.label" - Label for the email field of the PPro feedback form
+    static let pproFeedbackFormEmailLabel = "Provide an email if you’d like us to contact you about this issue (we may not be able to respond to all issues):"
+    // "ppro.feedback-form.email.placeholder" - Placeholder for the email field of the PPro feedback form
+    static let pproFeedbackFormEmailPlaceholder = "Email (optional)"
 
     // "ppro.feedback-form.sending-confirmation.title" - Title for the feedback sent view title of the feedback form
     static let pproFeedbackFormSendingConfirmationTitle = "Thank you!"

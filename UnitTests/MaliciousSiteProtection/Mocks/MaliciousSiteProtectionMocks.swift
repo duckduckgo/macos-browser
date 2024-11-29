@@ -24,20 +24,44 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 class MockMaliciousSiteDataProvider: MaliciousSiteProtection.EmbeddedDataProviding {
+
     var embeddedFilterSet: Set<Filter> = []
     var embeddedHashPrefixes: Set<String> = []
     var embeddedRevision: Int = 0
     var didLoadFilterSet: Bool = false
     var didLoadHashPrefixes: Bool = false
 
-    func loadEmbeddedFilterSet() -> Set<Filter> {
-        didLoadFilterSet = true
-        return embeddedFilterSet
+    public func revision(for detectionKind: MaliciousSiteProtection.DataManager.StoredDataType) -> Int {
+        embeddedRevision
     }
 
-    func loadEmbeddedHashPrefixes() -> Set<String> {
-        didLoadHashPrefixes = true
-        return embeddedHashPrefixes
+    func url(for dataType: MaliciousSiteProtection.DataManager.StoredDataType) -> URL {
+        switch dataType {
+        case .filterSet:
+            return URL(string: "filterSet")!
+        case .hashPrefixSet:
+            return URL(string: "hashPrefixSet")!
+        }
+    }
+
+    func hash(for dataType: MaliciousSiteProtection.DataManager.StoredDataType) -> String {
+        let url = url(for: dataType)
+        let data = try! data(withContentsOf: url)
+        let sha = data.sha256
+        return sha
+    }
+
+    func data(withContentsOf url: URL) throws -> Data {
+        switch url.absoluteString {
+        case "filterSet":
+            self.didLoadFilterSet = true
+            return "[]".utf8data
+        case "hashPrefixSet":
+            self.didLoadHashPrefixes = true
+            return "[]".utf8data
+        default:
+            fatalError("Unexpected url \(url.absoluteString)")
+        }
     }
 }
 
@@ -46,29 +70,15 @@ class MockMaliciousSiteFileStore: MaliciousSiteProtection.FileStoring {
     var didWriteToDisk: Bool = false
     var didReadFromDisk: Bool = false
 
-    func write(data: Data, to filename: String) {
+    func write(data: Data, to filename: String) -> Bool {
         didWriteToDisk = true
         storage[filename] = data
+        return true
     }
 
     func read(from filename: String) -> Data? {
         didReadFromDisk = true
         return storage[filename]
-    }
-}
-
-final class MockPhishingDataActivitites: PhishingDetectionDataActivityHandling {
-    var started: Bool = false
-    var stopped: Bool = true
-
-    func start() {
-        started = true
-        stopped = false
-    }
-
-    func stop() {
-        stopped = true
-        started = false
     }
 }
 

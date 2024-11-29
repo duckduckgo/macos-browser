@@ -24,64 +24,91 @@ import Foundation
 import MaliciousSiteProtection
 import PixelKit
 
+extension MaliciousSiteProtectionManager {
+
+    static func fileName(for dataType: MaliciousSiteProtection.DataManager.StoredDataType) -> String {
+        switch (dataType, dataType.threatKind) {
+        case (.hashPrefixSet, .phishing): "phishingHashPrefixes.json"
+        case (.filterSet, .phishing): "phishingFilterSet.json"
+//            case (.hashPrefixes, .malware): "malwareHashPrefixes.json"
+//            case (.filters, .malware): "malwareFilterSet.json"
+        }
+    }
+
+    static func updateInterval(for dataKind: MaliciousSiteProtection.DataManager.StoredDataType) -> TimeInterval? {
+        switch dataKind {
+        case .hashPrefixSet: .minutes(20)
+        case .filterSet: .hours(12)
+        }
+    }
+
+    struct EmbeddedDataProvider: MaliciousSiteProtection.EmbeddedDataProviding {
+
+        private enum Constants {
+            static let embeddedDataRevision = 1692083
+            static let phishingEmbeddedHashPrefixDataSHA = "b423fa3cf21d82a8f537ae3c817c7aa5338603401c77a6ed7094f0b20af30055"
+            static let phishingEmbeddedFilterSetDataSHA = "6633f7a2e521071485128c6bf3b84ce2a2dc7bd09750fed7b0300913ed8bfa96"
+//            static let malwareEmbeddedHashPrefixDataSHA = "b423fa3cf21d82a8f537ae3c817c7aa5338603401c77a6ed7094f0b20af30055"
+//            static let malwareEmbeddedFilterSetDataSHA = "6633f7a2e521071485128c6bf3b84ce2a2dc7bd09750fed7b0300913ed8bfa96"
+        }
+
+        func revision(for dataType: MaliciousSiteProtection.DataManager.StoredDataType) -> Int {
+            Constants.embeddedDataRevision
+        }
+
+        func url(for dataType: MaliciousSiteProtection.DataManager.StoredDataType) -> URL {
+            return Bundle.main.url(forResource: fileName(for: dataType), withExtension: nil)!
+        }
+
+        func hash(for dataType: MaliciousSiteProtection.DataManager.StoredDataType) -> String {
+            switch (dataType, dataType.threatKind) {
+            case (.hashPrefixSet, .phishing): Constants.phishingEmbeddedHashPrefixDataSHA
+            case (.filterSet, .phishing): Constants.phishingEmbeddedFilterSetDataSHA
+//            case (.hashPrefixes, .malware): Constants.malwareEmbeddedHashPrefixDataSHA
+//            case (.filters, .malware): Constants.malwareEmbeddedFilterSetDataSHA
+            }
+        }
+
+        // see `EmbeddedThreatDataProviding.swift` extension for `EmbeddedThreatDataProviding.load` method implementation
+    }
+}
+
 public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
     static let shared = MaliciousSiteProtectionManager()
 
-    private let revision: Int
-    private let filterSetURL: URL
-    private let filterSetDataSHA: String
-    private let hashPrefixURL: URL
-    private let hashPrefixDataSHA: String
-
     private let detector: MaliciousSiteDetecting
-    private let updateManager: MaliciousSiteProtection.UpdateManaging
-    private let dataActivities: PhishingDetectionDataActivityHandling
+    private let updateManager: MaliciousSiteProtection.UpdateManager
     private let detectionPreferences: MaliciousSiteProtectionPreferences
     private let featureFlagger: FeatureFlagger
     private let configManager: PrivacyConfigurationManaging
 
     private var featureFlagsCancellable: AnyCancellable?
     private var detectionPreferencesEnabledCancellable: AnyCancellable?
+    private var updateTask: Task<Void, Error>?
+    var backgroundUpdatesEnabled: Bool { updateTask != nil }
 
     init(
-        revision: Int = 1686837,
-        filterSetURL: URL = Bundle.main.url(forResource: "phishingFilterSet", withExtension: "json")!,
-        filterSetDataSHA: String = "517e610cd7c304f91ff5aaee91d570f7b6e678dbe9744e00cdb0a3126068432f",
-        hashPrefixURL: URL = Bundle.main.url(forResource: "phishingHashPrefixes", withExtension: "json")!,
-        hashPrefixDataSHA: String = "05075ab14302a9e0329fbc0ba7e4e3118d7fa37846ec087c3942cfb1be92ffe0",
-        apiClient: MaliciousSiteProtection.APIClientProtocol = .production,
+        apiEnvironment: MaliciousSiteDetector.APIEnvironment = .production,
         embeddedDataProvider: MaliciousSiteProtection.EmbeddedDataProviding? = nil,
-        dataManager: MaliciousSiteProtection.DataManaging? = nil,
+        dataManager: MaliciousSiteProtection.DataManager? = nil,
         detector: MaliciousSiteProtection.MaliciousSiteDetecting? = nil,
-        updateManager: MaliciousSiteProtection.UpdateManaging? = nil,
-        dataActivities: PhishingDetectionDataActivityHandling? = nil,
         detectionPreferences: MaliciousSiteProtectionPreferences = MaliciousSiteProtectionPreferences.shared,
         featureFlagger: FeatureFlagger? = nil,
         configManager: PrivacyConfigurationManaging? = nil
     ) {
-        self.revision = revision
-        self.filterSetURL = filterSetURL
-        self.filterSetDataSHA = filterSetDataSHA
-        self.hashPrefixURL = hashPrefixURL
-        self.hashPrefixDataSHA = hashPrefixDataSHA
-
         self.featureFlagger = featureFlagger ?? NSApp.delegateTyped.featureFlagger
         self.configManager = configManager ?? AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
 
-        let embeddedDataProvider = embeddedDataProvider ?? MaliciousSiteProtection.EmbeddedDataProvider(
-            revision: revision,
-            filterSetURL: filterSetURL,
-            filterSetDataSHA: filterSetDataSHA,
-            hashPrefixURL: hashPrefixURL,
-            hashPrefixDataSHA: hashPrefixDataSHA
-        )
+        let embeddedDataProvider = embeddedDataProvider ?? EmbeddedDataProvider()
+        let dataManager = dataManager ?? {
+            let configurationUrl = FileManager.default.configurationDirectory()
+            let fileStore = MaliciousSiteProtection.FileStore(dataStoreURL: configurationUrl)
+            return MaliciousSiteProtection.DataManager(fileStore: fileStore, embeddedDataProvider: embeddedDataProvider, fileNameProvider: Self.fileName(for:))
+        }()
 
-        let dataManager = dataManager ?? MaliciousSiteProtection.DataManager(embeddedDataProvider: embeddedDataProvider)
-
-        self.detector = detector ?? MaliciousSiteDetector(apiClient: apiClient, dataManager: dataManager, eventMapping: Self.debugEvents)
-        self.updateManager = updateManager ?? MaliciousSiteProtection.UpdateManager(apiClient: apiClient, dataManager: dataManager)
+        self.detector = detector ?? MaliciousSiteDetector(apiEnvironment: apiEnvironment, dataManager: dataManager, eventMapping: Self.debugEvents)
+        self.updateManager = MaliciousSiteProtection.UpdateManager(apiEnvironment: apiEnvironment, dataManager: dataManager, updateIntervalProvider: Self.updateInterval)
         self.detectionPreferences = detectionPreferences
-        self.dataActivities = dataActivities ?? PhishingDetectionDataActivities(updateManager: self.updateManager)
 
         self.setupBindings()
     }
@@ -126,11 +153,12 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
     }
 
     private func startUpdateTasks() {
-        dataActivities.start()
+        self.updateTask = updateManager.startPeriodicUpdates()
     }
 
     private func stopUpdateTasks() {
-        dataActivities.stop()
+        updateTask?.cancel()
+        updateTask = nil
     }
 
     // MARK: - Public

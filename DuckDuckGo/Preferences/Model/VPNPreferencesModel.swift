@@ -32,12 +32,20 @@ final class VPNPreferencesModel: ObservableObject {
 
     @Published var connectOnLogin: Bool {
         didSet {
+            guard settings.connectOnLogin != connectOnLogin else {
+                return
+            }
+
             settings.connectOnLogin = connectOnLogin
         }
     }
 
     @Published var excludeLocalNetworks: Bool {
         didSet {
+            guard settings.excludeLocalNetworks != excludeLocalNetworks else {
+                return
+            }
+
             settings.excludeLocalNetworks = excludeLocalNetworks
 
             Task {
@@ -48,8 +56,6 @@ final class VPNPreferencesModel: ObservableObject {
             }
         }
     }
-
-    @Published var secureDNS: Bool = true
 
     @Published var showInMenuBar: Bool {
         didSet {
@@ -117,6 +123,8 @@ final class VPNPreferencesModel: ObservableObject {
         locationItem = VPNLocationPreferenceItemModel(selectedLocation: settings.selectedLocation)
 
         subscribeToOnboardingStatusChanges(defaults: defaults)
+        subscribeToConnectOnLoginSettingChanges()
+        subscribeToExcludeLocalNetworksSettingChanges()
         subscribeToShowInMenuBarSettingChanges()
         subscribeToShowInBrowserToolbarSettingsChanges()
         subscribeToLocationSettingChanges()
@@ -126,6 +134,18 @@ final class VPNPreferencesModel: ObservableObject {
     func subscribeToOnboardingStatusChanges(defaults: UserDefaults) {
         defaults.networkProtectionOnboardingStatusPublisher
             .assign(to: \.onboardingStatus, onWeaklyHeld: self)
+            .store(in: &cancellables)
+    }
+
+    func subscribeToConnectOnLoginSettingChanges() {
+        settings.connectOnLoginPublisher
+            .assign(to: \.connectOnLogin, onWeaklyHeld: self)
+            .store(in: &cancellables)
+    }
+
+    func subscribeToExcludeLocalNetworksSettingChanges() {
+        settings.excludeLocalNetworksPublisher
+            .assign(to: \.excludeLocalNetworks, onWeaklyHeld: self)
             .store(in: &cancellables)
     }
 
