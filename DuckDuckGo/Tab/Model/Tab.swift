@@ -231,9 +231,6 @@ protocol NewWindowPolicyDecisionMaker {
         specialPagesUserScript?
             .withAllSubfeatures()
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
-        if #available(macOS 14.4, *) {
-            WebExtensionManager.shared.setUpWebExtensionController(for: configuration)
-        }
         configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking,
                                                  burnerMode: burnerMode,
                                                  earlyAccessHandlers: specialPagesUserScript.map { [$0] } ?? [])

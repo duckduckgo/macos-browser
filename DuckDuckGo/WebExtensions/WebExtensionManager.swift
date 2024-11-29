@@ -154,15 +154,22 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
         return button
     }
 
+    func setBackgroundWebViewUserAgent() {
+        for context in extensionController.extensionContexts {
+            if let backgroundWebView = context._backgroundWebView {
+                if backgroundWebView.customUserAgent != UserAgent.safari {
+                    backgroundWebView.customUserAgent = UserAgent.safari
+                }
+            }
+        }
+    }
+
     @MainActor
     func showBackgroundConsole(context: _WKWebExtensionContext) {
         guard let backgroundWebView = context._backgroundWebView else {
             return
         }
         backgroundWebView.configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
-
-        //TODO: Remove this line, or find a better place. This is just a test of setting user agent
-        backgroundWebView.customUserAgent = UserAgent.safari
 
         guard backgroundWebView.responds(to: NSSelectorFromString("_inspector")),
               let inspector = backgroundWebView.value(forKey: "_inspector") as? NSObject,
@@ -334,7 +341,12 @@ extension WebExtensionManager: @preconcurrency _WKWebExtensionControllerDelegate
         popupWebView.configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
         popupWebView.customUserAgent = UserAgent.safari
 
+        //TODO: Temporary
+        setBackgroundWebViewUserAgent()
+
         popupPopover.show(relativeTo: button.bounds, of: button, preferredEdge: .maxY)
+
+        popupWebView.reload()
     }
 
     func webExtensionController(_ controller: _WKWebExtensionController, sendMessage message: Any, to applicationIdentifier: String?, for extensionContext: _WKWebExtensionContext) async throws -> Any? {

@@ -67,7 +67,11 @@ extension WKWebViewConfiguration {
             }
         }
 
-//TODO: Resolve conflict with user content controller
+        if #available(macOS 14.4, *) {
+            self._webExtensionController = WebExtensionManager.shared.extensionController
+        }
+
+//TODO: Resolve conflict with user content controller by refactoring removeAllUserScripts() from UserContentController
 //        let userContentController = UserContentController(assetsPublisher: contentBlocking.contentBlockingAssetsPublisher,
 //                                                          privacyConfigurationManager: contentBlocking.privacyConfigurationManager,
 //                                                          earlyAccessHandlers: earlyAccessHandlers)
