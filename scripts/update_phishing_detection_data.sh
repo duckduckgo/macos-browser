@@ -29,8 +29,8 @@ performUpdate() {
 
 	old_sha="$(grep "static let ${threat_type}Embedded${capitalized_data_type}DataSHA =" "${def_filename}" | awk -F '"' '{print $2}')"
     if [ -z "$old_sha" ]; then
-        echo "❌ Could not read ${threat_type}Embedded${capitalized_data_type}DataSHA"
-        exit 1
+        echo "⚠️ Could not read ${threat_type}Embedded${capitalized_data_type}DataSHA"
+        old_sha=""
     fi
 
 	printf "Embedded SHA256: %s\n" "${old_sha}"
@@ -51,20 +51,23 @@ performUpdate() {
 
     new_sha="$(shasum -a 256 "$data_path" | awk -F ' ' '{print $1}')"
 
-    if [ "$new_sha" == "$old_sha" ]; then
-        printf "🆗 Data not modified.\n"
-    else
+    if [ "$new_sha" != "$old_sha" ]; then
         printf "New SHA256: %s ✨\n" "$new_sha"
     fi
 
-    sed -i '' -e "s/$old_sha/$new_sha/g" "${def_filename}"
+    sed -i '' -e "s/${threat_type}Embedded${capitalized_data_type}DataSHA =.*/${threat_type}Embedded${capitalized_data_type}DataSHA = \"$new_sha\"/g" "${def_filename}"
     sed -i '' -e "s/${threat_type}EmbeddedDataRevision =.*/${threat_type}EmbeddedDataRevision = $new_revision/" "${def_filename}"
 
-    if [ "$new_sha" == "$old_sha" ]; then
-        printf "\n"
+    # Validate number of records in the data file
+    record_count=$(jq 'length' "$data_path")
+    if [ "$record_count" -eq 0 ]; then
+        echo "⚠️⚠️⚠️: No data at $data_path"
+    elif [ "$new_sha" == "$old_sha" ]; then
+        printf "🆗 Data not modified. Number of records: %d\n\n" "$record_count"
     else
-        printf "✅ %s updated\n\n" "${threat_type}Embedded${capitalized_data_type}DataSHA"
+        printf "✅ %s updated with %d records\n\n" "${threat_type}Embedded${capitalized_data_type}DataSHA" "$record_count"
     fi
+
 	rm -f "$temp_filename"
 }
 
@@ -73,7 +76,7 @@ updateRevision() {
     printf "Updated revision from %s to %s\n" "$old_revision" "$new_revision"
 }
 
-if [ "$old_revision" -lt "$new_revision" ]; then
+if [[ "$old_revision" -lt "$new_revision" ]] || [[ "$*" == *"-f"* ]]; then
     performUpdate phishing hashPrefix "${work_dir}/phishingHashPrefixes.json"
     performUpdate phishing filterSet "${work_dir}/phishingFilterSet.json"
 
