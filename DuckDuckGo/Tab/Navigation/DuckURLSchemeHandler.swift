@@ -34,29 +34,25 @@ final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
     }
 
     func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
-        guard let requestURL = webView.url ?? urlSchemeTask.request.url else {
+        guard let requestURL = urlSchemeTask.request.url else {
             assertionFailure("No URL for Duck scheme handler")
             return
         }
+        let webViewURL = webView.url ?? requestURL
 
-        switch requestURL.type {
-        case .onboarding, .releaseNotes:
+        if webViewURL.isOnboarding || webViewURL.isReleaseNotes {
             handleSpecialPages(urlSchemeTask: urlSchemeTask)
-        case .duckPlayer:
+        } else if webViewURL.isDuckPlayer {
             handleDuckPlayer(requestURL: requestURL, urlSchemeTask: urlSchemeTask, webView: webView)
-        case .error:
+        } else if webViewURL.isErrorURL {
             handleErrorPage(urlSchemeTask: urlSchemeTask)
-        case .newTab:
-            if featureFlagger.isFeatureOn(.htmlNewTabPage) {
-                if urlSchemeTask.request.url?.type == .favicon {
-                    handleFavicon(urlSchemeTask: urlSchemeTask)
-                } else {
-                    handleSpecialPages(urlSchemeTask: urlSchemeTask)
-                }
+        } else if webViewURL.isNewTabPage && featureFlagger.isFeatureOn(.htmlNewTabPage) {
+            if requestURL.isFavicon {
+                handleFavicon(urlSchemeTask: urlSchemeTask)
             } else {
-                handleNativeUIPages(requestURL: requestURL, urlSchemeTask: urlSchemeTask)
+                handleSpecialPages(urlSchemeTask: urlSchemeTask)
             }
-        default:
+        } else {
             handleNativeUIPages(requestURL: requestURL, urlSchemeTask: urlSchemeTask)
         }
     }
@@ -190,15 +186,14 @@ private extension DuckURLSchemeHandler {
         var fileName = "index"
         var fileExtension = "html"
         var directoryURL: URL
-        switch url.type {
-        case .onboarding:
+        if url.isOnboarding {
             directoryURL = URL(fileURLWithPath: "/pages/onboarding")
-        case .releaseNotes:
+        } else if url.isReleaseNotes {
             directoryURL = URL(fileURLWithPath: "/pages/release-notes")
-        case .newTab:
+        } else if url.isNewTabPage {
             directoryURL = URL(fileURLWithPath: "/pages/new-tab")
-        default:
-            assertionFailure("Unsupported URL")
+        } else {
+            assertionFailure("Unknown scheme")
             return nil
         }
         directoryURL.appendPathComponent(url.path)
@@ -269,36 +264,18 @@ private extension DuckURLSchemeHandler {
     }
 }
 
-extension URL {
-    enum URLType {
-        case newTab
-        case favicon
-        case onboarding
-        case duckPlayer
-        case releaseNotes
-        case error
+private extension URL {
+
+    var isOnboarding: Bool {
+        return isDuckURLScheme && host == "onboarding"
     }
 
-    var type: URLType? {
-        guard case .duck = navigationalScheme else { return nil }
-        if self.isDuckPlayer {
-            return .duckPlayer
-        } else if self.isErrorURL {
-            return .error
-        } else if self.isFavicon {
-            return .favicon
-        }
+    var isNewTabPage: Bool {
+        return isDuckURLScheme && host == "newtab"
+    }
 
-        switch self {
-        case .onboarding:
-            return .onboarding
-        case .releaseNotes:
-            return .releaseNotes
-        case .newtab:
-            return .newTab
-        default:
-            return nil
-        }
+    var isReleaseNotes: Bool {
+        return isDuckURLScheme && host == "release-notes"
     }
 
     var isFavicon: Bool {

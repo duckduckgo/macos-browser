@@ -28,7 +28,7 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 extension WKError {
-    static func serverCertificateUntrustedError(sslErrorCode: Int, url: String) -> WKError {
+    static func serverCertificateUntrustedError(sslErrorCode: Int32, url: String) -> WKError {
         WKError(_nsError: NSError(domain: NSURLErrorDomain, code: NSURLErrorServerCertificateUntrusted, userInfo: [
             SSLErrorCodeKey: sslErrorCode,
             NSURLErrorFailingURLErrorKey: URL(string: url)!,
