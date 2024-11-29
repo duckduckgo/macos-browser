@@ -44,7 +44,7 @@ class MaliciousSiteProtectionIntegrationTests: XCTestCase {
         WebTrackingProtectionPreferences.shared.isGPCEnabled = false
         MaliciousSiteProtectionPreferences.shared.isEnabled = true
         let featureFlagger = MockFeatureFlagger()
-        detector = MaliciousSiteProtectionManager(featureFlagger: featureFlagger, configManager: MockPrivacyConfigurationManager())
+        detector = MaliciousSiteProtectionManager(featureFlagger: featureFlagger, configManager: MockPrivacyConfigurationManager(), updateIntervalProvider: { _ in nil })
         schemeHandler = TestSchemeHandler()
         schemeHandler.middleware = [{
             if $0.url!.lastPathComponent == "phishing.html" {
@@ -104,11 +104,14 @@ class MaliciousSiteProtectionIntegrationTests: XCTestCase {
     @MainActor
     func testFeatureDisabledAndPhishingDetection_tabIsNotMarkedPhishing() async throws {
         MaliciousSiteProtectionPreferences.shared.isEnabled = false
+        let e = expectation(description: "request sent")
         schemeHandler.middleware = [{ _ in
+            e.fulfill()
             return .ok(.html(""))
         }]
         let url = URL(string: "http://privacy-test-pages.site/security/badware/phishing.html")!
         try await loadUrl(url)
+        await fulfillment(of: [e], timeout: 1)
         XCTAssertNil(tabViewModel.tab.error)
     }
 
@@ -203,7 +206,7 @@ class MaliciousSiteProtectionIntegrationTests: XCTestCase {
             loadingExpectation.fulfill()
         }
         defer { task.cancel() }
-        await fulfillment(of: [loadingExpectation], timeout: 5)
+        await fulfillment(of: [loadingExpectation], timeout: 1)
     }
 }
 

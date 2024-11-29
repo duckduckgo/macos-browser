@@ -98,7 +98,8 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
         detector: MaliciousSiteProtection.MaliciousSiteDetecting? = nil,
         detectionPreferences: MaliciousSiteProtectionPreferences = MaliciousSiteProtectionPreferences.shared,
         featureFlagger: FeatureFlagger? = nil,
-        configManager: PrivacyConfigurationManaging? = nil
+        configManager: PrivacyConfigurationManaging? = nil,
+        updateIntervalProvider: UpdateManager.UpdateIntervalProvider? = nil
     ) {
         self.featureFlagger = featureFlagger ?? NSApp.delegateTyped.featureFlagger
         self.configManager = configManager ?? AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
@@ -111,7 +112,7 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
         }()
 
         self.detector = detector ?? MaliciousSiteDetector(apiEnvironment: apiEnvironment, dataManager: dataManager, eventMapping: Self.debugEvents)
-        self.updateManager = MaliciousSiteProtection.UpdateManager(apiEnvironment: apiEnvironment, dataManager: dataManager, updateIntervalProvider: Self.updateInterval)
+        self.updateManager = MaliciousSiteProtection.UpdateManager(apiEnvironment: apiEnvironment, dataManager: dataManager, updateIntervalProvider: updateIntervalProvider ?? Self.updateInterval)
         self.detectionPreferences = detectionPreferences
 
         self.setupBindings()
