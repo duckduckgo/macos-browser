@@ -108,7 +108,7 @@ final class NewTabPageFavoritesClient: NewTabPageScriptClient {
 
     @MainActor
     private func notifyConfigUpdated(_ showAllFavorites: Bool) {
-        let expansion: NewTabPageUserScript.WidgetConfig.Expansion = favoritesModel.isViewExpanded ? .expanded : .collapsed
+        let expansion: NewTabPageUserScript.WidgetConfig.Expansion = showAllFavorites ? .expanded : .collapsed
         let config = NewTabPageUserScript.WidgetConfig(animation: .auto, expansion: expansion)
         pushMessage(named: MessageName.onConfigUpdate.rawValue, params: config)
     }
