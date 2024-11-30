@@ -141,7 +141,7 @@ final class NewTabPageNextStepsCardsClient: NewTabPageScriptClient {
     }
 
     func dismiss(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let card: NewTabPageNextStepsCardsClient.Card = DecodableHelper.decode(from: params) else {
+        guard let card: Card = DecodableHelper.decode(from: params) else {
             return nil
         }
         model.dismiss(card.id)
@@ -164,14 +164,14 @@ final class NewTabPageNextStepsCardsClient: NewTabPageScriptClient {
 
     @MainActor
     func getData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        let cards = model.cards.map(NewTabPageNextStepsCardsClient.Card.init(id:))
-        return cards.isEmpty ? nil : cards
+        let cards = model.cards.map(Card.init(id:))
+        return NextStepsData(content: cards.isEmpty ? nil : cards)
     }
 
     @MainActor
-    func notifyDataUpdated(_ cardIDs: [NewTabPageNextStepsCardsClient.CardID]) {
-        let cards = cardIDs.map(NewTabPageNextStepsCardsClient.Card.init(id:))
-        let params = cards.isEmpty ? nil : cards
+    func notifyDataUpdated(_ cardIDs: [CardID]) {
+        let cards = cardIDs.map(Card.init(id:))
+        let params = NextStepsData(content: cards.isEmpty ? nil : cards)
         pushMessage(named: MessageName.onDataUpdate.rawValue, params: params)
     }
 
@@ -210,5 +210,9 @@ extension NewTabPageNextStepsCardsClient {
 
     struct Card: Codable {
         let id: CardID
+    }
+
+    struct NextStepsData: Codable {
+        let content: [Card]?
     }
 }
