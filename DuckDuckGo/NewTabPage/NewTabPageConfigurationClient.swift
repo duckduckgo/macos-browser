@@ -37,13 +37,6 @@ final class NewTabPageConfigurationClient: NewTabPageScriptClient {
         self.appearancePreferences = appearancePreferences
         self.contextMenuPresenter = contextMenuPresenter
 
-        appearancePreferences.isContinueSetUpVisiblePublisher.removeDuplicates().asVoid()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] in
-                self?.notifyWidgetConfigsDidChange()
-            }
-            .store(in: &cancellables)
-
         appearancePreferences.$isFavoriteVisible.dropFirst().removeDuplicates().asVoid()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in
@@ -80,7 +73,6 @@ final class NewTabPageConfigurationClient: NewTabPageScriptClient {
 
     private func notifyWidgetConfigsDidChange() {
         let widgetConfigs: [NewTabPageUserScript.NewTabPageConfiguration.WidgetConfig] = [
-            .init(id: .nextSteps, isVisible: appearancePreferences.isContinueSetUpVisible),
             .init(id: .favorites, isVisible: appearancePreferences.isFavoriteVisible),
             .init(id: .privacyStats, isVisible: appearancePreferences.isRecentActivityVisible)
         ]
@@ -96,11 +88,6 @@ final class NewTabPageConfigurationClient: NewTabPageScriptClient {
 
         for menuItem in params.visibilityMenuItems {
             switch menuItem.id {
-            case .nextSteps:
-                let item = NSMenuItem(title: menuItem.title, action: #selector(toggleVisibility(_:)), representedObject: menuItem.id)
-                    .targetting(self)
-                item.state = appearancePreferences.isContinueSetUpVisible ? .on : .off
-                menu.addItem(item)
             case .favorites:
                 let item = NSMenuItem(title: menuItem.title, action: #selector(toggleVisibility(_:)), representedObject: menuItem.id)
                     .targetting(self)
@@ -125,8 +112,6 @@ final class NewTabPageConfigurationClient: NewTabPageScriptClient {
 
     @objc private func toggleVisibility(_ sender: NSMenuItem) {
         switch sender.representedObject as? NewTabPageUserScript.WidgetId {
-        case .nextSteps:
-            appearancePreferences.isContinueSetUpVisible.toggle()
         case .favorites:
             appearancePreferences.isFavoriteVisible.toggle()
         case .privacyStats:
@@ -151,7 +136,6 @@ final class NewTabPageConfigurationClient: NewTabPageScriptClient {
                 .init(id: .privacyStats)
             ],
             widgetConfigs: [
-                .init(id: .nextSteps, isVisible: appearancePreferences.isContinueSetUpVisible),
                 .init(id: .favorites, isVisible: appearancePreferences.isFavoriteVisible),
                 .init(id: .privacyStats, isVisible: appearancePreferences.isRecentActivityVisible)
             ],
@@ -168,8 +152,6 @@ final class NewTabPageConfigurationClient: NewTabPageScriptClient {
         }
         for widgetConfig in widgetConfigs {
             switch widgetConfig.id {
-            case .nextSteps:
-                appearancePreferences.isContinueSetUpVisible = widgetConfig.visibility.isVisible
             case .favorites:
                 appearancePreferences.isFavoriteVisible = widgetConfig.visibility.isVisible
             case .privacyStats:
