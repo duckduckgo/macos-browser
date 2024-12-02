@@ -22,8 +22,6 @@ import SubscriptionTestingUtilities
 @testable import DuckDuckGo_Privacy_Browser
 @testable import TestUtils
 @testable import Networking
-import SubscriptionTestingUtilities
-
 final class UnifiedFeedbackFormViewModelTests: XCTestCase {
 
     var subscriptionManager: SubscriptionManagerMock!
@@ -47,7 +45,7 @@ final class UnifiedFeedbackFormViewModelTests: XCTestCase {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
 
-        let viewModel = UnifiedFeedbackFormViewModel(subscriptionManager: subscriptionTokenProvider,
+        let viewModel = UnifiedFeedbackFormViewModel(subscriptionManager: subscriptionManager,
                                                      apiService: apiService,
                                                      vpnMetadataCollector: collector,
                                                      feedbackSender: sender)
@@ -82,7 +80,7 @@ final class UnifiedFeedbackFormViewModelTests: XCTestCase {
 
         apiService.set(response: response, forRequestURL: UnifiedFeedbackFormViewModel.feedbackEndpoint)
 
-        subscriptionTokenProvider.resultTokenContainer = OAuthTokensFactory.makeValidTokenContainerWithEntitlements()
+        subscriptionManager.resultTokenContainer = OAuthTokensFactory.makeValidTokenContainerWithEntitlements()
         let viewModel = UnifiedFeedbackFormViewModel(subscriptionManager: subscriptionManager,
                                                      apiService: apiService,
                                                      vpnMetadataCollector: collector,

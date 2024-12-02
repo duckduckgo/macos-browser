@@ -49,11 +49,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
                                                                 SubscriptionOption(id: "2",
                                                                                    cost: SubscriptionOptionCost(displayPrice: "99 USD", recurrence: "yearly"))
                                                              ],
-                                                             features: [
-                                                                SubscriptionFeature(name: .networkProtection),
-                                                                SubscriptionFeature(name: .dataBrokerProtection),
-                                                                SubscriptionFeature(name: .identityTheftRestoration)
-                                                             ])
+                                                             features: [.networkProtection, .dataBrokerProtection, .identityTheftRestoration])
         static let mockParams: [String: String] = [:]
         @MainActor static let mockScriptMessage = MockWKScriptMessage(name: "", body: "", webView: WKWebView() )
     }
@@ -736,7 +732,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
     func testFeatureSelectedSuccessForNetworkProtection() async throws {
         // Given
         ensureUserAuthenticatedState()
-        let selectedFeature = Entitlement.ProductName.networkProtection
+        let selectedFeature = SubscriptionEntitlement.networkProtection
 
         let notificationPostedExpectation = expectation(forNotification: .ToggleNetworkProtectionInMainWindow, object: nil)
 
@@ -753,7 +749,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
     func testFeatureSelectedSuccessForPersonalInformationRemoval() async throws {
         // Given
         ensureUserAuthenticatedState()
-        let selectedFeature = Entitlement.ProductName.dataBrokerProtection
+        let selectedFeature = SubscriptionEntitlement.dataBrokerProtection
 
         let notificationPostedExpectation = expectation(forNotification: .openPersonalInformationRemoval, object: nil)
         let uiHandlerCalledExpectation = expectation(description: "uiHandlerCalled")
@@ -777,7 +773,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
     func testFeatureSelectedSuccessForIdentityTheftRestoration() async throws {
         // Given
         ensureUserAuthenticatedState()
-        let selectedFeature = Entitlement.ProductName.identityTheftRestoration
+        let selectedFeature = SubscriptionEntitlement.identityTheftRestoration
 
         let uiHandlerCalledExpectation = expectation(description: "uiHandlerCalled")
 

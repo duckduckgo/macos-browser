@@ -65,20 +65,9 @@ final class SubscriptionPagesUseSubscriptionFeatureForStripeTests: XCTestCase {
                                                                 SubscriptionOption(id: "2",
                                                                                    cost: SubscriptionOptionCost(displayPrice: "$99.00", recurrence: "yearly"))
                                                              ],
-                                                             features: [
-                                                                SubscriptionFeature(name: .networkProtection),
-                                                                SubscriptionFeature(name: .dataBrokerProtection),
-                                                                SubscriptionFeature(name: .identityTheftRestoration)
-                                                             ])
-
-//        static let validateTokenResponse = ValidateTokenResponse(account: ValidateTokenResponse.Account(email: Constants.email,
-//                                                                                                        entitlements: Constants.entitlements,
-//                                                                                                        externalID: Constants.externalID))
-
+                                                             features: [.networkProtection, .dataBrokerProtection, .identityTheftRestoration])
         static let mockParams: [String: String] = [:]
         @MainActor static let mockScriptMessage = MockWKScriptMessage(name: "", body: "", webView: WKWebView() )
-
-//        static let invalidTokenError = APIServiceError.serverError(statusCode: 401, error: "invalid_token")
     }
 
     var userDefaults: UserDefaults!
