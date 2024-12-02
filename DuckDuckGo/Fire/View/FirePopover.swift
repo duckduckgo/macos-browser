@@ -63,11 +63,7 @@ final class FirePopover: NSPopover {
     // swiftlint:enable force_cast
 
     private func setupContentController(fireViewModel: FireViewModel, tabCollectionViewModel: TabCollectionViewModel) {
-        let storyboard = NSStoryboard(name: "Fire", bundle: nil)
-        let controller = storyboard.instantiateController(identifier: "FirePopoverWrapperViewController") { coder -> FirePopoverWrapperViewController? in
-            return FirePopoverWrapperViewController(coder: coder, fireViewModel: fireViewModel, tabCollectionViewModel: tabCollectionViewModel)
-        }
-        contentViewController = controller
+        contentViewController = FirePopoverWrapperViewController(fireViewModel: fireViewModel, tabCollectionViewModel: tabCollectionViewModel)
     }
 
 }

@@ -21,6 +21,12 @@ import Combine
 import Common
 import os.log
 
+extension NSButton {
+    var isFirstResponder: Bool {
+        window?.firstResponder === self
+    }
+}
+
 extension NSView {
 
     // Since macOS 14 Sonoma view has clipsToBound == false by default

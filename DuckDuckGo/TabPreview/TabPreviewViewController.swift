@@ -204,7 +204,21 @@ extension TabPreviewViewController {
 import Combine
 
 @available(macOS 14.0, *)
-#Preview(traits: .fixedLayout(width: 280, height: 220)) { {
+#Preview("Not selected", traits: .fixedLayout(width: 280, height: 220)) { {
+
+    let vc = TabPreviewViewController()
+    vc.displayMockPreview(of: NSSize(width: 1280, height: 560),
+                          withTitle: "Some reasonably long tab preview title that won‘t fit in one line",
+                          content: .url(.makeSearchUrl(from: "SERP query string to search for some ducks")!, source: .ui),
+                          previewable: true,
+                          isSelected: false)
+
+    return vc._preview_hidingWindowControlsOnAppear(sizeToFit: true)
+
+}() }
+
+@available(macOS 14.0, *)
+#Preview("Selected", traits: .fixedLayout(width: 280, height: 220)) { {
 
     let vc = TabPreviewViewController()
     vc.displayMockPreview(of: NSSize(width: 1280, height: 560),
@@ -213,16 +227,8 @@ import Combine
                           previewable: true,
                           isSelected: true)
 
-    var c: AnyCancellable!
-    c = vc.publisher(for: \.view.window).sink { window in
-        window?.titlebarAppearsTransparent = true
-        window?.titleVisibility = .hidden
-        window?.styleMask = []
-        window?.setFrame(NSRect(origin: .zero, size: vc.view.bounds.size), display: true)
-        withExtendedLifetime(c) {}
-    }
-
-    return vc
+    return vc._preview_hidingWindowControlsOnAppear(sizeToFit: true)
 
 }() }
+
 #endif
