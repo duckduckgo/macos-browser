@@ -47,12 +47,16 @@ public enum FeatureFlag: String, CaseIterable {
 
     /// https://app.asana.com/0/72649045549333/1208241266421040/f
     case htmlNewTabPage
+
+    case isPrivacyProLaunchedROW
+    case isPrivacyProLaunchedROWOverride
 }
 
 extension FeatureFlag: FeatureFlagDescribing {
     public var supportsLocalOverriding: Bool {
         switch self {
-        case .htmlNewTabPage:
+        case .htmlNewTabPage,
+             .isPrivacyProLaunchedROWOverride:
             return true
         case .maliciousSiteProtectionErrorPage,
              .maliciousSiteProtectionPreferences:
@@ -73,9 +77,9 @@ extension FeatureFlag: FeatureFlagDescribing {
     public var source: FeatureFlagSource {
         switch self {
         case .debugMenu:
-            return .internalOnly
+            return .internalOnly()
         case .appendAtbToSerpQueries:
-            return .internalOnly
+            return .internalOnly()
         case .sslCertificatesBypass:
             return .remoteReleasable(.subfeature(SslCertificatesSubfeature.allowBypass))
         case .unknownUsernameCategorization:
@@ -96,6 +100,10 @@ extension FeatureFlag: FeatureFlagDescribing {
             return .remoteDevelopment(.subfeature(NetworkProtectionSubfeature.enforceRoutes))
         case .htmlNewTabPage:
             return .disabled
+        case .isPrivacyProLaunchedROW:
+            return .remoteReleasable(.subfeature(PrivacyProSubfeature.isLaunchedROW))
+        case .isPrivacyProLaunchedROWOverride:
+            return .remoteReleasable(.subfeature(PrivacyProSubfeature.isLaunchedROWOverride))
         }
     }
 }

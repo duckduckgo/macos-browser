@@ -34,6 +34,7 @@ final class FreemiumDBPPixelExperimentManagingTests: XCTestCase {
         let mockSubscriptionService = SubscriptionEndpointServiceMock()
         let mockAuthService = AuthEndpointServiceMock()
         let mockStorePurchaseManager = StorePurchaseManagerMock()
+        let mockSubscriptionFeatureMappingCache = SubscriptionFeatureMappingCacheMock()
 
         let currentEnvironment = SubscriptionEnvironment(serviceEnvironment: .production,
                                                          purchasePlatform: .appStore)
@@ -43,7 +44,8 @@ final class FreemiumDBPPixelExperimentManagingTests: XCTestCase {
                                                           authEndpointService: mockAuthService,
                                                           storePurchaseManager: mockStorePurchaseManager,
                                                           currentEnvironment: currentEnvironment,
-                                                          canPurchase: false)
+                                                          canPurchase: false,
+                                                          subscriptionFeatureMappingCache: mockSubscriptionFeatureMappingCache)
         mockUserDefaults = MockUserDefaults()
         let testLocale = Locale(identifier: "en_US")
         sut = FreemiumDBPPixelExperimentManager(subscriptionManager: mockSubscriptionManager, userDefaults: mockUserDefaults, locale: testLocale)
