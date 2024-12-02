@@ -24,7 +24,7 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
 
     private let schedulingConfig = DataBrokerScheduleConfig(
         retryError: 48,
-        confirmOptOutScan: 2000,
+        confirmOptOutScan: 72,
         maintenanceScan: 120,
         maxAttempts: 3
     )
@@ -535,7 +535,7 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
     }
 
     func testOptOutRequestedWithCurrentPreferredDate_thenOptOutIsNotScheduled() throws {
-        let expectedOptOutDate = MockDate().now.addingTimeInterval(schedulingConfig.maintenanceScan.hoursToSeconds)
+        let expectedOptOutDate = MockDate().now.addingTimeInterval(schedulingConfig.optOutReattempt.hoursToSeconds)
 
         let historyEvents = [
             HistoryEvent(extractedProfileId: 1,
@@ -556,7 +556,7 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
     }
 
     func testOptOutRequestedWithoutCurrentPreferredDate_thenOptOutIsNotScheduled() throws {
-        let expectedOptOutDate = MockDate().now.addingTimeInterval(schedulingConfig.maintenanceScan.hoursToSeconds)
+        let expectedOptOutDate = MockDate().now.addingTimeInterval(schedulingConfig.optOutReattempt.hoursToSeconds)
 
         let historyEvents = [
             HistoryEvent(extractedProfileId: 1,
@@ -757,7 +757,7 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
     }
 
     func testChildBrokerTurnsParentBroker_whenFirstOptOutSucceeds_thenOptOutDateIsNotScheduled() throws {
-        let expectedOptOutDate = MockDate().now.addingTimeInterval(schedulingConfig.maintenanceScan.hoursToSeconds)
+        let expectedOptOutDate = MockDate().now.addingTimeInterval(schedulingConfig.optOutReattempt.hoursToSeconds)
 
         let historyEvents = [
             HistoryEvent(extractedProfileId: 1,
@@ -858,7 +858,7 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
     }
 
     func testOptOutRequestedWithRecentDate_thenOutOutIsNotScheduled() throws {
-        let expectedOptOutDate = MockDate().now.addingTimeInterval(schedulingConfig.maintenanceScan.hoursToSeconds)
+        let expectedOptOutDate = MockDate().now.addingTimeInterval(schedulingConfig.optOutReattempt.hoursToSeconds)
 
         let historyEvents = [
             HistoryEvent(extractedProfileId: 1,

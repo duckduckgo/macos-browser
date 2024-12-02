@@ -25,6 +25,15 @@ struct DataBrokerScheduleConfig: Codable {
     let confirmOptOutScan: Int
     let maintenanceScan: Int
     let maxAttempts: Int
+
+    var optOutReattempt: Int {
+        let interval = maintenanceScan
+        guard interval > confirmOptOutScan else {
+            assertionFailure("We don't want another opt-out attempt before the next scan")
+            return Int.max
+        }
+        return interval
+    }
 }
 
 extension Int {
