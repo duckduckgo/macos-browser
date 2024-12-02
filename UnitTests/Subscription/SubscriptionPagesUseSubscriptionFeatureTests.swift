@@ -42,7 +42,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
                                                             .networkProtection]
 
         static let mostRecentTransactionJWS = "dGhpcyBpcyBub3QgYSByZWFsIEFw(...)cCBTdG9yZSB0cmFuc2FjdGlvbiBKV1M="
-        static let subscriptionOptions = SubscriptionOptions(platform: SubscriptionPlatformName.ios.rawValue,
+        static let subscriptionOptions = SubscriptionOptions(platform: SubscriptionPlatformName.macos,
                                                              options: [
                                                                 SubscriptionOption(id: "1",
                                                                                    cost: SubscriptionOptionCost(displayPrice: "9 USD", recurrence: "monthly")),
@@ -50,9 +50,9 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
                                                                                    cost: SubscriptionOptionCost(displayPrice: "99 USD", recurrence: "yearly"))
                                                              ],
                                                              features: [
-                                                                SubscriptionFeature(name: "vpn"),
-                                                                SubscriptionFeature(name: "personal-information-removal"),
-                                                                SubscriptionFeature(name: "identity-theft-restoration")
+                                                                SubscriptionFeature(name: .networkProtection),
+                                                                SubscriptionFeature(name: .dataBrokerProtection),
+                                                                SubscriptionFeature(name: .identityTheftRestoration)
                                                              ])
         static let mockParams: [String: String] = [:]
         @MainActor static let mockScriptMessage = MockWKScriptMessage(name: "", body: "", webView: WKWebView() )
@@ -733,83 +733,15 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
 
     // MARK: - Tests for featureSelected
 
-    func testFeatureSelectedSuccessForPrivateBrowsing() async throws {
-        // Given
-        ensureUserAuthenticatedState()
-        let selectedFeature = SubscriptionFeatureName.privateBrowsing
-
-        let notificationPostedExpectation = expectation(forNotification: .openPrivateBrowsing, object: nil)
-
-        // When
-        let featureSelectionParams = ["feature": selectedFeature.rawValue]
-        let result = try await feature.featureSelected(params: featureSelectionParams, original: Constants.mockScriptMessage)
-
-        // Then
-        await fulfillment(of: [notificationPostedExpectation], timeout: 0.5)
-        XCTAssertNil(result)
-        XCTAssertPrivacyPixelsFired([])
-    }
-
-    func testFeatureSelectedSuccessForPrivateSearch() async throws {
-        // Given
-        ensureUserAuthenticatedState()
-        let selectedFeature = SubscriptionFeatureName.privateSearch
-
-        let notificationPostedExpectation = expectation(forNotification: .openPrivateSearch, object: nil)
-
-        // When
-        let featureSelectionParams = ["feature": selectedFeature.rawValue]
-        let result = try await feature.featureSelected(params: featureSelectionParams, original: Constants.mockScriptMessage)
-
-        // Then
-        await fulfillment(of: [notificationPostedExpectation], timeout: 0.5)
-        XCTAssertNil(result)
-        XCTAssertPrivacyPixelsFired([])
-    }
-
-    func testFeatureSelectedSuccessForEmailProtection() async throws {
-        // Given
-        ensureUserAuthenticatedState()
-        let selectedFeature = SubscriptionFeatureName.emailProtection
-
-        let notificationPostedExpectation = expectation(forNotification: .openEmailProtection, object: nil)
-
-        // When
-        let featureSelectionParams = ["feature": selectedFeature.rawValue]
-        let result = try await feature.featureSelected(params: featureSelectionParams, original: Constants.mockScriptMessage)
-
-        // Then
-        await fulfillment(of: [notificationPostedExpectation], timeout: 0.5)
-        XCTAssertNil(result)
-        XCTAssertPrivacyPixelsFired([])
-    }
-
-    func testFeatureSelectedSuccessForAppTrackingProtection() async throws {
-        // Given
-        ensureUserAuthenticatedState()
-        let selectedFeature = SubscriptionFeatureName.appTrackingProtection
-
-        let notificationPostedExpectation = expectation(forNotification: .openAppTrackingProtection, object: nil)
-
-        // When
-        let featureSelectionParams = ["feature": selectedFeature.rawValue]
-        let result = try await feature.featureSelected(params: featureSelectionParams, original: Constants.mockScriptMessage)
-
-        // Then
-        await fulfillment(of: [notificationPostedExpectation], timeout: 0.5)
-        XCTAssertNil(result)
-        XCTAssertPrivacyPixelsFired([])
-    }
-
     func testFeatureSelectedSuccessForNetworkProtection() async throws {
         // Given
         ensureUserAuthenticatedState()
-        let selectedFeature = SubscriptionFeatureName.vpn
+        let selectedFeature = Entitlement.ProductName.networkProtection
 
         let notificationPostedExpectation = expectation(forNotification: .ToggleNetworkProtectionInMainWindow, object: nil)
 
         // When
-        let featureSelectionParams = ["feature": selectedFeature.rawValue]
+        let featureSelectionParams = ["productFeature": selectedFeature.rawValue]
         let result = try await feature.featureSelected(params: featureSelectionParams, original: Constants.mockScriptMessage)
 
         // Then
@@ -821,7 +753,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
     func testFeatureSelectedSuccessForPersonalInformationRemoval() async throws {
         // Given
         ensureUserAuthenticatedState()
-        let selectedFeature = SubscriptionFeatureName.personalInformationRemoval
+        let selectedFeature = Entitlement.ProductName.dataBrokerProtection
 
         let notificationPostedExpectation = expectation(forNotification: .openPersonalInformationRemoval, object: nil)
         let uiHandlerCalledExpectation = expectation(description: "uiHandlerCalled")
@@ -833,7 +765,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
         }
 
         // When
-        let featureSelectionParams = ["feature": selectedFeature.rawValue]
+        let featureSelectionParams = ["productFeature": selectedFeature.rawValue]
         let result = try await feature.featureSelected(params: featureSelectionParams, original: Constants.mockScriptMessage)
 
         // Then
@@ -845,7 +777,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
     func testFeatureSelectedSuccessForIdentityTheftRestoration() async throws {
         // Given
         ensureUserAuthenticatedState()
-        let selectedFeature = SubscriptionFeatureName.identityTheftRestoration
+        let selectedFeature = Entitlement.ProductName.identityTheftRestoration
 
         let uiHandlerCalledExpectation = expectation(description: "uiHandlerCalled")
 
@@ -858,7 +790,7 @@ final class SubscriptionPagesUseSubscriptionFeatureTests: XCTestCase {
         }
 
         // When
-        let featureSelectionParams = ["feature": selectedFeature.rawValue]
+        let featureSelectionParams = ["productFeature": selectedFeature.rawValue]
         let result = try await feature.featureSelected(params: featureSelectionParams, original: Constants.mockScriptMessage)
 
         // Then

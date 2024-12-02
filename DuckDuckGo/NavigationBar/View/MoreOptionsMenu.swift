@@ -899,7 +899,6 @@ final class SubscriptionSubMenu: NSMenu, NSMenuDelegate {
         self.subscriptionSettingsItem = makeSubscriptionSettingsItem(target: target)
 
         delegate = self
-
         addMenuItems()
     }
 
@@ -908,9 +907,17 @@ final class SubscriptionSubMenu: NSMenu, NSMenuDelegate {
     }
 
     private func addMenuItems() {
-        addItem(networkProtectionItem)
-        addItem(dataBrokerProtectionItem)
-        addItem(identityTheftRestorationItem)
+        let features = subscriptionManager.currentEntitlements
+
+        if features.contains(.networkProtection) {
+            addItem(networkProtectionItem)
+        }
+        if features.contains(.dataBrokerProtection) {
+            addItem(dataBrokerProtectionItem)
+        }
+        if features.contains(.identityTheftRestoration) || features.contains(.identityTheftRestorationGlobal) {
+            addItem(identityTheftRestorationItem)
+        }
         addItem(NSMenuItem.separator())
         addItem(subscriptionSettingsItem)
     }
@@ -948,19 +955,16 @@ final class SubscriptionSubMenu: NSMenu, NSMenuDelegate {
 
     private func refreshAvailabilityBasedOnEntitlements() {
         guard subscriptionFeatureAvailability.isFeatureAvailable, subscriptionManager.isUserAuthenticated else { return }
+        let isNetworkProtectionItemEnabled = subscriptionManager.isEntitlementActive(.networkProtection)
+        let isDataBrokerProtectionItemEnabled = subscriptionManager.isEntitlementActive(.dataBrokerProtection)
+        let hasIdentityTheftRestoration = subscriptionManager.isEntitlementActive(.identityTheftRestoration)
+        let hasIdentityTheftRestorationGlobal = subscriptionManager.isEntitlementActive(.identityTheftRestorationGlobal)
+        let isIdentityTheftRestorationItemEnabled = hasIdentityTheftRestoration || hasIdentityTheftRestorationGlobal
 
-        Task.detached(priority: .background) { [weak self] in
-            guard let self else { return }
-
-            let isNetworkProtectionItemEnabled = self.subscriptionManager.isEntitlementActive(.networkProtection)
-            let isDataBrokerProtectionItemEnabled = self.subscriptionManager.isEntitlementActive(.dataBrokerProtection)
-            let isIdentityTheftRestorationItemEnabled = self.subscriptionManager.isEntitlementActive(.identityTheftRestoration)
-
-            Task { @MainActor in
-                self.networkProtectionItem.isEnabled = isNetworkProtectionItemEnabled
-                self.dataBrokerProtectionItem.isEnabled = isDataBrokerProtectionItemEnabled
-                self.identityTheftRestorationItem.isEnabled = isIdentityTheftRestorationItemEnabled
-            }
+        Task { @MainActor in
+            self.networkProtectionItem.isEnabled = isNetworkProtectionItemEnabled
+            self.dataBrokerProtectionItem.isEnabled = isDataBrokerProtectionItemEnabled
+            self.identityTheftRestorationItem.isEnabled = isIdentityTheftRestorationItemEnabled
         }
     }
 

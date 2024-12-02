@@ -150,28 +150,39 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
 
     weak var delegate: UnifiedFeedbackFormViewModelDelegate?
 
-    private let subscriptionTokenProvider: any SubscriptionTokenProvider
+    private let subscriptionManager: any SubscriptionManager
     private let apiService: any Networking.APIService
     private let vpnMetadataCollector: any UnifiedMetadataCollector
     private let defaultMetadataCollector: any UnifiedMetadataCollector
     private let feedbackSender: any UnifiedFeedbackSender
 
     let source: UnifiedFeedbackSource
+    private(set) var availableCategories: [UnifiedFeedbackCategory] = [.selectFeature, .subscription]
 
-    init(subscriptionTokenProvider: any SubscriptionTokenProvider,
+    init(subscriptionManager: any SubscriptionManager,
          apiService: any Networking.APIService,
          vpnMetadataCollector: any UnifiedMetadataCollector,
          defaultMetadataCollector: any UnifiedMetadataCollector = EmptyMetadataCollector(),
          feedbackSender: any UnifiedFeedbackSender = DefaultFeedbackSender(),
          source: UnifiedFeedbackSource = .default) {
         self.viewState = .feedbackPending
-
-        self.subscriptionTokenProvider = subscriptionTokenProvider
         self.apiService = apiService
         self.vpnMetadataCollector = vpnMetadataCollector
         self.defaultMetadataCollector = defaultMetadataCollector
         self.feedbackSender = feedbackSender
         self.source = source
+        self.subscriptionManager = subscriptionManager
+
+        let features = subscriptionManager.currentEntitlements
+        if features.contains(.networkProtection) {
+            availableCategories.append(.vpn)
+        }
+        if features.contains(.dataBrokerProtection) {
+            availableCategories.append(.pir)
+        }
+        if features.contains(.identityTheftRestoration) || features.contains(.identityTheftRestorationGlobal) {
+            availableCategories.append(.itr)
+        }
     }
 
     @MainActor
@@ -267,7 +278,7 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
     private func submitIssue(metadata: UnifiedFeedbackMetadata?) async throws {
         guard !userEmail.isEmpty else { return }
 
-        guard let accessToken = try? await subscriptionTokenProvider.getTokenContainer(policy: .localValid) else {
+        guard let accessToken = try? await subscriptionManager.getTokenContainer(policy: .localValid) else {
             throw Error.missingAccessToken
         }
 

@@ -25,7 +25,7 @@ import Subscription
 @available(macOS 12.0, *)
 public final class DebugPurchaseViewController: NSViewController {
 
-    private let manager: DefaultStorePurchaseManager
+    private let manager: any StorePurchaseManager
     private let model: DebugPurchaseModel
 
     private var cancellables = Set<AnyCancellable>()
@@ -34,7 +34,7 @@ public final class DebugPurchaseViewController: NSViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public init(storePurchaseManager: DefaultStorePurchaseManager, appStorePurchaseFlow: DefaultAppStorePurchaseFlow) {
+    public init(storePurchaseManager: any StorePurchaseManager, appStorePurchaseFlow: any AppStorePurchaseFlow) {
         manager = storePurchaseManager
         model = DebugPurchaseModel(manager: manager, appStorePurchaseFlow: appStorePurchaseFlow)
 
@@ -59,11 +59,11 @@ public final class DebugPurchaseViewController: NSViewController {
     }
 
     public override func viewDidLoad() {
+        guard let manager = manager as? DefaultStorePurchaseManager else { return }
         Task {
             await manager.updatePurchasedProducts()
             await manager.updateAvailableProducts()
         }
-
         manager.$availableProducts.combineLatest(manager.$purchasedProductIDs, manager.$purchaseQueue).receive(on: RunLoop.main).sink { [weak self] availableProducts, purchasedProductIDs, purchaseQueue in
             print(" -- got combineLatest -")
             print(" -- got combineLatest - availableProducts: \(availableProducts.map { $0.id }.joined(separator: ","))")

@@ -30,7 +30,6 @@ final class FreemiumDBPPixelExperimentManagingTests: XCTestCase {
     override func setUp() {
        super.setUp()
         mockSubscriptionManager = SubscriptionManagerMock()
-        let mockStorePurchaseManager = StorePurchaseManagerMock()
         let currentEnvironment = SubscriptionEnvironment(serviceEnvironment: .production,
                                                          purchasePlatform: .appStore)
         mockSubscriptionManager.currentEnvironment = currentEnvironment

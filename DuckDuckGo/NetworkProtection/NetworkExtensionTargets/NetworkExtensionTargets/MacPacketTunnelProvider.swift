@@ -390,11 +390,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 NetworkProtectionPixelEvent.networkProtectionTunnelStartAttemptOnDemandWithoutAccessToken,
                 frequency: .legacyDailyAndCount,
                 includeAppVersionParameter: true)
-        case .malformedErrorDetected(let error):
-            PixelKit.fire(
-                NetworkProtectionPixelEvent.networkProtectionMalformedErrorDetected(error),
-                frequency: .legacyDailyAndCount,
-                includeAppVersionParameter: true)
         }
     }
 
@@ -431,7 +426,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         Logger.networkProtection.debug("Subscription ServiceEnvironment: \(subscriptionEnvironment.serviceEnvironment.rawValue, privacy: .public)")
 
         let subscriptionManager = DefaultSubscriptionManager(keychainType: Bundle.keychainType, // note: the old public static let tokenStoreService = "com.duckduckgo.networkprotection.authToken" was used as kSecAttrService in NetworkProtectionKeychainStore, now is different. the old token recovery will not work in the extension, yes in main app
-                                                             environment: subscriptionEnvironment)
+                                                             environment: subscriptionEnvironment,
+                                                             userDefaults: defaults)
 
         let entitlementsCheck: (() async -> Result<Bool, Error>) = {
             do {

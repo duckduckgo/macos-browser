@@ -21,12 +21,20 @@ import Subscription
 import struct Combine.AnyPublisher
 import enum Combine.Publishers
 import Networking
+import FeatureFlags
+import BrowserServicesKit
 
 public final class PreferencesSubscriptionModel: ObservableObject {
 
     @Published var isUserAuthenticated: Bool = false
     @Published var subscriptionDetails: String?
     @Published var subscriptionStatus: PrivacyProSubscription.Status?
+
+    @Published var subscriptionStorefrontRegion: SubscriptionRegion = .usa
+
+    @Published var shouldShowVPN: Bool = false
+    @Published var shouldShowDBP: Bool = false
+    @Published var shouldShowITR: Bool = false
 
     @Published var hasAccessToVPN: Bool = false
     @Published var hasAccessToDBP: Bool = false
@@ -36,9 +44,11 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     var hasEmail: Bool { !(email?.isEmpty ?? true) }
 
     private var subscriptionPlatform: PrivacyProSubscription.Platform?
+    let featureFlagger: FeatureFlagger
+    var isROWLaunched: Bool = false
 
     lazy var sheetModel = SubscriptionAccessViewModel(actionHandlers: sheetActionHandler,
-                                                      purchasePlatform: subscriptionManager.currentEnvironment.purchasePlatform)
+        purchasePlatform: subscriptionManager.currentEnvironment.purchasePlatform)
 
     private let subscriptionManager: SubscriptionManager
     private let openURLHandler: (URL) -> Void
@@ -93,11 +103,14 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     public init(openURLHandler: @escaping (URL) -> Void,
                 userEventHandler: @escaping (UserEvent) -> Void,
                 sheetActionHandler: SubscriptionAccessActionHandlers,
-                subscriptionManager: SubscriptionManager) {
+                subscriptionManager: SubscriptionManager,
+                featureFlagger: FeatureFlagger) {
         self.subscriptionManager = subscriptionManager
         self.openURLHandler = openURLHandler
         self.userEventHandler = userEventHandler
         self.sheetActionHandler = sheetActionHandler
+        self.featureFlagger = featureFlagger
+        self.subscriptionStorefrontRegion = currentStorefrontRegion()
 
         self.isUserAuthenticated = subscriptionManager.isUserAuthenticated
 
@@ -105,6 +118,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             Task {
                 await self.updateSubscription(cachePolicy: .returnCacheDataElseLoad)
                 await self.loadEntitlements(policy: .local)
+                await self.updateAvailableSubscriptionFeatures()
             }
 
             self.email = subscriptionManager.userEmail
@@ -121,6 +135,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         subscriptionChangeObserver = NotificationCenter.default.addObserver(forName: .subscriptionDidChange, object: nil, queue: .main) { _ in
             Task { [weak self] in
                 await self?.updateSubscription(cachePolicy: .returnCacheDataDontLoad)
+                await self?.updateAvailableSubscriptionFeatures()
             }
         }
     }
@@ -137,6 +152,17 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         if let subscriptionChangeObserver {
             NotificationCenter.default.removeObserver(subscriptionChangeObserver)
         }
+    }
+
+    @MainActor
+    func didAppear() {
+        if isUserAuthenticated {
+            userEventHandler(.activeSubscriptionSettingsClick)
+            fetchAndUpdateSubscriptionDetails()
+        } else {
+            self.subscriptionStorefrontRegion = currentStorefrontRegion()
+        }
+        isROWLaunched = featureFlagger.isFeatureOn(.isPrivacyProLaunchedROW) || featureFlagger.isFeatureOn(.isPrivacyProLaunchedROWOverride)
     }
 
     private func updateUserAuthenticatedState(_ isUserAuthenticated: Bool) {
@@ -272,7 +298,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             if #available(macOS 12.0, *) {
                 Task {
                     let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(subscriptionManager: subscriptionManager,
-                                                                         storePurchaseManager: DefaultStorePurchaseManager())
+                                                                         storePurchaseManager: subscriptionManager.storePurchaseManager())
                     await appStoreRestoreFlow.restoreAccountFromPastPurchase()
                     fetchAndUpdateSubscriptionDetails()
                 }
@@ -289,7 +315,6 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             await self?.fetchEmailAndRemoteEntitlements()
             await self?.updateSubscription(cachePolicy: .reloadIgnoringLocalCacheData)
         }
-
 //        guard fetchSubscriptionDetailsTask == nil else { return }
 //
 //        fetchSubscriptionDetailsTask = Task { [weak self] in
@@ -300,6 +325,36 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 //            await self?.fetchEmailAndRemoteEntitlements()
 //            await self?.updateSubscription(cachePolicy: .reloadIgnoringLocalCacheData)
 //        }
+    }
+
+    private func currentStorefrontRegion() -> SubscriptionRegion {
+        var region: SubscriptionRegion?
+
+        switch subscriptionManager.currentEnvironment.purchasePlatform {
+        case .appStore:
+            if #available(macOS 12.0, *) {
+                region = subscriptionManager.storePurchaseManager().currentStorefrontRegion
+            }
+        case .stripe:
+            region = .usa
+        }
+
+        return region ?? .usa
+    }
+
+    private func updateAvailableSubscriptionFeatures() {
+        let features = currentSubscriptionFeatures()
+        shouldShowVPN = features.contains(.networkProtection)
+        shouldShowDBP = features.contains(.dataBrokerProtection)
+        shouldShowITR = features.contains(.identityTheftRestoration) || features.contains(.identityTheftRestorationGlobal)
+    }
+
+    private func currentSubscriptionFeatures() -> [SubscriptionEntitlement] {
+        if subscriptionManager.currentEnvironment.purchasePlatform == .appStore {
+            return subscriptionManager.currentEntitlements
+        } else {
+            return [.networkProtection, .dataBrokerProtection, .identityTheftRestoration]
+        }
     }
 
     @MainActor
@@ -313,28 +368,16 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
         hasAccessToVPN = tokenContainer.decodedAccessToken.hasEntitlement(.networkProtection)
         hasAccessToDBP = tokenContainer.decodedAccessToken.hasEntitlement(.dataBrokerProtection)
-        hasAccessToITR = tokenContainer.decodedAccessToken.hasEntitlement(.identityTheftRestoration)
+
+        var hasITR = tokenContainer.decodedAccessToken.hasEntitlement(.identityTheftRestoration)
+        var hasITRGlobal = tokenContainer.decodedAccessToken.hasEntitlement(.identityTheftRestorationGlobal)
+        hasAccessToITR = hasITR || hasITRGlobal
     }
 
     @MainActor func fetchEmailAndRemoteEntitlements() async {
         await loadEntitlements(policy: .localForceRefresh)
         guard let tokenContainer = try? await subscriptionManager.getTokenContainer(policy: .local) else { return }
         email = tokenContainer.decodedAccessToken.email
-
-//        guard let accessToken = accountManager.accessToken else { return }
-//
-//        if case let .success(response) = await subscriptionManager.authEndpointService.validateToken(accessToken: accessToken) {
-//            if accountManager.email != response.account.email {
-//                email = response.account.email
-//                accountManager.storeAccount(token: accessToken, email: response.account.email, externalID: response.account.externalID)
-//            }
-//
-//            let entitlements = response.account.entitlements.compactMap { $0.product }
-//            hasAccessToVPN = entitlements.contains(.networkProtection)
-//            hasAccessToDBP = entitlements.contains(.dataBrokerProtection)
-//            hasAccessToITR = entitlements.contains(.identityTheftRestoration)
-//            accountManager.updateCache(with: response.account.entitlements)
-//        }
     }
 
     @MainActor

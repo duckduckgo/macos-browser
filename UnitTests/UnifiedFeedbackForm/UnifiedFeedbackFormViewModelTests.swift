@@ -17,6 +17,8 @@
 //
 
 import XCTest
+import Subscription
+import SubscriptionTestingUtilities
 @testable import DuckDuckGo_Privacy_Browser
 @testable import TestUtils
 @testable import Networking
@@ -24,16 +26,16 @@ import SubscriptionTestingUtilities
 
 final class UnifiedFeedbackFormViewModelTests: XCTestCase {
 
-    var subscriptionTokenProvider: SubscriptionManagerMock!
+    var subscriptionManager: SubscriptionManagerMock!
     var apiService: MockAPIService!
 
     override func setUpWithError() throws {
-        subscriptionTokenProvider = SubscriptionManagerMock()
+        subscriptionManager = SubscriptionManagerMock()
         apiService = MockAPIService()
     }
 
     override func tearDownWithError() throws {
-        subscriptionTokenProvider = nil
+        subscriptionManager = nil
         apiService = nil
     }
 
@@ -44,7 +46,8 @@ final class UnifiedFeedbackFormViewModelTests: XCTestCase {
     func testWhenCreatingViewModel_ThenInitialStateIsFeedbackPending() throws {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
-        let viewModel = UnifiedFeedbackFormViewModel(subscriptionTokenProvider: subscriptionTokenProvider,
+
+        let viewModel = UnifiedFeedbackFormViewModel(subscriptionManager: subscriptionTokenProvider,
                                                      apiService: apiService,
                                                      vpnMetadataCollector: collector,
                                                      feedbackSender: sender)
@@ -55,7 +58,7 @@ final class UnifiedFeedbackFormViewModelTests: XCTestCase {
     func testGivenNoEmail_WhenSendingFeedbackSucceeds_ThenFeedbackIsSent() async throws {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
-        let viewModel = UnifiedFeedbackFormViewModel(subscriptionTokenProvider: subscriptionTokenProvider,
+        let viewModel = UnifiedFeedbackFormViewModel(subscriptionManager: subscriptionManager,
                                                      apiService: apiService,
                                                      vpnMetadataCollector: collector,
                                                      feedbackSender: sender)
@@ -76,10 +79,11 @@ final class UnifiedFeedbackFormViewModelTests: XCTestCase {
         // API request to mock
         let payload = UnifiedFeedbackFormViewModel.Response(message: "something", error: nil)
         let response = APIResponseV2(data: try! JSONEncoder().encode(payload), httpResponse: HTTPURLResponse())
+
         apiService.set(response: response, forRequestURL: UnifiedFeedbackFormViewModel.feedbackEndpoint)
 
         subscriptionTokenProvider.resultTokenContainer = OAuthTokensFactory.makeValidTokenContainerWithEntitlements()
-        let viewModel = UnifiedFeedbackFormViewModel(subscriptionTokenProvider: subscriptionTokenProvider,
+        let viewModel = UnifiedFeedbackFormViewModel(subscriptionManager: subscriptionManager,
                                                      apiService: apiService,
                                                      vpnMetadataCollector: collector,
                                                      feedbackSender: sender)
@@ -97,7 +101,7 @@ final class UnifiedFeedbackFormViewModelTests: XCTestCase {
     func testWhenSendingFeedbackFails_ThenFeedbackIsNotSent() async throws {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
-        let viewModel = UnifiedFeedbackFormViewModel(subscriptionTokenProvider: subscriptionTokenProvider,
+        let viewModel = UnifiedFeedbackFormViewModel(subscriptionManager: subscriptionManager,
                                                      apiService: apiService,
                                                      vpnMetadataCollector: collector,
                                                      feedbackSender: sender)
@@ -115,9 +119,8 @@ final class UnifiedFeedbackFormViewModelTests: XCTestCase {
     func testGivenInvalidEmail_WhenSendingFeedbackFails_ThenFeedbackIsNotSent() async throws {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
-        let viewModel = UnifiedFeedbackFormViewModel(subscriptionTokenProvider: subscriptionTokenProvider,
+        let viewModel = UnifiedFeedbackFormViewModel(subscriptionManager: subscriptionManager,
                                                      apiService: apiService,
-
                                                      vpnMetadataCollector: collector,
                                                      feedbackSender: sender)
         viewModel.selectedReportType = UnifiedFeedbackReportType.reportIssue.rawValue
@@ -135,7 +138,7 @@ final class UnifiedFeedbackFormViewModelTests: XCTestCase {
     func testGivenValidEmail_WhenSendingFeedbackFails_ThenFeedbackIsNotSent() async throws {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
-        let viewModel = UnifiedFeedbackFormViewModel(subscriptionTokenProvider: subscriptionTokenProvider,
+        let viewModel = UnifiedFeedbackFormViewModel(subscriptionManager: subscriptionManager,
                                                      apiService: apiService,
                                                      vpnMetadataCollector: collector,
                                                      feedbackSender: sender)
@@ -155,9 +158,8 @@ final class UnifiedFeedbackFormViewModelTests: XCTestCase {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
         let delegate = MockVPNFeedbackFormViewModelDelegate()
-        let viewModel = UnifiedFeedbackFormViewModel(subscriptionTokenProvider: subscriptionTokenProvider,
+        let viewModel = UnifiedFeedbackFormViewModel(subscriptionManager: subscriptionManager,
                                                      apiService: apiService,
-
                                                      vpnMetadataCollector: collector,
                                                      feedbackSender: sender)
         viewModel.delegate = delegate

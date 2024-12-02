@@ -22,12 +22,16 @@ import Common
 import PixelKit
 import Networking
 import os.log
+import BrowserServicesKit
+import FeatureFlags
 
 extension DefaultSubscriptionManager {
 
     // Init the SubscriptionManager using the standard dependencies and configuration, to be used only in the dependencies tree root
     public convenience init(keychainType: KeychainType,
-                            environment: SubscriptionEnvironment) {
+                            environment: SubscriptionEnvironment,
+                            featureFlagger: FeatureFlagger? = nil,
+                            userDefaults: UserDefaults) {
 
         let configuration = URLSessionConfiguration.default
         configuration.httpCookieStorage = nil
@@ -63,6 +67,30 @@ extension DefaultSubscriptionManager {
 
         let subscriptionEndpointService = DefaultSubscriptionEndpointService(apiService: apiService,
                                                                              baseURL: environment.serviceEnvironment.url)
+//        let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
+        let subscriptionFeatureMappingCache = DefaultSubscriptionFeatureMappingCache(subscriptionEndpointService: subscriptionEndpointService,
+                                                                                     userDefaults: userDefaults)
+        let subscriptionFeatureFlagger: FeatureFlaggerMapping<SubscriptionFeatureFlags> = FeatureFlaggerMapping { feature in
+            guard let featureFlagger else {
+                // With no featureFlagger provided there is no gating of features
+                return feature.defaultState
+            }
+
+            switch feature {
+            case .isLaunchedROW:
+                return featureFlagger.isFeatureOn(.isPrivacyProLaunchedROW)
+            case .isLaunchedROWOverride:
+                return featureFlagger.isFeatureOn(.isPrivacyProLaunchedROWOverride)
+            case .usePrivacyProUSARegionOverride:
+                return (featureFlagger.internalUserDecider.isInternalUser &&
+                        environment.serviceEnvironment == .staging &&
+                        userDefaults.storefrontRegionOverride == .usa)
+            case .usePrivacyProROWRegionOverride:
+                return (featureFlagger.internalUserDecider.isInternalUser &&
+                        environment.serviceEnvironment == .staging &&
+                        userDefaults.storefrontRegionOverride == .restOfWorld)
+            }
+        }
         let pixelHandler: SubscriptionManager.PixelHandler = { type in
             switch type {
             case .deadToken:
@@ -71,15 +99,20 @@ extension DefaultSubscriptionManager {
         }
 
         if #available(macOS 12.0, *) {
-            self.init(storePurchaseManager: DefaultStorePurchaseManager(),
+            self.init(storePurchaseManager: DefaultStorePurchaseManager(subscriptionFeatureMappingCache: subscriptionFeatureMappingCache,
+                                                                        subscriptionFeatureFlagger: subscriptionFeatureFlagger),
                       oAuthClient: authClient,
                       subscriptionEndpointService: subscriptionEndpointService,
+                      subscriptionFeatureMappingCache: subscriptionFeatureMappingCache,
                       subscriptionEnvironment: environment,
+                      subscriptionFeatureFlagger: subscriptionFeatureFlagger,
                       pixelHandler: pixelHandler)
         } else {
             self.init(oAuthClient: authClient,
                       subscriptionEndpointService: subscriptionEndpointService,
+                      subscriptionFeatureMappingCache: subscriptionFeatureMappingCache,
                       subscriptionEnvironment: environment,
+                      subscriptionFeatureFlagger: subscriptionFeatureFlagger,
                       pixelHandler: pixelHandler)
         }
     }

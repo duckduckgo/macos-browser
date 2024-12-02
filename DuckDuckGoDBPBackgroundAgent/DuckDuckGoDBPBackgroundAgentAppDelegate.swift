@@ -73,7 +73,8 @@ final class DuckDuckGoDBPBackgroundAgentApplication: NSApplication {
         let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
         let subscriptionEnvironment = DefaultSubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
         self.subscriptionManager = DefaultSubscriptionManager(keychainType: .dataProtection(.named(subscriptionAppGroup)),
-                                                              environment: subscriptionEnvironment)
+                                                              environment: subscriptionEnvironment,
+                                                              userDefaults: subscriptionUserDefaults)
 
         _delegate = DuckDuckGoDBPBackgroundAgentAppDelegate(subscriptionManager: subscriptionManager)
 
@@ -84,7 +85,6 @@ final class DuckDuckGoDBPBackgroundAgentApplication: NSApplication {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
 }
 
 @main

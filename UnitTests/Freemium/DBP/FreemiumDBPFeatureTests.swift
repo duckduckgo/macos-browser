@@ -41,16 +41,15 @@ final class FreemiumDBPFeatureTests: XCTestCase {
         mockFreemiumDBPExperimentManager = MockFreemiumDBPExperimentManager()
         let mockSubscriptionService = SubscriptionEndpointServiceMock()
         let mockStorePurchaseManager = StorePurchaseManagerMock()
+        let mockSubscriptionFeatureMappingCache = SubscriptionFeatureMappingCacheMock()
 
         let currentEnvironment = SubscriptionEnvironment(serviceEnvironment: .production,
                                                          purchasePlatform: .appStore)
 
         mockSubscriptionManager = SubscriptionManagerMock()
         mockSubscriptionManager.currentEnvironment = currentEnvironment
-
         mockFreemiumDBPUserStateManagerManager = MockFreemiumDBPUserStateManager()
         mockFeatureDisabler = MockFeatureDisabler()
-
     }
 
     func testWhenFeatureFlagDisabled_thenFreemiumDBPIsNotAvailable() throws {

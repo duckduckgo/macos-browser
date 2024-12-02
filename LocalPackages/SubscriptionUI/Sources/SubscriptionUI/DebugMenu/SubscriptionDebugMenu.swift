@@ -28,19 +28,11 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     var openSubscriptionTab: (URL) -> Void
 
     private var purchasePlatformItem: NSMenuItem?
+    private var regionOverrideItem: NSMenuItem?
 
     var currentViewController: () -> NSViewController?
     let subscriptionManager: SubscriptionManager
-
-    private var _purchaseManager: Any?
-    @available(macOS 12.0, *)
-    fileprivate var purchaseManager: DefaultStorePurchaseManager {
-        if _purchaseManager == nil {
-            _purchaseManager = DefaultStorePurchaseManager()
-        }
-        // swiftlint:disable:next force_cast
-        return _purchaseManager as! DefaultStorePurchaseManager
-    }
+    let subscriptionUserDefaults: UserDefaults
 
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -51,13 +43,15 @@ public final class SubscriptionDebugMenu: NSMenuItem {
                 updatePurchasingPlatform: @escaping (SubscriptionEnvironment.PurchasePlatform) -> Void,
                 currentViewController: @escaping () -> NSViewController?,
                 openSubscriptionTab: @escaping (URL) -> Void,
-                subscriptionManager: SubscriptionManager) {
+                subscriptionManager: SubscriptionManager,
+                subscriptionUserDefaults: UserDefaults) {
         self.currentEnvironment = currentEnvironment
         self.updateServiceEnvironment = updateServiceEnvironment
         self.updatePurchasingPlatform = updatePurchasingPlatform
         self.currentViewController = currentViewController
         self.openSubscriptionTab = openSubscriptionTab
         self.subscriptionManager = subscriptionManager
+        self.subscriptionUserDefaults = subscriptionUserDefaults
         super.init(title: "Subscription", action: nil, keyEquivalent: "")
         self.submenu = makeSubmenu()
     }
@@ -95,6 +89,10 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         menu.addItem(NSMenuItem(title: "Storefront ID: \(storefrontID)", action: nil, target: nil))
         let storefrontCountryCode = SKPaymentQueue.default().storefront?.countryCode ?? "nil"
         menu.addItem(NSMenuItem(title: "Storefront Country Code: \(storefrontCountryCode)", action: nil, target: nil))
+
+        let regionOverrideItem = NSMenuItem(title: "Region override for App Store Sandbox", action: nil, target: nil)
+        menu.addItem(regionOverrideItem)
+        self.regionOverrideItem = regionOverrideItem
 
         menu.delegate = self
 
@@ -154,6 +152,37 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
         let disclaimerItem = NSMenuItem(title: "⚠️ App restart required! The changes are persistent", action: nil, target: nil)
         menu.addItem(disclaimerItem)
+
+        return menu
+    }
+
+    private func makeRegionOverrideItemSubmenu() -> NSMenu {
+        let menu = NSMenu(title: "")
+
+        let currentRegionOverride = subscriptionUserDefaults.storefrontRegionOverride
+
+        let usaItem = NSMenuItem(title: "USA", action: #selector(setRegionOverrideToUSA), target: self)
+        if currentRegionOverride == .usa {
+            usaItem.state = .on
+            usaItem.isEnabled = false
+            usaItem.action = nil
+            usaItem.target = nil
+        }
+        menu.addItem(usaItem)
+
+        let rowItem = NSMenuItem(title: "Rest of World", action: #selector(setRegionOverrideToROW), target: self)
+        if currentRegionOverride == .restOfWorld {
+            rowItem.state = .on
+            rowItem.isEnabled = false
+            rowItem.action = nil
+            rowItem.target = nil
+        }
+        menu.addItem(rowItem)
+
+        menu.addItem(.separator())
+
+        let clearItem = NSMenuItem(title: "Clear storefront region override", action: #selector(clearRegionOverride), target: self)
+        menu.addItem(clearItem)
 
         return menu
     }
@@ -221,7 +250,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     @objc
     func syncAppleIDAccount() {
         Task { @MainActor in
-            try? await purchaseManager.syncAppleIDAccount()
+            try? await subscriptionManager.storePurchaseManager().syncAppleIDAccount()
         }
     }
 
@@ -233,7 +262,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
                                                                    storePurchaseManager: subscriptionManager.storePurchaseManager(),
                                                                    appStoreRestoreFlow: appStoreRestoreFlow)
 
-            let vc = DebugPurchaseViewController(storePurchaseManager: DefaultStorePurchaseManager(),
+            let vc = DebugPurchaseViewController(storePurchaseManager: subscriptionManager.storePurchaseManager(),
                                                  appStorePurchaseFlow: appStorePurchaseFlow)
             currentViewController()?.presentAsSheet(vc)
         }
@@ -287,6 +316,30 @@ public final class SubscriptionDebugMenu: NSMenuItem {
       NSApp.terminate(self)
     }
 
+    // MARK: - Region override
+
+    @IBAction func clearRegionOverride(_ sender: Any?) {
+        updateRegionOverride(to: nil)
+    }
+
+    @IBAction func setRegionOverrideToUSA(_ sender: Any?) {
+        updateRegionOverride(to: .usa)
+    }
+
+    @IBAction func setRegionOverrideToROW(_ sender: Any?) {
+        updateRegionOverride(to: .restOfWorld)
+    }
+
+    private func updateRegionOverride(to region: SubscriptionRegion?) {
+        self.subscriptionUserDefaults.storefrontRegionOverride = region
+
+        if #available(macOS 12.0, *) {
+            Task {
+                await subscriptionManager.storePurchaseManager().updateAvailableProducts()
+            }
+        }
+    }
+
     // MARK: -
 
     @objc
@@ -335,5 +388,6 @@ extension SubscriptionDebugMenu: NSMenuDelegate {
 
     public func menuWillOpen(_ menu: NSMenu) {
         purchasePlatformItem?.submenu = makePurchasePlatformSubmenu()
+        regionOverrideItem?.submenu = makeRegionOverrideItemSubmenu()
     }
 }

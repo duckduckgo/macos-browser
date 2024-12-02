@@ -41,6 +41,7 @@ final class SubscriptionAppStoreRestorerTests: XCTestCase {
     var pixelKit: PixelKit!
     var uiHandler: SubscriptionUIHandlerMock!
     var storePurchaseManager: StorePurchaseManagerMock!
+    var subscriptionFeatureMappingCache: SubscriptionFeatureMappingCacheMock!
     var subscriptionEnvironment: SubscriptionEnvironment!
 
     var subscriptionManager: SubscriptionManagerMock!
@@ -68,15 +69,11 @@ final class SubscriptionAppStoreRestorerTests: XCTestCase {
         })
 
         storePurchaseManager = StorePurchaseManagerMock()
-
-        subscriptionEnvironment = SubscriptionEnvironment(serviceEnvironment: .production,
-                                                           purchasePlatform: .appStore)
-
+        subscriptionEnvironment = SubscriptionEnvironment(serviceEnvironment: .production, purchasePlatform: .appStore)
         subscriptionManager = SubscriptionManagerMock()
         subscriptionManager.currentEnvironment = subscriptionEnvironment
         subscriptionManager.resultStorePurchaseManager = storePurchaseManager
         appStoreRestoreFlow = AppStoreRestoreFlowMock()
-
         subscriptionAppStoreRestorer = DefaultSubscriptionAppStoreRestorer(subscriptionManager: subscriptionManager,
                                                                            appStoreRestoreFlow: appStoreRestoreFlow,
                                                                            uiHandler: uiHandler)
