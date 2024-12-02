@@ -145,6 +145,12 @@
                   Identifier = "StatisticsLoaderTests/testWhenRefreshRetentionAtbIsPerformedForNavigationThenAppRetentionAtbRequested()">
                </Test>
                <Test
+                  Identifier = "SubscriptionPagesUseSubscriptionFeatureTests/testBackToSettingsErrorOnFetchingAccountDetails()">
+               </Test>
+               <Test
+                  Identifier = "SubscriptionPagesUseSubscriptionFeatureTests/testBackToSettingsSuccess()">
+               </Test>
+               <Test
                   Identifier = "TabSnapshotExtensionTests/testWhenSnapshotIsRestored_ThenRenderingIsSkippedAfterLoading()">
                </Test>
                <Test
@@ -169,9 +175,6 @@
                   Identifier = "CoreDataEncryptionTests/testSavingIncorrectValueTypes()">
                </Test>
                <Test
-                  Identifier = "DownloadsIntegrationTests/testWhenDownloadIsStartedInNewTab_tabIsClosed()">
-               </Test>
-               <Test
                   Identifier = "EncryptionKeyStoreTests">
                </Test>
                <Test
@@ -182,6 +185,39 @@
                </Test>
                <Test
                   Identifier = "NavigationProtectionIntegrationTests/testReferrerTrimming()">
+               </Test>
+               <Test
+                  Identifier = "PhishingDetectionIntegrationTests">
+               </Test>
+               <Test
+                  Identifier = "PhishingDetectionIntegrationTests/testFeatureDisabledAndPhishingDetection_tabIsNotMarkedPhishing()">
+               </Test>
+               <Test
+                  Identifier = "PhishingDetectionIntegrationTests/testPhishingDetectedThenDDGLoaded_tabIsNotMarkedPhishing()">
+               </Test>
+               <Test
+                  Identifier = "PhishingDetectionIntegrationTests/testPhishingDetectedThenNotDetected_tabIsNotMarkedPhishing()">
+               </Test>
+               <Test
+                  Identifier = "PhishingDetectionIntegrationTests/testPhishingDetectedViaHTTPRedirectChain_tabIsMarkedPhishing()">
+               </Test>
+               <Test
+                  Identifier = "PhishingDetectionIntegrationTests/testPhishingDetectedViaJSRedirectChain_tabIsMarkedPhishing()">
+               </Test>
+               <Test
+                  Identifier = "PhishingDetectionIntegrationTests/testPhishingDetected_tabIsMarkedPhishing()">
+               </Test>
+               <Test
+                  Identifier = "PhishingDetectionIntegrationTests/testPhishingNotDetected_tabIsNotMarkedPhishing()">
+               </Test>
+               <Test
+                  Identifier = "TabContentTests/testWhenPDFContextMenuPrintChosen_printDialogOpens()">
+               </Test>
+               <Test
+                  Identifier = "TabContentTests/testWhenPDFContextMenuSaveAsChosen_saveDialogOpens()">
+               </Test>
+               <Test
+                  Identifier = "TabContentTests/testWhenPDFMainMenuPrintChosen_printDialogOpens()">
                </Test>
             </SkippedTests>
          </TestableReference>
@@ -225,6 +261,16 @@
                ReferencedContainer = "container:LocalPackages/UDSHelper">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "AppKitExtensionsTests"
+               BuildableName = "AppKitExtensionsTests"
+               BlueprintName = "AppKitExtensionsTests"
+               ReferencedContainer = "container:LocalPackages/AppKitExtensions">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
@@ -258,18 +304,6 @@
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
-      <EnvironmentVariables>
-         <EnvironmentVariable
-            key = "OS_ACTIVITY_DT_MODE"
-            value = "YES"
-            isEnabled = "YES">
-         </EnvironmentVariable>
-         <EnvironmentVariable
-            key = "OS_ACTIVITY_MODE"
-            value = "debug"
-            isEnabled = "YES">
-         </EnvironmentVariable>
-      </EnvironmentVariables>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"

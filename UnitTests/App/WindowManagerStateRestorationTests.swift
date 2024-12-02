@@ -20,12 +20,12 @@ import XCTest
 
 @testable import DuckDuckGo_Privacy_Browser
 
-@MainActor
 final class WindowManagerStateRestorationTests: XCTestCase {
 
     override func setUp() {
     }
 
+    @MainActor
     override func tearDown() {
         WindowsManager.closeWindows()
     }
@@ -42,12 +42,14 @@ final class WindowManagerStateRestorationTests: XCTestCase {
             !a.enumerated().contains { !isTab($0.1, equalTo: b[$0.0]) }
     }
 
+    @MainActor
     func areTabCollectionViewModelsEqual(_ a: TabCollectionViewModel, _ b: TabCollectionViewModel) -> Bool {
         a.selectionIndex == b.selectionIndex && areTabsEqual(a.tabCollection.tabs, b.tabCollection.tabs)
     }
 
     // MARK: -
 
+    @MainActor
     func testWindowManagerStateRestoration() throws {
         let tabs1 = [
             Tab(content: .url(.duckDuckGo, source: .link),

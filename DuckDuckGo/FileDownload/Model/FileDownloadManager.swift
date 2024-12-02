@@ -21,6 +21,7 @@ import Combine
 import Common
 import Navigation
 import UniformTypeIdentifiers
+import os.log
 
 protocol FileDownloadManagerProtocol: AnyObject {
     var downloads: Set<WebKitDownloadTask> { get }
@@ -28,7 +29,7 @@ protocol FileDownloadManagerProtocol: AnyObject {
 
     @discardableResult
     @MainActor
-    func add(_ download: WebKitDownload, fromBurnerWindow: Bool, delegate: DownloadTaskDelegate?, destination: WebKitDownloadTask.DownloadDestination) -> WebKitDownloadTask
+    func add(_ download: WebKitDownload, fireWindowSession: FireWindowSessionRef?, delegate: DownloadTaskDelegate?, destination: WebKitDownloadTask.DownloadDestination) -> WebKitDownloadTask
 
     func cancelAll(waitUntilDone: Bool)
 }
@@ -37,8 +38,8 @@ extension FileDownloadManagerProtocol {
 
     @discardableResult
     @MainActor
-    func add(_ download: WebKitDownload, fromBurnerWindow: Bool, destination: WebKitDownloadTask.DownloadDestination) -> WebKitDownloadTask {
-        add(download, fromBurnerWindow: fromBurnerWindow, delegate: nil, destination: destination)
+    func add(_ download: WebKitDownload, fireWindowSession: FireWindowSessionRef?, destination: WebKitDownloadTask.DownloadDestination) -> WebKitDownloadTask {
+        add(download, fireWindowSession: fireWindowSession, delegate: nil, destination: destination)
     }
 
 }
@@ -47,14 +48,9 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
 
     static let shared = FileDownloadManager()
     private let preferences: DownloadsPreferences
-    private let getLogger: (() -> OSLog)
-    private var log: OSLog {
-        getLogger()
-    }
 
-    init(preferences: DownloadsPreferences = .shared, log: @autoclosure @escaping (() -> OSLog) = .downloads) {
+    init(preferences: DownloadsPreferences = .shared) {
         self.preferences = preferences
-        self.getLogger = log
     }
 
     private(set) var downloads = Set<WebKitDownloadTask>()
@@ -67,7 +63,7 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
 
     @discardableResult
     @MainActor
-    func add(_ download: WebKitDownload, fromBurnerWindow: Bool, delegate: DownloadTaskDelegate?, destination: WebKitDownloadTask.DownloadDestination) -> WebKitDownloadTask {
+    func add(_ download: WebKitDownload, fireWindowSession: FireWindowSessionRef?, delegate: DownloadTaskDelegate?, destination: WebKitDownloadTask.DownloadDestination) -> WebKitDownloadTask {
         dispatchPrecondition(condition: .onQueue(.main))
 
         var destination = destination
@@ -75,17 +71,17 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
         if download.originalRequest?.url?.isFileURL ?? true, case .auto = destination {
             destination = .prompt
         }
-        let task = WebKitDownloadTask(download: download, destination: destination, isBurner: fromBurnerWindow)
-        os_log(log: log, "add \(download): \(download.originalRequest?.url?.absoluteString ?? "<nil>") -> \(destination): \(task)")
+        let task = WebKitDownloadTask(download: download, destination: destination, fireWindowSession: fireWindowSession)
+        Logger.fileDownload.debug("add \(String(describing: download)): \(download.originalRequest?.url?.absoluteString ?? "<nil>") -> \(destination.debugDescription): \(task)")
 
         let shouldCancelDownloadIfDelegateIsGone = delegate != nil
-        self.downloadTaskDelegates[task] = { [weak delegate, log] in
+        self.downloadTaskDelegates[task] = { [weak delegate] in
             if let delegate {
                 return delegate
             }
             // if the delegate was originally provided but deallocated since then – the download task should be cancelled
             if shouldCancelDownloadIfDelegateIsGone {
-                os_log(log: log, "🦀 \(download) delegate is gone: cancelling")
+                Logger.fileDownload.debug("🦀 \( String(describing: download) ) delegate is gone: cancelling")
                 return CancelledDownloadTaskDelegate()
             }
             return nil
@@ -101,7 +97,7 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
     func cancelAll(waitUntilDone: Bool) {
         dispatchPrecondition(condition: .onQueue(.main))
 
-        os_log(log: log, "FileDownloadManager: cancel all: [\(downloads.map(\.debugDescription).joined(separator: ", "))]")
+        Logger.fileDownload.debug("FileDownloadManager: cancel all: [\(self.downloads.map(\.debugDescription).joined(separator: ", "))]")
         let dispatchGroup: DispatchGroup? = waitUntilDone ? DispatchGroup() : nil
         var cancellables = Set<AnyCancellable>()
         for task in downloads {
@@ -131,10 +127,10 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
     @MainActor
     func fileDownloadTaskNeedsDestinationURL(_ task: WebKitDownloadTask, suggestedFilename: String, suggestedFileType fileType: UTType?) async -> (URL?, UTType?) {
         guard case (.some(let url), let fileType) = await chooseDestination(for: task, suggestedFilename: suggestedFilename, suggestedFileType: fileType) else {
-            os_log(log: log, "choose destination cancelled: \(task)")
+            Logger.fileDownload.debug("choose destination cancelled: \(task)")
             return (nil, nil)
         }
-        os_log(log: log, "destination chosen: \(task): \"\(url.path)\" (\(fileType?.description ?? "nil"))")
+        Logger.fileDownload.debug("destination chosen: \(task): \"\(url.path)\" (\(fileType?.description ?? "nil"))")
 
         if let originalRect = self.downloadTaskDelegates[task]?()?.fileIconFlyAnimationOriginalRect(for: task) {
             let utType = UTType(filenameExtension: url.pathExtension) ?? fileType ?? .data
@@ -191,7 +187,7 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
             fileTypes.append(fileType)
         }
 
-        os_log(log: log, "FileDownloadManager: requesting download location \"\(suggestedFilename)\"/\(fileTypes.map(\.description).joined(separator: ", "))")
+        Logger.fileDownload.debug("FileDownloadManager: requesting download location \"\(suggestedFilename)\"/\(fileTypes.map(\.description).joined(separator: ", "))")
         delegate.chooseDestination(suggestedFilename: suggestedFilename, fileTypes: fileTypes) { url, fileType in
             guard let url else {
                 completionHandler(nil, nil)
@@ -216,13 +212,13 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
 
         let fileName = suggestedFilename.isEmpty ? "download".appendingPathExtension(fileType?.preferredFilenameExtension) : suggestedFilename
         var url = downloadLocation.appendingPathComponent(fileName)
-        os_log(log: log, "FileDownloadManager: using default download location for \"\(suggestedFilename)\": \"\(url.path)\"")
+        Logger.fileDownload.debug("FileDownloadManager: using default download location for \"\(suggestedFilename)\": \"\(url.path)\"")
 
         // make sure the app has access to the destination
         let folderUrl = url.deletingLastPathComponent()
         let fm = FileManager.default
         guard fm.isWritableFile(atPath: folderUrl.path) else {
-            os_log(log: log, "FileDownloadManager: no write permissions for \"\(folderUrl.path)\": fallback to user request")
+            Logger.fileDownload.debug("FileDownloadManager: no write permissions for \"\(folderUrl.path)\": fallback to user request")
             return await requestDestinationFromUser(for: task, suggestedFilename: suggestedFilename, suggestedFileType: fileType)
         }
 
@@ -246,7 +242,28 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
         self.downloads.remove(task)
         self.downloadTaskDelegates[task] = nil
 
-        os_log(log: log, "❎ removed task \(task)")
+        Logger.fileDownload.debug("❎ removed task \(task)")
+    }
+
+}
+
+extension FileDownloadManager {
+
+    static func observeDownloadsFinished(_ downloads: Set<WebKitDownloadTask>, callback: @escaping () -> Void) -> AnyCancellable {
+        var cancellables = [WebKitDownloadTask: AnyCancellable]()
+        for download in downloads {
+            cancellables[download] = download.$state.sink {
+                if !$0.isDownloading {
+                    cancellables[download] = nil
+                    if cancellables.isEmpty {
+                        callback()
+                    }
+                }
+            }
+        }
+        return AnyCancellable {
+            cancellables.removeAll()
+        }
     }
 
 }

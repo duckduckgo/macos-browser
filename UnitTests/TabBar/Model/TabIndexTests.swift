@@ -19,7 +19,6 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-@MainActor
 final class TabIndexTests: XCTestCase {
 
     func testComparison() {
@@ -58,6 +57,7 @@ final class TabIndexTests: XCTestCase {
         XCTAssertEqual(TabIndex.pinned(2).makeNextUnpinned(), TabIndex.unpinned(0))
     }
 
+    @MainActor
     func testWhenViewModelHasNoPinnedTabsThenFirstTabIsUnpinned() {
         let tabCollectionViewModel = TabCollectionViewModel(
             tabCollection: tabCollection(tabsCount: 1),
@@ -67,6 +67,7 @@ final class TabIndexTests: XCTestCase {
         XCTAssertEqual(TabIndex.first(in: tabCollectionViewModel), .unpinned(0))
     }
 
+    @MainActor
     func testWhenViewModelHasPinnedTabsThenFirstTabIsPinned() {
         let tabCollectionViewModel = TabCollectionViewModel(
             tabCollection: tabCollection(tabsCount: 1),
@@ -76,6 +77,7 @@ final class TabIndexTests: XCTestCase {
         XCTAssertEqual(TabIndex.first(in: tabCollectionViewModel), .pinned(0))
     }
 
+    @MainActor
     func testLastTab() {
         let tabCollectionViewModel = TabCollectionViewModel(
             tabCollection: tabCollection(tabsCount: 10),
@@ -85,6 +87,7 @@ final class TabIndexTests: XCTestCase {
         XCTAssertEqual(TabIndex.last(in: tabCollectionViewModel), .unpinned(9))
     }
 
+    @MainActor
     func testThatNextInViewModelCyclesThroughPinnedAndUnpinnedTabs() {
         let viewModel = TabCollectionViewModel(
             tabCollection: tabCollection(tabsCount: 2),
@@ -98,6 +101,7 @@ final class TabIndexTests: XCTestCase {
         XCTAssertEqual(TabIndex.unpinned(1).next(in: viewModel), .pinned(0))
     }
 
+    @MainActor
     func testWhenViewModelHasNoPinnedTabsThenNextInViewModelCyclesThroughUnpinnedTabs() {
         let viewModel = TabCollectionViewModel(
             tabCollection: tabCollection(tabsCount: 2),
@@ -108,6 +112,7 @@ final class TabIndexTests: XCTestCase {
         XCTAssertEqual(TabIndex.unpinned(1).next(in: viewModel), .unpinned(0))
     }
 
+    @MainActor
     func testWhenViewModelHasNoUnpinnedTabsThenNextInViewModelCyclesThroughPinnedTabs() {
         let viewModel = TabCollectionViewModel(
             tabCollection: tabCollection(tabsCount: 0),
@@ -120,6 +125,7 @@ final class TabIndexTests: XCTestCase {
         XCTAssertEqual(TabIndex.pinned(2).next(in: viewModel), .pinned(0))
     }
 
+    @MainActor
     func testThatPreviousInViewModelCyclesThroughPinnedAndUnpinnedTabs() {
         let viewModel = TabCollectionViewModel(
             tabCollection: tabCollection(tabsCount: 2),
@@ -133,6 +139,7 @@ final class TabIndexTests: XCTestCase {
         XCTAssertEqual(TabIndex.pinned(0).previous(in: viewModel), .unpinned(1))
     }
 
+    @MainActor
     func testWhenViewModelHasNoPinnedTabsThenPreviousInViewModelCyclesThroughUnpinnedTabs() {
         let viewModel = TabCollectionViewModel(
             tabCollection: tabCollection(tabsCount: 3),
@@ -144,6 +151,7 @@ final class TabIndexTests: XCTestCase {
         XCTAssertEqual(TabIndex.unpinned(0).previous(in: viewModel), .unpinned(2))
     }
 
+    @MainActor
     func testWhenViewModelHasNoUnpinnedTabsThenPreviousInViewModelCyclesThroughPinnedTabs() {
         let viewModel = TabCollectionViewModel(
             tabCollection: tabCollection(tabsCount: 0),
@@ -156,6 +164,7 @@ final class TabIndexTests: XCTestCase {
         XCTAssertEqual(TabIndex.pinned(0).previous(in: viewModel), .pinned(2))
     }
 
+    @MainActor
     func testThatSanitizedInViewModelReturnsIndexRepresentingExistingTab() {
         let viewModel = TabCollectionViewModel(
             tabCollection: tabCollection(tabsCount: 10),
@@ -171,6 +180,7 @@ final class TabIndexTests: XCTestCase {
         XCTAssertEqual(TabIndex.pinned(800).sanitized(for: viewModel), .unpinned(9))
     }
 
+    @MainActor
     func testThatSanitizedInViewModelReturnsLastPinnedTabIndexWhenThereAreNoPinnedTabsRepresentingExistingTab() {
         let viewModel = TabCollectionViewModel(
             tabCollection: tabCollection(tabsCount: 0),
@@ -182,6 +192,7 @@ final class TabIndexTests: XCTestCase {
         XCTAssertEqual(TabIndex.unpinned(5).sanitized(for: viewModel), .pinned(4))
     }
 
+    @MainActor
     func testThatAtPositionInViewModelReturnsExistingTab() {
         let viewModel = TabCollectionViewModel(
             tabCollection: tabCollection(tabsCount: 2),
@@ -198,6 +209,7 @@ final class TabIndexTests: XCTestCase {
         XCTAssertEqual(TabIndex.at(-5, in: viewModel), .pinned(0))
     }
 
+    @MainActor
     func testThatAtPositionInViewModelReturnsExistingTabWhenThereAreNoPinnedTabs() {
         let viewModel = TabCollectionViewModel(
             tabCollection: tabCollection(tabsCount: 4),
@@ -213,6 +225,7 @@ final class TabIndexTests: XCTestCase {
         XCTAssertEqual(TabIndex.at(-5, in: viewModel), .unpinned(0))
     }
 
+    @MainActor
     func testThatAtPositionInViewModelReturnsExistingTabWhenThereAreNoUnpinnedTabs() {
         let viewModel = TabCollectionViewModel(
             tabCollection: tabCollection(tabsCount: 0),
@@ -231,11 +244,13 @@ final class TabIndexTests: XCTestCase {
 
     // MARK: -
 
+    @MainActor
     private func tabCollection(tabsCount: Int) -> TabCollection {
         let tab = Tab(content: .url("https://duck.com".url!, source: .link))
         return TabCollection(tabs: .init(repeating: tab, count: tabsCount))
     }
 
+    @MainActor
     private func pinnedTabsManager(tabsCount: Int) -> PinnedTabsManager {
         PinnedTabsManager(tabCollection: tabCollection(tabsCount: tabsCount))
     }

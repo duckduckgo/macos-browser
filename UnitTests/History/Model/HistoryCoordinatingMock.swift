@@ -68,9 +68,9 @@ final class HistoryCoordinatingMock: HistoryCoordinating {
     }
 
     var burnDomainsCalled = false
-    func burnDomains(_ baseDomains: Set<String>, tld: Common.TLD, completion: @escaping () -> Void) {
+    func burnDomains(_ baseDomains: Set<String>, tld: Common.TLD, completion: @escaping (Set<URL>) -> Void) {
         burnDomainsCalled = true
-        completion()
+        completion([])
     }
 
     var burnVisitsCalled = false
@@ -93,6 +93,12 @@ final class HistoryCoordinatingMock: HistoryCoordinating {
     var trackerFoundCalled = false
     func trackerFound(on: URL) {
         trackerFoundCalled = true
+    }
+
+    var removeUrlEntryCalled = false
+    func removeUrlEntry(_ url: URL, completion: (((any Error)?) -> Void)?) {
+        removeUrlEntryCalled = true
+        completion?(nil)
     }
 
 }

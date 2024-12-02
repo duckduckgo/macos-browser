@@ -21,6 +21,7 @@ import Foundation
 import BrowserServicesKit
 import Networking
 import PixelKit
+import os.log
 
 final class StatisticsLoader {
 
@@ -45,12 +46,6 @@ final class StatisticsLoader {
     }
 
     func refreshRetentionAtb(isSearch: Bool, completion: @escaping Completion = {}) {
-        // Search ATB is the only call being used currently. This guard statement can be removed to re-enable app retention ATB.
-        guard isSearch else {
-            completion()
-            return
-        }
-
         load {
             dispatchPrecondition(condition: .onQueue(.main))
 
@@ -87,19 +82,19 @@ final class StatisticsLoader {
         guard !isAppRetentionRequestInProgress else { return }
         isAppRetentionRequestInProgress = true
 
-        os_log("Requesting install statistics", log: .atb, type: .debug)
+        Logger.atb.debug("Requesting install statistics")
 
         let configuration = APIRequest.Configuration(url: URL.initialAtb)
         let request = APIRequest(configuration: configuration, urlSession: URLSession.session(useMainThreadCallbackQueue: true))
         request.fetch { response, error in
             self.isAppRetentionRequestInProgress = false
             if let error = error {
-                os_log("Initial atb request failed with error %s", type: .error, error.localizedDescription)
+                Logger.atb.error("Initial atb request failed with error \(error.localizedDescription)")
                 completion()
                 return
             }
 
-            os_log("Install statistics request succeeded", log: .atb, type: .debug)
+            Logger.atb.debug("Install statistics request succeeded")
 
             if let data = response?.data, let atb = try? self.parser.convert(fromJsonData: data) {
                 self.requestExti(atb: atb, completion: completion)
@@ -116,7 +111,7 @@ final class StatisticsLoader {
         guard !isAppRetentionRequestInProgress else { return }
         self.isAppRetentionRequestInProgress = true
 
-        os_log("Requesting exti", log: .atb, type: .debug)
+        Logger.atb.debug("Requesting exti")
 
         let installAtb = atb.version + (statisticsStore.variant ?? "")
 
@@ -125,12 +120,12 @@ final class StatisticsLoader {
         request.fetch { _, error in
             self.isAppRetentionRequestInProgress = false
             if let error = error {
-                os_log("Exti request failed with error %s", type: .error, error.localizedDescription)
+                Logger.atb.error("Extit request failed with error \(error.localizedDescription)")
                 completion()
                 return
             }
 
-            os_log("Exti request succeeded", log: .atb, type: .debug)
+            Logger.atb.debug("Exti request succeeded")
 
             assert(self.statisticsStore.atb == nil)
             assert(self.statisticsStore.installDate == nil)
@@ -151,19 +146,19 @@ final class StatisticsLoader {
             return
         }
 
-        os_log("Requesting search retention ATB", log: .atb, type: .debug)
+        Logger.atb.debug("Requesting search retention ATB")
 
         let url = URL.searchAtb(atbWithVariant: atbWithVariant, setAtb: searchRetentionAtb, isSignedIntoEmailProtection: emailManager.isSignedIn)
         let configuration = APIRequest.Configuration(url: url)
         let request = APIRequest(configuration: configuration, urlSession: URLSession.session(useMainThreadCallbackQueue: true))
         request.fetch { (response, error) in
             if let error = error {
-                os_log("Search atb request failed with error %s", type: .error, error.localizedDescription)
+                Logger.atb.error("Search atb request failed with error \(error.localizedDescription)")
                 completion()
                 return
             }
 
-            os_log("Search retention ATB request succeeded", log: .atb, type: .debug)
+            Logger.atb.debug("Search retention ATB request succeeded")
 
             if let data = response?.data, let atb  = try? self.parser.convert(fromJsonData: data) {
                 self.statisticsStore.searchRetentionAtb = atb.version
@@ -186,7 +181,7 @@ final class StatisticsLoader {
             return
         }
 
-        os_log("Requesting app retention ATB", log: .atb, type: .debug)
+        Logger.atb.debug("Requesting app retention ATB")
 
         isAppRetentionRequestInProgress = true
 
@@ -197,12 +192,12 @@ final class StatisticsLoader {
             self.isAppRetentionRequestInProgress = false
 
             if let error = error {
-                os_log("App atb request failed with error %s", type: .error, error.localizedDescription)
+                Logger.atb.error("App atb request failed with error \(error.localizedDescription)")
                 completion()
                 return
             }
 
-            os_log("App retention ATB request succeeded", log: .atb, type: .debug)
+            Logger.atb.debug("App retention ATB request succeeded")
 
             if let data = response?.data, let atb  = try? self.parser.convert(fromJsonData: data) {
                 self.statisticsStore.appRetentionAtb = atb.version
@@ -229,8 +224,7 @@ final class StatisticsLoader {
 
         DispatchQueue.global().asyncAfter(deadline: .now() + randomDelay) {
             PixelKit.fire(GeneralPixel.dailyOsVersionCounter,
-                          frequency: .legacyDaily,
-                          includeAppVersionParameter: false)
+                          frequency: .legacyDaily)
         }
     }
 

@@ -69,4 +69,13 @@ public struct HistoryEvent: Identifiable, Sendable {
             return false
         }
     }
+
+    func isMatchesFoundEvent() -> Bool {
+        switch type {
+        case .matchesFound:
+            return true
+        default:
+            return false
+        }
+    }
 }

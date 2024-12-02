@@ -19,15 +19,14 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-@MainActor
 final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
     private var bookmarkManager: LocalBookmarkManager!
     private var bookmarkStoreMock: BookmarkStoreMock!
 
+    @MainActor
     override func setUpWithError() throws {
         try super.setUpWithError()
-        bookmarkStoreMock = BookmarkStoreMock()
-        bookmarkStoreMock.bookmarks = [BookmarkFolder.mock]
+        bookmarkStoreMock = BookmarkStoreMock(bookmarks: [BookmarkFolder.mock])
         bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
         bookmarkManager.loadBookmarks()
     }
@@ -40,6 +39,7 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
 
     // MARK: - Copy
 
+    @MainActor
     func testReturnAddBookmarkFolderTitleWhenModeIsAdd() {
         // GIVEN
         let sut = AddEditBookmarkFolderDialogViewModel(mode: .add(), bookmarkManager: bookmarkManager)
@@ -51,6 +51,7 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         XCTAssertEqual(title, UserText.Bookmarks.Dialog.Title.addFolder)
     }
 
+    @MainActor
     func testReturnEditBookmarkFolderTitleWhenModeIsEdit() {
         // GIVEN
         let sut = AddEditBookmarkFolderDialogViewModel(mode: .edit(folder: .mock, parentFolder: nil), bookmarkManager: bookmarkManager)
@@ -62,6 +63,7 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         XCTAssertEqual(title, UserText.Bookmarks.Dialog.Title.editFolder)
     }
 
+    @MainActor
     func testReturnCancelActionTitleWhenModeIsAdd() {
         // GIVEN
         let sut = AddEditBookmarkFolderDialogViewModel(mode: .add(), bookmarkManager: bookmarkManager)
@@ -73,6 +75,7 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         XCTAssertEqual(title, UserText.cancel)
     }
 
+    @MainActor
     func testReturnCancelActionTitleWhenModeIsEdit() {
         // GIVEN
         let sut = AddEditBookmarkFolderDialogViewModel(mode: .edit(folder: .mock, parentFolder: nil), bookmarkManager: bookmarkManager)
@@ -84,6 +87,7 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         XCTAssertEqual(title, UserText.cancel)
     }
 
+    @MainActor
     func testReturnAddBookmarkFolderActionTitleWhenModeIsAdd() {
         // GIVEN
         let sut = AddEditBookmarkFolderDialogViewModel(mode: .add(), bookmarkManager: bookmarkManager)
@@ -95,6 +99,7 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         XCTAssertEqual(title, UserText.Bookmarks.Dialog.Action.addFolder)
     }
 
+    @MainActor
     func testReturnSaveActionTitleWhenModeIsEdit() {
         // GIVEN
         let sut = AddEditBookmarkFolderDialogViewModel(mode: .edit(folder: .mock, parentFolder: nil), bookmarkManager: bookmarkManager)
@@ -108,6 +113,7 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
 
     // MARK: State
 
+    @MainActor
     func testShouldSetFolderNameToEmptyWhenInitAndModeIsAdd() {
         // GIVEN
         let sut = AddEditBookmarkFolderDialogViewModel(mode: .add(parentFolder: .mock), bookmarkManager: bookmarkManager)
@@ -119,6 +125,7 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         XCTAssertTrue(result.isEmpty)
     }
 
+    @MainActor
     func testShouldSetFolderNameToValueWhenInitAndModeIsEdit() {
         // GIVEN
         let folder = BookmarkFolder(id: "1", title: #function)
@@ -131,10 +138,12 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         XCTAssertEqual(result, #function)
     }
 
+    @MainActor
     func testShouldSetFoldersFromBookmarkListWhenInitAndModeIsAdd() {
         // GIVEN
         let folder = BookmarkFolder(id: "1", title: #function)
-        bookmarkStoreMock.bookmarks = [folder]
+        bookmarkStoreMock = BookmarkStoreMock(bookmarks: [folder])
+        bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
         bookmarkManager.loadBookmarks()
         let sut = AddEditBookmarkFolderDialogViewModel(mode: .add(), bookmarkManager: bookmarkManager)
 
@@ -146,10 +155,12 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         XCTAssertEqual(result.first?.entity, folder)
     }
 
+    @MainActor
     func testShouldSetFoldersFromBookmarkListWhenInitAndModeIsEdit() {
         // GIVEN
         let folder = BookmarkFolder(id: "1", title: #function)
-        bookmarkStoreMock.bookmarks = [folder]
+        bookmarkStoreMock = BookmarkStoreMock(bookmarks: [folder])
+        bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
         bookmarkManager.loadBookmarks()
         let sut = AddEditBookmarkFolderDialogViewModel(mode: .edit(folder: .mock, parentFolder: nil), bookmarkManager: bookmarkManager)
 
@@ -161,10 +172,13 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         XCTAssertEqual(result.first?.entity, folder)
     }
 
+    @MainActor
     func testShouldSetSelectedFolderToNilWhenParentFolderIsNilAndModeIsAdd() {
         // GIVEN
         let folder = BookmarkFolder(id: "1", title: #function)
-        bookmarkStoreMock.bookmarks = [folder]
+        bookmarkStoreMock = BookmarkStoreMock(bookmarks: [folder])
+        bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
+        bookmarkManager.loadBookmarks()
         let sut = AddEditBookmarkFolderDialogViewModel(mode: .add(), bookmarkManager: bookmarkManager)
 
         // WHEN
@@ -174,10 +188,13 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         XCTAssertNil(result)
     }
 
+    @MainActor
     func testShouldSetSelectedFolderToValueWhenParentFolderIsNotNilAndModeIsAdd() {
         // GIVEN
         let folder = BookmarkFolder(id: "1", title: #function)
-        bookmarkStoreMock.bookmarks = [folder]
+        bookmarkStoreMock = BookmarkStoreMock(bookmarks: [folder])
+        bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
+        bookmarkManager.loadBookmarks()
         let sut = AddEditBookmarkFolderDialogViewModel(mode: .add(parentFolder: .mock), bookmarkManager: bookmarkManager)
 
         // WHEN
@@ -187,10 +204,13 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         XCTAssertEqual(result, .mock)
     }
 
+    @MainActor
     func testShouldSetSelectedFolderToNilWhenParentFolderIsNilAndModeIsEdit() {
         // GIVEN
         let folder = BookmarkFolder(id: "1", title: #function)
-        bookmarkStoreMock.bookmarks = [folder]
+        bookmarkStoreMock = BookmarkStoreMock(bookmarks: [folder])
+        bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
+        bookmarkManager.loadBookmarks()
         let sut = AddEditBookmarkFolderDialogViewModel(mode: .edit(folder: folder, parentFolder: nil), bookmarkManager: bookmarkManager)
 
         // WHEN
@@ -200,10 +220,13 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         XCTAssertNil(result)
     }
 
+    @MainActor
     func testShouldSetSelectedFolderToValueWhenParentFolderIsNotNilAndModeIsEdit() {
         // GIVEN
         let folder = BookmarkFolder(id: "1", title: #function)
-        bookmarkStoreMock.bookmarks = [folder]
+        bookmarkStoreMock = BookmarkStoreMock(bookmarks: [folder])
+        bookmarkManager = .init(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
+        bookmarkManager.loadBookmarks()
         let sut = AddEditBookmarkFolderDialogViewModel(mode: .edit(folder: folder, parentFolder: .mock), bookmarkManager: bookmarkManager)
 
         // WHEN
@@ -215,6 +238,7 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
 
     // MARK: - Actions
 
+    @MainActor
     func testReturnIsCancelActionDisabledFalseWhenModeIsAdd() {
         // GIVEN
         let sut = AddEditBookmarkFolderDialogViewModel(mode: .add(), bookmarkManager: bookmarkManager)
@@ -226,6 +250,7 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         XCTAssertFalse(result)
     }
 
+    @MainActor
     func testReturnIsCancelActionDisabledFalseWhenModeIsEdit() {
         // GIVEN
         let sut = AddEditBookmarkFolderDialogViewModel(mode: .edit(folder: .mock, parentFolder: nil), bookmarkManager: bookmarkManager)
@@ -237,6 +262,7 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         XCTAssertFalse(result)
     }
 
+    @MainActor
     func testReturnIsDefaultActionButtonDisabledTrueWhenFolderNameIsEmptyAndModeIsAdd() {
         // GIVEN
         let sut = AddEditBookmarkFolderDialogViewModel(mode: .add(), bookmarkManager: bookmarkManager)
@@ -249,6 +275,7 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         XCTAssertTrue(result)
     }
 
+    @MainActor
     func testReturnIsDefaultActionButtonDisabledTrueWhenFolderNameIsEmptyAndModeIsEdit() {
         // GIVEN
         let sut = AddEditBookmarkFolderDialogViewModel(mode: .edit(folder: .mock, parentFolder: nil), bookmarkManager: bookmarkManager)
@@ -261,6 +288,7 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         XCTAssertTrue(result)
     }
 
+    @MainActor
     func testReturnIsDefaultActionButtonDisabledFalseWhenFolderNameIsNotEmptyAndModeIsAdd() {
         // GIVEN
         let sut = AddEditBookmarkFolderDialogViewModel(mode: .add(), bookmarkManager: bookmarkManager)
@@ -273,6 +301,7 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         XCTAssertFalse(result)
     }
 
+    @MainActor
     func testReturnIsDefaultActionButtonDisabledFalseWhenFolderNameIsNotEmptyAndModeIsEdit() {
         // GIVEN
         let sut = AddEditBookmarkFolderDialogViewModel(mode: .edit(folder: .mock, parentFolder: nil), bookmarkManager: bookmarkManager)
@@ -285,6 +314,7 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         XCTAssertFalse(result)
     }
 
+    @MainActor
     func testShouldCallDismissWhenCancelIsCalled() {
         // GIVEN
         let sut = AddEditBookmarkFolderDialogViewModel(mode: .add(), bookmarkManager: bookmarkManager)
@@ -299,6 +329,7 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         XCTAssertTrue(didCallDismiss)
     }
 
+    @MainActor
     func testShouldCallDismissWhenAddOrSaveIsCalled() {
         // GIVEN
         let sut = AddEditBookmarkFolderDialogViewModel(mode: .add(), bookmarkManager: bookmarkManager)
@@ -314,6 +345,7 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         XCTAssertTrue(didCallDismiss)
     }
 
+    @MainActor
     func testShouldAskBookmarkStoreToSaveFolderWhenAddOrSaveIsCalledAndModeIsAdd() {
         // GIVEN
         let folder = BookmarkFolder(id: #file, title: #function)
@@ -328,11 +360,12 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
 
         // THEN
         XCTAssertFalse(bookmarkStoreMock.updateFolderCalled)
-        XCTAssertTrue(bookmarkStoreMock.saveFolderCalled)
-        XCTAssertEqual(bookmarkStoreMock.capturedFolder?.title, #function)
-        XCTAssertEqual(bookmarkStoreMock.capturedParentFolder, folder)
+        let result = bookmarkStoreMock.saveEntitiesAtIndicesCalledWith?.first?.entity as? BookmarkFolder
+        XCTAssertEqual(result?.title, #function)
+        XCTAssertEqual(result?.parentFolderUUID, folder.id)
     }
 
+    @MainActor
     func testShouldAskBookmarkStoreToUpdateFolderWhenNameIsChanged() {
         // GIVEN
         let folder = BookmarkFolder(id: #file, title: #function)
@@ -349,6 +382,7 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         XCTAssertEqual(bookmarkStoreMock.capturedFolder?.title, "TEST")
     }
 
+    @MainActor
     func testShouldNotAskBookmarkStoreToUpdateFolderWhenNameIsNotChanged() {
         // GIVEN
         let sut = AddEditBookmarkFolderDialogViewModel(mode: .edit(folder: .mock, parentFolder: nil), bookmarkManager: bookmarkManager)
@@ -364,6 +398,7 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         XCTAssertNil(bookmarkStoreMock.capturedFolder?.title)
     }
 
+    @MainActor
     func testShouldAskBookmarkStoreToMoveFolderToSubfolderWhenSelectedFolderIsDifferentFromOriginalFolder() {
         // GIVEN
         let location = BookmarkFolder(id: #file, title: #function)
@@ -384,6 +419,7 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         XCTAssertEqual(bookmarkStoreMock.capturedParentFolderType, .parent(uuid: #file))
     }
 
+    @MainActor
     func testShouldAskBookmarkStoreToMoveFolderToRootFolderWhenSelectedFolderIsDifferentFromOriginalFolder() {
         // GIVEN
         let folder = BookmarkFolder.mock
@@ -403,6 +439,7 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         XCTAssertEqual(bookmarkStoreMock.capturedParentFolderType, .root)
     }
 
+    @MainActor
     func testShouldNotAskBookmarkStoreToMoveFolderWhenSelectedFolderIsNotDifferentFromOriginalFolder() {
         // GIVEN
         let folder = BookmarkFolder.mock

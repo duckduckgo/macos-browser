@@ -21,7 +21,7 @@ import PixelKit
 
 /// A type that handles Pixels for acquisition attributions.
 protocol InstallationAttributionsPixelHandler: AnyObject {
-    /// Fire the Pixel to track the App install.
+    /// Fire the Pixel to anonymously track the App install.
     func fireInstallationAttributionPixel()
 }
 

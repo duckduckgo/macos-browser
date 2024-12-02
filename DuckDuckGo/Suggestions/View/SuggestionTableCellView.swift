@@ -18,6 +18,8 @@
 
 import Cocoa
 import Common
+import os.log
+import Suggestions
 
 final class SuggestionTableCellView: NSTableCellView {
 
@@ -30,25 +32,39 @@ final class SuggestionTableCellView: NSTableCellView {
     static let selectedTintColor: NSColor = .selectedSuggestionTint
 
     @IBOutlet weak var iconImageView: NSImageView!
+    @IBOutlet weak var removeButton: NSButton!
     @IBOutlet weak var suffixTextField: NSTextField!
+    @IBOutlet weak var suffixTrailingConstraint: NSLayoutConstraint!
+
+    var suggestion: Suggestion?
 
     override func awakeFromNib() {
         suffixTextField.textColor = Self.suffixColor
+        removeButton.toolTip = UserText.removeSuggestionTooltip
+    }
+
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+
+        updateDeleteImageViewVisibility()
     }
 
     var isSelected: Bool = false {
         didSet {
-            updateIconImageView()
+            updateImageViews()
             updateTextField()
+            updateDeleteImageViewVisibility()
         }
     }
 
     var isBurner: Bool = false
 
     func display(_ suggestionViewModel: SuggestionViewModel) {
+        self.suggestion = suggestionViewModel.suggestion
         attributedString = suggestionViewModel.tableCellViewAttributedString
         iconImageView.image = suggestionViewModel.icon
         suffixTextField.stringValue = suggestionViewModel.suffix
+        setRemoveButtonHidden(true)
 
         updateTextField()
     }
@@ -57,7 +73,7 @@ final class SuggestionTableCellView: NSTableCellView {
 
     private func updateTextField() {
         guard let attributedString = attributedString else {
-            os_log("SuggestionTableCellView: Attributed strings are nil", type: .error)
+            Logger.general.error("SuggestionTableCellView: Attributed strings are nil")
             return
         }
         if isSelected {
@@ -75,8 +91,28 @@ final class SuggestionTableCellView: NSTableCellView {
         }
     }
 
-    private func updateIconImageView() {
+    private func updateImageViews() {
         iconImageView.contentTintColor = isSelected ? Self.selectedTintColor : Self.iconColor
+        removeButton.contentTintColor = isSelected ? Self.selectedTintColor : Self.iconColor
+    }
+
+    func updateDeleteImageViewVisibility() {
+        guard let window = window else { return }
+        let mouseLocation = NSEvent.mouseLocation
+        let windowFrameInScreen = window.frame
+
+        // If the suggestion is based on history, if the mouse is inside the window's frame and
+        // the suggestion is selected, show the delete button
+        if let suggestion, suggestion.isHistoryEntry, windowFrameInScreen.contains(mouseLocation) {
+            setRemoveButtonHidden(!isSelected)
+        } else {
+            setRemoveButtonHidden(true)
+        }
+    }
+
+    private func setRemoveButtonHidden(_ hidden: Bool) {
+        removeButton.isHidden = hidden
+        suffixTrailingConstraint.priority = hidden ? .required : .defaultLow
     }
 
 }

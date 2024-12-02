@@ -20,6 +20,7 @@ import Combine
 import Common
 import Foundation
 import XPCHelper
+import os.log
 
 /// This protocol describes the server-side IPC interface for controlling the tunnel
 ///
@@ -109,7 +110,7 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
         xpc.execute(call: { server in
             server.openBrowser(domain: domain)
         }, xpcReplyErrorHandler: { error in
-            os_log("Error \(error.localizedDescription)")
+            Logger.dataBrokerProtection.error("Error \(error.localizedDescription)")
             // Intentional no-op as there's no completion block
             // If you add a completion block, please remember to call it here too!
         })
@@ -119,7 +120,7 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
         xpc.execute(call: { server in
             server.startImmediateOperations(showWebView: showWebView)
         }, xpcReplyErrorHandler: { error in
-            os_log("Error \(error.localizedDescription)")
+            Logger.dataBrokerProtection.error("Error \(error.localizedDescription)")
             // Intentional no-op as there's no completion block
             // If you add a completion block, please remember to call it here too!
         })
@@ -129,16 +130,17 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
         xpc.execute(call: { server in
             server.startScheduledOperations(showWebView: showWebView)
         }, xpcReplyErrorHandler: { error in
-            os_log("Error \(error.localizedDescription)")
+            Logger.dataBrokerProtection.error("Error \(error.localizedDescription)")
             // Intentional no-op as there's no completion block
             // If you add a completion block, please remember to call it here too!
-        })    }
+        })
+    }
 
     public func runAllOptOuts(showWebView: Bool) {
         xpc.execute(call: { server in
             server.runAllOptOuts(showWebView: showWebView)
         }, xpcReplyErrorHandler: { error in
-            os_log("Error \(error.localizedDescription)")
+            Logger.dataBrokerProtection.error("Error \(error.localizedDescription)")
             // Intentional no-op as there's no completion block
             // If you add a completion block, please remember to call it here too!
         })
@@ -151,7 +153,7 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
                     continuation.resume(returning: metaData)
                 }
             }, xpcReplyErrorHandler: { error in
-                os_log("Error \(error.localizedDescription)")
+                Logger.dataBrokerProtection.error("Error \(error.localizedDescription)")
                 continuation.resume(returning: nil)
             })
         }

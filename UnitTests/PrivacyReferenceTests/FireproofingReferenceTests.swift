@@ -59,7 +59,7 @@ final class FireproofingReferenceTests: XCTestCase {
 
     @MainActor
     private func runReferenceTest(_ test: Test) async {
-        os_log("Testing %s", test.name)
+        Logger.general.debug("Testing \(test.name)")
 
         let loginDomains = testData.fireButtonFireproofing.fireproofedSites.map { sanitizedSite($0) }
         let logins = MockPreservedLogins(domains: loginDomains, tld: ContentBlocking.shared.tld)

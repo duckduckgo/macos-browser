@@ -19,49 +19,85 @@
 import Combine
 import Common
 import Foundation
+import os.log
 
 @MainActor
 final class DownloadListViewModel {
 
+    private let fireWindowSession: FireWindowSessionRef?
     private let coordinator: DownloadListCoordinator
     private var viewModels: [UUID: DownloadViewModel]
-    private var cancellable: AnyCancellable?
+    private var cancellables = Set<AnyCancellable>()
 
     @Published private(set) var items: [DownloadViewModel]
+    @Published private(set) var shouldShowErrorBanner: Bool = false
 
-    init(coordinator: DownloadListCoordinator = DownloadListCoordinator.shared) {
+    init(fireWindowSession: FireWindowSessionRef?, coordinator: DownloadListCoordinator = DownloadListCoordinator.shared) {
+        self.fireWindowSession = fireWindowSession
         self.coordinator = coordinator
 
-        let items = coordinator.downloads(sortedBy: \.added, ascending: false).map(DownloadViewModel.init)
+        let items = coordinator.downloads(sortedBy: \.added, ascending: false)
+            .filter { $0.fireWindowSession == fireWindowSession }
+            .map(DownloadViewModel.init)
         self.items = items
         self.viewModels = items.reduce(into: [:]) { $0[$1.id] = $1 }
-        cancellable = coordinator.updates.receive(on: DispatchQueue.main).sink { [weak self] update in
+        coordinator.updates.receive(on: DispatchQueue.main).sink { [weak self] update in
             self?.handleDownloadsUpdate(of: update.kind, item: update.item)
-        }
+        }.store(in: &cancellables)
+        self.setupErrorBannerBinding()
     }
 
     private func handleDownloadsUpdate(of kind: DownloadListCoordinator.UpdateKind, item: DownloadListItem) {
-        os_log(.debug, log: .downloads, "DownloadListViewModel: .\(kind) \(item.identifier)")
+        Logger.fileDownload.debug("DownloadListViewModel: .\(String(describing: kind)) \(item.identifier)")
 
         dispatchPrecondition(condition: .onQueue(.main))
         switch kind {
         case .added:
+            guard item.fireWindowSession == self.fireWindowSession else { return }
+
             let viewModel = DownloadViewModel(item: item)
             self.viewModels[item.identifier] = viewModel
             self.items.insert(viewModel, at: 0)
         case .updated:
             self.viewModels[item.identifier]?.update(with: item)
         case .removed:
-            guard let index = self.items.firstIndex(where: { $0.id == item.identifier }) else {
-                return
-            }
+            guard let index = self.items.firstIndex(where: { $0.id == item.identifier }) else { return }
             self.viewModels[item.identifier] = nil
             self.items.remove(at: index)
         }
     }
 
+    private func setupErrorBannerBinding() {
+        $items.flatMap { items in
+                Publishers.MergeMany(items.map { $0.$state })
+            }.map { state in
+                if case .failed(let error) = state {
+                    if error.isNSFileReadUnknownError && self.isAffectedMacOSVersion() {
+                        return true
+                    }
+                }
+
+                return false
+            }
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] showError in
+                self?.shouldShowErrorBanner = showError
+            }
+            .store(in: &cancellables)
+    }
+
+    /// macOS 15.0.1 and 14.7.1 have a bug that affects downloads. Apple fixed the issue on macOS 15.1
+    /// For more information: https://app.asana.com/0/1204006570077678/1208522448255790/f
+    private func isAffectedMacOSVersion() -> Bool {
+        let currentVersion = AppVersion.shared.osVersion
+        let targetVersions = ["15.0.1", "14.7.1"]
+
+        return targetVersions.contains(currentVersion)
+    }
+
     func cleanupInactiveDownloads() {
-        coordinator.cleanupInactiveDownloads()
+        coordinator.cleanupInactiveDownloads(for: fireWindowSession)
     }
 
     func cancelDownload(at index: Int) {

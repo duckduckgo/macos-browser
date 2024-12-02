@@ -54,6 +54,9 @@ extension Tab: NavigationResponder {
             // Duck Player overlay navigations handling
             .weak(nullable: self.duckPlayer),
 
+            // AI Chat onboarding navigations handling
+            .weak(nullable: self.aiChatOnboarding),
+
             // open external scheme link in another app
             .weak(nullable: self.externalAppSchemeHandler),
 
@@ -89,6 +92,9 @@ extension Tab: NavigationResponder {
 
             // Error Page
             .weak(nullable: self.errorPage),
+
+            // Release Notes
+            .weak(nullable: self.releaseNotes),
 
             // should be the last, for Unit Tests navigation events tracking
             .struct(nullable: testsClosureNavigationResponder),

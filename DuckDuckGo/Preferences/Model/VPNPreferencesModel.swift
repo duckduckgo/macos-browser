@@ -20,6 +20,7 @@ import AppKit
 import Combine
 import Foundation
 import NetworkProtection
+import NetworkProtectionIPC
 import NetworkProtectionUI
 import BrowserServicesKit
 
@@ -31,17 +32,30 @@ final class VPNPreferencesModel: ObservableObject {
 
     @Published var connectOnLogin: Bool {
         didSet {
+            guard settings.connectOnLogin != connectOnLogin else {
+                return
+            }
+
             settings.connectOnLogin = connectOnLogin
         }
     }
 
     @Published var excludeLocalNetworks: Bool {
         didSet {
+            guard settings.excludeLocalNetworks != excludeLocalNetworks else {
+                return
+            }
+
             settings.excludeLocalNetworks = excludeLocalNetworks
+
+            Task {
+                // We need to allow some time for the setting to propagate
+                // But ultimately this should actually be a user choice
+                try await Task.sleep(interval: 0.1)
+                try await vpnXPCClient.command(.restartAdapter)
+            }
         }
     }
-
-    @Published var secureDNS: Bool = true
 
     @Published var showInMenuBar: Bool {
         didSet {
@@ -59,6 +73,13 @@ final class VPNPreferencesModel: ObservableObject {
         }
     }
 
+    /// Whether the excluded sites section in preferences is shown.
+    ///
+    /// Only necessary because this is feature flagged to internal users.
+    ///
+    @Published
+    var showExcludedSites: Bool
+
     @Published var notifyStatusChanges: Bool {
         didSet {
             settings.notifyStatusChanges = notifyStatusChanges
@@ -74,17 +95,20 @@ final class VPNPreferencesModel: ObservableObject {
     }
 
     @Published public var dnsSettings: NetworkProtectionDNSSettings = .default
-
     @Published public var isCustomDNSSelected = false
     @Published public var customDNSServers: String?
 
+    private let vpnXPCClient: VPNControllerXPCClient
     private let settings: VPNSettings
     private let pinningManager: PinningManager
     private var cancellables = Set<AnyCancellable>()
 
-    init(settings: VPNSettings = .init(defaults: .netP),
+    init(vpnXPCClient: VPNControllerXPCClient = .shared,
+         settings: VPNSettings = .init(defaults: .netP),
          pinningManager: PinningManager = LocalPinningManager.shared,
          defaults: UserDefaults = .netP) {
+
+        self.vpnXPCClient = vpnXPCClient
         self.settings = settings
         self.pinningManager = pinningManager
 
@@ -94,10 +118,13 @@ final class VPNPreferencesModel: ObservableObject {
         showInMenuBar = settings.showInMenuBar
         showInBrowserToolbar = pinningManager.isPinned(.networkProtection)
         showUninstallVPN = defaults.networkProtectionOnboardingStatus != .default
+        showExcludedSites = true
         onboardingStatus = defaults.networkProtectionOnboardingStatus
         locationItem = VPNLocationPreferenceItemModel(selectedLocation: settings.selectedLocation)
 
         subscribeToOnboardingStatusChanges(defaults: defaults)
+        subscribeToConnectOnLoginSettingChanges()
+        subscribeToExcludeLocalNetworksSettingChanges()
         subscribeToShowInMenuBarSettingChanges()
         subscribeToShowInBrowserToolbarSettingsChanges()
         subscribeToLocationSettingChanges()
@@ -107,6 +134,18 @@ final class VPNPreferencesModel: ObservableObject {
     func subscribeToOnboardingStatusChanges(defaults: UserDefaults) {
         defaults.networkProtectionOnboardingStatusPublisher
             .assign(to: \.onboardingStatus, onWeaklyHeld: self)
+            .store(in: &cancellables)
+    }
+
+    func subscribeToConnectOnLoginSettingChanges() {
+        settings.connectOnLoginPublisher
+            .assign(to: \.connectOnLogin, onWeaklyHeld: self)
+            .store(in: &cancellables)
+    }
+
+    func subscribeToExcludeLocalNetworksSettingChanges() {
+        settings.excludeLocalNetworksPublisher
+            .assign(to: \.excludeLocalNetworks, onWeaklyHeld: self)
             .store(in: &cancellables)
     }
 
@@ -181,6 +220,22 @@ final class VPNPreferencesModel: ObservableObject {
         cancelButton.keyEquivalent = "\r"
 
         return alert
+    }
+
+    // MARK: - Excluded Sites
+
+    @MainActor
+    func manageExcludedSites() {
+        let windowController = ExcludedDomainsViewController.create().wrappedInWindowController()
+
+        guard let window = windowController.window,
+              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
+        else {
+            assertionFailure("DataClearingPreferences: Failed to present ExcludedDomainsViewController")
+            return
+        }
+
+        parentWindowController.window?.beginSheet(window)
     }
 }
 

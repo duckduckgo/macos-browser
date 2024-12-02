@@ -1,9 +1,10 @@
 {
   "name": "People Search Now",
   "url": "peoplesearchnow.com",
-  "version": "0.2.0",
+  "version": "0.4.0",
   "parent": "peoplefinders.com",
   "addedDatetime": 1705989600000,
+  "optOutUrl": "https://www.peoplesearchnow.com/opt-out",
   "steps": [
     {
       "stepType": "scan",
@@ -59,6 +60,7 @@
   "schedulingConfig": {
     "retryError": 48,
     "confirmOptOutScan": 72,
-    "maintenanceScan": 240
+    "maintenanceScan": 120,
+    "maxAttempts": -1
   }
 }

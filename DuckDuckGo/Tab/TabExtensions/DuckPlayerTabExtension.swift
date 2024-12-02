@@ -22,6 +22,7 @@ import ContentBlocking
 import Foundation
 import Navigation
 import PixelKit
+import DuckPlayer
 
 protocol YoutubeScriptsProvider {
     var youtubeOverlayScript: YoutubeOverlayUserScript? { get }
@@ -34,6 +35,15 @@ final class DuckPlayerTabExtension {
     private let isBurner: Bool
     private var cancellables = Set<AnyCancellable>()
     private var youtubePlayerCancellables = Set<AnyCancellable>()
+    private var shouldOpenInNewTab: Bool  {
+        preferences.isOpenInNewTabSettingsAvailable &&
+        preferences.duckPlayerOpenInNewTab &&
+        preferences.duckPlayerMode != .disabled
+    }
+    private var shouldOpenDuckPlayerDirectly: Bool {
+        preferences.duckPlayerMode == .enabled
+    }
+    private let preferences: DuckPlayerPreferences
 
     private weak var webView: WKWebView? {
         didSet {
@@ -43,16 +53,22 @@ final class DuckPlayerTabExtension {
     }
     private weak var youtubeOverlayScript: YoutubeOverlayUserScript?
     private weak var youtubePlayerScript: YoutubePlayerUserScript?
-
+    private let onboardingDecider: DuckPlayerOnboardingDecider
     private var shouldSelectNextNewTab: Bool?
+    private var duckPlayerOverlayUsagePixels: DuckPlayerOverlayPixelFiring
 
     init(duckPlayer: DuckPlayer,
          isBurner: Bool,
          scriptsPublisher: some Publisher<some YoutubeScriptsProvider, Never>,
-         webViewPublisher: some Publisher<WKWebView, Never>) {
+         webViewPublisher: some Publisher<WKWebView, Never>,
+         preferences: DuckPlayerPreferences = .shared,
+         onboardingDecider: DuckPlayerOnboardingDecider,
+         duckPlayerOverlayPixels: DuckPlayerOverlayPixelFiring = DuckPlayerOverlayUsagePixels()) {
         self.duckPlayer = duckPlayer
         self.isBurner = isBurner
-
+        self.preferences = preferences
+        self.onboardingDecider = onboardingDecider
+        self.duckPlayerOverlayUsagePixels = duckPlayerOverlayPixels
         webViewPublisher.sink { [weak self] webView in
             self?.webView = webView
         }.store(in: &cancellables)
@@ -74,6 +90,12 @@ final class DuckPlayerTabExtension {
     private func setUpYoutubeScriptsIfNeeded(for url: URL?) {
         youtubePlayerCancellables.removeAll()
         guard duckPlayer.isAvailable else { return }
+
+        onboardingDecider.valueChangedPublisher.sink {[weak self] _ in
+            guard let self = self else { return }
+
+            self.youtubeOverlayScript?.userUISettingsUpdated(uiValues: UIUserValues(onboardingDecider: self.onboardingDecider))
+        }.store(in: &youtubePlayerCancellables)
 
         if let hostname = url?.host, let script = youtubeOverlayScript {
             if script.messageOriginPolicy.isAllowed(hostname) {
@@ -106,6 +128,30 @@ final class DuckPlayerTabExtension {
         }
     }
 
+    private func fireOverlayShownPixelIfNeeded(url: URL) {
+
+        guard duckPlayer.isAvailable,
+              duckPlayer.mode == .alwaysAsk,
+              url.isYoutubeWatch else {
+            return
+        }
+
+        // Static variable for debounce logic
+        let debounceInterval: TimeInterval = 1.0
+        let now = Date()
+
+        struct Debounce {
+            static var lastFireTime: Date?
+        }
+
+        // Check debounce condition and update timestamp if firing
+        guard Debounce.lastFireTime == nil || now.timeIntervalSince(Debounce.lastFireTime!) >= debounceInterval else {
+            return
+        }
+
+        Debounce.lastFireTime = now
+        PixelKit.fire(GeneralPixel.duckPlayerOverlayYoutubeImpressions)
+    }
 }
 
 extension DuckPlayerTabExtension: YoutubeOverlayUserScriptDelegate {
@@ -113,13 +159,18 @@ extension DuckPlayerTabExtension: YoutubeOverlayUserScriptDelegate {
     func youtubeOverlayUserScriptDidRequestDuckPlayer(with url: URL, in webView: WKWebView) {
         if duckPlayer.mode == .enabled {
             PixelKit.fire(GeneralPixel.duckPlayerViewFromYoutubeAutomatic)
-        } else {
-            PixelKit.fire(GeneralPixel.duckPlayerViewFromYoutubeViaHoverButton)
         }
-        // to be standardised across the app
-        let isRequestingNewTab = NSApp.isCommandPressed
+
+        var shouldRequestNewTab = shouldOpenInNewTab
+
+        // PopUpWindows don't support tabs
+        if let window = webView.window, window is PopUpWindow {
+            shouldRequestNewTab = false
+        }
+
+        let isRequestingNewTab = NSApp.isCommandPressed || shouldRequestNewTab
         if isRequestingNewTab {
-            shouldSelectNextNewTab = NSApp.isShiftPressed
+            shouldSelectNextNewTab = NSApp.isShiftPressed || shouldOpenInNewTab
             webView.loadInNewWindow(url)
         } else {
             shouldSelectNextNewTab = nil
@@ -155,12 +206,18 @@ extension DuckPlayerTabExtension: NewWindowPolicyDecisionMaker {
 }
 
 extension DuckPlayerTabExtension: NavigationResponder {
-
+    // swiftlint:disable cyclomatic_complexity
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         // only proceed when Private Player is enabled
+
         guard duckPlayer.isAvailable, duckPlayer.mode != .disabled else {
             return decidePolicyWithDisabledDuckPlayer(for: navigationAction)
+        }
+
+        // Fires the Overlay Shown Pixel if not coming from DuckPlayer's Watch in Youtube
+        if !navigationAction.sourceFrame.url.isDuckPlayer {
+            fireOverlayShownPixelIfNeeded(url: navigationAction.url)
         }
 
         // session restoration will try to load real www.youtube-nocookie.com url
@@ -179,6 +236,18 @@ extension DuckPlayerTabExtension: NavigationResponder {
                 navigator.goBack()?.overrideResponders { _, _ in .cancel }
                 navigator.load(URLRequest(url: .duckPlayer(videoID, timestamp: timestamp)))
             }
+        }
+
+        // Fire DuckPlayer Temporary Pixels on Reload
+        if case .reload = navigationAction.navigationType {
+            if let url = navigationAction.request.url {
+                duckPlayerOverlayUsagePixels.handleNavigationAndFirePixels(url: url, duckPlayerMode: duckPlayer.mode)
+            }
+        }
+
+        // Fire DuckPlayer temporary pixels on navigating outside Youtube
+        if let url = navigationAction.request.url, !url.isYoutube, navigationAction.isForMainFrame {
+            duckPlayerOverlayUsagePixels.handleNavigationAndFirePixels(url: url, duckPlayerMode: duckPlayer.mode)
         }
 
         // when in Private Player, don't directly reload current URL when it‘s a Private Player target URL
@@ -204,21 +273,41 @@ extension DuckPlayerTabExtension: NavigationResponder {
         if navigationAction.url.isDuckURLScheme || navigationAction.url.isDuckPlayer {
             if navigationAction.request.allHTTPHeaderFields?["Referer"] == URL.duckDuckGo.absoluteString {
                 PixelKit.fire(GeneralPixel.duckPlayerViewFromSERP)
+
+                if shouldOpenInNewTab,
+                   let url = webView?.url, !url.isEmpty, !url.isYoutubeVideo {
+                    shouldSelectNextNewTab = true
+                    webView?.loadInNewWindow(navigationAction.url)
+                    return .cancel
+                }
             }
             return .allow
         }
 
         // Navigating to a Youtube URL
-        if navigationAction.url.isYoutubeVideo,
-           let (videoID, timestamp) = navigationAction.url.youtubeVideoParams {
-            return decidePolicy(for: navigationAction, withYoutubeVideoID: videoID, timestamp: timestamp)
+        return handleYoutubeNavigation(for: navigationAction)
+    }
+    // swiftlint:enable cyclomatic_complexity
+
+    @MainActor
+    private func handleYoutubeNavigation(for navigationAction: NavigationAction) -> NavigationActionPolicy? {
+        guard navigationAction.url.isYoutubeVideo,
+              let (videoID, timestamp) = navigationAction.url.youtubeVideoParams else {
+            return .next
         }
-        return .next
+
+        if shouldOpenInNewTab, shouldOpenDuckPlayerDirectly,
+           let url = webView?.url, !url.isEmpty, !url.isYoutubeVideo {
+            webView?.loadInNewWindow(navigationAction.url)
+            return .cancel
+        }
+
+        return decidePolicy(for: navigationAction, withYoutubeVideoID: videoID, timestamp: timestamp)
     }
 
     func navigation(_ navigation: Navigation, didSameDocumentNavigationOf navigationType: WKSameDocumentNavigationType) {
         // Navigating to a Youtube URL without page reload
-        if duckPlayer.mode == .enabled,
+        if shouldOpenDuckPlayerDirectly,
            case .sessionStatePush = navigationType,
            let webView, let url = webView.url,
            url.isYoutubeVideo,
@@ -227,6 +316,14 @@ extension DuckPlayerTabExtension: NavigationResponder {
             webView.goBack()
             webView.load(URLRequest(url: .duckPlayer(videoID, timestamp: timestamp)))
         }
+
+        // Fire Overlay Shown Pixels
+        fireOverlayShownPixelIfNeeded(url: navigation.url)
+
+        // Fire DuckPlayer Overlay Temporary Pixels
+        if let url = navigation.request.url {
+            duckPlayerOverlayUsagePixels.handleNavigationAndFirePixels(url: url, duckPlayerMode: duckPlayer.mode)
+        }
     }
 
     @MainActor
@@ -234,13 +331,14 @@ extension DuckPlayerTabExtension: NavigationResponder {
         // When the feature is disabled but the webView still gets a Private Player URL,
         // convert it back to a regular YouTube video URL.
         if navigationAction.url.isDuckPlayer {
-            guard let (videoID, timestamp) = navigationAction.url.youtubeVideoParams,
-                  let mainFrame = navigationAction.mainFrameTarget else {
+            guard let (videoID, timestamp) = navigationAction.url.youtubeVideoParams else {
                 return .cancel
             }
 
-            return .redirect(mainFrame) { navigator in
-                navigator.load(URLRequest(url: .youtube(videoID, timestamp: timestamp)))
+            if let mainFrame = navigationAction.mainFrameTarget {
+                return .redirect(mainFrame) { navigator in
+                    navigator.load(URLRequest(url: .youtube(videoID, timestamp: timestamp)))
+                }
             }
         }
         return .next
@@ -259,7 +357,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
         // SERP+Video <<<< YT (redirected to DP) <- Duck Player
         //
         if case .backForward(distance: let distance) = navigationAction.navigationType, distance < 0,
-           duckPlayer.mode == .enabled,
+           shouldOpenDuckPlayerDirectly,
            navigationAction.sourceFrame.url.isDuckPlayer,
            navigationAction.url.youtubeVideoID == navigationAction.sourceFrame.url.youtubeVideoID,
            let mainFrame = navigationAction.mainFrameTarget {
@@ -271,8 +369,8 @@ extension DuckPlayerTabExtension: NavigationResponder {
 
         // “Watch in YouTube” selected
         // when currently displayed content is the Duck Player and loading a YouTube URL, don‘t override it
-        if navigationAction.targetFrame?.url.isDuckPlayer == true,
-           navigationAction.targetFrame?.url.youtubeVideoID == videoID {
+        if didUserSelectWatchInYoutubeFromDuckPlayer(navigationAction, preferences: preferences, videoID: videoID) {
+            duckPlayer.setNextVideoToOpenOnYoutube()
             PixelKit.fire(GeneralPixel.duckPlayerWatchOnYoutube)
             return .next
 
@@ -284,7 +382,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
         }
 
         // Redirect youtube urls to Duck Player when [Always enable] preference is set
-        if duckPlayer.mode == .enabled
+        if shouldOpenDuckPlayerDirectly
             // - or - recommendations must always be opened in the Duck Player
             || (navigationAction.sourceFrame.url.isDuckPlayer && navigationAction.url.isYoutubeVideoRecommendation),
            let mainFrame = navigationAction.mainFrameTarget {
@@ -308,13 +406,28 @@ extension DuckPlayerTabExtension: NavigationResponder {
         return .next
     }
 
+    private func didUserSelectWatchInYoutubeFromDuckPlayer(_ navigationAction: NavigationAction, preferences: DuckPlayerPreferences, videoID: String) -> Bool {
+        let url = preferences.duckPlayerOpenInNewTab ? navigationAction.sourceFrame.url : navigationAction.targetFrame?.url
+        return url?.isDuckPlayer == true && url?.youtubeVideoID == videoID
+    }
+
     func didCommit(_ navigation: Navigation) {
         guard duckPlayer.isAvailable, duckPlayer.mode != .disabled else {
             return
         }
         if navigation.url.isDuckPlayer {
-            let setting = duckPlayer.mode == .enabled ? "always" : "default"
-            PixelKit.fire(GeneralPixel.duckPlayerDailyUniqueView, frequency: .legacyDaily, withAdditionalParameters: ["setting": setting])
+            let setting = preferences.duckPlayerMode == .enabled ? "always" : "default"
+            let newTabSettings = preferences.duckPlayerOpenInNewTab ? "true" : "false"
+            let autoplay = preferences.duckPlayerAutoplay ? "true" : "false"
+
+            let params = ["setting": setting,
+                          "newtab": newTabSettings,
+                          "autoplay": autoplay]
+
+            PixelKit.fire(GeneralPixel.duckPlayerDailyUniqueView,
+                          frequency: .legacyDaily,
+                          withAdditionalParameters: params)
+
         }
     }
 
@@ -333,5 +446,7 @@ extension DuckPlayerTabExtension: DuckPlayerExtensionProtocol, TabExtension {
 }
 
 extension TabExtensions {
-    var duckPlayer: DuckPlayerExtensionProtocol? { resolve(DuckPlayerTabExtension.self) }
+    var duckPlayer: DuckPlayerExtensionProtocol? {
+        resolve(DuckPlayerTabExtension.self)
+    }
 }

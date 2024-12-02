@@ -27,9 +27,19 @@ extension NSPopover {
         Self.defaultMainWindowMargin
     }
 
+    private static let shouldHideAnchorKey = Data(base64Encoded: "c2hvdWxkSGlkZUFuY2hvcg==")!.utf8String()! // shouldHideAnchor
+    var shouldHideAnchor: Bool {
+        get {
+            value(forKey: Self.shouldHideAnchorKey) as? Bool ?? false
+        }
+        set {
+            setValue(newValue, forKey: Self.shouldHideAnchorKey)
+        }
+    }
+
     /// temporary value used to get popover‘s owner window while it‘s not yet set
     @TaskLocal
-    private static var mainWindow: NSWindow?
+    static var mainWindow: NSWindow?
 
     var mainWindow: NSWindow? {
         self.contentViewController?.view.window?.parent ?? Self.mainWindow
@@ -75,6 +85,16 @@ extension NSPopover {
         self.show(positionedBelow: view.bounds, in: view)
     }
 
+    func show(positionedAsSubmenuAgainst positioningView: NSView) {
+        assert(!positioningView.isHidden && positioningView.alphaValue > 0)
+        _=Self.swizzleCurrentFrameOnScreenOnce
+
+        let positioningRect = NSRect(x: 0, y: positioningView.bounds.midY - 1, width: positioningView.bounds.width, height: 2)
+        Self.$mainWindow.withValue(positioningView.window) {
+            self.show(relativeTo: positioningRect, of: positioningView, preferredEdge: .maxX)
+        }
+    }
+
     static let currentFrameOnScreenWithContentSizeSelector = NSSelectorFromString("_currentFrameOnScreenWithContentSize:outAnchorEdge:")
 
     private static let swizzleCurrentFrameOnScreenOnce: () = {
@@ -91,6 +111,15 @@ extension NSPopover {
     @objc(swizzled_currentFrameOnScreenWithContentSize:outAnchorEdge:)
     private dynamic func currentFrameOnScreenWithContentSize(size: NSSize, outAnchorEdge: UnsafeRawPointer?) -> NSRect {
         self.adjustFrame(currentFrameOnScreenWithContentSize(size: size, outAnchorEdge: outAnchorEdge))
+    }
+
+    // prevent exception if private API keys go missing
+    open override func setValue(_ value: Any?, forUndefinedKey key: String) {
+        assertionFailure("setValueForUndefinedKey: \(key)")
+    }
+    open override func value(forUndefinedKey key: String) -> Any? {
+        assertionFailure("valueForUndefinedKey: \(key)")
+        return nil
     }
 
 }

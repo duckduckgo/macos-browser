@@ -20,13 +20,13 @@ import XCTest
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
-@MainActor
 final class AddEditBookmarkDialogCoordinatorViewModelTests: XCTestCase {
     private var sut: AddEditBookmarkDialogCoordinatorViewModel<AddEditBookmarkDialogViewModelMock, AddEditBookmarkFolderDialogViewModelMock>!
     private var bookmarkViewModelMock: AddEditBookmarkDialogViewModelMock!
     private var bookmarkFolderViewModelMock: AddEditBookmarkFolderDialogViewModelMock!
     private var cancellables: Set<AnyCancellable>!
 
+    @MainActor
     override func setUpWithError() throws {
         try super.setUpWithError()
 
@@ -61,6 +61,7 @@ final class AddEditBookmarkDialogCoordinatorViewModelTests: XCTestCase {
 
     }
 
+    @MainActor
     func testShouldSetSelectedFolderOnFolderViewModelAndReturnFolderViewStateWhenAddFolderActionIsCalled() {
         // GIVEN
         let folder = BookmarkFolder(id: "1", title: "Folder")
@@ -110,6 +111,7 @@ final class AddEditBookmarkDialogCoordinatorViewModelTests: XCTestCase {
         XCTAssertTrue(didCallChangeValue)
     }
 
+    @MainActor
     func testShouldSetSelectedFolderOnBookmarkViewModelWhenAddFolderPublisherSendsEvent() {
         // GIVEN
         let expectation = self.expectation(description: #function)
@@ -127,13 +129,13 @@ final class AddEditBookmarkDialogCoordinatorViewModelTests: XCTestCase {
 
     // MARK: - Integration Test
 
+    @MainActor
     func testWhenAddFolderMultipleTimesThenFolderListIsUpdatedAndSelectedFolderIsNil() {
         // GIVEN
         let expectation = self.expectation(description: #function)
         let folder = BookmarkFolder(id: "1", title: "Folder")
         bookmarkViewModelMock.selectedFolder = folder
-        let bookmarkStoreMock = BookmarkStoreMock()
-        bookmarkStoreMock.bookmarks = [folder]
+        let bookmarkStoreMock = BookmarkStoreMock(bookmarks: [folder])
         let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
         bookmarkManager.loadBookmarks()
         let folderModel = AddEditBookmarkFolderDialogViewModel(mode: .add(parentFolder: nil), bookmarkManager: bookmarkManager)

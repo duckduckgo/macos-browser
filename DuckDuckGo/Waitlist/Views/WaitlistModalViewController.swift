@@ -95,13 +95,3 @@ extension WaitlistModalViewController: WaitlistViewModelDelegate {
     }
 
 }
-
-struct WaitlistModalDismisser {
-
-    // Small hack to force the waitlist modal view controller to dismiss all instances of itself whenever the user opens a link from the T&C view.
-    static func dismissWaitlistModalViewControllerIfNecessary(_ url: URL) {
-        if ["https://duckduckgo.com/privacy", "https://duckduckgo.com/terms"].contains(url.absoluteString) {
-            NotificationCenter.default.post(name: .waitlistModalViewControllerShouldDismiss, object: nil)
-        }
-    }
-}

@@ -17,59 +17,31 @@
 //
 
 import Foundation
+import os.log
 import Combine
 import BrowserServicesKit
+import Persistence
 import Configuration
 import Common
 import Networking
 import PixelKit
 
-final class ConfigurationManager {
+final class ConfigurationManager: DefaultConfigurationManager {
 
-    enum Error: Swift.Error {
+    private enum Constants {
+        static let lastConfigurationInstallDateKey = "config.last.installed"
+    }
 
-        case timeout
-        case bloomFilterSpecNotFound
-        case bloomFilterBinaryNotFound
-        case bloomFilterPersistenceFailed
-        case bloomFilterExclusionsNotFound
-        case bloomFilterExclusionsPersistenceFailed
+    private var defaults: KeyValueStoring
 
-        func withUnderlyingError(_ underlyingError: Swift.Error) -> Swift.Error {
-            let nsError = self as NSError
-            return NSError(domain: nsError.domain, code: nsError.code, userInfo: [NSUnderlyingErrorKey: underlyingError])
+    private(set) var lastConfigurationInstallDate: Date? {
+        get {
+            defaults.object(forKey: Constants.lastConfigurationInstallDateKey) as? Date
         }
-
+        set {
+            defaults.set(newValue, forKey: Constants.lastConfigurationInstallDateKey)
+        }
     }
-
-    enum Constants {
-
-        static let downloadTimeoutSeconds = 60.0 * 5
-#if DEBUG
-        static let refreshPeriodSeconds = 60.0 * 2 // 2 minutes
-#else
-        static let refreshPeriodSeconds = 60.0 * 30 // 30 minutes
-#endif
-        static let retryDelaySeconds = 60.0 * 60 * 1 // 1 hour delay before checking again if something went wrong last time
-        static let refreshCheckIntervalSeconds = 60.0 // check if we need a refresh every minute
-
-    }
-
-    static let shared = ConfigurationManager()
-    static let queue: DispatchQueue = DispatchQueue(label: "Configuration Manager")
-
-    @UserDefaultsWrapper(key: .configLastUpdated, defaultValue: .distantPast)
-    private(set) var lastUpdateTime: Date
-
-    @UserDefaultsWrapper(key: .configLastInstalled, defaultValue: nil)
-    private(set) var lastConfigurationInstallDate: Date?
-
-    private var timerCancellable: AnyCancellable?
-    private var lastRefreshCheckTime: Date = Date()
-
-    private lazy var fetcher = ConfigurationFetcher(store: ConfigurationStore.shared,
-                                                    log: .config,
-                                                    eventMapping: Self.configurationDebugEvents)
 
     static let configurationDebugEvents = EventMapping<ConfigurationDebugEvents> { event, error, _, _ in
         let domainEvent: GeneralPixel
@@ -81,26 +53,19 @@ final class ConfigurationManager {
         PixelKit.fire(DebugEvent(domainEvent, error: error))
     }
 
-    func start() {
-        os_log("Starting configuration refresh timer", log: .config, type: .debug)
-        timerCancellable = Timer.publish(every: Constants.refreshCheckIntervalSeconds, on: .main, in: .default)
-            .autoconnect()
-            .receive(on: Self.queue)
-            .sink(receiveValue: { _ in
-                self.lastRefreshCheckTime = Date()
-                self.refreshIfNeeded()
-            })
-        Task {
-            await refreshNow()
-        }
+    override init(fetcher: ConfigurationFetching = ConfigurationFetcher(store: ConfigurationStore(), eventMapping: configurationDebugEvents),
+                  store: ConfigurationStoring = ConfigurationStore(),
+                  defaults: KeyValueStoring = UserDefaults.appConfiguration) {
+        self.defaults = defaults
+        super.init(fetcher: fetcher, store: store, defaults: defaults)
     }
 
     func log() {
-        os_log("last update %{public}s", log: .config, type: .default, String(describing: lastUpdateTime))
-        os_log("last refresh check %{public}s", log: .config, type: .default, String(describing: lastRefreshCheckTime))
+        Logger.config.log("last update \(String(describing: self.lastUpdateTime), privacy: .public)")
+        Logger.config.log("last refresh check \(String(describing: self.lastRefreshCheckTime), privacy: .public)")
     }
 
-    private func refreshNow(isDebug: Bool = false) async {
+    override public func refreshNow(isDebug: Bool = false) async {
         let updateTrackerBlockingDependenciesTask = Task {
             let didFetchAnyTrackerBlockingDependencies = await fetchTrackerBlockingDependencies(isDebug: isDebug)
             if didFetchAnyTrackerBlockingDependencies {
@@ -121,7 +86,7 @@ final class ConfigurationManager {
 
         let updateBloomFilterExclusionsTask = Task {
             do {
-                try await fetcher.fetch(.bloomFilterExcludedDomains)
+                try await fetcher.fetch(.bloomFilterExcludedDomains, isDebug: isDebug)
                 try await updateBloomFilterExclusions()
                 tryAgainLater()
             } catch {
@@ -133,16 +98,18 @@ final class ConfigurationManager {
         await updateBloomFilterTask.value
         await updateBloomFilterExclusionsTask.value
 
-        ConfigurationStore.shared.log()
-        log()
+        (store as? ConfigurationStore)?.log()
+
+        Logger.config.info("last update \(String(describing: self.lastUpdateTime), privacy: .public)")
+        Logger.config.info("last refresh check \(String(describing: self.lastRefreshCheckTime), privacy: .public)")
     }
 
     private func fetchTrackerBlockingDependencies(isDebug: Bool) async -> Bool {
         var didFetchAnyTrackerBlockingDependencies = false
 
         var tasks = [Configuration: Task<(), Swift.Error>]()
-        tasks[.trackerDataSet] = Task { try await fetcher.fetch(.trackerDataSet) }
-        tasks[.surrogates] = Task { try await fetcher.fetch(.surrogates) }
+        tasks[.trackerDataSet] = Task { try await fetcher.fetch(.trackerDataSet, isDebug: isDebug) }
+        tasks[.surrogates] = Task { try await fetcher.fetch(.surrogates, isDebug: isDebug) }
         tasks[.privacyConfiguration] = Task { try await fetcher.fetch(.privacyConfiguration, isDebug: isDebug) }
 
         for (configuration, task) in tasks {
@@ -150,11 +117,9 @@ final class ConfigurationManager {
                 try await task.value
                 didFetchAnyTrackerBlockingDependencies = true
             } catch {
-                os_log("Failed to complete configuration update to %@: %@",
-                       log: .config,
-                       type: .error,
-                       configuration.rawValue,
-                       error.localizedDescription)
+                Logger.config.error(
+                    "Failed to complete configuration update to \(configuration.rawValue, privacy: .public): \(error.localizedDescription, privacy: .public)"
+                )
                 tryAgainSoon()
             }
         }
@@ -169,53 +134,25 @@ final class ConfigurationManager {
             return
         }
 
-        os_log("Failed to complete configuration update %@", log: .config, type: .error, error.localizedDescription)
+        Logger.config.error("Failed to complete configuration update \(error.localizedDescription, privacy: .public)")
         PixelKit.fire(DebugEvent(GeneralPixel.configurationFetchError(error: error)))
         tryAgainSoon()
     }
 
-    @discardableResult
-    public func refreshIfNeeded() -> Task<Void, Never>? {
-        guard isReadyToRefresh else {
-            os_log("Configuration refresh is not needed at this time", log: .config, type: .debug)
-            return nil
-        }
-        return Task {
-            await refreshNow()
-        }
-    }
-
-    private var isReadyToRefresh: Bool { Date().timeIntervalSince(lastUpdateTime) > Constants.refreshPeriodSeconds }
-
-    public func forceRefresh(isDebug: Bool = false) {
-        Task {
-            await refreshNow(isDebug: isDebug)
-        }
-    }
-
-    private func tryAgainLater() {
-        lastUpdateTime = Date()
-    }
-
-    private func tryAgainSoon() {
-        // Set the last update time to in the past so it triggers again sooner
-        lastUpdateTime = Date(timeIntervalSinceNow: Constants.refreshPeriodSeconds - Constants.retryDelaySeconds)
-    }
-
     private func updateTrackerBlockingDependencies() {
         lastConfigurationInstallDate = Date()
-        ContentBlocking.shared.trackerDataManager.reload(etag: ConfigurationStore.shared.loadEtag(for: .trackerDataSet),
-                                                         data: ConfigurationStore.shared.loadData(for: .trackerDataSet))
-        ContentBlocking.shared.privacyConfigurationManager.reload(etag: ConfigurationStore.shared.loadEtag(for: .privacyConfiguration),
-                                                                  data: ConfigurationStore.shared.loadData(for: .privacyConfiguration))
+        ContentBlocking.shared.trackerDataManager.reload(etag: store.loadEtag(for: .trackerDataSet),
+                                                         data: store.loadData(for: .trackerDataSet))
+        ContentBlocking.shared.privacyConfigurationManager.reload(etag: store.loadEtag(for: .privacyConfiguration),
+                                                                  data: store.loadData(for: .privacyConfiguration))
         ContentBlocking.shared.contentBlockingManager.scheduleCompilation()
     }
 
     private func updateBloomFilter() async throws {
-        guard let specData = ConfigurationStore.shared.loadData(for: .bloomFilterSpec) else {
+        guard let specData = store.loadData(for: .bloomFilterSpec) else {
             throw Error.bloomFilterSpecNotFound
         }
-        guard let bloomFilterData = ConfigurationStore.shared.loadData(for: .bloomFilterBinary) else {
+        guard let bloomFilterData = store.loadData(for: .bloomFilterBinary) else {
             throw Error.bloomFilterBinaryNotFound
         }
         try await Task.detached {
@@ -231,7 +168,7 @@ final class ConfigurationManager {
     }
 
     private func updateBloomFilterExclusions() async throws {
-        guard let bloomFilterExclusions = ConfigurationStore.shared.loadData(for: .bloomFilterExcludedDomains) else {
+        guard let bloomFilterExclusions = store.loadData(for: .bloomFilterExcludedDomains) else {
             throw Error.bloomFilterExclusionsNotFound
         }
         try await Task.detached {
@@ -245,4 +182,20 @@ final class ConfigurationManager {
         }.value
     }
 
+}
+
+extension ConfigurationManager {
+    override var presentedItemURL: URL? {
+        store.fileUrl(for: .privacyConfiguration).deletingLastPathComponent()
+    }
+
+    override func presentedSubitemDidAppear(at url: URL) {
+        guard url == store.fileUrl(for: .privacyConfiguration) else { return }
+        updateTrackerBlockingDependencies()
+    }
+
+    override func presentedSubitemDidChange(at url: URL) {
+        guard url == store.fileUrl(for: .privacyConfiguration) else { return }
+        updateTrackerBlockingDependencies()
+    }
 }

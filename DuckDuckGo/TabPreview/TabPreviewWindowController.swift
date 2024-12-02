@@ -18,6 +18,7 @@
 
 import Cocoa
 import Common
+import os.log
 
 final class TabPreviewWindowController: NSWindowController {
 
@@ -72,7 +73,11 @@ final class TabPreviewWindowController: NSWindowController {
     }
 
     func show(parentWindow: NSWindow, topLeftPointInWindow: CGPoint) {
+        Logger.tabPreview.log("Showing tab preview")
+
         func presentPreview(tabPreviewWindow: NSWindow) {
+            Logger.tabPreview.log("Presenting tab preview")
+
             parentWindow.addChildWindow(tabPreviewWindow, ordered: .above)
             self.layout(topLeftPoint: parentWindow.convertPoint(toScreen: topLeftPointInWindow))
         }
@@ -82,7 +87,7 @@ final class TabPreviewWindowController: NSWindowController {
 
         guard let childWindows = parentWindow.childWindows,
               let tabPreviewWindow = self.window else {
-            os_log("TabPreviewWindowController: Showing tab preview window failed", type: .error)
+            Logger.general.error("Showing tab preview window failed")
             return
         }
 
@@ -106,7 +111,11 @@ final class TabPreviewWindowController: NSWindowController {
     }
 
     func hide(allowQuickRedisplay: Bool = false, withDelay delay: Bool = false) {
+        Logger.tabPreview.log("Hiding tab preview allowQuickRedisplay:\(allowQuickRedisplay) delay:\(delay)")
+
         func removePreview(allowQuickRedisplay: Bool) {
+            Logger.tabPreview.log("Removing tab preview allowQuickRedisplay:\(allowQuickRedisplay)")
+
             guard let window = window else {
                 lastHideTime = nil
                 return
@@ -116,11 +125,12 @@ final class TabPreviewWindowController: NSWindowController {
                 if !allowQuickRedisplay {
                     lastHideTime = nil
                 }
+                window.orderOut(nil)
                 return
             }
 
             parentWindow.removeChildWindow(window)
-            (window).orderOut(nil)
+            window.orderOut(nil)
 
             // Record the hide time
             lastHideTime = allowQuickRedisplay ? Date() : nil
@@ -131,6 +141,7 @@ final class TabPreviewWindowController: NSWindowController {
         if delay {
             // Set up a new timer to hide the preview after 0.05 seconds
             // It makes the transition from one preview to another more fluent
+            hideTimer?.invalidate()
             hideTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: false) { _ in
                 removePreview(allowQuickRedisplay: allowQuickRedisplay)
             }

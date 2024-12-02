@@ -1,0 +1,97 @@
+{
+  "name": "DDG Fake Broker",
+  "url": "fakebroker.com",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "http://localhost:3000/profiles/search?fname=${firstName}&mname=${middleName}&lname=${lastName}&state=${state|upcase}&city=${city}&age=${age}",
+          "id": "268c96ef-7d5e-44bf-b5e6-ba606240b802"
+        },
+        {
+          "actionType": "extract",
+          "selector": ".profile-card",
+          "noResultsSelector": "//div[contains(@class, 'results')]//p[contains(text(), 'No Results Found')]",
+          "profile": {
+            "name": {
+              "selector": ".profile-card__name",
+              "beforeText": ", "
+            },
+            "age": {
+              "selector": ".profile-card__name",
+              "afterText": ", "
+            },
+            "addressCityStateList": {
+              "selector": ".profile-card__address",
+              "findElements": true
+            },
+            "profileUrl": {
+              "selector": "a",
+              "identifierType": "path",
+              "identifier": "http://localhost:3000/profiles/search/${id}"
+            }
+          },
+          "id": "43118aca-c38c-4145-b75a-2fad858005b7"
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "http://localhost:3000/opt-out",
+          "id": "649d3c0c-8efd-4365-bba4-e88fdbfd489b"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".opt-out-form",
+          "elements": [
+            {
+              "type": "email",
+              "selector": "#email"
+            },
+            {
+              "type": "profileUrl",
+              "selector": "#profile-url"
+            }
+          ],
+          "id": "71ed7587-4617-4bc5-b2f4-48a02fae7235"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".opt-out-form__submit"
+            }
+          ],
+          "id": "6348c8af-e5ce-4451-a002-da92ec12faf0"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your opt-out request has been successfully processed."
+            }
+          ],
+          "id": "87d899df-01fe-4f7d-9183-16c7c868278f"
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 0,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "addedDatetime": 1725632531153,
+  "version": "0.0.1"
+}

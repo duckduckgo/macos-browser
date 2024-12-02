@@ -18,32 +18,23 @@
 
 import AppKit
 import Subscription
+import StoreKit
 
 public final class SubscriptionDebugMenu: NSMenuItem {
 
     var currentEnvironment: SubscriptionEnvironment
     var updateServiceEnvironment: (SubscriptionEnvironment.ServiceEnvironment) -> Void
     var updatePurchasingPlatform: (SubscriptionEnvironment.PurchasePlatform) -> Void
-
-    var isInternalTestingEnabled: () -> Bool
-    var updateInternalTestingFlag: (Bool) -> Void
+    var openSubscriptionTab: (URL) -> Void
 
     private var purchasePlatformItem: NSMenuItem?
+    private var regionOverrideItem: NSMenuItem?
 
     var currentViewController: () -> NSViewController?
     let subscriptionManager: SubscriptionManager
+    let subscriptionUserDefaults: UserDefaults
     var accountManager: AccountManager {
         subscriptionManager.accountManager
-    }
-
-    private var _purchaseManager: Any?
-    @available(macOS 12.0, *)
-    fileprivate var purchaseManager: DefaultStorePurchaseManager {
-        if _purchaseManager == nil {
-            _purchaseManager = DefaultStorePurchaseManager()
-        }
-        // swiftlint:disable:next force_cast
-        return _purchaseManager as! DefaultStorePurchaseManager
     }
 
     required init(coder: NSCoder) {
@@ -53,17 +44,17 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     public init(currentEnvironment: SubscriptionEnvironment,
                 updateServiceEnvironment: @escaping (SubscriptionEnvironment.ServiceEnvironment) -> Void,
                 updatePurchasingPlatform: @escaping (SubscriptionEnvironment.PurchasePlatform) -> Void,
-                isInternalTestingEnabled: @escaping () -> Bool,
-                updateInternalTestingFlag: @escaping (Bool) -> Void,
                 currentViewController: @escaping () -> NSViewController?,
-                subscriptionManager: SubscriptionManager) {
+                openSubscriptionTab: @escaping (URL) -> Void,
+                subscriptionManager: SubscriptionManager,
+                subscriptionUserDefaults: UserDefaults) {
         self.currentEnvironment = currentEnvironment
         self.updateServiceEnvironment = updateServiceEnvironment
         self.updatePurchasingPlatform = updatePurchasingPlatform
-        self.isInternalTestingEnabled = isInternalTestingEnabled
-        self.updateInternalTestingFlag = updateInternalTestingFlag
         self.currentViewController = currentViewController
+        self.openSubscriptionTab = openSubscriptionTab
         self.subscriptionManager = subscriptionManager
+        self.subscriptionUserDefaults = subscriptionUserDefaults
         super.init(title: "Subscription", action: nil, keyEquivalent: "")
         self.submenu = makeSubmenu()
     }
@@ -71,20 +62,19 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     private func makeSubmenu() -> NSMenu {
         let menu = NSMenu(title: "")
 
-        menu.addItem(NSMenuItem(title: "Simulate Subscription Active State (fake token)", action: #selector(simulateSubscriptionActiveState), target: self))
-        menu.addItem(NSMenuItem(title: "Clear Subscription Authorization Data", action: #selector(signOut), target: self))
-        menu.addItem(NSMenuItem(title: "Show account details", action: #selector(showAccountDetails), target: self))
+        menu.addItem(NSMenuItem(title: "I Have a Subscription", action: #selector(activateSubscription), target: self))
+        menu.addItem(NSMenuItem(title: "Remove Subscription From This Device", action: #selector(signOut), target: self))
+        menu.addItem(NSMenuItem(title: "Show Account Details", action: #selector(showAccountDetails), target: self))
         menu.addItem(.separator())
         menu.addItem(NSMenuItem(title: "Validate Token", action: #selector(validateToken), target: self))
         menu.addItem(NSMenuItem(title: "Check Entitlements", action: #selector(checkEntitlements), target: self))
-        menu.addItem(NSMenuItem(title: "Get Subscription Info", action: #selector(getSubscriptionDetails), target: self))
-        menu.addItem(NSMenuItem(title: "Restore Subscription from App Store transaction", action: #selector(restorePurchases), target: self))
-        menu.addItem(NSMenuItem(title: "Post didSignIn notification", action: #selector(postDidSignInNotification), target: self))
-        menu.addItem(NSMenuItem(title: "Post subscriptionDidChange notification", action: #selector(postSubscriptionDidChangeNotification), target: self))
-        menu.addItem(.separator())
+        menu.addItem(NSMenuItem(title: "Get Subscription Details", action: #selector(getSubscriptionDetails), target: self))
+
         if #available(macOS 12.0, *) {
+            menu.addItem(.separator())
             menu.addItem(NSMenuItem(title: "Sync App Store AppleID Account (re- sign-in)", action: #selector(syncAppleIDAccount), target: self))
             menu.addItem(NSMenuItem(title: "Purchase Subscription from App Store", action: #selector(showPurchaseView), target: self))
+            menu.addItem(NSMenuItem(title: "Restore Subscription from App Store transaction", action: #selector(restorePurchases), target: self))
         }
 
         menu.addItem(.separator())
@@ -98,10 +88,14 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         menu.addItem(environmentItem)
 
         menu.addItem(.separator())
+        let storefrontID = SKPaymentQueue.default().storefront?.identifier ?? "nil"
+        menu.addItem(NSMenuItem(title: "Storefront ID: \(storefrontID)", action: nil, target: nil))
+        let storefrontCountryCode = SKPaymentQueue.default().storefront?.countryCode ?? "nil"
+        menu.addItem(NSMenuItem(title: "Storefront Country Code: \(storefrontCountryCode)", action: nil, target: nil))
 
-        let internalTestingItem = NSMenuItem(title: "Internal testing", action: #selector(toggleInternalTesting), target: self)
-        internalTestingItem.state = isInternalTestingEnabled() ? .on : .off
-        menu.addItem(internalTestingItem)
+        let regionOverrideItem = NSMenuItem(title: "Region override for App Store Sandbox", action: nil, target: nil)
+        menu.addItem(regionOverrideItem)
+        self.regionOverrideItem = regionOverrideItem
 
         menu.delegate = self
 
@@ -165,13 +159,45 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         return menu
     }
 
+    private func makeRegionOverrideItemSubmenu() -> NSMenu {
+        let menu = NSMenu(title: "")
+
+        let currentRegionOverride = subscriptionUserDefaults.storefrontRegionOverride
+
+        let usaItem = NSMenuItem(title: "USA", action: #selector(setRegionOverrideToUSA), target: self)
+        if currentRegionOverride == .usa {
+            usaItem.state = .on
+            usaItem.isEnabled = false
+            usaItem.action = nil
+            usaItem.target = nil
+        }
+        menu.addItem(usaItem)
+
+        let rowItem = NSMenuItem(title: "Rest of World", action: #selector(setRegionOverrideToROW), target: self)
+        if currentRegionOverride == .restOfWorld {
+            rowItem.state = .on
+            rowItem.isEnabled = false
+            rowItem.action = nil
+            rowItem.target = nil
+        }
+        menu.addItem(rowItem)
+
+        menu.addItem(.separator())
+
+        let clearItem = NSMenuItem(title: "Clear storefront region override", action: #selector(clearRegionOverride), target: self)
+        menu.addItem(clearItem)
+
+        return menu
+    }
+
     private func refreshSubmenu() {
         self.submenu = makeSubmenu()
     }
 
     @objc
-    func simulateSubscriptionActiveState() {
-        accountManager.storeAccount(token: "fake-token", email: "fake@email.com", externalID: "123")
+    func activateSubscription() {
+        let url = subscriptionManager.url(for: .activateViaEmail)
+        openSubscriptionTab(url)
     }
 
     @objc
@@ -236,13 +262,12 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     @objc
     func syncAppleIDAccount() {
         Task { @MainActor in
-            try? await purchaseManager.syncAppleIDAccount()
+            try? await subscriptionManager.storePurchaseManager().syncAppleIDAccount()
         }
     }
 
     @IBAction func showPurchaseView(_ sender: Any?) {
         if #available(macOS 12.0, *) {
-            let storePurchaseManager = DefaultStorePurchaseManager()
             let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(accountManager: subscriptionManager.accountManager,
                                                                  storePurchaseManager: subscriptionManager.storePurchaseManager(),
                                                                  subscriptionEndpointService: subscriptionManager.subscriptionEndpointService,
@@ -252,7 +277,8 @@ public final class SubscriptionDebugMenu: NSMenuItem {
                                                                    accountManager: subscriptionManager.accountManager,
                                                                    appStoreRestoreFlow: appStoreRestoreFlow,
                                                                    authEndpointService: subscriptionManager.authEndpointService)
-            let vc = DebugPurchaseViewController(storePurchaseManager: storePurchaseManager, appStorePurchaseFlow: appStorePurchaseFlow)
+            // swiftlint:disable:next force_cast
+            let vc = DebugPurchaseViewController(storePurchaseManager: subscriptionManager.storePurchaseManager() as! DefaultStorePurchaseManager, appStorePurchaseFlow: appStorePurchaseFlow)
             currentViewController()?.presentAsSheet(vc)
         }
     }
@@ -305,17 +331,31 @@ public final class SubscriptionDebugMenu: NSMenuItem {
       NSApp.terminate(self)
     }
 
+    // MARK: - Region override
+
+    @IBAction func clearRegionOverride(_ sender: Any?) {
+        updateRegionOverride(to: nil)
+    }
+
+    @IBAction func setRegionOverrideToUSA(_ sender: Any?) {
+        updateRegionOverride(to: .usa)
+    }
+
+    @IBAction func setRegionOverrideToROW(_ sender: Any?) {
+        updateRegionOverride(to: .restOfWorld)
+    }
+
+    private func updateRegionOverride(to region: SubscriptionRegion?) {
+        self.subscriptionUserDefaults.storefrontRegionOverride = region
+
+        if #available(macOS 12.0, *) {
+            Task {
+                await subscriptionManager.storePurchaseManager().updateAvailableProducts()
+            }
+        }
+    }
+
     // MARK: -
-
-    @objc
-    func postDidSignInNotification(_ sender: Any?) {
-        NotificationCenter.default.post(name: .accountDidSignIn, object: self, userInfo: nil)
-    }
-
-    @objc
-    func postSubscriptionDidChangeNotification(_ sender: Any?) {
-        NotificationCenter.default.post(name: .subscriptionDidChange, object: self, userInfo: nil)
-    }
 
     @objc
     func restorePurchases(_ sender: Any?) {
@@ -327,26 +367,6 @@ public final class SubscriptionDebugMenu: NSMenuItem {
                                                                      authEndpointService: subscriptionManager.authEndpointService)
                 await appStoreRestoreFlow.restoreAccountFromPastPurchase()
             }
-        }
-    }
-
-    @objc
-    func toggleInternalTesting(_ sender: Any?) {
-        Task { @MainActor in
-            let currentValue = isInternalTestingEnabled()
-            let shouldShowAlert = currentValue == false
-
-            if shouldShowAlert {
-                let alert = makeAlert(title: "Are you sure you want to enable internal testing",
-                                      message: "Only enable this option if you are participating in internal testing and have been requested to do so.",
-                                      buttonNames: ["Yes", "No"])
-                let response = alert.runModal()
-
-                guard case .alertFirstButtonReturn = response else { return }
-            }
-
-            updateInternalTestingFlag(!currentValue)
-            self.refreshSubmenu()
         }
     }
 
@@ -367,6 +387,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         for buttonName in buttonNames {
             alert.addButton(withTitle: buttonName)
         }
+        alert.accessoryView = NSView(frame: NSRect(x: 0, y: 0, width: 300, height: 0))
         return alert
     }
 }
@@ -384,5 +405,6 @@ extension SubscriptionDebugMenu: NSMenuDelegate {
 
     public func menuWillOpen(_ menu: NSMenu) {
         purchasePlatformItem?.submenu = makePurchasePlatformSubmenu()
+        regionOverrideItem?.submenu = makeRegionOverrideItemSubmenu()
     }
 }

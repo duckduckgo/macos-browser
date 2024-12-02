@@ -21,13 +21,14 @@ import Combine
 import WebKit
 import BrowserServicesKit
 import Common
+import os.log
 
 protocol DBPUIScanOps: AnyObject {
     func updateCacheWithCurrentScans() async
     func getBackgroundAgentMetadata() async -> DBPBackgroundAgentMetadata?
 }
 
-final class DBPUIViewModel {
+public final class DBPUIViewModel {
     private let dataManager: DataBrokerProtectionDataManaging
     private let agentInterface: DataBrokerProtectionAppToAgentInterface
 
@@ -38,12 +39,12 @@ final class DBPUIViewModel {
     private let webUISettings: DataBrokerProtectionWebUIURLSettingsRepresentable
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()
 
-    init(dataManager: DataBrokerProtectionDataManaging,
-         agentInterface: DataBrokerProtectionAppToAgentInterface,
-         webUISettings: DataBrokerProtectionWebUIURLSettingsRepresentable,
-         privacyConfig: PrivacyConfigurationManaging? = nil,
-         prefs: ContentScopeProperties? = nil,
-         webView: WKWebView? = nil) {
+    public init(dataManager: DataBrokerProtectionDataManaging,
+                agentInterface: DataBrokerProtectionAppToAgentInterface,
+                webUISettings: DataBrokerProtectionWebUIURLSettingsRepresentable,
+                privacyConfig: PrivacyConfigurationManaging? = nil,
+                prefs: ContentScopeProperties? = nil,
+                webView: WKWebView? = nil) {
         self.dataManager = dataManager
         self.agentInterface = agentInterface
         self.webUISettings = webUISettings
@@ -81,7 +82,7 @@ extension DBPUIViewModel: DBPUIScanOps {
         do {
             try dataManager.prepareBrokerProfileQueryDataCache()
         } catch {
-            os_log("DBPUIViewModel error: updateCacheWithCurrentScans, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("DBPUIViewModel error: updateCacheWithCurrentScans, error: \(error.localizedDescription, privacy: .public)")
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DBPUIViewModel.updateCacheWithCurrentScans"))
         }
     }

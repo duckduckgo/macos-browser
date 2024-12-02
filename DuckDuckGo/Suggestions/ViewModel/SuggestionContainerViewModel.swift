@@ -16,10 +16,12 @@
 //  limitations under the License.
 //
 
-import Foundation
+import BrowserServicesKit
 import Combine
 import Common
-import BrowserServicesKit
+import Foundation
+import os.log
+import Suggestions
 
 final class SuggestionContainerViewModel {
 
@@ -47,37 +49,47 @@ final class SuggestionContainerViewModel {
 
     private(set) var userStringValue: String?
 
-    private var isTopSuggestionSelectionExpected = false
+    var isTopSuggestionSelectionExpected = false
 
-    private var shouldSelectTopSuggestion: Bool {
-        guard let result = suggestionContainer.result, !result.isEmpty else { return false }
-
-        if self.isTopSuggestionSelectionExpected,
-           result.canBeAutocompleted,
-           let userStringValue = self.userStringValue,
-           let firstSuggestion = self.suggestionViewModel(at: 0),
-           firstSuggestion.autocompletionString.lowercased().hasPrefix(userStringValue.lowercased()) {
-            return true
-        } else {
-            return false
+    private enum IgnoreTopSuggestionError: Error {
+        case emptyResult
+        case topSuggestionSelectionNotExpected
+        case cantBeAutocompleted
+        case noUserStringValue
+        case noSuggestionViewModel
+        case notEqual(lhs: String, rhs: String)
+    }
+    private func validateShouldSelectTopSuggestion(from result: SuggestionResult?) throws {
+        assert(suggestionContainer.result == result)
+        guard let result, !result.isEmpty else { throw IgnoreTopSuggestionError.emptyResult }
+        guard self.isTopSuggestionSelectionExpected else { throw IgnoreTopSuggestionError.topSuggestionSelectionNotExpected }
+        guard result.canBeAutocompleted else {
+            throw IgnoreTopSuggestionError.cantBeAutocompleted
+        }
+        guard let userStringValue else { throw IgnoreTopSuggestionError.noUserStringValue }
+        guard let firstSuggestion = self.suggestionViewModel(at: 0) else { throw IgnoreTopSuggestionError.noSuggestionViewModel }
+        guard firstSuggestion.autocompletionString.lowercased().hasPrefix(userStringValue.lowercased()) else {
+            throw IgnoreTopSuggestionError.notEqual(lhs: firstSuggestion.autocompletionString, rhs: userStringValue)
         }
     }
 
     private func subscribeToSuggestionResult() {
-        suggestionResultCancellable = suggestionContainer.$result.receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-            guard let self = self,
-                  self.shouldSelectTopSuggestion
-            else { return }
+        suggestionResultCancellable = suggestionContainer.$result
+            .sink { [weak self] result in
+                guard let self else { return }
+                do {
+                    try validateShouldSelectTopSuggestion(from: result)
+                } catch {
+                    Logger.general.debug("SuggestionContainerViewModel: ignoring top suggestion from \( result.map(String.init(describing:)) ?? "<nil>"): \(error)")
+                    return
+                }
 
-            self.select(at: 0)
-        }
+                self.select(at: 0)
+            }
     }
 
     func setUserStringValue(_ userStringValue: String, userAppendedStringToTheEnd: Bool) {
-        guard SearchPreferences.shared.showAutocompleteSuggestions else {
-            return
-        }
+        guard SearchPreferences.shared.showAutocompleteSuggestions else { return }
 
         let oldValue = self.userStringValue
         self.userStringValue = userStringValue
@@ -99,7 +111,7 @@ final class SuggestionContainerViewModel {
     }
 
     private func updateSelectedSuggestionViewModel() {
-        if let selectionIndex = selectionIndex {
+        if let selectionIndex {
             selectedSuggestionViewModel = suggestionViewModel(at: selectionIndex)
         } else {
             selectedSuggestionViewModel = nil
@@ -110,7 +122,7 @@ final class SuggestionContainerViewModel {
         let items = suggestionContainer.result?.all ?? []
 
         guard index < items.count else {
-            os_log("SuggestionContainerViewModel: Absolute index is out of bounds", type: .error)
+            Logger.general.error("SuggestionContainerViewModel: Absolute index is out of bounds")
             return nil
         }
 
@@ -119,7 +131,7 @@ final class SuggestionContainerViewModel {
 
     func select(at index: Int) {
         guard index >= 0, index < numberOfSuggestions else {
-            os_log("SuggestionContainerViewModel: Index out of bounds", type: .error)
+            Logger.general.error("SuggestionContainerViewModel: Index out of bounds")
             selectionIndex = nil
             return
         }
@@ -167,6 +179,21 @@ final class SuggestionContainerViewModel {
 
         let newIndex = max(0, selectionIndex - 1)
         select(at: newIndex)
+    }
+
+    func removeSuggestionFromResult(suggestion: Suggestion) {
+        let topHits = suggestionContainer.result?.topHits.filter({
+            !($0 == suggestion && $0.isHistoryEntry)
+        }) ?? []
+        let duckduckgoSuggestions = suggestionContainer.result?.duckduckgoSuggestions ?? []
+        let localSuggestions = suggestionContainer.result?.localSuggestions.filter({
+            !($0 == suggestion && $0.isHistoryEntry)
+        }) ?? []
+        let result = SuggestionResult(topHits: topHits,
+                                      duckduckgoSuggestions: duckduckgoSuggestions,
+                                      localSuggestions: localSuggestions)
+
+        suggestionContainer.result = result
     }
 
 }

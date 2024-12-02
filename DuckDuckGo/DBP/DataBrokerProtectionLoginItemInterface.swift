@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if DBP
-
 import Foundation
 import DataBrokerProtection
 import Common
@@ -53,7 +51,7 @@ extension DefaultDataBrokerProtectionLoginItemInterface: DataBrokerProtectionLog
 
     private func enableLoginItem() {
         DataBrokerProtectionLoginItemPixels.fire(pixel: GeneralPixel.dataBrokerEnableLoginItemDaily, frequency: .daily)
-        loginItemsManager.enableLoginItems([.dbpBackgroundAgent], log: .dbp)
+        loginItemsManager.enableLoginItems([.dbpBackgroundAgent])
     }
 
     // MARK: - DataBrokerProtectionLoginItemInterface
@@ -115,5 +113,3 @@ extension DefaultDataBrokerProtectionLoginItemInterface: DataBrokerProtectionLog
         return await ipcClient.getDebugMetadata()
     }
 }
-
-#endif

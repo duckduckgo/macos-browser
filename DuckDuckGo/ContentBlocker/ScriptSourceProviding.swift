@@ -30,6 +30,7 @@ protocol ScriptSourceProviding {
     var privacyConfigurationManager: PrivacyConfigurationManaging { get }
     var autofillSourceProvider: AutofillUserScriptSourceProvider? { get }
     var sessionKey: String? { get }
+    var messageSecret: String? { get }
     var onboardingActionsManager: OnboardingActionsManaging? { get }
     func buildAutofillSource() -> AutofillUserScriptSourceProvider
 
@@ -37,8 +38,8 @@ protocol ScriptSourceProviding {
 
 // refactor: ScriptSourceProvider to be passed to init methods as `some ScriptSourceProviding`, DefaultScriptSourceProvider to be killed
 // swiftlint:disable:next identifier_name
-func DefaultScriptSourceProvider() -> ScriptSourceProviding {
-    ScriptSourceProvider(configStorage: ConfigurationStore.shared, privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager, webTrackingProtectionPreferences: WebTrackingProtectionPreferences.shared, contentBlockingManager: ContentBlocking.shared.contentBlockingManager, trackerDataManager: ContentBlocking.shared.trackerDataManager, tld: ContentBlocking.shared.tld)
+@MainActor func DefaultScriptSourceProvider() -> ScriptSourceProviding {
+    ScriptSourceProvider(configStorage: Application.appDelegate.configurationStore, privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager, webTrackingProtectionPreferences: WebTrackingProtectionPreferences.shared, contentBlockingManager: ContentBlocking.shared.contentBlockingManager, trackerDataManager: ContentBlocking.shared.trackerDataManager, tld: ContentBlocking.shared.tld)
 }
 
 struct ScriptSourceProvider: ScriptSourceProviding {
@@ -47,6 +48,7 @@ struct ScriptSourceProvider: ScriptSourceProviding {
     private(set) var onboardingActionsManager: OnboardingActionsManaging?
     private(set) var autofillSourceProvider: AutofillUserScriptSourceProvider?
     private(set) var sessionKey: String?
+    private(set) var messageSecret: String?
 
     let configStorage: ConfigurationStoring
     let privacyConfigurationManager: PrivacyConfigurationManaging
@@ -55,6 +57,7 @@ struct ScriptSourceProvider: ScriptSourceProviding {
     let webTrakcingProtectionPreferences: WebTrackingProtectionPreferences
     let tld: TLD
 
+    @MainActor
     init(configStorage: ConfigurationStoring,
          privacyConfigurationManager: PrivacyConfigurationManaging,
          webTrackingProtectionPreferences: WebTrackingProtectionPreferences,
@@ -72,6 +75,7 @@ struct ScriptSourceProvider: ScriptSourceProviding {
         self.contentBlockerRulesConfig = buildContentBlockerRulesConfig()
         self.surrogatesConfig = buildSurrogatesConfig()
         self.sessionKey = generateSessionKey()
+        self.messageSecret = generateSessionKey()
         self.autofillSourceProvider = buildAutofillSource()
         self.onboardingActionsManager = buildOnboardingActionsManager()
     }
@@ -85,6 +89,7 @@ struct ScriptSourceProvider: ScriptSourceProviding {
         return DefaultAutofillSourceProvider.Builder(privacyConfigurationManager: privacyConfigurationManager,
                                                      properties: ContentScopeProperties(gpcEnabled: webTrakcingProtectionPreferences.isGPCEnabled,
                                                                                         sessionKey: self.sessionKey ?? "",
+                                                                                        messageSecret: self.messageSecret ?? "",
                                                                                         featureToggles: ContentScopeFeatureToggles.supportedFeaturesOnMacOS(privacyConfig)),
                                                      isDebug: AutofillPreferences().debugScriptEnabled)
                 .withJSLoading()
@@ -127,6 +132,7 @@ struct ScriptSourceProvider: ScriptSourceProviding {
                                                  isDebugBuild: isDebugBuild)
     }
 
+    @MainActor
     private func buildOnboardingActionsManager() -> OnboardingActionsManaging {
         return OnboardingActionsManager(
             navigationDelegate: WindowControllersManager.shared,

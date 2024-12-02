@@ -37,7 +37,7 @@ class BookmarkNodeTests: XCTestCase {
     }
 
     func testWhenIsRootNode_ThenIsRootReturnsCorrectValue() {
-        let rootNode = BookmarkNode(representedObject: TestObject(), parent: nil)
+        let rootNode = BookmarkNode.genericRootNode()
         XCTAssertTrue(rootNode.isRoot)
 
         let childNode = BookmarkNode(representedObject: TestObject(), parent: rootNode)
@@ -164,20 +164,6 @@ class BookmarkNodeTests: XCTestCase {
         XCTAssertNil(foundNode)
     }
 
-    func testWhenGettingDescendantNodeForObject_AndObjectIsNotDirectChild_ThenNodeIsReturned() {
-        let desiredObject = TestObject()
-        let rootNode = BookmarkNode(representedObject: TestObject(), parent: nil)
-
-        let childOfRootNode = BookmarkNode(representedObject: TestObject(), parent: rootNode)
-        rootNode.childNodes = [childOfRootNode]
-
-        let childOfChildNode = BookmarkNode(representedObject: desiredObject, parent: childOfRootNode)
-        childOfRootNode.childNodes = [childOfChildNode]
-
-        let foundNode = rootNode.descendantNodeRepresenting(object: desiredObject)
-        XCTAssertEqual(foundNode, childOfChildNode)
-    }
-
     func testWhenCheckingIfNodeIsAncestor_AndNodeIsSelf_ThenFalseIsReturned() {
         let rootNode = BookmarkNode(representedObject: TestObject(), parent: nil)
         XCTAssertFalse(rootNode.isAncestor(of: rootNode))
@@ -198,6 +184,15 @@ class BookmarkNodeTests: XCTestCase {
 
         XCTAssertTrue(node.representedObjectEquals(object))
         XCTAssertFalse(node.representedObjectEquals(TestObject()))
+    }
+
+    func testWhenCheckingRepresentedObjectEqualityForSearch_AndObjectsHaveSameId_ThenTrueIsReturned() {
+        let bookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: "DDG", isFavorite: true)
+        let firstFolder = BookmarkFolder(id: "2", title: "Folder", children: [])
+        let firstFolderWithDifferentChildren = BookmarkFolder(id: "2", title: "Folder", children: [bookmark])
+        let node = BookmarkNode(representedObject: firstFolder, parent: nil)
+
+        XCTAssertTrue(node.representedObjectHasSameId(firstFolderWithDifferentChildren))
     }
 
     func testWhenFindingOrCreatingChildNode_AndChildExists_ThenChildIsReturned() {

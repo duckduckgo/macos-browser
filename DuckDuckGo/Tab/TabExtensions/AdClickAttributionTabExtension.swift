@@ -25,6 +25,7 @@ import Navigation
 import PrivacyDashboard
 import TrackerRadarKit
 import WebKit
+import os.log
 
 protocol AdClickAttributionDependencies {
 
@@ -61,6 +62,8 @@ protocol AdClickLogicProtocol: AnyObject {
     var state: AdClickAttributionLogic.State { get }
     var delegate: AdClickAttributionLogicDelegate? { get set }
 
+    var debugID: String { get }
+
     func applyInheritedAttribution(state: AdClickAttributionLogic.State?)
     func onRulesChanged(latestRules: [ContentBlockerRulesManager.Rules])
     func onRequestDetected(request: DetectedRequest)
@@ -83,8 +86,7 @@ final class AdClickAttributionTabExtension: TabExtension {
         let detection = AdClickAttributionDetection(feature: dependencies.adClickAttribution,
                                                     tld: dependencies.tld,
                                                     eventReporting: dependencies.attributionEvents,
-                                                    errorReporting: dependencies.attributionDebugEvents,
-                                                    log: OSLog.attribution)
+                                                    errorReporting: dependencies.attributionDebugEvents)
         detection.delegate = delegate
         return detection
 
@@ -95,8 +97,7 @@ final class AdClickAttributionTabExtension: TabExtension {
                                        rulesProvider: dependencies.adClickAttributionRulesProvider,
                                        tld: dependencies.tld,
                                        eventReporting: dependencies.attributionEvents,
-                                       errorReporting: dependencies.attributionDebugEvents,
-                                       log: OSLog.attribution)
+                                       errorReporting: dependencies.attributionDebugEvents)
     }
 
     private static func makeAdClickAttribution(with dependencies: any AdClickAttributionDependencies) -> (AdClickLogicProtocol, AdClickAttributionDetecting) {
@@ -114,6 +115,8 @@ final class AdClickAttributionTabExtension: TabExtension {
     private let detection: AdClickAttributionDetecting
     private let logic: AdClickLogicProtocol
 
+    private var didReceiveRedirectCancellation = false
+
     public var currentAttributionState: AdClickAttributionLogic.State {
         logic.state
     }
@@ -130,8 +133,9 @@ final class AdClickAttributionTabExtension: TabExtension {
 
         self.dependencies = dependencies
         self.dateTimeProvider = dateTimeProvider
-
         (self.logic, self.detection) = logicsProvider(dependencies)
+
+        Logger.contentBlocking.debug("<\(self.logic.debugID)> AttributionLogic created in Tab Extension")
         self.logic.delegate = self
 
         // delay firing up until UserContentController is published
@@ -144,6 +148,8 @@ final class AdClickAttributionTabExtension: TabExtension {
     }
 
     private func delayedInitialization(with userContentController: UserContentControllerProtocol, inheritedAttribution: AdClickAttributionLogic.State?, contentBlockerRulesScriptPublisher: some Publisher<(any ContentBlockerScriptProtocol)?, Never>, trackerInfoPublisher: some Publisher<DetectedRequest, Never>) {
+
+        Logger.contentBlocking.debug("<\(self.logic.debugID)> Performing delayed initialization")
 
         cancellables.removeAll()
         self.userContentController = userContentController
@@ -180,6 +186,8 @@ extension AdClickAttributionTabExtension: AdClickAttributionLogicDelegate {
             assertionFailure("UserContentController not set")
             return
         }
+
+        Logger.contentBlocking.debug("<\(self.logic.debugID)> Attribution requesting Rule application for \(vendor ?? "<none>")")
 
         let attributedTempListName = AdClickAttributionRulesProvider.Constants.attributedTempRuleListName
 
@@ -225,6 +233,7 @@ extension AdClickAttributionTabExtension: NavigationResponder {
 
     @MainActor
     func didStart(_ navigation: Navigation) {
+        didReceiveRedirectCancellation = false
         detection.onStartNavigation(url: navigation.url)
     }
 
@@ -244,13 +253,26 @@ extension AdClickAttributionTabExtension: NavigationResponder {
     @MainActor
     func navigationDidFinish(_ navigation: Navigation) {
         guard navigation.isCurrent else { return }
+
+        didReceiveRedirectCancellation = false
         detection.onDidFinishNavigation(url: navigation.url)
         logic.onDidFinishNavigation(host: navigation.url.host, currentTime: dateTimeProvider())
     }
 
     @MainActor
+    func didCancelNavigationAction(_ navigationAction: NavigationAction, withRedirectNavigations expectedNavigations: [ExpectedNavigation]?) {
+        if let expectedNavigations, !expectedNavigations.isEmpty {
+            didReceiveRedirectCancellation = true
+        }
+    }
+
+    @MainActor
     func navigation(_ navigation: Navigation, didFailWith error: WKError) {
         guard navigation.isCurrent else { return }
+        guard !didReceiveRedirectCancellation else {
+            didReceiveRedirectCancellation = false
+            return
+        }
         detection.onDidFailNavigation()
     }
 

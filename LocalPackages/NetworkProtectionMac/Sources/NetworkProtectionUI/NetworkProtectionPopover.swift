@@ -20,59 +20,32 @@ import AppKit
 import Combine
 import Foundation
 import SwiftUI
+import SwiftUIExtensions
 import NetworkProtection
 import LoginItems
-
-@available(iOS, introduced: 10.15, deprecated: 12.0, message: "Use Apple's DismissAction")
-public struct DismissAction: EnvironmentKey {
-    public static var defaultValue: () -> Void = {}
-}
-
-@available(iOS, introduced: 10.15, deprecated: 12.0, message: "Use Apple's DismissAction")
-public extension EnvironmentValues {
-    var dismiss: () -> Void {
-        get {
-            self[DismissAction.self]
-        }
-
-        set {
-            self[DismissAction.self] = newValue
-        }
-    }
-}
 
 public final class NetworkProtectionPopover: NSPopover {
 
     public typealias MenuItem = NetworkProtectionStatusView.Model.MenuItem
 
-    private let debugInformationPublisher = CurrentValueSubject<Bool, Never>(false)
     private let statusReporter: NetworkProtectionStatusReporter
-    private let model: NetworkProtectionStatusView.Model
+    private let debugInformationViewModel: DebugInformationViewModel
+    private let siteTroubleshootingViewModel: SiteTroubleshootingView.Model
+    private let statusViewModel: NetworkProtectionStatusView.Model
+    private let tipsModel: VPNTipsModel
     private var appLifecycleCancellables = Set<AnyCancellable>()
 
-    public required init(controller: TunnelController,
-                         onboardingStatusPublisher: OnboardingStatusPublisher,
+    public required init(statusViewModel: NetworkProtectionStatusView.Model,
                          statusReporter: NetworkProtectionStatusReporter,
-                         uiActionHandler: VPNUIActionHandler,
-                         menuItems: @escaping () -> [MenuItem],
-                         agentLoginItem: LoginItem?,
-                         isMenuBarStatusView: Bool,
-                         userDefaults: UserDefaults,
-                         locationFormatter: VPNLocationFormatting,
-                         uninstallHandler: @escaping () async -> Void) {
+                         siteTroubleshootingViewModel: SiteTroubleshootingView.Model,
+                         tipsModel: VPNTipsModel,
+                         debugInformationViewModel: DebugInformationViewModel) {
 
         self.statusReporter = statusReporter
-        self.model = NetworkProtectionStatusView.Model(controller: controller,
-                                                       onboardingStatusPublisher: onboardingStatusPublisher,
-                                                       statusReporter: statusReporter,
-                                                       debugInformationPublisher: debugInformationPublisher.eraseToAnyPublisher(),
-                                                       uiActionHandler: uiActionHandler,
-                                                       menuItems: menuItems,
-                                                       agentLoginItem: agentLoginItem,
-                                                       isMenuBarStatusView: isMenuBarStatusView,
-                                                       userDefaults: userDefaults,
-                                                       locationFormatter: locationFormatter,
-                                                       uninstallHandler: uninstallHandler)
+        self.debugInformationViewModel = debugInformationViewModel
+        self.siteTroubleshootingViewModel = siteTroubleshootingViewModel
+        self.tipsModel = tipsModel
+        self.statusViewModel = statusViewModel
 
         super.init()
 
@@ -88,7 +61,12 @@ public final class NetworkProtectionPopover: NSPopover {
     }
 
     private func setupContentController() {
-        let view = NetworkProtectionStatusView(model: self.model).environment(\.dismiss, { [weak self] in
+        let view = NetworkProtectionStatusView()
+            .environmentObject(debugInformationViewModel)
+            .environmentObject(siteTroubleshootingViewModel)
+            .environmentObject(statusViewModel)
+            .environmentObject(tipsModel)
+            .environment(\.dismiss, { [weak self] in
             self?.close()
         }).fixedSize()
 
@@ -106,7 +84,7 @@ public final class NetworkProtectionPopover: NSPopover {
         NotificationCenter
             .default
             .publisher(for: NSApplication.didBecomeActiveNotification)
-            .sink { [weak self] _ in self?.model.refreshLoginItemStatus() }
+            .sink { [weak self] _ in self?.statusViewModel.refreshLoginItemStatus() }
             .store(in: &appLifecycleCancellables)
 
         NotificationCenter
@@ -117,20 +95,18 @@ public final class NetworkProtectionPopover: NSPopover {
     }
 
     private func closePopoverIfOnboarded() {
-        if self.model.onboardingStatus == .completed {
+        if self.statusViewModel.onboardingStatus == .completed {
             self.close()
         }
     }
 
     override public func show(relativeTo positioningRect: NSRect, of positioningView: NSView, preferredEdge: NSRectEdge) {
+
+        // Starting on macOS sequoia this is necessary to make sure the popover has focus
+        NSRunningApplication.current.activate(options: .activateIgnoringOtherApps)
+
         statusReporter.forceRefresh()
-        model.refreshLoginItemStatus()
+        statusViewModel.refreshLoginItemStatus()
         super.show(relativeTo: positioningRect, of: positioningView, preferredEdge: preferredEdge)
-    }
-
-    // MARK: - Debug Information
-
-    func setShowsDebugInformation(_ showsDebugInformation: Bool) {
-        debugInformationPublisher.send(showsDebugInformation)
     }
 }

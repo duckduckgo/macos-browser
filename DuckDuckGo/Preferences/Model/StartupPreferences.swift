@@ -20,15 +20,12 @@ import Foundation
 import Combine
 
 protocol StartupPreferencesPersistor {
-    var appearancePrefs: AppearancePreferences { get set }
     var restorePreviousSession: Bool { get set }
     var launchToCustomHomePage: Bool { get set }
     var customHomePageURL: String { get set }
 }
 
 struct StartupPreferencesUserDefaultsPersistor: StartupPreferencesPersistor {
-    var appearancePrefs: AppearancePreferences
-
     @UserDefaultsWrapper(key: .restorePreviousSession, defaultValue: false)
     var restorePreviousSession: Bool
 
@@ -44,15 +41,18 @@ final class StartupPreferences: ObservableObject, PreferencesTabOpening {
 
     static let shared = StartupPreferences()
     private let pinningManager: LocalPinningManager
+    private var appearancePreferences: AppearancePreferences
     private var persistor: StartupPreferencesPersistor
     private var pinnedViewsNotificationCancellable: AnyCancellable?
     private var dataClearingPreferences: DataClearingPreferences
     private var dataClearingPreferencesNotificationCancellable: AnyCancellable?
 
-    init(pinningManager: LocalPinningManager = LocalPinningManager.shared,
-         persistor: StartupPreferencesPersistor = StartupPreferencesUserDefaultsPersistor(appearancePrefs: AppearancePreferences.shared),
-         dataClearingPreferences: DataClearingPreferences = DataClearingPreferences.shared) {
+    init(pinningManager: LocalPinningManager = .shared,
+         appearancePreferences: AppearancePreferences = .shared,
+         persistor: StartupPreferencesPersistor = StartupPreferencesUserDefaultsPersistor(),
+         dataClearingPreferences: DataClearingPreferences = .shared) {
         self.pinningManager = pinningManager
+        self.appearancePreferences = appearancePreferences
         self.persistor = persistor
         self.dataClearingPreferences = dataClearingPreferences
         restorePreviousSession = persistor.restorePreviousSession
@@ -117,7 +117,7 @@ final class StartupPreferences: ObservableObject, PreferencesTabOpening {
     }
 
     func updateHomeButton() {
-        persistor.appearancePrefs.homeButtonPosition = homeButtonPosition
+        appearancePreferences.homeButtonPosition = homeButtonPosition
         if homeButtonPosition != .hidden {
             pinningManager.unpin(.homeButton)
             pinningManager.pin(.homeButton)
@@ -127,7 +127,7 @@ final class StartupPreferences: ObservableObject, PreferencesTabOpening {
     }
 
     private func updateHomeButtonState() {
-        homeButtonPosition = pinningManager.isPinned(.homeButton) ? persistor.appearancePrefs.homeButtonPosition : .hidden
+        homeButtonPosition = pinningManager.isPinned(.homeButton) ? appearancePreferences.homeButtonPosition : .hidden
     }
 
     private func listenToPinningManagerNotifications() {

@@ -19,13 +19,19 @@
 import AppLauncher
 import AppKit
 import Combine
+import Common
 import Foundation
 import LoginItems
 import NetworkProtection
 import NetworkProtectionIPC
+import NetworkProtectionProxy
 import NetworkProtectionUI
+import os.log
 import Subscription
+import SwiftUI
 import VPNAppLauncher
+import BrowserServicesKit
+import FeatureFlags
 
 protocol NetworkProtectionIPCClient {
     var ipcStatusObserver: ConnectionStatusObserver { get }
@@ -35,6 +41,7 @@ protocol NetworkProtectionIPCClient {
 
     func start(completion: @escaping (Error?) -> Void)
     func stop(completion: @escaping (Error?) -> Void)
+    func command(_ command: VPNCommand) async throws
 }
 
 extension VPNControllerXPCClient: NetworkProtectionIPCClient {
@@ -44,15 +51,36 @@ extension VPNControllerXPCClient: NetworkProtectionIPCClient {
     public var ipcDataVolumeObserver: any NetworkProtection.DataVolumeObserver { dataVolumeObserver }
 }
 
+@MainActor
 final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
     private var networkProtectionPopover: NetworkProtectionPopover?
     let ipcClient: NetworkProtectionIPCClient
     let vpnUninstaller: VPNUninstalling
 
+    @Published
+    private var siteInfo: ActiveSiteInfo?
+    private let activeSitePublisher: ActiveSiteInfoPublisher
+    private var cancellables = Set<AnyCancellable>()
+
     init(ipcClient: VPNControllerXPCClient,
          vpnUninstaller: VPNUninstalling) {
+
         self.ipcClient = ipcClient
         self.vpnUninstaller = vpnUninstaller
+
+        let activeDomainPublisher = ActiveDomainPublisher(windowControllersManager: .shared)
+
+        activeSitePublisher = ActiveSiteInfoPublisher(
+            activeDomainPublisher: activeDomainPublisher.eraseToAnyPublisher(),
+            proxySettings: TransparentProxySettings(defaults: .netP))
+
+        subscribeToCurrentSitePublisher()
+    }
+
+    private func subscribeToCurrentSitePublisher() {
+        activeSitePublisher
+            .assign(to: \.siteInfo, onWeaklyHeld: self)
+            .store(in: &cancellables)
     }
 
     var isShown: Bool {
@@ -60,8 +88,12 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
     }
 
     func show(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate) -> NSPopover {
-        let popover = {
 
+        /// Since the favicon doesn't have a publisher we force refreshing here
+        activeSitePublisher.refreshActiveSiteInfo()
+
+        let popover: NSPopover = {
+            let vpnSettings = VPNSettings(defaults: .netP)
             let controller = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
 
             let statusReporter = DefaultNetworkProtectionStatusReporter(
@@ -75,14 +107,29 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
             )
 
             let onboardingStatusPublisher = UserDefaults.netP.networkProtectionOnboardingStatusPublisher
-            _ = VPNSettings(defaults: .netP)
             let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
+            let vpnURLEventHandler = VPNURLEventHandler()
+            let proxySettings = TransparentProxySettings(defaults: .netP)
+            let uiActionHandler = VPNUIActionHandler(vpnURLEventHandler: vpnURLEventHandler, proxySettings: proxySettings)
 
-            let popover = NetworkProtectionPopover(controller: controller,
-                                                   onboardingStatusPublisher: onboardingStatusPublisher,
-                                                   statusReporter: statusReporter,
-                                                   uiActionHandler: appLauncher,
-                                                   menuItems: {
+            let connectionStatusPublisher = CurrentValuePublisher(
+                initialValue: statusReporter.statusObserver.recentValue,
+                publisher: statusReporter.statusObserver.publisher)
+
+            let activeSitePublisher = CurrentValuePublisher(
+                initialValue: siteInfo,
+                publisher: $siteInfo.eraseToAnyPublisher())
+
+            let siteTroubleshootingViewModel = SiteTroubleshootingView.Model(
+                connectionStatusPublisher: connectionStatusPublisher,
+                activeSitePublisher: activeSitePublisher,
+                uiActionHandler: uiActionHandler)
+
+            let statusViewModel = NetworkProtectionStatusView.Model(controller: controller,
+                                              onboardingStatusPublisher: onboardingStatusPublisher,
+                                              statusReporter: statusReporter,
+                                              uiActionHandler: uiActionHandler,
+                                              menuItems: {
                 if UserDefaults.netP.networkProtectionOnboardingStatus == .completed {
                     return [
                         NetworkProtectionStatusView.Model.MenuItem(
@@ -94,7 +141,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
                                 try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showFAQ)
                             }),
                         NetworkProtectionStatusView.Model.MenuItem(
-                            name: UserText.networkProtectionNavBarStatusViewShareFeedback,
+                            name: UserText.networkProtectionNavBarStatusViewSendFeedback,
                             action: {
                                 try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.shareFeedback)
                             })
@@ -106,20 +153,52 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
                                 try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showFAQ)
                             }),
                         NetworkProtectionStatusView.Model.MenuItem(
-                            name: UserText.networkProtectionNavBarStatusViewShareFeedback,
+                            name: UserText.networkProtectionNavBarStatusViewSendFeedback,
                             action: {
                                 try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.shareFeedback)
                             })
                     ]
                 }
             },
-                                                   agentLoginItem: LoginItem.vpnMenu,
-                                                   isMenuBarStatusView: false,
-                                                   userDefaults: .netP,
-                                                   locationFormatter: DefaultVPNLocationFormatter(),
-                                                   uninstallHandler: { [weak self] in
+                                              agentLoginItem: LoginItem.vpnMenu,
+                                              isMenuBarStatusView: false,
+                                              userDefaults: .netP,
+                                              locationFormatter: DefaultVPNLocationFormatter(),
+                                              uninstallHandler: { [weak self] in
                 _ = try? await self?.vpnUninstaller.uninstall(removeSystemExtension: true)
             })
+
+            let featureFlagger = NSApp.delegateTyped.featureFlagger
+            let tipsFeatureFlagInitialValue = featureFlagger.isFeatureOn(.networkProtectionUserTips)
+            let tipsFeatureFlagPublisher: CurrentValuePublisher<Bool, Never>
+
+            if let overridesHandler = featureFlagger.localOverrides?.actionHandler as? FeatureFlagOverridesPublishingHandler<FeatureFlag> {
+
+                let featureFlagPublisher = overridesHandler.flagDidChangePublisher
+                    .filter { $0.0 == .networkProtectionUserTips }
+
+                tipsFeatureFlagPublisher = CurrentValuePublisher(
+                    initialValue: tipsFeatureFlagInitialValue,
+                    publisher: Just(tipsFeatureFlagInitialValue).eraseToAnyPublisher())
+            } else {
+                tipsFeatureFlagPublisher = CurrentValuePublisher(
+                    initialValue: tipsFeatureFlagInitialValue,
+                    publisher: Just(tipsFeatureFlagInitialValue).eraseToAnyPublisher())
+            }
+
+            let tipsModel = VPNTipsModel(featureFlagPublisher: tipsFeatureFlagPublisher,
+                                         statusObserver: statusReporter.statusObserver,
+                                         activeSitePublisher: activeSitePublisher,
+                                         forMenuApp: false,
+                                         vpnSettings: vpnSettings,
+                                         logger: Logger(subsystem: "DuckDuckGo", category: "TipKit"))
+
+            let popover = NetworkProtectionPopover(
+                statusViewModel: statusViewModel,
+                statusReporter: statusReporter,
+                siteTroubleshootingViewModel: siteTroubleshootingViewModel,
+                tipsModel: tipsModel,
+                debugInformationViewModel: DebugInformationViewModel(showDebugInformation: false))
             popover.delegate = delegate
 
             networkProtectionPopover = popover

@@ -23,6 +23,30 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 Fetches and updates certificates and provisioning profiles for App Store distribution
 
+### mac sync_signing_dmg_release
+
+```sh
+[bundle exec] fastlane mac sync_signing_dmg_release
+```
+
+Fetches and updates certificates and provisioning profiles for DMG distribution
+
+### mac sync_signing_dmg_review
+
+```sh
+[bundle exec] fastlane mac sync_signing_dmg_review
+```
+
+Fetches and updates certificates and provisioning profiles for DMG Review builds
+
+### mac sync_signing_ci
+
+```sh
+[bundle exec] fastlane mac sync_signing_ci
+```
+
+Fetches and updates certificates and provisioning profiles for CI builds
+
 ### mac release_testflight
 
 ```sh
@@ -38,6 +62,14 @@ Makes App Store release build and uploads it to TestFlight
 ```
 
 Makes App Store release build and uploads it to TestFlight
+
+### mac promote_latest_testflight_to_appstore
+
+```sh
+[bundle exec] fastlane mac promote_latest_testflight_to_appstore
+```
+
+Promotes the latest testflight build to appstore without submitting for review
 
 ### mac release_appstore
 

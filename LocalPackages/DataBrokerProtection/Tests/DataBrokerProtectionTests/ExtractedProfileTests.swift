@@ -61,4 +61,159 @@ final class ExtractedProfileTests: XCTestCase {
 
         XCTAssertEqual(sut.age, "52")
     }
+
+    // MARK: - Test matching logic
+
+    func testDoesMatchExtractedProfile_whenThereAnExactMatch_thenDoesMatchExtractedProfileIsTrue() {
+
+        // Given
+        let extractedProfile = ExtractedProfile.mockWithName("Steve Jones",
+                                                             alternativeNames: ["Steven Jones",
+                                                                                "Steven M Jones"],
+                                                             age: "20",
+                                                             addresses: [AddressCityState(city: "New York", state: "NY"),
+                                                                         AddressCityState(city: "Miami", state: "FL")],
+                                                             relatives: ["Steven Jones Jr",
+                                                                         "Steven Jones Sr",
+                                                                         "Steven Jones Staff",
+                                                                         "Steven Jones Principle"])
+        let matchingExtractedProfile = ExtractedProfile.mockWithName("Steve Jones",
+                                                                     alternativeNames: ["Steven Jones",
+                                                                                        "Steven M Jones"],
+                                                                     age: "20",
+                                                                     addresses: [AddressCityState(city: "New York", state: "NY"),
+                                                                                 AddressCityState(city: "Miami", state: "FL")],
+                                                                     relatives: ["Steven Jones Jr",
+                                                                                 "Steven Jones Sr",
+                                                                                 "Steven Jones Staff",
+                                                                                 "Steven Jones Principle"])
+
+        // Then
+        XCTAssertTrue(extractedProfile.doesMatchExtractedProfile(matchingExtractedProfile))
+    }
+
+    func testDoesMatchExtractedProfile_whenThereIsANonMatch_thenDoesMatchExtractedProfileIsFalse() {
+
+        // Given
+        let extractedProfile = ExtractedProfile.mockWithName("Steve Jones",
+                                                             alternativeNames: ["Steven Jones",
+                                                                                "Steven M Jones"],
+                                                             age: "20",
+                                                             addresses: [AddressCityState(city: "New York", state: "NY"),
+                                                                         AddressCityState(city: "Miami", state: "FL")],
+                                                             relatives: ["Steven Jones Jr",
+                                                                         "Steven Jones Sr",
+                                                                         "Steven Jones Staff",
+                                                                         "Steven Jones Principle"])
+        let nonmatchingExtractedProfile = ExtractedProfile.mockWithName("James Smith",
+                                                                        alternativeNames: ["James Jameson and The Legion of Doom"],
+                                                                        age: "57",
+                                                                        addresses: [AddressCityState(city: "Blackpool", state: "NY"),
+                                                                                    AddressCityState(city: "Underneath a Volcano", state: "FL")],
+                                                                        relatives: ["Beelzebub",
+                                                                                    "Barney the Dinosaur"])
+
+        // Then
+        XCTAssertFalse(extractedProfile.doesMatchExtractedProfile(nonmatchingExtractedProfile))
+    }
+
+    func testDoesMatchExtractedProfile_whenThereAPartialMatch_thenDoesMatchExtractedProfileIsFalse() {
+
+        // Given
+        let extractedProfile = ExtractedProfile.mockWithName("Steve Jones",
+                                                             alternativeNames: ["Steven Jones",
+                                                                                "Steven M Jones"],
+                                                             age: "20",
+                                                             addresses: [AddressCityState(city: "New York", state: "NY"),
+                                                                         AddressCityState(city: "Miami", state: "FL")],
+                                                             relatives: ["Steven Jones Jr",
+                                                                         "Steven Jones Sr",
+                                                                         "Steven Jones Staff",
+                                                                         "Steven Jones Principle"])
+        let nonmatchingExtractedProfile = ExtractedProfile.mockWithName("Steve Jones",
+                                                                        alternativeNames: ["Steven Jones",
+                                                                                           "Steven M Jones"],
+                                                                        age: "30",
+                                                                        addresses: [AddressCityState(city: "New York", state: "NY"),
+                                                                                    AddressCityState(city: "Miami", state: "FL")],
+                                                                        relatives: ["Steven Jones Jr",
+                                                                                    "Steven Jones Sr",
+                                                                                    "Steven Jones Staff",
+                                                                                    "Steven Jones Principle"])
+
+        // Then
+        XCTAssertFalse(extractedProfile.doesMatchExtractedProfile(nonmatchingExtractedProfile))
+    }
+
+    func testDoesMatchExtractedProfile_whenThereASubsetMatch_thenDoesMatchExtractedProfileIsTrue() {
+
+        // Given
+        let extractedProfile = ExtractedProfile.mockWithName("Steve Jones",
+                                                             alternativeNames: ["Steven Jones",
+                                                                                "Steven M Jones"],
+                                                             age: "20",
+                                                             addresses: [AddressCityState(city: "New York", state: "NY"),
+                                                                         AddressCityState(city: "Miami", state: "FL")],
+                                                             relatives: ["Steven Jones Jr",
+                                                                         "Steven Jones Sr",
+                                                                         "Steven Jones Staff",
+                                                                         "Steven Jones Principle"])
+        let matchingExtractedProfile = ExtractedProfile.mockWithName("Steve Jones",
+                                                                     alternativeNames: ["Steven Jones"],
+                                                                     age: "20",
+                                                                     addresses: [AddressCityState(city: "Miami", state: "FL")],
+                                                                     relatives: [])
+
+        // Then
+        XCTAssertTrue(extractedProfile.doesMatchExtractedProfile(matchingExtractedProfile))
+    }
+
+    func testDoesMatchExtractedProfile_whenThereIsASupersetMatch_thenDoesMatchExtractedProfileIsTrue() {
+
+        // Given
+        let extractedProfile = ExtractedProfile.mockWithName("Steve Jones",
+                                                             alternativeNames: [],
+                                                             age: "20",
+                                                             addresses: [AddressCityState(city: "Miami", state: "FL")],
+                                                             relatives: ["Steven Jones Staff",
+                                                                         "Steven Jones Principle"])
+        let matchingExtractedProfile = ExtractedProfile.mockWithName("Steve Jones",
+                                                                     alternativeNames: ["Steven Jones",
+                                                                                        "Steven M Jones"],
+                                                                     age: "20",
+                                                                     addresses: [AddressCityState(city: "New York", state: "NY"),
+                                                                                 AddressCityState(city: "Miami", state: "FL")],
+                                                                     relatives: ["Steven Jones Jr",
+                                                                                 "Steven Jones Sr",
+                                                                                 "Steven Jones Staff",
+                                                                                 "Steven Jones Principle"])
+
+        // Then
+        XCTAssertTrue(extractedProfile.doesMatchExtractedProfile(matchingExtractedProfile))
+    }
+
+    // When some fields are subsets, and some are supersets
+    func testDoesMatchExtractedProfile_whenThereAMixedSubsetSupersetMatch_thenDoesMatchExtractedProfileIsTrue() {
+
+        // Given
+        let extractedProfile = ExtractedProfile.mockWithName("Steve Jones",
+                                                             alternativeNames: [],
+                                                             age: "20",
+                                                             addresses: [],
+                                                             relatives: ["Steven Jones Jr",
+                                                                         "Steven Jones Sr",
+                                                                         "Steven Jones Staff",
+                                                                         "Steven Jones Principle"])
+        let matchingExtractedProfile = ExtractedProfile.mockWithName("Steve Jones",
+                                                                     alternativeNames: ["Steven Jones",
+                                                                                        "Steven M Jones"],
+                                                                     age: "20",
+                                                                     addresses: [AddressCityState(city: "New York", state: "NY"),
+                                                                                 AddressCityState(city: "Miami", state: "FL")],
+                                                                     relatives: ["Steven Jones Jr",
+                                                                                 "Steven Jones Principle"])
+
+        // Then
+        XCTAssertTrue(extractedProfile.doesMatchExtractedProfile(matchingExtractedProfile))
+    }
 }

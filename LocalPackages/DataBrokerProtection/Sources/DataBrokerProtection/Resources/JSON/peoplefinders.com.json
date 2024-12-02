@@ -1,8 +1,9 @@
 {
   "name": "PeopleFinders",
   "url": "peoplefinders.com",
-  "version": "0.2.0",
+  "version": "0.5.0",
   "addedDatetime": 1677132000000,
+  "optOutUrl": "https://www.peoplefinders.com/opt-out",
   "steps": [
     {
       "stepType": "scan",
@@ -68,27 +69,49 @@
         {
           "actionType": "fillForm",
           "id": "5685d436-32d5-4de0-a2b8-d5bbb4fa778d",
-          "selector": ".opt-out-form",
+          "selector": ".v-out-out-form",
+          "dataSource": "userProfile",
           "elements": [
             {
-              "type": "email",
-              "selector": "#Email"
+              "type": "firstName",
+              "selector": ".//input[@placeholder='First Name']"
             },
             {
-              "type": "profileUrl",
-              "selector": "#Url"
+              "type": "lastName",
+              "selector": ".//input[@placeholder='Last Name']"
             }
           ]
         },
         {
+          "actionType": "fillForm",
+          "selector": ".v-out-out-form",
+          "elements": [
+            {
+              "type": "email",
+              "selector": ".//input[@type='email']"
+            }
+          ],
+          "id": "45b04749-beb1-4567-a95f-649c2966b810"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//input[@type='checkbox']"
+            }
+          ],
+          "id": "5ec1e28f-c179-424d-a50c-8808040668c3"
+        },
+        {
           "actionType": "getCaptchaInfo",
           "id": "fcf4b0cf-9bb4-42e6-a2a9-68e4f2a25a2c",
-          "selector": ".g-recaptcha"
+          "selector": ".v-recaptcha"
         },
         {
           "actionType": "solveCaptcha",
           "id": "25c7fbb0-0508-4f93-aeb8-3642ecef8c33",
-          "selector": ".g-recaptcha"
+          "selector": ".v-recaptcha"
         },
         {
           "actionType": "click",
@@ -96,9 +119,20 @@
           "elements": [
             {
               "type": "button",
-              "selector": "//button[@class='btn btn-primary mt-3']"
+              "selector": "//button[@class='btn btn-primary']"
             }
           ]
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Email Sent"
+            }
+          ],
+          "id": "31e2af63-840f-4040-8f35-35d8d0156201"
         },
         {
           "actionType": "emailConfirmation",
@@ -106,14 +140,75 @@
           "pollingTime": 30
         },
         {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Record Suppression Form"
+            }
+          ],
+          "id": "c39dbadc-e398-4068-93cb-bb3c1a2b047e"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".v-out-out-record-removal-form",
+          "dataSource": "userProfile",
+          "elements": [
+            {
+              "type": "$generated_phone_number$",
+              "selector": ".//input[@type='tel']"
+            },
+            {
+              "type": "$generated_random_number$",
+              "selector": ".//select[option[1][text()='Month']]",
+              "min": "1",
+              "max": "12"
+            },
+            {
+              "type": "$generated_random_number$",
+              "selector": ".//input[@name='day']",
+              "min": "1",
+              "max": "28"
+            },
+            {
+              "type": "birthYear",
+              "selector": ".//input[@name='year']"
+            },
+            {
+              "type": "$generated_street_address$",
+              "selector": ".//input[@placeholder='Street Address']"
+            },
+            {
+              "type": "city",
+              "selector": ".//input[@placeholder='City']"
+            },
+            {
+              "type": "state",
+              "selector": ".//select[option[1][text()='State']]"
+            }
+          ],
+          "id": "6ba153e8-676c-4b81-8a4b-5b6689fd978c"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".//input[@type='checkbox']"
+            }
+          ],
+          "id": "3a6a98ff-0ad6-4d0e-9537-a0844ced4598"
+        },
+        {
           "actionType": "getCaptchaInfo",
           "id": "45f59ed0-3a36-4ab6-9c45-e906471fb3e4",
-          "selector": ".g-recaptcha"
+          "selector": ".v-recaptcha"
         },
         {
           "actionType": "solveCaptcha",
           "id": "85469ad1-8870-449d-961e-22ea10738ec0",
-          "selector": ".g-recaptcha"
+          "selector": ".v-recaptcha"
         },
         {
           "actionType": "click",
@@ -121,7 +216,7 @@
           "elements": [
             {
               "type": "button",
-              "selector": "//button[@class='btn btn-primary mt-3']"
+              "selector": "//button[@class='btn btn-primary']"
             }
           ]
         },
@@ -130,8 +225,9 @@
           "id": "bc09540c-8aeb-4d9f-b515-0ebb6f4583a5",
           "expectations": [
             {
-              "type": "url",
-              "expect": "https://www.peoplefinders.com/opt-out/confirmation"
+              "type": "text",
+              "selector": "body",
+              "expect": "Opt-Out Request Confirmation"
             }
           ]
         }
@@ -141,6 +237,7 @@
   "schedulingConfig": {
     "retryError": 48,
     "confirmOptOutScan": 72,
-    "maintenanceScan": 240
+    "maintenanceScan": 120,
+    "maxAttempts": -1
   }
 }

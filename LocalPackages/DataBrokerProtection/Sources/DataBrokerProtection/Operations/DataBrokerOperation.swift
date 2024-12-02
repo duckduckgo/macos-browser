@@ -18,6 +18,7 @@
 
 import Foundation
 import Common
+import os.log
 
 protocol DataBrokerOperationDependencies {
     var database: DataBrokerProtectionRepository { get }
@@ -38,7 +39,8 @@ struct DefaultDataBrokerOperationDependencies: DataBrokerOperationDependencies {
 }
 
 enum OperationType {
-    case scan
+    case manualScan
+    case scheduledScan
     case optOut
     case all
 }
@@ -62,7 +64,7 @@ class DataBrokerOperation: Operation, @unchecked Sendable {
     private var _isFinished = false
 
     deinit {
-        os_log("Deinit operation: %{public}@", log: .dataBrokerProtection, String(describing: id.uuidString))
+        Logger.dataBrokerProtection.debug("Deinit operation: \(String(describing: self.id.uuidString), privacy: .public)")
     }
 
     init(dataBrokerID: Int64,
@@ -119,7 +121,7 @@ class DataBrokerOperation: Operation, @unchecked Sendable {
         switch operationType {
         case .optOut:
             operationsData = brokerProfileQueriesData.flatMap { $0.optOutJobData }
-        case .scan:
+        case .manualScan, .scheduledScan:
             operationsData = brokerProfileQueriesData.filter { $0.profileQuery.deprecated == false }.compactMap { $0.scanJobData }
         case .all:
             operationsData = brokerProfileQueriesData.flatMap { $0.operationsData }
@@ -144,7 +146,7 @@ class DataBrokerOperation: Operation, @unchecked Sendable {
         do {
             allBrokerProfileQueryData = try operationDependencies.database.fetchAllBrokerProfileQueryData()
         } catch {
-            os_log("DataBrokerOperationsCollection error: runOperation, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("DataBrokerOperationsCollection error: runOperation, error: \(error.localizedDescription, privacy: .public)")
             return
         }
 
@@ -154,11 +156,11 @@ class DataBrokerOperation: Operation, @unchecked Sendable {
                                                                           operationType: operationType,
                                                                           priorityDate: priorityDate)
 
-        os_log("filteredAndSortedOperationsData count: %{public}d for brokerID %{public}d", log: .dataBrokerProtection, filteredAndSortedOperationsData.count, dataBrokerID)
+        Logger.dataBrokerProtection.debug("filteredAndSortedOperationsData count: \(filteredAndSortedOperationsData.count, privacy: .public) for brokerID \(self.dataBrokerID, privacy: .public)")
 
         for operationData in filteredAndSortedOperationsData {
             if isCancelled {
-                os_log("Cancelled operation, returning...", log: .dataBrokerProtection)
+                Logger.dataBrokerProtection.debug("Cancelled operation, returning...")
                 return
             }
 
@@ -170,7 +172,7 @@ class DataBrokerOperation: Operation, @unchecked Sendable {
                 continue
             }
             do {
-                os_log("Running operation: %{public}@", log: .dataBrokerProtection, String(describing: operationData))
+                Logger.dataBrokerProtection.debug("Running operation: \(String(describing: operationData), privacy: .public)")
 
                 try await DataBrokerProfileQueryOperationManager().runOperation(operationData: operationData,
                                                                                 brokerProfileQueryData: brokerProfileData,
@@ -179,7 +181,7 @@ class DataBrokerOperation: Operation, @unchecked Sendable {
                                                                                 runner: operationDependencies.runnerProvider.getJobRunner(),
                                                                                 pixelHandler: operationDependencies.pixelHandler,
                                                                                 showWebView: showWebView,
-                                                                                isImmediateOperation: operationType == .scan,
+                                                                                isImmediateOperation: operationType == .manualScan,
                                                                                 userNotificationService: operationDependencies.userNotificationService,
                                                                                 shouldRunNextStep: { [weak self] in
                     guard let self = self else { return false }
@@ -187,10 +189,10 @@ class DataBrokerOperation: Operation, @unchecked Sendable {
                 })
 
                 let sleepInterval = operationDependencies.config.intervalBetweenSameBrokerOperations
-                os_log("Waiting...: %{public}f", log: .dataBrokerProtection, sleepInterval)
+                Logger.dataBrokerProtection.debug("Waiting...: \(sleepInterval, privacy: .public)")
                 try await Task.sleep(nanoseconds: UInt64(sleepInterval) * 1_000_000_000)
             } catch {
-                os_log("Error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
+                Logger.dataBrokerProtection.error("Error: \(error.localizedDescription, privacy: .public)")
 
                 errorDelegate?.dataBrokerOperationDidError(error, withBrokerName: brokerProfileQueriesData.first?.dataBroker.name)
             }
@@ -209,7 +211,7 @@ class DataBrokerOperation: Operation, @unchecked Sendable {
         didChangeValue(forKey: #keyPath(isExecuting))
         didChangeValue(forKey: #keyPath(isFinished))
 
-        os_log("Finished operation: %{public}@", log: .dataBrokerProtection, String(describing: id.uuidString))
+        Logger.dataBrokerProtection.debug("Finished operation: \(self.id.uuidString, privacy: .public)")
     }
 }
 // swiftlint:enable explicit_non_final_class

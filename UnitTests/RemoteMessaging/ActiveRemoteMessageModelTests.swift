@@ -31,7 +31,7 @@ final class ActiveRemoteMessageModelTests: XCTestCase {
         store = MockRemoteMessagingStore()
         message = RemoteMessageModel(
             id: "1",
-            content: .small(titleText: "test", descriptionText: "desc"), matchingRules: [], exclusionRules: []
+            content: .small(titleText: "test", descriptionText: "desc"), matchingRules: [], exclusionRules: [], isMetricsEnabled: false
         )
     }
 
@@ -55,18 +55,18 @@ final class ActiveRemoteMessageModelTests: XCTestCase {
         XCTAssertEqual(model.remoteMessage, message)
     }
 
-    func testWhenMessageIsDismissedThenItIsClearedFromModel() throws {
+    func testWhenMessageIsDismissedThenItIsClearedFromModel() async throws {
         store.scheduledRemoteMessage = message
         model = ActiveRemoteMessageModel(
             remoteMessagingStore: self.store,
             remoteMessagingAvailabilityProvider: MockRemoteMessagingAvailabilityProvider()
         )
-        model.dismissRemoteMessage(with: .close)
+        await model.dismissRemoteMessage(with: .close)
 
         XCTAssertNil(model.remoteMessage)
     }
 
-    func testWhenMessageIsMarkedAsShownThenShownFlagIsSavedInStore() throws {
+    func testWhenMessageIsMarkedAsShownThenShownFlagIsSavedInStore() async throws {
         store.scheduledRemoteMessage = message
         model = ActiveRemoteMessageModel(
             remoteMessagingStore: self.store,
@@ -74,7 +74,7 @@ final class ActiveRemoteMessageModelTests: XCTestCase {
         )
 
         XCTAssertFalse(store.hasShownRemoteMessage(withID: message.id))
-        model.markRemoteMessageAsShown()
+        await model.markRemoteMessageAsShown()
         XCTAssertTrue(store.hasShownRemoteMessage(withID: message.id))
     }
 }

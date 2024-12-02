@@ -33,6 +33,7 @@ extension Tab {
         case dataBrokerProtection
         case subscription(URL)
         case identityTheftRestoration(URL)
+        case releaseNotes
     }
     typealias TabContent = Tab.Content
 
@@ -69,26 +70,38 @@ extension TabContent {
         var navigationType: NavigationType {
             switch self {
             case .userEntered(_, downloadRequested: true):
-                    .custom(.userRequestedPageDownload)
+                .custom(.userRequestedPageDownload)
             case .userEntered:
-                    .custom(.userEnteredUrl)
+                .custom(.userEnteredUrl)
             case .pendingStateRestoration:
-                    .sessionRestoration
-            case .loadedByStateRestoration, .appOpenUrl, .historyEntry, .bookmark, .ui, .link, .webViewUpdated:
-                    .custom(.tabContentUpdate)
+                .sessionRestoration
+            case .loadedByStateRestoration:
+                .custom(.loadedByStateRestoration)
+            case .appOpenUrl:
+                .custom(.appOpenUrl)
+            case .historyEntry:
+                .custom(.historyEntry)
+            case .bookmark:
+                .custom(.bookmark)
+            case .ui:
+                .custom(.ui)
+            case .link:
+                .custom(.link)
+            case .webViewUpdated:
+                .custom(.webViewUpdated)
             case .reload:
-                    .reload
+                .reload
             }
         }
 
         var cachePolicy: URLRequest.CachePolicy {
             switch self {
             case .pendingStateRestoration, .historyEntry:
-                    .returnCacheDataElseLoad
+                .returnCacheDataElseLoad
             case .reload, .loadedByStateRestoration:
-                    .reloadIgnoringCacheData
+                .reloadIgnoringCacheData
             case .userEntered, .bookmark, .ui, .link, .appOpenUrl, .webViewUpdated:
-                    .useProtocolCachePolicy
+                .useProtocolCachePolicy
             }
         }
 
@@ -110,6 +123,8 @@ extension TabContent {
             return .bookmarks
         case URL.dataBrokerProtection:
             return .dataBrokerProtection
+        case URL.releaseNotes:
+            return .releaseNotes
         case URL.Invalid.aboutHome:
             guard let customURL = URL(string: StartupPreferences.shared.formattedCustomHomePageURL) else {
                 return .newtab
@@ -163,7 +178,7 @@ extension TabContent {
 
     var isDisplayable: Bool {
         switch self {
-        case .settings, .bookmarks, .dataBrokerProtection, .subscription, .identityTheftRestoration:
+        case .settings, .bookmarks, .dataBrokerProtection, .subscription, .identityTheftRestoration, .releaseNotes:
             return true
         default:
             return false
@@ -182,6 +197,8 @@ extension TabContent {
             return true
         case (.identityTheftRestoration, .identityTheftRestoration):
             return true
+        case (.releaseNotes, .releaseNotes):
+            return true
         default:
             return false
         }
@@ -194,6 +211,7 @@ extension TabContent {
         case .bookmarks: return UserText.tabBookmarksTitle
         case .onboardingDeprecated: return UserText.tabOnboardingTitle
         case .dataBrokerProtection: return UserText.tabDataBrokerProtectionTitle
+        case .releaseNotes: return UserText.releaseNotesTitle
         case .subscription, .identityTheftRestoration: return nil
         }
     }
@@ -230,6 +248,8 @@ extension TabContent {
             return URL.onboarding
         case .dataBrokerProtection:
             return .dataBrokerProtection
+        case .releaseNotes:
+            return .releaseNotes
         case .subscription(let url), .identityTheftRestoration(let url):
             return url
         case .none:
@@ -241,7 +261,7 @@ extension TabContent {
         switch self {
         case .url(_, _, source: let source):
             return source
-        case .newtab, .settings, .bookmarks, .onboardingDeprecated, .onboarding, .dataBrokerProtection,
+        case .newtab, .settings, .bookmarks, .onboardingDeprecated, .onboarding, .releaseNotes, .dataBrokerProtection,
                 .subscription, .identityTheftRestoration, .none:
             return .ui
         }
@@ -249,7 +269,7 @@ extension TabContent {
 
     var isUrl: Bool {
         switch self {
-        case .url, .subscription, .identityTheftRestoration:
+        case .url, .subscription, .identityTheftRestoration, .releaseNotes:
             return true
         default:
             return false
@@ -283,7 +303,7 @@ extension TabContent {
 
     var canBeDuplicated: Bool {
         switch self {
-        case .settings, .subscription, .identityTheftRestoration, .dataBrokerProtection:
+        case .settings, .subscription, .identityTheftRestoration, .dataBrokerProtection, .releaseNotes:
             return false
         default:
             return true
@@ -292,7 +312,7 @@ extension TabContent {
 
     var canBePinned: Bool {
         switch self {
-        case .subscription, .identityTheftRestoration, .dataBrokerProtection:
+        case .subscription, .identityTheftRestoration, .dataBrokerProtection, .releaseNotes:
             return false
         default:
             return isUrl
@@ -303,7 +323,7 @@ extension TabContent {
         switch self {
         case .newtab, .onboardingDeprecated, .onboarding, .none:
             return false
-        case .url, .settings, .bookmarks, .subscription, .identityTheftRestoration, .dataBrokerProtection:
+        case .url, .settings, .bookmarks, .subscription, .identityTheftRestoration, .dataBrokerProtection, .releaseNotes:
             return true
         }
     }

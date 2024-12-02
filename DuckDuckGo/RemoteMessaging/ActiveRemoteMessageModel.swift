@@ -22,6 +22,7 @@ import Common
 import Foundation
 import PixelKit
 import RemoteMessaging
+import os.log
 
 /**
  * This is used to feed a remote message to the home page view.
@@ -35,6 +36,7 @@ import RemoteMessaging
 final class ActiveRemoteMessageModel: ObservableObject {
 
     @Published var remoteMessage: RemoteMessageModel?
+    @Published var isViewOnScreen: Bool = false
 
     /**
      * A block that returns a remote messaging store, if it exists.
@@ -61,8 +63,6 @@ final class ActiveRemoteMessageModel: ObservableObject {
     ) {
         self.store = remoteMessagingStore
 
-        updateRemoteMessage()
-
         let messagesDidChangePublisher = NotificationCenter.default.publisher(for: RemoteMessagingStore.Notifications.remoteMessagesDidChange)
             .asVoid()
             .eraseToAnyPublisher()
@@ -86,17 +86,39 @@ final class ActiveRemoteMessageModel: ObservableObject {
             }
             .store(in: &cancellables)
 
+        let remoteMessagePublisher = $remoteMessage
+            .compactMap({ $0 })
+            .filter { [weak self] _ in self?.isViewOnScreen == true }
+            .asVoid()
+        let isViewOnScreenPublisher = $isViewOnScreen.removeDuplicates().filter({ $0 }).asVoid()
+        Publishers.Merge(remoteMessagePublisher, isViewOnScreenPublisher)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in
+                guard let self else {
+                    return
+                }
+                Task {
+                    await self.markRemoteMessageAsShown()
+                }
+            }
+            .store(in: &cancellables)
+
+        updateRemoteMessage()
     }
 
-    func dismissRemoteMessage(with action: RemoteMessageViewModel.ButtonAction?) {
+    @MainActor
+    func dismissRemoteMessage(with action: RemoteMessageViewModel.ButtonAction?) async {
         guard let remoteMessage else {
             return
         }
 
-        store()?.dismissRemoteMessage(withID: remoteMessage.id)
+        await store()?.dismissRemoteMessage(withID: remoteMessage.id)
         self.remoteMessage = nil
 
         let pixel: GeneralPixel? = {
+            guard remoteMessage.isMetricsEnabled else {
+                return nil
+            }
             switch action {
             case .close:
                 return GeneralPixel.remoteMessageDismissed
@@ -116,17 +138,25 @@ final class ActiveRemoteMessageModel: ObservableObject {
         }
     }
 
-    func markRemoteMessageAsShown() {
+    func markRemoteMessageAsShown() async {
         guard let remoteMessage, let store = store() else {
             return
         }
-        os_log("Remote message shown: %s", log: .remoteMessaging, type: .info, remoteMessage.id)
-        PixelKit.fire(GeneralPixel.remoteMessageShown, withAdditionalParameters: ["message": remoteMessage.id])
-        if !store.hasShownRemoteMessage(withID: remoteMessage.id) {
-            os_log("Remote message shown for first time: %s", log: .remoteMessaging, type: .info, remoteMessage.id)
-            PixelKit.fire(GeneralPixel.remoteMessageShownUnique, withAdditionalParameters: ["mesage": remoteMessage.id])
-            store.updateRemoteMessage(withID: remoteMessage.id, asShown: true)
+        Logger.remoteMessaging.info("Remote message shown: \(remoteMessage.id, privacy: .public)")
+        if remoteMessage.isMetricsEnabled {
+            PixelKit.fire(GeneralPixel.remoteMessageShown, withAdditionalParameters: ["message": remoteMessage.id])
         }
+        if !store.hasShownRemoteMessage(withID: remoteMessage.id) {
+            Logger.remoteMessaging.info("Remote message shown for first time: \(remoteMessage.id, privacy: .public)")
+            if remoteMessage.isMetricsEnabled {
+                PixelKit.fire(GeneralPixel.remoteMessageShownUnique, withAdditionalParameters: ["message": remoteMessage.id])
+            }
+            await store.updateRemoteMessage(withID: remoteMessage.id, asShown: true)
+        }
+    }
+
+    var shouldShowRemoteMessage: Bool {
+        remoteMessage?.content?.isSupported == true
     }
 
     private func updateRemoteMessage() {
@@ -134,4 +164,16 @@ final class ActiveRemoteMessageModel: ObservableObject {
     }
 
     private var cancellables = Set<AnyCancellable>()
+}
+
+extension RemoteMessageModelType {
+
+    var isSupported: Bool {
+        switch self {
+        case .promoSingleAction:
+            return false
+        default:
+            return true
+        }
+    }
 }

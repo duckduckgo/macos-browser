@@ -21,6 +21,7 @@ import Common
 import Foundation
 import Navigation
 import PixelKit
+import os.log
 
 @MainActor
 private func getFirstAvailableWebView() -> WKWebView? {
@@ -48,6 +49,7 @@ final class DownloadListCoordinator {
     private var downloadsCancellable: AnyCancellable?
     private var downloadTaskCancellables = [WebKitDownloadTask: AnyCancellable]()
     private var taskProgressCancellables = [WebKitDownloadTask: Set<AnyCancellable>]()
+    @MainActor private var fireWindowSessions = Set<FireWindowSessionRef>()
 
     private var filePresenters = [UUID: (destination: FilePresenter?, tempFile: FilePresenter?)]()
     private var filePresenterCancellables = [UUID: Set<AnyCancellable>]()
@@ -63,23 +65,17 @@ final class DownloadListCoordinator {
     }
     private let updatesSubject = PassthroughSubject<Update, Never>()
 
-    let progress = Progress()
-
-    private let getLogger: (() -> OSLog)
-    private var log: OSLog {
-        getLogger()
-    }
+    private let regularWindowDownloadProgress = Progress()
+    @MainActor private var fireWindowSessionsProgress = [FireWindowSessionRef: Progress]()
 
     init(store: DownloadListStoring = DownloadListStore(),
          downloadManager: FileDownloadManagerProtocol = FileDownloadManager.shared,
          clearItemsOlderThan clearDate: Date = .daysAgo(2),
-         webViewProvider: (() -> WKWebView?)? = nil,
-         log: @autoclosure @escaping (() -> OSLog) = .downloads) {
+         webViewProvider: (() -> WKWebView?)? = nil) {
 
         self.store = store
         self.downloadManager = downloadManager
         self.webViewProvider = webViewProvider
-        self.getLogger = log
 
         load(clearingItemsOlderThan: clearDate)
         subscribeToDownloadManager()
@@ -93,12 +89,12 @@ final class DownloadListCoordinator {
 
             switch result {
             case .success(let items):
-                os_log(.error, log: log, "coordinator: loaded \(items.count) items")
+                Logger.fileDownload.error("coordinator: loaded \(items.count) items")
                 for item in items {
                     do {
                         try add(item, ifModifiedLaterThan: clearDate)
                     } catch {
-                        os_log(.debug, log: self.log, "❗️ coordinator: drop item \(item.identifier): \(error)")
+                        Logger.fileDownload.debug("❗️ coordinator: drop item \(item.identifier): \(error)")
                         // remove item from db removing temp files if needed without sending a `.removed` update
                         cleanupTempFiles(for: item)
                         filePresenters[item.identifier] = nil
@@ -109,7 +105,7 @@ final class DownloadListCoordinator {
                 }
 
             case .failure(let error):
-                os_log(.error, log: log, "coordinator: loading failed: \(error)")
+                Logger.fileDownload.error("coordinator: loading failed: \(error)")
             }
         }
     }
@@ -156,9 +152,9 @@ final class DownloadListCoordinator {
         // locate destination file
         let destinationPresenterResult = Result<FilePresenter?, Error> {
             if let destinationFileBookmarkData = item.destinationFileBookmarkData {
-                try BookmarkFilePresenter(fileBookmarkData: destinationFileBookmarkData, logger: log)
+                try BookmarkFilePresenter(fileBookmarkData: destinationFileBookmarkData)
             } else if let destinationURL = item.destinationURL {
-                try BookmarkFilePresenter(url: destinationURL, logger: log)
+                try BookmarkFilePresenter(url: destinationURL)
             } else {
                 nil
             }
@@ -167,9 +163,9 @@ final class DownloadListCoordinator {
         // locate temp download file
         var tempFilePresenterResult = Result<FilePresenter?, Error> {
             if let tempFileBookmarkData = item.tempFileBookmarkData {
-                try BookmarkFilePresenter(fileBookmarkData: tempFileBookmarkData, logger: log)
+                try BookmarkFilePresenter(fileBookmarkData: tempFileBookmarkData)
             } else if let tempURL = item.tempURL {
-                try BookmarkFilePresenter(url: tempURL, logger: log)
+                try BookmarkFilePresenter(url: tempURL)
             } else {
                 nil
             }
@@ -213,13 +209,13 @@ final class DownloadListCoordinator {
         guard downloadTaskCancellables[task] == nil else { return }
 
         let item = item ?? DownloadListItem(task: task)
-        os_log(.debug, log: log, "coordinator: subscribing to \(item.identifier)")
+        Logger.fileDownload.debug("coordinator: subscribing to \(item.identifier)")
 
         self.downloadTaskCancellables[task] = task.$state
             .sink { [weak self] state in
                 DispatchQueue.main.async {
                     guard let self else { return }
-                    os_log(.debug, log: self.log, "coordinator: state updated \(item.identifier) ➡️ \(state)")
+                    Logger.fileDownload.debug("coordinator: state updated \(item.identifier.uuidString) ➡️ \(state.debugDescription)")
                     switch state {
                     case .initial:
                         // only add item when download starts, destination URL is set
@@ -236,12 +232,20 @@ final class DownloadListCoordinator {
                 }
             }
 
+        if let fireWindowSession = task.fireWindowSession,
+           case (inserted: true, _) = self.fireWindowSessions.insert(fireWindowSession) {
+            // remove inactive items when the burner window is closed
+            fireWindowSession.onBurn { [weak self] in
+                self?.clearBurnerWindowItems(for: fireWindowSession)
+            }
+        }
+
         self.subscribeToProgress(of: task)
     }
 
     @MainActor
     private func addItemIfNeededAndSubscribe(to presenters: (destination: FilePresenter, tempFile: FilePresenter?), for initialItem: DownloadListItem) {
-        os_log(.debug, log: log, "coordinator: add/update \(initialItem.identifier)")
+        Logger.fileDownload.debug("coordinator: add/update \(initialItem.identifier)")
         updateItem(withId: initialItem.identifier) { item in
             if item == nil { item = initialItem }
         }
@@ -259,14 +263,14 @@ final class DownloadListCoordinator {
         .scan((oldURL: nil, newURL: nil, fileBookmarkData: nil)) { (oldURL: $0.newURL, newURL: $1.0, fileBookmarkData: $1.1) }
         .sink { [weak self] oldURL, newURL, fileBookmarkData in
             DispatchQueue.main.asyncOrNow {
-                self?.updateItem(withId: item.identifier) { [id=item.identifier, log=(self?.log ?? .disabled)] item in
+                self?.updateItem(withId: item.identifier) { [id=item.identifier] item in
                     guard !Self.checkIfFileWasRemoved(oldURL: oldURL, newURL: newURL) else {
-                        os_log(.debug, log: log, "coordinator: destination file removed \(id)")
+                        Logger.fileDownload.debug("coordinator: destination file removed \(id)")
                         item = nil
                         return
                     }
 
-                    os_log(.debug, log: log, "⚠️coordinator: destination url updated \(id): \"\(newURL?.path ?? "<nil>")\"")
+                    Logger.fileDownload.debug("⚠️coordinator: destination url updated \(id): \"\(newURL?.path ?? "<nil>")\"")
                     item?.destinationURL = newURL
                     item?.destinationFileBookmarkData = fileBookmarkData
                     // keep the filename even when the destinationURL is nullified
@@ -288,14 +292,14 @@ final class DownloadListCoordinator {
         .scan((oldURL: nil, newURL: nil, fileBookmarkData: nil)) { (oldURL: $0.newURL, newURL: $1.0, fileBookmarkData: $1.1) }
         .sink { [weak self] oldURL, newURL, fileBookmarkData in
             DispatchQueue.main.asyncOrNow {
-                self?.updateItem(withId: item.identifier) { [id=item.identifier, log=(self?.log ?? .disabled)] item in
+                self?.updateItem(withId: item.identifier) { [id=item.identifier] item in
                     guard !Self.checkIfFileWasRemoved(oldURL: oldURL, newURL: newURL) else {
-                        os_log(.debug, log: log, "coordinator: temp file removed \(id)")
+                        Logger.fileDownload.debug("coordinator: temp file removed \(id)")
                         item = nil
                         return
                     }
 
-                    os_log(.debug, log: log, "coordinator: temp url updated \(id): \"\(newURL?.path ?? "<nil>")\"")
+                    Logger.fileDownload.debug("coordinator: temp url updated \(id): \"\(newURL?.path ?? "<nil>")\"")
                     item?.tempURL = newURL
                     item?.tempFileBookmarkData = fileBookmarkData
                 }
@@ -316,15 +320,28 @@ final class DownloadListCoordinator {
         return false
     }
 
+    @MainActor
+    func combinedDownloadProgressCreatingIfNeeded(for fireWindowSession: FireWindowSessionRef?) -> Progress {
+        guard let fireWindowSession else { return regularWindowDownloadProgress }
+
+        return fireWindowSessionsProgress[fireWindowSession] ?? {
+            let progress = Progress()
+            fireWindowSessionsProgress[fireWindowSession] = progress
+            return progress
+        }()
+    }
+
+    @MainActor
     private func subscribeToProgress(of task: WebKitDownloadTask) {
         dispatchPrecondition(condition: .onQueue(.main))
 
         var lastKnownProgress = (total: Int64(0), completed: Int64(0))
+        let progress = self.combinedDownloadProgressCreatingIfNeeded(for: task.fireWindowSession)
         task.progress.publisher(for: \.totalUnitCount)
             .combineLatest(task.progress.publisher(for: \.completedUnitCount))
             .throttle(for: 0.2, scheduler: DispatchQueue.main, latest: true)
-            .sink { [weak self] (total, completed) in
-                guard let self = self, total > 0, completed > 0 else { return }
+            .sink { (total, completed) in
+                guard total > 0, completed > 0 else { return }
 
                 progress.totalUnitCount += (total - lastKnownProgress.total)
                 progress.completedUnitCount += (completed - lastKnownProgress.completed)
@@ -335,7 +352,7 @@ final class DownloadListCoordinator {
         task.$state.receive(on: DispatchQueue.main)
             .sink { [weak self] state in
                 guard let self, state.isCompleted else { return }
-                os_log(.debug, log: log, "coordinator: unsubscribe from progress: \(task)")
+                Logger.fileDownload.debug("coordinator: unsubscribe from progress: \(task)")
 
                 progress.completedUnitCount -= lastKnownProgress.completed
                 progress.totalUnitCount -= lastKnownProgress.total
@@ -346,12 +363,14 @@ final class DownloadListCoordinator {
 
     @MainActor
     private func downloadTask(_ task: WebKitDownloadTask, withOriginalItem initialItem: DownloadListItem, completedWith result: Subscribers.Completion<FileDownloadError>) -> DownloadListItem? {
-        os_log(.debug, log: log, "coordinator: task did finish \(initialItem.identifier) \(task) with .\(result)")
+        Logger.fileDownload.debug("coordinator: task did finish \(initialItem.identifier.uuidString) \(task.debugDescription) with .\(String(describing: result))")
 
         self.downloadTaskCancellables[task] = nil
 
         return updateItem(withId: initialItem.identifier) { item in
-            if item?.isBurner ?? false {
+            if let fireWindowSession = (item ?? initialItem).fireWindowSession,
+               !fireWindowSession.isActive {
+                // remove finished downloads from the list instantly for downloads in already closed burner window
                 item = nil
                 return
             }
@@ -409,11 +428,11 @@ final class DownloadListCoordinator {
         let fm = FileManager.default
         do {
             try filePresenters[item.identifier]?.tempFile?.coordinateWrite(with: .forDeleting, using: { url in
-                os_log(.debug, log: self.log, "🦀 coordinator: removing \"\(url.path)\" (\(item.identifier))")
+                Logger.fileDownload.debug("🦀 coordinator: removing \"\(url.path)\" (\(item.identifier))")
                 try fm.removeItem(at: url)
             })
         } catch {
-            os_log(.error, log: self.log, "🦀 coordinator: failed to remove temp file: \(error)")
+            Logger.fileDownload.error("🦀 coordinator: failed to remove temp file: \(error)")
         }
 
         struct DestinationFileNotEmpty: Error {}
@@ -421,13 +440,13 @@ final class DownloadListCoordinator {
             guard let presenter = filePresenters[item.identifier]?.destination,
                   (try? presenter.url?.resourceValues(forKeys: [.fileSizeKey]).fileSize) == 0 else { throw DestinationFileNotEmpty() }
             try presenter.coordinateWrite(with: .forDeleting, using: { url in
-                os_log(.debug, log: self.log, "🦀 coordinator: removing \"\(url.path)\" (\(item.identifier))")
+                Logger.fileDownload.debug("🦀 coordinator: removing \"\(url.path)\" (\(item.identifier))")
                 try fm.removeItem(at: url)
             })
         } catch is DestinationFileNotEmpty {
             // don‘t delete non-empty destination file
         } catch {
-            os_log(.error, log: self.log, "🦀 coordinator: failed to remove destination file: \(error)")
+            Logger.fileDownload.error("🦀 coordinator: failed to remove destination file: \(error)")
         }
     }
 
@@ -436,13 +455,13 @@ final class DownloadListCoordinator {
             // Important: WebKitDownloadTask (as well as WKWebView) should be deallocated on the Main Thread
             dispatchPrecondition(condition: .onQueue(.main))
             withExtendedLifetime(webView) {
-                os_log(.debug, log: self.log, "coordinator: restarting \(item.identifier): \(download)")
+                Logger.fileDownload.debug("coordinator: restarting \(item.identifier.uuidString): \(String(describing: download))")
                 let destination: WebKitDownloadTask.DownloadDestination = if let presenters {
                     .resume(destination: presenters.destination, tempFile: presenters.tempFile)
                 } else {
                     .auto
                 }
-                let task = self.downloadManager.add(download, fromBurnerWindow: item.isBurner, destination: destination)
+                let task = self.downloadManager.add(download, fireWindowSession: item.fireWindowSession, destination: destination)
                 self.subscribeToDownloadTask(task, updating: item)
             }
         }
@@ -450,12 +469,17 @@ final class DownloadListCoordinator {
 
     // MARK: interface
 
-    var hasActiveDownloads: Bool {
-        !downloadTaskCancellables.isEmpty
+    func hasActiveDownloads(for fireWindowSession: FireWindowSessionRef?) -> Bool {
+        for task in downloadTaskCancellables.keys where task.fireWindowSession == fireWindowSession {
+            return true
+        }
+        return false
     }
 
-    var isEmpty: Bool {
-        items.isEmpty
+    func hasDownloads(for fireWindowSession: FireWindowSessionRef?) -> Bool {
+        return items.contains { _, item in
+            item.fireWindowSession == fireWindowSession
+        }
     }
 
     @MainActor
@@ -471,7 +495,7 @@ final class DownloadListCoordinator {
 
     @MainActor
     func restart(downloadWithIdentifier identifier: UUID) {
-        os_log(.debug, log: self.log, "coordinator: restart \(identifier)")
+        Logger.fileDownload.debug("coordinator: restart \(identifier)")
         guard let item = items[identifier], let webView = (webViewProvider ?? getFirstAvailableWebView)() else { return }
         do {
             guard var resumeData = item.error?.resumeData,
@@ -509,17 +533,28 @@ final class DownloadListCoordinator {
     }
 
     @MainActor
-    func cleanupInactiveDownloads() {
-        os_log(.debug, log: self.log, "coordinator: cleanupInactiveDownloads")
+    func cleanupInactiveDownloads(for fireWindowSession: FireWindowSessionRef?) {
+        Logger.fileDownload.debug("coordinator: cleanupInactiveDownloads")
 
-        for (id, item) in self.items where item.progress == nil {
+        for (id, item) in self.items where item.fireWindowSession == fireWindowSession && item.progress == nil {
             remove(downloadWithIdentifier: id)
         }
     }
 
     @MainActor
+    private func clearBurnerWindowItems(for fireWindowSession: FireWindowSessionRef) {
+        Logger.fileDownload.debug("coordinator: cleanup Fire Window Downloads")
+
+        for (id, item) in self.items where item.fireWindowSession == fireWindowSession {
+            item.progress?.cancel()
+            remove(downloadWithIdentifier: id)
+        }
+        fireWindowSessionsProgress[fireWindowSession] = nil
+    }
+
+    @MainActor
     func cleanupInactiveDownloads(for baseDomains: Set<String>, tld: TLD) {
-        os_log(.debug, log: self.log, "coordinator: cleanupInactiveDownloads for \(baseDomains)")
+        Logger.fileDownload.debug("coordinator: cleanupInactiveDownloads for \(baseDomains)")
 
         for (id, item) in self.items where item.progress == nil {
             let websiteUrlBaseDomain = tld.eTLDplus1(item.websiteURL?.host) ?? ""
@@ -533,7 +568,7 @@ final class DownloadListCoordinator {
 
     @MainActor
     func remove(downloadWithIdentifier identifier: UUID) {
-        os_log(.debug, log: self.log, "coordinator: remove \(identifier)")
+        Logger.fileDownload.debug("coordinator: remove \(identifier)")
 
         updateItem(withId: identifier) { item in
             item = nil
@@ -542,7 +577,7 @@ final class DownloadListCoordinator {
 
     @MainActor
     func cancel(downloadWithIdentifier identifier: UUID) {
-        os_log(.debug, log: self.log, "coordinator: cancel \(identifier)")
+        Logger.fileDownload.debug("coordinator: cancel \(identifier)")
 
         guard let item = self.items[identifier] else {
             assertionFailure("Item with identifier \(identifier) not found")
@@ -568,7 +603,7 @@ private extension DownloadListItem {
                   websiteURL: task.originalRequest?.mainDocumentURL,
                   fileName: "",
                   progress: task.progress,
-                  isBurner: task.isBurner,
+                  fireWindowSession: task.fireWindowSession,
                   error: nil)
     }
 

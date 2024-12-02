@@ -46,12 +46,19 @@ enum Preferences {
 
         @ObservedObject var model: PreferencesSidebarModel
 
+        let addressBarModel: HomePage.Models.AddressBarModel
         var subscriptionModel: PreferencesSubscriptionModel?
         let subscriptionManager: SubscriptionManager
         let subscriptionUIHandler: SubscriptionUIHandling
 
-        init(model: PreferencesSidebarModel, subscriptionManager: SubscriptionManager, subscriptionUIHandler: SubscriptionUIHandling) {
+        init(
+            model: PreferencesSidebarModel,
+            addressBarModel: HomePage.Models.AddressBarModel,
+            subscriptionManager: SubscriptionManager,
+            subscriptionUIHandler: SubscriptionUIHandling
+        ) {
             self.model = model
+            self.addressBarModel = addressBarModel
             self.subscriptionManager = subscriptionManager
             self.subscriptionUIHandler = subscriptionUIHandler
             self.subscriptionModel = makeSubscriptionViewModel()
@@ -94,17 +101,19 @@ enum Preferences {
                                 searchModel: SearchPreferences.shared,
                                 tabsModel: TabsPreferences.shared,
                                 dataClearingModel: DataClearingPreferences.shared,
+                                phishingDetectionModel: PhishingDetectionPreferences.shared,
                                 dockCustomizer: DockCustomizer())
                 case .sync:
                     SyncView()
                 case .appearance:
-                    AppearanceView(model: .shared)
+                    AppearanceView(model: .shared, addressBarModel: addressBarModel)
                 case .dataClearing:
                     DataClearingView(model: DataClearingPreferences.shared)
                 case .vpn:
                     VPNView(model: VPNPreferencesModel(), status: model.vpnProtectionStatus())
                 case .subscription:
-                    SubscriptionUI.PreferencesSubscriptionView(model: subscriptionModel!)
+                    SubscriptionUI.PreferencesSubscriptionView(model: subscriptionModel!,
+                                                               subscriptionFeatureAvailability: DefaultSubscriptionFeatureAvailability())
                 case .autofill:
                     AutofillView(model: AutofillPreferencesModel())
                 case .accessibility:
@@ -115,7 +124,9 @@ enum Preferences {
                     // Opens a new tab
                     Spacer()
                 case .about:
-                    AboutView(model: AboutModel())
+                    AboutView(model: AboutPreferences.shared)
+                case .aiChat:
+                    AIChatView(model: AIChatPreferences.shared)
                 }
             }
             .frame(maxWidth: Const.paneContentWidth, maxHeight: .infinity, alignment: .topLeading)
@@ -136,6 +147,10 @@ enum Preferences {
                     case .openVPN:
                         PixelKit.fire(PrivacyProPixel.privacyProVPNSettings)
                         NotificationCenter.default.post(name: .ToggleNetworkProtectionInMainWindow, object: self, userInfo: nil)
+                    case .openFeedback:
+                        NotificationCenter.default.post(name: .OpenUnifiedFeedbackForm,
+                                                        object: self,
+                                                        userInfo: UnifiedFeedbackSource.userInfo(source: .ppro))
                     case .openDB:
                         PixelKit.fire(PrivacyProPixel.privacyProPersonalInformationRemovalSettings)
                         WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
@@ -146,11 +161,11 @@ enum Preferences {
                     case .iHaveASubscriptionClick:
                         PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseClick)
                     case .activateAddEmailClick:
-                        PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseEmailStart, frequency: .dailyAndCount)
+                        PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseEmailStart, frequency: .legacyDailyAndCount)
                     case .postSubscriptionAddEmailClick:
                         PixelKit.fire(PrivacyProPixel.privacyProWelcomeAddDevice, frequency: .unique)
                     case .restorePurchaseStoreClick:
-                        PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreStart, frequency: .dailyAndCount)
+                        PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreStart, frequency: .legacyDailyAndCount)
                     case .addDeviceEnterEmail:
                         PixelKit.fire(PrivacyProPixel.privacyProAddDeviceEnterEmail)
                     case .activeSubscriptionSettingsClick:
@@ -186,7 +201,8 @@ enum Preferences {
             return PreferencesSubscriptionModel(openURLHandler: openURL,
                                                 userEventHandler: handleUIEvent,
                                                 sheetActionHandler: sheetActionHandler,
-                                                subscriptionManager: subscriptionManager)
+                                                subscriptionManager: subscriptionManager,
+                                                featureFlagger: NSApp.delegateTyped.featureFlagger)
         }
     }
 }

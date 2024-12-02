@@ -18,42 +18,71 @@
 
 import Foundation
 import Common
+import os.log
+
+public extension Notification.Name {
+    /// Notification posted when a profile is saved.
+    static let pirProfileSaved = Notification.Name("pirProfileSaved")
+}
+
+/// A protocol that defines the behavior for posting a notification when a profile is saved, if permitted by certain conditions.
+public protocol DBPProfileSavedNotifier {
+
+    /// Posts the "Profile Saved" notification if certain conditions allow it.
+    /// This method checks whether the notification can be posted, and if so, it triggers the notification.
+    func postProfileSavedNotificationIfPermitted()
+}
 
 public protocol DataBrokerProtectionDataManaging {
     var cache: InMemoryDataCache { get }
     var delegate: DataBrokerProtectionDataManagerDelegate? { get set }
 
-    init(pixelHandler: EventMapping<DataBrokerProtectionPixels>, fakeBrokerFlag: DataBrokerDebugFlag)
+    init(database: DataBrokerProtectionRepository?,
+         profileSavedNotifier: DBPProfileSavedNotifier?,
+         pixelHandler: EventMapping<DataBrokerProtectionPixels>,
+         fakeBrokerFlag: DataBrokerDebugFlag)
     func saveProfile(_ profile: DataBrokerProtectionProfile) async throws
     func fetchProfile() throws -> DataBrokerProtectionProfile?
     func prepareProfileCache() throws
     func fetchBrokerProfileQueryData(ignoresCache: Bool) throws -> [BrokerProfileQueryData]
     func prepareBrokerProfileQueryDataCache() throws
     func hasMatches() throws -> Bool
+    /// Returns the total number of matches and brokers with matches.
+    func matchesFoundAndBrokersCount() throws -> (matchCount: Int, brokerCount: Int)
     func profileQueriesCount() throws -> Int
 }
 
 public protocol DataBrokerProtectionDataManagerDelegate: AnyObject {
     func dataBrokerProtectionDataManagerDidUpdateData()
     func dataBrokerProtectionDataManagerDidDeleteData()
+    func dataBrokerProtectionDataManagerWillOpenSendFeedbackForm()
+    func isAuthenticatedUser() -> Bool
 }
 
 public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
+
+    private let profileSavedNotifier: DBPProfileSavedNotifier?
+
     public let cache = InMemoryDataCache()
 
     public weak var delegate: DataBrokerProtectionDataManagerDelegate?
 
     internal let database: DataBrokerProtectionRepository
 
-    required public init(pixelHandler: EventMapping<DataBrokerProtectionPixels>, fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker()) {
-        self.database = DataBrokerProtectionDatabase(fakeBrokerFlag: fakeBrokerFlag, pixelHandler: pixelHandler)
+    required public init(database: DataBrokerProtectionRepository? = nil,
+                         profileSavedNotifier: DBPProfileSavedNotifier? = nil,
+                         pixelHandler: EventMapping<DataBrokerProtectionPixels>,
+                         fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker()) {
+        self.database = database ?? DataBrokerProtectionDatabase(fakeBrokerFlag: fakeBrokerFlag, pixelHandler: pixelHandler)
 
+        self.profileSavedNotifier = profileSavedNotifier
         cache.delegate = self
     }
 
     public func saveProfile(_ profile: DataBrokerProtectionProfile) async throws {
         do {
             try await database.save(profile)
+            profileSavedNotifier?.postProfileSavedNotificationIfPermitted()
         } catch {
             // We should still invalidate the cache if the save fails
             cache.invalidate()
@@ -65,7 +94,7 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
 
     public func fetchProfile() throws -> DataBrokerProtectionProfile? {
         if cache.profile != nil {
-            os_log("Returning cached profile", log: .dataBrokerProtection)
+            Logger.dataBrokerProtection.debug("Returning cached profile")
             return cache.profile
         }
 
@@ -85,7 +114,7 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
             cache.profile = profile
             return profile
         } else {
-            os_log("No profile found", log: .dataBrokerProtection)
+            Logger.dataBrokerProtection.debug("No profile found")
             return nil
         }
     }
@@ -94,13 +123,13 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
         if let profile = try database.fetchProfile() {
             cache.profile = profile
         } else {
-            os_log("No profile found", log: .dataBrokerProtection)
+            Logger.dataBrokerProtection.debug("No profile found")
         }
     }
 
     public func fetchBrokerProfileQueryData(ignoresCache: Bool = false) throws -> [BrokerProfileQueryData] {
         if !ignoresCache, !cache.brokerProfileQueryData.isEmpty {
-            os_log("Returning cached brokerProfileQueryData", log: .dataBrokerProtection)
+            Logger.dataBrokerProtection.debug("Returning cached brokerProfileQueryData")
             return cache.brokerProfileQueryData
         }
 
@@ -116,9 +145,54 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
     public func hasMatches() throws -> Bool {
         return try database.hasMatches()
     }
+
+    /// Fetches all broker profile query data from the database and calculates the total number of matches and brokers with matches.
+    ///
+    /// A match is defined as: An extracted profile associated with the broker profile query data.
+    ///
+    /// Additionally, a broker is counted if it has at least one match (either an extracted profile).
+    ///
+    /// - Returns: A tuple containing:
+    ///   - `matchCount`: The total number of matches found (extracted profiles).
+    ///   - `brokerCount`: The number of brokers that have at least one match.
+    /// - Throws: An error if fetching broker profile query data from the database fails.
+    public func matchesFoundAndBrokersCount() throws -> (matchCount: Int, brokerCount: Int) {
+        let queryData = try database.fetchAllBrokerProfileQueryData()
+        return matchesAndBrokersCount(forQueryData: queryData)
+    }
+}
+
+private extension DataBrokerProtectionDataManager {
+
+    /// Calculates the number of profile matches and the unique broker count based on the provided query data.
+    ///
+    /// This method filters out deprecated profile queries from the input `queryData`, generates the profile matches,
+    /// and then calculates two counts:
+    /// - The total number of profile matches (`matchCount`).
+    /// - The number of unique data brokers involved in those matches (`brokerCount`).
+    ///
+    /// The method groups the profile matches by data broker to ensure that each broker is counted only once.
+    ///
+    /// - Parameter queryData: An array of `BrokerProfileQueryData` that contains data brokers and profile queries.
+    /// - Returns: A tuple containing:
+    ///   - `matchCount`: The total number of profile matches after filtering out deprecated queries.
+    ///   - `brokerCount`: The number of unique data brokers involved in the profile matches.
+    func matchesAndBrokersCount(forQueryData queryData: [BrokerProfileQueryData]) -> (matchCount: Int, brokerCount: Int) {
+        let withoutDeprecated = queryData.filter { !$0.profileQuery.deprecated }
+        let profileMatches = DBPUIDataBrokerProfileMatch.profileMatches(from: withoutDeprecated)
+
+        // Calculate the total number of profile matches.
+        let matchCount = profileMatches.count
+
+        // Calculate the number of unique brokers by grouping the matches by data broker.
+        let brokerCount = Dictionary(grouping: profileMatches, by: { $0.dataBroker }).values.count
+
+        return (matchCount, brokerCount)
+    }
 }
 
 extension DataBrokerProtectionDataManager: InMemoryDataCacheDelegate {
+
     public func saveCachedProfileToDatabase(_ profile: DataBrokerProtectionProfile) async throws {
         try await saveProfile(profile)
 
@@ -131,11 +205,21 @@ extension DataBrokerProtectionDataManager: InMemoryDataCacheDelegate {
 
         delegate?.dataBrokerProtectionDataManagerDidDeleteData()
     }
+
+    public func willOpenSendFeedbackForm() {
+        delegate?.dataBrokerProtectionDataManagerWillOpenSendFeedbackForm()
+    }
+
+    public func isAuthenticatedUser() -> Bool {
+        delegate?.isAuthenticatedUser() ?? true
+    }
 }
 
 public protocol InMemoryDataCacheDelegate: AnyObject {
     func saveCachedProfileToDatabase(_ profile: DataBrokerProtectionProfile) async throws
     func removeAllData() throws
+    func willOpenSendFeedbackForm()
+    func isAuthenticatedUser() -> Bool
 }
 
 public final class InMemoryDataCache {
@@ -157,6 +241,12 @@ public final class InMemoryDataCache {
 }
 
 extension InMemoryDataCache: DBPUICommunicationDelegate {
+
+    func getHandshakeUserData() -> DBPUIHandshakeUserData? {
+        let isAuthenticatedUser = delegate?.isAuthenticatedUser() ?? true
+        return DBPUIHandshakeUserData(isAuthenticatedUser: isAuthenticatedUser)
+    }
+
     func saveProfile() async throws {
         guard let profile = profile else { return }
         try await delegate?.saveCachedProfileToDatabase(profile)
@@ -319,10 +409,10 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
         // 2. We map the brokers to the UI model
             .flatMap { dataBroker -> [DBPUIDataBroker] in
                 var result: [DBPUIDataBroker] = []
-                result.append(DBPUIDataBroker(name: dataBroker.name, url: dataBroker.url))
+                result.append(DBPUIDataBroker(name: dataBroker.name, url: dataBroker.url, parentURL: dataBroker.parent, optOutUrl: dataBroker.optOutUrl))
 
                 for mirrorSite in dataBroker.mirrorSites {
-                    result.append(DBPUIDataBroker(name: mirrorSite.name, url: mirrorSite.url))
+                    result.append(DBPUIDataBroker(name: mirrorSite.name, url: mirrorSite.url, parentURL: dataBroker.parent, optOutUrl: dataBroker.optOutUrl))
                 }
                 return result
             }
@@ -338,5 +428,9 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
         let metadata = await scanDelegate?.getBackgroundAgentMetadata()
 
         return mapper.mapToUIDebugMetadata(metadata: metadata, brokerProfileQueryData: brokerProfileQueryData)
+    }
+
+    func openSendFeedbackModal() async {
+        delegate?.willOpenSendFeedbackForm()
     }
 }

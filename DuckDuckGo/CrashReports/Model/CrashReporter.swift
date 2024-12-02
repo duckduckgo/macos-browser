@@ -24,7 +24,7 @@ import PixelKit
 final class CrashReporter {
 
     private let reader = CrashReportReader()
-    private lazy var sender = CrashReportSender(platform: .macOS, log: .default)
+    private lazy var sender = CrashReportSender(platform: .macOS)
     private lazy var promptPresenter = CrashReportPromptPresenter()
 
     @UserDefaultsWrapper(key: .lastCrashReportCheckDate, defaultValue: nil)

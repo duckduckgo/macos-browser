@@ -12,4 +12,5 @@
 #ifndef APPSTORE
 #import "BWEncryption.h"
 #import "PFMoveApplication.h"
+#import "Sparkle/SPUStandardUserDriver+Private.h"
 #endif

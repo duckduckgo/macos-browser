@@ -35,8 +35,8 @@ extension HomePage.Views {
                     }
                     Spacer()
                 }
-                .padding(.vertical, -25)
-                .padding(.leading, 1)
+                .padding(.top, -24)
+                .padding(.leading, 2)
                 VStack(spacing: 20) {
                     if #available(macOS 12.0, *) {
                         LazyVStack(spacing: 4) {
@@ -77,17 +77,15 @@ extension HomePage.Views {
                     }
                 }
 
-                MoreOrLess(isExpanded: $model.shouldShowAllFeatures)
+                HomePage.Views.MoreOrLess(isExpanded: $model.shouldShowAllFeatures)
                     .padding(.top, -3)
-                    .visibility(model.isMoreOrLessButtonNeeded ? .visible : .invisible)
+                    .visibility(model.isMoreOrLessButtonNeeded ? .visible : .gone)
             }
         }
 
         struct FeatureCard: View {
 
             @EnvironmentObject var model: HomePage.Models.ContinueSetUpModel
-
-            @State var isHovering = false
 
             private let featureType: HomePage.Models.FeatureType
 
@@ -101,7 +99,7 @@ extension HomePage.Views {
                         .frame(width: 24, height: 24)
                 }
                 ZStack {
-                    CardTemplate(title: featureType.title, summary: featureType.summary, actionText: featureType.action, confirmationText: featureType.confirmation, icon: icon, width: model.itemWidth, height: model.itemHeight, action: { model.performAction(for: featureType) })
+                    HomePage.Views.ContinueSetUpView.CardTemplate(title: featureType.title, summary: featureType.summary, actionText: featureType.action, confirmationText: featureType.confirmation, icon: icon, width: model.itemWidth, height: model.itemHeight, action: { model.performAction(for: featureType) })
                         .contextMenu(ContextMenu(menuItems: {
                             Button(featureType.action, action: { model.performAction(for: featureType) })
                             Divider()
@@ -110,17 +108,13 @@ extension HomePage.Views {
                     HStack {
                         Spacer()
                         VStack {
-                            RemoveIemButton(icon: .close) {
+                            HomePage.Views.CloseButton(icon: .close, size: 16) {
                                 model.removeItem(for: featureType)
                             }
-                            .visibility(isHovering ? .visible : .gone)
                             Spacer()
                         }
                     }
                     .padding(6)
-                }
-                .onHover { isHovering in
-                    self.isHovering = isHovering
                 }
                 .onAppear {
                     if featureType == .dock {
@@ -145,13 +139,16 @@ extension HomePage.Views {
 
             @State var isHovering = false
             @State var isClicked = false
+            @EnvironmentObject var settingsModel: HomePage.Models.SettingsModel
 
             var body: some View {
                 ZStack(alignment: .center) {
+
                     RoundedRectangle(cornerRadius: 12)
                         .stroke(Color.homeFavoritesGhost, style: StrokeStyle(lineWidth: 1.0))
-                        .background(Color.homepageCardBackground)
+                        .homePageViewBackground(settingsModel.customBackground)
                         .cornerRadius(12)
+
                     ZStack {
                         VStack(spacing: 18) {
                             icon
@@ -259,28 +256,6 @@ extension HomePage.Views {
             }
         }
 
-        struct RemoveIemButton: View {
-            let icon: NSImage
-            let action: () -> Void
-            let foreGroundColor: Color = .homeFavoritesBackground
-            let foregroundColorOnHover: Color = .homeFavoritesHover
-
-            @State var isHovering = false
-
-            var body: some View {
-                ZStack {
-                    Circle()
-                        .fill(isHovering ? foregroundColorOnHover : foreGroundColor)
-                        .frame(width: 16, height: 16)
-                    IconButton(icon: icon, action: action)
-                        .foregroundColor(.gray)
-                }
-                .onHover { isHovering in
-                    self.isHovering = isHovering
-                }
-            }
-        }
-
         struct NextStepsView: View {
             let text = UserText.newTabSetUpSectionTitle
             let textWidth: CGFloat
@@ -309,6 +284,15 @@ extension HomePage.Views {
     }
 }
 
-#Preview {
+@available(macOS 14.0, *)
+#Preview(traits: .fixedLayout(width: 600, height: 700)) {
     HomePage.Views.ContinueSetUpView()
+        .environmentObject(HomePage.Models.SettingsModel())
+        .environmentObject(HomePage.Models.ContinueSetUpModel(
+            defaultBrowserProvider: SystemDefaultBrowserProvider(),
+            dockCustomizer: DockCustomizer(),
+            dataImportProvider: BookmarksAndPasswordsImportStatusProvider(),
+            tabCollectionViewModel: TabCollectionViewModel(),
+            duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor()
+        ))
 }

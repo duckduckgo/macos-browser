@@ -20,16 +20,28 @@ import BrowserServicesKit
 import Combine
 import Common
 import WebKit
+import UserScript
+import os.log
 
 extension WKWebViewConfiguration {
 
+    static var sharedVisitedLinkStore: WKVisitedLinkStoreWrapper?
+
     @MainActor
-    func applyStandardConfiguration(contentBlocking: some ContentBlockingProtocol, burnerMode: BurnerMode) {
+    func applyStandardConfiguration(contentBlocking: some ContentBlockingProtocol, burnerMode: BurnerMode, earlyAccessHandlers: [UserScript] = []) {
         if case .burner(let websiteDataStore) = burnerMode {
             self.websiteDataStore = websiteDataStore
             // Fire Window: disable audio/video item info reporting to macOS Control Center / Lock Screen
             preferences[.mediaSessionEnabled] = false
+
+        } else if let sharedVisitedLinkStore = Self.sharedVisitedLinkStore {
+            // share visited link store between regular tabs
+            self.visitedLinkStore = sharedVisitedLinkStore
+        } else {
+            // set shared object if not set yet
+            Self.sharedVisitedLinkStore = self.visitedLinkStore
         }
+
         allowsAirPlayForMediaPlayback = true
         if #available(macOS 12.3, *) {
             preferences.isElementFullscreenEnabled = true
@@ -48,18 +60,22 @@ extension WKWebViewConfiguration {
 
         if SupportedOSChecker.isCurrentOSReceivingUpdates {
             if urlSchemeHandler(forURLScheme: URL.NavigationalScheme.duck.rawValue) == nil {
-                setURLSchemeHandler(DuckURLSchemeHandler(), forURLScheme: URL.NavigationalScheme.duck.rawValue)
+                setURLSchemeHandler(
+                    DuckURLSchemeHandler(featureFlagger: NSApp.delegateTyped.featureFlagger),
+                    forURLScheme: URL.NavigationalScheme.duck.rawValue
+                )
             }
         }
 
         let userContentController = UserContentController(assetsPublisher: contentBlocking.contentBlockingAssetsPublisher,
-                                                          privacyConfigurationManager: contentBlocking.privacyConfigurationManager)
+                                                          privacyConfigurationManager: contentBlocking.privacyConfigurationManager,
+                                                          earlyAccessHandlers: earlyAccessHandlers)
 
         self.userContentController = userContentController
         self.processPool.geolocationProvider = GeolocationProvider(processPool: self.processPool)
 
         _=NSPopover.swizzleShowRelativeToRectOnce
-     }
+    }
 
 }
 
@@ -106,7 +122,7 @@ extension NSPopover {
     // https://app.asana.com/0/1201037661562251/1206407295280737/f
     @objc(swizzled_showRelativeToRect:ofView:preferredEdge:)
     private dynamic func swizzled_show(relativeTo positioningRect: NSRect, of positioningView: NSView, preferredEdge: NSRectEdge) {
-        if positioningView.superview == nil {
+        if positioningView.window == nil {
             var observer: Cancellable?
             observer = positioningView.observe(\.window) { positioningView, _ in
                 if positioningView.window != nil {
@@ -118,7 +134,7 @@ extension NSPopover {
                 observer?.cancel()
             }
 
-            os_log(.error, "trying to present \(self) from \(positioningView) not in view hierarchy")
+            Logger.general.error("trying to present \(self) from \(positioningView) not in view hierarchy")
             return
         }
         self.swizzled_show(relativeTo: positioningRect, of: positioningView, preferredEdge: preferredEdge)

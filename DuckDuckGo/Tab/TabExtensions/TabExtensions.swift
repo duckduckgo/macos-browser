@@ -22,6 +22,7 @@ import ContentBlocking
 import Foundation
 import PrivacyDashboard
 import History
+import PhishingDetection
 
 /**
  Tab Extensions should conform to TabExtension protocol
@@ -72,6 +73,8 @@ protocol TabExtensionDependencies {
     var duckPlayer: DuckPlayer { get }
     var certificateTrustEvaluator: CertificateTrustEvaluating { get }
     var tunnelController: NetworkProtectionIPCTunnelController? { get }
+    var phishingDetector: PhishingSiteDetecting { get }
+    var phishingStateManager: PhishingTabStateManaging { get }
 }
 
 // swiftlint:disable:next large_tuple
@@ -127,7 +130,8 @@ extension TabExtensionsBuilder {
                                          autoconsentUserScriptPublisher: userScripts.map(\.?.autoconsentUserScript),
                                          didUpgradeToHttpsPublisher: httpsUpgrade.didUpgradeToHttpsPublisher,
                                          trackersPublisher: contentBlocking.trackersPublisher,
-                                         webViewPublisher: args.webViewFuture)
+                                         webViewPublisher: args.webViewFuture,
+                                         phishingStateManager: dependencies.phishingStateManager)
         }
 
         add {
@@ -182,23 +186,45 @@ extension TabExtensionsBuilder {
                                 titlePublisher: args.titlePublisher)
         }
         add {
+            PrivacyStatsTabExtension(trackersPublisher: contentBlocking.trackersPublisher)
+        }
+        add {
             ExternalAppSchemeHandler(workspace: dependencies.workspace, permissionModel: args.permissionModel, contentPublisher: args.contentPublisher)
         }
         add {
             NavigationHotkeyHandler(isTabPinned: args.isTabPinned, isBurner: args.isTabBurner)
         }
 
+        let duckPlayerOnboardingDecider = DefaultDuckPlayerOnboardingDecider()
         add {
             DuckPlayerTabExtension(duckPlayer: dependencies.duckPlayer,
                                    isBurner: args.isTabBurner,
                                    scriptsPublisher: userScripts.compactMap { $0 },
-                                   webViewPublisher: args.webViewFuture)
+                                   webViewPublisher: args.webViewFuture,
+                                   onboardingDecider: duckPlayerOnboardingDecider)
         }
 
         add {
-            SSLErrorPageTabExtension(webViewPublisher: args.webViewFuture,
-                                  scriptsPublisher: userScripts.compactMap { $0 })
+            AIChatOnboardingTabExtension(webViewPublisher: args.webViewFuture,
+                                         notificationCenter: .default,
+                                         remoteSettings: AIChatRemoteSettings())
         }
+
+        add {
+            SpecialErrorPageTabExtension(webViewPublisher: args.webViewFuture,
+                                  scriptsPublisher: userScripts.compactMap { $0 },
+                                  phishingDetector: dependencies.phishingDetector,
+                                  phishingStateManager: dependencies.phishingStateManager)
+        }
+#if SPARKLE
+        add {
+            ReleaseNotesTabExtension(scriptsPublisher: userScripts.compactMap { $0 }, webViewPublisher: args.webViewFuture)
+        }
+#else
+        add {
+            ReleaseNotesTabExtension()
+        }
+#endif
 
         add {
             OnboardingTabExtension()

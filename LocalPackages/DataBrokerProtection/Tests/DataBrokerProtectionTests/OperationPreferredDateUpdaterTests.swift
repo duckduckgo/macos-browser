@@ -41,8 +41,10 @@ final class OperationPreferredDateUpdaterTests: XCTestCase {
             schedulingConfig: DataBrokerScheduleConfig(
                 retryError: 1,
                 confirmOptOutScan: confirmOptOutScanHours,
-                maintenanceScan: 1
-            )
+                maintenanceScan: 1,
+                maxAttempts: -1
+            ),
+            optOutUrl: ""
         )
         databaseMock.childBrokers = [childBroker]
 
@@ -60,5 +62,57 @@ final class OperationPreferredDateUpdaterTests: XCTestCase {
         XCTAssertNoThrow(try sut.updateChildrenBrokerForParentBroker(.mock, profileQueryId: 1))
 
         XCTAssertFalse(databaseMock.wasDatabaseCalled)
+    }
+
+    func testWhenOptOutSubmitted_thenSubmittedSuccessfullyDateIsUpdated() {
+        // Given
+        let extractedProfileId: Int64 = 1
+        let brokerId: Int64 = 1
+        let profileQueryId: Int64 = 11
+        let createdDate = Date()
+        let submittedDate = Date()
+
+        let lastHistoryEventToReturn = HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested, date: submittedDate)
+        databaseMock.lastHistoryEventToReturn = lastHistoryEventToReturn
+
+        let scanJobData = ScanJobData(brokerId: brokerId, profileQueryId: profileQueryId, historyEvents: [lastHistoryEventToReturn])
+        let optOutJobData = OptOutJobData(brokerId: brokerId, profileQueryId: profileQueryId, createdDate: createdDate, historyEvents: [lastHistoryEventToReturn], attemptCount: 0, extractedProfile: .mockWithoutRemovedDate)
+        databaseMock.brokerProfileQueryDataToReturn = [
+            BrokerProfileQueryData(dataBroker: .mock, profileQuery: .mock, scanJobData: scanJobData, optOutJobData: [optOutJobData])
+        ]
+        let sut = OperationPreferredDateUpdaterUseCase(database: databaseMock)
+
+        // When
+        XCTAssertNoThrow(try sut.updateOperationDataDates(origin: .optOut, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId, schedulingConfig: DataBrokerScheduleConfig.mock))
+
+        // Then
+        XCTAssertTrue(databaseMock.wasUpdateSubmittedSuccessfullyDateForOptOutCalled)
+        let date = databaseMock.submittedSuccessfullyDate!
+        XCTAssertTrue(date >= submittedDate)
+    }
+
+    func testWhenSubittedSuccessfullyDateIsAlreadySaved_thenSubittedSuccessfullyDateDoesNotChange() {
+        // Given
+        let extractedProfileId: Int64 = 1
+        let brokerId: Int64 = 1
+        let profileQueryId: Int64 = 11
+        let createdDate = Date()
+        let submittedDate = Date()
+
+        let lastHistoryEventToReturn = HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested, date: submittedDate)
+        databaseMock.lastHistoryEventToReturn = lastHistoryEventToReturn
+
+        let scanJobData = ScanJobData(brokerId: brokerId, profileQueryId: profileQueryId, historyEvents: [lastHistoryEventToReturn])
+        let optOutJobData = OptOutJobData(brokerId: brokerId, profileQueryId: profileQueryId, createdDate: createdDate, historyEvents: [lastHistoryEventToReturn], attemptCount: 0, submittedSuccessfullyDate: submittedDate, extractedProfile: .mockWithoutRemovedDate)
+        databaseMock.brokerProfileQueryDataToReturn = [
+            BrokerProfileQueryData(dataBroker: .mock, profileQuery: .mock, scanJobData: scanJobData, optOutJobData: [optOutJobData])
+        ]
+        let sut = OperationPreferredDateUpdaterUseCase(database: databaseMock)
+
+        // When
+        XCTAssertNoThrow(try sut.updateOperationDataDates(origin: .optOut, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId, schedulingConfig: DataBrokerScheduleConfig.mock))
+
+        // Then
+        XCTAssertFalse(databaseMock.wasUpdateSubmittedSuccessfullyDateForOptOutCalled)
     }
 }

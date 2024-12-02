@@ -21,6 +21,7 @@ import Common
 import Foundation
 import Navigation
 import WebKit
+import os.log
 
 final class TabSnapshotExtension {
 
@@ -88,7 +89,7 @@ final class TabSnapshotExtension {
             guard let self = self else { return }
 
             guard let image = await self.store.loadSnapshot(for: identifier) as NSImage? else {
-                os_log("No snapshot restored", log: .tabSnapshots)
+                Logger.tabSnapshots.debug("No snapshot restored")
                 return
             }
 
@@ -101,7 +102,7 @@ final class TabSnapshotExtension {
                                              image: image,
                                              webviewBoundsSize: NSSize.zero,
                                              isRestored: true)
-            os_log("Snapshot restored", log: .tabSnapshots)
+            Logger.tabSnapshots.debug("Snapshot restored")
 
             self.renderSnapshotAfterLoad = false
         }
@@ -152,7 +153,8 @@ final class TabSnapshotExtension {
     @MainActor
     func renderWebViewSnapshot() async {
         guard let webView, let tabContent,
-              let url = tabContent.userEditableUrl, !url.isDuckURLScheme else {
+              let url = tabContent.userEditableUrl,
+              !(url.isDuckURLScheme && !url.isReleaseNotesScheme) else {
             // Previews of native views are rendered in renderNativePreview()
             return
         }
@@ -167,7 +169,7 @@ final class TabSnapshotExtension {
            !userDidInteractWithWebsite,
            snapshotData.webviewBoundsSize == webView.bounds.size,
            snapshotData.url == url {
-            os_log("Skipping snapshot rendering, it is already rendered. url: \(url)", log: .tabSnapshots)
+            Logger.tabSnapshots.debug("Skipping snapshot rendering, it is already rendered. url: \(url)")
             return
         }
 
@@ -194,7 +196,7 @@ final class TabSnapshotExtension {
         }
 
         snapshotData = SnapshotData.snapshotDataForRegularView(from: snapshot)
-        os_log("Snapshot of native page rendered", log: .tabSnapshots)
+        Logger.tabSnapshots.debug("Snapshot of native page rendered")
     }
 
 }
@@ -230,7 +232,7 @@ extension TabSnapshotExtension: NSCodingExtension {
 
         guard let uuidString = decoder.decodeObject(of: NSString.self, forKey: NSSecureCodingKeys.tabSnapshotIdentifier),
               let identifier = UUID(uuidString: uuidString as String) else {
-            os_log("Snapshot not available in the session state", log: .tabSnapshots)
+            Logger.tabSnapshots.debug("Snapshot not available in the session state")
             return
         }
 

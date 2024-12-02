@@ -37,6 +37,7 @@ final class MockPrivacyConfiguration: PrivacyConfiguration {
     }
 
     var identifier: String = "MockPrivacyConfiguration"
+    var version: String? = "1234567890"
     var userUnprotectedDomains: [String] = []
     var tempUnprotectedDomains: [String] = []
     var trackerAllowlist: PrivacyConfigurationData.TrackerAllowlist = .init(entries: [:],
@@ -54,6 +55,18 @@ final class MockPrivacyConfiguration: PrivacyConfiguration {
             return .enabled
         }
         return .disabled(.disabledInConfig)
+    }
+
+    func stateFor(subfeatureID: SubfeatureID, parentFeatureID: ParentFeatureID, versionProvider: AppVersionProvider, randomizer: (Range<Double>) -> Double) -> PrivacyConfigurationFeatureState {
+        return .disabled(.disabledInConfig)
+    }
+
+    func cohorts(for subfeature: any PrivacySubfeature) -> [PrivacyConfigurationData.Cohort]? {
+        return nil
+    }
+
+    func cohorts(subfeatureID: SubfeatureID, parentFeatureID: ParentFeatureID) -> [PrivacyConfigurationData.Cohort]? {
+        return nil
     }
 
     func isFeature(_ feature: PrivacyFeature, enabledForDomain: String?) -> Bool { true }
@@ -91,7 +104,7 @@ final class MockPrivacyConfigurationManager: NSObject, PrivacyConfigurationManag
     }
 
     func reload(etag: String?, data: Data?) -> BrowserServicesKit.PrivacyConfigurationManager.ReloadResult {
-        fatalError("not implemented")
+        return .embedded
     }
 
     var updatesPublisher: AnyPublisher<Void, Never> = Just(()).eraseToAnyPublisher()

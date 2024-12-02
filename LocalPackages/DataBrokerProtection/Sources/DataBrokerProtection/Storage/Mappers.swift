@@ -176,7 +176,8 @@ struct MapperToModel {
             version: decodedBroker.version,
             schedulingConfig: decodedBroker.schedulingConfig,
             parent: decodedBroker.parent,
-            mirrorSites: decodedBroker.mirrorSites
+            mirrorSites: decodedBroker.mirrorSites,
+            optOutUrl: decodedBroker.optOutUrl
         )
     }
 
@@ -213,10 +214,16 @@ struct MapperToModel {
         .init(
             brokerId: optOutDB.brokerId,
             profileQueryId: optOutDB.profileQueryId,
+            createdDate: optOutDB.createdDate,
             preferredRunDate: optOutDB.preferredRunDate,
             historyEvents: try events.map(mapToModel(_:)),
             lastRunDate: optOutDB.lastRunDate,
-            extractedProfile: try mapToModel(extractedProfileDB)
+            attemptCount: optOutDB.attemptCount,
+            submittedSuccessfullyDate: optOutDB.submittedSuccessfullyDate,
+            extractedProfile: try mapToModel(extractedProfileDB),
+            sevenDaysConfirmationPixelFired: optOutDB.sevenDaysConfirmationPixelFired,
+            fourteenDaysConfirmationPixelFired: optOutDB.fourteenDaysConfirmationPixelFired,
+            twentyOneDaysConfirmationPixelFired: optOutDB.twentyOneDaysConfirmationPixelFired
         )
     }
 

@@ -19,7 +19,7 @@
 import SwiftUI
 import SwiftUIExtensions
 
-struct PinnedTabView: View {
+struct PinnedTabView: View, DropDelegate {
     enum Const {
         static let dimension: CGFloat = 34
         static let cornerRadius: CGFloat = 10
@@ -49,6 +49,10 @@ struct PinnedTabView: View {
             .buttonStyle(TouchDownButtonStyle())
             .cornerRadius(Const.cornerRadius, corners: [.topLeft, .topRight])
             .contextMenu { contextMenu }
+            .onDrop(of: [
+                NSPasteboard.PasteboardType.URL.rawValue,
+                NSPasteboard.PasteboardType.string.rawValue,
+            ], delegate: self)
 
             BorderView(isSelected: isSelected,
                        cornerRadius: Const.cornerRadius,
@@ -62,7 +66,22 @@ struct PinnedTabView: View {
         } else {
             stack
         }
+    }
 
+    func performDrop(info: DropInfo) -> Bool {
+        guard let item = info.itemProviders(for: [.url, .text, .data]).first,
+              let typeIdentifier = [
+                NSPasteboard.PasteboardType.URL.rawValue,
+                NSPasteboard.PasteboardType.string.rawValue
+              ].first(where: { item.registeredTypeIdentifiers.contains($0) }) else { return false }
+
+        item.loadItem(forTypeIdentifier: typeIdentifier) { (result, _) in
+            guard let url = result as? URL ?? ((result as? Data)?.utf8String() ?? result as? String).flatMap(URL.makeURL(from:)) else { return }
+            DispatchQueue.main.async {
+                model.setUrl(url, source: .userEntered(url.absoluteString, downloadRequested: false))
+            }
+        }
+        return true
     }
 
     private var isSelected: Bool {
@@ -210,20 +229,43 @@ struct PinnedTabInnerView: View {
     }
 
     @ViewBuilder
-    var mutedTabIndicator: some View {
-        switch model.audioState {
-        case .muted:
-            ZStack {
-                Circle()
-                    .stroke(Color.gray.opacity(0.5), lineWidth: 0.5)
-                    .background(Circle().foregroundColor(.pinnedTabMuteStateCircle))
-                    .frame(width: 16, height: 16)
+    var audioStateView: some View {
+        switch model.webView.audioState {
+        case .muted(let isPlayingAudio):
+            if isPlayingAudio {
+                audioIndicator(isMuted: true)
+            } else {
+                EmptyView()
+            }
+        case .unmuted(let isPlayingAudio):
+            if isPlayingAudio {
+                audioIndicator(isMuted: false)
+            } else {
+                EmptyView()
+            }
+        }
+    }
+
+    private func audioIndicator(isMuted: Bool) -> some View {
+        ZStack {
+            Circle()
+                .stroke(Color.gray.opacity(0.5), lineWidth: 0.5)
+                .background(Circle().foregroundColor(.pinnedTabMuteStateCircle))
+                .frame(width: 16, height: 16)
+
+            if isMuted {
                 Image(.audioMute)
                     .resizable()
-                    .renderingMode(.template)
                     .frame(width: 12, height: 12)
-            }.offset(x: 8, y: -8)
-        case .unmuted, .none: EmptyView()
+            } else {
+                Image(.audio)
+                    .resizable()
+                    .frame(width: 12, height: 12)
+            }
+        }
+        .offset(x: 8, y: -8)
+        .onTapGesture {
+            model.muteUnmuteTab()
         }
     }
 
@@ -233,7 +275,7 @@ struct PinnedTabInnerView: View {
             ZStack(alignment: .topTrailing) {
                 Image(nsImage: favicon)
                     .resizable()
-                mutedTabIndicator
+                audioStateView
             }
         } else if let domain = model.content.userEditableUrl?.host,
                   let eTLDplus1 = ContentBlocking.shared.tld.eTLDplus1(domain),
@@ -244,14 +286,14 @@ struct PinnedTabInnerView: View {
                 Text(firstLetter)
                     .font(.caption)
                     .foregroundColor(.white)
-                mutedTabIndicator
+                audioStateView
             }
             .cornerRadius(4.0)
         } else {
             ZStack {
                 Image(nsImage: .web)
                     .resizable()
-                mutedTabIndicator
+                audioStateView
             }
         }
     }

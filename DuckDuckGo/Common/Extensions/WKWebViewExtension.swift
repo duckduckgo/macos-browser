@@ -16,9 +16,11 @@
 //  limitations under the License.
 //
 
+import Combine
 import Common
 import Navigation
 import WebKit
+import os.log
 
 extension WKWebView {
 
@@ -30,17 +32,24 @@ extension WKWebView {
     }
 
     enum AudioState {
-        case muted
-        case unmuted
+        case muted(isPlayingAudio: Bool)
+        case unmuted(isPlayingAudio: Bool)
 
-        init(wkMediaMutedState: _WKMediaMutedState) {
-            self = wkMediaMutedState.contains(.audioMuted) ? .muted : .unmuted
+        init(wkMediaMutedState: _WKMediaMutedState, isPlayingAudio: Bool) {
+            self = wkMediaMutedState.contains(.audioMuted) ? .muted(isPlayingAudio: isPlayingAudio) : .unmuted(isPlayingAudio: isPlayingAudio)
+        }
+
+        var isMuted: Bool {
+            if case .muted = self {
+                return true
+            }
+            return false
         }
 
         mutating func toggle() {
             self = switch self {
-            case .muted: .unmuted
-            case .unmuted: .muted
+            case let .muted(isPlayingAudio): .unmuted(isPlayingAudio: isPlayingAudio)
+            case let .unmuted(isPlayingAudio): .muted(isPlayingAudio: isPlayingAudio)
             }
         }
     }
@@ -163,7 +172,7 @@ extension WKWebView {
     ///            `unmuted` if the web view is unmuted
     var audioState: AudioState {
         get {
-            AudioState(wkMediaMutedState: mediaMutedState)
+            AudioState(wkMediaMutedState: mediaMutedState, isPlayingAudio: isPlayingAudio)
         }
         set {
             switch newValue {
@@ -173,6 +182,23 @@ extension WKWebView {
                 self.mediaMutedState.remove(.audioMuted)
             }
         }
+    }
+
+    var audioStatePublisher: AnyPublisher<AudioState, Never> {
+        publisher(for: \.mediaMutedState)
+            .combineLatest(publisher(for: \.isPlayingAudio))
+            .map { AudioState(wkMediaMutedState: $0, isPlayingAudio: $1) }
+            .eraseToAnyPublisher()
+    }
+
+    @objc(webViewIsPlayingAudio) // named this way to avoid clashing with a real method when (in case) it becomes public
+    var isPlayingAudio: Bool {
+        return self.value(forKey: Selector.isPlayingAudio) as? Bool ?? false
+    }
+
+    @objc(keyPathsForValuesAffectingWebViewIsPlayingAudio)
+    static func keyPathsForValuesAffectingIsPlayingAudio() -> Set<String> {
+        return [NSStringFromSelector(Selector.mediaMutedState), Selector.isPlayingAudio]
     }
 
     func stopMediaCapture() {
@@ -274,7 +300,7 @@ extension WKWebView {
     func loadAlternateHTML(_ html: String, baseURL: URL, forUnreachableURL failingURL: URL) {
         guard responds(to: Selector.loadAlternateHTMLString) else {
             if #available(macOS 12.0, *) {
-                os_log(.error, log: .navigation, "WKWebView._loadAlternateHTMLString not available")
+                Logger.navigation.error("WKWebView._loadAlternateHTMLString not available")
                 loadSimulatedRequest(URLRequest(url: failingURL), responseHTML: html)
             }
             return
@@ -347,12 +373,38 @@ extension WKWebView {
         try await evaluateJavaScript("window.getSelection().removeAllRanges()") as Void?
     }
 
+    var addsVisitedLinks: Bool {
+        get {
+            guard self.responds(to: Selector.addsVisitedLinks) else {
+                assertionFailure("WKWebView doesn‘t respond to _addsVisitedLinks")
+                return false
+            }
+            return self.value(forKey: NSStringFromSelector(Selector.addsVisitedLinks)) as? Bool ?? false
+        }
+        set {
+            guard self.responds(to: Selector.addsVisitedLinks) else {
+                assertionFailure("WKWebView doesn‘t respond to _setAddsVisitedLinks:")
+                return
+            }
+            self.perform(Selector.setAddsVisitedLinks, with: newValue ? true : nil)
+        }
+    }
+
     enum Selector {
         static let fullScreenPlaceholderView = NSSelectorFromString("_fullScreenPlaceholderView")
         static let printOperationWithPrintInfoForFrame = NSSelectorFromString("_printOperationWithPrintInfo:forFrame:")
         static let loadAlternateHTMLString = NSSelectorFromString("_loadAlternateHTMLString:baseURL:forUnreachableURL:")
         static let mediaMutedState = NSSelectorFromString("_mediaMutedState")
         static let setPageMuted = NSSelectorFromString("_setPageMuted:")
+        static let setAddsVisitedLinks = NSSelectorFromString("_setAddsVisitedLinks:")
+        static let addsVisitedLinks = NSSelectorFromString("_addsVisitedLinks")
+        static let isPlayingAudio = "_isPlayingAudio"
+    }
+
+    // prevent exception if private API keys go missing
+    open override func value(forUndefinedKey key: String) -> Any? {
+        assertionFailure("valueForUndefinedKey: \(key)")
+        return nil
     }
 
 }

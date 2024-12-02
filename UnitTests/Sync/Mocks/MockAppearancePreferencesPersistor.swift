@@ -23,6 +23,8 @@ class MockAppearancePreferencesPersistor: AppearancePreferencesPersistor {
 
     var homeButtonPosition: HomeButtonPosition = .hidden
 
+    var homePageCustomBackground: String?
+
     var showFullURL: Bool = false
 
     var showAutocompleteSuggestions: Bool = false
@@ -37,10 +39,21 @@ class MockAppearancePreferencesPersistor: AppearancePreferencesPersistor {
 
     var isContinueSetUpVisible: Bool = true
 
+    var continueSetUpCardsLastDemonstrated: Date?
+
+    var continueSetUpCardsNumberOfDaysDemonstrated: Int = 0
+
+    var continueSetUpCardsClosed: Bool = false
+
     var isRecentActivityVisible: Bool = true
+
+    var isSearchBarVisible: Bool = true
 
     var showBookmarksBar: Bool = false
 
     var bookmarksBarAppearance: BookmarksBarAppearance = .alwaysOn
 
+    var centerAlignedBookmarksBar: Bool = false
+
+    var didDismissHomePagePromotion = true
 }

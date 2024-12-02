@@ -18,7 +18,10 @@
 
 import Foundation
 import Common
+import AppKitExtensions
+import Cocoa
 import SecureStorage
+import os.log
 
 protocol ResourcesRepository {
     func fetchBrokerFromResourceFiles() throws -> [DataBroker]?
@@ -37,26 +40,38 @@ final class FileResources: ResourcesRepository {
     }
 
     func fetchBrokerFromResourceFiles() throws -> [DataBroker]? {
+        guard NSApplication.runType != .unitTests && NSApplication.runType != .uiTests else {
+            /*
+             There's a bug with the bundle resources in tests:
+             https://forums.swift.org/t/swift-5-3-swiftpm-resources-in-tests-uses-wrong-bundle-path/37051/49
+             */
+            return []
+        }
+
         guard let resourceURL = Bundle.module.resourceURL else {
+            Logger.dataBrokerProtection.fault("DataBrokerProtectionUpdater: error FileResources fetchBrokerFromResourceFiles, error: Bundle.module.resourceURL is nil")
             assertionFailure()
-            os_log("DataBrokerProtectionUpdater: error FileResources fetchBrokerFromResourceFiles, error: Bundle.module.resourceURL is nil", log: .error)
             throw FileResourcesError.bundleResourceURLNil
         }
 
+        let shouldUseFakeBrokers = (NSApp.runType == .integrationTests)
+        let brokersURL = resourceURL.appendingPathComponent("Resources").appendingPathComponent("JSON")
         do {
             let fileURLs = try fileManager.contentsOfDirectory(
-                at: resourceURL,
+                at: brokersURL,
                 includingPropertiesForKeys: nil,
                 options: [.skipsHiddenFiles]
             )
 
             let brokerJSONFiles = fileURLs.filter {
-                $0.isJSON && !$0.hasFakePrefix
+                $0.isJSON && (
+                (shouldUseFakeBrokers && $0.hasFakePrefix) ||
+                (!shouldUseFakeBrokers && !$0.hasFakePrefix))
             }
 
             return try brokerJSONFiles.map(DataBroker.initFromResource(_:))
         } catch {
-            os_log("DataBrokerProtectionUpdater: error FileResources error: fetchBrokerFromResourceFiles, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("DataBrokerProtectionUpdater: error FileResources error: fetchBrokerFromResourceFiles, error: \(error.localizedDescription, privacy: .public)")
             throw error
         }
     }
@@ -129,7 +144,7 @@ public struct DefaultDataBrokerProtectionBrokerUpdater: DataBrokerProtectionBrok
             return DefaultDataBrokerProtectionBrokerUpdater(vault: vault)
         }
 
-        os_log("Error when trying to create vault for data broker protection updater debug menu item", log: .dataBrokerProtection)
+        Logger.dataBrokerProtection.debug("Error when trying to create vault for data broker protection updater debug menu item")
         return nil
     }
 
@@ -138,7 +153,7 @@ public struct DefaultDataBrokerProtectionBrokerUpdater: DataBrokerProtectionBrok
         do {
             brokers = try resources.fetchBrokerFromResourceFiles()
         } catch {
-            os_log("DataBrokerProtectionBrokerUpdater updateBrokers, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("DataBrokerProtectionBrokerUpdater updateBrokers, error: \(error.localizedDescription, privacy: .public)")
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionBrokerUpdater.updateBrokers"))
             return
         }
@@ -148,7 +163,7 @@ public struct DefaultDataBrokerProtectionBrokerUpdater: DataBrokerProtectionBrok
             do {
                 try update(broker)
             } catch {
-                os_log("Error updating broker: %{public}@, with version: %{public}@", log: .dataBrokerProtection, broker.name, broker.version)
+                Logger.dataBrokerProtection.debug("Error updating broker: \(broker.name, privacy: .public), with version: \(broker.version, privacy: .public)")
                 pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionBrokerUpdater.updateBrokers"))
             }
         }
@@ -187,6 +202,18 @@ public struct DefaultDataBrokerProtectionBrokerUpdater: DataBrokerProtectionBrok
             guard let savedBrokerId = savedBroker.id else { return }
 
             try vault.update(broker, with: savedBrokerId)
+            try updateAttemptCount(broker)
+        }
+    }
+
+    private func updateAttemptCount(_ broker: DataBroker) throws {
+        guard broker.type == .parent, let brokerId = broker.id else { return }
+
+        let optOutJobs = try vault.fetchOptOuts(brokerId: brokerId)
+        for optOutJob in optOutJobs {
+            if let extractedProfileId = optOutJob.extractedProfile.id {
+                try vault.updateAttemptCount(0, brokerId: brokerId, profileQueryId: optOutJob.profileQueryId, extractedProfileId: extractedProfileId)
+            }
         }
     }
 

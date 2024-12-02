@@ -31,8 +31,12 @@ protocol WebViewInteractionEventsDelegate: AnyObject {
 }
 
 protocol WebViewZoomLevelDelegate: AnyObject {
-     func zoomWasSet(to level: DefaultZoomValue)
- }
+    func zoomWasSet(to level: DefaultZoomValue)
+}
+
+@objc protocol WKInspectorDelegate {
+    @MainActor @objc(inspector:openURLExternally:) optional func inspector(_ inspector: NSObject, openURLExternally url: NSURL?)
+}
 
 @objc(DuckDuckGo_WebView)
 final class WebView: WKWebView {
@@ -106,12 +110,6 @@ final class WebView: WKWebView {
             return DefaultZoomValue(rawValue: pageZoom) ?? .percent100
         }
         set {
-            // There are cases where the pageZoom does not reflect the actual display, such as after a command-click on a link.
-            // The API may not trigger a change if the new value is the same as the current value.
-            if pageZoom == newValue.rawValue {
-                // Slightly modify the value to force the API to trigger a change.
-                pageZoom = newValue.rawValue - 0.001
-            }
             pageZoom = newValue.rawValue
         }
     }
@@ -139,12 +137,22 @@ final class WebView: WKWebView {
     }
 
     func zoomIn() {
+        // if displaying PDF
+        if let pdfHudView = self.hudView() {
+            pdfHudView.zoomIn()
+            return
+        }
         guard canZoomIn else { return }
         zoomLevel = DefaultZoomValue.allCases[self.zoomLevel.index + 1]
         zoomLevelDelegate?.zoomWasSet(to: zoomLevel)
     }
 
     func zoomOut() {
+        // if displaying PDF
+        if let pdfHudView = self.hudView() {
+            pdfHudView.zoomOut()
+            return
+        }
         guard canZoomOut else { return }
         zoomLevel = DefaultZoomValue.allCases[self.zoomLevel.index - 1]
         zoomLevelDelegate?.zoomWasSet(to: zoomLevel)
@@ -180,6 +188,15 @@ final class WebView: WKWebView {
     }
 
     // MARK: - Developer Tools
+
+    var inspectorDelegate: WKInspectorDelegate? {
+        get {
+            inspectorPerform("delegate")?.takeUnretainedValue() as? WKInspectorDelegate
+        }
+        set {
+            inspectorPerform("setDelegate:", with: newValue)
+        }
+    }
 
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()

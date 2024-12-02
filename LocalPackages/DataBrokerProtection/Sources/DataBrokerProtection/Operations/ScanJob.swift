@@ -21,6 +21,7 @@ import WebKit
 import BrowserServicesKit
 import UserScript
 import Common
+import os.log
 
 final class ScanJob: DataBrokerJob {
     typealias ReturnValue = [ExtractedProfile]
@@ -107,15 +108,15 @@ final class ScanJob: DataBrokerJob {
 
     func executeNextStep() async {
         retriesCountOnError = 0 // We reset the retries on error when it is successful
-        os_log("SCAN Waiting %{public}f seconds...", log: .action, operationAwaitTime)
+        Logger.action.debug("SCAN Waiting \(self.operationAwaitTime, privacy: .public) seconds...")
 
         try? await Task.sleep(nanoseconds: UInt64(operationAwaitTime) * 1_000_000_000)
 
         if let action = actionsHandler?.nextAction() {
-            os_log("Next action: %{public}@", log: .action, String(describing: action.actionType.rawValue))
+            Logger.action.debug("Next action: \(String(describing: action.actionType.rawValue), privacy: .public)")
             await runNextAction(action)
         } else {
-            os_log("Releasing the web view", log: .action)
+            Logger.action.debug("Releasing the web view")
             await webViewHandler?.finish() // If we executed all steps we release the web view
         }
     }

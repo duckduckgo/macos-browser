@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-
+opt_out_usage
 fastlane_require 'httparty'
 fastlane_require 'rexml/document'
 
@@ -45,6 +45,36 @@ platform :mac do
     do_sync_signing(options)
   end
 
+  # Fetches and updates certificates and provisioning profiles for DMG distribution
+  #
+  # @option [String] username (default: nil) Your DDG Apple ID. Pass it to not be asked
+  #         for it a couple of times during the process.
+  #
+  desc 'Fetches and updates certificates and provisioning profiles for DMG distribution'
+  lane :sync_signing_dmg_release do |options|
+    do_sync_signing(options)
+  end
+
+  # Fetches and updates certificates and provisioning profiles for DMG Review builds
+  #
+  # @option [String] username (default: nil) Your DDG Apple ID. Pass it to not be asked
+  #         for it a couple of times during the process.
+  #
+  desc 'Fetches and updates certificates and provisioning profiles for DMG Review builds'
+  lane :sync_signing_dmg_review do |options|
+    do_sync_signing(options)
+  end
+
+  # Fetches and updates certificates and provisioning profiles for CI builds
+  #
+  # @option [String] username (default: nil) Your DDG Apple ID. Pass it to not be asked
+  #         for it a couple of times during the process.
+  #
+  desc 'Fetches and updates certificates and provisioning profiles for CI builds'
+  lane :sync_signing_ci do |options|
+    do_sync_signing(options)
+  end
+
   # Makes App Store release build and uploads it to TestFlight without managing App Store listing.
   #
   # @option [String] username (default: nil) Your DDG Apple ID. Pass it to not be asked
@@ -76,6 +106,21 @@ platform :mac do
     )
   end
 
+  desc 'Promotes the latest TestFlight build to App Store without submitting for review'
+  lane :promote_latest_testflight_to_appstore do |options|
+
+    latest_build_info = fetch_testflight_build_number(options)
+    latest_build_number = lane_context[SharedValues::LATEST_TESTFLIGHT_BUILD_NUMBER]   
+    latest_build_version = lane_context[SharedValues::LATEST_TESTFLIGHT_VERSION]
+
+    UI.message("The latest build number #{latest_build_number} of the latest version: #{latest_build_version}")
+
+    upload_metadata(options.merge({
+      build_number: latest_build_number.to_s,
+      app_version: latest_build_version.to_s,
+    }))
+
+  end
   # Makes App Store release build, uploads it to TestFlight, and prepares App Store listing for submission.
   #
   # - it first uploads just the build, and only then attempts uploading metadata.
@@ -115,7 +160,8 @@ platform :mac do
   lane :upload_metadata do |options|
     deliver(common_deliver_arguments(options).merge({
       skip_binary_upload: true,
-      skip_metadata: false
+      skip_metadata: false,
+      version_check_wait_retry_limit: 1
     }))
   end
 
@@ -292,6 +338,18 @@ platform :mac do
     macos_update_version_and_build_number_config(
       version: new_version,
       build_number: build_number
+    )
+  end
+
+  desc 'Creates a new Kechain to use on UI tests'
+  lane :create_keychain_ui_tests do |options|
+    create_keychain(
+      name: "DefaultKeychain",
+      password: "default",
+      default_keychain: true,
+      unlock: true,
+      timeout: 54000,
+      lock_when_sleeps: false
     )
   end
 
@@ -544,7 +602,7 @@ release in progress and you're making a follow-up internal release that includes
 
     # Create the branch and push
     if is_ci
-      sha = Action.sh('git', 'rev-parse', source_version).chomp
+      sha = Action.sh('git', 'rev-parse', "#{source_version}^{}").chomp
       Action.sh('gh', 'api', '--method', 'POST', '/repos/duckduckgo/macos-browser/git/refs', '-f', "ref=refs/heads/#{release_branch}", '-f', "sha=#{sha}")
       Action.sh('git', 'fetch', 'origin')
       Action.sh('git', 'checkout', release_branch)

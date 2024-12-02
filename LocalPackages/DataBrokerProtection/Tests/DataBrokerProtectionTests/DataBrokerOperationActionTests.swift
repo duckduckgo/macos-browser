@@ -128,7 +128,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
     }
 
     func testWhenActionNeedsEmail_thenExtractedProfileEmailIsSet() async {
-        let fillFormAction = FillFormAction(id: "1", actionType: .fillForm, selector: "#test", elements: [.init(type: "email", selector: "#email", parent: nil, multiple: nil)], dataSource: nil)
+        let fillFormAction = FillFormAction(id: "1", actionType: .fillForm, selector: "#test", elements: [.init(type: "email", selector: "#email", parent: nil, multiple: nil, min: nil, max: nil)], dataSource: nil)
         let step = Step(type: .optOut, actions: [fillFormAction])
         let sut = OptOutJob(
             privacyConfig: PrivacyConfigurationManagingMock(),
@@ -152,7 +152,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
     }
 
     func testWhenGetEmailServiceFails_thenOperationThrows() async {
-        let fillFormAction = FillFormAction(id: "1", actionType: .fillForm, selector: "#test", elements: [.init(type: "email", selector: "#email", parent: nil, multiple: nil)], dataSource: nil)
+        let fillFormAction = FillFormAction(id: "1", actionType: .fillForm, selector: "#test", elements: [.init(type: "email", selector: "#email", parent: nil, multiple: nil, min: nil, max: nil)], dataSource: nil)
         let step = Step(type: .optOut, actions: [fillFormAction])
         let sut = OptOutJob(
             privacyConfig: PrivacyConfigurationManagingMock(),
@@ -331,7 +331,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
     }
 
     func testWhenRunningActionWithoutExtractedProfile_thenExecuteIsCalledWithProfileData() async {
-        let expectationAction = ExpectationAction(id: "1", actionType: .expectation, expectations: [Item](), dataSource: nil)
+        let expectationAction = ExpectationAction(id: "1", actionType: .expectation, expectations: [Item](), dataSource: nil, actions: nil)
         let sut = OptOutJob(
             privacyConfig: PrivacyConfigurationManagingMock(),
             prefs: ContentScopeProperties.mock,
@@ -415,7 +415,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
 
     func testWhenExpectationActionRuns_thenStageIsSetToSubmit() async {
         let mockStageCalculator = MockStageDurationCalculator()
-        let expectationAction = ExpectationAction(id: "1", actionType: .expectation, expectations: [Item](), dataSource: nil)
+        let expectationAction = ExpectationAction(id: "1", actionType: .expectation, expectations: [Item](), dataSource: nil, actions: nil)
         let sut = OptOutJob(
             privacyConfig: PrivacyConfigurationManagingMock(),
             prefs: ContentScopeProperties.mock,

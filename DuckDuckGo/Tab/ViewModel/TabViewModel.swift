@@ -21,6 +21,8 @@ import Cocoa
 import Combine
 import Common
 import WebKit
+import PhishingDetection
+import PrivacyDashboard
 
 final class TabViewModel {
 
@@ -98,7 +100,7 @@ final class TabViewModel {
         switch tab.content {
         case .url(let url, _, _):
             return !(url.isDuckPlayer || url.isDuckURLScheme)
-        case .subscription, .identityTheftRestoration:
+        case .subscription, .identityTheftRestoration, .releaseNotes:
             return true
 
         case .newtab, .settings, .bookmarks, .onboardingDeprecated, .onboarding, .dataBrokerProtection, .none:
@@ -133,15 +135,24 @@ final class TabViewModel {
     }
 
     private func subscribeToUrl() {
-        tab.$content
-            .map { [tab] content -> AnyPublisher<Void, Never> in
+        Publishers.CombineLatest(
+            tab.$content,
+            tab.$userInteractionDialog
+        )
+            .map { [tab] content, userDialog -> AnyPublisher<Void, Never> in
+                if userDialog != nil {
+                    // Update the address bar instantly when page presents a dialog to prevent spoofing attacks
+                    // https://app.asana.com/0/414709148257752/1208060693227754/f
+                    return Just( () ).eraseToAnyPublisher()
+                }
+
                 switch content {
                 case .url(_, _, source: .userEntered(_, downloadRequested: true)):
                     // don‘t update the address bar for download navigations
                     return Empty().eraseToAnyPublisher()
 
                 case .url(let url, _, source: .webViewUpdated),
-                        .url(let url, _, source: .link):
+                     .url(let url, _, source: .link):
 
                     guard !url.isEmpty, url != .blankPage, !url.isDuckPlayer else { fallthrough }
 
@@ -154,22 +165,23 @@ final class TabViewModel {
                         .asVoid().eraseToAnyPublisher()
 
                 case .url(_, _, source: .pendingStateRestoration),
-                        .url(_, _, source: .loadedByStateRestoration),
-                        .url(_, _, source: .userEntered),
-                        .url(_, _, source: .historyEntry),
-                        .url(_, _, source: .bookmark),
-                        .url(_, _, source: .ui),
-                        .url(_, _, source: .appOpenUrl),
-                        .url(_, _, source: .reload),
-                        .newtab,
-                        .settings,
-                        .bookmarks,
-                        .onboarding,
-                        .onboardingDeprecated,
-                        .none,
-                        .dataBrokerProtection,
-                        .subscription,
-                        .identityTheftRestoration:
+                     .url(_, _, source: .loadedByStateRestoration),
+                     .url(_, _, source: .userEntered),
+                     .url(_, _, source: .historyEntry),
+                     .url(_, _, source: .bookmark),
+                     .url(_, _, source: .ui),
+                     .url(_, _, source: .appOpenUrl),
+                     .url(_, _, source: .reload),
+                     .newtab,
+                     .settings,
+                     .bookmarks,
+                     .onboarding,
+                     .onboardingDeprecated,
+                     .none,
+                     .dataBrokerProtection,
+                     .subscription,
+                     .identityTheftRestoration,
+                     .releaseNotes:
                     // Update the address bar instantly for built-in content types or user-initiated navigations
                     return Just( () ).eraseToAnyPublisher()
                 }
@@ -177,9 +189,15 @@ final class TabViewModel {
             .switchToLatest()
             .sink { [weak self] _ in
                 guard let self else { return }
-
                 updateAddressBarStrings()
                 updateFavicon()
+            }
+            .store(in: &cancellables)
+
+        // The tab content is updated for every same document navigation as well while we want to update zoom and can be bookmarked only for full navifation. Using it allows for the zoom to be applied immediately and not only when the navigation is ended avoiding a visible change in size
+        tab.$hasCommittedContent
+            .sink { [weak self] _ in
+                guard let self else { return }
                 updateCanBeBookmarked()
                 updateZoomForWebsite()
             }
@@ -275,10 +293,37 @@ final class TabViewModel {
     }
 
     private func subscribeToWebViewDidFinishNavigation() {
-        tab.webViewDidFinishNavigationPublisher.sink { [weak self] in
+        // When a web page finishes loading, wait when the `ContentBlockerRulesUserScript` detects trackers
+        // and adds them to `PrivacyDashboardTabExtension.$privacyInfo.$trackerInfo`.
+        // Map the `$trackerInfo` into a debounced Publisher and play trackers animations
+        // if there were any trackers detected.
+        tab.webViewDidFinishNavigationPublisher.map { [weak tab] in
+            guard let tab,
+                  tab.privacyInfo?.trackerInfo.trackersBlocked.isEmpty ?? true else {
+                // the blocked trackers are already present when the navigation is finished, just return them
+                return Just(tab?.privacyInfo?.trackerInfo).eraseToAnyPublisher()
+            }
+
+            // `Tab(PrivacyDashboardTabExtension).$privacyInfo` is reset on new navigation start.
+            return tab.privacyInfoPublisher.map {
+                guard let trackerInfoPublisher = $0?.$trackerInfo else {
+                    // no TrackerInfo added yet, don‘t publish
+                    return Empty<TrackerInfo?, Never>().eraseToAnyPublisher()
+                }
+                // map the TrackerInfo Publisher and `switchToLatest` to use its Output.
+                return trackerInfoPublisher.map { TrackerInfo?.some($0) }.eraseToAnyPublisher()
+            }
+            .switchToLatest()
+            // debounce detected trackers (if any)
+            .debounce(for: 0.2, scheduler: RunLoop.main)
+            // prepend with existing (empty) TrackerInfo that won‘t trigger the animation but will update the privacy icon
+            .prepend(tab.privacyInfo?.trackerInfo)
+            .eraseToAnyPublisher()
+        }
+        .switchToLatest()
+        .sink { [weak self] trackerInfo in
             guard let self = self else { return }
-            self.sendAnimationTrigger()
-            self.updateZoomForWebsite()
+            self.sendAnimationTrigger(trackerInfo: trackerInfo)
         }.store(in: &cancellables)
     }
 
@@ -318,6 +363,8 @@ final class TabViewModel {
                 .subscriptionTrustedIndicator
         case .identityTheftRestoration:
                 .identityTheftRestorationTrustedIndicator
+        case .releaseNotes:
+                .releaseNotesTrustedIndicator
         case .url(let url, _, _) where url.isDuckPlayer:
                 .duckPlayerTrustedIndicator
         case .url(let url, _, _) where url.isEmailProtection:
@@ -352,6 +399,8 @@ final class TabViewModel {
         case _ where isShowingErrorPage && (tab.error?.code != .webContentProcessTerminated || tab.title == nil):
             if tab.error?.errorCode == NSURLErrorServerCertificateUntrusted {
                 title = UserText.sslErrorPageTabTitle
+            } else if tab.error?.errorCode == PhishingDetectionError.detected.errorCode {
+                title = UserText.phishingErrorPageTabTitle
             } else {
                 title = UserText.tabErrorTitle
             }
@@ -379,6 +428,8 @@ final class TabViewModel {
             } else {
                 title = addressBarString
             }
+        case .releaseNotes:
+            title = UserText.releaseNotesTitle
         }
         if title.isEmpty {
             title = UserText.tabUntitledTitle
@@ -408,6 +459,8 @@ final class TabViewModel {
             Favicon.subscription
         case .identityTheftRestoration:
             Favicon.identityTheftRestoration
+        case .releaseNotes:
+            Favicon.home
         case .url(let url, _, _) where url.isDuckPlayer:
             Favicon.duckPlayer
         case .url(let url, _, _) where url.isEmailProtection:
@@ -424,7 +477,7 @@ final class TabViewModel {
     }
 
     private func errorFaviconToShow(error: WKError?) -> NSImage {
-        if error?.errorCode == NSURLErrorServerCertificateUntrusted {
+        if error?.errorCode == NSURLErrorServerCertificateUntrusted || error?.errorCode == PhishingDetectionError.detected.errorCode {
             return .redAlertCircle16
         }
         return.alertCircleColor16
@@ -437,9 +490,9 @@ final class TabViewModel {
 
     private var trackerAnimationTimer: Timer?
 
-    private func sendAnimationTrigger() {
+    private func sendAnimationTrigger(trackerInfo: TrackerInfo?) {
         privacyEntryPointIconUpdateTrigger.send()
-        if self.tab.privacyInfo?.trackerInfo.trackersBlocked.count ?? 0 > 0 {
+        if let trackerInfo, !trackerInfo.trackersBlocked.isEmpty {
             self.trackersAnimationTriggerPublisher.send()
         }
     }
@@ -541,5 +594,7 @@ private extension NSAttributedString {
                                                                              title: UserText.duckPlayer)
     static let emailProtectionTrustedIndicator = trustedIndicatorAttributedString(with: .emailProtectionIcon,
                                                                                   title: UserText.emailProtectionPreferences)
+    static let releaseNotesTrustedIndicator = trustedIndicatorAttributedString(with: .releaseNotesIndicator,
+                                                                               title: UserText.releaseNotesTitle)
 
 }

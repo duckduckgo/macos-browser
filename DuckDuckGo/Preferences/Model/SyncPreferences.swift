@@ -26,6 +26,7 @@ import SwiftUI
 import PDFKit
 import Navigation
 import PixelKit
+import os.log
 
 extension SyncDevice {
     init(_ account: SyncAccount) {
@@ -270,6 +271,11 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
             .receive(on: DispatchQueue.main)
             .assign(to: \.isScreenLocked, onWeaklyHeld: self)
             .store(in: &cancellables)
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(launchedFromSyncPromo(_:)),
+                                               name: SyncPromoManager.SyncPromoManagerNotifications.didGoToSync,
+                                               object: nil)
     }
 
     @MainActor
@@ -285,19 +291,6 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     @MainActor
     func presentRemoveDevice(_ device: SyncDevice) {
         presentDialog(for: .removeDevice(device))
-    }
-
-    func turnOffSync() {
-        Task { @MainActor in
-            do {
-                try await syncService.disconnect()
-                managementDialogModel.endFlow()
-                syncPausedStateManager.syncDidTurnOff()
-            } catch {
-                managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToTurnSyncOff, description: error.localizedDescription)
-                PixelKit.fire(DebugEvent(GeneralPixel.syncLogoutError(error: error)))
-            }
-        }
     }
 
     @MainActor
@@ -371,7 +364,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
     func refreshDevices() {
         guard !isScreenLocked else {
-            os_log(.debug, log: .sync, "Screen is locked, skipping devices refresh")
+            Logger.sync.debug("Screen is locked, skipping devices refresh")
             return
         }
         guard syncService.account != nil else {
@@ -383,7 +376,8 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
                 let registeredDevices = try await syncService.fetchDevices()
                 mapDevices(registeredDevices)
             } catch {
-                os_log(.error, log: .sync, "Failed to refresh devices: \(error)")
+                PixelKit.fire(DebugEvent(GeneralPixel.syncRefreshDevicesError(error: error), error: error))
+                Logger.sync.debug("Failed to refresh devices: \(error)")
             }
         }
     }
@@ -425,6 +419,11 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         parentWindowController.window?.beginSheet(syncWindow)
     }
 
+    @objc
+    private func launchedFromSyncPromo(_ sender: Notification) {
+        syncPromoSource = sender.userInfo?[SyncPromoManager.Constants.syncPromoSourceKey] as? String
+    }
+
     private var onEndFlow: () -> Void = {}
 
     private let syncService: DDGSyncing
@@ -434,9 +433,24 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     private var cancellables = Set<AnyCancellable>()
     private var connector: RemoteConnecting?
     private let userAuthenticator: UserAuthenticating
+    private var syncPromoSource: String?
 }
 
 extension SyncPreferences: ManagementDialogModelDelegate {
+
+    func turnOffSync() {
+        Task { @MainActor in
+            do {
+                try await syncService.disconnect()
+                managementDialogModel.endFlow()
+                syncPausedStateManager.syncDidTurnOff()
+                SyncDiagnosisHelper(syncService: syncService).didManuallyDisableSync()
+            } catch {
+                managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToTurnSyncOff, description: error.localizedDescription)
+                PixelKit.fire(DebugEvent(GeneralPixel.syncLogoutError(error: error)))
+            }
+        }
+    }
 
     func deleteAccount() {
         Task { @MainActor in
@@ -444,6 +458,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 try await syncService.deleteAccount()
                 managementDialogModel.endFlow()
                 syncPausedStateManager.syncDidTurnOff()
+                SyncDiagnosisHelper(syncService: syncService).didManuallyDisableSync()
             } catch {
                 managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToDeleteData, description: error.localizedDescription)
                 PixelKit.fire(DebugEvent(GeneralPixel.syncDeleteAccountError(error: error)))
@@ -499,7 +514,8 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 let device = deviceInfo()
                 presentDialog(for: .prepareToSync)
                 try await syncService.createAccount(deviceName: device.name, deviceType: device.type)
-                PixelKit.fire(GeneralPixel.syncSignupDirect)
+                let additionalParameters = syncPromoSource.map { ["source": $0] } ?? [:]
+                PixelKit.fire(GeneralPixel.syncSignupDirect, withAdditionalParameters: additionalParameters)
                 presentDialog(for: .saveRecoveryCode(recoveryCode ?? ""))
             } catch {
                 managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToSyncToServer, description: error.localizedDescription)
@@ -569,7 +585,8 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                     if syncService.account == nil {
                         let device = deviceInfo()
                         try await syncService.createAccount(deviceName: device.name, deviceType: device.type)
-                        PixelKit.fire(GeneralPixel.syncSignupConnect)
+                        let additionalParameters = syncPromoSource.map { ["source": $0] } ?? [:]
+                        PixelKit.fire(GeneralPixel.syncSignupConnect, withAdditionalParameters: additionalParameters)
                         presentDialog(for: .saveRecoveryCode(recoveryCode))
                     }
 

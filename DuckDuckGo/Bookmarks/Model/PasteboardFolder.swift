@@ -56,8 +56,8 @@ struct PasteboardFolder: Hashable {
         self.init(dictionary: dictionary)
     }
 
-    static func pasteboardFolders(with pasteboard: NSPasteboard) -> Set<PasteboardFolder>? {
-        guard let items = pasteboard.pasteboardItems else {
+    static func pasteboardFolders(with pasteboardItems: [NSPasteboardItem]?) -> Set<PasteboardFolder>? {
+        guard let items = pasteboardItems else {
             return nil
         }
 

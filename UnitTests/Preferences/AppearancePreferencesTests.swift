@@ -21,36 +21,58 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
+
     var isFavoriteVisible: Bool
     var isContinueSetUpVisible: Bool
+    var continueSetUpCardsLastDemonstrated: Date?
+    var continueSetUpCardsNumberOfDaysDemonstrated: Int
+    var continueSetUpCardsClosed: Bool
     var isRecentActivityVisible: Bool
+    var isSearchBarVisible: Bool
     var showFullURL: Bool
     var currentThemeName: String
     var favoritesDisplayMode: String?
     var showBookmarksBar: Bool
     var bookmarksBarAppearance: BookmarksBarAppearance
     var homeButtonPosition: HomeButtonPosition
+    var homePageCustomBackground: String?
+    var centerAlignedBookmarksBar: Bool
+    var didDismissHomePagePromotion: Bool
 
     init(
         showFullURL: Bool = false,
         currentThemeName: String = ThemeName.systemDefault.rawValue,
         favoritesDisplayMode: String? = FavoritesDisplayMode.displayNative(.desktop).description,
         isContinueSetUpVisible: Bool = true,
+        continueSetUpCardsLastDemonstrated: Date? = nil,
+        continueSetUpCardsNumberOfDaysDemonstrated: Int = 0,
+        continueSetUpCardsClosed: Bool = false,
         isFavoriteVisible: Bool = true,
         isRecentActivityVisible: Bool = true,
+        isSearchBarVisible: Bool = true,
         showBookmarksBar: Bool = true,
         bookmarksBarAppearance: BookmarksBarAppearance = .alwaysOn,
-        homeButtonPosition: HomeButtonPosition = .right
+        homeButtonPosition: HomeButtonPosition = .right,
+        homePageCustomBackground: String? = nil,
+        centerAlignedBookmarksBar: Bool = true,
+        didDismissHomePagePromotion: Bool = true
     ) {
         self.showFullURL = showFullURL
         self.currentThemeName = currentThemeName
         self.favoritesDisplayMode = favoritesDisplayMode
         self.isContinueSetUpVisible = isContinueSetUpVisible
+        self.continueSetUpCardsLastDemonstrated = continueSetUpCardsLastDemonstrated
+        self.continueSetUpCardsNumberOfDaysDemonstrated = continueSetUpCardsNumberOfDaysDemonstrated
+        self.continueSetUpCardsClosed = continueSetUpCardsClosed
         self.isFavoriteVisible = isFavoriteVisible
         self.isRecentActivityVisible = isRecentActivityVisible
+        self.isSearchBarVisible = isSearchBarVisible
         self.showBookmarksBar = showBookmarksBar
         self.bookmarksBarAppearance = bookmarksBarAppearance
         self.homeButtonPosition = homeButtonPosition
+        self.homePageCustomBackground = homePageCustomBackground
+        self.centerAlignedBookmarksBar = centerAlignedBookmarksBar
+        self.didDismissHomePagePromotion = didDismissHomePagePromotion
     }
 }
 
@@ -65,7 +87,9 @@ final class AppearancePreferencesTests: XCTestCase {
                 isContinueSetUpVisible: true,
                 isFavoriteVisible: true,
                 isRecentActivityVisible: true,
-                homeButtonPosition: .left
+                homeButtonPosition: .left,
+                homePageCustomBackground: CustomBackground.gradient(.gradient01).description,
+                centerAlignedBookmarksBar: true
             )
         )
 
@@ -75,7 +99,10 @@ final class AppearancePreferencesTests: XCTestCase {
         XCTAssertEqual(model.isFavoriteVisible, true)
         XCTAssertEqual(model.isContinueSetUpVisible, true)
         XCTAssertEqual(model.isRecentActivityVisible, true)
+        XCTAssertEqual(model.isSearchBarVisible, true)
         XCTAssertEqual(model.homeButtonPosition, .left)
+        XCTAssertEqual(model.homePageCustomBackground, .gradient(.gradient01))
+        XCTAssertTrue(model.centerAlignedBookmarksBarBool)
 
         model = AppearancePreferences(
             persistor: AppearancePreferencesPersistorMock(
@@ -85,7 +112,10 @@ final class AppearancePreferencesTests: XCTestCase {
                 isContinueSetUpVisible: false,
                 isFavoriteVisible: false,
                 isRecentActivityVisible: false,
-                homeButtonPosition: .left
+                isSearchBarVisible: false,
+                homeButtonPosition: .left,
+                homePageCustomBackground: CustomBackground.gradient(.gradient05).description,
+                centerAlignedBookmarksBar: false
             )
         )
         XCTAssertEqual(model.showFullURL, true)
@@ -94,7 +124,10 @@ final class AppearancePreferencesTests: XCTestCase {
         XCTAssertEqual(model.isFavoriteVisible, false)
         XCTAssertEqual(model.isContinueSetUpVisible, false)
         XCTAssertEqual(model.isRecentActivityVisible, false)
+        XCTAssertEqual(model.isSearchBarVisible, false)
         XCTAssertEqual(model.homeButtonPosition, .left)
+        XCTAssertEqual(model.homePageCustomBackground, .gradient(.gradient05))
+        XCTAssertFalse(model.centerAlignedBookmarksBarBool)
     }
 
     func testWhenInitializedWithGarbageThenThemeIsSetToSystemDefault() throws {
@@ -138,6 +171,8 @@ final class AppearancePreferencesTests: XCTestCase {
         XCTAssertEqual(model.isFavoriteVisible, true)
         model.isContinueSetUpVisible = true
         XCTAssertEqual(model.isContinueSetUpVisible, true)
+        model.isSearchBarVisible = true
+        XCTAssertEqual(model.isSearchBarVisible, true)
 
         model.isRecentActivityVisible = false
         XCTAssertEqual(model.isRecentActivityVisible, false)
@@ -145,6 +180,8 @@ final class AppearancePreferencesTests: XCTestCase {
         XCTAssertEqual(model.isFavoriteVisible, false)
         model.isContinueSetUpVisible = false
         XCTAssertEqual(model.isContinueSetUpVisible, false)
+        model.isSearchBarVisible = false
+        XCTAssertEqual(model.isSearchBarVisible, false)
     }
 
     func testPersisterReturnsValuesFromDisk() {
@@ -158,9 +195,78 @@ final class AppearancePreferencesTests: XCTestCase {
         persister1.isRecentActivityVisible = true
         persister2.isContinueSetUpVisible = false
         persister1.isContinueSetUpVisible = true
+        persister2.isSearchBarVisible = false
+        persister1.isSearchBarVisible = true
 
         XCTAssertTrue(persister2.isFavoriteVisible)
         XCTAssertTrue(persister2.isRecentActivityVisible)
         XCTAssertTrue(persister2.isContinueSetUpVisible)
+        XCTAssertTrue(persister2.isSearchBarVisible)
     }
+
+    func testContinueSetUpIsNotDismissedAfterSeveralDemonstrationsWithinSeveralDays() {
+        // 1. app installed and launched
+        var now = Date()
+
+        // listen to AppearancePreferences.objectWillChange
+        let model = AppearancePreferences(persistor: AppearancePreferencesPersistorMock(), dateTimeProvider: { now })
+        let c = model.objectWillChange.sink {
+            XCTFail("Unexpected model.objectWillChange")
+        }
+        func incrementDate() {
+            now = Calendar.current.date(byAdding: .hour, value: 1, to: now)!
+        }
+
+        // check during N hours
+        // eObjectWillChange shouldn‘t be called until N days
+        for i in 0..<max(AppearancePreferences.Constants.dismissNextStepsCardsAfterDays, 48) {
+            XCTAssertTrue(model.isContinueSetUpVisible, "\(i)")
+            XCTAssertFalse(model.isContinueSetUpCardsViewOutdated, "\(i)")
+            incrementDate()
+        }
+
+        withExtendedLifetime(c) {}
+    }
+
+    func testContinueSetUpIsDismissedAfterNDays() {
+        // 1. app installed and launched
+        var now = Date()
+
+        // listen to AppearancePreferences.objectWillChange
+        let model = AppearancePreferences(persistor: AppearancePreferencesPersistorMock(), dateTimeProvider: { now })
+        var eObjectWillChange: XCTestExpectation!
+        let c = model.objectWillChange.sink {
+            eObjectWillChange.fulfill()
+        }
+        func incrementDate() {
+            now = Calendar.current.date(byAdding: .day, value: 5, to: now)!
+        }
+
+        // check during N days
+        // eObjectWillChange shouldn‘t be called until N days
+        for i in 0..<AppearancePreferences.Constants.dismissNextStepsCardsAfterDays {
+            XCTAssertTrue(model.isContinueSetUpVisible, "\(i)")
+            XCTAssertFalse(model.isContinueSetUpCardsViewOutdated, "\(i)")
+            model.continueSetUpCardsViewDidAppear()
+            incrementDate()
+        }
+        // N days passed
+        // eObjectWillChange should be called once
+        eObjectWillChange = expectation(description: "AppearancePreferences.objectWillChange called")
+        incrementDate()
+        model.continueSetUpCardsViewDidAppear()
+        XCTAssertFalse(model.isContinueSetUpVisible, "dismissNextStepsCardsAfterDays")
+        waitForExpectations(timeout: 1)
+
+        // shouldn‘t change after being set once
+        for i in (AppearancePreferences.Constants.dismissNextStepsCardsAfterDays + 1)..<(AppearancePreferences.Constants.dismissNextStepsCardsAfterDays + 20) {
+            XCTAssertFalse(model.isContinueSetUpVisible, "\(i)")
+            XCTAssertTrue(model.isContinueSetUpCardsViewOutdated, "\(i)")
+            incrementDate()
+            model.continueSetUpCardsViewDidAppear()
+        }
+
+        withExtendedLifetime(c) {}
+    }
+
 }

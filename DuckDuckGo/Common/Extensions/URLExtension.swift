@@ -20,10 +20,11 @@ import AppKit
 import BrowserServicesKit
 import Common
 import Foundation
+import AppKitExtensions
+import os.log
 
 extension URL.NavigationalScheme {
 
-    static let duck = URL.NavigationalScheme(rawValue: "duck")
     static let javascript = URL.NavigationalScheme(rawValue: "javascript")
 
     static var validSchemes: [URL.NavigationalScheme] {
@@ -117,7 +118,7 @@ extension URL {
             return searchUrl
         }
 
-        os_log("URL extension: Making URL from %s failed", type: .error, addressBarString)
+        Logger.general.error("URL extension: Making URL from \(addressBarString) failed")
         return nil
     }
 
@@ -139,8 +140,14 @@ extension URL {
     static let welcome = URL(string: "duck://welcome")!
     static let settings = URL(string: "duck://settings")!
     static let bookmarks = URL(string: "duck://bookmarks")!
+    static let releaseNotes = URL(string: "duck://release-notes")!
     // base url for Error Page Alternate HTML loaded into Web View
     static let error = URL(string: "duck://error")!
+
+    static func duckFavicon(for faviconURL: URL) -> URL? {
+        let encodedURL = faviconURL.absoluteString.percentEncoded(withAllowedCharacters: .urlPathAllowed)
+        return URL(string: "duck://favicon/\(encodedURL)")
+    }
 
     static let dataBrokerProtection = URL(string: "duck://personal-information-removal")!
 
@@ -224,10 +231,6 @@ extension URL {
         func separated() -> String {
             self.rawValue + "."
         }
-    }
-
-    var navigationalScheme: NavigationalScheme? {
-        self.scheme.map(NavigationalScheme.init(rawValue:))
     }
 
     var separatedScheme: String? {
@@ -364,6 +367,10 @@ extension URL {
         return URL(string: "https://duckduckgo.com/about")!
     }
 
+    static var updates: URL {
+        return URL(string: "https://duckduckgo.com/updates")!
+    }
+
     static var webTrackingProtection: URL {
         return URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/")!
     }
@@ -378,6 +385,10 @@ extension URL {
 
     static var privateSearchLearnMore: URL {
         return URL(string: "https://duckduckgo.com/duckduckgo-help-pages/search-privacy/")!
+    }
+
+    static var passwordManagerLearnMore: URL {
+        return URL(string: "https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/password-manager-security/")!
     }
 
     static var searchSettings: URL {
@@ -585,6 +596,12 @@ extension URL {
         } else {
             return false
         }
+    }
+
+    // MARK: - Other
+
+    static var appStore: URL {
+        URL(string: "https://apps.apple.com/app/duckduckgo-privacy-browser/id663592361")!
     }
 
 }

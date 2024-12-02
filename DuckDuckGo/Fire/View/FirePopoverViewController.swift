@@ -20,6 +20,7 @@ import Cocoa
 import Combine
 import Common
 import History
+import os.log
 
 protocol FirePopoverViewControllerDelegate: AnyObject {
 
@@ -88,7 +89,8 @@ final class FirePopoverViewController: NSViewController {
                                                          historyCoordinating: historyCoordinating,
                                                          fireproofDomains: fireproofDomains,
                                                          faviconManagement: faviconManagement,
-                                                         tld: ContentBlocking.shared.tld)
+                                                         tld: ContentBlocking.shared.tld,
+                                                         contextualOnboardingStateMachine: Application.appDelegate.onboardingStateMachine)
 
         super.init(nibName: nil, bundle: nil)
     }
@@ -758,7 +760,7 @@ final class FirePopoverViewController: NSViewController {
 
     private func setupOptionsButton() {
         guard let menu = optionsButton.menu, let font = optionsButton.font else {
-            os_log("FirePopoverViewController: Menu and/or font not present for optionsMenu", type: .error)
+            Logger.fire.error("FirePopoverViewController: Menu and/or font not present for optionsMenu")
             return
         }
         menu.removeAllItems()

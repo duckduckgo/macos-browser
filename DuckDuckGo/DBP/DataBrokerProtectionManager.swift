@@ -16,13 +16,12 @@
 //  limitations under the License.
 //
 
-#if DBP
-
 import Foundation
 import BrowserServicesKit
 import DataBrokerProtection
 import LoginItems
 import Common
+import Freemium
 
 public final class DataBrokerProtectionManager {
 
@@ -31,10 +30,17 @@ public final class DataBrokerProtectionManager {
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()
     private let authenticationManager: DataBrokerProtectionAuthenticationManaging
     private let fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker()
-    private let dataBrokerProtectionWaitlistDataSource: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .dbp)
+
+    private lazy var freemiumDBPFirstProfileSavedNotifier: FreemiumDBPFirstProfileSavedNotifier = {
+        let freemiumDBPUserStateManager = DefaultFreemiumDBPUserStateManager(userDefaults: .dbp)
+        let accountManager = Application.appDelegate.subscriptionManager.accountManager
+        let freemiumDBPFirstProfileSavedNotifier = FreemiumDBPFirstProfileSavedNotifier(freemiumDBPUserStateManager: freemiumDBPUserStateManager,
+                                                                                        accountManager: accountManager)
+        return freemiumDBPFirstProfileSavedNotifier
+    }()
 
     lazy var dataManager: DataBrokerProtectionDataManager = {
-        let dataManager = DataBrokerProtectionDataManager(pixelHandler: pixelHandler, fakeBrokerFlag: fakeBrokerFlag)
+        let dataManager = DataBrokerProtectionDataManager(profileSavedNotifier: freemiumDBPFirstProfileSavedNotifier, pixelHandler: pixelHandler, fakeBrokerFlag: fakeBrokerFlag)
         dataManager.delegate = self
         return dataManager
     }()
@@ -66,16 +72,20 @@ public final class DataBrokerProtectionManager {
 }
 
 extension DataBrokerProtectionManager: DataBrokerProtectionDataManagerDelegate {
+
     public func dataBrokerProtectionDataManagerDidUpdateData() {
         loginItemInterface.profileSaved()
-
-        let dbpDateStore = DefaultWaitlistActivationDateStore(source: .dbp)
-        dbpDateStore.setActivationDateIfNecessary()
     }
 
     public func dataBrokerProtectionDataManagerDidDeleteData() {
         loginItemInterface.dataDeleted()
     }
-}
 
-#endif
+    public func dataBrokerProtectionDataManagerWillOpenSendFeedbackForm() {
+        NotificationCenter.default.post(name: .OpenUnifiedFeedbackForm, object: nil, userInfo: UnifiedFeedbackSource.userInfo(source: .pir))
+    }
+
+    public func isAuthenticatedUser() -> Bool {
+        isUserAuthenticated()
+    }
+}

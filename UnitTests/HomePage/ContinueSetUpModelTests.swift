@@ -21,22 +21,6 @@ import BrowserServicesKit
 import Common
 @testable import DuckDuckGo_Privacy_Browser
 
-final class MockSurveyRemoteMessaging: SurveyRemoteMessaging {
-
-    var messages: [SurveyRemoteMessage] = []
-
-    func fetchRemoteMessages() async {
-        return
-    }
-
-    func presentableRemoteMessages() -> [SurveyRemoteMessage] {
-        messages
-    }
-
-    func dismiss(message: SurveyRemoteMessage) {}
-
-}
-
 final class ContinueSetUpModelTests: XCTestCase {
 
     var vm: HomePage.Models.ContinueSetUpModel!
@@ -48,16 +32,12 @@ final class ContinueSetUpModelTests: XCTestCase {
     var duckPlayerPreferences: DuckPlayerPreferencesPersistor!
     var coookiePopupProtectionPreferences: MockCookiePopupProtectionPreferencesPersistor!
     var privacyConfigManager: MockPrivacyConfigurationManager!
-    var randomNumberGenerator: MockRandomNumberGenerator!
     var dockCustomizer: DockCustomization!
-    var mockSurveyMessaging: SurveyRemoteMessaging!
     let userDefaults = UserDefaults(suiteName: "\(Bundle.main.bundleIdentifier!).\(NSApplication.runType)")!
 
     @MainActor override func setUp() {
         UserDefaultsWrapper<Any>.clearAll()
         userDefaults.set(Date(), forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
-        userDefaults.set(false, forKey: UserDefaultsWrapper<Date>.Key.homePageUserInSurveyShare.rawValue)
-        userDefaults.set(nil, forKey: UserDefaultsWrapper<Bool?>.Key.homePageShowPermanentSurvey.rawValue)
         capturingDefaultBrowserProvider = CapturingDefaultBrowserProvider()
         capturingDataImportProvider = CapturingDataImportProvider()
         tabCollectionVM = TabCollectionViewModel()
@@ -67,8 +47,6 @@ final class ContinueSetUpModelTests: XCTestCase {
         privacyConfigManager = MockPrivacyConfigurationManager()
         let config = MockPrivacyConfiguration()
         privacyConfigManager.privacyConfig = config
-        randomNumberGenerator = MockRandomNumberGenerator()
-        mockSurveyMessaging = MockSurveyRemoteMessaging()
         dockCustomizer = DockCustomizerMock()
 
         vm = HomePage.Models.ContinueSetUpModel(
@@ -78,9 +56,7 @@ final class ContinueSetUpModelTests: XCTestCase {
             tabCollectionViewModel: tabCollectionVM,
             emailManager: emailManager,
             duckPlayerPreferences: duckPlayerPreferences,
-            surveyRemoteMessaging: mockSurveyMessaging,
-            privacyConfigurationManager: privacyConfigManager,
-            permanentSurveyManager: MockPermanentSurveyManager()
+            privacyConfigurationManager: privacyConfigManager
         )
     }
 
@@ -121,9 +97,7 @@ final class ContinueSetUpModelTests: XCTestCase {
             dataImportProvider: capturingDataImportProvider,
             tabCollectionViewModel: tabCollectionVM,
             emailManager: emailManager,
-            duckPlayerPreferences: duckPlayerPreferences,
-            surveyRemoteMessaging: createMessaging(),
-            permanentSurveyManager: MockPermanentSurveyManager()
+            duckPlayerPreferences: duckPlayerPreferences
         )
 
         XCTAssertFalse(vm.isMoreOrLessButtonNeeded)
@@ -139,16 +113,14 @@ final class ContinueSetUpModelTests: XCTestCase {
             dataImportProvider: capturingDataImportProvider,
             tabCollectionViewModel: tabCollectionVM,
             emailManager: emailManager,
-            duckPlayerPreferences: duckPlayerPreferences,
-            surveyRemoteMessaging: createMessaging(),
-            permanentSurveyManager: MockPermanentSurveyManager()
+            duckPlayerPreferences: duckPlayerPreferences
         )
 
         XCTAssertEqual(vm.visibleFeaturesMatrix, expectedMatrix)
 
         vm.shouldShowAllFeatures = true
 
-        expectedMatrix = expectedFeatureMatrixWithout(types: [.permanentSurvey])
+        expectedMatrix = expectedFeatureMatrixWithout(types: [])
 
         XCTAssertEqual(vm.visibleFeaturesMatrix, expectedMatrix)
     }
@@ -160,12 +132,11 @@ final class ContinueSetUpModelTests: XCTestCase {
         vm.shouldShowAllFeatures = true
 
         XCTAssertEqual(vm.visibleFeaturesMatrix[0][0], HomePage.Models.FeatureType.defaultBrowser)
-        // All cases minus two since it will show only one of the surveys and no NetP card
-        XCTAssertEqual(vm.visibleFeaturesMatrix.reduce([], +).count, HomePage.Models.FeatureType.allCases.count - 1)
+        XCTAssertEqual(vm.visibleFeaturesMatrix.reduce([], +).count, HomePage.Models.FeatureType.allCases.count)
     }
 
     func testWhenTogglingShowAllFeatureThenCorrectElementsAreVisible() {
-        let expectedMatrix = expectedFeatureMatrixWithout(types: [.permanentSurvey])
+        let expectedMatrix = expectedFeatureMatrixWithout(types: [])
 
         vm.shouldShowAllFeatures = true
 
@@ -193,7 +164,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     @MainActor func testWhenIsDefaultBrowserAndTogglingShowAllFeatureThenCorrectElementsAreVisible() {
-        let expectedMatrix = expectedFeatureMatrixWithout(types: [.defaultBrowser, .permanentSurvey])
+        let expectedMatrix = expectedFeatureMatrixWithout(types: [.defaultBrowser])
 
         capturingDefaultBrowserProvider.isDefault = true
         vm = HomePage.Models.ContinueSetUpModel.fixture(defaultBrowserProvider: capturingDefaultBrowserProvider, appGroupUserDefaults: userDefaults)
@@ -209,7 +180,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     @MainActor func testWhenAskedToPerformActionForImportPromptThrowsThenItOpensImportWindow() {
-        let numberOfFeatures = HomePage.Models.FeatureType.allCases.count - 1
+        let numberOfFeatures = HomePage.Models.FeatureType.allCases.count
 
         vm.shouldShowAllFeatures = true
         XCTAssertEqual(vm.visibleFeaturesMatrix.flatMap { $0 }.count, numberOfFeatures)
@@ -222,7 +193,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     @MainActor func testWhenUserHasUsedImportAndTogglingShowAllFeatureThenCorrectElementsAreVisible() {
-        let expectedMatrix = expectedFeatureMatrixWithout(types: [.permanentSurvey, .importBookmarksAndPasswords])
+        let expectedMatrix = expectedFeatureMatrixWithout(types: [.importBookmarksAndPasswords])
 
         capturingDataImportProvider.didImport = true
         vm = HomePage.Models.ContinueSetUpModel.fixture(dataImportProvider: capturingDataImportProvider, appGroupUserDefaults: userDefaults)
@@ -244,7 +215,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     @MainActor func testWhenUserHasEmailProtectionEnabledThenCorrectElementsAreVisible() {
-        let expectedMatrix = expectedFeatureMatrixWithout(types: [.permanentSurvey, .emailProtection])
+        let expectedMatrix = expectedFeatureMatrixWithout(types: [.emailProtection])
 
         emailStorage.isEmailProtectionEnabled = true
         vm = HomePage.Models.ContinueSetUpModel.fixture(emailManager: emailManager, appGroupUserDefaults: userDefaults)
@@ -266,7 +237,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     @MainActor func testWhenUserHasDuckPlayerEnabledAndOverlayButtonNotPressedThenCorrectElementsAreVisible() {
-        let expectedMatrix = expectedFeatureMatrixWithout(types: [.permanentSurvey, .duckplayer])
+        let expectedMatrix = expectedFeatureMatrixWithout(types: [.duckplayer])
 
         duckPlayerPreferences.youtubeOverlayAnyButtonPressed = false
         duckPlayerPreferences.duckPlayerModeBool = true
@@ -283,7 +254,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     @MainActor func testWhenUserHasDuckPlayerDisabledAndOverlayButtonNotPressedThenCorrectElementsAreVisible() {
-        let expectedMatrix = expectedFeatureMatrixWithout(types: [.permanentSurvey, .duckplayer])
+        let expectedMatrix = expectedFeatureMatrixWithout(types: [.duckplayer])
 
         duckPlayerPreferences.youtubeOverlayAnyButtonPressed = false
         duckPlayerPreferences.duckPlayerModeBool = false
@@ -300,7 +271,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     @MainActor func testWhenUserHasDuckPlayerOnAlwaysAskAndOverlayButtonNotPressedThenCorrectElementsAreVisible() {
-        let expectedMatrix = expectedFeatureMatrixWithout(types: [.permanentSurvey])
+        let expectedMatrix = expectedFeatureMatrixWithout(types: [])
 
         duckPlayerPreferences.youtubeOverlayAnyButtonPressed = false
         duckPlayerPreferences.duckPlayerModeBool = nil
@@ -317,7 +288,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     @MainActor func testWhenUserHasDuckPlayerOnAlwaysAskAndOverlayButtonIsPressedThenCorrectElementsAreVisible() {
-        let expectedMatrix = expectedFeatureMatrixWithout(types: [.permanentSurvey, .duckplayer])
+        let expectedMatrix = expectedFeatureMatrixWithout(types: [.duckplayer])
 
         duckPlayerPreferences.youtubeOverlayAnyButtonPressed = true
         duckPlayerPreferences.duckPlayerModeBool = nil
@@ -339,7 +310,6 @@ final class ContinueSetUpModelTests: XCTestCase {
         duckPlayerPreferences.youtubeOverlayAnyButtonPressed = true
         capturingDataImportProvider.didImport = true
         dockCustomizer.addToDock()
-        userDefaults.set(false, forKey: UserDefaultsWrapper<Date>.Key.homePageShowPermanentSurvey.rawValue)
 
         vm = HomePage.Models.ContinueSetUpModel(
             defaultBrowserProvider: capturingDefaultBrowserProvider,
@@ -347,9 +317,7 @@ final class ContinueSetUpModelTests: XCTestCase {
             dataImportProvider: capturingDataImportProvider,
             tabCollectionViewModel: tabCollectionVM,
             emailManager: emailManager,
-            duckPlayerPreferences: duckPlayerPreferences,
-            surveyRemoteMessaging: createMessaging(),
-            permanentSurveyManager: MockPermanentSurveyManager()
+            duckPlayerPreferences: duckPlayerPreferences
         )
 
         XCTAssertEqual(vm.visibleFeaturesMatrix, [[]])
@@ -364,12 +332,10 @@ final class ContinueSetUpModelTests: XCTestCase {
             dataImportProvider: capturingDataImportProvider,
             tabCollectionViewModel: tabCollectionVM,
             emailManager: emailManager,
-            duckPlayerPreferences: duckPlayerPreferences,
-            surveyRemoteMessaging: createMessaging(),
-            permanentSurveyManager: MockPermanentSurveyManager()
+            duckPlayerPreferences: duckPlayerPreferences
         )
         vm.shouldShowAllFeatures = true
-        let expectedMatrix = expectedFeatureMatrixWithout(types: [.permanentSurvey])
+        let expectedMatrix = expectedFeatureMatrixWithout(types: [])
         XCTAssertEqual(expectedMatrix, vm.visibleFeaturesMatrix)
 
         vm.removeItem(for: .defaultBrowser)
@@ -401,89 +367,6 @@ final class ContinueSetUpModelTests: XCTestCase {
         XCTAssertFalse(vm2.shouldShowAllFeatures)
     }
 
-    @MainActor func test_PermanentSurveyHasExpectedStrings() {
-        let surveyCardType = HomePage.Models.FeatureType.permanentSurvey
-
-        XCTAssertEqual(surveyCardType.title, PermanentSurveyManager.title)
-        XCTAssertEqual(surveyCardType.summary, PermanentSurveyManager.body)
-        XCTAssertEqual(surveyCardType.action, PermanentSurveyManager.actionTitle)
-    }
-
-    @MainActor func test_whenSurveyIsAvailable_AndUserHasNotInteractedWithTheCard_ThenPermanentSureveyDisplayed() {
-        let expectedURL = URL(string: "someurl.com")
-        let surveyManager = MockPermanentSurveyManager(isSurveyAvailable: true, url: expectedURL)
-        userDefaults.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowPermanentSurvey.rawValue)
-
-        let vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, permanentSurveyManager: surveyManager)
-        vm.shouldShowAllFeatures = true
-
-        XCTAssertTrue(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.permanentSurvey))
-    }
-
-    @MainActor func test_whenSurveyIsNotAvailable_AndUserHasNotInteractedWithTheCard_ThenPermanentSureveyIsNotDisplayed() {
-        let expectedURL = URL(string: "someurl.com")
-        let surveyManager = MockPermanentSurveyManager(isSurveyAvailable: false, url: expectedURL)
-        userDefaults.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowPermanentSurvey.rawValue)
-
-        let vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, permanentSurveyManager: surveyManager)
-        vm.shouldShowAllFeatures = true
-
-        XCTAssertFalse(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.permanentSurvey))
-    }
-
-    @MainActor func test_whenSurveyIsAvailable_AndUserHasInteractedWithTheCard_ThenPermanentSureveyIsNotDisplayed() {
-        let expectedURL = URL(string: "someurl.com")
-        let surveyManager = MockPermanentSurveyManager(isSurveyAvailable: false, url: expectedURL)
-        userDefaults.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowPermanentSurvey.rawValue)
-
-        let vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, permanentSurveyManager: surveyManager)
-        vm.shouldShowAllFeatures = true
-
-        XCTAssertFalse(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.permanentSurvey))
-    }
-
-    @MainActor func test_whenUserDismissPermanentSurvey_ThenPermoanentSurveyIsRemovedFromVisibleMatrixAndChoicesArePersisted() {
-        let expectedURL = URL(string: "someurl.com")
-        let surveyManager = MockPermanentSurveyManager(isSurveyAvailable: false, url: expectedURL)
-        userDefaults.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowPermanentSurvey.rawValue)
-        let vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, permanentSurveyManager: surveyManager)
-        vm.shouldShowAllFeatures = true
-
-        vm.removeItem(for: .permanentSurvey)
-
-        XCTAssertFalse(vm.visibleFeaturesMatrix.flatMap { $0 }.contains(.permanentSurvey))
-
-        let vm2 = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, permanentSurveyManager: surveyManager)
-        vm2.shouldShowAllFeatures = true
-
-        XCTAssertFalse(vm2.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.permanentSurvey))
-    }
-
-    @MainActor func testWhenAskedToPerformActionForPermanentShowsTheSurveySite() async {
-        let expectedURL = URL(string: "someurl.com")
-        let surveyManager = MockPermanentSurveyManager(isSurveyAvailable: true, url: expectedURL)
-        userDefaults.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowPermanentSurvey.rawValue)
-        let vm = HomePage.Models.ContinueSetUpModel(
-            defaultBrowserProvider: capturingDefaultBrowserProvider,
-            dockCustomizer: dockCustomizer,
-            dataImportProvider: capturingDataImportProvider,
-            tabCollectionViewModel: tabCollectionVM,
-            emailManager: emailManager,
-            duckPlayerPreferences: duckPlayerPreferences,
-            surveyRemoteMessaging: createMessaging(),
-            privacyConfigurationManager: privacyConfigManager,
-            permanentSurveyManager: surveyManager
-        )
-
-        vm.performAction(for: .permanentSurvey)
-
-        XCTAssertEqual(tabCollectionVM.tabs[1].url, expectedURL)
-
-        let vm2 = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, permanentSurveyManager: surveyManager)
-        vm2.shouldShowAllFeatures = true
-        XCTAssertFalse(vm2.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.permanentSurvey))
-    }
-
     private func doTheyContainTheSameElements(matrix1: [[HomePage.Models.FeatureType]], matrix2: [[HomePage.Models.FeatureType]]) -> Bool {
         Set(matrix1.flatMap { $0 }) == Set(matrix2.flatMap { $0 })
     }
@@ -499,10 +382,6 @@ final class ContinueSetUpModelTests: XCTestCase {
             features.remove(at: index)
         }
         return features.chunked(into: HomePage.featuresPerRow)
-    }
-
-    private func createMessaging() -> SurveyRemoteMessaging {
-        MockSurveyRemoteMessaging()
     }
 
     @MainActor func test_WhenUserDoesntHaveApplicationInTheDock_ThenAddToDockCardIsDisplayed() {
@@ -536,8 +415,6 @@ extension HomePage.Models.ContinueSetUpModel {
         duckPlayerPreferences: DuckPlayerPreferencesPersistor = DuckPlayerPreferencesPersistorMock(),
         privacyConfig: MockPrivacyConfiguration = MockPrivacyConfiguration(),
         appGroupUserDefaults: UserDefaults,
-        permanentSurveyManager: MockPermanentSurveyManager = MockPermanentSurveyManager(),
-        randomNumberGenerator: RandomNumberGenerating = MockRandomNumberGenerator(),
         dockCustomizer: DockCustomization = DockCustomizerMock()
     ) -> HomePage.Models.ContinueSetUpModel {
         privacyConfig.featureSettings = [
@@ -553,19 +430,6 @@ extension HomePage.Models.ContinueSetUpModel {
             tabCollectionViewModel: TabCollectionViewModel(),
             emailManager: emailManager,
             duckPlayerPreferences: duckPlayerPreferences,
-            surveyRemoteMessaging: MockSurveyRemoteMessaging(),
-            privacyConfigurationManager: manager,
-            permanentSurveyManager: permanentSurveyManager)
+            privacyConfigurationManager: manager)
     }
-}
-
-struct MockPermanentSurveyManager: SurveyManager {
-    var isSurveyAvailable: Bool = false
-    var url: URL?
-
-    static var title: String = "some title"
-
-    static var body: String = "some body"
-
-    static var actionTitle: String = "some action"
 }

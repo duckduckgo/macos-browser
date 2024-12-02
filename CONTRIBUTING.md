@@ -2,10 +2,10 @@
 
 Thank you for taking the time to contribute to DuckDuckGo! :sparkles:
 
-We are pleased to open up the project to you - our community. How can you contribute?
+We are pleased to open up this project to you — our community. We want to build the best browser out there. Here's how you can help us make that happen!
 
 ## Share feedback
-Contact us at https://duckduckgo.com/feedback if you have feedback, questions or want to chat. You can also use the feedback form embedded within our app - to do so please go to Main Menu -> Help -> Send Feedback.
+If you have feedback or questions, you can [contact us](https://duckduckgo.com/duckduckgo-help-pages/company/contact-us/). You can also use the feedback form in the browser. To do so, go to the three-dot menu > Send Feedback.
 
 ## Report an issue
 A great way to contribute to the project is to report an issue when you encounter a problem.
@@ -19,7 +19,7 @@ We want our app to be as stable as possible thus your bug reports are immensely 
 
 If you have encountered a security issue, please reach us through https://hackerone.com/duckduckgo.
 
-## Contributing Code
+## Contribute Code
 We're always open to contributions from the community! There are different approaches depending on how you wish to contribute:
 
 * **For bug fixes**, feel free to open a pull request along with an associated issue. Someone from the team will review your issue/change within a few days.

@@ -18,20 +18,25 @@
 
 import Common
 import Foundation
+import os.log
 
 protocol DataBrokerProtectionOperationQueue {
     var maxConcurrentOperationCount: Int { get set }
     func cancelAllOperations()
     func addOperation(_ op: Operation)
-    func addBarrierBlock(_ barrier: @escaping @Sendable () -> Void)
+    func addBarrierBlock1(_ barrier: @escaping @Sendable () -> Void)
 }
 
-extension OperationQueue: DataBrokerProtectionOperationQueue {}
+extension OperationQueue: DataBrokerProtectionOperationQueue {
+    func addBarrierBlock1(_ barrier: @escaping () -> Void) {
+        addBarrierBlock(barrier)
+    }
+}
 
 enum DataBrokerProtectionQueueMode {
     case idle
-    case immediate(completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?)
-    case scheduled(completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?)
+    case immediate(errorHandler: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?, completion: (() -> Void)?)
+    case scheduled(errorHandler: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?, completion: (() -> Void)?)
 
     var priorityDate: Date? {
         switch self {
@@ -62,7 +67,8 @@ enum DataBrokerProtectionQueueError: Error {
 enum DataBrokerProtectionQueueManagerDebugCommand {
     case startOptOutOperations(showWebView: Bool,
                                operationDependencies: DataBrokerOperationDependencies,
-                               completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?)
+                               errorHandler: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?,
+                               completion: (() -> Void)?)
 }
 
 protocol DataBrokerProtectionQueueManager {
@@ -73,12 +79,18 @@ protocol DataBrokerProtectionQueueManager {
          brokerUpdater: DataBrokerProtectionBrokerUpdater?,
          pixelHandler: EventMapping<DataBrokerProtectionPixels>)
 
-    func startImmediateOperationsIfPermitted(showWebView: Bool,
-                                             operationDependencies: DataBrokerOperationDependencies,
-                                             completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?)
-    func startScheduledOperationsIfPermitted(showWebView: Bool,
-                                             operationDependencies: DataBrokerOperationDependencies,
-                                             completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?)
+    func startImmediateScanOperationsIfPermitted(showWebView: Bool,
+                                                 operationDependencies: DataBrokerOperationDependencies,
+                                                 errorHandler: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?,
+                                                 completion: (() -> Void)?)
+    func startScheduledAllOperationsIfPermitted(showWebView: Bool,
+                                                operationDependencies: DataBrokerOperationDependencies,
+                                                errorHandler: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?,
+                                                completion: (() -> Void)?)
+    func startScheduledScanOperationsIfPermitted(showWebView: Bool,
+                                                 operationDependencies: DataBrokerOperationDependencies,
+                                                 errorHandler: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?,
+                                                 completion: (() -> Void)?)
 
     func execute(_ command: DataBrokerProtectionQueueManagerDebugCommand)
     var debugRunningStatusString: String { get }
@@ -118,55 +130,87 @@ final class DefaultDataBrokerProtectionQueueManager: DataBrokerProtectionQueueMa
         self.pixelHandler = pixelHandler
     }
 
-    func startImmediateOperationsIfPermitted(showWebView: Bool,
-                                             operationDependencies: DataBrokerOperationDependencies,
-                                             completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
+    func startImmediateScanOperationsIfPermitted(showWebView: Bool,
+                                                 operationDependencies: DataBrokerOperationDependencies,
+                                                 errorHandler: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?,
+                                                 completion: (() -> Void)?) {
 
-        let newMode = DataBrokerProtectionQueueMode.immediate(completion: completion)
+        let newMode = DataBrokerProtectionQueueMode.immediate(errorHandler: errorHandler, completion: completion)
         startOperationsIfPermitted(forNewMode: newMode,
-                                   type: .scan,
+                                   type: .manualScan,
                                    showWebView: showWebView,
                                    operationDependencies: operationDependencies) { [weak self] errors in
-            completion?(errors)
             self?.mismatchCalculator.calculateMismatches()
+            errorHandler?(errors)
+        } completion: {
+            completion?()
         }
     }
 
-    func startScheduledOperationsIfPermitted(showWebView: Bool,
-                                             operationDependencies: DataBrokerOperationDependencies,
-                                             completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
-        let newMode = DataBrokerProtectionQueueMode.scheduled(completion: completion)
-        startOperationsIfPermitted(forNewMode: newMode,
-                                   type: .all,
-                                   showWebView: showWebView,
-                                   operationDependencies: operationDependencies,
-                                   completion: completion)
+    func startScheduledAllOperationsIfPermitted(showWebView: Bool,
+                                                operationDependencies: DataBrokerOperationDependencies,
+                                                errorHandler: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?,
+                                                completion: (() -> Void)?) {
+        startScheduleOperationsIfPermitted(withOperationType: .all,
+                                           showWebView: showWebView,
+                                           operationDependencies: operationDependencies,
+                                           errorHandler: errorHandler,
+                                           completion: completion)
+    }
+
+    func startScheduledScanOperationsIfPermitted(showWebView: Bool,
+                                                 operationDependencies: DataBrokerOperationDependencies,
+                                                 errorHandler: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?,
+                                                 completion: (() -> Void)?) {
+        startScheduleOperationsIfPermitted(withOperationType: .scheduledScan,
+                                           showWebView: showWebView,
+                                           operationDependencies: operationDependencies,
+                                           errorHandler: errorHandler,
+                                           completion: completion)
     }
 
     func execute(_ command: DataBrokerProtectionQueueManagerDebugCommand) {
         guard case .startOptOutOperations(let showWebView,
                                           let operationDependencies,
+                                          let errorHandler,
                                           let completion) = command else { return }
 
         addOperations(withType: .optOut,
                       showWebView: showWebView,
                       operationDependencies: operationDependencies,
+                      errorHandler: errorHandler,
                       completion: completion)
     }
 }
 
 private extension DefaultDataBrokerProtectionQueueManager {
 
+    func startScheduleOperationsIfPermitted(withOperationType operationType: OperationType,
+                                            showWebView: Bool,
+                                            operationDependencies: DataBrokerOperationDependencies,
+                                            errorHandler: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?,
+                                            completion: (() -> Void)?) {
+        let newMode = DataBrokerProtectionQueueMode.scheduled(errorHandler: errorHandler, completion: completion)
+        startOperationsIfPermitted(forNewMode: newMode,
+                                   type: operationType,
+                                   showWebView: showWebView,
+                                   operationDependencies: operationDependencies,
+                                   errorHandler: errorHandler,
+                                   completion: completion)
+    }
+
     func startOperationsIfPermitted(forNewMode newMode: DataBrokerProtectionQueueMode,
                                     type: OperationType,
                                     showWebView: Bool,
                                     operationDependencies: DataBrokerOperationDependencies,
-                                    completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
+                                    errorHandler: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?,
+                                    completion: (() -> Void)?) {
 
         guard mode.canBeInterruptedBy(newMode: newMode) else {
             let error = DataBrokerProtectionQueueError.cannotInterrupt
             let errorCollection = DataBrokerProtectionAgentErrorCollection(oneTimeError: error)
-            completion?(errorCollection)
+            errorHandler?(errorCollection)
+            completion?()
             return
         }
 
@@ -176,30 +220,33 @@ private extension DefaultDataBrokerProtectionQueueManager {
 
         updateBrokerData()
 
-        firePixels(operationDependencies: operationDependencies)
-
         addOperations(withType: type,
                       priorityDate: mode.priorityDate,
                       showWebView: showWebView,
                       operationDependencies: operationDependencies,
+                      errorHandler: errorHandler,
                       completion: completion)
     }
 
     func cancelCurrentModeAndResetIfNeeded() {
         switch mode {
-        case .immediate(let completion), .scheduled(let completion):
+        case .immediate(let errorHandler, let completion), .scheduled(let errorHandler, let completion):
             operationQueue.cancelAllOperations()
             let errorCollection = DataBrokerProtectionAgentErrorCollection(oneTimeError: DataBrokerProtectionQueueError.interrupted, operationErrors: operationErrorsForCurrentOperations())
-            completion?(errorCollection)
-            resetModeAndClearErrors()
+            errorHandler?(errorCollection)
+            resetMode(clearErrors: true)
+            completion?()
+            resetMode()
         default:
             break
         }
     }
 
-    func resetModeAndClearErrors() {
+    func resetMode(clearErrors: Bool = false) {
         mode = .idle
-        operationErrors = []
+        if clearErrors {
+            operationErrors = []
+        }
     }
 
     func updateBrokerData() {
@@ -211,7 +258,8 @@ private extension DefaultDataBrokerProtectionQueueManager {
                        priorityDate: Date? = nil,
                        showWebView: Bool,
                        operationDependencies: DataBrokerOperationDependencies,
-                       completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
+                       errorHandler: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?,
+                       completion: (() -> Void)?) {
 
         operationQueue.maxConcurrentOperationCount = operationDependencies.config.concurrentOperationsFor(type)
 
@@ -228,36 +276,23 @@ private extension DefaultDataBrokerProtectionQueueManager {
                 operationQueue.addOperation(collection)
             }
         } catch {
-            os_log("DataBrokerProtectionProcessor error: addOperations, error: %{public}@", log: .error, error.localizedDescription)
-            completion?(DataBrokerProtectionAgentErrorCollection(oneTimeError: error))
+            Logger.dataBrokerProtection.error("DataBrokerProtectionProcessor error: addOperations, error: \(error.localizedDescription, privacy: .public)")
+            errorHandler?(DataBrokerProtectionAgentErrorCollection(oneTimeError: error))
+            completion?()
             return
         }
 
-        operationQueue.addBarrierBlock { [weak self] in
+        operationQueue.addBarrierBlock1 { [weak self] in
             let errorCollection = DataBrokerProtectionAgentErrorCollection(oneTimeError: nil, operationErrors: self?.operationErrorsForCurrentOperations())
-            completion?(errorCollection)
-            self?.resetModeAndClearErrors()
+            errorHandler?(errorCollection)
+            self?.resetMode(clearErrors: true)
+            completion?()
+            self?.resetMode()
         }
     }
 
     func operationErrorsForCurrentOperations() -> [Error]? {
         return operationErrors.count != 0 ? operationErrors : nil
-    }
-
-    func firePixels(operationDependencies: DataBrokerOperationDependencies) {
-        let database = operationDependencies.database
-        let pixelHandler = operationDependencies.pixelHandler
-
-        let engagementPixels = DataBrokerProtectionEngagementPixels(database: database, handler: pixelHandler)
-        let eventPixels = DataBrokerProtectionEventPixels(database: database, handler: pixelHandler)
-        let statsPixels = DataBrokerProtectionStatsPixels(database: database, handler: pixelHandler)
-
-        // This will fire the DAU/WAU/MAU pixels,
-        engagementPixels.fireEngagementPixel()
-        // This will try to fire the event weekly report pixels
-        eventPixels.tryToFireWeeklyPixels()
-        // This will try to fire the stats pixels
-        statsPixels.tryToFireStatsPixels()
     }
 }
 

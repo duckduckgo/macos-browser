@@ -35,6 +35,8 @@ protocol FaviconManagement: AnyObject {
 
     func handleFaviconsByDocumentUrl(_ faviconsByDocumentUrl: [URL: [Favicon]])
 
+    func getCachedFaviconURL(for documentUrl: URL, sizeCategory: Favicon.SizeCategory) -> URL?
+
     func getCachedFavicon(for documentUrl: URL, sizeCategory: Favicon.SizeCategory) -> Favicon?
 
     func getCachedFavicon(for host: String, sizeCategory: Favicon.SizeCategory) -> Favicon?
@@ -55,12 +57,14 @@ protocol FaviconManagement: AnyObject {
 @MainActor
 final class FaviconManager: FaviconManagement {
 
-    static let shared: FaviconManager = {
+    nonisolated static let shared: FaviconManager = {
+        MainActor.assumeIsolated {
 #if DEBUG
-        return FaviconManager(cacheType: NSApp.runType == .normal ? .standard : .inMemory)
+            return FaviconManager(cacheType: NSApp.runType == .normal ? .standard : .inMemory)
 #else
-        return FaviconManager(cacheType: .standard)
+            return FaviconManager(cacheType: .standard)
 #endif
+        }
     }()
 
     enum CacheType {
@@ -191,6 +195,10 @@ final class FaviconManager: FaviconManagement {
 
             return cachedFavicon
         }
+    }
+
+    func getCachedFaviconURL(for documentUrl: URL, sizeCategory: Favicon.SizeCategory) -> URL? {
+        referenceCache.getFaviconUrl(for: documentUrl, sizeCategory: sizeCategory)
     }
 
     func getCachedFavicon(for documentUrl: URL, sizeCategory: Favicon.SizeCategory) -> Favicon? {

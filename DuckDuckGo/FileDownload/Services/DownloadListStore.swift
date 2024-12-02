@@ -22,6 +22,7 @@ import CoreData
 import Foundation
 import UniformTypeIdentifiers
 import PixelKit
+import AppKitExtensions
 
 protocol DownloadListStoring {
 
@@ -207,7 +208,7 @@ extension DownloadListItem {
                   downloadURL: url,
                   websiteURL: managedObject.websiteURLEncrypted as? URL,
                   fileName: managedObject.filenameEncrypted as? String ?? destinationURL?.lastPathComponent ?? "",
-                  isBurner: false,
+                  fireWindowSession: nil, // burner items aren‘t stored
                   destinationURL: destinationURL,
                   destinationFileBookmarkData: managedObject.destinationFileBookmarkDataEncrypted as? Data,
                   tempURL: managedObject.tempURLEncrypted as? URL,

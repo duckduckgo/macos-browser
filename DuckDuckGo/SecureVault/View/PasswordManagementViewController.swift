@@ -25,6 +25,7 @@ import Foundation
 import SecureStorage
 import SwiftUI
 import PixelKit
+import os.log
 
 protocol PasswordManagementDelegate: AnyObject {
 
@@ -62,7 +63,8 @@ final class PasswordManagementViewController: NSViewController {
     @IBOutlet var emptyState: NSView!
     @IBOutlet var emptyStateImageView: NSImageView!
     @IBOutlet var emptyStateTitle: NSTextField!
-    @IBOutlet var emptyStateMessage: NSTextField!
+    @IBOutlet var emptyStateMessageHeight: NSLayoutConstraint!
+    @IBOutlet var emptyStateMessageContainer: NSView!
     @IBOutlet var emptyStateButton: NSButton!
     @IBOutlet weak var exportLoginItem: NSMenuItem!
     @IBOutlet var lockScreen: NSView!
@@ -170,7 +172,8 @@ final class PasswordManagementViewController: NSViewController {
         reloadDataAfterSyncCancellable = bindSyncDidFinish()
 
         emptyStateTitle.attributedStringValue = NSAttributedString.make(emptyStateTitle.stringValue, lineHeight: 1.14, kern: -0.23)
-        emptyStateMessage.attributedStringValue = NSAttributedString.make(emptyStateMessage.stringValue, lineHeight: 1.05, kern: -0.08)
+
+        setUpEmptyStateMessageView()
 
         addVaultItemButton.toolTip = UserText.addItemTooltip
         moreButton.toolTip = UserText.moreOptionsTooltip
@@ -196,6 +199,21 @@ final class PasswordManagementViewController: NSViewController {
             .store(in: &cancellables)
     }
 
+    private func setUpEmptyStateMessageView() {
+        guard let listModel else { return }
+
+        let message = " \(listModel.emptyStateMessageDescription) [\(listModel.emptyStateMessageLinkText)](\(listModel.emptyStateMessageLinkURL))"
+
+        let hostingView = NSHostingView(rootView: PasswordManagementEmptyStateMessage(
+            message: message,
+            image: .lockSolid16
+        ).fixedSize())
+
+        hostingView.frame = CGRect(origin: .zero, size: hostingView.intrinsicContentSize)
+        emptyStateMessageContainer.addSubview(hostingView)
+        emptyStateMessageHeight.constant = hostingView.intrinsicContentSize.height
+    }
+
     private func setupStrings() {
         importPasswordMenuItem.title = UserText.importPasswords
         exportLoginItem.title = UserText.exportLogins
@@ -204,7 +222,7 @@ final class PasswordManagementViewController: NSViewController {
         unlockYourAutofillLabel.title = UserText.passwordManagerUnlockAutofill
         autofillTitleLabel.stringValue = UserText.passwordManagementTitle
         emptyStateTitle.stringValue = UserText.pmEmptyStateDefaultTitle
-        emptyStateMessage.stringValue = UserText.pmEmptyStateDefaultDescription
+        setUpEmptyStateMessageView()
         emptyStateButton.title = UserText.pmEmptyStateDefaultButtonTitle
     }
 
@@ -723,9 +741,10 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     var passwordManagerSelectionCancellable: AnyCancellable?
+    var syncPromoSelectionCancellable: AnyCancellable?
 
     private func createListView() {
-        let listModel = PasswordManagementItemListModel(passwordManagerCoordinator: self.passwordManagerCoordinator, onItemSelected: { [weak self] previousValue, newValue in
+        let listModel = PasswordManagementItemListModel(passwordManagerCoordinator: self.passwordManagerCoordinator, syncPromoManager: self.syncPromoManager, onItemSelected: { [weak self] previousValue, newValue in
             guard let newValue = newValue,
                   let id = newValue.secureVaultID,
                   let window = self?.view.window else {
@@ -807,6 +826,16 @@ final class PasswordManagementViewController: NSViewController {
                     self?.displayExternalPasswordManagerView()
                 }
             }
+
+        syncPromoSelectionCancellable = listModel.$syncPromoSelected
+            .receive(on: DispatchQueue.main)
+            .removeDuplicates()
+            .sink { [weak self] value in
+                if value {
+                    self?.displaySyncPromoView()
+                }
+            }
+
     }
 
     private func displayExternalPasswordManagerView() {
@@ -815,6 +844,24 @@ final class PasswordManagementViewController: NSViewController {
         }
 
         let view = NSHostingView(rootView: passwordManagerView)
+        replaceItemContainerChildView(with: view)
+    }
+
+    private lazy var syncPromoManager: SyncPromoManaging = SyncPromoManager()
+    lazy var syncPromoViewModel: SyncPromoViewModel = SyncPromoViewModel(touchpointType: .passwords,
+                                                                         primaryButtonAction: { [weak self] in
+        self?.syncPromoManager.goToSyncSettings(for: .passwords)
+        self?.dismiss()
+    },
+                                                                         dismissButtonAction: { [weak self] in
+        self?.syncPromoManager.dismissPromoFor(.passwords)
+        self?.refreshData()
+    })
+
+    private func displaySyncPromoView() {
+
+        let syncPromoView = SyncPromoView(viewModel: syncPromoViewModel, layout: .vertical)
+        let view = NSHostingView(rootView: syncPromoView)
         replaceItemContainerChildView(with: view)
     }
 
@@ -986,7 +1033,7 @@ final class PasswordManagementViewController: NSViewController {
 
     private func showEmptyState(category: SecureVaultSorting.Category) {
         switch category {
-        case .allItems: showEmptyState(image: .passwordsAdd128, title: UserText.pmEmptyStateDefaultTitle, message: UserText.pmEmptyStateDefaultDescription, hideMessage: false, hideButton: false)
+        case .allItems: showEmptyState(image: .passwordsAdd128, title: UserText.pmEmptyStateDefaultTitle, hideMessage: false, hideButton: false)
         case .logins: showEmptyState(image: .passwordsAdd128, title: UserText.pmEmptyStateLoginsTitle, hideMessage: false, hideButton: false)
         case .identities: showEmptyState(image: .identityAdd128, title: UserText.pmEmptyStateIdentitiesTitle)
         case .cards: showEmptyState(image: .creditCardsAdd128, title: UserText.pmEmptyStateCardsTitle)
@@ -997,22 +1044,22 @@ final class PasswordManagementViewController: NSViewController {
         emptyState.isHidden = true
     }
 
-    private func showEmptyState(image: NSImage, title: String, message: String? = nil, hideMessage: Bool = true, hideButton: Bool = true) {
+    private func showEmptyState(image: NSImage, title: String, hideMessage: Bool = true, hideButton: Bool = true) {
         emptyState.isHidden = false
         emptyStateImageView.image = image
         emptyStateTitle.attributedStringValue = NSAttributedString.make(title, lineHeight: 1.14, kern: -0.23)
-        if let message {
-            emptyStateMessage.attributedStringValue = NSAttributedString.make(message, lineHeight: 1.05, kern: -0.08)
+        if !hideMessage {
+            setUpEmptyStateMessageView()
         }
-        emptyStateMessage.isHidden = hideMessage
         emptyStateButton.isHidden = hideButton
+        emptyStateMessageContainer.isHidden = hideMessage
     }
 
     private func requestSync() {
         guard let syncService = NSApp.delegateTyped.syncService else {
             return
         }
-        os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
+        Logger.sync.debug("Requesting sync if enabled")
         syncService.scheduler.requestSyncImmediately()
     }
 
@@ -1039,14 +1086,17 @@ extension PasswordManagementViewController: NSTextFieldDelegate {
     func controlTextDidChange(_ obj: Notification) {
         updateFilter()
     }
-
 }
 
 extension PasswordManagementViewController: NSTextViewDelegate {
 
     func textView(_ textView: NSTextView, clickedOnLink link: Any, at charIndex: Int) -> Bool {
-        if let link = link as? URL, let pane = PreferencePaneIdentifier(url: link) {
-            WindowControllersManager.shared.showPreferencesTab(withSelectedPane: pane)
+        if let link = link as? URL {
+            if let pane = PreferencePaneIdentifier(url: link) {
+                WindowControllersManager.shared.showPreferencesTab(withSelectedPane: pane)
+            } else {
+                WindowControllersManager.shared.showTab(with: .url(link, source: .link))
+            }
             self.dismiss()
         }
 
@@ -1077,5 +1127,20 @@ extension PasswordManagementViewController: NSMenuItemValidation {
         guard let vault = try? AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared) else { return false }
         let accounts = (try? vault.accounts()) ?? []
         return !accounts.isEmpty
+    }
+}
+
+struct PasswordManagementEmptyStateMessage: View {
+    let message: String
+    let image: ImageResource
+
+    var body: some View {
+        (
+            Text(Image(image)).baselineOffset(-1.0)
+            +
+            Text(.init(message))
+        )
+        .multilineTextAlignment(.center)
+        .frame(width: 280)
     }
 }

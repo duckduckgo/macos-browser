@@ -1,9 +1,10 @@
 {
   "name": "People Background Check",
   "url": "people-background-check.com",
-  "version": "0.3.0",
+  "version": "0.5.0",
   "parent": "verecor.com",
   "addedDatetime": 1702965600000,
+  "optOutUrl": "https://people-background-check.com/ng/control/privacy",
   "steps": [
     {
       "stepType": "scan",
@@ -57,6 +58,7 @@
   "schedulingConfig": {
     "retryError": 48,
     "confirmOptOutScan": 72,
-    "maintenanceScan": 240
+    "maintenanceScan": 120,
+    "maxAttempts": -1
   }
 }

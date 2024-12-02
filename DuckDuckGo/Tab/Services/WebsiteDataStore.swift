@@ -19,6 +19,8 @@
 import Common
 import WebKit
 import GRDB
+import Subscription
+import os.log
 
 public protocol HTTPCookieStore {
     func allCookies() async -> [HTTPCookie]
@@ -74,7 +76,7 @@ internal class WebCacheManager {
         do {
             try fm.createDirectory(at: tmpDir, withIntermediateDirectories: false, attributes: nil)
         } catch {
-            os_log("Could not create temporary directory: %s", type: .error, "\(error)")
+            Logger.general.error("Could not create temporary directory: \(error.localizedDescription)")
             return
         }
 
@@ -104,7 +106,7 @@ internal class WebCacheManager {
         do {
             try fm.createDirectory(at: tmpDir, withIntermediateDirectories: false, attributes: nil)
         } catch {
-            os_log("Could not create temporary directory: %s", type: .error, "\(error)")
+            Logger.general.error("Could not create temporary directory: \(error.localizedDescription)")
             return
         }
 
@@ -131,7 +133,7 @@ internal class WebCacheManager {
         let removableRecords = allRecords.filter { record in
             // For Local Storage, only remove records that *exactly match* the display name.
             // Subdomains or root domains should be excluded.
-            !fireproofDomains.fireproofDomains.contains(record.displayName)
+            !URL.duckduckgoDomain.contains(record.displayName) && !fireproofDomains.fireproofDomains.contains(record.displayName)
         }
 
         await websiteDataStore.removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypesExceptCookies, for: removableRecords)
@@ -153,11 +155,11 @@ internal class WebCacheManager {
 
         // Don't clear fireproof domains
         let cookiesToRemove = cookies.filter { cookie in
-            !self.fireproofDomains.isFireproof(cookieDomain: cookie.domain) && cookie.domain != URL.cookieDomain
+            !self.fireproofDomains.isFireproof(cookieDomain: cookie.domain) && ![URL.duckduckgoDomain, SubscriptionCookieManager.cookieDomain].contains(cookie.domain)
         }
 
         for cookie in cookiesToRemove {
-            os_log("Deleting cookie for %s named %s", log: .fire, cookie.domain, cookie.name)
+            Logger.fire.debug("Deleting cookie for \(cookie.domain) named \(cookie.name)")
             await cookieStore.deleteCookie(cookie)
         }
     }
@@ -208,7 +210,7 @@ internal class WebCacheManager {
                 }
             }
         } catch {
-            os_log("Failed to clear observations database: %s", log: .fire, error.localizedDescription)
+            Logger.fire.error("Failed to clear observations database: \(error.localizedDescription)")
         }
     }
 

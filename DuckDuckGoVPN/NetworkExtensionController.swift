@@ -49,10 +49,10 @@ extension NetworkExtensionController {
 
     func activateSystemExtension(waitingForUserApproval: @escaping () -> Void) async throws {
 #if NETP_SYSTEM_EXTENSION
-        let extensionVersion = try await systemExtensionManager.activate(
-            waitingForUserApproval: waitingForUserApproval)
+        if let extensionVersion = try await systemExtensionManager.activate(waitingForUserApproval: waitingForUserApproval) {
 
-        NetworkProtectionLastVersionRunStore(userDefaults: defaults).lastExtensionVersionRun = extensionVersion
+            NetworkProtectionLastVersionRunStore(userDefaults: defaults).lastExtensionVersionRun = extensionVersion
+        }
 
         try await Task.sleep(nanoseconds: 300 * NSEC_PER_MSEC)
 #endif

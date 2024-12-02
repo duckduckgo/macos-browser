@@ -55,7 +55,24 @@ extension Preferences {
                 }
                 .padding(.bottom, 12)
 
-                // SECTION: Manage VPN
+                // SECTION: Excluded Sites
+
+                if model.showExcludedSites {
+                    PreferencePaneSection(UserText.vpnExcludedSitesTitle, spacing: 4) {
+                        Text(UserText.vpnExcludedDomainsDescription)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 18)
+
+                        PreferencePaneSubSection {
+                            Button(UserText.vpnExcludedDomainsManageButtonTitle) {
+                                model.manageExcludedSites()
+                            }
+                        }
+                    }
+                    .padding(.bottom, 12)
+                }
+
+                // SECTION: General
 
                 PreferencePaneSection(UserText.vpnGeneralTitle) {
 
@@ -122,7 +139,7 @@ extension Preferences {
                                 showsCustomDNSServerPageSheet.toggle()
                             } else {
                                 model.resetDNSSettings()
-                                PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDNSUpdateDefault, frequency: .dailyAndCount)
+                                PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDNSUpdateDefault, frequency: .legacyDailyAndCount)
                             }
                         }
                         .onChange(of: showsCustomDNSServerPageSheet) { showsCustomDNSServerPageSheet in
@@ -225,9 +242,9 @@ struct CustomDNSServerPageSheet: View {
         /// Updating `dnsSettings` does an IPv4 conversion before actually commiting the change,
         /// so we do a final check to see which outcome the user ends up with
         if settings.dnsSettings.usesCustomDNS {
-            PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDNSUpdateCustom, frequency: .dailyAndCount)
+            PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDNSUpdateCustom, frequency: .legacyDailyAndCount)
         } else {
-            PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDNSUpdateDefault, frequency: .dailyAndCount)
+            PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDNSUpdateDefault, frequency: .legacyDailyAndCount)
         }
     }
 

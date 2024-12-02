@@ -17,16 +17,17 @@
 //
 
 import Foundation
+import History
 
 import XCTest
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
-@MainActor
 final class FireTests: XCTestCase {
 
     var cancellables = Set<AnyCancellable>()
 
+    @MainActor
     override func tearDown() {
         WindowsManager.closeWindows()
         for controller in WindowControllersManager.shared.mainWindowControllers {
@@ -34,6 +35,7 @@ final class FireTests: XCTestCase {
         }
     }
 
+    @MainActor
     func testWhenBurnAll_ThenAllWindowsAreClosed() {
         let manager = WebCacheManagerMock()
         let historyCoordinator = HistoryCoordinatingMock()
@@ -63,6 +65,7 @@ final class FireTests: XCTestCase {
         waitForExpectations(timeout: 5, handler: nil)
     }
 
+    @MainActor
     func testWhenBurnAll_ThenPinnedTabsArePersisted() {
         let manager = WebCacheManagerMock()
         let historyCoordinator = HistoryCoordinatingMock()
@@ -97,6 +100,7 @@ final class FireTests: XCTestCase {
         XCTAssertEqual(pinnedTabsManager.tabCollection.tabs.map(\.content.userEditableUrl), pinnedTabs.map(\.content.userEditableUrl))
     }
 
+    @MainActor
     func testWhenBurnAll_ThenAllWebsiteDataAreRemoved() {
         let manager = WebCacheManagerMock()
         let historyCoordinator = HistoryCoordinatingMock()
@@ -104,6 +108,7 @@ final class FireTests: XCTestCase {
         let permissionManager = PermissionManagerMock()
         let faviconManager = FaviconManagerMock()
         let recentlyClosedCoordinator = RecentlyClosedCoordinatorMock()
+        let visitedLinkStore = WKVisitedLinkStoreMock()
 
         let fire = Fire(cacheManager: manager,
                         historyCoordinating: historyCoordinator,
@@ -112,7 +117,8 @@ final class FireTests: XCTestCase {
                         windowControllerManager: WindowControllersManager.shared,
                         faviconManagement: faviconManager,
                         recentlyClosedCoordinator: recentlyClosedCoordinator,
-                        tld: ContentBlocking.shared.tld)
+                        tld: ContentBlocking.shared.tld,
+                        getVisitedLinkStore: { WKVisitedLinkStoreWrapper(visitedLinkStore: visitedLinkStore) })
         let tabCollectionViewModel = TabCollectionViewModel.makeTabCollectionViewModel()
         _ = WindowsManager.openNewWindow(with: tabCollectionViewModel, lazyLoadTabs: true)
 
@@ -127,8 +133,10 @@ final class FireTests: XCTestCase {
         XCTAssert(permissionManager.burnPermissionsCalled)
         XCTAssert(recentlyClosedCoordinator.burnCacheCalled)
         XCTAssert(zoomLevelsCoordinator.burnAllZoomLevelsCalled)
+        XCTAssertTrue(visitedLinkStore.removeAllCalled)
     }
 
+    @MainActor
     func testWhenBurnAllThenBurningFlagToggles() {
         let manager = WebCacheManagerMock()
         let historyCoordinator = HistoryCoordinatingMock()
@@ -159,6 +167,7 @@ final class FireTests: XCTestCase {
         waitForExpectations(timeout: 5, handler: nil)
     }
 
+    @MainActor
     func testWhenBurnAllIsCalledThenLastSessionStateIsCleared() {
         let fileName = "testStateFileForBurningAllData"
         let fileStore = preparePersistedState(withFileName: fileName)
@@ -177,6 +186,7 @@ final class FireTests: XCTestCase {
         XCTAssertFalse(appStateRestorationManager.canRestoreLastSessionState)
     }
 
+    @MainActor
     func testWhenBurnDomainsIsCalledThenLastSessionStateIsCleared() {
         let fileName = "testStateFileForBurningAllData"
         let fileStore = preparePersistedState(withFileName: fileName)
@@ -195,6 +205,7 @@ final class FireTests: XCTestCase {
         XCTAssertFalse(appStateRestorationManager.canRestoreLastSessionState)
     }
 
+    @MainActor
     func testWhenBurnDomainsIsCalledThenSelectedDomainsZoomLevelsAreBurned() {
         let domainsToBurn: Set<String> = ["test.com", "provola.co.uk"]
         let zoomLevelsCoordinator = MockSavedZoomCoordinator()
@@ -207,12 +218,14 @@ final class FireTests: XCTestCase {
         XCTAssertEqual(zoomLevelsCoordinator.domainsBurned, domainsToBurn)
     }
 
+    @MainActor
     func testWhenBurnVisitIsCalledForTodayThenAllExistingTabsAreCleared() {
         let manager = WebCacheManagerMock()
         let historyCoordinator = HistoryCoordinatingMock()
         let permissionManager = PermissionManagerMock()
         let faviconManager = FaviconManagerMock()
         let recentlyClosedCoordinator = RecentlyClosedCoordinatorMock()
+        let visitedLinkStore = WKVisitedLinkStoreMock()
 
         let fire = Fire(cacheManager: manager,
                         historyCoordinating: historyCoordinator,
@@ -220,7 +233,8 @@ final class FireTests: XCTestCase {
                         windowControllerManager: WindowControllersManager.shared,
                         faviconManagement: faviconManager,
                         recentlyClosedCoordinator: recentlyClosedCoordinator,
-                        tld: ContentBlocking.shared.tld)
+                        tld: ContentBlocking.shared.tld,
+                        getVisitedLinkStore: { WKVisitedLinkStoreWrapper(visitedLinkStore: visitedLinkStore) })
         let tabCollectionViewModel = TabCollectionViewModel.makeTabCollectionViewModel()
         _ = WindowsManager.openNewWindow(with: tabCollectionViewModel, lazyLoadTabs: true)
         XCTAssertNotEqual(tabCollectionViewModel.allTabsCount, 0)
@@ -241,14 +255,17 @@ final class FireTests: XCTestCase {
         XCTAssert(permissionManager.burnPermissionsOfDomainsCalled)
         XCTAssertFalse(permissionManager.burnPermissionsCalled)
         XCTAssert(recentlyClosedCoordinator.burnCacheCalled)
+        XCTAssertFalse(visitedLinkStore.removeAllCalled)
     }
 
+    @MainActor
     func testWhenBurnVisitIsCalledForOtherDayThenExistingTabsRemainOpen() {
         let manager = WebCacheManagerMock()
         let historyCoordinator = HistoryCoordinatingMock()
         let permissionManager = PermissionManagerMock()
         let faviconManager = FaviconManagerMock()
         let recentlyClosedCoordinator = RecentlyClosedCoordinatorMock()
+        let visitedLinkStore = WKVisitedLinkStoreMock()
 
         let fire = Fire(cacheManager: manager,
                         historyCoordinating: historyCoordinator,
@@ -256,14 +273,22 @@ final class FireTests: XCTestCase {
                         windowControllerManager: WindowControllersManager.shared,
                         faviconManagement: faviconManager,
                         recentlyClosedCoordinator: recentlyClosedCoordinator,
-                        tld: ContentBlocking.shared.tld)
+                        tld: ContentBlocking.shared.tld,
+                        getVisitedLinkStore: { WKVisitedLinkStoreWrapper(visitedLinkStore: visitedLinkStore) })
         let tabCollectionViewModel = TabCollectionViewModel.makeTabCollectionViewModel()
         _ = WindowsManager.openNewWindow(with: tabCollectionViewModel, lazyLoadTabs: true)
         XCTAssertNotEqual(tabCollectionViewModel.allTabsCount, 0)
         let numberOfTabs = tabCollectionViewModel.allTabsCount
 
         let finishedBurningExpectation = expectation(description: "Finished burning")
-        fire.burnVisits(of: [],
+        let historyEntries = [
+            HistoryEntry(identifier: UUID(), url: .duckDuckGo, failedToLoad: false, numberOfTotalVisits: 1, lastVisit: Date(), visits: [], numberOfTrackersBlocked: 0, blockedTrackingEntities: [], trackersFound: false),
+            HistoryEntry(identifier: UUID(), url: .duckDuckGoEmail, failedToLoad: false, numberOfTotalVisits: 1, lastVisit: Date(), visits: [], numberOfTrackersBlocked: 0, blockedTrackingEntities: [], trackersFound: false),
+        ]
+        fire.burnVisits(of: [
+            Visit(date: Date(), identifier: nil, historyEntry: historyEntries[0]),
+            Visit(date: Date(), identifier: nil, historyEntry: historyEntries[1]),
+                        ],
                         except: FireproofDomains.shared,
                         isToday: false,
                         completion: {
@@ -278,8 +303,11 @@ final class FireTests: XCTestCase {
         XCTAssert(permissionManager.burnPermissionsOfDomainsCalled)
         XCTAssertFalse(permissionManager.burnPermissionsCalled)
         XCTAssert(recentlyClosedCoordinator.burnCacheCalled)
+        XCTAssertFalse(visitedLinkStore.removeAllCalled)
+        XCTAssertEqual(visitedLinkStore.removeVisitedLinkCalledWithURLs, [.duckDuckGo, .duckDuckGoEmail])
     }
 
+    @MainActor
     func preparePersistedState(withFileName fileName: String) -> FileStore {
         let fileStore = FileStoreMock()
         let state = SavedStateMock()
@@ -320,4 +348,19 @@ class MockSavedZoomCoordinator: SavedZoomLevelsCoordinating {
         burnZoomLevelsOfDomainsCalled = true
         domainsBurned = baseDomains
     }
+}
+
+private class WKVisitedLinkStoreMock: NSObject {
+
+    private(set) var removeAllCalled = false
+    @objc func removeAll() {
+        removeAllCalled = true
+    }
+
+    private(set) var removeVisitedLinkCalledWithURLs = Set<URL>()
+    @objc(removeVisitedLinkWithURL:)
+    func removeVisitedLink(with url: URL) {
+        removeVisitedLinkCalledWithURLs.insert(url)
+    }
+
 }

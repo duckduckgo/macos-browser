@@ -23,14 +23,14 @@ import BrowserServicesKit
 
 final class CSVImporterIntegrationTests: XCTestCase {
 
-    override func setUpWithError() throws {
+    override func setUp() {
         super.setUp()
-        try clearDB()
+        try? clearDB()
         executionTimeAllowance = 10
     }
 
-    override func tearDownWithError() throws {
-        try clearDB()
+    override func tearDown() {
+        try? clearDB()
         super.tearDown()
     }
 
@@ -45,6 +45,7 @@ final class CSVImporterIntegrationTests: XCTestCase {
         }
     }
 
+// Flakiness needs addressing
     func _testImportPasswordsPerformance() async throws {
         let csvURL = Bundle(for: Self.self).url(forResource: "mock_login_data_large", withExtension: "csv")!
         let csvImporter = CSVImporter(
@@ -54,7 +55,7 @@ final class CSVImporterIntegrationTests: XCTestCase {
         )
         let importTask = csvImporter.importData(types: [.passwords])
 
-        // No baseline set, but should be no more than 0.3 seconds on an M1 Max with 32GB memory
+        // No baseline set, but should be no more than 0.5 seconds on an M1 Max with 32GB memory
         measureMetrics([.wallClockTime], automaticallyStartMeasuring: false) {
             let expectation = expectation(description: "Measure finished")
             Task {
@@ -68,6 +69,7 @@ final class CSVImporterIntegrationTests: XCTestCase {
         }
     }
 
+    // Flakiness needs addressing
     // Deduplication rules: https://app.asana.com/0/0/1207598052765977/f
     func _testImportingPasswords_deduplicatesAccordingToDefinedRules() async throws {
         let startingDataURL = Bundle(for: Self.self).url(forResource: "login_deduplication_starting_data", withExtension: "csv")!

@@ -47,6 +47,12 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         return manager
     }()
 
+    lazy var credentialsImportManager: AutofillCredentialsImportManager = {
+        let manager = AutofillCredentialsImportManager(isBurnerWindow: false)
+        manager.presentationDelegate = self
+        return manager
+    }()
+
     lazy var autofillPreferencesModel: AutofillPreferencesModel = {
         let model = AutofillPreferencesModel()
         return model
@@ -148,6 +154,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         topAutofillUserScript.contentOverlay = self
         topAutofillUserScript.emailDelegate = emailManager
         topAutofillUserScript.vaultDelegate = vaultManager
+        topAutofillUserScript.passwordImportDelegate = credentialsImportManager
     }
 
     // EmailManagerRequestDelegate
@@ -328,6 +335,8 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
 
             PixelKit.fire(NonStandardEvent(GeneralPixel.jsPixel(pixel)), withAdditionalParameters: pixelParameters)
             NotificationCenter.default.post(name: .autofillFillEvent, object: nil)
+        } else if pixel.isCredentialsImportPromotionPixel {
+            PixelKit.fire(NonStandardEvent(GeneralPixel.jsPixel(pixel)))
         } else {
             if pixel.isIdentityPixel {
                 NotificationCenter.default.post(name: .autofillFillEvent, object: nil)
@@ -357,6 +366,7 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
         let isGPCEnabled = WebTrackingProtectionPreferences.shared.isGPCEnabled
         let properties = ContentScopeProperties(gpcEnabled: isGPCEnabled,
                                                 sessionKey: topAutofillUserScript?.sessionKey ?? "",
+                                                messageSecret: topAutofillUserScript?.messageSecret ?? "",
                                                 featureToggles: ContentScopeFeatureToggles.supportedFeaturesOnMacOS(privacyConfigurationManager.privacyConfig))
 
         let runtimeConfiguration = DefaultAutofillSourceProvider.Builder(privacyConfigurationManager: privacyConfigurationManager,
@@ -365,5 +375,12 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
             .buildRuntimeConfigResponse()
 
         completionHandler(runtimeConfiguration)
+    }
+}
+
+extension ContentOverlayViewController: AutofillCredentialsImportPresentationDelegate {
+    public func autofillDidRequestCredentialsImportFlow(onFinished: @escaping () -> Void, onCancelled: @escaping () -> Void) {
+        let viewModel = DataImportViewModel(onFinished: onFinished, onCancelled: onCancelled)
+        DataImportView(model: viewModel).show()
     }
 }

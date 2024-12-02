@@ -56,7 +56,6 @@ final class SyncSettingsAdapter {
             metadataStore: metadataStore,
             settingsHandlers: [FavoritesDisplayModeSyncHandler(), EmailProtectionSyncHandler(emailManager: emailManager)],
             metricsEvents: metricsEventsHandler,
-            log: OSLog.sync,
             syncDidUpdateData: { [weak self] in
                 self?.syncDidCompleteSubject.send()
             }

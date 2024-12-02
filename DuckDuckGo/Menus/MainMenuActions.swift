@@ -19,11 +19,15 @@
 import BrowserServicesKit
 import Cocoa
 import Common
-import WebKit
 import Configuration
+import Crashes
+import FeatureFlags
 import History
 import PixelKit
 import Subscription
+import WebKit
+import os.log
+import SwiftUI
 
 // Actions are sent to objects of responder chain
 
@@ -33,9 +37,18 @@ extension AppDelegate {
 
     // MARK: - DuckDuckGo
 
+    @MainActor
     @objc func checkForUpdates(_ sender: Any?) {
 #if SPARKLE
-        updateController.checkForUpdates(sender)
+        if !SupportedOSChecker.isCurrentOSReceivingUpdates {
+            // Show not supported info
+            if NSAlert.osNotSupported().runModal() != .cancel {
+                let url = Preferences.UnsupportedDeviceInfoBox.softwareUpdateURL
+                NSWorkspace.shared.open(url)
+            }
+        }
+
+        showAbout(sender)
 #endif
     }
 
@@ -50,6 +63,13 @@ extension AppDelegate {
     @objc func newBurnerWindow(_ sender: Any?) {
         DispatchQueue.main.async {
             WindowsManager.openNewWindow(burnerMode: BurnerMode(isBurner: true))
+        }
+    }
+
+    @objc func newAIChat(_ sender: Any?) {
+        DispatchQueue.main.async {
+            AIChatTabOpener.openAIChatTab()
+            PixelKit.fire(GeneralPixel.aichatApplicationMenuFileClicked, includeAppVersionParameter: true)
         }
     }
 
@@ -135,6 +155,27 @@ extension AppDelegate {
 
     // MARK: - Help
 
+    @MainActor
+    @objc func showAbout(_ sender: Any?) {
+        WindowControllersManager.shared.showTab(with: .settings(pane: .about))
+    }
+
+    @MainActor
+    @objc func setAsDefault(_ sender: Any?) {
+        PixelKit.fire(GeneralPixel.defaultRequestedFromMainMenu)
+        DefaultBrowserPreferences.shared.becomeDefault()
+    }
+
+    @MainActor
+    @objc func showReleaseNotes(_ sender: Any?) {
+        WindowControllersManager.shared.showTab(with: .releaseNotes)
+    }
+
+    @MainActor
+    @objc func showWhatIsNew(_ sender: Any?) {
+        WindowControllersManager.shared.showTab(with: .url(.updates, source: .ui))
+    }
+
     #if FEEDBACK
 
     @objc func openFeedback(_ sender: Any?) {
@@ -165,11 +206,16 @@ extension AppDelegate {
         }
     }
 
+    @MainActor
+    @objc func openPProFeedback(_ sender: Any?) {
+        WindowControllersManager.shared.showShareFeedbackModal(source: .settings)
+    }
+
     #endif
 
     @objc func navigateToBookmark(_ sender: Any?) {
         guard let menuItem = sender as? NSMenuItem else {
-            os_log("AppDelegate: Casting to menu item failed", type: .error)
+            Logger.general.error("AppDelegate: Casting to menu item failed")
             return
         }
 
@@ -223,6 +269,7 @@ extension AppDelegate {
 
         DeviceAuthenticator.shared.authenticateUser(reason: .exportLogins) { authenticationResult in
             guard authenticationResult.authenticated else {
+
                 return
             }
 
@@ -281,6 +328,8 @@ extension AppDelegate {
     @objc func fireButtonAction(_ sender: NSButton) {
         DispatchQueue.main.async {
             FireCoordinator.fireButtonAction()
+            let pixelReporter = OnboardingPixelReporter()
+            pixelReporter.trackFireButtonPressed()
         }
     }
 
@@ -295,6 +344,15 @@ extension AppDelegate {
         }
     }
 
+    @objc func resetRemoteMessages(_ sender: Any?) {
+        Task {
+            await remoteMessagingClient.store?.resetRemoteMessages()
+        }
+    }
+
+    @objc func resetNewTabPageCustomization(_ sender: Any?) {
+        homePageSettingsModel.resetAllCustomizations()
+    }
 }
 
 extension MainViewController {
@@ -348,7 +406,7 @@ extension MainViewController {
     @objc func openLocation(_ sender: Any?) {
         makeKeyIfNeeded()
         guard let addressBarTextField = navigationBarViewController.addressBarViewController?.addressBarTextField else {
-            os_log("MainViewController: Cannot reference address bar text field", type: .error)
+            Logger.general.error("MainViewController: Cannot reference address bar text field")
             return
         }
 
@@ -458,6 +516,10 @@ extension MainViewController {
         LocalPinningManager.shared.togglePinning(for: .networkProtection)
     }
 
+    @objc func toggleAIChatShortcut(_ sender: Any) {
+        LocalPinningManager.shared.togglePinning(for: .aiChat)
+    }
+
     // MARK: - History
 
     @objc func back(_ sender: Any?) {
@@ -563,7 +625,7 @@ extension MainViewController {
 
     @objc func openBookmark(_ sender: Any?) {
         guard let menuItem = sender as? NSMenuItem else {
-            os_log("MainViewController: Casting to menu item failed", type: .error)
+            Logger.general.error("MainViewController: Casting to menu item failed")
             return
         }
 
@@ -575,7 +637,7 @@ extension MainViewController {
 
     @objc func openAllInTabs(_ sender: Any?) {
         guard let menuItem = sender as? NSMenuItem else {
-            os_log("MainViewController: Casting to menu item failed", type: .error)
+            Logger.general.error("MainViewController: Casting to menu item failed")
             return
         }
 
@@ -621,11 +683,11 @@ extension MainViewController {
     @objc func showTab(_ sender: Any?) {
         makeKeyIfNeeded()
         guard let sender = sender as? NSMenuItem else {
-            os_log("MainViewController: Casting to NSMenuItem failed", type: .error)
+            Logger.general.error("MainViewController: Casting to NSMenuItem failed")
             return
         }
         guard let keyEquivalent = Int(sender.keyEquivalent), keyEquivalent >= 0 && keyEquivalent <= 9 else {
-            os_log("MainViewController: Key equivalent is not correct for tab selection", type: .error)
+            Logger.general.error("MainViewController: Key equivalent is not correct for tab selection")
             return
         }
         let index = keyEquivalent - 1
@@ -706,6 +768,27 @@ extension MainViewController {
         }
     }
 
+    @objc func debugResetContinueSetup(_ sender: Any?) {
+        AppearancePreferencesUserDefaultsPersistor().continueSetUpCardsLastDemonstrated = nil
+        AppearancePreferencesUserDefaultsPersistor().continueSetUpCardsNumberOfDaysDemonstrated = 0
+        AppearancePreferences.shared.isContinueSetUpCardsViewOutdated = false
+        AppearancePreferences.shared.continueSetUpCardsClosed = false
+        AppearancePreferences.shared.isContinueSetUpVisible = true
+        HomePage.Models.ContinueSetUpModel.Settings().clear()
+        NotificationCenter.default.post(name: NSApplication.didBecomeActiveNotification, object: NSApp)
+    }
+
+    @objc func debugShiftNewTabOpeningDate(_ sender: Any?) {
+        AppearancePreferencesUserDefaultsPersistor().continueSetUpCardsLastDemonstrated = (AppearancePreferencesUserDefaultsPersistor().continueSetUpCardsLastDemonstrated ?? Date()).addingTimeInterval(-.day)
+        AppearancePreferences.shared.continueSetUpCardsViewDidAppear()
+    }
+
+    @objc func debugShiftNewTabOpeningDateNtimes(_ sender: Any?) {
+        for _ in 0..<AppearancePreferences.Constants.dismissNextStepsCardsAfterDays {
+            debugShiftNewTabOpeningDate(sender)
+        }
+    }
+
     @objc func resetDefaultBrowserPrompt(_ sender: Any?) {
         UserDefaultsWrapper.clear(.defaultBrowserDismissed)
     }
@@ -717,6 +800,16 @@ extension MainViewController {
 
     @objc func triggerFatalError(_ sender: Any?) {
         fatalError("Fatal error triggered from the Debug menu")
+    }
+
+    @objc func crashOnException(_ sender: Any?) {
+        DispatchQueue.main.async {
+            self.navigationBarViewController.addressBarViewController?.addressBarTextField.suggestionViewController.tableView.view(atColumn: 1, row: .max, makeIfNecessary: false)
+        }
+    }
+
+    @objc func crashOnCxxException(_ sender: Any?) {
+        throwTestCppExteption()
     }
 
     @objc func resetSecureVaultData(_ sender: Any?) {
@@ -750,11 +843,15 @@ extension MainViewController {
                                                           eventMapping: EventMapping<AutofillPixelEvent> { _, _, _, _ in },
                                                           installDate: nil)
         autofillPixelReporter.resetStoreDefaults()
+        let loginImportState = AutofillLoginImportState()
+        loginImportState.hasImportedLogins = false
+        loginImportState.isCredentialsImportPromptPermanantlyDismissed = false
     }
 
     @objc func resetBookmarks(_ sender: Any?) {
         LocalBookmarkManager.shared.resetBookmarks()
         UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageContinueSetUpImport.rawValue)
+        LocalBookmarkManager.shared.sortMode = .manual
     }
 
     @objc func resetPinnedTabs(_ sender: Any?) {
@@ -775,7 +872,37 @@ extension MainViewController {
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowImport.rawValue)
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowDuckPlayer.rawValue)
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowEmailProtection.rawValue)
-        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowPermanentSurvey.rawValue)
+    }
+
+    @objc func skipOnboarding(_ sender: Any?) {
+        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.onboardingFinished.rawValue)
+        Application.appDelegate.onboardingStateMachine.state = .onboardingCompleted
+        WindowControllersManager.shared.updatePreventUserInteraction(prevent: false)
+        WindowControllersManager.shared.replaceTabWith(Tab(content: .newtab))
+    }
+
+    @objc func resetOnboarding(_ sender: Any?) {
+        UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.onboardingFinished.rawValue)
+    }
+
+    @objc func resetHomePageSettingsOnboarding(_ sender: Any?) {
+        UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Any>.Key.homePageDidShowSettingsOnboarding.rawValue)
+    }
+
+    @objc func resetContextualOnboarding(_ sender: Any?) {
+        Application.appDelegate.onboardingStateMachine.state = .notStarted
+    }
+
+    @objc func resetDuckPlayerPreferences(_ sender: Any?) {
+        DuckPlayerPreferences.shared.reset()
+    }
+
+    @objc func resetSyncPromoPrompts(_ sender: Any?) {
+        SyncPromoManager().resetPromos()
+    }
+
+    @objc func resetTipKit(_ sender: Any?) {
+        TipKitDebugOptionsUIActionHandler().resetTipKitTapped()
     }
 
     @objc func internalUserState(_ sender: Any?) {
@@ -796,20 +923,11 @@ extension MainViewController {
     ///
     private func clearPrivacyProState() {
         Application.appDelegate.subscriptionManager.accountManager.signOut()
-        resetThankYouModalChecks(nil)
         UserDefaults.netP.networkProtectionEntitlementsExpired = false
     }
 
     @objc func resetDailyPixels(_ sender: Any?) {
         PixelKit.shared?.clearFrequencyHistoryForAllPixels()
-    }
-
-    @objc func inPermanentSurveyShareOn(_ sender: Any?) {
-        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool?>.Key.homePageUserInSurveyShare.rawValue)
-    }
-
-    @objc func inPermanentSurveyShareOff(_ sender: Any?) {
-        UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool?>.Key.homePageUserInSurveyShare.rawValue)
     }
 
     @objc func changePixelExperimentInstalledDateToLessMoreThan5DayAgo(_ sender: Any?) {
@@ -859,28 +977,6 @@ extension MainViewController {
         WindowsManager.openPopUpWindow(with: tab, origin: nil, contentSize: nil)
     }
 
-    @objc func resetThankYouModalChecks(_ sender: Any?) {
-        let presenter = WaitlistThankYouPromptPresenter()
-        presenter.resetPromptCheck()
-        UserDefaults.netP.removeObject(forKey: UserDefaults.vpnLegacyUserAccessDisabledOnceKey)
-    }
-
-    @objc func showVPNThankYouModal(_ sender: Any?) {
-        let thankYouModalView = WaitlistBetaThankYouDialogViewController(copy: .vpn)
-        let thankYouWindowController = thankYouModalView.wrappedInWindowController()
-        if let thankYouWindow = thankYouWindowController.window {
-            WindowsManager.windows.first?.beginSheet(thankYouWindow)
-        }
-    }
-
-    @objc func showPIRThankYouModal(_ sender: Any?) {
-        let thankYouModalView = WaitlistBetaThankYouDialogViewController(copy: .dbp)
-        let thankYouWindowController = thankYouModalView.wrappedInWindowController()
-        if let thankYouWindow = thankYouWindowController.window {
-            WindowsManager.windows.first?.beginSheet(thankYouWindow)
-        }
-    }
-
     @objc func resetEmailProtectionInContextPrompt(_ sender: Any?) {
         EmailManager().resetEmailProtectionInContextPrompt()
     }
@@ -888,28 +984,24 @@ extension MainViewController {
     @objc func removeUserScripts(_ sender: Any?) {
         tabCollectionViewModel.selectedTab?.userContentController?.cleanUpBeforeClosing()
         tabCollectionViewModel.selectedTab?.reload()
-        os_log("User scripts removed from the current tab", type: .info)
+        Logger.general.info("User scripts removed from the current tab")
     }
 
     @objc func reloadConfigurationNow(_ sender: Any?) {
-        OSLog.loggingCategories.insert(OSLog.AppCategories.config.rawValue)
-
-        ConfigurationManager.shared.forceRefresh(isDebug: true)
+        Application.appDelegate.configurationManager.forceRefresh(isDebug: true)
     }
 
     private func setConfigurationUrl(_ configurationUrl: URL?) {
-        OSLog.loggingCategories.insert(OSLog.AppCategories.config.rawValue)
-
         var configurationProvider = AppConfigurationURLProvider(customPrivacyConfiguration: configurationUrl)
         if configurationUrl == nil {
             configurationProvider.resetToDefaultConfigurationUrl()
         }
         Configuration.setURLProvider(configurationProvider)
-        ConfigurationManager.shared.forceRefresh(isDebug: true)
+        Application.appDelegate.configurationManager.forceRefresh(isDebug: true)
         if let configurationUrl {
-            os_log("New configuration URL set to \(configurationUrl.absoluteString)", type: .info)
+            Logger.config.debug("New configuration URL set to \(configurationUrl.absoluteString)")
         } else {
-            os_log("New configuration URL reset to default", type: .info)
+            Logger.config.log("New configuration URL reset to default")
         }
     }
 
@@ -919,7 +1011,7 @@ extension MainViewController {
         if alert.runModal() != .cancel {
             guard let textField = alert.accessoryView as? NSTextField,
                   let newConfigurationUrl = URL(string: textField.stringValue) else {
-                os_log("Failed to set custom configuration URL", type: .error)
+                Logger.config.error("Failed to set custom configuration URL")
                 return
             }
 
@@ -931,15 +1023,30 @@ extension MainViewController {
         setConfigurationUrl(nil)
     }
 
-    @objc func resetSurveyRemoteMessages(_ sender: Any?) {
-        DefaultSurveyRemoteMessagingStorage.surveys().removeStoredAndDismissedMessages()
-        DefaultSurveyRemoteMessaging(subscriptionManager: Application.appDelegate.subscriptionManager).resetLastRefreshTimestamp()
+    @available(macOS 13.5, *)
+    @objc func showAllCredentials(_ sender: Any?) {
+        let hostingView = NSHostingView(rootView: AutofillCredentialsDebugView())
+        hostingView.translatesAutoresizingMaskIntoConstraints = false
+        hostingView.frame.size = hostingView.intrinsicContentSize
+
+        let window = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 1400, height: 700),
+                styleMask: [.titled, .closable, .resizable],
+                backing: .buffered, defer: false)
+
+        window.center()
+        window.title = "Credentials"
+        window.contentView = hostingView
+        window.isReleasedWhenClosed = false
+        window.makeKeyAndOrderFront(nil)
     }
 
     // MARK: - Developer Tools
 
     @objc func toggleDeveloperTools(_ sender: Any?) {
-        guard let webView = getActiveTabAndIndex()?.tab.webView else { return }
+        guard let webView = browserTabViewController.webView else {
+            return
+        }
 
         if webView.isInspectorShown == true {
             webView.closeDeveloperTools()
@@ -949,15 +1056,15 @@ extension MainViewController {
     }
 
     @objc func openJavaScriptConsole(_ sender: Any?) {
-        getActiveTabAndIndex()?.tab.webView.openJavaScriptConsole()
+        browserTabViewController.webView?.openJavaScriptConsole()
     }
 
     @objc func showPageSource(_ sender: Any?) {
-        getActiveTabAndIndex()?.tab.webView.showPageSource()
+        browserTabViewController.webView?.showPageSource()
     }
 
     @objc func showPageResources(_ sender: Any?) {
-        getActiveTabAndIndex()?.tab.webView.showPageSource()
+        browserTabViewController.webView?.showPageSource()
     }
 }
 
@@ -1054,7 +1161,7 @@ extension MainViewController: NSMenuItemValidation {
         case #selector(MainViewController.openJavaScriptConsole(_:)),
              #selector(MainViewController.showPageSource(_:)),
              #selector(MainViewController.showPageResources(_:)):
-            return activeTabViewModel?.canReload == true
+            return activeTabViewModel?.canReload == true || (featureFlagger.isFeatureOn(.htmlNewTabPage) && activeTabViewModel?.tab.content == .newtab)
 
         case #selector(MainViewController.toggleDownloads(_:)):
             let isDownloadsPopoverShown = self.navigationBarViewController.isDownloadsPopoverShown

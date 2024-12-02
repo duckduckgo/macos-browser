@@ -88,7 +88,7 @@ final class NetworkProtectionAppEvents {
             return
         }
 
-        loginItemsManager.restartLoginItems(LoginItemsManager.networkProtectionLoginItems, log: .networkProtection)
+        loginItemsManager.restartLoginItems(LoginItemsManager.networkProtectionLoginItems)
     }
 
 }

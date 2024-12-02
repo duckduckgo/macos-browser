@@ -18,38 +18,9 @@
 
 import Foundation
 import Common
+import os.log
 
 struct MapperToUI {
-
-    func mapToUI(_ dataBroker: DataBroker, extractedProfile: ExtractedProfile) -> DBPUIDataBrokerProfileMatch {
-        DBPUIDataBrokerProfileMatch(
-            dataBroker: mapToUI(dataBroker),
-            name: extractedProfile.fullName ?? "No name",
-            addresses: extractedProfile.addresses?.map(mapToUI) ?? [],
-            alternativeNames: extractedProfile.alternativeNames ?? [String](),
-            relatives: extractedProfile.relatives ?? [String](),
-            date: extractedProfile.removedDate?.timeIntervalSince1970
-        )
-    }
-
-    func mapToUI(_ dataBrokerName: String, databrokerURL: String, extractedProfile: ExtractedProfile) -> DBPUIDataBrokerProfileMatch {
-        DBPUIDataBrokerProfileMatch(
-            dataBroker: DBPUIDataBroker(name: dataBrokerName, url: databrokerURL),
-            name: extractedProfile.fullName ?? "No name",
-            addresses: extractedProfile.addresses?.map(mapToUI) ?? [],
-            alternativeNames: extractedProfile.alternativeNames ?? [String](),
-            relatives: extractedProfile.relatives ?? [String](),
-            date: extractedProfile.removedDate?.timeIntervalSince1970
-        )
-    }
-
-    func mapToUI(_ dataBroker: DataBroker) -> DBPUIDataBroker {
-        DBPUIDataBroker(name: dataBroker.name, url: dataBroker.url)
-    }
-
-    func mapToUI(_ address: AddressCityState) -> DBPUIUserProfileAddress {
-        DBPUIUserProfileAddress(street: address.fullAddress, city: address.city, state: address.state, zipCode: nil)
-    }
 
     func initialScanState(_ brokerProfileQueryData: [BrokerProfileQueryData]) -> DBPUIInitialScanState {
 
@@ -73,31 +44,9 @@ struct MapperToUI {
                                              totalScans: totalScans,
                                              scannedBrokers: partiallyScannedBrokers)
 
-        let matches = mapMatchesToUI(brokerProfileQueryData)
+        let matches = DBPUIDataBrokerProfileMatch.profileMatches(from: withoutDeprecated)
 
         return .init(resultsFound: matches, scanProgress: scanProgress)
-    }
-
-    private func mapMatchesToUI(_ brokerProfileQueryData: [BrokerProfileQueryData]) -> [DBPUIDataBrokerProfileMatch] {
-        return brokerProfileQueryData.flatMap {
-            var profiles = [DBPUIDataBrokerProfileMatch]()
-            for extractedProfile in $0.extractedProfiles where !$0.profileQuery.deprecated {
-                profiles.append(mapToUI($0.dataBroker, extractedProfile: extractedProfile))
-
-                if !$0.dataBroker.mirrorSites.isEmpty {
-                    let mirrorSitesMatches = $0.dataBroker.mirrorSites.compactMap { mirrorSite in
-                        if mirrorSite.shouldWeIncludeMirrorSite() {
-                            return mapToUI(mirrorSite.name, databrokerURL: mirrorSite.url, extractedProfile: extractedProfile)
-                        }
-
-                        return nil
-                    }
-                    profiles.append(contentsOf: mirrorSitesMatches)
-                }
-            }
-
-            return profiles
-        }
     }
 
     func maintenanceScanState(_ brokerProfileQueryData: [BrokerProfileQueryData]) -> DBPUIScanAndOptOutMaintenanceState {
@@ -107,12 +56,25 @@ struct MapperToUI {
         let scansThatRanAtLeastOnce = brokerProfileQueryData.flatMap { $0.sitesScanned }
         let sitesScanned = Dictionary(grouping: scansThatRanAtLeastOnce, by: { $0 }).count
 
+        // Used to find opt outs on the parent
+        let brokerURLsToQueryData =  Dictionary(grouping: brokerProfileQueryData, by: { $0.dataBroker.url })
+
         brokerProfileQueryData.forEach {
             let dataBroker = $0.dataBroker
             let scanJob = $0.scanJobData
             for optOutJob in $0.optOutJobData {
                 let extractedProfile = optOutJob.extractedProfile
-                let profileMatch = mapToUI(dataBroker, extractedProfile: extractedProfile)
+
+                var parentBrokerOptOutJobData: [OptOutJobData]?
+                if let parent = $0.dataBroker.parent,
+                   let parentsQueryData = brokerURLsToQueryData[parent] {
+                    parentBrokerOptOutJobData = parentsQueryData.flatMap { $0.optOutJobData }
+                }
+
+                let profileMatch = DBPUIDataBrokerProfileMatch(optOutJobData: optOutJob,
+                                                               dataBroker: dataBroker,
+                                                               parentBrokerOptOutJobData: parentBrokerOptOutJobData,
+                                                               optOutUrl: dataBroker.optOutUrl)
 
                 if extractedProfile.removedDate == nil {
                     inProgressOptOuts.append(profileMatch)
@@ -122,7 +84,12 @@ struct MapperToUI {
 
                 if let closestMatchesFoundEvent = scanJob.closestMatchesFoundEvent() {
                     for mirrorSite in dataBroker.mirrorSites where mirrorSite.shouldWeIncludeMirrorSite(for: closestMatchesFoundEvent.date) {
-                        let mirrorSiteMatch = mapToUI(mirrorSite.name, databrokerURL: mirrorSite.url, extractedProfile: extractedProfile)
+                        let mirrorSiteMatch = DBPUIDataBrokerProfileMatch(optOutJobData: optOutJob,
+                                                                          dataBrokerName: mirrorSite.name,
+                                                                          dataBrokerURL: mirrorSite.url,
+                                                                          dataBrokerParentURL: dataBroker.parent,
+                                                                          parentBrokerOptOutJobData: parentBrokerOptOutJobData,
+                                                                          optOutUrl: dataBroker.optOutUrl)
 
                         if let extractedProfileRemovedDate = extractedProfile.removedDate,
                            mirrorSite.shouldWeIncludeMirrorSite(for: extractedProfileRemovedDate) {
@@ -136,15 +103,9 @@ struct MapperToUI {
         }
 
         let completedOptOutsDictionary = Dictionary(grouping: removedProfiles, by: { $0.dataBroker })
-        let completedOptOuts: [DBPUIOptOutMatch] = completedOptOutsDictionary.compactMap { (key: DBPUIDataBroker, value: [DBPUIDataBrokerProfileMatch]) in
+        let completedOptOuts: [DBPUIOptOutMatch] = completedOptOutsDictionary.compactMap { (_, value: [DBPUIDataBrokerProfileMatch]) in
             value.compactMap { match in
-                guard let removedDate = match.date else { return nil }
-                return DBPUIOptOutMatch(dataBroker: key,
-                                        matches: value.count,
-                                        name: match.name,
-                                        alternativeNames: match.alternativeNames,
-                                        addresses: match.addresses,
-                                        date: removedDate)
+                return DBPUIOptOutMatch(profileMatch: match, matches: value.count)
             }
         }.flatMap { $0 }
 
@@ -173,10 +134,18 @@ struct MapperToUI {
             }
             .flatMap {
                 var brokers = [DBPUIDataBroker]()
-                brokers.append(DBPUIDataBroker(name: $0.dataBroker.name, url: $0.dataBroker.url, date: $0.scanJobData.lastRunDate!.timeIntervalSince1970))
+                brokers.append(DBPUIDataBroker(name: $0.dataBroker.name,
+                                               url: $0.dataBroker.url,
+                                               date: $0.scanJobData.lastRunDate!.timeIntervalSince1970,
+                                               parentURL: $0.dataBroker.parent,
+                                               optOutUrl: $0.dataBroker.optOutUrl))
 
                 for mirrorSite in $0.dataBroker.mirrorSites where mirrorSite.addedAt < $0.scanJobData.lastRunDate! {
-                    brokers.append(DBPUIDataBroker(name: mirrorSite.name, url: mirrorSite.url, date: $0.scanJobData.lastRunDate!.timeIntervalSince1970))
+                    brokers.append(DBPUIDataBroker(name: mirrorSite.name,
+                                                   url: mirrorSite.url,
+                                                   date: $0.scanJobData.lastRunDate!.timeIntervalSince1970,
+                                                   parentURL: $0.dataBroker.parent,
+                                                   optOutUrl: $0.dataBroker.optOutUrl))
                 }
 
                 return brokers
@@ -203,15 +172,27 @@ struct MapperToUI {
             }
             .flatMap {
                 var brokers = [DBPUIDataBroker]()
-                brokers.append(DBPUIDataBroker(name: $0.dataBroker.name, url: $0.dataBroker.url, date: $0.scanJobData.preferredRunDate!.timeIntervalSince1970))
+                brokers.append(DBPUIDataBroker(name: $0.dataBroker.name,
+                                               url: $0.dataBroker.url,
+                                               date: $0.scanJobData.preferredRunDate!.timeIntervalSince1970,
+                                               parentURL: $0.dataBroker.parent,
+                                               optOutUrl: $0.dataBroker.optOutUrl))
 
                 for mirrorSite in $0.dataBroker.mirrorSites {
                     if let removedDate = mirrorSite.removedAt {
                         if removedDate > $0.scanJobData.preferredRunDate! {
-                            brokers.append(DBPUIDataBroker(name: mirrorSite.name, url: mirrorSite.url, date: $0.scanJobData.preferredRunDate!.timeIntervalSince1970))
+                            brokers.append(DBPUIDataBroker(name: mirrorSite.name,
+                                                           url: mirrorSite.url,
+                                                           date: $0.scanJobData.preferredRunDate!.timeIntervalSince1970,
+                                                           parentURL: $0.dataBroker.parent,
+                                                           optOutUrl: $0.dataBroker.optOutUrl))
                         }
                     } else {
-                        brokers.append(DBPUIDataBroker(name: mirrorSite.name, url: mirrorSite.url, date: $0.scanJobData.preferredRunDate!.timeIntervalSince1970))
+                        brokers.append(DBPUIDataBroker(name: mirrorSite.name,
+                                                       url: mirrorSite.url,
+                                                       date: $0.scanJobData.preferredRunDate!.timeIntervalSince1970,
+                                                       parentURL: $0.dataBroker.parent,
+                                                       optOutUrl: $0.dataBroker.optOutUrl))
                     }
                 }
 
@@ -259,10 +240,10 @@ struct MapperToUI {
             encoder.outputFormatting = .prettyPrinted
             let jsonData = try encoder.encode(metadataUI)
             if let jsonString = String(data: jsonData, encoding: .utf8) {
-                os_log("Metadata: %{public}s", log: OSLog.default, type: .info, jsonString)
+                Logger.dataBrokerProtection.debug("Metadata: \(jsonString, privacy: .public)")
             }
         } catch {
-            os_log("Error encoding struct to JSON: %{public}@", log: OSLog.default, type: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("Error encoding struct to JSON: \(error.localizedDescription, privacy: .public)")
         }
 #endif
 
@@ -373,7 +354,14 @@ private extension Array where Element == [BrokerProfileQueryData] {
     /// - Returns: An array of `[BrokerProfileQueryData]` values sorted by the first `lastRunDate` of each element
     func sortedByLastRunDate() -> Self {
         self.sorted { lhs, rhs in
-            lhs.first?.scanJobData.lastRunDate < rhs.first?.scanJobData.lastRunDate
+            let lhsDate = lhs.first?.scanJobData.lastRunDate
+            let rhsDate = rhs.first?.scanJobData.lastRunDate
+
+            if lhsDate == rhsDate {
+                return lhs.first?.dataBroker.name ?? "" < rhs.first?.dataBroker.name ?? ""
+            } else {
+                return lhsDate < rhsDate
+            }
         }
     }
 }
@@ -495,17 +483,6 @@ extension HistoryEvent {
         case .error(let error):
             return error.name
         default: return nil
-        }
-    }
-}
-
-fileprivate extension MirrorSite {
-
-    func shouldWeIncludeMirrorSite(for date: Date = Date()) -> Bool {
-        if let removedAt = self.removedAt {
-            return self.addedAt < date && date < removedAt
-        } else {
-            return self.addedAt < date
         }
     }
 }

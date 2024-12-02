@@ -33,7 +33,7 @@ enum UserText {
     static let personalInformationRemovalServiceButtonTitle = NSLocalizedString("subscription.preferences.services.personal.information.removal.button.title", value: "Open", comment: "Title for the Personal Information Removal service button to open its settings")
 
     static let identityTheftRestorationServiceTitle = NSLocalizedString("subscription.preferences.services.identity.theft.restoration.title", value: "Identity Theft Restoration", comment: "Title for the Identity Theft Restoration service listed in the subscription preferences pane")
-    static let identityTheftRestorationServiceDescription = NSLocalizedString("subscription.preferences.services.identity.theft.restoration.description", value: "Restore stolen accounts and financial losses in the event of identity theft.", comment: "Description for the Identity Theft Restoration service listed in the subscription preferences pane")
+    static let identityTheftRestorationServiceDescription = NSLocalizedString("subscription.preferences.services.identity.theft.restoration.description", value: "Get help restoring stolen accounts and financial losses in the event of identity theft.", comment: "Description for the Identity Theft Restoration service listed in the subscription preferences pane")
     static let identityTheftRestorationServiceButtonTitle = NSLocalizedString("subscription.preferences.services.identity.theft.restoration.button.title", value: "View", comment: "Title for the Identity Theft Restoration service button to open its settings")
 
     // MARK: Preferences activate section
@@ -49,7 +49,11 @@ enum UserText {
     // MARK: Preferences footer
     static let preferencesSubscriptionFooterTitle = NSLocalizedString("subscription.preferences.subscription.footer.title", value: "Need help with Privacy Pro?", comment: "Title for the subscription preferences pane footer")
     static let preferencesSubscriptionFooterCaption = NSLocalizedString("subscription.preferences.subscription.footer.caption", value: "Get answers to frequently asked questions or contact Privacy Pro support from our help pages.", comment: "Caption for the subscription preferences pane footer")
+    static let preferencesSubscriptionHelpFooterCaption = NSLocalizedString("subscription.preferences.subscription.help.footer.caption", value: "Get answers to frequently asked questions or contact Privacy Pro support from our help pages. Feature availability varies by country.", comment: "Caption for the subscription preferences pane footer")
     static let viewFaqsButton = NSLocalizedString("subscription.preferences.view.faqs.button", value: "FAQs and Support", comment: "Button to open page for FAQs")
+    static let preferencesSubscriptionFeedbackTitle = NSLocalizedString("subscription.preferences.feedback.title", value: "Send Feedback", comment: "Title for the subscription feedback section")
+    static let preferencesSubscriptionFeedbackCaption = NSLocalizedString("subscription.preferences.feedback.caption", value: "Help improve Privacy Pro. Your feedback matters to us. Feel free to report any issues or provide general feedback.", comment: "Caption for the subscription feedback section")
+    static let preferencesSubscriptionFeedbackButton = NSLocalizedString("subscription.preferences.feedback.button", value: "Send Feedback", comment: "Title for the subscription feedback button")
 
     static func preferencesSubscriptionActiveRenewCaption(period: String, formattedDate: String) -> String {
         let localized = NSLocalizedString("subscription.preferences.subscription.active.renew.caption", value: "Your %@ Privacy Pro subscription renews on %@.", comment: "Caption for the subscription preferences pane when the subscription is active and will renew. First parameter is renewal period (monthly/yearly). Second parameter is date.")
@@ -74,8 +78,9 @@ enum UserText {
     static let removeFromThisDeviceButton = NSLocalizedString("subscription.preferences.remove.from.this.device.button", value: "Remove From This Device", comment: "Button to remove subscription from this device")
 
     // MARK: Preferences when subscription is inactive
-    static let preferencesSubscriptionInactiveHeader = NSLocalizedString("subscription.preferences.subscription.inactive.header", value: "Subscribe to Privacy Pro", comment: "Header for the subscription preferences pane when the subscription is inactive")
-    static let preferencesSubscriptionInactiveCaption = NSLocalizedString("subscription.preferences.subscription.inactive.caption", value: "More seamless privacy with three new protections.", comment: "Caption for the subscription preferences pane when the subscription is inactive")
+    static let preferencesSubscriptionInactiveHeader = NSLocalizedString("subscription.preferences.subscription.inactive.header", value: "Protect your connection and identity with Privacy Pro", comment: "Header for the subscription preferences pane when the subscription is inactive")
+    static let preferencesSubscriptionInactiveUSCaption = NSLocalizedString("subscription.preferences.subscription.inactive.us.caption", value: "Three premium protections in one subscription.", comment: "Caption for the subscription preferences pane when the subscription is inactive")
+    static let preferencesSubscriptionInactiveROWCaption = NSLocalizedString("subscription.preferences.subscription.inactive.row.caption", value: "Two premium protections in one subscription.", comment: "Caption for the subscription preferences pane when the subscription is inactive")
 
     static let purchaseButton = NSLocalizedString("subscription.preferences.purchase.button", value: "Get Privacy Pro", comment: "Button to open a page where user can learn more and purchase the subscription")
     static let haveSubscriptionButton = NSLocalizedString("subscription.preferences.i.have.a.subscription.button", value: "I Have a Subscription", comment: "Button enabling user to activate a subscription user bought earlier or on another device")

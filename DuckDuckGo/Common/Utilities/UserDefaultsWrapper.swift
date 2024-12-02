@@ -18,12 +18,14 @@
 
 import AppKit
 import Foundation
+import AppKitExtensions
 
 extension UserDefaults {
     /// The app group's shared UserDefaults
     static let netP = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .netP))!
     static let dbp = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .dbp))!
     static let subs = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .subs))!
+    static let appConfiguration = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .appConfiguration))!
 }
 
 public struct UserDefaultsWrapperKey: RawRepresentable {
@@ -41,18 +43,6 @@ public struct UserDefaultsWrapper<T> {
     public enum Key: String, CaseIterable {
         /// system setting defining window title double-click action
         case appleActionOnDoubleClick = "AppleActionOnDoubleClick"
-
-        case configLastUpdated = "config.last.updated"
-        case configStorageTrackerRadarEtag = "config.storage.trackerradar.etag"
-        case configStorageBloomFilterSpecEtag = "config.storage.bloomfilter.spec.etag"
-        case configStorageBloomFilterBinaryEtag = "config.storage.bloomfilter.binary.etag"
-        case configStorageBloomFilterExclusionsEtag = "config.storage.bloomfilter.exclusions.etag"
-        case configStorageSurrogatesEtag = "config.storage.surrogates.etag"
-        case configStoragePrivacyConfigurationEtag = "config.storage.privacyconfiguration.etag"
-        case configFBConfigEtag = "config.storage.fbconfig.etag"
-        case configStorageRemoteMessagingConfigEtag = "config.storage.remotemessagingconfig.etag"
-
-        case configLastInstalled = "config.last.installed"
 
         case fireproofDomains = "com.duckduckgo.fireproofing.allowedDomains"
         case areDomainsMigratedToETLDPlus1 = "com.duckduckgo.are-domains-migrated-to-etldplus1"
@@ -77,6 +67,7 @@ public struct UserDefaultsWrapper<T> {
         case youtubeOverlayInteracted = "preferences.youtube-overlay-interacted"
         case youtubeOverlayButtonsUsed = "preferences.youtube-overlay-user-used-buttons"
         case duckPlayerAutoplay = "preferences.duckplayer.autoplay"
+        case duckPlayerOpenInNewTab = "preferences.duckplayer.open-new-tab"
 
         case selectedPasswordManager = "preferences.autofill.selected-password-manager"
 
@@ -89,6 +80,7 @@ public struct UserDefaultsWrapper<T> {
         case saveAsPreferredFileType = "saveAs.selected.filetype"
 
         case lastCrashReportCheckDate = "last.crash.report.check.date"
+        case didCrashDuringCrashHandlersSetUp = "browser.didCrashDuringCrashHandlersSetUp"
 
         case fireInfoPresentedOnce = "fire.info.presented.once"
         case appTerminationHandledCorrectly = "app.termination.handled.correctly"
@@ -109,6 +101,8 @@ public struct UserDefaultsWrapper<T> {
 
         case homeButtonPosition = "preferences.appeareance.home-button-position"
 
+        case phishingDetectionEnabled = "preferences.security.phishing-detection-enabled"
+
         // ATB
         case installDate = "statistics.installdate.key"
         case atb = "statistics.atb.key"
@@ -121,6 +115,7 @@ public struct UserDefaultsWrapper<T> {
         case legacyStatisticsStoreDataCleared = "statistics.appretentionatb.legacy-data-cleared"
 
         case onboardingFinished = "onboarding.finished"
+        case contextualOnboardingState = "contextual.onboarding.state"
 
         // Home Page
         case homePageShowPagesOnHover = "home.page.show.pages.on.hover"
@@ -131,15 +126,24 @@ public struct UserDefaultsWrapper<T> {
         case homePageShowImport = "home.page.show.import"
         case homePageShowDuckPlayer = "home.page.show.duck.player"
         case homePageShowEmailProtection = "home.page.show.email.protection"
-        case homePageUserInSurveyShare = "home.page.user.in.survey.share"
-        case homePageShowPermanentSurvey = "home.page.show.import.permanent.survey"
         case homePageShowPageTitles = "home.page.show.page.titles"
         case homePageShowRecentlyVisited = "home.page.show.recently.visited"
         case homePageContinueSetUpImport = "home.page.continue.set.up.import"
         case homePageIsFavoriteVisible = "home.page.is.favorite.visible"
         case homePageIsContinueSetupVisible = "home.page.is.continue.setup.visible"
+        case continueSetUpCardsLastDemonstrated = "home.page.contiune.setup.last.demonstrated"
+        case continueSetUpCardsNumberOfDaysDemonstrated = "home.page.contiune.setup.demo.days"
+        case continueSetUpCardsClosed = "home.page.contiune.setup.cards.closed"
         case homePageIsRecentActivityVisible = "home.page.is.recent.activity.visible"
+        case homePageIsSearchBarVisible = "home.page.is.search.bar.visible"
         case homePageIsFirstSession = "home.page.is.first.session"
+        case homePageDidShowSettingsOnboarding = "home.page.did.show.settings.onboarding"
+        case homePageUserBackgroundImages = "home.page.user.background.images"
+        case homePageCustomBackground = "home.page.custom.background"
+        case homePageLastPickedCustomColor = "home.page.last.picked.custom.color"
+
+        case homePagePromotionVisible = "home.page.promotion.visible"
+        case homePagePromotionDidDismiss = "home.page.promotion.did.dismiss"
 
         case appIsRelaunchingAutomatically = "app-relaunching-automatically"
 
@@ -148,6 +152,7 @@ public struct UserDefaultsWrapper<T> {
 
         case bookmarksBarPromptShown = "bookmarks.bar.prompt.shown"
         case showBookmarksBar = "bookmarks.bar.show"
+        case centerAlignedBookmarksBar = "bookmarks.bar.center.aligned"
         case lastBookmarksBarUsagePixelSendDate = "bookmarks.bar.last-usage-pixel-send-date"
 
         case pinnedViews = "pinning.pinned-views"
@@ -171,8 +176,6 @@ public struct UserDefaultsWrapper<T> {
         // VPN
 
         case networkProtectionExcludedRoutes = "netp.excluded-routes"
-        case networkProtectionTermsAndConditionsAccepted = "network-protection.waitlist-terms-and-conditions.accepted"
-        case networkProtectionWaitlistSignUpPromptDismissed = "network-protection.waitlist.sign-up-prompt-dismissed"
 
         // VPN: Shared Defaults
         // ---
@@ -180,8 +183,10 @@ public struct UserDefaultsWrapper<T> {
         // or else KVO will just not work as of 2023-08-07
 
         case networkProtectionOnboardingStatusRawValue = "networkProtectionOnboardingStatusRawValue"
-        case networkProtectionWaitlistActiveOverrideRawValue = "networkProtectionWaitlistActiveOverrideRawValue"
-        case networkProtectionWaitlistEnabledOverrideRawValue = "networkProtectionWaitlistEnabledOverrideRawValue"
+
+        // Updates
+        case automaticUpdates = "updates.automatic"
+        case pendingUpdateShown = "pending.update.shown"
 
         // Experiments
         case pixelExperimentInstalled = "pixel.experiment.installed"
@@ -189,6 +194,10 @@ public struct UserDefaultsWrapper<T> {
         case pixelExperimentEnrollmentDate = "pixel.experiment.enrollment.date"
         case pixelExperimentFiredPixels = "pixel.experiment.pixels.fired"
         case campaignVariant = "campaign.variant"
+
+        // Updates
+        case previousAppVersion = "previous.app.version"
+        case previousBuild = "previous.build"
 
         // Sync
 
@@ -211,11 +220,21 @@ public struct UserDefaultsWrapper<T> {
         case syncCurrentAllPausedError = "sync.current-all-paused-error"
         case syncCurrentBookmarksPausedError = "sync.current-bookmarks-paused-error"
         case syncCurrentCredentialsPausedError = "sync.current-credentials-paused-error"
+        case syncPromoBookmarksDismissed = "sync.promotion-bookmarks-dismissed"
+        case syncPromoPasswordsDismissed = "sync.promotion-passwords-dismissed"
 
         // Subscription
 
-        case subscriptionInternalTesting = "subscription.internal-testing-enabled"
         case subscriptionEnvironment = "subscription.environment"
+
+        // PageRefreshMonitor
+
+        case refreshTimestamps = "pageRefreshMonitor.refresh-timestamps"
+
+        // BrokenSitePrompt
+
+        case lastBrokenSiteToastShownDate = "brokenSitePrompt.last-broken-site-toast-shown-date"
+        case toastDismissStreakCounter = "brokenSitePrompt.toast-dismiss-streak-counter"
     }
 
     enum RemovedKeys: String, CaseIterable {

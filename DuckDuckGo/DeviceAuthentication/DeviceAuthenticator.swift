@@ -19,6 +19,7 @@
 import Foundation
 import LocalAuthentication
 import Common
+import os.log
 
 extension NSNotification.Name {
 
@@ -41,6 +42,7 @@ final class DeviceAuthenticator: UserAuthenticating {
         case exportLogins
         case syncSettings
         case deleteAllPasswords
+        case viewAllCredentials
 
         var localizedDescription: String {
             switch self {
@@ -50,6 +52,7 @@ final class DeviceAuthenticator: UserAuthenticating {
             case .exportLogins: return UserText.pmAutoLockPromptExportLogins
             case .syncSettings: return UserText.syncAutoLockPrompt
             case .deleteAllPasswords: return UserText.deleteAllPasswordsPermissionText
+            case .viewAllCredentials: return UserText.pmAutoLockPromptUnlockLogins
             }
         }
     }
@@ -117,7 +120,7 @@ final class DeviceAuthenticator: UserAuthenticating {
                 self._deviceIsLocked = newState
             }
 
-            os_log("Device lock state changed: %s", log: .autoLock, deviceIsLocked ? "locked" : "unlocked")
+            Logger.autoLock.debug("Device lock state changed: \(self.deviceIsLocked ? "locked" : "unlocked", privacy: .public)")
 
             if newState {
                 NotificationCenter.default.post(name: .deviceBecameLocked, object: nil)
@@ -162,17 +165,19 @@ final class DeviceAuthenticator: UserAuthenticating {
         let needsAuthenticationForCreditCardsAutofill = reason == .autofillCreditCards && isCreditCardTimeIntervalExpired()
         let needsAuthenticationForSyncSettings = reason == .syncSettings && isSyncSettingsTimeIntervalExpired()
         let needsAuthenticationForDeleteAllPasswords = reason == .deleteAllPasswords
-        guard needsAuthenticationForCreditCardsAutofill || needsAuthenticationForSyncSettings || needsAuthenticationForDeleteAllPasswords || requiresAuthentication else {
+        let needsAuthenticationForViewAllCredentials = reason == .viewAllCredentials
+        guard needsAuthenticationForCreditCardsAutofill || needsAuthenticationForSyncSettings || needsAuthenticationForDeleteAllPasswords || needsAuthenticationForViewAllCredentials ||
+                requiresAuthentication else {
             result(.success)
             return
         }
 
-        os_log("Began authenticating", log: .autoLock)
+        Logger.autoLock.debug("Began authenticating")
 
         isAuthenticating = true
 
         authenticationService.authenticateDevice(reason: reason.localizedDescription) { authenticationResult in
-            os_log("Completed authenticating, with result: %{bool}d", log: .autoLock, authenticationResult.authenticated)
+            Logger.autoLock.debug("Completed authenticating, with result: \(authenticationResult.authenticated, privacy: .public)")
 
             self.isAuthenticating = false
             self.deviceIsLocked = !authenticationResult.authenticated
@@ -199,7 +204,7 @@ final class DeviceAuthenticator: UserAuthenticating {
     // MARK: - Idle Timer Monitoring
 
     private func beginIdleCheckTimer() {
-        os_log("Beginning idle check timer", log: .autoLock)
+        Logger.autoLock.debug("Beginning idle check timer")
 
         self.timer?.invalidate()
         self.timer = nil
@@ -217,7 +222,7 @@ final class DeviceAuthenticator: UserAuthenticating {
     }
 
     private func cancelIdleCheckTimer() {
-        os_log("Cancelling idle check timer", log: .autoLock)
+        Logger.autoLock.debug("Cancelling idle check timer")
         self.timer?.invalidate()
         self.timer = nil
     }
@@ -235,12 +240,12 @@ final class DeviceAuthenticator: UserAuthenticating {
 
     func beginCheckingIdleTimer() {
         guard !deviceIsLocked else {
-            os_log("Tried to start idle timer while device was already locked", log: .autoLock)
+            Logger.autoLock.debug("Tried to start idle timer while device was already locked")
             return
         }
 
         guard autofillPreferences.isAutoLockEnabled else {
-            os_log("Tried to start idle timer but device should not auto-lock", log: .autoLock)
+            Logger.autoLock.debug("Tried to start idle timer but device should not auto-lock")
             return
         }
 
@@ -256,7 +261,7 @@ final class DeviceAuthenticator: UserAuthenticating {
     // MARK: - Credit Card Autofill Timer
 
     private func beginCreditCardAutofillTimer() {
-        os_log("Beginning credit card autofill timer", log: .autoLock)
+        Logger.autoLock.debug("Beginning credit card autofill timer")
 
         self.timerCreditCard?.invalidate()
         self.timerCreditCard = nil
@@ -273,7 +278,7 @@ final class DeviceAuthenticator: UserAuthenticating {
     }
 
     private func cancelCreditCardAutofillTimer() {
-        os_log("Cancelling credit card autofill timer", log: .autoLock)
+        Logger.autoLock.debug("Cancelling credit card autofill timer")
         self.timerCreditCard?.invalidate()
         self.timerCreditCard = nil
     }
@@ -288,7 +293,7 @@ final class DeviceAuthenticator: UserAuthenticating {
     // MARK: - Sync Timer
 
     private func beginSyncSettingsTimer() {
-        os_log("Beginning Sync Settings timer", log: .autoLock)
+        Logger.autoLock.debug("Beginning Sync Settings timer")
 
         self.timerSyncSettings?.invalidate()
         self.timerSyncSettings = nil
@@ -305,7 +310,7 @@ final class DeviceAuthenticator: UserAuthenticating {
     }
 
     private func cancelSyncSettingsTimer() {
-        os_log("Cancelling Sync Settings timer", log: .autoLock)
+        Logger.autoLock.debug("Cancelling Sync Settings timer")
         self.timerSyncSettings?.invalidate()
         self.timerSyncSettings = nil
     }

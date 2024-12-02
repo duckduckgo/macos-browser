@@ -21,17 +21,21 @@ import Suggestions
 import Common
 import History
 import PixelKit
+import os.log
 
 final class SuggestionContainer {
 
     static let maximumNumberOfSuggestions = 9
 
-    @Published private(set) var result: SuggestionResult?
+    @PublishedAfter var result: SuggestionResult?
 
     private let historyCoordinating: HistoryCoordinating
     private let bookmarkManager: BookmarkManager
     private let startupPreferences: StartupPreferences
     private let loading: SuggestionLoading
+
+    // Used for presenting the same suggestions after the removal of the local suggestion
+    private(set) var suggestionDataCache: Data?
 
     private var latestQuery: Query?
 
@@ -42,7 +46,6 @@ final class SuggestionContainer {
         self.historyCoordinating = historyCoordinating
         self.startupPreferences = startupPreferences
         self.loading = suggestionLoading
-        self.loading.dataSource = self
     }
 
     convenience init () {
@@ -55,29 +58,31 @@ final class SuggestionContainer {
                   bookmarkManager: LocalBookmarkManager.shared)
     }
 
-    func getSuggestions(for query: String) {
+    func getSuggestions(for query: String, useCachedData: Bool = false) {
         latestQuery = query
-        loading.getSuggestions(query: query) { [weak self] result, error in
+
+        // Don't use cache by default
+        if !useCachedData {
+            suggestionDataCache = nil
+        }
+
+        loading.getSuggestions(query: query, usingDataSource: self) { [weak self] result, error in
             dispatchPrecondition(condition: .onQueue(.main))
 
-            guard self?.latestQuery == query else { return }
-            guard let result = result else {
-                self?.result = nil
-                os_log("Suggestions: Failed to get suggestions - %s",
-                       type: .error,
-                       "\(String(describing: error))")
+            guard let self, self.latestQuery == query else { return }
+            guard let result else {
+                self.result = nil
+                Logger.general.error("Suggestions: Failed to get suggestions - \(String(describing: error))")
                 PixelKit.fire(DebugEvent(GeneralPixel.suggestionsFetchFailed, error: error))
                 return
             }
 
             if let error = error {
                 // Fetching remote suggestions failed but local can be presented
-                os_log("Suggestions: Error when getting suggestions - %s",
-                       type: .error,
-                       "\(String(describing: error))")
+                Logger.general.error("Suggestions: Error when getting suggestions - \(error.localizedDescription)")
             }
 
-            self?.result = result
+            self.result = result
         }
     }
 
@@ -88,6 +93,10 @@ final class SuggestionContainer {
 }
 
 extension SuggestionContainer: SuggestionLoadingDataSource {
+
+    var platform: Platform {
+        return .desktop
+    }
 
     func history(for suggestionLoading: SuggestionLoading) -> [HistorySuggestion] {
         return historyCoordinating.history ?? []
@@ -113,15 +122,26 @@ extension SuggestionContainer: SuggestionLoadingDataSource {
         bookmarkManager.list?.bookmarks() ?? []
     }
 
+    @MainActor func openTabs(for suggestionLoading: any Suggestions.SuggestionLoading) -> [any Suggestions.BrowserTab] {
+        // Support for this on macOS will come later.
+        []
+    }
+
     func suggestionLoading(_ suggestionLoading: SuggestionLoading,
                            suggestionDataFromUrl url: URL,
                            withParameters parameters: [String: String],
                            completion: @escaping (Data?, Error?) -> Void) {
+        if let suggestionDataCache = suggestionDataCache {
+            completion(suggestionDataCache, nil)
+            return
+        }
+
         let url = url.appendingParameters(parameters)
         var request = URLRequest.defaultRequest(with: url)
         request.timeoutInterval = 1
 
         suggestionsURLSession.dataTask(with: request) { (data, _, error) in
+            self.suggestionDataCache = data
             completion(data, error)
         }.resume()
     }

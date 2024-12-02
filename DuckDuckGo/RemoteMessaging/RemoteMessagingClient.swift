@@ -36,8 +36,7 @@ struct DefaultRemoteMessagingStoreProvider: RemoteMessagingStoreProviding {
             database: database,
             notificationCenter: .default,
             errorEvents: RemoteMessagingStoreErrorHandling(),
-            remoteMessagingAvailabilityProvider: availabilityProvider,
-            log: .remoteMessaging
+            remoteMessagingAvailabilityProvider: availabilityProvider
         )
     }
 }
@@ -55,6 +54,7 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
         }()
     }
 
+    let database: CoreDataDatabase
     let endpoint: URL = Constants.endpoint
     let configFetcher: RemoteMessagingConfigFetching
     let configMatcherProvider: RemoteMessagingConfigMatcherProviding
@@ -65,6 +65,7 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
         database: CoreDataDatabase,
         bookmarksDatabase: CoreDataDatabase,
         appearancePreferences: AppearancePreferences,
+        pinnedTabsManager: PinnedTabsManager,
         internalUserDecider: InternalUserDecider,
         configurationStore: ConfigurationStoring,
         remoteMessagingAvailabilityProvider: RemoteMessagingAvailabilityProviding,
@@ -73,6 +74,7 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
         let provider = RemoteMessagingConfigMatcherProvider(
             bookmarksDatabase: bookmarksDatabase,
             appearancePreferences: appearancePreferences,
+            pinnedTabsManager: pinnedTabsManager,
             internalUserDecider: internalUserDecider
         )
         self.init(
@@ -83,23 +85,43 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
         )
     }
 
-    init(
+    convenience init(
         database: CoreDataDatabase,
         configMatcherProvider: RemoteMessagingConfigMatcherProviding,
         configurationStore: ConfigurationStoring,
         remoteMessagingAvailabilityProvider: RemoteMessagingAvailabilityProviding,
         remoteMessagingStoreProvider: RemoteMessagingStoreProviding = DefaultRemoteMessagingStoreProvider()
     ) {
-        self.database = database
-        self.configFetcher = RemoteMessagingConfigFetcher(
+        let configFetcher = RemoteMessagingConfigFetcher(
             configurationFetcher: ConfigurationFetcher(
                 store: configurationStore,
                 urlSession: .session(),
-                log: .remoteMessaging,
                 eventMapping: ConfigurationManager.configurationDebugEvents
             ),
-            configurationStore: ConfigurationStore.shared
+            configurationStore: configurationStore
         )
+
+        self.init(
+            database: database,
+            configFetcher: configFetcher,
+            configMatcherProvider: configMatcherProvider,
+            remoteMessagingAvailabilityProvider: remoteMessagingAvailabilityProvider,
+            remoteMessagingStoreProvider: remoteMessagingStoreProvider
+        )
+    }
+
+    /**
+     * This designated initializer is used in unit tests where `configFetcher` needs mocking.
+     */
+    init(
+        database: CoreDataDatabase,
+        configFetcher: RemoteMessagingConfigFetching,
+        configMatcherProvider: RemoteMessagingConfigMatcherProviding,
+        remoteMessagingAvailabilityProvider: RemoteMessagingAvailabilityProviding,
+        remoteMessagingStoreProvider: RemoteMessagingStoreProviding = DefaultRemoteMessagingStoreProvider()
+    ) {
+        self.database = database
+        self.configFetcher = configFetcher
         self.configMatcherProvider = configMatcherProvider
         self.remoteMessagingAvailabilityProvider = remoteMessagingAvailabilityProvider
         self.remoteMessagingStoreProvider = remoteMessagingStoreProvider
@@ -135,6 +157,19 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
             .sink { [weak self] in
                 self?.refreshRemoteMessages()
             }
+    }
+
+    /// It's public in order to allow refreshing on demand via Debug menu. Otherwise it shouldn't be called from outside.
+    func refreshRemoteMessages() {
+        guard NSApp.runType.requiresEnvironment else {
+            return
+        }
+        Task {
+            guard let store else {
+                return
+            }
+            try? await fetchAndProcess(using: store)
+        }
     }
 
     private func stopRefreshingRemoteMessages() {
@@ -181,19 +216,9 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
         isRemoteMessagingDatabaseLoaded = true
     }
 
-    private let database: CoreDataDatabase
-    private var isRemoteMessagingDatabaseLoaded = false
+    // Publicly accessible for use in RemoteMessagingDebugMenu
+    private(set) var isRemoteMessagingDatabaseLoaded = false
     private let remoteMessagingStoreProvider: RemoteMessagingStoreProviding
     private var scheduledRefreshCancellable: AnyCancellable?
     private var featureFlagCancellable: AnyCancellable?
-
-    private func refreshRemoteMessages() {
-        guard let store else {
-            return
-        }
-
-        Task {
-            try? await fetchAndProcess(using: store)
-        }
-    }
 }

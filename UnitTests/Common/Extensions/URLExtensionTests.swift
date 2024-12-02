@@ -57,7 +57,15 @@ final class URLExtensionTests: XCTestCase {
             ("http://💩.la:8080 ", "http://xn--ls8h.la:8080"),
             ("http:// 💩.la:8080 ", "https://duckduckgo.com/?q=http%3A%2F%2F%20%F0%9F%92%A9.la%3A8080"),
             ("https://xn--ls8h.la/path/to/resource", "https://xn--ls8h.la/path/to/resource"),
-            ("1.4/3.4", "https://duckduckgo.com/?q=1.4%2F3.4")
+            ("1.4/3.4", "https://duckduckgo.com/?q=1.4%2F3.4"),
+            ("16385-12228.72", "https://duckduckgo.com/?q=16385-12228.72"),
+            ("user@localhost", "https://duckduckgo.com/?q=user%40localhost"),
+            ("user@domain.com", "https://duckduckgo.com/?q=user%40domain.com"),
+            ("http://user@domain.com", "http://user@domain.com"),
+            ("http://user:@domain.com", "http://user:@domain.com"),
+            ("http://user: @domain.com", "https://duckduckgo.com/?q=http%3A%2F%2Fuser%3A%20%40domain.com"),
+            ("http://user:,,@domain.com", "http://user:,,@domain.com"),
+            ("http://user:pass@domain.com", "http://user:pass@domain.com")
         ]
 
         for (string, expected) in data {
@@ -230,5 +238,26 @@ final class URLExtensionTests: XCTestCase {
         let parentURL = URL(string: "https://duckduckgo.com/subscriptions/welcome")!
         let testedURL = URL(string: "https://duckduckgo.com/subscriptions")!
         XCTAssertFalse(testedURL.isChild(of: parentURL))
+    }
+
+    // MARK: - Duck Favicon URL
+
+    func testDuckFaviconURL() throws {
+        XCTAssertEqual(
+            URL.duckFavicon(for: "https://example.com".url!)?.absoluteString,
+            "duck://favicon/https%3A//example.com"
+        )
+        XCTAssertEqual(
+            URL.duckFavicon(for: "https://example.com/1/2/3#anchor".url!)?.absoluteString,
+            "duck://favicon/https%3A//example.com/1/2/3%23anchor"
+        )
+        XCTAssertEqual(
+            URL.duckFavicon(for: "https://example.com/1/2/3?query=yes&other=no".url!)?.absoluteString,
+            "duck://favicon/https%3A//example.com/1/2/3%3Fquery=yes&other=no"
+        )
+        XCTAssertEqual(
+            URL.duckFavicon(for: "https://рнидс.срб/".url!)?.absoluteString,
+            "duck://favicon/https%3A//xn--d1aholi.xn--90a3ac/"
+        )
     }
 }

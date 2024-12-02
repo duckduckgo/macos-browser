@@ -17,9 +17,10 @@
 //
 
 import Foundation
-import Common
+import os.log
 import BrowserServicesKit
 import PixelKit
+import Common
 
 protocol DataBrokerProtectionEventPixelsRepository {
     func markWeeklyPixelSent()
@@ -92,7 +93,7 @@ final class DataBrokerProtectionEventPixels {
         do {
             data = try database.fetchAllBrokerProfileQueryData()
         } catch {
-            os_log("Database error: when attempting to fireWeeklyReportPixels, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("Database error: when attempting to fireWeeklyReportPixels, error: \(error.localizedDescription, privacy: .public)")
             return
         }
         let dataInThePastWeek = data.filter(hadScanThisWeek(_:))
@@ -129,6 +130,8 @@ final class DataBrokerProtectionEventPixels {
 
         handler.fire(.weeklyReportScanning(hadNewMatch: newMatchesFoundInTheLastWeek > 0, hadReAppereance: reAppereancesInTheLastWeek > 0, scanCoverage: percentageOfBrokersScanned.toString))
         handler.fire(.weeklyReportRemovals(removals: removalsInTheLastWeek))
+
+        fireWeeklyChildBrokerOrphanedOptOutsPixels(for: data)
     }
 
     private func hadScanThisWeek(_ brokerProfileQuery: BrokerProfileQueryData) -> Bool {
@@ -145,6 +148,77 @@ final class DataBrokerProtectionEventPixels {
         } else {
             return false
         }
+    }
+}
+
+// MARK: - Orphaned profiles stuff
+
+extension DataBrokerProtectionEventPixels {
+
+    func weeklyOptOuts(for brokerProfileQueries: [BrokerProfileQueryData]) -> [OptOutJobData] {
+        let optOuts = brokerProfileQueries.flatMap { $0.optOutJobData }
+        let weeklyOptOuts = optOuts.filter { !didWeekPassedBetweenDates(start: $0.createdDate, end: Date()) }
+        return weeklyOptOuts
+    }
+
+    func fireWeeklyChildBrokerOrphanedOptOutsPixels(for data: [BrokerProfileQueryData]) {
+        let brokerURLsToQueryData = Dictionary(grouping: data, by: { $0.dataBroker.url })
+        let childBrokerURLsToOrphanedProfilesCount = childBrokerURLsToOrphanedProfilesWeeklyCount(for: data)
+        for (key, value) in childBrokerURLsToOrphanedProfilesCount {
+            guard let childQueryData = brokerURLsToQueryData[key],
+                  let childBrokerName = childQueryData.first?.dataBroker.name,
+                  let parentURL = childQueryData.first?.dataBroker.parent,
+                  let parentQueryData = brokerURLsToQueryData[parentURL] else {
+                continue
+            }
+            let childRecordsCount = weeklyOptOuts(for: childQueryData).count
+            let parentRecordsCount = weeklyOptOuts(for: parentQueryData).count
+            let recordsCountDifference = childRecordsCount - parentRecordsCount
+
+            // If both values are zero there's no point sending the pixel
+            if recordsCountDifference <= 0 && value == 0 {
+                continue
+            }
+            handler.fire(.weeklyChildBrokerOrphanedOptOuts(dataBrokerName: childBrokerName,
+                                                           childParentRecordDifference: recordsCountDifference,
+                                                           calculatedOrphanedRecords: value))
+        }
+    }
+
+    func childBrokerURLsToOrphanedProfilesWeeklyCount(for data: [BrokerProfileQueryData]) -> [String: Int] {
+
+        let brokerURLsToQueryData = Dictionary(grouping: data, by: { $0.dataBroker.url })
+        let childBrokerURLsToQueryData = brokerURLsToQueryData.filter { (_, value: Array<BrokerProfileQueryData>) in
+            guard let first = value.first,
+                  first.dataBroker.parent != nil else {
+                return false
+            }
+            return true
+        }
+
+        let childBrokerURLsToOrphanedProfilesCount = childBrokerURLsToQueryData.mapValues { value in
+            guard let parent = value.first?.dataBroker.parent,
+                let parentsQueryData = brokerURLsToQueryData[parent] else {
+                return 0
+            }
+
+            let optOuts = weeklyOptOuts(for: value)
+            let parentBrokerOptOuts = weeklyOptOuts(for: parentsQueryData)
+
+            return orphanedProfilesCount(with: optOuts, parentOptOuts: parentBrokerOptOuts)
+        }
+
+        return childBrokerURLsToOrphanedProfilesCount
+    }
+
+    func orphanedProfilesCount(with childOptOuts: [OptOutJobData], parentOptOuts: [OptOutJobData]) -> Int {
+        let matchingCount = childOptOuts.reduce(0) { (partialResult: Int, optOut: OptOutJobData) in
+            let hasFoundParentMatch = parentOptOuts.contains { parentOptOut in
+                optOut.extractedProfile.doesMatchExtractedProfile(parentOptOut.extractedProfile)
+            }
+            return partialResult + (hasFoundParentMatch ? 1 : 0)
+        }
+        return childOptOuts.count - matchingCount
     }
 }
 

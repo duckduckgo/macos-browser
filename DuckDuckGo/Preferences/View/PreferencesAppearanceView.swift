@@ -84,6 +84,7 @@ extension Preferences {
 
     struct AppearanceView: View {
         @ObservedObject var model: AppearancePreferences
+        @ObservedObject var addressBarModel: HomePage.Models.AddressBarModel
 
         var body: some View {
             PreferencePane(UserText.appearance) {
@@ -103,16 +104,35 @@ extension Preferences {
                 // SECTION 3: New Tab Page
                 PreferencePaneSection(UserText.newTabBottomPopoverTitle) {
 
-                    if model.isContinueSetUpAvailable {
-                        ToggleMenuItem(UserText.newTabSetUpSectionTitle, isOn: $model.isContinueSetUpVisible)
+                    PreferencePaneSubSection {
+                        if addressBarModel.shouldShowAddressBar {
+                            ToggleMenuItem(UserText.newTabSearchBarSectionTitle, isOn: $model.isSearchBarVisible)
+                        }
+                        if model.isContinueSetUpAvailable && !model.isContinueSetUpCardsViewOutdated && !model.continueSetUpCardsClosed {
+                            ToggleMenuItem(UserText.newTabSetUpSectionTitle, isOn: $model.isContinueSetUpVisible)
+                        }
+                        ToggleMenuItem(UserText.newTabFavoriteSectionTitle, isOn: $model.isFavoriteVisible).accessibilityIdentifier("Preferences.AppearanceView.showFavoritesToggle")
+                        ToggleMenuItem(UserText.newTabRecentActivitySectionTitle, isOn: $model.isRecentActivityVisible)
                     }
-                    ToggleMenuItem(UserText.newTabFavoriteSectionTitle, isOn: $model.isFavoriteVisible).accessibilityIdentifier("Preferences.AppearanceView.showFavoritesToggle")
-                    ToggleMenuItem(UserText.newTabRecentActivitySectionTitle, isOn: $model.isRecentActivityVisible)
+
+                    PreferencePaneSubSection {
+
+                        Button {
+                            model.openNewTabPageBackgroundCustomizationSettings()
+                        } label: {
+                            HStack {
+                                Text(UserText.customizeBackground)
+                                Image(.externalAppScheme)
+                            }
+                            .foregroundColor(Color.linkBlue)
+                            .cursor(.pointingHand)
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
 
                 // SECTION 4: Bookmarks Bar
                 PreferencePaneSection(UserText.showBookmarksBar) {
-
                     HStack {
                         ToggleMenuItem(UserText.showBookmarksBarPreference, isOn: $model.showBookmarksBar)
                             .accessibilityIdentifier("Preferences.AppearanceView.showBookmarksBarPreferenceToggle")
@@ -132,6 +152,22 @@ extension Preferences {
                             return button
                         }
                         .disabled(!model.showBookmarksBar)
+                    }
+
+                    HStack {
+                        Text(UserText.preferencesBookmarksCenterAlignBookmarksBarTitle)
+                        NSPopUpButtonView(selection: $model.centerAlignedBookmarksBarBool) {
+                            let button = NSPopUpButton()
+                            button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+
+                            let leftAligned = button.menu?.addItem(withTitle: UserText.preferencesBookmarksLeftAlignBookmarksBare, action: nil, keyEquivalent: "")
+                            leftAligned?.representedObject = false
+
+                            let centerAligned = button.menu?.addItem(withTitle: UserText.preferencesBookmarksCenterAlignBookmarksBar, action: nil, keyEquivalent: "")
+                            centerAligned?.representedObject = true
+
+                            return button
+                        }
                     }
                 }
             }

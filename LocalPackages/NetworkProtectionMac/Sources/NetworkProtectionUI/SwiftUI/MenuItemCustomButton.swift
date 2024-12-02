@@ -24,7 +24,7 @@ struct MenuItemCustomButton<Label: View>: View {
     private var label: (Bool) -> Label
     private let action: () async -> Void
 
-    private let highlightAnimationStepSpeed = 0.05
+    private let highlightAnimationStepSpeed = AnimationConstants.highlightAnimationStepSpeed
 
     @State private var isHovered = false
     @State private var animatingTap = false

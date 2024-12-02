@@ -1,9 +1,10 @@
 {
   "name": "Inforver",
   "url": "inforver.com",
-  "version": "0.1.5",
+  "version": "0.3.0",
   "parent": "verecor.com",
   "addedDatetime": 1677736800000,
+  "optOutUrl": "https://persontrust.com/ng/control/privacy",
   "steps": [
     {
       "stepType": "scan",
@@ -63,6 +64,7 @@
   "schedulingConfig": {
     "retryError": 48,
     "confirmOptOutScan": 72,
-    "maintenanceScan": 240
+    "maintenanceScan": 120,
+    "maxAttempts": -1
   }
 }

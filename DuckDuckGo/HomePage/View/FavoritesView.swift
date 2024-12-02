@@ -34,7 +34,7 @@ struct Favorites: View {
     var body: some View {
 
         if #available(macOS 12.0, *) {
-            LazyVStack(spacing: 4) {
+            LazyVStack(spacing: 0) {
                 FavoritesGrid(isHovering: $isHovering)
             }
             .frame(maxWidth: .infinity)
@@ -42,7 +42,7 @@ struct Favorites: View {
                 self.isHovering = isHovering
             }
         } else {
-            VStack(spacing: 4) {
+            VStack(spacing: 0) {
                 FavoritesGrid(isHovering: $isHovering)
             }
             .frame(maxWidth: .infinity)
@@ -97,7 +97,7 @@ struct FavoritesGrid: View {
         static let itemWidth: CGFloat = 64
         static let itemHeight: CGFloat = 101
         static let verticalSpacing: CGFloat = 10
-        static let horizontalSpacing: CGFloat = 20
+        static let horizontalSpacing: CGFloat = 24
 
         static let width: CGFloat = (itemWidth + horizontalSpacing) * CGFloat(HomePage.favoritesPerRow) - horizontalSpacing
 
@@ -256,15 +256,43 @@ struct FavoriteTemplate: View {
     let url: URL?
     let onFaviconMissing: (() -> Void)?
 
-    @State var isHovering = false
+    @State var isHovering = false {
+        didSet {
+            guard isHovering != oldValue else {
+                return
+            }
+            if isHovering {
+                NSCursor.pointingHand.push()
+            } else {
+                NSCursor.pointingHand.pop()
+            }
+        }
+    }
+
+    @EnvironmentObject var settingsModel: HomePage.Models.SettingsModel
 
     var body: some View {
         VStack(spacing: 5) {
 
             ZStack(alignment: .center) {
 
+                ZStack(alignment: .center) {
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.homeFavoritesGhost, style: StrokeStyle(lineWidth: 1.0))
+                        .shadow(color: isHovering ? .clear : .black.opacity(0.16), radius: 1.5, x: 0, y: 0)
+                        .shadow(color: isHovering ? .clear : .black.opacity(0.12), radius: 2, x: 0, y: 2)
+
+                    RoundedRectangle(cornerRadius: 12)
+                        .homePageViewBackground(settingsModel.customBackground)
+                        .cornerRadius(12)
+                        .blendMode(.destinationOut)
+                }
+                .compositingGroup()
+
                 RoundedRectangle(cornerRadius: 12)
-                    .foregroundColor(isHovering ? .homeFavoritesHover : .homeFavoritesBackground)
+                    .fill(isHovering ? .buttonMouseOver : .clear)
+                    .homePageViewBackground(settingsModel.customBackground)
+                    .cornerRadius(12)
 
                 if let url = url {
                     FaviconView(url: url, onFaviconMissing: onFaviconMissing)
@@ -273,7 +301,6 @@ struct FavoriteTemplate: View {
                 }
             }
             .frame(width: FavoritesGrid.GridDimensions.itemWidth, height: FavoritesGrid.GridDimensions.itemWidth)
-            .clipped()
 
             Text(title)
                 .multilineTextAlignment(.center)
@@ -286,13 +313,6 @@ struct FavoriteTemplate: View {
         .frame(maxWidth: FavoritesGrid.GridDimensions.itemWidth)
         .onHover { isHovering in
             self.isHovering = isHovering
-
-            if isHovering {
-                NSCursor.pointingHand.push()
-            } else {
-                NSCursor.pointingHand.pop()
-            }
-
         }
     }
 

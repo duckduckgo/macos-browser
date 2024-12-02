@@ -19,6 +19,7 @@
 import Cocoa
 import Combine
 import Common
+import os.log
 
 extension NSButton {
     var isFirstResponder: Bool {
@@ -90,9 +91,15 @@ extension NSView {
         set { isHidden = !newValue }
     }
 
+    var isVisible: Bool {
+        guard !isHiddenOrHasHiddenAncestor,
+              let window, window.isVisible else { return false }
+        return true
+    }
+
     func makeMeFirstResponder() {
         guard let window = window else {
-            os_log("%s: Window not available", type: .error, className)
+            Logger.general.error("\(self.className): Window not available")
             return
         }
         // prevent all text selection on repeated Address Bar activation
@@ -164,7 +171,7 @@ extension NSView {
         return convert(locationInView)
     }
 
-    func mouseLocationInsideBounds(_ point: NSPoint?) -> NSPoint? {
+    func mouseLocationInsideBounds(_ point: NSPoint? = nil) -> NSPoint? {
         withMouseLocationInViewCoordinates(point) { locationInView in
             guard self.visibleRectClampedToBounds().contains(locationInView) else { return nil }
             return locationInView

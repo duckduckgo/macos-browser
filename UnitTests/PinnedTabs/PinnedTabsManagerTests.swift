@@ -19,7 +19,6 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-@MainActor
 class PinnedTabsManagerTests: XCTestCase {
 
     func testInitialState() throws {
@@ -28,6 +27,7 @@ class PinnedTabsManagerTests: XCTestCase {
         XCTAssertTrue(manager.pinnedDomains.isEmpty)
     }
 
+    @MainActor
     func testPinning() throws {
         let manager = PinnedTabsManager()
         let tab = Tab("https://duck.com")
@@ -39,6 +39,7 @@ class PinnedTabsManagerTests: XCTestCase {
         XCTAssertEqual(manager.pinnedDomains, ["duck.com"])
     }
 
+    @MainActor
     func testWhenIndexIsSpecifiedThenTabIsPinnedAtThatIndex() {
         let tabA = Tab("https://a.com")
         let tabB = Tab("https://b.com")
@@ -50,6 +51,7 @@ class PinnedTabsManagerTests: XCTestCase {
         XCTAssertEqual(manager.tabCollection.tabs, [tabA, tabC, tabB])
     }
 
+    @MainActor
     func testThatPinnedTabCanBeUnpinned() {
         let tabA = Tab("https://a.com")
         let tabB = Tab("https://b.com")
@@ -62,6 +64,7 @@ class PinnedTabsManagerTests: XCTestCase {
         XCTAssertFalse(manager.isDomainPinned("b.com"))
     }
 
+    @MainActor
     func testWhenTabIsUnpinnedThenUnpinnedEventIsPublished() {
         let tabA = Tab("https://a.com")
         let tabB = Tab("https://b.com")
@@ -82,6 +85,7 @@ class PinnedTabsManagerTests: XCTestCase {
         XCTAssertEqual(events[safe: 0], 1)
     }
 
+    @MainActor
     func testWhenTabUnpinningFailsThenUnpinnedEventIsNotPublished() {
         let tabA = Tab("https://a.com")
         let tabB = Tab("https://b.com")
@@ -101,6 +105,7 @@ class PinnedTabsManagerTests: XCTestCase {
         XCTAssertTrue(events.isEmpty)
     }
 
+    @MainActor
     func testThatTabViewModelsAreCreatedForPinnedTabs() {
         let manager = PinnedTabsManager()
         let tab = Tab("https://duck.com")
@@ -113,6 +118,7 @@ class PinnedTabsManagerTests: XCTestCase {
         XCTAssertNotNil(manager.tabViewModel(at: 0))
     }
 
+    @MainActor
     func testWhenSetUpIsCalledThenPinnedTabsArePopulatedWithCollectionContents() {
         let manager = PinnedTabsManager()
         let tabA = Tab("https://a.com")

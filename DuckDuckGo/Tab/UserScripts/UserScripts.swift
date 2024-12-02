@@ -21,6 +21,7 @@ import BrowserServicesKit
 import UserScript
 import WebKit
 import Subscription
+import SpecialErrorPages
 
 @MainActor
 final class UserScripts: UserScriptsProvider {
@@ -44,19 +45,27 @@ final class UserScripts: UserScriptsProvider {
     let autoconsentUserScript: UserScriptWithAutoconsent
     let youtubeOverlayScript: YoutubeOverlayUserScript?
     let youtubePlayerUserScript: YoutubePlayerUserScript?
-    let sslErrorPageUserScript: SSLErrorPageUserScript?
+    let specialErrorPageUserScript: SpecialErrorPageUserScript?
     let onboardingUserScript: OnboardingUserScript?
+#if SPARKLE
+    let releaseNotesUserScript: ReleaseNotesUserScript?
+#endif
+    let aiChatUserScript: AIChatUserScript?
 
     init(with sourceProvider: ScriptSourceProviding) {
         clickToLoadScript = ClickToLoadUserScript()
         contentBlockerRulesScript = ContentBlockerRulesUserScript(configuration: sourceProvider.contentBlockerRulesConfig!)
         surrogatesScript = SurrogatesUserScript(configuration: sourceProvider.surrogatesConfig!)
+        aiChatUserScript = AIChatUserScript(handler: AIChatUserScriptHandler(storage: DefaultAIChatPreferencesStorage()),
+                                            urlSettings: AIChatDebugURLSettings())
 
         let isGPCEnabled = WebTrackingProtectionPreferences.shared.isGPCEnabled
         let privacyConfig = sourceProvider.privacyConfigurationManager.privacyConfig
         let sessionKey = sourceProvider.sessionKey ?? ""
+        let messageSecret = sourceProvider.messageSecret ?? ""
         let prefs = ContentScopeProperties(gpcEnabled: isGPCEnabled,
                                                 sessionKey: sessionKey,
+                                                messageSecret: messageSecret,
                                                 featureToggles: ContentScopeFeatureToggles.supportedFeaturesOnMacOS(privacyConfig))
         contentScopeUserScript = ContentScopeUserScript(sourceProvider.privacyConfigurationManager, properties: prefs)
         contentScopeUserScriptIsolated = ContentScopeUserScript(sourceProvider.privacyConfigurationManager, properties: prefs, isIsolated: true)
@@ -65,7 +74,9 @@ final class UserScripts: UserScriptsProvider {
 
         autoconsentUserScript = AutoconsentUserScript(scriptSource: sourceProvider, config: sourceProvider.privacyConfigurationManager.privacyConfig)
 
-        sslErrorPageUserScript = SSLErrorPageUserScript()
+        let lenguageCode = Locale.current.languageCode ?? "en"
+        specialErrorPageUserScript = SpecialErrorPageUserScript(localeStrings: SpecialErrorPageUserScript.localeStrings(for: lenguageCode),
+                                                                    languageCode: lenguageCode)
 
         onboardingUserScript = OnboardingUserScript(onboardingActionsManager: sourceProvider.onboardingActionsManager!)
 
@@ -79,21 +90,35 @@ final class UserScripts: UserScriptsProvider {
             youtubePlayerUserScript = nil
         }
 
+#if SPARKLE
+        releaseNotesUserScript = ReleaseNotesUserScript()
+#endif
+
         userScripts.append(autoconsentUserScript)
 
         contentScopeUserScriptIsolated.registerSubfeature(delegate: clickToLoadScript)
+
+        if let aiChatUserScript {
+            contentScopeUserScriptIsolated.registerSubfeature(delegate: aiChatUserScript)
+        }
 
         if let youtubeOverlayScript {
             contentScopeUserScriptIsolated.registerSubfeature(delegate: youtubeOverlayScript)
         }
 
         if let specialPages = specialPages {
-            if let sslErrorPageUserScript {
-                specialPages.registerSubfeature(delegate: sslErrorPageUserScript)
+
+            if let specialErrorPageUserScript {
+                specialPages.registerSubfeature(delegate: specialErrorPageUserScript)
             }
             if let youtubePlayerUserScript {
                 specialPages.registerSubfeature(delegate: youtubePlayerUserScript)
             }
+#if SPARKLE
+            if let releaseNotesUserScript {
+                specialPages.registerSubfeature(delegate: releaseNotesUserScript)
+            }
+#endif
             if let onboardingUserScript {
                 specialPages.registerSubfeature(delegate: onboardingUserScript)
             }
@@ -105,9 +130,11 @@ final class UserScripts: UserScriptsProvider {
             let stripePurchaseFlow = DefaultStripePurchaseFlow(subscriptionEndpointService: subscriptionManager.subscriptionEndpointService,
                                                                authEndpointService: subscriptionManager.authEndpointService,
                                                                accountManager: subscriptionManager.accountManager)
+            let freemiumDBPPixelExperimentManager = FreemiumDBPPixelExperimentManager(subscriptionManager: subscriptionManager)
             let delegate = SubscriptionPagesUseSubscriptionFeature(subscriptionManager: subscriptionManager,
                                                                    stripePurchaseFlow: stripePurchaseFlow,
-                                                                   uiHandler: Application.appDelegate.subscriptionUIHandler)
+                                                                   uiHandler: Application.appDelegate.subscriptionUIHandler,
+                                                                   freemiumDBPPixelExperimentManager: freemiumDBPPixelExperimentManager)
             subscriptionPagesUserScript.registerSubfeature(delegate: delegate)
             userScripts.append(subscriptionPagesUserScript)
 

@@ -32,13 +32,15 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .secureVaultInitError(let error),
                     .secureVaultError(let error),
                     .secureVaultKeyStoreReadError(let error),
-                    .secureVaultKeyStoreUpdateError(let error):
+                    .secureVaultKeyStoreUpdateError(let error),
+                    .errorLoadingCachedConfig(let error),
+                    .failedToParsePrivacyConfig(let error):
                 PixelKit.fire(DebugEvent(event, error: error))
             case .ipcServerProfileSavedXPCError(error: let error),
                     .ipcServerImmediateScansFinishedWithError(error: let error),
                     .ipcServerAppLaunchedXPCError(error: let error),
                     .ipcServerAppLaunchedScheduledScansFinishedWithError(error: let error):
-                PixelKit.fire(DebugEvent(event, error: error), frequency: .dailyAndCount, includeAppVersionParameter: true)
+                PixelKit.fire(DebugEvent(event, error: error), frequency: .legacyDailyAndCount, includeAppVersionParameter: true)
             case .ipcServerProfileSavedCalledByApp,
                     .ipcServerProfileSavedReceivedByAgent,
                     .ipcServerImmediateScansInterrupted,
@@ -48,7 +50,7 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .ipcServerAppLaunchedScheduledScansBlocked,
                     .ipcServerAppLaunchedScheduledScansInterrupted,
                     .ipcServerAppLaunchedScheduledScansFinishedWithoutError:
-                PixelKit.fire(event, frequency: .dailyAndCount, includeAppVersionParameter: true)
+                PixelKit.fire(event, frequency: .legacyDailyAndCount, includeAppVersionParameter: true)
             case .parentChildMatches,
                     .optOutStart,
                     .optOutEmailGenerate,
@@ -82,6 +84,12 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .monthlyActiveUser,
                     .weeklyReportScanning,
                     .weeklyReportRemovals,
+                    .optOutJobAt7DaysConfirmed,
+                    .optOutJobAt7DaysUnconfirmed,
+                    .optOutJobAt14DaysConfirmed,
+                    .optOutJobAt14DaysUnconfirmed,
+                    .optOutJobAt21DaysConfirmed,
+                    .optOutJobAt21DaysUnconfirmed,
                     .scanningEventNewMatch,
                     .scanningEventReAppearance,
                     .webUILoadingFailed,
@@ -97,8 +105,10 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .globalMetricsMonthlyStats,
                     .dataBrokerMetricsWeeklyStats,
                     .dataBrokerMetricsMonthlyStats,
-                    .gatekeeperNotAuthenticated,
-                    .gatekeeperEntitlementsInvalid:
+                    .invalidPayload,
+                    .customDataBrokerStatsOptoutSubmit,
+                    .customGlobalStatsOptoutSubmit,
+                    .weeklyChildBrokerOrphanedOptOuts:
 
                 PixelKit.fire(event)
 
@@ -111,7 +121,7 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .entitlementCheckValid,
                     .entitlementCheckInvalid,
                     .entitlementCheckError:
-                PixelKit.fire(event, frequency: .dailyAndCount)
+                PixelKit.fire(event, frequency: .legacyDailyAndCount)
             }
         }
     }

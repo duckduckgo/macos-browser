@@ -244,4 +244,49 @@ final class BaseBookmarkEntityTests: XCTestCase {
         XCTAssertFalse(result)
     }
 
+    func testWhenSortingByManualModeThenBookmarksAreReturnedInOriginalOrder() {
+        // GIVEN
+        let bookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: "Test 3", isFavorite: true)
+        let folder = BookmarkFolder(id: "2", title: "Test 1")
+        let bookmarkTwo = Bookmark(id: "3", url: URL.duckDuckGo.absoluteString, title: "Test 2", isFavorite: false)
+
+        // WHEN
+        let sut = [bookmark, folder, bookmarkTwo].sorted(by: .manual)
+
+        // THEN
+        XCTAssertEqual(sut[0], bookmark)
+        XCTAssertEqual(sut[1], folder)
+        XCTAssertEqual(sut[2], bookmarkTwo)
+    }
+
+    func testWhenSortingByNameAscThenBookmarksAreReturnedByAscendingTitle() {
+        // GIVEN
+        let bookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: "Test 3", isFavorite: true)
+        let folder = BookmarkFolder(id: "2", title: "Test 1")
+        let bookmarkTwo = Bookmark(id: "3", url: URL.duckDuckGo.absoluteString, title: "Test 2", isFavorite: false)
+
+        // WHEN
+        let sut = [bookmark, folder, bookmarkTwo].sorted(by: .nameAscending)
+
+        // THEN
+        XCTAssertEqual(sut[0], folder)
+        XCTAssertEqual(sut[1], bookmarkTwo)
+        XCTAssertEqual(sut[2], bookmark)
+    }
+
+    func testWhenSortingByNameDescThenBookmarksAreReturnedByDescendingTitle() {
+        // GIVEN
+        let bookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: "Test 3", isFavorite: true)
+        let folder = BookmarkFolder(id: "2", title: "Test 1")
+        let bookmarkTwo = Bookmark(id: "3", url: URL.duckDuckGo.absoluteString, title: "Test 2", isFavorite: false)
+
+        // WHEN
+        let sut = [bookmark, folder, bookmarkTwo].sorted(by: .nameDescending)
+
+        // THEN
+        XCTAssertEqual(sut[0], bookmark)
+        XCTAssertEqual(sut[1], bookmarkTwo)
+        XCTAssertEqual(sut[2], folder)
+    }
+
 }

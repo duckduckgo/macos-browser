@@ -88,6 +88,10 @@ final class IPCClientMock: NetworkProtectionIPCClient {
         completion(nil)
     }
 
+    func command(_ command: VPNCommand) async throws {
+        return
+    }
+
 }
 
 final class ConnectivityIssueObserverMock: ConnectivityIssueObserver {

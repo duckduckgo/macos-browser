@@ -17,6 +17,8 @@
 //
 
 import XCTest
+import Configuration
+import Persistence
 @testable import DataBrokerProtection
 
 final class DataBrokerProtectionAgentManagerTests: XCTestCase {
@@ -32,13 +34,20 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
     private var mockDependencies: DefaultDataBrokerOperationDependencies!
     private var mockProfile: DataBrokerProtectionProfile!
     private var mockAgentStopper: MockAgentStopper!
+    private var mockConfigurationManager: MockConfigurationManager!
+    private var mockPrivacyConfigurationManager: DBPPrivacyConfigurationManager!
+    private var mockAuthenticationManager: MockAuthenticationManager!
+    private var mockFreemiumDBPUserStateManager: MockFreemiumDBPUserStateManager!
 
     override func setUpWithError() throws {
 
         mockPixelHandler = MockPixelHandler()
         mockActivityScheduler = MockDataBrokerProtectionBackgroundActivityScheduler()
         mockNotificationService = MockUserNotificationService()
+        mockAuthenticationManager = MockAuthenticationManager()
         mockAgentStopper = MockAgentStopper()
+        mockConfigurationManager = MockConfigurationManager()
+        mockPrivacyConfigurationManager = DBPPrivacyConfigurationManager()
 
         let mockDatabase = MockDatabase()
         let mockMismatchCalculator = MockMismatchCalculator(database: mockDatabase, pixelHandler: mockPixelHandler)
@@ -55,7 +64,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
         mockDataManager = MockDataBrokerProtectionDataManager(pixelHandler: mockPixelHandler, fakeBrokerFlag: fakeBroker)
 
         mockDependencies = DefaultDataBrokerOperationDependencies(database: mockDatabase,
-                                                                  config: DataBrokerExecutionConfig(),
+                                                                  config: DataBrokerExecutionConfig(mode: .normal),
                                                                   runnerProvider: MockRunnerProvider(),
                                                                   notificationCenter: .default,
                                                                   pixelHandler: mockPixelHandler,
@@ -66,9 +75,11 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             addresses: [],
             phones: [],
             birthYear: 1992)
+
+        mockFreemiumDBPUserStateManager = MockFreemiumDBPUserStateManager()
     }
 
-    func testWhenAgentStart_andProfileExists_thenActivityIsScheduled_andSheduledOpereationsRun() async throws {
+    func testWhenAgentStart_andProfileExists_andUserIsNotFreemium_thenActivityIsScheduled_andScheduledAllOperationsRun() async throws {
         // Given
         sut = DataBrokerProtectionAgentManager(
             userNotificationService: mockNotificationService,
@@ -78,9 +89,15 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             dataManager: mockDataManager,
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
-            agentStopper: mockAgentStopper)
+            agentStopper: mockAgentStopper,
+            configurationManager: mockConfigurationManager,
+            privacyConfigurationManager: mockPrivacyConfigurationManager,
+            authenticationManager: mockAuthenticationManager,
+            freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager)
 
         mockDataManager.profileToReturn = mockProfile
+        mockAuthenticationManager.isUserAuthenticatedValue = true
+        mockFreemiumDBPUserStateManager.didActivate = false
 
         let schedulerStartedExpectation = XCTestExpectation(description: "Scheduler started")
         var schedulerStarted = false
@@ -91,7 +108,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
 
         let scanCalledExpectation = XCTestExpectation(description: "Scan called")
         var startScheduledScansCalled = false
-        mockQueueManager.startScheduledOperationsIfPermittedCalledCompletion = { _ in
+        mockQueueManager.startScheduledAllOperationsIfPermittedCalledCompletion = {
             startScheduledScansCalled = true
             scanCalledExpectation.fulfill()
         }
@@ -105,14 +122,8 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
         XCTAssertTrue(startScheduledScansCalled)
     }
 
-    func testWhenAgentStart_andProfileDoesNotExist_thenActivityIsNotScheduled_andStopAgentIsCalled() async throws {
+    func testWhenAgentStart_andProfileExists_andUserIsFreemium_thenActivityIsScheduled_andScheduledScanOperationsRun() async throws {
         // Given
-        let mockStopAction = MockDataProtectionStopAction()
-        let agentStopper = DefaultDataBrokerProtectionAgentStopper(dataManager: mockDataManager,
-                                                                   entitlementMonitor: DataBrokerProtectionEntitlementMonitor(),
-                                                                   authenticationManager: MockAuthenticationManager(),
-                                                                   pixelHandler: mockPixelHandler,
-                                                                   stopAction: mockStopAction)
         sut = DataBrokerProtectionAgentManager(
             userNotificationService: mockNotificationService,
             activityScheduler: mockActivityScheduler,
@@ -121,9 +132,62 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             dataManager: mockDataManager,
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
-            agentStopper: agentStopper)
+            agentStopper: mockAgentStopper,
+            configurationManager: mockConfigurationManager,
+            privacyConfigurationManager: mockPrivacyConfigurationManager,
+            authenticationManager: mockAuthenticationManager,
+            freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager)
+
+        mockDataManager.profileToReturn = mockProfile
+        mockFreemiumDBPUserStateManager.didActivate = true
+
+        let schedulerStartedExpectation = XCTestExpectation(description: "Scheduler started")
+        var schedulerStarted = false
+        mockActivityScheduler.startSchedulerCompletion = {
+            schedulerStarted = true
+            schedulerStartedExpectation.fulfill()
+        }
+
+        let scanCalledExpectation = XCTestExpectation(description: "Scan called")
+        var startScheduledScansCalled = false
+        mockQueueManager.startScheduledScanOperationsIfPermittedCalledCompletion = {
+            startScheduledScansCalled = true
+            scanCalledExpectation.fulfill()
+        }
+
+        // When
+        sut.agentFinishedLaunching()
+
+        // Then
+        await fulfillment(of: [scanCalledExpectation, schedulerStartedExpectation], timeout: 1.0)
+        XCTAssertTrue(schedulerStarted)
+        XCTAssertTrue(startScheduledScansCalled)
+    }
+
+    func testWhenAgentStart_andProfileDoesNotExist_andUserIsFreemium_thenActivityIsNotScheduled_andStopAgentIsCalled() async throws {
+        // Given
+        let mockStopAction = MockDataProtectionStopAction()
+        let agentStopper = DefaultDataBrokerProtectionAgentStopper(dataManager: mockDataManager,
+                                                                   entitlementMonitor: DataBrokerProtectionEntitlementMonitor(),
+                                                                   authenticationManager: MockAuthenticationManager(),
+                                                                   pixelHandler: mockPixelHandler,
+                                                                   stopAction: mockStopAction, freemiumDBPUserStateManager: MockFreemiumDBPUserStateManager())
+        sut = DataBrokerProtectionAgentManager(
+            userNotificationService: mockNotificationService,
+            activityScheduler: mockActivityScheduler,
+            ipcServer: mockIPCServer,
+            queueManager: mockQueueManager,
+            dataManager: mockDataManager,
+            operationDependencies: mockDependencies,
+            pixelHandler: mockPixelHandler,
+            agentStopper: agentStopper,
+            configurationManager: mockConfigurationManager,
+            privacyConfigurationManager: mockPrivacyConfigurationManager,
+            authenticationManager: mockAuthenticationManager,
+            freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager)
 
         mockDataManager.profileToReturn = nil
+        mockFreemiumDBPUserStateManager.didActivate = true
 
         let stopAgentExpectation = XCTestExpectation(description: "Stop agent expectation")
 
@@ -153,7 +217,11 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             dataManager: mockDataManager,
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
-            agentStopper: mockAgentStopper)
+            agentStopper: mockAgentStopper,
+            configurationManager: mockConfigurationManager,
+            privacyConfigurationManager: mockPrivacyConfigurationManager,
+            authenticationManager: mockAuthenticationManager,
+            freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager)
 
         mockDataManager.profileToReturn = nil
 
@@ -180,7 +248,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
         XCTAssertTrue(monitorEntitlementWasCalled)
     }
 
-    func testWhenActivitySchedulerTriggers_thenSheduledOpereationsRun() async throws {
+    func testWhenActivitySchedulerTriggers_andUserIsNotFreemium_thenScheduledAllOperationsRun() async throws {
         // Given
         sut = DataBrokerProtectionAgentManager(
             userNotificationService: mockNotificationService,
@@ -190,12 +258,18 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             dataManager: mockDataManager,
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
-            agentStopper: mockAgentStopper)
+            agentStopper: mockAgentStopper,
+            configurationManager: mockConfigurationManager,
+            privacyConfigurationManager: mockPrivacyConfigurationManager,
+            authenticationManager: mockAuthenticationManager,
+            freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager)
 
         mockDataManager.profileToReturn = mockProfile
+        mockAuthenticationManager.isUserAuthenticatedValue = true
+        mockFreemiumDBPUserStateManager.didActivate = false
 
         var startScheduledScansCalled = false
-        mockQueueManager.startScheduledOperationsIfPermittedCalledCompletion = { _ in
+        mockQueueManager.startScheduledAllOperationsIfPermittedCalledCompletion = {
             startScheduledScansCalled = true
         }
 
@@ -206,7 +280,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
         XCTAssertTrue(startScheduledScansCalled)
     }
 
-    func testWhenProfileSaved_thenImmediateOpereationsRun() async throws {
+    func testWhenActivitySchedulerTriggers_andUserIsFreemium_thenScheduledScanOperationsRun() async throws {
         // Given
         sut = DataBrokerProtectionAgentManager(
             userNotificationService: mockNotificationService,
@@ -216,12 +290,79 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             dataManager: mockDataManager,
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
-            agentStopper: mockAgentStopper)
+            agentStopper: mockAgentStopper,
+            configurationManager: mockConfigurationManager,
+            privacyConfigurationManager: mockPrivacyConfigurationManager,
+            authenticationManager: mockAuthenticationManager,
+            freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager)
 
         mockDataManager.profileToReturn = mockProfile
+        mockFreemiumDBPUserStateManager.didActivate = true
+
+        var startScheduledScansCalled = false
+        mockQueueManager.startScheduledScanOperationsIfPermittedCalledCompletion = {
+            startScheduledScansCalled = true
+        }
+
+        // When
+        mockActivityScheduler.triggerDelegateCall()
+
+        // Then
+        XCTAssertTrue(startScheduledScansCalled)
+    }
+
+    func testWhenProfileSaved_andUserIsNotFreemium_thenImmediateOperationsRun() async throws {
+        // Given
+        sut = DataBrokerProtectionAgentManager(
+            userNotificationService: mockNotificationService,
+            activityScheduler: mockActivityScheduler,
+            ipcServer: mockIPCServer,
+            queueManager: mockQueueManager,
+            dataManager: mockDataManager,
+            operationDependencies: mockDependencies,
+            pixelHandler: mockPixelHandler,
+            agentStopper: mockAgentStopper,
+            configurationManager: mockConfigurationManager,
+            privacyConfigurationManager: mockPrivacyConfigurationManager,
+            authenticationManager: mockAuthenticationManager,
+            freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager)
+
+        mockDataManager.profileToReturn = mockProfile
+        mockFreemiumDBPUserStateManager.didActivate = false
 
         var startImmediateScansCalled = false
-        mockQueueManager.startImmediateOperationsIfPermittedCalledCompletion = { _ in
+        mockQueueManager.startImmediateScanOperationsIfPermittedCalledCompletion = {
+            startImmediateScansCalled = true
+        }
+
+        // When
+        sut.profileSaved()
+
+        // Then
+        XCTAssertTrue(startImmediateScansCalled)
+    }
+
+    func testWhenProfileSaved_andUserIsFreemium_thenImmediateOperationsRun() async throws {
+        // Given
+        sut = DataBrokerProtectionAgentManager(
+            userNotificationService: mockNotificationService,
+            activityScheduler: mockActivityScheduler,
+            ipcServer: mockIPCServer,
+            queueManager: mockQueueManager,
+            dataManager: mockDataManager,
+            operationDependencies: mockDependencies,
+            pixelHandler: mockPixelHandler,
+            agentStopper: mockAgentStopper,
+            configurationManager: mockConfigurationManager,
+            privacyConfigurationManager: mockPrivacyConfigurationManager,
+            authenticationManager: mockAuthenticationManager,
+            freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager)
+
+        mockDataManager.profileToReturn = mockProfile
+        mockFreemiumDBPUserStateManager.didActivate = true
+
+        var startImmediateScansCalled = false
+        mockQueueManager.startImmediateScanOperationsIfPermittedCalledCompletion = {
             startImmediateScansCalled = true
         }
 
@@ -242,7 +383,11 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             dataManager: mockDataManager,
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
-            agentStopper: mockAgentStopper)
+            agentStopper: mockAgentStopper,
+            configurationManager: mockConfigurationManager,
+            privacyConfigurationManager: mockPrivacyConfigurationManager,
+            authenticationManager: mockAuthenticationManager,
+            freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager)
 
         mockNotificationService.reset()
 
@@ -263,7 +408,11 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             dataManager: mockDataManager,
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
-            agentStopper: mockAgentStopper)
+            agentStopper: mockAgentStopper,
+            configurationManager: mockConfigurationManager,
+            privacyConfigurationManager: mockPrivacyConfigurationManager,
+            authenticationManager: mockAuthenticationManager,
+            freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager)
 
         mockNotificationService.reset()
 
@@ -284,10 +433,14 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             dataManager: mockDataManager,
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
-            agentStopper: mockAgentStopper)
+            agentStopper: mockAgentStopper,
+            configurationManager: mockConfigurationManager,
+            privacyConfigurationManager: mockPrivacyConfigurationManager,
+            authenticationManager: mockAuthenticationManager,
+            freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager)
 
         mockNotificationService.reset()
-        mockQueueManager.startImmediateOperationsIfPermittedCompletionError = DataBrokerProtectionAgentErrorCollection(oneTimeError: NSError(domain: "test", code: 10))
+        mockQueueManager.startImmediateScanOperationsIfPermittedCompletionError = DataBrokerProtectionAgentErrorCollection(oneTimeError: NSError(domain: "test", code: 10))
 
         // When
         sut.profileSaved()
@@ -306,7 +459,11 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             dataManager: mockDataManager,
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
-            agentStopper: mockAgentStopper)
+            agentStopper: mockAgentStopper,
+            configurationManager: mockConfigurationManager,
+            privacyConfigurationManager: mockPrivacyConfigurationManager,
+            authenticationManager: mockAuthenticationManager,
+            freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager)
 
         mockNotificationService.reset()
         mockDataManager.shouldReturnHasMatches = true
@@ -328,7 +485,11 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             dataManager: mockDataManager,
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
-            agentStopper: mockAgentStopper)
+            agentStopper: mockAgentStopper,
+            configurationManager: mockConfigurationManager,
+            privacyConfigurationManager: mockPrivacyConfigurationManager,
+            authenticationManager: mockAuthenticationManager,
+            freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager)
 
         mockNotificationService.reset()
         mockDataManager.shouldReturnHasMatches = false
@@ -340,7 +501,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
         XCTAssertFalse(mockNotificationService.checkInNotificationWasScheduled)
     }
 
-    func testWhenAppLaunched_thenSheduledOpereationsRun() async throws {
+    func testWhenAppLaunched_andUserIsNotFreemium_thenScheduledAllOperationsRun() async throws {
         // Given
         sut = DataBrokerProtectionAgentManager(
             userNotificationService: mockNotificationService,
@@ -350,10 +511,17 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             dataManager: mockDataManager,
             operationDependencies: mockDependencies,
             pixelHandler: mockPixelHandler,
-            agentStopper: mockAgentStopper)
+            agentStopper: mockAgentStopper,
+            configurationManager: mockConfigurationManager,
+            privacyConfigurationManager: mockPrivacyConfigurationManager,
+            authenticationManager: mockAuthenticationManager,
+            freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager)
+
+        mockAuthenticationManager.isUserAuthenticatedValue = true
+        mockFreemiumDBPUserStateManager.didActivate = false
 
         var startScheduledScansCalled = false
-        mockQueueManager.startScheduledOperationsIfPermittedCalledCompletion = { _ in
+        mockQueueManager.startScheduledAllOperationsIfPermittedCalledCompletion = {
             startScheduledScansCalled = true
         }
 
@@ -362,5 +530,133 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
 
         // Then
         XCTAssertTrue(startScheduledScansCalled)
+    }
+
+    func testWhenAppLaunched_andUserIsFreemium_thenScheduledScanOperationsRun() async throws {
+        // Given
+        sut = DataBrokerProtectionAgentManager(
+            userNotificationService: mockNotificationService,
+            activityScheduler: mockActivityScheduler,
+            ipcServer: mockIPCServer,
+            queueManager: mockQueueManager,
+            dataManager: mockDataManager,
+            operationDependencies: mockDependencies,
+            pixelHandler: mockPixelHandler,
+            agentStopper: mockAgentStopper,
+            configurationManager: mockConfigurationManager,
+            privacyConfigurationManager: mockPrivacyConfigurationManager,
+            authenticationManager: mockAuthenticationManager,
+            freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager)
+
+        mockFreemiumDBPUserStateManager.didActivate = true
+
+        var startScheduledScansCalled = false
+        mockQueueManager.startScheduledScanOperationsIfPermittedCalledCompletion = {
+            startScheduledScansCalled = true
+        }
+
+        // When
+        sut.appLaunched()
+
+        // Then
+        XCTAssertTrue(startScheduledScansCalled)
+    }
+
+    func testWhenFirePixelsCalled_andUserIsAuthenticated_thenPixelsAreFired() async throws {
+        // Given
+        sut = DataBrokerProtectionAgentManager(
+            userNotificationService: mockNotificationService,
+            activityScheduler: mockActivityScheduler,
+            ipcServer: mockIPCServer,
+            queueManager: mockQueueManager,
+            dataManager: mockDataManager,
+            operationDependencies: mockDependencies,
+            pixelHandler: mockPixelHandler,
+            agentStopper: mockAgentStopper,
+            configurationManager: mockConfigurationManager,
+            privacyConfigurationManager: mockPrivacyConfigurationManager,
+            authenticationManager: mockAuthenticationManager,
+            freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager)
+
+        mockAuthenticationManager.isUserAuthenticatedValue = true
+        mockFreemiumDBPUserStateManager.didActivate = false
+
+        // When
+        sut.fireMonitoringPixels()
+
+        // Then
+        XCTAssertNotNil(mockPixelHandler.lastFiredEvent)
+    }
+
+    func testWhenFirePixelsCalled_andUserIsNotAuthenticated_thenPixelsAreNotFired() async throws {
+        // Given
+        sut = DataBrokerProtectionAgentManager(
+            userNotificationService: mockNotificationService,
+            activityScheduler: mockActivityScheduler,
+            ipcServer: mockIPCServer,
+            queueManager: mockQueueManager,
+            dataManager: mockDataManager,
+            operationDependencies: mockDependencies,
+            pixelHandler: mockPixelHandler,
+            agentStopper: mockAgentStopper,
+            configurationManager: mockConfigurationManager,
+            privacyConfigurationManager: mockPrivacyConfigurationManager,
+            authenticationManager: mockAuthenticationManager,
+            freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager)
+
+        mockAuthenticationManager.isUserAuthenticatedValue = false
+        mockFreemiumDBPUserStateManager.didActivate = false
+
+        // When
+        sut.fireMonitoringPixels()
+
+        // Then
+        XCTAssertNil(mockPixelHandler.lastFiredEvent)
+    }
+
+}
+
+struct MockConfigurationFetcher: ConfigurationFetching {
+    func fetch(_ configuration: Configuration, isDebug: Bool) async throws {
+        return
+    }
+
+    func fetch(all configurations: [Configuration]) async throws {
+        return
+    }
+}
+
+struct MockConfigurationStore: ConfigurationStoring {
+    func loadData(for configuration: Configuration) -> Data? {
+        return nil
+    }
+
+    func loadEtag(for configuration: Configuration) -> String? {
+        return nil
+    }
+
+    func loadEmbeddedEtag(for configuration: Configuration) -> String? {
+        return nil
+    }
+
+    mutating func saveData(_ data: Data, for configuration: Configuration) throws {
+        return
+    }
+
+    mutating func saveEtag(_ etag: String, for configuration: Configuration) throws {
+        return
+    }
+
+    func fileUrl(for configuration: Configuration) -> URL {
+        return URL(string: "file:///\(configuration.rawValue)")!
+    }
+
+}
+
+final class MockConfigurationManager: DefaultConfigurationManager {
+    override init(fetcher: ConfigurationFetching = MockConfigurationFetcher(),
+                  store: ConfigurationStoring = MockConfigurationStore(),
+                  defaults: KeyValueStoring = UserDefaults()) {
+        super.init(fetcher: fetcher, store: store, defaults: defaults)
     }
 }

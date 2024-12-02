@@ -24,7 +24,6 @@ import SwiftUI
 
 /// Implements the logic for the VPN's onboarding menu.
 ///
-@MainActor
 final class NetworkProtectionOnboardingMenu: NSMenu {
 
     private let resetMenuItem = NSMenuItem(title: "Reset Onboarding Status",

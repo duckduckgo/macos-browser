@@ -26,7 +26,10 @@ struct PreferencesSection: Hashable, Identifiable {
     let panes: [PreferencePaneIdentifier]
 
     @MainActor
-    static func defaultSections(includingDuckPlayer: Bool, includingSync: Bool, includingVPN: Bool) -> [PreferencesSection] {
+    static func defaultSections(includingDuckPlayer: Bool,
+                                includingSync: Bool,
+                                includingVPN: Bool,
+                                includingAIChat: Bool) -> [PreferencesSection] {
         let privacyPanes: [PreferencePaneIdentifier] = [
             .defaultBrowser, .privateSearch, .webTrackingProtection, .cookiePopupProtection, .emailProtection
         ]
@@ -40,6 +43,10 @@ struct PreferencesSection: Hashable, Identifiable {
 
             if includingDuckPlayer {
                 panes.append(.duckPlayer)
+            }
+
+            if includingAIChat {
+                panes.append(.aiChat)
             }
 
             return panes
@@ -119,7 +126,8 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable, CaseIt
     case autofill
     case accessibility
     case duckPlayer = "duckplayer"
-    case otherPlatforms = "https://duckduckgo.com/app"
+    case otherPlatforms = "https://duckduckgo.com/app?origin=funnel_app_macos"
+    case aiChat = "aichat"
     case about
 
     var id: Self {
@@ -178,6 +186,8 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable, CaseIt
             return UserText.accessibility
         case .duckPlayer:
             return UserText.duckPlayer
+        case .aiChat:
+            return UserText.aiChat
         case .about:
             return UserText.about
         case .otherPlatforms:
@@ -219,6 +229,8 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable, CaseIt
             return "About"
         case .otherPlatforms:
             return "OtherPlatformsPreferences"
+        case .aiChat:
+            return "AiChatPreferences"
         }
     }
 }

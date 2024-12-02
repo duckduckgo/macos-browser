@@ -19,7 +19,10 @@
 import Foundation
 import NetworkProtectionUI
 
-public final class MockVPNUIActionHandler: VPNUIActionHandler {
+public final class MockVPNUIActionHandler: VPNUIActionHandling {
+    public func setExclusion(_ exclude: Bool, forDomain domain: String) async {
+        // placeholder
+    }
 
     public func moveAppToApplications() async {
         // placeholder

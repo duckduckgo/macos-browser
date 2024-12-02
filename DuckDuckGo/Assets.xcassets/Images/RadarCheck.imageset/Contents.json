@@ -1,0 +1,15 @@
+{
+  "images" : [
+    {
+      "filename" : "Radar-Check-96x96.pdf",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  },
+  "properties" : {
+    "preserves-vector-representation" : true
+  }
+}

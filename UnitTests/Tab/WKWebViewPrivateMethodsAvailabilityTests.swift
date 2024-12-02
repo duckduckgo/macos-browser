@@ -60,4 +60,8 @@ final class WKWebViewPrivateMethodsAvailabilityTests: XCTestCase {
         XCTAssertTrue(WKPDFHUDViewWrapper.WKPDFHUDViewClass?.instancesRespond(to: WKPDFHUDViewWrapper.setVisibleSelector) ==  true)
     }
 
+    func testWebViewRespondsTo_isPlayingAudio() {
+        XCTAssertTrue(WKWebView.instancesRespond(to: NSSelectorFromString(WKWebView.Selector.isPlayingAudio)))
+    }
+
 }

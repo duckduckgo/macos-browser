@@ -124,7 +124,6 @@ final class VPNUninstaller: VPNUninstalling {
         }
     }
 
-    private let log: OSLog
     private let ipcServiceLauncher: IPCServiceLauncher
     private let loginItemsManager: LoginItemsManaging
     private let pinningManager: LocalPinningManager
@@ -144,16 +143,13 @@ final class VPNUninstaller: VPNUninstalling {
          settings: VPNSettings = .init(defaults: .netP),
          ipcClient: VPNControllerIPCClient = VPNControllerUDSClient(),
          vpnMenuLoginItem: LoginItem = .vpnMenu,
-         pixelKit: PixelFiring? = PixelKit.shared,
-         log: OSLog = .networkProtection) {
+         pixelKit: PixelFiring? = PixelKit.shared) {
 
         let vpnAgentBundleID = Bundle.main.vpnMenuAgentBundleId
         let appLauncher = AppLauncher(appBundleURL: Bundle.main.vpnMenuAgentURL)
         let ipcServiceLaunchMethod = IPCServiceLauncher.LaunchMethod.direct(
             bundleID: vpnAgentBundleID,
             appLauncher: appLauncher)
-
-        self.log = log
         self.ipcServiceLauncher = ipcServiceLauncher ?? IPCServiceLauncher(launchMethod: ipcServiceLaunchMethod)
         self.loginItemsManager = loginItemsManager
         self.pinningManager = pinningManager
@@ -180,15 +176,15 @@ final class VPNUninstaller: VPNUninstalling {
             return
         }
 
-        pixelKit?.fire(IPCUninstallAttempt.begin, frequency: .dailyAndCount)
+        pixelKit?.fire(IPCUninstallAttempt.begin, frequency: .legacyDailyAndCount)
 
         do {
             try await executeUninstallSequence(removeSystemExtension: removeSystemExtension)
-            pixelKit?.fire(IPCUninstallAttempt.success, frequency: .dailyAndCount)
+            pixelKit?.fire(IPCUninstallAttempt.success, frequency: .legacyDailyAndCount)
         } catch UninstallError.cancelled(let reason) {
-            pixelKit?.fire(IPCUninstallAttempt.cancelled(reason), frequency: .dailyAndCount)
+            pixelKit?.fire(IPCUninstallAttempt.cancelled(reason), frequency: .legacyDailyAndCount)
         } catch {
-            pixelKit?.fire(IPCUninstallAttempt.failure(error), frequency: .dailyAndCount)
+            pixelKit?.fire(IPCUninstallAttempt.failure(error), frequency: .legacyDailyAndCount)
         }
     }
 
@@ -297,7 +293,7 @@ final class VPNUninstaller: VPNUninstalling {
         pinningManager.unpin(.networkProtection)
     }
 
-    private func removeVPNConfiguration() async throws {
+    func removeVPNConfiguration() async throws {
         // Remove the agent VPN configuration
         do {
             try await ipcClient.uninstall(.configuration)

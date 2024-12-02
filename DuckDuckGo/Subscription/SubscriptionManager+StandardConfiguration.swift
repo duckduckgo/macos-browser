@@ -19,11 +19,14 @@
 import Foundation
 import Subscription
 import Common
+import PixelKit
+import BrowserServicesKit
+import FeatureFlags
 
 extension DefaultSubscriptionManager {
 
     // Init the SubscriptionManager using the standard dependencies and configuration, to be used only in the dependencies tree root
-    public convenience init() {
+    public convenience init(featureFlagger: FeatureFlagger? = nil) {
         // MARK: - Configure Subscription
         let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
         let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
@@ -35,23 +38,63 @@ extension DefaultSubscriptionManager {
         let accessTokenStorage = SubscriptionTokenKeychainStorage(keychainType: .dataProtection(.named(subscriptionAppGroup)))
         let subscriptionEndpointService = DefaultSubscriptionEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
         let authEndpointService = DefaultAuthEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
+        let subscriptionFeatureMappingCache = DefaultSubscriptionFeatureMappingCache(subscriptionEndpointService: subscriptionEndpointService,
+                                                                                     userDefaults: subscriptionUserDefaults)
+
         let accountManager = DefaultAccountManager(accessTokenStorage: accessTokenStorage,
                                                    entitlementsCache: entitlementsCache,
                                                    subscriptionEndpointService: subscriptionEndpointService,
                                                    authEndpointService: authEndpointService)
 
+        let subscriptionFeatureFlagger: FeatureFlaggerMapping<SubscriptionFeatureFlags> = FeatureFlaggerMapping { feature in
+            guard let featureFlagger else {
+                // With no featureFlagger provided there is no gating of features
+                return feature.defaultState
+            }
+
+            switch feature {
+            case .isLaunchedROW:
+                return featureFlagger.isFeatureOn(.isPrivacyProLaunchedROW)
+            case .isLaunchedROWOverride:
+                return featureFlagger.isFeatureOn(.isPrivacyProLaunchedROWOverride)
+            case .usePrivacyProUSARegionOverride:
+                return (featureFlagger.internalUserDecider.isInternalUser &&
+                        subscriptionEnvironment.serviceEnvironment == .staging &&
+                        subscriptionUserDefaults.storefrontRegionOverride == .usa)
+            case .usePrivacyProROWRegionOverride:
+                return (featureFlagger.internalUserDecider.isInternalUser &&
+                        subscriptionEnvironment.serviceEnvironment == .staging &&
+                        subscriptionUserDefaults.storefrontRegionOverride == .restOfWorld)
+            }
+        }
+
         if #available(macOS 12.0, *) {
-            let storePurchaseManager = DefaultStorePurchaseManager()
+            let storePurchaseManager = DefaultStorePurchaseManager(subscriptionFeatureMappingCache: subscriptionFeatureMappingCache,
+                                                                   subscriptionFeatureFlagger: subscriptionFeatureFlagger)
             self.init(storePurchaseManager: storePurchaseManager,
                       accountManager: accountManager,
                       subscriptionEndpointService: subscriptionEndpointService,
                       authEndpointService: authEndpointService,
-                      subscriptionEnvironment: subscriptionEnvironment)
+                      subscriptionFeatureMappingCache: subscriptionFeatureMappingCache,
+                      subscriptionEnvironment: subscriptionEnvironment,
+                      subscriptionFeatureFlagger: subscriptionFeatureFlagger)
         } else {
             self.init(accountManager: accountManager,
                       subscriptionEndpointService: subscriptionEndpointService,
                       authEndpointService: authEndpointService,
-                      subscriptionEnvironment: subscriptionEnvironment)
+                      subscriptionFeatureMappingCache: subscriptionFeatureMappingCache,
+                      subscriptionEnvironment: subscriptionEnvironment,
+                      subscriptionFeatureFlagger: subscriptionFeatureFlagger)
         }
+
+        accountManager.delegate = self
+    }
+}
+
+extension DefaultSubscriptionManager: AccountManagerKeychainAccessDelegate {
+
+    public func accountManagerKeychainAccessFailed(accessType: AccountKeychainAccessType, error: AccountKeychainAccessError) {
+        PixelKit.fire(PrivacyProErrorPixel.privacyProKeychainAccessError(accessType: accessType, accessError: error),
+                      frequency: .legacyDailyAndCount)
     }
 }

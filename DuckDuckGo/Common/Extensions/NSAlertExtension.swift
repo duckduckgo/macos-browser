@@ -21,6 +21,17 @@ import Cocoa
 
 extension NSAlert {
 
+    @discardableResult
+    func addButton(withTitle title: String, response: NSApplication.ModalResponse, keyEquivalent: NSEvent.KeyEquivalent? = nil) -> NSButton {
+        let button = addButton(withTitle: title)
+        button.tag = response.rawValue
+        if let keyEquivalent {
+            button.keyEquivalent = keyEquivalent.charCode
+            button.keyEquivalentModifierMask = keyEquivalent.modifierMask
+        }
+        return button
+    }
+
     static func fireproofAlert(with domain: String) -> NSAlert {
         let alert = NSAlert()
         alert.messageText = UserText.fireproofConfirmationTitle(domain: domain)
@@ -113,6 +124,16 @@ extension NSAlert {
         alert.informativeText = "This will remove the VPN \(sysExText)Status Menu icon and disable the VPN."
         alert.alertStyle = .warning
         alert.addButton(withTitle: "Uninstall")
+        alert.addButton(withTitle: UserText.cancel)
+        return alert
+    }
+
+    static func removeVPNConfigurationAlert() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = "Remove VPN Configuration?"
+        alert.informativeText = "This will remove the VPN configuration from System Settings > VPN."
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "Remove")
         alert.addButton(withTitle: UserText.cancel)
         return alert
     }
@@ -233,6 +254,14 @@ extension NSAlert {
 
         alert.accessoryView = containerView
 
+        return alert
+    }
+
+    static func cannotReadImageAlert() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = UserText.cannotReadImageAlertMessage
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: UserText.close)
         return alert
     }
 

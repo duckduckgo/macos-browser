@@ -60,8 +60,8 @@ enum PixelExperiment: String, CaseIterable {
 
     // These are the variants. Rename or add/remove them as needed.  If you change the string value
     //  remember to keep it clear for privacy triage.
-    case control = "oa"
-    case newOnboarding = "ob"
+    case control = "oc"
+    case newOnboarding = "od"
 }
 
 // These functions contain the business logic for determining if the pixel should be fired or not.
@@ -208,8 +208,11 @@ final internal class PixelExperimentLogic {
     }
 
     func fireSerpPixel() {
-        guard allocatedCohort != nil, let cohort else { return }
-        PixelKit.fire(GeneralPixel.serp(cohort: cohort.rawValue), frequency: .standard, includeAppVersionParameter: false)
+        if allocatedCohort != nil {
+            PixelKit.fire(GeneralPixel.serp(cohort: cohort?.rawValue), frequency: .standard)
+        } else {
+            PixelKit.fire(GeneralPixel.serp(cohort: nil), frequency: .standard)
+        }
     }
 
     func fireOnboardingHomeButtonEnabledPixel() {

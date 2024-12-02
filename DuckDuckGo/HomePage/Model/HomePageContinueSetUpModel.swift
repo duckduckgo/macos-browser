@@ -40,8 +40,6 @@ extension HomePage.Models {
         let gridWidth = FeaturesGridDimensions.width
         let deleteActionTitle = UserText.newTabSetUpRemoveItemAction
         let privacyConfigurationManager: PrivacyConfigurationManaging
-        let surveyRemoteMessaging: SurveyRemoteMessaging
-        let permanentSurveyManager: SurveyManager
 
         var duckPlayerURL: String {
             let duckPlayerSettings = privacyConfigurationManager.privacyConfig.settings(for: .duckPlayer)
@@ -63,26 +61,36 @@ extension HomePage.Models {
             }
         }
 
-        @UserDefaultsWrapper(key: .homePageShowMakeDefault, defaultValue: true)
-        private var shouldShowMakeDefaultSetting: Bool
+        struct Settings {
+            @UserDefaultsWrapper(key: .homePageShowMakeDefault, defaultValue: true)
+            var shouldShowMakeDefaultSetting: Bool
 
-        @UserDefaultsWrapper(key: .homePageShowAddToDock, defaultValue: true)
-        private var shouldShowAddToDockSetting: Bool
+            @UserDefaultsWrapper(key: .homePageShowAddToDock, defaultValue: true)
+            var shouldShowAddToDockSetting: Bool
 
-        @UserDefaultsWrapper(key: .homePageShowImport, defaultValue: true)
-        private var shouldShowImportSetting: Bool
+            @UserDefaultsWrapper(key: .homePageShowImport, defaultValue: true)
+            var shouldShowImportSetting: Bool
 
-        @UserDefaultsWrapper(key: .homePageShowDuckPlayer, defaultValue: true)
-        private var shouldShowDuckPlayerSetting: Bool
+            @UserDefaultsWrapper(key: .homePageShowDuckPlayer, defaultValue: true)
+            var shouldShowDuckPlayerSetting: Bool
 
-        @UserDefaultsWrapper(key: .homePageShowEmailProtection, defaultValue: true)
-        private var shouldShowEmailProtectionSetting: Bool
+            @UserDefaultsWrapper(key: .homePageShowEmailProtection, defaultValue: true)
+            var shouldShowEmailProtectionSetting: Bool
 
-        @UserDefaultsWrapper(key: .homePageShowPermanentSurvey, defaultValue: true)
-        private var shouldShowPermanentSurvey: Bool
+            @UserDefaultsWrapper(key: .homePageIsFirstSession, defaultValue: true)
+            var isFirstSession: Bool
 
-        @UserDefaultsWrapper(key: .homePageIsFirstSession, defaultValue: true)
-        private var isFirstSession: Bool
+            func clear() {
+                _shouldShowMakeDefaultSetting.clear()
+                _shouldShowAddToDockSetting.clear()
+                _shouldShowImportSetting.clear()
+                _shouldShowDuckPlayerSetting.clear()
+                _shouldShowEmailProtectionSetting.clear()
+                _isFirstSession.clear()
+            }
+        }
+
+        private let settings: Settings
 
         var isMoreOrLessButtonNeeded: Bool {
             return featuresMatrix.count > itemsRowCountWhenCollapsed
@@ -92,7 +100,7 @@ extension HomePage.Models {
             return !featuresMatrix.isEmpty
         }
 
-        lazy var listOfFeatures = isFirstSession ? firstRunFeatures : randomisedFeatures
+        lazy var listOfFeatures = settings.isFirstSession ? firstRunFeatures : randomisedFeatures
 
         private var featuresMatrix: [[FeatureType]] = [[]] {
             didSet {
@@ -108,9 +116,7 @@ extension HomePage.Models {
              tabCollectionViewModel: TabCollectionViewModel,
              emailManager: EmailManager = EmailManager(),
              duckPlayerPreferences: DuckPlayerPreferencesPersistor,
-             surveyRemoteMessaging: SurveyRemoteMessaging,
              privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
-             permanentSurveyManager: SurveyManager = PermanentSurveyManager(),
              subscriptionManager: SubscriptionManager = Application.appDelegate.subscriptionManager) {
             self.defaultBrowserProvider = defaultBrowserProvider
             self.dockCustomizer = dockCustomizer
@@ -118,10 +124,9 @@ extension HomePage.Models {
             self.tabCollectionViewModel = tabCollectionViewModel
             self.emailManager = emailManager
             self.duckPlayerPreferences = duckPlayerPreferences
-            self.surveyRemoteMessaging = surveyRemoteMessaging
             self.privacyConfigurationManager = privacyConfigurationManager
-            self.permanentSurveyManager = permanentSurveyManager
             self.subscriptionManager = subscriptionManager
+            self.settings = .init()
 
             refreshFeaturesMatrix()
 
@@ -141,10 +146,6 @@ extension HomePage.Models {
                 performDuckPlayerAction()
             case .emailProtection:
                 performEmailProtectionAction()
-            case .permanentSurvey:
-                visitSurvey()
-            case .surveyRemoteMessage(let message):
-                handle(remoteMessage: message)
             }
         }
 
@@ -158,7 +159,7 @@ extension HomePage.Models {
         }
 
         private func performImportBookmarksAndPasswordsAction() {
-            dataImportProvider.showImportWindow(completion: { self.refreshFeaturesMatrix() })
+            dataImportProvider.showImportWindow(customTitle: nil, completion: { self.refreshFeaturesMatrix() })
         }
 
         @MainActor
@@ -184,34 +185,25 @@ extension HomePage.Models {
         func removeItem(for featureType: FeatureType) {
             switch featureType {
             case .defaultBrowser:
-                shouldShowMakeDefaultSetting = false
+                settings.shouldShowMakeDefaultSetting = false
             case .dock:
-                shouldShowAddToDockSetting = false
+                settings.shouldShowAddToDockSetting = false
             case .importBookmarksAndPasswords:
-                shouldShowImportSetting = false
+                settings.shouldShowImportSetting = false
             case .duckplayer:
-                shouldShowDuckPlayerSetting = false
+                settings.shouldShowDuckPlayerSetting = false
             case .emailProtection:
-                shouldShowEmailProtectionSetting = false
-            case .permanentSurvey:
-                shouldShowPermanentSurvey = false
-            case .surveyRemoteMessage(let message):
-                surveyRemoteMessaging.dismiss(message: message)
-                PixelKit.fire(GeneralPixel.surveyRemoteMessageDismissed(messageID: message.id))
+                settings.shouldShowEmailProtectionSetting = false
             }
             refreshFeaturesMatrix()
         }
 
         func refreshFeaturesMatrix() {
             var features: [FeatureType] = []
-
-            for message in surveyRemoteMessaging.presentableRemoteMessages() {
-                features.append(.surveyRemoteMessage(message))
-                PixelKit.fire(GeneralPixel.surveyRemoteMessageDisplayed(messageID: message.id), frequency: .daily)
-            }
-
             appendFeatureCards(&features)
-
+            if features.isEmpty {
+                AppearancePreferences.shared.continueSetUpCardsClosed = true
+            }
             featuresMatrix = features.chunked(into: itemsPerRow)
         }
 
@@ -233,24 +225,20 @@ extension HomePage.Models {
                 return shouldDuckPlayerCardBeVisible
             case .emailProtection:
                 return shouldEmailProtectionCardBeVisible
-            case .permanentSurvey:
-                return shouldPermanentSurveyBeVisible
-            case .surveyRemoteMessage:
-                return false // This is handled separately
             }
         }
 
         // Helper Functions
-        @MainActor(unsafe)
+        @MainActor
         @objc private func newTabOpenNotification(_ notification: Notification) {
-            if !isFirstSession {
+            if !settings.isFirstSession {
                 listOfFeatures = randomisedFeatures
             }
 #if DEBUG
-            isFirstSession = false
+            settings.isFirstSession = false
 #endif
             if OnboardingViewModel.isOnboardingFinished {
-                isFirstSession = false
+                settings.isFirstSession = false
             }
         }
 
@@ -259,8 +247,8 @@ extension HomePage.Models {
         }
 
         var randomisedFeatures: [FeatureType] {
-            var features: [FeatureType]  = [.permanentSurvey, .defaultBrowser]
-            var shuffledFeatures = FeatureType.allCases.filter { $0 != .defaultBrowser && $0 != .permanentSurvey }
+            var features: [FeatureType]  = [.defaultBrowser]
+            var shuffledFeatures = FeatureType.allCases.filter { $0 != .defaultBrowser }
             shuffledFeatures.shuffle()
             features.append(contentsOf: shuffledFeatures)
             return features
@@ -281,85 +269,27 @@ extension HomePage.Models {
         }
 
         private var shouldMakeDefaultCardBeVisible: Bool {
-            shouldShowMakeDefaultSetting &&
-            !defaultBrowserProvider.isDefault
+            settings.shouldShowMakeDefaultSetting && !defaultBrowserProvider.isDefault
         }
 
         private var shouldDockCardBeVisible: Bool {
 #if !APPSTORE
-            shouldShowAddToDockSetting &&
-            !dockCustomizer.isAddedToDock
+            settings.shouldShowAddToDockSetting && !dockCustomizer.isAddedToDock
 #else
             return false
 #endif
         }
 
         private var shouldImportCardBeVisible: Bool {
-            shouldShowImportSetting &&
-            !dataImportProvider.didImport
+            settings.shouldShowImportSetting && !dataImportProvider.didImport
         }
 
         private var shouldDuckPlayerCardBeVisible: Bool {
-            shouldShowDuckPlayerSetting &&
-            duckPlayerPreferences.duckPlayerModeBool == nil &&
-            !duckPlayerPreferences.youtubeOverlayAnyButtonPressed
+            settings.shouldShowDuckPlayerSetting && duckPlayerPreferences.duckPlayerModeBool == nil && !duckPlayerPreferences.youtubeOverlayAnyButtonPressed
         }
 
         private var shouldEmailProtectionCardBeVisible: Bool {
-            shouldShowEmailProtectionSetting &&
-            !emailManager.isSignedIn
-        }
-
-        private var shouldPermanentSurveyBeVisible: Bool {
-            return shouldShowPermanentSurvey &&
-            permanentSurveyManager.isSurveyAvailable &&
-            surveyRemoteMessaging.presentableRemoteMessages().isEmpty // When Privacy Pro survey is visible, ensure we do not show multiple at once
-        }
-
-        @MainActor private func visitSurvey() {
-            guard let url = permanentSurveyManager.url else { return }
-
-            let tab = Tab(content: .url(url, source: .ui), shouldLoadInBackground: true)
-            tabCollectionViewModel.append(tab: tab)
-            shouldShowPermanentSurvey = false
-        }
-
-        @MainActor private func handle(remoteMessage: SurveyRemoteMessage) {
-            guard let actionType = remoteMessage.action.actionType else {
-                PixelKit.fire(GeneralPixel.surveyRemoteMessageDismissed(messageID: remoteMessage.id))
-                surveyRemoteMessaging.dismiss(message: remoteMessage)
-                refreshFeaturesMatrix()
-                return
-            }
-
-            switch actionType {
-            case .openSurveyURL, .openURL:
-                Task { @MainActor in
-                    var subscription: Subscription?
-
-                    if let token = subscriptionManager.accountManager.accessToken {
-                        switch await subscriptionManager.subscriptionEndpointService.getSubscription(
-                            accessToken: token,
-                            cachePolicy: .returnCacheDataElseLoad
-                        ) {
-                        case .success(let fetchedSubscription):
-                            subscription = fetchedSubscription
-                        case .failure:
-                            break
-                        }
-                    }
-
-                    if let surveyURL = remoteMessage.presentableSurveyURL(subscription: subscription) {
-                        let tab = Tab(content: .url(surveyURL, source: .ui), shouldLoadInBackground: true)
-                        tabCollectionViewModel.append(tab: tab)
-                        PixelKit.fire(GeneralPixel.surveyRemoteMessageOpened(messageID: remoteMessage.id))
-
-                        // Dismiss the message after the user opens the URL, even if they just close the tab immediately afterwards.
-                        surveyRemoteMessaging.dismiss(message: remoteMessage)
-                        refreshFeaturesMatrix()
-                    }
-                }
-            }
+            settings.shouldShowEmailProtectionSetting && !emailManager.isSignedIn
         }
 
     }
@@ -372,9 +302,9 @@ extension HomePage.Models {
         // included elsewhere.
         static var allCases: [HomePage.Models.FeatureType] {
 #if APPSTORE
-            [.duckplayer, .emailProtection, .defaultBrowser, .importBookmarksAndPasswords, .permanentSurvey]
+            [.duckplayer, .emailProtection, .defaultBrowser, .importBookmarksAndPasswords]
 #else
-            [.duckplayer, .emailProtection, .defaultBrowser, .dock, .importBookmarksAndPasswords, .permanentSurvey]
+            [.duckplayer, .emailProtection, .defaultBrowser, .dock, .importBookmarksAndPasswords]
 #endif
         }
 
@@ -383,8 +313,6 @@ extension HomePage.Models {
         case defaultBrowser
         case dock
         case importBookmarksAndPasswords
-        case permanentSurvey
-        case surveyRemoteMessage(SurveyRemoteMessage)
 
         var title: String {
             switch self {
@@ -398,10 +326,6 @@ extension HomePage.Models {
                 return UserText.newTabSetUpDuckPlayerCardTitle
             case .emailProtection:
                 return UserText.newTabSetUpEmailProtectionCardTitle
-            case .permanentSurvey:
-                return PermanentSurveyManager.title
-            case .surveyRemoteMessage(let message):
-                return message.cardTitle
             }
         }
 
@@ -417,10 +341,6 @@ extension HomePage.Models {
                 return UserText.newTabSetUpDuckPlayerSummary
             case .emailProtection:
                 return UserText.newTabSetUpEmailProtectionSummary
-            case .permanentSurvey:
-                return PermanentSurveyManager.body
-            case .surveyRemoteMessage(let message):
-                return message.cardDescription
             }
         }
 
@@ -436,10 +356,6 @@ extension HomePage.Models {
                 return UserText.newTabSetUpDuckPlayerAction
             case .emailProtection:
                 return UserText.newTabSetUpEmailProtectionAction
-            case .permanentSurvey:
-                return PermanentSurveyManager.actionTitle
-            case .surveyRemoteMessage(let message):
-                return message.action.actionTitle
             }
         }
 
@@ -466,10 +382,6 @@ extension HomePage.Models {
                 return .cleanTube128.resized(to: iconSize)!
             case .emailProtection:
                 return .inbox128.resized(to: iconSize)!
-            case .permanentSurvey:
-                return .survey128.resized(to: iconSize)!
-            case .surveyRemoteMessage:
-                return .privacyProSurvey.resized(to: iconSize)!
             }
         }
     }

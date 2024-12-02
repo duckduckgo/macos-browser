@@ -16,11 +16,28 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
+import FeatureFlags
 import Foundation
 import WebKit
 import ContentScopeScripts
+import PhishingDetection
 
 final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
+
+    let featureFlagger: FeatureFlagger
+    let faviconManager: FaviconManagement
+    let isNTPSpecialPageSupported: Bool
+
+    init(
+        featureFlagger: FeatureFlagger,
+        faviconManager: FaviconManagement = FaviconManager.shared,
+        isNTPSpecialPageSupported: Bool = false
+    ) {
+        self.featureFlagger = featureFlagger
+        self.faviconManager = faviconManager
+        self.isNTPSpecialPageSupported = isNTPSpecialPageSupported
+    }
 
     func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
         guard let requestURL = webView.url ?? urlSchemeTask.request.url else {
@@ -29,10 +46,22 @@ final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
         }
 
         switch requestURL.type {
-        case .onboarding:
-            handleOnboarding(urlSchemeTask: urlSchemeTask)
+        case .onboarding, .releaseNotes:
+            handleSpecialPages(urlSchemeTask: urlSchemeTask)
         case .duckPlayer:
             handleDuckPlayer(requestURL: requestURL, urlSchemeTask: urlSchemeTask, webView: webView)
+        case .phishingErrorPage:
+            handleErrorPage(urlSchemeTask: urlSchemeTask)
+        case .newTab:
+            if isNTPSpecialPageSupported && featureFlagger.isFeatureOn(.htmlNewTabPage) {
+                if urlSchemeTask.request.url?.type == .favicon {
+                    handleFavicon(urlSchemeTask: urlSchemeTask)
+                } else {
+                    handleSpecialPages(urlSchemeTask: urlSchemeTask)
+                }
+            } else {
+                handleNativeUIPages(requestURL: requestURL, urlSchemeTask: urlSchemeTask)
+            }
         default:
             handleNativeUIPages(requestURL: requestURL, urlSchemeTask: urlSchemeTask)
         }
@@ -67,7 +96,6 @@ extension DuckURLSchemeHandler {
     private func handleNativeUIPages(requestURL: URL, urlSchemeTask: WKURLSchemeTask) {
         // return empty page for native UI pages navigations (like the Home page or Settings) if the request is not for the Duck Player
         let data = Self.emptyHtml.utf8data
-
         let response = URLResponse(url: requestURL,
                                    mimeType: "text/html",
                                    expectedContentLength: data.count,
@@ -104,23 +132,80 @@ private extension DuckURLSchemeHandler {
     }
 }
 
-// MARK: - Onboarding
+// MARK: - Favicons
+
 private extension DuckURLSchemeHandler {
-    func handleOnboarding(urlSchemeTask: WKURLSchemeTask) {
+    /**
+     * This handler supports special Duck favicon URLs and uses `FaviconManager`
+     * to return a favicon in response, based on the actual favicon URL that's
+     * encoded in the URL path.
+     *
+     * If favicon is not found, an `HTTP 404` response is returned.
+     */
+    func handleFavicon(urlSchemeTask: WKURLSchemeTask) {
         guard let requestURL = urlSchemeTask.request.url else {
-            assertionFailure("No URL for Onboarding scheme handler")
+            assertionFailure("No URL for Favicon scheme handler")
             return
         }
-        guard let (response, data) = onboardingResponse(for: requestURL) else { return }
+
+        /**
+         * Favicon URL has the format of `duck://favicon/<url_percent_encoded_favicon_url>`.
+         * Calling `requestURL.path` drops leading `duck://favicon` and automatically
+         * handles percent-encoding. We only need to drop the leading forward slash to get the favicon URL.
+         */
+        guard let faviconURL = requestURL.path.dropping(prefix: "/").url else {
+            assertionFailure("Favicon URL malformed \(requestURL.path.dropping(prefix: "/"))")
+            return
+        }
+
+        guard let (response, data) = response(for: requestURL, withFaviconURL: faviconURL) else { return }
         urlSchemeTask.didReceive(response)
         urlSchemeTask.didReceive(data)
         urlSchemeTask.didFinish()
     }
 
-    func onboardingResponse(for url: URL) -> (URLResponse, Data)? {
+    func response(for requestURL: URL, withFaviconURL faviconURL: URL) -> (URLResponse, Data)? {
+        guard faviconManager.areFaviconsLoaded,
+              let favicon = faviconManager.getCachedFavicon(for: faviconURL, sizeCategory: .medium),
+              let imagePNGData = favicon.image?.pngData
+        else {
+            guard let response = HTTPURLResponse(url: requestURL, statusCode: 404, httpVersion: "HTTP/1.1", headerFields: nil) else {
+                return nil
+            }
+            return (response, Data())
+        }
+        let response = URLResponse(url: requestURL, mimeType: "image/png", expectedContentLength: imagePNGData.count, textEncodingName: nil)
+        return (response, imagePNGData)
+    }
+}
+
+// MARK: - Onboarding & Release Notes
+private extension DuckURLSchemeHandler {
+    func handleSpecialPages(urlSchemeTask: WKURLSchemeTask) {
+        guard let requestURL = urlSchemeTask.request.url else {
+            assertionFailure("No URL for Special Pages scheme handler")
+            return
+        }
+        guard let (response, data) = response(for: requestURL) else { return }
+        urlSchemeTask.didReceive(response)
+        urlSchemeTask.didReceive(data)
+        urlSchemeTask.didFinish()
+    }
+
+    func response(for url: URL) -> (URLResponse, Data)? {
         var fileName = "index"
         var fileExtension = "html"
-        var directoryURL = URL(fileURLWithPath: "/pages/onboarding")
+        var directoryURL: URL
+        if url.isOnboarding {
+            directoryURL = URL(fileURLWithPath: "/pages/onboarding")
+        } else if url.isReleaseNotesScheme {
+            directoryURL = URL(fileURLWithPath: "/pages/release-notes")
+        } else if url.isNewTabPage {
+            directoryURL = URL(fileURLWithPath: "/pages/new-tab")
+        } else {
+            assertionFailure("Unknown scheme")
+            return nil
+        }
         directoryURL.appendPathComponent(url.path)
 
         if !directoryURL.pathExtension.isEmpty {
@@ -131,8 +216,8 @@ private extension DuckURLSchemeHandler {
         }
 
         guard let file = ContentScopeScripts.Bundle.path(forResource: fileName, ofType: fileExtension, inDirectory: directoryURL.path) else {
-            assertionFailure("\(fileExtension) template not found")
-            return nil
+            let response = HTTPURLResponse(url: url, statusCode: 404, httpVersion: "HTTP/1.1", headerFields: nil)!
+            return (response, Data())
         }
 
         guard let data = try? Data(contentsOf: URL(fileURLWithPath: file)) else {
@@ -159,10 +244,48 @@ private extension DuckURLSchemeHandler {
 
 }
 
+// MARK: Error Page
+private extension DuckURLSchemeHandler {
+    func handleErrorPage(urlSchemeTask: WKURLSchemeTask) {
+        guard let requestURL = urlSchemeTask.request.url else {
+            assertionFailure("No URL for error page scheme handler")
+            return
+        }
+
+        guard requestURL.isPhishingErrorPage,
+              let urlString = requestURL.getParameter(named: "url"),
+              let decodedData = URLTokenValidator.base64URLDecode(base64URLString: urlString),
+              let decodedString = String(data: decodedData, encoding: .utf8),
+              let url = URL(string: decodedString),
+              let token = requestURL.getParameter(named: "token"),
+              URLTokenValidator.shared.validateToken(token, for: url) else {
+            let error = WKError.unknown
+            let nsError = NSError(domain: "Unexpected Error", code: error.rawValue, userInfo: [
+                NSURLErrorFailingURLErrorKey: "about:blank",
+                NSLocalizedDescriptionKey: "Unexpected Error"
+            ])
+            urlSchemeTask.didFailWithError(nsError)
+            return
+        }
+
+        let error = PhishingDetectionError.detected
+        let nsError = NSError(domain: PhishingDetectionError.errorDomain, code: error.errorCode, userInfo: [
+            NSURLErrorFailingURLErrorKey: url,
+            NSLocalizedDescriptionKey: error.errorUserInfo[NSLocalizedDescriptionKey] ?? "Phishing detected"
+        ])
+        urlSchemeTask.didFailWithError(nsError)
+        return
+    }
+}
+
 extension URL {
     enum URLType {
+        case newTab
+        case favicon
         case onboarding
         case duckPlayer
+        case releaseNotes
+        case phishingErrorPage
     }
 
     var type: URLType? {
@@ -170,7 +293,15 @@ extension URL {
             return .duckPlayer
         } else if self.isOnboarding {
             return .onboarding
-        } else  {
+        } else if self.isPhishingErrorPage {
+            return .phishingErrorPage
+        } else if self.isReleaseNotesScheme {
+            return .releaseNotes
+        } else if self.isNewTabPage {
+            return .newTab
+        } else if self.isFavicon {
+            return .favicon
+        } else {
             return nil
         }
     }
@@ -179,7 +310,28 @@ extension URL {
         return isDuckURLScheme && host == "onboarding"
     }
 
+    var isNewTabPage: Bool {
+        return isDuckURLScheme && host == "newtab"
+    }
+
+    var isFavicon: Bool {
+        return isDuckURLScheme && host == "favicon"
+    }
+
     var isDuckURLScheme: Bool {
         navigationalScheme == .duck
     }
+
+    var isReleaseNotesScheme: Bool {
+        return isDuckURLScheme && host == "release-notes"
+    }
+
+    var isErrorPage: Bool {
+        isDuckURLScheme && self.host == "error"
+    }
+
+    var isPhishingErrorPage: Bool {
+        isErrorPage && self.getParameter(named: "reason") == "phishing" && self.getParameter(named: "url") != nil
+    }
+
 }

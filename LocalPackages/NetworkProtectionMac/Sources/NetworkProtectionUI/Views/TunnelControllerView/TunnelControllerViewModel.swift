@@ -20,6 +20,7 @@ import Combine
 import Foundation
 import NetworkProtection
 import SwiftUI
+import TipKit
 
 @MainActor
 public final class TunnelControllerViewModel: ObservableObject {
@@ -34,8 +35,17 @@ public final class TunnelControllerViewModel: ObservableObject {
 
     /// Whether the VPN is enabled
     /// This is determined based on the connection status, same as the iOS version
-    @Published
-    public var isVPNEnabled = false
+    ///
+    public var isVPNEnabled: Bool {
+        get {
+            switch connectionStatus {
+            case .connected, .connecting:
+                return true
+            default:
+                return false
+            }
+        }
+    }
 
     /// The type of extension that's being used for NetP
     ///
@@ -57,7 +67,6 @@ public final class TunnelControllerViewModel: ObservableObject {
     private let statusReporter: NetworkProtectionStatusReporter
 
     private let vpnSettings: VPNSettings
-
     private let locationFormatter: VPNLocationFormatting
 
     private static let byteCountFormatter: ByteCountFormatter = {
@@ -67,7 +76,7 @@ public final class TunnelControllerViewModel: ObservableObject {
         return formatter
     }()
 
-    private let uiActionHandler: VPNUIActionHandler
+    private let uiActionHandler: VPNUIActionHandling
 
     // MARK: - Misc
 
@@ -75,13 +84,6 @@ public final class TunnelControllerViewModel: ObservableObject {
     ///
     private let runLoopMode: RunLoop.Mode?
     private var cancellables = Set<AnyCancellable>()
-
-    // MARK: - Dispatch Queues
-
-    private static let statusDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.statusDispatchQueue", qos: .userInteractive)
-    private static let connectivityIssuesDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.connectivityIssuesDispatchQueue", qos: .userInteractive)
-    private static let serverInfoDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.serverInfoDispatchQueue", qos: .userInteractive)
-    private static let dataVolumeDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.dataVolumeDispatchQueue", qos: .userInteractive)
 
     // MARK: - Initialization & Deinitialization
 
@@ -91,7 +93,7 @@ public final class TunnelControllerViewModel: ObservableObject {
                 runLoopMode: RunLoop.Mode? = nil,
                 vpnSettings: VPNSettings,
                 locationFormatter: VPNLocationFormatting,
-                uiActionHandler: VPNUIActionHandler) {
+                uiActionHandler: VPNUIActionHandling) {
 
         self.tunnelController = controller
         self.onboardingStatusPublisher = onboardingStatusPublisher
@@ -102,6 +104,8 @@ public final class TunnelControllerViewModel: ObservableObject {
         self.uiActionHandler = uiActionHandler
 
         connectionStatus = statusReporter.statusObserver.recentValue
+        dnsSettings = vpnSettings.dnsSettings
+
         formattedDataVolume = statusReporter.dataVolumeObserver.recentValue.formatted(using: Self.byteCountFormatter)
         internalServerAddress = statusReporter.serverInfoObserver.recentValue.serverAddress
         internalServerAttributes = statusReporter.serverInfoObserver.recentValue.serverLocation
@@ -136,29 +140,15 @@ public final class TunnelControllerViewModel: ObservableObject {
 
     private func subscribeToStatusChanges() {
         statusReporter.statusObserver.publisher
-            .subscribe(on: Self.statusDispatchQueue)
-            .sink { [weak self] status in
-
-            guard let self else {
-                return
-            }
-
-            Task { @MainActor in
-                self.connectionStatus = status
-                switch status {
-                case .connected, .connecting:
-                    self.isVPNEnabled = true
-                default:
-                    self.isVPNEnabled = false
-                }
-            }
-        }
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .assign(to: \.connectionStatus, onWeaklyHeld: self)
             .store(in: &cancellables)
     }
 
     private func subscribeToServerInfoChanges() {
         statusReporter.serverInfoObserver.publisher
-            .subscribe(on: Self.serverInfoDispatchQueue)
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] serverInfo in
 
             guard let self else {
@@ -176,7 +166,6 @@ public final class TunnelControllerViewModel: ObservableObject {
 
     private func subscribeToDataVolumeUpdates() {
         statusReporter.dataVolumeObserver.publisher
-            .subscribe(on: Self.dataVolumeDispatchQueue)
             .map { $0.formatted(using: Self.byteCountFormatter) }
             .receive(on: DispatchQueue.main)
             .assign(to: \.formattedDataVolume, onWeaklyHeld: self)
@@ -191,11 +180,15 @@ public final class TunnelControllerViewModel: ObservableObject {
         }
 
         refreshTimeLapsed()
-        let call = refreshTimeLapsed
 
-        let newTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+        let newTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+
+            guard let self else {
+                return
+            }
+
             Task { @MainActor in
-                call()
+                self.refreshTimeLapsed()
             }
         }
 
@@ -282,7 +275,7 @@ public final class TunnelControllerViewModel: ObservableObject {
 
     @MainActor
     @Published
-    private var connectionStatus: NetworkProtection.ConnectionStatus = .default {
+    private var connectionStatus: NetworkProtection.ConnectionStatus {
         didSet {
             detectAndRefreshExternalToggleSwitching()
             previousConnectionStatus = oldValue
@@ -294,6 +287,7 @@ public final class TunnelControllerViewModel: ObservableObject {
     /// This method serves as a simple mechanism to detect when the toggle is controlled by the agent app, or by another
     /// external event causing the tunnel to start or stop, so we can disable the toggle as it's transitioning..
     ///
+    @MainActor
     private func detectAndRefreshExternalToggleSwitching() {
         switch toggleTransition {
         case .idle:
@@ -317,7 +311,6 @@ public final class TunnelControllerViewModel: ObservableObject {
 
     // MARK: - Connection Status: Toggle State
 
-    @frozen
     enum ToggleTransition: Equatable {
         case idle
         case switchingOn(locallyInitiated: Bool)
@@ -346,6 +339,7 @@ public final class TunnelControllerViewModel: ObservableObject {
     ///
     @Published var timeLapsed = UserText.networkProtectionStatusViewTimerZero
 
+    @MainActor
     private func refreshTimeLapsed() {
         switch connectionStatus {
         case .connected(let connectedDate):
@@ -381,6 +375,9 @@ public final class TunnelControllerViewModel: ObservableObject {
             return UserText.networkProtectionStatusDisconnected
         case .disconnecting:
             return UserText.networkProtectionStatusDisconnecting
+        case .snoozing:
+            // Snooze mode is not supported on macOS, but fall back to the disconnected string to be safe.
+            return UserText.networkProtectionStatusDisconnected
         }
     }
 
@@ -470,7 +467,7 @@ public final class TunnelControllerViewModel: ObservableObject {
     private var internalServerAttributes: NetworkProtectionServerInfo.ServerAttributes?
 
     @Published
-    var dnsSettings: NetworkProtectionDNSSettings = .default
+    var dnsSettings: NetworkProtectionDNSSettings
 
     @Published
     var formattedDataVolume: FormattedDataVolume
@@ -531,11 +528,13 @@ public final class TunnelControllerViewModel: ObservableObject {
         }
     }
 
+#if !APPSTORE && !DEBUG
     func moveToApplications() {
         Task { @MainActor in
             await uiActionHandler.moveAppToApplications()
         }
     }
+#endif
 }
 
 extension DataVolume {

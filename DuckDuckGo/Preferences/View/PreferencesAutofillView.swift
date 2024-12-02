@@ -65,6 +65,10 @@ extension Preferences {
         var body: some View {
             PreferencePane(UserText.passwordManagementTitle) {
 
+                if model.showSyncPromo {
+                    SyncPromoView(viewModel: model.syncPromoViewModel, layout: .horizontal)
+                }
+
                 // Autofill Content  Button
                 PreferencePaneSection {
                     Button(UserText.autofillViewContentButtonPasswords) {
@@ -353,7 +357,7 @@ struct BitwardenDowngradeInfoView: View, PreferencesTabOpening {
                 HStack {
                     Text("1.")
                     Button(UserText.bitwardenIncompatibleStep1, action: {
-                        openNewTab(with: URL(string: "https://github.com/bitwarden/clients/releases/download/desktop-v2024.4.3/Bitwarden-2024.4.3-universal.dmg")!)
+                        openNewTab(with: URL(string: "https://github.com/bitwarden/clients/releases/download/desktop-v2024.9.0/Bitwarden-2024.9.0-universal.dmg")!)
                     }).foregroundColor(.accentColor)
                 }
                 Text(UserText.bitwardenIncompatibleStep2)

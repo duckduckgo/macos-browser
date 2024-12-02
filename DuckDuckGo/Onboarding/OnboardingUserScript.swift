@@ -25,7 +25,7 @@ final class OnboardingUserScript: NSObject, Subfeature {
     let onboardingActionsManager: OnboardingActionsManaging
     var messageOriginPolicy: MessageOriginPolicy = .only(rules: [.exact(hostname: "onboarding")])
     let featureName: String = "onboarding"
-    var broker: UserScriptMessageBroker?
+    weak var broker: UserScriptMessageBroker?
 
     // MARK: - MessageNames
     enum MessageNames: String, CaseIterable {
@@ -109,8 +109,8 @@ extension OnboardingUserScript {
 
     @MainActor
     private func requestImport(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        onboardingActionsManager.importData()
-        return Result()
+        let isDataImported = await onboardingActionsManager.importData()
+        return OnboardingImportResponse(enabled: isDataImported)
     }
 
     private func requestSetAsDefault(params: Any, original: WKScriptMessage) async throws -> Encodable? {

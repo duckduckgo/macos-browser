@@ -19,6 +19,7 @@
 import Foundation
 import Common
 import BrowserServicesKit
+import Configuration
 import PixelKit
 
 enum ErrorCategory: Equatable {
@@ -54,6 +55,7 @@ public enum DataBrokerProtectionPixels {
         static let triesKey = "tries"
         static let errorCategoryKey = "error_category"
         static let errorDetailsKey = "error_details"
+        static let errorDomainKey = "error_domain"
         static let pattern = "pattern"
         static let isParent = "is_parent"
         static let actionIDKey = "action_id"
@@ -78,6 +80,9 @@ public enum DataBrokerProtectionPixels {
         static let durationOfFirstOptOut = "duration_firstoptout"
         static let numberOfNewRecordsFound = "num_new_found"
         static let numberOfReappereances = "num_reappeared"
+        static let optOutSubmitSuccessRate = "optout_submit_success_rate"
+        static let childParentRecordDifference = "child-parent-record-difference"
+        static let calculatedOrphanedRecords = "calculated-orphaned-records"
     }
 
     case error(error: DataBrokerProtectionError, dataBroker: String)
@@ -152,6 +157,14 @@ public enum DataBrokerProtectionPixels {
     case scanningEventNewMatch
     case scanningEventReAppearance
 
+    // Additional opt out metrics
+    case optOutJobAt7DaysConfirmed(dataBroker: String)
+    case optOutJobAt7DaysUnconfirmed(dataBroker: String)
+    case optOutJobAt14DaysConfirmed(dataBroker: String)
+    case optOutJobAt14DaysUnconfirmed(dataBroker: String)
+    case optOutJobAt21DaysConfirmed(dataBroker: String)
+    case optOutJobAt21DaysUnconfirmed(dataBroker: String)
+
     // Web UI - loading errors
     case webUILoadingStarted(environment: String)
     case webUILoadingFailed(errorCategory: String)
@@ -180,6 +193,11 @@ public enum DataBrokerProtectionPixels {
     case entitlementCheckInvalid
     case entitlementCheckError
 
+    // Configuration
+    case invalidPayload(Configuration)
+    case errorLoadingCachedConfig(Error)
+    case failedToParsePrivacyConfig(Error)
+
     // Measure success/failure rate of Personal Information Removal Pixels
     // https://app.asana.com/0/1204006570077678/1206889724879222/f
     case globalMetricsWeeklyStats(profilesFound: Int, optOutsInProgress: Int, successfulOptOuts: Int, failedOptOuts: Int, durationOfFirstOptOut: Int, numberOfNewRecordsFound: Int)
@@ -187,9 +205,10 @@ public enum DataBrokerProtectionPixels {
     case dataBrokerMetricsWeeklyStats(dataBrokerURL: String, profilesFound: Int, optOutsInProgress: Int, successfulOptOuts: Int, failedOptOuts: Int, durationOfFirstOptOut: Int, numberOfNewRecordsFound: Int, numberOfReappereances: Int)
     case dataBrokerMetricsMonthlyStats(dataBrokerURL: String, profilesFound: Int, optOutsInProgress: Int, successfulOptOuts: Int, failedOptOuts: Int, durationOfFirstOptOut: Int, numberOfNewRecordsFound: Int, numberOfReappereances: Int)
 
-    // Feature Gatekeeper
-    case gatekeeperNotAuthenticated
-    case gatekeeperEntitlementsInvalid
+    // Custom stats
+    case customDataBrokerStatsOptoutSubmit(dataBrokerName: String, optOutSubmitSuccessRate: Double)
+    case customGlobalStatsOptoutSubmit(optOutSubmitSuccessRate: Double)
+    case weeklyChildBrokerOrphanedOptOuts(dataBrokerName: String, childParentRecordDifference: Int, calculatedOrphanedRecords: Int)
 }
 
 extension DataBrokerProtectionPixels: PixelKitEvent {
@@ -279,6 +298,14 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .webUILoadingSuccess: return "m_mac_dbp_web_ui_loading_success"
         case .webUILoadingFailed: return "m_mac_dbp_web_ui_loading_failed"
 
+            // Additional opt out metrics
+        case .optOutJobAt7DaysConfirmed: return "m_mac_dbp_optoutjob_at-7-days_confirmed"
+        case .optOutJobAt7DaysUnconfirmed: return "m_mac_dbp_optoutjob_at-7-days_unconfirmed"
+        case .optOutJobAt14DaysConfirmed: return "m_mac_dbp_optoutjob_at-14-days_confirmed"
+        case .optOutJobAt14DaysUnconfirmed: return "m_mac_dbp_optoutjob_at-14-days_unconfirmed"
+        case .optOutJobAt21DaysConfirmed: return "m_mac_dbp_optoutjob_at-21-days_confirmed"
+        case .optOutJobAt21DaysUnconfirmed: return "m_mac_dbp_optoutjob_at-21-days_unconfirmed"
+
             // Backend service errors
         case .generateEmailHTTPErrorDaily: return "m_mac_dbp_service_email-generate-http-error"
         case .emptyAccessTokenDaily: return "m_mac_dbp_service_empty-auth-token"
@@ -306,9 +333,15 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .dataBrokerMetricsWeeklyStats: return "m_mac_dbp_databroker_weekly_stats"
         case .dataBrokerMetricsMonthlyStats: return "m_mac_dbp_databroker_monthly_stats"
 
-            // Feature Gatekeeper
-        case .gatekeeperNotAuthenticated: return "m_mac_dbp_gatekeeper_not_authenticated"
-        case .gatekeeperEntitlementsInvalid: return "m_mac_dbp_gatekeeper_entitlements_invalid"
+            // Configuration
+        case .invalidPayload(let configuration): return "m_mac_dbp_\(configuration.rawValue)_invalid_payload".lowercased()
+        case .errorLoadingCachedConfig: return "m_mac_dbp_configuration_error_loading_cached_config"
+        case .failedToParsePrivacyConfig: return "m_mac_dbp_configuration_failed_to_parse"
+
+            // Various monitoring pixels
+        case .customDataBrokerStatsOptoutSubmit: return "m_mac_dbp_databroker_custom_stats_optoutsubmit"
+        case .customGlobalStatsOptoutSubmit: return "m_mac_dbp_custom_stats_optoutsubmit"
+        case .weeklyChildBrokerOrphanedOptOuts: return "m_mac_dbp_weekly_child-broker_orphaned-optouts"
         }
     }
 
@@ -376,6 +409,13 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             return [Consts.hadNewMatch: hadNewMatch ? "1" : "0", Consts.hadReAppereance: hadReAppereance ? "1" : "0", Consts.scanCoverage: scanCoverage.description]
         case .weeklyReportRemovals(let removals):
             return [Consts.removals: String(removals)]
+        case .optOutJobAt7DaysConfirmed(let dataBroker),
+                .optOutJobAt7DaysUnconfirmed(let dataBroker),
+                .optOutJobAt14DaysConfirmed(let dataBroker),
+                .optOutJobAt14DaysUnconfirmed(let dataBroker),
+                .optOutJobAt21DaysConfirmed(let dataBroker),
+                .optOutJobAt21DaysUnconfirmed(let dataBroker):
+            return [Consts.dataBrokerParamKey: dataBroker]
         case .webUILoadingStarted(let environment):
             return [Consts.environmentKey: environment]
         case .webUILoadingSuccess(let environment):
@@ -410,8 +450,8 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                 .secureVaultKeyStoreReadError,
                 .secureVaultKeyStoreUpdateError,
                 .secureVaultError,
-                .gatekeeperNotAuthenticated,
-                .gatekeeperEntitlementsInvalid:
+                .invalidPayload,
+                .failedToParsePrivacyConfig:
             return [:]
         case .ipcServerProfileSavedCalledByApp,
                 .ipcServerProfileSavedReceivedByAgent,
@@ -467,6 +507,17 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                            Consts.durationOfFirstOptOut: String(durationOfFirstOptOut),
                            Consts.numberOfNewRecordsFound: String(numberOfNewRecordsFound),
                            Consts.numberOfReappereances: String(numberOfReappereances)]
+        case .errorLoadingCachedConfig(let error):
+            return [Consts.errorDomainKey: (error as NSError).domain]
+        case .customDataBrokerStatsOptoutSubmit(let dataBrokerName, let optOutSubmitSuccessRate):
+            return [Consts.dataBrokerParamKey: dataBrokerName,
+                    Consts.optOutSubmitSuccessRate: String(optOutSubmitSuccessRate)]
+        case .customGlobalStatsOptoutSubmit(let optOutSubmitSuccessRate):
+            return [Consts.optOutSubmitSuccessRate: String(optOutSubmitSuccessRate)]
+        case .weeklyChildBrokerOrphanedOptOuts(let dataBrokerName, let childParentRecordDifference, let calculatedOrphanedRecords):
+            return [Consts.dataBrokerParamKey: dataBrokerName,
+                    Consts.childParentRecordDifference: String(childParentRecordDifference),
+                    Consts.calculatedOrphanedRecords: String(calculatedOrphanedRecords)]
         }
     }
 }
@@ -484,16 +535,19 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                 PixelKit.fire(DebugEvent(event, error: error))
             case .generalError(let error, _):
                 PixelKit.fire(DebugEvent(event, error: error))
+            case .errorLoadingCachedConfig(let error):
+                PixelKit.fire(DebugEvent(event, error: error))
             case .secureVaultInitError(let error),
                     .secureVaultError(let error),
                     .secureVaultKeyStoreReadError(let error),
-                    .secureVaultKeyStoreUpdateError(let error):
+                    .secureVaultKeyStoreUpdateError(let error),
+                    .failedToParsePrivacyConfig(let error):
                 PixelKit.fire(DebugEvent(event, error: error))
             case .ipcServerProfileSavedXPCError(error: let error),
                     .ipcServerImmediateScansFinishedWithError(error: let error),
                     .ipcServerAppLaunchedXPCError(error: let error),
                     .ipcServerAppLaunchedScheduledScansFinishedWithError(error: let error):
-                PixelKit.fire(DebugEvent(event, error: error), frequency: .dailyAndCount, includeAppVersionParameter: true)
+                PixelKit.fire(DebugEvent(event, error: error), frequency: .legacyDailyAndCount, includeAppVersionParameter: true)
             case .ipcServerProfileSavedCalledByApp,
                     .ipcServerProfileSavedReceivedByAgent,
                     .ipcServerImmediateScansInterrupted,
@@ -503,7 +557,7 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .ipcServerAppLaunchedScheduledScansBlocked,
                     .ipcServerAppLaunchedScheduledScansInterrupted,
                     .ipcServerAppLaunchedScheduledScansFinishedWithoutError:
-                PixelKit.fire(event, frequency: .dailyAndCount, includeAppVersionParameter: true)
+                PixelKit.fire(event, frequency: .legacyDailyAndCount, includeAppVersionParameter: true)
             case .parentChildMatches,
                     .optOutStart,
                     .optOutEmailGenerate,
@@ -537,6 +591,12 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .monthlyActiveUser,
                     .weeklyReportScanning,
                     .weeklyReportRemovals,
+                    .optOutJobAt7DaysConfirmed,
+                    .optOutJobAt7DaysUnconfirmed,
+                    .optOutJobAt14DaysConfirmed,
+                    .optOutJobAt14DaysUnconfirmed,
+                    .optOutJobAt21DaysConfirmed,
+                    .optOutJobAt21DaysUnconfirmed,
                     .scanningEventNewMatch,
                     .scanningEventReAppearance,
                     .webUILoadingFailed,
@@ -550,8 +610,10 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .globalMetricsMonthlyStats,
                     .dataBrokerMetricsWeeklyStats,
                     .dataBrokerMetricsMonthlyStats,
-                    .gatekeeperNotAuthenticated,
-                    .gatekeeperEntitlementsInvalid:
+                    .invalidPayload,
+                    .customDataBrokerStatsOptoutSubmit,
+                    .customGlobalStatsOptoutSubmit,
+                    .weeklyChildBrokerOrphanedOptOuts:
 
                 PixelKit.fire(event)
 
@@ -563,7 +625,7 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .entitlementCheckValid,
                     .entitlementCheckInvalid,
                     .entitlementCheckError:
-                PixelKit.fire(event, frequency: .dailyAndCount)
+                PixelKit.fire(event, frequency: .legacyDailyAndCount)
 
             }
         }

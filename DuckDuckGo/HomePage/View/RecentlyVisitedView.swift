@@ -24,35 +24,45 @@ extension HomePage.Views {
 struct RecentlyVisited: View {
 
     @EnvironmentObject var model: HomePage.Models.RecentlyVisitedModel
+    @EnvironmentObject var settingsModel: HomePage.Models.SettingsModel
 
     var body: some View {
 
-        VStack(spacing: 0) {
-            RecentlyVisitedTitle(isExpanded: $model.showRecentlyVisited)
-                .padding(.bottom, 18)
+        ZStack {
 
-            Group {
-                if #available(macOS 12, *) {
-                    LazyVStack(spacing: 0) {
-                        ForEach(model.recentSites, id: \.domain) {
-                            RecentlyVisitedSite(site: $0)
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.homeFavoritesGhost, style: StrokeStyle(lineWidth: 1.0))
+                .homePageViewBackground(settingsModel.customBackground)
+                .cornerRadius(12)
+
+            VStack(spacing: 18) {
+                RecentlyVisitedTitle(isExpanded: $model.showRecentlyVisited)
+
+                Group {
+                    if #available(macOS 12, *) {
+                        LazyVStack(spacing: 0) {
+                            ForEach(model.recentSites, id: \.domain) {
+                                RecentlyVisitedSite(site: $0)
+                            }
+                        }
+                    } else {
+                        VStack(spacing: 0) {
+                            ForEach(model.recentSites, id: \.domain) {
+                                RecentlyVisitedSite(site: $0)
+                            }
                         }
                     }
-                } else {
-                    VStack(spacing: 0) {
-                        ForEach(model.recentSites, id: \.domain) {
-                            RecentlyVisitedSite(site: $0)
-                        }
-                    }
+
+                    RecentlyVisitedSiteEmptyState()
+                        .visibility(model.recentSites.isEmpty ? .visible : .gone)
+
                 }
-
-                RecentlyVisitedSiteEmptyState()
-                    .visibility(model.recentSites.isEmpty ? .visible : .gone)
-
+                .visibility(model.showRecentlyVisited ? .visible : .gone)
             }
-            .visibility(model.showRecentlyVisited ? .visible : .gone)
-
-        }.padding(.bottom, 24)
+            .padding(.vertical, 24)
+        }
+        .padding(.horizontal, 2)
+        .padding(.bottom, 24)
 
     }
 
@@ -91,7 +101,7 @@ struct RecentlyVisitedSiteEmptyState: View {
 
             Spacer()
 
-        }.padding([.leading, .trailing], 12)
+        }.padding(.horizontal, 24)
 
     }
 
@@ -144,7 +154,8 @@ struct RecentlyVisitedSite: View {
                 Spacer()
 
             }
-            .padding([.leading, .trailing, .top], 12)
+            .padding(.top, 12)
+            .padding(.horizontal, 24)
             .visibility(site.isHidden ? .invisible : .visible)
 
             HStack(spacing: 2) {
@@ -174,7 +185,7 @@ struct RecentlyVisitedSite: View {
                 .tooltip(fireButtonTooltip)
 
             }
-            .padding(.trailing, 12)
+            .padding(.trailing, 24)
             .padding(.top, 13)
             .visibility(site.isHidden ? .invisible : .visible)
 
@@ -317,7 +328,6 @@ struct RecentlyVisitedTitle: View {
                     model.showPagesOnHover.toggle()
                 }
                 .padding(.leading, isExpanded ? 5 : 0)
-                .padding(.top, 4)
 
             VStack(alignment: isExpanded ? .leading : .center, spacing: 6) {
                 Text(UserText.homePageProtectionSummaryMessage(numberOfTrackersBlocked: model.numberOfTrackersBlocked))
@@ -330,7 +340,6 @@ struct RecentlyVisitedTitle: View {
             }
             .visibility(model.recentSites.count > 0 ? .visible : .gone)
             .padding(.leading, 4)
-            .padding(.top, 4)
 
             Text(UserText.homePageProtectionSummaryInfo)
                 .font(.system(size: 17, weight: .bold, design: .default))
@@ -347,14 +356,14 @@ struct RecentlyVisitedTitle: View {
             }.rotationEffect(.degrees(isExpanded ? 0 : 180))
 
         }
-        .padding([.leading, .trailing], 12)
+        .padding(.horizontal, 24)
     }
 
 }
 
 struct SiteIconAndConnector: View {
 
-    let backgroundColor = Color.homeFavoritesBackground
+    let backgroundColor = Color.homeFeedIconBackground
     let mouseOverColor = Color.homeFavoritesHover
 
     @EnvironmentObject var model: HomePage.Models.RecentlyVisitedModel

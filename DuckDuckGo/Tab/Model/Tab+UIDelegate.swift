@@ -176,11 +176,11 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
 
     @objc(_webView:checkUserMediaPermissionForURL:mainFrameURL:frameIdentifier:decisionHandler:)
     func webView(_ webView: WKWebView,
-                 checkUserMediaPermissionFor url: URL,
-                 mainFrameURL: URL,
+                 checkUserMediaPermissionFor url: NSURL?,
+                 mainFrameURL: NSURL?,
                  frameIdentifier: UInt64,
                  decisionHandler: @escaping (String, Bool) -> Void) {
-        self.permissions.checkUserMediaPermission(for: url, mainFrameURL: mainFrameURL, decisionHandler: decisionHandler)
+        self.permissions.checkUserMediaPermission(for: url as? URL, mainFrameURL: mainFrameURL as? URL, decisionHandler: decisionHandler)
     }
 
     // https://github.com/WebKit/WebKit/blob/995f6b1595611c934e742a4f3a9af2e678bc6b8d/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegate.h#L147
@@ -369,4 +369,14 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         self.runPrintOperation(for: nil, in: self.webView)
     }
 
+}
+
+extension Tab: WKInspectorDelegate {
+    @MainActor
+    func inspector(_ inspector: NSObject, openURLExternally url: NSURL?) {
+        let tab = Tab(content: url.map { Tab.Content.url($0 as URL, source: .link) } ?? .none,
+                      burnerMode: BurnerMode(isBurner: burnerMode.isBurner),
+                      webViewSize: webView.superview?.bounds.size ?? .zero)
+        delegate?.tab(self, createdChild: tab, of: .window(active: true, burner: burnerMode.isBurner))
+    }
 }

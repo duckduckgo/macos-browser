@@ -19,6 +19,7 @@
 import Foundation
 import Common
 import PixelKit
+import os.log
 
 enum SubscriptionError: Error {
     case purchaseFailed,
@@ -45,7 +46,7 @@ struct DefaultSubscriptionErrorReporter: SubscriptionErrorReporter {
 
     func report(subscriptionActivationError: SubscriptionError) {
 
-        os_log(.error, log: .subscription, "Subscription purchase error: %{public}s", subscriptionActivationError.localizedDescription)
+        Logger.subscription.error("Subscription purchase error: \(subscriptionActivationError.localizedDescription, privacy: .public)")
 
         var isStoreError = false
         var isBackendError = false
@@ -64,7 +65,7 @@ struct DefaultSubscriptionErrorReporter: SubscriptionErrorReporter {
         case .failedToRestorePastPurchase:
             isStoreError = true
         case .subscriptionNotFound:
-            PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreFailureNotFound, frequency: .dailyAndCount)
+            PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreFailureNotFound, frequency: .legacyDailyAndCount)
             isStoreError = true
         case .subscriptionExpired:
             isStoreError = true
@@ -73,17 +74,17 @@ struct DefaultSubscriptionErrorReporter: SubscriptionErrorReporter {
             isBackendError = true
         case .cancelledByUser: break
         case .accountCreationFailed:
-            PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailureAccountNotCreated, frequency: .dailyAndCount)
+            PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailureAccountNotCreated, frequency: .legacyDailyAndCount)
         case .activeSubscriptionAlreadyPresent: break
         case .generalError: break
         }
 
         if isStoreError {
-            PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailureStoreError, frequency: .dailyAndCount)
+            PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailureStoreError, frequency: .legacyDailyAndCount)
         }
 
         if isBackendError {
-            PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailureBackendError, frequency: .dailyAndCount)
+            PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailureBackendError, frequency: .legacyDailyAndCount)
         }
     }
 }

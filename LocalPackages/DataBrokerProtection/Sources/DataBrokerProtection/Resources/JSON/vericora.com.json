@@ -1,9 +1,10 @@
 {
   "name": "Vericora",
   "url": "vericora.com",
-  "version": "0.2.0",
+  "version": "0.4.0",
   "parent": "verecor.com",
   "addedDatetime": 1677736800000,
+  "optOutUrl": "https://vericora.com/ng/control/privacy",
   "steps": [
     {
       "stepType": "scan",
@@ -66,6 +67,7 @@
   "schedulingConfig": {
     "retryError": 48,
     "confirmOptOutScan": 72,
-    "maintenanceScan": 240
+    "maintenanceScan": 120,
+    "maxAttempts": -1
   }
 }

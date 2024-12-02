@@ -19,10 +19,13 @@
 import Cocoa
 import Combine
 import Common
+import os.log
+import BrowserServicesKit
 
 @MainActor
 protocol WindowControllersManagerProtocol {
 
+    var lastKeyMainWindowController: MainWindowController? { get }
     var pinnedTabsManager: PinnedTabsManager { get }
 
     var didRegisterWindowController: PassthroughSubject<(MainWindowController), Never> { get }
@@ -31,24 +34,62 @@ protocol WindowControllersManagerProtocol {
     func register(_ windowController: MainWindowController)
     func unregister(_ windowController: MainWindowController)
 
+    func show(url: URL?, source: Tab.TabContent.URLSource, newTab: Bool)
+    func showBookmarksTab()
+
+    @discardableResult
+    func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel?,
+                       burnerMode: BurnerMode,
+                       droppingPoint: NSPoint?,
+                       contentSize: NSSize?,
+                       showWindow: Bool,
+                       popUp: Bool,
+                       lazyLoadTabs: Bool,
+                       isMiniaturized: Bool) -> MainWindow?
+    func showTab(with content: Tab.TabContent)
+}
+extension WindowControllersManagerProtocol {
+    @discardableResult
+    func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel? = nil,
+                       burnerMode: BurnerMode = .regular,
+                       droppingPoint: NSPoint? = nil,
+                       contentSize: NSSize? = nil,
+                       showWindow: Bool = true,
+                       popUp: Bool = false,
+                       lazyLoadTabs: Bool = false) -> MainWindow? {
+        openNewWindow(with: tabCollectionViewModel, burnerMode: burnerMode, droppingPoint: droppingPoint, contentSize: contentSize, showWindow: showWindow, popUp: popUp, lazyLoadTabs: lazyLoadTabs, isMiniaturized: false)
+    }
 }
 
 @MainActor
 final class WindowControllersManager: WindowControllersManagerProtocol {
 
-    static let shared = WindowControllersManager()
+    static let shared = WindowControllersManager(pinnedTabsManager: Application.appDelegate.pinnedTabsManager,
+                                                 subscriptionFeatureAvailability: DefaultSubscriptionFeatureAvailability()
+    )
+
+    var activeViewController: MainViewController? {
+        lastKeyMainWindowController?.mainViewController
+    }
+
+    init(pinnedTabsManager: PinnedTabsManager,
+         subscriptionFeatureAvailability: SubscriptionFeatureAvailability) {
+        self.pinnedTabsManager = pinnedTabsManager
+        self.subscriptionFeatureAvailability = subscriptionFeatureAvailability
+    }
 
     /**
      * _Initial_ meaning a single window with a single home page tab.
      */
     @Published private(set) var isInInitialState: Bool = true
     @Published private(set) var mainWindowControllers = [MainWindowController]()
-    private(set) var pinnedTabsManager = PinnedTabsManager()
+    private(set) var pinnedTabsManager: PinnedTabsManager
+    private let subscriptionFeatureAvailability: SubscriptionFeatureAvailability
 
     weak var lastKeyMainWindowController: MainWindowController? {
         didSet {
             if lastKeyMainWindowController != oldValue {
-                didChangeKeyWindowController.send(())
+                didChangeKeyWindowController.send(lastKeyMainWindowController)
             }
         }
     }
@@ -65,7 +106,7 @@ final class WindowControllersManager: WindowControllersManagerProtocol {
         return mainWindowController?.mainViewController.tabCollectionViewModel.selectedTab
     }
 
-    let didChangeKeyWindowController = PassthroughSubject<Void, Never>()
+    let didChangeKeyWindowController = PassthroughSubject<MainWindowController?, Never>()
     let didRegisterWindowController = PassthroughSubject<(MainWindowController), Never>()
     let didUnregisterWindowController = PassthroughSubject<(MainWindowController), Never>()
 
@@ -81,7 +122,7 @@ final class WindowControllersManager: WindowControllersManagerProtocol {
 
     func unregister(_ windowController: MainWindowController) {
         guard let idx = mainWindowControllers.firstIndex(of: windowController) else {
-            os_log("WindowControllersManager: Window Controller not registered", type: .error)
+            Logger.general.error("WindowControllersManager: Window Controller not registered")
             return
         }
         mainWindowControllers.remove(at: idx)
@@ -107,11 +148,9 @@ final class WindowControllersManager: WindowControllersManagerProtocol {
 
 extension WindowControllersManager {
 
-#if DBP
     func showDataBrokerProtectionTab() {
         showTab(with: .dataBrokerProtection)
     }
-#endif
 
     func showBookmarksTab() {
         showTab(with: .bookmarks)
@@ -182,7 +221,7 @@ extension WindowControllersManager {
         } else {
             let newTab = Tab(content: url.map { .url($0, source: source) } ?? .newtab, shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
             newTab.setContent(url.map { .contentFromURL($0, source: source) } ?? .newtab)
-            tabCollectionViewModel.append(tab: newTab)
+            tabCollectionViewModel.insertOrAppend(tab: newTab, selected: true)
         }
     }
 
@@ -196,7 +235,7 @@ extension WindowControllersManager {
 
         let viewController = windowController.mainViewController
         let tabCollectionViewModel = viewController.tabCollectionViewModel
-        tabCollectionViewModel.appendNewTab(with: content)
+        tabCollectionViewModel.insertOrAppendNewTab(content)
         windowController.window?.orderFront(nil)
     }
 
@@ -220,8 +259,14 @@ extension WindowControllersManager {
         windowController.mainViewController.navigationBarViewController.showNetworkProtectionStatus()
     }
 
-    func showShareFeedbackModal() {
-        let feedbackFormViewController = VPNFeedbackFormViewController()
+    func showShareFeedbackModal(source: UnifiedFeedbackSource = .default) {
+        let feedbackFormViewController: NSViewController = {
+            if subscriptionFeatureAvailability.usesUnifiedFeedbackForm {
+                return UnifiedFeedbackFormViewController(source: source)
+            } else {
+                return VPNFeedbackFormViewController()
+            }
+        }()
         let feedbackFormWindowController = feedbackFormViewController.wrappedInWindowController()
 
         guard let feedbackFormWindow = feedbackFormWindowController.window else {
@@ -257,6 +302,18 @@ extension WindowControllersManager {
         }
 
         parentWindowController.window?.beginSheet(locationsFormWindow)
+    }
+
+    @discardableResult
+    func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel? = nil,
+                       burnerMode: BurnerMode = .regular,
+                       droppingPoint: NSPoint? = nil,
+                       contentSize: NSSize? = nil,
+                       showWindow: Bool = true,
+                       popUp: Bool = false,
+                       lazyLoadTabs: Bool = false,
+                       isMiniaturized: Bool = false) -> MainWindow? {
+        WindowsManager.openNewWindow(with: tabCollectionViewModel, burnerMode: burnerMode, droppingPoint: droppingPoint, contentSize: contentSize, showWindow: showWindow, popUp: popUp, lazyLoadTabs: lazyLoadTabs, isMiniaturized: isMiniaturized)
     }
 
 }
@@ -298,15 +355,21 @@ extension WindowControllersManager: OnboardingNavigating {
 
     @MainActor
     func showImportDataView() {
-        DataImportView().show()
+        DataImportView(title: UserText.importDataTitleOnboarding).show()
     }
 
     @MainActor
     func replaceTabWith(_ tab: Tab) {
         guard let tabToRemove = selectedTab else { return }
-        guard let index = mainWindowController?.mainViewController.tabCollectionViewModel.indexInAllTabs(of: tabToRemove) else { return }
-        mainWindowController?.mainViewController.tabCollectionViewModel.append(tab: tab)
-        mainWindowController?.mainViewController.tabCollectionViewModel.remove(at: index)
+        guard let mainWindowController else { return }
+        guard let index = mainWindowController.mainViewController.tabCollectionViewModel.indexInAllTabs(of: tabToRemove) else { return }
+        var tabToAppend = tab
+        if mainWindowController.mainViewController.isBurner {
+            let burnerMode = mainWindowController.mainViewController.tabCollectionViewModel.burnerMode
+            tabToAppend = Tab(content: tab.content, burnerMode: burnerMode)
+        }
+        mainWindowController.mainViewController.tabCollectionViewModel.append(tab: tabToAppend)
+        mainWindowController.mainViewController.tabCollectionViewModel.remove(at: index)
     }
 
     @MainActor

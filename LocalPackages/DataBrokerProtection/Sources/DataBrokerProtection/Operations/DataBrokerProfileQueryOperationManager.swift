@@ -18,6 +18,7 @@
 
 import Foundation
 import Common
+import os.log
 
 enum OperationsError: Error {
     case idsMissingForBrokerOrProfileQuery
@@ -100,7 +101,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         }
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
+    // swiftlint:disable cyclomatic_complexity
     internal func runScanOperation(on runner: WebJobRunner,
                                    brokerProfileQueryData: BrokerProfileQueryData,
                                    database: DataBrokerProtectionRepository,
@@ -110,7 +111,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                    isManual: Bool = false,
                                    userNotificationService: DataBrokerProtectionUserNotificationService,
                                    shouldRunNextStep: @escaping () -> Bool) async throws {
-        os_log("Running scan operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))
+        Logger.dataBrokerProtection.debug("Running scan operation: \(brokerProfileQueryData.dataBroker.name, privacy: .public)")
 
         guard let brokerId = brokerProfileQueryData.dataBroker.id, let profileQueryId = brokerProfileQueryData.profileQuery.id else {
             // Maybe send pixel?
@@ -119,7 +120,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
 
         defer {
             try? database.updateLastRunDate(Date(), brokerId: brokerId, profileQueryId: profileQueryId)
-            os_log("Finished scan operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))
+            Logger.dataBrokerProtection.debug("Finished scan operation: \(brokerProfileQueryData.dataBroker.name, privacy: .public)")
             notificationCenter.post(name: DataBrokerProtectionNotifications.didFinishScan, object: brokerProfileQueryData.dataBroker.name)
         }
 
@@ -134,7 +135,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             try database.add(event)
 
             let extractedProfiles = try await runner.scan(brokerProfileQueryData, stageCalculator: stageCalculator, pixelHandler: pixelHandler, showWebView: showWebView, shouldRunNextStep: shouldRunNextStep)
-            os_log("Extracted profiles: %@", log: .dataBrokerProtection, extractedProfiles)
+            Logger.dataBrokerProtection.debug("Extracted profiles: \(extractedProfiles)")
 
             if !extractedProfiles.isEmpty {
                 stageCalculator.fireScanSuccess(matchesFound: extractedProfiles.count)
@@ -157,7 +158,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                             try database.updateRemovedDate(nil, on: id)
                         }
 
-                        os_log("Extracted profile already exists in database: %@", log: .dataBrokerProtection, id.description)
+                        Logger.dataBrokerProtection.debug("Extracted profile already exists in database: \(id.description)")
                     } else {
                         // If it's a new found profile, we'd like to opt-out ASAP
                         // If this broker has a parent opt out, we set the preferred date to nil, as we will only perform the operation within the parent.
@@ -171,14 +172,20 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                         // we insert the opt-out operation, we do not want to do things separately in case creating an opt-out fails
                         // causing the extracted profile to be orphan.
                         let optOutJobData = OptOutJobData(brokerId: brokerId,
-                                                                      profileQueryId: profileQueryId,
-                                                                      preferredRunDate: preferredRunOperation,
-                                                                      historyEvents: [HistoryEvent](),
-                                                                      extractedProfile: extractedProfile)
+                                                          profileQueryId: profileQueryId,
+                                                          createdDate: Date(),
+                                                          preferredRunDate: preferredRunOperation,
+                                                          historyEvents: [HistoryEvent](),
+                                                          attemptCount: 0,
+                                                          submittedSuccessfullyDate: nil,
+                                                          extractedProfile: extractedProfile,
+                                                          sevenDaysConfirmationPixelFired: false,
+                                                          fourteenDaysConfirmationPixelFired: false,
+                                                          twentyOneDaysConfirmationPixelFired: false)
 
                         try database.saveOptOutJob(optOut: optOutJobData, extractedProfile: extractedProfile)
 
-                        os_log("Creating new opt-out operation data for: %@", log: .dataBrokerProtection, String(describing: extractedProfile.name))
+                        Logger.dataBrokerProtection.debug("Creating new opt-out operation data for: \(String(describing: extractedProfile.name))")
                     }
                 }
             } else {
@@ -211,7 +218,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                             database: database
                         )
 
-                        os_log("Profile removed from optOutsData: %@", log: .dataBrokerProtection, String(describing: removedProfile))
+                        Logger.dataBrokerProtection.debug("Profile removed from optOutsData: \(String(describing: removedProfile))")
 
                         if let attempt = try database.fetchAttemptInformation(for: extractedProfileId), let attemptUUID = UUID(uuidString: attempt.attemptId) {
                             let now = Date()
@@ -249,6 +256,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             throw error
         }
     }
+    // swiftlint:enable cyclomatic_complexity
 
     private func sendProfileRemovedNotificationIfNecessary(userNotificationService: DataBrokerProtectionUserNotificationService, database: DataBrokerProtectionRepository) {
 
@@ -283,12 +291,12 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         }
 
         guard extractedProfile.removedDate == nil else {
-            os_log("Profile already extracted, skipping...", log: .dataBrokerProtection)
+            Logger.dataBrokerProtection.debug("Profile already extracted, skipping...")
             return
         }
 
         guard let optOutStep = brokerProfileQueryData.dataBroker.optOutStep(), optOutStep.optOutType != .parentSiteOptOut else {
-            os_log("Broker opts out in parent, skipping...", log: .dataBrokerProtection)
+            Logger.dataBrokerProtection.debug("Broker opts out in parent, skipping...")
             return
         }
 
@@ -297,10 +305,10 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                                                                   dataBrokerVersion: brokerProfileQueryData.dataBroker.version,
                                                                                   handler: pixelHandler)
         stageDurationCalculator.fireOptOutStart()
-        os_log("Running opt-out operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))
+        Logger.dataBrokerProtection.debug("Running opt-out operation: \(brokerProfileQueryData.dataBroker.name, privacy: .public)")
 
         defer {
-            os_log("Finished opt-out operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))
+            Logger.dataBrokerProtection.debug("Finished opt-out operation: \(brokerProfileQueryData.dataBroker.name, privacy: .public)")
 
             try? database.updateLastRunDate(Date(), brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
             do {
@@ -345,11 +353,17 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                                         profileQueryId: profileQueryId)
 
             try database.addAttempt(extractedProfileId: extractedProfileId,
-                                attemptUUID: stageDurationCalculator.attemptId,
-                                dataBroker: stageDurationCalculator.dataBroker,
-                                lastStageDate: stageDurationCalculator.lastStateTime,
-                                startTime: stageDurationCalculator.startTime)
+                                    attemptUUID: stageDurationCalculator.attemptId,
+                                    dataBroker: stageDurationCalculator.dataBroker,
+                                    lastStageDate: stageDurationCalculator.lastStateTime,
+                                    startTime: stageDurationCalculator.startTime)
             try database.add(.init(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested))
+            try incrementAttemptCountIfNeeded(
+                database: database,
+                brokerId: brokerId,
+                profileQueryId: profileQueryId,
+                extractedProfileId: extractedProfileId
+            )
         } catch {
             let tries = try? retriesCalculatorUseCase.calculateForOptOut(database: database, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
             stageDurationCalculator.fireOptOutFailure(tries: tries ?? -1)
@@ -381,6 +395,18 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                                      extractedProfileId: extractedProfileId,
                                                      schedulingConfig: schedulingConfig)
         }
+
+    private func incrementAttemptCountIfNeeded(database: DataBrokerProtectionRepository,
+                                               brokerId: Int64,
+                                               profileQueryId: Int64,
+                                               extractedProfileId: Int64) throws {
+        guard let events = try? database.fetchOptOutHistoryEvents(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId),
+              events.max(by: { $0.date < $1.date })?.type == .optOutRequested else {
+            return
+        }
+
+        try database.incrementAttemptCount(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
+    }
 
     private func handleOperationError(origin: OperationPreferredDateUpdaterOrigin,
                                       brokerId: Int64,
@@ -417,9 +443,9 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                 database: database
             )
         } catch {
-            os_log("Can't update operation date after error")
+            Logger.dataBrokerProtection.debug("Can't update operation date after error")
         }
 
-        os_log("Error on operation : %{public}@", log: .dataBrokerProtection, error.localizedDescription)
+        Logger.dataBrokerProtection.error("Error on operation : \(error.localizedDescription, privacy: .public)")
     }
 }

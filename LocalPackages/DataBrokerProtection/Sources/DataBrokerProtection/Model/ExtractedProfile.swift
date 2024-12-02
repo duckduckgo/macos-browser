@@ -56,7 +56,7 @@ struct ExtractProfileSelectors: Codable, Sendable {
     }
 }
 
-struct AddressCityState: Codable {
+struct AddressCityState: Codable, Hashable {
     let city: String
     let state: String
 
@@ -65,7 +65,7 @@ struct AddressCityState: Codable {
     }
 }
 
-struct ExtractedProfile: Codable, Sendable {
+public struct ExtractedProfile: Codable, Sendable {
     let id: Int64?
     let name: String?
     let alternativeNames: [String]?
@@ -127,7 +127,7 @@ struct ExtractedProfile: Codable, Sendable {
         self.identifier = identifier
     }
 
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decodeIfPresent(Int64.self, forKey: .id)
         name = try container.decodeIfPresent(String.self, forKey: .name)
@@ -166,10 +166,51 @@ struct ExtractedProfile: Codable, Sendable {
             identifier: self.identifier
         )
     }
+
+    /*
+     Matching records are:
+     1/ Completely identical records (same name, addresses, ages, etc)
+     2/ Records that overlap completely (record A has all the data of record B, but might have
+        extra information as well (e.g. an extra address, a middle name where record B doesn't)
+        I.e. B is a subset of A, or vice versa
+     However, we ignore some of the properties
+     So, basically age == age, we ignore phone numbers and email, and then everything else one should be a subset of the other
+     */
+    func doesMatchExtractedProfile(_ extractedProfile: ExtractedProfile) -> Bool {
+        if age != extractedProfile.age {
+            return false
+        }
+
+        if name != extractedProfile.name {
+            return false
+        }
+
+        if !(alternativeNames ?? []).isASubSetOrSuperSetOf(extractedProfile.alternativeNames ?? []) {
+            return false
+        }
+
+        if !(addresses ?? []).isASubSetOrSuperSetOf(extractedProfile.addresses ?? []) {
+            return false
+        }
+
+        if !(relatives ?? []).isASubSetOrSuperSetOf(extractedProfile.relatives ?? []) {
+            return false
+        }
+
+        return true
+    }
 }
 
 extension ExtractedProfile: Equatable {
-    static func == (lhs: ExtractedProfile, rhs: ExtractedProfile) -> Bool {
+    public static func == (lhs: ExtractedProfile, rhs: ExtractedProfile) -> Bool {
         lhs.name == rhs.name
+    }
+}
+
+private extension Sequence where Element: Hashable {
+    func isASubSetOrSuperSetOf<Settable>(_ sequence: Settable) -> Bool where Settable: Sequence, Element == Settable.Element {
+        let setA = Set(self)
+        let setB = Set(sequence)
+        return setA.isSubset(of: setB) || setB.isSubset(of: setA)
     }
 }

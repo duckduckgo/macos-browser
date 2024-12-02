@@ -21,13 +21,24 @@ import XCTest
 import Common
 import BrowserServicesKit
 import Combine
+import PhishingDetection
 
 final class DuckSchemeHandlerTests: XCTestCase {
 
+    var featureFlagger: MockFeatureFlagger!
+    var handler: DuckURLSchemeHandler!
+
+    override func setUp() {
+        super.setUp()
+        featureFlagger = MockFeatureFlagger()
+        featureFlagger.isFeatureOn = false
+
+        handler = DuckURLSchemeHandler(featureFlagger: featureFlagger)
+    }
+
     func testWebViewFromOnboardingHandlerReturnsResponseAndData() throws {
         // Given
-        let onboardingURL = URL(string: "duck://onboarding?platform=integration")!
-        let handler = DuckURLSchemeHandler()
+        let onboardingURL = URL(string: "duck://onboarding")!
         let webView = WKWebView()
         let schemeTask = MockSchemeTask(request: URLRequest(url: onboardingURL))
 
@@ -43,11 +54,28 @@ final class DuckSchemeHandlerTests: XCTestCase {
         XCTAssertNil(schemeTask.error)
     }
 
+    func testWebViewFromReleaseNoteHandlerReturnsResponseAndData() throws {
+        // Given
+        let releaseNotesURL = URL(string: "duck://release-notes")!
+        let webView = WKWebView()
+        let schemeTask = MockSchemeTask(request: URLRequest(url: releaseNotesURL))
+
+        // When
+        handler.webView(webView, start: schemeTask)
+
+        // Then
+        XCTAssertEqual(schemeTask.response?.url, releaseNotesURL)
+        XCTAssertEqual(schemeTask.response?.mimeType, "text/html")
+        XCTAssertNotNil(schemeTask.data)
+        XCTAssertTrue(schemeTask.data?.utf8String()?.contains("<title>Browser Release Notes</title>") ?? false)
+        XCTAssertTrue(schemeTask.didFinishCalled)
+        XCTAssertNil(schemeTask.error)
+    }
+
     @MainActor
     func testWebViewFromDuckPlayerHandlerReturnsResponseAndData() throws {
         // Given
         let duckPlayerURL = URL(string: "duck://player")!
-        let handler = DuckURLSchemeHandler()
         let webView = WKWebView()
         let schemeTask = MockSchemeTask(request: URLRequest(url: duckPlayerURL))
 
@@ -64,7 +92,6 @@ final class DuckSchemeHandlerTests: XCTestCase {
     func testWebViewFromNativeUIHandlerReturnsResponseAndData() throws {
         // Given
         let nativeURL = URL(string: "duck://newtab")!
-        let handler = DuckURLSchemeHandler()
         let webView = WKWebView()
         let schemeTask = MockSchemeTask(request: URLRequest(url: nativeURL))
 
@@ -93,6 +120,57 @@ final class DuckSchemeHandlerTests: XCTestCase {
         XCTAssertNotNil(configuration.urlSchemeHandler(forURLScheme: "duck"))
         XCTAssertTrue(configuration.urlSchemeHandler(forURLScheme: "duck") is DuckURLSchemeHandler)
     }
+
+    @MainActor
+    func testErrorPageSchemeHandlerSetsError() {
+        // Given
+        let urlString = "https://privacy-test-pages.site/security/badware/phishing.html"
+        let phishingUrl = URL(string: urlString)!
+        let encodedURL = URLTokenValidator.base64URLEncode(data: urlString.data(using: .utf8)!)
+        let token = URLTokenValidator.shared.generateToken(for: phishingUrl)
+        let errorURLString = "duck://error?reason=phishing&url=\(encodedURL)&token=\(token)"
+        let errorURL = URL(string: errorURLString)!
+        let webView = WKWebView()
+        let schemeTask = MockSchemeTask(request: URLRequest(url: errorURL))
+
+        // When
+        handler.webView(webView, start: schemeTask)
+
+        // Then
+        let error = PhishingDetectionError.detected
+        let expectedError = NSError(domain: PhishingDetectionError.errorDomain, code: error.errorCode, userInfo: [
+            NSURLErrorFailingURLErrorKey: phishingUrl,
+            NSLocalizedDescriptionKey: error.errorUserInfo[NSLocalizedDescriptionKey] ?? "Phishing detected"
+        ])
+        XCTAssertNotNil(schemeTask.error)
+        XCTAssertEqual(schemeTask.error! as NSError, expectedError)
+    }
+
+    @MainActor
+    func testErrorPageSchemeHandlerSetsError_WhenTokenInvalid() {
+        // Given
+        let urlString = "https://privacy-test-pages.site/security/badware/phishing.html"
+        let encodedURL = URLTokenValidator.base64URLEncode(data: urlString.data(using: .utf8)!)
+        let token = "ababababababababababab"
+        let errorURLString = "duck://error?reason=phishing&url=\(encodedURL)&token=\(token)"
+        let errorURL = URL(string: errorURLString)!
+        let webView = WKWebView()
+        let schemeTask = MockSchemeTask(request: URLRequest(url: errorURL))
+
+        // When
+        handler.webView(webView, start: schemeTask)
+
+        // Then
+        let error = WKError.unknown
+        let expectedError = NSError(domain: "Unexpected Error", code: error.rawValue, userInfo: [
+            NSURLErrorFailingURLErrorKey: "about:blank",
+            NSLocalizedDescriptionKey: "Unexpected Error"
+        ])
+        XCTAssertNotNil(schemeTask.error)
+        XCTAssertEqual(schemeTask.error! as NSError, expectedError)
+    }
+
+    @MainActor
 
     class MockWebView: WKWebView {
         var lastURLRequest: URLRequest?

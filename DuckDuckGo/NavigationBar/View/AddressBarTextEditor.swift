@@ -147,7 +147,30 @@ final class AddressBarTextEditor: NSTextView {
     // MARK: - Copy/Paste
 
     override func copy(_ sender: Any?) {
-        CopyHandler().copy(sender)
+        let selectedText = self.selectedText
+        guard !selectedText.isEmpty else {
+            super.copy(sender)
+            return
+        }
+
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(selectedText, forType: .string)
+
+        if let url = URL(trimmedAddressBarString: selectedText.trimmingWhitespace()) {
+            NSPasteboard.general.copy(url, withString: selectedText)
+        } else {
+            NSPasteboard.general.copy(selectedText)
+        }
+    }
+
+    override func cut(_ sender: Any?) {
+        guard !self.selectedText.isEmpty else {
+            super.cut(sender)
+            return
+        }
+
+        copy(sender)
+        self.delete(sender)
     }
 
     override func paste(_ sender: Any?) {
@@ -440,6 +463,19 @@ final class AddressBarTextEditor: NSTextView {
     private func scrollToSelectionEnd() {
         let endRange = NSRange(location: selectedRange.location + selectedRange.length, length: 0)
         self.scrollRangeToVisible(endRange)
+    }
+
+    override func draggingSession(_ session: NSDraggingSession, willBeginAt screenPoint: NSPoint) {
+        // add URL and Title to the dragging pasteboard
+        if let draggedString = session.draggingPasteboard.string(forType: .string),
+           let url = URL(trimmedAddressBarString: draggedString) {
+            session.draggingPasteboard.setString(url.absoluteString, forType: .URL)
+            // if the address matches currently loaded URL
+            if let title = addressBar?.tabCollectionViewModel.selectedTabViewModel?.title, !title.isEmpty,
+               addressBar?.tabCollectionViewModel.selectedTabViewModel?.tab.url == url {
+                session.draggingPasteboard.setString(title, forType: .urlName)
+            }
+        }
     }
 
 }

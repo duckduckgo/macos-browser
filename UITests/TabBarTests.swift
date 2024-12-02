@@ -18,7 +18,7 @@
 
 import XCTest
 
-class TabBarTests: XCTestCase {
+class TabBarTests: UITestCase {
     private var app: XCUIApplication!
 
     override func setUpWithError() throws {
@@ -29,6 +29,7 @@ class TabBarTests: XCTestCase {
     }
 
     override class func setUp() {
+        super.setUp()
         UITests.firstRun()
     }
 

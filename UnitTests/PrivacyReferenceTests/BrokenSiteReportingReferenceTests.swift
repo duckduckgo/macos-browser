@@ -63,11 +63,11 @@ final class BrokenSiteReportingReferenceTests: XCTestCase {
 
         for test in testData.reportURL.tests {
             if test.exceptPlatforms.contains(PrivacyReferenceTestHelper.privacyReferenceTestPlatformName) {
-                os_log("Skipping test, ignore platform for [%s]", type: .info, test.name)
+                Logger.general.debug("Skipping test, ignore platform for [\(test.name)]")
                 continue
             }
 
-            os_log("Testing [%s]", type: .info, test.name)
+            Logger.general.debug("Testing [\(test.name)]")
 
             var errors: [Error]?
             if let errs = test.errorDescriptions {
@@ -81,6 +81,7 @@ final class BrokenSiteReportingReferenceTests: XCTestCase {
                                             manufacturer: "Apple",
                                             upgradedHttps: test.wasUpgraded,
                                             tdsETag: test.blocklistVersion,
+                                            configVersion: test.remoteConfigVersion,
                                             blockedTrackerDomains: test.blockedTrackers,
                                             installedSurrogates: test.surrogates,
                                             isGPCEnabled: test.gpcEnabled ?? false,
@@ -165,6 +166,7 @@ private struct Test: Codable {
     let providedDescription: String?
     let blockedTrackers, surrogates: [String]
     let atb, blocklistVersion: String
+    let remoteConfigVersion: String?
     let expectReportURLPrefix: String
     let expectReportURLParams: [ExpectReportURLParam]
     let exceptPlatforms: [String]

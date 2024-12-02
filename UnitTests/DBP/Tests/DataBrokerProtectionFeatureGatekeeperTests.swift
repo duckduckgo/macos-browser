@@ -27,8 +27,8 @@ final class DataBrokerProtectionFeatureGatekeeperTests: XCTestCase {
     private var sut: DefaultDataBrokerProtectionFeatureGatekeeper!
     private var mockFeatureDisabler: MockFeatureDisabler!
     private var mockFeatureAvailability: MockFeatureAvailability!
-    private var waitlistStorage: MockWaitlistStorage!
     private var mockAccountManager: MockAccountManager!
+    private var mockFreemiumDBPUserStateManager: MockFreemiumDBPUserStateManager!
 
     private func userDefaults() -> UserDefaults {
         UserDefaults(suiteName: "testing_\(UUID().uuidString)")!
@@ -37,102 +37,20 @@ final class DataBrokerProtectionFeatureGatekeeperTests: XCTestCase {
     override func setUpWithError() throws {
         mockFeatureDisabler = MockFeatureDisabler()
         mockFeatureAvailability = MockFeatureAvailability()
-        waitlistStorage = MockWaitlistStorage()
         mockAccountManager = MockAccountManager()
+        mockFreemiumDBPUserStateManager = MockFreemiumDBPUserStateManager()
+        mockFreemiumDBPUserStateManager.didActivate = false
     }
 
-    /// Waitlist is OFF, Not redeemed
-    /// PP flag is OF
-    func testWhenWaitlistHasNoInviteCodeAndFeatureDisabled_thenCleanUpIsNotCalled() throws {
-        sut = DefaultDataBrokerProtectionFeatureGatekeeper(featureDisabler: mockFeatureDisabler,
-                                                           userDefaults: userDefaults(),
-                                                           waitlistStorage: waitlistStorage,
-                                                           subscriptionAvailability: mockFeatureAvailability,
-                                                           accountManager: mockAccountManager)
-
-        XCTAssertFalse(sut.cleanUpDBPForPrivacyProIfNecessary())
-        XCTAssertFalse(mockFeatureDisabler.disableAndDeleteWasCalled)
-    }
-
-    /// Waitlist is OFF, Not redeemed
-    /// PP flag is ON
-    func testWhenWaitlistHasNoInviteCodeAndFeatureEnabled_thenCleanUpIsNotCalled() throws {
-        mockFeatureAvailability.mockFeatureAvailable = true
-
-        sut = DefaultDataBrokerProtectionFeatureGatekeeper(featureDisabler: mockFeatureDisabler,
-                                                           userDefaults: userDefaults(),
-                                                           waitlistStorage: waitlistStorage,
-                                                           subscriptionAvailability: mockFeatureAvailability,
-                                                           accountManager: mockAccountManager)
-
-        XCTAssertFalse(sut.cleanUpDBPForPrivacyProIfNecessary())
-        XCTAssertFalse(mockFeatureDisabler.disableAndDeleteWasCalled)
-    }
-
-    /// Waitlist is ON, redeemed
-    /// PP flag is OFF
-    func testWhenWaitlistHasInviteCodeAndFeatureDisabled_thenCleanUpIsNotCalled() throws {
-        waitlistStorage.store(waitlistToken: "potato")
-        waitlistStorage.store(inviteCode: "banana")
-        waitlistStorage.store(waitlistTimestamp: 123)
-
-        sut = DefaultDataBrokerProtectionFeatureGatekeeper(featureDisabler: mockFeatureDisabler,
-                                                           userDefaults: userDefaults(),
-                                                           waitlistStorage: waitlistStorage,
-                                                           subscriptionAvailability: mockFeatureAvailability,
-                                                           accountManager: mockAccountManager)
-
-        XCTAssertFalse(sut.cleanUpDBPForPrivacyProIfNecessary())
-        XCTAssertFalse(mockFeatureDisabler.disableAndDeleteWasCalled)
-    }
-
-    /// Waitlist is ON, redeemed
-    /// PP flag is ON
-    func testWhenWaitlistHasInviteCodeAndFeatureEnabled_thenCleanUpIsCalled() throws {
-        waitlistStorage.store(waitlistToken: "potato")
-        waitlistStorage.store(inviteCode: "banana")
-        waitlistStorage.store(waitlistTimestamp: 123)
-        mockFeatureAvailability.mockFeatureAvailable = true
-
-        sut = DefaultDataBrokerProtectionFeatureGatekeeper(featureDisabler: mockFeatureDisabler,
-                                                           userDefaults: userDefaults(),
-                                                           waitlistStorage: waitlistStorage,
-                                                           subscriptionAvailability: mockFeatureAvailability,
-                                                           accountManager: mockAccountManager)
-
-        XCTAssertTrue(sut.cleanUpDBPForPrivacyProIfNecessary())
-        XCTAssertTrue(mockFeatureDisabler.disableAndDeleteWasCalled)
-    }
-
-    /// Waitlist is ON, redeemed
-    /// PP flag is ON
-    func testWhenWaitlistHasInviteCodeAndFeatureEnabled_thenCleanUpIsCalledTwice() throws {
-        waitlistStorage.store(waitlistToken: "potato")
-        waitlistStorage.store(inviteCode: "banana")
-        waitlistStorage.store(waitlistTimestamp: 123)
-        mockFeatureAvailability.mockFeatureAvailable = true
-
-        sut = DefaultDataBrokerProtectionFeatureGatekeeper(featureDisabler: mockFeatureDisabler,
-                                                           userDefaults: userDefaults(),
-                                                           waitlistStorage: waitlistStorage,
-                                                           subscriptionAvailability: mockFeatureAvailability,
-                                                           accountManager: mockAccountManager)
-
-        XCTAssertTrue(sut.cleanUpDBPForPrivacyProIfNecessary())
-        XCTAssertTrue(mockFeatureDisabler.disableAndDeleteWasCalled)
-
-        XCTAssertFalse(sut.cleanUpDBPForPrivacyProIfNecessary())
-    }
-
-    func testWhenNoAccessTokenIsFound_butEntitlementIs_thenFeatureIsDisabled() async {
+    func testWhenNoAccessTokenIsFound_butEntitlementIs_andIsNotActiveFreemiumUser_thenFeatureIsDisabled() async {
         // Given
         mockAccountManager.accessToken = nil
         mockAccountManager.hasEntitlementResult = .success(true)
         sut = DefaultDataBrokerProtectionFeatureGatekeeper(featureDisabler: mockFeatureDisabler,
                                                            userDefaults: userDefaults(),
-                                                           waitlistStorage: waitlistStorage,
                                                            subscriptionAvailability: mockFeatureAvailability,
-                                                           accountManager: mockAccountManager)
+                                                           accountManager: mockAccountManager,
+                                                           freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager)
 
         // When
         let result = await sut.arePrerequisitesSatisfied()
@@ -141,15 +59,16 @@ final class DataBrokerProtectionFeatureGatekeeperTests: XCTestCase {
         XCTAssertFalse(result)
     }
 
-    func testWhenAccessTokenIsFound_butNoEntitlementIs_thenFeatureIsDisabled() async {
+    func testWhenAccessTokenIsFound_butNoEntitlementIs_andIsNotActiveFreemiumUser_thenFeatureIsDisabled() async {
         // Given
         mockAccountManager.accessToken = "token"
         mockAccountManager.hasEntitlementResult = .failure(MockError.someError)
+        mockFreemiumDBPUserStateManager.didActivate = false
         sut = DefaultDataBrokerProtectionFeatureGatekeeper(featureDisabler: mockFeatureDisabler,
                                                            userDefaults: userDefaults(),
-                                                           waitlistStorage: waitlistStorage,
                                                            subscriptionAvailability: mockFeatureAvailability,
-                                                           accountManager: mockAccountManager)
+                                                           accountManager: mockAccountManager,
+                                                           freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager)
 
         // When
         let result = await sut.arePrerequisitesSatisfied()
@@ -158,15 +77,34 @@ final class DataBrokerProtectionFeatureGatekeeperTests: XCTestCase {
         XCTAssertFalse(result)
     }
 
-    func testWhenAccessTokenAndEntitlementAreNotFound_thenFeatureIsDisabled() async {
+    func testWhenAccessTokenIsFound_butNoEntitlementIs_andIsActiveFreemiumUser_thenFeatureIsDisabled() async {
+        // Given
+        mockAccountManager.accessToken = "token"
+        mockAccountManager.hasEntitlementResult = .failure(MockError.someError)
+        mockFreemiumDBPUserStateManager.didActivate = true
+        sut = DefaultDataBrokerProtectionFeatureGatekeeper(featureDisabler: mockFeatureDisabler,
+                                                           userDefaults: userDefaults(),
+                                                           subscriptionAvailability: mockFeatureAvailability,
+                                                           accountManager: mockAccountManager,
+                                                           freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager)
+
+        // When
+        let result = await sut.arePrerequisitesSatisfied()
+
+        // Then
+        XCTAssertFalse(result)
+    }
+
+    func testWhenAccessTokenAndEntitlementAreNotFound_andIsNotActiveFreemiumUser_thenFeatureIsDisabled() async {
         // Given
         mockAccountManager.accessToken = nil
         mockAccountManager.hasEntitlementResult = .failure(MockError.someError)
+        mockFreemiumDBPUserStateManager.didActivate = false
         sut = DefaultDataBrokerProtectionFeatureGatekeeper(featureDisabler: mockFeatureDisabler,
                                                            userDefaults: userDefaults(),
-                                                           waitlistStorage: waitlistStorage,
                                                            subscriptionAvailability: mockFeatureAvailability,
-                                                           accountManager: mockAccountManager)
+                                                           accountManager: mockAccountManager,
+                                                           freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager)
 
         // When
         let result = await sut.arePrerequisitesSatisfied()
@@ -175,15 +113,34 @@ final class DataBrokerProtectionFeatureGatekeeperTests: XCTestCase {
         XCTAssertFalse(result)
     }
 
-    func testWhenAccessTokenAndEntitlementAreFound_thenFeatureIsEnabled() async {
+    func testWhenAccessTokenAndEntitlementAreFound_andIsNotActiveFreemiumUser_thenFeatureIsEnabled() async {
         // Given
         mockAccountManager.accessToken = "token"
         mockAccountManager.hasEntitlementResult = .success(true)
+        mockFreemiumDBPUserStateManager.didActivate = false
         sut = DefaultDataBrokerProtectionFeatureGatekeeper(featureDisabler: mockFeatureDisabler,
                                                            userDefaults: userDefaults(),
-                                                           waitlistStorage: waitlistStorage,
                                                            subscriptionAvailability: mockFeatureAvailability,
-                                                           accountManager: mockAccountManager)
+                                                           accountManager: mockAccountManager,
+                                                           freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager)
+
+        // When
+        let result = await sut.arePrerequisitesSatisfied()
+
+        // Then
+        XCTAssertTrue(result)
+    }
+
+    func testWhenAccessTokenAndEntitlementAreNotFound_andIsActiveFreemiumUser_thenFeatureIsEnabled() async {
+        // Given
+        mockAccountManager.accessToken = nil
+        mockAccountManager.hasEntitlementResult = .failure(MockError.someError)
+        mockFreemiumDBPUserStateManager.didActivate = true
+        sut = DefaultDataBrokerProtectionFeatureGatekeeper(featureDisabler: mockFeatureDisabler,
+                                                           userDefaults: userDefaults(),
+                                                           subscriptionAvailability: mockFeatureAvailability,
+                                                           accountManager: mockAccountManager,
+                                                           freemiumDBPUserStateManager: mockFreemiumDBPUserStateManager)
 
         // When
         let result = await sut.arePrerequisitesSatisfied()
@@ -197,27 +154,18 @@ private enum MockError: Error {
     case someError
 }
 
-private class MockFeatureDisabler: DataBrokerProtectionFeatureDisabling {
-    var disableAndDeleteWasCalled = false
-
-    func disableAndDelete() {
-        disableAndDeleteWasCalled = true
-    }
-
-    func reset() {
-        disableAndDeleteWasCalled = false
-    }
-}
-
 private class MockFeatureAvailability: SubscriptionFeatureAvailability {
     var mockFeatureAvailable: Bool = false
     var mockSubscriptionPurchaseAllowed: Bool = false
+    var mockUsesUnifiedFeedbackForm: Bool = false
 
     var isFeatureAvailable: Bool { mockFeatureAvailable }
     var isSubscriptionPurchaseAllowed: Bool { mockSubscriptionPurchaseAllowed }
+    var usesUnifiedFeedbackForm: Bool { mockUsesUnifiedFeedbackForm }
 
     func reset() {
         mockFeatureAvailable = false
         mockSubscriptionPurchaseAllowed = false
+        mockUsesUnifiedFeedbackForm = false
     }
 }

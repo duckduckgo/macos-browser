@@ -1,9 +1,10 @@
 {
   "name": "PeopleWhizr.net",
   "url": "peoplewhizr.net",
-  "version": "0.2.0",
+  "version": "0.4.0",
   "parent": "peoplewhiz.com",
   "addedDatetime": 1709445600000,
+  "optOutUrl": "https://peoplewhizr.net/optout",
   "steps": [
     {
       "stepType": "scan",
@@ -50,6 +51,7 @@
   "schedulingConfig": {
     "retryError": 48,
     "confirmOptOutScan": 72,
-    "maintenanceScan": 240
+    "maintenanceScan": 120,
+    "maxAttempts": -1
   }
 }

@@ -18,11 +18,13 @@
 
 import Foundation
 import Common
+import os.log
 
 struct DataBrokerScheduleConfig: Codable {
     let retryError: Int
     let confirmOptOutScan: Int
     let maintenanceScan: Int
+    let maxAttempts: Int
 }
 
 extension Int {
@@ -84,6 +86,20 @@ extension MirrorSite {
     func scannedBroker(withStatus status: ScannedBroker.Status) -> ScannedBroker {
         ScannedBroker(name: name, url: url, status: status)
     }
+
+    /// Determines whether a mirror site should be included in scan result calculations based on the provided date.
+    ///
+    /// - Parameter date: The date for which to check if the mirror site should be included. Defaults to the current date.
+    /// - Returns: A Boolean value indicating whether the mirror site should be included.
+    ///   - `true`: If the profile was added before the given date and has not been removed, or if it was removed but the provided date is between the `addedAt` and `removedAt` timestamps.
+    ///   - `false`: If the profile was either added after the given date or has been removed before the given date.
+    func shouldWeIncludeMirrorSite(for date: Date = Date()) -> Bool {
+        if let removedAt = self.removedAt {
+            return self.addedAt < date && date < removedAt
+        } else {
+            return self.addedAt < date
+        }
+    }
 }
 
 public enum DataBrokerHierarchy: Int {
@@ -91,7 +107,7 @@ public enum DataBrokerHierarchy: Int {
     case child = 0
 }
 
-struct DataBroker: Codable, Sendable {
+public struct DataBroker: Codable, Sendable {
     let id: Int64?
     let name: String
     let url: String
@@ -100,6 +116,7 @@ struct DataBroker: Codable, Sendable {
     let schedulingConfig: DataBrokerScheduleConfig
     let parent: String?
     let mirrorSites: [MirrorSite]
+    let optOutUrl: String
 
     var isFakeBroker: Bool {
         name.contains("fake") // A future improvement will be to add a property in the JSON file.
@@ -113,6 +130,7 @@ struct DataBroker: Codable, Sendable {
         case schedulingConfig
         case parent
         case mirrorSites
+        case optOutUrl
     }
 
     init(id: Int64? = nil,
@@ -122,7 +140,8 @@ struct DataBroker: Codable, Sendable {
          version: String,
          schedulingConfig: DataBrokerScheduleConfig,
          parent: String? = nil,
-         mirrorSites: [MirrorSite] = [MirrorSite]()
+         mirrorSites: [MirrorSite] = [MirrorSite](),
+         optOutUrl: String
     ) {
         self.id = id
         self.name = name
@@ -138,9 +157,10 @@ struct DataBroker: Codable, Sendable {
         self.schedulingConfig = schedulingConfig
         self.parent = parent
         self.mirrorSites = mirrorSites
+        self.optOutUrl = optOutUrl
     }
 
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         name = try container.decode(String.self, forKey: .name)
 
@@ -163,6 +183,8 @@ struct DataBroker: Codable, Sendable {
         } catch {
             mirrorSites = [MirrorSite]()
         }
+
+        optOutUrl = (try? container.decode(String.self, forKey: .optOutUrl)) ?? ""
 
         id = nil
     }
@@ -198,7 +220,7 @@ struct DataBroker: Codable, Sendable {
             let broker = try jsonDecoder.decode(DataBroker.self, from: data)
             return broker
         } catch {
-            os_log("DataBroker error: initFromResource, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("DataBroker error: initFromResource, error: \(error.localizedDescription, privacy: .public)")
             throw error
         }
     }
@@ -206,11 +228,11 @@ struct DataBroker: Codable, Sendable {
 
 extension DataBroker: Hashable {
 
-    func hash(into hasher: inout Hasher) {
+    public func hash(into hasher: inout Hasher) {
         hasher.combine(name)
     }
 
-    static func == (lhs: DataBroker, rhs: DataBroker) -> Bool {
+    public static func == (lhs: DataBroker, rhs: DataBroker) -> Bool {
         return lhs.name == rhs.name
     }
 }

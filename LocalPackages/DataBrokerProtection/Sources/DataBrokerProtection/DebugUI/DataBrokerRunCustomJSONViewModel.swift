@@ -21,6 +21,7 @@ import BrowserServicesKit
 import Common
 import ContentScopeScripts
 import Combine
+import os.log
 
 struct ExtractedAddress: Codable {
     let state: String
@@ -154,7 +155,7 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
     private let authenticationManager: DataBrokerProtectionAuthenticationManaging
 
     init(authenticationManager: DataBrokerProtectionAuthenticationManaging) {
-        let privacyConfigurationManager = PrivacyConfigurationManagingMock()
+        let privacyConfigurationManager = DBPPrivacyConfigurationManager()
         let features = ContentScopeFeatureToggles(emailProtection: false,
                                                   emailProtectionIncontextSignup: false,
                                                   credentialsAutofill: false,
@@ -163,12 +164,15 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
                                                   credentialsSaving: false,
                                                   passwordGeneration: false,
                                                   inlineIconCredentials: false,
-                                                  thirdPartyCredentialsProvider: false)
+                                                  thirdPartyCredentialsProvider: false,
+                                                  unknownUsernameCategorization: false)
 
         let sessionKey = UUID().uuidString
+        let messageSecret = UUID().uuidString
         self.authenticationManager = authenticationManager
         let contentScopeProperties = ContentScopeProperties(gpcEnabled: false,
                                                             sessionKey: sessionKey,
+                                                            messageSecret: messageSecret,
                                                             featureToggles: features)
 
         self.runnerProvider = DataBrokerJobRunnerProvider(
@@ -335,10 +339,10 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
                 let fileURL = URL(fileURLWithPath: "\(path)/\(fileName)")
                 try csv.write(to: fileURL, atomically: true, encoding: .utf8)
             } else {
-                os_log("Error getting path")
+                Logger.dataBrokerProtection.debug("Error getting path")
             }
         } catch {
-            os_log("Error writing to file: \(error)")
+            Logger.dataBrokerProtection.error("Error writing to file: \(error)")
         }
     }
 

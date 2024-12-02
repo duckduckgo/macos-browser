@@ -113,16 +113,16 @@ class MockTabViewItemDelegate: TabBarViewItemDelegate {
 
     }
 
-    func tabBarViewItemAudioState(_ tabBarViewItem: TabBarViewItem) -> WKWebView.AudioState? {
-        return audioState
-    }
-
     func tabBarViewItemMuteUnmuteSite(_ tabBarViewItem: TabBarViewItem) {
 
     }
 
     func otherTabBarViewItemsState(for tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) -> DuckDuckGo_Privacy_Browser.OtherTabBarViewItemsState {
         OtherTabBarViewItemsState(hasItemsToTheLeft: hasItemsToTheLeft, hasItemsToTheRight: hasItemsToTheRight)
+    }
+
+    func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, replaceContentWithDroppedStringValue: String) {
+
     }
 
     func clear() {

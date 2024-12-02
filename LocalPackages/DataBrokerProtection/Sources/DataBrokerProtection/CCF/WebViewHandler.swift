@@ -21,6 +21,7 @@ import WebKit
 import BrowserServicesKit
 import UserScript
 import Common
+import os.log
 
 protocol WebViewHandler: NSObject {
     func initializeWebView(showWebView: Bool) async
@@ -44,6 +45,8 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
 
     private var webView: WebView?
     private var window: NSWindow?
+
+    private var timer: Timer?
 
     init(privacyConfig: PrivacyConfigurationManaging, prefs: ContentScopeProperties, delegate: CCFCommunicationDelegate, isFakeBroker: Bool = false) {
         let configuration = WKWebViewConfiguration()
@@ -77,12 +80,14 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
             window?.makeKeyAndOrderFront(nil)
         }
 
+        installTimer()
+
         try? await load(url: URL(string: "\(WebViewSchemeHandler.dataBrokerProtectionScheme)://blank")!)
     }
 
     func load(url: URL) async throws {
         webView?.load(url)
-        os_log("Loading URL: %@", log: .action, String(describing: url.absoluteString))
+        Logger.action.debug("Loading URL: \(String(describing: url.absoluteString))")
         try await waitForWebViewLoad()
     }
 
@@ -93,12 +98,14 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
     }
 
     func finish() {
-        os_log("WebViewHandler finished", log: .action)
+        Logger.action.debug("WebViewHandler finished")
         webView?.stopLoading()
         userContentController?.cleanUpBeforeClosing()
         WKWebsiteDataStore.default().removeData(ofTypes: [WKWebsiteDataTypeDiskCache, WKWebsiteDataTypeMemoryCache], modifiedSince: Date(timeIntervalSince1970: 0)) {
-            os_log("WKWebView data store deleted correctly", log: .action)
+            Logger.action.debug("WKWebView data store deleted correctly")
         }
+
+        stopTimer()
 
         webViewConfiguration = nil
         userContentController = nil
@@ -107,7 +114,7 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
     }
 
     deinit {
-        os_log("WebViewHandler Deinit", log: .action)
+        Logger.action.debug("WebViewHandler Deinit")
     }
 
     func waitForWebViewLoad() async throws {
@@ -117,7 +124,7 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
     }
 
     func execute(action: Action, data: CCFRequestData) {
-        os_log("Executing action: %{public}@", log: .action, String(describing: action.actionType.rawValue))
+        Logger.action.debug("Executing action: \(String(describing: action.actionType.rawValue), privacy: .public)")
 
         userContentController?.dataBrokerUserScripts?.dataBrokerFeature.pushAction(
             method: .onActionReceived,
@@ -154,7 +161,7 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
             try htmlString.write(to: fileURL, atomically: true, encoding: .utf8)
             print("HTML content saved to file: \(fileURL)")
         } catch {
-            os_log(.error, "Error writing HTML content to file: \(error)")
+            Logger.action.error("Error writing HTML content to file: \(error)")
         }
     }
 
@@ -192,6 +199,24 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
             print("Error png data was not respresented")
         }
     }
+
+    /// Workaround for stuck scans
+    /// https://app.asana.com/0/0/1208502720748038/1208596554608118/f
+
+    private func installTimer() {
+        stopTimer()
+        timer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { _ in
+            Task {
+                try await self.webView?.evaluateJavaScript("1+1") as Void?
+            }
+        }
+    }
+
+    private func stopTimer() {
+        timer?.invalidate()
+        timer = nil
+    }
+
 }
 
 extension DataBrokerProtectionWebViewHandler: WKNavigationDelegate {
@@ -200,20 +225,20 @@ extension DataBrokerProtectionWebViewHandler: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        os_log("WebViewHandler didFinish", log: .action)
+        Logger.action.debug("WebViewHandler didFinish")
 
         self.activeContinuation?.resume()
         self.activeContinuation = nil
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        os_log("WebViewHandler didFail: %{public}@", log: .action, String(describing: error.localizedDescription))
+        Logger.action.error("WebViewHandler didFail: \(error.localizedDescription, privacy: .public)")
         self.activeContinuation?.resume(throwing: error)
         self.activeContinuation = nil
     }
 
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-        os_log("WebViewHandler didFailProvisionalNavigation: %{public}@", log: .action, String(describing: error.localizedDescription))
+        Logger.action.error("WebViewHandler didFailProvisionalNavigation: \(error.localizedDescription, privacy: .public)")
         self.activeContinuation?.resume(throwing: error)
         self.activeContinuation = nil
     }
@@ -225,7 +250,7 @@ extension DataBrokerProtectionWebViewHandler: WKNavigationDelegate {
         }
 
         if statusCode >= 400 {
-            os_log("WebViewHandler failed with status code: %{public}@", log: .action, String(describing: statusCode))
+            Logger.action.debug("WebViewHandler failed with status code: \(String(describing: statusCode), privacy: .public)")
             self.activeContinuation?.resume(throwing: DataBrokerProtectionError.httpError(code: statusCode))
             self.activeContinuation = nil
         }
@@ -264,6 +289,6 @@ private class WebView: WKWebView {
 
     deinit {
         configuration.userContentController.removeAllUserScripts()
-        os_log("DBP WebView Deinit", log: .action)
+        Logger.action.debug("DBP WebView Deinit")
     }
 }

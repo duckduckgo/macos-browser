@@ -95,6 +95,7 @@ private extension Tab.TabContent {
         case subscription = 7
         case identityTheftRestoration = 8
         case onboarding = 9
+        case releaseNotes = 10
     }
 
     init?(type: ContentType, url: URL?, videoID: String?, timestamp: String?, preferencePane: PreferencePaneIdentifier?) {
@@ -121,6 +122,8 @@ private extension Tab.TabContent {
         case .identityTheftRestoration:
             guard let url = url else { return nil }
             self = .identityTheftRestoration(url)
+        case .releaseNotes:
+            self = .releaseNotes
         case .onboarding:
             self = .onboarding
         }
@@ -138,6 +141,7 @@ private extension Tab.TabContent {
         case .dataBrokerProtection: return .dataBrokerProtection
         case .subscription: return .subscription
         case .identityTheftRestoration: return .identityTheftRestoration
+        case .releaseNotes: return .releaseNotes
         }
     }
 

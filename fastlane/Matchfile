@@ -3,6 +3,8 @@ git_url "git@github.com:duckduckgo/Apple-certificates.git"
 git_branch "macos"
 platform "macos"
 
+generate_apple_certs false
+
 type "appstore"
 app_identifier [
     "com.duckduckgo.mobile.ios",
@@ -15,9 +17,53 @@ app_identifier [
     "com.duckduckgo.mobile.ios.vpn.agent.review.proxy",
     "com.duckduckgo.mobile.ios.DBP.backgroundAgent.review",
     "com.duckduckgo.mobile.ios.DBP.backgroundAgent"
-
 ]
 additional_cert_types ["mac_installer_distribution"]
-generate_apple_certs false
+
+for_lane :sync_signing_dmg_release do
+    type "developer_id"
+    app_identifier [
+        "com.duckduckgo.macos.browser",
+        "com.duckduckgo.macos.vpn.network-extension",
+        "HKE973VLUW.com.duckduckgo.macos.browser.network-protection.notifications",
+        "com.duckduckgo.macos.vpn",
+        "com.duckduckgo.macos.DBP.backgroundAgent"
+    ]
+    additional_cert_types []
+end
+
+for_lane :sync_signing_dmg_review do
+    type "developer_id"
+    app_identifier [
+        "com.duckduckgo.macos.browser.review",
+        "com.duckduckgo.macos.vpn.network-extension.review",
+        "HKE973VLUW.com.duckduckgo.macos.browser.network-protection.notifications.review",
+        "com.duckduckgo.macos.vpn.review",
+        "com.duckduckgo.macos.DBP.backgroundAgent.review"
+    ]
+    additional_cert_types []
+end
+
+
+for_lane :sync_signing_ci do
+    type "developer_id"
+    app_identifier [
+        "com.duckduckgo.macos.browser.debug",
+        "com.duckduckgo.mobile.ios.debug",
+        "com.duckduckgo.macos.browser.DuckDuckGoTests",
+        "com.duckduckgo.Integration-Tests",
+        "com.duckduckgo.mobile.ios.DuckDuckGoTests",
+        "com.duckduckgo.mobile.ios.Integration-Tests",
+        "com.duckduckgo.mobile.ios.vpn.agent.debug.network-protection-extension",
+        "com.duckduckgo.mobile.ios.vpn.agent.debug.proxy",
+        "HKE973VLUW.com.duckduckgo.macos.browser.network-protection.notifications.debug",
+        "com.duckduckgo.macos.vpn.debug",
+        "com.duckduckgo.mobile.ios.vpn.agent.debug",
+        "com.duckduckgo.macos.DBP.backgroundAgent.debug",
+        "com.duckduckgo.mobile.ios.DBP.backgroundAgent.debug",
+        "com.duckduckgo.DBPE2ETests"
+    ]
+    additional_cert_types []
+end
 
 # The docs are available on https://docs.fastlane.tools/actions/match

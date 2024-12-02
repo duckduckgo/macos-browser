@@ -53,17 +53,37 @@ enum DuckPlayerMode: Equatable, Codable {
 }
 
 /// Values that the Frontend can use to determine the current state.
-struct InitialSetupSettings: Codable {
+struct InitialPlayerSettings: Codable {
     struct PlayerSettings: Codable {
         let pip: PIP
         let autoplay: Autoplay
+        let focusMode: FocusMode
     }
 
     struct PIP: Codable {
         let state: State
     }
 
+    struct Platform: Codable {
+        let name: String
+    }
+
+    enum Locale: String, Codable {
+        case en
+    }
+
     struct Autoplay: Codable {
+        let state: State
+    }
+
+    /// Represents the current focus mode of the player.
+    ///
+    /// Focus mode determines whether the bottom toolbar should be visible or hidden.
+    /// When focus mode is enabled, the toolbar will auto-hide after a few seconds.
+    /// When focus mode is disabled, the toolbar will always be visible and the background wallpaper will be slightly brighter.
+    ///
+    /// Default should be enabled.
+    struct FocusMode: Codable {
         let state: State
     }
 
@@ -72,8 +92,22 @@ struct InitialSetupSettings: Codable {
         case disabled
     }
 
+    enum Environment: String, Codable {
+        case development
+        case production
+    }
+
     let userValues: UserValues
     let settings: PlayerSettings
+    let platform: Platform
+    let environment: Environment
+    let locale: Locale
+
+}
+
+struct InitialOverlaySettings: Codable {
+    let userValues: UserValues
+    let ui: UIUserValues
 }
 
 // Values that the YouTube Overlays can use to determine the current state
@@ -89,6 +123,17 @@ public struct UserValues: Codable {
     }
     let duckPlayerMode: DuckPlayerMode
     let overlayInteracted: Bool
+}
+
+public struct UIUserValues: Codable {
+    /// If this value is true, we force the FE layer to play in duck player even if the settings is off
+    let playInDuckPlayer: Bool
+    let allowFirstVideo: Bool
+
+    init(onboardingDecider: DuckPlayerOnboardingDecider, allowFirstVideo: Bool = false) {
+        self.playInDuckPlayer = onboardingDecider.shouldOpenFirstVideoOnDuckPlayer
+        self.allowFirstVideo = allowFirstVideo
+    }
 }
 
 final class DuckPlayer {
@@ -119,14 +164,20 @@ final class DuckPlayer {
         preferences.youtubeOverlayInteracted
     }
 
+    var shouldDisplayPreferencesSideBar: Bool {
+        isAvailable || preferences.shouldDisplayContingencyMessage
+    }
+
     init(
         preferences: DuckPlayerPreferences = .shared,
-        privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager
+        privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
+        onboardingDecider: DuckPlayerOnboardingDecider = DefaultDuckPlayerOnboardingDecider()
     ) {
         self.preferences = preferences
         isFeatureEnabled = privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .duckPlayer)
         isPiPFeatureEnabled = privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DuckPlayerSubfeature.pip)
         isAutoplayFeatureEnabled = privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DuckPlayerSubfeature.autoplay)
+        self.onboardingDecider = onboardingDecider
 
         mode = preferences.duckPlayerMode
         bindDuckPlayerModeIfNeeded()
@@ -177,7 +228,7 @@ final class DuckPlayer {
                 // If user checks "Remember my choice" and clicks "Watch here", we won't show
                 // the overlay anymore, but will keep presenting Dax logos (the mode stays at
                 // "alwaysAsk" which may be a bit counterintuitive, but it's the overlayInteracted
-                // flag that plays a role here). We want to track users opting in to not showing overlays,
+                // flag that plays a role here). We want to anonymously track users opting in to not showing overlays,
                 // hence firing the pixel here.
                 if userValues.duckPlayerMode == .alwaysAsk {
                     switch origin {
@@ -199,9 +250,15 @@ final class DuckPlayer {
         encodeUserValues()
     }
 
-    public func initialSetup(with webView: WKWebView?) -> (_ params: Any, _ message: UserScriptMessage) async -> Encodable? {
+    public func initialPlayerSetup(with webView: WKWebView?) -> (_ params: Any, _ message: UserScriptMessage) async -> Encodable? {
         return { _, _ in
-            return await self.encodedSettings(with: webView)
+            return await self.encodedPlayerSettings(with: webView)
+        }
+    }
+
+    public func initialOverlaySetup(with webView: WKWebView?) -> (_ params: Any, _ message: UserScriptMessage) async -> Encodable? {
+        return { _, _ in
+            return await self.encodedOverlaySettings(with: webView)
         }
     }
 
@@ -213,10 +270,16 @@ final class DuckPlayer {
     }
 
     @MainActor
-    private func encodedSettings(with webView: WKWebView?) async -> InitialSetupSettings {
+    private func encodedPlayerSettings(with webView: WKWebView?) async -> InitialPlayerSettings {
         var isPiPEnabled = webView?.configuration.preferences[.allowsPictureInPictureMediaPlayback] == true
 
-        let isAutoplayEnabled = isAutoplayFeatureEnabled && DuckPlayerPreferences.shared.duckPlayerAutoplay
+        var isAutoplayEnabled = DuckPlayerPreferences.shared.duckPlayerAutoplay
+
+        /// If the feature flag is disabled, we want to turn autoPlay to false
+        /// https://app.asana.com/0/1204167627774280/1207906550241281/f
+        if !isAutoplayFeatureEnabled {
+            isAutoplayEnabled = false
+        }
 
         // Disable WebView PiP if if the subFeature is off
         if !isPiPFeatureEnabled {
@@ -224,13 +287,41 @@ final class DuckPlayer {
             isPiPEnabled = false
         }
 
-        let pip = InitialSetupSettings.PIP(state: isPiPEnabled ? .enabled : .disabled)
-        let autoplay = InitialSetupSettings.Autoplay(state: isAutoplayEnabled ? .enabled : .disabled)
-
-        let playerSettings = InitialSetupSettings.PlayerSettings(pip: pip, autoplay: autoplay)
+        let pip = InitialPlayerSettings.PIP(state: isPiPEnabled ? .enabled : .disabled)
+        let autoplay = InitialPlayerSettings.Autoplay(state: isAutoplayEnabled ? .enabled : .disabled)
+        let platform = InitialPlayerSettings.Platform(name: "macos")
+        let environment = InitialPlayerSettings.Environment.development
+        let locale = InitialPlayerSettings.Locale.en
+        let focusMode = InitialPlayerSettings.FocusMode(state: onboardingDecider.shouldOpenFirstVideoOnDuckPlayer ? .disabled : .enabled)
+        let playerSettings = InitialPlayerSettings.PlayerSettings(pip: pip, autoplay: autoplay, focusMode: focusMode)
         let userValues = encodeUserValues()
 
-        return InitialSetupSettings(userValues: userValues, settings: playerSettings)
+        /// Since the FE is requesting player-encoded values, we can assume that the first player video setup is complete from the onboarding point of view.
+        onboardingDecider.setFirstVideoInDuckPlayerAsDone()
+
+        return InitialPlayerSettings(userValues: userValues,
+                                     settings: playerSettings,
+                                     platform: platform,
+                                     environment: environment,
+                                     locale: locale)
+    }
+
+    @MainActor
+    private func encodedOverlaySettings(with webView: WKWebView?) async -> InitialOverlaySettings {
+        let userValues = encodeUserValues()
+
+        /// If the user clicked on "Watch on Youtube" the next vide should open directly on youtube instead of displaying the overlay
+        let allowFirstVideo = shouldOpenNextVideoOnYoutube
+
+        /// Reset the flag for subsequent videos
+        shouldOpenNextVideoOnYoutube = false
+        return InitialOverlaySettings(userValues: userValues,
+                                      ui: UIUserValues(onboardingDecider: onboardingDecider,
+                                                       allowFirstVideo: allowFirstVideo))
+    }
+
+    public func setNextVideoToOpenOnYoutube() {
+        self.shouldOpenNextVideoOnYoutube = true
     }
 
     // MARK: - Private
@@ -247,6 +338,8 @@ final class DuckPlayer {
     private var isFeatureEnabledCancellable: AnyCancellable?
     private var isPiPFeatureEnabled: Bool
     private var isAutoplayFeatureEnabled: Bool
+    private let onboardingDecider: DuckPlayerOnboardingDecider
+    private var shouldOpenNextVideoOnYoutube: Bool = false
 
     private func bindDuckPlayerModeIfNeeded() {
         if isFeatureEnabled {
@@ -323,15 +416,18 @@ final class DuckPlayerPreferencesPersistorMock: DuckPlayerPreferencesPersistor {
     var youtubeOverlayInteracted: Bool
     var youtubeOverlayAnyButtonPressed: Bool
     var duckPlayerAutoplay: Bool
+    var duckPlayerOpenInNewTab: Bool
 
     init(duckPlayerMode: DuckPlayerMode = .alwaysAsk,
          youtubeOverlayInteracted: Bool = false,
          youtubeOverlayAnyButtonPressed: Bool = false,
-         duckPlayerAutoplay: Bool = false) {
+         duckPlayerAutoplay: Bool = false,
+         duckPlayerOpenInNewTab: Bool = false) {
         self.duckPlayerModeBool = duckPlayerMode.boolValue
         self.youtubeOverlayInteracted = youtubeOverlayInteracted
         self.youtubeOverlayAnyButtonPressed = youtubeOverlayAnyButtonPressed
         self.duckPlayerAutoplay = duckPlayerAutoplay
+        self.duckPlayerOpenInNewTab = duckPlayerOpenInNewTab
     }
 }
 

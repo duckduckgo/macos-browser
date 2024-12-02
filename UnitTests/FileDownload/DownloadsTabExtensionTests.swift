@@ -22,7 +22,6 @@ import UniformTypeIdentifiers
 
 @testable import DuckDuckGo_Privacy_Browser
 
-@MainActor
 final class DownloadsTabExtensionTests: XCTestCase {
     private var testData: Data!
     private var testOriginatingURL: URL!

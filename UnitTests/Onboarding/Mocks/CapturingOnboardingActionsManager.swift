@@ -21,7 +21,14 @@ import Foundation
 
 class CapturingOnboardingActionsManager: OnboardingActionsManaging {
 
-    var configuration: OnboardingConfiguration = OnboardingConfiguration(stepDefinitions: StepDefinitions(systemSettings: SystemSettings(rows: [])), env: "environment", locale: "en")
+    var configuration: OnboardingConfiguration = OnboardingConfiguration(
+        stepDefinitions: StepDefinitions(systemSettings: SystemSettings(rows: [])),
+        exclude: [],
+        order: "",
+        env: "environment",
+        locale: "en",
+        platform: .init(name: "")
+    )
 
     var goToAddressBarCalled = false
     var goToSettingsCalled = false
@@ -55,8 +62,9 @@ class CapturingOnboardingActionsManager: OnboardingActionsManaging {
         addToDockCalled = true
     }
 
-    func importData() {
+    func importData() async -> Bool {
         importDataCalled = true
+        return true
     }
 
     func setAsDefault() {

@@ -23,6 +23,7 @@ import PixelKit
 import Persistence
 import Combine
 import SyncDataProviders
+import os.log
 
 /// The SyncErrorHandling protocol defines methods for handling sync errors related to specific data types such as bookmarks and credentials.
 protocol SyncErrorHandling {
@@ -87,11 +88,24 @@ public class SyncErrorHandler: EventMapping<SyncError>, ObservableObject {
 
     let alertPresenter: SyncAlertsPresenting
 
+    static var errorHandlerMapping: Mapping {
+        return { event, _, _, _ in
+            switch event {
+            case .failedToReadSecureStore:
+                PixelKit.fire(DebugEvent(GeneralPixel.syncSecureStorageReadError(error: event), error: event))
+            case .failedToDecodeSecureStoreData(let error):
+                PixelKit.fire(DebugEvent(GeneralPixel.syncSecureStorageDecodingError(error: error), error: error))
+            case .accountRemoved(let reason):
+                PixelKit.fire(DebugEvent(GeneralPixel.syncAccountRemoved(reason: reason.rawValue), error: event))
+            default:
+                PixelKit.fire(DebugEvent(GeneralPixel.syncSentUnauthenticatedRequest, error: event))
+            }
+        }
+    }
+
     public init(alertPresenter: SyncAlertsPresenting = SyncAlertsPresenter()) {
         self.alertPresenter = alertPresenter
-        super.init { event, _, _, _ in
-            PixelKit.fire(DebugEvent(GeneralPixel.syncSentUnauthenticatedRequest, error: event))
-        }
+        super.init(mapping: Self.errorHandlerMapping)
     }
 
     override init(mapping: @escaping EventMapping<SyncError>.Mapping) {
@@ -252,7 +266,7 @@ extension SyncErrorHandler: SyncErrorHandling {
                 PixelKit.fire(DebugEvent(modelType.syncFailedPixel, error: error), withAdditionalParameters: params)
             }
             let modelTypeString = modelType.rawValue.capitalized
-            os_log(.error, log: OSLog.sync, "%{public}@ Sync error: %{public}s", modelTypeString, String(reflecting: error))
+            Logger.sync.error("\(modelTypeString, privacy: .public) Sync error: \(String(reflecting: error), privacy: .public)")
         }
     }
 
