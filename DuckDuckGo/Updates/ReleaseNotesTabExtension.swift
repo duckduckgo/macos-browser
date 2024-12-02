@@ -105,11 +105,11 @@ final class ReleaseNotesTabExtension: NavigationResponder {
 
     @MainActor
     func navigationDidFinish(_ navigation: Navigation) {
-#if !DEBUG
+//#if !DEBUG
         guard NSApp.runType != .uiTests, navigation.url.isReleaseNotesScheme else { return }
         let updateController = Application.appDelegate.updateController!
         updateController.checkForUpdateIfNeeded()
-#endif
+//#endif
     }
 }
 
