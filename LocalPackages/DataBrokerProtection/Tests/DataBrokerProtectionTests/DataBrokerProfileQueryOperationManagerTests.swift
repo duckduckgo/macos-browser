@@ -832,7 +832,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: mockDatabase.lastPreferredRunDateOnScan, date2: Date().addingTimeInterval(schedulingConfig.confirmOptOutScan.hoursToSeconds)))
     }
 
-    func testWhenUpdatingDatesAndLastEventIsOptOutRequested_thenWeSetOptOutPreferredRunDateToDistantFuture() throws {
+    func testWhenUpdatingDatesAndLastEventIsOptOutRequested_thenWeSetOptOutPreferredRunDateToMaintenance() throws {
         let brokerId: Int64 = 1
         let profileQueryId: Int64 = 1
         let extractedProfileId: Int64 = 1
@@ -842,7 +842,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
         try sut.updateOperationDataDates(origin: .scan, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId, schedulingConfig: schedulingConfig, database: mockDatabase)
 
         XCTAssertTrue(mockDatabase.wasUpdatedPreferredRunDateForScanCalled)
-        XCTAssertTrue(mockDatabase.lastPreferredRunDateOnOptOut!.isInDistantFuture())
+        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: mockDatabase.lastPreferredRunDateOnOptOut, date2: Date().addingTimeInterval(schedulingConfig.maintenanceScan.hoursToSeconds)))
     }
 
     func testWhenUpdatingDatesAndLastEventIsMatchesFound_thenWeSetScanPreferredDateToMaintanence() throws {
@@ -911,7 +911,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
         XCTAssertFalse(mockDatabase.wasUpdatedPreferredRunDateForScanCalled)
 
         XCTAssertTrue(mockDatabase.wasUpdatedPreferredRunDateForOptOutCalled)
-        XCTAssertTrue(mockDatabase.lastPreferredRunDateOnOptOut!.isInDistantFuture())
+        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: mockDatabase.lastPreferredRunDateOnOptOut, date2: Date().addingTimeInterval(config.maintenanceScan.hoursToSeconds)))
     }
 
     func testUpdatingScanDateFromScan_thenScanDoesNotRespectMostRecentDate() throws {
@@ -938,7 +938,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: mockDatabase.lastPreferredRunDateOnScan, date2: expectedPreferredRunDate), "\(String(describing: mockDatabase.lastPreferredRunDateOnScan)) is not equal to \(expectedPreferredRunDate)")
 
         XCTAssertTrue(mockDatabase.wasUpdatedPreferredRunDateForOptOutCalled)
-        XCTAssertTrue(mockDatabase.lastPreferredRunDateOnOptOut!.isInDistantFuture())
+        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: mockDatabase.lastPreferredRunDateOnOptOut, date2: Date().addingTimeInterval(config.maintenanceScan.hoursToSeconds)))
     }
 }
 
