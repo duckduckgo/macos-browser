@@ -1,7 +1,585 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "" : {
 
+    },
+    "Change Your Location" : {
+
+    },
+    "Connect Automatically" : {
+
+    },
+    "Connect to any of our servers worldwide to customize the VPN location." : {
+
+    },
+    "Enable" : {
+
+    },
+    "Exclude %@ from VPN" : {
+
+    },
+    "Exclude websites that block VPN traffic so you can use them without turning the VPN off." : {
+
+    },
+    "network.protection.interrupted" : {
+      "comment" : "The warning message shown in NetP's status view when the connection is interrupted.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The VPN was unable to connect at this time. Please try again later."
+          }
+        }
+      }
+    },
+    "network.protection.interrupted.reconnecting" : {
+      "comment" : "The warning message shown in NetP's status view when the connection is interrupted and its attempting to reconnect.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your VPN connection was interrupted. Attempting to reconnect now..."
+          }
+        }
+      }
+    },
+    "network.protection.onboarding.allow.extension.action" : {
+      "comment" : "Action button title for the onboarding allow-extension view",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open System Settings..."
+          }
+        }
+      }
+    },
+    "network.protection.onboarding.allow.extension.desc.allow" : {
+      "comment" : "'Allow' word between the prefix and suffix for the onboarding allow-extension description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Allow"
+          }
+        }
+      }
+    },
+    "network.protection.onboarding.allow.extension.desc.prefix" : {
+      "comment" : "Non-bold prefix for the onboarding allow-extension description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open System Settings to Privacy & Security. Scroll and select "
+          }
+        }
+      }
+    },
+    "network.protection.onboarding.allow.extension.desc.sequoia.emphasized" : {
+      "comment" : "'Allow' word between the prefix and suffix for the onboarding allow-extension description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open System Settings"
+          }
+        }
+      }
+    },
+    "network.protection.onboarding.allow.extension.desc.sequoia.prefix" : {
+      "comment" : "Non-bold description for the onboarding allow-extension description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Click "
+          }
+        }
+      }
+    },
+    "network.protection.onboarding.allow.extension.desc.sequoia.suffix" : {
+      "comment" : "Non-bold description for the onboarding allow-extension description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : ", then enable the DuckDuckGo VPN network extension."
+          }
+        }
+      }
+    },
+    "network.protection.onboarding.allow.extension.desc.suffix" : {
+      "comment" : "Non-bold suffix for the onboarding allow-extension description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : " for DuckDuckGo software."
+          }
+        }
+      }
+    },
+    "network.protection.onboarding.allow.vpn.action" : {
+      "comment" : "Action button title for the onboarding allow-VPN view",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add VPN Configuration..."
+          }
+        }
+      }
+    },
+    "network.protection.onboarding.allow.vpn.desc.allow" : {
+      "comment" : "'Allow' word between the prefix and suffix for the onboarding allow-VPN description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Allow"
+          }
+        }
+      }
+    },
+    "network.protection.onboarding.allow.vpn.desc.expanded.suffix" : {
+      "comment" : "Non-bold suffix for the onboarding allow-VPN description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : " when prompted to finish setting up VPN.\n\nThis adds a shortcut in the menu bar so you can still access the VPN if the browser isn't running."
+          }
+        }
+      }
+    },
+    "network.protection.onboarding.allow.vpn.desc.prefix" : {
+      "comment" : "Non-bold prefix for the onboarding allow-VPN description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Select "
+          }
+        }
+      }
+    },
+    "network.protection.onboarding.allow.vpn.desc.suffix" : {
+      "comment" : "Non-bold suffix for the onboarding allow-VPN description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : " when prompted to finish setting up VPN."
+          }
+        }
+      }
+    },
+    "network.protection.onboarding.allow.vpn.title" : {
+      "comment" : "Title for the onboarding allow-VPN step",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add VPN Configuration"
+          }
+        }
+      }
+    },
+    "network.protection.onboarding.install.extension.title" : {
+      "comment" : "Title for the onboarding install-vpn-extension step",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Install VPN System Extension"
+          }
+        }
+      }
+    },
+    "network.protection.onboarding.move.to.applications.action" : {
+      "comment" : "Action button title for the onboarding move-app-to-applications step",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Move App for Me and Restart…"
+          }
+        }
+      }
+    },
+    "network.protection.onboarding.move.to.applications.desc" : {
+      "comment" : "Description for the onboarding move-app-to-applications step",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "To use the VPN, the DuckDuckGo app needs to be in the Applications folder on your Mac. Click the button below to move the app and restart the browser."
+          }
+        }
+      }
+    },
+    "network.protection.onboarding.move.to.applications.title" : {
+      "comment" : "Title for the onboarding move-app-to-applications step",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Move DuckDuckGo App"
+          }
+        }
+      }
+    },
+    "network.protection.server.address.unknown" : {
+      "comment" : "When we can't tell the user the IP of the NetP server is",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Unknown"
+          }
+        }
+      }
+    },
+    "network.protection.server.location.link" : {
+      "comment" : "Clickable text linking to the server location picker screen",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%@..."
+          }
+        }
+      }
+    },
+    "network.protection.server.location.unknown" : {
+      "comment" : "When we can't tell the user the location of the NetP server",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Unknown..."
+          }
+        }
+      }
+    },
+    "network.protection.status.connected" : {
+      "comment" : "The label for the NetP VPN when connected\nThe label for the NetP VPN when connecting",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Connected"
+          }
+        }
+      }
+    },
+    "network.protection.status.disconnected" : {
+      "comment" : "The label for the NetP VPN when disconnected",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Not connected"
+          }
+        }
+      }
+    },
+    "network.protection.status.disconnecting" : {
+      "comment" : "The label for the NetP VPN when disconnecting",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Disconnecting..."
+          }
+        }
+      }
+    },
+    "network.protection.status.header.message.off" : {
+      "comment" : "Message label text for the status view when VPN is disconnected",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Connect to secure all of your device’s\nInternet traffic."
+          }
+        }
+      }
+    },
+    "network.protection.status.header.message.on" : {
+      "comment" : "Message label text for the status view when VPN is connected",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "All device Internet traffic is being secured\nthrough the VPN."
+          }
+        }
+      }
+    },
+    "network.protection.status.view.connection.details" : {
+      "comment" : "Connection details label shown in NetworkProtection's status view.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Connection Details"
+          }
+        }
+      }
+    },
+    "network.protection.status.view.connection.label" : {
+      "comment" : "Connection label shown in NetworkProtection's status view.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "VPN"
+          }
+        }
+      }
+    },
+    "network.protection.status.view.feature.on" : {
+      "comment" : "Text shown in NetworkProtection's status view when NetP is OFF.\nText shown in NetworkProtection's status view when NetP is ON.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo VPN is OFF"
+          }
+        }
+      }
+    },
+    "network.protection.status.view.ip.address" : {
+      "comment" : "IP Address label shown in NetworkProtection's status view.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "IP Address"
+          }
+        }
+      }
+    },
+    "network.protection.status.view.location" : {
+      "comment" : "Location label shown in NetworkProtection's status view.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Location"
+          }
+        }
+      }
+    },
+    "network.protection.subscription.expired.resubscribe.button" : {
+      "comment" : "Button for the prompt that takes the user to the page to resubscribe.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Subscribe to Privacy Pro"
+          }
+        }
+      }
+    },
+    "network.protection.subscription.expired.subtitle" : {
+      "comment" : "Subtitle for the prompt that tells the user their subscription expired.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Subscribe to Privacy Pro to reconnect DuckDuckGo VPN."
+          }
+        }
+      }
+    },
+    "network.protection.subscription.expired.title" : {
+      "comment" : "Title for the prompt that tells the user their subscription expired.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "VPN disconnected"
+          }
+        }
+      }
+    },
+    "network.protection.subscription.expired.uninstall.button" : {
+      "comment" : "Button for the prompt that uninstalls the VPN.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Uninstall DuckDuckGo VPN"
+          }
+        }
+      }
+    },
+    "network.protection.vpn.data-volume" : {
+      "comment" : "Title for the data volume section in the VPN status view",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Data Volume"
+          }
+        }
+      }
+    },
+    "network.protection.vpn.dns-server" : {
+      "comment" : "Title for the DNS server section in the VPN status view",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DNS Server"
+          }
+        }
+      }
+    },
+    "network.protection.vpn.failure.login-item-version-mismatched" : {
+      "comment" : "Error message for the Login item version mismatched error",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Unable to connect due to versioning conflict. If you have multiple versions of the browser installed, remove all but the most recent version of DuckDuckGo and restart your Mac."
+          }
+        }
+      }
+    },
+    "network.protection.vpn.failure.operation-not-permitted" : {
+      "comment" : "Error message for the Operation not permitted error",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Unable to connect due to an unexpected error. Restarting your Mac can usually fix the issue."
+          }
+        }
+      }
+    },
+    "network.protection.vpn.failure.registered-server-fetching-failed" : {
+      "comment" : "Error message for the Failed to fetch registered server error",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Unable to connect. Double check your internet connection. Make sure other software or services aren't blocking DuckDuckGo VPN servers."
+          }
+        }
+      }
+    },
+    "network.protection.vpn.location.connected" : {
+      "comment" : "Description of the location type in the VPN status view",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Connected Location"
+          }
+        }
+      }
+    },
+    "network.protection.vpn.location.nearest" : {
+      "comment" : "Description of the location type in the VPN status view",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "(Nearest)"
+          }
+        }
+      }
+    },
+    "network.protection.vpn.location.selected" : {
+      "comment" : "Description of the location type in the VPN status view",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Selected Location"
+          }
+        }
+      }
+    },
+    "network.protection.vpn.send-feedback" : {
+      "comment" : "Action button title for the Send feedback option",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Send Feedback…"
+          }
+        }
+      }
+    },
+    "Please let us know if you excluded %@ from the VPN because you experienced issues." : {
+
+    },
+    "Report an issue with %@?" : {
+
+    },
+    "Reports only include the domain of the affected website." : {
+
+    },
+    "The VPN can connect on its own when you log in to your computer." : {
+
+    },
+    "Website not working?" : {
+
+    },
+    "Website Preferences" : {
+
+    }
   },
   "version" : "1.0"
 }
