@@ -1,0 +1,840 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Cancel" : {
+
+    },
+    "Close" : {
+
+    },
+    "subscription.access.channel.email.name" : {
+      "comment" : "Service name displayed when accessing subscription using email address",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Email"
+          }
+        }
+      }
+    },
+    "subscription.activate.modal.description" : {
+      "comment" : "Activate subscription modal view subtitle description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Access your Privacy Pro subscription via an email address."
+          }
+        }
+      }
+    },
+    "subscription.activate.modal.email.description" : {
+      "comment" : "Activate subscription modal description for email address channel",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Use your email to activate your subscription on this device."
+          }
+        }
+      }
+    },
+    "subscription.activate.modal.restore.purchase.description" : {
+      "comment" : "Activate subscription modal description via restore purchase from Apple ID",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your subscription is automatically available in DuckDuckGo on any device signed in to your Apple ID."
+          }
+        }
+      }
+    },
+    "subscription.activate.modal.title" : {
+      "comment" : "Activate subscription modal view title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Activate your subscription on this device"
+          }
+        }
+      }
+    },
+    "subscription.alert.button.cancel" : {
+      "comment" : "Alert button for dismissing it",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Cancel"
+          }
+        }
+      }
+    },
+    "subscription.alert.button.ok" : {
+      "comment" : "Alert button for confirming it",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "OK"
+          }
+        }
+      }
+    },
+    "subscription.alert.button.restore" : {
+      "comment" : "Alert button for restoring past subscription purchases",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Restore"
+          }
+        }
+      }
+    },
+    "subscription.alert.button.retry" : {
+      "comment" : "Alert button for continue action",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Continue"
+          }
+        }
+      }
+    },
+    "subscription.alert.button.view.plans" : {
+      "comment" : "Alert button for viewing subscription plans",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "View Plans"
+          }
+        }
+      }
+    },
+    "subscription.alert.something.went.wrong.description" : {
+      "comment" : "Alert message when unknown error has occurred",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "We’re having trouble connecting. Please try again later."
+          }
+        }
+      }
+    },
+    "subscription.alert.something.went.wrong.title" : {
+      "comment" : "Alert title when unknown error has occurred",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Something Went Wrong"
+          }
+        }
+      }
+    },
+    "subscription.alert.subscription.apple-id.sync-failed.title" : {
+      "comment" : "Alert message when the subscription failed to restore",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Something Went Wrong When Syncing Your Apple ID"
+          }
+        }
+      }
+    },
+    "subscription.alert.subscription.found.description" : {
+      "comment" : "Alert message when subscription was found",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "We found a subscription associated with this Apple ID."
+          }
+        }
+      }
+    },
+    "subscription.alert.subscription.found.title" : {
+      "comment" : "Alert title when subscription was found",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Subscription Found"
+          }
+        }
+      }
+    },
+    "subscription.alert.subscription.inactive.description" : {
+      "comment" : "Alert message when subscription was inactive",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The subscription associated with this Apple ID is no longer active."
+          }
+        }
+      }
+    },
+    "subscription.alert.subscription.inactive.title" : {
+      "comment" : "Alert title when subscription was inactive",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Subscription Not Found"
+          }
+        }
+      }
+    },
+    "subscription.alert.subscription.not.found.description" : {
+      "comment" : "Alert message when subscription was not found",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "We couldn’t find a subscription associated with this Apple ID."
+          }
+        }
+      }
+    },
+    "subscription.alert.subscription.not.found.title" : {
+      "comment" : "Alert title when subscription was not found",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Subscription Not Found"
+          }
+        }
+      }
+    },
+    "subscription.appstore.activate.modal.description" : {
+      "comment" : "Activate subscription modal view subtitle description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Access your Privacy Pro subscription on this device via Apple ID or an email address."
+          }
+        }
+      }
+    },
+    "subscription.billing.period.monthly" : {
+      "comment" : "Type of subscription billing period that lasts a month",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Monthly"
+          }
+        }
+      }
+    },
+    "subscription.billing.period.yearly" : {
+      "comment" : "Type of subscription billing period that lasts a year",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Yearly"
+          }
+        }
+      }
+    },
+    "subscription.dialog.change.apple.description" : {
+      "comment" : "Change plan or billing dialog subtitle description for subscription purchased via Apple",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your subscription was purchased through the Apple App Store. To change your plan or billing settings, please go to System Settings > Apple ID > Media and Purchases > Subscriptions > Manage on a device signed in to the same Apple ID used to purchase your subscription."
+          }
+        }
+      }
+    },
+    "subscription.dialog.change.done.button" : {
+      "comment" : "Button to close the change subscription dialog",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Done"
+          }
+        }
+      }
+    },
+    "subscription.dialog.change.google.description" : {
+      "comment" : "Change plan or billing dialog subtitle description for subscription purchased via Google",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your subscription was purchased through the Google Play Store. To change your plan or billing settings, please open Google Play Store subscription settings on a device signed in to the same Google Account used to purchase your subscription."
+          }
+        }
+      }
+    },
+    "subscription.dialog.change.title" : {
+      "comment" : "Change plan or billing dialog title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Change Plan or Billing"
+          }
+        }
+      }
+    },
+    "subscription.dialog.remove.cancel.button" : {
+      "comment" : "Button to cancel removing subscription from device",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Cancel"
+          }
+        }
+      }
+    },
+    "subscription.dialog.remove.confirm" : {
+      "comment" : "Button to confirm removing subscription from device",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Remove Subscription"
+          }
+        }
+      }
+    },
+    "subscription.dialog.remove.description" : {
+      "comment" : "Remove subscription from device dialog subtitle description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You will no longer be able to access your Privacy Pro subscription on this device. This will not cancel your subscription, and it will remain active on your other devices."
+          }
+        }
+      }
+    },
+    "subscription.dialog.remove.title" : {
+      "comment" : "Remove subscription from device dialog title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Remove from this device?"
+          }
+        }
+      }
+    },
+    "subscription.modal.enter.email.button" : {
+      "comment" : "Button for opening page to enter email address",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Enter Email"
+          }
+        }
+      }
+    },
+    "subscription.modal.restore.purchase.button" : {
+      "comment" : "Button for restoring past subscription purchase",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Restore Purchase"
+          }
+        }
+      }
+    },
+    "subscription.preferences.button.view.plans" : {
+      "comment" : "Button for viewing subscription plans on expired subscription",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "View Plans"
+          }
+        }
+      }
+    },
+    "subscription.preferences.feedback.button" : {
+      "comment" : "Title for the subscription feedback button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Send Feedback"
+          }
+        }
+      }
+    },
+    "subscription.preferences.feedback.caption" : {
+      "comment" : "Caption for the subscription feedback section",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Help improve Privacy Pro. Your feedback matters to us. Feel free to report any issues or provide general feedback."
+          }
+        }
+      }
+    },
+    "subscription.preferences.feedback.title" : {
+      "comment" : "Title for the subscription feedback section",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Send Feedback"
+          }
+        }
+      }
+    },
+    "subscription.preferences.i.have.a.subscription.button" : {
+      "comment" : "Button enabling user to activate a subscription user bought earlier or on another device",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "I Have a Subscription"
+          }
+        }
+      }
+    },
+    "subscription.preferences.manage.subscription.button" : {
+      "comment" : "Button to manage subscription",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Manage Subscription"
+          }
+        }
+      }
+    },
+    "subscription.preferences.purchase.button" : {
+      "comment" : "Button to open a page where user can learn more and purchase the subscription",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Get Privacy Pro"
+          }
+        }
+      }
+    },
+    "subscription.preferences.remove.from.this.device.button" : {
+      "comment" : "Button to remove subscription from this device",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Remove From This Device"
+          }
+        }
+      }
+    },
+    "subscription.preferences.services.identity.theft.restoration.button.title" : {
+      "comment" : "Title for the Identity Theft Restoration service button to open its settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "View"
+          }
+        }
+      }
+    },
+    "subscription.preferences.services.identity.theft.restoration.description" : {
+      "comment" : "Description for the Identity Theft Restoration service listed in the subscription preferences pane",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Get help restoring stolen accounts and financial losses in the event of identity theft."
+          }
+        }
+      }
+    },
+    "subscription.preferences.services.identity.theft.restoration.title" : {
+      "comment" : "Title for the Identity Theft Restoration service listed in the subscription preferences pane",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Identity Theft Restoration"
+          }
+        }
+      }
+    },
+    "subscription.preferences.services.personal.information.removal.button.title" : {
+      "comment" : "Title for the Personal Information Removal service button to open its settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open"
+          }
+        }
+      }
+    },
+    "subscription.preferences.services.personal.information.removal.description" : {
+      "comment" : "Description for the Personal Information Removal service listed in the subscription preferences pane",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Find and remove your personal information from sites that store and sell it."
+          }
+        }
+      }
+    },
+    "subscription.preferences.services.personal.information.removal.title" : {
+      "comment" : "Title for the Personal Information Removal service listed in the subscription preferences pane",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Personal Information Removal"
+          }
+        }
+      }
+    },
+    "subscription.preferences.services.vpn.button.title" : {
+      "comment" : "Title for the VPN service button to open its settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open"
+          }
+        }
+      }
+    },
+    "subscription.preferences.services.vpn.description" : {
+      "comment" : "Description for the VPN service listed in the subscription preferences pane",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Full-device protection with the VPN built for speed and security."
+          }
+        }
+      }
+    },
+    "subscription.preferences.services.vpn.title" : {
+      "comment" : "Title for the VPN service listed in the subscription preferences pane",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "VPN"
+          }
+        }
+      }
+    },
+    "subscription.preferences.subscription.activate.add.email.button" : {
+      "comment" : "Button for adding email address to subscription",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add Email"
+          }
+        }
+      }
+    },
+    "subscription.preferences.subscription.activate.edit.email.button" : {
+      "comment" : "Button for editing email address added to subscription",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Edit"
+          }
+        }
+      }
+    },
+    "subscription.preferences.subscription.activate.no.email.caption" : {
+      "comment" : "Caption for the subscription preferences activate section when email is not added to subscription",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add an optional email to your subscription or use your Apple ID to access Privacy Pro on other devices. [Learn more](https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email/)"
+          }
+        }
+      }
+    },
+    "subscription.preferences.subscription.activate.title" : {
+      "comment" : "Title for the subscription preferences activate section",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Activate on Other Devices"
+          }
+        }
+      }
+    },
+    "subscription.preferences.subscription.activate.with.email.caption" : {
+      "comment" : "Caption for the subscription preferences activate section when email is added to subscription",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Use this email to activate your subscription in Settings > Privacy Pro in the DuckDuckGo app on your other devices. [Learn more](https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email/)"
+          }
+        }
+      }
+    },
+    "subscription.preferences.subscription.active.expire.caption" : {
+      "comment" : "Caption for the subscription preferences pane when the subscription is active but will expire. First parameter is renewal period (monthly/yearly). Second parameter is date.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your %1$@ Privacy Pro subscription expires on %2$@."
+          }
+        }
+      }
+    },
+    "subscription.preferences.subscription.active.renew.caption" : {
+      "comment" : "Caption for the subscription preferences pane when the subscription is active and will renew. First parameter is renewal period (monthly/yearly). Second parameter is date.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your %1$@ Privacy Pro subscription renews on %2$@."
+          }
+        }
+      }
+    },
+    "subscription.preferences.subscription.expired.caption" : {
+      "comment" : "Caption for the subscription preferences pane when the subscription activation is pending\nCaption for the subscription preferences pane when the subscription has expired. The parameter is date of expiry.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Subscribe again to continue using Privacy Pro."
+          }
+        }
+      }
+    },
+    "subscription.preferences.subscription.footer.caption" : {
+      "comment" : "Caption for the subscription preferences pane footer",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Get answers to frequently asked questions or contact Privacy Pro support from our help pages."
+          }
+        }
+      }
+    },
+    "subscription.preferences.subscription.footer.title" : {
+      "comment" : "Title for the subscription preferences pane footer",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Need help with Privacy Pro?"
+          }
+        }
+      }
+    },
+    "subscription.preferences.subscription.help.footer.caption" : {
+      "comment" : "Caption for the subscription preferences pane footer",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Get answers to frequently asked questions or contact Privacy Pro support from our help pages. Feature availability varies by country."
+          }
+        }
+      }
+    },
+    "subscription.preferences.subscription.inactive.header" : {
+      "comment" : "Header for the subscription preferences pane when the subscription is inactive",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Protect your connection and identity with Privacy Pro"
+          }
+        }
+      }
+    },
+    "subscription.preferences.subscription.inactive.row.caption" : {
+      "comment" : "Caption for the subscription preferences pane when the subscription is inactive",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Two premium protections in one subscription."
+          }
+        }
+      }
+    },
+    "subscription.preferences.subscription.inactive.us.caption" : {
+      "comment" : "Caption for the subscription preferences pane when the subscription is inactive",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Three premium protections in one subscription."
+          }
+        }
+      }
+    },
+    "subscription.preferences.subscription.pending.caption" : {
+      "comment" : "Caption for the subscription preferences pane when the subscription activation is pending",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "This is taking longer than usual. Please check back later."
+          }
+        }
+      }
+    },
+    "subscription.preferences.subscription.pending.header" : {
+      "comment" : "Header for the subscription preferences pane when the subscription activation is pending",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your subscription is being activated"
+          }
+        }
+      }
+    },
+    "subscription.preferences.subscription.settings.title" : {
+      "comment" : "Title for the subscription preferences settings section",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Subscription Settings"
+          }
+        }
+      }
+    },
+    "subscription.preferences.title" : {
+      "comment" : "Title for the preferences pane for the subscription",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Privacy Pro"
+          }
+        }
+      }
+    },
+    "subscription.preferences.update.plan.or.cancel.button" : {
+      "comment" : "Button to update subscription plan or cancel",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Update Plan or Cancel"
+          }
+        }
+      }
+    },
+    "subscription.preferences.view.faqs.button" : {
+      "comment" : "Button to open page for FAQs",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "FAQs and Support"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
