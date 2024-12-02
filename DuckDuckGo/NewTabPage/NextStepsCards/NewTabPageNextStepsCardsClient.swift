@@ -16,84 +16,27 @@
 //  limitations under the License.
 //
 
-import Bookmarks
 import Common
 import Combine
 import UserScript
 
-protocol NewTabPageNextStepsCardsProviding: AnyObject {
-    var isViewExpanded: Bool { get set }
-    var isViewExpandedPublisher: AnyPublisher<Bool, Never> { get }
-
-    var cards: [NewTabPageNextStepsCardsClient.CardID] { get }
-    var cardsPublisher: AnyPublisher<[NewTabPageNextStepsCardsClient.CardID], Never> { get }
-
-    @MainActor
-    func performAction(for card: NewTabPageNextStepsCardsClient.CardID)
-    func dismiss(_ card: NewTabPageNextStepsCardsClient.CardID)
-}
-
-extension HomePage.Models.ContinueSetUpModel: NewTabPageNextStepsCardsProviding {
-    var isViewExpanded: Bool {
-        get {
-            shouldShowAllFeatures
-        }
-        set {
-            shouldShowAllFeatures = newValue
-        }
-    }
-
-    var isViewExpandedPublisher: AnyPublisher<Bool, Never> {
-        $shouldShowAllFeatures.dropFirst().eraseToAnyPublisher()
-    }
-
-    var cards: [NewTabPageNextStepsCardsClient.CardID] {
-        featuresMatrix.flatMap { $0.map(NewTabPageNextStepsCardsClient.CardID.init) }
-    }
-
-    var cardsPublisher: AnyPublisher<[NewTabPageNextStepsCardsClient.CardID], Never> {
-        $featuresMatrix.dropFirst()
-            .map { matrix in
-                matrix.flatMap { $0.map(NewTabPageNextStepsCardsClient.CardID.init) }
-            }
-            .eraseToAnyPublisher()
-    }
-
-    @MainActor
-    func performAction(for card: NewTabPageNextStepsCardsClient.CardID) {
-        performAction(for: .init(card))
-    }
-
-    func dismiss(_ card: NewTabPageNextStepsCardsClient.CardID) {
-        removeItem(for: .init(card))
-    }
-}
-
-extension HomePage.Models.FeatureType {
-    init(_ card: NewTabPageNextStepsCardsClient.CardID) {
-        switch card {
-        case .bringStuff:
-            self = .importBookmarksAndPasswords
-        case .defaultApp:
-            self = .defaultBrowser
-        case .emailProtection:
-            self = .emailProtection
-        case .duckplayer:
-            self = .duckplayer
-        case .addAppToDockMac:
-            self = .dock
-        }
-    }
-}
-
 final class NewTabPageNextStepsCardsClient: NewTabPageScriptClient {
 
     let model: NewTabPageNextStepsCardsProviding
+    let willDisplayCardsPublisher: AnyPublisher<[CardID], Never>
     weak var userScriptsSource: NewTabPageUserScriptsSource?
+
+    private let willDisplayCardsSubject = PassthroughSubject<[CardID], Never>()
+    private let getDataSubject = PassthroughSubject<[CardID], Never>()
+    private let getConfigSubject = PassthroughSubject<Bool, Never>()
+    private let notifyDataUpdatedSubject = PassthroughSubject<[CardID], Never>()
+    private let notifyConfigUpdatedSubject = PassthroughSubject<Bool, Never>()
     private var cancellables: Set<AnyCancellable> = []
 
     init(model: NewTabPageNextStepsCardsProviding) {
         self.model = model
+        willDisplayCardsPublisher = willDisplayCardsSubject.eraseToAnyPublisher()
+        connectWillDisplayCardsPublisher()
 
         model.cardsPublisher
             .sink { [weak self] cardIDs in
@@ -108,6 +51,32 @@ final class NewTabPageNextStepsCardsClient: NewTabPageScriptClient {
                 Task { @MainActor in
                     self?.notifyConfigUpdated(showAllCards)
                 }
+            }
+            .store(in: &cancellables)
+    }
+
+    private func connectWillDisplayCardsPublisher() {
+        let initialCards = Publishers.CombineLatest(getDataSubject, getConfigSubject)
+            .map { cards, isViewExpanded in
+                isViewExpanded ? cards : Array(cards.prefix(2))
+            }
+
+        // only notify about visible cards (i.e. if collapsed, only the first 2)
+        let cardsOnDataUpdated = notifyDataUpdatedSubject.map { [weak self] cards in
+            self?.model.isViewExpanded == true ? cards: Array(cards.prefix(2))
+        }
+
+        // only notify about cards revealed by expanding the view (i.e. other than the first 2)
+        let cardsOnConfigUpdated = notifyConfigUpdatedSubject.compactMap { [weak self] isViewExpanded -> [CardID]? in
+            guard let self, isViewExpanded, model.cards.count > 2 else {
+                return nil
+            }
+            return Array(self.model.cards.suffix(from: 2))
+        }
+
+        Publishers.Merge3(initialCards, cardsOnDataUpdated, cardsOnConfigUpdated)
+            .sink { [weak self] cards in
+                self?.willDisplayCardsSubject.send(cards)
             }
             .store(in: &cancellables)
     }
@@ -150,6 +119,8 @@ final class NewTabPageNextStepsCardsClient: NewTabPageScriptClient {
 
     func getConfig(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         let expansion: NewTabPageUserScript.WidgetConfig.Expansion = model.isViewExpanded ? .expanded : .collapsed
+
+        getConfigSubject.send(model.isViewExpanded)
         return NewTabPageUserScript.WidgetConfig(animation: .auto, expansion: expansion)
     }
 
@@ -164,14 +135,19 @@ final class NewTabPageNextStepsCardsClient: NewTabPageScriptClient {
 
     @MainActor
     func getData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        let cards = model.cards.map(Card.init(id:))
+        let cardIDs = model.cards
+        let cards = cardIDs.map(Card.init(id:))
+
+        getDataSubject.send(cardIDs)
         return NextStepsData(content: cards.isEmpty ? nil : cards)
     }
 
     @MainActor
-    func notifyDataUpdated(_ cardIDs: [CardID]) {
+    private func notifyDataUpdated(_ cardIDs: [CardID]) {
         let cards = cardIDs.map(Card.init(id:))
         let params = NextStepsData(content: cards.isEmpty ? nil : cards)
+
+        notifyDataUpdatedSubject.send(cardIDs)
         pushMessage(named: MessageName.onDataUpdate.rawValue, params: params)
     }
 
@@ -179,6 +155,8 @@ final class NewTabPageNextStepsCardsClient: NewTabPageScriptClient {
     private func notifyConfigUpdated(_ showAllCards: Bool) {
         let expansion: NewTabPageUserScript.WidgetConfig.Expansion = showAllCards ? .expanded : .collapsed
         let config = NewTabPageUserScript.WidgetConfig(animation: .auto, expansion: expansion)
+
+        notifyConfigUpdatedSubject.send(showAllCards)
         pushMessage(named: MessageName.onConfigUpdate.rawValue, params: config)
     }
 }
@@ -191,21 +169,6 @@ extension NewTabPageNextStepsCardsClient {
         case emailProtection
         case duckplayer
         case addAppToDockMac
-
-        init(_ feature: HomePage.Models.FeatureType) {
-            switch feature {
-            case .duckplayer:
-                self = .duckplayer
-            case .emailProtection:
-                self = .emailProtection
-            case .defaultBrowser:
-                self = .defaultApp
-            case .dock:
-                self = .addAppToDockMac
-            case .importBookmarksAndPasswords:
-                self = .bringStuff
-            }
-        }
     }
 
     struct Card: Codable {
