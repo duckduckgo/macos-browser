@@ -45,11 +45,11 @@ extension VPNDomainExclusionsTip: Tip {
     }
 
     var title: Text {
-        Text("Website not working?")
+        Text(UserText.networkProtectionDomainExclusionsTipTitle)
     }
 
     var message: Text? {
-        Text("Exclude websites that block VPN traffic so you can use them without turning the VPN off.")
+        Text(UserText.networkProtectionDomainExclusionsTipMessage)
     }
 
     var image: Image? {

@@ -88,4 +88,31 @@ final class UserText {
     static let networkProtectionSubscriptionExpiredSubtitle = NSLocalizedString("network.protection.subscription.expired.subtitle", bundle: Bundle.module, value: "Subscribe to Privacy Pro to reconnect DuckDuckGo VPN.", comment: "Subtitle for the prompt that tells the user their subscription expired.")
     static let networkProtectionSubscriptionExpiredResubscribeButton = NSLocalizedString("network.protection.subscription.expired.resubscribe.button", bundle: Bundle.module, value: "Subscribe to Privacy Pro", comment: "Button for the prompt that takes the user to the page to resubscribe.")
     static let networkProtectionSubscriptionExpiredUninstallButton = NSLocalizedString("network.protection.subscription.expired.uninstall.button", bundle: Bundle.module, value: "Uninstall DuckDuckGo VPN", comment: "Button for the prompt that uninstalls the VPN.")
+
+    // MARK: Tool tips
+
+    static let networkProtectionGeoswitchingTipTitle = NSLocalizedString("network.protection.geoswitching.tip.title", bundle: Bundle.module, value: "Change Your Location", comment: "Title for tooltip about geoswitching")
+    static let networkProtectionGeoswitchingTipMessage = NSLocalizedString("network.protection.geoswitching.tip.message", bundle: Bundle.module, value: "Connect to any of our servers worldwide to customize the VPN location.", comment: "Message for tooltip about geoswitching")
+
+    static let networkProtectionAutoconnectTipTitle = NSLocalizedString("network.protection.autoconnect.tip.title", bundle: Bundle.module, value: "Connect Automatically", comment: "Title for tooltip about auto-connect")
+    static let networkProtectionAutoconnectTipMessage = NSLocalizedString("network.protection.autoconnect.tip.message", bundle: Bundle.module, value: "The VPN can connect on its own when you log in to your computer.", comment: "Message for tooltip about auto-connect")
+    static let networkProtectionAutoconnectTipEnableAction = NSLocalizedString("network.protection.autoconnect.tip.enable", bundle: Bundle.module, value: "Enable", comment: "Action to enable auto-connect")
+
+    static let networkProtectionDomainExclusionsTipTitle = NSLocalizedString("network.protection.domain.exclusion.tip.title", bundle: Bundle.module, value: "Website not working?", comment: "Title for tooltip about domain exclusion")
+    static let networkProtectionDomainExclusionsTipMessage = NSLocalizedString("network.protection.domain.exclusion.tip.message", bundle: Bundle.module, value: "Exclude websites that block VPN traffic so you can use them without turning the VPN off.", comment: "Message for tooltip about domain exclusion")
+
+    // MARK: Report site issues
+
+    static let networkProtectionReportSiteIssuesViewTitle = NSLocalizedString("network.protection.report.site.issues.title", bundle: Bundle.module, value: "Report an issue with %@?", comment: "Title for report site issues view for website “%@”")
+    static let networkProtectionReportSiteIssuesViewDescription = NSLocalizedString("network.protection.report.site.issues.description", bundle: Bundle.module, value: "Please let us know if you excluded %@ from the VPN because you experienced issues.", comment: "Description for report site issues view for website “%@”")
+    static let networkProtectionReportSiteIssuesViewFooter = NSLocalizedString("network.protection.report.site.issues.footer", bundle: Bundle.module, value: "Reports only include the domain of the affected website.", comment: "Footer for report site issues view")
+
+    static let networkProtectionReportSiteIssuesViewButtonCancel = NSLocalizedString("network.protection.report.site.issues.button.cancel", bundle: Bundle.module, value: "Not Now", comment: "Report site issues view cancel button")
+    static let networkProtectionReportSiteIssuesViewButtonReport = NSLocalizedString("network.protection.report.site.issues.button.report", bundle: Bundle.module, value: "Report", comment: "Report site issues confirmation button to send report")
+    static let networkProtectionReportSiteIssuesViewButtonDontAsk = NSLocalizedString("network.protection.report.site.issues.button.dontask", bundle: Bundle.module, value: "Don't Ask Again", comment: "Report site issues view button not to ask again")
+
+    // MARK: Site troubleshooting
+
+    static let networkProtectionSiteTroubleShootingViewTitle = NSLocalizedString("network.protection.site.troubleshooting.title", bundle: Bundle.module, value: "Website Preferences", comment: "Title for VPN website preferences view")
+    static let networkProtectionSiteTroubleShootingViewExcludeWebsite = NSLocalizedString("network.protection.site.troubleshooting.exclude", bundle: Bundle.module, value: "Exclude %@ from VPN", comment: "Option to exclude a “%@” website from the VPN")
 }

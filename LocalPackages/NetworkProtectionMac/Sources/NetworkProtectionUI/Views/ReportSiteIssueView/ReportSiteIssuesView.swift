@@ -25,12 +25,7 @@ import VPNPixels
 struct ReportSiteIssuesView: ModalView {
 
     let domain: String
-    private let title = "Report"
     @Environment(\.dismiss) private var dismiss
-
-    private let cancelActionTitle = "Not Now"
-    private let defaultActionTitle = "Report"
-    private let dontAskAgainTitle = "Don't Ask Again"
 
     let defaultAction: @MainActor (_ dismiss: () -> Void) -> Void
     let cancelAction: @MainActor (_ dismiss: () -> Void) -> Void
@@ -40,36 +35,36 @@ struct ReportSiteIssuesView: ModalView {
         Dialog {
             Image(.siteBreakage128)
 
-            Text("Report an issue with \(domain)?")
+            Text(String(format: UserText.networkProtectionReportSiteIssuesViewTitle, domain))
                 .font(Font.custom("SF Pro", size: 17)
                     .weight(.bold))
                 .multilineText()
 
-            Text("Please let us know if you excluded \(domain) from the VPN because you experienced issues.")
+            Text(String(format: UserText.networkProtectionReportSiteIssuesViewDescription, domain))
                 .font(Font.custom("SF Pro", size: 13))
                 .fixedSize(horizontal: false, vertical: true)
                 .lineLimit(2)
                 .multilineTextAlignment(.center)
                 .multilineText()
 
-            Text("Reports only include the domain of the affected website.")
+            Text(UserText.networkProtectionReportSiteIssuesViewFooter)
                 .font(Font.custom("SF Pro", size: 11))
                 .fixedSize(horizontal: false, vertical: true)
                 .lineLimit(2)
                 .multilineTextAlignment(.center)
                 .multilineText()
         } buttons: {
-            Button(dontAskAgainTitle) {
+            Button(UserText.networkProtectionReportSiteIssuesViewButtonDontAsk) {
                 dontAskAgainAction(dismiss)
             }
 
             Spacer()
 
-            Button(cancelActionTitle) {
+            Button(UserText.networkProtectionReportSiteIssuesViewButtonCancel) {
                 cancelAction(dismiss)
             }
 
-            Button(defaultActionTitle) {
+            Button(UserText.networkProtectionReportSiteIssuesViewButtonReport) {
                 defaultAction(dismiss)
             }
         }

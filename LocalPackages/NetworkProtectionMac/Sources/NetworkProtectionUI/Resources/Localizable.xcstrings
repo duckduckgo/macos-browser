@@ -4,23 +4,89 @@
     "" : {
 
     },
-    "Change Your Location" : {
-
+    "network.protection.autoconnect.tip.enable" : {
+      "comment" : "Action to enable auto-connect",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Enable"
+          }
+        }
+      }
     },
-    "Connect Automatically" : {
-
+    "network.protection.autoconnect.tip.message" : {
+      "comment" : "Message for tooltip about auto-connect",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The VPN can connect on its own when you log in to your computer."
+          }
+        }
+      }
     },
-    "Connect to any of our servers worldwide to customize the VPN location." : {
-
+    "network.protection.autoconnect.tip.title" : {
+      "comment" : "Title for tooltip about auto-connect",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Connect Automatically"
+          }
+        }
+      }
     },
-    "Enable" : {
-
+    "network.protection.domain.exclusion.tip.message" : {
+      "comment" : "Message for tooltip about domain exclusion",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Exclude websites that block VPN traffic so you can use them without turning the VPN off."
+          }
+        }
+      }
     },
-    "Exclude %@ from VPN" : {
-
+    "network.protection.domain.exclusion.tip.title" : {
+      "comment" : "Title for tooltip about domain exclusion",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Website not working?"
+          }
+        }
+      }
     },
-    "Exclude websites that block VPN traffic so you can use them without turning the VPN off." : {
-
+    "network.protection.geoswitching.tip.message" : {
+      "comment" : "Message for tooltip about geoswitching",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Connect to any of our servers worldwide to customize the VPN location."
+          }
+        }
+      }
+    },
+    "network.protection.geoswitching.tip.title" : {
+      "comment" : "Title for tooltip about geoswitching",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Change Your Location"
+          }
+        }
+      }
     },
     "network.protection.interrupted" : {
       "comment" : "The warning message shown in NetP's status view when the connection is interrupted.",
@@ -250,6 +316,78 @@
         }
       }
     },
+    "network.protection.report.site.issues.button.cancel" : {
+      "comment" : "Report site issues view cancel button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Not Now"
+          }
+        }
+      }
+    },
+    "network.protection.report.site.issues.button.dontask" : {
+      "comment" : "Report site issues view button not to ask again",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Don't Ask Again"
+          }
+        }
+      }
+    },
+    "network.protection.report.site.issues.button.report" : {
+      "comment" : "Report site issues confirmation button to send report",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Report"
+          }
+        }
+      }
+    },
+    "network.protection.report.site.issues.description" : {
+      "comment" : "Description for report site issues view for website “%@”",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Please let us know if you excluded %@ from the VPN because you experienced issues."
+          }
+        }
+      }
+    },
+    "network.protection.report.site.issues.footer" : {
+      "comment" : "Footer for report site issues view",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Reports only include the domain of the affected website."
+          }
+        }
+      }
+    },
+    "network.protection.report.site.issues.title" : {
+      "comment" : "Title for report site issues view for website “%@”",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Report an issue with %@?"
+          }
+        }
+      }
+    },
     "network.protection.server.address.unknown" : {
       "comment" : "When we can't tell the user the IP of the NetP server is",
       "extractionState" : "extracted_with_value",
@@ -282,6 +420,30 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Unknown..."
+          }
+        }
+      }
+    },
+    "network.protection.site.troubleshooting.exclude" : {
+      "comment" : "Option to exclude a “%@” website from the VPN",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Exclude %@ from VPN"
+          }
+        }
+      }
+    },
+    "network.protection.site.troubleshooting.title" : {
+      "comment" : "Title for VPN website preferences view",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Website Preferences"
           }
         }
       }
@@ -561,24 +723,6 @@
           }
         }
       }
-    },
-    "Please let us know if you excluded %@ from the VPN because you experienced issues." : {
-
-    },
-    "Report an issue with %@?" : {
-
-    },
-    "Reports only include the domain of the affected website." : {
-
-    },
-    "The VPN can connect on its own when you log in to your computer." : {
-
-    },
-    "Website not working?" : {
-
-    },
-    "Website Preferences" : {
-
     }
   },
   "version" : "1.0"
