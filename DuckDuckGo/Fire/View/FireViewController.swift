@@ -164,6 +164,7 @@ final class FireViewController: NSViewController {
                 continuation.resume()
             }
             fireAnimationView?.play(fromProgress: fireAnimationBeginning, toProgress: fireAnimationEnd) { [weak self] _ in
+                defer { completion() }
                 guard let self = self else { return }
 
                 self.progressIndicatorWrapper.isHidden = false
