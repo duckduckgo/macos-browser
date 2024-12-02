@@ -443,6 +443,7 @@ private extension DBPEndToEndTests {
     }
 
     final class PrivacyConfigurationMock: PrivacyConfiguration {
+        
         var identifier: String = "mock"
         var version: String? = "123456789"
 
@@ -506,6 +507,18 @@ private extension DBPEndToEndTests {
 
         func isSubfeatureEnabled(_ subfeature: any BrowserServicesKit.PrivacySubfeature, versionProvider: BrowserServicesKit.AppVersionProvider, randomizer: (Range<Double>) -> Double) -> Bool {
             false
+        }
+
+        func stateFor(subfeatureID: SubfeatureID, parentFeatureID: ParentFeatureID, versionProvider: AppVersionProvider, randomizer: (Range<Double>) -> Double) -> PrivacyConfigurationFeatureState {
+            .disabled(.disabledInConfig)
+        }
+
+        func cohorts(for subfeature: any PrivacySubfeature) -> [PrivacyConfigurationData.Cohort]? {
+            return nil
+        }
+
+        func cohorts(subfeatureID: SubfeatureID, parentFeatureID: ParentFeatureID) -> [PrivacyConfigurationData.Cohort]? {
+            return nil
         }
     }
 }
