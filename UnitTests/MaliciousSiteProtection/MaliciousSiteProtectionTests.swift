@@ -20,19 +20,22 @@ import BrowserServicesKit
 import Combine
 import Foundation
 import MaliciousSiteProtection
+import TestUtils
 import XCTest
 
 @testable import DuckDuckGo_Privacy_Browser
 
 final class MaliciousSiteProtectionTests: XCTestCase {
     lazy var phishingDetection: MaliciousSiteProtectionManager! = {
-        MaliciousSiteProtectionManager(dataManager: dataManager, detector: MockMaliciousSiteDetector(), featureFlagger: MockFeatureFlagger())
+        MaliciousSiteProtectionManager(apiService: apiService, dataManager: dataManager, detector: MockMaliciousSiteDetector(), featureFlagger: MockFeatureFlagger())
     }()
+    var apiService: MockAPIService!
     var mockDetector: MockMaliciousSiteDetector!
     var mockDataProvider: MockMaliciousSiteDataProvider!
     var dataManager: MaliciousSiteProtection.DataManager!
 
     override func setUp() async throws {
+        apiService = MockAPIService(apiResponse: .failure(CancellationError()))
         let mockFileStore = MockMaliciousSiteFileStore()
         mockDataProvider = MockMaliciousSiteDataProvider()
         dataManager = MaliciousSiteProtection.DataManager(fileStore: mockFileStore, embeddedDataProvider: mockDataProvider, fileNameProvider: { _ in "file.json" })

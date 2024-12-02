@@ -89,10 +89,10 @@ final class PrivacyDashboardTabExtension {
     private func updatePrivacyInfo(with trust: SecTrust?) async {
         let isValid = await Task<Bool?, Never>.detached {
             await self.certificateTrustEvaluator.evaluateCertificateTrust(trust: trust)
-        }.value ?? false
+        }.value
 
         self.isCertificateValid = isValid
-        self.privacyInfo?.serverTrust = isValid ? trust : nil
+        self.privacyInfo?.serverTrust = (isValid == true) ? trust : nil
     }
 
     @MainActor

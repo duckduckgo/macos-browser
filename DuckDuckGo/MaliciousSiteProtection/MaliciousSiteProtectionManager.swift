@@ -22,6 +22,7 @@ import Common
 import FeatureFlags
 import Foundation
 import MaliciousSiteProtection
+import Networking
 import PixelKit
 
 extension MaliciousSiteProtectionManager {
@@ -94,12 +95,14 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
 
     init(
         apiEnvironment: MaliciousSiteDetector.APIEnvironment = .production,
+        apiService: APIService = DefaultAPIService(urlSession: .shared),
         embeddedDataProvider: MaliciousSiteProtection.EmbeddedDataProviding? = nil,
         dataManager: MaliciousSiteProtection.DataManager? = nil,
         detector: MaliciousSiteProtection.MaliciousSiteDetecting? = nil,
         detectionPreferences: MaliciousSiteProtectionPreferences = MaliciousSiteProtectionPreferences.shared,
         featureFlagger: FeatureFlagger? = nil,
-        configManager: PrivacyConfigurationManaging? = nil
+        configManager: PrivacyConfigurationManaging? = nil,
+        updateIntervalProvider: UpdateManager.UpdateIntervalProvider? = nil
     ) {
         self.featureFlagger = featureFlagger ?? NSApp.delegateTyped.featureFlagger
         self.configManager = configManager ?? AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
@@ -111,8 +114,8 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
             return MaliciousSiteProtection.DataManager(fileStore: fileStore, embeddedDataProvider: embeddedDataProvider, fileNameProvider: Self.fileName(for:))
         }()
 
-        self.detector = detector ?? MaliciousSiteDetector(apiEnvironment: apiEnvironment, dataManager: dataManager, eventMapping: Self.debugEvents)
-        self.updateManager = MaliciousSiteProtection.UpdateManager(apiEnvironment: apiEnvironment, dataManager: dataManager, updateIntervalProvider: Self.updateInterval)
+        self.detector = detector ?? MaliciousSiteDetector(apiEnvironment: apiEnvironment, service: apiService, dataManager: dataManager, eventMapping: Self.debugEvents)
+        self.updateManager = MaliciousSiteProtection.UpdateManager(apiEnvironment: apiEnvironment, service: apiService, dataManager: dataManager, updateIntervalProvider: updateIntervalProvider ?? Self.updateInterval)
         self.detectionPreferences = detectionPreferences
 
         self.setupBindings()
@@ -169,7 +172,7 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
     // MARK: - Public
 
     public func evaluate(_ url: URL) async -> ThreatKind? {
-        guard configManager.privacyConfig.isFeature(.maliciousSiteProtection, enabledForDomain: url.host) || featureFlagger.localOverrides?.override(for: FeatureFlag.maliciousSiteProtectionErrorPage) == true,
+        guard configManager.privacyConfig.isFeature(.maliciousSiteProtection, enabledForDomain: url.host),
               detectionPreferences.isEnabled else { return .none }
 
         return await detector.evaluate(url)

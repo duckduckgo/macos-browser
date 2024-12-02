@@ -42,7 +42,6 @@ extension Tab: NavigationResponder {
     func setupNavigationDelegate() {
         navigationDelegate.setResponders(
             .weak(nullable: self.navigationHotkeyHandler),
-            .struct(OnboardingNavigationResponder()),
             .weak(nullable: self.brokenSiteInfo),
 
             // redirect to SERP for non-valid domains entered by user

@@ -18,6 +18,7 @@
 
 import Foundation
 import CommonCrypto
+import SpecialErrorPages
 
 /**
  `URLTokenValidator` is responsible for generating and validating URL signatures to securely pass URLs around in Special Pages.
@@ -158,5 +159,39 @@ public class URLTokenValidator {
 
         // Decode the Base64 string to data
         return Data(base64Encoded: base64String)
+    }
+}
+
+extension URL {
+    private enum Parameter {
+        static let reason = "reason"
+        static let failingUrl = "url"
+        static let token = "token"
+    }
+
+    init?(base64UrlString: String) {
+        guard let decodedData = URLTokenValidator.base64URLDecode(base64UrlString),
+              let decodedString = String(data: decodedData, encoding: .utf8),
+              let url = URL(string: decodedString) else { return nil }
+        self = url
+    }
+
+    var specialErrorPageParameters: (failingUrl: URL, reason: SpecialErrorKind, token: String)? {
+        guard isErrorURL,
+              let reason = getParameter(named: Parameter.reason).flatMap(SpecialErrorKind.init(rawValue:)),
+              let failingUrl = getParameter(named: Parameter.failingUrl).flatMap(URL.init(base64UrlString:)),
+              let token = getParameter(named: Parameter.token) else { return nil }
+
+        return (failingUrl: failingUrl, reason: reason, token: token)
+    }
+
+    static func specialErrorPage(failingUrl: URL, kind: SpecialErrorKind) -> URL {
+        let encodedUrl = URLTokenValidator.base64URLEncode(failingUrl)
+        let token = URLTokenValidator.shared.generateToken(for: failingUrl)
+        return .error.appendingParameters([
+            Parameter.failingUrl: encodedUrl,
+            Parameter.reason: kind.rawValue,
+            Parameter.token: token
+        ])
     }
 }

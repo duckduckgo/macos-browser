@@ -30,6 +30,11 @@ class MaliciousSiteProtectionIntegrationTests: XCTestCase {
     var window: NSWindow!
     var cancellables: Set<AnyCancellable>!
     var detector: MaliciousSiteDetecting!
+    var contentBlockingMock: ContentBlockingMock!
+    var privacyFeaturesMock: AnyPrivacyFeatures!
+    var privacyConfiguration: MockPrivacyConfiguration {
+        contentBlockingMock.privacyConfigurationManager.privacyConfig as! MockPrivacyConfiguration
+    }
     var tab: Tab!
     var tabViewModel: TabViewModel!
     var schemeHandler: TestSchemeHandler!
@@ -39,7 +44,7 @@ class MaliciousSiteProtectionIntegrationTests: XCTestCase {
         WebTrackingProtectionPreferences.shared.isGPCEnabled = false
         MaliciousSiteProtectionPreferences.shared.isEnabled = true
         let featureFlagger = MockFeatureFlagger()
-        detector = MaliciousSiteProtectionManager(featureFlagger: featureFlagger, configManager: MockPrivacyConfigurationManager())
+        detector = MaliciousSiteProtectionManager(featureFlagger: featureFlagger, configManager: MockPrivacyConfigurationManager(), updateIntervalProvider: { _ in nil })
         schemeHandler = TestSchemeHandler()
         schemeHandler.middleware = [{
             if $0.url!.lastPathComponent == "phishing.html" {
@@ -54,7 +59,14 @@ class MaliciousSiteProtectionIntegrationTests: XCTestCase {
         webViewConfiguration.setURLSchemeHandler(schemeHandler, forURLScheme: URL.NavigationalScheme.http.rawValue)
         webViewConfiguration.setURLSchemeHandler(schemeHandler, forURLScheme: URL.NavigationalScheme.https.rawValue)
 
-        tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, maliciousSiteDetector: detector)
+        contentBlockingMock = ContentBlockingMock()
+        privacyFeaturesMock = AppPrivacyFeatures(contentBlocking: contentBlockingMock, httpsUpgradeStore: HTTPSUpgradeStoreMock())
+        // disable waiting for CBR compilation on navigation
+        privacyConfiguration.isFeatureKeyEnabled = { feature, _ in
+            if case .maliciousSiteProtection = feature { true } else { false }
+        }
+
+        tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock, maliciousSiteDetector: detector)
         tabViewModel = TabViewModel(tab: tab)
         window = WindowsManager.openNewWindow(with: tab)!
         cancellables = Set<AnyCancellable>()
@@ -92,11 +104,14 @@ class MaliciousSiteProtectionIntegrationTests: XCTestCase {
     @MainActor
     func testFeatureDisabledAndPhishingDetection_tabIsNotMarkedPhishing() async throws {
         MaliciousSiteProtectionPreferences.shared.isEnabled = false
+        let e = expectation(description: "request sent")
         schemeHandler.middleware = [{ _ in
+            e.fulfill()
             return .ok(.html(""))
         }]
         let url = URL(string: "http://privacy-test-pages.site/security/badware/phishing.html")!
         try await loadUrl(url)
+        await fulfillment(of: [e], timeout: 1)
         XCTAssertNil(tabViewModel.tab.error)
     }
 
