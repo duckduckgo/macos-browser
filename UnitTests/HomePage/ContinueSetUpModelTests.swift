@@ -53,7 +53,7 @@ final class ContinueSetUpModelTests: XCTestCase {
             defaultBrowserProvider: capturingDefaultBrowserProvider,
             dockCustomizer: dockCustomizer,
             dataImportProvider: capturingDataImportProvider,
-            tabCollectionViewModel: tabCollectionVM,
+            tabOpener: TabCollectionViewModelTabOpener(tabCollectionViewModel: tabCollectionVM),
             emailManager: emailManager,
             duckPlayerPreferences: duckPlayerPreferences,
             privacyConfigurationManager: privacyConfigManager
@@ -95,7 +95,7 @@ final class ContinueSetUpModelTests: XCTestCase {
             defaultBrowserProvider: capturingDefaultBrowserProvider,
             dockCustomizer: dockCustomizer,
             dataImportProvider: capturingDataImportProvider,
-            tabCollectionViewModel: tabCollectionVM,
+            tabOpener: TabCollectionViewModelTabOpener(tabCollectionViewModel: tabCollectionVM),
             emailManager: emailManager,
             duckPlayerPreferences: duckPlayerPreferences
         )
@@ -111,7 +111,7 @@ final class ContinueSetUpModelTests: XCTestCase {
             defaultBrowserProvider: capturingDefaultBrowserProvider,
             dockCustomizer: dockCustomizer,
             dataImportProvider: capturingDataImportProvider,
-            tabCollectionViewModel: tabCollectionVM,
+            tabOpener: TabCollectionViewModelTabOpener(tabCollectionViewModel: tabCollectionVM),
             emailManager: emailManager,
             duckPlayerPreferences: duckPlayerPreferences
         )
@@ -315,7 +315,7 @@ final class ContinueSetUpModelTests: XCTestCase {
             defaultBrowserProvider: capturingDefaultBrowserProvider,
             dockCustomizer: dockCustomizer,
             dataImportProvider: capturingDataImportProvider,
-            tabCollectionViewModel: tabCollectionVM,
+            tabOpener: TabCollectionViewModelTabOpener(tabCollectionViewModel: tabCollectionVM),
             emailManager: emailManager,
             duckPlayerPreferences: duckPlayerPreferences
         )
@@ -330,7 +330,7 @@ final class ContinueSetUpModelTests: XCTestCase {
             defaultBrowserProvider: capturingDefaultBrowserProvider,
             dockCustomizer: dockCustomizer,
             dataImportProvider: capturingDataImportProvider,
-            tabCollectionViewModel: tabCollectionVM,
+            tabOpener: TabCollectionViewModelTabOpener(tabCollectionViewModel: tabCollectionVM),
             emailManager: emailManager,
             duckPlayerPreferences: duckPlayerPreferences
         )
@@ -427,7 +427,7 @@ extension HomePage.Models.ContinueSetUpModel {
             defaultBrowserProvider: defaultBrowserProvider,
             dockCustomizer: dockCustomizer,
             dataImportProvider: dataImportProvider,
-            tabCollectionViewModel: TabCollectionViewModel(),
+            tabOpener: TabCollectionViewModelTabOpener(tabCollectionViewModel: TabCollectionViewModel()),
             emailManager: emailManager,
             duckPlayerPreferences: duckPlayerPreferences,
             privacyConfigurationManager: manager)

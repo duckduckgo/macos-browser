@@ -1109,6 +1109,8 @@
 		3723A9502CE7400D00A0C59A /* NewTabPageRMFClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3723A94E2CE73FDD00A0C59A /* NewTabPageRMFClient.swift */; };
 		3724ED8B2CFE6A290043626A /* NewTabPageNextStepsCardsProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3724ED8A2CFE6A120043626A /* NewTabPageNextStepsCardsProviding.swift */; };
 		3724ED8C2CFE6A290043626A /* NewTabPageNextStepsCardsProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3724ED8A2CFE6A120043626A /* NewTabPageNextStepsCardsProviding.swift */; };
+		3724ED8E2CFE6B3F0043626A /* NewTabPageNextStepsCardsClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3724ED8D2CFE6B330043626A /* NewTabPageNextStepsCardsClientTests.swift */; };
+		3724ED8F2CFE6B3F0043626A /* NewTabPageNextStepsCardsClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3724ED8D2CFE6B330043626A /* NewTabPageNextStepsCardsClientTests.swift */; };
 		37269EFB2B332F9E005E8E46 /* Common in Frameworks */ = {isa = PBXBuildFile; productRef = 37269EFA2B332F9E005E8E46 /* Common */; };
 		37269EFD2B332FAC005E8E46 /* Common in Frameworks */ = {isa = PBXBuildFile; productRef = 37269EFC2B332FAC005E8E46 /* Common */; };
 		37269EFF2B332FBB005E8E46 /* Common in Frameworks */ = {isa = PBXBuildFile; productRef = 37269EFE2B332FBB005E8E46 /* Common */; };
@@ -3670,6 +3672,7 @@
 		37219B3C2CC27DB300C9D7A8 /* NewTabPageSearchBoxExperimentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageSearchBoxExperimentTests.swift; sourceTree = "<group>"; };
 		3723A94E2CE73FDD00A0C59A /* NewTabPageRMFClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageRMFClient.swift; sourceTree = "<group>"; };
 		3724ED8A2CFE6A120043626A /* NewTabPageNextStepsCardsProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageNextStepsCardsProviding.swift; sourceTree = "<group>"; };
+		3724ED8D2CFE6B330043626A /* NewTabPageNextStepsCardsClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageNextStepsCardsClientTests.swift; sourceTree = "<group>"; };
 		372A0FEB2B2379310033BF7F /* SyncMetricsEventsHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncMetricsEventsHandler.swift; sourceTree = "<group>"; };
 		372BC2A02A4AFA47001D8FD5 /* SyncCredentialsAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncCredentialsAdapter.swift; sourceTree = "<group>"; };
 		372ED7C12CDD4815002287EC /* NewTabPageUserContentController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageUserContentController.swift; sourceTree = "<group>"; };
@@ -5882,6 +5885,7 @@
 				3767880E2CECD5A200F59D83 /* NewTabPageUserScriptTests.swift */,
 				3767880B2CECCB6C00F59D83 /* NewTabPageActionsManagerTests.swift */,
 				376788112CECF03000F59D83 /* NewTabPageRMFClientTests.swift */,
+				3724ED8D2CFE6B330043626A /* NewTabPageNextStepsCardsClientTests.swift */,
 				37F1E32E2CEF4A2C00130142 /* NewTabPageFavoritesClientTests.swift */,
 				378D62562CEF801A0056BBD8 /* NewTabPageFavoritesModelTests.swift */,
 				37FC2A1A2CF903A70048E226 /* NewTabPagePrivacyStatsClientTests.swift */,
@@ -12614,6 +12618,7 @@
 				CD33012A2C887B1C009AA127 /* URLTokenValidatorTests.swift in Sources */,
 				9F0660742BECC71200B8EEF1 /* SubscriptionAttributionPixelHandlerTests.swift in Sources */,
 				9FBD847B2BB3EC3300220859 /* MockAttributionOriginProvider.swift in Sources */,
+				3724ED8F2CFE6B3F0043626A /* NewTabPageNextStepsCardsClientTests.swift in Sources */,
 				56A214B02CB583BF00E5BC0E /* TrackerMessageProviderTests.swift in Sources */,
 				3706FE82293F661700E42796 /* MockStatisticsStore.swift in Sources */,
 				9FBD84712BB3DD8400220859 /* MockAttributionsPixelHandler.swift in Sources */,
@@ -14137,6 +14142,7 @@
 				4B98D27A28D95F1A003C2B6F /* ChromiumFaviconsReaderTests.swift in Sources */,
 				9F0660732BECC71200B8EEF1 /* SubscriptionAttributionPixelHandlerTests.swift in Sources */,
 				56A054302C2043C8007D8FAB /* OnboardingTabExtensionTests.swift in Sources */,
+				3724ED8E2CFE6B3F0043626A /* NewTabPageNextStepsCardsClientTests.swift in Sources */,
 				BDCB66D82C7CE1A600E8ABC9 /* VPNFeedbackFormViewModelTests.swift in Sources */,
 				567A23E12C89B1EE0010F66C /* BrowserTabViewControllerOnboardingTests.swift in Sources */,
 				986189E62A7CFB3E001B4519 /* LocalBookmarkStoreSavingTests.swift in Sources */,

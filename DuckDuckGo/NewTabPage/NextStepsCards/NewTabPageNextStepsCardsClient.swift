@@ -105,7 +105,7 @@ final class NewTabPageNextStepsCardsClient: NewTabPageScriptClient {
         guard let card: NewTabPageNextStepsCardsClient.Card = DecodableHelper.decode(from: params) else {
             return nil
         }
-        await model.performAction(for: card.id)
+        await model.handleAction(for: card.id)
         return nil
     }
 
@@ -171,11 +171,11 @@ extension NewTabPageNextStepsCardsClient {
         case addAppToDockMac
     }
 
-    struct Card: Codable {
+    struct Card: Codable, Equatable {
         let id: CardID
     }
 
-    struct NextStepsData: Codable {
+    struct NextStepsData: Codable, Equatable {
         let content: [Card]?
     }
 }

@@ -29,7 +29,7 @@ protocol NewTabPageNextStepsCardsProviding: AnyObject {
     var cardsPublisher: AnyPublisher<[NewTabPageNextStepsCardsClient.CardID], Never> { get }
 
     @MainActor
-    func performAction(for card: NewTabPageNextStepsCardsClient.CardID)
+    func handleAction(for card: NewTabPageNextStepsCardsClient.CardID)
     func dismiss(_ card: NewTabPageNextStepsCardsClient.CardID)
 
     func willDisplayCards(_ cards: [NewTabPageNextStepsCardsClient.CardID])
@@ -62,7 +62,7 @@ extension HomePage.Models.ContinueSetUpModel: NewTabPageNextStepsCardsProviding 
     }
 
     @MainActor
-    func performAction(for card: NewTabPageNextStepsCardsClient.CardID) {
+    func handleAction(for card: NewTabPageNextStepsCardsClient.CardID) {
         performAction(for: .init(card))
     }
 
