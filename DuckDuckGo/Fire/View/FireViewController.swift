@@ -159,14 +159,17 @@ final class FireViewController: NSViewController {
             fireViewModel.isAnimationPlaying = true
 
             fireAnimationView?.currentProgress = 0
+            let completion = { [fireViewModel] in
+                fireViewModel.isAnimationPlaying = false
+                continuation.resume()
+            }
             fireAnimationView?.play(fromProgress: fireAnimationBeginning, toProgress: fireAnimationEnd) { [weak self] _ in
                 guard let self = self else { return }
 
-                self.fireViewModel.isAnimationPlaying = false
                 self.progressIndicatorWrapper.isHidden = false
                 self.fakeFireButton.isHidden = false
-                continuation.resume()
-            } ?? continuation.resume() // Resume immediately if fireAnimationView is nil
+
+            } ?? completion() // Resume immediately if fireAnimationView is nil
         }
     }
 
@@ -188,11 +191,11 @@ final class FireViewController: NSViewController {
 
             fireViewModel.fire.fireAnimationDidStart()
             fireAnimationView?.currentProgress = 0
-            fireAnimationView?.play(fromProgress: fireAnimationBeginning, toProgress: fireAnimationEnd) { [weak self] _ in
-                guard let self = self else { return }
-
-                self.fireViewModel.isAnimationPlaying = false
+            fireAnimationView?.play(fromProgress: fireAnimationBeginning, toProgress: fireAnimationEnd) { [weak self, fireViewModel] _ in
+                fireViewModel.isAnimationPlaying = false
                 fireViewModel.fire.fireAnimationDidFinish()
+
+                guard let self = self else { return }
 
                 // If not finished yet, present the progress indicator
                 if self.fireViewModel.fire.burningData != nil {
