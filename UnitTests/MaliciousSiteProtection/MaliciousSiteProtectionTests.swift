@@ -1,0 +1,105 @@
+//
+//  MaliciousSiteProtectionTests.swift
+//
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+
+import BrowserServicesKit
+import Combine
+import Foundation
+import MaliciousSiteProtection
+import TestUtils
+import XCTest
+
+@testable import DuckDuckGo_Privacy_Browser
+
+final class MaliciousSiteProtectionTests: XCTestCase {
+    lazy var phishingDetection: MaliciousSiteProtectionManager! = {
+        MaliciousSiteProtectionManager(apiService: apiService, dataManager: dataManager, detector: MockMaliciousSiteDetector(), featureFlagger: MockFeatureFlagger())
+    }()
+    var apiService: MockAPIService!
+    var mockDetector: MockMaliciousSiteDetector!
+    var mockDataProvider: MockMaliciousSiteDataProvider!
+    var dataManager: MaliciousSiteProtection.DataManager!
+
+    override func setUp() async throws {
+        apiService = MockAPIService(apiResponse: .failure(CancellationError()))
+        let mockFileStore = MockMaliciousSiteFileStore()
+        mockDataProvider = MockMaliciousSiteDataProvider()
+        dataManager = MaliciousSiteProtection.DataManager(fileStore: mockFileStore, embeddedDataProvider: mockDataProvider, fileNameProvider: { _ in "file.json" })
+    }
+
+    override func tearDown() async throws {
+        phishingDetection = nil
+        mockDataProvider = nil
+        mockDetector = nil
+        dataManager = nil
+    }
+
+    func testDidLoadAndStartDataActivities() async {
+        MaliciousSiteProtectionPreferences.shared.isEnabled = true
+        XCTAssertTrue(phishingDetection.backgroundUpdatesEnabled)
+    }
+
+    func testDisableFeature() async {
+        MaliciousSiteProtectionPreferences.shared.isEnabled = false
+        let isMalicious = await phishingDetection.evaluate(URL(string: "https://malicious.com")!)
+        XCTAssertNil(isMalicious)
+    }
+
+    func testDidNotLoadAndStartDataActivities_IfFeatureDisabled() async {
+        MaliciousSiteProtectionPreferences.shared.isEnabled = false
+        _=phishingDetection
+        for _ in 0..<100 { await Task.yield() }
+        XCTAssertFalse(mockDataProvider.didLoadHashPrefixes)
+        XCTAssertFalse(mockDataProvider.didLoadFilterSet)
+        XCTAssertFalse(phishingDetection.backgroundUpdatesEnabled)
+    }
+
+    func testIsMalicious() async {
+        MaliciousSiteProtectionPreferences.shared.isEnabled = true
+        let isMalicious = await phishingDetection.evaluate(URL(string: "https://malicious.com")!)
+        XCTAssertEqual(isMalicious, .phishing)
+    }
+
+    func testIsNotMalicious() async {
+        MaliciousSiteProtectionPreferences.shared.isEnabled = true
+        let isMalicious = await phishingDetection.evaluate(URL(string: "https://trusted.com")!)
+        XCTAssertNil(isMalicious)
+    }
+}
+
+extension MaliciousSiteProtectionTests {
+    class MockFeatureFlagger: FeatureFlagger {
+        var internalUserDecider: InternalUserDecider = DefaultInternalUserDecider(store: MockInternalUserStoring())
+        var localOverrides: FeatureFlagLocalOverriding?
+
+        func isFeatureOn<Flag: FeatureFlagDescribing>(for featureFlag: Flag, allowOverride: Bool) -> Bool {
+            return true
+        }
+
+        func getCohortIfEnabled(_ subfeature: any PrivacySubfeature) -> CohortID? {
+            return nil
+        }
+
+        func getCohortIfEnabled<Flag>(for featureFlag: Flag) -> (any FlagCohort)? where Flag: FeatureFlagExperimentDescribing {
+            return nil
+        }
+
+        func getAllActiveExperiments() -> Experiments {
+            return [:]
+        }
+    }
+}
