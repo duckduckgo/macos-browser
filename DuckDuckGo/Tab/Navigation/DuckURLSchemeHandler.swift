@@ -55,6 +55,7 @@ final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
             handleErrorPage(urlSchemeTask: urlSchemeTask)
         case .newTab where isNTPSpecialPageSupported && featureFlagger.isFeatureOn(.htmlNewTabPage):
             if requestURL.type == .favicon {
+                handleFavicon(urlSchemeTask: urlSchemeTask)
             } else {
                 handleSpecialPages(urlSchemeTask: urlSchemeTask)
             }
