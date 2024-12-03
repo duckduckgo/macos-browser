@@ -143,7 +143,7 @@ struct WKURLSchemeTaskHandler {
 
 }
 
-class MockHTTPURLResponse: HTTPURLResponse {
+class MockHTTPURLResponse: HTTPURLResponse, @unchecked Sendable {
 
     private let mime: String?
 

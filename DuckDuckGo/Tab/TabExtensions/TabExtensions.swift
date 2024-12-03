@@ -225,10 +225,6 @@ extension TabExtensionsBuilder {
         }
 #endif
 
-        add {
-            OnboardingTabExtension()
-        }
-
         if let tunnelController = dependencies.tunnelController {
             add {
                 NetworkProtectionControllerTabExtension(tunnelController: tunnelController)

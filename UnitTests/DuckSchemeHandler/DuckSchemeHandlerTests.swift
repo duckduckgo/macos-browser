@@ -125,9 +125,8 @@ final class DuckSchemeHandlerTests: XCTestCase {
     @MainActor
     func testErrorPageSchemeHandlerSetsError() {
         // Given
-        let urlString = "https://privacy-test-pages.site/security/badware/phishing.html"
-        let phishingUrl = URL(string: urlString)!
-        let encodedURL = URLTokenValidator.base64URLEncode(data: urlString.data(using: .utf8)!)
+        let phishingUrl = URL(string: "https://privacy-test-pages.site/security/badware/phishing.html")!
+        let encodedURL = URLTokenValidator.base64URLEncode(phishingUrl)
         let token = URLTokenValidator.shared.generateToken(for: phishingUrl)
         let errorURLString = "duck://error?reason=phishing&url=\(encodedURL)&token=\(token)"
         let errorURL = URL(string: errorURLString)!
@@ -145,8 +144,8 @@ final class DuckSchemeHandlerTests: XCTestCase {
     @MainActor
     func testErrorPageSchemeHandlerSetsError_WhenTokenInvalid() {
         // Given
-        let urlString = "https://privacy-test-pages.site/security/badware/phishing.html"
-        let encodedURL = URLTokenValidator.base64URLEncode(data: urlString.data(using: .utf8)!)
+        let url = URL(string: "https://privacy-test-pages.site/security/badware/phishing.html")!
+        let encodedURL = URLTokenValidator.base64URLEncode(url)
         let token = "ababababababababababab"
         let errorURLString = "duck://error?reason=phishing&url=\(encodedURL)&token=\(token)"
         let errorURL = URL(string: errorURLString)!
