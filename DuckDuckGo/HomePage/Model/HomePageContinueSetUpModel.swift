@@ -18,6 +18,7 @@
 
 import AppKit
 import BrowserServicesKit
+import Combine
 import Common
 import Foundation
 import PixelKit
@@ -68,14 +69,17 @@ extension HomePage.Models {
         private let duckPlayerPreferences: DuckPlayerPreferencesPersistor
         private let subscriptionManager: SubscriptionManager
 
-        @Published
-        var shouldShowAllFeatures: Bool = UserDefaultsWrapper(key: .homePageShowAllFeatures, defaultValue: false).wrappedValue {
+
+        @UserDefaultsWrapper(key: .homePageShowAllFeatures, defaultValue: false)
+        var shouldShowAllFeatures: Bool {
             didSet {
-                let udWrapper = UserDefaultsWrapper(key: .homePageShowAllFeatures, defaultValue: false)
-                udWrapper.wrappedValue = shouldShowAllFeatures
                 updateVisibleMatrix()
+                shouldShowAllFeaturesSubject.send(shouldShowAllFeatures)
             }
         }
+
+        let shouldShowAllFeaturesPublisher: AnyPublisher<Bool, Never>
+        private let shouldShowAllFeaturesSubject = PassthroughSubject<Bool, Never>()
 
         struct Settings {
             @UserDefaultsWrapper(key: .homePageShowMakeDefault, defaultValue: true)
@@ -144,6 +148,8 @@ extension HomePage.Models {
             self.privacyConfigurationManager = privacyConfigurationManager
             self.subscriptionManager = subscriptionManager
             self.settings = .init()
+
+            shouldShowAllFeaturesPublisher = shouldShowAllFeaturesSubject.removeDuplicates().eraseToAnyPublisher()
 
             refreshFeaturesMatrix()
 

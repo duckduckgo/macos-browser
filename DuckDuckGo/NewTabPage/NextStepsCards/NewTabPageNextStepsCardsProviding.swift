@@ -46,7 +46,7 @@ extension HomePage.Models.ContinueSetUpModel: NewTabPageNextStepsCardsProviding 
     }
 
     var isViewExpandedPublisher: AnyPublisher<Bool, Never> {
-        $shouldShowAllFeatures.dropFirst().removeDuplicates().eraseToAnyPublisher()
+        shouldShowAllFeaturesPublisher.eraseToAnyPublisher()
     }
 
     var cards: [NewTabPageNextStepsCardsClient.CardID] {
