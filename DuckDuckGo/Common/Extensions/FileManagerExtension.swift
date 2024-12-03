@@ -22,6 +22,31 @@ import os.log
 
 extension FileManager {
 
+#if !SANDBOX_TEST_TOOL
+    func configurationDirectory() -> URL {
+        let fm = FileManager.default
+
+        guard let dir = fm.containerURL(forSecurityApplicationGroupIdentifier: Bundle.main.appGroup(bundle: .appConfiguration)) else {
+            fatalError("Failed to get application group URL")
+        }
+        let subDir = dir.appendingPathComponent("Configuration")
+
+        var isDir: ObjCBool = false
+        if !fm.fileExists(atPath: subDir.path, isDirectory: &isDir) || !isDir.boolValue {
+            if !isDir.boolValue {
+                try? fm.removeItem(at: subDir)
+            }
+            do {
+                try fm.createDirectory(at: subDir, withIntermediateDirectories: true, attributes: nil)
+                isDir = true
+            } catch {
+                fatalError("Failed to create directory at \(subDir.path)")
+            }
+        }
+        return subDir
+    }
+#endif
+
     @discardableResult
     func moveItem(at srcURL: URL, to destURL: URL, incrementingIndexIfExists flag: Bool, pathExtension: String? = nil) throws -> URL {
         guard srcURL != destURL else { return destURL }

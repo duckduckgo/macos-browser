@@ -16,25 +16,27 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
+import ContentScopeScripts
 import Foundation
-import PhishingDetection
+import MaliciousSiteProtection
+import Navigation
 import SpecialErrorPages
 
-protocol ErrorPageHTMLTemplating {
-    static var htmlTemplatePath: String { get }
-    func makeHTMLFromTemplate() -> String
-}
+enum ErrorPageHTMLFactory {
 
-final class ErrorPageHTMLFactory {
-    static func html(for error: Error, url: URL, errorCode: Int? = nil, header: String? = nil) -> String {
-        let defaultHeader = UserText.errorPageHeader
-        let nsError = error as NSError
-        let wkError = WKError(_nsError: nsError)
-        switch wkError.code {
-        case WKError.Code(rawValue: PhishingDetectionError.detected.rawValue):
+    static func html(for error: WKError, featureFlagger: FeatureFlagger, header: String? = nil) -> String {
+        switch error as NSError {
+        case is MaliciousSiteError:
             return SpecialErrorPageHTMLTemplate.htmlFromTemplate
+
+        case is URLError where error.isServerCertificateUntrusted && featureFlagger.isFeatureOn(.sslCertificatesBypass):
+            return SpecialErrorPageHTMLTemplate.htmlFromTemplate
+
         default:
-            return ErrorPageHTMLTemplate(error: wkError, header: header ?? defaultHeader).makeHTMLFromTemplate()
+            return ErrorPageHTMLTemplate(error: WKError(_nsError: error as NSError),
+                                         header: header ?? UserText.errorPageHeader).makeHTMLFromTemplate()
         }
     }
+
 }
