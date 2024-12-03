@@ -21,6 +21,7 @@ import Foundation
 import BrowserServicesKit
 import Networking
 import PixelKit
+import PixelExperimentKit
 import os.log
 
 final class StatisticsLoader {
@@ -34,15 +35,21 @@ final class StatisticsLoader {
     private let attributionPixelHandler: InstallationAttributionsPixelHandler
     private let parser = AtbParser()
     private var isAppRetentionRequestInProgress = false
+    private let fireSearchExperimentPixels: () -> Void
+    private let fireAppRetentionExperimentPixels: () -> Void
 
     init(
         statisticsStore: StatisticsStore = LocalStatisticsStore(),
         emailManager: EmailManager = EmailManager(),
-        attributionPixelHandler: InstallationAttributionsPixelHandler = AppInstallationAttributionPixelHandler()
+        attributionPixelHandler: InstallationAttributionsPixelHandler = AppInstallationAttributionPixelHandler(),
+        fireAppRetentionExperimentPixels: @escaping () -> Void = PixelKit.fireAppRetentionExperimentPixels,
+        fireSearchExperimentPixels: @escaping () -> Void = PixelKit.fireSearchExperimentPixels
     ) {
         self.statisticsStore = statisticsStore
         self.emailManager = emailManager
         self.attributionPixelHandler = attributionPixelHandler
+        self.fireSearchExperimentPixels = fireSearchExperimentPixels
+        self.fireAppRetentionExperimentPixels = fireAppRetentionExperimentPixels
     }
 
     func refreshRetentionAtb(isSearch: Bool, completion: @escaping Completion = {}) {
@@ -57,11 +64,14 @@ final class StatisticsLoader {
                 }
                 PixelExperiment.fireSerpPixel()
                 PixelExperiment.fireOnboardingSearchPerformed5to7Pixel()
+                self.fireSearchExperimentPixels()
                 self.fireDailyOsVersionCounterPixel()
                 self.fireDockPixel()
             } else if !self.statisticsStore.isAppRetentionFiredToday {
                 self.refreshAppRetentionAtb(completion: completion)
+                self.fireAppRetentionExperimentPixels()
             } else {
+                self.fireAppRetentionExperimentPixels()
                 completion()
             }
         }
