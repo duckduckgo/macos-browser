@@ -1970,12 +1970,12 @@
 		84B479092CCA7A3E00F40329 /* Logger+UnitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B479072CCA7A3900F40329 /* Logger+UnitTests.swift */; };
 		84B49F0D2CB10F0900FF08BB /* OHHTTPStubs in Frameworks */ = {isa = PBXBuildFile; productRef = 84B49F0C2CB10F0900FF08BB /* OHHTTPStubs */; };
 		84B49F0F2CB10F0900FF08BB /* OHHTTPStubsSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 84B49F0E2CB10F0900FF08BB /* OHHTTPStubsSwift */; };
+		84BBC7FF2CFA0D2F00BAE57A /* TestUtils in Frameworks */ = {isa = PBXBuildFile; productRef = 84BBC7FE2CFA0D2F00BAE57A /* TestUtils */; };
+		84BBC8012CFA0D3800BAE57A /* TestUtils in Frameworks */ = {isa = PBXBuildFile; productRef = 84BBC8002CFA0D3800BAE57A /* TestUtils */; };
 		84C96E462CF9BB6400A80A01 /* malwareFilterSet.json in Resources */ = {isa = PBXBuildFile; fileRef = 84C96E442CF9BB6400A80A01 /* malwareFilterSet.json */; };
 		84C96E472CF9BB6400A80A01 /* malwareHashPrefixes.json in Resources */ = {isa = PBXBuildFile; fileRef = 84C96E452CF9BB6400A80A01 /* malwareHashPrefixes.json */; };
 		84C96E482CF9BB6400A80A01 /* malwareFilterSet.json in Resources */ = {isa = PBXBuildFile; fileRef = 84C96E442CF9BB6400A80A01 /* malwareFilterSet.json */; };
 		84C96E492CF9BB6400A80A01 /* malwareHashPrefixes.json in Resources */ = {isa = PBXBuildFile; fileRef = 84C96E452CF9BB6400A80A01 /* malwareHashPrefixes.json */; };
-		84BBC7FF2CFA0D2F00BAE57A /* TestUtils in Frameworks */ = {isa = PBXBuildFile; productRef = 84BBC7FE2CFA0D2F00BAE57A /* TestUtils */; };
-		84BBC8012CFA0D3800BAE57A /* TestUtils in Frameworks */ = {isa = PBXBuildFile; productRef = 84BBC8002CFA0D3800BAE57A /* TestUtils */; };
 		84DC715A2C1C1E9000033B8C /* UserDefaultsWrapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DC71582C1C1E8A00033B8C /* UserDefaultsWrapperTests.swift */; };
 		84DC715B2C1C1E9000033B8C /* UserDefaultsWrapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DC71582C1C1E8A00033B8C /* UserDefaultsWrapperTests.swift */; };
 		84DDB90A2C92B66E008C997B /* WKVisitedLinkStoreWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DDB9092C92B667008C997B /* WKVisitedLinkStoreWrapper.swift */; };
@@ -2886,7 +2886,6 @@
 		B6F9BDE52B45CD1900677B33 /* ModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F9BDE32B45CD1900677B33 /* ModalView.swift */; };
 		B6FA893F269C424500588ECD /* PrivacyDashboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FA893E269C424500588ECD /* PrivacyDashboardViewController.swift */; };
 		B6FA8941269C425400588ECD /* PrivacyDashboardPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FA8940269C425400588ECD /* PrivacyDashboardPopover.swift */; };
-		BB1FD0D42CE549880027E1E3 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = BB1FD0D32CE549880027E1E3 /* InfoPlist.xcstrings */; };
 		BB4339DB2C7F9606005D7ED7 /* PinnedTabsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB4339DA2C7F9606005D7ED7 /* PinnedTabsTests.swift */; };
 		BB470EBB2C5A66D6002EE91D /* BookmarkManagementDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB470EBA2C5A66D6002EE91D /* BookmarkManagementDetailViewModel.swift */; };
 		BB470EBC2C5A66D6002EE91D /* BookmarkManagementDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB470EBA2C5A66D6002EE91D /* BookmarkManagementDetailViewModel.swift */; };
@@ -4875,7 +4874,6 @@
 		B6F9BDE32B45CD1900677B33 /* ModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModalView.swift; sourceTree = "<group>"; };
 		B6FA893E269C424500588ECD /* PrivacyDashboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardViewController.swift; sourceTree = "<group>"; };
 		B6FA8940269C425400588ECD /* PrivacyDashboardPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardPopover.swift; sourceTree = "<group>"; };
-		BB1FD0D32CE549880027E1E3 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		BB4339DA2C7F9606005D7ED7 /* PinnedTabsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedTabsTests.swift; sourceTree = "<group>"; };
 		BB470EBA2C5A66D6002EE91D /* BookmarkManagementDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkManagementDetailViewModel.swift; sourceTree = "<group>"; };
 		BB5789712B2CA70F0009DFE2 /* DataBrokerProtectionSubscriptionEventHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionSubscriptionEventHandler.swift; sourceTree = "<group>"; };
@@ -9491,7 +9489,6 @@
 		B6E6B9F42BA1FD90008AA7E1 /* sandbox-test-tool */ = {
 			isa = PBXGroup;
 			children = (
-				BB1FD0D32CE549880027E1E3 /* InfoPlist.xcstrings */,
 				B6E6BA212BA2E4FB008AA7E1 /* Info.plist */,
 				B6E6B9F52BA1FD90008AA7E1 /* SandboxTestTool.swift */,
 				B6E6BA222BA2EDDE008AA7E1 /* FileReadResult.swift */,
@@ -10542,7 +10539,6 @@
 				B6E6B9EF2BA1FD90008AA7E1 /* Sources */,
 				B6E6B9F02BA1FD90008AA7E1 /* Frameworks */,
 				B6AEB5532BA3029B00781A09 /* Cleanup entitlements */,
-				56A51CE92BE65B340098722D /* Resources */,
 			);
 			buildRules = (
 			);
@@ -10843,14 +10839,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		56A51CE92BE65B340098722D /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				BB1FD0D42CE549880027E1E3 /* InfoPlist.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
