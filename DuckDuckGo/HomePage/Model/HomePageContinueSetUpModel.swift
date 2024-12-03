@@ -69,7 +69,6 @@ extension HomePage.Models {
         private let duckPlayerPreferences: DuckPlayerPreferencesPersistor
         private let subscriptionManager: SubscriptionManager
 
-
         @UserDefaultsWrapper(key: .homePageShowAllFeatures, defaultValue: false)
         var shouldShowAllFeatures: Bool {
             didSet {
@@ -155,6 +154,10 @@ extension HomePage.Models {
 
             NotificationCenter.default.addObserver(self, selector: #selector(newTabOpenNotification(_:)), name: HomePage.Models.newHomePageTabOpen, object: nil)
             NotificationCenter.default.addObserver(self, selector: #selector(windowDidBecomeKey(_:)), name: NSWindow.didBecomeKeyNotification, object: nil)
+
+            // HTML NTP doesn't refresh on appear so we have to connect to the appear signal
+            // (the notification in this case) to trigger a refresh.
+            NotificationCenter.default.addObserver(self, selector: #selector(refreshFeaturesForHTMLNewTabPage(_:)), name: .newTabPageWebViewDidAppear, object: nil)
         }
 
         @MainActor func performAction(for featureType: FeatureType) {
@@ -266,6 +269,10 @@ extension HomePage.Models {
         }
 
         @objc private func windowDidBecomeKey(_ notification: Notification) {
+            refreshFeaturesMatrix()
+        }
+
+        @objc private func refreshFeaturesForHTMLNewTabPage(_ notification: Notification) {
             refreshFeaturesMatrix()
         }
 

@@ -115,14 +115,16 @@ final class NewTabPageNextStepsCardsClient: NewTabPageScriptClient {
         ])
     }
 
+    @MainActor
     func action(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let card: NewTabPageNextStepsCardsClient.Card = DecodableHelper.decode(from: params) else {
             return nil
         }
-        await model.handleAction(for: card.id)
+        model.handleAction(for: card.id)
         return nil
     }
 
+    @MainActor
     func dismiss(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let card: Card = DecodableHelper.decode(from: params) else {
             return nil

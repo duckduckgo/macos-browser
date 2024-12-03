@@ -30,6 +30,8 @@ protocol NewTabPageNextStepsCardsProviding: AnyObject {
 
     @MainActor
     func handleAction(for card: NewTabPageNextStepsCardsClient.CardID)
+
+    @MainActor
     func dismiss(_ card: NewTabPageNextStepsCardsClient.CardID)
 
     func willDisplayCards(_ cards: [NewTabPageNextStepsCardsClient.CardID])
@@ -66,6 +68,7 @@ extension HomePage.Models.ContinueSetUpModel: NewTabPageNextStepsCardsProviding 
         performAction(for: .init(card))
     }
 
+    @MainActor
     func dismiss(_ card: NewTabPageNextStepsCardsClient.CardID) {
         removeItem(for: .init(card))
     }
