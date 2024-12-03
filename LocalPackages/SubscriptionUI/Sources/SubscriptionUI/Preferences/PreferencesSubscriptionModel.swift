@@ -344,9 +344,11 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     private func updateAvailableSubscriptionFeatures() {
         let features = currentSubscriptionFeatures()
-        shouldShowVPN = features.contains(.networkProtection)
-        shouldShowDBP = features.contains(.dataBrokerProtection)
-        shouldShowITR = features.contains(.identityTheftRestoration) || features.contains(.identityTheftRestorationGlobal)
+        Task { @MainActor in
+            shouldShowVPN = features.contains(.networkProtection)
+            shouldShowDBP = features.contains(.dataBrokerProtection)
+            shouldShowITR = features.contains(.identityTheftRestoration) || features.contains(.identityTheftRestorationGlobal)
+        }
     }
 
     private func currentSubscriptionFeatures() -> [SubscriptionEntitlement] {

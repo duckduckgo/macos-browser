@@ -3154,7 +3154,8 @@
 		F118EA862BEACC7000F77634 /* NonStandardPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F118EA842BEACC7000F77634 /* NonStandardPixel.swift */; };
 		F1476FC02C1359FB00EAE46A /* SubscriptionUIHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1476FBF2C1359FB00EAE46A /* SubscriptionUIHandler.swift */; };
 		F1476FC12C1359FB00EAE46A /* SubscriptionUIHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1476FBF2C1359FB00EAE46A /* SubscriptionUIHandler.swift */; };
-		F14E5D532CFE18BC00B91BE6 /* BookmarksBarViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56AC09C62C2D7DD6002D70E0 /* BookmarksBarViewControllerTests.swift */; };
+		F14E5D562CFE1BE200B91BE6 /* BookmarksBarViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56AC09C62C2D7DD6002D70E0 /* BookmarksBarViewControllerTests.swift */; };
+		F14E5D572CFE1BE200B91BE6 /* BookmarksBarViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56AC09C62C2D7DD6002D70E0 /* BookmarksBarViewControllerTests.swift */; };
 		F17114822C7C98FB009836C1 /* Logger+Favicons.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17114812C7C98FB009836C1 /* Logger+Favicons.swift */; };
 		F17114832C7C98FB009836C1 /* Logger+Favicons.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17114812C7C98FB009836C1 /* Logger+Favicons.swift */; };
 		F17114852C7C9D28009836C1 /* Logger+Fire.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17114842C7C9D28009836C1 /* Logger+Fire.swift */; };
@@ -6305,6 +6306,7 @@
 		4B43468E285ED6CB00177407 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				56AC09C62C2D7DD6002D70E0 /* BookmarksBarViewControllerTests.swift */,
 				4B43468F285ED7A100177407 /* BookmarksBarViewModelTests.swift */,
 			);
 			path = ViewModel;
@@ -7163,7 +7165,6 @@
 		7B4CE8DB26F02108009134B1 /* UITests */ = {
 			isa = PBXGroup;
 			children = (
-				56AC09C62C2D7DD6002D70E0 /* BookmarksBarViewControllerTests.swift */,
 				B6A5A29F25B96E8300AA7ADA /* AppStateChangePublisherTests.swift */,
 				B6A5A2A725BAA35500AA7ADA /* WindowManagerStateRestorationTests.swift */,
 				567A23E02C89B1EE0010F66C /* BrowserTabViewControllerOnboardingTests.swift */,
@@ -12402,6 +12403,7 @@
 				37F1E3302CEF4A2C00130142 /* NewTabPageFavoritesClientTests.swift in Sources */,
 				567A23CF2C80CF4B0010F66C /* ErrorPageTabExtensionTest.swift in Sources */,
 				37D046A22C7DA9A200AEAA50 /* UserBackgroundImagesManagerTests.swift in Sources */,
+				F14E5D572CFE1BE200B91BE6 /* BookmarksBarViewControllerTests.swift in Sources */,
 				37DB56F02C3B31CD0093D4DC /* MockRemoteMessagingAvailabilityProvider.swift in Sources */,
 				1D8C2FEB2B70F5A7005E4BBD /* MockWebViewSnapshotRenderer.swift in Sources */,
 				378D62572CEF80200056BBD8 /* NewTabPageFavoritesModelTests.swift in Sources */,
@@ -12867,7 +12869,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F14E5D532CFE18BC00B91BE6 /* BookmarksBarViewControllerTests.swift in Sources */,
 				BB4339DB2C7F9606005D7ED7 /* PinnedTabsTests.swift in Sources */,
 				EEBCE6842BA4643200B9DF00 /* NSSizeExtension.swift in Sources */,
 				BB5F46A32C8751F6005F72DF /* BookmarkSortTests.swift in Sources */,
@@ -14227,6 +14228,7 @@
 				37E260922C8A3EB4006EE07F /* MockHomePageSettingsModelNavigator.swift in Sources */,
 				4BF4EA5027C71F26004E57C4 /* PasswordManagementListSectionTests.swift in Sources */,
 				AA7E9176286DB05D00AB6B62 /* RecentlyClosedCoordinatorMock.swift in Sources */,
+				F14E5D562CFE1BE200B91BE6 /* BookmarksBarViewControllerTests.swift in Sources */,
 				31E163BD293A579E00963C10 /* PrivacyReferenceTestHelper.swift in Sources */,
 				B693955D26F19CD70015B914 /* DownloadListStoreTests.swift in Sources */,
 				B610F2EB27AA8E4500FCEBE9 /* ContentBlockingUpdatingTests.swift in Sources */,

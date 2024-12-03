@@ -546,10 +546,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         DataBrokerProtectionAppEvents(featureGatekeeper: pirGatekeeper).applicationDidBecomeActive()
 
         Task {
-            guard let subscription = try? await subscriptionManager.currentSubscription(refresh: true) else {
-                return
-            }
-
+            guard let subscription = try? await subscriptionManager.currentSubscription(refresh: false) else { return }
             if subscription.isActive {
                 PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActive, frequency: .daily)
             }
