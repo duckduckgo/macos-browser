@@ -43,11 +43,13 @@ final class CapturingNewTabPageNextStepsCardsProvider: NewTabPageNextStepsCardsP
 
     func willDisplayCards(_ cards: [NewTabPageNextStepsCardsClient.CardID]) {
         willDisplayCardsCalls.append(cards)
+        willDisplayCardsImpl?(cards)
     }
 
     var handleActionCalls: [NewTabPageNextStepsCardsClient.CardID] = []
     var dismissCalls: [NewTabPageNextStepsCardsClient.CardID] = []
     var willDisplayCardsCalls: [[NewTabPageNextStepsCardsClient.CardID]] = []
+    var willDisplayCardsImpl: (([NewTabPageNextStepsCardsClient.CardID]) -> Void)?
 }
 
 final class NewTabPageNextStepsCardsClientTests: XCTestCase {
@@ -137,7 +139,146 @@ final class NewTabPageNextStepsCardsClientTests: XCTestCase {
         XCTAssertEqual(data, .init(content: nil))
     }
 
+    // MARK: - willDisplayCardsPublisher
+
+    func testThatWillDisplayCardsPublisherIsSentAfterGetDataAndGetConfigAreCalled() async throws {
+        model.cards = [.addAppToDockMac, .duckplayer]
+        _ = try await client.getData(params: [], original: .init())
+        _ = try await client.getConfig(params: [], original: .init())
+
+        XCTAssertEqual(model.willDisplayCardsCalls, [[.addAppToDockMac, .duckplayer]])
+    }
+
+    func testThatWillDisplayCardsPublisherIsNotSentBeforeGetConfigIsCalled() async throws {
+        model.cards = [.addAppToDockMac, .duckplayer]
+        _ = try await client.getData(params: [], original: .init())
+        _ = try await client.getData(params: [], original: .init())
+        _ = try await client.getData(params: [], original: .init())
+        _ = try await client.getData(params: [], original: .init())
+        _ = try await client.getData(params: [], original: .init())
+
+        XCTAssertEqual(model.willDisplayCardsCalls, [])
+
+        _ = try await client.getConfig(params: [], original: .init())
+
+        XCTAssertEqual(model.willDisplayCardsCalls, [[.addAppToDockMac, .duckplayer]])
+    }
+
+    func testThatWillDisplayCardsPublisherIsNotSentBeforeGetDataIsCalled() async throws {
+        model.cards = [.addAppToDockMac, .duckplayer]
+        _ = try await client.getConfig(params: [], original: .init())
+        _ = try await client.getConfig(params: [], original: .init())
+        _ = try await client.getConfig(params: [], original: .init())
+        _ = try await client.getConfig(params: [], original: .init())
+        _ = try await client.getConfig(params: [], original: .init())
+
+        XCTAssertEqual(model.willDisplayCardsCalls, [])
+
+        _ = try await client.getData(params: [], original: .init())
+
+        XCTAssertEqual(model.willDisplayCardsCalls, [[.addAppToDockMac, .duckplayer]])
+    }
+
+    func testThatWillDisplayCardsPublisherIsSentAfterUpdatingCards() async throws {
+        model.cards = [.addAppToDockMac, .duckplayer]
+        model.isViewExpanded = true
+        try await triggerInitialCardsEventAndResetMockState()
+
+        let expectation = self.expectation(description: "willDisplayCards")
+        model.willDisplayCardsImpl = { _ in expectation.fulfill() }
+
+        model.cards = [.addAppToDockMac, .duckplayer, .bringStuff]
+        await fulfillment(of: [expectation], timeout: 0.1)
+        XCTAssertEqual(model.willDisplayCardsCalls, [[.addAppToDockMac, .duckplayer, .bringStuff]])
+    }
+
+    func testWhenCardsAreUpdatedThenWillDisplayCardsEventOnlyContainsCurrentlyVisibleCards() async throws {
+        model.cards = [.addAppToDockMac, .duckplayer]
+        model.isViewExpanded = false
+        try await triggerInitialCardsEventAndResetMockState()
+
+        let expectation = self.expectation(description: "willDisplayCards")
+        expectation.expectedFulfillmentCount = 3
+        model.willDisplayCardsImpl = { _ in expectation.fulfill() }
+
+        model.cards = [.addAppToDockMac, .duckplayer, .bringStuff]
+        model.cards = [.duckplayer, .addAppToDockMac, .bringStuff]
+        model.cards = [.addAppToDockMac, .emailProtection, .duckplayer]
+        await fulfillment(of: [expectation], timeout: 0.1)
+        XCTAssertEqual(model.willDisplayCardsCalls, [
+            [.addAppToDockMac, .duckplayer],
+            [.duckplayer, .addAppToDockMac],
+            [.addAppToDockMac, .emailProtection]
+        ])
+    }
+
+    func testThatWillDisplayCardsEventIsNotPublishedWhenCardsIsEmpty() async throws {
+        model.cards = [.addAppToDockMac, .duckplayer]
+        model.isViewExpanded = false
+        try await triggerInitialCardsEventAndResetMockState()
+
+        let expectation = self.expectation(description: "willDisplayCards")
+        expectation.expectedFulfillmentCount = 2
+        model.willDisplayCardsImpl = { _ in expectation.fulfill() }
+
+        model.cards = [.addAppToDockMac, .duckplayer, .bringStuff]
+        model.cards = []
+        model.cards = [.addAppToDockMac, .emailProtection, .duckplayer]
+        await fulfillment(of: [expectation], timeout: 0.1)
+        XCTAssertEqual(model.willDisplayCardsCalls, [
+            [.addAppToDockMac, .duckplayer],
+            [.addAppToDockMac, .emailProtection]
+        ])
+    }
+
+    func testThatWillDisplayCardsPublisherIsSentAfterExpandingViewToRevealMoreCards() async throws {
+        model.cards = [.addAppToDockMac, .duckplayer, .emailProtection, .bringStuff, .defaultApp]
+        model.isViewExpanded = false
+        try await triggerInitialCardsEventAndResetMockState()
+
+        let expectation = self.expectation(description: "willDisplayCards")
+        model.willDisplayCardsImpl = { _ in expectation.fulfill() }
+
+        model.isViewExpanded = true
+        await fulfillment(of: [expectation], timeout: 0.1)
+        XCTAssertEqual(model.willDisplayCardsCalls, [[.emailProtection, .bringStuff, .defaultApp]])
+    }
+
+    func testThatWillDisplayCardsPublisherIsSentAfterExpandingViewAndNotRevealingMoreCards() async throws {
+        model.cards = [.addAppToDockMac, .duckplayer]
+        model.isViewExpanded = false
+        try await triggerInitialCardsEventAndResetMockState()
+
+        let expectation = self.expectation(description: "willDisplayCards")
+        expectation.isInverted = true
+        model.willDisplayCardsImpl = { _ in expectation.fulfill() }
+
+        model.isViewExpanded = true
+        await fulfillment(of: [expectation], timeout: 0.1)
+        XCTAssertEqual(model.willDisplayCardsCalls, [])
+    }
+
+    func testThatWillDisplayCardsPublisherIsNotSentAfterCollapsingView() async throws {
+        model.cards = [.addAppToDockMac, .duckplayer, .emailProtection]
+        model.isViewExpanded = true
+        try await triggerInitialCardsEventAndResetMockState()
+
+        let expectation = self.expectation(description: "willDisplayCards")
+        expectation.isInverted = true
+        model.willDisplayCardsImpl = { _ in expectation.fulfill() }
+
+        model.isViewExpanded = false
+        await fulfillment(of: [expectation], timeout: 0.1)
+        XCTAssertEqual(model.willDisplayCardsCalls, [])
+    }
+
     // MARK: - Helper functions
+
+    func triggerInitialCardsEventAndResetMockState() async throws {
+        _ = try await client.getConfig(params: [], original: .init())
+        _ = try await client.getData(params: [], original: .init())
+        model.willDisplayCardsCalls = []
+    }
 
     func handleMessage<Response: Encodable>(named methodName: NewTabPageNextStepsCardsClient.MessageName, parameters: Any = [], file: StaticString = #file, line: UInt = #line) async throws -> Response {
         let handler = try XCTUnwrap(userScript.handler(forMethodNamed: methodName.rawValue), file: file, line: line)

@@ -53,6 +53,12 @@ final class NewTabPageNextStepsCardsClient: NewTabPageScriptClient {
                 }
             }
             .store(in: &cancellables)
+
+        willDisplayCardsPublisher
+            .sink { cards in
+                model.willDisplayCards(cards)
+            }
+            .store(in: &cancellables)
     }
 
     private func connectWillDisplayCardsPublisher() {
@@ -60,21 +66,29 @@ final class NewTabPageNextStepsCardsClient: NewTabPageScriptClient {
             .map { cards, isViewExpanded in
                 isViewExpanded ? cards : Array(cards.prefix(2))
             }
+            .share()
+
+        let firstInitialCards = initialCards.first()
 
         // only notify about visible cards (i.e. if collapsed, only the first 2)
-        let cardsOnDataUpdated = notifyDataUpdatedSubject.map { [weak self] cards in
-            self?.model.isViewExpanded == true ? cards: Array(cards.prefix(2))
-        }
+        let cardsOnDataUpdated = notifyDataUpdatedSubject
+            .drop(untilOutputFrom: firstInitialCards)
+            .map { [weak self] cards in
+                self?.model.isViewExpanded == true ? cards: Array(cards.prefix(2))
+            }
 
         // only notify about cards revealed by expanding the view (i.e. other than the first 2)
-        let cardsOnConfigUpdated = notifyConfigUpdatedSubject.compactMap { [weak self] isViewExpanded -> [CardID]? in
-            guard let self, isViewExpanded, model.cards.count > 2 else {
-                return nil
+        let cardsOnConfigUpdated = notifyConfigUpdatedSubject
+            .drop(untilOutputFrom: firstInitialCards)
+            .compactMap { [weak self] isViewExpanded -> [CardID]? in
+                guard let self, isViewExpanded, model.cards.count > 2 else {
+                    return nil
+                }
+                return Array(self.model.cards.suffix(from: 2))
             }
-            return Array(self.model.cards.suffix(from: 2))
-        }
 
         Publishers.Merge3(initialCards, cardsOnDataUpdated, cardsOnConfigUpdated)
+            .filter { !$0.isEmpty }
             .sink { [weak self] cards in
                 self?.willDisplayCardsSubject.send(cards)
             }
