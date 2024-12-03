@@ -93,7 +93,8 @@ public class MaliciousSiteProtectionManager: MaliciousSiteDetecting {
         detector: MaliciousSiteProtection.MaliciousSiteDetecting? = nil,
         detectionPreferences: MaliciousSiteProtectionPreferences = MaliciousSiteProtectionPreferences.shared,
         featureFlagger: FeatureFlagger? = nil,
-        configManager: PrivacyConfigurationManaging? = nil
+        configManager: PrivacyConfigurationManaging? = nil,
+        updateIntervalProvider: UpdateManager.UpdateIntervalProvider? = nil
     ) {
         self.featureFlagger = featureFlagger ?? NSApp.delegateTyped.featureFlagger
         let configManager = configManager ?? AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager

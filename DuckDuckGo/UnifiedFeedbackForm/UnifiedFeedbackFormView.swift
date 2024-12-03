@@ -74,7 +74,7 @@ private struct FeedbackFormBodyView: View {
     @EnvironmentObject var viewModel: UnifiedFeedbackFormViewModel
 
     var body: some View {
-        CategoryPicker(sources: UnifiedFeedbackReportType.self, selection: $viewModel.selectedReportType) {
+        CategoryPicker(options: UnifiedFeedbackReportType.allCases, selection: $viewModel.selectedReportType) {
             switch UnifiedFeedbackReportType(rawValue: viewModel.selectedReportType) {
             case .selectReportType, nil:
                 EmptyView()
@@ -94,24 +94,24 @@ private struct FeedbackFormBodyView: View {
 
     @ViewBuilder
     func reportProblemView() -> some View {
-        CategoryPicker(sources: UnifiedFeedbackCategory.self, selection: $viewModel.selectedCategory) {
+        CategoryPicker(options: viewModel.availableCategories, selection: $viewModel.selectedCategory) {
             switch UnifiedFeedbackCategory(rawValue: viewModel.selectedCategory) {
             case .selectFeature, nil:
                 EmptyView()
             case .subscription:
-                CategoryPicker(sources: PrivacyProFeedbackSubcategory.self, selection: $viewModel.selectedSubcategory) {
+                CategoryPicker(options: PrivacyProFeedbackSubcategory.allCases, selection: $viewModel.selectedSubcategory) {
                     issueDescriptionView()
                 }
             case .vpn:
-                CategoryPicker(sources: VPNFeedbackSubcategory.self, selection: $viewModel.selectedSubcategory) {
+                CategoryPicker(options: VPNFeedbackSubcategory.allCases, selection: $viewModel.selectedSubcategory) {
                     issueDescriptionView()
                 }
             case .pir:
-                CategoryPicker(sources: PIRFeedbackSubcategory.self, selection: $viewModel.selectedSubcategory) {
+                CategoryPicker(options: PIRFeedbackSubcategory.allCases, selection: $viewModel.selectedSubcategory) {
                     issueDescriptionView()
                 }
             case .itr:
-                CategoryPicker(sources: ITRFeedbackSubcategory.self, selection: $viewModel.selectedSubcategory) {
+                CategoryPicker(options: ITRFeedbackSubcategory.allCases, selection: $viewModel.selectedSubcategory) {
                     issueDescriptionView()
                 }
             }
@@ -147,14 +147,14 @@ private struct FeedbackFormBodyView: View {
 }
 
 private struct CategoryPicker<Category: FeedbackCategoryProviding, Content: View>: View where Category.AllCases == [Category], Category.RawValue == String {
-    let sources: Category.Type
+    let options: [Category]
     let selection: Binding<String>
     let content: () -> Content
 
-    init(sources: Category.Type,
+    init(options: [Category],
          selection: Binding<String>,
          @ViewBuilder content: @escaping () -> Content) {
-        self.sources = sources
+        self.options = options
         self.selection = selection
         self.content = content
     }
@@ -162,7 +162,7 @@ private struct CategoryPicker<Category: FeedbackCategoryProviding, Content: View
     var body: some View {
         Group {
             Picker(selection: selection, content: {
-                ForEach(sources.allCases) { option in
+                ForEach(options) { option in
                     Text(option.displayName).tag(option.rawValue)
                 }
             }, label: {})

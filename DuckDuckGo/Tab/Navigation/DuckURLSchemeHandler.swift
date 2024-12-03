@@ -27,10 +27,16 @@ final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
 
     let featureFlagger: FeatureFlagger
     let faviconManager: FaviconManagement
+    let isNTPSpecialPageSupported: Bool
 
-    init(featureFlagger: FeatureFlagger, faviconManager: FaviconManagement = FaviconManager.shared) {
+    init(
+        featureFlagger: FeatureFlagger,
+        faviconManager: FaviconManagement = FaviconManager.shared,
+        isNTPSpecialPageSupported: Bool = false
+    ) {
         self.featureFlagger = featureFlagger
         self.faviconManager = faviconManager
+        self.isNTPSpecialPageSupported = isNTPSpecialPageSupported
     }
 
     func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
@@ -47,7 +53,7 @@ final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
             handleDuckPlayer(requestURL: requestURL, urlSchemeTask: urlSchemeTask, webView: webView)
         case .error:
             handleErrorPage(urlSchemeTask: urlSchemeTask)
-        case .newTab where featureFlagger.isFeatureOn(.htmlNewTabPage):
+        case .newTab where isNTPSpecialPageSupported && featureFlagger.isFeatureOn(.htmlNewTabPage):
             if requestURL.type == .favicon {
                 handleFavicon(urlSchemeTask: urlSchemeTask)
             } else {
