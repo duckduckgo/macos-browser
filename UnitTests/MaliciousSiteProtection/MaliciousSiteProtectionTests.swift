@@ -90,5 +90,12 @@ extension MaliciousSiteProtectionTests {
             return true
         }
 
+        func getCohortIfEnabled<Flag>(for featureFlag: Flag) -> (any BrowserServicesKit.FlagCohort)? where Flag: BrowserServicesKit.FeatureFlagExperimentDescribing {
+            nil
+        }
+
+        func getAllActiveExperiments() -> BrowserServicesKit.Experiments {
+            [:]
+        }
     }
 }
