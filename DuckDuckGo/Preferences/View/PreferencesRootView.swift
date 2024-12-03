@@ -201,7 +201,8 @@ enum Preferences {
             return PreferencesSubscriptionModel(openURLHandler: openURL,
                                                 userEventHandler: handleUIEvent,
                                                 sheetActionHandler: sheetActionHandler,
-                                                subscriptionManager: subscriptionManager)
+                                                subscriptionManager: subscriptionManager,
+                                                featureFlagger: NSApp.delegateTyped.featureFlagger)
         }
     }
 }

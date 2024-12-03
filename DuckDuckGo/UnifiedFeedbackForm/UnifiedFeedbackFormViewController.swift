@@ -47,13 +47,12 @@ final class UnifiedFeedbackFormViewController: NSViewController {
     init(feedbackSender: UnifiedFeedbackSender = DefaultFeedbackSender(),
          source: UnifiedFeedbackSource = .default) {
         self.feedbackSender = feedbackSender
-        self.viewModel = UnifiedFeedbackFormViewModel(
-            accountManager: DefaultSubscriptionManager().accountManager,
-            apiService: DefaultAPIService(),
-            vpnMetadataCollector: DefaultVPNMetadataCollector(accountManager: Application.appDelegate.subscriptionManager.accountManager),
-            feedbackSender: feedbackSender,
-            source: source
-        )
+        self.viewModel = UnifiedFeedbackFormViewModel(subscriptionManager: Application.appDelegate.subscriptionManager,
+                                                      apiService: DefaultAPIService(),
+                                                      vpnMetadataCollector: DefaultVPNMetadataCollector(accountManager: Application.appDelegate.subscriptionManager.accountManager),
+                                                      feedbackSender: feedbackSender,
+                                                      source: source)
+
         super.init(nibName: nil, bundle: nil)
         self.viewModel.delegate = self
     }
