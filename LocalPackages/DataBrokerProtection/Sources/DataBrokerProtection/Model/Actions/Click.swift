@@ -18,9 +18,60 @@
 
 import Foundation
 
+struct Condition: Codable, Sendable {
+    let left: String
+    let operation: String
+    let right: String
+}
+
+struct Choice: Codable, Sendable {
+    let condition: Condition
+    let expect: String?
+    let elements: [PageElement]
+}
+
 struct ClickAction: Action {
     let id: String
     let actionType: ActionType
     let elements: [PageElement]
     let dataSource: DataSource?
+    let choices: [Choice]?
+    let defaultClick: Default?
+
+    enum Default: Codable {
+        case null
+        case array([PageElement])
+
+        // Custom decoding to handle the different cases
+        init(from decoder: Decoder) throws {
+            let container = try decoder.singleValueContainer()
+            if container.decodeNil() {
+                self = .null
+            } else {
+                let array = try container.decode([PageElement].self)
+                self = .array(array)
+            }
+        }
+
+        // Custom encoding to handle the different cases
+        func encode(to encoder: Encoder) throws {
+            var container = encoder.singleValueContainer()
+            switch self {
+            case .null:
+                try container.encodeNil()
+            case .array(let array):
+                try container.encode(array)
+            }
+        }
+    }
+
+    // Use CodingKeys so that we can use "default" as the JSON key name, which is invalid in Swift
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case actionType
+        case elements
+        case dataSource
+        case choices
+        case defaultClick = "default"
+    }
 }
