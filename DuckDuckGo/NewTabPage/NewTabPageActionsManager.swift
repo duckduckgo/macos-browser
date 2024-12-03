@@ -19,6 +19,7 @@
 import Foundation
 import Combine
 import PixelKit
+import PrivacyStats
 import RemoteMessaging
 import Common
 import os.log
@@ -118,13 +119,19 @@ extension NewTabPageActionsManager {
     convenience init(
         appearancePreferences: AppearancePreferences,
         activeRemoteMessageModel: ActiveRemoteMessageModel,
+        privacyStats: PrivacyStatsCollecting,
         openURLHandler: @escaping (URL) -> Void
     ) {
+        let privacyStatsModel = NewTabPagePrivacyStatsModel(
+            privacyStats: privacyStats,
+            trackerDataProvider: PrivacyStatsTrackerDataProvider(contentBlocking: ContentBlocking.shared)
+        )
+
         self.init(scriptClients: [
             NewTabPageConfigurationClient(appearancePreferences: appearancePreferences),
             NewTabPageRMFClient(remoteMessageProvider: activeRemoteMessageModel, openURLHandler: openURLHandler),
             NewTabPageFavoritesClient(favoritesModel: NewTabPageFavoritesModel()),
-            NewTabPagePrivacyStatsClient()
+            NewTabPagePrivacyStatsClient(model: privacyStatsModel)
         ])
     }
 }

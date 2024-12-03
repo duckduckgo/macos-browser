@@ -200,6 +200,18 @@ private class DummyFeatureFlagger: FeatureFlagger {
     func isFeatureOn<Flag: FeatureFlagDescribing>(for: Flag, allowOverride: Bool) -> Bool {
         false
     }
+
+    func getCohortIfEnabled(_ subfeature: any PrivacySubfeature) -> CohortID? {
+        return nil
+    }
+
+    func getCohortIfEnabled<Flag>(for featureFlag: Flag) -> (any FlagCohort)? where Flag: FeatureFlagExperimentDescribing {
+        return nil
+    }
+
+    func getAllActiveExperiments() -> Experiments {
+        return [:]
+    }
 }
 
 private class DummyAIChatConfig: AIChatMenuVisibilityConfigurable {
