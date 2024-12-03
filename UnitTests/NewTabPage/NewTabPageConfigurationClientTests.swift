@@ -88,6 +88,7 @@ final class NewTabPageConfigurationClientTests: XCTestCase {
         let configuration: NewTabPageUserScript.NewTabPageConfiguration = try await sendMessage(named: .initialSetup)
         XCTAssertEqual(configuration.widgets, [
             .init(id: .rmf),
+            .init(id: .nextSteps),
             .init(id: .favorites),
             .init(id: .privacyStats)
         ])
