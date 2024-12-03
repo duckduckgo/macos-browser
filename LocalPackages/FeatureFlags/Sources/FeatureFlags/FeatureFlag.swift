@@ -69,7 +69,8 @@ extension FeatureFlag: FeatureFlagDescribing {
              .unknownUsernameCategorization,
              .credentialsImportPromotionForExistingUsers,
              .networkProtectionUserTips,
-             .networkProtectionEnforceRoutes:
+             .networkProtectionEnforceRoutes,
+             .isPrivacyProLaunchedROW:
             return false
         }
     }
