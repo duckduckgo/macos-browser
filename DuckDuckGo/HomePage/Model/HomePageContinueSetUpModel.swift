@@ -269,7 +269,11 @@ extension HomePage.Models {
         }
 
         @objc private func windowDidBecomeKey(_ notification: Notification) {
-            refreshFeaturesMatrix()
+            // Async dispatch allows default browser setting to propagate
+            // after being changed in the system dialog
+            DispatchQueue.main.async {
+                self.refreshFeaturesMatrix()
+            }
         }
 
         @objc private func refreshFeaturesForHTMLNewTabPage(_ notification: Notification) {
