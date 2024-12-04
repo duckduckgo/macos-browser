@@ -65,7 +65,9 @@ final class StatisticsLoader {
                 PixelExperiment.fireSerpPixel()
                 PixelExperiment.fireOnboardingSearchPerformed5to7Pixel()
                 self.fireSearchExperimentPixels()
-                self.fireDailyOsVersionCounterPixel()
+                if NSApp.runType == .normal {
+                    self.fireDailyOsVersionCounterPixel()
+                }
                 self.fireDockPixel()
             } else if !self.statisticsStore.isAppRetentionFiredToday {
                 self.refreshAppRetentionAtb(completion: completion)

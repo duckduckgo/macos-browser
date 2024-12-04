@@ -16,12 +16,13 @@
 //  limitations under the License.
 //
 
-import XCTest
 import Subscription
 import SubscriptionTestingUtilities
+import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
-@testable import TestUtils
 @testable import Networking
+@testable import TestUtils
 
 final class UnifiedFeedbackFormViewModelTests: XCTestCase {
     enum Error: String, Swift.Error {
@@ -269,6 +270,12 @@ private class MockVPNFeedbackFormViewModelDelegate: UnifiedFeedbackFormViewModel
         receivedDismissedViewCallback = true
     }
 
+}
+
+extension MockAPIService {
+    convenience init(apiResponse: Result<APIResponseV2, Error>) {
+        self.init { _ in apiResponse }
+    }
 }
 
 extension SubscriptionManagerMock {

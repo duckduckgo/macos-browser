@@ -194,7 +194,7 @@ class ContextualOnboardingStateMachineTests: XCTestCase {
     func test_OnSiteVisit_WhenStateIsTrackerRelatedOrFireUsedShowSearchDone_returnsTrackersShouldFollowUp() {
         let states: [ContextualOnboardingState] = [.showBlockedTrackers, .showMajorOrNoTracker, .searchDoneShowBlockedTrackers, .searchDoneShowMajorOrNoTracker, .fireUsedShowSearchDone]
         tab.url = URL.duckDuckGo
-        let privacyInfo = PrivacyInfo(url: tab.url!, parentEntity: nil, protectionStatus: ProtectionStatus(unprotectedTemporary: true, enabledFeatures: [], allowlisted: false, denylisted: false), isPhishing: false, shouldCheckServerTrust: true)
+        let privacyInfo = PrivacyInfo(url: tab.url!, parentEntity: nil, protectionStatus: ProtectionStatus(unprotectedTemporary: true, enabledFeatures: [], allowlisted: false, denylisted: false), malicousSiteThreatKind: .none, shouldCheckServerTrust: true)
 
         for state in states {
             stateMachine.state = state

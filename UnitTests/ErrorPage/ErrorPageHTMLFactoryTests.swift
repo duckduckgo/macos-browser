@@ -17,34 +17,45 @@
 //
 
 import Foundation
-import XCTest
-import PhishingDetection
+import MaliciousSiteProtection
 import SpecialErrorPages
+import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
 class ErrorPageHTMLFactoryTests: XCTestCase {
+
     func testPhishingErrorTemplate() {
-        let error = PhishingDetectionError.detected
         let url = URL(string: "https://example.com")!
-        let html = ErrorPageHTMLFactory.html(for: error, url: url)
+        let error = MaliciousSiteError(code: .phishing, failingUrl: url)
+        let html = ErrorPageHTMLFactory.html(for: WKError(_nsError: error as NSError), featureFlagger: MockFeatureFlagger())
 
         XCTAssertNotNil(html)
         XCTAssertTrue(html.contains("Phishing")) // Check if the HTML contains "Phishing"
     }
 
+    // func testMalwareErrorTemplate() {
+    //     let url = URL(string: "https://example.com")!
+    //     let error = MaliciousSiteError(code: .malware, failingUrl: url)
+    //     let html = ErrorPageHTMLFactory.html(for: WKError(_nsError: error as NSError), featureFlagger: MockFeatureFlagger())
+
+    //     XCTAssertNotNil(html)
+    //     XCTAssertTrue(html.contains("Malware")) // Check if the HTML contains "Phishing"
+    // }
+
     func testDefaultErrorTemplate() {
-        let error = NSError(domain: "TestDomain", code: 999, userInfo: nil)
         let url = URL(string: "https://example.com")!
-        let html = ErrorPageHTMLFactory.html(for: error, url: url, header: "Custom Header")
+        let error = NSError(domain: "TestDomain", code: 999, userInfo: [NSURLErrorFailingURLErrorKey: url])
+        let html = ErrorPageHTMLFactory.html(for: WKError(_nsError: error as NSError), featureFlagger: MockFeatureFlagger(), header: "Custom Header")
 
         XCTAssertNotNil(html)
         XCTAssertTrue(html.contains("Custom Header")) // Check if the custom header is included in the HTML
     }
 
     func testDefaultErrorTemplate_WhenNetworkTimeoutError() {
-        let networkTimeoutError = NSError(domain: NSURLErrorDomain, code: NSURLErrorTimedOut, userInfo: nil)
         let url = URL(string: "https://example.com")!
-        let html = ErrorPageHTMLFactory.html(for: networkTimeoutError, url: url)
+        let networkTimeoutError = NSError(domain: NSURLErrorDomain, code: NSURLErrorTimedOut, userInfo: [NSURLErrorFailingURLErrorKey: url])
+        let html = ErrorPageHTMLFactory.html(for: WKError(_nsError: networkTimeoutError as NSError), featureFlagger: MockFeatureFlagger())
 
         XCTAssertNotNil(html)
         XCTAssertTrue(html.contains("NSURLErrorDomain")) // Check if the domain is included in the HTML
