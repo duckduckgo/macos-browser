@@ -109,7 +109,7 @@ final class ReleaseNotesTabExtension: NavigationResponder {
         guard NSApp.runType != .uiTests, navigation.url == .releaseNotes else { return }
         let updateController = Application.appDelegate.updateController!
         updateController.checkForUpdateIfNeeded()
-//#endif
+#endif
     }
 }
 

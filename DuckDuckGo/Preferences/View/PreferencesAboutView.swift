@@ -52,9 +52,9 @@ extension Preferences {
                 }
             }
             .onAppear {
-//#if SPARKLE && !DEBUG
+#if SPARKLE && !DEBUG
                 model.checkForUpdate()
-//#endif
+#endif
             }
         }
     }
