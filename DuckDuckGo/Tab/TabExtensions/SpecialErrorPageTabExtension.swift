@@ -43,6 +43,7 @@ final class SpecialErrorPageTabExtension {
 
     @MainActor private weak var webView: ErrorPageTabExtensionNavigationDelegate?
     @MainActor private weak var specialErrorPageUserScript: SpecialErrorPageUserScript?
+    private let closeTab: () -> Void
 
     @MainActor private var exemptions: [URL: MaliciousSiteProtection.ThreatKind] = [:]
     @MainActor private var shouldBypassSSLError = false
@@ -53,6 +54,7 @@ final class SpecialErrorPageTabExtension {
 
     init(webViewPublisher: some Publisher<some ErrorPageTabExtensionNavigationDelegate, Never>,
          scriptsPublisher: some Publisher<some SpecialErrorPageScriptProvider, Never>,
+         closeTab: @escaping () -> Void,
          urlCredentialCreator: URLCredentialCreating = URLCredentialCreator(),
          featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger,
          maliciousSiteDetector: some MaliciousSiteDetecting) {
@@ -60,6 +62,7 @@ final class SpecialErrorPageTabExtension {
         self.featureFlagger = featureFlagger
         self.urlCredentialCreator = urlCredentialCreator
         self.detector = maliciousSiteDetector
+        self.closeTab = closeTab
 
         webViewPublisher.sink { [weak self] webView in
             MainActor.assumeIsolated {
@@ -152,7 +155,8 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
     }
 
     func navigation(_ navigation: Navigation, didFailWith error: WKError) {
-        guard navigation.isCurrent, let url = error.failingUrl else {
+        guard navigation.isCurrent else { return }
+        guard let url = error.failingUrl else {
             self.errorData = nil
             return
         }
@@ -179,6 +183,7 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
 
     @MainActor
     func navigationDidFinish(_ navigation: Navigation) {
+        guard navigation.isCurrent else { return }
         specialErrorPageUserScript?.isEnabled = (errorData != nil && navigation.navigationAction.navigationType == .alternateHtmlLoad)
     }
 
@@ -199,17 +204,16 @@ extension SpecialErrorPageTabExtension: SpecialErrorPageUserScriptDelegate {
 
     // Special error page "Leave site" button action
     func leaveSiteAction() {
-        guard webView?.canGoBack == true else {
-            webView?.close()
-            return
+        Task { @MainActor in
+            await self.webView?.openNewTabFromErrorPage()
+            self.closeTab()
         }
-        _ = webView?.goBack()
     }
 
     // Special error page "Visit site" button action
     func visitSiteAction() {
         defer {
-            webView?.reloadPage()
+            webView?.reloadPageFromErrorPage()
         }
         guard let errorData, let webView, let url = webView.url else { return }
         switch errorData {
@@ -250,16 +254,22 @@ protocol ErrorPageTabExtensionNavigationDelegate: AnyObject {
     func load(_ request: URLRequest) -> WKNavigation?
     func goBack() -> WKNavigation?
     func close()
-    @discardableResult func reloadPage() -> WKNavigation?
+    @discardableResult func reloadPageFromErrorPage() -> WKNavigation?
+    @MainActor func openNewTabFromErrorPage() async
 }
 
 extension ErrorPageTabExtensionNavigationDelegate {
-    func reloadPage() -> WKNavigation? {
-        guard let wevView = self as? WKWebView else { return nil }
-        if let item = wevView.backForwardList.currentItem {
-            return wevView.go(to: item)
+    func reloadPageFromErrorPage() -> WKNavigation? {
+        guard let webView = self as? WKWebView else { return nil }
+        if let item = webView.backForwardList.currentItem {
+            return webView.go(to: item)
         }
         return nil
+    }
+
+    @MainActor func openNewTabFromErrorPage() async {
+        guard let webView = self as? WKWebView else { return }
+        try? await webView.evaluateJavaScript("window.open('\(URL.newtab.absoluteString.escapedJavaScriptString())', '_blank')") as Void?
     }
 }
 

@@ -44,6 +44,7 @@ final class ErrorPageTabExtensionTest: XCTestCase {
     var detector: MockMaliciousSiteDetector!
     let errorURLString = "com.example.error"
     let phishingURLString = "https://privacy-test-pages.site/security/phishing.html"
+    private var closeTabCalled = false
 
     override func setUpWithError() throws {
         mockWebViewPublisher = PassthroughSubject<MockWKWebView, Never>()
@@ -51,7 +52,7 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         let featureFlagger = MockFeatureFlagger()
         credentialCreator = MockCredentialCreator()
         detector = MockMaliciousSiteDetector { _ in .phishing }
-        errorPageExtention = SpecialErrorPageTabExtension(webViewPublisher: mockWebViewPublisher, scriptsPublisher: scriptPublisher, urlCredentialCreator: credentialCreator, featureFlagger: featureFlagger, maliciousSiteDetector: detector)
+        errorPageExtention = SpecialErrorPageTabExtension(webViewPublisher: mockWebViewPublisher, scriptsPublisher: scriptPublisher, closeTab: self.closeTab, urlCredentialCreator: credentialCreator, featureFlagger: featureFlagger, maliciousSiteDetector: detector)
     }
 
     override func tearDownWithError() throws {
@@ -59,6 +60,10 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         scriptPublisher = nil
         errorPageExtention = nil
         credentialCreator = nil
+    }
+
+    private func closeTab() {
+        closeTabCalled = true
     }
 
     @MainActor func testWhenCertificateExpired_ThenTabExtenstionErrorIsExpectedError() {
@@ -195,7 +200,8 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         errorPageExtention.leaveSiteAction()
 
         // THEN
-        XCTAssertTrue(mockWebView.goBackCalled)
+        XCTAssertTrue(closeTabCalled)
+        XCTAssertTrue(mockWebView.openNewTabCalled)
     }
 
     @MainActor
@@ -209,7 +215,8 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         errorPageExtention.leaveSiteAction()
 
         // THEN
-        XCTAssertTrue(mockWebView.closedCalled)
+        XCTAssertTrue(closeTabCalled)
+        XCTAssertTrue(mockWebView.openNewTabCalled)
     }
 
     @MainActor
@@ -223,6 +230,7 @@ final class ErrorPageTabExtensionTest: XCTestCase {
 
         // THEN
         XCTAssertTrue(mockWebView.reloadCalled)
+        XCTAssertFalse(mockWebView.openNewTabCalled)
     }
 
     @MainActor
@@ -376,6 +384,7 @@ class MockWKWebView: NSObject, ErrorPageTabExtensionNavigationDelegate {
     var capturedHTML: String = ""
     var goBackCalled = false
     var reloadCalled = false
+    var openNewTabCalled = false
     var closedCalled = false
     var loadCalled = false
 
@@ -396,9 +405,13 @@ class MockWKWebView: NSObject, ErrorPageTabExtensionNavigationDelegate {
         return nil
     }
 
-    func reloadPage() -> WKNavigation? {
+    func reloadPageFromErrorPage() -> WKNavigation? {
         reloadCalled = true
         return nil
+    }
+
+    @MainActor func openNewTabFromErrorPage() async {
+        openNewTabCalled = true
     }
 
     func close() {
