@@ -26,14 +26,13 @@ struct Condition: Codable, Sendable {
 
 struct Choice: Codable, Sendable {
     let condition: Condition
-    let expect: String?
     let elements: [PageElement]
 }
 
 struct ClickAction: Action {
     let id: String
     let actionType: ActionType
-    let elements: [PageElement]
+    let elements: [PageElement]?
     let dataSource: DataSource?
     let choices: [Choice]?
     let defaultClick: Default?
