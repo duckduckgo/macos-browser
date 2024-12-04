@@ -23,6 +23,14 @@ import TestUtils
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
+final class CapturingNewTabPageContextMenuPresenter: NewTabPageContextMenuPresenting {
+    func showContextMenu(_ menu: NSMenu) {
+        showContextMenuCalls.append(menu)
+    }
+
+    var showContextMenuCalls: [NSMenu] = []
+}
+
 final class CapturingNewTabPageFavoritesActionsHandler: FavoritesActionsHandling {
     struct OpenCall: Equatable {
         let url: URL

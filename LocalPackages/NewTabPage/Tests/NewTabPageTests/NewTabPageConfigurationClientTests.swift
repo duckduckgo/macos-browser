@@ -18,30 +18,21 @@
 
 import AppKit
 import Combine
-import NewTabPage
 import XCTest
-@testable import DuckDuckGo_Privacy_Browser
-
-final class CapturingNewTabPageContextMenuPresenter: NewTabPageContextMenuPresenting {
-    func showContextMenu(_ menu: NSMenu) {
-        showContextMenuCalls.append(menu)
-    }
-
-    var showContextMenuCalls: [NSMenu] = []
-}
+@testable import NewTabPage
 
 final class NewTabPageConfigurationClientTests: XCTestCase {
     var client: NewTabPageConfigurationClient!
-    var appearancePreferences: AppearancePreferences!
+    var sectionsVisibilityProvider: MockNewTabPageSectionsVisibilityProvider!
     var contextMenuPresenter: CapturingNewTabPageContextMenuPresenter!
     var userScript: NewTabPageUserScript!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
-        appearancePreferences = AppearancePreferences(persistor: AppearancePreferencesPersistorMock())
+        sectionsVisibilityProvider = MockNewTabPageSectionsVisibilityProvider()
         contextMenuPresenter = CapturingNewTabPageContextMenuPresenter()
         client = NewTabPageConfigurationClient(
-            appearancePreferences: appearancePreferences,
+            sectionsVisibilityProvider: sectionsVisibilityProvider,
             contextMenuPresenter: contextMenuPresenter
         )
 
@@ -53,8 +44,8 @@ final class NewTabPageConfigurationClientTests: XCTestCase {
 
     @MainActor
     func testThatContextMenuShowsContextMenu() async throws {
-        appearancePreferences.isFavoriteVisible = true
-        appearancePreferences.isRecentActivityVisible = false
+        sectionsVisibilityProvider.isFavoritesVisible = true
+        sectionsVisibilityProvider.isPrivacyStatsVisible = false
 
         let parameters = NewTabPageUserScript.ContextMenuParams(visibilityMenuItems: [
             .init(id: .favorites, title: "Favorites"),
@@ -69,11 +60,6 @@ final class NewTabPageConfigurationClientTests: XCTestCase {
         XCTAssertEqual(menu.items[0].state, .on)
         XCTAssertEqual(menu.items[1].title, "Privacy Stats")
         XCTAssertEqual(menu.items[1].state, .off)
-
-        menu.performActionForItem(at: 0)
-        XCTAssertFalse(appearancePreferences.isFavoriteVisible)
-        menu.performActionForItem(at: 1)
-        XCTAssertTrue(appearancePreferences.isRecentActivityVisible)
     }
 
     func testWhenContextMenuParamsIsEmptyThenContextMenuDoesNotShow() async throws {
@@ -94,8 +80,8 @@ final class NewTabPageConfigurationClientTests: XCTestCase {
             .init(id: .privacyStats)
         ])
         XCTAssertEqual(configuration.widgetConfigs, [
-            .init(id: .favorites, isVisible: appearancePreferences.isFavoriteVisible),
-            .init(id: .privacyStats, isVisible: appearancePreferences.isRecentActivityVisible)
+            .init(id: .favorites, isVisible: sectionsVisibilityProvider.isFavoritesVisible),
+            .init(id: .privacyStats, isVisible: sectionsVisibilityProvider.isPrivacyStatsVisible)
         ])
         XCTAssertEqual(configuration.platform, .init(name: "macos"))
     }
@@ -108,19 +94,19 @@ final class NewTabPageConfigurationClientTests: XCTestCase {
             .init(id: .privacyStats, isVisible: true)
         ]
         try await sendMessageExpectingNilResponse(named: .widgetsSetConfig, parameters: configs)
-        XCTAssertEqual(appearancePreferences.isFavoriteVisible, false)
-        XCTAssertEqual(appearancePreferences.isRecentActivityVisible, true)
+        XCTAssertEqual(sectionsVisibilityProvider.isFavoritesVisible, false)
+        XCTAssertEqual(sectionsVisibilityProvider.isPrivacyStatsVisible, true)
     }
 
     func testWhenWidgetsSetConfigIsReceivedWithPartialConfigThenOnlyIncludedWidgetsConfigsAreUpdated() async throws {
-        let initialIsFavoritesVisible = appearancePreferences.isFavoriteVisible
+        let initialIsFavoritesVisible = sectionsVisibilityProvider.isFavoritesVisible
 
         let configs: [NewTabPageUserScript.NewTabPageConfiguration.WidgetConfig] = [
             .init(id: .privacyStats, isVisible: false)
         ]
         try await sendMessageExpectingNilResponse(named: .widgetsSetConfig, parameters: configs)
-        XCTAssertEqual(appearancePreferences.isFavoriteVisible, initialIsFavoritesVisible)
-        XCTAssertEqual(appearancePreferences.isRecentActivityVisible, false)
+        XCTAssertEqual(sectionsVisibilityProvider.isFavoritesVisible, initialIsFavoritesVisible)
+        XCTAssertEqual(sectionsVisibilityProvider.isPrivacyStatsVisible, false)
     }
 
     // MARK: - Helper functions

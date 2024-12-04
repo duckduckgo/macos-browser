@@ -34,7 +34,7 @@ extension NewTabPageActionsManager {
         )
 
         self.init(scriptClients: [
-            NewTabPageConfigurationClient(appearancePreferences: appearancePreferences),
+            NewTabPageConfigurationClient(sectionsVisibilityProvider: appearancePreferences),
             NewTabPageRMFClient(remoteMessageProvider: activeRemoteMessageModel, openURLHandler: openURLHandler),
             NewTabPageNextStepsCardsClient(model: HomePage.Models.ContinueSetUpModel(tabOpener: NewTabPageTabOpener())),
             NewTabPageFavoritesClient(favoritesModel: NewTabPageFavoritesModel()),
