@@ -41,7 +41,7 @@ final class OnboardingNavigationDelegateTests: XCTestCase {
         let expectation = self.expectation(description: "Wait for url to load in current tab")
 
         // WHEN
-        tab.navigateTo(url: expectedUrl)
+        tab.navigateFromOnboarding(to: expectedUrl)
 
         // THEN
         pollForCondition(
@@ -60,7 +60,7 @@ final class OnboardingNavigationDelegateTests: XCTestCase {
         let expectation = self.expectation(description: "Wait for query to load in current tab")
 
         // WHEN
-        tab.searchFor(query)
+        tab.searchFromOnboarding(for: query)
 
         // THEN
         pollForCondition(
