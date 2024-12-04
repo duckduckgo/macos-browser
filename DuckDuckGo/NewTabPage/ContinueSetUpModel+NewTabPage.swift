@@ -1,5 +1,5 @@
 //
-//  NewTabPageNextStepsCardsProviding.swift
+//  ContinueSetUpModel+NewTabPage.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -21,22 +21,6 @@ import Combine
 import NewTabPage
 import PixelKit
 import UserScript
-
-protocol NewTabPageNextStepsCardsProviding: AnyObject {
-    var isViewExpanded: Bool { get set }
-    var isViewExpandedPublisher: AnyPublisher<Bool, Never> { get }
-
-    var cards: [NewTabPageNextStepsCardsClient.CardID] { get }
-    var cardsPublisher: AnyPublisher<[NewTabPageNextStepsCardsClient.CardID], Never> { get }
-
-    @MainActor
-    func handleAction(for card: NewTabPageNextStepsCardsClient.CardID)
-
-    @MainActor
-    func dismiss(_ card: NewTabPageNextStepsCardsClient.CardID)
-
-    func willDisplayCards(_ cards: [NewTabPageNextStepsCardsClient.CardID])
-}
 
 extension HomePage.Models.ContinueSetUpModel: NewTabPageNextStepsCardsProviding {
     var isViewExpanded: Bool {
@@ -117,3 +101,4 @@ extension NewTabPageNextStepsCardsClient.CardID {
         }
     }
 }
+
