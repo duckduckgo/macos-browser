@@ -18,6 +18,7 @@
 
 import Combine
 import Common
+import NewTabPage
 import RemoteMessaging
 import UserScript
 

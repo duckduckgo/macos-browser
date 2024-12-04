@@ -20,13 +20,14 @@ import Foundation
 import WebKit
 import BrowserServicesKit
 import UserScript
+import WebKitExtensions
 
-final class NewTabPageUserContentController: WKUserContentController {
+public final class NewTabPageUserContentController: WKUserContentController {
 
-    let newTabPageUserScriptProvider: NewTabPageUserScriptProvider
+    public let newTabPageUserScriptProvider: NewTabPageUserScriptProvider
 
     @MainActor
-    init(newTabPageUserScript: NewTabPageUserScript) {
+    public init(newTabPageUserScript: NewTabPageUserScript) {
         newTabPageUserScriptProvider = NewTabPageUserScriptProvider(newTabPageUserScript: newTabPageUserScript)
 
         super.init()
@@ -49,18 +50,18 @@ final class NewTabPageUserContentController: WKUserContentController {
 }
 
 @MainActor
-final class NewTabPageUserScriptProvider: UserScriptsProvider {
-    lazy var userScripts: [UserScript] = [specialPagesUserScript]
+public final class NewTabPageUserScriptProvider: UserScriptsProvider {
+    public lazy var userScripts: [UserScript] = [specialPagesUserScript]
 
-    let specialPagesUserScript: SpecialPagesUserScript
+    public let specialPagesUserScript: SpecialPagesUserScript
 
-    init(newTabPageUserScript: NewTabPageUserScript) {
+    public init(newTabPageUserScript: NewTabPageUserScript) {
         specialPagesUserScript = SpecialPagesUserScript()
         specialPagesUserScript.registerSubfeature(delegate: newTabPageUserScript)
     }
 
     @MainActor
-    func loadWKUserScripts() async -> [WKUserScript] {
+    public func loadWKUserScripts() async -> [WKUserScript] {
         return await withTaskGroup(of: WKUserScriptBox.self) { @MainActor group in
             var wkUserScripts = [WKUserScript]()
             userScripts.forEach { userScript in
@@ -75,19 +76,4 @@ final class NewTabPageUserScriptProvider: UserScriptsProvider {
             return wkUserScripts
         }
     }
-}
-
-extension WKWebViewConfiguration {
-
-    @MainActor
-    func applyNewTabPageWebViewConfiguration(with featureFlagger: FeatureFlagger, newTabPageUserScript: NewTabPageUserScript) {
-        if urlSchemeHandler(forURLScheme: URL.NavigationalScheme.duck.rawValue) == nil {
-            setURLSchemeHandler(
-                DuckURLSchemeHandler(featureFlagger: featureFlagger, isNTPSpecialPageSupported: true),
-                forURLScheme: URL.NavigationalScheme.duck.rawValue
-            )
-        }
-        preferences[.developerExtrasEnabled] = true
-        self.userContentController = NewTabPageUserContentController(newTabPageUserScript: newTabPageUserScript)
-     }
 }

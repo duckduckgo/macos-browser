@@ -18,6 +18,7 @@
 
 import Combine
 import os.log
+import NewTabPage
 import Persistence
 import PrivacyStats
 

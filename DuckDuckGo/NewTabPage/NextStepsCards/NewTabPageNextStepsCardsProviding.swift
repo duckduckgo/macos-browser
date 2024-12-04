@@ -18,8 +18,9 @@
 
 import Common
 import Combine
-import UserScript
+import NewTabPage
 import PixelKit
+import UserScript
 
 protocol NewTabPageNextStepsCardsProviding: AnyObject {
     var isViewExpanded: Bool { get set }

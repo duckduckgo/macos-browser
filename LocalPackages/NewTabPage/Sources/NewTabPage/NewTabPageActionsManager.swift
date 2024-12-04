@@ -18,9 +18,6 @@
 
 import Foundation
 import Combine
-import PixelKit
-import PrivacyStats
-import RemoteMessaging
 import Common
 import os.log
 
@@ -34,7 +31,7 @@ import os.log
  *
  * Objects implementing this protocol are added to `NewTabPageActionsManager`.
  */
-protocol NewTabPageScriptClient: AnyObject {
+public protocol NewTabPageScriptClient: AnyObject {
     /**
      * Handle to the object that returns the list of all living `NewTabPageUserScript` instances.
      */
@@ -46,7 +43,7 @@ protocol NewTabPageScriptClient: AnyObject {
     func registerMessageHandlers(for userScript: SubfeatureWithExternalMessageHandling)
 }
 
-extension NewTabPageScriptClient {
+public extension NewTabPageScriptClient {
     /**
      * Convenience method to push a message with specific parameters to all user scripts
      * currently registered with `userScriptsSource`.
@@ -66,14 +63,14 @@ extension NewTabPageScriptClient {
  *
  * It's conformed to by `NewTabPageActionsManager` (via `NewTabPageActionsManaging`).
  */
-protocol NewTabPageUserScriptsSource: AnyObject {
+public protocol NewTabPageUserScriptsSource: AnyObject {
     var userScripts: [NewTabPageUserScript] { get }
 }
 
 /**
  * This protocol describes the API of `NewTabPageActionsManager`.
  */
-protocol NewTabPageActionsManaging: AnyObject, NewTabPageUserScriptsSource {
+public protocol NewTabPageActionsManaging: AnyObject, NewTabPageUserScriptsSource {
     func registerUserScript(_ userScript: NewTabPageUserScript)
 }
 
@@ -85,7 +82,7 @@ protocol NewTabPageActionsManaging: AnyObject, NewTabPageUserScriptsSource {
  * of NTP data sources, this class keeps track of all living NTP user scripts and makes sure
  * script clients' message handlers are registered with all user scripts.
  */
-final class NewTabPageActionsManager: NewTabPageActionsManaging, NewTabPageUserScriptsSource {
+public final class NewTabPageActionsManager: NewTabPageActionsManaging, NewTabPageUserScriptsSource {
 
     private let newTabPageScriptClients: [NewTabPageScriptClient]
 
@@ -95,7 +92,7 @@ final class NewTabPageActionsManager: NewTabPageActionsManaging, NewTabPageUserS
      */
     private let userScriptsHandles = NSHashTable<NewTabPageUserScript>.weakObjects()
 
-    var userScripts: [NewTabPageUserScript] {
+    public var userScripts: [NewTabPageUserScript] {
         userScriptsHandles.allObjects
     }
 
@@ -103,43 +100,13 @@ final class NewTabPageActionsManager: NewTabPageActionsManaging, NewTabPageUserS
      * Records user script reference internally and register all clients' message handlers
      * with the user script.
      */
-    func registerUserScript(_ userScript: NewTabPageUserScript) {
+    public func registerUserScript(_ userScript: NewTabPageUserScript) {
         userScriptsHandles.add(userScript)
         newTabPageScriptClients.forEach { $0.registerMessageHandlers(for: userScript) }
     }
 
-    init(scriptClients: [NewTabPageScriptClient]) {
+    public init(scriptClients: [NewTabPageScriptClient]) {
         newTabPageScriptClients = scriptClients
         newTabPageScriptClients.forEach { $0.userScriptsSource = self }
-    }
-}
-
-extension NewTabPageActionsManager {
-
-    convenience init(
-        appearancePreferences: AppearancePreferences,
-        activeRemoteMessageModel: ActiveRemoteMessageModel,
-        privacyStats: PrivacyStatsCollecting,
-        openURLHandler: @escaping (URL) -> Void
-    ) {
-        let privacyStatsModel = NewTabPagePrivacyStatsModel(
-            privacyStats: privacyStats,
-            trackerDataProvider: PrivacyStatsTrackerDataProvider(contentBlocking: ContentBlocking.shared)
-        )
-
-        self.init(scriptClients: [
-            NewTabPageConfigurationClient(appearancePreferences: appearancePreferences),
-            NewTabPageRMFClient(remoteMessageProvider: activeRemoteMessageModel, openURLHandler: openURLHandler),
-            NewTabPageNextStepsCardsClient(model: HomePage.Models.ContinueSetUpModel(tabOpener: NewTabPageTabOpener())),
-            NewTabPageFavoritesClient(favoritesModel: NewTabPageFavoritesModel()),
-            NewTabPagePrivacyStatsClient(model: privacyStatsModel)
-        ])
-    }
-}
-
-struct NewTabPageTabOpener: ContinueSetUpModelTabOpening {
-    @MainActor
-    func openTab(_ tab: Tab) {
-        WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel.insertOrAppend(tab: tab, selected: true)
     }
 }

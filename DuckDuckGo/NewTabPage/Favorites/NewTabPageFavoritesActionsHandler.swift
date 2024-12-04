@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import NewTabPage
 
 protocol FavoritesActionsHandling {
     @MainActor func open(_ url: URL, target: NewTabPageFavoritesModel.OpenTarget)

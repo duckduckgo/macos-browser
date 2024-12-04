@@ -21,7 +21,7 @@ import WebKit
 import UserScript
 
 @MainActor
-extension WKUserContentController {
+public extension WKUserContentController {
 
     func addHandler(_ userScript: UserScript) {
         for messageName in userScript.messageNames {

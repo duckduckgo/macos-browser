@@ -18,6 +18,7 @@
 
 import Combine
 import Foundation
+import NewTabPage
 import Persistence
 
 protocol NewTabPageFavoritesSettingsPersistor: AnyObject {

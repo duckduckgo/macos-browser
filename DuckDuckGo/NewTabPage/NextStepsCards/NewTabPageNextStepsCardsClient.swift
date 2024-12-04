@@ -18,6 +18,7 @@
 
 import Common
 import Combine
+import NewTabPage
 import UserScript
 
 final class NewTabPageNextStepsCardsClient: NewTabPageScriptClient {

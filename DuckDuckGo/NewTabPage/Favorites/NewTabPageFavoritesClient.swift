@@ -19,6 +19,7 @@
 import Bookmarks
 import Common
 import Combine
+import NewTabPage
 import UserScript
 
 final class NewTabPageFavoritesClient: NewTabPageScriptClient {

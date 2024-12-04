@@ -19,6 +19,7 @@
 import Combine
 import Common
 import os.log
+import NewTabPage
 import UserScript
 
 final class NewTabPagePrivacyStatsClient: NewTabPageScriptClient {

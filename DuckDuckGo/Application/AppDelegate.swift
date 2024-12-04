@@ -29,6 +29,7 @@ import FeatureFlags
 import History
 import MetricKit
 import Networking
+import NewTabPage
 import Persistence
 import PixelKit
 import ServiceManagement

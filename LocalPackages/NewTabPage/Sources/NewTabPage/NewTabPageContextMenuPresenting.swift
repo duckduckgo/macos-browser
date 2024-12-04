@@ -18,14 +18,16 @@
 
 import AppKit
 
-protocol NewTabPageContextMenuPresenting {
+public protocol NewTabPageContextMenuPresenting {
     func showContextMenu(_ menu: NSMenu)
 }
 
-struct DefaultNewTabPageContextMenuPresenter: NewTabPageContextMenuPresenting {
-    func showContextMenu(_ menu: NSMenu) {
+public struct DefaultNewTabPageContextMenuPresenter: NewTabPageContextMenuPresenting {
+    public func showContextMenu(_ menu: NSMenu) {
         if !menu.items.isEmpty {
             menu.popUp(positioning: nil, at: NSEvent.mouseLocation, in: nil)
         }
     }
+
+    public init() {}
 }

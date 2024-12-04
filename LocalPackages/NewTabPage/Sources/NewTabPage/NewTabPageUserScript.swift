@@ -30,16 +30,16 @@ import WebKit
  * registered as handlers to handle feature-specific messages, e.g. a separate object
  * responsible for RMF, favorites, privacy stats, etc.
  */
-protocol SubfeatureWithExternalMessageHandling: AnyObject, Subfeature {
+public protocol SubfeatureWithExternalMessageHandling: AnyObject, Subfeature {
     var webView: WKWebView? { get }
     func registerMessageHandlers(_ handlers: [String: Subfeature.Handler])
 }
 
-final class NewTabPageUserScript: NSObject, SubfeatureWithExternalMessageHandling {
+public final class NewTabPageUserScript: NSObject, SubfeatureWithExternalMessageHandling {
 
-    var messageOriginPolicy: MessageOriginPolicy = .only(rules: [.exact(hostname: "newtab")])
-    let featureName: String = "newTabPage"
-    weak var broker: UserScriptMessageBroker?
+    public var messageOriginPolicy: MessageOriginPolicy = .only(rules: [.exact(hostname: "newtab")])
+    public let featureName: String = "newTabPage"
+    public weak var broker: UserScriptMessageBroker?
 
     public func with(broker: UserScriptMessageBroker) {
         self.broker = broker
@@ -47,20 +47,20 @@ final class NewTabPageUserScript: NSObject, SubfeatureWithExternalMessageHandlin
 
     // MARK: - Message Handling
 
-    typealias MessageName = String
+    public typealias MessageName = String
 
-    weak var webView: WKWebView?
+    public weak var webView: WKWebView?
     private var messageHandlers: [MessageName: Handler] = [:]
 
-    func registerMessageHandlers(_ handlers: [MessageName: Subfeature.Handler]) {
+    public func registerMessageHandlers(_ handlers: [MessageName: Subfeature.Handler]) {
         messageHandlers.merge(handlers, uniquingKeysWith: { $1 })
     }
 
-    func handler(forMethodNamed methodName: MessageName) -> Handler? {
+    public func handler(forMethodNamed methodName: MessageName) -> Handler? {
         messageHandlers[methodName]
     }
 
-    func pushMessage(named method: String, params: Encodable?, using script: NewTabPageUserScript) {
+    public func pushMessage(named method: String, params: Encodable?, using script: NewTabPageUserScript) {
         guard let webView = script.webView else {
             return
         }
@@ -68,24 +68,33 @@ final class NewTabPageUserScript: NSObject, SubfeatureWithExternalMessageHandlin
     }
 }
 
-extension NewTabPageUserScript {
+public extension NewTabPageUserScript {
 
-    struct WidgetConfig: Codable {
-        let animation: Animation?
-        let expansion: Expansion
+    public struct WidgetConfig: Codable {
+        public let animation: Animation?
+        public let expansion: Expansion
 
-        enum Expansion: String, Codable {
+        public init(animation: Animation?, expansion: Expansion) {
+            self.animation = animation
+            self.expansion = expansion
+        }
+
+        public enum Expansion: String, Codable {
             case collapsed, expanded
         }
 
-        struct Animation: Codable, Equatable {
-            let kind: AnimationKind
+        public struct Animation: Codable, Equatable {
+            public let kind: AnimationKind
 
-            static let none = Animation(kind: .none)
-            static let viewTransitions = Animation(kind: .viewTransitions)
-            static let auto = Animation(kind: .auto)
+            public init(kind: AnimationKind) {
+                self.kind = kind
+            }
 
-            enum AnimationKind: String, Codable {
+            public static let none = Animation(kind: .none)
+            public static let viewTransitions = Animation(kind: .viewTransitions)
+            public static let auto = Animation(kind: .auto)
+
+            public enum AnimationKind: String, Codable {
                 case none
                 case viewTransitions = "view-transitions"
                 case auto = "auto-animate"
