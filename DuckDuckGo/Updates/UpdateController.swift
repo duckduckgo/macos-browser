@@ -101,9 +101,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
             if oldValue != areAutomaticUpdatesEnabled {
                 userDriver?.cancelAndDismissCurrentUpdate()
                 try? configureUpdater()
-#if !DEBUG
                 checkForUpdateIfNeeded()
-#endif
             }
         }
     }
@@ -132,12 +130,6 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         super.init()
 
         try? configureUpdater()
-
-#if DEBUG
-        updater?.automaticallyChecksForUpdates = false
-        updater?.automaticallyDownloadsUpdates = false
-        updater?.updateCheckInterval = 0
-#endif
     }
 
     func checkNewApplicationVersion() {
