@@ -166,19 +166,24 @@ struct MapperToModel {
     }
 
     func mapToModel(_ brokerDB: BrokerDB) throws -> DataBroker {
-        let decodedBroker = try jsonDecoder.decode(DataBroker.self, from: brokerDB.json)
+        do {
+            let decodedBroker = try jsonDecoder.decode(DataBroker.self, from: brokerDB.json)
 
-        return DataBroker(
-            id: brokerDB.id,
-            name: decodedBroker.name,
-            url: decodedBroker.url,
-            steps: decodedBroker.steps,
-            version: decodedBroker.version,
-            schedulingConfig: decodedBroker.schedulingConfig,
-            parent: decodedBroker.parent,
-            mirrorSites: decodedBroker.mirrorSites,
-            optOutUrl: decodedBroker.optOutUrl
-        )
+            return DataBroker(
+                id: brokerDB.id,
+                name: decodedBroker.name,
+                url: decodedBroker.url,
+                steps: decodedBroker.steps,
+                version: decodedBroker.version,
+                schedulingConfig: decodedBroker.schedulingConfig,
+                parent: decodedBroker.parent,
+                mirrorSites: decodedBroker.mirrorSites,
+                optOutUrl: decodedBroker.optOutUrl
+            )
+        } catch {
+            testableAssertionFailure("Failed to decode stored broker JSON: \(error.localizedDescription)")
+            throw error
+        }
     }
 
     func mapToModel(_ profileQueryDB: ProfileQueryDB) throws -> ProfileQuery {

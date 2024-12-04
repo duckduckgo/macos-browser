@@ -25,6 +25,13 @@ struct DataBrokerScheduleConfig: Codable {
     let confirmOptOutScan: Int
     let maintenanceScan: Int
     let maxAttempts: Int
+
+    struct Defaults {
+        static let retryError = 48
+        static let confirmOptOutScan = 72
+        static let maintenanceScan = 120
+        static let maxAttempts = -1
+    }
 }
 
 extension Int {
@@ -174,12 +181,17 @@ public struct DataBroker: Codable, Sendable {
 
         version = try container.decode(String.self, forKey: .version)
         steps = try container.decode([Step].self, forKey: .steps)
-        // Hotfix for https://app.asana.com/0/1203581873609357/1208895331283089/f
+
+        // Fallback for older versions of the JSON file not having a maxAttempts property.
         do {
             schedulingConfig = try container.decode(DataBrokerScheduleConfig.self, forKey: .schedulingConfig)
         } catch {
-            schedulingConfig = .init(retryError: 48, confirmOptOutScan: 72, maintenanceScan: 120, maxAttempts: -1)
+            schedulingConfig = .init(retryError: DataBrokerScheduleConfig.Defaults.retryError,
+                                     confirmOptOutScan: DataBrokerScheduleConfig.Defaults.confirmOptOutScan,
+                                     maintenanceScan: DataBrokerScheduleConfig.Defaults.maintenanceScan,
+                                     maxAttempts: DataBrokerScheduleConfig.Defaults.maxAttempts)
         }
+
         parent = try? container.decode(String.self, forKey: .parent)
 
         do {
