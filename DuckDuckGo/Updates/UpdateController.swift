@@ -42,7 +42,8 @@ protocol UpdateControllerProtocol: AnyObject {
 
     var lastUpdateCheckDate: Date? { get }
 
-    func checkForUpdateIfNeeded()
+    func checkForUpdateRespectingRollout()
+    func checkForUpdateSkippingRollout()
     func runUpdate()
 
     var areAutomaticUpdatesEnabled: Bool { get set }
@@ -101,7 +102,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
             if oldValue != areAutomaticUpdatesEnabled {
                 userDriver?.cancelAndDismissCurrentUpdate()
                 try? configureUpdater()
-                checkForUpdateIfNeeded()
+                checkForUpdateSkippingRollout()
             }
         }
     }
@@ -130,6 +131,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         super.init()
 
         try? configureUpdater()
+        checkForUpdateRespectingRollout()
     }
 
     func checkNewApplicationVersion() {
@@ -143,10 +145,18 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         }
     }
 
-    func checkForUpdateIfNeeded() {
+    func checkForUpdateRespectingRollout() {
         guard let updater, !updater.sessionInProgress else { return }
 
-        Logger.updates.log("Checking for updates")
+        Logger.updates.log("Checking for updates respecting rollout")
+
+        updater.checkForUpdatesInBackground()
+    }
+
+    func checkForUpdateSkippingRollout() {
+        guard let updater, !updater.sessionInProgress else { return }
+
+        Logger.updates.log("Checking for updates skipping rollout")
 
         updater.checkForUpdates()
     }
@@ -266,10 +276,10 @@ extension UpdateController: SPUUpdaterDelegate {
     func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {
         if error == nil {
             Logger.updates.log("Updater did finish update cycle")
-            updateProgress = .updateCycleDone
         } else {
             Logger.updates.log("Updater did finish update cycle with error")
         }
+        updateProgress = .updateCycleDone
     }
 
 }
