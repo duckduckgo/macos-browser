@@ -23,17 +23,21 @@ import Configuration
 import Persistence
 import PixelKit
 
-final class ConfigurationStore: ConfigurationStoring {
+private extension Configuration {
+    var fileName: String {
+        switch self {
+        case .bloomFilterBinary: "smarterEncryption.bin"
+        case .bloomFilterExcludedDomains: "smarterEncryptionExclusions.json"
+        case .bloomFilterSpec: "smarterEncryptionSpec.json"
+        case .surrogates: "surrogates.txt"
+        case .privacyConfiguration: "macos-config.json"
+        case .trackerDataSet: "tracker-radar.json"
+        case .remoteMessagingConfig: "remote-messaging-config.json"
+        }
+    }
+}
 
-    private static let fileLocations: [Configuration: String] = [
-        .bloomFilterBinary: "smarterEncryption.bin",
-        .bloomFilterExcludedDomains: "smarterEncryptionExclusions.json",
-        .bloomFilterSpec: "smarterEncryptionSpec.json",
-        .surrogates: "surrogates.txt",
-        .privacyConfiguration: "macos-config.json",
-        .trackerDataSet: "tracker-radar.json",
-        .remoteMessagingConfig: "remote-messaging-config.json"
-    ]
+final class ConfigurationStore: ConfigurationStoring {
 
     private enum Etag {
         static let configStorageTrackerRadarEtag = "config.storage.trackerradar.etag"
@@ -200,29 +204,9 @@ final class ConfigurationStore: ConfigurationStoring {
         Logger.config.info("remoteMessagingConfig \(self.remoteMessagingConfigEtag ?? "", privacy: .public)")
     }
 
-    func fileUrl(for config: Configuration) -> URL {
-        let fm = FileManager.default
-
-        guard let dir = fm.containerURL(forSecurityApplicationGroupIdentifier: Bundle.main.appGroup(bundle: .appConfiguration)) else {
-            fatalError("Failed to get application group URL")
-        }
-        let subDir = dir.appendingPathComponent("Configuration")
-
-        var isDir: ObjCBool = false
-        if !fm.fileExists(atPath: subDir.path, isDirectory: &isDir) {
-            do {
-                try fm.createDirectory(at: subDir, withIntermediateDirectories: true, attributes: nil)
-                isDir = true
-            } catch {
-                fatalError("Failed to create directory at \(subDir.path)")
-            }
-        }
-
-        if !isDir.boolValue {
-            fatalError("Configuration folder at \(subDir.path) is not a directory")
-        }
-
-        return subDir.appendingPathComponent(Self.fileLocations[config]!)
+    func fileUrl(for configuration: Configuration) -> URL {
+        let dir = FileManager.default.configurationDirectory()
+        return dir.appendingPathComponent(configuration.fileName)
     }
 
 }

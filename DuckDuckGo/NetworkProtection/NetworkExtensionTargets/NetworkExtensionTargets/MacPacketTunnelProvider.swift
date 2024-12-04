@@ -390,11 +390,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 NetworkProtectionPixelEvent.networkProtectionTunnelStartAttemptOnDemandWithoutAccessToken,
                 frequency: .legacyDailyAndCount,
                 includeAppVersionParameter: true)
-        case .malformedErrorDetected(let error):
-            PixelKit.fire(
-                NetworkProtectionPixelEvent.networkProtectionMalformedErrorDetected(error),
-                frequency: .legacyDailyAndCount,
-                includeAppVersionParameter: true)
         }
     }
 

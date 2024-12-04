@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1732540137973,
+    "version": 1733132819168,
     "features": {
         "adAttributionReporting": {
             "state": "disabled",
@@ -5866,6 +5866,15 @@
             "state": "disabled",
             "hash": "728493ef7a1488e4781656d3f9db84aa"
         },
+        "maliciousSiteProtection": {
+            "state": "internal",
+            "exceptions": [],
+            "settings": {
+                "hashPrefixUpdateFrequency": 20,
+                "filterSetUpdateFrequency": 720
+            },
+            "hash": "ca9942379aea7619f878337a2debdee8"
+        },
         "marketplaceAdPostback": {
             "state": "disabled",
             "exceptions": [],
@@ -6028,23 +6037,7 @@
         },
         "phishingDetection": {
             "state": "internal",
-            "exceptions": [
-                {
-                    "domain": "marvel.com"
-                },
-                {
-                    "domain": "sundancecatalog.com"
-                },
-                {
-                    "domain": "noaprints.com"
-                },
-                {
-                    "domain": "flexmls.com"
-                },
-                {
-                    "domain": "instructure.com"
-                }
-            ],
+            "exceptions": [],
             "features": {
                 "allowErrorPage": {
                     "state": "internal"
@@ -6053,7 +6046,7 @@
                     "state": "internal"
                 }
             },
-            "hash": "9a9143022e6cc8976461b337abfa81a1"
+            "hash": "178cd0cce43d63354abbb438773c910d"
         },
         "pluginPointFocusedViewPlugin": {
             "state": "disabled",

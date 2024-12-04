@@ -20,17 +20,18 @@ import Foundation
 import Onboarding
 
 class CapturingOnboardingNavigationDelegate: OnboardingNavigationDelegate {
+
     var didCallSearchFor = false
     var didNavigateToCalled = false
     var capturedQuery = ""
     var capturedUrlString = ""
 
-    func searchFor(_ query: String) {
+    func searchFromOnboarding(for query: String) {
         didCallSearchFor = true
         capturedQuery = query
     }
 
-    func navigateTo(url: URL) {
+    func navigateFromOnboarding(to url: URL) {
         didNavigateToCalled = true
         capturedUrlString = url.absoluteString
     }
