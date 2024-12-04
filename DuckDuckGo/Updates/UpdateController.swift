@@ -65,13 +65,20 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     struct UpdateCheckResult {
         let item: SUAppcastItem
         let isInstalled: Bool
+        let needsLatestReleaseNote: Bool
+
+        init(item: SUAppcastItem, isInstalled: Bool, needsLatestReleaseNote: Bool = false) {
+            self.item = item
+            self.isInstalled = isInstalled
+            self.needsLatestReleaseNote = needsLatestReleaseNote
+        }
     }
     private var cachedUpdateResult: UpdateCheckResult?
 
     @Published private(set) var updateProgress = UpdateCycleProgress.default {
         didSet {
             if let cachedUpdateResult {
-                latestUpdate = Update(appcastItem: cachedUpdateResult.item, isInstalled: cachedUpdateResult.isInstalled)
+                latestUpdate = Update(appcastItem: cachedUpdateResult.item, isInstalled: cachedUpdateResult.isInstalled, needsLatestReleaseNote: cachedUpdateResult.needsLatestReleaseNote)
                 hasPendingUpdate = latestUpdate?.isInstalled == false && updateProgress.isDone && userDriver?.isResumable == true
                 needsNotificationDot = hasPendingUpdate
             }
@@ -252,12 +259,18 @@ extension UpdateController: SPUUpdaterDelegate {
 
     func updaterDidNotFindUpdate(_ updater: SPUUpdater, error: any Error) {
         let nsError = error as NSError
-        guard let item = nsError.userInfo["SULatestAppcastItemFound"] as? SUAppcastItem else { return }
+        guard let item = nsError.userInfo[SPULatestAppcastItemFoundKey] as? SUAppcastItem else { return }
 
         Logger.updates.log("Updater did not find update: \(String(describing: item.displayVersionString))(\(String(describing: item.versionString)))")
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidNotFindUpdate, error: error))
 
-        cachedUpdateResult = UpdateCheckResult(item: item, isInstalled: true)
+        // Edge case: User upgrades to latest version within their rollout group
+        // But fetched release notes are outdated due to rollout group reset
+        let needsLatestReleaseNote = {
+            guard let reason = nsError.userInfo[SPUNoUpdateFoundReasonKey] as? Int else { return false }
+            return reason == Int(Sparkle.SPUNoUpdateFoundReason.onNewerThanLatestVersion.rawValue)
+        }()
+        cachedUpdateResult = UpdateCheckResult(item: item, isInstalled: true, needsLatestReleaseNote: needsLatestReleaseNote)
     }
 
     func updater(_ updater: SPUUpdater, didDownloadUpdate item: SUAppcastItem) {
@@ -276,10 +289,13 @@ extension UpdateController: SPUUpdaterDelegate {
     func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {
         if error == nil {
             Logger.updates.log("Updater did finish update cycle")
+            updateProgress = .updateCycleDone
+        } else if let errorCode = (error as? NSError)?.code, errorCode == Int(Sparkle.SUError.noUpdateError.rawValue) {
+            Logger.updates.log("Updater did finish update cycle with no update found")
+            updateProgress = .updateCycleDone
         } else {
             Logger.updates.log("Updater did finish update cycle with error")
         }
-        updateProgress = .updateCycleDone
     }
 
 }

@@ -102,6 +102,15 @@ final class ReleaseNotesTabExtension: NavigationResponder {
             }
             .store(in: &cancellables)
     }
+
+    @MainActor
+    func navigationDidFinish(_ navigation: Navigation) {
+        guard NSApp.runType != .uiTests, navigation.url == .releaseNotes else { return }
+        let updateController = Application.appDelegate.updateController!
+        if updateController.latestUpdate?.needsLatestReleaseNote == true {
+            updateController.checkForUpdateSkippingRollout()
+        }
+    }
 }
 
 protocol ReleaseNotesTabExtensionProtocol: AnyObject, NavigationResponder {}
