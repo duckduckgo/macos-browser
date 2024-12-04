@@ -159,6 +159,11 @@ extension URL {
     var isSettingsURL: Bool {
         isChild(of: .settings) && (pathComponents.isEmpty || PreferencePaneIdentifier(url: self) != nil)
     }
+
+    var isErrorURL: Bool {
+        return navigationalScheme == .duck && host == URL.error.host
+    }
+
 #endif
 
     enum Invalid {

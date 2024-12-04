@@ -93,7 +93,7 @@ class PrivacyDashboardIntegrationTests: XCTestCase {
 
         let isPhishingPromise = tab.privacyInfoPublisher
             .compactMap {
-                $0?.$isPhishing
+                $0?.$malicousSiteThreatKind
             }
             .map { _ in true }
             .timeout(10)
