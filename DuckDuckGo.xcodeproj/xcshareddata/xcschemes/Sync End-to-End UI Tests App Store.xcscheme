@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "3706FA6A293F65D500E42796"
-               BuildableName = "DuckDuckGo App Store.app"
+               BuildableName = ".app"
                BlueprintName = "DuckDuckGo Privacy Browser App Store"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
@@ -38,7 +38,7 @@
                   <BuildableReference
                      BuildableIdentifier = "primary"
                      BlueprintIdentifier = "4B1AD89C25FC27E200261379"
-                     BuildableName = "Integration Tests.xctest"
+                     BuildableName = ".xctest"
                      BlueprintName = "Integration Tests"
                      ReferencedContainer = "container:DuckDuckGo.xcodeproj">
                   </BuildableReference>
@@ -61,7 +61,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "376113C82B29CD5B00E794BB"
-               BuildableName = "SyncE2EUITests App Store.xctest"
+               BuildableName = ".xctest"
                BlueprintName = "SyncE2EUITests App Store"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
@@ -84,7 +84,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "3706FA6A293F65D500E42796"
-            BuildableName = "DuckDuckGo App Store.app"
+            BuildableName = ".app"
             BlueprintName = "DuckDuckGo Privacy Browser App Store"
             ReferencedContainer = "container:DuckDuckGo.xcodeproj">
          </BuildableReference>
@@ -122,7 +122,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "3706FA6A293F65D500E42796"
-            BuildableName = "DuckDuckGo App Store.app"
+            BuildableName = ".app"
             BlueprintName = "DuckDuckGo Privacy Browser App Store"
             ReferencedContainer = "container:DuckDuckGo.xcodeproj">
          </BuildableReference>

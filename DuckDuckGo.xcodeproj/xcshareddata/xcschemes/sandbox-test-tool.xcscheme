@@ -16,7 +16,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "B6E6B9F22BA1FD90008AA7E1"
-               BuildableName = "sandbox-test-tool.app"
+               BuildableName = ".app"
                BlueprintName = "sandbox-test-tool"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
@@ -46,7 +46,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B6E6B9F22BA1FD90008AA7E1"
-            BuildableName = "sandbox-test-tool.app"
+            BuildableName = ".app"
             BlueprintName = "sandbox-test-tool"
             ReferencedContainer = "container:DuckDuckGo.xcodeproj">
          </BuildableReference>
@@ -63,7 +63,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B6E6B9F22BA1FD90008AA7E1"
-            BuildableName = "sandbox-test-tool.app"
+            BuildableName = ".app"
             BlueprintName = "sandbox-test-tool"
             ReferencedContainer = "container:DuckDuckGo.xcodeproj">
          </BuildableReference>

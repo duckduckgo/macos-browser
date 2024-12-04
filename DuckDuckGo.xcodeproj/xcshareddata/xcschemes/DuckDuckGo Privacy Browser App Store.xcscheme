@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "3706FA6A293F65D500E42796"
-               BuildableName = "DuckDuckGo App Store.app"
+               BuildableName = ".app"
                BlueprintName = "DuckDuckGo Privacy Browser App Store"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
@@ -29,7 +29,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "3706FDD3293F661700E42796"
-               BuildableName = "Unit Tests App Store.xctest"
+               BuildableName = ".xctest"
                BlueprintName = "Unit Tests App Store"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
@@ -43,7 +43,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "3706FE9B293F662100E42796"
-               BuildableName = "Integration Tests App Store.xctest"
+               BuildableName = ".xctest"
                BlueprintName = "Integration Tests App Store"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
@@ -66,7 +66,7 @@
                   <BuildableReference
                      BuildableIdentifier = "primary"
                      BlueprintIdentifier = "3706FA6A293F65D500E42796"
-                     BuildableName = "DuckDuckGo App Store.app"
+                     BuildableName = ".app"
                      BlueprintName = "DuckDuckGo Privacy Browser App Store"
                      ReferencedContainer = "container:DuckDuckGo.xcodeproj">
                   </BuildableReference>
@@ -89,7 +89,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "3706FDD3293F661700E42796"
-               BuildableName = "Unit Tests App Store.xctest"
+               BuildableName = ".xctest"
                BlueprintName = "Unit Tests App Store"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
@@ -131,7 +131,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "3706FE9B293F662100E42796"
-               BuildableName = "Integration Tests App Store.xctest"
+               BuildableName = ".xctest"
                BlueprintName = "Integration Tests App Store"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
@@ -220,7 +220,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "3706FA6A293F65D500E42796"
-            BuildableName = "DuckDuckGo App Store.app"
+            BuildableName = ".app"
             BlueprintName = "DuckDuckGo Privacy Browser App Store"
             ReferencedContainer = "container:DuckDuckGo.xcodeproj">
          </BuildableReference>
@@ -246,7 +246,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "3706FA6A293F65D500E42796"
-            BuildableName = "DuckDuckGo App Store.app"
+            BuildableName = ".app"
             BlueprintName = "DuckDuckGo Privacy Browser App Store"
             ReferencedContainer = "container:DuckDuckGo.xcodeproj">
          </BuildableReference>

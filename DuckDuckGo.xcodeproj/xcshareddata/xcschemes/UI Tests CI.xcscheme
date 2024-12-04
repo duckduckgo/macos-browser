@@ -21,7 +21,7 @@
                   <BuildableReference
                      BuildableIdentifier = "primary"
                      BlueprintIdentifier = "7B4CE8D926F02108009134B1"
-                     BuildableName = "UI Tests.xctest"
+                     BuildableName = ".xctest"
                      BlueprintName = "UI Tests"
                      ReferencedContainer = "container:DuckDuckGo.xcodeproj">
                   </BuildableReference>
@@ -50,7 +50,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "7B4CE8D926F02108009134B1"
-               BuildableName = "UI Tests.xctest"
+               BuildableName = ".xctest"
                BlueprintName = "UI Tests"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
@@ -77,7 +77,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "AA585D7D248FD31100E9A3E2"
-            BuildableName = "DuckDuckGo.app"
+            BuildableName = ".app"
             BlueprintName = "DuckDuckGo Privacy Browser"
             ReferencedContainer = "container:DuckDuckGo.xcodeproj">
          </BuildableReference>

@@ -19,7 +19,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "565E46DC2B2725DC0013AC2A"
-               BuildableName = "SyncE2EUITests.xctest"
+               BuildableName = ".xctest"
                BlueprintName = "SyncE2EUITests"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
