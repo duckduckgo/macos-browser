@@ -39,28 +39,33 @@ struct ClickAction: Action {
 
     enum Default: Codable {
         case null
-        case array([PageElement])
+        case elements([PageElement])
 
         // Custom decoding to handle the different cases
         init(from decoder: Decoder) throws {
-            let container = try decoder.singleValueContainer()
-            if container.decodeNil() {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            if container.allKeys.isEmpty {
                 self = .null
             } else {
-                let array = try container.decode([PageElement].self)
-                self = .array(array)
+                let elements = try container.decode([PageElement].self, forKey: .elements)
+                self = .elements(elements)
             }
         }
 
         // Custom encoding to handle the different cases
         func encode(to encoder: Encoder) throws {
-            var container = encoder.singleValueContainer()
+            var container = encoder.container(keyedBy: CodingKeys.self)
             switch self {
             case .null:
-                try container.encodeNil()
-            case .array(let array):
-                try container.encode(array)
+                // Encode an empty object to represent null
+                break
+            case .elements(let elements):
+                try container.encode(elements, forKey: .elements)
             }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case elements
         }
     }
 
