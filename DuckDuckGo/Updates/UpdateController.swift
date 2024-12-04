@@ -137,8 +137,6 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         updater?.automaticallyChecksForUpdates = false
         updater?.automaticallyDownloadsUpdates = false
         updater?.updateCheckInterval = 0
-#else
-        updater?.checkForUpdatesInBackground()
 #endif
     }
 
