@@ -31,9 +31,9 @@ extension SiteTroubleshootingView {
         private(set) var connectionStatus: ConnectionStatus = .disconnected
 
         @Published
-        private var internalSiteInfo: SiteTroubleshootingInfo?
+        private var internalSiteInfo: ActiveSiteInfo?
 
-        var siteInfo: SiteTroubleshootingInfo? {
+        var siteInfo: ActiveSiteInfo? {
             guard case .connected = connectionStatus else {
                 return nil
             }
@@ -45,19 +45,21 @@ extension SiteTroubleshootingView {
         private let pixelKit: PixelFiring?
         private var cancellables = Set<AnyCancellable>()
 
-        public init(connectionStatusPublisher: AnyPublisher<ConnectionStatus, Never>,
-                    siteTroubleshootingInfoPublisher: AnyPublisher<SiteTroubleshootingInfo?, Never>,
+        public init(connectionStatusPublisher: CurrentValuePublisher<ConnectionStatus, Never>,
+                    activeSitePublisher: CurrentValuePublisher<ActiveSiteInfo?, Never>,
                     uiActionHandler: VPNUIActionHandling,
                     pixelKit: PixelFiring? = PixelKit.shared) {
 
+            connectionStatus = connectionStatusPublisher.value
             self.uiActionHandler = uiActionHandler
             self.pixelKit = pixelKit
+            internalSiteInfo = activeSitePublisher.value
 
             subscribeToConnectionStatusChanges(connectionStatusPublisher)
-            subscribeToSiteTroubleshootingInfoChanges(siteTroubleshootingInfoPublisher)
+            subscribeToActiveSiteInfoChanges(activeSitePublisher)
         }
 
-        private func subscribeToConnectionStatusChanges(_ publisher: AnyPublisher<ConnectionStatus, Never>) {
+        private func subscribeToConnectionStatusChanges(_ publisher: CurrentValuePublisher<ConnectionStatus, Never>) {
 
             publisher
                 .receive(on: DispatchQueue.main)
@@ -65,7 +67,7 @@ extension SiteTroubleshootingView {
                 .store(in: &cancellables)
         }
 
-        private func subscribeToSiteTroubleshootingInfoChanges(_ publisher: AnyPublisher<SiteTroubleshootingInfo?, Never>) {
+        private func subscribeToActiveSiteInfoChanges(_ publisher: CurrentValuePublisher<ActiveSiteInfo?, Never>) {
 
             publisher
                 .receive(on: DispatchQueue.main)

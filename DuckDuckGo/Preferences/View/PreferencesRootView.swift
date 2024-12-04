@@ -101,7 +101,7 @@ enum Preferences {
                                 searchModel: SearchPreferences.shared,
                                 tabsModel: TabsPreferences.shared,
                                 dataClearingModel: DataClearingPreferences.shared,
-                                phishingDetectionModel: PhishingDetectionPreferences.shared,
+                                phishingDetectionModel: MaliciousSiteProtectionPreferences.shared,
                                 dockCustomizer: DockCustomizer())
                 case .sync:
                     SyncView()
@@ -201,7 +201,8 @@ enum Preferences {
             return PreferencesSubscriptionModel(openURLHandler: openURL,
                                                 userEventHandler: handleUIEvent,
                                                 sheetActionHandler: sheetActionHandler,
-                                                subscriptionManager: subscriptionManager)
+                                                subscriptionManager: subscriptionManager,
+                                                featureFlagger: NSApp.delegateTyped.featureFlagger)
         }
     }
 }

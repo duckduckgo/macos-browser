@@ -314,6 +314,10 @@ enum GeneralPixel: PixelKitEventV2 {
     case contentBlockingCompilationFailed(listType: CompileRulesListType, component: ContentBlockerDebugEvents.Component)
 
     case contentBlockingCompilationTime
+    case contentBlockingLookupRulesSucceeded
+    case contentBlockingFetchLRCSucceeded
+    case contentBlockingNoMatchInLRC
+    case contentBlockingLRCMissing
 
     case secureVaultInitError(error: Error)
     case secureVaultError(error: Error)
@@ -458,6 +462,9 @@ enum GeneralPixel: PixelKitEventV2 {
     case pageRefreshThreeTimesWithin20Seconds
     case siteNotWorkingShown
     case siteNotWorkingWebsiteIsBroken
+
+    // Privacy Stats
+    case privacyStatsCouldNotLoadDatabase
 
     var name: String {
         switch self {
@@ -930,6 +937,15 @@ enum GeneralPixel: PixelKitEventV2 {
         case .contentBlockingCompilationTime:
             return "content_blocking_compilation_time"
 
+        case .contentBlockingLookupRulesSucceeded:
+            return "content_blocking_lookup_rules_succeeded"
+        case .contentBlockingFetchLRCSucceeded:
+            return "content_blocking_fetch_lrc_succeeded"
+        case .contentBlockingNoMatchInLRC:
+            return "content_blocking_no_match_in_lrc"
+        case .contentBlockingLRCMissing:
+            return "content_blocking_lrc_missing"
+
         case .secureVaultInitError:
             return "secure_vault_init_error"
         case .secureVaultError:
@@ -1125,6 +1141,8 @@ enum GeneralPixel: PixelKitEventV2 {
         case .siteNotWorkingShown: return "m_mac_site-not-working_shown"
         case .siteNotWorkingWebsiteIsBroken: return "m_mac_site-not-working_website-is-broken"
 
+            // Privacy Stats
+        case .privacyStatsCouldNotLoadDatabase: return "privacy_stats_could_not_load_database"
         }
     }
 

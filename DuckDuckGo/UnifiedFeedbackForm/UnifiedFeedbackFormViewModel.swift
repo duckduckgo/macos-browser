@@ -49,7 +49,6 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
 
     enum Error: String, Swift.Error {
         case missingAccessToken
-        case invalidRequest
         case invalidResponse
     }
 
@@ -157,8 +156,9 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
     private let feedbackSender: any UnifiedFeedbackSender
 
     let source: UnifiedFeedbackSource
+    private(set) var availableCategories: [UnifiedFeedbackCategory] = [.selectFeature, .subscription]
 
-    init(accountManager: any AccountManager,
+    init(subscriptionManager: any SubscriptionManager,
          apiService: any Networking.APIService,
          vpnMetadataCollector: any UnifiedMetadataCollector,
          defaultMetadataCollector: any UnifiedMetadataCollector = EmptyMetadataCollector(),
@@ -166,12 +166,26 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
          source: UnifiedFeedbackSource = .default) {
         self.viewState = .feedbackPending
 
-        self.accountManager = accountManager
+        self.accountManager = subscriptionManager.accountManager
         self.apiService = apiService
         self.vpnMetadataCollector = vpnMetadataCollector
         self.defaultMetadataCollector = defaultMetadataCollector
         self.feedbackSender = feedbackSender
         self.source = source
+
+        Task {
+            let features = await subscriptionManager.currentSubscriptionFeatures()
+
+            if features.contains(.networkProtection) {
+                availableCategories.append(.vpn)
+            }
+            if features.contains(.dataBrokerProtection) {
+                availableCategories.append(.pir)
+            }
+            if features.contains(.identityTheftRestoration) || features.contains(.identityTheftRestorationGlobal) {
+                availableCategories.append(.itr)
+            }
+        }
     }
 
     @MainActor
@@ -279,9 +293,7 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
                               problemSubCategory: selectedSubcategory,
                               customMetadata: metadata?.toString() ?? "")
         let headers = APIRequestV2.HeadersV2(additionalHeaders: [HTTPHeaderKey.authorization: "Bearer \(accessToken)"])
-        guard let request = APIRequestV2(url: Self.feedbackEndpoint, method: .post, headers: headers, body: payload.toData()) else {
-            throw Error.invalidRequest
-        }
+        let request = APIRequestV2(url: Self.feedbackEndpoint, method: .post, headers: headers, body: payload.toData())
 
         let response: Response = try await apiService.fetch(request: request).decodeBody()
         if let error = response.error, !error.isEmpty {

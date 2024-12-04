@@ -137,7 +137,8 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private let privacyConfigurationManager = VPNPrivacyConfigurationManager(internalUserDecider: DefaultInternalUserDecider(store: UserDefaults.appConfiguration))
     private lazy var featureFlagger = DefaultFeatureFlagger(
         internalUserDecider: privacyConfigurationManager.internalUserDecider,
-        privacyConfigManager: privacyConfigurationManager)
+        privacyConfigManager: privacyConfigurationManager,
+        experimentManager: nil)
 
     public init(accountManager: AccountManager,
                 accessTokenStorage: SubscriptionTokenKeychainStorage,
@@ -374,6 +375,10 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         configurationManager.start()
         // Load cached config (if any)
         privacyConfigurationManager.reload(etag: configurationStore.loadEtag(for: .privacyConfiguration), data: configurationStore.loadData(for: .privacyConfiguration))
+
+        // It's important for this to be set-up after the privacy configuration is loaded
+        // as it relies on it for the remote feature flag.
+        TipKitAppEventHandler(featureFlagger: featureFlagger).appDidFinishLaunching()
 
         setupMenuVisibility()
 

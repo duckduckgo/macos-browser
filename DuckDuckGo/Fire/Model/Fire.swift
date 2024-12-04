@@ -24,6 +24,7 @@ import PrivacyDashboard
 import WebKit
 import SecureStorage
 import History
+import PrivacyStats
 import os.log
 
 final class Fire {
@@ -46,6 +47,7 @@ final class Fire {
     let secureVaultFactory: AutofillVaultFactory
     let tld: TLD
     let getVisitedLinkStore: () -> WKVisitedLinkStoreWrapper?
+    let getPrivacyStats: () async -> PrivacyStatsCollecting
 
     private var dispatchGroup: DispatchGroup?
 
@@ -104,6 +106,7 @@ final class Fire {
          syncService: DDGSyncing? = nil,
          syncDataProviders: SyncDataProviders? = nil,
          secureVaultFactory: AutofillVaultFactory = AutofillSecureVaultFactory,
+         getPrivacyStats: (() async -> PrivacyStatsCollecting)? = nil,
          getVisitedLinkStore: (() -> WKVisitedLinkStoreWrapper?)? = nil
     ) {
         self.webCacheManager = cacheManager
@@ -120,6 +123,7 @@ final class Fire {
         self.syncDataProviders = syncDataProviders ?? NSApp.delegateTyped.syncDataProviders
         self.secureVaultFactory = secureVaultFactory
         self.tld = tld
+        self.getPrivacyStats = getPrivacyStats ?? { NSApp.delegateTyped.privacyStats }
         self.getVisitedLinkStore = getVisitedLinkStore ?? { WKWebViewConfiguration.sharedVisitedLinkStore }
         self.autoconsentManagement = autoconsentManagement ?? AutoconsentManagement.shared
         if let stateRestorationManager = stateRestorationManager {
@@ -213,6 +217,7 @@ final class Fire {
             self.burnTabs(burningEntity: .allWindows(mainWindowControllers: windowControllers, selectedDomains: Set())) {
                 Task { @MainActor in
                     await self.burnWebCache()
+                    await self.burnPrivacyStats()
                     self.burnAllVisitedLinks()
                     self.burnAllHistory {
                         self.burnPermissions {
@@ -381,6 +386,12 @@ final class Fire {
 
     private func burnAllHistory(completion: @escaping () -> Void) {
         historyCoordinating.burnAll(completion: completion)
+    }
+
+    // MARK: - Privacy Stats
+
+    private func burnPrivacyStats() async {
+        await getPrivacyStats().clearPrivacyStats()
     }
 
     // MARK: - Visited links

@@ -27,6 +27,9 @@ public struct SiteTroubleshootingView: View {
     @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var model: Model
 
+    @EnvironmentObject
+    private var tipsModel: VPNTipsModel
+
     // MARK: - View Contents
 
     public var body: some View {
@@ -38,7 +41,7 @@ public struct SiteTroubleshootingView: View {
     }
 
     @ViewBuilder
-    private func siteTroubleshootingView(_ siteInfo: SiteTroubleshootingInfo) -> some View {
+    private func siteTroubleshootingView(_ siteInfo: ActiveSiteInfo) -> some View {
         Divider()
             .padding(EdgeInsets(top: 5, leading: 9, bottom: 5, trailing: 9))
 
@@ -51,6 +54,10 @@ public struct SiteTroubleshootingView: View {
             Toggle(isOn: Binding(get: {
                 siteInfo.excluded
             }, set: { value in
+                if #available(macOS 14.0, *) {
+                    tipsModel.handleSiteExcluded()
+                }
+
                 model.setExclusion(value, forDomain: siteInfo.domain)
             })) {
                 HStack(spacing: 5) {
