@@ -17,6 +17,7 @@
 //
 
 import Combine
+import NewTabPage
 import RemoteMessaging
 import TestUtils
 import XCTest

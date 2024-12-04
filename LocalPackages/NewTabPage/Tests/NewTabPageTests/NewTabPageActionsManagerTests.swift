@@ -17,7 +17,7 @@
 //
 
 import XCTest
-@testable import DuckDuckGo_Privacy_Browser
+@testable import NewTabPage
 
 final class MockNewTabPageScriptClient: NewTabPageScriptClient {
     var userScriptsSource: NewTabPageUserScriptsSource?

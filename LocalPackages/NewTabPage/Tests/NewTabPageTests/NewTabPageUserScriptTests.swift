@@ -18,7 +18,7 @@
 
 import WebKit
 import XCTest
-@testable import DuckDuckGo_Privacy_Browser
+@testable import NewTabPage
 
 final class NewTabPageUserScriptTests: XCTestCase {
 

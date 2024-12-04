@@ -17,6 +17,7 @@
 //
 
 import Combine
+import NewTabPage
 import RemoteMessaging
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser

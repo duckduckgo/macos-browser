@@ -48,5 +48,11 @@ let package = Package(
                 .define("DEBUG", .when(configuration: .debug))
             ]
         ),
+        .testTarget(
+            name: "NewTabPageTests",
+            dependencies: [
+                "NewTabPage",
+            ]
+        ),
     ]
 )

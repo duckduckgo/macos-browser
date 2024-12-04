@@ -19,7 +19,7 @@
 import Combine
 import TestUtils
 import XCTest
-@testable import DuckDuckGo_Privacy_Browser
+@testable import NewTabPage
 
 final class CapturingNewTabPageNextStepsCardsProvider: NewTabPageNextStepsCardsProviding {
 

@@ -17,6 +17,7 @@
 //
 
 import Combine
+import NewTabPage
 import PrivacyStats
 import TestUtils
 import TrackerRadarKit
