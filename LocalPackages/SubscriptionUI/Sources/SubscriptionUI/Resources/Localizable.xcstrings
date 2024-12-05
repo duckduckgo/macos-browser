@@ -247,30 +247,6 @@
         }
       }
     },
-    "subscription.billing.period.monthly" : {
-      "comment" : "Type of subscription billing period that lasts a month",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Monthly"
-          }
-        }
-      }
-    },
-    "subscription.billing.period.yearly" : {
-      "comment" : "Type of subscription billing period that lasts a year",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Yearly"
-          }
-        }
-      }
-    },
     "subscription.dialog.change.apple.description" : {
       "comment" : "Change plan or billing dialog subtitle description for subscription purchased via Apple",
       "extractionState" : "extracted_with_value",
@@ -655,26 +631,74 @@
         }
       }
     },
-    "subscription.preferences.subscription.active.expire.caption" : {
-      "comment" : "Caption for the subscription preferences pane when the subscription is active but will expire. First parameter is renewal period (monthly/yearly). Second parameter is date.",
+    "subscription.preferences.subscription.active.expiring.monthly.caption" : {
+      "comment" : "Caption for the subscription preferences pane when the monthly subscription is active and will expire, the parameter is date of expiry.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Your %1$@ Privacy Pro subscription expires on %2$@."
+            "value" : "Your monthly subscription expires on %@."
           }
         }
       }
     },
-    "subscription.preferences.subscription.active.renew.caption" : {
-      "comment" : "Caption for the subscription preferences pane when the subscription is active and will renew. First parameter is renewal period (monthly/yearly). Second parameter is date.",
+    "subscription.preferences.subscription.active.expiring.unknown.caption" : {
+      "comment" : "Caption for the subscription preferences pane when the subscription is active and will expire, the parameter is date of expiry.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Your %1$@ Privacy Pro subscription renews on %2$@."
+            "value" : "Your subscription expires on %@."
+          }
+        }
+      }
+    },
+    "subscription.preferences.subscription.active.expiring.yearly.caption" : {
+      "comment" : "Caption for the subscription preferences pane when the annual subscription is active and will expire, the parameter is date of expiry.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your annual subscription expires on %@."
+          }
+        }
+      }
+    },
+    "subscription.preferences.subscription.active.renewing.monthly.caption" : {
+      "comment" : "Caption for the subscription preferences pane when the monthly subscription is active and will renew, the parameter is date of renewal.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your monthly subscription renews on %@."
+          }
+        }
+      }
+    },
+    "subscription.preferences.subscription.active.renewing.unknown.caption" : {
+      "comment" : "Caption for the subscription preferences pane when the subscription is active and will renew, the parameter is date of renewal.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your subscription renews on %@."
+          }
+        }
+      }
+    },
+    "subscription.preferences.subscription.active.renewing.yearly.caption" : {
+      "comment" : "Caption for the subscription preferences pane when the annual subscription is active and will renew, the parameter is date of renewal.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your annual subscription renews on %@."
           }
         }
       }

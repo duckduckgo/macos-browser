@@ -55,23 +55,58 @@ enum UserText {
     static let preferencesSubscriptionFeedbackCaption = NSLocalizedString("subscription.preferences.feedback.caption", bundle: Bundle.module, value: "Help improve Privacy Pro. Your feedback matters to us. Feel free to report any issues or provide general feedback.", comment: "Caption for the subscription feedback section")
     static let preferencesSubscriptionFeedbackButton = NSLocalizedString("subscription.preferences.feedback.button", bundle: Bundle.module, value: "Send Feedback", comment: "Title for the subscription feedback button")
 
-    static func preferencesSubscriptionActiveRenewCaption(period: String, formattedDate: String) -> String {
-        let localized = NSLocalizedString("subscription.preferences.subscription.active.renew.caption", bundle: Bundle.module, value: "Your %@ Privacy Pro subscription renews on %@.", comment: "Caption for the subscription preferences pane when the subscription is active and will renew. First parameter is renewal period (monthly/yearly). Second parameter is date.")
-        return String(format: localized, period, formattedDate)
+    static func preferencesSubscriptionRenewingCaption(billingPeriod: Subscription.BillingPeriod, formattedDate: String) -> String {
+        let localized: String
+
+        switch billingPeriod {
+        case .monthly:
+            localized = NSLocalizedString("subscription.preferences.subscription.active.renewing.monthly.caption",
+                                          bundle: Bundle.module,
+                                          value: "Your monthly subscription renews on %@.",
+                                          comment: "Caption for the subscription preferences pane when the monthly subscription is active and will renew, the parameter is date of renewal.")
+        case .yearly:
+            localized = NSLocalizedString("subscription.preferences.subscription.active.renewing.yearly.caption",
+                                          bundle: Bundle.module,
+                                          value: "Your annual subscription renews on %@.",
+                                          comment: "Caption for the subscription preferences pane when the annual subscription is active and will renew, the parameter is date of renewal.")
+        case .unknown:
+            localized = NSLocalizedString("subscription.preferences.subscription.active.renewing.unknown.caption",
+                                          bundle: Bundle.module,
+                                          value: "Your subscription renews on %@.",
+                                          comment: "Caption for the subscription preferences pane when the subscription is active and will renew, the parameter is date of renewal.")
+        }
+
+        return String(format: localized, formattedDate)
     }
 
-    static func preferencesSubscriptionActiveExpireCaption(period: String, formattedDate: String) -> String {
-        let localized = NSLocalizedString("subscription.preferences.subscription.active.expire.caption", bundle: Bundle.module, value: "Your %@ Privacy Pro subscription expires on %@.", comment: "Caption for the subscription preferences pane when the subscription is active but will expire. First parameter is renewal period (monthly/yearly). Second parameter is date.")
-        return String(format: localized, period, formattedDate)
+    static func preferencesSubscriptionExpiringCaption(billingPeriod: Subscription.BillingPeriod, formattedDate: String) -> String {
+        let localized: String
+
+        switch billingPeriod {
+        case .monthly:
+            localized = NSLocalizedString("subscription.preferences.subscription.active.expiring.monthly.caption",
+                                          bundle: Bundle.module,
+                                          value: "Your monthly subscription expires on %@.",
+                                          comment: "Caption for the subscription preferences pane when the monthly subscription is active and will expire, the parameter is date of expiry.")
+        case .yearly:
+            localized = NSLocalizedString("subscription.preferences.subscription.active.expiring.yearly.caption",
+                                          bundle: Bundle.module,
+                                          value: "Your annual subscription expires on %@.",
+                                          comment: "Caption for the subscription preferences pane when the annual subscription is active and will expire, the parameter is date of expiry.")
+        case .unknown:
+            localized = NSLocalizedString("subscription.preferences.subscription.active.expiring.unknown.caption",
+                                          bundle: Bundle.module,
+                                          value: "Your subscription expires on %@.",
+                                          comment: "Caption for the subscription preferences pane when the subscription is active and will expire, the parameter is date of expiry.")
+        }
+
+        return String(format: localized, formattedDate)
     }
 
     static func preferencesSubscriptionExpiredCaption(formattedDate: String) -> String {
         let localized = NSLocalizedString("subscription.preferences.subscription.expired.caption", bundle: Bundle.module, value: "Your Privacy Pro subscription expired on %@", comment: "Caption for the subscription preferences pane when the subscription has expired. The parameter is date of expiry.")
         return String(format: localized, formattedDate)
     }
-
-    static let monthlySubscriptionBillingPeriod = NSLocalizedString("subscription.billing.period.monthly", bundle: Bundle.module, value: "Monthly", comment: "Type of subscription billing period that lasts a month")
-    static let yearlySubscriptionBillingPeriod = NSLocalizedString("subscription.billing.period.yearly", bundle: Bundle.module, value: "Yearly", comment: "Type of subscription billing period that lasts a year")
 
     static let manageSubscriptionButton = NSLocalizedString("subscription.preferences.manage.subscription.button", bundle: Bundle.module, value: "Manage Subscription", comment: "Button to manage subscription")
     static let updatePlanOrCancelButton = NSLocalizedString("subscription.preferences.update.plan.or.cancel.button", bundle: Bundle.module, value: "Update Plan or Cancel", comment: "Button to update subscription plan or cancel")
